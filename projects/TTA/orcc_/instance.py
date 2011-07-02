@@ -36,28 +36,16 @@ import subprocess
 import shutil
 
 class Instance:
-    name = ""
-    # Ports
-    inputs = []
-    outputs = []
-    # Useful filenames
-    _adfFile = ""
-    _idfFile = ""
-    _llFile = ""
-    _tpefFile = ""
-    _asmFile = ""
-    _bemFile = ""
-    _mifFile = ""
-    _mifDataFile = ""
-    _romFile = ""
-    _ramFile = ""
-    # Useful names
-    _entity = ""
 
     def __init__(self, name, inputs, outputs):
         self.name = name
+        # Ports
         self.inputs = inputs
         self.outputs = outputs
+        # Memories
+        self.rom = None
+        self.ram = None
+        # Useful filenames
         self._adfFile = "processor_" + self.name + ".adf"
         self._idfFile = "processor_" + self.name + ".idf"
         self._llFile = self.name + ".ll"
@@ -66,9 +54,10 @@ class Instance:
         self._bemFile = self.name + ".bem"
         self._mifFile = self.name + ".mif"
         self._mifDataFile = self.name + "_data" + ".mif"
-        self._entity = "processor_" + self.name + "_tl"
         self._romFile = "irom_" + self.name + ".vhd"
         self._ramFile = "dram_" + self.name + ".vhd"
+        # Useful names
+        self._entity = "processor_" + self.name + "_tl"
 
     def compile(self, srcPath):
         instancePath = os.path.join(srcPath, self.name)

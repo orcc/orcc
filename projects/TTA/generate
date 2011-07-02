@@ -3,10 +3,10 @@
 #
 # Copyright (c) 2011, IRISA
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 #   * Redistributions of source code must retain the above copyright notice,
 #     this list of conditions and the following disclaimer.
 #   * Redistributions in binary form must reproduce the above copyright notice,
@@ -15,7 +15,7 @@
 #   * Neither the name of IRISA nor the names of its
 #     contributors may be used to endorse or promote products derived from this
 #     software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -37,90 +37,90 @@ import getopt
 from orcc_ import *
 
 def main():
-	try:
-		opts, args = getopt.getopt(sys.argv[1:], "hcsgx:v", ["help", "verbose", "compile", "simulate", "generate"])
-	except getopt.GetoptError, err:
-		print str(err)
-		usage()
-		sys.exit(2)
-		
-	for o, a in opts:
-		if o in ("-v", "--verbose"):
-			verbose = True
-		elif o in ("-h", "--help"):
-			usage()
-			sys.exit()
-			
-	for o, a in opts:
-		if o in ("-c", "--compile"):
-			compile()
-			
-	for o, a in opts:
-		if o in ("-s", "--simulate"):
-			# simulate()
-			print "Simulation is currently break."
-	
-	for o, a in opts:
-		if o in ("-g", "--generate"):
-			generate()
-	
-	
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "hcsgx:v", ["help", "verbose", "compile", "simulate", "generate"])
+    except getopt.GetoptError, err:
+        print str(err)
+        usage()
+        sys.exit(2)
+
+    for o, a in opts:
+        if o in ("-v", "--verbose"):
+            verbose = True
+        elif o in ("-h", "--help"):
+            usage()
+            sys.exit()
+
+    for o, a in opts:
+        if o in ("-c", "--compile"):
+            compile()
+
+    for o, a in opts:
+        if o in ("-s", "--simulate"):
+            # simulate()
+            print "Simulation is currently break."
+
+    for o, a in opts:
+        if o in ("-g", "--generate"):
+            generate()
+
+
 def usage():
-	print "Open RVC-CAL Compiler - TTA backend"
-	print "generate - Software/Hardware Generator for Transport Trigger Architecture"
-	print "Usage: generate [options]"
-	print ""
-	print "Options:"
-	print "-c, --compile  \t Compile the application from the generated LLVM assembly code into TTA binary"
-	print "-g, --generate \t Generate the VHDL files of the TTA processors"
-	print "-s, --simulate \t (BROKEN) Simulate the generated code with the TCE simulator"
-	
+    print "Open RVC-CAL Compiler - TTA backend"
+    print "generate - Software/Hardware Generator for Transport Trigger Architecture"
+    print "Usage: generate [options]"
+    print ""
+    print "Options:"
+    print "-c, --compile  \t Compile the application from the generated LLVM assembly code into TTA binary"
+    print "-g, --generate \t Generate the VHDL files of the TTA processors"
+    print "-s, --simulate \t (BROKEN) Simulate the generated code with the TCE simulator"
+
 
 
 def compile():
-	start = time.time()
-	
-	print "*********************************************************************"
-	print "* Compile the application for TTA"
-	print "*********************************************************************"
+    start = time.time()
 
-	for instance in instances:
-		print ">> Instance " + instance.name + "."
-		instance.compile(srcPath)
+    print "*********************************************************************"
+    print "* Compile the application for TTA"
+    print "*********************************************************************"
 
-	print "* Compilation of %d instances done in %f seconds." % (len(instances), time.time() - start)
+    for instance in instances:
+        print ">> Instance " + instance.name + "."
+        instance.compile(srcPath)
+
+    print "* Compilation of %d instances done in %f seconds." % (len(instances), time.time() - start)
 
 
 def simulate():
-	start = time.time()
+    start = time.time()
 
-	print "*********************************************************************"
-	print "* Simulate the execution of the application on  each TTA"
-	print "*********************************************************************"
+    print "*********************************************************************"
+    print "* Simulate the execution of the application on  each TTA"
+    print "*********************************************************************"
 
-	for instance in instances:
-		print ">> Instance " + instance.name + "."
-		instance.simulate(srcPath)
+    for instance in instances:
+        print ">> Instance " + instance.name + "."
+        instance.simulate(srcPath)
 
-	print "* Simulation of %d instances done in %f seconds." % (len(instances), time.time() - start)
-	
+    print "* Simulation of %d instances done in %f seconds." % (len(instances), time.time() - start)
+
 
 def generate():
-	start = time.time()
-	
-	print "*********************************************************************"
-	print "* Generate the TTA processors"
-	print "*********************************************************************"
+    start = time.time()
 
-	for instance in instances:
-		print ">> Instance " + instance.name + "."
-		instance.generate(srcPath, buildPath, libPath)
+    print "*********************************************************************"
+    print "* Generate the TTA processors"
+    print "*********************************************************************"
 
-	print "* Generation of %d instances done in %f seconds." % (len(instances), time.time() - start)
+    for instance in instances:
+        print ">> Instance " + instance.name + "."
+        instance.generate(srcPath, buildPath, libPath)
+
+    print "* Generation of %d instances done in %f seconds." % (len(instances), time.time() - start)
 
 
 # Get useful path
-pathname = os.path.dirname(sys.argv[0])        
+pathname = os.path.dirname(sys.argv[0])
 scriptPath = os.path.abspath(pathname)
 srcPath = os.path.join(scriptPath, "generated")
 buildPath = os.path.join(scriptPath, "build-generated")
