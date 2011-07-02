@@ -37,7 +37,7 @@ import subprocess
 class Instance:
     name = ""
     # Ports
-    inputs = []
+    inputs 	= []
     outputs = []
     # Useful filenames
     _adfFile = ""
@@ -46,6 +46,7 @@ class Instance:
     _tpefFile = ""
     _asmFile = ""
     _bemFile = ""
+    _mifFile = ""
     # Useful names
     _entity = ""
 
@@ -59,26 +60,32 @@ class Instance:
         self._tpefFile = self.name + ".tpef"
         self._asmFile = self.name + ".tceasm"
         self._bemFile = self.name + ".bem"
+        self._mifFile = self.name + ".mif"
         self._entity = "processor_" + self.name + "_tl"
-
 
     def compile(self, srcPath):
         instancePath = os.path.join(srcPath, self.name)
         os.chdir(instancePath)
         retcode = subprocess.call(["tcecc", "-o", self._tpefFile, "-a", self._adfFile, self._llFile])
         if retcode >= 0: retcode = subprocess.call(["tcedisasm", "-n", "-o", self._asmFile, self._adfFile, self._tpefFile])
+        if retcode >= 0: retcode = subprocess.call(["createbem", "-o", self._bemFile, self._adfFile])
+        if retcode >= 0: retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", "images", "-f", "mif", "-o", "mif", self._adfFile])
 
     def generate(self, srcPath, buildPath, libPath):
         srcPath = os.path.join(srcPath, self.name)
         sharePath = os.path.join(buildPath, "share")
         buildPath = os.path.join(buildPath, self.name)
         os.chdir(srcPath)
-        retcode = subprocess.call(["createbem", "-o", self._bemFile, self._adfFile])
-        if retcode >= 0: retcode = subprocess.call(["cp", "-f", os.path.join(libPath, "fifo", "many_streams.hdb"), srcPath])
+        # Copy libraries in working directory
+        retcode = subprocess.call(["cp", "-f", os.path.join(libPath, "fifo", "many_streams.hdb"), srcPath])
         if retcode >= 0: retcode = subprocess.call(["cp", "-Rf", os.path.join(libPath, "fifo", "vhdl"), srcPath])
+        # Remove existing build directory
         if retcode >= 0: retcode = subprocess.call(["rm", "-rf", buildPath])
+        # Generate the processor in build directory
         if retcode >= 0: retcode = subprocess.call(["generateprocessor", "-o", buildPath, "-b", self._bemFile, "--shared-files-dir", sharePath, 
                                         "-l", "vhdl", "-e", self._entity, "-i", self._idfFile, self._adfFile])
+        if retcode >= 0: retcode = subprocess.call(["cp", "-f", self._mifFile, buildPath])
+        # Clean working directory
         if retcode >= 0: retcode = subprocess.call(["rm", "-f", "many_streams.hdb"])
         if retcode >= 0: retcode = subprocess.call(["rm", "-rf", os.path.join(srcPath, "vhdl")])
 
