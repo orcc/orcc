@@ -62,6 +62,7 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class LLVMTemplateData {
 
+	
 	/**
 	 * Medata container of actions of MoCs
 	 */
@@ -139,6 +140,7 @@ public class LLVMTemplateData {
 	private Map<Var, Integer> vars;
 
 	public LLVMTemplateData(Actor actor) {
+		
 		nodeToLabelMap = new HashMap<Node, Integer>();
 		castedListReferences = new HashMap<Var, Var>();
 
@@ -227,7 +229,7 @@ public class LLVMTemplateData {
 		computePattern(sdfmoc.getInputPattern());
 		computePattern(sdfmoc.getOutputPattern());
 	}
-
+	
 	private void computeMetadataMaps(Actor actor) {
 		// Insert source file info
 		names.put(actor.getFile().getFullPath(), id++);

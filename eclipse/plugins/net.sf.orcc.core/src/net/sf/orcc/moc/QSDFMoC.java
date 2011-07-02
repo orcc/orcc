@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.moc;
 
+import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.ir.Action;
@@ -55,6 +56,13 @@ public interface QSDFMoC extends MoC {
 	Set<Action> getActions();
 
 	/**
+	 * Returns the configurations of the QSDF MoC.
+	 * 
+	 * @return a map of Action and the associated SDF MoC
+	 */
+	Map<Action, SDFMoC> getConfigurations();
+
+	/**
 	 * Returns the SDF MoC that is associated with the configuration given by
 	 * the action.
 	 * 
@@ -63,7 +71,7 @@ public interface QSDFMoC extends MoC {
 	 * @return a SDF MoC
 	 */
 	SDFMoC getSDFMoC(Action action);
-
+	
 	/**
 	 * Sets the SDF MoC that is associated with the configuration given by the
 	 * action.

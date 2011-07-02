@@ -53,6 +53,11 @@ public class QSDFMoCImpl extends MoCImpl implements QSDFMoC {
 	}
 
 	@Override
+	public Map<Action, SDFMoC> getConfigurations(){
+		return configurations;
+	}
+
+	@Override
 	public SDFMoC getSDFMoC(Action action) {
 		return configurations.get(action);
 	}
@@ -66,7 +71,7 @@ public class QSDFMoCImpl extends MoCImpl implements QSDFMoC {
 	public void setSDFMoC(Action action, SDFMoC moc) {
 		configurations.put(action, moc);
 	}
-
+	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

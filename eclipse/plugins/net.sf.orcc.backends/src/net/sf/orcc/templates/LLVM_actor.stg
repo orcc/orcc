@@ -380,7 +380,7 @@ MoC_CSDF_MD(actor, csdf) ::= <<
 
 MoC_Configuration_MD(actor, configuration) ::= <<
 <MoC_Configuration_decl_MD(actor, configuration)> = metadata !{metadata <action_decl_MD(actor, configuration)>, metadata <MoC_CSDF_decl_MD(actor, actor.MoC.configurations.(configuration))>}
-	
+
 <MoC_CSDF_MD(actor=actor, csdf=actor.MoC.configurations.(configuration))>
 >>
 
@@ -393,14 +393,14 @@ MoC_MD(actor)::= <<
 	if(actor.MoC.CSDF)
 		> , metadata <MoC_CSDF_decl_MD(actor, actor.MoC)> <
 	elseif(actor.MoC.quasiStatic)
-		>, <actor.MoC.configurations.keys: {configuration | metadata <MoC_Configuration_decl_MD(actor, configuration)>}; separator=", "
+		>, <actor.templateData.configurations.keys: {configuration | metadata <MoC_Configuration_decl_MD(actor, configuration)>}; separator=", "
 	><endif>
 }
 
 <if(actor.MoC.CSDF)>
 <MoC_CSDF_MD(actor, actor.MoC)>
 <elseif(actor.MoC.quasiStatic)>
-<actor.MoC.configurations.keys: {configuration | <MoC_Configuration_MD(actor, configuration)>}>
+<actor.templateData.configurations.keys: {configuration | <MoC_Configuration_MD(actor, configuration)>}>
 <endif>
 >>
 
