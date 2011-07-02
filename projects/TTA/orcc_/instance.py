@@ -33,11 +33,12 @@
 import os
 import commands
 import subprocess
+import shutil
 
 class Instance:
     name = ""
     # Ports
-    inputs 	= []
+    inputs = []
     outputs = []
     # Useful filenames
     _adfFile = ""
@@ -47,6 +48,7 @@ class Instance:
     _asmFile = ""
     _bemFile = ""
     _mifFile = ""
+    _mifDataFile = ""
     # Useful names
     _entity = ""
 
@@ -61,6 +63,7 @@ class Instance:
         self._asmFile = self.name + ".tceasm"
         self._bemFile = self.name + ".bem"
         self._mifFile = self.name + ".mif"
+        self._mifDataFile = self.name + "_data" + ".mif"
         self._entity = "processor_" + self.name + "_tl"
 
     def compile(self, srcPath):
@@ -77,17 +80,20 @@ class Instance:
         buildPath = os.path.join(buildPath, self.name)
         os.chdir(srcPath)
         # Copy libraries in working directory
-        retcode = subprocess.call(["cp", "-f", os.path.join(libPath, "fifo", "many_streams.hdb"), srcPath])
-        if retcode >= 0: retcode = subprocess.call(["cp", "-Rf", os.path.join(libPath, "fifo", "vhdl"), srcPath])
+        shutil.copy(os.path.join(libPath, "fifo", "many_streams.hdb"), srcPath)
+        shutil.rmtree("vhdl", ignore_errors=True)
+        shutil.copytree(os.path.join(libPath, "fifo", "vhdl"), "vhdl")
         # Remove existing build directory
-        if retcode >= 0: retcode = subprocess.call(["rm", "-rf", buildPath])
+        shutil.rmtree(buildPath)
         # Generate the processor in build directory
-        if retcode >= 0: retcode = subprocess.call(["generateprocessor", "-o", buildPath, "-b", self._bemFile, "--shared-files-dir", sharePath, 
+        subprocess.call(["generateprocessor", "-o", buildPath, "-b", self._bemFile, "--shared-files-dir", sharePath, 
                                         "-l", "vhdl", "-e", self._entity, "-i", self._idfFile, self._adfFile])
-        if retcode >= 0: retcode = subprocess.call(["cp", "-f", self._mifFile, buildPath])
+        # Copy memories to build directory
+        shutil.copy(self._mifFile, buildPath)
+        shutil.copy(self._mifDataFile, buildPath)
         # Clean working directory
-        if retcode >= 0: retcode = subprocess.call(["rm", "-f", "many_streams.hdb"])
-        if retcode >= 0: retcode = subprocess.call(["rm", "-rf", os.path.join(srcPath, "vhdl")])
+        os.remove("many_streams.hdb")
+        shutil.rmtree("vhdl", ignore_errors=True)
 
     def simulate(self, srcPath):
         instancePath = os.path.join(srcPath, self.name)
