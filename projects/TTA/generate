@@ -66,61 +66,61 @@ def main():
 	
 	
 def usage():
-	print 'Usage: generate [options]'
-	print ''
-	print 'Options:'
+	print "Usage: generate [options]"
+	print ""
+	print "Options:"
 	
 
 
 def compile():
 	start = time.time()
 	
-	print '*********************************************************************'
-	print '* Compile the application for TTA'
-	print '*********************************************************************'
+	print "*********************************************************************"
+	print "* Compile the application for TTA"
+	print "*********************************************************************"
 
 	for instance in instances:
-		print '>> Instance ' + instance.name + '.'
+		print ">> Instance " + instance.name + "."
 		instance.compile(srcPath)
 
-	print '* Compilation of %d instances done in %f seconds.' % (len(instances), time.time() - start)
+	print "* Compilation of %d instances done in %f seconds." % (len(instances), time.time() - start)
 
 
 def simulate():
 	start = time.time()
 
-	print '*********************************************************************'
-	print '* Simulate the execution of the application on  each TTA'
-	print '*********************************************************************'
+	print "*********************************************************************"
+	print "* Simulate the execution of the application on  each TTA"
+	print "*********************************************************************"
 
 	for instance in instances:
-		print '>> Instance ' + instance.name + '.'
+		print ">> Instance " + instance.name + "."
 		instance.simulate(srcPath)
 
-	print '* Simulation of %d instances done in %f seconds.' % (len(instances), time.time() - start)
+	print "* Simulation of %d instances done in %f seconds." % (len(instances), time.time() - start)
 	
 
 def generate():
 	start = time.time()
 	
-	print '*********************************************************************'
-	print '* Generate the TTA processors'
-	print '*********************************************************************'
+	print "*********************************************************************"
+	print "* Generate the TTA processors"
+	print "*********************************************************************"
 
 	for instance in instances:
-		print '>> Instance ' + instance.name + '.'
+		print ">> Instance " + instance.name + "."
 		instance.generate(srcPath, buildPath, libPath)
 
-	print '* Generation of %d instances done in %f seconds.' % (len(instances), time.time() - start)
+	print "* Generation of %d instances done in %f seconds." % (len(instances), time.time() - start)
 
 
 # Get useful path
 pathname = os.path.dirname(sys.argv[0])        
 scriptPath = os.path.abspath(pathname)
-srcPath = os.path.join(scriptPath, 'generated')
-buildPath = os.path.join(scriptPath, 'build-generated')
-pylibPath = os.path.join(scriptPath, 'orcc_')
+srcPath = os.path.join(scriptPath, "generated")
+buildPath = os.path.join(scriptPath, "build-generated")
 libPath = os.path.join(os.path.dirname(os.path.dirname(scriptPath)), "libraries", "TTA")
+pylibPath = os.path.join(libPath, "orcc_")
 
 # Add orcc_ to python path
 sys.path.append(pylibPath)

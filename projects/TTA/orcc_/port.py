@@ -31,7 +31,7 @@
 
 
 class Port:
-	name = ''
+	name = ""
 	index = 0
 	
 	def __init__(self, name, index):

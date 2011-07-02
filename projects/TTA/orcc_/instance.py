@@ -35,43 +35,43 @@ import commands
 import subprocess
 
 class Instance:
-    name = ''
+    name = ""
     # Ports
     inputs = []
     outputs = []
     # Useful filenames
-    _adfFile = ''
-    _idfFile = ''
-    _llFile = ''
-    _tpefFile = ''
-    _asmFile = ''
-    _bemFile = ''
+    _adfFile = ""
+    _idfFile = ""
+    _llFile = ""
+    _tpefFile = ""
+    _asmFile = ""
+    _bemFile = ""
     # Useful names
-    _entity = ''
+    _entity = ""
 
     def __init__(self, name, inputs, outputs):
         self.name = name
         self.inputs = inputs
         self.outputs = outputs
-        self._adfFile = 'processor_' + self.name + '.adf'
-        self._idfFile = 'processor_' + self.name + '.idf'
-        self._llFile = self.name + '.ll'
-        self._tpefFile = self.name + '.tpef'
-        self._asmFile = self.name + '.tceasm'
-        self._bemFile = self.name + '.bem'
-        self._entity = 'processor_' + self.name + '_tl'
+        self._adfFile = "processor_" + self.name + ".adf"
+        self._idfFile = "processor_" + self.name + ".idf"
+        self._llFile = self.name + ".ll"
+        self._tpefFile = self.name + ".tpef"
+        self._asmFile = self.name + ".tceasm"
+        self._bemFile = self.name + ".bem"
+        self._entity = "processor_" + self.name + "_tl"
 
 
     def compile(self, srcPath):
         instancePath = os.path.join(srcPath, self.name)
         os.chdir(instancePath)
 
-        status,output = commands.getstatusoutput('tcecc -o ' + self._tpefFile + ' -a ' + self._adfFile + ' ' + self._llFile)
+        status,output = commands.getstatusoutput("tcecc -o " + self._tpefFile + " -a " + self._adfFile + " " + self._llFile)
         if status != 0:
-            print '** ERROR **'
+            print "** ERROR **"
             print output
         else:
-            commands.getstatusoutput('tcedisasm -n -o ' + self._asmFile + ' ' + self._adfFile + ' ' + self._tpefFile)
+            commands.getstatusoutput("tcedisasm -n -o " + self._asmFile + " " + self._adfFile + " " + self._tpefFile)
 
     def generate(self, srcPath, buildPath, libPath):
 		srcPath = os.path.join(srcPath, self.name)
@@ -93,12 +93,12 @@ class Instance:
 
         # Copy trace to the instance folder
         for input in self.inputs:
-            srcTrace = srcPath + os.sep + 'trace' + os.sep + 'decoder_' + self.name + '_' + input.name + '.txt'
-            tgtTrace = instancePath + os.sep + 'tta_stream_v%d.in' % (input.index)
-            status,output = commands.getstatusoutput('cp ' + srcTrace + ' ' + tgtTrace)
+            srcTrace = srcPath + os.sep + "trace" + os.sep + "decoder_" + self.name + "_" + input.name + ".txt"
+            tgtTrace = instancePath + os.sep + "tta_stream_v%d.in" % (input.index)
+            status,output = commands.getstatusoutput("cp " + srcTrace + " " + tgtTrace)
             if status != 0:
                 print output
 
-        status,output = commands.getstatusoutput('ttasim --no-debugmode -q -a ' + self._adfFile + ' -p ' + self._tpefFile)
+        status,output = commands.getstatusoutput("ttasim --no-debugmode -q -a " + self._adfFile + " -p " + self._tpefFile)
         
 
