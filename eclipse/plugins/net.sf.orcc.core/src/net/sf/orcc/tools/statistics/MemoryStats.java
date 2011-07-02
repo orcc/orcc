@@ -28,10 +28,15 @@
  */
 package net.sf.orcc.tools.statistics;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
@@ -68,29 +73,52 @@ public class MemoryStats {
 		}
 	}
 
-	private Map<Actor, MemoryStatsElement> memoryStatsMap;
-
-	private void computeMemorySize(Actor actor, MemoryStatsElement statsElement) {
+	/**
+	 * Returns the memory size needed by the given actor in bits. This size
+	 * corresponds to the sum of state variable size plus the maximum of the sum
+	 * of local arrays per each action.
+	 * 
+	 * @param actor
+	 *            the given actor
+	 * @return the memory size needed by the given actor
+	 */
+	public static int computeNeededMemorySize(Actor actor) {
+		int neededMemorySize = 0;
+		// Compute memory size needed by state variable
 		for (Var var : actor.getStateVars()) {
-			statsElement.globalMemorySize += getSize(var.getType());
+			neededMemorySize += getSize(var.getType());
 		}
-	}
-
-	public void computeMemoryStats(Network network) {
-		memoryStatsMap = new HashMap<Actor, MemoryStats.MemoryStatsElement>();
-		for (Actor actor : network.getActors()) {
-			MemoryStatsElement statsElement = new MemoryStatsElement();
-			computeMemorySize(actor, statsElement);
-			memoryStatsMap.put(actor, statsElement);
+		// Compute memory size needed by the actions
+		Collection<Integer> actionsMemorySize = new ArrayList<Integer>();
+		for (Action action : actor.getActions()) {
+			actionsMemorySize.add(computeNeededMemorySize(action.getBody()));
+			actionsMemorySize
+					.add(computeNeededMemorySize(action.getScheduler()));
 		}
-
+		neededMemorySize += Collections.max(actionsMemorySize);
+		return neededMemorySize;
 	}
 
-	public Map<Actor, MemoryStatsElement> getMemoryStatsMap() {
-		return memoryStatsMap;
+	/**
+	 * Return the memory size needed by the given procedure. That corresponds to
+	 * the total size of its local arrays.
+	 * 
+	 * @param procedure
+	 *            the given procedure
+	 * @return the memory size needed by the given procedure
+	 */
+	public static int computeNeededMemorySize(Procedure procedure) {
+		int neededMemorySize = 0;
+		// Compute memory size needed by local arrays
+		for (Var var : procedure.getLocals()) {
+			if (var.getType().isList()) {
+				neededMemorySize += getSize(var.getType());
+			}
+		}
+		return neededMemorySize;
 	}
 
-	private int getSize(Type type) {
+	private static int getSize(Type type) {
 		int size;
 		if (type.isBool()) {
 			size = 1;
@@ -111,6 +139,28 @@ public class MemoryStats {
 			size = 0;
 		}
 		return size;
+	}
+
+	private Map<Actor, MemoryStatsElement> memoryStatsMap;
+
+	private void computeMemorySize(Actor actor, MemoryStatsElement statsElement) {
+		for (Var var : actor.getStateVars()) {
+			statsElement.globalMemorySize += getSize(var.getType());
+		}
+	}
+
+	public void computeMemoryStats(Network network) {
+		memoryStatsMap = new HashMap<Actor, MemoryStats.MemoryStatsElement>();
+		for (Actor actor : network.getActors()) {
+			MemoryStatsElement statsElement = new MemoryStatsElement();
+			computeMemorySize(actor, statsElement);
+			memoryStatsMap.put(actor, statsElement);
+		}
+
+	}
+
+	public Map<Actor, MemoryStatsElement> getMemoryStatsMap() {
+		return memoryStatsMap;
 	}
 
 }
