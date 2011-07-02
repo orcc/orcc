@@ -65,27 +65,22 @@ class Instance:
     def compile(self, srcPath):
         instancePath = os.path.join(srcPath, self.name)
         os.chdir(instancePath)
-
-        status,output = commands.getstatusoutput("tcecc -o " + self._tpefFile + " -a " + self._adfFile + " " + self._llFile)
-        if status != 0:
-            print "** ERROR **"
-            print output
-        else:
-            commands.getstatusoutput("tcedisasm -n -o " + self._asmFile + " " + self._adfFile + " " + self._tpefFile)
+        retcode = subprocess.call(["tcecc", "-o", self._tpefFile, "-a", self._adfFile, self._llFile])
+        if retcode >= 0: retcode = subprocess.call(["tcedisasm", "-n", "-o", self._asmFile, self._adfFile, self._tpefFile])
 
     def generate(self, srcPath, buildPath, libPath):
-		srcPath = os.path.join(srcPath, self.name)
-		sharePath = os.path.join(buildPath, "share")
-		buildPath = os.path.join(buildPath, self.name)
-		os.chdir(srcPath)
-		retcode = subprocess.call(["createbem", "-o", self._bemFile, self._adfFile])
-		retcode = subprocess.call(["cp", "-f", os.path.join(libPath, "fifo", "many_streams.hdb"), srcPath])
-		retcode = subprocess.call(["cp", "-Rf", os.path.join(libPath, "fifo", "vhdl"), srcPath])
-		retcode = subprocess.call(["rm", "-rf", buildPath])
-		retcode = subprocess.call(["generateprocessor", "-o", buildPath, "-b", self._bemFile, "--shared-files-dir", sharePath, 
-		"-l", "vhdl", "-e", self._entity, "-i", self._idfFile, self._adfFile])
-		retcode = subprocess.call(["rm", "-f", "many_streams.hdb"])
-		retcode = subprocess.call(["rm", "-rf", os.path.join(srcPath, "vhdl")])
+        srcPath = os.path.join(srcPath, self.name)
+        sharePath = os.path.join(buildPath, "share")
+        buildPath = os.path.join(buildPath, self.name)
+        os.chdir(srcPath)
+        retcode = subprocess.call(["createbem", "-o", self._bemFile, self._adfFile])
+        if retcode >= 0: retcode = subprocess.call(["cp", "-f", os.path.join(libPath, "fifo", "many_streams.hdb"), srcPath])
+        if retcode >= 0: retcode = subprocess.call(["cp", "-Rf", os.path.join(libPath, "fifo", "vhdl"), srcPath])
+        if retcode >= 0: retcode = subprocess.call(["rm", "-rf", buildPath])
+        if retcode >= 0: retcode = subprocess.call(["generateprocessor", "-o", buildPath, "-b", self._bemFile, "--shared-files-dir", sharePath, 
+                                        "-l", "vhdl", "-e", self._entity, "-i", self._idfFile, self._adfFile])
+        if retcode >= 0: retcode = subprocess.call(["rm", "-f", "many_streams.hdb"])
+        if retcode >= 0: retcode = subprocess.call(["rm", "-rf", os.path.join(srcPath, "vhdl")])
 
     def simulate(self, srcPath):
         instancePath = os.path.join(srcPath, self.name)
@@ -93,12 +88,12 @@ class Instance:
 
         # Copy trace to the instance folder
         for input in self.inputs:
-            srcTrace = srcPath + os.sep + "trace" + os.sep + "decoder_" + self.name + "_" + input.name + ".txt"
-            tgtTrace = instancePath + os.sep + "tta_stream_v%d.in" % (input.index)
-            status,output = commands.getstatusoutput("cp " + srcTrace + " " + tgtTrace)
-            if status != 0:
-                print output
+            traceName = "decoder_" + self.name + "_" + input.name + ".txt"
+            fifoName = "tta_stream_v%d.in" % (input.index)
+            srcTrace = os.path.join(srcPath, "trace", traceName)
+            tgtTrace = os.path.join(instancePath, "test")
+            retcode = subprocess.call(["cp", srcTrace, tgtTrace])
 
-        status,output = commands.getstatusoutput("ttasim --no-debugmode -q -a " + self._adfFile + " -p " + self._tpefFile)
+        retcode = subprocess.call(["ttasim", "--no-debugmode", "-q", "-a", self._adfFile, "-p", self._tpefFile])
         
 

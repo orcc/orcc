@@ -66,9 +66,14 @@ def main():
 	
 	
 def usage():
+	print "Open RVC-CAL Compiler - TTA backend"
+	print "generate - Software/Hardware Generator for Transport Trigger Architecture"
 	print "Usage: generate [options]"
 	print ""
 	print "Options:"
+	print "-c, --compile  \t Compile the application from the generated LLVM assembly code into TTA binary"
+	print "-g, --generate \t Generate the VHDL files of the TTA processors"
+	print "-s, --simulate \t (BROKEN) Simulate the generated code with the TCE simulator"
 	
 
 
