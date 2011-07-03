@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.moc;
 
-import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 
@@ -102,22 +101,6 @@ public interface CSDFMoC extends MoC {
 	void setInputPattern(Pattern pattern);
 
 	void setNumberOfPhases(int numberOfPhases);
-
-	/**
-	 * Saves the number of tokens consumed by input ports of the given actor.
-	 * 
-	 * @param actor
-	 *            an actor
-	 */
-	void setNumTokensConsumed(Actor actor);
-
-	/**
-	 * Saves the number of tokens written to output ports of the given actor.
-	 * 
-	 * @param actor
-	 *            an actor
-	 */
-	void setNumTokensProduced(Actor actor);
 
 	/**
 	 * Set the output pattern of this CSDF MoC.

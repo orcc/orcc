@@ -60,7 +60,6 @@ import net.sf.orcc.util.UniqueEdge;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.ConnectivityInspector;
 import org.jgrapht.traverse.DepthFirstIterator;
@@ -183,8 +182,7 @@ public class ActorClassifier implements ActorVisitor<Object> {
 	 * @return an actor class
 	 */
 	private MoC classifyCSDF() {
-		// new interpreter must be called before creation of ActorState
-		AbstractInterpreter interpreter = newInterpreter();
+		AbstractInterpreter interpreter = new AbstractInterpreter(actor);
 
 		ActorState state = new ActorState(interpreter.getActor());
 		if (state.isEmpty()) {
@@ -216,9 +214,7 @@ public class ActorClassifier implements ActorVisitor<Object> {
 			return MocFactory.eINSTANCE.createKPNMoC();
 		}
 
-		// set token rates
-		csdfMoc.setNumTokensConsumed(interpreter.getActor());
-		csdfMoc.setNumTokensProduced(interpreter.getActor());
+		interpreter.setTokenRates(csdfMoc);
 		csdfMoc.setNumberOfPhases(nbPhases);
 
 		return csdfMoc;
@@ -235,7 +231,7 @@ public class ActorClassifier implements ActorVisitor<Object> {
 	private SDFMoC classifyFsmConfiguration(Map<String, Object> configuration) {
 		SDFMoC sdfMoc = MocFactory.eINSTANCE.createSDFMoC();
 
-		AbstractInterpreter interpreter = newInterpreter();
+		AbstractInterpreter interpreter = new AbstractInterpreter(actor);
 		State initialState = interpreter.getFsmState();
 		interpreter.setConfiguration(configuration);
 
@@ -255,9 +251,7 @@ public class ActorClassifier implements ActorVisitor<Object> {
 			throw new OrccRuntimeException("too many phases");
 		}
 
-		// set token rates
-		sdfMoc.setNumTokensConsumed(interpreter.getActor());
-		sdfMoc.setNumTokensProduced(interpreter.getActor());
+		interpreter.setTokenRates(sdfMoc);
 
 		return sdfMoc;
 	}
@@ -333,15 +327,13 @@ public class ActorClassifier implements ActorVisitor<Object> {
 
 		// schedule
 		SDFMoC sdfMoc = MocFactory.eINSTANCE.createSDFMoC();
-		AbstractInterpreter interpreter = newInterpreter();
+		AbstractInterpreter interpreter = new AbstractInterpreter(actor);
 		interpreter.schedule();
 		Action action = interpreter.getScheduledAction();
 		Invocation invocation = eINSTANCE.createInvocation(action);
 		sdfMoc.getInvocations().add(invocation);
 
-		// set token rates
-		sdfMoc.setNumTokensConsumed(interpreter.getActor());
-		sdfMoc.setNumTokensProduced(interpreter.getActor());
+		interpreter.setTokenRates(sdfMoc);
 
 		return sdfMoc;
 	}
@@ -555,19 +547,6 @@ public class ActorClassifier implements ActorVisitor<Object> {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Creates a new interpreted actor, initializes it, and resets the actor's
-	 * token production/consumption.
-	 * 
-	 * @return the interpreter created
-	 */
-	private AbstractInterpreter newInterpreter() {
-		AbstractInterpreter interpreter = new AbstractInterpreter(
-				EcoreUtil.copy(actor));
-		interpreter.initialize();
-		return interpreter;
 	}
 
 	private void showMarker() {

@@ -8,7 +8,6 @@ package net.sf.orcc.moc.impl;
 
 import java.util.Collection;
 
-import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.moc.CSDFMoC;
@@ -330,20 +329,6 @@ public class CSDFMoCImpl extends MoCImpl implements CSDFMoC {
 		numberOfPhases = newNumberOfPhases;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, MocPackage.CSDF_MO_C__NUMBER_OF_PHASES, oldNumberOfPhases, numberOfPhases));
-	}
-
-	@Override
-	public void setNumTokensConsumed(Actor actor) {
-		for (Port port : actor.getInputs()) {
-			inputPattern.setNumTokens(port, port.getNumTokensConsumed());
-		}
-	}
-
-	@Override
-	public void setNumTokensProduced(Actor actor) {
-		for (Port port : actor.getOutputs()) {
-			outputPattern.setNumTokens(port, port.getNumTokensProduced());
-		}
 	}
 
 	/**

@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir.util;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -82,32 +83,28 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	 * Actor's constant parameters to be set at initialization time
 	 */
 	private Map<String, Expression> parameters;
+	
+	/**
+	 * Creates a new interpreter with no actor and no parameters.
+	 * 
+	 */
+	public ActorInterpreter() {
+		this.parameters = Collections.emptyMap();
+		exprInterpreter = new ExpressionEvaluator();
+	}
 
 	/**
-	 * Creates a new interpreted actor instance for simulation or debug
+	 * Creates a new interpreter.
 	 * 
-	 * @param id
-	 *            name of the associated instance
-	 * @param parameters
-	 *            actor's parameters to be set
 	 * @param actor
-	 *            actor class definition
+	 *            the actor to interpret
+	 * @param parameters
+	 *            parameters of the instance of the given actor
 	 */
 	public ActorInterpreter(Actor actor, Map<String, Expression> parameters) {
-		// Set instance name and actor class definition at parent level
-		this.actor = actor;
-
-		exprInterpreter = new ExpressionEvaluator();
-
-		// Get actor FSM properties
-		if (actor.hasFsm()) {
-			fsmState = actor.getFsm().getInitialState();
-		} else {
-			fsmState = null;
-		}
-
-		// Get the parameters value from instance map
 		this.parameters = parameters;
+		exprInterpreter = new ExpressionEvaluator();
+		setActor(actor);
 	}
 
 	/**
@@ -492,6 +489,24 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 			throw new OrccRuntimeException("Runtime exception thrown by actor "
 					+ actor.getName(), ex);
 		}
+	}
+
+	/**
+	 * Sets the actor interpreter by this interpreter.
+	 * 
+	 * @param actor
+	 *            an actor
+	 */
+	protected void setActor(Actor actor) {
+		this.actor = actor;
+
+		// set fsm state to initial state (if any)
+		if (actor.hasFsm()) {
+			fsmState = actor.getFsm().getInitialState();
+		} else {
+			fsmState = null;
+		}
+
 	}
 
 }
