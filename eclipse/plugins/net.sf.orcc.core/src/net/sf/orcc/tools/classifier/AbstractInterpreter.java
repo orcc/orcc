@@ -62,6 +62,8 @@ public class AbstractInterpreter extends ActorInterpreter {
 
 	private Copier copier;
 
+	private Actor originalActor;
+
 	private Map<String, Boolean> portRead;
 
 	private boolean schedulableMode;
@@ -75,6 +77,9 @@ public class AbstractInterpreter extends ActorInterpreter {
 	 *            an actor
 	 */
 	public AbstractInterpreter(Actor actor) {
+		// save the original actor
+		originalActor = actor;
+
 		// create a copier, and copy the original actor
 		copier = new EcoreUtil.Copier();
 		Actor copyOfActor = (Actor) copier.copy(actor);
@@ -277,16 +282,16 @@ public class AbstractInterpreter extends ActorInterpreter {
 	public void setTokenRates(CSDFMoC csdfMoc) {
 		// we use the ports of the original actor
 		Pattern inputPattern = csdfMoc.getInputPattern();
-		for (Port port : actor.getInputs()) {
+		for (Port originalPort : originalActor.getInputs()) {
+			Port port = (Port) copier.get(originalPort);
 			int numTokens = port.getNumTokensConsumed();
-			Port originalPort = (Port) copier.get(port);
 			inputPattern.setNumTokens(originalPort, numTokens);
 		}
 
 		Pattern outputPattern = csdfMoc.getOutputPattern();
-		for (Port port : actor.getOutputs()) {
+		for (Port originalPort : originalActor.getOutputs()) {
+			Port port = (Port) copier.get(originalPort);
 			int numTokens = port.getNumTokensProduced();
-			Port originalPort = (Port) copier.get(port);
 			outputPattern.setNumTokens(originalPort, numTokens);
 		}
 	}
