@@ -43,7 +43,7 @@ entity dram_${id} is
   port
     (
       address : in  std_logic_vector (${m_depth} downto 0);
-      byteena : in  std_logic_vector (3 downto 0) := (others =\> '1');
+      byteena : in  std_logic_vector (3 downto 0) := (others => '1');
       clock   : in  std_logic                     := '1';
       data    : in  std_logic_vector (31 downto 0);
       wren    : in  std_logic;
@@ -89,35 +89,35 @@ architecture SYN of dram_${id} is
   end component;
 
 begin
-  q \<= sub_wire0(31 downto 0);
+  q <= sub_wire0(31 downto 0);
 
   altsyncram_component : altsyncram
     generic map (
-      byte_size                     =\> 8,
-      clock_enable_input_a          =\> "BYPASS",
-      clock_enable_output_a         =\> "BYPASS",
-      init_file                     =\> "${id}_data.mif",
-      intended_device_family        =\> "Cyclone IV E",
-      lpm_hint                      =\> "ENABLE_RUNTIME_MOD=NO",
-      lpm_type                      =\> "altsyncram",
-      numwords_a                    =\> ${depth},
-      operation_mode                =\> "SINGLE_PORT",
-      outdata_aclr_a                =\> "NONE",
-      outdata_reg_a                 =\> "UNREGISTERED",
-      power_up_uninitialized        =\> "FALSE",
-      ram_block_type                =\> "M9K",
-      read_during_write_mode_port_a =\> "NEW_DATA_NO_NBE_READ",
-      widthad_a                     =\> ${log_depth},
-      width_a                       =\> 32,
-      width_byteena_a               =\> 4
+      byte_size                     => 8,
+      clock_enable_input_a          => "BYPASS",
+      clock_enable_output_a         => "BYPASS",
+      init_file                     => "${id}_data.mif",
+      intended_device_family        => "Cyclone IV E",
+      lpm_hint                      => "ENABLE_RUNTIME_MOD=NO",
+      lpm_type                      => "altsyncram",
+      numwords_a                    => ${depth},
+      operation_mode                => "SINGLE_PORT",
+      outdata_aclr_a                => "NONE",
+      outdata_reg_a                 => "UNREGISTERED",
+      power_up_uninitialized        => "FALSE",
+      ram_block_type                => "M9K",
+      read_during_write_mode_port_a => "NEW_DATA_NO_NBE_READ",
+      widthad_a                     => ${log_depth},
+      width_a                       => 32,
+      width_byteena_a               => 4
       )
     port map (
-      address_a =\> address,
-      byteena_a =\> byteena,
-      clock0    =\> clock,
-      data_a    =\> data,
-      wren_a    =\> wren,
-      q_a       =\> sub_wire0
+      address_a => address,
+      byteena_a => byteena,
+      clock0    => clock,
+      data_a    => data,
+      wren_a    => wren,
+      q_a       => sub_wire0
       );
 
 

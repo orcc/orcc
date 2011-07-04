@@ -81,30 +81,30 @@ architecture SYN of irom_${id} is
   end component;
 
 begin
-  q \<= sub_wire0(${m_width} downto 0);
+  q <= sub_wire0(${m_width} downto 0);
 
   altsyncram_component : altsyncram
     generic map (
-      address_aclr_a         =\> "NONE",
-      clock_enable_input_a   =\> "BYPASS",
-      clock_enable_output_a  =\> "BYPASS",
-      init_file              =\> "${id}.mif",
-      intended_device_family =\> "Cyclone IV E",
-      lpm_hint               =\> "ENABLE_RUNTIME_MOD=NO",
-      lpm_type               =\> "altsyncram",
-      numwords_a             =\> ${depth},
-      operation_mode         =\> "ROM",
-      outdata_aclr_a         =\> "NONE",
-      outdata_reg_a          =\> "UNREGISTERED",
-      ram_block_type         =\> "M9K",
-      widthad_a              =\> ${log_depth},
-      width_a                =\> ${width},
-      width_byteena_a        =\> 1
+      address_aclr_a         => "NONE",
+      clock_enable_input_a   => "BYPASS",
+      clock_enable_output_a  => "BYPASS",
+      init_file              => "${id}.mif",
+      intended_device_family => "Cyclone IV E",
+      lpm_hint               => "ENABLE_RUNTIME_MOD=NO",
+      lpm_type               => "altsyncram",
+      numwords_a             => ${depth},
+      operation_mode         => "ROM",
+      outdata_aclr_a         => "NONE",
+      outdata_reg_a          => "UNREGISTERED",
+      ram_block_type         => "M9K",
+      widthad_a              => ${log_depth},
+      width_a                => ${width},
+      width_byteena_a        => 1
       )
     port map (
-      address_a =\> address,
-      clock0    =\> clock,
-      q_a       =\> sub_wire0
+      address_a => address,
+      clock0    => clock,
+      q_a       => sub_wire0
       );
 
 
