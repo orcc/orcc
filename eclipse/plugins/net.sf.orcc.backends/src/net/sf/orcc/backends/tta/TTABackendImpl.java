@@ -168,10 +168,6 @@ public class TTABackendImpl extends AbstractBackend {
 				"TTA_processor_adf");
 		ArchitecturePrinter idfPrinter = new ArchitecturePrinter(
 				"TTA_processor_idf");
-		InstancePrinter dramPrinter = new InstancePrinter("TTA_dram",
-				!debugMode, true);
-		InstancePrinter iromPrinter = new InstancePrinter("TTA_irom",
-				!debugMode, true);
 
 		vhdlPrinter.print("processor_" + instance.getId() + ".vhd",
 				instancePath, instance, "processor");
@@ -179,10 +175,6 @@ public class TTABackendImpl extends AbstractBackend {
 				instancePath, simpleTTA, "tta");
 		idfPrinter.print("processor_" + instance.getId() + ".idf",
 				instancePath, simpleTTA, "tta");
-		dramPrinter.print("dram_" + instance.getId() + ".vhd", instancePath,
-				instance, "dram");
-		iromPrinter.print("irom_" + instance.getId() + ".vhd", instancePath,
-				instance, "irom");
 
 	}
 

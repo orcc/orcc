@@ -29,10 +29,24 @@
 #
 # @author Herve Yviquel
 
+import string
+import math
 
 class Memory:
 
     def __init__(self, width, depth):
         self.width = width
         self.depth = depth
+        
+    def generate(self, instanceName, templateFile, targetFile):
+        form = open(templateFile, "r").read()
+        template = string.Template(form)
+        # n_width = 2^width and log_depth = log2(depth)
+        result = template.substitute(id=instanceName,
+                            width=str(self.width), depth=str(self.depth),
+                            m_width=str(self.width - 1), m_depth=str(self.depth - 1),
+                            n_width=str(1 << self.width), log_depth=str(int(math.ceil(math.log(self.depth, 2)))))
+        output = open(targetFile, "w")
+        output.write(result)
+        
 

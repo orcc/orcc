@@ -31,11 +31,11 @@
 # @package orcc_
 
 import instance
-import port
 import memory
+import port
 import util
 
 Instance = instance.Instance
-Port = port.Port
 Memory = memory.Memory
+Port = port.Port
 Util = util.Util

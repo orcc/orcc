@@ -114,7 +114,7 @@ def generate():
 
     for instance in instances:
         print ">> Instance " + instance.name + "."
-        instance.generate(srcPath, buildPath, libPath)
+        instance.generate(srcPath, buildPath, libPath, pylibPath)
 
     print "* Generation of %d instances done in %f seconds." % (len(instances), time.time() - start)
 
@@ -125,7 +125,7 @@ scriptPath = os.path.abspath(pathname)
 srcPath = os.path.join(scriptPath, "generated")
 buildPath = os.path.join(scriptPath, "build-generated")
 libPath = os.path.join(os.path.dirname(os.path.dirname(scriptPath)), "libraries", "TTA")
-pylibPath = os.path.join(libPath, "orcc_")
+pylibPath = os.path.join(scriptPath, "orcc_")
 
 # Add orcc_ to python path
 sys.path.append(pylibPath)

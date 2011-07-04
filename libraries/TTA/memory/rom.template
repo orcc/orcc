@@ -1,11 +1,10 @@
-irom(instance, options) ::= <<
 -- megafunction wizard: %ROM: 1-PORT%
 -- GENERATION: STANDARD
 -- VERSION: WM1.0
 -- MODULE: altsyncram
 
 -- ============================================================
--- File Name: irom_<instance.id>.vhd
+-- File Name: irom_${id}.vhd
 -- Megafunction Name(s):
 --                      altsyncram
 --
@@ -40,19 +39,19 @@ use ieee.std_logic_1164.all;
 library altera_mf;
 use altera_mf.all;
 
-entity irom_<instance.id> is
+entity irom_${id} is
   port
     (
-      address : in  std_logic_vector (-1 downto 0);
+      address : in  std_logic_vector (${m_depth} downto 0);
       clock   : in  std_logic := '1';
-      q       : out std_logic_vector (-1 downto 0)
+      q       : out std_logic_vector (${m_width} downto 0)
       );
-end irom_<instance.id>;
+end irom_${id};
 
 
-architecture SYN of irom_<instance.id> is
+architecture SYN of irom_${id} is
 
-  signal sub_wire0 : std_logic_vector (-1 downto 0);
+  signal sub_wire0 : std_logic_vector (${m_width} downto 0);
 
 
 
@@ -75,31 +74,31 @@ architecture SYN of irom_<instance.id> is
       width_byteena_a        : natural
       );
     port (
-      address_a : in  std_logic_vector (-1 downto 0);
+      address_a : in  std_logic_vector (${m_depth} downto 0);
       clock0    : in  std_logic;
-      q_a       : out std_logic_vector (-1 downto 0)
+      q_a       : out std_logic_vector (${m_width} downto 0)
       );
   end component;
 
 begin
-  q \<= sub_wire0(-1 downto 0);
+  q \<= sub_wire0(${m_width} downto 0);
 
   altsyncram_component : altsyncram
     generic map (
       address_aclr_a         =\> "NONE",
       clock_enable_input_a   =\> "BYPASS",
       clock_enable_output_a  =\> "BYPASS",
-      init_file              =\> "<instance.id>.mif",
+      init_file              =\> "${id}.mif",
       intended_device_family =\> "Cyclone IV E",
       lpm_hint               =\> "ENABLE_RUNTIME_MOD=NO",
       lpm_type               =\> "altsyncram",
-      numwords_a             =\> 1,
+      numwords_a             =\> ${depth},
       operation_mode         =\> "ROM",
       outdata_aclr_a         =\> "NONE",
       outdata_reg_a          =\> "UNREGISTERED",
       ram_block_type         =\> "M9K",
-      widthad_a              =\> 0,
-      width_a                =\> 0,
+      widthad_a              =\> ${log_depth},
+      width_a                =\> ${width},
       width_byteena_a        =\> 1
       )
     port map (
@@ -133,15 +132,15 @@ end SYN;
 -- Retrieval info: PRIVATE: JTAG_ID STRING "NONE"
 -- Retrieval info: PRIVATE: MAXIMUM_DEPTH NUMERIC "0"
 -- Retrieval info: PRIVATE: MIFfilename STRING "address.mif"
--- Retrieval info: PRIVATE: NUMWORDS_A NUMERIC "1"
+-- Retrieval info: PRIVATE: NUMWORDS_A NUMERIC "${depth}"
 -- Retrieval info: PRIVATE: RAM_BLOCK_TYPE NUMERIC "2"
 -- Retrieval info: PRIVATE: RegAddr NUMERIC "1"
 -- Retrieval info: PRIVATE: RegOutput NUMERIC "0"
 -- Retrieval info: PRIVATE: SYNTH_WRAPPER_GEN_POSTFIX STRING "0"
 -- Retrieval info: PRIVATE: SingleClock NUMERIC "1"
 -- Retrieval info: PRIVATE: UseDQRAM NUMERIC "0"
--- Retrieval info: PRIVATE: WidthAddr NUMERIC "0"
--- Retrieval info: PRIVATE: WidthData NUMERIC "0"
+-- Retrieval info: PRIVATE: WidthAddr NUMERIC "${log_depth}"
+-- Retrieval info: PRIVATE: WidthData NUMERIC "${width}"
 -- Retrieval info: PRIVATE: rden NUMERIC "0"
 -- Retrieval info: LIBRARY: altera_mf altera_mf.altera_mf_components.all
 -- Retrieval info: CONSTANT: ADDRESS_ACLR_A STRING "NONE"
@@ -151,25 +150,23 @@ end SYN;
 -- Retrieval info: CONSTANT: INTENDED_DEVICE_FAMILY STRING "Cyclone IV E"
 -- Retrieval info: CONSTANT: LPM_HINT STRING "ENABLE_RUNTIME_MOD=NO"
 -- Retrieval info: CONSTANT: LPM_TYPE STRING "altsyncram"
--- Retrieval info: CONSTANT: NUMWORDS_A NUMERIC "1"
+-- Retrieval info: CONSTANT: NUMWORDS_A NUMERIC "${depth}"
 -- Retrieval info: CONSTANT: OPERATION_MODE STRING "ROM"
 -- Retrieval info: CONSTANT: OUTDATA_ACLR_A STRING "NONE"
 -- Retrieval info: CONSTANT: OUTDATA_REG_A STRING "UNREGISTERED"
 -- Retrieval info: CONSTANT: RAM_BLOCK_TYPE STRING "M9K"
--- Retrieval info: CONSTANT: WIDTHAD_A NUMERIC "0"
--- Retrieval info: CONSTANT: WIDTH_A NUMERIC "0"
+-- Retrieval info: CONSTANT: WIDTHAD_A NUMERIC "${log_depth}"
+-- Retrieval info: CONSTANT: WIDTH_A NUMERIC "${width}"
 -- Retrieval info: CONSTANT: WIDTH_BYTEENA_A NUMERIC "1"
 -- Retrieval info: USED_PORT: address 0 0 0 0 INPUT NODEFVAL "address[-1..0]"
 -- Retrieval info: USED_PORT: clock 0 0 0 0 INPUT VCC "clock"
 -- Retrieval info: USED_PORT: q 0 0 0 0 OUTPUT NODEFVAL "q[-1..0]"
--- Retrieval info: CONNECT: @address_a 0 0 0 0 address 0 0 0 0
+-- Retrieval info: CONNECT: @address_a 0 0 ${log_depth} 0 address 0 0 ${log_depth} 0
 -- Retrieval info: CONNECT: @clock0 0 0 0 0 clock 0 0 0 0
--- Retrieval info: CONNECT: q 0 0 0 0 @q_a 0 0 0 0
--- Retrieval info: GEN_FILE: TYPE_NORMAL irom_<instance.id>.vhd TRUE
--- Retrieval info: GEN_FILE: TYPE_NORMAL irom_<instance.id>.inc FALSE
--- Retrieval info: GEN_FILE: TYPE_NORMAL irom_<instance.id>.cmp FALSE
--- Retrieval info: GEN_FILE: TYPE_NORMAL irom_<instance.id>.bsf FALSE
--- Retrieval info: GEN_FILE: TYPE_NORMAL irom_<instance.id>_inst.vhd FALSE
+-- Retrieval info: CONNECT: q 0 0 ${width} 0 @q_a 0 0 ${width} 0
+-- Retrieval info: GEN_FILE: TYPE_NORMAL irom_${id}.vhd TRUE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL irom_${id}.inc FALSE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL irom_${id}.cmp FALSE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL irom_${id}.bsf FALSE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL irom_${id}_inst.vhd FALSE
 -- Retrieval info: LIB_FILE: altera_mf
-
->>

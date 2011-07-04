@@ -35,6 +35,9 @@ import commands
 import subprocess
 import shutil
 
+from .port import *
+from .memory import *
+
 class Instance:
 
     def __init__(self, name, inputs, outputs):
@@ -59,6 +62,7 @@ class Instance:
         # Useful names
         self._entity = "processor_" + self.name + "_tl"
 
+
     def compile(self, srcPath):
         instancePath = os.path.join(srcPath, self.name)
         os.chdir(instancePath)
@@ -67,7 +71,8 @@ class Instance:
         if retcode >= 0: retcode = subprocess.call(["createbem", "-o", self._bemFile, self._adfFile])
         if retcode >= 0: retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", "images", "-f", "mif", "-o", "mif", self._adfFile])
 
-    def generate(self, srcPath, buildPath, libPath):
+
+    def generate(self, srcPath, buildPath, libPath, pylibPath):
         srcPath = os.path.join(srcPath, self.name)
         sharePath = os.path.join(buildPath, "share")
         buildPath = os.path.join(buildPath, self.name)
@@ -77,20 +82,23 @@ class Instance:
         shutil.rmtree("vhdl", ignore_errors=True)
         shutil.copytree(os.path.join(libPath, "fifo", "vhdl"), "vhdl")
         # Remove existing build directory
-        shutil.rmtree(buildPath)
-        # Generate the processor in build directory
-        subprocess.call(["generateprocessor", "-o", buildPath, "-b", self._bemFile, "--shared-files-dir", sharePath, 
+        shutil.rmtree(buildPath, ignore_errors=True)
+        # Generate the processor
+        subprocess.call(["generateprocessor", "-o", buildPath, "-b", self._bemFile, "--shared-files-dir", sharePath,
                                         "-l", "vhdl", "-e", self._entity, "-i", self._idfFile, self._adfFile])
-        # Copy memories to build directory
+        # Generate vhdl memory files
+        self.rom = self._readMemory(self._mifFile)
+        self.ram = self._readMemory(self._mifDataFile)
+        self.rom.generate(self.name, os.path.join(libPath, "memory", "rom.template"), os.path.join(buildPath, self._romFile))
+        self.ram.generate(self.name, os.path.join(libPath, "memory", "ram.template"), os.path.join(buildPath, self._ramFile))
+        # Copy memory files to build directory
         shutil.copy(self._mifFile, buildPath)
         shutil.copy(self._mifDataFile, buildPath)
         shutil.copy("imem_mau_pkg.vhdl", buildPath)
-        shutil.copy(self._romFile, buildPath)
-        shutil.copy(self._ramFile, buildPath)
-        
         # Clean working directory
         os.remove("many_streams.hdb")
         shutil.rmtree("vhdl", ignore_errors=True)
+
 
     def simulate(self, srcPath):
         instancePath = os.path.join(srcPath, self.name)
@@ -105,5 +113,22 @@ class Instance:
             retcode = subprocess.call(["cp", srcTrace, tgtTrace])
 
         retcode = subprocess.call(["ttasim", "--no-debugmode", "-q", "-a", self._adfFile, "-p", self._tpefFile])
-        
+
+
+    def _readMemory(self, fileName):
+        fh = open(fileName, "r")
+        igot = fh.readlines()
+
+        for line in igot:
+            if line.find("WIDTH") > -1:
+                content = line.split()
+                width = content[2]
+                width = width[:len(width)-1]
+            if line.find("DEPTH") > -1:
+                content = line.split()
+                depth = content[2]
+                depth = depth[:len(depth)-1]
+
+        return Memory(int(width), int(depth))
+
 
