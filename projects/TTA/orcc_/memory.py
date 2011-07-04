@@ -46,7 +46,6 @@ class Memory:
                             width=str(self.width), depth=str(self.depth),
                             m_width=str(self.width - 1), m_depth=str(self.depth - 1),
                             n_width=str(1 << self.width), log_depth=str(int(math.ceil(math.log(self.depth, 2)))))
-        output = open(targetFile, "w")
-        output.write(result)
+        open(targetFile, "w").write(result)
         
 
