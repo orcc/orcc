@@ -40,8 +40,10 @@ from .memory import *
 
 class Instance:
 
-    def __init__(self, name, inputs, outputs):
+    def __init__(self, name, inputs, outputs, isNative):
+        # General
         self.name = name
+        self.isNative = isNative
         # Ports
         self.inputs = inputs
         self.outputs = outputs
@@ -49,6 +51,7 @@ class Instance:
         self.rom = None
         self.ram = None
         # Useful filenames
+        self._processorFile = "processor_" + self.name + ".vhd"
         self._adfFile = "processor_" + self.name + ".adf"
         self._idfFile = "processor_" + self.name + ".idf"
         self._llFile = self.name + ".ll"
@@ -87,14 +90,19 @@ class Instance:
         subprocess.call(["generateprocessor", "-o", buildPath, "-b", self._bemFile, "--shared-files-dir", sharePath,
                                         "-l", "vhdl", "-e", self._entity, "-i", self._idfFile, self._adfFile])
         # Generate vhdl memory files
-        self.rom = self._readMemory(self._mifFile)
-        self.ram = self._readMemory(self._mifDataFile)
-        self.rom.generate(self.name, os.path.join(libPath, "memory", "rom.template"), os.path.join(buildPath, self._romFile))
-        self.ram.generate(self.name, os.path.join(libPath, "memory", "ram.template"), os.path.join(buildPath, self._ramFile))
-        # Copy memory files to build directory
+        if not self.isNative:
+            self.rom = self._readMemory(self._mifFile)
+            self.ram = self._readMemory(self._mifDataFile)
+            self.rom.generate(self.name, os.path.join(libPath, "memory", "rom.template"), os.path.join(buildPath, self._romFile))
+            self.ram.generate(self.name, os.path.join(libPath, "memory", "ram.template"), os.path.join(buildPath, self._ramFile))
+        else:
+            shutil.copy(self._romFile, buildPath)
+            shutil.copy(self._ramFile, buildPath)
+        # Copy files to build directory
         shutil.copy(self._mifFile, buildPath)
         shutil.copy(self._mifDataFile, buildPath)
         shutil.copy("imem_mau_pkg.vhdl", buildPath)
+        shutil.copy(self._processorFile, buildPath)
         # Clean working directory
         os.remove("many_streams.hdb")
         shutil.rmtree("vhdl", ignore_errors=True)
