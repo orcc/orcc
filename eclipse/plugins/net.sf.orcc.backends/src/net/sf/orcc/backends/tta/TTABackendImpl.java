@@ -154,9 +154,12 @@ public class TTABackendImpl extends AbstractBackend {
 	private void printNetwork(Network network) {
 		NetworkPrinter networkPrinter = new NetworkPrinter("TTA_network");
 		NetworkPrinter scriptPrinter = new NetworkPrinter("TTA_script");
+		NetworkPrinter projectPrinter = new NetworkPrinter("TTA_project");
 		networkPrinter.print(network.getName() + ".vhd", path, network,
 				"network");
 		scriptPrinter.print("informations.py", path, network, "script");
+		projectPrinter.print(network.getName() + ".qsf", path, network, "qsfNetwork");
+		projectPrinter.print(network.getName() + ".qpf", path, network, "qpfNetwork");
 		OrccUtil.createFile(path, "__init__.py");
 	}
 
