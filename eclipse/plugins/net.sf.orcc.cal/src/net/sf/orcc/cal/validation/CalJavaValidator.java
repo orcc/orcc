@@ -192,8 +192,8 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 					Type type = checker.getType(value);
 					if (!checker.isConvertibleTo(type, portType)) {
 						error("this expression must be of type " + portType,
-								astRepeat,
-								eINSTANCE.getAstOutputPattern_Repeat(), index);
+								pattern,
+								eINSTANCE.getAstOutputPattern_Values(), index);
 					}
 					index++;
 				}
@@ -214,11 +214,9 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 							}
 						}
 
-						error("this expression must be of type List of "
-								+ portType
-								+ " with a size greater than or equal to "
-								+ repeat, value,
-								eINSTANCE.getAstOutputPattern_Repeat(), index);
+						error("Type mismatch: expected " + portType + "["
+								+ repeat + "]", pattern,
+								eINSTANCE.getAstOutputPattern_Values(), index);
 						index++;
 					}
 				}
