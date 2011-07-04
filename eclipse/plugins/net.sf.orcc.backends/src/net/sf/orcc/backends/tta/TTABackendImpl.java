@@ -144,7 +144,9 @@ public class TTABackendImpl extends AbstractBackend {
 		printer.setTypePrinter(new LLVMTypePrinter());
 
 		String instancePath = OrccUtil.createFolder(path, instance.getId());
-		printProcessor(instance, instancePath);
+		if (!(instance.isActor() && instance.getActor().isNative())) {
+			printProcessor(instance, instancePath);
+		}
 		return printer.print(instance.getId() + ".ll", instancePath, instance,
 				"instance");
 	}
