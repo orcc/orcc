@@ -35,6 +35,7 @@ import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_OPTIONS;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_TYPE;
 import net.sf.orcc.OrccActivator;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
@@ -168,7 +169,11 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 					// with arrays, and does not support (get-value)
 					textControl.setText("+lang smt2");
 				} else if ("Z3".equals(text)) {
-					textControl.setText("/smt2 /m");
+					if (Platform.OS_WIN32.equals(Platform.getOS())) {
+						textControl.setText("/smt2 /m");
+					} else {
+						textControl.setText("-smt2 -m");
+					}
 				}
 				updateMode = true;
 			}
