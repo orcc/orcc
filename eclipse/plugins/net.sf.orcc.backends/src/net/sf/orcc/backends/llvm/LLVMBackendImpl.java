@@ -57,6 +57,10 @@ import net.sf.orcc.backends.xlim.transformations.InstPhiTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.transformations.BlockCombine;
 import net.sf.orcc.ir.transformations.BuildCFG;
+import net.sf.orcc.ir.transformations.DeadCodeElimination;
+import net.sf.orcc.ir.transformations.DeadGlobalElimination;
+import net.sf.orcc.ir.transformations.DeadVariableRemoval;
+import net.sf.orcc.ir.transformations.PhiRemoval;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.util.ActorVisitor;
@@ -133,7 +137,9 @@ public class LLVMBackendImpl extends AbstractBackend {
 		}
 
 		ActorVisitor<?>[] transformations = { new SSATransformation(),
-				new BoolToIntTransformation(), new PrintlnTransformation(),
+				new DeadGlobalElimination(), new DeadCodeElimination(),
+				new DeadVariableRemoval(), new BoolToIntTransformation(),
+				new PrintlnTransformation(),
 				new RenameTransformation(this.transformations),
 				new TacTransformation(true), new InstPhiTransformation(),
 				new GetElementPtrAdder(), new TypeResizer(),
@@ -143,7 +149,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 			transformation.doSwitch(actor);
 		}
 
-		// Organize medata information for the current actor
+		// Organize metadata information for the current actor
 		actor.setTemplateData(new LLVMTemplateData(actor));
 	}
 
