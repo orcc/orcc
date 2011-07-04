@@ -792,7 +792,7 @@
     <element xmi:type="ecore:EReference" href="TTA.ecore#//TTA/registerFiles"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_GrxoE6W6EeCsxNsHPGfaeQ" points="[0, 0, -670, 60]$[670, -60, 0, 0]"/>
     <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_Gz-h0KW6EeCsxNsHPGfaeQ" id="(0.9401709401709402,0.40816326530612246)"/>
-    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_Gz_I4KW6EeCsxNsHPGfaeQ" id="(0.328125,1.0)"/>
+    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_Gz_I4KW6EeCsxNsHPGfaeQ" id="(0.140625,0.7610619469026548)"/>
   </edges>
   <edges xmi:type="notation:Edge" xmi:id="_GrxoGKW6EeCsxNsHPGfaeQ" type="3002" source="_GrKkEKW6EeCsxNsHPGfaeQ" target="_GrZNlqW6EeCsxNsHPGfaeQ">
     <children xmi:type="notation:Node" xmi:id="_GrxoHKW6EeCsxNsHPGfaeQ" type="4011">
@@ -1014,7 +1014,7 @@
     <styles xmi:type="notation:ConnectorStyle" xmi:id="_Gr4VxaW6EeCsxNsHPGfaeQ" lineColor="4210752"/>
     <styles xmi:type="notation:FontStyle" xmi:id="_Gr4VxqW6EeCsxNsHPGfaeQ" fontColor="4210752" fontName="Ubuntu" fontHeight="10"/>
     <element xmi:type="ecore:EReference" href="TTA.ecore#//FunctionUnit/implementation"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_Gr4Vx6W6EeCsxNsHPGfaeQ" points="[-9, 47, -235, -190]$[-9, 168, -235, -69]$[165, 219, -61, -18]"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_Gr4Vx6W6EeCsxNsHPGfaeQ" points="[-9, 47, -235, -190]$[-9, 168, -235, -69]$[165, 192, -61, -45]$[165, 192, -61, -45]"/>
     <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_Gzv4UqW6EeCsxNsHPGfaeQ" id="(0.49572649572649574,0.0)"/>
     <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_GzwfYKW6EeCsxNsHPGfaeQ" id="(0.4806201550387597,1.0)"/>
   </edges>
@@ -1028,7 +1028,7 @@
     <styles xmi:type="notation:ConnectorStyle" xmi:id="_Gr480KW6EeCsxNsHPGfaeQ" lineColor="4210752"/>
     <styles xmi:type="notation:FontStyle" xmi:id="_Gr480aW6EeCsxNsHPGfaeQ" fontColor="4210752" fontName="Ubuntu" fontHeight="10"/>
     <element xmi:type="ecore:EReference" href="TTA.ecore#//RegisterFile/ports"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_Gr480qW6EeCsxNsHPGfaeQ" points="[12, -11, -66, 96]$[96, -11, 18, 96]$[96, -89, 18, 18]"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_Gr480qW6EeCsxNsHPGfaeQ" points="[12, -47, 0, 72]$[12, -101, 0, 18]"/>
     <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_Gz0JwaW6EeCsxNsHPGfaeQ" id="(0.90625,0.4247787610619469)"/>
     <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_Gz0w0KW6EeCsxNsHPGfaeQ" id="(0.5699481865284974,0.8269230769230769)"/>
   </edges>
@@ -1043,7 +1043,7 @@
     <styles xmi:type="notation:FontStyle" xmi:id="_Gr482aW6EeCsxNsHPGfaeQ" fontColor="4210752" fontName="Ubuntu" fontHeight="10"/>
     <element xmi:type="ecore:EReference" href="TTA.ecore#//RegisterFile/implementation"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_Gr482qW6EeCsxNsHPGfaeQ" points="[-41, 42, 273, -279]$[-280, 286, 34, -35]"/>
-    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_Gz0w0aW6EeCsxNsHPGfaeQ" id="(0.328125,0.0)"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_Gz0w0aW6EeCsxNsHPGfaeQ" id="(0.609375,0.8672566371681416)"/>
     <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_Gz1X4KW6EeCsxNsHPGfaeQ" id="(0.7364341085271318,1.0)"/>
   </edges>
   <edges xmi:type="notation:Edge" xmi:id="_Gr5j4KW6EeCsxNsHPGfaeQ" type="3002" source="_GrVjNKW6EeCsxNsHPGfaeQ" target="_GrXYYKW6EeCsxNsHPGfaeQ">
@@ -1260,7 +1260,7 @@
     <styles xmi:type="notation:ConnectorStyle" xmi:id="_Gr-cZ6W6EeCsxNsHPGfaeQ" lineColor="4210752"/>
     <styles xmi:type="notation:FontStyle" xmi:id="_Gr-caKW6EeCsxNsHPGfaeQ" fontColor="4210752" fontName="Ubuntu" fontHeight="10"/>
     <element xmi:type="ecore:EReference" href="TTA.ecore#//TermUnit/functionUnit"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_Gr-caaW6EeCsxNsHPGfaeQ" points="[-7, -1, 938, 144]$[-961, -72, -16, 73]$[-961, -145, -16, 0]"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_Gr-caaW6EeCsxNsHPGfaeQ" points="[-7, -1, 938, 144]$[-931, -72, 14, 73]$[-931, -145, 14, 0]"/>
     <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_Gz9TsaW6EeCsxNsHPGfaeQ" id="(0.0784313725490196,0.9047619047619048)"/>
     <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_Gz9TsqW6EeCsxNsHPGfaeQ" id="(0.6666666666666666,1.0)"/>
   </edges>
