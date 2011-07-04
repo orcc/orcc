@@ -90,14 +90,10 @@ class Instance:
         subprocess.call(["generateprocessor", "-o", buildPath, "-b", self._bemFile, "--shared-files-dir", sharePath,
                                         "-l", "vhdl", "-e", self._entity, "-i", self._idfFile, self._adfFile])
         # Generate vhdl memory files
-        if not self.isNative:
-            self.rom = self._readMemory(self._mifFile)
-            self.ram = self._readMemory(self._mifDataFile)
-            self.rom.generate(self.name, os.path.join(libPath, "memory", "rom.template"), os.path.join(buildPath, self._romFile))
-            self.ram.generate(self.name, os.path.join(libPath, "memory", "ram.template"), os.path.join(buildPath, self._ramFile))
-        else:
-            shutil.copy(self._romFile, buildPath)
-            shutil.copy(self._ramFile, buildPath)
+        self.rom = self._readMemory(self._mifFile)
+        self.ram = self._readMemory(self._mifDataFile)
+        self.rom.generate(self.name, os.path.join(libPath, "memory", "rom.template"), os.path.join(buildPath, self._romFile))
+        self.ram.generate(self.name, os.path.join(libPath, "memory", "ram.template"), os.path.join(buildPath, self._ramFile))
         # Copy files to build directory
         shutil.copy(self._mifFile, buildPath)
         shutil.copy(self._mifDataFile, buildPath)
