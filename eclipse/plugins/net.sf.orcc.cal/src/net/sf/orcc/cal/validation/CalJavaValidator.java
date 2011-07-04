@@ -124,10 +124,24 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 	@Check(CheckType.NORMAL)
 	public void checkAction(AstAction action) {
+		checkActionGuards(action);
 		checkActionTag(action);
 		checkActionVariables(action);
 		checkActionInputs(action.getInputs());
 		checkActionOutputs(action.getOutputs());
+	}
+
+	private void checkActionGuards(AstAction action) {
+		List<AstExpression> guards = action.getGuards();
+		int index = 0;
+		for (AstExpression guard : guards) {
+			Type type = new TypeChecker(this).getType(guard);
+			if (type == null || !type.isBool()) {
+				error("Type mismatch: cannot convert from " + type + " to bool",
+						action, eINSTANCE.getAstAction_Guards(), index);
+			}
+			index++;
+		}
 	}
 
 	/**
@@ -331,24 +345,6 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	}
 
 	@Check(CheckType.NORMAL)
-	public void checkAstStatementIf(AstStatementIf astIf) {
-		Type type = new TypeChecker(this).getType(astIf.getCondition());
-		if (type == null || !type.isBool()) {
-			error("Type mismatch: cannot convert from " + type + " to bool",
-					astIf, eINSTANCE.getAstStatementIf_Condition(), -1);
-		}
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkAstStatementWhile(AstStatementWhile astWhile) {
-		Type type = new TypeChecker(this).getType(astWhile.getCondition());
-		if (type == null || !type.isBool()) {
-			error("Type mismatch: cannot convert from " + type + " to bool",
-					astWhile, eINSTANCE.getAstStatementWhile_Condition(), -1);
-		}
-	}
-
-	@Check(CheckType.NORMAL)
 	public void checkAstStatementCall(AstStatementCall astCall) {
 		AstProcedure procedure = astCall.getProcedure();
 		String name = procedure.getName();
@@ -388,6 +384,24 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 						eINSTANCE.getAstStatementCall_Parameters(), index);
 			}
 			index++;
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkAstStatementIf(AstStatementIf astIf) {
+		Type type = new TypeChecker(this).getType(astIf.getCondition());
+		if (type == null || !type.isBool()) {
+			error("Type mismatch: cannot convert from " + type + " to bool",
+					astIf, eINSTANCE.getAstStatementIf_Condition(), -1);
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkAstStatementWhile(AstStatementWhile astWhile) {
+		Type type = new TypeChecker(this).getType(astWhile.getCondition());
+		if (type == null || !type.isBool()) {
+			error("Type mismatch: cannot convert from " + type + " to bool",
+					astWhile, eINSTANCE.getAstStatementWhile_Condition(), -1);
 		}
 	}
 
