@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Vertex;
@@ -103,25 +104,30 @@ public class RepetitionVectorAnalyzer {
 					+ "is not SDF or CSDF!");
 		}
 
+		CSDFMoC moc = (CSDFMoC) instance.getMoC();
+
 		rationals.put(vertex, rate);
 
 		for (Connection conn : graph.outgoingEdgesOf(vertex)) {
 			Vertex tgt = graph.getEdgeTarget(conn);
 			if (tgt.isInstance()) {
+				CSDFMoC tgtMoC = (CSDFMoC) tgt.getInstance().getMoC();
+
 				if (!rationals.containsKey(tgt)) {
-					int prd = conn.getSource().getNumTokensProduced();
-					int cns = conn.getTarget().getNumTokensConsumed();
+					int prd = moc.getNumTokensProduced(conn.getSource());
+					int cns = tgtMoC.getNumTokensConsumed(conn.getTarget());
 					calculateRate(tgt, rate.mul(new Rational(prd, cns)));
 				}
 			}
 		}
 
-		for (Connection connection : graph.incomingEdgesOf(vertex)) {
-			Vertex src = graph.getEdgeSource(connection);
+		for (Connection conn : graph.incomingEdgesOf(vertex)) {
+			Vertex src = graph.getEdgeSource(conn);
 			if (src.isInstance()) {
+				CSDFMoC srcMoC = (CSDFMoC) src.getInstance().getMoC();
 				if (!rationals.containsKey(src)) {
-					int prd = connection.getSource().getNumTokensProduced();
-					int cns = connection.getTarget().getNumTokensConsumed();
+					int prd = srcMoC.getNumTokensProduced(conn.getSource());
+					int cns = moc.getNumTokensConsumed(conn.getTarget());
 					calculateRate(src, rate.mul(new Rational(cns, prd)));
 				}
 			}
@@ -138,8 +144,13 @@ public class RepetitionVectorAnalyzer {
 			int srcRate = repetitionVector.get(graph.getEdgeSource(connection));
 			int tgtRate = repetitionVector.get(graph.getEdgeTarget(connection));
 
-			int prd = connection.getSource().getNumTokensProduced();
-			int cns = connection.getTarget().getNumTokensConsumed();
+			CSDFMoC srcMoc = (CSDFMoC) graph.getEdgeSource(connection)
+					.getInstance().getMoC();
+			CSDFMoC tgtMoc = (CSDFMoC) graph.getEdgeTarget(connection)
+					.getInstance().getMoC();
+
+			int prd = srcMoc.getNumTokensProduced(connection.getSource());
+			int cns = tgtMoc.getNumTokensConsumed(connection.getTarget());
 
 			if (srcRate * prd != tgtRate * cns) {
 				throw new OrccRuntimeException(
