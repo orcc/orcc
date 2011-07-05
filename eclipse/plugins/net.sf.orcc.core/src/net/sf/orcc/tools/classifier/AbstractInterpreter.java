@@ -62,7 +62,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 
 	private Copier copier;
 
-	private Map<String, Action> originalActions;
+	private Map<Action, Action> originalActions;
 
 	private Actor originalActor;
 
@@ -82,16 +82,16 @@ public class AbstractInterpreter extends ActorInterpreter {
 		// save the original actor
 		originalActor = actor;
 
-		// save actions of the original actor
-		originalActions = new HashMap<String, Action>();
-		for (Action action : actor.getActions()) {
-			originalActions.put(action.getName(), action);
-		}
-
 		// create a copier, and copy the original actor
 		copier = new EcoreUtil.Copier();
 		Actor copyOfActor = (Actor) copier.copy(actor);
 		copier.copyReferences();
+
+		// save actions of the original actor
+		originalActions = new HashMap<Action, Action>();
+		for (Action action : originalActor.getActions()) {
+			originalActions.put((Action) copier.get(action), action);
+		}
 
 		setActor(copyOfActor);
 
@@ -213,7 +213,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 	 */
 	public Action getScheduledAction() {
 		// return the action of the original actor
-		return originalActions.get(scheduledAction.getName());
+		return originalActions.get(scheduledAction);
 	}
 
 	@Override
