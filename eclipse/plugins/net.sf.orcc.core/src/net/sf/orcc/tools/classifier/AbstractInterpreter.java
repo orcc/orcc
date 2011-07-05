@@ -62,6 +62,8 @@ public class AbstractInterpreter extends ActorInterpreter {
 
 	private Copier copier;
 
+	private Map<String, Action> originalActions;
+
 	private Actor originalActor;
 
 	private Map<String, Boolean> portRead;
@@ -79,6 +81,12 @@ public class AbstractInterpreter extends ActorInterpreter {
 	public AbstractInterpreter(Actor actor) {
 		// save the original actor
 		originalActor = actor;
+
+		// save actions of the original actor
+		originalActions = new HashMap<String, Action>();
+		for (Action action : actor.getActions()) {
+			originalActions.put(action.getName(), action);
+		}
 
 		// create a copier, and copy the original actor
 		copier = new EcoreUtil.Copier();
@@ -205,7 +213,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 	 */
 	public Action getScheduledAction() {
 		// return the action of the original actor
-		return (Action) copier.get(scheduledAction);
+		return originalActions.get(scheduledAction.getName());
 	}
 
 	@Override
