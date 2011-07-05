@@ -345,8 +345,9 @@ public class ActorMerger implements INetworkTransformation {
 						.createPort(EcoreUtil.copy(tgtPort.getType()), "input_"
 								+ inIndex++);
 
+				CSDFMoC moc = (CSDFMoC) tgt.getInstance().getMoC();
 				int cns = scheduler.getRepetitionVector().get(tgt)
-						* tgtPort.getNumTokensConsumed();
+						* moc.getNumTokensConsumed(tgtPort);
 				port.increaseTokenConsumption(cns);
 				inputPattern.setNumTokens(port, cns);
 
@@ -360,8 +361,9 @@ public class ActorMerger implements INetworkTransformation {
 						EcoreUtil.copy(srcPort.getType()), "output_"
 								+ outIndex++);
 
+				CSDFMoC moc = (CSDFMoC) src.getInstance().getMoC();
 				int prd = scheduler.getRepetitionVector().get(src)
-						* srcPort.getNumTokensProduced();
+						* moc.getNumTokensProduced(srcPort);
 				port.increaseTokenProduction(prd);
 				outputPattern.setNumTokens(port, prd);
 
