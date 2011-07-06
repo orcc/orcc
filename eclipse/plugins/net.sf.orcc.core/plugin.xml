@@ -7,7 +7,7 @@
       <package
             class="net.sf.orcc.ir.IrPackage"
             genModel="model/Ir.genmodel"
-            uri="platform:/resource/net.sf.orcc.core/model/Ir.ecore">
+            uri="http://orcc.sf.net/ir/Ir">
       </package>
    </extension>
    <extension
