@@ -41,6 +41,7 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.InstancePrinter;
 import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.transformations.CastAdder;
+import net.sf.orcc.backends.transformations.DivisionSubstitution;
 import net.sf.orcc.backends.transformations.Inliner;
 import net.sf.orcc.backends.transformations.Multi2MonoToken;
 import net.sf.orcc.backends.transformations.tac.ExpressionSplitter;
@@ -127,6 +128,7 @@ public class XlimBackendImpl extends AbstractBackend {
 		if (multi2mono) {
 			new Multi2MonoToken().doSwitch(actor);
 			new LocalArrayRemoval().doSwitch(actor);
+			new DivisionSubstitution().doSwitch(actor);
 		}
 
 		ActorVisitor<?>[] transformations = { new SSATransformation(),
