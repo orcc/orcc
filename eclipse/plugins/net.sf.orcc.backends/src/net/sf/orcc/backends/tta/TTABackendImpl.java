@@ -167,15 +167,11 @@ public class TTABackendImpl extends AbstractBackend {
 		TTA simpleTTA = ArchitectureFactory.eINSTANCE.createTTASpecialized(
 				instance.getId(), instance);
 
-		InstancePrinter vhdlPrinter = new InstancePrinter("TTA_processor_vhdl",
-				!debugMode, true);
 		ArchitecturePrinter adfPrinter = new ArchitecturePrinter(
 				"TTA_processor_adf");
 		ArchitecturePrinter idfPrinter = new ArchitecturePrinter(
 				"TTA_processor_idf");
 
-		vhdlPrinter.print("processor_" + instance.getId() + ".vhd",
-				instancePath, instance, "processor");
 		adfPrinter.print("processor_" + instance.getId() + ".adf",
 				instancePath, simpleTTA, "tta");
 		idfPrinter.print("processor_" + instance.getId() + ".idf",

@@ -54,12 +54,6 @@ set_global_assignment -name VHDL_FILE others/tta_fifo.vhd
 set_global_assignment -name VHDL_FILE others/tta_fifo.vhd
 set_global_assignment -name VHDL_FILE others/stream_source_2.vhd
 set_global_assignment -name VHDL_FILE others/stream_source_1.vhd
-set_global_assignment -name VHDL_FILE others/mainpll.vhd
-set_global_assignment -name VHDL_FILE others/clock_div.vhd
-set_global_assignment -name VHDL_FILE others/allzero32.vhd
-set_global_assignment -name VHDL_FILE others/allzero13.vhd
-set_global_assignment -name VHDL_FILE others/allzero9.vhd
-set_global_assignment -name VHDL_FILE others/allzero8.vhd
 set_global_assignment -name VERILOG_FILE others/data_src2.v
 set_global_assignment -name VERILOG_FILE others/data_src1.v
 set_global_assignment -name VERILOG_FILE others/usedw_to_status.v

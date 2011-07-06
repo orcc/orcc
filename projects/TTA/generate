@@ -34,6 +34,7 @@ import sys
 import os
 import time
 import getopt
+import shutil
 from orcc_ import *
 
 def main():
@@ -85,7 +86,7 @@ def compile():
     print "*********************************************************************"
 
     for instance in instances:
-        print ">> Instance " + instance.name + "."
+        print ">> Instance " + instance.id + "."
         instance.compile(srcPath)
 
     print "* Compilation of %d instances done in %f seconds." % (len(instances), time.time() - start)
@@ -99,7 +100,7 @@ def simulate():
     print "*********************************************************************"
 
     for instance in instances:
-        print ">> Instance " + instance.name + "."
+        print ">> Instance " + instance.id + "."
         instance.simulate(srcPath)
 
     print "* Simulation of %d instances done in %f seconds." % (len(instances), time.time() - start)
@@ -111,10 +112,25 @@ def generate():
     print "*********************************************************************"
     print "* Generate the TTA processors"
     print "*********************************************************************"
-
+    
+    print "* Initialize the generation."
+    shutil.copy(os.path.join(srcPath, "top.vhd"), buildPath)
+    shutil.copy(os.path.join(srcPath, "top.qsf"), buildPath)
+    shutil.copy(os.path.join(srcPath, "top.qpf"), buildPath)
+    iromAddrList = []
+    dramAddrList = []
+    
     for instance in instances:
-        print ">> Instance " + instance.name + "."
-        instance.generate(srcPath, buildPath, libPath, pylibPath)
+        instance.initializeMemories(srcPath)
+        iromAddrList.append(instance.irom.getAddr())
+        dramAddrList.append(instance.dram.getAddr())
+    
+    iromAddrMax = max(iromAddrList)
+    dramAddrMax = max(dramAddrList)
+    
+    for instance in instances:
+        print ">> Instance " + instance.id + "."
+        instance.generate(srcPath, buildPath, libPath, pylibPath, iromAddrMax, dramAddrMax)
 
     print "* Generation of %d instances done in %f seconds." % (len(instances), time.time() - start)
 

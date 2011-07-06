@@ -34,6 +34,7 @@ import os
 import commands
 import subprocess
 import shutil
+import tempita
 
 from .port import *
 from .memory import *
@@ -42,43 +43,48 @@ class Instance:
 
     def __init__(self, name, inputs, outputs, isNative):
         # General
-        self.name = name
+        self.id = name
         self.isNative = isNative
         # Ports
         self.inputs = inputs
         self.outputs = outputs
         # Memories
-        self.rom = None
-        self.ram = None
+        self.irom = None
+        self.dram = None
         # Useful filenames
-        self._processorFile = "processor_" + self.name + ".vhd"
-        self._adfFile = "processor_" + self.name + ".adf"
-        self._idfFile = "processor_" + self.name + ".idf"
-        self._llFile = self.name + ".ll"
-        self._tpefFile = self.name + ".tpef"
-        self._asmFile = self.name + ".tceasm"
-        self._bemFile = self.name + ".bem"
-        self._mifFile = self.name + ".mif"
-        self._mifDataFile = self.name + "_data" + ".mif"
-        self._romFile = "irom_" + self.name + ".vhd"
-        self._ramFile = "dram_" + self.name + ".vhd"
+        self._processorFile = "processor_" + self.id + ".vhd"
+        self._adfFile = "processor_" + self.id + ".adf"
+        self._idfFile = "processor_" + self.id + ".idf"
+        self._llFile = self.id + ".ll"
+        self._tpefFile = self.id + ".tpef"
+        self._asmFile = self.id + ".tceasm"
+        self._bemFile = self.id + ".bem"
+        self._mifFile = self.id + ".mif"
+        self._mifDataFile = self.id + "_data" + ".mif"
+        self._romFile = "irom_" + self.id + ".vhd"
+        self._ramFile = "dram_" + self.id + ".vhd"
         # Useful names
-        self._entity = "processor_" + self.name + "_tl"
+        self._entity = "processor_" + self.id + "_tl"
 
 
     def compile(self, srcPath):
-        instancePath = os.path.join(srcPath, self.name)
+        instancePath = os.path.join(srcPath, self.id)
         os.chdir(instancePath)
         retcode = subprocess.call(["tcecc", "-o", self._tpefFile, "-a", self._adfFile, self._llFile])
         if retcode >= 0: retcode = subprocess.call(["tcedisasm", "-n", "-o", self._asmFile, self._adfFile, self._tpefFile])
         if retcode >= 0: retcode = subprocess.call(["createbem", "-o", self._bemFile, self._adfFile])
         if retcode >= 0: retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", "images", "-f", "mif", "-o", "mif", self._adfFile])
 
+    def initializeMemories(self, srcPath):
+        srcPath = os.path.join(srcPath, self.id)
+        os.chdir(srcPath)
+        self.irom = self._readMemory(self._mifFile)
+        self.dram = self._readMemory(self._mifDataFile)
 
-    def generate(self, srcPath, buildPath, libPath, pylibPath):
-        srcPath = os.path.join(srcPath, self.name)
+    def generate(self, srcPath, buildPath, libPath, pylibPath, iromAddrMax, dramAddrMax):
+        srcPath = os.path.join(srcPath, self.id)
         sharePath = os.path.join(buildPath, "share")
-        buildPath = os.path.join(buildPath, self.name)
+        buildPath = os.path.join(buildPath, self.id)
         os.chdir(srcPath)
         # Copy libraries in working directory
         shutil.copy(os.path.join(libPath, "fifo", "many_streams.hdb"), srcPath)
@@ -89,28 +95,27 @@ class Instance:
         # Generate the processor
         subprocess.call(["generateprocessor", "-o", buildPath, "-b", self._bemFile, "--shared-files-dir", sharePath,
                                         "-l", "vhdl", "-e", self._entity, "-i", self._idfFile, self._adfFile])
-        # Generate vhdl memory files
-        self.rom = self._readMemory(self._mifFile)
-        self.ram = self._readMemory(self._mifDataFile)
-        self.rom.generate(self.name, os.path.join(libPath, "memory", "rom.template"), os.path.join(buildPath, self._romFile))
-        self.ram.generate(self.name, os.path.join(libPath, "memory", "ram.template"), os.path.join(buildPath, self._ramFile))
+        # Generate vhdl memory and processor files
+        self.irom.generate(self.id, os.path.join(libPath, "memory", "rom.template"), os.path.join(buildPath, self._romFile))
+        self.dram.generate(self.id, os.path.join(libPath, "memory", "ram.template"), os.path.join(buildPath, self._ramFile))
+        self.generateProcessor(os.path.join(libPath, "processor", "processor.template"), os.path.join(buildPath, self._processorFile), iromAddrMax, dramAddrMax)
         # Copy files to build directory
         shutil.copy(self._mifFile, buildPath)
         shutil.copy(self._mifDataFile, buildPath)
         shutil.copy("imem_mau_pkg.vhdl", buildPath)
-        shutil.copy(self._processorFile, buildPath)
+
         # Clean working directory
         os.remove("many_streams.hdb")
         shutil.rmtree("vhdl", ignore_errors=True)
 
 
     def simulate(self, srcPath):
-        instancePath = os.path.join(srcPath, self.name)
+        instancePath = os.path.join(srcPath, self.id)
         os.chdir(instancePath)
 
         # Copy trace to the instance folder
         for input in self.inputs:
-            traceName = "decoder_" + self.name + "_" + input.name + ".txt"
+            traceName = "decoder_" + self.id + "_" + input.name + ".txt"
             fifoName = "tta_stream_v%d.in" % (input.index)
             srcTrace = os.path.join(srcPath, "trace", traceName)
             tgtTrace = os.path.join(instancePath, "test")
@@ -134,5 +139,14 @@ class Instance:
                 depth = depth[:len(depth)-1]
 
         return Memory(int(width), int(depth))
+
+
+    def generateProcessor(self, templateFile, targetFile, iromAddrMax, dramAddrMax):
+        template = tempita.Template.from_filename(templateFile, namespace={}, encoding=None)
+        result = template.substitute(id=self.id, inputs=self.inputs, outputs=self.outputs,
+                            irom_width=self.irom.getWidth(), irom_addr=self.irom.getAddr(),
+                            dram_width=self.dram.getWidth(), dram_addr=self.dram.getAddr(),
+                            irom_addr_max=iromAddrMax, dram_addr_max=dramAddrMax)
+        open(targetFile, "w").write(result)
 
 

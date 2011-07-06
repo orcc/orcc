@@ -31,6 +31,7 @@
 
 import string
 import math
+import tempita
 
 class Memory:
 
@@ -39,13 +40,18 @@ class Memory:
         self.depth = depth
         
     def generate(self, instanceName, templateFile, targetFile):
-        form = open(templateFile, "r").read()
-        template = string.Template(form)
-        # n_width = 2^width and log_depth = log2(depth) + 1
-        result = template.substitute(id=instanceName,
-                            width=str(self.width), depth=str(self.depth),
-                            m_width=str(self.width - 1), m_depth=str(self.depth - 1),
-                            n_width=str(1 << self.width), log_depth=str(int(math.ceil(math.log(self.depth, 2))) + 1))
+        template = tempita.Template.from_filename(templateFile, namespace={}, encoding=None)
+        result = template.substitute(id=instanceName, width=self.getWidth(),
+                            depth=self.getDepth(), addr=self.getAddr())
         open(targetFile, "w").write(result)
+    
+    def getAddr(self):
+        return int(math.ceil(math.log(self.depth, 2))) + 1
+            
+    def getDepth(self):
+        return self.depth
+        
+    def getWidth(self):
+        return self.width
         
 
