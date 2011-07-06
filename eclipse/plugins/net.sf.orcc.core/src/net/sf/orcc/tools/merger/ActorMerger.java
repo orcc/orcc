@@ -105,6 +105,8 @@ public class ActorMerger implements INetworkTransformation {
 
 	private Map<Port, Var> buffersMap;
 
+	private SDFMoC moc;
+
 	private void addBuffer(String name, int size, Type eltType) {
 		IrFactory factory = IrFactory.eINSTANCE;
 		Type type = factory.createTypeList(size, eltType);
@@ -290,8 +292,9 @@ public class ActorMerger implements INetworkTransformation {
 	private Pattern createInputPattern() {
 		IrFactory factory = IrFactory.eINSTANCE;
 		Pattern ip = factory.createPattern();
+		SDFMoC moc = (SDFMoC) superActor.getMoC();
 		for (Port port : superActor.getInputs()) {
-			int numTokens = port.getNumTokensConsumed();
+			int numTokens = moc.getNumTokensConsumed(port);
 			Type type = factory.createTypeList(numTokens,
 					EcoreUtil.copy(port.getType()));
 			Var var = factory.createVar(0, type, port.getName(), false, true);
@@ -309,8 +312,9 @@ public class ActorMerger implements INetworkTransformation {
 	private Pattern createOutputPattern() {
 		IrFactory factory = IrFactory.eINSTANCE;
 		Pattern op = factory.createPattern();
+		SDFMoC moc = (SDFMoC) superActor.getMoC();		
 		for (Port port : superActor.getOutputs()) {
-			int numTokens = port.getNumTokensProduced();
+			int numTokens = moc.getNumTokensProduced(port);
 			Type type = factory.createTypeList(numTokens,
 					EcoreUtil.copy(port.getType()));
 			Var var = factory.createVar(0, type, port.getName(), false, true);
@@ -328,6 +332,11 @@ public class ActorMerger implements INetworkTransformation {
 		IrFactory factory = IrFactory.eINSTANCE;
 		Pattern inputPattern = factory.createPattern();
 		Pattern outputPattern = factory.createPattern();
+
+		SDFMoC sdfMoC = MocFactory.eINSTANCE.createSDFMoC();
+		sdfMoC.setInputPattern(inputPattern);
+		sdfMoC.setOutputPattern(outputPattern);
+		superActor.setMoC(sdfMoC);
 
 		inputs = new HashMap<Connection, Port>();
 		outputs = new HashMap<Connection, Port>();
@@ -348,7 +357,7 @@ public class ActorMerger implements INetworkTransformation {
 				CSDFMoC moc = (CSDFMoC) tgt.getInstance().getMoC();
 				int cns = scheduler.getRepetitionVector().get(tgt)
 						* moc.getNumTokensConsumed(tgtPort);
-				port.increaseTokenConsumption(cns);
+
 				inputPattern.setNumTokens(port, cns);
 
 				superActor.getInputs().add(port);
@@ -364,7 +373,7 @@ public class ActorMerger implements INetworkTransformation {
 				CSDFMoC moc = (CSDFMoC) src.getInstance().getMoC();
 				int prd = scheduler.getRepetitionVector().get(src)
 						* moc.getNumTokensProduced(srcPort);
-				port.increaseTokenProduction(prd);
+
 				outputPattern.setNumTokens(port, prd);
 
 				superActor.getOutputs().add(port);
@@ -372,11 +381,6 @@ public class ActorMerger implements INetworkTransformation {
 				portsMap.put(port, srcPort);
 			}
 		}
-
-		SDFMoC sdfMoC = MocFactory.eINSTANCE.createSDFMoC();
-		sdfMoC.setInputPattern(inputPattern);
-		sdfMoC.setOutputPattern(outputPattern);
-		superActor.setMoC(sdfMoC);
 	}
 
 	/**
@@ -438,12 +442,13 @@ public class ActorMerger implements INetworkTransformation {
 	private void createStateVariables() {
 		buffersMap = new HashMap<Port, Var>();
 		inputToVarMap = new HashMap<Port, Var>();
+		SDFMoC sdfMoc = (SDFMoC) superActor.getMoC();
 
 		int index = 0;
 		// Create buffers for inputs
 		for (Port port : superActor.getInputs()) {
 			String name = "buffer_" + index++;
-			int numTokens = port.getNumTokensConsumed();
+			int numTokens = sdfMoc.getNumTokensConsumed(port);
 			addBuffer(name, numTokens, port.getType());
 			addCounter(name + "_r");
 			inputToVarMap.put(port, superActor.getStateVar(name));
@@ -453,7 +458,9 @@ public class ActorMerger implements INetworkTransformation {
 		// Create buffers for outputs
 		for (Port port : superActor.getOutputs()) {
 			String name = "buffer_" + index++;
-			int numTokens = port.getNumTokensProduced();
+
+			int numTokens = sdfMoc.getNumTokensProduced(port);
+
 			addBuffer(name, numTokens, port.getType());
 			addCounter(name + "_w");
 			inputToVarMap.put(port, superActor.getStateVar(name));
@@ -557,7 +564,6 @@ public class ActorMerger implements INetworkTransformation {
 	 */
 	private void mergeActors() {
 		superActor = IrFactory.eINSTANCE.createActor();
-
 		String name = "SuperActor_" + index;
 		superActor.setName(name);
 		superActor.setFileName(name);
