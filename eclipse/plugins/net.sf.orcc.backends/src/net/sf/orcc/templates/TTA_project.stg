@@ -66,6 +66,7 @@ set_global_assignment -name VERILOG_FILE others/usedw_to_status.v
 set_global_assignment -name VERILOG_FILE others/button_debouncer.v
 set_global_assignment -name VERILOG_FILE others/addr_gen_2.v
 set_global_assignment -name VERILOG_FILE others/addr_gen_1.v
+set_global_assignment -name VHDL_FILE others/orcc_fifo.vhd
 
 # Pin assignments
 set_location_assignment PIN_F21 -to user_led[0]

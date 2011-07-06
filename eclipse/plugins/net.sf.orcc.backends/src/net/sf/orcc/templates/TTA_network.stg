@@ -53,18 +53,6 @@ architecture bdf_type of top is
          );
   end component;
 
-  component mainpll
-    port(inclk0			: in  std_logic;
-         c0				: out std_logic
-         );
-  end component;
-
-  component clock_div
-    port(inclk0 		: in  std_logic;
-         c0     		: out std_logic
-         );
-  end component;
-
   component button_debouncer
     generic (counter_max : integer;
              preset_val  : integer
@@ -84,7 +72,6 @@ architecture bdf_type of top is
   -- Signals declaration
   ---------------------------------------------------------------------------
   -- System
-  signal system_clock   : std_logic;
   signal system_vcc     : std_logic;
   signal system_reset_n : std_logic;
   
@@ -98,19 +85,11 @@ begin
   --------------------------------------------------------------------------- 
   system_vcc \<= '1';
 
-  mainpll_inst : mainpll
-    port map(inclk0 =\> hw_clk,
-             c0     =\> system_clock);
-
-  st_clock_inst : clock_div
-    port map(inclk0 =\> system_clock,
-             c0     =\> st2clk);
-
   reset_debouncer : button_debouncer
     generic map(counter_max =\> 100000,
                 preset_val  =\> 0
                 )
-    port map(clk      =\> system_clock,
+    port map(clk      =\> hw_clk,
              rst_n    =\> system_vcc,
              data_in  =\> button(1),
              data_out =\> system_reset_n);
@@ -228,7 +207,7 @@ assignFifo(connection) ::= <<
 fifo_<indexFifo(connection)> : tta_fifo
   port map(wrreq   =\> fifo_<indexFifo(connection)>_wrreq,
            reset_n =\> system_reset_n,
-           clk     =\> system_clock,
+           clk     =\> hw_clk,
            rdreq   =\> fifo_<indexFifo(connection)>_rdreq,
            data    =\> fifo_<indexFifo(connection)>_data,
            q       =\> fifo_<indexFifo(connection)>_q,
@@ -241,7 +220,7 @@ assignInstances(instances) ::= <<
 
 assignInstance(instance) ::= <<
 <instance.id>_inst : processor_<instance.id>
-  port map(clk          =\> system_clock,
+  port map(clk          =\> hw_clk,
            <assignPorts(instance)>
            reset_n      =\> system_reset_n);
 >>
