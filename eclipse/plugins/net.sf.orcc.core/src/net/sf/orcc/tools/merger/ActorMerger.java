@@ -105,8 +105,6 @@ public class ActorMerger implements INetworkTransformation {
 
 	private Map<Port, Var> buffersMap;
 
-	private SDFMoC moc;
-
 	private void addBuffer(String name, int size, Type eltType) {
 		IrFactory factory = IrFactory.eINSTANCE;
 		Type type = factory.createTypeList(size, eltType);
@@ -312,7 +310,7 @@ public class ActorMerger implements INetworkTransformation {
 	private Pattern createOutputPattern() {
 		IrFactory factory = IrFactory.eINSTANCE;
 		Pattern op = factory.createPattern();
-		SDFMoC moc = (SDFMoC) superActor.getMoC();		
+		SDFMoC moc = (SDFMoC) superActor.getMoC();
 		for (Port port : superActor.getOutputs()) {
 			int numTokens = moc.getNumTokensProduced(port);
 			Type type = factory.createTypeList(numTokens,
@@ -458,9 +456,7 @@ public class ActorMerger implements INetworkTransformation {
 		// Create buffers for outputs
 		for (Port port : superActor.getOutputs()) {
 			String name = "buffer_" + index++;
-
 			int numTokens = sdfMoc.getNumTokensProduced(port);
-
 			addBuffer(name, numTokens, port.getType());
 			addCounter(name + "_w");
 			inputToVarMap.put(port, superActor.getStateVar(name));
@@ -585,6 +581,9 @@ public class ActorMerger implements INetworkTransformation {
 	public void transform(Network network) throws OrccException {
 		graph = network.getGraph();
 
+		// make instance unique in the network
+		new UniqueInstantiator().transform(network);
+
 		// static region detections
 		StaticRegionDetector detector = new StaticRegionDetector(network);
 		for (Set<Vertex> vertices : detector.staticRegionSets()) {
@@ -592,9 +591,6 @@ public class ActorMerger implements INetworkTransformation {
 
 			DirectedGraph<Vertex, Connection> subgraph = new DirectedSubgraph<Vertex, Connection>(
 					graph, vertices, null);
-
-			// make instance unique in the sub-graph
-			new UniqueInstantiator().transform(subgraph);
 
 			// create the static schedule of vertices
 			scheduler = new SASLoopScheduler(subgraph);
