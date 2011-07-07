@@ -63,16 +63,16 @@ set_global_assignment -name VERILOG_FILE others/addr_gen_1.v
 set_global_assignment -name VHDL_FILE others/orcc_fifo.vhd
 
 # Pin assignments
-set_location_assignment PIN_F21 -to user_led[0]
-set_location_assignment PIN_C23 -to user_led[1]
-set_location_assignment PIN_B23 -to user_led[2]
-set_location_assignment PIN_A23 -to user_led[3]
-set_location_assignment PIN_D19 -to user_led[4]
-set_location_assignment PIN_C19 -to user_led[5]
-set_location_assignment PIN_F19 -to user_led[6]
-set_location_assignment PIN_E19 -to user_led[7]
-set_location_assignment PIN_AP5 -to user_resetn
-set_location_assignment PIN_T33 -to clkin_50
+set_location_assignment PIN_F21 -to leds[0]
+set_location_assignment PIN_C23 -to leds[1]
+set_location_assignment PIN_B23 -to leds[2]
+set_location_assignment PIN_A23 -to leds[3]
+set_location_assignment PIN_D19 -to leds[4]
+set_location_assignment PIN_C19 -to leds[5]
+set_location_assignment PIN_F19 -to leds[6]
+set_location_assignment PIN_E19 -to leds[7]
+set_location_assignment PIN_AP5 -to button
+set_location_assignment PIN_T33 -to hw_clk
 
 >>
 
