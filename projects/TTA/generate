@@ -128,6 +128,9 @@ def generate():
     iromAddrMax = max(iromAddrList)
     dramAddrMax = max(dramAddrList)
     
+    shutil.rmtree(os.path.join(buildPath, "others"), ignore_errors=True)
+    shutil.copytree(os.path.join(libPath, "others"), os.path.join(buildPath, "others"))
+    
     for instance in instances:
         print ">> Instance " + instance.id + "."
         instance.generate(srcPath, buildPath, libPath, pylibPath, iromAddrMax, dramAddrMax)

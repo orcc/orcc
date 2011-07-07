@@ -110,8 +110,6 @@ class Instance:
         shutil.copy(self._mifFile, buildPath)
         shutil.copy(self._mifDataFile, buildPath)
         shutil.copy("imem_mau_pkg.vhdl", buildPath)
-        shutil.rmtree(os.path.join(buildPath, "others"), ignore_errors=True)
-        shutil.copytree(os.path.join(libPath, "others"), os.path.join(buildPath, "others"))
 
         # Clean working directory
         os.remove("many_streams.hdb")
