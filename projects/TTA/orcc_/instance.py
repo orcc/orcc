@@ -67,9 +67,13 @@ class Instance:
         self._entity = "processor_" + self.id + "_tl"
 
 
-    def compile(self, srcPath):
+    def compile(self, srcPath, libPath):
         instancePath = os.path.join(srcPath, self.id)
         os.chdir(instancePath)
+        if self.isNative:
+            shutil.copy(os.path.join(libPath, "native", self._llFile), instancePath)
+            shutil.copy(os.path.join(libPath, "native", self._adfFile), instancePath)
+            shutil.copy(os.path.join(libPath, "native", self._idfFile), instancePath)
         retcode = subprocess.call(["tcecc", "-o", self._tpefFile, "-a", self._adfFile, self._llFile])
         if retcode >= 0: retcode = subprocess.call(["tcedisasm", "-n", "-o", self._asmFile, self._adfFile, self._tpefFile])
         if retcode >= 0: retcode = subprocess.call(["createbem", "-o", self._bemFile, self._adfFile])
@@ -98,11 +102,16 @@ class Instance:
         # Generate vhdl memory and processor files
         self.irom.generate(self.id, os.path.join(libPath, "memory", "rom.template"), os.path.join(buildPath, self._romFile))
         self.dram.generate(self.id, os.path.join(libPath, "memory", "ram.template"), os.path.join(buildPath, self._ramFile))
-        self.generateProcessor(os.path.join(libPath, "processor", "processor.template"), os.path.join(buildPath, self._processorFile), iromAddrMax, dramAddrMax)
+        if self.isNative:
+            shutil.copy(os.path.join(libPath, "native", self._processorFile), buildPath)
+        else:
+            self.generateProcessor(os.path.join(libPath, "processor", "processor.template"), os.path.join(buildPath, self._processorFile), iromAddrMax, dramAddrMax)
         # Copy files to build directory
         shutil.copy(self._mifFile, buildPath)
         shutil.copy(self._mifDataFile, buildPath)
         shutil.copy("imem_mau_pkg.vhdl", buildPath)
+        shutil.rmtree(os.path.join(buildPath, "others"), ignore_errors=True)
+        shutil.copytree(os.path.join(libPath, "others"), os.path.join(buildPath, "others"))
 
         # Clean working directory
         os.remove("many_streams.hdb")

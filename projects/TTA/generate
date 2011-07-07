@@ -87,7 +87,7 @@ def compile():
 
     for instance in instances:
         print ">> Instance " + instance.id + "."
-        instance.compile(srcPath)
+        instance.compile(srcPath, libPath)
 
     print "* Compilation of %d instances done in %f seconds." % (len(instances), time.time() - start)
 
