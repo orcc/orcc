@@ -1,0 +1,355 @@
+///////////////////////////////////////////////////////////////////////////////
+// Common applet
+///////////////////////////////////////////////////////////////////////////////
+sendData(port) ::= <<
+<if(port.type.bool)
+>if (input_bit = 1) then
+  <port.name>_data  \<= '1';
+else
+  <port.name>_data  \<= '0';
+end if;<
+else
+><if(port.type.int)
+  ><port.name>_data  \<= std_logic_vector(to_signed(input_bit, <port.type.size>));<
+  else
+  ><port.name>_data  \<= std_logic_vector(to_unsigned(input_bit, <port.type.size>));<
+  endif><
+endif>
+>>
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Print signal and instanciation
+///////////////////////////////////////////////////////////////////////////////
+printSignals(port) ::= <<
+<if(port.type.bool)
+ >signal <port.name>_data  : std_logic;
+<else
+ >signal <port.name>_data  : std_logic_vector(<port.type.size> -1 downto 0);
+<endif>
+signal <port.name>_send  : std_logic;
+signal <port.name>_ack   : std_logic;
+signal <port.name>_rdy   : std_logic;
+signal <port.name>_count  : std_logic_vector(15 downto 0) ;
+>>
+
+printPorts(port) ::= <<
+<if(port.type.bool)
+ ><port.name>_data  : std_logic;
+<else
+ ><port.name>_data  : std_logic_vector(<port.type.size> -1 downto 0);
+<endif>
+<port.name>_send  : std_logic;
+<port.name>_ack   : std_logic;
+<port.name>_rdy   : std_logic;
+<port.name>_count  : std_logic_vector(15 downto 0);
+>>
+
+signalInit(port) ::=<<
+<port.name>_send \<= '0';
+<if(port.type.bool)>
+<port.name>_data \<= '0';
+<else>
+<port.name>_data \<= (others =\> '0');
+<endif>
+>>
+
+signalsInstanciation(port) ::= <<
+<port.name>_data  =\> <port.name>_data,
+<port.name>_send  =\> <port.name>_send,
+<port.name>_ack   =\> <port.name>_ack,
+<port.name>_count   =\> <port.name>_count,
+<port.name>_rdy   =\> <port.name>_rdy
+>>
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+///////////////////////////////////////////////////////////////////////////////
+// the dimensions of a list: [dim1][dim2]...[dimn]
+// does not output anything if <value> is empty
+listSize(values) ::= <<
+<values : {value | <value>}; separator=" * ">
+>>
+
+sig_const(input, output) ::= <<
+constant PERIOD : time := 50 ps;
+constant DUTY_CYCLE : real := 0.5;
+constant OFFSET : time := 100 ps;
+--
+type severity_level is (note, warning, error, failure);
+type tb_type is (after_reset, read_file, CheckRead);
+--
+-- Input and Output files
+<input.list: printFSMIn(); separator="\n">
+<output.list: printFSMOut(); separator="\n">
+--
+-- Input and Output signals
+<input.list: printSignals(); separator="\n">
+<output.list: printSignals(); separator="\n">
+--
+-- Configuration
+signal count       : integer range 255 downto 0;
+signal CLK       : std_logic := '0';
+signal RESET     : std_logic := '0';
+
+>>
+
+printFSMIn(port) ::= <<
+signal tb_FSM_<port.name>  : tb_type;
+file sim_file_<instance.id>_<port.name>  : text is "<instance.id>_<port.name>_sim.txt";
+>>
+
+printFSMOut(port) ::= <<
+file sim_file_<instance.id>_<port.name>  : text is "<instance.id>_<port.name>_sim.txt";
+>>
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Print processes
+///////////////////////////////////////////////////////////////////////////////
+CLK_process() ::= <<
+CLKProcess : process
+        begin
+            wait for OFFSET;
+            CLK_LOOP : loop
+                CLK \<= '0';
+                wait for (PERIOD - (PERIOD * DUTY_CYCLE));
+                CLK \<= '1';
+                wait for (PERIOD * DUTY_CYCLE);
+            end loop CLK_LOOP;
+        end process;
+
+>>
+
+RESET_process() ::= <<
+resetProcess : process
+   begin		
+	 wait for OFFSET;
+      -- reset state for 100ps.
+		RESET \<= '0';
+      wait for 100 ps;
+      RESET \<= '1';	
+		wait;
+   end process;
+
+>>
+
+init_process(output) ::= <<
+<output.list: RdyInit(); separator="\n">
+>>
+
+RdyInit(port) ::= <<
+<port.name>_rdy \<= '1';
+>>
+
+waveform_process_in(input) ::= <<
+--
+-- Input(s) Waveform Generation
+WaveGen_Proc_In : process (RESET, CLK)
+  variable Input_bit   : integer range 2147483647 downto - 2147483648;
+  variable line_number : line;
+begin
+  if RESET = '0' then
+    <input.list: signalInit()>    --
+    <input.list: {port|tb_FSM_<port.name> \<= after_reset;}; separator="\n">    
+    count \<= 0;
+  --  
+  elsif rising_edge(CLK) then 
+    <input.list: case_define_in(); separator="\n">
+  end if;
+end process WaveGen_Proc_In;
+
+>>
+
+
+case_define_in(port) ::= <<
+--
+-- Input port: <port.name> Waveform Generation
+case tb_FSM_<port.name> is
+  when after_reset =\>
+    count \<= count + 1;
+    if (count = 15) then
+      tb_FSM_<port.name> \<= read_file;
+      count           \<= 0;
+    end if;
+
+  when read_file =\>
+    if (not endfile (sim_file_<instance.id>_<port.name>)) then
+      readline(sim_file_<instance.id>_<port.name>, line_number);
+      --
+      if (line_number'length \> 0 and line_number(1) /= '/') then
+        read(line_number, input_bit);
+        <sendData(port)>
+        <port.name>_send \<= '1';    
+        tb_FSM_<port.name> \<= CheckRead;
+      end if;
+    end if;
+
+  when CheckRead =\>
+    if (not endfile (sim_file_<instance.id>_<port.name>)) and <port.name>_ack = '1' then
+      readline(sim_file_<instance.id>_<port.name>, line_number);
+      --
+      if (line_number'length \> 0 and line_number(1) /= '/') then
+        read(line_number, input_bit);
+        <sendData(port)>
+        <port.name>_send \<= '1';      
+      end if;
+    elsif (endfile (sim_file_<instance.id>_<port.name>)) then
+      <port.name>_send \<= '0'; 
+    end if;
+
+  when others =\> null;
+end case;
+
+>>
+
+waveform_process_out(output) ::= <<
+-- Output(s) waveform Generation
+<output.list: {port|<port.name>_ack \<= <port.name>_send;}; separator="\n">    
+--
+WaveGen_Proc_Out : process (RESET, CLK)
+  variable Input_bit   : integer range 2147483647 downto - 2147483648;
+  variable line_number : line;
+begin
+  if (RESET = '0') then
+    -- nothing here
+  elsif (rising_edge(CLK)) then
+    <output.list: case_define_out(); separator="\n">
+  end if;
+end process WaveGen_Proc_Out;
+
+>>
+
+
+case_define_out(port) ::= <<
+--
+-- Output port: <port.name> Waveform Generation
+if (not endfile (sim_file_<instance.id>_<port.name>) and <port.name>_send = '1') then
+  readline(sim_file_<instance.id>_<port.name>, line_number);
+  --
+  if (line_number'length \> 0 and line_number(1) /= '/') then
+    read(line_number, input_bit);
+<
+if(port.type.bool)
+>    if (input_bit = 1) then
+      assert (<port.name>_data = '1')
+        report "on port <port.name> incorrectly value computed : '0' instead of : '1'"
+        severity error;
+    else
+      assert (<port.name>_data = '0')
+        report "on port <port.name> incorrectly value computed : '1' instead of : '0'"
+        severity error;                
+    end if;<
+else
+><if(port.type.int)
+  >    assert (<port.name>_data  = std_logic_vector(to_signed(input_bit, <port.type.size>)))
+      -- report "on <port.name> incorrectly value computed : " & to_string(to_integer(to_signed(<port.name>_data))) & " instead of :" & to_string(input_bit)
+      -- report "on port <port.name> incorrectly value computed : " & str(to_integer(signed(<port.name>_data))) & " instead of :" & str(input_bit)
+      severity error;
+  <else
+  >    assert (<port.name>_data  = std_logic_vector(to_unsigned(input_bit, <port.type.size>)))
+      report "on port <port.name> incorrectly value computed : " & to_string(to_integer(to_unsigned(<port.name>_data))) & " instead of :" & to_string(input_bit)
+      --report "on port <port.name> incorrectly value computed : " & str(to_integer(unsigned(<port.name>_data))) & " instead of :" & str(input_bit)
+      severity error;
+  <endif
+  ><endif
+>    --
+  end if;
+end if;
+
+>>
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// testbench
+///////////////////////////////////////////////////////////////////////////////
+instance(instance, options) ::= <<
+------------------------------------------------------------------------------
+-- Generated from <instance.id>
+------------------------------------------------------------------------------
+
+library ieee;
+use ieee.std_logic_1164.all;
+use std.textio.all;
+use ieee.numeric_std.all;
+USE ieee.std_logic_unsigned.all;
+
+entity tb_<instance.id> is
+
+end tb_<instance.id>;
+
+
+architecture arch_tb_<instance.id> of tb_<instance.id> is 
+
+<if(instance.actor)>
+
+  ---------------------------------------------------------------------------
+  -- Signal & constant declaration
+  --------------------------------------------------------------------------- 
+  <sig_const(input=instance.actor.inputs,output=instance.actor.outputs)>
+  ---------------------------------------------------------------------------
+
+begin
+       
+    <CLK_process()>
+    
+    <init_process(output=instance.actor.outputs)>
+    
+    <RESET_process()>
+    
+    <if(instance.actor.inputs.list)
+    ><waveform_process_in(input=instance.actor.inputs)><
+    endif>
+    <if(instance.actor.outputs.list)
+    ><waveform_process_out(output=instance.actor.outputs)><
+    endif>
+<else>
+
+----------------------------------------------------------------------------
+-- component declaration
+----------------------------------------------------------------------------
+
+component <instance.id>
+	port (
+     
+      <if(instance.network.inputs.list || instance.network.outputs.list)><endif>
+      <instance.network.inputs.list: printPorts(); separator="\n"><if(instance.network.inputs.list && instance.network.outputs.list)><endif>
+      <instance.network.outputs.list: printPorts(); separator="\n"><if(!instance.network.outputs.list)>    <endif>
+      CLK : IN std_logic;
+      RESET : IN std_logic);
+      end component;
+  ---------------------------------------------------------------------------
+  -- Signal & constant declaration
+  --------------------------------------------------------------------------- 
+  <sig_const(input=instance.network.inputs,output=instance.network.outputs)>
+  ---------------------------------------------------------------------------
+
+begin
+
+   uut : <instance.id> port map (
+      CLK      =\> CLK,
+      RESET    =\> RESET<if(instance.network.inputs.list || instance.network.outputs.list)>,<endif>
+      <instance.network.inputs.list: signalsInstanciation(); separator=",\n"><if(instance.network.inputs.list && instance.network.outputs.list)>,<endif>
+      <instance.network.outputs.list: signalsInstanciation(); separator=",\n"><if(!instance.network.outputs.list)>    <endif>);
+      
+    <CLK_process()>
+    
+    <init_process(output=instance.network.outputs)>
+    
+    <RESET_process()>
+    
+    <if(instance.network.inputs.list)
+    ><waveform_process_in(input=instance.network.inputs)><
+    endif>
+    <if(instance.network.outputs.list)
+    ><waveform_process_out(output=instance.network.outputs)><
+    endif>
+<endif>
+
+end architecture arch_tb_<instance.id>;
+>>
