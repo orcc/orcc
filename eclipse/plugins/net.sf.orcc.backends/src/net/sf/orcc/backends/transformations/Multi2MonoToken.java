@@ -1512,7 +1512,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 */
 	private void visitTransition(State sourceState, State targetState,
 			Action action) {
-		VerifVisitedActions(action, sourceState, targetState);
+//		VerifVisitedActions(action, sourceState, targetState);
 		createActionsSet(action, sourceState, targetState);
 
 		if (repeatInput && !repeatOutput) {
