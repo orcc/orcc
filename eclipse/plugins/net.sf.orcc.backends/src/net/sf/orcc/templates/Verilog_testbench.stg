@@ -22,29 +22,53 @@ endif>
 ///////////////////////////////////////////////////////////////////////////////
 // Print signal and instanciation
 ///////////////////////////////////////////////////////////////////////////////
-printSignals(port) ::= <<
+printInPortSignals(port) ::= <<
+<if(port.type.bool)
+ >signal <port.name>_data  : std_logic := '0';
+<else
+ >signal <port.name>_data  : std_logic_vector(<port.type.size> -1 downto 0) := (others =\> '0');
+<endif>
+signal <port.name>_send  : std_logic := '0';
+signal <port.name>_ack   : std_logic;
+signal <port.name>_rdy   : std_logic;
+signal <port.name>_count  : std_logic_vector(15 downto 0) := (others =\> '0');
+>>
+printOutPortSignals(port) ::= <<
 <if(port.type.bool)
  >signal <port.name>_data  : std_logic;
 <else
  >signal <port.name>_data  : std_logic_vector(<port.type.size> -1 downto 0);
 <endif>
 signal <port.name>_send  : std_logic;
-signal <port.name>_ack   : std_logic;
-signal <port.name>_rdy   : std_logic;
-signal <port.name>_count  : std_logic_vector(15 downto 0) ;
+signal <port.name>_ack   : std_logic := '0';
+signal <port.name>_rdy   : std_logic := '0';
+signal <port.name>_count  : std_logic_vector(15 downto 0);
 >>
 
-printPorts(port) ::= <<
+printInPorts(port) ::= <<
 <if(port.type.bool)
- ><port.name>_data  : std_logic;
+ ><port.name>_data  : IN std_logic;
 <else
- ><port.name>_data  : std_logic_vector(<port.type.size> -1 downto 0);
+ ><port.name>_data  : IN std_logic_vector(<port.type.size> -1 downto 0);
 <endif>
-<port.name>_send  : std_logic;
-<port.name>_ack   : std_logic;
-<port.name>_rdy   : std_logic;
-<port.name>_count  : std_logic_vector(15 downto 0);
+<port.name>_send  : IN std_logic;
+<port.name>_ack   : OUT std_logic;
+<port.name>_rdy   : OUT std_logic;
+<port.name>_count  : IN std_logic_vector(15 downto 0);
 >>
+
+printOutPorts(port) ::= <<
+<if(port.type.bool)
+ ><port.name>_data  : OUT std_logic;
+<else
+ ><port.name>_data  : OUT std_logic_vector(<port.type.size> -1 downto 0);
+<endif>
+<port.name>_send  : OUT std_logic;
+<port.name>_ack   : IN std_logic;
+<port.name>_rdy   : IN std_logic;
+<port.name>_count  : OU std_logic_vector(15 downto 0);
+>>
+
 
 signalInit(port) ::=<<
 <port.name>_send \<= '0';
@@ -75,9 +99,9 @@ listSize(values) ::= <<
 >>
 
 sig_const(input, output) ::= <<
-constant PERIOD : time := 50 ps;
+constant PERIOD : time := 50 ns;
 constant DUTY_CYCLE : real := 0.5;
-constant OFFSET : time := 100 ps;
+constant OFFSET : time := 100 ns;
 --
 type severity_level is (note, warning, error, failure);
 type tb_type is (after_reset, read_file, CheckRead);
@@ -87,11 +111,11 @@ type tb_type is (after_reset, read_file, CheckRead);
 <output.list: printFSMOut(); separator="\n">
 --
 -- Input and Output signals
-<input.list: printSignals(); separator="\n">
-<output.list: printSignals(); separator="\n">
+<input.list: printInPortSignals(); separator="\n">
+<output.list: printOutPortSignals(); separator="\n">
 --
 -- Configuration
-signal count       : integer range 255 downto 0;
+signal count       : integer range 255 downto 0 := 0;
 signal CLK       : std_logic := '0';
 signal RESET     : std_logic := '0';
 
@@ -129,36 +153,32 @@ RESET_process() ::= <<
 resetProcess : process
    begin		
 	 wait for OFFSET;
-      -- reset state for 100ps.
-		RESET \<= '0';
-      wait for 100 ps;
-      RESET \<= '1';	
+      -- reset state for 100 ns.
+		RESET \<= '1';
+      wait for 100 ns;
+      RESET \<= '0';	
 		wait;
    end process;
 
 >>
 
 init_process(output) ::= <<
-<output.list: RdyInit(); separator="\n">
+<output.list: RdyAckInit(); separator="\n">
 >>
 
-RdyInit(port) ::= <<
+RdyAckInit(port) ::= <<
+<port.name>_ack \<= <port.name>_send;
 <port.name>_rdy \<= '1';
 >>
 
 waveform_process_in(input) ::= <<
 --
 -- Input(s) Waveform Generation
-WaveGen_Proc_In : process (RESET, CLK)
+WaveGen_Proc_In : process (CLK)
   variable Input_bit   : integer range 2147483647 downto - 2147483648;
   variable line_number : line;
 begin
-  if RESET = '0' then
-    <input.list: signalInit()>    --
-    <input.list: {port|tb_FSM_<port.name> \<= after_reset;}; separator="\n">    
-    count \<= 0;
-  --  
-  elsif rising_edge(CLK) then 
+  if rising_edge(CLK) then 
     <input.list: case_define_in(); separator="\n">
   end if;
 end process WaveGen_Proc_In;
@@ -252,7 +272,7 @@ else
       severity error;
   <else
   >    assert (<port.name>_data  = std_logic_vector(to_unsigned(input_bit, <port.type.size>)))
-      report "on port <port.name> incorrectly value computed : " & to_string(to_integer(to_unsigned(<port.name>_data))) & " instead of :" & to_string(input_bit)
+      --report "on port <port.name> incorrectly value computed : " & to_string(to_integer(to_unsigned(<port.name>_data))) & " instead of :" & to_string(input_bit)
       --report "on port <port.name> incorrectly value computed : " & str(to_integer(unsigned(<port.name>_data))) & " instead of :" & str(input_bit)
       severity error;
   <endif
@@ -273,11 +293,11 @@ instance(instance, options) ::= <<
 -- Generated from <instance.id>
 ------------------------------------------------------------------------------
 
-library ieee;
-use ieee.std_logic_1164.all;
-use std.textio.all;
-use ieee.numeric_std.all;
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
 USE ieee.std_logic_unsigned.all;
+USE ieee.numeric_std.ALL;
+USE std.textio.all;
 
 entity tb_<instance.id> is
 
@@ -318,8 +338,8 @@ component <instance.id>
 	port (
      
       <if(instance.network.inputs.list || instance.network.outputs.list)><endif>
-      <instance.network.inputs.list: printPorts(); separator="\n"><if(instance.network.inputs.list && instance.network.outputs.list)><endif>
-      <instance.network.outputs.list: printPorts(); separator="\n"><if(!instance.network.outputs.list)>    <endif>
+      <instance.network.inputs.list: printInPorts(); separator="\n"><if(instance.network.inputs.list && instance.network.outputs.list)><endif>
+      <instance.network.outputs.list: printOutPorts(); separator="\n"><if(!instance.network.outputs.list)>    <endif>
       CLK : IN std_logic;
       RESET : IN std_logic);
       end component;
