@@ -31,6 +31,7 @@ package net.sf.orcc.backends.xlim;
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.OrccLaunchConstants.MAPPING;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -204,11 +205,34 @@ public class XlimBackendImpl extends AbstractBackend {
 		networkPrinter.print(network.getName() + ".xcf", path, network,
 				"mapping");
 	}
+	
+	private void printTestbench(InstancePrinter printer, Instance instance) {
+		printer.print(instance.getId() + "_tb.vhd", path + File.separator
+				+ "Testbench", instance, "instance");
+
+		if (instance.isNetwork()) {
+			Network network = instance.getNetwork();
+			for (Instance subInstance : network.getInstances()) {
+				printTestbench(printer, subInstance);
+			}
+		}
+	}
 
 	private void printNetwork(Network network) {
 		NetworkPrinter printer;
 		String file = network.getName();
 		if (hardwareGen) {
+			
+			// generate instances test bench
+			File folder = new File(path + File.separator + "Testbench");
+			if (!folder.exists()) {
+				folder.mkdir();
+			}
+			InstancePrinter instancePrinter = new InstancePrinter("Verilog_testbench");
+			Instance instance = new Instance(network.getName(), network.getName());
+			instance.setContents(network);
+			printTestbench(instancePrinter, instance);
+			
 			file += ".vhd";
 			printer = new NetworkPrinter("XLIM_hw_network");
 		} else {
