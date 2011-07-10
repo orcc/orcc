@@ -65,12 +65,12 @@ type severity_level is (note, warning, error, failure);
 type tb_type is (after_reset, read_file, CheckRead);
 --
 -- Input and Output files
-<input.list: printFSMIn(); separator="\n">
-<output.list: printFSMOut(); separator="\n">
+<input: printFSMIn(); separator="\n">
+<output: printFSMOut(); separator="\n">
 --
 -- Input and Output signals
-<input.list: printSignals(); separator="\n">
-<output.list: printSignals(); separator="\n">
+<input: printSignals(); separator="\n">
+<output: printSignals(); separator="\n">
 --
 -- Configuration
 signal count       : integer range 255 downto 0;
@@ -110,12 +110,12 @@ WaveGen_Proc_In : process (reset_n, clock)
   variable line_number : line;
 begin
   if reset_n = '0' then
-    <input.list: signalInit()>    --
-    <input.list: {port|tb_FSM_<port.name> \<= after_reset;}; separator="\n">    
+    <input: signalInit()>    --
+    <input: {port|tb_FSM_<port.name> \<= after_reset;}; separator="\n">    
     count \<= 0;
   --  
   elsif rising_edge(clock) then 
-    <input.list: case_define_in(); separator="\n">
+    <input: case_define_in(); separator="\n">
   end if;
 end process WaveGen_Proc_In;
 
@@ -256,22 +256,22 @@ begin
   <instance.actor.simpleName>_orcc : entity work.<instance.actor.simpleName>
     port map (
       clock      =\> clock,
-      reset_n    =\> reset_n<if(instance.actor.inputs.list || instance.actor.outputs.list)>,<endif>
-      <instance.actor.inputs.list: signalsInstanciation(); separator=",\n"><if(instance.actor.inputs.list && instance.actor.outputs.list)>,<endif>
-      <instance.actor.outputs.list: signalsInstanciation(); separator=",\n"><if(!instance.actor.outputs.list)>    <endif>);
+      reset_n    =\> reset_n<if(instance.actor.inputs || instance.actor.outputs)>,<endif>
+      <instance.actor.inputs: signalsInstanciation(); separator=",\n"><if(instance.actor.inputs && instance.actor.outputs)>,<endif>
+      <instance.actor.outputs: signalsInstanciation(); separator=",\n"><if(!instance.actor.outputs)>    <endif>);
             
     <init_process()>
-    <if(instance.actor.inputs.list)
+    <if(instance.actor.inputs)
     ><waveform_process_in(input=instance.actor.inputs)><
     endif>
-    <if(instance.actor.outputs.list)
+    <if(instance.actor.outputs)
     ><waveform_process_out(output=instance.actor.outputs)><
     endif>
 <else>
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
   --------------------------------------------------------------------------- 
-  <sig_const(input=instance.network.inputs,output=instance.network.outputs)>
+  <sig_const(input=instance.network.inputs.list,output=instance.network.outputs.list)>
   ---------------------------------------------------------------------------
 
 begin
@@ -285,10 +285,10 @@ begin
       
     <init_process()>
     <if(instance.network.inputs.list)
-    ><waveform_process_in(input=instance.network.inputs)><
+    ><waveform_process_in(input=instance.network.inputs.list)><
     endif>
     <if(instance.network.outputs.list)
-    ><waveform_process_out(output=instance.network.outputs)><
+    ><waveform_process_out(output=instance.network.outputs.list)><
     endif>
 <endif>
 
