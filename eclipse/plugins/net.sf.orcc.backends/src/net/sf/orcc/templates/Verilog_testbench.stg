@@ -1,23 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
-// Common applet
-///////////////////////////////////////////////////////////////////////////////
-sendData(port) ::= <<
-<if(port.type.bool)
->if (input_bit = 1) then
-  <port.name>_data  \<= '1';
-else
-  <port.name>_data  \<= '0';
-end if;<
-else
-><if(port.type.int)
-  ><port.name>_data  \<= std_logic_vector(to_signed(input_bit, <port.type.size>));<
-  else
-  ><port.name>_data  \<= std_logic_vector(to_unsigned(input_bit, <port.type.size>));<
-  endif><
-endif>
->>
-
-
+import "net/sf/orcc/templates/VHDL_testbench.stg"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Print signal and instanciation
@@ -86,8 +67,6 @@ signalsInstanciation(port) ::= <<
 <port.name>_count   =\> <port.name>_count,
 <port.name>_rdy   =\> <port.name>_rdy
 >>
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -244,7 +223,6 @@ end process WaveGen_Proc_Out;
 
 >>
 
-
 case_define_out(port) ::= <<
 --
 -- Output port: <port.name> Waveform Generation
@@ -282,8 +260,6 @@ else
 end if;
 
 >>
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // testbench
