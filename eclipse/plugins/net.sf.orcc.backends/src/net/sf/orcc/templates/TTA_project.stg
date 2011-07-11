@@ -1,3 +1,5 @@
+// Quartus project
+
 qsfNetwork(network, options) ::= <<
 
 # Quartus II Project

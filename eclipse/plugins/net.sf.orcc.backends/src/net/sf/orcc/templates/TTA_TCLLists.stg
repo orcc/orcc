@@ -1,0 +1,74 @@
+
+
+network(network, options) ::= <<
+
+set SRC "."
+
+# Shared components
+vcom -93 -reportprogress 30 -work work $SRC/share/vhdl/util_pkg.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/share/vhdl/tce_util_pkg.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/share/vhdl/stream_out_8.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/share/vhdl/stream_out_7.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/share/vhdl/stream_out_6.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/share/vhdl/stream_out_5.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/share/vhdl/stream_out_4.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/share/vhdl/stream_out_3.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/share/vhdl/stream_out_2.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/share/vhdl/stream_out_1.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/share/vhdl/stream_in_6.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/share/vhdl/stream_in_5.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/share/vhdl/stream_in_4.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/share/vhdl/stream_in_3.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/share/vhdl/stream_in_2.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/share/vhdl/stream_in_1.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/share/vhdl/stream_in.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/share/vhdl/rf_1wr_1rd_always_1_guarded_0.vhd
+vcom -93 -reportprogress 30 -work work $SRC/share/vhdl/mul.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/share/vhdl/ldh_ldhu_ldq_ldqu_ldw_sth_stq_stw.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/share/vhdl/and_ior_xor.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/share/vhdl/add_and_eq_gt_gtu_ior_shl_shr_shru_sub_sxhw_sxqw_xor.vhdl
+
+# Other components
+vcom -93 -reportprogress 30 -work work $SRC/others/tta_fifo.vhd
+vcom -93 -reportprogress 30 -work work $SRC/others/tta_fifo.vhd
+vcom -93 -reportprogress 30 -work work $SRC/others/stream_source_2.vhd
+vcom -93 -reportprogress 30 -work work $SRC/others/stream_source_1.vhd
+vlog -reportprogress -work work $SRC/others/data_src2.v
+vlog -reportprogress -work work $SRC/others/data_src1.v
+vlog -reportprogress -work work $SRC/others/usedw_to_status.v
+vlog -reportprogress -work work $SRC/others/button_debouncer.v
+vlog -reportprogress -work work $SRC/others/addr_gen_2.v
+vlog -reportprogress -work work $SRC/others/addr_gen_1.v
+vcom -93 -reportprogress 30 -work work $SRC/others/orcc_fifo.vhd
+
+<network.instances: instance(); separator="\n">
+
+# Network
+vcom -93 -reportprogress 30 -work work $SRC/top.vhd
+
+
+# Simulate
+vsim -novopt top.vhd
+do wave.do
+run 10 us
+
+>>
+
+instance(instance) ::= <<
+# Instance <instance.id>
+vcom -93 -reportprogress 30 -work work $SRC/<instance.id>/vhdl/processor_<instance.id>_tl_params_pkg.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/<instance.id>/vhdl/processor_<instance.id>_tl.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/<instance.id>/vhdl/globals_pkg.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/<instance.id>/gcu_ic/output_socket_2_1.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/<instance.id>/gcu_ic/output_socket_1_1.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/<instance.id>/gcu_ic/input_socket_2.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/<instance.id>/gcu_ic/ifetch.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/<instance.id>/gcu_ic/idecompressor.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/<instance.id>/gcu_ic/ic.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/<instance.id>/gcu_ic/gcu_opcodes_pkg.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/<instance.id>/gcu_ic/decoder.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/<instance.id>/processor_<instance.id>.vhd
+vcom -93 -reportprogress 30 -work work $SRC/<instance.id>/irom_<instance.id>.vhd
+vcom -93 -reportprogress 30 -work work $SRC/<instance.id>/imem_mau_pkg.vhdl
+vcom -93 -reportprogress 30 -work work $SRC/<instance.id>/dram_<instance.id>.vhd
+>>
