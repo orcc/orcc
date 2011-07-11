@@ -63,7 +63,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 	private IrFactory factory = IrFactory.eINSTANCE;
 	private Procedure divProc;
-
+	private Var tmp = factory.createVar(0, factory.createTypeInt(), "resultDiv", true, 0);
 	public DivisionSubstitution() {
 		super(true);
 	}
@@ -73,6 +73,7 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 		super.caseActor(actor);
 
 		if (divProc != null) {
+			actor.getStateVars().add(tmp);
 			actor.getProcs().add(0, divProc);
 		}
 		return null;
@@ -92,9 +93,9 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 					factory.createTypeInt(), "num");
 			Var varDenum = procedure.newTempLocalVariable(
 					factory.createTypeInt(), "den");
-			Var varResult = procedure.newTempLocalVariable(
-					factory.createTypeInt(), "result");
-
+			//Var varResult = procedure.newTempLocalVariable(
+					//factory.createTypeInt(), "result");
+			tmp.setGlobal(true);
 			InstAssign assign0 = factory.createInstAssign(varNum, expr.getE1());
 			InstAssign assign1 = factory.createInstAssign(varDenum,
 					expr.getE2());
@@ -103,13 +104,13 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 			parameters.add(factory.createExprVar(varNum));
 			parameters.add(factory.createExprVar(varDenum));
 
-			InstCall call = factory.createInstCall(varResult, divProc,
+			InstCall call = factory.createInstCall(null, divProc,
 					parameters);
 			IrUtil.addInstBeforeExpr(expr, assign0, true);
 			IrUtil.addInstBeforeExpr(expr, assign1, true);
 			IrUtil.addInstBeforeExpr(expr, call, true);
 
-			EcoreUtil.replace(expr, factory.createExprVar(varResult));
+			EcoreUtil.replace(expr, factory.createExprVar(tmp));
 		}
 		return null;
 	}
@@ -135,8 +136,8 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 		divProc.getParameters().add(varDenum);
 
 		// Create needed local variables
-		Var result = divProc.newTempLocalVariable(factory.createTypeInt(),
-				"result");
+		//Var result = divProc.newTempLocalVariable(factory.createTypeInt(),
+			//	"result");
 		Var i = divProc.newTempLocalVariable(factory.createTypeInt(), "i");
 		Var flipResult = divProc.newTempLocalVariable(factory.createTypeInt(),
 				"flipResult");
@@ -151,21 +152,20 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 
 		// Create procedural code
 		EList<Node> nodes = divProc.getNodes();
-		nodes.add(createInitBlock(result, flipResult));
+		nodes.add(createInitBlock(tmp, flipResult));
 		nodes.add(createNodeIf(varNum, flipResult));
 		nodes.add(createNodeIf(varDenum, flipResult));
 		nodes.add(createAssignmentBlock(varDenum, remainder, varNum, denom,
-				mask, remainder));
-		nodes.add(createNodeWhile(i, numer, remainder, denom, result, mask,
+				mask, i));
+		nodes.add(createNodeWhile(i, numer, remainder, denom, tmp, mask,
 				varDenum));
-		nodes.add(createResultNodeIf(flipResult, result));
+		nodes.add(createResultNodeIf(flipResult, tmp));
 
 		// Create return instruction
 		NodeBlock blockReturn = factory.createNodeBlock();
-		InstReturn instReturn = factory.createInstReturn(factory
-				.createExprVar(result));
+		InstReturn instReturn = factory.createInstReturn();
 		blockReturn.add(instReturn);
-		divProc.setReturnType(factory.createTypeInt());
+		divProc.setReturnType(factory.createTypeVoid());
 		divProc.getNodes().add(blockReturn);
 
 		return divProc;
