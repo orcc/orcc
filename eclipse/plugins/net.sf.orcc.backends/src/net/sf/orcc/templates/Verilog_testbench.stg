@@ -208,7 +208,7 @@ end case;
 
 waveform_process_out(output) ::= <<
 -- Output(s) waveform Generation
-<output.list: {port|<port.name>_ack \<= <port.name>_send;}; separator="\n">    
+<output: {port|<port.name>_ack \<= <port.name>_send;}; separator="\n">    
 --
 WaveGen_Proc_Out : process (RESET, CLK)
   variable Input_bit   : integer range 2147483647 downto - 2147483648;
@@ -217,7 +217,7 @@ begin
   if (RESET = '0') then
     -- nothing here
   elsif (rising_edge(CLK)) then
-    <output.list: case_define_out(); separator="\n">
+    <output: case_define_out(); separator="\n">
   end if;
 end process WaveGen_Proc_Out;
 
