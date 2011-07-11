@@ -41,10 +41,11 @@ from .memory import *
 
 class Instance:
 
-    def __init__(self, name, inputs, outputs, isNative):
+    def __init__(self, name, inputs, outputs, isNative, isBroadcast):
         # General
         self.id = name
         self.isNative = isNative
+        self.isBroadcast = isBroadcast
         # Ports
         self.inputs = inputs
         self.outputs = outputs
@@ -117,18 +118,21 @@ class Instance:
 
 
     def simulate(self, srcPath):
-        instancePath = os.path.join(srcPath, self.id)
-        os.chdir(instancePath)
+        if not (self.isNative or self.isBroadcast) :
+            instancePath = os.path.join(srcPath, self.id)
+            os.chdir(instancePath)
+            i = 0
 
-        # Copy trace to the instance folder
-        for input in self.inputs:
-            traceName = "decoder_" + self.id + "_" + input.name + ".txt"
-            fifoName = "tta_stream_v%d.in" % (input.index)
-            srcTrace = os.path.join(srcPath, "trace", traceName)
-            tgtTrace = os.path.join(instancePath, "test")
-            retcode = subprocess.call(["cp", srcTrace, tgtTrace])
+            # Copy trace to the instance folder
+            for input in self.inputs:
+                i+= 1
+                traceName = self.id + "_" + input.name + ".txt"
+                fifoName = "tta_stream_v%d.in" % (input.index)
+                srcTrace = os.path.join(srcPath, "trace", traceName)
+                tgtTrace = os.path.join(instancePath, "tta_stream_v" + str(i) +".in")
+                shutil.copy(srcTrace, tgtTrace)
 
-        retcode = subprocess.call(["ttasim", "--no-debugmode", "-q", "-a", self._adfFile, "-p", self._tpefFile])
+            retcode = subprocess.call(["ttasim", "--no-debugmode", "-a", self._adfFile, "-p", self._tpefFile])
 
 
     def _readMemory(self, fileName):
