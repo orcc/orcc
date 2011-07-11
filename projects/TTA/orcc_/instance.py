@@ -121,18 +121,28 @@ class Instance:
         if not (self.isNative or self.isBroadcast) :
             instancePath = os.path.join(srcPath, self.id)
             os.chdir(instancePath)
-            i = 0
+            tracePath = os.path.join(srcPath, "trace")
 
             # Copy trace to the instance folder
             for input in self.inputs:
-                i+= 1
                 traceName = self.id + "_" + input.name + ".txt"
                 fifoName = "tta_stream_v%d.in" % (input.index)
-                srcTrace = os.path.join(srcPath, "trace", traceName)
-                tgtTrace = os.path.join(instancePath, "tta_stream_v" + str(i) +".in")
+                srcTrace = os.path.join(tracePath, traceName)
+                tgtTrace = os.path.join(instancePath, fifoName)
                 shutil.copy(srcTrace, tgtTrace)
 
+            # Launch the simulation
             retcode = subprocess.call(["ttasim", "--no-debugmode", "-a", self._adfFile, "-p", self._tpefFile])
+
+            # Check generated data
+            i = 0
+            for output in self.outputs:
+                i+= 1
+                traceName = self.id + "_" + output.name + ".txt"
+                fifoName = "tta_stream_v%d.out" % (output.index)
+                srcTrace = os.path.join(tracePath, traceName)
+                tgtTrace = os.path.join(instancePath, fifoName)
+                self.diff(srcTrace, tgtTrace, output)
 
 
     def _readMemory(self, fileName):
@@ -159,5 +169,26 @@ class Instance:
                             dram_width=self.dram.getWidth(), dram_addr=self.dram.getAddr(),
                             irom_addr_max=iromAddrMax, dram_addr_max=dramAddrMax)
         open(targetFile, "w").write(result)
+
+    def diff(self, traceFile, genFile, port):
+        f_trace = open(traceFile, 'r')
+        f_gen = open(genFile, 'r')
+
+        # Compare files line after line
+        i = 0
+        for ligne1 in f_gen:
+            i += 1
+            ligne2 = f_trace.readline()
+            if ligne1 != ligne2:
+                break
+
+        # Compute the number of line
+        f_gen.seek(0)
+        j = 0
+        for ligne1 in f_gen:
+            j += 1
+
+        if i!=j:
+            print "ERROR: Wrong generated data on '" + port.name + "' (line " + str(i) + ")."
 
 
