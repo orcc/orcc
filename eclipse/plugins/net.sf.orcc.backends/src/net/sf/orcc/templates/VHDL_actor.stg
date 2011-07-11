@@ -78,6 +78,10 @@ constant <variable.name> : <variable.type> := <variable.initialValue>;
 <endif>
 >>
 
+printValue(type, value) ::= <<
+<if (type.bool)><if (value)>1<else>0<endif><else><value><endif>
+>>
+
 ramDeclaration(variable) ::= <<
 <if(variable.type.list)>
 <if(variable.assignable)>
@@ -89,7 +93,7 @@ DP_genericRam_<variable.name> : entity work.DP_genericRam
   generic map (
     depth =\> <listSize(variable.type.dimensions)>,
     width =\> <variable.type.sizeInBits>,
-    initVal =\> <actor.templateData.initValueMap.(variable)>)
+    initVal =\> <printValue(variable.type.elementType, actor.templateData.initValueMap.(variable))>)
   port map (
     clk        =\> clock,
     wren_p1    =\> <variable.name>_wren_p1,
@@ -116,8 +120,6 @@ else
 >variable <variable.indexedName> : <variable.type>;<
 endif>
 >>
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Init at reset
