@@ -199,95 +199,99 @@ public class CNetworkTemplateData {
 	}
 
 	/**
+	 * Find all instances which belong to instance's network
+	 * 
+	 * @param instance
+	 *            instance which will be analyzed
+	 * @param graph
+	 *            connection graph in order to know predecessors and successors
+	 *            of each instances
+	 * @return list of all instances linked together
+	 */
+	private Set<Instance> findLinkedInstances(Instance instance,
+			DirectedGraph<Vertex, Connection> graph) {
+		Set<Instance> linkedInstances = new HashSet<Instance>();
+		List<Instance> instanceListToCheck = new ArrayList<Instance>();
+		boolean instanceListEmpty = false;
+
+		instanceListToCheck.add(instance);
+
+		while (!instanceListEmpty) {
+			Instance instanceToCheck = instanceListToCheck.get(0);
+			instanceListToCheck.remove(0);
+			linkedInstances.add(instanceToCheck);
+
+			Vertex vertexToCheck = new Vertex(instanceToCheck);
+			for (Connection connection : graph.edgesOf(vertexToCheck)) {
+				Vertex connectedVertex = graph.getEdgeSource(connection);
+
+				if (connectedVertex.equals(vertexToCheck)) {
+					connectedVertex = graph.getEdgeTarget(connection);
+				}
+				if (connectedVertex.isInstance()) {
+					Instance connectedInstance = connectedVertex.getInstance();
+					if (!linkedInstances.contains(connectedInstance)) {
+						instanceListToCheck.add(connectedInstance);
+					}
+				}
+			}
+			instanceListEmpty = instanceListToCheck.isEmpty();
+		}
+		return linkedInstances;
+	}
+
+	/**
 	 * Find out all source instances
 	 * 
 	 * @param network
 	 *            network to analyze
 	 */
 	private void buildSourceInstances(Network network) {
-		Set<Instance> instancesAnalysed = new HashSet<Instance>();
 		Set<Vertex> graphVertex = network.getGraph().vertexSet();
+		DirectedGraph<Vertex, Connection> graph = network.getGraph();
+		List<Set<Instance>> networksNotConnected = new ArrayList<Set<Instance>>();
 
+		// Searching for all non-connected networks
 		for (Vertex vertex : graphVertex) {
 			if (vertex.isInstance()) {
 				Instance instanceToCheck = vertex.getInstance();
-				boolean sourceDetected;
 
-				if (!instancesAnalysed.contains(instanceToCheck)) {
-					sourceDetected = checkSourceInstances(instanceToCheck,
-							instancesAnalysed, network.getGraph());
-					if (!sourceDetected
-							&& (instanceToCheck.isActor() || instanceToCheck
-									.isBroadcast())) {
-						sourceInstances.add(instanceToCheck);
+				if (networksNotConnected.isEmpty()) {
+					networksNotConnected.add(findLinkedInstances(
+							instanceToCheck, network.getGraph()));
+				} else {
+					boolean instanceAlreadyAnalysed = false;
+
+					for (Set<Instance> networkOfInstances : networksNotConnected) {
+						if (networkOfInstances.contains(instanceToCheck)) {
+							instanceAlreadyAnalysed = true;
+						}
+					}
+					if (!instanceAlreadyAnalysed) {
+						networksNotConnected.add(findLinkedInstances(
+								instanceToCheck, network.getGraph()));
 					}
 				}
 			}
 		}
-	}
 
-	/**
-	 * Check if an instance is a source Instance and analyze all instances
-	 * closed to this one.
-	 * 
-	 * @param instanceToCheck
-	 *            instance which will be analyzed
-	 * @param instancesAnalysed
-	 *            Set of instances analyzed in order to prevent multiple
-	 *            analyzes on instances
-	 * @param graph
-	 *            connection graph in order to know predecessors and successors
-	 *            of each instances
-	 * @return
-	 */
-	private boolean checkSourceInstances(Instance instanceToCheck,
-			Set<Instance> instancesAnalysed,
-			DirectedGraph<Vertex, Connection> graph) {
-		if ((instanceToCheck.isActor() || instanceToCheck.isBroadcast())
-				&& !instancesAnalysed.contains(instanceToCheck)) {
-			instancesAnalysed.add(instanceToCheck);
-
+		// Searching for source instance(s) for each network
+		for (Set<Instance> instances : networksNotConnected) {
 			boolean sourceDetected = false;
-			Set<Connection> connections;
 
-			connections = graph.incomingEdgesOf(new Vertex(instanceToCheck));
-			if (connections.isEmpty()) {
-				sourceInstances.add(instanceToCheck);
-				sourceDetected = true;
-			} else {
-				for (Connection connection : connections) {
-					Vertex inputVertex = graph.getEdgeSource(connection);
-
-					if (inputVertex.isInstance()) {
-						Instance inputInstance = inputVertex.getInstance();
-						boolean result = checkSourceInstances(inputInstance,
-								instancesAnalysed, graph);
-						if (result == true) {
-							sourceDetected = true;
-						}
-					}
-
+			for (Instance instance : instances) {
+				if (graph.inDegreeOf(new Vertex(instance)) == 0) {
+					sourceInstances.add(instance);
+					sourceDetected = true;
 				}
 			}
-
-			connections = graph.outgoingEdgesOf(new Vertex(instanceToCheck));
-			if (!connections.isEmpty()) {
-				for (Connection connection : connections) {
-					Vertex inputVertex = graph.getEdgeTarget(connection);
-
-					if (inputVertex.isInstance()) {
-						Instance outputInstance = inputVertex.getInstance();
-						boolean result = checkSourceInstances(outputInstance,
-								instancesAnalysed, graph);
-						if (result == true) {
-							sourceDetected = true;
-						}
-					}
-				}
+			// if there isn't any "source" instance (instance without
+			// predecessors) in this network
+			if (!sourceDetected) {
+				// we will launch random instance for this network.
+				sourceInstances.add(instances.iterator().next());
 			}
-			return sourceDetected;
 		}
-		return false;
 	}
 
 	public void computeHierarchicalTemplateMaps(Network network) {
