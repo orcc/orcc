@@ -174,7 +174,6 @@ instanceSignals(instance, incomingMap, outgoingMap) ::= <<
 
 inputPortSignals(port, connection) ::= <<
 ---- Input port: <port.name>
-signal fifo_<indexFifo(connection)>_clk		: std_logic;
 signal fifo_<indexFifo(connection)>_wrreq		: std_logic;
 signal fifo_<indexFifo(connection)>_data		: std_logic_vector(31 downto 0);
 >>
