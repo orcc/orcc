@@ -116,6 +116,7 @@ def generate():
     shutil.copy(os.path.join(srcPath, "top.vhd"), buildPath)
     shutil.copy(os.path.join(srcPath, "top.qsf"), buildPath)
     shutil.copy(os.path.join(srcPath, "top.qpf"), buildPath)
+    shutil.copy(os.path.join(srcPath, "top.tcl"), buildPath)
     iromAddrList = []
     dramAddrList = []
     
