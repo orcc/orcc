@@ -47,7 +47,7 @@ printOutPorts(port) ::= <<
 <port.name>_send  : OUT std_logic;
 <port.name>_ack   : IN std_logic;
 <port.name>_rdy   : IN std_logic;
-<port.name>_count  : OU std_logic_vector(15 downto 0);
+<port.name>_count  : OUT std_logic_vector(15 downto 0);
 >>
 
 
