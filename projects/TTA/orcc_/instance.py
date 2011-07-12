@@ -57,6 +57,8 @@ class Instance:
         self._adfFile = "processor_" + self.id + ".adf"
         self._idfFile = "processor_" + self.id + ".idf"
         self._llFile = self.id + ".ll"
+        self._bcFile = self.id + ".bc"
+        self._llOptFile = self.id + "_opt.ll"
         self._tpefFile = self.id + ".tpef"
         self._asmFile = self.id + ".tceasm"
         self._bemFile = self.id + ".bem"
@@ -76,6 +78,8 @@ class Instance:
             shutil.copy(os.path.join(libPath, "native", self._adfFile), instancePath)
             shutil.copy(os.path.join(libPath, "native", self._idfFile), instancePath)
         retcode = subprocess.call(["tcecc", "-o", self._tpefFile, "-a", self._adfFile, self._llFile])
+        if retcode >= 0: retcode = subprocess.call(["tcecc", "-O3", "-o", self._bcFile, self._llFile, "--emit-llvm"])
+        if retcode >= 0: retcode = subprocess.call(["llvm-dis", "-o", self._llOptFile, self._bcFile])
         if retcode >= 0: retcode = subprocess.call(["tcedisasm", "-n", "-o", self._asmFile, self._adfFile, self._tpefFile])
         if retcode >= 0: retcode = subprocess.call(["createbem", "-o", self._bemFile, self._adfFile])
         if retcode >= 0: retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", "images", "-f", "mif", "-o", "mif", self._adfFile])
