@@ -130,6 +130,14 @@
                         </xsl:attribute>
                     </parameter>
                 </xsl:if>
+                <xsl:if test="Attribute[@kind = 'Value' and @name = 'clockDomain']">
+                    <parameter name="clock domain">
+                        <xsl:attribute name="value">
+                            <xsl:apply-templates
+                                select="Attribute[@kind = 'Value' and @name = 'clockDomain']/Expr"/>
+                        </xsl:attribute>
+                    </parameter>
+                </xsl:if>
                 <xsl:if test="Attribute[@kind = 'Flag' and @name = 'skip']">
                     <parameter name="skip" value="true"/>
                 </xsl:if>

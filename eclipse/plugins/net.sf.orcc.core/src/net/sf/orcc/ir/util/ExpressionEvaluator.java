@@ -47,7 +47,6 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class defines an expression evaluator.
@@ -134,7 +133,7 @@ public class ExpressionEvaluator extends IrSwitch<Object> {
 
 	@Override
 	public Object caseExprString(ExprString expr) {
-		return EcoreUtil.copy(expr);
+		return expr.getValue();
 	}
 
 	@Override

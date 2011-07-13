@@ -231,6 +231,19 @@ public class XdfExporter extends CalSwitch<Object> implements ITransformation {
 					instance.getAttributes().put("partName", attr);
 				}
 			}
+			// clokc domain attribute
+			String clockDomain = (String) vertex.getValue("clock domain");
+			if (clockDomain != null) {
+				clockDomain = clockDomain.replaceAll("^\"|\"$", "");
+				if (clockDomain.length() != 0) {
+					// remove extra quotes
+					Expression expr = IrFactory.eINSTANCE
+							.createExprString(clockDomain);
+					IValueAttribute attr = new ValueAttribute(expr);
+					instance.getAttributes().put("clockDomain", attr);
+				}
+			}
+			
 		}
 
 		network.getGraph().addVertex(networkVertex);

@@ -220,7 +220,7 @@ public class ValueUtil {
 		if (array == null) {
 			return null;
 		}
-		
+
 		int numIndexes = indexes.length;
 		for (int i = 0; i < numIndexes - 1; i++) {
 			int index = getIntValue(indexes[i]);
@@ -292,6 +292,8 @@ public class ValueUtil {
 			return IrFactory.eINSTANCE.createExprBool((Boolean) value);
 		} else if (isInt(value)) {
 			return IrFactory.eINSTANCE.createExprInt(getBigInteger(value));
+		} else if (isString(value)) {
+			return IrFactory.eINSTANCE.createExprString((String) value);
 		} else if (isList(value)) {
 			ExprList list = IrFactory.eINSTANCE.createExprList();
 			int length = Array.getLength(value);
@@ -299,6 +301,7 @@ public class ValueUtil {
 				list.getValue().add(getExpression(Array.get(value, i)));
 			}
 			return list;
+
 		} else {
 			return null;
 		}
@@ -443,6 +446,18 @@ public class ValueUtil {
 	 */
 	public static boolean isList(Object value) {
 		return (value != null && value.getClass().isArray());
+	}
+
+	/**
+	 * Returns <code>true</code> if value is a String.
+	 * 
+	 * @param value
+	 *            a value
+	 * @return <code>true</code> if value is a String
+	 */
+
+	public static boolean isString(Object value) {
+		return value instanceof String;
 	}
 
 	/**
@@ -649,7 +664,7 @@ public class ValueUtil {
 		if (array == null || value == null) {
 			return;
 		}
-		
+
 		int numIndexes = indexes.length;
 		for (int i = 0; i < numIndexes - 1; i++) {
 			int index = getIntValue(indexes[i]);
