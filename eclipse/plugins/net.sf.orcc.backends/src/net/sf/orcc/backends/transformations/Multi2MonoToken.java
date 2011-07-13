@@ -1477,7 +1477,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 * @param action
 	 *            action to be checked
 	 */
-	private void VerifVisitedActions(Action action, State source, State target) {
+	void verifVisitedActions(Action action, State source, State target) {
 		String actionName = action.getName();
 		if (visitedActionsNames.isEmpty()) {
 			// fill lists the first time
