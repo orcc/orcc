@@ -68,7 +68,7 @@ public class Source {
 			byte[] b = new byte[outTable.length];
 			in.read(b);
 			for (int i = 0; i < nbTokenToRead; i++) {
-				outTable[i] = b[i];
+				outTable[i] = (short) (b[i] & 0xFF);
 			}
 		} catch (IOException e) {
 			String msg = "I/O error when reading file \"" + fileName + "\"";
