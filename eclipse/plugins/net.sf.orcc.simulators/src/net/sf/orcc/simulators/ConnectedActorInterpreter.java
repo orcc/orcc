@@ -228,7 +228,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 			Type type = ((TypeList) peeked.getType()).getElementType();
 			Object array = peeked.getValue();
 			for (int i = 0; i < numTokens; i++) {
-				Object value = fifo.peek();
+				Object value = fifo.peek(i);
 				ValueUtil.set(type, array, value, i);
 			}
 		}

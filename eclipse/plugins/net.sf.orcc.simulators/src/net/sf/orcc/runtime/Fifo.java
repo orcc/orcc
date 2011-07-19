@@ -63,6 +63,7 @@ public class Fifo {
 	private Type type;
 
 	private int writeIdx;
+	
 
 	/**
 	 * Creates a new FIFO with the given size and a file for tracing exchanged
@@ -177,8 +178,8 @@ public class Fifo {
 	 * 
 	 * @return the token read
 	 */
-	public Object peek() {
-		return ValueUtil.get(type, contents, readIdx);
+	public Object peek(int offset) {
+		return ValueUtil.get(type, contents, readIdx + offset);
 	}
 
 	/**
