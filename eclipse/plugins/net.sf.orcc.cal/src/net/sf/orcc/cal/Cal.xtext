@@ -30,6 +30,9 @@ QualifiedNameWithWildCard:
 AstUnit: {AstUnit} ':'
 
 	(functions += AstFunction
+	| functions += AstNativeFunction
+	| procedures += AstProcedure
+	| procedures += AstNativeProcedure
 	| variables += AstConstantVariable)*
 
 	'end';
