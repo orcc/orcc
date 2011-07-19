@@ -245,14 +245,14 @@ if(port.type.bool)
 else
 ><if(port.type.int)
   >    assert (<port.name>_data  = std_logic_vector(to_signed(input_bit, <port.type.size>)))
-      -- report "on <port.name> incorrectly value computed : " & to_string(to_integer(to_signed(<port.name>_data))) & " instead of :" & to_string(input_bit)
-      -- report "on port <port.name> incorrectly value computed : " & str(to_integer(signed(<port.name>_data))) & " instead of :" & str(input_bit)
-      severity error;
+       report "on <port.name> incorrectly value computed : " & to_string(to_integer(to_signed(<port.name>_data))) & " instead of :" & to_string(input_bit)
+       report "on port <port.name> incorrectly value computed : " & str(to_integer(signed(<port.name>_data))) & " instead of :" & str(input_bit)
+       severity error;
   <else
   >    assert (<port.name>_data  = std_logic_vector(to_unsigned(input_bit, <port.type.size>)))
-      --report "on port <port.name> incorrectly value computed : " & to_string(to_integer(to_unsigned(<port.name>_data))) & " instead of :" & to_string(input_bit)
-      --report "on port <port.name> incorrectly value computed : " & str(to_integer(unsigned(<port.name>_data))) & " instead of :" & str(input_bit)
-      severity error;
+       report "on port <port.name> incorrectly value computed : " & to_string(to_integer(to_unsigned(<port.name>_data))) & " instead of :" & to_string(input_bit)
+       report "on port <port.name> incorrectly value computed : " & str(to_integer(unsigned(<port.name>_data))) & " instead of :" & str(input_bit)
+       severity error;
   <endif
   ><endif
 >    --
@@ -274,6 +274,9 @@ USE ieee.std_logic_1164.ALL;
 USE ieee.std_logic_unsigned.all;
 USE ieee.numeric_std.ALL;
 USE std.textio.all;
+
+library work;
+use work.sim_package.all;
 
 entity tb_<instance.id> is
 
