@@ -92,6 +92,8 @@ import org.eclipse.emf.ecore.EStructuralFeature;
  */
 public class ActorTransformer {
 
+	private Actor actor;
+
 	private AstTransformer astTransformer;
 
 	/**
@@ -780,7 +782,5 @@ public class ActorTransformer {
 			((List<Port>) actor.eGet(feature)).add(port);
 		}
 	}
-
-	private Actor actor;
 
 }

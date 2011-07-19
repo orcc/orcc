@@ -140,10 +140,10 @@ public class AstTransformer {
 
 			// retrieve IR procedure
 			AstFunction astFunction = astCall.getFunction();
-			if (!mapFunctions.containsKey(astFunction)) {
+			if (!mapAstToIr.containsKey(astFunction)) {
 				transformFunction(astFunction);
 			}
-			Procedure calledProcedure = mapFunctions.get(astFunction);
+			Procedure calledProcedure = (Procedure) mapAstToIr.get(astFunction);
 
 			// generates a new target
 			Var target = procedure.newTempLocalVariable(
@@ -674,10 +674,10 @@ public class AstTransformer {
 				return null;
 			}
 
-			if (!mapProcedures.containsKey(astProcedure)) {
+			if (!mapAstToIr.containsKey(astProcedure)) {
 				transformProcedure(astProcedure);
 			}
-			Procedure procedure = mapProcedures.get(astProcedure);
+			Procedure procedure = (Procedure) mapAstToIr.get(astProcedure);
 
 			// creates call with spilling code around it
 			createCall(lineNumber, null, procedure, astCall.getParameters());
@@ -855,14 +855,9 @@ public class AstTransformer {
 	private Procedure initialize;
 
 	/**
-	 * A map from AST functions to IR procedures.
+	 * A map from AST objects to IR objects.
 	 */
-	final private Map<AstFunction, Procedure> mapFunctions;
-
-	/**
-	 * A map from AST procedures to IR procedures.
-	 */
-	final private Map<AstProcedure, Procedure> mapProcedures;
+	final private Map<EObject, EObject> mapAstToIr;
 
 	/**
 	 * statement transformer.
@@ -873,8 +868,7 @@ public class AstTransformer {
 	 * Creates a new AST to IR transformation.
 	 */
 	public AstTransformer() {
-		mapFunctions = new HashMap<AstFunction, Procedure>();
-		mapProcedures = new HashMap<AstProcedure, Procedure>();
+		mapAstToIr = new HashMap<EObject, EObject>();
 
 		exprTransformer = new ExpressionTransformer();
 		stmtTransformer = new StatementTransformer();
@@ -915,8 +909,7 @@ public class AstTransformer {
 		actor = null;
 		blockCount = 0;
 
-		mapFunctions.clear();
-		mapProcedures.clear();
+		mapAstToIr.clear();
 
 		exprTransformer.clearTarget();
 
@@ -1221,7 +1214,7 @@ public class AstTransformer {
 	/**
 	 * Transforms the given AST function to an IR procedure, and adds it to the
 	 * IR procedure list {@link #procedures} and to the map
-	 * {@link #mapFunctions}.
+	 * {@link #mapAstToIr}.
 	 * 
 	 * @param astFunction
 	 *            an AST function
@@ -1257,7 +1250,7 @@ public class AstTransformer {
 		}
 
 		actor.getProcs().add(procedure);
-		mapFunctions.put(astFunction, procedure);
+		mapAstToIr.put(astFunction, procedure);
 	}
 
 	/**
@@ -1429,7 +1422,7 @@ public class AstTransformer {
 		}
 
 		actor.getProcs().add(procedure);
-		mapProcedures.put(astProcedure, procedure);
+		mapAstToIr.put(astProcedure, procedure);
 	}
 
 	/**
