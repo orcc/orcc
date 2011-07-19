@@ -97,9 +97,9 @@ public class ActorTransformer {
 	private AstTransformer astTransformer;
 
 	/**
-	 * A map from AST ports to IR ports.
+	 * A map from AST objects to IR objects.
 	 */
-	final private Map<AstPort, Port> mapPorts;
+	final private Map<EObject, EObject> mapAstToIr;
 
 	/**
 	 * count of un-tagged actions
@@ -110,7 +110,7 @@ public class ActorTransformer {
 	 * Creates a new AST to IR transformation.
 	 */
 	public ActorTransformer() {
-		mapPorts = new HashMap<AstPort, Port>();
+		mapAstToIr = new HashMap<EObject, EObject>();
 		astTransformer = new AstTransformer();
 	}
 
@@ -136,7 +136,7 @@ public class ActorTransformer {
 				indexes.add(IrFactory.eINSTANCE.createExprInt(i));
 				int lineNumber = portVariable.getLineNumber();
 
-				Var irToken = context.getVariable(token);
+				Var irToken = (Var) mapAstToIr.get(token);
 				InstLoad load = IrFactory.eINSTANCE.createInstLoad(lineNumber,
 						irToken, portVariable, indexes);
 				addInstruction(load);
@@ -175,7 +175,7 @@ public class ActorTransformer {
 						tmpVar, portVariable, indexes);
 				block.add(load);
 
-				Var irToken = context.getVariable(token);
+				Var irToken = (Var) mapAstToIr.get(token);
 
 				indexes = new ArrayList<Expression>(1);
 				indexes.add(IrFactory.eINSTANCE.createExprVar(loopVar));
@@ -420,11 +420,10 @@ public class ActorTransformer {
 		int lineNumber = Util.getLocation(astActor);
 		actor.setLineNumber(lineNumber);
 
+		astTransformer.setMapAstToIr(mapAstToIr);
 		astTransformer.setIrActor(actor);
 
-		Context context = astTransformer.getContext();
 		try {
-
 			// parameters
 			for (AstVariable astVariable : astActor.getParameters()) {
 				astTransformer.transformGlobalVariable(
@@ -436,10 +435,6 @@ public class ActorTransformer {
 					astActor.getInputs());
 			transformPorts(IrPackage.eINSTANCE.getActor_Outputs(),
 					astActor.getOutputs());
-
-			// creates a new scope before translating things with local
-			// variables
-			context.newScope();
 
 			// transform actions
 			ActionList actions = transformActions(astActor.getActions());
@@ -492,8 +487,6 @@ public class ActorTransformer {
 				actor.setFsm(fsm);
 			}
 
-			context.restoreScope();
-
 			// create IR actor
 			AstEntity entity = (AstEntity) astActor.eContainer();
 			actor.setName(net.sf.orcc.cal.util.Util.getQualifiedName(entity));
@@ -506,7 +499,7 @@ public class ActorTransformer {
 		} finally {
 			// cleanup
 			astTransformer.clear();
-			mapPorts.clear();
+			mapAstToIr.clear();
 
 			untaggedCount = 0;
 		}
@@ -667,7 +660,7 @@ public class ActorTransformer {
 	private void transformInputPattern(AstInputPattern pattern,
 			Pattern irInputPattern) {
 		Context context = astTransformer.getContext();
-		Port port = mapPorts.get(pattern.getPort());
+		Port port = (Port) mapAstToIr.get(pattern.getPort());
 		List<AstVariable> tokens = pattern.getTokens();
 
 		// evaluates token consumption
@@ -741,7 +734,7 @@ public class ActorTransformer {
 			Pattern irOutputPattern) {
 		List<AstOutputPattern> astOutputPattern = astAction.getOutputs();
 		for (AstOutputPattern pattern : astOutputPattern) {
-			Port port = mapPorts.get(pattern.getPort());
+			Port port = (Port) mapAstToIr.get(pattern.getPort());
 			List<AstExpression> values = pattern.getValues();
 
 			// evaluates token consumption
@@ -778,7 +771,7 @@ public class ActorTransformer {
 			Type type = Util.getType(astPort);
 			Port port = IrFactory.eINSTANCE.createPort(type, astPort.getName(),
 					astPort.isNative());
-			mapPorts.put(astPort, port);
+			mapAstToIr.put(astPort, port);
 			((List<Port>) actor.eGet(feature)).add(port);
 		}
 	}

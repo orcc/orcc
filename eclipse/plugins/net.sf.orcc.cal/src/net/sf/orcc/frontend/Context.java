@@ -33,10 +33,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.util.Scope;
 
 /**
  * This class defines a context used by the AST transformer.
@@ -50,11 +48,6 @@ public class Context {
 	 * A map from global variables to local variables
 	 */
 	private Map<Var, Var> mapGlobals;
-
-	/**
-	 * A map from AST variables to IR variables.
-	 */
-	private Scope<AstVariable, Var> mapVariables;
 
 	/**
 	 * Contains the current procedures where local variables or nodes should be
@@ -80,12 +73,6 @@ public class Context {
 
 		mapGlobals = new HashMap<Var, Var>();
 
-		if (context == null) {
-			mapVariables = new Scope<AstVariable, Var>();
-		} else {
-			mapVariables = new Scope<AstVariable, Var>(context
-					.getMapVariables().getParent(), true);
-		}
 		setGlobalsToLoad = new LinkedHashSet<Var>();
 		setGlobalsToStore = new LinkedHashSet<Var>();
 	}
@@ -95,7 +82,6 @@ public class Context {
 	 */
 	public void clear() {
 		mapGlobals.clear();
-		mapVariables.clear();
 		procedure = null;
 		setGlobalsToLoad.clear();
 		setGlobalsToStore.clear();
@@ -108,15 +94,6 @@ public class Context {
 	 */
 	public Map<Var, Var> getMapGlobals() {
 		return mapGlobals;
-	}
-
-	/**
-	 * Returns the mapVariables field.
-	 * 
-	 * @return the mapVariables field
-	 */
-	public Scope<AstVariable, Var> getMapVariables() {
-		return mapVariables;
 	}
 
 	/**
@@ -144,43 +121,6 @@ public class Context {
 	 */
 	public Set<Var> getSetGlobalsToStore() {
 		return setGlobalsToStore;
-	}
-
-	/**
-	 * Returns the IR variable associated with the given AST variable.
-	 * 
-	 * @param variable
-	 *            an AST variable
-	 * @return the IR variable associated with the given AST variable
-	 */
-	public Var getVariable(AstVariable variable) {
-		return mapVariables.get(variable);
-	}
-
-	/**
-	 * Creates a new scope for mapVariables.
-	 */
-	public void newScope() {
-		mapVariables = new Scope<AstVariable, Var>(mapVariables, true);
-	}
-
-	/**
-	 * Restores the scope for mapVariables.
-	 */
-	public void restoreScope() {
-		mapVariables = mapVariables.getParent();
-	}
-
-	/**
-	 * Associates an IR variable with the given AST variable.
-	 * 
-	 * @param astVariable
-	 *            an AST variable
-	 * @param var
-	 *            an IR variable associated with the given AST variable
-	 */
-	public void putVariable(AstVariable astVariable, Var var) {
-		mapVariables.put(astVariable, var);
 	}
 
 }

@@ -31,7 +31,6 @@ of Rennes
 package net.sf.orcc.frontend;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -87,7 +86,6 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.OrccUtil;
-import net.sf.orcc.util.Scope;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
@@ -215,7 +213,7 @@ public class AstTransformer {
 			// we always load in this case
 			int lineNumber = Util.getLocation(expression);
 			AstVariable astVariable = expression.getSource().getVariable();
-			Var var = context.getVariable(astVariable);
+			Var var = (Var) mapAstToIr.get(astVariable);
 			if (var == null) {
 				var = transformGlobalVariable(astVariable);
 			}
@@ -292,7 +290,7 @@ public class AstTransformer {
 				AstExpressionVariable expression) {
 			AstVariable astVariable = expression.getValue().getVariable();
 
-			Var var = context.getVariable(astVariable);
+			Var var = (Var) mapAstToIr.get(astVariable);
 			if (var == null) {
 				var = actor.getStateVar(astVariable.getName());
 				if (var == null) {
@@ -501,7 +499,7 @@ public class AstTransformer {
 
 				// assigns the loop variable its initial value
 				AstVariable astVariable = generator.getVariable();
-				Var loopVar = context.getVariable(astVariable);
+				Var loopVar = (Var) mapAstToIr.get(astVariable);
 
 				// condition
 				AstExpression astHigher = generator.getHigher();
@@ -565,8 +563,7 @@ public class AstTransformer {
 			for (AstExpression expression : expressions) {
 				int lineNumber = Util.getLocation(expression);
 
-				indexes = new ArrayList<Expression>(
-						IrUtil.copy(currentIndexes));
+				indexes = new ArrayList<Expression>(IrUtil.copy(currentIndexes));
 				indexes.add(IrFactory.eINSTANCE.createExprInt(i));
 				i++;
 
@@ -645,7 +642,7 @@ public class AstTransformer {
 
 			// get target
 			AstVariable astTarget = astAssign.getTarget().getVariable();
-			Var target = context.getVariable(astTarget);
+			Var target = (Var) mapAstToIr.get(astTarget);
 			if (target == null) {
 				target = transformGlobalVariable(astTarget);
 			}
@@ -857,7 +854,7 @@ public class AstTransformer {
 	/**
 	 * A map from AST objects to IR objects.
 	 */
-	final private Map<EObject, EObject> mapAstToIr;
+	private Map<EObject, EObject> mapAstToIr;
 
 	/**
 	 * statement transformer.
@@ -868,8 +865,6 @@ public class AstTransformer {
 	 * Creates a new AST to IR transformation.
 	 */
 	public AstTransformer() {
-		mapAstToIr = new HashMap<EObject, EObject>();
-
 		exprTransformer = new ExpressionTransformer();
 		stmtTransformer = new StatementTransformer();
 
@@ -909,11 +904,11 @@ public class AstTransformer {
 		actor = null;
 		blockCount = 0;
 
-		mapAstToIr.clear();
-
 		exprTransformer.clearTarget();
 
 		context = new Context(null, null);
+
+		mapAstToIr = null;
 
 		// clear the initialize procedure that may have been created
 		initialize = null;
@@ -1157,6 +1152,10 @@ public class AstTransformer {
 		this.actor = actor;
 	}
 
+	public void setMapAstToIr(Map<EObject, EObject> mapAstToIr) {
+		this.mapAstToIr = mapAstToIr;
+	}
+
 	/**
 	 * Writes back the globals that need to be stored.
 	 */
@@ -1213,8 +1212,7 @@ public class AstTransformer {
 
 	/**
 	 * Transforms the given AST function to an IR procedure, and adds it to the
-	 * IR procedure list {@link #procedures} and to the map
-	 * {@link #mapAstToIr}.
+	 * IR procedure list {@link #procedures} and to the map {@link #mapAstToIr}.
 	 * 
 	 * @param astFunction
 	 *            an AST function
@@ -1298,16 +1296,10 @@ public class AstTransformer {
 			}
 		}
 
-		// create state variable
+		// create state variable and put it in the map
 		Var variable = IrFactory.eINSTANCE.createVar(lineNumber, type, name,
 				assignable, initialValue);
-
-		// registers the global variable in the outermost scope
-		Scope<AstVariable, Var> top = context.getMapVariables();
-		while (top.getParent() != null) {
-			top = top.getParent();
-		}
-		top.put(astVariable, variable);
+		mapAstToIr.put(astVariable, variable);
 
 		// translate and add to initialize
 		if (mustInitialize) {
@@ -1317,14 +1309,12 @@ public class AstTransformer {
 			}
 
 			Context oldContext = newContext(initialize);
-			context.newScope();
 
 			exprTransformer.setTarget(variable, new ArrayList<Expression>(0));
 			Expression expression = transformExpression(astVariable.getValue());
 			createAssignOrStore(lineNumber, variable, null, expression);
 			exprTransformer.clearTarget();
 
-			context.restoreScope();
 			restoreContext(oldContext);
 		}
 
@@ -1362,7 +1352,7 @@ public class AstTransformer {
 			exprTransformer.clearTarget();
 		}
 
-		context.putVariable(astVariable, local);
+		mapAstToIr.put(astVariable, local);
 		return local;
 	}
 
