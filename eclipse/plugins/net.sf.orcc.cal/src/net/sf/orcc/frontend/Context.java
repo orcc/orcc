@@ -28,13 +28,7 @@
  */
 package net.sf.orcc.frontend;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Var;
 
 /**
  * This class defines a context used by the AST transformer.
@@ -45,19 +39,10 @@ import net.sf.orcc.ir.Var;
 public class Context {
 
 	/**
-	 * A map from global variables to local variables
-	 */
-	private Map<Var, Var> mapGlobals;
-
-	/**
 	 * Contains the current procedures where local variables or nodes should be
 	 * added by the expression transformer or statement transformer.
 	 */
 	private Procedure procedure;
-
-	private Set<Var> setGlobalsToLoad;
-
-	private Set<Var> setGlobalsToStore;
 
 	/**
 	 * Creates a new context with the given parent context and the given
@@ -70,30 +55,13 @@ public class Context {
 	 */
 	public Context(Context context, Procedure procedure) {
 		this.procedure = procedure;
-
-		mapGlobals = new HashMap<Var, Var>();
-
-		setGlobalsToLoad = new LinkedHashSet<Var>();
-		setGlobalsToStore = new LinkedHashSet<Var>();
 	}
 
 	/**
 	 * Clears this context.
 	 */
 	public void clear() {
-		mapGlobals.clear();
 		procedure = null;
-		setGlobalsToLoad.clear();
-		setGlobalsToStore.clear();
-	}
-
-	/**
-	 * Returns the mapGlobals field.
-	 * 
-	 * @return the mapGlobals field
-	 */
-	public Map<Var, Var> getMapGlobals() {
-		return mapGlobals;
 	}
 
 	/**
@@ -103,24 +71,6 @@ public class Context {
 	 */
 	public Procedure getProcedure() {
 		return procedure;
-	}
-
-	/**
-	 * Returns the setGlobalsToLoad field.
-	 * 
-	 * @return the setGlobalsToLoad field
-	 */
-	public Set<Var> getSetGlobalsToLoad() {
-		return setGlobalsToLoad;
-	}
-
-	/**
-	 * Returns the setGlobalsToStore field.
-	 * 
-	 * @return the setGlobalsToStore field
-	 */
-	public Set<Var> getSetGlobalsToStore() {
-		return setGlobalsToStore;
 	}
 
 }

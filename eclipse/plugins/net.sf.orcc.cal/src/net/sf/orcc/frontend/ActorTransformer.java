@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010, IETR/INSA of Rennes
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -428,6 +428,12 @@ public class ActorTransformer {
 			for (AstVariable astVariable : astActor.getParameters()) {
 				astTransformer.transformGlobalVariable(
 						IrPackage.eINSTANCE.getActor_Parameters(), astVariable);
+			}
+
+			// state variables
+			for (AstVariable astVariable : astActor.getStateVariables()) {
+				astTransformer.transformGlobalVariable(
+						IrPackage.eINSTANCE.getActor_StateVars(), astVariable);
 			}
 
 			// transform ports

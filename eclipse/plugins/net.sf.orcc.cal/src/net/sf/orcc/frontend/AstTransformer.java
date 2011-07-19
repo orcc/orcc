@@ -1,7 +1,5 @@
 /*
- * Copyright (c) 2009-2010, IETR/INSA 
-import com.google.inject.Inject;
-of Rennes
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -68,7 +66,6 @@ import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstReturn;
-import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
@@ -292,28 +289,29 @@ public class AstTransformer {
 
 			Var var = (Var) mapAstToIr.get(astVariable);
 			if (var == null) {
-				var = actor.getStateVar(astVariable.getName());
-				if (var == null) {
-					var = actor.getParameter(astVariable.getName());
-					if (var == null) {
-						var = transformGlobalVariable(astVariable);
-					}
-				}
+				var = transformGlobalVariable(astVariable);
 			}
 
 			if (var.getType().isList()) {
 				Expression varExpr = IrFactory.eINSTANCE.createExprVar(var);
 				return varExpr;
 			} else {
-				Var v = null;
 				if (context.getProcedure() != null) {
-					v = getLocalVariable(var, false);
-				} else {
-					v = var;
+					if (var.isGlobal()) {
+						Var global = var;
+						var = context.getProcedure().getLocal(
+								"local_" + global.getName());
+						if (var == null) {
+							var = context.getProcedure().newTempLocalVariable(
+									global.getType(),
+									"local_" + global.getName());
+						}
+						addInstruction(IrFactory.eINSTANCE.createInstLoad(var,
+								global));
+					}
 				}
 
-				Expression varExpr = IrFactory.eINSTANCE.createExprVar(v);
-				return varExpr;
+				return IrFactory.eINSTANCE.createExprVar(var);
 			}
 		}
 
@@ -756,10 +754,29 @@ public class AstTransformer {
 			int lineNumber = Util.getLocation(stmtWhile);
 			Procedure procedure = context.getProcedure();
 
+			// to help track the instructions added
+			NodeBlock block = procedure.getLast();
+			List<Instruction> instructions = block.getInstructions();
+			int first = instructions.size();
 			Expression condition = transformExpression(stmtWhile.getCondition());
+			int last = instructions.size();
 
+			// the body
 			List<Node> nodes = getNodes(stmtWhile.getStatements());
 
+			// copy load instructions
+			List<Instruction> subList = instructions.subList(first, last);
+			for (Instruction instruction : subList) {
+				if (instruction instanceof InstLoad) {
+					InstLoad load = (InstLoad) instruction;
+					load = IrFactory.eINSTANCE.createInstLoad(load
+							.getLineNumber(), load.getTarget().getVariable(),
+							load.getSource().getVariable(), load.getIndexes());
+					procedure.getLast(nodes).add(load);
+				}
+			}
+
+			// create the while
 			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
 			nodeWhile.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 			nodeWhile.setLineNumber(lineNumber);
@@ -925,10 +942,9 @@ public class AstTransformer {
 		}
 
 		Instruction instruction;
-		if (indexes == null || indexes.isEmpty()) {
-			Var local = getLocalVariable(target, true);
+		if (target.isLocal() && (indexes == null || indexes.isEmpty())) {
 			instruction = IrFactory.eINSTANCE.createInstAssign(lineNumber,
-					local, value);
+					target, value);
 		} else {
 			instruction = IrFactory.eINSTANCE.createInstStore(lineNumber,
 					target, indexes, value);
@@ -953,40 +969,10 @@ public class AstTransformer {
 		// transform parameters
 		List<Expression> parameters = transformExpressions(expressions);
 
-		// stores variables that have been loaded and modified, and are loaded
-		// by the procedure
-		for (Var global : procedure.getLoadedVariables()) {
-			Var local = context.getMapGlobals().get(global);
-			if (local != null
-					&& context.getSetGlobalsToStore().contains(global)) {
-				// variable already loaded somewhere and modified
-				ExprVar value = IrFactory.eINSTANCE.createExprVar(local);
-
-				List<Expression> indexes = new ArrayList<Expression>(0);
-				InstStore store = IrFactory.eINSTANCE.createInstStore(
-						lineNumber, global, indexes, value);
-				addInstruction(store);
-			}
-		}
-
 		// add call
 		InstCall call = IrFactory.eINSTANCE.createInstCall(lineNumber, target,
 				procedure, parameters);
 		addInstruction(call);
-
-		// loads variables that are stored by the procedure
-		for (Var global : procedure.getStoredVariables()) {
-			Var local = context.getMapGlobals().get(global);
-			if (local == null) {
-				// creates a new local variable
-				local = context.getProcedure().newTempLocalVariable(
-						global.getType(), "local_" + global.getName());
-				context.getMapGlobals().put(global, local);
-			}
-
-			InstLoad load = IrFactory.eINSTANCE.createInstLoad(local, global);
-			addInstruction(load);
-		}
 	}
 
 	/**
@@ -1014,39 +1000,6 @@ public class AstTransformer {
 
 		this.initialize = null;
 		return initialize;
-	}
-
-	/**
-	 * Returns the IR mapping of the given variable. If the variable is a
-	 * global, returns a local associated with it. The variable is added to the
-	 * set of globals to load, and if <code>isStored</code> is <code>true</code>
-	 * , the variable is added to the set of variables to store, too.
-	 * 
-	 * @param var
-	 *            an IR variable, possibly global
-	 * @param isStored
-	 *            <code>true</code> if the variable is stored,
-	 *            <code>false</code> otherwise
-	 * @return a local IR variable
-	 */
-	private Var getLocalVariable(Var var, boolean isStored) {
-		if (var.isGlobal()) {
-			Var local = context.getMapGlobals().get(var);
-			if (local == null) {
-				local = context.getProcedure().newTempLocalVariable(
-						var.getType(), "local_" + var.getName());
-				context.getMapGlobals().put(var, local);
-			}
-
-			context.getSetGlobalsToLoad().add(var);
-			if (isStored) {
-				context.getSetGlobalsToStore().add(var);
-			}
-
-			return local;
-		}
-
-		return var;
 	}
 
 	/**
@@ -1101,23 +1054,6 @@ public class AstTransformer {
 	}
 
 	/**
-	 * Loads the globals that need to be loaded.
-	 */
-	private void loadGlobals() {
-		int i = 0;
-		for (Var global : context.getSetGlobalsToLoad()) {
-			Var local = context.getMapGlobals().get(global);
-
-			InstLoad load = IrFactory.eINSTANCE.createInstLoad(local, global);
-			NodeBlock block = context.getProcedure().getFirst();
-			block.add(i, load);
-			i++;
-		}
-
-		context.getSetGlobalsToLoad().clear();
-	}
-
-	/**
 	 * Returns the current context, and creates a new one.
 	 * 
 	 * @return the current context
@@ -1136,9 +1072,6 @@ public class AstTransformer {
 	 *            the context returned by {@link #newContext()}
 	 */
 	public void restoreContext(Context context) {
-		loadGlobals();
-		storeGlobals();
-
 		this.context = context;
 	}
 
@@ -1154,24 +1087,6 @@ public class AstTransformer {
 
 	public void setMapAstToIr(Map<EObject, EObject> mapAstToIr) {
 		this.mapAstToIr = mapAstToIr;
-	}
-
-	/**
-	 * Writes back the globals that need to be stored.
-	 */
-	private void storeGlobals() {
-		for (Var global : context.getSetGlobalsToStore()) {
-			Var local = context.getMapGlobals().get(global);
-			ExprVar value = IrFactory.eINSTANCE.createExprVar(local);
-			int lineNumber = global.getLineNumber();
-
-			List<Expression> indexes = new ArrayList<Expression>(0);
-			InstStore store = IrFactory.eINSTANCE.createInstStore(lineNumber,
-					global, indexes, value);
-			addInstruction(store);
-		}
-
-		context.getSetGlobalsToStore().clear();
 	}
 
 	/**
