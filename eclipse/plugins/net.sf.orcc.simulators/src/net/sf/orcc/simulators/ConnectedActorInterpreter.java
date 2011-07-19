@@ -63,9 +63,11 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 	 * Communication fifos map : key = related I/O port name; value =
 	 * Fifo_int/boolean/String
 	 */
-	private Map<Port, Fifo> fifos;
+	private Map<Port, Fifo> inputFifos;
 
 	private WriteListener listener;
+
+	private Map<Port, List<Fifo>> outputFifos;
 
 	public ConnectedActorInterpreter(Actor actor,
 			Map<String, Expression> parameters, WriteListener listener) {
@@ -136,15 +138,17 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 	 * @return true if the pattern is empty or satisfiable
 	 */
 	protected boolean checkOutputPattern(Pattern outputPattern) {
+		boolean hasRooms = true;
 		if (outputPattern != null) {
 			for (Port port : outputPattern.getPorts()) {
 				Integer nbOfTokens = outputPattern.getNumTokens(port);
-				if (!fifos.get(port).hasRoom(nbOfTokens)) {
-					return false;
+				List<Fifo> fifos = outputFifos.get(port);
+				for (Fifo fifo : fifos) {
+					hasRooms &= fifo.hasRoom(nbOfTokens);
 				}
 			}
 		}
-		return true;
+		return hasRooms;
 	}
 
 	/**
@@ -161,7 +165,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 
 		for (Port port : inputPattern.getPorts()) {
 			int numTokens = inputPattern.getNumTokens(port);
-			Fifo fifo = fifos.get(port);
+			Fifo fifo = inputFifos.get(port);
 
 			Var variable = inputPattern.getVariable(port);
 			Type type = ((TypeList) variable.getType()).getElementType();
@@ -177,14 +181,16 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 
 		for (Port port : outputPattern.getPorts()) {
 			int numTokens = outputPattern.getNumTokens(port);
-			Fifo fifo = fifos.get(port);
+			List<Fifo> fifos = outputFifos.get(port);
 
 			Var variable = outputPattern.getVariable(port);
 			Type type = ((TypeList) variable.getType()).getElementType();
 			Object array = variable.getValue();
 			for (int i = 0; i < numTokens; i++) {
 				Object value = ValueUtil.get(type, array, i);
-				fifo.write(value);
+				for (Fifo fifo : fifos) {
+					fifo.write(value);
+				}
 			}
 		}
 	}
@@ -200,7 +206,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		Pattern pattern = action.getInputPattern();
 		// check tokens
 		for (Port port : pattern.getPorts()) {
-			Fifo fifo = fifos.get(port);
+			Fifo fifo = inputFifos.get(port);
 			boolean hasTok = fifo.hasTokens(pattern.getNumTokens(port));
 			if (!hasTok) {
 				return false;
@@ -211,7 +217,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		pattern = action.getPeekPattern();
 		for (Port port : pattern.getPorts()) {
 			int numTokens = pattern.getNumTokens(port);
-			Fifo fifo = fifos.get(port);
+			Fifo fifo = inputFifos.get(port);
 
 			Var peeked = pattern.getVariable(port);
 			if (peeked != null) {
@@ -236,9 +242,12 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 	 * read/write accesses.
 	 * 
 	 * @param fifos
+	 * @param outputFifos
 	 */
-	public void setFifos(Map<Port, Fifo> fifos) {
-		this.fifos = fifos;
+	public void setFifos(Map<Port, Fifo> fifos,
+			Map<Port, List<Fifo>> outputFifos) {
+		this.inputFifos = fifos;
+		this.outputFifos = outputFifos;
 	}
 
 	@Override

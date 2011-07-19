@@ -35,6 +35,7 @@ import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +59,6 @@ import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IValueAttribute;
 import net.sf.orcc.network.serialize.XDFParser;
-import net.sf.orcc.network.transformations.BroadcastAdder;
 import net.sf.orcc.runtime.Fifo;
 import net.sf.orcc.util.OrccUtil;
 
@@ -81,28 +81,35 @@ import std.io.impl.Source;
  */
 public class SlowSimulator extends AbstractSimulator {
 
-	private Map<Instance, BroadcastInterpreter> bcastInterpreters;
-
 	protected List<Fifo> fifoList;
 
-	private Map<Port, Fifo> fifos;
+	protected Map<Port, Fifo> inputFifos;
+
+	protected Map<Port, List<Fifo>> outputFifos;
 
 	private int fifoSize;
 
-	private Map<Instance, ActorInterpreter> interpreters;
+	protected Map<Instance, ActorInterpreter> interpreters;
 
-	private IProject project;
+	protected IProject project;
 
 	private String stimulusFile;
 
-	private List<IFolder> vtlFolders;
+	protected List<IFolder> vtlFolders;
 
-	private String xdfFile;
+	protected String xdfFile;
 
 	protected void connectActors(Port srcPort, Port tgtPort, int fifoSize) {
 		Fifo fifo = new Fifo(srcPort.getType(), fifoSize);
-		fifos.put(srcPort, fifo);
-		fifos.put(tgtPort, fifo);
+		// inputFifos.put(srcPort, fifo);
+		inputFifos.put(tgtPort, fifo);
+
+		List<Fifo> fifos = outputFifos.get(srcPort);
+		if (fifos == null) {
+			fifos = new ArrayList<Fifo>();
+			outputFifos.put(srcPort, fifos);
+		}
+		fifos.add(fifo);
 	}
 
 	/**
@@ -150,14 +157,8 @@ public class SlowSimulator extends AbstractSimulator {
 		Source.setFileName(stimulusFile);
 
 		for (Instance instance : network.getInstances()) {
-			if (instance.isActor()) {
-				ActorInterpreter interpreter = interpreters.get(instance);
-				interpreter.initialize();
-			} else {
-				BroadcastInterpreter interpreter = bcastInterpreters
-						.get(instance);
-				interpreter.initialize();
-			}
+			ActorInterpreter interpreter = interpreters.get(instance);
+			interpreter.initialize();
 		}
 	}
 
@@ -182,7 +183,7 @@ public class SlowSimulator extends AbstractSimulator {
 	 * @throws OrccException
 	 * @throws FileNotFoundException
 	 */
-	private void instantiateNetwork(DirectedGraph<Vertex, Connection> graph)
+	protected void instantiateNetwork(DirectedGraph<Vertex, Connection> graph)
 			throws OrccException, FileNotFoundException {
 		// Loop over the graph vertexes and get instances definition for
 		// instantiating the network to simulate.
@@ -206,13 +207,7 @@ public class SlowSimulator extends AbstractSimulator {
 							getWriteListener());
 
 					interpreters.put(instance, interpreter);
-					interpreter.setFifos(fifos);
-
-				} else if (instance.isBroadcast()) {
-					BroadcastInterpreter bcastInterpreter = new BroadcastInterpreter(
-							instance.getBroadcast());
-					bcastInterpreters.put(instance, bcastInterpreter);
-					bcastInterpreter.setFifos(fifos);
+					interpreter.setFifos(inputFifos, outputFifos);
 				}
 			}
 		}
@@ -224,17 +219,10 @@ public class SlowSimulator extends AbstractSimulator {
 			boolean hasExecuted = false;
 			for (Instance instance : network.getInstances()) {
 				int nbFiring = 0;
-				if (instance.isActor()) {
-					ActorInterpreter interpreter = interpreters.get(instance);
-					while (interpreter.schedule()) {
-						nbFiring++;
-					}
-				} else {
-					BroadcastInterpreter interpreter = bcastInterpreters
-							.get(instance);
-					while (interpreter.schedule()) {
-						nbFiring++;
-					}
+				ActorInterpreter interpreter = interpreters.get(instance);
+
+				while (interpreter.schedule()) {
+					nbFiring++;
 				}
 
 				hasExecuted |= (nbFiring > 0);
@@ -253,9 +241,9 @@ public class SlowSimulator extends AbstractSimulator {
 		try {
 			interpreters = new HashMap<Instance, ActorInterpreter>();
 
-			bcastInterpreters = new HashMap<Instance, BroadcastInterpreter>();
+			inputFifos = new HashMap<Port, Fifo>();
 
-			fifos = new HashMap<Port, Fifo>();
+			outputFifos = new HashMap<Port, List<Fifo>>();
 
 			IFile file = OrccUtil.getFile(project, xdfFile, "xdf");
 
@@ -267,9 +255,6 @@ public class SlowSimulator extends AbstractSimulator {
 
 			// Flatten the hierarchical network
 			network.flatten();
-
-			// Add broadcasts before connecting actors
-			new BroadcastAdder().transform(network);
 
 			// Parse XDF file, do some transformations and return the
 			// graph corresponding to the flat network instantiation.
@@ -286,7 +271,7 @@ public class SlowSimulator extends AbstractSimulator {
 		}
 	}
 
-	private void updateConnections(DirectedGraph<Vertex, Connection> graph)
+	protected void updateConnections(DirectedGraph<Vertex, Connection> graph)
 			throws OrccException {
 		for (Connection connection : graph.edgeSet()) {
 			Vertex srcVertex = graph.getEdgeSource(connection);
