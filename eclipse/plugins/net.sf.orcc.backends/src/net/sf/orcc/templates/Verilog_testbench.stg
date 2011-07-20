@@ -50,16 +50,6 @@ printOutPorts(port) ::= <<
 <port.name>_count  : OUT std_logic_vector(15 downto 0);
 >>
 
-
-signalInit(port) ::=<<
-<port.name>_send \<= '0';
-<if(port.type.bool)>
-<port.name>_data \<= '0';
-<else>
-<port.name>_data \<= (others =\> '0');
-<endif>
->>
-
 signalsInstanciation(port) ::= <<
 <port.name>_data  =\> <port.name>_data,
 <port.name>_send  =\> <port.name>_send,
@@ -73,9 +63,6 @@ signalsInstanciation(port) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 // the dimensions of a list: [dim1][dim2]...[dimn]
 // does not output anything if <value> is empty
-listSize(values) ::= <<
-<values : {value | <value>}; separator=" * ">
->>
 
 sig_const(input, output) ::= <<
 constant PERIOD : time := 50 ns;
@@ -95,35 +82,24 @@ type tb_type is (after_reset, read_file, CheckRead);
 --
 -- Configuration
 signal count       : integer range 255 downto 0 := 0;
-signal CLK       : std_logic := '0';
-signal RESET     : std_logic := '0';
+signal clock       : std_logic := '0';
+signal reset_n     : std_logic := '0';
 
 >>
-
-printFSMIn(port) ::= <<
-signal tb_FSM_<port.name>  : tb_type;
-file sim_file_<instance.id>_<port.name>  : text is "<instance.id>_<port.name>_sim.txt";
->>
-
-printFSMOut(port) ::= <<
-file sim_file_<instance.id>_<port.name>  : text is "<instance.id>_<port.name>_sim.txt";
->>
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Print processes
 ///////////////////////////////////////////////////////////////////////////////
-CLK_process() ::= <<
-CLKProcess : process
+clock_process() ::= <<
+clockProcess : process
         begin
             wait for OFFSET;
-            CLK_LOOP : loop
-                CLK \<= '0';
+            clock_LOOP : loop
+                clock \<= '0';
                 wait for (PERIOD - (PERIOD * DUTY_CYCLE));
-                CLK \<= '1';
+                clock \<= '1';
                 wait for (PERIOD * DUTY_CYCLE);
-            end loop CLK_LOOP;
+            end loop clock_LOOP;
         end process;
 
 >>
@@ -133,9 +109,9 @@ resetProcess : process
    begin		
 	 wait for OFFSET;
       -- reset state for 100 ns.
-		RESET \<= '1';
+		reset_n \<= '1';
       wait for 100 ns;
-      RESET \<= '0';	
+      reset_n \<= '0';	
 		wait;
    end process;
 
@@ -148,117 +124,6 @@ init_process(output) ::= <<
 RdyAckInit(port) ::= <<
 <port.name>_ack \<= <port.name>_send;
 <port.name>_rdy \<= '1';
->>
-
-waveform_process_in(input) ::= <<
---
--- Input(s) Waveform Generation
-WaveGen_Proc_In : process (CLK)
-  variable Input_bit   : integer range 2147483647 downto - 2147483648;
-  variable line_number : line;
-begin
-  if rising_edge(CLK) then 
-    <input: case_define_in(); separator="\n">
-  end if;
-end process WaveGen_Proc_In;
-
->>
-
-
-case_define_in(port) ::= <<
---
--- Input port: <port.name> Waveform Generation
-case tb_FSM_<port.name> is
-  when after_reset =\>
-    count \<= count + 1;
-    if (count = 15) then
-      tb_FSM_<port.name> \<= read_file;
-      count           \<= 0;
-    end if;
-
-  when read_file =\>
-    if (not endfile (sim_file_<instance.id>_<port.name>)) then
-      readline(sim_file_<instance.id>_<port.name>, line_number);
-      --
-      if (line_number'length \> 0 and line_number(1) /= '/') then
-        read(line_number, input_bit);
-        <sendData(port)>
-        <port.name>_send \<= '1';    
-        tb_FSM_<port.name> \<= CheckRead;
-      end if;
-    end if;
-
-  when CheckRead =\>
-    if (not endfile (sim_file_<instance.id>_<port.name>)) and <port.name>_ack = '1' then
-      readline(sim_file_<instance.id>_<port.name>, line_number);
-      --
-      if (line_number'length \> 0 and line_number(1) /= '/') then
-        read(line_number, input_bit);
-        <sendData(port)>
-        <port.name>_send \<= '1';      
-      end if;
-    elsif (endfile (sim_file_<instance.id>_<port.name>)) then
-      <port.name>_send \<= '0'; 
-    end if;
-
-  when others =\> null;
-end case;
-
->>
-
-waveform_process_out(output) ::= <<
--- Output(s) waveform Generation
-<output: {port|<port.name>_ack \<= <port.name>_send;}; separator="\n">    
---
-WaveGen_Proc_Out : process (RESET, CLK)
-  variable Input_bit   : integer range 2147483647 downto - 2147483648;
-  variable line_number : line;
-begin
-  if (RESET = '0') then
-    -- nothing here
-  elsif (rising_edge(CLK)) then
-    <output: case_define_out(); separator="\n">
-  end if;
-end process WaveGen_Proc_Out;
-
->>
-
-case_define_out(port) ::= <<
---
--- Output port: <port.name> Waveform Generation
-if (not endfile (sim_file_<instance.id>_<port.name>) and <port.name>_send = '1') then
-  readline(sim_file_<instance.id>_<port.name>, line_number);
-  --
-  if (line_number'length \> 0 and line_number(1) /= '/') then
-    read(line_number, input_bit);
-<
-if(port.type.bool)
->    if (input_bit = 1) then
-      assert (<port.name>_data = '1')
-        report "on port <port.name> incorrectly value computed : '0' instead of : '1'"
-        severity error;
-    else
-      assert (<port.name>_data = '0')
-        report "on port <port.name> incorrectly value computed : '1' instead of : '0'"
-        severity error;                
-    end if;<
-else
-><if(port.type.int)
-  >    assert (<port.name>_data  = std_logic_vector(to_signed(input_bit, <port.type.size>)))
-       report "on <port.name> incorrectly value computed : " & to_string(to_integer(to_signed(<port.name>_data))) & " instead of :" & to_string(input_bit)
-       report "on port <port.name> incorrectly value computed : " & str(to_integer(signed(<port.name>_data))) & " instead of :" & str(input_bit)
-       severity error;
-  <else
-  >    assert (<port.name>_data  = std_logic_vector(to_unsigned(input_bit, <port.type.size>)))
-       report "on port <port.name> incorrectly value computed : " & to_string(to_integer(to_unsigned(<port.name>_data))) & " instead of :" & to_string(input_bit)
-       report "on port <port.name> incorrectly value computed : " & str(to_integer(unsigned(<port.name>_data))) & " instead of :" & str(input_bit)
-       severity error;
-  <endif
-  ><endif
->    --
-  end if;
-end if;
-
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -295,7 +160,7 @@ architecture arch_tb_<instance.id> of tb_<instance.id> is
 
 begin
        
-    <CLK_process()>
+    <clock_process()>
     
     <init_process(output=instance.actor.outputs)>
     
@@ -319,8 +184,8 @@ component <instance.id>
       <if(instance.network.inputs.list || instance.network.outputs.list)><endif>
       <instance.network.inputs.list: printInPorts(); separator="\n"><if(instance.network.inputs.list && instance.network.outputs.list)><endif>
       <instance.network.outputs.list: printOutPorts(); separator="\n"><if(!instance.network.outputs.list)>    <endif>
-      CLK : IN std_logic;
-      RESET : IN std_logic);
+      clock : IN std_logic;
+      reset_n : IN std_logic);
       end component;
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
@@ -331,12 +196,12 @@ component <instance.id>
 begin
 
    uut : <instance.id> port map (
-      CLK      =\> CLK,
-      RESET    =\> RESET<if(instance.network.inputs.list || instance.network.outputs.list)>,<endif>
+      clock      =\> clock,
+      reset_n    =\> reset_n<if(instance.network.inputs.list || instance.network.outputs.list)>,<endif>
       <instance.network.inputs.list: signalsInstanciation(); separator=",\n"><if(instance.network.inputs.list && instance.network.outputs.list)>,<endif>
       <instance.network.outputs.list: signalsInstanciation(); separator=",\n"><if(!instance.network.outputs.list)>    <endif>);
       
-    <CLK_process()>
+    <clock_process()>
     
     <init_process(output=instance.network.outputs)>
     
