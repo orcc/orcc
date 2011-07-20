@@ -28,15 +28,22 @@
  */
 package net.sf.orcc.backends.instructions.util;
 
-import java.util.List;
-
-import net.sf.orcc.backends.instructions.*;
-
+import net.sf.orcc.backends.instructions.InstAssignIndex;
+import net.sf.orcc.backends.instructions.InstCast;
+import net.sf.orcc.backends.instructions.InstGetElementPtr;
+import net.sf.orcc.backends.instructions.InstRam;
+import net.sf.orcc.backends.instructions.InstRamRead;
+import net.sf.orcc.backends.instructions.InstRamSetAddress;
+import net.sf.orcc.backends.instructions.InstRamWrite;
+import net.sf.orcc.backends.instructions.InstSplit;
+import net.sf.orcc.backends.instructions.InstTernary;
+import net.sf.orcc.backends.instructions.InstructionsPackage;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Instruction;
 
-import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.emf.ecore.util.Switch;
 
 /**
  * <!-- begin-user-doc -->
@@ -51,7 +58,7 @@ import org.eclipse.emf.ecore.EObject;
  * @see net.sf.orcc.backends.instructions.InstructionsPackage
  * @generated
  */
-public class InstructionsSwitch<T> {
+public class InstructionsSwitch<T> extends Switch<T> {
 	/**
 	 * The cached model package
 	 * <!-- begin-user-doc -->
@@ -73,14 +80,16 @@ public class InstructionsSwitch<T> {
 	}
 
 	/**
-	 * Calls <code>caseXXX</code> for each class of the model until one returns a non null result; it yields that result.
+	 * Checks whether this is a switch for the given package.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the first non-null result returned by a <code>caseXXX</code> call.
+	 * @parameter ePackage the package in question.
+	 * @return whether this is a switch for the given package.
 	 * @generated
 	 */
-	public T doSwitch(EObject theEObject) {
-		return doSwitch(theEObject.eClass(), theEObject);
+	@Override
+	protected boolean isSwitchFor(EPackage ePackage) {
+		return ePackage == modelPackage;
 	}
 
 	/**
@@ -90,26 +99,7 @@ public class InstructionsSwitch<T> {
 	 * @return the first non-null result returned by a <code>caseXXX</code> call.
 	 * @generated
 	 */
-	protected T doSwitch(EClass theEClass, EObject theEObject) {
-		if (theEClass.eContainer() == modelPackage) {
-			return doSwitch(theEClass.getClassifierID(), theEObject);
-		}
-		else {
-			List<EClass> eSuperTypes = theEClass.getESuperTypes();
-			return
-				eSuperTypes.isEmpty() ?
-					defaultCase(theEObject) :
-					doSwitch(eSuperTypes.get(0), theEObject);
-		}
-	}
-
-	/**
-	 * Calls <code>caseXXX</code> for each class of the model until one returns a non null result; it yields that result.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the first non-null result returned by a <code>caseXXX</code> call.
-	 * @generated
-	 */
+	@Override
 	protected T doSwitch(int classifierID, EObject theEObject) {
 		switch (classifierID) {
 			case InstructionsPackage.INST_TERNARY: {
@@ -367,6 +357,7 @@ public class InstructionsSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject)
 	 * @generated
 	 */
+	@Override
 	public T defaultCase(EObject object) {
 		return null;
 	}
