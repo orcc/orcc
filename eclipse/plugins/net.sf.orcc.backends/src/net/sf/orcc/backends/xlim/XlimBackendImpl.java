@@ -91,7 +91,7 @@ public class XlimBackendImpl extends AbstractBackend {
 	private Map<String, String> mapping;
 
 	private boolean multi2mono;
-	
+
 	private List<String> entities;
 
 	private HashSet<String> entitySet;
@@ -211,7 +211,7 @@ public class XlimBackendImpl extends AbstractBackend {
 		networkPrinter.print(network.getName() + ".xcf", path, network,
 				"mapping");
 	}
-	
+
 	private void printTestbench(InstancePrinter printer, Instance instance) {
 		printer.print(instance.getId() + "_tb.vhd", path + File.separator
 				+ "Testbench", instance, "instance");
@@ -223,7 +223,7 @@ public class XlimBackendImpl extends AbstractBackend {
 			}
 		}
 	}
-	
+
 	private void printTCL(Instance instance) {
 		Printer printer = new Printer("Verilog_TCLLists");
 
@@ -237,7 +237,7 @@ public class XlimBackendImpl extends AbstractBackend {
 
 		printer.print("TCLLists.tcl", path, "TCLLists");
 	}
-	
+
 	private void computeEntityList(Instance instance) {
 		if (instance.isActor()) {
 			String name = instance.getId();
@@ -262,18 +262,24 @@ public class XlimBackendImpl extends AbstractBackend {
 		NetworkPrinter printer;
 		String file = network.getName();
 		if (hardwareGen) {
-			
+			// create a folder where to put .v files generated with openforge
+			File sourceFolder = new File(path + File.separator + "Design");
+			if (!sourceFolder.exists()) {
+				sourceFolder.mkdir();
+			}
 			// generate instances test bench
 			File folder = new File(path + File.separator + "Testbench");
 			if (!folder.exists()) {
 				folder.mkdir();
 			}
-			InstancePrinter instancePrinter = new InstancePrinter("Verilog_testbench");
-			Instance instance = new Instance(network.getName(), network.getName());
+			InstancePrinter instancePrinter = new InstancePrinter(
+					"Verilog_testbench");
+			Instance instance = new Instance(network.getName(),
+					network.getName());
 			instance.setContents(network);
 			printTestbench(instancePrinter, instance);
 			printTCL(instance);
-			
+
 			file += ".vhd";
 			printer = new NetworkPrinter("XLIM_hw_network");
 		} else {
