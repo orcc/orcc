@@ -59,7 +59,6 @@ import net.sf.orcc.cal.services.AstExpressionEvaluator;
 import net.sf.orcc.cal.type.TypeChecker;
 import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.cal.util.Util;
-import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
@@ -68,7 +67,6 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
@@ -85,7 +83,6 @@ import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -826,12 +823,11 @@ public class AstTransformer {
 			int lineNumber = Util.getLocation(astCall);
 			String name = astCall.getProcedure().getName();
 			if ("print".equals(name) || "println".equals(name)) {
-				Procedure procedure = actor.getProcedure("print");
-				if (procedure == null) {
-					procedure = IrFactory.eINSTANCE.createProcedure("print",
+				if (print == null) {
+					print = IrFactory.eINSTANCE.createProcedure("print",
 							lineNumber, IrFactory.eINSTANCE.createTypeVoid());
-					procedure.setNative(true);
-					actor.getProcs().add(procedure);
+					print.setNative(true);
+					procedures.add(print);
 				}
 
 				List<AstExpression> astParameters = astCall.getParameters();
@@ -846,13 +842,11 @@ public class AstTransformer {
 				}
 
 				addInstruction(IrFactory.eINSTANCE.createInstCall(lineNumber,
-						(Var) null, procedure, parameters));
+						(Var) null, print, parameters));
 			}
 		}
 
 	}
-
-	private Actor actor;
 
 	/**
 	 * allows creation of unique names
@@ -872,6 +866,18 @@ public class AstTransformer {
 	 * A map from AST objects to IR objects.
 	 */
 	private Map<EObject, EObject> mapAstToIr;
+
+	private Procedure print;
+
+	/**
+	 * list of procedures of the IR target (actor/unit)
+	 */
+	private List<Procedure> procedures;
+
+	/**
+	 * list of variables of the IR target (actor/unit)
+	 */
+	private List<Var> variables;
 
 	/**
 	 * statement transformer.
@@ -912,23 +918,6 @@ public class AstTransformer {
 		NodeBlock block = procedure.getLast();
 		InstReturn returnInstr = IrFactory.eINSTANCE.createInstReturn(value);
 		block.add(returnInstr);
-	}
-
-	/**
-	 * Clears up context and functions/proceudres maps.
-	 */
-	public void clear() {
-		actor = null;
-		blockCount = 0;
-
-		exprTransformer.clearTarget();
-
-		context = new Context(null, null);
-
-		mapAstToIr = null;
-
-		// clear the initialize procedure that may have been created
-		initialize = null;
 	}
 
 	private void createAssignOrStore(int lineNumber, Var target,
@@ -1075,18 +1064,16 @@ public class AstTransformer {
 		this.context = context;
 	}
 
-	/**
-	 * Sets the IR actor.
-	 * 
-	 * @param actor
-	 *            IR actor
-	 */
-	public void setIrActor(Actor actor) {
-		this.actor = actor;
-	}
-
 	public void setMapAstToIr(Map<EObject, EObject> mapAstToIr) {
 		this.mapAstToIr = mapAstToIr;
+	}
+
+	/**
+	 * Sets the lists.
+	 */
+	public void setLists(List<Procedure> procedures, List<Var> variables) {
+		this.procedures = procedures;
+		this.variables = variables;
 	}
 
 	/**
@@ -1132,13 +1119,15 @@ public class AstTransformer {
 	 * @param astFunction
 	 *            an AST function
 	 */
-	private void transformFunction(AstFunction astFunction) {
+	public void transformFunction(AstFunction astFunction) {
 		String name = astFunction.getName();
 		int lineNumber = Util.getLocation(astFunction);
 		Type type = Util.getType(astFunction);
 
 		Procedure procedure = IrFactory.eINSTANCE.createProcedure(name,
 				lineNumber, type);
+		mapAstToIr.put(astFunction, procedure);
+
 		Context oldContext = newContext(procedure);
 
 		transformParameters(astFunction.getParameters());
@@ -1162,8 +1151,7 @@ public class AstTransformer {
 			procedure.setNative(true);
 		}
 
-		actor.getProcs().add(procedure);
-		mapAstToIr.put(astFunction, procedure);
+		procedures.add(procedure);
 	}
 
 	/**
@@ -1176,22 +1164,6 @@ public class AstTransformer {
 	 * @return an ordered map of IR state variables
 	 */
 	public Var transformGlobalVariable(AstVariable astVariable) {
-		return transformGlobalVariable(
-				IrPackage.eINSTANCE.getActor_StateVars(), astVariable);
-	}
-
-	/**
-	 * Transforms AST state variables to IR state variables. The initial value
-	 * of an AST state variable is evaluated to a constant by
-	 * {@link #exprEvaluator}.
-	 * 
-	 * @param stateVariables
-	 *            a list of AST state variables
-	 * @return an ordered map of IR state variables
-	 */
-	@SuppressWarnings("unchecked")
-	public Var transformGlobalVariable(EStructuralFeature feature,
-			AstVariable astVariable) {
 		int lineNumber = Util.getLocation(astVariable);
 		Type type = EcoreUtil.copy(Util.getType(astVariable));
 		String name = astVariable.getName();
@@ -1233,7 +1205,7 @@ public class AstTransformer {
 			restoreContext(oldContext);
 		}
 
-		((List<Var>) actor.eGet(feature)).add(variable);
+		variables.add(variable);
 
 		return variable;
 	}
@@ -1307,12 +1279,14 @@ public class AstTransformer {
 	 * @param astProcedure
 	 *            an AST procedure
 	 */
-	private void transformProcedure(AstProcedure astProcedure) {
+	public void transformProcedure(AstProcedure astProcedure) {
 		String name = astProcedure.getName();
 		int lineNumber = Util.getLocation(astProcedure);
 
 		Procedure procedure = IrFactory.eINSTANCE.createProcedure(name,
 				lineNumber, IrFactory.eINSTANCE.createTypeVoid());
+		mapAstToIr.put(astProcedure, procedure);
+
 		Context oldContext = newContext(procedure);
 
 		transformParameters(astProcedure.getParameters());
@@ -1326,8 +1300,7 @@ public class AstTransformer {
 			procedure.setNative(true);
 		}
 
-		actor.getProcs().add(procedure);
-		mapAstToIr.put(astProcedure, procedure);
+		procedures.add(procedure);
 	}
 
 	/**

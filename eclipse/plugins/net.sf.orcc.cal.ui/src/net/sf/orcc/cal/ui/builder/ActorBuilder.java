@@ -31,12 +31,8 @@ package net.sf.orcc.cal.ui.builder;
 import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccProjectNature;
-import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.frontend.Frontend;
@@ -50,17 +46,13 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EValidator;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.xtext.builder.IXtextBuilderParticipant;
 import org.eclipse.xtext.resource.IEObjectDescription;
 import org.eclipse.xtext.resource.IResourceDescription;
@@ -90,10 +82,12 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			return;
 		}
 
+		// create front-end
 		IFolder outputFolder = OrccUtil.getOutputFolder(project);
 		if (outputFolder == null) {
 			return;
 		}
+		Frontend frontend = new Frontend(outputFolder);
 
 		// if build is cleaning, remove output folder completely
 		BuildType type = context.getBuildType();
@@ -104,7 +98,6 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		}
 
 		ResourceSet set = context.getResourceSet();
-		ResourceSet setIR = new ResourceSetImpl();
 		monitor.beginTask("Building actors", context.getDeltas().size());
 		for (Delta delta : context.getDeltas()) {
 			if (delta.getNew() == null) {
@@ -124,7 +117,11 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 					if (obj.eClass()
 							.equals(CalPackage.eINSTANCE.getAstEntity())) {
 						AstEntity entity = (AstEntity) obj;
-						build(setIR, outputFolder, resource, entity);
+						IFile file = getFile(resource);
+						if (!hasErrors(file)) {
+							// and then we compile
+							frontend.compile(file, entity);
+						}
 					}
 				}
 			}
@@ -139,53 +136,40 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 	}
 
 	/**
-	 * Builds the actor defined in the given resource.
+	 * Returns the IFile associated with the given resource.
 	 * 
 	 * @param resource
-	 *            the resource of the actor
-	 * @param actor
-	 *            the AST actor
+	 *            a resource
 	 * @throws CoreException
 	 *             if something goes wrong
 	 */
-	private void build(ResourceSet set, IFolder outputFolder,
-			Resource resource, AstEntity entity) throws CoreException {
-		try {
-			URL resourceUrl = new URL(resource.getURI().toString());
-			URL url = FileLocator.toFileURL(resourceUrl);
-			IPath path = new Path(url.getPath());
+	private IFile getFile(Resource resource) throws CoreException {
+		String fullPath = resource.getURI().toPlatformString(true);
+		IPath path = new Path(fullPath);
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		return root.getFile(path);
+	}
 
-			// get markers to check for errors
-			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-			IFile file = root.getFileForLocation(path);
-			IMarker[] markers = file.findMarkers(EValidator.MARKER, true,
-					IResource.DEPTH_INFINITE);
-			for (IMarker marker : markers) {
-				if (IMarker.SEVERITY_ERROR == marker.getAttribute(
-						IMarker.SEVERITY, IMarker.SEVERITY_INFO)) {
-					// an error => no compilation
-					return;
-				}
+	/**
+	 * Returns <code>true</code> if the given file has errors.
+	 * 
+	 * @param file
+	 *            a file containing an entity (actor/unit)
+	 * @return <code>true</code> if the given file has errors
+	 * @throws CoreException
+	 */
+	private boolean hasErrors(IFile file) throws CoreException {
+		IMarker[] markers = file.findMarkers(EValidator.MARKER, true,
+				IResource.DEPTH_INFINITE);
+		for (IMarker marker : markers) {
+			if (IMarker.SEVERITY_ERROR == marker.getAttribute(IMarker.SEVERITY,
+					IMarker.SEVERITY_INFO)) {
+				// an error => no compilation
+				return true;
 			}
-
-			// if using clustering, we need to transform the types
-			// new TypeTransformer(null).transformTypes(entity);
-
-			// and then we compile
-			AstActor actor = entity.getActor();
-			if (actor != null) {
-				Frontend frontend = new Frontend();
-				frontend.compile(set, outputFolder, file, actor);
-			}
-		} catch (IOException e) {
-			IStatus status = new Status(IStatus.ERROR, "net.sf.orcc.cal.ui",
-					"could not generate code for " + resource, e);
-			throw new CoreException(status);
-		} catch (OrccException e) {
-			IStatus status = new Status(IStatus.ERROR, "net.sf.orcc.cal.ui",
-					"could not generate code for " + resource, e);
-			throw new CoreException(status);
 		}
+
+		return false;
 	}
 
 }

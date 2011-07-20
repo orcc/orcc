@@ -63,7 +63,6 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeWhile;
@@ -82,7 +81,6 @@ import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EStructuralFeature;
 
 /**
  * This class transforms an AST actor to its IR equivalent.
@@ -92,14 +90,12 @@ import org.eclipse.emf.ecore.EStructuralFeature;
  */
 public class ActorTransformer {
 
-	private Actor actor;
-
 	private AstTransformer astTransformer;
 
 	/**
 	 * A map from AST objects to IR objects.
 	 */
-	final private Map<EObject, EObject> mapAstToIr;
+	private Map<EObject, EObject> mapAstToIr;
 
 	/**
 	 * count of un-tagged actions
@@ -110,8 +106,6 @@ public class ActorTransformer {
 	 * Creates a new AST to IR transformation.
 	 */
 	public ActorTransformer() {
-		mapAstToIr = new HashMap<EObject, EObject>();
-		astTransformer = new AstTransformer();
 	}
 
 	/**
@@ -414,33 +408,32 @@ public class ActorTransformer {
 	 * @return the actor in IR form
 	 */
 	public Actor transform(IFile file, AstActor astActor) {
-		actor = IrFactory.eINSTANCE.createActor();
+		Actor actor = IrFactory.eINSTANCE.createActor();
 		actor.setFileName(file.getFullPath().toString());
 
 		int lineNumber = Util.getLocation(astActor);
 		actor.setLineNumber(lineNumber);
 
+		astTransformer = new AstTransformer();
+		mapAstToIr = new HashMap<EObject, EObject>();
 		astTransformer.setMapAstToIr(mapAstToIr);
-		astTransformer.setIrActor(actor);
+		astTransformer.setLists(actor.getProcs(), actor.getParameters());
 
 		try {
 			// parameters
 			for (AstVariable astVariable : astActor.getParameters()) {
-				astTransformer.transformGlobalVariable(
-						IrPackage.eINSTANCE.getActor_Parameters(), astVariable);
+				astTransformer.transformGlobalVariable(astVariable);
 			}
 
 			// state variables
+			astTransformer.setLists(actor.getProcs(), actor.getStateVars());
 			for (AstVariable astVariable : astActor.getStateVariables()) {
-				astTransformer.transformGlobalVariable(
-						IrPackage.eINSTANCE.getActor_StateVars(), astVariable);
+				astTransformer.transformGlobalVariable(astVariable);
 			}
 
 			// transform ports
-			transformPorts(IrPackage.eINSTANCE.getActor_Inputs(),
-					astActor.getInputs());
-			transformPorts(IrPackage.eINSTANCE.getActor_Outputs(),
-					astActor.getOutputs());
+			transformPorts(actor.getInputs(), astActor.getInputs());
+			transformPorts(actor.getOutputs(), astActor.getOutputs());
 
 			// transform actions
 			ActionList actions = transformActions(astActor.getActions());
@@ -504,9 +497,8 @@ public class ActorTransformer {
 			return actor;
 		} finally {
 			// cleanup
-			astTransformer.clear();
-			mapAstToIr.clear();
-
+			astTransformer = null;
+			mapAstToIr = null;
 			untaggedCount = 0;
 		}
 	}
@@ -770,15 +762,13 @@ public class ActorTransformer {
 	 *            a list of AST ports
 	 * @return an ordered map of IR ports
 	 */
-	@SuppressWarnings("unchecked")
-	private void transformPorts(EStructuralFeature feature,
-			List<AstPort> portList) {
+	private void transformPorts(List<Port> ports, List<AstPort> portList) {
 		for (AstPort astPort : portList) {
 			Type type = Util.getType(astPort);
 			Port port = IrFactory.eINSTANCE.createPort(type, astPort.getName(),
 					astPort.isNative());
 			mapAstToIr.put(astPort, port);
-			((List<Port>) actor.eGet(feature)).add(port);
+			ports.add(port);
 		}
 	}
 

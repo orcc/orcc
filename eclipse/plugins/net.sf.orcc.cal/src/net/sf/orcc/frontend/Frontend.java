@@ -28,10 +28,16 @@
  */
 package net.sf.orcc.frontend;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.cal.cal.AstActor;
+import net.sf.orcc.cal.cal.AstEntity;
+import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Unit;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrUtil;
@@ -41,6 +47,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -51,10 +58,16 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class Frontend {
 
-	private ActorTransformer actorTransformer;
+	private ResourceSet set;
 
-	public Frontend() {
-		actorTransformer = new ActorTransformer();
+	private IFolder outputFolder;
+
+	private Map<EObject, EObject> mapAstToIr;
+
+	public Frontend(IFolder outputFolder) {
+		this.outputFolder = outputFolder;
+		mapAstToIr = new HashMap<EObject, EObject>();
+		set = new ResourceSetImpl();
 	}
 
 	/**
@@ -71,12 +84,21 @@ public class Frontend {
 	 *            AST of the actor
 	 * @throws OrccException
 	 */
-	public void compile(ResourceSet set, IFolder outputFolder, IFile file,
-			AstActor astActor) throws OrccException {
+	public void compile(IFile file, AstEntity entity) {
 		try {
-			Actor actor = actorTransformer.transform(file, astActor);
-			removeDanglingUses(actor);
-			IrUtil.serializeActor(set, outputFolder, actor);
+			AstActor astActor = entity.getActor();
+			if (astActor != null) {
+				ActorTransformer transformer = new ActorTransformer();
+				Actor actor = transformer.transform(file, astActor);
+				mapAstToIr.put(astActor, actor);
+				removeDanglingUses(actor);
+				IrUtil.serializeActor(set, outputFolder, actor);
+			} else {
+				UnitTransformer transformer = new UnitTransformer();
+				AstUnit astUnit = entity.getUnit();
+				Unit unit = transformer.transform(file, astUnit);
+				mapAstToIr.put(astUnit, unit);
+			}
 		} catch (OrccRuntimeException e) {
 			e.printStackTrace();
 		}

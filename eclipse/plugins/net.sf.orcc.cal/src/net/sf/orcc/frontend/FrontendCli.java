@@ -32,9 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.cal.CalStandaloneSetup;
-import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.util.OrccUtil;
 
@@ -49,8 +47,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.xtext.diagnostics.Severity;
@@ -71,14 +67,13 @@ public class FrontendCli implements IApplication {
 
 	private List<IFile> actors;
 
+	private Frontend frontend;
+
 	private IFolder outputFolder;
 
 	private XtextResourceSet resourceSet;
 
-	private ResourceSet setIR;
-
 	public FrontendCli() {
-		setIR = new ResourceSetImpl();
 	}
 
 	private void getActors(IContainer container) throws CoreException {
@@ -126,16 +121,8 @@ public class FrontendCli implements IApplication {
 		}
 
 		// only compile if there are no errors
-		try {
-			if (!hasErrors) {
-				AstActor actor = entity.getActor();
-				if (actor != null) {
-					Frontend frontend = new Frontend();
-					frontend.compile(setIR, outputFolder, actorPath, actor);
-				}
-			}
-		} catch (OrccException e) {
-			e.printStackTrace();
+		if (!hasErrors) {
+			frontend.compile(actorPath, entity);
 		}
 	}
 
@@ -150,6 +137,8 @@ public class FrontendCli implements IApplication {
 		}
 
 		outputFolder = OrccUtil.getOutputFolder(project);
+
+		frontend = new Frontend(outputFolder);
 	}
 
 	@Override
