@@ -1,0 +1,24 @@
+printEntity(entity) ::= <<
+vcom -93 -reportprogress 30 -work work $Design/<entity>.v
+>>
+
+TCLLists(name, entities, options) ::= <<
+# Generated from <name>
+set SRC "../../../libraries/VHDL/src"
+set Design "../src/Design"
+set Testbench "../src/Testbench"
+
+# Compile Packages
+vcom -93 -reportprogress 30 -work work $SRC/sim_package.vhd
+
+# Compile actors and networks
+<entities: printEntity(); separator="\n">
+vcom -93 -reportprogress 30 -work work $Design/<name>.vhd
+vcom -93 -reportprogress 30 -work work $Testbench/<name>_tb.vhd
+
+# Simulate
+vsim -novopt tb_<name>
+do wave.do
+run 10 us
+
+>>
