@@ -8,6 +8,7 @@ package net.sf.orcc.ir.util;
 
 import java.util.Map;
 
+import net.sf.orcc.ir.*;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Def;
@@ -86,6 +87,10 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseActor(Actor object) {
 				return createActorAdapter();
+			}
+			@Override
+			public Adapter caseUnit(Unit object) {
+				return createUnitAdapter();
 			}
 			@Override
 			public Adapter casePort(Port object) {
@@ -310,6 +315,20 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createActorAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Unit <em>Unit</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.Unit
+	 * @generated
+	 */
+	public Adapter createUnitAdapter() {
 		return null;
 	}
 

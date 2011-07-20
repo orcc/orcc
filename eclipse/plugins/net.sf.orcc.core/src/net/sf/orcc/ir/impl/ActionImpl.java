@@ -28,9 +28,9 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getBody <em>Body</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getInputPattern <em>Input Pattern</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getOutputPattern <em>Output Pattern</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getPeekPattern <em>Peek Pattern</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getScheduler <em>Scheduler</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getTag <em>Tag</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getPeekPattern <em>Peek Pattern</em>}</li>
  * </ul>
  * </p>
  *
@@ -68,6 +68,16 @@ public class ActionImpl extends EObjectImpl implements Action {
 	protected Pattern outputPattern;
 
 	/**
+	 * The cached value of the '{@link #getPeekPattern() <em>Peek Pattern</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getPeekPattern()
+	 * @generated
+	 * @ordered
+	 */
+	protected Pattern peekPattern;
+
+	/**
 	 * The cached value of the '{@link #getScheduler() <em>Scheduler</em>}' containment reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getScheduler()
@@ -84,16 +94,6 @@ public class ActionImpl extends EObjectImpl implements Action {
 	 * @ordered
 	 */
 	protected Tag tag;
-
-	/**
-	 * The cached value of the '{@link #getPeekPattern() <em>Peek Pattern</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getPeekPattern()
-	 * @generated
-	 * @ordered
-	 */
-	protected Pattern peekPattern;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -205,12 +205,12 @@ public class ActionImpl extends EObjectImpl implements Action {
 				return getInputPattern();
 			case IrPackage.ACTION__OUTPUT_PATTERN:
 				return getOutputPattern();
+			case IrPackage.ACTION__PEEK_PATTERN:
+				return getPeekPattern();
 			case IrPackage.ACTION__SCHEDULER:
 				return getScheduler();
 			case IrPackage.ACTION__TAG:
 				return getTag();
-			case IrPackage.ACTION__PEEK_PATTERN:
-				return getPeekPattern();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -229,12 +229,12 @@ public class ActionImpl extends EObjectImpl implements Action {
 				return basicSetInputPattern(null, msgs);
 			case IrPackage.ACTION__OUTPUT_PATTERN:
 				return basicSetOutputPattern(null, msgs);
+			case IrPackage.ACTION__PEEK_PATTERN:
+				return basicSetPeekPattern(null, msgs);
 			case IrPackage.ACTION__SCHEDULER:
 				return basicSetScheduler(null, msgs);
 			case IrPackage.ACTION__TAG:
 				return basicSetTag(null, msgs);
-			case IrPackage.ACTION__PEEK_PATTERN:
-				return basicSetPeekPattern(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -252,12 +252,12 @@ public class ActionImpl extends EObjectImpl implements Action {
 				return inputPattern != null;
 			case IrPackage.ACTION__OUTPUT_PATTERN:
 				return outputPattern != null;
+			case IrPackage.ACTION__PEEK_PATTERN:
+				return peekPattern != null;
 			case IrPackage.ACTION__SCHEDULER:
 				return scheduler != null;
 			case IrPackage.ACTION__TAG:
 				return tag != null;
-			case IrPackage.ACTION__PEEK_PATTERN:
-				return peekPattern != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -278,14 +278,14 @@ public class ActionImpl extends EObjectImpl implements Action {
 			case IrPackage.ACTION__OUTPUT_PATTERN:
 				setOutputPattern((Pattern)newValue);
 				return;
+			case IrPackage.ACTION__PEEK_PATTERN:
+				setPeekPattern((Pattern)newValue);
+				return;
 			case IrPackage.ACTION__SCHEDULER:
 				setScheduler((Procedure)newValue);
 				return;
 			case IrPackage.ACTION__TAG:
 				setTag((Tag)newValue);
-				return;
-			case IrPackage.ACTION__PEEK_PATTERN:
-				setPeekPattern((Pattern)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -316,14 +316,14 @@ public class ActionImpl extends EObjectImpl implements Action {
 			case IrPackage.ACTION__OUTPUT_PATTERN:
 				setOutputPattern((Pattern)null);
 				return;
+			case IrPackage.ACTION__PEEK_PATTERN:
+				setPeekPattern((Pattern)null);
+				return;
 			case IrPackage.ACTION__SCHEDULER:
 				setScheduler((Procedure)null);
 				return;
 			case IrPackage.ACTION__TAG:
 				setTag((Tag)null);
-				return;
-			case IrPackage.ACTION__PEEK_PATTERN:
-				setPeekPattern((Pattern)null);
 				return;
 		}
 		super.eUnset(featureID);

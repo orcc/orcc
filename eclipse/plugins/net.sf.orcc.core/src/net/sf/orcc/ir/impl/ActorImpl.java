@@ -44,19 +44,19 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * The following features are implemented:
  * <ul>
  *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getActions <em>Actions</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getActionsOutsideFsm <em>Actions Outside Fsm</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getFileName <em>File Name</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getFsm <em>Fsm</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getInitializes <em>Initializes</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getInputs <em>Inputs</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getLineNumber <em>Line Number</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getMoC <em>Mo C</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#isNative <em>Native</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getOutputs <em>Outputs</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getParameters <em>Parameters</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getProcs <em>Procs</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getStateVars <em>State Vars</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#isNative <em>Native</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getActionsOutsideFsm <em>Actions Outside Fsm</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getFsm <em>Fsm</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getMoC <em>Mo C</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getLineNumber <em>Line Number</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getFileName <em>File Name</em>}</li>
  * </ul>
  * </p>
  *
@@ -71,6 +71,55 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	 * @ordered
 	 */
 	protected EList<Action> actions;
+
+	private Map<String, Port> mapInputs;
+
+	private Map<String, Port> mapOutputs;
+
+	private Map<String, Var> mapParameters;
+
+	private Map<String, Procedure> mapProcedures;
+
+	private Map<String, Var> mapStateVars;
+
+	/**
+	 * The cached value of the '{@link #getActionsOutsideFsm() <em>Actions Outside Fsm</em>}' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getActionsOutsideFsm()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Action> actionsOutsideFsm;
+
+	/**
+	 * The default value of the '{@link #getFileName() <em>File Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getFileName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String FILE_NAME_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getFileName() <em>File Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getFileName()
+	 * @generated
+	 * @ordered
+	 */
+	protected String fileName = FILE_NAME_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getFsm() <em>Fsm</em>}' containment reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getFsm()
+	 * @generated
+	 * @ordered
+	 */
+	protected FSM fsm;
 
 	/**
 	 * The cached value of the '{@link #getInitializes() <em>Initializes</em>}' containment reference list.
@@ -91,6 +140,36 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	protected EList<Port> inputs;
 
 	/**
+	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getLineNumber()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final int LINE_NUMBER_EDEFAULT = 0;
+
+	/**
+	 * The cached value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getLineNumber()
+	 * @generated
+	 * @ordered
+	 */
+	protected int lineNumber = LINE_NUMBER_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getMoC() <em>Mo C</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getMoC()
+	 * @generated
+	 * @ordered
+	 */
+	protected MoC moC;
+
+	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getName()
@@ -98,16 +177,6 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	 * @ordered
 	 */
 	protected static final String NAME_EDEFAULT = null;
-
-	private Map<String, Port> mapInputs;
-
-	private Map<String, Port> mapOutputs;
-
-	private Map<String, Var> mapParameters;
-
-	private Map<String, Procedure> mapProcedures;
-
-	private Map<String, Var> mapStateVars;
 
 	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
@@ -117,6 +186,24 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	 * @ordered
 	 */
 	protected String name = NAME_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #isNative()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean NATIVE_EDEFAULT = false;
+
+	/**
+	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #isNative()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean native_ = NATIVE_EDEFAULT;
 
 	/**
 	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' containment reference list.
@@ -153,93 +240,6 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	 * @ordered
 	 */
 	protected EList<Var> stateVars;
-
-	/**
-	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isNative()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean NATIVE_EDEFAULT = false;
-
-	/**
-	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isNative()
-	 * @generated
-	 * @ordered
-	 */
-	protected boolean native_ = NATIVE_EDEFAULT;
-
-	/**
-	 * The cached value of the '{@link #getActionsOutsideFsm() <em>Actions Outside Fsm</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getActionsOutsideFsm()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Action> actionsOutsideFsm;
-
-	/**
-	 * The cached value of the '{@link #getFsm() <em>Fsm</em>}' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getFsm()
-	 * @generated
-	 * @ordered
-	 */
-	protected FSM fsm;
-
-	/**
-	 * The cached value of the '{@link #getMoC() <em>Mo C</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getMoC()
-	 * @generated
-	 * @ordered
-	 */
-	protected MoC moC;
-
-	/**
-	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getLineNumber()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final int LINE_NUMBER_EDEFAULT = 0;
-
-	/**
-	 * The cached value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getLineNumber()
-	 * @generated
-	 * @ordered
-	 */
-	protected int lineNumber = LINE_NUMBER_EDEFAULT;
-
-	/**
-	 * The default value of the '{@link #getFileName() <em>File Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getFileName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String FILE_NAME_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getFileName() <em>File Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getFileName()
-	 * @generated
-	 * @ordered
-	 */
-	protected String fileName = FILE_NAME_EDEFAULT;
 
 	/**
 	 * holds template-specific data.
@@ -299,12 +299,24 @@ public class ActorImpl extends EObjectImpl implements Actor {
 		switch (featureID) {
 			case IrPackage.ACTOR__ACTIONS:
 				return getActions();
+			case IrPackage.ACTOR__ACTIONS_OUTSIDE_FSM:
+				return getActionsOutsideFsm();
+			case IrPackage.ACTOR__FILE_NAME:
+				return getFileName();
+			case IrPackage.ACTOR__FSM:
+				return getFsm();
 			case IrPackage.ACTOR__INITIALIZES:
 				return getInitializes();
 			case IrPackage.ACTOR__INPUTS:
 				return getInputs();
+			case IrPackage.ACTOR__LINE_NUMBER:
+				return getLineNumber();
+			case IrPackage.ACTOR__MO_C:
+				return getMoC();
 			case IrPackage.ACTOR__NAME:
 				return getName();
+			case IrPackage.ACTOR__NATIVE:
+				return isNative();
 			case IrPackage.ACTOR__OUTPUTS:
 				return getOutputs();
 			case IrPackage.ACTOR__PARAMETERS:
@@ -313,18 +325,6 @@ public class ActorImpl extends EObjectImpl implements Actor {
 				return getProcs();
 			case IrPackage.ACTOR__STATE_VARS:
 				return getStateVars();
-			case IrPackage.ACTOR__NATIVE:
-				return isNative();
-			case IrPackage.ACTOR__ACTIONS_OUTSIDE_FSM:
-				return getActionsOutsideFsm();
-			case IrPackage.ACTOR__FSM:
-				return getFsm();
-			case IrPackage.ACTOR__MO_C:
-				return getMoC();
-			case IrPackage.ACTOR__LINE_NUMBER:
-				return getLineNumber();
-			case IrPackage.ACTOR__FILE_NAME:
-				return getFileName();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -339,10 +339,14 @@ public class ActorImpl extends EObjectImpl implements Actor {
 		switch (featureID) {
 			case IrPackage.ACTOR__ACTIONS:
 				return ((InternalEList<?>)getActions()).basicRemove(otherEnd, msgs);
+			case IrPackage.ACTOR__FSM:
+				return basicSetFsm(null, msgs);
 			case IrPackage.ACTOR__INITIALIZES:
 				return ((InternalEList<?>)getInitializes()).basicRemove(otherEnd, msgs);
 			case IrPackage.ACTOR__INPUTS:
 				return ((InternalEList<?>)getInputs()).basicRemove(otherEnd, msgs);
+			case IrPackage.ACTOR__MO_C:
+				return basicSetMoC(null, msgs);
 			case IrPackage.ACTOR__OUTPUTS:
 				return ((InternalEList<?>)getOutputs()).basicRemove(otherEnd, msgs);
 			case IrPackage.ACTOR__PARAMETERS:
@@ -351,10 +355,6 @@ public class ActorImpl extends EObjectImpl implements Actor {
 				return ((InternalEList<?>)getProcs()).basicRemove(otherEnd, msgs);
 			case IrPackage.ACTOR__STATE_VARS:
 				return ((InternalEList<?>)getStateVars()).basicRemove(otherEnd, msgs);
-			case IrPackage.ACTOR__FSM:
-				return basicSetFsm(null, msgs);
-			case IrPackage.ACTOR__MO_C:
-				return basicSetMoC(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -368,12 +368,24 @@ public class ActorImpl extends EObjectImpl implements Actor {
 		switch (featureID) {
 			case IrPackage.ACTOR__ACTIONS:
 				return actions != null && !actions.isEmpty();
+			case IrPackage.ACTOR__ACTIONS_OUTSIDE_FSM:
+				return actionsOutsideFsm != null && !actionsOutsideFsm.isEmpty();
+			case IrPackage.ACTOR__FILE_NAME:
+				return FILE_NAME_EDEFAULT == null ? fileName != null : !FILE_NAME_EDEFAULT.equals(fileName);
+			case IrPackage.ACTOR__FSM:
+				return fsm != null;
 			case IrPackage.ACTOR__INITIALIZES:
 				return initializes != null && !initializes.isEmpty();
 			case IrPackage.ACTOR__INPUTS:
 				return inputs != null && !inputs.isEmpty();
+			case IrPackage.ACTOR__LINE_NUMBER:
+				return lineNumber != LINE_NUMBER_EDEFAULT;
+			case IrPackage.ACTOR__MO_C:
+				return moC != null;
 			case IrPackage.ACTOR__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
+			case IrPackage.ACTOR__NATIVE:
+				return native_ != NATIVE_EDEFAULT;
 			case IrPackage.ACTOR__OUTPUTS:
 				return outputs != null && !outputs.isEmpty();
 			case IrPackage.ACTOR__PARAMETERS:
@@ -382,18 +394,6 @@ public class ActorImpl extends EObjectImpl implements Actor {
 				return procs != null && !procs.isEmpty();
 			case IrPackage.ACTOR__STATE_VARS:
 				return stateVars != null && !stateVars.isEmpty();
-			case IrPackage.ACTOR__NATIVE:
-				return native_ != NATIVE_EDEFAULT;
-			case IrPackage.ACTOR__ACTIONS_OUTSIDE_FSM:
-				return actionsOutsideFsm != null && !actionsOutsideFsm.isEmpty();
-			case IrPackage.ACTOR__FSM:
-				return fsm != null;
-			case IrPackage.ACTOR__MO_C:
-				return moC != null;
-			case IrPackage.ACTOR__LINE_NUMBER:
-				return lineNumber != LINE_NUMBER_EDEFAULT;
-			case IrPackage.ACTOR__FILE_NAME:
-				return FILE_NAME_EDEFAULT == null ? fileName != null : !FILE_NAME_EDEFAULT.equals(fileName);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -410,6 +410,16 @@ public class ActorImpl extends EObjectImpl implements Actor {
 				getActions().clear();
 				getActions().addAll((Collection<? extends Action>)newValue);
 				return;
+			case IrPackage.ACTOR__ACTIONS_OUTSIDE_FSM:
+				getActionsOutsideFsm().clear();
+				getActionsOutsideFsm().addAll((Collection<? extends Action>)newValue);
+				return;
+			case IrPackage.ACTOR__FILE_NAME:
+				setFileName((String)newValue);
+				return;
+			case IrPackage.ACTOR__FSM:
+				setFsm((FSM)newValue);
+				return;
 			case IrPackage.ACTOR__INITIALIZES:
 				getInitializes().clear();
 				getInitializes().addAll((Collection<? extends Action>)newValue);
@@ -418,8 +428,17 @@ public class ActorImpl extends EObjectImpl implements Actor {
 				getInputs().clear();
 				getInputs().addAll((Collection<? extends Port>)newValue);
 				return;
+			case IrPackage.ACTOR__LINE_NUMBER:
+				setLineNumber((Integer)newValue);
+				return;
+			case IrPackage.ACTOR__MO_C:
+				setMoC((MoC)newValue);
+				return;
 			case IrPackage.ACTOR__NAME:
 				setName((String)newValue);
+				return;
+			case IrPackage.ACTOR__NATIVE:
+				setNative((Boolean)newValue);
 				return;
 			case IrPackage.ACTOR__OUTPUTS:
 				getOutputs().clear();
@@ -436,25 +455,6 @@ public class ActorImpl extends EObjectImpl implements Actor {
 			case IrPackage.ACTOR__STATE_VARS:
 				getStateVars().clear();
 				getStateVars().addAll((Collection<? extends Var>)newValue);
-				return;
-			case IrPackage.ACTOR__NATIVE:
-				setNative((Boolean)newValue);
-				return;
-			case IrPackage.ACTOR__ACTIONS_OUTSIDE_FSM:
-				getActionsOutsideFsm().clear();
-				getActionsOutsideFsm().addAll((Collection<? extends Action>)newValue);
-				return;
-			case IrPackage.ACTOR__FSM:
-				setFsm((FSM)newValue);
-				return;
-			case IrPackage.ACTOR__MO_C:
-				setMoC((MoC)newValue);
-				return;
-			case IrPackage.ACTOR__LINE_NUMBER:
-				setLineNumber((Integer)newValue);
-				return;
-			case IrPackage.ACTOR__FILE_NAME:
-				setFileName((String)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -479,14 +479,32 @@ public class ActorImpl extends EObjectImpl implements Actor {
 			case IrPackage.ACTOR__ACTIONS:
 				getActions().clear();
 				return;
+			case IrPackage.ACTOR__ACTIONS_OUTSIDE_FSM:
+				getActionsOutsideFsm().clear();
+				return;
+			case IrPackage.ACTOR__FILE_NAME:
+				setFileName(FILE_NAME_EDEFAULT);
+				return;
+			case IrPackage.ACTOR__FSM:
+				setFsm((FSM)null);
+				return;
 			case IrPackage.ACTOR__INITIALIZES:
 				getInitializes().clear();
 				return;
 			case IrPackage.ACTOR__INPUTS:
 				getInputs().clear();
 				return;
+			case IrPackage.ACTOR__LINE_NUMBER:
+				setLineNumber(LINE_NUMBER_EDEFAULT);
+				return;
+			case IrPackage.ACTOR__MO_C:
+				setMoC((MoC)null);
+				return;
 			case IrPackage.ACTOR__NAME:
 				setName(NAME_EDEFAULT);
+				return;
+			case IrPackage.ACTOR__NATIVE:
+				setNative(NATIVE_EDEFAULT);
 				return;
 			case IrPackage.ACTOR__OUTPUTS:
 				getOutputs().clear();
@@ -499,24 +517,6 @@ public class ActorImpl extends EObjectImpl implements Actor {
 				return;
 			case IrPackage.ACTOR__STATE_VARS:
 				getStateVars().clear();
-				return;
-			case IrPackage.ACTOR__NATIVE:
-				setNative(NATIVE_EDEFAULT);
-				return;
-			case IrPackage.ACTOR__ACTIONS_OUTSIDE_FSM:
-				getActionsOutsideFsm().clear();
-				return;
-			case IrPackage.ACTOR__FSM:
-				setFsm((FSM)null);
-				return;
-			case IrPackage.ACTOR__MO_C:
-				setMoC((MoC)null);
-				return;
-			case IrPackage.ACTOR__LINE_NUMBER:
-				setLineNumber(LINE_NUMBER_EDEFAULT);
-				return;
-			case IrPackage.ACTOR__FILE_NAME:
-				setFileName(FILE_NAME_EDEFAULT);
 				return;
 		}
 		super.eUnset(featureID);
@@ -881,14 +881,14 @@ public class ActorImpl extends EObjectImpl implements Actor {
 		if (eIsProxy()) return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (name: ");
+		result.append(" (fileName: ");
+		result.append(fileName);
+		result.append(", lineNumber: ");
+		result.append(lineNumber);
+		result.append(", name: ");
 		result.append(name);
 		result.append(", native: ");
 		result.append(native_);
-		result.append(", lineNumber: ");
-		result.append(lineNumber);
-		result.append(", fileName: ");
-		result.append(fileName);
 		result.append(')');
 		return result.toString();
 	}

@@ -24,8 +24,8 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.ir.impl.InstructionImpl#getPredicate <em>Predicate</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.InstructionImpl#getLineNumber <em>Line Number</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.InstructionImpl#getPredicate <em>Predicate</em>}</li>
  * </ul>
  * </p>
  *
@@ -33,15 +33,6 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  */
 public abstract class InstructionImpl extends EObjectImpl implements
 		Instruction {
-
-	/**
-	 * The cached value of the '{@link #getPredicate() <em>Predicate</em>}' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getPredicate()
-	 * @generated
-	 * @ordered
-	 */
-	protected Predicate predicate;
 
 	/**
 	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
@@ -62,6 +53,15 @@ public abstract class InstructionImpl extends EObjectImpl implements
 	 * @ordered
 	 */
 	protected int lineNumber = LINE_NUMBER_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getPredicate() <em>Predicate</em>}' containment reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getPredicate()
+	 * @generated
+	 * @ordered
+	 */
+	protected Predicate predicate;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -93,10 +93,10 @@ public abstract class InstructionImpl extends EObjectImpl implements
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.INSTRUCTION__PREDICATE:
-				return getPredicate();
 			case IrPackage.INSTRUCTION__LINE_NUMBER:
 				return getLineNumber();
+			case IrPackage.INSTRUCTION__PREDICATE:
+				return getPredicate();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -122,10 +122,10 @@ public abstract class InstructionImpl extends EObjectImpl implements
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.INSTRUCTION__PREDICATE:
-				return predicate != null;
 			case IrPackage.INSTRUCTION__LINE_NUMBER:
 				return lineNumber != LINE_NUMBER_EDEFAULT;
+			case IrPackage.INSTRUCTION__PREDICATE:
+				return predicate != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -137,11 +137,11 @@ public abstract class InstructionImpl extends EObjectImpl implements
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.INSTRUCTION__PREDICATE:
-				setPredicate((Predicate)newValue);
-				return;
 			case IrPackage.INSTRUCTION__LINE_NUMBER:
 				setLineNumber((Integer)newValue);
+				return;
+			case IrPackage.INSTRUCTION__PREDICATE:
+				setPredicate((Predicate)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -163,11 +163,11 @@ public abstract class InstructionImpl extends EObjectImpl implements
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.INSTRUCTION__PREDICATE:
-				setPredicate((Predicate)null);
-				return;
 			case IrPackage.INSTRUCTION__LINE_NUMBER:
 				setLineNumber(LINE_NUMBER_EDEFAULT);
+				return;
+			case IrPackage.INSTRUCTION__PREDICATE:
+				setPredicate((Predicate)null);
 				return;
 		}
 		super.eUnset(featureID);

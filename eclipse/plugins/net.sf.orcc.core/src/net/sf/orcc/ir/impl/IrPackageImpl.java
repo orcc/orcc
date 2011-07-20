@@ -52,6 +52,7 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
+import net.sf.orcc.ir.Unit;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MocPackage;
@@ -310,6 +311,13 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	private EClass actorEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass unitEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -612,7 +620,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getInstruction_Predicate() {
-		return (EReference)instructionEClass.getEStructuralFeatures().get(0);
+		return (EReference)instructionEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -621,7 +629,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EAttribute getInstruction_LineNumber() {
-		return (EAttribute)instructionEClass.getEStructuralFeatures().get(1);
+		return (EAttribute)instructionEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -756,15 +764,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getNodeIf_ElseNodes() {
-		return (EReference)nodeIfEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getNodeIf_JoinNode() {
 		return (EReference)nodeIfEClass.getEStructuralFeatures().get(1);
 	}
 
@@ -773,7 +772,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getNodeIf_ThenNodes() {
+	public EReference getNodeIf_JoinNode() {
 		return (EReference)nodeIfEClass.getEStructuralFeatures().get(2);
 	}
 
@@ -782,8 +781,17 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getNodeIf_ThenNodes() {
+		return (EReference)nodeIfEClass.getEStructuralFeatures().get(4);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EReference getNodeIf_Condition() {
-		return (EReference)nodeIfEClass.getEStructuralFeatures().get(3);
+		return (EReference)nodeIfEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -792,7 +800,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EAttribute getNodeIf_LineNumber() {
-		return (EAttribute)nodeIfEClass.getEStructuralFeatures().get(4);
+		return (EAttribute)nodeIfEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -810,15 +818,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getNodeWhile_JoinNode() {
-		return (EReference)nodeWhileEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getNodeWhile_Nodes() {
 		return (EReference)nodeWhileEClass.getEStructuralFeatures().get(1);
 	}
 
@@ -827,8 +826,17 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getNodeWhile_Nodes() {
+		return (EReference)nodeWhileEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EReference getNodeWhile_Condition() {
-		return (EReference)nodeWhileEClass.getEStructuralFeatures().get(2);
+		return (EReference)nodeWhileEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -837,7 +845,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EAttribute getNodeWhile_LineNumber() {
-		return (EAttribute)nodeWhileEClass.getEStructuralFeatures().get(3);
+		return (EAttribute)nodeWhileEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -864,7 +872,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EAttribute getProcedure_Name() {
-		return (EAttribute)procedureEClass.getEStructuralFeatures().get(0);
+		return (EAttribute)procedureEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -873,7 +881,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getProcedure_Nodes() {
-		return (EReference)procedureEClass.getEStructuralFeatures().get(1);
+		return (EReference)procedureEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -882,7 +890,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getProcedure_ReturnType() {
-		return (EReference)procedureEClass.getEStructuralFeatures().get(2);
+		return (EReference)procedureEClass.getEStructuralFeatures().get(6);
 	}
 
 	/**
@@ -900,7 +908,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getProcedure_Locals() {
-		return (EReference)procedureEClass.getEStructuralFeatures().get(4);
+		return (EReference)procedureEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -918,7 +926,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EAttribute getProcedure_LineNumber() {
-		return (EAttribute)procedureEClass.getEStructuralFeatures().get(6);
+		return (EAttribute)procedureEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -1134,7 +1142,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EAttribute getVar_Index() {
-		return (EAttribute)varEClass.getEStructuralFeatures().get(0);
+		return (EAttribute)varEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -1143,7 +1151,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getVar_InitialValue() {
-		return (EReference)varEClass.getEStructuralFeatures().get(1);
+		return (EReference)varEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -1152,42 +1160,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EAttribute getVar_Name() {
-		return (EAttribute)varEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getVar_Type() {
-		return (EReference)varEClass.getEStructuralFeatures().get(3);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getVar_Value() {
-		return (EAttribute)varEClass.getEStructuralFeatures().get(4);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getVar_Assignable() {
-		return (EAttribute)varEClass.getEStructuralFeatures().get(5);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getVar_Global() {
 		return (EAttribute)varEClass.getEStructuralFeatures().get(6);
 	}
 
@@ -1196,7 +1168,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getVar_Uses() {
+	public EReference getVar_Type() {
 		return (EReference)varEClass.getEStructuralFeatures().get(7);
 	}
 
@@ -1205,7 +1177,34 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getVar_Defs() {
+	public EAttribute getVar_Value() {
+		return (EAttribute)varEClass.getEStructuralFeatures().get(9);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getVar_Assignable() {
+		return (EAttribute)varEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getVar_Global() {
+		return (EAttribute)varEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getVar_Uses() {
 		return (EReference)varEClass.getEStructuralFeatures().get(8);
 	}
 
@@ -1214,8 +1213,17 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getVar_Defs() {
+		return (EReference)varEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EAttribute getVar_LineNumber() {
-		return (EAttribute)varEClass.getEStructuralFeatures().get(9);
+		return (EAttribute)varEClass.getEStructuralFeatures().get(5);
 	}
 
 	/**
@@ -1485,15 +1493,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getAction_Scheduler() {
-		return (EReference)actionEClass.getEStructuralFeatures().get(3);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getAction_Tag() {
 		return (EReference)actionEClass.getEStructuralFeatures().get(4);
 	}
 
@@ -1502,8 +1501,17 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getAction_PeekPattern() {
+	public EReference getAction_Tag() {
 		return (EReference)actionEClass.getEStructuralFeatures().get(5);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getAction_PeekPattern() {
+		return (EReference)actionEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -1530,33 +1538,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getActor_Initializes() {
-		return (EReference)actorEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getActor_Inputs() {
-		return (EReference)actorEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getActor_Name() {
-		return (EAttribute)actorEClass.getEStructuralFeatures().get(3);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getActor_Outputs() {
 		return (EReference)actorEClass.getEStructuralFeatures().get(4);
 	}
 
@@ -1565,7 +1546,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getActor_Parameters() {
+	public EReference getActor_Inputs() {
 		return (EReference)actorEClass.getEStructuralFeatures().get(5);
 	}
 
@@ -1574,25 +1555,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getActor_Procs() {
-		return (EReference)actorEClass.getEStructuralFeatures().get(6);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getActor_StateVars() {
-		return (EReference)actorEClass.getEStructuralFeatures().get(7);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getActor_Native() {
+	public EAttribute getActor_Name() {
 		return (EAttribute)actorEClass.getEStructuralFeatures().get(8);
 	}
 
@@ -1601,16 +1564,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getActor_ActionsOutsideFsm() {
-		return (EReference)actorEClass.getEStructuralFeatures().get(9);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getActor_Fsm() {
+	public EReference getActor_Outputs() {
 		return (EReference)actorEClass.getEStructuralFeatures().get(10);
 	}
 
@@ -1619,7 +1573,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getActor_MoC() {
+	public EReference getActor_Parameters() {
 		return (EReference)actorEClass.getEStructuralFeatures().get(11);
 	}
 
@@ -1628,8 +1582,62 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getActor_Procs() {
+		return (EReference)actorEClass.getEStructuralFeatures().get(12);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getActor_StateVars() {
+		return (EReference)actorEClass.getEStructuralFeatures().get(13);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getActor_Native() {
+		return (EAttribute)actorEClass.getEStructuralFeatures().get(9);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getActor_ActionsOutsideFsm() {
+		return (EReference)actorEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getActor_Fsm() {
+		return (EReference)actorEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getActor_MoC() {
+		return (EReference)actorEClass.getEStructuralFeatures().get(7);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EAttribute getActor_LineNumber() {
-		return (EAttribute)actorEClass.getEStructuralFeatures().get(12);
+		return (EAttribute)actorEClass.getEStructuralFeatures().get(6);
 	}
 
 	/**
@@ -1638,7 +1646,34 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EAttribute getActor_FileName() {
-		return (EAttribute)actorEClass.getEStructuralFeatures().get(13);
+		return (EAttribute)actorEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getUnit() {
+		return unitEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getUnit_Procedures() {
+		return (EReference)unitEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getUnit_Constants() {
+		return (EReference)unitEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -1719,15 +1754,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EAttribute getPort_NumTokensConsumed() {
-		return (EAttribute)portEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getPort_NumTokensProduced() {
 		return (EAttribute)portEClass.getEStructuralFeatures().get(2);
 	}
 
@@ -1736,8 +1762,17 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EAttribute getPort_NumTokensProduced() {
+		return (EAttribute)portEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EReference getPort_Type() {
-		return (EReference)portEClass.getEStructuralFeatures().get(3);
+		return (EReference)portEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -1746,7 +1781,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EAttribute getPort_Native() {
-		return (EAttribute)portEClass.getEStructuralFeatures().get(4);
+		return (EAttribute)portEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -1924,26 +1959,30 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		// Create classes and their features
 		actorEClass = createEClass(ACTOR);
 		createEReference(actorEClass, ACTOR__ACTIONS);
+		createEReference(actorEClass, ACTOR__ACTIONS_OUTSIDE_FSM);
+		createEAttribute(actorEClass, ACTOR__FILE_NAME);
+		createEReference(actorEClass, ACTOR__FSM);
 		createEReference(actorEClass, ACTOR__INITIALIZES);
 		createEReference(actorEClass, ACTOR__INPUTS);
+		createEAttribute(actorEClass, ACTOR__LINE_NUMBER);
+		createEReference(actorEClass, ACTOR__MO_C);
 		createEAttribute(actorEClass, ACTOR__NAME);
+		createEAttribute(actorEClass, ACTOR__NATIVE);
 		createEReference(actorEClass, ACTOR__OUTPUTS);
 		createEReference(actorEClass, ACTOR__PARAMETERS);
 		createEReference(actorEClass, ACTOR__PROCS);
 		createEReference(actorEClass, ACTOR__STATE_VARS);
-		createEAttribute(actorEClass, ACTOR__NATIVE);
-		createEReference(actorEClass, ACTOR__ACTIONS_OUTSIDE_FSM);
-		createEReference(actorEClass, ACTOR__FSM);
-		createEReference(actorEClass, ACTOR__MO_C);
-		createEAttribute(actorEClass, ACTOR__LINE_NUMBER);
-		createEAttribute(actorEClass, ACTOR__FILE_NAME);
+
+		unitEClass = createEClass(UNIT);
+		createEReference(unitEClass, UNIT__CONSTANTS);
+		createEReference(unitEClass, UNIT__PROCEDURES);
 
 		portEClass = createEClass(PORT);
 		createEAttribute(portEClass, PORT__NAME);
+		createEAttribute(portEClass, PORT__NATIVE);
 		createEAttribute(portEClass, PORT__NUM_TOKENS_CONSUMED);
 		createEAttribute(portEClass, PORT__NUM_TOKENS_PRODUCED);
 		createEReference(portEClass, PORT__TYPE);
-		createEAttribute(portEClass, PORT__NATIVE);
 
 		fsmEClass = createEClass(FSM);
 		createEReference(fsmEClass, FSM__INITIAL_STATE);
@@ -1965,9 +2004,9 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEReference(actionEClass, ACTION__BODY);
 		createEReference(actionEClass, ACTION__INPUT_PATTERN);
 		createEReference(actionEClass, ACTION__OUTPUT_PATTERN);
+		createEReference(actionEClass, ACTION__PEEK_PATTERN);
 		createEReference(actionEClass, ACTION__SCHEDULER);
 		createEReference(actionEClass, ACTION__TAG);
-		createEReference(actionEClass, ACTION__PEEK_PATTERN);
 
 		tagEClass = createEClass(TAG);
 		createEAttribute(tagEClass, TAG__IDENTIFIERS);
@@ -1980,13 +2019,13 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEReference(patternEClass, PATTERN__VAR_TO_PORT_MAP);
 
 		procedureEClass = createEClass(PROCEDURE);
-		createEAttribute(procedureEClass, PROCEDURE__NAME);
-		createEReference(procedureEClass, PROCEDURE__NODES);
-		createEReference(procedureEClass, PROCEDURE__RETURN_TYPE);
-		createEAttribute(procedureEClass, PROCEDURE__NATIVE);
-		createEReference(procedureEClass, PROCEDURE__LOCALS);
-		createEReference(procedureEClass, PROCEDURE__PARAMETERS);
 		createEAttribute(procedureEClass, PROCEDURE__LINE_NUMBER);
+		createEReference(procedureEClass, PROCEDURE__LOCALS);
+		createEAttribute(procedureEClass, PROCEDURE__NAME);
+		createEAttribute(procedureEClass, PROCEDURE__NATIVE);
+		createEReference(procedureEClass, PROCEDURE__NODES);
+		createEReference(procedureEClass, PROCEDURE__PARAMETERS);
+		createEReference(procedureEClass, PROCEDURE__RETURN_TYPE);
 
 		nodeEClass = createEClass(NODE);
 
@@ -1994,21 +2033,21 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEReference(nodeBlockEClass, NODE_BLOCK__INSTRUCTIONS);
 
 		nodeIfEClass = createEClass(NODE_IF);
+		createEReference(nodeIfEClass, NODE_IF__CONDITION);
 		createEReference(nodeIfEClass, NODE_IF__ELSE_NODES);
 		createEReference(nodeIfEClass, NODE_IF__JOIN_NODE);
-		createEReference(nodeIfEClass, NODE_IF__THEN_NODES);
-		createEReference(nodeIfEClass, NODE_IF__CONDITION);
 		createEAttribute(nodeIfEClass, NODE_IF__LINE_NUMBER);
+		createEReference(nodeIfEClass, NODE_IF__THEN_NODES);
 
 		nodeWhileEClass = createEClass(NODE_WHILE);
-		createEReference(nodeWhileEClass, NODE_WHILE__JOIN_NODE);
-		createEReference(nodeWhileEClass, NODE_WHILE__NODES);
 		createEReference(nodeWhileEClass, NODE_WHILE__CONDITION);
+		createEReference(nodeWhileEClass, NODE_WHILE__JOIN_NODE);
 		createEAttribute(nodeWhileEClass, NODE_WHILE__LINE_NUMBER);
+		createEReference(nodeWhileEClass, NODE_WHILE__NODES);
 
 		instructionEClass = createEClass(INSTRUCTION);
-		createEReference(instructionEClass, INSTRUCTION__PREDICATE);
 		createEAttribute(instructionEClass, INSTRUCTION__LINE_NUMBER);
+		createEReference(instructionEClass, INSTRUCTION__PREDICATE);
 
 		instAssignEClass = createEClass(INST_ASSIGN);
 		createEReference(instAssignEClass, INST_ASSIGN__TARGET);
@@ -2095,16 +2134,16 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEReference(defEClass, DEF__VARIABLE);
 
 		varEClass = createEClass(VAR);
+		createEAttribute(varEClass, VAR__ASSIGNABLE);
+		createEReference(varEClass, VAR__DEFS);
+		createEAttribute(varEClass, VAR__GLOBAL);
 		createEAttribute(varEClass, VAR__INDEX);
 		createEReference(varEClass, VAR__INITIAL_VALUE);
+		createEAttribute(varEClass, VAR__LINE_NUMBER);
 		createEAttribute(varEClass, VAR__NAME);
 		createEReference(varEClass, VAR__TYPE);
-		createEAttribute(varEClass, VAR__VALUE);
-		createEAttribute(varEClass, VAR__ASSIGNABLE);
-		createEAttribute(varEClass, VAR__GLOBAL);
 		createEReference(varEClass, VAR__USES);
-		createEReference(varEClass, VAR__DEFS);
-		createEAttribute(varEClass, VAR__LINE_NUMBER);
+		createEAttribute(varEClass, VAR__VALUE);
 
 		useEClass = createEClass(USE);
 		createEReference(useEClass, USE__VARIABLE);
@@ -2190,26 +2229,30 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		// Initialize classes and features; add operations and parameters
 		initEClass(actorEClass, Actor.class, "Actor", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getActor_Actions(), this.getAction(), null, "actions", null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getActor_ActionsOutsideFsm(), this.getAction(), null, "actionsOutsideFsm", null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getActor_FileName(), theEcorePackage.getEString(), "fileName", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getActor_Fsm(), this.getFSM(), null, "fsm", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getActor_Initializes(), this.getAction(), null, "initializes", null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getActor_Inputs(), this.getPort(), null, "inputs", null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getActor_LineNumber(), ecorePackage.getEInt(), "lineNumber", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getActor_MoC(), theMocPackage.getMoC(), null, "moC", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getActor_Name(), theEcorePackage.getEString(), "name", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getActor_Native(), ecorePackage.getEBoolean(), "native", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getActor_Outputs(), this.getPort(), null, "outputs", null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getActor_Parameters(), this.getVar(), null, "parameters", null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getActor_Procs(), this.getProcedure(), null, "procs", null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getActor_StateVars(), this.getVar(), null, "stateVars", null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getActor_Native(), ecorePackage.getEBoolean(), "native", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getActor_ActionsOutsideFsm(), this.getAction(), null, "actionsOutsideFsm", null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getActor_Fsm(), this.getFSM(), null, "fsm", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getActor_MoC(), theMocPackage.getMoC(), null, "moC", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getActor_LineNumber(), ecorePackage.getEInt(), "lineNumber", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getActor_FileName(), theEcorePackage.getEString(), "fileName", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(unitEClass, Unit.class, "Unit", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getUnit_Constants(), this.getVar(), null, "constants", null, 0, -1, Unit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getUnit_Procedures(), this.getProcedure(), null, "procedures", null, 0, -1, Unit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(portEClass, Port.class, "Port", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getPort_Name(), theEcorePackage.getEString(), "name", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getPort_Native(), ecorePackage.getEBoolean(), "native", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getPort_NumTokensConsumed(), ecorePackage.getEInt(), "numTokensConsumed", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getPort_NumTokensProduced(), ecorePackage.getEInt(), "numTokensProduced", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getPort_Type(), this.getType(), null, "type", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getPort_Native(), ecorePackage.getEBoolean(), "native", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(fsmEClass, net.sf.orcc.ir.FSM.class, "FSM", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getFSM_InitialState(), this.getState(), null, "initialState", null, 0, 1, net.sf.orcc.ir.FSM.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -2231,9 +2274,9 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEReference(getAction_Body(), this.getProcedure(), null, "body", null, 0, 1, Action.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getAction_InputPattern(), this.getPattern(), null, "inputPattern", null, 0, 1, Action.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getAction_OutputPattern(), this.getPattern(), null, "outputPattern", null, 0, 1, Action.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getAction_PeekPattern(), this.getPattern(), null, "peekPattern", null, 0, 1, Action.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getAction_Scheduler(), this.getProcedure(), null, "scheduler", null, 0, 1, Action.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getAction_Tag(), this.getTag(), null, "tag", null, 0, 1, Action.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getAction_PeekPattern(), this.getPattern(), null, "peekPattern", null, 0, 1, Action.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(tagEClass, Tag.class, "Tag", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getTag_Identifiers(), theEcorePackage.getEString(), "identifiers", null, 0, -1, Tag.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -2246,13 +2289,13 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEReference(getPattern_VarToPortMap(), this.getVarToPortMapEntry(), null, "varToPortMap", null, 0, -1, Pattern.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(procedureEClass, Procedure.class, "Procedure", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getProcedure_Name(), theEcorePackage.getEString(), "name", null, 0, 1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getProcedure_Nodes(), this.getNode(), null, "nodes", null, 0, -1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getProcedure_ReturnType(), this.getType(), null, "returnType", null, 0, 1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getProcedure_Native(), ecorePackage.getEBoolean(), "native", null, 0, 1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getProcedure_Locals(), this.getVar(), null, "locals", null, 0, -1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getProcedure_Parameters(), this.getVar(), null, "parameters", null, 0, -1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getProcedure_LineNumber(), ecorePackage.getEInt(), "lineNumber", null, 0, 1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getProcedure_Locals(), this.getVar(), null, "locals", null, 0, -1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getProcedure_Name(), theEcorePackage.getEString(), "name", null, 0, 1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getProcedure_Native(), ecorePackage.getEBoolean(), "native", null, 0, 1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getProcedure_Nodes(), this.getNode(), null, "nodes", null, 0, -1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getProcedure_Parameters(), this.getVar(), null, "parameters", null, 0, -1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getProcedure_ReturnType(), this.getType(), null, "returnType", null, 0, 1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(nodeEClass, Node.class, "Node", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
@@ -2260,21 +2303,21 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEReference(getNodeBlock_Instructions(), this.getInstruction(), null, "instructions", null, 0, -1, NodeBlock.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(nodeIfEClass, NodeIf.class, "NodeIf", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getNodeIf_Condition(), this.getExpression(), null, "condition", null, 0, 1, NodeIf.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNodeIf_ElseNodes(), this.getNode(), null, "elseNodes", null, 0, -1, NodeIf.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNodeIf_JoinNode(), this.getNodeBlock(), null, "joinNode", null, 0, 1, NodeIf.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getNodeIf_ThenNodes(), this.getNode(), null, "thenNodes", null, 0, -1, NodeIf.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getNodeIf_Condition(), this.getExpression(), null, "condition", null, 0, 1, NodeIf.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getNodeIf_LineNumber(), ecorePackage.getEInt(), "lineNumber", null, 0, 1, NodeIf.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getNodeIf_ThenNodes(), this.getNode(), null, "thenNodes", null, 0, -1, NodeIf.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(nodeWhileEClass, NodeWhile.class, "NodeWhile", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getNodeWhile_JoinNode(), this.getNodeBlock(), null, "joinNode", null, 0, 1, NodeWhile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getNodeWhile_Nodes(), this.getNode(), null, "nodes", null, 0, -1, NodeWhile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNodeWhile_Condition(), this.getExpression(), null, "condition", null, 0, 1, NodeWhile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getNodeWhile_JoinNode(), this.getNodeBlock(), null, "joinNode", null, 0, 1, NodeWhile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getNodeWhile_LineNumber(), ecorePackage.getEInt(), "lineNumber", null, 0, 1, NodeWhile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getNodeWhile_Nodes(), this.getNode(), null, "nodes", null, 0, -1, NodeWhile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(instructionEClass, Instruction.class, "Instruction", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getInstruction_Predicate(), this.getPredicate(), null, "predicate", null, 0, 1, Instruction.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getInstruction_LineNumber(), ecorePackage.getEInt(), "lineNumber", null, 0, 1, Instruction.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getInstruction_Predicate(), this.getPredicate(), null, "predicate", null, 0, 1, Instruction.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(instAssignEClass, InstAssign.class, "InstAssign", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getInstAssign_Target(), this.getDef(), null, "target", null, 0, 1, InstAssign.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -2361,16 +2404,16 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEReference(getDef_Variable(), this.getVar(), this.getVar_Defs(), "variable", null, 0, 1, Def.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(varEClass, Var.class, "Var", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getVar_Assignable(), ecorePackage.getEBoolean(), "assignable", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getVar_Defs(), this.getDef(), this.getDef_Variable(), "defs", null, 0, -1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getVar_Global(), ecorePackage.getEBoolean(), "global", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getVar_Index(), ecorePackage.getEInt(), "index", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getVar_InitialValue(), this.getExpression(), null, "initialValue", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getVar_LineNumber(), ecorePackage.getEInt(), "lineNumber", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getVar_Name(), theEcorePackage.getEString(), "name", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getVar_Type(), this.getType(), null, "type", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getVar_Value(), ecorePackage.getEJavaObject(), "value", null, 0, 1, Var.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getVar_Assignable(), ecorePackage.getEBoolean(), "assignable", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getVar_Global(), ecorePackage.getEBoolean(), "global", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getVar_Uses(), this.getUse(), this.getUse_Variable(), "uses", null, 0, -1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getVar_Defs(), this.getDef(), this.getDef_Variable(), "defs", null, 0, -1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getVar_LineNumber(), ecorePackage.getEInt(), "lineNumber", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getVar_Value(), ecorePackage.getEJavaObject(), "value", null, 0, 1, Var.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(useEClass, Use.class, "Use", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getUse_Variable(), this.getVar(), this.getVar_Uses(), "variable", null, 0, 1, Use.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

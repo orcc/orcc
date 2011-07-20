@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.ir.*;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Def;
@@ -153,6 +154,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
 			case IrPackage.ACTOR: return createActor();
+			case IrPackage.UNIT: return createUnit();
 			case IrPackage.PORT: return createPort();
 			case IrPackage.FSM: return createFSM();
 			case IrPackage.STATE: return createState();
@@ -228,6 +230,16 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public Actor createActor() {
 		ActorImpl actor = new ActorImpl();
 		return actor;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Unit createUnit() {
+		UnitImpl unit = new UnitImpl();
+		return unit;
 	}
 
 	/**

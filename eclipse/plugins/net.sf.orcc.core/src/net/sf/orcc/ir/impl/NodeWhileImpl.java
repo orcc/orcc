@@ -29,34 +29,16 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.ir.impl.NodeWhileImpl#getJoinNode <em>Join Node</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.NodeWhileImpl#getNodes <em>Nodes</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.NodeWhileImpl#getCondition <em>Condition</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.NodeWhileImpl#getJoinNode <em>Join Node</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.NodeWhileImpl#getLineNumber <em>Line Number</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.NodeWhileImpl#getNodes <em>Nodes</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
 public class NodeWhileImpl extends NodeImpl implements NodeWhile {
-	/**
-	 * The cached value of the '{@link #getJoinNode() <em>Join Node</em>}' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getJoinNode()
-	 * @generated
-	 * @ordered
-	 */
-	protected NodeBlock joinNode;
-
-	/**
-	 * The cached value of the '{@link #getNodes() <em>Nodes</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getNodes()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Node> nodes;
-
 	/**
 	 * The cached value of the '{@link #getCondition() <em>Condition</em>}' containment reference.
 	 * <!-- begin-user-doc -->
@@ -66,6 +48,15 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	 * @ordered
 	 */
 	protected Expression condition;
+
+	/**
+	 * The cached value of the '{@link #getJoinNode() <em>Join Node</em>}' containment reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getJoinNode()
+	 * @generated
+	 * @ordered
+	 */
+	protected NodeBlock joinNode;
 
 	/**
 	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
@@ -86,6 +77,15 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	 * @ordered
 	 */
 	protected int lineNumber = LINE_NUMBER_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getNodes() <em>Nodes</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getNodes()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Node> nodes;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -132,14 +132,14 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.NODE_WHILE__JOIN_NODE:
-				return getJoinNode();
-			case IrPackage.NODE_WHILE__NODES:
-				return getNodes();
 			case IrPackage.NODE_WHILE__CONDITION:
 				return getCondition();
+			case IrPackage.NODE_WHILE__JOIN_NODE:
+				return getJoinNode();
 			case IrPackage.NODE_WHILE__LINE_NUMBER:
 				return getLineNumber();
+			case IrPackage.NODE_WHILE__NODES:
+				return getNodes();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -152,12 +152,12 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
+			case IrPackage.NODE_WHILE__CONDITION:
+				return basicSetCondition(null, msgs);
 			case IrPackage.NODE_WHILE__JOIN_NODE:
 				return basicSetJoinNode(null, msgs);
 			case IrPackage.NODE_WHILE__NODES:
 				return ((InternalEList<?>)getNodes()).basicRemove(otherEnd, msgs);
-			case IrPackage.NODE_WHILE__CONDITION:
-				return basicSetCondition(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -169,14 +169,14 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.NODE_WHILE__JOIN_NODE:
-				return joinNode != null;
-			case IrPackage.NODE_WHILE__NODES:
-				return nodes != null && !nodes.isEmpty();
 			case IrPackage.NODE_WHILE__CONDITION:
 				return condition != null;
+			case IrPackage.NODE_WHILE__JOIN_NODE:
+				return joinNode != null;
 			case IrPackage.NODE_WHILE__LINE_NUMBER:
 				return lineNumber != LINE_NUMBER_EDEFAULT;
+			case IrPackage.NODE_WHILE__NODES:
+				return nodes != null && !nodes.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -205,18 +205,18 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
+			case IrPackage.NODE_WHILE__CONDITION:
+				setCondition((Expression)newValue);
+				return;
 			case IrPackage.NODE_WHILE__JOIN_NODE:
 				setJoinNode((NodeBlock)newValue);
+				return;
+			case IrPackage.NODE_WHILE__LINE_NUMBER:
+				setLineNumber((Integer)newValue);
 				return;
 			case IrPackage.NODE_WHILE__NODES:
 				getNodes().clear();
 				getNodes().addAll((Collection<? extends Node>)newValue);
-				return;
-			case IrPackage.NODE_WHILE__CONDITION:
-				setCondition((Expression)newValue);
-				return;
-			case IrPackage.NODE_WHILE__LINE_NUMBER:
-				setLineNumber((Integer)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -238,17 +238,17 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.NODE_WHILE__JOIN_NODE:
-				setJoinNode((NodeBlock)null);
-				return;
-			case IrPackage.NODE_WHILE__NODES:
-				getNodes().clear();
-				return;
 			case IrPackage.NODE_WHILE__CONDITION:
 				setCondition((Expression)null);
 				return;
+			case IrPackage.NODE_WHILE__JOIN_NODE:
+				setJoinNode((NodeBlock)null);
+				return;
 			case IrPackage.NODE_WHILE__LINE_NUMBER:
 				setLineNumber(LINE_NUMBER_EDEFAULT);
+				return;
+			case IrPackage.NODE_WHILE__NODES:
+				getNodes().clear();
 				return;
 		}
 		super.eUnset(featureID);

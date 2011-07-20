@@ -31,22 +31,68 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
+ *   <li>{@link net.sf.orcc.ir.impl.VarImpl#isAssignable <em>Assignable</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getDefs <em>Defs</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.VarImpl#isGlobal <em>Global</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getIndex <em>Index</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getInitialValue <em>Initial Value</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getLineNumber <em>Line Number</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getType <em>Type</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getValue <em>Value</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.VarImpl#isAssignable <em>Assignable</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.VarImpl#isGlobal <em>Global</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getUses <em>Uses</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getDefs <em>Defs</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getLineNumber <em>Line Number</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getValue <em>Value</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
 public class VarImpl extends EObjectImpl implements Var {
+	/**
+	 * The default value of the '{@link #isAssignable() <em>Assignable</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #isAssignable()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean ASSIGNABLE_EDEFAULT = false;
+
+	/**
+	 * The cached value of the '{@link #isAssignable() <em>Assignable</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #isAssignable()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean assignable = ASSIGNABLE_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getDefs() <em>Defs</em>}' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getDefs()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Def> defs;
+
+	/**
+	 * The default value of the '{@link #isGlobal() <em>Global</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #isGlobal()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean GLOBAL_EDEFAULT = false;
+
+	/**
+	 * The cached value of the '{@link #isGlobal() <em>Global</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #isGlobal()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean global = GLOBAL_EDEFAULT;
+
 	/**
 	 * The default value of the '{@link #getIndex() <em>Index</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -74,6 +120,26 @@ public class VarImpl extends EObjectImpl implements Var {
 	 * @ordered
 	 */
 	protected Expression initialValue;
+
+	/**
+	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getLineNumber()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final int LINE_NUMBER_EDEFAULT = 0;
+
+	/**
+	 * The cached value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getLineNumber()
+	 * @generated
+	 * @ordered
+	 */
+	protected int lineNumber = LINE_NUMBER_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
@@ -104,6 +170,15 @@ public class VarImpl extends EObjectImpl implements Var {
 	protected Type type;
 
 	/**
+	 * The cached value of the '{@link #getUses() <em>Uses</em>}' reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getUses()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Use> uses;
+
+	/**
 	 * The default value of the '{@link #getValue() <em>Value</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -121,81 +196,6 @@ public class VarImpl extends EObjectImpl implements Var {
 	 * @ordered
 	 */
 	protected Object value = VALUE_EDEFAULT;
-
-	/**
-	 * The default value of the '{@link #isAssignable() <em>Assignable</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isAssignable()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean ASSIGNABLE_EDEFAULT = false;
-
-	/**
-	 * The cached value of the '{@link #isAssignable() <em>Assignable</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isAssignable()
-	 * @generated
-	 * @ordered
-	 */
-	protected boolean assignable = ASSIGNABLE_EDEFAULT;
-
-	/**
-	 * The default value of the '{@link #isGlobal() <em>Global</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isGlobal()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean GLOBAL_EDEFAULT = false;
-
-	/**
-	 * The cached value of the '{@link #isGlobal() <em>Global</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isGlobal()
-	 * @generated
-	 * @ordered
-	 */
-	protected boolean global = GLOBAL_EDEFAULT;
-
-	/**
-	 * The cached value of the '{@link #getUses() <em>Uses</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getUses()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Use> uses;
-
-	/**
-	 * The cached value of the '{@link #getDefs() <em>Defs</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getDefs()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Def> defs;
-
-	/**
-	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getLineNumber()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final int LINE_NUMBER_EDEFAULT = 0;
-
-	/**
-	 * The cached value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getLineNumber()
-	 * @generated
-	 * @ordered
-	 */
-	protected int lineNumber = LINE_NUMBER_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -241,26 +241,26 @@ public class VarImpl extends EObjectImpl implements Var {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
+			case IrPackage.VAR__ASSIGNABLE:
+				return isAssignable();
+			case IrPackage.VAR__DEFS:
+				return getDefs();
+			case IrPackage.VAR__GLOBAL:
+				return isGlobal();
 			case IrPackage.VAR__INDEX:
 				return getIndex();
 			case IrPackage.VAR__INITIAL_VALUE:
 				return getInitialValue();
+			case IrPackage.VAR__LINE_NUMBER:
+				return getLineNumber();
 			case IrPackage.VAR__NAME:
 				return getName();
 			case IrPackage.VAR__TYPE:
 				return getType();
-			case IrPackage.VAR__VALUE:
-				return getValue();
-			case IrPackage.VAR__ASSIGNABLE:
-				return isAssignable();
-			case IrPackage.VAR__GLOBAL:
-				return isGlobal();
 			case IrPackage.VAR__USES:
 				return getUses();
-			case IrPackage.VAR__DEFS:
-				return getDefs();
-			case IrPackage.VAR__LINE_NUMBER:
-				return getLineNumber();
+			case IrPackage.VAR__VALUE:
+				return getValue();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -274,10 +274,10 @@ public class VarImpl extends EObjectImpl implements Var {
 	public NotificationChain eInverseAdd(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrPackage.VAR__USES:
-				return ((InternalEList<InternalEObject>)(InternalEList<?>)getUses()).basicAdd(otherEnd, msgs);
 			case IrPackage.VAR__DEFS:
 				return ((InternalEList<InternalEObject>)(InternalEList<?>)getDefs()).basicAdd(otherEnd, msgs);
+			case IrPackage.VAR__USES:
+				return ((InternalEList<InternalEObject>)(InternalEList<?>)getUses()).basicAdd(otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -290,14 +290,14 @@ public class VarImpl extends EObjectImpl implements Var {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
+			case IrPackage.VAR__DEFS:
+				return ((InternalEList<?>)getDefs()).basicRemove(otherEnd, msgs);
 			case IrPackage.VAR__INITIAL_VALUE:
 				return basicSetInitialValue(null, msgs);
 			case IrPackage.VAR__TYPE:
 				return basicSetType(null, msgs);
 			case IrPackage.VAR__USES:
 				return ((InternalEList<?>)getUses()).basicRemove(otherEnd, msgs);
-			case IrPackage.VAR__DEFS:
-				return ((InternalEList<?>)getDefs()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -309,26 +309,26 @@ public class VarImpl extends EObjectImpl implements Var {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
+			case IrPackage.VAR__ASSIGNABLE:
+				return assignable != ASSIGNABLE_EDEFAULT;
+			case IrPackage.VAR__DEFS:
+				return defs != null && !defs.isEmpty();
+			case IrPackage.VAR__GLOBAL:
+				return global != GLOBAL_EDEFAULT;
 			case IrPackage.VAR__INDEX:
 				return index != INDEX_EDEFAULT;
 			case IrPackage.VAR__INITIAL_VALUE:
 				return initialValue != null;
+			case IrPackage.VAR__LINE_NUMBER:
+				return lineNumber != LINE_NUMBER_EDEFAULT;
 			case IrPackage.VAR__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 			case IrPackage.VAR__TYPE:
 				return type != null;
-			case IrPackage.VAR__VALUE:
-				return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT.equals(value);
-			case IrPackage.VAR__ASSIGNABLE:
-				return assignable != ASSIGNABLE_EDEFAULT;
-			case IrPackage.VAR__GLOBAL:
-				return global != GLOBAL_EDEFAULT;
 			case IrPackage.VAR__USES:
 				return uses != null && !uses.isEmpty();
-			case IrPackage.VAR__DEFS:
-				return defs != null && !defs.isEmpty();
-			case IrPackage.VAR__LINE_NUMBER:
-				return lineNumber != LINE_NUMBER_EDEFAULT;
+			case IrPackage.VAR__VALUE:
+				return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT.equals(value);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -341,11 +341,24 @@ public class VarImpl extends EObjectImpl implements Var {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
+			case IrPackage.VAR__ASSIGNABLE:
+				setAssignable((Boolean)newValue);
+				return;
+			case IrPackage.VAR__DEFS:
+				getDefs().clear();
+				getDefs().addAll((Collection<? extends Def>)newValue);
+				return;
+			case IrPackage.VAR__GLOBAL:
+				setGlobal((Boolean)newValue);
+				return;
 			case IrPackage.VAR__INDEX:
 				setIndex((Integer)newValue);
 				return;
 			case IrPackage.VAR__INITIAL_VALUE:
 				setInitialValue((Expression)newValue);
+				return;
+			case IrPackage.VAR__LINE_NUMBER:
+				setLineNumber((Integer)newValue);
 				return;
 			case IrPackage.VAR__NAME:
 				setName((String)newValue);
@@ -353,25 +366,12 @@ public class VarImpl extends EObjectImpl implements Var {
 			case IrPackage.VAR__TYPE:
 				setType((Type)newValue);
 				return;
-			case IrPackage.VAR__VALUE:
-				setValue(newValue);
-				return;
-			case IrPackage.VAR__ASSIGNABLE:
-				setAssignable((Boolean)newValue);
-				return;
-			case IrPackage.VAR__GLOBAL:
-				setGlobal((Boolean)newValue);
-				return;
 			case IrPackage.VAR__USES:
 				getUses().clear();
 				getUses().addAll((Collection<? extends Use>)newValue);
 				return;
-			case IrPackage.VAR__DEFS:
-				getDefs().clear();
-				getDefs().addAll((Collection<? extends Def>)newValue);
-				return;
-			case IrPackage.VAR__LINE_NUMBER:
-				setLineNumber((Integer)newValue);
+			case IrPackage.VAR__VALUE:
+				setValue(newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -393,11 +393,23 @@ public class VarImpl extends EObjectImpl implements Var {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
+			case IrPackage.VAR__ASSIGNABLE:
+				setAssignable(ASSIGNABLE_EDEFAULT);
+				return;
+			case IrPackage.VAR__DEFS:
+				getDefs().clear();
+				return;
+			case IrPackage.VAR__GLOBAL:
+				setGlobal(GLOBAL_EDEFAULT);
+				return;
 			case IrPackage.VAR__INDEX:
 				setIndex(INDEX_EDEFAULT);
 				return;
 			case IrPackage.VAR__INITIAL_VALUE:
 				setInitialValue((Expression)null);
+				return;
+			case IrPackage.VAR__LINE_NUMBER:
+				setLineNumber(LINE_NUMBER_EDEFAULT);
 				return;
 			case IrPackage.VAR__NAME:
 				setName(NAME_EDEFAULT);
@@ -405,23 +417,11 @@ public class VarImpl extends EObjectImpl implements Var {
 			case IrPackage.VAR__TYPE:
 				setType((Type)null);
 				return;
-			case IrPackage.VAR__VALUE:
-				setValue(VALUE_EDEFAULT);
-				return;
-			case IrPackage.VAR__ASSIGNABLE:
-				setAssignable(ASSIGNABLE_EDEFAULT);
-				return;
-			case IrPackage.VAR__GLOBAL:
-				setGlobal(GLOBAL_EDEFAULT);
-				return;
 			case IrPackage.VAR__USES:
 				getUses().clear();
 				return;
-			case IrPackage.VAR__DEFS:
-				getDefs().clear();
-				return;
-			case IrPackage.VAR__LINE_NUMBER:
-				setLineNumber(LINE_NUMBER_EDEFAULT);
+			case IrPackage.VAR__VALUE:
+				setValue(VALUE_EDEFAULT);
 				return;
 		}
 		super.eUnset(featureID);
@@ -662,18 +662,18 @@ public class VarImpl extends EObjectImpl implements Var {
 		if (eIsProxy()) return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (index: ");
+		result.append(" (assignable: ");
+		result.append(assignable);
+		result.append(", global: ");
+		result.append(global);
+		result.append(", index: ");
 		result.append(index);
+		result.append(", lineNumber: ");
+		result.append(lineNumber);
 		result.append(", name: ");
 		result.append(name);
 		result.append(", value: ");
 		result.append(value);
-		result.append(", assignable: ");
-		result.append(assignable);
-		result.append(", global: ");
-		result.append(global);
-		result.append(", lineNumber: ");
-		result.append(lineNumber);
 		result.append(')');
 		return result.toString();
 	}

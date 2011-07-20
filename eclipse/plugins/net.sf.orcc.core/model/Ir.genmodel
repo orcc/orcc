@@ -51,6 +51,10 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Actor/lineNumber"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Actor/fileName"/>
     </genClasses>
+    <genClasses ecoreClass="Ir.ecore#//Unit">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Unit/procedures"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Unit/constants"/>
+    </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Port">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Port/name"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Port/numTokensConsumed"/>

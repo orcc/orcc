@@ -29,17 +29,27 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
+ *   <li>{@link net.sf.orcc.ir.impl.NodeIfImpl#getCondition <em>Condition</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.NodeIfImpl#getElseNodes <em>Else Nodes</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.NodeIfImpl#getJoinNode <em>Join Node</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.NodeIfImpl#getThenNodes <em>Then Nodes</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.NodeIfImpl#getCondition <em>Condition</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.NodeIfImpl#getLineNumber <em>Line Number</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.NodeIfImpl#getThenNodes <em>Then Nodes</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
 public class NodeIfImpl extends NodeImpl implements NodeIf {
+	/**
+	 * The cached value of the '{@link #getCondition() <em>Condition</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getCondition()
+	 * @generated
+	 * @ordered
+	 */
+	protected Expression condition;
+
 	/**
 	 * The cached value of the '{@link #getElseNodes() <em>Else Nodes</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -57,25 +67,6 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 	 * @ordered
 	 */
 	protected NodeBlock joinNode;
-
-	/**
-	 * The cached value of the '{@link #getThenNodes() <em>Then Nodes</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getThenNodes()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Node> thenNodes;
-
-	/**
-	 * The cached value of the '{@link #getCondition() <em>Condition</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getCondition()
-	 * @generated
-	 * @ordered
-	 */
-	protected Expression condition;
 
 	/**
 	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
@@ -96,6 +87,15 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 	 * @ordered
 	 */
 	protected int lineNumber = LINE_NUMBER_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getThenNodes() <em>Then Nodes</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getThenNodes()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Node> thenNodes;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -142,16 +142,16 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
+			case IrPackage.NODE_IF__CONDITION:
+				return getCondition();
 			case IrPackage.NODE_IF__ELSE_NODES:
 				return getElseNodes();
 			case IrPackage.NODE_IF__JOIN_NODE:
 				return getJoinNode();
-			case IrPackage.NODE_IF__THEN_NODES:
-				return getThenNodes();
-			case IrPackage.NODE_IF__CONDITION:
-				return getCondition();
 			case IrPackage.NODE_IF__LINE_NUMBER:
 				return getLineNumber();
+			case IrPackage.NODE_IF__THEN_NODES:
+				return getThenNodes();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -164,14 +164,14 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
+			case IrPackage.NODE_IF__CONDITION:
+				return basicSetCondition(null, msgs);
 			case IrPackage.NODE_IF__ELSE_NODES:
 				return ((InternalEList<?>)getElseNodes()).basicRemove(otherEnd, msgs);
 			case IrPackage.NODE_IF__JOIN_NODE:
 				return basicSetJoinNode(null, msgs);
 			case IrPackage.NODE_IF__THEN_NODES:
 				return ((InternalEList<?>)getThenNodes()).basicRemove(otherEnd, msgs);
-			case IrPackage.NODE_IF__CONDITION:
-				return basicSetCondition(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -183,16 +183,16 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
+			case IrPackage.NODE_IF__CONDITION:
+				return condition != null;
 			case IrPackage.NODE_IF__ELSE_NODES:
 				return elseNodes != null && !elseNodes.isEmpty();
 			case IrPackage.NODE_IF__JOIN_NODE:
 				return joinNode != null;
-			case IrPackage.NODE_IF__THEN_NODES:
-				return thenNodes != null && !thenNodes.isEmpty();
-			case IrPackage.NODE_IF__CONDITION:
-				return condition != null;
 			case IrPackage.NODE_IF__LINE_NUMBER:
 				return lineNumber != LINE_NUMBER_EDEFAULT;
+			case IrPackage.NODE_IF__THEN_NODES:
+				return thenNodes != null && !thenNodes.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -221,6 +221,9 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
+			case IrPackage.NODE_IF__CONDITION:
+				setCondition((Expression)newValue);
+				return;
 			case IrPackage.NODE_IF__ELSE_NODES:
 				getElseNodes().clear();
 				getElseNodes().addAll((Collection<? extends Node>)newValue);
@@ -228,15 +231,12 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 			case IrPackage.NODE_IF__JOIN_NODE:
 				setJoinNode((NodeBlock)newValue);
 				return;
+			case IrPackage.NODE_IF__LINE_NUMBER:
+				setLineNumber((Integer)newValue);
+				return;
 			case IrPackage.NODE_IF__THEN_NODES:
 				getThenNodes().clear();
 				getThenNodes().addAll((Collection<? extends Node>)newValue);
-				return;
-			case IrPackage.NODE_IF__CONDITION:
-				setCondition((Expression)newValue);
-				return;
-			case IrPackage.NODE_IF__LINE_NUMBER:
-				setLineNumber((Integer)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -258,20 +258,20 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
+			case IrPackage.NODE_IF__CONDITION:
+				setCondition((Expression)null);
+				return;
 			case IrPackage.NODE_IF__ELSE_NODES:
 				getElseNodes().clear();
 				return;
 			case IrPackage.NODE_IF__JOIN_NODE:
 				setJoinNode((NodeBlock)null);
 				return;
-			case IrPackage.NODE_IF__THEN_NODES:
-				getThenNodes().clear();
-				return;
-			case IrPackage.NODE_IF__CONDITION:
-				setCondition((Expression)null);
-				return;
 			case IrPackage.NODE_IF__LINE_NUMBER:
 				setLineNumber(LINE_NUMBER_EDEFAULT);
+				return;
+			case IrPackage.NODE_IF__THEN_NODES:
+				getThenNodes().clear();
 				return;
 		}
 		super.eUnset(featureID);

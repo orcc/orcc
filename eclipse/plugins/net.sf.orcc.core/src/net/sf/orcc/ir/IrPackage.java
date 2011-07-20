@@ -168,6 +168,32 @@ public interface IrPackage extends EPackage {
 		EAttribute ACTOR__FILE_NAME = eINSTANCE.getActor_FileName();
 
 		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.UnitImpl <em>Unit</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.UnitImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getUnit()
+		 * @generated
+		 */
+		EClass UNIT = eINSTANCE.getUnit();
+
+		/**
+		 * The meta object literal for the '<em><b>Procedures</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference UNIT__PROCEDURES = eINSTANCE.getUnit_Procedures();
+
+		/**
+		 * The meta object literal for the '<em><b>Constants</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference UNIT__CONSTANTS = eINSTANCE.getUnit_Constants();
+
+		/**
 		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
@@ -1315,7 +1341,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getAction()
 	 * @generated
 	 */
-	int ACTION = 6;
+	int ACTION = 7;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ActorImpl <em>Actor</em>}' class.
@@ -1335,105 +1361,12 @@ public interface IrPackage extends EPackage {
 	int ACTOR__ACTIONS = 0;
 
 	/**
-	 * The feature id for the '<em><b>Initializes</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__INITIALIZES = 1;
-
-	/**
-	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__INPUTS = 2;
-
-	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__NAME = 3;
-
-	/**
-	 * The feature id for the '<em><b>Outputs</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__OUTPUTS = 4;
-
-	/**
-	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__PARAMETERS = 5;
-
-	/**
-	 * The feature id for the '<em><b>Procs</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__PROCS = 6;
-
-	/**
-	 * The feature id for the '<em><b>State Vars</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__STATE_VARS = 7;
-
-	/**
-	 * The feature id for the '<em><b>Native</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__NATIVE = 8;
-
-	/**
 	 * The feature id for the '<em><b>Actions Outside Fsm</b></em>' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__ACTIONS_OUTSIDE_FSM = 9;
-
-	/**
-	 * The feature id for the '<em><b>Fsm</b></em>' containment reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__FSM = 10;
-
-	/**
-	 * The feature id for the '<em><b>Mo C</b></em>' containment reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__MO_C = 11;
-
-	/**
-	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__LINE_NUMBER = 12;
+	int ACTOR__ACTIONS_OUTSIDE_FSM = 1;
 
 	/**
 	 * The feature id for the '<em><b>File Name</b></em>' attribute.
@@ -1442,7 +1375,100 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__FILE_NAME = 13;
+	int ACTOR__FILE_NAME = 2;
+
+	/**
+	 * The feature id for the '<em><b>Fsm</b></em>' containment reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__FSM = 3;
+
+	/**
+	 * The feature id for the '<em><b>Initializes</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__INITIALIZES = 4;
+
+	/**
+	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__INPUTS = 5;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__LINE_NUMBER = 6;
+
+	/**
+	 * The feature id for the '<em><b>Mo C</b></em>' containment reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__MO_C = 7;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__NAME = 8;
+
+	/**
+	 * The feature id for the '<em><b>Native</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__NATIVE = 9;
+
+	/**
+	 * The feature id for the '<em><b>Outputs</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__OUTPUTS = 10;
+
+	/**
+	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__PARAMETERS = 11;
+
+	/**
+	 * The feature id for the '<em><b>Procs</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__PROCS = 12;
+
+	/**
+	 * The feature id for the '<em><b>State Vars</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__STATE_VARS = 13;
 
 	/**
 	 * The number of structural features of the '<em>Actor</em>' class. <!--
@@ -1454,13 +1480,50 @@ public interface IrPackage extends EPackage {
 	int ACTOR_FEATURE_COUNT = 14;
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.UnitImpl <em>Unit</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.UnitImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getUnit()
+	 * @generated
+	 */
+	int UNIT = 1;
+
+	/**
+	 * The feature id for the '<em><b>Constants</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int UNIT__CONSTANTS = 0;
+
+	/**
+	 * The feature id for the '<em><b>Procedures</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int UNIT__PROCEDURES = 1;
+
+	/**
+	 * The number of structural features of the '<em>Unit</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int UNIT_FEATURE_COUNT = 2;
+
+	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.DefImpl <em>Def</em>}' class.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.ir.impl.DefImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getDef()
 	 * @generated
 	 */
-	int DEF = 39;
+	int DEF = 40;
 
 	/**
 	 * The singleton instance of the package.
@@ -1500,7 +1563,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprBinary()
 	 * @generated
 	 */
-	int EXPR_BINARY = 23;
+	int EXPR_BINARY = 24;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprBoolImpl <em>Expr Bool</em>}' class.
@@ -1509,7 +1572,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprBool()
 	 * @generated
 	 */
-	int EXPR_BOOL = 24;
+	int EXPR_BOOL = 25;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprFloatImpl
@@ -1520,7 +1583,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprFloat()
 	 * @generated
 	 */
-	int EXPR_FLOAT = 25;
+	int EXPR_FLOAT = 26;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprIntImpl <em>Expr Int</em>}' class.
@@ -1529,7 +1592,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprInt()
 	 * @generated
 	 */
-	int EXPR_INT = 26;
+	int EXPR_INT = 27;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprListImpl <em>Expr List</em>}' class.
@@ -1538,7 +1601,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprList()
 	 * @generated
 	 */
-	int EXPR_LIST = 27;
+	int EXPR_LIST = 28;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprStringImpl
@@ -1549,7 +1612,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprString()
 	 * @generated
 	 */
-	int EXPR_STRING = 28;
+	int EXPR_STRING = 29;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprUnaryImpl
@@ -1560,7 +1623,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprUnary()
 	 * @generated
 	 */
-	int EXPR_UNARY = 29;
+	int EXPR_UNARY = 30;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprVarImpl <em>Expr Var</em>}' class.
@@ -1569,7 +1632,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprVar()
 	 * @generated
 	 */
-	int EXPR_VAR = 30;
+	int EXPR_VAR = 31;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExpressionImpl
@@ -1580,7 +1643,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExpression()
 	 * @generated
 	 */
-	int EXPRESSION = 22;
+	int EXPRESSION = 23;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.FSMImpl <em>FSM</em>}' class.
@@ -1589,7 +1652,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getFSM()
 	 * @generated
 	 */
-	int FSM = 2;
+	int FSM = 3;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstructionImpl
@@ -1600,7 +1663,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstruction()
 	 * @generated
 	 */
-	int INSTRUCTION = 14;
+	int INSTRUCTION = 15;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstAssignImpl
@@ -1611,7 +1674,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstAssign()
 	 * @generated
 	 */
-	int INST_ASSIGN = 15;
+	int INST_ASSIGN = 16;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstCallImpl <em>Inst Call</em>}' class.
@@ -1620,7 +1683,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstCall()
 	 * @generated
 	 */
-	int INST_CALL = 16;
+	int INST_CALL = 17;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstLoadImpl <em>Inst Load</em>}' class.
@@ -1629,7 +1692,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstLoad()
 	 * @generated
 	 */
-	int INST_LOAD = 17;
+	int INST_LOAD = 18;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstPhiImpl <em>Inst Phi</em>}' class.
@@ -1638,7 +1701,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstPhi()
 	 * @generated
 	 */
-	int INST_PHI = 18;
+	int INST_PHI = 19;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstReturnImpl
@@ -1649,7 +1712,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstReturn()
 	 * @generated
 	 */
-	int INST_RETURN = 19;
+	int INST_RETURN = 20;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstSpecificImpl
@@ -1660,7 +1723,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstSpecific()
 	 * @generated
 	 */
-	int INST_SPECIFIC = 20;
+	int INST_SPECIFIC = 21;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstStoreImpl
@@ -1671,7 +1734,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstStore()
 	 * @generated
 	 */
-	int INST_STORE = 21;
+	int INST_STORE = 22;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeImpl <em>Node</em>}' class.
@@ -1680,7 +1743,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNode()
 	 * @generated
 	 */
-	int NODE = 10;
+	int NODE = 11;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeBlockImpl
@@ -1691,7 +1754,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNodeBlock()
 	 * @generated
 	 */
-	int NODE_BLOCK = 11;
+	int NODE_BLOCK = 12;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeIfImpl <em>Node If</em>}' class.
@@ -1700,7 +1763,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNodeIf()
 	 * @generated
 	 */
-	int NODE_IF = 12;
+	int NODE_IF = 13;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeWhileImpl
@@ -1711,7 +1774,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNodeWhile()
 	 * @generated
 	 */
-	int NODE_WHILE = 13;
+	int NODE_WHILE = 14;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpBinary <em>Op Binary</em>}' enum.
@@ -1720,7 +1783,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpBinary()
 	 * @generated
 	 */
-	int OP_BINARY = 46;
+	int OP_BINARY = 47;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpUnary <em>Op Unary</em>}' enum.
@@ -1729,7 +1792,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpUnary()
 	 * @generated
 	 */
-	int OP_UNARY = 47;
+	int OP_UNARY = 48;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.PatternImpl <em>Pattern</em>}' class.
@@ -1738,7 +1801,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPattern()
 	 * @generated
 	 */
-	int PATTERN = 8;
+	int PATTERN = 9;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.PortImpl <em>Port</em>}' class.
@@ -1747,7 +1810,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPort()
 	 * @generated
 	 */
-	int PORT = 1;
+	int PORT = 2;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -1759,12 +1822,21 @@ public interface IrPackage extends EPackage {
 	int PORT__NAME = 0;
 
 	/**
+	 * The feature id for the '<em><b>Native</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT__NATIVE = 1;
+
+	/**
 	 * The feature id for the '<em><b>Num Tokens Consumed</b></em>' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__NUM_TOKENS_CONSUMED = 1;
+	int PORT__NUM_TOKENS_CONSUMED = 2;
 
 	/**
 	 * The feature id for the '<em><b>Num Tokens Produced</b></em>' attribute.
@@ -1772,7 +1844,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__NUM_TOKENS_PRODUCED = 2;
+	int PORT__NUM_TOKENS_PRODUCED = 3;
 
 	/**
 	 * The feature id for the '<em><b>Type</b></em>' containment reference. <!--
@@ -1781,16 +1853,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__TYPE = 3;
-
-	/**
-	 * The feature id for the '<em><b>Native</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PORT__NATIVE = 4;
+	int PORT__TYPE = 4;
 
 	/**
 	 * The number of structural features of the '<em>Port</em>' class. <!--
@@ -1843,7 +1906,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getProcedure()
 	 * @generated
 	 */
-	int PROCEDURE = 9;
+	int PROCEDURE = 10;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.StateImpl <em>State</em>}' class.
@@ -1852,7 +1915,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getState()
 	 * @generated
 	 */
-	int STATE = 3;
+	int STATE = 4;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -1880,7 +1943,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTransitions()
 	 * @generated
 	 */
-	int TRANSITIONS = 4;
+	int TRANSITIONS = 5;
 
 	/**
 	 * The feature id for the '<em><b>List</b></em>' containment reference list.
@@ -1916,7 +1979,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTag()
 	 * @generated
 	 */
-	int TAG = 7;
+	int TAG = 8;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TransitionImpl
@@ -1927,7 +1990,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTransition()
 	 * @generated
 	 */
-	int TRANSITION = 5;
+	int TRANSITION = 6;
 
 	/**
 	 * The feature id for the '<em><b>Action</b></em>' reference.
@@ -1981,12 +2044,20 @@ public interface IrPackage extends EPackage {
 	int ACTION__OUTPUT_PATTERN = 2;
 
 	/**
+	 * The feature id for the '<em><b>Peek Pattern</b></em>' containment reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTION__PEEK_PATTERN = 3;
+
+	/**
 	 * The feature id for the '<em><b>Scheduler</b></em>' containment reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ACTION__SCHEDULER = 3;
+	int ACTION__SCHEDULER = 4;
 
 	/**
 	 * The feature id for the '<em><b>Tag</b></em>' containment reference. <!--
@@ -1995,15 +2066,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTION__TAG = 4;
-
-	/**
-	 * The feature id for the '<em><b>Peek Pattern</b></em>' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTION__PEEK_PATTERN = 5;
+	int ACTION__TAG = 5;
 
 	/**
 	 * The number of structural features of the '<em>Action</em>' class. <!--
@@ -2087,29 +2150,30 @@ public interface IrPackage extends EPackage {
 	int PATTERN_FEATURE_COUNT = 5;
 
 	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCEDURE__LINE_NUMBER = 0;
+
+	/**
+	 * The feature id for the '<em><b>Locals</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCEDURE__LOCALS = 1;
+
+	/**
 	 * The feature id for the '<em><b>Name</b></em>' reference. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int PROCEDURE__NAME = 0;
-
-	/**
-	 * The feature id for the '<em><b>Nodes</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PROCEDURE__NODES = 1;
-
-	/**
-	 * The feature id for the '<em><b>Return Type</b></em>' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PROCEDURE__RETURN_TYPE = 2;
+	int PROCEDURE__NAME = 2;
 
 	/**
 	 * The feature id for the '<em><b>Native</b></em>' attribute. <!--
@@ -2121,12 +2185,12 @@ public interface IrPackage extends EPackage {
 	int PROCEDURE__NATIVE = 3;
 
 	/**
-	 * The feature id for the '<em><b>Locals</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Nodes</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PROCEDURE__LOCALS = 4;
+	int PROCEDURE__NODES = 4;
 
 	/**
 	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
@@ -2137,13 +2201,12 @@ public interface IrPackage extends EPackage {
 	int PROCEDURE__PARAMETERS = 5;
 
 	/**
-	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Return Type</b></em>' containment reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PROCEDURE__LINE_NUMBER = 6;
+	int PROCEDURE__RETURN_TYPE = 6;
 
 	/**
 	 * The number of structural features of the '<em>Procedure</em>' class. <!--
@@ -2180,12 +2243,20 @@ public interface IrPackage extends EPackage {
 	int NODE_BLOCK_FEATURE_COUNT = NODE_FEATURE_COUNT + 1;
 
 	/**
+	 * The feature id for the '<em><b>Condition</b></em>' containment reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NODE_IF__CONDITION = NODE_FEATURE_COUNT + 0;
+
+	/**
 	 * The feature id for the '<em><b>Else Nodes</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_IF__ELSE_NODES = NODE_FEATURE_COUNT + 0;
+	int NODE_IF__ELSE_NODES = NODE_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Join Node</b></em>' containment reference.
@@ -2193,23 +2264,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_IF__JOIN_NODE = NODE_FEATURE_COUNT + 1;
-
-	/**
-	 * The feature id for the '<em><b>Then Nodes</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NODE_IF__THEN_NODES = NODE_FEATURE_COUNT + 2;
-
-	/**
-	 * The feature id for the '<em><b>Condition</b></em>' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NODE_IF__CONDITION = NODE_FEATURE_COUNT + 3;
+	int NODE_IF__JOIN_NODE = NODE_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -2218,7 +2273,15 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_IF__LINE_NUMBER = NODE_FEATURE_COUNT + 4;
+	int NODE_IF__LINE_NUMBER = NODE_FEATURE_COUNT + 3;
+
+	/**
+	 * The feature id for the '<em><b>Then Nodes</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NODE_IF__THEN_NODES = NODE_FEATURE_COUNT + 4;
 
 	/**
 	 * The number of structural features of the '<em>Node If</em>' class. <!--
@@ -2230,28 +2293,20 @@ public interface IrPackage extends EPackage {
 	int NODE_IF_FEATURE_COUNT = NODE_FEATURE_COUNT + 5;
 
 	/**
-	 * The feature id for the '<em><b>Join Node</b></em>' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NODE_WHILE__JOIN_NODE = NODE_FEATURE_COUNT + 0;
-
-	/**
-	 * The feature id for the '<em><b>Nodes</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NODE_WHILE__NODES = NODE_FEATURE_COUNT + 1;
-
-	/**
 	 * The feature id for the '<em><b>Condition</b></em>' containment reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_WHILE__CONDITION = NODE_FEATURE_COUNT + 2;
+	int NODE_WHILE__CONDITION = NODE_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>Join Node</b></em>' containment reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NODE_WHILE__JOIN_NODE = NODE_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -2260,7 +2315,15 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_WHILE__LINE_NUMBER = NODE_FEATURE_COUNT + 3;
+	int NODE_WHILE__LINE_NUMBER = NODE_FEATURE_COUNT + 2;
+
+	/**
+	 * The feature id for the '<em><b>Nodes</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NODE_WHILE__NODES = NODE_FEATURE_COUNT + 3;
 
 	/**
 	 * The number of structural features of the '<em>Node While</em>' class.
@@ -2271,22 +2334,22 @@ public interface IrPackage extends EPackage {
 	int NODE_WHILE_FEATURE_COUNT = NODE_FEATURE_COUNT + 4;
 
 	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INSTRUCTION__PREDICATE = 0;
-
-	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INSTRUCTION__LINE_NUMBER = 1;
+	int INSTRUCTION__LINE_NUMBER = 0;
+
+	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INSTRUCTION__PREDICATE = 1;
 
 	/**
 	 * The number of structural features of the '<em>Instruction</em>' class.
@@ -2304,16 +2367,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPredicate()
 	 * @generated
 	 */
-	int PREDICATE = 42;
-
-	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_ASSIGN__PREDICATE = INSTRUCTION__PREDICATE;
+	int PREDICATE = 43;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -2323,6 +2377,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int INST_ASSIGN__LINE_NUMBER = INSTRUCTION__LINE_NUMBER;
+
+	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_ASSIGN__PREDICATE = INSTRUCTION__PREDICATE;
 
 	/**
 	 * The feature id for the '<em><b>Target</b></em>' reference. <!--
@@ -2350,15 +2413,6 @@ public interface IrPackage extends EPackage {
 	int INST_ASSIGN_FEATURE_COUNT = INSTRUCTION_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_CALL__PREDICATE = INSTRUCTION__PREDICATE;
-
-	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2366,6 +2420,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int INST_CALL__LINE_NUMBER = INSTRUCTION__LINE_NUMBER;
+
+	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_CALL__PREDICATE = INSTRUCTION__PREDICATE;
 
 	/**
 	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
@@ -2403,15 +2466,6 @@ public interface IrPackage extends EPackage {
 	int INST_CALL_FEATURE_COUNT = INSTRUCTION_FEATURE_COUNT + 3;
 
 	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_LOAD__PREDICATE = INSTRUCTION__PREDICATE;
-
-	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2419,6 +2473,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int INST_LOAD__LINE_NUMBER = INSTRUCTION__LINE_NUMBER;
+
+	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_LOAD__PREDICATE = INSTRUCTION__PREDICATE;
 
 	/**
 	 * The feature id for the '<em><b>Indexes</b></em>' containment reference list.
@@ -2456,15 +2519,6 @@ public interface IrPackage extends EPackage {
 	int INST_LOAD_FEATURE_COUNT = INSTRUCTION_FEATURE_COUNT + 3;
 
 	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_PHI__PREDICATE = INSTRUCTION__PREDICATE;
-
-	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2472,6 +2526,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int INST_PHI__LINE_NUMBER = INSTRUCTION__LINE_NUMBER;
+
+	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_PHI__PREDICATE = INSTRUCTION__PREDICATE;
 
 	/**
 	 * The feature id for the '<em><b>Old Variable</b></em>' reference. <!--
@@ -2509,15 +2572,6 @@ public interface IrPackage extends EPackage {
 	int INST_PHI_FEATURE_COUNT = INSTRUCTION_FEATURE_COUNT + 3;
 
 	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_RETURN__PREDICATE = INSTRUCTION__PREDICATE;
-
-	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2525,6 +2579,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int INST_RETURN__LINE_NUMBER = INSTRUCTION__LINE_NUMBER;
+
+	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RETURN__PREDICATE = INSTRUCTION__PREDICATE;
 
 	/**
 	 * The feature id for the '<em><b>Value</b></em>' containment reference.
@@ -2543,15 +2606,6 @@ public interface IrPackage extends EPackage {
 	int INST_RETURN_FEATURE_COUNT = INSTRUCTION_FEATURE_COUNT + 1;
 
 	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_SPECIFIC__PREDICATE = INSTRUCTION__PREDICATE;
-
-	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2559,6 +2613,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int INST_SPECIFIC__LINE_NUMBER = INSTRUCTION__LINE_NUMBER;
+
+	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_SPECIFIC__PREDICATE = INSTRUCTION__PREDICATE;
 
 	/**
 	 * The number of structural features of the '<em>Inst Specific</em>' class.
@@ -2569,15 +2632,6 @@ public interface IrPackage extends EPackage {
 	int INST_SPECIFIC_FEATURE_COUNT = INSTRUCTION_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_STORE__PREDICATE = INSTRUCTION__PREDICATE;
-
-	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2585,6 +2639,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int INST_STORE__LINE_NUMBER = INSTRUCTION__LINE_NUMBER;
+
+	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_STORE__PREDICATE = INSTRUCTION__PREDICATE;
 
 	/**
 	 * The feature id for the '<em><b>Indexes</b></em>' containment reference list.
@@ -2818,7 +2881,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getType()
 	 * @generated
 	 */
-	int TYPE = 31;
+	int TYPE = 32;
 
 	/**
 	 * The number of structural features of the '<em>Type</em>' class. <!--
@@ -2836,7 +2899,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeBool()
 	 * @generated
 	 */
-	int TYPE_BOOL = 32;
+	int TYPE_BOOL = 33;
 
 	/**
 	 * The number of structural features of the '<em>Type Bool</em>' class. <!--
@@ -2856,7 +2919,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeFloat()
 	 * @generated
 	 */
-	int TYPE_FLOAT = 33;
+	int TYPE_FLOAT = 34;
 
 	/**
 	 * The number of structural features of the '<em>Type Float</em>' class.
@@ -2873,7 +2936,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeInt()
 	 * @generated
 	 */
-	int TYPE_INT = 34;
+	int TYPE_INT = 35;
 
 	/**
 	 * The feature id for the '<em><b>Size</b></em>' attribute. <!--
@@ -2900,7 +2963,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeList()
 	 * @generated
 	 */
-	int TYPE_LIST = 35;
+	int TYPE_LIST = 36;
 
 	/**
 	 * The feature id for the '<em><b>Size Expr</b></em>' containment reference.
@@ -2937,7 +3000,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeString()
 	 * @generated
 	 */
-	int TYPE_STRING = 36;
+	int TYPE_STRING = 37;
 
 	/**
 	 * The feature id for the '<em><b>Size</b></em>' attribute. <!--
@@ -2963,7 +3026,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeUint()
 	 * @generated
 	 */
-	int TYPE_UINT = 37;
+	int TYPE_UINT = 38;
 
 	/**
 	 * The feature id for the '<em><b>Size</b></em>' attribute. <!--
@@ -2990,7 +3053,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeVoid()
 	 * @generated
 	 */
-	int TYPE_VOID = 38;
+	int TYPE_VOID = 39;
 
 	/**
 	 * The number of structural features of the '<em>Type Void</em>' class. <!--
@@ -3026,7 +3089,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getUse()
 	 * @generated
 	 */
-	int USE = 41;
+	int USE = 42;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.VarImpl <em>Var</em>}' class.
@@ -3035,50 +3098,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getVar()
 	 * @generated
 	 */
-	int VAR = 40;
-
-	/**
-	 * The feature id for the '<em><b>Index</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int VAR__INDEX = 0;
-
-	/**
-	 * The feature id for the '<em><b>Initial Value</b></em>' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int VAR__INITIAL_VALUE = 1;
-
-	/**
-	 * The feature id for the '<em><b>Name</b></em>' reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int VAR__NAME = 2;
-
-	/**
-	 * The feature id for the '<em><b>Type</b></em>' containment reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int VAR__TYPE = 3;
-
-	/**
-	 * The feature id for the '<em><b>Value</b></em>' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int VAR__VALUE = 4;
+	int VAR = 41;
 
 	/**
 	 * The feature id for the '<em><b>Assignable</b></em>' attribute. <!--
@@ -3087,25 +3107,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VAR__ASSIGNABLE = 5;
-
-	/**
-	 * The feature id for the '<em><b>Global</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int VAR__GLOBAL = 6;
-
-	/**
-	 * The feature id for the '<em><b>Uses</b></em>' reference list. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int VAR__USES = 7;
+	int VAR__ASSIGNABLE = 0;
 
 	/**
 	 * The feature id for the '<em><b>Defs</b></em>' reference list. <!--
@@ -3114,7 +3116,33 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VAR__DEFS = 8;
+	int VAR__DEFS = 1;
+
+	/**
+	 * The feature id for the '<em><b>Global</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int VAR__GLOBAL = 2;
+
+	/**
+	 * The feature id for the '<em><b>Index</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int VAR__INDEX = 3;
+
+	/**
+	 * The feature id for the '<em><b>Initial Value</b></em>' containment reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VAR__INITIAL_VALUE = 4;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -3123,7 +3151,42 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VAR__LINE_NUMBER = 9;
+	int VAR__LINE_NUMBER = 5;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int VAR__NAME = 6;
+
+	/**
+	 * The feature id for the '<em><b>Type</b></em>' containment reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int VAR__TYPE = 7;
+
+	/**
+	 * The feature id for the '<em><b>Uses</b></em>' reference list. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int VAR__USES = 8;
+
+	/**
+	 * The feature id for the '<em><b>Value</b></em>' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VAR__VALUE = 9;
 
 	/**
 	 * The number of structural features of the '<em>Var</em>' class. <!--
@@ -3178,7 +3241,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPortToEIntegerObjectMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = 43;
+	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = 44;
 
 	/**
 	 * The feature id for the '<em><b>Key</b></em>' reference.
@@ -3215,7 +3278,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPortToVarMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_VAR_MAP_ENTRY = 44;
+	int PORT_TO_VAR_MAP_ENTRY = 45;
 
 	/**
 	 * The feature id for the '<em><b>Key</b></em>' reference.
@@ -3252,7 +3315,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getVarToPortMapEntry()
 	 * @generated
 	 */
-	int VAR_TO_PORT_MAP_ENTRY = 45;
+	int VAR_TO_PORT_MAP_ENTRY = 46;
 
 	/**
 	 * The feature id for the '<em><b>Key</b></em>' reference.
@@ -3463,6 +3526,38 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getActor_FileName();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.Unit <em>Unit</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Unit</em>'.
+	 * @see net.sf.orcc.ir.Unit
+	 * @generated
+	 */
+	EClass getUnit();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.Unit#getProcedures <em>Procedures</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Procedures</em>'.
+	 * @see net.sf.orcc.ir.Unit#getProcedures()
+	 * @see #getUnit()
+	 * @generated
+	 */
+	EReference getUnit_Procedures();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.Unit#getConstants <em>Constants</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Constants</em>'.
+	 * @see net.sf.orcc.ir.Unit#getConstants()
+	 * @see #getUnit()
+	 * @generated
+	 */
+	EReference getUnit_Constants();
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Actor#getName <em>Name</em>}'.

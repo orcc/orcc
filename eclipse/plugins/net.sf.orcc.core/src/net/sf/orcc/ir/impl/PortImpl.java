@@ -25,10 +25,10 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * The following features are implemented:
  * <ul>
  *   <li>{@link net.sf.orcc.ir.impl.PortImpl#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.PortImpl#isNative <em>Native</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.PortImpl#getNumTokensConsumed <em>Num Tokens Consumed</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.PortImpl#getNumTokensProduced <em>Num Tokens Produced</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.PortImpl#getType <em>Type</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.PortImpl#isNative <em>Native</em>}</li>
  * </ul>
  * </p>
  *
@@ -54,6 +54,26 @@ public class PortImpl extends EObjectImpl implements Port {
 	 * @ordered
 	 */
 	protected String name = NAME_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isNative()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean NATIVE_EDEFAULT = false;
+
+	/**
+	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isNative()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean native_ = NATIVE_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #getNumTokensConsumed() <em>Num Tokens Consumed</em>}' attribute.
@@ -106,26 +126,6 @@ public class PortImpl extends EObjectImpl implements Port {
 	protected Type type;
 
 	/**
-	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #isNative()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean NATIVE_EDEFAULT = false;
-
-	/**
-	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #isNative()
-	 * @generated
-	 * @ordered
-	 */
-	protected boolean native_ = NATIVE_EDEFAULT;
-
-	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -159,14 +159,14 @@ public class PortImpl extends EObjectImpl implements Port {
 		switch (featureID) {
 			case IrPackage.PORT__NAME:
 				return getName();
+			case IrPackage.PORT__NATIVE:
+				return isNative();
 			case IrPackage.PORT__NUM_TOKENS_CONSUMED:
 				return getNumTokensConsumed();
 			case IrPackage.PORT__NUM_TOKENS_PRODUCED:
 				return getNumTokensProduced();
 			case IrPackage.PORT__TYPE:
 				return getType();
-			case IrPackage.PORT__NATIVE:
-				return isNative();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -195,14 +195,14 @@ public class PortImpl extends EObjectImpl implements Port {
 		switch (featureID) {
 			case IrPackage.PORT__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
+			case IrPackage.PORT__NATIVE:
+				return native_ != NATIVE_EDEFAULT;
 			case IrPackage.PORT__NUM_TOKENS_CONSUMED:
 				return numTokensConsumed != NUM_TOKENS_CONSUMED_EDEFAULT;
 			case IrPackage.PORT__NUM_TOKENS_PRODUCED:
 				return numTokensProduced != NUM_TOKENS_PRODUCED_EDEFAULT;
 			case IrPackage.PORT__TYPE:
 				return type != null;
-			case IrPackage.PORT__NATIVE:
-				return native_ != NATIVE_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -218,6 +218,9 @@ public class PortImpl extends EObjectImpl implements Port {
 			case IrPackage.PORT__NAME:
 				setName((String)newValue);
 				return;
+			case IrPackage.PORT__NATIVE:
+				setNative((Boolean)newValue);
+				return;
 			case IrPackage.PORT__NUM_TOKENS_CONSUMED:
 				setNumTokensConsumed((Integer)newValue);
 				return;
@@ -226,9 +229,6 @@ public class PortImpl extends EObjectImpl implements Port {
 				return;
 			case IrPackage.PORT__TYPE:
 				setType((Type)newValue);
-				return;
-			case IrPackage.PORT__NATIVE:
-				setNative((Boolean)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -255,6 +255,9 @@ public class PortImpl extends EObjectImpl implements Port {
 			case IrPackage.PORT__NAME:
 				setName(NAME_EDEFAULT);
 				return;
+			case IrPackage.PORT__NATIVE:
+				setNative(NATIVE_EDEFAULT);
+				return;
 			case IrPackage.PORT__NUM_TOKENS_CONSUMED:
 				setNumTokensConsumed(NUM_TOKENS_CONSUMED_EDEFAULT);
 				return;
@@ -263,9 +266,6 @@ public class PortImpl extends EObjectImpl implements Port {
 				return;
 			case IrPackage.PORT__TYPE:
 				setType((Type)null);
-				return;
-			case IrPackage.PORT__NATIVE:
-				setNative(NATIVE_EDEFAULT);
 				return;
 		}
 		super.eUnset(featureID);
@@ -423,12 +423,12 @@ public class PortImpl extends EObjectImpl implements Port {
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (name: ");
 		result.append(name);
+		result.append(", native: ");
+		result.append(native_);
 		result.append(", numTokensConsumed: ");
 		result.append(numTokensConsumed);
 		result.append(", numTokensProduced: ");
 		result.append(numTokensProduced);
-		result.append(", native: ");
-		result.append(native_);
 		result.append(')');
 		return result.toString();
 	}

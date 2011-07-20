@@ -8,6 +8,7 @@ package net.sf.orcc.ir.util;
 
 import java.util.Map;
 
+import net.sf.orcc.ir.*;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Def;
@@ -131,6 +132,21 @@ public class IrSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseActor(Actor object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Unit</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Unit</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseUnit(Unit object) {
 		return null;
 	}
 
@@ -823,6 +839,12 @@ public class IrSwitch<T> extends Switch<T> {
 			case IrPackage.ACTOR: {
 				Actor actor = (Actor)theEObject;
 				T result = caseActor(actor);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.UNIT: {
+				Unit unit = (Unit)theEObject;
+				T result = caseUnit(unit);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
