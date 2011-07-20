@@ -46,7 +46,11 @@ class Memory:
         open(targetFile, "w").write(result)
     
     def getAddr(self):
-        return int(math.ceil(math.log(self.depth, 2))) + 1
+        addr = int(math.ceil(math.log(self.depth, 2)))
+        if addr == 0:
+            return 1
+        else:
+            return addr
             
     def getDepth(self):
         return self.depth

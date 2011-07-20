@@ -35,6 +35,9 @@ import commands
 import subprocess
 import shutil
 import tempita
+import math
+
+from xml.dom.minidom import parse
 
 from .port import *
 from .memory import *
@@ -87,8 +90,11 @@ class Instance:
     def initializeMemories(self, srcPath):
         srcPath = os.path.join(srcPath, self.id)
         os.chdir(srcPath)
-        self.irom = self._readMemory(self._mifFile)
-        self.dram = self._readMemory(self._mifDataFile)
+        self.irom = self._readMif(self._mifFile)
+        if self.isNative:
+            self.dram = self._readMif(self._mifDataFile)
+        else:
+            self.dram = self._readAdf(self._adfFile)
 
     def generate(self, srcPath, buildPath, libPath, pylibPath, iromAddrMax, dramAddrMax):
         srcPath = os.path.join(srcPath, self.id)
@@ -149,7 +155,7 @@ class Instance:
                 self.diff(srcTrace, tgtTrace, output)
 
 
-    def _readMemory(self, fileName):
+    def _readMif(self, fileName):
         fh = open(fileName, "r")
         igot = fh.readlines()
 
@@ -162,9 +168,18 @@ class Instance:
                 content = line.split()
                 depth = content[2]
                 depth = depth[:len(depth)-1]
-
+        
         return Memory(int(width), int(depth))
 
+    def _readAdf(self, fileName):
+        adf = parse(fileName)
+        for node in adf.getElementsByTagName("address-space"):
+            if node.hasAttributes() and (node.attributes["name"].value == "data"):
+                width = int(node.getElementsByTagName("width")[0].childNodes[0].nodeValue) * 4
+                depth = int((int(node.getElementsByTagName("max-address")[0].childNodes[0].nodeValue) - int(node.getElementsByTagName("min-address")[0].childNodes[0].nodeValue)) / 4)
+                break
+        #print fileName, width, depth
+        return Memory(width, depth)
 
     def generateProcessor(self, templateFile, targetFile, iromAddrMax, dramAddrMax):
         template = tempita.Template.from_filename(templateFile, namespace={}, encoding=None)

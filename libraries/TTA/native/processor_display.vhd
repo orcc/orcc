@@ -73,7 +73,7 @@ END COMPONENT;
 
   component irom_display
     port(clock   : in  std_logic;
-         address : in  std_logic_vector(9 downto 0);
+         address : in  std_logic_vector(8 downto 0);
          q       : out std_logic_vector(85 downto 0)
          );
   end component;
@@ -173,7 +173,7 @@ begin
 
   inst_irom_display : irom_display
     port map(clock   => clk,
-             address => imem_addr(9 downto 0),
+             address => imem_addr(8 downto 0),
              q       => idata_wire);
 
   processor_display : processor_display_tl

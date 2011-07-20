@@ -66,7 +66,7 @@ END COMPONENT;
 
   component irom_source
     port(clock   : in  std_logic;
-         address : in  std_logic_vector(5 downto 0);
+         address : in  std_logic_vector(4 downto 0);
          q       : out std_logic_vector(85 downto 0)
          );
   end component;
@@ -172,7 +172,7 @@ begin
 
   inst_irom_source : irom_source
     port map(clock   => clk,
-             address => imem_addr(5 downto 0),
+             address => imem_addr(4 downto 0),
              q       => idata_wire);
 
   processor_source : processor_source_tl

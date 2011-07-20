@@ -31,7 +31,6 @@ entity top is
     (
       hw_clk : in  std_logic;
       button : in  std_logic_vector(1 to 1);
-      st2clk : out std_logic;
       leds   : out std_logic_vector(7 downto 0)
       );
 end top;

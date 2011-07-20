@@ -61,6 +61,7 @@ import net.sf.orcc.backends.tta.architecture.Term;
 import net.sf.orcc.backends.tta.architecture.TermBool;
 import net.sf.orcc.backends.tta.architecture.TermUnit;
 import net.sf.orcc.backends.tta.architecture.Writes;
+import net.sf.orcc.backends.tta.architecture.util.ArchitectureMemoryStats;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.util.EcoreHelper;
 
@@ -1119,19 +1120,29 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	@Override
 	public TTA createTTASpecialized(String name, Instance instance) {
+		// Create default TTA processor
 		TTA tta = createTTADefault(name);
+		int errorMargin = 16;
 		if (instance.isActor()) {
+			// Add needed stream units
 			for (int i = 0; i < instance.getActor().getInputs().size(); i++) {
 				tta.getFunctionUnits().add(createStreamInput(tta, i + 1));
 			}
 			for (int i = 0; i < instance.getActor().getOutputs().size(); i++) {
 				tta.getFunctionUnits().add(createStreamOutput(tta, i + 1));
 			}
+			// Set ram size = memory estimation / word size + error margin
+			int ramSize = ArchitectureMemoryStats
+					.computeNeededMemorySize(instance.getActor());
+			tta.getData().setMaxAddress((ramSize / 8) + errorMargin);
 		} else if (instance.isBroadcast()) {
+			// Add needed stream units
 			tta.getFunctionUnits().add(createStreamInput(tta, 1));
 			for (int i = 0; i < instance.getBroadcast().getNumOutputs(); i++) {
 				tta.getFunctionUnits().add(createStreamOutput(tta, i + 1));
 			}
+			// Set ram size = memory estimation / word size + error margin
+			tta.getData().setMaxAddress(errorMargin);
 		}
 		return tta;
 	}
