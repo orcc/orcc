@@ -34,6 +34,7 @@ import static net.sf.orcc.OrccLaunchConstants.MAPPING;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +42,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.InstancePrinter;
 import net.sf.orcc.backends.NetworkPrinter;
+import net.sf.orcc.backends.Printer;
 import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.backends.transformations.DivisionSubstitution;
 import net.sf.orcc.backends.transformations.Inliner;
@@ -89,6 +91,10 @@ public class XlimBackendImpl extends AbstractBackend {
 	private Map<String, String> mapping;
 
 	private boolean multi2mono;
+	
+	private List<String> entities;
+
+	private HashSet<String> entitySet;
 
 	private Map<Integer, List<Instance>> computeMapping(Network network,
 			Map<String, String> mapping) {
@@ -116,7 +122,7 @@ public class XlimBackendImpl extends AbstractBackend {
 		hardwareGen = getAttribute("net.sf.orcc.backends.xlimHard", true);
 		fpgaType = getAttribute("net.sf.orcc.backends.xlimFpgaType",
 				"xc2vp30-7-ff1152");
-		multi2mono = getAttribute("net.sf.orcc.backends.multi2mono", false);
+		multi2mono = getAttribute("net.sf.orcc.backends.multi2mono", true);
 		mapping = getAttribute(MAPPING, new HashMap<String, String>());
 		debugMode = getAttribute(DEBUG_MODE, true);
 	}
@@ -217,6 +223,40 @@ public class XlimBackendImpl extends AbstractBackend {
 			}
 		}
 	}
+	
+	private void printTCL(Instance instance) {
+		Printer printer = new Printer("Verilog_TCLLists");
+
+		entities = new ArrayList<String>();
+		entitySet = new HashSet<String>();
+		computeEntityList(instance);
+
+		printer.getCustomAttributes().put("name",
+				instance.getNetwork().getName());
+		printer.getCustomAttributes().put("entities", entities);
+
+		printer.print("TCLLists.tcl", path, "TCLLists");
+	}
+	
+	private void computeEntityList(Instance instance) {
+		if (instance.isActor()) {
+			String name = instance.getId();
+			if (!entitySet.contains(name)) {
+				entitySet.add(name);
+				entities.add(name);
+			}
+		} else if (instance.isNetwork()) {
+			String name = instance.getId();
+			Network network = instance.getNetwork();
+			if (!entitySet.contains(name)) {
+				for (Instance subInstance : network.getInstances()) {
+					computeEntityList(subInstance);
+				}
+
+				entitySet.add(name);
+			}
+		}
+	}
 
 	private void printNetwork(Network network) {
 		NetworkPrinter printer;
@@ -232,6 +272,7 @@ public class XlimBackendImpl extends AbstractBackend {
 			Instance instance = new Instance(network.getName(), network.getName());
 			instance.setContents(network);
 			printTestbench(instancePrinter, instance);
+			printTCL(instance);
 			
 			file += ".vhd";
 			printer = new NetworkPrinter("XLIM_hw_network");
