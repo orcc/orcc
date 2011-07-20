@@ -35,6 +35,8 @@ import net.sf.orcc.util.WriteListener;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 
 /**
  * This class defines an abstract actor analyzer.
@@ -93,7 +95,8 @@ public abstract class AbstractActorAnalyzer implements ActorAnalyzer {
 		Actor actor;
 
 		IFile file = null;
-		actor = IrUtil.deserializeActor(file);
+		ResourceSet set = new ResourceSetImpl();
+		actor = IrUtil.deserializeActor(set, file);
 
 		if (isCanceled()) {
 			return;

@@ -58,6 +58,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DirectedMultigraph;
 
@@ -640,8 +641,9 @@ public class Network {
 	 *             if an actor could not be instantiated, or a connection is
 	 *             wrong
 	 */
-	public void instantiate(List<IFolder> paths) throws OrccException {
-		new Instantiator(paths).transform(this);
+	public void instantiate(ResourceSet set, List<IFolder> paths)
+			throws OrccException {
+		new Instantiator(set, paths).transform(this);
 	}
 
 	/**

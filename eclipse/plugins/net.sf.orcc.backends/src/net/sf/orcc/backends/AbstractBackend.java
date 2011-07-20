@@ -48,7 +48,6 @@ import java.util.concurrent.Future;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFParser;
@@ -68,6 +67,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 
@@ -154,7 +158,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		}
 
 		write("Instantiating actors...\n");
-		network.instantiate(vtlFolders);
+		ResourceSet set = new ResourceSetImpl();
+		network.instantiate(set, vtlFolders);
 		Network.clearActorPool();
 		write("Instantiation done\n");
 
@@ -363,10 +368,16 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		// particular concerning types), and instantiation then complains.
 
 		write("Parsing " + files.size() + " actors...\n");
+		ResourceSet set = new ResourceSetImpl();
 		List<Actor> actors = new ArrayList<Actor>();
 		for (IFile file : files) {
-			Actor actor = IrUtil.deserializeActor(file);
-			actors.add(actor);
+			Resource resource = set.getResource(URI.createPlatformResourceURI(file
+					.getFullPath().toString(), true), true);
+			EObject eObject = resource.getContents().get(0);
+			if (eObject instanceof Actor) {
+				// do not add units
+				actors.add((Actor) eObject);
+			}
 
 			if (isCanceled()) {
 				break;

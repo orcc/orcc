@@ -55,7 +55,6 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 
@@ -220,8 +219,7 @@ public class IrUtil {
 	 *            a .ir file
 	 * @return the actor serialized with XMI in the given file
 	 */
-	public static Actor deserializeActor(IFile file) {
-		ResourceSet set = new ResourceSetImpl();
+	public static Actor deserializeActor(ResourceSet set, IFile file) {
 		Resource resource = set.getResource(URI.createPlatformResourceURI(file
 				.getFullPath().toString(), true), true);
 		Actor actor = (Actor) resource.getContents().get(0);
@@ -293,11 +291,12 @@ public class IrUtil {
 	 *            an actor
 	 * @return <code>true</code> if the serialization succeeded
 	 */
-	public static boolean serializeActor(IFolder outputFolder, Actor actor) {
+	public static boolean serializeActor(ResourceSet set, IFolder outputFolder,
+			Actor actor) {
 		URI uri = URI.createPlatformResourceURI(outputFolder.getFullPath()
 				.append(OrccUtil.getFile(actor)).addFileExtension("ir")
 				.toString(), true);
-		return serializeActor(uri, actor);
+		return serializeActor(set, uri, actor);
 	}
 
 	/**
@@ -309,11 +308,12 @@ public class IrUtil {
 	 *            an actor
 	 * @return <code>true</code> if the serialization succeeded
 	 */
-	public static boolean serializeActor(String outputFolder, Actor actor) {
+	public static boolean serializeActor(ResourceSet set, String outputFolder,
+			Actor actor) {
 		String pathName = outputFolder + File.separator
 				+ OrccUtil.getFile(actor) + ".ir";
 		URI uri = URI.createFileURI(pathName);
-		return serializeActor(uri, actor);
+		return serializeActor(set, uri, actor);
 	}
 
 	/**
@@ -325,7 +325,7 @@ public class IrUtil {
 	 *            an actor
 	 * @return <code>true</code> if the serialization succeeded
 	 */
-	private static boolean serializeActor(URI uri, Actor actor) {
+	private static boolean serializeActor(ResourceSet set, URI uri, Actor actor) {
 		// check that the factory is registered
 		// (only happens in command-line mode)
 		// ...
@@ -339,7 +339,6 @@ public class IrUtil {
 		}
 
 		// serialization
-		ResourceSet set = new ResourceSetImpl();
 		Resource resource = set.createResource(uri);
 		resource.getContents().add(actor);
 		try {

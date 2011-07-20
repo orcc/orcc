@@ -60,6 +60,8 @@ import net.sf.orcc.tools.normalizer.ActorNormalizer;
 import net.sf.orcc.util.WriteListener;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DirectedMultigraph;
 
@@ -232,7 +234,8 @@ public class CBackendImpl extends AbstractBackend {
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);
-			if (debugMode && !IrUtil.serializeActor(path, actor)) {
+			ResourceSet set = new ResourceSetImpl();
+			if (debugMode && !IrUtil.serializeActor(set, path, actor)) {
 				System.out.println("oops " + transformation + " "
 						+ actor.getName());
 			}

@@ -67,6 +67,8 @@ import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transformations.BroadcastAdder;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 
 /**
  * VHDL back-end.
@@ -158,7 +160,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 		// applies transformations
 		for (ActorVisitor<?> transformation : transformationsCodegen) {
 			transformation.doSwitch(actor);
-			if (debugMode && !IrUtil.serializeActor(path, actor)) {
+			ResourceSet set = new ResourceSetImpl();
+			if (debugMode && !IrUtil.serializeActor(set, path, actor)) {
 				System.out.println("oops " + transformation + " "
 						+ actor.getName());
 			}

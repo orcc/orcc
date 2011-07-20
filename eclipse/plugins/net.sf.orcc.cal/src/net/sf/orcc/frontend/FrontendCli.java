@@ -49,6 +49,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.xtext.diagnostics.Severity;
@@ -73,7 +75,10 @@ public class FrontendCli implements IApplication {
 
 	private XtextResourceSet resourceSet;
 
+	private ResourceSet setIR;
+
 	public FrontendCli() {
+		setIR = new ResourceSetImpl();
 	}
 
 	private void getActors(IContainer container) throws CoreException {
@@ -126,7 +131,7 @@ public class FrontendCli implements IApplication {
 				AstActor actor = entity.getActor();
 				if (actor != null) {
 					Frontend frontend = new Frontend();
-					frontend.compile(outputFolder, actorPath, actor);
+					frontend.compile(setIR, outputFolder, actorPath, actor);
 				}
 			}
 		} catch (OrccException e) {

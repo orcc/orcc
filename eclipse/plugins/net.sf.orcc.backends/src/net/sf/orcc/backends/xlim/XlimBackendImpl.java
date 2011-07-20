@@ -70,6 +70,8 @@ import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 
 /**
  * This class defines a template-based XLIM back-end.
@@ -151,7 +153,8 @@ public class XlimBackendImpl extends AbstractBackend {
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);
-			if (debugMode && !IrUtil.serializeActor(path, actor)) {
+			ResourceSet set = new ResourceSetImpl();
+			if (debugMode && !IrUtil.serializeActor(set, path, actor)) {
 				System.out.println("oops " + transformation + " "
 						+ actor.getName());
 			}

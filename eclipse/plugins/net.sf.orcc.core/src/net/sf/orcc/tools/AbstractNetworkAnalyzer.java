@@ -52,6 +52,8 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 
@@ -121,9 +123,12 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 	 */
 	private List<IFolder> vtlFolders;
 
+	private ResourceSet set;
+
 	public AbstractNetworkAnalyzer(AbstractActorAnalyzer actorAnalyzer) {
 		this.actorAnalyzer = actorAnalyzer;
 		this.analysis = new HashMap<String, Object>();
+		set = new ResourceSetImpl();
 	}
 
 	/**
@@ -179,7 +184,7 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 		}
 
 		listener.writeText("Instantiating actors...\n");
-		network.instantiate(vtlFolders);
+		network.instantiate(set, vtlFolders);
 		Network.clearActorPool();
 		listener.writeText("Instantiation done\n");
 

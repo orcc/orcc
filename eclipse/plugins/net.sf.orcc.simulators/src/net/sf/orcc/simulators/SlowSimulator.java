@@ -67,6 +67,8 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.jgrapht.DirectedGraph;
 
@@ -250,7 +252,8 @@ public class SlowSimulator extends AbstractSimulator {
 			Network network = new XDFParser(file).parseNetwork();
 
 			// Instantiate the network
-			network.instantiate(vtlFolders);
+			ResourceSet set = new ResourceSetImpl();
+			network.instantiate(set, vtlFolders);
 			Network.clearActorPool();
 
 			// Flatten the hierarchical network

@@ -46,6 +46,7 @@ import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.jgrapht.DirectedGraph;
 
@@ -63,13 +64,16 @@ public class Instantiator implements INetworkTransformation {
 
 	private List<IFolder> paths;
 
+	private ResourceSet set;
+
 	/**
 	 * Creates a new instantiator that will look up actors in the given path.
 	 * 
 	 * @param paths
 	 *            the paths where actors should be looked up
 	 */
-	public Instantiator(List<IFolder> paths) {
+	public Instantiator(ResourceSet set, List<IFolder> paths) {
+		this.set = set;
 		this.paths = paths;
 	}
 
@@ -181,11 +185,11 @@ public class Instantiator implements INetworkTransformation {
 				Instance instance = vertex.getInstance();
 				if (instance.isNetwork()) {
 					// instantiate the child network
-					instance.getNetwork().instantiate(paths);
+					instance.getNetwork().instantiate(set, paths);
 				} else {
 					// at this point there are only actors and networks, so if
 					// it is not a network it's an actor: instantiate it
-					instance.instantiate(paths);
+					instance.instantiate(set, paths);
 				}
 			}
 		}

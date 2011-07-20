@@ -44,6 +44,7 @@ import net.sf.orcc.network.attributes.IAttributeContainer;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 
 /**
  * This class defines an instance. An instance has an id, a class, parameters
@@ -303,7 +304,8 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 * 
 	 * @throws OrccException
 	 */
-	public void instantiate(List<IFolder> vtlFolders) throws OrccException {
+	public void instantiate(ResourceSet set, List<IFolder> vtlFolders)
+			throws OrccException {
 		String className = new File(clasz).getName();
 		for (IFolder path : vtlFolders) {
 			file = path.getFile(className.replace('.', '/') + ".ir");
@@ -321,7 +323,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 		}
 		actor = Network.getActorFromPool(className);
 		if (actor == null) {
-			actor = IrUtil.deserializeActor(file);
+			actor = IrUtil.deserializeActor(set, file);
 			if (actor == null) {
 				throw new OrccException("Actor \"" + className
 						+ "\" not found!\nIf this actor has errors, please "

@@ -40,6 +40,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -70,12 +71,12 @@ public class Frontend {
 	 *            AST of the actor
 	 * @throws OrccException
 	 */
-	public void compile(IFolder outputFolder, IFile file, AstActor astActor)
-			throws OrccException {
+	public void compile(ResourceSet set, IFolder outputFolder, IFile file,
+			AstActor astActor) throws OrccException {
 		try {
 			Actor actor = actorTransformer.transform(file, astActor);
 			removeDanglingUses(actor);
-			IrUtil.serializeActor(outputFolder, actor);
+			IrUtil.serializeActor(set, outputFolder, actor);
 		} catch (OrccRuntimeException e) {
 			e.printStackTrace();
 		}

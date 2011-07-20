@@ -60,6 +60,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EValidator;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.xtext.builder.IXtextBuilderParticipant;
 import org.eclipse.xtext.resource.IEObjectDescription;
 import org.eclipse.xtext.resource.IResourceDescription;
@@ -103,6 +104,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		}
 
 		ResourceSet set = context.getResourceSet();
+		ResourceSet setIR = new ResourceSetImpl();
 		monitor.beginTask("Building actors", context.getDeltas().size());
 		for (Delta delta : context.getDeltas()) {
 			if (delta.getNew() == null) {
@@ -122,7 +124,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 					if (obj.eClass()
 							.equals(CalPackage.eINSTANCE.getAstEntity())) {
 						AstEntity entity = (AstEntity) obj;
-						build(outputFolder, resource, entity);
+						build(setIR, outputFolder, resource, entity);
 					}
 				}
 			}
@@ -146,8 +148,8 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 	 * @throws CoreException
 	 *             if something goes wrong
 	 */
-	private void build(IFolder outputFolder, Resource resource, AstEntity entity)
-			throws CoreException {
+	private void build(ResourceSet set, IFolder outputFolder,
+			Resource resource, AstEntity entity) throws CoreException {
 		try {
 			URL resourceUrl = new URL(resource.getURI().toString());
 			URL url = FileLocator.toFileURL(resourceUrl);
@@ -173,7 +175,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			AstActor actor = entity.getActor();
 			if (actor != null) {
 				Frontend frontend = new Frontend();
-				frontend.compile(outputFolder, file, actor);
+				frontend.compile(set, outputFolder, file, actor);
 			}
 		} catch (IOException e) {
 			IStatus status = new Status(IStatus.ERROR, "net.sf.orcc.cal.ui",
