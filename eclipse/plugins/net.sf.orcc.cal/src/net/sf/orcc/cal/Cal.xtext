@@ -200,7 +200,7 @@ AstStatementAssign:
 		('[' indexes += AstExpression ']')* ':=' value=AstExpression ';';
 
 AstStatementCall:
-	procedure=[AstProcedure]
+	procedure=[AstProcedure|QualifiedName]
 	'(' (parameters += AstExpression (',' parameters += AstExpression)*)? ')' ';';
 
 AstStatementForeach:
@@ -269,7 +269,7 @@ AstExpressionPostfix returns AstExpression:
     | '(' AstExpression ')';
 
 AstExpressionCall:
-	function=[AstFunction] '(' (parameters += AstExpression (',' parameters += AstExpression)*)? ')';
+	function=[AstFunction|QualifiedName] '(' (parameters += AstExpression (',' parameters += AstExpression)*)? ')';
 
 AstExpressionIndex:
 	source=AstVariableReference ('[' indexes += AstExpression ']')+;
