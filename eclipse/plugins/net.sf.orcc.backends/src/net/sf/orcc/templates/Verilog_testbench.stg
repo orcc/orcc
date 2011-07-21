@@ -184,8 +184,8 @@ component <instance.id>
       <if(instance.network.inputs.list || instance.network.outputs.list)><endif>
       <instance.network.inputs.list: printInPorts(); separator="\n"><if(instance.network.inputs.list && instance.network.outputs.list)><endif>
       <instance.network.outputs.list: printOutPorts(); separator="\n"><if(!instance.network.outputs.list)>    <endif>
-      clock : IN std_logic;
-      reset_n : IN std_logic);
+      CLK : IN std_logic;
+      RESET : IN std_logic);
       end component;
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
@@ -196,8 +196,8 @@ component <instance.id>
 begin
 
    uut : <instance.id> port map (
-      clock      =\> clock,
-      reset_n    =\> reset_n<if(instance.network.inputs.list || instance.network.outputs.list)>,<endif>
+      CLK      =\> clock,
+      RESET    =\> reset_n<if(instance.network.inputs.list || instance.network.outputs.list)>,<endif>
       <instance.network.inputs.list: signalsInstanciation(); separator=",\n"><if(instance.network.inputs.list && instance.network.outputs.list)>,<endif>
       <instance.network.outputs.list: signalsInstanciation(); separator=",\n"><if(!instance.network.outputs.list)>    <endif>);
       
