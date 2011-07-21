@@ -208,8 +208,8 @@ else
       severity error;
   <else
   >    assert (<port.name>_data  = std_logic_vector(to_unsigned(input_bit, <port.type.size>)))
-      report "on port <port.name> incorrectly value computed : " & to_string(to_integer(to_unsigned(<port.name>_data))) & " instead of :" & to_string(input_bit)
-      --report "on port <port.name> incorrectly value computed : " & str(to_integer(unsigned(<port.name>_data))) & " instead of :" & str(input_bit)
+      --report "on port <port.name> incorrectly value computed : " & to_string(to_integer(to_unsigned(<port.name>_data))) & " instead of :" & to_string(input_bit)
+      report "on port <port.name> incorrectly value computed : " & str(to_integer(unsigned(<port.name>_data))) & " instead of :" & str(input_bit)
       severity error;
   <endif
   ><endif
