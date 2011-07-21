@@ -1,5 +1,5 @@
 printEntity(entity) ::= <<
-vcom -93 -reportprogress 30 -work work $Design/<entity>.v
+vlog -reportprogress 300 -work work $Design/<entity>.v
 >>
 
 TCLLists(name, entities, options) ::= <<
