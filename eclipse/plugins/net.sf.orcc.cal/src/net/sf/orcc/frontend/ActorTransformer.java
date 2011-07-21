@@ -39,9 +39,11 @@ import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpression;
+import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstInputPattern;
 import net.sf.orcc.cal.cal.AstOutputPattern;
 import net.sf.orcc.cal.cal.AstPort;
+import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstSchedule;
 import net.sf.orcc.cal.cal.AstScheduleRegExp;
 import net.sf.orcc.cal.cal.AstTag;
@@ -424,6 +426,23 @@ public class ActorTransformer {
 		for (AstVariable astVariable : astActor.getStateVariables()) {
 			Var var = astTransformer.transformGlobalVariable(astVariable);
 			actor.getStateVars().add(var);
+		}
+
+		// functions
+		Map<EObject, EObject> mapAstToIr = frontend.getMap();
+		for (AstFunction function : astActor.getFunctions()) {
+			if (!mapAstToIr.containsKey(function)) {
+				Procedure proc = astTransformer.transformFunction(function);
+				actor.getProcs().add(proc);
+			}
+		}
+
+		// procedures
+		for (AstProcedure procedure : astActor.getProcedures()) {
+			if (!mapAstToIr.containsKey(procedure)) {
+				Procedure proc = astTransformer.transformProcedure(procedure);
+				actor.getProcs().add(proc);
+			}
 		}
 
 		// transform ports

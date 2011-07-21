@@ -86,6 +86,7 @@ import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.xtext.EcoreUtil2;
 
 /**
  * This class transforms an AST actor to its IR equivalent.
@@ -134,10 +135,16 @@ public class AstTransformer {
 
 			// retrieve IR procedure
 			AstFunction astFunction = astCall.getFunction();
-			if (!mapAstToIr.containsKey(astFunction)) {
-				transformFunction(astFunction);
-			}
 			Procedure calledProcedure = (Procedure) mapAstToIr.get(astFunction);
+			if (calledProcedure == null) {
+				if (EcoreUtil2.getContainerOfType(astCall, AstUnit.class) == null) {
+					calledProcedure = (Procedure) getExternalObject(astFunction);
+				}
+				if (calledProcedure == null) {
+					calledProcedure = transformFunction(astFunction);
+					procedures.add(calledProcedure);
+				}
+			}
 
 			// generates a new target
 			Var target = procedure.newTempLocalVariable(
@@ -211,7 +218,7 @@ public class AstTransformer {
 			AstVariable astVariable = expression.getSource().getVariable();
 			Var var = (Var) mapAstToIr.get(astVariable);
 			if (var == null) {
-				var = getGlobalVariable(astVariable);
+				var = (Var) getExternalObject(astVariable);
 			}
 
 			List<Expression> indexes = transformExpressions(expression
@@ -288,7 +295,7 @@ public class AstTransformer {
 
 			Var var = (Var) mapAstToIr.get(astVariable);
 			if (var == null) {
-				var = getGlobalVariable(astVariable);
+				var = (Var) getExternalObject(astVariable);
 			}
 
 			if (var.getType().isList()) {
@@ -641,7 +648,7 @@ public class AstTransformer {
 			AstVariable astTarget = astAssign.getTarget().getVariable();
 			Var target = (Var) mapAstToIr.get(astTarget);
 			if (target == null) {
-				target = getGlobalVariable(astTarget);
+				target = (Var) getExternalObject(astTarget);
 			}
 
 			// transform indexes and value
@@ -668,10 +675,17 @@ public class AstTransformer {
 				return null;
 			}
 
-			if (!mapAstToIr.containsKey(astProcedure)) {
-				transformProcedure(astProcedure);
-			}
+			// retrieve IR procedure
 			Procedure procedure = (Procedure) mapAstToIr.get(astProcedure);
+			if (procedure == null) {
+				if (EcoreUtil2.getContainerOfType(astCall, AstUnit.class) == null) {
+					procedure = (Procedure) getExternalObject(astProcedure);
+				}
+				if (procedure == null) {
+					procedure = transformProcedure(astProcedure);
+					procedures.add(procedure);
+				}
+			}
 
 			// creates call with spilling code around it
 			createCall(lineNumber, null, procedure, astCall.getParameters());
@@ -976,11 +990,11 @@ public class AstTransformer {
 		return context;
 	}
 
-	private Var getGlobalVariable(AstVariable variable) {
-		if (variable.eContainer() instanceof AstUnit) {
-			AstUnit astUnit = (AstUnit) variable.eContainer();
+	private EObject getExternalObject(EObject eObject) {
+		if (eObject.eContainer() instanceof AstUnit) {
+			AstUnit astUnit = (AstUnit) eObject.eContainer();
 			frontend.compile((AstEntity) astUnit.eContainer());
-			return (Var) mapAstToIr.get(variable);
+			return mapAstToIr.get(eObject);
 		}
 		return null;
 	}
@@ -1119,7 +1133,7 @@ public class AstTransformer {
 	 * @param astFunction
 	 *            an AST function
 	 */
-	public void transformFunction(AstFunction astFunction) {
+	public Procedure transformFunction(AstFunction astFunction) {
 		String name = astFunction.getName();
 		int lineNumber = Util.getLocation(astFunction);
 		Type type = Util.getType(astFunction);
@@ -1151,7 +1165,7 @@ public class AstTransformer {
 			procedure.setNative(true);
 		}
 
-		procedures.add(procedure);
+		return procedure;
 	}
 
 	/**
@@ -1277,7 +1291,7 @@ public class AstTransformer {
 	 * @param astProcedure
 	 *            an AST procedure
 	 */
-	public void transformProcedure(AstProcedure astProcedure) {
+	public Procedure transformProcedure(AstProcedure astProcedure) {
 		String name = astProcedure.getName();
 		int lineNumber = Util.getLocation(astProcedure);
 
@@ -1298,7 +1312,7 @@ public class AstTransformer {
 			procedure.setNative(true);
 		}
 
-		procedures.add(procedure);
+		return procedure;
 	}
 
 	/**
