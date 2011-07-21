@@ -36,6 +36,7 @@ import net.sf.orcc.OrccProjectNature;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.frontend.Frontend;
+import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -43,12 +44,8 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EValidator;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -117,10 +114,10 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 					if (obj.eClass()
 							.equals(CalPackage.eINSTANCE.getAstEntity())) {
 						AstEntity entity = (AstEntity) obj;
-						IFile file = getFile(resource);
+						IFile file = EcoreHelper.getFile(resource);
 						if (!hasErrors(file)) {
 							// and then we compile
-							frontend.compile(file, entity);
+							frontend.compile(entity);
 						}
 					}
 				}
@@ -133,21 +130,6 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		}
 
 		monitor.done();
-	}
-
-	/**
-	 * Returns the IFile associated with the given resource.
-	 * 
-	 * @param resource
-	 *            a resource
-	 * @throws CoreException
-	 *             if something goes wrong
-	 */
-	private IFile getFile(Resource resource) throws CoreException {
-		String fullPath = resource.getURI().toPlatformString(true);
-		IPath path = new Path(fullPath);
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		return root.getFile(path);
 	}
 
 	/**

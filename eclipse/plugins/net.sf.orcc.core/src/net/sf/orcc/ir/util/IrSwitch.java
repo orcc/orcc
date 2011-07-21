@@ -836,15 +836,23 @@ public class IrSwitch<T> extends Switch<T> {
 	@Override
 	protected T doSwitch(int classifierID, EObject theEObject) {
 		switch (classifierID) {
+			case IrPackage.ENTITY: {
+				Entity entity = (Entity)theEObject;
+				T result = caseEntity(entity);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
 			case IrPackage.ACTOR: {
 				Actor actor = (Actor)theEObject;
 				T result = caseActor(actor);
+				if (result == null) result = caseEntity(actor);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.UNIT: {
 				Unit unit = (Unit)theEObject;
 				T result = caseUnit(unit);
+				if (result == null) result = caseEntity(unit);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -1145,6 +1153,21 @@ public class IrSwitch<T> extends Switch<T> {
 			}
 			default: return defaultCase(theEObject);
 		}
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Entity</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Entity</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseEntity(Entity object) {
+		return null;
 	}
 
 } //IrSwitch

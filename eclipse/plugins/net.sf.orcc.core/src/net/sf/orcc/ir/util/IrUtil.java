@@ -37,6 +37,7 @@ import java.util.Map;
 
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Def;
+import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
@@ -283,49 +284,50 @@ public class IrUtil {
 	}
 
 	/**
-	 * Serializes the given actor to the given output folder.
+	 * Serializes the given entity to the given output folder.
 	 * 
 	 * @param outputFolder
 	 *            an IFolder of the workspace
-	 * @param actor
-	 *            an actor
+	 * @param entity
+	 *            an entity
 	 * @return <code>true</code> if the serialization succeeded
 	 */
 	public static boolean serializeActor(ResourceSet set, IFolder outputFolder,
-			Actor actor) {
+			Entity entity) {
 		URI uri = URI.createPlatformResourceURI(outputFolder.getFullPath()
-				.append(OrccUtil.getFile(actor)).addFileExtension("ir")
+				.append(OrccUtil.getFile(entity)).addFileExtension("ir")
 				.toString(), true);
-		return serializeActor(set, uri, actor);
+		return serializeActor(set, uri, entity);
 	}
 
 	/**
-	 * Serializes the given actor to the given output folder.
+	 * Serializes the given entity to the given output folder.
 	 * 
 	 * @param outputFolder
 	 *            output folder
-	 * @param actor
-	 *            an actor
+	 * @param entity
+	 *            an entity
 	 * @return <code>true</code> if the serialization succeeded
 	 */
 	public static boolean serializeActor(ResourceSet set, String outputFolder,
-			Actor actor) {
+			Entity entity) {
 		String pathName = outputFolder + File.separator
-				+ OrccUtil.getFile(actor) + ".ir";
+				+ OrccUtil.getFile(entity) + ".ir";
 		URI uri = URI.createFileURI(pathName);
-		return serializeActor(set, uri, actor);
+		return serializeActor(set, uri, entity);
 	}
 
 	/**
-	 * Serializes the given actor to the given URI.
+	 * Serializes the given entity to the given URI.
 	 * 
 	 * @param uri
 	 *            URI
-	 * @param actor
-	 *            an actor
+	 * @param entity
+	 *            an entity
 	 * @return <code>true</code> if the serialization succeeded
 	 */
-	private static boolean serializeActor(ResourceSet set, URI uri, Actor actor) {
+	private static boolean serializeActor(ResourceSet set, URI uri,
+			Entity entity) {
 		// check that the factory is registered
 		// (only happens in command-line mode)
 		// ...
@@ -340,7 +342,7 @@ public class IrUtil {
 
 		// serialization
 		Resource resource = set.createResource(uri);
-		resource.getContents().add(actor);
+		resource.getContents().add(entity);
 		try {
 			resource.save(null);
 			return true;

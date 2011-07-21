@@ -29,7 +29,6 @@
 package net.sf.orcc.frontend;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -79,7 +78,6 @@ import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrccUtil;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -401,106 +399,95 @@ public class ActorTransformer {
 	/**
 	 * Transforms the given AST Actor to an IR actor.
 	 * 
-	 * @param file
-	 *            the .cal file where the actor is defined
 	 * @param astActor
 	 *            the AST of the actor
 	 * @return the actor in IR form
 	 */
-	public Actor transform(IFile file, AstActor astActor) {
+	public Actor transform(Frontend frontend, AstActor astActor) {
+		this.mapAstToIr = frontend.getMap();
+
 		Actor actor = IrFactory.eINSTANCE.createActor();
-		actor.setFileName(file.getFullPath().toString());
+		actor.setFileName(astActor.eResource().getURI().toPlatformString(true));
 
 		int lineNumber = Util.getLocation(astActor);
 		actor.setLineNumber(lineNumber);
 
-		astTransformer = new AstTransformer();
-		mapAstToIr = new HashMap<EObject, EObject>();
-		astTransformer.setMapAstToIr(mapAstToIr);
-		astTransformer.setLists(actor.getProcs(), actor.getParameters());
+		astTransformer = new AstTransformer(frontend, actor.getProcs());
 
-		try {
-			// parameters
-			for (AstVariable astVariable : astActor.getParameters()) {
-				astTransformer.transformGlobalVariable(astVariable);
-			}
-
-			// state variables
-			astTransformer.setLists(actor.getProcs(), actor.getStateVars());
-			for (AstVariable astVariable : astActor.getStateVariables()) {
-				astTransformer.transformGlobalVariable(astVariable);
-			}
-
-			// transform ports
-			transformPorts(actor.getInputs(), astActor.getInputs());
-			transformPorts(actor.getOutputs(), astActor.getOutputs());
-
-			// transform actions
-			ActionList actions = transformActions(astActor.getActions());
-
-			// transform initializes
-			ActionList initializes = transformActions(astActor.getInitializes());
-
-			// add call to initialize procedure (if any)
-			Procedure initialize = astTransformer.getInitialize();
-			if (initialize != null) {
-				actor.getProcs().add(initialize);
-
-				if (initializes.isEmpty()) {
-					Action action = createInitialize();
-					initializes.add(action);
-				}
-
-				for (Action action : initializes) {
-					NodeBlock block = action.getBody().getFirst();
-					List<Expression> params = new ArrayList<Expression>(0);
-					block.add(0, IrFactory.eINSTANCE.createInstCall(lineNumber,
-							null, initialize, params));
-				}
-			}
-
-			// sort actions by priority
-			ActionSorter sorter = new ActionSorter(actions);
-			ActionList sortedActions = sorter.applyPriority(astActor
-					.getPriorities());
-
-			// transform FSM
-			AstSchedule schedule = astActor.getSchedule();
-			AstScheduleRegExp scheduleRegExp = astActor.getScheduleRegExp();
-			if (schedule == null && scheduleRegExp == null) {
-				actor.getActionsOutsideFsm().addAll(
-						sortedActions.getAllActions());
-			} else {
-				FSM fsm = null;
-				if (schedule != null) {
-					FSMBuilder builder = new FSMBuilder(astActor.getSchedule());
-					fsm = builder.buildFSM(sortedActions);
-				} else {
-					RegExpConverter converter = new RegExpConverter(
-							scheduleRegExp);
-					fsm = converter.convert(sortedActions);
-				}
-
-				actor.getActionsOutsideFsm().addAll(
-						sortedActions.getUntaggedActions());
-				actor.setFsm(fsm);
-			}
-
-			// create IR actor
-			AstEntity entity = (AstEntity) astActor.eContainer();
-			actor.setName(net.sf.orcc.cal.util.Util.getQualifiedName(entity));
-			actor.setNative(entity.isNative());
-
-			actor.getActions().addAll(actions.getAllActions());
-			actor.getInitializes().addAll(initializes.getAllActions());
-
-			return actor;
-		} finally {
-			// cleanup
-			astTransformer = null;
-			mapAstToIr = null;
-			untaggedCount = 0;
+		// parameters
+		for (AstVariable astVariable : astActor.getParameters()) {
+			Var var = astTransformer.transformGlobalVariable(astVariable);
+			actor.getParameters().add(var);
 		}
+
+		// state variables
+		for (AstVariable astVariable : astActor.getStateVariables()) {
+			Var var = astTransformer.transformGlobalVariable(astVariable);
+			actor.getStateVars().add(var);
+		}
+
+		// transform ports
+		transformPorts(actor.getInputs(), astActor.getInputs());
+		transformPorts(actor.getOutputs(), astActor.getOutputs());
+
+		// transform actions
+		ActionList actions = transformActions(astActor.getActions());
+
+		// transform initializes
+		ActionList initializes = transformActions(astActor.getInitializes());
+
+		// add call to initialize procedure (if any)
+		Procedure initialize = astTransformer.getInitialize();
+		if (initialize != null) {
+			actor.getProcs().add(initialize);
+
+			if (initializes.isEmpty()) {
+				Action action = createInitialize();
+				initializes.add(action);
+			}
+
+			for (Action action : initializes) {
+				NodeBlock block = action.getBody().getFirst();
+				List<Expression> params = new ArrayList<Expression>(0);
+				block.add(0, IrFactory.eINSTANCE.createInstCall(lineNumber,
+						null, initialize, params));
+			}
+		}
+
+		// sort actions by priority
+		ActionSorter sorter = new ActionSorter(actions);
+		ActionList sortedActions = sorter.applyPriority(astActor
+				.getPriorities());
+
+		// transform FSM
+		AstSchedule schedule = astActor.getSchedule();
+		AstScheduleRegExp scheduleRegExp = astActor.getScheduleRegExp();
+		if (schedule == null && scheduleRegExp == null) {
+			actor.getActionsOutsideFsm().addAll(sortedActions.getAllActions());
+		} else {
+			FSM fsm = null;
+			if (schedule != null) {
+				FSMBuilder builder = new FSMBuilder(astActor.getSchedule());
+				fsm = builder.buildFSM(sortedActions);
+			} else {
+				RegExpConverter converter = new RegExpConverter(scheduleRegExp);
+				fsm = converter.convert(sortedActions);
+			}
+
+			actor.getActionsOutsideFsm().addAll(
+					sortedActions.getUntaggedActions());
+			actor.setFsm(fsm);
+		}
+
+		// create IR actor
+		AstEntity entity = (AstEntity) astActor.eContainer();
+		actor.setName(net.sf.orcc.cal.util.Util.getQualifiedName(entity));
+		actor.setNative(entity.isNative());
+
+		actor.getActions().addAll(actions.getAllActions());
+		actor.getInitializes().addAll(initializes.getAllActions());
+
+		return actor;
 	}
 
 	/**

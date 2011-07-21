@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstExpressionBinary;
 import net.sf.orcc.cal.cal.AstExpressionBoolean;
@@ -53,6 +54,7 @@ import net.sf.orcc.cal.cal.AstStatementCall;
 import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstStatementIf;
 import net.sf.orcc.cal.cal.AstStatementWhile;
+import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.services.AstExpressionEvaluator;
@@ -209,7 +211,7 @@ public class AstTransformer {
 			AstVariable astVariable = expression.getSource().getVariable();
 			Var var = (Var) mapAstToIr.get(astVariable);
 			if (var == null) {
-				var = transformGlobalVariable(astVariable);
+				var = getGlobalVariable(astVariable);
 			}
 
 			List<Expression> indexes = transformExpressions(expression
@@ -286,7 +288,7 @@ public class AstTransformer {
 
 			Var var = (Var) mapAstToIr.get(astVariable);
 			if (var == null) {
-				var = transformGlobalVariable(astVariable);
+				var = getGlobalVariable(astVariable);
 			}
 
 			if (var.getType().isList()) {
@@ -639,7 +641,7 @@ public class AstTransformer {
 			AstVariable astTarget = astAssign.getTarget().getVariable();
 			Var target = (Var) mapAstToIr.get(astTarget);
 			if (target == null) {
-				target = transformGlobalVariable(astTarget);
+				target = getGlobalVariable(astTarget);
 			}
 
 			// transform indexes and value
@@ -860,6 +862,8 @@ public class AstTransformer {
 	 */
 	final private ExpressionTransformer exprTransformer;
 
+	private Frontend frontend;
+
 	private Procedure initialize;
 
 	/**
@@ -875,11 +879,6 @@ public class AstTransformer {
 	private List<Procedure> procedures;
 
 	/**
-	 * list of variables of the IR target (actor/unit)
-	 */
-	private List<Var> variables;
-
-	/**
 	 * statement transformer.
 	 */
 	final private StatementTransformer stmtTransformer;
@@ -887,7 +886,11 @@ public class AstTransformer {
 	/**
 	 * Creates a new AST to IR transformation.
 	 */
-	public AstTransformer() {
+	public AstTransformer(Frontend frontend, List<Procedure> procedures) {
+		this.frontend = frontend;
+		this.mapAstToIr = frontend.getMap();
+		this.procedures = procedures;
+
 		exprTransformer = new ExpressionTransformer();
 		stmtTransformer = new StatementTransformer();
 
@@ -971,6 +974,15 @@ public class AstTransformer {
 	 */
 	public Context getContext() {
 		return context;
+	}
+
+	private Var getGlobalVariable(AstVariable variable) {
+		if (variable.eContainer() instanceof AstUnit) {
+			AstUnit astUnit = (AstUnit) variable.eContainer();
+			frontend.compile((AstEntity) astUnit.eContainer());
+			return (Var) mapAstToIr.get(variable);
+		}
+		return null;
 	}
 
 	/**
@@ -1062,18 +1074,6 @@ public class AstTransformer {
 	 */
 	public void restoreContext(Context context) {
 		this.context = context;
-	}
-
-	public void setMapAstToIr(Map<EObject, EObject> mapAstToIr) {
-		this.mapAstToIr = mapAstToIr;
-	}
-
-	/**
-	 * Sets the lists.
-	 */
-	public void setLists(List<Procedure> procedures, List<Var> variables) {
-		this.procedures = procedures;
-		this.variables = variables;
 	}
 
 	/**
@@ -1204,8 +1204,6 @@ public class AstTransformer {
 
 			restoreContext(oldContext);
 		}
-
-		variables.add(variable);
 
 		return variable;
 	}

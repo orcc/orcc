@@ -38,6 +38,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Entity;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -233,14 +234,14 @@ public class OrccUtil {
 
 	/**
 	 * Returns the file name that corresponds to the qualified name of the
-	 * actor.
+	 * actor/unit.
 	 * 
-	 * @param actor
-	 *            an actor
+	 * @param entity
+	 *            an actor/unit
 	 * @return the file name that corresponds to the qualified name of the actor
 	 */
-	public static String getFile(Actor actor) {
-		return actor.getName().replace('.', '/');
+	public static String getFile(Entity entity) {
+		return entity.getName().replace('.', '/');
 	}
 
 	/**

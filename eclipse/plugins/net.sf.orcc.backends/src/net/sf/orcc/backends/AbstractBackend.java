@@ -162,6 +162,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		network.instantiate(set, vtlFolders);
 		Network.clearActorPool();
 		write("Instantiation done\n");
+		
+		// need to import objects from unit into actors here
 
 		if (isCanceled()) {
 			return;
@@ -371,8 +373,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		ResourceSet set = new ResourceSetImpl();
 		List<Actor> actors = new ArrayList<Actor>();
 		for (IFile file : files) {
-			Resource resource = set.getResource(URI.createPlatformResourceURI(file
-					.getFullPath().toString(), true), true);
+			Resource resource = set.getResource(URI.createPlatformResourceURI(
+					file.getFullPath().toString(), true), true);
 			EObject eObject = resource.getContents().get(0);
 			if (eObject instanceof Actor) {
 				// do not add units

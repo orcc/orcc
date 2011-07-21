@@ -29,15 +29,14 @@
 package net.sf.orcc.ir;
 
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines a unit.
  * 
  * @author Matthieu Wipliez
- * @model
+ * @model extends="Entity"
  */
-public interface Unit extends EObject {
+public interface Unit extends Entity {
 
 	/**
 	 * Returns the constants contained in this unit.

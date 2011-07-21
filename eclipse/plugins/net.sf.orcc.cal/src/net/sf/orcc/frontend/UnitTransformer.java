@@ -28,18 +28,15 @@
  */
 package net.sf.orcc.frontend;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Unit;
-
-import org.eclipse.core.resources.IFile;
-import org.eclipse.emf.ecore.EObject;
+import net.sf.orcc.ir.Var;
 
 /**
  * This class transforms an AST unit to its IR equivalent.
@@ -52,29 +49,24 @@ public class UnitTransformer {
 	/**
 	 * Transforms the given AST unit to an IR unit.
 	 * 
-	 * @param file
-	 *            the .cal file where the unit is defined
 	 * @param astUnit
 	 *            the AST of the unit
 	 * @return the unit in IR form
 	 */
-	public Unit transform(IFile file, AstUnit astUnit) {
-		AstTransformer astTransformer = new AstTransformer();
+	public Unit transform(Frontend frontend, AstUnit astUnit) {
 		Unit unit = IrFactory.eINSTANCE.createUnit();
-		// TODO add file name
-		// unit.setFileName(file.getFullPath().toString());
+		unit.setFileName(astUnit.eResource().getURI().toPlatformString(true));
 
-		// TODO add line number
-		// int lineNumber = Util.getLocation(astUnit);
-		// unit.setLineNumber(lineNumber);
+		int lineNumber = Util.getLocation(astUnit);
+		unit.setLineNumber(lineNumber);
 
-		Map<EObject, EObject> mapAstToIr = new HashMap<EObject, EObject>();
-		astTransformer.setMapAstToIr(mapAstToIr);
-		astTransformer.setLists(unit.getProcedures(), unit.getConstants());
+		AstTransformer astTransformer = new AstTransformer(frontend,
+				unit.getProcedures());
 
 		// constants
 		for (AstVariable astVariable : astUnit.getVariables()) {
-			astTransformer.transformGlobalVariable(astVariable);
+			Var var = astTransformer.transformGlobalVariable(astVariable);
+			unit.getConstants().add(var);
 		}
 
 		// functions
@@ -87,9 +79,8 @@ public class UnitTransformer {
 			astTransformer.transformProcedure(procedure);
 		}
 
-		// TODO set unit name
-		// AstEntity entity = (AstEntity) astUnit.eContainer();
-		// unit.setName(net.sf.orcc.cal.util.Util.getQualifiedName(entity));
+		AstEntity entity = (AstEntity) astUnit.eContainer();
+		unit.setName(net.sf.orcc.cal.util.Util.getQualifiedName(entity));
 
 		return unit;
 	}

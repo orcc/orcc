@@ -28,13 +28,9 @@
  */
 package net.sf.orcc.ir;
 
-import java.util.List;
-
 import net.sf.orcc.moc.MoC;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines an actor. An actor has parameters, input and output ports,
@@ -43,9 +39,9 @@ import org.eclipse.emf.ecore.EObject;
  * in which actions should be scheduled.
  * 
  * @author Matthieu Wipliez
- * @model
+ * @model extends="Entity"
  */
-public interface Actor extends EObject {
+public interface Actor extends Entity {
 
 	/**
 	 * Returns all the actions of this actor.
@@ -64,21 +60,6 @@ public interface Actor extends EObject {
 	 * @model
 	 */
 	EList<Action> getActionsOutsideFsm();
-
-	/**
-	 * Returns the file this actor is defined in.
-	 * 
-	 * @return the file this actor is defined in
-	 */
-	IFile getFile();
-
-	/**
-	 * Returns the name of the file this actor is defined in.
-	 * 
-	 * @return the name of the file this actor is defined in
-	 * @model dataType="org.eclipse.emf.ecore.EString"
-	 */
-	String getFileName();
 
 	/**
 	 * Returns the FSM of this actor, or <code>null</code> if it does not have
@@ -115,28 +96,12 @@ public interface Actor extends EObject {
 	EList<Port> getInputs();
 
 	/**
-	 * Returns the line number on which this actor starts.
-	 * 
-	 * @return the line number on which this actor starts
-	 * @model
-	 */
-	public int getLineNumber();
-
-	/**
 	 * Returns the MoC of this actor.
 	 * 
 	 * @return an MoC
 	 * @model containment="true"
 	 */
 	MoC getMoC();
-
-	/**
-	 * Returns the name of this actor.
-	 * 
-	 * @return the name of this actor
-	 * @model dataType="org.eclipse.emf.ecore.EString"
-	 */
-	String getName();
 
 	/**
 	 * Returns the output port whose name matches the given name.
@@ -154,20 +119,6 @@ public interface Actor extends EObject {
 	 * @model containment="true"
 	 */
 	EList<Port> getOutputs();
-
-	/**
-	 * Returns the package of this actor.
-	 * 
-	 * @return the package of this actor
-	 */
-	String getPackage();
-
-	/**
-	 * Returns the package of this actor as a list of strings.
-	 * 
-	 * @return the package of this actor as a list of strings
-	 */
-	List<String> getPackageAsList();
 
 	/**
 	 * Returns the parameter with the given name.
@@ -213,13 +164,6 @@ public interface Actor extends EObject {
 	EList<Procedure> getProcs();
 
 	/**
-	 * Returns the simple name of this actor.
-	 * 
-	 * @return the simple name of this actor
-	 */
-	String getSimpleName();
-
-	/**
 	 * Returns the state variable with the given name.
 	 * 
 	 * @param name
@@ -235,13 +179,6 @@ public interface Actor extends EObject {
 	 * @model containment="true"
 	 */
 	EList<Var> getStateVars();
-
-	/**
-	 * Returns an object with template-specific data.
-	 * 
-	 * @return an object with template-specific data
-	 */
-	Object getTemplateData();
 
 	/**
 	 * Returns true if this actor has an FSM.
@@ -280,14 +217,6 @@ public interface Actor extends EObject {
 	void resetTokenProduction();
 
 	/**
-	 * Sets the name of the file in which this actor is defined.
-	 * 
-	 * @param fileName
-	 *            name of the file in which this actor is defined
-	 */
-	void setFileName(String fileName);
-
-	/**
 	 * Sets the FSM of this actor to the given FSM.
 	 * 
 	 * @param fsm
@@ -296,28 +225,12 @@ public interface Actor extends EObject {
 	void setFsm(FSM fsm);
 
 	/**
-	 * Sets the line number on which this actor starts.
-	 * 
-	 * @param newLineNumber
-	 *            the line number on which this actor starts
-	 */
-	public void setLineNumber(int newLineNumber);
-
-	/**
 	 * Sets the MoC of this actor.
 	 * 
 	 * @param moc
 	 *            an MoC
 	 */
 	void setMoC(MoC moc);
-
-	/**
-	 * Sets the name of this actor.
-	 * 
-	 * @param name
-	 *            the new name of this actor
-	 */
-	void setName(String name);
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.ir.Actor#isNative
@@ -330,14 +243,5 @@ public interface Actor extends EObject {
 	 * @generated
 	 */
 	void setNative(boolean value);
-
-	/**
-	 * Sets the template data associated with this actor. Template data should
-	 * hold data that is specific to a given template.
-	 * 
-	 * @param templateData
-	 *            an object with template-specific data
-	 */
-	void setTemplateData(Object templateData);
 
 }

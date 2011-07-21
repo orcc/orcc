@@ -32,17 +32,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.Unit;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrUtil;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
@@ -58,11 +57,11 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class Frontend {
 
-	private ResourceSet set;
+	private Map<EObject, EObject> mapAstToIr;
 
 	private IFolder outputFolder;
 
-	private Map<EObject, EObject> mapAstToIr;
+	private ResourceSet set;
 
 	public Frontend(IFolder outputFolder) {
 		this.outputFolder = outputFolder;
@@ -84,24 +83,38 @@ public class Frontend {
 	 *            AST of the actor
 	 * @throws OrccException
 	 */
-	public void compile(IFile file, AstEntity entity) {
-		try {
-			AstActor astActor = entity.getActor();
-			if (astActor != null) {
-				ActorTransformer transformer = new ActorTransformer();
-				Actor actor = transformer.transform(file, astActor);
-				mapAstToIr.put(astActor, actor);
-				removeDanglingUses(actor);
-				IrUtil.serializeActor(set, outputFolder, actor);
-			} else {
-				UnitTransformer transformer = new UnitTransformer();
-				AstUnit astUnit = entity.getUnit();
-				Unit unit = transformer.transform(file, astUnit);
-				mapAstToIr.put(astUnit, unit);
+	public Entity compile(AstEntity entity) {
+		AstActor astActor = entity.getActor();
+		if (astActor != null) {
+			Actor actor = (Actor) mapAstToIr.get(astActor);
+			if (actor != null) {
+				return actor;
 			}
-		} catch (OrccRuntimeException e) {
-			e.printStackTrace();
+
+			ActorTransformer transformer = new ActorTransformer();
+			actor = transformer.transform(this, astActor);
+			mapAstToIr.put(astActor, actor);
+			removeDanglingUses(actor);
+			IrUtil.serializeActor(set, outputFolder, actor);
+			return actor;
+		} else {
+			AstUnit astUnit = entity.getUnit();
+
+			Unit unit = (Unit) mapAstToIr.get(astUnit);
+			if (unit != null) {
+				return unit;
+			}
+
+			UnitTransformer transformer = new UnitTransformer();
+			unit = transformer.transform(this, astUnit);
+			mapAstToIr.put(astUnit, unit);
+			IrUtil.serializeActor(set, outputFolder, unit);
+			return unit;
 		}
+	}
+
+	public Map<EObject, EObject> getMap() {
+		return mapAstToIr;
 	}
 
 	/**

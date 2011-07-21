@@ -147,12 +147,23 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Entity createEntity() {
+		EntityImpl entity = new EntityImpl();
+		return entity;
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
+			case IrPackage.ENTITY: return createEntity();
 			case IrPackage.ACTOR: return createActor();
 			case IrPackage.UNIT: return createUnit();
 			case IrPackage.PORT: return createPort();

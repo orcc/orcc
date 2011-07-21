@@ -14,14 +14,9 @@ import net.sf.orcc.ir.Unit;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.common.notify.NotificationChain;
-
 import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-
-import org.eclipse.emf.ecore.impl.EObjectImpl;
-
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
@@ -38,7 +33,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *
  * @generated
  */
-public class UnitImpl extends EObjectImpl implements Unit {
+public class UnitImpl extends EntityImpl implements Unit {
 	/**
 	 * The cached value of the '{@link #getConstants() <em>Constants</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->

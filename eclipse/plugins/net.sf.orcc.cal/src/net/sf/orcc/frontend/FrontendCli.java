@@ -122,7 +122,7 @@ public class FrontendCli implements IApplication {
 
 		// only compile if there are no errors
 		if (!hasErrors) {
-			frontend.compile(actorPath, entity);
+			frontend.compile(entity);
 		}
 	}
 
