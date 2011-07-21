@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -47,6 +47,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -162,8 +163,21 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		network.instantiate(set, vtlFolders);
 		Network.clearActorPool();
 		write("Instantiation done\n");
-		
-		// need to import objects from unit into actors here
+
+		// because the UnitImporter will load additional resources, we filter
+		// only actors
+		List<Actor> actors = new ArrayList<Actor>();
+		for (Resource resource : set.getResources()) {
+			EObject eObject = resource.getContents().get(0);
+			if (eObject instanceof Actor) {
+				actors.add((Actor) eObject);
+			}
+		}
+
+		// and we import objects from unit into actors
+		for (Actor actor : actors) {
+			new UnitImporter().doSwitch(actor);
+		}
 
 		if (isCanceled()) {
 			return;
