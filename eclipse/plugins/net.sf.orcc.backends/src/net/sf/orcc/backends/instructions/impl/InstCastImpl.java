@@ -234,7 +234,7 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 		Type sourceType = source.getVariable().getType();
 		if (targetType.isList()) {
 			return sourceType.getClass() != ((TypeList) targetType)
-					.getElementType().getClass();
+					.getInnermostType().getClass();
 		} else {
 			return sourceType.getClass() != targetType.getClass();
 		}
@@ -270,13 +270,13 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 			return false;
 		}
 		if (sourceType.isList()) {
-			Type elementType = ((TypeList) source).getElementType();
+			Type elementType = ((TypeList) source).getInnermostType();
 			if (elementType.isUint() || elementType.isBool()) {
 				return false;
 			}
 		}
 		if (targetType.isList()) {
-			Type elementType = ((TypeList) targetType).getElementType();
+			Type elementType = ((TypeList) targetType).getInnermostType();
 			if (elementType.isUint() || elementType.isBool()) {
 				return false;
 			}

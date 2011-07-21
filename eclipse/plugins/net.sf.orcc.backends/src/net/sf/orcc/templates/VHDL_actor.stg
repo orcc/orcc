@@ -93,7 +93,7 @@ DP_genericRam_<variable.name> : entity work.DP_genericRam
   generic map (
     depth =\> <listSize(variable.type.dimensions)>,
     width =\> <variable.type.sizeInBits>,
-    initVal =\> <printValue(variable.type.elementType, actor.templateData.initValueMap.(variable))>)
+    initVal =\> <printValue(variable.type.innermostType, actor.templateData.initValueMap.(variable))>)
   port map (
     clk        =\> clock,
     wren_p1    =\> <variable.name>_wren_p1,
@@ -309,9 +309,9 @@ endif>
 ///////////////////////////////////////////////////////////////////////////////
 
 printRamRead(ramRead) ::= <<
-<ramRead.target.variable.indexedName> := <if(ramRead.variable.type.elementType.bool)
+<ramRead.target.variable.indexedName> := <if(ramRead.variable.type.innermostType.bool)
 ><ramRead.variable.name>_q_p<ramRead.port>(0);<
-elseif(ramRead.variable.type.elementType.int)
+elseif(ramRead.variable.type.innermostType.int)
 >to_integer(signed(<ramRead.variable.name>_q_p<ramRead.port>));<
 else
 >to_integer(unsigned(<ramRead.variable.name>_q_p<ramRead.port>));<
@@ -319,12 +319,12 @@ endif>
 >>
 
 printRamWrite(ramWrite) ::= <<
-<ramWrite.variable.name>_data_p<ramWrite.port><if(ramWrite.variable.type.elementType.bool)
+<ramWrite.variable.name>_data_p<ramWrite.port><if(ramWrite.variable.type.innermostType.bool)
 >(0) \<= <ramWrite.value>;
-<elseif(ramWrite.variable.type.elementType.int)
-> \<= std_logic_vector(to_signed(<ramWrite.value>, <ramWrite.variable.type.elementType.size>));
+<elseif(ramWrite.variable.type.innermostType.int)
+> \<= std_logic_vector(to_signed(<ramWrite.value>, <ramWrite.variable.type.innermostType.size>));
 <else
-> \<= std_logic_vector(to_unsigned(<ramWrite.value>, <ramWrite.variable.type.elementType.size>));
+> \<= std_logic_vector(to_unsigned(<ramWrite.value>, <ramWrite.variable.type.innermostType.size>));
 <endif>
 <ramWrite.variable.name>_wren_p<ramWrite.port> \<= '1';
 >>

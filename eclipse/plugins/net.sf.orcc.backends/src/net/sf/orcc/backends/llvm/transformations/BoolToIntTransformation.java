@@ -48,7 +48,7 @@ public class BoolToIntTransformation extends AbstractActorVisitor<Object> {
 
 	private void changeType(Var var) {
 		TypeList listType = (TypeList) var.getType();
-		if (listType.getElementType().isBool()) {
+		if (listType.getInnermostType().isBool()) {
 			listType.setType(IrFactory.eINSTANCE.createTypeInt(8));
 		}
 	}

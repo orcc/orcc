@@ -154,7 +154,7 @@ public class ValueUtil {
 			dimensions[i] = listDimensions.get(i);
 		}
 
-		Type eltType = ((TypeList) type).getElementType();
+		Type eltType = ((TypeList) type).getInnermostType();
 		return createArray(eltType, dimensions);
 	}
 

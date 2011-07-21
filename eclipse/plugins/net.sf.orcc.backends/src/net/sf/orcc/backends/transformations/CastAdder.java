@@ -206,7 +206,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 		} else {
 			// Load from an array variable
 			uncastedType = IrUtil.copy(((TypeList) source.getType())
-					.getElementType());
+					.getInnermostType());
 		}
 
 		if (needCast(target.getType(), uncastedType)) {
@@ -285,7 +285,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 		} else {
 			// Store to an array variable
 			parentType = ((TypeList) store.getTarget().getVariable().getType())
-					.getElementType();
+					.getInnermostType();
 		}
 		store.setValue(doSwitch(store.getValue()));
 		parentType = oldParentType;
@@ -411,8 +411,8 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 					return true;
 				}
 			}
-			return needCast(typeList1.getElementType(),
-					typeList2.getElementType());
+			return needCast(typeList1.getInnermostType(),
+					typeList2.getInnermostType());
 		} else {
 			return (type1.getSizeInBits() != type2.getSizeInBits())
 					|| (castToUnsigned && type1.getClass() != type2.getClass())

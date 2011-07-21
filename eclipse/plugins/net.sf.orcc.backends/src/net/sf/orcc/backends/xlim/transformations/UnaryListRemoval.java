@@ -121,7 +121,7 @@ public class UnaryListRemoval extends AbstractActorVisitor<Object> {
 
 	private Var createScalarVariable(Var listVar, Procedure procedure) {
 		Var scalarVar = procedure.newTempLocalVariable(
-				((TypeList) listVar.getType()).getElementType(), "scalar_"
+				((TypeList) listVar.getType()).getInnermostType(), "scalar_"
 						+ listVar.getName());
 		scalarVar.setAssignable(true);
 		scalarVar.setIndex(1);

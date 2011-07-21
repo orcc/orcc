@@ -70,7 +70,7 @@ public class ArchitectureMemoryStats {
 	private static int getSize(Type type) {
 		int size;
 		if (type.isList()) {
-			size = getSize(((TypeList) type).getElementType());
+			size = getSize(((TypeList) type).getInnermostType());
 			for (int dim : type.getDimensions()) {
 				size *= dim;
 			}

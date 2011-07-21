@@ -222,7 +222,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 					indexes[i++] = exprInterpreter.doSwitch(index);
 				}
 
-				Type type = ((TypeList) source.getType()).getElementType();
+				Type type = ((TypeList) source.getType()).getInnermostType();
 				Object value = ValueUtil.get(type, array, indexes);
 				target.setValue(value);
 			} catch (IndexOutOfBoundsException e) {
@@ -270,7 +270,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 					indexes[i++] = exprInterpreter.doSwitch(index);
 				}
 
-				Type type = ((TypeList) target.getType()).getElementType();
+				Type type = ((TypeList) target.getType()).getInnermostType();
 				ValueUtil.set(type, array, value, indexes);
 			} catch (IndexOutOfBoundsException e) {
 				throw new OrccRuntimeException(

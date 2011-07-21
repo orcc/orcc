@@ -43,24 +43,23 @@ public interface TypeList extends Type {
 	public static final String NAME = "List";
 
 	/**
-	 * Returns the element type of this list, which is the innermost type of the
-	 * list declaration.
+	 * Returns the innermost type of this List type declaration.
 	 * 
 	 * <p>
-	 * The difference between the "type" and the "element type" of a list is as
-	 * follows: given a list
+	 * The difference between the "type" of a list and the "innermost type" of a
+	 * list is as follows: given a list
 	 * <code>List(type: List(type: uint(size=3), size=59), size=42)</code>
 	 * </p>
 	 * <ul>
 	 * <li>
 	 * type is <code>List(type: uint(size=3), size=59)</code></li>
 	 * <li>
-	 * element type is <code>uint(size=3)</code></li>
+	 * innermost type is <code>uint(size=3)</code></li>
 	 * </ul>
 	 * 
-	 * @return the element type of this list
+	 * @return the innermost type of this List type
 	 */
-	Type getElementType();
+	Type getInnermostType();
 
 	/**
 	 * Returns the number of elements of this list type.

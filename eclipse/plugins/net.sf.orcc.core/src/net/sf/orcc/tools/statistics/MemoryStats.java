@@ -127,7 +127,7 @@ public class MemoryStats {
 		} else if (type.isInt()) {
 			size = ((TypeInt) type).getSize();
 		} else if (type.isList()) {
-			size = getSize(((TypeList) type).getElementType());
+			size = getSize(((TypeList) type).getInnermostType());
 			for (int dim : type.getDimensions()) {
 				size *= dim;
 			}

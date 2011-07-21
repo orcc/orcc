@@ -164,7 +164,7 @@ public class VHDLTemplateData {
 		for (Var variable : actor.getStateVars()) {
 			if (variable.getType().isList() && variable.isAssignable()) {
 				TypeList typeList = (TypeList) variable.getType();
-				Type eltType = typeList.getElementType();
+				Type eltType = typeList.getInnermostType();
 
 				boolean customInit = false;
 				if (variable.getValue() == null) {

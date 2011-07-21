@@ -49,7 +49,7 @@ public class PromelaTypePrinter extends TypePrinter {
 	@Override
 	public String caseTypeList(TypeList type) {
 		// size will be printed later
-		return doSwitch(type.getElementType());
+		return doSwitch(type.getInnermostType());
 	}
 
 	@Override

@@ -103,7 +103,7 @@ public class ExpressionEvaluator extends IrSwitch<Object> {
 		Type type = (TypeList) expr.getType();
 		if (eltType == null) {
 			rootExpr = expr;
-			eltType = ((TypeList) type).getElementType();
+			eltType = ((TypeList) type).getInnermostType();
 		}
 
 		List<Integer> listDimensions = type.getDimensions();

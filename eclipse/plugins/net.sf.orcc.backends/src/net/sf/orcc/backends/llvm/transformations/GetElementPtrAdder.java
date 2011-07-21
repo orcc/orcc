@@ -75,7 +75,7 @@ public class GetElementPtrAdder extends AbstractActorVisitor<Object> {
 		if (!indexes.isEmpty()) {
 			TypeList typeList = (TypeList) source.getType();
 			
-			Var newSource = addGEP(source, typeList.getElementType(), indexes,
+			Var newSource = addGEP(source, typeList.getInnermostType(), indexes,
 					load.getBlock());
 
 			load.setSource(IrFactory.eINSTANCE.createUse(newSource));
@@ -91,7 +91,7 @@ public class GetElementPtrAdder extends AbstractActorVisitor<Object> {
 		if (!indexes.isEmpty()) {
 			TypeList typeList = (TypeList) target.getType();
 
-			Var newTarget = addGEP(target, typeList.getElementType(), indexes,
+			Var newTarget = addGEP(target, typeList.getInnermostType(), indexes,
 					store.getBlock());
 
 			store.setTarget(IrFactory.eINSTANCE.createDef(newTarget));

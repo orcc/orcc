@@ -427,7 +427,7 @@ varType_MD(type) ::= <<
 <if(type.int)> i32 <type.size> <
 elseif(type.uint)> i32 <type.size> <
 elseif(type.bool)> i32 1 < 
-elseif(type.list)><varType_MD(type.elementType)><
+elseif(type.list)><varType_MD(type.innermostType)><
 elseif(type.string)> i32 8 <
 endif>
 >>

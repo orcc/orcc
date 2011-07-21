@@ -56,7 +56,7 @@ public class ListDeclarationTransformation extends AbstractActorVisitor<Object> 
 		for (Var variable : actor.getStateVars()) {
 			if (variable.getType().isList() && variable.isInitialized()) {
 				TypeList typeList = (TypeList) variable.getType();
-				Type eltType = typeList.getElementType();
+				Type eltType = typeList.getInnermostType();
 
 				// compute total size
 				int size = 1;

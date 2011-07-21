@@ -180,7 +180,7 @@ public class AstTransformer {
 				if (target != null) {
 					type = target.getType();
 					if (type.isList()) {
-						type = ((TypeList) type).getElementType();
+						type = ((TypeList) type).getInnermostType();
 					}
 				}
 

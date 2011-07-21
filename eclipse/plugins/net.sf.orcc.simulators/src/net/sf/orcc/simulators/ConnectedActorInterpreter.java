@@ -168,7 +168,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 			Fifo fifo = inputFifos.get(port);
 
 			Var variable = inputPattern.getVariable(port);
-			Type type = ((TypeList) variable.getType()).getElementType();
+			Type type = ((TypeList) variable.getType()).getInnermostType();
 			Object array = variable.getValue();
 			for (int i = 0; i < numTokens; i++) {
 				Object value = fifo.read();
@@ -184,7 +184,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 			List<Fifo> fifos = outputFifos.get(port);
 
 			Var variable = outputPattern.getVariable(port);
-			Type type = ((TypeList) variable.getType()).getElementType();
+			Type type = ((TypeList) variable.getType()).getInnermostType();
 			Object array = variable.getValue();
 			for (int i = 0; i < numTokens; i++) {
 				Object value = ValueUtil.get(type, array, i);
@@ -225,7 +225,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 						.getType()));
 			}
 
-			Type type = ((TypeList) peeked.getType()).getElementType();
+			Type type = ((TypeList) peeked.getType()).getInnermostType();
 			Object array = peeked.getValue();
 			for (int i = 0; i < numTokens; i++) {
 				Object value = fifo.peek(i);

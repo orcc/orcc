@@ -229,9 +229,9 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 	}
 
 	@Override
-	public Type getElementType() {
+	public Type getInnermostType() {
 		if (type.isList()) {
-			return ((TypeList) type).getElementType();
+			return ((TypeList) type).getInnermostType();
 		}
 		return type;
 	}
