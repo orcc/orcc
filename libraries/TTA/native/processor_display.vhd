@@ -41,7 +41,7 @@ entity processor_display is
       status_3_in  : in  std_logic_vector(8 downto 0);
       ack_3_in     : out std_logic;
       reset_n      : in  std_logic;
-      		out_leds :  OUT  STD_LOGIC_VECTOR(7 DOWNTO 0)
+      out_leds     : out std_logic_vector(7 downto 0)
       );
 end processor_display;
 
