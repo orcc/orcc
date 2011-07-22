@@ -29,7 +29,7 @@ public class ArchitectureMemoryStats {
 		}
 		// Compute memory size needed by the actions
 		for (Action action : actor.getActions()) {
-			neededMemorySize += 1.5 * computeNeededMemorySize(action);
+			neededMemorySize += computeNeededMemorySize(action) * 1.3;
 		}
 		return neededMemorySize;
 	}

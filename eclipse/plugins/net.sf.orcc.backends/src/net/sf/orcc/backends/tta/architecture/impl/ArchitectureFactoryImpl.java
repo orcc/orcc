@@ -1122,7 +1122,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	public TTA createTTASpecialized(String name, Instance instance) {
 		// Create default TTA processor
 		TTA tta = createTTADefault(name);
-		int errorMargin = 16;
 		if (instance.isActor()) {
 			// Add needed stream units
 			for (int i = 0; i < instance.getActor().getInputs().size(); i++) {
@@ -1134,7 +1133,12 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 			// Set ram size = memory estimation / word size + error margin
 			int ramSize = ArchitectureMemoryStats
 					.computeNeededMemorySize(instance.getActor());
-			tta.getData().setMaxAddress((ramSize / 8) + errorMargin);
+			if(ramSize == 0){
+				tta.getData().setMaxAddress(256);
+			} else {
+				tta.getData().setMaxAddress(ramSize / 8 + 256);
+			}
+			
 		} else if (instance.isBroadcast()) {
 			// Add needed stream units
 			tta.getFunctionUnits().add(createStreamInput(tta, 1));
@@ -1142,7 +1146,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 				tta.getFunctionUnits().add(createStreamOutput(tta, i + 1));
 			}
 			// Set ram size = memory estimation / word size + error margin
-			tta.getData().setMaxAddress(errorMargin);
+			tta.getData().setMaxAddress(64);
 		}
 		return tta;
 	}
