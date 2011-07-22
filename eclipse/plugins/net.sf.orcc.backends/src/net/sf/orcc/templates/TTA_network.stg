@@ -29,7 +29,7 @@ library work;
 entity top is
   port
     (
-      hw_clk : in  std_logic;
+      clk : in  std_logic;
       button : in  std_logic_vector(1 to 1);
       leds   : out std_logic_vector(7 downto 0)
       );
@@ -88,7 +88,7 @@ begin
     generic map(counter_max =\> 100000,
                 preset_val  =\> 0
                 )
-    port map(clk      =\> hw_clk,
+    port map(clk      =\> clk,
              rst_n    =\> system_vcc,
              data_in  =\> button(1),
              data_out =\> system_reset_n);
@@ -201,7 +201,7 @@ assignFifo(connection) ::= <<
 fifo_<indexFifo(connection)> : tta_fifo
   port map(wrreq   =\> fifo_<indexFifo(connection)>_wrreq,
            reset_n =\> system_reset_n,
-           clk     =\> hw_clk,
+           clk     =\> clk,
            rdreq   =\> fifo_<indexFifo(connection)>_rdreq,
            data    =\> fifo_<indexFifo(connection)>_data,
            q       =\> fifo_<indexFifo(connection)>_q,
@@ -214,7 +214,7 @@ assignInstances(instances) ::= <<
 
 assignInstance(instance) ::= <<
 <instance.id>_inst : processor_<instance.id>
-  port map(clk          =\> hw_clk,
+  port map(clk          =\> clk,
            <assignPorts(instance)>
            reset_n      =\> system_reset_n);
 >>
