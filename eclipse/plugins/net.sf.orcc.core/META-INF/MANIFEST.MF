@@ -16,7 +16,6 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .
 Bundle-Vendor: IETR/INSA Rennes
 Export-Package: net.sf.orcc,
- net.sf.orcc.interpreter,
  net.sf.orcc.ir,
  net.sf.orcc.ir.impl,
  net.sf.orcc.ir.transformations,
