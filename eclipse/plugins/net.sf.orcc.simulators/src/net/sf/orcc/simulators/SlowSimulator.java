@@ -46,12 +46,9 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.transformations.DeadCodeElimination;
-import net.sf.orcc.ir.transformations.DeadGlobalElimination;
-import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 import net.sf.orcc.ir.util.ActorInterpreter;
-import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
+import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -69,7 +66,6 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.jgrapht.DirectedGraph;
 
 import std.io.impl.Source;
@@ -103,9 +99,9 @@ public class SlowSimulator extends AbstractSimulator {
 
 	protected void connectActors(Port srcPort, Port tgtPort, int fifoSize) {
 		Fifo fifo = new Fifo(srcPort.getType(), fifoSize);
-		
+
 		inputFifos.put(tgtPort, fifo);
-		
+
 		List<Fifo> fifos = outputFifos.get(srcPort);
 		if (fifos == null) {
 			fifos = new ArrayList<Fifo>();
@@ -192,15 +188,15 @@ public class SlowSimulator extends AbstractSimulator {
 		for (Vertex vertex : graph.vertexSet()) {
 			if (vertex.isInstance()) {
 				Instance instance = vertex.getInstance();
-				Actor clonedActor = EcoreUtil.copy(instance.getActor());
+				Actor actor = instance.getActor();
+
+				// copy actor with references (in case it references units)
+				Actor clonedActor = IrUtil.copy(actor);
 				instance.setContents(clonedActor);
 
-				ActorVisitor<?>[] transformations = {
-						new DeadGlobalElimination(), new DeadCodeElimination(),
-						new DeadVariableRemoval() };
-				for (ActorVisitor<?> transformation : transformations) {
-					transformation.doSwitch(clonedActor);
-				}
+				// add the cloned actor to the resource of the original actor.
+				// the interpreter will need that information
+				actor.eResource().getContents().add(clonedActor);
 
 				ConnectedActorInterpreter interpreter = new ConnectedActorInterpreter(
 						clonedActor, instance.getParameters(),
@@ -241,7 +237,7 @@ public class SlowSimulator extends AbstractSimulator {
 			interpreters = new HashMap<Instance, ActorInterpreter>();
 			inputFifos = new HashMap<Port, Fifo>();
 			outputFifos = new HashMap<Port, List<Fifo>>();
-			
+
 			IFile file = OrccUtil.getFile(project, xdfFile, "xdf");
 			Network network = new XDFParser(file).parseNetwork();
 
