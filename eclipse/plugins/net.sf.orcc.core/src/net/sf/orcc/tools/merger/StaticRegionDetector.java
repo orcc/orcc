@@ -73,10 +73,15 @@ public class StaticRegionDetector {
 		graph = network.getGraph();
 	}
 
-	private boolean checkCycles(DirectedGraph<Vertex, Connection> graph,
+	/**
+	 * 
+	 * @param graph
+	 * @param vertices
+	 * @return
+	 */
+	private boolean introduceCycle(DirectedGraph<Vertex, Connection> graph,
 			List<Vertex> vertices) {
-
-		boolean ret = true;
+		boolean ret = false;
 
 		int inIndex = 0;
 		int outIndex = 0;
@@ -106,7 +111,6 @@ public class StaticRegionDetector {
 			Vertex tgtVertex = graph.getEdgeTarget(edge);
 
 			if (!vertices.contains(srcVertex) && vertices.contains(tgtVertex)) {
-
 				Port tgtPort = IrFactory.eINSTANCE.createPort(edge.getTarget());
 				tgtPort.setName("input_" + outIndex++);
 				cluster.getInputs().add(tgtPort);
@@ -115,7 +119,6 @@ public class StaticRegionDetector {
 				clusteredGraph.addEdge(srcVertex, clusterVertex, incoming);
 			} else if (vertices.contains(srcVertex)
 					&& !vertices.contains(tgtVertex)) {
-
 				Port srcPort = IrFactory.eINSTANCE.createPort(edge.getSource());
 				srcPort.setName("output_" + inIndex++);
 				cluster.getOutputs().add(srcPort);
@@ -136,7 +139,7 @@ public class StaticRegionDetector {
 					for (Vertex v : scc) {
 						MoC clasz = v.getInstance().getMoC();
 						if (!clasz.isCSDF()) {
-							ret = false;
+							ret = true;
 						}
 					}
 				}
@@ -158,8 +161,8 @@ public class StaticRegionDetector {
 
 		while (!stack.isEmpty()) {
 			Vertex v = stack.pop();
-			MoC clasz = v.getInstance().getMoC();
-			if (clasz.isCSDF()) {
+			MoC moc = v.getInstance().getMoC();
+			if (moc.isCSDF()) {
 				if (!discovered.contains(v)) {
 					discovered.add(v);
 					if (vertices != null) {
@@ -169,13 +172,13 @@ public class StaticRegionDetector {
 					finished.add(v);
 					for (Connection edge : graph.outgoingEdgesOf(v)) {
 						Vertex tgtVertex = graph.getEdgeTarget(edge);
-						clasz = tgtVertex.getInstance().getMoC();
-						if (!discovered.contains(tgtVertex) && clasz.isCSDF()) {
+						moc = tgtVertex.getInstance().getMoC();
+						if (!discovered.contains(tgtVertex) && moc.isCSDF()) {
 							if (vertices != null) {
 								List<Vertex> l = new LinkedList<Vertex>(
 										vertices);
 								l.add(tgtVertex);
-								if (checkCycles(graph, l)) {
+								if (!introduceCycle(graph, l)) {
 									stack.push(tgtVertex);
 								}
 							}
@@ -193,11 +196,9 @@ public class StaticRegionDetector {
 	 * 
 	 */
 	public Set<Set<Vertex>> staticRegionSets() {
-
 		staticRegionSet = new HashSet<Set<Vertex>>();
 		List<List<Vertex>> staticRegionList = new ArrayList<List<Vertex>>();
 
-		// 1) orders vertices according to finishing time.
 		discovered = new HashSet<Vertex>();
 		finished = new HashSet<Vertex>();
 

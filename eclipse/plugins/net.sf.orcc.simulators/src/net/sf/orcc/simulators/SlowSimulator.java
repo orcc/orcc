@@ -103,9 +103,9 @@ public class SlowSimulator extends AbstractSimulator {
 
 	protected void connectActors(Port srcPort, Port tgtPort, int fifoSize) {
 		Fifo fifo = new Fifo(srcPort.getType(), fifoSize);
-		// inputFifos.put(srcPort, fifo);
+		
 		inputFifos.put(tgtPort, fifo);
-
+		
 		List<Fifo> fifos = outputFifos.get(srcPort);
 		if (fifos == null) {
 			fifos = new ArrayList<Fifo>();
@@ -192,25 +192,22 @@ public class SlowSimulator extends AbstractSimulator {
 		for (Vertex vertex : graph.vertexSet()) {
 			if (vertex.isInstance()) {
 				Instance instance = vertex.getInstance();
-				if (instance.isActor()) {
-					Actor clonedActor = EcoreUtil.copy(instance.getActor());
-					instance.setContents(clonedActor);
+				Actor clonedActor = EcoreUtil.copy(instance.getActor());
+				instance.setContents(clonedActor);
 
-					ActorVisitor<?>[] transformations = {
-							new DeadGlobalElimination(),
-							new DeadCodeElimination(),
-							new DeadVariableRemoval() };
-					for (ActorVisitor<?> transformation : transformations) {
-						transformation.doSwitch(clonedActor);
-					}
-
-					ConnectedActorInterpreter interpreter = new ConnectedActorInterpreter(
-							clonedActor, instance.getParameters(),
-							getWriteListener());
-
-					interpreters.put(instance, interpreter);
-					interpreter.setFifos(inputFifos, outputFifos);
+				ActorVisitor<?>[] transformations = {
+						new DeadGlobalElimination(), new DeadCodeElimination(),
+						new DeadVariableRemoval() };
+				for (ActorVisitor<?> transformation : transformations) {
+					transformation.doSwitch(clonedActor);
 				}
+
+				ConnectedActorInterpreter interpreter = new ConnectedActorInterpreter(
+						clonedActor, instance.getParameters(),
+						getWriteListener());
+
+				interpreters.put(instance, interpreter);
+				interpreter.setFifos(inputFifos, outputFifos);
 			}
 		}
 	}
@@ -242,13 +239,10 @@ public class SlowSimulator extends AbstractSimulator {
 	public void start(String mode) {
 		try {
 			interpreters = new HashMap<Instance, ActorInterpreter>();
-
 			inputFifos = new HashMap<Port, Fifo>();
-
 			outputFifos = new HashMap<Port, List<Fifo>>();
-
+			
 			IFile file = OrccUtil.getFile(project, xdfFile, "xdf");
-
 			Network network = new XDFParser(file).parseNetwork();
 
 			// Instantiate the network

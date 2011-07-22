@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir.util;
 
+import java.lang.reflect.Array;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +84,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	 * Actor's constant parameters to be set at initialization time
 	 */
 	private Map<String, Expression> parameters;
-	
+
 	/**
 	 * Creates a new interpreter with no actor and no parameters.
 	 * 
@@ -438,7 +439,16 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 					}
 				} else {
 					// initialize
-					stateVar.setValue(exprInterpreter.doSwitch(initConst));
+					if (type.isList()) {
+						Object array = ValueUtil.createArray((TypeList) type);
+						Object values = exprInterpreter.doSwitch(initConst);
+						for(int i=0; i<Array.getLength(array); i++) {
+							Array.set(array, i, Array.get(values, i));
+						}
+						stateVar.setValue(array);
+					} else {
+						stateVar.setValue(exprInterpreter.doSwitch(initConst));
+					}
 				}
 			}
 
