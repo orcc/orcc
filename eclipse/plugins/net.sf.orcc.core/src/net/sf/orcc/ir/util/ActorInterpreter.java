@@ -55,8 +55,13 @@ import net.sf.orcc.ir.Transition;
 import net.sf.orcc.ir.Transitions;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.Unit;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.util.OrccUtil;
+
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 
 /**
  * This class defines an interpreter for an actor. The interpreter can
@@ -419,35 +424,30 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	 */
 	public void initialize() {
 		try {
-			// Initialize actors parameters with instance map
+			// initializes actors parameters from instance map
 			for (Var param : actor.getParameters()) {
 				Expression value = parameters.get(param.getName());
 				param.setValue(exprInterpreter.doSwitch(value));
 			}
 
-			// Check for List state variables which need to be allocated or
-			// initialized
+			// initializes state variables
 			for (Var stateVar : actor.getStateVars()) {
-				Type type = stateVar.getType();
-				// Initialize variables with constant values
-				Expression initConst = stateVar.getInitialValue();
-				if (initConst == null) {
-					if (type.isList()) {
-						// Allocate empty array variable
-						stateVar.setValue(ValueUtil
-								.createArray((TypeList) type));
-					}
-				} else {
-					// initialize
-					if (type.isList()) {
-						Object array = ValueUtil.createArray((TypeList) type);
-						Object values = exprInterpreter.doSwitch(initConst);
-						for(int i=0; i<Array.getLength(array); i++) {
-							Array.set(array, i, Array.get(values, i));
+				initializeVar(stateVar);
+			}
+
+			// initializes runtime value of constants declared in units
+			Resource resource = actor.eResource();
+			if (resource != null) {
+				ResourceSet set = resource.getResourceSet();
+				for (Resource res : set.getResources()) {
+					EObject eObject = res.getContents().get(0);
+					if (eObject instanceof Unit) {
+						Unit unit = (Unit) eObject;
+						for (Var var : unit.getConstants()) {
+							if (var.getValue() == null) {
+								initializeVar(var);
+							}
 						}
-						stateVar.setValue(array);
-					} else {
-						stateVar.setValue(exprInterpreter.doSwitch(initConst));
 					}
 				}
 			}
@@ -462,6 +462,35 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 		} catch (OrccRuntimeException ex) {
 			throw new OrccRuntimeException("Runtime exception thrown by actor "
 					+ actor.getName(), ex);
+		}
+	}
+
+	/**
+	 * Initializes the given variable.
+	 * 
+	 * @param variable
+	 *            a variable
+	 */
+	private void initializeVar(Var variable) {
+		Type type = variable.getType();
+		Expression initConst = variable.getInitialValue();
+		if (initConst == null) {
+			if (type.isList()) {
+				// Allocate empty array variable
+				variable.setValue(ValueUtil.createArray((TypeList) type));
+			}
+		} else {
+			// initialize
+			if (type.isList()) {
+				Object array = ValueUtil.createArray((TypeList) type);
+				Object values = exprInterpreter.doSwitch(initConst);
+				for (int i = 0; i < Array.getLength(array); i++) {
+					Array.set(array, i, Array.get(values, i));
+				}
+				variable.setValue(array);
+			} else {
+				variable.setValue(exprInterpreter.doSwitch(initConst));
+			}
 		}
 	}
 
