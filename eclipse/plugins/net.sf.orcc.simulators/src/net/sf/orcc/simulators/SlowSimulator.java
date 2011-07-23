@@ -224,11 +224,12 @@ public class SlowSimulator extends AbstractSimulator {
 
 				// check for cancelation
 				if (isCanceled()) {
-					return;
+					break;
 				}
 			}
 			isAlive = hasExecuted;
 		} while (isAlive);
+		SimulatorDescriptor.killDescriptors();
 	}
 
 	@Override

@@ -35,6 +35,7 @@ import java.util.Map;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Pattern;
@@ -98,10 +99,14 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		}
 
 		String methodName = procedure.getName();
+
 		try {
-			String packageName = actor.getPackage() + ".impl";
-			Class<?> clasz = Class.forName(packageName + "."
-					+ actor.getSimpleName());
+			// get packageName and containerName for calling the correct native function
+			Entity entity = (Entity) procedure.eContainer();
+			String packageName = entity.getPackage() + ".impl";
+			String containerName = entity.getSimpleName();
+
+			Class<?> clasz = Class.forName(packageName + "." + containerName);
 			Method method = clasz
 					.getMethod(procedure.getName(), parameterTypes);
 			return method.invoke(null, args);
