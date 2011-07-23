@@ -37,7 +37,7 @@ import net.sf.orcc.simulators.SimulatorDescriptor;
 /**
  * This class defines native functions for the File unit.
  * 
- * This class use the SimulatorDecriptor class to handle descriptors. 
+ * This class uses the SimulatorDecriptor class to handle descriptors.
  * 
  * @author Thavot Richard
  * 
@@ -132,6 +132,18 @@ public class File {
 				throw new RuntimeException(msg, e);
 			}
 		}
+	}
+
+	public static Integer filePointer(Integer desc) {
+		if (SimulatorDescriptor.containsFile(desc)) {
+			try {
+				return (int) SimulatorDescriptor.getFile(desc).getFilePointer();
+			} catch (IOException e) {
+				String msg = "I/O error : filePointer function";
+				throw new RuntimeException(msg, e);
+			}
+		}
+		return 0;
 	}
 
 }
