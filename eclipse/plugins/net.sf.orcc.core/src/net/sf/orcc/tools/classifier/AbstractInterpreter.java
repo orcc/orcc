@@ -43,6 +43,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.ActorInterpreter;
+import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.moc.CSDFMoC;
 
@@ -84,8 +85,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 
 		// create a copier, and copy the original actor
 		copier = new EcoreUtil.Copier();
-		Actor copyOfActor = (Actor) copier.copy(actor);
-		copier.copyReferences();
+		Actor copyOfActor = IrUtil.copy(copier, actor);
 
 		// save actions of the original actor
 		originalActions = new HashMap<Action, Action>();

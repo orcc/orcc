@@ -159,12 +159,13 @@ public class IrUtil {
 	/**
 	 * Returns a deep copy of the given expression, and updates uses.
 	 * 
+	 * @param copier
+	 *            a copier
 	 * @param expression
 	 *            an expression
 	 * @return a deep copy of the given expression with uses correctly updated
 	 */
-	public static <T extends EObject> T copy(T eObject) {
-		Copier copier = new Copier();
+	public static <T extends EObject> T copy(Copier copier, T eObject) {
 		@SuppressWarnings("unchecked")
 		T result = (T) copier.copy(eObject);
 		copier.copyReferences();
@@ -189,6 +190,17 @@ public class IrUtil {
 		}
 
 		return result;
+	}
+
+	/**
+	 * Returns a deep copy of the given expression, and updates uses.
+	 * 
+	 * @param expression
+	 *            an expression
+	 * @return a deep copy of the given expression with uses correctly updated
+	 */
+	public static <T extends EObject> T copy(T eObject) {
+		return copy(new Copier(), eObject);
 	}
 
 	/**
