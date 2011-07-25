@@ -210,9 +210,9 @@ public class OrccProcess extends PlatformObject implements IProcess,
 		DebugEvent event = new DebugEvent(this, DebugEvent.TERMINATE);
 		DebugEvent[] events = { event };
 		DebugPlugin.getDefault().fireDebugEventSet(events);
-		
+
 		if (monitor != null) {
-			monitor.setCanceled(true);
+			monitor.done();
 		}
 	}
 
