@@ -29,6 +29,7 @@
 package net.sf.orcc.tools.classifier;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -42,10 +43,12 @@ import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -53,6 +56,7 @@ import net.sf.orcc.ir.TypeBool;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
+import net.sf.orcc.ir.Unit;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
@@ -60,10 +64,11 @@ import net.sf.orcc.ir.util.IrSwitch;
 import net.sf.orcc.ir.util.TypePrinter;
 import net.sf.orcc.tools.classifier.smt.SmtScript;
 import net.sf.orcc.tools.classifier.smt.SmtSolver;
-import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.sexp.SExp;
 import net.sf.orcc.util.sexp.SExpList;
 import net.sf.orcc.util.sexp.SExpSymbol;
+
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines a satisfiability checker for guards of actions. The
@@ -84,7 +89,16 @@ public class GuardSatChecker {
 	 */
 	private static class SmtTranslator extends AbstractActorVisitor<Object> {
 
+		private StringBuilder builder;
+
+		private int numLets;
+
 		private SmtScript script;
+
+		/**
+		 * list of procedures declared in this script
+		 */
+		private List<Procedure> procs;
 
 		/**
 		 * Creates a new constraint expression visitor.
@@ -92,6 +106,7 @@ public class GuardSatChecker {
 		 */
 		public SmtTranslator() {
 			script = new SmtScript();
+			procs = new ArrayList<Procedure>();
 		}
 
 		/**
@@ -102,8 +117,8 @@ public class GuardSatChecker {
 		 * @param value
 		 *            an expression
 		 */
-		private void addAssertion(Var variable, Expression value) {
-			addAssertion(variable, (String) doSwitch(value));
+		private void addLet(Var variable, Expression value) {
+			addLet(variable, (String) doSwitch(value));
 		}
 
 		/**
@@ -114,13 +129,37 @@ public class GuardSatChecker {
 		 * @param term
 		 *            a term
 		 */
-		private void addAssertion(Var variable, String term) {
-			if (!script.getVariables().contains(variable)) {
+		private void addLet(Var variable, String term) {
+			builder.append("(let (");
+			builder.append(variable.getName());
+			builder.append(" ");
+			builder.append(term);
+			builder.append(") ");
+			numLets++;
+		}
+
+		@Override
+		public Object caseAction(Action action) {
+			Pattern pattern = action.getPeekPattern();
+			for (Port port : pattern.getPorts()) {
+				Var variable = pattern.getVariable(port);
 				declareVar(variable);
+				int numTokens = pattern.getNumTokens(port);
+				String command = getUniqueName(variable);
+				for (int i = 0; i < numTokens; i++) {
+					String select = "(select " + port.getName() + " "
+							+ getStringOfInt(i) + ")";
+					command = "(store " + command + " " + getStringOfInt(i)
+							+ " " + select + ")";
+				}
+				command = "(assert (= " + getUniqueName(variable) + " "
+						+ command + "))";
+				script.addCommand(command);
 			}
 
-			String name = getUniqueName(variable);
-			script.addCommand("(assert (= " + name + " " + term + "))");
+			caseProcedure(action.getScheduler());
+
+			return null;
 		}
 
 		@Override
@@ -212,7 +251,10 @@ public class GuardSatChecker {
 		@Override
 		public Object caseExprVar(ExprVar expr) {
 			Var variable = expr.getUse().getVariable();
-			if (!script.getVariables().contains(variable)) {
+			EObject cter = variable.eContainer();
+			if ((cter instanceof Actor || cter instanceof Unit)
+					&& !script.getVariables().contains(variable)) {
+				// an expr var may contain a reference to a global var (array)
 				declareVar(variable);
 			}
 
@@ -221,7 +263,26 @@ public class GuardSatChecker {
 
 		@Override
 		public Object caseInstAssign(InstAssign assign) {
-			addAssertion(assign.getTarget().getVariable(), assign.getValue());
+			addLet(assign.getTarget().getVariable(), assign.getValue());
+			return null;
+		}
+
+		@Override
+		public Object caseInstCall(InstCall call) {
+			if (call.getTarget() != null) {
+				Procedure proc = call.getProcedure();
+				if (!procs.contains(procs)) {
+					doSwitch(proc);
+				}
+
+				Var variable = call.getTarget().getVariable();
+				String term = "(" + call.getProcedure().getName();
+				for (Expression expr : call.getParameters()) {
+					term += " " + doSwitch(expr);
+				}
+				term += ")";
+				addLet(variable, term);
+			}
 			return null;
 		}
 
@@ -229,7 +290,10 @@ public class GuardSatChecker {
 		public Object caseInstLoad(InstLoad load) {
 			Use source = load.getSource();
 			Var variable = source.getVariable();
-			if (!script.getVariables().contains(variable)) {
+			EObject cter = variable.eContainer();
+			if ((cter instanceof Actor || cter instanceof Unit)
+					&& !script.getVariables().contains(variable)) {
+				// might be necessary to declare the variable loaded
 				declareVar(variable);
 			}
 
@@ -238,39 +302,85 @@ public class GuardSatChecker {
 				term = "(select " + term + " " + doSwitch(index) + ")";
 			}
 
-			addAssertion(load.getTarget().getVariable(), term);
+			addLet(load.getTarget().getVariable(), term);
 
 			return null;
 		}
 
 		@Override
 		public Object caseInstReturn(InstReturn instReturn) {
-			// a return becomes an assertion that a variable with the same name
-			// as the procedure equals the returned value
-
-			Expression value = instReturn.getValue();
-			Procedure procedure = EcoreHelper.getContainerOfType(value,
-					Procedure.class);
-			Var variable = IrFactory.eINSTANCE.createVar(
-					IrFactory.eINSTANCE.createTypeBool(), procedure.getName(),
-					true, 0);
-			addAssertion(variable, value);
-			return null;
-		}
-
-		@Override
-		public Object caseInstStore(InstStore store) {
-			if (store.getIndexes().isEmpty()) {
-				addAssertion(store.getTarget().getVariable(), store.getValue());
+			builder.append(doSwitch(instReturn.getValue()));
+			for (; numLets > 0; numLets--) {
+				builder.append(")");
 			}
 			return null;
 		}
 
 		@Override
+		public Object caseInstStore(InstStore store) {
+			// if (store.getIndexes().isEmpty()) {
+			// addLet(store.getTarget().getVariable(), store.getValue());
+			// }
+			System.err.println("store");
+			return null;
+		}
+
+		@Override
+		public Object casePort(Port port) {
+			String name = port.getName();
+			Type portType = IrFactory.eINSTANCE.createTypeList(0,
+					port.getType());
+			String type = new TypeSwitchBitVec().doSwitch(portType);
+			script.addCommand("(declare-fun " + name + " () " + type + ")");
+			return null;
+		}
+
+		@Override
 		public Object caseProcedure(Procedure procedure) {
+			// add procedure to list of procedures
+			procs.add(procedure);
+
+			// save state
+			StringBuilder oldBuilder = builder;
+			int oldNumLets = numLets;
+
+			// start definition
+			numLets = 0;
+			builder = new StringBuilder();
+			builder.append("(define-fun ");
+			builder.append(procedure.getName());
+
+			// parameters
+			builder.append(" (");
+			for (Var param : procedure.getParameters()) {
+				builder.append("(");
+				builder.append(param.getName());
+				String type = new TypeSwitchBitVec().doSwitch(param.getType());
+				builder.append(" ");
+				builder.append(type);
+				builder.append(") ");
+			}
+			builder.append(") ");
+
+			// return type
+			String type = new TypeSwitchBitVec().doSwitch(procedure
+					.getReturnType());
+			builder.append(type);
+			builder.append(" ");
+
+			// body
+			super.caseProcedure(procedure);
+			builder.append(")");
+
+			// add declaration to script
 			script.addCommand("");
-			script.addCommand("; procedure " + procedure.getName());
-			return super.caseProcedure(procedure);
+			script.addCommand(builder.toString());
+
+			// restore state
+			builder = oldBuilder;
+			numLets = oldNumLets;
+
+			return null;
 		}
 
 		/**
@@ -280,9 +390,8 @@ public class GuardSatChecker {
 		 *            a variable
 		 */
 		private void declareVar(Var variable) {
-			String type = new TypeSwitchBitVec().doSwitch(variable.getType());
-
 			String name = getUniqueName(variable);
+			String type = new TypeSwitchBitVec().doSwitch(variable.getType());
 			script.addCommand("(declare-fun " + name + " () " + type + ")");
 			script.getVariables().add(variable);
 
@@ -314,6 +423,17 @@ public class GuardSatChecker {
 		}
 
 		/**
+		 * Returns the 32-bit BitVec representation of the given BigInteger.
+		 * 
+		 * @param integer
+		 *            a BigInteger
+		 * @return the 32-bit BitVec representation
+		 */
+		private String getStringOfInt(int integer) {
+			return "(_ bv" + integer + " 32)";
+		}
+
+		/**
 		 * Returns the name of the given variable so that it does not conflict
 		 * with variables with a similar name declared in other procedures.
 		 * 
@@ -322,12 +442,14 @@ public class GuardSatChecker {
 		 * @return a unique name for the given variable
 		 */
 		private String getUniqueName(Var variable) {
-			if (variable.eContainer() instanceof Procedure) {
-				Procedure procedure = (Procedure) variable.eContainer();
-				return procedure.getName() + "_" + variable.getIndexedName();
-			} else {
-				return variable.getName();
+			String name = variable.getName();
+			EObject cter = variable.eContainer();
+			if (cter instanceof Pattern) {
+				return ((Action) cter.eContainer()).getName() + "_" + name;
+			} else if (cter instanceof Procedure && variable.getType().isList()) {
+				return ((Procedure) cter).getName() + "_" + name;
 			}
+			return name;
 		}
 
 	}
@@ -425,7 +547,11 @@ public class GuardSatChecker {
 	public Map<String, Object> computeTokenValues(List<Port> ports,
 			List<Action> others, Action action) {
 		SmtTranslator translator = new SmtTranslator();
-		translator.doSwitch(action.getScheduler());
+		// declare arrays for configuration ports
+		for (Port port : ports) {
+			translator.doSwitch(port);
+		}
+		translator.doSwitch(action);
 
 		SExp assertion;
 
@@ -436,7 +562,7 @@ public class GuardSatChecker {
 			assertion = list;
 
 			for (Action previous : others) {
-				translator.doSwitch(previous.getScheduler());
+				translator.doSwitch(previous);
 				list.add(new SExpList(new SExpSymbol("not"), new SExpSymbol(
 						previous.getScheduler().getName())));
 			}

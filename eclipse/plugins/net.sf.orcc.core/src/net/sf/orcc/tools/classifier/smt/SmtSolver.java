@@ -263,7 +263,8 @@ public class SmtSolver {
 			}
 			ps.close();
 
-			IFile file = output.getFile(actor.getSimpleName() + ".smt2");
+			IFile file = output.getFile(actor.getSimpleName() + "_"
+					+ System.currentTimeMillis() + ".smt2");
 			InputStream source = new ByteArrayInputStream(bos.toByteArray());
 			OrccUtil.setFileContents(file, source);
 
