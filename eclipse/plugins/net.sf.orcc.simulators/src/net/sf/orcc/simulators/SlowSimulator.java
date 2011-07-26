@@ -66,9 +66,9 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.ietr.stdio.impl.Source;
 import org.jgrapht.DirectedGraph;
 
-import std.io.impl.Source;
 
 /**
  * This class implements a simulator using a slow, visitor-based approach.

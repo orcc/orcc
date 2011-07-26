@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package std.io.impl;
+package org.ietr.stdio.impl;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

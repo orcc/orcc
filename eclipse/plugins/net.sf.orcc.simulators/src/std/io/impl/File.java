@@ -31,6 +31,7 @@ package std.io.impl;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 
 import net.sf.orcc.simulators.SimulatorDescriptor;
 
@@ -68,7 +69,7 @@ public class File {
 	public static Integer readByte(Integer desc) {
 		if (SimulatorDescriptor.containsFile(desc)) {
 			try {
-				return new Integer(SimulatorDescriptor.getFile(desc).readByte());
+				return new Integer(SimulatorDescriptor.getFile(desc).readUnsignedByte());
 			} catch (IOException e) {
 				String msg = "I/O error : readByte function";
 				throw new RuntimeException(msg, e);
@@ -77,16 +78,43 @@ public class File {
 		return 0;
 	}
 
-	public static Integer readUnsignedByte(Integer desc) {
+	public static void readBytes(Integer desc, byte buf[], Integer count) {
 		if (SimulatorDescriptor.containsFile(desc)) {
+			RandomAccessFile raf = SimulatorDescriptor.getFile(desc);
 			try {
-				return SimulatorDescriptor.getFile(desc).readUnsignedByte();
+				for (int i = 0; i < count; i++) {
+					buf[i] = (byte) raf.readUnsignedByte();
+				}
 			} catch (IOException e) {
-				String msg = "I/O error : readUnsignedByte function";
+				String msg = "I/O error : readNBytes function";
 				throw new RuntimeException(msg, e);
 			}
 		}
-		return 0;
+	}
+	
+	public static void writeByte(Integer desc, Integer v) {
+		if (SimulatorDescriptor.containsFile(desc)) {
+			try {
+				SimulatorDescriptor.getFile(desc).writeByte(v);
+			} catch (IOException e) {
+				String msg = "I/O error : writeByte function";
+				throw new RuntimeException(msg, e);
+			}
+		}
+	}
+	
+	public static void writeBytes(Integer desc, byte buf[], Integer count) {
+		if (SimulatorDescriptor.containsFile(desc)) {
+			RandomAccessFile raf = SimulatorDescriptor.getFile(desc);
+			try {
+				for (int i = 0; i < count; i++) {
+					raf.writeByte(buf[i]);
+				}
+			} catch (IOException e) {
+				String msg = "I/O error : readNBytes function";
+				throw new RuntimeException(msg, e);
+			}
+		}
 	}
 
 	public static Integer sizeOfFile(Integer desc) {
@@ -99,28 +127,6 @@ public class File {
 			}
 		}
 		return 0;
-	}
-
-	public static void writeUnsignedByte(Integer desc, Integer v) {
-		if (SimulatorDescriptor.containsFile(desc)) {
-			try {
-				SimulatorDescriptor.getFile(desc).write(v);
-			} catch (IOException e) {
-				String msg = "I/O error : writeUnsignedByte function";
-				throw new RuntimeException(msg, e);
-			}
-		}
-	}
-
-	public static void writeByte(Integer desc, Integer v) {
-		if (SimulatorDescriptor.containsFile(desc)) {
-			try {
-				SimulatorDescriptor.getFile(desc).write(v);
-			} catch (IOException e) {
-				String msg = "I/O error : writeByte function";
-				throw new RuntimeException(msg, e);
-			}
-		}
 	}
 
 	public static void seek(Integer desc, Integer pos) {
