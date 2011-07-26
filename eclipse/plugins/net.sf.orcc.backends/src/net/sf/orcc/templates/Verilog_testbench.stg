@@ -58,6 +58,52 @@ signalsInstanciation(port) ::= <<
 <port.name>_rdy   =\> <port.name>_rdy
 >>
 
+ActorInputSignalsInstanciation(port) ::= <<
+<port.name>_data  =\> <port.name>_data,
+<port.name>_send  =\> <port.name>_send,
+<port.name>_ack   =\> <port.name>_ack,
+<port.name>_count   =\> <port.name>_count
+>>
+
+waveform_process_in(input) ::= <<
+--
+-- Input(s) Waveform Generation
+WaveGen_Proc_In : process (clock)
+  variable Input_bit   : integer range 2147483647 downto - 2147483648;
+  variable line_number : line;
+begin
+  if rising_edge(clock) then 
+    <input: case_define_in(); separator="\n">
+  end if;
+end process WaveGen_Proc_In;
+
+>>
+
+waveform_process_out(output) ::= <<
+-- Output(s) waveform Generation
+<output: {port|<port.name>_ack \<= <port.name>_send;}; separator="\n">
+<output: {port|<port.name>_rdy \<= '1';}; separator="\n">    
+--
+WaveGen_Proc_Out : process (clock)
+  variable Input_bit   : integer range 2147483647 downto - 2147483648;
+  variable line_number : line;
+begin
+  if (rising_edge(clock)) then
+    <output: case_define_out(); separator="\n">
+  end if;
+end process WaveGen_Proc_Out;
+
+>>
+
+printFSMIn(port) ::= <<
+signal tb_FSM_<port.name>  : tb_type;
+file sim_file_<instance.id>_<port.name>  : text is "decoder_<instance.id>_<port.name>.txt";
+>>
+
+printFSMOut(port) ::= <<
+file sim_file_<instance.id>_<port.name>  : text is "decoder_<instance.id>_<port.name>.txt";
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////
@@ -117,15 +163,6 @@ resetProcess : process
 
 >>
 
-init_process(output) ::= <<
-<output.list: RdyAckInit(); separator="\n">
->>
-
-RdyAckInit(port) ::= <<
-<port.name>_ack \<= <port.name>_send;
-<port.name>_rdy \<= '1';
->>
-
 ///////////////////////////////////////////////////////////////////////////////
 // testbench
 ///////////////////////////////////////////////////////////////////////////////
@@ -152,6 +189,20 @@ architecture arch_tb_<instance.id> of tb_<instance.id> is
 
 <if(instance.actor)>
 
+----------------------------------------------------------------------------
+-- component declaration
+----------------------------------------------------------------------------
+
+component <instance.id>
+	port (
+     
+      <if(instance.actor.inputs || instance.actor.outputs)><endif>
+      <instance.actor.inputs: printInPorts(); separator="\n"><if(instance.actor.inputs && instance.actor.outputs)><endif>
+      <instance.actor.outputs: printOutPorts(); separator="\n"><if(!instance.actor.outputs)>    <endif>
+      CLK : IN std_logic;
+      RESET : IN std_logic);
+      end component;
+
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
   --------------------------------------------------------------------------- 
@@ -159,10 +210,15 @@ architecture arch_tb_<instance.id> of tb_<instance.id> is
   ---------------------------------------------------------------------------
 
 begin
+
+	uut : <instance.id> port map (
+    CLK      =\> clock,
+    RESET    =\> reset_n<if(instance.actor.inputs || instance.actor.outputs)>,<endif>
+    <instance.actor.inputs: ActorInputSignalsInstanciation(); separator=",\n"><if(instance.actor.inputs && instance.actor.outputs)>,<endif>
+    <instance.actor.outputs: signalsInstanciation(); separator=",\n"><if(!instance.actor.outputs)>    <endif>);
+      
        
     <clock_process()>
-    
-    <init_process(output=instance.actor.outputs)>
     
     <RESET_process()>
     
@@ -202,9 +258,7 @@ begin
       <instance.network.outputs.list: signalsInstanciation(); separator=",\n"><if(!instance.network.outputs.list)>    <endif>);
       
     <clock_process()>
-    
-    <init_process(output=instance.network.outputs)>
-    
+
     <RESET_process()>
     
     <if(instance.network.inputs.list)
