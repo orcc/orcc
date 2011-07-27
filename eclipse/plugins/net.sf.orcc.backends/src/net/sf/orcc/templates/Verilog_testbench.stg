@@ -104,6 +104,63 @@ printFSMOut(port) ::= <<
 file sim_file_<instance.id>_<port.name>  : text is "decoder_<instance.id>_<port.name>.txt";
 >>
 
+case_define_out(port) ::= <<
+--
+-- Output port: <port.name> Waveform Generation
+if (not endfile (sim_file_<instance.id>_<port.name>) and <port.name>_send = '1') then
+  readline(sim_file_<instance.id>_<port.name>, line_number);
+  --
+  if (line_number'length \> 0 and line_number(1) /= '/') then
+    read(line_number, input_bit);
+<
+if(port.type.bool)
+>    if (input_bit = 1) then
+      assert (<port.name>_data = '1')
+        report "on port <port.name> incorrectly value computed : '0' instead of : '1'"
+        severity error;
+        
+        assert (<port.name>_data = '0')
+        report "on port <port.name> correct value computed : '1' equals : '1'"
+        severity note;
+    else
+      assert (<port.name>_data = '0')
+        report "on port <port.name> incorrectly value computed : '1' instead of : '0'"
+        severity error;
+        
+        assert (<port.name>_data = '1')
+        report "on port <port.name> correct value computed : '0' equals : '0'"           
+        severity note;     
+    end if;<
+else
+><if(port.type.int)
+  >    assert (<port.name>_data  = std_logic_vector(to_signed(input_bit, <port.type.size>)))
+      -- report "on <port.name> incorrectly value computed : " & to_string(to_integer(to_signed(<port.name>_data))) & " instead of :" & to_string(input_bit)
+      report "on port <port.name> incorrectly value computed : " & str(to_integer(signed(<port.name>_data))) & " instead of :" & str(input_bit)
+      severity error;
+      
+      assert (<port.name>_data /= std_logic_vector(to_signed(input_bit, <port.type.size>)))
+      -- report "on <port.name> incorrectly value computed : " & to_string(to_integer(to_signed(<port.name>_data))) & " equals :" & to_string(input_bit)
+      report "on port <port.name> correct value computed : " & str(to_integer(signed(<port.name>_data))) & " equals :" & str(input_bit)
+      severity note;
+      
+  <else
+  >    assert (<port.name>_data  = std_logic_vector(to_unsigned(input_bit, <port.type.size>)))
+      --report "on port <port.name> incorrectly value computed : " & to_string(to_integer(to_unsigned(<port.name>_data))) & " instead of :" & to_string(input_bit)
+      report "on port <port.name> incorrectly value computed : " & str(to_integer(unsigned(<port.name>_data))) & " instead of :" & str(input_bit)
+      severity error;
+      
+      assert (<port.name>_data /= std_logic_vector(to_unsigned(input_bit, <port.type.size>)))
+      --report "on port <port.name> incorrectly value computed : " & to_string(to_integer(to_unsigned(<port.name>_data))) & " equals :" & to_string(input_bit)
+      report "on port <port.name> correct value computed : " & str(to_integer(unsigned(<port.name>_data))) & " equals :" & str(input_bit)
+      severity note;
+      
+  <endif
+  ><endif
+>    --
+  end if;
+end if;
+
+>>
 ///////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////
@@ -237,35 +294,35 @@ begin
 component <instance.id>
 	port (
      
-      <if(instance.network.inputs || instance.network.outputs)><endif>
-      <instance.network.inputs: printInPorts(); separator="\n"><if(instance.network.inputs && instance.network.outputs)><endif>
-      <instance.network.outputs: printOutPorts(); separator="\n"><if(!instance.network.outputs)>    <endif>
+      <if(instance.network.inputs.list || instance.network.outputs.list)><endif>
+      <instance.network.inputs.list: printInPorts(); separator="\n"><if(instance.network.inputs.list && instance.network.outputs.list)><endif>
+      <instance.network.outputs.list: printOutPorts(); separator="\n"><if(!instance.network.outputs.list)>    <endif>
       CLK : IN std_logic;
       RESET : IN std_logic);
       end component;
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
   --------------------------------------------------------------------------- 
-  <sig_const(input=instance.network.inputs,output=instance.network.outputs)>
+  <sig_const(input=instance.network.inputs.list,output=instance.network.outputs.list)>
   ---------------------------------------------------------------------------
 
 begin
 
    uut : <instance.id> port map (
       CLK      =\> clock,
-      RESET    =\> reset_n<if(instance.network.inputs || instance.network.outputs)>,<endif>
-      <instance.network.inputs: signalsInstanciation(); separator=",\n"><if(instance.network.inputs && instance.network.outputs)>,<endif>
-      <instance.network.outputs: signalsInstanciation(); separator=",\n"><if(!instance.network.outputs)>    <endif>);
+      RESET    =\> reset_n<if(instance.network.inputs.list || instance.network.outputs.list)>,<endif>
+      <instance.network.inputs.list: signalsInstanciation(); separator=",\n"><if(instance.network.inputs.list && instance.network.outputs.list)>,<endif>
+      <instance.network.outputs.list: signalsInstanciation(); separator=",\n"><if(!instance.network.outputs.list)>    <endif>);
       
     <clock_process()>
 
     <RESET_process()>
     
-    <if(instance.network.inputs)
-    ><waveform_process_in(input=instance.network.inputs)><
+    <if(instance.network.inputs.list)
+    ><waveform_process_in(input=instance.network.inputs.list)><
     endif>
-    <if(instance.network.outputs)
-    ><waveform_process_out(output=instance.network.outputs)><
+    <if(instance.network.outputs.list)
+    ><waveform_process_out(output=instance.network.outputs.list)><
     endif>
 <endif>
 
