@@ -49,7 +49,6 @@ import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IValueAttribute;
 import net.sf.orcc.network.transformations.INetworkTransformation;
-import net.sf.orcc.util.OrderedMap;
 
 import org.jgrapht.DirectedGraph;
 
@@ -177,10 +176,10 @@ public class SerDesAdder implements INetworkTransformation {
 	public void transform(Network network) throws OrccException {
 		graph = network.getGraph();
 
-		OrderedMap<String, Port> inputs = network.getInputs();
-		OrderedMap<String, Port> outputs = network.getOutputs();
+		List<Port> inputs = network.getInputs();
+		List<Port> outputs = network.getOutputs();
 
-		if (inputs.getLength() > 0 || outputs.getLength() > 0) {
+		if (inputs.size() > 0 || outputs.size() > 0) {
 			for (Connection conn : graph.edgeSet()) {
 				if (graph.getEdgeSource(conn).isPort()) {
 					IAttribute attr = conn.getAttribute("busRef");
@@ -229,7 +228,7 @@ public class SerDesAdder implements INetworkTransformation {
 				if (vertex.isPort()) {
 					Port port = vertex.getPort();
 
-					if (outputs.contains(port.getName())) {
+					if (outputs.contains(port)) {
 						Set<Connection> conns = graph.incomingEdgesOf(vertex);
 
 						// FIXME: there should be only one connection since
@@ -253,7 +252,7 @@ public class SerDesAdder implements INetworkTransformation {
 									incoming);
 
 							vertexToRemove.add(vertex);
-							outputs.remove(port.getName());
+							outputs.remove(port);
 						}
 					} else {
 						Iterator<Connection> it = graph.outgoingEdgesOf(vertex)
@@ -274,7 +273,7 @@ public class SerDesAdder implements INetworkTransformation {
 
 						graph.addEdge(serdesMap.get(attrName), vTgt, outgoing);
 						vertexToRemove.add(vertex);
-						inputs.remove(port.getName());
+						inputs.remove(port);
 
 						while (it.hasNext()) {
 							connection = it.next();

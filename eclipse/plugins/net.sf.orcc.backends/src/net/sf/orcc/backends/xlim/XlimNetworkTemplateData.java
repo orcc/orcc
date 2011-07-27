@@ -39,7 +39,6 @@ import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
-import net.sf.orcc.util.OrderedMap;
 
 /**
  * This class is giving the necessary information for the XLIM Network
@@ -82,13 +81,13 @@ public class XlimNetworkTemplateData {
 	 * @param network
 	 */
 	public void computeNetworkInputPortBroadcast(Network network) {
-		OrderedMap<String, Port> inputs = network.getInputs();
+		List<Port> inputs = network.getInputs();
 		Set<Vertex> graphVertex = network.getGraph().vertexSet();
 
 		for (Vertex vertex : graphVertex) {
 			if (vertex.isPort()) {
 				Port port = vertex.getPort();
-				if (inputs.contains(port.getName())) {
+				if (inputs.contains(port)) {
 					countNetwokPortBroadcastMap.put(port, network.getGraph()
 							.outDegreeOf(vertex));
 				}

@@ -68,7 +68,6 @@ import net.sf.orcc.network.attributes.ValueAttribute;
 import net.sf.orcc.util.BinOpSeqParser;
 import net.sf.orcc.util.DomUtil;
 import net.sf.orcc.util.OrccUtil;
-import net.sf.orcc.util.OrderedMap;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -547,14 +546,19 @@ public class XDFParser {
 	 *            the name of a vertex
 	 * @param portName
 	 *            the name of a port
-	 * @param ports
-	 *            a map of input ports "exclusive or" output ports
+	 * @param kind
+	 *            the kind of port
 	 * @return a vertex that contains a port or an instance
 	 */
-	private Vertex getVertex(String vertexName, String portName, String kind,
-			OrderedMap<String, Port> ports) throws OrccException {
+	private Vertex getVertex(String vertexName, String portName, String kind)
+			throws OrccException {
 		if (vertexName.isEmpty()) {
-			Port port = ports.get(portName);
+			Port port;
+			if ("Input".equals(kind)) {
+				port = network.getInput(portName);
+			} else {
+				port = network.getOutput(portName);
+			}
 			if (port == null) {
 				throw new OrccException("An Connection element has an invalid"
 						+ " \"src-port\" " + "attribute");
@@ -675,9 +679,9 @@ public class XDFParser {
 		String dst = connection.getAttribute("dst");
 		String dst_port = connection.getAttribute("dst-port");
 
-		Vertex source = getVertex(src, src_port, "Input", network.getInputs());
+		Vertex source = getVertex(src, src_port, "Input");
 		Port srcPort = getPort(src, src_port);
-		Vertex target = getVertex(dst, dst_port, "Output", network.getOutputs());
+		Vertex target = getVertex(dst, dst_port, "Output");
 		Port dstPort = getPort(dst, dst_port);
 
 		Node child = connection.getFirstChild();
@@ -865,9 +869,9 @@ public class XDFParser {
 		// adds the port to inputs or outputs depending on its kind
 		String kind = eltPort.getAttribute("kind");
 		if (kind.equals("Input")) {
-			network.getInputs().put(name, port);
+			network.getInputs().add(port);
 		} else if (kind.equals("Output")) {
-			network.getOutputs().put(name, port);
+			network.getOutputs().add(port);
 		} else {
 			throw new OrccException("Port \"" + name + "\", invalid kind: \""
 					+ kind + "\"");

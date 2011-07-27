@@ -273,7 +273,7 @@ begin
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
   --------------------------------------------------------------------------- 
-  <sig_const(input=instance.network.inputs.list,output=instance.network.outputs.list)>
+  <sig_const(input=instance.network.inputs,output=instance.network.outputs)>
   ---------------------------------------------------------------------------
 
 begin
@@ -281,18 +281,18 @@ begin
   <instance.network.name>_orcc : entity work.<instance.network.name>
     port map (
       clock      =\> clock,
-      reset_n    =\> reset_n<if(instance.network.inputs.list || instance.network.outputs.list)>,<endif>
-      <instance.network.inputs.list: signalsInstanciation(); separator=",\n"><if(instance.network.inputs.list && instance.network.outputs.list)>,<endif>
-      <instance.network.outputs.list: signalsInstanciation(); separator=",\n"><if(!instance.network.outputs.list)>    <endif>);
+      reset_n    =\> reset_n<if(instance.network.inputs || instance.network.outputs)>,<endif>
+      <instance.network.inputs: signalsInstanciation(); separator=",\n"><if(instance.network.inputs && instance.network.outputs)>,<endif>
+      <instance.network.outputs: signalsInstanciation(); separator=",\n"><if(!instance.network.outputs)>    <endif>);
       
     <init_process()>
-    <if(instance.network.inputs.list)
-    ><waveform_process_in(input=instance.network.inputs.list)><
+    <if(instance.network.inputs)
+    ><waveform_process_in(input=instance.network.inputs)><
     endif>
     
     
-    <if(instance.network.outputs.list)
-    ><waveform_process_out(output=instance.network.outputs.list)><
+    <if(instance.network.outputs)
+    ><waveform_process_out(output=instance.network.outputs)><
     endif>
 <endif>
 

@@ -117,7 +117,7 @@ public class Network {
 
 	private Map<Instance, Map<Port, Connection>> incomingMap;
 
-	private OrderedMap<String, Port> inputs;
+	private List<Port> inputs;
 
 	/**
 	 * the class of this network. Initialized to unknown.
@@ -128,7 +128,7 @@ public class Network {
 
 	private Map<Instance, Map<Port, List<Connection>>> outgoingMap;
 
-	private OrderedMap<String, Port> outputs;
+	private List<Port> outputs;
 
 	private Scope<String, Var> parameters;
 
@@ -153,8 +153,8 @@ public class Network {
 	public Network(String file) {
 		this.fileName = file;
 		graph = new DirectedMultigraph<Vertex, Connection>(Connection.class);
-		inputs = new OrderedMap<String, Port>();
-		outputs = new OrderedMap<String, Port>();
+		inputs = new ArrayList<Port>();
+		outputs = new ArrayList<Port>();
 		parameters = new Scope<String, Var>();
 		variables = new Scope<String, Var>(parameters, false);
 	}
@@ -217,8 +217,8 @@ public class Network {
 							.getOutputs().getList());
 				} else if (instance.isNetwork()) {
 					Network network = instance.getNetwork();
-					computePredSucc(vertex, network.getInputs().getList(),
-							network.getOutputs().getList());
+					computePredSucc(vertex, network.getInputs(),
+							network.getOutputs());
 				}
 			}
 		}
@@ -425,7 +425,12 @@ public class Network {
 	 * @return an input port whose name matches the given name
 	 */
 	public Port getInput(String name) {
-		return inputs.get(name);
+		for (Port port : inputs) {
+			if (port.getName().equals(name)) {
+				return port;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -433,7 +438,7 @@ public class Network {
 	 * 
 	 * @return the list of this network's input ports
 	 */
-	public OrderedMap<String, Port> getInputs() {
+	public List<Port> getInputs() {
 		return inputs;
 	}
 
@@ -546,7 +551,12 @@ public class Network {
 	 * @return an output port whose name matches the given name
 	 */
 	public Port getOutput(String name) {
-		return outputs.get(name);
+		for (Port port : outputs) {
+			if (port.getName().equals(name)) {
+				return port;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -554,7 +564,7 @@ public class Network {
 	 * 
 	 * @return the list of this network's output ports
 	 */
-	public OrderedMap<String, Port> getOutputs() {
+	public List<Port> getOutputs() {
 		return outputs;
 	}
 

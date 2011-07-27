@@ -152,9 +152,9 @@ public class Instantiator implements INetworkTransformation {
 					Network network = instance.getNetwork();
 
 					Set<Connection> connections = graph.incomingEdgesOf(vertex);
-					checkPorts(id, connections, network.getInputs().getList());
+					checkPorts(id, connections, network.getInputs());
 					connections = graph.outgoingEdgesOf(vertex);
-					checkPorts(id, connections, network.getOutputs().getList());
+					checkPorts(id, connections, network.getOutputs());
 				} else {
 					Actor actor = instance.getActor();
 

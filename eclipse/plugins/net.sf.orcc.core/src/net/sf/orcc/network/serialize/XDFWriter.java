@@ -555,8 +555,7 @@ public class XDFWriter {
 	 * @param ports
 	 *            an ordered map of ports
 	 */
-	private void writePorts(Element parent, String kind,
-			OrderedMap<String, Port> ports) {
+	private void writePorts(Element parent, String kind, List<Port> ports) {
 		for (Port port : ports) {
 			Element portElt = document.createElement("Port");
 			parent.appendChild(portElt);

@@ -95,7 +95,7 @@ port map (
 >>
 
 NetworkInputFanoutInstantiation(network) ::=<<
-<network.inputs.list: printNetworkFanOutInputInstantiation(); separator="\n">
+<network.inputs: printNetworkFanOutInputInstantiation(); separator="\n">
 >>
 
 printNetworkFanOutInputInstantiation(port) ::=<<
@@ -264,10 +264,10 @@ port map (
 
 PrintNetworkPortsInstantiation(network) ::=<<
 -- Network Output Port(s) Instantiation
-<network.outputs.list: printNetworkOutputPortsInstantiation(); separator="\n">
+<network.outputs: printNetworkOutputPortsInstantiation(); separator="\n">
 
 -- Network Intput Port(s) Instantiation
-<network.inputs.list: printNetworkInputPortsInstantiation(); separator="\n">
+<network.inputs: printNetworkInputPortsInstantiation(); separator="\n">
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -353,9 +353,9 @@ printActorsComponentsOutputs(port) ::=<<
 
 PrintSignals(network) ::= <<
 -- Input Port Signals
-<network.inputs.list:{ port | <printInputPortsSignals(port=port)>}; separator="\n">
+<network.inputs:{ port | <printInputPortsSignals(port=port)>}; separator="\n">
 -- Output Port Signals
-<network.outputs.list:{ port | <printOutputPortsSignals(port=port)>}; separator="\n">
+<network.outputs:{ port | <printOutputPortsSignals(port=port)>}; separator="\n">
 -- Actors I/O Signals
 <network.instances: { instance | <printActorsSignals(instance=instance,numberOfReaders=network.outgoingMap.(instance))>}; separator="\n">
 >>
@@ -454,8 +454,8 @@ signal aof_<instance.id>_<port.name>_RDY : std_logic_vector(<if(numberOfReaders.
 ///////////////////////////////////////////////////////////////////////////////
 
 printNetworkPorts(network) ::= <<
-<network.inputs.list: {port | <printNetPorts(port=port, dir1="in",dir2="out")>}; separator="\n">
-<network.outputs.list: {port | <printNetPorts(port=port, dir1="out",dir2="in")>}; separator="\n">
+<network.inputs: {port | <printNetPorts(port=port, dir1="in",dir2="out")>}; separator="\n">
+<network.outputs: {port | <printNetPorts(port=port, dir1="out",dir2="in")>}; separator="\n">
 >>
 
 printNetPorts(port, dir1, dir2) ::= <<

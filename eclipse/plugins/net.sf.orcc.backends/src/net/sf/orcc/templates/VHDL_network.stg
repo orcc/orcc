@@ -21,8 +21,8 @@ endif>
 // print IOs of the TOP Network
 ///////////////////////////////////////////////////////////////////////////////
 printNetworkPorts(network) ::= <<
-<network.inputs.list: printNetPortsInput(); separator="\n">
-<network.outputs.list: printNetPortsOutput(); separator="\n">
+<network.inputs: printNetPortsInput(); separator="\n">
+<network.outputs: printNetPortsOutput(); separator="\n">
 >>
 
 printNetPortsInput(port) ::= <<
@@ -57,8 +57,8 @@ elseif (instance.broadcast)
               outputs=instance.broadcast.outputs.list)><
 elseif (instance.network)
 >                                            -- Network : <instance.id>
-<printSignals(inputs=instance.network.inputs.list,
-              outputs=instance.network.outputs.list)><
+<printSignals(inputs=instance.network.inputs,
+              outputs=instance.network.outputs)><
 endif>
 >>
 
@@ -176,8 +176,8 @@ checkNetworkOrActors(instance) ::= <<
                  <
 elseif (instance.network)
 ><printInstances(name=instance.network.name,
-				 inputs=instance.network.inputs.list,
-                 outputs=instance.network.outputs.list)>
+				 inputs=instance.network.inputs,
+                 outputs=instance.network.outputs)>
                  
                  <
 endif>
@@ -271,8 +271,8 @@ printBroadcasts(outgoingMap) ::= <<
 checkBroadcast(instance) ::= <<
 <if (instance.broadcast)
 ><printBroadcast(name=instance.id,
-				 inputs=instance.broadcast.inputs.list,
-                 outputs=instance.broadcast.outputs.list)><
+				 inputs=instance.broadcast.inputs,
+                 outputs=instance.broadcast.outputs)><
 endif>
 >>
 
