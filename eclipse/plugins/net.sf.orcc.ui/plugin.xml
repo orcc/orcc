@@ -132,17 +132,17 @@
             </parameter>
             <parameter
                   name="buffer size"
-                  type="java.lang.String">
+                  type="java.lang.Integer">
             </parameter>
          </edgeType>
          <import>
-            <xslt
-                  name="xslt/net/sf/graphiti/xdf/input_XDF.xslt">
-            </xslt>
+            <transformation
+                  class="net.sf.orcc.ui.editor.XdfTransformation">
+            </transformation>
          </import>
          <export>
             <transformation
-                  class="net.sf.orcc.ui.editor.XdfExporter">
+                  class="net.sf.orcc.ui.editor.XdfTransformation">
             </transformation>
          </export>
       </configuration>

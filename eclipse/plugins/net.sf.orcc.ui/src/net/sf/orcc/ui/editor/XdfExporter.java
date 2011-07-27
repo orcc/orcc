@@ -43,7 +43,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.sf.graphiti.io.ITransformation;
 import net.sf.graphiti.io.LayoutWriter;
 import net.sf.graphiti.model.Edge;
 import net.sf.graphiti.model.Graph;
@@ -110,7 +109,7 @@ import com.google.inject.Injector;
  * @author Matthieu Wipliez
  * 
  */
-public class XdfExporter extends CalSwitch<Object> implements ITransformation {
+public class XdfExporter extends CalSwitch<Object> {
 
 	private class PortComparator implements Comparator<Port> {
 
@@ -161,11 +160,10 @@ public class XdfExporter extends CalSwitch<Object> implements ITransformation {
 
 		// buffer size
 		Map<String, IAttribute> attributes = new HashMap<String, IAttribute>();
-		String bufferSize = (String) edge.getValue("buffer size");
+		Integer bufferSize = (Integer) edge.getValue("buffer size");
 
-		if (bufferSize != null && bufferSize.length() != 0) {
-			Expression expr = IrFactory.eINSTANCE.createExprInt(Integer
-					.parseInt(bufferSize));
+		if (bufferSize != null) {
+			Expression expr = IrFactory.eINSTANCE.createExprInt(bufferSize);
 			IValueAttribute attr = new ValueAttribute(expr);
 			attributes.put("bufferSize", attr);
 		}
@@ -414,7 +412,14 @@ public class XdfExporter extends CalSwitch<Object> implements ITransformation {
 		return (T) result.getRootASTElement();
 	}
 
-	@Override
+	/**
+	 * Transforms the given graph to XDF, and writes it to the output stream.
+	 * 
+	 * @param graph
+	 *            a graph
+	 * @param out
+	 *            an output stream
+	 */
 	public void transform(Graph graph, OutputStream out) {
 		injector = CalActivator.getInstance()
 				.getInjector("net.sf.orcc.cal.Cal");
@@ -460,11 +465,6 @@ public class XdfExporter extends CalSwitch<Object> implements ITransformation {
 		} catch (CoreException e) {
 			throw new OrccRuntimeException("error when writing layout", e);
 		}
-	}
-
-	@Override
-	public Graph transform(IFile file) {
-		return null;
 	}
 
 }
