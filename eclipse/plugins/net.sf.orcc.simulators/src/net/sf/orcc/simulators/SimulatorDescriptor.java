@@ -28,11 +28,14 @@
  */
 package net.sf.orcc.simulators;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.File;
+import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+
+import net.sf.orcc.OrccRuntimeException;
 
 /**
  * This class handle handle descriptors used by the native functions.
@@ -42,39 +45,56 @@ import java.util.Map;
  */
 public class SimulatorDescriptor {
 
-	private static Map<Integer, RandomAccessFile> fileDescs = new HashMap<Integer, RandomAccessFile>();
+	private static Map<Integer, File> fileDescs = new HashMap<Integer, File>();
+	private static Map<Integer, Method> shutters = new HashMap<Integer, Method>();
 
-	public static int openFile(String path) throws FileNotFoundException {
-		RandomAccessFile in = new RandomAccessFile(path, "rw");
-		fileDescs.put(in.hashCode(), in);
-		return in.hashCode();
+	public static Integer create(String fileName, Method shutter) {
+		File f = new File(fileName);
+		Integer desc = f.hashCode();
+		fileDescs.put(desc, f);
+		shutters.put(desc, shutter);
+		return desc;
 	}
 
-	public static RandomAccessFile getFile(int descriptor) {
+	public static File get(Integer descriptor) {
 		return fileDescs.get(descriptor);
 	}
 
-	public static boolean containsFile(int descriptor) {
+	public static boolean contains(Integer descriptor) {
 		return fileDescs.containsKey(descriptor);
 	}
 
-	public static void closeFile(int descriptor) throws IOException {
-		fileDescs.get(descriptor).close();
+	public static void finalize(Integer descriptor) {
 		fileDescs.remove(descriptor);
 	}
 
 	/**
-	 *  Kill all simulation descriptors by closing them correctly.
+	 * Kill all simulation descriptors by closing them correctly.
 	 */
 	public static void killDescriptors() {
-		for (RandomAccessFile in : fileDescs.values()) {
-			try {
-				in.close();
-			} catch (IOException e) {
-				String msg = "I/O error : A file cannot be close";
-				throw new RuntimeException(msg, e);
+
+		Set<Integer> descs = new HashSet<Integer>(fileDescs.keySet());
+		for (Integer desc : descs) {
+			Method shutter = shutters.get(desc);
+			if (shutter != null) {
+				Object args[] = new Object[1];
+				args[0] = desc;
+				try {
+					shutter.invoke(null, args);
+				} catch (Exception e) {
+					throw new OrccRuntimeException(
+							"exception during the killing "
+									+ "of the descriptors by calling to "
+									+ shutter.getName(), e);
+				}
 			}
 		}
-		fileDescs.clear();
+		
+		if (!fileDescs.isEmpty()) {
+			fileDescs.clear();
+			throw new OrccRuntimeException("A descriptor may be still alive");
+		}
+
+		shutters.clear();
 	}
 }

@@ -26,130 +26,28 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-
 package std.io.impl;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
 
 import net.sf.orcc.simulators.SimulatorDescriptor;
 
-/**
- * This class defines native functions for the File unit.
- * 
- * This class uses the SimulatorDecriptor class to handle descriptors.
- * 
- * @author Thavot Richard
- * 
- */
 public class File {
 
-	public static Integer accessFile(String path) {
-		try {
-			return SimulatorDescriptor.openFile(path);
-		} catch (FileNotFoundException e) {
-			String msg = "I/O error : A file cannot be open";
-			throw new RuntimeException(msg, e);
+	public static String getName(Integer desc) {
+		if (SimulatorDescriptor.contains(desc)) {
+			return SimulatorDescriptor.get(desc).getName();
 		}
+		return "";
 	}
 
-	public static Integer closeFile(Integer desc) {
-		if (SimulatorDescriptor.containsFile(desc)) {
-			try {
-				SimulatorDescriptor.closeFile(desc);
-			} catch (IOException e) {
-				String msg = "I/O error : A file cannot be close";
-				throw new RuntimeException(msg, e);
-			}
-		}
-		return 0;
+	public static String separator() {
+		return java.io.File.separator;
 	}
 
-	public static Integer readByte(Integer desc) {
-		if (SimulatorDescriptor.containsFile(desc)) {
-			try {
-				return new Integer(SimulatorDescriptor.getFile(desc).readUnsignedByte());
-			} catch (IOException e) {
-				String msg = "I/O error : readByte function";
-				throw new RuntimeException(msg, e);
-			}
+	public static String getParent(Integer desc) {
+		if (SimulatorDescriptor.contains(desc)) {
+			return SimulatorDescriptor.get(desc).getParent();
 		}
-		return 0;
-	}
-
-	public static void readBytes(Integer desc, byte buf[], Integer count) {
-		if (SimulatorDescriptor.containsFile(desc)) {
-			RandomAccessFile raf = SimulatorDescriptor.getFile(desc);
-			try {
-				for (int i = 0; i < count; i++) {
-					buf[i] = (byte) raf.readUnsignedByte();
-				}
-			} catch (IOException e) {
-				String msg = "I/O error : readNBytes function";
-				throw new RuntimeException(msg, e);
-			}
-		}
-	}
-	
-	public static void writeByte(Integer desc, Integer v) {
-		if (SimulatorDescriptor.containsFile(desc)) {
-			try {
-				SimulatorDescriptor.getFile(desc).writeByte(v);
-			} catch (IOException e) {
-				String msg = "I/O error : writeByte function";
-				throw new RuntimeException(msg, e);
-			}
-		}
-	}
-	
-	public static void writeBytes(Integer desc, byte buf[], Integer count) {
-		if (SimulatorDescriptor.containsFile(desc)) {
-			RandomAccessFile raf = SimulatorDescriptor.getFile(desc);
-			try {
-				for (int i = 0; i < count; i++) {
-					raf.writeByte(buf[i]);
-				}
-			} catch (IOException e) {
-				String msg = "I/O error : readNBytes function";
-				throw new RuntimeException(msg, e);
-			}
-		}
-	}
-
-	public static Integer sizeOfFile(Integer desc) {
-		if (SimulatorDescriptor.containsFile(desc)) {
-			try {
-				return (int) SimulatorDescriptor.getFile(desc).length();
-			} catch (IOException e) {
-				String msg = "I/O error : sizeOfFile function";
-				throw new RuntimeException(msg, e);
-			}
-		}
-		return 0;
-	}
-
-	public static void seek(Integer desc, Integer pos) {
-		if (SimulatorDescriptor.containsFile(desc)) {
-			try {
-				SimulatorDescriptor.getFile(desc).seek(pos);
-			} catch (IOException e) {
-				String msg = "I/O error : seek function";
-				throw new RuntimeException(msg, e);
-			}
-		}
-	}
-
-	public static Integer filePointer(Integer desc) {
-		if (SimulatorDescriptor.containsFile(desc)) {
-			try {
-				return (int) SimulatorDescriptor.getFile(desc).getFilePointer();
-			} catch (IOException e) {
-				String msg = "I/O error : filePointer function";
-				throw new RuntimeException(msg, e);
-			}
-		}
-		return 0;
+		return "";
 	}
 
 }

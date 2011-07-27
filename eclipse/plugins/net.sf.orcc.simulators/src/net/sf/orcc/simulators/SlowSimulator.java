@@ -224,12 +224,11 @@ public class SlowSimulator extends AbstractSimulator {
 
 				// check for cancelation
 				if (isCanceled()) {
-					break;
+					return;
 				}
 			}
 			isAlive = hasExecuted;
 		} while (isAlive);
-		SimulatorDescriptor.killDescriptors();
 	}
 
 	@Override
@@ -258,6 +257,7 @@ public class SlowSimulator extends AbstractSimulator {
 			connectNetwork(graph);
 			initializeNetwork(network);
 			runNetwork(network);
+			SimulatorDescriptor.killDescriptors();
 		} catch (OrccException e) {
 			throw new OrccRuntimeException(e.getMessage());
 		} catch (FileNotFoundException e) {

@@ -26,46 +26,46 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+
 package std.lang.impl;
 
-public class Integer {
+/**
+ * This class defines native functions for the Chain unit.
+ * 
+ * @author Thavot Richard
+ * 
+ */
+public class Chain {
 
-	/*
-	 * Returns a String representing the specified integer.
-	 */
-	public static String toString(java.lang.Integer i) {
-		return i.toString();
-	}
-	
-
-	/*
-    * Returns a string representation of the integer argument as an unsigned integer in base 16.
-    */
-	public static String toHexString(java.lang.Integer i) {
-		return java.lang.Integer.toHexString(i);
-	}
-
-	/*
-    * Returns a string representation of the integer argument as an unsigned integer in base 8.
-    */
-	public static String toOctalString(java.lang.Integer i) {
-		return java.lang.Integer.toOctalString(i);
+	public static void split(String string, String regex,
+			String dividedString[]) {
+		String[] ds = string.split(regex);
+		for (int i = 0; i < ds.length; i++) {
+			dividedString[i] = ds[i];
+		}
 	}
 
-	/*
-	 * Returns a string representation of the integer argument as an unsigned integer in base 2.
-	 */
-	public static String toBinaryString(java.lang.Integer i) {
-		return java.lang.Integer.toBinaryString(i);
+	public static String concat(String dividedString[], String separator) {
+		StringBuffer result = new StringBuffer();
+		if (dividedString.length > 0) {
+			result.append(dividedString[0]);
+			for (int i = 1; i < dividedString.length; i++) {
+				if (dividedString[i] != null) {
+					result.append(separator);
+					result.append(dividedString[i]);
+				}
+			}
+		}
+		return result.toString();
 	}
-	
-	
-	/*
-	 * Parses the string argument as a signed integer in the radix specified by the second argument.
-	 */
-	
-	public static int toBinaryString(String s, java.lang.Integer radix) {
-		return java.lang.Integer.parseInt(s, radix);
+
+	public static String replace(String string, String regex, String replacement) {
+		StringBuffer result = new StringBuffer(string);
+		int k;
+		while ((k = result.indexOf(regex)) > 0) {
+			result.replace(k, k + regex.length(), replacement);
+		}
+		return result.toString();
 	}
-	
+
 }
