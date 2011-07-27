@@ -195,18 +195,11 @@ if(port.type.bool)
       assert (<port.name>_data = '1')
         report "on port <port.name> incorrectly value computed : '0' instead of : '1'"
         severity error;
-        
-        assert (<port.name>_data = '0')
-        report "on port <port.name> correct value computed : '1' equals : '1'"
-        severity note;
     else
       assert (<port.name>_data = '0')
         report "on port <port.name> incorrectly value computed : '1' instead of : '0'"
         severity error;
-        
-        assert (<port.name>_data = '1')
-        report "on port <port.name> correct value computed : '0' equals : '0'"           
-        severity note;     
+           
     end if;<
 else
 ><if(port.type.int)
@@ -214,22 +207,12 @@ else
       -- report "on <port.name> incorrectly value computed : " & to_string(to_integer(to_signed(<port.name>_data))) & " instead of :" & to_string(input_bit)
       report "on port <port.name> incorrectly value computed : " & str(to_integer(signed(<port.name>_data))) & " instead of :" & str(input_bit)
       severity error;
-      
-      assert (<port.name>_data /= std_logic_vector(to_signed(input_bit, <port.type.size>)))
-      -- report "on <port.name> incorrectly value computed : " & to_string(to_integer(to_signed(<port.name>_data))) & " equals :" & to_string(input_bit)
-      report "on port <port.name> correct value computed : " & str(to_integer(signed(<port.name>_data))) & " equals :" & str(input_bit)
-      severity note;
-      
+
   <else
   >    assert (<port.name>_data  = std_logic_vector(to_unsigned(input_bit, <port.type.size>)))
       --report "on port <port.name> incorrectly value computed : " & to_string(to_integer(to_unsigned(<port.name>_data))) & " instead of :" & to_string(input_bit)
       report "on port <port.name> incorrectly value computed : " & str(to_integer(unsigned(<port.name>_data))) & " instead of :" & str(input_bit)
       severity error;
-      
-      assert (<port.name>_data /= std_logic_vector(to_unsigned(input_bit, <port.type.size>)))
-      --report "on port <port.name> incorrectly value computed : " & to_string(to_integer(to_unsigned(<port.name>_data))) & " equals :" & to_string(input_bit)
-      report "on port <port.name> correct value computed : " & str(to_integer(unsigned(<port.name>_data))) & " equals :" & str(input_bit)
-      severity note;
       
   <endif
   ><endif
@@ -250,7 +233,7 @@ instance(instance, options) ::= <<
 ------------------------------------------------------------------------------
 
 library ieee;
-use ieee.std_logic_1164.all;
+use ieee.std_logic_1164.all; 
 use std.textio.all;
 use ieee.numeric_std.all;
 
