@@ -36,6 +36,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,6 +92,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.IGrammarAccess;
@@ -109,15 +112,30 @@ import com.google.inject.Injector;
  */
 public class XdfExporter extends CalSwitch<Object> implements ITransformation {
 
+	private class PortComparator implements Comparator<Port> {
+
+		@Override
+		public int compare(Port p1, Port p2) {
+			Vertex v1 = portMap.get(p1);
+			Rectangle r1 = (Rectangle) v1.getValue(Vertex.PROPERTY_SIZE);
+			Vertex v2 = portMap.get(p2);
+			Rectangle r2 = (Rectangle) v2.getValue(Vertex.PROPERTY_SIZE);
+			return (r1.y < r2.y ? -1 : (r1.y == r2.y ? 0 : 1));
+		}
+
+	}
+
+	private CalGrammarAccess access;
+
+	private Injector injector;
+
 	private IParser parser;
+
+	private Map<Port, Vertex> portMap;
 
 	private Map<String, Var> varMap;
 
 	private Map<Vertex, net.sf.orcc.network.Vertex> vertexMap;
-
-	private Injector injector;
-
-	private CalGrammarAccess access;
 
 	private void addEdge(Network network, Edge edge) {
 		net.sf.orcc.network.Vertex source = vertexMap.get(edge.getSource());
@@ -144,7 +162,7 @@ public class XdfExporter extends CalSwitch<Object> implements ITransformation {
 		// buffer size
 		Map<String, IAttribute> attributes = new HashMap<String, IAttribute>();
 		String bufferSize = (String) edge.getValue("buffer size");
-		
+
 		if (bufferSize != null && bufferSize.length() != 0) {
 			Expression expr = IrFactory.eINSTANCE.createExprInt(Integer
 					.parseInt(bufferSize));
@@ -196,15 +214,17 @@ public class XdfExporter extends CalSwitch<Object> implements ITransformation {
 			Type type = parseType(vertex.getValue("port type"));
 			boolean native_ = (Boolean) vertex.getValue("native");
 			Port port = IrFactory.eINSTANCE.createPort(type, name, native_);
+			portMap.put(port, vertex);
 
-			network.getInputs().put(name, port);
+			network.getInputs().add(port);
 			networkVertex = new net.sf.orcc.network.Vertex("Input", port);
 		} else if ("Output port".equals(vertex.getType().getName())) {
 			Type type = parseType(vertex.getValue("port type"));
 			boolean native_ = (Boolean) vertex.getValue("native");
 			Port port = IrFactory.eINSTANCE.createPort(type, name, native_);
+			portMap.put(port, vertex);
 
-			network.getOutputs().put(name, port);
+			network.getOutputs().add(port);
 			networkVertex = new net.sf.orcc.network.Vertex("Output", port);
 		} else {
 			String clasz = (String) vertex.getValue(PARAMETER_REFINEMENT);
@@ -243,7 +263,7 @@ public class XdfExporter extends CalSwitch<Object> implements ITransformation {
 					instance.getAttributes().put("clockDomain", attr);
 				}
 			}
-			
+
 		}
 
 		network.getGraph().addVertex(networkVertex);
@@ -347,6 +367,24 @@ public class XdfExporter extends CalSwitch<Object> implements ITransformation {
 		return IrFactory.eINSTANCE.createTypeUint(size);
 	}
 
+	private void linkModel(EObject object) {
+		TreeIterator<EObject> it = object.eAllContents();
+		while (it.hasNext()) {
+			EObject obj = it.next();
+			if (obj instanceof AstVariableReference) {
+				AstVariableReference ref = (AstVariableReference) obj;
+
+				ICompositeNode node = NodeModelUtils.getNode(obj);
+				for (ILeafNode leaf : node.getLeafNodes()) {
+					AstVariable variable = CalFactory.eINSTANCE
+							.createAstVariable();
+					variable.setName(leaf.getText());
+					ref.setVariable(variable);
+				}
+			}
+		}
+	}
+
 	private Expression parseExpression(Object value) {
 		Reader reader = new StringReader((String) value);
 		IParseResult result = parser.parse(access.getAstExpressionRule(),
@@ -368,24 +406,6 @@ public class XdfExporter extends CalSwitch<Object> implements ITransformation {
 		return (Type) doSwitch(type);
 	}
 
-	private void linkModel(EObject object) {
-		TreeIterator<EObject> it = object.eAllContents();
-		while (it.hasNext()) {
-			EObject obj = it.next();
-			if (obj instanceof AstVariableReference) {
-				AstVariableReference ref = (AstVariableReference) obj;
-
-				ICompositeNode node = NodeModelUtils.getNode(obj);
-				for (ILeafNode leaf : node.getLeafNodes()) {
-					AstVariable variable = CalFactory.eINSTANCE
-							.createAstVariable();
-					variable.setName(leaf.getText());
-					ref.setVariable(variable);
-				}
-			}
-		}
-	}
-
 	@SuppressWarnings("unchecked")
 	private <T> T parseVariable(Object parameter) {
 		Reader reader = new StringReader((String) parameter);
@@ -402,6 +422,7 @@ public class XdfExporter extends CalSwitch<Object> implements ITransformation {
 		access = (CalGrammarAccess) injector.getInstance(IGrammarAccess.class);
 
 		varMap = new HashMap<String, Var>();
+		portMap = new HashMap<Port, Vertex>();
 		vertexMap = new HashMap<Vertex, net.sf.orcc.network.Vertex>();
 
 		Network network = new Network("");
@@ -410,10 +431,16 @@ public class XdfExporter extends CalSwitch<Object> implements ITransformation {
 		addParameters(network, graph);
 		addVariables(network, graph);
 
+		// add vertices
 		for (Vertex vertex : graph.vertexSet()) {
 			addVertex(network, vertex);
 		}
 
+		// sort ports based on their position in the window (top to bottom)
+		Collections.sort(network.getInputs(), new PortComparator());
+		Collections.sort(network.getOutputs(), new PortComparator());
+
+		// add edges
 		for (Edge edge : graph.edgeSet()) {
 			addEdge(network, edge);
 		}
