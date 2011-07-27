@@ -271,8 +271,8 @@ printBroadcasts(outgoingMap) ::= <<
 checkBroadcast(instance) ::= <<
 <if (instance.broadcast)
 ><printBroadcast(name=instance.id,
-				 inputs=instance.broadcast.inputs,
-                 outputs=instance.broadcast.outputs)><
+				 inputs=instance.broadcast.inputs.list,
+                 outputs=instance.broadcast.outputs.list)><
 endif>
 >>
 
