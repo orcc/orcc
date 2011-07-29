@@ -1,13 +1,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Common applet
 ///////////////////////////////////////////////////////////////////////////////
-portType(port, IOtype, dataType) ::= <<
-<if(port.type.bool)
-><port.name>_<dataType>  :<IOtype>std_logic;<
-else
-><port.name>_<dataType>  :<IOtype>std_logic_vector(<port.type.size> -1 downto 0);<
-endif>
->>
+portType(port, IOtype, dataType) ::= <%
+<if(port.type.bool)>
+<port.name><dataType>  : <IOtype>std_logic
+<else>
+<port.name><dataType>  : <IOtype>std_logic_vector(<port.type.size> -1 downto 0)
+<endif>
+%>
 
 
 
@@ -15,23 +15,17 @@ endif>
 // Print instance's ports
 ///////////////////////////////////////////////////////////////////////////////
 PrintInputPorts(port) ::= <<
-<portType(port=port, IOtype=" in  ", dataType="data")>
+<if (port.native)><portType(port=port, IOtype="in  ", dataType="")><
+else><portType(port=port, IOtype="in  ", dataType="_data")>;
 <port.name>_send  : in  std_logic;
-<if(last(port.name))
-><port.name>_ack   : out  std_logic<
-else
-><port.name>_ack   : out  std_logic;<
-endif>
+<port.name>_ack   : out std_logic<endif>
 >>
 
 PrintOutputPorts(port) ::= <<
-<portType(port=port, IOtype=" out ", dataType="data")>
+<if (port.native)><portType(port=port, IOtype="out ", dataType="")><
+else><portType(port=port, IOtype="out ", dataType="_data")>;
 <port.name>_send  : out std_logic;
-<if(last(port.name))
-><port.name>_ack   : in  std_logic<
-else
-><port.name>_ack   : in  std_logic;<
-endif>
+<port.name>_ack   : in  std_logic<endif>
 >>
 
 
@@ -47,9 +41,9 @@ listSize(values) ::= <<
 
 // These signals are used by the IOs management processes
 IOsManagementSignals(port)::= <<
-signal <port.name>_rdy    : std_logic;
+<if (!port.native)>signal <port.name>_rdy    : std_logic;
 signal <port.name>_isend  : std_logic;
-signal <portType(port=port, IOtype=" ", dataType="idata")>
+signal <portType(port=port, IOtype="", dataType="_idata")><endif>
 >>
 
 signalDeclaration(variable) ::= <<
@@ -471,7 +465,7 @@ OutputsManag() ::= <<
 ---------------------------------------------------------------------------
 -- Transmission manager
 ---------------------------------------------------------------------------
-<actor.outputs : printArbiter(); separator="\n\n">
+<actor.outputs: {port|<if(!port.native)><printArbiter(port)><endif>}; separator="\n\n">
 >>
 
 // instanciate an arbiter which manage the communication between actors.
@@ -522,23 +516,11 @@ end process;
 
 // prints the condition on the ack and go signals according to the input and output pattern
 printActionFire(action) ::= <<
-((isSchedulable_<action.name>_go <action.inputPattern.ports : {port| and <port.name>_send }>) = '1') then
-<if(action.inputPattern.ports)
->< if(action.outputPattern.ports)
->    <action.name>_go \<= isSchedulable_<action.name>_go and <action.outputPattern.ports : {port|<port.name>_rdy}; separator=" and ">;
-    <action.inputPattern.ports : {
-      port|<port.name>_ack \<= isSchedulable_<action.name>_go and <action.outputPattern.ports : {port|<port.name>_rdy}; separator=" and ">} ; separator=";\n">;<
-  else
->    <action.name>_go \<= isSchedulable_<action.name>_go;
-    <action.inputPattern.ports : {port|<port.name>_ack \<= isSchedulable_<action.name>_go;} ; separator="\n"><
-  endif><
-else
->< if(action.outputPattern.ports)
->    <action.name>_go \<= isSchedulable_<action.name>_go and <action.outputPattern.ports : {port|<port.name>_rdy}; separator=" and ">;<
-  else
->    <action.name>_go \<= isSchedulable_<action.name>_go;<
-  endif><
-endif>  
+((isSchedulable_<action.name>_go<action.inputPattern.ports : {port|<if(!port.native)> and <port.name>_send<endif>}>) = '1') then
+    <action.name>_go \<= isSchedulable_<action.name>_go<action.outputPattern.ports : {port|<if(!port.native)> and <port.name>_rdy<endif>}>;<
+action.inputPattern.ports : {port|<if(!port.native)>
+    <port.name>_ack \<= isSchedulable_<action.name>_go<action.outputPattern.ports : {port|<if(!port.native)> and <port.name>_rdy<endif>}>;<endif>
+}>
 >>
 
 printActionFireFSM(actions, fsm) ::= <<
@@ -589,7 +571,8 @@ begin
     FSM    \<= s_<actor.fsm.initialState.name>;    --
 <endif>
   elsif rising_edge(clock) then
-    <actor.outputs :{port|<port.name>_isend \<= '0';}; separator="\n">
+    <actor.outputs: {port|<if(!port.native)>
+<port.name>_isend \<= '0';<endif>}>
     <actor.stateVars: resetReadWriteEnable()>
     --  
 <if(actor.fsm)>
@@ -612,19 +595,23 @@ actionTestScheduler(action) ::= <<
 (<action.name>_go = '1') then
   -- body of "<action.name>" action
   <printActionBody(action)><
-  if(action.outputPattern.ports)>
-  <action.outputPattern.ports: {port|<port.name>_isend \<= '1';}; separator="\n">
-  <endif>
+  action.outputPattern.ports: {port|<if(!port.native)>
+  <port.name>_isend \<= '1';<endif>}>
+
 >>
 
 port_out_init(port) ::=<<
 
-<port.name>_isend \<= '0';
+<if (port.native)><if(port.type.bool)>
+<port.name> \<= 'Z';
+<else>
+<port.name> \<= (others =\> 'Z');
+<endif><else><port.name>_isend \<= '0';
 <if(port.type.bool)>
 <port.name>_idata \<= '0';
 <else>
 <port.name>_idata \<= (others =\> '0');
-<endif>
+<endif><endif>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -716,7 +703,7 @@ architecture rtl_<actor.simpleName> of <actor.simpleName> is
   ---------------------------------------------------------------------------
   <actor.actions:       {action| signal <action.name>_go    : std_logic;}; separator="\n">
   --
-  <actor.outputs :IOsManagementSignals(); separator="\n">
+  <actor.outputs: IOsManagementSignals(); separator="\n">
   --
   <actor.stateVars: signalDeclaration()>
 
