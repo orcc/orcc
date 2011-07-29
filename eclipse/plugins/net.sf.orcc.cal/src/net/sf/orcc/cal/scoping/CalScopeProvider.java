@@ -29,7 +29,9 @@
 package net.sf.orcc.cal.scoping;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
@@ -38,12 +40,20 @@ import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstGenerator;
 import net.sf.orcc.cal.cal.AstInputPattern;
 import net.sf.orcc.cal.cal.AstProcedure;
+import net.sf.orcc.cal.cal.AstSchedule;
+import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.AstStatementForeach;
+import net.sf.orcc.cal.cal.AstTransition;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.cal.CalFactory;
+import net.sf.orcc.cal.cal.CalPackage;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
+import org.eclipse.xtext.nodemodel.ILeafNode;
+import org.eclipse.xtext.nodemodel.INode;
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 import org.eclipse.xtext.scoping.IScope;
 import org.eclipse.xtext.scoping.Scopes;
 import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider;
@@ -56,6 +66,36 @@ import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider;
  * 
  */
 public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
+
+	private void addState(AstSchedule schedule, Set<String> nameSet,
+			List<INode> nodes) {
+		ILeafNode leaf = (ILeafNode) nodes.get(0);
+		String name = leaf.getText();
+		if (!nameSet.contains(name)) {
+			AstState state = CalFactory.eINSTANCE.createAstState();
+			state.setName(name);
+			state.setNode(leaf);
+
+			schedule.getStates().add(state);
+		}
+	}
+
+	private void buildStates(AstSchedule schedule) {
+		Set<String> nameSet = new HashSet<String>();
+		// source states
+		for (AstTransition transition : schedule.getTransitions()) {
+			List<INode> nodes = NodeModelUtils.findNodesForFeature(transition,
+					CalPackage.eINSTANCE.getAstTransition_Source());
+			addState(schedule, nameSet, nodes);
+		}
+
+		// just for stupid dead-end states
+		for (AstTransition transition : schedule.getTransitions()) {
+			List<INode> nodes = NodeModelUtils.findNodesForFeature(transition,
+					CalPackage.eINSTANCE.getAstTransition_Target());
+			addState(schedule, nameSet, nodes);
+		}
+	}
 
 	/**
 	 * Returns the scope of functions within an actor.
@@ -127,6 +167,57 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	public IScope scope_AstProcedure(AstActor actor, EReference reference) {
 		return Scopes.scopeFor(actor.getProcedures(),
 				delegateGetScope(actor, reference));
+	}
+
+	/**
+	 * Returns the scope for a source state referenced inside a transition.
+	 * 
+	 * @param schedule
+	 *            a schedule
+	 * @param reference
+	 *            a variable reference
+	 * @return a scope
+	 */
+	public IScope scope_AstSchedule_initialState(AstSchedule schedule,
+			EReference reference) {
+		if (schedule.getStates().isEmpty()) {
+			buildStates(schedule);
+		}
+		return Scopes.scopeFor(schedule.getStates());
+	}
+
+	/**
+	 * Returns the scope for a source state referenced inside a transition.
+	 * 
+	 * @param schedule
+	 *            a schedule
+	 * @param reference
+	 *            a variable reference
+	 * @return a scope
+	 */
+	public IScope scope_AstTransition_source(AstSchedule schedule,
+			EReference reference) {
+		if (schedule.getStates().isEmpty()) {
+			buildStates(schedule);
+		}
+		return Scopes.scopeFor(schedule.getStates());
+	}
+
+	/**
+	 * Returns the scope for a source state referenced inside a transition.
+	 * 
+	 * @param schedule
+	 *            a schedule
+	 * @param reference
+	 *            a variable reference
+	 * @return a scope
+	 */
+	public IScope scope_AstTransition_target(AstSchedule schedule,
+			EReference reference) {
+		if (schedule.getStates().isEmpty()) {
+			buildStates(schedule);
+		}
+		return Scopes.scopeFor(schedule.getStates());
 	}
 
 	/**
