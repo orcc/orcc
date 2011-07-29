@@ -28,7 +28,25 @@
  */
 package net.sf.orcc.cal.ui.outline;
 
+import net.sf.orcc.cal.cal.AstAction;
+import net.sf.orcc.cal.cal.AstActor;
+import net.sf.orcc.cal.cal.AstEntity;
+import net.sf.orcc.cal.cal.AstFunction;
+import net.sf.orcc.cal.cal.AstInequality;
+import net.sf.orcc.cal.cal.AstPort;
+import net.sf.orcc.cal.cal.AstPriority;
+import net.sf.orcc.cal.cal.AstProcedure;
+import net.sf.orcc.cal.cal.AstSchedule;
+import net.sf.orcc.cal.cal.AstTransition;
+import net.sf.orcc.cal.cal.AstUnit;
+import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.cal.CalPackage;
+
+import org.eclipse.xtext.ui.IImageHelper;
+import org.eclipse.xtext.ui.editor.outline.IOutlineNode;
 import org.eclipse.xtext.ui.editor.outline.impl.DefaultOutlineTreeProvider;
+
+import com.google.inject.Inject;
 
 /**
  * customization of the default outline structure
@@ -36,90 +54,128 @@ import org.eclipse.xtext.ui.editor.outline.impl.DefaultOutlineTreeProvider;
  */
 public class CalOutlineTreeProvider extends DefaultOutlineTreeProvider {
 
-//	@CreateNode
-//	public ContentOutlineNode createNode(AstActor actor,
-//			ContentOutlineNode parentNode) {
-//		ContentOutlineNode node = super.newOutlineNode(actor, parentNode);
-//
-//		createNodes(node, "Parameters", actor.getParameters());
-//		createNodes(node, "Input ports", actor.getInputs());
-//		createNodes(node, "Output ports", actor.getOutputs());
-//		createNodes(node, "State variables", actor.getStateVariables());
-//		createNodes(node, "Functions", actor.getFunctions());
-//		createNodes(node, "Procedures", actor.getProcedures());
-//		createNodes(node, "Actions", actor.getActions());
-//
-//		AstSchedule schedule = actor.getSchedule();
-//		if (schedule != null) {
-//			createNodes(node, "FSM", schedule.getTransitions());
-//		}
-//
-//		List<AstPriority> priorities = actor.getPriorities();
-//		if (!priorities.isEmpty()) {
-//			createNodes(node, "Priorities", priorities.get(0).getInequalities());
-//		}
-//
-//		return node;
-//	}
-//
-//	@CreateNode
-//	public ContentOutlineNode createNode(AstEntity entity,
-//			ContentOutlineNode parentNode) {
-//		AstActor actor = entity.getActor();
-//		if (actor == null) {
-//			AstUnit unit = entity.getUnit();
-//			return createNode(unit, parentNode);
-//		} else {
-//			return createNode(actor, parentNode);
-//		}
-//	}
-//
-//	@CreateNode
-//	public ContentOutlineNode createNode(AstUnit unit,
-//			ContentOutlineNode parentNode) {
-//		ContentOutlineNode node = super.newOutlineNode(unit, parentNode);
-//
-//		createNodes(node, "Functions", unit.getFunctions());
-//		createNodes(node, "Constants", unit.getVariables());
-//
-//		return node;
-//	}
-//
-//	private void createNodes(ContentOutlineNode parent, String name,
-//			EList<?> objects) {
-//		if (!objects.isEmpty()) {
-//			ContentOutlineNode node = new ContentOutlineNode(name);
-//			parent.addChildren(node);
-//			for (Object obj : objects) {
-//				createNode((EObject) obj, node);
-//			}
-//		}
-//	}
-//
-//	@GetChildren
-//	public List<EObject> getChildren(AstAction action) {
-//		return NO_CHILDREN;
-//	}
-//
-//	@GetChildren
-//	public List<EObject> getChildren(AstActor actor) {
-//		return NO_CHILDREN;
-//	}
-//
-//	@GetChildren
-//	public List<EObject> getChildren(AstEntity entity) {
-//		AstActor actor = entity.getActor();
-//		if (actor == null) {
-//			AstUnit unit = entity.getUnit();
-//			return getChildren(unit);
-//		} else {
-//			return getChildren(actor);
-//		}
-//	}
-//
-//	@GetChildren
-//	public List<EObject> getChildren(AstUnit unit) {
-//		return NO_CHILDREN;
-//	}
+	@Inject
+	private IImageHelper imageHelper;
+
+	protected void _createNode(IOutlineNode parentNode, AstActor actor) {
+		createEStructuralFeatureNode(parentNode, actor,
+				CalPackage.eINSTANCE.getAstActor_Parameters(), null,
+				"parameters", false);
+
+		createEStructuralFeatureNode(parentNode, actor,
+				CalPackage.eINSTANCE.getAstActor_Inputs(), null, "input ports",
+				false);
+
+		createEStructuralFeatureNode(parentNode, actor,
+				CalPackage.eINSTANCE.getAstActor_Outputs(), null,
+				"output ports", false);
+
+		createEStructuralFeatureNode(parentNode, actor,
+				CalPackage.eINSTANCE.getAstActor_StateVariables(), null,
+				"state variables", false);
+
+		if (!actor.getFunctions().isEmpty()) {
+			createEStructuralFeatureNode(parentNode, actor,
+					CalPackage.eINSTANCE.getAstActor_Functions(), null,
+					"functions", false);
+		}
+
+		if (!actor.getProcedures().isEmpty()) {
+			createEStructuralFeatureNode(parentNode, actor,
+					CalPackage.eINSTANCE.getAstActor_Procedures(), null,
+					"procedures", false);
+		}
+
+		createEStructuralFeatureNode(parentNode, actor,
+				CalPackage.eINSTANCE.getAstActor_Actions(), null, "actions",
+				false);
+
+		if (actor.getSchedule() != null) {
+			createEStructuralFeatureNode(parentNode, actor,
+					CalPackage.eINSTANCE.getAstActor_Schedule(), null, "FSM",
+					false);
+		}
+
+		if (!actor.getPriorities().isEmpty()) {
+			createEStructuralFeatureNode(parentNode, actor,
+					CalPackage.eINSTANCE.getAstActor_Priorities(), null,
+					"priorities", false);
+		}
+	}
+
+	protected void _createNode(IOutlineNode parentNode, AstEntity entity) {
+		createEStructuralFeatureNode(parentNode, entity,
+				CalPackage.eINSTANCE.getAstEntity_Package(), _image(entity),
+				entity.getPackage(), true);
+
+		createEStructuralFeatureNode(parentNode, entity,
+				CalPackage.eINSTANCE.getAstEntity_Imports(),
+				imageHelper.getImage("impc_obj.gif"), "import declarations",
+				false);
+
+		String name = entity.getName();
+		if (entity.getActor() != null) {
+			createEStructuralFeatureNode(parentNode, entity,
+					CalPackage.eINSTANCE.getAstEntity_Actor(),
+					_image(entity.getActor()), name, false);
+		} else if (entity.getUnit() != null) {
+			createEStructuralFeatureNode(parentNode, entity,
+					CalPackage.eINSTANCE.getAstEntity_Unit(), null, name, false);
+		}
+	}
+
+	protected void _createNode(IOutlineNode parentNode, AstPriority priority) {
+		for (AstInequality inequality : priority.getInequalities()) {
+			createNode(parentNode, inequality);
+		}
+	}
+
+	protected void _createNode(IOutlineNode parentNode, AstSchedule schedule) {
+		for (AstTransition transition : schedule.getTransitions()) {
+			createNode(parentNode, transition);
+		}
+	}
+
+	protected void _createNode(IOutlineNode parentNode, AstUnit unit) {
+		createEStructuralFeatureNode(parentNode, unit,
+				CalPackage.eINSTANCE.getAstUnit_Variables(), null, "variables",
+				false);
+
+		if (!unit.getFunctions().isEmpty()) {
+			createEStructuralFeatureNode(parentNode, unit,
+					CalPackage.eINSTANCE.getAstUnit_Functions(), null,
+					"functions", false);
+		}
+
+		if (!unit.getProcedures().isEmpty()) {
+			createEStructuralFeatureNode(parentNode, unit,
+					CalPackage.eINSTANCE.getAstUnit_Procedures(), null,
+					"procedures", false);
+		}
+	}
+
+	protected boolean _isLeaf(AstAction action) {
+		return true;
+	}
+
+	protected boolean _isLeaf(AstFunction function) {
+		return true;
+	}
+
+	protected boolean _isLeaf(AstPort port) {
+		return true;
+	}
+
+	protected boolean _isLeaf(AstProcedure procedure) {
+		return true;
+	}
+
+	protected boolean _isLeaf(AstTransition transition) {
+		return true;
+	}
+
+	protected boolean _isLeaf(AstVariable variable) {
+		return true;
+	}
 
 }

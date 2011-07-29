@@ -32,11 +32,19 @@ import java.util.Iterator;
 
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
+import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstInequality;
 import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstTransition;
+import net.sf.orcc.cal.cal.AstTypeBool;
+import net.sf.orcc.cal.cal.AstTypeFloat;
+import net.sf.orcc.cal.cal.AstTypeInt;
+import net.sf.orcc.cal.cal.AstTypeList;
+import net.sf.orcc.cal.cal.AstTypeUint;
 import net.sf.orcc.cal.cal.AstUnit;
+import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.cal.Import;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
@@ -55,6 +63,18 @@ public class CalLabelProvider extends DefaultEObjectLabelProvider {
 	@Inject
 	public CalLabelProvider(AdapterFactoryLabelProvider delegate) {
 		super(delegate);
+	}
+
+	public String image(AstActor actor) {
+		return "orcc.png";
+	}
+
+	public String image(AstEntity entity) {
+		return "package_obj.gif";
+	}
+
+	public String image(Import import_) {
+		return "imp_obj.gif";
 	}
 
 	public String text(AstAction action) {
@@ -99,8 +119,40 @@ public class CalLabelProvider extends DefaultEObjectLabelProvider {
 				+ getText(transition.getTarget());
 	}
 
+	public String text(AstTypeBool type) {
+		return "bool";
+	}
+
+	public String text(AstTypeFloat type) {
+		return "float";
+	}
+
+	public String text(AstTypeInt type) {
+		return "int";
+	}
+
+	public String text(AstTypeList type) {
+		return "List";
+	}
+
+	public String text(AstTypeUint type) {
+		return "uint";
+	}
+
 	public String text(AstUnit unit) {
 		return null;
+	}
+
+	public String text(AstVariable variable) {
+		String result = getText(variable.getType()) + " " + variable.getName();
+		if (variable.getValue() != null) {
+			result += " ";
+			if (!variable.isConstant()) {
+				result += ":";
+			}
+			result += "= " + getText(variable.getValue());
+		}
+		return result;
 	}
 
 }
