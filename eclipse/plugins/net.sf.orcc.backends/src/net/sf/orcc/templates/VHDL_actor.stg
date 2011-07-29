@@ -1,11 +1,19 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Common applet
 ///////////////////////////////////////////////////////////////////////////////
+getPortName(port, dataType) ::= <%
+<if (port.native)>
+<port.name>
+<else>
+<port.name><dataType>
+<endif>
+%>
+
 portType(port, IOtype, dataType) ::= <%
 <if(port.type.bool)>
-<port.name><dataType>  : <IOtype>std_logic
+<getPortName(port, dataType)>  : <IOtype>std_logic
 <else>
-<port.name><dataType>  : <IOtype>std_logic_vector(<port.type.size> -1 downto 0)
+<getPortName(port, dataType)>  : <IOtype>std_logic_vector(<port.type.size> -1 downto 0)
 <endif>
 %>
 
@@ -14,18 +22,10 @@ portType(port, IOtype, dataType) ::= <%
 ///////////////////////////////////////////////////////////////////////////////
 // Print instance's ports
 ///////////////////////////////////////////////////////////////////////////////
-PrintInputPorts(port) ::= <<
-<if (port.native)><portType(port=port, IOtype="in  ", dataType="")><
-else><portType(port=port, IOtype="in  ", dataType="_data")>;
-<port.name>_send  : in  std_logic;
-<port.name>_ack   : out std_logic<endif>
->>
-
-PrintOutputPorts(port) ::= <<
-<if (port.native)><portType(port=port, IOtype="out ", dataType="")><
-else><portType(port=port, IOtype="out ", dataType="_data")>;
-<port.name>_send  : out std_logic;
-<port.name>_ack   : in  std_logic<endif>
+printPort(port, dirSend, dirAck) ::= <<
+<portType(port=port, IOtype=dirSend, dataType="_data")><if (!port.native)>;
+<port.name>_send  : <dirSend>std_logic;
+<port.name>_ack   : <dirAck>std_logic<endif>
 >>
 
 
@@ -277,24 +277,22 @@ endif>
 // port read/write //
 
 printRead(procedure, port, variable) ::= <<
-<if(variable)
-><if(port.type.bool)
-><procedure.name>_<variable.name> := <port.name>_data;<
+<if(port.type.bool)
+><procedure.name>_<variable.name> := <getPortName(port, "_data")>;<
 elseif(port.type.int)
-><procedure.name>_<variable.name> := to_integer(signed(<port.name>_data));<
+><procedure.name>_<variable.name> := to_integer(signed(<getPortName(port, "_data")>));<
 elseif(port.type.uint)
-><procedure.name>_<variable.name> := to_integer(unsigned(<port.name>_data));<
-endif
-><endif>
+><procedure.name>_<variable.name> := to_integer(unsigned(<getPortName(port, "_data")>));<
+endif>
 >>
 
 printWrite(procedure, port, variable) ::= <<
 <if(port.type.bool)
-><port.name>_idata \<= <procedure.name>_<variable.name>;<
+><getPortName(port, "_idata")> \<= <procedure.name>_<variable.name>;<
 elseif(port.type.int)
-><port.name>_idata \<= std_logic_vector(to_signed(<procedure.name>_<variable.name>, <port.type.size>));<
+><getPortName(port, "_idata")> \<= std_logic_vector(to_signed(<procedure.name>_<variable.name>, <port.type.size>));<
 else
-><port.name>_idata \<= std_logic_vector(to_unsigned(<procedure.name>_<variable.name>, <port.type.size>));<
+><getPortName(port, "_idata")> \<= std_logic_vector(to_unsigned(<procedure.name>_<variable.name>, <port.type.size>));<
 endif>
 >>
 
@@ -491,13 +489,12 @@ port map (
 Actor_Scheduler(actor) ::= <<
 <actor.simpleName>_scheduler : process(<actor.templateData.signals; wrap, anchor, separator=", ">)
   <actor.actions : { action |<printLocals(action.scheduler)>
-variable <action.scheduler.name>_go : std_logic; <action.inputPattern.ports: {port | <if(action.peekPattern.portToVarMap.(port))>
-variable <action.scheduler.name>_<port.name> : <port.type>;<
-endif>}; separator="\n">
+variable <action.scheduler.name>_go : std_logic; <action.peekPattern.ports: {port |
+variable <action.scheduler.name>_<port.name> : <port.type>;}; separator="\n">
 }>  --
 begin
   <actor.actions: {action|-- test if "<action.name>" action is schedulable
-<action.inputPattern.ports: { port |<printRead(procedure=action.scheduler, port=port, variable=action.peekPattern.portToVarMap.(port))>}; separator="\n">
+<action.peekPattern.ports: { port |<printRead(procedure=action.scheduler, port=port, variable=action.peekPattern.portToVarMap.(port))>}; separator="\n">
 <printProcedure(procedure=action.scheduler, transformReturn="true")>}; separator="\n">
   --
   -- Test the action's inputs to fire (or not) an action  
@@ -689,9 +686,9 @@ entity <actor.simpleName> is
   -- Inputs
   clock    : in  std_logic;
   reset_n  : in  std_logic<if(actor.inputs || actor.outputs)>;<endif>
-  <actor.inputs: PrintInputPorts(); separator=";\n"><if(actor.inputs && actor.outputs)>;<endif>
+  <actor.inputs: {port|<printPort(port, "in  ", "out ")>}; separator=";\n"><if(actor.inputs && actor.outputs)>;<endif>
   -- Outputs
-  <actor.outputs: PrintOutputPorts(); separator=";\n">);
+  <actor.outputs: {port|<printPort(port, "out ", "in  ")>}; separator=";\n">);
 end <actor.simpleName>;
 
 

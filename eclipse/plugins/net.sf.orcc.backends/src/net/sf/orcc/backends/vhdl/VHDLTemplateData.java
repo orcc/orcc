@@ -77,17 +77,21 @@ public class VHDLTemplateData {
 		@Override
 		public Set<String> caseActor(Actor actor) {
 			for (Port port : actor.getInputs()) {
-				signals.add(port.getName() + "_send");
+				if (!port.isNative()) {
+					signals.add(port.getName() + "_send");
+				}
 			}
 
 			for (Port port : actor.getOutputs()) {
-				signals.add(port.getName() + "_rdy");
+				if (!port.isNative()) {
+					signals.add(port.getName() + "_rdy");
+				}
 			}
 
 			for (Action action : actor.getActions()) {
 				Pattern peekPattern = action.getPeekPattern();
 				for (Port port : peekPattern.getPorts()) {
-					if (peekPattern.getVariable(port) != null) {
+					if (!port.isNative()) {
 						String name = port.getName() + "_data";
 						signals.add(name);
 					}
