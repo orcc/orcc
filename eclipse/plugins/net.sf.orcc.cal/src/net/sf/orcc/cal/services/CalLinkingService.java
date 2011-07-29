@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.cal.cal.AstProcedure;
-import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.util.Util;
@@ -125,28 +124,10 @@ public class CalLinkingService extends DefaultLinkingService {
 		if (requiredType != null && s != null) {
 			if (CalPackage.Literals.AST_PROCEDURE.isSuperTypeOf(requiredType)) {
 				return builtinProcedure(context, s);
-			} else if (CalPackage.Literals.AST_STATE
-					.isSuperTypeOf(requiredType)) {
-				return getState(context, ref, s);
 			}
 		}
 
 		return Collections.emptyList();
-	}
-
-	private List<EObject> getState(EObject context, EReference reference,
-			String name) {
-		EObject cter = Util.getTopLevelContainer(context);
-
-		// Create the model element instance using the factory
-		AstState state = CalFactory.eINSTANCE.createAstState();
-		state.setName(name);
-
-		// Attach the stub to the resource that's being parsed
-		Resource res = makeResource(cter.eResource());
-		res.getContents().add(state);
-
-		return Collections.singletonList((EObject) state);
 	}
 
 	/**
