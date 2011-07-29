@@ -164,8 +164,12 @@ public class VHDLBackendImpl extends AbstractBackend {
 		// applies transformations
 		for (ActorVisitor<?> transformation : transformationsCodegen) {
 			transformation.doSwitch(actor);
+
+			// serializes a clone of the actor so that we don't change the
+			// eResource() of the actor being transformed
 			ResourceSet set = new ResourceSetImpl();
-			if (debugMode && !IrUtil.serializeActor(set, path, actor)) {
+			Actor clonedActor = IrUtil.copy(actor);
+			if (debugMode && !IrUtil.serializeActor(set, path, clonedActor)) {
 				System.out.println("oops " + transformation + " "
 						+ actor.getName());
 			}
