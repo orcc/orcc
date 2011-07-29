@@ -50,6 +50,7 @@ import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.vhdl.ram.RAMTransformation;
 import net.sf.orcc.backends.vhdl.transformations.BoolExprTransformation;
 import net.sf.orcc.backends.vhdl.transformations.ListDeclarationTransformation;
+import net.sf.orcc.backends.vhdl.transformations.StoreOnceTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Procedure;
@@ -144,6 +145,9 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 				// transform "b := a > b;" statements to if conditionals
 				new BoolExprTransformation(),
+
+				// makes sure there is at most one store per variable per cycle
+				new StoreOnceTransformation(),
 
 				// flattens declarations of multi-dimensional arrays
 				new ListDeclarationTransformation(),
