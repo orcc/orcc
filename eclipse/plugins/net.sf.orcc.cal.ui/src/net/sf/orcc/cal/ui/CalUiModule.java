@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2010-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,8 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.xtext.resource.ILocationInFileProvider;
 
 /**
- * Use this class to register components to be used within the IDE.
+ * This class extends the default abstract CAL UI module to define customized
+ * services.
  */
 public class CalUiModule extends net.sf.orcc.cal.ui.AbstractCalUiModule {
 
@@ -43,15 +44,5 @@ public class CalUiModule extends net.sf.orcc.cal.ui.AbstractCalUiModule {
 	public Class<? extends ILocationInFileProvider> bindILocationInFileProvider() {
 		return CalLocationProvider.class;
 	}
-
-	// commented out at the moment because clustering seems to double
-	// compilation time
-	// @Override
-	// public void configureIResourceDescriptionsBuilderScope(Binder binder) {
-	// binder.bind(IResourceDescriptions.class)
-	// .annotatedWith(
-	// Names.named(AbstractGlobalScopeProvider.NAMED_BUILDER_SCOPE))
-	// .to(CurrentDescriptions.ResourceSetAware.class);
-	// }
 
 }
