@@ -307,10 +307,10 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 		c.setLinewrap().after(access.getColonKeyword_8());
 
 		// "end" unindents
-		c.setIndentation(null, access.getEndKeyword_10());
+		c.setIndentation(null, access.getEndKeyword_11());
 
-		c.setLinewrap().before(access.getEndKeyword_10());
-		c.setLinewrap(2).after(access.getEndKeyword_10());
+		c.setLinewrap().before(access.getEndKeyword_11());
+		c.setLinewrap(2).after(access.getEndKeyword_11());
 	}
 
 	/**
@@ -403,7 +403,7 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 		keywordAndCommas(c, access.getVarKeyword_5_0(),
 				access.getCommaKeyword_5_2_0());
 
-		body(c, access.getBeginKeyword_6(), access.getEndKeyword_8());
+		body(c, access.getBeginKeyword_6(), access.getEndKeyword_9());
 	}
 
 	private void configureSchedule(FormattingConfig c) {

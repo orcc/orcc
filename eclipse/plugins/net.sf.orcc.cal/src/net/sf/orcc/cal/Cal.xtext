@@ -73,6 +73,7 @@ AstFunction:
 	('var'
 		variables += AstValuedVariableDeclaration
 		(',' variables += AstValuedVariableDeclaration)*)? ':'
+	(variables += AstValuedVariableDeclaration ';')*
 	expression=AstExpression
 	'end';
 
@@ -91,6 +92,7 @@ AstProcedure:
 		variables += AstValuedVariableDeclaration
 		(',' variables += AstValuedVariableDeclaration)*)?
 	'begin'
+		(variables += AstValuedVariableDeclaration ';')*
 		(statements += AstStatement)*
 	'end';
 
@@ -166,7 +168,10 @@ AstAction:
 	('var'
 		variables += AstValuedVariableDeclaration
 		(',' variables += AstValuedVariableDeclaration)*)?
-	('do' (statements+=AstStatement)*)?
+	('do'
+		(variables += AstValuedVariableDeclaration ';')*
+		(statements += AstStatement)*
+	)?
 	'end';
 
 AstInitialize returns AstAction:
@@ -180,7 +185,10 @@ AstInitialize returns AstAction:
 	('var'
 		variables += AstValuedVariableDeclaration
 		(',' variables += AstValuedVariableDeclaration)*)?
-	('do' (statements+=AstStatement)*)?
+	('do'
+		(variables += AstValuedVariableDeclaration ';')*
+		(statements+=AstStatement)*
+	)?
 	'end';
 
 AstInputPattern: port=[AstPort] ':' '[' tokens+=AstToken (',' tokens+=AstToken)* ']'
