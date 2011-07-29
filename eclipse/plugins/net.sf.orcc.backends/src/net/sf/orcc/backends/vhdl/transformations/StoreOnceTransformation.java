@@ -28,10 +28,22 @@
  */
 package net.sf.orcc.backends.vhdl.transformations;
 
+import static net.sf.orcc.ir.IrFactory.eINSTANCE;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.IrUtil;
 
 /**
  * This class defines an actor transformation that transforms code so that at
@@ -42,18 +54,72 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  */
 public class StoreOnceTransformation extends AbstractActorVisitor<Object> {
 
-	@Override
-	public Object caseProcedure(Procedure procedure) {
-		return null;
+	private List<Var> globalsToStore;
+
+	private Map<Var, Var> globalToLocalMap;
+
+	public StoreOnceTransformation() {
+		globalToLocalMap = new HashMap<Var, Var>();
+		globalsToStore = new ArrayList<Var>();
 	}
 
 	@Override
 	public Object caseInstLoad(InstLoad load) {
+		if (load.getIndexes().isEmpty()) {
+			Var source = load.getSource().getVariable();
+			Var target = load.getTarget().getVariable();
+			Var local = globalToLocalMap.get(source);
+			if (local == null) {
+				globalToLocalMap.put(source, target);
+			} else {
+				// we already loaded the variable
+				NodeBlock block = (NodeBlock) load.eContainer();
+				IrUtil.delete(load);
+
+				InstAssign assign = eINSTANCE.createInstAssign(target, local);
+				block.getInstructions().add(indexInst, assign);
+			}
+		}
 		return null;
 	}
 
 	@Override
 	public Object caseInstStore(InstStore store) {
+		if (store.getIndexes().isEmpty()) {
+			Var target = store.getTarget().getVariable();
+			Expression value = store.getValue();
+
+			// create new local
+			Var local = procedure.newTempLocalVariable(target.getType(),
+					"local_" + target.getName());
+			globalToLocalMap.put(target, local);
+
+			// replace store by assignment
+			NodeBlock block = (NodeBlock) store.eContainer();
+			InstAssign assign = eINSTANCE.createInstAssign(local, value);
+			IrUtil.delete(store);
+			block.getInstructions().add(indexInst, assign);
+
+			// add global to store list
+			if (!globalsToStore.contains(target)) {
+				globalsToStore.add(target);
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public Object caseProcedure(Procedure procedure) {
+		super.caseProcedure(procedure);
+
+		for (Var global : globalsToStore) {
+			Var local = globalToLocalMap.get(global);
+			InstStore store = eINSTANCE.createInstStore(global, local);
+			procedure.getLast().add(store);
+		}
+
+		globalToLocalMap.clear();
+		globalsToStore.clear();
 		return null;
 	}
 

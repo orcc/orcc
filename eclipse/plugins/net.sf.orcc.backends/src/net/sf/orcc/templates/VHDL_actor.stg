@@ -43,7 +43,7 @@ listSize(values) ::= <<
 IOsManagementSignals(port)::= <<
 <if (!port.native)>signal <port.name>_rdy    : std_logic;
 signal <port.name>_isend  : std_logic;
-signal <portType(port=port, IOtype="", dataType="_idata")><endif>
+signal <portType(port=port, IOtype="", dataType="_idata")>;<endif>
 >>
 
 signalDeclaration(variable) ::= <<
