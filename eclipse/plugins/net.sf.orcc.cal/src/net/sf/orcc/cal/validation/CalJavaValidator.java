@@ -30,8 +30,6 @@ package net.sf.orcc.cal.validation;
 
 import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -131,44 +129,15 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	}
 
 	/**
-	 * Checks the input pattern.
-	 * 
-	 * @param inputs
-	 *            the input patterns of an action
-	 */
-	private void checkActionInputs(List<AstInputPattern> inputs) {
-		Set<String> names = new HashSet<String>();
-
-		for (AstInputPattern pattern : inputs) {
-			// check duplicate ports in output pattern
-			String name = pattern.getPort().getName();
-			if (names.contains(name)) {
-				error("Duplicate port " + name + " in input pattern", pattern,
-						eINSTANCE.getAstInputPattern_Port(), -1);
-			}
-			names.add(name);
-		}
-	}
-
-	/**
 	 * Checks the token expressions are correctly typed.
 	 * 
 	 * @param outputs
 	 *            the output patterns of an action
 	 */
 	private void checkActionOutputs(List<AstOutputPattern> outputs) {
-		Set<String> names = new HashSet<String>();
 		TypeChecker checker = new TypeChecker(this);
 
 		for (AstOutputPattern pattern : outputs) {
-			// check duplicate ports in output pattern
-			String name = pattern.getPort().getName();
-			if (names.contains(name)) {
-				error("Duplicate port " + name + " in output pattern", pattern,
-						eINSTANCE.getAstOutputPattern_Port(), -1);
-			}
-			names.add(name);
-
 			Type portType = Util.getType(pattern.getPort());
 			AstExpression astRepeat = pattern.getRepeat();
 			if (astRepeat == null) {
@@ -251,28 +220,10 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		}
 	}
 
-	/**
-	 * Checks the tokens and variables declared in the action are unique.
-	 * 
-	 * @param action
-	 *            the action to check
-	 */
-	private void checkActionVariables(AstAction action) {
-		List<AstInputPattern> inputs = action.getInputs();
-		List<AstVariable> variables = new ArrayList<AstVariable>();
-		for (AstInputPattern pattern : inputs) {
-			variables.addAll(pattern.getTokens());
-		}
-
-		variables.addAll(action.getVariables());
-	}
-
 	@Check(CheckType.NORMAL)
 	public void checkAstAction(AstAction action) {
 		checkActionGuards(action);
 		checkActionTag(action);
-		checkActionVariables(action);
-		checkActionInputs(action.getInputs());
 		checkActionOutputs(action.getOutputs());
 	}
 
