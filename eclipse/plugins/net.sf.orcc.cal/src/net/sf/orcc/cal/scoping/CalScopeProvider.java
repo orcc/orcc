@@ -77,6 +77,7 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 			state.setNode(leaf);
 
 			schedule.getStates().add(state);
+			nameSet.add(name);
 		}
 	}
 
