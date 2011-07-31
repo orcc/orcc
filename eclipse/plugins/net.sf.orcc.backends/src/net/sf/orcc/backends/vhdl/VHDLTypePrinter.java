@@ -29,6 +29,7 @@
  */
 package net.sf.orcc.backends.vhdl;
 
+import static java.lang.Integer.MAX_VALUE;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.TypeBool;
 import net.sf.orcc.ir.TypeInt;
@@ -44,41 +45,6 @@ import net.sf.orcc.ir.util.TypePrinter;
  * 
  */
 public class VHDLTypePrinter extends TypePrinter {
-
-	/**
-	 * Prints an integer with the given number of bits.
-	 * 
-	 * @param size
-	 *            an integer that gives the number of bits
-	 */
-	private String printInt(int size) {
-		// limits size to 32 bit signed int
-		if (size >= 32) {
-			size = 32;
-		}
-
-		long bound = (long) 1 << (size - 1);
-		return "integer range " + (bound - 1) + " downto -"
-				+ ((bound < 2147483647) ? bound : (bound - 1));
-		// up to 1073741824, fine
-		// because Altera only allows bounds down to "-2147483647"
-	}
-
-	/**
-	 * Prints an unsigned integer with the given number of bits.
-	 * 
-	 * @param size
-	 *            an unsigned integer that gives the number of bits
-	 */
-	private String printUint(int size) {
-		// limits size to 31 bit unsigned int
-		if (size >= 31) {
-			size = 31;
-		}
-
-		long bound = (long) 1 << size;
-		return "integer range " + (bound - 1) + " downto 0";
-	}
 
 	@Override
 	public String caseTypeBool(TypeBool type) {
@@ -104,6 +70,39 @@ public class VHDLTypePrinter extends TypePrinter {
 	@Override
 	public String caseTypeUint(TypeUint type) {
 		return printUint(type.getSize());
+	}
+
+	/**
+	 * Prints an integer with the given number of bits.
+	 * 
+	 * @param size
+	 *            an integer that gives the number of bits
+	 */
+	private String printInt(int size) {
+		// IEEE 1076-1993
+		// Section 3.1.2.1 Predefined integer types
+		// "The range of INTEGER is implementation dependent, but it is
+		// guaranteed to include the range -2147483647 to +2147483647."
+
+		// so we limit to 31-bit signed integers.
+		if (size >= 31) {
+			return "integer range " + MAX_VALUE + " downto -" + MAX_VALUE;
+		} else {
+			int bound = 1 << (size - 1);
+			return "integer range " + (bound - 1) + " downto -" + bound;
+		}
+	}
+
+	/**
+	 * Prints an unsigned integer with the given number of bits.
+	 * 
+	 * @param size
+	 *            an unsigned integer that gives the number of bits
+	 */
+	private String printUint(int size) {
+		// we limit to 31-bit unsigned integers (see printInt)
+		int bound = (size >= 31) ? MAX_VALUE : (1 << size) - 1;
+		return "integer range " + bound + " downto 0";
 	}
 
 }
