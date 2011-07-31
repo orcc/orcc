@@ -71,7 +71,6 @@ import net.sf.orcc.cal.type.TypeCycleDetector;
 import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.cal.util.CalActionList;
 import net.sf.orcc.cal.util.Util;
-import net.sf.orcc.cal.validation.AbstractCalJavaValidator;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.util.TypeUtil;
@@ -93,7 +92,6 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.xtext.EcoreUtil2;
-import org.eclipse.xtext.util.SimpleAttributeResolver;
 import org.eclipse.xtext.validation.Check;
 import org.eclipse.xtext.validation.CheckType;
 import org.jgrapht.DirectedGraph;
@@ -113,22 +111,10 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 	private static final String DEFAULT = "(default)";
 
-	private SimpleAttributeResolver<EObject, String> resolver = SimpleAttributeResolver
-			.newResolver(String.class, "name");
-
 	/**
 	 * Creates a new CAL validator written in Java.
 	 */
 	public CalJavaValidator() {
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkAction(AstAction action) {
-		checkActionGuards(action);
-		checkActionTag(action);
-		checkActionVariables(action);
-		checkActionInputs(action.getInputs());
-		checkActionOutputs(action.getOutputs());
 	}
 
 	private void checkActionGuards(AstAction action) {
@@ -279,19 +265,19 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		}
 
 		variables.addAll(action.getVariables());
-		checkUniqueNames(variables);
 	}
 
 	@Check(CheckType.NORMAL)
-	public void checkActor(AstActor actor) {
-		// check unique names
-		checkUniqueNames(actor.getParameters());
-		checkUniqueNames(actor.getInputs());
-		checkUniqueNames(actor.getOutputs());
-		checkUniqueNames(actor.getFunctions());
-		checkUniqueNames(actor.getProcedures());
-		checkUniqueNames(actor.getStateVariables());
+	public void checkAstAction(AstAction action) {
+		checkActionGuards(action);
+		checkActionTag(action);
+		checkActionVariables(action);
+		checkActionInputs(action.getInputs());
+		checkActionOutputs(action.getOutputs());
+	}
 
+	@Check(CheckType.NORMAL)
+	public void checkAstActor(AstActor actor) {
 		// build action list
 		CalActionList actionList = new CalActionList();
 		actionList.addActions(actor.getActions());
@@ -311,7 +297,96 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	}
 
 	@Check(CheckType.NORMAL)
-	public void checkAssign(AstStatementAssign assign) {
+	public void checkAstEntity(AstEntity entity) {
+		checkEntityPackage(entity);
+		checkEntityName(entity);
+
+		// check there are no cycles in type definitions
+		if (!new TypeCycleDetector(this).detectCycles(entity)) {
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkAstExpressionCall(AstExpressionCall astCall) {
+		AstFunction function = astCall.getFunction();
+		String name = function.getName();
+
+		EObject rootCter = EcoreUtil.getRootContainer(astCall);
+		EObject rootCterFunction = EcoreUtil.getRootContainer(function);
+		if (function.eContainer() instanceof AstActor
+				&& rootCter != rootCterFunction) {
+			// calling an actor's function from another actor/unit
+			error("function " + name
+					+ " cannot be called from another actor/unit", astCall,
+					eINSTANCE.getAstExpressionCall_Function(), -1);
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkAstFunction(final AstFunction function) {
+		if (!function.isNative()) {
+			checkReturnType(function);
+		}
+
+		// do not check functions of a unit
+		if (function.eContainer() instanceof AstUnit) {
+			return;
+		}
+
+		boolean used = new BooleanSwitch() {
+
+			@Override
+			public Boolean caseAstExpressionCall(AstExpressionCall expression) {
+				if (expression.getFunction().equals(function)) {
+					return true;
+				}
+
+				return super.caseAstExpressionCall(expression);
+			}
+
+		}.doSwitch(Util.getTopLevelContainer(function));
+
+		if (!used && !function.isNative()) {
+			warning("The function " + function.getName() + " is never called",
+					eINSTANCE.getAstFunction_Name());
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkAstGenerator(AstGenerator generator) {
+		int lower = Util.getIntValue(generator.getLower());
+		int higher = Util.getIntValue(generator.getHigher());
+
+		if (higher < lower) {
+			error("higher bound must be greater than lower bound", generator,
+					eINSTANCE.getAstGenerator_Higher(), -1);
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkAstProcedure(final AstProcedure procedure) {
+		boolean used = new BooleanSwitch() {
+
+			@Override
+			public Boolean caseAstStatementCall(AstStatementCall call) {
+				if (call.getProcedure().equals(procedure)) {
+					return true;
+				}
+
+				return false;
+			}
+
+		}.doSwitch(Util.getTopLevelContainer(procedure));
+
+		if (!used && procedure.eContainer() instanceof AstActor
+				&& !procedure.isNative()) {
+			warning("The procedure " + procedure.getName() + " is never called",
+					eINSTANCE.getAstProcedure_Name());
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkAstStatementAssign(AstStatementAssign assign) {
 		AstVariable variable = assign.getTarget().getVariable();
 		if (variable.isConstant()) {
 			error("The variable " + variable.getName() + " is not assignable",
@@ -347,6 +422,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		AstProcedure procedure = astCall.getProcedure();
 		String name = procedure.getName();
 		List<AstExpression> parameters = astCall.getParameters();
+
 		if (procedure.eContainer() == null) {
 			if ("print".equals(name) || "println".equals(name)) {
 				if (parameters.size() > 1) {
@@ -357,6 +433,16 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			}
 
 			return;
+		}
+
+		EObject rootCter = EcoreUtil.getRootContainer(astCall);
+		EObject rootCterProcedure = EcoreUtil.getRootContainer(procedure);
+		if (procedure.eContainer() instanceof AstActor
+				&& rootCter != rootCterProcedure) {
+			// calling an actor's procedure from another actor/unit
+			error("procedure " + name
+					+ " cannot be called from another actor/unit", astCall,
+					eINSTANCE.getAstStatementCall_Procedure(), -1);
 		}
 
 		if (procedure.getParameters().size() != parameters.size()) {
@@ -404,12 +490,39 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	}
 
 	@Check(CheckType.NORMAL)
-	public void checkEntity(AstEntity entity) {
-		checkEntityPackage(entity);
-		checkEntityName(entity);
+	public void checkAstUnit(AstUnit unit) {
+		// check unique names
+	}
 
-		// check there are no cycles in type definitions
-		if (!new TypeCycleDetector(this).detectCycles(entity)) {
+	@Check(CheckType.NORMAL)
+	public void checkAstVariable(AstVariable variable) {
+		checkIsVariableUsed(variable);
+		AstExpression value = variable.getValue();
+		TypeChecker checker = new TypeChecker(this);
+		if (value != null) {
+			// check types
+			Type targetType = Util.getType(variable);
+			Type type = checker.getType(value);
+			if (!checker.isConvertibleTo(type, targetType)) {
+				error("Type mismatch: cannot convert from " + type + " to "
+						+ targetType, variable,
+						eINSTANCE.getAstVariable_Value(), -1);
+			}
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkAstVariableReference(AstVariableReference ref) {
+		AstVariable variable = ref.getVariable();
+		String name = variable.getName();
+
+		EObject rootCter = EcoreUtil.getRootContainer(ref);
+		EObject rootCter2 = EcoreUtil.getRootContainer(variable);
+		if (variable.eContainer() instanceof AstActor && rootCter != rootCter2) {
+			// referencing an actor's variable from another actor/unit
+			error("variable " + name + " can only be referenced "
+					+ "within the actor in which it is declared", ref,
+					eINSTANCE.getAstVariableReference_Variable(), -1);
 		}
 	}
 
@@ -533,49 +646,6 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 							eINSTANCE.getAstTransition_Tag(), -1);
 				}
 			}
-		}
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkFunction(final AstFunction function) {
-		checkUniqueNames(function.getParameters());
-		checkUniqueNames(function.getVariables());
-		if (!function.isNative()) {
-			checkReturnType(function);
-		}
-
-		// do not check functions of a unit
-		if (function.eContainer() instanceof AstUnit) {
-			return;
-		}
-
-		boolean used = new BooleanSwitch() {
-
-			@Override
-			public Boolean caseAstExpressionCall(AstExpressionCall expression) {
-				if (expression.getFunction().equals(function)) {
-					return true;
-				}
-
-				return super.caseAstExpressionCall(expression);
-			}
-
-		}.doSwitch(Util.getTopLevelContainer(function));
-
-		if (!used && !function.isNative()) {
-			warning("The function " + function.getName() + " is never called",
-					eINSTANCE.getAstFunction_Name());
-		}
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkGenerator(AstGenerator generator) {
-		int lower = Util.getIntValue(generator.getLower());
-		int higher = Util.getIntValue(generator.getHigher());
-
-		if (higher < lower) {
-			error("higher bound must be greater than lower bound", generator,
-					eINSTANCE.getAstGenerator_Higher(), -1);
 		}
 	}
 
@@ -737,31 +807,6 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		}
 	}
 
-	@Check(CheckType.NORMAL)
-	public void checkProcedure(final AstProcedure procedure) {
-		checkUniqueNames(procedure.getParameters());
-		checkUniqueNames(procedure.getVariables());
-
-		boolean used = new BooleanSwitch() {
-
-			@Override
-			public Boolean caseAstStatementCall(AstStatementCall call) {
-				if (call.getProcedure().equals(procedure)) {
-					return true;
-				}
-
-				return false;
-			}
-
-		}.doSwitch(Util.getTopLevelContainer(procedure));
-
-		if (!used && procedure.eContainer() instanceof AstActor
-				&& !procedure.isNative()) {
-			warning("The procedure " + procedure.getName() + " is never called",
-					eINSTANCE.getAstProcedure_Name());
-		}
-	}
-
 	private void checkReturnType(AstFunction function) {
 		TypeChecker checker = new TypeChecker(this);
 		Type returnType = Util.getType(function);
@@ -770,41 +815,6 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			error("Type mismatch: cannot convert from " + expressionType
 					+ " to " + returnType, function,
 					eINSTANCE.getAstFunction_Expression(), -1);
-		}
-	}
-
-	private void checkUniqueNames(List<? extends EObject> variables) {
-		Set<String> names = new HashSet<String>();
-		for (EObject variable : variables) {
-			String name = getName(variable);
-			if (names.contains(name)) {
-				error("Duplicate variable " + name, variable,
-						eINSTANCE.getAstVariable_Name(), -1);
-			}
-			names.add(name);
-		}
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkUnit(AstUnit unit) {
-		// check unique names
-		checkUniqueNames(unit.getVariables());
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkVariable(AstVariable variable) {
-		checkIsVariableUsed(variable);
-		AstExpression value = variable.getValue();
-		TypeChecker checker = new TypeChecker(this);
-		if (value != null) {
-			// check types
-			Type targetType = Util.getType(variable);
-			Type type = checker.getType(value);
-			if (!checker.isConvertibleTo(type, targetType)) {
-				error("Type mismatch: cannot convert from " + type + " to "
-						+ targetType, variable,
-						eINSTANCE.getAstVariable_Value(), -1);
-			}
 		}
 	}
 
@@ -843,10 +853,6 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 	private String getName(AstTag tag) {
 		return OrccUtil.toString(tag.getIdentifiers(), ".");
-	}
-
-	private String getName(EObject object) {
-		return resolver.getValue(object);
 	}
 
 }
