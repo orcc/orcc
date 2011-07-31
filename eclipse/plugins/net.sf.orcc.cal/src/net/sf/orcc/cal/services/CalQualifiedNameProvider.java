@@ -32,6 +32,7 @@ import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpression;
+import net.sf.orcc.cal.cal.AstGenerator;
 import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstUnit;
@@ -65,16 +66,20 @@ public class CalQualifiedNameProvider extends
 				Util.getQualifiedName((AstEntity) actor.eContainer()));
 	}
 
-	public QualifiedName qualifiedName(AstStatementForeach foreach) {
-		return getConverter().toQualifiedName(foreach.toString());
-	}
-
 	public QualifiedName qualifiedName(AstEntity entity) {
 		return getConverter().toQualifiedName(Util.getQualifiedName(entity));
 	}
 
 	public QualifiedName qualifiedName(AstExpression expr) {
 		return null;
+	}
+
+	public QualifiedName qualifiedName(AstGenerator generator) {
+		return getConverter().toQualifiedName(generator.toString());
+	}
+
+	public QualifiedName qualifiedName(AstStatementForeach foreach) {
+		return getConverter().toQualifiedName(foreach.toString());
 	}
 
 	public QualifiedName qualifiedName(AstTag tag) {
