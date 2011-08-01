@@ -406,7 +406,9 @@ public class GuardSatChecker {
 			// constant
 			if (!variable.isAssignable() && variable.isInitialized()) {
 				String term = (String) doSwitch(variable.getInitialValue());
-				script.addCommand("(assert (= " + name + " " + term + "))");
+				if (term != null) {
+					script.addCommand("(assert (= " + name + " " + term + "))");
+				}
 			}
 		}
 
