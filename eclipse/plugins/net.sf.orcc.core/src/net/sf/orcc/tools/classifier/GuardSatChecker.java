@@ -524,8 +524,11 @@ public class GuardSatChecker {
 	 */
 	public boolean checkSat(Action action1, Action action2) {
 		SmtTranslator translator = new SmtTranslator();
-		translator.doSwitch(action1.getScheduler());
-		translator.doSwitch(action2.getScheduler());
+		for (Port port : actor.getInputs()) {
+			translator.doSwitch(port);
+		}
+		translator.doSwitch(action1);
+		translator.doSwitch(action2);
 
 		SmtScript script = translator.getScript();
 
