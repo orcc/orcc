@@ -502,11 +502,7 @@ public class ActionImpl extends EObjectImpl implements Action {
 	
 	@Override
 	public String toString() {
-		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (name: ");
-		result.append(getName());
-		result.append(')');
-		return result.toString();
+		return getName();
 	}
 
 } // ActionImpl
