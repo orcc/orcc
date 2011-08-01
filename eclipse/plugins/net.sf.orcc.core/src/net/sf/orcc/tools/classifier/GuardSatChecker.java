@@ -419,6 +419,10 @@ public class GuardSatChecker {
 		 * @return the 32-bit BitVec representation
 		 */
 		private String getStringOfInt(BigInteger integer) {
+			if (integer.signum() == -1) {
+				BigInteger m = BigInteger.valueOf((long) 1 << 32);
+				integer = m.add(integer);
+			}
 			return "(_ bv" + integer + " 32)";
 		}
 
