@@ -484,7 +484,9 @@ public class ActorClassifier implements ActorVisitor<Object> {
 		if (actor.hasFsm()) {
 			FSM fsm = actor.getFsm();
 			for (Transitions transitions : fsm.getTransitions()) {
-				List<Action> actions = new ArrayList<Action>();
+				// add anonymous actions
+				List<Action> actions = new ArrayList<Action>(
+						actor.getActionsOutsideFsm());
 				for (Transition transition : transitions.getList()) {
 					actions.add(transition.getAction());
 				}
@@ -531,18 +533,18 @@ public class ActorClassifier implements ActorVisitor<Object> {
 
 				if (!lowerPriorityPattern.isSupersetOf(higherPriorityPattern)) {
 					for (Action action : higherPriorityActions) {
-						// it may still be ok if guards are mutually
-						// exclusive
-						if (areGuardsCompatible(action, lowerPriorityAction)) {
-							return true;
+						Pattern pattern = action.getInputPattern();
+						if (!lowerPriorityPattern.isSupersetOf(pattern)) {
+							if (areGuardsCompatible(action, lowerPriorityAction)) {
+								return true;
+							}
 						}
 					}
 				}
 
 				// Add the current action to higherPriorityActions
 				higherPriorityActions.add(lowerPriorityAction);
-				higherPriorityPattern.updatePattern(lowerPriorityAction
-						.getInputPattern());
+				higherPriorityPattern.updatePattern(lowerPriorityPattern);
 			}
 		}
 
