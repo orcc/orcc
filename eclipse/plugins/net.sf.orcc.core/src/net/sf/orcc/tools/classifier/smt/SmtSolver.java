@@ -128,37 +128,40 @@ public class SmtSolver {
 
 			SExpParser parser = new SExpParser(builder.toString());
 			SExp exp = parser.read();
-			if (exp != null && exp.isSymbol()) {
-				SExpSymbol symbol = (SExpSymbol) exp;
-				satisfied = "sat".equals(symbol.getContents());
+			if (exp == null || !exp.isSymbol()) {
+				System.err.println(actor.getName() + ": " + builder.toString());
+				return;
+			}
 
-				// parse assertions (if there are any)
-				if (satisfied && action != null && ports != null) {
-					exp = parser.read();
-					if (exp != null && exp.isList()) {
-						SExpList list = (SExpList) exp;
+			SExpSymbol symbol = (SExpSymbol) exp;
+			satisfied = "sat".equals(symbol.getContents());
 
-						Pattern pattern = action.getPeekPattern();
-						int index = 0;
-						for (Port port : ports) {
-							exp = list.get(index);
-							index++;
+			// parse assertions (if there are any)
+			if (satisfied && action != null && ports != null) {
+				exp = parser.read();
+				if (exp != null && exp.isList()) {
+					SExpList list = (SExpList) exp;
 
-							Object value;
-							int numTokens = pattern.getNumTokens(port);
-							if (numTokens > 1) {
-								List<Object> values = new ArrayList<Object>();
-								SExpList portList = (SExpList) exp;
-								for (int i = 0; i < numTokens; i++) {
-									SExp subExpr = portList.get(i);
-									values.add(getExpression(subExpr));
-								}
-								value = values.toArray();
-							} else {
-								value = getExpression(exp);
+					Pattern pattern = action.getPeekPattern();
+					int index = 0;
+					for (Port port : ports) {
+						exp = list.get(index);
+						index++;
+
+						Object value;
+						int numTokens = pattern.getNumTokens(port);
+						if (numTokens > 1) {
+							List<Object> values = new ArrayList<Object>();
+							SExpList portList = (SExpList) exp;
+							for (int i = 0; i < numTokens; i++) {
+								SExp subExpr = portList.get(i);
+								values.add(getExpression(subExpr));
 							}
-							assertions.put(port.getName(), value);
+							value = values.toArray();
+						} else {
+							value = getExpression(exp);
 						}
+						assertions.put(port.getName(), value);
 					}
 				}
 			}
@@ -223,12 +226,15 @@ public class SmtSolver {
 	}
 
 	/**
-	 * Checks if the given script is satisfiable, and
+	 * Checks if the given script is satisfiable, and retrieve the value of the
+	 * tokens present on the control ports.
 	 * 
 	 * @param script
 	 *            an SMT script
 	 * @param action
 	 *            if present, will get the tokens read on these ports
+	 * @param ports
+	 *            the list of control ports
 	 * @return <code>true</code> if the given script is satisfiable
 	 */
 	public boolean checkSat(SmtScript script, Action action, List<Port> ports) {
