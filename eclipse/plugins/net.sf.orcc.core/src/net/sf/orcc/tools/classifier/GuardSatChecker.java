@@ -197,7 +197,7 @@ public class GuardSatChecker {
 			case MINUS:
 				return "(bvadd " + e1 + " (bvneg " + e2 + "))";
 			case MOD:
-				return "(bvurm " + e1 + " " + e2 + ")";
+				return "(bvurem " + e1 + " " + e2 + ")";
 			case NE:
 				return "(not (= " + e1 + " " + e2 + "))";
 			case PLUS:
