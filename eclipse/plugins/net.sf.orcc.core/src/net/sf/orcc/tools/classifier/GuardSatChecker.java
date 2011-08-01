@@ -31,6 +31,7 @@ package net.sf.orcc.tools.classifier;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
@@ -561,26 +562,19 @@ public class GuardSatChecker {
 	public Map<String, Object> computeTokenValues(List<Port> ports,
 			List<Action> others, Action action) {
 		SmtTranslator translator = new SmtTranslator();
-		// declare arrays for configuration ports
-		for (Port port : ports) {
+		for (Port port : actor.getInputs()) {
 			translator.doSwitch(port);
 		}
 		translator.doSwitch(action);
 
-		SExp assertion;
-
-		if (others.isEmpty()) {
-			assertion = new SExpSymbol(action.getScheduler().getName());
-		} else {
-			SExpList list = new SExpList(new SExpSymbol("and"));
-			assertion = list;
-
-			for (Action previous : others) {
-				translator.doSwitch(previous);
-				list.add(new SExpList(new SExpSymbol("not"), new SExpSymbol(
-						previous.getScheduler().getName())));
-			}
-			list.add(new SExpSymbol(action.getScheduler().getName()));
+		SExp assertion = new SExpSymbol(action.getScheduler().getName());
+		ListIterator<Action> it = others.listIterator(others.size());
+		while (it.hasPrevious()) {
+			Action previous = it.previous();
+			translator.doSwitch(previous);
+			assertion = new SExpList(new SExpSymbol("ite"), new SExpSymbol(
+					previous.getScheduler().getName()),
+					new SExpSymbol("false"), assertion);
 		}
 
 		SmtScript script = translator.getScript();
