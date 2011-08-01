@@ -379,8 +379,6 @@ use ieee.numeric_std.all;
 
 ------------------------------------------------------------------------------
 entity <network.name> is
-  generic (
-  SIZE : integer := <options.fifoSize>);
   port (
     <printNetworkPorts(network)>
     clock    : in  std_logic;

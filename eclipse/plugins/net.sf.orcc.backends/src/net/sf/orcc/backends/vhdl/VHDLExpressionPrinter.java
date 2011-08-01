@@ -71,7 +71,7 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 		// expression from being parenthesized
 		int nextPrec = Integer.MAX_VALUE;
 		String call = function + "(" + doSwitch(e1, nextPrec, 0) + ", "
-				+ doSwitch(e2, nextPrec, 1) + ", ";;
+				+ doSwitch(e2, nextPrec, 1) + ", ";
 
 		if (size.isUint()) {
 			call = "u" + call;
