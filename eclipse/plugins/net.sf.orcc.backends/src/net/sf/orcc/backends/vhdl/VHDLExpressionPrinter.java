@@ -70,9 +70,13 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 		// parent precedence is the highest possible to prevent top-level binary
 		// expression from being parenthesized
 		int nextPrec = Integer.MAX_VALUE;
-
 		String call = function + "(" + doSwitch(e1, nextPrec, 0) + ", "
-				+ doSwitch(e2, nextPrec, 1) + ", ";
+				+ doSwitch(e2, nextPrec, 1) + ", ";;
+
+		if (size.isUint()) {
+			call = "u" + call;
+		}
+		
 		if (function == "bitand") {
 			Type lub = getLub(e1.getType(), e2.getType());
 			call += lub.getSizeInBits() + ", ";
@@ -239,10 +243,17 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 	@Override
 	public String caseExprUnary(ExprUnary expr) {
 		OpUnary op = expr.getOp();
+		String utype = "";
+
+		if (expr.getType().isUint()) {
+			utype = "u";
+		}
+
 		switch (op) {
 		case BITNOT:
-			return "bitnot(" + doSwitch(expr.getExpr(), Integer.MIN_VALUE, 0)
-					+ ", " + expr.getExpr().getType().getSizeInBits() + ")";
+			return utype + "bitnot("
+					+ doSwitch(expr.getExpr(), Integer.MIN_VALUE, 0) + ", "
+					+ expr.getExpr().getType().getSizeInBits() + ")";
 		default:
 			return super.caseExprUnary(expr);
 		}
