@@ -93,12 +93,12 @@ public class GuardSatChecker {
 
 		private int numLets;
 
-		private SmtScript script;
-
 		/**
 		 * list of procedures declared in this script
 		 */
 		private List<Procedure> procs;
+
+		private SmtScript script;
 
 		/**
 		 * Creates a new constraint expression visitor.
@@ -347,7 +347,12 @@ public class GuardSatChecker {
 			// start definition
 			numLets = 0;
 			builder = new StringBuilder();
-			builder.append("(define-fun ");
+			if (procedure.isNative()) {
+				// cannot define a native function/procedure
+				builder.append("(declare-fun ");
+			} else {
+				builder.append("(define-fun ");
+			}
 			builder.append(procedure.getName());
 
 			// parameters
@@ -369,7 +374,9 @@ public class GuardSatChecker {
 			builder.append(" ");
 
 			// body
-			super.caseProcedure(procedure);
+			if (!procedure.isNative()) {
+				super.caseProcedure(procedure);
+			}
 			builder.append(")");
 
 			// add declaration to script
