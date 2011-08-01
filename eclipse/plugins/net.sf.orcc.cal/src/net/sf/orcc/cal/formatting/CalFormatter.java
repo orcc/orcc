@@ -403,7 +403,7 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 		keywordAndCommas(c, access.getVarKeyword_5_0(),
 				access.getCommaKeyword_5_2_0());
 
-		body(c, access.getBeginKeyword_6(), access.getEndKeyword_8());
+		body(c, access.getBeginKeyword_6(), access.getEndKeyword_9());
 	}
 
 	private void configureSchedule(FormattingConfig c) {

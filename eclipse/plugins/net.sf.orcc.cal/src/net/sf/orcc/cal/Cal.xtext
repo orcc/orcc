@@ -92,7 +92,8 @@ AstProcedure:
 		variables += AstValuedVariableDeclaration
 		(',' variables += AstValuedVariableDeclaration)*)?
 	'begin'
-		((variables += AstValuedVariableDeclaration ';') | (statements += AstStatement))*
+		(variables += AstValuedVariableDeclaration ';')*
+		(statements += AstStatement)*
 	'end';
 
 AstNativeProcedure returns AstProcedure:
@@ -168,7 +169,8 @@ AstAction:
 		variables += AstValuedVariableDeclaration
 		(',' variables += AstValuedVariableDeclaration)*)?
 	('do'
-		((variables += AstValuedVariableDeclaration ';') | (statements += AstStatement))*
+		(variables += AstValuedVariableDeclaration ';')*
+		(statements += AstStatement)*
 	)?
 	'end';
 
@@ -184,7 +186,8 @@ AstInitialize returns AstAction:
 		variables += AstValuedVariableDeclaration
 		(',' variables += AstValuedVariableDeclaration)*)?
 	('do'
-		((variables += AstValuedVariableDeclaration ';') | (statements += AstStatement))*
+		(variables += AstValuedVariableDeclaration ';')*
+		(statements += AstStatement)*
 	)?
 	'end';
 
