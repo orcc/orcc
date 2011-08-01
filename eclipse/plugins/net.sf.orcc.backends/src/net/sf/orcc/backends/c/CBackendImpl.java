@@ -54,7 +54,6 @@ import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.attributes.StringAttribute;
 import net.sf.orcc.network.transformations.BroadcastAdder;
-import net.sf.orcc.network.transformations.NetworkClassifier;
 import net.sf.orcc.network.transformations.NetworkSplitter;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
 import net.sf.orcc.util.WriteListener;
@@ -255,7 +254,7 @@ public class CBackendImpl extends AbstractBackend {
 
 		if (classify) {
 			write("Starting classification of actors... ");
-			new NetworkClassifier().transform(network);
+			network.classify();
 			write("done\n");
 		}
 
