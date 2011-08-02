@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2011-08-01
+-- Last update: 2011-08-02
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -123,14 +123,14 @@ package body orcc_package is
 -----------------------------------------------------------------------------
 -- Logical not on op1
   function bitnot(op1 : integer; size : integer) return integer is
-    variable result : std_logic_vector(size downto 0);
+    variable result : std_logic_vector(size -1 downto 0);
   begin
     result := not std_logic_vector(to_signed(op1, size));
     return to_integer(signed(result));
   end function;
 
   function ubitnot(op1 : integer; size : integer) return integer is
-    variable result : std_logic_vector(size downto 0);
+    variable result : std_logic_vector(size -1 downto 0);
   begin
     result := not std_logic_vector(to_unsigned(op1, size));
     return to_integer(unsigned(result));
