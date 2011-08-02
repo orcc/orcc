@@ -1,14 +1,9 @@
+import "net/sf/orcc/templates/VHDL_actor.stg"
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Common applet
 ///////////////////////////////////////////////////////////////////////////////
-portType(port, IOtype, dataType) ::=<<
-<if(port.type.bool)
-><port.name>_<dataType>  :<IOtype>std_logic;<
-else
-><port.name>_<dataType>  :<IOtype>std_logic_vector(<port.type.size> -1 downto 0);<
-endif>
->>
-
 SignalType(instance, port, dataType) ::=<<
 <if(port.type.bool)
 >signal <instance.id>_<port.name>_<dataType>   : std_logic;<
@@ -21,22 +16,11 @@ endif>
 // print IOs of the TOP Network
 ///////////////////////////////////////////////////////////////////////////////
 printNetworkPorts(network) ::= <<
-<network.inputs: printNetPortsInput(); separator="\n">
-<network.outputs: printNetPortsOutput(); separator="\n">
+-- Inputs
+<network.inputs: {port|<printPort(port, "in  ", "out ")>}; separator=";\n"><if(network.inputs && network.outputs)>;<endif>
+-- Outputs
+<network.outputs: {port|<printPort(port, "out ", "in  ")>}; separator=";\n">
 >>
-
-printNetPortsInput(port) ::= <<
-<portType(port=port, IOtype=" in  ", dataType="data")>
-<port.name>_send  : in  std_logic;
-<port.name>_ack   : out std_logic;
->>
-
-printNetPortsOutput(port) ::= <<
-<portType(port=port, IOtype=" out ", dataType="data")>
-<port.name>_send  : out std_logic;
-<port.name>_ack   : in  std_logic;
->>
-
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -254,9 +238,13 @@ else
 <connection.source.name>_ack      =\> <first(portSuccMap.(connection.source)).id>_<connection.target.name>_ack,<
 endif><
 else
-><connection.source.name>_data     =\> <tgtVertex.port.name>_data,
+><if(connection.source.native)
+><connection.source.name>         =\> <tgtVertex.port.name>,<
+else
+><connection.source.name>_data    =\> <tgtVertex.port.name>_data,
 <connection.source.name>_send     =\> <tgtVertex.port.name>_send,
 <connection.source.name>_ack      =\> <tgtVertex.port.name>_ack,<
+endif><
 endif>
 >>
 
@@ -380,9 +368,9 @@ use ieee.numeric_std.all;
 ------------------------------------------------------------------------------
 entity <network.name> is
   port (
-    <printNetworkPorts(network)>
     clock    : in  std_logic;
-    reset_n  : in  std_logic);  
+    reset_n  : in  std_logic;
+    <printNetworkPorts(network)>);  
 end <network.name>;
 
 

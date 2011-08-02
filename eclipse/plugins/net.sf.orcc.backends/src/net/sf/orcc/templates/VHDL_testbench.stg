@@ -1,3 +1,5 @@
+import "net/sf/orcc/templates/VHDL_actor.stg"
+
 ///////////////////////////////////////////////////////////////////////////////
 // Common applet
 ///////////////////////////////////////////////////////////////////////////////
@@ -22,29 +24,33 @@ endif>
 ///////////////////////////////////////////////////////////////////////////////
 // Print signal and instanciation
 ///////////////////////////////////////////////////////////////////////////////
-printSignals(port) ::= <<
-<if(port.type.bool)
- >signal <port.name>_data  : std_logic;
-<else
- >signal <port.name>_data  : std_logic_vector(<port.type.size> -1 downto 0);
-<endif>
-signal <port.name>_send  : std_logic;
-signal <port.name>_ack   : std_logic;
+printSignal(port, dirSend, dirAck) ::= <<
+signal <portType(port=port, IOtype=dirSend, dataType="_data")>;<if (!port.native)>
+signal <port.name>_send  : <dirSend>std_logic;
+signal <port.name>_ack   : <dirAck>std_logic;<endif>
 >>
 
 signalInit(port) ::=<<
+<if (port.native)>
+<port.name>      \<= 'Z';
+<else>
 <port.name>_send \<= '0';
 <if(port.type.bool)>
 <port.name>_data \<= '0';
 <else>
 <port.name>_data \<= (others =\> '0');
 <endif>
+<endif>
 >>
 
 signalsInstanciation(port) ::= <<
-<port.name>_data  =\> <port.name>_data,
+<if (port.native)
+><port.name>       =\> <port.name><
+else
+><port.name>_data  =\> <port.name>_data,
 <port.name>_send  =\> <port.name>_send,
-<port.name>_ack   =\> <port.name>_ack
+<port.name>_ack   =\> <port.name>_ack<
+endif>
 >>
 
 
@@ -69,8 +75,8 @@ type tb_type is (after_reset, read_file, CheckRead);
 <output: printFSMOut(); separator="\n">
 --
 -- Input and Output signals
-<input: printSignals(); separator="\n">
-<output: printSignals(); separator="\n">
+<input: {port| <printSignal(port, "", "")>}; separator="\n">
+<output: {port| <printSignal(port, "", "")>}; separator="\n">
 --
 -- Configuration
 signal count       : integer range 255 downto 0;
@@ -80,12 +86,16 @@ signal reset_n     : std_logic := '0';
 >>
 
 printFSMIn(port) ::= <<
-signal tb_FSM_<port.name>  : tb_type;
-file sim_file_<instance.id>_<port.name>  : text is "<instance.id>_<port.name>_sim.txt";
+<if(!port.native)
+>signal tb_FSM_<port.name>  : tb_type;
+file sim_file_<instance.id>_<port.name>  : text is "<instance.id>_<port.name>_sim.txt";<
+endif>
 >>
 
 printFSMOut(port) ::= <<
-file sim_file_<instance.id>_<port.name>  : text is "<instance.id>_<port.name>_sim.txt";
+<if(!port.native)
+>file sim_file_<instance.id>_<port.name>  : text is "<instance.id>_<port.name>_sim.txt";<
+endif>
 >>
 
 
@@ -106,12 +116,12 @@ waveform_process_in(input) ::= <<
 --
 -- Input(s) Waveform Generation
 WaveGen_Proc_In : process (reset_n, clock)
-  variable Input_bit   : integer range 2147483647 downto - 2147483648;
+  variable Input_bit   : integer;
   variable line_number : line;
 begin
   if reset_n = '0' then
     <input: signalInit()>    --
-    <input: {port|tb_FSM_<port.name> \<= after_reset;}; separator="\n">    
+    <input: {port|<if (!port.native)> tb_FSM_<port.name> \<= after_reset; <endif>} ; separator="\n">    
     count \<= 0;
   --  
   elsif rising_edge(clock) then 
@@ -123,7 +133,8 @@ end process WaveGen_Proc_In;
 
 
 case_define_in(port) ::= <<
---
+<if (!port.native)
+>--
 -- Input port: <port.name> Waveform Generation
 case tb_FSM_<port.name> is
   when after_reset =\>
@@ -160,15 +171,16 @@ case tb_FSM_<port.name> is
 
   when others =\> null;
 end case;
+<endif>
 
 >>
 
 waveform_process_out(output) ::= <<
 -- Output(s) waveform Generation
-<output: {port|<port.name>_ack \<= <port.name>_send;}; separator="\n">    
+<output: {port| <if (!port.native)> <port.name>_ack \<= <port.name>_send;<\n><endif>}>    
 --
 WaveGen_Proc_Out : process (reset_n, clock)
-  variable Input_bit   : integer range 2147483647 downto - 2147483648;
+  variable Input_bit   : integer;
   variable line_number : line;
 begin
   if (reset_n = '0') then
@@ -182,7 +194,8 @@ end process WaveGen_Proc_Out;
 
 
 case_define_out(port) ::= <<
---
+<if (!port.native)
+>--
 -- Output port: <port.name> Waveform Generation
 if (not endfile (sim_file_<instance.id>_<port.name>) and <port.name>_send = '1') then
   readline(sim_file_<instance.id>_<port.name>, line_number);
@@ -219,7 +232,7 @@ else
 >    --
   end if;
 end if;
-
+<endif>
 >>
 
 
@@ -292,7 +305,6 @@ begin
     <if(instance.network.inputs)
     ><waveform_process_in(input=instance.network.inputs)><
     endif>
-    
     
     <if(instance.network.outputs)
     ><waveform_process_out(output=instance.network.outputs)><
