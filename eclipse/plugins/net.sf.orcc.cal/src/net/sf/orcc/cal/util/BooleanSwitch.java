@@ -489,6 +489,12 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 		if (doSwitch(type)) {
 			return true;
 		}
+		
+		for (AstExpression dim : variable.getDimensions()) {
+			if (doSwitch(dim)) {
+				return true;
+			}
+		}
 
 		return doSwitch(variable.getValue());
 	}

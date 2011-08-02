@@ -41,7 +41,6 @@ import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstExpressionCall;
 import net.sf.orcc.cal.cal.AstExpressionIndex;
-import net.sf.orcc.cal.cal.AstExpressionVariable;
 import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstGenerator;
 import net.sf.orcc.cal.cal.AstInequality;
@@ -629,9 +628,8 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			}
 
 			@Override
-			public Boolean caseAstExpressionVariable(
-					AstExpressionVariable expression) {
-				return expression.getValue().getVariable().equals(variable);
+			public Boolean caseAstVariableReference(AstVariableReference ref) {
+				return ref.getVariable().equals(variable);
 			}
 
 			@Override
