@@ -78,7 +78,7 @@ public class ChangeFifoArrayAccess extends AbstractActorVisitor<Object> {
 					.getStateVar(var.getName() + "_r")));
 			Expression e2 = IrUtil.copy(indexes.get(0));
 			Expression bop = factory.createExprBinary(e1, OpBinary.PLUS, e2,
-					null);
+					e1.getType());
 			indexes.set(0, bop);
 		}
 
@@ -102,7 +102,7 @@ public class ChangeFifoArrayAccess extends AbstractActorVisitor<Object> {
 					.getStateVar(var.getName() + "_w")));
 			Expression e2 = IrUtil.copy(store.getIndexes().get(0));
 			Expression bop = factory.createExprBinary(e1, OpBinary.PLUS, e2,
-					null);
+					e1.getType());
 			store.getIndexes().set(0, bop);
 		}
 
@@ -118,7 +118,8 @@ public class ChangeFifoArrayAccess extends AbstractActorVisitor<Object> {
 			IrFactory factory = IrFactory.eINSTANCE;
 			ExprBinary incr = factory.createExprBinary(
 					factory.createExprVar(factory.createUse(readVar)),
-					OpBinary.PLUS, factory.createExprInt(cns), null);
+					OpBinary.PLUS, factory.createExprInt(cns),
+					readVar.getType());
 
 			InstStore store = factory.createInstStore(readVar, incr);
 			currentBlock.add(store);
@@ -134,7 +135,8 @@ public class ChangeFifoArrayAccess extends AbstractActorVisitor<Object> {
 			IrFactory factory = IrFactory.eINSTANCE;
 			ExprBinary incr = factory.createExprBinary(
 					factory.createExprVar(factory.createUse(readVar)),
-					OpBinary.PLUS, factory.createExprInt(prd), null);
+					OpBinary.PLUS, factory.createExprInt(prd),
+					readVar.getType());
 
 			InstStore store = factory.createInstStore(readVar, incr);
 			currentBlock.add(store);
