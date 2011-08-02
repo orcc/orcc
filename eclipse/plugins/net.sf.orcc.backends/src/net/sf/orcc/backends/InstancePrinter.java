@@ -101,7 +101,12 @@ public class InstancePrinter extends Printer {
 		long instanceModified = 0;
 		if (instance.isActor()) {
 			Actor actor = instance.getActor();
-			instanceModified = actor.getFile().getLocalTimeStamp();
+			if (actor.getFileName() == null) {
+				// if source file does not exist
+				instanceModified = Long.MAX_VALUE;
+			} else {
+				instanceModified = actor.getFile().getLocalTimeStamp();
+			}
 		} else if (instance.isNetwork()) {
 			Network network = instance.getNetwork();
 			instanceModified = network.getFile().getLocalTimeStamp();
