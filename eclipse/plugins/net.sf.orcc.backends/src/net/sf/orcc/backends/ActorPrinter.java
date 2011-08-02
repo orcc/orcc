@@ -89,7 +89,12 @@ public class ActorPrinter extends Printer {
 			String file = path + File.separator + fileName;
 			if (keepUnchangedFiles) {
 				// if source file is older than target file, do not generate
-				long sourceTimeStamp = actor.getFile().getLocalTimeStamp();
+				long sourceTimeStamp = 0;
+				if(actor.getFileName() == null) {
+					sourceTimeStamp = Long.MAX_VALUE;
+				} else {
+					sourceTimeStamp = actor.getFile().getLocalTimeStamp();					
+				}
 				File targetFile = new File(file);
 				if (sourceTimeStamp < targetFile.lastModified()) {
 					return true;

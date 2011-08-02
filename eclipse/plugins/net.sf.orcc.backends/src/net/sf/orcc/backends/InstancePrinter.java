@@ -102,7 +102,7 @@ public class InstancePrinter extends Printer {
 		if (instance.isActor()) {
 			Actor actor = instance.getActor();
 			if (actor.getFileName() == null) {
-				// if source file does not exist
+				// if source file does not exist, force to generate
 				instanceModified = Long.MAX_VALUE;
 			} else {
 				instanceModified = actor.getFile().getLocalTimeStamp();
