@@ -562,7 +562,6 @@ public class ActorMerger implements INetworkTransformation {
 		superActor = IrFactory.eINSTANCE.createActor();
 		String name = "SuperActor_" + index;
 		superActor.setName(name);
-		superActor.setFileName(name);
 
 		createPorts();
 
