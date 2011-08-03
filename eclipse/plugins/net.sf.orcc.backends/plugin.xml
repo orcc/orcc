@@ -28,9 +28,6 @@
          <option
                id="net.sf.orcc.backends.enableTrace">
          </option>
-         <option
-               id="net.sf.orcc.backends.coDesign">
-         </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.java.JavaBackendImpl"

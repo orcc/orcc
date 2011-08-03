@@ -31,7 +31,6 @@ package net.sf.orcc.backends.c;
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.OrccLaunchConstants.MAPPING;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,17 +51,12 @@ import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
-import net.sf.orcc.network.attributes.StringAttribute;
-import net.sf.orcc.network.transformations.BroadcastAdder;
-import net.sf.orcc.network.transformations.NetworkSplitter;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
 import net.sf.orcc.util.WriteListener;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.graph.DirectedMultigraph;
 
 /**
  * C back-end.
@@ -75,8 +69,6 @@ public class CBackendImpl extends AbstractBackend {
 
 	private boolean classify;
 
-	private boolean codesign;
-
 	private boolean debugMode;
 
 	private boolean enableTrace;
@@ -86,10 +78,6 @@ public class CBackendImpl extends AbstractBackend {
 	private Map<String, List<Instance>> instancesTarget;
 
 	private Map<String, String> mapping;
-
-	private Map<String, Network> mapTargetsNetworks;
-
-	private DirectedGraph<String, StringAttribute> mediumGraph;
 
 	private boolean merge;
 
@@ -138,25 +126,6 @@ public class CBackendImpl extends AbstractBackend {
 						+ "' is not mapped.\n");
 			}
 		}
-
-		mediumGraph = new DirectedMultigraph<String, StringAttribute>(
-				StringAttribute.class);
-		Set<String> targets = instancesTarget.keySet();
-
-		for (String target : targets) {
-			mediumGraph.addVertex(target);
-		}
-
-		for (String target : targets) {
-			for (String otherTarget : targets) {
-				if (!target.equals(otherTarget)) {
-					mediumGraph.addEdge(target, otherTarget,
-							new StringAttribute("_socket"));
-					mediumGraph.addEdge(otherTarget, target,
-							new StringAttribute("_socket"));
-				}
-			}
-		}
 	}
 
 	private void computeOptions(Map<String, Object> options) {
@@ -164,31 +133,13 @@ public class CBackendImpl extends AbstractBackend {
 		options.put("ringTopology", ringTopology);
 		options.put("fifoSize", fifoSize);
 
-		if (codesign) {
-			options.put("threadsNb", 1);
-
-			for (String targetName : mapTargetsNetworks.keySet()) {
-				Network worknet = mapTargetsNetworks.get(targetName);
-				CNetworkTemplateData targetsData = new CNetworkTemplateData();
-				targetsData.computeTemplateMaps(worknet);
-				worknet.setTemplateData(targetsData);
-			}
+		if (geneticAlgorithm) {
+			options.put("useGeneticAlgorithm", geneticAlgorithm);
+			options.put("threadsNb", threadsNb);
 		} else {
-			if (geneticAlgorithm) {
-				options.put("useGeneticAlgorithm", geneticAlgorithm);
-				options.put("threadsNb", threadsNb);
-			} else {
-				if (instancesTarget != null) {
-					options.put("threads", instancesTarget);
-					options.put("threadsNb", instancesTarget.size());
-				}
-			}
-
-			for (String targetName : mapTargetsNetworks.keySet()) {
-				Network worknet = mapTargetsNetworks.get(targetName);
-				CNetworkTemplateData targetsData = (CNetworkTemplateData) worknet
-						.getTemplateData();
-				targetsData.computeTemplateMaps(worknet);
+			if (instancesTarget != null) {
+				options.put("threads", instancesTarget);
+				options.put("threadsNb", instancesTarget.size());
 			}
 		}
 	}
@@ -199,7 +150,6 @@ public class CBackendImpl extends AbstractBackend {
 		classify = getAttribute("net.sf.orcc.backends.classify", false);
 		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
 		merge = getAttribute("net.sf.orcc.backends.merge", false);
-		codesign = getAttribute("net.sf.orcc.backends.coDesign", false);
 		geneticAlgorithm = getAttribute(
 				"net.sf.orcc.backends.geneticAlgorithm", false);
 		newScheduler = getAttribute("net.sf.orcc.backends.newScheduler", false);
@@ -258,24 +208,12 @@ public class CBackendImpl extends AbstractBackend {
 			write("done\n");
 		}
 
-		if (codesign) {
-			new BroadcastAdder().transform(network);
-
-			// computeMapping(network);
-			NetworkSplitter netSplit = new NetworkSplitter(instancesTarget,
-					mediumGraph);
-			netSplit.transform(network);
-			mapTargetsNetworks = netSplit.getNetworksMap();
-		} else {
-			new CBroadcastAdder(new WriteListener() {
-				@Override
-				public void writeText(String text) {
-					write(text);
-				}
-			}, fifoSize).transform(network);
-			mapTargetsNetworks = new HashMap<String, Network>();
-			mapTargetsNetworks.put(new String(""), network);
-		}
+		new CBroadcastAdder(new WriteListener() {
+			@Override
+			public void writeText(String text) {
+				write(text);
+			}
+		}, fifoSize).transform(network);
 	}
 
 	@Override
@@ -286,58 +224,43 @@ public class CBackendImpl extends AbstractBackend {
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 
+		workingNetwork = network;
 		// Transform the network
 		doTransformNetwork(network);
 
-		String rootPath = new String(path);
-		for (String targetName : mapTargetsNetworks.keySet()) {
-			workingNetwork = mapTargetsNetworks.get(targetName);
+		if (merge) {
+			network.mergeActors();
+		}
 
-			if (merge) {
-				workingNetwork.mergeActors();
+		// Transform all actors of the network
+		transformActors(network.getActors());
+
+		network.computeTemplateMaps();
+
+		NetworkPrinter printer = new NetworkPrinter("C_network");
+		printer.setTypePrinter(new CTypePrinter());
+
+		instancesTarget = null;
+		for (String mappedThing : mapping.values()) {
+			if (!mappedThing.isEmpty()) {
+				computeMapping(network);
+				break;
 			}
+		}
 
-			// Transform all actors of the network
-			transformActors(workingNetwork.getActors());
+		computeOptions(printer.getOptions());
 
+		// print instances
+		printInstances(network);
 
-			workingNetwork.computeTemplateMaps();
+		// print network
+		write("Printing network...\n");
+		printer.print(network.getName() + ".c", path, network, "network");
 
-			NetworkPrinter printer = new NetworkPrinter("C_network");
-			printer.setTypePrinter(new CTypePrinter());
-
-			instancesTarget = null;
-			for (String mappedThing : mapping.values()) {
-				if (!mappedThing.isEmpty()) {
-					computeMapping(workingNetwork);
-					break;
-				}
-			}
-
-			computeOptions(printer.getOptions());
-
-			if (codesign) {
-				write("\nPrinting " + targetName + "'s instances\n");
-				path = rootPath + File.separator + targetName;
-				File directory = new File(path);
-				if (!directory.exists()) {
-					directory.mkdirs();
-				}
-			}
-
-			// print instances
-			printInstances(workingNetwork);
-
-			// print network
-			write("Printing network...\n");
-			printer.print(workingNetwork.getName() + ".c", path,
-					workingNetwork, "network");
-
-			// print CMakeLists
-			printCMake(workingNetwork);
-			if (!codesign && !geneticAlgorithm && instancesTarget != null) {
-				printMapping(workingNetwork);
-			}
+		// print CMakeLists
+		printCMake(network);
+		if (!geneticAlgorithm && instancesTarget != null) {
+			printMapping(network);
 		}
 	}
 
