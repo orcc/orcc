@@ -14,9 +14,6 @@
                id="net.sf.orcc.backends.classify">
          </option>
          <option
-               id="net.sf.orcc.backends.merger2">
-         </option>
-         <option
                id="net.sf.orcc.backends.normalize">
          </option>
          <option
