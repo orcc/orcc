@@ -293,12 +293,13 @@ public class CBackendImpl extends AbstractBackend {
 		for (String targetName : mapTargetsNetworks.keySet()) {
 			workingNetwork = mapTargetsNetworks.get(targetName);
 
-			// Transform all actors of the network
-			transformActors(workingNetwork.getActors());
-
 			if (merge) {
 				workingNetwork.mergeActors();
 			}
+
+			// Transform all actors of the network
+			transformActors(workingNetwork.getActors());
+
 
 			workingNetwork.computeTemplateMaps();
 
