@@ -904,11 +904,6 @@ public class XDFParser {
 		network.setName(name);
 
 		parseBody(root);
-
-		if (network.getInstances().isEmpty()) {
-			throw new OrccException(
-					"A valid network must contain at least one instance");
-		}
 	}
 
 }
