@@ -111,11 +111,11 @@ static void compareYUV_readComponent(unsigned char **Component, unsigned short w
 	size_t numByteRead;
 
 	if(*Component == NULL) {
-		*Component = malloc(width*height * sizeof(unsigned char));
+		*Component = (unsigned char*)malloc(width*height * sizeof(unsigned char));
 	}
 	else {
 		if(sizeChanged) {
-			*Component = realloc(*Component, width*height * sizeof(unsigned char));
+			*Component =  (unsigned char*)realloc(*Component, width*height * sizeof(unsigned char));
 		}
 	}
 	if(*Component == NULL) {
@@ -139,7 +139,7 @@ void compareYUV_comparePicture(unsigned char *pictureBufferY, unsigned char *pic
 	static unsigned char *Y = NULL;
 	static unsigned char *U = NULL;
 	static unsigned char *V = NULL;
-	int i;
+
 	char sizeChanged;
 
 	if(useCompare) {
