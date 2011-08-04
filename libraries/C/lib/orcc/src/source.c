@@ -76,6 +76,16 @@ void source_init() {
 	}
 }
 
+unsigned int source_getNbLoop(void)
+{
+		return nbLoops;
+}
+
+void source_exit(int exitCode)
+{
+	exit(exitCode);
+}
+
 int source_sizeOfFile() { 
 	struct stat st; 
 	fstat(fileno(file), &st); 

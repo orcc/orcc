@@ -30,6 +30,9 @@
 #ifndef ORCC_UTIL_H
 #define ORCC_UTIL_H
 
+//Nb Loops
+extern unsigned int nbLoops;
+
 // input file
 extern char *input_file;
 

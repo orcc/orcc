@@ -159,8 +159,6 @@ void compareYUV_comparePicture(unsigned char *pictureBufferY, unsigned char *pic
 		if(ftell(ptrFile) == fileSize) {
 			rewind(ptrFile);
 			frameNumber = 0;
-			printf("End Of File !!\n");
-			exit(0);//Will be removed.
 		}
 		prevXSize = pictureWidth;
 		prevYSize = pictureHeight;

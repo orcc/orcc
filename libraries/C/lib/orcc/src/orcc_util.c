@@ -51,6 +51,9 @@
 extern char	*optarg;
 extern int getopt(int nargc, char * const *nargv, const char *ostr);
 
+//Nb Loops
+unsigned int nbLoops = 1;
+
 // input file
 char *input_file;
 
@@ -106,7 +109,7 @@ void print_and_exit(const char *msg) {
 	exit(1);
 }
 
-static const char *usage = "%s: -i <file> [-o <file>] [-w <file>]...\n";
+static const char *usage = "%s: -i <file> [-o <file>] [-w <file>] [-l <number of loop iterations>...\n";
 static char *program;
 
 void print_usage() {
@@ -116,7 +119,7 @@ void print_usage() {
 ///////////////////////////////////////////////////////////////////////////////
 // initializes APR and parses options
 void init_orcc(int argc, char *argv[]) {
-	const char *ostr = "i:o:w:m:g:n:";
+	const char *ostr = "g:i:l:m:n:o:w:";
 	int c;
 
 	program = argv[0];
@@ -130,14 +133,17 @@ void init_orcc(int argc, char *argv[]) {
 		case ':': // BADARG
 			fprintf(stderr, "missing argument\n");
 			exit(1);
+		case 'g':
+			output_genetic = strdup(optarg);
+			break;
 		case 'i':
 			input_file = strdup(optarg);
 			break;
-		case 'o':
-			yuv_file = strdup(optarg);
-			break;
-		case 'w':
-			write_file = strdup(optarg);
+		case 'l':
+			nbLoops = strtoul(optarg, NULL, 10);
+			if(nbLoops == 0) {
+				nbLoops = 1;
+			}
 			break;
 		case 'm':
 			mapping_file = strdup(optarg);
@@ -145,8 +151,11 @@ void init_orcc(int argc, char *argv[]) {
 		case 'n':
 			display_flags = DISPLAY_DISABLE;
 			break;
-		case 'g':
-			output_genetic = strdup(optarg);
+		case 'o':
+			yuv_file = strdup(optarg);
+			break;
+		case 'w':
+			write_file = strdup(optarg);
 			break;
 		default:
 			fprintf(stderr, "skipping option -%c\n", c);
