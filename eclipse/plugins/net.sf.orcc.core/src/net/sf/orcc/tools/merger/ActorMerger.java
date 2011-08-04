@@ -245,7 +245,8 @@ public class ActorMerger implements INetworkTransformation {
 
 		// increment loop counter
 		Expression expr = factory.createExprBinary(factory.createExprVar(loop),
-				OpBinary.PLUS, factory.createExprInt(1), loop.getType());
+				OpBinary.PLUS, factory.createExprInt(1),
+				factory.createTypeInt(32));
 		InstAssign assign = factory.createInstAssign(loop, expr);
 		childBlock.add(assign);
 	}
@@ -353,7 +354,7 @@ public class ActorMerger implements INetworkTransformation {
 								+ inIndex++);
 
 				CSDFMoC moc = (CSDFMoC) tgt.getInstance().getMoC();
-				int cns = scheduler.getRepetitionVector().get(tgt)
+				int cns = scheduler.getRepetitionsVector().get(tgt)
 						* moc.getNumTokensConsumed(tgtPort);
 
 				inputPattern.setNumTokens(port, cns);
@@ -369,7 +370,7 @@ public class ActorMerger implements INetworkTransformation {
 								+ outIndex++);
 
 				CSDFMoC moc = (CSDFMoC) src.getInstance().getMoC();
-				int prd = scheduler.getRepetitionVector().get(src)
+				int prd = scheduler.getRepetitionsVector().get(src)
 						* moc.getNumTokensProduced(srcPort);
 
 				outputPattern.setNumTokens(port, prd);
@@ -547,7 +548,7 @@ public class ActorMerger implements INetworkTransformation {
 				// Increment current while loop variable
 				Expression expr = factory.createExprBinary(
 						factory.createExprVar(loopVar), OpBinary.PLUS,
-						factory.createExprInt(1), loopVar.getType());
+						factory.createExprInt(1), factory.createTypeInt(32));
 				InstAssign assign = factory.createInstAssign(loopVar, expr);
 				procedure.getLast(nodeWhile.getNodes()).add(assign);
 			}
@@ -564,15 +565,10 @@ public class ActorMerger implements INetworkTransformation {
 		superActor.setName(name);
 
 		createPorts();
-
 		copyStateVariables();
-
 		copyProcedures();
-
 		createStateVariables();
-
 		createProcedures();
-
 		createStaticAction();
 	}
 
@@ -594,6 +590,9 @@ public class ActorMerger implements INetworkTransformation {
 			// create the static schedule of vertices
 			scheduler = new SASLoopScheduler(subgraph);
 			scheduler.schedule();
+
+			System.out.println("Schedule of superActor_" + index + " is "
+					+ scheduler.getSchedule());
 
 			// merge vertices inside a single actor
 			mergeActors();

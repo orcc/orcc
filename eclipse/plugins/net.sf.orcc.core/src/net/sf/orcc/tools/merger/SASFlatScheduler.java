@@ -60,7 +60,7 @@ public class SASFlatScheduler extends AbstractScheduler {
 			Vertex vertex = it.next();
 
 			if (vertex.isInstance()) {
-				int rep = repetitionVector.get(vertex);
+				int rep = repetitionsVector.get(vertex);
 				Iterand iterand = null;
 				for (int i = 0; i < rep; i++) {
 					iterand = new Iterand(vertex);

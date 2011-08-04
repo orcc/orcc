@@ -52,7 +52,7 @@ public abstract class AbstractScheduler implements IScheduler {
 
 	protected Map<Connection, Integer> maxTokens;
 
-	protected Map<Vertex, Integer> repetitionVector;
+	protected Map<Vertex, Integer> repetitionsVector;
 
 	private int depth;
 
@@ -63,7 +63,7 @@ public abstract class AbstractScheduler implements IScheduler {
 	public AbstractScheduler(DirectedGraph<Vertex, Connection> graph) {
 		this.graph = graph;
 
-		repetitionVector = new RepetitionVectorAnalyzer(graph)
+		repetitionsVector = new RepetitionVectorAnalyzer(graph)
 				.getRepetitionVector();
 	}
 
@@ -138,8 +138,8 @@ public abstract class AbstractScheduler implements IScheduler {
 	 * 
 	 * @return
 	 */
-	public Map<Vertex, Integer> getRepetitionVector() {
-		return repetitionVector;
+	public Map<Vertex, Integer> getRepetitionsVector() {
+		return repetitionsVector;
 	}
 
 	/**

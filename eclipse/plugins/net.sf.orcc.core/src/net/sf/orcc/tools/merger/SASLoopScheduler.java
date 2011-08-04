@@ -60,11 +60,11 @@ public class SASLoopScheduler extends AbstractScheduler {
 			Vertex vertex = it.next();
 
 			if (vertex.isInstance()) {
-				int rep = repetitionVector.get(vertex);
+				int rep = repetitionsVector.get(vertex);
 				Iterand iterand = null;
 				if (rep > 1) {
 					Schedule subSched = new Schedule();
-					subSched.setIterationCount(repetitionVector.get(vertex));
+					subSched.setIterationCount(repetitionsVector.get(vertex));
 					subSched.add(new Iterand(vertex));
 					iterand = new Iterand(subSched);
 				} else {

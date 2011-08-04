@@ -204,11 +204,13 @@ public class StaticRegionDetector {
 
 		List<Vertex> vertices = new TopologicalSorter(graph).topologicalSort();
 		for (Vertex vertex : vertices) {
-			MoC clasz = vertex.getInstance().getMoC();
-			if (!discovered.contains(vertex) && clasz.isCSDF()) {
-				List<Vertex> set = new LinkedList<Vertex>();
-				staticRegionList.add(set);
-				staticRegionAnalysis(graph, vertex, set);
+			if(vertex.isInstance()) {
+				MoC clasz = vertex.getInstance().getMoC();
+				if (!discovered.contains(vertex) && clasz.isCSDF()) {
+					List<Vertex> set = new LinkedList<Vertex>();
+					staticRegionList.add(set);
+					staticRegionAnalysis(graph, vertex, set);
+				}				
 			}
 		}
 
