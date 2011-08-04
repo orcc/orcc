@@ -104,7 +104,8 @@ void compareYUV_init()
 		exit(-1);
 	}
 
-	fileSize = fstat(fileno(ptrFile), &st);
+	fstat(fileno(ptrFile), &st);
+	fileSize = st.st_size;
 }
 
 static void compareYUV_readComponent(unsigned char **Component, unsigned short width, unsigned short height, char sizeChanged) {
@@ -158,7 +159,8 @@ void compareYUV_comparePicture(unsigned char *pictureBufferY, unsigned char *pic
 		if(ftell(ptrFile) == fileSize) {
 			rewind(ptrFile);
 			frameNumber = 0;
-			exit(0);
+			printf("End Of File !!\n");
+			exit(0);//Will be removed.
 		}
 		prevXSize = pictureWidth;
 		prevYSize = pictureHeight;
