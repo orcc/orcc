@@ -45,7 +45,8 @@ import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.CycleDetector;
 
 /**
- * This class computes a topological sort of the graph.
+ * This class computes a topological sort of the graph. The graph must be
+ * acyclic. The results with cyclic graphs are undefined.
  * 
  * @author Ghislain Roquier
  * 
@@ -60,14 +61,16 @@ public class TopologicalSorter {
 
 		private Map<Vertex, TimeStamp> timeStamps = new HashMap<Vertex, TimeStamp>();
 
+		private int currentTime = 0;
+
 		public DFS(DirectedGraph<Vertex, Connection> graph) {
 			this.graph = graph;
 		}
 
 		private void dfsVisit(Vertex vertex) {
 			defined.add(vertex);
-			TimeStamp.currentTime++;
-			timeStamps.put(vertex, new TimeStamp(TimeStamp.currentTime, 0));
+			currentTime++;
+			timeStamps.put(vertex, new TimeStamp(currentTime, 0));
 
 			for (Connection connection : graph.outgoingEdgesOf(vertex)) {
 				Vertex tgtVertex = graph.getEdgeTarget(connection);
@@ -75,8 +78,8 @@ public class TopologicalSorter {
 					dfsVisit(tgtVertex);
 				}
 			}
-			TimeStamp.currentTime++;
-			timeStamps.get(vertex).setFinished(TimeStamp.currentTime);
+			currentTime++;
+			timeStamps.get(vertex).setFinished(currentTime);
 		}
 
 		private Map<Vertex, TimeStamp> getTimestamps() {
@@ -88,7 +91,7 @@ public class TopologicalSorter {
 			return timeStamps;
 		}
 
-		public List<Vertex> orderedByFinishingTime() {
+		public List<Vertex> sortByFinishingTime() {
 			List<Vertex> sorted = new LinkedList<Vertex>(getTimestamps()
 					.keySet());
 			Collections.sort(sorted, new TimeStampComparator(timeStamps));
@@ -97,9 +100,7 @@ public class TopologicalSorter {
 
 	};
 
-	private static class TimeStamp {
-
-		static int currentTime = 0;
+	private static class TimeStamp implements Comparable<TimeStamp> {
 		private int finish;
 		private int start;
 
@@ -119,6 +120,11 @@ public class TopologicalSorter {
 
 		public void setFinished(int finished) {
 			this.finish = finished;
+		}
+
+		@Override
+		public int compareTo(TimeStamp that) {
+			return that.getFinished() - this.getFinished();
 		}
 	};
 
@@ -148,6 +154,6 @@ public class TopologicalSorter {
 	}
 
 	public List<Vertex> topologicalSort() {
-		return new DFS(graph).orderedByFinishingTime();
+		return new DFS(graph).sortByFinishingTime();
 	}
 }

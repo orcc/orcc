@@ -50,15 +50,15 @@ import org.jgrapht.DirectedGraph;
  * @author Ghislain Roquier
  * 
  */
-public class RepetitionVectorAnalyzer {
+public class RepetitionsAnalyzer {
 
 	private DirectedGraph<Vertex, Connection> graph;
 
 	private Map<Vertex, Rational> rationals = new HashMap<Vertex, Rational>();
 
-	private Map<Vertex, Integer> repetitionVector = new HashMap<Vertex, Integer>();
+	private Map<Vertex, Integer> repetitions = new HashMap<Vertex, Integer>();
 
-	public RepetitionVectorAnalyzer(DirectedGraph<Vertex, Connection> graph) {
+	public RepetitionsAnalyzer(DirectedGraph<Vertex, Connection> graph) {
 		this.graph = graph;
 
 		analyze();
@@ -84,7 +84,7 @@ public class RepetitionVectorAnalyzer {
 			Vertex vertex = entry.getKey();
 			Rational rat = entry.getValue();
 			int rep = rat.getNumerator() * lcm / rat.getDenominator();
-			repetitionVector.put(vertex, rep);
+			repetitions.put(vertex, rep);
 		}
 
 		checkConsistency();
@@ -112,7 +112,6 @@ public class RepetitionVectorAnalyzer {
 			Vertex tgt = graph.getEdgeTarget(conn);
 			if (tgt.isInstance()) {
 				CSDFMoC tgtMoC = (CSDFMoC) tgt.getInstance().getMoC();
-
 				if (!rationals.containsKey(tgt)) {
 					int prd = moc.getNumTokensProduced(conn.getSource());
 					int cns = tgtMoC.getNumTokensConsumed(conn.getTarget());
@@ -132,7 +131,6 @@ public class RepetitionVectorAnalyzer {
 				}
 			}
 		}
-
 	}
 
 	/**
@@ -141,8 +139,8 @@ public class RepetitionVectorAnalyzer {
 	 */
 	private void checkConsistency() {
 		for (Connection connection : graph.edgeSet()) {
-			int srcRate = repetitionVector.get(graph.getEdgeSource(connection));
-			int tgtRate = repetitionVector.get(graph.getEdgeTarget(connection));
+			int srcRate = repetitions.get(graph.getEdgeSource(connection));
+			int tgtRate = repetitions.get(graph.getEdgeTarget(connection));
 
 			CSDFMoC srcMoc = (CSDFMoC) graph.getEdgeSource(connection)
 					.getInstance().getMoC();
@@ -159,8 +157,8 @@ public class RepetitionVectorAnalyzer {
 		}
 	}
 
-	public Map<Vertex, Integer> getRepetitionVector() {
-		return repetitionVector;
+	public Map<Vertex, Integer> getRepetitions() {
+		return repetitions;
 	}
 
 }

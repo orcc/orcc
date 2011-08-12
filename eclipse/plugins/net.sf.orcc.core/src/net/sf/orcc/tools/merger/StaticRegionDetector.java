@@ -82,7 +82,6 @@ public class StaticRegionDetector {
 	private boolean introduceCycle(DirectedGraph<Vertex, Connection> graph,
 			List<Vertex> vertices) {
 		boolean ret = false;
-
 		int inIndex = 0;
 		int outIndex = 0;
 
@@ -92,6 +91,7 @@ public class StaticRegionDetector {
 		for (Vertex vertex : graph.vertexSet()) {
 			clusteredGraph.addVertex(vertex);
 		}
+		
 		for (Connection connection : graph.edgeSet()) {
 			clusteredGraph.addEdge(graph.getEdgeSource(connection),
 					graph.getEdgeTarget(connection), connection);

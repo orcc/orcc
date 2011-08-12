@@ -63,8 +63,7 @@ public abstract class AbstractScheduler implements IScheduler {
 	public AbstractScheduler(DirectedGraph<Vertex, Connection> graph) {
 		this.graph = graph;
 
-		repetitionsVector = new RepetitionVectorAnalyzer(graph)
-				.getRepetitionVector();
+		repetitionsVector = new RepetitionsAnalyzer(graph).getRepetitions();
 	}
 
 	private void computeMemoryBound(Schedule schedule) {
@@ -86,8 +85,7 @@ public abstract class AbstractScheduler implements IScheduler {
 					}
 				}
 			} else {
-				Schedule sched = iterand.getSchedule();
-				int count = sched.getIterationCount();
+				int count = iterand.getSchedule().getIterationCount();
 				while (count != 0) {
 					computeMemoryBound(iterand.getSchedule());
 					count--;

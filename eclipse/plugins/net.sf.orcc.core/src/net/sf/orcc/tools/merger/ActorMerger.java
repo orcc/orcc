@@ -216,39 +216,55 @@ public class ActorMerger implements INetworkTransformation {
 		IrFactory factory = IrFactory.eINSTANCE;
 
 		List<Node> nodes = procedure.getNodes();
-		Var loop = procedure.getLocal("idx_0");
-		NodeBlock block = procedure.getLast(nodes);
-		block.add(factory.createInstAssign(loop, factory.createExprInt(0)));
 
-		Expression condition = factory.createExprBinary(
-				factory.createExprVar(loop), OpBinary.LT,
-				factory.createExprInt(((TypeList) source.getType()).getSize()),
-				factory.createTypeBool());
-
-		NodeWhile nodeWhile = factory.createNodeWhile();
-		nodeWhile.setJoinNode(factory.createNodeBlock());
-		nodeWhile.setCondition(condition);
-		nodes.add(nodeWhile);
+		int size = ((TypeList) source.getType()).getSize();
 
 		Var tmpVar = procedure.getLocal("tmp_" + name);
-		List<Expression> indexes = new ArrayList<Expression>();
-		indexes.add(factory.createExprVar(loop));
-		InstLoad load = factory.createInstLoad(tmpVar, source, indexes);
 
-		indexes = new ArrayList<Expression>();
-		indexes.add(factory.createExprVar(loop));
-		InstStore store = factory.createInstStore(0, target, indexes,
-				factory.createExprVar(tmpVar));
-		NodeBlock childBlock = procedure.getLast(nodeWhile.getNodes());
-		childBlock.add(load);
-		childBlock.add(store);
+		if (size == 1) {
+			List<Expression> indexes = new ArrayList<Expression>();
+			indexes.add(factory.createExprInt(0));
+			InstLoad load = factory.createInstLoad(tmpVar, source, indexes);
+			indexes = new ArrayList<Expression>();
+			indexes.add(factory.createExprInt(0));
+			InstStore store = factory.createInstStore(0, target, indexes,
+					factory.createExprVar(tmpVar));
+			NodeBlock node = procedure.getLast(nodes);
+			node.add(load);
+			node.add(store);
+		} else {
+			Var loop = procedure.getLocal("idx_0");
+			NodeBlock block = procedure.getLast(nodes);
+			block.add(factory.createInstAssign(loop, factory.createExprInt(0)));
 
-		// increment loop counter
-		Expression expr = factory.createExprBinary(factory.createExprVar(loop),
-				OpBinary.PLUS, factory.createExprInt(1),
-				factory.createTypeInt(32));
-		InstAssign assign = factory.createInstAssign(loop, expr);
-		childBlock.add(assign);
+			Expression condition = factory.createExprBinary(
+					factory.createExprVar(loop), OpBinary.LT,
+					factory.createExprInt(size), factory.createTypeBool());
+
+			NodeWhile nodeWhile = factory.createNodeWhile();
+			nodeWhile.setJoinNode(factory.createNodeBlock());
+			nodeWhile.setCondition(condition);
+			nodes.add(nodeWhile);
+
+			List<Expression> indexes = new ArrayList<Expression>();
+			indexes.add(factory.createExprVar(loop));
+			InstLoad load = factory.createInstLoad(tmpVar, source, indexes);
+
+			indexes = new ArrayList<Expression>();
+			indexes.add(factory.createExprVar(loop));
+			InstStore store = factory.createInstStore(0, target, indexes,
+					factory.createExprVar(tmpVar));
+			NodeBlock childBlock = procedure.getLast(nodeWhile.getNodes());
+			childBlock.add(load);
+			childBlock.add(store);
+
+			// increment loop counter
+			Expression expr = factory.createExprBinary(
+					factory.createExprVar(loop), OpBinary.PLUS,
+					factory.createExprInt(1), factory.createTypeInt(32));
+			InstAssign assign = factory.createInstAssign(loop, expr);
+			childBlock.add(assign);
+		}
 	}
 
 	private void createCopiesFromInputs(Procedure procedure, Pattern ip) {
