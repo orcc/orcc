@@ -51,7 +51,7 @@ static FILE        *ptrFile ;
 static unsigned int fileSize;
 static char         useCompare;
 
-static void compareYUV_compareComponent(const int x_size, const int y_size, 
+static int compareYUV_compareComponent(const int x_size, const int y_size, 
                const unsigned char *true_img_uchar, const unsigned char *test_img_uchar,
                unsigned char SizeMbSide, char Component_Type) {
 	int pix_x, pix_y,blk_x,blk_y;
@@ -74,7 +74,7 @@ static void compareYUV_compareComponent(const int x_size, const int y_size,
 						error++;
 						if (error < 100)
 						{
-							printf("error %3d instead of %3d at position : mb = (%d ; %d) , loc_in_mb = (%d ; %d)\n",
+							printf("\nerror %3d instead of %3d at position : mb = (%d ; %d) , loc_in_mb = (%d ; %d)",
 								test_img_uchar[Idx_pix] , true_img_uchar[Idx_pix], blk_x, blk_y, pix_x, pix_y);
 						}
 					}
@@ -84,8 +84,9 @@ static void compareYUV_compareComponent(const int x_size, const int y_size,
 	}
 
 	if (error != 0) {
-		printf("%d error(s) in %c Component !!!!!!!!!!!!!\n", error, Component_Type);
+		printf("\n%d error(s) in %c Component !!!!!!!!!!!!!\n", error, Component_Type);
 	}
+	return error;
 }
 
 void compareYUV_init()
@@ -144,7 +145,9 @@ void compareYUV_comparePicture(unsigned char *pictureBufferY, unsigned char *pic
 	char sizeChanged;
 
 	if(useCompare) {
-		printf("Frame number %d \n", frameNumber);
+		int numErrors = 0;
+
+		printf("Frame number %d", frameNumber);
 		frameNumber++;
 
 		sizeChanged = ((prevXSize*prevYSize) != (pictureWidth*pictureHeight)) ? 1 : 0;
@@ -152,9 +155,14 @@ void compareYUV_comparePicture(unsigned char *pictureBufferY, unsigned char *pic
 		compareYUV_readComponent(&U, pictureWidth/2, pictureHeight/2, sizeChanged);
 		compareYUV_readComponent(&V, pictureWidth/2, pictureHeight/2, sizeChanged);
 
-		compareYUV_compareComponent(pictureWidth, pictureHeight, Y, pictureBufferY,16, 'Y');
-		compareYUV_compareComponent(pictureWidth >> 1, pictureHeight >> 1, U, pictureBufferU,8,'U');
-		compareYUV_compareComponent(pictureWidth >> 1, pictureHeight >> 1, V, pictureBufferV,8, 'V');
+		numErrors += compareYUV_compareComponent(pictureWidth, pictureHeight, Y, pictureBufferY,16, 'Y');
+		numErrors += compareYUV_compareComponent(pictureWidth >> 1, pictureHeight >> 1, U, pictureBufferU,8,'U');
+		numErrors += compareYUV_compareComponent(pictureWidth >> 1, pictureHeight >> 1, V, pictureBufferV,8, 'V');
+
+		if(numErrors == 0)
+		{
+			printf("; no error detected !\n");
+		}
 
 		if(ftell(ptrFile) == fileSize) {
 			rewind(ptrFile);
