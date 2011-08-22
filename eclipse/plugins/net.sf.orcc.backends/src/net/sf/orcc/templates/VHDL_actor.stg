@@ -247,7 +247,7 @@ endif
 // is called
 printReturn(return) ::= <<
 <if(return.value)
- ><if(transformReturn)
+ ><if(insideIsSchedulable)
    ><procedure.name>_go := <return.value>;<
   else
    >return <return.value>;<
@@ -381,7 +381,7 @@ end loop;
 ///////////////////////////////////////////////////////////////////////////////
 // Prints functions
 ///////////////////////////////////////////////////////////////////////////////
-function(procedure) ::= <<
+printFunction(procedure, insideIsSchedulable=false) ::= <<
 <if (!procedure.native)
   ><if (procedure.returnType.void)
 >procedure <procedure.name>(<printParameters(procedure.parameters)>dummy : std_logic) is
@@ -446,7 +446,7 @@ endif>
 ///////////////////////////////////////////////////////////////////////////////
 // Action
 ///////////////////////////////////////////////////////////////////////////////
-printProcedure(procedure, transformReturn) ::= <<
+printProcedure(procedure, insideIsSchedulable=false) ::= <<
 <printNodes(procedure.nodes)>
 >>
 
@@ -495,7 +495,7 @@ variable <action.scheduler.name>_<port.name> : <port.type>;}; separator="\n">
 begin
   <actor.actions: {action|-- test if "<action.name>" action is schedulable
 <action.peekPattern.ports: { port |<printRead(procedure=action.scheduler, port=port, variable=action.peekPattern.portToVarMap.(port))>}; separator="\n">
-<printProcedure(procedure=action.scheduler, transformReturn="true")>}; separator="\n">
+<printProcedure(procedure=action.scheduler, insideIsSchedulable=true)>}; separator="\n">
   --
   -- Test the action's inputs to fire (or not) an action  
   <actor.actions : {action|<action.name>_go \<= '0';}; separator="\n">
@@ -584,7 +584,7 @@ end process <actor.simpleName>_execute;
 
 printActionBody(action) ::= <<
 <action.inputPattern.ports: { port |<printRead(procedure=action.body, port=port, variable=action.inputPattern.portToVarMap.(port))>}; separator="\n">
-<printProcedure(procedure=action.body, transformReturn="true")><
+<printProcedure(procedure=action.body, insideIsSchedulable=true)><
 action.outputPattern.ports: { port |<printWrite(procedure=action.body, port=port, variable=action.outputPattern.portToVarMap.(port))>}; separator="\n">
 >>
 
@@ -708,7 +708,7 @@ architecture rtl_<actor.simpleName> of <actor.simpleName> is
 >  ---------------------------------------------------------------------------
   -- Functions and procedures
   ---------------------------------------------------------------------------
-  <actor.procs: {proc|<function(procedure=proc)>}; separator="\n\n">
+  <actor.procs: {proc|<printFunction(procedure=proc)>}; separator="\n\n">
 <endif>
 
 <if(actor.fsm)
