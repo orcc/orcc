@@ -68,6 +68,17 @@ public interface Predicate extends EObject {
 	boolean isEmpty();
 
 	/**
+	 * Returns <code>true</code> if this predicate and the given predicate are
+	 * mutually exclusive.
+	 * 
+	 * @param predicate
+	 *            a predicate
+	 * @return <code>true</code> if this predicate and the given predicate are
+	 *         mutually exclusive
+	 */
+	boolean isMutuallyExclusive(Predicate predicate);
+
+	/**
 	 * Returns <code>true</code> if this predicate is the same as the given
 	 * predicate.
 	 * 
