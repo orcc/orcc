@@ -1136,7 +1136,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 			if(ramSize == 0){
 				tta.getData().setMaxAddress(256);
 			} else {
-				tta.getData().setMaxAddress(ramSize / 8 + 256);
+				tta.getData().setMaxAddress(quantizeUp(ramSize / 8 + 256));
 			}
 			
 		} else if (instance.isBroadcast()) {
@@ -1149,6 +1149,16 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 			tta.getData().setMaxAddress(64);
 		}
 		return tta;
+	}
+
+	// round up to next power or 2
+	// for example 30000 -> 32768
+	public int quantizeUp(int value) {
+		double tmp;
+		
+		tmp = Math.log(value)/Math.log(2.0);
+		
+		return (int) (Math.pow(2,(Math.floor(tmp)+1.0))-1.0);
 	}
 
 	/**
