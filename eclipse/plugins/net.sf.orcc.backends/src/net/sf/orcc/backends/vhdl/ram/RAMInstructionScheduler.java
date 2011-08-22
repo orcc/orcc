@@ -289,7 +289,8 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 		Predicate predicate = load.getPredicate();
 
 		RAM ram = ramMap.get(var);
-		if (ram.isLastAccessRead() && ram.getPredicate().isSameAs(predicate)) {
+		if (ram.isLastAccessRead()
+				&& !ram.getPredicate().isMutuallyExclusive(predicate)) {
 			int port = ram.getLastPortUsed() + 1;
 			ram.setLastPortUsed(port);
 
@@ -330,7 +331,8 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 
 		RAM ram = ramMap.get(var);
 		int port;
-		if (ram.isLastAccessWrite() && ram.getPredicate().isSameAs(predicate)) {
+		if (ram.isLastAccessWrite()
+				&& !ram.getPredicate().isMutuallyExclusive(predicate)) {
 			port = ram.getLastPortUsed() + 1;
 			if (port > 0 && port % 2 == 0) {
 				// port == 2, 4, 6, 8...
