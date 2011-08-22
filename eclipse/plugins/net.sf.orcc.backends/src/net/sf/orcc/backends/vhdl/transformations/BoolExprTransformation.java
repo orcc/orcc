@@ -90,11 +90,17 @@ public class BoolExprTransformation extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseExprBinary(ExprBinary expr) {
-		Expression e1 = doSwitch(expr.getE1());
-		Expression e2 = doSwitch(expr.getE2());
+		Expression e1 = expr.getE1();
+		Expression e2 = expr.getE2();
 		OpBinary op = negateCondition ? expr.getOp().getInverse() : expr
 				.getOp();
 		Type type = expr.getType();
+
+		// only transforms expressions whose operands are not booleans
+		if (!e1.isBooleanExpr() && !e2.isBooleanExpr()) {
+			e1 = doSwitch(e1);
+			e2 = doSwitch(e2);
+		}
 		return IrFactory.eINSTANCE.createExprBinary(e1, op, e2, type);
 	}
 
