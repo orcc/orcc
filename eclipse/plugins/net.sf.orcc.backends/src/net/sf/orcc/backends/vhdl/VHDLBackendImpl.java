@@ -57,9 +57,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
-import net.sf.orcc.ir.transformations.PhiRemoval;
 import net.sf.orcc.ir.transformations.RenameTransformation;
-import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.util.ActorInterpreter;
 import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
@@ -132,13 +130,9 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 		ActorVisitor<?>[] transformationsCodegen = {
 				// cleanup code
-				new SSATransformation(),
 				new DeadGlobalElimination(),
 				new DeadCodeElimination(),
 				new DeadVariableRemoval(),
-
-				// out-of-SSA transformation
-				new PhiRemoval(),
 
 				// array to RAM transformation
 				new RAMTransformation(),

@@ -235,7 +235,7 @@ printLoad(load) ::= <<
 ><if(load.cast)><CastLoad(targetName=load.target.variable.indexedName,
 targetTypeIsUint=load.target.variable.type.uint, targetSize=load.target.variable.size,
 source={<procedure.name>_<getPort(load.source.variable)>}, cast=load.cast)>;<
-else><load.target.variable.indexedName> := <procedure.name>_<getPort(load.source.variable)>;<
+else><load.target.variable.indexedName> := <procedure.name>_<getPort(load.source.variable)>_i;<
 endif
 ><else><load.target.variable.indexedName> := <load.source.variable.name>(<load.indexes : {index | <index>}; separator=", ">);<
 endif
@@ -263,7 +263,7 @@ printStore(store) ::= <<
 targetTypeIsUint=getPortTypeUint(store.target.variable), targetSize=getPortTypeSize(store.target.variable),
 cast=store.cast, value=store.value)>;<
    else
-    ><procedure.name>_<getPort(store.target.variable)> := <store.value>;<
+    ><procedure.name>_<getPort(store.target.variable)>_o := <store.value>;<
    endif><
   else
    ><store.target.variable.name>(<store.indexes : {index | <index>}; separator=", ">) \<= <store.value>;<
@@ -278,21 +278,21 @@ endif>
 
 printRead(procedure, port, variable) ::= <<
 <if(port.type.bool)
-><procedure.name>_<variable.name> := <getPortName(port, "_data")>;<
+><procedure.name>_<variable.name>_i := <getPortName(port, "_data")>;<
 elseif(port.type.int)
-><procedure.name>_<variable.name> := to_integer(signed(<getPortName(port, "_data")>));<
+><procedure.name>_<variable.name>_i := to_integer(signed(<getPortName(port, "_data")>));<
 elseif(port.type.uint)
-><procedure.name>_<variable.name> := to_integer(unsigned(<getPortName(port, "_data")>));<
+><procedure.name>_<variable.name>_i := to_integer(unsigned(<getPortName(port, "_data")>));<
 endif>
 >>
 
 printWrite(procedure, port, variable) ::= <<
 <if(port.type.bool)
-><getPortName(port, "_idata")> \<= <procedure.name>_<variable.name>;<
+><getPortName(port, "_idata")> \<= <procedure.name>_<variable.name>_o;<
 elseif(port.type.int)
-><getPortName(port, "_idata")> \<= std_logic_vector(to_signed(<procedure.name>_<variable.name>, <port.type.size>));<
+><getPortName(port, "_idata")> \<= std_logic_vector(to_signed(<procedure.name>_<variable.name>_o, <port.type.size>));<
 else
-><getPortName(port, "_idata")> \<= std_logic_vector(to_unsigned(<procedure.name>_<variable.name>, <port.type.size>));<
+><getPortName(port, "_idata")> \<= std_logic_vector(to_unsigned(<procedure.name>_<variable.name>_o, <port.type.size>));<
 endif>
 >>
 
@@ -490,7 +490,7 @@ Actor_Scheduler(actor) ::= <<
 <actor.simpleName>_scheduler : process(<actor.templateData.signals; wrap, anchor, separator=", ">)
   <actor.actions : { action |<printLocals(action.scheduler)>
 variable <action.scheduler.name>_go : std_logic; <action.peekPattern.ports: {port |
-variable <action.scheduler.name>_<port.name> : <port.type>;}; separator="\n">
+variable <action.scheduler.name>_<port.name>_i : <port.type>;}; separator="\n">
 }>  --
 begin
   <actor.actions: {action|-- test if "<action.name>" action is schedulable
@@ -554,9 +554,9 @@ Actor_Exec(actor) ::= <<
 <actor.simpleName>_execute : process (reset_n, clock) is
   <actor.actions: {action |<printLocals(action.body)><
 action.inputPattern.ports : { port | 
-variable <action.body.name>_<port.name> : <port.type>;}><
+variable <action.body.name>_<port.name>_i : <port.type>;}><
 action.outputPattern.ports: { port | 
-variable <action.body.name>_<port.name> : <port.type>;}>
+variable <action.body.name>_<port.name>_o : <port.type>;}>
 }>  --
 begin
   if reset_n = '0' then
