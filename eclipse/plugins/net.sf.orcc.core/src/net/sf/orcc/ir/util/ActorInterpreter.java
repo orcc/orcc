@@ -364,13 +364,20 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	}
 
 	/**
-	 * Executes the given action. Does nothing by default. May be overriden by
-	 * implementations.
+	 * Executes the given action. This implementation allocates input/output
+	 * pattern and executes the body. Should be overriden by implementations to
+	 * perform read/write from/to FIFOs.
 	 * 
 	 * @param action
 	 *            an action
 	 */
 	protected void execute(Action action) {
+		Pattern input = action.getInputPattern();
+		Pattern output = action.getOutputPattern();
+		allocatePattern(input);
+		allocatePattern(output);
+
+		doSwitch(action.getBody());
 	}
 
 	/**
@@ -495,16 +502,20 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	}
 
 	/**
-	 * Returns true if the given action is schedulable. Always returns
-	 * <code>true</code> by default. This method should be overridden to define
-	 * how to test the schedulability of an action.
+	 * Returns true if the given action is schedulable. This implementation
+	 * allocates the peek pattern and calls the scheduler procedure. This method
+	 * should be overridden to define how to test the schedulability of an
+	 * action.
 	 * 
 	 * @param action
 	 *            an action
 	 * @return true if the given action is schedulable
 	 */
 	protected boolean isSchedulable(Action action) {
-		return true;
+		Pattern pattern = action.getPeekPattern();
+		allocatePattern(pattern);
+		Object result = doSwitch(action.getScheduler());
+		return ValueUtil.isTrue(result);
 	}
 
 	/**
