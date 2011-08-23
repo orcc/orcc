@@ -1133,12 +1133,12 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 			// Set ram size = memory estimation / word size + error margin
 			int ramSize = ArchitectureMemoryStats
 					.computeNeededMemorySize(instance.getActor());
-			if(ramSize == 0){
+			if (ramSize == 0) {
 				tta.getData().setMaxAddress(256);
 			} else {
 				tta.getData().setMaxAddress(quantizeUp(ramSize / 8 + 256));
 			}
-			
+
 		} else if (instance.isBroadcast()) {
 			// Add needed stream units
 			tta.getFunctionUnits().add(createStreamInput(tta, 1));
@@ -1149,16 +1149,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 			tta.getData().setMaxAddress(64);
 		}
 		return tta;
-	}
-
-	// round up to next power or 2
-	// for example 30000 -> 32768
-	public int quantizeUp(int value) {
-		double tmp;
-		
-		tmp = Math.log(value)/Math.log(2.0);
-		
-		return (int) (Math.pow(2,(Math.floor(tmp)+1.0))-1.0);
 	}
 
 	/**
@@ -1195,6 +1185,18 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	 */
 	public ArchitecturePackage getArchitecturePackage() {
 		return (ArchitecturePackage) getEPackage();
+	}
+
+	/**
+	 * Round up to next power of 2 for example 30000 -> 32768
+	 * 
+	 * @param value
+	 *            the value to round up
+	 * @return the next power of 2 after the value
+	 */
+	private int quantizeUp(int value) {
+		double tmp = Math.log(value) / Math.log(2.0);
+		return (int) (Math.pow(2, (Math.floor(tmp) + 1.0)) - 1.0);
 	}
 
 } // ArchitectureFactoryImpl

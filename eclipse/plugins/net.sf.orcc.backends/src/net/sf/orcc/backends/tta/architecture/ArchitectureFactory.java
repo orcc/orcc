@@ -615,8 +615,6 @@ public interface ArchitectureFactory extends EFactory {
 
 	TTA createTTASpecialized(String name, Instance instance);
 
-	int quantizeUp(int value);
-
 	/**
 	 * Returns a new object of class '<em>Writes</em>'.
 	 * <!-- begin-user-doc -->
