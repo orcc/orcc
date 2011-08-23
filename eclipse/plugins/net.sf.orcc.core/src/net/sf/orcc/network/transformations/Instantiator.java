@@ -212,13 +212,13 @@ public class Instantiator implements INetworkTransformation {
 		Vertex srcVertex = graph.getEdgeSource(connection);
 		Vertex tgtVertex = graph.getEdgeTarget(connection);
 
+		Port srcPort;
 		Type srcPortType;
 		String sourceString;
 		if (srcVertex.isInstance()) {
 			Instance source = srcVertex.getInstance();
 			String srcPortName = connection.getSource().getName();
 
-			Port srcPort;
 			if (source.isActor()) {
 				srcPort = source.getActor().getOutput(srcPortName);
 			} else {
@@ -237,17 +237,18 @@ public class Instantiator implements INetworkTransformation {
 			srcPortType = srcPort.getType();
 			sourceString = srcPort.getName() + " of " + source.getId();
 		} else {
-			srcPortType = srcVertex.getPort().getType();
-			sourceString = srcVertex.getPort().getName();
+			srcPort = srcVertex.getPort();
+			srcPortType = srcPort.getType();
+			sourceString = srcPort.getName();
 		}
 
+		Port dstPort;
 		Type dstPortType;
 		String targetString;
 		if (tgtVertex.isInstance()) {
 			Instance target = tgtVertex.getInstance();
 			String dstPortName = connection.getTarget().getName();
 
-			Port dstPort;
 			if (target.isActor()) {
 				dstPort = target.getActor().getInput(dstPortName);
 			} else {
@@ -267,8 +268,16 @@ public class Instantiator implements INetworkTransformation {
 			dstPortType = dstPort.getType();
 			targetString = dstPort.getName() + " of " + target.getId();
 		} else {
-			dstPortType = tgtVertex.getPort().getType();
-			targetString = tgtVertex.getPort().getName();
+			dstPort = tgtVertex.getPort();
+			dstPortType = dstPort.getType();
+			targetString = dstPort.getName();
+		}
+
+		// check port nativity match
+		if (srcPort.isNative() != dstPort.isNative()) {
+			throw new OrccException("Error: the nativity of port "
+					+ sourceString + " doesn't match with the one of port "
+					+ targetString);
 		}
 
 		// check port types match
