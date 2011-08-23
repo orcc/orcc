@@ -123,15 +123,15 @@ public class StoreOnceTransformation extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseInstCall(InstCall call) {
-		Procedure procedure = call.getProcedure();
+		Procedure calledProc = call.getProcedure();
 
 		// retrieve loaded variables
-		List<Var> loadedVars = procsToLoadedVarsMap.get(procedure);
+		List<Var> loadedVars = procsToLoadedVarsMap.get(calledProc);
 		if (loadedVars == null) {
 			// transform procedure
 			new StoreOnceTransformation(procsToLoadedVarsMap)
-					.doSwitch(procedure);
-			loadedVars = procsToLoadedVarsMap.get(procedure);
+					.doSwitch(calledProc);
+			loadedVars = procsToLoadedVarsMap.get(calledProc);
 		}
 
 		// add additional parameters
