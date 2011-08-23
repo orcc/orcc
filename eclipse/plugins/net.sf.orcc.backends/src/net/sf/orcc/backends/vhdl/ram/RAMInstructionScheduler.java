@@ -216,6 +216,10 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 			return null;
 		}
 
+		// check if this instruction should be moved to the pending list:
+		// happens when at least one instruction that defines one of the
+		// variables used by this instruction is in the pending list
+		boolean addToPending = false;
 		TreeIterator<EObject> it = instruction.eAllContents();
 		while (it.hasNext()) {
 			EObject eObject = it.next();
@@ -223,23 +227,28 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 				Use use = (Use) eObject;
 				Var var = use.getVariable();
 				if (var.isLocal() && !var.getType().isList()) {
-					Def def = var.getDefs().get(0);
-					Instruction defInst = EcoreHelper.getContainerOfType(def,
-							Instruction.class);
-					if (pendingInstructions.contains(defInst)) {
-						// removes this instruction from the instruction list
-						// and adds it to the pending list
-						EcoreUtil.remove(instruction);
-						pendingInstructions.add(instruction);
-
-						// updates the index so we don't skip the next
-						// instruction
-						indexInst--;
-
-						break;
+					for (Def def : var.getDefs()) {
+						Instruction defInst = EcoreHelper.getContainerOfType(
+								def, Instruction.class);
+						if (pendingInstructions.contains(defInst)) {
+							addToPending = true;
+							break;
+						}
 					}
 				}
 			}
+		}
+
+		// if necessary, move instruction to pending list
+		if (addToPending) {
+			// removes this instruction from the instruction
+			// list and adds it to the pending list
+			EcoreUtil.remove(instruction);
+			pendingInstructions.add(instruction);
+
+			// updates the index so we don't skip the next
+			// instruction
+			indexInst--;
 		}
 
 		return null;
