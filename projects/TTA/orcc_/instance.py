@@ -111,12 +111,12 @@ class Instance:
         subprocess.call(["generateprocessor", "-o", buildPath, "-b", self._bemFile, "--shared-files-dir", sharePath,
                                         "-l", "vhdl", "-e", self._entity, "-i", self._idfFile, self._adfFile])
         # Generate vhdl memory and processor files
-        self.irom.generate(self.id, os.path.join(libPath, "memory", "rom.template"), os.path.join(buildPath, self._romFile))
-        self.dram.generate(self.id, os.path.join(libPath, "memory", "ram.template"), os.path.join(buildPath, self._ramFile))
+        self.irom.generate(self.id, os.path.join(libPath, "templates", "rom.template"), os.path.join(buildPath, self._romFile))
+        self.dram.generate(self.id, os.path.join(libPath, "templates", "ram.template"), os.path.join(buildPath, self._ramFile))
         if self.isNative:
             shutil.copy(os.path.join(libPath, "native", self._processorFile), buildPath)
         else:
-            self.generateProcessor(os.path.join(libPath, "processor", "processor.template"), os.path.join(buildPath, self._processorFile), iromAddrMax, dramAddrMax)
+            self.generateProcessor(os.path.join(libPath, "templates", "processor.template"), os.path.join(buildPath, self._processorFile), iromAddrMax, dramAddrMax)
         # Copy files to build directory
         shutil.copy(self._mifFile, buildPath)
         shutil.copy(self._mifDataFile, buildPath)
