@@ -6,18 +6,13 @@
  */
 package net.sf.orcc.ir.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.sf.orcc.ir.CFG;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.InstLoad;
-import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Node;
@@ -25,7 +20,6 @@ import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.MapAdapter;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -57,51 +51,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * @generated
  */
 public class ProcedureImpl extends EObjectImpl implements Procedure {
-
-	/**
-	 * This class visits the procedure to find the state variables used.
-	 * 
-	 * @author Matthieu Wipliez
-	 * 
-	 */
-	private class ProcVisitor extends AbstractActorVisitor<Object> {
-
-		private Set<Var> loadedVariables;
-
-		private Set<Var> storedVariables;
-
-		public ProcVisitor() {
-			storedVariables = new HashSet<Var>();
-			loadedVariables = new HashSet<Var>();
-		}
-
-		@Override
-		public Object caseInstLoad(InstLoad node) {
-			Var var = node.getSource().getVariable();
-			if (!var.getType().isList()) {
-				loadedVariables.add((Var) var);
-			}
-			return null;
-		}
-
-		@Override
-		public Object caseInstStore(InstStore store) {
-			Var var = store.getTarget().getVariable();
-			if (!var.getType().isList()) {
-				storedVariables.add((Var) var);
-			}
-			return null;
-		}
-
-		public List<Var> getLoadedVariables() {
-			return new ArrayList<Var>(loadedVariables);
-		}
-
-		public List<Var> getStoredVariables() {
-			return new ArrayList<Var>(storedVariables);
-		}
-
-	}
 
 	private CFG graph;
 
@@ -470,18 +419,6 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 		return block;
 	}
 
-	/**
-	 * Computes and returns the list of scalar variables loaded by this
-	 * procedure.
-	 * 
-	 * @return the list of scalar variables loaded by this procedure
-	 */
-	public List<Var> getLoadedVariables() {
-		ProcVisitor visitor = new ProcVisitor();
-		visitor.doSwitch(nodes);
-		return visitor.getLoadedVariables();
-	}
-
 	@Override
 	public Var getLocal(String name) {
 		return mapLocals.get(name);
@@ -570,18 +507,6 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 */
 	public Type getReturnType() {
 		return returnType;
-	}
-
-	/**
-	 * Computes and returns the list of scalar variables stored by this
-	 * procedure.
-	 * 
-	 * @return the list of scalar variables stored by this procedure
-	 */
-	public List<Var> getStoredVariables() {
-		ProcVisitor visitor = new ProcVisitor();
-		visitor.doSwitch(nodes);
-		return visitor.getStoredVariables();
 	}
 
 	/**

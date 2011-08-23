@@ -96,14 +96,6 @@ public interface Procedure extends EObject {
 	NodeBlock getLast(List<Node> nodes);
 
 	/**
-	 * Computes and returns the list of scalar variables loaded by this
-	 * procedure.
-	 * 
-	 * @return the list of scalar variables loaded by this procedure
-	 */
-	List<Var> getLoadedVariables();
-
-	/**
 	 * Returns the local variable of this procedure that has the given name.
 	 * 
 	 * @param name
@@ -177,14 +169,6 @@ public interface Procedure extends EObject {
 	 * @model containment="true"
 	 */
 	Type getReturnType();
-
-	/**
-	 * Computes and returns the list of scalar variables stored by this
-	 * procedure.
-	 * 
-	 * @return the list of scalar variables stored by this procedure
-	 */
-	List<Var> getStoredVariables();
 
 	/**
 	 * Returns <code>true</code> if this procedure is native.
