@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
@@ -56,9 +57,12 @@ public class StoreOnceTransformation extends AbstractActorVisitor<Object> {
 
 	private List<Var> globalsToStore;
 
+	private Map<Var, Var> globalsToLoad;
+
 	private Map<Var, Var> globalToLocalMap;
 
 	public StoreOnceTransformation() {
+		globalsToLoad = new HashMap<Var, Var>();
 		globalToLocalMap = new HashMap<Var, Var>();
 		globalsToStore = new ArrayList<Var>();
 	}
@@ -66,18 +70,30 @@ public class StoreOnceTransformation extends AbstractActorVisitor<Object> {
 	@Override
 	public Object caseInstLoad(InstLoad load) {
 		if (load.getIndexes().isEmpty()) {
+			// gets source, target, block of this load
+			NodeBlock block = (NodeBlock) load.eContainer();
 			Var source = load.getSource().getVariable();
 			Var target = load.getTarget().getVariable();
+
+			// removes this load
+			IrUtil.delete(load);
+			indexInst--;
+
+			// find the local associated with the source
 			Var local = globalToLocalMap.get(source);
 			if (local == null) {
+				// we haven't loaded the variable yet, add it to the "to load"
+				// set
 				globalToLocalMap.put(source, target);
+				globalsToLoad.put(source, target);
 			} else {
-				// we already loaded the variable
-				NodeBlock block = (NodeBlock) load.eContainer();
-				IrUtil.delete(load);
-
-				InstAssign assign = eINSTANCE.createInstAssign(target, local);
-				block.getInstructions().add(indexInst, assign);
+				// we already loaded the variable, add an assign
+				if (target != local) {
+					InstAssign assign = eINSTANCE.createInstAssign(target,
+							local);
+					indexInst++;
+					block.getInstructions().add(indexInst, assign);
+				}
 			}
 		}
 		return null;
@@ -89,12 +105,15 @@ public class StoreOnceTransformation extends AbstractActorVisitor<Object> {
 			Var target = store.getTarget().getVariable();
 			Expression value = store.getValue();
 
-			// create new local
-			Var local = procedure.newTempLocalVariable(target.getType(),
-					"local_" + target.getName());
-			globalToLocalMap.put(target, local);
+			Var local = globalToLocalMap.get(target);
+			if (local == null) {
+				// variable not loaded yet, create new local
+				local = procedure.newTempLocalVariable(target.getType(),
+						"local_" + target.getName());
+				globalToLocalMap.put(target, local);
+			}
 
-			// replace store by assignment
+			// replace store by assignment "local := value;"
 			NodeBlock block = (NodeBlock) store.eContainer();
 			InstAssign assign = eINSTANCE.createInstAssign(local, value);
 			IrUtil.delete(store);
@@ -112,12 +131,23 @@ public class StoreOnceTransformation extends AbstractActorVisitor<Object> {
 	public Object caseProcedure(Procedure procedure) {
 		super.caseProcedure(procedure);
 
+		// add loads
+		int i = 0;
+		for (Entry<Var, Var> entry : globalsToLoad.entrySet()) {
+			Var global = entry.getKey();
+			Var local = entry.getValue();
+			InstLoad load = eINSTANCE.createInstLoad(local, global);
+			procedure.getFirst().add(i++, load);
+		}
+
+		// add stores
 		for (Var global : globalsToStore) {
 			Var local = globalToLocalMap.get(global);
 			InstStore store = eINSTANCE.createInstStore(global, local);
 			procedure.getLast().add(store);
 		}
 
+		globalsToLoad.clear();
 		globalToLocalMap.clear();
 		globalsToStore.clear();
 		return null;
