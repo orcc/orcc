@@ -176,9 +176,9 @@ class Instance:
         for node in adf.getElementsByTagName("address-space"):
             if node.hasAttributes() and (node.attributes["name"].value == "data"):
                 width = int(node.getElementsByTagName("width")[0].childNodes[0].nodeValue) * 4
-                depth = int((int(node.getElementsByTagName("max-address")[0].childNodes[0].nodeValue) - int(node.getElementsByTagName("min-address")[0].childNodes[0].nodeValue)) / 4)
-                break
-        #print fileName, width, depth
+                minAddress = int(node.getElementsByTagName("min-address")[0].childNodes[0].nodeValue)
+                maxAddress = int(node.getElementsByTagName("max-address")[0].childNodes[0].nodeValue)
+                depth = int((maxAddress - minAddress) / 4)
         return Memory(width, depth)
 
     def generateProcessor(self, templateFile, targetFile, iromAddrMax, dramAddrMax):
