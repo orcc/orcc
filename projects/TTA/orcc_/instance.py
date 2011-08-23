@@ -91,10 +91,7 @@ class Instance:
         srcPath = os.path.join(srcPath, self.id)
         os.chdir(srcPath)
         self.irom = self._readMif(self._mifFile)
-        if self.isNative:
-            self.dram = self._readMif(self._mifDataFile)
-        else:
-            self.dram = self._readAdf(self._adfFile)
+        self.dram = self._readAdf(self._adfFile)
 
     def generate(self, srcPath, buildPath, libPath, pylibPath, iromAddrMax, dramAddrMax):
         srcPath = os.path.join(srcPath, self.id)
