@@ -653,28 +653,19 @@ public class VarImpl extends EObjectImpl implements Var {
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.VAR__VALUE, oldValue, value));
 	}
 
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	@Override
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (assignable: ");
+		StringBuffer result = new StringBuffer();
+		result.append(type);
+		result.append(" ");
+		result.append(getIndexedName());
+		result.append(" <assignable: ");
 		result.append(assignable);
 		result.append(", global: ");
 		result.append(global);
-		result.append(", index: ");
-		result.append(index);
-		result.append(", lineNumber: ");
-		result.append(lineNumber);
-		result.append(", name: ");
-		result.append(name);
-		result.append(", value: ");
-		result.append(value);
-		result.append(')');
+		result.append('>');
 		return result.toString();
 	}
 

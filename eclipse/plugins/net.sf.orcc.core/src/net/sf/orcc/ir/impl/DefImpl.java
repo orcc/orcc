@@ -211,4 +211,9 @@ public class DefImpl extends EObjectImpl implements Def {
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.DEF__VARIABLE, newVariable, newVariable));
 	}
 
+	@Override
+	public String toString() {
+		return "def of: " + variable;
+	}
+
 } //DefImpl

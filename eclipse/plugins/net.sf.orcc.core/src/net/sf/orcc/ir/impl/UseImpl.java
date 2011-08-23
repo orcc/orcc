@@ -209,4 +209,9 @@ public class UseImpl extends EObjectImpl implements Use {
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.USE__VARIABLE, newVariable, newVariable));
 	}
 
+	@Override
+	public String toString() {
+		return "use of: " + variable;
+	}
+
 } //UseImpl
