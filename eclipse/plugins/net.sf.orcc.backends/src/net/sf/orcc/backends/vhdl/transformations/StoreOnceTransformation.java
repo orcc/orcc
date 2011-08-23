@@ -36,10 +36,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
@@ -55,16 +58,98 @@ import net.sf.orcc.ir.util.IrUtil;
  */
 public class StoreOnceTransformation extends AbstractActorVisitor<Object> {
 
-	private List<Var> globalsToStore;
-
 	private Map<Var, Var> globalsToLoad;
+
+	private List<Var> globalsToStore;
 
 	private Map<Var, Var> globalToLocalMap;
 
+	private Map<Procedure, List<Var>> procsToLoadedVarsMap;
+
 	public StoreOnceTransformation() {
-		globalsToLoad = new HashMap<Var, Var>();
-		globalToLocalMap = new HashMap<Var, Var>();
-		globalsToStore = new ArrayList<Var>();
+		procsToLoadedVarsMap = new HashMap<Procedure, List<Var>>();
+	}
+
+	private StoreOnceTransformation(
+			Map<Procedure, List<Var>> procsToLoadedVarsMap) {
+		this.procsToLoadedVarsMap = procsToLoadedVarsMap;
+	}
+
+	/**
+	 * Add Load instructions at the beginning of the given procedure, and Store
+	 * instructions at the end.
+	 * 
+	 * @param procedure
+	 *            a procedure
+	 */
+	private void addLoadsStores(Procedure procedure) {
+		// add loads
+		int i = 0;
+		for (Entry<Var, Var> entry : globalsToLoad.entrySet()) {
+			Var global = entry.getKey();
+			Var local = entry.getValue();
+			InstLoad load = eINSTANCE.createInstLoad(local, global);
+			procedure.getFirst().add(i++, load);
+		}
+
+		// add stores
+		for (Var global : globalsToStore) {
+			Var local = globalToLocalMap.get(global);
+			InstStore store = eINSTANCE.createInstStore(global, local);
+			procedure.getLast().add(store);
+		}
+	}
+
+	/**
+	 * Adds one parameter to the given procedure for each global loaded by the
+	 * procedure.
+	 * 
+	 * @param procedure
+	 *            a procedure
+	 */
+	private void addParameters(Procedure procedure) {
+		int i = 0;
+		List<Var> loadedVars = new ArrayList<Var>();
+		for (Entry<Var, Var> entry : globalsToLoad.entrySet()) {
+			Var global = entry.getKey();
+			loadedVars.add(global);
+
+			Var local = entry.getValue();
+			procedure.getParameters().add(i++, local);
+		}
+
+		procsToLoadedVarsMap.put(procedure, loadedVars);
+	}
+
+	@Override
+	public Object caseInstCall(InstCall call) {
+		Procedure procedure = call.getProcedure();
+
+		// retrieve loaded variables
+		List<Var> loadedVars = procsToLoadedVarsMap.get(procedure);
+		if (loadedVars == null) {
+			// transform procedure
+			new StoreOnceTransformation(procsToLoadedVarsMap)
+					.doSwitch(procedure);
+			loadedVars = procsToLoadedVarsMap.get(procedure);
+		}
+
+		// add additional parameters
+		int i = 0;
+		for (Var var : loadedVars) {
+			Var local = globalToLocalMap.get(var);
+			if (local == null) {
+				// variable not loaded yet, create new local
+				local = procedure.newTempLocalVariable(var.getType(),
+						"local_" + var.getName());
+				globalToLocalMap.put(var, local);
+				globalsToLoad.put(var, local);
+			}
+			Expression param = IrFactory.eINSTANCE.createExprVar(local);
+			call.getParameters().add(i++, param);
+		}
+
+		return null;
 	}
 
 	@Override
@@ -129,27 +214,18 @@ public class StoreOnceTransformation extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseProcedure(Procedure procedure) {
+		globalsToLoad = new HashMap<Var, Var>();
+		globalToLocalMap = new HashMap<Var, Var>();
+		globalsToStore = new ArrayList<Var>();
+
 		super.caseProcedure(procedure);
 
-		// add loads
-		int i = 0;
-		for (Entry<Var, Var> entry : globalsToLoad.entrySet()) {
-			Var global = entry.getKey();
-			Var local = entry.getValue();
-			InstLoad load = eINSTANCE.createInstLoad(local, global);
-			procedure.getFirst().add(i++, load);
+		if (procedure.eContainer() instanceof Action) {
+			addLoadsStores(procedure);
+		} else {
+			addParameters(procedure);
 		}
 
-		// add stores
-		for (Var global : globalsToStore) {
-			Var local = globalToLocalMap.get(global);
-			InstStore store = eINSTANCE.createInstStore(global, local);
-			procedure.getLast().add(store);
-		}
-
-		globalsToLoad.clear();
-		globalToLocalMap.clear();
-		globalsToStore.clear();
 		return null;
 	}
 

@@ -189,15 +189,12 @@ printAssignIndex(assignIndex) ::= <<
 <assignIndex.target.variable.indexedName> := to_integer(unsigned(<assignIndex.indexes: {index | std_logic_vector(to_unsigned(<index>, <index.type.size>))}; separator=" & ">));
 >>
 
-printCall(call) ::= <<
-<if(call.target)
-><call.target.variable.indexedName> := <call.procedure.name>(<call.procedure.loadedVariables: {var | <var.name>, }><call.parameters: {param | <param>, }>'1');<
-elseif(call.parameters)
-><call.procedure.name>(<call.parameters; separator=", ">, '1');<
-else
-><call.procedure.name>('1');<
-endif>
->>
+printCall(call) ::= <%
+<if(call.target)>
+<call.target.variable.indexedName> := 
+<endif>
+<call.procedure.name>(<call.parameters; separator=", ">);
+%>
 
 getPort(variable) ::= <<
 <if (action.inputPattern.varToPortMap.(variable))
@@ -383,65 +380,35 @@ end loop;
 ///////////////////////////////////////////////////////////////////////////////
 printFunction(procedure, insideIsSchedulable=false) ::= <<
 <if (!procedure.native)
-  ><if (procedure.returnType.void)
->procedure <procedure.name>(<printParameters(procedure.parameters)>dummy : std_logic) is
-<else
->function <procedure.name>(<VarUsed(procedure)><printParameters(procedure)>dummy : std_logic) <returnFunction(procedure.returnType)> is
+><if (procedure.returnType.void)>procedure<else>function<endif> <procedure.name>(<
+procedure.parameters: varFunction(); separator=", "
+>) <if (!procedure.returnType.void)>return <typeFunction(procedure.returnType)><endif> is
+<if(procedure.locals)>
+  <procedure.locals: {variable| <varFunction(variable)>;}; separator="\n">
 <endif>
-  <if(procedure.locals)
-><procedure.locals: {variable| <VarInFctDeclaration(variable)>;<\n>}><
-  endif>
 begin
   <printNodes(procedure.nodes)>end <procedure.name>;<
 endif>
 
 >>
 
-VarUsed(procedure) ::= <<
-<procedure.loadedVariables: functionParameter(); wrap>
->>
+varFunction(variable) ::= <%
+<if(variable.type.list)>
+-- error !!!!! type memory type
+<else>
+<variable.indexedName> : <typeFunction(variable.type)>
+<endif>
+%>
 
-printParameters(procedure) ::= <<
-<procedure.parameters: functionParameter()>
->>
-
-functionParameter(variable) ::= <<
-<if(variable.type.list)
->-- error !!!!! type memory type<
-else
-><variable.name> : <typeFunction(variable.type)>; <
-endif
->
->>
-
-VarInFctDeclaration(variable) ::= <<
-<if(variable.type.list)
->-- error !!!!! type memory_type<
-else
->variable <variable.indexedName> : <typeFunction(variable.type)><
-endif>
->>
-
-
-returnFunction(type) ::= <<
-<if(type.bool)
->return std_logic<
-elseif(type.int)
->return integer<
-endif>
->>
-
-typeFunction(type) ::= <<
-<if(type.bool)
->std_logic<
-elseif(type.int)
->integer<
-else
->integer<
-endif>
->>
-
-
+typeFunction(type) ::= <%
+<if(type.bool)>
+std_logic
+<elseif(type.int)>
+integer
+<else>
+integer
+<endif>
+%>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Action
