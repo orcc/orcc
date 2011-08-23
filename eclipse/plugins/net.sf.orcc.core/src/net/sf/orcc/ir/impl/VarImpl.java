@@ -666,6 +666,10 @@ public class VarImpl extends EObjectImpl implements Var {
 		result.append(", global: ");
 		result.append(global);
 		result.append('>');
+		if (value != null) {
+			result.append(" value = ");
+			result.append(value);
+		}
 		return result.toString();
 	}
 
