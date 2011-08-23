@@ -381,10 +381,10 @@ end loop;
 printFunction(procedure, insideIsSchedulable=false) ::= <<
 <if (!procedure.native)
 ><if (procedure.returnType.void)>procedure<else>function<endif> <procedure.name>(<
-procedure.parameters: varFunction(); separator=", "
+procedure.parameters: varFunction(); separator="; "
 >) <if (!procedure.returnType.void)>return <typeFunction(procedure.returnType)><endif> is
 <if(procedure.locals)>
-  <procedure.locals: {variable| <varFunction(variable)>;}; separator="\n">
+  <procedure.locals: {variable| variable <varFunction(variable)>;}; separator="\n">
 <endif>
 begin
   <printNodes(procedure.nodes)>end <procedure.name>;<
