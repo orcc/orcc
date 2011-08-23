@@ -94,7 +94,9 @@ public class TtaTypeResizer extends AbstractActorVisitor<Object> {
 
 	private void checkPorts(List<Port> ports, int newSize) {
 		for (Port port : ports) {
-			checkType(port.getType(), newSize);
+			if (!port.isNative()) {
+				checkType(port.getType(), newSize);
+			}
 		}
 	}
 

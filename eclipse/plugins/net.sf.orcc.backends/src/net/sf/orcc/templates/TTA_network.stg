@@ -31,7 +31,7 @@ entity top is
     (
       clk : in  std_logic;
       button : in  std_logic_vector(1 to 1);
-      leds   : out std_logic_vector(7 downto 0)
+      <ports(network)>
       );
 end top;
 
@@ -93,6 +93,10 @@ begin
              data_in  =\> button(1),
              data_out =\> system_reset_n);
   ---------------------------------------------------------------------------
+  -- Ports instantiation 
+  ---------------------------------------------------------------------------
+  <assignNetworkPorts(network)>
+  ---------------------------------------------------------------------------
   -- FIFOs instantiation 
   --------------------------------------------------------------------------- 
   <assignFifos(network.connections)>
@@ -101,12 +105,25 @@ begin
   ---------------------------------------------------------------------------
   <assignInstances(network.instances)>
   ---------------------------------------------------------------------------
+  
 
 
 end bdf_type;
 
 >>
 
+///////////////////////////////////////////////////////////////////////////////
+// Network ports
+///////////////////////////////////////////////////////////////////////////////
+
+ports(network) ::= <<
+<network.inputs: {port|<port(port, "in")>}; separator=";\n"><if(network.inputs && network.outputs)>;<endif>
+<network.outputs: {port|<port(port, "out")>}; separator=";\n">
+>>
+
+port(port, dir) ::= <<
+<port.name> : <dir> <if(port.type.bool)>std_logic<else>std_logic_vector(<port.type.size>-1 downto 0)<endif>
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Components
@@ -137,15 +154,23 @@ endif>
 >>
 
 inputPort(port) ::= <<
-data_<indexPort(port)>_in		: in  std_logic_vector(31 downto 0);
+<if(port.native)
+><port.name>_in				: in std_logic_vector(<port.type.size>-1 downto 0)<
+else
+>data_<indexPort(port)>_in		: in  std_logic_vector(31 downto 0);
 status_<indexPort(port)>_in	: in  std_logic_vector(8 downto 0);
-ack_<indexPort(port)>_in		: out std_logic;
+ack_<indexPort(port)>_in		: out std_logic;<
+endif>
 >>
 
 outputPort(port) ::= <<
-data_<indexPort(port)>_out		: out std_logic_vector(31 downto 0);
+<if(port.native)
+><port.name>_out		: out std_logic_vector(<port.type.size>-1 downto 0)<
+else
+>data_<indexPort(port)>_out		: out std_logic_vector(31 downto 0);
 status_<indexPort(port)>_out	: in  std_logic_vector(8 downto 0);
-dv_<indexPort(port)>_out		: out std_logic;
+dv_<indexPort(port)>_out		: out std_logic;<
+endif>
 >>
 
 indexPort(port) ::= <<
@@ -173,18 +198,26 @@ instanceSignals(instance, incomingMap, outgoingMap) ::= <<
 
 inputPortSignals(port, connection) ::= <<
 ---- Input port: <port.name>
-signal fifo_<indexFifo(connection)>_wrreq		: std_logic;
-signal fifo_<indexFifo(connection)>_data		: std_logic_vector(31 downto 0);
+<if(port.native)
+>signal s_<indexConnection(connection)> 		: std_logic_vector(<port.type.size>-1 downto 0)<
+else
+>signal fifo_<indexConnection(connection)>_wrreq		: std_logic;
+signal fifo_<indexConnection(connection)>_data		: std_logic_vector(31 downto 0);<
+endif>
 >>
 
 outputPortSignals(port, connection) ::= <<
 ---- Output port: <port.name>
-signal fifo_<indexFifo(connection)>_rdreq		: std_logic;
-signal fifo_<indexFifo(connection)>_q			: std_logic_vector(31 downto 0);
-signal fifo_<indexFifo(connection)>_status		: std_logic_vector(8 downto 0);
+<if(port.native && !connection.src)
+>signal s_<indexConnection(connection)> 		: std_logic_vector(<port.type.size>-1 downto 0)<
+else
+>signal fifo_<indexConnection(connection)>_rdreq		: std_logic;
+signal fifo_<indexConnection(connection)>_q			: std_logic_vector(31 downto 0);
+signal fifo_<indexConnection(connection)>_status		: std_logic_vector(8 downto 0);<
+endif>
 >>
 
-indexFifo(connection) ::= <<
+indexConnection(connection) ::= <<
 <network.connectionMap.(connection)>
 >>
 
@@ -193,19 +226,33 @@ indexFifo(connection) ::= <<
 // Instantiation
 ///////////////////////////////////////////////////////////////////////////////
 
+assignNetworkPorts(network) ::= <<
+<network.connections: assignNetworkPort()>
+>>
+
+assignNetworkPort(connection) ::= <<
+<if(!connection.source)>
+<network.sourceMap.(connection).port.name> \<= s_<indexConnection(connection)>;
+<elseif(!connection.target)>
+<network.targetMap.(connection).port.name> \<= s_<indexConnection(connection)>;
+<endif>
+>>
+
 assignFifos(connections) ::= <<
 <connections: assignFifo(); separator="\n\n">
 >>
 
 assignFifo(connection) ::= <<
-fifo_<indexFifo(connection)> : tta_fifo
-  port map(wrreq   =\> fifo_<indexFifo(connection)>_wrreq,
+<if(!connection.src.native && !connection.dst.native)>
+fifo_<indexConnection(connection)> : tta_fifo
+  port map(wrreq   =\> fifo_<indexConnection(connection)>_wrreq,
            reset_n =\> system_reset_n,
            clk     =\> clk,
-           rdreq   =\> fifo_<indexFifo(connection)>_rdreq,
-           data    =\> fifo_<indexFifo(connection)>_data,
-           q       =\> fifo_<indexFifo(connection)>_q,
-           status  =\> fifo_<indexFifo(connection)>_status);
+           rdreq   =\> fifo_<indexConnection(connection)>_rdreq,
+           data    =\> fifo_<indexConnection(connection)>_data,
+           q       =\> fifo_<indexConnection(connection)>_q,
+           status  =\> fifo_<indexConnection(connection)>_status);
+<endif>
 >>
 
 assignInstances(instances) ::= <<
@@ -230,21 +277,29 @@ endif>
 >>
 
 assignInputPort(port) ::= <<
-data_<indexPort(port)>_in    =\> fifo_<indexInputFifo(port)>_q,
-status_<indexPort(port)>_in  =\> fifo_<indexInputFifo(port)>_status,
-ack_<indexPort(port)>_in     =\> fifo_<indexInputFifo(port)>_rdreq,
+<if(port.native)
+><port.name>_in   =\> s_<indexInputConnection(port)>,<
+else
+>data_<indexPort(port)>_in    =\> fifo_<indexInputConnection(port)>_q,
+status_<indexPort(port)>_in  =\> fifo_<indexInputConnection(port)>_status,
+ack_<indexPort(port)>_in     =\> fifo_<indexInputConnection(port)>_rdreq,<
+endif>
 >>
 
 assignOutputPort(port) ::= <<
-data_<indexPort(port)>_out   =\> fifo_<indexOutputFifo(port)>_data,
-status_<indexPort(port)>_out =\> fifo_<indexOutputFifo(port)>_status,
-dv_<indexPort(port)>_out     =\> fifo_<indexOutputFifo(port)>_wrreq,
+<if(port.native)
+><port.name>_out   =\> s_<indexOutputConnection(port)>,<
+else
+>data_<indexPort(port)>_out   =\> fifo_<indexOutputConnection(port)>_data,
+status_<indexPort(port)>_out =\> fifo_<indexOutputConnection(port)>_status,
+dv_<indexPort(port)>_out     =\> fifo_<indexOutputConnection(port)>_wrreq,<
+endif>
 >>
 
-indexInputFifo(port) ::= <<
-<indexFifo(network.incomingMap.(instance).(port))>
+indexInputConnection(port) ::= <<
+<indexConnection(network.incomingMap.(instance).(port))>
 >>
 
-indexOutputFifo(port) ::= <<
-<indexFifo(first(network.outgoingMap.(instance).(port)))>
+indexOutputConnection(port) ::= <<
+<indexConnection(first(network.outgoingMap.(instance).(port)))>
 >>
