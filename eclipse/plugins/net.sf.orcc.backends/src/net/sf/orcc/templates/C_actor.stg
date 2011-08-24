@@ -23,6 +23,7 @@ getPortName(port) ::= <<
 Constant(constant) ::= <<
 <if (constant.booleanExpr)><printBool(constant)><
 elseif (constant.intExpr)><printInt(constant)><
+elseif (constant.floatExpr)><printFloat(constant)><
 elseif (constant.listExpr)><printList(constant)><
 elseif (constant.stringExpr)><printString(constant)><
 endif>
@@ -34,6 +35,10 @@ printBool(constant) ::= <<
 
 printInt(number) ::= <<
 <number><if (number.long)>L<endif>
+>>
+
+printFloat(number) ::= <<
+<number>
 >>
 
 // the values of a list: {val1, val2, ..., valn}
