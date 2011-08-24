@@ -57,7 +57,7 @@ END COMPONENT;
   component dram_source
     port(clock   : in  std_logic;
          wren    : in  std_logic;
-         address : in  std_logic_vector(0 downto 0);
+         address : in  std_logic_vector(fu_LSU_addrw-2-1 downto 0);
          byteena : in  std_logic_vector(fu_LSU_dataw/8-1 downto 0);
          data    : in  std_logic_vector(31 downto 0);
          q       : out std_logic_vector(31 downto 0)
@@ -101,7 +101,7 @@ END COMPONENT;
 		 imem_data : IN STD_LOGIC_VECTOR(85 DOWNTO 0);
 		 pc_init : IN STD_LOGIC_VECTOR(12 DOWNTO 0);
 		 imem_en_x : OUT STD_LOGIC;
-		 fu_LSU_dmem_addr : OUT STD_LOGIC_VECTOR(14 DOWNTO 0);
+		 fu_LSU_dmem_addr : OUT STD_LOGIC_VECTOR(fu_LSU_addrw-2-1 DOWNTO 0);
 		 fu_LSU_dmem_bytemask : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
 		 fu_LSU_dmem_data_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 		 fu_LSU_dmem_mem_en_x : OUT STD_LOGIC_VECTOR(0 TO 0);
@@ -163,7 +163,7 @@ begin
   inst_dram_decoder_motion_add : dram_source
     port map(clock   => clk,
              wren    => wren_wire,
-             address => dram_addr(0 downto 0),
+             address => dram_addr,
              byteena => bytemask_wire,
              data    => dram_data_in_wire,
              q       => dram_data_out_wire);

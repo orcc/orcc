@@ -63,6 +63,7 @@ set_global_assignment -name VERILOG_FILE others/button_debouncer.v
 set_global_assignment -name VERILOG_FILE others/addr_gen_2.v
 set_global_assignment -name VERILOG_FILE others/addr_gen_1.v
 set_global_assignment -name VHDL_FILE others/orcc_fifo.vhd
+set_global_assignment -name VHDL_FILE others/main_pll.vhd
 
 # Pin assignments
 set_location_assignment PIN_F21 -to leds[0]
@@ -74,7 +75,7 @@ set_location_assignment PIN_C19 -to leds[5]
 set_location_assignment PIN_F19 -to leds[6]
 set_location_assignment PIN_E19 -to leds[7]
 set_location_assignment PIN_B17 -to button
-set_location_assignment PIN_T33 -to clk
+set_location_assignment PIN_T33 -to hw_clk
 
 >>
 
