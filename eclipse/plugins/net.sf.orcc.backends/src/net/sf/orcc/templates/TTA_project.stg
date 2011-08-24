@@ -9,16 +9,6 @@ qsfNetwork(network, options) ::= <<
 set_global_assignment -name FAMILY "Stratix III"
 set_global_assignment -name DEVICE EP3SL150F1152C2
 set_global_assignment -name TOP_LEVEL_ENTITY top
-set_global_assignment -name ORIGINAL_QUARTUS_VERSION 11.0
-set_global_assignment -name PROJECT_CREATION_TIME_DATE "17:41:45  JULY 04, 2011"
-set_global_assignment -name LAST_QUARTUS_VERSION 11.0
-set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
-set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
-set_global_assignment -name DEVICE_FILTER_PIN_COUNT 1152
-set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 256
-set_global_assignment -name NOMINAL_CORE_SUPPLY_VOLTAGE 1.1V
-set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
-set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 
 # Network
 set_global_assignment -name VHDL_FILE top.vhd
