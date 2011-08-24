@@ -299,5 +299,16 @@
          </run>
       </application>
    </extension>
-
+   <extension
+         id="tta"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="true">
+         <run
+               class="net.sf.orcc.backends.tta.TTABackendImpl">
+         </run>
+      </application>
+   </extension>
 </plugin>
