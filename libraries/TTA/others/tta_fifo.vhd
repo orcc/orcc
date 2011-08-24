@@ -12,77 +12,77 @@
 -- Altera or its authorized distributors.  Please refer to the 
 -- applicable agreement for further details.
 
--- PROGRAM		"Quartus II"
--- VERSION		"Version 10.0 Build 218 06/27/2010 SJ Full Version"
--- CREATED		"Mon Mar 14 11:27:27 2011"
+-- PROGRAM              "Quartus II"
+-- VERSION              "Version 10.0 Build 218 06/27/2010 SJ Full Version"
+-- CREATED              "Mon Mar 14 11:27:27 2011"
 
-LIBRARY ieee;
-USE ieee.std_logic_1164.all; 
+library ieee;
+use ieee.std_logic_1164.all;
 
-LIBRARY work;
+library work;
 
-ENTITY tta_fifo IS 
-	PORT
-	(
-		wrreq :  IN  STD_LOGIC;
-		reset_n :  IN  STD_LOGIC;
-		clk :  IN  STD_LOGIC;
-		rdreq :  IN  STD_LOGIC;
-		data :  IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-		q :  OUT  STD_LOGIC_VECTOR(31 DOWNTO 0);
-		status :  OUT  STD_LOGIC_VECTOR(8 DOWNTO 0)
-	);
-END tta_fifo;
+entity tta_fifo is
+  port
+    (
+      wrreq   : in  std_logic;
+      reset_n : in  std_logic;
+      clk     : in  std_logic;
+      rdreq   : in  std_logic;
+      data    : in  std_logic_vector(31 downto 0);
+      q       : out std_logic_vector(31 downto 0);
+      status  : out std_logic_vector(8 downto 0)
+      );
+end tta_fifo;
 
-ARCHITECTURE bdf_type OF tta_fifo IS 
+architecture bdf_type of tta_fifo is
 
-COMPONENT orcc_fifo
-	PORT(wrreq : IN STD_LOGIC;
-		 rdreq : IN STD_LOGIC;
-		 clock : IN STD_LOGIC;
-		 sclr : IN STD_LOGIC;
-		 data : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-		 full : OUT STD_LOGIC;
-		 q : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-		 usedw : OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
-	);
-END COMPONENT;
+  component orcc_fifo
+    port(wrreq : in  std_logic;
+         rdreq : in  std_logic;
+         clock : in  std_logic;
+         sclr  : in  std_logic;
+         data  : in  std_logic_vector(31 downto 0);
+         full  : out std_logic;
+         q     : out std_logic_vector(31 downto 0);
+         usedw : out std_logic_vector(7 downto 0)
+         );
+  end component;
 
-COMPONENT usedw_to_status
-	PORT(full : IN STD_LOGIC;
-		 usedw : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-		 status : OUT STD_LOGIC_VECTOR(8 DOWNTO 0)
-	);
-END COMPONENT;
+  component usedw_to_status
+    port(full   : in  std_logic;
+         usedw  : in  std_logic_vector(7 downto 0);
+         status : out std_logic_vector(8 downto 0)
+         );
+  end component;
 
-SIGNAL	SYNTHESIZED_WIRE_0 :  STD_LOGIC;
-SIGNAL	SYNTHESIZED_WIRE_1 :  STD_LOGIC;
-SIGNAL	SYNTHESIZED_WIRE_2 :  STD_LOGIC_VECTOR(7 DOWNTO 0);
-
-
-BEGIN 
+  signal SYNTHESIZED_WIRE_0 : std_logic;
+  signal SYNTHESIZED_WIRE_1 : std_logic;
+  signal SYNTHESIZED_WIRE_2 : std_logic_vector(7 downto 0);
 
 
-
-b2v_inst2 : orcc_fifo
-PORT MAP(wrreq => wrreq,
-		 rdreq => rdreq,
-		 clock => clk,
-		 sclr => SYNTHESIZED_WIRE_0,
-		 data => data,
-		 full => SYNTHESIZED_WIRE_1,
-		 q => q,
-		 usedw => SYNTHESIZED_WIRE_2);
-
-
-SYNTHESIZED_WIRE_0 <= NOT(reset_n);
+begin
 
 
 
-b2v_inst99 : usedw_to_status
-PORT MAP(full => SYNTHESIZED_WIRE_1,
-		 usedw => SYNTHESIZED_WIRE_2,
-		 status => status);
+  b2v_inst2 : orcc_fifo
+    port map(wrreq => wrreq,
+             rdreq => rdreq,
+             clock => clk,
+             sclr  => SYNTHESIZED_WIRE_0,
+             data  => data,
+             full  => SYNTHESIZED_WIRE_1,
+             q     => q,
+             usedw => SYNTHESIZED_WIRE_2);
 
 
-END bdf_type;
+  SYNTHESIZED_WIRE_0 <= not(reset_n);
+
+
+
+  b2v_inst99 : usedw_to_status
+    port map(full   => SYNTHESIZED_WIRE_1,
+             usedw  => SYNTHESIZED_WIRE_2,
+             status => status);
+
+
+end bdf_type;
