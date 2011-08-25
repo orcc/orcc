@@ -338,7 +338,8 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	@Check(CheckType.NORMAL)
 	public void checkAstStatementAssign(AstStatementAssign assign) {
 		AstVariable variable = assign.getTarget().getVariable();
-		if (variable.isConstant()) {
+		if (variable.isConstant()
+				|| variable.eContainingFeature() == CalPackage.Literals.AST_ACTOR__PARAMETERS) {
 			error("The variable " + variable.getName() + " is not assignable",
 					eINSTANCE.getAstStatementAssign_Target());
 		}
