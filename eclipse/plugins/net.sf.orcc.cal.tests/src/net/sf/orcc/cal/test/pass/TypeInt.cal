@@ -1,0 +1,7 @@
+actor TypeInt() ==> :
+
+	int(size=5) x := 7;
+
+	int(size=15) y := x + 1;
+
+end
