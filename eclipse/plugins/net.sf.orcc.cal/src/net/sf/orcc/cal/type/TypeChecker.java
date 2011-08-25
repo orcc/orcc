@@ -133,7 +133,7 @@ public class TypeChecker extends CalSwitch<Type> {
 			// check types
 			if (!isConvertibleTo(actualType, formalType)) {
 				error("Type mismatch: cannot convert from " + actualType
-						+ " to " + formalType, expression,
+						+ " to " + formalType, astCall,
 						eINSTANCE.getAstExpressionCall_Parameters(), index);
 			}
 			index++;
