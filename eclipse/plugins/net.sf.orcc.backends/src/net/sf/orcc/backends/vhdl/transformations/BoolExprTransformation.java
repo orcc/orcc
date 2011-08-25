@@ -160,8 +160,8 @@ public class BoolExprTransformation extends AbstractActorVisitor<Expression> {
 	@Override
 	public Expression caseInstAssign(InstAssign assign) {
 		Var target = assign.getTarget().getVariable();
-		if (target.getType().isBool()) {
-			Expression expr = assign.getValue();
+		Expression expr = assign.getValue();
+		if (expr.getType().isBool()) {
 			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
 				createIfNode(assign, target, expr);
 
@@ -181,8 +181,8 @@ public class BoolExprTransformation extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseInstReturn(InstReturn returnInstr) {
-		if (procedure.getReturnType().isBool()) {
-			Expression expr = returnInstr.getValue();
+		Expression expr = returnInstr.getValue();
+		if (expr.getType().isBool()) {
 			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
 				Var local = newVariable();
 				returnInstr.setValue(IrFactory.eINSTANCE.createExprVar(local));
@@ -198,9 +198,8 @@ public class BoolExprTransformation extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseInstStore(InstStore store) {
-		Var target = store.getTarget().getVariable();
-		if (target.getType().isBool()) {
-			Expression expr = store.getValue();
+		Expression expr = store.getValue();
+		if (expr.getType().isBool()) {
 			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
 				Var local = newVariable();
 				store.setValue(IrFactory.eINSTANCE.createExprVar(local));
