@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<layout>
-   <vertices>
-      <vertex id="CABAC_Entropy_Decoding" x="549" y="145"/>
-      <vertex id="ParserSim" x="262" y="145"/>
-   </vertices>
-</layout>
