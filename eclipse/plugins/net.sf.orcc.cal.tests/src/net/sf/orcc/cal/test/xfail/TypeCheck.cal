@@ -1,0 +1,13 @@
+unit TypeCheck :
+
+	function abc(uint c) --> bool :
+		 c > 4
+	end
+
+	procedure buggy()
+	begin
+		uint a[3][2];
+		bool b := abc(a[2]);
+	end
+
+end

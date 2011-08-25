@@ -49,7 +49,8 @@ public class AllTests {
 
 	@Test
 	public void checkExpectedFails() throws Exception {
-		String[] tests = new String[] { prefix + "xfail/Param.cal" };
+		String[] tests = new String[] { prefix + "xfail/Param.cal",
+				prefix + "xfail/TypeCheck.cal" };
 		for (String test : tests) {
 			Assert.assertNull("expected parsing/validation to fail",
 					parseAndValidate(test));
