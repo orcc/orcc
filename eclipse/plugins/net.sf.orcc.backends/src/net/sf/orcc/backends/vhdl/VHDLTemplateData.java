@@ -62,7 +62,7 @@ public class VHDLTemplateData {
 	 * @author Matthieu Wipliez
 	 * 
 	 */
-	private class SensitivityComputer extends AbstractActorVisitor<Set<String>> {
+	private class SensitivityComputer extends AbstractActorVisitor<Object> {
 
 		/**
 		 * the set of signals that appear in the sensitivity list of the
@@ -104,16 +104,20 @@ public class VHDLTemplateData {
 				signals.add("FSM");
 			}
 
-			return signals;
+			return null;
 		}
 
 		@Override
-		public Set<String> caseInstLoad(InstLoad load) {
+		public Object caseInstLoad(InstLoad load) {
 			Var var = load.getSource().getVariable();
 			if (!var.getType().isList() && var.isAssignable()) {
 				signals.add(var.getName());
 			}
-			return signals;
+			return null;
+		}
+
+		public List<String> getList() {
+			return new ArrayList<String>(signals);
 		}
 
 	}
@@ -160,8 +164,9 @@ public class VHDLTemplateData {
 	 *            an actor
 	 */
 	public void initializeFrom(Actor actor) {
-		signals = new ArrayList<String>(
-				new SensitivityComputer().doSwitch(actor));
+		SensitivityComputer sensitivityComputer = new SensitivityComputer();
+		sensitivityComputer.doSwitch(actor);
+		signals = sensitivityComputer.getList();
 
 		customInitMap = new HashMap<Var, Boolean>();
 		initValueMap = new HashMap<Var, Object>();
