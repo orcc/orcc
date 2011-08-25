@@ -182,7 +182,7 @@ public class BoolExprTransformation extends AbstractActorVisitor<Expression> {
 	@Override
 	public Expression caseInstReturn(InstReturn returnInstr) {
 		Expression expr = returnInstr.getValue();
-		if (expr.getType().isBool()) {
+		if (expr != null && expr.getType().isBool()) {
 			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
 				Var local = newVariable();
 				returnInstr.setValue(IrFactory.eINSTANCE.createExprVar(local));
