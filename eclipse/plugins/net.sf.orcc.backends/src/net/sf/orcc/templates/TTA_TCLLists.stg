@@ -1,7 +1,14 @@
 
 
 network(network, options) ::= <<
+# Create Working library
+vlib work
 
+# Create and compile Altera library
+vlib altera_mf
+vmap altera_mf altera_mf
+vcom -work altera_mf -93 -explicit others/altera_mf_components.vhd
+vcom -work altera_mf -93 -explicit others/altera_mf.vhd
 
 # Compile Shared components
 vcom -93 -reportprogress 30 -work work share/vhdl/util_pkg.vhdl
@@ -43,7 +50,7 @@ vcom -93 -reportprogress 30 -work work others/orcc_fifo.vhd
 <network.instances: instance(); separator="\n">
 
 # Network
-vcom -93 -reportprogress 30 -work work $SRC/top.vhd
+vcom -93 -reportprogress 30 -work work top.vhd
 
 
 # Simulate
