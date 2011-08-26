@@ -223,6 +223,6 @@ begin
              status => src_status,
              data   => src_data);
 
-  leds_out <= ledline;
+  leds_out <= ledline(7 downto 0);
   
 end bdf_type;
