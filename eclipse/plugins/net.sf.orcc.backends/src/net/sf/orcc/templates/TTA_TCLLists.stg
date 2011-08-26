@@ -52,11 +52,8 @@ vcom -93 -quiet -work work others/orcc_fifo.vhd
 # Network
 vcom -93 -quiet -work work top.vhd
 
-
 # Simulate
-vsim -novopt top.vhd
-do wave.do
-run 10 us
+vsim -novopt -L altera_mf work.top -do "run 1000000 1ns; quit"
 
 >>
 
