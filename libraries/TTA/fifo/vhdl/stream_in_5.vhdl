@@ -36,8 +36,8 @@ entity stream_in_stream_in_status_V5 is
 
     -- external port interface
     ext_data   : in  std_logic_vector(31 downto 0);  -- acquired data comes through this
-    ext_status : in  std_logic_vector(8 downto 0);   -- status signal provided from outside
-    ext_ack    : out std_logic          -- data acknowledge to outside
+    ext_status : in  std_logic_vector(8 downto 0);  -- status signal provided from outside
+    ext_ack    : out std_logic_vector(0 downto 0)  -- data acknowledge to outside
     );
 
 end stream_in_stream_in_status_V5;
@@ -46,7 +46,7 @@ end stream_in_stream_in_status_V5;
 architecture rtl of stream_in_stream_in_status_V5 is
   
   signal r1reg  : std_logic_vector(31 downto 0);
-  signal ackreg : std_logic;
+  signal ackreg : std_logic_vector(0 downto 0);
 
 begin
   
@@ -54,23 +54,23 @@ begin
   begin  -- process regs
     if rstx = '0' then
       r1reg  <= (others => '0');
-      ackreg <= '0';
+      ackreg <= (others => '0');
     elsif clk'event and clk = '1' then
       if glock = '0' then
 
         -- reset the acknowledge signal after a while
-        ackreg <= '0';
+        ackreg <= (others => '0');
 
         if t1load = '1' then
           case t1opcode is
             when STREAM_IN_V5 =>
               r1reg  <= ext_data;
-              ackreg <= '1';
+              ackreg <= (0 => '1');
             when STREAM_IN_STATUS_V5 =>
               -- stream_in_status is placed in the least significant bits of r1reg
               r1reg <= (0 => ext_status(0), 1 => ext_status(1), 2 => ext_status(2), 3 => ext_status(3), 4 => ext_status(4), 5 => ext_status(5), 6 => ext_status(6), 7 => ext_status(7), 8 => ext_status(8), others => '0');
             when STREAM_IN_PEEK_V5 =>
-              r1reg  <= ext_data;
+              r1reg <= ext_data;
             when others => null;
           end case;
         end if;
