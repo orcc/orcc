@@ -39,8 +39,8 @@ vcom -93 -quiet -work work others/tta_fifo.vhd
 vcom -93 -quiet -work work others/tta_fifo.vhd
 vcom -93 -quiet -work work others/stream_source_2.vhd
 vcom -93 -quiet -work work others/stream_source_1.vhd
-vlog -quiet -work work others/data_src2.v
-vlog -quiet -work work others/data_src1.v
+vcom -93 -quiet -work work others/data_src2.vhd
+vcom -93 -quiet -work work others/data_src1.vhd
 vlog -quiet -work work others/usedw_to_status.v
 vlog -quiet -work work others/button_debouncer.v
 vlog -quiet -work work others/addr_gen_2.v

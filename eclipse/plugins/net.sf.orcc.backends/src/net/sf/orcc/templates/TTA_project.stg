@@ -46,8 +46,8 @@ set_global_assignment -name VHDL_FILE others/tta_fifo.vhd
 set_global_assignment -name VHDL_FILE others/tta_fifo.vhd
 set_global_assignment -name VHDL_FILE others/stream_source_2.vhd
 set_global_assignment -name VHDL_FILE others/stream_source_1.vhd
-set_global_assignment -name VERILOG_FILE others/data_src2.v
-set_global_assignment -name VERILOG_FILE others/data_src1.v
+set_global_assignment -name VHDL_FILE others/data_src2.vhd
+set_global_assignment -name VHDL_FILE others/data_src1.vhd
 set_global_assignment -name VERILOG_FILE others/usedw_to_status.v
 set_global_assignment -name VERILOG_FILE others/button_debouncer.v
 set_global_assignment -name VERILOG_FILE others/addr_gen_2.v
