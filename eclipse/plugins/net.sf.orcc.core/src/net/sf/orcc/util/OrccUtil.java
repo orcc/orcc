@@ -452,15 +452,11 @@ public class OrccUtil {
 	 *            the name of the group to load
 	 * @return a StringTemplate group
 	 */
-	public static STGroup loadGroup(String groupName, String path,
-			ClassLoader cl) {
-		STGroup group = null;
-
+	public static STGroup loadGroup(String fullPath, ClassLoader cl) {
 		ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
 		Thread.currentThread().setContextClassLoader(cl);
 
-		String groupPath = path + groupName + ".stg";
-		group = new STGroupFile(groupPath);
+		STGroup group = new STGroupFile(fullPath);
 		group.load();
 
 		Thread.currentThread().setContextClassLoader(oldCl);

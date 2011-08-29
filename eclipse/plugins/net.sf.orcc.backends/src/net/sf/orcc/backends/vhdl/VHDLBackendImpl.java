@@ -185,7 +185,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
-		actorPrinter = new ActorPrinter("VHDL_actor", !debugMode);
+		actorPrinter = new ActorPrinter(
+				"net/sf/orcc/backends/vhld/VHDL_actor.stg", !debugMode);
 		actorPrinter.setExpressionPrinter(new VHDLExpressionPrinter());
 		actorPrinter.setTypePrinter(new VHDLTypePrinter());
 
@@ -253,7 +254,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 			folder.mkdir();
 		}
 
-		InstancePrinter instancePrinter = new InstancePrinter("VHDL_testbench");
+		InstancePrinter instancePrinter = new InstancePrinter(
+				"net/sf/orcc/backends/vhdl/VHDL_testbench.stg");
 		Instance instance = new Instance(network.getName(), network.getName());
 		instance.setContents(network);
 		printTestbench(instancePrinter, instance);
@@ -261,7 +263,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 		network.computeTemplateMaps();
 
-		NetworkPrinter networkPrinter = new NetworkPrinter("VHDL_network");
+		NetworkPrinter networkPrinter = new NetworkPrinter(
+				"net/sf/orcc/backends/vhdl/VHDL_network.stg");
 		networkPrinter.setExpressionPrinter(new VHDLExpressionPrinter());
 		networkPrinter.setTypePrinter(new VHDLTypePrinter());
 		networkPrinter.getOptions().put("fifoSize", fifoSize);
@@ -276,7 +279,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 	}
 
 	private void printTCL(Instance instance) {
-		Printer printer = new Printer("VHDL_TCLLists");
+		Printer printer = new Printer("net/sf/orcc/backends/vhdl/VHDL_TCLLists");
 
 		entities = new ArrayList<String>();
 		entitySet = new HashSet<String>();

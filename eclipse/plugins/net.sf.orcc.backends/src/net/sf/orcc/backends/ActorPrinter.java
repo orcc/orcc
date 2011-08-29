@@ -43,17 +43,7 @@ import org.stringtemplate.v4.ST;
  */
 public class ActorPrinter extends Printer {
 
-	private boolean keepUnchangedFiles = false;
-
-	/**
-	 * Creates a new actor printer.
-	 * 
-	 * @param templateName
-	 *            the name of the template
-	 */
-	public ActorPrinter(String templateName) {
-		this(templateName, false);
-	}
+	private boolean keepUnchangedFiles;
 
 	/**
 	 * Creates a new actor printer.

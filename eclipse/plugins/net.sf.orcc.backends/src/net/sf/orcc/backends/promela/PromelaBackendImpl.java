@@ -67,9 +67,9 @@ public class PromelaBackendImpl extends AbstractBackend {
 	private Map<Action, List<Expression>> guards = new HashMap<Action, List<Expression>>();
 
 	private Map<EObject, List<Action>> priority = new HashMap<EObject, List<Action>>();
-	
+
 	private Map<Action, List<InstLoad>> loadPeeks = new HashMap<Action, List<InstLoad>>();
-	
+
 	private InstancePrinter instancePrinter;
 
 	private final Map<String, String> transformations;
@@ -95,11 +95,13 @@ public class PromelaBackendImpl extends AbstractBackend {
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		ActorVisitor<?>[] transformations = {
-				new Inliner(true,false),
-				//new ListFlattener(), //Promela does not support multi dimensional arrays
+				new Inliner(true, false),
+				// new ListFlattener(), //Promela does not support multi
+				// dimensional arrays
 				new RenameTransformation(this.transformations),
-				new GuardsExtractor(guards, priority, loadPeeks), new PhiRemoval(),
-				new DeadCodeElimination(), new DeadVariableRemoval() };
+				new GuardsExtractor(guards, priority, loadPeeks),
+				new PhiRemoval(), new DeadCodeElimination(),
+				new DeadVariableRemoval() };
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);
@@ -115,20 +117,21 @@ public class PromelaBackendImpl extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
 
-		instancePrinter = new InstancePrinter("PROMELA_actor");
+		instancePrinter = new InstancePrinter(
+				"net/sf/orcc/backends/promela/PROMELA_actor.stg");
 		instancePrinter.setExpressionPrinter(new CExpressionPrinter());
 		instancePrinter.setTypePrinter(new PromelaTypePrinter());
 		instancePrinter.getOptions().put("guards", guards);
 		instancePrinter.getOptions().put("priority", priority);
 		instancePrinter.getOptions().put("loadPeeks", loadPeeks);
 		instancePrinter.getOptions().put("network", network);
-		
+
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
 		printInstances(network);
 
 		new BroadcastAdder().transform(network);
-		
+
 		network.computeTemplateMaps();
 		printNetwork(network);
 	}
@@ -148,7 +151,8 @@ public class PromelaBackendImpl extends AbstractBackend {
 	 *             if something goes wrong
 	 */
 	private void printNetwork(Network network) {
-		NetworkPrinter printer = new NetworkPrinter("PROMELA_network");
+		NetworkPrinter printer = new NetworkPrinter(
+				"net/sf/orcc/backends/promela/PROMELA_network.stg");
 		printer.setTypePrinter(new PromelaTypePrinter());
 		printer.print("main_" + network.getName() + ".pml", path, network,
 				"network");

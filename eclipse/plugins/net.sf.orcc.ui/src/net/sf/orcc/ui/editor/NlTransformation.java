@@ -68,7 +68,7 @@ public class NlTransformation implements ITransformation {
 	@Override
 	public void transform(Graph graph, OutputStream out) {
 		// reload group
-		group = OrccUtil.loadGroup("NL", "net/sf/orcc/ui/editor/",
+		group = OrccUtil.loadGroup("net/sf/orcc/ui/editor/NL.stg",
 				NlTransformation.class.getClassLoader());
 
 		// register model adaptor for AbstractObject

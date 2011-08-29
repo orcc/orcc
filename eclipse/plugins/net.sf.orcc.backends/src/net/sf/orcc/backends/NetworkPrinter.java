@@ -43,7 +43,7 @@ import org.stringtemplate.v4.ST;
  */
 public class NetworkPrinter extends Printer {
 
-	private boolean keepUnchangedFiles = false;
+	private boolean keepUnchangedFiles;
 
 	/**
 	 * Creates a new network printer.

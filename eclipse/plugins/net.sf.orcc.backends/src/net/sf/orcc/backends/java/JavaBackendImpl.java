@@ -83,7 +83,8 @@ public class JavaBackendImpl extends AbstractBackend {
 	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
 		List<Actor> actors = parseActors(files);
 
-		actorPrinter = new ActorPrinter("Java_actor", true);
+		actorPrinter = new ActorPrinter(
+				"net/sf/orcc/backends/java/Java_actor.stg", true);
 		actorPrinter.setExpressionPrinter(new CppExprPrinter());
 		actorPrinter.setTypePrinter(new JavaTypePrinter());
 
@@ -121,7 +122,8 @@ public class JavaBackendImpl extends AbstractBackend {
 	 *             if something goes wrong
 	 */
 	protected void printNetwork(Network network) throws OrccException {
-		NetworkPrinter printer = new NetworkPrinter("Java_network");
+		NetworkPrinter printer = new NetworkPrinter(
+				"net/sf/orcc/backends/java/Java_network.stg");
 		printer.getOptions().put("fifoSize", fifoSize);
 		printer.print("Network_" + network.getName() + ".java", path, "network");
 	}

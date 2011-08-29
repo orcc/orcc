@@ -237,7 +237,8 @@ public class CBackendImpl extends AbstractBackend {
 
 		network.computeTemplateMaps();
 
-		NetworkPrinter printer = new NetworkPrinter("C_network");
+		NetworkPrinter printer = new NetworkPrinter(
+				"net/sf/orcc/backends/c/C_network.stg");
 		printer.setTypePrinter(new CTypePrinter());
 
 		instancesTarget = null;
@@ -265,13 +266,15 @@ public class CBackendImpl extends AbstractBackend {
 	}
 
 	private void printCMake(Network network) {
-		NetworkPrinter networkPrinter = new NetworkPrinter("C_CMakeLists");
+		NetworkPrinter networkPrinter = new NetworkPrinter(
+				"net/sf/orcc/backends/c/C_CMakeLists.stg");
 		networkPrinter.print("CMakeLists.txt", path, network, "CMakeLists");
 	}
 
 	@Override
 	protected boolean printInstance(Instance instance) throws OrccException {
-		InstancePrinter printer = new InstancePrinter("C_actor", !debugMode);
+		InstancePrinter printer = new InstancePrinter(
+				"net/sf/orcc/backends/c/C_actor.stg", !debugMode);
 		printer.setExpressionPrinter(new CExpressionPrinter());
 		printer.setTypePrinter(new CTypePrinter());
 		printer.getOptions().put("network", workingNetwork);
@@ -284,7 +287,8 @@ public class CBackendImpl extends AbstractBackend {
 	}
 
 	private void printMapping(Network network) {
-		NetworkPrinter networkPrinter = new NetworkPrinter("C_mapping");
+		NetworkPrinter networkPrinter = new NetworkPrinter(
+				"net/sf/orcc/backends/c/C_mapping.stg");
 		networkPrinter.getOptions().put("mapping", instancesTarget);
 		networkPrinter.print(network.getName() + ".xcf", path, network,
 				"mapping");

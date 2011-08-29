@@ -183,8 +183,10 @@ public class CppBackendImpl extends AbstractBackend {
 
 	@Override
 	protected boolean printActor(Actor actor) {
-		ActorPrinter actorPrinter = new ActorPrinter("Cpp_actorImpl");
-		ActorPrinter headerPrinter = new ActorPrinter("Cpp_actorDecl");
+		ActorPrinter actorPrinter = new ActorPrinter(
+				"net/sf/orcc/backends/cpp/Cpp_actorImpl.stg", false);
+		ActorPrinter headerPrinter = new ActorPrinter(
+				"net/sf/orcc/backends/cpp/Cpp_actorDecl.stg", false);
 
 		actorPrinter.setTypePrinter(new CppTypePrinter());
 		headerPrinter.setTypePrinter(new CppTypePrinter());
@@ -203,7 +205,8 @@ public class CppBackendImpl extends AbstractBackend {
 	}
 
 	private void printCMake(Network network) {
-		NetworkPrinter networkPrinter = new NetworkPrinter("Cpp_CMakeLists");
+		NetworkPrinter networkPrinter = new NetworkPrinter(
+				"net/sf/orcc/backends/cpp/Cpp_CMakeLists.stg");
 		networkPrinter.getOptions().put("needSerDes", needSerDes);
 		networkPrinter.print("CMakeLists.txt", path, network, "Cpp_CMakeLists");
 	}
@@ -217,7 +220,8 @@ public class CppBackendImpl extends AbstractBackend {
 	 *             if something goes wrong
 	 */
 	private void printNetwork(Network network) throws OrccException {
-		NetworkPrinter printer = new NetworkPrinter("Cpp_network");
+		NetworkPrinter printer = new NetworkPrinter(
+				"net/sf/orcc/backends/cpp/Cpp_network.stg");
 
 		printer.setExpressionPrinter(new CppExprPrinter());
 		printer.setTypePrinter(new CppTypePrinter());

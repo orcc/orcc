@@ -216,8 +216,8 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 
 	public void printResults(String templateName, String instanceName,
 			String fileName) throws IOException {
-		STGroup group = OrccUtil.loadGroup(templateName,
-				"net/sf/orcc/tools/templates/",
+		STGroup group = OrccUtil.loadGroup("net/sf/orcc/tools/templates/"
+				+ templateName + ".stg",
 				AbstractNetworkAnalyzer.class.getClassLoader());
 		ST template = group.getInstanceOf(instanceName);
 		template.add("analysis", analysis);

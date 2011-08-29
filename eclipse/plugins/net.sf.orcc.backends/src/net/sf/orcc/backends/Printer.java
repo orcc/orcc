@@ -100,12 +100,11 @@ public class Printer {
 	/**
 	 * Creates a new printer.
 	 * 
-	 * @param templateName
-	 *            the name of the template
+	 * @param fullPath
+	 *            the full path of the template
 	 */
-	public Printer(String templateName) {
-		group = OrccUtil.loadGroup(templateName, "net/sf/orcc/templates/",
-				Printer.class.getClassLoader());
+	public Printer(String fullPath) {
+		group = OrccUtil.loadGroup(fullPath, Printer.class.getClassLoader());
 		group.registerRenderer(Expression.class, new ExpressionRenderer());
 		group.registerRenderer(Type.class, new TypeRenderer());
 

@@ -156,7 +156,8 @@ public class LLVMBackendImpl extends AbstractBackend {
 	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
 		List<Actor> actors = parseActors(files);
 
-		printer = new ActorPrinter("LLVM_actor", !debugMode);
+		printer = new ActorPrinter("net/sf/orcc/backends/llvm/LLVM_actor.stg",
+				!debugMode);
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
 

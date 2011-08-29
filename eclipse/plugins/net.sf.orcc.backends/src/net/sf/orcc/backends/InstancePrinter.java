@@ -45,6 +45,7 @@ import org.stringtemplate.v4.ST;
 public class InstancePrinter extends Printer {
 
 	private boolean keepUnchangedFiles;
+
 	private boolean printBroadcasts;
 
 	/**

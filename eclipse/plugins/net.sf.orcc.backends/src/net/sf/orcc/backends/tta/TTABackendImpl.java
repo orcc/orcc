@@ -138,8 +138,8 @@ public class TTABackendImpl extends AbstractBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) throws OrccException {
-		InstancePrinter printer = new InstancePrinter("TTA_actor", !debugMode,
-				true);
+		InstancePrinter printer = new InstancePrinter(
+				"net/sf/orcc/backends/tta/TTA_actor.stg", !debugMode, true);
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
 
@@ -152,12 +152,15 @@ public class TTABackendImpl extends AbstractBackend {
 	}
 
 	private void printNetwork(Network network) {
-		NetworkPrinter networkPrinter = new NetworkPrinter("TTA_network");
-		NetworkPrinter scriptPrinter = new NetworkPrinter("TTA_script");
-		NetworkPrinter projectPrinter = new NetworkPrinter("TTA_project");
-		NetworkPrinter tclPrinter = new NetworkPrinter("TTA_TCLLists");
-		networkPrinter.print("top.vhd", path, network,
-				"network");
+		NetworkPrinter networkPrinter = new NetworkPrinter(
+				"net/sf/orcc/backends/tta/TTA_network.stg");
+		NetworkPrinter scriptPrinter = new NetworkPrinter(
+				"net/sf/orcc/backends/tta/TTA_script.stg");
+		NetworkPrinter projectPrinter = new NetworkPrinter(
+				"net/sf/orcc/backends/tta/TTA_project.stg");
+		NetworkPrinter tclPrinter = new NetworkPrinter(
+				"net/sf/orcc/backends/tta/TTA_TCLLists.stg");
+		networkPrinter.print("top.vhd", path, network, "network");
 		scriptPrinter.print("informations.py", path, network, "script");
 		projectPrinter.print("top.qsf", path, network, "qsfNetwork");
 		projectPrinter.print("top.qpf", path, network, "qpfNetwork");
@@ -170,9 +173,9 @@ public class TTABackendImpl extends AbstractBackend {
 				instance.getId(), instance);
 
 		ArchitecturePrinter adfPrinter = new ArchitecturePrinter(
-				"TTA_processor_adf");
+				"net/sf/orcc/backends/tta/TTA_processor_adf.stg");
 		ArchitecturePrinter idfPrinter = new ArchitecturePrinter(
-				"TTA_processor_idf");
+				"net/sf/orcc/backends/tta/TTA_processor_idf.stg");
 
 		adfPrinter.print("processor_" + instance.getId() + ".adf",
 				instancePath, simpleTTA, "tta");
