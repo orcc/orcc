@@ -1,4 +1,4 @@
-import "net/sf/orcc/templates/VHDL_testbench.stg"
+import "net/sf/orcc/backends/vhdl/VHDL_testbench.stg"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Print signal and instanciation

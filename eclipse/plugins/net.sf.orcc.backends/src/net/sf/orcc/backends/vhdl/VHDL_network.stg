@@ -1,4 +1,4 @@
-import "net/sf/orcc/templates/VHDL_actor.stg"
+import "net/sf/orcc/backends/vhdl/VHDL_actor.stg"
 
 
 ///////////////////////////////////////////////////////////////////////////////
