@@ -76,6 +76,7 @@ public class TTABackendImpl extends AbstractBackend {
 	 */
 	private boolean debugMode;
 
+	private String tbPath;
 	private final Map<String, String> transformations;
 
 	/**
@@ -166,6 +167,13 @@ public class TTABackendImpl extends AbstractBackend {
 		projectPrinter.print("top.qpf", path, network, "qpfNetwork");
 		tclPrinter.print("top.tcl", path, network, "network");
 		OrccUtil.createFile(path, "__init__.py");
+
+		InstancePrinter instancePrinter = new InstancePrinter(
+				"net/sf/orcc/backends/tta/TTA_testbench.stg");
+		tbPath = OrccUtil.createFolder(path, "testbench");
+		Instance instance = new Instance(network.getName(), network.getName());
+		instance.setContents(network);
+		printTestbench(instancePrinter, instance);
 	}
 
 	private void printProcessor(Instance instance, String instancePath) {
@@ -182,6 +190,18 @@ public class TTABackendImpl extends AbstractBackend {
 		idfPrinter.print("processor_" + instance.getId() + ".idf",
 				instancePath, simpleTTA, "tta");
 
+	}
+
+	private void printTestbench(InstancePrinter printer, Instance instance) {
+		printer.print(instance.getId() + "_tb.vhd", tbPath, instance,
+				"instance");
+
+		if (instance.isNetwork()) {
+			Network network = instance.getNetwork();
+			for (Instance subInstance : network.getInstances()) {
+				printTestbench(printer, subInstance);
+			}
+		}
 	}
 
 }
