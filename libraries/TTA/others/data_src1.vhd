@@ -96,7 +96,7 @@ begin
       operation_mode         => "ROM",
       outdata_aclr_a         => "NONE",
       outdata_reg_a          => "UNREGISTERED",
-      ram_block_type         => "Auto",
+      ram_block_type         => "AUTO",
       widthad_a              => 13,
       width_a                => 8,
       width_byteena_a        => 1
@@ -154,7 +154,7 @@ end SYN;
 -- Retrieval info: CONSTANT: OPERATION_MODE STRING "ROM"
 -- Retrieval info: CONSTANT: OUTDATA_ACLR_A STRING "NONE"
 -- Retrieval info: CONSTANT: OUTDATA_REG_A STRING "CLOCK0"
--- Retrieval info: CONSTANT: RAM_BLOCK_TYPE STRING "Auto"
+-- Retrieval info: CONSTANT: RAM_BLOCK_TYPE STRING "AUTO"
 -- Retrieval info: CONSTANT: WIDTHAD_A NUMERIC "13"
 -- Retrieval info: CONSTANT: WIDTH_A NUMERIC "8"
 -- Retrieval info: CONSTANT: WIDTH_BYTEENA_A NUMERIC "1"
