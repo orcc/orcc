@@ -2,6 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Common applet
 ///////////////////////////////////////////////////////////////////////////////
+
 sendData(port) ::= <<
 <if(port.type.bool)
 >if (input_bit = 1) then
@@ -17,10 +18,10 @@ endif>
 >>
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Print signal and instanciation
 ///////////////////////////////////////////////////////////////////////////////
+
 printSignalInput(port) ::= <<
 <if(!port.native)
 >signal s_<port.name>_wrreq		: std_logic;
@@ -49,13 +50,22 @@ s_<port.name>_native \<= 'Z';
 <endif>
 >>
 
-signalsInstanciation(port) ::= <<
+mapSignalInput(port) ::= <<
 <if (port.native)
-><port.name>       =\> <port.name><
+><port.name>       =\> s_<port.name>_native<
 else
-><port.name>_data  =\> <port.name>_data,
-<port.name>_send  =\> <port.name>_send,
-<port.name>_ack   =\> <port.name>_ack<
+><port.name>_wrreq  =\> <port.name>_wrreq,
+<port.name>_data  =\> <port.name>_data<
+endif>
+>>
+
+mapSignalOutput(port) ::= <<
+<if (port.native)
+><port.name>       =\> s_<port.name>_native<
+else
+><port.name>_rdreq  =\> <port.name>_rdreq,
+<port.name>_q  =\> <port.name>_q,
+<port.name>_status   =\> <port.name>_status<
 endif>
 >>
 
@@ -94,16 +104,13 @@ endif>
 >>
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Print processes
 ///////////////////////////////////////////////////////////////////////////////
+
 init_process() ::= <<
 -- clock generation
 clock \<= not clock after PERIOD/2;
-
--- reset generation
-reset_n \<= '1' after 10*PERIOD;
 
 >>
 
@@ -231,10 +238,10 @@ end if;
 >>
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Testbench
+///////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////
-// testbench
-///////////////////////////////////////////////////////////////////////////////
 instance(instance, options) ::= <<
 ------------------------------------------------------------------------------
 -- Generated from <instance.id>
@@ -246,7 +253,6 @@ use std.textio.all;
 use ieee.numeric_std.all;
 
 library work;
-use work.sim_package.all;
 
 entity tb_<instance.id> is
 
@@ -255,7 +261,6 @@ end tb_<instance.id>;
 
 architecture arch_tb_<instance.id> of tb_<instance.id> is 
 
-<if(instance.actor)>
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
   --------------------------------------------------------------------------- 
@@ -267,9 +272,9 @@ begin
   <instance.actor.simpleName>_orcc : entity work.<instance.actor.simpleName>
     port map (
       clock      =\> clock,
-      reset_n    =\> reset_n<if(instance.actor.inputs || instance.actor.outputs)>,<endif>
-      <instance.actor.inputs: signalsInstanciation(); separator=",\n"><if(instance.actor.inputs && instance.actor.outputs)>,<endif>
-      <instance.actor.outputs: signalsInstanciation(); separator=",\n"><if(!instance.actor.outputs)>    <endif>);
+      <if(instance.actor.inputs)><instance.actor.inputs: mapSignalInput(); separator=",\n">,<endif>
+      <if(instance.actor.outputs)><instance.actor.outputs: mapSignalOutput(); separator=",\n">,<endif>
+      reset_n    =\> reset_n);
             
     <init_process()>
     <if(instance.actor.inputs)
@@ -280,31 +285,46 @@ begin
     <if(instance.actor.outputs)
     ><waveform_process_out(output=instance.actor.outputs)><
     endif>
-<else>
+
+end architecture arch_tb_<instance.id>;
+>>
+
+network(network, options) ::= <<
+------------------------------------------------------------------------------
+-- Generated from top
+------------------------------------------------------------------------------
+
+library ieee;
+use ieee.std_logic_1164.all; 
+use std.textio.all;
+use ieee.numeric_std.all;
+
+library work;
+
+entity tb_top is
+
+end tb_top;
+
+
+architecture arch_tb_top of tb_top is 
+
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
   --------------------------------------------------------------------------- 
-  <sig_const(input=instance.network.inputs,output=instance.network.outputs)>
+  <sig_const(input=network.inputs,output=network.outputs)>
   ---------------------------------------------------------------------------
 
 begin
 
-  <instance.network.name>_orcc : entity work.<instance.network.name>
+  top_orcc : entity work.top
     port map (
-      clock      =\> clock,
-      reset_n    =\> reset_n<if(instance.network.inputs || instance.network.outputs)>,<endif>
-      <instance.network.inputs: signalsInstanciation(); separator=",\n"><if(instance.network.inputs && instance.network.outputs)>,<endif>
-      <instance.network.outputs: signalsInstanciation(); separator=",\n"><if(!instance.network.outputs)>    <endif>);
+      hw_clk      =\> clock,
+      <if(network.inputs)><network.inputs: mapSignalInput(); separator=",\n">,<endif>
+      <if(network.outputs)><network.outputs: mapSignalOutput(); separator=",\n">,<endif>
+      reset_n    =\> reset_n);
       
     <init_process()>
-    <if(instance.network.inputs)
-    ><waveform_process_in(input=instance.network.inputs)><
-    endif>
-    
-    <if(instance.network.outputs)
-    ><waveform_process_out(output=instance.network.outputs)><
-    endif>
-<endif>
 
-end architecture arch_tb_<instance.id>;
+
+end architecture arch_tb_top;
 >>

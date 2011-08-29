@@ -46,6 +46,7 @@ vlog -quiet -work work others/button_debouncer.v
 vlog -quiet -work work others/addr_gen_2.v
 vlog -quiet -work work others/addr_gen_1.v
 vcom -93 -quiet -work work others/orcc_fifo.vhd
+vcom -93 -quiet -work work others/main_pll.vhd
 
 exec cp -f others/tta_stream_1_in.mif . &
 exec cp -f others/tta_stream_2_in.mif . &
@@ -54,9 +55,10 @@ exec cp -f others/tta_stream_2_in.mif . &
 
 # Network
 vcom -93 -quiet -work work top.vhd
+vcom -93 -quiet -work work top_tb.vhd
 
 # Simulate
-vsim -novopt -L altera_mf work.top -do "run 1000000 1ns;"
+vsim -novopt -L altera_mf work.tb_top -t ps -do "view wave; add wave *;"
 
 >>
 
@@ -77,6 +79,10 @@ vcom -93 -quiet -work work <instance.id>/gcu_ic/decoder.vhdl
 vcom -93 -quiet -work work <instance.id>/irom_<instance.id>.vhd
 vcom -93 -quiet -work work <instance.id>/dram_<instance.id>.vhd
 vcom -93 -quiet -work work <instance.id>/processor_<instance.id>.vhd
+
+<if(!instance.actor.native)
+>#vcom -93 -quiet -work work <instance.id>/<instance.id>_tb.vhd<
+endif>
 
 exec cp -f <instance.id>/<instance.id>.mif . &
 exec cp -f <instance.id>/<instance.id>_data.mif . &

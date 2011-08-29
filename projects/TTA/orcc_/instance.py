@@ -57,6 +57,7 @@ class Instance:
         self.dram = None
         # Useful filenames
         self._processorFile = "processor_" + self.id + ".vhd"
+        self._tbFile = self.id + "_tb.vhd"
         self._adfFile = "processor_" + self.id + ".adf"
         self._idfFile = "processor_" + self.id + ".idf"
         self._llFile = self.id + ".ll"
@@ -118,6 +119,8 @@ class Instance:
         shutil.copy(self._mifFile, buildPath)
         shutil.copy(self._mifDataFile, buildPath)
         shutil.copy("imem_mau_pkg.vhdl", buildPath)
+        if not self.isNative:
+            shutil.copy(self._tbFile, buildPath)
 
         # Clean working directory
         os.remove("many_streams.hdb")

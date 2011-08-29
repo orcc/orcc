@@ -30,8 +30,8 @@ entity top is
   port
     (
       hw_clk : in  std_logic;
-      button : in  std_logic_vector(1 to 1);
       <ports(network)>
+      reset_n : in  std_logic
       );
 end top;
 
@@ -51,17 +51,6 @@ architecture bdf_type of top is
          status			: out std_logic_vector(8 downto 0)
          );
   end component;
-
-  component button_debouncer
-    generic (counter_max : integer;
-             preset_val  : integer
-             );
-    port(clk      		: in  std_logic;
-         rst_n    		: in  std_logic;
-         data_in  		: in  std_logic;
-         data_out 		: out std_logic
-         );
-  end component;
   
   component main_pll
     port(inclk0			: in  std_logic;
@@ -77,8 +66,6 @@ architecture bdf_type of top is
   -- Signals declaration
   ---------------------------------------------------------------------------
   -- System
-  signal system_vcc     : std_logic;
-  signal system_reset_n : std_logic;
   signal clk            : std_logic;
   
   <signals(network)>
@@ -88,18 +75,7 @@ begin
 
   ---------------------------------------------------------------------------
   -- System instantiation 
-  --------------------------------------------------------------------------- 
-  system_vcc \<= '1';
-
-  reset_debouncer : button_debouncer
-    generic map(counter_max =\> 100000,
-                preset_val  =\> 0
-                )
-    port map(clk      =\> clk,
-             rst_n    =\> system_vcc,
-             data_in  =\> button(1),
-             data_out =\> system_reset_n);
-  
+  ---------------------------------------------------------------------------   
   mainpll_inst : main_pll
     port map(inclk0 => hw_clk,
              c0 => clk);
@@ -128,8 +104,8 @@ end bdf_type;
 ///////////////////////////////////////////////////////////////////////////////
 
 ports(network) ::= <<
-<network.inputs: {port|<port(port, "in")>}; separator=";\n"><if(network.inputs && network.outputs)>;<endif>
-<network.outputs: {port|<port(port, "out")>}; separator=";\n">
+<if(network.inputs)><network.inputs: {port|<port(port, "in")>}; separator=";\n">;<endif>
+<if(network.outputs)><network.outputs: {port|<port(port, "out")>}; separator=";\n">;<endif>
 >>
 
 port(port, dir) ::= <<
@@ -257,7 +233,7 @@ assignFifo(connection) ::= <<
 <if(!connection.source.native && !connection.target.native)
 >fifo_<indexConnection(connection)> : tta_fifo
   port map(wrreq   =\> fifo_<indexConnection(connection)>_wrreq,
-           reset_n =\> system_reset_n,
+           reset_n =\> reset_n,
            clk     =\> clk,
            rdreq   =\> fifo_<indexConnection(connection)>_rdreq,
            data    =\> fifo_<indexConnection(connection)>_data,
@@ -274,7 +250,7 @@ assignInstance(instance) ::= <<
 <instance.id>_inst : processor_<instance.id>
   port map(clk          =\> clk,
            <assignPorts(instance)>
-           reset_n      =\> system_reset_n);
+           reset_n      =\> reset_n);
 >>
 
 assignPorts(instance) ::= <<

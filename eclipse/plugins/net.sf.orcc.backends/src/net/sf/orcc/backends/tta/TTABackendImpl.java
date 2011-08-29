@@ -76,7 +76,6 @@ public class TTABackendImpl extends AbstractBackend {
 	 */
 	private boolean debugMode;
 
-	private String tbPath;
 	private final Map<String, String> transformations;
 
 	/**
@@ -143,11 +142,16 @@ public class TTABackendImpl extends AbstractBackend {
 				"net/sf/orcc/backends/tta/TTA_actor.stg", !debugMode, true);
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
+		InstancePrinter tbPrinter = new InstancePrinter(
+				"net/sf/orcc/backends/tta/TTA_testbench.stg", !debugMode, true);
 
 		String instancePath = OrccUtil.createFolder(path, instance.getId());
 		if (!(instance.isActor() && instance.getActor().isNative())) {
 			printProcessor(instance, instancePath);
 		}
+		tbPrinter.print(instance.getId() + "_tb.vhd", instancePath, instance,
+				"instance");
+
 		return printer.print(instance.getId() + ".ll", instancePath, instance,
 				"instance");
 	}
@@ -161,19 +165,15 @@ public class TTABackendImpl extends AbstractBackend {
 				"net/sf/orcc/backends/tta/TTA_project.stg");
 		NetworkPrinter tclPrinter = new NetworkPrinter(
 				"net/sf/orcc/backends/tta/TTA_TCLLists.stg");
+		NetworkPrinter tbPrinter = new NetworkPrinter(
+				"net/sf/orcc/backends/tta/TTA_testbench.stg");
 		networkPrinter.print("top.vhd", path, network, "network");
 		scriptPrinter.print("informations.py", path, network, "script");
 		projectPrinter.print("top.qsf", path, network, "qsfNetwork");
 		projectPrinter.print("top.qpf", path, network, "qpfNetwork");
 		tclPrinter.print("top.tcl", path, network, "network");
+		tbPrinter.print("top_tb.vhd", path, network, "network");
 		OrccUtil.createFile(path, "__init__.py");
-
-		InstancePrinter instancePrinter = new InstancePrinter(
-				"net/sf/orcc/backends/tta/TTA_testbench.stg");
-		tbPath = OrccUtil.createFolder(path, "testbench");
-		Instance instance = new Instance(network.getName(), network.getName());
-		instance.setContents(network);
-		printTestbench(instancePrinter, instance);
 	}
 
 	private void printProcessor(Instance instance, String instancePath) {
@@ -190,18 +190,6 @@ public class TTABackendImpl extends AbstractBackend {
 		idfPrinter.print("processor_" + instance.getId() + ".idf",
 				instancePath, simpleTTA, "tta");
 
-	}
-
-	private void printTestbench(InstancePrinter printer, Instance instance) {
-		printer.print(instance.getId() + "_tb.vhd", tbPath, instance,
-				"instance");
-
-		if (instance.isNetwork()) {
-			Network network = instance.getNetwork();
-			for (Instance subInstance : network.getInstances()) {
-				printTestbench(printer, subInstance);
-			}
-		}
 	}
 
 }
