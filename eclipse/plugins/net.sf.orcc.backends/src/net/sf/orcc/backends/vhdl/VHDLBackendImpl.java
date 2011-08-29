@@ -186,7 +186,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		actorPrinter = new ActorPrinter(
-				"net/sf/orcc/backends/vhld/VHDL_actor.stg", !debugMode);
+				"net/sf/orcc/backends/vhdl/VHDL_actor.stg", !debugMode);
 		actorPrinter.setExpressionPrinter(new VHDLExpressionPrinter());
 		actorPrinter.setTypePrinter(new VHDLTypePrinter());
 
@@ -279,7 +279,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 	}
 
 	private void printTCL(Instance instance) {
-		Printer printer = new Printer("net/sf/orcc/backends/vhdl/VHDL_TCLLists");
+		Printer printer = new Printer(
+				"net/sf/orcc/backends/vhdl/VHDL_TCLLists.stg");
 
 		entities = new ArrayList<String>();
 		entitySet = new HashSet<String>();
