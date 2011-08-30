@@ -45,4 +45,6 @@ public class PreferenceConstants {
 
 	public static final String P_SOLVER_TYPE = "solverType";
 
+	public static final String P_VHDL_LIB = "vhdlLibraryPath";
+
 }

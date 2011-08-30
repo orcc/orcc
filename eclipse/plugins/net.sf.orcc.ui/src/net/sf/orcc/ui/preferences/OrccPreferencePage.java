@@ -33,10 +33,12 @@ import static net.sf.orcc.preferences.PreferenceConstants.P_JADE_TOOLBOX;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_OPTIONS;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_TYPE;
+import static net.sf.orcc.preferences.PreferenceConstants.P_VHDL_LIB;
 import net.sf.orcc.OrccActivator;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -68,6 +70,35 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 public class OrccPreferencePage extends FieldEditorPreferencePage implements
 		IWorkbenchPreferencePage {
 
+	private class SolverSelectionListener implements SelectionListener {
+
+		@Override
+		public void widgetDefaultSelected(SelectionEvent e) {
+		}
+
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			Widget widget = e.widget;
+			Button button = (Button) widget;
+			String text = button.getText();
+
+			updateMode = false;
+			if ("CVC3".equals(text)) {
+				// no model option because CVC3 does not know how to deal
+				// with arrays, and does not support (get-value)
+				textControl.setText("+lang smt2");
+			} else if ("Z3".equals(text)) {
+				if (Platform.OS_WIN32.equals(Platform.getOS())) {
+					textControl.setText("/smt2 /m");
+				} else {
+					textControl.setText("-smt2 -m");
+				}
+			}
+			updateMode = true;
+		}
+
+	};
+
 	private Composite radioComposite;
 
 	private Text textControl;
@@ -98,7 +129,18 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 		Composite parent = getFieldEditorParent();
 		parent.setLayout(new GridLayout(1, false));
 
-		// Jade group
+		createJadeFieldEditors(parent);
+		createSolverFieldEditors(parent);
+		createVHDLFieldEditors(parent);
+	}
+
+	/**
+	 * Creates field editors for the Jade preferences.
+	 * 
+	 * @param parent
+	 *            parent composite
+	 */
+	private void createJadeFieldEditors(Composite parent) {
 		Group group = new Group(parent, SWT.NONE);
 		group.setFont(getFont());
 		group.setLayout(new GridLayout(3, false));
@@ -108,9 +150,49 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 		addField(new FileFieldEditor(P_JADE, "Path of Jade executable:", group));
 		addField(new FileFieldEditor(P_JADE_TOOLBOX, "Path of Jade toolbox:",
 				group));
+	}
 
-		// solver group
-		group = new Group(parent, SWT.NONE);
+	/**
+	 * Creates a new solver selection listener, and add it to all children of
+	 * the radioComposite field. Also add a modify listener to the text control
+	 * field.
+	 */
+	private void createListeners() {
+		SelectionListener sel = new SolverSelectionListener();
+
+		final Control[] children = radioComposite.getChildren();
+		for (int i = 0; i < children.length; i++) {
+			Control child = children[i];
+			if (child instanceof Button) {
+				Button button = (Button) child;
+				button.addSelectionListener(sel);
+			}
+		}
+
+		updateMode = true;
+		textControl.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				if (updateMode) {
+					for (int i = 0; i < children.length - 1; i++) {
+						((Button) children[i]).setSelection(false);
+					}
+					((Button) children[children.length - 1]).setSelection(true);
+				}
+			}
+
+		});
+	}
+
+	/**
+	 * Creates field editors for the solver preferences.
+	 * 
+	 * @param parent
+	 *            parent composite
+	 */
+	private void createSolverFieldEditors(Composite parent) {
+		Group group = new Group(parent, SWT.NONE);
 		group.setFont(getFont());
 		group.setLayout(new GridLayout(3, false));
 		group.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
@@ -150,59 +232,21 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 		createListeners();
 	}
 
-	private void createListeners() {
-		SelectionListener sel = new SelectionListener() {
+	/**
+	 * Creates field editors for the VHDL preferences.
+	 * 
+	 * @param parent
+	 *            parent composite
+	 */
+	private void createVHDLFieldEditors(Composite parent) {
+		Group group = new Group(parent, SWT.NONE);
+		group.setFont(getFont());
+		group.setLayout(new GridLayout(3, false));
+		group.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+		group.setText("VHDL");
 
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				Widget widget = e.widget;
-				Button button = (Button) widget;
-				String text = button.getText();
-
-				updateMode = false;
-				if ("CVC3".equals(text)) {
-					// no model option because CVC3 does not know how to deal
-					// with arrays, and does not support (get-value)
-					textControl.setText("+lang smt2");
-				} else if ("Z3".equals(text)) {
-					if (Platform.OS_WIN32.equals(Platform.getOS())) {
-						textControl.setText("/smt2 /m");
-					} else {
-						textControl.setText("-smt2 -m");
-					}
-				}
-				updateMode = true;
-			}
-
-		};
-
-		final Control[] children = radioComposite.getChildren();
-		for (int i = 0; i < children.length; i++) {
-			Control child = children[i];
-			if (child instanceof Button) {
-				Button button = (Button) child;
-				button.addSelectionListener(sel);
-			}
-		}
-
-		updateMode = true;
-		textControl.addModifyListener(new ModifyListener() {
-
-			@Override
-			public void modifyText(ModifyEvent e) {
-				if (updateMode) {
-					for (int i = 0; i < children.length - 1; i++) {
-						((Button) children[i]).setSelection(false);
-					}
-					((Button) children[children.length - 1]).setSelection(true);
-				}
-			}
-
-		});
+		addField(new DirectoryFieldEditor(P_VHDL_LIB, "Path of VHDL library:",
+				group));
 	}
 
 	@Override
