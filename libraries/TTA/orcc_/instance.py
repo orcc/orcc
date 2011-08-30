@@ -94,7 +94,7 @@ class Instance:
         self.irom = self._readMif(self._mifFile)
         self.dram = self._readAdf(self._adfFile)
 
-    def generate(self, srcPath, buildPath, libPath, pylibPath, iromAddrMax, dramAddrMax):
+    def generate(self, srcPath, buildPath, libPath, iromAddrMax, dramAddrMax):
         srcPath = os.path.join(srcPath, self.id)
         sharePath = os.path.join(buildPath, "share")
         buildPath = os.path.join(buildPath, self.id)
