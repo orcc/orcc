@@ -29,7 +29,6 @@
  */
 package net.sf.orcc.backends.vhdl;
 
-import static java.lang.Integer.MAX_VALUE;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.TypeBool;
 import net.sf.orcc.ir.TypeInt;
@@ -86,7 +85,7 @@ public class VHDLTypePrinter extends TypePrinter {
 
 		// so we limit to 31-bit signed integers.
 		if (size >= 31) {
-			return "integer range " + MAX_VALUE + " downto -" + MAX_VALUE;
+			return "integer";
 		} else {
 			int bound = 1 << (size - 1);
 			return "integer range " + (bound - 1) + " downto -" + bound;
@@ -101,8 +100,12 @@ public class VHDLTypePrinter extends TypePrinter {
 	 */
 	private String printUint(int size) {
 		// we limit to 31-bit unsigned integers (see printInt)
-		int bound = (size >= 31) ? MAX_VALUE : (1 << size) - 1;
-		return "integer range " + bound + " downto 0";
+		if (size >= 31) {
+			return "integer";
+		} else {
+			int bound = 1 << size;
+			return "integer range " + (bound - 1) + " downto 0";
+		}
 	}
 
 }
