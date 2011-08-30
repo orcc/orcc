@@ -112,6 +112,8 @@ public class ExpressionPrinter extends IrSwitch<String> {
 
 	@Override
 	public String caseExprString(ExprString expr) {
+		// note the difference with the caseExprString method from the
+		// expression evaluator: quotes around the string
 		return '"' + String.valueOf(expr.getValue()) + '"';
 	}
 

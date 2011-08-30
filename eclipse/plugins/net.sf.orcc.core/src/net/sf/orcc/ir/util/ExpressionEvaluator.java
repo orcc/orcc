@@ -52,6 +52,7 @@ import org.eclipse.emf.ecore.EObject;
  * This class defines an expression evaluator.
  * 
  * @author Pierre-Laurent Lagalaye
+ * @author Matthieu Wipliez
  * 
  */
 public class ExpressionEvaluator extends IrSwitch<Object> {
@@ -133,6 +134,8 @@ public class ExpressionEvaluator extends IrSwitch<Object> {
 
 	@Override
 	public Object caseExprString(ExprString expr) {
+		// note the difference with the caseExprString method from the
+		// expression printer: here we return the string without quotes
 		return expr.getValue();
 	}
 
