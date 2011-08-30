@@ -66,6 +66,29 @@ import org.stringtemplate.v4.STGroupFile;
 public class OrccUtil {
 
 	/**
+	 * Creates a new file if needed and returns its path
+	 * 
+	 * @param path
+	 *            the path of the file
+	 * @param fileName
+	 *            the name of the file
+	 * @return the full path to the file
+	 */
+	public static String createFile(String path, String fileName) {
+		// checks output folder exists, and if not creates it
+		String newPath = path + File.separator + fileName;
+		File file = new File(newPath);
+		if (!file.exists()) {
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return newPath;
+	}
+
+	/**
 	 * If it does not exist, creates the given folder. If the parent folders do
 	 * not exist either, create them.
 	 * 
@@ -110,6 +133,25 @@ public class OrccUtil {
 				folder.create(true, true, null);
 			}
 		}
+	}
+
+	/**
+	 * Creates a new folder if needed and returns its path
+	 * 
+	 * @param path
+	 *            the path of the folder
+	 * @param fileName
+	 *            the name of the folder
+	 * @return the full path to the folder
+	 */
+	public static String createFolder(String path, String folderName) {
+		// checks output folder exists, and if not creates it
+		String newPath = path + File.separator + folderName;
+		File folder = new File(newPath);
+		if (!folder.exists()) {
+			folder.mkdir();
+		}
+		return newPath;
 	}
 
 	private static void findFiles(String fileExt, List<IFile> vtlFiles,
@@ -379,6 +421,31 @@ public class OrccUtil {
 	}
 
 	/**
+	 * Returns the qualified package of the given file, i.e. qualified.name.of
+	 * for <code>/project/sourceFolder/qualified/name/of/File.fileExt</code>
+	 * 
+	 * @param file
+	 *            a file
+	 * @return a qualified name, or <code>null</code> if the file is not in a
+	 *         source folder
+	 */
+	public static String getQualifiedPackage(IFile file) {
+		IProject project = file.getProject();
+		IPath filePath = file.getFullPath();
+		for (IFolder folder : getSourceFolders(project)) {
+			IPath folderPath = folder.getFullPath();
+			if (folderPath.isPrefixOf(filePath)) {
+				// yay we found the folder!
+				IPath qualifiedPath = filePath.removeFirstSegments(
+						folderPath.segmentCount()).removeLastSegments(1);
+				return qualifiedPath.toString().replace('/', '.');
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Returns the list of source folders of the given project as a list of
 	 * absolute workspace paths.
 	 * 
@@ -520,48 +587,6 @@ public class OrccUtil {
 		}
 
 		return builder.toString();
-	}
-
-	/**
-	 * Creates a new file if needed and returns its path
-	 * 
-	 * @param path
-	 *            the path of the file
-	 * @param fileName
-	 *            the name of the file
-	 * @return the full path to the file
-	 */
-	public static String createFile(String path, String fileName) {
-		// checks output folder exists, and if not creates it
-		String newPath = path + File.separator + fileName;
-		File file = new File(newPath);
-		if (!file.exists()) {
-			try {
-				file.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return newPath;
-	}
-
-	/**
-	 * Creates a new folder if needed and returns its path
-	 * 
-	 * @param path
-	 *            the path of the folder
-	 * @param fileName
-	 *            the name of the folder
-	 * @return the full path to the folder
-	 */
-	public static String createFolder(String path, String folderName) {
-		// checks output folder exists, and if not creates it
-		String newPath = path + File.separator + folderName;
-		File folder = new File(newPath);
-		if (!folder.exists()) {
-			folder.mkdir();
-		}
-		return newPath;
 	}
 
 }
