@@ -175,7 +175,7 @@ AstAction:
 	'end';
 
 AstInitialize returns AstAction:
-	{AstInitialize}
+	{AstAction}
 
 	(tag=AstTag ':')?
 	'initialize'
