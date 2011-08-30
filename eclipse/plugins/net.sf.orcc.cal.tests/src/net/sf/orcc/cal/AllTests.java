@@ -48,13 +48,37 @@ public class AllTests {
 	}
 
 	@Test
-	public void checkExpectedFails() throws Exception {
-		String[] tests = new String[] { "Param", "Pattern1", "Pattern2",
-				"TypeCheck" };
-		for (String test : tests) {
-			Assert.assertNull("expected parsing/validation to fail",
-					parseAndValidate(prefix + "xfail/" + test + ".cal"));
-		}
+	public void checkParam() throws Exception {
+		Assert.assertNull(
+				"assignment to an actor parameter must not be allowed",
+				parseAndValidate(prefix + "xfail/Param.cal"));
+	}
+
+	@Test
+	public void checkPattern1() throws Exception {
+		Assert.assertNull(
+				"reference to an output port in an input pattern must not be allowed",
+				parseAndValidate(prefix + "xfail/Pattern1.cal"));
+	}
+
+	@Test
+	public void checkPattern2() throws Exception {
+		Assert.assertNull("an input pattern cannot contain expressions",
+				parseAndValidate(prefix + "xfail/Pattern2.cal"));
+	}
+
+	@Test
+	public void checkPattern3() throws Exception {
+		Assert.assertNull(
+				"combining Pattern1 and Pattern2 must be invalid code",
+				parseAndValidate(prefix + "xfail/Pattern3.cal"));
+	}
+
+	@Test
+	public void checkTypeCheck() throws Exception {
+		Assert.assertNull(
+				"passing a list in lieu of a scalar must raise a type error",
+				parseAndValidate(prefix + "xfail/TypeCheck.cal"));
 	}
 
 	@Test
