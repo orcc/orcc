@@ -180,7 +180,7 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	public IScope scope_AstInputPattern_port(AstAction action,
 			EReference reference) {
 		AstActor actor = (AstActor) action.eContainer();
-		return Scopes.scopeFor(actor.getInputs(), getScope(actor, reference));
+		return Scopes.scopeFor(actor.getInputs());
 	}
 
 	/**
@@ -195,7 +195,7 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	public IScope scope_AstOutputPattern_port(AstAction action,
 			EReference reference) {
 		AstActor actor = (AstActor) action.eContainer();
-		return Scopes.scopeFor(actor.getOutputs(), getScope(actor, reference));
+		return Scopes.scopeFor(actor.getOutputs());
 	}
 
 	/**
