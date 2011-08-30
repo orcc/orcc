@@ -29,6 +29,7 @@ ${orcc_SOURCE_DIR}/orcc/src/orcc_util.c
 ${orcc_SOURCE_DIR}/orcc/src/thread.c
 ${orcc_SOURCE_DIR}/orcc/src/genetic.c
 ${orcc_SOURCE_DIR}/orcc/src/accessFile.c
+${orcc_SOURCE_DIR}/orcc/src/fpsPrint.c
 )
 
 # Roxml library
