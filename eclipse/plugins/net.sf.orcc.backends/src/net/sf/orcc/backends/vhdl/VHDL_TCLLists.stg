@@ -4,7 +4,7 @@ vcom -93 -reportprogress 30 -work work $Design/<entity>.vhd
 
 TCLLists(name, entities, options) ::= <<
 # Generated from <name>
-set SRC "../../../libraries/VHDL/src"
+set SRC "<options.vhdlLibraryPath>/src"
 set Design "../src/Design"
 set Testbench "../src/Testbench"
 

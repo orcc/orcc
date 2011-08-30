@@ -30,6 +30,7 @@
 package net.sf.orcc.backends.vhdl;
 
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
+import static net.sf.orcc.preferences.PreferenceConstants.P_VHDL_LIB;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import net.sf.orcc.OrccActivator;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.ActorPrinter;
@@ -289,6 +291,13 @@ public class VHDLBackendImpl extends AbstractBackend {
 		printer.getCustomAttributes().put("name",
 				instance.getNetwork().getName());
 		printer.getCustomAttributes().put("entities", entities);
+
+		String lib = OrccActivator.getDefault().getPreference(P_VHDL_LIB, "");
+		if (lib == null || lib.isEmpty()) {
+			write("Warning: The path to VHDL libraries is not set!\n"
+					+ "Go to Window > Preferences > Orcc to edit them.\n");
+		}
+		printer.getOptions().put("vhdlLibraryPath", lib);
 
 		printer.print("TCLLists.tcl", path, "TCLLists");
 	}
