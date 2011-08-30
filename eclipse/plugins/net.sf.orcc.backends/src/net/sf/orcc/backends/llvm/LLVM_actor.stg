@@ -529,7 +529,7 @@ printList(constant, type) ::= <<
 >>
 
 printString(constant) ::= <<
-c"<constant>"
+c<constant>
 >>
 
 

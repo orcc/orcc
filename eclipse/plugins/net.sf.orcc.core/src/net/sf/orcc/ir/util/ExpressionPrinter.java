@@ -112,7 +112,7 @@ public class ExpressionPrinter extends IrSwitch<String> {
 
 	@Override
 	public String caseExprString(ExprString expr) {
-		return String.valueOf(expr.getValue());
+		return '"' + String.valueOf(expr.getValue()) + '"';
 	}
 
 	@Override
@@ -147,7 +147,7 @@ public class ExpressionPrinter extends IrSwitch<String> {
 		branch = oldBranch;
 		return result;
 	}
-	
+
 	/**
 	 * Returns the string representation of the given binary operator.
 	 * 

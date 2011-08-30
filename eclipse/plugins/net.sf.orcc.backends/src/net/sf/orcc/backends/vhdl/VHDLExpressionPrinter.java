@@ -34,7 +34,6 @@ import java.util.Iterator;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprList;
-import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
@@ -233,11 +232,6 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 
 		builder.append(')');
 		return builder.toString();
-	}
-
-	@Override
-	public String caseExprString(ExprString expr) {
-		return '"' + expr.getValue() + '"';
 	}
 
 	@Override

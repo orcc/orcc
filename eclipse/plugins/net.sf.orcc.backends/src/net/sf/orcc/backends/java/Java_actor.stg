@@ -107,7 +107,7 @@ private <variableDeclarationInit(variable)>;
 
 printParameter(parameter) ::= <<
 <if (parameter.stringExpr)
->"<parameter>"<
+><parameter><
 else
 ><Constant(parameter)><
 endif>

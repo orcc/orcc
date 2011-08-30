@@ -52,7 +52,7 @@ printList(constant) ::= <<
 >>
 
 printString(constant) ::= <<
-"<constant>"
+<constant>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -64,17 +64,9 @@ printAssign(assign) ::= <<
 <assign.target.variable.indexedName> = <assign.value>;
 >>
 
-printParameter(parameter)::= <<
-<if (parameter.stringExpr)
->"<parameter>"<
-else
-><parameter><
-endif>
->>
-
 printCall(call) ::= <<
 
-<if(call.print)>std::cout \<\< <call.parameters: printParameter(); separator=" << ">;<
+<if(call.print)>std::cout \<\< <call.parameters: {parameter|<parameter>}; separator=" << ">;<
 else
 ><if(call.target)><call.target.variable.indexedName> = <endif><call.procedure.name>(<call.parameters; separator=", ">);<
 endif>

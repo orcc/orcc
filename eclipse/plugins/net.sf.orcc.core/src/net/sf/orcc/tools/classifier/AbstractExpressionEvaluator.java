@@ -53,8 +53,8 @@ public class AbstractExpressionEvaluator extends ExpressionEvaluator {
 		// only throws an exception if we are in schedulable mode and the result
 		// is null
 		if (schedulableMode && result == null) {
-			throw new OrccRuntimeException("Expression \""
-					+ new ExpressionPrinter().doSwitch(expr) + "\" is null");
+			throw new OrccRuntimeException("Expression '"
+					+ new ExpressionPrinter().doSwitch(expr) + "' is null");
 		}
 		return result;
 	}
@@ -65,8 +65,8 @@ public class AbstractExpressionEvaluator extends ExpressionEvaluator {
 		Object result = interpretUnaryExpr(expr.getOp(), value);
 
 		if (schedulableMode && value == null) {
-			throw new OrccRuntimeException("Expression \""
-					+ new ExpressionPrinter().doSwitch(expr) + "\" is null");
+			throw new OrccRuntimeException("Expression '"
+					+ new ExpressionPrinter().doSwitch(expr) + "' is null");
 		}
 		return result;
 	}
