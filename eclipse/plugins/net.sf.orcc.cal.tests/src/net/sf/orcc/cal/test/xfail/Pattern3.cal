@@ -1,3 +1,5 @@
+package net.sf.orcc.cal.test.xfail;
+
 actor Pattern3() int I ==> int O :
 
     action O:[42] ==>

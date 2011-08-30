@@ -1,3 +1,5 @@
+package net.sf.orcc.cal.test.pass;
+
 actor InitializePattern() int I ==> int O :
 
     initialize ==> O:[42]

@@ -1,3 +1,5 @@
+package net.sf.orcc.cal.test.pass;
+
 actor TypeInt() ==> :
 
 	int(size=5) x := 7;
