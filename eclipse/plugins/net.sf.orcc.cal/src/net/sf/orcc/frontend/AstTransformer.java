@@ -784,7 +784,8 @@ public class AstTransformer {
 					InstLoad load = (InstLoad) instruction;
 					load = IrFactory.eINSTANCE.createInstLoad(load
 							.getLineNumber(), load.getTarget().getVariable(),
-							load.getSource().getVariable(), load.getIndexes());
+							load.getSource().getVariable(),
+							(List<Expression>) IrUtil.copy(load.getIndexes()));
 					procedure.getLast(nodes).add(load);
 				}
 			}
