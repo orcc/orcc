@@ -642,5 +642,11 @@
             </instanceof>
          </enablement>
       </moveParticipant>
+      <moveParticipant
+            class="net.sf.orcc.ui.refactoring.CalMoveParticipant"
+            id="net.sf.orcc.ui.calMoveParticipant"
+            name="Cal move participant">
+         <enablement></enablement>
+      </moveParticipant>
    </extension>
 </plugin>
