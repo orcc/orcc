@@ -58,11 +58,16 @@ public class AllTests {
 		outputFolder = root.getFolder(new Path("/net.sf.orcc.cal.tests/bin"));
 	}
 
-	@Test
-	public void checkExecWhile() throws Exception {
-		assertExecution("idx is 60", prefix + "pass/CodegenWhile.cal");
-	}
-
+	/**
+	 * Parses, validates, compiles, and interprets the actor defined in the file
+	 * whose name is given. Then matches the output of the interpreter with the
+	 * <code>expected</code> string.
+	 * 
+	 * @param expected
+	 *            expected output
+	 * @param name
+	 *            name of a .cal file that contains an entity
+	 */
 	private void assertExecution(String expected, String name) {
 		Entity entity = generateCode(name);
 		Assert.assertNotNull("expected parsing, validation, and code "
@@ -73,8 +78,8 @@ public class AllTests {
 		interpreter.schedule();
 
 		String output = interpreter.getOutput();
-		Assert.assertEquals("expected " + expected + ", got " + output, output,
-				expected);
+		Assert.assertEquals("expected " + expected + ", got " + output,
+				expected, output);
 	}
 
 	@Test
@@ -134,6 +139,16 @@ public class AllTests {
 		type = Util.getType(y.getValue());
 		Assert.assertTrue("type of value of y should be int(size=6)",
 				EcoreUtil.equals(type, IrFactory.eINSTANCE.createTypeInt(6)));
+	}
+
+	@Test
+	public void execShadow() throws Exception {
+		assertExecution("x = 0", prefix + "pass/Shadowing.cal");
+	}
+
+	@Test
+	public void execWhile() throws Exception {
+		assertExecution("idx is 60", prefix + "pass/CodegenWhile.cal");
 	}
 
 	/**

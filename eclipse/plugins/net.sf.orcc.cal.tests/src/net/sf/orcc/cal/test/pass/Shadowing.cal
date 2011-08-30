@@ -1,0 +1,23 @@
+actor Shadowing() ==> :
+
+ 	uint(size=16) x;
+
+  	procedure p()
+  	begin
+		x := x - 2;
+  	end
+ 
+  	procedure q()
+  	begin
+  		x := x - 1;
+		p();
+		x := x - 1;
+    end
+
+	initialize ==> do
+		x := 4;
+		q();
+		print("x = " + x);
+	end
+
+end
