@@ -40,7 +40,7 @@ from orcc_ import *
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hcsgx:v", ["help", "verbose", "compile", "simulate", "generate"])
+        opts, args = getopt.getopt(sys.argv[1:], "hcsgx:v", ["help", "verbose", "compile", "simulate", "generate", "clean"])
     except getopt.GetoptError, err:
         print str(err)
         usage()
@@ -49,10 +49,17 @@ def main():
     for o, a in opts:
         if o in ("-v", "--verbose"):
             verbose = True
-        elif o in ("-h", "--help"):
+        if o in ("-h", "--help"):
             usage()
             sys.exit()
-
+        if o in ("--clean"):
+            clean()
+            sys.exit()
+            
+    # Import list of instances
+    import_string = "from generated.informations import instances"
+    exec(import_string)
+            
     for o, a in opts:
         if o in ("-c", "--compile"):
             compile()
@@ -75,8 +82,27 @@ def usage():
     print "-c, --compile  \t Compile the application from the generated LLVM assembly code into TTA binary"
     print "-g, --generate \t Generate the VHDL files of the TTA processors"
     print "-s, --simulate \t Simulate the generated code with the TCE simulator (FIFO traces have to be in 'generated/trace' directory)"
+    print "--clean \t Clean source directory ('generated') and build directory ('build-generated')"
 
 
+def clean():
+    for obj in os.listdir(srcPath):
+        obj_path = os.path.join(srcPath, obj)
+        print obj
+        if os.path.isfile(obj_path):
+            os.remove(obj_path)
+        elif obj != ".svn":
+            shutil.rmtree(obj_path, ignore_errors=True)
+    print "-- Source directory is cleaned."
+    for obj in os.listdir(buildPath):
+        print obj
+        obj_path = os.path.join(buildPath, obj)
+        if os.path.isfile(obj_path):
+            os.remove(obj_path)
+        elif obj != ".svn":
+            shutil.rmtree(obj_path, ignore_errors=True)
+    print "-- Build directory is cleaned."
+    
 
 def compile():
     start = time.time()
@@ -151,9 +177,5 @@ pylibPath = os.path.join(scriptPath, "orcc_")
 
 # Add orcc_ to python path
 sys.path.append(pylibPath)
-
-# Import list of instances
-import_string = "from generated.informations import instances"
-exec(import_string)
 
 main()
