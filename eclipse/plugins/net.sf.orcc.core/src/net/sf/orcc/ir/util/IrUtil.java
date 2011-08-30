@@ -51,6 +51,7 @@ import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -310,6 +311,12 @@ public class IrUtil {
 	 */
 	public static boolean serializeActor(ResourceSet set, IFolder outputFolder,
 			Entity entity) {
+		try {
+			OrccUtil.createFolder(outputFolder);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+
 		URI uri = URI.createPlatformResourceURI(outputFolder.getFullPath()
 				.append(OrccUtil.getFile(entity)).addFileExtension("ir")
 				.toString(), true);

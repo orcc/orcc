@@ -85,8 +85,19 @@ public class OrccUtil {
 					+ "must have at least two segments");
 		}
 
-		// check the first folder
+		// check project
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		IProject project = root.getProject(path.segment(0));
+		if (!project.exists()) {
+			project.create(null);
+		}
+
+		// open project
+		if (!project.isOpen()) {
+			project.open(null);
+		}
+
+		// check folder
 		folder = root.getFolder(path.uptoSegment(2));
 		if (!folder.exists()) {
 			folder.create(true, true, null);
