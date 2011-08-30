@@ -1,0 +1,20 @@
+package net.sf.orcc.cal.test.pass;
+
+actor CodegenWhile() ==> :
+
+	procedure proc()
+	begin
+		int idx := 0;
+		int table[256] = [ i - 18 : for int i in 0 .. 255 ];
+		while idx < #table and table[idx] != 42 do
+			idx := idx + 1;
+		end
+		print("idx is " + idx);
+	end
+
+	action ==>
+	do
+		proc();
+	end
+
+end

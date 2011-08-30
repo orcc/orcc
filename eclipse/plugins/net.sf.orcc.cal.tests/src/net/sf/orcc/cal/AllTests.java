@@ -4,13 +4,19 @@ import java.io.InputStream;
 import java.util.List;
 
 import junit.framework.Assert;
-
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.util.Util;
+import net.sf.orcc.frontend.Frontend;
+import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
 
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
@@ -34,17 +40,47 @@ import com.google.inject.Inject;
 @InjectWith(CalInjectorProvider.class)
 public class AllTests {
 
+	private static final String prefix = "net/sf/orcc/cal/test/";
+
+	private IFolder outputFolder;
+
 	@Inject
 	private ParseHelper<AstEntity> parser;
 
 	private XtextResourceSet resourceSet;
 
-	private static final String prefix = "net/sf/orcc/cal/test/";
-
 	public AllTests() {
 		resourceSet = new XtextResourceSet();
 		resourceSet.addLoadOption(XtextResource.OPTION_RESOLVE_ALL,
 				Boolean.TRUE);
+
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		outputFolder = root.getFolder(new Path("/net.sf.orcc.cal.tests/bin"));
+	}
+
+	@Test
+	public void checkExecWhile() throws Exception {
+		assertExecution("idx is 60", prefix + "pass/CodegenWhile.cal");
+	}
+
+	private void assertExecution(String expected, String name) {
+		Entity entity = generateCode(name);
+		Assert.assertNotNull("expected parsing, validation, and code "
+				+ "generation to be correct for " + name, entity);
+
+		TestInterpreter interpreter = new TestInterpreter((Actor) entity, null);
+		interpreter.initialize();
+		interpreter.schedule();
+
+		String output = interpreter.getOutput();
+		Assert.assertEquals("expected " + expected + ", got " + output, output,
+				expected);
+	}
+
+	@Test
+	public void checkInitialize() throws Exception {
+		Assert.assertNotNull("expected correct actor with initialize action",
+				parseAndValidate(prefix + "pass/InitializePattern.cal"));
 	}
 
 	@Test
@@ -82,12 +118,6 @@ public class AllTests {
 	}
 
 	@Test
-	public void checkInitialize() throws Exception {
-		Assert.assertNotNull("expected correct actor with initialize action",
-				parseAndValidate(prefix + "pass/InitializePattern.cal"));
-	}
-
-	@Test
 	public void checkTypeInt() throws Exception {
 		AstEntity entity = parseAndValidate(prefix + "pass/TypeInt.cal");
 		List<AstVariable> stateVars = entity.getActor().getStateVariables();
@@ -106,6 +136,33 @@ public class AllTests {
 				EcoreUtil.equals(type, IrFactory.eINSTANCE.createTypeInt(6)));
 	}
 
+	/**
+	 * Parses, validates, and generates code for the entity defined in the file
+	 * whose name is given.
+	 * 
+	 * @param name
+	 *            name of a .cal file that contains an entity
+	 * @return an IR entity if the file could be parsed, validated, and
+	 *         translated to IR, otherwise <code>null</code>
+	 */
+	private Entity generateCode(String name) {
+		AstEntity entity = parseAndValidate(name);
+		if (entity == null) {
+			return null;
+		}
+
+		Frontend frontend = new Frontend(outputFolder);
+		return frontend.compile(entity);
+	}
+
+	/**
+	 * Parses and validates the entity defined in the file whose name is given.
+	 * 
+	 * @param name
+	 *            name of a .cal file that contains an entity
+	 * @return an AST entity if the file could be parsed and validated,
+	 *         otherwise <code>null</code>
+	 */
 	private AstEntity parseAndValidate(String name) {
 		InputStream in = Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream(name);
