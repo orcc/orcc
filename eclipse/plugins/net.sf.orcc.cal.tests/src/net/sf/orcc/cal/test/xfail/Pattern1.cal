@@ -1,0 +1,6 @@
+actor Pattern1() int I ==> int O :
+
+    action O:[o] ==>
+    end
+
+end

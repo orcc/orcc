@@ -1,0 +1,6 @@
+actor InitializePattern() int I ==> int O :
+
+    initialize ==> O:[42]
+    end
+
+end

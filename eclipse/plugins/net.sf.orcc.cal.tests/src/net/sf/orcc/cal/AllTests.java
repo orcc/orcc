@@ -49,12 +49,18 @@ public class AllTests {
 
 	@Test
 	public void checkExpectedFails() throws Exception {
-		String[] tests = new String[] { prefix + "xfail/Param.cal",
-				prefix + "xfail/TypeCheck.cal" };
+		String[] tests = new String[] { "Param", "Pattern1", "Pattern2",
+				"TypeCheck" };
 		for (String test : tests) {
 			Assert.assertNull("expected parsing/validation to fail",
-					parseAndValidate(test));
+					parseAndValidate(prefix + "xfail/" + test + ".cal"));
 		}
+	}
+
+	@Test
+	public void checkInitialize() throws Exception {
+		Assert.assertNotNull("expected correct actor with initialize action",
+				parseAndValidate(prefix + "pass/InitializePattern.cal"));
 	}
 
 	@Test
