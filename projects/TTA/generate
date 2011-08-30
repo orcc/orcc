@@ -36,7 +36,6 @@ import time
 import getopt
 import shutil
 import stat
-from orcc_ import *
 
 def main():
     try:
@@ -47,22 +46,22 @@ def main():
         sys.exit(2)
 
     for o, a in opts:
+        #print o, a
         if o in ("-v", "--verbose"):
             verbose = True
         if o in ("-h", "--help"):
             usage()
             sys.exit()
-        if o in ("--clean"):
+        if o == "--clean":
             clean()
             sys.exit()
             
-    # Import list of instances
-    import_string = "from generated.informations import instances"
-    exec(import_string)
-            
     for o, a in opts:
         if o in ("-c", "--compile"):
-            compile()
+            try:
+                compile()
+            except NameError:
+                print "Error: Did you generate the application from Orcc ?"
 
     for o, a in opts:
         if o in ("-s", "--simulate"):
@@ -88,14 +87,12 @@ def usage():
 def clean():
     for obj in os.listdir(srcPath):
         obj_path = os.path.join(srcPath, obj)
-        print obj
         if os.path.isfile(obj_path):
             os.remove(obj_path)
         elif obj != ".svn":
             shutil.rmtree(obj_path, ignore_errors=True)
     print "-- Source directory is cleaned."
     for obj in os.listdir(buildPath):
-        print obj
         obj_path = os.path.join(buildPath, obj)
         if os.path.isfile(obj_path):
             os.remove(obj_path)
@@ -167,15 +164,19 @@ def generate():
     print "* Generation of %d instances done in %f seconds." % (len(instances), time.time() - start)
 
 
+
 # Get useful path
 pathname = os.path.dirname(sys.argv[0])
 scriptPath = os.path.abspath(pathname)
 srcPath = os.path.join(scriptPath, "generated")
 buildPath = os.path.join(scriptPath, "build-generated")
 libPath = os.path.join(os.path.dirname(os.path.dirname(scriptPath)), "libraries", "TTA")
-pylibPath = os.path.join(scriptPath, "orcc_")
+pylibPath = os.path.join(libPath, "orcc")
 
-# Add orcc_ to python path
-sys.path.append(pylibPath)
+sys.path.insert(0, libPath)
+from orcc_ import *
+from generated.informations import instances
 
 main()
+
+
