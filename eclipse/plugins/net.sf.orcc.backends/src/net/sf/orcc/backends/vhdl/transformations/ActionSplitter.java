@@ -1,6 +1,8 @@
 /*
  * Copyright (c) 2011, IETR/INSA of Rennes
- * All rights reserved.
+ * All rights re
+import net.sf.orcc.util.EcoreHelper;
+served.
  * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -56,6 +58,7 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.jgrapht.DirectedGraph;
@@ -92,7 +95,7 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 		@Override
 		public Object caseInstruction(Instruction instruction) {
 			NodeBlock block = instruction.getBlock();
-			for (Def def : IrUtil.getObjects(instruction, Def.class)) {
+			for (Def def : EcoreHelper.getObjects(instruction, Def.class)) {
 				Var var = def.getVariable();
 				if (var.isLocal() && !var.getType().isList()) {
 					if (instruction.isAssign()) {

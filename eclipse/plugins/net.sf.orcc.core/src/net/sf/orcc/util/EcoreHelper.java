@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.util;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -36,6 +37,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -114,6 +116,54 @@ public class EcoreHelper {
 		IPath path = new Path(fullPath);
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		return root.getFile(path);
+	}
+
+	/**
+	 * Returns an Iterable that contains an iterator that filters descendants of
+	 * the given object that match the given class (or one of its subclasses).
+	 * 
+	 * @param eObject
+	 *            an object
+	 * @param cls
+	 *            class of the descendants to match
+	 * @return an Iterable
+	 */
+	public static <T> Iterable<T> getObjects(EObject eObject, final Class<T> cls) {
+		final TreeIterator<EObject> it = eObject.eAllContents();
+		return new Iterable<T>() {
+
+			@Override
+			public Iterator<T> iterator() {
+				return new Iterator<T>() {
+
+					private EObject nextObject;
+
+					@Override
+					public boolean hasNext() {
+						while (it.hasNext()) {
+							EObject next = it.next();
+							if (cls.isAssignableFrom(next.getClass())) {
+								nextObject = next;
+								return true;
+							}
+						}
+						return false;
+					}
+
+					@Override
+					@SuppressWarnings("unchecked")
+					public T next() {
+						return (T) nextObject;
+					}
+
+					@Override
+					public void remove() {
+						it.remove();
+					}
+				};
+			}
+
+		};
 	}
 
 }

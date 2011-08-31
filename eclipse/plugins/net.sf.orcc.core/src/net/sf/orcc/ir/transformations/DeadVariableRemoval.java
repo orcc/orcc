@@ -61,32 +61,6 @@ public class DeadVariableRemoval extends AbstractActorVisitor<Object> {
 
 	private List<Var> unusedLocals;
 
-	protected void handleInstruction(Var target, Instruction instruction) {
-		// do not remove assign to variables of patterns
-		if (target.eContainmentFeature() == IrPackage.eINSTANCE
-				.getPattern_Variables()) {
-			return;
-		}
-
-		for (Use use : IrUtil.getObjects(instruction, Use.class)) {
-			for (Def def : use.getVariable().getDefs()) {
-				Instruction instDef = EcoreHelper.getContainerOfType(def,
-						Instruction.class);
-				if (instDef != null) {
-					instructionsToVisit.add(instDef);
-				}
-			}
-		}
-
-		// remove instruction
-		IrUtil.delete(instruction);
-
-		// adds target to list of to-be-removed variables
-		unusedLocals.add(target);
-		changed = true;
-		indexInst--;
-	}
-
 	@Override
 	public Object caseInstAssign(InstAssign assign) {
 		Var target = assign.getTarget().getVariable();
@@ -176,6 +150,32 @@ public class DeadVariableRemoval extends AbstractActorVisitor<Object> {
 		}
 
 		return null;
+	}
+
+	protected void handleInstruction(Var target, Instruction instruction) {
+		// do not remove assign to variables of patterns
+		if (target.eContainmentFeature() == IrPackage.eINSTANCE
+				.getPattern_Variables()) {
+			return;
+		}
+
+		for (Use use : EcoreHelper.getObjects(instruction, Use.class)) {
+			for (Def def : use.getVariable().getDefs()) {
+				Instruction instDef = EcoreHelper.getContainerOfType(def,
+						Instruction.class);
+				if (instDef != null) {
+					instructionsToVisit.add(instDef);
+				}
+			}
+		}
+
+		// remove instruction
+		IrUtil.delete(instruction);
+
+		// adds target to list of to-be-removed variables
+		unusedLocals.add(target);
+		changed = true;
+		indexInst--;
 	}
 
 }

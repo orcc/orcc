@@ -31,7 +31,6 @@ package net.sf.orcc.ir.util;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -242,44 +241,6 @@ public class IrUtil {
 				.getFullPath().toString(), true), true);
 		Actor actor = (Actor) resource.getContents().get(0);
 		return actor;
-	}
-
-	public static <T> Iterable<T> getObjects(EObject eObject, final Class<T> cls) {
-		final TreeIterator<EObject> it = eObject.eAllContents();
-		return new Iterable<T>() {
-
-			@Override
-			public Iterator<T> iterator() {
-				return new Iterator<T>() {
-
-					private EObject nextObject;
-
-					@Override
-					public boolean hasNext() {
-						while (it.hasNext()) {
-							EObject next = it.next();
-							if (cls.isAssignableFrom(next.getClass())) {
-								nextObject = next;
-								return true;
-							}
-						}
-						return false;
-					}
-
-					@Override
-					@SuppressWarnings("unchecked")
-					public T next() {
-						return (T) nextObject;
-					}
-
-					@Override
-					public void remove() {
-						it.remove();
-					}
-				};
-			}
-
-		};
 	}
 
 	private static boolean isWhileJoinNode(Node node) {
