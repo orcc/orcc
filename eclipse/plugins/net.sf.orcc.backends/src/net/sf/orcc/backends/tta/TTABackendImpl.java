@@ -94,7 +94,7 @@ public class TTABackendImpl extends AbstractBackend {
 
 	@Override
 	public void doInitializeOptions() {
-		debugMode = getAttribute(DEBUG_MODE, false);
+		debugMode = getAttribute(DEBUG_MODE, true);
 	}
 
 	@Override
