@@ -466,7 +466,7 @@ begin
   --
   -- Test the action's inputs to fire (or not) an action  
   <actor.actions : {action|<action.name>_go \<= '0';}; separator="\n">
-  <actor.inputs :{port|<port.name>_ack \<= '0';}; separator="\n">  
+  <actor.inputs :{port|<if(!port.native)><port.name>_ack \<= '0';<endif>}; separator="\n">  
 <if(actor.fsm)    
 >  <printActionFireFSM(actions=actor.actionsOutsideFsm, fsm=actor.fsm)><
 else  

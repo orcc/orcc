@@ -205,17 +205,21 @@ printInputs(connection, portPredMap, srcVertex) ::= <<
 <else
 ><connection.target.name>_data     =\> <instance.id>_<connection.target.name>_data,
 <endif>
-<endif>
-<connection.target.name>_send     =\> <instance.id>_<connection.target.name>_send,
+<endif><
+if(!connection.target.native)
+><connection.target.name>_send     =\> <instance.id>_<connection.target.name>_send,
 <connection.target.name>_ack      =\> <instance.id>_<connection.target.name>_ack,<
+endif><
 else
 ><if(instance.broadcast && connection.target.type.bool)
 ><connection.target.name>_data(0)  =\> <srcVertex.port.name>_data,
 <else
 ><connection.target.name>_data     =\> <srcVertex.port.name>_data,
-<endif>
-<connection.target.name>_send     =\> <srcVertex.port.name>_send,
+<endif><
+if(!connection.target.native)
+><connection.target.name>_send     =\> <srcVertex.port.name>_send,
 <connection.target.name>_ack      =\> <srcVertex.port.name>_ack,<
+endif><
 endif>
 >>
 
