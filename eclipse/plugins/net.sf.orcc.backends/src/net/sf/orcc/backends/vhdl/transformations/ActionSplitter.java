@@ -30,7 +30,6 @@ package net.sf.orcc.backends.vhdl.transformations;
 
 import static net.sf.orcc.ir.IrFactory.eINSTANCE;
 import static net.sf.orcc.ir.util.IrUtil.copy;
-import static net.sf.orcc.ir.util.IrUtil.getObjects;
 import static net.sf.orcc.util.EcoreHelper.getContainerOfType;
 import static org.eclipse.emf.ecore.util.EcoreUtil.isAncestor;
 
@@ -59,7 +58,6 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
-import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.jgrapht.DirectedGraph;
@@ -72,6 +70,97 @@ import org.jgrapht.DirectedGraph;
  * 
  */
 public class ActionSplitter extends AbstractActorVisitor<Object> {
+
+	private class UseUpdater extends AbstractActorVisitor<Object> {
+
+		public UseUpdater() {
+			this.actor = ActionSplitter.this.actor;
+		}
+
+		@Override
+		public Object caseInstLoad(InstLoad load) {
+			if (load.getIndexes().isEmpty()) {
+				// gets source, target of this load
+				Var source = load.getSource().getVariable();
+				Var target = load.getTarget().getVariable();
+
+				// saves the global associated with the local
+				mapLocalToGlobal.put(target, source);
+			}
+
+			return null;
+		}
+
+		@Override
+		public Object caseInstruction(Instruction instruction) {
+			NodeBlock block = instruction.getBlock();
+			for (Def def : IrUtil.getObjects(instruction, Def.class)) {
+				Var var = def.getVariable();
+				if (var.isLocal() && !var.getType().isList()) {
+					if (instruction.isAssign()) {
+						handleLocalVarDef(block, var);
+					}
+				}
+			}
+
+			return null;
+		}
+
+		private Var createGlobal(Var var) {
+			String name = "sg_" + procedure.getName() + "_" + var.getName();
+			Var global = eINSTANCE.createVar(procedure.getLineNumber(),
+					copy(var.getType()), name, true, null);
+			actor.getStateVars().add(global);
+			mapLocalToGlobal.put(var, global);
+
+			// copy uses and replace those that are in different procedures
+			List<Use> uses = new ArrayList<Use>(var.getUses());
+			for (Use use : uses) {
+				if (!isAncestor(procedure, use)) {
+					Procedure procUse = getContainerOfType(use, Procedure.class);
+					Var local = procUse.newTempLocalVariable(
+							copy(var.getType()), var.getName());
+					InstLoad load = eINSTANCE.createInstLoad(local, global);
+					load.setPredicate(eINSTANCE.createPredicate());
+
+					Instruction inst = getContainerOfType(use,
+							Instruction.class);
+					NodeBlock block = inst.getBlock();
+					int index = block.indexOf(inst);
+					block.add(index, load);
+
+					use.setVariable(local);
+				}
+			}
+
+			return global;
+		}
+
+		private void handleLocalVarDef(NodeBlock block, Var var) {
+			boolean interProcUses = false;
+			for (Use use : var.getUses()) {
+				if (!isAncestor(procedure, use)) {
+					interProcUses = true;
+				}
+			}
+
+			// get global variable
+			Var global = mapLocalToGlobal.get(var);
+			if (global == null && interProcUses && isAncestor(procedure, var)) {
+				global = createGlobal(var);
+			}
+
+			if (global != null) {
+				// create store
+				InstStore store = eINSTANCE.createInstStore(global, var);
+				store.setPredicate(eINSTANCE.createPredicate());
+
+				// add store after this assign
+				block.add(++indexInst, store);
+			}
+		}
+
+	}
 
 	/**
 	 * name of the branch being visited
@@ -88,8 +177,6 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 	 * an FSM is added to the actor.
 	 */
 	private FSM fsm;
-
-	private Map<Var, Var> mapLocals;
 
 	private Map<Var, Var> mapLocalToGlobal;
 
@@ -152,6 +239,7 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 			// visit current action
 			doSwitch(currentAction.getBody());
 		}
+
 		return null;
 	}
 
@@ -160,58 +248,12 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 		this.actor = actor;
 		stateNames = new HashMap<String, Integer>();
 		statesMap = new HashMap<String, State>();
-		mapLocals = new HashMap<Var, Var>();
-		mapLocalToGlobal = new HashMap<Var, Var>();
 
 		visitAllActions();
 
-		return null;
-	}
-
-	@Override
-	public Object caseInstLoad(InstLoad load) {
-		if (load.getIndexes().isEmpty()) {
-			// gets source, target of this load
-			Var source = load.getSource().getVariable();
-			Var target = load.getTarget().getVariable();
-
-			// saves the global associated with the local
-			mapLocalToGlobal.put(target, source);
-		}
-
-		return null;
-	}
-
-	@Override
-	public Object caseInstruction(Instruction instruction) {
-		// do not consider deleted instructions
-		if (instruction.eContainer() == null) {
-			return null;
-		}
-
-		// the procedure that contains this instruction
-		Procedure procedure = EcoreHelper.getContainerOfType(instruction,
-				Procedure.class);
-
-		// moves the variables defined elsewhere
-		for (Def def : IrUtil.getObjects(instruction, Def.class)) {
-			Var var = def.getVariable();
-			if (var.isLocal() && !var.getType().isList()) {
-				if (!isAncestor(procedure, var)) {
-					procedure.getLocals().add(var);
-				}
-			}
-		}
-
-		// visit uses
-		for (Use use : IrUtil.getObjects(instruction, Use.class)) {
-			Var var = use.getVariable();
-			if (var.isLocal() && !var.getType().isList()) {
-				if (!isAncestor(procedure, var)) {
-					// update the use
-					updateUse(procedure, instruction, use);
-				}
-			}
+		mapLocalToGlobal = new HashMap<Var, Var>();
+		for (Action action : actor.getActions()) {
+			new UseUpdater().doSwitch(action.getBody());
 		}
 
 		return null;
@@ -232,6 +274,7 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 		if (var.eContainer() == pattern) {
 			portWrittenList.add(pattern.getPort(var));
 		}
+
 		return null;
 	}
 
@@ -354,91 +397,6 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 
 		// set new source state to the new state name
 		source = statesMap.get(newActionName);
-	}
-
-	/**
-	 * Stores the given local variable in a newly-created global variable.
-	 * 
-	 * @param var
-	 *            a local variable defined in a procedure and used in another
-	 * @return the created global variable
-	 */
-	private Var storeLocal(Var var) {
-		final IrFactory fac = IrFactory.eINSTANCE;
-
-		Procedure procDef = getContainerOfType(var, Procedure.class);
-
-		// create global variable
-		String name = "sg_" + procDef.getName() + "_" + var.getName();
-		Var global = fac.createVar(procDef.getLineNumber(),
-				copy(var.getType()), name, true, null);
-		actor.getStateVars().add(global);
-
-		// create store
-		InstStore store = fac.createInstStore(global, var);
-		store.setPredicate(fac.createPredicate());
-
-		// these two determine where to add the store
-		int instIndex = 0;
-		NodeBlock block = null;
-
-		// find last definition of "var" in the defining procedure
-		int index = 0;
-		for (Instruction instruction : getObjects(procDef, Instruction.class)) {
-			for (Def def : getObjects(instruction, Def.class)) {
-				if (def.getVariable() == var) {
-					block = getContainerOfType(def, NodeBlock.class);
-					instIndex = index;
-				}
-			}
-			index++;
-		}
-
-		// add store
-		block.add(instIndex + 1, store);
-
-		return global;
-	}
-
-	/**
-	 * Updates the given use using the mapLocals map. If no local is associated
-	 * yet, create one and adds a load before the given instruction.
-	 * 
-	 * @param procedure
-	 *            the target procedure
-	 * @param instruction
-	 *            the current instruction
-	 * @param use
-	 *            a use
-	 */
-	private void updateUse(Procedure procedure, Instruction instruction, Use use) {
-		// "var" is in another procedure
-		Var var = use.getVariable();
-
-		Var local = mapLocals.get(var);
-		if (!isAncestor(procedure, local)) {
-			// first, maybe "var" was loaded from a global
-			Var global = mapLocalToGlobal.get(var);
-			if (global == null) {
-				// no? then store local in a new global
-				global = storeLocal(var);
-			}
-
-			// add a load before the current instruction
-			local = procedure.newTempLocalVariable(copy(var.getType()),
-					var.getName());
-			mapLocals.put(var, local);
-			mapLocalToGlobal.put(local, global);
-
-			InstLoad load = eINSTANCE.createInstLoad(local, global);
-			load.setPredicate(eINSTANCE.createPredicate());
-
-			NodeBlock block = instruction.getBlock();
-			block.add(indexInst, load);
-		}
-
-		// "local" is the equivalent of "var" in this procedure
-		use.setVariable(local);
 	}
 
 	/**
