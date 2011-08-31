@@ -30,8 +30,8 @@ package net.sf.orcc.ir.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -244,17 +244,78 @@ public class IrUtil {
 		return actor;
 	}
 
-	public static List<Use> getUses(EObject eObject) {
-		List<Use> uses = new ArrayList<Use>();
-		TreeIterator<EObject> it = eObject.eAllContents();
-		while (it.hasNext()) {
-			EObject descendant = it.next();
-			if (descendant instanceof Use) {
-				uses.add((Use) descendant);
-			}
-		}
+	public static Iterable<Def> getDefs(EObject eObject) {
+		final TreeIterator<EObject> it = eObject.eAllContents();
+		return new Iterable<Def>() {
 
-		return uses;
+			@Override
+			public Iterator<Def> iterator() {
+				return new Iterator<Def>() {
+
+					private Def nextDef;
+
+					@Override
+					public boolean hasNext() {
+						while (it.hasNext()) {
+							EObject next = it.next();
+							if (next instanceof Def) {
+								nextDef = (Def) next;
+								return true;
+							}
+						}
+						return false;
+					}
+
+					@Override
+					public Def next() {
+						return nextDef;
+					}
+
+					@Override
+					public void remove() {
+						it.remove();
+					}
+				};
+			}
+
+		};
+	}
+
+	public static Iterable<Use> getUses(EObject eObject) {
+		final TreeIterator<EObject> it = eObject.eAllContents();
+		return new Iterable<Use>() {
+
+			@Override
+			public Iterator<Use> iterator() {
+				return new Iterator<Use>() {
+
+					private Use nextUse;
+
+					@Override
+					public boolean hasNext() {
+						while (it.hasNext()) {
+							EObject next = it.next();
+							if (next instanceof Use) {
+								nextUse = (Use) next;
+								return true;
+							}
+						}
+						return false;
+					}
+
+					@Override
+					public Use next() {
+						return nextUse;
+					}
+
+					@Override
+					public void remove() {
+						it.remove();
+					}
+				};
+			}
+
+		};
 	}
 
 	private static boolean isWhileJoinNode(Node node) {
