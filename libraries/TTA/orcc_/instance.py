@@ -74,14 +74,14 @@ class Instance:
         self._entity = "processor_" + self.id + "_tl"
 
 
-    def compile(self, srcPath, libPath):
+    def compile(self, srcPath, libPath, args):
         instancePath = os.path.join(srcPath, self.id)
         os.chdir(instancePath)
         if self.isNative:
             shutil.copy(os.path.join(libPath, "native", self._llFile), instancePath)
             shutil.copy(os.path.join(libPath, "native", self._adfFile), instancePath)
             shutil.copy(os.path.join(libPath, "native", self._idfFile), instancePath)
-        retcode = subprocess.call(["tcecc", "-o", self._tpefFile, "-a", self._adfFile, self._llFile])
+        retcode = subprocess.call(["tcecc"] + args + ["-o", self._tpefFile, "-a", self._adfFile, self._llFile])
         if retcode >= 0: retcode = subprocess.call(["tcecc", "-O3", "-o", self._bcFile, self._llFile, "--emit-llvm"])
         if retcode >= 0: retcode = subprocess.call(["llvm-dis", "-o", self._llOptFile, self._bcFile])
         if retcode >= 0: retcode = subprocess.call(["tcedisasm", "-n", "-o", self._asmFile, self._adfFile, self._tpefFile])
@@ -94,7 +94,7 @@ class Instance:
         self.irom = self._readMif(self._mifFile)
         self.dram = self._readAdf(self._adfFile)
 
-    def generate(self, srcPath, buildPath, libPath, iromAddrMax, dramAddrMax):
+    def generate(self, srcPath, buildPath, libPath, iromAddrMax, dramAddrMax, args):
         srcPath = os.path.join(srcPath, self.id)
         sharePath = os.path.join(buildPath, "share")
         buildPath = os.path.join(buildPath, self.id)
@@ -106,7 +106,7 @@ class Instance:
         # Remove existing build directory
         shutil.rmtree(buildPath, ignore_errors=True)
         # Generate the processor
-        subprocess.call(["generateprocessor", "-o", buildPath, "-b", self._bemFile, "--shared-files-dir", sharePath,
+        subprocess.call(["generateprocessor"] + args + ["-o", buildPath, "-b", self._bemFile, "--shared-files-dir", sharePath,
                                         "-l", "vhdl", "-e", self._entity, "-i", self._idfFile, self._adfFile])
         # Generate vhdl memory and processor files
         self.irom.generate(self.id, os.path.join(libPath, "templates", "rom.template"), os.path.join(buildPath, self._romFile))

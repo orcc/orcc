@@ -39,7 +39,7 @@ import stat
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hcsgx:v", ["help", "verbose", "compile", "simulate", "generate", "clean"])
+        opts, args = getopt.getopt(sys.argv[1:], "hcsgx:v", ["help", "verbose", "compile=", "simulate", "generate=", "clean"])
     except getopt.GetoptError, err:
         print str(err)
         usage()
@@ -59,7 +59,7 @@ def main():
     for o, a in opts:
         if o in ("-c", "--compile"):
             try:
-                compile()
+                compile(a)
             except NameError:
                 print "Error: Did you generate the application from Orcc ?"
 
@@ -69,7 +69,7 @@ def main():
 
     for o, a in opts:
         if o in ("-g", "--generate"):
-            generate()
+            generate(a)
 
 
 def usage():
@@ -78,10 +78,10 @@ def usage():
     print "Usage: generate [options]"
     print ""
     print "Options:"
-    print "-c, --compile  \t Compile the application from the generated LLVM assembly code into TTA binary"
-    print "-g, --generate \t Generate the VHDL files of the TTA processors"
-    print "-s, --simulate \t Simulate the generated code with the TCE simulator (FIFO traces have to be in 'generated/trace' directory)"
-    print "--clean \t Clean source directory ('generated') and build directory ('build-generated')"
+    print "-c, --compile=[options]  \t Compile the application from the generated LLVM assembly code into TTA binary"
+    print "-g, --generate=[options] \t Generate the VHDL files of the TTA processors"
+    print "-s, --simulate \t\t\t Simulate the generated code with the TCE simulator (FIFO traces have to be in 'generated/trace' directory)"
+    print "--clean \t\t\t Clean source directory ('generated') and build directory ('build-generated')"
 
 
 def clean():
@@ -101,7 +101,7 @@ def clean():
     print "-- Build directory is cleaned."
     
 
-def compile():
+def compile(arg):
     start = time.time()
 
     print "*********************************************************************"
@@ -110,7 +110,7 @@ def compile():
 
     for instance in instances:
         print ">> Instance " + instance.id + "."
-        instance.compile(srcPath, libPath)
+        instance.compile(srcPath, libPath, arg.split())
 
     print "* Compilation of %d instances done in %f seconds." % (len(instances), time.time() - start)
 
@@ -129,7 +129,7 @@ def simulate():
     print "* Simulation of %d instances done in %f seconds." % (len(instances), time.time() - start)
 
 
-def generate():
+def generate(arg):
     start = time.time()
 
     print "*********************************************************************"
@@ -159,7 +159,7 @@ def generate():
     
     for instance in instances:
         print ">> Instance " + instance.id + "."
-        instance.generate(srcPath, buildPath, libPath, iromAddrMax, dramAddrMax)
+        instance.generate(srcPath, buildPath, libPath, iromAddrMax, dramAddrMax, arg.split())
 
     print "* Generation of %d instances done in %f seconds." % (len(instances), time.time() - start)
 
