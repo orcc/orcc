@@ -34,10 +34,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.emf.common.util.TreeIterator;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.util.EcoreUtil;
-
 import net.sf.orcc.backends.instructions.InstRamRead;
 import net.sf.orcc.backends.instructions.InstRamSetAddress;
 import net.sf.orcc.backends.instructions.InstRamWrite;
@@ -51,6 +47,7 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
@@ -58,6 +55,10 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.EcoreHelper;
+
+import org.eclipse.emf.common.util.TreeIterator;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class defines a visitor that transforms loads and stores to RAM
@@ -77,6 +78,13 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	 * instructions that depend on a pending InstRamRead
 	 */
 	private List<Instruction> pendingInstructions;
+
+	/**
+	 * store instructions that write to variables of output pattern. Must be
+	 * done as late as possible so we don't accidentally lose prefetched data if
+	 * we can't fire an action.
+	 */
+	private List<InstStore> pendingStores;
 
 	private Map<RAM, List<InstRamRead>> pendingReads;
 
@@ -256,17 +264,31 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseInstStore(InstStore store) {
-		if (isVarTransformableToRam(store.getTarget().getVariable())) {
+		Var var = store.getTarget().getVariable();
+		if (isVarTransformableToRam(var)) {
 			convertStore(store);
 			IrUtil.delete(store);
 			indexInst--;
+		} else if (var.eContainer() instanceof Pattern) {
+			// removes this instruction from the instruction
+			// list and adds it to the pending list
+			EcoreUtil.remove(store);
+			pendingStores.add(store);
+
+			// updates the index so we don't skip the next
+			// instruction
+			indexInst--;
 		}
+
 		return null;
 	}
 
 	@Override
 	public Object caseProcedure(Procedure procedure) {
 		pendingInstructions = new ArrayList<Instruction>();
+		pendingStores = new ArrayList<InstStore>();
+
+		instructions = null; //just in case
 		super.caseProcedure(procedure);
 
 		NodeBlock block = procedure.getLast();
@@ -281,6 +303,11 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 				hasMorePendingReads = executeTwoPendingReads(ram);
 			} while (hasMorePendingReads);
 		}
+
+		// add all pending stores
+		instructions = block.getInstructions();
+		indexInst = instructions.size() - 1; // before the return
+		instructions.addAll(indexInst, pendingStores);
 
 		return null;
 	}
