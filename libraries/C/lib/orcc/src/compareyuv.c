@@ -72,7 +72,7 @@ static int compareYUV_compareComponent(const int x_size, const int y_size,
 					if (true_img_uchar[Idx_pix] - test_img_uchar[Idx_pix] != 0)
 					{
 						error++;
-						if (error < 100)
+						if (error < 50)
 						{
 							printf("\nerror %3d instead of %3d at position : mb = (%d ; %d) , loc_in_mb = (%d ; %d)",
 								test_img_uchar[Idx_pix] , true_img_uchar[Idx_pix], blk_x, blk_y, pix_x, pix_y);
