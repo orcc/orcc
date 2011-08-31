@@ -116,7 +116,7 @@ begin
               ackreg <= (0 => '1');
             when STREAM_IN_STATUS =>
               -- stream_in_status is placed in the lsb of r1data
-              r1reg <= (0 => ext_status(0), others => '0');
+              r1reg <= (0 => ext_status(0));
             when others => null;
           end case;
         end if;
