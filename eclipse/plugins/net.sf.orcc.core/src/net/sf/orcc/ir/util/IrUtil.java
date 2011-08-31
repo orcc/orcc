@@ -244,22 +244,22 @@ public class IrUtil {
 		return actor;
 	}
 
-	public static Iterable<Def> getDefs(EObject eObject) {
+	public static <T> Iterable<T> getObjects(EObject eObject, final Class<T> cls) {
 		final TreeIterator<EObject> it = eObject.eAllContents();
-		return new Iterable<Def>() {
+		return new Iterable<T>() {
 
 			@Override
-			public Iterator<Def> iterator() {
-				return new Iterator<Def>() {
+			public Iterator<T> iterator() {
+				return new Iterator<T>() {
 
-					private Def nextDef;
+					private EObject nextObject;
 
 					@Override
 					public boolean hasNext() {
 						while (it.hasNext()) {
 							EObject next = it.next();
-							if (next instanceof Def) {
-								nextDef = (Def) next;
+							if (cls.isAssignableFrom(next.getClass())) {
+								nextObject = next;
 								return true;
 							}
 						}
@@ -267,45 +267,9 @@ public class IrUtil {
 					}
 
 					@Override
-					public Def next() {
-						return nextDef;
-					}
-
-					@Override
-					public void remove() {
-						it.remove();
-					}
-				};
-			}
-
-		};
-	}
-
-	public static Iterable<Use> getUses(EObject eObject) {
-		final TreeIterator<EObject> it = eObject.eAllContents();
-		return new Iterable<Use>() {
-
-			@Override
-			public Iterator<Use> iterator() {
-				return new Iterator<Use>() {
-
-					private Use nextUse;
-
-					@Override
-					public boolean hasNext() {
-						while (it.hasNext()) {
-							EObject next = it.next();
-							if (next instanceof Use) {
-								nextUse = (Use) next;
-								return true;
-							}
-						}
-						return false;
-					}
-
-					@Override
-					public Use next() {
-						return nextUse;
+					@SuppressWarnings("unchecked")
+					public T next() {
+						return (T) nextObject;
 					}
 
 					@Override

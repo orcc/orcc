@@ -68,7 +68,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor<Object> {
 			return;
 		}
 
-		for (Use use : IrUtil.getUses(instruction)) {
+		for (Use use : IrUtil.getObjects(instruction, Use.class)) {
 			for (Def def : use.getVariable().getDefs()) {
 				Instruction instDef = EcoreHelper.getContainerOfType(def,
 						Instruction.class);
