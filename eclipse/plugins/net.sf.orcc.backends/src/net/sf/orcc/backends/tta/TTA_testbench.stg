@@ -51,20 +51,20 @@ endif>
 >>
 
 signalInitInput(port) ::=<<
-<if(!port.native)>
-s_<port.name>_q       \<= '0';
-s_<port.name>_status  \<= (others =\> '0');
-<else>
-s_<port.name>_native  \<= 'Z';
-<endif>
+<if(!port.native)
+>s_<port.name>_q       \<= '0';
+s_<port.name>_status  \<= (others =\> '0');<
+else
+>s_<port.name>_native  \<= 'Z';<
+endif>
 >>
 
 signalInitOutput(port) ::=<<
-<if(!port.native)>
-s_<port.name>_status   \<= (others =\> '0');
-<else>
-s_<port.name>_native   \<= 'Z';
-<endif>
+<if(!port.native)
+>s_<port.name>_status   \<= (others =\> '0');<
+else
+>s_<port.name>_native   \<= 'Z';<
+endif>
 >>
 
 mapSignalInput(port) ::= <<
@@ -111,13 +111,13 @@ signal reset_n     : std_logic := '0';
 printTraceIn(port) ::= <<
 <if(!port.native)
 >signal tb_FSM_<port.name>  : tb_type;
-file trace_<instance.id>_<port.name>  : text is "<instance.id>_<port.name>.txt";<
+file trace_<instance.id>_<port.name>  : text is "../../trace/<instance.id>_<port.name>.txt";<
 endif>
 >>
 
 printTraceOut(port) ::= <<
 <if(!port.native)
->file trace_<instance.id>_<port.name>  : text is "<instance.id>_<port.name>.txt";<
+>file trace_<instance.id>_<port.name>  : text is "../../trace/<instance.id>_<port.name>.txt";<
 endif>
 >>
 
@@ -140,8 +140,9 @@ WaveGen_Proc_In : process (reset_n, clock)
   variable line_number : line;
 begin
   if reset_n = '0' then
-    <inputs: signalInitInput()>    --
-    <inputs: {port|<if(!port.native)>tb_FSM_<port.name> \<= after_reset;<endif>} ; separator="\n">    
+    <inputs: signalInitInput(); separator="\n">
+    --
+    <inputs: {port|<if(!port.native)>tb_FSM_<port.name> \<= after_reset;<endif>}; separator="\n">    
     count \<= 0;
   --  
   elsif rising_edge(clock) then 
@@ -224,24 +225,22 @@ if (not endfile (sim_file_<instance.id>_<port.name>) and <port.name>_send = '1')
 if(port.type.bool)
 >    if (input_bit = 1) then
       assert (<port.name>_data = '1')
-        report "on port <port.name> incorrectly value computed : '0' instead of : '1'"
+        report "on port <port.name> incorrectly value computed : '0' instead of '1'"
         severity error;
     else
       assert (<port.name>_data = '0')
-        report "on port <port.name> incorrectly value computed : '1' instead of : '0'"
+        report "on port <port.name> incorrectly value computed : '1' instead of '0'"
         severity error;
            
     end if;<
 else
 ><if(port.type.int)
   >    assert (<port.name>_data  = std_logic_vector(to_signed(input_bit, <port.type.size>)))
-      -- report "on <port.name> incorrectly value computed : " & to_string(to_integer(to_signed(<port.name>_data))) & " instead of :" & to_string(input_bit)
       report "on port <port.name> incorrectly value computed : " & str(to_integer(signed(<port.name>_data))) & " instead of :" & str(input_bit)
       severity error;
 
   <else
   >    assert (<port.name>_data  = std_logic_vector(to_unsigned(input_bit, <port.type.size>)))
-      --report "on port <port.name> incorrectly value computed : " & to_string(to_integer(to_unsigned(<port.name>_data))) & " instead of :" & to_string(input_bit)
       report "on port <port.name> incorrectly value computed : " & str(to_integer(unsigned(<port.name>_data))) & " instead of :" & str(input_bit)
       severity error;
       
