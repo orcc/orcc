@@ -136,9 +136,9 @@ public class BoolExprTransformation extends AbstractActorVisitor<Expression> {
 		if (op == OpUnary.LOGIC_NOT) {
 			// returns the sub-expression negated
 			// i.e. "x > 42" => "x <= 42"
-			negateCondition = true;
+			negateCondition = !negateCondition;
 			Expression result = doSwitch(subExpr);
-			negateCondition = false;
+			negateCondition = !negateCondition;
 			return result;
 		} else {
 			return IrFactory.eINSTANCE.createExprUnary(op, doSwitch(subExpr),
