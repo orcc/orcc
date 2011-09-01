@@ -342,6 +342,11 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 				executeTwoPendingReads(ram);
 			}
 		} else {
+			if (ram.isLastAccessWrite()) {
+				// read after write... let's wait a cycle
+				addSplitInstruction(ram);
+			}
+			
 			// udpate state of RAM
 			ram.setLastAccessRead();
 			ram.setLastPortUsed(0);
