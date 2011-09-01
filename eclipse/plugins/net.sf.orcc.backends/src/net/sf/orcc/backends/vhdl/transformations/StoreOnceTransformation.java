@@ -196,6 +196,7 @@ public class StoreOnceTransformation extends AbstractActorVisitor<Object> {
 				local = procedure.newTempLocalVariable(target.getType(),
 						"local_" + target.getName());
 				globalToLocalMap.put(target, local);
+				globalsToLoad.put(target, local);
 			}
 
 			// replace store by assignment "local := value;"
