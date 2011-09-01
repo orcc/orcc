@@ -119,7 +119,7 @@ class Instance:
         shutil.copy(self._mifFile, buildPath)
         shutil.copy(self._mifDataFile, buildPath)
         shutil.copy("imem_mau_pkg.vhdl", buildPath)
-        if not self.isNative:
+        if not (self.isNative or self.isBroadcast):
             shutil.copy(self._tbFile, buildPath)
 
         # Clean working directory

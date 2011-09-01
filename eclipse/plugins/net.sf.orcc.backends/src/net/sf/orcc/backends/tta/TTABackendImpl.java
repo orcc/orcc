@@ -143,7 +143,7 @@ public class TTABackendImpl extends AbstractBackend {
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
 		InstancePrinter tbPrinter = new InstancePrinter(
-				"net/sf/orcc/backends/tta/TTA_testbench.stg", !debugMode, true);
+				"net/sf/orcc/backends/tta/TTA_testbench.stg", !debugMode, false);
 
 		String instancePath = OrccUtil.createFolder(path, instance.getId());
 		if (!(instance.isActor() && instance.getActor().isNative())) {

@@ -19,9 +19,9 @@ else
   s_<port.name>_q  \<= '0';
 end if;<
 elseif(port.type.int)
->s_<port.name>_q  \<= std_logic_vector(to_signed(input_bit, <port.type.size>));<
+>s_<port.name>_q  \<= std_logic_vector(to_signed(input_bit, 32));<
 else
->s_<port.name>_q  \<= std_logic_vector(to_unsigned(input_bit, <port.type.size>));<
+>s_<port.name>_q  \<= std_logic_vector(to_unsigned(input_bit, 32));<
 endif>
 >>
 
@@ -32,7 +32,7 @@ endif>
 
 printSignalInput(port) ::= <<
 <if(!port.native)
->signal s_<port.name>_q			: std_logic_vector(<port.type.size>-1 downto 0);
+>signal s_<port.name>_q			: std_logic_vector(31 downto 0);
 signal s_<port.name>_status		: std_logic_vector(8 downto 0);
 signal s_<port.name>_rdreq		: std_logic;<
 else
@@ -42,7 +42,7 @@ endif>
 
 printSignalOutput(port) ::= <<
 <if(!port.native)
->signal s_<port.name>_data		: std_logic_vector(<port.type.size>-1 downto 0);
+>signal s_<port.name>_data		: std_logic_vector(31 downto 0);
 signal s_<port.name>_status		: std_logic_vector(8 downto 0);
 signal s_<port.name>_wrreq		: std_logic;<
 else
@@ -52,7 +52,7 @@ endif>
 
 signalInitInput(port) ::=<<
 <if(!port.native)
->s_<port.name>_q       \<= '0';
+>s_<port.name>_q       \<= (others =\> '0');
 s_<port.name>_status  \<= (others =\> '0');<
 else
 >s_<port.name>_native  \<= 'Z';<
@@ -168,25 +168,23 @@ case tb_FSM_<port.name> is
     if (not endfile (trace_<instance.id>_<port.name>)) then
       readline(trace_<instance.id>_<port.name>, line_number);
       --
-      if (line_number'length \> 0 and line_number(1) /= '/') then
+      if ((line_number'length \> 0 and line_number(1) /= '/') and s_<port.name>_rdreq = '1') then
         read(line_number, input_bit);
         <sendData(port)>
-        <port.name>_send \<= '1';    
         tb_FSM_<port.name> \<= CheckRead;
       end if;
     end if;
 
   when CheckRead =\>
-    if (not endfile (sim_file_<instance.id>_<port.name>)) and <port.name>_ack = '1' then
-      readline(sim_file_<instance.id>_<port.name>, line_number);
+    if (not endfile (trace_<instance.id>_<port.name>) and s_<port.name>_rdreq = '1') then
+      readline(trace_<instance.id>_<port.name>, line_number);
       --
       if (line_number'length \> 0 and line_number(1) /= '/') then
         read(line_number, input_bit);
-        <sendData(port)>
-        <port.name>_send \<= '1';      
+        <sendData(port)>  
       end if;
-    elsif (endfile (sim_file_<instance.id>_<port.name>)) then
-      <port.name>_send \<= '0'; 
+    elsif (endfile (trace_<instance.id>_<port.name>)) then
+      s_<port.name>_status \<= (others => '0'); 
     end if;
 
   when others =\> null;
@@ -197,7 +195,7 @@ end case;
 
 waveform_process_out(outputs) ::= <<
 -- Output(s) waveform Generation
-<outputs: {port|<if(!port.native)><port.name>_ack \<= <port.name>_send;<\n><endif>}>    
+<outputs: {port|<if(!port.native)>s_<port.name>_status \<= (others => '0');<\n><endif>}>    
 --
 WaveGen_Proc_Out : process (reset_n, clock)
   variable Input_bit   : integer;
@@ -216,32 +214,32 @@ end process WaveGen_Proc_Out;
 case_define_out(port) ::= <<
 <if (!port.native)
 >-- Output port: <port.name> Waveform Generation
-if (not endfile (sim_file_<instance.id>_<port.name>) and <port.name>_send = '1') then
-  readline(sim_file_<instance.id>_<port.name>, line_number);
+if (not endfile (trace_<instance.id>_<port.name>) and s_<port.name>_wrreq = '1') then
+  readline(trace_<instance.id>_<port.name>, line_number);
   --
   if (line_number'length \> 0 and line_number(1) /= '/') then
     read(line_number, input_bit);
 <
 if(port.type.bool)
 >    if (input_bit = 1) then
-      assert (<port.name>_data = '1')
+      assert (s_<port.name>_data = '1')
         report "on port <port.name> incorrectly value computed : '0' instead of '1'"
         severity error;
     else
-      assert (<port.name>_data = '0')
+      assert (s_<port.name>_data = '0')
         report "on port <port.name> incorrectly value computed : '1' instead of '0'"
         severity error;
            
     end if;<
 else
 ><if(port.type.int)
-  >    assert (<port.name>_data  = std_logic_vector(to_signed(input_bit, <port.type.size>)))
-      report "on port <port.name> incorrectly value computed : " & str(to_integer(signed(<port.name>_data))) & " instead of :" & str(input_bit)
+  >    assert (s_<port.name>_data  = std_logic_vector(to_signed(input_bit, 32)))
+      report "on port <port.name> incorrectly value computed : " & str(to_integer(signed(s_<port.name>_data))) & " instead of :" & str(input_bit)
       severity error;
 
   <else
-  >    assert (<port.name>_data  = std_logic_vector(to_unsigned(input_bit, <port.type.size>)))
-      report "on port <port.name> incorrectly value computed : " & str(to_integer(unsigned(<port.name>_data))) & " instead of :" & str(input_bit)
+  >    assert (s_<port.name>_data  = std_logic_vector(to_unsigned(input_bit, 32)))
+      report "on port <port.name> incorrectly value computed : " & str(to_integer(unsigned(s_<port.name>_data))) & " instead of :" & str(input_bit)
       severity error;
       
   <endif
@@ -268,6 +266,7 @@ use std.textio.all;
 use ieee.numeric_std.all;
 
 library work;
+use work.sim_package.all;
 
 entity tb_<instance.id> is
 
@@ -284,11 +283,11 @@ architecture arch_tb_<instance.id> of tb_<instance.id> is
 
 begin
 
-  <instance.id>_orcc : entity work.<instance.id>
+  <instance.id>_orcc : entity work.processor_<instance.id>
     port map (
-      clock         =\> clock,
-      <if(instance.actor.inputs)><instance.actor.inputs: mapSignalInput(); separator=",\n">,<endif>
-      <if(instance.actor.outputs)><instance.actor.outputs: mapSignalOutput(); separator=",\n">,<endif>
+      clk         =\> clock,
+      <if(instance.actor.inputs)><instance.actor.inputs: mapSignalInput(); separator="\n"><endif>
+      <if(instance.actor.outputs)><instance.actor.outputs: mapSignalOutput(); separator="\n"><endif>
       reset_n       =\> reset_n);
             
     <init_process()>
@@ -333,8 +332,8 @@ begin
   top_orcc : entity work.top
     port map (
       hw_clk      =\> clock,
-      <if(network.inputs)><network.inputs: mapSignalInput(); separator=",\n">,<endif>
-      <if(network.outputs)><network.outputs: mapSignalOutput(); separator=",\n">,<endif>
+      <if(network.inputs)><network.inputs: mapSignalInput(); separator="\n"><endif>
+      <if(network.outputs)><network.outputs: mapSignalOutput(); separator="\n"><endif>
       reset_n    =\> reset_n);
       
     <init_process()>
