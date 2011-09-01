@@ -736,7 +736,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	private Operation createOperationStore(String name, Port in1, Port in2) {
-		return createOperationDefault(name, in1, 0, 1, true, in2, 2, 1, true);
+		return createOperationDefault(name, in1, 0, 1, true, in2, 0, 1, true);
 	}
 
 	/**
