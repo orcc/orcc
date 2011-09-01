@@ -196,7 +196,8 @@ endif>
  * 
  */ 
 printInputs(connection, portPredMap, srcVertex) ::= <<
-<if(portPredMap.(connection.target))
+<if(!connection.target.native)
+><if(portPredMap.(connection.target))
 ><if(portPredMap.(connection.target).broadcast)
 ><connection.target.name>_data     =\> <portPredMap.(connection.target).id>_fromBroad_data,
 <else
@@ -215,11 +216,12 @@ else
 ><connection.target.name>_data(0)  =\> <srcVertex.port.name>_data,
 <else
 ><connection.target.name>_data     =\> <srcVertex.port.name>_data,
-<endif><
-if(!connection.target.native)
-><connection.target.name>_send     =\> <srcVertex.port.name>_send,
+<endif>
+<connection.target.name>_send     =\> <srcVertex.port.name>_send,
 <connection.target.name>_ack      =\> <srcVertex.port.name>_ack,<
 endif><
+else
+><connection.target.name>     =\> <connection.target.name>,<
 endif>
 >>
 
@@ -245,7 +247,7 @@ else
 ><if(connection.source.native)
 ><connection.source.name>         =\> <tgtVertex.port.name>,<
 else
-><connection.source.name>_data    =\> <tgtVertex.port.name>_data,
+><connection.source.name>_data     =\> <tgtVertex.port.name>_data,
 <connection.source.name>_send     =\> <tgtVertex.port.name>_send,
 <connection.source.name>_ack      =\> <tgtVertex.port.name>_ack,<
 endif><

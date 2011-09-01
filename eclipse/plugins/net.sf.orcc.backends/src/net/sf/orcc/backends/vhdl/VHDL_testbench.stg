@@ -31,8 +31,12 @@ signal <port.name>_ack   : <dirAck>std_logic;<endif>
 >>
 
 signalInit(port) ::=<<
-<if (port.native)>
-<port.name>      \<= 'Z';
+<if (port.native)><
+if(port.type.bool)>
+<port.name> \<= 'Z';
+<else>
+<port.name> \<= (others =\> 'Z');
+<endif>
 <else>
 <port.name>_send \<= '0';
 <if(port.type.bool)>
