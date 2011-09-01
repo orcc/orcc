@@ -14,14 +14,14 @@ endif>
 sendData(port) ::= <<
 <if(port.type.bool)
 >if (input_bit = 1) then
-  <port.name>_data  \<= '1';
+  s_<port.name>_q  \<= '1';
 else
-  <port.name>_data  \<= '0';
+  s_<port.name>_q  \<= '0';
 end if;<
 elseif(port.type.int)
-  ><port.name>_data  \<= std_logic_vector(to_signed(input_bit, <port.type.size>));<
+>s_<port.name>_q  \<= std_logic_vector(to_signed(input_bit, <port.type.size>));<
 else
-  ><port.name>_data  \<= std_logic_vector(to_unsigned(input_bit, <port.type.size>));<
+>s_<port.name>_q  \<= std_logic_vector(to_unsigned(input_bit, <port.type.size>));<
 endif>
 >>
 
@@ -50,13 +50,20 @@ else
 endif>
 >>
 
-signalInit(port) ::=<<
+signalInitInput(port) ::=<<
 <if(!port.native)>
-signal s_<port.name>_q \<= '0';
-signal s_<port.name>_status  \<= (others =\> '0');
-signal s_<port.name>_rdreq   \<= (others =\> '0');
+s_<port.name>_q       \<= '0';
+s_<port.name>_status  \<= (others =\> '0');
 <else>
-s_<port.name>_native \<= 'Z';
+s_<port.name>_native  \<= 'Z';
+<endif>
+>>
+
+signalInitOutput(port) ::=<<
+<if(!port.native)>
+s_<port.name>_status   \<= (others =\> '0');
+<else>
+s_<port.name>_native   \<= 'Z';
 <endif>
 >>
 
@@ -125,7 +132,7 @@ clock \<= not clock after PERIOD/2;
 
 >>
 
-waveform_process_in(input) ::= <<
+waveform_process_in(inputs) ::= <<
 --
 -- Input(s) Waveform Generation
 WaveGen_Proc_In : process (reset_n, clock)
@@ -133,12 +140,12 @@ WaveGen_Proc_In : process (reset_n, clock)
   variable line_number : line;
 begin
   if reset_n = '0' then
-    <input: signalInit()>    --
-    <input: {port|<if (!port.native)> tb_FSM_<port.name> \<= after_reset; <endif>} ; separator="\n">    
+    <inputs: signalInitInput()>    --
+    <inputs: {port|<if(!port.native)>tb_FSM_<port.name> \<= after_reset;<endif>} ; separator="\n">    
     count \<= 0;
   --  
   elsif rising_edge(clock) then 
-    <input: case_define_in(); separator="\n">
+    <inputs: case_define_in(); separator="\n">
   end if;
 end process WaveGen_Proc_In;
 
@@ -147,8 +154,7 @@ end process WaveGen_Proc_In;
 
 case_define_in(port) ::= <<
 <if (!port.native)
->--
--- Input port: <port.name> Waveform Generation
+>-- Input port: <port.name> Waveform Generation
 case tb_FSM_<port.name> is
   when after_reset =\>
     count \<= count + 1;
@@ -188,18 +194,18 @@ end case;
 
 >>
 
-waveform_process_out(output) ::= <<
+waveform_process_out(outputs) ::= <<
 -- Output(s) waveform Generation
-<output: {port| <if (!port.native)> <port.name>_ack \<= <port.name>_send;<\n><endif>}>    
+<outputs: {port|<if(!port.native)><port.name>_ack \<= <port.name>_send;<\n><endif>}>    
 --
 WaveGen_Proc_Out : process (reset_n, clock)
   variable Input_bit   : integer;
   variable line_number : line;
 begin
   if (reset_n = '0') then
-    -- nothing here
+    <outputs: signalInitOutput()>    --
   elsif (rising_edge(clock)) then
-    <output: case_define_out(); separator="\n">
+    <outputs: case_define_out(); separator="\n">
   end if;
 end process WaveGen_Proc_Out;
 
@@ -208,8 +214,7 @@ end process WaveGen_Proc_Out;
 
 case_define_out(port) ::= <<
 <if (!port.native)
->--
--- Output port: <port.name> Waveform Generation
+>-- Output port: <port.name> Waveform Generation
 if (not endfile (sim_file_<instance.id>_<port.name>) and <port.name>_send = '1') then
   readline(sim_file_<instance.id>_<port.name>, line_number);
   --
@@ -280,7 +285,7 @@ architecture arch_tb_<instance.id> of tb_<instance.id> is
 
 begin
 
-  <instance.actor.simpleName>_orcc : entity work.<instance.actor.simpleName>
+  <instance.id>_orcc : entity work.<instance.id>
     port map (
       clock         =\> clock,
       <if(instance.actor.inputs)><instance.actor.inputs: mapSignalInput(); separator=",\n">,<endif>
@@ -289,12 +294,11 @@ begin
             
     <init_process()>
     <if(instance.actor.inputs)
-    ><waveform_process_in(input=instance.actor.inputs)><
+    ><waveform_process_in(instance.actor.inputs)><
     endif>
     
-    
     <if(instance.actor.outputs)
-    ><waveform_process_out(output=instance.actor.outputs)><
+    ><waveform_process_out(instance.actor.outputs)><
     endif>
 
 end architecture arch_tb_<instance.id>;
