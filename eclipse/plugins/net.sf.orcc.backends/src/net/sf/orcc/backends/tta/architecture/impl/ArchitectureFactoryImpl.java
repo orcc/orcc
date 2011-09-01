@@ -607,6 +607,17 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return LSU;
 	}
 
+	@Override
+	public FunctionUnit createMultiplier(TTA tta, Implementation implementation) {
+		FunctionUnit multiplier = createFunctionUnit(tta, "Mul", implementation);
+		multiplier.getOperations().add(
+				createOperationMul("mul", multiplier.getPorts().get(0),
+						multiplier.getPorts().get(1), multiplier.getPorts()
+								.get(2)));
+		multiplier.setAddressSpace(tta.getData());
+		return multiplier;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -717,6 +728,16 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	private Operation createOperationLoad(String name, Port in, Port out) {
 		return createOperationDefault(name, in, 0, 1, true, out, 2, 1, false);
+	}
+
+	private Operation createOperationMul(String name, Port in1, Port in2,
+			Port out) {
+		Operation operation = createOperation(name);
+		operation.setControl(false);
+		operation.getPipeline().add(createReads(in1, 0, 1));
+		operation.getPipeline().add(createReads(in2, 0, 1));
+		operation.getPipeline().add(createWrites(out, 1, 1));
+		return operation;
 	}
 
 	private Operation createOperationOut(String name, Port in, Port out) {
@@ -1105,8 +1126,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		tta.getHardwareDatabase().add(lsuImpl);
 		// * Mul
 		Implementation mulImpl = createImplementation("asic_130nm_1.5V.hdb", 88);
-		String[] mulOperations2 = { "mul" };
-		units.add(createFunctionUnit(tta, "Mul", null, mulOperations2, mulImpl));
+		units.add(createMultiplier(tta, mulImpl));
 		tta.getHardwareDatabase().add(mulImpl);
 		// * And-ior-xor
 		Implementation logicImpl = createImplementation("asic_130nm_1.5V.hdb",
