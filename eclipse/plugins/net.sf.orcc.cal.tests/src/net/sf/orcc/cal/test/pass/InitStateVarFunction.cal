@@ -1,0 +1,17 @@
+package net.sf.orcc.cal.test.pass;
+
+actor InitStateVarFunction() ==> :
+
+	function perThousand(uint(size=16) s, uint rate) --> uint(size=16) :
+		s * rate / 1000
+	end
+	
+	uint(size=16) width = 512+128;
+	uint(size=16) pp = 255 * 16 / perThousand(width, 775);
+	
+	initialize ==>
+	do
+		print("pp = " + pp);
+	end
+
+end

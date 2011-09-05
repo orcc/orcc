@@ -163,6 +163,11 @@ public class AllTests {
 	}
 
 	@Test
+	public void execInitStateVar() throws Exception {
+		assertExecution("pp = 8", prefix + "pass/InitStateVarFunction.cal");
+	}
+
+	@Test
 	public void execShadow() throws Exception {
 		assertExecution("x = 0", prefix + "pass/Shadowing.cal");
 	}
