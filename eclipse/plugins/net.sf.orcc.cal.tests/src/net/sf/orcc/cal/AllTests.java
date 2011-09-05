@@ -116,10 +116,17 @@ public class AllTests {
 	}
 
 	@Test
-	public void checkTypeCheck() throws Exception {
+	public void checkTypeError1() throws Exception {
 		Assert.assertNull(
 				"passing a list in lieu of a scalar must raise a type error",
-				parseAndValidate(prefix + "xfail/TypeCheck.cal"));
+				parseAndValidate(prefix + "xfail/TypeError1.cal"));
+	}
+
+	@Test
+	public void checkTypeError2() throws Exception {
+		Assert.assertNull(
+				"passing a scalar in lieu of a list must raise a type error",
+				parseAndValidate(prefix + "xfail/TypeError2.cal"));
 	}
 
 	@Test

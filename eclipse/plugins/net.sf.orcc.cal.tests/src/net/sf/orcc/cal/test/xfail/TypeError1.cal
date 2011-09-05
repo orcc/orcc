@@ -1,6 +1,6 @@
 package net.sf.orcc.cal.test.xfail;
 
-unit TypeCheck :
+unit TypeError1 :
 
 	function abc(uint c) --> bool :
 		 c > 4
@@ -13,3 +13,4 @@ unit TypeCheck :
 	end
 
 end
+

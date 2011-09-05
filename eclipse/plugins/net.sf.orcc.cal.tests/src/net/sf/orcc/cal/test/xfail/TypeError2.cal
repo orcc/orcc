@@ -1,0 +1,15 @@
+package net.sf.orcc.cal.test.xfail;
+
+actor TypeError2() ==> :
+
+	native procedure compare_init() end
+	native procedure compare_NBytes(uint(size=8) outTable[1], uint(size=12) nbTokenToRead) end
+
+	readByte : action ==>
+	do
+		int(size=8)  tmp := 17;
+		compare_NBytes(tmp, 1);
+	end
+
+end
+
