@@ -415,7 +415,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			// check types
 			if (!checker.isConvertibleTo(actualType, formalType)) {
 				error("Type mismatch: cannot convert from " + actualType
-						+ " to " + formalType, expression,
+						+ " to " + formalType, astCall,
 						eINSTANCE.getAstStatementCall_Parameters(), index);
 			}
 			index++;
