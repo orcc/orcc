@@ -209,9 +209,13 @@ endif>
 
 printStore(store) ::= <<
 
-<if (action.inputPattern.varToPortMap.(store.target.variable) || action.outputPattern.varToPortMap.(store.target.variable) || action.peekPattern.varToPortMap.(store.target.variable))
->tokens_<getPort(store.target.variable)>[(index_<getPort(store.target.variable)> + <first(store.indexes)>) % SIZE_<getPort(store.target.variable)>] = <store.value>;<
+<if(action.inputPattern.varToPortMap.(store.target.variable) || action.outputPattern.varToPortMap.(store.target.variable) || action.peekPattern.varToPortMap.(store.target.variable))
+><if(action.outputPattern.varToPortMap.(store.target.variable).native)
+>printf("<getPort(store.target.variable)> = %i\n", <store.value>);<
 else
+>tokens_<getPort(store.target.variable)>[(index_<getPort(store.target.variable)> + <first(store.indexes)>) % SIZE_<getPort(store.target.variable)>] = <store.value>;<
+endif
+><else
 ><store.target.variable.name><store.indexes : {index | [<index>]}> = <store.value>;<
 endif>
 >>
@@ -307,7 +311,7 @@ static void <action.body.name>() {
 <endif>
 	<printNodes(action.body.nodes)>
 	<action.inputPattern.ports: { port |<printReadEnd(port=port, numTokens=action.inputPattern.numTokensMap.(port))>}>
-	<action.outputPattern.ports: { port |<printWriteEnd(port=port, numTokens=action.outputPattern.numTokensMap.(port))>}>
+	<action.outputPattern.ports: { port |<if(!port.native)><printWriteEnd(port=port, numTokens=action.outputPattern.numTokensMap.(port))><endif>}>
 }
 
 <printProcedure(procedure=action.scheduler, action=action)>
@@ -373,13 +377,13 @@ static void write_end_<port.name>() {
 
 printTokensFunctions() ::= <<
 <instance.actor.inputs: printReadTokensFunction()>
-<instance.actor.outputs: printWriteTokensFunction()>
+<instance.actor.outputs: {port|<if(!port.native)><printWriteTokensFunction(port)><endif>}>
 >>
 
 printCallTokenFunctions() ::= <<
 <instance.actor.inputs: {port|read_<port.name>();
 }>
-<instance.actor.outputs: {port|write_<port.name>();
+<instance.actor.outputs: {port|<if(!port.native)>write_<port.name>();<endif>
 }>
 >>
 
@@ -547,7 +551,7 @@ finished:
 	<printCloseFiles()>
 <endif>
 	<instance.actor.inputs: {port|read_end_<port.name>();}; separator="\n">
-	<instance.actor.outputs: {port|write_end_<port.name>();}; separator="\n">
+	<instance.actor.outputs: {port|<if(!port.native)>write_end_<port.name>();<endif>}; separator="\n">
 }
 
 >>
@@ -652,8 +656,8 @@ extern struct actor_s <instance.id>;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Output FIFOs
-<instance.actor.outputs: { port | extern struct fifo<printMedium(port)>_<port.type>_s *<getPortName(port)>;}; separator="\n">
-<instance.actor.outputs: printOutputPort()>
+<instance.actor.outputs: { port | <if(!port.native)>extern struct fifo<printMedium(port)>_<port.type>_s *<getPortName(port)>;<endif>}; separator="\n">
+<instance.actor.outputs: { port | <if(!port.native)><printOutputPort(port)><endif> }>
 <if(options.enableTrace)>
 <instance.actor.outputs: { port | FILE *file_<port.name>;}; separator="\n">
 <endif>
@@ -713,7 +717,7 @@ finished:
 	<printCloseFiles()>
 <endif>
 	<instance.actor.inputs: {port|read_end_<port.name>();}; separator="\n">
-	<instance.actor.outputs: {port|write_end_<port.name>();}; separator="\n">
+	<instance.actor.outputs: {port|<if(!port.native)>write_end_<port.name>();<endif>}; separator="\n">
 }
 <endif>
 
