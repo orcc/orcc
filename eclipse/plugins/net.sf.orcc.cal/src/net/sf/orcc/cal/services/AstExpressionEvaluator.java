@@ -30,7 +30,7 @@ package net.sf.orcc.cal.services;
 
 import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
 
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.OrccRuntimeException;
@@ -46,6 +46,7 @@ import net.sf.orcc.cal.cal.AstExpressionList;
 import net.sf.orcc.cal.cal.AstExpressionString;
 import net.sf.orcc.cal.cal.AstExpressionUnary;
 import net.sf.orcc.cal.cal.AstExpressionVariable;
+import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstGenerator;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
@@ -107,15 +108,24 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 
 	@Override
 	public Expression caseAstExpressionCall(AstExpressionCall expression) {
-		String name = expression.getFunction().getName();
-		List<AstExpression> parameters = expression.getParameters();
-		List<Expression> values = new ArrayList<Expression>(parameters.size());
-		for (AstExpression parameter : parameters) {
-			values.add(evaluate(parameter));
+		AstFunction function = expression.getFunction();
+		if (expression.getParameters().size() != function.getParameters()
+				.size()) {
+			return null;
 		}
 
-		error("cannot use function \"" + name + "\" in expression", expression,
-				eINSTANCE.getAstExpressionCall_Function(), -1);
+		Iterator<AstVariable> itFormal = function.getParameters().iterator();
+		Iterator<AstExpression> itActual = expression.getParameters()
+				.iterator();
+		// int index = 0;
+		while (itFormal.hasNext() && itActual.hasNext()) {
+			/* AstVariable paramV = */itFormal.next();
+			AstExpression paramE = itActual.next();
+
+			evaluate(paramE);
+
+			// index++;
+		}
 
 		return null;
 	}
