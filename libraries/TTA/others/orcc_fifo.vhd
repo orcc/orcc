@@ -95,7 +95,7 @@ begin
   scfifo_component : scfifo
     generic map (
       add_ram_output_register => "OFF",
-      intended_device_family  => "Cyclone III",
+      intended_device_family  => "Stratix III",
       lpm_numwords            => 256,
       lpm_showahead           => "ON",
       lpm_type                => "scfifo",
@@ -157,7 +157,7 @@ end SYN;
 -- Retrieval info: PRIVATE: wsUsedW NUMERIC "0"
 -- Retrieval info: LIBRARY: altera_mf altera_mf.altera_mf_components.all
 -- Retrieval info: CONSTANT: ADD_RAM_OUTPUT_REGISTER STRING "OFF"
--- Retrieval info: CONSTANT: INTENDED_DEVICE_FAMILY STRING "Cyclone III"
+-- Retrieval info: CONSTANT: INTENDED_DEVICE_FAMILY STRING "Stratix III"
 -- Retrieval info: CONSTANT: LPM_NUMWORDS NUMERIC "256"
 -- Retrieval info: CONSTANT: LPM_SHOWAHEAD STRING "ON"
 -- Retrieval info: CONSTANT: LPM_TYPE STRING "scfifo"
