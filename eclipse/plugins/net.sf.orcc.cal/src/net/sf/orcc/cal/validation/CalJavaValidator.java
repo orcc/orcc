@@ -30,6 +30,7 @@ package net.sf.orcc.cal.validation;
 
 import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -128,6 +129,26 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	}
 
 	/**
+	 * Checks the inputs patterns.
+	 * 
+	 * @param inputs
+	 *            the input patterns of an action
+	 */
+	private void checkActionInputs(List<AstInputPattern> inputs) {
+		List<AstPort> ports = new ArrayList<AstPort>();
+
+		for (AstInputPattern pattern : inputs) {
+			AstPort port = pattern.getPort();
+			if (ports.contains(port)) {
+				error("duplicate reference to port " + port.getName(), pattern,
+						eINSTANCE.getAstInputPattern_Port(), -1);
+			} else {
+				ports.add(port);
+			}
+		}
+	}
+
+	/**
 	 * Checks the token expressions are correctly typed.
 	 * 
 	 * @param outputs
@@ -135,9 +156,18 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	 */
 	private void checkActionOutputs(List<AstOutputPattern> outputs) {
 		TypeChecker checker = new TypeChecker(this);
+		List<AstPort> ports = new ArrayList<AstPort>();
 
 		for (AstOutputPattern pattern : outputs) {
-			Type portType = Util.getType(pattern.getPort());
+			AstPort port = pattern.getPort();
+			if (ports.contains(port)) {
+				error("duplicate reference to port " + port.getName(), pattern,
+						eINSTANCE.getAstOutputPattern_Port(), -1);
+			} else {
+				ports.add(port);
+			}
+
+			Type portType = Util.getType(port);
 			AstExpression astRepeat = pattern.getRepeat();
 			if (astRepeat == null) {
 				List<AstExpression> values = pattern.getValues();
@@ -223,6 +253,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	public void checkAstAction(AstAction action) {
 		checkActionGuards(action);
 		checkActionTag(action);
+		checkActionInputs(action.getInputs());
 		checkActionOutputs(action.getOutputs());
 	}
 
@@ -629,17 +660,17 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			}
 
 			@Override
-			public Boolean caseAstVariableReference(AstVariableReference ref) {
-				return ref.getVariable().equals(variable);
-			}
-
-			@Override
 			public Boolean caseAstStatementAssign(AstStatementAssign assign) {
 				if (assign.getTarget().getVariable().equals(variable)) {
 					return true;
 				}
 
 				return super.caseAstStatementAssign(assign);
+			}
+
+			@Override
+			public Boolean caseAstVariableReference(AstVariableReference ref) {
+				return ref.getVariable().equals(variable);
 			}
 
 		}.doSwitch(Util.getTopLevelContainer(variable));
