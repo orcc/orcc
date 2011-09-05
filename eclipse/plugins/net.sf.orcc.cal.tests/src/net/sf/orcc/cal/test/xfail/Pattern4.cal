@@ -1,0 +1,8 @@
+package net.sf.orcc.cal.test.xfail;
+
+actor Pattern4() int I ==> :
+
+    action I:[x], I:[y] ==>
+    end
+
+end

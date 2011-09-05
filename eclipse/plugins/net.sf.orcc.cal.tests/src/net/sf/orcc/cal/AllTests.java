@@ -116,6 +116,20 @@ public class AllTests {
 	}
 
 	@Test
+	public void checkPattern4() throws Exception {
+		Assert.assertNull(
+				"more than one reference per output port must not be allowed",
+				parseAndValidate(prefix + "xfail/Pattern4.cal"));
+	}
+
+	@Test
+	public void checkPattern5() throws Exception {
+		Assert.assertNull(
+				"more than one reference per input port must not be allowed",
+				parseAndValidate(prefix + "xfail/Pattern5.cal"));
+	}
+
+	@Test
 	public void checkTypeError1() throws Exception {
 		Assert.assertNull(
 				"passing a list in lieu of a scalar must raise a type error",
