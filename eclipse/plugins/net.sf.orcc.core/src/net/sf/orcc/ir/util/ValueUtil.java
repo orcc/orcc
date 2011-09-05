@@ -374,11 +374,13 @@ public class ValueUtil {
 	}
 
 	public static Object getValue(Expression expr) {
-		switch (expr.eClass().getClassifierID()) {
-		case IrPackage.EXPR_BOOL:
-			return ((ExprBool) expr).isValue();
-		case IrPackage.EXPR_INT:
-			return getIntValue(((ExprInt) expr).getValue());
+		if (expr != null) {
+			switch (expr.eClass().getClassifierID()) {
+			case IrPackage.EXPR_BOOL:
+				return ((ExprBool) expr).isValue();
+			case IrPackage.EXPR_INT:
+				return getIntValue(((ExprInt) expr).getValue());
+			}
 		}
 		return null;
 	}
