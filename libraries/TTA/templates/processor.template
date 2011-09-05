@@ -32,14 +32,22 @@ entity processor_{{id}} is
     (
       clk          : in  std_logic;
 {{for input in inputs}}
+{{if input.isNative}}
+      {{input.name}}_in     : in  std_logic_vector({{input.size - 1}} downto 0);     
+{{else}}
       data_{{input.index}}_in    : in  std_logic_vector(31 downto 0);
       status_{{input.index}}_in  : in  std_logic_vector(8 downto 0);
       ack_{{input.index}}_in     : out std_logic;
+{{endif}}
 {{endfor}}
 {{for output in outputs}}
+{{if output.isNative}}
+      {{output.name}}_out     : out  std_logic_vector({{output.size - 1}} downto 0);     
+{{else}}
       data_{{output.index}}_out   : out std_logic_vector(31 downto 0);
       status_{{output.index}}_out : in  std_logic_vector(8 downto 0);
       dv_{{output.index}}_out     : out std_logic;
+{{endif}}
 {{endfor}}
       reset_n      : in  std_logic
       );
@@ -107,9 +115,30 @@ architecture bdf_type of processor_{{id}} is
   signal dram_data_out_wire : std_logic_vector(fu_LSU_dataw-1 downto 0);
   signal wren_x_wire        : std_logic;
   signal idata_wire         : std_logic_vector(IMEMWIDTHINMAUS*IMEMMAUWIDTH-1 downto 0);
+{{for input in inputs}}
+{{if input.isNative}}
+  signal s_{{input.name}} : std_logic_vector(31 downto 0) := (others => '0');
+{{endif}}
+{{endfor}}
+{{for output in outputs}}
+{{if output.isNative}}
+  signal s_{{output.name}} : std_logic_vector(31 downto 0) := (others => '0');
+{{endif}}
+{{endfor}}
   ---------------------------------------------------------------------------
 
 begin
+
+{{for input in inputs}}
+{{if input.isNative}}
+  {{input.name}}_in <= s_{{input.name}}({{output.size - 1}} downto 0);
+{{endif}}
+{{endfor}}
+{{for output in outputs}}
+{{if output.isNative}}
+  {{output.name}}_out <= s_{{output.name}}({{output.size - 1}} downto 0);
+{{endif}}
+{{endfor}}
 
   inst_dram_{{id}} : dram_{{id}}
     port map(clock   => clk,
@@ -138,14 +167,24 @@ begin
              fu_LSU_dmem_wr_en_x(0)     => wren_x_wire,
              fu_LSU_dmem_bytemask       => bytemask_wire,
 {{for input in inputs}}
+{{if input.isNative}}
+             fu_STREAM_IN_{{input.index}}_ext_data    => s_{{input.name}},
+             fu_STREAM_IN_{{input.index}}_ext_status  => (others => '0'),
+{{else}}
              fu_STREAM_IN_{{input.index}}_ext_data    => data_{{input.index}}_in,
              fu_STREAM_IN_{{input.index}}_ext_status  => status_{{input.index}}_in,
              fu_STREAM_IN_{{input.index}}_ext_ack(0)  => ack_{{input.index}}_in,
+{{endif}}
 {{endfor}}
 {{for output in outputs}}
+{{if output.isNative}}
+             fu_STREAM_OUT_{{output.index}}_ext_data   => s_{{output.name}},
+             fu_STREAM_OUT_{{output.index}}_ext_status => (others => '0'),
+{{else}}
              fu_STREAM_OUT_{{output.index}}_ext_data   => data_{{output.index}}_out,
              fu_STREAM_OUT_{{output.index}}_ext_status => status_{{output.index}}_out,
              fu_STREAM_OUT_{{output.index}}_ext_dv(0)  => dv_{{output.index}}_out,
+{{endif}}
 {{endfor}}
              rstx                       => reset_n);
 end bdf_type;

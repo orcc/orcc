@@ -8,7 +8,7 @@ endif>
 >>
 
 port(port) ::= <<
-Port('<port.name>', <indexPort(port)>)
+Port('<port.name>', <indexPort(port)>, <if(port.native)>True<else>False<endif>, <port.type.sizeInBits>)
 >>
 
 initPorts(instance) ::= <<
