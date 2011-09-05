@@ -145,7 +145,15 @@ public class Instantiator implements INetworkTransformation {
 
 	private void checkPortsAreConnected() throws OrccException {
 		for (Vertex vertex : graph.vertexSet()) {
-			if (vertex.isInstance()) {
+			if (vertex.isPort()) {
+				Port port = vertex.getPort();
+				if (graph.outDegreeOf(vertex) == 0
+						&& graph.inDegreeOf(vertex) == 0) {
+					throw new OrccException("In network \"" + network.getName()
+							+ "\": port \"" + port.getName()
+							+ "\" is not used!");
+				}
+			} else {
 				Instance instance = vertex.getInstance();
 				String id = instance.getId();
 				if (instance.isNetwork()) {
