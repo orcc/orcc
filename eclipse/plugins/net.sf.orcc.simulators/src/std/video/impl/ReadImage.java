@@ -34,9 +34,9 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-public class ReadImage {
+import net.sf.orcc.runtime.impl.GenericSource;
 
-	private static String fileName;
+public class ReadImage extends GenericSource {
 
 	private static int height;
 
@@ -103,16 +103,6 @@ public class ReadImage {
 
 		width = image.getWidth();
 		height = image.getHeight();
-	}
-
-	/**
-	 * Sets the file name used by this ReadImage class.
-	 * 
-	 * @param fileName
-	 *            name of a file to read
-	 */
-	public static void setFileName(String fileName) {
-		ReadImage.fileName = fileName;
 	}
 
 }

@@ -57,6 +57,7 @@ import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IValueAttribute;
 import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.runtime.Fifo;
+import net.sf.orcc.runtime.impl.GenericSource;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -66,9 +67,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.ietr.stdio.impl.Source;
 import org.jgrapht.DirectedGraph;
-
 
 /**
  * This class implements a simulator using a slow, visitor-based approach.
@@ -152,7 +151,7 @@ public class SlowSimulator extends AbstractSimulator {
 	}
 
 	protected void initializeNetwork(Network network) {
-		Source.setFileName(stimulusFile);
+		GenericSource.setFileName(stimulusFile);
 
 		for (Instance instance : network.getInstances()) {
 			ActorInterpreter interpreter = interpreters.get(instance);

@@ -34,8 +34,8 @@ import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.orcc.runtime.impl.GenericSource;
 import net.sf.orcc.simulators.SimulatorDescriptor;
-
 
 /**
  * This class defines native functions for the File unit.
@@ -45,12 +45,14 @@ import net.sf.orcc.simulators.SimulatorDescriptor;
  * @author Thavot Richard
  * 
  */
-public class AccessFile {
+public class AccessFile extends GenericSource {
 
 	private static Map<Integer, RandomAccessFile> randomAccessFiles = new HashMap<Integer, RandomAccessFile>();
 
 	public static Integer openFile(String fileName) {
 		try {
+			if (fileName.isEmpty())
+				fileName = getFileName();
 			Integer desc = SimulatorDescriptor.create(fileName,
 					AccessFile.class.getMethod("closeFile", Integer.class));
 			randomAccessFiles.put(desc, new RandomAccessFile(

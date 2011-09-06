@@ -246,7 +246,6 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 	 * Set the communication FIFOs map for interpreter to be able to execute
 	 * read/write accesses.
 	 * 
-	 * @param fifos
 	 * @param outputFifos
 	 */
 	public void setFifos(Map<Port, Fifo> fifos,

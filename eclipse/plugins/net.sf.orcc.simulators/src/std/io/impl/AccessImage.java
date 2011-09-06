@@ -9,9 +9,10 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import net.sf.orcc.runtime.impl.GenericSource;
 import net.sf.orcc.simulators.SimulatorDescriptor;
 
-public class AccessImage {
+public class AccessImage extends GenericSource {
 
 	private enum AccessImageColorSpace {
 
@@ -57,6 +58,8 @@ public class AccessImage {
 
 	public static Integer openImage(String fileName, Integer colorSpace) {
 		try {
+			if(fileName.isEmpty())
+					fileName = getFileName();
 			Integer desc = SimulatorDescriptor.create(fileName,
 					AccessImage.class.getMethod("closeImage", Integer.class));
 
