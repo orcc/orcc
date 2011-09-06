@@ -38,16 +38,20 @@ import shutil
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hcsgx:v", ["help", "verbose", "compile=", "simulate", "generate=", "clean"])
+        opts, args = getopt.getopt(sys.argv[1:], "hcsgdx:v", ["help", "verbose", "compile=", "simulate", "generate=", "clean", "debug"])
     except getopt.GetoptError, err:
         print str(err)
         usage()
         sys.exit(2)
+        
+    debug = False
 
     for o, a in opts:
         #print o, a
         if o in ("-v", "--verbose"):
             verbose = True
+        if o in ("-d", "--debug"):
+            debug = True
         if o in ("-h", "--help"):
             usage()
             sys.exit()
@@ -57,7 +61,7 @@ def main():
             
     for o, a in opts:
         if o in ("-c", "--compile"):
-            compile(a)
+            compile(a, debug)
 
     for o, a in opts:
         if o in ("-s", "--simulate"):
@@ -65,7 +69,7 @@ def main():
 
     for o, a in opts:
         if o in ("-g", "--generate"):
-            generate(a)
+            generate(a, debug)
 
 
 def usage():
@@ -75,6 +79,7 @@ def usage():
     print ""
     print "Options:"
     print "-c, --compile=[options]  \t Compile the application from the generated LLVM assembly code into TTA binary"
+    print "-d, --debug \t\t\t Debug mode, generate extra files and print additionnal information"
     print "-g, --generate=[options] \t Generate the VHDL files of the TTA processors"
     print "-s, --simulate \t\t\t Simulate the generated code with the TCE simulator (FIFO traces have to be in 'trace' directory)"
     print "--clean \t\t\t Clean source directory ('generated') and build directory ('build-generated')"
@@ -97,14 +102,14 @@ def clean():
     print "-- Build directory is cleaned."
     
 
-def compile(arg):
+def compile(arg, debug):
     start = time.time()
 
     print "*********************************************************************"
     print "* Compile the application for TTA"
     print "*********************************************************************"
 
-    network.compile(srcPath, libPath, arg.split())
+    network.compile(srcPath, libPath, arg.split(), debug)
 
     print "* Compilation of %d instances done in %f seconds." % (len(network.instances), time.time() - start)
 
@@ -121,14 +126,14 @@ def simulate():
     print "* Simulation of %d instances done in %f seconds." % (len(network.instances), time.time() - start)
 
 
-def generate(arg):
+def generate(arg, debug):
     start = time.time()
 
     print "*********************************************************************"
     print "* Generate the TTA processors"
     print "*********************************************************************"
     
-    network.generate(srcPath, buildPath, libPath, arg.split())
+    network.generate(srcPath, buildPath, libPath, arg.split(), debug)
 
     print "* Generation of %d instances done in %f seconds." % (len(network.instances), time.time() - start)
 

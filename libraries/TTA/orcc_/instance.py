@@ -74,13 +74,13 @@ class Instance:
         self._entity = "processor_" + self.id + "_tl"
 
 
-    def compile(self, srcPath, libPath, args):
+    def compile(self, srcPath, libPath, args, debug):
         instancePath = os.path.join(srcPath, self.id)
         os.chdir(instancePath)
         retcode = subprocess.call(["tcecc"] + args + ["-o", self._tpefFile, "-a", self._adfFile, self._llFile])
-        if retcode >= 0: retcode = subprocess.call(["tcecc", "-O3", "-o", self._bcFile, self._llFile, "--emit-llvm"])
-        if retcode >= 0: retcode = subprocess.call(["llvm-dis", "-o", self._llOptFile, self._bcFile])
-        if retcode >= 0: retcode = subprocess.call(["tcedisasm", "-n", "-o", self._asmFile, self._adfFile, self._tpefFile])
+        if retcode >= 0 and debug: retcode = subprocess.call(["tcecc", "-O3", "-o", self._bcFile, self._llFile, "--emit-llvm"])
+        if retcode >= 0 and debug: retcode = subprocess.call(["llvm-dis", "-o", self._llOptFile, self._bcFile])
+        if retcode >= 0 and debug: retcode = subprocess.call(["tcedisasm", "-n", "-o", self._asmFile, self._adfFile, self._tpefFile])
         if retcode >= 0: retcode = subprocess.call(["createbem", "-o", self._bemFile, self._adfFile])
         if retcode >= 0: retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", "images", "-f", "mif", "-o", "mif", self._adfFile])
 
@@ -90,11 +90,14 @@ class Instance:
         self.irom = self._readMif(self._mifFile)
         self.dram = self._readAdf(self._adfFile)
 
-    def generate(self, srcPath, buildPath, libPath, iromAddrMax, dramAddrMax, args):
+    def generate(self, srcPath, buildPath, libPath, iromAddrMax, dramAddrMax, args, debug):
         srcPath = os.path.join(srcPath, self.id)
         sharePath = os.path.join(buildPath, "share")
         buildPath = os.path.join(buildPath, self.id)
         os.chdir(srcPath)
+        if debug: 
+            print "ROM: " + str(self.irom.depth) + "x" + str(self.irom.width) + "bits"
+            print "RAM: " + str(self.dram.depth) + "x" + str(self.dram.width) + "bits"
         # Copy libraries in working directory
         shutil.copy(os.path.join(libPath, "fifo", "many_streams.hdb"), srcPath)
         shutil.rmtree("vhdl", ignore_errors=True)

@@ -43,10 +43,10 @@ class Network:
         self.instances = instances
 
 
-    def compile(self, srcPath, libPath, args):
+    def compile(self, srcPath, libPath, args, debug):
         for instance in self.instances:
             print ">> Instance " + instance.id + "."
-            instance.compile(srcPath, libPath, args)
+            instance.compile(srcPath, libPath, args, debug)
 
 
     def simulate(self, srcPath, tracePath):
@@ -55,7 +55,7 @@ class Network:
             instance.simulate(srcPath, tracePath)
 
 
-    def generate(self, srcPath, buildPath, libPath, args):
+    def generate(self, srcPath, buildPath, libPath, args, debug):
         print "* Initialize the generation."
         shutil.copy(os.path.join(srcPath, "top.vhd"), buildPath)
         shutil.copy(os.path.join(srcPath, "top_tb.vhd"), buildPath)
@@ -81,4 +81,4 @@ class Network:
 
         for instance in self.instances:
             print ">> Instance " + instance.id + "."
-            instance.generate(srcPath, buildPath, libPath, iromAddrMax, dramAddrMax, args)
+            instance.generate(srcPath, buildPath, libPath, iromAddrMax, dramAddrMax, args, debug)
