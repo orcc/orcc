@@ -7,8 +7,8 @@ vlib work
 # Create and compile Altera library
 vlib altera_mf
 vmap altera_mf altera_mf
-vcom -quiet -opt=-clkOpt -work altera_mf -93 -explicit others/altera_mf_components.vhd
-vcom -quiet -opt=-clkOpt -work altera_mf -93 -explicit others/altera_mf.vhd
+vcom -quiet -opt=-clkOpt -work altera_mf -93 -explicit simulation/altera_mf_components.vhd
+vcom -quiet -opt=-clkOpt -work altera_mf -93 -explicit simulation/altera_mf.vhd
 
 # Compile Shared components
 vcom -93 -quiet -work work share/vhdl/util_pkg.vhdl
@@ -38,7 +38,7 @@ vcom -93 -quiet -work work others/tta_fifo.vhd
 vlog -quiet -work work others/usedw_to_status.v
 vcom -93 -quiet -work work others/orcc_fifo.vhd
 vcom -93 -quiet -work work others/main_pll.vhd
-vcom -93 -quiet -work work others/sim_package.vhd
+vcom -93 -quiet -work work simulation/sim_package.vhd
 
 <network.instances: instance(); separator="\n">
 
