@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, IETR/INSA of Rennes
+ * Copyright (c) 2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,30 +26,24 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.cal.ui;
+package net.sf.orcc.cal.ui.editor.hover;
 
-import net.sf.orcc.cal.ui.editor.hover.CalObjectHover;
-
-import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.eclipse.xtext.resource.ILocationInFileProvider;
-import org.eclipse.xtext.ui.editor.hover.IEObjectHoverProvider;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.xtext.ui.editor.hover.html.DefaultEObjectHoverProvider;
 
 /**
- * This class extends the default abstract CAL UI module to define customized
- * services.
+ * This class overrides the default hover provider by not showing the class
+ * name.
+ * 
+ * @author Matthieu Wipliez
+ * 
  */
-public class CalUiModule extends net.sf.orcc.cal.ui.AbstractCalUiModule {
+public class CalObjectHover extends DefaultEObjectHoverProvider {
 
-	public CalUiModule(AbstractUIPlugin plugin) {
-		super(plugin);
-	}
-
-	public Class<? extends IEObjectHoverProvider> bindIEObjectHoverProvider() {
-		return CalObjectHover.class;
-	}
-
-	public Class<? extends ILocationInFileProvider> bindILocationInFileProvider() {
-		return CalLocationProvider.class;
+	@Override
+	protected String getFirstLine(EObject o) {
+		return "<b>" + StringEscapeUtils.escapeHtml(getLabel(o)) + "</b>";
 	}
 
 }
