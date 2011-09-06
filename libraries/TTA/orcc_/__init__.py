@@ -30,11 +30,13 @@
 # @author Herve Yviquel
 # @package orcc_
 
+import network
 import instance
 import memory
 import port
 import util
 
+Network = network.Network
 Instance = instance.Instance
 Memory = memory.Memory
 Port = port.Port

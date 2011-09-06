@@ -35,7 +35,6 @@ import os
 import time
 import getopt
 import shutil
-import stat
 
 def main():
     try:
@@ -58,10 +57,7 @@ def main():
             
     for o, a in opts:
         if o in ("-c", "--compile"):
-            try:
-                compile(a)
-            except NameError:
-                print "Error: Did you generate the application from Orcc ?"
+            compile(a)
 
     for o, a in opts:
         if o in ("-s", "--simulate"):
@@ -108,11 +104,9 @@ def compile(arg):
     print "* Compile the application for TTA"
     print "*********************************************************************"
 
-    for instance in instances:
-        print ">> Instance " + instance.id + "."
-        instance.compile(srcPath, libPath, arg.split())
+    network.compile(srcPath, libPath, arg.split())
 
-    print "* Compilation of %d instances done in %f seconds." % (len(instances), time.time() - start)
+    print "* Compilation of %d instances done in %f seconds." % (len(network.instances), time.time() - start)
 
 
 def simulate():
@@ -122,11 +116,9 @@ def simulate():
     print "* Simulate the execution of the application on  each TTA"
     print "*********************************************************************"
 
-    for instance in instances:
-        print ">> Instance " + instance.id + "."
-        instance.simulate(srcPath)
+    network.simulate(srcPath)
 
-    print "* Simulation of %d instances done in %f seconds." % (len(instances), time.time() - start)
+    print "* Simulation of %d instances done in %f seconds." % (len(network.instances), time.time() - start)
 
 
 def generate(arg):
@@ -136,34 +128,9 @@ def generate(arg):
     print "* Generate the TTA processors"
     print "*********************************************************************"
     
-    print "* Initialize the generation."
-    shutil.copy(os.path.join(srcPath, "top.vhd"), buildPath)
-    shutil.copy(os.path.join(srcPath, "top_tb.vhd"), buildPath)
-    shutil.copy(os.path.join(srcPath, "top.qsf"), buildPath)
-    shutil.copy(os.path.join(srcPath, "top.qpf"), buildPath)
-    shutil.copy(os.path.join(srcPath, "top.tcl"), buildPath)
-    os.chmod(os.path.join(buildPath, "top.tcl"), stat.S_IRWXU)
-    iromAddrList = []
-    dramAddrList = []
-    
-    for instance in instances:
-        instance.initializeMemories(srcPath)
-        iromAddrList.append(instance.irom.getAddr())
-        dramAddrList.append(instance.dram.getAddr())
-    
-    iromAddrMax = max(iromAddrList)
-    dramAddrMax = max(dramAddrList)
-    
-    shutil.rmtree(os.path.join(buildPath, "others"), ignore_errors=True)
-    shutil.copytree(os.path.join(libPath, "others"), os.path.join(buildPath, "others"))
-    shutil.rmtree(os.path.join(buildPath, "simulation"), ignore_errors=True)
-    shutil.copytree(os.path.join(libPath, "simulation"), os.path.join(buildPath, "simulation"))
-    
-    for instance in instances:
-        print ">> Instance " + instance.id + "."
-        instance.generate(srcPath, buildPath, libPath, iromAddrMax, dramAddrMax, arg.split())
+    network.generate(srcPath, buildPath, libPath, arg.split())
 
-    print "* Generation of %d instances done in %f seconds." % (len(instances), time.time() - start)
+    print "* Generation of %d instances done in %f seconds." % (len(network.instances), time.time() - start)
 
 
 
@@ -176,7 +143,7 @@ libPath = os.path.join(os.path.dirname(os.path.dirname(scriptPath)), "libraries"
 
 sys.path.insert(0, libPath)
 from orcc_ import *
-from generated.informations import instances
+from generated.informations import network
 
 main()
 

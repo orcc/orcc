@@ -8,7 +8,7 @@ endif>
 >>
 
 port(port) ::= <<
-Port('<port.name>', <indexPort(port)>, <if(port.native)>True<else>False<endif>, <port.type.sizeInBits>)
+Port("<port.name>", <indexPort(port)>, <if(port.native)>True<else>False<endif>, <port.type.sizeInBits>)
 >>
 
 initPorts(instance) ::= <<
@@ -22,7 +22,7 @@ endif>
 >>
 
 initInstance(instance) ::= <<
-Instance('<instance.id>', <instance.id>_inputs, <instance.id>_outputs, <if(instance.actor.native)>True<else>False<endif>, <if(instance.broadcast)>True<else>False<endif>)
+Instance("<instance.id>", <instance.id>_inputs, <instance.id>_outputs, <if(instance.actor.native)>True<else>False<endif>, <if(instance.broadcast)>True<else>False<endif>)
 >>
 
 script(network, options) ::= <<
@@ -38,5 +38,8 @@ from orcc_ import *
 
 ## Instances initialization
 instances = [<network.instances: initInstance(); wrap, separator=", ">]
+
+## Network initialization
+network = Network("<network.name>", instances)
 		
 >>
