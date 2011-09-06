@@ -49,10 +49,10 @@ class Network:
             instance.compile(srcPath, libPath, args)
 
 
-    def simulate(self, srcPath):
+    def simulate(self, srcPath, tracePath):
         for instance in self.instances:
             print ">> Instance " + instance.id + "."
-            instance.simulate(srcPath)
+            instance.simulate(srcPath, tracePath)
 
 
     def generate(self, srcPath, buildPath, libPath, args):

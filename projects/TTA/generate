@@ -76,7 +76,7 @@ def usage():
     print "Options:"
     print "-c, --compile=[options]  \t Compile the application from the generated LLVM assembly code into TTA binary"
     print "-g, --generate=[options] \t Generate the VHDL files of the TTA processors"
-    print "-s, --simulate \t\t\t Simulate the generated code with the TCE simulator (FIFO traces have to be in 'generated/trace' directory)"
+    print "-s, --simulate \t\t\t Simulate the generated code with the TCE simulator (FIFO traces have to be in 'trace' directory)"
     print "--clean \t\t\t Clean source directory ('generated') and build directory ('build-generated')"
 
 
@@ -116,7 +116,7 @@ def simulate():
     print "* Simulate the execution of the application on  each TTA"
     print "*********************************************************************"
 
-    network.simulate(srcPath)
+    network.simulate(srcPath, tracePath)
 
     print "* Simulation of %d instances done in %f seconds." % (len(network.instances), time.time() - start)
 
@@ -139,6 +139,7 @@ pathname = os.path.dirname(sys.argv[0])
 scriptPath = os.path.abspath(pathname)
 srcPath = os.path.join(scriptPath, "generated")
 buildPath = os.path.join(scriptPath, "build-generated")
+tracePath = os.path.join(scriptPath, "trace")
 libPath = os.path.join(os.path.dirname(os.path.dirname(scriptPath)), "libraries", "TTA")
 
 sys.path.insert(0, libPath)

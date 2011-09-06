@@ -120,11 +120,10 @@ class Instance:
         shutil.rmtree("vhdl", ignore_errors=True)
 
 
-    def simulate(self, srcPath):
+    def simulate(self, srcPath, tracePath):
         if not (self.isNative or self.isBroadcast) :
             instancePath = os.path.join(srcPath, self.id)
             os.chdir(instancePath)
-            tracePath = os.path.join(srcPath, "trace")
 
             # Copy trace to the instance folder
             for input in self.inputs:
