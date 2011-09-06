@@ -28,23 +28,25 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
-static unsigned int startTime;
-static unsigned int relativeStartTime;
+static clock_t startTime;
+static clock_t relativeStartTime;
 static int lastNumPic;
 static int numPicturesDecoded;
 
 
 static void print_fps_avg(void) {
-	unsigned int endTime = SDL_GetTicks();
+	clock_t endTime = clock();
 
 	printf("%i images in %f seconds: %f FPS\n", numPicturesDecoded,
-		(float) (endTime - startTime)/ 1000.0f,
-		1000.0f * (float) numPicturesDecoded / (float) (endTime -startTime));
+		(float) (endTime - startTime)/ CLOCKS_PER_SEC,
+		CLOCKS_PER_SEC * (float) numPicturesDecoded / (float) (endTime -startTime));
 }
 
 void fpsPrintInit() {
-	startTime = SDL_GetTicks();
+	startTime = clock();
 	relativeStartTime = startTime;
 	numPicturesDecoded = 0;
 	lastNumPic = 0;
@@ -54,10 +56,10 @@ void fpsPrintInit() {
 void fpsPrintNewPicDecoded(void) {
 	unsigned int endTime;
 	numPicturesDecoded++;
-	endTime = SDL_GetTicks();
+	endTime = clock();
 	if (endTime - relativeStartTime > 5000) {
 		printf("%f images/sec\n",
-				1000.0f * (float) (numPicturesDecoded - lastNumPic)
+				CLOCKS_PER_SEC * (float) (numPicturesDecoded - lastNumPic)
 						/ (float) (endTime - relativeStartTime));
 
 		relativeStartTime = endTime;
