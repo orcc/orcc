@@ -77,10 +77,6 @@ class Instance:
     def compile(self, srcPath, libPath, args):
         instancePath = os.path.join(srcPath, self.id)
         os.chdir(instancePath)
-        if self.isNative:
-            shutil.copy(os.path.join(libPath, "native", self._llFile), instancePath)
-            shutil.copy(os.path.join(libPath, "native", self._adfFile), instancePath)
-            shutil.copy(os.path.join(libPath, "native", self._idfFile), instancePath)
         retcode = subprocess.call(["tcecc"] + args + ["-o", self._tpefFile, "-a", self._adfFile, self._llFile])
         if retcode >= 0: retcode = subprocess.call(["tcecc", "-O3", "-o", self._bcFile, self._llFile, "--emit-llvm"])
         if retcode >= 0: retcode = subprocess.call(["llvm-dis", "-o", self._llOptFile, self._bcFile])
@@ -111,10 +107,7 @@ class Instance:
         # Generate vhdl memory and processor files
         self.irom.generate(self.id, os.path.join(libPath, "templates", "rom.template"), os.path.join(buildPath, self._romFile))
         self.dram.generate(self.id, os.path.join(libPath, "templates", "ram.template"), os.path.join(buildPath, self._ramFile))
-        if self.isNative:
-            shutil.copy(os.path.join(libPath, "native", self._processorFile), buildPath)
-        else:
-            self.generateProcessor(os.path.join(libPath, "templates", "processor.template"), os.path.join(buildPath, self._processorFile), iromAddrMax, dramAddrMax)
+        self.generateProcessor(os.path.join(libPath, "templates", "processor.template"), os.path.join(buildPath, self._processorFile), iromAddrMax, dramAddrMax)
         # Copy files to build directory
         shutil.copy(self._mifFile, buildPath)
         shutil.copy(self._mifDataFile, buildPath)

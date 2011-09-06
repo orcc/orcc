@@ -69,7 +69,7 @@ endif>
 
 mapSignalInput(port) ::= <<
 <if(port.native)
-><port.name>_in   =\> s_<port.name>_native,<
+><port.name>   =\> s_<port.name>_native,<
 else
 >data_<indexPort(port)>_in     =\> s_<port.name>_q,
 status_<indexPort(port)>_in   =\> s_<port.name>_status,
@@ -79,7 +79,7 @@ endif>
 
 mapSignalOutput(port) ::= <<
 <if(port.native)
-><port.name>_out   =\> s_<port.name>_native,<
+><port.name>   =\> s_<port.name>_native,<
 else
 >data_<indexPort(port)>_out    =\> s_<port.name>_data,
 status_<indexPort(port)>_out  =\> s_<port.name>_status,
@@ -334,7 +334,7 @@ begin
       hw_clk      =\> clock,
       <if(network.inputs)><network.inputs: mapSignalInput(); separator="\n"><endif>
       <if(network.outputs)><network.outputs: mapSignalOutput(); separator="\n"><endif>
-      reset_n    =\> reset_n);
+      reset    =\> reset);
       
     <init_process()>
 

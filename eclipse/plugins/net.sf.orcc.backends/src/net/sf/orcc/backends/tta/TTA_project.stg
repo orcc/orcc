@@ -40,18 +40,9 @@ set_global_assignment -name VHDL_FILE share/vhdl/and_ior_xor.vhdl
 set_global_assignment -name VHDL_FILE share/vhdl/add_and_eq_gt_gtu_ior_shl_shr_shru_sub_sxhw_sxqw_xor.vhdl
 
 # Other components
-set_global_assignment -name MIF_FILE others/tta_stream_2_in.mif
-set_global_assignment -name MIF_FILE others/tta_stream_1_in.mif
 set_global_assignment -name VHDL_FILE others/tta_fifo.vhd
-set_global_assignment -name VHDL_FILE others/tta_fifo.vhd
-set_global_assignment -name VHDL_FILE others/stream_source_2.vhd
-set_global_assignment -name VHDL_FILE others/stream_source_1.vhd
-set_global_assignment -name VHDL_FILE others/data_src2.vhd
-set_global_assignment -name VHDL_FILE others/data_src1.vhd
 set_global_assignment -name VERILOG_FILE others/usedw_to_status.v
 set_global_assignment -name VERILOG_FILE others/button_debouncer.v
-set_global_assignment -name VERILOG_FILE others/addr_gen_2.v
-set_global_assignment -name VERILOG_FILE others/addr_gen_1.v
 set_global_assignment -name VHDL_FILE others/orcc_fifo.vhd
 set_global_assignment -name VHDL_FILE others/main_pll.vhd
 
@@ -64,7 +55,7 @@ set_location_assignment PIN_D19 -to leds[4]
 set_location_assignment PIN_C19 -to leds[5]
 set_location_assignment PIN_F19 -to leds[6]
 set_location_assignment PIN_E19 -to leds[7]
-set_location_assignment PIN_AP5 -to reset_n
+set_location_assignment PIN_B17 -to reset
 set_location_assignment PIN_T33 -to hw_clk
 
 >>
