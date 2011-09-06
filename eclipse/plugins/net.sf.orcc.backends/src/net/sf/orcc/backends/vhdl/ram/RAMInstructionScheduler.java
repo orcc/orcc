@@ -56,8 +56,6 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.EcoreHelper;
 
-import org.eclipse.emf.common.util.TreeIterator;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -101,20 +99,42 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	 *            list of expressions
 	 */
 	private void addEarlySetAddress(RAM ram, Var var, List<Expression> indexes) {
-		int port = ram.getLastPortUsed() % 2 + 1;
-		InstRamSetAddress rsa = InstructionsFactory.eINSTANCE
-				.createInstRamSetAddress(port, var, indexes);
-		rsa.setPredicate(IrUtil.copy(ram.getPredicate()));
-
 		// insert the RSA before the previous split instruction
 		for (int i = indexInst - 1; i > 0; i--) {
 			Instruction instruction = instructions.get(i);
 			if (instruction instanceof InstSplit) {
+				int port = ram.getLastPortUsed() % 2 + 1;
+				InstRamSetAddress rsa = InstructionsFactory.eINSTANCE
+						.createInstRamSetAddress(port, var, indexes);
+				rsa.setPredicate(IrUtil.copy(ram.getPredicate()));
 				instructions.add(i, rsa);
+				indexInst++;
 				break;
+			} else {
+				// check if the instruction defines a variable that is used by
+				// the indexes
+				boolean keepGoing = true;
+				for (Expression expr : indexes) {
+					for (Use use : EcoreHelper.getObjects(expr, Use.class)) {
+						for (Def def : EcoreHelper.getObjects(instruction,
+								Def.class)) {
+							if (def.getVariable() == use.getVariable()) {
+								keepGoing = false;
+							}
+						}
+					}
+				}
+
+				// if that is the case, we cannot set the address early
+				// so reset the port used (so that split instructions will be
+				// added appropriately)
+				if (!keepGoing) {
+					ram.setLastPortUsed(0);
+					addSetAddress(ram, var, indexes);
+					break;
+				}
 			}
 		}
-		indexInst++;
 	}
 
 	/**
@@ -228,20 +248,15 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 		// happens when at least one instruction that defines one of the
 		// variables used by this instruction is in the pending list
 		boolean addToPending = false;
-		TreeIterator<EObject> it = instruction.eAllContents();
-		while (it.hasNext()) {
-			EObject eObject = it.next();
-			if (eObject instanceof Use) {
-				Use use = (Use) eObject;
-				Var var = use.getVariable();
-				if (var.isLocal() && !var.getType().isList()) {
-					for (Def def : var.getDefs()) {
-						Instruction defInst = EcoreHelper.getContainerOfType(
-								def, Instruction.class);
-						if (pendingInstructions.contains(defInst)) {
-							addToPending = true;
-							break;
-						}
+		for (Use use : EcoreHelper.getObjects(instruction, Use.class)) {
+			Var var = use.getVariable();
+			if (var.isLocal() && !var.getType().isList()) {
+				for (Def def : var.getDefs()) {
+					Instruction defInst = EcoreHelper.getContainerOfType(def,
+							Instruction.class);
+					if (pendingInstructions.contains(defInst)) {
+						addToPending = true;
+						break;
 					}
 				}
 			}
@@ -288,7 +303,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 		pendingInstructions = new ArrayList<Instruction>();
 		pendingStores = new ArrayList<InstStore>();
 
-		instructions = null; //just in case
+		instructions = null; // just in case
 		super.caseProcedure(procedure);
 
 		NodeBlock block = procedure.getLast();
@@ -329,6 +344,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 				&& !ram.getPredicate().isMutuallyExclusive(predicate)) {
 			int port = ram.getLastPortUsed() + 1;
 			ram.setLastPortUsed(port);
+			ram.setPredicate(predicate);
 
 			if (port < 2) {
 				addSetAddress(ram, var, indexes);
@@ -346,7 +362,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 				// read after write... let's wait a cycle
 				addSplitInstruction(ram);
 			}
-			
+
 			// udpate state of RAM
 			ram.setLastAccessRead();
 			ram.setLastPortUsed(0);
@@ -372,14 +388,19 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 
 		RAM ram = ramMap.get(var);
 		int port;
+		boolean addPendingWrites = false;
 		if (ram.isLastAccessWrite()
 				&& !ram.getPredicate().isMutuallyExclusive(predicate)) {
 			port = ram.getLastPortUsed() + 1;
+			ram.setPredicate(predicate);
 			if (port > 0 && port % 2 == 0) {
 				// port == 2, 4, 6, 8...
 				addSplitInstruction(ram);
 			}
 		} else {
+			// need to schedule the Writes after the pending reads
+			addPendingWrites = ram.isLastAccessRead();
+
 			port = 0;
 		}
 
@@ -391,6 +412,14 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 		// set address and write
 		addSetAddress(ram, var, indexes);
 		addWrite(ram, store);
+
+		// move set address and write to pending list
+		if (addPendingWrites) {
+			indexInst -= 2;
+			for (int i = 0; i < 2; i++) {
+				pendingInstructions.add(instructions.remove(indexInst));
+			}
+		}
 	}
 
 	/**
