@@ -27,7 +27,6 @@ vcom -93 -quiet -work work share/vhdl/stream_in_4.vhdl
 vcom -93 -quiet -work work share/vhdl/stream_in_3.vhdl
 vcom -93 -quiet -work work share/vhdl/stream_in_2.vhdl
 vcom -93 -quiet -work work share/vhdl/stream_in_1.vhdl
-vcom -93 -quiet -work work share/vhdl/stream_in.vhdl
 vcom -93 -quiet -work work share/vhdl/rf_1wr_1rd_always_1_guarded_0.vhd
 vcom -93 -quiet -work work share/vhdl/mul.vhdl
 vcom -93 -quiet -work work share/vhdl/ldh_ldhu_ldq_ldqu_ldw_sth_stq_stw.vhdl
@@ -72,7 +71,7 @@ vcom -93 -quiet -work work <instance.id>/dram_<instance.id>.vhd
 vcom -93 -quiet -work work <instance.id>/processor_<instance.id>.vhd
 
 <if(instance.actor && !instance.actor.native)
->vcom -93 -quiet -work work <instance.id>/<instance.id>_tb.vhd<
+>#vcom -93 -quiet -work work <instance.id>/<instance.id>_tb.vhd<
 endif>
 
 exec cp -f <instance.id>/<instance.id>.mif . &

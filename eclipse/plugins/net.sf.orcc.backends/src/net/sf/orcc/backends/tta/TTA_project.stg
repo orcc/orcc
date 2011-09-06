@@ -32,7 +32,6 @@ set_global_assignment -name VHDL_FILE share/vhdl/stream_in_4.vhdl
 set_global_assignment -name VHDL_FILE share/vhdl/stream_in_3.vhdl
 set_global_assignment -name VHDL_FILE share/vhdl/stream_in_2.vhdl
 set_global_assignment -name VHDL_FILE share/vhdl/stream_in_1.vhdl
-set_global_assignment -name VHDL_FILE share/vhdl/stream_in.vhdl
 set_global_assignment -name VHDL_FILE share/vhdl/rf_1wr_1rd_always_1_guarded_0.vhd
 set_global_assignment -name VHDL_FILE share/vhdl/mul.vhdl
 set_global_assignment -name VHDL_FILE share/vhdl/ldh_ldhu_ldq_ldqu_ldw_sth_stq_stw.vhdl
@@ -55,7 +54,7 @@ set_location_assignment PIN_D19 -to leds[4]
 set_location_assignment PIN_C19 -to leds[5]
 set_location_assignment PIN_F19 -to leds[6]
 set_location_assignment PIN_E19 -to leds[7]
-set_location_assignment PIN_B17 -to reset
+set_location_assignment PIN_AP5 -to reset_n
 set_location_assignment PIN_T33 -to hw_clk
 
 >>

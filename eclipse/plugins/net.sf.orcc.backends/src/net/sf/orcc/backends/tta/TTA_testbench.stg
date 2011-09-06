@@ -104,7 +104,7 @@ type tb_type is (after_reset, read_file, CheckRead);
 -- Configuration
 signal count       : integer range 255 downto 0;
 signal clock       : std_logic := '0';
-signal reset_n     : std_logic := '0';
+signal reset       : std_logic := '0';
 
 >>
 
@@ -130,6 +130,15 @@ init_process() ::= <<
 -- clock generation
 clock \<= not clock after PERIOD/2;
 
+    
+-- reset generation
+reset_proc: process
+begin
+    reset \<= '0';
+    wait for 100 ns;
+    reset \<= '1';
+    wait;
+end process;
 >>
 
 waveform_process_in(inputs) ::= <<
@@ -334,7 +343,7 @@ begin
       hw_clk      =\> clock,
       <if(network.inputs)><network.inputs: mapSignalInput(); separator="\n"><endif>
       <if(network.outputs)><network.outputs: mapSignalOutput(); separator="\n"><endif>
-      reset    =\> reset);
+      reset_n    =\> reset);
       
     <init_process()>
 
