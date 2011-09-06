@@ -80,7 +80,11 @@ public class TtaTypeResizer extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object casePattern(Pattern pattern) {
-		checkVariables(pattern.getVariables(), 32);
+		for (Var var : pattern.getVariables()) {
+			if (!pattern.getPort(var).isNative()) {
+				checkType(var.getType(), 32);
+			}
+		}
 		return null;
 	}
 
