@@ -119,17 +119,21 @@ endif>
 // Init at reset
 ///////////////////////////////////////////////////////////////////////////////
 stateConst(variable) ::= <<
-<if(variable.assignable)>
-<if(variable.type.list)>
+<if (variable.assignable)>
+<if (variable.type.list)>
 --
+<if (actor.templateData.ramMap.(variable).port1Used)>
 <variable.name>_wren_p1    \<= '0';
 <variable.name>_address_p1 \<= (others =\> '0');
 <variable.name>_data_p1    \<= (others =\> '0');
+<endif>
+<if (actor.templateData.ramMap.(variable).port2Used)>
 <variable.name>_wren_p2    \<= '0';
 <variable.name>_address_p2 \<= (others =\> '0');
 <variable.name>_data_p2    \<= (others =\> '0');
+<endif>
 --
-<elseif(variable.initialized)>
+<elseif (variable.initialized)>
 <variable.name> \<= <variable.initialValue>;
 <endif>
 <endif>
@@ -527,12 +531,11 @@ variable <action.body.name>_<port.name>_o : <port.type>;}>
 }>  --
 begin
   if reset_n = '0' then
-<if(actor.stateVars)>
     <actor.stateVars: stateConst()>    --
-<endif>
     <actor.outputs : port_out_init()>    --
 <if(actor.fsm)>
-    FSM    \<= s_<actor.fsm.initialState.name>;    --
+    FSM    \<= s_<actor.fsm.initialState.name>;
+    --
 <endif>
   elsif rising_edge(clock) then
     <actor.outputs: {port|<if(!port.native)>

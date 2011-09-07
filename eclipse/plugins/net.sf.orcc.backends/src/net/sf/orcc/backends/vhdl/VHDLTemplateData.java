@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.orcc.backends.vhdl.ram.RAM;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.InstLoad;
@@ -128,6 +129,8 @@ public class VHDLTemplateData {
 
 	private Map<Var, Object> initValueMap;
 
+	private Map<Var, RAM> ramMap;
+
 	private List<String> signals;
 
 	/**
@@ -149,9 +152,30 @@ public class VHDLTemplateData {
 	}
 
 	/**
-	 * Returns the list of variables.
+	 * Returns the global variable to RAM map.
 	 * 
-	 * @return the list of variables
+	 * @return the global variable to RAM map
+	 */
+	public Map<Var, RAM> getRamMap() {
+		return ramMap;
+	}
+
+	/**
+	 * Sets the global variable to RAM map.
+	 * 
+	 * @param ramMap
+	 *            the global variable to RAM map
+	 */
+	public void setRamMap(Map<Var, RAM> ramMap) {
+		this.ramMap = ramMap;
+	}
+
+	/**
+	 * Returns the list of signals in the sensitivity list of the scheduler
+	 * process.
+	 * 
+	 * @return the list of signals in the sensitivity list of the scheduler
+	 *         process
 	 */
 	public List<String> getSignals() {
 		return signals;

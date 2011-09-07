@@ -39,6 +39,7 @@ import net.sf.orcc.backends.instructions.InstRamSetAddress;
 import net.sf.orcc.backends.instructions.InstRamWrite;
 import net.sf.orcc.backends.instructions.InstSplit;
 import net.sf.orcc.backends.instructions.InstructionsFactory;
+import net.sf.orcc.backends.vhdl.VHDLTemplateData;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Def;
@@ -209,7 +210,12 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	@Override
 	public Object caseActor(Actor actor) {
 		pendingReads = new HashMap<RAM, List<InstRamRead>>();
+
+		// creates RAM map and reference it in the template data
 		ramMap = new HashMap<Var, RAM>();
+		((VHDLTemplateData) actor.getTemplateData()).setRamMap(ramMap);
+
+		// fill RAM map
 		for (Var variable : actor.getStateVars()) {
 			if (variable.isAssignable() && variable.getType().isList()) {
 				RAM ram = new RAM();
