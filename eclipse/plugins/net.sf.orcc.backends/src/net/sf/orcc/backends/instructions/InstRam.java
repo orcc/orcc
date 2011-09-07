@@ -29,7 +29,7 @@
 package net.sf.orcc.backends.instructions;
 
 import net.sf.orcc.ir.InstSpecific;
-import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.Use;
 
 /**
  * This interface defines a specific instruction that manipulates a RAM
@@ -49,12 +49,12 @@ public interface InstRam extends InstSpecific {
 	int getPort();
 
 	/**
-	 * Returns the var to which the RAM is associated.
+	 * Returns the variable used by this RAM instruction.
 	 * 
-	 * @return the var to which the RAM is associated
-	 * @model
+	 * @return the variable used by this RAM instruction
+	 * @model containment="true"
 	 */
-	Var getVariable();
+	Use getSource();
 
 	/**
 	 * Sets the port on which operations should be performed.
@@ -65,11 +65,11 @@ public interface InstRam extends InstSpecific {
 	void setPort(int port);
 
 	/**
-	 * Sets the var to which the RAM is associated.
+	 * Sets the variable used by this RAM instruction.
 	 * 
 	 * @param var
-	 *            the var to which the RAM is associated
+	 *            the variable used by this RAM instruction
 	 */
-	void setVariable(Var var);
+	void setSource(Use source);
 
 }

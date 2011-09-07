@@ -21,7 +21,7 @@
     <genClasses ecoreClass="Instructions.ecore#//InstSplit"/>
     <genClasses ecoreClass="Instructions.ecore#//InstRam">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Instructions.ecore#//InstRam/port"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstRam/variable"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstRam/source"/>
     </genClasses>
     <genClasses ecoreClass="Instructions.ecore#//InstRamRead">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstRamRead/target"/>

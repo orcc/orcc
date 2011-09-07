@@ -97,16 +97,16 @@ public class InstructionsAdapterFactory extends AdapterFactoryImpl {
 	protected InstructionsSwitch<Adapter> modelSwitch =
 		new InstructionsSwitch<Adapter>() {
 			@Override
-			public Adapter caseInstTernary(InstTernary object) {
-				return createInstTernaryAdapter();
-			}
-			@Override
 			public Adapter caseInstAssignIndex(InstAssignIndex object) {
 				return createInstAssignIndexAdapter();
 			}
 			@Override
-			public Adapter caseInstSplit(InstSplit object) {
-				return createInstSplitAdapter();
+			public Adapter caseInstCast(InstCast object) {
+				return createInstCastAdapter();
+			}
+			@Override
+			public Adapter caseInstGetElementPtr(InstGetElementPtr object) {
+				return createInstGetElementPtrAdapter();
 			}
 			@Override
 			public Adapter caseInstRam(InstRam object) {
@@ -125,12 +125,12 @@ public class InstructionsAdapterFactory extends AdapterFactoryImpl {
 				return createInstRamWriteAdapter();
 			}
 			@Override
-			public Adapter caseInstGetElementPtr(InstGetElementPtr object) {
-				return createInstGetElementPtrAdapter();
+			public Adapter caseInstSplit(InstSplit object) {
+				return createInstSplitAdapter();
 			}
 			@Override
-			public Adapter caseInstCast(InstCast object) {
-				return createInstCastAdapter();
+			public Adapter caseInstTernary(InstTernary object) {
+				return createInstTernaryAdapter();
 			}
 			@Override
 			public Adapter caseInstruction(Instruction object) {

@@ -104,14 +104,14 @@ public class InstructionsFactoryImpl extends EFactoryImpl implements
 	@Override
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
-			case InstructionsPackage.INST_TERNARY: return createInstTernary();
 			case InstructionsPackage.INST_ASSIGN_INDEX: return createInstAssignIndex();
-			case InstructionsPackage.INST_SPLIT: return createInstSplit();
+			case InstructionsPackage.INST_CAST: return createInstCast();
+			case InstructionsPackage.INST_GET_ELEMENT_PTR: return createInstGetElementPtr();
 			case InstructionsPackage.INST_RAM_READ: return createInstRamRead();
 			case InstructionsPackage.INST_RAM_SET_ADDRESS: return createInstRamSetAddress();
 			case InstructionsPackage.INST_RAM_WRITE: return createInstRamWrite();
-			case InstructionsPackage.INST_GET_ELEMENT_PTR: return createInstGetElementPtr();
-			case InstructionsPackage.INST_CAST: return createInstCast();
+			case InstructionsPackage.INST_SPLIT: return createInstSplit();
+			case InstructionsPackage.INST_TERNARY: return createInstTernary();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -185,7 +185,7 @@ public class InstructionsFactoryImpl extends EFactoryImpl implements
 	public InstRamRead createInstRamRead(int port, Var variable, Var target) {
 		InstRamReadImpl instRamRead = new InstRamReadImpl();
 		instRamRead.setPort(port);
-		instRamRead.setVariable(variable);
+		instRamRead.setSource(IrFactory.eINSTANCE.createUse(variable));
 		instRamRead.setTarget(IrFactory.eINSTANCE.createDef(target));
 		return instRamRead;
 	}
@@ -204,7 +204,7 @@ public class InstructionsFactoryImpl extends EFactoryImpl implements
 			List<Expression> indexes) {
 		InstRamSetAddressImpl instRamSetAddress = new InstRamSetAddressImpl();
 		instRamSetAddress.setPort(port);
-		instRamSetAddress.setVariable(variable);
+		instRamSetAddress.setSource(IrFactory.eINSTANCE.createUse(variable));
 		instRamSetAddress.getIndexes().addAll(indexes);
 		return instRamSetAddress;
 	}
@@ -223,7 +223,7 @@ public class InstructionsFactoryImpl extends EFactoryImpl implements
 			Expression value) {
 		InstRamWriteImpl instRamWrite = new InstRamWriteImpl();
 		instRamWrite.setPort(port);
-		instRamWrite.setVariable(variable);
+		instRamWrite.setSource(IrFactory.eINSTANCE.createUse(variable));
 		instRamWrite.setValue(value);
 		return instRamWrite;
 	}

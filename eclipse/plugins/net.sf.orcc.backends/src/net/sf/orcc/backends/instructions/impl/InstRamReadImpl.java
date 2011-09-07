@@ -197,8 +197,10 @@ public class InstRamReadImpl extends InstRamImpl implements InstRamRead {
 
 	@Override
 	public String toString() {
-		return super.toString() + "RamRead(" + getTarget().getVariable().getIndexedName() + ", "
-				+ getVariable().getName() + "_q_p" + getPort() + ")";
+		return super.toString() + "RamRead("
+				+ getTarget().getVariable().getIndexedName() + ", "
+				+ getSource().getVariable().getName() + "_q_p" + getPort()
+				+ ")";
 	}
 
-} // InstRamReadImpl
+}

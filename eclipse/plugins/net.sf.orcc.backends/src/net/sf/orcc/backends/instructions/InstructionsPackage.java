@@ -69,70 +69,7 @@ public interface InstructionsPackage extends EPackage {
 	 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getInstTernary()
 	 * @generated
 	 */
-	int INST_TERNARY = 0;
-
-	/**
-	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_TERNARY__LINE_NUMBER = IrPackage.INST_SPECIFIC__LINE_NUMBER;
-
-	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_TERNARY__PREDICATE = IrPackage.INST_SPECIFIC__PREDICATE;
-
-	/**
-	 * The feature id for the '<em><b>Condition Value</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_TERNARY__CONDITION_VALUE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 0;
-
-	/**
-	 * The feature id for the '<em><b>True Value</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_TERNARY__TRUE_VALUE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 1;
-
-	/**
-	 * The feature id for the '<em><b>False Value</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_TERNARY__FALSE_VALUE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 2;
-
-	/**
-	 * The feature id for the '<em><b>Target</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_TERNARY__TARGET = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 3;
-
-	/**
-	 * The number of structural features of the '<em>Inst Ternary</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_TERNARY_FEATURE_COUNT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 4;
+	int INST_TERNARY = 8;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.instructions.impl.InstAssignIndexImpl <em>Inst Assign Index</em>}' class.
@@ -142,7 +79,7 @@ public interface InstructionsPackage extends EPackage {
 	 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getInstAssignIndex()
 	 * @generated
 	 */
-	int INST_ASSIGN_INDEX = 1;
+	int INST_ASSIGN_INDEX = 0;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -206,35 +143,7 @@ public interface InstructionsPackage extends EPackage {
 	 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getInstSplit()
 	 * @generated
 	 */
-	int INST_SPLIT = 2;
-
-	/**
-	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_SPLIT__LINE_NUMBER = IrPackage.INST_SPECIFIC__LINE_NUMBER;
-
-	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_SPLIT__PREDICATE = IrPackage.INST_SPECIFIC__PREDICATE;
-
-	/**
-	 * The number of structural features of the '<em>Inst Split</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_SPLIT_FEATURE_COUNT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 0;
-
+	int INST_SPLIT = 7;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.instructions.impl.InstRamImpl <em>Inst Ram</em>}' class.
@@ -247,51 +156,6 @@ public interface InstructionsPackage extends EPackage {
 	int INST_RAM = 3;
 
 	/**
-	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_RAM__LINE_NUMBER = IrPackage.INST_SPECIFIC__LINE_NUMBER;
-
-	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_RAM__PREDICATE = IrPackage.INST_SPECIFIC__PREDICATE;
-
-	/**
-	 * The feature id for the '<em><b>Port</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_RAM__PORT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 0;
-
-	/**
-	 * The feature id for the '<em><b>Variable</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_RAM__VARIABLE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 1;
-
-	/**
-	 * The number of structural features of the '<em>Inst Ram</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_RAM_FEATURE_COUNT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 2;
-
-	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.instructions.impl.InstRamReadImpl <em>Inst Ram Read</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -300,60 +164,6 @@ public interface InstructionsPackage extends EPackage {
 	 * @generated
 	 */
 	int INST_RAM_READ = 4;
-
-	/**
-	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_RAM_READ__LINE_NUMBER = INST_RAM__LINE_NUMBER;
-
-	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_RAM_READ__PREDICATE = INST_RAM__PREDICATE;
-
-	/**
-	 * The feature id for the '<em><b>Port</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_RAM_READ__PORT = INST_RAM__PORT;
-
-	/**
-	 * The feature id for the '<em><b>Variable</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_RAM_READ__VARIABLE = INST_RAM__VARIABLE;
-
-	/**
-	 * The feature id for the '<em><b>Target</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_RAM_READ__TARGET = INST_RAM_FEATURE_COUNT + 0;
-
-	/**
-	 * The number of structural features of the '<em>Inst Ram Read</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_RAM_READ_FEATURE_COUNT = INST_RAM_FEATURE_COUNT + 1;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.instructions.impl.InstRamSetAddressImpl <em>Inst Ram Set Address</em>}' class.
@@ -366,60 +176,6 @@ public interface InstructionsPackage extends EPackage {
 	int INST_RAM_SET_ADDRESS = 5;
 
 	/**
-	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_RAM_SET_ADDRESS__LINE_NUMBER = INST_RAM__LINE_NUMBER;
-
-	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_RAM_SET_ADDRESS__PREDICATE = INST_RAM__PREDICATE;
-
-	/**
-	 * The feature id for the '<em><b>Port</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_RAM_SET_ADDRESS__PORT = INST_RAM__PORT;
-
-	/**
-	 * The feature id for the '<em><b>Variable</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_RAM_SET_ADDRESS__VARIABLE = INST_RAM__VARIABLE;
-
-	/**
-	 * The feature id for the '<em><b>Indexes</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_RAM_SET_ADDRESS__INDEXES = INST_RAM_FEATURE_COUNT + 0;
-
-	/**
-	 * The number of structural features of the '<em>Inst Ram Set Address</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_RAM_SET_ADDRESS_FEATURE_COUNT = INST_RAM_FEATURE_COUNT + 1;
-
-	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.instructions.impl.InstRamWriteImpl <em>Inst Ram Write</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -430,13 +186,33 @@ public interface InstructionsPackage extends EPackage {
 	int INST_RAM_WRITE = 6;
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.backends.instructions.impl.InstGetElementPtrImpl <em>Inst Get Element Ptr</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.instructions.impl.InstGetElementPtrImpl
+	 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getInstGetElementPtr()
+	 * @generated
+	 */
+	int INST_GET_ELEMENT_PTR = 2;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.backends.instructions.impl.InstCastImpl <em>Inst Cast</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.instructions.impl.InstCastImpl
+	 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getInstCast()
+	 * @generated
+	 */
+	int INST_CAST = 1;
+
+	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INST_RAM_WRITE__LINE_NUMBER = INST_RAM__LINE_NUMBER;
+	int INST_CAST__LINE_NUMBER = IrPackage.INST_SPECIFIC__LINE_NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
@@ -445,54 +221,34 @@ public interface InstructionsPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_RAM_WRITE__PREDICATE = INST_RAM__PREDICATE;
+	int INST_CAST__PREDICATE = IrPackage.INST_SPECIFIC__PREDICATE;
 
 	/**
-	 * The feature id for the '<em><b>Port</b></em>' attribute.
+	 * The feature id for the '<em><b>Target</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INST_RAM_WRITE__PORT = INST_RAM__PORT;
+	int INST_CAST__TARGET = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Variable</b></em>' reference.
+	 * The feature id for the '<em><b>Source</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INST_RAM_WRITE__VARIABLE = INST_RAM__VARIABLE;
+	int INST_CAST__SOURCE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 1;
 
 	/**
-	 * The feature id for the '<em><b>Value</b></em>' containment reference.
+	 * The number of structural features of the '<em>Inst Cast</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INST_RAM_WRITE__VALUE = INST_RAM_FEATURE_COUNT + 0;
-
-	/**
-	 * The number of structural features of the '<em>Inst Ram Write</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_RAM_WRITE_FEATURE_COUNT = INST_RAM_FEATURE_COUNT + 1;
-
-
-	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.instructions.impl.InstGetElementPtrImpl <em>Inst Get Element Ptr</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.backends.instructions.impl.InstGetElementPtrImpl
-	 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getInstGetElementPtr()
-	 * @generated
-	 */
-	int INST_GET_ELEMENT_PTR = 7;
+	int INST_CAST_FEATURE_COUNT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -548,17 +304,6 @@ public interface InstructionsPackage extends EPackage {
 	 */
 	int INST_GET_ELEMENT_PTR_FEATURE_COUNT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 3;
 
-
-	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.instructions.impl.InstCastImpl <em>Inst Cast</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.backends.instructions.impl.InstCastImpl
-	 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getInstCast()
-	 * @generated
-	 */
-	int INST_CAST = 8;
-
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
 	 * <!-- begin-user-doc -->
@@ -566,7 +311,7 @@ public interface InstructionsPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_CAST__LINE_NUMBER = IrPackage.INST_SPECIFIC__LINE_NUMBER;
+	int INST_RAM__LINE_NUMBER = IrPackage.INST_SPECIFIC__LINE_NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
@@ -575,16 +320,16 @@ public interface InstructionsPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_CAST__PREDICATE = IrPackage.INST_SPECIFIC__PREDICATE;
+	int INST_RAM__PREDICATE = IrPackage.INST_SPECIFIC__PREDICATE;
 
 	/**
-	 * The feature id for the '<em><b>Target</b></em>' containment reference.
+	 * The feature id for the '<em><b>Port</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INST_CAST__TARGET = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 0;
+	int INST_RAM__PORT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Source</b></em>' containment reference.
@@ -593,16 +338,268 @@ public interface InstructionsPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_CAST__SOURCE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 1;
+	int INST_RAM__SOURCE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 1;
 
 	/**
-	 * The number of structural features of the '<em>Inst Cast</em>' class.
+	 * The number of structural features of the '<em>Inst Ram</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INST_CAST_FEATURE_COUNT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 2;
+	int INST_RAM_FEATURE_COUNT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 2;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_READ__LINE_NUMBER = INST_RAM__LINE_NUMBER;
+
+	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_READ__PREDICATE = INST_RAM__PREDICATE;
+
+	/**
+	 * The feature id for the '<em><b>Port</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_READ__PORT = INST_RAM__PORT;
+
+	/**
+	 * The feature id for the '<em><b>Source</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_READ__SOURCE = INST_RAM__SOURCE;
+
+	/**
+	 * The feature id for the '<em><b>Target</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_READ__TARGET = INST_RAM_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Inst Ram Read</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_READ_FEATURE_COUNT = INST_RAM_FEATURE_COUNT + 1;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_SET_ADDRESS__LINE_NUMBER = INST_RAM__LINE_NUMBER;
+
+	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_SET_ADDRESS__PREDICATE = INST_RAM__PREDICATE;
+
+	/**
+	 * The feature id for the '<em><b>Port</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_SET_ADDRESS__PORT = INST_RAM__PORT;
+
+	/**
+	 * The feature id for the '<em><b>Source</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_SET_ADDRESS__SOURCE = INST_RAM__SOURCE;
+
+	/**
+	 * The feature id for the '<em><b>Indexes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_SET_ADDRESS__INDEXES = INST_RAM_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Inst Ram Set Address</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_SET_ADDRESS_FEATURE_COUNT = INST_RAM_FEATURE_COUNT + 1;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_WRITE__LINE_NUMBER = INST_RAM__LINE_NUMBER;
+
+	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_WRITE__PREDICATE = INST_RAM__PREDICATE;
+
+	/**
+	 * The feature id for the '<em><b>Port</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_WRITE__PORT = INST_RAM__PORT;
+
+	/**
+	 * The feature id for the '<em><b>Source</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_WRITE__SOURCE = INST_RAM__SOURCE;
+
+	/**
+	 * The feature id for the '<em><b>Value</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_WRITE__VALUE = INST_RAM_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Inst Ram Write</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_WRITE_FEATURE_COUNT = INST_RAM_FEATURE_COUNT + 1;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_SPLIT__LINE_NUMBER = IrPackage.INST_SPECIFIC__LINE_NUMBER;
+
+	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_SPLIT__PREDICATE = IrPackage.INST_SPECIFIC__PREDICATE;
+
+	/**
+	 * The number of structural features of the '<em>Inst Split</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_SPLIT_FEATURE_COUNT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_TERNARY__LINE_NUMBER = IrPackage.INST_SPECIFIC__LINE_NUMBER;
+
+	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_TERNARY__PREDICATE = IrPackage.INST_SPECIFIC__PREDICATE;
+
+	/**
+	 * The feature id for the '<em><b>Condition Value</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_TERNARY__CONDITION_VALUE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>True Value</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_TERNARY__TRUE_VALUE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 1;
+
+	/**
+	 * The feature id for the '<em><b>False Value</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_TERNARY__FALSE_VALUE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 2;
+
+	/**
+	 * The feature id for the '<em><b>Target</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_TERNARY__TARGET = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 3;
+
+	/**
+	 * The number of structural features of the '<em>Inst Ternary</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_TERNARY_FEATURE_COUNT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 4;
 
 
 	/**
@@ -734,15 +731,15 @@ public interface InstructionsPackage extends EPackage {
 	EAttribute getInstRam_Port();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.instructions.InstRam#getVariable <em>Variable</em>}'.
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.instructions.InstRam#getSource <em>Source</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Variable</em>'.
-	 * @see net.sf.orcc.backends.instructions.InstRam#getVariable()
+	 * @return the meta object for the containment reference '<em>Source</em>'.
+	 * @see net.sf.orcc.backends.instructions.InstRam#getSource()
 	 * @see #getInstRam()
 	 * @generated
 	 */
-	EReference getInstRam_Variable();
+	EReference getInstRam_Source();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.instructions.InstRamRead <em>Inst Ram Read</em>}'.
@@ -1009,12 +1006,12 @@ public interface InstructionsPackage extends EPackage {
 		EAttribute INST_RAM__PORT = eINSTANCE.getInstRam_Port();
 
 		/**
-		 * The meta object literal for the '<em><b>Variable</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Source</b></em>' containment reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INST_RAM__VARIABLE = eINSTANCE.getInstRam_Variable();
+		EReference INST_RAM__SOURCE = eINSTANCE.getInstRam_Source();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.instructions.impl.InstRamReadImpl <em>Inst Ram Read</em>}' class.

@@ -3,16 +3,6 @@
     xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="instructions"
     nsURI="http://orcc.sf.net/backends/instructions/Instructions" nsPrefix="net.sf.orcc.backends.instructions">
-  <eClassifiers xsi:type="ecore:EClass" name="InstTernary" eSuperTypes="../../net.sf.orcc.core/model/Ir.ecore#//InstSpecific">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="conditionValue" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Expression"
-        containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="trueValue" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Expression"
-        containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="falseValue" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Expression"
-        containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Def"
-        containment="true" resolveProxies="false"/>
-  </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="InstAssignIndex" eSuperTypes="../../net.sf.orcc.core/model/Ir.ecore#//InstSpecific">
     <eStructuralFeatures xsi:type="ecore:EReference" name="indexes" upperBound="-1"
         eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Expression" containment="true"
@@ -22,10 +12,25 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="listType" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Type"
         containment="true" resolveProxies="false"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="InstSplit" eSuperTypes="../../net.sf.orcc.core/model/Ir.ecore#//InstSpecific"/>
+  <eClassifiers xsi:type="ecore:EClass" name="InstCast" eSuperTypes="../../net.sf.orcc.core/model/Ir.ecore#//InstSpecific">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Def"
+        containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="source" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Use"
+        containment="true" resolveProxies="false"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="InstGetElementPtr" eSuperTypes="../../net.sf.orcc.core/model/Ir.ecore#//InstSpecific">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="indexes" upperBound="-1"
+        eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Expression" containment="true"
+        resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Def"
+        containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="source" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Use"
+        containment="true" resolveProxies="false"/>
+  </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="InstRam" abstract="true" eSuperTypes="../../net.sf.orcc.core/model/Ir.ecore#//InstSpecific">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="port" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="variable" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Var"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="source" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Use"
+        containment="true" resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="InstRamRead" eSuperTypes="#//InstRam">
     <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Def"
@@ -40,19 +45,15 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Expression"
         containment="true" resolveProxies="false"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="InstGetElementPtr" eSuperTypes="../../net.sf.orcc.core/model/Ir.ecore#//InstSpecific">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="indexes" upperBound="-1"
-        eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Expression" containment="true"
-        resolveProxies="false"/>
+  <eClassifiers xsi:type="ecore:EClass" name="InstSplit" eSuperTypes="../../net.sf.orcc.core/model/Ir.ecore#//InstSpecific"/>
+  <eClassifiers xsi:type="ecore:EClass" name="InstTernary" eSuperTypes="../../net.sf.orcc.core/model/Ir.ecore#//InstSpecific">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="conditionValue" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Expression"
+        containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="trueValue" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Expression"
+        containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="falseValue" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Expression"
+        containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Def"
-        containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="source" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Use"
-        containment="true" resolveProxies="false"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="InstCast" eSuperTypes="../../net.sf.orcc.core/model/Ir.ecore#//InstSpecific">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Def"
-        containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="source" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Use"
         containment="true" resolveProxies="false"/>
   </eClassifiers>
 </ecore:EPackage>

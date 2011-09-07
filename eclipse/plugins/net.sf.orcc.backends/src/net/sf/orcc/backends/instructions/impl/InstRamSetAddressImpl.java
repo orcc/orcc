@@ -172,7 +172,8 @@ public class InstRamSetAddressImpl extends InstRamImpl implements
 	 * @return a list containing the sizes of the indexes
 	 */
 	public List<Integer> getIndexesSizes() {
-		List<Integer> dimensions = getVariable().getType().getDimensions();
+		List<Integer> dimensions = getSource().getVariable().getType()
+				.getDimensions();
 		List<Integer> indexSizes = new ArrayList<Integer>(dimensions.size());
 		for (int size : dimensions) {
 			// index goes from 0 to size - 1, and we remove the sign bit
@@ -196,7 +197,8 @@ public class InstRamSetAddressImpl extends InstRamImpl implements
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(super.toString());
-		builder.append("RamSetAddress(").append(getVariable().getName())
+		builder.append("RamSetAddress(")
+				.append(getSource().getVariable().getName())
 				.append("_address_p").append(getPort());
 		for (Expression index : indexes) {
 			builder.append("[");
@@ -207,4 +209,4 @@ public class InstRamSetAddressImpl extends InstRamImpl implements
 		return builder.toString();
 	}
 
-} // InstRamSetAddressImpl
+}
