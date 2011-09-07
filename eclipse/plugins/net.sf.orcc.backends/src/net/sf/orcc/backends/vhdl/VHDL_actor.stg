@@ -317,15 +317,17 @@ endif>
 /////////////////////
 // port read/write //
 
-printRead(procedure, port, variable) ::= <<
-<if(port.type.bool)
-><procedure.name>_<variable.name>_i := <getPortName(port, "_data")>;<
-elseif(port.type.int)
-><procedure.name>_<variable.name>_i := to_integer(signed(<getPortName(port, "_data")>));<
-elseif(port.type.uint)
-><procedure.name>_<variable.name>_i := to_integer(unsigned(<getPortName(port, "_data")>));<
-endif>
->>
+printRead(procedure, port, variable) ::= <%
+<if (variable.used)>
+<if(port.type.bool)>
+<procedure.name>_<variable.name>_i := <getPortName(port, "_data")>;
+<elseif(port.type.int)>
+<procedure.name>_<variable.name>_i := to_integer(signed(<getPortName(port, "_data")>));
+<elseif(port.type.uint)>
+<procedure.name>_<variable.name>_i := to_integer(unsigned(<getPortName(port, "_data")>));
+<endif>
+<endif>
+%>
 
 printWrite(procedure, port, variable) ::= <<
 <if(port.type.bool)
