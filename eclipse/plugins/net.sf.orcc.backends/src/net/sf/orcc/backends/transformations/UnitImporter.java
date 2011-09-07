@@ -122,12 +122,21 @@ public class UnitImporter extends AbstractActorVisitor<Object> {
 
 					if (object instanceof Def) {
 						Def def = (Def) object;
+						Var copyVar = (Var) copier.get(def.getVariable());
 						Def copyDef = (Def) copier.get(def);
-						copyDef.setVariable(def.getVariable());
+						copyDef.setVariable(copyVar);
 					} else if (object instanceof Use) {
 						Use use = (Use) object;
+						Var var = use.getVariable();
+						Var copyVar = (Var) copier.get(var);
 						Use copyUse = (Use) copier.get(use);
-						copyUse.setVariable(use.getVariable());
+						if (copyVar == null) {
+							// happens for variables loaded from units
+							// handled by caseInstLoad
+							copyUse.setVariable(var);
+						} else {
+							copyUse.setVariable(copyVar);
+						}
 					} else if (object instanceof InstCall) {
 						InstCall innerCall = (InstCall) object;
 						Procedure copyProc = (Procedure) doSwitch(innerCall
