@@ -42,9 +42,11 @@ import net.sf.orcc.runtime.impl.GenericSource;
  */
 public class Source extends GenericSource {
 
-	//private static String fileName;
+	// private static String fileName;
 
 	private static RandomAccessFile in;
+
+	private static int nbLoops = 1;
 
 	public static void source_init() {
 		try {
@@ -89,6 +91,10 @@ public class Source extends GenericSource {
 					+ "\"";
 			throw new RuntimeException(msg, e);
 		}
+	}
+
+	public static int source_getNbLoop() {
+		return nbLoops;
 	}
 
 }

@@ -75,7 +75,7 @@ public class DisplayYUV {
 	private static long t1;
 
 	private static long t2;
-
+	
 	private static int clip(int n) {
 		if (n < 0) {
 			return 0;
@@ -159,10 +159,6 @@ public class DisplayYUV {
 			buffer.show();
 			graphics.dispose();
 		}
-
-		t2 = System.currentTimeMillis();
-		System.out.println("image displayed in " + (t2 - t1) + " ms");
-		t1 = t2;
 	}
 
 	/**
@@ -199,8 +195,6 @@ public class DisplayYUV {
 		canvas = new Canvas();
 		frame.add(canvas);
 		frame.setVisible(true);
-
-		t1 = System.currentTimeMillis();
 	}
 
 	private static void setVideoSize(int newWidth, int newHeight) {
@@ -215,6 +209,16 @@ public class DisplayYUV {
 
 		image = new BufferedImage(lastWidth, lastHeight,
 				BufferedImage.TYPE_INT_RGB);
+	}
+	
+	public static void fpsPrintInit()  {
+		t1 = System.currentTimeMillis();
+	}
+
+	public static void fpsPrintNewPicDecoded() {
+		t2 = System.currentTimeMillis();
+		System.out.println("image displayed in " + (t2 - t1) + " ms");
+		t1 = t2;
 	}
 
 }
