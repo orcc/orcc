@@ -46,12 +46,15 @@ public class RAM {
 
 	private int lastPortUsed;
 
+	private boolean[] portsUsed;
+
 	private Predicate predicate;
 
 	/**
 	 * Creates a new RAM.
 	 */
 	public RAM() {
+		portsUsed = new boolean[2];
 	}
 
 	/**
@@ -91,6 +94,24 @@ public class RAM {
 	}
 
 	/**
+	 * Returns true if port 1 is used.
+	 * 
+	 * @return true if port 1 is used
+	 */
+	public boolean isPort1Used() {
+		return portsUsed[0];
+	}
+
+	/**
+	 * Returns true if port 2 is used.
+	 * 
+	 * @return true if port 2 is used
+	 */
+	public boolean isPort2Used() {
+		return portsUsed[1];
+	}
+
+	/**
 	 * Resets this RAM. Sets the <code>alreadyAccessed</code> to
 	 * <code>false</code>, and resets the predicate this RAM was last accessed
 	 * with.
@@ -117,13 +138,15 @@ public class RAM {
 	}
 
 	/**
-	 * Sets the last port used by this RAM. The port number is 0-based.
+	 * Sets the last port used by this RAM. The port number is 0-based. Updates
+	 * the state of the ports that have been used by this RAM at least once.
 	 * 
-	 * @param lastPortUsed
+	 * @param port
 	 *            last port used
 	 */
-	public void setLastPortUsed(int lastPortUsed) {
-		this.lastPortUsed = lastPortUsed;
+	public void setLastPortUsed(int port) {
+		portsUsed[port % 2] = true;
+		this.lastPortUsed = port;
 	}
 
 	/**
