@@ -40,13 +40,17 @@ import net.sf.orcc.ir.util.IrUtil;
  */
 public class RAM {
 
+	private static final int READ = 1;
+
+	private static final int WRITE = 2;
+
 	private boolean alreadyAccessed;
 
 	private boolean lastAccessRead;
 
 	private int lastPortUsed;
 
-	private boolean[] portsUsed;
+	private int[] portsUsed;
 
 	private Predicate predicate;
 
@@ -54,7 +58,7 @@ public class RAM {
 	 * Creates a new RAM.
 	 */
 	public RAM() {
-		portsUsed = new boolean[2];
+		portsUsed = new int[2];
 	}
 
 	/**
@@ -94,21 +98,39 @@ public class RAM {
 	}
 
 	/**
-	 * Returns true if port 1 is used.
+	 * Returns true if port 1 is used for read operations.
 	 * 
-	 * @return true if port 1 is used
+	 * @return true if port 1 is used for read operations
 	 */
-	public boolean isPort1Used() {
-		return portsUsed[0];
+	public boolean isPort1UsedRead() {
+		return (portsUsed[0] & READ) != 0;
 	}
 
 	/**
-	 * Returns true if port 2 is used.
+	 * Returns true if port 1 is used for write operations.
 	 * 
-	 * @return true if port 2 is used
+	 * @return true if port 1 is used for write operations
 	 */
-	public boolean isPort2Used() {
-		return portsUsed[1];
+	public boolean isPort1UsedWrite() {
+		return (portsUsed[0] & WRITE) != 0;
+	}
+
+	/**
+	 * Returns true if port 2 is used for read operations.
+	 * 
+	 * @return true if port 2 is used for read operations
+	 */
+	public boolean isPort2UsedRead() {
+		return (portsUsed[1] & READ) != 0;
+	}
+
+	/**
+	 * Returns true if port 2 is used for write operations.
+	 * 
+	 * @return true if port 2 is used for write operations
+	 */
+	public boolean isPort2UsedWrite() {
+		return (portsUsed[1] & WRITE) != 0;
 	}
 
 	/**
@@ -145,7 +167,9 @@ public class RAM {
 	 *            last port used
 	 */
 	public void setLastPortUsed(int port) {
-		portsUsed[port % 2] = true;
+		// set bit for read/write operation depending on lastAccessRead flag
+		portsUsed[port % 2] |= lastAccessRead ? READ : WRITE;
+
 		this.lastPortUsed = port;
 	}
 
