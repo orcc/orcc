@@ -298,28 +298,28 @@ endif>
 ///////////////////////////////////////////////////////////////////////////////
 
 printRamRead(ramRead) ::= <<
-<ramRead.target.variable.indexedName> := <if(ramRead.variable.type.innermostType.bool)
-><ramRead.variable.name>_q_p<ramRead.port>(0);<
-elseif(ramRead.variable.type.innermostType.int)
->to_integer(signed(<ramRead.variable.name>_q_p<ramRead.port>));<
+<ramRead.target.variable.indexedName> := <if(ramRead.source.variable.type.innermostType.bool)
+><ramRead.source.variable.name>_q_p<ramRead.port>(0);<
+elseif(ramRead.source.variable.type.innermostType.int)
+>to_integer(signed(<ramRead.source.variable.name>_q_p<ramRead.port>));<
 else
->to_integer(unsigned(<ramRead.variable.name>_q_p<ramRead.port>));<
+>to_integer(unsigned(<ramRead.source.variable.name>_q_p<ramRead.port>));<
 endif>
 >>
 
 printRamWrite(ramWrite) ::= <<
-<ramWrite.variable.name>_data_p<ramWrite.port><if(ramWrite.variable.type.innermostType.bool)
+<ramWrite.source.variable.name>_data_p<ramWrite.port><if(ramWrite.source.variable.type.innermostType.bool)
 >(0) \<= <ramWrite.value>;
-<elseif(ramWrite.variable.type.innermostType.int)
-> \<= std_logic_vector(to_signed(<ramWrite.value>, <ramWrite.variable.type.innermostType.size>));
+<elseif(ramWrite.source.variable.type.innermostType.int)
+> \<= std_logic_vector(to_signed(<ramWrite.value>, <ramWrite.source.variable.type.innermostType.size>));
 <else
-> \<= std_logic_vector(to_unsigned(<ramWrite.value>, <ramWrite.variable.type.innermostType.size>));
+> \<= std_logic_vector(to_unsigned(<ramWrite.value>, <ramWrite.source.variable.type.innermostType.size>));
 <endif>
-<ramWrite.variable.name>_wren_p<ramWrite.port> \<= '1';
+<ramWrite.source.variable.name>_wren_p<ramWrite.port> \<= '1';
 >>
 
 printRamSetAddress(ramSetAddress) ::= <<
-<ramSetAddress.variable.name>_address_p<ramSetAddress.port> \<= <ramSetAddress.indexes, ramSetAddress.indexesSizes: {index, size | std_logic_vector(to_unsigned(<index>, <size>))}; separator=" & ">;
+<ramSetAddress.source.variable.name>_address_p<ramSetAddress.port> \<= <ramSetAddress.indexes, ramSetAddress.indexesSizes: {index, size | std_logic_vector(to_unsigned(<index>, <size>))}; separator=" & ">;
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
