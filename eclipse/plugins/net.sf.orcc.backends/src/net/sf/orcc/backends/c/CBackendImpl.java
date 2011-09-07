@@ -149,7 +149,13 @@ public class CBackendImpl extends AbstractBackend {
 		mapping = getAttribute(MAPPING, new HashMap<String, String>());
 		classify = getAttribute("net.sf.orcc.backends.classify", false);
 		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
-		merge = getAttribute("net.sf.orcc.backends.merge", false);
+		if (classify) {
+			// only retrieve the merge option if classify is true
+			merge = getAttribute("net.sf.orcc.backends.merge", false);
+		} else {
+			merge = false;
+		}
+
 		geneticAlgorithm = getAttribute(
 				"net.sf.orcc.backends.geneticAlgorithm", false);
 		newScheduler = getAttribute("net.sf.orcc.backends.newScheduler", false);
