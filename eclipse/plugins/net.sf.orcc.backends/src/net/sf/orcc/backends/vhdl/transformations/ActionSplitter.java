@@ -30,11 +30,6 @@ served.
  */
 package net.sf.orcc.backends.vhdl.transformations;
 
-import static net.sf.orcc.ir.IrFactory.eINSTANCE;
-import static net.sf.orcc.ir.util.IrUtil.copy;
-import static net.sf.orcc.util.EcoreHelper.getContainerOfType;
-import static org.eclipse.emf.ecore.util.EcoreUtil.isAncestor;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,21 +39,15 @@ import java.util.Set;
 import net.sf.orcc.backends.instructions.InstSplit;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstSpecific;
-import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.State;
-import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
-import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.jgrapht.DirectedGraph;
@@ -71,97 +60,6 @@ import org.jgrapht.DirectedGraph;
  * 
  */
 public class ActionSplitter extends AbstractActorVisitor<Object> {
-
-	private class UseUpdater extends AbstractActorVisitor<Object> {
-
-		public UseUpdater() {
-			this.actor = ActionSplitter.this.actor;
-		}
-
-		@Override
-		public Object caseInstLoad(InstLoad load) {
-			if (load.getIndexes().isEmpty()) {
-				// gets source, target of this load
-				Var source = load.getSource().getVariable();
-				Var target = load.getTarget().getVariable();
-
-				// saves the global associated with the local
-				mapLocalToGlobal.put(target, source);
-			}
-
-			return null;
-		}
-
-		@Override
-		public Object caseInstruction(Instruction instruction) {
-			NodeBlock block = instruction.getBlock();
-			for (Def def : EcoreHelper.getObjects(instruction, Def.class)) {
-				Var var = def.getVariable();
-				if (var.isLocal() && !var.getType().isList()) {
-					if (instruction.isAssign()) {
-						handleLocalVarDef(block, var);
-					}
-				}
-			}
-
-			return null;
-		}
-
-		private Var createGlobal(Var var) {
-			String name = "sg_" + procedure.getName() + "_" + var.getName();
-			Var global = eINSTANCE.createVar(procedure.getLineNumber(),
-					copy(var.getType()), name, true, null);
-			actor.getStateVars().add(global);
-			mapLocalToGlobal.put(var, global);
-
-			// copy uses and replace those that are in different procedures
-			List<Use> uses = new ArrayList<Use>(var.getUses());
-			for (Use use : uses) {
-				if (!isAncestor(procedure, use)) {
-					Procedure procUse = getContainerOfType(use, Procedure.class);
-					Var local = procUse.newTempLocalVariable(
-							copy(var.getType()), var.getName());
-					InstLoad load = eINSTANCE.createInstLoad(local, global);
-					load.setPredicate(eINSTANCE.createPredicate());
-
-					Instruction inst = getContainerOfType(use,
-							Instruction.class);
-					NodeBlock block = inst.getBlock();
-					int index = block.indexOf(inst);
-					block.add(index, load);
-
-					use.setVariable(local);
-				}
-			}
-
-			return global;
-		}
-
-		private void handleLocalVarDef(NodeBlock block, Var var) {
-			boolean interProcUses = false;
-			for (Use use : var.getUses()) {
-				if (!isAncestor(procedure, use)) {
-					interProcUses = true;
-				}
-			}
-
-			// get global variable
-			Var global = mapLocalToGlobal.get(var);
-			if (global == null && interProcUses && isAncestor(procedure, var)) {
-				global = createGlobal(var);
-			}
-
-			if (global != null) {
-				// create store
-				InstStore store = eINSTANCE.createInstStore(global, var);
-				store.setPredicate(eINSTANCE.createPredicate());
-
-				// add store after this assign
-				block.add(++indexInst, store);
-			}
-		}
-
-	}
 
 	/**
 	 * name of the branch being visited
@@ -178,8 +76,6 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 	 * an FSM is added to the actor.
 	 */
 	private FSM fsm;
-
-	private Map<Var, Var> mapLocalToGlobal;
 
 	/**
 	 * action to visit next (may be null)
@@ -246,11 +142,6 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 		statesMap = new HashMap<String, State>();
 
 		visitAllActions();
-
-		mapLocalToGlobal = new HashMap<Var, Var>();
-		for (Action action : actor.getActions()) {
-			new UseUpdater().doSwitch(action.getBody());
-		}
 
 		return null;
 	}
