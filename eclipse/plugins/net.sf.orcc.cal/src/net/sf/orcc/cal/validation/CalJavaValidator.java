@@ -174,7 +174,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 				int index = 0;
 				for (AstExpression value : values) {
 					Type type = checker.getType(value);
-					if (!checker.isConvertibleTo(type, portType)) {
+					if (!TypeUtil.isConvertibleTo(type, portType)) {
 						error("this expression must be of type " + portType,
 								pattern,
 								eINSTANCE.getAstOutputPattern_Values(), index);
@@ -392,7 +392,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		TypeChecker checker = new TypeChecker(this);
 		Type targetType = checker.getType(expression);
 		Type type = checker.getType(assign.getValue());
-		if (!checker.isConvertibleTo(type, targetType)) {
+		if (!TypeUtil.isConvertibleTo(type, targetType)) {
 			error("Type mismatch: cannot convert from " + type + " to "
 					+ targetType, assign,
 					eINSTANCE.getAstStatementAssign_Value(), -1);
@@ -444,7 +444,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			Type actualType = checker.getType(expression);
 
 			// check types
-			if (!checker.isConvertibleTo(actualType, formalType)) {
+			if (!TypeUtil.isConvertibleTo(actualType, formalType)) {
 				error("Type mismatch: cannot convert from " + actualType
 						+ " to " + formalType, astCall,
 						eINSTANCE.getAstStatementCall_Parameters(), index);
@@ -485,7 +485,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			// check types
 			Type targetType = Util.getType(variable);
 			Type type = checker.getType(value);
-			if (!checker.isConvertibleTo(type, targetType)) {
+			if (!TypeUtil.isConvertibleTo(type, targetType)) {
 				error("Type mismatch: cannot convert from " + type + " to "
 						+ targetType, variable,
 						eINSTANCE.getAstVariable_Value(), -1);
@@ -789,10 +789,9 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	}
 
 	private void checkReturnType(AstFunction function) {
-		TypeChecker checker = new TypeChecker(this);
 		Type returnType = Util.getType(function);
 		Type expressionType = Util.getType(function.getExpression());
-		if (!checker.isConvertibleTo(expressionType, returnType)) {
+		if (!TypeUtil.isConvertibleTo(expressionType, returnType)) {
 			error("Type mismatch: cannot convert from " + expressionType
 					+ " to " + returnType, function,
 					eINSTANCE.getAstFunction_Expression(), -1);

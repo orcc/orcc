@@ -33,8 +33,6 @@ import static net.sf.orcc.ir.IrFactory.eINSTANCE;
 import java.math.BigInteger;
 import java.util.Iterator;
 
-import org.eclipse.emf.ecore.util.EcoreUtil;
-
 import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
@@ -42,6 +40,8 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
+
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class defines static utility methods to deal with types.
@@ -52,20 +52,78 @@ import net.sf.orcc.ir.TypeUint;
 public class TypeUtil {
 
 	/**
-	 * Returns <code>true</code> if the two given types are compatible.
+	 * Returns <code>true</code> if type src can be converted to type dst.
+	 * 
+	 * @param src
+	 *            a type
+	 * @param dst
+	 *            the type src should be converted to
+	 * @return <code>true</code> if type src can be converted to type dst
+	 */
+	public static boolean isConvertibleTo(Type src, Type dst) {
+		if (src == null || dst == null) {
+			return false;
+		}
+
+		if (src.isBool() && dst.isBool() || src.isFloat() && dst.isFloat()
+				|| src.isString() && dst.isString()
+				|| (src.isInt() || src.isUint())
+				&& (dst.isInt() || dst.isUint())) {
+			return true;
+		}
+
+		if (src.isList() && dst.isList()) {
+			TypeList typeSrc = (TypeList) src;
+			TypeList typeDst = (TypeList) dst;
+			// Recursively check type convertibility
+			if (isConvertibleTo(typeSrc.getType(), typeDst.getType())) {
+				if (typeSrc.getSizeExpr() != null
+						&& typeDst.getSizeExpr() != null) {
+					return typeSrc.getSize() <= typeDst.getSize();
+				}
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Returns the Greatest Lower Bound of the given types. The GLB is the
+	 * smallest type of (t1, t2).
 	 * 
 	 * @param t1
 	 *            a type
 	 * @param t2
 	 *            another type
-	 * @return <code>true</code> if the two given types are compatible
+	 * @return the Greatest Lower Bound of the given types
 	 */
-	public static boolean areTypeCompatible(Type t1, Type t2) {
-		if (t1 == null || t2 == null) {
-			return false;
+	public static Type getGlb(Type t1, Type t2) {
+		if (t1.isInt() && t2.isInt()) {
+			return IrFactory.eINSTANCE.createTypeInt(Math.min(
+					((TypeInt) t1).getSize(), ((TypeInt) t2).getSize()));
+		} else if (t1.isUint() && t2.isUint()) {
+			return IrFactory.eINSTANCE.createTypeUint(Math.min(
+					((TypeUint) t1).getSize(), ((TypeUint) t2).getSize()));
+		} else if (t1.isInt() && t2.isUint()) {
+			int si = ((TypeInt) t1).getSize();
+			int su = ((TypeUint) t2).getSize();
+			if (si > su) {
+				return IrFactory.eINSTANCE.createTypeInt(su + 1);
+			} else {
+				return IrFactory.eINSTANCE.createTypeInt(si);
+			}
+		} else if (t1.isUint() && t2.isInt()) {
+			int su = ((TypeUint) t1).getSize();
+			int si = ((TypeInt) t2).getSize();
+			if (si > su) {
+				return IrFactory.eINSTANCE.createTypeInt(su + 1);
+			} else {
+				return IrFactory.eINSTANCE.createTypeInt(si);
+			}
 		}
 
-		return getLub(t1, t2) != null;
+		return null;
 	}
 
 	/**

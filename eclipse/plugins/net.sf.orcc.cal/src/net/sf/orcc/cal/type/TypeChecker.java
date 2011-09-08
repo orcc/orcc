@@ -82,6 +82,10 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class TypeChecker extends CalSwitch<Type> {
 
+	private static enum Unification {
+		GLB, LUB, LUB_PLUS_1, LUB_SUM_SIZE
+	}
+
 	private int maxSize;
 
 	private CalJavaValidator validator;
@@ -131,7 +135,7 @@ public class TypeChecker extends CalSwitch<Type> {
 			Type actualType = getType(expression);
 
 			// check types
-			if (!isConvertibleTo(actualType, formalType)) {
+			if (!TypeUtil.isConvertibleTo(actualType, formalType)) {
 				error("Type mismatch: cannot convert from " + actualType
 						+ " to " + formalType, astCall,
 						eINSTANCE.getAstExpressionCall_Parameters(), index);
@@ -307,6 +311,59 @@ public class TypeChecker extends CalSwitch<Type> {
 	}
 
 	/**
+	 * Creates a new type based on the unification of t1 and t2, and clips its
+	 * size to {@link #maxSize}.
+	 * 
+	 * @param t1
+	 *            a type
+	 * @param t2
+	 *            a type
+	 * @param unification
+	 *            how to unify t1 and t2
+	 */
+	private Type createType(Type t1, Type t2, Unification unification) {
+		Type type = null;
+		int size = 0;
+
+		switch (unification) {
+		case GLB:
+			type = TypeUtil.getGlb(t1, t2);
+			size = type.getSizeInBits();
+			break;
+
+		case LUB:
+			type = TypeUtil.getLub(t1, t2);
+			size = type.getSizeInBits();
+			break;
+
+		case LUB_PLUS_1:
+			type = TypeUtil.getLub(t1, t2);
+			size = type.getSizeInBits() + 1;
+			break;
+
+		case LUB_SUM_SIZE:
+			type = TypeUtil.getLub(t1, t2);
+			size = t1.getSizeInBits() + t2.getSizeInBits();
+			break;
+		}
+
+		// clips the size
+		if (size > maxSize) {
+			size = maxSize;
+		}
+
+		if (type.isInt()) {
+			TypeInt typeInt = (TypeInt) type;
+			typeInt.setSize(size);
+		} else if (type.isUint()) {
+			TypeUint typeUint = (TypeUint) type;
+			typeUint.setSize(size);
+		}
+
+		return type;
+	}
+
+	/**
 	 * Wrapper call to {@link CalJavaValidator#error(String, EObject, Integer)}.
 	 * 
 	 * @param string
@@ -399,44 +456,6 @@ public class TypeChecker extends CalSwitch<Type> {
 	}
 
 	/**
-	 * Returns the Greatest Lower Bound of the given types. The GLB is the
-	 * smallest type of (t1, t2).
-	 * 
-	 * @param t1
-	 *            a type
-	 * @param t2
-	 *            another type
-	 * @return the Greatest Lower Bound of the given types
-	 */
-	private Type getGlb(Type t1, Type t2) {
-		if (t1.isInt() && t2.isInt()) {
-			return IrFactory.eINSTANCE.createTypeInt(Math.min(
-					((TypeInt) t1).getSize(), ((TypeInt) t2).getSize()));
-		} else if (t1.isUint() && t2.isUint()) {
-			return IrFactory.eINSTANCE.createTypeUint(Math.min(
-					((TypeUint) t1).getSize(), ((TypeUint) t2).getSize()));
-		} else if (t1.isInt() && t2.isUint()) {
-			int si = ((TypeInt) t1).getSize();
-			int su = ((TypeUint) t2).getSize();
-			if (si > su) {
-				return IrFactory.eINSTANCE.createTypeInt(su + 1);
-			} else {
-				return IrFactory.eINSTANCE.createTypeInt(si);
-			}
-		} else if (t1.isUint() && t2.isInt()) {
-			int su = ((TypeUint) t1).getSize();
-			int si = ((TypeInt) t2).getSize();
-			if (si > su) {
-				return IrFactory.eINSTANCE.createTypeInt(su + 1);
-			} else {
-				return IrFactory.eINSTANCE.createTypeInt(si);
-			}
-		}
-
-		return null;
-	}
-
-	/**
 	 * Computes and returns the type of the given expression.
 	 * 
 	 * @param expression
@@ -521,14 +540,7 @@ public class TypeChecker extends CalSwitch<Type> {
 			return null;
 		}
 
-		Type type = TypeUtil.getLub(t1, t2);
-		if (type == null) {
-			return null;
-		}
-
-		setSize(type, type.getSizeInBits() + 1);
-
-		return type;
+		return createType(t1, t2, Unification.LUB_PLUS_1);
 	}
 
 	/**
@@ -565,7 +577,7 @@ public class TypeChecker extends CalSwitch<Type> {
 						index);
 				return null;
 			}
-			return getGlb(t1, t2);
+			return TypeUtil.getGlb(t1, t2);
 
 		case BITOR:
 		case BITXOR:
@@ -655,7 +667,7 @@ public class TypeChecker extends CalSwitch<Type> {
 		}
 
 		return null;
-	}
+	};
 
 	/**
 	 * Returns the type for a subtraction whose left operand has type t1 and
@@ -684,14 +696,7 @@ public class TypeChecker extends CalSwitch<Type> {
 			return null;
 		}
 
-		Type type = TypeUtil.getLub(t1, t2);
-		if (type == null) {
-			return null;
-		}
-
-		setSize(type, type.getSizeInBits() + 1);
-
-		return type;
+		return createType(t1, t2, Unification.LUB_PLUS_1);
 	}
 
 	/**
@@ -774,75 +779,7 @@ public class TypeChecker extends CalSwitch<Type> {
 			return null;
 		}
 
-		Type type = TypeUtil.getLub(t1, t2);
-		if (type == null) {
-			return null;
-		}
-
-		setSize(type, t1.getSizeInBits() + t2.getSizeInBits());
-
-		return type;
-	}
-
-	/**
-	 * Returns <code>true</code> if type src can be converted to type dst.
-	 * 
-	 * @param src
-	 *            a type
-	 * @param dst
-	 *            the type src should be converted to
-	 * @return <code>true</code> if type src can be converted to type dst
-	 */
-	public boolean isConvertibleTo(Type src, Type dst) {
-		if (src == null || dst == null) {
-			return false;
-		}
-
-		if (src.isBool() && dst.isBool() || src.isFloat() && dst.isFloat()
-				|| src.isString() && dst.isString()
-				|| (src.isInt() || src.isUint())
-				&& (dst.isInt() || dst.isUint())) {
-			return true;
-		}
-
-		if (src.isList() && dst.isList()) {
-			TypeList typeSrc = (TypeList) src;
-			TypeList typeDst = (TypeList) dst;
-			// Recursively check type convertibility
-			if (isConvertibleTo(typeSrc.getType(), typeDst.getType())) {
-				if (typeSrc.getSizeExpr() != null
-						&& typeDst.getSizeExpr() != null) {
-					return typeSrc.getSize() <= typeDst.getSize();
-				}
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Sets the size of the given type (if it is an int or an uint) to min(size,
-	 * maxSize).
-	 * 
-	 * @param type
-	 *            a type
-	 * @param size
-	 *            the size in bits that the type should have
-	 */
-	private void setSize(Type type, int size) {
-		// clips the size
-		if (size > maxSize) {
-			size = maxSize;
-		}
-
-		if (type.isInt()) {
-			TypeInt typeInt = (TypeInt) type;
-			typeInt.setSize(size);
-		} else if (type.isUint()) {
-			TypeUint typeUint = (TypeUint) type;
-			typeUint.setSize(size);
-		}
+		return createType(t1, t2, Unification.LUB_SUM_SIZE);
 	}
 
 	/**
