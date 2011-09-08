@@ -577,7 +577,7 @@ public class TypeChecker extends CalSwitch<Type> {
 						index);
 				return null;
 			}
-			return TypeUtil.getGlb(t1, t2);
+			return createType(t1, t2, Unification.GLB);
 
 		case BITOR:
 		case BITXOR:
@@ -591,13 +591,33 @@ public class TypeChecker extends CalSwitch<Type> {
 						index);
 				return null;
 			}
-			return TypeUtil.getLub(t1, t2);
+			return createType(t1, t2, Unification.LUB);
 
 		case TIMES:
-			return getTypeTimes(t1, t2, source, feature, index);
+			if (!t1.isInt() && !t1.isUint()) {
+				error("Cannot convert " + t1 + " to int/uint", source, feature,
+						index);
+				return null;
+			}
+			if (!t2.isInt() && !t2.isUint()) {
+				error("Cannot convert " + t2 + " to int/uint", source, feature,
+						index);
+				return null;
+			}
+			return createType(t1, t2, Unification.LUB_SUM_SIZE);
 
 		case MINUS:
-			return getTypeMinus(t1, t2, source, feature, index);
+			if (!t1.isInt() && !t1.isUint()) {
+				error("Cannot convert " + t1 + " to int/uint", source, feature,
+						index);
+				return null;
+			}
+			if (!t2.isInt() && !t2.isUint()) {
+				error("Cannot convert " + t2 + " to int/uint", source, feature,
+						index);
+				return null;
+			}
+			return createType(t1, t2, Unification.LUB_PLUS_1);
 
 		case PLUS:
 			return getTypeAdd(t1, t2, source, feature, index);
@@ -670,36 +690,6 @@ public class TypeChecker extends CalSwitch<Type> {
 	};
 
 	/**
-	 * Returns the type for a subtraction whose left operand has type t1 and
-	 * right operand has type t2. Result has lub(t1, t2) + 1 for integers.
-	 * 
-	 * @param t1
-	 *            type of left operand
-	 * @param t2
-	 *            type of right operand
-	 * @param source
-	 *            source object
-	 * @param feature
-	 *            feature
-	 * @return type of the subtraction
-	 */
-	private Type getTypeMinus(Type t1, Type t2, EObject source,
-			EStructuralFeature feature, int index) {
-		if (!t1.isInt() && !t1.isUint()) {
-			error("Cannot convert " + t1 + " to int/uint", source, feature,
-					index);
-			return null;
-		}
-		if (!t2.isInt() && !t2.isUint()) {
-			error("Cannot convert " + t2 + " to int/uint", source, feature,
-					index);
-			return null;
-		}
-
-		return createType(t1, t2, Unification.LUB_PLUS_1);
-	}
-
-	/**
 	 * Returns the type for a left shift whose left operand has type t1 and
 	 * right operand has type t2.
 	 * 
@@ -750,36 +740,6 @@ public class TypeChecker extends CalSwitch<Type> {
 		}
 
 		return IrFactory.eINSTANCE.createTypeInt(size);
-	}
-
-	/**
-	 * Returns the type for a multiplication whose left operand has type t1 and
-	 * right operand has type t2. Result has size(t1) + size(t2) for integers.
-	 * 
-	 * @param t1
-	 *            type of left operand
-	 * @param t2
-	 *            type of right operand
-	 * @param source
-	 *            source object
-	 * @param feature
-	 *            feature
-	 * @return type of the multiplication
-	 */
-	private Type getTypeTimes(Type t1, Type t2, EObject source,
-			EStructuralFeature feature, int index) {
-		if (!t1.isInt() && !t1.isUint()) {
-			error("Cannot convert " + t1 + " to int/uint", source, feature,
-					index);
-			return null;
-		}
-		if (!t2.isInt() && !t2.isUint()) {
-			error("Cannot convert " + t2 + " to int/uint", source, feature,
-					index);
-			return null;
-		}
-
-		return createType(t1, t2, Unification.LUB_SUM_SIZE);
 	}
 
 	/**
