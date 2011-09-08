@@ -218,11 +218,15 @@ AstStatementForeach:
 	'end';
 
 AstStatementIf:
-	'if' condition=AstExpression 'then'
+	'if' condition = AstExpression 'then'
 		(then += AstStatement)*
-	('else'
-		(else += AstStatement)*)?
+	(elsifs += AstStatementElsif)*
+	('else' (else += AstStatement)*)?
 	'end';
+
+AstStatementElsif:
+	'elsif' condition = AstExpression 'then'
+		(then += AstStatement)*;
 
 AstStatementWhile:
 	'while' condition=AstExpression 'do'
@@ -283,10 +287,15 @@ AstExpressionIndex:
 	source=AstVariableReference ('[' indexes += AstExpression ']')+;
 
 AstExpressionIf:
-	'if' condition=AstExpression
-	'then' then=AstExpression
-	'else' else=AstExpression
+	'if' condition = AstExpression 'then'
+		then = AstExpression
+	(elsifs += AstExpressionElsif)*
+	'else'
+		else = AstExpression
 	'end';
+
+AstExpressionElsif:
+	'elsif' condition = AstExpression 'then' then = AstExpression;
 
 AstExpressionList:
 	'[' expressions+=AstExpression (',' expressions+=AstExpression)*

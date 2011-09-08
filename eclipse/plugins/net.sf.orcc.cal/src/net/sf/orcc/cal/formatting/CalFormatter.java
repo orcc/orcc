@@ -190,12 +190,12 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	 */
 	private void configureExpressionIf(FormattingConfig c) {
 		AstExpressionIfElements access = f.getAstExpressionIfAccess();
-		c.setIndentation(access.getThenKeyword_2(), access.getElseKeyword_4());
+		c.setIndentation(access.getThenKeyword_2(), access.getElseKeyword_5());
 		c.setLinewrap().after(access.getThenKeyword_2());
-		c.setIndentation(access.getElseKeyword_4(), access.getEndKeyword_6());
-		c.setLinewrap().before(access.getElseKeyword_4());
-		c.setLinewrap().after(access.getElseKeyword_4());
-		c.setLinewrap().before(access.getEndKeyword_6());
+		c.setIndentation(access.getElseKeyword_5(), access.getEndKeyword_7());
+		c.setLinewrap().before(access.getElseKeyword_5());
+		c.setLinewrap().after(access.getElseKeyword_5());
+		c.setLinewrap().before(access.getEndKeyword_7());
 	}
 
 	/**
@@ -475,13 +475,13 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 		AstStatementIfElements access = f.getAstStatementIfAccess();
 
 		c.setIndentation(access.getThenKeyword_2(), null);
-		c.setIndentation(access.getElseKeyword_4_0(),
-				access.getElseKeyword_4_0());
-		c.setIndentation(null, access.getEndKeyword_5());
+		c.setIndentation(access.getElseKeyword_5_0(),
+				access.getElseKeyword_5_0());
+		c.setIndentation(null, access.getEndKeyword_6());
 
 		c.setLinewrap().after(access.getThenKeyword_2());
-		c.setLinewrap().after(access.getElseKeyword_4_0());
-		c.setLinewrap().after(access.getEndKeyword_5());
+		c.setLinewrap().after(access.getElseKeyword_5_0());
+		c.setLinewrap().after(access.getEndKeyword_6());
 	}
 
 	private void configureStatements(FormattingConfig c) {
@@ -569,7 +569,7 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 
 		c.setLinewrap(2).after(access.getSemicolonKeyword_0_2());
 		c.setNoSpace().before(access.getSemicolonKeyword_0_2());
-		
+
 		c.setLinewrap(2).after(access.getImportsAssignment_1());
 	}
 
