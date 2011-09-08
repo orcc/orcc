@@ -57,7 +57,7 @@ void fpsPrintNewPicDecoded(void) {
 	unsigned int endTime;
 	numPicturesDecoded++;
 	endTime = clock();
-	if (endTime - relativeStartTime > 5000) {
+	if ((endTime - relativeStartTime) / CLOCKS_PER_SEC >= 5) {
 		printf("%f images/sec\n",
 				CLOCKS_PER_SEC * (float) (numPicturesDecoded - lastNumPic)
 						/ (float) (endTime - relativeStartTime));
