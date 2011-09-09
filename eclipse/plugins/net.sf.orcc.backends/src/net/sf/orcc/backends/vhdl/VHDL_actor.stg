@@ -383,8 +383,7 @@ elseif (instr.ramRead)><printRamRead(ramRead=instr)><
 elseif (instr.ramWrite)><printRamWrite(ramWrite=instr)><
 elseif (instr.ramSetAddress)><printRamSetAddress(ramSetAddress=instr)><
 endif>
-
-}>
+}; separator="\n">
 >>
 
 printNodes(nodes) ::= <<
@@ -403,10 +402,11 @@ printBlockNode(blockNode) ::= <<
 printIfNode(ifNode) ::= <<
 
 if (<ifNode.condition>) then
-  <printNodes(ifNode.thenNodes)><if(ifNode.elseNodes)
->else
-  <printNodes(ifNode.elseNodes)
-><endif>
+  <printNodes(ifNode.thenNodes)>
+<if(ifNode.elseRequired)>
+else
+  <printNodes(ifNode.elseNodes)>
+<endif>
 end if;
 <printBlockNode(ifNode.joinNode)>
 >>
@@ -415,8 +415,10 @@ end if;
 printWhileNode(whileNode) ::= <<
 
 while (<whileNode.condition>) loop
-  <printNodes(whileNode.nodes)><printBlockNode(whileNode.joinNode)>
+  <printNodes(whileNode.nodes)>
+  <printBlockNode(whileNode.joinNode)>
 end loop;
+
 >>
 
 
