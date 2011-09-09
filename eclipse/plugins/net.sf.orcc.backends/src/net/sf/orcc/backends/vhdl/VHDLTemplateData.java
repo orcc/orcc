@@ -133,7 +133,21 @@ public class VHDLTemplateData {
 
 	private List<String> signals;
 
-	private boolean computeInitValue(Type type, Object array, Object... indexes) {
+	/**
+	 * Visits the given array in its entirety to check if it is filled with one
+	 * given value.
+	 * 
+	 * @param array
+	 *            the array to visit
+	 * @param type
+	 *            type of the current dimension
+	 * @param indexes
+	 *            indexes that lead to the current dimension (empty for the
+	 *            outermost call)
+	 * @return <code>true</code> if the array contains different values (should
+	 *         be initialized with distinct values)
+	 */
+	private boolean computeInitValue(Object array, Type type, Object... indexes) {
 		if (type.isList()) {
 			TypeList typeList = (TypeList) type;
 			Type eltType = typeList.getType();
@@ -143,7 +157,7 @@ public class VHDLTemplateData {
 			System.arraycopy(indexes, 0, innerIndexes, 0, indexes.length);
 			for (int i = 0; i < typeList.getSize() && !customInit; i++) {
 				innerIndexes[indexes.length] = i;
-				customInit = computeInitValue(eltType, array, innerIndexes);
+				customInit = computeInitValue(array, eltType, innerIndexes);
 			}
 			return customInit;
 		} else {
@@ -227,7 +241,7 @@ public class VHDLTemplateData {
 					Object array = variable.getValue();
 					int length = ValueUtil.length(array);
 					if (length > 0) {
-						customInit = computeInitValue(typeList, array);
+						customInit = computeInitValue(array, typeList);
 					}
 				}
 
