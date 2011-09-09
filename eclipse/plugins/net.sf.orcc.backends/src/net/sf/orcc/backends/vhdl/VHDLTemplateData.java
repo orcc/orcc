@@ -133,6 +133,32 @@ public class VHDLTemplateData {
 
 	private List<String> signals;
 
+	private boolean computeInitValue(Type type, Object array, Object... indexes) {
+		if (type.isList()) {
+			TypeList typeList = (TypeList) type;
+			Type eltType = typeList.getType();
+			boolean customInit = false;
+
+			Object[] innerIndexes = new Object[indexes.length + 1];
+			System.arraycopy(indexes, 0, innerIndexes, 0, indexes.length);
+			for (int i = 0; i < typeList.getSize() && !customInit; i++) {
+				innerIndexes[indexes.length] = i;
+				customInit = computeInitValue(eltType, array, innerIndexes);
+			}
+			return customInit;
+		} else {
+			Object value = ValueUtil.get(type, array, indexes);
+			if (initValue == null) {
+				initValue = value;
+			} else if (!initValue.equals(value)) {
+				initValue = null;
+				return true;
+			}
+
+			return false;
+		}
+	}
+
 	/**
 	 * Returns the map of global variables to custom init flag.
 	 * 
@@ -158,16 +184,6 @@ public class VHDLTemplateData {
 	 */
 	public Map<Var, RAM> getRamMap() {
 		return ramMap;
-	}
-
-	/**
-	 * Sets the global variable to RAM map.
-	 * 
-	 * @param ramMap
-	 *            the global variable to RAM map
-	 */
-	public void setRamMap(Map<Var, RAM> ramMap) {
-		this.ramMap = ramMap;
 	}
 
 	/**
@@ -211,16 +227,7 @@ public class VHDLTemplateData {
 					Object array = variable.getValue();
 					int length = ValueUtil.length(array);
 					if (length > 0) {
-						Object firstValue = ValueUtil.get(eltType, array, 0);
-						initValue = firstValue;
-						for (int i = 1; i < length; i++) {
-							Object value = ValueUtil.get(eltType, array, i);
-							if (!firstValue.equals(value)) {
-								customInit = true;
-								initValue = null;
-								break;
-							}
-						}
+						customInit = computeInitValue(typeList, array);
 					}
 				}
 
@@ -231,6 +238,16 @@ public class VHDLTemplateData {
 				customInitMap.put(variable, customInit);
 			}
 		}
+	}
+
+	/**
+	 * Sets the global variable to RAM map.
+	 * 
+	 * @param ramMap
+	 *            the global variable to RAM map
+	 */
+	public void setRamMap(Map<Var, RAM> ramMap) {
+		this.ramMap = ramMap;
 	}
 
 }
