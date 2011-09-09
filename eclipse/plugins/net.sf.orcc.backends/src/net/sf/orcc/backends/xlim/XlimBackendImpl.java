@@ -48,6 +48,7 @@ import net.sf.orcc.backends.transformations.DivisionSubstitution;
 import net.sf.orcc.backends.transformations.Inliner;
 import net.sf.orcc.backends.transformations.Multi2MonoToken;
 import net.sf.orcc.backends.transformations.tac.ExpressionSplitter;
+import net.sf.orcc.backends.vhdl.transformations.StoreOnceTransformation;
 import net.sf.orcc.backends.xlim.transformations.CustomPeekAdder;
 import net.sf.orcc.backends.xlim.transformations.GlobalArrayInitializer;
 import net.sf.orcc.backends.xlim.transformations.InstPhiTransformation;
@@ -133,6 +134,10 @@ public class XlimBackendImpl extends AbstractBackend {
 	protected void doTransformActor(Actor actor) throws OrccException {
 		XlimActorTemplateData data = new XlimActorTemplateData();
 		actor.setTemplateData(data);
+		
+		if(hardwareGen) {
+			new StoreOnceTransformation().doSwitch(actor);
+		}
 
 		if (multi2mono) {
 			new Multi2MonoToken().doSwitch(actor);
