@@ -57,8 +57,6 @@ import net.sf.orcc.cal.cal.AstStatementWhile;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
-import net.sf.orcc.cal.services.AstExpressionEvaluator;
-import net.sf.orcc.cal.type.TypeChecker;
 import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.ExprVar;
@@ -347,8 +345,7 @@ public class AstTransformer {
 			}
 
 			// size of expressions
-			TypeChecker checker = new TypeChecker(null);
-			Type type = checker.getType(expressions);
+			Type type = Util.getType(expressions);
 			size *= expressions.size();
 
 			Procedure procedure = context.getProcedure();
@@ -1191,11 +1188,7 @@ public class AstTransformer {
 		if (mustInitialize) {
 			initialValue = null;
 		} else {
-			AstExpression value = astVariable.getValue();
-			if (value != null) {
-				initialValue = (Expression) new AstExpressionEvaluator(null)
-						.evaluate(value);
-			}
+			initialValue = Util.getValue(astVariable);
 		}
 
 		// create state variable and put it in the map

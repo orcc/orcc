@@ -30,16 +30,15 @@ package net.sf.orcc.cal.type;
 
 import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
 
+import java.util.List;
 import java.util.Set;
 
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpressionVariable;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.util.VoidSwitch;
-import net.sf.orcc.cal.validation.CalJavaValidator;
+import net.sf.orcc.cal.validation.ValidationError;
 
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EStructuralFeature;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.CycleDetector;
 import org.jgrapht.graph.DefaultDirectedGraph;
@@ -57,13 +56,10 @@ public class TypeCycleDetector extends VoidSwitch {
 
 	private AstVariable source;
 
-	private CalJavaValidator validator;
-
 	/**
 	 * Creates a new type cycle detector.
 	 */
-	public TypeCycleDetector(CalJavaValidator validator) {
-		this.validator = validator;
+	public TypeCycleDetector() {
 	}
 
 	@Override
@@ -96,7 +92,8 @@ public class TypeCycleDetector extends VoidSwitch {
 	 *            an actor
 	 * @return <code>true</code> if the actor has cycles in its type definitions
 	 */
-	public boolean detectCycles(AstEntity entity) {
+	public boolean detectCycles(AstEntity entity,
+			List<ValidationError> errorList) {
 		graph = new DefaultDirectedGraph<AstVariable, DefaultEdge>(
 				DefaultEdge.class);
 		doSwitch(entity);
@@ -108,21 +105,15 @@ public class TypeCycleDetector extends VoidSwitch {
 			Set<AstVariable> variables = cycleDetector.findCycles();
 			if (!variables.isEmpty()) {
 				for (AstVariable variable : variables) {
-					error(variable.getName() + " has a cyclic type definition",
-							variable, eINSTANCE.getAstVariable_Name(), -1);
+					errorList.add(new ValidationError(variable.getName()
+							+ " has a cyclic type definition", variable,
+							eINSTANCE.getAstVariable_Name(), -1));
 				}
 			}
 		}
 
 		graph = null;
 		return hasCycles;
-	}
-
-	private void error(String string, EObject source,
-			EStructuralFeature feature, int index) {
-		if (validator != null) {
-			validator.error(string, source, feature, index);
-		}
 	}
 
 }

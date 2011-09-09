@@ -362,7 +362,7 @@ public class VoidSwitch extends CalSwitch<Void> {
 
 		return null;
 	}
-	
+
 	@Override
 	public Void caseAstStatementIf(AstStatementIf stmtIf) {
 		doSwitch(stmtIf.getCondition());
@@ -370,7 +370,7 @@ public class VoidSwitch extends CalSwitch<Void> {
 		for (AstStatement statement : stmtIf.getThen()) {
 			doSwitch(statement);
 		}
-		
+
 		for (AstStatementElsif statement : stmtIf.getElsifs()) {
 			doSwitch(statement);
 		}
@@ -432,6 +432,10 @@ public class VoidSwitch extends CalSwitch<Void> {
 			doSwitch(function);
 		}
 
+		for (AstProcedure procedure : unit.getProcedures()) {
+			doSwitch(procedure);
+		}
+
 		for (AstVariable variable : unit.getVariables()) {
 			doSwitch(variable);
 		}
@@ -442,6 +446,11 @@ public class VoidSwitch extends CalSwitch<Void> {
 	@Override
 	public Void caseAstVariable(AstVariable variable) {
 		doSwitch(variable.getType());
+
+		for (AstExpression dim : variable.getDimensions()) {
+			doSwitch(dim);
+		}
+
 		return doSwitch(variable.getValue());
 	}
 

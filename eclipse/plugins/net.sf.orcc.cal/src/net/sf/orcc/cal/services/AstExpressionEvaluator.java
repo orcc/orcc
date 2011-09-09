@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -51,9 +51,8 @@ import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstGenerator;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
-import net.sf.orcc.cal.type.TypeChecker;
 import net.sf.orcc.cal.util.Util;
-import net.sf.orcc.cal.validation.CalJavaValidator;
+import net.sf.orcc.cal.validation.ValidationError;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.ExprList;
@@ -79,13 +78,13 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class AstExpressionEvaluator extends CalSwitch<Expression> {
 
-	private CalJavaValidator validator;
+	private List<ValidationError> errors;
 
 	/**
 	 * Creates a new AST expression evaluator.
 	 */
-	public AstExpressionEvaluator(CalJavaValidator validator) {
-		this.validator = validator;
+	public AstExpressionEvaluator(List<ValidationError> errors) {
+		this.errors = errors;
 	}
 
 	@Override
@@ -282,8 +281,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 			return null;
 		}
 		case NUM_ELTS:
-			TypeChecker typeChecker = new TypeChecker(validator);
-			Type type = typeChecker.getType(expression.getExpression());
+			Type type = Util.getType(expression.getExpression());
 			if (type != null && type.isList()) {
 				return IrFactory.eINSTANCE.createExprInt(((TypeList) type)
 						.getSize());
@@ -300,13 +298,21 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 	@Override
 	public Expression caseAstExpressionVariable(AstExpressionVariable expression) {
 		AstVariable variable = expression.getValue().getVariable();
-		return evaluate(variable.getValue());
+		Expression value = Util.getValue(variable);
+		if (value != null) {
+			return value;
+		}
+
+		// evaluate because it has not been done before
+		value = evaluate(variable.getValue());
+		Util.putValue(variable, value);
+		return value;
 	}
 
-	private void error(String string, EObject source,
+	private void error(String message, EObject source,
 			EStructuralFeature feature, int index) {
-		if (validator != null) {
-			validator.error(string, source, feature, index);
+		if (errors != null) {
+			errors.add(new ValidationError(message, source, feature, index));
 		}
 	}
 

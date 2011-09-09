@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,46 +26,49 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.cal.type;
+package net.sf.orcc.cal.validation;
 
-import net.sf.orcc.cal.cal.AstExpression;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EStructuralFeature;
 
 /**
- * This class defines a type mismatch exception.
+ * This class defines a validation error.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class TypeMismatchException extends RuntimeException {
+public class ValidationError {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	private EStructuralFeature feature;
 
-	private AstExpression expression;
+	private int index;
 
-	/**
-	 * Creates a new exception with the given message, because the given
-	 * expression has the wrong type.
-	 * 
-	 * @param message
-	 *            a message
-	 * @param expression
-	 *            an AST expression
-	 */
-	public TypeMismatchException(String message, AstExpression expression) {
-		super(message);
-		this.expression = expression;
+	private String message;
+
+	private EObject source;
+
+	public ValidationError(String message, EObject source, EStructuralFeature feature,
+			int index) {
+		this.message = message;
+		this.source = source;
+		this.feature = feature;
+		this.index = index;
 	}
 
-	/**
-	 * Returns the expression that caused this exception.
-	 * 
-	 * @return the expression that caused this exception
-	 */
-	public AstExpression getExpression() {
-		return expression;
+	public EStructuralFeature getFeature() {
+		return feature;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public EObject getSource() {
+		return source;
 	}
 
 }

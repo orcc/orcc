@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2010-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -57,7 +57,9 @@ import net.sf.orcc.cal.cal.AstVariableReference;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.services.AstExpressionEvaluator;
+import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.cal.validation.CalJavaValidator;
+import net.sf.orcc.cal.validation.ValidationError;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
@@ -75,27 +77,27 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
- * This class defines a type checker for RVC-CAL AST. Note that types must have
- * been transformed to IR types first.
+ * This class defines a typer for RVC-CAL AST. Note that types must have been
+ * transformed to IR types first.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class TypeChecker extends CalSwitch<Type> {
+public class Typer extends CalSwitch<Type> {
 
 	private static enum Unification {
 		GLB, LUB, LUB_PLUS_1, LUB_SUM_SIZE
 	}
 
-	private int maxSize;
+	private List<ValidationError> errors;
 
-	private CalJavaValidator validator;
+	private int maxSize;
 
 	/**
 	 * Creates a new type checker.
 	 */
-	public TypeChecker(CalJavaValidator validator) {
-		this.validator = validator;
+	public Typer(List<ValidationError> errors) {
+		this.errors = errors;
 	}
 
 	@Override
@@ -115,8 +117,7 @@ public class TypeChecker extends CalSwitch<Type> {
 	@Override
 	public Type caseAstExpressionCall(AstExpressionCall astCall) {
 		AstFunction function = astCall.getFunction();
-		TypeTransformer transformer = new TypeTransformer();
-		Type type = transformer.doSwitch(function);
+		Type type = Util.getType(function);
 
 		String name = function.getName();
 		List<AstExpression> parameters = astCall.getParameters();
@@ -131,7 +132,7 @@ public class TypeChecker extends CalSwitch<Type> {
 		Iterator<AstExpression> itActual = parameters.iterator();
 		int index = 0;
 		while (itFormal.hasNext() && itActual.hasNext()) {
-			Type formalType = transformer.doSwitch(itFormal.next());
+			Type formalType = Util.getType(itFormal.next());
 			AstExpression expression = itActual.next();
 			Type actualType = getType(expression);
 
@@ -200,8 +201,7 @@ public class TypeChecker extends CalSwitch<Type> {
 	@Override
 	public Type caseAstExpressionIndex(AstExpressionIndex expression) {
 		AstVariable variable = expression.getSource().getVariable();
-		TypeTransformer transformer = new TypeTransformer();
-		Type type = transformer.doSwitch(variable);
+		Type type = Util.getType(variable);
 
 		List<AstExpression> indexes = expression.getIndexes();
 		int errorIdx = 0;
@@ -239,12 +239,9 @@ public class TypeChecker extends CalSwitch<Type> {
 
 		// size of generators
 		for (AstGenerator generator : expression.getGenerators()) {
-			// getType(generator.getLower());
-			// getType(generator.getHigher());
-
-			int lower = new AstExpressionEvaluator(validator)
+			int lower = new AstExpressionEvaluator(errors)
 					.evaluateAsInteger(generator.getLower());
-			int higher = new AstExpressionEvaluator(validator)
+			int higher = new AstExpressionEvaluator(errors)
 					.evaluateAsInteger(generator.getHigher());
 			size *= (higher - lower) + 1;
 		}
@@ -316,8 +313,7 @@ public class TypeChecker extends CalSwitch<Type> {
 	@Override
 	public Type caseAstExpressionVariable(AstExpressionVariable expression) {
 		AstVariable variable = expression.getValue().getVariable();
-		TypeTransformer transformer = new TypeTransformer();
-		return transformer.doSwitch(variable);
+		return Util.getType(variable);
 	}
 
 	@Override
@@ -383,17 +379,17 @@ public class TypeChecker extends CalSwitch<Type> {
 	/**
 	 * Wrapper call to {@link CalJavaValidator#error(String, EObject, Integer)}.
 	 * 
-	 * @param string
+	 * @param message
 	 *            error message
 	 * @param source
 	 *            source object
 	 * @param feature
 	 *            feature of the object that caused the error
 	 */
-	private void error(String string, EObject source,
+	private void error(String message, EObject source,
 			EStructuralFeature feature, int index) {
-		if (validator != null) {
-			validator.error(string, source, feature, index);
+		if (errors != null) {
+			errors.add(new ValidationError(message, source, feature, index));
 		}
 	}
 
@@ -419,8 +415,7 @@ public class TypeChecker extends CalSwitch<Type> {
 			return null;
 		}
 
-		TypeTransformer transformer = new TypeTransformer();
-		Type type = transformer.doSwitch(variable);
+		Type type = Util.getType(variable);
 		List<Expression> dimensions = type.getDimensionsExpr();
 
 		Iterator<Expression> itD = dimensions.iterator();
@@ -464,8 +459,7 @@ public class TypeChecker extends CalSwitch<Type> {
 			AstVariable formal = itF.next();
 			AstExpression actual = itA.next();
 			if (actual == expression) {
-				TypeTransformer transformer = new TypeTransformer();
-				return transformer.doSwitch(formal);
+				return Util.getType(formal);
 			}
 		}
 
@@ -473,7 +467,8 @@ public class TypeChecker extends CalSwitch<Type> {
 	}
 
 	/**
-	 * Computes and returns the type of the given expression.
+	 * Computes the type of the given expression, stores it in the type cache,
+	 * and then returns it.
 	 * 
 	 * @param expression
 	 *            an AST expression
@@ -484,9 +479,11 @@ public class TypeChecker extends CalSwitch<Type> {
 			return null;
 		}
 
-		TypeChecker checker = new TypeChecker(validator);
+		Typer checker = new Typer(errors);
 		checker.setTargetType(expression);
-		return checker.doSwitch(expression);
+		Type type = checker.doSwitch(expression);
+		Util.putType(expression, type);
+		return type;
 	}
 
 	/**
@@ -768,7 +765,6 @@ public class TypeChecker extends CalSwitch<Type> {
 	 *            an expression
 	 */
 	private void setTargetType(AstExpression expression) {
-		TypeTransformer transformer = new TypeTransformer();
 		EObject cter = expression.eContainer();
 		Type targetType = null;
 
@@ -791,25 +787,24 @@ public class TypeChecker extends CalSwitch<Type> {
 
 			case CalPackage.AST_FUNCTION:
 				AstFunction func = (AstFunction) cter;
-				targetType = transformer.doSwitch(func);
+				targetType = Util.getType(func);
 				break;
 
 			case CalPackage.AST_GENERATOR:
 				AstGenerator generator = (AstGenerator) cter;
-				targetType = transformer.doSwitch(generator.getVariable());
+				targetType = Util.getType(generator.getVariable());
 				break;
 
 			case CalPackage.AST_OUTPUT_PATTERN:
 				AstOutputPattern pattern = (AstOutputPattern) cter;
-				targetType = transformer.doSwitch(pattern.getPort());
+				targetType = Util.getType(pattern.getPort());
 				break;
 
 			case CalPackage.AST_STATEMENT_ASSIGN: {
 				AstStatementAssign assign = (AstStatementAssign) cter;
 				if (expression.eContainer() == assign.getValue()) {
 					// expression is located in the value
-					targetType = transformer.doSwitch(assign.getTarget()
-							.getVariable());
+					targetType = Util.getType(assign.getTarget().getVariable());
 				} else {
 					// expression is located in the indexes
 					targetType = findIndexType(assign.getTarget(),
@@ -828,12 +823,12 @@ public class TypeChecker extends CalSwitch<Type> {
 
 			case CalPackage.AST_STATEMENT_FOREACH:
 				AstStatementForeach foreach = (AstStatementForeach) cter;
-				targetType = transformer.doSwitch(foreach.getVariable());
+				targetType = Util.getType(foreach.getVariable());
 				break;
 
 			case CalPackage.AST_VARIABLE:
 				AstVariable variable = (AstVariable) cter;
-				targetType = transformer.doSwitch(variable);
+				targetType = Util.getType(variable);
 				break;
 			}
 		}

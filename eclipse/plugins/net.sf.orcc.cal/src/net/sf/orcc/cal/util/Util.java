@@ -28,16 +28,22 @@
  */
 package net.sf.orcc.cal.util;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpression;
+import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.services.AstExpressionEvaluator;
-import net.sf.orcc.cal.type.TypeTransformer;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.util.TypeUtil;
 
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.xtext.nodemodel.ICompositeNode;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 
@@ -49,11 +55,44 @@ import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
  */
 public class Util {
 
-	private static Map<EObject, Integer> cacheIntValue = new WeakHashMap<EObject, Integer>();
+	private static class Cache<T> {
 
-	private static Map<EObject, Type> cacheType = new WeakHashMap<EObject, Type>();
+		private Map<String, Map<String, T>> map = new HashMap<String, Map<String, T>>();
 
-	public static int getIntValue(final AstExpression expr) {
+		public T get(EObject eObject) {
+			URI uri = EcoreUtil.getURI(eObject);
+			Map<String, T> resourceMap = getMap(uri);
+			return resourceMap.get(uri.fragment());
+		}
+
+		private Map<String, T> getMap(URI uri) {
+			Map<String, T> resourceMap = map.get(uri.path());
+			if (resourceMap == null) {
+				resourceMap = new HashMap<String, T>();
+				map.put(uri.path(), resourceMap);
+			}
+			return resourceMap;
+		}
+
+		public void put(EObject eObject, T value) {
+			URI uri = EcoreUtil.getURI(eObject);
+			Map<String, T> resourceMap = getMap(uri);
+			resourceMap.put(uri.fragment(), value);
+		}
+
+		public void removeEntries(URI uri) {
+			Map<String, T> resourceMap = getMap(uri);
+			resourceMap.clear();
+		}
+	}
+
+	private static Cache<Integer> cacheIntValue = new Cache<Integer>();
+
+	private static Cache<Type> cacheType = new Cache<Type>();
+
+	private static Cache<Expression> cacheValue = new Cache<Expression>();
+
+	public static int getIntValue(AstExpression expr) {
 		Integer intValue = cacheIntValue.get(expr);
 		if (intValue == null) {
 			intValue = new AstExpressionEvaluator(null).evaluateAsInteger(expr);
@@ -116,20 +155,61 @@ public class Util {
 	}
 
 	/**
-	 * Returns the type of the given object using the resource description to
-	 * which the object belongs.
+	 * Returns the type of the given object using its URI.
 	 * 
 	 * @param eObject
 	 *            an AST node
 	 * @return the type of the given object
 	 */
-	public static Type getType(final EObject eObject) {
-		Type type = cacheType.get(eObject);
-		if (type == null) {
-			type = new TypeTransformer().doSwitch(eObject);
-			cacheType.put(eObject, type);
+	public static Type getType(EObject eObject) {
+		return cacheType.get(eObject);
+	}
+
+	/**
+	 * Returns the type of the given list of objects using their URI.
+	 * 
+	 * @param eObject
+	 *            an AST node
+	 * @return the type of the given object
+	 */
+	public static Type getType(List<? extends EObject> eObjects) {
+		Iterator<? extends EObject> it = eObjects.iterator();
+		if (!it.hasNext()) {
+			return null;
 		}
+
+		Type type = getType(it.next());
+		while (it.hasNext()) {
+			type = TypeUtil.getLub(type, getType(it.next()));
+		}
+
 		return type;
+	}
+
+	public static Expression getValue(AstVariable variable) {
+		return cacheValue.get(variable);
+	}
+
+	/**
+	 * Stores the type of the given object using its URI.
+	 * 
+	 * @param eObject
+	 *            an AST node
+	 * @param type
+	 *            the type of the object
+	 */
+	public static void putType(EObject eObject, Type type) {
+		cacheType.put(eObject, type);
+	}
+
+	public static void putValue(AstVariable variable, Expression value) {
+		cacheValue.put(variable, value);
+	}
+
+	public static void removeCacheForURI(URI uri) {
+		cacheType.removeEntries(uri);
+		cacheValue.removeEntries(uri);
+		cacheIntValue.removeEntries(uri);
 	}
 
 }

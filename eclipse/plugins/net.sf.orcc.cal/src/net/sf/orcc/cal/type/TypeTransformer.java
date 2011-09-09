@@ -33,9 +33,12 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.orcc.cal.cal.AstExpression;
+import net.sf.orcc.cal.cal.AstExpressionCall;
 import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstInputPattern;
 import net.sf.orcc.cal.cal.AstPort;
+import net.sf.orcc.cal.cal.AstProcedure;
+import net.sf.orcc.cal.cal.AstStatementCall;
 import net.sf.orcc.cal.cal.AstType;
 import net.sf.orcc.cal.cal.AstTypeBool;
 import net.sf.orcc.cal.cal.AstTypeFloat;
@@ -44,95 +47,144 @@ import net.sf.orcc.cal.cal.AstTypeList;
 import net.sf.orcc.cal.cal.AstTypeString;
 import net.sf.orcc.cal.cal.AstTypeUint;
 import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.cal.AstVariableReference;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.services.AstExpressionEvaluator;
+import net.sf.orcc.cal.util.Util;
+import net.sf.orcc.cal.util.VoidSwitch;
+import net.sf.orcc.cal.validation.ValidationError;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
 
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
- * This class defines an AST type to IR type transformer.
+ * This class defines a visitor that associates every typed function and
+ * variable with a type.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class TypeTransformer extends CalSwitch<Type> {
+public class TypeTransformer extends VoidSwitch {
+
+	private class TypeConverter extends CalSwitch<Type> {
+
+		@Override
+		public Type caseAstTypeBool(AstTypeBool type) {
+			return IrFactory.eINSTANCE.createTypeBool();
+		}
+
+		@Override
+		public Type caseAstTypeFloat(AstTypeFloat type) {
+			return IrFactory.eINSTANCE.createTypeFloat();
+		}
+
+		@Override
+		public Type caseAstTypeInt(AstTypeInt type) {
+			AstExpression astSize = type.getSize();
+			int size;
+			if (astSize == null) {
+				size = 32;
+			} else {
+				size = new AstExpressionEvaluator(errors)
+						.evaluateAsInteger(astSize);
+			}
+			return IrFactory.eINSTANCE.createTypeInt(size);
+		}
+
+		@Override
+		public Type caseAstTypeList(AstTypeList listType) {
+			Type type = doSwitch(listType.getType());
+			AstExpression expression = listType.getSize();
+			Expression size = new AstExpressionEvaluator(errors)
+					.evaluate(expression);
+			size = EcoreUtil.copy(size);
+			return IrFactory.eINSTANCE.createTypeList(size, type);
+		}
+
+		@Override
+		public Type caseAstTypeString(AstTypeString type) {
+			return IrFactory.eINSTANCE.createTypeString();
+		}
+
+		@Override
+		public Type caseAstTypeUint(AstTypeUint type) {
+			AstExpression astSize = type.getSize();
+			int size;
+			if (astSize == null) {
+				size = 32;
+			} else {
+				size = new AstExpressionEvaluator(errors)
+						.evaluateAsInteger(astSize);
+			}
+
+			return IrFactory.eINSTANCE.createTypeUint(size);
+		}
+
+	}
+
+	private List<ValidationError> errors;
+
+	private List<EObject> seen;
 
 	/**
 	 * Creates a new AST type to IR type transformation.
 	 */
-	public TypeTransformer() {
+	public TypeTransformer(List<ValidationError> errors) {
+		this.errors = errors;
+		seen = new ArrayList<EObject>();
 	}
 
 	@Override
-	public Type caseAstExpression(AstExpression expression) {
-		TypeChecker checker = new TypeChecker(null);
-		return checker.getType(expression);
-	}
-
-	@Override
-	public Type caseAstFunction(AstFunction function) {
-		return doSwitch(function.getType());
-	}
-
-	@Override
-	public Type caseAstPort(AstPort port) {
-		return doSwitch(port.getType());
-	}
-
-	@Override
-	public Type caseAstTypeBool(AstTypeBool type) {
-		return IrFactory.eINSTANCE.createTypeBool();
-	}
-
-	@Override
-	public Type caseAstTypeFloat(AstTypeFloat type) {
-		return IrFactory.eINSTANCE.createTypeFloat();
-	}
-
-	@Override
-	public Type caseAstTypeInt(AstTypeInt type) {
-		AstExpression astSize = type.getSize();
-		int size;
-		if (astSize == null) {
-			size = 32;
-		} else {
-			size = new AstExpressionEvaluator(null).evaluateAsInteger(astSize);
+	public Void caseAstExpressionCall(AstExpressionCall call) {
+		AstFunction function = call.getFunction();
+		if (!seen.contains(function)) {
+			seen.add(function);
+			doSwitch(function);
 		}
-		return IrFactory.eINSTANCE.createTypeInt(size);
+		return super.caseAstExpressionCall(call);
 	}
 
 	@Override
-	public Type caseAstTypeList(AstTypeList listType) {
-		Type type = doSwitch(listType.getType());
-		AstExpression expression = listType.getSize();
-		Expression size = new AstExpressionEvaluator(null).evaluate(expression);
-		return IrFactory.eINSTANCE.createTypeList(size, type);
+	public Void caseAstFunction(AstFunction function) {
+		Type type = new TypeConverter().doSwitch(function.getType());
+		Util.putType(function, type);
+
+		// visits the rest of the function
+		super.caseAstFunction(function);
+
+		return null;
 	}
 
 	@Override
-	public Type caseAstTypeString(AstTypeString type) {
-		return IrFactory.eINSTANCE.createTypeString();
+	public Void caseAstPort(AstPort port) {
+		Type type = new TypeConverter().doSwitch(port.getType());
+		Util.putType(port, type);
+		return null;
 	}
 
 	@Override
-	public Type caseAstTypeUint(AstTypeUint type) {
-		AstExpression astSize = type.getSize();
-		int size;
-		if (astSize == null) {
-			size = 32;
-		} else {
-			size = new AstExpressionEvaluator(null).evaluateAsInteger(astSize);
+	public Void caseAstStatementCall(AstStatementCall call) {
+		AstProcedure procedure = call.getProcedure();
+		if (!seen.contains(procedure)) {
+			doSwitch(procedure);
+			seen.add(procedure);
+		}
+		return super.caseAstStatementCall(call);
+	}
+
+	@Override
+	public Void caseAstVariable(AstVariable variable) {
+		super.caseAstVariable(variable);
+
+		// do not revisit
+		if (Util.getType(variable) != null) {
+			return null;
 		}
 
-		return IrFactory.eINSTANCE.createTypeUint(size);
-	}
-
-	@Override
-	public Type caseAstVariable(AstVariable variable) {
 		AstType astType;
 		List<AstExpression> dimensions;
 
@@ -163,7 +215,16 @@ public class TypeTransformer extends CalSwitch<Type> {
 			astType = newAstType;
 		}
 
-		return doSwitch(astType);
+		Type type = new TypeConverter().doSwitch(astType);
+		Util.putType(variable, type);
+
+		return null;
+	}
+
+	@Override
+	public Void caseAstVariableReference(AstVariableReference reference) {
+		doSwitch(reference.getVariable());
+		return null;
 	}
 
 }
