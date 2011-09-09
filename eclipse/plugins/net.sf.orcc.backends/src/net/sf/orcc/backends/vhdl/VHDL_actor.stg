@@ -49,6 +49,7 @@ signal <portType(port=port, IOtype="", dataType="_idata")>;<endif>
 signalDeclaration(variable) ::= <<
 <if(variable.type.list)>
 <if(variable.assignable)>
+<if (actor.templateData.ramMap.(variable))>
 -- RAM signals for "<variable.name>"
 signal <variable.name>_wren_p1       : std_logic;
 signal <variable.name>_address_p1    : std_logic_vector(bit_width(<listSize(variable.type.dimensions)>)-1 downto 0);
@@ -58,7 +59,10 @@ signal <variable.name>_wren_p2       : std_logic;
 signal <variable.name>_address_p2    : std_logic_vector(bit_width(<listSize(variable.type.dimensions)>)-1 downto 0);
 signal <variable.name>_data_p2       : std_logic_vector(<variable.type.innermostType.sizeInBits> -1 downto 0);
 signal <variable.name>_q_p2          : std_logic_vector(<variable.type.innermostType.sizeInBits> -1 downto 0);
-
+<else>
+type memory_type_<variable.name> is array (0 to <listSize(variable.type.dimensions)> -1) of <variable.type>;
+signal <variable.name> : memory_type_<variable.name><if(variable.initialValue)> := <variable.initialValue><endif>;
+<endif>
 <else>
 type memory_type_<variable.name> is array (0 to <listSize(variable.type.dimensions)> -1) of <variable.type>;
 constant <variable.name> : memory_type_<variable.name><if(variable.initialized)> := <variable.initialValue><endif>;
@@ -77,9 +81,8 @@ printValue(type, value) ::= <<
 >>
 
 ramDeclaration(variable) ::= <<
-<if(variable.type.list)>
-<if(variable.assignable)>
-<if(actor.templateData.customInitMap.(variable))>
+<if (actor.templateData.ramMap.(variable))>
+<if (actor.templateData.customInitMap.(variable))>
 -- custom init of arrays not supported
 <else>
 -- RAM instantiation for "<variable.name>"
@@ -133,7 +136,6 @@ DP_genericRam_<variable.name> : entity work.DP_genericRam
 
 <endif>
 <endif>
-<endif>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -151,8 +153,7 @@ endif>
 // Init at reset
 ///////////////////////////////////////////////////////////////////////////////
 resetStateVar(variable) ::= <<
-<if (variable.assignable)>
-<if (variable.type.list)>
+<if (actor.templateData.ramMap.(variable))>
 --
 <if (actor.templateData.ramMap.(variable).port1UsedRead || actor.templateData.ramMap.(variable).port1UsedWrite)>
 <variable.name>_address_p1 \<= (others =\> '0');
@@ -169,14 +170,13 @@ resetStateVar(variable) ::= <<
 <variable.name>_data_p2    \<= (others =\> '0');
 <endif>
 --
-<elseif (variable.initialized)>
+<elseif (variable.assignable && variable.initialValue)>
 <variable.name> \<= <variable.initialValue>;
-<endif>
 <endif>
 >>
 
 resetRamWriteEnable(variable) ::= <<
-<if(variable.assignable && variable.type.list)>
+<if (actor.templateData.ramMap.(variable))>
 <if (actor.templateData.ramMap.(variable).port1UsedWrite)>
 <variable.name>_wren_p1 \<= '0';
 <endif>

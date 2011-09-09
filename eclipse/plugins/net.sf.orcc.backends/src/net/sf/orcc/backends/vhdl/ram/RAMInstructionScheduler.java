@@ -51,6 +51,7 @@ import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
@@ -78,14 +79,14 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	 */
 	private List<Instruction> pendingInstructions;
 
+	private Map<RAM, List<InstRamRead>> pendingReads;
+
 	/**
 	 * store instructions that write to variables of output pattern. Must be
 	 * done as late as possible so we don't accidentally lose prefetched data if
 	 * we can't fire an action.
 	 */
 	private List<InstStore> pendingStores;
-
-	private Map<RAM, List<InstRamRead>> pendingReads;
 
 	private Map<Var, RAM> ramMap;
 
@@ -217,7 +218,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 
 		// fill RAM map
 		for (Var variable : actor.getStateVars()) {
-			if (variable.isAssignable() && variable.getType().isList()) {
+			if (isVarTransformableToRam(variable)) {
 				RAM ram = new RAM();
 				ramMap.put(variable, ram);
 
@@ -489,7 +490,16 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	 *         RAM
 	 */
 	private boolean isVarTransformableToRam(Var var) {
-		return var.isAssignable() && var.isGlobal() && var.getType().isList();
+		boolean isCandidate = var.isAssignable() && var.isGlobal()
+				&& var.getType().isList();
+		if (isCandidate) {
+			// only put RAM for memories larger than 1024 bits
+			TypeList typeList = (TypeList) var.getType();
+			int size = typeList.getSizeInBits();
+			return (size > 1024);
+		}
+
+		return false;
 	}
 
 }
