@@ -7,6 +7,7 @@
 package net.sf.orcc.ir.impl;
 
 import java.util.Collection;
+import java.util.List;
 
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrPackage;
@@ -316,6 +317,21 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 		return thenNodes;
 	}
 
+	@Override
+	public boolean isElseRequired() {
+		List<Node> nodes = getElseNodes();
+		if (nodes.isEmpty()) {
+			return false;
+		}
+
+		Node node = nodes.get(0);
+		if (node.isBlockNode()) {
+			return !((NodeBlock) node).getInstructions().isEmpty();
+		}
+
+		return true;
+	}
+	
 	@Override
 	public boolean isIfNode() {
 		return true;

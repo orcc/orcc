@@ -49,6 +49,14 @@ public interface NodeIf extends Node {
 	Expression getCondition();
 
 	/**
+	 * Returns <code>true</code> if it is necessary to generate an "else" branch
+	 * in the code.
+	 * 
+	 * @return <code>true</code> if it is necessary to generate an "else" branch
+	 */
+	boolean isElseRequired();
+
+	/**
 	 * Returns the nodes in the "else" branch of this NodeIf.
 	 * 
 	 * @return the nodes in the "else" branch of this NodeIf
