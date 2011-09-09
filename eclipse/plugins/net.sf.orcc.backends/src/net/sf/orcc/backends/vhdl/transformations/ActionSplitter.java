@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.instructions.InstSplit;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
@@ -44,10 +45,12 @@ import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.jgrapht.DirectedGraph;
@@ -149,6 +152,12 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 	@Override
 	public Object caseInstSpecific(InstSpecific instruction) {
 		if (instruction instanceof InstSplit) {
+			NodeWhile nodeWhile = EcoreHelper.getContainerOfType(instruction,
+					NodeWhile.class);
+			if (nodeWhile != null) {
+				throw new OrccRuntimeException(
+						"splitting while nodes is not supported at the moment.");
+			}
 			splitAction((InstSplit) instruction);
 		}
 		return null;

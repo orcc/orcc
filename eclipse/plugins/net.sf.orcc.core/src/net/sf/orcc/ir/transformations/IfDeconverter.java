@@ -107,6 +107,12 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseProcedure(Procedure procedure) {
+		// do not perform if-deconversion if procedure contains whiles
+		if (EcoreHelper.getObjects(procedure, NodeWhile.class).iterator()
+				.hasNext()) {
+			return null;
+		}
+
 		nodeIfList = new ArrayList<NodeIf>();
 
 		// initialized to "null" so that the first empty predicate will create

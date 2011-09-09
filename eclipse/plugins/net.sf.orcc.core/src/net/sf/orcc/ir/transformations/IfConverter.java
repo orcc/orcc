@@ -41,6 +41,7 @@ import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.EcoreHelper;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -112,8 +113,16 @@ public class IfConverter extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseProcedure(Procedure procedure) {
+		// do not perform if-conversion if procedure contains whiles
+		if (EcoreHelper.getObjects(procedure, NodeWhile.class).iterator()
+				.hasNext()) {
+			return null;
+		}
+
+		// now we can safely perform if-conversion
 		currentPredicate = IrFactory.eINSTANCE.createPredicate();
 		targetBlock = IrFactory.eINSTANCE.createNodeBlock();
+
 		super.caseProcedure(procedure);
 		procedure.getNodes().add(targetBlock);
 		return null;
