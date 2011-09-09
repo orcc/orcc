@@ -37,6 +37,7 @@ import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstExpressionBinary;
 import net.sf.orcc.cal.cal.AstExpressionBoolean;
 import net.sf.orcc.cal.cal.AstExpressionCall;
+import net.sf.orcc.cal.cal.AstExpressionElsif;
 import net.sf.orcc.cal.cal.AstExpressionFloat;
 import net.sf.orcc.cal.cal.AstExpressionIf;
 import net.sf.orcc.cal.cal.AstExpressionIndex;
@@ -147,6 +148,22 @@ public class TypeChecker extends CalSwitch<Type> {
 	}
 
 	@Override
+	public Type caseAstExpressionElsif(AstExpressionElsif expression) {
+		Type type = getType(expression.getCondition());
+		if (type == null) {
+			return null;
+		}
+
+		if (!type.isBool()) {
+			error("Cannot convert " + type + " to bool", expression,
+					eINSTANCE.getAstExpressionElsif_Condition(), -1);
+			return null;
+		}
+
+		return getType(expression.getThen());
+	}
+
+	@Override
 	public Type caseAstExpressionFloat(AstExpressionFloat expression) {
 		return IrFactory.eINSTANCE.createTypeFloat();
 	}
@@ -165,11 +182,11 @@ public class TypeChecker extends CalSwitch<Type> {
 		}
 
 		Type t1 = getType(expression.getThen());
-		Type t2 = getType(expression.getElse());
-		if (t1 == null || t2 == null) {
-			return null;
+		for (AstExpressionElsif elsif : expression.getElsifs()) {
+			t1 = TypeUtil.getLub(t1, doSwitch(elsif));
 		}
 
+		Type t2 = getType(expression.getElse());
 		type = TypeUtil.getLub(t1, t2);
 		if (type == null) {
 			error("Incompatible operand types " + t1 + " and " + t2,

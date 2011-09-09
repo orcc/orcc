@@ -54,6 +54,7 @@ import net.sf.orcc.cal.cal.AstSchedule;
 import net.sf.orcc.cal.cal.AstScheduleRegExp;
 import net.sf.orcc.cal.cal.AstStatementAssign;
 import net.sf.orcc.cal.cal.AstStatementCall;
+import net.sf.orcc.cal.cal.AstStatementElsif;
 import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstStatementIf;
 import net.sf.orcc.cal.cal.AstStatementWhile;
@@ -450,6 +451,15 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 						eINSTANCE.getAstStatementCall_Parameters(), index);
 			}
 			index++;
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkAstStatementElsif(AstStatementElsif elsIf) {
+		Type type = new TypeChecker(this).getType(elsIf.getCondition());
+		if (type == null || !type.isBool()) {
+			error("Type mismatch: cannot convert from " + type + " to bool",
+					elsIf, eINSTANCE.getAstStatementElsif_Condition(), -1);
 		}
 	}
 

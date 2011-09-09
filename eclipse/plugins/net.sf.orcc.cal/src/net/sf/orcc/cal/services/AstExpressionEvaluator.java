@@ -38,6 +38,7 @@ import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstExpressionBinary;
 import net.sf.orcc.cal.cal.AstExpressionBoolean;
 import net.sf.orcc.cal.cal.AstExpressionCall;
+import net.sf.orcc.cal.cal.AstExpressionElsif;
 import net.sf.orcc.cal.cal.AstExpressionFloat;
 import net.sf.orcc.cal.cal.AstExpressionIf;
 import net.sf.orcc.cal.cal.AstExpressionIndex;
@@ -139,15 +140,20 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 	public Expression caseAstExpressionIf(AstExpressionIf expression) {
 		Expression condition = evaluate(expression.getCondition());
 
-		// evaluates both branches so errors are caught early
-		Expression oThen = evaluate(expression.getThen());
-		Expression oElse = evaluate(expression.getElse());
-
 		if (condition != null && condition.isBooleanExpr()) {
 			if (((ExprBool) condition).isValue()) {
-				return oThen;
+				return evaluate(expression.getThen());
 			} else {
-				return oElse;
+				for (AstExpressionElsif elsif : expression.getElsifs()) {
+					condition = evaluate(elsif.getCondition());
+					if (condition != null && condition.isBooleanExpr()) {
+						if (((ExprBool) condition).isValue()) {
+							return evaluate(elsif.getThen());
+						}
+					}
+				}
+
+				return evaluate(expression.getElse());
 			}
 		} else {
 			error("expected condition of type bool", expression,

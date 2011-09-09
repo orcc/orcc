@@ -37,6 +37,7 @@ import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstExpressionBinary;
 import net.sf.orcc.cal.cal.AstExpressionBoolean;
 import net.sf.orcc.cal.cal.AstExpressionCall;
+import net.sf.orcc.cal.cal.AstExpressionElsif;
 import net.sf.orcc.cal.cal.AstExpressionFloat;
 import net.sf.orcc.cal.cal.AstExpressionIf;
 import net.sf.orcc.cal.cal.AstExpressionIndex;
@@ -54,6 +55,7 @@ import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstStatement;
 import net.sf.orcc.cal.cal.AstStatementAssign;
 import net.sf.orcc.cal.cal.AstStatementCall;
+import net.sf.orcc.cal.cal.AstStatementElsif;
 import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstStatementIf;
 import net.sf.orcc.cal.cal.AstStatementWhile;
@@ -204,6 +206,12 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 	}
 
 	@Override
+	public Boolean caseAstExpressionElsif(AstExpressionElsif expression) {
+		return doSwitch(expression.getCondition())
+				|| doSwitch(expression.getThen());
+	}
+
+	@Override
 	public Boolean caseAstExpressionFloat(AstExpressionFloat expression) {
 		return false;
 	}
@@ -211,8 +219,17 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 	@Override
 	public Boolean caseAstExpressionIf(AstExpressionIf expression) {
 		if (doSwitch(expression.getCondition())
-				|| doSwitch(expression.getThen())
-				|| doSwitch(expression.getElse())) {
+				|| doSwitch(expression.getThen())) {
+			return true;
+		}
+
+		for (AstExpressionElsif elsif : expression.getElsifs()) {
+			if (doSwitch(elsif)) {
+				return true;
+			}
+		}
+
+		if (doSwitch(expression.getElse())) {
 			return true;
 		}
 
@@ -224,7 +241,7 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 		if (doSwitch(expression.getSource())) {
 			return true;
 		}
-		
+
 		for (AstExpression index : expression.getIndexes()) {
 			if (doSwitch(index)) {
 				return true;
@@ -293,7 +310,7 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 	public Boolean caseAstGenerator(AstGenerator generator) {
 		return (doSwitch(generator.getVariable())
 				|| doSwitch(generator.getLower()) || doSwitch(generator
-				.getHigher()));
+					.getHigher()));
 	}
 
 	@Override
@@ -385,6 +402,21 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 	}
 
 	@Override
+	public Boolean caseAstStatementElsif(AstStatementElsif elsif) {
+		if (doSwitch(elsif.getCondition())) {
+			return true;
+		}
+
+		for (AstStatement statement : elsif.getThen()) {
+			if (doSwitch(statement)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
 	public Boolean caseAstStatementForeach(AstStatementForeach foreach) {
 		if (doSwitch(foreach.getVariable()) || doSwitch(foreach.getLower())
 				|| doSwitch(foreach.getHigher())) {
@@ -408,6 +440,12 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 
 		for (AstStatement statement : stmtIf.getThen()) {
 			if (doSwitch(statement)) {
+				return true;
+			}
+		}
+
+		for (AstStatementElsif elsIf : stmtIf.getElsifs()) {
+			if (doSwitch(elsIf)) {
 				return true;
 			}
 		}
@@ -489,7 +527,7 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 		if (doSwitch(type)) {
 			return true;
 		}
-		
+
 		for (AstExpression dim : variable.getDimensions()) {
 			if (doSwitch(dim)) {
 				return true;

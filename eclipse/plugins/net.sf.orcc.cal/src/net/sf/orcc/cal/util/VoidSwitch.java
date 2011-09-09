@@ -37,6 +37,7 @@ import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstExpressionBinary;
 import net.sf.orcc.cal.cal.AstExpressionBoolean;
 import net.sf.orcc.cal.cal.AstExpressionCall;
+import net.sf.orcc.cal.cal.AstExpressionElsif;
 import net.sf.orcc.cal.cal.AstExpressionFloat;
 import net.sf.orcc.cal.cal.AstExpressionIf;
 import net.sf.orcc.cal.cal.AstExpressionIndex;
@@ -54,6 +55,7 @@ import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstStatement;
 import net.sf.orcc.cal.cal.AstStatementAssign;
 import net.sf.orcc.cal.cal.AstStatementCall;
+import net.sf.orcc.cal.cal.AstStatementElsif;
 import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstStatementIf;
 import net.sf.orcc.cal.cal.AstStatementWhile;
@@ -175,6 +177,14 @@ public class VoidSwitch extends CalSwitch<Void> {
 	}
 
 	@Override
+	public Void caseAstExpressionElsif(AstExpressionElsif expression) {
+		doSwitch(expression.getCondition());
+		doSwitch(expression.getThen());
+
+		return null;
+	}
+
+	@Override
 	public Void caseAstExpressionFloat(AstExpressionFloat expression) {
 		return null;
 	}
@@ -183,6 +193,11 @@ public class VoidSwitch extends CalSwitch<Void> {
 	public Void caseAstExpressionIf(AstExpressionIf expression) {
 		doSwitch(expression.getCondition());
 		doSwitch(expression.getThen());
+
+		for (AstExpressionElsif elsif : expression.getElsifs()) {
+			doSwitch(elsif);
+		}
+
 		doSwitch(expression.getElse());
 
 		return null;
@@ -325,6 +340,17 @@ public class VoidSwitch extends CalSwitch<Void> {
 	}
 
 	@Override
+	public Void caseAstStatementElsif(AstStatementElsif stmtIf) {
+		doSwitch(stmtIf.getCondition());
+
+		for (AstStatement statement : stmtIf.getThen()) {
+			doSwitch(statement);
+		}
+
+		return null;
+	}
+
+	@Override
 	public Void caseAstStatementForeach(AstStatementForeach foreach) {
 		doSwitch(foreach.getVariable());
 		doSwitch(foreach.getLower());
@@ -336,12 +362,16 @@ public class VoidSwitch extends CalSwitch<Void> {
 
 		return null;
 	}
-
+	
 	@Override
 	public Void caseAstStatementIf(AstStatementIf stmtIf) {
 		doSwitch(stmtIf.getCondition());
 
 		for (AstStatement statement : stmtIf.getThen()) {
+			doSwitch(statement);
+		}
+		
+		for (AstStatementElsif statement : stmtIf.getElsifs()) {
 			doSwitch(statement);
 		}
 
