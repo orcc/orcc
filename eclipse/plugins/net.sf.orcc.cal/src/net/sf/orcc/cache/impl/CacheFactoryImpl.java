@@ -12,6 +12,7 @@ import net.sf.orcc.cache.Cache;
 import net.sf.orcc.cache.CacheFactory;
 import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cache.CachePackage;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 
 import org.eclipse.emf.ecore.EClass;
@@ -75,6 +76,7 @@ public class CacheFactoryImpl extends EFactoryImpl implements CacheFactory {
 			case CachePackage.CACHE: return createCache();
 			case CachePackage.CACHE_MANAGER: return createCacheManager();
 			case CachePackage.ESTRING_TO_TYPE_MAP_ENTRY: return (EObject)createEStringToTypeMapEntry();
+			case CachePackage.ESTRING_TO_EXPRESSION_MAP_ENTRY: return (EObject)createEStringToExpressionMapEntry();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -105,6 +107,16 @@ public class CacheFactoryImpl extends EFactoryImpl implements CacheFactory {
 	public Map.Entry<String, Type> createEStringToTypeMapEntry() {
 		EStringToTypeMapEntryImpl eStringToTypeMapEntry = new EStringToTypeMapEntryImpl();
 		return eStringToTypeMapEntry;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Map.Entry<String, Expression> createEStringToExpressionMapEntry() {
+		EStringToExpressionMapEntryImpl eStringToExpressionMapEntry = new EStringToExpressionMapEntryImpl();
+		return eStringToExpressionMapEntry;
 	}
 
 	/**

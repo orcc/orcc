@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.cache;
 
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 
 import org.eclipse.emf.common.util.EList;
@@ -43,14 +44,21 @@ import org.eclipse.emf.ecore.EObject;
 public interface Cache extends EObject {
 
 	/**
-	 * Returns the type of the given object, first looking in the cache and if
-	 * not present the type is computed and added to the cache.
+	 * Returns all the expressions stored in this cache. This method should only
+	 * be called internally to make types belong to this cache.
 	 * 
-	 * @param eObject
-	 *            an EObject
-	 * @return the type of the given object
+	 * @return all the types stored in this cache
+	 * @model containment="true"
 	 */
-	Type getType(EObject eObject);
+	EList<Expression> getExpressions();
+
+	/**
+	 * Returns a String to Expression map.
+	 * 
+	 * @return a String to Expression map
+	 * @model keyType="String" valueType="Expression"
+	 */
+	EMap<String, Expression> getMapExpressions();
 
 	/**
 	 * Returns a String to Type map.
@@ -58,7 +66,7 @@ public interface Cache extends EObject {
 	 * @return a String to Type map
 	 * @model keyType="String" valueType="Type"
 	 */
-	EMap<String, Type> getTypeMap();
+	EMap<String, Type> getMapTypes();
 
 	/**
 	 * Returns all the types stored in this cache. This method should only be

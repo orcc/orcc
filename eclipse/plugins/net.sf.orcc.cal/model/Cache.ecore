@@ -4,15 +4,24 @@
     xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="cache"
     nsURI="http://orcc.sf.net/cache" nsPrefix="net.sf.orcc.cal.cache">
   <eClassifiers xsi:type="ecore:EClass" name="Cache">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="typeMap" upperBound="-1"
-        eType="#//EStringToTypeMapEntry" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="expressions" upperBound="-1"
+        eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Expression" containment="true"
+        resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="types" upperBound="-1"
         eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Type" containment="true"
         resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="mapExpressions" upperBound="-1"
+        eType="#//EStringToExpressionMapEntry" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="mapTypes" upperBound="-1"
+        eType="#//EStringToTypeMapEntry" containment="true" resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="CacheManager"/>
   <eClassifiers xsi:type="ecore:EClass" name="EStringToTypeMapEntry" instanceClassName="java.util.Map$Entry">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Type"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="EStringToExpressionMapEntry" instanceClassName="java.util.Map$Entry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Expression"/>
   </eClassifiers>
 </ecore:EPackage>

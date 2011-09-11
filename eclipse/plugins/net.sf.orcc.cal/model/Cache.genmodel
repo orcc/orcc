@@ -8,13 +8,19 @@
   <genPackages prefix="Cache" basePackage="net.sf.orcc" disposableProviderFactory="true"
       ecorePackage="Cache.ecore#/">
     <genClasses ecoreClass="Cache.ecore#//Cache">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Cache.ecore#//Cache/typeMap"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Cache.ecore#//Cache/types"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Cache.ecore#//Cache/expressions"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Cache.ecore#//Cache/mapExpressions"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Cache.ecore#//Cache/mapTypes"/>
     </genClasses>
     <genClasses ecoreClass="Cache.ecore#//CacheManager"/>
     <genClasses ecoreClass="Cache.ecore#//EStringToTypeMapEntry">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Cache.ecore#//EStringToTypeMapEntry/key"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Cache.ecore#//EStringToTypeMapEntry/value"/>
+    </genClasses>
+    <genClasses ecoreClass="Cache.ecore#//EStringToExpressionMapEntry">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Cache.ecore#//EStringToExpressionMapEntry/key"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Cache.ecore#//EStringToExpressionMapEntry/value"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

@@ -11,6 +11,7 @@ import java.util.Map;
 import net.sf.orcc.cache.Cache;
 import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cache.CachePackage;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 
 import org.eclipse.emf.common.notify.Adapter;
@@ -51,6 +52,10 @@ public class CacheAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseEStringToTypeMapEntry(Map.Entry<String, Type> object) {
 				return createEStringToTypeMapEntryAdapter();
+			}
+			@Override
+			public Adapter caseEStringToExpressionMapEntry(Map.Entry<String, Expression> object) {
+				return createEStringToExpressionMapEntryAdapter();
 			}
 			@Override
 			public Adapter defaultCase(EObject object) {
@@ -134,6 +139,20 @@ public class CacheAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createEStringToTypeMapEntryAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>EString To Expression Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see java.util.Map.Entry
+	 * @generated
+	 */
+	public Adapter createEStringToExpressionMapEntryAdapter() {
 		return null;
 	}
 

@@ -11,6 +11,7 @@ import java.util.Map;
 import net.sf.orcc.cache.Cache;
 import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cache.CachePackage;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 
 import org.eclipse.emf.ecore.EObject;
@@ -97,6 +98,21 @@ public class CacheSwitch<T> extends Switch<T> {
 	}
 
 	/**
+	 * Returns the result of interpreting the object as an instance of '<em>EString To Expression Map Entry</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>EString To Expression Map Entry</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseEStringToExpressionMapEntry(Map.Entry<String, Expression> object) {
+		return null;
+	}
+
+	/**
 	 * Returns the result of interpreting the object as an instance of '<em>EObject</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
@@ -137,6 +153,12 @@ public class CacheSwitch<T> extends Switch<T> {
 			case CachePackage.ESTRING_TO_TYPE_MAP_ENTRY: {
 				@SuppressWarnings("unchecked") Map.Entry<String, Type> eStringToTypeMapEntry = (Map.Entry<String, Type>)theEObject;
 				T result = caseEStringToTypeMapEntry(eStringToTypeMapEntry);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case CachePackage.ESTRING_TO_EXPRESSION_MAP_ENTRY: {
+				@SuppressWarnings("unchecked") Map.Entry<String, Expression> eStringToExpressionMapEntry = (Map.Entry<String, Expression>)theEObject;
+				T result = caseEStringToExpressionMapEntry(eStringToExpressionMapEntry);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
