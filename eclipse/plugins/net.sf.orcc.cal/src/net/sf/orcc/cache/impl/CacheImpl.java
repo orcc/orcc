@@ -186,7 +186,7 @@ public class CacheImpl extends EObjectImpl implements Cache {
 		String fragment = uri.fragment();
 		Type type = getTypeMap().get(fragment);
 		if (type == null) {
-			type = new Typer(null).doSwitch(eObject);
+			type = new Typer().doSwitch(eObject);
 			getTypes().add(type);
 			getTypeMap().put(fragment, type);
 		}

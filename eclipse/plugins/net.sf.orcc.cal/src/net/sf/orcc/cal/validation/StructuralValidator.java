@@ -214,6 +214,22 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 	}
 
 	@Check(CheckType.NORMAL)
+	public void checkAstExpressionCall(AstExpressionCall astCall) {
+		AstFunction function = astCall.getFunction();
+		String name = function.getName();
+
+		EObject rootCter = EcoreUtil.getRootContainer(astCall);
+		EObject rootCterFunction = EcoreUtil.getRootContainer(function);
+		if (function.eContainer() instanceof AstActor
+				&& rootCter != rootCterFunction) {
+			// calling an actor's function from another actor/unit
+			error("function " + name
+					+ " cannot be called from another actor/unit", astCall,
+					eINSTANCE.getAstExpressionCall_Function(), -1);
+		}
+	}
+
+	@Check(CheckType.NORMAL)
 	public void checkAstFunction(final AstFunction function) {
 		// do not check functions of a unit
 		if (function.eContainer() instanceof AstUnit) {
@@ -269,6 +285,22 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 				&& !procedure.isNative()) {
 			warning("The procedure " + procedure.getName() + " is never called",
 					eINSTANCE.getAstProcedure_Name());
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkAstStatementCall(AstStatementCall astCall) {
+		AstProcedure procedure = astCall.getProcedure();
+		String name = procedure.getName();
+
+		EObject rootCter = EcoreUtil.getRootContainer(astCall);
+		EObject rootCterProcedure = EcoreUtil.getRootContainer(procedure);
+		if (procedure.eContainer() instanceof AstActor
+				&& rootCter != rootCterProcedure) {
+			// calling an actor's procedure from another actor/unit
+			error("procedure " + name
+					+ " cannot be called from another actor/unit", astCall,
+					eINSTANCE.getAstStatementCall_Procedure(), -1);
 		}
 	}
 

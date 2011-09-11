@@ -70,8 +70,6 @@ import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.services.AstExpressionEvaluator;
 import net.sf.orcc.cal.util.Util;
-import net.sf.orcc.cal.validation.CalJavaValidator;
-import net.sf.orcc.cal.validation.ValidationError;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
@@ -101,16 +99,7 @@ public class Typer extends CalSwitch<Type> {
 		GLB, LUB, LUB_PLUS_1, LUB_SUM_SIZE
 	}
 
-	private List<ValidationError> errors;
-
 	private int maxSize;
-
-	/**
-	 * Creates a new type checker.
-	 */
-	public Typer(List<ValidationError> errors) {
-		this.errors = errors;
-	}
 
 	@Override
 	public Type caseAstExpressionBinary(AstExpressionBinary expression) {
@@ -132,49 +121,11 @@ public class Typer extends CalSwitch<Type> {
 	public Type caseAstExpressionCall(AstExpressionCall astCall) {
 		AstFunction function = astCall.getFunction();
 		Type type = Util.getType(function);
-
-		String name = function.getName();
-		List<AstExpression> parameters = astCall.getParameters();
-		if (function.getParameters().size() != parameters.size()) {
-			error("function " + name + " takes "
-					+ function.getParameters().size() + " arguments.", astCall,
-					eINSTANCE.getAstExpressionCall_Function(), -1);
-			return null;
-		}
-
-		Iterator<AstVariable> itFormal = function.getParameters().iterator();
-		Iterator<AstExpression> itActual = parameters.iterator();
-		int index = 0;
-		while (itFormal.hasNext() && itActual.hasNext()) {
-			Type formalType = Util.getType(itFormal.next());
-			AstExpression expression = itActual.next();
-			Type actualType = Util.getType(expression);
-
-			// check types
-			if (!TypeUtil.isConvertibleTo(actualType, formalType)) {
-				error("Type mismatch: cannot convert from " + actualType
-						+ " to " + formalType, astCall,
-						eINSTANCE.getAstExpressionCall_Parameters(), index);
-			}
-			index++;
-		}
-
 		return EcoreUtil.copy(type);
 	}
 
 	@Override
 	public Type caseAstExpressionElsif(AstExpressionElsif expression) {
-		Type type = Util.getType(expression.getCondition());
-		if (type == null) {
-			return null;
-		}
-
-		if (!type.isBool()) {
-			error("Cannot convert " + type + " to bool", expression,
-					eINSTANCE.getAstExpressionElsif_Condition(), -1);
-			return null;
-		}
-
 		return Util.getType(expression.getThen());
 	}
 
@@ -186,16 +137,6 @@ public class Typer extends CalSwitch<Type> {
 	@Override
 	public Type caseAstExpressionIf(AstExpressionIf expression) {
 		Type type = Util.getType(expression.getCondition());
-		if (type == null) {
-			return null;
-		}
-
-		if (!type.isBool()) {
-			error("Cannot convert " + type + " to bool", expression,
-					eINSTANCE.getAstExpressionIf_Condition(), -1);
-			return null;
-		}
-
 		Type t1 = Util.getType(expression.getThen());
 		for (AstExpressionElsif elsif : expression.getElsifs()) {
 			t1 = TypeUtil.getLub(t1, doSwitch(elsif));
@@ -203,12 +144,6 @@ public class Typer extends CalSwitch<Type> {
 
 		Type t2 = Util.getType(expression.getElse());
 		type = TypeUtil.getLub(t1, t2);
-		if (type == null) {
-			error("Incompatible operand types " + t1 + " and " + t2,
-					expression, eINSTANCE.getAstExpressionIf_Condition(), -1);
-			return null;
-		}
-
 		return type;
 	}
 
@@ -218,22 +153,15 @@ public class Typer extends CalSwitch<Type> {
 		Type type = Util.getType(variable);
 
 		List<AstExpression> indexes = expression.getIndexes();
-		int errorIdx = 0;
 		for (AstExpression index : indexes) {
 			Type subType = Util.getType(index);
 			if (type.isList()) {
 				if (subType != null && (subType.isInt() || subType.isUint())) {
 					type = ((TypeList) type).getType();
-				} else {
-					error("index must be an integer", index,
-							eINSTANCE.getAstExpressionIndex_Indexes(), errorIdx);
 				}
 			} else {
-				error("Cannot convert " + type + " to List", expression,
-						eINSTANCE.getAstExpressionIndex_Source(), -1);
 				return null;
 			}
-			errorIdx++;
 		}
 
 		return EcoreUtil.copy(type);
@@ -253,9 +181,9 @@ public class Typer extends CalSwitch<Type> {
 
 		// size of generators
 		for (AstGenerator generator : expression.getGenerators()) {
-			int lower = new AstExpressionEvaluator(errors)
+			int lower = new AstExpressionEvaluator(null)
 					.evaluateAsInteger(generator.getLower());
-			int higher = new AstExpressionEvaluator(errors)
+			int higher = new AstExpressionEvaluator(null)
 					.evaluateAsInteger(generator.getHigher());
 			size *= (higher - lower) + 1;
 		}
@@ -284,42 +212,23 @@ public class Typer extends CalSwitch<Type> {
 
 		switch (op) {
 		case BITNOT:
-			if (!(type.isInt() || type.isUint())) {
-				error("Cannot convert " + type + " to int/uint", expression,
-						eINSTANCE.getAstExpressionUnary_Expression(), -1);
-				return null;
-			}
 			return type;
 		case LOGIC_NOT:
-			if (!type.isBool()) {
-				error("Cannot convert " + type + " to boolean", expression,
-						eINSTANCE.getAstExpressionUnary_Expression(), -1);
-				return null;
-			}
 			return type;
 		case MINUS:
 			if (type.isUint()) {
 				return IrFactory.eINSTANCE.createTypeInt(((TypeUint) type)
 						.getSize());
 			}
-			if (!type.isInt()) {
-				error("Cannot convert " + type + " to int", expression,
-						eINSTANCE.getAstExpressionUnary_Expression(), -1);
-				return null;
-			}
 			return type;
 		case NUM_ELTS:
 			if (!type.isList()) {
-				error("Cannot convert " + type + " to List", expression,
-						eINSTANCE.getAstExpressionUnary_Expression(), -1);
-				return null;
+				return IrFactory.eINSTANCE.createTypeInt(1);
 			}
 			TypeList listType = (TypeList) type;
 			return IrFactory.eINSTANCE.createTypeInt(TypeUtil.getSize(listType
 					.getSize()));
 		default:
-			error("Unknown unary operator", expression,
-					eINSTANCE.getAstExpressionUnary_Expression(), -1);
 			return null;
 		}
 	}
@@ -337,8 +246,6 @@ public class Typer extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstGenerator(AstGenerator expression) {
-		error("cannot evaluate generator", expression,
-				eINSTANCE.getAstGenerator_Variable(), -1);
 		return null;
 	}
 
@@ -364,8 +271,7 @@ public class Typer extends CalSwitch<Type> {
 		if (astSize == null) {
 			size = 32;
 		} else {
-			size = new AstExpressionEvaluator(errors)
-					.evaluateAsInteger(astSize);
+			size = new AstExpressionEvaluator(null).evaluateAsInteger(astSize);
 		}
 		return IrFactory.eINSTANCE.createTypeInt(size);
 	}
@@ -374,8 +280,7 @@ public class Typer extends CalSwitch<Type> {
 	public Type caseAstTypeList(AstTypeList listType) {
 		Type type = doSwitch(listType.getType());
 		AstExpression expression = listType.getSize();
-		Expression size = new AstExpressionEvaluator(errors)
-				.evaluate(expression);
+		Expression size = new AstExpressionEvaluator(null).evaluate(expression);
 		size = EcoreUtil.copy(size);
 		return IrFactory.eINSTANCE.createTypeList(size, type);
 	}
@@ -392,8 +297,7 @@ public class Typer extends CalSwitch<Type> {
 		if (astSize == null) {
 			size = 32;
 		} else {
-			size = new AstExpressionEvaluator(errors)
-					.evaluateAsInteger(astSize);
+			size = new AstExpressionEvaluator(null).evaluateAsInteger(astSize);
 		}
 
 		return IrFactory.eINSTANCE.createTypeUint(size);
@@ -452,17 +356,23 @@ public class Typer extends CalSwitch<Type> {
 		switch (unification) {
 		case GLB:
 			type = TypeUtil.getGlb(t1, t2);
-			size = type.getSizeInBits();
+			if (type != null) {
+				size = type.getSizeInBits();
+			}
 			break;
 
 		case LUB:
 			type = TypeUtil.getLub(t1, t2);
-			size = type.getSizeInBits();
+			if (type != null) {
+				size = type.getSizeInBits();
+			}
 			break;
 
 		case LUB_PLUS_1:
 			type = TypeUtil.getLub(t1, t2);
-			size = type.getSizeInBits() + 1;
+			if (type != null) {
+				size = type.getSizeInBits() + 1;
+			}
 			break;
 
 		case LUB_SUM_SIZE:
@@ -476,32 +386,17 @@ public class Typer extends CalSwitch<Type> {
 			size = maxSize;
 		}
 
-		if (type.isInt()) {
-			TypeInt typeInt = (TypeInt) type;
-			typeInt.setSize(size);
-		} else if (type.isUint()) {
-			TypeUint typeUint = (TypeUint) type;
-			typeUint.setSize(size);
+		if (type != null) {
+			if (type.isInt()) {
+				TypeInt typeInt = (TypeInt) type;
+				typeInt.setSize(size);
+			} else if (type.isUint()) {
+				TypeUint typeUint = (TypeUint) type;
+				typeUint.setSize(size);
+			}
 		}
 
 		return type;
-	}
-
-	/**
-	 * Wrapper call to {@link CalJavaValidator#error(String, EObject, Integer)}.
-	 * 
-	 * @param message
-	 *            error message
-	 * @param source
-	 *            source object
-	 * @param feature
-	 *            feature of the object that caused the error
-	 */
-	private void error(String message, EObject source,
-			EStructuralFeature feature, int index) {
-		if (errors != null) {
-			errors.add(new ValidationError(message, source, feature, index));
-		}
 	}
 
 	/**
@@ -619,30 +514,8 @@ public class Typer extends CalSwitch<Type> {
 	 */
 	private Type getTypeAdd(Type t1, Type t2, EObject source,
 			EStructuralFeature feature, int index) {
-		if (t1.isString()) {
-			if (t2.isList()) {
-				error("Cannot convert " + t2 + " to String", source, feature,
-						index);
-				return null;
-			} else {
-				return t1;
-			}
-		}
-
-		if (t2.isString()) {
-			if (t1.isList()) {
-				error("Cannot convert " + t1 + " to String", source, feature,
-						index);
-				return null;
-			} else {
-				return t1;
-			}
-		}
-
-		if (t1.isBool() || t2.isBool()) {
-			error("Addition is not defined for booleans", source, feature,
-					index);
-			return null;
+		if (t1.isString() && !t2.isList() || t2.isString() && !t1.isList()) {
+			return t1;
 		}
 
 		return createType(t1, t2, Unification.LUB_PLUS_1);
@@ -672,56 +545,16 @@ public class Typer extends CalSwitch<Type> {
 
 		switch (op) {
 		case BITAND:
-			if (!t1.isInt() && !t1.isUint()) {
-				error("Cannot convert " + t1 + " to int/uint", source, feature,
-						index);
-				return null;
-			}
-			if (!t2.isInt() && !t2.isUint()) {
-				error("Cannot convert " + t2 + " to int/uint", source, feature,
-						index);
-				return null;
-			}
 			return createType(t1, t2, Unification.GLB);
 
 		case BITOR:
 		case BITXOR:
-			if (!t1.isInt() && !t1.isUint()) {
-				error("Cannot convert " + t1 + " to int/uint", source, feature,
-						index);
-				return null;
-			}
-			if (!t2.isInt() && !t2.isUint()) {
-				error("Cannot convert " + t2 + " to int/uint", source, feature,
-						index);
-				return null;
-			}
 			return createType(t1, t2, Unification.LUB);
 
 		case TIMES:
-			if (!t1.isInt() && !t1.isUint()) {
-				error("Cannot convert " + t1 + " to int/uint", source, feature,
-						index);
-				return null;
-			}
-			if (!t2.isInt() && !t2.isUint()) {
-				error("Cannot convert " + t2 + " to int/uint", source, feature,
-						index);
-				return null;
-			}
 			return createType(t1, t2, Unification.LUB_SUM_SIZE);
 
 		case MINUS:
-			if (!t1.isInt() && !t1.isUint()) {
-				error("Cannot convert " + t1 + " to int/uint", source, feature,
-						index);
-				return null;
-			}
-			if (!t2.isInt() && !t2.isUint()) {
-				error("Cannot convert " + t2 + " to int/uint", source, feature,
-						index);
-				return null;
-			}
 			return createType(t1, t2, Unification.LUB_PLUS_1);
 
 		case PLUS:
@@ -730,29 +563,9 @@ public class Typer extends CalSwitch<Type> {
 		case DIV:
 		case DIV_INT:
 		case SHIFT_RIGHT:
-			if (!t1.isInt() && !t1.isUint()) {
-				error("Cannot convert " + t1 + " to int/uint", source, feature,
-						index);
-				return null;
-			}
-			if (!t2.isInt() && !t2.isUint()) {
-				error("Cannot convert " + t2 + " to int/uint", source, feature,
-						index);
-				return null;
-			}
 			return t1;
 
 		case MOD:
-			if (!t1.isInt() && !t1.isUint()) {
-				error("Cannot convert " + t1 + " to int/uint", source, feature,
-						index);
-				return null;
-			}
-			if (!t2.isInt() && !t2.isUint()) {
-				error("Cannot convert " + t2 + " to int/uint", source, feature,
-						index);
-				return null;
-			}
 			return t2;
 
 		case SHIFT_LEFT:
@@ -764,30 +577,13 @@ public class Typer extends CalSwitch<Type> {
 		case LE:
 		case LT:
 		case NE:
-			Type type = TypeUtil.getLub(t1, t2);
-			if (type == null) {
-				error("Incompatible operand types " + t1 + " and " + t2,
-						source, feature, index);
-				return null;
-			}
 			return IrFactory.eINSTANCE.createTypeBool();
 
 		case EXP:
-			error("Operator ** not implemented", source, feature, index);
 			return null;
 
 		case LOGIC_AND:
 		case LOGIC_OR:
-			if (!t1.isBool()) {
-				error("Cannot convert " + t1 + " to bool", source, feature,
-						index);
-				return null;
-			}
-			if (!t2.isBool()) {
-				error("Cannot convert " + t2 + " to bool", source, feature,
-						index);
-				return null;
-			}
 			return IrFactory.eINSTANCE.createTypeBool();
 		}
 
@@ -816,9 +612,7 @@ public class Typer extends CalSwitch<Type> {
 		} else if (t1.isUint()) {
 			s1 = ((TypeUint) t1).getSize();
 		} else {
-			error("Cannot convert " + t1 + " to int/uint", source, feature,
-					index);
-			return null;
+			s1 = 32;
 		}
 
 		int shift;
@@ -828,9 +622,7 @@ public class Typer extends CalSwitch<Type> {
 		} else if (t2.isUint()) {
 			shift = ((TypeUint) t2).getSize();
 		} else {
-			error("Cannot convert " + t2 + " to int/uint", source, feature,
-					index);
-			return null;
+			shift = 0;
 		}
 
 		int size;

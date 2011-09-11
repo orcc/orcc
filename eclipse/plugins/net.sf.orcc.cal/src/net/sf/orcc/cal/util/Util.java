@@ -167,7 +167,7 @@ public class Util {
 		Resource resource = eObject.eResource();
 		Type type;
 		if (resource == null) {
-			type = new Typer(null).doSwitch(eObject);
+			type = new Typer().doSwitch(eObject);
 		} else {
 			Cache cache = CacheManager.instance.getCache(resource);
 
@@ -176,7 +176,7 @@ public class Util {
 			type = cache.getTypeMap().get(fragment);
 
 			if (type == null) {
-				type = new Typer(null).doSwitch(eObject);
+				type = new Typer().doSwitch(eObject);
 				cache.getTypes().add(type);
 				cache.getTypeMap().put(fragment, type);
 			}

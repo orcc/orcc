@@ -34,10 +34,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.cal.cal.AstAction;
-import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstExpression;
+import net.sf.orcc.cal.cal.AstExpressionBinary;
 import net.sf.orcc.cal.cal.AstExpressionCall;
+import net.sf.orcc.cal.cal.AstExpressionElsif;
+import net.sf.orcc.cal.cal.AstExpressionIf;
 import net.sf.orcc.cal.cal.AstExpressionIndex;
+import net.sf.orcc.cal.cal.AstExpressionUnary;
 import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstOutputPattern;
 import net.sf.orcc.cal.cal.AstPort;
@@ -53,11 +56,14 @@ import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.OpBinary;
+import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.util.TypeUtil;
 
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.xtext.validation.Check;
 import org.eclipse.xtext.validation.CheckType;
@@ -84,12 +90,6 @@ public class TypeValidator extends AbstractCalJavaValidator {
 			}
 			index++;
 		}
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkAstAction(AstAction action) {
-		checkActionGuards(action);
-		checkActionOutputs(action.getOutputs());
 	}
 
 	/**
@@ -144,18 +144,156 @@ public class TypeValidator extends AbstractCalJavaValidator {
 	}
 
 	@Check(CheckType.NORMAL)
+	public void checkAstAction(AstAction action) {
+		checkActionGuards(action);
+		checkActionOutputs(action.getOutputs());
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkAstExpressionBinary(AstExpressionBinary expression) {
+		OpBinary op = OpBinary.getOperator(expression.getOperator());
+		checkTypeBinary(op, Util.getType(expression.getLeft()),
+				Util.getType(expression.getRight()), expression,
+				eINSTANCE.getAstExpressionBinary_Operator(), -1);
+	}
+
+	@Check(CheckType.NORMAL)
 	public void checkAstExpressionCall(AstExpressionCall astCall) {
 		AstFunction function = astCall.getFunction();
-		String name = function.getName();
 
-		EObject rootCter = EcoreUtil.getRootContainer(astCall);
-		EObject rootCterFunction = EcoreUtil.getRootContainer(function);
-		if (function.eContainer() instanceof AstActor
-				&& rootCter != rootCterFunction) {
-			// calling an actor's function from another actor/unit
-			error("function " + name
-					+ " cannot be called from another actor/unit", astCall,
+		String name = function.getName();
+		List<AstExpression> parameters = astCall.getParameters();
+		if (function.getParameters().size() != parameters.size()) {
+			error("function " + name + " takes "
+					+ function.getParameters().size() + " arguments.", astCall,
 					eINSTANCE.getAstExpressionCall_Function(), -1);
+			return;
+		}
+
+		Iterator<AstVariable> itFormal = function.getParameters().iterator();
+		Iterator<AstExpression> itActual = parameters.iterator();
+		int index = 0;
+		while (itFormal.hasNext() && itActual.hasNext()) {
+			Type formalType = Util.getType(itFormal.next());
+			AstExpression expression = itActual.next();
+			Type actualType = Util.getType(expression);
+
+			// check types
+			if (!TypeUtil.isConvertibleTo(actualType, formalType)) {
+				error("Type mismatch: cannot convert from " + actualType
+						+ " to " + formalType, astCall,
+						eINSTANCE.getAstExpressionCall_Parameters(), index);
+			}
+			index++;
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkAstExpressionElsif(AstExpressionElsif expression) {
+		Type type = Util.getType(expression.getCondition());
+		if (type == null || !type.isBool()) {
+			error("Cannot convert " + type + " to bool", expression,
+					eINSTANCE.getAstExpressionElsif_Condition(), -1);
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkAstExpressionIf(AstExpressionIf expression) {
+		Type type = Util.getType(expression.getCondition());
+		if (type == null || !type.isBool()) {
+			error("Cannot convert " + type + " to bool", expression,
+					eINSTANCE.getAstExpressionIf_Condition(), -1);
+		}
+
+		Type typeThen = Util.getType(expression.getThen());
+		type = typeThen;
+		int index = 0;
+		for (AstExpressionElsif elsif : expression.getElsifs()) {
+			Type typeElsif = Util.getType(elsif);
+			type = TypeUtil.getLub(type, typeElsif);
+			if (type == null) {
+				error("Type mismatch: cannot convert " + typeElsif + " to "
+						+ typeThen, expression,
+						eINSTANCE.getAstExpressionIf_Elsifs(), index);
+			}
+			index++;
+		}
+
+		Type typeElse = Util.getType(expression.getElse());
+		type = TypeUtil.getLub(type, typeElse);
+		if (type == null) {
+			error("Type mismatch: cannot convert " + typeElse + " to " + type,
+					expression, eINSTANCE.getAstExpressionIf_Else(), -1);
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkAstExpressionIndex(AstExpressionIndex expression) {
+		AstVariable variable = expression.getSource().getVariable();
+		Type type = Util.getType(variable);
+
+		List<AstExpression> indexes = expression.getIndexes();
+		int errorIdx = 0;
+		for (AstExpression index : indexes) {
+			Type subType = Util.getType(index);
+			if (type.isList()) {
+				if (subType != null && (subType.isInt() || subType.isUint())) {
+					type = ((TypeList) type).getType();
+				} else {
+					error("index must be an integer", index,
+							eINSTANCE.getAstExpressionIndex_Indexes(), errorIdx);
+				}
+			} else {
+				error("Cannot convert " + type + " to List", expression,
+						eINSTANCE.getAstExpressionIndex_Source(), -1);
+			}
+			errorIdx++;
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkAstExpressionUnary(AstExpressionUnary expression) {
+		OpUnary op = OpUnary.getOperator(expression.getUnaryOperator());
+		Type type = Util.getType(expression.getExpression());
+		if (type == null) {
+			return;
+		}
+
+		switch (op) {
+		case BITNOT:
+			if (!(type.isInt() || type.isUint())) {
+				error("Cannot convert " + type + " to int/uint", expression,
+						eINSTANCE.getAstExpressionUnary_Expression(), -1);
+			}
+			break;
+		case LOGIC_NOT:
+			if (!type.isBool()) {
+				error("Cannot convert " + type + " to boolean", expression,
+						eINSTANCE.getAstExpressionUnary_Expression(), -1);
+			}
+			break;
+		case MINUS:
+			if (!type.isUint() && !type.isInt()) {
+				error("Cannot convert " + type + " to int", expression,
+						eINSTANCE.getAstExpressionUnary_Expression(), -1);
+			}
+			break;
+		case NUM_ELTS:
+			if (!type.isList()) {
+				error("Cannot convert " + type + " to List", expression,
+						eINSTANCE.getAstExpressionUnary_Expression(), -1);
+			}
+			break;
+		default:
+			error("Unknown unary operator", expression,
+					eINSTANCE.getAstExpressionUnary_Expression(), -1);
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkAstFunction(final AstFunction function) {
+		if (!function.isNative()) {
+			checkReturnType(function);
 		}
 	}
 
@@ -209,16 +347,6 @@ public class TypeValidator extends AbstractCalJavaValidator {
 			return;
 		}
 
-		EObject rootCter = EcoreUtil.getRootContainer(astCall);
-		EObject rootCterProcedure = EcoreUtil.getRootContainer(procedure);
-		if (procedure.eContainer() instanceof AstActor
-				&& rootCter != rootCterProcedure) {
-			// calling an actor's procedure from another actor/unit
-			error("procedure " + name
-					+ " cannot be called from another actor/unit", astCall,
-					eINSTANCE.getAstStatementCall_Procedure(), -1);
-		}
-
 		if (procedure.getParameters().size() != parameters.size()) {
 			error("procedure " + name + " takes "
 					+ procedure.getParameters().size() + " arguments.",
@@ -241,28 +369,6 @@ public class TypeValidator extends AbstractCalJavaValidator {
 						eINSTANCE.getAstStatementCall_Parameters(), index);
 			}
 			index++;
-		}
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkAstVariable(AstVariable variable) {
-		AstExpression value = variable.getValue();
-		if (value != null) {
-			// check types
-			Type targetType = Util.getType(variable);
-			Type type = Util.getType(value);
-			if (!TypeUtil.isConvertibleTo(type, targetType)) {
-				error("Type mismatch: cannot convert from " + type + " to "
-						+ targetType, variable,
-						eINSTANCE.getAstVariable_Value(), -1);
-			}
-		}
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkAstFunction(final AstFunction function) {
-		if (!function.isNative()) {
-			checkReturnType(function);
 		}
 	}
 
@@ -296,6 +402,21 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		}
 	}
 
+	@Check(CheckType.NORMAL)
+	public void checkAstVariable(AstVariable variable) {
+		AstExpression value = variable.getValue();
+		if (value != null) {
+			// check types
+			Type targetType = Util.getType(variable);
+			Type type = Util.getType(value);
+			if (!TypeUtil.isConvertibleTo(type, targetType)) {
+				error("Type mismatch: cannot convert from " + type + " to "
+						+ targetType, variable,
+						eINSTANCE.getAstVariable_Value(), -1);
+			}
+		}
+	}
+
 	private void checkReturnType(AstFunction function) {
 		Type returnType = Util.getType(function);
 		Type expressionType = Util.getType(function.getExpression());
@@ -304,6 +425,174 @@ public class TypeValidator extends AbstractCalJavaValidator {
 					+ " to " + returnType, function,
 					eINSTANCE.getAstFunction_Expression(), -1);
 		}
+	}
+
+	/**
+	 * Check that the type of a binary expression whose left operand has type t1
+	 * and right operand has type t2, and whose operator is given, is correct.
+	 * 
+	 * @param op
+	 *            operator
+	 * @param t1
+	 *            type of the first operand
+	 * @param t2
+	 *            type of the second operand
+	 * @param source
+	 *            source object
+	 * @param feature
+	 *            feature
+	 */
+	private void checkTypeBinary(OpBinary op, Type t1, Type t2, EObject source,
+			EStructuralFeature feature, int index) {
+		switch (op) {
+		case BITAND:
+			if (!t1.isInt() && !t1.isUint()) {
+				error("Cannot convert " + t1 + " to int/uint", source, feature,
+						index);
+			}
+			if (!t2.isInt() && !t2.isUint()) {
+				error("Cannot convert " + t2 + " to int/uint", source, feature,
+						index);
+			}
+			break;
+
+		case BITOR:
+		case BITXOR:
+			if (!t1.isInt() && !t1.isUint()) {
+				error("Cannot convert " + t1 + " to int/uint", source, feature,
+						index);
+			}
+			if (!t2.isInt() && !t2.isUint()) {
+				error("Cannot convert " + t2 + " to int/uint", source, feature,
+						index);
+			}
+			break;
+
+		case TIMES:
+			if (!t1.isInt() && !t1.isUint()) {
+				error("Cannot convert " + t1 + " to int/uint", source, feature,
+						index);
+			}
+			if (!t2.isInt() && !t2.isUint()) {
+				error("Cannot convert " + t2 + " to int/uint", source, feature,
+						index);
+			}
+			break;
+
+		case MINUS:
+			if (!t1.isInt() && !t1.isUint()) {
+				error("Cannot convert " + t1 + " to int/uint", source, feature,
+						index);
+			}
+			if (!t2.isInt() && !t2.isUint()) {
+				error("Cannot convert " + t2 + " to int/uint", source, feature,
+						index);
+			}
+			break;
+
+		case PLUS:
+			if (t1.isString() && t2.isList()) {
+				error("Cannot convert " + t2 + " to String", source, feature,
+						index);
+			}
+			if (t2.isString() && t1.isList()) {
+				error("Cannot convert " + t1 + " to String", source, feature,
+						index);
+			}
+			if (t1.isBool() && !t2.isString() || !t1.isString() && t2.isBool()) {
+				error("Addition is not defined for booleans", source, feature,
+						index);
+			}
+			break;
+
+		case DIV:
+		case DIV_INT:
+		case SHIFT_RIGHT:
+			if (!t1.isInt() && !t1.isUint()) {
+				error("Cannot convert " + t1 + " to int/uint", source, feature,
+						index);
+			}
+			if (!t2.isInt() && !t2.isUint()) {
+				error("Cannot convert " + t2 + " to int/uint", source, feature,
+						index);
+			}
+			break;
+
+		case MOD:
+			if (!t1.isInt() && !t1.isUint()) {
+				error("Cannot convert " + t1 + " to int/uint", source, feature,
+						index);
+			}
+			if (!t2.isInt() && !t2.isUint()) {
+				error("Cannot convert " + t2 + " to int/uint", source, feature,
+						index);
+			}
+			break;
+
+		case SHIFT_LEFT:
+			if (!t1.isInt() && !t1.isUint()) {
+				error("Cannot convert " + t1 + " to int/uint", source, feature,
+						index);
+			}
+			if (!t2.isInt() && !t2.isUint()) {
+				error("Cannot convert " + t2 + " to int/uint", source, feature,
+						index);
+			}
+			break;
+
+		case EQ:
+		case GE:
+		case GT:
+		case LE:
+		case LT:
+		case NE:
+			Type type = TypeUtil.getLub(t1, t2);
+			if (type == null) {
+				error("Incompatible operand types " + t1 + " and " + t2,
+						source, feature, index);
+			}
+			break;
+
+		case EXP:
+			error("Operator ** not implemented", source, feature, index);
+			break;
+
+		case LOGIC_AND:
+		case LOGIC_OR:
+			if (!t1.isBool()) {
+				error("Cannot convert " + t1 + " to bool", source, feature,
+						index);
+			}
+			if (!t2.isBool()) {
+				error("Cannot convert " + t2 + " to bool", source, feature,
+						index);
+			}
+			break;
+		}
+	}
+
+	/**
+	 * Computes and returns the type that is the Least Upper Bound of the types
+	 * for the given expressions.
+	 * 
+	 * @param expressions
+	 *            a list of expressions
+	 * @return the common type to the given expressions
+	 */
+	public Type getType(List<AstExpression> expressions) {
+		Iterator<AstExpression> it = expressions.iterator();
+		if (it.hasNext()) {
+			AstExpression expression = it.next();
+			Type t1 = Util.getType(expression);
+			while (it.hasNext()) {
+				expression = it.next();
+				Type t2 = Util.getType(expression);
+				t1 = TypeUtil.getLub(t1, t2);
+			}
+			return t1;
+		}
+
+		return null;
 	}
 
 }
