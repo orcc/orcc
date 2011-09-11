@@ -58,15 +58,7 @@ public interface Cache extends EObject {
 	 * @return a String to Expression map
 	 * @model keyType="String" valueType="Expression"
 	 */
-	EMap<String, Expression> getMapExpressions();
-
-	/**
-	 * Returns a String to Type map.
-	 * 
-	 * @return a String to Type map
-	 * @model keyType="String" valueType="Type"
-	 */
-	EMap<String, Type> getMapTypes();
+	EMap<String, Expression> getExpressionsMap();
 
 	/**
 	 * Returns all the types stored in this cache. This method should only be
@@ -76,5 +68,13 @@ public interface Cache extends EObject {
 	 * @model containment="true"
 	 */
 	EList<Type> getTypes();
+
+	/**
+	 * Returns a String to Type map.
+	 * 
+	 * @return a String to Type map
+	 * @model keyType="String" valueType="Type"
+	 */
+	EMap<String, Type> getTypesMap();
 
 }

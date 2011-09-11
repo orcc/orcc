@@ -119,12 +119,12 @@ public class Typer extends CalSwitch<Type> {
 
 			URI uri = EcoreUtil.getURI(eObject);
 			String fragment = uri.fragment();
-			type = cache.getMapTypes().get(fragment);
+			type = cache.getTypesMap().get(fragment);
 
 			if (type == null) {
 				type = new Typer().doSwitch(eObject);
 				cache.getTypes().add(type);
-				cache.getMapTypes().put(fragment, type);
+				cache.getTypesMap().put(fragment, type);
 			}
 		}
 

@@ -8,10 +8,10 @@
   <genPackages prefix="Cache" basePackage="net.sf.orcc" disposableProviderFactory="true"
       ecorePackage="Cache.ecore#/">
     <genClasses ecoreClass="Cache.ecore#//Cache">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Cache.ecore#//Cache/types"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Cache.ecore#//Cache/expressions"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Cache.ecore#//Cache/mapExpressions"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Cache.ecore#//Cache/mapTypes"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Cache.ecore#//Cache/expressionsMap"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Cache.ecore#//Cache/types"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Cache.ecore#//Cache/typesMap"/>
     </genClasses>
     <genClasses ecoreClass="Cache.ecore#//CacheManager"/>
     <genClasses ecoreClass="Cache.ecore#//EStringToTypeMapEntry">

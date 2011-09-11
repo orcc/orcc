@@ -34,7 +34,7 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
  * <em><b>Manager</b></em>'. <!-- end-user-doc -->
  * <p>
  * </p>
- * 
+ *
  * @generated
  */
 public class CacheManagerImpl extends EObjectImpl implements CacheManager {
@@ -47,7 +47,6 @@ public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	protected CacheManagerImpl() {
@@ -77,7 +76,6 @@ public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override

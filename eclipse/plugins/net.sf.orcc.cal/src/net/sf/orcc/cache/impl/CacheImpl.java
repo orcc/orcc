@@ -31,9 +31,9 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * The following features are implemented:
  * <ul>
  *   <li>{@link net.sf.orcc.cache.impl.CacheImpl#getExpressions <em>Expressions</em>}</li>
+ *   <li>{@link net.sf.orcc.cache.impl.CacheImpl#getExpressionsMap <em>Expressions Map</em>}</li>
  *   <li>{@link net.sf.orcc.cache.impl.CacheImpl#getTypes <em>Types</em>}</li>
- *   <li>{@link net.sf.orcc.cache.impl.CacheImpl#getMapExpressions <em>Map Expressions</em>}</li>
- *   <li>{@link net.sf.orcc.cache.impl.CacheImpl#getMapTypes <em>Map Types</em>}</li>
+ *   <li>{@link net.sf.orcc.cache.impl.CacheImpl#getTypesMap <em>Types Map</em>}</li>
  * </ul>
  * </p>
  *
@@ -42,13 +42,23 @@ import org.eclipse.emf.ecore.util.InternalEList;
 public class CacheImpl extends EObjectImpl implements Cache {
 	/**
 	 * The cached value of the '{@link #getExpressions() <em>Expressions</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getExpressions()
 	 * @generated
 	 * @ordered
 	 */
 	protected EList<Expression> expressions;
+
+	/**
+	 * The cached value of the '{@link #getExpressionsMap()
+	 * <em>Expressions Map</em>}' map. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
+	 * @see #getExpressionsMap()
+	 * @generated
+	 * @ordered
+	 */
+	protected EMap<String, Expression> expressionsMap;
 
 	/**
 	 * The cached value of the '{@link #getTypes() <em>Types</em>}' containment reference list.
@@ -59,23 +69,13 @@ public class CacheImpl extends EObjectImpl implements Cache {
 	 */
 	protected EList<Type> types;
 	/**
-	 * The cached value of the '{@link #getMapExpressions() <em>Map Expressions</em>}' map.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getMapExpressions()
+	 * The cached value of the '{@link #getTypesMap() <em>Types Map</em>}' map.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getTypesMap()
 	 * @generated
 	 * @ordered
 	 */
-	protected EMap<String, Expression> mapExpressions;
-	/**
-	 * The cached value of the '{@link #getMapTypes() <em>Map Types</em>}' map.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getMapTypes()
-	 * @generated
-	 * @ordered
-	 */
-	protected EMap<String, Type> mapTypes;
+	protected EMap<String, Type> typesMap;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -83,6 +83,92 @@ public class CacheImpl extends EObjectImpl implements Cache {
 	 */
 	protected CacheImpl() {
 		super();
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+		switch (featureID) {
+			case CachePackage.CACHE__EXPRESSIONS:
+				return getExpressions();
+			case CachePackage.CACHE__EXPRESSIONS_MAP:
+				if (coreType) return getExpressionsMap();
+				else return getExpressionsMap().map();
+			case CachePackage.CACHE__TYPES:
+				return getTypes();
+			case CachePackage.CACHE__TYPES_MAP:
+				if (coreType) return getTypesMap();
+				else return getTypesMap().map();
+		}
+		return super.eGet(featureID, resolve, coreType);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case CachePackage.CACHE__EXPRESSIONS:
+				return ((InternalEList<?>)getExpressions()).basicRemove(otherEnd, msgs);
+			case CachePackage.CACHE__EXPRESSIONS_MAP:
+				return ((InternalEList<?>)getExpressionsMap()).basicRemove(otherEnd, msgs);
+			case CachePackage.CACHE__TYPES:
+				return ((InternalEList<?>)getTypes()).basicRemove(otherEnd, msgs);
+			case CachePackage.CACHE__TYPES_MAP:
+				return ((InternalEList<?>)getTypesMap()).basicRemove(otherEnd, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public boolean eIsSet(int featureID) {
+		switch (featureID) {
+			case CachePackage.CACHE__EXPRESSIONS:
+				return expressions != null && !expressions.isEmpty();
+			case CachePackage.CACHE__EXPRESSIONS_MAP:
+				return expressionsMap != null && !expressionsMap.isEmpty();
+			case CachePackage.CACHE__TYPES:
+				return types != null && !types.isEmpty();
+			case CachePackage.CACHE__TYPES_MAP:
+				return typesMap != null && !typesMap.isEmpty();
+		}
+		return super.eIsSet(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public void eSet(int featureID, Object newValue) {
+		switch (featureID) {
+			case CachePackage.CACHE__EXPRESSIONS:
+				getExpressions().clear();
+				getExpressions().addAll((Collection<? extends Expression>)newValue);
+				return;
+			case CachePackage.CACHE__EXPRESSIONS_MAP:
+				((EStructuralFeature.Setting)getExpressionsMap()).set(newValue);
+				return;
+			case CachePackage.CACHE__TYPES:
+				getTypes().clear();
+				getTypes().addAll((Collection<? extends Type>)newValue);
+				return;
+			case CachePackage.CACHE__TYPES_MAP:
+				((EStructuralFeature.Setting)getTypesMap()).set(newValue);
+				return;
+		}
+		super.eSet(featureID, newValue);
 	}
 
 	/**
@@ -98,11 +184,45 @@ public class CacheImpl extends EObjectImpl implements Cache {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EMap<String, Type> getMapTypes() {
-		if (mapTypes == null) {
-			mapTypes = new EcoreEMap<String,Type>(CachePackage.Literals.ESTRING_TO_TYPE_MAP_ENTRY, EStringToTypeMapEntryImpl.class, this, CachePackage.CACHE__MAP_TYPES);
+	@Override
+	public void eUnset(int featureID) {
+		switch (featureID) {
+			case CachePackage.CACHE__EXPRESSIONS:
+				getExpressions().clear();
+				return;
+			case CachePackage.CACHE__EXPRESSIONS_MAP:
+				getExpressionsMap().clear();
+				return;
+			case CachePackage.CACHE__TYPES:
+				getTypes().clear();
+				return;
+			case CachePackage.CACHE__TYPES_MAP:
+				getTypesMap().clear();
+				return;
 		}
-		return mapTypes;
+		super.eUnset(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Expression> getExpressions() {
+		if (expressions == null) {
+			expressions = new EObjectContainmentEList<Expression>(Expression.class, this, CachePackage.CACHE__EXPRESSIONS);
+		}
+		return expressions;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EMap<String, Expression> getExpressionsMap() {
+		if (expressionsMap == null) {
+			expressionsMap = new EcoreEMap<String,Expression>(CachePackage.Literals.ESTRING_TO_EXPRESSION_MAP_ENTRY, EStringToExpressionMapEntryImpl.class, this, CachePackage.CACHE__EXPRESSIONS_MAP);
+		}
+		return expressionsMap;
 	}
 
 	/**
@@ -117,136 +237,14 @@ public class CacheImpl extends EObjectImpl implements Cache {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Expression> getExpressions() {
-		if (expressions == null) {
-			expressions = new EObjectContainmentEList<Expression>(Expression.class, this, CachePackage.CACHE__EXPRESSIONS);
-		}
-		return expressions;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EMap<String, Expression> getMapExpressions() {
-		if (mapExpressions == null) {
-			mapExpressions = new EcoreEMap<String,Expression>(CachePackage.Literals.ESTRING_TO_EXPRESSION_MAP_ENTRY, EStringToExpressionMapEntryImpl.class, this, CachePackage.CACHE__MAP_EXPRESSIONS);
-		}
-		return mapExpressions;
-	}
-
-	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
-		switch (featureID) {
-			case CachePackage.CACHE__EXPRESSIONS:
-				return ((InternalEList<?>)getExpressions()).basicRemove(otherEnd, msgs);
-			case CachePackage.CACHE__TYPES:
-				return ((InternalEList<?>)getTypes()).basicRemove(otherEnd, msgs);
-			case CachePackage.CACHE__MAP_EXPRESSIONS:
-				return ((InternalEList<?>)getMapExpressions()).basicRemove(otherEnd, msgs);
-			case CachePackage.CACHE__MAP_TYPES:
-				return ((InternalEList<?>)getMapTypes()).basicRemove(otherEnd, msgs);
+	public EMap<String, Type> getTypesMap() {
+		if (typesMap == null) {
+			typesMap = new EcoreEMap<String,Type>(CachePackage.Literals.ESTRING_TO_TYPE_MAP_ENTRY, EStringToTypeMapEntryImpl.class, this, CachePackage.CACHE__TYPES_MAP);
 		}
-		return super.eInverseRemove(otherEnd, featureID, msgs);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public Object eGet(int featureID, boolean resolve, boolean coreType) {
-		switch (featureID) {
-			case CachePackage.CACHE__EXPRESSIONS:
-				return getExpressions();
-			case CachePackage.CACHE__TYPES:
-				return getTypes();
-			case CachePackage.CACHE__MAP_EXPRESSIONS:
-				if (coreType) return getMapExpressions();
-				else return getMapExpressions().map();
-			case CachePackage.CACHE__MAP_TYPES:
-				if (coreType) return getMapTypes();
-				else return getMapTypes().map();
-		}
-		return super.eGet(featureID, resolve, coreType);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public void eSet(int featureID, Object newValue) {
-		switch (featureID) {
-			case CachePackage.CACHE__EXPRESSIONS:
-				getExpressions().clear();
-				getExpressions().addAll((Collection<? extends Expression>)newValue);
-				return;
-			case CachePackage.CACHE__TYPES:
-				getTypes().clear();
-				getTypes().addAll((Collection<? extends Type>)newValue);
-				return;
-			case CachePackage.CACHE__MAP_EXPRESSIONS:
-				((EStructuralFeature.Setting)getMapExpressions()).set(newValue);
-				return;
-			case CachePackage.CACHE__MAP_TYPES:
-				((EStructuralFeature.Setting)getMapTypes()).set(newValue);
-				return;
-		}
-		super.eSet(featureID, newValue);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public void eUnset(int featureID) {
-		switch (featureID) {
-			case CachePackage.CACHE__EXPRESSIONS:
-				getExpressions().clear();
-				return;
-			case CachePackage.CACHE__TYPES:
-				getTypes().clear();
-				return;
-			case CachePackage.CACHE__MAP_EXPRESSIONS:
-				getMapExpressions().clear();
-				return;
-			case CachePackage.CACHE__MAP_TYPES:
-				getMapTypes().clear();
-				return;
-		}
-		super.eUnset(featureID);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-			case CachePackage.CACHE__EXPRESSIONS:
-				return expressions != null && !expressions.isEmpty();
-			case CachePackage.CACHE__TYPES:
-				return types != null && !types.isEmpty();
-			case CachePackage.CACHE__MAP_EXPRESSIONS:
-				return mapExpressions != null && !mapExpressions.isEmpty();
-			case CachePackage.CACHE__MAP_TYPES:
-				return mapTypes != null && !mapTypes.isEmpty();
-		}
-		return super.eIsSet(featureID);
+		return typesMap;
 	}
 
 }

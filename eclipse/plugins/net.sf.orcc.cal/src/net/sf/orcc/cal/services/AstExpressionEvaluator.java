@@ -114,13 +114,13 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 
 			URI uri = EcoreUtil.getURI(eObject);
 			String fragment = uri.fragment();
-			value = cache.getMapExpressions().get(fragment);
+			value = cache.getExpressionsMap().get(fragment);
 
 			if (value == null) {
 				value = new AstExpressionEvaluator().doSwitch(eObject);
 				if (value != null) {
 					cache.getExpressions().add(value);
-					cache.getMapExpressions().put(fragment, value);
+					cache.getExpressionsMap().put(fragment, value);
 				}
 			}
 		}
