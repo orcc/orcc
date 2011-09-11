@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstUnit;
@@ -97,7 +96,6 @@ public class Frontend {
 			mapAstToIr.put(astActor, actor);
 			removeDanglingUses(actor);
 			IrUtil.serializeActor(set, outputFolder, actor);
-			CacheManager.instance.saveCache(entity.eResource());
 			return actor;
 		} else {
 			AstUnit astUnit = entity.getUnit();
@@ -111,7 +109,6 @@ public class Frontend {
 			unit = transformer.transform(this, astUnit);
 			mapAstToIr.put(astUnit, unit);
 			IrUtil.serializeActor(set, outputFolder, unit);
-			CacheManager.instance.saveCache(entity.eResource());
 			return unit;
 		}
 	}

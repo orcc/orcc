@@ -110,7 +110,7 @@ public class Evaluator extends CalSwitch<Expression> {
 		if (resource == null) {
 			value = new Evaluator().doSwitch(eObject);
 		} else {
-			Cache cache = CacheManager.instance.getCache(resource);
+			Cache cache = CacheManager.instance.getCache(resource.getURI());
 
 			URI uri = EcoreUtil.getURI(eObject);
 			String fragment = uri.fragment();
@@ -128,8 +128,15 @@ public class Evaluator extends CalSwitch<Expression> {
 		return value;
 	}
 
-	private Evaluator() {
+	private static void setValue(EObject eObject, AstExpression value) {
+		Resource resource = eObject.eResource();
+		if (resource != null && value != null) {
+			Cache cache = CacheManager.instance.getCache(resource.getURI());
 
+			URI uri = EcoreUtil.getURI(eObject);
+			String fragment = uri.fragment();
+			cache.getExpressionsMap().put(fragment, getValue(value));
+		}
 	}
 
 	@Override
@@ -159,20 +166,23 @@ public class Evaluator extends CalSwitch<Expression> {
 			return null;
 		}
 
+		// set the value of parameters
 		Iterator<AstVariable> itFormal = function.getParameters().iterator();
 		Iterator<AstExpression> itActual = expression.getParameters()
 				.iterator();
-		// int index = 0;
 		while (itFormal.hasNext() && itActual.hasNext()) {
-			/* AstVariable paramV = */itFormal.next();
+			AstVariable paramV = itFormal.next();
 			AstExpression paramE = itActual.next();
 
-			getValue(paramE);
-
-			// index++;
+			setValue(paramV, paramE);
 		}
 
-		return null;
+		// set the value of variables
+		for (AstVariable variable : function.getVariables()) {
+			setValue(variable, variable.getValue());
+		}
+
+		return getValue(function.getExpression());
 	}
 
 	@Override

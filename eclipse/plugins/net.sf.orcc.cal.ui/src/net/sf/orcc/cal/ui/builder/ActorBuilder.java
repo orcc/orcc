@@ -125,6 +125,9 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 						}
 					}
 				}
+
+				// save cache
+				CacheManager.instance.saveCache(desc.getURI());
 			}
 
 			if (monitor.isCanceled()) {
@@ -132,6 +135,9 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			}
 			monitor.worked(1);
 		}
+
+		// to free up some memory
+		CacheManager.instance.unloadAllCaches();
 
 		monitor.done();
 	}

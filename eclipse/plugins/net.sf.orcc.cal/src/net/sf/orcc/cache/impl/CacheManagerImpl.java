@@ -84,8 +84,7 @@ public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 	}
 
 	@Override
-	public Cache getCache(Resource resource) {
-		URI uri = resource.getURI();
+	public Cache getCache(URI uri) {
 		Cache cache = cacheMap.get(uri);
 		if (cache == null) {
 			// try to load the cache
@@ -123,12 +122,6 @@ public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 	}
 
 	@Override
-	public void removeCache(Resource resource) {
-		URI uri = resource.getURI();
-		removeCache(uri);
-	}
-
-	@Override
 	public void removeCache(URI uri) {
 		// removes the cache from the map
 		cacheMap.remove(uri);
@@ -149,8 +142,7 @@ public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 	}
 
 	@Override
-	public void saveCache(Resource resource) {
-		URI uri = resource.getURI();
+	public void saveCache(URI uri) {
 		Cache cache = cacheMap.remove(uri);
 		if (cache != null) {
 			// get the cache URI to save the resource to which the cache belongs
@@ -164,6 +156,12 @@ public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void unloadAllCaches() {
+		cacheMap.clear();
+		uriMap.clear();
 	}
 
 }

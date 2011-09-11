@@ -30,7 +30,6 @@ package net.sf.orcc.cache;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
 
 /**
  * This class defines a cache manager, that is responsible of loading caches
@@ -48,36 +47,33 @@ public interface CacheManager extends EObject {
 			.createCacheManager();
 
 	/**
-	 * Returns the cache associated with the given resource.
+	 * Returns the cache associated with the given resource URI.
 	 * 
-	 * @param resource
-	 *            a resource
-	 * @return the cache associated with the given resource
+	 * @param uri
+	 *            URI of a resource
+	 * @return the cache associated with the given resource URI
 	 */
-	Cache getCache(Resource resource);
-
-	/**
-	 * Removes the cache associated with the given resource.
-	 * 
-	 * @param resource
-	 *            a resource
-	 */
-	void removeCache(Resource resource);
+	Cache getCache(URI uri);
 
 	/**
 	 * Removes the cache associated with the given resource URI.
 	 * 
-	 * @param resource
-	 *            a resource
+	 * @param uri
+	 *            URI of a resource
 	 */
 	void removeCache(URI uri);
 
 	/**
-	 * Saves the cache associated with the given resource.
+	 * Saves the cache associated with the given resource URI.
 	 * 
-	 * @param resource
-	 *            a resource
+	 * @param uri
+	 *            URI of a resource
 	 */
-	void saveCache(Resource resource);
+	void saveCache(URI uri);
+
+	/**
+	 * Unloads all caches (the underlying resources are NOT removed).
+	 */
+	void unloadAllCaches();
 
 }

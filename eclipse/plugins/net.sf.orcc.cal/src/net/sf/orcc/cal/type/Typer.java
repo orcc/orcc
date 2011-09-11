@@ -115,7 +115,7 @@ public class Typer extends CalSwitch<Type> {
 		if (resource == null) {
 			type = new Typer().doSwitch(eObject);
 		} else {
-			Cache cache = CacheManager.instance.getCache(resource);
+			Cache cache = CacheManager.instance.getCache(resource.getURI());
 
 			URI uri = EcoreUtil.getURI(eObject);
 			String fragment = uri.fragment();

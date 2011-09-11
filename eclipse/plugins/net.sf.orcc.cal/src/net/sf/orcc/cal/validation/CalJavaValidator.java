@@ -77,7 +77,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		}
 
 		// clear cache associated with entry
-		CacheManager.instance.removeCache(entity.eResource());
+		CacheManager.instance.removeCache(entity.eResource().getURI());
 
 		// perform structural validation and type checking
 		structuralValidator.validate(entity, getChain(), getContext());
