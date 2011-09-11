@@ -29,7 +29,6 @@ Export-Package: net.sf.orcc.cache,
  net.sf.orcc.cal.parser.antlr,
  net.sf.orcc.cal.parser.antlr.internal,
  net.sf.orcc.cal.services,
- net.sf.orcc.cal.type,
  net.sf.orcc.cal.util,
  net.sf.orcc.cal.validation,
  net.sf.orcc.frontend

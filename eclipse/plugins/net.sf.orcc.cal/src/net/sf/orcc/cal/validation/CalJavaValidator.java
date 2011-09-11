@@ -33,7 +33,7 @@ import java.util.List;
 
 import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstEntity;
-import net.sf.orcc.cal.type.TypeCycleDetector;
+import net.sf.orcc.cal.services.TypeCycleDetector;
 
 import org.eclipse.xtext.validation.Check;
 import org.eclipse.xtext.validation.CheckType;

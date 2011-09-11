@@ -58,7 +58,7 @@ import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.services.Evaluator;
-import net.sf.orcc.cal.type.Typer;
+import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.ExprVar;

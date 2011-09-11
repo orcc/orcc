@@ -8,7 +8,7 @@ import junit.framework.Assert;
 import net.sf.orcc.OrccProjectNature;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstVariable;
-import net.sf.orcc.cal.type.Typer;
+import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.frontend.Frontend;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Entity;
