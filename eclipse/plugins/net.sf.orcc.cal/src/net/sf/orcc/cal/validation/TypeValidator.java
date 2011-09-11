@@ -54,6 +54,7 @@ import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.AstVariableReference;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
+import net.sf.orcc.cal.type.Typer;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
@@ -82,7 +83,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		List<AstExpression> guards = action.getGuards();
 		int index = 0;
 		for (AstExpression guard : guards) {
-			Type type = Util.getType(guard);
+			Type type = Typer.getType(guard);
 			if (!TypeUtil.isConvertibleTo(type,
 					IrFactory.eINSTANCE.createTypeBool())) {
 				error("Type mismatch: cannot convert from " + type + " to bool",
@@ -102,13 +103,13 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		for (AstOutputPattern pattern : outputs) {
 			AstPort port = pattern.getPort();
 
-			Type portType = Util.getType(port);
+			Type portType = Typer.getType(port);
 			AstExpression astRepeat = pattern.getRepeat();
 			if (astRepeat == null) {
 				List<AstExpression> values = pattern.getValues();
 				int index = 0;
 				for (AstExpression value : values) {
-					Type type = Util.getType(value);
+					Type type = Typer.getType(value);
 					if (!TypeUtil.isConvertibleTo(type, portType)) {
 						error("this expression must be of type " + portType,
 								pattern,
@@ -123,7 +124,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 					List<AstExpression> values = pattern.getValues();
 					int index = 0;
 					for (AstExpression value : values) {
-						Type type = Util.getType(value);
+						Type type = Typer.getType(value);
 						if (type.isList()) {
 							TypeList typeList = (TypeList) type;
 							Type lub = TypeUtil.getLub(portType,
@@ -152,8 +153,8 @@ public class TypeValidator extends AbstractCalJavaValidator {
 	@Check(CheckType.NORMAL)
 	public void checkAstExpressionBinary(AstExpressionBinary expression) {
 		OpBinary op = OpBinary.getOperator(expression.getOperator());
-		checkTypeBinary(op, Util.getType(expression.getLeft()),
-				Util.getType(expression.getRight()), expression,
+		checkTypeBinary(op, Typer.getType(expression.getLeft()),
+				Typer.getType(expression.getRight()), expression,
 				eINSTANCE.getAstExpressionBinary_Operator(), -1);
 	}
 
@@ -174,9 +175,9 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		Iterator<AstExpression> itActual = parameters.iterator();
 		int index = 0;
 		while (itFormal.hasNext() && itActual.hasNext()) {
-			Type formalType = Util.getType(itFormal.next());
+			Type formalType = Typer.getType(itFormal.next());
 			AstExpression expression = itActual.next();
-			Type actualType = Util.getType(expression);
+			Type actualType = Typer.getType(expression);
 
 			// check types
 			if (!TypeUtil.isConvertibleTo(actualType, formalType)) {
@@ -190,7 +191,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 
 	@Check(CheckType.NORMAL)
 	public void checkAstExpressionElsif(AstExpressionElsif expression) {
-		Type type = Util.getType(expression.getCondition());
+		Type type = Typer.getType(expression.getCondition());
 		if (type == null || !type.isBool()) {
 			error("Cannot convert " + type + " to bool", expression,
 					eINSTANCE.getAstExpressionElsif_Condition(), -1);
@@ -199,17 +200,17 @@ public class TypeValidator extends AbstractCalJavaValidator {
 
 	@Check(CheckType.NORMAL)
 	public void checkAstExpressionIf(AstExpressionIf expression) {
-		Type type = Util.getType(expression.getCondition());
+		Type type = Typer.getType(expression.getCondition());
 		if (type == null || !type.isBool()) {
 			error("Cannot convert " + type + " to bool", expression,
 					eINSTANCE.getAstExpressionIf_Condition(), -1);
 		}
 
-		Type typeThen = Util.getType(expression.getThen());
+		Type typeThen = Typer.getType(expression.getThen());
 		type = typeThen;
 		int index = 0;
 		for (AstExpressionElsif elsif : expression.getElsifs()) {
-			Type typeElsif = Util.getType(elsif);
+			Type typeElsif = Typer.getType(elsif);
 			type = TypeUtil.getLub(type, typeElsif);
 			if (type == null) {
 				error("Type mismatch: cannot convert " + typeElsif + " to "
@@ -219,7 +220,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 			index++;
 		}
 
-		Type typeElse = Util.getType(expression.getElse());
+		Type typeElse = Typer.getType(expression.getElse());
 		type = TypeUtil.getLub(type, typeElse);
 		if (type == null) {
 			error("Type mismatch: cannot convert " + typeElse + " to " + type,
@@ -230,12 +231,12 @@ public class TypeValidator extends AbstractCalJavaValidator {
 	@Check(CheckType.NORMAL)
 	public void checkAstExpressionIndex(AstExpressionIndex expression) {
 		AstVariable variable = expression.getSource().getVariable();
-		Type type = Util.getType(variable);
+		Type type = Typer.getType(variable);
 
 		List<AstExpression> indexes = expression.getIndexes();
 		int errorIdx = 0;
 		for (AstExpression index : indexes) {
-			Type subType = Util.getType(index);
+			Type subType = Typer.getType(index);
 			if (type.isList()) {
 				if (subType != null && (subType.isInt() || subType.isUint())) {
 					type = ((TypeList) type).getType();
@@ -254,7 +255,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 	@Check(CheckType.NORMAL)
 	public void checkAstExpressionUnary(AstExpressionUnary expression) {
 		OpUnary op = OpUnary.getOperator(expression.getUnaryOperator());
-		Type type = Util.getType(expression.getExpression());
+		Type type = Typer.getType(expression.getExpression());
 		if (type == null) {
 			return;
 		}
@@ -320,8 +321,8 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		expression.getIndexes().addAll(EcoreUtil.copyAll(assign.getIndexes()));
 
 		// check types
-		Type targetType = Util.getType(expression);
-		Type type = Util.getType(assign.getValue());
+		Type targetType = Typer.getType(expression);
+		Type type = Typer.getType(assign.getValue());
 		if (!TypeUtil.isConvertibleTo(type, targetType)) {
 			error("Type mismatch: cannot convert from " + type + " to "
 					+ targetType, assign,
@@ -358,9 +359,9 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		Iterator<AstExpression> itActual = parameters.iterator();
 		int index = 0;
 		while (itFormal.hasNext() && itActual.hasNext()) {
-			Type formalType = Util.getType(itFormal.next());
+			Type formalType = Typer.getType(itFormal.next());
 			AstExpression expression = itActual.next();
-			Type actualType = Util.getType(expression);
+			Type actualType = Typer.getType(expression);
 
 			// check types
 			if (!TypeUtil.isConvertibleTo(actualType, formalType)) {
@@ -374,7 +375,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 
 	@Check(CheckType.NORMAL)
 	public void checkAstStatementElsif(AstStatementElsif elsIf) {
-		Type type = Util.getType(elsIf.getCondition());
+		Type type = Typer.getType(elsIf.getCondition());
 		if (!TypeUtil.isConvertibleTo(type,
 				IrFactory.eINSTANCE.createTypeBool())) {
 			error("Type mismatch: cannot convert from " + type + " to bool",
@@ -384,7 +385,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 
 	@Check(CheckType.NORMAL)
 	public void checkAstStatementIf(AstStatementIf astIf) {
-		Type type = Util.getType(astIf.getCondition());
+		Type type = Typer.getType(astIf.getCondition());
 		if (!TypeUtil.isConvertibleTo(type,
 				IrFactory.eINSTANCE.createTypeBool())) {
 			error("Type mismatch: cannot convert from " + type + " to bool",
@@ -394,7 +395,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 
 	@Check(CheckType.NORMAL)
 	public void checkAstStatementWhile(AstStatementWhile astWhile) {
-		Type type = Util.getType(astWhile.getCondition());
+		Type type = Typer.getType(astWhile.getCondition());
 		if (!TypeUtil.isConvertibleTo(type,
 				IrFactory.eINSTANCE.createTypeBool())) {
 			error("Type mismatch: cannot convert from " + type + " to bool",
@@ -407,8 +408,8 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		AstExpression value = variable.getValue();
 		if (value != null) {
 			// check types
-			Type targetType = Util.getType(variable);
-			Type type = Util.getType(value);
+			Type targetType = Typer.getType(variable);
+			Type type = Typer.getType(value);
 			if (!TypeUtil.isConvertibleTo(type, targetType)) {
 				error("Type mismatch: cannot convert from " + type + " to "
 						+ targetType, variable,
@@ -418,8 +419,8 @@ public class TypeValidator extends AbstractCalJavaValidator {
 	}
 
 	private void checkReturnType(AstFunction function) {
-		Type returnType = Util.getType(function);
-		Type expressionType = Util.getType(function.getExpression());
+		Type returnType = Typer.getType(function);
+		Type expressionType = Typer.getType(function.getExpression());
 		if (!TypeUtil.isConvertibleTo(expressionType, returnType)) {
 			error("Type mismatch: cannot convert from " + expressionType
 					+ " to " + returnType, function,
@@ -569,30 +570,6 @@ public class TypeValidator extends AbstractCalJavaValidator {
 			}
 			break;
 		}
-	}
-
-	/**
-	 * Computes and returns the type that is the Least Upper Bound of the types
-	 * for the given expressions.
-	 * 
-	 * @param expressions
-	 *            a list of expressions
-	 * @return the common type to the given expressions
-	 */
-	public Type getType(List<AstExpression> expressions) {
-		Iterator<AstExpression> it = expressions.iterator();
-		if (it.hasNext()) {
-			AstExpression expression = it.next();
-			Type t1 = Util.getType(expression);
-			while (it.hasNext()) {
-				expression = it.next();
-				Type t2 = Util.getType(expression);
-				t1 = TypeUtil.getLub(t1, t2);
-			}
-			return t1;
-		}
-
-		return null;
 	}
 
 }

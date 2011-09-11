@@ -49,6 +49,7 @@ import net.sf.orcc.cal.cal.AstScheduleRegExp;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.AstVariableReference;
+import net.sf.orcc.cal.type.Typer;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.cal.util.VoidSwitch;
 import net.sf.orcc.frontend.schedule.ActionSorter;
@@ -770,7 +771,7 @@ public class ActorTransformer {
 	 */
 	private void transformPorts(List<Port> ports, List<AstPort> portList) {
 		for (AstPort astPort : portList) {
-			Type type = Util.getType(astPort);
+			Type type = Typer.getType(astPort);
 			Port port = IrFactory.eINSTANCE.createPort(type, astPort.getName(),
 					astPort.isNative());
 			mapAstToIr.put(astPort, port);

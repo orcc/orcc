@@ -35,6 +35,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.cache.Cache;
+import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstExpressionBinary;
 import net.sf.orcc.cal.cal.AstExpressionBoolean;
@@ -69,7 +71,6 @@ import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.services.AstExpressionEvaluator;
-import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
@@ -82,8 +83,10 @@ import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
 import net.sf.orcc.ir.util.TypeUtil;
 
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -99,6 +102,56 @@ public class Typer extends CalSwitch<Type> {
 		GLB, LUB, LUB_PLUS_1, LUB_SUM_SIZE
 	}
 
+	/**
+	 * Returns the type of the given object using its URI.
+	 * 
+	 * @param eObject
+	 *            an AST node
+	 * @return the type of the given object
+	 */
+	public static Type getType(EObject eObject) {
+		Resource resource = eObject.eResource();
+		Type type;
+		if (resource == null) {
+			type = new Typer().doSwitch(eObject);
+		} else {
+			Cache cache = CacheManager.instance.getCache(resource);
+
+			URI uri = EcoreUtil.getURI(eObject);
+			String fragment = uri.fragment();
+			type = cache.getTypeMap().get(fragment);
+
+			if (type == null) {
+				type = new Typer().doSwitch(eObject);
+				cache.getTypes().add(type);
+				cache.getTypeMap().put(fragment, type);
+			}
+		}
+
+		return type;
+	}
+
+	/**
+	 * Returns the type of the given list of objects using their URI.
+	 * 
+	 * @param eObject
+	 *            an AST node
+	 * @return the type of the given object
+	 */
+	public static Type getType(List<? extends EObject> eObjects) {
+		Iterator<? extends EObject> it = eObjects.iterator();
+		if (!it.hasNext()) {
+			return null;
+		}
+
+		Type type = getType(it.next());
+		while (it.hasNext()) {
+			type = TypeUtil.getLub(type, getType(it.next()));
+		}
+
+		return type;
+	}
+
 	private int maxSize;
 
 	@Override
@@ -106,8 +159,8 @@ public class Typer extends CalSwitch<Type> {
 		setTargetType(expression);
 
 		OpBinary op = OpBinary.getOperator(expression.getOperator());
-		Type t1 = Util.getType(expression.getLeft());
-		Type t2 = Util.getType(expression.getRight());
+		Type t1 = getType(expression.getLeft());
+		Type t2 = getType(expression.getRight());
 		return getTypeBinary(op, t1, t2, expression,
 				eINSTANCE.getAstExpressionBinary_Operator(), -1);
 	}
@@ -120,13 +173,13 @@ public class Typer extends CalSwitch<Type> {
 	@Override
 	public Type caseAstExpressionCall(AstExpressionCall astCall) {
 		AstFunction function = astCall.getFunction();
-		Type type = Util.getType(function);
+		Type type = getType(function);
 		return EcoreUtil.copy(type);
 	}
 
 	@Override
 	public Type caseAstExpressionElsif(AstExpressionElsif expression) {
-		return Util.getType(expression.getThen());
+		return getType(expression.getThen());
 	}
 
 	@Override
@@ -136,13 +189,13 @@ public class Typer extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstExpressionIf(AstExpressionIf expression) {
-		Type type = Util.getType(expression.getCondition());
-		Type t1 = Util.getType(expression.getThen());
+		Type type = getType(expression.getCondition());
+		Type t1 = getType(expression.getThen());
 		for (AstExpressionElsif elsif : expression.getElsifs()) {
 			t1 = TypeUtil.getLub(t1, doSwitch(elsif));
 		}
 
-		Type t2 = Util.getType(expression.getElse());
+		Type t2 = getType(expression.getElse());
 		type = TypeUtil.getLub(t1, t2);
 		return type;
 	}
@@ -150,11 +203,11 @@ public class Typer extends CalSwitch<Type> {
 	@Override
 	public Type caseAstExpressionIndex(AstExpressionIndex expression) {
 		AstVariable variable = expression.getSource().getVariable();
-		Type type = Util.getType(variable);
+		Type type = getType(variable);
 
 		List<AstExpression> indexes = expression.getIndexes();
 		for (AstExpression index : indexes) {
-			Type subType = Util.getType(index);
+			Type subType = getType(index);
 			if (type.isList()) {
 				if (subType != null && (subType.isInt() || subType.isUint())) {
 					type = ((TypeList) type).getType();
@@ -205,7 +258,7 @@ public class Typer extends CalSwitch<Type> {
 	@Override
 	public Type caseAstExpressionUnary(AstExpressionUnary expression) {
 		OpUnary op = OpUnary.getOperator(expression.getUnaryOperator());
-		Type type = Util.getType(expression.getExpression());
+		Type type = getType(expression.getExpression());
 		if (type == null) {
 			return null;
 		}
@@ -236,7 +289,7 @@ public class Typer extends CalSwitch<Type> {
 	@Override
 	public Type caseAstExpressionVariable(AstExpressionVariable expression) {
 		AstVariable variable = expression.getValue().getVariable();
-		return Util.getType(variable);
+		return getType(variable);
 	}
 
 	@Override
@@ -421,7 +474,7 @@ public class Typer extends CalSwitch<Type> {
 			return null;
 		}
 
-		Type type = Util.getType(variable);
+		Type type = getType(variable);
 		List<Expression> dimensions = type.getDimensionsExpr();
 
 		Iterator<Expression> itD = dimensions.iterator();
@@ -465,32 +518,8 @@ public class Typer extends CalSwitch<Type> {
 			AstVariable formal = itF.next();
 			AstExpression actual = itA.next();
 			if (actual == expression) {
-				return Util.getType(formal);
+				return getType(formal);
 			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * Computes and returns the type that is the Least Upper Bound of the types
-	 * for the given expressions.
-	 * 
-	 * @param expressions
-	 *            a list of expressions
-	 * @return the common type to the given expressions
-	 */
-	public Type getType(List<AstExpression> expressions) {
-		Iterator<AstExpression> it = expressions.iterator();
-		if (it.hasNext()) {
-			AstExpression expression = it.next();
-			Type t1 = Util.getType(expression);
-			while (it.hasNext()) {
-				expression = it.next();
-				Type t2 = Util.getType(expression);
-				t1 = TypeUtil.getLub(t1, t2);
-			}
-			return t1;
 		}
 
 		return null;
@@ -670,24 +699,24 @@ public class Typer extends CalSwitch<Type> {
 
 			case CalPackage.AST_FUNCTION:
 				AstFunction func = (AstFunction) cter;
-				targetType = Util.getType(func);
+				targetType = getType(func);
 				break;
 
 			case CalPackage.AST_GENERATOR:
 				AstGenerator generator = (AstGenerator) cter;
-				targetType = Util.getType(generator.getVariable());
+				targetType = getType(generator.getVariable());
 				break;
 
 			case CalPackage.AST_OUTPUT_PATTERN:
 				AstOutputPattern pattern = (AstOutputPattern) cter;
-				targetType = Util.getType(pattern.getPort());
+				targetType = getType(pattern.getPort());
 				break;
 
 			case CalPackage.AST_STATEMENT_ASSIGN: {
 				AstStatementAssign assign = (AstStatementAssign) cter;
 				if (expression.eContainer() == assign.getValue()) {
 					// expression is located in the value
-					targetType = Util.getType(assign.getTarget().getVariable());
+					targetType = getType(assign.getTarget().getVariable());
 				} else {
 					// expression is located in the indexes
 					targetType = findIndexType(assign.getTarget(),
@@ -706,12 +735,12 @@ public class Typer extends CalSwitch<Type> {
 
 			case CalPackage.AST_STATEMENT_FOREACH:
 				AstStatementForeach foreach = (AstStatementForeach) cter;
-				targetType = Util.getType(foreach.getVariable());
+				targetType = getType(foreach.getVariable());
 				break;
 
 			case CalPackage.AST_VARIABLE:
 				AstVariable variable = (AstVariable) cter;
-				targetType = Util.getType(variable);
+				targetType = getType(variable);
 				break;
 			}
 		}

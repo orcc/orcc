@@ -51,6 +51,7 @@ import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstGenerator;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
+import net.sf.orcc.cal.type.Typer;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.cal.validation.ValidationError;
 import net.sf.orcc.ir.ExprBool;
@@ -281,7 +282,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 			return null;
 		}
 		case NUM_ELTS:
-			Type type = Util.getType(expression.getExpression());
+			Type type = Typer.getType(expression.getExpression());
 			if (type != null && type.isList()) {
 				return IrFactory.eINSTANCE.createExprInt(((TypeList) type)
 						.getSize());

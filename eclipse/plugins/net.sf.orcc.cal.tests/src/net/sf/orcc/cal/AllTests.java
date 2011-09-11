@@ -8,7 +8,7 @@ import junit.framework.Assert;
 import net.sf.orcc.OrccProjectNature;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstVariable;
-import net.sf.orcc.cal.util.Util;
+import net.sf.orcc.cal.type.Typer;
 import net.sf.orcc.frontend.Frontend;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Entity;
@@ -106,7 +106,7 @@ public class AllTests {
 				e.printStackTrace();
 			}
 		}
-		
+
 		// update output folder
 		outputFolder = OrccUtil.getOutputFolder(project);
 	}
@@ -202,15 +202,15 @@ public class AllTests {
 		List<AstVariable> stateVars = entity.getActor().getStateVariables();
 		AstVariable x = stateVars.get(0);
 		AstVariable y = stateVars.get(1);
-		Type type = Util.getType(x);
+		Type type = Typer.getType(x);
 		Assert.assertTrue("type of x should be int(size=5)",
 				EcoreUtil.equals(type, IrFactory.eINSTANCE.createTypeInt(5)));
 
-		type = Util.getType(x.getValue());
+		type = Typer.getType(x.getValue());
 		Assert.assertTrue("type of value of x should be int(size=4)",
 				EcoreUtil.equals(type, IrFactory.eINSTANCE.createTypeInt(4)));
 
-		type = Util.getType(y.getValue());
+		type = Typer.getType(y.getValue());
 		Assert.assertTrue("type of value of y should be int(size=6)",
 				EcoreUtil.equals(type, IrFactory.eINSTANCE.createTypeInt(6)));
 	}

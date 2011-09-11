@@ -29,24 +29,16 @@
 package net.sf.orcc.cal.util;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.cache.Cache;
-import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.services.AstExpressionEvaluator;
-import net.sf.orcc.cal.type.Typer;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.util.TypeUtil;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.xtext.nodemodel.ICompositeNode;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
@@ -154,56 +146,6 @@ public class Util {
 		} else {
 			return getTopLevelContainer(cter);
 		}
-	}
-
-	/**
-	 * Returns the type of the given object using its URI.
-	 * 
-	 * @param eObject
-	 *            an AST node
-	 * @return the type of the given object
-	 */
-	public static Type getType(EObject eObject) {
-		Resource resource = eObject.eResource();
-		Type type;
-		if (resource == null) {
-			type = new Typer().doSwitch(eObject);
-		} else {
-			Cache cache = CacheManager.instance.getCache(resource);
-
-			URI uri = EcoreUtil.getURI(eObject);
-			String fragment = uri.fragment();
-			type = cache.getTypeMap().get(fragment);
-
-			if (type == null) {
-				type = new Typer().doSwitch(eObject);
-				cache.getTypes().add(type);
-				cache.getTypeMap().put(fragment, type);
-			}
-		}
-
-		return type;
-	}
-
-	/**
-	 * Returns the type of the given list of objects using their URI.
-	 * 
-	 * @param eObject
-	 *            an AST node
-	 * @return the type of the given object
-	 */
-	public static Type getType(List<? extends EObject> eObjects) {
-		Iterator<? extends EObject> it = eObjects.iterator();
-		if (!it.hasNext()) {
-			return null;
-		}
-
-		Type type = getType(it.next());
-		while (it.hasNext()) {
-			type = TypeUtil.getLub(type, getType(it.next()));
-		}
-
-		return type;
 	}
 
 	public static Expression getValue(AstVariable variable) {

@@ -57,6 +57,7 @@ import net.sf.orcc.cal.cal.AstStatementWhile;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
+import net.sf.orcc.cal.type.Typer;
 import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.ExprVar;
@@ -116,7 +117,7 @@ public class AstTransformer {
 			Expression e2 = doSwitch(expression.getRight());
 
 			return IrFactory.eINSTANCE.createExprBinary(e1, op, e2,
-					Util.getType(expression));
+					Typer.getType(expression));
 		}
 
 		@Override
@@ -168,7 +169,7 @@ public class AstTransformer {
 			Var currentTarget = target;
 			List<Expression> currentIndexes = indexes;
 
-			Type type = Util.getType(expression);
+			Type type = Typer.getType(expression);
 			// create a temporary variable if the target is null
 			// or it is not null and the expression does not return a list
 			if (target == null || !type.isList()) {
@@ -223,7 +224,7 @@ public class AstTransformer {
 					.getIndexes());
 
 			Var target = context.getProcedure().newTempLocalVariable(
-					Util.getType(expression), "local_" + var.getName());
+					Typer.getType(expression), "local_" + var.getName());
 
 			InstLoad load = IrFactory.eINSTANCE.createInstLoad(lineNumber,
 					target, var, indexes);
@@ -283,7 +284,7 @@ public class AstTransformer {
 			}
 
 			return IrFactory.eINSTANCE.createExprUnary(op, expr,
-					Util.getType(expression));
+					Typer.getType(expression));
 		}
 
 		@Override
@@ -345,7 +346,7 @@ public class AstTransformer {
 			}
 
 			// size of expressions
-			Type type = Util.getType(expressions);
+			Type type = Typer.getType(expressions);
 			size *= expressions.size();
 
 			Procedure procedure = context.getProcedure();
@@ -1049,7 +1050,7 @@ public class AstTransformer {
 	 * 
 	 */
 	private boolean isInitializeNeeded(AstVariable astVariable) {
-		Type type = Util.getType(astVariable);
+		Type type = Typer.getType(astVariable);
 		AstExpression value = astVariable.getValue();
 		if (type.isList() && value != null) {
 			// the variable is a List with an initial value
@@ -1134,7 +1135,7 @@ public class AstTransformer {
 	public Procedure transformFunction(AstFunction astFunction) {
 		String name = astFunction.getName();
 		int lineNumber = Util.getLocation(astFunction);
-		Type type = Util.getType(astFunction);
+		Type type = Typer.getType(astFunction);
 
 		Procedure procedure = IrFactory.eINSTANCE.createProcedure(name,
 				lineNumber, type);
@@ -1177,7 +1178,7 @@ public class AstTransformer {
 	 */
 	public Var transformGlobalVariable(AstVariable astVariable) {
 		int lineNumber = Util.getLocation(astVariable);
-		Type type = EcoreUtil.copy(Util.getType(astVariable));
+		Type type = EcoreUtil.copy(Typer.getType(astVariable));
 		String name = astVariable.getName();
 		boolean assignable = !astVariable.isConstant();
 
@@ -1231,7 +1232,7 @@ public class AstTransformer {
 		String name = getQualifiedName(astVariable);
 
 		boolean assignable = !astVariable.isConstant();
-		Type type = Util.getType(astVariable);
+		Type type = Typer.getType(astVariable);
 
 		// create local variable with the given name
 		Var local = IrFactory.eINSTANCE.createVar(lineNumber, type, name,
