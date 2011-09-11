@@ -39,12 +39,14 @@ import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.services.AstExpressionEvaluator;
+import net.sf.orcc.cal.type.Typer;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.util.TypeUtil;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.xtext.nodemodel.ICompositeNode;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
@@ -162,8 +164,25 @@ public class Util {
 	 * @return the type of the given object
 	 */
 	public static Type getType(EObject eObject) {
-		Cache cache = CacheManager.instance.getCache(eObject.eResource());
-		return cache.getType(eObject);
+		Resource resource = eObject.eResource();
+		Type type;
+		if (resource == null) {
+			type = new Typer(null).doSwitch(eObject);
+		} else {
+			Cache cache = CacheManager.instance.getCache(resource);
+
+			URI uri = EcoreUtil.getURI(eObject);
+			String fragment = uri.fragment();
+			type = cache.getTypeMap().get(fragment);
+
+			if (type == null) {
+				type = new Typer(null).doSwitch(eObject);
+				cache.getTypes().add(type);
+				cache.getTypeMap().put(fragment, type);
+			}
+		}
+
+		return type;
 	}
 
 	/**

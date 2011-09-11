@@ -114,9 +114,11 @@ public class Typer extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstExpressionBinary(AstExpressionBinary expression) {
+		setTargetType(expression);
+
 		OpBinary op = OpBinary.getOperator(expression.getOperator());
-		Type t1 = getType(expression.getLeft());
-		Type t2 = getType(expression.getRight());
+		Type t1 = Util.getType(expression.getLeft());
+		Type t2 = Util.getType(expression.getRight());
 		return getTypeBinary(op, t1, t2, expression,
 				eINSTANCE.getAstExpressionBinary_Operator(), -1);
 	}
@@ -146,7 +148,7 @@ public class Typer extends CalSwitch<Type> {
 		while (itFormal.hasNext() && itActual.hasNext()) {
 			Type formalType = Util.getType(itFormal.next());
 			AstExpression expression = itActual.next();
-			Type actualType = getType(expression);
+			Type actualType = Util.getType(expression);
 
 			// check types
 			if (!TypeUtil.isConvertibleTo(actualType, formalType)) {
@@ -162,7 +164,7 @@ public class Typer extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstExpressionElsif(AstExpressionElsif expression) {
-		Type type = getType(expression.getCondition());
+		Type type = Util.getType(expression.getCondition());
 		if (type == null) {
 			return null;
 		}
@@ -173,7 +175,7 @@ public class Typer extends CalSwitch<Type> {
 			return null;
 		}
 
-		return getType(expression.getThen());
+		return Util.getType(expression.getThen());
 	}
 
 	@Override
@@ -183,7 +185,7 @@ public class Typer extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstExpressionIf(AstExpressionIf expression) {
-		Type type = getType(expression.getCondition());
+		Type type = Util.getType(expression.getCondition());
 		if (type == null) {
 			return null;
 		}
@@ -194,12 +196,12 @@ public class Typer extends CalSwitch<Type> {
 			return null;
 		}
 
-		Type t1 = getType(expression.getThen());
+		Type t1 = Util.getType(expression.getThen());
 		for (AstExpressionElsif elsif : expression.getElsifs()) {
 			t1 = TypeUtil.getLub(t1, doSwitch(elsif));
 		}
 
-		Type t2 = getType(expression.getElse());
+		Type t2 = Util.getType(expression.getElse());
 		type = TypeUtil.getLub(t1, t2);
 		if (type == null) {
 			error("Incompatible operand types " + t1 + " and " + t2,
@@ -218,7 +220,7 @@ public class Typer extends CalSwitch<Type> {
 		List<AstExpression> indexes = expression.getIndexes();
 		int errorIdx = 0;
 		for (AstExpression index : indexes) {
-			Type subType = getType(index);
+			Type subType = Util.getType(index);
 			if (type.isList()) {
 				if (subType != null && (subType.isInt() || subType.isUint())) {
 					type = ((TypeList) type).getType();
@@ -275,7 +277,7 @@ public class Typer extends CalSwitch<Type> {
 	@Override
 	public Type caseAstExpressionUnary(AstExpressionUnary expression) {
 		OpUnary op = OpUnary.getOperator(expression.getUnaryOperator());
-		Type type = getType(expression.getExpression());
+		Type type = Util.getType(expression.getExpression());
 		if (type == null) {
 			return null;
 		}
@@ -576,25 +578,6 @@ public class Typer extends CalSwitch<Type> {
 	}
 
 	/**
-	 * Computes the type of the given expression, stores it in the type cache,
-	 * and then returns it.
-	 * 
-	 * @param expression
-	 *            an AST expression
-	 * @return a type
-	 */
-	public Type getType(AstExpression expression) {
-		if (expression == null) {
-			return null;
-		}
-
-		Typer checker = new Typer(errors);
-		checker.setTargetType(expression);
-		Type type = checker.doSwitch(expression);
-		return type;
-	}
-
-	/**
 	 * Computes and returns the type that is the Least Upper Bound of the types
 	 * for the given expressions.
 	 * 
@@ -606,10 +589,10 @@ public class Typer extends CalSwitch<Type> {
 		Iterator<AstExpression> it = expressions.iterator();
 		if (it.hasNext()) {
 			AstExpression expression = it.next();
-			Type t1 = getType(expression);
+			Type t1 = Util.getType(expression);
 			while (it.hasNext()) {
 				expression = it.next();
-				Type t2 = getType(expression);
+				Type t2 = Util.getType(expression);
 				t1 = TypeUtil.getLub(t1, t2);
 			}
 			return t1;

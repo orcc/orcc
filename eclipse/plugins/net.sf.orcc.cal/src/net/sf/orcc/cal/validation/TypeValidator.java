@@ -51,7 +51,6 @@ import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.AstVariableReference;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
-import net.sf.orcc.cal.type.Typer;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
@@ -183,7 +182,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		expression.getIndexes().addAll(EcoreUtil.copyAll(assign.getIndexes()));
 
 		// check types
-		Type targetType = new Typer(null).getType(expression);
+		Type targetType = Util.getType(expression);
 		Type type = Util.getType(assign.getValue());
 		if (!TypeUtil.isConvertibleTo(type, targetType)) {
 			error("Type mismatch: cannot convert from " + type + " to "
