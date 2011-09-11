@@ -234,10 +234,10 @@ public class Typer extends CalSwitch<Type> {
 
 		// size of generators
 		for (AstGenerator generator : expression.getGenerators()) {
-			int lower = new AstExpressionEvaluator(null)
-					.evaluateAsInteger(generator.getLower());
-			int higher = new AstExpressionEvaluator(null)
-					.evaluateAsInteger(generator.getHigher());
+			int lower = AstExpressionEvaluator
+					.getIntValue(generator.getLower());
+			int higher = AstExpressionEvaluator.getIntValue(generator
+					.getHigher());
 			size *= (higher - lower) + 1;
 		}
 
@@ -324,7 +324,7 @@ public class Typer extends CalSwitch<Type> {
 		if (astSize == null) {
 			size = 32;
 		} else {
-			size = new AstExpressionEvaluator(null).evaluateAsInteger(astSize);
+			size = AstExpressionEvaluator.getIntValue(astSize);
 		}
 		return IrFactory.eINSTANCE.createTypeInt(size);
 	}
@@ -333,7 +333,7 @@ public class Typer extends CalSwitch<Type> {
 	public Type caseAstTypeList(AstTypeList listType) {
 		Type type = doSwitch(listType.getType());
 		AstExpression expression = listType.getSize();
-		Expression size = new AstExpressionEvaluator(null).evaluate(expression);
+		Expression size = AstExpressionEvaluator.getValue(expression);
 		size = EcoreUtil.copy(size);
 		return IrFactory.eINSTANCE.createTypeList(size, type);
 	}
@@ -350,7 +350,7 @@ public class Typer extends CalSwitch<Type> {
 		if (astSize == null) {
 			size = 32;
 		} else {
-			size = new AstExpressionEvaluator(null).evaluateAsInteger(astSize);
+			size = AstExpressionEvaluator.getIntValue(astSize);
 		}
 
 		return IrFactory.eINSTANCE.createTypeUint(size);

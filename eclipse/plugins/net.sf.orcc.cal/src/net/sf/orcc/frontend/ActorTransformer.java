@@ -49,6 +49,7 @@ import net.sf.orcc.cal.cal.AstScheduleRegExp;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.AstVariableReference;
+import net.sf.orcc.cal.services.AstExpressionEvaluator;
 import net.sf.orcc.cal.type.Typer;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.cal.util.VoidSwitch;
@@ -82,6 +83,7 @@ import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class transforms an AST actor to its IR equivalent.
@@ -673,7 +675,7 @@ public class ActorTransformer {
 		int repeat = 1;
 		AstExpression astRepeat = pattern.getRepeat();
 		if (astRepeat != null) {
-			repeat = Util.getIntValue(astRepeat);
+			repeat = AstExpressionEvaluator.getIntValue(astRepeat);
 			totalConsumption *= repeat;
 		}
 		irInputPattern.setNumTokens(port, totalConsumption);
@@ -747,7 +749,7 @@ public class ActorTransformer {
 			int repeat = 1;
 			AstExpression astRepeat = pattern.getRepeat();
 			if (astRepeat != null) {
-				repeat = Util.getIntValue(astRepeat);
+				repeat = AstExpressionEvaluator.getIntValue(astRepeat);
 				totalConsumption *= repeat;
 			}
 			irOutputPattern.setNumTokens(port, totalConsumption);
@@ -771,7 +773,7 @@ public class ActorTransformer {
 	 */
 	private void transformPorts(List<Port> ports, List<AstPort> portList) {
 		for (AstPort astPort : portList) {
-			Type type = Typer.getType(astPort);
+			Type type = EcoreUtil.copy(Typer.getType(astPort));
 			Port port = IrFactory.eINSTANCE.createPort(type, astPort.getName(),
 					astPort.isNative());
 			mapAstToIr.put(astPort, port);

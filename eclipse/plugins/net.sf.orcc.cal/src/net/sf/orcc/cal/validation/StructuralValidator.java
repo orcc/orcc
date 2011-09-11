@@ -60,6 +60,7 @@ import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.AstVariableReference;
 import net.sf.orcc.cal.cal.CalPackage;
+import net.sf.orcc.cal.services.AstExpressionEvaluator;
 import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.cal.util.CalActionList;
 import net.sf.orcc.cal.util.Util;
@@ -257,8 +258,8 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 
 	@Check(CheckType.NORMAL)
 	public void checkAstGenerator(AstGenerator generator) {
-		int lower = Util.getIntValue(generator.getLower());
-		int higher = Util.getIntValue(generator.getHigher());
+		int lower = AstExpressionEvaluator.getIntValue(generator.getLower());
+		int higher = AstExpressionEvaluator.getIntValue(generator.getHigher());
 
 		if (higher < lower) {
 			error("higher bound must be greater than lower bound", generator,

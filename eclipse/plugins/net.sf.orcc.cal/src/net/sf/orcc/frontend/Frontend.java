@@ -85,8 +85,6 @@ public class Frontend {
 	 * @throws OrccException
 	 */
 	public Entity compile(AstEntity entity) {
-		CacheManager.instance.saveCache(entity.eResource());
-		
 		AstActor astActor = entity.getActor();
 		if (astActor != null) {
 			Actor actor = (Actor) mapAstToIr.get(astActor);
@@ -99,6 +97,7 @@ public class Frontend {
 			mapAstToIr.put(astActor, actor);
 			removeDanglingUses(actor);
 			IrUtil.serializeActor(set, outputFolder, actor);
+			CacheManager.instance.saveCache(entity.eResource());
 			return actor;
 		} else {
 			AstUnit astUnit = entity.getUnit();
@@ -112,6 +111,7 @@ public class Frontend {
 			unit = transformer.transform(this, astUnit);
 			mapAstToIr.put(astUnit, unit);
 			IrUtil.serializeActor(set, outputFolder, unit);
+			CacheManager.instance.saveCache(entity.eResource());
 			return unit;
 		}
 	}

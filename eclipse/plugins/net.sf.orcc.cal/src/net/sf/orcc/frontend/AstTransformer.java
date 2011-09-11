@@ -57,6 +57,7 @@ import net.sf.orcc.cal.cal.AstStatementWhile;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
+import net.sf.orcc.cal.services.AstExpressionEvaluator;
 import net.sf.orcc.cal.type.Typer;
 import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.cal.util.Util;
@@ -340,8 +341,10 @@ public class AstTransformer {
 
 			// size of generators
 			for (AstGenerator generator : generators) {
-				int lower = Util.getIntValue(generator.getLower());
-				int higher = Util.getIntValue(generator.getHigher());
+				int lower = AstExpressionEvaluator.getIntValue(generator
+						.getLower());
+				int higher = AstExpressionEvaluator.getIntValue(generator
+						.getHigher());
 				size *= (higher - lower) + 1;
 			}
 
@@ -462,7 +465,8 @@ public class AstTransformer {
 				Var loopVar = transformLocalVariable(astVariable);
 				procedure.getLocals().add(loopVar);
 
-				int lower = Util.getIntValue(generator.getLower());
+				int lower = AstExpressionEvaluator.getIntValue(generator
+						.getLower());
 				Expression thisIndex = IrFactory.eINSTANCE
 						.createExprVar(loopVar);
 				if (lower != 0) {
@@ -472,7 +476,8 @@ public class AstTransformer {
 							thisIndex.getType());
 				}
 
-				int higher = Util.getIntValue(generator.getHigher());
+				int higher = AstExpressionEvaluator.getIntValue(generator
+						.getHigher());
 
 				if (index == null) {
 					index = thisIndex;
@@ -1189,7 +1194,8 @@ public class AstTransformer {
 		if (mustInitialize) {
 			initialValue = null;
 		} else {
-			initialValue = Util.getValue(astVariable);
+			initialValue = EcoreUtil.copy(AstExpressionEvaluator
+					.getValue(astVariable));
 		}
 
 		// create state variable and put it in the map

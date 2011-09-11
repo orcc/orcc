@@ -34,7 +34,7 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
  * <em><b>Manager</b></em>'. <!-- end-user-doc -->
  * <p>
  * </p>
- *
+ * 
  * @generated
  */
 public class CacheManagerImpl extends EObjectImpl implements CacheManager {
@@ -47,6 +47,7 @@ public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected CacheManagerImpl() {
@@ -58,6 +59,9 @@ public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 		String name = uri.segment(1);
 		IProject project = root.getProject(name);
 		IFolder folder = OrccUtil.getOutputFolder(project);
+		if (folder == null) {
+			return null;
+		}
 
 		IPath path = new Path(uri.path());
 		path = path.removeFirstSegments(3).removeLastSegments(1);
@@ -73,6 +77,7 @@ public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -133,12 +138,14 @@ public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 		// get the cache URI to delete the resource in which the cache was
 		// serialized (if it exists)
 		URI cacheUri = getCacheURI(uri);
-		Resource cacheResource = set.getResource(cacheUri, false);
-		if (cacheResource != null) {
-			try {
-				cacheResource.delete(null);
-			} catch (IOException e) {
-				e.printStackTrace();
+		if (cacheUri != null) {
+			Resource cacheResource = set.getResource(cacheUri, false);
+			if (cacheResource != null) {
+				try {
+					cacheResource.delete(null);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}

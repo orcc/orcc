@@ -54,8 +54,8 @@ import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.AstVariableReference;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
+import net.sf.orcc.cal.services.AstExpressionEvaluator;
 import net.sf.orcc.cal.type.Typer;
-import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
@@ -118,7 +118,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 					index++;
 				}
 			} else {
-				int repeat = Util.getIntValue(astRepeat);
+				int repeat = AstExpressionEvaluator.getIntValue(astRepeat);
 				if (repeat != 1) {
 					// each value is supposed to be a list
 					List<AstExpression> values = pattern.getValues();

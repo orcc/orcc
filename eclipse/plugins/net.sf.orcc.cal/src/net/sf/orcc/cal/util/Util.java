@@ -28,18 +28,9 @@
  */
 package net.sf.orcc.cal.util;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import net.sf.orcc.cal.cal.AstEntity;
-import net.sf.orcc.cal.cal.AstExpression;
-import net.sf.orcc.cal.cal.AstVariable;
-import net.sf.orcc.cal.services.AstExpressionEvaluator;
-import net.sf.orcc.ir.Expression;
 
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.xtext.nodemodel.ICompositeNode;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 
@@ -50,50 +41,6 @@ import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
  * 
  */
 public class Util {
-
-	private static class CacheUtil<T> {
-
-		private Map<String, Map<String, T>> map = new HashMap<String, Map<String, T>>();
-
-		public T get(EObject eObject) {
-			URI uri = EcoreUtil.getURI(eObject);
-			Map<String, T> resourceMap = getMap(uri);
-			return resourceMap.get(uri.fragment());
-		}
-
-		private Map<String, T> getMap(URI uri) {
-			Map<String, T> resourceMap = map.get(uri.path());
-			if (resourceMap == null) {
-				resourceMap = new HashMap<String, T>();
-				map.put(uri.path(), resourceMap);
-			}
-			return resourceMap;
-		}
-
-		public void put(EObject eObject, T value) {
-			URI uri = EcoreUtil.getURI(eObject);
-			Map<String, T> resourceMap = getMap(uri);
-			resourceMap.put(uri.fragment(), value);
-		}
-
-		public void removeEntries(URI uri) {
-			Map<String, T> resourceMap = getMap(uri);
-			resourceMap.clear();
-		}
-	}
-
-	private static CacheUtil<Integer> cacheIntValue = new CacheUtil<Integer>();
-
-	private static CacheUtil<Expression> cacheValue = new CacheUtil<Expression>();
-
-	public static int getIntValue(AstExpression expr) {
-		Integer intValue = cacheIntValue.get(expr);
-		if (intValue == null) {
-			intValue = new AstExpressionEvaluator(null).evaluateAsInteger(expr);
-			cacheIntValue.put(expr, intValue);
-		}
-		return intValue;
-	}
 
 	/**
 	 * Returns the line on which the given object is defined.
@@ -146,19 +93,6 @@ public class Util {
 		} else {
 			return getTopLevelContainer(cter);
 		}
-	}
-
-	public static Expression getValue(AstVariable variable) {
-		return cacheValue.get(variable);
-	}
-
-	public static void putValue(AstVariable variable, Expression value) {
-		cacheValue.put(variable, value);
-	}
-
-	public static void removeCacheForURI(URI uri) {
-		cacheValue.removeEntries(uri);
-		cacheIntValue.removeEntries(uri);
 	}
 
 }

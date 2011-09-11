@@ -28,12 +28,11 @@
  */
 package net.sf.orcc.cal.services;
 
-import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
-
 import java.util.Iterator;
 import java.util.List;
 
-import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.cache.Cache;
+import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstExpressionBinary;
 import net.sf.orcc.cal.cal.AstExpressionBoolean;
@@ -52,8 +51,6 @@ import net.sf.orcc.cal.cal.AstGenerator;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.type.Typer;
-import net.sf.orcc.cal.util.Util;
-import net.sf.orcc.cal.validation.ValidationError;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.ExprList;
@@ -67,8 +64,9 @@ import net.sf.orcc.ir.util.ExpressionEvaluator;
 import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.util.OrccUtil;
 
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -79,20 +77,66 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class AstExpressionEvaluator extends CalSwitch<Expression> {
 
-	private List<ValidationError> errors;
+	/**
+	 * Returns the integer value associated with the given object using its URI.
+	 * 
+	 * @param eObject
+	 *            an AST node
+	 * @return the integer value associated with the given object
+	 */
+	public static int getIntValue(EObject eObject) {
+		Expression value = getValue(eObject);
+		if (value != null && value.isIntExpr()) {
+			ExprInt intExpr = (ExprInt) value;
+			if (!intExpr.isLong()) {
+				return intExpr.getIntValue();
+			}
+		}
+
+		// evaluated ok, but not as an integer
+		return -1;
+	}
 
 	/**
-	 * Creates a new AST expression evaluator.
+	 * Returns the value associated with the given object using its URI.
+	 * 
+	 * @param eObject
+	 *            an AST node
+	 * @return the value associated with the given object
 	 */
-	public AstExpressionEvaluator(List<ValidationError> errors) {
-		this.errors = errors;
+	public static Expression getValue(EObject eObject) {
+		Resource resource = eObject.eResource();
+		Expression value;
+		if (resource == null) {
+			value = new AstExpressionEvaluator().doSwitch(eObject);
+		} else {
+			Cache cache = CacheManager.instance.getCache(resource);
+
+			URI uri = EcoreUtil.getURI(eObject);
+			String fragment = uri.fragment();
+			value = cache.getMapExpressions().get(fragment);
+
+			if (value == null) {
+				value = new AstExpressionEvaluator().doSwitch(eObject);
+				if (value != null) {
+					cache.getExpressions().add(value);
+					cache.getMapExpressions().put(fragment, value);
+				}
+			}
+		}
+
+		return value;
+	}
+
+	private AstExpressionEvaluator() {
+
 	}
 
 	@Override
 	public Expression caseAstExpressionBinary(AstExpressionBinary expression) {
 		OpBinary op = OpBinary.getOperator(expression.getOperator());
-		Expression e1 = evaluate(expression.getLeft());
-		Expression e2 = evaluate(expression.getRight());
+		Expression e1 = getValue(expression.getLeft());
+		Expression e2 = getValue(expression.getRight());
 
 		Object val1 = ValueUtil.getValue(e1);
 		Object val2 = ValueUtil.getValue(e2);
@@ -123,7 +167,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 			/* AstVariable paramV = */itFormal.next();
 			AstExpression paramE = itActual.next();
 
-			evaluate(paramE);
+			getValue(paramE);
 
 			// index++;
 		}
@@ -138,26 +182,24 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 
 	@Override
 	public Expression caseAstExpressionIf(AstExpressionIf expression) {
-		Expression condition = evaluate(expression.getCondition());
+		Expression condition = getValue(expression.getCondition());
 
 		if (condition != null && condition.isBooleanExpr()) {
 			if (((ExprBool) condition).isValue()) {
-				return evaluate(expression.getThen());
+				return getValue(expression.getThen());
 			} else {
 				for (AstExpressionElsif elsif : expression.getElsifs()) {
-					condition = evaluate(elsif.getCondition());
+					condition = getValue(elsif.getCondition());
 					if (condition != null && condition.isBooleanExpr()) {
 						if (((ExprBool) condition).isValue()) {
-							return evaluate(elsif.getThen());
+							return getValue(elsif.getThen());
 						}
 					}
 				}
 
-				return evaluate(expression.getElse());
+				return getValue(expression.getElse());
 			}
 		} else {
-			error("expected condition of type bool", expression,
-					eINSTANCE.getAstExpressionIf_Condition(), -1);
 			return null;
 		}
 	}
@@ -165,48 +207,27 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 	@Override
 	public Expression caseAstExpressionIndex(AstExpressionIndex expression) {
 		AstVariable variable = expression.getSource().getVariable();
-		Expression value = evaluate(variable.getValue());
+		Expression value = getValue(variable.getValue());
 		if (value == null) {
-			error("variable \"" + variable.getName() + "\" ("
-					+ Util.getLocation(variable)
-					+ ") does not have a compile-time constant value",
-					expression, eINSTANCE.getAstExpressionIndex_Source(), -1);
 			return null;
 		}
 
 		List<AstExpression> indexes = expression.getIndexes();
-		int errorIdx = 0;
 		for (AstExpression index : indexes) {
-			Expression indexValue = evaluate(index);
+			Expression indexValue = getValue(index);
 			if (value != null && value.isListExpr()) {
 				ExprList list = (ExprList) value;
 				if (indexValue != null && indexValue.isIntExpr()) {
 					ExprInt intExpr = (ExprInt) indexValue;
-					if (intExpr.isLong()) {
-						error("index must be a int(size=32) integer",
-								expression,
-								eINSTANCE.getAstExpressionIndex_Indexes(),
-								errorIdx);
-					} else {
+					if (!intExpr.isLong()) {
 						try {
 							value = list.get(intExpr.getIntValue());
 						} catch (IndexOutOfBoundsException e) {
-							error("index out of bounds", expression,
-									eINSTANCE.getAstExpressionIndex_Indexes(),
-									errorIdx);
+							e.printStackTrace();
 						}
 					}
-				} else {
-					error("index must be an integer", expression,
-							eINSTANCE.getAstExpressionIndex_Indexes(), errorIdx);
 				}
-			} else {
-				error("variable \"" + variable.getName() + "\" ("
-						+ Util.getLocation(variable) + ") must be of type List",
-						expression, eINSTANCE.getAstExpressionIndex_Source(),
-						-1);
 			}
-			errorIdx++;
 		}
 
 		return EcoreUtil.copy(value);
@@ -225,7 +246,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 		ExprList list = IrFactory.eINSTANCE.createExprList();
 		if (generators.isEmpty()) {
 			for (AstExpression subExpression : expressions) {
-				list.getValue().add(EcoreUtil.copy(evaluate(subExpression)));
+				list.getValue().add(EcoreUtil.copy(getValue(subExpression)));
 			}
 		} else {
 			// generators will be translated to statements in initialize
@@ -250,35 +271,26 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 
 		switch (op) {
 		case BITNOT: {
-			Expression value = evaluate(expression.getExpression());
+			Expression value = getValue(expression.getExpression());
 			if (value != null && value.isIntExpr()) {
 				ExprInt i = (ExprInt) value;
 				return i.not();
 			}
-
-			error("bitnot expects an integer expression", expression,
-					eINSTANCE.getAstExpressionUnary_UnaryOperator(), -1);
 			return null;
 		}
 		case LOGIC_NOT: {
-			Expression value = evaluate(expression.getExpression());
+			Expression value = getValue(expression.getExpression());
 			if (value != null && value.isBooleanExpr()) {
 				return ((ExprBool) value).not();
 			}
-
-			error("not expects a boolean expression", expression,
-					eINSTANCE.getAstExpressionUnary_UnaryOperator(), -1);
 			return null;
 		}
 		case MINUS: {
-			Expression value = evaluate(expression.getExpression());
+			Expression value = getValue(expression.getExpression());
 			if (value != null && value.isIntExpr()) {
 				ExprInt i = (ExprInt) value;
 				return i.negate();
 			}
-
-			error("minus expects an integer expression", expression,
-					eINSTANCE.getAstExpressionUnary_UnaryOperator(), -1);
 			return null;
 		}
 		case NUM_ELTS:
@@ -287,9 +299,6 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 				return IrFactory.eINSTANCE.createExprInt(((TypeList) type)
 						.getSize());
 			}
-
-			error("operator # expects a list expression", expression,
-					eINSTANCE.getAstExpressionUnary_UnaryOperator(), -1);
 			return null;
 		}
 
@@ -299,69 +308,19 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 	@Override
 	public Expression caseAstExpressionVariable(AstExpressionVariable expression) {
 		AstVariable variable = expression.getValue().getVariable();
-		Expression value = Util.getValue(variable);
-		if (value != null) {
-			return value;
-		}
-
-		// evaluate because it has not been done before
-		value = evaluate(variable.getValue());
-		Util.putValue(variable, value);
+		Expression value = getValue(variable);
 		return value;
 	}
 
-	private void error(String message, EObject source,
-			EStructuralFeature feature, int index) {
-		if (errors != null) {
-			errors.add(new ValidationError(message, source, feature, index));
-		}
-	}
-
-	/**
-	 * Evaluates the given AST expression and returns an object that can be a
-	 * boolean, an integer, a string, or a list of objects.
-	 * 
-	 * @param expression
-	 *            an AST expression
-	 * @return the expression value
-	 * @throws OrccRuntimeException
-	 *             if the given expression cannot be evaluated.
-	 */
-	public Expression evaluate(AstExpression expression) {
+	@Override
+	public Expression caseAstVariable(AstVariable variable) {
+		AstExpression expression = variable.getValue();
 		if (expression == null) {
 			return null;
 		}
-
-		return doSwitch(expression);
-	}
-
-	/**
-	 * Evaluates the given AST expression and returns the expression as an
-	 * integer, or throws an exception.
-	 * 
-	 * @param expression
-	 *            an AST expression
-	 * @return an integer
-	 * @throws OrccRuntimeException
-	 *             if the given expression cannot be evaluated.
-	 */
-	public int evaluateAsInteger(AstExpression expression) {
-		EObject cter = expression.eContainer();
-		EStructuralFeature feature = expression.eContainingFeature();
-		Expression value = evaluate(expression);
-		if (value != null && value.isIntExpr()) {
-			ExprInt intExpr = (ExprInt) value;
-			if (intExpr.isLong()) {
-				error("integer expression too large", cter, feature, -1);
-			} else {
-				return intExpr.getIntValue();
-			}
-		}
-
-		// evaluated ok, but not as an integer
-		error("expected compile-time constant integer expression", cter,
-				feature, -1);
-		return 0;
+		
+		Expression value = getValue(expression);
+		return value;
 	}
 
 }
