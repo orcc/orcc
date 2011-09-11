@@ -104,19 +104,18 @@ public class CacheFactoryImpl extends EFactoryImpl implements CacheFactory {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Map.Entry<String, Type> createEStringToTypeMapEntry() {
-		EStringToTypeMapEntryImpl eStringToTypeMapEntry = new EStringToTypeMapEntryImpl();
-		return eStringToTypeMapEntry;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public Map.Entry<String, Expression> createEStringToExpressionMapEntry() {
 		EStringToExpressionMapEntryImpl eStringToExpressionMapEntry = new EStringToExpressionMapEntryImpl();
 		return eStringToExpressionMapEntry;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Map.Entry<String, Type> createEStringToTypeMapEntry() {
+		EStringToTypeMapEntryImpl eStringToTypeMapEntry = new EStringToTypeMapEntryImpl();
+		return eStringToTypeMapEntry;
 	}
 
 	/**

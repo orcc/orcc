@@ -75,7 +75,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Matthieu Wipliez
  * 
  */
-public class AstExpressionEvaluator extends CalSwitch<Expression> {
+public class Evaluator extends CalSwitch<Expression> {
 
 	/**
 	 * Returns the integer value associated with the given object using its URI.
@@ -108,7 +108,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 		Resource resource = eObject.eResource();
 		Expression value;
 		if (resource == null) {
-			value = new AstExpressionEvaluator().doSwitch(eObject);
+			value = new Evaluator().doSwitch(eObject);
 		} else {
 			Cache cache = CacheManager.instance.getCache(resource);
 
@@ -117,7 +117,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 			value = cache.getExpressionsMap().get(fragment);
 
 			if (value == null) {
-				value = new AstExpressionEvaluator().doSwitch(eObject);
+				value = new Evaluator().doSwitch(eObject);
 				if (value != null) {
 					cache.getExpressions().add(value);
 					cache.getExpressionsMap().put(fragment, value);
@@ -128,7 +128,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 		return value;
 	}
 
-	private AstExpressionEvaluator() {
+	private Evaluator() {
 
 	}
 
@@ -318,7 +318,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 		if (expression == null) {
 			return null;
 		}
-		
+
 		Expression value = getValue(expression);
 		return value;
 	}

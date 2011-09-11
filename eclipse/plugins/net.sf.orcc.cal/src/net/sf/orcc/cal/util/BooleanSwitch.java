@@ -511,7 +511,7 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 				return true;
 			}
 		}
-		
+
 		for (AstProcedure procedure : unit.getProcedures()) {
 			if (doSwitch(procedure)) {
 				return true;

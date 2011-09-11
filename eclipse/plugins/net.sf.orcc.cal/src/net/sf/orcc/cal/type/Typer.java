@@ -70,7 +70,7 @@ import net.sf.orcc.cal.cal.AstVariableReference;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.util.CalSwitch;
-import net.sf.orcc.cal.services.AstExpressionEvaluator;
+import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
@@ -234,10 +234,8 @@ public class Typer extends CalSwitch<Type> {
 
 		// size of generators
 		for (AstGenerator generator : expression.getGenerators()) {
-			int lower = AstExpressionEvaluator
-					.getIntValue(generator.getLower());
-			int higher = AstExpressionEvaluator.getIntValue(generator
-					.getHigher());
+			int lower = Evaluator.getIntValue(generator.getLower());
+			int higher = Evaluator.getIntValue(generator.getHigher());
 			size *= (higher - lower) + 1;
 		}
 
@@ -324,7 +322,7 @@ public class Typer extends CalSwitch<Type> {
 		if (astSize == null) {
 			size = 32;
 		} else {
-			size = AstExpressionEvaluator.getIntValue(astSize);
+			size = Evaluator.getIntValue(astSize);
 		}
 		return IrFactory.eINSTANCE.createTypeInt(size);
 	}
@@ -333,7 +331,7 @@ public class Typer extends CalSwitch<Type> {
 	public Type caseAstTypeList(AstTypeList listType) {
 		Type type = doSwitch(listType.getType());
 		AstExpression expression = listType.getSize();
-		Expression size = AstExpressionEvaluator.getValue(expression);
+		Expression size = Evaluator.getValue(expression);
 		size = EcoreUtil.copy(size);
 		return IrFactory.eINSTANCE.createTypeList(size, type);
 	}
@@ -350,7 +348,7 @@ public class Typer extends CalSwitch<Type> {
 		if (astSize == null) {
 			size = 32;
 		} else {
-			size = AstExpressionEvaluator.getIntValue(astSize);
+			size = Evaluator.getIntValue(astSize);
 		}
 
 		return IrFactory.eINSTANCE.createTypeUint(size);

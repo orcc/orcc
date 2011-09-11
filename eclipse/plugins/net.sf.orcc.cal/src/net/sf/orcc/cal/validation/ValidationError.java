@@ -47,8 +47,8 @@ public class ValidationError {
 
 	private EObject source;
 
-	public ValidationError(String message, EObject source, EStructuralFeature feature,
-			int index) {
+	public ValidationError(String message, EObject source,
+			EStructuralFeature feature, int index) {
 		this.message = message;
 		this.source = source;
 		this.feature = feature;

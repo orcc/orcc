@@ -38,13 +38,13 @@ public interface CalConstants {
 
 	public static final String ERROR_DEFAULT = "default";
 
-	public static final String ERROR_LIST = "list";
-
-	public static final String ERROR_NAME = "name";
-
 	public static final String ERROR_EXTRANEOUS_PACKAGE = "extraneous_package";
 
+	public static final String ERROR_LIST = "list";
+
 	public static final String ERROR_MISSING_PACKAGE = "missing_package";
+
+	public static final String ERROR_NAME = "name";
 
 	public static final String ERROR_PACKAGE = "package";
 

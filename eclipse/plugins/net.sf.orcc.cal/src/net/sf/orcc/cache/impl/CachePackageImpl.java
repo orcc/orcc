@@ -92,14 +92,13 @@ public class CachePackageImpl extends EPackageImpl implements CachePackage {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass eStringToTypeMapEntryEClass = null;
+	private EClass eStringToExpressionMapEntryEClass = null;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass eStringToExpressionMapEntryEClass = null;
+	private EClass eStringToTypeMapEntryEClass = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -170,26 +169,7 @@ public class CachePackageImpl extends EPackageImpl implements CachePackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getCache_Types() {
-		return (EReference)cacheEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getCache_TypesMap() {
-		return (EReference)cacheEClass.getEStructuralFeatures().get(3);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getCache_Expressions() {
@@ -197,12 +177,27 @@ public class CachePackageImpl extends EPackageImpl implements CachePackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getCache_ExpressionsMap() {
 		return (EReference)cacheEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getCache_Types() {
+		return (EReference)cacheEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getCache_TypesMap() {
+		return (EReference)cacheEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -219,6 +214,30 @@ public class CachePackageImpl extends EPackageImpl implements CachePackage {
 	 */
 	public EClass getCacheManager() {
 		return cacheManagerEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getEStringToExpressionMapEntry() {
+		return eStringToExpressionMapEntryEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getEStringToExpressionMapEntry_Key() {
+		return (EAttribute)eStringToExpressionMapEntryEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getEStringToExpressionMapEntry_Value() {
+		return (EReference)eStringToExpressionMapEntryEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -243,33 +262,6 @@ public class CachePackageImpl extends EPackageImpl implements CachePackage {
 	 */
 	public EReference getEStringToTypeMapEntry_Value() {
 		return (EReference)eStringToTypeMapEntryEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getEStringToExpressionMapEntry() {
-		return eStringToExpressionMapEntryEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getEStringToExpressionMapEntry_Key() {
-		return (EAttribute)eStringToExpressionMapEntryEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getEStringToExpressionMapEntry_Value() {
-		return (EReference)eStringToExpressionMapEntryEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**

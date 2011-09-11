@@ -49,7 +49,7 @@ import net.sf.orcc.cal.cal.AstScheduleRegExp;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.AstVariableReference;
-import net.sf.orcc.cal.services.AstExpressionEvaluator;
+import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.cal.type.Typer;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.cal.util.VoidSwitch;
@@ -675,7 +675,7 @@ public class ActorTransformer {
 		int repeat = 1;
 		AstExpression astRepeat = pattern.getRepeat();
 		if (astRepeat != null) {
-			repeat = AstExpressionEvaluator.getIntValue(astRepeat);
+			repeat = Evaluator.getIntValue(astRepeat);
 			totalConsumption *= repeat;
 		}
 		irInputPattern.setNumTokens(port, totalConsumption);
@@ -749,7 +749,7 @@ public class ActorTransformer {
 			int repeat = 1;
 			AstExpression astRepeat = pattern.getRepeat();
 			if (astRepeat != null) {
-				repeat = AstExpressionEvaluator.getIntValue(astRepeat);
+				repeat = Evaluator.getIntValue(astRepeat);
 				totalConsumption *= repeat;
 			}
 			irOutputPattern.setNumTokens(port, totalConsumption);
