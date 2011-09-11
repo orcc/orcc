@@ -30,6 +30,7 @@ package net.sf.orcc.cache;
 
 import net.sf.orcc.ir.Type;
 
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EObject;
 
@@ -42,14 +43,6 @@ import org.eclipse.emf.ecore.EObject;
 public interface Cache extends EObject {
 
 	/**
-	 * Returns a String to Type map.
-	 * 
-	 * @return a String to Type map
-	 * @model keyType="String" valueType="Type"
-	 */
-	EMap<String, Type> getTypeMap();
-
-	/**
 	 * Returns the type of the given object, first looking in the cache and if
 	 * not present the type is computed and added to the cache.
 	 * 
@@ -58,5 +51,22 @@ public interface Cache extends EObject {
 	 * @return the type of the given object
 	 */
 	Type getType(EObject eObject);
+
+	/**
+	 * Returns a String to Type map.
+	 * 
+	 * @return a String to Type map
+	 * @model keyType="String" valueType="Type"
+	 */
+	EMap<String, Type> getTypeMap();
+
+	/**
+	 * Returns all the types stored in this cache. This method should only be
+	 * called internally to make types belong to this cache.
+	 * 
+	 * @return all the types stored in this cache
+	 * @model containment="true"
+	 */
+	EList<Type> getTypes();
 
 }

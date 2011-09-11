@@ -9,12 +9,9 @@
       ecorePackage="Cache.ecore#/">
     <genClasses ecoreClass="Cache.ecore#//Cache">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Cache.ecore#//Cache/typeMap"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Cache.ecore#//Cache/types"/>
     </genClasses>
-    <genClasses ecoreClass="Cache.ecore#//CacheManager">
-      <genOperations ecoreOperation="Cache.ecore#//CacheManager/getCache">
-        <genParameters ecoreParameter="Cache.ecore#//CacheManager/getCache/eObject"/>
-      </genOperations>
-    </genClasses>
+    <genClasses ecoreClass="Cache.ecore#//CacheManager"/>
     <genClasses ecoreClass="Cache.ecore#//EStringToTypeMapEntry">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Cache.ecore#//EStringToTypeMapEntry/key"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Cache.ecore#//EStringToTypeMapEntry/value"/>

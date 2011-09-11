@@ -33,6 +33,7 @@ import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
 import java.io.File;
 
 import net.sf.orcc.OrccProjectNature;
+import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.util.Util;
@@ -54,7 +55,6 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.xtext.builder.IXtextBuilderParticipant;
 import org.eclipse.xtext.resource.IEObjectDescription;
 import org.eclipse.xtext.resource.IResourceDescription;
-import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.resource.IResourceDescription.Delta;
 
 /**
@@ -102,6 +102,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			if (delta.getNew() == null) {
 				// deletion
 				IResourceDescription desc = delta.getOld();
+				CacheManager.instance.removeCache(desc.getURI());
 				Util.removeCacheForURI(desc.getURI());
 				for (IEObjectDescription objDesc : desc
 						.getExportedObjectsByType(eINSTANCE.getAstActor())) {
@@ -112,7 +113,8 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			} else {
 				// creation
 				IResourceDescription desc = delta.getNew();
-				set.getLoadOptions().put(XtextResource.OPTION_RESOLVE_ALL, "true");
+
+				// load resource and compile
 				Resource resource = set.getResource(desc.getURI(), true);
 				for (EObject obj : resource.getContents()) {
 					if (obj.eClass()

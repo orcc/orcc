@@ -20,7 +20,8 @@ Require-Bundle: org.eclipse.xtext;bundle-version="2.0.0",
  org.eclipse.xtext.util
 Import-Package: org.apache.log4j
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: net.sf.orcc.cal,
+Export-Package: net.sf.orcc.cache,
+ net.sf.orcc.cal,
  net.sf.orcc.cal.cal,
  net.sf.orcc.cal.cal.impl,
  net.sf.orcc.cal.cal.util,

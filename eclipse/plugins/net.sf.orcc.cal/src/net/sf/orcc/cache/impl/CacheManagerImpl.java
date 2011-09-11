@@ -6,6 +6,7 @@
  */
 package net.sf.orcc.cache.impl;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,10 +24,10 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 
 /**
  * <!-- begin-user-doc --> An implementation of the model object '
@@ -38,9 +39,11 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
  */
 public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 
-	private Map<URI, Cache> cacheMap = new HashMap<URI, Cache>();
+	private final Map<URI, Cache> cacheMap = new HashMap<URI, Cache>();
 
-	private Map<URI, URI> uriMap = new HashMap<URI, URI>();
+	private final ResourceSet set = new ResourceSetImpl();
+
+	private final Map<URI, URI> uriMap = new HashMap<URI, URI>();
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -54,18 +57,17 @@ public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		String name = uri.segment(1);
 		IProject project = root.getProject(name);
-
 		IFolder folder = OrccUtil.getOutputFolder(project);
-		IPath outputPath = folder.getFullPath();
 
-		String nameNoExt = uri.trimFileExtension().lastSegment();
 		IPath path = new Path(uri.path());
 		path = path.removeFirstSegments(3).removeLastSegments(1);
 
-		URI cacheUri = URI.createPlatformResourceURI(outputPath.append(path)
-				.append("cache_" + nameNoExt).addFileExtension("xmi")
-				.toString(), true);
+		String nameNoExt = uri.trimFileExtension().lastSegment();
+		IPath outputPath = folder.getFullPath().append(path)
+				.append("cache_" + nameNoExt + ".xmi");
 
+		URI cacheUri = URI.createPlatformResourceURI(outputPath.toString(),
+				true);
 		return cacheUri;
 	}
 
@@ -79,25 +81,28 @@ public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 	}
 
 	@Override
-	public Cache getCache(EObject eObject) {
-		Resource resource = eObject.eResource();
+	public Cache getCache(Resource resource) {
 		URI uri = resource.getURI();
 		Cache cache = cacheMap.get(uri);
 		if (cache == null) {
 			// try to load the cache
 			URI cacheUri = getCacheURI(uri);
+			Resource cacheResource = set.getResource(cacheUri, false);
+			if (cacheResource == null) {
+				cacheResource = set.createResource(cacheUri);
 
-			ResourceSet set = resource.getResourceSet();
-			Resource cacheResource = set.getResource(cacheUri, true);
-			if (cacheResource.getContents().isEmpty()) {
-				// create cache
+				// create cache and save resource
 				cache = CacheFactory.eINSTANCE.createCache();
 				cacheResource.getContents().add(cache);
-			} else {
-				// retrieve cache
-				cache = (Cache) cacheResource.getContents().get(0);
+				try {
+					cacheResource.save(null);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 
+			// retrieve cache
+			cache = (Cache) cacheResource.getContents().get(0);
 			cacheMap.put(uri, cache);
 		}
 
@@ -112,6 +117,48 @@ public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 		}
 
 		return cacheUri;
+	}
+
+	@Override
+	public void removeCache(Resource resource) {
+		URI uri = resource.getURI();
+		removeCache(uri);
+	}
+
+	@Override
+	public void removeCache(URI uri) {
+		// removes the cache from the map
+		cacheMap.remove(uri);
+
+		// get the cache URI to delete the resource in which the cache was
+		// serialized (if it exists)
+		URI cacheUri = getCacheURI(uri);
+		Resource cacheResource = set.getResource(cacheUri, false);
+		if (cacheResource != null) {
+			try {
+				cacheResource.delete(null);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	@Override
+	public void saveCache(Resource resource) {
+		URI uri = resource.getURI();
+		Cache cache = cacheMap.remove(uri);
+		if (cache != null) {
+			// get the cache URI to save the resource to which the cache belongs
+			URI cacheUri = getCacheURI(uri);
+			Resource cacheResource = set.getResource(cacheUri, false);
+			if (cacheResource != null) {
+				try {
+					cacheResource.save(null);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 }

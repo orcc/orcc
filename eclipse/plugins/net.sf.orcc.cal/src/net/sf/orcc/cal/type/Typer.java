@@ -30,8 +30,10 @@ package net.sf.orcc.cal.type;
 
 import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstExpressionBinary;
@@ -48,12 +50,22 @@ import net.sf.orcc.cal.cal.AstExpressionUnary;
 import net.sf.orcc.cal.cal.AstExpressionVariable;
 import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstGenerator;
+import net.sf.orcc.cal.cal.AstInputPattern;
 import net.sf.orcc.cal.cal.AstOutputPattern;
+import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstStatementAssign;
 import net.sf.orcc.cal.cal.AstStatementCall;
 import net.sf.orcc.cal.cal.AstStatementForeach;
+import net.sf.orcc.cal.cal.AstType;
+import net.sf.orcc.cal.cal.AstTypeBool;
+import net.sf.orcc.cal.cal.AstTypeFloat;
+import net.sf.orcc.cal.cal.AstTypeInt;
+import net.sf.orcc.cal.cal.AstTypeList;
+import net.sf.orcc.cal.cal.AstTypeString;
+import net.sf.orcc.cal.cal.AstTypeUint;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.AstVariableReference;
+import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.services.AstExpressionEvaluator;
@@ -145,7 +157,7 @@ public class Typer extends CalSwitch<Type> {
 			index++;
 		}
 
-		return type;
+		return EcoreUtil.copy(type);
 	}
 
 	@Override
@@ -222,7 +234,7 @@ public class Typer extends CalSwitch<Type> {
 			errorIdx++;
 		}
 
-		return type;
+		return EcoreUtil.copy(type);
 	}
 
 	@Override
@@ -317,10 +329,107 @@ public class Typer extends CalSwitch<Type> {
 	}
 
 	@Override
+	public Type caseAstFunction(AstFunction function) {
+		return doSwitch(function.getType());
+	}
+
+	@Override
 	public Type caseAstGenerator(AstGenerator expression) {
 		error("cannot evaluate generator", expression,
 				eINSTANCE.getAstGenerator_Variable(), -1);
 		return null;
+	}
+
+	@Override
+	public Type caseAstPort(AstPort port) {
+		return doSwitch(port.getType());
+	}
+
+	@Override
+	public Type caseAstTypeBool(AstTypeBool type) {
+		return IrFactory.eINSTANCE.createTypeBool();
+	}
+
+	@Override
+	public Type caseAstTypeFloat(AstTypeFloat type) {
+		return IrFactory.eINSTANCE.createTypeFloat();
+	}
+
+	@Override
+	public Type caseAstTypeInt(AstTypeInt type) {
+		AstExpression astSize = type.getSize();
+		int size;
+		if (astSize == null) {
+			size = 32;
+		} else {
+			size = new AstExpressionEvaluator(errors)
+					.evaluateAsInteger(astSize);
+		}
+		return IrFactory.eINSTANCE.createTypeInt(size);
+	}
+
+	@Override
+	public Type caseAstTypeList(AstTypeList listType) {
+		Type type = doSwitch(listType.getType());
+		AstExpression expression = listType.getSize();
+		Expression size = new AstExpressionEvaluator(errors)
+				.evaluate(expression);
+		size = EcoreUtil.copy(size);
+		return IrFactory.eINSTANCE.createTypeList(size, type);
+	}
+
+	@Override
+	public Type caseAstTypeString(AstTypeString type) {
+		return IrFactory.eINSTANCE.createTypeString();
+	}
+
+	@Override
+	public Type caseAstTypeUint(AstTypeUint type) {
+		AstExpression astSize = type.getSize();
+		int size;
+		if (astSize == null) {
+			size = 32;
+		} else {
+			size = new AstExpressionEvaluator(errors)
+					.evaluateAsInteger(astSize);
+		}
+
+		return IrFactory.eINSTANCE.createTypeUint(size);
+	};
+
+	@Override
+	public Type caseAstVariable(AstVariable variable) {
+		AstType astType;
+		List<AstExpression> dimensions;
+
+		if (variable.eContainer() instanceof AstInputPattern) {
+			AstInputPattern pattern = (AstInputPattern) variable.eContainer();
+			astType = EcoreUtil.copy(pattern.getPort().getType());
+			dimensions = new ArrayList<AstExpression>();
+			AstExpression repeat = pattern.getRepeat();
+			if (repeat != null) {
+				dimensions.add(repeat);
+			}
+		} else {
+			astType = EcoreUtil.copy(variable.getType());
+			dimensions = variable.getDimensions();
+		}
+
+		// convert the type of the variable
+		ListIterator<AstExpression> it = dimensions.listIterator(dimensions
+				.size());
+		while (it.hasPrevious()) {
+			AstExpression expression = it.previous();
+
+			AstTypeList newAstType = CalFactory.eINSTANCE.createAstTypeList();
+			AstExpression size = EcoreUtil.copy(expression);
+			newAstType.setSize(size);
+			newAstType.setType(astType);
+
+			astType = newAstType;
+		}
+
+		return doSwitch(astType);
 	}
 
 	/**
@@ -482,7 +591,6 @@ public class Typer extends CalSwitch<Type> {
 		Typer checker = new Typer(errors);
 		checker.setTargetType(expression);
 		Type type = checker.doSwitch(expression);
-		Util.putType(expression, type);
 		return type;
 	}
 
@@ -701,7 +809,7 @@ public class Typer extends CalSwitch<Type> {
 		}
 
 		return null;
-	};
+	}
 
 	/**
 	 * Returns the type for a left shift whose left operand has type t1 and

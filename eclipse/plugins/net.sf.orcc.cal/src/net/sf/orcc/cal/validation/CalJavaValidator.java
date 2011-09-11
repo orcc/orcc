@@ -31,6 +31,7 @@ package net.sf.orcc.cal.validation;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpression;
@@ -43,12 +44,9 @@ import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.AstVariableReference;
 import net.sf.orcc.cal.services.AstExpressionEvaluator;
 import net.sf.orcc.cal.type.TypeCycleDetector;
-import net.sf.orcc.cal.type.TypeTransformer;
-import net.sf.orcc.cal.type.Typer;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.cal.util.VoidSwitch;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Type;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -125,58 +123,6 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 	}
 
-	public class FullAstTyper extends VoidSwitch {
-
-		private List<ValidationError> errors;
-
-		private List<EObject> seen;
-
-		/**
-		 * Creates a new type checker.
-		 */
-		public FullAstTyper(List<ValidationError> errors) {
-			this.errors = errors;
-			seen = new ArrayList<EObject>();
-		}
-
-		@Override
-		public Void caseAstExpression(AstExpression expression) {
-			// only type if it has not been done before
-			if (Util.getType(expression) == null) {
-				Type type = new Typer(errors).getType(expression);
-				Util.putType(expression, type);
-			}
-			return null;
-		}
-
-		@Override
-		public Void caseAstExpressionCall(AstExpressionCall call) {
-			AstFunction function = call.getFunction();
-			if (!seen.contains(function)) {
-				seen.add(function);
-				doSwitch(function);
-			}
-			return super.caseAstExpressionCall(call);
-		}
-
-		@Override
-		public Void caseAstStatementCall(AstStatementCall call) {
-			AstProcedure procedure = call.getProcedure();
-			if (!seen.contains(procedure)) {
-				doSwitch(procedure);
-				seen.add(procedure);
-			}
-			return super.caseAstStatementCall(call);
-		}
-
-		@Override
-		public Void caseAstVariableReference(AstVariableReference reference) {
-			doSwitch(reference.getVariable());
-			return null;
-		}
-
-	}
-
 	@Inject
 	private StructuralValidator structuralValidator;
 
@@ -206,15 +152,11 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		// empty cache
 		Util.removeCacheForURI(EcoreUtil.getURI(entity));
 
+		// clear cache associated with entry
+		CacheManager.instance.removeCache(entity.eResource());
+
 		// evaluates constants and initial value of state variables
 		new FullAstEvaluator(errors).doSwitch(entity);
-
-		// converts all types
-		// will evaluate expressions when necessary
-		new TypeTransformer(errors).doSwitch(entity);
-
-		// then type every expression
-		new FullAstTyper(errors).doSwitch(entity);
 
 		// finally, perform structural validation and type checking
 		structuralValidator.validate(entity, getChain(), getContext());

@@ -33,6 +33,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.cache.Cache;
+import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstVariable;
@@ -55,7 +57,7 @@ import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
  */
 public class Util {
 
-	private static class Cache<T> {
+	private static class CacheUtil<T> {
 
 		private Map<String, Map<String, T>> map = new HashMap<String, Map<String, T>>();
 
@@ -86,11 +88,9 @@ public class Util {
 		}
 	}
 
-	private static Cache<Integer> cacheIntValue = new Cache<Integer>();
+	private static CacheUtil<Integer> cacheIntValue = new CacheUtil<Integer>();
 
-	private static Cache<Type> cacheType = new Cache<Type>();
-
-	private static Cache<Expression> cacheValue = new Cache<Expression>();
+	private static CacheUtil<Expression> cacheValue = new CacheUtil<Expression>();
 
 	public static int getIntValue(AstExpression expr) {
 		Integer intValue = cacheIntValue.get(expr);
@@ -162,7 +162,8 @@ public class Util {
 	 * @return the type of the given object
 	 */
 	public static Type getType(EObject eObject) {
-		return cacheType.get(eObject);
+		Cache cache = CacheManager.instance.getCache(eObject.eResource());
+		return cache.getType(eObject);
 	}
 
 	/**
@@ -190,24 +191,11 @@ public class Util {
 		return cacheValue.get(variable);
 	}
 
-	/**
-	 * Stores the type of the given object using its URI.
-	 * 
-	 * @param eObject
-	 *            an AST node
-	 * @param type
-	 *            the type of the object
-	 */
-	public static void putType(EObject eObject, Type type) {
-		cacheType.put(eObject, type);
-	}
-
 	public static void putValue(AstVariable variable, Expression value) {
 		cacheValue.put(variable, value);
 	}
 
 	public static void removeCacheForURI(URI uri) {
-		cacheType.removeEntries(uri);
 		cacheValue.removeEntries(uri);
 		cacheIntValue.removeEntries(uri);
 	}

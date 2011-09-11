@@ -17,7 +17,6 @@ import net.sf.orcc.moc.MocPackage;
 
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EcorePackage;
@@ -140,6 +139,7 @@ public class CachePackageImpl extends EPackageImpl implements CachePackage {
 		// Create classes and their features
 		cacheEClass = createEClass(CACHE);
 		createEReference(cacheEClass, CACHE__TYPE_MAP);
+		createEReference(cacheEClass, CACHE__TYPES);
 
 		cacheManagerEClass = createEClass(CACHE_MANAGER);
 
@@ -162,6 +162,15 @@ public class CachePackageImpl extends EPackageImpl implements CachePackage {
 	 */
 	public EReference getCache_TypeMap() {
 		return (EReference)cacheEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getCache_Types() {
+		return (EReference)cacheEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -221,8 +230,8 @@ public class CachePackageImpl extends EPackageImpl implements CachePackage {
 		setNsURI(eNS_URI);
 
 		// Obtain other dependent packages
-		EcorePackage theEcorePackage = (EcorePackage)EPackage.Registry.INSTANCE.getEPackage(EcorePackage.eNS_URI);
 		IrPackage theIrPackage = (IrPackage)EPackage.Registry.INSTANCE.getEPackage(IrPackage.eNS_URI);
+		EcorePackage theEcorePackage = (EcorePackage)EPackage.Registry.INSTANCE.getEPackage(EcorePackage.eNS_URI);
 
 		// Create type parameters
 
@@ -233,11 +242,9 @@ public class CachePackageImpl extends EPackageImpl implements CachePackage {
 		// Initialize classes and features; add operations and parameters
 		initEClass(cacheEClass, Cache.class, "Cache", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getCache_TypeMap(), this.getEStringToTypeMapEntry(), null, "typeMap", null, 0, -1, Cache.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getCache_Types(), theIrPackage.getType(), null, "types", null, 0, -1, Cache.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(cacheManagerEClass, CacheManager.class, "CacheManager", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-
-		EOperation op = addEOperation(cacheManagerEClass, this.getCache(), "getCache", 0, 1, IS_UNIQUE, IS_ORDERED);
-		addEParameter(op, theEcorePackage.getEObject(), "eObject", 0, 1, IS_UNIQUE, IS_ORDERED);
 
 		initEClass(eStringToTypeMapEntryEClass, Map.Entry.class, "EStringToTypeMapEntry", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getEStringToTypeMapEntry_Key(), theEcorePackage.getEString(), "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

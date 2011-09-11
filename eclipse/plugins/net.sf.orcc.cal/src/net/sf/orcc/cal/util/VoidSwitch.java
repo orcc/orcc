@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.cal.util;
 
-import org.eclipse.emf.ecore.EObject;
-
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
@@ -69,6 +67,8 @@ import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.AstVariableReference;
 import net.sf.orcc.cal.cal.util.CalSwitch;
+
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines a basic switch that visits everything. Case methods should

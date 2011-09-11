@@ -56,6 +56,13 @@ public interface CachePackage extends EPackage {
 		 */
 		EReference CACHE__TYPE_MAP = eINSTANCE.getCache_TypeMap();
 		/**
+		 * The meta object literal for the '<em><b>Types</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference CACHE__TYPES = eINSTANCE.getCache_Types();
+		/**
 		 * The meta object literal for the '{@link net.sf.orcc.cache.impl.CacheManagerImpl <em>Manager</em>}' class.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.cache.impl.CacheManagerImpl
@@ -106,13 +113,22 @@ public interface CachePackage extends EPackage {
 	int CACHE__TYPE_MAP = 0;
 
 	/**
+	 * The feature id for the '<em><b>Types</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CACHE__TYPES = 1;
+
+	/**
 	 * The number of structural features of the '<em>Cache</em>' class. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int CACHE_FEATURE_COUNT = 1;
+	int CACHE_FEATURE_COUNT = 2;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.cache.impl.CacheManagerImpl <em>Manager</em>}' class.
@@ -218,6 +234,17 @@ public interface CachePackage extends EPackage {
 	 * @generated
 	 */
 	EReference getCache_TypeMap();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.cache.Cache#getTypes <em>Types</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Types</em>'.
+	 * @see net.sf.orcc.cache.Cache#getTypes()
+	 * @see #getCache()
+	 * @generated
+	 */
+	EReference getCache_Types();
 
 	/**
 	 * Returns the factory that creates the instances of the model. <!--

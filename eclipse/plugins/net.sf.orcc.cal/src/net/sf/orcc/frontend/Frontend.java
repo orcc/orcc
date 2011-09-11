@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstUnit;
@@ -84,6 +85,8 @@ public class Frontend {
 	 * @throws OrccException
 	 */
 	public Entity compile(AstEntity entity) {
+		CacheManager.instance.saveCache(entity.eResource());
+		
 		AstActor astActor = entity.getActor();
 		if (astActor != null) {
 			Actor actor = (Actor) mapAstToIr.get(astActor);
