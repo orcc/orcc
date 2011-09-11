@@ -13,4 +13,5 @@ Require-Bundle: net.sf.orcc.cal,
  org.eclipse.xtext,
  org.eclipse.xtext.junit4,
  org.eclipse.xtext.ui.junit,
- org.junit4
+ org.junit4,
+ org.eclipse.jdt.core;bundle-version="3.7.0"

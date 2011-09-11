@@ -1,9 +1,11 @@
 package net.sf.orcc.cal;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.Assert;
+import net.sf.orcc.OrccProjectNature;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.util.Util;
@@ -12,15 +14,21 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.util.OrccUtil;
 
+import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.xtext.diagnostics.Severity;
 import org.eclipse.xtext.junit4.InjectWith;
 import org.eclipse.xtext.junit4.XtextRunner;
@@ -40,12 +48,16 @@ import com.google.inject.Inject;
 @InjectWith(CalInjectorProvider.class)
 public class AllTests {
 
+	private static final String projectPrefix = "/Tests/src/";
+
 	private static final String prefix = "net/sf/orcc/cal/test/";
 
 	private IFolder outputFolder;
 
 	@Inject
 	private ParseHelper<AstEntity> parser;
+
+	private static final String projectName = "Tests";
 
 	private XtextResourceSet resourceSet;
 
@@ -55,7 +67,48 @@ public class AllTests {
 				Boolean.TRUE);
 
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		outputFolder = root.getFolder(new Path("/net.sf.orcc.cal.tests/bin"));
+		IProject project = root.getProject(projectName);
+		if (!project.exists()) {
+			IWorkspace workspace = ResourcesPlugin.getWorkspace();
+			try {
+				IProjectDescription description = workspace
+						.newProjectDescription(projectName);
+
+				String[] natures = description.getNatureIds();
+				String[] newNatures = new String[natures.length + 2];
+
+				// add new natures
+				System.arraycopy(natures, 0, newNatures, 2, natures.length);
+				newNatures[0] = OrccProjectNature.NATURE_ID;
+				newNatures[1] = JavaCore.NATURE_ID;
+				description.setNatureIds(newNatures);
+
+				project.create(description, null);
+
+				// retrieves the up-to-date description
+				project.open(null);
+				description = project.getDescription();
+
+				// filters out the Java builder
+				ICommand[] commands = description.getBuildSpec();
+				List<ICommand> buildSpec = new ArrayList<ICommand>(
+						commands.length);
+				for (ICommand command : commands) {
+					if (!JavaCore.BUILDER_ID.equals(command.getBuilderName())) {
+						buildSpec.add(command);
+					}
+				}
+
+				// updates the description and replaces the existing description
+				description.setBuildSpec(buildSpec.toArray(new ICommand[0]));
+				project.setDescription(description, null);
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		// update output folder
+		outputFolder = OrccUtil.getOutputFolder(project);
 	}
 
 	/**
@@ -207,7 +260,7 @@ public class AllTests {
 	private AstEntity parseAndValidate(String name) {
 		InputStream in = Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream(name);
-		URI uri = URI.createPlatformResourceURI(name, true);
+		URI uri = URI.createPlatformResourceURI(projectPrefix + name, true);
 		AstEntity entity = parser.parse(in, uri, null, resourceSet);
 
 		boolean isValid = true;
