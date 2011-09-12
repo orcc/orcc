@@ -153,7 +153,7 @@ public class Typer extends CalSwitch<Type> {
 		return type;
 	}
 
-	private int maxSize;
+	private Type boundType;
 
 	@Override
 	public Type caseAstExpressionBinary(AstExpressionBinary expression) {
@@ -433,18 +433,16 @@ public class Typer extends CalSwitch<Type> {
 			break;
 		}
 
-		// clips the size
-		if (size > maxSize) {
-			size = maxSize;
-		}
-
 		if (type != null) {
 			if (type.isInt()) {
-				TypeInt typeInt = (TypeInt) type;
-				typeInt.setSize(size);
+				((TypeInt) type).setSize(size);
 			} else if (type.isUint()) {
-				TypeUint typeUint = (TypeUint) type;
-				typeUint.setSize(size);
+				((TypeUint) type).setSize(size);
+			}
+
+			Type maxType = TypeUtil.getGlb(type, boundType);
+			if (maxType != null) {
+				type = maxType;
 			}
 		}
 
@@ -654,6 +652,8 @@ public class Typer extends CalSwitch<Type> {
 		}
 
 		int size;
+		int maxSize = boundType.getSizeInBits();
+
 		// 1 << 6 = 64
 		if (shift >= 6) {
 			size = maxSize;
@@ -713,7 +713,7 @@ public class Typer extends CalSwitch<Type> {
 
 			case CalPackage.AST_STATEMENT_ASSIGN: {
 				AstStatementAssign assign = (AstStatementAssign) cter;
-				if (expression.eContainer() == assign.getValue()) {
+				if (expression == assign.getValue()) {
 					// expression is located in the value
 					targetType = getType(assign.getTarget().getVariable());
 				} else {
@@ -747,9 +747,9 @@ public class Typer extends CalSwitch<Type> {
 		if (targetType == null) {
 			// in expressions contained in other expressions, and in if & while
 			// conditions, guard expressions, calls to built-in functions
-			maxSize = 32;
+			boundType = IrFactory.eINSTANCE.createTypeInt(32);
 		} else {
-			maxSize = targetType.getSizeInBits();
+			boundType = targetType;
 		}
 	}
 
