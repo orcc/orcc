@@ -241,7 +241,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 				if (subType != null && (subType.isInt() || subType.isUint())) {
 					type = ((TypeList) type).getType();
 				} else {
-					error("index must be an integer", index,
+					error("index must be an integer", expression,
 							eINSTANCE.getAstExpressionIndex_Indexes(), errorIdx);
 				}
 			} else {
@@ -492,17 +492,20 @@ public class TypeValidator extends AbstractCalJavaValidator {
 			break;
 
 		case PLUS:
-			if (t1.isString() && t2.isList()) {
-				error("Cannot convert " + t2 + " to String", source, feature,
-						index);
-			}
-			if (t2.isString() && t1.isList()) {
-				error("Cannot convert " + t1 + " to String", source, feature,
-						index);
-			}
-			if (t1.isBool() && !t2.isString() || !t1.isString() && t2.isBool()) {
-				error("Addition is not defined for booleans", source, feature,
-						index);
+			if (t1 != null && t2 != null) {
+				if (t1.isString() && t2.isList()) {
+					error("Cannot convert " + t2 + " to String", source,
+							feature, index);
+				}
+				if (t2.isString() && t1.isList()) {
+					error("Cannot convert " + t1 + " to String", source,
+							feature, index);
+				}
+				if (t1.isBool() && !t2.isString() || !t1.isString()
+						&& t2.isBool()) {
+					error("Addition is not defined for booleans", source,
+							feature, index);
+				}
 			}
 			break;
 
