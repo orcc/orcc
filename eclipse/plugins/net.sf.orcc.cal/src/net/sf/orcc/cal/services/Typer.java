@@ -122,8 +122,10 @@ public class Typer extends CalSwitch<Type> {
 
 			if (type == null) {
 				type = new Typer().doSwitch(eObject);
-				cache.getTypes().add(type);
-				cache.getTypesMap().put(fragment, type);
+				if (type != null) {
+					cache.getTypes().add(type);
+					cache.getTypesMap().put(fragment, type);
+				}
 			}
 		}
 
@@ -178,7 +180,8 @@ public class Typer extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstExpressionElsif(AstExpressionElsif expression) {
-		return getType(expression.getThen());
+		Type type = getType(expression.getThen());
+		return EcoreUtil.copy(type);
 	}
 
 	@Override
@@ -262,15 +265,14 @@ public class Typer extends CalSwitch<Type> {
 
 		switch (op) {
 		case BITNOT:
-			return type;
 		case LOGIC_NOT:
-			return type;
+			return EcoreUtil.copy(type);
 		case MINUS:
 			if (type.isUint()) {
 				return IrFactory.eINSTANCE.createTypeInt(((TypeUint) type)
 						.getSize());
 			}
-			return type;
+			return EcoreUtil.copy(type);
 		case NUM_ELTS:
 			if (!type.isList()) {
 				return IrFactory.eINSTANCE.createTypeInt(1);
@@ -286,7 +288,7 @@ public class Typer extends CalSwitch<Type> {
 	@Override
 	public Type caseAstExpressionVariable(AstExpressionVariable expression) {
 		AstVariable variable = expression.getValue().getVariable();
-		return getType(variable);
+		return EcoreUtil.copy(getType(variable));
 	}
 
 	@Override
@@ -589,10 +591,10 @@ public class Typer extends CalSwitch<Type> {
 		case DIV:
 		case DIV_INT:
 		case SHIFT_RIGHT:
-			return t1;
+			return EcoreUtil.copy(t1);
 
 		case MOD:
-			return t2;
+			return EcoreUtil.copy(t2);
 
 		case SHIFT_LEFT:
 			return getTypeShiftLeft(t1, t2, source, feature, index);

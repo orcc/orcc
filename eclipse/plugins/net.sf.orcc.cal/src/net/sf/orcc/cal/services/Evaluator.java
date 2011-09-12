@@ -318,7 +318,7 @@ public class Evaluator extends CalSwitch<Expression> {
 	public Expression caseAstExpressionVariable(AstExpressionVariable expression) {
 		AstVariable variable = expression.getValue().getVariable();
 		Expression value = getValue(variable);
-		return value;
+		return EcoreUtil.copy(value);
 	}
 
 	@Override
