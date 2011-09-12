@@ -55,6 +55,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.Invocation;
 import net.sf.orcc.moc.MocFactory;
@@ -229,12 +230,12 @@ public class ActorMerger implements INetworkTransformation {
 			indexes.add(factory.createExprInt(0));
 			InstStore store = factory.createInstStore(0, target, indexes,
 					factory.createExprVar(tmpVar));
-			NodeBlock node = procedure.getLast(nodes);
+			NodeBlock node = IrUtil.getLast(nodes);
 			node.add(load);
 			node.add(store);
 		} else {
 			Var loop = procedure.getLocal("idx_0");
-			NodeBlock block = procedure.getLast(nodes);
+			NodeBlock block = IrUtil.getLast(nodes);
 			block.add(factory.createInstAssign(loop, factory.createExprInt(0)));
 
 			Expression condition = factory.createExprBinary(
@@ -254,7 +255,7 @@ public class ActorMerger implements INetworkTransformation {
 			indexes.add(factory.createExprVar(loop));
 			InstStore store = factory.createInstStore(0, target, indexes,
 					factory.createExprVar(tmpVar));
-			NodeBlock childBlock = procedure.getLast(nodeWhile.getNodes());
+			NodeBlock childBlock = IrUtil.getLast(nodeWhile.getNodes());
 			childBlock.add(load);
 			childBlock.add(store);
 
@@ -423,7 +424,7 @@ public class ActorMerger implements INetworkTransformation {
 					List<Node> nodes = body.getNodes();
 					proc.getLocals().addAll(body.getLocals());
 					proc.getNodes().addAll(nodes);
-					proc.getLast(nodes).add(factory.createInstReturn());
+					IrUtil.getLast(nodes).add(factory.createInstReturn());
 					superActor.getProcs().add(proc);
 					new ChangeFifoArrayAccess(action.getInputPattern(),
 							action.getOutputPattern(), buffersMap)
@@ -526,7 +527,7 @@ public class ActorMerger implements INetworkTransformation {
 			if (iterand.isVertex()) {
 				Instance instance = iterand.getVertex().getInstance();
 				CSDFMoC moc = (CSDFMoC) instance.getMoC();
-				NodeBlock block = procedure.getLast(nodes);
+				NodeBlock block = IrUtil.getLast(nodes);
 				for (Invocation invocation : moc.getInvocations()) {
 					Action action = invocation.getAction();
 					Procedure proc = superActor.getProcedure(instance.getId()
@@ -541,7 +542,7 @@ public class ActorMerger implements INetworkTransformation {
 				Var loopVar = procedure.getLocal("idx_" + depth);
 
 				// init counter
-				NodeBlock block = procedure.getLast(nodes);
+				NodeBlock block = IrUtil.getLast(nodes);
 				block.add(factory.createInstAssign(loopVar,
 						factory.createExprInt(0)));
 
@@ -566,7 +567,7 @@ public class ActorMerger implements INetworkTransformation {
 						factory.createExprVar(loopVar), OpBinary.PLUS,
 						factory.createExprInt(1), factory.createTypeInt(32));
 				InstAssign assign = factory.createInstAssign(loopVar, expr);
-				procedure.getLast(nodeWhile.getNodes()).add(assign);
+				IrUtil.getLast(nodeWhile.getNodes()).add(assign);
 			}
 		}
 	}

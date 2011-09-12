@@ -103,11 +103,11 @@ public class PhiRemoval extends AbstractActorVisitor<Object> {
 	@Override
 	public Object caseNodeIf(NodeIf node) {
 		NodeBlock join = node.getJoinNode();
-		targetBlock = procedure.getLast(node.getThenNodes());
+		targetBlock = IrUtil.getLast(node.getThenNodes());
 		phiIndex = 0;
 		caseNodeBlock(join);
 
-		targetBlock = procedure.getLast(node.getElseNodes());
+		targetBlock = IrUtil.getLast(node.getElseNodes());
 		phiIndex = 1;
 		caseNodeBlock(join);
 		new PhiRemover().caseNodeBlock(join);
@@ -139,7 +139,7 @@ public class PhiRemoval extends AbstractActorVisitor<Object> {
 		caseNodeBlock(join);
 
 		// last node of the while
-		targetBlock = procedure.getLast(node.getNodes());
+		targetBlock = IrUtil.getLast(node.getNodes());
 		phiIndex = 1;
 		caseNodeBlock(join);
 		new PhiRemover().caseNodeBlock(join);

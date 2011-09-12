@@ -13,6 +13,16 @@ actor Elsif() ==> :
 		else
 			print("error3");
 		end
+
+		if false then
+			print("error4");
+		elsif false then
+			print("error5");
+		elsif false then
+			print("error6");
+		else
+			print("ok");
+		end
 	end
 
 end

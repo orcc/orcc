@@ -200,7 +200,7 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 				currentPredicate.add(IrUtil.copy(condition));
 			}
 
-			return procedure.getLast(parentNodes);
+			return IrUtil.getLast(parentNodes);
 		}
 	}
 

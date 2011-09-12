@@ -8,7 +8,6 @@ package net.sf.orcc.ir.impl;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.ir.CFG;
@@ -20,6 +19,7 @@ import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.ir.util.MapAdapter;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -38,21 +38,74 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getLineNumber <em>Line Number</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getLocals <em>Locals</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getName <em>Name</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#isNative <em>Native</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getNodes <em>Nodes</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getParameters <em>Parameters</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getReturnType <em>Return Type</em>}</li>
+ * <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getLineNumber <em>Line Number
+ * </em>}</li>
+ * <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getLocals <em>Locals</em>}</li>
+ * <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getName <em>Name</em>}</li>
+ * <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#isNative <em>Native</em>}</li>
+ * <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getNodes <em>Nodes</em>}</li>
+ * <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getParameters <em>Parameters
+ * </em>}</li>
+ * <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getReturnType <em>Return Type
+ * </em>}</li>
  * </ul>
  * </p>
- *
+ * 
  * @generated
  */
 public class ProcedureImpl extends EObjectImpl implements Procedure {
 
+	/**
+	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}'
+	 * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getLineNumber()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final int LINE_NUMBER_EDEFAULT = 0;
+
+	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
+
+	/**
+	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #isNative()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean NATIVE_EDEFAULT = false;
+
 	private CFG graph;
+
+	/**
+	 * The cached value of the '{@link #getLineNumber() <em>Line Number</em>}'
+	 * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getLineNumber()
+	 * @generated
+	 * @ordered
+	 */
+	protected int lineNumber = LINE_NUMBER_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getLocals() <em>Locals</em>}'
+	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getLocals()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Var> locals;
 
 	/**
 	 * A map from name to index in the locals list.
@@ -61,47 +114,10 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 
 	private Map<String, Var> mapParameters;
 
-	private Expression result;
-
-	/**
-	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getLineNumber()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final int LINE_NUMBER_EDEFAULT = 0;
-
-	/**
-	 * The cached value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getLineNumber()
-	 * @generated
-	 * @ordered
-	 */
-	protected int lineNumber = LINE_NUMBER_EDEFAULT;
-
-	/**
-	 * The cached value of the '{@link #getLocals() <em>Locals</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getLocals()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Var> locals;
-
-	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String NAME_EDEFAULT = null;
-
 	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -109,17 +125,9 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	protected String name = NAME_EDEFAULT;
 
 	/**
-	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isNative()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean NATIVE_EDEFAULT = false;
-
-	/**
 	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #isNative()
 	 * @generated
 	 * @ordered
@@ -127,8 +135,9 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	protected boolean native_ = NATIVE_EDEFAULT;
 
 	/**
-	 * The cached value of the '{@link #getNodes() <em>Nodes</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getNodes() <em>Nodes</em>}' containment
+	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getNodes()
 	 * @generated
 	 * @ordered
@@ -136,17 +145,21 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	protected EList<Node> nodes;
 
 	/**
-	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}'
+	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getParameters()
 	 * @generated
 	 * @ordered
 	 */
 	protected EList<Var> parameters;
 
+	private Expression result;
+
 	/**
-	 * The cached value of the '{@link #getReturnType() <em>Return Type</em>}' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getReturnType() <em>Return Type</em>}'
+	 * containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getReturnType()
 	 * @generated
 	 * @ordered
@@ -168,6 +181,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public NotificationChain basicSetReturnType(Type newReturnType,
@@ -175,120 +189,132 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 		Type oldReturnType = returnType;
 		returnType = newReturnType;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.PROCEDURE__RETURN_TYPE, oldReturnType, newReturnType);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.PROCEDURE__RETURN_TYPE,
+					oldReturnType, newReturnType);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.PROCEDURE__LINE_NUMBER:
-				return getLineNumber();
-			case IrPackage.PROCEDURE__LOCALS:
-				return getLocals();
-			case IrPackage.PROCEDURE__NAME:
-				return getName();
-			case IrPackage.PROCEDURE__NATIVE:
-				return isNative();
-			case IrPackage.PROCEDURE__NODES:
-				return getNodes();
-			case IrPackage.PROCEDURE__PARAMETERS:
-				return getParameters();
-			case IrPackage.PROCEDURE__RETURN_TYPE:
-				return getReturnType();
+		case IrPackage.PROCEDURE__LINE_NUMBER:
+			return getLineNumber();
+		case IrPackage.PROCEDURE__LOCALS:
+			return getLocals();
+		case IrPackage.PROCEDURE__NAME:
+			return getName();
+		case IrPackage.PROCEDURE__NATIVE:
+			return isNative();
+		case IrPackage.PROCEDURE__NODES:
+			return getNodes();
+		case IrPackage.PROCEDURE__PARAMETERS:
+			return getParameters();
+		case IrPackage.PROCEDURE__RETURN_TYPE:
+			return getReturnType();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrPackage.PROCEDURE__LOCALS:
-				return ((InternalEList<?>)getLocals()).basicRemove(otherEnd, msgs);
-			case IrPackage.PROCEDURE__NODES:
-				return ((InternalEList<?>)getNodes()).basicRemove(otherEnd, msgs);
-			case IrPackage.PROCEDURE__PARAMETERS:
-				return ((InternalEList<?>)getParameters()).basicRemove(otherEnd, msgs);
-			case IrPackage.PROCEDURE__RETURN_TYPE:
-				return basicSetReturnType(null, msgs);
+		case IrPackage.PROCEDURE__LOCALS:
+			return ((InternalEList<?>) getLocals()).basicRemove(otherEnd, msgs);
+		case IrPackage.PROCEDURE__NODES:
+			return ((InternalEList<?>) getNodes()).basicRemove(otherEnd, msgs);
+		case IrPackage.PROCEDURE__PARAMETERS:
+			return ((InternalEList<?>) getParameters()).basicRemove(otherEnd,
+					msgs);
+		case IrPackage.PROCEDURE__RETURN_TYPE:
+			return basicSetReturnType(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.PROCEDURE__LINE_NUMBER:
-				return lineNumber != LINE_NUMBER_EDEFAULT;
-			case IrPackage.PROCEDURE__LOCALS:
-				return locals != null && !locals.isEmpty();
-			case IrPackage.PROCEDURE__NAME:
-				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
-			case IrPackage.PROCEDURE__NATIVE:
-				return native_ != NATIVE_EDEFAULT;
-			case IrPackage.PROCEDURE__NODES:
-				return nodes != null && !nodes.isEmpty();
-			case IrPackage.PROCEDURE__PARAMETERS:
-				return parameters != null && !parameters.isEmpty();
-			case IrPackage.PROCEDURE__RETURN_TYPE:
-				return returnType != null;
+		case IrPackage.PROCEDURE__LINE_NUMBER:
+			return lineNumber != LINE_NUMBER_EDEFAULT;
+		case IrPackage.PROCEDURE__LOCALS:
+			return locals != null && !locals.isEmpty();
+		case IrPackage.PROCEDURE__NAME:
+			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
+					.equals(name);
+		case IrPackage.PROCEDURE__NATIVE:
+			return native_ != NATIVE_EDEFAULT;
+		case IrPackage.PROCEDURE__NODES:
+			return nodes != null && !nodes.isEmpty();
+		case IrPackage.PROCEDURE__PARAMETERS:
+			return parameters != null && !parameters.isEmpty();
+		case IrPackage.PROCEDURE__RETURN_TYPE:
+			return returnType != null;
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.PROCEDURE__LINE_NUMBER:
-				setLineNumber((Integer)newValue);
-				return;
-			case IrPackage.PROCEDURE__LOCALS:
-				getLocals().clear();
-				getLocals().addAll((Collection<? extends Var>)newValue);
-				return;
-			case IrPackage.PROCEDURE__NAME:
-				setName((String)newValue);
-				return;
-			case IrPackage.PROCEDURE__NATIVE:
-				setNative((Boolean)newValue);
-				return;
-			case IrPackage.PROCEDURE__NODES:
-				getNodes().clear();
-				getNodes().addAll((Collection<? extends Node>)newValue);
-				return;
-			case IrPackage.PROCEDURE__PARAMETERS:
-				getParameters().clear();
-				getParameters().addAll((Collection<? extends Var>)newValue);
-				return;
-			case IrPackage.PROCEDURE__RETURN_TYPE:
-				setReturnType((Type)newValue);
-				return;
+		case IrPackage.PROCEDURE__LINE_NUMBER:
+			setLineNumber((Integer) newValue);
+			return;
+		case IrPackage.PROCEDURE__LOCALS:
+			getLocals().clear();
+			getLocals().addAll((Collection<? extends Var>) newValue);
+			return;
+		case IrPackage.PROCEDURE__NAME:
+			setName((String) newValue);
+			return;
+		case IrPackage.PROCEDURE__NATIVE:
+			setNative((Boolean) newValue);
+			return;
+		case IrPackage.PROCEDURE__NODES:
+			getNodes().clear();
+			getNodes().addAll((Collection<? extends Node>) newValue);
+			return;
+		case IrPackage.PROCEDURE__PARAMETERS:
+			getParameters().clear();
+			getParameters().addAll((Collection<? extends Var>) newValue);
+			return;
+		case IrPackage.PROCEDURE__RETURN_TYPE:
+			setReturnType((Type) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -298,32 +324,33 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.PROCEDURE__LINE_NUMBER:
-				setLineNumber(LINE_NUMBER_EDEFAULT);
-				return;
-			case IrPackage.PROCEDURE__LOCALS:
-				getLocals().clear();
-				return;
-			case IrPackage.PROCEDURE__NAME:
-				setName(NAME_EDEFAULT);
-				return;
-			case IrPackage.PROCEDURE__NATIVE:
-				setNative(NATIVE_EDEFAULT);
-				return;
-			case IrPackage.PROCEDURE__NODES:
-				getNodes().clear();
-				return;
-			case IrPackage.PROCEDURE__PARAMETERS:
-				getParameters().clear();
-				return;
-			case IrPackage.PROCEDURE__RETURN_TYPE:
-				setReturnType((Type)null);
-				return;
+		case IrPackage.PROCEDURE__LINE_NUMBER:
+			setLineNumber(LINE_NUMBER_EDEFAULT);
+			return;
+		case IrPackage.PROCEDURE__LOCALS:
+			getLocals().clear();
+			return;
+		case IrPackage.PROCEDURE__NAME:
+			setName(NAME_EDEFAULT);
+			return;
+		case IrPackage.PROCEDURE__NATIVE:
+			setNative(NATIVE_EDEFAULT);
+			return;
+		case IrPackage.PROCEDURE__NODES:
+			getNodes().clear();
+			return;
+		case IrPackage.PROCEDURE__PARAMETERS:
+			getParameters().clear();
+			return;
+		case IrPackage.PROCEDURE__RETURN_TYPE:
+			setReturnType((Type) null);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -339,84 +366,32 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	}
 
 	/**
-	 * Returns the first block in the list of nodes of the given procedure. A
-	 * new block is created if there is no block in the given node list.
-	 * 
-	 * @param procedure
-	 *            a procedure
-	 * @return a block
-	 */
-	public NodeBlock getFirst() {
-		return getFirst(getNodes());
-	}
-
-	/**
-	 * Returns the first block in the given list of nodes. A new block is
-	 * created if there is no block in the given node list.
-	 * 
-	 * @param procedure
-	 *            a procedure
-	 * @param nodes
-	 *            a list of nodes of the given procedure
-	 * @return a block
-	 */
-	public NodeBlock getFirst(List<Node> nodes) {
-		NodeBlock block;
-		if (nodes.isEmpty()) {
-			block = IrFactoryImpl.eINSTANCE.createNodeBlock();
-			nodes.add(block);
-		} else {
-			Node node = nodes.get(0);
-			if (node.isBlockNode()) {
-				block = (NodeBlock) node;
-			} else {
-				block = IrFactoryImpl.eINSTANCE.createNodeBlock();
-				nodes.add(0, block);
-			}
-		}
-
-		return block;
-	}
-
-	/**
-	 * Returns the last block in the list of nodes of the given procedure. A new
+	 * Returns the first block in the list of nodes of this procedure. A new
 	 * block is created if there is no block in the given node list.
 	 * 
-	 * @param procedure
-	 *            a procedure
-	 * @return a block
+	 * @return the first block in the list of nodes of this procedure
 	 */
-	public NodeBlock getLast() {
-		return getLast(getNodes());
+	public NodeBlock getFirst() {
+		return IrUtil.getFirst(getNodes());
 	}
 
 	/**
-	 * Returns the last block in the given list of nodes. A new block is created
-	 * if there is no block in the given node list.
+	 * Returns the last block in the list of nodes of this procedure. A new
+	 * block is created if there is no block in the given node list.
 	 * 
-	 * @param procedure
-	 *            a procedure
-	 * @param nodes
-	 *            a list of nodes that are a subset of the given procedure's
-	 *            nodes
-	 * @return a block
+	 * @return the last block in the list of nodes of this procedure
 	 */
-	public NodeBlock getLast(List<Node> nodes) {
-		NodeBlock block;
-		if (nodes.isEmpty()) {
-			block = IrFactoryImpl.eINSTANCE.createNodeBlock();
-			nodes.add(block);
-		} else {
-			Node node = nodes.get(nodes.size() - 1);
-			if (node.isBlockNode()) {
-				block = (NodeBlock) node;
-			} else {
-				block = IrFactoryImpl.eINSTANCE.createNodeBlock();
-				nodes.add(block);
-			}
-		}
+	public NodeBlock getLast() {
+		return IrUtil.getLast(getNodes());
+	}
 
-		return block;
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public int getLineNumber() {
+		return lineNumber;
 	}
 
 	@Override
@@ -426,11 +401,13 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Var> getLocals() {
 		if (locals == null) {
-			locals = new EObjectContainmentEList<Var>(Var.class, this, IrPackage.PROCEDURE__LOCALS);
+			locals = new EObjectContainmentEList<Var>(Var.class, this,
+					IrPackage.PROCEDURE__LOCALS);
 		}
 		return locals;
 	}
@@ -449,11 +426,13 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Node> getNodes() {
 		if (nodes == null) {
-			nodes = new EObjectContainmentEList<Node>(Node.class, this, IrPackage.PROCEDURE__NODES);
+			nodes = new EObjectContainmentEList<Node>(Node.class, this,
+					IrPackage.PROCEDURE__NODES);
 		}
 		return nodes;
 	}
@@ -465,32 +444,15 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Var> getParameters() {
 		if (parameters == null) {
-			parameters = new EObjectContainmentEList<Var>(Var.class, this, IrPackage.PROCEDURE__PARAMETERS);
+			parameters = new EObjectContainmentEList<Var>(Var.class, this,
+					IrPackage.PROCEDURE__PARAMETERS);
 		}
 		return parameters;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public int getLineNumber() {
-		return lineNumber;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setLineNumber(int newLineNumber) {
-		int oldLineNumber = lineNumber;
-		lineNumber = newLineNumber;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PROCEDURE__LINE_NUMBER, oldLineNumber, lineNumber));
 	}
 
 	public Map<String, Var> getParametersMap() {
@@ -503,6 +465,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Type getReturnType() {
@@ -511,6 +474,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public boolean isNative() {
@@ -554,24 +518,41 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public void setLineNumber(int newLineNumber) {
+		int oldLineNumber = lineNumber;
+		lineNumber = newLineNumber;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.PROCEDURE__LINE_NUMBER, oldLineNumber, lineNumber));
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void setName(String newName) {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PROCEDURE__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.PROCEDURE__NAME, oldName, name));
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void setNative(boolean newNative) {
 		boolean oldNative = native_;
 		native_ = newNative;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PROCEDURE__NATIVE, oldNative, native_));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.PROCEDURE__NATIVE, oldNative, native_));
 	}
 
 	public void setResult(Expression result) {
@@ -580,29 +561,38 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void setReturnType(Type newReturnType) {
 		if (newReturnType != returnType) {
 			NotificationChain msgs = null;
 			if (returnType != null)
-				msgs = ((InternalEObject)returnType).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.PROCEDURE__RETURN_TYPE, null, msgs);
+				msgs = ((InternalEObject) returnType).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE
+								- IrPackage.PROCEDURE__RETURN_TYPE, null, msgs);
 			if (newReturnType != null)
-				msgs = ((InternalEObject)newReturnType).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.PROCEDURE__RETURN_TYPE, null, msgs);
+				msgs = ((InternalEObject) newReturnType).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE
+								- IrPackage.PROCEDURE__RETURN_TYPE, null, msgs);
 			msgs = basicSetReturnType(newReturnType, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PROCEDURE__RETURN_TYPE, newReturnType, newReturnType));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.PROCEDURE__RETURN_TYPE, newReturnType,
+					newReturnType));
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (lineNumber: ");

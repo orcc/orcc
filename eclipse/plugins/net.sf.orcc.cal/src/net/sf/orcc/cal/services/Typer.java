@@ -191,7 +191,7 @@ public class Typer extends CalSwitch<Type> {
 		Type type = getType(expression.getCondition());
 		Type t1 = getType(expression.getThen());
 		for (AstExpressionElsif elsif : expression.getElsifs()) {
-			t1 = TypeUtil.getLub(t1, doSwitch(elsif));
+			t1 = TypeUtil.getLub(t1, getType(elsif));
 		}
 
 		Type t2 = getType(expression.getElse());

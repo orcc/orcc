@@ -44,6 +44,7 @@ import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.impl.IrResourceFactoryImpl;
 import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.OrccUtil;
@@ -241,6 +242,58 @@ public class IrUtil {
 				.getFullPath().toString(), true), true);
 		Actor actor = (Actor) resource.getContents().get(0);
 		return actor;
+	}
+
+	/**
+	 * Returns the first block in the given list of nodes. A new block is
+	 * created if there is no block in the given node list.
+	 * 
+	 * @param nodes
+	 *            a list of nodes
+	 * @return a block
+	 */
+	public static NodeBlock getFirst(List<Node> nodes) {
+		NodeBlock block;
+		if (nodes.isEmpty()) {
+			block = IrFactoryImpl.eINSTANCE.createNodeBlock();
+			nodes.add(block);
+		} else {
+			Node node = nodes.get(0);
+			if (node.isBlockNode()) {
+				block = (NodeBlock) node;
+			} else {
+				block = IrFactoryImpl.eINSTANCE.createNodeBlock();
+				nodes.add(0, block);
+			}
+		}
+
+		return block;
+	}
+
+	/**
+	 * Returns the last block in the given list of nodes. A new block is created
+	 * if there is no block in the given node list.
+	 * 
+	 * @param nodes
+	 *            a list of nodes
+	 * @return a block
+	 */
+	public static NodeBlock getLast(List<Node> nodes) {
+		NodeBlock block;
+		if (nodes.isEmpty()) {
+			block = IrFactoryImpl.eINSTANCE.createNodeBlock();
+			nodes.add(block);
+		} else {
+			Node node = nodes.get(nodes.size() - 1);
+			if (node.isBlockNode()) {
+				block = (NodeBlock) node;
+			} else {
+				block = IrFactoryImpl.eINSTANCE.createNodeBlock();
+				nodes.add(block);
+			}
+		}
+
+		return block;
 	}
 
 	private static boolean isWhileJoinNode(Node node) {

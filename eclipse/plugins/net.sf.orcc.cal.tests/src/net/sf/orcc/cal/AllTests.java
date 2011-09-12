@@ -226,7 +226,7 @@ public class AllTests {
 
 	@Test
 	public void passExecElsif() throws Exception {
-		assertExecution("ok", prefix + "pass/Elsif.cal");
+		assertExecution("okok", prefix + "pass/Elsif.cal");
 	}
 
 	@Test

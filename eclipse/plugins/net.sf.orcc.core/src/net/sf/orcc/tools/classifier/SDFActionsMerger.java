@@ -48,6 +48,7 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -242,7 +243,7 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 			Pattern input = action.getInputPattern();
 			Pattern output = action.getOutputPattern();
 
-			NodeBlock thenBlock = target.getFirst(elseNodes);
+			NodeBlock thenBlock = IrUtil.getFirst(elseNodes);
 			Expression callExpr = createActionCondition(thenBlock,
 					action.getScheduler(), input, output);
 			NodeIf nodeIf = createActionCall(callExpr, action.getBody(), input,

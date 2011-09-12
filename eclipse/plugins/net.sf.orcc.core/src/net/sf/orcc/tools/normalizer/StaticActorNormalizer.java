@@ -52,6 +52,7 @@ import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
+import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.moc.CSDFMoC;
 
 /**
@@ -78,10 +79,7 @@ public class StaticActorNormalizer {
 
 		private List<Node> nodes;
 
-		private Procedure procedure;
-
 		public MyPatternVisitor(Procedure procedure) {
-			this.procedure = procedure;
 			nodes = procedure.getNodes();
 			indexes = new ArrayList<Var>();
 		}
@@ -101,7 +99,7 @@ public class StaticActorNormalizer {
 			Var loopVar = indexes.get(depth - 1);
 
 			// init var
-			NodeBlock block = procedure.getLast(nodes);
+			NodeBlock block = IrUtil.getLast(nodes);
 			InstAssign assign = factory.createInstAssign(loopVar,
 					factory.createExprInt(0));
 			block.add(assign);
@@ -127,7 +125,7 @@ public class StaticActorNormalizer {
 			pattern.getPattern().accept(this);
 
 			// add assign
-			block = procedure.getLast(nodes);
+			block = IrUtil.getLast(nodes);
 			assign = factory.createInstAssign(loopVar, factory
 					.createExprBinary(factory.createExprVar(loopVar),
 							OpBinary.PLUS, factory.createExprInt(1),
@@ -148,7 +146,7 @@ public class StaticActorNormalizer {
 
 		@Override
 		public void visit(SimplePattern pattern) {
-			NodeBlock block = procedure.getLast(nodes);
+			NodeBlock block = IrUtil.getLast(nodes);
 			Action action = pattern.getAction();
 
 			// Call the action corresponding to the pattern

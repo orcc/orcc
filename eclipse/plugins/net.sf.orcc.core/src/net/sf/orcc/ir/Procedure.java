@@ -28,9 +28,6 @@
  */
 package net.sf.orcc.ir;
 
-import java.lang.String;
-import java.util.List;
-
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 
@@ -61,18 +58,6 @@ public interface Procedure extends EObject {
 	NodeBlock getFirst();
 
 	/**
-	 * Returns the first block in the given list of nodes. A new block is
-	 * created if there is no block in the given node list.
-	 * 
-	 * @param procedure
-	 *            a procedure
-	 * @param nodes
-	 *            a list of nodes of the given procedure
-	 * @return a block
-	 */
-	NodeBlock getFirst(List<Node> nodes);
-
-	/**
 	 * Returns the last block in the list of nodes of the given procedure. A new
 	 * block is created if there is no block in the given node list.
 	 * 
@@ -81,19 +66,6 @@ public interface Procedure extends EObject {
 	 * @return a block
 	 */
 	NodeBlock getLast();
-
-	/**
-	 * Returns the last block in the given list of nodes. A new block is created
-	 * if there is no block in the given node list.
-	 * 
-	 * @param procedure
-	 *            a procedure
-	 * @param nodes
-	 *            a list of nodes that are a subset of the given procedure's
-	 *            nodes
-	 * @return a block
-	 */
-	NodeBlock getLast(List<Node> nodes);
 
 	/**
 	 * Returns the local variable of this procedure that has the given name.

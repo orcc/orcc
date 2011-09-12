@@ -51,6 +51,7 @@ import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstStatement;
 import net.sf.orcc.cal.cal.AstStatementAssign;
 import net.sf.orcc.cal.cal.AstStatementCall;
+import net.sf.orcc.cal.cal.AstStatementElsif;
 import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstStatementIf;
 import net.sf.orcc.cal.cal.AstStatementWhile;
@@ -513,7 +514,7 @@ public class AstTransformer {
 						IrFactory.eINSTANCE.createTypeBool());
 
 				// add increment to body
-				NodeBlock block = procedure.getLast(nodes);
+				NodeBlock block = IrUtil.getLast(nodes);
 				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
 						lineNumber, loopVar, IrFactory.eINSTANCE
 								.createExprBinary(IrFactory.eINSTANCE
@@ -717,7 +718,7 @@ public class AstTransformer {
 
 			// body
 			List<Node> nodes = getNodes(foreach.getStatements());
-			NodeBlock block = procedure.getLast(nodes);
+			NodeBlock block = IrUtil.getLast(nodes);
 			assign = IrFactory.eINSTANCE.createInstAssign(lineNumber, loopVar,
 					IrFactory.eINSTANCE.createExprBinary(
 							IrFactory.eINSTANCE.createExprVar(loopVar),
@@ -747,16 +748,35 @@ public class AstTransformer {
 
 			// transforms "then" statements and "else" statements
 			List<Node> thenNodes = getNodes(stmtIf.getThen());
-			List<Node> elseNodes = getNodes(stmtIf.getElse());
 
+			// creates if and adds it to procedure
 			NodeIf node = IrFactoryImpl.eINSTANCE.createNodeIf();
+			procedure.getNodes().add(node);
 			node.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 			node.setLineNumber(lineNumber);
 			node.setCondition(condition);
 			node.getThenNodes().addAll(thenNodes);
-			node.getElseNodes().addAll(elseNodes);
 
-			procedure.getNodes().add(node);
+			// add elsif statements
+			for (AstStatementElsif elsif : stmtIf.getElsifs()) {
+				// saves outerIf, creates new if, and adds it to else nodes
+				NodeIf outerIf = node;
+				node = IrFactoryImpl.eINSTANCE.createNodeIf();
+				outerIf.getElseNodes().add(node);
+
+				node.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
+				node.setLineNumber(lineNumber);
+
+				condition = transformExpression(elsif.getCondition());
+				node.setCondition(condition);
+
+				thenNodes = getNodes(elsif.getThen());
+				node.getThenNodes().addAll(thenNodes);
+			}
+
+			// add else nodes to current if
+			List<Node> elseNodes = getNodes(stmtIf.getElse());
+			node.getElseNodes().addAll(elseNodes);
 
 			return object;
 		}
@@ -785,7 +805,7 @@ public class AstTransformer {
 							.getLineNumber(), load.getTarget().getVariable(),
 							load.getSource().getVariable(),
 							(List<Expression>) IrUtil.copy(load.getIndexes()));
-					procedure.getLast(nodes).add(load);
+					IrUtil.getLast(nodes).add(load);
 				}
 			}
 
