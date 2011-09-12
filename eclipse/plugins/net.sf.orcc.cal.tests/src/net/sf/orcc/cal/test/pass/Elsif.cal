@@ -1,0 +1,18 @@
+package net.sf.orcc.cal.test.pass;
+
+actor Elsif() ==> :
+	
+	initialize ==>
+	do
+		if false then
+			print("error1");
+		elsif false then
+			print("error2");
+		elsif true then
+			print("ok");
+		else
+			print("error3");
+		end
+	end
+
+end

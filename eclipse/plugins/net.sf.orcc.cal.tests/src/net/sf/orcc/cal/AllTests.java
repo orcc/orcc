@@ -48,16 +48,16 @@ import com.google.inject.Inject;
 @InjectWith(CalInjectorProvider.class)
 public class AllTests {
 
-	private static final String projectPrefix = "/Tests/src/";
-
 	private static final String prefix = "net/sf/orcc/cal/test/";
+
+	private static final String projectName = "Tests";
+
+	private static final String projectPrefix = "/Tests/src/";
 
 	private IFolder outputFolder;
 
 	@Inject
 	private ParseHelper<AstEntity> parser;
-
-	private static final String projectName = "Tests";
 
 	private XtextResourceSet resourceSet;
 
@@ -135,101 +135,6 @@ public class AllTests {
 				expected, output);
 	}
 
-	@Test
-	public void checkInitialize() throws Exception {
-		Assert.assertNotNull("expected correct actor with initialize action",
-				parseAndValidate(prefix + "pass/InitializePattern.cal"));
-	}
-
-	@Test
-	public void checkParam() throws Exception {
-		Assert.assertNull(
-				"assignment to an actor parameter must not be allowed",
-				parseAndValidate(prefix + "xfail/Param.cal"));
-	}
-
-	@Test
-	public void checkPattern1() throws Exception {
-		Assert.assertNull(
-				"reference to an output port in an input pattern must not be allowed",
-				parseAndValidate(prefix + "xfail/Pattern1.cal"));
-	}
-
-	@Test
-	public void checkPattern2() throws Exception {
-		Assert.assertNull("an input pattern cannot contain expressions",
-				parseAndValidate(prefix + "xfail/Pattern2.cal"));
-	}
-
-	@Test
-	public void checkPattern3() throws Exception {
-		Assert.assertNull(
-				"combining Pattern1 and Pattern2 must be invalid code",
-				parseAndValidate(prefix + "xfail/Pattern3.cal"));
-	}
-
-	@Test
-	public void checkPattern4() throws Exception {
-		Assert.assertNull(
-				"more than one reference per output port must not be allowed",
-				parseAndValidate(prefix + "xfail/Pattern4.cal"));
-	}
-
-	@Test
-	public void checkPattern5() throws Exception {
-		Assert.assertNull(
-				"more than one reference per input port must not be allowed",
-				parseAndValidate(prefix + "xfail/Pattern5.cal"));
-	}
-
-	@Test
-	public void checkTypeError1() throws Exception {
-		Assert.assertNull(
-				"passing a list in lieu of a scalar must raise a type error",
-				parseAndValidate(prefix + "xfail/TypeError1.cal"));
-	}
-
-	@Test
-	public void checkTypeError2() throws Exception {
-		Assert.assertNull(
-				"passing a scalar in lieu of a list must raise a type error",
-				parseAndValidate(prefix + "xfail/TypeError2.cal"));
-	}
-
-	@Test
-	public void checkTypeInt() throws Exception {
-		AstEntity entity = parseAndValidate(prefix + "pass/TypeInt.cal");
-		List<AstVariable> stateVars = entity.getActor().getStateVariables();
-		AstVariable x = stateVars.get(0);
-		AstVariable y = stateVars.get(1);
-		Type type = Typer.getType(x);
-		Assert.assertTrue("type of x should be int(size=5)",
-				EcoreUtil.equals(type, IrFactory.eINSTANCE.createTypeInt(5)));
-
-		type = Typer.getType(x.getValue());
-		Assert.assertTrue("type of value of x should be int(size=4)",
-				EcoreUtil.equals(type, IrFactory.eINSTANCE.createTypeInt(4)));
-
-		type = Typer.getType(y.getValue());
-		Assert.assertTrue("type of value of y should be int(size=6)",
-				EcoreUtil.equals(type, IrFactory.eINSTANCE.createTypeInt(6)));
-	}
-
-	@Test
-	public void execInitStateVar() throws Exception {
-		assertExecution("pp = 8", prefix + "pass/InitStateVarFunction.cal");
-	}
-
-	@Test
-	public void execShadow() throws Exception {
-		assertExecution("x = 0", prefix + "pass/Shadowing.cal");
-	}
-
-	@Test
-	public void execWhile() throws Exception {
-		assertExecution("idx is 60", prefix + "pass/CodegenWhile.cal");
-	}
-
 	/**
 	 * Parses, validates, and generates code for the entity defined in the file
 	 * whose name is given.
@@ -292,6 +197,106 @@ public class AllTests {
 		}
 
 		return isValid ? entity : null;
+	}
+
+	@Test
+	public void passCheckInitialize() throws Exception {
+		Assert.assertNotNull("expected correct actor with initialize action",
+				parseAndValidate(prefix + "pass/InitializePattern.cal"));
+	}
+
+	@Test
+	public void passCheckTypeInt() throws Exception {
+		AstEntity entity = parseAndValidate(prefix + "pass/TypeInt.cal");
+		List<AstVariable> stateVars = entity.getActor().getStateVariables();
+		AstVariable x = stateVars.get(0);
+		AstVariable y = stateVars.get(1);
+		Type type = Typer.getType(x);
+		Assert.assertTrue("type of x should be int(size=5)",
+				EcoreUtil.equals(type, IrFactory.eINSTANCE.createTypeInt(5)));
+
+		type = Typer.getType(x.getValue());
+		Assert.assertTrue("type of value of x should be int(size=4)",
+				EcoreUtil.equals(type, IrFactory.eINSTANCE.createTypeInt(4)));
+
+		type = Typer.getType(y.getValue());
+		Assert.assertTrue("type of value of y should be int(size=6)",
+				EcoreUtil.equals(type, IrFactory.eINSTANCE.createTypeInt(6)));
+	}
+
+	@Test
+	public void passExecElsif() throws Exception {
+		assertExecution("ok", prefix + "pass/Elsif.cal");
+	}
+
+	@Test
+	public void passExecInitStateVar() throws Exception {
+		assertExecution("pp = 8", prefix + "pass/InitStateVarFunction.cal");
+	}
+
+	@Test
+	public void passExecShadow() throws Exception {
+		assertExecution("x = 0", prefix + "pass/Shadowing.cal");
+	}
+
+	@Test
+	public void passExecWhile() throws Exception {
+		assertExecution("idx is 60", prefix + "pass/CodegenWhile.cal");
+	}
+
+	@Test
+	public void xfailCheckParam() throws Exception {
+		Assert.assertNull(
+				"assignment to an actor parameter must not be allowed",
+				parseAndValidate(prefix + "xfail/Param.cal"));
+	}
+
+	@Test
+	public void xfailCheckPattern1() throws Exception {
+		Assert.assertNull(
+				"reference to an output port in an input pattern must not be allowed",
+				parseAndValidate(prefix + "xfail/Pattern1.cal"));
+	}
+
+	@Test
+	public void xfailCheckPattern2() throws Exception {
+		Assert.assertNull("an input pattern cannot contain expressions",
+				parseAndValidate(prefix + "xfail/Pattern2.cal"));
+	}
+
+	@Test
+	public void xfailCheckPattern3() throws Exception {
+		Assert.assertNull(
+				"combining Pattern1 and Pattern2 must be invalid code",
+				parseAndValidate(prefix + "xfail/Pattern3.cal"));
+	}
+
+	@Test
+	public void xfailCheckPattern4() throws Exception {
+		Assert.assertNull(
+				"more than one reference per output port must not be allowed",
+				parseAndValidate(prefix + "xfail/Pattern4.cal"));
+	}
+
+	@Test
+	public void xfailCheckPattern5() throws Exception {
+		Assert.assertNull(
+				"more than one reference per input port must not be allowed",
+				parseAndValidate(prefix + "xfail/Pattern5.cal"));
+	}
+
+	@Test
+	public void xfailCheckTypeError1() throws Exception {
+		Assert.assertNull(
+				"passing a list in lieu of a scalar must raise a type error",
+				parseAndValidate(prefix + "xfail/TypeError1.cal"));
+	}
+
+	@Test
+	public void xfailCheckTypeError2() throws Exception {
+		Assert.assertNull(
+				"passing a scalar in lieu of a list must raise a type error",
+				parseAndValidate(prefix + "xfail/TypeError2.cal"));
 	}
 
 }
