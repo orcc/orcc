@@ -133,7 +133,6 @@ public class VHDLBackendImpl extends AbstractBackend {
 		// set the template data before transformations so that
 		// RAM transformation can update it (with the RAM map)
 		VHDLTemplateData templateData = new VHDLTemplateData();
-		templateData.initializeFrom(actor);
 		actor.setTemplateData(templateData);
 
 		// transformations on the code
@@ -177,6 +176,12 @@ public class VHDLBackendImpl extends AbstractBackend {
 						+ actor.getName());
 			}
 		}
+
+		// compute init value (depends on ListDeclarationTransformation)
+		templateData.computeInitValue(actor);
+		
+		// compute sensitivity list (depends on RamTransformation)
+		templateData.computeSensitivityList(actor);
 	}
 
 	private void doTransformNetwork(Network network) throws OrccException {
