@@ -62,8 +62,8 @@ package orcc_package is
   function get_mod (ARG0    : integer; ARG1 : integer) return integer;
   function shift_left (op1  : integer; op2 : integer; size : integer) return integer;
   function ushift_left (op1  : integer; op2 : integer; size : integer) return integer;
-  function shift_right (op1 : integer; op2 : integer; size : integer) return integer;
-  function ushift_right (op1 : integer; op2 : integer; size : integer) return integer;
+  function shift_right (op1 : integer; op2 : integer; size_op1 : integer; size : integer) return integer;
+  function ushift_right (op1 : integer; op2 : integer; size_op1 : integer; size : integer) return integer;
   function cast (op1        : integer; sizeop1 : integer; sizeresult : integer) return integer;
   function ucast (op1       : integer; sizeop1 : integer; sizeresult : integer) return integer;
   function bit_width (op1   : integer) return integer;
@@ -168,7 +168,7 @@ package body orcc_package is
 
 -----------------------------------------------------------------------------
 -- logical right shift
-  function fsra (input : std_logic_vector; count : integer) return std_logic_vector is
+  function fsra (input : std_logic_vector; count : integer; size : integer) return std_logic_vector is
     constant input_length : integer := input'length -1;
     variable result       : std_logic_vector(input_length downto 0);
     variable xcount       : integer := count;
@@ -182,22 +182,22 @@ package body orcc_package is
       result(input_length - xcount downto 0)                  := input(input_length downto xcount);
       result(input_length downto (input_length - xcount + 1)) := (others => input(input_length));
     end if;
-    return result;
+    return result(size -1 downto 0);
   end fsra;
 
-  function shift_right(op1 : integer; op2 : integer; size : integer) return integer is
-    variable arg1 : std_logic_vector(size -1 downto 0);
+  function shift_right(op1 : integer; op2 : integer; size_op1 : integer; size : integer) return integer is
+    variable arg1 : std_logic_vector(size_op1 - 1 downto 0);
   begin
-    arg1 := std_logic_vector(to_signed(op1, size));
-    return to_integer(signed(fsra(arg1, op2)));
+    arg1 := std_logic_vector(to_signed(op1, size_op1));
+    return to_integer(signed(fsra(arg1, op2, size)));
     -- return to_integer(to_signed(op1, size) srl op2);
   end function;
 
-  function ushift_right(op1 : integer; op2 : integer; size : integer) return integer is
-    variable arg1 : std_logic_vector(size -1 downto 0);
+  function ushift_right(op1 : integer; op2 : integer; size_op1 : integer; size : integer) return integer is
+    variable arg1 : std_logic_vector(size_op1 - 1 downto 0);
   begin
-    arg1 := std_logic_vector(to_unsigned(op1, size));
-    return to_integer(unsigned(fsra(arg1, op2)));
+    arg1 := std_logic_vector(to_unsigned(op1, size_op1));
+    return to_integer(unsigned(fsra(arg1, op2, size)));
     -- return to_integer(to_signed(op1, size) srl op2);
   end function;
 
