@@ -515,31 +515,6 @@ public class Typer extends CalSwitch<Type> {
 	}
 
 	/**
-	 * Returns the type for an addition whose left operand has type t1 and right
-	 * operand has type t2. Result has type String if t1 or t2 is a String,
-	 * lub(t1, t2) + 1 for integers (signed or not), and lub(t1, t2) for other
-	 * types.
-	 * 
-	 * @param t1
-	 *            type of left operand
-	 * @param t2
-	 *            type of right operand
-	 * @param source
-	 *            source object
-	 * @param feature
-	 *            feature
-	 * @return type of the addition
-	 */
-	private Type getTypeAdd(Type t1, Type t2, EObject source,
-			EStructuralFeature feature, int index) {
-		if (t1.isString() && !t2.isList() || t2.isString() && !t1.isList()) {
-			return t1;
-		}
-
-		return createType(t1, t2, Unification.LUB_PLUS_1);
-	}
-
-	/**
 	 * Returns the type of a binary expression whose left operand has type t1
 	 * and right operand has type t2, and whose operator is given.
 	 * 
@@ -576,7 +551,11 @@ public class Typer extends CalSwitch<Type> {
 			return createType(t1, t2, Unification.LUB_PLUS_1);
 
 		case PLUS:
-			return getTypeAdd(t1, t2, source, feature, index);
+			if (t1.isString() && !t2.isList() || t2.isString() && !t1.isList()) {
+				return EcoreUtil.copy(t1);
+			}
+
+			return createType(t1, t2, Unification.LUB_PLUS_1);
 
 		case DIV:
 		case DIV_INT:
