@@ -54,7 +54,7 @@ printArrayValue(type, value) ::= <%
 '0'
 <endif>
 <else>
-(others => <value>)
+<value>
 <endif>
 %>
 
