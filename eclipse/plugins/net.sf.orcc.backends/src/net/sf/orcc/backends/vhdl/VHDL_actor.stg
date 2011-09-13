@@ -290,13 +290,13 @@ endif
 // is present, which normally only occurs when printActionSchedulerInline
 // is called
 printReturn(return) ::= <<
-<if(return.value)
- ><if(insideIsSchedulable)
-   ><procedure.name>_go := <return.value>;<
-  else
-   >return <return.value>;<
-  endif><
-endif>
+<if(return.value)>
+<if(insideIsSchedulable)>
+<procedure.name>_go := <return.value>;
+<else>
+return <return.value>;
+<endif>
+<endif>
 >>
 
 printStore(store) ::= <<
