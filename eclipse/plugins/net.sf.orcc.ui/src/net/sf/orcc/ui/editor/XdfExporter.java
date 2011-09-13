@@ -158,6 +158,17 @@ public class XdfExporter extends CalSwitch<Object> {
 			}
 		}
 
+		if (source.isInstance() && sourcePort == null) {
+			throw new OrccRuntimeException("the source port of a connection "
+					+ "from instance " + source.getInstance().getId()
+					+ " must be specified");
+		}
+		if (target.isInstance() && targetPort == null) {
+			throw new OrccRuntimeException("the target port of a connection "
+					+ "to instance " + target.getInstance().getId()
+					+ " must be specified");
+		}
+
 		// buffer size
 		Map<String, IAttribute> attributes = new HashMap<String, IAttribute>();
 		Integer bufferSize = (Integer) edge.getValue("buffer size");
