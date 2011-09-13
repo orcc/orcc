@@ -13,20 +13,8 @@ vcom -quiet -opt=-clkOpt -work altera_mf -93 -explicit simulation/altera_mf.vhd
 # Compile Shared components
 vcom -93 -quiet -work work share/vhdl/util_pkg.vhdl
 vcom -93 -quiet -work work share/vhdl/tce_util_pkg.vhdl
-vcom -93 -quiet -work work share/vhdl/stream_out_8.vhdl
-vcom -93 -quiet -work work share/vhdl/stream_out_7.vhdl
-vcom -93 -quiet -work work share/vhdl/stream_out_6.vhdl
-vcom -93 -quiet -work work share/vhdl/stream_out_5.vhdl
-vcom -93 -quiet -work work share/vhdl/stream_out_4.vhdl
-vcom -93 -quiet -work work share/vhdl/stream_out_3.vhdl
-vcom -93 -quiet -work work share/vhdl/stream_out_2.vhdl
-vcom -93 -quiet -work work share/vhdl/stream_out_1.vhdl
-vcom -93 -quiet -work work share/vhdl/stream_in_6.vhdl
-vcom -93 -quiet -work work share/vhdl/stream_in_5.vhdl
-vcom -93 -quiet -work work share/vhdl/stream_in_4.vhdl
-vcom -93 -quiet -work work share/vhdl/stream_in_3.vhdl
-vcom -93 -quiet -work work share/vhdl/stream_in_2.vhdl
-vcom -93 -quiet -work work share/vhdl/stream_in_1.vhdl
+vcom -93 -quiet -work work share/vhdl/cal_stream_in.vhdl
+vcom -93 -quiet -work work share/vhdl/cal_stream_out.vhdl
 vcom -93 -quiet -work work share/vhdl/rf_1wr_1rd_always_1_guarded_0.vhd
 vcom -93 -quiet -work work share/vhdl/mul.vhdl
 vcom -93 -quiet -work work share/vhdl/ldh_ldhu_ldq_ldqu_ldw_sth_stq_stw.vhdl

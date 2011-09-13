@@ -99,7 +99,7 @@ class Instance:
             print "ROM: " + str(self.irom.depth) + "x" + str(self.irom.width) + "bits"
             print "RAM: " + str(self.dram.depth) + "x" + str(self.dram.width) + "bits"
         # Copy libraries in working directory
-        shutil.copy(os.path.join(libPath, "fifo", "many_streams.hdb"), srcPath)
+        shutil.copy(os.path.join(libPath, "fifo", "stream_units.hdb"), srcPath)
         shutil.rmtree("vhdl", ignore_errors=True)
         shutil.copytree(os.path.join(libPath, "fifo", "vhdl"), "vhdl")
         # Remove existing build directory
@@ -119,7 +119,7 @@ class Instance:
             shutil.copy(self._tbFile, buildPath)
 
         # Clean working directory
-        os.remove("many_streams.hdb")
+        os.remove("stream_units.hdb")
         shutil.rmtree("vhdl", ignore_errors=True)
 
 

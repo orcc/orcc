@@ -30,7 +30,7 @@ entity tta_fifo is
       rdreq   : in  std_logic;
       data    : in  std_logic_vector(31 downto 0);
       q       : out std_logic_vector(31 downto 0);
-      status  : out std_logic_vector(8 downto 0)
+      status  : out std_logic_vector(31 downto 0)
       );
 end tta_fifo;
 
@@ -51,7 +51,7 @@ architecture bdf_type of tta_fifo is
   component usedw_to_status
     port(full   : in  std_logic;
          usedw  : in  std_logic_vector(7 downto 0);
-         status : out std_logic_vector(8 downto 0)
+         status : out std_logic_vector(31 downto 0)
          );
   end component;
 

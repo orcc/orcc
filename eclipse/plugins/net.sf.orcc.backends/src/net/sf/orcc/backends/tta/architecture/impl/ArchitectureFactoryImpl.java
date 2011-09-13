@@ -973,9 +973,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public FunctionUnit createStreamInput(TTA tta, int index) {
+	public FunctionUnit createStreamInput(TTA tta, String portName) {
 		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
-		String name = "STREAM_IN_" + index;
+		String name = "STREAM_IN_" + portName;
 		functionUnit.setName(name);
 		// Sockets
 		EList<Segment> segments = getAllSegments(tta.getBuses());
@@ -990,24 +990,22 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		functionUnit.getPorts().add(out1);
 		// Operations
 		functionUnit.getOperations().add(
-				createOperationIn("stream_in_v" + index, in1t, out1));
+				createOperationIn("cal_stream_in_read", in1t, out1));
 		functionUnit.getOperations().add(
-				createOperationInPeek("stream_in_peek_v" + index, in1t, out1));
+				createOperationInPeek("cal_stream_in_peek", in1t, out1));
 		functionUnit.getOperations().add(
-				createOperationInStatus("stream_in_status_v" + index, in1t,
-						out1));
+				createOperationInStatus("cal_stream_in_status", in1t, out1));
 		// Implementation
-		Implementation streamImpl = createImplementation("many_streams.hdb",
-				8 + index);
+		Implementation streamImpl = createImplementation("stream_units.hdb", 1);
 		functionUnit.setImplementation(streamImpl);
 		tta.getHardwareDatabase().add(streamImpl);
 		return functionUnit;
 	}
 
 	@Override
-	public FunctionUnit createStreamOutput(TTA tta, int index) {
+	public FunctionUnit createStreamOutput(TTA tta, String portName) {
 		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
-		String name = "STREAM_OUT_" + index;
+		String name = "STREAM_OUT_" + portName;
 		functionUnit.setName(name);
 		// Sockets
 		EList<Segment> segments = getAllSegments(tta.getBuses());
@@ -1022,13 +1020,11 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		functionUnit.getPorts().add(out1);
 		// Operations
 		functionUnit.getOperations().add(
-				createOperationOut("stream_out_v" + index, in1t, out1));
+				createOperationOut("cal_stream_out_write", in1t, out1));
 		functionUnit.getOperations().add(
-				createOperationOutStatus("stream_out_status_v" + index, in1t,
-						out1));
+				createOperationOutStatus("cal_stream_out_status", in1t, out1));
 		// Implementation
-		Implementation streamImpl = createImplementation("many_streams.hdb",
-				index);
+		Implementation streamImpl = createImplementation("stream_units.hdb", 2);
 		functionUnit.setImplementation(streamImpl);
 		tta.getHardwareDatabase().add(streamImpl);
 		return functionUnit;
@@ -1144,11 +1140,13 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		TTA tta = createTTADefault(name);
 		if (instance.isActor()) {
 			// Add needed stream units
-			for (int i = 0; i < instance.getActor().getInputs().size(); i++) {
-				tta.getFunctionUnits().add(createStreamInput(tta, i + 1));
+			for (net.sf.orcc.ir.Port input : instance.getActor().getInputs()) {
+				tta.getFunctionUnits().add(
+						createStreamInput(tta, input.getName()));
 			}
-			for (int i = 0; i < instance.getActor().getOutputs().size(); i++) {
-				tta.getFunctionUnits().add(createStreamOutput(tta, i + 1));
+			for (net.sf.orcc.ir.Port output : instance.getActor().getOutputs()) {
+				tta.getFunctionUnits().add(
+						createStreamOutput(tta, output.getName()));
 			}
 			// Set ram size = memory estimation / word size + error margin
 			int ramSize = ArchitectureMemoryStats
@@ -1161,9 +1159,13 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 		} else if (instance.isBroadcast()) {
 			// Add needed stream units
-			tta.getFunctionUnits().add(createStreamInput(tta, 1));
-			for (int i = 0; i < instance.getBroadcast().getNumOutputs(); i++) {
-				tta.getFunctionUnits().add(createStreamOutput(tta, i + 1));
+			tta.getFunctionUnits().add(
+					createStreamInput(tta, instance.getBroadcast().getInput()
+							.getName()));
+			for (net.sf.orcc.ir.Port output : instance.getBroadcast()
+					.getOutputs()) {
+				tta.getFunctionUnits().add(
+						createStreamOutput(tta, output.getName()));
 			}
 			// Set ram size = memory estimation / word size + error margin
 			tta.getData().setMaxAddress(64);

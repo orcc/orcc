@@ -536,22 +536,22 @@ public interface ArchitectureFactory extends EFactory {
 	 * 
 	 * @param tta
 	 *            the containing tta processor
-	 * @param index
-	 *            the index of the stream unit
+	 * @param portName
+	 *            the name of the associated input port
 	 * @return a new input Stream unit
 	 */
-	FunctionUnit createStreamInput(TTA tta, int index);
+	FunctionUnit createStreamInput(TTA tta, String portName);
 
 	/**
 	 * Return a new output Stream unit
 	 * 
 	 * @param tta
 	 *            the containing TTA processor
-	 * @param index
-	 *            the index of the stream unit
+	 * @param portName
+	 *            the name of the associated output port
 	 * @return a new output Stream unit
 	 */
-	FunctionUnit createStreamOutput(TTA tta, int index);
+	FunctionUnit createStreamOutput(TTA tta, String portName);
 
 	/**
 	 * Returns a new object of class '<em>Term Bool</em>'. <!-- begin-user-doc

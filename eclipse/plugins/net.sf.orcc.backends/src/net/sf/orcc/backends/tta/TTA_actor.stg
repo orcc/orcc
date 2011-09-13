@@ -15,12 +15,12 @@ endif>
 >>
 
 printStatus(dir, port) ::= <<
-%local_status_<port.name> = tail call i32 asm sideeffect "STREAM_<dir>_STATUS_V<indexPort(port)>", "=r,ir"(i32 0) nounwind
+%local_status_<port.name> = tail call i32 asm sideeffect "STREAM_<dir>_<port.name>.CAL_STREAM_<dir>_STATUS", "=r,ir"(i32 0) nounwind
 store i32 %local_status_<port.name>, i32* @status_<port.name>
 >>
 
 printBcastStatus(dir, port) ::= <<
-%status_<port.name> = tail call i32 asm sideeffect "STREAM_<dir>_STATUS_V<indexPort(port)>", "=r,ir"(i32 0) nounwind
+%status_<port.name> = tail call i32 asm sideeffect "STREAM_<dir>_<port.name>.CAL_STREAM_<dir>_STATUS", "=r,ir"(i32 0) nounwind
 >>
 
 printStatusVar(port) ::= <<
@@ -40,7 +40,7 @@ bb0:
 	
 bb1:
 	%indvar = phi i32 [ 0, %bb0 ], [ %indvar.next, %bb1 ]
-	%value = tail call <port.type> asm sideeffect "STREAM_IN_V<indexPort(port)>", "=r,ir"(i32 0) nounwind
+	%value = tail call <port.type> asm sideeffect "STREAM_IN_<port.name>.CAL_STREAM_IN_READ", "=r,ir"(i32 0) nounwind
 	%scevgep = getelementptr <port.type>* %data, i32 %indvar
 	store <port.type> %value, <port.type>* %scevgep
 	%indvar.next = add i32 %indvar, 1
@@ -68,7 +68,7 @@ bb1:
   %indvar = phi i32 [ 0, %bb0 ], [ %indvar.next, %bb1 ]
   %scevgep = getelementptr <port.type>* %data, i32 %indvar
   %value = load <port.type>* %scevgep
-  tail call void asm sideeffect "STREAM_OUT_V<indexPort(port)>", "ir"(<port.type> %value) nounwind
+  tail call void asm sideeffect "STREAM_OUT_<port.name>.CAL_STREAM_OUT_WRITE", "ir"(<port.type> %value) nounwind
   %indvar.next = add i32 %indvar, 1
   %exitcond = icmp eq i32 %indvar.next, %numTokens
   
@@ -92,7 +92,7 @@ bb0:
 	
 bb1:
 	%indvar = phi i32 [ 0, %bb0 ], [ %indvar.next, %bb1 ]
-	%value = tail call <port.type> asm sideeffect "STREAM_IN_PEEK_V<indexPort(port)>", "=r,ir"(i32 0) nounwind
+	%value = tail call <port.type> asm sideeffect "STREAM_IN_<port.name>.CAL_STREAM_IN_PEEK", "=r,ir"(i32 0) nounwind
 	%scevgep = getelementptr <port.type>* %data, i32 %indvar
 	store <port.type> %value, <port.type>* %scevgep
 	%indvar.next = add i32 %indvar, 1

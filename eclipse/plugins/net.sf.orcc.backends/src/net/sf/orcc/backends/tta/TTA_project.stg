@@ -18,20 +18,8 @@ set_global_assignment -name VHDL_FILE top.vhd
 # Shared components
 set_global_assignment -name VHDL_FILE share/vhdl/util_pkg.vhdl
 set_global_assignment -name VHDL_FILE share/vhdl/tce_util_pkg.vhdl
-set_global_assignment -name VHDL_FILE share/vhdl/stream_out_8.vhdl
-set_global_assignment -name VHDL_FILE share/vhdl/stream_out_7.vhdl
-set_global_assignment -name VHDL_FILE share/vhdl/stream_out_6.vhdl
-set_global_assignment -name VHDL_FILE share/vhdl/stream_out_5.vhdl
-set_global_assignment -name VHDL_FILE share/vhdl/stream_out_4.vhdl
-set_global_assignment -name VHDL_FILE share/vhdl/stream_out_3.vhdl
-set_global_assignment -name VHDL_FILE share/vhdl/stream_out_2.vhdl
-set_global_assignment -name VHDL_FILE share/vhdl/stream_out_1.vhdl
-set_global_assignment -name VHDL_FILE share/vhdl/stream_in_6.vhdl
-set_global_assignment -name VHDL_FILE share/vhdl/stream_in_5.vhdl
-set_global_assignment -name VHDL_FILE share/vhdl/stream_in_4.vhdl
-set_global_assignment -name VHDL_FILE share/vhdl/stream_in_3.vhdl
-set_global_assignment -name VHDL_FILE share/vhdl/stream_in_2.vhdl
-set_global_assignment -name VHDL_FILE share/vhdl/stream_in_1.vhdl
+set_global_assignment -name VHDL_FILE share/vhdl/cal_stream_in.vhdl
+set_global_assignment -name VHDL_FILE share/vhdl/cal_stream_out.vhdl
 set_global_assignment -name VHDL_FILE share/vhdl/rf_1wr_1rd_always_1_guarded_0.vhd
 set_global_assignment -name VHDL_FILE share/vhdl/mul.vhdl
 set_global_assignment -name VHDL_FILE share/vhdl/ldh_ldhu_ldq_ldqu_ldw_sth_stq_stw.vhdl

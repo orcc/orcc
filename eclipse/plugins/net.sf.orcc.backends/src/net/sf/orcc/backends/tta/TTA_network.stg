@@ -48,7 +48,7 @@ architecture bdf_type of top is
          rdreq			: in  std_logic;
          data			: in  std_logic_vector(31 downto 0);
          q				: out std_logic_vector(31 downto 0);
-         status			: out std_logic_vector(8 downto 0)
+         status			: out std_logic_vector(31 downto 0)
          );
   end component; 
   
@@ -145,7 +145,7 @@ inputPort(port) ::= <<
 ><port.name>_in				: in std_logic_vector(<port.type.size>-1 downto 0);<
 else
 >data_<indexPort(port)>_in		: in  std_logic_vector(31 downto 0);
-status_<indexPort(port)>_in	: in  std_logic_vector(8 downto 0);
+status_<indexPort(port)>_in	: in  std_logic_vector(31 downto 0);
 ack_<indexPort(port)>_in		: out std_logic;<
 endif>
 >>
@@ -155,7 +155,7 @@ outputPort(port) ::= <<
 ><port.name>_out		: out std_logic_vector(<port.type.size>-1 downto 0);<
 else
 >data_<indexPort(port)>_out		: out std_logic_vector(31 downto 0);
-status_<indexPort(port)>_out	: in  std_logic_vector(8 downto 0);
+status_<indexPort(port)>_out	: in  std_logic_vector(31 downto 0);
 dv_<indexPort(port)>_out		: out std_logic;<
 endif>
 >>
@@ -198,7 +198,7 @@ outputPortSignals(port, connection) ::= <<
 <if(!port.native)
 >signal fifo_<indexConnection(connection)>_rdreq		: std_logic;
 signal fifo_<indexConnection(connection)>_q			: std_logic_vector(31 downto 0);
-signal fifo_<indexConnection(connection)>_status		: std_logic_vector(8 downto 0);<
+signal fifo_<indexConnection(connection)>_status		: std_logic_vector(31 downto 0);<
 else
 >signal s_<indexConnection(connection)> 		: std_logic_vector(<port.type.size>-1 downto 0);<
 endif>

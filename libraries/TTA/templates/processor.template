@@ -36,7 +36,7 @@ entity processor_{{id}} is
       {{input.name}}_in     : in  std_logic_vector({{input.size - 1}} downto 0);     
 {{else}}
       data_{{input.index}}_in    : in  std_logic_vector(31 downto 0);
-      status_{{input.index}}_in  : in  std_logic_vector(8 downto 0);
+      status_{{input.index}}_in  : in  std_logic_vector(31 downto 0);
       ack_{{input.index}}_in     : out std_logic;
 {{endif}}
 {{endfor}}
@@ -45,7 +45,7 @@ entity processor_{{id}} is
       {{output.name}}_out     : out  std_logic_vector({{output.size - 1}} downto 0);     
 {{else}}
       data_{{output.index}}_out   : out std_logic_vector(31 downto 0);
-      status_{{output.index}}_out : in  std_logic_vector(8 downto 0);
+      status_{{output.index}}_out : in  std_logic_vector(31 downto 0);
       dv_{{output.index}}_out     : out std_logic;
 {{endif}}
 {{endfor}}
@@ -91,14 +91,14 @@ architecture bdf_type of processor_{{id}} is
          fu_LSU_dmem_wr_en_x        : out std_logic_vector(0 to 0);
          fu_LSU_dmem_bytemask       : out std_logic_vector(fu_LSU_dataw/8-1 downto 0);
 {{for input in inputs}}
-         fu_STREAM_IN_{{input.index}}_ext_data    : in  std_logic_vector(31 downto 0);
-         fu_STREAM_IN_{{input.index}}_ext_status  : in  std_logic_vector(8 downto 0);
-         fu_STREAM_IN_{{input.index}}_ext_ack     : out std_logic_vector(0 to 0);
+         fu_STREAM_IN_{{input.name}}_ext_data    : in  std_logic_vector(31 downto 0);
+         fu_STREAM_IN_{{input.name}}_ext_status  : in  std_logic_vector(31 downto 0);
+         fu_STREAM_IN_{{input.name}}_ext_ack     : out std_logic_vector(0 to 0);
 {{endfor}}
 {{for output in outputs}}
-         fu_STREAM_OUT_{{output.index}}_ext_data   : out std_logic_vector(31 downto 0);
-         fu_STREAM_OUT_{{output.index}}_ext_status : in  std_logic_vector(8 downto 0);
-         fu_STREAM_OUT_{{output.index}}_ext_dv     : out std_logic_vector(0 to 0);
+         fu_STREAM_OUT_{{output.name}}_ext_data   : out std_logic_vector(31 downto 0);
+         fu_STREAM_OUT_{{output.name}}_ext_status : in  std_logic_vector(31 downto 0);
+         fu_STREAM_OUT_{{output.name}}_ext_dv     : out std_logic_vector(0 to 0);
 {{endfor}}
          rstx                       : in  std_logic);
   end component;
@@ -168,22 +168,22 @@ begin
              fu_LSU_dmem_bytemask       => bytemask_wire,
 {{for input in inputs}}
 {{if input.isNative}}
-             fu_STREAM_IN_{{input.index}}_ext_data    => s_{{input.name}},
-             fu_STREAM_IN_{{input.index}}_ext_status  => (others => '0'),
+             fu_STREAM_IN_{{input.name}}_ext_data    => s_{{input.name}},
+             fu_STREAM_IN_{{input.name}}_ext_status  => (others => '0'),
 {{else}}
-             fu_STREAM_IN_{{input.index}}_ext_data    => data_{{input.index}}_in,
-             fu_STREAM_IN_{{input.index}}_ext_status  => status_{{input.index}}_in,
-             fu_STREAM_IN_{{input.index}}_ext_ack(0)  => ack_{{input.index}}_in,
+             fu_STREAM_IN_{{input.name}}_ext_data    => data_{{input.index}}_in,
+             fu_STREAM_IN_{{input.name}}_ext_status  => status_{{input.index}}_in,
+             fu_STREAM_IN_{{input.name}}_ext_ack(0)  => ack_{{input.index}}_in,
 {{endif}}
 {{endfor}}
 {{for output in outputs}}
 {{if output.isNative}}
-             fu_STREAM_OUT_{{output.index}}_ext_data   => s_{{output.name}},
-             fu_STREAM_OUT_{{output.index}}_ext_status => (others => '0'),
+             fu_STREAM_OUT_{{output.name}}_ext_data   => s_{{output.name}},
+             fu_STREAM_OUT_{{output.name}}_ext_status => (others => '0'),
 {{else}}
-             fu_STREAM_OUT_{{output.index}}_ext_data   => data_{{output.index}}_out,
-             fu_STREAM_OUT_{{output.index}}_ext_status => status_{{output.index}}_out,
-             fu_STREAM_OUT_{{output.index}}_ext_dv(0)  => dv_{{output.index}}_out,
+             fu_STREAM_OUT_{{output.name}}_ext_data   => data_{{output.index}}_out,
+             fu_STREAM_OUT_{{output.name}}_ext_status => status_{{output.index}}_out,
+             fu_STREAM_OUT_{{output.name}}_ext_dv(0)  => dv_{{output.index}}_out,
 {{endif}}
 {{endfor}}
              rstx                       => reset_n);
