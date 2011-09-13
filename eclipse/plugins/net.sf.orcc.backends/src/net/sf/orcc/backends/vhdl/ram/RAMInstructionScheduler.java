@@ -355,7 +355,14 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 		RAM ram = ramMap.get(var);
 		if (ram.isLastAccessRead()
 				&& !ram.getPredicate().isMutuallyExclusive(predicate)) {
-			int port = ram.getLastPortUsed() + 1;
+			int port = ram.getLastPortUsed();
+			if ((port + 1) % numPortsRam == 0) {
+				// all ports have been used
+				executeAllPendingReads(ram);
+			}
+
+			// increase the number of the port used
+			port++;
 			ram.setLastPortUsed(port);
 			ram.setPredicate(predicate);
 
@@ -365,11 +372,6 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 				addEarlySetAddress(ram, var, indexes);
 			}
 			addPendingRead(ram, load);
-
-			if ((port + 1) % numPortsRam == 0) {
-				// all ports have been used
-				executeAllPendingReads(ram);
-			}
 		} else {
 			if (ram.isLastAccessWrite()) {
 				// read after write... let's wait a cycle
@@ -426,10 +428,10 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 		addSetAddress(ram, var, indexes);
 		addWrite(ram, store);
 
-		// move set address and write to pending list
+		// move the two instructions set address and write to pending list
 		if (addPendingWrites) {
-			indexInst -= numPortsRam;
-			for (int i = 0; i < numPortsRam; i++) {
+			indexInst -= 2;
+			for (int i = 0; i < 2; i++) {
 				pendingInstructions.add(instructions.remove(indexInst));
 			}
 		}
