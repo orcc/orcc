@@ -89,6 +89,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 	private HashSet<String> entitySet;
 
+	private int numPortsRam;
+
 	private final Map<String, String> transformations;
 
 	public VHDLBackendImpl() {
@@ -124,6 +126,21 @@ public class VHDLBackendImpl extends AbstractBackend {
 	@Override
 	public void doInitializeOptions() {
 		debugMode = getAttribute(DEBUG_MODE, true);
+		String ports = getAttribute("net.sf.orcc.backends.vhdl.numPortsRam",
+				"2");
+		try {
+			numPortsRam = Integer.parseInt(ports);
+			if (numPortsRam <= 0 || numPortsRam > 256) {
+				write("Invalid number of RAM ports specified: " + numPortsRam
+						+ "\n");
+				write("Will use true dual-port RAM by default\n");
+				numPortsRam = 2;
+			}
+		} catch (NumberFormatException e) {
+			write("Invalid number of RAM ports specified: " + ports + "\n");
+			write("Will use true dual-port RAM by default\n");
+			numPortsRam = 2;
+		}
 	}
 
 	@Override
@@ -143,7 +160,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 				new DeadVariableRemoval(),
 
 				// array to RAM transformation
-				new RAMTransformation(),
+				new RAMTransformation(numPortsRam),
 
 				// transform "b := a > b;" statements to if conditionals
 				new BoolExprTransformation(),
@@ -179,7 +196,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 		// compute init value (depends on ListDeclarationTransformation)
 		templateData.computeInitValue(actor);
-		
+
 		// compute sensitivity list (depends on RamTransformation)
 		templateData.computeSensitivityList(actor);
 	}

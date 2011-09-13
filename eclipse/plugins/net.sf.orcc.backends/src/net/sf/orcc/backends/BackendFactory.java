@@ -91,9 +91,9 @@ public class BackendFactory extends PluginFactory {
 		String backendName = (String) options.get(BACKEND);
 		Backend backend = (Backend) plugins.get(backendName);
 
-		backend.setOptions(options);
 		backend.setProgressMonitor(monitor);
 		backend.setWriteListener(listener);
+		backend.setOptions(options);
 
 		// always compile VTL.
 		// an actor is only compiled if it needs to (based on modification date)

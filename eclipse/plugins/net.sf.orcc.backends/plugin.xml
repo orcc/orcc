@@ -68,6 +68,9 @@
          <option
                id="net.sf.orcc.plugins.compileXDF">
          </option>
+         <option
+               id="net.sf.orcc.backends.vhdl.numPortsRam">
+         </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.xlim.XlimBackendImpl"
@@ -253,6 +256,14 @@
                id="net.sf.orcc.backends.merger2"
                name="New version of merger">
             <checkBox></checkBox>
+         </option>
+         <option
+               defaultValue="2"
+               id="net.sf.orcc.backends.vhdl.numPortsRam"
+               name="Number of ports for inferred RAM">
+            <textBox>
+               
+            </textBox>
          </option>
    </extension>
    <extension
