@@ -97,8 +97,85 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class Typer extends CalSwitch<Type> {
 
-	private static enum Unification {
-		GLB, LUB, LUB_PLUS_1, LUB_SUM_SIZE
+	private static class Glb implements Unification {
+
+		public static Glb instance = new Glb();
+
+		@Override
+		public int getSize(Type t1, Type t2) {
+			return 0;
+		}
+
+		@Override
+		public Type getType(Type t1, Type t2) {
+			return TypeUtil.getGlb(t1, t2);
+		}
+
+	}
+
+	private static class Lub implements Unification {
+
+		public static Lub instance = new Lub();
+
+		protected Type type;
+
+		@Override
+		public int getSize(Type t1, Type t2) {
+			return 0;
+		}
+
+		@Override
+		public Type getType(Type t1, Type t2) {
+			type = TypeUtil.getLub(t1, t2);
+			return type;
+		}
+
+	}
+
+	private static class LubPlus1 extends Lub {
+
+		public static LubPlus1 instance = new LubPlus1();
+
+		@Override
+		public int getSize(Type t1, Type t2) {
+			return type.getSizeInBits() + 1;
+		}
+
+	}
+
+	private static class LubSum extends Lub {
+
+		public static LubSum instance = new LubSum();
+
+		@Override
+		public int getSize(Type t1, Type t2) {
+			return t1.getSizeInBits() + t2.getSizeInBits();
+		}
+
+	}
+
+	private static class LubSumPow extends Lub {
+
+		public static LubSumPow instance = new LubSumPow();
+
+		@Override
+		public int getSize(Type t1, Type t2) {
+			int shift = t2.getSizeInBits() - 1;
+			if (shift >= 6) {
+				// limits type size to 64
+				shift = 6;
+			}
+			return t1.getSizeInBits() + (1 << shift);
+		}
+
+	}
+
+	private static interface Unification {
+
+		int getSize(Type t1, Type t2);
+
+		Type getType(Type t1, Type t2);
+
 	}
 
 	/**
@@ -402,32 +479,8 @@ public class Typer extends CalSwitch<Type> {
 	 *            how to unify t1 and t2
 	 */
 	private Type createType(Type t1, Type t2, Unification unification) {
-		Type type = null;
-		int size = 0;
-
-		switch (unification) {
-		case GLB:
-			type = TypeUtil.getGlb(t1, t2);
-			break;
-
-		case LUB:
-			type = TypeUtil.getLub(t1, t2);
-			break;
-
-		case LUB_PLUS_1:
-			type = TypeUtil.getLub(t1, t2);
-			if (type != null) {
-				size = type.getSizeInBits() + 1;
-			}
-			break;
-
-		case LUB_SUM_SIZE:
-			type = TypeUtil.getLub(t1, t2);
-			if (type != null) {
-				size = t1.getSizeInBits() + t2.getSizeInBits();
-			}
-			break;
-		}
+		Type type = unification.getType(t1, t2);
+		int size = unification.getSize(t1, t2);
 
 		// only set the size if it is different than 0
 		if (size != 0) {
@@ -538,24 +591,24 @@ public class Typer extends CalSwitch<Type> {
 
 		switch (op) {
 		case BITAND:
-			return createType(t1, t2, Unification.GLB);
+			return createType(t1, t2, Glb.instance);
 
 		case BITOR:
 		case BITXOR:
-			return createType(t1, t2, Unification.LUB);
+			return createType(t1, t2, Lub.instance);
 
 		case TIMES:
-			return createType(t1, t2, Unification.LUB_SUM_SIZE);
+			return createType(t1, t2, LubSum.instance);
 
 		case MINUS:
-			return createType(t1, t2, Unification.LUB_PLUS_1);
+			return createType(t1, t2, LubPlus1.instance);
 
 		case PLUS:
 			if (t1.isString() && !t2.isList() || t2.isString() && !t1.isList()) {
 				return EcoreUtil.copy(t1);
 			}
 
-			return createType(t1, t2, Unification.LUB_PLUS_1);
+			return createType(t1, t2, LubPlus1.instance);
 
 		case DIV:
 		case DIV_INT:
@@ -566,7 +619,7 @@ public class Typer extends CalSwitch<Type> {
 			return limitType(t2);
 
 		case SHIFT_LEFT:
-			return getTypeShiftLeft(t1, t2, source, feature, index);
+			return createType(t1, t2, LubSumPow.instance);
 
 		case EQ:
 		case GE:
@@ -585,57 +638,6 @@ public class Typer extends CalSwitch<Type> {
 		}
 
 		return null;
-	}
-
-	/**
-	 * Returns the type for a left shift whose left operand has type t1 and
-	 * right operand has type t2.
-	 * 
-	 * @param t1
-	 *            type of left operand
-	 * @param t2
-	 *            type of right operand
-	 * @param source
-	 *            source object
-	 * @param feature
-	 *            feature
-	 * @return type of the left shift
-	 */
-	private Type getTypeShiftLeft(Type t1, Type t2, EObject source,
-			EStructuralFeature feature, int index) {
-		int s1;
-		if (t1.isInt()) {
-			s1 = ((TypeInt) t1).getSize();
-		} else if (t1.isUint()) {
-			s1 = ((TypeUint) t1).getSize();
-		} else {
-			s1 = 32;
-		}
-
-		int shift;
-		if (t2.isInt()) {
-			// shift is unsigned, so we do not take the bit sign into account
-			shift = ((TypeInt) t2).getSize() - 1;
-		} else if (t2.isUint()) {
-			shift = ((TypeUint) t2).getSize();
-		} else {
-			shift = 0;
-		}
-
-		int size;
-		int maxSize = boundType.getSizeInBits();
-
-		// 1 << 6 = 64
-		if (shift >= 6) {
-			size = maxSize;
-		} else {
-			size = s1 + (1 << shift) - 1;
-			if (size > maxSize) {
-				size = maxSize;
-			}
-		}
-
-		return IrFactory.eINSTANCE.createTypeInt(size);
 	}
 
 	/**
