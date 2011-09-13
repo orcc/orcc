@@ -92,10 +92,11 @@ public class VHDLTemplateData {
 			for (Action action : actor.getActions()) {
 				Pattern peekPattern = action.getPeekPattern();
 				for (Port port : peekPattern.getPorts()) {
+					String name = port.getName();
 					if (!port.isNative()) {
-						String name = port.getName() + "_data";
-						signals.add(name);
+						name += "_data";
 					}
+					signals.add(name);
 				}
 
 				doSwitch(action.getScheduler());
