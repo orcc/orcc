@@ -113,8 +113,10 @@ public class TextBoxOptionWidget implements ModifyListener, OptionWidget {
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration)
 			throws CoreException {
+		updateLaunchConfiguration = false;
 		text.setText(configuration.getAttribute(option.getIdentifier(),
 				option.getDefaultValue()));
+		updateLaunchConfiguration = true;
 	}
 
 	@Override
