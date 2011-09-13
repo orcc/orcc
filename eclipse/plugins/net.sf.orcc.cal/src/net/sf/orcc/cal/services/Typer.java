@@ -408,16 +408,10 @@ public class Typer extends CalSwitch<Type> {
 		switch (unification) {
 		case GLB:
 			type = TypeUtil.getGlb(t1, t2);
-			if (type != null) {
-				size = type.getSizeInBits();
-			}
 			break;
 
 		case LUB:
 			type = TypeUtil.getLub(t1, t2);
-			if (type != null) {
-				size = type.getSizeInBits();
-			}
 			break;
 
 		case LUB_PLUS_1:
@@ -429,24 +423,22 @@ public class Typer extends CalSwitch<Type> {
 
 		case LUB_SUM_SIZE:
 			type = TypeUtil.getLub(t1, t2);
-			size = t1.getSizeInBits() + t2.getSizeInBits();
+			if (type != null) {
+				size = t1.getSizeInBits() + t2.getSizeInBits();
+			}
 			break;
 		}
 
-		if (type != null) {
+		// only set the size if it is different than 0
+		if (size != 0) {
 			if (type.isInt()) {
 				((TypeInt) type).setSize(size);
 			} else if (type.isUint()) {
 				((TypeUint) type).setSize(size);
 			}
-
-			Type maxType = TypeUtil.getGlb(type, boundType);
-			if (maxType != null) {
-				type = maxType;
-			}
 		}
 
-		return type;
+		return limitType(type);
 	}
 
 	/**
@@ -589,10 +581,10 @@ public class Typer extends CalSwitch<Type> {
 		case DIV:
 		case DIV_INT:
 		case SHIFT_RIGHT:
-			return EcoreUtil.copy(t1);
+			return limitType(t1);
 
 		case MOD:
-			return EcoreUtil.copy(t2);
+			return limitType(t2);
 
 		case SHIFT_LEFT:
 			return getTypeShiftLeft(t1, t2, source, feature, index);
@@ -665,6 +657,24 @@ public class Typer extends CalSwitch<Type> {
 		}
 
 		return IrFactory.eINSTANCE.createTypeInt(size);
+	}
+
+	/**
+	 * Returns a new type that is bounded by the {@link #boundType}.
+	 * 
+	 * @param type
+	 *            a type
+	 * @return a new type that is bounded by the {@link #boundType}
+	 */
+	private Type limitType(Type type) {
+		if (type != null) {
+			Type maxType = TypeUtil.getGlb(type, boundType);
+			if (maxType != null) {
+				return maxType;
+			}
+		}
+
+		return type;
 	}
 
 	/**
