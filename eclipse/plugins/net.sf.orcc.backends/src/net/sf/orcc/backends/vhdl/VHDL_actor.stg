@@ -111,7 +111,7 @@ ramDeclaration(variable) ::= <<
 -- custom init of arrays not supported
 <else>
 -- RAM instantiation for "<variable.name>"
-DP_genericRam_<variable.name> : entity work.DP_genericRam
+inferredRam_<variable.name> : entity work.inferredRAM_2p
   generic map (
     depth =\> <listSize(variable.type.dimensions)>,
     width =\> <variable.type.innermostType.sizeInBits>,

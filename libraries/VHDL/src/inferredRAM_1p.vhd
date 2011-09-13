@@ -1,16 +1,16 @@
 -------------------------------------------------------------------------------
--- Title      : True Dual Port RAM
+-- Title      : Single-Port RAM
 -- Project    : ORCC
 -------------------------------------------------------------------------------
--- File       : DP_genericRAM.vhd
+-- File       : inferredRAM_1p.vhd
 -- Author     : Nicolas Siret (nicolas.siret@live.fr)
 -- Company    : INSA - Rennes
 -- Created    : 
--- Last update: 2011-03-07
+-- Last update: 2011-09-13
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
--- Copyright (c) 2009-2010, IETR/INSA of Rennes
+-- Copyright (c) 2011, IETR/INSA of Rennes
 -- All rights reserved.
 -- 
 -- Redistribution and use in source and binary forms, with or without
@@ -51,7 +51,7 @@ use work.orcc_package.all;
 -------------------------------------------------------------------------------
 
 
-entity DP_genericRam is
+entity inferredRAM_1p is
   generic (
     depth : integer := 32;
     width : integer := 16;
@@ -62,18 +62,13 @@ entity DP_genericRam is
     wren_p1    : in  std_logic;
     address_p1 : in  std_logic_vector(bit_width(depth)-1 downto 0);
     data_p1    : in  std_logic_vector(width -1 downto 0);
-    q_p1       : out std_logic_vector(width -1 downto 0);
-    --
-    wren_p2    : in  std_logic;
-    address_p2 : in  std_logic_vector(bit_width(depth)-1 downto 0);
-    data_p2    : in  std_logic_vector(width -1 downto 0);
-    q_p2       : out std_logic_vector(width -1 downto 0));
-end DP_genericRam;
+    q_p1       : out std_logic_vector(width -1 downto 0));
+end inferredRAM_1p;
 
 -------------------------------------------------------------------------------
 
 
-architecture arch_DP_genericRam of DP_genericRam is
+architecture arch_inferredRAM_1p of inferredRAM_1p is
 
 
   -----------------------------------------------------------------------------
@@ -88,16 +83,14 @@ architecture arch_DP_genericRam of DP_genericRam is
   -----------------------------------------------------------------------------
   shared variable ram : ram_type := (others => std_logic_vector(to_signed(initVal, width)));
   signal iaddress_p1 : integer range DEPTH - 1 downto 0;
-  signal iaddress_p2 : integer range DEPTH - 1 downto 0;
   --
   -----------------------------------------------------------------------------
   
 begin
 
   iaddress_p1 <= to_integer(unsigned(address_p1));
-  iaddress_p2 <= to_integer(unsigned(address_p2));
 
-                                        -- read and write data processes
+  -- read and write data process
   rdwrData_p1 : process (clk)
   begin
     if rising_edge(clk) then
@@ -110,17 +103,4 @@ begin
     end if;
   end process rdwrData_p1;
 
-  rdwrData_p2 : process (clk)
-  begin
-    if rising_edge(clk) then
-      if (wren_p2 = '1') then
-        ram(iaddress_p2) := data_p2;
-        q_p2             <= data_p2;
-      else
-        q_p2 <= ram(iaddress_p2);
-      end if;
-    end if;
-  end process rdwrData_p2;
-
-
-end arch_DP_genericRam;
+end arch_inferredRAM_1p;

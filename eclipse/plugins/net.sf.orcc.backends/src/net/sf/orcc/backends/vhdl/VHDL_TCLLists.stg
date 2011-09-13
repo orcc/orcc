@@ -11,8 +11,9 @@ set Testbench "../src/Testbench"
 # Compile Packages
 vcom -93 -reportprogress 30 -work work $SRC/orcc_package.vhd
 vcom -93 -reportprogress 30 -work work $SRC/sim_package.vhd
-# Compile Dual-Port Generic RAM
-vcom -93 -reportprogress 30 -work work $SRC/DP_genericRam.vhd
+# Compile Generic RAMs
+vcom -93 -reportprogress 30 -work work $SRC/inferredRAM_1p.vhd
+vcom -93 -reportprogress 30 -work work $SRC/inferredRAM_2p.vhd
 # Compile FIFO and broadcast
 vcom -93 -reportprogress 30 -work work $SRC/broadcast.vhd
 vcom -93 -reportprogress 30 -work work $SRC/comArbiter.vhd
