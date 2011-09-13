@@ -31,8 +31,10 @@ package net.sf.orcc.cal.validation;
 import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.cal.CalConstants;
@@ -51,6 +53,7 @@ import net.sf.orcc.cal.cal.AstPriority;
 import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstSchedule;
 import net.sf.orcc.cal.cal.AstScheduleRegExp;
+import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.AstStatementAssign;
 import net.sf.orcc.cal.cal.AstStatementCall;
 import net.sf.orcc.cal.cal.AstStatementForeach;
@@ -439,6 +442,7 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 	 *            the FSM of the actor
 	 */
 	private void checkFsm(CalActionList actionList, AstSchedule schedule) {
+		Map<AstState, List<AstAction>> stateActionMap = new HashMap<AstState, List<AstAction>>();
 		for (AstTransition transition : schedule.getTransitions()) {
 			AstTag tag = transition.getTag();
 			if (tag != null) {
@@ -448,6 +452,24 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 					error("tag " + getName(tag)
 							+ " does not refer to any action", transition,
 							eINSTANCE.getAstTransition_Tag(), -1);
+				} else {
+					AstState source = transition.getSource();
+					List<AstAction> stateActions = stateActionMap.get(source);
+					if (stateActions == null) {
+						stateActions = new ArrayList<AstAction>(1);
+						stateActionMap.put(source, stateActions);
+					}
+
+					for (AstAction action : actions) {
+						if (stateActions.contains(action)) {
+							error(source.getName()
+									+ " has more than one transition associated with "
+									+ getName(action), transition,
+									eINSTANCE.getAstTransition_Tag(), -1);
+						} else {
+							stateActions.add(action);
+						}
+					}
 				}
 			}
 		}
