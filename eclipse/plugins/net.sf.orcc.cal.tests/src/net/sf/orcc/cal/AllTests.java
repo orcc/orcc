@@ -245,6 +245,13 @@ public class AllTests {
 	}
 
 	@Test
+	public void xfailCheckBadFsm() throws Exception {
+		Assert.assertNull(
+				"there cannot be two transitions from a source state with the same action",
+				parseAndValidate(prefix + "xfail/BadFsm.cal"));
+	}
+
+	@Test
 	public void xfailCheckParam() throws Exception {
 		Assert.assertNull(
 				"assignment to an actor parameter must not be allowed",

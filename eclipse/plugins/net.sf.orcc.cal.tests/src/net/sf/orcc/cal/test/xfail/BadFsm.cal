@@ -1,0 +1,12 @@
+package net.sf.orcc.cal.test.xfail;
+
+actor BadFsm() ==> :
+
+	action1: action ==> end
+
+	schedule fsm State1:
+		State1 (action1) --> State2;
+    	State1 (action1) --> State3;
+	end
+
+end
