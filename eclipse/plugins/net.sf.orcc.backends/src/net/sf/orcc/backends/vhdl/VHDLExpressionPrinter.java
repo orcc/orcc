@@ -36,158 +36,46 @@ import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.TypeInt;
-import net.sf.orcc.ir.TypeList;
-import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.util.ExpressionPrinter;
+import net.sf.orcc.ir.util.TypeUtil;
 
 /**
  * This class defines a VHDL expression printer.
  * 
  * @author Nicolas Siret
+ * @author Matthieu Wipliez
  * 
  */
 public class VHDLExpressionPrinter extends ExpressionPrinter {
-
-	/**
-	 * Prints a function call to the function with the given name, whose
-	 * arguments are the expressions e1 and e2.
-	 * 
-	 * @param function
-	 *            a function name
-	 * @param e1
-	 *            first expression
-	 * @param e2
-	 *            second expression
-	 */
-	private String printCall(String function, Expression e1, Expression e2,
-			Type size) {
-		// parent precedence is the highest possible to prevent top-level binary
-		// expression from being parenthesized
-		int nextPrec = Integer.MAX_VALUE;
-		String call = function + "(" + doSwitch(e1, nextPrec, 0) + ", "
-				+ doSwitch(e2, nextPrec, 1) + ", ";
-
-		if (size.isUint()) {
-			call = "u" + call;
-		}
-		
-		if (function == "bitand") {
-			Type lub = getLub(e1.getType(), e2.getType());
-			call += lub.getSizeInBits() + ", ";
-		}
-		return call + size.getSizeInBits() + ")";
-	}
-
-	/**
-	 * Returns the Least Upper Bound of the given types.
-	 * 
-	 * @param t1
-	 *            a type
-	 * @param t2
-	 *            another type
-	 * @return the Least Upper Bound of the given types
-	 */
-	public Type getLub(Type t1, Type t2) {
-		if (t1 == null || t2 == null) {
-			return null;
-		}
-
-		if (t1.isBool() && t2.isBool()) {
-			return t1;
-		} else if (t1.isFloat() && t2.isFloat()) {
-			return t1;
-		} else if (t1.isString() && t2.isString()) {
-			return t1;
-		} else if (t1.isInt() && t2.isInt()) {
-			return IrFactory.eINSTANCE.createTypeInt(Math.max(
-					((TypeInt) t1).getSize(), ((TypeInt) t2).getSize()));
-		} else if (t1.isList() && t2.isList()) {
-			TypeList listType1 = (TypeList) t1;
-			TypeList listType2 = (TypeList) t2;
-			Type type = getLub(listType1.getType(), listType2.getType());
-			if (type != null) {
-				// only return a list when the underlying type is valid
-				int size = Math.max(listType1.getSize(), listType2.getSize());
-				return IrFactory.eINSTANCE.createTypeList(size, type);
-			}
-		} else if (t1.isUint() && t2.isUint()) {
-			return IrFactory.eINSTANCE.createTypeUint(Math.max(
-					((TypeUint) t1).getSize(), ((TypeUint) t2).getSize()));
-		} else if (t1.isInt() && t2.isUint()) {
-			int si = ((TypeInt) t1).getSize();
-			int su = ((TypeUint) t2).getSize();
-			if (si > su) {
-				return IrFactory.eINSTANCE.createTypeInt(si);
-			} else {
-				return IrFactory.eINSTANCE.createTypeInt(su + 1);
-			}
-		} else if (t1.isUint() && t2.isInt()) {
-			int su = ((TypeUint) t1).getSize();
-			int si = ((TypeInt) t2).getSize();
-			if (si > su) {
-				return IrFactory.eINSTANCE.createTypeInt(si);
-			} else {
-				return IrFactory.eINSTANCE.createTypeInt(su + 1);
-			}
-		}
-
-		return null;
-	}
-
-	@Override
-	protected String toString(OpBinary op) {
-		switch (op) {
-		case EQ:
-			return "=";
-		case LOGIC_AND:
-			return "and";
-		case LOGIC_OR:
-			return "or";
-		case NE:
-			return "/=";
-		default:
-			return op.getText();
-		}
-	}
-
-	@Override
-	protected String toString(OpUnary op) {
-		switch (op) {
-		case LOGIC_NOT:
-			return "not ";
-		default:
-			return op.getText();
-		}
-	}
 
 	@Override
 	public String caseExprBinary(ExprBinary expr) {
 		OpBinary op = expr.getOp();
 		Expression e1 = expr.getE1();
 		Expression e2 = expr.getE2();
-		Type size = expr.getType();
+		Type type = expr.getType();
+		boolean isUint = type.isUint();
 
 		switch (op) {
 		case BITAND:
-			return printCall("bitand", e1, e2, size);
+			return printCall(isUint, "bitand", e1, e2,
+					TypeUtil.getLub(e1.getType(), e2.getType()), type);
 		case BITOR:
-			return printCall("bitor", e1, e2, size);
+			return printCall(isUint, "bitor", e1, e2, type);
 		case BITXOR:
-			return printCall("bitxor", e1, e2, size);
+			return printCall(isUint, "bitxor", e1, e2, type);
 		case DIV:
 		case DIV_INT:
-			return printCall("div", e1, e2, size);
+			return printCall(isUint, "div", e1, e2, type);
 		case MOD:
-			return printCall("get_mod", e1, e2, size);
+			return printCall(isUint, "get_mod", e1, e2, type);
 		case SHIFT_LEFT:
-			return printCall("shift_left", e1, e2, size);
+			return printCall(isUint, "shift_left", e1, e2, type);
 		case SHIFT_RIGHT:
-			return printCall("shift_right", e1, e2, size);
+			return printCall(isUint, "shift_right", e1, e2, e1.getType(), type);
 		default: {
 			int currentPrec = op.getPrecedence();
 			int nextPrec;
@@ -250,6 +138,71 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 					+ expr.getExpr().getType().getSizeInBits() + ")";
 		default:
 			return super.caseExprUnary(expr);
+		}
+	}
+
+	/**
+	 * Prints a function call to the function with the given name, whose
+	 * arguments are the expressions e1 and e2.
+	 * 
+	 * @param function
+	 *            a function name
+	 * @param e1
+	 *            first expression
+	 * @param e2
+	 *            second expression
+	 * @param type
+	 *            type to give the function
+	 * @param types
+	 *            additional types to pass the function
+	 */
+	private String printCall(boolean isUint, String function, Expression e1,
+			Expression e2, Type... types) {
+		// parent precedence is the highest possible to prevent top-level binary
+		// expression from being parenthesized
+		int nextPrec = Integer.MAX_VALUE;
+		StringBuilder builder = new StringBuilder();
+		if (isUint) {
+			builder.append('u');
+		}
+		builder.append(function);
+		builder.append('(');
+		builder.append(doSwitch(e1, nextPrec, 0));
+		builder.append(", ");
+		builder.append(doSwitch(e2, nextPrec, 1));
+
+		for (Type type : types) {
+			builder.append(", ");
+			builder.append(type.getSizeInBits());
+		}
+		builder.append(')');
+
+		return builder.toString();
+	}
+
+	@Override
+	protected String toString(OpBinary op) {
+		switch (op) {
+		case EQ:
+			return "=";
+		case LOGIC_AND:
+			return "and";
+		case LOGIC_OR:
+			return "or";
+		case NE:
+			return "/=";
+		default:
+			return op.getText();
+		}
+	}
+
+	@Override
+	protected String toString(OpUnary op) {
+		switch (op) {
+		case LOGIC_NOT:
+			return "not ";
+		default:
+			return op.getText();
 		}
 	}
 
