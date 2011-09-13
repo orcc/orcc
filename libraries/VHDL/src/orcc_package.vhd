@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2011-08-02
+-- Last update: 2011-09-13
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -184,6 +184,24 @@ package body orcc_package is
     end if;
     return result(size -1 downto 0);
   end fsra;
+  
+  function ufsra (input : std_logic_vector; count : integer; size : integer) return std_logic_vector is
+    constant input_length : integer := input'length -1;
+    variable result       : std_logic_vector(input_length downto 0);
+    variable xcount       : integer := count;
+  begin
+    if (input'length <= 1 or count = 0) then
+      return input;
+    else
+      if (count > input_length) then
+        xcount := input_length;
+      end if;
+      result(input_length - xcount downto 0)                  := input(input_length downto xcount);
+      result(input_length downto (input_length - xcount + 1)) := (others => '0');
+    end if;
+    return result(size -1 downto 0);
+  end ufsra;
+  
 
   function shift_right(op1 : integer; op2 : integer; size_op1 : integer; size : integer) return integer is
     variable arg1 : std_logic_vector(size_op1 - 1 downto 0);
@@ -197,7 +215,7 @@ package body orcc_package is
     variable arg1 : std_logic_vector(size_op1 - 1 downto 0);
   begin
     arg1 := std_logic_vector(to_unsigned(op1, size_op1));
-    return to_integer(unsigned(fsra(arg1, op2, size)));
+    return to_integer(unsigned(ufsra(arg1, op2, size)));
     -- return to_integer(to_signed(op1, size) srl op2);
   end function;
 
