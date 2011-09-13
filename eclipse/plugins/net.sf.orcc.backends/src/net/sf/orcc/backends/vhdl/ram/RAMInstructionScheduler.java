@@ -225,7 +225,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 		// fill RAM map
 		for (Var variable : actor.getStateVars()) {
 			if (isVarTransformableToRam(variable)) {
-				RAM ram = new RAM();
+				RAM ram = new RAM(numPortsRam);
 				ramMap.put(variable, ram);
 
 				// initialize the list of pending reads for this RAM

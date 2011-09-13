@@ -40,25 +40,27 @@ import net.sf.orcc.ir.util.IrUtil;
  */
 public class RAM {
 
-	private static final int READ = 1;
-
-	private static final int WRITE = 2;
-
 	private boolean alreadyAccessed;
 
 	private boolean lastAccessRead;
 
 	private int lastPortUsed;
 
-	private int[] portsUsed;
+	private final int numPorts;
+
+	private final RAMPort[] ports;
 
 	private Predicate predicate;
 
 	/**
 	 * Creates a new RAM.
 	 */
-	public RAM() {
-		portsUsed = new int[2];
+	public RAM(int numPorts) {
+		this.numPorts = numPorts;
+		ports = new RAMPort[numPorts];
+		for (int i = 0; i < numPorts; i++) {
+			ports[i] = new RAMPort(i + 1);
+		}
 	}
 
 	/**
@@ -68,6 +70,24 @@ public class RAM {
 	 */
 	public int getLastPortUsed() {
 		return lastPortUsed;
+	}
+
+	/**
+	 * Returns the number of ports of this RAM.
+	 * 
+	 * @return the number of ports of this RAM
+	 */
+	public int getNumPorts() {
+		return numPorts;
+	}
+
+	/**
+	 * Returns the ports of this RAM.
+	 * 
+	 * @return the ports of this RAM
+	 */
+	public RAMPort[] getPorts() {
+		return ports;
 	}
 
 	/**
@@ -95,42 +115,6 @@ public class RAM {
 	 */
 	public boolean isLastAccessWrite() {
 		return alreadyAccessed && !lastAccessRead;
-	}
-
-	/**
-	 * Returns true if port 1 is used for read operations.
-	 * 
-	 * @return true if port 1 is used for read operations
-	 */
-	public boolean isPort1UsedRead() {
-		return (portsUsed[0] & READ) != 0;
-	}
-
-	/**
-	 * Returns true if port 1 is used for write operations.
-	 * 
-	 * @return true if port 1 is used for write operations
-	 */
-	public boolean isPort1UsedWrite() {
-		return (portsUsed[0] & WRITE) != 0;
-	}
-
-	/**
-	 * Returns true if port 2 is used for read operations.
-	 * 
-	 * @return true if port 2 is used for read operations
-	 */
-	public boolean isPort2UsedRead() {
-		return (portsUsed[1] & READ) != 0;
-	}
-
-	/**
-	 * Returns true if port 2 is used for write operations.
-	 * 
-	 * @return true if port 2 is used for write operations
-	 */
-	public boolean isPort2UsedWrite() {
-		return (portsUsed[1] & WRITE) != 0;
 	}
 
 	/**
@@ -167,8 +151,12 @@ public class RAM {
 	 *            last port used
 	 */
 	public void setLastPortUsed(int port) {
-		// set bit for read/write operation depending on lastAccessRead flag
-		portsUsed[port % 2] |= lastAccessRead ? READ : WRITE;
+		// set flag for read/write operation depending on lastAccessRead flag
+		if (lastAccessRead) {
+			ports[port % numPorts].setRead(true);
+		} else {
+			ports[port % numPorts].setWritten(true);
+		}
 
 		this.lastPortUsed = port;
 	}
