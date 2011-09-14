@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.instructions.InstRamRead;
 import net.sf.orcc.backends.instructions.InstRamSetAddress;
 import net.sf.orcc.backends.instructions.InstRamWrite;
@@ -42,6 +43,7 @@ import net.sf.orcc.backends.instructions.InstructionsFactory;
 import net.sf.orcc.backends.vhdl.VHDLTemplateData;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Annotation;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
@@ -518,6 +520,25 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 		boolean isCandidate = var.isAssignable() && var.isGlobal()
 				&& var.getType().isList();
 		if (isCandidate) {
+			// check annotations
+			Annotation annotation = var.getAnnotation("vhdl");
+			if (annotation != null) {
+				String inferAs = annotation.getValue("infer");
+				if (inferAs != null) {
+					if ("RAM".equals(inferAs)) {
+						// always transform to RAM
+						return true;
+					} else if ("register".equals(inferAs)) {
+						// always use register
+						return false;
+					} else {
+						throw new OrccRuntimeException("only admissible "
+								+ "values for \"infer\" attribute are \"RAM\" "
+								+ "and \"register\"");
+					}
+				}
+			}
+
 			// only put RAM for memories larger than minSizeRam
 			TypeList typeList = (TypeList) var.getType();
 			int size = typeList.getSizeInBits();
