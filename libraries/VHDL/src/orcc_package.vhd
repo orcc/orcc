@@ -252,6 +252,11 @@ package body orcc_package is
     while 2**arg1 < op1 loop
       arg1 := arg1 + 1;
     end loop;
+
+    -- if op1 is a power of two, need to add a bit
+    if 2**arg1 = op1 then
+      arg1 := arg1 + 1;
+    end if;
     return arg1;
   end function;
 
