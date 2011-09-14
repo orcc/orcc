@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2011-09-13
+-- Last update: 2011-09-14
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -50,23 +50,23 @@ use IEEE.numeric_std.all;
 
 package orcc_package is
 
-  function bitand (op1      : integer; op2 : integer; size : integer; sizeresult : integer) return integer;
+  function bitand (op1       : integer; op2 : integer; size : integer; sizeresult : integer) return integer;
   function ubitand (op1      : integer; op2 : integer; size : integer; sizeresult : integer) return integer;
-  function bitor (op1       : integer; op2 : integer; size : integer) return integer;
+  function bitor (op1        : integer; op2 : integer; size : integer) return integer;
   function ubitor (op1       : integer; op2 : integer; size : integer) return integer;
-  function bitxor (op1      : integer; op2 : integer; size : integer) return integer;
+  function bitxor (op1       : integer; op2 : integer; size : integer) return integer;
   function ubitxor (op1      : integer; op2 : integer; size : integer) return integer;
-  function bitnot (op1      : integer; size : integer) return integer;
+  function bitnot (op1       : integer; size : integer) return integer;
   function ubitnot (op1      : integer; size : integer) return integer;
-  function div (op1         : integer; op2 : integer; size : integer) return integer;
-  function get_mod (ARG0    : integer; ARG1 : integer) return integer;
-  function shift_left (op1  : integer; op2 : integer; size : integer) return integer;
+  function div (op1          : integer; op2 : integer; size : integer) return integer;
+  function get_mod (ARG0     : integer; ARG1 : integer) return integer;
+  function shift_left (op1   : integer; op2 : integer; size : integer) return integer;
   function ushift_left (op1  : integer; op2 : integer; size : integer) return integer;
-  function shift_right (op1 : integer; op2 : integer; size_op1 : integer; size : integer) return integer;
+  function shift_right (op1  : integer; op2 : integer; size_op1 : integer; size : integer) return integer;
   function ushift_right (op1 : integer; op2 : integer; size_op1 : integer; size : integer) return integer;
-  function cast (op1        : integer; sizeop1 : integer; sizeresult : integer) return integer;
-  function ucast (op1       : integer; sizeop1 : integer; sizeresult : integer) return integer;
-  function bit_width (op1   : integer) return integer;
+  function cast (op1         : integer; sizeop1 : integer; sizeresult : integer) return integer;
+  function ucast (op1        : integer; sizeop1 : integer; sizeresult : integer) return integer;
+  function bit_width (op1    : integer) return integer;
 
 end;
 
@@ -170,38 +170,47 @@ package body orcc_package is
 -- logical right shift
   function fsra (input : std_logic_vector; count : integer; size : integer) return std_logic_vector is
     constant input_length : integer := input'length -1;
-    variable result       : std_logic_vector(input_length downto 0);
-    variable xcount       : integer := count;
+    variable iresult      : std_logic_vector(input_length downto 0);
+    variable result       : std_logic_vector(size -1 downto 0);
   begin
     if (input'length <= 1 or count = 0) then
       return input;
     else
-      if (count > input_length) then
-        xcount := input_length;
+      iresult                                := (others => input(input_length));
+      result                                 := (others => input(input_length));
+      iresult(input_length - count downto 0) := input(input_length downto count);
+      -- 
+      if (input_length > size) then
+        result := iresult(size -1 downto 0);
+      else
+        result(input_length downto 0) := iresult;
       end if;
-      result(input_length - xcount downto 0)                  := input(input_length downto xcount);
-      result(input_length downto (input_length - xcount + 1)) := (others => input(input_length));
+      --
     end if;
-    return result(size -1 downto 0);
+    return result;
   end fsra;
-  
+
   function ufsra (input : std_logic_vector; count : integer; size : integer) return std_logic_vector is
     constant input_length : integer := input'length -1;
-    variable result       : std_logic_vector(input_length downto 0);
-    variable xcount       : integer := count;
+    variable iresult      : std_logic_vector(input_length downto 0);    
+    variable result       : std_logic_vector(size -1 downto 0);
   begin
     if (input'length <= 1 or count = 0) then
       return input;
     else
-      if (count > input_length) then
-        xcount := input_length;
+      iresult                                := (others => '0');
+      result                                 := (others => '0');
+      iresult(input_length - count downto 0) := input(input_length downto count);
+      -- 
+      if (input_length > size) then
+        result := iresult(size -1 downto 0);
+      else
+        result(input_length downto 0) := iresult;
       end if;
-      result(input_length - xcount downto 0)                  := input(input_length downto xcount);
-      result(input_length downto (input_length - xcount + 1)) := (others => '0');
     end if;
-    return result(size -1 downto 0);
+    return result;
   end ufsra;
-  
+
 
   function shift_right(op1 : integer; op2 : integer; size_op1 : integer; size : integer) return integer is
     variable arg1 : std_logic_vector(size_op1 - 1 downto 0);
