@@ -221,6 +221,7 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Var/type"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Var/uses"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EAttribute Ir.ecore#//Var/value"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Var/annotations"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Use">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Use/variable"/>

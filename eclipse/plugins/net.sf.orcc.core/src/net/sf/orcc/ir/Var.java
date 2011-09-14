@@ -44,6 +44,14 @@ import org.eclipse.emf.ecore.EObject;
 public interface Var extends EObject {
 
 	/**
+	 * Returns the annotations that may be associated with this variable.
+	 * 
+	 * @return the annotations that may be associated with this variable
+	 * @model containment="true"
+	 */
+	EList<Annotation> getAnnotations();
+
+	/**
 	 * Returns the definitions of this variable. A definition is an instruction
 	 * whose target is this variable. If this variable is a local scalar, at
 	 * most one definition is expected.

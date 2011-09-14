@@ -1324,6 +1324,14 @@ public interface IrPackage extends EPackage {
 		EClass VAR = eINSTANCE.getVar();
 
 		/**
+		 * The meta object literal for the '<em><b>Annotations</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference VAR__ANNOTATIONS = eINSTANCE.getVar_Annotations();
+
+		/**
 		 * The meta object literal for the '<em><b>Assignable</b></em>' attribute feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
@@ -3317,13 +3325,22 @@ public interface IrPackage extends EPackage {
 	int VAR = 43;
 
 	/**
+	 * The feature id for the '<em><b>Annotations</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VAR__ANNOTATIONS = 0;
+
+	/**
 	 * The feature id for the '<em><b>Assignable</b></em>' attribute. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int VAR__ASSIGNABLE = 0;
+	int VAR__ASSIGNABLE = 1;
 
 	/**
 	 * The feature id for the '<em><b>Defs</b></em>' reference list. <!--
@@ -3332,7 +3349,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VAR__DEFS = 1;
+	int VAR__DEFS = 2;
 
 	/**
 	 * The feature id for the '<em><b>Global</b></em>' attribute. <!--
@@ -3341,7 +3358,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VAR__GLOBAL = 2;
+	int VAR__GLOBAL = 3;
 
 	/**
 	 * The feature id for the '<em><b>Index</b></em>' attribute. <!--
@@ -3350,7 +3367,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VAR__INDEX = 3;
+	int VAR__INDEX = 4;
 
 	/**
 	 * The feature id for the '<em><b>Initial Value</b></em>' containment reference.
@@ -3358,7 +3375,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VAR__INITIAL_VALUE = 4;
+	int VAR__INITIAL_VALUE = 5;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -3367,7 +3384,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VAR__LINE_NUMBER = 5;
+	int VAR__LINE_NUMBER = 6;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' reference. <!--
@@ -3376,7 +3393,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VAR__NAME = 6;
+	int VAR__NAME = 7;
 
 	/**
 	 * The feature id for the '<em><b>Type</b></em>' containment reference. <!--
@@ -3385,7 +3402,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VAR__TYPE = 7;
+	int VAR__TYPE = 8;
 
 	/**
 	 * The feature id for the '<em><b>Uses</b></em>' reference list. <!--
@@ -3394,7 +3411,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VAR__USES = 8;
+	int VAR__USES = 9;
 
 	/**
 	 * The feature id for the '<em><b>Value</b></em>' attribute.
@@ -3402,7 +3419,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VAR__VALUE = 9;
+	int VAR__VALUE = 10;
 
 	/**
 	 * The number of structural features of the '<em>Var</em>' class. <!--
@@ -3411,7 +3428,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VAR_FEATURE_COUNT = 10;
+	int VAR_FEATURE_COUNT = 11;
 
 	/**
 	 * The feature id for the '<em><b>Variable</b></em>' reference. <!--
@@ -5295,6 +5312,17 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getVar();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.Var#getAnnotations <em>Annotations</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Annotations</em>'.
+	 * @see net.sf.orcc.ir.Var#getAnnotations()
+	 * @see #getVar()
+	 * @generated
+	 */
+	EReference getVar_Annotations();
 
 	/**
 	 * Returns the meta object for the attribute '

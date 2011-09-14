@@ -1227,8 +1227,17 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getVar_Annotations() {
+		return (EReference)varEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EAttribute getVar_Index() {
-		return (EAttribute)varEClass.getEStructuralFeatures().get(3);
+		return (EAttribute)varEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -1237,7 +1246,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getVar_InitialValue() {
-		return (EReference)varEClass.getEStructuralFeatures().get(4);
+		return (EReference)varEClass.getEStructuralFeatures().get(5);
 	}
 
 	/**
@@ -1246,7 +1255,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EAttribute getVar_Name() {
-		return (EAttribute)varEClass.getEStructuralFeatures().get(6);
+		return (EAttribute)varEClass.getEStructuralFeatures().get(7);
 	}
 
 	/**
@@ -1255,42 +1264,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getVar_Type() {
-		return (EReference)varEClass.getEStructuralFeatures().get(7);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getVar_Value() {
-		return (EAttribute)varEClass.getEStructuralFeatures().get(9);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getVar_Assignable() {
-		return (EAttribute)varEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getVar_Global() {
-		return (EAttribute)varEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getVar_Uses() {
 		return (EReference)varEClass.getEStructuralFeatures().get(8);
 	}
 
@@ -1299,8 +1272,44 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EAttribute getVar_Value() {
+		return (EAttribute)varEClass.getEStructuralFeatures().get(10);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getVar_Assignable() {
+		return (EAttribute)varEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getVar_Global() {
+		return (EAttribute)varEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getVar_Uses() {
+		return (EReference)varEClass.getEStructuralFeatures().get(9);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EReference getVar_Defs() {
-		return (EReference)varEClass.getEStructuralFeatures().get(1);
+		return (EReference)varEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -1309,7 +1318,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EAttribute getVar_LineNumber() {
-		return (EAttribute)varEClass.getEStructuralFeatures().get(5);
+		return (EAttribute)varEClass.getEStructuralFeatures().get(6);
 	}
 
 	/**
@@ -2226,6 +2235,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEReference(annotationEClass, ANNOTATION__VALUES);
 
 		varEClass = createEClass(VAR);
+		createEReference(varEClass, VAR__ANNOTATIONS);
 		createEAttribute(varEClass, VAR__ASSIGNABLE);
 		createEReference(varEClass, VAR__DEFS);
 		createEAttribute(varEClass, VAR__GLOBAL);
@@ -2508,6 +2518,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEReference(getAnnotation_Values(), this.getEStringToEStringMapEntry(), null, "values", null, 0, -1, Annotation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(varEClass, Var.class, "Var", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getVar_Annotations(), this.getAnnotation(), null, "annotations", null, 0, -1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getVar_Assignable(), ecorePackage.getEBoolean(), "assignable", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getVar_Defs(), this.getDef(), this.getDef_Variable(), "defs", null, 0, -1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getVar_Global(), ecorePackage.getEBoolean(), "global", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
