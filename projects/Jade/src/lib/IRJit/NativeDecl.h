@@ -51,9 +51,10 @@ extern "C"{
 		unsigned char *pictureBufferU, unsigned char *pictureBufferV,
 		unsigned short pictureWidth, unsigned short pictureHeight);
 	extern char displayYUV_getFlags();
-	extern void compareYUV_init();
+
 
 	//External functions for compare
+	extern void compareYUV_init();
 	extern void compareYUV_comparePicture(unsigned char *pictureBufferY, unsigned char *pictureBufferU,
                                unsigned char *pictureBufferV, unsigned short pictureWidth,
                                unsigned short pictureHeight);
@@ -63,11 +64,19 @@ extern "C"{
 	extern void source_readNBytes(unsigned char *outTable, unsigned short nbTokenToRead);
 	extern int source_sizeOfFile();
 	extern void source_rewind();
+	extern void printSpeed();
+	extern unsigned int source_getNbLoop(void);
+	extern void source_exit(int exitCode);
+	extern unsigned int source_readByte();
 
 	//Extern functions for writer
 	extern void Writer_init();
 	extern void Writer_write(unsigned char byte);
 	extern void Writer_close();
+	
+	//Extern functions for fpsPrint
+	extern void fpsPrintInit();
+	extern void fpsPrintNewPicDecoded(void);
 
 }
 
@@ -76,19 +85,29 @@ std::map<std::string, void*> createNativeMap()
 	std::map<std::string, void*> native;
 
 	// Link external function with their native names
+	
 	native["displayYUV_init"] = (void*)displayYUV_init;
 	native["displayYUV_displayPicture"] = (void*)displayYUV_displayPicture;
 	native["displayYUV_getFlags"] = (void*)displayYUV_getFlags;
+	
 	native["compareYUV_init"] = (void*)compareYUV_init;
 	native["compareYUV_comparePicture"] = (void*)compareYUV_comparePicture;
+	
 	native["source_init"] = (void*)source_init;
 	native["source_readNBytes"] = (void*)source_readNBytes;
 	native["source_sizeOfFile"] = (void*)source_sizeOfFile;
 	native["source_rewind"] = (void*)source_rewind;
-	native["Writer_init"] =(void*) Writer_init;
+	native["printSpeed"] = (void*)printSpeed;
+	native["source_getNbLoop"] = (void*)source_getNbLoop;
+	native["source_exit"] = (void*)source_exit;
+	native["source_readByte"] = (void*)source_readByte;
+	
+	native["Writer_init"] = (void*)Writer_init;
 	native["Writer_write"] = (void*)Writer_write;
 	native["Writer_close"] = (void*)Writer_close;
-
+	
+	native["fpsPrintInit"] = (void*)fpsPrintInit;
+	native["fpsPrintNewPicDecoded"] = (void*)fpsPrintNewPicDecoded;
 
 	return native;
 }

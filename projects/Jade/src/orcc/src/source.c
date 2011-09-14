@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <time.h>
 
 
 #include "orcc_util.h"
@@ -47,10 +48,24 @@
 
 #define LOOP_NUMBER 1
 
+const int PRINT_SPEED = 0;
+
 static FILE *file = NULL;
 static int nb;
 static int stop;
 static int genetic = 0;
+static clock_t startTime;
+static unsigned int nbByteRead = 0;
+
+void printSpeed(void) {
+	double executionTime;
+	int speed;
+
+	executionTime = (double)(clock() - startTime)/CLOCKS_PER_SEC;
+	speed = nbByteRead / executionTime;
+	speed /= 1024;
+	printf("Speed : %ld Kib/s\n",speed);
+}
 
 // Called before any *_scheduler function.
 void source_init() {
@@ -74,6 +89,20 @@ void source_init() {
 		wait_for_key();
 		exit(1);
 	}
+	if(PRINT_SPEED) {
+		atexit(printSpeed);
+	}
+	startTime = clock();
+}
+
+unsigned int source_getNbLoop(void)
+{
+		return nbLoops;
+}
+
+void source_exit(int exitCode)
+{
+	exit(exitCode);
 }
 
 int source_sizeOfFile() { 
@@ -131,6 +160,7 @@ unsigned int source_readByte(){
 			fprintf(stderr,"Problem when reading input file.\n");
 		}
 	}
+	nbByteRead += 8;
 	return buf[0];
 }
 
@@ -142,4 +172,5 @@ void source_readNBytes(unsigned char *outTable, unsigned short nbTokenToRead){
 		fprintf(stderr,"Problem when reading input file.\n");
 		exit(-4);
 	}
+	nbByteRead += nbTokenToRead * 8;
 }
