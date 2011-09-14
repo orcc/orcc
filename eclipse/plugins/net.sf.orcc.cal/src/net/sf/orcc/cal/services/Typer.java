@@ -30,6 +30,7 @@ package net.sf.orcc.cal.services;
 
 import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -301,8 +302,8 @@ public class Typer extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstExpressionInteger(AstExpressionInteger expression) {
-		return IrFactory.eINSTANCE.createTypeInt(TypeUtil.getSize(expression
-				.getValue()));
+		BigInteger value = BigInteger.valueOf(expression.getValue());
+		return IrFactory.eINSTANCE.createTypeIntOrUint(value);
 	}
 
 	@Override
@@ -334,6 +335,8 @@ public class Typer extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstExpressionUnary(AstExpressionUnary expression) {
+		setTargetType(expression);
+
 		OpUnary op = OpUnary.getOperator(expression.getUnaryOperator());
 		Type type = getType(expression.getExpression());
 		if (type == null) {
@@ -346,16 +349,17 @@ public class Typer extends CalSwitch<Type> {
 			return EcoreUtil.copy(type);
 		case MINUS:
 			if (type.isUint()) {
-				return IrFactory.eINSTANCE.createTypeInt(((TypeUint) type)
-						.getSize());
+				int size = ((TypeUint) type).getSize() + 1;
+				type = IrFactory.eINSTANCE.createTypeInt(size);
 			}
-			return EcoreUtil.copy(type);
+			return limitType(type);
 		case NUM_ELTS:
 			if (!type.isList()) {
 				return IrFactory.eINSTANCE.createTypeInt(1);
 			}
 			TypeList listType = (TypeList) type;
-			return IrFactory.eINSTANCE.createTypeInt(TypeUtil.getSize(listType
+			// uint because the size of a list is always positive
+			return IrFactory.eINSTANCE.createTypeUint(TypeUtil.getSize(listType
 					.getSize()));
 		default:
 			return null;
@@ -530,10 +534,10 @@ public class Typer extends CalSwitch<Type> {
 
 			AstExpression index = itI.next();
 			if (EcoreUtil.isAncestor(index, expression)) {
-				// index goes from 0 to dim - 1
+				// uint because index goes from 0 to dim - 1
 				int indexSize = TypeUtil.getSize(new ExpressionEvaluator()
 						.evaluateAsInteger(dim) - 1);
-				return IrFactory.eINSTANCE.createTypeInt(indexSize);
+				return IrFactory.eINSTANCE.createTypeUint(indexSize);
 			}
 		}
 

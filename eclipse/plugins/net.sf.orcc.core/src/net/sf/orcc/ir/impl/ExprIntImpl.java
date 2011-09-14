@@ -13,7 +13,6 @@ import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.util.TypeUtil;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EClass;
@@ -158,7 +157,7 @@ public class ExprIntImpl extends ExpressionImpl implements ExprInt {
 
 	@Override
 	public Type getType() {
-		return IrFactory.eINSTANCE.createTypeInt(TypeUtil.getSize(value));
+		return IrFactory.eINSTANCE.createTypeIntOrUint(value);
 	}
 
 	/**

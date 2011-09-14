@@ -184,7 +184,8 @@ public class TypeUtil {
 
 	/**
 	 * Returns the number of bits in the two's-complement representation of the
-	 * given number, <i>including</i> a sign bit.
+	 * given number, including a sign bit <i>only</i> if <code>number</code> is
+	 * less than zero.
 	 * 
 	 * @param number
 	 *            a number
@@ -192,12 +193,15 @@ public class TypeUtil {
 	 *         given number, <i>including</i> a sign bit
 	 */
 	public static int getSize(BigInteger number) {
-		return number.bitLength() + 1;
+		int bitLength = number.bitLength();
+		return (number.compareTo(BigInteger.ZERO) < 0) ? bitLength + 1
+				: bitLength;
 	}
 
 	/**
 	 * Returns the number of bits in the two's-complement representation of the
-	 * given number, <i>including</i> a sign bit.
+	 * given number, including a sign bit <i>only</i> if <code>number</code> is
+	 * less than zero.
 	 * 
 	 * @param number
 	 *            a number

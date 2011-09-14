@@ -13,50 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.ir.*;
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Def;
-import net.sf.orcc.ir.ExprBinary;
-import net.sf.orcc.ir.ExprBool;
-import net.sf.orcc.ir.ExprFloat;
-import net.sf.orcc.ir.ExprInt;
-import net.sf.orcc.ir.ExprList;
-import net.sf.orcc.ir.ExprString;
-import net.sf.orcc.ir.ExprUnary;
-import net.sf.orcc.ir.ExprVar;
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.InstAssign;
-import net.sf.orcc.ir.InstCall;
-import net.sf.orcc.ir.InstLoad;
-import net.sf.orcc.ir.InstPhi;
-import net.sf.orcc.ir.InstReturn;
-import net.sf.orcc.ir.InstStore;
-import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.NodeWhile;
-import net.sf.orcc.ir.OpBinary;
-import net.sf.orcc.ir.OpUnary;
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.Predicate;
-import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.State;
-import net.sf.orcc.ir.Tag;
-import net.sf.orcc.ir.Transition;
-import net.sf.orcc.ir.Transitions;
-import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.TypeBool;
-import net.sf.orcc.ir.TypeFloat;
-import net.sf.orcc.ir.TypeInt;
-import net.sf.orcc.ir.TypeList;
-import net.sf.orcc.ir.TypeString;
-import net.sf.orcc.ir.TypeUint;
-import net.sf.orcc.ir.TypeVoid;
-import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.TypeUtil;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EDataType;
@@ -147,16 +104,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Entity createEntity() {
-		EntityImpl entity = new EntityImpl();
-		return entity;
-	}
-
-	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -244,16 +191,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Unit createUnit() {
-		UnitImpl unit = new UnitImpl();
-		return unit;
-	}
-
-	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -267,6 +204,16 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		DefImpl def = new DefImpl();
 		def.setVariable(variable);
 		return def;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Entity createEntity() {
+		EntityImpl entity = new EntityImpl();
+		return entity;
 	}
 
 	/**
@@ -653,56 +600,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public InstStore createInstStore(Var target, List<Expression> indexes,
-			Expression value) {
-		return createInstStore(0, target, indexes, value);
-	}
-	
-	@Override
-	public InstStore createInstStore(Var target, List<Expression> indexes,
-			Var source) {
-		return createInstStore(target, indexes, createExprVar(source));
-	}
-	
-	@Override
-	public InstStore createInstStore(Var target, int index,
-			Var source) {
-		List<Expression> indexes = new ArrayList<Expression>(1);
-		indexes.add(createExprInt(index));
-		return createInstStore(target, indexes, createExprVar(source));
-	}
-	
-	@Override
-	public InstStore createInstStore(Var target, int index,
-			Expression source) {
-		List<Expression> indexes = new ArrayList<Expression>(1);
-		indexes.add(createExprInt(index));
-		return createInstStore(target, indexes, source);
-	}
-	
-	@Override
-	public InstStore createInstStore(Var target, Var index,
-			Var source) {
-		List<Expression> indexes = new ArrayList<Expression>(1);
-		indexes.add(createExprVar(index));
-		return createInstStore(target, indexes, createExprVar(source));
-	}
-	
-	@Override
-	public InstStore createInstStore(Var target, Var index,
-			Expression source) {
-		List<Expression> indexes = new ArrayList<Expression>(1);
-		indexes.add(createExprVar(index));
-		return createInstStore(target, indexes, source);
-	}
-	
-	@Override
-	public InstStore createInstStore(Var target, List<Expression> indexes,
-			int value) {
-		return createInstStore(target, indexes, createExprInt(value));
-	}
-
-	@Override
 	public InstStore createInstStore(Var target, Expression value) {
 		InstStoreImpl instStore = new InstStoreImpl();
 		instStore.setTarget(IrFactory.eINSTANCE.createDef(target));
@@ -711,13 +608,63 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
+	public InstStore createInstStore(Var target, int value) {
+		return createInstStore(target, createExprInt(value));
+	}
+	
+	@Override
+	public InstStore createInstStore(Var target, int index,
+			Expression source) {
+		List<Expression> indexes = new ArrayList<Expression>(1);
+		indexes.add(createExprInt(index));
+		return createInstStore(target, indexes, source);
+	}
+	
+	@Override
+	public InstStore createInstStore(Var target, int index,
+			Var source) {
+		List<Expression> indexes = new ArrayList<Expression>(1);
+		indexes.add(createExprInt(index));
+		return createInstStore(target, indexes, createExprVar(source));
+	}
+	
+	@Override
+	public InstStore createInstStore(Var target, List<Expression> indexes,
+			Expression value) {
+		return createInstStore(0, target, indexes, value);
+	}
+	
+	@Override
+	public InstStore createInstStore(Var target, List<Expression> indexes,
+			int value) {
+		return createInstStore(target, indexes, createExprInt(value));
+	}
+	
+	@Override
+	public InstStore createInstStore(Var target, List<Expression> indexes,
+			Var source) {
+		return createInstStore(target, indexes, createExprVar(source));
+	}
+	
+	@Override
 	public InstStore createInstStore(Var target, Var source) {
 		return createInstStore(target, createExprVar(source));
 	}
 
 	@Override
-	public InstStore createInstStore(Var target, int value) {
-		return createInstStore(target, createExprInt(value));
+	public InstStore createInstStore(Var target, Var index,
+			Expression source) {
+		List<Expression> indexes = new ArrayList<Expression>(1);
+		indexes.add(createExprVar(index));
+		return createInstStore(target, indexes, source);
+	}
+
+	@Override
+	public InstStore createInstStore(Var target, Var index,
+			Var source) {
+		List<Expression> indexes = new ArrayList<Expression>(1);
+		indexes.add(createExprVar(index));
+		return createInstStore(target, indexes, createExprVar(source));
 	}
 
 	/**
@@ -963,6 +910,16 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		return typeInt;
 	}
 
+	@Override
+	public Type createTypeIntOrUint(BigInteger value) {
+		int size = TypeUtil.getSize(value);
+		if (value.compareTo(BigInteger.ZERO) >= 0) {
+			return IrFactory.eINSTANCE.createTypeUint(size);
+		} else {
+			return IrFactory.eINSTANCE.createTypeInt(size);
+		}
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -1020,6 +977,16 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public TypeVoid createTypeVoid() {
 		TypeVoidImpl typeVoid = new TypeVoidImpl();
 		return typeVoid;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Unit createUnit() {
+		UnitImpl unit = new UnitImpl();
+		return unit;
 	}
 
 	/**

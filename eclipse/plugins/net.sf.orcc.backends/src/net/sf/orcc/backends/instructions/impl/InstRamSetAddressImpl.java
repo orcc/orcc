@@ -176,8 +176,8 @@ public class InstRamSetAddressImpl extends InstRamImpl implements
 				.getDimensions();
 		List<Integer> indexSizes = new ArrayList<Integer>(dimensions.size());
 		for (int size : dimensions) {
-			// index goes from 0 to size - 1, and we remove the sign bit
-			int indexSize = TypeUtil.getSize(size - 1) - 1;
+			// index goes from 0 to size - 1
+			int indexSize = TypeUtil.getSize(size - 1);
 			indexSizes.add(indexSize);
 		}
 
