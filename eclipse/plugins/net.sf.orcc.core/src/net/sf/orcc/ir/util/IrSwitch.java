@@ -166,6 +166,21 @@ public class IrSwitch<T> extends Switch<T> {
 	}
 
 	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Annotation</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Annotation</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseAnnotation(Annotation object) {
+		return null;
+	}
+
+	/**
 	 * Returns the result of interpreting the object as an instance of '<em>Expr Binary</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
@@ -372,6 +387,21 @@ public class IrSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseVarToPortMapEntry(Map.Entry<Var, Port> object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>EString To EString Map Entry</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>EString To EString Map Entry</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseEStringToEStringMapEntry(Map.Entry<String, String> object) {
 		return null;
 	}
 
@@ -1115,6 +1145,12 @@ public class IrSwitch<T> extends Switch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
+			case IrPackage.ANNOTATION: {
+				Annotation annotation = (Annotation)theEObject;
+				T result = caseAnnotation(annotation);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
 			case IrPackage.VAR: {
 				Var var = (Var)theEObject;
 				T result = caseVar(var);
@@ -1148,6 +1184,12 @@ public class IrSwitch<T> extends Switch<T> {
 			case IrPackage.VAR_TO_PORT_MAP_ENTRY: {
 				@SuppressWarnings("unchecked") Map.Entry<Var, Port> varToPortMapEntry = (Map.Entry<Var, Port>)theEObject;
 				T result = caseVarToPortMapEntry(varToPortMapEntry);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY: {
+				@SuppressWarnings("unchecked") Map.Entry<String, String> eStringToEStringMapEntry = (Map.Entry<String, String>)theEObject;
+				T result = caseEStringToEStringMapEntry(eStringToEStringMapEntry);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}

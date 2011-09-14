@@ -10,6 +10,7 @@ import java.util.Map;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Annotation;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.ExprBinary;
@@ -311,6 +312,13 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	private EClass annotationEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	private EClass actionEClass = null;
 
 	/**
@@ -382,6 +390,13 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	private EClass varToPortMapEntryEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass eStringToEStringMapEntryEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -773,6 +788,33 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 */
 	public EReference getVarToPortMapEntry_Value() {
 		return (EReference)varToPortMapEntryEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getEStringToEStringMapEntry() {
+		return eStringToEStringMapEntryEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getEStringToEStringMapEntry_Key() {
+		return (EAttribute)eStringToEStringMapEntryEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getEStringToEStringMapEntry_Value() {
+		return (EAttribute)eStringToEStringMapEntryEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -1500,6 +1542,33 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EClass getAnnotation() {
+		return annotationEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getAnnotation_Name() {
+		return (EAttribute)annotationEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getAnnotation_Values() {
+		return (EReference)annotationEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getAction() {
 		return actionEClass;
 	}
@@ -2152,6 +2221,10 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		defEClass = createEClass(DEF);
 		createEReference(defEClass, DEF__VARIABLE);
 
+		annotationEClass = createEClass(ANNOTATION);
+		createEAttribute(annotationEClass, ANNOTATION__NAME);
+		createEReference(annotationEClass, ANNOTATION__VALUES);
+
 		varEClass = createEClass(VAR);
 		createEAttribute(varEClass, VAR__ASSIGNABLE);
 		createEReference(varEClass, VAR__DEFS);
@@ -2181,6 +2254,10 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		varToPortMapEntryEClass = createEClass(VAR_TO_PORT_MAP_ENTRY);
 		createEReference(varToPortMapEntryEClass, VAR_TO_PORT_MAP_ENTRY__KEY);
 		createEReference(varToPortMapEntryEClass, VAR_TO_PORT_MAP_ENTRY__VALUE);
+
+		eStringToEStringMapEntryEClass = createEClass(ESTRING_TO_ESTRING_MAP_ENTRY);
+		createEAttribute(eStringToEStringMapEntryEClass, ESTRING_TO_ESTRING_MAP_ENTRY__KEY);
+		createEAttribute(eStringToEStringMapEntryEClass, ESTRING_TO_ESTRING_MAP_ENTRY__VALUE);
 
 		// Create enums
 		opBinaryEEnum = createEEnum(OP_BINARY);
@@ -2426,6 +2503,10 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEClass(defEClass, Def.class, "Def", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getDef_Variable(), this.getVar(), this.getVar_Defs(), "variable", null, 0, 1, Def.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
+		initEClass(annotationEClass, Annotation.class, "Annotation", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getAnnotation_Name(), ecorePackage.getEString(), "name", null, 0, 1, Annotation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getAnnotation_Values(), this.getEStringToEStringMapEntry(), null, "values", null, 0, -1, Annotation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
 		initEClass(varEClass, Var.class, "Var", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getVar_Assignable(), ecorePackage.getEBoolean(), "assignable", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getVar_Defs(), this.getDef(), this.getDef_Variable(), "defs", null, 0, -1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -2455,6 +2536,10 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEClass(varToPortMapEntryEClass, Map.Entry.class, "VarToPortMapEntry", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getVarToPortMapEntry_Key(), this.getVar(), null, "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getVarToPortMapEntry_Value(), this.getPort(), null, "value", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(eStringToEStringMapEntryEClass, Map.Entry.class, "EStringToEStringMapEntry", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getEStringToEStringMapEntry_Key(), theEcorePackage.getEString(), "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getEStringToEStringMapEntry_Value(), theEcorePackage.getEString(), "value", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Initialize enums and add enum literals
 		initEEnum(opBinaryEEnum, OpBinary.class, "OpBinary");

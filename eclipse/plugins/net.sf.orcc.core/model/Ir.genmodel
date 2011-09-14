@@ -206,6 +206,10 @@
     <genClasses ecoreClass="Ir.ecore#//Def">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Def/variable"/>
     </genClasses>
+    <genClasses ecoreClass="Ir.ecore#//Annotation">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Annotation/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Annotation/values"/>
+    </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Var">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Var/assignable"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Var/defs"/>
@@ -235,6 +239,10 @@
     <genClasses ecoreClass="Ir.ecore#//VarToPortMapEntry">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//VarToPortMapEntry/key"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//VarToPortMapEntry/value"/>
+    </genClasses>
+    <genClasses ecoreClass="Ir.ecore#//EStringToEStringMapEntry">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//EStringToEStringMapEntry/key"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//EStringToEStringMapEntry/value"/>
     </genClasses>
   </genPackages>
   <genPackages prefix="Moc" basePackage="net.sf.orcc" disposableProviderFactory="true"

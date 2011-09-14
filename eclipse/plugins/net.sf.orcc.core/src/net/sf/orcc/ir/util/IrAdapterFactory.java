@@ -253,6 +253,10 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 				return createDefAdapter();
 			}
 			@Override
+			public Adapter caseAnnotation(Annotation object) {
+				return createAnnotationAdapter();
+			}
+			@Override
 			public Adapter caseVar(Var object) {
 				return createVarAdapter();
 			}
@@ -275,6 +279,10 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseVarToPortMapEntry(Map.Entry<Var, Port> object) {
 				return createVarToPortMapEntryAdapter();
+			}
+			@Override
+			public Adapter caseEStringToEStringMapEntry(Map.Entry<String, String> object) {
+				return createEStringToEStringMapEntryAdapter();
 			}
 			@Override
 			public Adapter defaultCase(EObject object) {
@@ -374,6 +382,20 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createDefAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Annotation <em>Annotation</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.Annotation
+	 * @generated
+	 */
+	public Adapter createAnnotationAdapter() {
 		return null;
 	}
 
@@ -582,6 +604,20 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createVarToPortMapEntryAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>EString To EString Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see java.util.Map.Entry
+	 * @generated
+	 */
+	public Adapter createEStringToEStringMapEntryAdapter() {
 		return null;
 	}
 

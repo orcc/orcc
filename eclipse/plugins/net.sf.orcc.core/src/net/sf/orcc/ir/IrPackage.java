@@ -265,6 +265,32 @@ public interface IrPackage extends EPackage {
 		EReference DEF__VARIABLE = eINSTANCE.getDef_Variable();
 
 		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.AnnotationImpl <em>Annotation</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.AnnotationImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getAnnotation()
+		 * @generated
+		 */
+		EClass ANNOTATION = eINSTANCE.getAnnotation();
+
+		/**
+		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute ANNOTATION__NAME = eINSTANCE.getAnnotation_Name();
+
+		/**
+		 * The meta object literal for the '<em><b>Values</b></em>' map feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference ANNOTATION__VALUES = eINSTANCE.getAnnotation_Values();
+
+		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.ExprBinaryImpl <em>Expr Binary</em>}' class.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.ExprBinaryImpl
@@ -757,6 +783,32 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EReference VAR_TO_PORT_MAP_ENTRY__VALUE = eINSTANCE.getVarToPortMapEntry_Value();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.EStringToEStringMapEntryImpl <em>EString To EString Map Entry</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.EStringToEStringMapEntryImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getEStringToEStringMapEntry()
+		 * @generated
+		 */
+		EClass ESTRING_TO_ESTRING_MAP_ENTRY = eINSTANCE.getEStringToEStringMapEntry();
+
+		/**
+		 * The meta object literal for the '<em><b>Key</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute ESTRING_TO_ESTRING_MAP_ENTRY__KEY = eINSTANCE.getEStringToEStringMapEntry_Key();
+
+		/**
+		 * The meta object literal for the '<em><b>Value</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute ESTRING_TO_ESTRING_MAP_ENTRY__VALUE = eINSTANCE.getEStringToEStringMapEntry_Value();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.NodeImpl <em>Node</em>}' class.
@@ -1867,7 +1919,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpBinary()
 	 * @generated
 	 */
-	int OP_BINARY = 48;
+	int OP_BINARY = 50;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpUnary <em>Op Unary</em>}' enum.
@@ -1876,7 +1928,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpUnary()
 	 * @generated
 	 */
-	int OP_UNARY = 49;
+	int OP_UNARY = 51;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Entity <em>Entity</em>}'.
@@ -2494,7 +2546,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPredicate()
 	 * @generated
 	 */
-	int PREDICATE = 44;
+	int PREDICATE = 45;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -3210,13 +3262,50 @@ public interface IrPackage extends EPackage {
 	int DEF_FEATURE_COUNT = 1;
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.AnnotationImpl <em>Annotation</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.AnnotationImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getAnnotation()
+	 * @generated
+	 */
+	int ANNOTATION = 42;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ANNOTATION__NAME = 0;
+
+	/**
+	 * The feature id for the '<em><b>Values</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ANNOTATION__VALUES = 1;
+
+	/**
+	 * The number of structural features of the '<em>Annotation</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ANNOTATION_FEATURE_COUNT = 2;
+
+	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.UseImpl <em>Use</em>}' class.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.ir.impl.UseImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getUse()
 	 * @generated
 	 */
-	int USE = 43;
+	int USE = 44;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.VarImpl <em>Var</em>}' class.
@@ -3225,7 +3314,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getVar()
 	 * @generated
 	 */
-	int VAR = 42;
+	int VAR = 43;
 
 	/**
 	 * The feature id for the '<em><b>Assignable</b></em>' attribute. <!--
@@ -3368,7 +3457,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPortToEIntegerObjectMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = 45;
+	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = 46;
 
 	/**
 	 * The feature id for the '<em><b>Key</b></em>' reference.
@@ -3405,7 +3494,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPortToVarMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_VAR_MAP_ENTRY = 46;
+	int PORT_TO_VAR_MAP_ENTRY = 47;
 
 	/**
 	 * The feature id for the '<em><b>Key</b></em>' reference.
@@ -3442,7 +3531,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getVarToPortMapEntry()
 	 * @generated
 	 */
-	int VAR_TO_PORT_MAP_ENTRY = 47;
+	int VAR_TO_PORT_MAP_ENTRY = 48;
 
 	/**
 	 * The feature id for the '<em><b>Key</b></em>' reference.
@@ -3470,6 +3559,43 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int VAR_TO_PORT_MAP_ENTRY_FEATURE_COUNT = 2;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.EStringToEStringMapEntryImpl <em>EString To EString Map Entry</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.EStringToEStringMapEntryImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getEStringToEStringMapEntry()
+	 * @generated
+	 */
+	int ESTRING_TO_ESTRING_MAP_ENTRY = 49;
+
+	/**
+	 * The feature id for the '<em><b>Key</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ESTRING_TO_ESTRING_MAP_ENTRY__KEY = 0;
+
+	/**
+	 * The feature id for the '<em><b>Value</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ESTRING_TO_ESTRING_MAP_ENTRY__VALUE = 1;
+
+	/**
+	 * The number of structural features of the '<em>EString To EString Map Entry</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ESTRING_TO_ESTRING_MAP_ENTRY_FEATURE_COUNT = 2;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Action <em>Action</em>}'.
@@ -3748,6 +3874,38 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getDef_Variable();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.Annotation <em>Annotation</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Annotation</em>'.
+	 * @see net.sf.orcc.ir.Annotation
+	 * @generated
+	 */
+	EClass getAnnotation();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Annotation#getName <em>Name</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Name</em>'.
+	 * @see net.sf.orcc.ir.Annotation#getName()
+	 * @see #getAnnotation()
+	 * @generated
+	 */
+	EAttribute getAnnotation_Name();
+
+	/**
+	 * Returns the meta object for the map '{@link net.sf.orcc.ir.Annotation#getValues <em>Values</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the map '<em>Values</em>'.
+	 * @see net.sf.orcc.ir.Annotation#getValues()
+	 * @see #getAnnotation()
+	 * @generated
+	 */
+	EReference getAnnotation_Values();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.ExprBinary <em>Expr Binary</em>}'.
@@ -4369,6 +4527,40 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getVarToPortMapEntry_Value();
+
+	/**
+	 * Returns the meta object for class '{@link java.util.Map.Entry <em>EString To EString Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>EString To EString Map Entry</em>'.
+	 * @see java.util.Map.Entry
+	 * @model keyDataType="org.eclipse.emf.ecore.EString"
+	 *        valueDataType="org.eclipse.emf.ecore.EString"
+	 * @generated
+	 */
+	EClass getEStringToEStringMapEntry();
+
+	/**
+	 * Returns the meta object for the attribute '{@link java.util.Map.Entry <em>Key</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Key</em>'.
+	 * @see java.util.Map.Entry
+	 * @see #getEStringToEStringMapEntry()
+	 * @generated
+	 */
+	EAttribute getEStringToEStringMapEntry_Key();
+
+	/**
+	 * Returns the meta object for the attribute '{@link java.util.Map.Entry <em>Value</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Value</em>'.
+	 * @see java.util.Map.Entry
+	 * @see #getEStringToEStringMapEntry()
+	 * @generated
+	 */
+	EAttribute getEStringToEStringMapEntry_Value();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.InstSpecific <em>Inst Specific</em>}'.

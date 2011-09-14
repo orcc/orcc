@@ -73,6 +73,15 @@ public interface IrFactory extends EFactory {
 	Def createDef();
 
 	/**
+	 * Returns a new object of class '<em>Annotation</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Annotation</em>'.
+	 * @generated
+	 */
+	Annotation createAnnotation();
+
+	/**
 	 * Creates a new definition of the given variable.
 	 * 
 	 * @param variable

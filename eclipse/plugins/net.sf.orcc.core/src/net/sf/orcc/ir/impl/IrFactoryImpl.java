@@ -147,12 +147,14 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 			case IrPackage.TYPE_UINT: return createTypeUint();
 			case IrPackage.TYPE_VOID: return createTypeVoid();
 			case IrPackage.DEF: return createDef();
+			case IrPackage.ANNOTATION: return createAnnotation();
 			case IrPackage.VAR: return createVar();
 			case IrPackage.USE: return createUse();
 			case IrPackage.PREDICATE: return createPredicate();
 			case IrPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY: return (EObject)createPortToEIntegerObjectMapEntry();
 			case IrPackage.PORT_TO_VAR_MAP_ENTRY: return (EObject)createPortToVarMapEntry();
 			case IrPackage.VAR_TO_PORT_MAP_ENTRY: return (EObject)createVarToPortMapEntry();
+			case IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY: return (EObject)createEStringToEStringMapEntry();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -197,6 +199,16 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public Def createDef() {
 		DefImpl def = new DefImpl();
 		return def;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Annotation createAnnotation() {
+		AnnotationImpl annotation = new AnnotationImpl();
+		return annotation;
 	}
 
 	@Override
@@ -1074,6 +1086,16 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public Map.Entry<Var, Port> createVarToPortMapEntry() {
 		VarToPortMapEntryImpl varToPortMapEntry = new VarToPortMapEntryImpl();
 		return varToPortMapEntry;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Map.Entry<String, String> createEStringToEStringMapEntry() {
+		EStringToEStringMapEntryImpl eStringToEStringMapEntry = new EStringToEStringMapEntryImpl();
+		return eStringToEStringMapEntry;
 	}
 
 	/**
