@@ -131,7 +131,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 		numPortsRam = getInteger("number of ports per RAM",
 				"net.sf.orcc.backends.vhdl.numPortsRam", 2, 1, 256);
 		minSizeRam = getInteger("minimum size of RAM",
-				"net.sf.orcc.backends.vhdl.minSizeRam", 1024, 0, 65536);
+				"net.sf.orcc.backends.vhdl.minSizeRam", 256, 0, 65536);
 	}
 
 	@Override
