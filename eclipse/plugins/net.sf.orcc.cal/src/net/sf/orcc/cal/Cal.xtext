@@ -323,13 +323,13 @@ BOOL returns ecore::EBoolean: 'true' | 'false';
 AstExpressionFloat: value=REAL;
 
 terminal REAL returns ecore::EFloat :
-	('0'..'9')+ '.' ('0'..'9')* (('e'|'E') ('+' | '-')? ('0'..'9')+)?
-|	'.' ('0'..'9')+ (('e'|'E') ('+' | '-')? ('0'..'9')+)?
-|	('0'..'9')+ ('e'|'E') ('+' | '-')? ('0'..'9')+;
+	'-'? ('0'..'9')+ '.' ('0'..'9')* (('e'|'E') ('+' | '-')? ('0'..'9')+)?
+|	'-'? '.' ('0'..'9')+ (('e'|'E') ('+' | '-')? ('0'..'9')+)?
+|	'-'? ('0'..'9')+ ('e'|'E') ('+' | '-')? ('0'..'9')+;
 
 AstExpressionInteger: value=(DECIMAL | OCTAL | HEX);
 
-terminal DECIMAL returns ecore::ELong : ('1'..'9') ('0'..'9')*;
+terminal DECIMAL returns ecore::ELong : '-'? ('1'..'9') ('0'..'9')*;
 
 terminal OCTAL returns ecore::ELong : '0' ('0'..'7')*;
 
