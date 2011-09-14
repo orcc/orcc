@@ -1248,7 +1248,7 @@ public class AstTransformer {
 			Annotation annotation = IrFactory.eINSTANCE
 					.createAnnotation(astAnnotation.getName());
 			for (AstAnnotationArgument arg : astAnnotation.getArguments()) {
-				annotation.getArguments().put(arg.getName(), arg.getValue());
+				annotation.getAttributes().put(arg.getName(), arg.getValue());
 			}
 			variable.getAnnotations().add(annotation);
 		}
