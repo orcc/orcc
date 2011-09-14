@@ -53,12 +53,12 @@ import org.eclipse.emf.ecore.EObject;
 public interface Annotation extends EObject {
 
 	/**
-	 * Returns the arguments of this annotation as key-value mappings.
+	 * Returns the attributes of this annotation as key-value mappings.
 	 * 
-	 * @return the arguments of this annotation
+	 * @return the attributes of this annotation
 	 * @model keyType="String" valueType="String"
 	 */
-	EMap<String, String> getArguments();
+	EMap<String, String> getAttributes();
 
 	/**
 	 * Returns the name of this annotation.
@@ -67,6 +67,17 @@ public interface Annotation extends EObject {
 	 * @model
 	 */
 	String getName();
+
+	/**
+	 * If there is an attribute with the given name, returns its value,
+	 * otherwise returns <code>null</code>.
+	 * 
+	 * @param name
+	 *            name of an attribute
+	 * @return the value of the attribute with the given name, or
+	 *         <code>null</code>
+	 */
+	String getValue(String name);
 
 	/**
 	 * Sets the name of this annotation.

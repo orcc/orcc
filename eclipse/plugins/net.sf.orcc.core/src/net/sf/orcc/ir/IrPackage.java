@@ -275,12 +275,12 @@ public interface IrPackage extends EPackage {
 		EClass ANNOTATION = eINSTANCE.getAnnotation();
 
 		/**
-		 * The meta object literal for the '<em><b>Arguments</b></em>' map feature.
+		 * The meta object literal for the '<em><b>Attributes</b></em>' map feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference ANNOTATION__ARGUMENTS = eINSTANCE.getAnnotation_Arguments();
+		EReference ANNOTATION__ATTRIBUTES = eINSTANCE.getAnnotation_Attributes();
 
 		/**
 		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
@@ -3280,13 +3280,13 @@ public interface IrPackage extends EPackage {
 	int ANNOTATION = 42;
 
 	/**
-	 * The feature id for the '<em><b>Arguments</b></em>' map.
+	 * The feature id for the '<em><b>Attributes</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ANNOTATION__ARGUMENTS = 0;
+	int ANNOTATION__ATTRIBUTES = 0;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -3903,15 +3903,15 @@ public interface IrPackage extends EPackage {
 	EClass getAnnotation();
 
 	/**
-	 * Returns the meta object for the map '{@link net.sf.orcc.ir.Annotation#getArguments <em>Arguments</em>}'.
+	 * Returns the meta object for the map '{@link net.sf.orcc.ir.Annotation#getAttributes <em>Attributes</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the map '<em>Arguments</em>'.
-	 * @see net.sf.orcc.ir.Annotation#getArguments()
+	 * @return the meta object for the map '<em>Attributes</em>'.
+	 * @see net.sf.orcc.ir.Annotation#getAttributes()
 	 * @see #getAnnotation()
 	 * @generated
 	 */
-	EReference getAnnotation_Arguments();
+	EReference getAnnotation_Attributes();
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Annotation#getName <em>Name</em>}'.

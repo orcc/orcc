@@ -44,6 +44,16 @@ import org.eclipse.emf.ecore.EObject;
 public interface Var extends EObject {
 
 	/**
+	 * If it exists, returns the annotation with the given name, otherwise
+	 * returns <code>null</code>.
+	 * 
+	 * @param name
+	 *            name of an annotation
+	 * @return the annotation with the given name, or <code>null</code>
+	 */
+	Annotation getAnnotation(String name);
+
+	/**
 	 * Returns the annotations that may be associated with this variable.
 	 * 
 	 * @return the annotations that may be associated with this variable

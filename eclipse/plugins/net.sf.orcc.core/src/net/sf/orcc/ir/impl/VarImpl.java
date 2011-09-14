@@ -409,6 +409,17 @@ public class VarImpl extends EObjectImpl implements Var {
 		return IrPackage.Literals.VAR;
 	}
 
+	@Override
+	public Annotation getAnnotation(String name) {
+		for (Annotation annotation : getAnnotations()) {
+			if (name.equals(annotation.getName())) {
+				return annotation;
+			}
+		}
+
+		return null;
+	}
+	
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -711,4 +722,4 @@ public class VarImpl extends EObjectImpl implements Var {
 		return result.toString();
 	}
 
-} // VarImpl
+}

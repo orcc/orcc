@@ -208,7 +208,7 @@
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Annotation">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Annotation/name"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Annotation/arguments"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Annotation/attributes"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Var">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Var/annotations"/>
