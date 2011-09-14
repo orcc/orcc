@@ -41,7 +41,7 @@ architecture bdf_type of top is
   ---------------------------------------------------------------------------
   -- Components declaration
   ---------------------------------------------------------------------------
-  component tta_fifo
+  component fifo
     port(wrreq			: in  std_logic;
          reset_n		: in  std_logic;
          clk			: in  std_logic;
@@ -231,7 +231,7 @@ assignFifos(connections) ::= <<
 
 assignFifo(connection) ::= <<
 <if(!connection.source.native && !connection.target.native)
->fifo_<indexConnection(connection)> : tta_fifo
+>fifo_<indexConnection(connection)> : fifo
   port map(wrreq   =\> fifo_<indexConnection(connection)>_wrreq,
            reset_n =\> reset_n,
            clk     =\> clk,
