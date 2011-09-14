@@ -71,6 +71,9 @@
          <option
                id="net.sf.orcc.backends.vhdl.numPortsRam">
          </option>
+         <option
+               id="net.sf.orcc.backends.vhdl.minSizeRam">
+         </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.xlim.XlimBackendImpl"
@@ -260,10 +263,17 @@
          <option
                defaultValue="2"
                id="net.sf.orcc.backends.vhdl.numPortsRam"
-               name="Number of ports for inferred RAM">
+               name="Number of ports of inferred RAM">
             <textBox>
                
             </textBox>
+         </option>
+         <option
+               defaultValue="1024"
+               description="Minimum size in bits for a list to be translated as a RAM instead of registers"
+               id="net.sf.orcc.backends.vhdl.minSizeRam"
+               name="Minimum size of inferred RAM">
+            <textBox></textBox>
          </option>
    </extension>
    <extension

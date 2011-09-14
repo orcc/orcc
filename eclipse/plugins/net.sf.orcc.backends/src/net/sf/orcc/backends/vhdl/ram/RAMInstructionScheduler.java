@@ -74,6 +74,14 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	 */
 	private List<Instruction> instructions;
 
+	/**
+	 * minimum size in bits for a RAM to be inferred (default 1024)
+	 */
+	private final int minSizeRam;
+
+	/**
+	 * number of ports of inferred RAM (default 2)
+	 */
 	private final int numPortsRam;
 
 	/**
@@ -92,8 +100,17 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 
 	private Map<Var, RAM> ramMap;
 
-	public RAMInstructionScheduler(int numPortsRam) {
+	/**
+	 * Creates a new RAM instruction scheduler.
+	 * 
+	 * @param numPortsRam
+	 *            number of ports of inferred RAM
+	 * @param minSizeRam
+	 *            minimum size in bits for a RAM to be inferred
+	 */
+	public RAMInstructionScheduler(int numPortsRam, int minSizeRam) {
 		this.numPortsRam = numPortsRam;
+		this.minSizeRam = minSizeRam;
 	}
 
 	/**
@@ -501,10 +518,10 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 		boolean isCandidate = var.isAssignable() && var.isGlobal()
 				&& var.getType().isList();
 		if (isCandidate) {
-			// only put RAM for memories larger than 1024 bits
+			// only put RAM for memories larger than minSizeRam
 			TypeList typeList = (TypeList) var.getType();
 			int size = typeList.getSizeInBits();
-			return (size > 1024);
+			return (size > minSizeRam);
 		}
 
 		return false;

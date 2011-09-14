@@ -41,17 +41,20 @@ import net.sf.orcc.ir.util.ActorVisitor;
  * 
  */
 public class RAMTransformation implements ActorVisitor<Object> {
-	
+
 	private final int numPortsRam;
-	
-	public RAMTransformation(int numPortsRam) {
+
+	private final int minSizeRam;
+
+	public RAMTransformation(int numPortsRam, int minSizeRam) {
 		this.numPortsRam = numPortsRam;
+		this.minSizeRam = minSizeRam;
 	}
 
 	@Override
 	public Object doSwitch(Actor actor) {
 		new IfConverter().doSwitch(actor);
-		new RAMInstructionScheduler(numPortsRam).doSwitch(actor);
+		new RAMInstructionScheduler(numPortsRam, minSizeRam).doSwitch(actor);
 		new ConditionedSplitExtractor().doSwitch(actor);
 		new ActionSplitter().doSwitch(actor);
 		new IfDeconverter().doSwitch(actor);

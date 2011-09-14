@@ -89,6 +89,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 	private HashSet<String> entitySet;
 
+	private int minSizeRam;
+
 	private int numPortsRam;
 
 	private final Map<String, String> transformations;
@@ -126,21 +128,10 @@ public class VHDLBackendImpl extends AbstractBackend {
 	@Override
 	public void doInitializeOptions() {
 		debugMode = getAttribute(DEBUG_MODE, true);
-		String ports = getAttribute("net.sf.orcc.backends.vhdl.numPortsRam",
-				"2");
-		try {
-			numPortsRam = Integer.parseInt(ports);
-			if (numPortsRam <= 0 || numPortsRam > 256) {
-				write("Invalid number of RAM ports specified: " + numPortsRam
-						+ "\n");
-				write("Will use true dual-port RAM by default\n");
-				numPortsRam = 2;
-			}
-		} catch (NumberFormatException e) {
-			write("Invalid number of RAM ports specified: " + ports + "\n");
-			write("Will use true dual-port RAM by default\n");
-			numPortsRam = 2;
-		}
+		numPortsRam = getInteger("number of ports per RAM",
+				"net.sf.orcc.backends.vhdl.numPortsRam", 2, 1, 256);
+		minSizeRam = getInteger("minimum size of RAM",
+				"net.sf.orcc.backends.vhdl.minSizeRam", 1024, 0, 65536);
 	}
 
 	@Override
@@ -160,7 +151,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 				new DeadVariableRemoval(),
 
 				// array to RAM transformation
-				new RAMTransformation(numPortsRam),
+				new RAMTransformation(numPortsRam, minSizeRam),
 
 				// transform "b := a > b;" statements to if conditionals
 				new BoolExprTransformation(),
@@ -259,6 +250,40 @@ public class VHDLBackendImpl extends AbstractBackend {
 		if (initProc != null) {
 			IrUtil.delete(initProc);
 		}
+	}
+
+	/**
+	 * Returns the integer value associated with the attribute whose name is
+	 * given.
+	 * 
+	 * @param name
+	 *            user-friendly name of the attribute
+	 * @param attributeName
+	 *            attribute name
+	 * @param defaultValue
+	 *            default value
+	 * @param min
+	 *            minimum value allowed (inclusive)
+	 * @param max
+	 *            maximum value allowed (inclusive)
+	 * @return integer value associated with the attribute whose name is given
+	 */
+	private int getInteger(String name, String attributeName, int defaultValue,
+			int min, int max) {
+		String attrValue = getAttribute(attributeName,
+				String.valueOf(defaultValue));
+		int value;
+		try {
+			value = Integer.parseInt(attrValue);
+			if (value < min || value > max) {
+				throw new NumberFormatException();
+			}
+		} catch (NumberFormatException e) {
+			write("Invalid value " + attrValue + " for " + name + "\n");
+			write("Will use default value " + defaultValue + "\n");
+			value = defaultValue;
+		}
+		return value;
 	}
 
 	@Override
