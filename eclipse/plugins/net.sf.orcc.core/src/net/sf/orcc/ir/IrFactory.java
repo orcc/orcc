@@ -64,15 +64,6 @@ public interface IrFactory extends EFactory {
 	Actor createActor();
 
 	/**
-	 * Returns a new object of class '<em>Def</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Def</em>'.
-	 * @generated
-	 */
-	Def createDef();
-
-	/**
 	 * Returns a new object of class '<em>Annotation</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -80,6 +71,24 @@ public interface IrFactory extends EFactory {
 	 * @generated
 	 */
 	Annotation createAnnotation();
+
+	/**
+	 * Creates a new annotation with the given name.
+	 * 
+	 * @param name
+	 *            name of the annotation
+	 * @return a new annotation with the given name
+	 */
+	Annotation createAnnotation(String name);
+
+	/**
+	 * Returns a new object of class '<em>Def</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Def</em>'.
+	 * @generated
+	 */
+	Def createDef();
 
 	/**
 	 * Creates a new definition of the given variable.
@@ -254,7 +263,7 @@ public interface IrFactory extends EFactory {
 	 * @return an InstAssign with the given location, target and value.
 	 */
 	InstAssign createInstAssign(Var target, Expression value);
-
+	
 	/**
 	 * Creates an InstAssign with the given target and integer value.
 	 * 
@@ -265,7 +274,7 @@ public interface IrFactory extends EFactory {
 	 * @return an InstAssign with the given target and value.
 	 */
 	InstAssign createInstAssign(Var target, int value);
-	
+
 	/**
 	 * Creates an InstAssign with the given target and integer value.
 	 * 
@@ -276,7 +285,7 @@ public interface IrFactory extends EFactory {
 	 * @return an InstAssign with the given target and value.
 	 */
 	InstAssign createInstAssign(Var target, long value);
-
+	
 	/**
 	 * Creates an InstAssign with the given target and source.
 	 * 
@@ -287,7 +296,7 @@ public interface IrFactory extends EFactory {
 	 * @return an InstAssign with the given target and value.
 	 */
 	InstAssign createInstAssign(Var target, Var value);
-	
+
 	/**
 	 * Returns a new object of class '<em>Inst Call</em>'.
 	 * <!-- begin-user-doc
@@ -470,7 +479,7 @@ public interface IrFactory extends EFactory {
 	 */
 	InstStore createInstStore(int lineNumber, Var target,
 			List<Expression> indexes, Expression value);
-
+	
 	/**
 	 * Creates an InstStore with the given target and source.
 	 * 
@@ -479,7 +488,7 @@ public interface IrFactory extends EFactory {
 	 * @return a store
 	 */
 	InstStore createInstStore(Var target, Expression value);
-	
+
 	/**
 	 * Creates an InstStore with the given target and value.
 	 * 
@@ -488,7 +497,7 @@ public interface IrFactory extends EFactory {
 	 * @return a store
 	 */
 	InstStore createInstStore(Var target, int value);
-
+	
 	/**
 	 * Creates an InstStore with the given target, index and source.
 	 * 
@@ -574,7 +583,7 @@ public interface IrFactory extends EFactory {
 	 */
 	InstStore createInstStore(Var target, Var index,
 			Var source);
-	
+
 	/**
 	 * Returns a new object of class '<em>Node Block</em>'.
 	 * <!-- begin-user-doc
@@ -892,7 +901,7 @@ public interface IrFactory extends EFactory {
 	 */
 	Var createVar(int lineNumber, Type type, String name, boolean assignable,
 			Expression initialValue);
-
+	
 	/**
 	 * Creates a new local variable with the given location, type, name, index.
 	 * The variable may be assignable or not. Type is copied.
@@ -925,7 +934,7 @@ public interface IrFactory extends EFactory {
 	 *            index of this variable
 	 */
 	Var createVar(Type type, String name, boolean assignable, int index);
-	
+
 	/**
 	 * Creates a new local integer variable with the given name, index. The
 	 * variable may be assignable or not.

@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import net.sf.orcc.cal.cal.AstAnnotation;
+import net.sf.orcc.cal.cal.AstAnnotationArgument;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstExpressionBinary;
@@ -62,6 +64,7 @@ import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.cal.util.Util;
+import net.sf.orcc.ir.Annotation;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
@@ -1216,6 +1219,7 @@ public class AstTransformer {
 		// create state variable and put it in the map
 		Var variable = IrFactory.eINSTANCE.createVar(lineNumber, type, name,
 				assignable, initialValue);
+		transformAnnotations(variable, astVariable.getAnnotations());
 		mapAstToIr.put(astVariable, variable);
 
 		// translate and add to initialize
@@ -1236,6 +1240,18 @@ public class AstTransformer {
 		}
 
 		return variable;
+	}
+
+	private void transformAnnotations(Var variable,
+			List<AstAnnotation> annotations) {
+		for (AstAnnotation astAnnotation : annotations) {
+			Annotation annotation = IrFactory.eINSTANCE
+					.createAnnotation(astAnnotation.getName());
+			for (AstAnnotationArgument arg : astAnnotation.getArguments()) {
+				annotation.getArguments().put(arg.getName(), arg.getValue());
+			}
+			variable.getAnnotations().add(annotation);
+		}
 	}
 
 	/**

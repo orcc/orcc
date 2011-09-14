@@ -27,14 +27,24 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
+ *   <li>{@link net.sf.orcc.ir.impl.AnnotationImpl#getArguments <em>Arguments</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.AnnotationImpl#getName <em>Name</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.AnnotationImpl#getValues <em>Values</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
 public class AnnotationImpl extends EObjectImpl implements Annotation {
+	/**
+	 * The cached value of the '{@link #getArguments() <em>Arguments</em>}' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getArguments()
+	 * @generated
+	 * @ordered
+	 */
+	protected EMap<String, String> arguments;
+
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -54,16 +64,6 @@ public class AnnotationImpl extends EObjectImpl implements Annotation {
 	 * @ordered
 	 */
 	protected String name = NAME_EDEFAULT;
-
-	/**
-	 * The cached value of the '{@link #getValues() <em>Values</em>}' map.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getValues()
-	 * @generated
-	 * @ordered
-	 */
-	protected EMap<String, String> values;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -110,11 +110,11 @@ public class AnnotationImpl extends EObjectImpl implements Annotation {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EMap<String, String> getValues() {
-		if (values == null) {
-			values = new EcoreEMap<String,String>(IrPackage.Literals.ESTRING_TO_ESTRING_MAP_ENTRY, EStringToEStringMapEntryImpl.class, this, IrPackage.ANNOTATION__VALUES);
+	public EMap<String, String> getArguments() {
+		if (arguments == null) {
+			arguments = new EcoreEMap<String,String>(IrPackage.Literals.ESTRING_TO_ESTRING_MAP_ENTRY, EStringToEStringMapEntryImpl.class, this, IrPackage.ANNOTATION__ARGUMENTS);
 		}
-		return values;
+		return arguments;
 	}
 
 	/**
@@ -125,8 +125,8 @@ public class AnnotationImpl extends EObjectImpl implements Annotation {
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrPackage.ANNOTATION__VALUES:
-				return ((InternalEList<?>)getValues()).basicRemove(otherEnd, msgs);
+			case IrPackage.ANNOTATION__ARGUMENTS:
+				return ((InternalEList<?>)getArguments()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -139,11 +139,11 @@ public class AnnotationImpl extends EObjectImpl implements Annotation {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
+			case IrPackage.ANNOTATION__ARGUMENTS:
+				if (coreType) return getArguments();
+				else return getArguments().map();
 			case IrPackage.ANNOTATION__NAME:
 				return getName();
-			case IrPackage.ANNOTATION__VALUES:
-				if (coreType) return getValues();
-				else return getValues().map();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -156,11 +156,11 @@ public class AnnotationImpl extends EObjectImpl implements Annotation {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
+			case IrPackage.ANNOTATION__ARGUMENTS:
+				((EStructuralFeature.Setting)getArguments()).set(newValue);
+				return;
 			case IrPackage.ANNOTATION__NAME:
 				setName((String)newValue);
-				return;
-			case IrPackage.ANNOTATION__VALUES:
-				((EStructuralFeature.Setting)getValues()).set(newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -174,11 +174,11 @@ public class AnnotationImpl extends EObjectImpl implements Annotation {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
+			case IrPackage.ANNOTATION__ARGUMENTS:
+				getArguments().clear();
+				return;
 			case IrPackage.ANNOTATION__NAME:
 				setName(NAME_EDEFAULT);
-				return;
-			case IrPackage.ANNOTATION__VALUES:
-				getValues().clear();
 				return;
 		}
 		super.eUnset(featureID);
@@ -192,10 +192,10 @@ public class AnnotationImpl extends EObjectImpl implements Annotation {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
+			case IrPackage.ANNOTATION__ARGUMENTS:
+				return arguments != null && !arguments.isEmpty();
 			case IrPackage.ANNOTATION__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
-			case IrPackage.ANNOTATION__VALUES:
-				return values != null && !values.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

@@ -193,15 +193,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Def createDef() {
-		DefImpl def = new DefImpl();
-		return def;
-	}
-
-	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -209,6 +200,22 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public Annotation createAnnotation() {
 		AnnotationImpl annotation = new AnnotationImpl();
 		return annotation;
+	}
+
+	@Override
+	public Annotation createAnnotation(String name) {
+		AnnotationImpl annotation = new AnnotationImpl();
+		annotation.setName(name);
+		return annotation;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Def createDef() {
+		DefImpl def = new DefImpl();
+		return def;
 	}
 
 	@Override
@@ -226,6 +233,16 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public Entity createEntity() {
 		EntityImpl entity = new EntityImpl();
 		return entity;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Map.Entry<String, String> createEStringToEStringMapEntry() {
+		EStringToEStringMapEntryImpl eStringToEStringMapEntry = new EStringToEStringMapEntryImpl();
+		return eStringToEStringMapEntry;
 	}
 
 	/**
@@ -610,7 +627,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		return createInstStore(lineNumber,
 				IrFactory.eINSTANCE.createDef(target), indexes, value);
 	}
-
+	
 	@Override
 	public InstStore createInstStore(Var target, Expression value) {
 		InstStoreImpl instStore = new InstStoreImpl();
@@ -618,7 +635,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		instStore.setValue(value);
 		return instStore;
 	}
-
+	
 	@Override
 	public InstStore createInstStore(Var target, int value) {
 		return createInstStore(target, createExprInt(value));
@@ -651,13 +668,13 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 			int value) {
 		return createInstStore(target, indexes, createExprInt(value));
 	}
-	
+
 	@Override
 	public InstStore createInstStore(Var target, List<Expression> indexes,
 			Var source) {
 		return createInstStore(target, indexes, createExprVar(source));
 	}
-	
+
 	@Override
 	public InstStore createInstStore(Var target, Var source) {
 		return createInstStore(target, createExprVar(source));
@@ -1086,16 +1103,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public Map.Entry<Var, Port> createVarToPortMapEntry() {
 		VarToPortMapEntryImpl varToPortMapEntry = new VarToPortMapEntryImpl();
 		return varToPortMapEntry;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Map.Entry<String, String> createEStringToEStringMapEntry() {
-		EStringToEStringMapEntryImpl eStringToEStringMapEntry = new EStringToEStringMapEntryImpl();
-		return eStringToEStringMapEntry;
 	}
 
 	/**

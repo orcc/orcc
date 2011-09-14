@@ -1560,8 +1560,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getAnnotation_Name() {
-		return (EAttribute)annotationEClass.getEStructuralFeatures().get(0);
+	public EReference getAnnotation_Arguments() {
+		return (EReference)annotationEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -1569,8 +1569,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getAnnotation_Values() {
-		return (EReference)annotationEClass.getEStructuralFeatures().get(1);
+	public EAttribute getAnnotation_Name() {
+		return (EAttribute)annotationEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -2231,8 +2231,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEReference(defEClass, DEF__VARIABLE);
 
 		annotationEClass = createEClass(ANNOTATION);
+		createEReference(annotationEClass, ANNOTATION__ARGUMENTS);
 		createEAttribute(annotationEClass, ANNOTATION__NAME);
-		createEReference(annotationEClass, ANNOTATION__VALUES);
 
 		varEClass = createEClass(VAR);
 		createEReference(varEClass, VAR__ANNOTATIONS);
@@ -2514,8 +2514,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEReference(getDef_Variable(), this.getVar(), this.getVar_Defs(), "variable", null, 0, 1, Def.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(annotationEClass, Annotation.class, "Annotation", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getAnnotation_Arguments(), this.getEStringToEStringMapEntry(), null, "arguments", null, 0, -1, Annotation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getAnnotation_Name(), ecorePackage.getEString(), "name", null, 0, 1, Annotation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getAnnotation_Values(), this.getEStringToEStringMapEntry(), null, "values", null, 0, -1, Annotation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(varEClass, Var.class, "Var", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getVar_Annotations(), this.getAnnotation(), null, "annotations", null, 0, -1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

@@ -338,7 +338,7 @@ terminal HEX returns ecore::ELong : '0' ('x'|'X') ('0'..'9' | 'a'..'f' | 'A'..'F
 AstExpressionString: value=STRING;
 
 ///////////////////////////////////////////////////////////////////////////////
-// common stuff
+// types
 ///////////////////////////////////////////////////////////////////////////////
 
 AstType: AstTypeBool | AstTypeFloat | AstTypeInt | AstTypeList | AstTypeString | AstTypeUint;
@@ -355,10 +355,26 @@ AstTypeString: {AstTypeString} 'String';
 
 AstTypeUint: {AstTypeUint} 'uint' ('(' 'size' '=' size = AstExpression ')')?;
 
-AstVariableDeclaration returns AstVariable: type=AstType name=ID
+///////////////////////////////////////////////////////////////////////////////
+// variables
+///////////////////////////////////////////////////////////////////////////////
+
+// any variable declaration may have annotations
+AstVariableDeclaration returns AstVariable: 
+	(annotations += AstAnnotation)*
+	type = AstType
+	name = ID
 	('[' dimensions += AstExpression ']')*;
 
 AstValuedVariableDeclaration returns AstVariable:
 	AstVariableDeclaration ((constant ?= '=' | ':=') value=AstExpression)?;
 
 AstVariableReference: variable=[AstVariable|QualifiedName];
+
+///////////////////////////////////////////////////////////////////////////////
+// annotations
+///////////////////////////////////////////////////////////////////////////////
+
+AstAnnotation: '@' name=ID ('(' arguments += AstAnnotationArgument (',' arguments += AstAnnotationArgument)* ')')?;
+
+AstAnnotationArgument: name=ID '=' value=STRING;
