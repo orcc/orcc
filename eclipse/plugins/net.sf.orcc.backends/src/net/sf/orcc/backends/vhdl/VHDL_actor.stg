@@ -273,18 +273,34 @@ else
 endif>
 >>
 
-printLoad(load) ::= <<
-<if(load.indexes)
-><if (action.inputPattern.varToPortMap.(load.source.variable) || action.outputPattern.varToPortMap.(load.source.variable) || action.peekPattern.varToPortMap.(load.source.variable))
-><if(load.cast)><CastLoad(targetName=load.target.variable.indexedName,
+printIndexes(type, indexes) ::= <%
+<if (rest(indexes))>
+to_integer(<
+indexes, type.dimensions :
+{index,dim | to_unsigned(<index>, bit_width(<dim>-1))}; separator=" & ">)
+<else>
+<! when there is only one index, no need to perform conversion !>
+<first(indexes)>
+<endif>
+%>
+
+printLoad(load) ::= <%
+<if(load.indexes)>
+<if(action.inputPattern.varToPortMap.(load.source.variable) || action.outputPattern.varToPortMap.(load.source.variable) || action.peekPattern.varToPortMap.(load.source.variable))>
+<if(load.cast)>
+<CastLoad(targetName=load.target.variable.indexedName,
 targetTypeIsUint=load.target.variable.type.uint, targetSize=load.target.variable.size,
-source={<procedure.name>_<getPort(load.source.variable)>}, cast=load.cast)>;<
-else><load.target.variable.indexedName> := <procedure.name>_<getPort(load.source.variable)>_i;<
-endif
-><else><load.target.variable.indexedName> := <load.source.variable.name>(<load.indexes : {index | <index>}; separator=", ">);<
-endif
-><else><load.target.variable.indexedName> := <load.source.variable.name>;<endif>
->>
+source={<procedure.name>_<getPort(load.source.variable)>}, cast=load.cast)>;
+<else>
+<load.target.variable.indexedName> := <procedure.name>_<getPort(load.source.variable)>_i;
+<endif>
+<else>
+<load.target.variable.indexedName> := <load.source.variable.name>(<printIndexes(load.source.variable.type, load.indexes)>);
+<endif>
+<else>
+<load.target.variable.indexedName> := <load.source.variable.name>;
+<endif>
+%>
 
 // a "return" must be transformed when the attribute "transformReturn"
 // is present, which normally only occurs when printActionSchedulerInline
@@ -310,7 +326,7 @@ cast=store.cast, value=store.value)>;<
     ><procedure.name>_<getPort(store.target.variable)>_o := <store.value>;<
    endif><
   else
-   ><store.target.variable.name>(<store.indexes : {index | <index>}; separator=", ">) \<= <store.value>;<
+   ><store.target.variable.name>(<printIndexes(store.target.variable.type, store.indexes)>) \<= <store.value>;<
   endif><
 else
  ><store.target.variable.name> \<= <store.value>;<
