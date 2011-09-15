@@ -196,7 +196,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	}
 
 	private List<Action> AddedUntaggedActions;
-	private int bufferSize;
+	//private int bufferSize;
 	private Action done;
 	private Type entryType;
 	private FSM fsm;
@@ -219,6 +219,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	private Map<String, State> statesMap;
 	private Action write;
 	private List<Var> writeIndexes;
+	private List<Integer>bufferSizes;
 
 	/**
 	 * transforms the transformed action to a transition action
@@ -233,7 +234,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 *            read index of the buffer
 	 */
 	private void actionToTransition(Port port, Action action, Var buffer,
-			Var writeIndex, Var readIndex) {
+			Var writeIndex, Var readIndex, int bufferSize) {
 		ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
 				buffer, writeIndex, port, bufferSize);
 		modifyActionScheduler.doSwitch(action.getScheduler());
@@ -266,7 +267,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		visitedRenameIndex = 0;
 		repeatInput = false;
 		repeatOutput = false;
-		bufferSize = 0;
+		//bufferSize = 0;
 		AddedUntaggedActions = new ArrayList<Action>();
 		inputBuffers = new ArrayList<Var>();
 		inputPorts = new ArrayList<Port>();
@@ -274,6 +275,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		readIndexes = new ArrayList<Var>();
 		statesMap = new HashMap<String, State>();
 		writeIndexes = new ArrayList<Var>();
+		bufferSizes = new ArrayList<Integer>();
 		visitedActions = new ArrayList<Action>();
 		visitedActionsNames = new ArrayList<String>();
 		modifyRepeatActionsInFSM();
@@ -489,7 +491,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 * @return new store action
 	 */
 	private Action createStoreAction(String actionName, Var readCounter,
-			Var storeList, Var buffer, Var writeIndex) {
+			Var storeList, Var buffer, Var writeIndex, int bufferSize) {
 		String storeName = actionName + port.getName() + "_NewStore";
 		Expression guardValue = factory.createExprInt(numTokens);
 		Expression counterExpression = factory.createExprVar(readCounter);
@@ -498,7 +500,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 
 		Action newStoreAction = createAction(expression, storeName);
 		defineStoreBody(readCounter, storeList, newStoreAction.getBody(),
-				buffer, writeIndex);
+				buffer, writeIndex, bufferSize);
 		return newStoreAction;
 	}
 
@@ -536,7 +538,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 */
 
 	private Action createUntaggedAction(Var readIndex, Var writeIndex,
-			Var storeList, Port port, boolean priority) {
+			Var storeList, Port port, boolean priority, int bufferSize) {
 		Expression expression = factory.createExprBool(true);
 		Action newUntaggedAction = createAction(expression,
 				"untagged_" + port.getName());
@@ -545,7 +547,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				true, 0);
 
 		defineUntaggedBody(readIndex, storeList, newUntaggedAction.getBody(),
-				localINPUT, port);
+				localINPUT, port, bufferSize);
 		modifyActionSchedulability(newUntaggedAction, writeIndex, readIndex,
 				OpBinary.LT, factory.createExprInt(bufferSize), port);
 		Pattern pattern = newUntaggedAction.getInputPattern();
@@ -604,7 +606,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 *            new store action body
 	 */
 	private void defineStoreBody(Var readCounter, Var storeList,
-			Procedure body, Var buffer, Var writeIndex) {
+			Procedure body, Var buffer, Var writeIndex, int bufferSize) {
 
 		NodeBlock bodyNode = body.getFirst();
 
@@ -662,7 +664,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 *            new untagged action body
 	 */
 	private void defineUntaggedBody(Var readCounter, Var storeList,
-			Procedure body, Var localINPUT, Port port) {
+			Procedure body, Var localINPUT, Port port, int bufferSize) {
 		NodeBlock bodyNode = body.getFirst();
 
 		EList<Var> locals = body.getLocals();
@@ -852,6 +854,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 						Var buffer = inputBuffers.get(position);
 						Var writeIndex = writeIndexes.get(position);
 						Var readIndex = readIndexes.get(position);
+						int bufferSize = bufferSizes.get(position);
 
 						ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
 								buffer, writeIndex, port, bufferSize);
@@ -1220,7 +1223,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 					numTokens = entry.getValue();
 					inputIndex = inputIndex + 100;
 					port = entry.getKey();
-					bufferSize = 512;// OptimalBufferSize(action, port);
+					int bufferSize =  OptimalBufferSize(action, port);
 					entryType = port.getType();
 
 					if (inputPorts.contains(port)) {
@@ -1228,8 +1231,10 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 						untagBuffer = inputBuffers.get(position);
 						untagReadIndex = readIndexes.get(position);
 						untagWriteIndex = writeIndexes.get(position);
+						bufferSize = bufferSizes.get(position);
 					} else {
 						inputPorts.add(port);
+						bufferSizes.add(bufferSize);
 						untagBuffer = createTab(port.getName() + "_buffer",
 								entryType, bufferSize);
 						inputBuffers.add(untagBuffer);
@@ -1240,7 +1245,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 								+ port.getName());
 						writeIndexes.add(untagWriteIndex);
 						createUntaggedAction(untagReadIndex, untagWriteIndex,
-								untagBuffer, port, true);
+								untagBuffer, port, true, bufferSize);
 					}
 
 					String counterName = action.getName() + "NewStoreCounter"
@@ -1251,7 +1256,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 					Var tab = createTab(listName, entryType, numTokens);
 
 					store = createStoreAction(action.getName(), counter, tab,
-							untagBuffer, untagWriteIndex);
+							untagBuffer, untagWriteIndex, bufferSize);
 
 					ModifyProcessActionStore modifyProcessAction = new ModifyProcessActionStore(
 							tab);
@@ -1268,7 +1273,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 						modifyDoneAction(counter, inputIndex, port.getName());
 					}
 					actionToTransition(port, action, untagBuffer,
-							untagWriteIndex, untagReadIndex);
+							untagWriteIndex, untagReadIndex, bufferSize);
 					// action.getInputPattern().remove(port);
 				}
 
@@ -1371,12 +1376,13 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 			int verifNumTokens = verifEntry.getValue();
 			Port verifPort = verifEntry.getKey();
 			Type entryType = verifPort.getType();
-			bufferSize = 512;// OptimalBufferSize(action, verifPort);
+			int bufferSize = OptimalBufferSize(action, verifPort);
 			if (inputPorts.contains(verifPort)) {
 				int position = portPosition(inputPorts, verifPort);
 				Var buffer = inputBuffers.get(position);
 				Var writeIndex = writeIndexes.get(position);
 				Var readIndex = readIndexes.get(position);
+				bufferSize = bufferSizes.get(position);
 				ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
 						buffer, writeIndex, verifPort, bufferSize);
 				modifyActionScheduler.doSwitch(action.getBody());
@@ -1406,8 +1412,9 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 					untagWriteIndex = createCounter("writeIndex_"
 							+ verifPort.getName());
 					writeIndexes.add(untagWriteIndex);
+					bufferSizes.add(bufferSize);
 					createUntaggedAction(untagReadIndex, untagWriteIndex,
-							untagBuffer, verifPort, false);
+							untagBuffer, verifPort, false, bufferSize);
 
 					ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
 							untagBuffer, untagWriteIndex, verifPort, bufferSize);
@@ -1526,6 +1533,47 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 			}
 		}
 	}
+	
+	/**
+	 * this method returns the closest power of 2 of x --> optimal buffer size
+	 * 
+	 * @param x
+	 * @return closest power of 2 of x
+	 */
+	private int closestPow_2(int x) {
+		int p = 1;
+		while (p < x) {
+			p = p * 2;
+		}
+		return p;
+	}
+	
+	/**
+	 * This method return the closest power of 2 of the maximum repeat value of
+	 * a port
+	 * 
+	 * @param action
+	 *            action containing the port
+	 * @param port
+	 *            repeat port
+	 * @return optimal buffer size
+	 */
+	private int OptimalBufferSize(Action action, Port port) {
+		int size = 0;
+		int optimalSize = 0;
+		for (Entry<Port, Integer> entry : action.getInputPattern()
+				.getNumTokensMap().entrySet()) {
+			if (entry.getKey() == port) {
+				if (entry.getValue() > size) {
+					size = entry.getValue();
+				}
+			}
+		}
+		optimalSize = closestPow_2(size);
+		return optimalSize;
+	}
+
+	/**
 
 	/**
 	 * visits a transition characterized by its source name, target name and
