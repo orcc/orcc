@@ -448,7 +448,7 @@ end loop;
 printFunction(procedure, insideIsSchedulable=false) ::= <<
 <if (!procedure.native)
 ><if (procedure.returnType.void)>procedure<else>function<endif> <procedure.name>(<
-procedure.parameters: varFunction(); separator="; "
+procedure.parameters: {param|<varFunction(param.variable)>}; separator="; "
 >) <if (!procedure.returnType.void)>return <typeFunction(procedure.returnType)><endif> is
 <if(procedure.locals)>
   <procedure.locals: {variable| variable <varFunction(variable)>;}; separator="\n">

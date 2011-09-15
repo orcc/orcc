@@ -287,10 +287,10 @@ while (<whileNode.condition>) {
 printProcedure(procedure,action="") ::= <<
 <if(procedure.native)>
 extern <procedure.returnType> <procedure.name>(<
-  procedure.parameters: {param | <varDecl(variable=param)>}; wrap, anchor, separator=", ">);
+  procedure.parameters: {param | <varDecl(variable=param.variable)>}; wrap, anchor, separator=", ">);
 <else>
 static <procedure.returnType> <procedure.name>(<
-  procedure.parameters: {param | <varDecl(variable=param)>}; wrap, anchor, separator=", ">) {
+  procedure.parameters: {param | <varDecl(variable=param.variable)>}; wrap, anchor, separator=", ">) {
 <if(procedure.locals)>
 	<procedure.locals: {local | <varDecl(variable=local,sep=";\n")>}>
 <endif>

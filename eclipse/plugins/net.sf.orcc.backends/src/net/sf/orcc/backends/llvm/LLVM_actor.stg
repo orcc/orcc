@@ -537,8 +537,8 @@ c<constant>
 // Argument type declaration
 ///////////////////////////////////////////////////////////////////////////////
 
-argumentTypeDeclaration(variable) ::= <<
-<variable.type><if(variable.type.list)>*<endif>
+argumentTypeDeclaration(param) ::= <<
+<param.variable.type><if(param.variable.type.list)>*<endif>
 >>
 
 
@@ -570,8 +570,8 @@ parameter(type, expr) ::= <<
 <type><if(type.list)>*<endif> <Expr(expr)>
 >>
 
-argumentDeclaration(variable) ::= <<
-<variable.type><if(variable.type.list)>*<endif> %<variable.name>
+argumentDeclaration(param) ::= <<
+<param.variable.type><if(param.variable.type.list)>*<endif> %<param.variable.name>
 >>
 
 
