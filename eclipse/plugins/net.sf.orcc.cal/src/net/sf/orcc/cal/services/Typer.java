@@ -39,26 +39,7 @@ import java.util.ListIterator;
 import net.sf.orcc.cache.Cache;
 import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstExpression;
-import net.sf.orcc.cal.cal.AstExpressionBinary;
-import net.sf.orcc.cal.cal.AstExpressionBoolean;
-import net.sf.orcc.cal.cal.AstExpressionCall;
-import net.sf.orcc.cal.cal.AstExpressionElsif;
-import net.sf.orcc.cal.cal.AstExpressionFloat;
-import net.sf.orcc.cal.cal.AstExpressionIf;
-import net.sf.orcc.cal.cal.AstExpressionIndex;
-import net.sf.orcc.cal.cal.AstExpressionInteger;
-import net.sf.orcc.cal.cal.AstExpressionList;
-import net.sf.orcc.cal.cal.AstExpressionString;
-import net.sf.orcc.cal.cal.AstExpressionUnary;
-import net.sf.orcc.cal.cal.AstExpressionVariable;
-import net.sf.orcc.cal.cal.AstFunction;
-import net.sf.orcc.cal.cal.AstGenerator;
-import net.sf.orcc.cal.cal.AstInputPattern;
-import net.sf.orcc.cal.cal.AstOutputPattern;
 import net.sf.orcc.cal.cal.AstPort;
-import net.sf.orcc.cal.cal.AstStatementAssign;
-import net.sf.orcc.cal.cal.AstStatementCall;
-import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstType;
 import net.sf.orcc.cal.cal.AstTypeBool;
 import net.sf.orcc.cal.cal.AstTypeFloat;
@@ -67,9 +48,28 @@ import net.sf.orcc.cal.cal.AstTypeList;
 import net.sf.orcc.cal.cal.AstTypeString;
 import net.sf.orcc.cal.cal.AstTypeUint;
 import net.sf.orcc.cal.cal.AstVariable;
-import net.sf.orcc.cal.cal.AstVariableReference;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
+import net.sf.orcc.cal.cal.ExpressionBinary;
+import net.sf.orcc.cal.cal.ExpressionBoolean;
+import net.sf.orcc.cal.cal.ExpressionCall;
+import net.sf.orcc.cal.cal.ExpressionElsif;
+import net.sf.orcc.cal.cal.ExpressionFloat;
+import net.sf.orcc.cal.cal.ExpressionIf;
+import net.sf.orcc.cal.cal.ExpressionIndex;
+import net.sf.orcc.cal.cal.ExpressionInteger;
+import net.sf.orcc.cal.cal.ExpressionList;
+import net.sf.orcc.cal.cal.ExpressionString;
+import net.sf.orcc.cal.cal.ExpressionUnary;
+import net.sf.orcc.cal.cal.ExpressionVariable;
+import net.sf.orcc.cal.cal.Function;
+import net.sf.orcc.cal.cal.Generator;
+import net.sf.orcc.cal.cal.InputPattern;
+import net.sf.orcc.cal.cal.OutputPattern;
+import net.sf.orcc.cal.cal.StatementAssign;
+import net.sf.orcc.cal.cal.StatementCall;
+import net.sf.orcc.cal.cal.StatementForeach;
+import net.sf.orcc.cal.cal.VariableReference;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
@@ -234,155 +234,6 @@ public class Typer extends CalSwitch<Type> {
 	private Type boundType;
 
 	@Override
-	public Type caseAstExpressionBinary(AstExpressionBinary expression) {
-		setTargetType(expression);
-
-		OpBinary op = OpBinary.getOperator(expression.getOperator());
-		Type t1 = getType(expression.getLeft());
-		Type t2 = getType(expression.getRight());
-		return getTypeBinary(op, t1, t2, expression,
-				eINSTANCE.getAstExpressionBinary_Operator(), -1);
-	}
-
-	@Override
-	public Type caseAstExpressionBoolean(AstExpressionBoolean expression) {
-		return IrFactory.eINSTANCE.createTypeBool();
-	}
-
-	@Override
-	public Type caseAstExpressionCall(AstExpressionCall astCall) {
-		AstFunction function = astCall.getFunction();
-		Type type = getType(function);
-		return EcoreUtil.copy(type);
-	}
-
-	@Override
-	public Type caseAstExpressionElsif(AstExpressionElsif expression) {
-		Type type = getType(expression.getThen());
-		return EcoreUtil.copy(type);
-	}
-
-	@Override
-	public Type caseAstExpressionFloat(AstExpressionFloat expression) {
-		return IrFactory.eINSTANCE.createTypeFloat();
-	}
-
-	@Override
-	public Type caseAstExpressionIf(AstExpressionIf expression) {
-		Type type = getType(expression.getCondition());
-		Type t1 = getType(expression.getThen());
-		for (AstExpressionElsif elsif : expression.getElsifs()) {
-			t1 = TypeUtil.getLub(t1, getType(elsif));
-		}
-
-		Type t2 = getType(expression.getElse());
-		type = TypeUtil.getLub(t1, t2);
-		return type;
-	}
-
-	@Override
-	public Type caseAstExpressionIndex(AstExpressionIndex expression) {
-		AstVariable variable = expression.getSource().getVariable();
-		Type type = getType(variable);
-
-		List<AstExpression> indexes = expression.getIndexes();
-		for (AstExpression index : indexes) {
-			Type subType = getType(index);
-			if (type.isList()) {
-				if (subType != null && (subType.isInt() || subType.isUint())) {
-					type = ((TypeList) type).getType();
-				}
-			} else {
-				return null;
-			}
-		}
-
-		return EcoreUtil.copy(type);
-	}
-
-	@Override
-	public Type caseAstExpressionInteger(AstExpressionInteger expression) {
-		BigInteger value = BigInteger.valueOf(expression.getValue());
-		return IrFactory.eINSTANCE.createTypeIntOrUint(value);
-	}
-
-	@Override
-	public Type caseAstExpressionList(AstExpressionList expression) {
-		List<AstExpression> expressions = expression.getExpressions();
-
-		int size = 1;
-
-		// size of generators
-		for (AstGenerator generator : expression.getGenerators()) {
-			int lower = Evaluator.getIntValue(generator.getLower());
-			int higher = Evaluator.getIntValue(generator.getHigher());
-			size *= (higher - lower) + 1;
-		}
-
-		// size of expressions
-		size *= expressions.size();
-
-		Type type = getType(expressions);
-		return IrFactory.eINSTANCE.createTypeList(size, type);
-	}
-
-	@Override
-	public Type caseAstExpressionString(AstExpressionString expression) {
-		TypeString type = IrFactory.eINSTANCE.createTypeString();
-		type.setSize(expression.getValue().length());
-		return type;
-	}
-
-	@Override
-	public Type caseAstExpressionUnary(AstExpressionUnary expression) {
-		setTargetType(expression);
-
-		OpUnary op = OpUnary.getOperator(expression.getUnaryOperator());
-		Type type = getType(expression.getExpression());
-		if (type == null) {
-			return null;
-		}
-
-		switch (op) {
-		case BITNOT:
-		case LOGIC_NOT:
-			return EcoreUtil.copy(type);
-		case MINUS:
-			if (type.isUint()) {
-				int size = ((TypeUint) type).getSize() + 1;
-				type = IrFactory.eINSTANCE.createTypeInt(size);
-			}
-			return limitType(type);
-		case NUM_ELTS:
-			if (!type.isList()) {
-				return IrFactory.eINSTANCE.createTypeInt(1);
-			}
-			TypeList listType = (TypeList) type;
-			// uint because the size of a list is always positive
-			return IrFactory.eINSTANCE.createTypeUint(TypeUtil.getSize(listType
-					.getSize()));
-		default:
-			return null;
-		}
-	}
-
-	@Override
-	public Type caseAstExpressionVariable(AstExpressionVariable expression) {
-		AstVariable variable = expression.getValue().getVariable();
-		return EcoreUtil.copy(getType(variable));
-	}
-
-	@Override
-	public Type caseAstFunction(AstFunction function) {
-		return doSwitch(function.getType());
-	}
-
-	@Override
-	public Type caseAstGenerator(AstGenerator expression) {
-		return null;
-	}
-
-	@Override
 	public Type caseAstPort(AstPort port) {
 		return doSwitch(port.getType());
 	}
@@ -434,15 +285,15 @@ public class Typer extends CalSwitch<Type> {
 		}
 
 		return IrFactory.eINSTANCE.createTypeUint(size);
-	};
+	}
 
 	@Override
 	public Type caseAstVariable(AstVariable variable) {
 		AstType astType;
 		List<AstExpression> dimensions;
 
-		if (variable.eContainer() instanceof AstInputPattern) {
-			AstInputPattern pattern = (AstInputPattern) variable.eContainer();
+		if (variable.eContainer() instanceof InputPattern) {
+			InputPattern pattern = (InputPattern) variable.eContainer();
 			astType = EcoreUtil.copy(pattern.getPort().getType());
 			dimensions = new ArrayList<AstExpression>();
 			AstExpression repeat = pattern.getRepeat();
@@ -469,6 +320,155 @@ public class Typer extends CalSwitch<Type> {
 		}
 
 		return doSwitch(astType);
+	}
+
+	@Override
+	public Type caseExpressionBinary(ExpressionBinary expression) {
+		setTargetType(expression);
+
+		OpBinary op = OpBinary.getOperator(expression.getOperator());
+		Type t1 = getType(expression.getLeft());
+		Type t2 = getType(expression.getRight());
+		return getTypeBinary(op, t1, t2, expression,
+				eINSTANCE.getExpressionBinary_Operator(), -1);
+	}
+
+	@Override
+	public Type caseExpressionBoolean(ExpressionBoolean expression) {
+		return IrFactory.eINSTANCE.createTypeBool();
+	}
+
+	@Override
+	public Type caseExpressionCall(ExpressionCall call) {
+		Function function = call.getFunction();
+		Type type = getType(function);
+		return EcoreUtil.copy(type);
+	}
+
+	@Override
+	public Type caseExpressionElsif(ExpressionElsif expression) {
+		Type type = getType(expression.getThen());
+		return EcoreUtil.copy(type);
+	}
+
+	@Override
+	public Type caseExpressionFloat(ExpressionFloat expression) {
+		return IrFactory.eINSTANCE.createTypeFloat();
+	}
+
+	@Override
+	public Type caseExpressionIf(ExpressionIf expression) {
+		Type type = getType(expression.getCondition());
+		Type t1 = getType(expression.getThen());
+		for (ExpressionElsif elsif : expression.getElsifs()) {
+			t1 = TypeUtil.getLub(t1, getType(elsif));
+		}
+
+		Type t2 = getType(expression.getElse());
+		type = TypeUtil.getLub(t1, t2);
+		return type;
+	}
+
+	@Override
+	public Type caseExpressionIndex(ExpressionIndex expression) {
+		AstVariable variable = expression.getSource().getVariable();
+		Type type = getType(variable);
+
+		List<AstExpression> indexes = expression.getIndexes();
+		for (AstExpression index : indexes) {
+			Type subType = getType(index);
+			if (type.isList()) {
+				if (subType != null && (subType.isInt() || subType.isUint())) {
+					type = ((TypeList) type).getType();
+				}
+			} else {
+				return null;
+			}
+		}
+
+		return EcoreUtil.copy(type);
+	}
+
+	@Override
+	public Type caseExpressionInteger(ExpressionInteger expression) {
+		BigInteger value = BigInteger.valueOf(expression.getValue());
+		return IrFactory.eINSTANCE.createTypeIntOrUint(value);
+	}
+
+	@Override
+	public Type caseExpressionList(ExpressionList expression) {
+		List<AstExpression> expressions = expression.getExpressions();
+
+		int size = 1;
+
+		// size of generators
+		for (Generator generator : expression.getGenerators()) {
+			int lower = Evaluator.getIntValue(generator.getLower());
+			int higher = Evaluator.getIntValue(generator.getHigher());
+			size *= (higher - lower) + 1;
+		}
+
+		// size of expressions
+		size *= expressions.size();
+
+		Type type = getType(expressions);
+		return IrFactory.eINSTANCE.createTypeList(size, type);
+	}
+
+	@Override
+	public Type caseExpressionString(ExpressionString expression) {
+		TypeString type = IrFactory.eINSTANCE.createTypeString();
+		type.setSize(expression.getValue().length());
+		return type;
+	}
+
+	@Override
+	public Type caseExpressionUnary(ExpressionUnary expression) {
+		setTargetType(expression);
+
+		OpUnary op = OpUnary.getOperator(expression.getUnaryOperator());
+		Type type = getType(expression.getExpression());
+		if (type == null) {
+			return null;
+		}
+
+		switch (op) {
+		case BITNOT:
+		case LOGIC_NOT:
+			return EcoreUtil.copy(type);
+		case MINUS:
+			if (type.isUint()) {
+				int size = ((TypeUint) type).getSize() + 1;
+				type = IrFactory.eINSTANCE.createTypeInt(size);
+			}
+			return limitType(type);
+		case NUM_ELTS:
+			if (!type.isList()) {
+				return IrFactory.eINSTANCE.createTypeInt(1);
+			}
+			TypeList listType = (TypeList) type;
+			// uint because the size of a list is always positive
+			return IrFactory.eINSTANCE.createTypeUint(TypeUtil.getSize(listType
+					.getSize()));
+		default:
+			return null;
+		}
+	}
+
+	@Override
+	public Type caseExpressionVariable(ExpressionVariable expression) {
+		AstVariable variable = expression.getValue().getVariable();
+		return EcoreUtil.copy(getType(variable));
+	}
+
+	@Override
+	public Type caseFunction(Function function) {
+		return doSwitch(function.getType());
+	};
+
+	@Override
+	public Type caseGenerator(Generator expression) {
+		return null;
 	}
 
 	/**
@@ -513,7 +513,7 @@ public class Typer extends CalSwitch<Type> {
 	 *            the expression that is a child of one of the indexes
 	 * @return the type that is necessary to store the index t
 	 */
-	private Type findIndexType(AstVariableReference reference,
+	private Type findIndexType(VariableReference reference,
 			List<AstExpression> indexes, AstExpression expression) {
 		AstVariable variable = reference.getVariable();
 		if (variable == null) {
@@ -676,38 +676,38 @@ public class Typer extends CalSwitch<Type> {
 
 		if (cter != null) {
 			switch (cter.eClass().getClassifierID()) {
-			case CalPackage.AST_EXPRESSION_CALL: {
-				AstExpressionCall call = (AstExpressionCall) cter;
+			case CalPackage.EXPRESSION_CALL: {
+				ExpressionCall call = (ExpressionCall) cter;
 				List<AstVariable> formal = call.getFunction().getParameters();
 				List<AstExpression> actual = call.getParameters();
 				targetType = findParameter(formal, actual, expression);
 				break;
 			}
 
-			case CalPackage.AST_EXPRESSION_INDEX: {
-				AstExpressionIndex index = (AstExpressionIndex) cter;
+			case CalPackage.EXPRESSION_INDEX: {
+				ExpressionIndex index = (ExpressionIndex) cter;
 				targetType = findIndexType(index.getSource(),
 						index.getIndexes(), expression);
 				break;
 			}
 
-			case CalPackage.AST_FUNCTION:
-				AstFunction func = (AstFunction) cter;
+			case CalPackage.FUNCTION:
+				Function func = (Function) cter;
 				targetType = getType(func);
 				break;
 
-			case CalPackage.AST_GENERATOR:
-				AstGenerator generator = (AstGenerator) cter;
+			case CalPackage.GENERATOR:
+				Generator generator = (Generator) cter;
 				targetType = getType(generator.getVariable());
 				break;
 
-			case CalPackage.AST_OUTPUT_PATTERN:
-				AstOutputPattern pattern = (AstOutputPattern) cter;
+			case CalPackage.OUTPUT_PATTERN:
+				OutputPattern pattern = (OutputPattern) cter;
 				targetType = getType(pattern.getPort());
 				break;
 
-			case CalPackage.AST_STATEMENT_ASSIGN: {
-				AstStatementAssign assign = (AstStatementAssign) cter;
+			case CalPackage.STATEMENT_ASSIGN: {
+				StatementAssign assign = (StatementAssign) cter;
 				if (expression == assign.getValue()) {
 					// expression is located in the value
 					targetType = getType(assign.getTarget().getVariable());
@@ -719,16 +719,16 @@ public class Typer extends CalSwitch<Type> {
 				break;
 			}
 
-			case CalPackage.AST_STATEMENT_CALL: {
-				AstStatementCall call = (AstStatementCall) cter;
+			case CalPackage.STATEMENT_CALL: {
+				StatementCall call = (StatementCall) cter;
 				List<AstVariable> formal = call.getProcedure().getParameters();
 				List<AstExpression> actual = call.getParameters();
 				targetType = findParameter(formal, actual, expression);
 				break;
 			}
 
-			case CalPackage.AST_STATEMENT_FOREACH:
-				AstStatementForeach foreach = (AstStatementForeach) cter;
+			case CalPackage.STATEMENT_FOREACH:
+				StatementForeach foreach = (StatementForeach) cter;
 				targetType = getType(foreach.getVariable());
 				break;
 

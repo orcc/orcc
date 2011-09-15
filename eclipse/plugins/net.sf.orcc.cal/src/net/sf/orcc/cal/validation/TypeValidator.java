@@ -35,25 +35,25 @@ import java.util.List;
 
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstExpression;
-import net.sf.orcc.cal.cal.AstExpressionBinary;
-import net.sf.orcc.cal.cal.AstExpressionCall;
-import net.sf.orcc.cal.cal.AstExpressionElsif;
-import net.sf.orcc.cal.cal.AstExpressionIf;
-import net.sf.orcc.cal.cal.AstExpressionIndex;
-import net.sf.orcc.cal.cal.AstExpressionUnary;
-import net.sf.orcc.cal.cal.AstFunction;
-import net.sf.orcc.cal.cal.AstOutputPattern;
 import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstProcedure;
-import net.sf.orcc.cal.cal.AstStatementAssign;
-import net.sf.orcc.cal.cal.AstStatementCall;
-import net.sf.orcc.cal.cal.AstStatementElsif;
-import net.sf.orcc.cal.cal.AstStatementIf;
-import net.sf.orcc.cal.cal.AstStatementWhile;
 import net.sf.orcc.cal.cal.AstVariable;
-import net.sf.orcc.cal.cal.AstVariableReference;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
+import net.sf.orcc.cal.cal.ExpressionBinary;
+import net.sf.orcc.cal.cal.ExpressionCall;
+import net.sf.orcc.cal.cal.ExpressionElsif;
+import net.sf.orcc.cal.cal.ExpressionIf;
+import net.sf.orcc.cal.cal.ExpressionIndex;
+import net.sf.orcc.cal.cal.ExpressionUnary;
+import net.sf.orcc.cal.cal.Function;
+import net.sf.orcc.cal.cal.OutputPattern;
+import net.sf.orcc.cal.cal.StatementAssign;
+import net.sf.orcc.cal.cal.StatementCall;
+import net.sf.orcc.cal.cal.StatementElsif;
+import net.sf.orcc.cal.cal.StatementIf;
+import net.sf.orcc.cal.cal.StatementWhile;
+import net.sf.orcc.cal.cal.VariableReference;
 import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.ir.IrFactory;
@@ -99,8 +99,8 @@ public class TypeValidator extends AbstractCalJavaValidator {
 	 * @param outputs
 	 *            the output patterns of an action
 	 */
-	private void checkActionOutputs(List<AstOutputPattern> outputs) {
-		for (AstOutputPattern pattern : outputs) {
+	private void checkActionOutputs(List<OutputPattern> outputs) {
+		for (OutputPattern pattern : outputs) {
 			AstPort port = pattern.getPort();
 
 			Type portType = Typer.getType(port);
@@ -112,8 +112,8 @@ public class TypeValidator extends AbstractCalJavaValidator {
 					Type type = Typer.getType(value);
 					if (!TypeUtil.isConvertibleTo(type, portType)) {
 						error("this expression must be of type " + portType,
-								pattern,
-								eINSTANCE.getAstOutputPattern_Values(), index);
+								pattern, eINSTANCE.getOutputPattern_Values(),
+								index);
 					}
 					index++;
 				}
@@ -136,7 +136,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 
 						error("Type mismatch: expected " + portType + "["
 								+ repeat + "]", pattern,
-								eINSTANCE.getAstOutputPattern_Values(), index);
+								eINSTANCE.getOutputPattern_Values(), index);
 						index++;
 					}
 				}
@@ -148,259 +148,6 @@ public class TypeValidator extends AbstractCalJavaValidator {
 	public void checkAstAction(AstAction action) {
 		checkActionGuards(action);
 		checkActionOutputs(action.getOutputs());
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkAstExpressionBinary(AstExpressionBinary expression) {
-		OpBinary op = OpBinary.getOperator(expression.getOperator());
-		checkTypeBinary(op, Typer.getType(expression.getLeft()),
-				Typer.getType(expression.getRight()), expression,
-				eINSTANCE.getAstExpressionBinary_Operator(), -1);
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkAstExpressionCall(AstExpressionCall astCall) {
-		AstFunction function = astCall.getFunction();
-
-		String name = function.getName();
-		List<AstExpression> parameters = astCall.getParameters();
-		if (function.getParameters().size() != parameters.size()) {
-			error("function " + name + " takes "
-					+ function.getParameters().size() + " arguments.", astCall,
-					eINSTANCE.getAstExpressionCall_Function(), -1);
-			return;
-		}
-
-		Iterator<AstVariable> itFormal = function.getParameters().iterator();
-		Iterator<AstExpression> itActual = parameters.iterator();
-		int index = 0;
-		while (itFormal.hasNext() && itActual.hasNext()) {
-			Type formalType = Typer.getType(itFormal.next());
-			AstExpression expression = itActual.next();
-			Type actualType = Typer.getType(expression);
-
-			// check types
-			if (!TypeUtil.isConvertibleTo(actualType, formalType)) {
-				error("Type mismatch: cannot convert from " + actualType
-						+ " to " + formalType, astCall,
-						eINSTANCE.getAstExpressionCall_Parameters(), index);
-			}
-			index++;
-		}
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkAstExpressionElsif(AstExpressionElsif expression) {
-		Type type = Typer.getType(expression.getCondition());
-		if (type == null || !type.isBool()) {
-			error("Cannot convert " + type + " to bool", expression,
-					eINSTANCE.getAstExpressionElsif_Condition(), -1);
-		}
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkAstExpressionIf(AstExpressionIf expression) {
-		Type type = Typer.getType(expression.getCondition());
-		if (type == null || !type.isBool()) {
-			error("Cannot convert " + type + " to bool", expression,
-					eINSTANCE.getAstExpressionIf_Condition(), -1);
-		}
-
-		Type typeThen = Typer.getType(expression.getThen());
-		type = typeThen;
-		int index = 0;
-		for (AstExpressionElsif elsif : expression.getElsifs()) {
-			Type typeElsif = Typer.getType(elsif);
-			type = TypeUtil.getLub(type, typeElsif);
-			if (type == null) {
-				error("Type mismatch: cannot convert " + typeElsif + " to "
-						+ typeThen, expression,
-						eINSTANCE.getAstExpressionIf_Elsifs(), index);
-			}
-			index++;
-		}
-
-		Type typeElse = Typer.getType(expression.getElse());
-		type = TypeUtil.getLub(type, typeElse);
-		if (type == null) {
-			error("Type mismatch: cannot convert " + typeElse + " to " + type,
-					expression, eINSTANCE.getAstExpressionIf_Else(), -1);
-		}
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkAstExpressionIndex(AstExpressionIndex expression) {
-		AstVariable variable = expression.getSource().getVariable();
-		Type type = Typer.getType(variable);
-
-		List<AstExpression> indexes = expression.getIndexes();
-		int errorIdx = 0;
-		for (AstExpression index : indexes) {
-			Type subType = Typer.getType(index);
-			if (type.isList()) {
-				if (subType != null && (subType.isInt() || subType.isUint())) {
-					type = ((TypeList) type).getType();
-				} else {
-					error("index must be an integer", expression,
-							eINSTANCE.getAstExpressionIndex_Indexes(), errorIdx);
-				}
-			} else {
-				error("Cannot convert " + type + " to List", expression,
-						eINSTANCE.getAstExpressionIndex_Source(), -1);
-			}
-			errorIdx++;
-		}
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkAstExpressionUnary(AstExpressionUnary expression) {
-		OpUnary op = OpUnary.getOperator(expression.getUnaryOperator());
-		Type type = Typer.getType(expression.getExpression());
-		if (type == null) {
-			return;
-		}
-
-		switch (op) {
-		case BITNOT:
-			if (!(type.isInt() || type.isUint())) {
-				error("Cannot convert " + type + " to int/uint", expression,
-						eINSTANCE.getAstExpressionUnary_Expression(), -1);
-			}
-			break;
-		case LOGIC_NOT:
-			if (!type.isBool()) {
-				error("Cannot convert " + type + " to boolean", expression,
-						eINSTANCE.getAstExpressionUnary_Expression(), -1);
-			}
-			break;
-		case MINUS:
-			if (!type.isUint() && !type.isInt()) {
-				error("Cannot convert " + type + " to int", expression,
-						eINSTANCE.getAstExpressionUnary_Expression(), -1);
-			}
-			break;
-		case NUM_ELTS:
-			if (!type.isList()) {
-				error("Cannot convert " + type + " to List", expression,
-						eINSTANCE.getAstExpressionUnary_Expression(), -1);
-			}
-			break;
-		default:
-			error("Unknown unary operator", expression,
-					eINSTANCE.getAstExpressionUnary_Expression(), -1);
-		}
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkAstFunction(final AstFunction function) {
-		if (!function.isNative()) {
-			checkReturnType(function);
-		}
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkAstStatementAssign(AstStatementAssign assign) {
-		AstVariable variable = assign.getTarget().getVariable();
-		if (variable.isConstant()
-				|| variable.eContainingFeature() == CalPackage.Literals.AST_ACTOR__PARAMETERS) {
-			error("The variable " + variable.getName() + " is not assignable",
-					eINSTANCE.getAstStatementAssign_Target());
-		}
-
-		// create expression
-		AstExpressionIndex expression = CalFactory.eINSTANCE
-				.createAstExpressionIndex();
-
-		// set reference
-		AstVariableReference reference = CalFactory.eINSTANCE
-				.createAstVariableReference();
-		reference.setVariable(variable);
-		expression.setSource(reference);
-
-		// copy indexes
-		expression.getIndexes().addAll(EcoreUtil.copyAll(assign.getIndexes()));
-
-		// check types
-		Type targetType = Typer.getType(expression);
-		Type type = Typer.getType(assign.getValue());
-		if (!TypeUtil.isConvertibleTo(type, targetType)) {
-			error("Type mismatch: cannot convert from " + type + " to "
-					+ targetType, assign,
-					eINSTANCE.getAstStatementAssign_Value(), -1);
-		}
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkAstStatementCall(AstStatementCall astCall) {
-		AstProcedure procedure = astCall.getProcedure();
-		String name = procedure.getName();
-		List<AstExpression> parameters = astCall.getParameters();
-
-		if (procedure.eContainer() == null) {
-			if ("print".equals(name) || "println".equals(name)) {
-				if (parameters.size() > 1) {
-					error("built-in procedure " + name
-							+ " takes at most one expression", astCall,
-							eINSTANCE.getAstStatementCall_Procedure(), -1);
-				}
-			}
-
-			return;
-		}
-
-		if (procedure.getParameters().size() != parameters.size()) {
-			error("procedure " + name + " takes "
-					+ procedure.getParameters().size() + " arguments.",
-					astCall, eINSTANCE.getAstStatementCall_Procedure(), -1);
-			return;
-		}
-
-		Iterator<AstVariable> itFormal = procedure.getParameters().iterator();
-		Iterator<AstExpression> itActual = parameters.iterator();
-		int index = 0;
-		while (itFormal.hasNext() && itActual.hasNext()) {
-			Type formalType = Typer.getType(itFormal.next());
-			AstExpression expression = itActual.next();
-			Type actualType = Typer.getType(expression);
-
-			// check types
-			if (!TypeUtil.isConvertibleTo(actualType, formalType)) {
-				error("Type mismatch: cannot convert from " + actualType
-						+ " to " + formalType, astCall,
-						eINSTANCE.getAstStatementCall_Parameters(), index);
-			}
-			index++;
-		}
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkAstStatementElsif(AstStatementElsif elsIf) {
-		Type type = Typer.getType(elsIf.getCondition());
-		if (!TypeUtil.isConvertibleTo(type,
-				IrFactory.eINSTANCE.createTypeBool())) {
-			error("Type mismatch: cannot convert from " + type + " to bool",
-					elsIf, eINSTANCE.getAstStatementElsif_Condition(), -1);
-		}
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkAstStatementIf(AstStatementIf astIf) {
-		Type type = Typer.getType(astIf.getCondition());
-		if (!TypeUtil.isConvertibleTo(type,
-				IrFactory.eINSTANCE.createTypeBool())) {
-			error("Type mismatch: cannot convert from " + type + " to bool",
-					astIf, eINSTANCE.getAstStatementIf_Condition(), -1);
-		}
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkAstStatementWhile(AstStatementWhile astWhile) {
-		Type type = Typer.getType(astWhile.getCondition());
-		if (!TypeUtil.isConvertibleTo(type,
-				IrFactory.eINSTANCE.createTypeBool())) {
-			error("Type mismatch: cannot convert from " + type + " to bool",
-					astWhile, eINSTANCE.getAstStatementWhile_Condition(), -1);
-		}
 	}
 
 	@Check(CheckType.NORMAL)
@@ -418,13 +165,266 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		}
 	}
 
-	private void checkReturnType(AstFunction function) {
+	@Check(CheckType.NORMAL)
+	public void checkExpressionBinary(ExpressionBinary expression) {
+		OpBinary op = OpBinary.getOperator(expression.getOperator());
+		checkTypeBinary(op, Typer.getType(expression.getLeft()),
+				Typer.getType(expression.getRight()), expression,
+				eINSTANCE.getExpressionBinary_Operator(), -1);
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkExpressionCall(ExpressionCall call) {
+		Function function = call.getFunction();
+
+		String name = function.getName();
+		List<AstExpression> parameters = call.getParameters();
+		if (function.getParameters().size() != parameters.size()) {
+			error("function " + name + " takes "
+					+ function.getParameters().size() + " arguments.", call,
+					eINSTANCE.getExpressionCall_Function(), -1);
+			return;
+		}
+
+		Iterator<AstVariable> itFormal = function.getParameters().iterator();
+		Iterator<AstExpression> itActual = parameters.iterator();
+		int index = 0;
+		while (itFormal.hasNext() && itActual.hasNext()) {
+			Type formalType = Typer.getType(itFormal.next());
+			AstExpression expression = itActual.next();
+			Type actualType = Typer.getType(expression);
+
+			// check types
+			if (!TypeUtil.isConvertibleTo(actualType, formalType)) {
+				error("Type mismatch: cannot convert from " + actualType
+						+ " to " + formalType, call,
+						eINSTANCE.getExpressionCall_Parameters(), index);
+			}
+			index++;
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkExpressionElsif(ExpressionElsif expression) {
+		Type type = Typer.getType(expression.getCondition());
+		if (type == null || !type.isBool()) {
+			error("Cannot convert " + type + " to bool", expression,
+					eINSTANCE.getExpressionElsif_Condition(), -1);
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkExpressionIf(ExpressionIf expression) {
+		Type type = Typer.getType(expression.getCondition());
+		if (type == null || !type.isBool()) {
+			error("Cannot convert " + type + " to bool", expression,
+					eINSTANCE.getExpressionIf_Condition(), -1);
+		}
+
+		Type typeThen = Typer.getType(expression.getThen());
+		type = typeThen;
+		int index = 0;
+		for (ExpressionElsif elsif : expression.getElsifs()) {
+			Type typeElsif = Typer.getType(elsif);
+			type = TypeUtil.getLub(type, typeElsif);
+			if (type == null) {
+				error("Type mismatch: cannot convert " + typeElsif + " to "
+						+ typeThen, expression,
+						eINSTANCE.getExpressionIf_Elsifs(), index);
+			}
+			index++;
+		}
+
+		Type typeElse = Typer.getType(expression.getElse());
+		type = TypeUtil.getLub(type, typeElse);
+		if (type == null) {
+			error("Type mismatch: cannot convert " + typeElse + " to " + type,
+					expression, eINSTANCE.getExpressionIf_Else(), -1);
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkExpressionIndex(ExpressionIndex expression) {
+		AstVariable variable = expression.getSource().getVariable();
+		Type type = Typer.getType(variable);
+
+		List<AstExpression> indexes = expression.getIndexes();
+		int errorIdx = 0;
+		for (AstExpression index : indexes) {
+			Type subType = Typer.getType(index);
+			if (type.isList()) {
+				if (subType != null && (subType.isInt() || subType.isUint())) {
+					type = ((TypeList) type).getType();
+				} else {
+					error("index must be an integer", expression,
+							eINSTANCE.getExpressionIndex_Indexes(), errorIdx);
+				}
+			} else {
+				error("Cannot convert " + type + " to List", expression,
+						eINSTANCE.getExpressionIndex_Source(), -1);
+			}
+			errorIdx++;
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkExpressionUnary(ExpressionUnary expression) {
+		OpUnary op = OpUnary.getOperator(expression.getUnaryOperator());
+		Type type = Typer.getType(expression.getExpression());
+		if (type == null) {
+			return;
+		}
+
+		switch (op) {
+		case BITNOT:
+			if (!(type.isInt() || type.isUint())) {
+				error("Cannot convert " + type + " to int/uint", expression,
+						eINSTANCE.getExpressionUnary_Expression(), -1);
+			}
+			break;
+		case LOGIC_NOT:
+			if (!type.isBool()) {
+				error("Cannot convert " + type + " to boolean", expression,
+						eINSTANCE.getExpressionUnary_Expression(), -1);
+			}
+			break;
+		case MINUS:
+			if (!type.isUint() && !type.isInt()) {
+				error("Cannot convert " + type + " to int", expression,
+						eINSTANCE.getExpressionUnary_Expression(), -1);
+			}
+			break;
+		case NUM_ELTS:
+			if (!type.isList()) {
+				error("Cannot convert " + type + " to List", expression,
+						eINSTANCE.getExpressionUnary_Expression(), -1);
+			}
+			break;
+		default:
+			error("Unknown unary operator", expression,
+					eINSTANCE.getExpressionUnary_Expression(), -1);
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkFunction(final Function function) {
+		if (!function.isNative()) {
+			checkReturnType(function);
+		}
+	}
+
+	private void checkReturnType(Function function) {
 		Type returnType = Typer.getType(function);
 		Type expressionType = Typer.getType(function.getExpression());
 		if (!TypeUtil.isConvertibleTo(expressionType, returnType)) {
 			error("Type mismatch: cannot convert from " + expressionType
 					+ " to " + returnType, function,
-					eINSTANCE.getAstFunction_Expression(), -1);
+					eINSTANCE.getFunction_Expression(), -1);
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkStatementAssign(StatementAssign assign) {
+		AstVariable variable = assign.getTarget().getVariable();
+		if (variable.isConstant()
+				|| variable.eContainingFeature() == CalPackage.Literals.AST_ACTOR__PARAMETERS) {
+			error("The variable " + variable.getName() + " is not assignable",
+					eINSTANCE.getStatementAssign_Target());
+		}
+
+		// create expression
+		ExpressionIndex expression = CalFactory.eINSTANCE
+				.createExpressionIndex();
+
+		// set reference
+		VariableReference reference = CalFactory.eINSTANCE
+				.createVariableReference();
+		reference.setVariable(variable);
+		expression.setSource(reference);
+
+		// copy indexes
+		expression.getIndexes().addAll(EcoreUtil.copyAll(assign.getIndexes()));
+
+		// check types
+		Type targetType = Typer.getType(expression);
+		Type type = Typer.getType(assign.getValue());
+		if (!TypeUtil.isConvertibleTo(type, targetType)) {
+			error("Type mismatch: cannot convert from " + type + " to "
+					+ targetType, assign, eINSTANCE.getStatementAssign_Value(),
+					-1);
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkStatementCall(StatementCall call) {
+		AstProcedure procedure = call.getProcedure();
+		String name = procedure.getName();
+		List<AstExpression> parameters = call.getParameters();
+
+		if (procedure.eContainer() == null) {
+			if ("print".equals(name) || "println".equals(name)) {
+				if (parameters.size() > 1) {
+					error("built-in procedure " + name
+							+ " takes at most one expression", call,
+							eINSTANCE.getStatementCall_Procedure(), -1);
+				}
+			}
+
+			return;
+		}
+
+		if (procedure.getParameters().size() != parameters.size()) {
+			error("procedure " + name + " takes "
+					+ procedure.getParameters().size() + " arguments.", call,
+					eINSTANCE.getStatementCall_Procedure(), -1);
+			return;
+		}
+
+		Iterator<AstVariable> itFormal = procedure.getParameters().iterator();
+		Iterator<AstExpression> itActual = parameters.iterator();
+		int index = 0;
+		while (itFormal.hasNext() && itActual.hasNext()) {
+			Type formalType = Typer.getType(itFormal.next());
+			AstExpression expression = itActual.next();
+			Type actualType = Typer.getType(expression);
+
+			// check types
+			if (!TypeUtil.isConvertibleTo(actualType, formalType)) {
+				error("Type mismatch: cannot convert from " + actualType
+						+ " to " + formalType, call,
+						eINSTANCE.getStatementCall_Parameters(), index);
+			}
+			index++;
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkStatementElsif(StatementElsif elsIf) {
+		Type type = Typer.getType(elsIf.getCondition());
+		if (!TypeUtil.isConvertibleTo(type,
+				IrFactory.eINSTANCE.createTypeBool())) {
+			error("Type mismatch: cannot convert from " + type + " to bool",
+					elsIf, eINSTANCE.getStatementElsif_Condition(), -1);
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkStatementIf(StatementIf stmtIf) {
+		Type type = Typer.getType(stmtIf.getCondition());
+		if (!TypeUtil.isConvertibleTo(type,
+				IrFactory.eINSTANCE.createTypeBool())) {
+			error("Type mismatch: cannot convert from " + type + " to bool",
+					stmtIf, eINSTANCE.getStatementIf_Condition(), -1);
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkStatementWhile(StatementWhile stmtWhile) {
+		Type type = Typer.getType(stmtWhile.getCondition());
+		if (!TypeUtil.isConvertibleTo(type,
+				IrFactory.eINSTANCE.createTypeBool())) {
+			error("Type mismatch: cannot convert from " + type + " to bool",
+					stmtWhile, eINSTANCE.getStatementWhile_Condition(), -1);
 		}
 	}
 

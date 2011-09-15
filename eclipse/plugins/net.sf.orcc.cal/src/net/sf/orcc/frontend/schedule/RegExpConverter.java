@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import net.sf.orcc.cal.cal.AstScheduleRegExp;
+import net.sf.orcc.cal.cal.RegExp;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.IrFactory;
@@ -57,7 +57,7 @@ public class RegExpConverter {
 	 */
 	private Map<Integer, State> nameMap;
 
-	private AstScheduleRegExp regexp;
+	private RegExp regexp;
 
 	/**
 	 * Creates a RegExp Converter and initializes it with the given
@@ -66,7 +66,7 @@ public class RegExpConverter {
 	 * @param tree
 	 *            an ANTLR tree that represents the AST of a ScheduleRegExp.
 	 */
-	public RegExpConverter(AstScheduleRegExp scheduleRegExp) {
+	public RegExpConverter(RegExp scheduleRegExp) {
 		regexp = scheduleRegExp;
 		nameMap = new TreeMap<Integer, State>();
 	}

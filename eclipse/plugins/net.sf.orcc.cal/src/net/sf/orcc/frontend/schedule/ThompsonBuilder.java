@@ -30,10 +30,10 @@ package net.sf.orcc.frontend.schedule;
 
 import java.util.Stack;
 
-import net.sf.orcc.cal.cal.AstRegExpBinary;
-import net.sf.orcc.cal.cal.AstRegExpTag;
-import net.sf.orcc.cal.cal.AstRegExpUnary;
-import net.sf.orcc.cal.cal.AstScheduleRegExp;
+import net.sf.orcc.cal.cal.RegExp;
+import net.sf.orcc.cal.cal.RegExpBinary;
+import net.sf.orcc.cal.cal.RegExpTag;
+import net.sf.orcc.cal.cal.RegExpUnary;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Tag;
@@ -61,7 +61,7 @@ public class ThompsonBuilder extends CalSwitch<Void> {
 		index = 0;
 	}
 
-	public Automaton build(AstScheduleRegExp regexp) {
+	public Automaton build(RegExp regexp) {
 		doSwitch(regexp);
 		int initialGlobal = recursionStack.pop();
 		int finalGlobal = recursionStack.pop();
@@ -70,7 +70,7 @@ public class ThompsonBuilder extends CalSwitch<Void> {
 		return eNFA;
 	}
 
-	private void caseAlternation(AstRegExpBinary regexp) {
+	private void caseAlternation(RegExpBinary regexp) {
 		int initialCurrent = index++;
 		eNFA.addVertex(initialCurrent);
 
@@ -93,8 +93,22 @@ public class ThompsonBuilder extends CalSwitch<Void> {
 		recursionStack.push(initialCurrent);
 	}
 
+	private void caseConcatenation(RegExpBinary regexp) {
+		doSwitch(regexp.getLeft());
+		int initialLeft = recursionStack.pop();
+		int finalLeft = recursionStack.pop();
+		doSwitch(regexp.getRight());
+		int initialRight = recursionStack.pop();
+		int finalRight = recursionStack.pop();
+
+		// Simply add an epsilon transition between the two sub automata
+		eNFA.addEdge(finalLeft, initialRight, NewEpsilon());
+		recursionStack.push(finalRight);
+		recursionStack.push(initialLeft);
+	}
+
 	@Override
-	public Void caseAstRegExpBinary(AstRegExpBinary regexp) {
+	public Void caseRegExpBinary(RegExpBinary regexp) {
 		if (regexp.getOperator() == null) {
 			caseConcatenation(regexp);
 		} else {
@@ -104,7 +118,7 @@ public class ThompsonBuilder extends CalSwitch<Void> {
 	}
 
 	@Override
-	public Void caseAstRegExpTag(AstRegExpTag term) {
+	public Void caseRegExpTag(RegExpTag term) {
 		int initialCurrent = index;
 		int finalCurrent = index + 1;
 		index = index + 2;
@@ -122,7 +136,7 @@ public class ThompsonBuilder extends CalSwitch<Void> {
 	}
 
 	@Override
-	public Void caseAstRegExpUnary(AstRegExpUnary regexp) {
+	public Void caseRegExpUnary(RegExpUnary regexp) {
 		if (regexp.getUnaryOperator().equals("*")) {
 			caseStar(regexp);
 		} else {
@@ -132,21 +146,7 @@ public class ThompsonBuilder extends CalSwitch<Void> {
 		return null;
 	}
 
-	private void caseConcatenation(AstRegExpBinary regexp) {
-		doSwitch(regexp.getLeft());
-		int initialLeft = recursionStack.pop();
-		int finalLeft = recursionStack.pop();
-		doSwitch(regexp.getRight());
-		int initialRight = recursionStack.pop();
-		int finalRight = recursionStack.pop();
-
-		// Simply add an epsilon transition between the two sub automata
-		eNFA.addEdge(finalLeft, initialRight, NewEpsilon());
-		recursionStack.push(finalRight);
-		recursionStack.push(initialLeft);
-	}
-
-	private void caseStar(AstRegExpUnary regexp) {
+	private void caseStar(RegExpUnary regexp) {
 		int initialCurrent = index++;
 		eNFA.addVertex(initialCurrent);
 
@@ -170,7 +170,7 @@ public class ThompsonBuilder extends CalSwitch<Void> {
 		recursionStack.push(initialCurrent);
 	}
 
-	private void caseZeroOrOne(AstRegExpUnary regexp) {
+	private void caseZeroOrOne(RegExpUnary regexp) {
 		// Match 0 or 1 element
 		// Similar to Kleene Star but with no loop back.
 

@@ -39,16 +39,16 @@ import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpression;
-import net.sf.orcc.cal.cal.AstFunction;
-import net.sf.orcc.cal.cal.AstInputPattern;
-import net.sf.orcc.cal.cal.AstOutputPattern;
 import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstProcedure;
-import net.sf.orcc.cal.cal.AstSchedule;
-import net.sf.orcc.cal.cal.AstScheduleRegExp;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstVariable;
-import net.sf.orcc.cal.cal.AstVariableReference;
+import net.sf.orcc.cal.cal.Function;
+import net.sf.orcc.cal.cal.InputPattern;
+import net.sf.orcc.cal.cal.OutputPattern;
+import net.sf.orcc.cal.cal.RegExp;
+import net.sf.orcc.cal.cal.Schedule;
+import net.sf.orcc.cal.cal.VariableReference;
 import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.cal.util.Util;
@@ -433,7 +433,7 @@ public class ActorTransformer {
 
 		// functions
 		Map<EObject, EObject> mapAstToIr = frontend.getMap();
-		for (AstFunction function : astActor.getFunctions()) {
+		for (Function function : astActor.getFunctions()) {
 			if (!mapAstToIr.containsKey(function)) {
 				Procedure proc = astTransformer.transformFunction(function);
 				actor.getProcs().add(proc);
@@ -482,8 +482,8 @@ public class ActorTransformer {
 				.getPriorities());
 
 		// transform FSM
-		AstSchedule schedule = astActor.getSchedule();
-		AstScheduleRegExp scheduleRegExp = astActor.getScheduleRegExp();
+		Schedule schedule = astActor.getSchedule();
+		RegExp scheduleRegExp = astActor.getScheduleRegExp();
 		if (schedule == null && scheduleRegExp == null) {
 			actor.getActionsOutsideFsm().addAll(sortedActions.getAllActions());
 		} else {
@@ -570,7 +570,7 @@ public class ActorTransformer {
 			Pattern inputPattern, Pattern outputPattern) {
 		Context oldContext = astTransformer.newContext(body);
 
-		for (AstInputPattern pattern : astAction.getInputs()) {
+		for (InputPattern pattern : astAction.getInputs()) {
 			transformInputPattern(pattern, inputPattern);
 		}
 
@@ -664,7 +664,7 @@ public class ActorTransformer {
 	 * @param pattern
 	 *            an input pattern
 	 */
-	private void transformInputPattern(AstInputPattern pattern,
+	private void transformInputPattern(InputPattern pattern,
 			Pattern irInputPattern) {
 		Context context = astTransformer.getContext();
 		Port port = (Port) mapAstToIr.get(pattern.getPort());
@@ -704,14 +704,14 @@ public class ActorTransformer {
 	 */
 	private void transformInputPatternPeek(final AstAction astAction,
 			Pattern peekPattern) {
-		final Set<AstInputPattern> patterns = new HashSet<AstInputPattern>();
+		final Set<InputPattern> patterns = new HashSet<InputPattern>();
 		VoidSwitch peekVariables = new VoidSwitch() {
 
 			@Override
-			public Void caseAstVariableReference(AstVariableReference reference) {
+			public Void caseVariableReference(VariableReference reference) {
 				EObject obj = reference.getVariable().eContainer();
-				if (obj instanceof AstInputPattern) {
-					patterns.add((AstInputPattern) obj);
+				if (obj instanceof InputPattern) {
+					patterns.add((InputPattern) obj);
 				}
 
 				return null;
@@ -725,7 +725,7 @@ public class ActorTransformer {
 		}
 
 		// add peeks for each pattern of the patterns set
-		for (AstInputPattern pattern : patterns) {
+		for (InputPattern pattern : patterns) {
 			transformInputPattern(pattern, peekPattern);
 		}
 	}
@@ -739,8 +739,8 @@ public class ActorTransformer {
 	 */
 	private void transformOutputPattern(AstAction astAction,
 			Pattern irOutputPattern) {
-		List<AstOutputPattern> astOutputPattern = astAction.getOutputs();
-		for (AstOutputPattern pattern : astOutputPattern) {
+		List<OutputPattern> astOutputPattern = astAction.getOutputs();
+		for (OutputPattern pattern : astOutputPattern) {
 			Port port = (Port) mapAstToIr.get(pattern.getPort());
 			List<AstExpression> values = pattern.getValues();
 

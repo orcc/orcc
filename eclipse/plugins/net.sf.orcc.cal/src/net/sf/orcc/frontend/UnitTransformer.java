@@ -31,7 +31,7 @@ package net.sf.orcc.frontend;
 import java.util.Map;
 
 import net.sf.orcc.cal.cal.AstEntity;
-import net.sf.orcc.cal.cal.AstFunction;
+import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.AstVariable;
@@ -76,7 +76,7 @@ public class UnitTransformer {
 
 		// functions
 		Map<EObject, EObject> mapAstToIr = frontend.getMap();
-		for (AstFunction function : astUnit.getFunctions()) {
+		for (Function function : astUnit.getFunctions()) {
 			if (!mapAstToIr.containsKey(function)) {
 				Procedure proc = astTransformer.transformFunction(function);
 				unit.getProcedures().add(proc);

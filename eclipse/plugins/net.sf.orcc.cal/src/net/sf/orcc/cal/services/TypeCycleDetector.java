@@ -34,8 +34,8 @@ import java.util.List;
 import java.util.Set;
 
 import net.sf.orcc.cal.cal.AstEntity;
-import net.sf.orcc.cal.cal.AstExpressionVariable;
 import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.cal.ExpressionVariable;
 import net.sf.orcc.cal.util.VoidSwitch;
 import net.sf.orcc.cal.validation.ValidationError;
 
@@ -63,7 +63,16 @@ public class TypeCycleDetector extends VoidSwitch {
 	}
 
 	@Override
-	public Void caseAstExpressionVariable(AstExpressionVariable expression) {
+	public Void caseAstVariable(AstVariable variable) {
+		source = variable;
+		graph.addVertex(variable);
+		doSwitch(variable.getType());
+		source = null;
+		return null;
+	}
+
+	@Override
+	public Void caseExpressionVariable(ExpressionVariable expression) {
 		AstVariable variable = expression.getValue().getVariable();
 		if (source != null && variable != null) {
 			if (!graph.containsVertex(variable)) {
@@ -72,15 +81,6 @@ public class TypeCycleDetector extends VoidSwitch {
 			graph.addEdge(source, variable);
 		}
 
-		return null;
-	}
-
-	@Override
-	public Void caseAstVariable(AstVariable variable) {
-		source = variable;
-		graph.addVertex(variable);
-		doSwitch(variable.getType());
-		source = null;
 		return null;
 	}
 

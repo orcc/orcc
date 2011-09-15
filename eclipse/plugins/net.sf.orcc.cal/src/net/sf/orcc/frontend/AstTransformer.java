@@ -33,32 +33,32 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import net.sf.orcc.cal.cal.AnnotationArgument;
 import net.sf.orcc.cal.cal.AstAnnotation;
-import net.sf.orcc.cal.cal.AstAnnotationArgument;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpression;
-import net.sf.orcc.cal.cal.AstExpressionBinary;
-import net.sf.orcc.cal.cal.AstExpressionBoolean;
-import net.sf.orcc.cal.cal.AstExpressionCall;
-import net.sf.orcc.cal.cal.AstExpressionIf;
-import net.sf.orcc.cal.cal.AstExpressionIndex;
-import net.sf.orcc.cal.cal.AstExpressionInteger;
-import net.sf.orcc.cal.cal.AstExpressionList;
-import net.sf.orcc.cal.cal.AstExpressionString;
-import net.sf.orcc.cal.cal.AstExpressionUnary;
-import net.sf.orcc.cal.cal.AstExpressionVariable;
-import net.sf.orcc.cal.cal.AstFunction;
-import net.sf.orcc.cal.cal.AstGenerator;
 import net.sf.orcc.cal.cal.AstProcedure;
-import net.sf.orcc.cal.cal.AstStatement;
-import net.sf.orcc.cal.cal.AstStatementAssign;
-import net.sf.orcc.cal.cal.AstStatementCall;
-import net.sf.orcc.cal.cal.AstStatementElsif;
-import net.sf.orcc.cal.cal.AstStatementForeach;
-import net.sf.orcc.cal.cal.AstStatementIf;
-import net.sf.orcc.cal.cal.AstStatementWhile;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.cal.ExpressionBinary;
+import net.sf.orcc.cal.cal.ExpressionBoolean;
+import net.sf.orcc.cal.cal.ExpressionCall;
+import net.sf.orcc.cal.cal.ExpressionIf;
+import net.sf.orcc.cal.cal.ExpressionIndex;
+import net.sf.orcc.cal.cal.ExpressionInteger;
+import net.sf.orcc.cal.cal.ExpressionList;
+import net.sf.orcc.cal.cal.ExpressionString;
+import net.sf.orcc.cal.cal.ExpressionUnary;
+import net.sf.orcc.cal.cal.ExpressionVariable;
+import net.sf.orcc.cal.cal.Function;
+import net.sf.orcc.cal.cal.Generator;
+import net.sf.orcc.cal.cal.Statement;
+import net.sf.orcc.cal.cal.StatementAssign;
+import net.sf.orcc.cal.cal.StatementCall;
+import net.sf.orcc.cal.cal.StatementElsif;
+import net.sf.orcc.cal.cal.StatementForeach;
+import net.sf.orcc.cal.cal.StatementIf;
+import net.sf.orcc.cal.cal.StatementWhile;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.cal.services.Typer;
@@ -116,7 +116,7 @@ public class AstTransformer {
 		}
 
 		@Override
-		public Expression caseAstExpressionBinary(AstExpressionBinary expression) {
+		public Expression caseExpressionBinary(ExpressionBinary expression) {
 			OpBinary op = OpBinary.getOperator(expression.getOperator());
 			Expression e1 = doSwitch(expression.getLeft());
 			Expression e2 = doSwitch(expression.getRight());
@@ -126,22 +126,21 @@ public class AstTransformer {
 		}
 
 		@Override
-		public Expression caseAstExpressionBoolean(
-				AstExpressionBoolean expression) {
+		public Expression caseExpressionBoolean(ExpressionBoolean expression) {
 			boolean value = expression.isValue();
 			return IrFactory.eINSTANCE.createExprBool(value);
 		}
 
 		@Override
-		public Expression caseAstExpressionCall(AstExpressionCall astCall) {
-			int lineNumber = Util.getLocation(astCall);
+		public Expression caseExpressionCall(ExpressionCall call) {
+			int lineNumber = Util.getLocation(call);
 			Procedure procedure = context.getProcedure();
 
 			// retrieve IR procedure
-			AstFunction astFunction = astCall.getFunction();
+			Function astFunction = call.getFunction();
 			Procedure calledProcedure = (Procedure) mapAstToIr.get(astFunction);
 			if (calledProcedure == null) {
-				if (EcoreUtil2.getContainerOfType(astCall, AstUnit.class) == null) {
+				if (EcoreUtil2.getContainerOfType(call, AstUnit.class) == null) {
 					calledProcedure = (Procedure) getExternalObject(astFunction);
 				}
 				if (calledProcedure == null) {
@@ -157,7 +156,7 @@ public class AstTransformer {
 
 			// creates call with spilling code around it
 			createCall(lineNumber, target, calledProcedure,
-					astCall.getParameters());
+					call.getParameters());
 
 			// return local variable
 			Expression varExpr = IrFactory.eINSTANCE.createExprVar(target);
@@ -165,7 +164,7 @@ public class AstTransformer {
 		}
 
 		@Override
-		public Expression caseAstExpressionIf(AstExpressionIf expression) {
+		public Expression caseExpressionIf(ExpressionIf expression) {
 			int lineNumber = Util.getLocation(expression);
 
 			Expression condition = transformExpression(expression
@@ -216,7 +215,7 @@ public class AstTransformer {
 		}
 
 		@Override
-		public Expression caseAstExpressionIndex(AstExpressionIndex expression) {
+		public Expression caseExpressionIndex(ExpressionIndex expression) {
 			// we always load in this case
 			int lineNumber = Util.getLocation(expression);
 			AstVariable astVariable = expression.getSource().getVariable();
@@ -240,19 +239,18 @@ public class AstTransformer {
 		}
 
 		@Override
-		public Expression caseAstExpressionInteger(
-				AstExpressionInteger expression) {
+		public Expression caseExpressionInteger(ExpressionInteger expression) {
 			long value = expression.getValue();
 			return IrFactory.eINSTANCE.createExprInt(value);
 		}
 
 		@Override
-		public Expression caseAstExpressionList(AstExpressionList astExpression) {
+		public Expression caseExpressionList(ExpressionList astExpression) {
 			Var currentTarget = target;
 			List<Expression> currentIndexes = indexes;
 
 			List<AstExpression> expressions = astExpression.getExpressions();
-			List<AstGenerator> generators = astExpression.getGenerators();
+			List<Generator> generators = astExpression.getGenerators();
 
 			checkTarget(expressions, generators);
 
@@ -273,13 +271,13 @@ public class AstTransformer {
 		}
 
 		@Override
-		public Expression caseAstExpressionString(AstExpressionString expression) {
+		public Expression caseExpressionString(ExpressionString expression) {
 			return IrFactory.eINSTANCE.createExprString(OrccUtil
 					.getEscapedString(expression.getValue()));
 		}
 
 		@Override
-		public Expression caseAstExpressionUnary(AstExpressionUnary expression) {
+		public Expression caseExpressionUnary(ExpressionUnary expression) {
 			OpUnary op = OpUnary.getOperator(expression.getUnaryOperator());
 			Expression expr = doSwitch(expression.getExpression());
 
@@ -293,8 +291,7 @@ public class AstTransformer {
 		}
 
 		@Override
-		public Expression caseAstExpressionVariable(
-				AstExpressionVariable expression) {
+		public Expression caseExpressionVariable(ExpressionVariable expression) {
 			AstVariable astVariable = expression.getValue().getVariable();
 
 			Var var = (Var) mapAstToIr.get(astVariable);
@@ -336,7 +333,7 @@ public class AstTransformer {
 		 *            a list of generators
 		 */
 		private void checkTarget(List<AstExpression> expressions,
-				List<AstGenerator> generators) {
+				List<Generator> generators) {
 			if (target != null) {
 				return;
 			}
@@ -344,7 +341,7 @@ public class AstTransformer {
 			int size = 1;
 
 			// size of generators
-			for (AstGenerator generator : generators) {
+			for (Generator generator : generators) {
 				int lower = Evaluator.getIntValue(generator.getLower());
 				int higher = Evaluator.getIntValue(generator.getHigher());
 				size *= (higher - lower) + 1;
@@ -452,7 +449,7 @@ public class AstTransformer {
 		 *            a list of generators
 		 */
 		private void transformListGenerators(List<AstExpression> expressions,
-				List<AstGenerator> generators) {
+				List<Generator> generators) {
 			Var currentTarget = target;
 			List<Expression> currentIndexes = indexes;
 
@@ -462,7 +459,7 @@ public class AstTransformer {
 
 			// first add local variables
 			Expression index = null;
-			for (AstGenerator generator : generators) {
+			for (Generator generator : generators) {
 				AstVariable astVariable = generator.getVariable();
 				Var loopVar = transformLocalVariable(astVariable);
 				procedure.getLocals().add(loopVar);
@@ -498,10 +495,10 @@ public class AstTransformer {
 			List<Node> nodes = getNodes(expressions);
 
 			// build the loops from the inside out
-			ListIterator<AstGenerator> it = generators.listIterator(generators
+			ListIterator<Generator> it = generators.listIterator(generators
 					.size());
 			while (it.hasPrevious()) {
-				AstGenerator generator = it.previous();
+				Generator generator = it.previous();
 				int lineNumber = Util.getLocation(generator);
 
 				// assigns the loop variable its initial value
@@ -612,7 +609,7 @@ public class AstTransformer {
 		}
 
 		@Override
-		public Object caseAstExpressionBinary(AstExpressionBinary astExpression) {
+		public Object caseExpressionBinary(ExpressionBinary astExpression) {
 			OpBinary op = OpBinary.getOperator(astExpression.getOperator());
 			if (op == OpBinary.PLUS) {
 				doSwitch(astExpression.getLeft());
@@ -644,22 +641,21 @@ public class AstTransformer {
 		}
 
 		@Override
-		public Object caseAstStatementAssign(AstStatementAssign astAssign) {
-			int lineNumber = Util.getLocation(astAssign);
+		public Object caseStatementAssign(StatementAssign assign) {
+			int lineNumber = Util.getLocation(assign);
 
 			// get target
-			AstVariable astTarget = astAssign.getTarget().getVariable();
+			AstVariable astTarget = assign.getTarget().getVariable();
 			Var target = (Var) mapAstToIr.get(astTarget);
 			if (target == null) {
 				target = (Var) getExternalObject(astTarget);
 			}
 
 			// transform indexes and value
-			List<Expression> indexes = transformExpressions(astAssign
-					.getIndexes());
+			List<Expression> indexes = transformExpressions(assign.getIndexes());
 
 			exprTransformer.setTarget(target, indexes);
-			Expression value = transformExpression(astAssign.getValue());
+			Expression value = transformExpression(assign.getValue());
 			exprTransformer.clearTarget();
 			createAssignOrStore(lineNumber, target, indexes, value);
 
@@ -667,21 +663,21 @@ public class AstTransformer {
 		}
 
 		@Override
-		public Object caseAstStatementCall(AstStatementCall astCall) {
-			int lineNumber = Util.getLocation(astCall);
+		public Object caseStatementCall(StatementCall call) {
+			int lineNumber = Util.getLocation(call);
 
 			// retrieve IR procedure
-			AstProcedure astProcedure = astCall.getProcedure();
+			AstProcedure astProcedure = call.getProcedure();
 			// special case if the procedure is a built-in procedure
 			if (astProcedure.eContainer() == null) {
-				transformBuiltinProcedure(astCall);
+				transformBuiltinProcedure(call);
 				return null;
 			}
 
 			// retrieve IR procedure
 			Procedure procedure = (Procedure) mapAstToIr.get(astProcedure);
 			if (procedure == null) {
-				if (EcoreUtil2.getContainerOfType(astCall, AstUnit.class) == null) {
+				if (EcoreUtil2.getContainerOfType(call, AstUnit.class) == null) {
 					procedure = (Procedure) getExternalObject(astProcedure);
 				}
 				if (procedure == null) {
@@ -691,13 +687,13 @@ public class AstTransformer {
 			}
 
 			// creates call with spilling code around it
-			createCall(lineNumber, null, procedure, astCall.getParameters());
+			createCall(lineNumber, null, procedure, call.getParameters());
 
 			return object;
 		}
 
 		@Override
-		public Object caseAstStatementForeach(AstStatementForeach foreach) {
+		public Object caseStatementForeach(StatementForeach foreach) {
 			int lineNumber = Util.getLocation(foreach);
 			Procedure procedure = context.getProcedure();
 
@@ -743,7 +739,7 @@ public class AstTransformer {
 		}
 
 		@Override
-		public Object caseAstStatementIf(AstStatementIf stmtIf) {
+		public Object caseStatementIf(StatementIf stmtIf) {
 			int lineNumber = Util.getLocation(stmtIf);
 			Procedure procedure = context.getProcedure();
 
@@ -761,7 +757,7 @@ public class AstTransformer {
 			node.getThenNodes().addAll(thenNodes);
 
 			// add elsif statements
-			for (AstStatementElsif elsif : stmtIf.getElsifs()) {
+			for (StatementElsif elsif : stmtIf.getElsifs()) {
 				// saves outerIf, creates new if, and adds it to else nodes
 				NodeIf outerIf = node;
 				node = IrFactoryImpl.eINSTANCE.createNodeIf();
@@ -785,7 +781,7 @@ public class AstTransformer {
 		}
 
 		@Override
-		public Object caseAstStatementWhile(AstStatementWhile stmtWhile) {
+		public Object caseStatementWhile(StatementWhile stmtWhile) {
 			int lineNumber = Util.getLocation(stmtWhile);
 			Procedure procedure = context.getProcedure();
 
@@ -834,7 +830,7 @@ public class AstTransformer {
 		 *            a list of statements
 		 * @return a list of CFG nodes
 		 */
-		private List<Node> getNodes(List<AstStatement> statements) {
+		private List<Node> getNodes(List<Statement> statements) {
 			List<Node> nodes = context.getProcedure().getNodes();
 
 			int first = nodes.size();
@@ -855,12 +851,12 @@ public class AstTransformer {
 		 * are transformed to a call to print, with an additional "\\n"
 		 * parameter in the case of println.
 		 * 
-		 * @param astCall
+		 * @param call
 		 *            an AST call statement
 		 */
-		private void transformBuiltinProcedure(AstStatementCall astCall) {
-			int lineNumber = Util.getLocation(astCall);
-			String name = astCall.getProcedure().getName();
+		private void transformBuiltinProcedure(StatementCall call) {
+			int lineNumber = Util.getLocation(call);
+			String name = call.getProcedure().getName();
 			if ("print".equals(name) || "println".equals(name)) {
 				if (print == null) {
 					print = IrFactory.eINSTANCE.createProcedure("print",
@@ -869,7 +865,7 @@ public class AstTransformer {
 					procedures.add(print);
 				}
 
-				List<AstExpression> astParameters = astCall.getParameters();
+				List<AstExpression> astParameters = call.getParameters();
 				List<Expression> parameters = new ArrayList<Expression>(7);
 				if (!astParameters.isEmpty()) {
 					AstExpression astExpression = astParameters.get(0);
@@ -1050,10 +1046,10 @@ public class AstTransformer {
 	private String getQualifiedName(AstVariable variable) {
 		EObject cter = variable.eContainer();
 		String name = variable.getName();
-		if (cter instanceof AstGenerator) {
+		if (cter instanceof Generator) {
 			name = "generator" + blockCount + "_" + name;
 			blockCount++;
-		} else if (cter instanceof AstStatementForeach) {
+		} else if (cter instanceof StatementForeach) {
 			name = "foreach" + blockCount + "_" + name;
 			blockCount++;
 		}
@@ -1081,7 +1077,7 @@ public class AstTransformer {
 			return new BooleanSwitch() {
 
 				@Override
-				public Boolean caseAstGenerator(AstGenerator generator) {
+				public Boolean caseGenerator(Generator generator) {
 					return true;
 				}
 
@@ -1111,6 +1107,18 @@ public class AstTransformer {
 	 */
 	public void restoreContext(Context context) {
 		this.context = context;
+	}
+
+	private void transformAnnotations(Var variable,
+			List<AstAnnotation> annotations) {
+		for (AstAnnotation astAnnotation : annotations) {
+			Annotation annotation = IrFactory.eINSTANCE
+					.createAnnotation(astAnnotation.getName());
+			for (AnnotationArgument arg : astAnnotation.getArguments()) {
+				annotation.getAttributes().put(arg.getName(), arg.getValue());
+			}
+			variable.getAnnotations().add(annotation);
+		}
 	}
 
 	/**
@@ -1153,38 +1161,38 @@ public class AstTransformer {
 	 * Transforms the given AST function to an IR procedure, and adds it to the
 	 * IR procedure list {@link #procedures} and to the map {@link #mapAstToIr}.
 	 * 
-	 * @param astFunction
+	 * @param function
 	 *            an AST function
 	 */
-	public Procedure transformFunction(AstFunction astFunction) {
-		String name = astFunction.getName();
-		int lineNumber = Util.getLocation(astFunction);
-		Type type = Typer.getType(astFunction);
+	public Procedure transformFunction(Function function) {
+		String name = function.getName();
+		int lineNumber = Util.getLocation(function);
+		Type type = Typer.getType(function);
 
 		Procedure procedure = IrFactory.eINSTANCE.createProcedure(name,
 				lineNumber, type);
-		mapAstToIr.put(astFunction, procedure);
+		mapAstToIr.put(function, procedure);
 
 		Context oldContext = newContext(procedure);
 
-		transformParameters(astFunction.getParameters());
-		transformLocalVariables(astFunction.getVariables());
+		transformParameters(function.getParameters());
+		transformLocalVariables(function.getVariables());
 
 		Expression value;
-		if (astFunction.isNative()) {
+		if (function.isNative()) {
 			value = null;
 		} else {
 			Var target = exprTransformer.target;
 			List<Expression> indexes = exprTransformer.indexes;
 			exprTransformer.clearTarget();
-			value = transformExpression(astFunction.getExpression());
+			value = transformExpression(function.getExpression());
 			exprTransformer.setTarget(target, indexes);
 		}
 
 		restoreContext(oldContext);
 		addReturn(procedure, value);
 
-		if (astFunction.eContainer() == null || astFunction.isNative()) {
+		if (function.eContainer() == null || function.isNative()) {
 			procedure.setNative(true);
 		}
 
@@ -1240,18 +1248,6 @@ public class AstTransformer {
 		}
 
 		return variable;
-	}
-
-	private void transformAnnotations(Var variable,
-			List<AstAnnotation> annotations) {
-		for (AstAnnotation astAnnotation : annotations) {
-			Annotation annotation = IrFactory.eINSTANCE
-					.createAnnotation(astAnnotation.getName());
-			for (AstAnnotationArgument arg : astAnnotation.getArguments()) {
-				annotation.getAttributes().put(arg.getName(), arg.getValue());
-			}
-			variable.getAnnotations().add(annotation);
-		}
 	}
 
 	/**
@@ -1354,7 +1350,7 @@ public class AstTransformer {
 	 * @param statement
 	 *            an AST statement
 	 */
-	private void transformStatement(AstStatement statement) {
+	private void transformStatement(Statement statement) {
 		stmtTransformer.doSwitch(statement);
 	}
 
@@ -1365,8 +1361,8 @@ public class AstTransformer {
 	 * @param statements
 	 *            a list of AST statements
 	 */
-	public void transformStatements(List<AstStatement> statements) {
-		for (AstStatement statement : statements) {
+	public void transformStatements(List<Statement> statements) {
+		for (Statement statement : statements) {
 			transformStatement(statement);
 		}
 	}

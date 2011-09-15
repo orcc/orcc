@@ -41,28 +41,28 @@ import net.sf.orcc.cal.CalConstants;
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
-import net.sf.orcc.cal.cal.AstExpressionCall;
-import net.sf.orcc.cal.cal.AstExpressionIndex;
-import net.sf.orcc.cal.cal.AstFunction;
-import net.sf.orcc.cal.cal.AstGenerator;
-import net.sf.orcc.cal.cal.AstInequality;
-import net.sf.orcc.cal.cal.AstInputPattern;
-import net.sf.orcc.cal.cal.AstOutputPattern;
 import net.sf.orcc.cal.cal.AstPort;
-import net.sf.orcc.cal.cal.AstPriority;
 import net.sf.orcc.cal.cal.AstProcedure;
-import net.sf.orcc.cal.cal.AstSchedule;
-import net.sf.orcc.cal.cal.AstScheduleRegExp;
 import net.sf.orcc.cal.cal.AstState;
-import net.sf.orcc.cal.cal.AstStatementAssign;
-import net.sf.orcc.cal.cal.AstStatementCall;
-import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstTransition;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.AstVariable;
-import net.sf.orcc.cal.cal.AstVariableReference;
 import net.sf.orcc.cal.cal.CalPackage;
+import net.sf.orcc.cal.cal.ExpressionCall;
+import net.sf.orcc.cal.cal.ExpressionIndex;
+import net.sf.orcc.cal.cal.Function;
+import net.sf.orcc.cal.cal.Generator;
+import net.sf.orcc.cal.cal.Inequality;
+import net.sf.orcc.cal.cal.InputPattern;
+import net.sf.orcc.cal.cal.OutputPattern;
+import net.sf.orcc.cal.cal.Priority;
+import net.sf.orcc.cal.cal.RegExp;
+import net.sf.orcc.cal.cal.Schedule;
+import net.sf.orcc.cal.cal.StatementAssign;
+import net.sf.orcc.cal.cal.StatementCall;
+import net.sf.orcc.cal.cal.StatementForeach;
+import net.sf.orcc.cal.cal.VariableReference;
 import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.cal.util.CalActionList;
@@ -109,14 +109,14 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 	 * @param inputs
 	 *            the input patterns of an action
 	 */
-	private void checkActionInputs(List<AstInputPattern> inputs) {
+	private void checkActionInputs(List<InputPattern> inputs) {
 		List<AstPort> ports = new ArrayList<AstPort>();
 
-		for (AstInputPattern pattern : inputs) {
+		for (InputPattern pattern : inputs) {
 			AstPort port = pattern.getPort();
 			if (ports.contains(port)) {
 				error("duplicate reference to port " + port.getName(), pattern,
-						eINSTANCE.getAstInputPattern_Port(), -1);
+						eINSTANCE.getInputPattern_Port(), -1);
 			} else {
 				ports.add(port);
 			}
@@ -129,14 +129,14 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 	 * @param outputs
 	 *            the output patterns of an action
 	 */
-	private void checkActionOutputs(List<AstOutputPattern> outputs) {
+	private void checkActionOutputs(List<OutputPattern> outputs) {
 		List<AstPort> ports = new ArrayList<AstPort>();
 
-		for (AstOutputPattern pattern : outputs) {
+		for (OutputPattern pattern : outputs) {
 			AstPort port = pattern.getPort();
 			if (ports.contains(port)) {
 				error("duplicate reference to port " + port.getName(), pattern,
-						eINSTANCE.getAstOutputPattern_Port(), -1);
+						eINSTANCE.getOutputPattern_Port(), -1);
 			} else {
 				ports.add(port);
 			}
@@ -198,11 +198,11 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 		actionList.addActions(actor.getActions());
 
 		// check FSM and priorities
-		AstSchedule schedule = actor.getSchedule();
+		Schedule schedule = actor.getSchedule();
 		if (schedule != null) {
 			checkFsm(actionList, schedule);
 		}
-		AstScheduleRegExp scheduleRegExp = actor.getScheduleRegExp();
+		RegExp scheduleRegExp = actor.getScheduleRegExp();
 		if (scheduleRegExp != null && !actor.getPriorities().isEmpty()) {
 			error("Regexp scheduler with priorities.", actor,
 					eINSTANCE.getAstActor_ScheduleRegExp(), -1);
@@ -218,64 +218,11 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 	}
 
 	@Check(CheckType.NORMAL)
-	public void checkAstExpressionCall(AstExpressionCall astCall) {
-		AstFunction function = astCall.getFunction();
-		String name = function.getName();
-
-		EObject rootCter = EcoreUtil.getRootContainer(astCall);
-		EObject rootCterFunction = EcoreUtil.getRootContainer(function);
-		if (function.eContainer() instanceof AstActor
-				&& rootCter != rootCterFunction) {
-			// calling an actor's function from another actor/unit
-			error("function " + name
-					+ " cannot be called from another actor/unit", astCall,
-					eINSTANCE.getAstExpressionCall_Function(), -1);
-		}
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkAstFunction(final AstFunction function) {
-		// do not check functions of a unit
-		if (function.eContainer() instanceof AstUnit) {
-			return;
-		}
-
-		boolean used = new BooleanSwitch() {
-
-			@Override
-			public Boolean caseAstExpressionCall(AstExpressionCall expression) {
-				if (expression.getFunction().equals(function)) {
-					return true;
-				}
-
-				return super.caseAstExpressionCall(expression);
-			}
-
-		}.doSwitch(Util.getTopLevelContainer(function));
-
-		if (!used && !function.isNative()) {
-			warning("The function " + function.getName() + " is never called",
-					eINSTANCE.getAstFunction_Name());
-		}
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkAstGenerator(AstGenerator generator) {
-		int lower = Evaluator.getIntValue(generator.getLower());
-		int higher = Evaluator.getIntValue(generator.getHigher());
-
-		if (higher < lower) {
-			error("higher bound must be greater than lower bound", generator,
-					eINSTANCE.getAstGenerator_Higher(), -1);
-		}
-	}
-
-	@Check(CheckType.NORMAL)
 	public void checkAstProcedure(final AstProcedure procedure) {
 		boolean used = new BooleanSwitch() {
 
 			@Override
-			public Boolean caseAstStatementCall(AstStatementCall call) {
+			public Boolean caseStatementCall(StatementCall call) {
 				if (call.getProcedure().equals(procedure)) {
 					return true;
 				}
@@ -293,22 +240,6 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 	}
 
 	@Check(CheckType.NORMAL)
-	public void checkAstStatementCall(AstStatementCall astCall) {
-		AstProcedure procedure = astCall.getProcedure();
-		String name = procedure.getName();
-
-		EObject rootCter = EcoreUtil.getRootContainer(astCall);
-		EObject rootCterProcedure = EcoreUtil.getRootContainer(procedure);
-		if (procedure.eContainer() instanceof AstActor
-				&& rootCter != rootCterProcedure) {
-			// calling an actor's procedure from another actor/unit
-			error("procedure " + name
-					+ " cannot be called from another actor/unit", astCall,
-					eINSTANCE.getAstStatementCall_Procedure(), -1);
-		}
-	}
-
-	@Check(CheckType.NORMAL)
 	public void checkAstUnit(AstUnit unit) {
 		// check unique names
 	}
@@ -316,21 +247,6 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 	@Check(CheckType.NORMAL)
 	public void checkAstVariable(AstVariable variable) {
 		checkIsVariableUsed(variable);
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkAstVariableReference(AstVariableReference ref) {
-		AstVariable variable = ref.getVariable();
-		String name = variable.getName();
-
-		EObject rootCter = EcoreUtil.getRootContainer(ref);
-		EObject rootCter2 = EcoreUtil.getRootContainer(variable);
-		if (variable.eContainer() instanceof AstActor && rootCter != rootCter2) {
-			// referencing an actor's variable from another actor/unit
-			error("variable " + name + " can only be referenced "
-					+ "within the actor in which it is declared", ref,
-					eINSTANCE.getAstVariableReference_Variable(), -1);
-		}
 	}
 
 	/**
@@ -431,6 +347,22 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 		}
 	}
 
+	@Check(CheckType.NORMAL)
+	public void checkExpressionCall(ExpressionCall call) {
+		Function function = call.getFunction();
+		String name = function.getName();
+
+		EObject rootCter = EcoreUtil.getRootContainer(call);
+		EObject rootCterFunction = EcoreUtil.getRootContainer(function);
+		if (function.eContainer() instanceof AstActor
+				&& rootCter != rootCterFunction) {
+			// calling an actor's function from another actor/unit
+			error("function " + name
+					+ " cannot be called from another actor/unit", call,
+					eINSTANCE.getExpressionCall_Function(), -1);
+		}
+	}
+
 	/**
 	 * Checks the given FSM using the given action list. This check is not
 	 * annotated because we need to build the action list, which is also useful
@@ -441,7 +373,7 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 	 * @param schedule
 	 *            the FSM of the actor
 	 */
-	private void checkFsm(CalActionList actionList, AstSchedule schedule) {
+	private void checkFsm(CalActionList actionList, Schedule schedule) {
 		Map<AstState, List<AstAction>> stateActionMap = new HashMap<AstState, List<AstAction>>();
 		for (AstTransition transition : schedule.getTransitions()) {
 			AstTag tag = transition.getTag();
@@ -475,6 +407,43 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 		}
 	}
 
+	@Check(CheckType.NORMAL)
+	public void checkFunction(final Function function) {
+		// do not check functions of a unit
+		if (function.eContainer() instanceof AstUnit) {
+			return;
+		}
+
+		boolean used = new BooleanSwitch() {
+
+			@Override
+			public Boolean caseExpressionCall(ExpressionCall expression) {
+				if (expression.getFunction().equals(function)) {
+					return true;
+				}
+
+				return super.caseExpressionCall(expression);
+			}
+
+		}.doSwitch(Util.getTopLevelContainer(function));
+
+		if (!used && !function.isNative()) {
+			warning("The function " + function.getName() + " is never called",
+					eINSTANCE.getFunction_Name());
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkGenerator(Generator generator) {
+		int lower = Evaluator.getIntValue(generator.getLower());
+		int higher = Evaluator.getIntValue(generator.getHigher());
+
+		if (higher < lower) {
+			error("higher bound must be greater than lower bound", generator,
+					eINSTANCE.getGenerator_Higher(), -1);
+		}
+	}
+
 	/**
 	 * Checks that the given variable is used. If it is not, issue a warning.
 	 * 
@@ -485,9 +454,8 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 		// do not take variables declared by input patterns and
 		// generator/foreach
 		EObject container = variable.eContainer();
-		if (container instanceof AstInputPattern
-				|| container instanceof AstGenerator
-				|| container instanceof AstStatementForeach
+		if (container instanceof InputPattern || container instanceof Generator
+				|| container instanceof StatementForeach
 				|| container instanceof AstUnit) {
 			return;
 		}
@@ -495,25 +463,25 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 		boolean used = new BooleanSwitch() {
 
 			@Override
-			public Boolean caseAstExpressionIndex(AstExpressionIndex expression) {
+			public Boolean caseExpressionIndex(ExpressionIndex expression) {
 				if (expression.getSource().getVariable().equals(variable)) {
 					return true;
 				}
 
-				return super.caseAstExpressionIndex(expression);
+				return super.caseExpressionIndex(expression);
 			}
 
 			@Override
-			public Boolean caseAstStatementAssign(AstStatementAssign assign) {
+			public Boolean caseStatementAssign(StatementAssign assign) {
 				if (assign.getTarget().getVariable().equals(variable)) {
 					return true;
 				}
 
-				return super.caseAstStatementAssign(assign);
+				return super.caseStatementAssign(assign);
 			}
 
 			@Override
-			public Boolean caseAstVariableReference(AstVariableReference ref) {
+			public Boolean caseVariableReference(VariableReference ref) {
 				return ref.getVariable().equals(variable);
 			}
 
@@ -527,8 +495,8 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 				return;
 			}
 
-			if (variable.eContainer() instanceof AstFunction) {
-				AstFunction function = (AstFunction) variable.eContainer();
+			if (variable.eContainer() instanceof Function) {
+				Function function = (Function) variable.eContainer();
 				if (function.isNative()) {
 					return;
 				}
@@ -558,7 +526,7 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 	 *            the action list of the actor
 	 */
 	private void checkPriorities(AstActor actor, CalActionList actionList) {
-		List<AstPriority> priorities = actor.getPriorities();
+		List<Priority> priorities = actor.getPriorities();
 		DirectedGraph<AstAction, DefaultEdge> graph = new DefaultDirectedGraph<AstAction, DefaultEdge>(
 				DefaultEdge.class);
 
@@ -570,8 +538,8 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 			}
 		}
 
-		for (AstPriority priority : priorities) {
-			for (AstInequality inequality : priority.getInequalities()) {
+		for (Priority priority : priorities) {
+			for (Inequality inequality : priority.getInequalities()) {
 				// the grammar requires there be at least two tags
 				Iterator<AstTag> it = inequality.getTags().iterator();
 				AstTag previousTag = it.next();
@@ -582,7 +550,7 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 				if (sources == null || sources.isEmpty()) {
 					error("tag " + getName(previousTag)
 							+ " does not refer to any action", inequality,
-							eINSTANCE.getAstInequality_Tags(), index);
+							eINSTANCE.getInequality_Tags(), index);
 				}
 
 				while (it.hasNext()) {
@@ -596,7 +564,7 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 					if (targets == null || targets.isEmpty()) {
 						error("tag " + getName(tag)
 								+ " does not refer to any action", inequality,
-								eINSTANCE.getAstInequality_Tags(), index);
+								eINSTANCE.getInequality_Tags(), index);
 					}
 
 					if (sources != null && targets != null) {
@@ -629,6 +597,37 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 					+ ((AstEntity) actor.eContainer()).getName()
 					+ " contain a cycle: " + builder.toString(), actor,
 					eINSTANCE.getAstActor_Priorities(), -1);
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkStatementCall(StatementCall call) {
+		AstProcedure procedure = call.getProcedure();
+		String name = procedure.getName();
+
+		EObject rootCter = EcoreUtil.getRootContainer(call);
+		EObject rootCterProcedure = EcoreUtil.getRootContainer(procedure);
+		if (procedure.eContainer() instanceof AstActor
+				&& rootCter != rootCterProcedure) {
+			// calling an actor's procedure from another actor/unit
+			error("procedure " + name
+					+ " cannot be called from another actor/unit", call,
+					eINSTANCE.getStatementCall_Procedure(), -1);
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkVariableReference(VariableReference ref) {
+		AstVariable variable = ref.getVariable();
+		String name = variable.getName();
+
+		EObject rootCter = EcoreUtil.getRootContainer(ref);
+		EObject rootCter2 = EcoreUtil.getRootContainer(variable);
+		if (variable.eContainer() instanceof AstActor && rootCter != rootCter2) {
+			// referencing an actor's variable from another actor/unit
+			error("variable " + name + " can only be referenced "
+					+ "within the actor in which it is declared", ref,
+					eINSTANCE.getVariableReference_Variable(), -1);
 		}
 	}
 

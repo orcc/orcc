@@ -35,19 +35,19 @@ import java.util.Set;
 
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
-import net.sf.orcc.cal.cal.AstExpressionList;
-import net.sf.orcc.cal.cal.AstFunction;
-import net.sf.orcc.cal.cal.AstGenerator;
-import net.sf.orcc.cal.cal.AstInputPattern;
 import net.sf.orcc.cal.cal.AstProcedure;
-import net.sf.orcc.cal.cal.AstSchedule;
 import net.sf.orcc.cal.cal.AstState;
-import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstTransition;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
+import net.sf.orcc.cal.cal.ExpressionList;
+import net.sf.orcc.cal.cal.Function;
+import net.sf.orcc.cal.cal.Generator;
+import net.sf.orcc.cal.cal.InputPattern;
+import net.sf.orcc.cal.cal.Schedule;
+import net.sf.orcc.cal.cal.StatementForeach;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
@@ -67,7 +67,7 @@ import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider;
  */
 public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 
-	private void addState(AstSchedule schedule, Set<String> nameSet,
+	private void addState(Schedule schedule, Set<String> nameSet,
 			List<INode> nodes) {
 		ILeafNode leaf = (ILeafNode) nodes.get(0);
 		String name = leaf.getText();
@@ -81,7 +81,7 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 		}
 	}
 
-	private void buildStates(AstSchedule schedule) {
+	private void buildStates(Schedule schedule) {
 		Set<String> nameSet = new HashSet<String>();
 		// source states
 		for (AstTransition transition : schedule.getTransitions()) {
@@ -141,64 +141,6 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	}
 
 	/**
-	 * Returns the scope of functions within an actor.
-	 * 
-	 * @param actor
-	 *            an actor
-	 * @param reference
-	 *            a reference
-	 * @return a scope
-	 */
-	public IScope scope_AstFunction(AstActor actor, EReference reference) {
-		return Scopes.scopeFor(actor.getFunctions(),
-				delegateGetScope(actor, reference));
-	}
-
-	/**
-	 * Returns the scope of functions within a unit.
-	 * 
-	 * @param unit
-	 *            a unit
-	 * @param reference
-	 *            a reference
-	 * @return a scope
-	 */
-	public IScope scope_AstFunction(AstUnit unit, EReference reference) {
-		return Scopes.scopeFor(unit.getFunctions(),
-				delegateGetScope(unit, reference));
-	}
-
-	/**
-	 * Returns the scope for an input pattern.
-	 * 
-	 * @param action
-	 *            an action
-	 * @param reference
-	 *            a variable reference
-	 * @return a scope
-	 */
-	public IScope scope_AstInputPattern_port(AstAction action,
-			EReference reference) {
-		AstActor actor = (AstActor) action.eContainer();
-		return Scopes.scopeFor(actor.getInputs());
-	}
-
-	/**
-	 * Returns the scope for an output pattern.
-	 * 
-	 * @param action
-	 *            an action
-	 * @param reference
-	 *            a variable reference
-	 * @return a scope
-	 */
-	public IScope scope_AstOutputPattern_port(AstAction action,
-			EReference reference) {
-		AstActor actor = (AstActor) action.eContainer();
-		return Scopes.scopeFor(actor.getOutputs());
-	}
-
-	/**
 	 * Returns the scope of procedures within an actor.
 	 * 
 	 * @param actor
@@ -235,7 +177,7 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 *            a variable reference
 	 * @return a scope
 	 */
-	public IScope scope_AstSchedule_initialState(AstSchedule schedule,
+	public IScope scope_AstTransition_source(Schedule schedule,
 			EReference reference) {
 		if (schedule.getStates().isEmpty()) {
 			buildStates(schedule);
@@ -252,12 +194,69 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 *            a variable reference
 	 * @return a scope
 	 */
-	public IScope scope_AstTransition_source(AstSchedule schedule,
+	public IScope scope_AstTransition_target(Schedule schedule,
 			EReference reference) {
 		if (schedule.getStates().isEmpty()) {
 			buildStates(schedule);
 		}
 		return Scopes.scopeFor(schedule.getStates());
+	}
+
+	/**
+	 * Returns the scope of functions within an actor.
+	 * 
+	 * @param actor
+	 *            an actor
+	 * @param reference
+	 *            a reference
+	 * @return a scope
+	 */
+	public IScope scope_Function(AstActor actor, EReference reference) {
+		return Scopes.scopeFor(actor.getFunctions(),
+				delegateGetScope(actor, reference));
+	}
+
+	/**
+	 * Returns the scope of functions within a unit.
+	 * 
+	 * @param unit
+	 *            a unit
+	 * @param reference
+	 *            a reference
+	 * @return a scope
+	 */
+	public IScope scope_Function(AstUnit unit, EReference reference) {
+		return Scopes.scopeFor(unit.getFunctions(),
+				delegateGetScope(unit, reference));
+	}
+
+	/**
+	 * Returns the scope for an input pattern.
+	 * 
+	 * @param action
+	 *            an action
+	 * @param reference
+	 *            a variable reference
+	 * @return a scope
+	 */
+	public IScope scope_InputPattern_port(AstAction action, EReference reference) {
+		AstActor actor = (AstActor) action.eContainer();
+		return Scopes.scopeFor(actor.getInputs());
+	}
+
+	/**
+	 * Returns the scope for an output pattern.
+	 * 
+	 * @param action
+	 *            an action
+	 * @param reference
+	 *            a variable reference
+	 * @return a scope
+	 */
+	public IScope scope_OutputPattern_port(AstAction action,
+			EReference reference) {
+		AstActor actor = (AstActor) action.eContainer();
+		return Scopes.scopeFor(actor.getOutputs());
 	}
 
 	/**
@@ -269,7 +268,7 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 *            a variable reference
 	 * @return a scope
 	 */
-	public IScope scope_AstTransition_target(AstSchedule schedule,
+	public IScope scope_Schedule_initialState(Schedule schedule,
 			EReference reference) {
 		if (schedule.getStates().isEmpty()) {
 			buildStates(schedule);
@@ -286,10 +285,10 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 *            a variable reference
 	 * @return a scope
 	 */
-	public IScope scope_AstVariableReference_variable(AstAction action,
+	public IScope scope_VariableReference_variable(AstAction action,
 			EReference reference) {
 		List<AstVariable> tokens = new ArrayList<AstVariable>();
-		for (AstInputPattern pattern : action.getInputs()) {
+		for (InputPattern pattern : action.getInputs()) {
 			tokens.addAll(pattern.getTokens());
 		}
 		return getScope(action, tokens, action.getVariables(), reference);
@@ -304,13 +303,64 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 *            a variable reference
 	 * @return a scope
 	 */
-	public IScope scope_AstVariableReference_variable(AstActor actor,
+	public IScope scope_VariableReference_variable(AstActor actor,
 			EReference reference) {
 		List<AstVariable> elements = new ArrayList<AstVariable>();
 		elements.addAll(actor.getParameters());
 		elements.addAll(actor.getStateVariables());
 
 		return Scopes.scopeFor(elements, delegateGetScope(actor, reference));
+	}
+
+	/**
+	 * Returns the scope for a variable referenced inside a procedure.
+	 * 
+	 * @param procedure
+	 *            a procedure
+	 * @param reference
+	 *            a variable reference
+	 * @return a scope
+	 */
+	public IScope scope_VariableReference_variable(AstProcedure procedure,
+			EReference reference) {
+		return getScope(procedure, procedure.getParameters(),
+				procedure.getVariables(), reference);
+	}
+
+	/**
+	 * Returns the scope for a variable referenced inside a variable
+	 * declaration.
+	 * 
+	 * @param variable
+	 *            a variable declaration
+	 * @param reference
+	 *            a variable reference
+	 * @return a scope
+	 */
+	public IScope scope_VariableReference_variable(AstVariable variable,
+			EReference reference) {
+		EObject cter = variable.eContainer();
+		List<AstVariable> parameters;
+		List<AstVariable> variables;
+		if (cter instanceof Function) {
+			parameters = ((Function) cter).getParameters();
+			variables = ((Function) cter).getVariables();
+		} else if (cter instanceof AstProcedure) {
+			parameters = ((AstProcedure) cter).getParameters();
+			variables = ((AstProcedure) cter).getVariables();
+		} else if (cter instanceof AstAction) {
+			AstAction action = (AstAction) cter;
+			parameters = new ArrayList<AstVariable>();
+			for (InputPattern pattern : action.getInputs()) {
+				parameters.addAll(pattern.getTokens());
+			}
+			variables = action.getVariables();
+		} else {
+			// in a state variable
+			return getScope(variable.eContainer(), reference);
+		}
+
+		return getScope(variable, parameters, variables, reference);
 	}
 
 	/**
@@ -322,10 +372,10 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 *            a variable reference
 	 * @return a scope
 	 */
-	public IScope scope_AstVariableReference_variable(AstExpressionList list,
+	public IScope scope_VariableReference_variable(ExpressionList list,
 			EReference reference) {
 		List<AstVariable> elements = new ArrayList<AstVariable>();
-		for (AstGenerator generator : list.getGenerators()) {
+		for (Generator generator : list.getGenerators()) {
 			elements.add(generator.getVariable());
 		}
 		EObject container = list.eContainer();
@@ -341,25 +391,10 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 *            a variable reference
 	 * @return a scope
 	 */
-	public IScope scope_AstVariableReference_variable(AstFunction function,
+	public IScope scope_VariableReference_variable(Function function,
 			EReference reference) {
 		return getScope(function, function.getParameters(),
 				function.getVariables(), reference);
-	}
-
-	/**
-	 * Returns the scope for a variable referenced inside a procedure.
-	 * 
-	 * @param procedure
-	 *            a procedure
-	 * @param reference
-	 *            a variable reference
-	 * @return a scope
-	 */
-	public IScope scope_AstVariableReference_variable(AstProcedure procedure,
-			EReference reference) {
-		return getScope(procedure, procedure.getParameters(),
-				procedure.getVariables(), reference);
 	}
 
 	/**
@@ -371,48 +406,12 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 *            a variable reference
 	 * @return a scope
 	 */
-	public IScope scope_AstVariableReference_variable(
-			AstStatementForeach foreach, EReference reference) {
+	public IScope scope_VariableReference_variable(StatementForeach foreach,
+			EReference reference) {
 		List<AstVariable> variables = new ArrayList<AstVariable>();
 		variables.add(foreach.getVariable());
 		return Scopes.scopeFor(variables,
 				getScope(foreach.eContainer(), reference));
-	}
-
-	/**
-	 * Returns the scope for a variable referenced inside a variable
-	 * declaration.
-	 * 
-	 * @param variable
-	 *            a variable declaration
-	 * @param reference
-	 *            a variable reference
-	 * @return a scope
-	 */
-	public IScope scope_AstVariableReference_variable(AstVariable variable,
-			EReference reference) {
-		EObject cter = variable.eContainer();
-		List<AstVariable> parameters;
-		List<AstVariable> variables;
-		if (cter instanceof AstFunction) {
-			parameters = ((AstFunction) cter).getParameters();
-			variables = ((AstFunction) cter).getVariables();
-		} else if (cter instanceof AstProcedure) {
-			parameters = ((AstProcedure) cter).getParameters();
-			variables = ((AstProcedure) cter).getVariables();
-		} else if (cter instanceof AstAction) {
-			AstAction action = (AstAction) cter;
-			parameters = new ArrayList<AstVariable>();
-			for (AstInputPattern pattern : action.getInputs()) {
-				parameters.addAll(pattern.getTokens());
-			}
-			variables = action.getVariables();
-		} else {
-			// in a state variable
-			return getScope(variable.eContainer(), reference);
-		}
-
-		return getScope(variable, parameters, variables, reference);
 	}
 
 }

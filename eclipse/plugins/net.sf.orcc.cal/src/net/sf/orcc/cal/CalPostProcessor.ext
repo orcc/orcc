@@ -22,7 +22,7 @@ process(EClassifier this) :
 
 process(EClass this) :
 	switch (this.name) {
-		case "AstSchedule": (
+		case "Schedule": (
 			// add a transient list of states referenced by transitions to Schedule class 
 			let etype = (EClass) ePackage.getEClassifier("AstState") :
 			let field = new EReference :

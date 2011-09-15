@@ -34,21 +34,21 @@ import java.util.List;
 import net.sf.orcc.cache.Cache;
 import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstExpression;
-import net.sf.orcc.cal.cal.AstExpressionBinary;
-import net.sf.orcc.cal.cal.AstExpressionBoolean;
-import net.sf.orcc.cal.cal.AstExpressionCall;
-import net.sf.orcc.cal.cal.AstExpressionElsif;
-import net.sf.orcc.cal.cal.AstExpressionFloat;
-import net.sf.orcc.cal.cal.AstExpressionIf;
-import net.sf.orcc.cal.cal.AstExpressionIndex;
-import net.sf.orcc.cal.cal.AstExpressionInteger;
-import net.sf.orcc.cal.cal.AstExpressionList;
-import net.sf.orcc.cal.cal.AstExpressionString;
-import net.sf.orcc.cal.cal.AstExpressionUnary;
-import net.sf.orcc.cal.cal.AstExpressionVariable;
-import net.sf.orcc.cal.cal.AstFunction;
-import net.sf.orcc.cal.cal.AstGenerator;
 import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.cal.ExpressionBinary;
+import net.sf.orcc.cal.cal.ExpressionBoolean;
+import net.sf.orcc.cal.cal.ExpressionCall;
+import net.sf.orcc.cal.cal.ExpressionElsif;
+import net.sf.orcc.cal.cal.ExpressionFloat;
+import net.sf.orcc.cal.cal.ExpressionIf;
+import net.sf.orcc.cal.cal.ExpressionIndex;
+import net.sf.orcc.cal.cal.ExpressionInteger;
+import net.sf.orcc.cal.cal.ExpressionList;
+import net.sf.orcc.cal.cal.ExpressionString;
+import net.sf.orcc.cal.cal.ExpressionUnary;
+import net.sf.orcc.cal.cal.ExpressionVariable;
+import net.sf.orcc.cal.cal.Function;
+import net.sf.orcc.cal.cal.Generator;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprInt;
@@ -139,7 +139,18 @@ public class Evaluator extends CalSwitch<Expression> {
 	}
 
 	@Override
-	public Expression caseAstExpressionBinary(AstExpressionBinary expression) {
+	public Expression caseAstVariable(AstVariable variable) {
+		AstExpression expression = variable.getValue();
+		if (expression == null) {
+			return null;
+		}
+
+		Expression value = getValue(expression);
+		return value;
+	}
+
+	@Override
+	public Expression caseExpressionBinary(ExpressionBinary expression) {
 		OpBinary op = OpBinary.getOperator(expression.getOperator());
 		Expression e1 = getValue(expression.getLeft());
 		Expression e2 = getValue(expression.getRight());
@@ -153,13 +164,13 @@ public class Evaluator extends CalSwitch<Expression> {
 	}
 
 	@Override
-	public Expression caseAstExpressionBoolean(AstExpressionBoolean expression) {
+	public Expression caseExpressionBoolean(ExpressionBoolean expression) {
 		return IrFactory.eINSTANCE.createExprBool(expression.isValue());
 	}
 
 	@Override
-	public Expression caseAstExpressionCall(AstExpressionCall expression) {
-		AstFunction function = expression.getFunction();
+	public Expression caseExpressionCall(ExpressionCall expression) {
+		Function function = expression.getFunction();
 		if (expression.getParameters().size() != function.getParameters()
 				.size()) {
 			return null;
@@ -185,19 +196,19 @@ public class Evaluator extends CalSwitch<Expression> {
 	}
 
 	@Override
-	public Expression caseAstExpressionFloat(AstExpressionFloat expression) {
+	public Expression caseExpressionFloat(ExpressionFloat expression) {
 		return IrFactory.eINSTANCE.createExprFloat(expression.getValue());
 	}
 
 	@Override
-	public Expression caseAstExpressionIf(AstExpressionIf expression) {
+	public Expression caseExpressionIf(ExpressionIf expression) {
 		Expression condition = getValue(expression.getCondition());
 
 		if (condition != null && condition.isBooleanExpr()) {
 			if (((ExprBool) condition).isValue()) {
 				return getValue(expression.getThen());
 			} else {
-				for (AstExpressionElsif elsif : expression.getElsifs()) {
+				for (ExpressionElsif elsif : expression.getElsifs()) {
 					condition = getValue(elsif.getCondition());
 					if (condition != null && condition.isBooleanExpr()) {
 						if (((ExprBool) condition).isValue()) {
@@ -214,7 +225,7 @@ public class Evaluator extends CalSwitch<Expression> {
 	}
 
 	@Override
-	public Expression caseAstExpressionIndex(AstExpressionIndex expression) {
+	public Expression caseExpressionIndex(ExpressionIndex expression) {
 		AstVariable variable = expression.getSource().getVariable();
 		Expression value = getValue(variable.getValue());
 		if (value == null) {
@@ -243,14 +254,14 @@ public class Evaluator extends CalSwitch<Expression> {
 	}
 
 	@Override
-	public Expression caseAstExpressionInteger(AstExpressionInteger expression) {
+	public Expression caseExpressionInteger(ExpressionInteger expression) {
 		return IrFactory.eINSTANCE.createExprInt(expression.getValue());
 	}
 
 	@Override
-	public Expression caseAstExpressionList(AstExpressionList expression) {
+	public Expression caseExpressionList(ExpressionList expression) {
 		List<AstExpression> expressions = expression.getExpressions();
-		List<AstGenerator> generators = expression.getGenerators();
+		List<Generator> generators = expression.getGenerators();
 
 		ExprList list = IrFactory.eINSTANCE.createExprList();
 		if (generators.isEmpty()) {
@@ -269,13 +280,13 @@ public class Evaluator extends CalSwitch<Expression> {
 	}
 
 	@Override
-	public Expression caseAstExpressionString(AstExpressionString expression) {
+	public Expression caseExpressionString(ExpressionString expression) {
 		return IrFactory.eINSTANCE.createExprString(OrccUtil
 				.getEscapedString(expression.getValue()));
 	}
 
 	@Override
-	public Expression caseAstExpressionUnary(AstExpressionUnary expression) {
+	public Expression caseExpressionUnary(ExpressionUnary expression) {
 		OpUnary op = OpUnary.getOperator(expression.getUnaryOperator());
 
 		switch (op) {
@@ -315,21 +326,10 @@ public class Evaluator extends CalSwitch<Expression> {
 	}
 
 	@Override
-	public Expression caseAstExpressionVariable(AstExpressionVariable expression) {
+	public Expression caseExpressionVariable(ExpressionVariable expression) {
 		AstVariable variable = expression.getValue().getVariable();
 		Expression value = getValue(variable);
 		return EcoreUtil.copy(value);
-	}
-
-	@Override
-	public Expression caseAstVariable(AstVariable variable) {
-		AstExpression expression = variable.getValue();
-		if (expression == null) {
-			return null;
-		}
-
-		Expression value = getValue(expression);
-		return value;
 	}
 
 }

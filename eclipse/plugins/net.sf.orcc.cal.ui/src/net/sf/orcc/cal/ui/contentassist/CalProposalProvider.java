@@ -35,14 +35,14 @@ import java.util.Set;
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
-import net.sf.orcc.cal.cal.AstInequality;
 import net.sf.orcc.cal.cal.AstPort;
-import net.sf.orcc.cal.cal.AstPriority;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstTransition;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
+import net.sf.orcc.cal.cal.Inequality;
+import net.sf.orcc.cal.cal.Priority;
 import net.sf.orcc.cal.util.CalActionList;
 import net.sf.orcc.cal.util.Util;
 
@@ -107,11 +107,11 @@ public class CalProposalProvider extends AbstractCalProposalProvider {
 
 			// find all variables to which we have access and are in units
 			EReference reference = CalPackage.eINSTANCE
-					.getAstVariableReference_Variable();
+					.getVariableReference_Variable();
 			addUnits(model, reference, units);
 
 			// find all functions to which we have access and are in units
-			reference = CalPackage.eINSTANCE.getAstExpressionCall_Function();
+			reference = CalPackage.eINSTANCE.getExpressionCall_Function();
 			addUnits(model, reference, units);
 
 			for (String unit : units) {
@@ -126,7 +126,7 @@ public class CalProposalProvider extends AbstractCalProposalProvider {
 
 	public void completeInequality_Tags(EObject model, Assignment assignment,
 			ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
-		if (model instanceof AstPriority) {
+		if (model instanceof Priority) {
 			proposeAllTags(model, context, acceptor);
 		}
 	}
@@ -146,13 +146,12 @@ public class CalProposalProvider extends AbstractCalProposalProvider {
 
 	public void completeTag_Identifiers(EObject model, Assignment assignment,
 			ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
-		if (model instanceof AstInequality || model instanceof AstTransition) {
+		if (model instanceof Inequality || model instanceof AstTransition) {
 			proposeAllTags(model.eContainer(), context, acceptor);
 		} else if (model instanceof AstTag) {
 			AstTag tag = (AstTag) model;
 			EObject parent = tag.eContainer();
-			if (parent instanceof AstInequality
-					|| parent instanceof AstTransition) {
+			if (parent instanceof Inequality || parent instanceof AstTransition) {
 				proposeTagAfter(tag, parent.eContainer(), context, acceptor);
 			}
 		}

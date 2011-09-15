@@ -50,13 +50,6 @@ import net.sf.graphiti.model.ObjectType;
 import net.sf.graphiti.model.Vertex;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.cal.cal.AstExpression;
-import net.sf.orcc.cal.cal.AstExpressionBinary;
-import net.sf.orcc.cal.cal.AstExpressionBoolean;
-import net.sf.orcc.cal.cal.AstExpressionFloat;
-import net.sf.orcc.cal.cal.AstExpressionInteger;
-import net.sf.orcc.cal.cal.AstExpressionString;
-import net.sf.orcc.cal.cal.AstExpressionUnary;
-import net.sf.orcc.cal.cal.AstExpressionVariable;
 import net.sf.orcc.cal.cal.AstType;
 import net.sf.orcc.cal.cal.AstTypeBool;
 import net.sf.orcc.cal.cal.AstTypeFloat;
@@ -65,8 +58,15 @@ import net.sf.orcc.cal.cal.AstTypeList;
 import net.sf.orcc.cal.cal.AstTypeString;
 import net.sf.orcc.cal.cal.AstTypeUint;
 import net.sf.orcc.cal.cal.AstVariable;
-import net.sf.orcc.cal.cal.AstVariableReference;
 import net.sf.orcc.cal.cal.CalFactory;
+import net.sf.orcc.cal.cal.ExpressionBinary;
+import net.sf.orcc.cal.cal.ExpressionBoolean;
+import net.sf.orcc.cal.cal.ExpressionFloat;
+import net.sf.orcc.cal.cal.ExpressionInteger;
+import net.sf.orcc.cal.cal.ExpressionString;
+import net.sf.orcc.cal.cal.ExpressionUnary;
+import net.sf.orcc.cal.cal.ExpressionVariable;
+import net.sf.orcc.cal.cal.VariableReference;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.services.CalGrammarAccess;
 import net.sf.orcc.cal.ui.internal.CalActivator;
@@ -280,53 +280,6 @@ public class XdfExporter extends CalSwitch<Object> {
 	}
 
 	@Override
-	public Expression caseAstExpressionBinary(AstExpressionBinary expression) {
-		OpBinary op = OpBinary.getOperator(expression.getOperator());
-		Expression val1 = (Expression) doSwitch(expression.getLeft());
-		Expression val2 = (Expression) doSwitch(expression.getRight());
-		return IrFactory.eINSTANCE.createExprBinary(val1, op, val2, null);
-	}
-
-	@Override
-	public Expression caseAstExpressionBoolean(AstExpressionBoolean expression) {
-		return IrFactory.eINSTANCE.createExprBool(expression.isValue());
-	}
-
-	@Override
-	public Expression caseAstExpressionFloat(AstExpressionFloat expression) {
-		return IrFactory.eINSTANCE.createExprFloat(expression.getValue());
-	}
-
-	@Override
-	public Object caseAstExpressionInteger(AstExpressionInteger expression) {
-		return IrFactory.eINSTANCE.createExprInt(expression.getValue());
-	}
-
-	@Override
-	public Expression caseAstExpressionString(AstExpressionString expression) {
-		return IrFactory.eINSTANCE.createExprString(OrccUtil
-				.getEscapedString(expression.getValue()));
-	}
-
-	@Override
-	public Expression caseAstExpressionUnary(AstExpressionUnary expression) {
-		OpUnary op = OpUnary.getOperator(expression.getUnaryOperator());
-		Expression expr = (Expression) doSwitch(expression.getExpression());
-		return IrFactory.eINSTANCE.createExprUnary(op, expr, null);
-	}
-
-	@Override
-	public Expression caseAstExpressionVariable(AstExpressionVariable expression) {
-		AstVariable variable = expression.getValue().getVariable();
-		Var var = varMap.get(variable.getName());
-		if (var == null) {
-			throw new OrccRuntimeException("unknown variable "
-					+ variable.getName());
-		}
-		return IrFactory.eINSTANCE.createExprVar(var);
-	}
-
-	@Override
 	public Type caseAstTypeBool(AstTypeBool type) {
 		return IrFactory.eINSTANCE.createTypeBool();
 	}
@@ -376,12 +329,59 @@ public class XdfExporter extends CalSwitch<Object> {
 		return IrFactory.eINSTANCE.createTypeUint(size);
 	}
 
+	@Override
+	public Expression caseExpressionBinary(ExpressionBinary expression) {
+		OpBinary op = OpBinary.getOperator(expression.getOperator());
+		Expression val1 = (Expression) doSwitch(expression.getLeft());
+		Expression val2 = (Expression) doSwitch(expression.getRight());
+		return IrFactory.eINSTANCE.createExprBinary(val1, op, val2, null);
+	}
+
+	@Override
+	public Expression caseExpressionBoolean(ExpressionBoolean expression) {
+		return IrFactory.eINSTANCE.createExprBool(expression.isValue());
+	}
+
+	@Override
+	public Expression caseExpressionFloat(ExpressionFloat expression) {
+		return IrFactory.eINSTANCE.createExprFloat(expression.getValue());
+	}
+
+	@Override
+	public Object caseExpressionInteger(ExpressionInteger expression) {
+		return IrFactory.eINSTANCE.createExprInt(expression.getValue());
+	}
+
+	@Override
+	public Expression caseExpressionString(ExpressionString expression) {
+		return IrFactory.eINSTANCE.createExprString(OrccUtil
+				.getEscapedString(expression.getValue()));
+	}
+
+	@Override
+	public Expression caseExpressionUnary(ExpressionUnary expression) {
+		OpUnary op = OpUnary.getOperator(expression.getUnaryOperator());
+		Expression expr = (Expression) doSwitch(expression.getExpression());
+		return IrFactory.eINSTANCE.createExprUnary(op, expr, null);
+	}
+
+	@Override
+	public Expression caseExpressionVariable(ExpressionVariable expression) {
+		AstVariable variable = expression.getValue().getVariable();
+		Var var = varMap.get(variable.getName());
+		if (var == null) {
+			throw new OrccRuntimeException("unknown variable "
+					+ variable.getName());
+		}
+		return IrFactory.eINSTANCE.createExprVar(var);
+	}
+
 	private void linkModel(EObject object) {
 		TreeIterator<EObject> it = object.eAllContents();
 		while (it.hasNext()) {
 			EObject obj = it.next();
-			if (obj instanceof AstVariableReference) {
-				AstVariableReference ref = (AstVariableReference) obj;
+			if (obj instanceof VariableReference) {
+				VariableReference ref = (VariableReference) obj;
 
 				ICompositeNode node = NodeModelUtils.getNode(obj);
 				for (ILeafNode leaf : node.getLeafNodes()) {
@@ -418,8 +418,8 @@ public class XdfExporter extends CalSwitch<Object> {
 	@SuppressWarnings("unchecked")
 	private <T> T parseVariable(Object parameter) {
 		Reader reader = new StringReader((String) parameter);
-		IParseResult result = parser.parse(
-				access.getAstVariableDeclarationRule(), reader);
+		IParseResult result = parser.parse(access.getVariableDeclarationRule(),
+				reader);
 		return (T) result.getRootASTElement();
 	}
 

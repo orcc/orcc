@@ -33,9 +33,9 @@ import java.io.OutputStreamWriter;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sf.orcc.cal.cal.AstInequality;
-import net.sf.orcc.cal.cal.AstPriority;
 import net.sf.orcc.cal.cal.AstTag;
+import net.sf.orcc.cal.cal.Inequality;
+import net.sf.orcc.cal.cal.Priority;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Tag;
@@ -94,7 +94,7 @@ public class ActionSorter {
 	 * 
 	 * @param priorities
 	 */
-	public ActionList applyPriority(List<AstPriority> priorities) {
+	public ActionList applyPriority(List<Priority> priorities) {
 		buildGraph(priorities);
 
 		ActionList actions = new ActionList();
@@ -143,15 +143,15 @@ public class ActionSorter {
 	 *            a list of inequalities, an inequality being a list of tags
 	 *            (and a tag is a list of strings)
 	 */
-	private void buildGraph(List<AstPriority> priorities) {
+	private void buildGraph(List<Priority> priorities) {
 		for (Action action : actionList) {
 			if (!action.getTag().isEmpty()) {
 				graph.addVertex(action);
 			}
 		}
 
-		for (AstPriority priority : priorities) {
-			for (AstInequality inequality : priority.getInequalities()) {
+		for (Priority priority : priorities) {
+			for (Inequality inequality : priority.getInequalities()) {
 				// the grammar requires there be at least two tags
 				Iterator<AstTag> it = inequality.getTags().iterator();
 				Tag previousTag = IrFactory.eINSTANCE.createTag(it.next()

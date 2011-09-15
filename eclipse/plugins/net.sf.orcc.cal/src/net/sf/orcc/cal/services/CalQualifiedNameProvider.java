@@ -32,10 +32,10 @@ import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpression;
-import net.sf.orcc.cal.cal.AstGenerator;
-import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstUnit;
+import net.sf.orcc.cal.cal.Generator;
+import net.sf.orcc.cal.cal.StatementForeach;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.util.OrccUtil;
 
@@ -74,14 +74,6 @@ public class CalQualifiedNameProvider extends
 		return null;
 	}
 
-	public QualifiedName qualifiedName(AstGenerator generator) {
-		return getConverter().toQualifiedName(generator.toString());
-	}
-
-	public QualifiedName qualifiedName(AstStatementForeach foreach) {
-		return getConverter().toQualifiedName(foreach.toString());
-	}
-
 	public QualifiedName qualifiedName(AstTag tag) {
 		return null;
 	}
@@ -89,6 +81,14 @@ public class CalQualifiedNameProvider extends
 	public QualifiedName qualifiedName(AstUnit unit) {
 		return getConverter().toQualifiedName(
 				Util.getQualifiedName((AstEntity) unit.eContainer()));
+	}
+
+	public QualifiedName qualifiedName(Generator generator) {
+		return getConverter().toQualifiedName(generator.toString());
+	}
+
+	public QualifiedName qualifiedName(StatementForeach foreach) {
+		return getConverter().toQualifiedName(foreach.toString());
 	}
 
 }

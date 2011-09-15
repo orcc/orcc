@@ -34,21 +34,6 @@ import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpression;
-import net.sf.orcc.cal.cal.AstExpressionBinary;
-import net.sf.orcc.cal.cal.AstExpressionBoolean;
-import net.sf.orcc.cal.cal.AstExpressionCall;
-import net.sf.orcc.cal.cal.AstExpressionFloat;
-import net.sf.orcc.cal.cal.AstExpressionIf;
-import net.sf.orcc.cal.cal.AstExpressionIndex;
-import net.sf.orcc.cal.cal.AstExpressionInteger;
-import net.sf.orcc.cal.cal.AstExpressionList;
-import net.sf.orcc.cal.cal.AstExpressionString;
-import net.sf.orcc.cal.cal.AstExpressionUnary;
-import net.sf.orcc.cal.cal.AstExpressionVariable;
-import net.sf.orcc.cal.cal.AstFunction;
-import net.sf.orcc.cal.cal.AstGenerator;
-import net.sf.orcc.cal.cal.AstInequality;
-import net.sf.orcc.cal.cal.AstInputPattern;
 import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstTransition;
@@ -60,7 +45,22 @@ import net.sf.orcc.cal.cal.AstTypeList;
 import net.sf.orcc.cal.cal.AstTypeUint;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.cal.ExpressionBinary;
+import net.sf.orcc.cal.cal.ExpressionBoolean;
+import net.sf.orcc.cal.cal.ExpressionCall;
+import net.sf.orcc.cal.cal.ExpressionFloat;
+import net.sf.orcc.cal.cal.ExpressionIf;
+import net.sf.orcc.cal.cal.ExpressionIndex;
+import net.sf.orcc.cal.cal.ExpressionInteger;
+import net.sf.orcc.cal.cal.ExpressionList;
+import net.sf.orcc.cal.cal.ExpressionString;
+import net.sf.orcc.cal.cal.ExpressionUnary;
+import net.sf.orcc.cal.cal.ExpressionVariable;
+import net.sf.orcc.cal.cal.Function;
+import net.sf.orcc.cal.cal.Generator;
 import net.sf.orcc.cal.cal.Import;
+import net.sf.orcc.cal.cal.Inequality;
+import net.sf.orcc.cal.cal.InputPattern;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
@@ -107,135 +107,6 @@ public class CalLabelProvider extends DefaultEObjectLabelProvider {
 		return null;
 	}
 
-	public String text(AstExpressionBinary expr) {
-		return getText(expr.getLeft()) + " " + expr.getOperator() + " "
-				+ getText(expr.getRight());
-	}
-
-	public String text(AstExpressionBoolean expr) {
-		return String.valueOf(expr.isValue());
-	}
-
-	public String text(AstExpressionCall expr) {
-		StringBuilder builder = new StringBuilder(expr.getFunction().getName());
-		builder.append("(");
-		Iterator<AstExpression> it = expr.getParameters().iterator();
-		if (it.hasNext()) {
-			AstExpression param = it.next();
-			builder.append(getText(param));
-			while (it.hasNext()) {
-				builder.append(", ");
-				builder.append(getText(it.next()));
-			}
-		}
-		builder.append(")");
-		return builder.toString();
-	}
-
-	public String text(AstExpressionFloat expr) {
-		return String.valueOf(expr.getValue());
-	}
-
-	public String text(AstExpressionIf expr) {
-		return "if " + getText(expr.getCondition()) + " then "
-				+ getText(expr.getThen()) + " else " + getText(expr.getElse())
-				+ " end";
-	}
-
-	public String text(AstExpressionIndex expr) {
-		StringBuilder builder = new StringBuilder(expr.getSource()
-				.getVariable().getName());
-		for (AstExpression index : expr.getIndexes()) {
-			builder.append('[');
-			builder.append(getText(index));
-			builder.append(']');
-		}
-		return builder.toString();
-	}
-
-	public String text(AstExpressionInteger expr) {
-		return String.valueOf(expr.getValue());
-	}
-
-	public String text(AstExpressionList expr) {
-		StringBuilder builder = new StringBuilder('[');
-		Iterator<AstExpression> it = expr.getExpressions().iterator();
-		if (it.hasNext()) {
-			AstExpression element = it.next();
-			builder.append(getText(element));
-			while (it.hasNext()) {
-				builder.append(", ");
-				builder.append(getText(it.next()));
-			}
-		}
-
-		Iterator<AstGenerator> itG = expr.getGenerators().iterator();
-		if (itG.hasNext()) {
-			builder.append(" : ");
-			AstGenerator generator = itG.next();
-			builder.append(getText(generator));
-			while (itG.hasNext()) {
-				builder.append(", ");
-				builder.append(getText(itG.next()));
-			}
-		}
-
-		builder.append(']');
-		return builder.toString();
-	}
-
-	public String text(AstExpressionString expr) {
-		return String.valueOf(expr.getValue());
-	}
-
-	public String text(AstExpressionUnary expr) {
-		return expr.getUnaryOperator() + " " + getText(expr.getExpression());
-	}
-
-	public String text(AstExpressionVariable expr) {
-		return expr.getValue().getVariable().getName();
-	}
-
-	public String text(AstFunction function) {
-		StringBuilder builder = new StringBuilder("function ");
-		builder.append(function.getName());
-		builder.append("(");
-
-		Iterator<AstVariable> it = function.getParameters().iterator();
-		if (it.hasNext()) {
-			AstVariable param = it.next();
-			builder.append(getText(param));
-			while (it.hasNext()) {
-				builder.append(", ");
-				builder.append(getText(it.next()));
-			}
-		}
-		builder.append(") --> ");
-		builder.append(getText(function.getType()));
-		return builder.toString();
-	}
-
-	public String text(AstGenerator generator) {
-		return "for " + getText(generator.getVariable()) + " in "
-				+ getText(generator.getLower()) + " .. "
-				+ getText(generator.getHigher());
-	}
-
-	public String text(AstInequality inequality) {
-		Iterator<AstTag> it = inequality.getTags().iterator();
-		StringBuilder builder = new StringBuilder();
-		if (it.hasNext()) {
-			builder.append(getText(it.next()));
-			while (it.hasNext()) {
-				builder.append(" > ");
-				builder.append(getText(it.next()));
-			}
-			builder.append(';');
-		}
-
-		return builder.toString();
-	}
-
 	public String text(AstState state) {
 		return state.getName();
 	}
@@ -280,8 +151,8 @@ public class CalLabelProvider extends DefaultEObjectLabelProvider {
 	public String text(AstVariable variable) {
 		AstType type = variable.getType();
 		if (type == null) {
-			AstInputPattern pattern = EcoreUtil2.getContainerOfType(variable,
-					AstInputPattern.class);
+			InputPattern pattern = EcoreUtil2.getContainerOfType(variable,
+					InputPattern.class);
 			if (pattern != null) {
 				type = pattern.getPort().getType();
 			}
@@ -305,6 +176,135 @@ public class CalLabelProvider extends DefaultEObjectLabelProvider {
 			builder.append("= ");
 			builder.append(getText(variable.getValue()));
 		}
+		return builder.toString();
+	}
+
+	public String text(ExpressionBinary expr) {
+		return getText(expr.getLeft()) + " " + expr.getOperator() + " "
+				+ getText(expr.getRight());
+	}
+
+	public String text(ExpressionBoolean expr) {
+		return String.valueOf(expr.isValue());
+	}
+
+	public String text(ExpressionCall expr) {
+		StringBuilder builder = new StringBuilder(expr.getFunction().getName());
+		builder.append("(");
+		Iterator<AstExpression> it = expr.getParameters().iterator();
+		if (it.hasNext()) {
+			AstExpression param = it.next();
+			builder.append(getText(param));
+			while (it.hasNext()) {
+				builder.append(", ");
+				builder.append(getText(it.next()));
+			}
+		}
+		builder.append(")");
+		return builder.toString();
+	}
+
+	public String text(ExpressionFloat expr) {
+		return String.valueOf(expr.getValue());
+	}
+
+	public String text(ExpressionIf expr) {
+		return "if " + getText(expr.getCondition()) + " then "
+				+ getText(expr.getThen()) + " else " + getText(expr.getElse())
+				+ " end";
+	}
+
+	public String text(ExpressionIndex expr) {
+		StringBuilder builder = new StringBuilder(expr.getSource()
+				.getVariable().getName());
+		for (AstExpression index : expr.getIndexes()) {
+			builder.append('[');
+			builder.append(getText(index));
+			builder.append(']');
+		}
+		return builder.toString();
+	}
+
+	public String text(ExpressionInteger expr) {
+		return String.valueOf(expr.getValue());
+	}
+
+	public String text(ExpressionList expr) {
+		StringBuilder builder = new StringBuilder('[');
+		Iterator<AstExpression> it = expr.getExpressions().iterator();
+		if (it.hasNext()) {
+			AstExpression element = it.next();
+			builder.append(getText(element));
+			while (it.hasNext()) {
+				builder.append(", ");
+				builder.append(getText(it.next()));
+			}
+		}
+
+		Iterator<Generator> itG = expr.getGenerators().iterator();
+		if (itG.hasNext()) {
+			builder.append(" : ");
+			Generator generator = itG.next();
+			builder.append(getText(generator));
+			while (itG.hasNext()) {
+				builder.append(", ");
+				builder.append(getText(itG.next()));
+			}
+		}
+
+		builder.append(']');
+		return builder.toString();
+	}
+
+	public String text(ExpressionString expr) {
+		return String.valueOf(expr.getValue());
+	}
+
+	public String text(ExpressionUnary expr) {
+		return expr.getUnaryOperator() + " " + getText(expr.getExpression());
+	}
+
+	public String text(ExpressionVariable expr) {
+		return expr.getValue().getVariable().getName();
+	}
+
+	public String text(Function function) {
+		StringBuilder builder = new StringBuilder("function ");
+		builder.append(function.getName());
+		builder.append("(");
+
+		Iterator<AstVariable> it = function.getParameters().iterator();
+		if (it.hasNext()) {
+			AstVariable param = it.next();
+			builder.append(getText(param));
+			while (it.hasNext()) {
+				builder.append(", ");
+				builder.append(getText(it.next()));
+			}
+		}
+		builder.append(") --> ");
+		builder.append(getText(function.getType()));
+		return builder.toString();
+	}
+
+	public String text(Generator generator) {
+		return "for " + getText(generator.getVariable()) + " in "
+				+ getText(generator.getLower()) + " .. "
+				+ getText(generator.getHigher());
+	}
+
+	public String text(Inequality inequality) {
+		Iterator<AstTag> it = inequality.getTags().iterator();
+		StringBuilder builder = new StringBuilder();
+		if (it.hasNext()) {
+			builder.append(getText(it.next()));
+			while (it.hasNext()) {
+				builder.append(" > ");
+				builder.append(getText(it.next()));
+			}
+			builder.append(';');
+		}
+
 		return builder.toString();
 	}
 

@@ -32,31 +32,8 @@ import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpression;
-import net.sf.orcc.cal.cal.AstExpressionBinary;
-import net.sf.orcc.cal.cal.AstExpressionBoolean;
-import net.sf.orcc.cal.cal.AstExpressionCall;
-import net.sf.orcc.cal.cal.AstExpressionElsif;
-import net.sf.orcc.cal.cal.AstExpressionFloat;
-import net.sf.orcc.cal.cal.AstExpressionIf;
-import net.sf.orcc.cal.cal.AstExpressionIndex;
-import net.sf.orcc.cal.cal.AstExpressionInteger;
-import net.sf.orcc.cal.cal.AstExpressionList;
-import net.sf.orcc.cal.cal.AstExpressionString;
-import net.sf.orcc.cal.cal.AstExpressionUnary;
-import net.sf.orcc.cal.cal.AstExpressionVariable;
-import net.sf.orcc.cal.cal.AstFunction;
-import net.sf.orcc.cal.cal.AstGenerator;
-import net.sf.orcc.cal.cal.AstInputPattern;
-import net.sf.orcc.cal.cal.AstOutputPattern;
 import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstProcedure;
-import net.sf.orcc.cal.cal.AstStatement;
-import net.sf.orcc.cal.cal.AstStatementAssign;
-import net.sf.orcc.cal.cal.AstStatementCall;
-import net.sf.orcc.cal.cal.AstStatementElsif;
-import net.sf.orcc.cal.cal.AstStatementForeach;
-import net.sf.orcc.cal.cal.AstStatementIf;
-import net.sf.orcc.cal.cal.AstStatementWhile;
 import net.sf.orcc.cal.cal.AstType;
 import net.sf.orcc.cal.cal.AstTypeBool;
 import net.sf.orcc.cal.cal.AstTypeFloat;
@@ -66,7 +43,30 @@ import net.sf.orcc.cal.cal.AstTypeString;
 import net.sf.orcc.cal.cal.AstTypeUint;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.AstVariable;
-import net.sf.orcc.cal.cal.AstVariableReference;
+import net.sf.orcc.cal.cal.ExpressionBinary;
+import net.sf.orcc.cal.cal.ExpressionBoolean;
+import net.sf.orcc.cal.cal.ExpressionCall;
+import net.sf.orcc.cal.cal.ExpressionElsif;
+import net.sf.orcc.cal.cal.ExpressionFloat;
+import net.sf.orcc.cal.cal.ExpressionIf;
+import net.sf.orcc.cal.cal.ExpressionIndex;
+import net.sf.orcc.cal.cal.ExpressionInteger;
+import net.sf.orcc.cal.cal.ExpressionList;
+import net.sf.orcc.cal.cal.ExpressionString;
+import net.sf.orcc.cal.cal.ExpressionUnary;
+import net.sf.orcc.cal.cal.ExpressionVariable;
+import net.sf.orcc.cal.cal.Function;
+import net.sf.orcc.cal.cal.Generator;
+import net.sf.orcc.cal.cal.InputPattern;
+import net.sf.orcc.cal.cal.OutputPattern;
+import net.sf.orcc.cal.cal.Statement;
+import net.sf.orcc.cal.cal.StatementAssign;
+import net.sf.orcc.cal.cal.StatementCall;
+import net.sf.orcc.cal.cal.StatementElsif;
+import net.sf.orcc.cal.cal.StatementForeach;
+import net.sf.orcc.cal.cal.StatementIf;
+import net.sf.orcc.cal.cal.StatementWhile;
+import net.sf.orcc.cal.cal.VariableReference;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 
 import org.eclipse.emf.ecore.EObject;
@@ -83,7 +83,7 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 
 	@Override
 	public Boolean caseAstAction(AstAction action) {
-		for (AstInputPattern input : action.getInputs()) {
+		for (InputPattern input : action.getInputs()) {
 			if (doSwitch(input)) {
 				return true;
 			}
@@ -101,13 +101,13 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 			}
 		}
 
-		for (AstStatement statement : action.getStatements()) {
+		for (Statement statement : action.getStatements()) {
 			if (doSwitch(statement)) {
 				return true;
 			}
 		}
 
-		for (AstOutputPattern output : action.getOutputs()) {
+		for (OutputPattern output : action.getOutputs()) {
 			if (doSwitch(output)) {
 				return true;
 			}
@@ -124,7 +124,7 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 			}
 		}
 
-		for (AstFunction function : actor.getFunctions()) {
+		for (Function function : actor.getFunctions()) {
 			if (doSwitch(function)) {
 				return true;
 			}
@@ -181,177 +181,6 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 	}
 
 	@Override
-	public Boolean caseAstExpressionBinary(AstExpressionBinary expression) {
-		if (doSwitch(expression.getLeft()) || doSwitch(expression.getRight())) {
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public Boolean caseAstExpressionBoolean(AstExpressionBoolean expression) {
-		return false;
-	}
-
-	@Override
-	public Boolean caseAstExpressionCall(AstExpressionCall call) {
-		for (AstExpression parameter : call.getParameters()) {
-			if (doSwitch(parameter)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	@Override
-	public Boolean caseAstExpressionElsif(AstExpressionElsif expression) {
-		return doSwitch(expression.getCondition())
-				|| doSwitch(expression.getThen());
-	}
-
-	@Override
-	public Boolean caseAstExpressionFloat(AstExpressionFloat expression) {
-		return false;
-	}
-
-	@Override
-	public Boolean caseAstExpressionIf(AstExpressionIf expression) {
-		if (doSwitch(expression.getCondition())
-				|| doSwitch(expression.getThen())) {
-			return true;
-		}
-
-		for (AstExpressionElsif elsif : expression.getElsifs()) {
-			if (doSwitch(elsif)) {
-				return true;
-			}
-		}
-
-		if (doSwitch(expression.getElse())) {
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public Boolean caseAstExpressionIndex(AstExpressionIndex expression) {
-		if (doSwitch(expression.getSource())) {
-			return true;
-		}
-
-		for (AstExpression index : expression.getIndexes()) {
-			if (doSwitch(index)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	@Override
-	public Boolean caseAstExpressionInteger(AstExpressionInteger expression) {
-		return false;
-	}
-
-	@Override
-	public Boolean caseAstExpressionList(AstExpressionList expression) {
-		for (AstExpression subExpression : expression.getExpressions()) {
-			if (doSwitch(subExpression)) {
-				return true;
-			}
-		}
-
-		for (AstGenerator generator : expression.getGenerators()) {
-			if (doSwitch(generator)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	@Override
-	public Boolean caseAstExpressionString(AstExpressionString expression) {
-		return false;
-	}
-
-	@Override
-	public Boolean caseAstExpressionUnary(AstExpressionUnary expression) {
-		return doSwitch(expression.getExpression());
-	}
-
-	@Override
-	public Boolean caseAstExpressionVariable(AstExpressionVariable expression) {
-		return doSwitch(expression.getValue());
-	}
-
-	@Override
-	public Boolean caseAstFunction(AstFunction function) {
-		for (AstVariable parameter : function.getParameters()) {
-			if (doSwitch(parameter)) {
-				return true;
-			}
-		}
-
-		for (AstVariable variable : function.getVariables()) {
-			if (doSwitch(variable)) {
-				return true;
-			}
-		}
-
-		return doSwitch(function.getType())
-				|| doSwitch(function.getExpression());
-	}
-
-	@Override
-	public Boolean caseAstGenerator(AstGenerator generator) {
-		return (doSwitch(generator.getVariable())
-				|| doSwitch(generator.getLower()) || doSwitch(generator
-					.getHigher()));
-	}
-
-	@Override
-	public Boolean caseAstInputPattern(AstInputPattern input) {
-		if (doSwitch(input.getPort())) {
-			return true;
-		}
-
-		for (AstVariable token : input.getTokens()) {
-			if (doSwitch(token)) {
-				return true;
-			}
-		}
-
-		if (doSwitch(input.getRepeat())) {
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public Boolean caseAstOutputPattern(AstOutputPattern output) {
-		if (doSwitch(output.getPort())) {
-			return true;
-		}
-
-		for (AstExpression value : output.getValues()) {
-			if (doSwitch(value)) {
-				return true;
-			}
-		}
-
-		if (doSwitch(output.getRepeat())) {
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
 	public Boolean caseAstPort(AstPort port) {
 		return doSwitch(port.getType());
 	}
@@ -370,102 +199,7 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 			}
 		}
 
-		for (AstStatement statement : procedure.getStatements()) {
-			if (doSwitch(statement)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	@Override
-	public Boolean caseAstStatementAssign(AstStatementAssign assign) {
-		for (AstExpression index : assign.getIndexes()) {
-			if (doSwitch(index)) {
-				return true;
-			}
-		}
-
-		return doSwitch(assign.getValue());
-	}
-
-	@Override
-	public Boolean caseAstStatementCall(AstStatementCall call) {
-		for (AstExpression parameter : call.getParameters()) {
-			if (doSwitch(parameter)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	@Override
-	public Boolean caseAstStatementElsif(AstStatementElsif elsif) {
-		if (doSwitch(elsif.getCondition())) {
-			return true;
-		}
-
-		for (AstStatement statement : elsif.getThen()) {
-			if (doSwitch(statement)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	@Override
-	public Boolean caseAstStatementForeach(AstStatementForeach foreach) {
-		if (doSwitch(foreach.getVariable()) || doSwitch(foreach.getLower())
-				|| doSwitch(foreach.getHigher())) {
-			return true;
-		}
-
-		for (AstStatement statement : foreach.getStatements()) {
-			if (doSwitch(statement)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	@Override
-	public Boolean caseAstStatementIf(AstStatementIf stmtIf) {
-		if (doSwitch(stmtIf.getCondition())) {
-			return true;
-		}
-
-		for (AstStatement statement : stmtIf.getThen()) {
-			if (doSwitch(statement)) {
-				return true;
-			}
-		}
-
-		for (AstStatementElsif elsIf : stmtIf.getElsifs()) {
-			if (doSwitch(elsIf)) {
-				return true;
-			}
-		}
-
-		for (AstStatement statement : stmtIf.getElse()) {
-			if (doSwitch(statement)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	@Override
-	public Boolean caseAstStatementWhile(AstStatementWhile stmtWhile) {
-		if (doSwitch(stmtWhile.getCondition())) {
-			return true;
-		}
-
-		for (AstStatement statement : stmtWhile.getStatements()) {
+		for (Statement statement : procedure.getStatements()) {
 			if (doSwitch(statement)) {
 				return true;
 			}
@@ -506,7 +240,7 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 
 	@Override
 	public Boolean caseAstUnit(AstUnit unit) {
-		for (AstFunction function : unit.getFunctions()) {
+		for (Function function : unit.getFunctions()) {
 			if (doSwitch(function)) {
 				return true;
 			}
@@ -544,7 +278,273 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 	}
 
 	@Override
-	public Boolean caseAstVariableReference(AstVariableReference reference) {
+	public Boolean caseExpressionBinary(ExpressionBinary expression) {
+		if (doSwitch(expression.getLeft()) || doSwitch(expression.getRight())) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public Boolean caseExpressionBoolean(ExpressionBoolean expression) {
+		return false;
+	}
+
+	@Override
+	public Boolean caseExpressionCall(ExpressionCall call) {
+		for (AstExpression parameter : call.getParameters()) {
+			if (doSwitch(parameter)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
+	public Boolean caseExpressionElsif(ExpressionElsif expression) {
+		return doSwitch(expression.getCondition())
+				|| doSwitch(expression.getThen());
+	}
+
+	@Override
+	public Boolean caseExpressionFloat(ExpressionFloat expression) {
+		return false;
+	}
+
+	@Override
+	public Boolean caseExpressionIf(ExpressionIf expression) {
+		if (doSwitch(expression.getCondition())
+				|| doSwitch(expression.getThen())) {
+			return true;
+		}
+
+		for (ExpressionElsif elsif : expression.getElsifs()) {
+			if (doSwitch(elsif)) {
+				return true;
+			}
+		}
+
+		if (doSwitch(expression.getElse())) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public Boolean caseExpressionIndex(ExpressionIndex expression) {
+		if (doSwitch(expression.getSource())) {
+			return true;
+		}
+
+		for (AstExpression index : expression.getIndexes()) {
+			if (doSwitch(index)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
+	public Boolean caseExpressionInteger(ExpressionInteger expression) {
+		return false;
+	}
+
+	@Override
+	public Boolean caseExpressionList(ExpressionList expression) {
+		for (AstExpression subExpression : expression.getExpressions()) {
+			if (doSwitch(subExpression)) {
+				return true;
+			}
+		}
+
+		for (Generator generator : expression.getGenerators()) {
+			if (doSwitch(generator)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
+	public Boolean caseExpressionString(ExpressionString expression) {
+		return false;
+	}
+
+	@Override
+	public Boolean caseExpressionUnary(ExpressionUnary expression) {
+		return doSwitch(expression.getExpression());
+	}
+
+	@Override
+	public Boolean caseExpressionVariable(ExpressionVariable expression) {
+		return doSwitch(expression.getValue());
+	}
+
+	@Override
+	public Boolean caseFunction(Function function) {
+		for (AstVariable parameter : function.getParameters()) {
+			if (doSwitch(parameter)) {
+				return true;
+			}
+		}
+
+		for (AstVariable variable : function.getVariables()) {
+			if (doSwitch(variable)) {
+				return true;
+			}
+		}
+
+		return doSwitch(function.getType())
+				|| doSwitch(function.getExpression());
+	}
+
+	@Override
+	public Boolean caseGenerator(Generator generator) {
+		return (doSwitch(generator.getVariable())
+				|| doSwitch(generator.getLower()) || doSwitch(generator
+					.getHigher()));
+	}
+
+	@Override
+	public Boolean caseInputPattern(InputPattern input) {
+		if (doSwitch(input.getPort())) {
+			return true;
+		}
+
+		for (AstVariable token : input.getTokens()) {
+			if (doSwitch(token)) {
+				return true;
+			}
+		}
+
+		if (doSwitch(input.getRepeat())) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public Boolean caseOutputPattern(OutputPattern output) {
+		if (doSwitch(output.getPort())) {
+			return true;
+		}
+
+		for (AstExpression value : output.getValues()) {
+			if (doSwitch(value)) {
+				return true;
+			}
+		}
+
+		if (doSwitch(output.getRepeat())) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public Boolean caseStatementAssign(StatementAssign assign) {
+		for (AstExpression index : assign.getIndexes()) {
+			if (doSwitch(index)) {
+				return true;
+			}
+		}
+
+		return doSwitch(assign.getValue());
+	}
+
+	@Override
+	public Boolean caseStatementCall(StatementCall call) {
+		for (AstExpression parameter : call.getParameters()) {
+			if (doSwitch(parameter)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
+	public Boolean caseStatementElsif(StatementElsif elsif) {
+		if (doSwitch(elsif.getCondition())) {
+			return true;
+		}
+
+		for (Statement statement : elsif.getThen()) {
+			if (doSwitch(statement)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
+	public Boolean caseStatementForeach(StatementForeach foreach) {
+		if (doSwitch(foreach.getVariable()) || doSwitch(foreach.getLower())
+				|| doSwitch(foreach.getHigher())) {
+			return true;
+		}
+
+		for (Statement statement : foreach.getStatements()) {
+			if (doSwitch(statement)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
+	public Boolean caseStatementIf(StatementIf stmtIf) {
+		if (doSwitch(stmtIf.getCondition())) {
+			return true;
+		}
+
+		for (Statement statement : stmtIf.getThen()) {
+			if (doSwitch(statement)) {
+				return true;
+			}
+		}
+
+		for (StatementElsif elsIf : stmtIf.getElsifs()) {
+			if (doSwitch(elsIf)) {
+				return true;
+			}
+		}
+
+		for (Statement statement : stmtIf.getElse()) {
+			if (doSwitch(statement)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
+	public Boolean caseStatementWhile(StatementWhile stmtWhile) {
+		if (doSwitch(stmtWhile.getCondition())) {
+			return true;
+		}
+
+		for (Statement statement : stmtWhile.getStatements()) {
+			if (doSwitch(statement)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
+	public Boolean caseVariableReference(VariableReference reference) {
 		return false;
 	}
 

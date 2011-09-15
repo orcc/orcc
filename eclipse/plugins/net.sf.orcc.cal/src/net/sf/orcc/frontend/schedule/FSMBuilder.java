@@ -38,8 +38,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.orcc.cal.cal.AstSchedule;
 import net.sf.orcc.cal.cal.AstTransition;
+import net.sf.orcc.cal.cal.Schedule;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.IrFactory;
@@ -76,7 +76,7 @@ public class FSMBuilder {
 	 * @param tree
 	 *            an ANTLR tree that represents the AST of an FSM.
 	 */
-	public FSMBuilder(AstSchedule schedule) {
+	public FSMBuilder(Schedule schedule) {
 		graph = new DirectedMultigraph<String, UniqueEdge>(UniqueEdge.class);
 		initialState = schedule.getInitialState().getName();
 		parseTransitions(schedule.getTransitions());

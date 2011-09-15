@@ -31,16 +31,16 @@ package net.sf.orcc.cal.ui.outline;
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
-import net.sf.orcc.cal.cal.AstFunction;
-import net.sf.orcc.cal.cal.AstInequality;
 import net.sf.orcc.cal.cal.AstPort;
-import net.sf.orcc.cal.cal.AstPriority;
 import net.sf.orcc.cal.cal.AstProcedure;
-import net.sf.orcc.cal.cal.AstSchedule;
 import net.sf.orcc.cal.cal.AstTransition;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.CalPackage;
+import net.sf.orcc.cal.cal.Function;
+import net.sf.orcc.cal.cal.Inequality;
+import net.sf.orcc.cal.cal.Priority;
+import net.sf.orcc.cal.cal.Schedule;
 
 import org.eclipse.xtext.ui.IImageHelper;
 import org.eclipse.xtext.ui.editor.outline.IOutlineNode;
@@ -124,18 +124,6 @@ public class CalOutlineTreeProvider extends DefaultOutlineTreeProvider {
 		}
 	}
 
-	protected void _createNode(IOutlineNode parentNode, AstPriority priority) {
-		for (AstInequality inequality : priority.getInequalities()) {
-			createNode(parentNode, inequality);
-		}
-	}
-
-	protected void _createNode(IOutlineNode parentNode, AstSchedule schedule) {
-		for (AstTransition transition : schedule.getTransitions()) {
-			createNode(parentNode, transition);
-		}
-	}
-
 	protected void _createNode(IOutlineNode parentNode, AstUnit unit) {
 		createEStructuralFeatureNode(parentNode, unit,
 				CalPackage.eINSTANCE.getAstUnit_Variables(), null, "variables",
@@ -154,11 +142,19 @@ public class CalOutlineTreeProvider extends DefaultOutlineTreeProvider {
 		}
 	}
 
-	protected boolean _isLeaf(AstAction action) {
-		return true;
+	protected void _createNode(IOutlineNode parentNode, Priority priority) {
+		for (Inequality inequality : priority.getInequalities()) {
+			createNode(parentNode, inequality);
+		}
 	}
 
-	protected boolean _isLeaf(AstFunction function) {
+	protected void _createNode(IOutlineNode parentNode, Schedule schedule) {
+		for (AstTransition transition : schedule.getTransitions()) {
+			createNode(parentNode, transition);
+		}
+	}
+
+	protected boolean _isLeaf(AstAction action) {
 		return true;
 	}
 
@@ -175,6 +171,10 @@ public class CalOutlineTreeProvider extends DefaultOutlineTreeProvider {
 	}
 
 	protected boolean _isLeaf(AstVariable variable) {
+		return true;
+	}
+
+	protected boolean _isLeaf(Function function) {
 		return true;
 	}
 
