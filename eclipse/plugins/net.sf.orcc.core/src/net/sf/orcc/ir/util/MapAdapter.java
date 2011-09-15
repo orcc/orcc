@@ -69,10 +69,6 @@ public class MapAdapter implements Adapter {
 			map = ((ProcedureImpl) target).getLocalsMap();
 			key = ((Var) object).getIndexedName();
 			((Map<Object, Object>) map).put(key, object);
-		} else if (feature == eINSTANCE.getProcedure_Parameters()) {
-			map = ((ProcedureImpl) target).getParametersMap();
-			key = ((Var) object).getIndexedName();
-			((Map<Object, Object>) map).put(key, object);
 		} else if (feature == eINSTANCE.getActor_Inputs()) {
 			map = ((ActorImpl) target).getInputsMap();
 			key = ((Port) object).getName();
@@ -159,10 +155,6 @@ public class MapAdapter implements Adapter {
 		Object feature = notification.getFeature();
 		if (feature == eINSTANCE.getProcedure_Locals()) {
 			map = ((ProcedureImpl) target).getLocalsMap();
-			key = ((Var) object).getIndexedName();
-			((Map<Object, Object>) map).remove(key);
-		} else if (feature == eINSTANCE.getProcedure_Parameters()) {
-			map = ((ProcedureImpl) target).getParametersMap();
 			key = ((Var) object).getIndexedName();
 			((Map<Object, Object>) map).remove(key);
 		} else if (feature == eINSTANCE.getActor_Inputs()) {

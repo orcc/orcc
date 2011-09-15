@@ -96,8 +96,6 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 */
 	private Map<String, Var> mapLocals;
 
-	private Map<String, Param> mapParameters;
-
 	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -162,7 +160,6 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 		super();
 
 		mapLocals = new HashMap<String, Var>();
-		mapParameters = new HashMap<String, Param>();
 
 		eAdapters().add(new MapAdapter());
 	}
@@ -406,11 +403,6 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 		return nodes;
 	}
 
-	@Override
-	public Param getParameter(String name) {
-		return mapParameters.get(name);
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -420,10 +412,6 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 			parameters = new EObjectContainmentEList<Param>(Param.class, this, IrPackage.PROCEDURE__PARAMETERS);
 		}
 		return parameters;
-	}
-
-	public Map<String, Param> getParametersMap() {
-		return mapParameters;
 	}
 
 	public Expression getResult() {

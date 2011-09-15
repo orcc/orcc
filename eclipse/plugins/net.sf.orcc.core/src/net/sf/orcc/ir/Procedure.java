@@ -110,16 +110,6 @@ public interface Procedure extends EObject {
 	EList<Node> getNodes();
 
 	/**
-	 * Returns the parameter of this procedure that has the given name.
-	 * 
-	 * @param name
-	 *            name of the parameter
-	 * 
-	 * @return the parameter of this procedure that has the given name.
-	 */
-	Param getParameter(String name);
-
-	/**
 	 * Returns the parameters of this procedure.
 	 * 
 	 * @return the parameters of this procedure
