@@ -35,12 +35,12 @@ import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstTransition;
 import net.sf.orcc.cal.cal.AstUnit;
-import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.Inequality;
 import net.sf.orcc.cal.cal.Priority;
 import net.sf.orcc.cal.cal.Schedule;
+import net.sf.orcc.cal.cal.Variable;
 
 import org.eclipse.xtext.ui.IImageHelper;
 import org.eclipse.xtext.ui.editor.outline.IOutlineNode;
@@ -170,11 +170,11 @@ public class CalOutlineTreeProvider extends DefaultOutlineTreeProvider {
 		return true;
 	}
 
-	protected boolean _isLeaf(AstVariable variable) {
+	protected boolean _isLeaf(Function function) {
 		return true;
 	}
 
-	protected boolean _isLeaf(Function function) {
+	protected boolean _isLeaf(Variable variable) {
 		return true;
 	}
 

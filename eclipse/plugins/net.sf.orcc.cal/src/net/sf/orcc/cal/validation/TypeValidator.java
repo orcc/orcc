@@ -37,7 +37,6 @@ import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstProcedure;
-import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.ExpressionBinary;
@@ -53,6 +52,7 @@ import net.sf.orcc.cal.cal.StatementCall;
 import net.sf.orcc.cal.cal.StatementElsif;
 import net.sf.orcc.cal.cal.StatementIf;
 import net.sf.orcc.cal.cal.StatementWhile;
+import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.VariableReference;
 import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.cal.services.Typer;
@@ -151,21 +151,6 @@ public class TypeValidator extends AbstractCalJavaValidator {
 	}
 
 	@Check(CheckType.NORMAL)
-	public void checkAstVariable(AstVariable variable) {
-		AstExpression value = variable.getValue();
-		if (value != null) {
-			// check types
-			Type targetType = Typer.getType(variable);
-			Type type = Typer.getType(value);
-			if (!TypeUtil.isConvertibleTo(type, targetType)) {
-				error("Type mismatch: cannot convert from " + type + " to "
-						+ targetType, variable,
-						eINSTANCE.getAstVariable_Value(), -1);
-			}
-		}
-	}
-
-	@Check(CheckType.NORMAL)
 	public void checkExpressionBinary(ExpressionBinary expression) {
 		OpBinary op = OpBinary.getOperator(expression.getOperator());
 		checkTypeBinary(op, Typer.getType(expression.getLeft()),
@@ -186,7 +171,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 			return;
 		}
 
-		Iterator<AstVariable> itFormal = function.getParameters().iterator();
+		Iterator<Variable> itFormal = function.getParameters().iterator();
 		Iterator<AstExpression> itActual = parameters.iterator();
 		int index = 0;
 		while (itFormal.hasNext() && itActual.hasNext()) {
@@ -245,7 +230,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 
 	@Check(CheckType.NORMAL)
 	public void checkExpressionIndex(ExpressionIndex expression) {
-		AstVariable variable = expression.getSource().getVariable();
+		Variable variable = expression.getSource().getVariable();
 		Type type = Typer.getType(variable);
 
 		List<AstExpression> indexes = expression.getIndexes();
@@ -325,7 +310,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 
 	@Check(CheckType.NORMAL)
 	public void checkStatementAssign(StatementAssign assign) {
-		AstVariable variable = assign.getTarget().getVariable();
+		Variable variable = assign.getTarget().getVariable();
 		if (variable.isConstant()
 				|| variable.eContainingFeature() == CalPackage.Literals.AST_ACTOR__PARAMETERS) {
 			error("The variable " + variable.getName() + " is not assignable",
@@ -380,7 +365,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 			return;
 		}
 
-		Iterator<AstVariable> itFormal = procedure.getParameters().iterator();
+		Iterator<Variable> itFormal = procedure.getParameters().iterator();
 		Iterator<AstExpression> itActual = parameters.iterator();
 		int index = 0;
 		while (itFormal.hasNext() && itActual.hasNext()) {
@@ -572,6 +557,21 @@ public class TypeValidator extends AbstractCalJavaValidator {
 						index);
 			}
 			break;
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkVariable(Variable variable) {
+		AstExpression value = variable.getValue();
+		if (value != null) {
+			// check types
+			Type targetType = Typer.getType(variable);
+			Type type = Typer.getType(value);
+			if (!TypeUtil.isConvertibleTo(type, targetType)) {
+				error("Type mismatch: cannot convert from " + type + " to "
+						+ targetType, variable, eINSTANCE.getVariable_Value(),
+						-1);
+			}
 		}
 	}
 

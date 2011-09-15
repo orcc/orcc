@@ -34,7 +34,6 @@ import java.util.List;
 import net.sf.orcc.cache.Cache;
 import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstExpression;
-import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.ExpressionBinary;
 import net.sf.orcc.cal.cal.ExpressionBoolean;
 import net.sf.orcc.cal.cal.ExpressionCall;
@@ -49,6 +48,7 @@ import net.sf.orcc.cal.cal.ExpressionUnary;
 import net.sf.orcc.cal.cal.ExpressionVariable;
 import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.Generator;
+import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprInt;
@@ -139,17 +139,6 @@ public class Evaluator extends CalSwitch<Expression> {
 	}
 
 	@Override
-	public Expression caseAstVariable(AstVariable variable) {
-		AstExpression expression = variable.getValue();
-		if (expression == null) {
-			return null;
-		}
-
-		Expression value = getValue(expression);
-		return value;
-	}
-
-	@Override
 	public Expression caseExpressionBinary(ExpressionBinary expression) {
 		OpBinary op = OpBinary.getOperator(expression.getOperator());
 		Expression e1 = getValue(expression.getLeft());
@@ -177,18 +166,18 @@ public class Evaluator extends CalSwitch<Expression> {
 		}
 
 		// set the value of parameters
-		Iterator<AstVariable> itFormal = function.getParameters().iterator();
+		Iterator<Variable> itFormal = function.getParameters().iterator();
 		Iterator<AstExpression> itActual = expression.getParameters()
 				.iterator();
 		while (itFormal.hasNext() && itActual.hasNext()) {
-			AstVariable paramV = itFormal.next();
+			Variable paramV = itFormal.next();
 			AstExpression paramE = itActual.next();
 
 			setValue(paramV, paramE);
 		}
 
 		// set the value of variables
-		for (AstVariable variable : function.getVariables()) {
+		for (Variable variable : function.getVariables()) {
 			setValue(variable, variable.getValue());
 		}
 
@@ -226,7 +215,7 @@ public class Evaluator extends CalSwitch<Expression> {
 
 	@Override
 	public Expression caseExpressionIndex(ExpressionIndex expression) {
-		AstVariable variable = expression.getSource().getVariable();
+		Variable variable = expression.getSource().getVariable();
 		Expression value = getValue(variable.getValue());
 		if (value == null) {
 			return null;
@@ -327,9 +316,20 @@ public class Evaluator extends CalSwitch<Expression> {
 
 	@Override
 	public Expression caseExpressionVariable(ExpressionVariable expression) {
-		AstVariable variable = expression.getValue().getVariable();
+		Variable variable = expression.getValue().getVariable();
 		Expression value = getValue(variable);
 		return EcoreUtil.copy(value);
+	}
+
+	@Override
+	public Expression caseVariable(Variable variable) {
+		AstExpression expression = variable.getValue();
+		if (expression == null) {
+			return null;
+		}
+
+		Expression value = getValue(expression);
+		return value;
 	}
 
 }

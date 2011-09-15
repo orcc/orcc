@@ -41,7 +41,6 @@ import net.sf.orcc.cal.cal.AstTypeList;
 import net.sf.orcc.cal.cal.AstTypeString;
 import net.sf.orcc.cal.cal.AstTypeUint;
 import net.sf.orcc.cal.cal.AstUnit;
-import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.ExpressionBinary;
 import net.sf.orcc.cal.cal.ExpressionBoolean;
 import net.sf.orcc.cal.cal.ExpressionCall;
@@ -65,6 +64,7 @@ import net.sf.orcc.cal.cal.StatementElsif;
 import net.sf.orcc.cal.cal.StatementForeach;
 import net.sf.orcc.cal.cal.StatementIf;
 import net.sf.orcc.cal.cal.StatementWhile;
+import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.VariableReference;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 
@@ -89,7 +89,7 @@ public class VoidSwitch extends CalSwitch<Void> {
 			doSwitch(guard);
 		}
 
-		for (AstVariable variable : action.getVariables()) {
+		for (Variable variable : action.getVariables()) {
 			doSwitch(variable);
 		}
 
@@ -106,11 +106,11 @@ public class VoidSwitch extends CalSwitch<Void> {
 
 	@Override
 	public Void caseAstActor(AstActor actor) {
-		for (AstVariable parameter : actor.getParameters()) {
+		for (Variable parameter : actor.getParameters()) {
 			doSwitch(parameter);
 		}
 
-		for (AstVariable stateVariable : actor.getStateVariables()) {
+		for (Variable stateVariable : actor.getStateVariables()) {
 			doSwitch(stateVariable);
 		}
 
@@ -161,11 +161,11 @@ public class VoidSwitch extends CalSwitch<Void> {
 
 	@Override
 	public Void caseAstProcedure(AstProcedure procedure) {
-		for (AstVariable parameter : procedure.getParameters()) {
+		for (Variable parameter : procedure.getParameters()) {
 			doSwitch(parameter);
 		}
 
-		for (AstVariable variable : procedure.getVariables()) {
+		for (Variable variable : procedure.getVariables()) {
 			doSwitch(variable);
 		}
 
@@ -219,22 +219,11 @@ public class VoidSwitch extends CalSwitch<Void> {
 			doSwitch(procedure);
 		}
 
-		for (AstVariable variable : unit.getVariables()) {
+		for (Variable variable : unit.getVariables()) {
 			doSwitch(variable);
 		}
 
 		return null;
-	}
-
-	@Override
-	public Void caseAstVariable(AstVariable variable) {
-		doSwitch(variable.getType());
-
-		for (AstExpression dim : variable.getDimensions()) {
-			doSwitch(dim);
-		}
-
-		return doSwitch(variable.getValue());
 	}
 
 	@Override
@@ -332,11 +321,11 @@ public class VoidSwitch extends CalSwitch<Void> {
 
 	@Override
 	public Void caseFunction(Function function) {
-		for (AstVariable parameter : function.getParameters()) {
+		for (Variable parameter : function.getParameters()) {
 			doSwitch(parameter);
 		}
 
-		for (AstVariable variable : function.getVariables()) {
+		for (Variable variable : function.getVariables()) {
 			doSwitch(variable);
 		}
 
@@ -358,7 +347,7 @@ public class VoidSwitch extends CalSwitch<Void> {
 	public Void caseInputPattern(InputPattern input) {
 		doSwitch(input.getPort());
 
-		for (AstVariable token : input.getTokens()) {
+		for (Variable token : input.getTokens()) {
 			doSwitch(token);
 		}
 
@@ -452,6 +441,17 @@ public class VoidSwitch extends CalSwitch<Void> {
 		}
 
 		return null;
+	}
+
+	@Override
+	public Void caseVariable(Variable variable) {
+		doSwitch(variable.getType());
+
+		for (AstExpression dim : variable.getDimensions()) {
+			doSwitch(dim);
+		}
+
+		return doSwitch(variable.getValue());
 	}
 
 	@Override

@@ -7,7 +7,7 @@ import java.util.List;
 import junit.framework.Assert;
 import net.sf.orcc.OrccProjectNature;
 import net.sf.orcc.cal.cal.AstEntity;
-import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.frontend.Frontend;
 import net.sf.orcc.ir.Actor;
@@ -208,9 +208,9 @@ public class AllTests {
 	@Test
 	public void passCheckTypeInt() throws Exception {
 		AstEntity entity = parseAndValidate(prefix + "pass/TypeInt.cal");
-		List<AstVariable> stateVars = entity.getActor().getStateVariables();
-		AstVariable x = stateVars.get(0);
-		AstVariable y = stateVars.get(1);
+		List<Variable> stateVars = entity.getActor().getStateVariables();
+		Variable x = stateVars.get(0);
+		Variable y = stateVars.get(1);
 		Type type = Typer.getType(x);
 		Assert.assertTrue("type of x should be int(size=5)",
 				EcoreUtil.equals(type, IrFactory.eINSTANCE.createTypeInt(5)));

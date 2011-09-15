@@ -42,12 +42,12 @@ import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstTag;
-import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.InputPattern;
 import net.sf.orcc.cal.cal.OutputPattern;
 import net.sf.orcc.cal.cal.RegExp;
 import net.sf.orcc.cal.cal.Schedule;
+import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.VariableReference;
 import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.cal.services.Typer;
@@ -122,13 +122,13 @@ public class ActorTransformer {
 	 *            an integer number of repeat (equals to one if there is no
 	 *            repeat)
 	 */
-	private void actionLoadTokens(Var portVariable, List<AstVariable> tokens,
+	private void actionLoadTokens(Var portVariable, List<Variable> tokens,
 			int repeat) {
 		Context context = astTransformer.getContext();
 		if (repeat == 1) {
 			int i = 0;
 
-			for (AstVariable token : tokens) {
+			for (Variable token : tokens) {
 				List<Expression> indexes = new ArrayList<Expression>(1);
 				indexes.add(IrFactory.eINSTANCE.createExprInt(i));
 				int lineNumber = portVariable.getLineNumber();
@@ -155,7 +155,7 @@ public class ActorTransformer {
 			int i = 0;
 			int numTokens = tokens.size();
 			Type type = ((TypeList) portVariable.getType()).getType();
-			for (AstVariable token : tokens) {
+			for (Variable token : tokens) {
 				int lineNumber = portVariable.getLineNumber();
 				List<Expression> indexes = new ArrayList<Expression>(1);
 				indexes.add(IrFactory.eINSTANCE.createExprBinary(
@@ -420,14 +420,14 @@ public class ActorTransformer {
 		astTransformer = new AstTransformer(frontend, actor.getProcs());
 
 		// parameters
-		for (AstVariable astVariable : astActor.getParameters()) {
-			Var var = astTransformer.transformGlobalVariable(astVariable);
+		for (Variable Variable : astActor.getParameters()) {
+			Var var = astTransformer.transformGlobalVariable(Variable);
 			actor.getParameters().add(var);
 		}
 
 		// state variables
-		for (AstVariable astVariable : astActor.getStateVariables()) {
-			Var var = astTransformer.transformGlobalVariable(astVariable);
+		for (Variable Variable : astActor.getStateVariables()) {
+			Var var = astTransformer.transformGlobalVariable(Variable);
 			actor.getStateVars().add(var);
 		}
 
@@ -668,7 +668,7 @@ public class ActorTransformer {
 			Pattern irInputPattern) {
 		Context context = astTransformer.getContext();
 		Port port = (Port) mapAstToIr.get(pattern.getPort());
-		List<AstVariable> tokens = pattern.getTokens();
+		List<Variable> tokens = pattern.getTokens();
 
 		// evaluates token consumption
 		int totalConsumption = tokens.size();
@@ -685,7 +685,7 @@ public class ActorTransformer {
 		irInputPattern.setVariable(port, variable);
 
 		// declare tokens
-		for (AstVariable token : tokens) {
+		for (Variable token : tokens) {
 			Var local = astTransformer.transformLocalVariable(token);
 			context.getProcedure().getLocals().add(local);
 		}

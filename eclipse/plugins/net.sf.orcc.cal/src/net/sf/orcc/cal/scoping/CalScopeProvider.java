@@ -39,7 +39,6 @@ import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.AstTransition;
 import net.sf.orcc.cal.cal.AstUnit;
-import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.ExpressionList;
@@ -48,6 +47,7 @@ import net.sf.orcc.cal.cal.Generator;
 import net.sf.orcc.cal.cal.InputPattern;
 import net.sf.orcc.cal.cal.Schedule;
 import net.sf.orcc.cal.cal.StatementForeach;
+import net.sf.orcc.cal.cal.Variable;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
@@ -99,32 +99,6 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	}
 
 	/**
-	 * Returns a scope vi-1 -> ... -> v1 -> v0 -> parameters where vi is the
-	 * given variable (the scope includes previous variables up to it).
-	 * 
-	 * @param variable
-	 * @param parameters
-	 * @param variables
-	 * @param reference
-	 * @return
-	 */
-	private IScope getScope(AstVariable variable, List<AstVariable> parameters,
-			List<AstVariable> variables, EReference reference) {
-		IScope outer = getScope(variable.eContainer().eContainer(), reference);
-		IScope inner = Scopes.scopeFor(parameters, outer);
-		for (AstVariable aVar : variables) {
-			List<AstVariable> elements = new ArrayList<AstVariable>(1);
-			if (aVar == variable) {
-				break;
-			}
-			elements.add(aVar);
-			inner = Scopes.scopeFor(elements, inner);
-		}
-
-		return inner;
-	}
-
-	/**
 	 * Returns the scope that contains all variables and parameters of the given
 	 * action/function/procedure.
 	 * 
@@ -134,10 +108,36 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 * @param reference
 	 * @return
 	 */
-	private IScope getScope(EObject eObject, List<AstVariable> parameters,
-			List<AstVariable> variables, EReference reference) {
+	private IScope getScope(EObject eObject, List<Variable> parameters,
+			List<Variable> variables, EReference reference) {
 		IScope outer = getScope(eObject.eContainer(), reference);
 		return Scopes.scopeFor(variables, Scopes.scopeFor(parameters, outer));
+	}
+
+	/**
+	 * Returns a scope vi-1 -> ... -> v1 -> v0 -> parameters where vi is the
+	 * given variable (the scope includes previous variables up to it).
+	 * 
+	 * @param variable
+	 * @param parameters
+	 * @param variables
+	 * @param reference
+	 * @return
+	 */
+	private IScope getScope(Variable variable, List<Variable> parameters,
+			List<Variable> variables, EReference reference) {
+		IScope outer = getScope(variable.eContainer().eContainer(), reference);
+		IScope inner = Scopes.scopeFor(parameters, outer);
+		for (Variable aVar : variables) {
+			List<Variable> elements = new ArrayList<Variable>(1);
+			if (aVar == variable) {
+				break;
+			}
+			elements.add(aVar);
+			inner = Scopes.scopeFor(elements, inner);
+		}
+
+		return inner;
 	}
 
 	/**
@@ -287,7 +287,7 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 */
 	public IScope scope_VariableReference_variable(AstAction action,
 			EReference reference) {
-		List<AstVariable> tokens = new ArrayList<AstVariable>();
+		List<Variable> tokens = new ArrayList<Variable>();
 		for (InputPattern pattern : action.getInputs()) {
 			tokens.addAll(pattern.getTokens());
 		}
@@ -305,7 +305,7 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 */
 	public IScope scope_VariableReference_variable(AstActor actor,
 			EReference reference) {
-		List<AstVariable> elements = new ArrayList<AstVariable>();
+		List<Variable> elements = new ArrayList<Variable>();
 		elements.addAll(actor.getParameters());
 		elements.addAll(actor.getStateVariables());
 
@@ -328,42 +328,6 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	}
 
 	/**
-	 * Returns the scope for a variable referenced inside a variable
-	 * declaration.
-	 * 
-	 * @param variable
-	 *            a variable declaration
-	 * @param reference
-	 *            a variable reference
-	 * @return a scope
-	 */
-	public IScope scope_VariableReference_variable(AstVariable variable,
-			EReference reference) {
-		EObject cter = variable.eContainer();
-		List<AstVariable> parameters;
-		List<AstVariable> variables;
-		if (cter instanceof Function) {
-			parameters = ((Function) cter).getParameters();
-			variables = ((Function) cter).getVariables();
-		} else if (cter instanceof AstProcedure) {
-			parameters = ((AstProcedure) cter).getParameters();
-			variables = ((AstProcedure) cter).getVariables();
-		} else if (cter instanceof AstAction) {
-			AstAction action = (AstAction) cter;
-			parameters = new ArrayList<AstVariable>();
-			for (InputPattern pattern : action.getInputs()) {
-				parameters.addAll(pattern.getTokens());
-			}
-			variables = action.getVariables();
-		} else {
-			// in a state variable
-			return getScope(variable.eContainer(), reference);
-		}
-
-		return getScope(variable, parameters, variables, reference);
-	}
-
-	/**
 	 * Returns the scope for a variable referenced inside a generator.
 	 * 
 	 * @param list
@@ -374,7 +338,7 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 */
 	public IScope scope_VariableReference_variable(ExpressionList list,
 			EReference reference) {
-		List<AstVariable> elements = new ArrayList<AstVariable>();
+		List<Variable> elements = new ArrayList<Variable>();
 		for (Generator generator : list.getGenerators()) {
 			elements.add(generator.getVariable());
 		}
@@ -408,10 +372,46 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 */
 	public IScope scope_VariableReference_variable(StatementForeach foreach,
 			EReference reference) {
-		List<AstVariable> variables = new ArrayList<AstVariable>();
+		List<Variable> variables = new ArrayList<Variable>();
 		variables.add(foreach.getVariable());
 		return Scopes.scopeFor(variables,
 				getScope(foreach.eContainer(), reference));
+	}
+
+	/**
+	 * Returns the scope for a variable referenced inside a variable
+	 * declaration.
+	 * 
+	 * @param variable
+	 *            a variable declaration
+	 * @param reference
+	 *            a variable reference
+	 * @return a scope
+	 */
+	public IScope scope_VariableReference_variable(Variable variable,
+			EReference reference) {
+		EObject cter = variable.eContainer();
+		List<Variable> parameters;
+		List<Variable> variables;
+		if (cter instanceof Function) {
+			parameters = ((Function) cter).getParameters();
+			variables = ((Function) cter).getVariables();
+		} else if (cter instanceof AstProcedure) {
+			parameters = ((AstProcedure) cter).getParameters();
+			variables = ((AstProcedure) cter).getVariables();
+		} else if (cter instanceof AstAction) {
+			AstAction action = (AstAction) cter;
+			parameters = new ArrayList<Variable>();
+			for (InputPattern pattern : action.getInputs()) {
+				parameters.addAll(pattern.getTokens());
+			}
+			variables = action.getVariables();
+		} else {
+			// in a state variable
+			return getScope(variable.eContainer(), reference);
+		}
+
+		return getScope(variable, parameters, variables, reference);
 	}
 
 }

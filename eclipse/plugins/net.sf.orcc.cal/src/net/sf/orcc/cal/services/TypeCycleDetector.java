@@ -34,8 +34,8 @@ import java.util.List;
 import java.util.Set;
 
 import net.sf.orcc.cal.cal.AstEntity;
-import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.ExpressionVariable;
+import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.util.VoidSwitch;
 import net.sf.orcc.cal.validation.ValidationError;
 
@@ -52,9 +52,9 @@ import org.jgrapht.graph.DefaultEdge;
  */
 public class TypeCycleDetector extends VoidSwitch {
 
-	private DirectedGraph<AstVariable, DefaultEdge> graph;
+	private DirectedGraph<Variable, DefaultEdge> graph;
 
-	private AstVariable source;
+	private Variable source;
 
 	/**
 	 * Creates a new type cycle detector.
@@ -63,17 +63,8 @@ public class TypeCycleDetector extends VoidSwitch {
 	}
 
 	@Override
-	public Void caseAstVariable(AstVariable variable) {
-		source = variable;
-		graph.addVertex(variable);
-		doSwitch(variable.getType());
-		source = null;
-		return null;
-	}
-
-	@Override
 	public Void caseExpressionVariable(ExpressionVariable expression) {
-		AstVariable variable = expression.getValue().getVariable();
+		Variable variable = expression.getValue().getVariable();
 		if (source != null && variable != null) {
 			if (!graph.containsVertex(variable)) {
 				graph.addVertex(variable);
@@ -81,6 +72,15 @@ public class TypeCycleDetector extends VoidSwitch {
 			graph.addEdge(source, variable);
 		}
 
+		return null;
+	}
+
+	@Override
+	public Void caseVariable(Variable variable) {
+		source = variable;
+		graph.addVertex(variable);
+		doSwitch(variable.getType());
+		source = null;
 		return null;
 	}
 
@@ -94,20 +94,20 @@ public class TypeCycleDetector extends VoidSwitch {
 	 */
 	public boolean detectCycles(AstEntity entity,
 			List<ValidationError> errorList) {
-		graph = new DefaultDirectedGraph<AstVariable, DefaultEdge>(
+		graph = new DefaultDirectedGraph<Variable, DefaultEdge>(
 				DefaultEdge.class);
 		doSwitch(entity);
 
-		CycleDetector<AstVariable, DefaultEdge> cycleDetector = new CycleDetector<AstVariable, DefaultEdge>(
+		CycleDetector<Variable, DefaultEdge> cycleDetector = new CycleDetector<Variable, DefaultEdge>(
 				graph);
 		boolean hasCycles = cycleDetector.detectCycles();
 		if (hasCycles) {
-			Set<AstVariable> variables = cycleDetector.findCycles();
+			Set<Variable> variables = cycleDetector.findCycles();
 			if (!variables.isEmpty()) {
-				for (AstVariable variable : variables) {
+				for (Variable variable : variables) {
 					errorList.add(new ValidationError(variable.getName()
 							+ " has a cyclic type definition", variable,
-							eINSTANCE.getAstVariable_Name(), -1));
+							eINSTANCE.getVariable_Name(), -1));
 				}
 			}
 		}

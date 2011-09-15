@@ -37,7 +37,7 @@ AstUnit: {AstUnit} ':'
 
 	'end';
 
-ConstantVariable returns AstVariable:
+ConstantVariable returns Variable:
 	VariableDeclaration (constant ?= '=') value=AstExpression ';';
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -102,9 +102,9 @@ NativeProcedure returns AstProcedure:
 		(parameters += VariableDeclaration (',' parameters += VariableDeclaration)*)?
 	')' 'end';
 
-ActorParameter returns AstVariable: VariableDeclaration ('=' value=AstExpression)?;
+ActorParameter returns Variable: VariableDeclaration ('=' value=AstExpression)?;
 
-StateVariable returns AstVariable: ValuedVariableDeclaration ';';
+StateVariable returns Variable: ValuedVariableDeclaration ';';
 
 AstTag: (identifiers += ID) ('.' identifiers += ID)*;
 
@@ -191,7 +191,7 @@ Initialize returns AstAction:
 InputPattern: port=[AstPort] ':' '[' tokens+=Token (',' tokens+=Token)* ']'
 	('repeat' repeat=AstExpression)?;
 
-Token returns AstVariable: name=ID;
+Token returns Variable: name=ID;
 
 OutputPattern: port=[AstPort] ':' '[' values+=AstExpression (',' values+=AstExpression)* ']'
 	('repeat' repeat=AstExpression)?;
@@ -357,16 +357,16 @@ AstTypeUint: {AstTypeUint} 'uint' ('(' 'size' '=' size = AstExpression ')')?;
 ///////////////////////////////////////////////////////////////////////////////
 
 // any variable declaration may have annotations
-VariableDeclaration returns AstVariable: 
+VariableDeclaration returns Variable: 
 	(annotations += AstAnnotation)*
 	type = AstType
 	name = ID
 	('[' dimensions += AstExpression ']')*;
 
-ValuedVariableDeclaration returns AstVariable:
+ValuedVariableDeclaration returns Variable:
 	VariableDeclaration ((constant ?= '=' | ':=') value=AstExpression)?;
 
-VariableReference: variable=[AstVariable|QualifiedName];
+VariableReference: variable=[Variable|QualifiedName];
 
 ///////////////////////////////////////////////////////////////////////////////
 // annotations

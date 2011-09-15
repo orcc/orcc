@@ -31,10 +31,10 @@ package net.sf.orcc.frontend;
 import java.util.Map;
 
 import net.sf.orcc.cal.cal.AstEntity;
-import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstUnit;
-import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.cal.Function;
+import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Procedure;
@@ -69,8 +69,8 @@ public class UnitTransformer {
 				unit.getProcedures());
 
 		// constants
-		for (AstVariable astVariable : astUnit.getVariables()) {
-			Var var = astTransformer.transformGlobalVariable(astVariable);
+		for (Variable Variable : astUnit.getVariables()) {
+			Var var = astTransformer.transformGlobalVariable(Variable);
 			unit.getConstants().add(var);
 		}
 

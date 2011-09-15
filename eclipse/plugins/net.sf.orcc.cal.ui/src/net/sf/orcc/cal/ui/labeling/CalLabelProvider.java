@@ -44,7 +44,6 @@ import net.sf.orcc.cal.cal.AstTypeInt;
 import net.sf.orcc.cal.cal.AstTypeList;
 import net.sf.orcc.cal.cal.AstTypeUint;
 import net.sf.orcc.cal.cal.AstUnit;
-import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.ExpressionBinary;
 import net.sf.orcc.cal.cal.ExpressionBoolean;
 import net.sf.orcc.cal.cal.ExpressionCall;
@@ -61,6 +60,7 @@ import net.sf.orcc.cal.cal.Generator;
 import net.sf.orcc.cal.cal.Import;
 import net.sf.orcc.cal.cal.Inequality;
 import net.sf.orcc.cal.cal.InputPattern;
+import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
@@ -146,37 +146,6 @@ public class CalLabelProvider extends DefaultEObjectLabelProvider {
 
 	public String text(AstUnit unit) {
 		return null;
-	}
-
-	public String text(AstVariable variable) {
-		AstType type = variable.getType();
-		if (type == null) {
-			InputPattern pattern = EcoreUtil2.getContainerOfType(variable,
-					InputPattern.class);
-			if (pattern != null) {
-				type = pattern.getPort().getType();
-			}
-		}
-
-		StringBuilder builder = new StringBuilder(getText(type));
-		builder.append(" ");
-		builder.append(variable.getName());
-
-		for (AstExpression dim : variable.getDimensions()) {
-			builder.append('[');
-			builder.append(getText(dim));
-			builder.append(']');
-		}
-
-		if (variable.getValue() != null) {
-			builder.append(" ");
-			if (!variable.isConstant()) {
-				builder.append(":");
-			}
-			builder.append("= ");
-			builder.append(getText(variable.getValue()));
-		}
-		return builder.toString();
 	}
 
 	public String text(ExpressionBinary expr) {
@@ -273,9 +242,9 @@ public class CalLabelProvider extends DefaultEObjectLabelProvider {
 		builder.append(function.getName());
 		builder.append("(");
 
-		Iterator<AstVariable> it = function.getParameters().iterator();
+		Iterator<Variable> it = function.getParameters().iterator();
 		if (it.hasNext()) {
-			AstVariable param = it.next();
+			Variable param = it.next();
 			builder.append(getText(param));
 			while (it.hasNext()) {
 				builder.append(", ");
@@ -305,6 +274,37 @@ public class CalLabelProvider extends DefaultEObjectLabelProvider {
 			builder.append(';');
 		}
 
+		return builder.toString();
+	}
+
+	public String text(Variable variable) {
+		AstType type = variable.getType();
+		if (type == null) {
+			InputPattern pattern = EcoreUtil2.getContainerOfType(variable,
+					InputPattern.class);
+			if (pattern != null) {
+				type = pattern.getPort().getType();
+			}
+		}
+
+		StringBuilder builder = new StringBuilder(getText(type));
+		builder.append(" ");
+		builder.append(variable.getName());
+
+		for (AstExpression dim : variable.getDimensions()) {
+			builder.append('[');
+			builder.append(getText(dim));
+			builder.append(']');
+		}
+
+		if (variable.getValue() != null) {
+			builder.append(" ");
+			if (!variable.isConstant()) {
+				builder.append(":");
+			}
+			builder.append("= ");
+			builder.append(getText(variable.getValue()));
+		}
 		return builder.toString();
 	}
 

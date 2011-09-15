@@ -47,7 +47,6 @@ import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstTransition;
 import net.sf.orcc.cal.cal.AstUnit;
-import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.ExpressionCall;
 import net.sf.orcc.cal.cal.ExpressionIndex;
@@ -62,6 +61,7 @@ import net.sf.orcc.cal.cal.Schedule;
 import net.sf.orcc.cal.cal.StatementAssign;
 import net.sf.orcc.cal.cal.StatementCall;
 import net.sf.orcc.cal.cal.StatementForeach;
+import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.VariableReference;
 import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.cal.util.BooleanSwitch;
@@ -156,8 +156,8 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 		String name = getName(action);
 
 		// Check if tag name is not already used in a state variable
-		List<AstVariable> variables = actor.getStateVariables();
-		for (AstVariable variable : variables) {
+		List<Variable> variables = actor.getStateVariables();
+		for (Variable variable : variables) {
 			if (name.equals(variable.getName())) {
 				error("Action " + name
 						+ " has the same name as a state variable",
@@ -242,11 +242,6 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 	@Check(CheckType.NORMAL)
 	public void checkAstUnit(AstUnit unit) {
 		// check unique names
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkAstVariable(AstVariable variable) {
-		checkIsVariableUsed(variable);
 	}
 
 	/**
@@ -450,7 +445,7 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 	 * @param variable
 	 *            a variable
 	 */
-	private void checkIsVariableUsed(final AstVariable variable) {
+	private void checkIsVariableUsed(final Variable variable) {
 		// do not take variables declared by input patterns and
 		// generator/foreach
 		EObject container = variable.eContainer();
@@ -510,7 +505,7 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 			}
 
 			warning("The variable " + variable.getName() + " is never read",
-					eINSTANCE.getAstVariable_Name());
+					eINSTANCE.getVariable_Name());
 		}
 	}
 
@@ -617,8 +612,13 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 	}
 
 	@Check(CheckType.NORMAL)
+	public void checkVariable(Variable variable) {
+		checkIsVariableUsed(variable);
+	}
+
+	@Check(CheckType.NORMAL)
 	public void checkVariableReference(VariableReference ref) {
-		AstVariable variable = ref.getVariable();
+		Variable variable = ref.getVariable();
 		String name = variable.getName();
 
 		EObject rootCter = EcoreUtil.getRootContainer(ref);

@@ -57,7 +57,6 @@ import net.sf.orcc.cal.cal.AstTypeInt;
 import net.sf.orcc.cal.cal.AstTypeList;
 import net.sf.orcc.cal.cal.AstTypeString;
 import net.sf.orcc.cal.cal.AstTypeUint;
-import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.ExpressionBinary;
 import net.sf.orcc.cal.cal.ExpressionBoolean;
@@ -66,6 +65,7 @@ import net.sf.orcc.cal.cal.ExpressionInteger;
 import net.sf.orcc.cal.cal.ExpressionString;
 import net.sf.orcc.cal.cal.ExpressionUnary;
 import net.sf.orcc.cal.cal.ExpressionVariable;
+import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.VariableReference;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.services.CalGrammarAccess;
@@ -188,7 +188,7 @@ public class XdfExporter extends CalSwitch<Object> {
 	private void addParameters(Network network, Graph graph) {
 		List<?> parameters = (List<?>) graph.getValue("network parameter");
 		for (Object parameter : parameters) {
-			AstVariable variable = parseVariable(parameter);
+			Variable variable = parseVariable(parameter);
 
 			Type type = (Type) doSwitch(variable.getType());
 			String name = variable.getName();
@@ -203,7 +203,7 @@ public class XdfExporter extends CalSwitch<Object> {
 		Map<?, ?> variables = (Map<?, ?>) graph
 				.getValue("network variable declaration");
 		for (Entry<?, ?> entry : variables.entrySet()) {
-			AstVariable variable = parseVariable(entry.getKey());
+			Variable variable = parseVariable(entry.getKey());
 			Expression expression = parseExpression(entry.getValue());
 
 			Type type = (Type) doSwitch(variable.getType());
@@ -243,7 +243,7 @@ public class XdfExporter extends CalSwitch<Object> {
 			Map<?, ?> variables = (Map<?, ?>) vertex
 					.getValue("instance parameter");
 			for (Entry<?, ?> entry : variables.entrySet()) {
-				AstVariable variable = parseVariable(entry.getKey());
+				Variable variable = parseVariable(entry.getKey());
 				Expression expression = parseExpression(entry.getValue());
 				instance.getParameters().put(variable.getName(), expression);
 			}
@@ -367,7 +367,7 @@ public class XdfExporter extends CalSwitch<Object> {
 
 	@Override
 	public Expression caseExpressionVariable(ExpressionVariable expression) {
-		AstVariable variable = expression.getValue().getVariable();
+		Variable variable = expression.getValue().getVariable();
 		Var var = varMap.get(variable.getName());
 		if (var == null) {
 			throw new OrccRuntimeException("unknown variable "
@@ -385,8 +385,7 @@ public class XdfExporter extends CalSwitch<Object> {
 
 				ICompositeNode node = NodeModelUtils.getNode(obj);
 				for (ILeafNode leaf : node.getLeafNodes()) {
-					AstVariable variable = CalFactory.eINSTANCE
-							.createAstVariable();
+					Variable variable = CalFactory.eINSTANCE.createVariable();
 					variable.setName(leaf.getText());
 					ref.setVariable(variable);
 				}

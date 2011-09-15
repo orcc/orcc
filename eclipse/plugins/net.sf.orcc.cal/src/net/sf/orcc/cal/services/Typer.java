@@ -47,7 +47,6 @@ import net.sf.orcc.cal.cal.AstTypeInt;
 import net.sf.orcc.cal.cal.AstTypeList;
 import net.sf.orcc.cal.cal.AstTypeString;
 import net.sf.orcc.cal.cal.AstTypeUint;
-import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.ExpressionBinary;
@@ -69,6 +68,7 @@ import net.sf.orcc.cal.cal.OutputPattern;
 import net.sf.orcc.cal.cal.StatementAssign;
 import net.sf.orcc.cal.cal.StatementCall;
 import net.sf.orcc.cal.cal.StatementForeach;
+import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.VariableReference;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.ir.Expression;
@@ -288,41 +288,6 @@ public class Typer extends CalSwitch<Type> {
 	}
 
 	@Override
-	public Type caseAstVariable(AstVariable variable) {
-		AstType astType;
-		List<AstExpression> dimensions;
-
-		if (variable.eContainer() instanceof InputPattern) {
-			InputPattern pattern = (InputPattern) variable.eContainer();
-			astType = EcoreUtil.copy(pattern.getPort().getType());
-			dimensions = new ArrayList<AstExpression>();
-			AstExpression repeat = pattern.getRepeat();
-			if (repeat != null) {
-				dimensions.add(repeat);
-			}
-		} else {
-			astType = EcoreUtil.copy(variable.getType());
-			dimensions = variable.getDimensions();
-		}
-
-		// convert the type of the variable
-		ListIterator<AstExpression> it = dimensions.listIterator(dimensions
-				.size());
-		while (it.hasPrevious()) {
-			AstExpression expression = it.previous();
-
-			AstTypeList newAstType = CalFactory.eINSTANCE.createAstTypeList();
-			AstExpression size = EcoreUtil.copy(expression);
-			newAstType.setSize(size);
-			newAstType.setType(astType);
-
-			astType = newAstType;
-		}
-
-		return doSwitch(astType);
-	}
-
-	@Override
 	public Type caseExpressionBinary(ExpressionBinary expression) {
 		setTargetType(expression);
 
@@ -371,7 +336,7 @@ public class Typer extends CalSwitch<Type> {
 
 	@Override
 	public Type caseExpressionIndex(ExpressionIndex expression) {
-		AstVariable variable = expression.getSource().getVariable();
+		Variable variable = expression.getSource().getVariable();
 		Type type = getType(variable);
 
 		List<AstExpression> indexes = expression.getIndexes();
@@ -457,18 +422,53 @@ public class Typer extends CalSwitch<Type> {
 
 	@Override
 	public Type caseExpressionVariable(ExpressionVariable expression) {
-		AstVariable variable = expression.getValue().getVariable();
+		Variable variable = expression.getValue().getVariable();
 		return EcoreUtil.copy(getType(variable));
 	}
 
 	@Override
 	public Type caseFunction(Function function) {
 		return doSwitch(function.getType());
-	};
+	}
 
 	@Override
 	public Type caseGenerator(Generator expression) {
 		return null;
+	};
+
+	@Override
+	public Type caseVariable(Variable variable) {
+		AstType astType;
+		List<AstExpression> dimensions;
+
+		if (variable.eContainer() instanceof InputPattern) {
+			InputPattern pattern = (InputPattern) variable.eContainer();
+			astType = EcoreUtil.copy(pattern.getPort().getType());
+			dimensions = new ArrayList<AstExpression>();
+			AstExpression repeat = pattern.getRepeat();
+			if (repeat != null) {
+				dimensions.add(repeat);
+			}
+		} else {
+			astType = EcoreUtil.copy(variable.getType());
+			dimensions = variable.getDimensions();
+		}
+
+		// convert the type of the variable
+		ListIterator<AstExpression> it = dimensions.listIterator(dimensions
+				.size());
+		while (it.hasPrevious()) {
+			AstExpression expression = it.previous();
+
+			AstTypeList newAstType = CalFactory.eINSTANCE.createAstTypeList();
+			AstExpression size = EcoreUtil.copy(expression);
+			newAstType.setSize(size);
+			newAstType.setType(astType);
+
+			astType = newAstType;
+		}
+
+		return doSwitch(astType);
 	}
 
 	/**
@@ -515,7 +515,7 @@ public class Typer extends CalSwitch<Type> {
 	 */
 	private Type findIndexType(VariableReference reference,
 			List<AstExpression> indexes, AstExpression expression) {
-		AstVariable variable = reference.getVariable();
+		Variable variable = reference.getVariable();
 		if (variable == null) {
 			return null;
 		}
@@ -556,12 +556,12 @@ public class Typer extends CalSwitch<Type> {
 	 *            an expression
 	 * @return the type of the formal parameter, or <code>null</code>
 	 */
-	private Type findParameter(List<AstVariable> formalParameters,
+	private Type findParameter(List<Variable> formalParameters,
 			List<AstExpression> actualParameters, AstExpression expression) {
-		Iterator<AstVariable> itF = formalParameters.iterator();
+		Iterator<Variable> itF = formalParameters.iterator();
 		Iterator<AstExpression> itA = actualParameters.iterator();
 		while (itF.hasNext() && itA.hasNext()) {
-			AstVariable formal = itF.next();
+			Variable formal = itF.next();
 			AstExpression actual = itA.next();
 			if (actual == expression) {
 				return getType(formal);
@@ -678,7 +678,7 @@ public class Typer extends CalSwitch<Type> {
 			switch (cter.eClass().getClassifierID()) {
 			case CalPackage.EXPRESSION_CALL: {
 				ExpressionCall call = (ExpressionCall) cter;
-				List<AstVariable> formal = call.getFunction().getParameters();
+				List<Variable> formal = call.getFunction().getParameters();
 				List<AstExpression> actual = call.getParameters();
 				targetType = findParameter(formal, actual, expression);
 				break;
@@ -721,7 +721,7 @@ public class Typer extends CalSwitch<Type> {
 
 			case CalPackage.STATEMENT_CALL: {
 				StatementCall call = (StatementCall) cter;
-				List<AstVariable> formal = call.getProcedure().getParameters();
+				List<Variable> formal = call.getProcedure().getParameters();
 				List<AstExpression> actual = call.getParameters();
 				targetType = findParameter(formal, actual, expression);
 				break;
@@ -732,8 +732,8 @@ public class Typer extends CalSwitch<Type> {
 				targetType = getType(foreach.getVariable());
 				break;
 
-			case CalPackage.AST_VARIABLE:
-				AstVariable variable = (AstVariable) cter;
+			case CalPackage.VARIABLE:
+				Variable variable = (Variable) cter;
 				targetType = getType(variable);
 				break;
 			}
