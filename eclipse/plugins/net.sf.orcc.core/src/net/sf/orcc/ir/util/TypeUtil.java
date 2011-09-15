@@ -52,43 +52,6 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 public class TypeUtil {
 
 	/**
-	 * Returns <code>true</code> if type src can be converted to type dst.
-	 * 
-	 * @param src
-	 *            a type
-	 * @param dst
-	 *            the type src should be converted to
-	 * @return <code>true</code> if type src can be converted to type dst
-	 */
-	public static boolean isConvertibleTo(Type src, Type dst) {
-		if (src == null || dst == null) {
-			return false;
-		}
-
-		if (src.isBool() && dst.isBool() || src.isFloat() && dst.isFloat()
-				|| src.isString() && dst.isString()
-				|| (src.isInt() || src.isUint())
-				&& (dst.isInt() || dst.isUint())) {
-			return true;
-		}
-
-		if (src.isList() && dst.isList()) {
-			TypeList typeSrc = (TypeList) src;
-			TypeList typeDst = (TypeList) dst;
-			// Recursively check type convertibility
-			if (isConvertibleTo(typeSrc.getType(), typeDst.getType())) {
-				if (typeSrc.getSizeExpr() != null
-						&& typeDst.getSizeExpr() != null) {
-					return typeSrc.getSize() <= typeDst.getSize();
-				}
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
 	 * Returns the Greatest Lower Bound of the given types. The GLB is the
 	 * smallest type of (t1, t2).
 	 * 
@@ -193,9 +156,14 @@ public class TypeUtil {
 	 *         given number, <i>including</i> a sign bit
 	 */
 	public static int getSize(BigInteger number) {
-		int bitLength = number.bitLength();
-		return (number.compareTo(BigInteger.ZERO) < 0) ? bitLength + 1
-				: bitLength;
+		int cmp = number.compareTo(BigInteger.ZERO);
+		if (cmp == 0) {
+			// 0 is represented as a uint(size=1)
+			return 1;
+		} else {
+			int bitLength = number.bitLength();
+			return (cmp > 0) ? bitLength : bitLength + 1;
+		}
 	}
 
 	/**
@@ -234,6 +202,43 @@ public class TypeUtil {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Returns <code>true</code> if type src can be converted to type dst.
+	 * 
+	 * @param src
+	 *            a type
+	 * @param dst
+	 *            the type src should be converted to
+	 * @return <code>true</code> if type src can be converted to type dst
+	 */
+	public static boolean isConvertibleTo(Type src, Type dst) {
+		if (src == null || dst == null) {
+			return false;
+		}
+
+		if (src.isBool() && dst.isBool() || src.isFloat() && dst.isFloat()
+				|| src.isString() && dst.isString()
+				|| (src.isInt() || src.isUint())
+				&& (dst.isInt() || dst.isUint())) {
+			return true;
+		}
+
+		if (src.isList() && dst.isList()) {
+			TypeList typeSrc = (TypeList) src;
+			TypeList typeDst = (TypeList) dst;
+			// Recursively check type convertibility
+			if (isConvertibleTo(typeSrc.getType(), typeDst.getType())) {
+				if (typeSrc.getSizeExpr() != null
+						&& typeDst.getSizeExpr() != null) {
+					return typeSrc.getSize() <= typeDst.getSize();
+				}
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 }
