@@ -612,6 +612,24 @@ public interface IrFactory extends EFactory {
 	NodeWhile createNodeWhile();
 
 	/**
+	 * Returns a new object of class '<em>Param</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Param</em>'.
+	 * @generated
+	 */
+	Param createParam();
+
+	/**
+	 * Creates a parameter that contains the given variable.
+	 * 
+	 * @param variable
+	 *            a variable
+	 * @return a parameter that contains the given variable
+	 */
+	Param createParam(Var variable);
+
+	/**
 	 * Returns a new object of class '<em>Pattern</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

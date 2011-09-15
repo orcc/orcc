@@ -1106,6 +1106,32 @@ public interface IrPackage extends EPackage {
 		EReference PROCEDURE__RETURN_TYPE = eINSTANCE.getProcedure_ReturnType();
 
 		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.ParamImpl <em>Param</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.ParamImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getParam()
+		 * @generated
+		 */
+		EClass PARAM = eINSTANCE.getParam();
+
+		/**
+		 * The meta object literal for the '<em><b>Variable</b></em>' containment reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference PARAM__VARIABLE = eINSTANCE.getParam_Variable();
+
+		/**
+		 * The meta object literal for the '<em><b>By Ref</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute PARAM__BY_REF = eINSTANCE.getParam_ByRef();
+
+		/**
 		 * The meta object literal for the '
 		 * {@link net.sf.orcc.ir.impl.StateImpl <em>State</em>}' class. <!--
 		 * begin-user-doc --> <!-- end-user-doc -->
@@ -1440,7 +1466,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getDef()
 	 * @generated
 	 */
-	int DEF = 41;
+	int DEF = 42;
 
 	/**
 	 * The singleton instance of the package.
@@ -1707,7 +1733,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprBinary()
 	 * @generated
 	 */
-	int EXPR_BINARY = 25;
+	int EXPR_BINARY = 26;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprBoolImpl <em>Expr Bool</em>}' class.
@@ -1716,7 +1742,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprBool()
 	 * @generated
 	 */
-	int EXPR_BOOL = 26;
+	int EXPR_BOOL = 27;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprFloatImpl
@@ -1727,7 +1753,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprFloat()
 	 * @generated
 	 */
-	int EXPR_FLOAT = 27;
+	int EXPR_FLOAT = 28;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprIntImpl <em>Expr Int</em>}' class.
@@ -1736,7 +1762,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprInt()
 	 * @generated
 	 */
-	int EXPR_INT = 28;
+	int EXPR_INT = 29;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprListImpl <em>Expr List</em>}' class.
@@ -1745,7 +1771,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprList()
 	 * @generated
 	 */
-	int EXPR_LIST = 29;
+	int EXPR_LIST = 30;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprStringImpl
@@ -1756,7 +1782,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprString()
 	 * @generated
 	 */
-	int EXPR_STRING = 30;
+	int EXPR_STRING = 31;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprUnaryImpl
@@ -1767,7 +1793,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprUnary()
 	 * @generated
 	 */
-	int EXPR_UNARY = 31;
+	int EXPR_UNARY = 32;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprVarImpl <em>Expr Var</em>}' class.
@@ -1776,7 +1802,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprVar()
 	 * @generated
 	 */
-	int EXPR_VAR = 32;
+	int EXPR_VAR = 33;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExpressionImpl
@@ -1787,7 +1813,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExpression()
 	 * @generated
 	 */
-	int EXPRESSION = 24;
+	int EXPRESSION = 25;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.FSMImpl <em>FSM</em>}' class.
@@ -1807,7 +1833,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstruction()
 	 * @generated
 	 */
-	int INSTRUCTION = 16;
+	int INSTRUCTION = 17;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstAssignImpl
@@ -1818,7 +1844,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstAssign()
 	 * @generated
 	 */
-	int INST_ASSIGN = 17;
+	int INST_ASSIGN = 18;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstCallImpl <em>Inst Call</em>}' class.
@@ -1827,7 +1853,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstCall()
 	 * @generated
 	 */
-	int INST_CALL = 18;
+	int INST_CALL = 19;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstLoadImpl <em>Inst Load</em>}' class.
@@ -1836,7 +1862,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstLoad()
 	 * @generated
 	 */
-	int INST_LOAD = 19;
+	int INST_LOAD = 20;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstPhiImpl <em>Inst Phi</em>}' class.
@@ -1845,7 +1871,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstPhi()
 	 * @generated
 	 */
-	int INST_PHI = 20;
+	int INST_PHI = 21;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstReturnImpl
@@ -1856,7 +1882,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstReturn()
 	 * @generated
 	 */
-	int INST_RETURN = 21;
+	int INST_RETURN = 22;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstSpecificImpl
@@ -1867,7 +1893,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstSpecific()
 	 * @generated
 	 */
-	int INST_SPECIFIC = 22;
+	int INST_SPECIFIC = 23;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstStoreImpl
@@ -1878,7 +1904,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstStore()
 	 * @generated
 	 */
-	int INST_STORE = 23;
+	int INST_STORE = 24;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeImpl <em>Node</em>}' class.
@@ -1887,7 +1913,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNode()
 	 * @generated
 	 */
-	int NODE = 12;
+	int NODE = 13;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeBlockImpl
@@ -1898,7 +1924,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNodeBlock()
 	 * @generated
 	 */
-	int NODE_BLOCK = 13;
+	int NODE_BLOCK = 14;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeIfImpl <em>Node If</em>}' class.
@@ -1907,7 +1933,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNodeIf()
 	 * @generated
 	 */
-	int NODE_IF = 14;
+	int NODE_IF = 15;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeWhileImpl
@@ -1918,7 +1944,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNodeWhile()
 	 * @generated
 	 */
-	int NODE_WHILE = 15;
+	int NODE_WHILE = 16;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpBinary <em>Op Binary</em>}' enum.
@@ -1927,7 +1953,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpBinary()
 	 * @generated
 	 */
-	int OP_BINARY = 50;
+	int OP_BINARY = 51;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpUnary <em>Op Unary</em>}' enum.
@@ -1936,7 +1962,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpUnary()
 	 * @generated
 	 */
-	int OP_UNARY = 51;
+	int OP_UNARY = 52;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Entity <em>Entity</em>}'.
@@ -2405,6 +2431,43 @@ public interface IrPackage extends EPackage {
 	int PROCEDURE_FEATURE_COUNT = 7;
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ParamImpl <em>Param</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.ParamImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getParam()
+	 * @generated
+	 */
+	int PARAM = 12;
+
+	/**
+	 * The feature id for the '<em><b>Variable</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PARAM__VARIABLE = 0;
+
+	/**
+	 * The feature id for the '<em><b>By Ref</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PARAM__BY_REF = 1;
+
+	/**
+	 * The number of structural features of the '<em>Param</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PARAM_FEATURE_COUNT = 2;
+
+	/**
 	 * The number of structural features of the '<em>Node</em>' class. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -2554,7 +2617,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPredicate()
 	 * @generated
 	 */
-	int PREDICATE = 45;
+	int PREDICATE = 46;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -3068,7 +3131,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getType()
 	 * @generated
 	 */
-	int TYPE = 33;
+	int TYPE = 34;
 
 	/**
 	 * The number of structural features of the '<em>Type</em>' class. <!--
@@ -3086,7 +3149,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeBool()
 	 * @generated
 	 */
-	int TYPE_BOOL = 34;
+	int TYPE_BOOL = 35;
 
 	/**
 	 * The number of structural features of the '<em>Type Bool</em>' class. <!--
@@ -3106,7 +3169,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeFloat()
 	 * @generated
 	 */
-	int TYPE_FLOAT = 35;
+	int TYPE_FLOAT = 36;
 
 	/**
 	 * The number of structural features of the '<em>Type Float</em>' class.
@@ -3123,7 +3186,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeInt()
 	 * @generated
 	 */
-	int TYPE_INT = 36;
+	int TYPE_INT = 37;
 
 	/**
 	 * The feature id for the '<em><b>Size</b></em>' attribute. <!--
@@ -3150,7 +3213,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeList()
 	 * @generated
 	 */
-	int TYPE_LIST = 37;
+	int TYPE_LIST = 38;
 
 	/**
 	 * The feature id for the '<em><b>Size Expr</b></em>' containment reference.
@@ -3187,7 +3250,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeString()
 	 * @generated
 	 */
-	int TYPE_STRING = 38;
+	int TYPE_STRING = 39;
 
 	/**
 	 * The feature id for the '<em><b>Size</b></em>' attribute. <!--
@@ -3213,7 +3276,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeUint()
 	 * @generated
 	 */
-	int TYPE_UINT = 39;
+	int TYPE_UINT = 40;
 
 	/**
 	 * The feature id for the '<em><b>Size</b></em>' attribute. <!--
@@ -3240,7 +3303,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeVoid()
 	 * @generated
 	 */
-	int TYPE_VOID = 40;
+	int TYPE_VOID = 41;
 
 	/**
 	 * The number of structural features of the '<em>Type Void</em>' class. <!--
@@ -3277,7 +3340,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getAnnotation()
 	 * @generated
 	 */
-	int ANNOTATION = 42;
+	int ANNOTATION = 43;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' map.
@@ -3313,7 +3376,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getUse()
 	 * @generated
 	 */
-	int USE = 44;
+	int USE = 45;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.VarImpl <em>Var</em>}' class.
@@ -3322,7 +3385,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getVar()
 	 * @generated
 	 */
-	int VAR = 43;
+	int VAR = 44;
 
 	/**
 	 * The feature id for the '<em><b>Annotations</b></em>' containment reference list.
@@ -3474,7 +3537,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPortToEIntegerObjectMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = 46;
+	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = 47;
 
 	/**
 	 * The feature id for the '<em><b>Key</b></em>' reference.
@@ -3511,7 +3574,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPortToVarMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_VAR_MAP_ENTRY = 47;
+	int PORT_TO_VAR_MAP_ENTRY = 48;
 
 	/**
 	 * The feature id for the '<em><b>Key</b></em>' reference.
@@ -3548,7 +3611,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getVarToPortMapEntry()
 	 * @generated
 	 */
-	int VAR_TO_PORT_MAP_ENTRY = 48;
+	int VAR_TO_PORT_MAP_ENTRY = 49;
 
 	/**
 	 * The feature id for the '<em><b>Key</b></em>' reference.
@@ -3585,7 +3648,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getEStringToEStringMapEntry()
 	 * @generated
 	 */
-	int ESTRING_TO_ESTRING_MAP_ENTRY = 49;
+	int ESTRING_TO_ESTRING_MAP_ENTRY = 50;
 
 	/**
 	 * The feature id for the '<em><b>Key</b></em>' attribute.
@@ -5045,6 +5108,38 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getProcedure_ReturnType();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.Param <em>Param</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Param</em>'.
+	 * @see net.sf.orcc.ir.Param
+	 * @generated
+	 */
+	EClass getParam();
+
+	/**
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Param#getVariable <em>Variable</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>Variable</em>'.
+	 * @see net.sf.orcc.ir.Param#getVariable()
+	 * @see #getParam()
+	 * @generated
+	 */
+	EReference getParam_Variable();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Param#isByRef <em>By Ref</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>By Ref</em>'.
+	 * @see net.sf.orcc.ir.Param#isByRef()
+	 * @see #getParam()
+	 * @generated
+	 */
+	EAttribute getParam_ByRef();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.State <em>State</em>}'.

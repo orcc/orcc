@@ -133,6 +133,10 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 				return createProcedureAdapter();
 			}
 			@Override
+			public Adapter caseParam(Param object) {
+				return createParamAdapter();
+			}
+			@Override
 			public Adapter caseNode(Node object) {
 				return createNodeAdapter();
 			}
@@ -870,6 +874,20 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createProcedureAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Param <em>Param</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.Param
+	 * @generated
+	 */
+	public Adapter createParamAdapter() {
 		return null;
 	}
 

@@ -43,6 +43,7 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
@@ -152,8 +153,9 @@ public class Inliner extends AbstractActorVisitor<Object> {
 			newVar.setAssignable(var.isAssignable());
 			variableToLocalVariableMap.put(var, newVar);
 		}
-		for (Var var : function.getParameters()) {
+		for (Param param : function.getParameters()) {
 			Var newVar;
+			Var var = param.getVariable();
 			if (var.getType().isList()) {
 				// In case of list, the parameter could be a global variable
 				newVar = ((ExprVar) call.getParameters().get(
@@ -173,7 +175,7 @@ public class Inliner extends AbstractActorVisitor<Object> {
 		// Assign all parameters except for list
 		NodeBlock parametersBlock = IrFactory.eINSTANCE.createNodeBlock();
 		for (int i = 0; i < function.getParameters().size(); i++) {
-			Var parameter = function.getParameters().get(i);
+			Var parameter = function.getParameters().get(i).getVariable();
 			if (!parameter.getType().isList()) {
 				Expression expr = call.getParameters().get(i);
 				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(

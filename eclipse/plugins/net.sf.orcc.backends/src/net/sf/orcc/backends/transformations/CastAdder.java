@@ -182,7 +182,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 			EList<Expression> newExpressions = new BasicEList<Expression>();
 			for (int i = 0; i < oldExpression.size(); i++) {
 				parentType = call.getProcedure().getParameters().get(i)
-						.getType();
+						.getVariable().getType();
 				newExpressions.add(doSwitch(oldExpression.get(i)));
 			}
 			expressions.clear();
@@ -326,8 +326,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 						"expr_" + procedure.getName());
 				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
 						oldVar, IrUtil.copy(expr));
-				IrUtil
-						.addInstBeforeExpr(expr, assign, usePreviousJoinNode);
+				IrUtil.addInstBeforeExpr(expr, assign, usePreviousJoinNode);
 			}
 
 			Var newVar = procedure.newTempLocalVariable(

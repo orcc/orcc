@@ -36,11 +36,10 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
-
-import org.eclipse.emf.common.util.EList;
 
 /**
  * 
@@ -56,7 +55,7 @@ public class InstPhiTransformation extends AbstractActorVisitor<Object> {
 	public Object caseInstPhi(InstPhi phi) {
 		List<Expression> values = phi.getValues();
 		Var target = phi.getTarget().getVariable();
-		EList<Var> parameters = procedure.getParameters();
+		List<Param> parameters = procedure.getParameters();
 
 		// Remove local variable with index = 0 from value
 		for (Expression value : values) {
@@ -64,7 +63,7 @@ public class InstPhiTransformation extends AbstractActorVisitor<Object> {
 				Var source = ((ExprVar) value).getUse().getVariable();
 
 				// Local variable must not be a parameter of the procedure
-				if (source.getIndex() == 0 && !parameters.contains(source)) {
+				if (!parameters.contains(source.eContainer())) {
 					Expression expr;
 					if (target.getType().isBool()) {
 						expr = IrFactory.eINSTANCE.createExprBool(false);

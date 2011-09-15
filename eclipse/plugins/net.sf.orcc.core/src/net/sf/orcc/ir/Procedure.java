@@ -117,15 +117,15 @@ public interface Procedure extends EObject {
 	 * 
 	 * @return the parameter of this procedure that has the given name.
 	 */
-	Var getParameter(String name);
+	Param getParameter(String name);
 
 	/**
-	 * Returns the parameters of this procedure as an ordered map.
+	 * Returns the parameters of this procedure.
 	 * 
-	 * @return the parameters of this procedure as an ordered map
+	 * @return the parameters of this procedure
 	 * @model containment="true"
 	 */
-	EList<Var> getParameters();
+	EList<Param> getParameters();
 
 	/**
 	 * Returns the result of this procedure.

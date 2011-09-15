@@ -41,6 +41,7 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
+import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.State;
@@ -262,17 +263,17 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 			Pattern inputPattern, Pattern outputPattern) {
 		List<Expression> exprs = new ArrayList<Expression>();
 
-		List<Var> parameters = procedure.getParameters();
+		List<Param> parameters = procedure.getParameters();
 
 		// Add inputs to procedure parameters
 		for (Var var : inputPattern.getVariables()) {
-			parameters.add(var);
+			parameters.add(IrFactory.eINSTANCE.createParam(var));
 			exprs.add(IrFactory.eINSTANCE.createExprVar(var));
 		}
 
 		// Add outputs to procedure parameters
 		for (Var var : outputPattern.getVariables()) {
-			parameters.add(var);
+			parameters.add(IrFactory.eINSTANCE.createParam(var));
 			exprs.add(IrFactory.eINSTANCE.createExprVar(var));
 		}
 

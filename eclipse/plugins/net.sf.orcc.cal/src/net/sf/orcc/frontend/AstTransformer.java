@@ -79,6 +79,7 @@ import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
+import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
@@ -1305,9 +1306,10 @@ public class AstTransformer {
 	 *            a list of AST parameters
 	 */
 	private void transformParameters(List<Variable> parameters) {
+		List<Param> params = context.getProcedure().getParameters();
 		for (Variable astParameter : parameters) {
 			Var local = transformLocalVariable(astParameter);
-			context.getProcedure().getParameters().add(local);
+			params.add(IrFactory.eINSTANCE.createParam(local));
 		}
 	}
 

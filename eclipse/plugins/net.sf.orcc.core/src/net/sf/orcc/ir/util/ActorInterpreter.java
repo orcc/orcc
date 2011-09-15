@@ -47,6 +47,7 @@ import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
@@ -198,9 +199,9 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 				call.getTarget().getVariable().setValue(result);
 			}
 		} else {
-			List<Var> procParams = proc.getParameters();
+			List<Param> procParams = proc.getParameters();
 			for (int i = 0; i < callParams.size(); i++) {
-				Var procVar = procParams.get(i);
+				Var procVar = procParams.get(i).getVariable();
 				procVar.setValue(exprInterpreter.doSwitch(callParams.get(i)));
 			}
 

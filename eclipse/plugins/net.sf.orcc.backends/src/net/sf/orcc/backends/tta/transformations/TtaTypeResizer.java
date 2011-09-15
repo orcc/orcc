@@ -33,6 +33,7 @@ import java.util.List;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprUnary;
+import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
@@ -90,10 +91,17 @@ public class TtaTypeResizer extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseProcedure(Procedure procedure) {
-		checkVariables(procedure.getParameters());
+		checkParameters(procedure.getParameters(), -1);
 		checkVariables(procedure.getLocals());
 		checkType(procedure.getReturnType());
 		return super.caseProcedure(procedure);
+	}
+
+	private void checkParameters(List<Param> parameters, int newSize) {
+		for (Param param : parameters) {
+			Var var = param.getVariable();
+			checkType(var.getType(), newSize);
+		}
 	}
 
 	private void checkPorts(List<Port> ports, int newSize) {
@@ -133,14 +141,14 @@ public class TtaTypeResizer extends AbstractActorVisitor<Object> {
 		}
 	}
 
+	private void checkVariables(List<Var> vars) {
+		checkVariables(vars, -1);
+	}
+
 	private void checkVariables(List<Var> vars, int newSize) {
 		for (Var var : vars) {
 			checkType(var.getType(), newSize);
 		}
-	}
-
-	private void checkVariables(List<Var> vars) {
-		checkVariables(vars, -1);
 	}
 
 	private int getIntSize(int size) {

@@ -133,8 +133,8 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 		varNum.setType(factory.createTypeInt(16));
 		Var varDenum = factory.createVarInt("den", true, 0);
 		varDenum.setType(factory.createTypeInt(16));
-		divProc.getParameters().add(varNum);
-		divProc.getParameters().add(varDenum);
+		divProc.getParameters().add(factory.createParam(varNum));
+		divProc.getParameters().add(factory.createParam(varDenum));
 
 		// Create needed local variables
 		Var result = divProc.newTempLocalVariable(factory.createTypeInt(16),

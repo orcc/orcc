@@ -115,7 +115,8 @@ public class StoreOnceTransformation extends AbstractActorVisitor<Object> {
 			loadedVars.add(global);
 
 			Var local = entry.getValue();
-			procedure.getParameters().add(i++, local);
+			procedure.getParameters().add(i++,
+					IrFactory.eINSTANCE.createParam(local));
 		}
 
 		procsToLoadedVarsMap.put(procedure, loadedVars);
@@ -140,8 +141,8 @@ public class StoreOnceTransformation extends AbstractActorVisitor<Object> {
 			Var local = globalToLocalMap.get(var);
 			if (local == null) {
 				// variable not loaded yet, create new local
-				local = procedure.newTempLocalVariable(var.getType(),
-						"local_" + var.getName());
+				local = procedure.newTempLocalVariable(var.getType(), "local_"
+						+ var.getName());
 				globalToLocalMap.put(var, local);
 				globalsToLoad.put(var, local);
 			}

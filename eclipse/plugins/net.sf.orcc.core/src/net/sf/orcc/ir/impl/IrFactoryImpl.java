@@ -122,6 +122,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 			case IrPackage.TAG: return createTag();
 			case IrPackage.PATTERN: return createPattern();
 			case IrPackage.PROCEDURE: return createProcedure();
+			case IrPackage.PARAM: return createParam();
 			case IrPackage.NODE_BLOCK: return createNodeBlock();
 			case IrPackage.NODE_IF: return createNodeIf();
 			case IrPackage.NODE_WHILE: return createNodeWhile();
@@ -743,6 +744,23 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		OpUnary result = OpUnary.get(initialValue);
 		if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
 		return result;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Param createParam() {
+		ParamImpl param = new ParamImpl();
+		return param;
+	}
+
+	@Override
+	public Param createParam(Var variable) {
+		ParamImpl param = new ParamImpl();
+		param.setVariable(variable);
+		return param;
 	}
 
 	/**

@@ -676,6 +676,21 @@ public class IrSwitch<T> extends Switch<T> {
 	}
 
 	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Param</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Param</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseParam(Param object) {
+		return null;
+	}
+
+	/**
 	 * Returns the result of interpreting the object as an instance of '<em>Tag</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
@@ -937,6 +952,12 @@ public class IrSwitch<T> extends Switch<T> {
 			case IrPackage.PROCEDURE: {
 				Procedure procedure = (Procedure)theEObject;
 				T result = caseProcedure(procedure);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.PARAM: {
+				Param param = (Param)theEObject;
+				T result = caseParam(param);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}

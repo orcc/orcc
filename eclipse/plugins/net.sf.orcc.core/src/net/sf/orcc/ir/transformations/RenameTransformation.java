@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
@@ -80,17 +81,6 @@ public class RenameTransformation extends AbstractActorVisitor<Object> {
 		this.replacement = replacement;
 	}
 
-	private void checkVariables(List<Var> variables) {
-		for (Var var : variables) {
-			String name = var.getName();
-			if (transformations != null && transformations.containsKey(name)) {
-				var.setName(transformations.get(name));
-			} else if (pattern != null) {
-				var.setName(pattern.matcher(name).replaceAll(replacement));
-			}
-		}
-	}
-
 	@Override
 	public Object caseActor(Actor actor) {
 		checkVariables(actor.getParameters());
@@ -108,9 +98,30 @@ public class RenameTransformation extends AbstractActorVisitor<Object> {
 			procedure.setName(pattern.matcher(name).replaceAll(replacement));
 		}
 
-		checkVariables(procedure.getParameters());
+		checkParameters(procedure.getParameters());
 		checkVariables(procedure.getLocals());
 		return null;
+	}
+
+	private void checkParameters(List<Param> parameters) {
+		for (Param param : parameters) {
+			checkVariable(param.getVariable());
+		}
+	}
+
+	private void checkVariable(Var var) {
+		String name = var.getName();
+		if (transformations != null && transformations.containsKey(name)) {
+			var.setName(transformations.get(name));
+		} else if (pattern != null) {
+			var.setName(pattern.matcher(name).replaceAll(replacement));
+		}
+	}
+
+	private void checkVariables(List<Var> variables) {
+		for (Var var : variables) {
+			checkVariable(var);
+		}
 	}
 
 }

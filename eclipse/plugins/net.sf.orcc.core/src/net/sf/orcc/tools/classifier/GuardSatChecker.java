@@ -49,6 +49,7 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
@@ -358,10 +359,11 @@ public class GuardSatChecker {
 
 			// parameters
 			builder.append(" (");
-			for (Var param : procedure.getParameters()) {
+			for (Param param : procedure.getParameters()) {
+				Var var = param.getVariable();
 				builder.append("(");
-				builder.append(param.getName());
-				String type = new TypeSwitchBitVec().doSwitch(param.getType());
+				builder.append(var.getName());
+				String type = new TypeSwitchBitVec().doSwitch(var.getType());
 				builder.append(" ");
 				builder.append(type);
 				builder.append(") ");

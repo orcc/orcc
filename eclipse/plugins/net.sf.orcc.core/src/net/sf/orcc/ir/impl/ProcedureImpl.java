@@ -15,6 +15,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Node;
+import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -95,7 +96,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 */
 	private Map<String, Var> mapLocals;
 
-	private Map<String, Var> mapParameters;
+	private Map<String, Param> mapParameters;
 
 	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
@@ -140,7 +141,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Var> parameters;
+	protected EList<Param> parameters;
 
 	private Expression result;
 
@@ -161,7 +162,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 		super();
 
 		mapLocals = new HashMap<String, Var>();
-		mapParameters = new HashMap<String, Var>();
+		mapParameters = new HashMap<String, Param>();
 
 		eAdapters().add(new MapAdapter());
 	}
@@ -278,7 +279,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 				return;
 			case IrPackage.PROCEDURE__PARAMETERS:
 				getParameters().clear();
-				getParameters().addAll((Collection<? extends Var>)newValue);
+				getParameters().addAll((Collection<? extends Param>)newValue);
 				return;
 			case IrPackage.PROCEDURE__RETURN_TYPE:
 				setReturnType((Type)newValue);
@@ -406,7 +407,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	}
 
 	@Override
-	public Var getParameter(String name) {
+	public Param getParameter(String name) {
 		return mapParameters.get(name);
 	}
 
@@ -414,14 +415,14 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Var> getParameters() {
+	public EList<Param> getParameters() {
 		if (parameters == null) {
-			parameters = new EObjectContainmentEList<Var>(Var.class, this, IrPackage.PROCEDURE__PARAMETERS);
+			parameters = new EObjectContainmentEList<Param>(Param.class, this, IrPackage.PROCEDURE__PARAMETERS);
 		}
 		return parameters;
 	}
 
-	public Map<String, Var> getParametersMap() {
+	public Map<String, Param> getParametersMap() {
 		return mapParameters;
 	}
 
