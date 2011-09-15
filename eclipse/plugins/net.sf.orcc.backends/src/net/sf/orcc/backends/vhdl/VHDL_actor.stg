@@ -76,7 +76,7 @@ signalDeclaration(variable) ::= <<
 -- RAM signals for "<variable.name>"
 <actor.templateData.ramMap.(variable).ports:{port|
 signal <variable.name>_wren_p<port.number>       : std_logic;
-signal <variable.name>_address_p<port.number>    : std_logic_vector(bit_width(<listSize(variable.type.dimensions)>)-1 downto 0);
+signal <variable.name>_address_p<port.number>    : std_logic_vector(bit_width(<listSize(variable.type.dimensions)> -1)-1 downto 0);
 signal <variable.name>_data_p<port.number>       : std_logic_vector(<variable.type.innermostType.sizeInBits> -1 downto 0);
 signal <variable.name>_q_p<port.number>          : std_logic_vector(<variable.type.innermostType.sizeInBits> -1 downto 0);}>
 <else>
@@ -111,7 +111,7 @@ ramSignalAssociation(variable, port) ::= <<
 <if (port.read || port.written)>
     address_p<port.number> =\> <variable.name>_address_p<port.number>,
 <else>
-    address_p<port.number> =\> std_logic_vector(to_unsigned(0, bit_width(<listSize(variable.type.dimensions)>))),
+    address_p<port.number> =\> std_logic_vector(to_unsigned(0, bit_width(<listSize(variable.type.dimensions)> -1))),
 <endif>
 <if (port.written)>
     data_p<port.number>    =\> <variable.name>_data_p<port.number>,
