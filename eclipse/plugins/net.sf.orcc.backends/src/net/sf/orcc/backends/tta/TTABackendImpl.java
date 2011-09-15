@@ -48,7 +48,8 @@ import net.sf.orcc.backends.transformations.tac.TacTransformation;
 import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.tta.architecture.TTA;
 import net.sf.orcc.backends.tta.architecture.util.ArchitecturePrinter;
-import net.sf.orcc.backends.tta.transformations.TtaTypeResizer;
+import net.sf.orcc.backends.tta.transformations.ActorTypeResizer;
+import net.sf.orcc.backends.tta.transformations.BroadcastTypeResizer;
 import net.sf.orcc.backends.xlim.transformations.InstPhiTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.transformations.BlockCombine;
@@ -101,7 +102,7 @@ public class TTABackendImpl extends AbstractBackend {
 	protected void doTransformActor(Actor actor) throws OrccException {
 
 		ActorVisitor<?>[] transformations = { new SSATransformation(),
-				new TtaTypeResizer(), new BoolToIntTransformation(),
+				new BoolToIntTransformation(), new ActorTypeResizer(), 
 				new PrintlnTransformation(),
 				new RenameTransformation(this.transformations),
 				new TacTransformation(true), new InstPhiTransformation(),
@@ -118,6 +119,7 @@ public class TTABackendImpl extends AbstractBackend {
 	private void doTransformNetwork(Network network) throws OrccException {
 		network.flatten();
 		new BroadcastAdder().transform(network);
+		new BroadcastTypeResizer().transform(network);
 	}
 
 	@Override

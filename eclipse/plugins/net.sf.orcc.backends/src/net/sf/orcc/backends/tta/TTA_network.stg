@@ -42,12 +42,18 @@ architecture bdf_type of top is
   -- Components declaration
   ---------------------------------------------------------------------------
   component fifo
+    generic
+        (size           : integer := 256;
+         width          : integer := 32;
+         widthu         : integer := 8;
+         device_family  : string  := "Stratix III"
+         );
     port(wrreq			: in  std_logic;
          reset_n		: in  std_logic;
          clk			: in  std_logic;
          rdreq			: in  std_logic;
-         data			: in  std_logic_vector(31 downto 0);
-         q				: out std_logic_vector(31 downto 0);
+         data			: in  std_logic_vector(width-1 downto 0);
+         q				: out std_logic_vector(width-1 downto 0);
          status			: out std_logic_vector(31 downto 0)
          );
   end component; 
@@ -187,7 +193,7 @@ inputPortSignals(port, connection) ::= <<
 ---- Input port: <port.name>
 <if(!port.native)
 >signal fifo_<indexConnection(connection)>_wrreq		: std_logic;
-signal fifo_<indexConnection(connection)>_data		: std_logic_vector(31 downto 0);<
+signal fifo_<indexConnection(connection)>_data		: std_logic_vector(31 downto 0) := (others =\> '0');<
 elseif(!connection.source)
 >signal s_<indexConnection(connection)> 		: std_logic_vector(<port.type.size>-1 downto 0);<
 endif>
@@ -197,7 +203,7 @@ outputPortSignals(port, connection) ::= <<
 ---- Output port: <port.name>
 <if(!port.native)
 >signal fifo_<indexConnection(connection)>_rdreq		: std_logic;
-signal fifo_<indexConnection(connection)>_q			: std_logic_vector(31 downto 0);
+signal fifo_<indexConnection(connection)>_q			: std_logic_vector(31 downto 0) := (others =\> '0');
 signal fifo_<indexConnection(connection)>_status		: std_logic_vector(31 downto 0);<
 else
 >signal s_<indexConnection(connection)> 		: std_logic_vector(<port.type.size>-1 downto 0);<
@@ -232,12 +238,13 @@ assignFifos(connections) ::= <<
 assignFifo(connection) ::= <<
 <if(!connection.source.native && !connection.target.native)
 >fifo_<indexConnection(connection)> : fifo
+  generic map(width =\> <connection.source.type.sizeInBits>)
   port map(wrreq   =\> fifo_<indexConnection(connection)>_wrreq,
            reset_n =\> reset_n,
            clk     =\> clk,
            rdreq   =\> fifo_<indexConnection(connection)>_rdreq,
-           data    =\> fifo_<indexConnection(connection)>_data,
-           q       =\> fifo_<indexConnection(connection)>_q,
+           data    =\> fifo_<indexConnection(connection)>_data(<connection.source.type.sizeInBits>-1 downto 0),
+           q       =\> fifo_<indexConnection(connection)>_q(<connection.target.type.sizeInBits>-1 downto 0),
            status  =\> fifo_<indexConnection(connection)>_status);<
 endif>
 >>

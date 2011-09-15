@@ -51,9 +51,9 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * @author Herve Yviquel
  * 
  */
-public class TtaTypeResizer extends AbstractActorVisitor<Object> {
+public class ActorTypeResizer extends AbstractActorVisitor<Object> {
 
-	public TtaTypeResizer() {
+	public ActorTypeResizer() {
 		super(true);
 	}
 
@@ -61,8 +61,8 @@ public class TtaTypeResizer extends AbstractActorVisitor<Object> {
 	public Object caseActor(Actor actor) {
 		checkVariables(actor.getParameters());
 		checkVariables(actor.getStateVars());
-		checkPorts(actor.getInputs(), 32);
-		checkPorts(actor.getOutputs(), 32);
+		checkPorts(actor.getInputs());
+		checkPorts(actor.getOutputs());
 
 		return super.caseActor(actor);
 	}
@@ -83,7 +83,7 @@ public class TtaTypeResizer extends AbstractActorVisitor<Object> {
 	public Object casePattern(Pattern pattern) {
 		for (Var var : pattern.getVariables()) {
 			if (!pattern.getPort(var).isNative()) {
-				checkType(var.getType(), 32);
+				checkType(var.getType());
 			}
 		}
 		return null;
@@ -91,63 +91,46 @@ public class TtaTypeResizer extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseProcedure(Procedure procedure) {
-		checkParameters(procedure.getParameters(), -1);
+		checkParameters(procedure.getParameters());
 		checkVariables(procedure.getLocals());
 		checkType(procedure.getReturnType());
 		return super.caseProcedure(procedure);
 	}
 
-	private void checkParameters(List<Param> parameters, int newSize) {
+	private void checkParameters(List<Param> parameters) {
 		for (Param param : parameters) {
 			Var var = param.getVariable();
-			checkType(var.getType(), newSize);
+			checkType(var.getType());
 		}
 	}
 
-	private void checkPorts(List<Port> ports, int newSize) {
+	private void checkPorts(List<Port> ports) {
 		for (Port port : ports) {
 			if (!port.isNative()) {
-				checkType(port.getType(), newSize);
+				checkType(port.getType());
 			}
 		}
 	}
 
 	private void checkType(Type type) {
-		checkType(type, -1);
-	}
-
-	private void checkType(Type type, int newSize) {
 		int size;
-
 		if (type.isInt()) {
 			TypeInt intType = (TypeInt) type;
-			if (newSize == -1) {
-				size = getIntSize(intType.getSize());
-			} else {
-				size = newSize;
-			}
+			size = getIntSize(intType.getSize());
 			intType.setSize(size);
 		} else if (type.isUint()) {
 			TypeUint uintType = (TypeUint) type;
-			if (newSize == -1) {
-				size = getIntSize(uintType.getSize());
-			} else {
-				size = newSize;
-			}
+			size = getIntSize(uintType.getSize());
 			uintType.setSize(size);
 		} else if (type.isList()) {
 			TypeList listType = (TypeList) type;
-			checkType(listType.getType(), newSize);
+			checkType(listType.getType());
 		}
 	}
 
 	private void checkVariables(List<Var> vars) {
-		checkVariables(vars, -1);
-	}
-
-	private void checkVariables(List<Var> vars, int newSize) {
 		for (Var var : vars) {
-			checkType(var.getType(), newSize);
+			checkType(var.getType());
 		}
 	}
 
