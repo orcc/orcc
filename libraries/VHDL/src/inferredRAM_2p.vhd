@@ -60,12 +60,12 @@ entity inferredRAM_2p is
     clk        : in  std_logic;
     --
     wren_p1    : in  std_logic;
-    address_p1 : in  std_logic_vector(bit_width(depth)-1 downto 0);
+    address_p1 : in  std_logic_vector(bit_width(depth - 1) -1 downto 0);
     data_p1    : in  std_logic_vector(width -1 downto 0);
     q_p1       : out std_logic_vector(width -1 downto 0);
     --
     wren_p2    : in  std_logic;
-    address_p2 : in  std_logic_vector(bit_width(depth)-1 downto 0);
+    address_p2 : in  std_logic_vector(bit_width(depth - 1) -1 downto 0);
     data_p2    : in  std_logic_vector(width -1 downto 0);
     q_p2       : out std_logic_vector(width -1 downto 0));
 end inferredRAM_2p;
