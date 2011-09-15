@@ -212,16 +212,19 @@ public class AllTests {
 		Variable x = stateVars.get(0);
 		Variable y = stateVars.get(1);
 		Type type = Typer.getType(x);
-		Assert.assertTrue("type of x should be int(size=5)",
-				EcoreUtil.equals(type, IrFactory.eINSTANCE.createTypeInt(5)));
+		Assert.assertTrue("type of x should be uint(size=3)",
+				EcoreUtil.equals(type, IrFactory.eINSTANCE.createTypeUint(3)));
 
 		type = Typer.getType(x.getValue());
-		Assert.assertTrue("type of value of x should be int(size=4)",
-				EcoreUtil.equals(type, IrFactory.eINSTANCE.createTypeInt(4)));
+		Assert.assertTrue("type of value of x should be uint(size=3)",
+				EcoreUtil.equals(type, IrFactory.eINSTANCE.createTypeUint(3)));
 
+		// type of "x + 1" is type of "8", i.e. uint(size=4)
+		// but because the expression is assigned to y whose type is int(...)
+		// it becomes int(size=5)
 		type = Typer.getType(y.getValue());
-		Assert.assertTrue("type of value of y should be int(size=6)",
-				EcoreUtil.equals(type, IrFactory.eINSTANCE.createTypeInt(6)));
+		Assert.assertTrue("type of value of y should be int(size=5)",
+				EcoreUtil.equals(type, IrFactory.eINSTANCE.createTypeInt(5)));
 	}
 
 	@Test
