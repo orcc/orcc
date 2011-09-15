@@ -579,11 +579,6 @@ public class VarImpl extends EObjectImpl implements Var {
 	}
 
 	@Override
-	public boolean isIndexed() {
-		return index != 0;
-	}
-
-	@Override
 	public boolean isInitialized() {
 		return (initialValue != null || value != null);
 	}

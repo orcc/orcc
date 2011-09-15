@@ -162,14 +162,6 @@ public interface Var extends EObject {
 	boolean isGlobal();
 
 	/**
-	 * Returns true if this variable has been assigned to an SSA index of this
-	 * variable.
-	 * 
-	 * @return true if the variable has an index otherwise false.
-	 */
-	boolean isIndexed();
-
-	/**
 	 * Returns <code>true</code> if this state variable has an initial value.
 	 * 
 	 * @return <code>true</code> if this state variable has an initial value
