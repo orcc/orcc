@@ -41,6 +41,7 @@ import net.sf.orcc.cal.CalConstants;
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
+import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstState;
@@ -120,6 +121,16 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 			} else {
 				ports.add(port);
 			}
+
+			AstExpression astRepeat = pattern.getRepeat();
+			if (astRepeat != null) {
+				int repeat = Evaluator.getIntValue(astRepeat);
+				if (repeat <= 0) {
+					error("This repeat clause must evaluate to a compile-time "
+							+ "constant greater than zero", pattern,
+							eINSTANCE.getInputPattern_Repeat(), -1);
+				}
+			}
 		}
 	}
 
@@ -139,6 +150,16 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 						eINSTANCE.getOutputPattern_Port(), -1);
 			} else {
 				ports.add(port);
+			}
+
+			AstExpression astRepeat = pattern.getRepeat();
+			if (astRepeat != null) {
+				int repeat = Evaluator.getIntValue(astRepeat);
+				if (repeat <= 0) {
+					error("This repeat clause must evaluate to a compile-time "
+							+ "constant greater than zero", pattern,
+							eINSTANCE.getOutputPattern_Repeat(), -1);
+				}
 			}
 		}
 	}
