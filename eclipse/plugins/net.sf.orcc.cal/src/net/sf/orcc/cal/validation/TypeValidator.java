@@ -37,6 +37,9 @@ import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstProcedure;
+import net.sf.orcc.cal.cal.AstTypeInt;
+import net.sf.orcc.cal.cal.AstTypeList;
+import net.sf.orcc.cal.cal.AstTypeUint;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.ExpressionBinary;
@@ -557,6 +560,45 @@ public class TypeValidator extends AbstractCalJavaValidator {
 						index);
 			}
 			break;
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkTypeInt(AstTypeInt type) {
+		AstExpression size = type.getSize();
+		if (size != null) {
+			int value = Evaluator.getIntValue(size);
+			if (value <= 0) {
+				error("This size must evaluate to a compile-time "
+						+ "constant greater than zero", type,
+						eINSTANCE.getAstTypeInt_Size(), -1);
+			}
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkTypeList(AstTypeList type) {
+		AstExpression size = type.getSize();
+		if (size != null) {
+			int value = Evaluator.getIntValue(size);
+			if (value <= 0) {
+				error("This size must evaluate to a compile-time "
+						+ "constant greater than zero", type,
+						eINSTANCE.getAstTypeList_Size(), -1);
+			}
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkTypeUint(AstTypeUint type) {
+		AstExpression size = type.getSize();
+		if (size != null) {
+			int value = Evaluator.getIntValue(size);
+			if (value <= 0) {
+				error("This size must evaluate to a compile-time "
+						+ "constant greater than zero", type,
+						eINSTANCE.getAstTypeUint_Size(), -1);
+			}
 		}
 	}
 

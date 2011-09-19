@@ -309,4 +309,11 @@ public class AllTests {
 				parseAndValidate(prefix + "xfail/TypeError2.cal"));
 	}
 
+	@Test
+	public void xfailCheckTypeError3() throws Exception {
+		Assert.assertNull(
+				"the size of a type must be a compile-time constant > 0",
+				parseAndValidate(prefix + "xfail/TypeError3.cal"));
+	}
+
 }
