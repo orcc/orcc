@@ -208,7 +208,11 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 			List<Param> procParams = proc.getParameters();
 			for (int i = 0; i < callParams.size(); i++) {
 				Var procVar = procParams.get(i).getVariable();
-				procVar.setValue(exprInterpreter.doSwitch(callParams.get(i)));
+				Arg arg = callParams.get(i);
+				if (arg.isByVal()) {
+					Expression value = ((ArgByVal) arg).getValue();
+					procVar.setValue(exprInterpreter.doSwitch(value));
+				}
 			}
 
 			// Interpret procedure body
