@@ -283,15 +283,24 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public Arg createArgByValue(Expression value) {
+	public Arg createArgByVal(Expression value) {
 		ArgByValImpl argByVal = new ArgByValImpl();
 		argByVal.setValue(value);
 		return argByVal;
 	}
 
 	@Override
-	public Arg createArgByValue(Var variable) {
-		return createArgByValue(createExprVar(variable));
+	public Arg createArgByVal(Var variable) {
+		return createArgByVal(createExprVar(variable));
+	}
+
+	@Override
+	public List<Arg> createArgsByVal(List<Expression> expressions) {
+		List<Arg> args = new ArrayList<Arg>(expressions.size());
+		for (Expression expr : expressions) {
+			args.add(createArgByVal(expr));
+		}
+		return args;
 	}
 
 	/**
@@ -577,9 +586,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		}
 		instCall.setProcedure(procedure);
 		if (parameters != null) {
-			for (Expression expr : parameters) {
-				instCall.getParameters().add(createArgByValue(expr));
-			}
+			instCall.getParameters().addAll(createArgsByVal(parameters));
 		}
 		return instCall;
 	}
@@ -687,7 +694,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		instReturn.setValue(value);
 		return instReturn;
 	}
-
+	
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -735,7 +742,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		indexes.add(createExprInt(index));
 		return createInstStore(target, indexes, source);
 	}
-	
+
 	@Override
 	public InstStore createInstStore(Var target, int index,
 			Var source) {

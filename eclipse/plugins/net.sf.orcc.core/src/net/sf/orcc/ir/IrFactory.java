@@ -106,8 +106,8 @@ public interface IrFactory extends EFactory {
 	 *            an expression
 	 * @return a new argument by value with the given expression
 	 */
-	Arg createArgByValue(Expression value);
-
+	Arg createArgByVal(Expression value);
+	
 	/**
 	 * Creates a new argument by value whose value is the given variable.
 	 * 
@@ -115,7 +115,16 @@ public interface IrFactory extends EFactory {
 	 *            a variable to pass as value
 	 * @return a new argument by value whose value is the given variable
 	 */
-	Arg createArgByValue(Var variable);
+	Arg createArgByVal(Var variable);
+
+	/**
+	 * Creates new arguments by value with the given expressions.
+	 * 
+	 * @param values
+	 *            a list of expressions
+	 * @return new arguments by value with the given expressions
+	 */
+	List<Arg> createArgsByVal(List<Expression> values);
 
 	/**
 	 * Returns a new object of class '<em>Def</em>'.
