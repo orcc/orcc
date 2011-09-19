@@ -150,7 +150,7 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="InstCall" eSuperTypes="#//Instruction">
     <eStructuralFeatures xsi:type="ecore:EReference" name="parameters" upperBound="-1"
-        eType="#//Expression" containment="true" resolveProxies="false"/>
+        eType="#//Arg" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="procedure" eType="#//Procedure"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="#//Def"
         containment="true" resolveProxies="false"/>
@@ -180,6 +180,17 @@
         eType="#//Expression" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="#//Def"
         containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="#//Expression"
+        containment="true" resolveProxies="false"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Arg" abstract="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="ArgByRef" eSuperTypes="#//Arg">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="indexes" upperBound="-1"
+        eType="#//Expression" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="use" eType="#//Use" containment="true"
+        resolveProxies="false"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ArgByVal" eSuperTypes="#//Arg">
     <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="#//Expression"
         containment="true" resolveProxies="false"/>
   </eClassifiers>

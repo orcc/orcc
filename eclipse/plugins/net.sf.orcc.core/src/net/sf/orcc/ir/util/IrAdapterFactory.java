@@ -185,6 +185,18 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 				return createInstStoreAdapter();
 			}
 			@Override
+			public Adapter caseArg(Arg object) {
+				return createArgAdapter();
+			}
+			@Override
+			public Adapter caseArgByRef(ArgByRef object) {
+				return createArgByRefAdapter();
+			}
+			@Override
+			public Adapter caseArgByVal(ArgByVal object) {
+				return createArgByValAdapter();
+			}
+			@Override
 			public Adapter caseExpression(Expression object) {
 				return createExpressionAdapter();
 			}
@@ -776,6 +788,48 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createInstStoreAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Arg <em>Arg</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.Arg
+	 * @generated
+	 */
+	public Adapter createArgAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.ArgByRef <em>Arg By Ref</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.ArgByRef
+	 * @generated
+	 */
+	public Adapter createArgByRefAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.ArgByVal <em>Arg By Val</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.ArgByVal
+	 * @generated
+	 */
+	public Adapter createArgByValAdapter() {
 		return null;
 	}
 

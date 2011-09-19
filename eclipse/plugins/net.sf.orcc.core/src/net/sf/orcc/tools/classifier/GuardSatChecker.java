@@ -37,6 +37,8 @@ import java.util.Map;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Arg;
+import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprInt;
@@ -279,8 +281,11 @@ public class GuardSatChecker {
 
 				Var variable = call.getTarget().getVariable();
 				String term = "(" + call.getProcedure().getName();
-				for (Expression expr : call.getParameters()) {
-					term += " " + doSwitch(expr);
+				for (Arg arg : call.getParameters()) {
+					if (arg.isByVal()) {
+						Expression expr = ((ArgByVal) arg).getValue();
+						term += " " + doSwitch(expr);
+					}
 				}
 				term += ")";
 				addLet(variable, term);

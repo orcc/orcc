@@ -54,7 +54,6 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.EcoreHelper;
 
-import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -233,43 +232,34 @@ public class SSATransformation extends AbstractActorVisitor<Object> {
 	}
 
 	/**
-	 * Replaces uses in the given expression.
+	 * Replaces uses in the given object.
 	 * 
-	 * @param expression
-	 *            an expression
+	 * @param object
+	 *            an object
 	 */
-	private void replaceUses(Expression expression) {
-		if (expression == null) {
-			return;
-		}
-
-		TreeIterator<EObject> it = expression.eAllContents();
-		while (it.hasNext()) {
-			EObject descendant = it.next();
-			if (descendant instanceof Use) {
-				Use use = (Use) descendant;
-				Var oldVar = use.getVariable();
-				if (oldVar.isLocal()) {
-					Var newVar = uses.get(oldVar.getName());
-					if (newVar != null) {
-						// newVar may be null if oldVar is a function parameter
-						// for instance
-						use.setVariable(newVar);
-					}
+	private void replaceUses(EObject eObject) {
+		for (Use use : EcoreHelper.getObjects(eObject, Use.class)) {
+			Var oldVar = use.getVariable();
+			if (oldVar.isLocal()) {
+				Var newVar = uses.get(oldVar.getName());
+				if (newVar != null) {
+					// newVar may be null if oldVar is a function parameter
+					// for instance
+					use.setVariable(newVar);
 				}
 			}
 		}
 	}
 
 	/**
-	 * Replaces uses of oldVar by newVar in the given expressions.
+	 * Replaces uses of oldVar by newVar in the given objects.
 	 * 
-	 * @param expressions
-	 *            a list of expressions
+	 * @param objects
+	 *            a list of objects
 	 */
-	private void replaceUses(List<Expression> expressions) {
-		for (Expression expression : expressions) {
-			replaceUses(expression);
+	private void replaceUses(List<? extends EObject> eObjects) {
+		for (EObject eObject : eObjects) {
+			replaceUses(eObject);
 		}
 	}
 

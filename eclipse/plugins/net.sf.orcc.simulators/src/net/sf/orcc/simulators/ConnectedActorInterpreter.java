@@ -35,6 +35,8 @@ import java.util.Map;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Arg;
+import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.Expression;
@@ -86,14 +88,17 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 	 */
 	@Override
 	protected Object callNativeProcedure(Procedure procedure,
-			List<Expression> parameters) {
-		int numParams = parameters.size();
+			List<Arg> arguments) {
+		int numParams = arguments.size();
 		Class<?>[] parameterTypes = new Class<?>[numParams];
 		Object[] args = new Object[numParams];
 		int i = 0;
-		for (Expression parameter : parameters) {
-			args[i] = exprInterpreter.doSwitch(parameter);
-			parameterTypes[i] = args[i].getClass();
+		for (Arg arg : arguments) {
+			if (arg.isByVal()) {
+				Expression expr = ((ArgByVal) arg).getValue();
+				args[i] = exprInterpreter.doSwitch(expr);
+				parameterTypes[i] = args[i].getClass();
+			}
 
 			i++;
 		}
@@ -101,7 +106,8 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		String methodName = procedure.getName();
 
 		try {
-			// get packageName and containerName for calling the correct native function
+			// get packageName and containerName for calling the correct native
+			// function
 			Entity entity = (Entity) procedure.eContainer();
 			String packageName = entity.getPackage() + ".impl";
 			String containerName = entity.getSimpleName();
@@ -118,18 +124,20 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 	}
 
 	@Override
-	protected void callPrintProcedure(Procedure procedure,
-			List<Expression> parameters) {
-		for (int i = 0; i < parameters.size(); i++) {
-			if (parameters.get(i).isStringExpr()) {
-				// String characters rework for escaped control
-				// management
-				String str = ((ExprString) parameters.get(i)).getValue();
-				String unescaped = OrccUtil.getUnescapedString(str);
-				listener.writeText(unescaped);
-			} else {
-				Object value = exprInterpreter.doSwitch(parameters.get(i));
-				listener.writeText(String.valueOf(value));
+	protected void callPrintProcedure(Procedure procedure, List<Arg> arguments) {
+		for (Arg arg : arguments) {
+			if (arg.isByVal()) {
+				Expression expr = ((ArgByVal) arg).getValue();
+				if (expr.isStringExpr()) {
+					// String characters rework for escaped control
+					// management
+					String str = ((ExprString) expr).getValue();
+					String unescaped = OrccUtil.getUnescapedString(str);
+					listener.writeText(unescaped);
+				} else {
+					Object value = exprInterpreter.doSwitch(expr);
+					listener.writeText(String.valueOf(value));
+				}
 			}
 		}
 	}

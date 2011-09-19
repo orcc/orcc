@@ -571,6 +571,51 @@ public class IrSwitch<T> extends Switch<T> {
 	}
 
 	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Arg</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Arg</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseArg(Arg object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Arg By Ref</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Arg By Ref</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseArgByRef(ArgByRef object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Arg By Val</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Arg By Val</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseArgByVal(ArgByVal object) {
+		return null;
+	}
+
+	/**
 	 * Returns the result of interpreting the object as an instance of '<em>Node</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
@@ -1040,6 +1085,26 @@ public class IrSwitch<T> extends Switch<T> {
 				InstStore instStore = (InstStore)theEObject;
 				T result = caseInstStore(instStore);
 				if (result == null) result = caseInstruction(instStore);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.ARG: {
+				Arg arg = (Arg)theEObject;
+				T result = caseArg(arg);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.ARG_BY_REF: {
+				ArgByRef argByRef = (ArgByRef)theEObject;
+				T result = caseArgByRef(argByRef);
+				if (result == null) result = caseArg(argByRef);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.ARG_BY_VAL: {
+				ArgByVal argByVal = (ArgByVal)theEObject;
+				T result = caseArgByVal(argByVal);
+				if (result == null) result = caseArg(argByVal);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}

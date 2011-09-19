@@ -82,6 +82,42 @@ public interface IrFactory extends EFactory {
 	Annotation createAnnotation(String name);
 
 	/**
+	 * Returns a new object of class '<em>Arg By Ref</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Arg By Ref</em>'.
+	 * @generated
+	 */
+	ArgByRef createArgByRef();
+
+	/**
+	 * Returns a new object of class '<em>Arg By Val</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Arg By Val</em>'.
+	 * @generated
+	 */
+	ArgByVal createArgByVal();
+
+	/**
+	 * Creates a new argument by value with the given expression.
+	 * 
+	 * @param value
+	 *            an expression
+	 * @return a new argument by value with the given expression
+	 */
+	Arg createArgByValue(Expression value);
+
+	/**
+	 * Creates a new argument by value whose value is the given variable.
+	 * 
+	 * @param variable
+	 *            a variable to pass as value
+	 * @return a new argument by value whose value is the given variable
+	 */
+	Arg createArgByValue(Var variable);
+
+	/**
 	 * Returns a new object of class '<em>Def</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -221,7 +257,7 @@ public interface IrFactory extends EFactory {
 	ExprVar createExprVar(Use use);
 
 	ExprVar createExprVar(Var variable);
-
+	
 	/**
 	 * Returns a new object of class '<em>FSM</em>'.
 	 * <!-- begin-user-doc -->
@@ -239,7 +275,7 @@ public interface IrFactory extends EFactory {
 	 * @generated
 	 */
 	InstAssign createInstAssign();
-
+	
 	/**
 	 * Creates an InstAssign with the given location, target and value.
 	 * 
@@ -263,7 +299,7 @@ public interface IrFactory extends EFactory {
 	 * @return an InstAssign with the given location, target and value.
 	 */
 	InstAssign createInstAssign(Var target, Expression value);
-	
+
 	/**
 	 * Creates an InstAssign with the given target and integer value.
 	 * 
@@ -285,7 +321,7 @@ public interface IrFactory extends EFactory {
 	 * @return an InstAssign with the given target and value.
 	 */
 	InstAssign createInstAssign(Var target, long value);
-	
+
 	/**
 	 * Creates an InstAssign with the given target and source.
 	 * 
@@ -455,7 +491,7 @@ public interface IrFactory extends EFactory {
 	 * @generated
 	 */
 	InstStore createInstStore();
-
+	
 	/**
 	 * Creates an InstStore with the given location, target, indexes, value.
 	 * 
@@ -488,7 +524,7 @@ public interface IrFactory extends EFactory {
 	 * @return a store
 	 */
 	InstStore createInstStore(Var target, Expression value);
-
+	
 	/**
 	 * Creates an InstStore with the given target and value.
 	 * 
@@ -561,7 +597,7 @@ public interface IrFactory extends EFactory {
 	 * @return a store
 	 */
 	InstStore createInstStore(Var target, Var source);
-	
+
 	/**
 	 * Creates an InstStore with the given target, index and source.
 	 * 
@@ -572,7 +608,7 @@ public interface IrFactory extends EFactory {
 	 */
 	InstStore createInstStore(Var target, Var index,
 			Expression source);
-	
+
 	/**
 	 * Creates an InstStore with the given target, index and source.
 	 * 
@@ -883,7 +919,7 @@ public interface IrFactory extends EFactory {
 	 * @generated
 	 */
 	Var createVar();
-
+	
 	/**
 	 * Creates a new variable with the given location, type, and name. The
 	 * variable may be global or local, and assignable or not. Type is copied.
@@ -901,7 +937,7 @@ public interface IrFactory extends EFactory {
 	 */
 	Var createVar(int lineNumber, Type type, String name, boolean global,
 			boolean assignable);
-
+	
 	/**
 	 * Creates a new global variable with the given location, type, name,
 	 * initial value. The variable may be assignable or not.
@@ -919,7 +955,7 @@ public interface IrFactory extends EFactory {
 	 */
 	Var createVar(int lineNumber, Type type, String name, boolean assignable,
 			Expression initialValue);
-	
+
 	/**
 	 * Creates a new local variable with the given location, type, name, index.
 	 * The variable may be assignable or not. Type is copied.
@@ -937,7 +973,7 @@ public interface IrFactory extends EFactory {
 	 */
 	Var createVar(int lineNumber, Type type, String name, boolean assignable,
 			int index);
-	
+
 	/**
 	 * Creates a new local variable with the given type, name, index. The
 	 * variable may be assignable or not. Type is copied.

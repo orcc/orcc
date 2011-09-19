@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Arg;
+import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstCall;
@@ -120,42 +122,45 @@ public class PrintlnTransformation extends AbstractActorVisitor<Object> {
 	public Object caseInstCall(InstCall call) {
 		if (call.isPrint()) {
 			String value = "";
-			List<Expression> newParameters = new ArrayList<Expression>();
-			EList<Expression> parameters = call.getParameters();
+			List<Arg> newParameters = new ArrayList<Arg>();
+			List<Arg> parameters = call.getParameters();
 			String name = "str" + strCnt++;
 
 			// Iterate though all the println arguments to provide an only
 			// string value
-			for (Expression expr : parameters) {
-				if (expr.isStringExpr()) {
-					String strExprVal = (((ExprString) expr).getValue());
-					value += strExprVal;
-				} else {
-					Type type = expr.getType();
-					if (type.isBool()) {
-						value += "%i";
-					} else if (type.isFloat()) {
-						value += "%f";
-					} else if (type.isInt()) {
-						TypeInt intType = (TypeInt) type;
-						if (intType.isLong()) {
-							value += "%ll";
-						} else {
+			for (Arg arg : parameters) {
+				if (arg.isByVal()) {
+					Expression expr = ((ArgByVal) arg).getValue();
+					if (expr.isStringExpr()) {
+						String strExprVal = (((ExprString) expr).getValue());
+						value += strExprVal;
+					} else {
+						Type type = expr.getType();
+						if (type.isBool()) {
 							value += "%i";
+						} else if (type.isFloat()) {
+							value += "%f";
+						} else if (type.isInt()) {
+							TypeInt intType = (TypeInt) type;
+							if (intType.isLong()) {
+								value += "%ll";
+							} else {
+								value += "%i";
+							}
+						} else if (type.isList()) {
+							value += "%p";
+						} else if (type.isString()) {
+							value += "%s";
+						} else if (type.isUint()) {
+							TypeUint uintType = (TypeUint) type;
+							if (uintType.isLong()) {
+								value += "%ll";
+							} else {
+								value += "%u";
+							}
+						} else if (type.isVoid()) {
+							value += "%p";
 						}
-					} else if (type.isList()) {
-						value += "%p";
-					} else if (type.isString()) {
-						value += "%s";
-					} else if (type.isUint()) {
-						TypeUint uintType = (TypeUint) type;
-						if (uintType.isLong()) {
-							value += "%ll";
-						} else {
-							value += "%u";
-						}
-					} else if (type.isVoid()) {
-						value += "%p";
 					}
 				}
 			}
@@ -173,11 +178,14 @@ public class PrintlnTransformation extends AbstractActorVisitor<Object> {
 
 			// Set the created state variable into call argument
 			stateVars.add(variable);
-			newParameters.add(IrFactory.eINSTANCE.createExprVar(variable));
+			newParameters.add(IrFactory.eINSTANCE.createArgByValue(variable));
 
-			for (Expression expr : parameters) {
-				if (!expr.isStringExpr()) {
-					newParameters.add(expr);
+			for (Arg arg : parameters) {
+				if (arg.isByVal()) {
+					Expression expr = ((ArgByVal) arg).getValue();
+					if (!expr.isStringExpr()) {
+						newParameters.add(arg);
+					}
 				}
 			}
 			parameters.clear();

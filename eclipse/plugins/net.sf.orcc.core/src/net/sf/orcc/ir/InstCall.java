@@ -45,7 +45,7 @@ public interface InstCall extends Instruction {
 	 * @return the parameters of this call instruction
 	 * @model containment="true"
 	 */
-	EList<Expression> getParameters();
+	EList<Arg> getParameters();
 
 	/**
 	 * Returns the procedure referenced by this call instruction.

@@ -36,6 +36,8 @@ import java.util.Map;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Arg;
+import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
@@ -137,7 +139,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	 * @return the result of calling the given procedure
 	 */
 	protected Object callNativeProcedure(Procedure procedure,
-			List<Expression> parameters) {
+			List<Arg> parameters) {
 		return null;
 	}
 
@@ -147,19 +149,23 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	 * 
 	 * @param procedure
 	 *            a native procedure
+	 * @param arguments
+	 *            arguments of the procedure
 	 */
-	protected void callPrintProcedure(Procedure procedure,
-			List<Expression> parameters) {
-		for (int i = 0; i < parameters.size(); i++) {
-			if (parameters.get(i).isStringExpr()) {
-				// String characters rework for escaped control
-				// management
-				String str = ((ExprString) parameters.get(i)).getValue();
-				String unescaped = OrccUtil.getUnescapedString(str);
-				System.out.print(unescaped);
-			} else {
-				Object value = exprInterpreter.doSwitch(parameters.get(i));
-				System.out.print(String.valueOf(value));
+	protected void callPrintProcedure(Procedure procedure, List<Arg> arguments) {
+		for (Arg arg : arguments) {
+			if (arg.isByVal()) {
+				Expression expr = ((ArgByVal) arg).getValue();
+				if (expr.isStringExpr()) {
+					// String characters rework for escaped control
+					// management
+					String str = ((ExprString) expr).getValue();
+					String unescaped = OrccUtil.getUnescapedString(str);
+					System.out.print(unescaped);
+				} else {
+					Object value = exprInterpreter.doSwitch(expr);
+					System.out.print(String.valueOf(value));
+				}
 			}
 		}
 	}
@@ -188,7 +194,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 		Procedure proc = call.getProcedure();
 
 		// Set the input parameters of the called procedure if any
-		List<Expression> callParams = call.getParameters();
+		List<Arg> callParams = call.getParameters();
 
 		// Special "print" case
 		if (call.isPrint()) {

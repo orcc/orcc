@@ -8,6 +8,8 @@ package net.sf.orcc.ir.impl;
 
 import java.util.Collection;
 
+import net.sf.orcc.ir.Arg;
+import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstCall;
@@ -46,7 +48,7 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Expression> parameters;
+	protected EList<Arg> parameters;
 
 	/**
 	 * The cached value of the '{@link #getProcedure() <em>Procedure</em>}' reference.
@@ -143,7 +145,7 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 		switch (featureID) {
 			case IrPackage.INST_CALL__PARAMETERS:
 				getParameters().clear();
-				getParameters().addAll((Collection<? extends Expression>)newValue);
+				getParameters().addAll((Collection<? extends Arg>)newValue);
 				return;
 			case IrPackage.INST_CALL__PROCEDURE:
 				setProcedure((Procedure)newValue);
@@ -188,9 +190,9 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Expression> getParameters() {
+	public EList<Arg> getParameters() {
 		if (parameters == null) {
-			parameters = new EObjectContainmentEList<Expression>(Expression.class, this, IrPackage.INST_CALL__PARAMETERS);
+			parameters = new EObjectContainmentEList<Arg>(Arg.class, this, IrPackage.INST_CALL__PARAMETERS);
 		}
 		return parameters;
 	}
@@ -284,13 +286,17 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 		builder.append(super.toString());
 		builder.append("Call(");
 		if (getTarget() != null) {
-			builder.append(getTarget().getVariable().getIndexedName()).append(", ");
+			builder.append(getTarget().getVariable().getIndexedName()).append(
+					", ");
 		}
 
 		builder.append(getProcedure().getName());
-		for (Expression parameter : getParameters()) {
-			builder.append(", ");
-			builder.append(new ExpressionPrinter().doSwitch(parameter));
+		for (Arg arg : getParameters()) {
+			if (arg.isByVal()) {
+				Expression expr = ((ArgByVal) arg).getValue();
+				builder.append(", ");
+				builder.append(new ExpressionPrinter().doSwitch(expr));
+			}
 		}
 		return builder.append(")").toString();
 	}

@@ -26,65 +26,43 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.cal;
+package net.sf.orcc.ir;
 
-import java.util.List;
-import java.util.Map;
-
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Arg;
-import net.sf.orcc.ir.ArgByVal;
-import net.sf.orcc.ir.ExprString;
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.util.ActorInterpreter;
-import net.sf.orcc.util.OrccUtil;
+import org.eclipse.emf.common.util.EList;
 
 /**
- * This interpreter implements
- * {@link #callPrintProcedure(net.sf.orcc.ir.Procedure, java.util.List)} to
- * check it gives the expected output.
+ * This class defines an argument passed by reference.
  * 
  * @author Matthieu Wipliez
  * 
+ * @model extends="Arg"
  */
-public class TestInterpreter extends ActorInterpreter {
-
-	private StringBuilder builder;
-
-	public TestInterpreter(Actor actor, Map<String, Expression> parameters) {
-		super(actor, parameters);
-		builder = new StringBuilder();
-	}
-
-	@Override
-	protected void callPrintProcedure(Procedure procedure, List<Arg> arguments) {
-		for (Arg arg : arguments) {
-			if (arg.isByVal()) {
-				Expression expr = ((ArgByVal) arg).getValue();
-				if (expr.isStringExpr()) {
-					// String characters rework for escaped control
-					// management
-					String str = ((ExprString) expr).getValue();
-					String unescaped = OrccUtil.getUnescapedString(str);
-					builder.append(unescaped);
-				} else {
-					Object value = exprInterpreter.doSwitch(expr);
-					builder.append(value);
-				}
-			}
-		}
-	}
+public interface ArgByRef extends Arg {
 
 	/**
-	 * Returns a String that contains everything the actor has written to the
-	 * standard output.
+	 * Returns the (possibly empty) list of indexes of this argument by
+	 * reference.
 	 * 
-	 * @return a String that contains everything the actor has written to the
-	 *         standard output.
+	 * @return the (possibly empty) list of indexes of this argument by
+	 *         reference
+	 * @model containment="true"
 	 */
-	public String getOutput() {
-		return builder.toString();
-	}
+	EList<Expression> getIndexes();
+
+	/**
+	 * Returns the use associated with this argument by reference.
+	 * 
+	 * @return the use associated with this argument by reference
+	 * @model containment="true"
+	 */
+	Use getUse();
+
+	/**
+	 * Sets the use referenced with this argument.
+	 * 
+	 * @param variable
+	 *            the use referenced with this argument
+	 */
+	void setUse(Use use);
 
 }

@@ -34,6 +34,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.ir.Arg;
+import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
@@ -177,11 +179,14 @@ public class Inliner extends AbstractActorVisitor<Object> {
 		for (int i = 0; i < function.getParameters().size(); i++) {
 			Var parameter = function.getParameters().get(i).getVariable();
 			if (!parameter.getType().isList()) {
-				Expression expr = call.getParameters().get(i);
-				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
-						variableToLocalVariableMap.get(parameter),
-						IrUtil.copy(expr));
-				parametersBlock.add(assign);
+				Arg arg = call.getParameters().get(i);
+				if (arg.isByVal()) {
+					Expression expr = ((ArgByVal) arg).getValue();
+					InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
+							variableToLocalVariableMap.get(parameter),
+							IrUtil.copy(expr));
+					parametersBlock.add(assign);
+				}
 			}
 		}
 

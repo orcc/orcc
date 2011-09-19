@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.backends.xlim.transformations;
 
+import java.util.List;
+
+import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -49,6 +52,7 @@ import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
@@ -104,7 +108,9 @@ public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseExprList(ExprList expr) {
-		transformExpressionList(expr.getValue());
+		List<Expression> newIndexes = transformExpressionList(expr.getValue());
+		expr.getValue().clear();
+		expr.getValue().addAll(newIndexes);
 		return null;
 	}
 
@@ -135,19 +141,30 @@ public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseInstCall(InstCall call) {
-		transformExpressionList(call.getParameters());
+		List<Expression> newParameters = transformExpressionList(EcoreHelper
+				.getObjects(call, Expression.class));
+		call.getParameters().clear();
+		while (!newParameters.isEmpty()) {
+			Expression expr = newParameters.get(0);
+			Arg arg = IrFactory.eINSTANCE.createArgByValue(expr);
+			call.getParameters().add(arg);
+		}
 		return null;
 	}
 
 	@Override
 	public Expression caseInstLoad(InstLoad load) {
-		transformExpressionList(load.getIndexes());
+		List<Expression> newIndexes = transformExpressionList(load.getIndexes());
+		load.getIndexes().clear();
+		load.getIndexes().addAll(newIndexes);
 		return null;
 	}
 
 	@Override
 	public Expression caseInstPhi(InstPhi phi) {
-		transformExpressionList(phi.getValues());
+		List<Expression> newIndexes = transformExpressionList(phi.getValues());
+		phi.getValues().clear();
+		phi.getValues().addAll(newIndexes);
 		return null;
 	}
 
@@ -163,7 +180,10 @@ public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 	@Override
 	public Expression caseInstStore(InstStore store) {
 		store.setValue(doSwitch(store.getValue()));
-		transformExpressionList(store.getIndexes());
+		List<Expression> newIndexes = transformExpressionList(store
+				.getIndexes());
+		store.getIndexes().clear();
+		store.getIndexes().addAll(newIndexes);
 		return null;
 	}
 
@@ -195,17 +215,23 @@ public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 		return IrFactory.eINSTANCE.createExprVar(target);
 	}
 
-	private void transformExpressionList(EList<Expression> expressions) {
+	private List<Expression> transformExpressionList(
+			Iterable<Expression> expressions) {
+		List<Expression> oldExpressions = new BasicEList<Expression>();
+		for (Expression expr : expressions) {
+			oldExpressions.add(expr);
+		}
+
 		EList<Expression> newExpressions = new BasicEList<Expression>();
-		for (int i = 0; i < expressions.size();) {
-			Expression expression = expressions.get(i);
+		for (int i = 0; i < oldExpressions.size();) {
+			Expression expression = oldExpressions.get(i);
 			newExpressions.add(doSwitch(expression));
 			if (expression != null) {
 				i++;
 			}
 		}
-		expressions.clear();
-		expressions.addAll(newExpressions);
+
+		return newExpressions;
 	}
 
 }

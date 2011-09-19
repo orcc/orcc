@@ -32,6 +32,7 @@ import java.util.List;
 
 import net.sf.orcc.backends.instructions.InstCast;
 import net.sf.orcc.backends.instructions.InstructionsFactory;
+import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -176,17 +177,27 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 	public Expression caseInstCall(InstCall call) {
 		if (!call.isPrint()) {
 			Type oldParentType = parentType;
-			EList<Expression> expressions = call.getParameters();
-			EList<Expression> oldExpression = new BasicEList<Expression>(
-					expressions);
+			Iterable<Expression> expressions = EcoreHelper.getObjects(call,
+					Expression.class);
+			EList<Expression> oldExpressions = new BasicEList<Expression>();
+			for (Expression expr : expressions) {
+				oldExpressions.add(expr);
+			}
+
 			EList<Expression> newExpressions = new BasicEList<Expression>();
-			for (int i = 0; i < oldExpression.size(); i++) {
+			for (int i = 0; i < oldExpressions.size(); i++) {
 				parentType = call.getProcedure().getParameters().get(i)
 						.getVariable().getType();
-				newExpressions.add(doSwitch(oldExpression.get(i)));
+				newExpressions.add(doSwitch(oldExpressions.get(i)));
 			}
-			expressions.clear();
-			expressions.addAll(newExpressions);
+			
+			call.getParameters().clear();
+			while (!newExpressions.isEmpty()) {
+				Expression expr = newExpressions.get(0);
+				Arg arg = IrFactory.eINSTANCE.createArgByValue(expr);
+				call.getParameters().add(arg);
+			}
+
 			parentType = oldParentType;
 		}
 		return null;

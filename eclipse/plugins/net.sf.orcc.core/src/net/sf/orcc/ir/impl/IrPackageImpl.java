@@ -11,6 +11,9 @@ import java.util.Map;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Annotation;
+import net.sf.orcc.ir.Arg;
+import net.sf.orcc.ir.ArgByRef;
+import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.ExprBinary;
@@ -237,6 +240,27 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	private EClass instStoreEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass argEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass argByRefEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass argByValEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -1253,6 +1277,60 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EClass getArg() {
+		return argEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getArgByRef() {
+		return argByRefEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getArgByRef_Indexes() {
+		return (EReference)argByRefEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getArgByRef_Use() {
+		return (EReference)argByRefEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getArgByVal() {
+		return argByValEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getArgByVal_Value() {
+		return (EReference)argByValEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getVar() {
 		return varEClass;
 	}
@@ -2214,6 +2292,15 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEReference(instStoreEClass, INST_STORE__TARGET);
 		createEReference(instStoreEClass, INST_STORE__VALUE);
 
+		argEClass = createEClass(ARG);
+
+		argByRefEClass = createEClass(ARG_BY_REF);
+		createEReference(argByRefEClass, ARG_BY_REF__INDEXES);
+		createEReference(argByRefEClass, ARG_BY_REF__USE);
+
+		argByValEClass = createEClass(ARG_BY_VAL);
+		createEReference(argByValEClass, ARG_BY_VAL__VALUE);
+
 		expressionEClass = createEClass(EXPRESSION);
 
 		exprBinaryEClass = createEClass(EXPR_BINARY);
@@ -2357,6 +2444,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		instReturnEClass.getESuperTypes().add(this.getInstruction());
 		instSpecificEClass.getESuperTypes().add(this.getInstruction());
 		instStoreEClass.getESuperTypes().add(this.getInstruction());
+		argByRefEClass.getESuperTypes().add(this.getArg());
+		argByValEClass.getESuperTypes().add(this.getArg());
 		exprBinaryEClass.getESuperTypes().add(this.getExpression());
 		exprBoolEClass.getESuperTypes().add(this.getExpression());
 		exprFloatEClass.getESuperTypes().add(this.getExpression());
@@ -2477,7 +2566,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEReference(getInstAssign_Value(), this.getExpression(), null, "value", null, 0, 1, InstAssign.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(instCallEClass, InstCall.class, "InstCall", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getInstCall_Parameters(), this.getExpression(), null, "parameters", null, 0, -1, InstCall.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getInstCall_Parameters(), this.getArg(), null, "parameters", null, 0, -1, InstCall.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getInstCall_Procedure(), this.getProcedure(), null, "procedure", null, 0, 1, InstCall.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getInstCall_Target(), this.getDef(), null, "target", null, 0, 1, InstCall.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
@@ -2500,6 +2589,15 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEReference(getInstStore_Indexes(), this.getExpression(), null, "indexes", null, 0, -1, InstStore.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getInstStore_Target(), this.getDef(), null, "target", null, 0, 1, InstStore.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getInstStore_Value(), this.getExpression(), null, "value", null, 0, 1, InstStore.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(argEClass, Arg.class, "Arg", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+
+		initEClass(argByRefEClass, ArgByRef.class, "ArgByRef", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getArgByRef_Indexes(), this.getExpression(), null, "indexes", null, 0, -1, ArgByRef.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getArgByRef_Use(), this.getUse(), null, "use", null, 0, 1, ArgByRef.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(argByValEClass, ArgByVal.class, "ArgByVal", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getArgByVal_Value(), this.getExpression(), null, "value", null, 0, 1, ArgByVal.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(expressionEClass, Expression.class, "Expression", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 

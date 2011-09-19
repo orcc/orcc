@@ -32,6 +32,9 @@ import java.util.List;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Arg;
+import net.sf.orcc.ir.ArgByRef;
+import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -141,6 +144,17 @@ public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
 	}
 
 	@Override
+	public T caseArgByRef(ArgByRef arg) {
+		return null;
+	}
+
+	@Override
+	public T caseArgByVal(ArgByVal arg) {
+		doSwitch(arg.getValue());
+		return null;
+	}
+
+	@Override
 	public T caseExprBinary(ExprBinary expr) {
 		doSwitch(expr.getE1());
 		doSwitch(expr.getE2());
@@ -194,8 +208,8 @@ public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
 	@Override
 	public T caseInstCall(InstCall call) {
 		if (visitFull) {
-			for (Expression expr : call.getParameters()) {
-				doSwitch(expr);
+			for (Arg arg : call.getParameters()) {
+				doSwitch(arg);
 			}
 		}
 		return null;

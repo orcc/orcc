@@ -160,6 +160,14 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//InstStore/target"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//InstStore/value"/>
     </genClasses>
+    <genClasses ecoreClass="Ir.ecore#//Arg"/>
+    <genClasses ecoreClass="Ir.ecore#//ArgByRef">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//ArgByRef/indexes"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//ArgByRef/use"/>
+    </genClasses>
+    <genClasses ecoreClass="Ir.ecore#//ArgByVal">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//ArgByVal/value"/>
+    </genClasses>
     <genClasses image="false" ecoreClass="Ir.ecore#//Expression"/>
     <genClasses ecoreClass="Ir.ecore#//ExprBinary">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//ExprBinary/e1"/>

@@ -26,65 +26,31 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.cal;
+package net.sf.orcc.ir;
 
-import java.util.List;
-import java.util.Map;
-
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Arg;
-import net.sf.orcc.ir.ArgByVal;
-import net.sf.orcc.ir.ExprString;
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.util.ActorInterpreter;
-import net.sf.orcc.util.OrccUtil;
+import org.eclipse.emf.ecore.EObject;
 
 /**
- * This interpreter implements
- * {@link #callPrintProcedure(net.sf.orcc.ir.Procedure, java.util.List)} to
- * check it gives the expected output.
+ * This class defines an argument of a Call instruction.
  * 
  * @author Matthieu Wipliez
  * 
+ * @model abstract="true"
  */
-public class TestInterpreter extends ActorInterpreter {
-
-	private StringBuilder builder;
-
-	public TestInterpreter(Actor actor, Map<String, Expression> parameters) {
-		super(actor, parameters);
-		builder = new StringBuilder();
-	}
-
-	@Override
-	protected void callPrintProcedure(Procedure procedure, List<Arg> arguments) {
-		for (Arg arg : arguments) {
-			if (arg.isByVal()) {
-				Expression expr = ((ArgByVal) arg).getValue();
-				if (expr.isStringExpr()) {
-					// String characters rework for escaped control
-					// management
-					String str = ((ExprString) expr).getValue();
-					String unescaped = OrccUtil.getUnescapedString(str);
-					builder.append(unescaped);
-				} else {
-					Object value = exprInterpreter.doSwitch(expr);
-					builder.append(value);
-				}
-			}
-		}
-	}
+public interface Arg extends EObject {
 
 	/**
-	 * Returns a String that contains everything the actor has written to the
-	 * standard output.
+	 * Returns <code>true</code> if this argument is passed by reference.
 	 * 
-	 * @return a String that contains everything the actor has written to the
-	 *         standard output.
+	 * @return <code>true</code> if this argument is passed by reference
 	 */
-	public String getOutput() {
-		return builder.toString();
-	}
+	boolean isByRef();
+
+	/**
+	 * Returns <code>true</code> if this argument is passed by value.
+	 * 
+	 * @return <code>true</code> if this argument is passed by value
+	 */
+	boolean isByVal();
 
 }

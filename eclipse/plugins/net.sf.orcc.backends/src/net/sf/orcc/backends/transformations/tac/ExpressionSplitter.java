@@ -28,7 +28,10 @@
  */
 package net.sf.orcc.backends.transformations.tac;
 
+import java.util.List;
+
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -51,6 +54,7 @@ import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
@@ -66,8 +70,8 @@ import org.eclipse.emf.common.util.EList;
  */
 public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 
-	private boolean usePreviousJoinNode;
 	private int complexityLevel = 0;
+	private boolean usePreviousJoinNode;
 
 	/**
 	 * Creates a new transformation which splits complex expressions
@@ -96,8 +100,7 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 					IrUtil.copy(expr));
 
 			// Add assignment to instruction's list
-			if (IrUtil
-					.addInstBeforeExpr(expr, assign, usePreviousJoinNode)) {
+			if (IrUtil.addInstBeforeExpr(expr, assign, usePreviousJoinNode)) {
 				indexInst++;
 			}
 
@@ -146,8 +149,7 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 		case MINUS:
 			newExpr = IrFactory.eINSTANCE.createExprBinary(
 					IrFactory.eINSTANCE.createExprInt(0), OpBinary.MINUS,
-					IrUtil.copy(expr.getExpr()),
-					IrUtil.copy(expr.getType()));
+					IrUtil.copy(expr.getExpr()), IrUtil.copy(expr.getType()));
 			break;
 		case LOGIC_NOT:
 			newExpr = IrFactory.eINSTANCE.createExprBinary(
@@ -158,8 +160,7 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 		case BITNOT:
 			newExpr = IrFactory.eINSTANCE.createExprBinary(
 					IrUtil.copy(expr.getExpr()), OpBinary.BITXOR,
-					IrUtil.copy(expr.getExpr()),
-					IrUtil.copy(expr.getType()));
+					IrUtil.copy(expr.getExpr()), IrUtil.copy(expr.getType()));
 			break;
 		default:
 			throw new OrccRuntimeException("unsupported operator");
@@ -173,8 +174,7 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 					newExpr);
 
 			// Add assignment to instruction's list
-			if (IrUtil
-					.addInstBeforeExpr(expr, assign, usePreviousJoinNode)) {
+			if (IrUtil.addInstBeforeExpr(expr, assign, usePreviousJoinNode)) {
 				indexInst++;
 			}
 
@@ -200,7 +200,14 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 	@Override
 	public Expression caseInstCall(InstCall call) {
 		complexityLevel++;
-		splitExpressionList(call.getParameters());
+		List<Expression> newParameters = splitExpressionList(EcoreHelper
+				.getObjects(call, Expression.class));
+		call.getParameters().clear();
+		while (!newParameters.isEmpty()) {
+			Expression expr = newParameters.get(0);
+			Arg arg = IrFactory.eINSTANCE.createArgByValue(expr);
+			call.getParameters().add(arg);
+		}
 		complexityLevel--;
 		return null;
 	}
@@ -208,7 +215,9 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 	@Override
 	public Expression caseInstLoad(InstLoad load) {
 		complexityLevel++;
-		splitExpressionList(load.getIndexes());
+		List<Expression> newIndexes = splitExpressionList(load.getIndexes());
+		load.getIndexes().clear();
+		load.getIndexes().addAll(newIndexes);
 		complexityLevel--;
 		return null;
 	}
@@ -216,7 +225,9 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 	@Override
 	public Expression caseInstPhi(InstPhi phi) {
 		complexityLevel++;
-		splitExpressionList(phi.getValues());
+		List<Expression> newIndexes = splitExpressionList(phi.getValues());
+		phi.getValues().clear();
+		phi.getValues().addAll(newIndexes);
 		complexityLevel--;
 		return null;
 	}
@@ -235,7 +246,11 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 	@Override
 	public Expression caseInstStore(InstStore store) {
 		complexityLevel++;
-		splitExpressionList(store.getIndexes());
+
+		List<Expression> newIndexes = splitExpressionList(store.getIndexes());
+		store.getIndexes().clear();
+		store.getIndexes().addAll(newIndexes);
+
 		store.setValue(doSwitch(store.getValue()));
 		complexityLevel--;
 		return null;
@@ -262,13 +277,19 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 		return null;
 	}
 
-	private void splitExpressionList(EList<Expression> expressions) {
-		EList<Expression> oldExpressions = new BasicEList<Expression>(expressions);
+	private List<Expression> splitExpressionList(
+			Iterable<Expression> expressions) {
+		List<Expression> oldExpressions = new BasicEList<Expression>();
+		for (Expression expr : expressions) {
+			oldExpressions.add(expr);
+		}
+
 		EList<Expression> newExpressions = new BasicEList<Expression>();
 		for (Expression expression : oldExpressions) {
 			newExpressions.add(doSwitch(expression));
 		}
-		expressions.clear();
-		expressions.addAll(newExpressions);
+
+		return newExpressions;
 	}
+
 }
