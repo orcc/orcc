@@ -29,9 +29,8 @@
  */
 package net.sf.orcc.backends;
 
-import java.io.FileOutputStream;
+import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Locale;
 
 import net.sf.orcc.OrccException;
@@ -47,6 +46,7 @@ import org.stringtemplate.v4.Interpreter;
 import org.stringtemplate.v4.ModelAdaptor;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.misc.ErrorManager;
 import org.stringtemplate.v4.misc.STNoSuchPropertyException;
 
 /**
@@ -109,12 +109,10 @@ public abstract class AbstractPrinter {
 		group.registerModelAdaptor(EMap.class, new EMapModelAdaptor());
 	}
 
-	protected void printTemplate(ST template, String file) {
+	protected void printTemplate(ST template, String fileName) {
 		try {
-			byte[] b = template.render(80).getBytes();
-			OutputStream os = new FileOutputStream(file);
-			os.write(b);
-			os.close();
+			template.write(new File(fileName),
+					ErrorManager.DEFAULT_ERROR_LISTENER, "UTF-8", 80);
 		} catch (IOException e) {
 			new OrccException("I/O error", e);
 		}
