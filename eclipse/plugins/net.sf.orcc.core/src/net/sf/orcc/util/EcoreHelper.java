@@ -121,6 +121,10 @@ public class EcoreHelper {
 	/**
 	 * Returns an Iterable that contains an iterator that filters descendants of
 	 * the given object that match the given class (or one of its subclasses).
+	 * The iterator does not explore the descendants of the objects of the given
+	 * class (in other words, the underlying iterator is pruned everytime a
+	 * candidate is found): if O of type T contain objects O1 and O2 both with
+	 * the type T, only O will be returned, not O1 nor O2.
 	 * 
 	 * @param eObject
 	 *            an object
@@ -143,6 +147,9 @@ public class EcoreHelper {
 						while (it.hasNext()) {
 							EObject next = it.next();
 							if (cls.isAssignableFrom(next.getClass())) {
+								// prune after next
+								it.prune();
+
 								nextObject = next;
 								return true;
 							}
