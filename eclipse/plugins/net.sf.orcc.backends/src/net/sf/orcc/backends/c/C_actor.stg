@@ -578,8 +578,15 @@ static enum states _FSM_state;
 >>
 
 parameters(parameters) ::= <<
-<parameters.keys: { k | #define <k> <Constant(parameters.(k))>
-}>
+<parameters.keys: {name|<printInstanceParameter(name, parameters.(name))>}>
+>>
+
+printInstanceParameter(name, value) ::= <<
+<if (value.listExpr)>
+static <if (value.innermostType.uintType)>unsigned <endif>int <name><listSize(value.type.dimensions)> = <Constant(value)>;
+<else>
+#define <name> <Constant(value)>
+<endif>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
