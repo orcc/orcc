@@ -147,7 +147,7 @@ public class StoreOnceTransformation extends AbstractActorVisitor<Object> {
 				globalsToLoad.put(var, local);
 			}
 			call.getParameters().add(i++,
-					IrFactory.eINSTANCE.createArgByValue(local));
+					IrFactory.eINSTANCE.createArgByVal(local));
 		}
 
 		return null;

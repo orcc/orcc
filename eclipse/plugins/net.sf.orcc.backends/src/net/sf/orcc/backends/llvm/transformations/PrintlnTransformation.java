@@ -178,7 +178,7 @@ public class PrintlnTransformation extends AbstractActorVisitor<Object> {
 
 			// Set the created state variable into call argument
 			stateVars.add(variable);
-			newParameters.add(IrFactory.eINSTANCE.createArgByValue(variable));
+			newParameters.add(IrFactory.eINSTANCE.createArgByVal(variable));
 
 			for (Arg arg : parameters) {
 				if (arg.isByVal()) {
