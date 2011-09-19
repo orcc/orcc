@@ -655,6 +655,14 @@ public class Typer extends CalSwitch<Type> {
 		if (type != null) {
 			Type maxType = TypeUtil.getGlb(type, boundType);
 			if (maxType != null) {
+				int size = boundType.getSizeInBits();
+				if (maxType.getSizeInBits() > size) {
+					if (maxType.isInt()) {
+						((TypeInt) maxType).setSize(size);
+					} else if (maxType.isUint()) {
+						((TypeUint) maxType).setSize(size);
+					}
+				}
 				return maxType;
 			}
 		}
@@ -742,7 +750,7 @@ public class Typer extends CalSwitch<Type> {
 		if (targetType == null) {
 			// in expressions contained in other expressions, and in if & while
 			// conditions, guard expressions, calls to built-in functions
-			boundType = IrFactory.eINSTANCE.createTypeInt(32);
+			boundType = IrFactory.eINSTANCE.createTypeUint(32);
 		} else {
 			boundType = targetType;
 		}
