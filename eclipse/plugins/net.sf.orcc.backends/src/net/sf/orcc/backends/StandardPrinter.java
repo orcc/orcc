@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2011, IRISA
+ * Copyright (c) 2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -29,6 +30,9 @@
 package net.sf.orcc.backends;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.network.Instance;
@@ -37,31 +41,36 @@ import net.sf.orcc.network.Network;
 import org.stringtemplate.v4.ST;
 
 /**
- * This class defines an instance printer.
+ * This class defines a printer for "standard" objects, namely actors,
+ * instances, and networks. This class supports caching in order not to
+ * regenerate all files all the time, which can be annoying.
  * 
  * @author Herve Yviquel
+ * @author Matthieu Wipliez
  * 
  */
-public class InstancePrinter extends Printer {
+public class StandardPrinter extends AbstractPrinter {
 
 	private boolean keepUnchangedFiles;
+
+	protected Map<String, Object> options;
 
 	private boolean printBroadcasts;
 
 	/**
-	 * Creates a new instance printer.
+	 * Creates a new network printer.
 	 * 
 	 * @param templateName
 	 *            the name of the template
 	 */
-	public InstancePrinter(String templateName) {
+	public StandardPrinter(String templateName) {
 		super(templateName);
-		this.keepUnchangedFiles = false;
-		this.printBroadcasts = false;
+
+		options = new HashMap<String, Object>();
 	}
 
 	/**
-	 * Creates a new instance printer.
+	 * Creates a new network printer.
 	 * 
 	 * @param templateName
 	 *            the name of the template
@@ -69,7 +78,7 @@ public class InstancePrinter extends Printer {
 	 *            if the printer must keep printing files from unchanged
 	 *            instances
 	 */
-	public InstancePrinter(String templateName, boolean keepUnchangedFiles) {
+	public StandardPrinter(String templateName, boolean keepUnchangedFiles) {
 		this(templateName);
 		this.keepUnchangedFiles = keepUnchangedFiles;
 	}
@@ -85,7 +94,7 @@ public class InstancePrinter extends Printer {
 	 * @param printBroadcasts
 	 *            if the printer have to print broadcast instances
 	 */
-	public InstancePrinter(String templateName, boolean keepUnchangedFiles,
+	public StandardPrinter(String templateName, boolean keepUnchangedFiles,
 			boolean printBroadcasts) {
 		this(templateName, keepUnchangedFiles);
 		this.printBroadcasts = printBroadcasts;
@@ -122,6 +131,48 @@ public class InstancePrinter extends Printer {
 		}
 	}
 
+	public Map<String, Object> getOptions() {
+		return options;
+	}
+
+	/**
+	 * Prints the given actor to a file whose name and path are given.
+	 * 
+	 * @param fileName
+	 *            name of the output file
+	 * @param path
+	 *            path of the output file
+	 * @param actor
+	 *            the actor to generate code for
+	 * @return <code>true</code> if the actor was cached
+	 * @throws IOException
+	 *             if there is an I/O error
+	 */
+	public boolean print(String fileName, String path, Actor actor) {
+		if (!actor.isNative()) {
+			String file = path + File.separator + fileName;
+			if (keepUnchangedFiles) {
+				// if source file is older than target file, do not generate
+				long sourceTimeStamp = 0;
+				if (actor.getFileName() == null) {
+					sourceTimeStamp = Long.MAX_VALUE;
+				} else {
+					sourceTimeStamp = actor.getFile().getLocalTimeStamp();
+				}
+				File targetFile = new File(file);
+				if (sourceTimeStamp < targetFile.lastModified()) {
+					return true;
+				}
+			}
+
+			ST template = group.getInstanceOf("actor");
+			template.add("actor", actor);
+			template.add("options", options);
+			printTemplate(template, file);
+		}
+		return false;
+	}
+
 	/**
 	 * Prints the given instance to a file whose name and path are given.
 	 * 
@@ -131,12 +182,9 @@ public class InstancePrinter extends Printer {
 	 *            path of the output file
 	 * @param instance
 	 *            the instance to generate code for
-	 * @param instanceName
-	 *            name of the root ST rule
 	 * @return <code>true</code> if the instance was cached
 	 */
-	public boolean print(String fileName, String path, Instance instance,
-			String instanceName) {
+	public boolean print(String fileName, String path, Instance instance) {
 		String file = path + File.separator + fileName;
 		if (instance.isNetwork()
 				|| (instance.isActor() && !instance.getActor().isNative())
@@ -150,10 +198,46 @@ public class InstancePrinter extends Printer {
 					return true;
 				}
 			}
-			ST template = group.getInstanceOf(instanceName);
+
+			ST template = group.getInstanceOf("instance");
 			template.add("instance", instance);
+			template.add("options", options);
 			printTemplate(template, file);
 		}
+		return false;
+	}
+
+	/**
+	 * Prints the given network to a file whose name and path are given.
+	 * 
+	 * @param fileName
+	 *            name of the output file
+	 * @param path
+	 *            path of the output file
+	 * @param network
+	 *            the network to generate code for
+	 * @param instanceName
+	 *            name of the root ST rule
+	 * @return <code>true</code> if the network was cached
+	 * @throws IOException
+	 *             if there is an I/O error
+	 */
+	public boolean print(String fileName, String path, Network network) {
+		String file = path + File.separator + fileName;
+		if (keepUnchangedFiles) {
+			// if source file is older than target file, do not generate
+			long sourceTimeStamp = network.getFile().getLocalTimeStamp();
+			File targetFile = new File(file);
+			if (sourceTimeStamp < targetFile.lastModified()) {
+				return true;
+			}
+		}
+
+		ST template = group.getInstanceOf("network");
+		template.add("network", network);
+		template.add("options", options);
+		printTemplate(template, file);
+
 		return false;
 	}
 

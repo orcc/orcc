@@ -40,9 +40,8 @@ import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.InstancePrinter;
-import net.sf.orcc.backends.NetworkPrinter;
-import net.sf.orcc.backends.Printer;
+import net.sf.orcc.backends.CustomPrinter;
+import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.backends.transformations.DivisionSubstitution;
 import net.sf.orcc.backends.transformations.Inliner;
@@ -134,8 +133,8 @@ public class XlimBackendImpl extends AbstractBackend {
 	protected void doTransformActor(Actor actor) throws OrccException {
 		XlimActorTemplateData data = new XlimActorTemplateData();
 		actor.setTemplateData(data);
-		
-		if(hardwareGen) {
+
+		if (hardwareGen) {
 			new StoreOnceTransformation().doSwitch(actor);
 		}
 
@@ -152,9 +151,8 @@ public class XlimBackendImpl extends AbstractBackend {
 				new DeadGlobalElimination(), new DeadCodeElimination(),
 				new XlimDeadVariableRemoval(), new ListFlattener(),
 				new ExpressionSplitter(true), /* new CopyPropagator(), */
-				new BuildCFG(), 
-				new InstPhiTransformation(), new LiteralIntegersAdder(true),
-				new CastAdder(true, true),
+				new BuildCFG(), new InstPhiTransformation(),
+				new LiteralIntegersAdder(true), new CastAdder(true, true),
 				new XlimVariableRenamer(), new BlockCombine() };
 
 		for (ActorVisitor<?> transformation : transformations) {
@@ -192,42 +190,41 @@ public class XlimBackendImpl extends AbstractBackend {
 	}
 
 	private void printCMake(Network network) {
-		NetworkPrinter networkPrinter = new NetworkPrinter(
+		StandardPrinter networkPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/xlim/XLIM_sw_CMakeLists.stg");
-		networkPrinter.print("CMakeLists.txt", path, network, "CMakeLists");
+		networkPrinter.print("CMakeLists.txt", path, network);
 	}
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		InstancePrinter printer;
+		StandardPrinter printer;
 		if (hardwareGen) {
-			printer = new InstancePrinter(
-					"net/sf/orcc/backends/xlim/hardware/XLIM_hw_actor.stg", !debugMode);
+			printer = new StandardPrinter(
+					"net/sf/orcc/backends/xlim/hardware/XLIM_hw_actor.stg",
+					!debugMode);
 			printer.getOptions().put("fpgaType", fpgaType);
 		} else {
-			printer = new InstancePrinter(
+			printer = new StandardPrinter(
 					"net/sf/orcc/backends/xlim/XLIM_sw_actor.stg", !debugMode);
 		}
 
 		printer.setExpressionPrinter(new XlimExprPrinter());
 		printer.setTypePrinter(new XlimTypePrinter());
-		return printer.print(instance.getId() + ".xlim", path, instance,
-				"instance");
+		return printer.print(instance.getId() + ".xlim", path, instance);
 	}
 
 	private void printMapping(Network network, Map<String, String> mapping) {
-		NetworkPrinter networkPrinter = new NetworkPrinter(
+		StandardPrinter networkPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/xlim/XLIM_sw_mapping.stg");
 		networkPrinter.getOptions().put("mapping",
 				computeMapping(network, mapping));
 		networkPrinter.getOptions().put("fifoSize", fifoSize);
-		networkPrinter.print(network.getName() + ".xcf", path, network,
-				"mapping");
+		networkPrinter.print(network.getName() + ".xcf", path, network);
 	}
 
-	private void printTestbench(InstancePrinter printer, Instance instance) {
+	private void printTestbench(StandardPrinter printer, Instance instance) {
 		printer.print(instance.getId() + "_tb.vhd", path + File.separator
-				+ "Testbench", instance, "instance");
+				+ "Testbench", instance);
 
 		if (instance.isNetwork()) {
 			Network network = instance.getNetwork();
@@ -238,18 +235,15 @@ public class XlimBackendImpl extends AbstractBackend {
 	}
 
 	private void printTCL(Instance instance) {
-		Printer printer = new Printer(
+		CustomPrinter printer = new CustomPrinter(
 				"net/sf/orcc/backends/xlim/hardware/Verilog_TCLLists.stg");
 
 		entities = new ArrayList<String>();
 		entitySet = new HashSet<String>();
 		computeEntityList(instance);
 
-		printer.getCustomAttributes().put("name",
-				instance.getNetwork().getName());
-		printer.getCustomAttributes().put("entities", entities);
-
-		printer.print("TCLLists.tcl", path, "TCLLists");
+		printer.print("TCLLists.tcl", path, "TCLLists", "name", instance
+				.getNetwork().getName(), "entities", entities);
 	}
 
 	private void computeEntityList(Instance instance) {
@@ -273,7 +267,7 @@ public class XlimBackendImpl extends AbstractBackend {
 	}
 
 	private void printNetwork(Network network) {
-		NetworkPrinter printer;
+		StandardPrinter printer;
 		String file = network.getName();
 		if (hardwareGen) {
 			// create a folder where to put .v files generated with openforge
@@ -286,7 +280,7 @@ public class XlimBackendImpl extends AbstractBackend {
 			if (!folder.exists()) {
 				folder.mkdir();
 			}
-			InstancePrinter instancePrinter = new InstancePrinter(
+			StandardPrinter instancePrinter = new StandardPrinter(
 					"net/sf/orcc/backends/xlim/hardware/Verilog_testbench.stg");
 			Instance instance = new Instance(network.getName(),
 					network.getName());
@@ -295,18 +289,18 @@ public class XlimBackendImpl extends AbstractBackend {
 			printTCL(instance);
 
 			file += ".vhd";
-			printer = new NetworkPrinter(
+			printer = new StandardPrinter(
 					"net/sf/orcc/backends/xlim/hardware/XLIM_hw_network.stg");
 		} else {
 			file += ".c";
-			printer = new NetworkPrinter(
+			printer = new StandardPrinter(
 					"net/sf/orcc/backends/xlim/XLIM_sw_network.stg");
 		}
 
 		printer.setExpressionPrinter(new XlimExprPrinter());
 		printer.setTypePrinter(new XlimTypePrinter());
 		printer.getOptions().put("fifoSize", fifoSize);
-		printer.print(file, path, network, "network");
+		printer.print(file, path, network);
 		if (!hardwareGen) {
 			printCMake(network);
 			if (!mapping.isEmpty()) {

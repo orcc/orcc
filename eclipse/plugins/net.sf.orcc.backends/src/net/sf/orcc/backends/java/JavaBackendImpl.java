@@ -35,8 +35,7 @@ import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.ActorPrinter;
-import net.sf.orcc.backends.NetworkPrinter;
+import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.cpp.CppExprPrinter;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.transformations.RenameTransformation;
@@ -54,7 +53,7 @@ import org.eclipse.core.resources.IFile;
  */
 public class JavaBackendImpl extends AbstractBackend {
 
-	private ActorPrinter actorPrinter;
+	private StandardPrinter actorPrinter;
 
 	private final Map<String, String> transformations;
 
@@ -83,7 +82,7 @@ public class JavaBackendImpl extends AbstractBackend {
 	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
 		List<Actor> actors = parseActors(files);
 
-		actorPrinter = new ActorPrinter(
+		actorPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/java/Java_actor.stg", true);
 		actorPrinter.setExpressionPrinter(new CppExprPrinter());
 		actorPrinter.setTypePrinter(new JavaTypePrinter());
@@ -110,7 +109,7 @@ public class JavaBackendImpl extends AbstractBackend {
 		new File(folder).mkdirs();
 
 		return actorPrinter.print("Actor_" + actor.getSimpleName() + ".java",
-				folder, actor, "actor");
+				folder, actor);
 	}
 
 	/**
@@ -122,10 +121,10 @@ public class JavaBackendImpl extends AbstractBackend {
 	 *             if something goes wrong
 	 */
 	protected void printNetwork(Network network) throws OrccException {
-		NetworkPrinter printer = new NetworkPrinter(
+		StandardPrinter printer = new StandardPrinter(
 				"net/sf/orcc/backends/java/Java_network.stg");
 		printer.getOptions().put("fifoSize", fifoSize);
-		printer.print("Network_" + network.getName() + ".java", path, "network");
+		printer.print("Network_" + network.getName() + ".java", path, network);
 	}
 
 }

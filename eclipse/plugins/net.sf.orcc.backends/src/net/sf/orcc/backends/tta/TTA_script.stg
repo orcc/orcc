@@ -25,7 +25,7 @@ initInstance(instance) ::= <<
 Instance("<instance.id>", <instance.id>_inputs, <instance.id>_outputs, <if(instance.actor.native)>True<else>False<endif>, <if(instance.broadcast)>True<else>False<endif>)
 >>
 
-script(network, options) ::= <<
+network(network, options) ::= <<
 # -*- coding: utf-8 -*-
 #
 # Generated from <network.name> using Open-RVC CAL Compiler

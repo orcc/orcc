@@ -36,8 +36,8 @@ import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.InstancePrinter;
-import net.sf.orcc.backends.NetworkPrinter;
+import net.sf.orcc.backends.CustomPrinter;
+import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.llvm.LLVMExpressionPrinter;
 import net.sf.orcc.backends.llvm.LLVMTypePrinter;
 import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
@@ -47,7 +47,6 @@ import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.backends.transformations.tac.TacTransformation;
 import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.tta.architecture.TTA;
-import net.sf.orcc.backends.tta.architecture.util.ArchitecturePrinter;
 import net.sf.orcc.backends.tta.transformations.ActorTypeResizer;
 import net.sf.orcc.backends.tta.transformations.BroadcastTypeResizer;
 import net.sf.orcc.backends.xlim.transformations.InstPhiTransformation;
@@ -102,7 +101,7 @@ public class TTABackendImpl extends AbstractBackend {
 	protected void doTransformActor(Actor actor) throws OrccException {
 
 		ActorVisitor<?>[] transformations = { new SSATransformation(),
-				new BoolToIntTransformation(), new ActorTypeResizer(), 
+				new BoolToIntTransformation(), new ActorTypeResizer(),
 				new PrintlnTransformation(),
 				new RenameTransformation(this.transformations),
 				new TacTransformation(true), new InstPhiTransformation(),
@@ -140,41 +139,43 @@ public class TTABackendImpl extends AbstractBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) throws OrccException {
-		InstancePrinter printer = new InstancePrinter(
+		StandardPrinter printer = new StandardPrinter(
 				"net/sf/orcc/backends/tta/TTA_actor.stg", !debugMode, true);
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
-		InstancePrinter tbPrinter = new InstancePrinter(
+		StandardPrinter tbPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/tta/TTA_testbench.stg", !debugMode, false);
 
 		String instancePath = OrccUtil.createFolder(path, instance.getId());
 		if (!(instance.isActor() && instance.getActor().isNative())) {
 			printProcessor(instance, instancePath);
 		}
-		tbPrinter.print(instance.getId() + "_tb.vhd", instancePath, instance,
-				"instance");
+		tbPrinter.print(instance.getId() + "_tb.vhd", instancePath, instance);
 
-		return printer.print(instance.getId() + ".ll", instancePath, instance,
-				"instance");
+		return printer.print(instance.getId() + ".ll", instancePath, instance);
 	}
 
 	private void printNetwork(Network network) {
-		NetworkPrinter networkPrinter = new NetworkPrinter(
+		StandardPrinter networkPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/tta/TTA_network.stg");
-		NetworkPrinter scriptPrinter = new NetworkPrinter(
+		StandardPrinter scriptPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/tta/TTA_script.stg");
-		NetworkPrinter projectPrinter = new NetworkPrinter(
+		StandardPrinter projectPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/tta/TTA_project.stg");
-		NetworkPrinter tclPrinter = new NetworkPrinter(
+		StandardPrinter tclPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/tta/TTA_TCLLists.stg");
-		NetworkPrinter tbPrinter = new NetworkPrinter(
+		StandardPrinter tbPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/tta/TTA_testbench.stg");
-		networkPrinter.print("top.vhd", path, network, "network");
-		scriptPrinter.print("informations.py", path, network, "script");
-		projectPrinter.print("top.qsf", path, network, "qsfNetwork");
-		projectPrinter.print("top.qpf", path, network, "qpfNetwork");
-		tclPrinter.print("top.tcl", path, network, "network");
-		tbPrinter.print("top_tb.vhd", path, network, "network");
+		networkPrinter.print("top.vhd", path, network);
+		scriptPrinter.print("informations.py", path, network);
+		projectPrinter.print("top.qsf", path, network);
+
+		CustomPrinter projectQpfPrinter = new CustomPrinter(
+				"net/sf/orcc/backends/tta/TTA_project.stg");
+		projectQpfPrinter.print("top.qpf", path, "qpfNetwork", network);
+
+		tclPrinter.print("top.tcl", path, network);
+		tbPrinter.print("top_tb.vhd", path, network);
 		OrccUtil.createFile(path, "__init__.py");
 	}
 
@@ -182,16 +183,15 @@ public class TTABackendImpl extends AbstractBackend {
 		TTA simpleTTA = ArchitectureFactory.eINSTANCE.createTTASpecialized(
 				instance.getId(), instance);
 
-		ArchitecturePrinter adfPrinter = new ArchitecturePrinter(
+		CustomPrinter adfPrinter = new CustomPrinter(
 				"net/sf/orcc/backends/tta/TTA_processor_adf.stg");
-		ArchitecturePrinter idfPrinter = new ArchitecturePrinter(
+		CustomPrinter idfPrinter = new CustomPrinter(
 				"net/sf/orcc/backends/tta/TTA_processor_idf.stg");
 
 		adfPrinter.print("processor_" + instance.getId() + ".adf",
-				instancePath, simpleTTA, "tta");
+				instancePath, "tta", simpleTTA);
 		idfPrinter.print("processor_" + instance.getId() + ".idf",
-				instancePath, simpleTTA, "tta");
-
+				instancePath, "tta", simpleTTA);
 	}
 
 }

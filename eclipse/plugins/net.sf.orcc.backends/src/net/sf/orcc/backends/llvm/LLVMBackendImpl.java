@@ -46,7 +46,7 @@ import java.util.Set;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.ActorPrinter;
+import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
 import net.sf.orcc.backends.llvm.transformations.GetElementPtrAdder;
 import net.sf.orcc.backends.llvm.transformations.PrintlnTransformation;
@@ -97,7 +97,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 	private String optLevel;
 
-	private ActorPrinter printer;
+	private StandardPrinter printer;
 
 	private final Map<String, String> transformations;
 
@@ -156,8 +156,8 @@ public class LLVMBackendImpl extends AbstractBackend {
 	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
 		List<Actor> actors = parseActors(files);
 
-		printer = new ActorPrinter("net/sf/orcc/backends/llvm/LLVM_actor.stg",
-				!debugMode);
+		printer = new StandardPrinter(
+				"net/sf/orcc/backends/llvm/LLVM_actor.stg", !debugMode);
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
 
@@ -205,7 +205,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		String folder = path + File.separator + OrccUtil.getFolder(actor);
 		new File(folder).mkdirs();
 
-		return printer.print(actor.getSimpleName(), folder, actor, "actor");
+		return printer.print(actor.getSimpleName(), folder, actor);
 	}
 
 	private void runJadeToolBox(List<Actor> actors) throws OrccException {

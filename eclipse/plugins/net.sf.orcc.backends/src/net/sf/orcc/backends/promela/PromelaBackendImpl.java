@@ -34,12 +34,10 @@ import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.InstancePrinter;
-import net.sf.orcc.backends.NetworkPrinter;
+import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.c.CExpressionPrinter;
 import net.sf.orcc.backends.promela.transformations.GuardsExtractor;
 import net.sf.orcc.backends.transformations.Inliner;
-//import net.sf.orcc.backends.xlim.transformations.ListFlattener;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
@@ -70,7 +68,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 
 	private Map<Action, List<InstLoad>> loadPeeks = new HashMap<Action, List<InstLoad>>();
 
-	private InstancePrinter instancePrinter;
+	private StandardPrinter instancePrinter;
 
 	private final Map<String, String> transformations;
 
@@ -117,7 +115,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
 
-		instancePrinter = new InstancePrinter(
+		instancePrinter = new StandardPrinter(
 				"net/sf/orcc/backends/promela/PROMELA_actor.stg");
 		instancePrinter.setExpressionPrinter(new CExpressionPrinter());
 		instancePrinter.setTypePrinter(new PromelaTypePrinter());
@@ -138,8 +136,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		return instancePrinter.print(instance.getId() + ".pml", path, instance,
-				"instance");
+		return instancePrinter.print(instance.getId() + ".pml", path, instance);
 	}
 
 	/**
@@ -151,11 +148,10 @@ public class PromelaBackendImpl extends AbstractBackend {
 	 *             if something goes wrong
 	 */
 	private void printNetwork(Network network) {
-		NetworkPrinter printer = new NetworkPrinter(
+		StandardPrinter printer = new StandardPrinter(
 				"net/sf/orcc/backends/promela/PROMELA_network.stg");
 		printer.setTypePrinter(new PromelaTypePrinter());
-		printer.print("main_" + network.getName() + ".pml", path, network,
-				"network");
+		printer.print("main_" + network.getName() + ".pml", path, network);
 	}
 
 }

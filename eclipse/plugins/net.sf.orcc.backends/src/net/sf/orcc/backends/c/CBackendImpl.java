@@ -39,8 +39,7 @@ import java.util.Set;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.InstancePrinter;
-import net.sf.orcc.backends.NetworkPrinter;
+import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.c.transformations.CBroadcastAdder;
 import net.sf.orcc.backends.transformations.TypeResizer;
 import net.sf.orcc.ir.Actor;
@@ -243,7 +242,7 @@ public class CBackendImpl extends AbstractBackend {
 
 		network.computeTemplateMaps();
 
-		NetworkPrinter printer = new NetworkPrinter(
+		StandardPrinter printer = new StandardPrinter(
 				"net/sf/orcc/backends/c/C_network.stg");
 		printer.setTypePrinter(new CTypePrinter());
 
@@ -262,7 +261,7 @@ public class CBackendImpl extends AbstractBackend {
 
 		// print network
 		write("Printing network...\n");
-		printer.print(network.getName() + ".c", path, network, "network");
+		printer.print(network.getName() + ".c", path, network);
 
 		// print CMakeLists
 		printCMake(network);
@@ -272,14 +271,14 @@ public class CBackendImpl extends AbstractBackend {
 	}
 
 	private void printCMake(Network network) {
-		NetworkPrinter networkPrinter = new NetworkPrinter(
+		StandardPrinter networkPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/c/C_CMakeLists.stg");
-		networkPrinter.print("CMakeLists.txt", path, network, "CMakeLists");
+		networkPrinter.print("CMakeLists.txt", path, network);
 	}
 
 	@Override
 	protected boolean printInstance(Instance instance) throws OrccException {
-		InstancePrinter printer = new InstancePrinter(
+		StandardPrinter printer = new StandardPrinter(
 				"net/sf/orcc/backends/c/C_actor.stg", !debugMode);
 		printer.setExpressionPrinter(new CExpressionPrinter());
 		printer.setTypePrinter(new CTypePrinter());
@@ -288,16 +287,14 @@ public class CBackendImpl extends AbstractBackend {
 		printer.getOptions().put("enableTrace", enableTrace);
 		printer.getOptions().put("ringTopology", ringTopology);
 		printer.getOptions().put("newScheduler", newScheduler);
-		return printer.print(instance.getId() + ".c", path, instance,
-				"instance");
+		return printer.print(instance.getId() + ".c", path, instance);
 	}
 
 	private void printMapping(Network network) {
-		NetworkPrinter networkPrinter = new NetworkPrinter(
+		StandardPrinter networkPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/c/C_mapping.stg");
 		networkPrinter.getOptions().put("mapping", instancesTarget);
-		networkPrinter.print(network.getName() + ".xcf", path, network,
-				"mapping");
+		networkPrinter.print(network.getName() + ".xcf", path, network);
 	}
 
 }

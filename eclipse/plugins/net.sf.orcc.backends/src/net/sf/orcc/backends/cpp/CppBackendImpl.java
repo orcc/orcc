@@ -36,8 +36,7 @@ import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.ActorPrinter;
-import net.sf.orcc.backends.NetworkPrinter;
+import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.cpp.transformations.SerDesAdder;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprString;
@@ -183,9 +182,9 @@ public class CppBackendImpl extends AbstractBackend {
 
 	@Override
 	protected boolean printActor(Actor actor) {
-		ActorPrinter actorPrinter = new ActorPrinter(
+		StandardPrinter actorPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/cpp/Cpp_actorImpl.stg", false);
-		ActorPrinter headerPrinter = new ActorPrinter(
+		StandardPrinter headerPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/cpp/Cpp_actorDecl.stg", false);
 
 		actorPrinter.setTypePrinter(new CppTypePrinter());
@@ -197,18 +196,17 @@ public class CppBackendImpl extends AbstractBackend {
 				+ actor.getPackage().replace('.', File.separatorChar);
 		new File(hier).mkdirs();
 
-		actorPrinter
-				.print(actor.getSimpleName() + ".cpp", hier, actor, "actor");
-		headerPrinter.print(actor.getSimpleName() + ".h", hier, actor, "actor");
+		actorPrinter.print(actor.getSimpleName() + ".cpp", hier, actor);
+		headerPrinter.print(actor.getSimpleName() + ".h", hier, actor);
 
 		return false;
 	}
 
 	private void printCMake(Network network) {
-		NetworkPrinter networkPrinter = new NetworkPrinter(
+		StandardPrinter networkPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/cpp/Cpp_CMakeLists.stg");
 		networkPrinter.getOptions().put("needSerDes", needSerDes);
-		networkPrinter.print("CMakeLists.txt", path, network, "Cpp_CMakeLists");
+		networkPrinter.print("CMakeLists.txt", path, network);
 	}
 
 	/**
@@ -220,7 +218,7 @@ public class CppBackendImpl extends AbstractBackend {
 	 *             if something goes wrong
 	 */
 	private void printNetwork(Network network) throws OrccException {
-		NetworkPrinter printer = new NetworkPrinter(
+		StandardPrinter printer = new StandardPrinter(
 				"net/sf/orcc/backends/cpp/Cpp_network.stg");
 
 		printer.setExpressionPrinter(new CppExprPrinter());
@@ -233,7 +231,7 @@ public class CppBackendImpl extends AbstractBackend {
 
 		printer.getOptions().put("needSerDes", needSerDes);
 
-		printer.print(network.getName() + ".cpp", path, network, "network");
+		printer.print(network.getName() + ".cpp", path, network);
 
 		printCMake(network);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, IRISA
+ * Copyright (c) 2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of IRISA nor the names of its
+ *   * Neither the name of the IETR/INSA of Rennes nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -26,32 +26,30 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.tta.architecture.util;
+package net.sf.orcc.backends;
 
 import java.io.File;
-import java.io.IOException;
-
-import net.sf.orcc.backends.Printer;
-import net.sf.orcc.backends.tta.architecture.TTA;
 
 import org.stringtemplate.v4.ST;
 
 /**
- * This class defines a architecture printer.
+ * This class defines a printer for arbitrary objects. When printing standard
+ * objects such as actors, instances, and networks, the StandardPrinter class
+ * should be used instead of this one.
  * 
- * @author Herve Yviquel
- * 
+ * @author Matthieu Wipliez
+ * @see StandardPrinter
  */
-public class ArchitecturePrinter extends Printer {
+public class CustomPrinter extends AbstractPrinter {
 
 	/**
-	 * Creates a new network printer.
+	 * Creates a new printer.
 	 * 
-	 * @param templateName
-	 *            the name of the template
+	 * @param fullPath
+	 *            the full path of the template
 	 */
-	public ArchitecturePrinter(String templateName) {
-		super(templateName);
+	public CustomPrinter(String fullPath) {
+		super(fullPath);
 	}
 
 	/**
@@ -61,21 +59,19 @@ public class ArchitecturePrinter extends Printer {
 	 *            name of the output file
 	 * @param path
 	 *            path of the output file
-	 * @param network
-	 *            the network to generate code for
-	 * @param instanceName
-	 *            name of the root ST rule
-	 * @return <code>true</code> if the network was cached
-	 * @throws IOException
-	 *             if there is an I/O error
+	 * @param tmplName
+	 *            name of the template to apply
+	 * @param attributes
+	 *            attributes to the template name1, val1, name2, val2...
 	 */
-	public boolean print(String fileName, String path, TTA tta,
-			String instanceName) {
-		String file = path + File.separator + fileName;
-		ST template = group.getInstanceOf(instanceName);
-		template.add("tta", tta);
-		printTemplate(template, file);
-		return false;
+	public void print(String fileName, String path, String tmplName,
+			Object... attributes) {
+		ST template = group.getInstanceOf(tmplName);
+		for (int i = 0; i < attributes.length - 1; i += 2) {
+			template.add(String.valueOf(attributes[i]), attributes[i + 1]);
+		}
+
+		printTemplate(template, path + File.separator + fileName);
 	}
 
 }

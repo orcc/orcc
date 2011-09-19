@@ -2,9 +2,9 @@ printEntity(entity) ::= <<
 vcom -93 -reportprogress 30 -work work $Design/<entity>.vhd
 >>
 
-TCLLists(name, entities, options) ::= <<
+TCLLists(name, entities, vhdlLibraryPath) ::= <<
 # Generated from <name>
-set SRC "<options.vhdlLibraryPath>/src"
+set SRC "<vhdlLibraryPath>/src"
 set Design "../src/Design"
 set Testbench "../src/Testbench"
 

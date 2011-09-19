@@ -44,10 +44,8 @@ import java.util.regex.Pattern;
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.ActorPrinter;
-import net.sf.orcc.backends.InstancePrinter;
-import net.sf.orcc.backends.NetworkPrinter;
-import net.sf.orcc.backends.Printer;
+import net.sf.orcc.backends.CustomPrinter;
+import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.vhdl.ram.RAMTransformation;
 import net.sf.orcc.backends.vhdl.transformations.BoolExprTransformation;
@@ -81,7 +79,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 	public static Pattern adjacentUnderscores = Pattern.compile("_+");
 
-	private ActorPrinter actorPrinter;
+	private StandardPrinter actorPrinter;
 
 	private boolean debugMode;
 
@@ -203,7 +201,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
-		actorPrinter = new ActorPrinter(
+		actorPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/vhdl/VHDL_actor.stg", !debugMode);
 		actorPrinter.setExpressionPrinter(new VHDLExpressionPrinter());
 		actorPrinter.setTypePrinter(new VHDLTypePrinter());
@@ -289,7 +287,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 	@Override
 	protected boolean printActor(Actor actor) {
 		return actorPrinter.print(actor.getName() + ".vhd", path
-				+ File.separator + "Design", actor, "actor");
+				+ File.separator + "Design", actor);
 	}
 
 	/**
@@ -306,7 +304,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 			folder.mkdir();
 		}
 
-		InstancePrinter instancePrinter = new InstancePrinter(
+		StandardPrinter instancePrinter = new StandardPrinter(
 				"net/sf/orcc/backends/vhdl/VHDL_testbench.stg");
 		Instance instance = new Instance(network.getName(), network.getName());
 		instance.setContents(network);
@@ -315,46 +313,43 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 		network.computeTemplateMaps();
 
-		NetworkPrinter networkPrinter = new NetworkPrinter(
+		StandardPrinter networkPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/vhdl/VHDL_network.stg");
 		networkPrinter.setExpressionPrinter(new VHDLExpressionPrinter());
 		networkPrinter.setTypePrinter(new VHDLTypePrinter());
 		networkPrinter.getOptions().put("fifoSize", fifoSize);
 
 		networkPrinter.print(network.getName() + ".vhd", path + File.separator
-				+ "Design", network, "network");
+				+ "Design", network);
 
 		for (Network subNetwork : network.getNetworks()) {
 			networkPrinter.print(subNetwork.getName() + ".vhd", path
-					+ File.separator + "Design", subNetwork, "network");
+					+ File.separator + "Design", subNetwork);
 		}
 	}
 
 	private void printTCL(Instance instance) {
-		Printer printer = new Printer(
+		CustomPrinter printer = new CustomPrinter(
 				"net/sf/orcc/backends/vhdl/VHDL_TCLLists.stg");
 
 		entities = new ArrayList<String>();
 		entitySet = new HashSet<String>();
 		computeEntityList(instance);
 
-		printer.getCustomAttributes().put("name",
-				instance.getNetwork().getName());
-		printer.getCustomAttributes().put("entities", entities);
-
 		String lib = OrccActivator.getDefault().getPreference(P_VHDL_LIB, "");
 		if (lib == null || lib.isEmpty()) {
 			write("Warning: The path to VHDL libraries is not set!\n"
 					+ "Go to Window > Preferences > Orcc to edit them.\n");
 		}
-		printer.getOptions().put("vhdlLibraryPath", lib);
 
-		printer.print("TCLLists.tcl", path, "TCLLists");
+		printer.print("TCLLists.tcl", path, "TCLLists", "name", instance
+				.getNetwork().getName(), "entities", entities,
+				"vhdlLibraryPath", lib);
 	}
 
-	private void printTestbench(InstancePrinter printer, Instance instance) {
+	private void printTestbench(StandardPrinter printer, Instance instance) {
 		printer.print(instance.getId() + "_tb.vhd", path + File.separator
-				+ "Testbench", instance, "instance");
+				+ "Testbench", instance);
 
 		if (instance.isNetwork()) {
 			Network network = instance.getNetwork();

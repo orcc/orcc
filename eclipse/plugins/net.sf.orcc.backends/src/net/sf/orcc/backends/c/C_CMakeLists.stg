@@ -10,7 +10,7 @@ printInstance(instance) ::= <<
 endif>
 >>
 
-CMakeLists(network, options) ::= <<
+network(network, options) ::= <<
 # Generated from <network.name>
 
 cmake_minimum_required (VERSION 2.6)
