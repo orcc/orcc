@@ -47,6 +47,7 @@ import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
@@ -82,13 +83,14 @@ public class Inliner extends AbstractActorVisitor<Object> {
 	@Override
 	public Object caseInstCall(InstCall call) {
 		// Function case
-		if (!call.getProcedure().getReturnType().isVoid() && inlineFunction) {
-			inline(call);
-		}
-
-		// Procedure case
-		if (call.getProcedure().getReturnType().isVoid() && inlineProcedure) {
-			inline(call);
+		Procedure procedure = call.getProcedure();
+		Type returnType = procedure.getReturnType();
+		if (!procedure.isNative()) {
+			// only inline non-native functions/procedures
+			if (returnType.isVoid() && inlineProcedure || !returnType.isVoid()
+					&& inlineFunction) {
+				inline(call);
+			}
 		}
 		return null;
 	}
