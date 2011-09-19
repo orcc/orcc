@@ -270,6 +270,10 @@ public class ValueUtil {
 			return BigInteger.valueOf(((Long) value));
 		} else if (value instanceof BigInteger) {
 			return (BigInteger) value;
+		} else if (value instanceof Byte) {
+			return BigInteger.valueOf((Byte) value);
+		} else if (value instanceof Short) {
+			return BigInteger.valueOf((Short) value);
 		} else {
 			return null;
 		}
