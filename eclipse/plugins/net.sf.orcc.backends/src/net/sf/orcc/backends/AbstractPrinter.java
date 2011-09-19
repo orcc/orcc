@@ -68,6 +68,7 @@ public abstract class AbstractPrinter {
 				throws STNoSuchPropertyException {
 			return ((EMap<?, ?>) o).get(property);
 		}
+
 	}
 
 	protected class ExpressionRenderer implements AttributeRenderer {

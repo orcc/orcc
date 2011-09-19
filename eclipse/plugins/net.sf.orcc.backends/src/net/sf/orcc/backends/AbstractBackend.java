@@ -233,7 +233,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	private int executeTasks(List<Callable<Boolean>> tasks)
 			throws OrccException {
 		// creates the pool
-		int nThreads = 1; // Runtime.getRuntime().availableProcessors();
+		int nThreads = Runtime.getRuntime().availableProcessors();
 		ExecutorService pool = Executors.newFixedThreadPool(nThreads);
 		try {
 			// invokes all tasks and wait for them to complete
