@@ -108,8 +108,8 @@ public class XDFWriter {
 			if (parentPrec < currentPrec) {
 				// create a new Expr element
 				Element exprElt = document.createElement("Expr");
-				parentElt.appendChild(exprElt);
 				exprElt.setAttribute("kind", "BinOpSeq");
+				parentElt.appendChild(exprElt);
 
 				Element oldParent = parentElt;
 				parentElt = exprElt;
@@ -175,9 +175,16 @@ public class XDFWriter {
 		public Expression caseExprList(ExprList expr) {
 			Element exprElt = document.createElement("Expr");
 			exprElt.setAttribute("kind", "List");
+			parentElt.appendChild(exprElt);
+
+			Element oldParent = parentElt;
+			parentElt = exprElt;
+			
 			for (Expression childExpr : expr.getValue()) {
 				doSwitch(childExpr);
 			}
+			
+			parentElt = oldParent;
 
 			return null;
 		}
