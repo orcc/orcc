@@ -333,7 +333,10 @@ public class SSATransformation extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseInstReturn(InstReturn returnInstr) {
-		replaceUses(returnInstr.getValue());
+		Expression value = returnInstr.getValue();
+		if (value != null) {
+			replaceUses(value);
+		}
 		return null;
 	}
 
