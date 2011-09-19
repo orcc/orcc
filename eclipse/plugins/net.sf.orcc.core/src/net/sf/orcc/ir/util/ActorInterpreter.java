@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir.util;
 
-import java.lang.reflect.Array;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -318,8 +317,9 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 			ret = doSwitch(node.getJoinNode());
 			branch = oldBranch;
 		} else {
-			throw new OrccRuntimeException("Condition not boolean at line "
-					+ node.getLineNumber() + "\n");
+			throw new OrccRuntimeException("Condition "
+					+ new ExpressionPrinter().doSwitch(node.getCondition())
+					+ " not boolean at line " + node.getLineNumber() + "\n");
 		}
 		return ret;
 	}
@@ -494,21 +494,12 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 		Expression initConst = variable.getInitialValue();
 		if (initConst == null) {
 			if (type.isList()) {
-				// Allocate empty array variable
+				// allocate empty array variable
 				variable.setValue(ValueUtil.createArray((TypeList) type));
 			}
 		} else {
-			// initialize
-			if (type.isList()) {
-				Object array = ValueUtil.createArray((TypeList) type);
-				Object values = exprInterpreter.doSwitch(initConst);
-				for (int i = 0; i < Array.getLength(array); i++) {
-					Array.set(array, i, Array.get(values, i));
-				}
-				variable.setValue(array);
-			} else {
-				variable.setValue(exprInterpreter.doSwitch(initConst));
-			}
+			// evaluate initial constant value
+			variable.setValue(exprInterpreter.doSwitch(initConst));
 		}
 	}
 
