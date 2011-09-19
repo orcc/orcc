@@ -562,13 +562,17 @@ indexesName(indexes) ::= <<
 <indexes: {index |<index>}; separator="_">
 >>
 
-parameters(arguments, parameters) ::= <<
-<arguments, parameters: { arg, param | <parameter(arg.type, param)>}; separator=", ">
+printParameters(arguments, parameters) ::= <<
+<arguments, parameters: { arg, param | <printParameter(arg.type, param)>}; separator=", ">
 >>
 
-parameter(type, expr) ::= <<
-<type><if(type.list)>*<endif> <Expr(expr)>
->>
+printParameter(type, param) ::= <%
+<if (param.byRef)>
+TODO
+<else>
+<type><if(type.list)>*<endif> <Expr(param.value)>
+<endif>
+%>
 
 argumentDeclaration(param) ::= <<
 <param.variable.type><if(param.variable.type.list)>*<endif> %<param.variable.name>
@@ -636,7 +640,7 @@ else
 ><if(call.target)
 >%<call.target.variable.indexedName> = <
 endif
->call <call.procedure.returnType> @<call.procedure.name> (<parameters(call.procedure.parameters, call.parameters)>)<
+>call <call.procedure.returnType> @<call.procedure.name> (<printParameters(call.procedure.parameters, call.parameters)>)<
 endif>
 >>
 

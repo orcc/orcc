@@ -240,7 +240,16 @@ printCall(call) ::= <%
 <if(call.target)>
 <call.target.variable.indexedName> := 
 <endif>
-<call.procedure.name>(<call.parameters; separator=", ">);
+<call.procedure.name>(<call.parameters: printCallParam(); separator=", ">);
+%>
+
+// no support of indexes in parameters by reference
+printCallParam(param) ::= <%
+<if (param.byRef)>
+<param.use.variable>
+<else>
+<param.value>
+<endif>
 %>
 
 getPort(variable) ::= <<

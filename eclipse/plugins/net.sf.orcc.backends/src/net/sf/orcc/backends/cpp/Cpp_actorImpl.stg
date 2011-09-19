@@ -66,9 +66,9 @@ printAssign(assign) ::= <<
 
 printCall(call) ::= <<
 
-<if(call.print)>std::cout \<\< <call.parameters: {parameter|<parameter>}; separator=" << ">;<
+<if(call.print)>std::cout \<\< <call.parameters: printCallParam(); separator=" << ">;<
 else
-><if(call.target)><call.target.variable.indexedName> = <endif><call.procedure.name>(<call.parameters; separator=", ">);<
+><if(call.target)><call.target.variable.indexedName> = <endif><call.procedure.name>(<call.parameters: printCallParam(); separator=", ">);<
 endif>
 >>
 
