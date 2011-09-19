@@ -577,8 +577,8 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		}
 		instCall.setProcedure(procedure);
 		if (parameters != null) {
-			while (!parameters.isEmpty()) {
-				instCall.getParameters().add(createArgByValue(parameters.get(0)));
+			for (Expression expr : parameters) {
+				instCall.getParameters().add(createArgByValue(expr));
 			}
 		}
 		return instCall;
