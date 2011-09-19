@@ -30,7 +30,6 @@ package net.sf.orcc.backends.xlim.transformations;
 
 import java.util.List;
 
-import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -141,14 +140,11 @@ public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseInstCall(InstCall call) {
-		List<Expression> newParameters = transformExpressionList(EcoreHelper
+		List<Expression> newArgs = transformExpressionList(EcoreHelper
 				.getObjects(call, Expression.class));
 		call.getParameters().clear();
-		while (!newParameters.isEmpty()) {
-			Expression expr = newParameters.get(0);
-			Arg arg = IrFactory.eINSTANCE.createArgByValue(expr);
-			call.getParameters().add(arg);
-		}
+		call.getParameters().addAll(
+				IrFactory.eINSTANCE.createArgsByVal(newArgs));
 		return null;
 	}
 

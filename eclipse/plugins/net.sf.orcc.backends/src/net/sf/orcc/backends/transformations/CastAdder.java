@@ -32,7 +32,6 @@ import java.util.List;
 
 import net.sf.orcc.backends.instructions.InstCast;
 import net.sf.orcc.backends.instructions.InstructionsFactory;
-import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -190,13 +189,10 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 						.getVariable().getType();
 				newExpressions.add(doSwitch(oldExpressions.get(i)));
 			}
-			
+
 			call.getParameters().clear();
-			while (!newExpressions.isEmpty()) {
-				Expression expr = newExpressions.get(0);
-				Arg arg = IrFactory.eINSTANCE.createArgByValue(expr);
-				call.getParameters().add(arg);
-			}
+			call.getParameters().addAll(
+					IrFactory.eINSTANCE.createArgsByVal(newExpressions));
 
 			parentType = oldParentType;
 		}
