@@ -36,6 +36,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -62,6 +63,7 @@ import net.sf.orcc.cal.cal.ExpressionBinary;
 import net.sf.orcc.cal.cal.ExpressionBoolean;
 import net.sf.orcc.cal.cal.ExpressionFloat;
 import net.sf.orcc.cal.cal.ExpressionInteger;
+import net.sf.orcc.cal.cal.ExpressionList;
 import net.sf.orcc.cal.cal.ExpressionString;
 import net.sf.orcc.cal.cal.ExpressionUnary;
 import net.sf.orcc.cal.cal.ExpressionVariable;
@@ -350,6 +352,16 @@ public class XdfExporter extends CalSwitch<Object> {
 	@Override
 	public Object caseExpressionInteger(ExpressionInteger expression) {
 		return IrFactory.eINSTANCE.createExprInt(expression.getValue());
+	}
+
+	@Override
+	public Object caseExpressionList(ExpressionList list) {
+		List<Expression> expressions = new ArrayList<Expression>(list
+				.getExpressions().size());
+		for (AstExpression expression : list.getExpressions()) {
+			expressions.add((Expression) doSwitch(expression));
+		}
+		return IrFactory.eINSTANCE.createExprList(expressions);
 	}
 
 	@Override
