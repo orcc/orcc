@@ -149,24 +149,32 @@ endif>
 >>
 
 printFormat(parameter) ::= <<
-<if (parameter.stringExpr)
-><parameter><
+<if (parameter.value.stringExpr)
+><parameter.value><
 else
-> "%<printFormatType(parameter.type)>" <
+> "%<printFormatType(parameter.value.type)>" <
 endif>
 >>
 
-printParameter(parameter) ::= <<
-<if (!parameter.stringExpr)>, <parameter><endif>
+printPrintfParam(parameter) ::= <<
+<if (!parameter.value.stringExpr)>, <parameter.value><endif>
 >>
 
 printCall(call) ::= <<
 
-<if(call.print)>printf(<call.parameters: printFormat()><call.parameters: printParameter()>);<
+<if(call.print)>printf(<call.parameters: printFormat()><call.parameters: printPrintfParam()>);<
 else
-><if(call.target)><call.target.variable.indexedName> = <endif><call.procedure.name>(<call.parameters; separator=", ">);<
+><if(call.target)><call.target.variable.indexedName> = <endif><call.procedure.name>(<call.parameters: printCallParam(); separator=", ">);<
 endif>
 >>
+
+printCallParam(param) ::= <%
+<if (param.byRef)>
+&<param.use.variable><param.indexes : {index | [<index>]}>
+<else>
+<param.value>
+<endif>
+%>
 
 getPort(variable) ::= <<
 <if (action.inputPattern.varToPortMap.(variable))
