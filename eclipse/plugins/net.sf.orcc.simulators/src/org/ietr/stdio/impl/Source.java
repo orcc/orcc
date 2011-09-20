@@ -48,6 +48,14 @@ public class Source extends GenericSource {
 
 	private static int nbLoops = 1;
 
+	public static void source_exit(Integer status) {
+		// System.exit(status);
+	}
+
+	public static int source_getNbLoop() {
+		return nbLoops;
+	}
+
 	public static void source_init() {
 		try {
 			in = new RandomAccessFile(fileName, "r");
@@ -91,10 +99,6 @@ public class Source extends GenericSource {
 					+ "\"";
 			throw new RuntimeException(msg, e);
 		}
-	}
-
-	public static int source_getNbLoop() {
-		return nbLoops;
 	}
 
 }
