@@ -261,6 +261,11 @@ public class SlowSimulator extends AbstractSimulator {
 			throw new OrccRuntimeException(e.getMessage());
 		} catch (FileNotFoundException e) {
 			throw new OrccRuntimeException(e.getMessage());
+		} finally {
+			// clean up to prevent memory leak
+			inputFifos = null;
+			outputFifos = null;
+			interpreters = null;
 		}
 	}
 
