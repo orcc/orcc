@@ -163,7 +163,7 @@ while (<whileNode.condition>) {
 
 procedure(procedure) ::= <<
 <if(!procedure.native)>
-<procedure.returnType> <actor.simpleName>::<procedure.name>(<procedure.parameters: varDecl(); wrap, anchor, separator=", ">)
+<procedure.returnType> <actor.simpleName>::<procedure.name>(<procedure.parameters: {param | <varDecl(variable=param.variable)>}; wrap, anchor, separator=", ">)
 {
 <if(procedure.locals)>
 	<procedure.locals: {local | <varDecl(local)>;<\n>}>
@@ -172,7 +172,7 @@ procedure(procedure) ::= <<
 	<printNodes(procedure.nodes)>
 }
 <else>
-extern <procedure.returnType> <procedure.name>(<procedure.parameters: varDecl(); wrap, anchor, separator=", ">);
+extern <procedure.returnType> <procedure.name>(<procedure.parameters: {param | <varDecl(variable=param.variable)>}; wrap, anchor, separator=", ">);
 <endif>
 
 >>

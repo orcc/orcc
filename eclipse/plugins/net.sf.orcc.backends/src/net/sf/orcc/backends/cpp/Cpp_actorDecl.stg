@@ -31,7 +31,7 @@ nonConstStateVar(variable) ::= <<
 procedure(procedure) ::= <<
 
 <if(!procedure.native)
-><procedure.returnType> <procedure.name>(<procedure.parameters: varDecl(); wrap, anchor, separator=", ">);<
+><procedure.returnType> <procedure.name>(<procedure.parameters: {param | <varDecl(variable=param.variable)>}; wrap, anchor, separator=", ">);<
 endif>
 
 >>

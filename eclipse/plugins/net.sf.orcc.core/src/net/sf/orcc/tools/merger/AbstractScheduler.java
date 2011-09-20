@@ -102,8 +102,7 @@ public abstract class AbstractScheduler implements IScheduler {
 				computeDepth(iterand.getSchedule());
 				depth--;
 			} else {
-				if (depth > maxDepth)
-					maxDepth = depth;
+				maxDepth = Math.max(depth, maxDepth);
 			}
 		}
 	}
