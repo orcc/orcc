@@ -1,0 +1,26 @@
+package net.sf.orcc.cal.test.pass;
+
+actor ElsifStateVar() ==> :
+
+	int stateVar1 := 42;
+	int stateVar2 := 4242;
+	int stateVar3 := 424242;
+	
+	initialize ==>
+	do
+		stateVar1 := stateVar1 + 1;
+		stateVar2 := stateVar2 + 1;
+		stateVar3 := stateVar3 + 1;
+	
+		if stateVar1 = 42 then
+			print("error1");
+		elsif stateVar2 = 4244 then
+			print("error2");
+		elsif stateVar3 = 424243 then
+			print("ok");
+		else
+			print("error3 stateVar3 = " + stateVar3);
+		end
+	end
+
+end

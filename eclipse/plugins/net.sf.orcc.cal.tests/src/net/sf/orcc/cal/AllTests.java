@@ -233,6 +233,11 @@ public class AllTests {
 	}
 
 	@Test
+	public void passExecElsifStateVar() throws Exception {
+		assertExecution("ok", prefix + "pass/ElsifStateVar.cal");
+	}
+
+	@Test
 	public void passExecInitStateVar() throws Exception {
 		assertExecution("pp = 8", prefix + "pass/InitStateVarFunction.cal");
 	}
