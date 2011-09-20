@@ -230,7 +230,7 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 		checkPriorities(actor, actionList);
 	}
 
-	@Check(CheckType.NORMAL)
+	@Check(CheckType.FAST)
 	public void checkAstEntity(AstEntity entity) {
 		checkEntityPackage(entity);
 		checkEntityName(entity);
