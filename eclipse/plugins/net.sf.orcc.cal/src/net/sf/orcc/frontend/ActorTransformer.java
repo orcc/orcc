@@ -118,7 +118,6 @@ public class ActorTransformer {
 	 */
 	private void actionLoadTokens(Var portVariable, List<Variable> tokens,
 			int repeat) {
-		Context context = astTransformer.getContext();
 		if (repeat == 1) {
 			int i = 0;
 
@@ -135,7 +134,7 @@ public class ActorTransformer {
 				i++;
 			}
 		} else {
-			Procedure procedure = context.getProcedure();
+			Procedure procedure = astTransformer.getContext();
 
 			// creates loop variable and initializes it
 			Var loopVar = procedure.newTempLocalVariable(
@@ -234,8 +233,7 @@ public class ActorTransformer {
 				i++;
 			}
 		} else {
-			Context context = astTransformer.getContext();
-			Procedure procedure = context.getProcedure();
+			Procedure procedure = astTransformer.getContext();
 
 			// creates loop variable and initializes it
 			Var loopVar = procedure.newTempLocalVariable(
@@ -315,8 +313,7 @@ public class ActorTransformer {
 	 *            an instruction
 	 */
 	private void addInstruction(Instruction instruction) {
-		Context context = astTransformer.getContext();
-		NodeBlock block = context.getProcedure().getLast();
+		NodeBlock block = astTransformer.getContext().getLast();
 		block.add(instruction);
 	}
 
@@ -388,8 +385,7 @@ public class ActorTransformer {
 	 */
 	private Var createPortVariable(Port port, int numTokens) {
 		// create the variable to hold the tokens
-		int lineNumber = astTransformer.getContext().getProcedure()
-				.getLineNumber();
+		int lineNumber = astTransformer.getContext().getLineNumber();
 		return IrFactory.eINSTANCE.createVar(lineNumber,
 				IrFactory.eINSTANCE.createTypeList(numTokens, port.getType()),
 				port.getName(), true, 0);
@@ -559,7 +555,7 @@ public class ActorTransformer {
 	 */
 	private void transformActionBody(AstAction astAction, Procedure body,
 			Pattern inputPattern, Pattern outputPattern) {
-		Context oldContext = astTransformer.newContext(body);
+		Procedure oldContext = astTransformer.newContext(body);
 
 		for (InputPattern pattern : astAction.getInputs()) {
 			transformInputPattern(pattern, inputPattern);
@@ -603,10 +599,10 @@ public class ActorTransformer {
 	 */
 	private void transformActionScheduler(AstAction astAction,
 			Procedure scheduler, Pattern peekPattern) {
-		Context oldContext = astTransformer.newContext(scheduler);
-		Context context = astTransformer.getContext();
+		Procedure oldContext = astTransformer.newContext(scheduler);
+		Procedure context = astTransformer.getContext();
 
-		Var result = context.getProcedure().newTempLocalVariable(
+		Var result = context.newTempLocalVariable(
 				IrFactory.eINSTANCE.createTypeBool(), "result");
 
 		List<AstExpression> guards = astAction.getGuards();
@@ -657,7 +653,7 @@ public class ActorTransformer {
 	 */
 	private void transformInputPattern(InputPattern pattern,
 			Pattern irInputPattern) {
-		Context context = astTransformer.getContext();
+		Procedure context = astTransformer.getContext();
 		Port port = (Port) Frontend.getMapping(pattern.getPort());
 		List<Variable> tokens = pattern.getTokens();
 
@@ -678,7 +674,7 @@ public class ActorTransformer {
 		// declare tokens
 		for (Variable token : tokens) {
 			Var local = astTransformer.transformLocalVariable(token);
-			context.getProcedure().getLocals().add(local);
+			context.getLocals().add(local);
 		}
 
 		// loads tokens

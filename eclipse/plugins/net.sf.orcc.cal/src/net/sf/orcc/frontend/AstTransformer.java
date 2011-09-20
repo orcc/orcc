@@ -134,7 +134,7 @@ public class AstTransformer {
 		@Override
 		public Expression caseExpressionCall(ExpressionCall call) {
 			int lineNumber = Util.getLocation(call);
-			Procedure procedure = context.getProcedure();
+			Procedure procedure = context;
 
 			// retrieve IR procedure
 			Function astFunction = call.getFunction();
@@ -188,8 +188,7 @@ public class AstTransformer {
 					}
 				}
 
-				target = context.getProcedure().newTempLocalVariable(type,
-						"_tmp_if");
+				target = context.newTempLocalVariable(type, "_tmp_if");
 				indexes = new ArrayList<Expression>(0);
 			}
 
@@ -203,7 +202,7 @@ public class AstTransformer {
 			node.setCondition(condition);
 			node.getThenNodes().addAll(thenNodes);
 			node.getElseNodes().addAll(elseNodes);
-			context.getProcedure().getNodes().add(node);
+			context.getNodes().add(node);
 
 			Expression varExpr = IrFactory.eINSTANCE.createExprVar(target);
 
@@ -228,7 +227,7 @@ public class AstTransformer {
 			List<Expression> indexes = transformExpressions(expression
 					.getIndexes());
 
-			Var target = context.getProcedure().newTempLocalVariable(
+			Var target = context.newTempLocalVariable(
 					Typer.getType(expression), "local_" + var.getName());
 
 			InstLoad load = IrFactory.eINSTANCE.createInstLoad(lineNumber,
@@ -304,13 +303,12 @@ public class AstTransformer {
 				Expression varExpr = IrFactory.eINSTANCE.createExprVar(var);
 				return varExpr;
 			} else {
-				if (context.getProcedure() != null) {
+				if (context != null) {
 					if (var.isGlobal()) {
 						Var global = var;
-						var = context.getProcedure().getLocal(
-								"local_" + global.getName());
+						var = context.getLocal("local_" + global.getName());
 						if (var == null) {
-							var = context.getProcedure().newTempLocalVariable(
+							var = context.newTempLocalVariable(
 									global.getType(),
 									"local_" + global.getName());
 						}
@@ -352,7 +350,7 @@ public class AstTransformer {
 			Type type = Typer.getType(expressions);
 			size *= expressions.size();
 
-			Procedure procedure = context.getProcedure();
+			Procedure procedure = context;
 			Type listType = IrFactory.eINSTANCE.createTypeList(size, type);
 			target = procedure.newTempLocalVariable(listType, "_list");
 		}
@@ -377,7 +375,7 @@ public class AstTransformer {
 		 */
 		private List<Node> getNodes(AstExpression astExpression) {
 			int lineNumber = Util.getLocation(astExpression);
-			List<Node> nodes = context.getProcedure().getNodes();
+			List<Node> nodes = context.getNodes();
 
 			int first = nodes.size();
 			nodes.add(IrFactoryImpl.eINSTANCE.createNodeBlock());
@@ -406,7 +404,7 @@ public class AstTransformer {
 		 * @return a list of CFG nodes
 		 */
 		private List<Node> getNodes(List<AstExpression> astExpressions) {
-			List<Node> nodes = context.getProcedure().getNodes();
+			List<Node> nodes = context.getNodes();
 
 			int first = nodes.size();
 			nodes.add(IrFactoryImpl.eINSTANCE.createNodeBlock());
@@ -456,7 +454,7 @@ public class AstTransformer {
 
 			indexes = new ArrayList<Expression>(currentIndexes);
 
-			Procedure procedure = context.getProcedure();
+			Procedure procedure = context;
 
 			// first add local variables
 			Expression index = null;
@@ -696,7 +694,7 @@ public class AstTransformer {
 		@Override
 		public Object caseStatementForeach(StatementForeach foreach) {
 			int lineNumber = Util.getLocation(foreach);
-			Procedure procedure = context.getProcedure();
+			Procedure procedure = context;
 
 			// creates loop variable and assigns it
 			Variable Variable = foreach.getVariable();
@@ -742,7 +740,7 @@ public class AstTransformer {
 		@Override
 		public Object caseStatementIf(StatementIf stmtIf) {
 			int lineNumber = Util.getLocation(stmtIf);
-			Procedure procedure = context.getProcedure();
+			Procedure procedure = context;
 
 			Expression condition = transformExpression(stmtIf.getCondition());
 
@@ -784,7 +782,7 @@ public class AstTransformer {
 		@Override
 		public Object caseStatementWhile(StatementWhile stmtWhile) {
 			int lineNumber = Util.getLocation(stmtWhile);
-			Procedure procedure = context.getProcedure();
+			Procedure procedure = context;
 
 			// to help track the instructions added
 			NodeBlock block = procedure.getLast();
@@ -832,7 +830,7 @@ public class AstTransformer {
 		 * @return a list of CFG nodes
 		 */
 		private List<Node> getNodes(List<Statement> statements) {
-			List<Node> nodes = context.getProcedure().getNodes();
+			List<Node> nodes = context.getNodes();
 
 			int first = nodes.size();
 			nodes.add(IrFactoryImpl.eINSTANCE.createNodeBlock());
@@ -889,7 +887,7 @@ public class AstTransformer {
 	 */
 	private int blockCount;
 
-	private Context context;
+	private Procedure context;
 
 	/**
 	 * expression transformer.
@@ -918,8 +916,6 @@ public class AstTransformer {
 
 		exprTransformer = new ExpressionTransformer();
 		stmtTransformer = new StatementTransformer();
-
-		context = new Context(null, null);
 	}
 
 	/**
@@ -929,7 +925,7 @@ public class AstTransformer {
 	 *            an instruction
 	 */
 	private void addInstruction(Instruction instruction) {
-		NodeBlock block = context.getProcedure().getLast();
+		NodeBlock block = context.getLast();
 		block.add(instruction);
 	}
 
@@ -993,11 +989,11 @@ public class AstTransformer {
 	}
 
 	/**
-	 * Returns the current context of this AST transformer.
+	 * Returns the current procedure of this AST transformer.
 	 * 
-	 * @return the current context of this AST transformer
+	 * @return the current procedure of this AST transformer
 	 */
-	public Context getContext() {
+	public Procedure getContext() {
 		return context;
 	}
 
@@ -1005,7 +1001,8 @@ public class AstTransformer {
 		if (eObject.eContainer() instanceof AstUnit) {
 			AstUnit astUnit = (AstUnit) eObject.eContainer();
 			AstEntity entity = (AstEntity) astUnit.eContainer();
-			return Frontend.instance.compile(entity);
+			Frontend.instance.compile(entity);
+			return Frontend.getMapping(eObject);
 		}
 		return null;
 	}
@@ -1084,9 +1081,9 @@ public class AstTransformer {
 	 * 
 	 * @return the current context
 	 */
-	public Context newContext(Procedure procedure) {
-		Context oldContext = context;
-		context = new Context(context, procedure);
+	public Procedure newContext(Procedure procedure) {
+		Procedure oldContext = context;
+		context = procedure;
 		return oldContext;
 	}
 
@@ -1097,7 +1094,7 @@ public class AstTransformer {
 	 * @param context
 	 *            the context returned by {@link #newContext()}
 	 */
-	public void restoreContext(Context context) {
+	public void restoreContext(Procedure context) {
 		this.context = context;
 	}
 
@@ -1166,7 +1163,7 @@ public class AstTransformer {
 				lineNumber, type);
 		Frontend.putMapping(function, procedure);
 
-		Context oldContext = newContext(procedure);
+		Procedure oldContext = newContext(procedure);
 
 		transformParameters(function.getParameters());
 		transformLocalVariables(function.getVariables());
@@ -1230,7 +1227,7 @@ public class AstTransformer {
 						lineNumber, IrFactory.eINSTANCE.createTypeVoid());
 			}
 
-			Context oldContext = newContext(initialize);
+			Procedure oldContext = newContext(initialize);
 
 			exprTransformer.setTarget(variable, new ArrayList<Expression>(0));
 			Expression expression = transformExpression(Variable.getValue());
@@ -1286,7 +1283,7 @@ public class AstTransformer {
 	public void transformLocalVariables(List<Variable> variables) {
 		for (Variable Variable : variables) {
 			Var local = transformLocalVariable(Variable);
-			context.getProcedure().getLocals().add(local);
+			context.getLocals().add(local);
 		}
 	}
 
@@ -1298,7 +1295,7 @@ public class AstTransformer {
 	 *            a list of AST parameters
 	 */
 	private void transformParameters(List<Variable> parameters) {
-		List<Param> params = context.getProcedure().getParameters();
+		List<Param> params = context.getParameters();
 		for (Variable astParameter : parameters) {
 			Var local = transformLocalVariable(astParameter);
 			params.add(IrFactory.eINSTANCE.createParam(local));
@@ -1321,7 +1318,7 @@ public class AstTransformer {
 				lineNumber, IrFactory.eINSTANCE.createTypeVoid());
 		Frontend.putMapping(astProcedure, procedure);
 
-		Context oldContext = newContext(procedure);
+		Procedure oldContext = newContext(procedure);
 
 		transformParameters(astProcedure.getParameters());
 		transformLocalVariables(astProcedure.getVariables());
