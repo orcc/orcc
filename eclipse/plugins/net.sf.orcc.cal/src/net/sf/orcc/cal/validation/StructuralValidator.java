@@ -48,9 +48,7 @@ import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstTransition;
 import net.sf.orcc.cal.cal.AstUnit;
-import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.ExpressionCall;
-import net.sf.orcc.cal.cal.ExpressionIndex;
 import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.Generator;
 import net.sf.orcc.cal.cal.Inequality;
@@ -256,7 +254,7 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 		if (!used && procedure.eContainer() instanceof AstActor
 				&& !procedure.isNative()) {
 			warning("The procedure " + procedure.getName() + " is never called",
-					eINSTANCE.getAstProcedure_Name());
+					procedure, eINSTANCE.getAstProcedure_Name(), -1);
 		}
 	}
 
@@ -445,7 +443,7 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 
 		if (!used && !function.isNative()) {
 			warning("The function " + function.getName() + " is never called",
-					eINSTANCE.getFunction_Name());
+					function, eINSTANCE.getFunction_Name(), -1);
 		}
 	}
 
@@ -467,66 +465,75 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 	 *            a variable
 	 */
 	private void checkIsVariableUsed(final Variable variable) {
-		// do not take variables declared by input patterns and
-		// generator/foreach
 		EObject container = variable.eContainer();
 		if (container instanceof InputPattern || container instanceof Generator
-				|| container instanceof StatementForeach
-				|| container instanceof AstUnit) {
+				|| container instanceof StatementForeach) {
+			// do not warn about these variables because it is ok if they are
+			// not used
+			return;
+		} else if (container instanceof AstUnit) {
+			// variables in unit, too, because they may be used in other
+			// entities
+			return;
+		} else if (container instanceof Function) {
+			Function function = (Function) variable.eContainer();
+			if (function.isNative()) {
+				// parameters in native functions are not read in CAL
+				return;
+			}
+		} else if (container instanceof AstProcedure) {
+			AstProcedure procedure = (AstProcedure) variable.eContainer();
+			if (procedure.isNative()) {
+				// parameters in native procedures are not read in CAL
+				return;
+			}
+		}
+
+		EReference reference = variable.eContainmentFeature();
+		AstEntity entity = EcoreUtil2.getContainerOfType(variable,
+				AstEntity.class);
+		if (reference == eINSTANCE.getAstActor_Parameters()
+				&& entity.isNative()) {
+			// parameters in native actors are not read in CAL
 			return;
 		}
 
-		boolean used = new BooleanSwitch() {
-
-			@Override
-			public Boolean caseExpressionIndex(ExpressionIndex expression) {
-				if (expression.getSource().getVariable().equals(variable)) {
-					return true;
-				}
-
-				return super.caseExpressionIndex(expression);
-			}
-
-			@Override
-			public Boolean caseStatementAssign(StatementAssign assign) {
-				if (assign.getTarget().getVariable().equals(variable)) {
-					return true;
-				}
-
-				return super.caseStatementAssign(assign);
-			}
+		boolean isRead = new BooleanSwitch() {
 
 			@Override
 			public Boolean caseVariableReference(VariableReference ref) {
 				return ref.getVariable().equals(variable);
 			}
 
-		}.doSwitch(Util.getTopLevelContainer(variable));
+		}.doSwitch(entity);
+
+		boolean isWritten = new BooleanSwitch() {
+
+			@Override
+			public Boolean caseStatementAssign(StatementAssign assign) {
+				return assign.getTarget().getVariable().equals(variable);
+			}
+
+		}.doSwitch(entity);
 
 		// do not warn about unused actor parameters
 		// used for system actors
-		EReference reference = variable.eContainmentFeature();
-		if (!used) {
-			if (reference == CalPackage.eINSTANCE.getAstActor_Parameters()) {
+		if (!isRead && !isWritten) {
+			warning("The variable " + variable.getName() + " is never used",
+					variable, eINSTANCE.getVariable_Name(), -1);
+		} else if (!isRead) {
+			warning("The variable " + variable.getName() + " is never read",
+					variable, eINSTANCE.getVariable_Name(), -1);
+		} else if (!isWritten) {
+			if (variable.isConstant()
+					|| reference == eINSTANCE.getAstActor_Parameters()
+					|| reference == eINSTANCE.getFunction_Parameters()
+					|| reference == eINSTANCE.getAstProcedure_Parameters()) {
 				return;
 			}
 
-			if (variable.eContainer() instanceof Function) {
-				Function function = (Function) variable.eContainer();
-				if (function.isNative()) {
-					return;
-				}
-			}
-
-			if (variable.eContainer() instanceof AstProcedure) {
-				AstProcedure procedure = (AstProcedure) variable.eContainer();
-				if (procedure.isNative()) {
-					return;
-				}
-			}
-
-			warning("The variable " + variable.getName() + " is never read",
-					eINSTANCE.getVariable_Name());
+			warning("The variable " + variable.getName() + " is never written",
+					variable, eINSTANCE.getVariable_Name(), -1);
 		}
 	}
 
