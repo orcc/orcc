@@ -85,7 +85,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		if (outputFolder == null) {
 			return;
 		}
-		Frontend frontend = new Frontend(outputFolder);
+		Frontend.instance.setOutputFolder(outputFolder);
 
 		// if build is cleaning, remove output folder completely
 		BuildType type = context.getBuildType();
@@ -121,7 +121,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 						IFile file = EcoreHelper.getFile(resource);
 						if (!hasErrors(file)) {
 							// and then we compile
-							frontend.compile(entity);
+							Frontend.instance.compile(entity);
 						}
 					}
 				}

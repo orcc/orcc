@@ -67,10 +67,6 @@ public class FrontendCli implements IApplication {
 
 	private List<IFile> actors;
 
-	private Frontend frontend;
-
-	private IFolder outputFolder;
-
 	private XtextResourceSet resourceSet;
 
 	public FrontendCli() {
@@ -122,7 +118,7 @@ public class FrontendCli implements IApplication {
 
 		// only compile if there are no errors
 		if (!hasErrors) {
-			frontend.compile(entity);
+			Frontend.instance.compile(entity);
 		}
 	}
 
@@ -136,9 +132,8 @@ public class FrontendCli implements IApplication {
 			e.printStackTrace();
 		}
 
-		outputFolder = OrccUtil.getOutputFolder(project);
-
-		frontend = new Frontend(outputFolder);
+		IFolder outputFolder = OrccUtil.getOutputFolder(project);
+		Frontend.instance.setOutputFolder(outputFolder);
 	}
 
 	@Override

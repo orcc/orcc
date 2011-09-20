@@ -402,14 +402,14 @@ public class ActorTransformer {
 	 *            the AST of the actor
 	 * @return the actor in IR form
 	 */
-	public Actor transform(Frontend frontend, AstActor astActor) {
+	public Actor transform(AstActor astActor) {
 		Actor actor = IrFactory.eINSTANCE.createActor();
 		actor.setFileName(astActor.eResource().getURI().toPlatformString(true));
 
 		int lineNumber = Util.getLocation(astActor);
 		actor.setLineNumber(lineNumber);
 
-		astTransformer = new AstTransformer(frontend, actor.getProcs());
+		astTransformer = new AstTransformer(actor.getProcs());
 
 		// parameters
 		for (Variable Variable : astActor.getParameters()) {

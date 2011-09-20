@@ -57,6 +57,8 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class Frontend {
 
+	public static final Frontend instance = new Frontend();
+
 	/**
 	 * Returns the IR equivalent of the given AST object using its URI.
 	 * 
@@ -95,14 +97,9 @@ public class Frontend {
 		}
 	}
 
-	private final IFolder outputFolder;
+	private IFolder outputFolder;
 
-	private final ResourceSet set;
-
-	public Frontend(IFolder outputFolder) {
-		this.outputFolder = outputFolder;
-		set = CacheManager.instance.getResourceSet();
-	}
+	private final ResourceSet set = CacheManager.instance.getResourceSet();
 
 	/**
 	 * Compiles the given actor which is defined in the given file, and writes
@@ -127,7 +124,7 @@ public class Frontend {
 			}
 
 			ActorTransformer transformer = new ActorTransformer();
-			actor = transformer.transform(this, astActor);
+			actor = transformer.transform(astActor);
 			putMapping(astActor, actor);
 			removeDanglingUses(actor);
 			IrUtil.serializeActor(set, outputFolder, actor);
@@ -141,7 +138,7 @@ public class Frontend {
 			}
 
 			UnitTransformer transformer = new UnitTransformer();
-			unit = transformer.transform(this, astUnit);
+			unit = transformer.transform(astUnit);
 			putMapping(astUnit, unit);
 			IrUtil.serializeActor(set, outputFolder, unit);
 			return unit;
@@ -181,6 +178,10 @@ public class Frontend {
 				}
 			}
 		}
+	}
+
+	public void setOutputFolder(IFolder outputFolder) {
+		this.outputFolder = outputFolder;
 	}
 
 }

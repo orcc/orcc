@@ -896,8 +896,6 @@ public class AstTransformer {
 	 */
 	final private ExpressionTransformer exprTransformer;
 
-	private Frontend frontend;
-
 	private Procedure initialize;
 
 	private Procedure print;
@@ -915,8 +913,7 @@ public class AstTransformer {
 	/**
 	 * Creates a new AST to IR transformation.
 	 */
-	public AstTransformer(Frontend frontend, List<Procedure> procedures) {
-		this.frontend = frontend;
+	public AstTransformer(List<Procedure> procedures) {
 		this.procedures = procedures;
 
 		exprTransformer = new ExpressionTransformer();
@@ -1007,8 +1004,8 @@ public class AstTransformer {
 	private EObject getExternalObject(EObject eObject) {
 		if (eObject.eContainer() instanceof AstUnit) {
 			AstUnit astUnit = (AstUnit) eObject.eContainer();
-			frontend.compile((AstEntity) astUnit.eContainer());
-			return Frontend.getMapping(eObject);
+			AstEntity entity = (AstEntity) astUnit.eContainer();
+			return Frontend.instance.compile(entity);
 		}
 		return null;
 	}

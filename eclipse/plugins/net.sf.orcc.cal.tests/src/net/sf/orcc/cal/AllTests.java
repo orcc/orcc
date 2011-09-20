@@ -150,8 +150,8 @@ public class AllTests {
 			return null;
 		}
 
-		Frontend frontend = new Frontend(outputFolder);
-		return frontend.compile(entity);
+		Frontend.instance.setOutputFolder(outputFolder);
+		return Frontend.instance.compile(entity);
 	}
 
 	/**

@@ -54,15 +54,14 @@ public class UnitTransformer {
 	 *            the AST of the unit
 	 * @return the unit in IR form
 	 */
-	public Unit transform(Frontend frontend, AstUnit astUnit) {
+	public Unit transform(AstUnit astUnit) {
 		Unit unit = IrFactory.eINSTANCE.createUnit();
 		unit.setFileName(astUnit.eResource().getURI().toPlatformString(true));
 
 		int lineNumber = Util.getLocation(astUnit);
 		unit.setLineNumber(lineNumber);
 
-		AstTransformer astTransformer = new AstTransformer(frontend,
-				unit.getProcedures());
+		AstTransformer astTransformer = new AstTransformer(unit.getProcedures());
 
 		// constants
 		for (Variable Variable : astUnit.getVariables()) {
