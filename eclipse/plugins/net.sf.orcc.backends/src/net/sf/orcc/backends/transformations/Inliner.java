@@ -85,13 +85,12 @@ public class Inliner extends AbstractActorVisitor<Object> {
 		// Function case
 		Procedure procedure = call.getProcedure();
 		Type returnType = procedure.getReturnType();
-		if (!procedure.isNative()) {
-			// only inline non-native functions/procedures
-			if (returnType.isVoid() && inlineProcedure || !returnType.isVoid()
-					&& inlineFunction) {
-				inline(call);
-			}
+
+		if (returnType.isVoid() && inlineProcedure || !returnType.isVoid()
+				&& inlineFunction) {
+			inline(call);
 		}
+
 		return null;
 	}
 
