@@ -75,8 +75,9 @@ public class CacheFactoryImpl extends EFactoryImpl implements CacheFactory {
 		switch (eClass.getClassifierID()) {
 			case CachePackage.CACHE: return createCache();
 			case CachePackage.CACHE_MANAGER: return createCacheManager();
-			case CachePackage.ESTRING_TO_TYPE_MAP_ENTRY: return (EObject)createEStringToTypeMapEntry();
 			case CachePackage.ESTRING_TO_EXPRESSION_MAP_ENTRY: return (EObject)createEStringToExpressionMapEntry();
+			case CachePackage.ESTRING_TO_EOBJECT_MAP_ENTRY: return (EObject)createEStringToEObjectMapEntry();
+			case CachePackage.ESTRING_TO_TYPE_MAP_ENTRY: return (EObject)createEStringToTypeMapEntry();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -107,6 +108,16 @@ public class CacheFactoryImpl extends EFactoryImpl implements CacheFactory {
 	public Map.Entry<String, Expression> createEStringToExpressionMapEntry() {
 		EStringToExpressionMapEntryImpl eStringToExpressionMapEntry = new EStringToExpressionMapEntryImpl();
 		return eStringToExpressionMapEntry;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Map.Entry<String, EObject> createEStringToEObjectMapEntry() {
+		EStringToEObjectMapEntryImpl eStringToEObjectMapEntry = new EStringToEObjectMapEntryImpl();
+		return eStringToEObjectMapEntry;
 	}
 
 	/**

@@ -17,6 +17,7 @@ import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
@@ -32,6 +33,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <ul>
  *   <li>{@link net.sf.orcc.cache.impl.CacheImpl#getExpressions <em>Expressions</em>}</li>
  *   <li>{@link net.sf.orcc.cache.impl.CacheImpl#getExpressionsMap <em>Expressions Map</em>}</li>
+ *   <li>{@link net.sf.orcc.cache.impl.CacheImpl#getIrMap <em>Ir Map</em>}</li>
  *   <li>{@link net.sf.orcc.cache.impl.CacheImpl#getTypes <em>Types</em>}</li>
  *   <li>{@link net.sf.orcc.cache.impl.CacheImpl#getTypesMap <em>Types Map</em>}</li>
  * </ul>
@@ -59,6 +61,16 @@ public class CacheImpl extends EObjectImpl implements Cache {
 	 * @ordered
 	 */
 	protected EMap<String, Expression> expressionsMap;
+
+	/**
+	 * The cached value of the '{@link #getIrMap() <em>Ir Map</em>}' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getIrMap()
+	 * @generated
+	 * @ordered
+	 */
+	protected EMap<String, EObject> irMap;
 
 	/**
 	 * The cached value of the '{@link #getTypes() <em>Types</em>}' containment reference list.
@@ -97,6 +109,9 @@ public class CacheImpl extends EObjectImpl implements Cache {
 			case CachePackage.CACHE__EXPRESSIONS_MAP:
 				if (coreType) return getExpressionsMap();
 				else return getExpressionsMap().map();
+			case CachePackage.CACHE__IR_MAP:
+				if (coreType) return getIrMap();
+				else return getIrMap().map();
 			case CachePackage.CACHE__TYPES:
 				return getTypes();
 			case CachePackage.CACHE__TYPES_MAP:
@@ -118,6 +133,8 @@ public class CacheImpl extends EObjectImpl implements Cache {
 				return ((InternalEList<?>)getExpressions()).basicRemove(otherEnd, msgs);
 			case CachePackage.CACHE__EXPRESSIONS_MAP:
 				return ((InternalEList<?>)getExpressionsMap()).basicRemove(otherEnd, msgs);
+			case CachePackage.CACHE__IR_MAP:
+				return ((InternalEList<?>)getIrMap()).basicRemove(otherEnd, msgs);
 			case CachePackage.CACHE__TYPES:
 				return ((InternalEList<?>)getTypes()).basicRemove(otherEnd, msgs);
 			case CachePackage.CACHE__TYPES_MAP:
@@ -137,6 +154,8 @@ public class CacheImpl extends EObjectImpl implements Cache {
 				return expressions != null && !expressions.isEmpty();
 			case CachePackage.CACHE__EXPRESSIONS_MAP:
 				return expressionsMap != null && !expressionsMap.isEmpty();
+			case CachePackage.CACHE__IR_MAP:
+				return irMap != null && !irMap.isEmpty();
 			case CachePackage.CACHE__TYPES:
 				return types != null && !types.isEmpty();
 			case CachePackage.CACHE__TYPES_MAP:
@@ -159,6 +178,9 @@ public class CacheImpl extends EObjectImpl implements Cache {
 				return;
 			case CachePackage.CACHE__EXPRESSIONS_MAP:
 				((EStructuralFeature.Setting)getExpressionsMap()).set(newValue);
+				return;
+			case CachePackage.CACHE__IR_MAP:
+				((EStructuralFeature.Setting)getIrMap()).set(newValue);
 				return;
 			case CachePackage.CACHE__TYPES:
 				getTypes().clear();
@@ -193,6 +215,9 @@ public class CacheImpl extends EObjectImpl implements Cache {
 			case CachePackage.CACHE__EXPRESSIONS_MAP:
 				getExpressionsMap().clear();
 				return;
+			case CachePackage.CACHE__IR_MAP:
+				getIrMap().clear();
+				return;
 			case CachePackage.CACHE__TYPES:
 				getTypes().clear();
 				return;
@@ -223,6 +248,18 @@ public class CacheImpl extends EObjectImpl implements Cache {
 			expressionsMap = new EcoreEMap<String,Expression>(CachePackage.Literals.ESTRING_TO_EXPRESSION_MAP_ENTRY, EStringToExpressionMapEntryImpl.class, this, CachePackage.CACHE__EXPRESSIONS_MAP);
 		}
 		return expressionsMap;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EMap<String, EObject> getIrMap() {
+		if (irMap == null) {
+			irMap = new EcoreEMap<String,EObject>(CachePackage.Literals.ESTRING_TO_EOBJECT_MAP_ENTRY, EStringToEObjectMapEntryImpl.class, this, CachePackage.CACHE__IR_MAP);
+		}
+		return irMap;
 	}
 
 	/**

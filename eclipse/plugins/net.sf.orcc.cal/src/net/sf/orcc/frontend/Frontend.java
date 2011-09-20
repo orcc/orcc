@@ -28,10 +28,9 @@
  */
 package net.sf.orcc.frontend;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import net.sf.orcc.OrccException;
+import net.sf.orcc.cache.Cache;
+import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstUnit;
@@ -44,7 +43,9 @@ import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.emf.common.util.TreeIterator;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -57,7 +58,43 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class Frontend {
 
-	private Map<EObject, EObject> mapAstToIr;
+	/**
+	 * Returns the IR equivalent of the given AST object using its URI.
+	 * 
+	 * @param eObject
+	 *            an AST node
+	 * @return the IR equivalent of the given object
+	 */
+	public static EObject getMapping(EObject eObject) {
+		Resource resource = eObject.eResource();
+		if (resource != null) {
+			Cache cache = CacheManager.instance.getCache(resource.getURI());
+
+			URI uri = EcoreUtil.getURI(eObject);
+			String fragment = uri.fragment();
+			return cache.getIrMap().get(fragment);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the IR equivalent of the given AST object using its URI.
+	 * 
+	 * @param eObject
+	 *            an AST node
+	 * @return the IR equivalent of the given object
+	 */
+	public static void putMapping(EObject astObject, EObject irObject) {
+		Resource resource = astObject.eResource();
+		if (resource != null) {
+			Cache cache = CacheManager.instance.getCache(resource.getURI());
+
+			URI uri = EcoreUtil.getURI(astObject);
+			String fragment = uri.fragment();
+			cache.getIrMap().put(fragment, irObject);
+		}
+	}
 
 	private IFolder outputFolder;
 
@@ -65,7 +102,6 @@ public class Frontend {
 
 	public Frontend(IFolder outputFolder) {
 		this.outputFolder = outputFolder;
-		mapAstToIr = new HashMap<EObject, EObject>();
 		set = new ResourceSetImpl();
 	}
 
@@ -86,35 +122,31 @@ public class Frontend {
 	public Entity compile(AstEntity entity) {
 		AstActor astActor = entity.getActor();
 		if (astActor != null) {
-			Actor actor = (Actor) mapAstToIr.get(astActor);
+			Actor actor = (Actor) getMapping(astActor);
 			if (actor != null) {
 				return actor;
 			}
 
 			ActorTransformer transformer = new ActorTransformer();
 			actor = transformer.transform(this, astActor);
-			mapAstToIr.put(astActor, actor);
+			putMapping(astActor, actor);
 			removeDanglingUses(actor);
 			IrUtil.serializeActor(set, outputFolder, actor);
 			return actor;
 		} else {
 			AstUnit astUnit = entity.getUnit();
 
-			Unit unit = (Unit) mapAstToIr.get(astUnit);
+			Unit unit = (Unit) getMapping(astUnit);
 			if (unit != null) {
 				return unit;
 			}
 
 			UnitTransformer transformer = new UnitTransformer();
 			unit = transformer.transform(this, astUnit);
-			mapAstToIr.put(astUnit, unit);
+			putMapping(astUnit, unit);
 			IrUtil.serializeActor(set, outputFolder, unit);
 			return unit;
 		}
-	}
-
-	public Map<EObject, EObject> getMap() {
-		return mapAstToIr;
 	}
 
 	/**

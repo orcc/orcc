@@ -95,6 +95,13 @@ public class CachePackageImpl extends EPackageImpl implements CachePackage {
 	private EClass eStringToExpressionMapEntryEClass = null;
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass eStringToEObjectMapEntryEClass = null;
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -146,18 +153,23 @@ public class CachePackageImpl extends EPackageImpl implements CachePackage {
 		cacheEClass = createEClass(CACHE);
 		createEReference(cacheEClass, CACHE__EXPRESSIONS);
 		createEReference(cacheEClass, CACHE__EXPRESSIONS_MAP);
+		createEReference(cacheEClass, CACHE__IR_MAP);
 		createEReference(cacheEClass, CACHE__TYPES);
 		createEReference(cacheEClass, CACHE__TYPES_MAP);
 
 		cacheManagerEClass = createEClass(CACHE_MANAGER);
 
-		eStringToTypeMapEntryEClass = createEClass(ESTRING_TO_TYPE_MAP_ENTRY);
-		createEAttribute(eStringToTypeMapEntryEClass, ESTRING_TO_TYPE_MAP_ENTRY__KEY);
-		createEReference(eStringToTypeMapEntryEClass, ESTRING_TO_TYPE_MAP_ENTRY__VALUE);
-
 		eStringToExpressionMapEntryEClass = createEClass(ESTRING_TO_EXPRESSION_MAP_ENTRY);
 		createEAttribute(eStringToExpressionMapEntryEClass, ESTRING_TO_EXPRESSION_MAP_ENTRY__KEY);
 		createEReference(eStringToExpressionMapEntryEClass, ESTRING_TO_EXPRESSION_MAP_ENTRY__VALUE);
+
+		eStringToEObjectMapEntryEClass = createEClass(ESTRING_TO_EOBJECT_MAP_ENTRY);
+		createEAttribute(eStringToEObjectMapEntryEClass, ESTRING_TO_EOBJECT_MAP_ENTRY__KEY);
+		createEReference(eStringToEObjectMapEntryEClass, ESTRING_TO_EOBJECT_MAP_ENTRY__VALUE);
+
+		eStringToTypeMapEntryEClass = createEClass(ESTRING_TO_TYPE_MAP_ENTRY);
+		createEAttribute(eStringToTypeMapEntryEClass, ESTRING_TO_TYPE_MAP_ENTRY__KEY);
+		createEReference(eStringToTypeMapEntryEClass, ESTRING_TO_TYPE_MAP_ENTRY__VALUE);
 	}
 
 	/**
@@ -185,10 +197,11 @@ public class CachePackageImpl extends EPackageImpl implements CachePackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getCache_Types() {
+	public EReference getCache_IrMap() {
 		return (EReference)cacheEClass.getEStructuralFeatures().get(2);
 	}
 
@@ -196,8 +209,16 @@ public class CachePackageImpl extends EPackageImpl implements CachePackage {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getCache_TypesMap() {
+	public EReference getCache_Types() {
 		return (EReference)cacheEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getCache_TypesMap() {
+		return (EReference)cacheEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -238,6 +259,33 @@ public class CachePackageImpl extends EPackageImpl implements CachePackage {
 	 */
 	public EReference getEStringToExpressionMapEntry_Value() {
 		return (EReference)eStringToExpressionMapEntryEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getEStringToEObjectMapEntry() {
+		return eStringToEObjectMapEntryEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getEStringToEObjectMapEntry_Key() {
+		return (EAttribute)eStringToEObjectMapEntryEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getEStringToEObjectMapEntry_Value() {
+		return (EReference)eStringToEObjectMapEntryEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -294,18 +342,23 @@ public class CachePackageImpl extends EPackageImpl implements CachePackage {
 		initEClass(cacheEClass, Cache.class, "Cache", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getCache_Expressions(), theIrPackage.getExpression(), null, "expressions", null, 0, -1, Cache.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getCache_ExpressionsMap(), this.getEStringToExpressionMapEntry(), null, "expressionsMap", null, 0, -1, Cache.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getCache_IrMap(), this.getEStringToEObjectMapEntry(), null, "irMap", null, 0, -1, Cache.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getCache_Types(), theIrPackage.getType(), null, "types", null, 0, -1, Cache.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getCache_TypesMap(), this.getEStringToTypeMapEntry(), null, "typesMap", null, 0, -1, Cache.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(cacheManagerEClass, CacheManager.class, "CacheManager", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
-		initEClass(eStringToTypeMapEntryEClass, Map.Entry.class, "EStringToTypeMapEntry", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getEStringToTypeMapEntry_Key(), theEcorePackage.getEString(), "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getEStringToTypeMapEntry_Value(), theIrPackage.getType(), null, "value", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
 		initEClass(eStringToExpressionMapEntryEClass, Map.Entry.class, "EStringToExpressionMapEntry", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getEStringToExpressionMapEntry_Key(), theEcorePackage.getEString(), "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getEStringToExpressionMapEntry_Value(), theIrPackage.getExpression(), null, "value", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(eStringToEObjectMapEntryEClass, Map.Entry.class, "EStringToEObjectMapEntry", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getEStringToEObjectMapEntry_Key(), ecorePackage.getEString(), "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getEStringToEObjectMapEntry_Value(), theEcorePackage.getEObject(), null, "value", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(eStringToTypeMapEntryEClass, Map.Entry.class, "EStringToTypeMapEntry", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getEStringToTypeMapEntry_Key(), theEcorePackage.getEString(), "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getEStringToTypeMapEntry_Value(), theIrPackage.getType(), null, "value", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Create resource
 		createResource(eNS_URI);

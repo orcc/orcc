@@ -63,6 +63,13 @@ public interface CachePackage extends EPackage {
 		 */
 		EReference CACHE__EXPRESSIONS_MAP = eINSTANCE.getCache_ExpressionsMap();
 		/**
+		 * The meta object literal for the '<em><b>Ir Map</b></em>' map feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference CACHE__IR_MAP = eINSTANCE.getCache_IrMap();
+		/**
 		 * The meta object literal for the '<em><b>Types</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
@@ -103,6 +110,29 @@ public interface CachePackage extends EPackage {
 		 * @generated
 		 */
 		EReference ESTRING_TO_EXPRESSION_MAP_ENTRY__VALUE = eINSTANCE.getEStringToExpressionMapEntry_Value();
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.cache.impl.EStringToEObjectMapEntryImpl <em>EString To EObject Map Entry</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.cache.impl.EStringToEObjectMapEntryImpl
+		 * @see net.sf.orcc.cache.impl.CachePackageImpl#getEStringToEObjectMapEntry()
+		 * @generated
+		 */
+		EClass ESTRING_TO_EOBJECT_MAP_ENTRY = eINSTANCE.getEStringToEObjectMapEntry();
+		/**
+		 * The meta object literal for the '<em><b>Key</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute ESTRING_TO_EOBJECT_MAP_ENTRY__KEY = eINSTANCE.getEStringToEObjectMapEntry_Key();
+		/**
+		 * The meta object literal for the '<em><b>Value</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference ESTRING_TO_EOBJECT_MAP_ENTRY__VALUE = eINSTANCE.getEStringToEObjectMapEntry_Value();
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.cache.impl.EStringToTypeMapEntryImpl <em>EString To Type Map Entry</em>}' class.
 		 * <!-- begin-user-doc -->
@@ -154,12 +184,21 @@ public interface CachePackage extends EPackage {
 	int CACHE__EXPRESSIONS_MAP = 1;
 
 	/**
+	 * The feature id for the '<em><b>Ir Map</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CACHE__IR_MAP = 2;
+
+	/**
 	 * The feature id for the '<em><b>Types</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int CACHE__TYPES = 2;
+	int CACHE__TYPES = 3;
 
 	/**
 	 * The feature id for the '<em><b>Types Map</b></em>' map. <!--
@@ -168,7 +207,7 @@ public interface CachePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CACHE__TYPES_MAP = 3;
+	int CACHE__TYPES_MAP = 4;
 
 	/**
 	 * The number of structural features of the '<em>Cache</em>' class. <!--
@@ -177,7 +216,7 @@ public interface CachePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CACHE_FEATURE_COUNT = 4;
+	int CACHE_FEATURE_COUNT = 5;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.cache.impl.CacheManagerImpl <em>Manager</em>}' class.
@@ -234,7 +273,7 @@ public interface CachePackage extends EPackage {
 	 * @see net.sf.orcc.cache.impl.CachePackageImpl#getEStringToExpressionMapEntry()
 	 * @generated
 	 */
-	int ESTRING_TO_EXPRESSION_MAP_ENTRY = 3;
+	int ESTRING_TO_EXPRESSION_MAP_ENTRY = 2;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.cache.impl.EStringToTypeMapEntryImpl <em>EString To Type Map Entry</em>}' class.
@@ -244,34 +283,7 @@ public interface CachePackage extends EPackage {
 	 * @see net.sf.orcc.cache.impl.CachePackageImpl#getEStringToTypeMapEntry()
 	 * @generated
 	 */
-	int ESTRING_TO_TYPE_MAP_ENTRY = 2;
-
-	/**
-	 * The feature id for the '<em><b>Key</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int ESTRING_TO_TYPE_MAP_ENTRY__KEY = 0;
-
-	/**
-	 * The feature id for the '<em><b>Value</b></em>' reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int ESTRING_TO_TYPE_MAP_ENTRY__VALUE = 1;
-
-	/**
-	 * The number of structural features of the '<em>EString To Type Map Entry</em>' class.
-	 * <!-- begin-user-doc --> <!--
-	 * end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ESTRING_TO_TYPE_MAP_ENTRY_FEATURE_COUNT = 2;
+	int ESTRING_TO_TYPE_MAP_ENTRY = 4;
 
 	/**
 	 * The feature id for the '<em><b>Key</b></em>' attribute. <!--
@@ -301,6 +313,70 @@ public interface CachePackage extends EPackage {
 	int ESTRING_TO_EXPRESSION_MAP_ENTRY_FEATURE_COUNT = 2;
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.cache.impl.EStringToEObjectMapEntryImpl <em>EString To EObject Map Entry</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.cache.impl.EStringToEObjectMapEntryImpl
+	 * @see net.sf.orcc.cache.impl.CachePackageImpl#getEStringToEObjectMapEntry()
+	 * @generated
+	 */
+	int ESTRING_TO_EOBJECT_MAP_ENTRY = 3;
+
+	/**
+	 * The feature id for the '<em><b>Key</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ESTRING_TO_EOBJECT_MAP_ENTRY__KEY = 0;
+
+	/**
+	 * The feature id for the '<em><b>Value</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ESTRING_TO_EOBJECT_MAP_ENTRY__VALUE = 1;
+
+	/**
+	 * The number of structural features of the '<em>EString To EObject Map Entry</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ESTRING_TO_EOBJECT_MAP_ENTRY_FEATURE_COUNT = 2;
+
+	/**
+	 * The feature id for the '<em><b>Key</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int ESTRING_TO_TYPE_MAP_ENTRY__KEY = 0;
+
+	/**
+	 * The feature id for the '<em><b>Value</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int ESTRING_TO_TYPE_MAP_ENTRY__VALUE = 1;
+
+	/**
+	 * The number of structural features of the '<em>EString To Type Map Entry</em>' class.
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ESTRING_TO_TYPE_MAP_ENTRY_FEATURE_COUNT = 2;
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.cache.Cache <em>Cache</em>}'.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Cache</em>'.
@@ -328,6 +404,17 @@ public interface CachePackage extends EPackage {
 	 * @generated
 	 */
 	EReference getCache_ExpressionsMap();
+
+	/**
+	 * Returns the meta object for the map '{@link net.sf.orcc.cache.Cache#getIrMap <em>Ir Map</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the map '<em>Ir Map</em>'.
+	 * @see net.sf.orcc.cache.Cache#getIrMap()
+	 * @see #getCache()
+	 * @generated
+	 */
+	EReference getCache_IrMap();
 
 	/**
 	 * Returns the meta object for the containment reference list '
@@ -403,6 +490,40 @@ public interface CachePackage extends EPackage {
 	 * @generated
 	 */
 	EReference getEStringToExpressionMapEntry_Value();
+
+	/**
+	 * Returns the meta object for class '{@link java.util.Map.Entry <em>EString To EObject Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>EString To EObject Map Entry</em>'.
+	 * @see java.util.Map.Entry
+	 * @model keyDataType="org.eclipse.emf.ecore.EString"
+	 *        valueType="org.eclipse.emf.ecore.EObject"
+	 * @generated
+	 */
+	EClass getEStringToEObjectMapEntry();
+
+	/**
+	 * Returns the meta object for the attribute '{@link java.util.Map.Entry <em>Key</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Key</em>'.
+	 * @see java.util.Map.Entry
+	 * @see #getEStringToEObjectMapEntry()
+	 * @generated
+	 */
+	EAttribute getEStringToEObjectMapEntry_Key();
+
+	/**
+	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Value</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Value</em>'.
+	 * @see java.util.Map.Entry
+	 * @see #getEStringToEObjectMapEntry()
+	 * @generated
+	 */
+	EReference getEStringToEObjectMapEntry_Value();
 
 	/**
 	 * Returns the meta object for class '{@link java.util.Map.Entry <em>EString To Type Map Entry</em>}'.

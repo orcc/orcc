@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.frontend;
 
-import java.util.Map;
-
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstUnit;
@@ -40,8 +38,6 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Unit;
 import net.sf.orcc.ir.Var;
-
-import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class transforms an AST unit to its IR equivalent.
@@ -75,9 +71,8 @@ public class UnitTransformer {
 		}
 
 		// functions
-		Map<EObject, EObject> mapAstToIr = frontend.getMap();
 		for (Function function : astUnit.getFunctions()) {
-			if (!mapAstToIr.containsKey(function)) {
+			if (Frontend.getMapping(function) == null) {
 				Procedure proc = astTransformer.transformFunction(function);
 				unit.getProcedures().add(proc);
 			}
@@ -85,7 +80,7 @@ public class UnitTransformer {
 
 		// procedures
 		for (AstProcedure procedure : astUnit.getProcedures()) {
-			if (!mapAstToIr.containsKey(procedure)) {
+			if (Frontend.getMapping(procedure) == null) {
 				Procedure proc = astTransformer.transformProcedure(procedure);
 				unit.getProcedures().add(proc);
 			}

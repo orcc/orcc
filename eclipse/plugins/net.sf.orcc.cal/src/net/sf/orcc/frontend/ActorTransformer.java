@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.cal.cal.AstAction;
@@ -96,11 +95,6 @@ public class ActorTransformer {
 	private AstTransformer astTransformer;
 
 	/**
-	 * A map from AST objects to IR objects.
-	 */
-	private Map<EObject, EObject> mapAstToIr;
-
-	/**
 	 * count of un-tagged actions
 	 */
 	private int untaggedCount;
@@ -133,7 +127,7 @@ public class ActorTransformer {
 				indexes.add(IrFactory.eINSTANCE.createExprInt(i));
 				int lineNumber = portVariable.getLineNumber();
 
-				Var irToken = (Var) mapAstToIr.get(token);
+				Var irToken = (Var) Frontend.getMapping(token);
 				InstLoad load = IrFactory.eINSTANCE.createInstLoad(lineNumber,
 						irToken, portVariable, indexes);
 				addInstruction(load);
@@ -172,7 +166,7 @@ public class ActorTransformer {
 						tmpVar, portVariable, indexes);
 				block.add(load);
 
-				Var irToken = (Var) mapAstToIr.get(token);
+				Var irToken = (Var) Frontend.getMapping(token);
 
 				indexes = new ArrayList<Expression>(1);
 				indexes.add(IrFactory.eINSTANCE.createExprVar(loopVar));
@@ -409,8 +403,6 @@ public class ActorTransformer {
 	 * @return the actor in IR form
 	 */
 	public Actor transform(Frontend frontend, AstActor astActor) {
-		this.mapAstToIr = frontend.getMap();
-
 		Actor actor = IrFactory.eINSTANCE.createActor();
 		actor.setFileName(astActor.eResource().getURI().toPlatformString(true));
 
@@ -432,9 +424,8 @@ public class ActorTransformer {
 		}
 
 		// functions
-		Map<EObject, EObject> mapAstToIr = frontend.getMap();
 		for (Function function : astActor.getFunctions()) {
-			if (!mapAstToIr.containsKey(function)) {
+			if (Frontend.getMapping(function) == null) {
 				Procedure proc = astTransformer.transformFunction(function);
 				actor.getProcs().add(proc);
 			}
@@ -442,7 +433,7 @@ public class ActorTransformer {
 
 		// procedures
 		for (AstProcedure procedure : astActor.getProcedures()) {
-			if (!mapAstToIr.containsKey(procedure)) {
+			if (Frontend.getMapping(procedure) == null) {
 				Procedure proc = astTransformer.transformProcedure(procedure);
 				actor.getProcs().add(proc);
 			}
@@ -667,7 +658,7 @@ public class ActorTransformer {
 	private void transformInputPattern(InputPattern pattern,
 			Pattern irInputPattern) {
 		Context context = astTransformer.getContext();
-		Port port = (Port) mapAstToIr.get(pattern.getPort());
+		Port port = (Port) Frontend.getMapping(pattern.getPort());
 		List<Variable> tokens = pattern.getTokens();
 
 		// evaluates token consumption
@@ -741,7 +732,7 @@ public class ActorTransformer {
 			Pattern irOutputPattern) {
 		List<OutputPattern> astOutputPattern = astAction.getOutputs();
 		for (OutputPattern pattern : astOutputPattern) {
-			Port port = (Port) mapAstToIr.get(pattern.getPort());
+			Port port = (Port) Frontend.getMapping(pattern.getPort());
 			List<AstExpression> values = pattern.getValues();
 
 			// evaluates token consumption
@@ -776,7 +767,7 @@ public class ActorTransformer {
 			Type type = EcoreUtil.copy(Typer.getType(astPort));
 			Port port = IrFactory.eINSTANCE.createPort(type, astPort.getName(),
 					astPort.isNative());
-			mapAstToIr.put(astPort, port);
+			Frontend.putMapping(astPort, port);
 			ports.add(port);
 		}
 	}

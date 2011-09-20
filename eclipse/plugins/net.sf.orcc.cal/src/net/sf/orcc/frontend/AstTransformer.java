@@ -31,7 +31,6 @@ package net.sf.orcc.frontend;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 
 import net.sf.orcc.cal.cal.AnnotationArgument;
 import net.sf.orcc.cal.cal.AstAnnotation;
@@ -139,7 +138,8 @@ public class AstTransformer {
 
 			// retrieve IR procedure
 			Function astFunction = call.getFunction();
-			Procedure calledProcedure = (Procedure) mapAstToIr.get(astFunction);
+			Procedure calledProcedure = (Procedure) Frontend
+					.getMapping(astFunction);
 			if (calledProcedure == null) {
 				if (EcoreUtil2.getContainerOfType(call, AstUnit.class) == null) {
 					calledProcedure = (Procedure) getExternalObject(astFunction);
@@ -220,7 +220,7 @@ public class AstTransformer {
 			// we always load in this case
 			int lineNumber = Util.getLocation(expression);
 			Variable Variable = expression.getSource().getVariable();
-			Var var = (Var) mapAstToIr.get(Variable);
+			Var var = (Var) Frontend.getMapping(Variable);
 			if (var == null) {
 				var = (Var) getExternalObject(Variable);
 			}
@@ -295,7 +295,7 @@ public class AstTransformer {
 		public Expression caseExpressionVariable(ExpressionVariable expression) {
 			Variable Variable = expression.getValue().getVariable();
 
-			Var var = (Var) mapAstToIr.get(Variable);
+			Var var = (Var) Frontend.getMapping(Variable);
 			if (var == null) {
 				var = (Var) getExternalObject(Variable);
 			}
@@ -504,7 +504,7 @@ public class AstTransformer {
 
 				// assigns the loop variable its initial value
 				Variable Variable = generator.getVariable();
-				Var loopVar = (Var) mapAstToIr.get(Variable);
+				Var loopVar = (Var) Frontend.getMapping(Variable);
 
 				// condition
 				AstExpression astHigher = generator.getHigher();
@@ -647,7 +647,7 @@ public class AstTransformer {
 
 			// get target
 			Variable astTarget = assign.getTarget().getVariable();
-			Var target = (Var) mapAstToIr.get(astTarget);
+			Var target = (Var) Frontend.getMapping(astTarget);
 			if (target == null) {
 				target = (Var) getExternalObject(astTarget);
 			}
@@ -676,7 +676,7 @@ public class AstTransformer {
 			}
 
 			// retrieve IR procedure
-			Procedure procedure = (Procedure) mapAstToIr.get(astProcedure);
+			Procedure procedure = (Procedure) Frontend.getMapping(astProcedure);
 			if (procedure == null) {
 				if (EcoreUtil2.getContainerOfType(call, AstUnit.class) == null) {
 					procedure = (Procedure) getExternalObject(astProcedure);
@@ -900,11 +900,6 @@ public class AstTransformer {
 
 	private Procedure initialize;
 
-	/**
-	 * A map from AST objects to IR objects.
-	 */
-	private Map<EObject, EObject> mapAstToIr;
-
 	private Procedure print;
 
 	/**
@@ -922,7 +917,6 @@ public class AstTransformer {
 	 */
 	public AstTransformer(Frontend frontend, List<Procedure> procedures) {
 		this.frontend = frontend;
-		this.mapAstToIr = frontend.getMap();
 		this.procedures = procedures;
 
 		exprTransformer = new ExpressionTransformer();
@@ -1014,7 +1008,7 @@ public class AstTransformer {
 		if (eObject.eContainer() instanceof AstUnit) {
 			AstUnit astUnit = (AstUnit) eObject.eContainer();
 			frontend.compile((AstEntity) astUnit.eContainer());
-			return mapAstToIr.get(eObject);
+			return Frontend.getMapping(eObject);
 		}
 		return null;
 	}
@@ -1159,11 +1153,12 @@ public class AstTransformer {
 	}
 
 	/**
-	 * Transforms the given AST function to an IR procedure, and adds it to the
-	 * IR procedure list {@link #procedures} and to the map {@link #mapAstToIr}.
+	 * Transforms and adds a mapping from the given AST function to an IR
+	 * procedure.
 	 * 
 	 * @param function
 	 *            an AST function
+	 * @return the IR procedure
 	 */
 	public Procedure transformFunction(Function function) {
 		String name = function.getName();
@@ -1172,7 +1167,7 @@ public class AstTransformer {
 
 		Procedure procedure = IrFactory.eINSTANCE.createProcedure(name,
 				lineNumber, type);
-		mapAstToIr.put(function, procedure);
+		Frontend.putMapping(function, procedure);
 
 		Context oldContext = newContext(procedure);
 
@@ -1229,7 +1224,7 @@ public class AstTransformer {
 		Var variable = IrFactory.eINSTANCE.createVar(lineNumber, type, name,
 				assignable, initialValue);
 		transformAnnotations(variable, Variable.getAnnotations());
-		mapAstToIr.put(Variable, variable);
+		Frontend.putMapping(Variable, variable);
 
 		// translate and add to initialize
 		if (mustInitialize) {
@@ -1280,7 +1275,7 @@ public class AstTransformer {
 			exprTransformer.clearTarget();
 		}
 
-		mapAstToIr.put(Variable, local);
+		Frontend.putMapping(Variable, local);
 		return local;
 	}
 
@@ -1314,12 +1309,12 @@ public class AstTransformer {
 	}
 
 	/**
-	 * Transforms the given AST procedure to an IR procedure, and adds it to the
-	 * IR procedure list {@link #procedures} and to the map
-	 * {@link #mapProcedures}.
+	 * Transforms and adds a mapping from the given AST procedure to an IR
+	 * procedure.
 	 * 
 	 * @param astProcedure
 	 *            an AST procedure
+	 * @return the IR procedure
 	 */
 	public Procedure transformProcedure(AstProcedure astProcedure) {
 		String name = astProcedure.getName();
@@ -1327,7 +1322,7 @@ public class AstTransformer {
 
 		Procedure procedure = IrFactory.eINSTANCE.createProcedure(name,
 				lineNumber, IrFactory.eINSTANCE.createTypeVoid());
-		mapAstToIr.put(astProcedure, procedure);
+		Frontend.putMapping(astProcedure, procedure);
 
 		Context oldContext = newContext(procedure);
 

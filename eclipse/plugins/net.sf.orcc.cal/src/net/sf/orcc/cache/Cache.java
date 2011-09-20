@@ -61,6 +61,14 @@ public interface Cache extends EObject {
 	EMap<String, Expression> getExpressionsMap();
 
 	/**
+	 * Returns a String to IR map.
+	 * 
+	 * @return a String to IR map
+	 * @model keyType="String" valueType="EObject"
+	 */
+	EMap<String, EObject> getIrMap();
+
+	/**
 	 * Returns all the types stored in this cache. This method should only be
 	 * called internally to make types belong to this cache.
 	 * 

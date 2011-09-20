@@ -92,6 +92,21 @@ public class CacheSwitch<T> extends Switch<T> {
 	}
 
 	/**
+	 * Returns the result of interpreting the object as an instance of '<em>EString To EObject Map Entry</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>EString To EObject Map Entry</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseEStringToEObjectMapEntry(Map.Entry<String, EObject> object) {
+		return null;
+	}
+
+	/**
 	 * Returns the result of interpreting the object as an instance of '<em>EString To Type Map Entry</em>'.
 	 * <!-- begin-user-doc --> This
 	 * implementation returns null; returning a non-null result will terminate
@@ -142,15 +157,21 @@ public class CacheSwitch<T> extends Switch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case CachePackage.ESTRING_TO_TYPE_MAP_ENTRY: {
-				@SuppressWarnings("unchecked") Map.Entry<String, Type> eStringToTypeMapEntry = (Map.Entry<String, Type>)theEObject;
-				T result = caseEStringToTypeMapEntry(eStringToTypeMapEntry);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
 			case CachePackage.ESTRING_TO_EXPRESSION_MAP_ENTRY: {
 				@SuppressWarnings("unchecked") Map.Entry<String, Expression> eStringToExpressionMapEntry = (Map.Entry<String, Expression>)theEObject;
 				T result = caseEStringToExpressionMapEntry(eStringToExpressionMapEntry);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case CachePackage.ESTRING_TO_EOBJECT_MAP_ENTRY: {
+				@SuppressWarnings("unchecked") Map.Entry<String, EObject> eStringToEObjectMapEntry = (Map.Entry<String, EObject>)theEObject;
+				T result = caseEStringToEObjectMapEntry(eStringToEObjectMapEntry);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case CachePackage.ESTRING_TO_TYPE_MAP_ENTRY: {
+				@SuppressWarnings("unchecked") Map.Entry<String, Type> eStringToTypeMapEntry = (Map.Entry<String, Type>)theEObject;
+				T result = caseEStringToTypeMapEntry(eStringToTypeMapEntry);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
