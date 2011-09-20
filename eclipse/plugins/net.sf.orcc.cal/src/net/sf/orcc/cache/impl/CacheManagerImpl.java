@@ -122,6 +122,11 @@ public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 	}
 
 	@Override
+	public ResourceSet getResourceSet() {
+		return set;
+	}
+
+	@Override
 	public void removeCache(URI uri) {
 		// removes the cache from the map
 		cacheMap.remove(uri);
