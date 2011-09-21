@@ -45,13 +45,13 @@ import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.backends.transformations.DivisionSubstitution;
 import net.sf.orcc.backends.transformations.Inliner;
+import net.sf.orcc.backends.transformations.InstPhiTransformation;
 import net.sf.orcc.backends.transformations.Multi2MonoToken;
 import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.backends.transformations.tac.ExpressionSplitter;
 import net.sf.orcc.backends.vhdl.transformations.StoreOnceTransformation;
 import net.sf.orcc.backends.xlim.transformations.CustomPeekAdder;
 import net.sf.orcc.backends.xlim.transformations.GlobalArrayInitializer;
-import net.sf.orcc.backends.xlim.transformations.InstPhiTransformation;
 import net.sf.orcc.backends.xlim.transformations.InstTernaryAdder;
 import net.sf.orcc.backends.xlim.transformations.ListFlattener;
 import net.sf.orcc.backends.xlim.transformations.LiteralIntegersAdder;
@@ -154,9 +154,8 @@ public class XlimBackendImpl extends AbstractBackend {
 				new XlimDeadVariableRemoval(), new ListFlattener(),
 				new ExpressionSplitter(true), /* new CopyPropagator(), */
 				new BuildCFG(), new InstPhiTransformation(),
-				new LiteralIntegersAdder(true),
-				new CastAdder(true, true), new XlimVariableRenamer(),
-				new BlockCombine() };
+				new LiteralIntegersAdder(true), new CastAdder(true, true),
+				new XlimVariableRenamer(), new BlockCombine() };
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);
