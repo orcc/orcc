@@ -8,6 +8,7 @@ package net.sf.orcc.cache.impl;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.cache.Cache;
@@ -24,17 +25,21 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.emf.ecore.util.Switch;
 
 /**
  * <!-- begin-user-doc --> An implementation of the model object '
  * <em><b>Manager</b></em>'. <!-- end-user-doc -->
  * <p>
  * </p>
- *
+ * 
  * @generated
  */
 public class CacheManagerImpl extends EObjectImpl implements CacheManager {
@@ -47,6 +52,7 @@ public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected CacheManagerImpl() {
@@ -76,6 +82,7 @@ public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -119,6 +126,40 @@ public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 		}
 
 		return cacheUri;
+	}
+
+	@Override
+	public <F extends EObject, T> T getOrCompute(F eObject,
+			Switch<T> switchInst, EStructuralFeature featureMap,
+			EStructuralFeature featureList) {
+		Resource resource = eObject.eResource();
+		T result;
+		if (resource == null) {
+			result = switchInst.doSwitch(eObject);
+		} else {
+			Cache cache = getCache(resource.getURI());
+
+			URI uri = EcoreUtil.getURI(eObject);
+			String fragment = uri.fragment();
+
+			@SuppressWarnings("unchecked")
+			Map<String, T> map = (Map<String, T>) cache.eGet(featureMap);
+			result = map.get(fragment);
+
+			if (result == null) {
+				result = switchInst.doSwitch(eObject);
+				if (result != null) {
+					if (featureList != null) {
+						@SuppressWarnings("unchecked")
+						List<T> list = (List<T>) cache.eGet(featureList);
+						list.add(result);
+					}
+					map.put(fragment, result);
+				}
+			}
+		}
+
+		return result;
 	}
 
 	@Override

@@ -36,8 +36,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.cache.Cache;
 import net.sf.orcc.cache.CacheManager;
+import net.sf.orcc.cache.CachePackage;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstType;
@@ -83,10 +83,8 @@ import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
 import net.sf.orcc.ir.util.TypeUtil;
 
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -187,27 +185,9 @@ public class Typer extends CalSwitch<Type> {
 	 * @return the type of the given object
 	 */
 	public static Type getType(EObject eObject) {
-		Resource resource = eObject.eResource();
-		Type type;
-		if (resource == null) {
-			type = new Typer().doSwitch(eObject);
-		} else {
-			Cache cache = CacheManager.instance.getCache(resource.getURI());
-
-			URI uri = EcoreUtil.getURI(eObject);
-			String fragment = uri.fragment();
-			type = cache.getTypesMap().get(fragment);
-
-			if (type == null) {
-				type = new Typer().doSwitch(eObject);
-				if (type != null) {
-					cache.getTypes().add(type);
-					cache.getTypesMap().put(fragment, type);
-				}
-			}
-		}
-
-		return type;
+		return CacheManager.instance.getOrCompute(eObject, new Typer(),
+				CachePackage.eINSTANCE.getCache_TypesMap(),
+				CachePackage.eINSTANCE.getCache_Types());
 	}
 
 	/**

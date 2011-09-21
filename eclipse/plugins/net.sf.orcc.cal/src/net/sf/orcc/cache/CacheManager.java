@@ -30,7 +30,9 @@ package net.sf.orcc.cache;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.util.Switch;
 
 /**
  * This class defines a cache manager, that is responsible of loading caches
@@ -55,6 +57,28 @@ public interface CacheManager extends EObject {
 	 * @return the cache associated with the given resource URI
 	 */
 	Cache getCache(URI uri);
+
+	/**
+	 * Returns an object of type T associated with the source object of type F.
+	 * If the object is in cache, retrieve it, otherwise compute it using the
+	 * given function.
+	 * 
+	 * @param <F>
+	 *            the type of the function input
+	 * @param <T>
+	 *            the type of the function output
+	 * @param eObject
+	 *            source object
+	 * @param switchInst
+	 *            an instance of a Switch to compute the object if necessary
+	 * @param featureMap
+	 *            the feature that returns a map to get/put the object
+	 * @param featureList
+	 *            the feature that returns a list to add the returned object to
+	 *            (possibly <code>null</code>)
+	 */
+	<F extends EObject, T> T getOrCompute(F eObject, Switch<T> switchInst,
+			EStructuralFeature featureMap, EStructuralFeature featureList);
 
 	/**
 	 * Returns the resource set used by this cache.

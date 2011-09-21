@@ -33,6 +33,7 @@ import java.util.List;
 
 import net.sf.orcc.cache.Cache;
 import net.sf.orcc.cache.CacheManager;
+import net.sf.orcc.cache.CachePackage;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.ExpressionBinary;
 import net.sf.orcc.cal.cal.ExpressionBoolean;
@@ -104,27 +105,9 @@ public class Evaluator extends CalSwitch<Expression> {
 	 * @return the value associated with the given object
 	 */
 	public static Expression getValue(EObject eObject) {
-		Resource resource = eObject.eResource();
-		Expression value;
-		if (resource == null) {
-			value = new Evaluator().doSwitch(eObject);
-		} else {
-			Cache cache = CacheManager.instance.getCache(resource.getURI());
-
-			URI uri = EcoreUtil.getURI(eObject);
-			String fragment = uri.fragment();
-			value = cache.getExpressionsMap().get(fragment);
-
-			if (value == null) {
-				value = new Evaluator().doSwitch(eObject);
-				if (value != null) {
-					cache.getExpressions().add(value);
-					cache.getExpressionsMap().put(fragment, value);
-				}
-			}
-		}
-
-		return value;
+		return CacheManager.instance.getOrCompute(eObject, new Evaluator(),
+				CachePackage.eINSTANCE.getCache_Expressions(),
+				CachePackage.eINSTANCE.getCache_ExpressionsMap());
 	}
 
 	private static void setValue(EObject eObject, AstExpression value) {
