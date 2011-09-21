@@ -499,6 +499,9 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 			}
 		} else {
 			// evaluate initial constant value
+			if (type.isList()) {
+				exprInterpreter.setType((TypeList) type);
+			}
 			variable.setValue(exprInterpreter.doSwitch(initConst));
 		}
 	}

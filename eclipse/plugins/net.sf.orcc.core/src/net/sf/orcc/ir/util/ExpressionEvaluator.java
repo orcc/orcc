@@ -57,11 +57,9 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class ExpressionEvaluator extends IrSwitch<Object> {
 
-	private Type eltType;
-
-	private Expression rootExpr;
-
 	private boolean throwException;
+
+	private TypeList typeList;
 
 	@Override
 	public Object caseExprBinary(ExprBinary expr) {
@@ -101,33 +99,16 @@ public class ExpressionEvaluator extends IrSwitch<Object> {
 
 	@Override
 	public Object caseExprList(ExprList expr) {
-		Type type = (TypeList) expr.getType();
-		if (eltType == null) {
-			rootExpr = expr;
-			eltType = ((TypeList) type).getInnermostType();
+		if (typeList == null) {
+			// if no type has been defined, use the expression's type
+			typeList = (TypeList) expr.getType();
 		}
 
-		List<Integer> listDimensions = type.getDimensions();
-		int[] dimensions = new int[listDimensions.size()];
-		for (int i = 0; i < dimensions.length; i++) {
-			dimensions[i] = listDimensions.get(i);
-		}
-		Object array = ValueUtil.createArray(eltType, dimensions);
+		Object array = ValueUtil.createArray(typeList);
+		computeInitValue(array, typeList, expr);
 
-		type = ((TypeList) type).getType();
-		List<Expression> expressions = expr.getValue();
-		int index = 0;
-		for (Expression expression : expressions) {
-			Object value = doSwitch(expression);
-			ValueUtil.set(type, array, value, index);
-			index++;
-		}
-
-		// reset element type
-		if (expr == rootExpr) {
-			rootExpr = null;
-			eltType = null;
-		}
+		// reset the type for future calls
+		typeList = null;
 
 		return array;
 	}
@@ -169,6 +150,38 @@ public class ExpressionEvaluator extends IrSwitch<Object> {
 					+ var.getName());
 		}
 		return value;
+	}
+
+	/**
+	 * Evaluates the given expression and copy it into the given array.
+	 * 
+	 * @param array
+	 *            the array to visit
+	 * @param type
+	 *            type of the current dimension
+	 * @param expr
+	 *            expression associated with the current dimension
+	 * @param indexes
+	 *            indexes that lead to the current dimension (empty for the
+	 *            outermost call)
+	 */
+	private void computeInitValue(Object array, Type type, Expression expr,
+			Object... indexes) {
+		if (type.isList()) {
+			TypeList typeList = (TypeList) type;
+			List<Expression> list = ((ExprList) expr).getValue();
+
+			Type eltType = typeList.getType();
+
+			Object[] innerIndexes = new Object[indexes.length + 1];
+			System.arraycopy(indexes, 0, innerIndexes, 0, indexes.length);
+			for (int i = 0; i < typeList.getSize(); i++) {
+				innerIndexes[indexes.length] = i;
+				computeInitValue(array, eltType, list.get(i), innerIndexes);
+			}
+		} else {
+			ValueUtil.set(type, array, doSwitch(expr), indexes);
+		}
 	}
 
 	@Override
@@ -281,6 +294,10 @@ public class ExpressionEvaluator extends IrSwitch<Object> {
 		}
 
 		return null;
+	}
+
+	public void setType(TypeList typeList) {
+		this.typeList = typeList;
 	}
 
 }
