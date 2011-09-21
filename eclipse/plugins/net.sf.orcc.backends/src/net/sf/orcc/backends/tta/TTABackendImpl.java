@@ -189,9 +189,9 @@ public class TTABackendImpl extends AbstractBackend {
 				"net/sf/orcc/backends/tta/TTA_processor_idf.stg");
 
 		adfPrinter.print("processor_" + instance.getId() + ".adf",
-				instancePath, "tta", simpleTTA);
+				instancePath, "printTTA", "tta", simpleTTA);
 		idfPrinter.print("processor_" + instance.getId() + ".idf",
-				instancePath, "tta", simpleTTA);
+				instancePath, "printTTA", "tta", simpleTTA);
 	}
 
 }

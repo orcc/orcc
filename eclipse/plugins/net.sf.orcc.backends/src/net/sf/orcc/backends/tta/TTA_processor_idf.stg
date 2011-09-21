@@ -1,5 +1,5 @@
 
-tta(tta, options) ::= <<
+printTTA(tta, options) ::= <<
 \<?xml version="1.0" encoding="UTF-8" standalone="no" ?\>
 \<adf-implementation\>
 	
@@ -9,21 +9,21 @@ tta(tta, options) ::= <<
 		\<hdb-file\>asic_130nm_1.5V.hdb\</hdb-file\>
 	\</ic-decoder-plugin\>
 	
-	<tta.functionUnits: functionUnit(); separator="\n\n">
+	<tta.functionUnits: printFunctionUnit(); separator="\n\n">
 	
-	<tta.registerFiles: registerFile(); separator="\n\n">
+	<tta.registerFiles: printRegisterFile(); separator="\n\n">
 	
 \</adf-implementation\>
 >>
 
-functionUnit(functionUnit) ::= <<
+printFunctionUnit(functionUnit) ::= <<
 \<fu name="<functionUnit.name>"\>
 	\<hdb-file\><functionUnit.implementation.hdbFile>\</hdb-file\>
 	\<fu-id\><functionUnit.implementation.id>\</fu-id\>
 \</fu\>
 >>
 
-registerFile(registerFile) ::= <<
+printRegisterFile(registerFile) ::= <<
 \<rf name="<registerFile.name>"\>
 	\<hdb-file\><registerFile.implementation.hdbFile>\</hdb-file\>
     \<rf-id\><registerFile.implementation.id>\</rf-id\>

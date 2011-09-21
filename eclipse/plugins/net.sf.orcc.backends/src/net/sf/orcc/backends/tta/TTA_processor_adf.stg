@@ -1,39 +1,39 @@
 
-tta(tta, options) ::= <<
+printTTA(tta) ::= <<
 \<?xml version="1.0" encoding="UTF-8" standalone="no" ?\>
 \<adf version="1.7"\>
-	<tta.buses: bus(); separator="\n\n">
+	<tta.buses: printBus(); separator="\n\n">
 	
-	<tta.sockets: socket(); separator="\n\n">
+	<tta.sockets: printSocket(); separator="\n\n">
 	
-	<tta.functionUnits: functionUnit(); separator="\n\n">
+	<tta.functionUnits: printFunctionUnit(); separator="\n\n">
 	
-	<tta.registerFiles: registerFile(); separator="\n\n">
+	<tta.registerFiles: printRegisterFile(); separator="\n\n">
 	
-	<if(tta.data)><addressSpace(tta.data)><endif>
+	<if(tta.data)><printAddressSpace(tta.data)><endif>
 	
-	<if(tta.program)><addressSpace(tta.program)><endif>
+	<if(tta.program)><printAddressSpace(tta.program)><endif>
 	
-	<if(tta.gcu)><globalControlUnit(tta.gcu)><endif>
+	<if(tta.gcu)><printGlobalControlUnit(tta.gcu)><endif>
 \</adf\>
 >>
 
-bus(bus) ::= <<
+printBus(bus) ::= <<
 \<bus name="<bus.name>"\>
 	\<width\><bus.width>\</width\>
-	<bus.guards: guard(); separator="\n">
+	<bus.guards: printGuard(); separator="\n">
 	<bus.segments: segment(); separator="\n">
 	<shortImmediate(bus.shortImmediate)>
 \</bus\>
 >>
 
-guard(guard) ::= <<
+printGuard(guard) ::= <<
 \<guard\>
-	<expression(guard)>
+	<printExpression(guard)>
 \</guard\>
 >>
 
-expression(expr) ::= <<
+printExpression(expr) ::= <<
 <if(expr.exprTrue)
 ><exprTrue()><
 elseif(expr.exprFalse)
@@ -101,39 +101,39 @@ shortImmediate(shortImmediate) ::= <<
 \</short-immediate\>
 >>
 
-socket(socket) ::= <<
+printSocket(socket) ::= <<
 \<socket name="<socket.name>"\>
-	<socket.connectedSegments: socketSegment()>
+	<socket.connectedSegments: printSocketSegment()>
 \</socket\>
 >>
 
-socketSegment(segment) ::= <<
+printSocketSegment(segment) ::= <<
 <if(socket.input)>\<reads-from\><else>\<writes-to\><endif>
 	\<bus\><segment.bus.name>\</bus\>
 	\<segment\><segment.name>\</segment\>
 <if(socket.input)>\</reads-from\><else>\</writes-to\><endif>
 >>
 
-functionUnit(functionUnit) ::= <<
+printFunctionUnit(functionUnit) ::= <<
 \<function-unit name="<functionUnit.name>"\>
-	<functionUnit.ports: port(); separator="\n">
-	<functionUnit.operations: { operation | <operation(operation, false)> }; separator="\n">
+	<functionUnit.ports: printPort(); separator="\n">
+	<functionUnit.operations: { operation | <printOperation(operation, false)> }; separator="\n">
 	<if(functionUnit.addressSpace)>\<address-space\><functionUnit.addressSpace.name>\</address-space\><else>\<address-space/\><endif>
 \</function-unit\>
 >>
 
-registerFile(register) ::= <<
+printRegisterFile(register) ::= <<
 \<register-file name="<register.name>"\>
 	\<type\>normal\</type\>
 	\<size\><register.size>\</size\>
 	\<width\><register.width>\</width\>
 	\<max-reads\><register.maxReads>\</max-reads\>
 	\<max-writes\><register.maxWrites>\</max-writes\>
-	<register.ports: { port | <port(port, false)> }; separator="\n">
+	<register.ports: { port | <printPort(port, false)> }; separator="\n">
 \</register-file\>
 >>
 
-port(port, width=true, special=false) ::= <<
+printPort(port, width=true, special=false) ::= <<
 \<<if(special)>special-<endif>port name="<port.name>"\>
 	<connectSocket(port.inputSocket)>
 	<connectSocket(port.outputSocket)>
@@ -147,7 +147,7 @@ connectSocket(socket) ::= <<
 <if(socket)>\<connects-to\><socket.name>\</connects-to\><endif>
 >>
 
-addressSpace(addressSpace) ::= <<
+printAddressSpace(addressSpace) ::= <<
 \<address-space name="<addressSpace.name>"\>
 	\<width\><addressSpace.width>\</width\>
 	\<min-address\><addressSpace.minAddress>\</min-address\>
@@ -155,53 +155,53 @@ addressSpace(addressSpace) ::= <<
 \</address-space\>
 >>
 
-globalControlUnit(gcu) ::= <<
+printGlobalControlUnit(gcu) ::= <<
 \<global-control-unit name="gcu"\>
-	<gcu.ports: port(); separator="\n">
-	<port(gcu.returnAddress, true, true)>
+	<gcu.ports: printPort(); separator="\n">
+	<printPort(gcu.returnAddress, true, true)>
 	\<return-address\><gcu.returnAddress.name>\</return-address\>
-	<gcu.operations: { operation | <operation(operation, true)> }; separator="\n">
+	<gcu.operations: { operation | <printOperation(operation, true)> }; separator="\n">
 	\<address-space\><gcu.addressSpace.name>\</address-space\>
 	\<delay-slots\><gcu.delaySlots>\</delay-slots\>
 	\<guard-latency\><gcu.guardLatency>\</guard-latency\>
 \</global-control-unit\>
 >>
 
-operation(operation, control=false) ::= <<
+printOperation(operation, control=false) ::= <<
 \<<if(control)>ctrl-<endif>operation\>
 	\<name\><operation.name>\</name\>
 	<operation.ports: { port | \<bind name="<operation.portToIndexMap.(port)>"\><port.name>\</bind\> }; separator="\n" >
 	\<pipeline\>
-		<operation.pipeline: element(); separator="\n">
+		<operation.pipeline: printElement(); separator="\n">
 	\</pipeline\>
 \</<if(control)>ctrl-<endif>operation\>
 >>
 
-element(element) ::= <<
+printElement(element) ::= <<
 <if(element.reads)
-><reads(element)><
+><printReads(element)><
 elseif(element.writes)
-><writes(element)><
+><printWrites(element)><
 elseif(element.resource)
-><resource(element)><
+><printResource(element)><
 endif>
 >>
 
-reads(element) ::= <<
+printReads(element) ::= <<
 \<reads name="<operation.portToIndexMap.(element.port)>"\>
 	\<start-cycle\><element.startCycle>\</start-cycle\>
 	\<cycles\><element.cycles>\</cycles\>
 \</reads\>
 >>
 
-writes(element) ::= <<
+printWrites(element) ::= <<
 \<writes name="<operation.portToIndexMap.(element.port)>"\>
 	\<start-cycle\><element.startCycle>\</start-cycle\>
 	\<cycles\><element.cycles>\</cycles\>
 \</writes\>
 >>
 
-resource(element) ::= <<
+printResource(element) ::= <<
 \<resource name="<element.name>"\>
 	\<start-cycle\><element.startCycle>\</start-cycle\>
 	\<cycles\><element.cycles>\</cycles\>
