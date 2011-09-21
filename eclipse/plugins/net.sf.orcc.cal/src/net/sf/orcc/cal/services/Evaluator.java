@@ -106,8 +106,8 @@ public class Evaluator extends CalSwitch<Expression> {
 	 */
 	public static Expression getValue(EObject eObject) {
 		return CacheManager.instance.getOrCompute(eObject, new Evaluator(),
-				CachePackage.eINSTANCE.getCache_Expressions(),
-				CachePackage.eINSTANCE.getCache_ExpressionsMap());
+				CachePackage.eINSTANCE.getCache_ExpressionsMap(),
+				CachePackage.eINSTANCE.getCache_Expressions());
 	}
 
 	private static void setValue(EObject eObject, AstExpression value) {
