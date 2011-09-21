@@ -2,7 +2,7 @@
 <feature
       id="net.sf.orcc"
       label="Orcc"
-      version="0.9.6.v20110706"
+      version="0.9.7.v20110921"
       provider-name="IETR/INSA Rennes">
 
    <description url="http://orcc.sf.net/eclipse/updates/">

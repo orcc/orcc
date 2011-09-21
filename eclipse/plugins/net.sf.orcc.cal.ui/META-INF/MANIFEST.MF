@@ -2,11 +2,11 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: RVC-CAL Xtext editor plug-in
 Bundle-Vendor: IETR/INSA Rennes
-Bundle-Version: 0.9.6.v20110706
+Bundle-Version: 0.9.7.v20110921
 Bundle-SymbolicName: net.sf.orcc.cal.ui;singleton:=true
 Bundle-ActivationPolicy: lazy
-Require-Bundle: net.sf.orcc.cal;bundle-version="0.9.6";visibility:=reexport,
- net.sf.orcc.core;bundle-version="0.9.6",
+Require-Bundle: net.sf.orcc.cal;bundle-version="0.9.7";visibility:=reexport,
+ net.sf.orcc.core;bundle-version="0.9.7",
  org.antlr.runtime;bundle-version="3.2.0",
  org.eclipse.compare,
  org.eclipse.jdt.core,

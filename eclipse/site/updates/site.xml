@@ -3,13 +3,10 @@
    <description name="Orcc Project Update Site" url="http://orcc.sourceforge.net/eclipse/updates/">
       Orcc Project Update Site
    </description>
-   <feature url="features/net.sf.orcc_0.9.3.v20110215.jar" id="net.sf.orcc" version="0.9.3.v20110215">
-      <category name="Open RVC-CAL Compiler"/>
-   </feature>
    <feature url="features/net.sf.orcc_0.9.4.v201105091058.jar" id="net.sf.orcc" version="0.9.4.v201105091058">
       <category name="Open RVC-CAL Compiler"/>
    </feature>
-   <feature url="features/net.sf.orcc_0.9.5.v20110520.jar" id="net.sf.orcc" version="0.9.5.v20110531">
+   <feature url="features/net.sf.orcc_0.9.5.v20110520.jar" id="net.sf.orcc" version="0.9.5.v20110520">
       <category name="Open RVC-CAL Compiler"/>
    </feature>
    <feature url="features/net.sf.orcc_0.9.5.v20110531.jar" id="net.sf.orcc" version="0.9.5.v20110531">
