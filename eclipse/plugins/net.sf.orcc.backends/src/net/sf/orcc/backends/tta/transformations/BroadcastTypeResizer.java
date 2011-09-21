@@ -29,24 +29,32 @@ public class BroadcastTypeResizer implements INetworkTransformation {
 	private void checkPorts(List<Port> ports) {
 		for (Port port : ports) {
 			if (!port.isNative()) {
-				checkType(port.getType());
+				checkType(port.getType(), 32);
 			}
 		}
 	}
-
-	private void checkType(Type type) {
+	
+	private void checkType(Type type, int newSize) {
 		int size;
 		if (type.isInt()) {
 			TypeInt intType = (TypeInt) type;
-			size = getIntSize(intType.getSize());
+			if (newSize > 0) {
+				size = newSize;
+			} else {
+				size = getIntSize(intType.getSize());
+			}
 			intType.setSize(size);
 		} else if (type.isUint()) {
 			TypeUint uintType = (TypeUint) type;
-			size = getIntSize(uintType.getSize());
+			if (newSize > 0) {
+				size = newSize;
+			} else {
+				size = getIntSize(uintType.getSize());
+			}
 			uintType.setSize(size);
 		} else if (type.isList()) {
 			TypeList listType = (TypeList) type;
-			checkType(listType.getType());
+			checkType(listType.getType(), newSize);
 		}
 	}
 
