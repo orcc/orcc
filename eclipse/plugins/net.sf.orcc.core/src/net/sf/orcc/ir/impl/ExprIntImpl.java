@@ -13,6 +13,7 @@ import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.util.TypeUtil;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EClass;
@@ -24,16 +25,17 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.ir.impl.ExprIntImpl#getValue <em>Value</em>}</li>
+ * <li>{@link net.sf.orcc.ir.impl.ExprIntImpl#getValue <em>Value</em>}</li>
  * </ul>
  * </p>
- *
+ * 
  * @generated
  */
 public class ExprIntImpl extends ExpressionImpl implements ExprInt {
 	/**
 	 * The default value of the '{@link #getValue() <em>Value</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getValue()
 	 * @generated
 	 * @ordered
@@ -43,6 +45,7 @@ public class ExprIntImpl extends ExpressionImpl implements ExprInt {
 	/**
 	 * The cached value of the '{@link #getValue() <em>Value</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getValue()
 	 * @generated
 	 * @ordered
@@ -51,6 +54,7 @@ public class ExprIntImpl extends ExpressionImpl implements ExprInt {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected ExprIntImpl() {
@@ -79,46 +83,51 @@ public class ExprIntImpl extends ExpressionImpl implements ExprInt {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.EXPR_INT__VALUE:
-				return getValue();
+		case IrPackage.EXPR_INT__VALUE:
+			return getValue();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.EXPR_INT__VALUE:
-				return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT.equals(value);
+		case IrPackage.EXPR_INT__VALUE:
+			return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT
+					.equals(value);
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.EXPR_INT__VALUE:
-				setValue((BigInteger)newValue);
-				return;
+		case IrPackage.EXPR_INT__VALUE:
+			setValue((BigInteger) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -128,14 +137,15 @@ public class ExprIntImpl extends ExpressionImpl implements ExprInt {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.EXPR_INT__VALUE:
-				setValue(VALUE_EDEFAULT);
-				return;
+		case IrPackage.EXPR_INT__VALUE:
+			setValue(VALUE_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -157,11 +167,12 @@ public class ExprIntImpl extends ExpressionImpl implements ExprInt {
 
 	@Override
 	public Type getType() {
-		return IrFactory.eINSTANCE.createTypeIntOrUint(value);
+		return IrFactory.eINSTANCE.createTypeInt(TypeUtil.getSize(value));
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public BigInteger getValue() {
@@ -220,13 +231,15 @@ public class ExprIntImpl extends ExpressionImpl implements ExprInt {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void setValue(BigInteger newValue) {
 		BigInteger oldValue = value;
 		value = newValue;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_INT__VALUE, oldValue, value));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.EXPR_INT__VALUE, oldValue, value));
 	}
 
 	@Override
@@ -247,11 +260,13 @@ public class ExprIntImpl extends ExpressionImpl implements ExprInt {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (value: ");
