@@ -48,7 +48,6 @@ import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
-import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
@@ -66,13 +65,11 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * 
  * @author Ghislain Roquier
  * @author Herve Yviquel
- * @author Endri Bezati
  * 
  */
 public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 
 	private boolean usePreviousJoinNode;
-	private boolean hardwareGen;
 
 	/**
 	 * Creates a new transformation which put literals into variables
@@ -81,10 +78,9 @@ public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 	 *            <code>true</code> if the current IR form has join node before
 	 *            while node
 	 */
-	public LiteralIntegersAdder(boolean usePreviousJoinNode, boolean hardwareGen) {
+	public LiteralIntegersAdder(boolean usePreviousJoinNode) {
 		super(true);
 		this.usePreviousJoinNode = usePreviousJoinNode;
-		this.hardwareGen = hardwareGen;
 	}
 
 	@Override
@@ -207,12 +203,6 @@ public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 	private Expression createExprVarAndAssign(Expression expr) {
 		Var target = procedure.newTempLocalVariable(
 				EcoreUtil.copy(expr.getType()), "literal");
-
-		if (hardwareGen) {
-			Type currentType = target.getType();
-			target.setType((IrFactory.eINSTANCE.createTypeInt(currentType
-					.getSizeInBits() + 1)));
-		}
 
 		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
 				IrUtil.copy(expr));
