@@ -50,7 +50,7 @@ import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.tta.architecture.TTA;
 import net.sf.orcc.backends.tta.transformations.ActorTypeResizer;
 import net.sf.orcc.backends.tta.transformations.BroadcastTypeResizer;
-import net.sf.orcc.backends.xlim.transformations.InstPhiTransformation;
+import net.sf.orcc.backends.transformations.InstPhiTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.transformations.BlockCombine;
 import net.sf.orcc.ir.transformations.BuildCFG;
