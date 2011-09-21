@@ -47,7 +47,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
