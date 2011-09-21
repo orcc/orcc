@@ -75,7 +75,7 @@ public class DisplayYUV {
 	private static long t1;
 
 	private static long t2;
-	
+
 	private static int clip(int n) {
 		if (n < 0) {
 			return 0;
@@ -130,6 +130,10 @@ public class DisplayYUV {
 			Integer pictureWidth, Integer pictureHeight) {
 		if (pictureWidth != lastWidth || pictureHeight != lastHeight) {
 			setVideoSize(pictureWidth, pictureHeight);
+		}
+		
+		if (image == null) {
+			return;
 		}
 
 		for (int i = 0; i < pictureWidth / 2; i++) {
@@ -201,17 +205,19 @@ public class DisplayYUV {
 		lastWidth = newWidth;
 		lastHeight = newHeight;
 
-		canvas.setSize(lastWidth, lastHeight);
-		frame.pack();
+		if (canvas != null) {
+			canvas.setSize(lastWidth, lastHeight);
+			frame.pack();
 
-		canvas.createBufferStrategy(2);
-		buffer = canvas.getBufferStrategy();
+			canvas.createBufferStrategy(2);
+			buffer = canvas.getBufferStrategy();
 
-		image = new BufferedImage(lastWidth, lastHeight,
-				BufferedImage.TYPE_INT_RGB);
+			image = new BufferedImage(lastWidth, lastHeight,
+					BufferedImage.TYPE_INT_RGB);
+		}
 	}
-	
-	public static void fpsPrintInit()  {
+
+	public static void fpsPrintInit() {
 		t1 = System.currentTimeMillis();
 	}
 
