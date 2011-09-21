@@ -23,6 +23,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
@@ -143,7 +144,7 @@ public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 			String fragment = uri.fragment();
 
 			@SuppressWarnings("unchecked")
-			Map<String, T> map = (Map<String, T>) cache.eGet(featureMap);
+			EMap<String, T> map = (EMap<String, T>) cache.eGet(featureMap);
 			result = map.get(fragment);
 
 			if (result == null) {
