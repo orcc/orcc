@@ -46,6 +46,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.CustomPrinter;
 import net.sf.orcc.backends.StandardPrinter;
+import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.vhdl.ram.RAMTransformation;
 import net.sf.orcc.backends.vhdl.transformations.BoolExprTransformation;
@@ -143,6 +144,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 		// transformations on the code
 		ActorVisitor<?>[] transformationsCodegen = {
+				new UnitImporter(),
+
 				// cleanup code
 				new DeadGlobalElimination(),
 				new DeadCodeElimination(),

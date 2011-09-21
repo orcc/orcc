@@ -37,8 +37,10 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.cpp.CppExprPrinter;
+import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.transformations.RenameTransformation;
+import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transformations.BroadcastAdder;
 import net.sf.orcc.util.OrccUtil;
@@ -70,7 +72,12 @@ public class JavaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		new RenameTransformation(this.transformations).doSwitch(actor);
+		ActorVisitor<?>[] transformations = { new UnitImporter(),
+				new RenameTransformation(this.transformations) };
+
+		for (ActorVisitor<?> transformation : transformations) {
+			transformation.doSwitch(actor);
+		}
 	}
 
 	private void doTransformNetwork(Network network) throws OrccException {

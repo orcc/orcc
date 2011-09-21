@@ -52,6 +52,7 @@ import net.sf.orcc.backends.llvm.transformations.GetElementPtrAdder;
 import net.sf.orcc.backends.llvm.transformations.PrintlnTransformation;
 import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.backends.transformations.TypeResizer;
+import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.backends.transformations.tac.TacTransformation;
 import net.sf.orcc.backends.xlim.transformations.InstPhiTransformation;
 import net.sf.orcc.ir.Actor;
@@ -135,10 +136,10 @@ public class LLVMBackendImpl extends AbstractBackend {
 			}
 		}
 
-		ActorVisitor<?>[] transformations = { new SSATransformation(),
-				new DeadGlobalElimination(), new DeadCodeElimination(),
-				new DeadVariableRemoval(), new BoolToIntTransformation(),
-				new PrintlnTransformation(),
+		ActorVisitor<?>[] transformations = { new UnitImporter(),
+				new SSATransformation(), new DeadGlobalElimination(),
+				new DeadCodeElimination(), new DeadVariableRemoval(),
+				new BoolToIntTransformation(), new PrintlnTransformation(),
 				new RenameTransformation(this.transformations),
 				new TacTransformation(true), new InstPhiTransformation(),
 				new GetElementPtrAdder(), new TypeResizer(),

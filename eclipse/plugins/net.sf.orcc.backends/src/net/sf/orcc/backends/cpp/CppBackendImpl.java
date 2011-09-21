@@ -38,6 +38,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.cpp.transformations.SerDesAdder;
+import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.Expression;
@@ -126,7 +127,7 @@ public class CppBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		ActorVisitor<?>[] transformations = {};
+		ActorVisitor<?>[] transformations = { new UnitImporter() };
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);

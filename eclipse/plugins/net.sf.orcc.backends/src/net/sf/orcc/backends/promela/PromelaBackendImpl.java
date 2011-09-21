@@ -38,6 +38,7 @@ import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.c.CExpressionPrinter;
 import net.sf.orcc.backends.promela.transformations.GuardsExtractor;
 import net.sf.orcc.backends.transformations.Inliner;
+import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
@@ -93,6 +94,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		ActorVisitor<?>[] transformations = {
+				new UnitImporter(),
 				new Inliner(true, false),
 				// new ListFlattener(), //Promela does not support multi
 				// dimensional arrays

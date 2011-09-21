@@ -174,11 +174,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			}
 		}
 
-		// and we import objects from unit into actors
-		for (Actor actor : actors) {
-			new UnitImporter().doSwitch(actor);
-		}
-
 		if (isCanceled()) {
 			return;
 		}

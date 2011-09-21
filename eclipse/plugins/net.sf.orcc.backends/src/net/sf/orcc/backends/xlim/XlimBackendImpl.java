@@ -46,6 +46,7 @@ import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.backends.transformations.DivisionSubstitution;
 import net.sf.orcc.backends.transformations.Inliner;
 import net.sf.orcc.backends.transformations.Multi2MonoToken;
+import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.backends.transformations.tac.ExpressionSplitter;
 import net.sf.orcc.backends.vhdl.transformations.StoreOnceTransformation;
 import net.sf.orcc.backends.xlim.transformations.CustomPeekAdder;
@@ -144,7 +145,8 @@ public class XlimBackendImpl extends AbstractBackend {
 			new DivisionSubstitution().doSwitch(actor);
 		}
 
-		ActorVisitor<?>[] transformations = { new SSATransformation(),
+		ActorVisitor<?>[] transformations = { new UnitImporter(),
+				new SSATransformation(),
 				new GlobalArrayInitializer(hardwareGen),
 				new InstTernaryAdder(), new Inliner(true, true),
 				new UnaryListRemoval(), new CustomPeekAdder(),
