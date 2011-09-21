@@ -563,7 +563,7 @@ indexesName(indexes) ::= <<
 >>
 
 printParameters(arguments, parameters) ::= <<
-<arguments, parameters: { arg, param | <printParameter(arg.type, param)>}; separator=", ">
+<arguments, parameters: { arg, param | <printParameter(arg.variable.type, param)>}; separator=", ">
 >>
 
 printParameter(type, param) ::= <%
