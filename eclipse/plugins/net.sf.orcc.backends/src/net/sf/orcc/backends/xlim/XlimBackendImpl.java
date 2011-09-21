@@ -56,7 +56,6 @@ import net.sf.orcc.backends.xlim.transformations.InstTernaryAdder;
 import net.sf.orcc.backends.xlim.transformations.ListFlattener;
 import net.sf.orcc.backends.xlim.transformations.LiteralIntegersAdder;
 import net.sf.orcc.backends.xlim.transformations.LocalArrayRemoval;
-import net.sf.orcc.backends.xlim.transformations.UintToInt;
 import net.sf.orcc.backends.xlim.transformations.UnaryListRemoval;
 import net.sf.orcc.backends.xlim.transformations.XlimDeadVariableRemoval;
 import net.sf.orcc.backends.xlim.transformations.XlimVariableRenamer;
@@ -155,9 +154,9 @@ public class XlimBackendImpl extends AbstractBackend {
 				new XlimDeadVariableRemoval(), new ListFlattener(),
 				new ExpressionSplitter(true), /* new CopyPropagator(), */
 				new BuildCFG(), new InstPhiTransformation(),
-				new LiteralIntegersAdder(true), new CastAdder(true, true),
-				new XlimVariableRenamer(), new BlockCombine(),
-				new UintToInt(hardwareGen) };
+				new LiteralIntegersAdder(true, hardwareGen),
+				new CastAdder(true, true), new XlimVariableRenamer(),
+				new BlockCombine() };
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);
