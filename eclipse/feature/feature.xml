@@ -68,42 +68,42 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
          id="net.sf.orcc.core"
          download-size="0"
          install-size="0"
-         version="0.9.6.v20110706"
+         version="0.9.7.v20110921"
          unpack="false"/>
 
    <plugin
          id="net.sf.orcc.backends"
          download-size="0"
          install-size="0"
-         version="0.9.6.v20110706"
+         version="0.9.7.v20110921"
          unpack="false"/>
 
    <plugin
          id="net.sf.orcc.cal"
          download-size="0"
          install-size="0"
-         version="0.9.6.v20110706"
+         version="0.9.7.v20110921"
          unpack="false"/>
 
    <plugin
          id="net.sf.orcc.cal.ui"
          download-size="0"
          install-size="0"
-         version="0.9.6.v20110706"
+         version="0.9.7.v20110921"
          unpack="false"/>
 
    <plugin
          id="net.sf.orcc.simulators"
          download-size="0"
          install-size="0"
-         version="0.9.6.v20110706"
+         version="0.9.7.v20110921"
          unpack="false"/>
 
    <plugin
          id="net.sf.orcc.ui"
          download-size="0"
          install-size="0"
-         version="0.9.6.v20110706"
+         version="0.9.7.v20110921"
          unpack="false"/>
 
 </feature>
