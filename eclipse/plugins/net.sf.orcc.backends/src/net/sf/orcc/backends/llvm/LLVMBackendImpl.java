@@ -123,7 +123,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		classify = getAttribute("net.sf.orcc.backends.classify", false);
 		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
 		jadeToolbox = getDefault().getPreference(P_JADE_TOOLBOX, "");
-		debugMode = getAttribute(DEBUG_MODE, false);
+		debugMode = getAttribute(DEBUG_MODE, true);
 	}
 
 	@Override
