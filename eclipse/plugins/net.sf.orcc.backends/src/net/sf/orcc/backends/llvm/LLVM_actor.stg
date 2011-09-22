@@ -601,7 +601,7 @@ initializeStateVar(variable) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 PrintInstr(parameters) ::= <<
-call i32 (i8*, ...)* @printf(<parameters: PrintParameter(); separator=", ">)
+call i32 (i8*, ...)* @printf(<parameters:{param | <PrintParameter(param.value)>}; separator=", ">)
 >>
 
 PrintParameter(parameter) ::= <<
