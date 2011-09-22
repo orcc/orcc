@@ -177,17 +177,24 @@ public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 		// removes the cache from the map
 		cacheMap.remove(uri);
 
-		// get the cache URI to delete the resource in which the cache was
-		// serialized (if it exists)
+		// get the cache URI and remove it from the map
 		URI cacheUri = getCacheURI(uri);
-		if (cacheUri != null) {
-			Resource cacheResource = set.getResource(cacheUri, false);
-			if (cacheResource != null) {
-				try {
-					cacheResource.delete(null);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+		uriMap.remove(uri);
+
+		// get the resource from the set
+		Resource cacheResource = set.getResource(cacheUri, false);
+		if (cacheResource == null) {
+			// create it so we can delete the serialized version 
+			cacheResource = set.createResource(cacheUri);
+		}
+
+		// delete the resource
+		// note: if it did not exist, deleting will do nothing, 
+		if (cacheResource != null) {
+			try {
+				cacheResource.delete(null);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 	}
