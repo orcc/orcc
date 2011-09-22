@@ -159,12 +159,12 @@ public class Typer extends CalSwitch<Type> {
 
 		@Override
 		public int getSize(Type t1, Type t2) {
-			int shift = t2.getSizeInBits() - 1;
+			int shift = t2.getSizeInBits();
 			if (shift >= 6) {
 				// limits type size to 64
 				shift = 6;
 			}
-			return t1.getSizeInBits() + (1 << shift);
+			return t1.getSizeInBits() + (1 << shift) - 1;
 		}
 
 	}
@@ -589,7 +589,7 @@ public class Typer extends CalSwitch<Type> {
 
 		case PLUS:
 			if (t1.isString() && !t2.isList() || t2.isString() && !t1.isList()) {
-				return EcoreUtil.copy(t1);
+				return IrFactory.eINSTANCE.createTypeString();
 			}
 
 			return createType(t1, t2, LubPlus1.instance);
@@ -633,17 +633,24 @@ public class Typer extends CalSwitch<Type> {
 	 */
 	private Type limitType(Type type) {
 		if (type != null) {
-			Type maxType = TypeUtil.getGlb(type, boundType);
-			if (maxType != null) {
-				int size = boundType.getSizeInBits();
-				if (maxType.getSizeInBits() > size) {
-					if (maxType.isInt()) {
-						((TypeInt) maxType).setSize(size);
-					} else if (maxType.isUint()) {
-						((TypeUint) maxType).setSize(size);
+			if (boundType == null) {
+				// when no bound type exists, limit to 32 bits
+				int size = 32;
+				Type maxUint = IrFactory.eINSTANCE.createTypeUint(size);
+				Type maxType = TypeUtil.getGlb(type, maxUint);
+
+				if (maxType != null) {
+					if (maxType.getSizeInBits() > size) {
+						if (maxType.isInt()) {
+							((TypeInt) maxType).setSize(size);
+						} else if (maxType.isUint()) {
+							((TypeUint) maxType).setSize(size);
+						}
 					}
 				}
 				return maxType;
+			} else {
+				return TypeUtil.getGlb(type, boundType);
 			}
 		}
 
@@ -660,48 +667,53 @@ public class Typer extends CalSwitch<Type> {
 	 */
 	private void setTargetType(AstExpression expression) {
 		EObject cter = expression.eContainer();
-		Type targetType = null;
-
 		if (cter != null) {
 			switch (cter.eClass().getClassifierID()) {
 			case CalPackage.EXPRESSION_CALL: {
 				ExpressionCall call = (ExpressionCall) cter;
 				List<Variable> formal = call.getFunction().getParameters();
 				List<AstExpression> actual = call.getParameters();
-				targetType = findParameter(formal, actual, expression);
+				boundType = findParameter(formal, actual, expression);
 				break;
 			}
 
 			case CalPackage.EXPRESSION_INDEX: {
 				ExpressionIndex index = (ExpressionIndex) cter;
-				targetType = findIndexType(index.getSource(),
+				boundType = findIndexType(index.getSource(),
 						index.getIndexes(), expression);
 				break;
 			}
 
 			case CalPackage.FUNCTION:
 				Function func = (Function) cter;
-				targetType = getType(func);
+				boundType = getType(func);
 				break;
 
 			case CalPackage.GENERATOR:
 				Generator generator = (Generator) cter;
-				targetType = getType(generator.getVariable());
+				boundType = getType(generator.getVariable());
 				break;
 
 			case CalPackage.OUTPUT_PATTERN:
 				OutputPattern pattern = (OutputPattern) cter;
-				targetType = getType(pattern.getPort());
+				boundType = getType(pattern.getPort());
 				break;
 
 			case CalPackage.STATEMENT_ASSIGN: {
 				StatementAssign assign = (StatementAssign) cter;
 				if (expression == assign.getValue()) {
 					// expression is located in the value
-					targetType = getType(assign.getTarget().getVariable());
+					
+					// get the innermost type of the target
+					boundType = getType(assign.getTarget().getVariable());
+					for (int i = 0; i < assign.getIndexes().size(); i++) {
+						if (boundType != null && boundType.isList()) {
+							boundType = ((TypeList) boundType).getType();
+						}
+					}
 				} else {
 					// expression is located in the indexes
-					targetType = findIndexType(assign.getTarget(),
+					boundType = findIndexType(assign.getTarget(),
 							assign.getIndexes(), expression);
 				}
 				break;
@@ -711,28 +723,20 @@ public class Typer extends CalSwitch<Type> {
 				StatementCall call = (StatementCall) cter;
 				List<Variable> formal = call.getProcedure().getParameters();
 				List<AstExpression> actual = call.getParameters();
-				targetType = findParameter(formal, actual, expression);
+				boundType = findParameter(formal, actual, expression);
 				break;
 			}
 
 			case CalPackage.STATEMENT_FOREACH:
 				StatementForeach foreach = (StatementForeach) cter;
-				targetType = getType(foreach.getVariable());
+				boundType = getType(foreach.getVariable());
 				break;
 
 			case CalPackage.VARIABLE:
 				Variable variable = (Variable) cter;
-				targetType = getType(variable);
+				boundType = getType(variable);
 				break;
 			}
-		}
-
-		if (targetType == null) {
-			// in expressions contained in other expressions, and in if & while
-			// conditions, guard expressions, calls to built-in functions
-			boundType = IrFactory.eINSTANCE.createTypeUint(32);
-		} else {
-			boundType = targetType;
 		}
 	}
 
