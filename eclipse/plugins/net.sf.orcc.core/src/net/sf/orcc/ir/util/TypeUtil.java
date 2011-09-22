@@ -53,7 +53,8 @@ public class TypeUtil {
 
 	/**
 	 * Returns the Greatest Lower Bound of the given types. The GLB is the
-	 * smallest type of (t1, t2).
+	 * smallest type of (t1, t2). When t1 and t2 have different types (e.g. one
+	 * is a int and the other is a uint), an int is returned.
 	 * 
 	 * @param t1
 	 *            a type
@@ -90,7 +91,9 @@ public class TypeUtil {
 	}
 
 	/**
-	 * Returns the Least Upper Bound of the given types.
+	 * Returns the Least Upper Bound of the given types, which is the smallest
+	 * type that can contain both types. If no such type exists (e.g. when types
+	 * are not compatible with each other), <code>null</code> is returned.
 	 * 
 	 * @param t1
 	 *            a type
