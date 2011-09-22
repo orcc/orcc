@@ -103,10 +103,9 @@ public class DeadVariableRemoval extends AbstractActorVisitor<Object> {
 	public Object caseInstStore(InstStore store) {
 		Var target = store.getTarget().getVariable();
 		if (target != null && !target.isUsed()) {
-			// do not remove stores to variables that are used by writes, or
-			// variables that are parameters
+			// do not remove stores to variables that are parameters
 			if (target.eContainmentFeature() == IrPackage.eINSTANCE
-					.getProcedure_Parameters()) {
+					.getParam_Variable()) {
 				return null;
 			}
 
