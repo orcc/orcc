@@ -100,14 +100,18 @@ public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 			Resource cacheResource = set.getResource(cacheUri, false);
 			if (cacheResource == null) {
 				cacheResource = set.createResource(cacheUri);
-
-				// create cache and save resource
-				cache = CacheFactory.eINSTANCE.createCache();
-				cacheResource.getContents().add(cache);
 				try {
-					cacheResource.save(null);
+					// try to load
+					cacheResource.load(null);
 				} catch (IOException e) {
-					e.printStackTrace();
+					// cannot load (or does not exist): create cache and save
+					cache = CacheFactory.eINSTANCE.createCache();
+					cacheResource.getContents().add(cache);
+					try {
+						cacheResource.save(null);
+					} catch (IOException e2) {
+						e2.printStackTrace();
+					}
 				}
 			}
 
@@ -209,6 +213,9 @@ public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 	public void unloadAllCaches() {
 		cacheMap.clear();
 		uriMap.clear();
+
+		// remove loaded resources to free up memory
+		set.getResources().clear();
 	}
 
 }
