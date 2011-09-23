@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.cal.ui.labeling;
 
+import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
+
 import java.util.Iterator;
 
 import net.sf.orcc.cal.cal.AstAction;
@@ -38,7 +40,6 @@ import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstTransition;
 import net.sf.orcc.cal.cal.AstUnit;
-import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.Import;
 import net.sf.orcc.cal.cal.Inequality;
@@ -211,26 +212,21 @@ public class CalLabelProvider extends DefaultEObjectLabelProvider {
 			builder.append(dimensions);
 		}
 
-		// value
-		if (variable.getValue() != null) {
+		// prints value for state variables and constants in units
+		EStructuralFeature feature = variable.eContainingFeature();
+		if ((feature == eINSTANCE.getAstUnit_Variables() || feature == eINSTANCE
+				.getAstActor_StateVariables()) && variable.getValue() != null) {
 			builder.append(" ");
 			if (!variable.isConstant()) {
 				builder.append(":");
 			}
 			builder.append("= ");
 
-			EStructuralFeature feature = variable.eContainingFeature();
-			if (feature == CalPackage.eINSTANCE.getAstUnit_Variables()
-					|| feature == CalPackage.eINSTANCE
-							.getAstActor_StateVariables()) {
-				// if the variable is a variable of a unit or actor
-				// prints the evaluated value
-				Expression expr = Evaluator.getValue(variable);
-				builder.append(new ExpressionPrinter().doSwitch(expr));
-			} else {
-				builder.append(getText(variable.getValue()));
-			}
+			// prints the evaluated value
+			Expression expr = Evaluator.getValue(variable);
+			builder.append(new ExpressionPrinter().doSwitch(expr));
 		}
+
 		return builder.toString();
 	}
 
