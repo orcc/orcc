@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2010-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -73,9 +73,9 @@ import org.eclipse.xtext.validation.Check;
 import org.eclipse.xtext.validation.CheckType;
 
 /**
- * This class describes the validation of an RVC-CAL actor. The checks tagged as
- * "expensive" are only performed when the file is saved and before code
- * generation.
+ * This class describes a validator that performs type checking for an RVC-CAL
+ * actor/unit. The checks tagged as "normal" are only performed when the file is
+ * saved and before code generation.
  * 
  * @author Matthieu Wipliez
  * 

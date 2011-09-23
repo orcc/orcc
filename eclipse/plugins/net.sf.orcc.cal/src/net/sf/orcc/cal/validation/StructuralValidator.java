@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2010-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -47,7 +47,6 @@ import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstTransition;
-import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.ExpressionCall;
 import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.Generator;
@@ -57,15 +56,11 @@ import net.sf.orcc.cal.cal.OutputPattern;
 import net.sf.orcc.cal.cal.Priority;
 import net.sf.orcc.cal.cal.RegExp;
 import net.sf.orcc.cal.cal.Schedule;
-import net.sf.orcc.cal.cal.StatementAssign;
 import net.sf.orcc.cal.cal.StatementCall;
-import net.sf.orcc.cal.cal.StatementForeach;
 import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.VariableReference;
 import net.sf.orcc.cal.services.Evaluator;
-import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.cal.util.CalActionList;
-import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -76,7 +71,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
@@ -91,9 +85,9 @@ import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
 /**
- * This class describes the validation of an RVC-CAL actor. The checks tagged as
- * "expensive" are only performed when the file is saved and before code
- * generation.
+ * This class describes a validator that performs structural validation of an
+ * RVC-CAL actor/unit. The checks tagged as "normal" are only performed when the
+ * file is saved and before code generation.
  * 
  * @author Matthieu Wipliez
  * 
@@ -234,33 +228,6 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 	public void checkAstEntity(AstEntity entity) {
 		checkEntityPackage(entity);
 		checkEntityName(entity);
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkAstProcedure(final AstProcedure procedure) {
-		boolean used = new BooleanSwitch() {
-
-			@Override
-			public Boolean caseStatementCall(StatementCall call) {
-				if (call.getProcedure().equals(procedure)) {
-					return true;
-				}
-
-				return false;
-			}
-
-		}.doSwitch(Util.getTopLevelContainer(procedure));
-
-		if (!used && procedure.eContainer() instanceof AstActor
-				&& !procedure.isNative()) {
-			warning("The procedure " + procedure.getName() + " is never called",
-					procedure, eINSTANCE.getAstProcedure_Name(), -1);
-		}
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkAstUnit(AstUnit unit) {
-		// check unique names
 	}
 
 	/**
@@ -422,32 +389,6 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 	}
 
 	@Check(CheckType.NORMAL)
-	public void checkFunction(final Function function) {
-		// do not check functions of a unit
-		if (function.eContainer() instanceof AstUnit) {
-			return;
-		}
-
-		boolean used = new BooleanSwitch() {
-
-			@Override
-			public Boolean caseExpressionCall(ExpressionCall expression) {
-				if (expression.getFunction().equals(function)) {
-					return true;
-				}
-
-				return super.caseExpressionCall(expression);
-			}
-
-		}.doSwitch(Util.getTopLevelContainer(function));
-
-		if (!used && !function.isNative()) {
-			warning("The function " + function.getName() + " is never called",
-					function, eINSTANCE.getFunction_Name(), -1);
-		}
-	}
-
-	@Check(CheckType.NORMAL)
 	public void checkGenerator(Generator generator) {
 		int lower = Evaluator.getIntValue(generator.getLower());
 		int higher = Evaluator.getIntValue(generator.getHigher());
@@ -455,85 +396,6 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 		if (higher < lower) {
 			error("higher bound must be greater than lower bound", generator,
 					eINSTANCE.getGenerator_Higher(), -1);
-		}
-	}
-
-	/**
-	 * Checks that the given variable is used. If it is not, issue a warning.
-	 * 
-	 * @param variable
-	 *            a variable
-	 */
-	private void checkIsVariableUsed(final Variable variable) {
-		EObject container = variable.eContainer();
-		if (container instanceof InputPattern || container instanceof Generator
-				|| container instanceof StatementForeach) {
-			// do not warn about these variables because it is ok if they are
-			// not used
-			return;
-		} else if (container instanceof AstUnit) {
-			// variables in unit, too, because they may be used in other
-			// entities
-			return;
-		} else if (container instanceof Function) {
-			Function function = (Function) variable.eContainer();
-			if (function.isNative()) {
-				// parameters in native functions are not read in CAL
-				return;
-			}
-		} else if (container instanceof AstProcedure) {
-			AstProcedure procedure = (AstProcedure) variable.eContainer();
-			if (procedure.isNative()) {
-				// parameters in native procedures are not read in CAL
-				return;
-			}
-		}
-
-		EReference reference = variable.eContainmentFeature();
-		AstEntity entity = EcoreUtil2.getContainerOfType(variable,
-				AstEntity.class);
-		if (reference == eINSTANCE.getAstActor_Parameters()
-				&& entity.isNative()) {
-			// parameters in native actors are not read in CAL
-			return;
-		}
-
-		boolean isRead = new BooleanSwitch() {
-
-			@Override
-			public Boolean caseVariableReference(VariableReference ref) {
-				return ref.getVariable().equals(variable);
-			}
-
-		}.doSwitch(entity);
-
-		boolean isWritten = new BooleanSwitch() {
-
-			@Override
-			public Boolean caseStatementAssign(StatementAssign assign) {
-				return assign.getTarget().getVariable().equals(variable);
-			}
-
-		}.doSwitch(entity);
-
-		// do not warn about unused actor parameters
-		// used for system actors
-		if (!isRead && !isWritten) {
-			warning("The variable " + variable.getName() + " is never used",
-					variable, eINSTANCE.getVariable_Name(), -1);
-		} else if (!isRead) {
-			warning("The variable " + variable.getName() + " is never read",
-					variable, eINSTANCE.getVariable_Name(), -1);
-		} else if (!isWritten) {
-			if (variable.isConstant()
-					|| reference == eINSTANCE.getAstActor_Parameters()
-					|| reference == eINSTANCE.getFunction_Parameters()
-					|| reference == eINSTANCE.getAstProcedure_Parameters()) {
-				return;
-			}
-
-			warning("The variable " + variable.getName() + " is never written",
-					variable, eINSTANCE.getVariable_Name(), -1);
 		}
 	}
 
@@ -637,11 +499,6 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 					+ " cannot be called from another actor/unit", call,
 					eINSTANCE.getStatementCall_Procedure(), -1);
 		}
-	}
-
-	@Check(CheckType.NORMAL)
-	public void checkVariable(Variable variable) {
-		checkIsVariableUsed(variable);
 	}
 
 	@Check(CheckType.NORMAL)

@@ -42,7 +42,7 @@ import com.google.inject.Inject;
 
 /**
  * This class describes the validation of an RVC-CAL actor. The checks tagged as
- * "expensive" are only performed when the file is saved and before code
+ * "normal" are only performed when the file is saved and before code
  * generation.
  * 
  * @author Matthieu Wipliez
@@ -52,6 +52,9 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 	@Inject
 	private StructuralValidator structuralValidator;
+
+	@Inject
+	private WarningValidator warningValidator;
 
 	@Inject
 	private TypeValidator typeValidator;
@@ -82,6 +85,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		// perform structural validation and type checking
 		structuralValidator.validate(entity, getChain(), getContext());
 		typeValidator.validate(entity, getChain(), getContext());
+		warningValidator.validate(entity, getChain(), getContext());
 	}
 
 	private void showErrors(List<ValidationError> errors) {
