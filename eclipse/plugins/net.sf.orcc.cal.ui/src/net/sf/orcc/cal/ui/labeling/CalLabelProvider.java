@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2010-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -33,36 +33,28 @@ import java.util.Iterator;
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
-import net.sf.orcc.cal.cal.AstExpression;
+import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstTransition;
-import net.sf.orcc.cal.cal.AstType;
-import net.sf.orcc.cal.cal.AstTypeBool;
-import net.sf.orcc.cal.cal.AstTypeFloat;
-import net.sf.orcc.cal.cal.AstTypeInt;
-import net.sf.orcc.cal.cal.AstTypeList;
-import net.sf.orcc.cal.cal.AstTypeUint;
 import net.sf.orcc.cal.cal.AstUnit;
-import net.sf.orcc.cal.cal.ExpressionBinary;
-import net.sf.orcc.cal.cal.ExpressionBoolean;
-import net.sf.orcc.cal.cal.ExpressionCall;
-import net.sf.orcc.cal.cal.ExpressionFloat;
-import net.sf.orcc.cal.cal.ExpressionIf;
-import net.sf.orcc.cal.cal.ExpressionIndex;
-import net.sf.orcc.cal.cal.ExpressionInteger;
-import net.sf.orcc.cal.cal.ExpressionList;
-import net.sf.orcc.cal.cal.ExpressionString;
-import net.sf.orcc.cal.cal.ExpressionUnary;
-import net.sf.orcc.cal.cal.ExpressionVariable;
+import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.Function;
-import net.sf.orcc.cal.cal.Generator;
 import net.sf.orcc.cal.cal.Import;
 import net.sf.orcc.cal.cal.Inequality;
 import net.sf.orcc.cal.cal.InputPattern;
 import net.sf.orcc.cal.cal.Variable;
+import net.sf.orcc.cal.services.Evaluator;
+import net.sf.orcc.cal.services.Typer;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.util.ExpressionPrinter;
+import net.sf.orcc.ir.util.IrSwitch;
+import net.sf.orcc.ir.util.TypePrinter;
 import net.sf.orcc.util.OrccUtil;
 
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.ui.label.DefaultEObjectLabelProvider;
@@ -70,12 +62,40 @@ import org.eclipse.xtext.ui.label.DefaultEObjectLabelProvider;
 import com.google.inject.Inject;
 
 /**
- * Provides labels for a EObjects.
+ * This class provides labels for AST nodes. Some fields use the computed IR
+ * (e.g. types and values) to give more information.
  * 
- * see
- * http://www.eclipse.org/Xtext/documentation/latest/xtext.html#labelProvider
+ * @author Matthieu Wipliez
  */
 public class CalLabelProvider extends DefaultEObjectLabelProvider {
+
+	private static class DimensionsPrinter extends IrSwitch<String> {
+
+		@Override
+		public String caseTypeList(TypeList type) {
+			StringBuilder builder = new StringBuilder();
+			builder.append('[');
+			builder.append(new ExpressionPrinter().doSwitch(type.getSizeExpr()));
+			builder.append(']');
+
+			String innerDim = doSwitch(type.getType());
+			if (innerDim != null) {
+				builder.append(innerDim);
+			}
+
+			return builder.toString();
+		}
+
+	}
+
+	private static class ElementTypePrinter extends TypePrinter {
+
+		@Override
+		public String caseTypeList(TypeList type) {
+			return doSwitch(type.getType());
+		}
+
+	}
 
 	@Inject
 	public CalLabelProvider(AdapterFactoryLabelProvider delegate) {
@@ -107,6 +127,15 @@ public class CalLabelProvider extends DefaultEObjectLabelProvider {
 		return null;
 	}
 
+	public String text(AstPort port) {
+		Type type = Typer.getType(port);
+		String eltType = new ElementTypePrinter().doSwitch(type);
+		StringBuilder builder = new StringBuilder(eltType);
+		builder.append(" ");
+		builder.append(port.getName());
+		return builder.toString();
+	}
+
 	public String text(AstState state) {
 		return state.getName();
 	}
@@ -121,125 +150,12 @@ public class CalLabelProvider extends DefaultEObjectLabelProvider {
 				+ getText(transition.getTarget());
 	}
 
-	public String text(AstTypeBool type) {
-		return "bool";
-	}
-
-	public String text(AstTypeFloat type) {
-		return "float";
-	}
-
-	public String text(AstTypeInt type) {
-		AstExpression size = type.getSize();
-		return size == null ? "int" : "int(size=" + getText(size) + ")";
-	}
-
-	public String text(AstTypeList type) {
-		return "List(type:" + getText(type.getType()) + ", size="
-				+ getText(type.getSize()) + ")";
-	}
-
-	public String text(AstTypeUint type) {
-		AstExpression size = type.getSize();
-		return size == null ? "uint" : "uint(size=" + getText(size) + ")";
-	}
-
 	public String text(AstUnit unit) {
 		return null;
 	}
 
-	public String text(ExpressionBinary expr) {
-		return getText(expr.getLeft()) + " " + expr.getOperator() + " "
-				+ getText(expr.getRight());
-	}
-
-	public String text(ExpressionBoolean expr) {
-		return String.valueOf(expr.isValue());
-	}
-
-	public String text(ExpressionCall expr) {
-		StringBuilder builder = new StringBuilder(expr.getFunction().getName());
-		builder.append("(");
-		Iterator<AstExpression> it = expr.getParameters().iterator();
-		if (it.hasNext()) {
-			AstExpression param = it.next();
-			builder.append(getText(param));
-			while (it.hasNext()) {
-				builder.append(", ");
-				builder.append(getText(it.next()));
-			}
-		}
-		builder.append(")");
-		return builder.toString();
-	}
-
-	public String text(ExpressionFloat expr) {
-		return String.valueOf(expr.getValue());
-	}
-
-	public String text(ExpressionIf expr) {
-		return "if " + getText(expr.getCondition()) + " then "
-				+ getText(expr.getThen()) + " else " + getText(expr.getElse())
-				+ " end";
-	}
-
-	public String text(ExpressionIndex expr) {
-		StringBuilder builder = new StringBuilder(expr.getSource()
-				.getVariable().getName());
-		for (AstExpression index : expr.getIndexes()) {
-			builder.append('[');
-			builder.append(getText(index));
-			builder.append(']');
-		}
-		return builder.toString();
-	}
-
-	public String text(ExpressionInteger expr) {
-		return String.valueOf(expr.getValue());
-	}
-
-	public String text(ExpressionList expr) {
-		StringBuilder builder = new StringBuilder('[');
-		Iterator<AstExpression> it = expr.getExpressions().iterator();
-		if (it.hasNext()) {
-			AstExpression element = it.next();
-			builder.append(getText(element));
-			while (it.hasNext()) {
-				builder.append(", ");
-				builder.append(getText(it.next()));
-			}
-		}
-
-		Iterator<Generator> itG = expr.getGenerators().iterator();
-		if (itG.hasNext()) {
-			builder.append(" : ");
-			Generator generator = itG.next();
-			builder.append(getText(generator));
-			while (itG.hasNext()) {
-				builder.append(", ");
-				builder.append(getText(itG.next()));
-			}
-		}
-
-		builder.append(']');
-		return builder.toString();
-	}
-
-	public String text(ExpressionString expr) {
-		return String.valueOf(expr.getValue());
-	}
-
-	public String text(ExpressionUnary expr) {
-		return expr.getUnaryOperator() + " " + getText(expr.getExpression());
-	}
-
-	public String text(ExpressionVariable expr) {
-		return expr.getValue().getVariable().getName();
-	}
-
 	public String text(Function function) {
-		StringBuilder builder = new StringBuilder("function ");
-		builder.append(function.getName());
+		StringBuilder builder = new StringBuilder(function.getName());
 		builder.append("(");
 
 		Iterator<Variable> it = function.getParameters().iterator();
@@ -252,14 +168,10 @@ public class CalLabelProvider extends DefaultEObjectLabelProvider {
 			}
 		}
 		builder.append(") --> ");
-		builder.append(getText(function.getType()));
-		return builder.toString();
-	}
 
-	public String text(Generator generator) {
-		return "for " + getText(generator.getVariable()) + " in "
-				+ getText(generator.getLower()) + " .. "
-				+ getText(generator.getHigher());
+		Type type = Typer.getType(function);
+		builder.append(new TypePrinter().doSwitch(type));
+		return builder.toString();
 	}
 
 	public String text(Inequality inequality) {
@@ -278,32 +190,46 @@ public class CalLabelProvider extends DefaultEObjectLabelProvider {
 	}
 
 	public String text(Variable variable) {
-		AstType type = variable.getType();
+		Type type = Typer.getType(variable);
 		if (type == null) {
 			InputPattern pattern = EcoreUtil2.getContainerOfType(variable,
 					InputPattern.class);
 			if (pattern != null) {
-				type = pattern.getPort().getType();
+				type = Typer.getType(pattern.getPort());
 			}
 		}
 
-		StringBuilder builder = new StringBuilder(getText(type));
+		// base type and name (prints C-like types)
+		String eltType = new ElementTypePrinter().doSwitch(type);
+		StringBuilder builder = new StringBuilder(eltType);
 		builder.append(" ");
 		builder.append(variable.getName());
 
-		for (AstExpression dim : variable.getDimensions()) {
-			builder.append('[');
-			builder.append(getText(dim));
-			builder.append(']');
+		// dimensions
+		String dimensions = new DimensionsPrinter().doSwitch(type);
+		if (dimensions != null) {
+			builder.append(dimensions);
 		}
 
+		// value
 		if (variable.getValue() != null) {
 			builder.append(" ");
 			if (!variable.isConstant()) {
 				builder.append(":");
 			}
 			builder.append("= ");
-			builder.append(getText(variable.getValue()));
+
+			EStructuralFeature feature = variable.eContainingFeature();
+			if (feature == CalPackage.eINSTANCE.getAstUnit_Variables()
+					|| feature == CalPackage.eINSTANCE
+							.getAstActor_StateVariables()) {
+				// if the variable is a variable of a unit or actor
+				// prints the evaluated value
+				Expression expr = Evaluator.getValue(variable);
+				builder.append(new ExpressionPrinter().doSwitch(expr));
+			} else {
+				builder.append(getText(variable.getValue()));
+			}
 		}
 		return builder.toString();
 	}
