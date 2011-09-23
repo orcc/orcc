@@ -238,13 +238,13 @@ assignFifos(connections) ::= <<
 assignFifo(connection) ::= <<
 <if(!connection.source.native && !connection.target.native)
 >fifo_<indexConnection(connection)> : fifo
-  generic map(width =\> <connection.source.type.sizeInBits>)
+  generic map(width =\> 32)
   port map(wrreq   =\> fifo_<indexConnection(connection)>_wrreq,
            reset_n =\> reset_n,
            clk     =\> clk,
            rdreq   =\> fifo_<indexConnection(connection)>_rdreq,
-           data    =\> fifo_<indexConnection(connection)>_data(<connection.source.type.sizeInBits>-1 downto 0),
-           q       =\> fifo_<indexConnection(connection)>_q(<connection.target.type.sizeInBits>-1 downto 0),
+           data    =\> fifo_<indexConnection(connection)>_data(31 downto 0),
+           q       =\> fifo_<indexConnection(connection)>_q(31 downto 0),
            status  =\> fifo_<indexConnection(connection)>_status);<
 endif>
 >>

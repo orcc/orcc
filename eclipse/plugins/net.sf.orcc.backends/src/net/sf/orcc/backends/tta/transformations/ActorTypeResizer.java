@@ -107,7 +107,7 @@ public class ActorTypeResizer extends AbstractActorVisitor<Object> {
 	private void checkPorts(List<Port> ports) {
 		for (Port port : ports) {
 			if (!port.isNative()) {
-				checkType(port.getType(), 32);
+				checkType(port.getType());
 			}
 		}
 	}
