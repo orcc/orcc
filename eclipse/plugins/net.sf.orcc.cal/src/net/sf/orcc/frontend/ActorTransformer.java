@@ -48,6 +48,7 @@ import net.sf.orcc.cal.cal.RegExp;
 import net.sf.orcc.cal.cal.Schedule;
 import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.VariableReference;
+import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.cal.util.Util;
@@ -90,7 +91,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Matthieu Wipliez
  * 
  */
-public class ActorTransformer {
+public class ActorTransformer extends CalSwitch<Actor> {
 
 	private AstTransformer astTransformer;
 
@@ -318,94 +319,23 @@ public class ActorTransformer {
 	}
 
 	/**
-	 * Creates the test for schedulability of the given action.
-	 * 
-	 * @param astAction
-	 *            an AST action
-	 * @param inputPattern
-	 *            input pattern of action
-	 * @param result
-	 *            target local variable
-	 */
-	private void createActionTest(AstAction astAction, Pattern peekPattern,
-			Var result) {
-		List<AstExpression> guards = astAction.getGuards();
-		if (guards.isEmpty()) {
-			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(result,
-					IrFactory.eINSTANCE.createExprBool(true));
-			addInstruction(assign);
-		} else {
-			transformInputPatternPeek(astAction, peekPattern);
-			// local variables are not transformed because they are not
-			// supposed to be available for guards
-			// astTransformer.transformLocalVariables(astAction.getVariables());
-			transformGuards(astAction.getGuards(), result);
-		}
-	}
-
-	/**
-	 * Creates a new empty "initialize" action that is empty and always
-	 * schedulable.
-	 * 
-	 * @return an initialize action
-	 */
-	private Action createInitialize() {
-		// transform tag
-		Tag tag = IrFactory.eINSTANCE.createTag();
-
-		Pattern inputPattern = IrFactory.eINSTANCE.createPattern();
-		Pattern outputPattern = IrFactory.eINSTANCE.createPattern();
-		Pattern peekPattern = IrFactory.eINSTANCE.createPattern();
-
-		Procedure scheduler = IrFactory.eINSTANCE.createProcedure(
-				"isSchedulable_init_actor", 0,
-				IrFactory.eINSTANCE.createTypeBool());
-		Procedure body = IrFactory.eINSTANCE.createProcedure("init_actor", 0,
-				IrFactory.eINSTANCE.createTypeVoid());
-
-		// add return instructions
-		astTransformer.addReturn(scheduler,
-				IrFactory.eINSTANCE.createExprBool(true));
-		astTransformer.addReturn(body, null);
-
-		// creates action
-		Action action = IrFactory.eINSTANCE.createAction(tag, inputPattern,
-				outputPattern, peekPattern, scheduler, body);
-		return action;
-	}
-
-	/**
-	 * Creates a variable to hold the number of tokens on the given port.
-	 * 
-	 * @param port
-	 *            a port
-	 * @param numTokens
-	 *            number of tokens
-	 * @return the local array created
-	 */
-	private Var createPortVariable(Port port, int numTokens) {
-		// create the variable to hold the tokens
-		int lineNumber = astTransformer.getContext().getLineNumber();
-		return IrFactory.eINSTANCE.createVar(lineNumber,
-				IrFactory.eINSTANCE.createTypeList(numTokens, port.getType()),
-				port.getName(), true, 0);
-	}
-
-	/**
 	 * Transforms the given AST Actor to an IR actor.
 	 * 
 	 * @param astActor
 	 *            the AST of the actor
 	 * @return the actor in IR form
 	 */
-	public Actor transform(AstActor astActor) {
+	@Override
+	public Actor caseAstActor(AstActor astActor) {
 		Actor actor = IrFactory.eINSTANCE.createActor();
+		Frontend.putMapping(astActor, actor);
+
 		actor.setFileName(astActor.eResource().getURI().toPlatformString(true));
 
 		int lineNumber = Util.getLocation(astActor);
 		actor.setLineNumber(lineNumber);
 
-		astTransformer = new AstTransformer(actor.getProcs());
+		astTransformer = new AstTransformer();
 
 		// parameters
 		for (Variable Variable : astActor.getParameters()) {
@@ -496,7 +426,87 @@ public class ActorTransformer {
 		actor.getActions().addAll(actions.getAllActions());
 		actor.getInitializes().addAll(initializes.getAllActions());
 
+		// TODO clean up
+		Frontend.instance.removeDanglingUses(actor);
+
+		// serialize actor
+		Frontend.instance.serialize(actor);
+
 		return actor;
+	}
+
+	/**
+	 * Creates the test for schedulability of the given action.
+	 * 
+	 * @param astAction
+	 *            an AST action
+	 * @param inputPattern
+	 *            input pattern of action
+	 * @param result
+	 *            target local variable
+	 */
+	private void createActionTest(AstAction astAction, Pattern peekPattern,
+			Var result) {
+		List<AstExpression> guards = astAction.getGuards();
+		if (guards.isEmpty()) {
+			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(result,
+					IrFactory.eINSTANCE.createExprBool(true));
+			addInstruction(assign);
+		} else {
+			transformInputPatternPeek(astAction, peekPattern);
+			// local variables are not transformed because they are not
+			// supposed to be available for guards
+			// astTransformer.transformLocalVariables(astAction.getVariables());
+			transformGuards(astAction.getGuards(), result);
+		}
+	}
+
+	/**
+	 * Creates a new empty "initialize" action that is empty and always
+	 * schedulable.
+	 * 
+	 * @return an initialize action
+	 */
+	private Action createInitialize() {
+		// transform tag
+		Tag tag = IrFactory.eINSTANCE.createTag();
+
+		Pattern inputPattern = IrFactory.eINSTANCE.createPattern();
+		Pattern outputPattern = IrFactory.eINSTANCE.createPattern();
+		Pattern peekPattern = IrFactory.eINSTANCE.createPattern();
+
+		Procedure scheduler = IrFactory.eINSTANCE.createProcedure(
+				"isSchedulable_init_actor", 0,
+				IrFactory.eINSTANCE.createTypeBool());
+		Procedure body = IrFactory.eINSTANCE.createProcedure("init_actor", 0,
+				IrFactory.eINSTANCE.createTypeVoid());
+
+		// add return instructions
+		astTransformer.addReturn(scheduler,
+				IrFactory.eINSTANCE.createExprBool(true));
+		astTransformer.addReturn(body, null);
+
+		// creates action
+		Action action = IrFactory.eINSTANCE.createAction(tag, inputPattern,
+				outputPattern, peekPattern, scheduler, body);
+		return action;
+	}
+
+	/**
+	 * Creates a variable to hold the number of tokens on the given port.
+	 * 
+	 * @param port
+	 *            a port
+	 * @param numTokens
+	 *            number of tokens
+	 * @return the local array created
+	 */
+	private Var createPortVariable(Port port, int numTokens) {
+		// create the variable to hold the tokens
+		int lineNumber = astTransformer.getContext().getLineNumber();
+		return IrFactory.eINSTANCE.createVar(lineNumber,
+				IrFactory.eINSTANCE.createTypeList(numTokens, port.getType()),
+				port.getName(), true, 0);
 	}
 
 	/**

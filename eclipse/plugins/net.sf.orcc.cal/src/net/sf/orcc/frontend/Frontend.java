@@ -28,14 +28,17 @@
  */
 package net.sf.orcc.frontend;
 
-import net.sf.orcc.OrccException;
+import java.util.List;
+
 import net.sf.orcc.cache.Cache;
 import net.sf.orcc.cache.CacheManager;
+import net.sf.orcc.cache.CachePackage;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Entity;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Unit;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
@@ -59,6 +62,21 @@ public class Frontend {
 
 	public static final Frontend instance = new Frontend();
 
+	public static Actor getActor(AstActor actor) {
+		return (Actor) CacheManager.instance.getOrCompute(actor,
+				new ActorTransformer(),
+				CachePackage.eINSTANCE.getCache_IrMap(), null);
+	}
+
+	public static Entity getEntity(AstEntity entity) {
+		AstActor actor = entity.getActor();
+		if (actor == null) {
+			return getUnit(entity.getUnit());
+		} else {
+			return getActor(actor);
+		}
+	}
+
 	/**
 	 * Returns the IR equivalent of the given AST object using its URI.
 	 * 
@@ -77,6 +95,25 @@ public class Frontend {
 		}
 
 		return null;
+	}
+
+	public static List<Procedure> getProcedures(EObject cter) {
+		if (cter instanceof AstEntity) {
+			Entity entity = getEntity((AstEntity) cter);
+			if (entity instanceof Actor) {
+				return ((Actor) entity).getProcs();
+			} else if (entity instanceof Unit) {
+				return ((Unit) entity).getProcedures();
+			}
+		}
+
+		return null;
+	}
+
+	public static Unit getUnit(AstUnit unit) {
+		return (Unit) CacheManager.instance.getOrCompute(unit,
+				new UnitTransformer(), CachePackage.eINSTANCE.getCache_IrMap(),
+				null);
 	}
 
 	/**
@@ -102,50 +139,6 @@ public class Frontend {
 	private final ResourceSet set = CacheManager.instance.getResourceSet();
 
 	/**
-	 * Compiles the given actor which is defined in the given file, and writes
-	 * IR to the output folder defined by {@link #setOutputFolder(String)}.
-	 * <p>
-	 * Note that callers of this method must ensure that the actor has no errors
-	 * for it to be properly compiled.
-	 * </p>
-	 * 
-	 * @param file
-	 *            name of the file where the actor is defined
-	 * @param astActor
-	 *            AST of the actor
-	 * @throws OrccException
-	 */
-	public Entity compile(AstEntity entity) {
-		AstActor astActor = entity.getActor();
-		if (astActor != null) {
-			Actor actor = (Actor) getMapping(astActor);
-			if (actor != null) {
-				return actor;
-			}
-
-			ActorTransformer transformer = new ActorTransformer();
-			actor = transformer.transform(astActor);
-			putMapping(astActor, actor);
-			removeDanglingUses(actor);
-			IrUtil.serializeActor(set, outputFolder, actor);
-			return actor;
-		} else {
-			AstUnit astUnit = entity.getUnit();
-
-			Unit unit = (Unit) getMapping(astUnit);
-			if (unit != null) {
-				return unit;
-			}
-
-			UnitTransformer transformer = new UnitTransformer();
-			unit = transformer.transform(astUnit);
-			putMapping(astUnit, unit);
-			IrUtil.serializeActor(set, outputFolder, unit);
-			return unit;
-		}
-	}
-
-	/**
 	 * Warning: dirty hack! Removes uses that were created by the front-end but
 	 * subsequently ignored.
 	 * <p>
@@ -163,7 +156,7 @@ public class Frontend {
 	 * @param actor
 	 *            the IR of an actor
 	 */
-	private void removeDanglingUses(Actor actor) {
+	public void removeDanglingUses(Actor actor) {
 		TreeIterator<EObject> it = actor.eAllContents();
 		while (it.hasNext()) {
 			EObject eObject = it.next();
@@ -178,6 +171,16 @@ public class Frontend {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Serializes the given actor.
+	 * 
+	 * @param actor
+	 *            an actor
+	 */
+	public void serialize(Entity entity) {
+		IrUtil.serializeActor(set, outputFolder, entity);
 	}
 
 	public void setOutputFolder(IFolder outputFolder) {

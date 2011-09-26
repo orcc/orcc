@@ -146,7 +146,9 @@ public class AstTransformer {
 				}
 				if (calledProcedure == null) {
 					calledProcedure = transformFunction(astFunction);
-					procedures.add(calledProcedure);
+
+					EObject cter = EcoreUtil.getRootContainer(call);
+					Frontend.getProcedures(cter).add(calledProcedure);
 				}
 			}
 
@@ -681,7 +683,9 @@ public class AstTransformer {
 				}
 				if (procedure == null) {
 					procedure = transformProcedure(astProcedure);
-					procedures.add(procedure);
+
+					EObject cter = EcoreUtil.getRootContainer(call);
+					Frontend.getProcedures(cter).add(procedure);
 				}
 			}
 
@@ -861,7 +865,9 @@ public class AstTransformer {
 					print = IrFactory.eINSTANCE.createProcedure("print",
 							lineNumber, IrFactory.eINSTANCE.createTypeVoid());
 					print.setNative(true);
-					procedures.add(print);
+
+					EObject cter = EcoreUtil.getRootContainer(call);
+					Frontend.getProcedures(cter).add(print);
 				}
 
 				List<AstExpression> astParameters = call.getParameters();
@@ -899,11 +905,6 @@ public class AstTransformer {
 	private Procedure print;
 
 	/**
-	 * list of procedures of the IR target (actor/unit)
-	 */
-	private List<Procedure> procedures;
-
-	/**
 	 * statement transformer.
 	 */
 	final private StatementTransformer stmtTransformer;
@@ -911,9 +912,7 @@ public class AstTransformer {
 	/**
 	 * Creates a new AST to IR transformation.
 	 */
-	public AstTransformer(List<Procedure> procedures) {
-		this.procedures = procedures;
-
+	public AstTransformer() {
 		exprTransformer = new ExpressionTransformer();
 		stmtTransformer = new StatementTransformer();
 	}
@@ -1001,7 +1000,7 @@ public class AstTransformer {
 		if (eObject.eContainer() instanceof AstUnit) {
 			AstUnit astUnit = (AstUnit) eObject.eContainer();
 			AstEntity entity = (AstEntity) astUnit.eContainer();
-			Frontend.instance.compile(entity);
+			Frontend.getEntity(entity);
 			return Frontend.getMapping(eObject);
 		}
 		return null;

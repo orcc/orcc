@@ -121,7 +121,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 						IFile file = EcoreHelper.getFile(resource);
 						if (!hasErrors(file)) {
 							// and then we compile
-							Frontend.instance.compile(entity);
+							Frontend.getEntity(entity);
 						}
 					}
 				}

@@ -33,6 +33,7 @@ import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.Variable;
+import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Procedure;
@@ -45,7 +46,7 @@ import net.sf.orcc.ir.Var;
  * @author Matthieu Wipliez
  * 
  */
-public class UnitTransformer {
+public class UnitTransformer extends CalSwitch<Unit> {
 
 	/**
 	 * Transforms the given AST unit to an IR unit.
@@ -54,14 +55,17 @@ public class UnitTransformer {
 	 *            the AST of the unit
 	 * @return the unit in IR form
 	 */
-	public Unit transform(AstUnit astUnit) {
+	@Override
+	public Unit caseAstUnit(AstUnit astUnit) {
 		Unit unit = IrFactory.eINSTANCE.createUnit();
+		Frontend.putMapping(astUnit, unit);
+
 		unit.setFileName(astUnit.eResource().getURI().toPlatformString(true));
 
 		int lineNumber = Util.getLocation(astUnit);
 		unit.setLineNumber(lineNumber);
 
-		AstTransformer astTransformer = new AstTransformer(unit.getProcedures());
+		AstTransformer astTransformer = new AstTransformer();
 
 		// constants
 		for (Variable Variable : astUnit.getVariables()) {
@@ -87,6 +91,9 @@ public class UnitTransformer {
 
 		AstEntity entity = (AstEntity) astUnit.eContainer();
 		unit.setName(net.sf.orcc.cal.util.Util.getQualifiedName(entity));
+
+		// serialize unit
+		Frontend.instance.serialize(unit);
 
 		return unit;
 	}

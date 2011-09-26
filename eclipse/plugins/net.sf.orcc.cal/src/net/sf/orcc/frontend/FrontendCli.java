@@ -118,7 +118,7 @@ public class FrontendCli implements IApplication {
 
 		// only compile if there are no errors
 		if (!hasErrors) {
-			Frontend.instance.compile(entity);
+			Frontend.getEntity(entity);
 		}
 	}
 
