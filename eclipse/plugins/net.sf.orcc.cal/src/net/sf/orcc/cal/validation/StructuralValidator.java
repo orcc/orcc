@@ -536,7 +536,8 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 			EStructuralFeature feature = target.eContainingFeature();
 			if (feature == CalPackage.eINSTANCE.getAstActor_StateVariables()
 					|| feature == CalPackage.eINSTANCE.getAstUnit_Variables()) {
-				if (variable.getValue() == null) {
+				if (variable.getValue() == null
+						&& !(variable.eContainer() instanceof Generator)) {
 					error("Cannot use the variable " + name + " in this "
 							+ "context because it has no initial value", ref,
 							eINSTANCE.getVariableReference_Variable(), -1);
