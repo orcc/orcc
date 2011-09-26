@@ -47,6 +47,7 @@ import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstTransition;
+import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.ExpressionCall;
 import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.Generator;
@@ -71,6 +72,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
@@ -396,6 +398,20 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 		if (higher < lower) {
 			error("higher bound must be greater than lower bound", generator,
 					eINSTANCE.getGenerator_Higher(), -1);
+			return;
+		}
+
+		Variable variable = EcoreUtil2.getContainerOfType(generator,
+				Variable.class);
+		if (variable != null) {
+			EStructuralFeature feature = variable.eContainingFeature();
+			if (feature == CalPackage.eINSTANCE.getAstActor_StateVariables()
+					|| feature == CalPackage.eINSTANCE.getAstUnit_Variables()) {
+				if (higher - lower > 65536) {
+					error("List generated is too large, please use an initialize action",
+							generator, eINSTANCE.getGenerator_Variable(), -1);
+				}
+			}
 		}
 	}
 
@@ -513,6 +529,19 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 			error("variable " + name + " can only be referenced "
 					+ "within the actor in which it is declared", ref,
 					eINSTANCE.getVariableReference_Variable(), -1);
+		}
+
+		Variable target = EcoreUtil2.getContainerOfType(ref, Variable.class);
+		if (target != null) {
+			EStructuralFeature feature = target.eContainingFeature();
+			if (feature == CalPackage.eINSTANCE.getAstActor_StateVariables()
+					|| feature == CalPackage.eINSTANCE.getAstUnit_Variables()) {
+				if (variable.getValue() == null) {
+					error("Cannot use the variable " + name + " in this "
+							+ "context because it has no initial value", ref,
+							eINSTANCE.getVariableReference_Variable(), -1);
+				}
+			}
 		}
 	}
 
