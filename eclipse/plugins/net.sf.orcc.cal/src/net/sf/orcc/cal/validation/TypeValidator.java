@@ -240,7 +240,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		int errorIdx = 0;
 		for (AstExpression index : indexes) {
 			Type subType = Typer.getType(index);
-			if (type.isList()) {
+			if (type != null && type.isList()) {
 				if (subType != null && (subType.isInt() || subType.isUint())) {
 					type = ((TypeList) type).getType();
 				} else {
@@ -433,6 +433,10 @@ public class TypeValidator extends AbstractCalJavaValidator {
 	 */
 	private void checkTypeBinary(OpBinary op, Type t1, Type t2, EObject source,
 			EStructuralFeature feature, int index) {
+		if (t1 == null || t2 == null) {
+			return;
+		}
+		
 		switch (op) {
 		case BITAND:
 			if (!t1.isInt() && !t1.isUint()) {
@@ -480,20 +484,17 @@ public class TypeValidator extends AbstractCalJavaValidator {
 			break;
 
 		case PLUS:
-			if (t1 != null && t2 != null) {
-				if (t1.isString() && t2.isList()) {
-					error("Cannot convert " + t2 + " to String", source,
-							feature, index);
-				}
-				if (t2.isString() && t1.isList()) {
-					error("Cannot convert " + t1 + " to String", source,
-							feature, index);
-				}
-				if (t1.isBool() && !t2.isString() || !t1.isString()
-						&& t2.isBool()) {
-					error("Addition is not defined for booleans", source,
-							feature, index);
-				}
+			if (t1.isString() && t2.isList()) {
+				error("Cannot convert " + t2 + " to String", source, feature,
+						index);
+			}
+			if (t2.isString() && t1.isList()) {
+				error("Cannot convert " + t1 + " to String", source, feature,
+						index);
+			}
+			if (t1.isBool() && !t2.isString() || !t1.isString() && t2.isBool()) {
+				error("Addition is not defined for booleans", source, feature,
+						index);
 			}
 			break;
 

@@ -322,7 +322,7 @@ public class Typer extends CalSwitch<Type> {
 		List<AstExpression> indexes = expression.getIndexes();
 		for (AstExpression index : indexes) {
 			Type subType = getType(index);
-			if (type.isList()) {
+			if (type != null && type.isList()) {
 				if (subType != null && (subType.isInt() || subType.isUint())) {
 					type = ((TypeList) type).getType();
 				}
@@ -478,6 +478,15 @@ public class Typer extends CalSwitch<Type> {
 		return limitType(type);
 	}
 
+	@Override
+	public Type doSwitch(EObject eObject) {
+		if (eObject == null) {
+			return null;
+		}
+
+		return super.doSwitch(eObject);
+	}
+
 	/**
 	 * Returns the type necessary to hold the index that contains (directly or
 	 * indirectly) the given expression. For instance suppose a list L with a
@@ -501,6 +510,10 @@ public class Typer extends CalSwitch<Type> {
 		}
 
 		Type type = getType(variable);
+		if (type == null) {
+			return null;
+		}
+
 		List<Expression> dimensions = type.getDimensionsExpr();
 
 		Iterator<Expression> itD = dimensions.iterator();
@@ -703,7 +716,7 @@ public class Typer extends CalSwitch<Type> {
 				StatementAssign assign = (StatementAssign) cter;
 				if (expression == assign.getValue()) {
 					// expression is located in the value
-					
+
 					// get the innermost type of the target
 					boundType = getType(assign.getTarget().getVariable());
 					for (int i = 0; i < assign.getIndexes().size(); i++) {

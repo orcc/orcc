@@ -315,4 +315,13 @@ public class Evaluator extends CalSwitch<Expression> {
 		return value;
 	}
 
+	@Override
+	public Expression doSwitch(EObject eObject) {
+		if (eObject == null) {
+			return null;
+		}
+
+		return super.doSwitch(eObject);
+	}
+
 }

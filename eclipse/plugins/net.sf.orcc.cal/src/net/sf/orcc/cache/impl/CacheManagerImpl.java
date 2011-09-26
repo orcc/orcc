@@ -184,12 +184,12 @@ public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 		// get the resource from the set
 		Resource cacheResource = set.getResource(cacheUri, false);
 		if (cacheResource == null) {
-			// create it so we can delete the serialized version 
+			// create it so we can delete the serialized version
 			cacheResource = set.createResource(cacheUri);
 		}
 
 		// delete the resource
-		// note: if it did not exist, deleting will do nothing, 
+		// note: if it did not exist, deleting will do nothing,
 		if (cacheResource != null) {
 			try {
 				cacheResource.delete(null);
