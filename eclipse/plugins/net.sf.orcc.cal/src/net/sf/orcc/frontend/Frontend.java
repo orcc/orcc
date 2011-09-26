@@ -37,6 +37,7 @@ import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstUnit;
+import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.Procedure;
@@ -68,12 +69,6 @@ public class Frontend {
 				CachePackage.eINSTANCE.getCache_IrMap(), null);
 	}
 
-	public static Procedure getProcedure(AstProcedure procedure) {
-		return (Procedure) CacheManager.instance.getOrCompute(procedure,
-				new AstTransformer(), CachePackage.eINSTANCE.getCache_IrMap(),
-				null);
-	}
-
 	public static Entity getEntity(AstEntity entity) {
 		AstActor actor = entity.getActor();
 		if (actor == null) {
@@ -99,6 +94,18 @@ public class Frontend {
 		}
 
 		return null;
+	}
+
+	public static Procedure getProcedure(AstProcedure procedure) {
+		return (Procedure) CacheManager.instance.getOrCompute(procedure,
+				new AstTransformer(), CachePackage.eINSTANCE.getCache_IrMap(),
+				null);
+	}
+
+	public static Procedure getProcedure(Function function) {
+		return (Procedure) CacheManager.instance.getOrCompute(function,
+				new AstTransformer(), CachePackage.eINSTANCE.getCache_IrMap(),
+				null);
 	}
 
 	public static List<Procedure> getProcedures(AstEntity astEntity) {

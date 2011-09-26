@@ -139,19 +139,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 			// retrieve IR procedure
 			Function astFunction = call.getFunction();
 			Procedure calledProcedure = (Procedure) Frontend
-					.getMapping(astFunction);
-			if (calledProcedure == null) {
-				if (EcoreUtil2.getContainerOfType(call, AstUnit.class) == null) {
-					calledProcedure = (Procedure) getExternalObject(astFunction);
-				}
-				if (calledProcedure == null) {
-					calledProcedure = transformFunction(astFunction);
-
-					AstEntity entity = EcoreUtil2.getContainerOfType(call,
-							AstEntity.class);
-					Frontend.getProcedures(entity).add(calledProcedure);
-				}
-			}
+					.getProcedure(astFunction);
 
 			// generates a new target
 			Var target = procedure.newTempLocalVariable(
@@ -978,6 +966,61 @@ public class AstTransformer extends CalSwitch<EObject> {
 		return procedure;
 	}
 
+	/**
+	 * Transforms and adds a mapping from the given AST function to an IR
+	 * procedure.
+	 * 
+	 * @param function
+	 *            an AST function
+	 * @return the IR procedure
+	 */
+	@Override
+	public Procedure caseFunction(Function function) {
+		String name = function.getName();
+		int lineNumber = Util.getLocation(function);
+		Type type = Typer.getType(function);
+
+		// create procedure
+		Procedure procedure = IrFactory.eINSTANCE.createProcedure(name,
+				lineNumber, type);
+
+		// set native flag
+		if (function.isNative()) {
+			procedure.setNative(true);
+		}
+
+		// add mapping now (in case this function is recursive)
+		Frontend.putMapping(function, procedure);
+
+		Procedure oldContext = newContext(procedure);
+
+		transformParameters(function.getParameters());
+		transformLocalVariables(function.getVariables());
+
+		Expression value;
+		if (function.isNative()) {
+			value = null;
+		} else {
+			Var target = exprTransformer.target;
+			List<Expression> indexes = exprTransformer.indexes;
+			exprTransformer.clearTarget();
+			value = transformExpression(function.getExpression());
+			exprTransformer.setTarget(target, indexes);
+		}
+
+		restoreContext(oldContext);
+		addReturn(procedure, value);
+
+		// add procedure to procedures of container
+		if (function.eContainer() != null) {
+			AstEntity entity = EcoreUtil2.getContainerOfType(function,
+					AstEntity.class);
+			Frontend.getProcedures(entity).add(procedure);
+		}
+
+		return procedure;
+	}
+
 	private void createAssignOrStore(int lineNumber, Var target,
 			List<Expression> indexes, Expression value) {
 		// special case for list expressions
@@ -1178,49 +1221,6 @@ public class AstTransformer extends CalSwitch<EObject> {
 			irExpressions.add(transformExpression(expression));
 		}
 		return irExpressions;
-	}
-
-	/**
-	 * Transforms and adds a mapping from the given AST function to an IR
-	 * procedure.
-	 * 
-	 * @param function
-	 *            an AST function
-	 * @return the IR procedure
-	 */
-	public Procedure transformFunction(Function function) {
-		String name = function.getName();
-		int lineNumber = Util.getLocation(function);
-		Type type = Typer.getType(function);
-
-		Procedure procedure = IrFactory.eINSTANCE.createProcedure(name,
-				lineNumber, type);
-		Frontend.putMapping(function, procedure);
-
-		Procedure oldContext = newContext(procedure);
-
-		transformParameters(function.getParameters());
-		transformLocalVariables(function.getVariables());
-
-		Expression value;
-		if (function.isNative()) {
-			value = null;
-		} else {
-			Var target = exprTransformer.target;
-			List<Expression> indexes = exprTransformer.indexes;
-			exprTransformer.clearTarget();
-			value = transformExpression(function.getExpression());
-			exprTransformer.setTarget(target, indexes);
-		}
-
-		restoreContext(oldContext);
-		addReturn(procedure, value);
-
-		if (function.eContainer() == null || function.isNative()) {
-			procedure.setNative(true);
-		}
-
-		return procedure;
 	}
 
 	/**

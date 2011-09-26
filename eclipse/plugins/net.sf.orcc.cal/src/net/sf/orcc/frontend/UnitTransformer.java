@@ -36,7 +36,6 @@ import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Unit;
 import net.sf.orcc.ir.Var;
 
@@ -75,10 +74,7 @@ public class UnitTransformer extends CalSwitch<Unit> {
 
 		// functions
 		for (Function function : astUnit.getFunctions()) {
-			if (Frontend.getMapping(function) == null) {
-				Procedure proc = astTransformer.transformFunction(function);
-				unit.getProcedures().add(proc);
-			}
+			Frontend.getProcedure(function);
 		}
 
 		// procedures

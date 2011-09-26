@@ -351,10 +351,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 
 		// functions
 		for (Function function : astActor.getFunctions()) {
-			if (Frontend.getMapping(function) == null) {
-				Procedure proc = astTransformer.transformFunction(function);
-				actor.getProcs().add(proc);
-			}
+			Frontend.getProcedure(function);
 		}
 
 		// procedures
