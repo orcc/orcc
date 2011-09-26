@@ -98,7 +98,7 @@ import org.eclipse.xtext.EcoreUtil2;
  * @author Matthieu Wipliez
  * 
  */
-public class AstTransformer {
+public class AstTransformer extends CalSwitch<EObject> {
 
 	/**
 	 * This class transforms an AST expression into one or more IR instructions
@@ -147,8 +147,9 @@ public class AstTransformer {
 				if (calledProcedure == null) {
 					calledProcedure = transformFunction(astFunction);
 
-					EObject cter = EcoreUtil.getRootContainer(call);
-					Frontend.getProcedures(cter).add(calledProcedure);
+					AstEntity entity = EcoreUtil2.getContainerOfType(call,
+							AstEntity.class);
+					Frontend.getProcedures(entity).add(calledProcedure);
 				}
 			}
 
@@ -676,18 +677,7 @@ public class AstTransformer {
 			}
 
 			// retrieve IR procedure
-			Procedure procedure = (Procedure) Frontend.getMapping(astProcedure);
-			if (procedure == null) {
-				if (EcoreUtil2.getContainerOfType(call, AstUnit.class) == null) {
-					procedure = (Procedure) getExternalObject(astProcedure);
-				}
-				if (procedure == null) {
-					procedure = transformProcedure(astProcedure);
-
-					EObject cter = EcoreUtil.getRootContainer(call);
-					Frontend.getProcedures(cter).add(procedure);
-				}
-			}
+			Procedure procedure = Frontend.getProcedure(astProcedure);
 
 			// creates call with spilling code around it
 			createCall(lineNumber, null, procedure, call.getParameters());
@@ -866,8 +856,9 @@ public class AstTransformer {
 							lineNumber, IrFactory.eINSTANCE.createTypeVoid());
 					print.setNative(true);
 
-					EObject cter = EcoreUtil.getRootContainer(call);
-					Frontend.getProcedures(cter).add(print);
+					AstEntity entity = EcoreUtil2.getContainerOfType(call,
+							AstEntity.class);
+					Frontend.getProcedures(entity).add(print);
 				}
 
 				List<AstExpression> astParameters = call.getParameters();
@@ -941,6 +932,50 @@ public class AstTransformer {
 		NodeBlock block = procedure.getLast();
 		InstReturn returnInstr = IrFactory.eINSTANCE.createInstReturn(value);
 		block.add(returnInstr);
+	}
+
+	/**
+	 * Transforms and adds a mapping from the given AST procedure to an IR
+	 * procedure.
+	 * 
+	 * @param astProcedure
+	 *            an AST procedure
+	 * @return the IR procedure
+	 */
+	@Override
+	public Procedure caseAstProcedure(AstProcedure astProcedure) {
+		String name = astProcedure.getName();
+		int lineNumber = Util.getLocation(astProcedure);
+
+		// create procedure
+		Procedure procedure = IrFactory.eINSTANCE.createProcedure(name,
+				lineNumber, IrFactory.eINSTANCE.createTypeVoid());
+
+		// set native flag
+		if (astProcedure.isNative()) {
+			procedure.setNative(true);
+		}
+
+		// add mapping now (in case this procedure is recursive)
+		Frontend.putMapping(astProcedure, procedure);
+
+		Procedure oldContext = newContext(procedure);
+
+		transformParameters(astProcedure.getParameters());
+		transformLocalVariables(astProcedure.getVariables());
+		transformStatements(astProcedure.getStatements());
+
+		restoreContext(oldContext);
+		addReturn(procedure, null);
+
+		// add procedure to procedures of container
+		if (astProcedure.eContainer() != null) {
+			AstEntity entity = EcoreUtil2.getContainerOfType(astProcedure,
+					AstEntity.class);
+			Frontend.getProcedures(entity).add(procedure);
+		}
+
+		return procedure;
 	}
 
 	private void createAssignOrStore(int lineNumber, Var target,
@@ -1299,38 +1334,6 @@ public class AstTransformer {
 			Var local = transformLocalVariable(astParameter);
 			params.add(IrFactory.eINSTANCE.createParam(local));
 		}
-	}
-
-	/**
-	 * Transforms and adds a mapping from the given AST procedure to an IR
-	 * procedure.
-	 * 
-	 * @param astProcedure
-	 *            an AST procedure
-	 * @return the IR procedure
-	 */
-	public Procedure transformProcedure(AstProcedure astProcedure) {
-		String name = astProcedure.getName();
-		int lineNumber = Util.getLocation(astProcedure);
-
-		Procedure procedure = IrFactory.eINSTANCE.createProcedure(name,
-				lineNumber, IrFactory.eINSTANCE.createTypeVoid());
-		Frontend.putMapping(astProcedure, procedure);
-
-		Procedure oldContext = newContext(procedure);
-
-		transformParameters(astProcedure.getParameters());
-		transformLocalVariables(astProcedure.getVariables());
-		transformStatements(astProcedure.getStatements());
-
-		restoreContext(oldContext);
-		addReturn(procedure, null);
-
-		if (astProcedure.eContainer() == null || astProcedure.isNative()) {
-			procedure.setNative(true);
-		}
-
-		return procedure;
 	}
 
 	/**

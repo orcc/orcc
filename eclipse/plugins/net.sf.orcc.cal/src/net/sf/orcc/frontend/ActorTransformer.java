@@ -359,10 +359,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 
 		// procedures
 		for (AstProcedure procedure : astActor.getProcedures()) {
-			if (Frontend.getMapping(procedure) == null) {
-				Procedure proc = astTransformer.transformProcedure(procedure);
-				actor.getProcs().add(proc);
-			}
+			Frontend.getProcedure(procedure);
 		}
 
 		// transform ports

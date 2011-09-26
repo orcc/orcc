@@ -83,10 +83,7 @@ public class UnitTransformer extends CalSwitch<Unit> {
 
 		// procedures
 		for (AstProcedure procedure : astUnit.getProcedures()) {
-			if (Frontend.getMapping(procedure) == null) {
-				Procedure proc = astTransformer.transformProcedure(procedure);
-				unit.getProcedures().add(proc);
-			}
+			Frontend.getProcedure(procedure);
 		}
 
 		AstEntity entity = (AstEntity) astUnit.eContainer();
