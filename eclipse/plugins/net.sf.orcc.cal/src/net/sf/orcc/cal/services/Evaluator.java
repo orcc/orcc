@@ -110,14 +110,14 @@ public class Evaluator extends CalSwitch<Expression> {
 				CachePackage.eINSTANCE.getCache_Expressions());
 	}
 
-	private static void setValue(EObject eObject, AstExpression value) {
+	private static void setValue(EObject eObject, Expression value) {
 		Resource resource = eObject.eResource();
-		if (resource != null && value != null) {
+		if (resource != null) {
 			Cache cache = CacheManager.instance.getCache(resource.getURI());
 
 			URI uri = EcoreUtil.getURI(eObject);
 			String fragment = uri.fragment();
-			cache.getExpressionsMap().put(fragment, getValue(value));
+			cache.getExpressionsMap().put(fragment, value);
 		}
 	}
 
@@ -156,15 +156,16 @@ public class Evaluator extends CalSwitch<Expression> {
 			Variable paramV = itFormal.next();
 			AstExpression paramE = itActual.next();
 
-			setValue(paramV, paramE);
+			setValue(paramV, doSwitch(paramE));
 		}
 
 		// set the value of variables
 		for (Variable variable : function.getVariables()) {
-			setValue(variable, variable.getValue());
+			setValue(variable, doSwitch(variable.getValue()));
 		}
 
-		return getValue(function.getExpression());
+		// do not cache value because it is influenced by variables
+		return doSwitch(function.getExpression());
 	}
 
 	@Override
@@ -236,17 +237,7 @@ public class Evaluator extends CalSwitch<Expression> {
 		List<Generator> generators = expression.getGenerators();
 
 		ExprList list = IrFactory.eINSTANCE.createExprList();
-		if (generators.isEmpty()) {
-			for (AstExpression subExpression : expressions) {
-				list.getValue().add(EcoreUtil.copy(getValue(subExpression)));
-			}
-		} else {
-			// generators will be translated to statements in initialize
-
-			// for some weird reason the evaluation of generators slows down *a
-			// lot* everything (even code generation, although I have no idea
-			// why), so we will not use it
-		}
+		computeList(list, expressions, generators, 0);
 
 		return list;
 	}
@@ -313,6 +304,30 @@ public class Evaluator extends CalSwitch<Expression> {
 
 		Expression value = getValue(expression);
 		return value;
+	}
+
+	private void computeList(ExprList list, List<AstExpression> expressions,
+			List<Generator> generators, int index) {
+		if (index < generators.size()) {
+			Generator generator = generators.get(index);
+			int lower = getIntValue(generator.getLower());
+			int higher = getIntValue(generator.getHigher());
+			for (int i = lower; i <= higher; i++) {
+				ExprInt value = IrFactory.eINSTANCE.createExprInt(i);
+				setValue(generator.getVariable(), value);
+
+				computeList(list, expressions, generators, index + 1);
+			}
+			setValue(generator.getVariable(), null);
+		} else {
+			for (AstExpression subExpression : expressions) {
+				// do not cache value because it is influenced by variables
+				Expression value = doSwitch(subExpression);
+				if (value != null) {
+					list.getValue().add(EcoreUtil.copy(value));
+				}
+			}
+		}
 	}
 
 	@Override

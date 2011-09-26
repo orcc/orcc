@@ -369,24 +369,6 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		// transform initializes
 		ActionList initializes = transformActions(astActor.getInitializes());
 
-		// add call to initialize procedure (if any)
-		Procedure initialize = astTransformer.getInitialize();
-		if (initialize != null) {
-			actor.getProcs().add(initialize);
-
-			if (initializes.isEmpty()) {
-				Action action = createInitialize();
-				initializes.add(action);
-			}
-
-			for (Action action : initializes) {
-				NodeBlock block = action.getBody().getFirst();
-				List<Expression> params = new ArrayList<Expression>(0);
-				block.add(0, IrFactory.eINSTANCE.createInstCall(lineNumber,
-						null, initialize, params));
-			}
-		}
-
 		// sort actions by priority
 		ActionSorter sorter = new ActionSorter(actions);
 		ActionList sortedActions = sorter.applyPriority(astActor
@@ -453,37 +435,6 @@ public class ActorTransformer extends CalSwitch<Actor> {
 			// astTransformer.transformLocalVariables(astAction.getVariables());
 			transformGuards(astAction.getGuards(), result);
 		}
-	}
-
-	/**
-	 * Creates a new empty "initialize" action that is empty and always
-	 * schedulable.
-	 * 
-	 * @return an initialize action
-	 */
-	private Action createInitialize() {
-		// transform tag
-		Tag tag = IrFactory.eINSTANCE.createTag();
-
-		Pattern inputPattern = IrFactory.eINSTANCE.createPattern();
-		Pattern outputPattern = IrFactory.eINSTANCE.createPattern();
-		Pattern peekPattern = IrFactory.eINSTANCE.createPattern();
-
-		Procedure scheduler = IrFactory.eINSTANCE.createProcedure(
-				"isSchedulable_init_actor", 0,
-				IrFactory.eINSTANCE.createTypeBool());
-		Procedure body = IrFactory.eINSTANCE.createProcedure("init_actor", 0,
-				IrFactory.eINSTANCE.createTypeVoid());
-
-		// add return instructions
-		astTransformer.addReturn(scheduler,
-				IrFactory.eINSTANCE.createExprBool(true));
-		astTransformer.addReturn(body, null);
-
-		// creates action
-		Action action = IrFactory.eINSTANCE.createAction(tag, inputPattern,
-				outputPattern, peekPattern, scheduler, body);
-		return action;
 	}
 
 	/**

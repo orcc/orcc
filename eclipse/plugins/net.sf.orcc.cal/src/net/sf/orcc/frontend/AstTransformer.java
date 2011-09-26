@@ -61,7 +61,6 @@ import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.cal.services.Typer;
-import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.Annotation;
 import net.sf.orcc.ir.ExprVar;
@@ -879,8 +878,6 @@ public class AstTransformer extends CalSwitch<EObject> {
 	 */
 	final private ExpressionTransformer exprTransformer;
 
-	private Procedure initialize;
-
 	private Procedure print;
 
 	/**
@@ -1085,24 +1082,6 @@ public class AstTransformer extends CalSwitch<EObject> {
 	}
 
 	/**
-	 * Returns the value of the initialize attribute (which is set to null when
-	 * the method returns).
-	 * 
-	 * @return the initialize procedure (or <code>null</code>)
-	 */
-	public Procedure getInitialize() {
-		Procedure initialize = this.initialize;
-
-		// adds return inst to initialize if it is not null
-		if (initialize != null) {
-			addReturn(initialize, null);
-		}
-
-		this.initialize = null;
-		return initialize;
-	}
-
-	/**
 	 * Returns the qualified name for the given object.
 	 * 
 	 * @param obj
@@ -1121,36 +1100,6 @@ public class AstTransformer extends CalSwitch<EObject> {
 		}
 
 		return name;
-	}
-
-	/**
-	 * Returns <code>true</code> if the given variable needs to be initialized
-	 * in an <code>initialize</code> action. This is the case for lists that
-	 * have generators, because we do not want to statically evaluate the
-	 * generators as this potentially generates many values.
-	 * 
-	 * @param Variable
-	 *            a state variable
-	 * @return <code>true</code> if the given variable needs to be initialized
-	 *         in an <code>initialize</code> action
-	 * 
-	 */
-	private boolean isInitializeNeeded(Variable Variable) {
-		Type type = Typer.getType(Variable);
-		AstExpression value = Variable.getValue();
-		if (type.isList() && value != null) {
-			// the variable is a List with an initial value
-			return new BooleanSwitch() {
-
-				@Override
-				public Boolean caseGenerator(Generator generator) {
-					return true;
-				}
-
-			}.doSwitch(value);
-		}
-
-		return false;
 	}
 
 	/**
@@ -1232,46 +1181,22 @@ public class AstTransformer extends CalSwitch<EObject> {
 	 *            a list of AST state variables
 	 * @return an ordered map of IR state variables
 	 */
-	public Var transformGlobalVariable(Variable Variable) {
-		int lineNumber = Util.getLocation(Variable);
-		Type type = EcoreUtil.copy(Typer.getType(Variable));
-		String name = Variable.getName();
-		boolean assignable = !Variable.isConstant();
+	public Var transformGlobalVariable(Variable variable) {
+		int lineNumber = Util.getLocation(variable);
+		Type type = EcoreUtil.copy(Typer.getType(variable));
+		String name = variable.getName();
+		boolean assignable = !variable.isConstant();
 
-		// check if the variable needs to be initialized in the "initialize"
-		// procedure
-		boolean mustInitialize = isInitializeNeeded(Variable);
-		Expression initialValue = null;
-		if (mustInitialize) {
-			initialValue = null;
-		} else {
-			initialValue = EcoreUtil.copy(Evaluator.getValue(Variable));
-		}
+		// retrieve initial value (may be null)
+		Expression initialValue = EcoreUtil.copy(Evaluator.getValue(variable));
 
 		// create state variable and put it in the map
-		Var variable = IrFactory.eINSTANCE.createVar(lineNumber, type, name,
+		Var var = IrFactory.eINSTANCE.createVar(lineNumber, type, name,
 				assignable, initialValue);
-		transformAnnotations(variable, Variable.getAnnotations());
-		Frontend.putMapping(Variable, variable);
+		transformAnnotations(var, variable.getAnnotations());
+		Frontend.putMapping(variable, var);
 
-		// translate and add to initialize
-		if (mustInitialize) {
-			if (initialize == null) {
-				initialize = IrFactory.eINSTANCE.createProcedure("_initialize",
-						lineNumber, IrFactory.eINSTANCE.createTypeVoid());
-			}
-
-			Procedure oldContext = newContext(initialize);
-
-			exprTransformer.setTarget(variable, new ArrayList<Expression>(0));
-			Expression expression = transformExpression(Variable.getValue());
-			createAssignOrStore(lineNumber, variable, null, expression);
-			exprTransformer.clearTarget();
-
-			restoreContext(oldContext);
-		}
-
-		return variable;
+		return var;
 	}
 
 	/**
