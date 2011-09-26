@@ -32,7 +32,6 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.util.Switch;
 
 /**
@@ -144,11 +143,9 @@ public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 		} else {
 			Cache cache = getCache(resource.getURI());
 
-			URI uri = EcoreUtil.getURI(eObject);
-			String fragment = uri.fragment();
-
 			@SuppressWarnings("unchecked")
 			EMap<String, T> map = (EMap<String, T>) cache.eGet(featureMap);
+			String fragment = resource.getURIFragment(eObject);
 			result = map.get(fragment);
 
 			if (result == null) {

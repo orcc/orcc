@@ -35,6 +35,7 @@ import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cache.CachePackage;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
+import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Entity;
@@ -46,7 +47,6 @@ import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.emf.common.util.TreeIterator;
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
@@ -62,10 +62,16 @@ public class Frontend {
 
 	public static final Frontend instance = new Frontend();
 
-	public static Actor getActor(AstActor actor) {
+	private static Actor getActor(AstActor actor) {
 		return (Actor) CacheManager.instance.getOrCompute(actor,
 				new ActorTransformer(),
 				CachePackage.eINSTANCE.getCache_IrMap(), null);
+	}
+
+	public static Procedure getProcedure(AstProcedure procedure) {
+		return (Procedure) CacheManager.instance.getOrCompute(procedure,
+				new AstTransformer(), CachePackage.eINSTANCE.getCache_IrMap(),
+				null);
 	}
 
 	public static Entity getEntity(AstEntity entity) {
@@ -88,29 +94,25 @@ public class Frontend {
 		Resource resource = eObject.eResource();
 		if (resource != null) {
 			Cache cache = CacheManager.instance.getCache(resource.getURI());
-
-			URI uri = EcoreUtil.getURI(eObject);
-			String fragment = uri.fragment();
+			String fragment = resource.getURIFragment(eObject);
 			return cache.getIrMap().get(fragment);
 		}
 
 		return null;
 	}
 
-	public static List<Procedure> getProcedures(EObject cter) {
-		if (cter instanceof AstEntity) {
-			Entity entity = getEntity((AstEntity) cter);
-			if (entity instanceof Actor) {
-				return ((Actor) entity).getProcs();
-			} else if (entity instanceof Unit) {
-				return ((Unit) entity).getProcedures();
-			}
+	public static List<Procedure> getProcedures(AstEntity astEntity) {
+		Entity entity = getEntity(astEntity);
+		if (entity instanceof Actor) {
+			return ((Actor) entity).getProcs();
+		} else if (entity instanceof Unit) {
+			return ((Unit) entity).getProcedures();
+		} else {
+			return null;
 		}
-
-		return null;
 	}
 
-	public static Unit getUnit(AstUnit unit) {
+	private static Unit getUnit(AstUnit unit) {
 		return (Unit) CacheManager.instance.getOrCompute(unit,
 				new UnitTransformer(), CachePackage.eINSTANCE.getCache_IrMap(),
 				null);
@@ -127,9 +129,7 @@ public class Frontend {
 		Resource resource = astObject.eResource();
 		if (resource != null) {
 			Cache cache = CacheManager.instance.getCache(resource.getURI());
-
-			URI uri = EcoreUtil.getURI(astObject);
-			String fragment = uri.fragment();
+			String fragment = resource.getURIFragment(astObject);
 			cache.getIrMap().put(fragment, irObject);
 		}
 	}
