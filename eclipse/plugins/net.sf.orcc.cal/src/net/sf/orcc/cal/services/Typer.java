@@ -137,7 +137,7 @@ public class Typer extends CalSwitch<Type> {
 
 		@Override
 		public int getSize(Type t1, Type t2) {
-			return type.getSizeInBits() + 1;
+			return type == null ? 0 : type.getSizeInBits() + 1;
 		}
 
 	}
