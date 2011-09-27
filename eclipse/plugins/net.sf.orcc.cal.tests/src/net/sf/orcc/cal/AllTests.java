@@ -8,12 +8,16 @@ import junit.framework.Assert;
 import net.sf.orcc.OrccProjectNature;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.Variable;
+import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.frontend.Frontend;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Entity;
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.util.ExpressionPrinter;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.ICommand;
@@ -151,7 +155,7 @@ public class AllTests {
 		}
 
 		Frontend.instance.setOutputFolder(outputFolder);
-		return Frontend.instance.compile(entity);
+		return Frontend.getEntity(entity);
 	}
 
 	/**
@@ -197,6 +201,38 @@ public class AllTests {
 		}
 
 		return isValid ? entity : null;
+	}
+
+	@Test
+	public void passCheckGenerator() throws Exception {
+		AstEntity entity = parseAndValidate(prefix + "pass/Generator.cal");
+		List<Variable> stateVars = entity.getActor().getStateVariables();
+		Variable var = stateVars.get(0);
+
+		Expression expr = Evaluator.getValue(var);
+
+		ExprList l11 = IrFactory.eINSTANCE.createExprList();
+		l11.getValue().add(IrFactory.eINSTANCE.createExprInt(1));
+		l11.getValue().add(IrFactory.eINSTANCE.createExprInt(2));
+		l11.getValue().add(IrFactory.eINSTANCE.createExprInt(3));
+
+		ExprList l12 = IrFactory.eINSTANCE.createExprList();
+		l12.getValue().add(IrFactory.eINSTANCE.createExprInt(2));
+		l12.getValue().add(IrFactory.eINSTANCE.createExprInt(4));
+		l12.getValue().add(IrFactory.eINSTANCE.createExprInt(6));
+
+		ExprList l1 = IrFactory.eINSTANCE.createExprList();
+		l1.getValue().add(l11);
+		l1.getValue().add(l12);
+
+		ExprList expected = IrFactory.eINSTANCE.createExprList();
+		expected.getValue().add(l1);
+
+		String strExpected = new ExpressionPrinter().doSwitch(expected);
+		
+		Assert.assertTrue(
+				"value of stateVar should be " + strExpected,
+				EcoreUtil.equals(expr, expected));
 	}
 
 	@Test

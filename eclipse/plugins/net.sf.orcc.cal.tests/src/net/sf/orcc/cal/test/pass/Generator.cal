@@ -1,0 +1,12 @@
+package net.sf.orcc.cal.test.pass;
+
+actor Generator() ==> :
+
+	int stateVar[1][2][3] :=
+	[
+	  [
+	    [ i * j * k : for int i in 1 .. 3 ] : for int j in 1 .. 2
+	  ] : for int k in 1 .. 1
+	];
+
+end
