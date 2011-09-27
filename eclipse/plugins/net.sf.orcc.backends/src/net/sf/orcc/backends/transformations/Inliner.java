@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.ir.Arg;
+import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprVar;
@@ -45,7 +46,6 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
@@ -156,14 +156,19 @@ public class Inliner extends AbstractActorVisitor<Object> {
 			newVar.setAssignable(var.isAssignable());
 			variableToLocalVariableMap.put(var, newVar);
 		}
-		for (Param param : function.getParameters()) {
+		for (int i = 0; i < function.getParameters().size(); i++) {
 			Var newVar;
-			Var var = param.getVariable();
+			Var var = function.getParameters().get(i).getVariable();
 			if (var.getType().isList()) {
 				// In case of list, the parameter could be a global variable
-				newVar = ((ExprVar) call.getParameters().get(
-						function.getParameters().indexOf(var))).getUse()
-						.getVariable();
+				Arg arg = call.getParameters().get(i);
+				if (arg.isByRef()) {
+					newVar = ((ArgByRef) arg).getUse().getVariable();
+				} else {
+					// TOFIX: probably wrong...
+					newVar = ((ExprVar) ((ArgByVal) arg).getValue()).getUse()
+							.getVariable();
+				}
 			} else {
 				newVar = procedure.newTempLocalVariable(var.getType(),
 						"inlined_" + var.getName());
