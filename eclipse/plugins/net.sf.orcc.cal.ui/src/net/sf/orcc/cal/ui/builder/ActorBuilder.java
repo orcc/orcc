@@ -28,10 +28,6 @@
  */
 package net.sf.orcc.cal.ui.builder;
 
-import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
-
-import java.io.File;
-
 import net.sf.orcc.OrccProjectNature;
 import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstEntity;
@@ -52,7 +48,6 @@ import org.eclipse.emf.ecore.EValidator;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.xtext.builder.IXtextBuilderParticipant;
-import org.eclipse.xtext.resource.IEObjectDescription;
 import org.eclipse.xtext.resource.IResourceDescription;
 import org.eclipse.xtext.resource.IResourceDescription.Delta;
 
@@ -95,21 +90,16 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			outputFolder.delete(true, null);
 		}
 
+		// clear cache associated with old/new entries
+		for (Delta delta : context.getDeltas()) {
+			CacheManager.instance.removeCache(delta.getUri());
+		}
+
+		// build actors/units
 		ResourceSet set = context.getResourceSet();
 		monitor.beginTask("Building actors", context.getDeltas().size());
 		for (Delta delta : context.getDeltas()) {
-			if (delta.getNew() == null) {
-				// deletion
-				IResourceDescription desc = delta.getOld();
-				CacheManager.instance.removeCache(desc.getURI());
-				for (IEObjectDescription objDesc : desc
-						.getExportedObjectsByType(eINSTANCE.getAstActor())) {
-					File file = new File(outputFolder + File.separator
-							+ objDesc.getName() + ".json");
-					file.delete();
-				}
-			} else {
-				// creation
+			if (delta.getNew() != null) {
 				IResourceDescription desc = delta.getNew();
 
 				// load resource and compile
