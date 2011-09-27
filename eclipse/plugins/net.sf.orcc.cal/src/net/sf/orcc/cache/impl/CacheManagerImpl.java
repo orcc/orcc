@@ -198,7 +198,7 @@ public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 
 	@Override
 	public void saveCache(URI uri) {
-		Cache cache = cacheMap.remove(uri);
+		Cache cache = cacheMap.get(uri);
 		if (cache != null) {
 			// get the cache URI to save the resource to which the cache belongs
 			URI cacheUri = getCacheURI(uri);
