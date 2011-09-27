@@ -88,7 +88,7 @@ p<id>_<port.name> = create<dir>putPort(p<id>, "<port.name>", <n>);
 >>
 
 initializeParameter(parameter,value,id) ::= <<
-setParameter(p<id>, "<parameter.name>", "<Constant(value)>");
+setParameter(p<id>, "<parameter.name>",<if(value.stringExpr)><Constant(value)><else>"<Constant(value)>"<endif>);
 >>
 
 /////////////////////////////
