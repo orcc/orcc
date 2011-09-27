@@ -1569,7 +1569,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				}
 			}
 		}
-		optimalSize = closestPow_2(size);
+		optimalSize = closestPow_2(size + 1);
 		return optimalSize;
 	}
 
