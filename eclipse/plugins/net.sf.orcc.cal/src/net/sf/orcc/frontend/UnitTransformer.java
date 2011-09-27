@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.frontend;
 
+import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstUnit;
@@ -74,19 +75,22 @@ public class UnitTransformer extends CalSwitch<Unit> {
 
 		// functions
 		for (Function function : astUnit.getFunctions()) {
-			Frontend.getProcedure(function);
+			// no need to require this unit
+			unit.getProcedures().add(Frontend.getProcedure(function, false));
 		}
 
 		// procedures
 		for (AstProcedure procedure : astUnit.getProcedures()) {
-			Frontend.getProcedure(procedure);
+			// no need to require this unit
+			unit.getProcedures().add(Frontend.getProcedure(procedure, false));
 		}
 
 		AstEntity entity = (AstEntity) astUnit.eContainer();
 		unit.setName(net.sf.orcc.cal.util.Util.getQualifiedName(entity));
 
-		// serialize unit
+		// serialize unit and cache
 		Frontend.instance.serialize(unit);
+		CacheManager.instance.saveCache(astUnit.eResource().getURI());
 
 		return unit;
 	}

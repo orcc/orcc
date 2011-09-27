@@ -35,9 +35,6 @@ import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cache.CachePackage;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
-import net.sf.orcc.cal.cal.AstProcedure;
-import net.sf.orcc.cal.cal.AstUnit;
-import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.Procedure;
@@ -52,6 +49,8 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.emf.ecore.util.Switch;
+import org.eclipse.xtext.EcoreUtil2;
 
 /**
  * This class defines an RVC-CAL front-end.
@@ -63,19 +62,27 @@ public class Frontend {
 
 	public static final Frontend instance = new Frontend();
 
-	private static Actor getActor(AstActor actor) {
-		return (Actor) CacheManager.instance.getOrCompute(actor,
-				new ActorTransformer(),
-				CachePackage.eINSTANCE.getCache_IrMap(), null);
-	}
-
+	/**
+	 * Returns the IR of the given AST entity. If it does not exist, creates it.
+	 * 
+	 * @param entity
+	 *            an AST entity
+	 * @return the IR of the given AST entity
+	 */
 	public static Entity getEntity(AstEntity entity) {
 		AstActor actor = entity.getActor();
+		EObject eObject;
+		Switch<? extends Entity> emfSwitch;
 		if (actor == null) {
-			return getUnit(entity.getUnit());
+			eObject = entity.getUnit();
+			emfSwitch = new UnitTransformer();
 		} else {
-			return getActor(actor);
+			eObject = actor;
+			emfSwitch = new ActorTransformer();
 		}
+
+		return (Entity) CacheManager.instance.getOrCompute(eObject, emfSwitch,
+				CachePackage.eINSTANCE.getCache_IrMap(), null);
 	}
 
 	/**
@@ -96,16 +103,44 @@ public class Frontend {
 		return null;
 	}
 
-	public static Procedure getProcedure(AstProcedure procedure) {
-		return (Procedure) CacheManager.instance.getOrCompute(procedure,
-				new AstTransformer(), CachePackage.eINSTANCE.getCache_IrMap(),
-				null);
+	/**
+	 * Returns the IR procedure equivalent of the AST function/procedure.
+	 * 
+	 * @param eObject
+	 *            an AST function/procedure
+	 * @return the IR procedure equivalent of the AST function/procedure
+	 */
+	public static Procedure getProcedure(EObject eObject) {
+		return getProcedure(eObject, true);
 	}
 
-	public static Procedure getProcedure(Function function) {
-		return (Procedure) CacheManager.instance.getOrCompute(function,
-				new AstTransformer(), CachePackage.eINSTANCE.getCache_IrMap(),
-				null);
+	/**
+	 * Returns the IR procedure equivalent of the AST function/procedure. If
+	 * <code>require</code> is <code>true</code>, first make sure that the IR of
+	 * the given AST function/procedure's containing entity exists.
+	 * 
+	 * @param eObject
+	 *            an AST function/procedure
+	 * @param require
+	 *            if <code>true</code>, first get the IR of the object's
+	 *            containing entity
+	 * @return the IR procedure equivalent of the AST function/procedure
+	 */
+	public static Procedure getProcedure(EObject eObject, boolean require) {
+		if (require) {
+			AstEntity entity = EcoreUtil2.getContainerOfType(eObject,
+					AstEntity.class);
+			getEntity(entity);
+		}
+
+		// no need to put the mapping back because the AstTransformer does it
+		// that's also why we don't use getOrCompute
+		Procedure proc = (Procedure) getMapping(eObject);
+		if (proc == null) {
+			proc = (Procedure) new AstTransformer().doSwitch(eObject);
+		}
+
+		return proc;
 	}
 
 	public static List<Procedure> getProcedures(AstEntity astEntity) {
@@ -117,12 +152,6 @@ public class Frontend {
 		} else {
 			return null;
 		}
-	}
-
-	private static Unit getUnit(AstUnit unit) {
-		return (Unit) CacheManager.instance.getOrCompute(unit,
-				new UnitTransformer(), CachePackage.eINSTANCE.getCache_IrMap(),
-				null);
 	}
 
 	/**

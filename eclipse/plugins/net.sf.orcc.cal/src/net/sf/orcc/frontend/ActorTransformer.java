@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
@@ -351,12 +352,14 @@ public class ActorTransformer extends CalSwitch<Actor> {
 
 		// functions
 		for (Function function : astActor.getFunctions()) {
-			Frontend.getProcedure(function);
+			// no need to require this actor
+			actor.getProcs().add(Frontend.getProcedure(function, false));
 		}
 
 		// procedures
 		for (AstProcedure procedure : astActor.getProcedures()) {
-			Frontend.getProcedure(procedure);
+			// no need to require this actor
+			actor.getProcs().add(Frontend.getProcedure(procedure, false));
 		}
 
 		// transform ports
@@ -405,8 +408,9 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		// TODO clean up
 		Frontend.instance.removeDanglingUses(actor);
 
-		// serialize actor
+		// serialize actor and cache
 		Frontend.instance.serialize(actor);
+		CacheManager.instance.saveCache(astActor.eResource().getURI());
 
 		return actor;
 	}
