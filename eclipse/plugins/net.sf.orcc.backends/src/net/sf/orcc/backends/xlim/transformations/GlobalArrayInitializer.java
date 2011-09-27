@@ -30,12 +30,16 @@ package net.sf.orcc.backends.xlim.transformations;
 
 import java.util.Collections;
 
+import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.ActorInterpreter;
+import net.sf.orcc.ir.util.ValueUtil;
 
 /**
  * 
@@ -48,6 +52,59 @@ import net.sf.orcc.ir.util.ActorInterpreter;
  */
 public class GlobalArrayInitializer extends AbstractActorVisitor<Object> {
 
+	private class XlimActorInitializer extends ActorInterpreter {
+		private boolean initToZero;
+
+		public XlimActorInitializer(Actor actor, boolean initToZero) {
+			super(actor, Collections.<String, Expression> emptyMap());
+			this.initToZero = initToZero;
+		}
+
+		public void initialize() {
+			try {
+				// initializes state variables
+				for (Var stateVar : actor.getStateVars()) {
+					initializeVar(stateVar);
+				}
+
+				// Get initializing procedure if any
+				for (Action action : actor.getInitializes()) {
+					if (isSchedulable(action)) {
+						execute(action);
+						continue;
+					}
+				}
+			} catch (OrccRuntimeException ex) {
+				throw new OrccRuntimeException(
+						"Runtime exception thrown by actor " + actor.getName(),
+						ex);
+			}
+		}
+
+		protected void initializeVar(Var variable) {
+			Type type = variable.getType();
+			Expression initConst = variable.getInitialValue();
+			if (initConst == null) {
+				if (initToZero) {
+					if (type.isList()) {
+						variable.setValue(ValueUtil
+								.createArray((TypeList) type));
+					} else if (type.isBool()) {
+						variable.setValue(false);
+					} else if (type.isInt()) {
+						variable.setValue(0);
+					}
+				}
+			} else {
+				// evaluate initial constant value
+				if (type.isList()) {
+					exprInterpreter.setType((TypeList) type);
+				}
+				variable.setValue(exprInterpreter.doSwitch(initConst));
+			}
+		}
+	}
+
 	private boolean initToZero;
 
 	public GlobalArrayInitializer(boolean initToZero) {
@@ -56,25 +113,7 @@ public class GlobalArrayInitializer extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseActor(Actor actor) {
-		ActorInterpreter actorInterpreter = new ActorInterpreter(actor,
-				Collections.<String, Expression> emptyMap());
-
-		// initialize variables
-		actorInterpreter.initialize();
-
-		if (initToZero) {
-			for (Var stateVar : actor.getStateVars()) {
-				Type type = stateVar.getType();
-				if (stateVar.getInitialValue() == null) {
-					if (type.isBool()) {
-						stateVar.setValue(false);
-					} else if (type.isInt()) {
-						stateVar.setValue(0);
-					}
-				}
-			}
-		}
-
+		new XlimActorInitializer(actor, initToZero).initialize();
 		return null;
 	}
 

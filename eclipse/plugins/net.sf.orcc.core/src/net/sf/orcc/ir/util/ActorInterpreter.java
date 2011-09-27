@@ -90,7 +90,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	/**
 	 * Actor's constant parameters to be set at initialization time
 	 */
-	private Map<String, Expression> parameters;
+	protected Map<String, Expression> parameters;
 
 	/**
 	 * Creates a new interpreter with no actor and no parameters.
@@ -489,7 +489,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	 * @param variable
 	 *            a variable
 	 */
-	private void initializeVar(Var variable) {
+	protected void initializeVar(Var variable) {
 		Type type = variable.getType();
 		Expression initConst = variable.getInitialValue();
 		if (initConst == null) {
