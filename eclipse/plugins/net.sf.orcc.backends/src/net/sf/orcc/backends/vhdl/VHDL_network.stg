@@ -221,7 +221,7 @@ else
 <connection.target.name>_ack      =\> <srcVertex.port.name>_ack,<
 endif><
 else
-><connection.target.name>     =\> <connection.target.name>,<
+><connection.target.name>     =\> <srcVertex.port.name>,<
 endif>
 >>
 
