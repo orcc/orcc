@@ -953,13 +953,6 @@ public class AstTransformer extends CalSwitch<EObject> {
 		restoreContext(oldContext);
 		addReturn(procedure, null);
 
-		// add procedure to procedures of container
-		if (astProcedure.eContainer() != null) {
-			AstEntity entity = EcoreUtil2.getContainerOfType(astProcedure,
-					AstEntity.class);
-			Frontend.getProcedures(entity).add(procedure);
-		}
-
 		return procedure;
 	}
 
@@ -1007,13 +1000,6 @@ public class AstTransformer extends CalSwitch<EObject> {
 
 		restoreContext(oldContext);
 		addReturn(procedure, value);
-
-		// add procedure to procedures of container
-		if (function.eContainer() != null) {
-			AstEntity entity = EcoreUtil2.getContainerOfType(function,
-					AstEntity.class);
-			Frontend.getProcedures(entity).add(procedure);
-		}
 
 		return procedure;
 	}
