@@ -292,11 +292,14 @@ while (<whileNode.condition>) {
 // Procedure
 ///////////////////////////////////////////////////////////////////////////////
 
+printProcedureDeclaration(procedure,action="") ::= <<
+<if(procedure.native)>extern<else>static<endif> <procedure.returnType> <procedure.name>(<procedure.parameters: {param |
+<varDecl(variable=param.variable)>}; separator=", ">);
+
+>>
+
 printProcedure(procedure,action="") ::= <<
-<if(procedure.native)>
-extern <procedure.returnType> <procedure.name>(<
-  procedure.parameters: {param | <varDecl(variable=param.variable)>}; wrap, anchor, separator=", ">);
-<else>
+<if(!procedure.native)>
 static <procedure.returnType> <procedure.name>(<
   procedure.parameters: {param | <varDecl(variable=param.variable)>}; wrap, anchor, separator=", ">) {
 <if(procedure.locals)>
@@ -698,6 +701,7 @@ extern struct actor_s <instance.id>;
 <endif>
 ////////////////////////////////////////////////////////////////////////////////
 // Functions/procedures
+<instance.actor.procs: printProcedureDeclaration()>
 <instance.actor.procs: printProcedure()>
 ////////////////////////////////////////////////////////////////////////////////
 // Actions
