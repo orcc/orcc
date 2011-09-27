@@ -399,6 +399,8 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 
 	private boolean isTypeReducer(OpBinary op) {
 		switch (op) {
+		case SHIFT_LEFT:
+		case SHIFT_RIGHT:
 		case MOD:
 			return true;
 		default:
