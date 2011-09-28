@@ -241,7 +241,6 @@ int* LLVMExecution::initialize(){
    if (NoLazyCompilation) {
 		for (Module::iterator I = module->begin(), E = module->end(); I != E; ++I) {
 			Function *Fn = &*I;
-        cout << Fn->getNameStr()<< "function name";
 			if (!Fn->isDeclaration())
 				EE->getPointerToFunction(Fn);
 		}
