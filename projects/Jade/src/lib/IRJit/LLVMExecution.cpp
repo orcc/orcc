@@ -48,6 +48,7 @@
 #include "llvm/Type.h"
 #include "llvm/ADT/Triple.h"
 #include "llvm/ExecutionEngine/GenericValue.h"
+#include "llvm/ExecutionEngine/Interpreter.h"
 #include "llvm/ExecutionEngine/JIT.h"
 #include "llvm/ExecutionEngine/JITEventListener.h"
 #include "llvm/Support/CommandLine.h"
