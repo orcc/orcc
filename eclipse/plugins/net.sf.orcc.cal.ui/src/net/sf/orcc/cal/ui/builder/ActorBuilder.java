@@ -90,9 +90,11 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			outputFolder.delete(true, null);
 		}
 
-		// clear cache associated with old/new entries
+		// clear cache associated with removed files
 		for (Delta delta : context.getDeltas()) {
-			CacheManager.instance.removeCache(delta.getUri());
+			if (delta.getNew() == null) {
+				CacheManager.instance.removeCache(delta.getUri());
+			}
 		}
 
 		// build actors/units
