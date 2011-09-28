@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package ch.epfl.impl;
+package ch.epfl.mpeg4.part2.impl;
 
 import java.awt.Canvas;
 import java.awt.Graphics;
