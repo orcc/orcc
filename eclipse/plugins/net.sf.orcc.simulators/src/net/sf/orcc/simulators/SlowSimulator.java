@@ -106,7 +106,8 @@ public class SlowSimulator extends AbstractSimulator {
 			Port tgtPort, int fifoSize) {
 		Fifo fifo = null;
 		if (enableTraces) {
-			String fifoName = src.getId() + "_" + srcPort.getName();
+			String fifoName = src.getId() + "_" + srcPort.getName() + "_"
+					+ tgt.getId() + "_" + tgtPort.getName();
 			fifo = new Fifo(srcPort.getType(), fifoSize, traceFolder, fifoName,
 					enableTraces);
 		} else {
@@ -155,7 +156,7 @@ public class SlowSimulator extends AbstractSimulator {
 				// create the communication FIFO between source and target
 				// actors
 				Instance src = srcVertex.getInstance();
-				Instance tgt = srcVertex.getInstance();
+				Instance tgt = tgtVertex.getInstance();
 				Port srcPort = connection.getSource();
 				Port tgtPort = connection.getTarget();
 				// connect source and target actors

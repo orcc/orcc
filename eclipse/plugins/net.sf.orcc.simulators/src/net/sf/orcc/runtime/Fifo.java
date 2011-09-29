@@ -217,15 +217,15 @@ public class Fifo {
 		}
 
 		if (enableTraces) {
-			writeFile(type, value);
+			write(type, value);
 		}
 	}
 
-	private void writeFile(Type type, Object value) {
+	private void write(Type type, Object value) {
 		if (type.isBool()) {
-			writer.println(String.valueOf((Boolean) value));
+			writer.println((Boolean) value);
 		} else if (type.isFloat()) {
-			writer.println(String.valueOf((Float) value));
+			writer.println((Float) value);
 		} else if (type.isInt()) {
 			int size = type.getSizeInBits();
 			if (size <= 8) {
@@ -248,8 +248,6 @@ public class Fifo {
 			} else if (size < 64) {
 				writer.println(ValueUtil.getLongValue(value));
 			}
-		} else {
 		}
-
 	}
 }
