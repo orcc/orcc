@@ -33,5 +33,14 @@
          </selectNetwork>
       </option>
    </extension>
+   <extension
+         id="nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="net.sf.orcc.OrccProjectNature">
+         </run>
+      </runtime>
+   </extension>
 
 </plugin>

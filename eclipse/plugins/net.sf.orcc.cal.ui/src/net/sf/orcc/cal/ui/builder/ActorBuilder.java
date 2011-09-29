@@ -40,6 +40,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -72,7 +73,11 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		// only build Orcc projects
 		IProject project = context.getBuiltProject();
 		if (!project.hasNature(OrccProjectNature.NATURE_ID)) {
-			return;
+			if (project.hasNature("net.sf.orcc.ui.OrccNature")) {
+				migrateNature(project);
+			} else {
+				return;
+			}
 		}
 
 		// create front-end
@@ -151,6 +156,25 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Migrates the old Orcc nature to the new one.
+	 * 
+	 * @param project
+	 *            project affected
+	 * @throws CoreException
+	 */
+	private void migrateNature(IProject project) throws CoreException {
+		IProjectDescription desc = project.getDescription();
+		String[] natures = desc.getNatureIds();
+		for (int i = 0; i < natures.length; i++) {
+			if ("net.sf.orcc.ui.OrccNature".equals(natures[i])) {
+				natures[i] = OrccProjectNature.NATURE_ID;
+			}
+		}
+		desc.setNatureIds(natures);
+		project.setDescription(desc, null);
 	}
 
 }

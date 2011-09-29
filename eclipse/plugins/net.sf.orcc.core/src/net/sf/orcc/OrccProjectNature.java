@@ -40,7 +40,7 @@ import org.eclipse.core.runtime.CoreException;
  */
 public class OrccProjectNature implements IProjectNature {
 
-	public static final String NATURE_ID = "net.sf.orcc.ui.OrccNature";
+	public static final String NATURE_ID = "net.sf.orcc.core.nature";
 
 	private IProject project;
 

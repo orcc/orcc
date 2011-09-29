@@ -346,15 +346,6 @@
       </propertyTester>
    </extension>
    <extension
-         id="OrccNature"
-         point="org.eclipse.core.resources.natures">
-      <runtime>
-         <run
-               class="net.sf.orcc.OrccProjectNature">
-         </run>
-      </runtime>
-   </extension>
-   <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
             class="net.sf.orcc.preferences.PreferenceInitializer">
@@ -487,7 +478,7 @@
       <image
             icon="icons/orcc.png"
             id="net.sf.orcc.ui.OrccNatureImage"
-            natureId="net.sf.orcc.ui.OrccNature">
+            natureId="net.sf.orcc.core.nature">
       </image>
    </extension>
    <extension point="org.eclipse.ui.editors">
