@@ -536,26 +536,6 @@
       </wizard>
    </extension>
    <extension
-         point="org.eclipse.ui.propertyPages">
-      <page
-            class="net.sf.orcc.ui.properties.ProjectPropertyPage"
-            icon="icons/orcc.png"
-            id="net.sf.orcc.ui.properties.ProjectPropertyPage"
-            name="Orcc Settings">
-         <enabledWhen>
-            <and>
-               <adapt
-                     type="org.eclipse.core.resources.IProject">
-               </adapt>
-               <test
-                     forcePluginActivation="true"
-                     property="net.sf.orcc.isOrccProject">
-               </test>
-            </and>
-         </enabledWhen>
-      </page>
-   </extension>
-   <extension
          point="org.eclipse.ui.preferencePages">
       <page
             class="net.sf.orcc.ui.preferences.OrccPreferencePage"
