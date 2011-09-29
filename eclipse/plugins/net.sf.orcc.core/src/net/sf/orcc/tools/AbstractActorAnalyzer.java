@@ -96,7 +96,7 @@ public abstract class AbstractActorAnalyzer implements ActorAnalyzer {
 
 		IFile file = null;
 		ResourceSet set = new ResourceSetImpl();
-		actor = IrUtil.deserializeActor(set, file);
+		actor = (Actor) IrUtil.deserializeEntity(set, file);
 
 		if (isCanceled()) {
 			return;

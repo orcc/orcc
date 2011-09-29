@@ -34,7 +34,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.Expression;
@@ -230,17 +229,19 @@ public class IrUtil {
 	}
 
 	/**
-	 * Deserializes the XMI representation of an actor stored in the given file,
-	 * and returns this actor.
+	 * Deserializes the XMI representation of an actor/unit stored in the given
+	 * file, and returns this actor/unit.
 	 * 
 	 * @param file
 	 *            a .ir file
 	 * @return the actor serialized with XMI in the given file
 	 */
-	public static Actor deserializeActor(ResourceSet set, IFile file) {
+	@SuppressWarnings("unchecked")
+	public static <T extends Entity> T deserializeEntity(ResourceSet set,
+			IFile file) {
 		Resource resource = set.getResource(URI.createPlatformResourceURI(file
 				.getFullPath().toString(), true), true);
-		Actor actor = (Actor) resource.getContents().get(0);
+		T actor = (T) resource.getContents().get(0);
 		return actor;
 	}
 

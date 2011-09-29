@@ -323,7 +323,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 		}
 		actor = Network.getActorFromPool(className);
 		if (actor == null) {
-			actor = IrUtil.deserializeActor(set, file);
+			actor = (Actor) IrUtil.deserializeEntity(set, file);
 			if (actor == null) {
 				throw new OrccException("Actor \"" + className
 						+ "\" not found!\nIf this actor has errors, please "
