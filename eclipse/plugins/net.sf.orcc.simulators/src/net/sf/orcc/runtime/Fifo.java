@@ -33,6 +33,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
 import net.sf.orcc.ir.Type;
@@ -54,7 +55,7 @@ public class Fifo {
 
 	private FileOutputStream fos;
 
-	private OutputStreamWriter out;
+	private PrintWriter writer;
 
 	private int readIdx;
 
@@ -63,7 +64,8 @@ public class Fifo {
 	private Type type;
 
 	private int writeIdx;
-	
+
+	private boolean enableTraces;
 
 	/**
 	 * Creates a new FIFO with the given size and a file for tracing exchanged
@@ -76,17 +78,20 @@ public class Fifo {
 	 * @param fifoName
 	 *            name of the fifo (and the trace file)
 	 */
-	public Fifo(int size, String folderName, String fifoName,
+	public Fifo(Type type, int size, String folderName, String fifoName,
 			boolean enableTraces) {
-		this.size = size;
+		this(type, size);
 		this.fifoName = fifoName;
+		this.enableTraces = enableTraces;
+
 		if (enableTraces) {
 			// Create network communication tracing file
 			File file = new File(folderName);
 			try {
 				fos = new FileOutputStream(new File(file, fifoName
 						+ "_traces.txt"));
-				this.out = new OutputStreamWriter(fos, "UTF-8");
+				writer = new PrintWriter(new OutputStreamWriter(fos, "UTF-8"),
+						true);
 			} catch (FileNotFoundException e) {
 				String msg = "folder not found: \"" + folderName + "\"";
 				throw new RuntimeException(msg, e);
@@ -112,12 +117,8 @@ public class Fifo {
 	}
 
 	public void close() {
-		if (out != null) {
-			try {
-				out.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		if (writer != null) {
+			writer.close();
 		}
 		if (fos != null) {
 			try {
@@ -214,6 +215,41 @@ public class Fifo {
 		if (writeIdx >= size) {
 			writeIdx -= size;
 		}
+
+		if (enableTraces) {
+			writeFile(type, value);
+		}
 	}
 
+	private void writeFile(Type type, Object value) {
+		if (type.isBool()) {
+			writer.println(String.valueOf((Boolean) value));
+		} else if (type.isFloat()) {
+			writer.println(String.valueOf((Float) value));
+		} else if (type.isInt()) {
+			int size = type.getSizeInBits();
+			if (size <= 8) {
+				writer.println(ValueUtil.getByteValue(value));
+			} else if (size <= 16) {
+				writer.println(ValueUtil.getShortValue(value));
+			} else if (size <= 32) {
+				writer.println(ValueUtil.getIntValue(value));
+			} else if (size <= 64) {
+				writer.println(ValueUtil.getLongValue(value));
+			}
+		} else if (type.isUint()) {
+			int size = type.getSizeInBits();
+			if (size < 8) {
+				writer.println(ValueUtil.getByteValue(value));
+			} else if (size < 16) {
+				writer.println(ValueUtil.getShortValue(value));
+			} else if (size < 32) {
+				writer.println(ValueUtil.getIntValue(value));
+			} else if (size < 64) {
+				writer.println(ValueUtil.getLongValue(value));
+			}
+		} else {
+		}
+
+	}
 }

@@ -279,7 +279,7 @@ public class ValueUtil {
 		}
 	}
 
-	private static byte getByteValue(Object value) {
+	public static byte getByteValue(Object value) {
 		if (value instanceof Integer) {
 			return ((Integer) value).byteValue();
 		} else if (value instanceof Long) {
@@ -353,7 +353,7 @@ public class ValueUtil {
 		}
 	}
 
-	private static long getLongValue(Object value) {
+	public static long getLongValue(Object value) {
 		if (value instanceof Integer) {
 			return ((Integer) value).longValue();
 		} else if (value instanceof Long) {
@@ -365,7 +365,7 @@ public class ValueUtil {
 		}
 	}
 
-	private static short getShortValue(Object value) {
+	public static short getShortValue(Object value) {
 		if (value instanceof Integer) {
 			return ((Integer) value).shortValue();
 		} else if (value instanceof Long) {

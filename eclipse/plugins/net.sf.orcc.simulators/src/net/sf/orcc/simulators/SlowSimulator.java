@@ -29,9 +29,11 @@
 package net.sf.orcc.simulators;
 
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
+import static net.sf.orcc.OrccLaunchConstants.ENABLE_TRACES;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
+import static net.sf.orcc.OrccLaunchConstants.TRACES_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 
 import java.io.FileNotFoundException;
@@ -96,8 +98,20 @@ public class SlowSimulator extends AbstractSimulator {
 
 	protected String xdfFile;
 
-	protected void connectActors(Port srcPort, Port tgtPort, int fifoSize) {
-		Fifo fifo = new Fifo(srcPort.getType(), fifoSize);
+	private boolean enableTraces;
+
+	private String traceFolder;
+
+	protected void connectActors(Instance src, Port srcPort, Instance tgt,
+			Port tgtPort, int fifoSize) {
+		Fifo fifo = null;
+		if (enableTraces) {
+			String fifoName = src.getId() + "_" + srcPort.getName();
+			fifo = new Fifo(srcPort.getType(), fifoSize, traceFolder, fifoName,
+					enableTraces);
+		} else {
+			fifo = new Fifo(srcPort.getType(), fifoSize);
+		}
 
 		inputFifos.put(tgtPort, fifo);
 
@@ -140,11 +154,13 @@ public class SlowSimulator extends AbstractSimulator {
 
 				// create the communication FIFO between source and target
 				// actors
+				Instance src = srcVertex.getInstance();
+				Instance tgt = srcVertex.getInstance();
 				Port srcPort = connection.getSource();
 				Port tgtPort = connection.getTarget();
 				// connect source and target actors
 				if ((srcPort != null) && (tgtPort != null)) {
-					connectActors(srcPort, tgtPort, size);
+					connectActors(src, srcPort, tgt, tgtPort, size);
 				}
 			}
 		}
@@ -164,8 +180,10 @@ public class SlowSimulator extends AbstractSimulator {
 		fifoSize = getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 		stimulusFile = getAttribute(INPUT_STIMULUS, "");
 		xdfFile = getAttribute(XDF_FILE, "");
-
 		String name = getAttribute(PROJECT, "");
+		enableTraces = getAttribute(ENABLE_TRACES, false);
+		traceFolder = getAttribute(TRACES_FOLDER, "");
+
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		project = root.getProject(name);
 

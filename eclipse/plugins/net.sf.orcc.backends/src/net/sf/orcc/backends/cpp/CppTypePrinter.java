@@ -31,6 +31,7 @@ package net.sf.orcc.backends.cpp;
 import net.sf.orcc.backends.c.CTypePrinter;
 import net.sf.orcc.ir.TypeBool;
 import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 
 /**
@@ -64,6 +65,11 @@ public class CppTypePrinter extends CTypePrinter {
 	@Override
 	public String caseTypeBool(TypeBool type) {
 		return "bool";
+	}
+
+	@Override
+	public String caseTypeString(TypeString type) {
+		return "std::string";
 	}
 
 	@Override
