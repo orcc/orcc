@@ -29,7 +29,9 @@
 package net.sf.orcc.cal.ui.builder;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.sf.orcc.OrccProjectNature;
 import net.sf.orcc.cache.CacheManager;
@@ -107,13 +109,17 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			}
 		}
 
-		// build actors/units
+		// store result of build
 		List<Entity> entities = new ArrayList<Entity>();
+		Set<IResourceDescription> builtDescs = new HashSet<IResourceDescription>();
+
+		// build actors/units
 		ResourceSet set = context.getResourceSet();
 		monitor.beginTask("Building actors", context.getDeltas().size());
 		for (Delta delta : context.getDeltas()) {
 			if (delta.getNew() != null) {
 				IResourceDescription desc = delta.getNew();
+				builtDescs.add(desc);
 				Entity entity = build(set, desc);
 				if (entity != null) {
 					entities.add(entity);
@@ -127,18 +133,15 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		}
 
 		// find out all entities that import things from the built entities
-		List<IResourceDescription> dependentDescs = new ArrayList<IResourceDescription>();
+		Set<IResourceDescription> dependentDescs = new HashSet<IResourceDescription>();
 		for (Entity entity : entities) {
 			String entityName = entity.getName().toLowerCase();
 			for (IResourceDescription desc : descs.getAllResourceDescriptions()) {
 				for (QualifiedName name : desc.getImportedNames()) {
-					if (name.toString().startsWith(entityName)) {
-						if (!dependentDescs.contains(desc)) {
-							dependentDescs.add(desc);
-
-							// remove cache associated with dependent entity
-							CacheManager.instance.removeCache(desc.getURI());
-						}
+					if (name.toString().startsWith(entityName)
+							&& !builtDescs.contains(desc)) {
+						// don't add if the description was just built
+						dependentDescs.add(desc);
 					}
 				}
 			}
@@ -146,6 +149,9 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 
 		// build dependent descs
 		for (IResourceDescription desc : dependentDescs) {
+			// remove cache associated with dependent entity
+			CacheManager.instance.removeCache(desc.getURI());
+
 			build(set, desc);
 		}
 
