@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
@@ -61,7 +60,7 @@ public class CBroadcastAdder extends BroadcastAdder {
 	@Override
 	protected void examineConnections(Vertex vertex,
 			Set<Connection> connections, Map<Port, List<Connection>> outMap,
-			Network network) throws OrccException {
+			Network network) {
 		Instance instance = vertex.getInstance();
 		for (Connection connection : connections) {
 			Port srcPort = connection.getSource();

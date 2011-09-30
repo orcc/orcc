@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.network.Broadcast;
 import net.sf.orcc.network.Connection;
@@ -138,11 +137,10 @@ public class BroadcastAdder implements INetworkTransformation {
 	 * @param outMap
 	 *            a map from each output port P(i) of vertex to a list of
 	 *            outgoing connections from P(i)
-	 * @throws OrccException
 	 */
 	protected void examineConnections(Vertex vertex,
 			Set<Connection> connections, Map<Port, List<Connection>> outMap,
-			Network network) throws OrccException {
+			Network network) {
 		if (vertex.isInstance()) {
 			Instance instance = vertex.getInstance();
 			for (Connection connection : connections) {
@@ -164,8 +162,7 @@ public class BroadcastAdder implements INetworkTransformation {
 		}
 	}
 
-	protected void examineVertex(Vertex vertex, Network network)
-			throws OrccException {
+	protected void examineVertex(Vertex vertex, Network network) {
 		// make a copy of the existing outgoing connections of vertex because
 		// the set returned is modified when new edges are added
 		Set<Connection> connections = new HashSet<Connection>(
@@ -188,7 +185,7 @@ public class BroadcastAdder implements INetworkTransformation {
 	}
 
 	@Override
-	public void transform(Network network) throws OrccException {
+	public void transform(Network network) {
 		graph = network.getGraph();
 		toBeRemoved = new HashSet<Connection>();
 
