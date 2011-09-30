@@ -29,18 +29,12 @@
 package net.sf.orcc.cal.validation;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.services.TypeCycleDetector;
 
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EStructuralFeature.Setting;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.xtext.validation.Check;
 import org.eclipse.xtext.validation.CheckType;
 
@@ -85,26 +79,8 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			return;
 		}
 
-		// clean cache for this entity and its dependencies
-		List<Resource> resources = new ArrayList<Resource>();
-		resources.add(entity.eResource());
-
-		// add dependencies
-		Map<EObject, Collection<Setting>> crossRefs = EcoreUtil.ExternalCrossReferencer
-				.find(entity);
-		for (EObject eObject : crossRefs.keySet()) {
-			Resource resource = eObject.eResource();
-			if (resource != null) {
-				if (resources.contains(resource)) {
-					resources.add(resource);
-				}
-			}
-		}
-
-		// clean cache for resources found
-		for (Resource resource : resources) {
-			CacheManager.instance.removeCache(resource.getURI());
-		}
+		// clean cache for this entity
+		CacheManager.instance.removeCache(entity.eResource().getURI());
 
 		// perform structural validation and type checking
 		structuralValidator.validate(entity, getChain(), getContext());
