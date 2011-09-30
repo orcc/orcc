@@ -93,13 +93,10 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		Map<EObject, Collection<Setting>> crossRefs = EcoreUtil.ExternalCrossReferencer
 				.find(entity);
 		for (EObject eObject : crossRefs.keySet()) {
-			EObject cter = EcoreUtil.getRootContainer(eObject);
-			if (cter != null) {
-				Resource resource = cter.eResource();
-				if (resource != null) {
-					if (resources.contains(resource)) {
-						resources.add(resource);
-					}
+			Resource resource = eObject.eResource();
+			if (resource != null) {
+				if (resources.contains(resource)) {
+					resources.add(resource);
 				}
 			}
 		}
