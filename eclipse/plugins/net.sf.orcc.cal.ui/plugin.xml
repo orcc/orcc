@@ -184,7 +184,7 @@
    <extension
          point="org.eclipse.xtext.builder.participant">
       <participant
-            class="net.sf.orcc.cal.ui.builder.ActorBuilder">
+            class="net.sf.orcc.cal.ui.CalExecutableExtensionFactory:net.sf.orcc.cal.ui.builder.ActorBuilder">
       </participant>
    </extension>
    <extension
