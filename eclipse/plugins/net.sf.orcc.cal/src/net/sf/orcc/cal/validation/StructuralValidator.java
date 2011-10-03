@@ -32,6 +32,7 @@ import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -215,14 +216,29 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 		// check FSM and priorities
 		Schedule schedule = actor.getSchedule();
 		if (schedule != null) {
-			checkFsm(actionList, schedule);
+			Set<AstAction> actionSet = new HashSet<AstAction>(
+					actor.getActions());
+			checkFsm(actionList, schedule, actionSet);
+
+			// shows warnings for tagged actions not referenced in the FSM
+			// not in the warning validator because we need checkFsm
+			for (AstAction action : actionSet) {
+				AstTag tag = action.getTag();
+				if (tag != null) {
+					warning("Action " + getName(tag) + " is not referenced "
+							+ "in the FSM", action,
+							CalPackage.eINSTANCE.getAstAction_Tag(), -1);
+				}
+			}
 		}
+
 		RegExp scheduleRegExp = actor.getScheduleRegExp();
 		if (scheduleRegExp != null && !actor.getPriorities().isEmpty()) {
 			error("Regexp scheduler with priorities.", actor,
 					eINSTANCE.getAstActor_ScheduleRegExp(), -1);
 		}
 
+		// check priorities
 		checkPriorities(actor, actionList);
 	}
 
@@ -355,8 +371,14 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 	 *            the action list of the actor
 	 * @param schedule
 	 *            the FSM of the actor
+	 * @param actionsSet
+	 *            on input the set of all actions; on output the set of actions
+	 *            that are not referenced by the FSM
 	 */
-	private void checkFsm(CalActionList actionList, Schedule schedule) {
+	private void checkFsm(CalActionList actionList, Schedule schedule,
+			Set<AstAction> actionsSet) {
+		// we use a map because the transitions departing from a given state can
+		// be scattered throughout the schedule
 		Map<AstState, List<AstAction>> stateActionMap = new HashMap<AstState, List<AstAction>>();
 		for (AstTransition transition : schedule.getTransitions()) {
 			AstTag tag = transition.getTag();
@@ -383,6 +405,7 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 									eINSTANCE.getAstTransition_Tag(), -1);
 						} else {
 							stateActions.add(action);
+							actionsSet.remove(action);
 						}
 					}
 				}
