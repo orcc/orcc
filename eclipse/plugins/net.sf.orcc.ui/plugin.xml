@@ -336,22 +336,6 @@
       </configuration>
    </extension>
    <extension
-         point="org.eclipse.core.expressions.propertyTesters">
-      <propertyTester
-            class="net.sf.orcc.ui.OrccPropertyTester"
-            id="net.sf.orcc.propertyTester"
-            namespace="net.sf.orcc"
-            properties="isVTL,isXDF,isOrccProject"
-            type="org.eclipse.core.runtime.IAdaptable">
-      </propertyTester>
-   </extension>
-   <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="net.sf.orcc.preferences.PreferenceInitializer">
-      </initializer>
-   </extension>
-   <extension
          point="org.eclipse.debug.core.launchConfigurationTypes">
       <launchConfigurationType
             delegate="net.sf.orcc.ui.launching.OrccRunLaunchDelegate"

@@ -3,12 +3,33 @@
 <plugin>
    <extension-point id="options" name="options" schema="schema/options.exsd"/>
    <extension
-         point="org.eclipse.emf.ecore.generated_package">
-      <package
-            class="net.sf.orcc.ir.IrPackage"
-            genModel="model/Ir.genmodel"
-            uri="http://orcc.sf.net/ir/Ir">
-      </package>
+         point="net.sf.orcc.core.options">
+      <option
+            description="Qualified name of top XDF network"
+            id="net.sf.orcc.core.xdfFile"
+            name="XDF name">
+         <selectNetwork>
+         </selectNetwork>
+      </option>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="net.sf.orcc.OrccPropertyTester"
+            id="net.sf.orcc.propertyTester"
+            namespace="net.sf.orcc"
+            properties="isVTL,isXDF,isOrccProject"
+            type="org.eclipse.core.runtime.IAdaptable">
+      </propertyTester>
+   </extension>
+   <extension
+         id="nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="net.sf.orcc.OrccProjectNature">
+         </run>
+      </runtime>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
@@ -24,23 +45,12 @@
       </parser>
    </extension>
    <extension
-         point="net.sf.orcc.core.options">
-      <option
-            description="Qualified name of top XDF network"
-            id="net.sf.orcc.core.xdfFile"
-            name="XDF name">
-         <selectNetwork>
-         </selectNetwork>
-      </option>
-   </extension>
-   <extension
-         id="nature"
-         point="org.eclipse.core.resources.natures">
-      <runtime>
-         <run
-               class="net.sf.orcc.OrccProjectNature">
-         </run>
-      </runtime>
+         point="org.eclipse.emf.ecore.generated_package">
+      <package
+            class="net.sf.orcc.ir.IrPackage"
+            genModel="model/Ir.genmodel"
+            uri="http://orcc.sf.net/ir/Ir">
+      </package>
    </extension>
 
 </plugin>
