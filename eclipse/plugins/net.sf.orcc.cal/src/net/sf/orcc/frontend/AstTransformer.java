@@ -133,7 +133,6 @@ public class AstTransformer extends CalSwitch<EObject> {
 		@Override
 		public Expression caseExpressionCall(ExpressionCall call) {
 			int lineNumber = Util.getLocation(call);
-			Procedure procedure = context;
 
 			// retrieve IR procedure
 			Function astFunction = call.getFunction();
@@ -178,7 +177,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 					}
 				}
 
-				target = context.newTempLocalVariable(type, "_tmp_if");
+				target = procedure.newTempLocalVariable(type, "_tmp_if");
 				indexes = new ArrayList<Expression>(0);
 			}
 
@@ -192,7 +191,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 			node.setCondition(condition);
 			node.getThenNodes().addAll(thenNodes);
 			node.getElseNodes().addAll(elseNodes);
-			context.getNodes().add(node);
+			procedure.getNodes().add(node);
 
 			Expression varExpr = IrFactory.eINSTANCE.createExprVar(target);
 
@@ -217,7 +216,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 			List<Expression> indexes = transformExpressions(expression
 					.getIndexes());
 
-			Var target = context.newTempLocalVariable(
+			Var target = procedure.newTempLocalVariable(
 					Typer.getType(expression), "local_" + var.getName());
 
 			InstLoad load = IrFactory.eINSTANCE.createInstLoad(lineNumber,
@@ -293,12 +292,12 @@ public class AstTransformer extends CalSwitch<EObject> {
 				Expression varExpr = IrFactory.eINSTANCE.createExprVar(var);
 				return varExpr;
 			} else {
-				if (context != null) {
+				if (procedure != null) {
 					if (var.isGlobal()) {
 						Var global = var;
-						var = context.getLocal("local_" + global.getName());
+						var = procedure.getLocal("local_" + global.getName());
 						if (var == null) {
-							var = context.newTempLocalVariable(
+							var = procedure.newTempLocalVariable(
 									global.getType(),
 									"local_" + global.getName());
 						}
@@ -340,7 +339,6 @@ public class AstTransformer extends CalSwitch<EObject> {
 			Type type = Typer.getType(expressions);
 			size *= expressions.size();
 
-			Procedure procedure = context;
 			Type listType = IrFactory.eINSTANCE.createTypeList(size, type);
 			target = procedure.newTempLocalVariable(listType, "_list");
 		}
@@ -365,7 +363,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 		 */
 		private List<Node> getNodes(AstExpression astExpression) {
 			int lineNumber = Util.getLocation(astExpression);
-			List<Node> nodes = context.getNodes();
+			List<Node> nodes = procedure.getNodes();
 
 			int first = nodes.size();
 			nodes.add(IrFactoryImpl.eINSTANCE.createNodeBlock());
@@ -394,7 +392,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 		 * @return a list of CFG nodes
 		 */
 		private List<Node> getNodes(List<AstExpression> astExpressions) {
-			List<Node> nodes = context.getNodes();
+			List<Node> nodes = procedure.getNodes();
 
 			int first = nodes.size();
 			nodes.add(IrFactoryImpl.eINSTANCE.createNodeBlock());
@@ -443,8 +441,6 @@ public class AstTransformer extends CalSwitch<EObject> {
 			List<Expression> currentIndexes = indexes;
 
 			indexes = new ArrayList<Expression>(currentIndexes);
-
-			Procedure procedure = context;
 
 			// first add local variables
 			Expression index = null;
@@ -675,7 +671,6 @@ public class AstTransformer extends CalSwitch<EObject> {
 		@Override
 		public Object caseStatementForeach(StatementForeach foreach) {
 			int lineNumber = Util.getLocation(foreach);
-			Procedure procedure = context;
 
 			// creates loop variable and assigns it
 			Variable Variable = foreach.getVariable();
@@ -721,7 +716,6 @@ public class AstTransformer extends CalSwitch<EObject> {
 		@Override
 		public Object caseStatementIf(StatementIf stmtIf) {
 			int lineNumber = Util.getLocation(stmtIf);
-			Procedure procedure = context;
 
 			Expression condition = transformExpression(stmtIf.getCondition());
 
@@ -763,7 +757,6 @@ public class AstTransformer extends CalSwitch<EObject> {
 		@Override
 		public Object caseStatementWhile(StatementWhile stmtWhile) {
 			int lineNumber = Util.getLocation(stmtWhile);
-			Procedure procedure = context;
 
 			// to help track the instructions added
 			NodeBlock block = procedure.getLast();
@@ -811,7 +804,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 		 * @return a list of CFG nodes
 		 */
 		private List<Node> getNodes(List<Statement> statements) {
-			List<Node> nodes = context.getNodes();
+			List<Node> nodes = procedure.getNodes();
 
 			int first = nodes.size();
 			nodes.add(IrFactoryImpl.eINSTANCE.createNodeBlock());
@@ -871,14 +864,14 @@ public class AstTransformer extends CalSwitch<EObject> {
 	 */
 	private int blockCount;
 
-	private Procedure context;
-
 	/**
 	 * expression transformer.
 	 */
 	final private ExpressionTransformer exprTransformer;
 
 	private Procedure print;
+
+	private Procedure procedure;
 
 	/**
 	 * statement transformer.
@@ -893,6 +886,11 @@ public class AstTransformer extends CalSwitch<EObject> {
 		stmtTransformer = new StatementTransformer();
 	}
 
+	public AstTransformer(Procedure procedure) {
+		this();
+		this.procedure = procedure;
+	}
+
 	/**
 	 * Adds the given instruction to the last block of the current procedure.
 	 * 
@@ -900,7 +898,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 	 *            an instruction
 	 */
 	private void addInstruction(Instruction instruction) {
-		NodeBlock block = context.getLast();
+		NodeBlock block = procedure.getLast();
 		block.add(instruction);
 	}
 
@@ -933,8 +931,8 @@ public class AstTransformer extends CalSwitch<EObject> {
 		int lineNumber = Util.getLocation(astProcedure);
 
 		// create procedure
-		Procedure procedure = IrFactory.eINSTANCE.createProcedure(name,
-				lineNumber, IrFactory.eINSTANCE.createTypeVoid());
+		procedure = IrFactory.eINSTANCE.createProcedure(name, lineNumber,
+				IrFactory.eINSTANCE.createTypeVoid());
 
 		// set native flag
 		if (astProcedure.isNative()) {
@@ -944,13 +942,10 @@ public class AstTransformer extends CalSwitch<EObject> {
 		// add mapping now (in case this procedure is recursive)
 		Frontend.putMapping(astProcedure, procedure);
 
-		Procedure oldContext = newContext(procedure);
-
 		transformParameters(astProcedure.getParameters());
 		transformLocalVariables(astProcedure.getVariables());
 		transformStatements(astProcedure.getStatements());
 
-		restoreContext(oldContext);
 		addReturn(procedure, null);
 
 		return procedure;
@@ -971,8 +966,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 		Type type = Typer.getType(function);
 
 		// create procedure
-		Procedure procedure = IrFactory.eINSTANCE.createProcedure(name,
-				lineNumber, type);
+		procedure = IrFactory.eINSTANCE.createProcedure(name, lineNumber, type);
 
 		// set native flag
 		if (function.isNative()) {
@@ -981,8 +975,6 @@ public class AstTransformer extends CalSwitch<EObject> {
 
 		// add mapping now (in case this function is recursive)
 		Frontend.putMapping(function, procedure);
-
-		Procedure oldContext = newContext(procedure);
 
 		transformParameters(function.getParameters());
 		transformLocalVariables(function.getVariables());
@@ -998,7 +990,6 @@ public class AstTransformer extends CalSwitch<EObject> {
 			exprTransformer.setTarget(target, indexes);
 		}
 
-		restoreContext(oldContext);
 		addReturn(procedure, value);
 
 		return procedure;
@@ -1048,15 +1039,6 @@ public class AstTransformer extends CalSwitch<EObject> {
 		addInstruction(call);
 	}
 
-	/**
-	 * Returns the current procedure of this AST transformer.
-	 * 
-	 * @return the current procedure of this AST transformer
-	 */
-	public Procedure getContext() {
-		return context;
-	}
-
 	private EObject getExternalObject(EObject eObject) {
 		if (eObject.eContainer() instanceof AstUnit) {
 			AstUnit astUnit = (AstUnit) eObject.eContainer();
@@ -1086,28 +1068,6 @@ public class AstTransformer extends CalSwitch<EObject> {
 		}
 
 		return name;
-	}
-
-	/**
-	 * Returns the current context, and creates a new one.
-	 * 
-	 * @return the current context
-	 */
-	public Procedure newContext(Procedure procedure) {
-		Procedure oldContext = context;
-		context = procedure;
-		return oldContext;
-	}
-
-	/**
-	 * Loads globals at the beginning of the current procedure, stores them at
-	 * the end, and restores the context
-	 * 
-	 * @param context
-	 *            the context returned by {@link #newContext()}
-	 */
-	public void restoreContext(Procedure context) {
-		this.context = context;
 	}
 
 	private void transformAnnotations(Var variable,
@@ -1228,7 +1188,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 	public void transformLocalVariables(List<Variable> variables) {
 		for (Variable Variable : variables) {
 			Var local = transformLocalVariable(Variable);
-			context.getLocals().add(local);
+			procedure.getLocals().add(local);
 		}
 	}
 
@@ -1240,7 +1200,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 	 *            a list of AST parameters
 	 */
 	private void transformParameters(List<Variable> parameters) {
-		List<Param> params = context.getParameters();
+		List<Param> params = procedure.getParameters();
 		for (Variable astParameter : parameters) {
 			Var local = transformLocalVariable(astParameter);
 			params.add(IrFactory.eINSTANCE.createParam(local));

@@ -65,7 +65,6 @@ import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
-import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
@@ -94,8 +93,6 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class ActorTransformer extends CalSwitch<Actor> {
 
-	private AstTransformer astTransformer;
-
 	/**
 	 * count of un-tagged actions
 	 */
@@ -118,8 +115,8 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	 *            an integer number of repeat (equals to one if there is no
 	 *            repeat)
 	 */
-	private void actionLoadTokens(Var portVariable, List<Variable> tokens,
-			int repeat) {
+	private void actionLoadTokens(Procedure procedure, Var portVariable,
+			List<Variable> tokens, int repeat) {
 		if (repeat == 1) {
 			int i = 0;
 
@@ -131,19 +128,17 @@ public class ActorTransformer extends CalSwitch<Actor> {
 				Var irToken = (Var) Frontend.getMapping(token);
 				InstLoad load = IrFactory.eINSTANCE.createInstLoad(lineNumber,
 						irToken, portVariable, indexes);
-				addInstruction(load);
+				procedure.getLast().add(load);
 
 				i++;
 			}
 		} else {
-			Procedure procedure = astTransformer.getContext();
-
 			// creates loop variable and initializes it
 			Var loopVar = procedure.newTempLocalVariable(
 					IrFactory.eINSTANCE.createTypeInt(32), "num_repeats");
 			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(loopVar,
 					IrFactory.eINSTANCE.createExprInt(0));
-			addInstruction(assign);
+			procedure.getLast().add(assign);
 
 			NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 
@@ -216,8 +211,9 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	 *            an integer number of repeat (equals to one if there is no
 	 *            repeat)
 	 */
-	private void actionStoreTokens(Var portVariable,
-			List<AstExpression> values, int repeat) {
+	private void actionStoreTokens(AstTransformer transformer,
+			Procedure procedure, Var portVariable, List<AstExpression> values,
+			int repeat) {
 		if (repeat == 1) {
 			int i = 0;
 
@@ -226,23 +222,20 @@ public class ActorTransformer extends CalSwitch<Actor> {
 				List<Expression> indexes = new ArrayList<Expression>(1);
 				indexes.add(IrFactory.eINSTANCE.createExprInt(i));
 
-				Expression value = astTransformer
-						.transformExpression(expression);
+				Expression value = transformer.transformExpression(expression);
 				InstStore store = IrFactory.eINSTANCE.createInstStore(
 						lineNumber, portVariable, indexes, value);
-				addInstruction(store);
+				procedure.getLast().add(store);
 
 				i++;
 			}
 		} else {
-			Procedure procedure = astTransformer.getContext();
-
 			// creates loop variable and initializes it
 			Var loopVar = procedure.newTempLocalVariable(
 					IrFactory.eINSTANCE.createTypeInt(32), "num_repeats");
 			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(loopVar,
 					IrFactory.eINSTANCE.createExprInt(0));
-			addInstruction(assign);
+			procedure.getLast().add(assign);
 
 			NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 
@@ -257,8 +250,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 				// each expression of an output pattern must be of type list
 				// so they are necessarily variables
 				Var tmpVar = procedure.newTempLocalVariable(type, "token");
-				Expression expression = astTransformer
-						.transformExpression(value);
+				Expression expression = transformer.transformExpression(value);
 				Use use = ((ExprVar) expression).getUse();
 
 				InstLoad load = IrFactory.eINSTANCE.createInstLoad(tmpVar,
@@ -309,17 +301,6 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	}
 
 	/**
-	 * Adds the given instruction to the last block of the current procedure.
-	 * 
-	 * @param instruction
-	 *            an instruction
-	 */
-	private void addInstruction(Instruction instruction) {
-		NodeBlock block = astTransformer.getContext().getLast();
-		block.add(instruction);
-	}
-
-	/**
 	 * Transforms the given AST Actor to an IR actor.
 	 * 
 	 * @param astActor
@@ -336,7 +317,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		int lineNumber = Util.getLocation(astActor);
 		actor.setLineNumber(lineNumber);
 
-		astTransformer = new AstTransformer();
+		AstTransformer astTransformer = new AstTransformer();
 
 		// parameters
 		for (Variable Variable : astActor.getParameters()) {
@@ -425,20 +406,21 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	 * @param result
 	 *            target local variable
 	 */
-	private void createActionTest(AstAction astAction, Pattern peekPattern,
+	private void createActionTest(AstTransformer transformer,
+			Procedure procedure, AstAction astAction, Pattern peekPattern,
 			Var result) {
 		List<AstExpression> guards = astAction.getGuards();
+		Expression value;
 		if (guards.isEmpty()) {
-			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(result,
-					IrFactory.eINSTANCE.createExprBool(true));
-			addInstruction(assign);
+			value = IrFactory.eINSTANCE.createExprBool(true);
 		} else {
-			transformInputPatternPeek(astAction, peekPattern);
-			// local variables are not transformed because they are not
-			// supposed to be available for guards
-			// astTransformer.transformLocalVariables(astAction.getVariables());
-			transformGuards(astAction.getGuards(), result);
+			transformInputPatternPeek(transformer, procedure, astAction,
+					peekPattern);
+			value = transformGuards(transformer, astAction.getGuards());
 		}
+
+		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(result, value);
+		procedure.getLast().add(assign);
 	}
 
 	/**
@@ -450,9 +432,8 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	 *            number of tokens
 	 * @return the local array created
 	 */
-	private Var createPortVariable(Port port, int numTokens) {
+	private Var createPortVariable(int lineNumber, Port port, int numTokens) {
 		// create the variable to hold the tokens
-		int lineNumber = astTransformer.getContext().getLineNumber();
 		return IrFactory.eINSTANCE.createVar(lineNumber,
 				IrFactory.eINSTANCE.createTypeList(numTokens, port.getType()),
 				port.getName(), true, 0);
@@ -514,18 +495,21 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	 */
 	private void transformActionBody(AstAction astAction, Procedure body,
 			Pattern inputPattern, Pattern outputPattern) {
-		Procedure oldContext = astTransformer.newContext(body);
+		AstTransformer transformer = new AstTransformer(body);
 
 		for (InputPattern pattern : astAction.getInputs()) {
-			transformInputPattern(pattern, inputPattern);
+			transformPattern(transformer, body, pattern, inputPattern);
 		}
 
-		astTransformer.transformLocalVariables(astAction.getVariables());
-		astTransformer.transformStatements(astAction.getStatements());
-		transformOutputPattern(astAction, outputPattern);
+		transformer.transformLocalVariables(astAction.getVariables());
+		transformer.transformStatements(astAction.getStatements());
 
-		astTransformer.restoreContext(oldContext);
-		astTransformer.addReturn(body, null);
+		List<OutputPattern> astOutputPattern = astAction.getOutputs();
+		for (OutputPattern pattern : astOutputPattern) {
+			transformPattern(transformer, body, pattern, outputPattern);
+		}
+
+		transformer.addReturn(body, null);
 	}
 
 	/**
@@ -558,10 +542,9 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	 */
 	private void transformActionScheduler(AstAction astAction,
 			Procedure scheduler, Pattern peekPattern) {
-		Procedure oldContext = astTransformer.newContext(scheduler);
-		Procedure context = astTransformer.getContext();
+		AstTransformer transformer = new AstTransformer(scheduler);
 
-		Var result = context.newTempLocalVariable(
+		Var result = scheduler.newTempLocalVariable(
 				IrFactory.eINSTANCE.createTypeBool(), "result");
 
 		List<AstExpression> guards = astAction.getGuards();
@@ -569,13 +552,13 @@ public class ActorTransformer extends CalSwitch<Actor> {
 			// the action is always fireable
 			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(result,
 					IrFactory.eINSTANCE.createExprBool(true));
-			addInstruction(assign);
+			scheduler.getLast().add(assign);
 		} else {
-			createActionTest(astAction, peekPattern, result);
+			createActionTest(transformer, scheduler, astAction, peekPattern,
+					result);
 		}
 
-		astTransformer.restoreContext(oldContext);
-		astTransformer.addReturn(scheduler,
+		transformer.addReturn(scheduler,
 				IrFactory.eINSTANCE.createExprVar(result));
 	}
 
@@ -585,12 +568,10 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	 * 
 	 * @param guards
 	 *            list of guard expressions
-	 * @param result
-	 *            target local variable
 	 */
-	private void transformGuards(List<AstExpression> guards, Var result) {
-		List<Expression> expressions = astTransformer
-				.transformExpressions(guards);
+	private Expression transformGuards(AstTransformer transformer,
+			List<AstExpression> guards) {
+		List<Expression> expressions = transformer.transformExpressions(guards);
 		Iterator<Expression> it = expressions.iterator();
 		Expression value = it.next();
 		while (it.hasNext()) {
@@ -599,45 +580,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 					IrFactory.eINSTANCE.createTypeBool());
 		}
 
-		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(result, value);
-		addInstruction(assign);
-	}
-
-	/**
-	 * Transforms the AST input pattern of the given action as a local variable,
-	 * adds peeks/reads and assigns tokens.
-	 * 
-	 * @param pattern
-	 *            an input pattern
-	 */
-	private void transformInputPattern(InputPattern pattern,
-			Pattern irInputPattern) {
-		Procedure context = astTransformer.getContext();
-		Port port = (Port) Frontend.getMapping(pattern.getPort());
-		List<Variable> tokens = pattern.getTokens();
-
-		// evaluates token consumption
-		int totalConsumption = tokens.size();
-		int repeat = 1;
-		AstExpression astRepeat = pattern.getRepeat();
-		if (astRepeat != null) {
-			repeat = Evaluator.getIntValue(astRepeat);
-			totalConsumption *= repeat;
-		}
-		irInputPattern.setNumTokens(port, totalConsumption);
-
-		// create port variable
-		Var variable = createPortVariable(port, totalConsumption);
-		irInputPattern.setVariable(port, variable);
-
-		// declare tokens
-		for (Variable token : tokens) {
-			Var local = astTransformer.transformLocalVariable(token);
-			context.getLocals().add(local);
-		}
-
-		// loads tokens
-		actionLoadTokens(variable, tokens, repeat);
+		return value;
 	}
 
 	/**
@@ -648,8 +591,8 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	 * @param astAction
 	 *            an AST action
 	 */
-	private void transformInputPatternPeek(final AstAction astAction,
-			Pattern peekPattern) {
+	private void transformInputPatternPeek(AstTransformer transformer,
+			Procedure scheduler, final AstAction astAction, Pattern peekPattern) {
 		final Set<InputPattern> patterns = new HashSet<InputPattern>();
 		VoidSwitch peekVariables = new VoidSwitch() {
 
@@ -672,40 +615,69 @@ public class ActorTransformer extends CalSwitch<Actor> {
 
 		// add peeks for each pattern of the patterns set
 		for (InputPattern pattern : patterns) {
-			transformInputPattern(pattern, peekPattern);
+			transformPattern(transformer, scheduler, pattern, peekPattern);
 		}
 	}
 
 	/**
-	 * Transforms the AST output patterns of the given action as expressions and
-	 * possibly statements, assigns tokens and adds writes.
+	 * Transforms the given AST input/output pattern of the given action.
 	 * 
-	 * @param astAction
-	 *            an AST action
+	 * @param transformer
+	 *            AST to IR transformer
+	 * @param procedure
+	 *            procedure to which instructions should be added (body or
+	 *            scheduler)
+	 * @param astPattern
+	 *            AST input or output pattern
+	 * @param irPattern
+	 *            IR input or output pattern
 	 */
-	private void transformOutputPattern(AstAction astAction,
-			Pattern irOutputPattern) {
-		List<OutputPattern> astOutputPattern = astAction.getOutputs();
-		for (OutputPattern pattern : astOutputPattern) {
-			Port port = (Port) Frontend.getMapping(pattern.getPort());
-			List<AstExpression> values = pattern.getValues();
+	private void transformPattern(AstTransformer transformer,
+			Procedure procedure, EObject astPattern, Pattern irPattern) {
+		Port port;
+		int totalConsumption;
+		AstExpression astRepeat;
+		if (astPattern instanceof InputPattern) {
+			InputPattern pattern = ((InputPattern) astPattern);
+			astRepeat = pattern.getRepeat();
+			port = (Port) Frontend.getMapping(pattern.getPort());
+			totalConsumption = pattern.getTokens().size();
+		} else {
+			OutputPattern pattern = ((OutputPattern) astPattern);
+			astRepeat = pattern.getRepeat();
+			port = (Port) Frontend.getMapping(pattern.getPort());
+			totalConsumption = pattern.getValues().size();
+		}
 
-			// evaluates token consumption
-			int totalConsumption = values.size();
-			int repeat = 1;
-			AstExpression astRepeat = pattern.getRepeat();
-			if (astRepeat != null) {
-				repeat = Evaluator.getIntValue(astRepeat);
-				totalConsumption *= repeat;
+		// evaluates token consumption
+		int repeat = 1;
+		if (astRepeat != null) {
+			repeat = Evaluator.getIntValue(astRepeat);
+			totalConsumption *= repeat;
+		}
+		irPattern.setNumTokens(port, totalConsumption);
+
+		// create port variable
+		Var variable = createPortVariable(procedure.getLineNumber(), port,
+				totalConsumption);
+		irPattern.setVariable(port, variable);
+
+		// load/store tokens (depending on the type of pattern)
+		if (astPattern instanceof InputPattern) {
+			InputPattern pattern = (InputPattern) astPattern;
+
+			// declare tokens
+			List<Variable> tokens = pattern.getTokens();
+			for (Variable token : tokens) {
+				Var local = transformer.transformLocalVariable(token);
+				procedure.getLocals().add(local);
 			}
-			irOutputPattern.setNumTokens(port, totalConsumption);
 
-			// create port variable
-			Var variable = createPortVariable(port, totalConsumption);
-			irOutputPattern.setVariable(port, variable);
-
-			// store tokens
-			actionStoreTokens(variable, values, repeat);
+			actionLoadTokens(procedure, variable, tokens, repeat);
+		} else {
+			OutputPattern pattern = (OutputPattern) astPattern;
+			List<AstExpression> values = pattern.getValues();
+			actionStoreTokens(transformer, procedure, variable, values, repeat);
 		}
 	}
 
