@@ -35,7 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
@@ -100,15 +100,12 @@ public class XDFParser {
 		 *            a node whose expected to be, or whose sibling is expected
 		 *            to be, a DOM element named "Expr".
 		 * @return an expression
-		 * @throws OrccException
-		 *             if the given node or its siblings could not be parsed as
-		 *             an expression
 		 */
-		public Expression parseExpr(Node node) throws OrccException {
+		public Expression parseExpr(Node node) {
 			ParseContinuation<Expression> cont = parseExprCont(node);
 			Expression expr = cont.getResult();
 			if (expr == null) {
-				throw new OrccException("Expected an Expr element");
+				throw new OrccRuntimeException("Expected an Expr element");
 			} else {
 				return expr;
 			}
@@ -122,11 +119,8 @@ public class XDFParser {
 		 *            a node that is expected, or whose sibling is expected, to
 		 *            be a DOM element named "Op".
 		 * @return a parse continuation with the operator parsed
-		 * @throws OrccException
-		 *             if the binary operator could not be parsed
 		 */
-		private ParseContinuation<OpBinary> parseExprBinaryOp(Node node)
-				throws OrccException {
+		private ParseContinuation<OpBinary> parseExprBinaryOp(Node node) {
 			while (node != null) {
 				if (node.getNodeName().equals("Op")) {
 					Element op = (Element) node;
@@ -149,11 +143,8 @@ public class XDFParser {
 		 * @param node
 		 *            the first child node of a Expr kind="BinOpSeq" element
 		 * @return a parse continuation with a BinaryExpr
-		 * @throws OrccException
-		 *             if something goes wrong
 		 */
-		private ParseContinuation<Expression> parseExprBinOpSeq(Node node)
-				throws OrccException {
+		private ParseContinuation<Expression> parseExprBinOpSeq(Node node) {
 			List<Expression> expressions = new ArrayList<Expression>();
 			List<OpBinary> operators = new ArrayList<OpBinary>();
 
@@ -170,7 +161,8 @@ public class XDFParser {
 					contE = parseExprCont(node);
 					Expression expr = contE.getResult();
 					if (expr == null) {
-						throw new OrccException("Expected an Expr element");
+						throw new OrccRuntimeException(
+								"Expected an Expr element");
 					}
 
 					expressions.add(expr);
@@ -190,12 +182,8 @@ public class XDFParser {
 		 *            a node whose sibling is expected to be a DOM element named
 		 *            "Expr".
 		 * @return an expression
-		 * @throws OrccException
-		 *             if the given node or its siblings could not be parsed as
-		 *             an expression
 		 */
-		private ParseContinuation<Expression> parseExprCont(Node node)
-				throws OrccException {
+		private ParseContinuation<Expression> parseExprCont(Node node) {
 			Expression expr = null;
 			while (node != null) {
 				if (node.getNodeName().equals("Expr")) {
@@ -225,7 +213,7 @@ public class XDFParser {
 						// found in parameters scope
 						Var var = network.getVariables().get(name);
 						if (var == null) {
-							throw new OrccException("In network \""
+							throw new OrccRuntimeException("In network \""
 									+ network.getName() + "\" defined in \""
 									+ file + "\": unknown variable: \"" + name
 									+ "\"");
@@ -233,7 +221,7 @@ public class XDFParser {
 						expr = IrFactory.eINSTANCE.createExprVar(var);
 						break;
 					} else {
-						throw new OrccException("In network \""
+						throw new OrccRuntimeException("In network \""
 								+ network.getName() + "\" defined in \"" + file
 								+ "\": Unsupported Expr kind: \"" + kind + "\"");
 					}
@@ -252,17 +240,15 @@ public class XDFParser {
 		 * @param elt
 		 *            a DOM element named "Expr"
 		 * @return an expression
-		 * @throws OrccException
-		 *             if the literal could not be parsed
 		 */
-		private Expression parseExprLiteral(Element elt) throws OrccException {
+		private Expression parseExprLiteral(Element elt) {
 			String kind = elt.getAttribute("literal-kind");
 			String value = elt.getAttribute("value");
 			if (kind.equals("Boolean")) {
 				return IrFactory.eINSTANCE.createExprBool(Boolean
 						.parseBoolean(value));
 			} else if (kind.equals("Character")) {
-				throw new OrccException("Characters not supported yet");
+				throw new OrccRuntimeException("Characters not supported yet");
 			} else if (kind.equals("Integer")) {
 				return IrFactory.eINSTANCE.createExprInt(Long.parseLong(value));
 			} else if (kind.equals("Real")) {
@@ -271,12 +257,12 @@ public class XDFParser {
 			} else if (kind.equals("String")) {
 				return IrFactory.eINSTANCE.createExprString(value);
 			} else {
-				throw new OrccException("Unsupported Expr "
+				throw new OrccRuntimeException("Unsupported Expr "
 						+ "literal kind: \"" + kind + "\"");
 			}
 		}
 
-		private List<Expression> parseExprs(Node node) throws OrccException {
+		private List<Expression> parseExprs(Node node) {
 			List<Expression> exprs = new ArrayList<Expression>();
 			while (node != null) {
 				if (node.getNodeName().equals("Expr")) {
@@ -297,11 +283,8 @@ public class XDFParser {
 		 *            a node that is expected, or whose sibling is expected, to
 		 *            be a DOM element named "Op".
 		 * @return a parse continuation with the operator parsed
-		 * @throws OrccException
-		 *             if the unary operator could not be parsed
 		 */
-		private ParseContinuation<OpUnary> parseExprUnaryOp(Node node)
-				throws OrccException {
+		private ParseContinuation<OpUnary> parseExprUnaryOp(Node node) {
 			while (node != null) {
 				if (node.getNodeName().equals("Op")) {
 					Element op = (Element) node;
@@ -313,7 +296,7 @@ public class XDFParser {
 				node = node.getNextSibling();
 			}
 
-			throw new OrccException("Expected an Op element");
+			throw new OrccRuntimeException("Expected an Op element");
 		}
 
 	}
@@ -337,11 +320,8 @@ public class XDFParser {
 		 * @param node
 		 *            the node to parse as a type.
 		 * @return a type
-		 * @throws OrccException
-		 *             if the node could not be parsed as a type
 		 */
-		public ParseContinuation<Type> parseType(Node node)
-				throws OrccException {
+		public ParseContinuation<Type> parseType(Node node) {
 			while (node != null) {
 				if (node.getNodeName().equals("Type")) {
 					Element eltType = (Element) node;
@@ -374,15 +354,15 @@ public class XDFParser {
 						type.setSize(size);
 						return new ParseContinuation<Type>(node, type);
 					} else {
-						throw new OrccException("unknown type name: \"" + name
-								+ "\"");
+						throw new OrccRuntimeException("unknown type name: \""
+								+ name + "\"");
 					}
 				}
 
 				node = node.getNextSibling();
 			}
 
-			throw new OrccException("Expected a Type element");
+			throw new OrccRuntimeException("Expected a Type element");
 		}
 
 		/**
@@ -393,11 +373,8 @@ public class XDFParser {
 		 *            The first node susceptible to be an entry, or
 		 *            <code>null</code>.
 		 * @return A map of entry names to contents.
-		 * @throws OrccException
-		 *             if something goes wrong
 		 */
-		private Map<String, Entry> parseTypeEntries(Node node)
-				throws OrccException {
+		private Map<String, Entry> parseTypeEntries(Node node) {
 			Map<String, Entry> entries = new HashMap<String, Entry>();
 			while (node != null) {
 				if (node.getNodeName().equals("Entry")) {
@@ -414,8 +391,8 @@ public class XDFParser {
 						entry = new Entry(parseType(node.getFirstChild())
 								.getResult());
 					} else {
-						throw new OrccException("unsupported entry type: \""
-								+ kind + "\"");
+						throw new OrccRuntimeException(
+								"unsupported entry type: \"" + kind + "\"");
 					}
 
 					entries.put(name, entry);
@@ -433,20 +410,20 @@ public class XDFParser {
 		 * @param node
 		 *            the Type node where this List is defined
 		 * @return a ListType
-		 * @throws OrccException
-		 *             if something is wrong, like a missing entry
 		 */
-		private Type parseTypeList(Node node) throws OrccException {
+		private Type parseTypeList(Node node) {
 			Map<String, Entry> entries = parseTypeEntries(node.getFirstChild());
 			Entry entry = entries.get("size");
 			if (entry == null) {
-				throw new OrccException("List type must have a \"size\" entry");
+				throw new OrccRuntimeException(
+						"List type must have a \"size\" entry");
 			}
 			Expression expr = entry.getEntryAsExpr();
 
 			entry = entries.get("type");
 			if (entry == null) {
-				throw new OrccException("List type must have a \"type\" entry");
+				throw new OrccRuntimeException(
+						"List type must have a \"type\" entry");
 			}
 			Type type = entry.getEntryAsType();
 
@@ -461,11 +438,8 @@ public class XDFParser {
 		 * @param entries
 		 *            a map of entries
 		 * @return an expression
-		 * @throws OrccException
-		 *             if the "size" entry does not contain an expression
 		 */
-		private Expression parseTypeSize(Map<String, Entry> entries)
-				throws OrccException {
+		private Expression parseTypeSize(Map<String, Entry> entries) {
 			Entry entry = entries.get("size");
 			if (entry == null) {
 				return IrFactory.eINSTANCE.createExprInt(defaultSize);
@@ -550,8 +524,7 @@ public class XDFParser {
 	 *            the kind of port
 	 * @return a vertex that contains a port or an instance
 	 */
-	private Vertex getVertex(String vertexName, String portName, String kind)
-			throws OrccException {
+	private Vertex getVertex(String vertexName, String portName, String kind) {
 		if (vertexName.isEmpty()) {
 			Port port;
 			if ("Input".equals(kind)) {
@@ -560,16 +533,18 @@ public class XDFParser {
 				port = network.getOutput(portName);
 			}
 			if (port == null) {
-				throw new OrccException("An Connection element has an invalid"
-						+ " \"src-port\" " + "attribute");
+				throw new OrccRuntimeException(
+						"An Connection element has an invalid"
+								+ " \"src-port\" " + "attribute");
 			}
 
 			return new Vertex(kind, port);
 		} else {
 			Instance instance = instances.get(vertexName);
 			if (instance == null) {
-				throw new OrccException("An Connection element has an invalid"
-						+ " \"src-port\" " + "attribute");
+				throw new OrccRuntimeException(
+						"An Connection element has an invalid"
+								+ " \"src-port\" " + "attribute");
 			}
 
 			return new Vertex(instance);
@@ -584,11 +559,8 @@ public class XDFParser {
 	 *            the first node of a node list, or <code>null</code> if the
 	 *            caller had no children.
 	 * @return a (possibly empty) map of attributes
-	 * @throws OrccException
-	 *             if an attribute could not be parsed
 	 */
-	private Map<String, IAttribute> parseAttributes(Node node)
-			throws OrccException {
+	private Map<String, IAttribute> parseAttributes(Node node) {
 		Map<String, IAttribute> attributes = new HashMap<String, IAttribute>();
 
 		while (node != null) {
@@ -615,8 +587,8 @@ public class XDFParser {
 							.parseExpr(node.getFirstChild());
 					attr = new ValueAttribute(expr);
 				} else {
-					throw new OrccException("unsupported attribute kind: \""
-							+ kind + "\"");
+					throw new OrccRuntimeException(
+							"unsupported attribute kind: \"" + kind + "\"");
 				}
 
 				attributes.put(attrName, attr);
@@ -634,9 +606,8 @@ public class XDFParser {
 	 * (kind=Param or kind=Var), Instance, Package, Port.
 	 * 
 	 * @param root
-	 * @throws OrccException
 	 */
-	private void parseBody(Element root) throws OrccException {
+	private void parseBody(Element root) {
 		Node node = root.getFirstChild();
 		while (node != null) {
 			// this test allows us to skip #text nodes
@@ -652,12 +623,13 @@ public class XDFParser {
 					instances.put(instance.getId(), instance);
 					network.getGraph().addVertex(new Vertex(instance));
 				} else if (name.equals("Package")) {
-					throw new OrccException(
+					throw new OrccRuntimeException(
 							"Package elements are not supported by Orcc yet");
 				} else if (name.equals("Port")) {
 					parsePort(element);
 				} else {
-					throw new OrccException("invalid node \"" + name + "\"");
+					throw new OrccRuntimeException("invalid node \"" + name
+							+ "\"");
 				}
 			}
 
@@ -671,9 +643,8 @@ public class XDFParser {
 	 * 
 	 * @param connection
 	 *            a DOM element named "Connection"
-	 * @throws OrccException
 	 */
-	private void parseConnection(Element connection) throws OrccException {
+	private void parseConnection(Element connection) {
 		String src = connection.getAttribute("src");
 		String src_port = connection.getAttribute("src-port");
 		String dst = connection.getAttribute("dst");
@@ -690,11 +661,11 @@ public class XDFParser {
 		network.getGraph().addEdge(source, target, conn);
 	}
 
-	private void parseDecl(Element decl) throws OrccException {
+	private void parseDecl(Element decl) {
 		String kind = decl.getAttribute("kind");
 		String name = decl.getAttribute("name");
 		if (name.isEmpty()) {
-			throw new OrccException("Decl has an empty name");
+			throw new OrccRuntimeException("Decl has an empty name");
 		}
 
 		if (kind.equals("Param")) {
@@ -711,7 +682,8 @@ public class XDFParser {
 			Var var = IrFactory.eINSTANCE.createVar(0, type, name, false, expr);
 			network.getVariables().put(name, var);
 		} else {
-			throw new OrccException("unsupported Decl kind: \"" + kind + "\"");
+			throw new OrccRuntimeException("unsupported Decl kind: \"" + kind
+					+ "\"");
 		}
 	}
 
@@ -721,14 +693,12 @@ public class XDFParser {
 	 * @param instance
 	 *            a DOM element named "Instance".
 	 * @return an instance
-	 * @throws OrccException
-	 *             if the instance is not well-formed
 	 */
-	private Instance parseInstance(Element instance) throws OrccException {
+	private Instance parseInstance(Element instance) {
 		// instance id
 		String id = instance.getAttribute("id");
 		if (id.isEmpty()) {
-			throw new OrccException("An Instance element "
+			throw new OrccRuntimeException("An Instance element "
 					+ "must have a valid \"id\" attribute");
 		}
 
@@ -745,7 +715,7 @@ public class XDFParser {
 		}
 
 		if (clasz == null || clasz.isEmpty()) {
-			throw new OrccException("An Instance element "
+			throw new OrccRuntimeException("An Instance element "
 					+ "must have a valid \"Class\" child.");
 		}
 
@@ -784,16 +754,14 @@ public class XDFParser {
 	 * Parses the file given to the constructor of this class.
 	 * 
 	 * @return a network
-	 * @throws OrccException
-	 *             if the file could not be parsed
 	 */
-	public Network parseNetwork() throws OrccException {
+	public Network parseNetwork() {
 		InputStream is;
 
 		try {
 			is = file.getContents();
 		} catch (CoreException e) {
-			throw new OrccException("I/O error when parsing network", e);
+			throw new OrccRuntimeException("I/O error when parsing network", e);
 		}
 
 		try {
@@ -807,19 +775,19 @@ public class XDFParser {
 			try {
 				is.close();
 			} catch (IOException e) {
-				throw new OrccException("I/O error when parsing network", e);
+				throw new OrccRuntimeException(
+						"I/O error when parsing network", e);
 			}
 		}
 	}
 
-	private Map<String, Expression> parseParameters(Node node)
-			throws OrccException {
+	private Map<String, Expression> parseParameters(Node node) {
 		Map<String, Expression> parameters = new HashMap<String, Expression>();
 		while (node != null) {
 			if (node.getNodeName().equals("Parameter")) {
 				String name = ((Element) node).getAttribute("name");
 				if (name.isEmpty()) {
-					throw new OrccException("A Parameter element "
+					throw new OrccRuntimeException("A Parameter element "
 							+ "must have a valid \"name\" attribute");
 				}
 
@@ -839,15 +807,14 @@ public class XDFParser {
 	 * 
 	 * @param eltPort
 	 *            a DOM element named "Port"
-	 * @throws OrccException
 	 */
-	private void parsePort(Element eltPort) throws OrccException {
+	private void parsePort(Element eltPort) {
 		ParseContinuation<Type> cont = typeParser.parseType(eltPort
 				.getFirstChild());
 		Type type = cont.getResult();
 		String name = eltPort.getAttribute("name");
 		if (name.isEmpty()) {
-			throw new OrccException("Port has an empty name");
+			throw new OrccRuntimeException("Port has an empty name");
 		}
 
 		boolean native_ = false;
@@ -873,8 +840,8 @@ public class XDFParser {
 		} else if (kind.equals("Output")) {
 			network.getOutputs().add(port);
 		} else {
-			throw new OrccException("Port \"" + name + "\", invalid kind: \""
-					+ kind + "\"");
+			throw new OrccRuntimeException("Port \"" + name
+					+ "\", invalid kind: \"" + kind + "\"");
 		}
 
 		network.getGraph().addVertex(new Vertex(kind, port));
@@ -885,18 +852,16 @@ public class XDFParser {
 	 * 
 	 * @param doc
 	 *            a DOM document that supposedly represent an XDF network
-	 * @throws OrccException
-	 *             if the DOM document is not a well-formed XDF network
 	 */
-	private void parseXDF(Document doc) throws OrccException {
+	private void parseXDF(Document doc) throws OrccRuntimeException {
 		Element root = doc.getDocumentElement();
 		if (!root.getNodeName().equals("XDF")) {
-			throw new OrccException("Expected \"XDF\" start element");
+			throw new OrccRuntimeException("Expected \"XDF\" start element");
 		}
 
 		String name = root.getAttribute("name");
 		if (name.isEmpty()) {
-			throw new OrccException("Expected a \"name\" attribute");
+			throw new OrccRuntimeException("Expected a \"name\" attribute");
 		}
 
 		this.network = new Network(file.getFullPath().toString());

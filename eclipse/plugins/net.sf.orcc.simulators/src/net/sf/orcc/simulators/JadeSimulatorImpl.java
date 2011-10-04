@@ -45,7 +45,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccActivator;
-import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFParser;
@@ -112,15 +111,11 @@ public class JadeSimulatorImpl extends AbstractSimulator {
 	private File xdfFlattenFile;
 
 	private void flatten() {
-		try {
-			Network network = new XDFParser(xdfFile).parseNetwork();
-			network.flatten();
+		Network network = new XDFParser(xdfFile).parseNetwork();
+		network.flatten();
 
-			XDFWriter writer = new XDFWriter();
-			xdfFlattenFile = writer.write(new File(vtlFolder), network);
-		} catch (OrccException e) {
-			e.printStackTrace();
-		}
+		XDFWriter writer = new XDFWriter();
+		xdfFlattenFile = writer.write(new File(vtlFolder), network);
 	}
 
 	@Override

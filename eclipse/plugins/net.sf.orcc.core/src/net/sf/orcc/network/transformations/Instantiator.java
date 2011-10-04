@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
@@ -124,7 +123,7 @@ public class Instantiator implements INetworkTransformation {
 	}
 
 	private void checkPorts(String id, Set<Connection> connections,
-			List<Port> ports) throws OrccException {
+			List<Port> ports) throws OrccRuntimeException {
 		for (Port port : ports) {
 			boolean portUsed = false;
 			for (Connection connection : connections) {
@@ -136,22 +135,22 @@ public class Instantiator implements INetworkTransformation {
 			}
 
 			if (!port.isNative() && !portUsed) {
-				throw new OrccException("In network \"" + network.getName()
-						+ "\": port \"" + port.getName() + "\" of instance \""
-						+ id + "\" is not used!");
+				throw new OrccRuntimeException("In network \""
+						+ network.getName() + "\": port \"" + port.getName()
+						+ "\" of instance \"" + id + "\" is not used!");
 			}
 		}
 	}
 
-	private void checkPortsAreConnected() throws OrccException {
+	private void checkPortsAreConnected() {
 		for (Vertex vertex : graph.vertexSet()) {
 			if (vertex.isPort()) {
 				Port port = vertex.getPort();
 				if (graph.outDegreeOf(vertex) == 0
 						&& graph.inDegreeOf(vertex) == 0) {
-					throw new OrccException("In network \"" + network.getName()
-							+ "\": port \"" + port.getName()
-							+ "\" is not used!");
+					throw new OrccRuntimeException("In network \""
+							+ network.getName() + "\": port \""
+							+ port.getName() + "\" is not used!");
 				}
 			} else {
 				Instance instance = vertex.getInstance();
@@ -180,11 +179,10 @@ public class Instantiator implements INetworkTransformation {
 	 * connections actually point to ports defined in actors. Instantiating an
 	 * actor implies first loading it and then giving it the right parameters.
 	 * 
-	 * @throws OrccException
-	 *             if an actor could not be instantiated, or a connection is
-	 *             wrong
+	 * @param network
+	 *            a network
 	 */
-	public void transform(Network network) throws OrccException {
+	public void transform(Network network) {
 		this.network = network;
 		graph = network.getGraph();
 
@@ -214,9 +212,8 @@ public class Instantiator implements INetworkTransformation {
 	 * 
 	 * @param connection
 	 *            a connection
-	 * @throws OrccException
 	 */
-	private void updateConnection(Connection connection) throws OrccException {
+	private void updateConnection(Connection connection) {
 		Vertex srcVertex = graph.getEdgeSource(connection);
 		Vertex tgtVertex = graph.getEdgeTarget(connection);
 
@@ -234,8 +231,8 @@ public class Instantiator implements INetworkTransformation {
 			}
 
 			if (srcPort == null) {
-				throw new OrccException("In network \"" + network.getName()
-						+ "\": A Connection refers to "
+				throw new OrccRuntimeException("In network \""
+						+ network.getName() + "\": A Connection refers to "
 						+ "a non-existent source port: \"" + srcPortName
 						+ "\" of instance \"" + source.getId() + "\"");
 			}
@@ -265,8 +262,8 @@ public class Instantiator implements INetworkTransformation {
 
 			// check ports exist
 			if (dstPort == null) {
-				throw new OrccException("In network \"" + network.getName()
-						+ "\": A Connection refers to "
+				throw new OrccRuntimeException("In network \""
+						+ network.getName() + "\": A Connection refers to "
 						+ "a non-existent target port: \"" + dstPortName
 						+ "\" of instance \"" + target.getId() + "\"");
 			}
@@ -283,7 +280,7 @@ public class Instantiator implements INetworkTransformation {
 
 		// check port nativity match
 		if (srcPort.isNative() != dstPort.isNative()) {
-			throw new OrccException("Error: the nativity of port "
+			throw new OrccRuntimeException("Error: the nativity of port "
 					+ sourceString + " doesn't match with the one of port "
 					+ targetString);
 		}
@@ -292,21 +289,17 @@ public class Instantiator implements INetworkTransformation {
 		Type srcType = srcPortType;
 		Type dstType = dstPortType;
 		if (!EcoreUtil.equals(srcType, dstType)) {
-			throw new OrccException("Type error: port " + sourceString + " is "
-					+ srcType + ", port " + targetString + " is " + dstType);
+			throw new OrccRuntimeException("Type error: port " + sourceString
+					+ " is " + srcType + ", port " + targetString + " is "
+					+ dstType);
 		}
 	}
 
 	/**
 	 * Updates the connections of this network. Must be called after actors have
 	 * been instantiated.
-	 * 
-	 * @throws OrccException
-	 *             if a connection could not be updated because it references a
-	 *             port that does not exist or have source and target ports that
-	 *             have incompatible types
 	 */
-	private void updateConnections() throws OrccException {
+	private void updateConnections() {
 		for (Connection connection : graph.edgeSet()) {
 			updateConnection(connection);
 		}

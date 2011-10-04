@@ -41,7 +41,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFParser;
@@ -382,30 +381,25 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 		}
 
 		if (xdfFile != null) {
-			try {
-				network = new XDFParser(xdfFile).parseNetwork();
-				network.updateIdentifiers();
+			network = new XDFParser(xdfFile).parseNetwork();
+			network.updateIdentifiers();
 
-				Set<String> instances = new HashSet<String>();
-				for (Instance instance : network.getInstances()) {
+			Set<String> instances = new HashSet<String>();
+			for (Instance instance : network.getInstances()) {
+				instances.add(instance.getHierarchicalPath());
+			}
+			for (Network subNetwork : network.getNetworks()) {
+				for (Instance instance : subNetwork.getInstances()) {
 					instances.add(instance.getHierarchicalPath());
 				}
-				for (Network subNetwork : network.getNetworks()) {
-					for (Instance instance : subNetwork.getInstances()) {
-						instances.add(instance.getHierarchicalPath());
-					}
-				}
+			}
 
-				Iterator<Entry<String, String>> it = mapping.entrySet()
-						.iterator();
-				while (it.hasNext()) {
-					Entry<String, String> entry = it.next();
-					if (!instances.contains(entry.getKey())) {
-						it.remove();
-					}
+			Iterator<Entry<String, String>> it = mapping.entrySet().iterator();
+			while (it.hasNext()) {
+				Entry<String, String> entry = it.next();
+				if (!instances.contains(entry.getKey())) {
+					it.remove();
 				}
-			} catch (OrccException e) {
-				e.printStackTrace();
 			}
 		}
 

@@ -34,8 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.sf.orcc.OrccException;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -77,9 +75,8 @@ public class XmlElement {
 	 * 
 	 * @param element
 	 *            a DOM element
-	 * @throws OrccException
 	 */
-	public XmlElement(Element element) throws OrccException {
+	public XmlElement(Element element) {
 		this();
 
 		this.name = element.getTagName();

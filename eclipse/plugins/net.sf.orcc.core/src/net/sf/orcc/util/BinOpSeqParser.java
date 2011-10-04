@@ -30,7 +30,6 @@ package net.sf.orcc.util;
 
 import java.util.List;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
@@ -62,11 +61,10 @@ public class BinOpSeqParser {
 	 * @param stopIndex
 	 *            stop index
 	 * @return an expression
-	 * @throws OrccException
 	 */
 	private static Expression createPrecedenceTree(
 			List<Expression> expressions, List<OpBinary> operators,
-			int startIndex, int stopIndex) throws OrccException {
+			int startIndex, int stopIndex) {
 		if (stopIndex == startIndex) {
 			return expressions.get(startIndex);
 		}
@@ -94,10 +92,9 @@ public class BinOpSeqParser {
 	 * @param stopIndex
 	 *            stop index
 	 * @return the index of the pivot operator
-	 * @throws OrccException
 	 */
 	private static int findPivot(List<OpBinary> operators, int startIndex,
-			int stopIndex) throws OrccException {
+			int stopIndex) {
 		int pivot = startIndex;
 		OpBinary bop = operators.get(pivot);
 		int pivotRank = bop.getPrecedence();
@@ -123,10 +120,9 @@ public class BinOpSeqParser {
 	 * @param operators
 	 *            a list of binary operators
 	 * @return a binary expression tree
-	 * @throws OrccException
 	 */
 	public static Expression parse(List<Expression> expressions,
-			List<OpBinary> operators) throws OrccException {
+			List<OpBinary> operators) {
 		return createPrecedenceTree(expressions, operators, 0,
 				expressions.size() - 1);
 	}

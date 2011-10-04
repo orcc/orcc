@@ -647,12 +647,8 @@ public class Network {
 	 * 
 	 * @param paths
 	 *            a list of paths
-	 * @throws OrccException
-	 *             if an actor could not be instantiated, or a connection is
-	 *             wrong
 	 */
-	public void instantiate(ResourceSet set, List<IFolder> paths)
-			throws OrccException {
+	public void instantiate(ResourceSet set, List<IFolder> paths) {
 		new Instantiator(set, paths).transform(this);
 	}
 

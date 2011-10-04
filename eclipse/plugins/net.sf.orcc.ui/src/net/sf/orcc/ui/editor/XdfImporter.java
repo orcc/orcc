@@ -45,7 +45,6 @@ import net.sf.graphiti.model.Edge;
 import net.sf.graphiti.model.Graph;
 import net.sf.graphiti.model.ObjectType;
 import net.sf.graphiti.model.Vertex;
-import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Port;
@@ -206,12 +205,7 @@ public class XdfImporter {
 		vertexMap = new HashMap<net.sf.orcc.network.Vertex, Vertex>();
 
 		XDFParser parser = new XDFParser(file);
-		Network network;
-		try {
-			network = parser.parseNetwork();
-		} catch (OrccException e) {
-			throw new RuntimeException(e.getCause());
-		}
+		Network network = parser.parseNetwork();
 
 		Configuration configuration = getDefault().getConfiguration("XDF");
 		ObjectType type = configuration.getGraphType("XML Dataflow Network");

@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ir.util;
 
-import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 
@@ -86,14 +86,13 @@ public class Entry {
 	 * Returns this entry's content as an expression
 	 * 
 	 * @return this entry's content as an expression
-	 * @throws OrccException
-	 *             if this entry does not contain an expression
 	 */
-	public Expression getEntryAsExpr() throws OrccException {
+	public Expression getEntryAsExpr() {
 		if (getType() == EXPR) {
 			return (Expression) content;
 		} else {
-			throw new OrccException("this entry does not contain an expression");
+			throw new OrccRuntimeException(
+					"this entry does not contain an expression");
 		}
 	}
 
@@ -101,14 +100,12 @@ public class Entry {
 	 * Returns this entry's content as a type
 	 * 
 	 * @return this entry's content as a type
-	 * @throws OrccException
-	 *             if this entry does not contain a type
 	 */
-	public Type getEntryAsType() throws OrccException {
+	public Type getEntryAsType() {
 		if (getType() == TYPE) {
 			return (Type) content;
 		} else {
-			throw new OrccException("this entry does not contain a type");
+			throw new OrccRuntimeException("this entry does not contain a type");
 		}
 	}
 

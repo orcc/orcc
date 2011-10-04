@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.util.IrUtil;
@@ -304,8 +305,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 * 
 	 * @throws OrccException
 	 */
-	public void instantiate(ResourceSet set, List<IFolder> vtlFolders)
-			throws OrccException {
+	public void instantiate(ResourceSet set, List<IFolder> vtlFolders) {
 		String className = new File(clasz).getName();
 		for (IFolder path : vtlFolders) {
 			file = path.getFile(className.replace('.', '/') + ".ir");
@@ -316,7 +316,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 			}
 		}
 		if (file == null) {
-			throw new OrccException("Actor \"" + className
+			throw new OrccRuntimeException("Actor \"" + className
 					+ "\" not found!\nIf this actor has errors, please "
 					+ "correct them and try again; otherwise, try to "
 					+ "refresh/clean projects.");
@@ -325,7 +325,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 		if (actor == null) {
 			actor = (Actor) IrUtil.deserializeEntity(set, file);
 			if (actor == null) {
-				throw new OrccException("Actor \"" + className
+				throw new OrccRuntimeException("Actor \"" + className
 						+ "\" not found!\nIf this actor has errors, please "
 						+ "correct them and try again; otherwise, try to "
 						+ "refresh/clean projects.");
