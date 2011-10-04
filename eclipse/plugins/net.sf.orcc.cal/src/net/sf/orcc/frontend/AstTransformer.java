@@ -104,14 +104,24 @@ public class AstTransformer extends CalSwitch<EObject> {
 	 * and/or nodes, and returns an IR expression.
 	 * 
 	 */
-	private class ExpressionTransformer extends CalSwitch<Expression> {
+	private class ExprTransformer extends CalSwitch<Expression> {
 
 		private List<Expression> indexes;
 
 		private Var target;
 
-		public ExpressionTransformer() {
+		public ExprTransformer() {
 			indexes = new ArrayList<Expression>();
+		}
+
+		public ExprTransformer(Var target) {
+			this();
+			this.target = target;
+		}
+
+		public ExprTransformer(Var target, List<Expression> indexes) {
+			this.target = target;
+			this.indexes = indexes;
 		}
 
 		@Override
@@ -157,8 +167,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 		public Expression caseExpressionIf(ExpressionIf expression) {
 			int lineNumber = Util.getLocation(expression);
 
-			Expression condition = transformExpression(expression
-					.getCondition());
+			Expression condition = doSwitch(expression.getCondition());
 
 			Var currentTarget = target;
 			List<Expression> currentIndexes = indexes;
@@ -344,14 +353,6 @@ public class AstTransformer extends CalSwitch<EObject> {
 		}
 
 		/**
-		 * Clears the target and indexes attributes.
-		 */
-		public void clearTarget() {
-			target = null;
-			indexes = new ArrayList<Expression>(0);
-		}
-
-		/**
 		 * Returns a list of CFG nodes from the given expression. This method
 		 * creates a new block node to hold the statements created when
 		 * translating the expression, transforms the expression, and transfers
@@ -368,7 +369,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 			int first = nodes.size();
 			nodes.add(IrFactoryImpl.eINSTANCE.createNodeBlock());
 
-			Expression value = transformExpression(astExpression);
+			Expression value = doSwitch(astExpression);
 			createAssignOrStore(lineNumber, target, indexes, value);
 
 			int last = nodes.size();
@@ -399,7 +400,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 
 			for (AstExpression astExpression : astExpressions) {
 				int lineNumber = Util.getLocation(astExpression);
-				Expression value = transformExpression(astExpression);
+				Expression value = doSwitch(astExpression);
 				createAssignOrStore(lineNumber, target, indexes, value);
 			}
 
@@ -411,20 +412,6 @@ public class AstTransformer extends CalSwitch<EObject> {
 			subList.clear();
 
 			return resultNodes;
-		}
-
-		/**
-		 * Sets the target variable that is assigned a list expression with the
-		 * given indexes.
-		 * 
-		 * @param target
-		 *            a variable
-		 * @param indexes
-		 *            a list of indexes
-		 */
-		public void setTarget(Var target, List<Expression> indexes) {
-			this.target = target;
-			this.indexes = indexes;
 		}
 
 		/**
@@ -492,7 +479,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 
 				// condition
 				AstExpression astHigher = generator.getHigher();
-				Expression higher = transformExpression(astHigher);
+				Expression higher = doSwitch(astHigher);
 				Expression condition = IrFactory.eINSTANCE.createExprBinary(
 						IrFactory.eINSTANCE.createExprVar(loopVar),
 						OpBinary.LE, higher,
@@ -518,7 +505,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 				// create assign
 				block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 				AstExpression astLower = generator.getLower();
-				Expression lower = transformExpression(astLower);
+				Expression lower = doSwitch(astLower);
 				InstAssign assignInit = IrFactory.eINSTANCE.createInstAssign(
 						lineNumber, loopVar, lower);
 				block.add(assignInit);
@@ -556,7 +543,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 				indexes.add(IrFactory.eINSTANCE.createExprInt(i));
 				i++;
 
-				Expression value = transformExpression(expression);
+				Expression value = doSwitch(expression);
 
 				createAssignOrStore(lineNumber, target, indexes, value);
 			}
@@ -587,7 +574,8 @@ public class AstTransformer extends CalSwitch<EObject> {
 
 		@Override
 		public Object caseAstExpression(AstExpression astExpression) {
-			Expression expression = transformExpression(astExpression);
+			ExprTransformer transformer = new ExprTransformer();
+			Expression expression = transformer.doSwitch(astExpression);
 			parameters.add(expression);
 
 			return object;
@@ -598,7 +586,8 @@ public class AstTransformer extends CalSwitch<EObject> {
 			OpBinary op = OpBinary.getOperator(astExpression.getOperator());
 			if (op == OpBinary.PLUS) {
 				doSwitch(astExpression.getLeft());
-				Expression expression = transformExpression(astExpression
+				ExprTransformer transformer = new ExprTransformer();
+				Expression expression = transformer.doSwitch(astExpression
 						.getRight());
 				parameters.add(expression);
 
@@ -617,11 +606,11 @@ public class AstTransformer extends CalSwitch<EObject> {
 	 * directly to the {@link #nodes} field.
 	 * 
 	 */
-	private class StatementTransformer extends CalSwitch<Object> {
+	private class StmtTransformer extends CalSwitch<Object> {
 
 		private Object object;
 
-		public StatementTransformer() {
+		public StmtTransformer() {
 			this.object = new Object();
 		}
 
@@ -639,9 +628,8 @@ public class AstTransformer extends CalSwitch<EObject> {
 			// transform indexes and value
 			List<Expression> indexes = transformExpressions(assign.getIndexes());
 
-			exprTransformer.setTarget(target, indexes);
-			Expression value = transformExpression(assign.getValue());
-			exprTransformer.clearTarget();
+			ExprTransformer transformer = new ExprTransformer(target, indexes);
+			Expression value = transformer.doSwitch(assign.getValue());
 			createAssignOrStore(lineNumber, target, indexes, value);
 
 			return object;
@@ -678,14 +666,15 @@ public class AstTransformer extends CalSwitch<EObject> {
 			procedure.getLocals().add(loopVar);
 
 			AstExpression astLower = foreach.getLower();
-			Expression lower = transformExpression(astLower);
+			ExprTransformer transformer = new ExprTransformer();
+			Expression lower = transformer.doSwitch(astLower);
 			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
 					lineNumber, loopVar, lower);
 			addInstruction(assign);
 
 			// condition
 			AstExpression astHigher = foreach.getHigher();
-			Expression higher = transformExpression(astHigher);
+			Expression higher = transformer.doSwitch(astHigher);
 			Expression condition = IrFactory.eINSTANCE.createExprBinary(
 					IrFactory.eINSTANCE.createExprVar(loopVar), OpBinary.LE,
 					higher, IrFactory.eINSTANCE.createTypeBool());
@@ -717,7 +706,8 @@ public class AstTransformer extends CalSwitch<EObject> {
 		public Object caseStatementIf(StatementIf stmtIf) {
 			int lineNumber = Util.getLocation(stmtIf);
 
-			Expression condition = transformExpression(stmtIf.getCondition());
+			ExprTransformer transformer = new ExprTransformer();
+			Expression condition = transformer.doSwitch(stmtIf.getCondition());
 
 			// transforms "then" statements and "else" statements
 			List<Node> thenNodes = getNodes(stmtIf.getThen());
@@ -740,7 +730,8 @@ public class AstTransformer extends CalSwitch<EObject> {
 				node.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 				node.setLineNumber(lineNumber);
 
-				condition = transformExpression(elsif.getCondition());
+				transformer = new ExprTransformer();
+				condition = transformer.doSwitch(elsif.getCondition());
 				node.setCondition(condition);
 
 				thenNodes = getNodes(elsif.getThen());
@@ -762,7 +753,10 @@ public class AstTransformer extends CalSwitch<EObject> {
 			NodeBlock block = procedure.getLast();
 			List<Instruction> instructions = block.getInstructions();
 			int first = instructions.size();
-			Expression condition = transformExpression(stmtWhile.getCondition());
+
+			ExprTransformer transformer = new ExprTransformer();
+			Expression condition = transformer.doSwitch(stmtWhile
+					.getCondition());
 			int last = instructions.size();
 
 			// the body
@@ -864,30 +858,24 @@ public class AstTransformer extends CalSwitch<EObject> {
 	 */
 	private int blockCount;
 
-	/**
-	 * expression transformer.
-	 */
-	final private ExpressionTransformer exprTransformer;
-
 	private Procedure print;
 
 	private Procedure procedure;
 
 	/**
-	 * statement transformer.
-	 */
-	final private StatementTransformer stmtTransformer;
-
-	/**
-	 * Creates a new AST to IR transformation.
+	 * Creates a new AST to IR transformer.
 	 */
 	public AstTransformer() {
-		exprTransformer = new ExpressionTransformer();
-		stmtTransformer = new StatementTransformer();
 	}
 
+	/**
+	 * Creates a new AST to IR transformer, which will append instructions and
+	 * nodes to the given procedure.
+	 * 
+	 * @param procedure
+	 *            a procedure
+	 */
 	public AstTransformer(Procedure procedure) {
-		this();
 		this.procedure = procedure;
 	}
 
@@ -983,11 +971,8 @@ public class AstTransformer extends CalSwitch<EObject> {
 		if (function.isNative()) {
 			value = null;
 		} else {
-			Var target = exprTransformer.target;
-			List<Expression> indexes = exprTransformer.indexes;
-			exprTransformer.clearTarget();
-			value = transformExpression(function.getExpression());
-			exprTransformer.setTarget(target, indexes);
+			ExprTransformer transformer = new ExprTransformer();
+			value = transformer.doSwitch(function.getExpression());
 		}
 
 		addReturn(procedure, value);
@@ -1083,21 +1068,14 @@ public class AstTransformer extends CalSwitch<EObject> {
 	}
 
 	/**
-	 * Transforms the given AST expression to an IR expression. In the process
-	 * nodes may be created and added to the current {@link #procedure}, since
-	 * many RVC-CAL expressions are expressed with IR statements.
+	 * Transforms the given AST expression to an IR expression.
 	 * 
 	 * @param expression
 	 *            an AST expression
 	 * @return an IR expression
 	 */
 	public Expression transformExpression(AstExpression expression) {
-		Var target = exprTransformer.target;
-		List<Expression> indexes = exprTransformer.indexes;
-		Expression result = exprTransformer.doSwitch(expression);
-		exprTransformer.target = target;
-		exprTransformer.indexes = indexes;
-		return result;
+		return new ExprTransformer().doSwitch(expression);
 	}
 
 	/**
@@ -1113,7 +1091,8 @@ public class AstTransformer extends CalSwitch<EObject> {
 		int length = expressions.size();
 		List<Expression> irExpressions = new ArrayList<Expression>(length);
 		for (AstExpression expression : expressions) {
-			irExpressions.add(transformExpression(expression));
+			ExprTransformer transformer = new ExprTransformer();
+			irExpressions.add(transformer.doSwitch(expression));
 		}
 		return irExpressions;
 	}
@@ -1168,10 +1147,9 @@ public class AstTransformer extends CalSwitch<EObject> {
 
 		AstExpression value = Variable.getValue();
 		if (value != null) {
-			exprTransformer.setTarget(local, new ArrayList<Expression>(0));
-			Expression expression = transformExpression(value);
+			ExprTransformer transformer = new ExprTransformer(local);
+			Expression expression = transformer.doSwitch(value);
 			createAssignOrStore(lineNumber, local, null, expression);
-			exprTransformer.clearTarget();
 		}
 
 		Frontend.putMapping(Variable, local);
@@ -1208,17 +1186,6 @@ public class AstTransformer extends CalSwitch<EObject> {
 	}
 
 	/**
-	 * Transforms the given AST statement to one or more IR instructions and/or
-	 * nodes that are added directly to the current {@link #procedure}.
-	 * 
-	 * @param statement
-	 *            an AST statement
-	 */
-	private void transformStatement(Statement statement) {
-		stmtTransformer.doSwitch(statement);
-	}
-
-	/**
 	 * Transforms the given AST statements to IR instructions and/or nodes that
 	 * are added directly to the current {@link #procedure}.
 	 * 
@@ -1226,8 +1193,9 @@ public class AstTransformer extends CalSwitch<EObject> {
 	 *            a list of AST statements
 	 */
 	public void transformStatements(List<Statement> statements) {
+		StmtTransformer transformer = new StmtTransformer();
 		for (Statement statement : statements) {
-			transformStatement(statement);
+			transformer.doSwitch(statement);
 		}
 	}
 
