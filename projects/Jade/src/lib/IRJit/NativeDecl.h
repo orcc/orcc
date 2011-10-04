@@ -108,6 +108,7 @@ std::map<std::string, void*> createNativeMap()
 	
 	native["fpsPrintInit"] = (void*)fpsPrintInit;
 	native["fpsPrintNewPicDecoded"] = (void*)fpsPrintNewPicDecoded;
+	native["print"] = (void*)printf;
 
 	return native;
 }
