@@ -121,15 +121,8 @@ public class CalMoveParticipant extends MoveParticipant {
 
 	@Override
 	protected boolean initialize(Object element) {
-		if (element instanceof IFile) {
-			IFile file = (IFile) element;
-			if ("cal".equals(file.getFileExtension())) {
-				actorFile = file;
-				return true;
-			}
-		}
-
-		return false;
+		actorFile = (IFile) element;
+		return true;
 	}
 
 }

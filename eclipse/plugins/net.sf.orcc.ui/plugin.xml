@@ -579,9 +579,13 @@
             id="net.sf.orcc.ui.xdfRenameParticipant"
             name="XDF rename participant">
          <enablement>
-            <instanceof
-                  value="org.eclipse.core.resources.IFile">
-            </instanceof>
+            <adapt
+                  type="org.eclipse.core.resources.IFile">
+               <test
+                     property="org.eclipse.core.resources.extension"
+                     value="xdf">
+               </test>
+            </adapt>
          </enablement>
       </renameParticipant>
    </extension>
@@ -592,16 +596,28 @@
             id="net.sf.orcc.ui.xdfMoveParticipant"
             name="XDF move participant">
          <enablement>
-            <instanceof
-                  value="org.eclipse.core.resources.IFile">
-            </instanceof>
+            <adapt
+                  type="org.eclipse.core.resources.IFile">
+               <test
+                     property="org.eclipse.core.resources.extension"
+                     value="xdf">
+               </test>
+            </adapt>
          </enablement>
       </moveParticipant>
       <moveParticipant
             class="net.sf.orcc.ui.refactoring.CalMoveParticipant"
             id="net.sf.orcc.ui.calMoveParticipant"
             name="Cal move participant">
-         <enablement></enablement>
+         <enablement>
+            <adapt
+                  type="org.eclipse.core.resources.IFile">
+               <test
+                     property="org.eclipse.core.resources.extension"
+                     value="cal">
+               </test>
+            </adapt>
+         </enablement>
       </moveParticipant>
    </extension>
 </plugin>

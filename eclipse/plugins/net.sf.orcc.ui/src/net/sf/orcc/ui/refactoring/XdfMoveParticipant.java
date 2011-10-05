@@ -83,15 +83,8 @@ public class XdfMoveParticipant extends MoveParticipant {
 
 	@Override
 	protected boolean initialize(Object element) {
-		if (element instanceof IFile) {
-			IFile file = (IFile) element;
-			if ("xdf".equals(file.getFileExtension())) {
-				networkFile = file;
-				return true;
-			}
-		}
-
-		return false;
+		networkFile = (IFile) element;
+		return true;
 	}
 
 }
