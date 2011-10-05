@@ -60,21 +60,33 @@ architecture bdf_type of processor_{{id}} is
   ---------------------------------------------------------------------------
   -- Components declaration
   ---------------------------------------------------------------------------
-  component dram_{{id}}
-    port(clock   : in  std_logic;
+  component dram
+    generic(size          : integer;
+            width         : integer;
+            widthu		  : integer;
+            init_file     : string;
+            device_family : string
+            );
+    port(address : in  std_logic_vector(widthu-1 downto 0);
+         byteena : in  std_logic_vector(3 downto 0) := (others => '1');
+         clock   : in  std_logic;
+         data    : in  std_logic_vector(width-1 downto 0);
          wren    : in  std_logic;
-         address : in  std_logic_vector({{dram_addr - 1}} downto 0);
-         byteena : in  std_logic_vector(fu_LSU_dataw/8-1 downto 0);
-         data    : in  std_logic_vector({{dram_width - 1}} downto 0);
-         q       : out std_logic_vector({{dram_width - 1}} downto 0)
+         q       : out std_logic_vector(width-1 downto 0)
          );
   end component;
 
-  component irom_{{id}}
-    port(clock   : in  std_logic;
-         address : in  std_logic_vector({{irom_addr - 1}} downto 0);
-         q       : out std_logic_vector({{irom_width - 1}} downto 0)
-         );
+  component irom
+    generic(size          : integer;
+            width         : integer;
+            widthu		  : integer;
+            init_file     : string;
+            device_family : string
+            );
+    port(address : in  std_logic_vector(widthu-1 downto 0);
+         clock   : in  std_logic;
+         q       : out std_logic_vector(width-1 downto 0)
+      );
   end component;
 
   component processor_{{id}}_tl
@@ -140,19 +152,29 @@ begin
 {{endif}}
 {{endfor}}
 
-  inst_dram_{{id}} : dram_{{id}}
+  inst_dram_{{id}} : dram
+    generic map(size          => {{dram_depth}},
+                width         => {{dram_width}},
+                widthu		  => {{dram_addr}},
+                init_file     => "../{{id}}/{{id}}_data.mif",
+                device_family => "Stratix III")
     port map(clock   => clk,
              wren    => wren_wire,
-             address => dram_addr({{dram_addr - 1}} downto 0),
+             address => dram_addr({{dram_addr-1}} downto 0),
              byteena => bytemask_wire,
              data    => dram_data_in_wire,
              q       => dram_data_out_wire);
 
   wren_wire <= not(wren_x_wire);
 
-  inst_irom_{{id}} : irom_{{id}}
+  inst_irom_{{id}} : irom
+    generic map(size          => {{irom_depth}},
+                width         => {{irom_width}},
+                widthu		  => {{irom_addr}},
+                init_file     => "../{{id}}/{{id}}.mif",
+                device_family => "Stratix III")
     port map(clock   => clk,
-             address => imem_addr({{irom_addr - 1}} downto 0),
+             address => imem_addr({{irom_addr-1}} downto 0),
              q       => idata_wire);
 
   processor_{{id}} : processor_{{id}}_tl

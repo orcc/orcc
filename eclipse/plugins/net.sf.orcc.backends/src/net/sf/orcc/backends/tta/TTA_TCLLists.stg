@@ -23,6 +23,8 @@ vcom -93 -quiet -work work share/vhdl/add_and_eq_gt_gtu_ior_shl_shr_shru_sub_sxh
 
 # Compile Other components
 vcom -93 -quiet -work work others/fifo.vhd
+vcom -93 -quiet -work work others/ram.vhd
+vcom -93 -quiet -work work others/rom.vhd
 vcom -93 -quiet -work work others/main_pll.vhd
 vcom -93 -quiet -work work simulation/sim_package.vhd
 
@@ -51,8 +53,6 @@ vcom -93 -quiet -work work <instance.id>/gcu_ic/ifetch.vhdl
 vcom -93 -quiet -work work <instance.id>/gcu_ic/idecompressor.vhdl
 vcom -93 -quiet -work work <instance.id>/gcu_ic/ic.vhdl
 vcom -93 -quiet -work work <instance.id>/gcu_ic/decoder.vhdl
-vcom -93 -quiet -work work <instance.id>/irom_<instance.id>.vhd
-vcom -93 -quiet -work work <instance.id>/dram_<instance.id>.vhd
 vcom -93 -quiet -work work <instance.id>/processor_<instance.id>.vhd
 
 <if(instance.actor && !instance.actor.native)

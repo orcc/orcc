@@ -68,8 +68,6 @@ class Instance:
         self._bemFile = self.id + ".bem"
         self._mifFile = self.id + ".mif"
         self._mifDataFile = self.id + "_data" + ".mif"
-        self._romFile = "irom_" + self.id + ".vhd"
-        self._ramFile = "dram_" + self.id + ".vhd"
         # Useful names
         self._entity = "processor_" + self.id + "_tl"
 
@@ -108,8 +106,6 @@ class Instance:
         subprocess.call(["generateprocessor"] + args + ["-o", buildPath, "-b", self._bemFile, "--shared-files-dir", sharePath,
                                         "-l", "vhdl", "-e", self._entity, "-i", self._idfFile, self._adfFile])
         # Generate vhdl memory and processor files
-        self.irom.generate(self.id, os.path.join(libPath, "templates", "rom.template"), os.path.join(buildPath, self._romFile))
-        self.dram.generate(self.id, os.path.join(libPath, "templates", "ram.template"), os.path.join(buildPath, self._ramFile))
         self.generateProcessor(os.path.join(libPath, "templates", "processor.template"), os.path.join(buildPath, self._processorFile), iromAddrMax, dramAddrMax)
         # Copy files to build directory
         shutil.copy(self._mifFile, buildPath)
@@ -179,9 +175,9 @@ class Instance:
     def generateProcessor(self, templateFile, targetFile, iromAddrMax, dramAddrMax):
         template = tempita.Template.from_filename(templateFile, namespace={}, encoding=None)
         result = template.substitute(id=self.id, inputs=self.inputs, outputs=self.outputs,
-                            irom_width=self.irom.getWidth(), irom_addr=self.irom.getAddr(),
-                            dram_width=self.dram.getWidth(), dram_addr=self.dram.getAddr(),
-                            irom_addr_max=iromAddrMax, dram_addr_max=dramAddrMax)
+			irom_width=self.irom.getWidth(), irom_addr=self.irom.getAddr(), irom_depth=self.irom.getDepth(),
+			dram_width=self.dram.getWidth(), dram_addr=self.dram.getAddr(), dram_depth=self.dram.getDepth(),
+			irom_addr_max=iromAddrMax, dram_addr_max=dramAddrMax)
         open(targetFile, "w").write(result)
 
     def diff(self, traceFile, genFile, port):
