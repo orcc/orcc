@@ -156,7 +156,7 @@ begin
     generic map(size          => {{dram_depth}},
                 width         => {{dram_width}},
                 widthu		  => {{dram_addr}},
-                init_file     => "../{{id}}/{{id}}_data.mif",
+                init_file     => "{{id}}_data.mif",
                 device_family => "Stratix III")
     port map(clock   => clk,
              wren    => wren_wire,
@@ -171,7 +171,7 @@ begin
     generic map(size          => {{irom_depth}},
                 width         => {{irom_width}},
                 widthu		  => {{irom_addr}},
-                init_file     => "../{{id}}/{{id}}.mif",
+                init_file     => "{{id}}.mif",
                 device_family => "Stratix III")
     port map(clock   => clk,
              address => imem_addr({{irom_addr-1}} downto 0),

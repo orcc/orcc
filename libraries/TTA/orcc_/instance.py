@@ -90,6 +90,7 @@ class Instance:
 
     def generate(self, srcPath, buildPath, libPath, iromAddrMax, dramAddrMax, args, debug):
         srcPath = os.path.join(srcPath, self.id)
+        wrapperPath = os.path.join(buildPath, "wrapper")
         sharePath = os.path.join(buildPath, "share")
         buildPath = os.path.join(buildPath, self.id)
         os.chdir(srcPath)
@@ -97,19 +98,19 @@ class Instance:
             print "ROM: " + str(self.irom.depth) + "x" + str(self.irom.width) + "bits"
             print "RAM: " + str(self.dram.depth) + "x" + str(self.dram.width) + "bits"
         # Copy libraries in working directory
-        shutil.copy(os.path.join(libPath, "fifo", "stream_units.hdb"), srcPath)
+        shutil.copy(os.path.join(libPath, "stream", "stream_units.hdb"), srcPath)
         shutil.rmtree("vhdl", ignore_errors=True)
-        shutil.copytree(os.path.join(libPath, "fifo", "vhdl"), "vhdl")
+        shutil.copytree(os.path.join(libPath, "stream", "vhdl"), "vhdl")
         # Remove existing build directory
         shutil.rmtree(buildPath, ignore_errors=True)
         # Generate the processor
         subprocess.call(["generateprocessor"] + args + ["-o", buildPath, "-b", self._bemFile, "--shared-files-dir", sharePath,
                                         "-l", "vhdl", "-e", self._entity, "-i", self._idfFile, self._adfFile])
-        # Generate vhdl memory and processor files
+        # Generate processor files
         self.generateProcessor(os.path.join(libPath, "templates", "processor.template"), os.path.join(buildPath, self._processorFile), iromAddrMax, dramAddrMax)
         # Copy files to build directory
-        shutil.copy(self._mifFile, buildPath)
-        shutil.copy(self._mifDataFile, buildPath)
+        shutil.copy(self._mifFile, wrapperPath)
+        shutil.copy(self._mifDataFile, wrapperPath)
         shutil.copy("imem_mau_pkg.vhdl", buildPath)
         if not (self.isNative or self.isBroadcast):
             shutil.copy(self._tbFile, buildPath)
@@ -175,9 +176,9 @@ class Instance:
     def generateProcessor(self, templateFile, targetFile, iromAddrMax, dramAddrMax):
         template = tempita.Template.from_filename(templateFile, namespace={}, encoding=None)
         result = template.substitute(id=self.id, inputs=self.inputs, outputs=self.outputs,
-			irom_width=self.irom.getWidth(), irom_addr=self.irom.getAddr(), irom_depth=self.irom.getDepth(),
-			dram_width=self.dram.getWidth(), dram_addr=self.dram.getAddr(), dram_depth=self.dram.getDepth(),
-			irom_addr_max=iromAddrMax, dram_addr_max=dramAddrMax)
+            irom_width=self.irom.getWidth(), irom_addr=self.irom.getAddr(), irom_depth=self.irom.getDepth(),
+            dram_width=self.dram.getWidth(), dram_addr=self.dram.getAddr(), dram_depth=self.dram.getDepth(),
+            irom_addr_max=iromAddrMax, dram_addr_max=dramAddrMax)
         open(targetFile, "w").write(result)
 
     def diff(self, traceFile, genFile, port):
