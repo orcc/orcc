@@ -427,9 +427,8 @@ public class AstTransformer extends CalSwitch<EObject> {
 			// first add local variables
 			Expression index = null;
 			for (Generator generator : generators) {
-				Variable Variable = generator.getVariable();
-				Var loopVar = caseVariableLocal(Variable);
-				procedure.getLocals().add(loopVar);
+				Variable variable = generator.getVariable();
+				Var loopVar = getLocalByName(variable);
 
 				int lower = Evaluator.getIntValue(generator.getLower());
 				Expression thisIndex = IrFactory.eINSTANCE
@@ -603,12 +602,6 @@ public class AstTransformer extends CalSwitch<EObject> {
 	 */
 	private class StmtTransformer extends CalSwitch<Object> {
 
-		private Object object;
-
-		public StmtTransformer() {
-			this.object = new Object();
-		}
-
 		@Override
 		public Object caseStatementAssign(StatementAssign assign) {
 			int lineNumber = Util.getLocation(assign);
@@ -624,7 +617,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 			Expression value = transformer.doSwitch(assign.getValue());
 			createAssignOrStore(lineNumber, target, indexes, value);
 
-			return object;
+			return null;
 		}
 
 		@Override
@@ -645,7 +638,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 			// creates call with spilling code around it
 			createCall(lineNumber, null, procedure, call.getParameters());
 
-			return object;
+			return null;
 		}
 
 		@Override
@@ -654,8 +647,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 
 			// creates loop variable and assigns it
 			Variable variable = foreach.getVariable();
-			Var loopVar = caseVariableLocal(variable);
-			procedure.getLocals().add(loopVar);
+			Var loopVar = getLocalByName(variable);
 
 			AstExpression astLower = foreach.getLower();
 			ExprTransformer transformer = new ExprTransformer();
@@ -691,7 +683,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 
 			procedure.getNodes().add(nodeWhile);
 
-			return object;
+			return null;
 		}
 
 		@Override
@@ -734,7 +726,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 			List<Node> elseNodes = getNodes(stmtIf.getElse());
 			node.getElseNodes().addAll(elseNodes);
 
-			return object;
+			return null;
 		}
 
 		@Override
@@ -776,7 +768,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 
 			procedure.getNodes().add(nodeWhile);
 
-			return object;
+			return null;
 		}
 
 		/**
@@ -844,11 +836,6 @@ public class AstTransformer extends CalSwitch<EObject> {
 		}
 
 	}
-
-	/**
-	 * allows creation of unique names
-	 */
-	private int blockCount;
 
 	private Procedure print;
 
@@ -1029,7 +1016,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 	private Var caseVariableLocal(Variable variable) {
 		int lineNumber = Util.getLocation(variable);
 		Type type = Typer.getType(variable);
-		String name = getQualifiedName(variable);
+		String name = variable.getName();
 		boolean assignable = !variable.isConstant();
 
 		// create local variable with the given name
@@ -1092,26 +1079,33 @@ public class AstTransformer extends CalSwitch<EObject> {
 	}
 
 	/**
-	 * Returns the qualified name for the given object.
+	 * Returns the IR equivalent of the given AST variable using its name. This
+	 * method is intended for generators/foreach loops.
 	 * 
-	 * @param obj
-	 *            an object
-	 * @return the qualified name for the given object
+	 * @param variable
+	 *            a local variable
+	 * @return the IR equivalent of the given AST variable
 	 */
-	private String getQualifiedName(Variable variable) {
-		EObject cter = variable.eContainer();
-		String name = variable.getName();
-		if (cter instanceof Generator) {
-			name = "generator" + blockCount + "_" + name;
-			blockCount++;
-		} else if (cter instanceof StatementForeach) {
-			name = "foreach" + blockCount + "_" + name;
-			blockCount++;
+	private Var getLocalByName(Variable variable) {
+		Var var = procedure.getLocal(variable.getName());
+		if (var == null) {
+			var = Frontend.getMapping(variable);
+			procedure.getLocals().add(var);
+		} else {
+			Frontend.putMapping(variable, var);
 		}
 
-		return name;
+		return var;
 	}
 
+	/**
+	 * Transforms the AST annotations to IR.
+	 * 
+	 * @param variable
+	 *            an annotated variable
+	 * @param annotations
+	 *            a list of annotations
+	 */
 	private void transformAnnotations(Var variable,
 			List<AstAnnotation> annotations) {
 		for (AstAnnotation astAnnotation : annotations) {
