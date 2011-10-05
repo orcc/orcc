@@ -137,12 +137,17 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		for (Entity entity : entities) {
 			String entityName = entity.getName().toLowerCase();
 			for (IResourceDescription desc : descs.getAllResourceDescriptions()) {
-				for (QualifiedName name : desc.getImportedNames()) {
-					if (name.toString().startsWith(entityName)
-							&& !builtDescs.contains(desc)) {
-						// don't add if the description was just built
-						dependentDescs.add(desc);
+				try {
+					for (QualifiedName name : desc.getImportedNames()) {
+						if (name.toString().startsWith(entityName)
+								&& !builtDescs.contains(desc)) {
+							// don't add if the description was just built
+							dependentDescs.add(desc);
+						}
 					}
+				} catch (UnsupportedOperationException e) {
+					// getImportedNames() may be unsupported (even if the
+					// documentation does not indicate it...)
 				}
 			}
 		}
