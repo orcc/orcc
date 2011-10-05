@@ -63,6 +63,7 @@ import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.VariableReference;
 import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.cal.util.CalActionList;
+import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -205,6 +206,9 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 		checkActionTag(action);
 		checkActionInputs(action.getInputs());
 		checkActionOutputs(action.getOutputs());
+
+		checkInnerVarDecls(action, eINSTANCE.getAstAction_Guards());
+		checkInnerVarDecls(action, eINSTANCE.getAstAction_Statements());
 	}
 
 	@Check(CheckType.NORMAL)
@@ -414,6 +418,11 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 	}
 
 	@Check(CheckType.NORMAL)
+	public void checkFunction(Function function) {
+		checkInnerVarDecls(function, eINSTANCE.getFunction_Expression());
+	}
+
+	@Check(CheckType.NORMAL)
 	public void checkGenerator(Generator generator) {
 		int lower = Evaluator.getIntValue(generator.getLower());
 		int higher = Evaluator.getIntValue(generator.getHigher());
@@ -434,6 +443,50 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 					error("List generated is too large, please use an initialize action",
 							generator, eINSTANCE.getGenerator_Variable(), -1);
 				}
+			}
+		}
+	}
+
+	private void checkInnerVarDecl(Set<String> names, EObject eObject) {
+		for (Variable variable : EcoreHelper
+				.getObjects(eObject, Variable.class)) {
+			String name = variable.getName();
+			if (names.contains(name)) {
+				error("Variable " + name
+						+ " shadows an existing variable with the same name",
+						variable, CalPackage.eINSTANCE.getVariable_Name(), -1);
+			}
+		}
+	}
+
+	private void checkInnerVarDecls(EObject eObject, EStructuralFeature feature) {
+		Set<String> names = new HashSet<String>();
+		Set<Variable> variables = new HashSet<Variable>();
+		for (EObject obj : eObject.eContents()) {
+			if (obj instanceof Variable) {
+				Variable variable = (Variable) obj;
+				variables.add(variable);
+				names.add(variable.getName());
+			}
+		}
+
+		for (Variable variable : variables) {
+			AstExpression value = variable.getValue();
+			if (value != null) {
+				checkInnerVarDecl(names, value);
+			}
+		}
+
+		Object object = eObject.eGet(feature);
+		if (feature.isMany()) {
+			for (Object obj : (Iterable<?>) object) {
+				if (obj instanceof EObject) {
+					checkInnerVarDecl(names, (EObject) obj);
+				}
+			}
+		} else {
+			if (object instanceof EObject) {
+				checkInnerVarDecl(names, (EObject) object);
 			}
 		}
 	}
@@ -522,6 +575,11 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 					+ " contain a cycle: " + builder.toString(), actor,
 					eINSTANCE.getAstActor_Priorities(), -1);
 		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkProcedure(AstProcedure procedure) {
+		checkInnerVarDecls(procedure, eINSTANCE.getAstProcedure_Statements());
 	}
 
 	@Check(CheckType.NORMAL)
