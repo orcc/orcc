@@ -33,9 +33,11 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.orcc.cal.cal.AnnotationArgument;
+import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstAnnotation;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpression;
+import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.ExpressionBinary;
@@ -78,6 +80,7 @@ import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Param;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
@@ -145,9 +148,8 @@ public class AstTransformer extends CalSwitch<EObject> {
 			int lineNumber = Util.getLocation(call);
 
 			// retrieve IR procedure
-			Function astFunction = call.getFunction();
-			Procedure calledProcedure = (Procedure) Frontend
-					.getProcedure(astFunction);
+			Function function = call.getFunction();
+			Procedure calledProcedure = Frontend.getMapping(function);
 
 			// generates a new target
 			Var target = procedure.newTempLocalVariable(
@@ -216,11 +218,8 @@ public class AstTransformer extends CalSwitch<EObject> {
 		public Expression caseExpressionIndex(ExpressionIndex expression) {
 			// we always load in this case
 			int lineNumber = Util.getLocation(expression);
-			Variable Variable = expression.getSource().getVariable();
-			Var var = (Var) Frontend.getMapping(Variable);
-			if (var == null) {
-				var = (Var) getExternalObject(Variable);
-			}
+			Variable variable = expression.getSource().getVariable();
+			Var var = Frontend.getMapping(variable);
 
 			List<Expression> indexes = transformExpressions(expression
 					.getIndexes());
@@ -290,12 +289,8 @@ public class AstTransformer extends CalSwitch<EObject> {
 
 		@Override
 		public Expression caseExpressionVariable(ExpressionVariable expression) {
-			Variable Variable = expression.getValue().getVariable();
-
-			Var var = (Var) Frontend.getMapping(Variable);
-			if (var == null) {
-				var = (Var) getExternalObject(Variable);
-			}
+			Variable variable = expression.getValue().getVariable();
+			Var var = Frontend.getMapping(variable);
 
 			if (var.getType().isList()) {
 				Expression varExpr = IrFactory.eINSTANCE.createExprVar(var);
@@ -433,7 +428,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 			Expression index = null;
 			for (Generator generator : generators) {
 				Variable Variable = generator.getVariable();
-				Var loopVar = transformLocalVariable(Variable);
+				Var loopVar = caseVariableLocal(Variable);
 				procedure.getLocals().add(loopVar);
 
 				int lower = Evaluator.getIntValue(generator.getLower());
@@ -474,8 +469,8 @@ public class AstTransformer extends CalSwitch<EObject> {
 				int lineNumber = Util.getLocation(generator);
 
 				// assigns the loop variable its initial value
-				Variable Variable = generator.getVariable();
-				Var loopVar = (Var) Frontend.getMapping(Variable);
+				Variable variable = generator.getVariable();
+				Var loopVar = Frontend.getMapping(variable);
 
 				// condition
 				AstExpression astHigher = generator.getHigher();
@@ -619,11 +614,8 @@ public class AstTransformer extends CalSwitch<EObject> {
 			int lineNumber = Util.getLocation(assign);
 
 			// get target
-			Variable astTarget = assign.getTarget().getVariable();
-			Var target = (Var) Frontend.getMapping(astTarget);
-			if (target == null) {
-				target = (Var) getExternalObject(astTarget);
-			}
+			Variable variable = assign.getTarget().getVariable();
+			Var target = Frontend.getMapping(variable);
 
 			// transform indexes and value
 			List<Expression> indexes = transformExpressions(assign.getIndexes());
@@ -648,7 +640,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 			}
 
 			// retrieve IR procedure
-			Procedure procedure = Frontend.getProcedure(astProcedure);
+			Procedure procedure = Frontend.getMapping(astProcedure);
 
 			// creates call with spilling code around it
 			createCall(lineNumber, null, procedure, call.getParameters());
@@ -661,8 +653,8 @@ public class AstTransformer extends CalSwitch<EObject> {
 			int lineNumber = Util.getLocation(foreach);
 
 			// creates loop variable and assigns it
-			Variable Variable = foreach.getVariable();
-			Var loopVar = transformLocalVariable(Variable);
+			Variable variable = foreach.getVariable();
+			Var loopVar = caseVariableLocal(variable);
 			procedure.getLocals().add(loopVar);
 
 			AstExpression astLower = foreach.getLower();
@@ -905,6 +897,15 @@ public class AstTransformer extends CalSwitch<EObject> {
 		block.add(returnInstr);
 	}
 
+	@Override
+	public EObject caseAstPort(AstPort astPort) {
+		Type type = EcoreUtil.copy(Typer.getType(astPort));
+		Port port = IrFactory.eINSTANCE.createPort(type, astPort.getName(),
+				astPort.isNative());
+		Frontend.putMapping(astPort, port);
+		return port;
+	}
+
 	/**
 	 * Transforms and adds a mapping from the given AST procedure to an IR
 	 * procedure.
@@ -980,6 +981,72 @@ public class AstTransformer extends CalSwitch<EObject> {
 		return procedure;
 	}
 
+	@Override
+	public EObject caseVariable(Variable variable) {
+		EObject cter = variable.eContainer();
+		if (cter instanceof AstActor || cter instanceof AstUnit) {
+			return caseVariableGlobal(variable);
+		} else {
+			return caseVariableLocal(variable);
+		}
+	}
+
+	/**
+	 * Transforms a global AST variable to its IR equivalent. The initial value
+	 * of an AST state variable is evaluated to a constant by
+	 * {@link #exprEvaluator}.
+	 * 
+	 * @param variable
+	 *            an AST variable
+	 * @return the IR equivalent of the AST variable
+	 */
+	private Var caseVariableGlobal(Variable variable) {
+		int lineNumber = Util.getLocation(variable);
+		Type type = EcoreUtil.copy(Typer.getType(variable));
+		String name = variable.getName();
+		boolean assignable = !variable.isConstant();
+
+		// retrieve initial value (may be null)
+		Expression initialValue = EcoreUtil.copy(Evaluator.getValue(variable));
+
+		// create state variable and put it in the map
+		Var var = IrFactory.eINSTANCE.createVar(lineNumber, type, name,
+				assignable, initialValue);
+		transformAnnotations(var, variable.getAnnotations());
+		Frontend.putMapping(variable, var);
+
+		return var;
+	}
+
+	/**
+	 * Transforms the given AST variable to an IR variable that has the name and
+	 * type of <code>variable</code>.
+	 * 
+	 * @param variable
+	 *            an AST variable
+	 * @return the IR local variable created
+	 */
+	private Var caseVariableLocal(Variable variable) {
+		int lineNumber = Util.getLocation(variable);
+		Type type = Typer.getType(variable);
+		String name = getQualifiedName(variable);
+		boolean assignable = !variable.isConstant();
+
+		// create local variable with the given name
+		Var local = IrFactory.eINSTANCE.createVar(lineNumber, type, name,
+				assignable, 0);
+
+		AstExpression value = variable.getValue();
+		if (value != null) {
+			ExprTransformer transformer = new ExprTransformer(local);
+			Expression expression = transformer.doSwitch(value);
+			createAssignOrStore(lineNumber, local, null, expression);
+		}
+
+		Frontend.putMapping(variable, local);
+		return local;
+	}
+
 	private void createAssignOrStore(int lineNumber, Var target,
 			List<Expression> indexes, Expression value) {
 		// special case for list expressions
@@ -1022,16 +1089,6 @@ public class AstTransformer extends CalSwitch<EObject> {
 		InstCall call = IrFactory.eINSTANCE.createInstCall(lineNumber, target,
 				procedure, parameters);
 		addInstruction(call);
-	}
-
-	private EObject getExternalObject(EObject eObject) {
-		if (eObject.eContainer() instanceof AstUnit) {
-			AstUnit astUnit = (AstUnit) eObject.eContainer();
-			AstEntity entity = (AstEntity) astUnit.eContainer();
-			Frontend.getEntity(entity);
-			return Frontend.getMapping(eObject);
-		}
-		return null;
 	}
 
 	/**
@@ -1098,65 +1155,6 @@ public class AstTransformer extends CalSwitch<EObject> {
 	}
 
 	/**
-	 * Transforms AST state variables to IR state variables. The initial value
-	 * of an AST state variable is evaluated to a constant by
-	 * {@link #exprEvaluator}.
-	 * 
-	 * @param stateVariables
-	 *            a list of AST state variables
-	 * @return an ordered map of IR state variables
-	 */
-	public Var transformGlobalVariable(Variable variable) {
-		int lineNumber = Util.getLocation(variable);
-		Type type = EcoreUtil.copy(Typer.getType(variable));
-		String name = variable.getName();
-		boolean assignable = !variable.isConstant();
-
-		// retrieve initial value (may be null)
-		Expression initialValue = EcoreUtil.copy(Evaluator.getValue(variable));
-
-		// create state variable and put it in the map
-		Var var = IrFactory.eINSTANCE.createVar(lineNumber, type, name,
-				assignable, initialValue);
-		transformAnnotations(var, variable.getAnnotations());
-		Frontend.putMapping(variable, var);
-
-		return var;
-	}
-
-	/**
-	 * Transforms the given AST variable to an IR variable that has the name and
-	 * type of <code>Variable</code>. A binding is added to the
-	 * {@link #mapVariables} between Variable and the created local variable.
-	 * 
-	 * @param Variable
-	 *            an AST variable
-	 * @return the IR local variable created
-	 */
-	public Var transformLocalVariable(Variable Variable) {
-		int lineNumber = Util.getLocation(Variable);
-
-		String name = getQualifiedName(Variable);
-
-		boolean assignable = !Variable.isConstant();
-		Type type = Typer.getType(Variable);
-
-		// create local variable with the given name
-		Var local = IrFactory.eINSTANCE.createVar(lineNumber, type, name,
-				assignable, 0);
-
-		AstExpression value = Variable.getValue();
-		if (value != null) {
-			ExprTransformer transformer = new ExprTransformer(local);
-			Expression expression = transformer.doSwitch(value);
-			createAssignOrStore(lineNumber, local, null, expression);
-		}
-
-		Frontend.putMapping(Variable, local);
-		return local;
-	}
-
-	/**
 	 * Transforms the given list of AST variables to IR variables, and adds them
 	 * to the current {@link #procedure}'s local variables list.
 	 * 
@@ -1165,7 +1163,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 	 */
 	public void transformLocalVariables(List<Variable> variables) {
 		for (Variable Variable : variables) {
-			Var local = transformLocalVariable(Variable);
+			Var local = caseVariableLocal(Variable);
 			procedure.getLocals().add(local);
 		}
 	}
@@ -1180,7 +1178,7 @@ public class AstTransformer extends CalSwitch<EObject> {
 	private void transformParameters(List<Variable> parameters) {
 		List<Param> params = procedure.getParameters();
 		for (Variable astParameter : parameters) {
-			Var local = transformLocalVariable(astParameter);
+			Var local = caseVariableLocal(astParameter);
 			params.add(IrFactory.eINSTANCE.createParam(local));
 		}
 	}

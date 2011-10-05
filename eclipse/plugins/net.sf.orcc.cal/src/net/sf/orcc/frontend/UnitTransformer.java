@@ -37,6 +37,7 @@ import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Unit;
 import net.sf.orcc.ir.Var;
 
@@ -65,24 +66,22 @@ public class UnitTransformer extends CalSwitch<Unit> {
 		int lineNumber = Util.getLocation(astUnit);
 		unit.setLineNumber(lineNumber);
 
-		AstTransformer astTransformer = new AstTransformer();
-
 		// constants
-		for (Variable Variable : astUnit.getVariables()) {
-			Var var = astTransformer.transformGlobalVariable(Variable);
+		for (Variable variable : astUnit.getVariables()) {
+			Var var = Frontend.getMapping(variable, false);
 			unit.getConstants().add(var);
 		}
 
 		// functions
 		for (Function function : astUnit.getFunctions()) {
-			// no need to require this unit
-			unit.getProcedures().add(Frontend.getProcedure(function, false));
+			Procedure procedure = Frontend.getMapping(function, false);
+			unit.getProcedures().add(procedure);
 		}
 
 		// procedures
-		for (AstProcedure procedure : astUnit.getProcedures()) {
-			// no need to require this unit
-			unit.getProcedures().add(Frontend.getProcedure(procedure, false));
+		for (AstProcedure astProcedure : astUnit.getProcedures()) {
+			Procedure procedure = Frontend.getMapping(astProcedure, false);
+			unit.getProcedures().add(procedure);
 		}
 
 		AstEntity entity = (AstEntity) astUnit.eContainer();

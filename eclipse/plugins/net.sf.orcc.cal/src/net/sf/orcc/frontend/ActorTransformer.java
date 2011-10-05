@@ -51,7 +51,6 @@ import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.VariableReference;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.services.Evaluator;
-import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.cal.util.VoidSwitch;
 import net.sf.orcc.frontend.schedule.ActionSorter;
@@ -83,7 +82,6 @@ import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class transforms an AST actor to its IR equivalent.
@@ -125,7 +123,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 				indexes.add(IrFactory.eINSTANCE.createExprInt(i));
 				int lineNumber = portVariable.getLineNumber();
 
-				Var irToken = (Var) Frontend.getMapping(token);
+				Var irToken = Frontend.getMapping(token);
 				InstLoad load = IrFactory.eINSTANCE.createInstLoad(lineNumber,
 						irToken, portVariable, indexes);
 				procedure.getLast().add(load);
@@ -162,7 +160,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 						tmpVar, portVariable, indexes);
 				block.add(load);
 
-				Var irToken = (Var) Frontend.getMapping(token);
+				Var irToken = Frontend.getMapping(token);
 
 				indexes = new ArrayList<Expression>(1);
 				indexes.add(IrFactory.eINSTANCE.createExprVar(loopVar));
@@ -317,35 +315,39 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		int lineNumber = Util.getLocation(astActor);
 		actor.setLineNumber(lineNumber);
 
-		AstTransformer astTransformer = new AstTransformer();
-
 		// parameters
-		for (Variable Variable : astActor.getParameters()) {
-			Var var = astTransformer.transformGlobalVariable(Variable);
+		for (Variable variable : astActor.getParameters()) {
+			Var var = Frontend.getMapping(variable, false);
 			actor.getParameters().add(var);
 		}
 
 		// state variables
-		for (Variable Variable : astActor.getStateVariables()) {
-			Var var = astTransformer.transformGlobalVariable(Variable);
+		for (Variable variable : astActor.getStateVariables()) {
+			Var var = Frontend.getMapping(variable, false);
 			actor.getStateVars().add(var);
 		}
 
 		// functions
 		for (Function function : astActor.getFunctions()) {
-			// no need to require this actor
-			actor.getProcs().add(Frontend.getProcedure(function, false));
+			Procedure procedure = Frontend.getMapping(function, false);
+			actor.getProcs().add(procedure);
 		}
 
 		// procedures
-		for (AstProcedure procedure : astActor.getProcedures()) {
-			// no need to require this actor
-			actor.getProcs().add(Frontend.getProcedure(procedure, false));
+		for (AstProcedure astProcedure : astActor.getProcedures()) {
+			Procedure procedure = Frontend.getMapping(astProcedure, false);
+			actor.getProcs().add(procedure);
 		}
 
 		// transform ports
-		transformPorts(actor.getInputs(), astActor.getInputs());
-		transformPorts(actor.getOutputs(), astActor.getOutputs());
+		for (AstPort astPort : astActor.getInputs()) {
+			Port port = Frontend.getMapping(astPort, false);
+			actor.getInputs().add(port);
+		}
+		for (AstPort astPort : astActor.getOutputs()) {
+			Port port = Frontend.getMapping(astPort, false);
+			actor.getOutputs().add(port);
+		}
 
 		// transform actions
 		ActionList actions = transformActions(astActor.getActions());
@@ -640,12 +642,12 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		if (astPattern instanceof InputPattern) {
 			InputPattern pattern = ((InputPattern) astPattern);
 			astRepeat = pattern.getRepeat();
-			port = (Port) Frontend.getMapping(pattern.getPort());
+			port = Frontend.getMapping(pattern.getPort());
 			totalConsumption = pattern.getTokens().size();
 		} else {
 			OutputPattern pattern = ((OutputPattern) astPattern);
 			astRepeat = pattern.getRepeat();
-			port = (Port) Frontend.getMapping(pattern.getPort());
+			port = Frontend.getMapping(pattern.getPort());
 			totalConsumption = pattern.getValues().size();
 		}
 
@@ -669,7 +671,10 @@ public class ActorTransformer extends CalSwitch<Actor> {
 			// declare tokens
 			List<Variable> tokens = pattern.getTokens();
 			for (Variable token : tokens) {
-				Var local = transformer.transformLocalVariable(token);
+				// do not use getMapping because we want to create a fresh new
+				// variable here
+				// because we can have one in the body and one in the scheduler
+				Var local = (Var) transformer.doSwitch(token);
 				procedure.getLocals().add(local);
 			}
 
@@ -678,24 +683,6 @@ public class ActorTransformer extends CalSwitch<Actor> {
 			OutputPattern pattern = (OutputPattern) astPattern;
 			List<AstExpression> values = pattern.getValues();
 			actionStoreTokens(transformer, procedure, variable, values, repeat);
-		}
-	}
-
-	/**
-	 * Transforms the given AST ports in an ordered map of IR ports.
-	 * 
-	 * @param feature
-	 * @param portList
-	 *            a list of AST ports
-	 * @return an ordered map of IR ports
-	 */
-	private void transformPorts(List<Port> ports, List<AstPort> portList) {
-		for (AstPort astPort : portList) {
-			Type type = EcoreUtil.copy(Typer.getType(astPort));
-			Port port = IrFactory.eINSTANCE.createPort(type, astPort.getName(),
-					astPort.isNative());
-			Frontend.putMapping(astPort, port);
-			ports.add(port);
 		}
 	}
 

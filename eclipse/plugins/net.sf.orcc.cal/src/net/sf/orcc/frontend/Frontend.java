@@ -86,47 +86,31 @@ public class Frontend {
 	}
 
 	/**
-	 * Returns the IR equivalent of the given AST object using its URI.
+	 * Returns the IR equivalent of the AST object.
 	 * 
 	 * @param eObject
-	 *            an AST node
-	 * @return the IR equivalent of the given object
+	 *            an AST object
+	 * @return the IR equivalent of the AST object
 	 */
-	public static EObject getMapping(EObject eObject) {
-		Resource resource = eObject.eResource();
-		if (resource != null) {
-			Cache cache = CacheManager.instance.getCache(resource.getURI());
-			String fragment = resource.getURIFragment(eObject);
-			return cache.getIrMap().get(fragment);
-		}
-
-		return null;
+	public static <T extends EObject> T getMapping(EObject eObject) {
+		return getMapping(eObject, true);
 	}
 
 	/**
-	 * Returns the IR procedure equivalent of the AST function/procedure.
-	 * 
-	 * @param eObject
-	 *            an AST function/procedure
-	 * @return the IR procedure equivalent of the AST function/procedure
-	 */
-	public static Procedure getProcedure(EObject eObject) {
-		return getProcedure(eObject, true);
-	}
-
-	/**
-	 * Returns the IR procedure equivalent of the AST function/procedure. If
+	 * Returns the IR mapping equivalent of the AST object. If
 	 * <code>require</code> is <code>true</code>, first make sure that the IR of
-	 * the given AST function/procedure's containing entity exists.
+	 * the given AST object's containing entity exists.
 	 * 
 	 * @param eObject
-	 *            an AST function/procedure
+	 *            an AST object
 	 * @param require
 	 *            if <code>true</code>, first get the IR of the object's
 	 *            containing entity
-	 * @return the IR procedure equivalent of the AST function/procedure
+	 * @return the IR equivalent of the AST object
 	 */
-	public static Procedure getProcedure(EObject eObject, boolean require) {
+	@SuppressWarnings("unchecked")
+	public static <T extends EObject> T getMapping(EObject eObject,
+			boolean require) {
 		if (require) {
 			AstEntity entity = EcoreUtil2.getContainerOfType(eObject,
 					AstEntity.class);
@@ -135,12 +119,12 @@ public class Frontend {
 
 		// no need to put the mapping back because the AstTransformer does it
 		// that's also why we don't use getOrCompute
-		Procedure proc = (Procedure) getMapping(eObject);
-		if (proc == null) {
-			proc = (Procedure) new AstTransformer().doSwitch(eObject);
+		EObject irObject = internalGetMapping(eObject);
+		if (irObject == null) {
+			irObject = new AstTransformer().doSwitch(eObject);
 		}
 
-		return proc;
+		return (T) irObject;
 	}
 
 	public static List<Procedure> getProcedures(AstEntity astEntity) {
@@ -158,7 +142,25 @@ public class Frontend {
 	 * Returns the IR equivalent of the given AST object using its URI.
 	 * 
 	 * @param eObject
-	 *            an AST node
+	 *            an AST object
+	 * @return the IR equivalent of the given object
+	 */
+	private static EObject internalGetMapping(EObject eObject) {
+		Resource resource = eObject.eResource();
+		if (resource != null) {
+			Cache cache = CacheManager.instance.getCache(resource.getURI());
+			String fragment = resource.getURIFragment(eObject);
+			return cache.getIrMap().get(fragment);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the IR equivalent of the given AST object using its URI.
+	 * 
+	 * @param eObject
+	 *            an AST object
 	 * @return the IR equivalent of the given object
 	 */
 	public static void putMapping(EObject astObject, EObject irObject) {
