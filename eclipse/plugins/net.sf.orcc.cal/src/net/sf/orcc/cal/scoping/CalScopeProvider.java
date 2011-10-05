@@ -89,13 +89,6 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 					CalPackage.eINSTANCE.getAstTransition_Source());
 			addState(schedule, nameSet, nodes);
 		}
-
-		// just for stupid dead-end states
-		//for (AstTransition transition : schedule.getTransitions()) {
-		//	List<INode> nodes = NodeModelUtils.findNodesForFeature(transition,
-		//			CalPackage.eINSTANCE.getAstTransition_Target());
-		//	addState(schedule, nameSet, nodes);
-		//}
 	}
 
 	/**
