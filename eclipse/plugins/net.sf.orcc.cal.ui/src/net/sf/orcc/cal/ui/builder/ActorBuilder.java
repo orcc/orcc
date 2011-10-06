@@ -59,6 +59,7 @@ import org.eclipse.xtext.naming.QualifiedName;
 import org.eclipse.xtext.resource.IResourceDescription;
 import org.eclipse.xtext.resource.IResourceDescription.Delta;
 import org.eclipse.xtext.resource.IResourceDescriptions;
+import org.eclipse.xtext.resource.impl.ResourceDescriptionsProvider;
 
 import com.google.inject.Inject;
 
@@ -72,7 +73,7 @@ import com.google.inject.Inject;
 public class ActorBuilder implements IXtextBuilderParticipant {
 
 	@Inject
-	private IResourceDescriptions descs;
+	private ResourceDescriptionsProvider provider;
 
 	@Override
 	public void build(IBuildContext context, IProgressMonitor monitor)
@@ -132,7 +133,42 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			monitor.worked(1);
 		}
 
-		// find out all entities that import things from the built entities
+		// find out and build all entities that import things from the built
+		// entities
+		if (!entities.isEmpty()) {
+			buildDependentEntities(set, builtDescs, entities);
+		}
+
+		// to free up some memory
+		CacheManager.instance.unloadAllCaches();
+
+		monitor.done();
+	}
+
+	private Entity build(ResourceSet set, IResourceDescription desc)
+			throws CoreException {
+		// load resource and compile
+		Resource resource = set.getResource(desc.getURI(), true);
+		for (EObject obj : resource.getContents()) {
+			if (obj.eClass().equals(CalPackage.eINSTANCE.getAstEntity())) {
+				AstEntity entity = (AstEntity) obj;
+				IFile file = EcoreHelper.getFile(resource);
+				if (hasErrors(file)) {
+					return null;
+				} else {
+					return Frontend.getEntity(entity);
+				}
+			}
+		}
+
+		return null;
+	}
+
+	private void buildDependentEntities(ResourceSet set,
+			Set<IResourceDescription> builtDescs, List<Entity> entities)
+			throws CoreException {
+		IResourceDescriptions descs = provider.createResourceDescriptions();
+
 		Set<IResourceDescription> dependentDescs = new HashSet<IResourceDescription>();
 		for (Entity entity : entities) {
 			String entityName = entity.getName().toLowerCase();
@@ -159,30 +195,6 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 
 			build(set, desc);
 		}
-
-		// to free up some memory
-		CacheManager.instance.unloadAllCaches();
-
-		monitor.done();
-	}
-
-	private Entity build(ResourceSet set, IResourceDescription desc)
-			throws CoreException {
-		// load resource and compile
-		Resource resource = set.getResource(desc.getURI(), true);
-		for (EObject obj : resource.getContents()) {
-			if (obj.eClass().equals(CalPackage.eINSTANCE.getAstEntity())) {
-				AstEntity entity = (AstEntity) obj;
-				IFile file = EcoreHelper.getFile(resource);
-				if (hasErrors(file)) {
-					return null;
-				} else {
-					return Frontend.getEntity(entity);
-				}
-			}
-		}
-
-		return null;
 	}
 
 	/**
