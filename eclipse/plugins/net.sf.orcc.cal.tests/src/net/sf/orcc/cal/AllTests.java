@@ -30,27 +30,30 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.xtext.diagnostics.Severity;
+import org.eclipse.xtext.junit.AbstractXtextTests;
 import org.eclipse.xtext.junit4.InjectWith;
 import org.eclipse.xtext.junit4.XtextRunner;
 import org.eclipse.xtext.junit4.util.ParseHelper;
+import org.eclipse.xtext.resource.IResourceServiceProvider;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.resource.XtextResourceSet;
 import org.eclipse.xtext.util.CancelIndicator;
 import org.eclipse.xtext.validation.CheckMode;
 import org.eclipse.xtext.validation.IResourceValidator;
 import org.eclipse.xtext.validation.Issue;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 @RunWith(XtextRunner.class)
 @InjectWith(CalInjectorProvider.class)
-public class AllTests {
+public class AllTests extends AbstractXtextTests {
 
 	private static final String prefix = "net/sf/orcc/cal/test/";
 
@@ -63,57 +66,11 @@ public class AllTests {
 	@Inject
 	private ParseHelper<AstEntity> parser;
 
-	private XtextResourceSet resourceSet;
+	@Inject
+	private Provider<XtextResourceSet> provider;
 
-	public AllTests() {
-		resourceSet = new XtextResourceSet();
-		resourceSet.addLoadOption(XtextResource.OPTION_RESOLVE_ALL,
-				Boolean.TRUE);
-
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		IProject project = root.getProject(projectName);
-		if (!project.exists()) {
-			IWorkspace workspace = ResourcesPlugin.getWorkspace();
-			try {
-				IProjectDescription description = workspace
-						.newProjectDescription(projectName);
-
-				String[] natures = description.getNatureIds();
-				String[] newNatures = new String[natures.length + 2];
-
-				// add new natures
-				System.arraycopy(natures, 0, newNatures, 2, natures.length);
-				newNatures[0] = OrccProjectNature.NATURE_ID;
-				newNatures[1] = JavaCore.NATURE_ID;
-				description.setNatureIds(newNatures);
-
-				project.create(description, null);
-
-				// retrieves the up-to-date description
-				project.open(null);
-				description = project.getDescription();
-
-				// filters out the Java builder
-				ICommand[] commands = description.getBuildSpec();
-				List<ICommand> buildSpec = new ArrayList<ICommand>(
-						commands.length);
-				for (ICommand command : commands) {
-					if (!JavaCore.BUILDER_ID.equals(command.getBuilderName())) {
-						buildSpec.add(command);
-					}
-				}
-
-				// updates the description and replaces the existing description
-				description.setBuildSpec(buildSpec.toArray(new ICommand[0]));
-				project.setDescription(description, null);
-			} catch (CoreException e) {
-				e.printStackTrace();
-			}
-		}
-
-		// update output folder
-		outputFolder = OrccUtil.getOutputFolder(project);
-	}
+	@Inject
+	private IResourceServiceProvider serviceProvider;
 
 	/**
 	 * Parses, validates, compiles, and interprets the actor defined in the file
@@ -167,30 +124,22 @@ public class AllTests {
 	 *         otherwise <code>null</code>
 	 */
 	private AstEntity parseAndValidate(String name) {
+		XtextResourceSet resourceSet = provider.get();
+		resourceSet.addLoadOption(XtextResource.OPTION_RESOLVE_ALL,
+				Boolean.TRUE);
+
 		InputStream in = Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream(name);
 		URI uri = URI.createPlatformResourceURI(projectPrefix + name, true);
 		AstEntity entity = parser.parse(in, uri, null, resourceSet);
 
-		boolean isValid = true;
-
-		// contains linking errors
+		// validates resources
+		IResourceValidator v = serviceProvider.getResourceValidator();
 		Resource resource = entity.eResource();
-		List<Diagnostic> errors = resource.getErrors();
-		if (!errors.isEmpty()) {
-			for (Diagnostic error : errors) {
-				System.err.println(error);
-			}
-
-			isValid = false;
-		}
-
-		// validates (unique names and CAL validator)
-		IResourceValidator v = ((XtextResource) resource)
-				.getResourceServiceProvider().getResourceValidator();
 		List<Issue> issues = v.validate(resource, CheckMode.ALL,
 				CancelIndicator.NullImpl);
 
+		boolean isValid = true;
 		for (Issue issue : issues) {
 			if (issue.getSeverity() == Severity.ERROR) {
 				System.err.println(issue.toString());
@@ -229,9 +178,8 @@ public class AllTests {
 		expected.getValue().add(l1);
 
 		String strExpected = new ExpressionPrinter().doSwitch(expected);
-		
-		Assert.assertTrue(
-				"value of stateVar should be " + strExpected,
+
+		Assert.assertTrue("value of stateVar should be " + strExpected,
 				EcoreUtil.equals(expr, expected));
 	}
 
@@ -286,6 +234,61 @@ public class AllTests {
 	@Test
 	public void passExecWhile() throws Exception {
 		assertExecution("idx is 60", prefix + "pass/CodegenWhile.cal");
+	}
+
+	@Override
+	@Before
+	public void setUp() {
+		try {
+			super.setUp();
+			with(CalStandaloneSetup.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		IProject project = root.getProject(projectName);
+		if (!project.exists()) {
+			IWorkspace workspace = ResourcesPlugin.getWorkspace();
+			try {
+				IProjectDescription description = workspace
+						.newProjectDescription(projectName);
+
+				String[] natures = description.getNatureIds();
+				String[] newNatures = new String[natures.length + 2];
+
+				// add new natures
+				System.arraycopy(natures, 0, newNatures, 2, natures.length);
+				newNatures[0] = OrccProjectNature.NATURE_ID;
+				newNatures[1] = JavaCore.NATURE_ID;
+				description.setNatureIds(newNatures);
+
+				project.create(description, null);
+
+				// retrieves the up-to-date description
+				project.open(null);
+				description = project.getDescription();
+
+				// filters out the Java builder
+				ICommand[] commands = description.getBuildSpec();
+				List<ICommand> buildSpec = new ArrayList<ICommand>(
+						commands.length);
+				for (ICommand command : commands) {
+					if (!JavaCore.BUILDER_ID.equals(command.getBuilderName())) {
+						buildSpec.add(command);
+					}
+				}
+
+				// updates the description and replaces the existing description
+				description.setBuildSpec(buildSpec.toArray(new ICommand[0]));
+				project.setDescription(description, null);
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+		}
+
+		// update output folder
+		outputFolder = OrccUtil.getOutputFolder(project);
 	}
 
 	@Test
