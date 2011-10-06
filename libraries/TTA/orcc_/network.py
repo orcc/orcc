@@ -76,8 +76,6 @@ class Network:
 
         shutil.rmtree(os.path.join(buildPath, "wrapper"), ignore_errors=True)
         shutil.copytree(os.path.join(libPath, "wrapper"), os.path.join(buildPath, "wrapper"))
-        shutil.rmtree(os.path.join(buildPath, "others"), ignore_errors=True)
-        shutil.copytree(os.path.join(libPath, "others"), os.path.join(buildPath, "others"))
         shutil.rmtree(os.path.join(buildPath, "simulation"), ignore_errors=True)
         shutil.copytree(os.path.join(libPath, "simulation"), os.path.join(buildPath, "simulation"))
 
