@@ -58,65 +58,6 @@ end processor_{{id}};
 architecture bdf_type of processor_{{id}} is
 
   ---------------------------------------------------------------------------
-  -- Components declaration
-  ---------------------------------------------------------------------------
-  component dram
-    generic(size          : integer;
-            width         : integer;
-            widthu		  : integer;
-            init_file     : string;
-            device_family : string
-            );
-    port(address : in  std_logic_vector(widthu-1 downto 0);
-         byteena : in  std_logic_vector(3 downto 0) := (others => '1');
-         clock   : in  std_logic;
-         data    : in  std_logic_vector(width-1 downto 0);
-         wren    : in  std_logic;
-         q       : out std_logic_vector(width-1 downto 0)
-         );
-  end component;
-
-  component irom
-    generic(size          : integer;
-            width         : integer;
-            widthu		  : integer;
-            init_file     : string;
-            device_family : string
-            );
-    port(address : in  std_logic_vector(widthu-1 downto 0);
-         clock   : in  std_logic;
-         q       : out std_logic_vector(width-1 downto 0)
-      );
-  end component;
-
-  component processor_{{id}}_tl
-    port(clk                        : in  std_logic;
-         busy                       : in  std_logic;
-         imem_en_x                  : out std_logic;
-         imem_addr                  : out std_logic_vector(IMEMADDRWIDTH-1 downto 0);
-         imem_data                  : in  std_logic_vector(IMEMWIDTHINMAUS*IMEMMAUWIDTH-1 downto 0);
-         pc_init                    : in  std_logic_vector(IMEMADDRWIDTH-1 downto 0);
-         fu_LSU_dmem_data_in        : in  std_logic_vector(fu_LSU_dataw-1 downto 0);
-         fu_LSU_dmem_data_out       : out std_logic_vector(fu_LSU_dataw-1 downto 0);
-         fu_LSU_dmem_addr           : out std_logic_vector(fu_LSU_addrw-2-1 downto 0);
-         fu_LSU_dmem_mem_en_x       : out std_logic_vector(0 to 0);
-         fu_LSU_dmem_wr_en_x        : out std_logic_vector(0 to 0);
-         fu_LSU_dmem_bytemask       : out std_logic_vector(fu_LSU_dataw/8-1 downto 0);
-{{for input in inputs}}
-         fu_STREAM_IN_{{input.name}}_ext_data    : in  std_logic_vector(31 downto 0);
-         fu_STREAM_IN_{{input.name}}_ext_status  : in  std_logic_vector(31 downto 0);
-         fu_STREAM_IN_{{input.name}}_ext_ack     : out std_logic_vector(0 to 0);
-{{endfor}}
-{{for output in outputs}}
-         fu_STREAM_OUT_{{output.name}}_ext_data   : out std_logic_vector(31 downto 0);
-         fu_STREAM_OUT_{{output.name}}_ext_status : in  std_logic_vector(31 downto 0);
-         fu_STREAM_OUT_{{output.name}}_ext_dv     : out std_logic_vector(0 to 0);
-{{endfor}}
-         rstx                       : in  std_logic);
-  end component;
-  ---------------------------------------------------------------------------
-
-  ---------------------------------------------------------------------------
   -- Signals declaration
   ---------------------------------------------------------------------------
   signal dram_addr          : std_logic_vector(fu_LSU_addrw-2-1 downto 0);
@@ -152,7 +93,7 @@ begin
 {{endif}}
 {{endfor}}
 
-  inst_dram_{{id}} : dram
+  inst_dram_{{id}} : work.dram
     generic map(size          => {{dram_depth}},
                 width         => {{dram_width}},
                 widthu		  => {{dram_addr}},
@@ -167,7 +108,7 @@ begin
 
   wren_wire <= not(wren_x_wire);
 
-  inst_irom_{{id}} : irom
+  inst_irom_{{id}} : work.irom
     generic map(size          => {{irom_depth}},
                 width         => {{irom_width}},
                 widthu		  => {{irom_addr}},
@@ -177,7 +118,7 @@ begin
              address => imem_addr({{irom_addr-1}} downto 0),
              q       => idata_wire);
 
-  processor_{{id}} : processor_{{id}}_tl
+  processor_{{id}} : work.processor_{{id}}_tl
     port map(clk                        => clk,
              busy                       => '0',
              imem_addr                  => imem_addr,

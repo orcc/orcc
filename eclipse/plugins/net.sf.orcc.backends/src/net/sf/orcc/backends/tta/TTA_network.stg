@@ -39,30 +39,6 @@ end top;
 architecture bdf_type of top is
 
   ---------------------------------------------------------------------------
-  -- Components declaration
-  ---------------------------------------------------------------------------
-  component fifo
-    generic
-        (size           : integer := 256;
-         width          : integer := 32;
-         widthu         : integer := 8;
-         device_family  : string  := "Stratix III"
-         );
-    port(wrreq			: in  std_logic;
-         reset_n		: in  std_logic;
-         clk			: in  std_logic;
-         rdreq			: in  std_logic;
-         data			: in  std_logic_vector(width-1 downto 0);
-         q				: out std_logic_vector(width-1 downto 0);
-         status			: out std_logic_vector(31 downto 0)
-         );
-  end component; 
-  
-  <components(network)>
-  ---------------------------------------------------------------------------
-  
-  
-  ---------------------------------------------------------------------------
   -- Signals declaration
   ---------------------------------------------------------------------------  
   <signals(network)>
@@ -222,7 +198,7 @@ assignFifos(connections) ::= <<
 
 assignFifo(connection) ::= <<
 <if(!connection.source.native && !connection.target.native)
->fifo_<indexConnection(connection)> : fifo
+>fifo_<indexConnection(connection)> : work.fifo
   generic map(width =\> 32)
   port map(wrreq   =\> fifo_<indexConnection(connection)>_wrreq,
            reset_n =\> reset_n,
@@ -239,7 +215,7 @@ assignInstances(instances) ::= <<
 >>
 
 assignInstance(instance) ::= <<
-<instance.id>_inst : processor_<instance.id>
+<instance.id>_inst : work.processor_<instance.id>
   port map(clk          =\> clk,
            <assignPorts(instance)>
            reset_n      =\> reset_n);
