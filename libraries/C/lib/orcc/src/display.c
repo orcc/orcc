@@ -82,13 +82,14 @@ void displayYUV_displayPicture(unsigned char *pictureBufferY,
 		unsigned int   pictureWidth, unsigned int pictureHeight) {
 	static unsigned int lastWidth = 0;
 	static unsigned int lastHeight = 0;
+	SDL_Event event;
 	//SDL_Rect rect = { 0, 0, pictureWidth, pictureHeight };
 	rect.x = 0;
 	rect.y = 0;
 	rect.w = pictureWidth;
 	rect.h = pictureHeight;
 
-	SDL_Event event;
+	
 
 	if ((pictureHeight != lastHeight) || (pictureWidth != lastWidth)) {
 		displayYUV_setSize(pictureWidth, pictureHeight);
