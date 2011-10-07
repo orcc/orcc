@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.backends.java;
 
+import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +61,8 @@ public class JavaBackendImpl extends AbstractBackend {
 
 	private final Map<String, String> transformations;
 
+	private boolean debugMode;
+
 	public JavaBackendImpl() {
 		transformations = new HashMap<String, String>();
 		transformations.put("initialize", "initialize_");
@@ -68,6 +72,7 @@ public class JavaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doInitializeOptions() {
+		debugMode = getAttribute(DEBUG_MODE, true);
 	}
 
 	@Override
@@ -90,7 +95,7 @@ public class JavaBackendImpl extends AbstractBackend {
 		List<Actor> actors = parseActors(files);
 
 		actorPrinter = new StandardPrinter(
-				"net/sf/orcc/backends/java/Java_actor.stg", true);
+				"net/sf/orcc/backends/java/Java_actor.stg", !debugMode);
 		actorPrinter.setExpressionPrinter(new CppExprPrinter());
 		actorPrinter.setTypePrinter(new JavaTypePrinter());
 
@@ -111,12 +116,12 @@ public class JavaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected boolean printActor(Actor actor) {
-		// Create folder if necessary
+		// create folder if necessary
 		String folder = path + File.separator + OrccUtil.getFolder(actor);
 		new File(folder).mkdirs();
 
-		return actorPrinter.print("Actor_" + actor.getSimpleName() + ".java",
-				folder, actor);
+		return actorPrinter.print(actor.getSimpleName() + ".java", folder,
+				actor);
 	}
 
 	/**
@@ -130,8 +135,15 @@ public class JavaBackendImpl extends AbstractBackend {
 	protected void printNetwork(Network network) throws OrccException {
 		StandardPrinter printer = new StandardPrinter(
 				"net/sf/orcc/backends/java/Java_network.stg");
+		printer.setExpressionPrinter(new CppExprPrinter());
+		printer.setTypePrinter(new JavaTypePrinter());
 		printer.getOptions().put("fifoSize", fifoSize);
-		printer.print("Network_" + network.getName() + ".java", path, network);
+
+		// create folder if necessary
+		String packageName = OrccUtil.getQualifiedPackage(network.getFile());
+		String folder = path + File.separator + packageName.replace('.', '/');
+		new File(folder).mkdirs();
+		printer.print(network.getName() + ".java", folder, network);
 	}
 
 }

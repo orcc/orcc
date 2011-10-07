@@ -18,11 +18,6 @@ if ("<port.name>".equals(portName)) {
 ///////////////////////////////////////////////////////////////////////////////
 // Types and variables
 ///////////////////////////////////////////////////////////////////////////////
-// the dimensions of a list: [dim1][dim2]...[dimn]
-// does not output anything if $value$ is empty
-listSize(values) ::= <<
-<values : {value | [<value>]} >
->>
 
 // the dimensions of a list: [][]...[]
 // does not output anything if <value> is empty
@@ -40,98 +35,56 @@ variableDeclaration(variable) ::= <<
 
 // a variable definition with initialization
 // called by "local variable", or "state variable with no value"
-variableDeclarationInit(variable) ::= <<
-<if(variable.port)>
-<variable.type>[] <variable><
-else
-><variable.type><listDim(variable.type.dimensions)> <variable><
-if(variable.type.dimensions)
-> = new <variable.type><listSize(variable.type.dimensions)><
-endif
-><endif> >>
-
-parameter(parameter) ::= <<
-private <variableDeclarationInit(parameter)>;
-
->>
-
-parameters(parameters) ::= <<
-<parameters: parameter()>
->>
-
-declareParameters(parameters) ::= <<
-<parameters: variableDeclaration(); wrap, separator=", ">
->>
-
-setParameter(parameter) ::= <<
-this.<parameter> = <parameter>;
-
->>
-
-setParameters(parameters) ::= <<
-<parameters: setParameter()>
->>
+variableDeclarationInit(variable) ::= <%
+<variableDeclaration(variable)>
+<if(variable.type.dimensions)> = new <variable.type><listSize(variable.type.dimensions)>
+<endif>
+%>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constants
 ///////////////////////////////////////////////////////////////////////////////
 
-Constant(constant) ::= <<
-<(constant.class.simpleName)(constant)>
->>
-
-BoolExpr(expr) ::= <<
-<expr.value>
->>
-
-BinaryExpr(expr) ::= <<
-(<expr>)
->>
-
-VarExpr(expr) ::= <<
-<expr>
+printBool(constant) ::= <<
+<constant.value>
 >>
 
 // a state variable
-stateVar(variable) ::= <<
-<if(variable.initialized)>
-private <variableDeclaration(variable)> = <Constant(variable.initialValue)>;
+stateVar(variable) ::= <%
+private <if(variable.initialized)>
+<if (!variable.assignable)> static <endif>
+<variableDeclaration(variable)> = <Constant(variable.initialValue)>;
 <else>
-private <variableDeclarationInit(variable)>;
+<variableDeclarationInit(variable)>;
 <endif>
->>
+%>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Instructions
 ///////////////////////////////////////////////////////////////////////////////
 
-printParameter(parameter) ::= <<
-<if (parameter.stringExpr)
-><parameter><
-else
-><Constant(parameter)><
-endif>
->>
+printParameter(parameter) ::= <%
+<if (parameter.value.stringExpr)>
+<parameter.value>
+<else>
+<Constant(parameter.value)>
+<endif>
+%>
 
 printCall(call) ::= <<
 
 <if(call.print)>System.out.print(<call.parameters: printParameter(); separator=" + ">);<
 else
-><if(call.target)><call.target> = <endif><call.procedure>(<call.parameters; separator=", ">);<
+><if(call.target)><call.target.variable.indexedName> = <endif><call.procedure.name>(<call.parameters: printCallParam(); separator=", ">);<
 endif>
 >>
 
 printLoad(load) ::= <<
 
 <if (load.source.variable.port && !load.indexes.empty)
-><load.target> = <load.source>[<load.source>_Index + <first(load.indexes)>]<rest(load.indexes) : {index | [<index>]}>;<
+><load.target.variable.indexedName> = <load.source.variable.name>[<load.source.variable.name>_Index + <first(load.indexes)>]<rest(load.indexes) : {index | [<index>]}>;<
 else
-><load.target> = <load.source><load.indexes : {index | [<index>]}>;<endif>
->>
-
-// peek instruction
-printPeek(peek) ::= <<
-<printRead(peek)>
+><load.target.variable.indexedName> = <load.source.variable.name><load.indexes : {index | [<index>]}>;<endif>
 >>
 
 // read instruction
@@ -145,17 +98,12 @@ else
 fifo_<read.port.name>.getReadArray(<read.numTokens>);<endif>
 >>
 
-printReadEnd(port, numTokens) ::= <<
-
-fifo_<port.name>.readEnd(<numTokens>);
->>
-
 printStore(store) ::= <<
 
 <if (store.target.port && !store.indexes.empty)
-><store.target>[<store.target>_Index + <first(store.indexes)>]<rest(store.indexes) : {index | [<index>]}> = <store.value>;<
+><store.target.variable.name>[<store.target>_Index + <first(store.indexes)>]<rest(store.indexes) : {index | [<index>]}> = <store.value>;<
 else
-><store.target><store.indexes : {index | [<index>]}> = <store.value>;<endif>
+><store.target.variable.name><store.indexes : {index | [<index>]}> = <store.value>;<endif>
 >>
 
 // write instruction
@@ -165,21 +113,16 @@ printWrite(write) ::= <<
 int <write.port>_Index = fifo_<write.port.name>.getWriteIndex(<write.numTokens>);
 >>
 
-printWriteEnd(port, numTokens) ::= <<
-
-fifo_<port.name>.writeEnd(<numTokens>, <port.name>);
->>
-
 ///////////////////////////////////////////////////////////////////////////////
 // Procedure and actions
 ///////////////////////////////////////////////////////////////////////////////
 
-printProcedure(procedure,action="") ::= <<
+printProcedure(procedure, action=false) ::= <<
 <if(!procedure.native)>
 
-private <procedure.returnType> <procedure>(<procedure.parameters.list: {parameter | <variableDeclaration(parameter)>}; wrap, anchor, separator=", ">) {
-<if(procedure.locals.list)>
-	<procedure.locals.list: {local | <variableDeclarationInit(local)>;<\n>}>
+private <procedure.returnType> <procedure.name>(<procedure.parameters: {parameter | <variableDeclaration(parameter.variable)>}; wrap, anchor, separator=", ">) {
+<if(procedure.locals)>
+	<procedure.locals: {local | <variableDeclarationInit(local)>;<\n>}>
 <endif>
 	<printNodes(procedure.nodes)>
 }
@@ -188,16 +131,16 @@ private <procedure.returnType> <procedure>(<procedure.parameters.list: {paramete
 >>
 
 printAction(action) ::= <<
-private void <action.body.name>() {
-<if(action.body.locals.list)>
-	<action.body.locals.list: {local | <variableDeclarationInit(local)>;<\n>}>
+private void <action.name>() {
+<if(action.body.locals)>
+	<action.body.locals: {local | <variableDeclarationInit(local)>;<\n>}>
 <endif>
 	<printNodes(action.body.nodes)>
-	<action.inputPattern.keys: { port |<printReadEnd(port=port, numTokens=action.inputPattern.(port))>}>
-	<action.outputPattern.keys: { port |<printWriteEnd(port=port, numTokens=action.outputPattern.(port))>}>
+	<action.inputPattern.ports: { port |<printReadEnd(port, action.inputPattern.numTokensMap.(port))>}>
+	<action.outputPattern.ports: { port |<printWriteEnd(port, action.outputPattern.numTokensMap.(port))>}>
 }
 
-<printProcedure(procedure=action.scheduler, action=action)>
+<printProcedure(action.scheduler, action)>
 >>
 
 
@@ -206,15 +149,15 @@ private void <action.body.name>() {
 ///////////////////////////////////////////////////////////////////////////////
 
 outputPattern(pattern) ::= <<
-<pattern.keys:{port|fifo_<port>.hasRoom(<pattern.(port)>)}; separator=" && ">
+<pattern.ports:{port|fifo_<port.name>.hasRoom(<pattern.numTokensMap.(port)>)}; separator=" && ">
 >>
 
 checkInputPatternPort(port) ::= <<
-fifo_<port>.hasTokens(<pattern.(port)>)
+fifo_<port.name>.hasTokens(<pattern.numTokensMap.(port)>)
 >>
 
 checkInputPattern(pattern) ::= <<
-<pattern.keys: { port | <checkInputPatternPort(port)> && }>
+<pattern.ports: { port | <checkInputPatternPort(port)> && }>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -227,7 +170,7 @@ i++;
 >>
 
 actionTest(action) ::= <<
-if (<checkInputPattern(action.inputPattern)>isSchedulable_<action>()) {
+if (<checkInputPattern(action.inputPattern)>isSchedulable_<action.name>()) {
 	<if(action.outputPattern)>
 	if (<outputPattern(action.outputPattern)>) {
 		<actionCall(action)>
@@ -262,48 +205,48 @@ public int schedule() {
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler with FSM
 
-actionCallState(nextState) ::= <<
-<nextState.action>();
-_FSM_state = States.s_<nextState.targetState>;
+actionCallState(transition) ::= <<
+<transition.action>();
+_FSM_state = States.s_<transition.state.name>;
 res = true;
 >>
 
-actionTestState(nextState) ::= <<
-if (<checkInputPattern(nextState.action.inputPattern)>isSchedulable_<nextState.action>()) {
-	<if(nextState.action.outputPattern)>
-	if (<outputPattern(nextState.action.outputPattern)>) {
-		<actionCallState(nextState)>
+actionTestState(transition) ::= <<
+if (<checkInputPattern(transition.action.inputPattern)>isSchedulable_<transition.action>()) {
+	<if(transition.action.outputPattern)>
+	if (<outputPattern(transition.action.outputPattern)>) {
+		<actionCallState(transition)>
 	}
 	<else>
-	<actionCallState(nextState)>
+	<actionCallState(transition)>
 	<endif>
 }>>
 
-schedulingTestState(nextStates) ::= <<
-<nextStates: actionTestState(); separator=" else ">
+schedulingTestState(transitionsList) ::= <<
+<transitionsList: actionTestState(); separator=" else ">
 >>
 
-stateScheduler(transition) ::= <<
-private boolean stateScheduler_<transition.sourceState>() {
+stateScheduler(transitions) ::= <<
+private boolean stateScheduler_<transitions.sourceState.name>() {
 	boolean res = false;
-	<schedulingTestState(transition.nextStateInfo)>
+	<schedulingTestState(transitions.list)>
 	return res;
 }
 
 >>
 
-transition(transition) ::= <<
-case s_<transition.sourceState>:
-	res = stateScheduler_<transition.sourceState>();
+switchTransition(transition) ::= <<
+case s_<transition.sourceState.name>:
+	res = stateScheduler_<transition.sourceState.name>();
 	if (res) {
 		i++;
 	}
 	break;
 >>
 
-switch(transitions) ::= <<
+printSwitch(transitions) ::= <<
 switch (_FSM_state) {
-<transitions: transition()>
+<transitions: switchTransition()>
 default:
 	System.out.println("unknown state: %s\n" + _FSM_state);
 	break;
@@ -312,10 +255,10 @@ default:
 
 schedulerFSM(actions, fsm) ::= <<
 private enum States {
-	<fsm.states : {state | s_<state>}; separator=",\n">
+	<fsm.states : {state | s_<state.name>}; separator=",\n">
 };
 
-private States _FSM_state = States.s_<fsm.initialState>;
+private States _FSM_state = States.s_<fsm.initialState.name>;
 
 <if(actions)>
 private boolean outside_FSM_scheduler() {
@@ -340,10 +283,10 @@ public int schedule() {
 			res = true;
 			i++;
 		} else {
-			<switch(fsm.transitions)>
+			<printSwitch(fsm.transitions)>
 		}
 		<else>
-		<switch(fsm.transitions)>
+		<printSwitch(fsm.transitions)>
 		<endif>
 	}
 
@@ -360,29 +303,28 @@ actor(actor, options) ::= <<
 /**
  * Generated from "<actor.name>"
  */
-package net.sf.orcc.generated.<actor.package>;
+package <actor.package>;
 
 import net.sf.orcc.runtime.*;
 import net.sf.orcc.runtime.actors.IActor;
 
-public class Actor_<actor.simpleName> implements IActor {
-
+public class <actor.simpleName> implements IActor {
 
 	// Input FIFOs
-	<actor.inputs.list: fifo()>
+	<actor.inputs: fifo()>
 	// Output FIFOs
-	<actor.outputs.list: fifo()>
+	<actor.outputs: fifo()>
 	// Parameters of the actor
-	<parameters(actor.parameters.list)>
+	<actor.parameters: {param|private <variableDeclarationInit(param)>;}>
 	// State variables of the actor
-	<actor.stateVars.list: stateVar()>
+	<actor.stateVars: stateVar(); separator="\n">
 	
-	public Actor_<actor.simpleName>(<declareParameters(actor.parameters.list)>) {
-		<setParameters(actor.parameters.list)>
+	public <actor.simpleName>(<actor.parameters: variableDeclaration(); wrap, separator=", ">) {
+		<actor.parameters: {param|this.<param.name> = <param.name>;}; separator="\n">
 	}
 	
 	// Functions/procedures
-	<actor.procs.list: printProcedure()>
+	<actor.procs: printProcedure()>
 	// Actions
 	<actor.actions: printAction()>
 <if(actor.initializes)>
@@ -403,21 +345,19 @@ public class Actor_<actor.simpleName> implements IActor {
 
 	@Override
 	public void setFifo(String portName, Fifo fifo) {
-		<actor.inputs.list: setFifo()><actor.outputs.list: setFifo()>{
+		<actor.inputs: setFifo()><actor.outputs: setFifo()>{
 			String msg = "unknown port \"" + portName + "\"";
 			throw new IllegalArgumentException(msg);
 		}
 	}
 
 	// Action scheduler
-<if(actor.actionScheduler.fsm)>
-	<schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)>
+<if(actor.fsm)>
+	<schedulerFSM(actor.actionsOutsideFsm, actor.fsm)>
 <else>
-	<scheduler(actor.actionScheduler.actions)>
+	<scheduler(actor.actionsOutsideFsm)>
 <endif>
 
 }
 
 >>
-
-

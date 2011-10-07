@@ -294,16 +294,16 @@ while (<whileNode.condition>) {
 
 printProcedureDeclaration(procedure,action="") ::= <<
 <if(procedure.native)>extern<else>static<endif> <procedure.returnType> <procedure.name>(<procedure.parameters: {param |
-<varDecl(variable=param.variable)>}; separator=", ">);
+<varDecl(param.variable)>}; separator=", ">);
 
 >>
 
 printProcedure(procedure,action="") ::= <<
 <if(!procedure.native)>
 static <procedure.returnType> <procedure.name>(<
-  procedure.parameters: {param | <varDecl(variable=param.variable)>}; wrap, anchor, separator=", ">) {
+  procedure.parameters: {param | <varDecl(param.variable)>}; wrap, anchor, separator=", ">) {
 <if(procedure.locals)>
-	<procedure.locals: {local | <varDecl(variable=local,sep=";\n")>}>
+	<procedure.locals: {local | <varDecl(local,";\n")>}>
 <endif>
 	<printNodes(procedure.nodes)>
 }
@@ -318,7 +318,7 @@ static <procedure.returnType> <procedure.name>(<
 printAction(action) ::= <<
 static void <action.body.name>() {
 <if(action.body.locals)>
-	<action.body.locals: {local | <varDecl(variable=local,sep=";\n")>}>
+	<action.body.locals: {local | <varDecl(local,";\n")>}>
 <endif>
 	<printNodes(action.body.nodes)>
 	<action.inputPattern.ports: { port |<printReadEnd(port=port, numTokens=action.inputPattern.numTokensMap.(port))>}>
