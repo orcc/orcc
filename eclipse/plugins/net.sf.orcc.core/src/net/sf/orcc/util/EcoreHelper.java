@@ -93,7 +93,7 @@ public class EcoreHelper {
 	public static <T extends EObject, T1 extends T> List<T> getContainingList(
 			T1 eObject) {
 		EStructuralFeature feature = eObject.eContainingFeature();
-		if (feature.getUpperBound() == EStructuralFeature.UNBOUNDED_MULTIPLICITY) {
+		if (feature.isMany()) {
 			Object obj = eObject.eContainer().eGet(feature);
 			if (obj != null && List.class.isAssignableFrom(obj.getClass())) {
 				return (List<T>) obj;
