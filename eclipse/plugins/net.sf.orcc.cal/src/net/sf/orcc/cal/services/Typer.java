@@ -48,7 +48,6 @@ import net.sf.orcc.cal.cal.AstTypeList;
 import net.sf.orcc.cal.cal.AstTypeString;
 import net.sf.orcc.cal.cal.AstTypeUint;
 import net.sf.orcc.cal.cal.CalFactory;
-import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.ExpressionBinary;
 import net.sf.orcc.cal.cal.ExpressionBoolean;
 import net.sf.orcc.cal.cal.ExpressionCall;
@@ -64,12 +63,7 @@ import net.sf.orcc.cal.cal.ExpressionVariable;
 import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.Generator;
 import net.sf.orcc.cal.cal.InputPattern;
-import net.sf.orcc.cal.cal.OutputPattern;
-import net.sf.orcc.cal.cal.StatementAssign;
-import net.sf.orcc.cal.cal.StatementCall;
-import net.sf.orcc.cal.cal.StatementForeach;
 import net.sf.orcc.cal.cal.Variable;
-import net.sf.orcc.cal.cal.VariableReference;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
@@ -80,7 +74,6 @@ import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
-import net.sf.orcc.ir.util.ExpressionEvaluator;
 import net.sf.orcc.ir.util.TypeUtil;
 
 import org.eclipse.emf.ecore.EObject;
@@ -211,8 +204,6 @@ public class Typer extends CalSwitch<Type> {
 		return type;
 	}
 
-	private Type boundType;
-
 	@Override
 	public Type caseAstPort(AstPort port) {
 		return doSwitch(port.getType());
@@ -269,8 +260,6 @@ public class Typer extends CalSwitch<Type> {
 
 	@Override
 	public Type caseExpressionBinary(ExpressionBinary expression) {
-		setTargetType(expression);
-
 		OpBinary op = OpBinary.getOperator(expression.getOperator());
 		Type t1 = getType(expression.getLeft());
 		Type t2 = getType(expression.getRight());
@@ -369,8 +358,6 @@ public class Typer extends CalSwitch<Type> {
 
 	@Override
 	public Type caseExpressionUnary(ExpressionUnary expression) {
-		setTargetType(expression);
-
 		OpUnary op = OpUnary.getOperator(expression.getUnaryOperator());
 		Type type = getType(expression.getExpression());
 		if (type == null) {
@@ -384,9 +371,10 @@ public class Typer extends CalSwitch<Type> {
 		case MINUS:
 			if (type.isUint()) {
 				int size = ((TypeUint) type).getSize() + 1;
-				type = IrFactory.eINSTANCE.createTypeInt(size);
+				return IrFactory.eINSTANCE.createTypeInt(size);
+			} else {
+				return EcoreUtil.copy(type);
 			}
-			return limitType(type);
 		case NUM_ELTS:
 			if (!type.isList()) {
 				return IrFactory.eINSTANCE.createTypeInt(1);
@@ -475,7 +463,7 @@ public class Typer extends CalSwitch<Type> {
 			}
 		}
 
-		return limitType(type);
+		return type;
 	}
 
 	@Override
@@ -485,83 +473,6 @@ public class Typer extends CalSwitch<Type> {
 		}
 
 		return super.doSwitch(eObject);
-	}
-
-	/**
-	 * Returns the type necessary to hold the index that contains (directly or
-	 * indirectly) the given expression. For instance suppose a list L with a
-	 * type List(type:List(type:int, size=4), size=150), then in L[a * 3][b],
-	 * the expression "a" will be constrained to uint(size=8), and "b" will be
-	 * constrained to uint(size=2) (the index goes from 0 to 3 at most).
-	 * 
-	 * @param reference
-	 *            a reference to a variable whose type is supposed to be a list
-	 * @param indexes
-	 *            a list of indexes as expressions
-	 * @param expression
-	 *            the expression that is a child of one of the indexes
-	 * @return the type that is necessary to store the index t
-	 */
-	private Type findIndexType(VariableReference reference,
-			List<AstExpression> indexes, AstExpression expression) {
-		Variable variable = reference.getVariable();
-		if (variable == null) {
-			return null;
-		}
-
-		Type type = getType(variable);
-		if (type == null) {
-			return null;
-		}
-
-		List<Expression> dimensions = type.getDimensionsExpr();
-
-		Iterator<Expression> itD = dimensions.iterator();
-		Iterator<AstExpression> itI = indexes.iterator();
-		while (itD.hasNext() && itI.hasNext()) {
-			Expression dim = itD.next();
-			if (dim == null) {
-				// no index size: assume 32 bits
-				dim = IrFactory.eINSTANCE.createExprInt(32);
-			}
-
-			AstExpression index = itI.next();
-			if (EcoreUtil.isAncestor(index, expression)) {
-				// uint because index goes from 0 to dim - 1
-				int indexSize = TypeUtil.getSize(new ExpressionEvaluator()
-						.evaluateAsInteger(dim) - 1);
-				return IrFactory.eINSTANCE.createTypeUint(indexSize);
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * Finds the type of the formal parameter that corresponds to the given
-	 * expression in the actual parameters.
-	 * 
-	 * @param formalParameters
-	 *            formal parameters
-	 * @param actualParameters
-	 *            actual parameters
-	 * @param expression
-	 *            an expression
-	 * @return the type of the formal parameter, or <code>null</code>
-	 */
-	private Type findParameter(List<Variable> formalParameters,
-			List<AstExpression> actualParameters, AstExpression expression) {
-		Iterator<Variable> itF = formalParameters.iterator();
-		Iterator<AstExpression> itA = actualParameters.iterator();
-		while (itF.hasNext() && itA.hasNext()) {
-			Variable formal = itF.next();
-			AstExpression actual = itA.next();
-			if (actual == expression) {
-				return getType(formal);
-			}
-		}
-
-		return null;
 	}
 
 	/**
@@ -610,10 +521,10 @@ public class Typer extends CalSwitch<Type> {
 		case DIV:
 		case DIV_INT:
 		case SHIFT_RIGHT:
-			return limitType(t1);
+			return EcoreUtil.copy(t1);
 
 		case MOD:
-			return limitType(t2);
+			return EcoreUtil.copy(t2);
 
 		case SHIFT_LEFT:
 			return createType(t1, t2, LubSumPow.instance);
@@ -635,122 +546,6 @@ public class Typer extends CalSwitch<Type> {
 		}
 
 		return null;
-	}
-
-	/**
-	 * Returns a new type that is bounded by the {@link #boundType}.
-	 * 
-	 * @param type
-	 *            a type
-	 * @return a new type that is bounded by the {@link #boundType}
-	 */
-	private Type limitType(Type type) {
-		if (type != null) {
-			if (boundType == null) {
-				// when no bound type exists, limit to 32 bits
-				int size = 32;
-				Type maxUint = IrFactory.eINSTANCE.createTypeUint(size);
-				Type maxType = TypeUtil.getGlb(type, maxUint);
-
-				if (maxType != null) {
-					if (maxType.getSizeInBits() > size) {
-						if (maxType.isInt()) {
-							((TypeInt) maxType).setSize(size);
-						} else if (maxType.isUint()) {
-							((TypeUint) maxType).setSize(size);
-						}
-					}
-				}
-				return maxType;
-			} else {
-				return TypeUtil.getGlb(type, boundType);
-			}
-		}
-
-		return type;
-	}
-
-	/**
-	 * Finds the target type of the container of the given expression, and sets
-	 * the maxSize field from it. If no target is found, set maxSize to 32. The
-	 * container is the direct container of the expression.
-	 * 
-	 * @param expression
-	 *            an expression
-	 */
-	private void setTargetType(AstExpression expression) {
-		EObject cter = expression.eContainer();
-		if (cter != null) {
-			switch (cter.eClass().getClassifierID()) {
-			case CalPackage.EXPRESSION_CALL: {
-				ExpressionCall call = (ExpressionCall) cter;
-				List<Variable> formal = call.getFunction().getParameters();
-				List<AstExpression> actual = call.getParameters();
-				boundType = findParameter(formal, actual, expression);
-				break;
-			}
-
-			case CalPackage.EXPRESSION_INDEX: {
-				ExpressionIndex index = (ExpressionIndex) cter;
-				boundType = findIndexType(index.getSource(),
-						index.getIndexes(), expression);
-				break;
-			}
-
-			case CalPackage.FUNCTION:
-				Function func = (Function) cter;
-				boundType = getType(func);
-				break;
-
-			case CalPackage.GENERATOR:
-				Generator generator = (Generator) cter;
-				boundType = getType(generator.getVariable());
-				break;
-
-			case CalPackage.OUTPUT_PATTERN:
-				OutputPattern pattern = (OutputPattern) cter;
-				boundType = getType(pattern.getPort());
-				break;
-
-			case CalPackage.STATEMENT_ASSIGN: {
-				StatementAssign assign = (StatementAssign) cter;
-				if (expression == assign.getValue()) {
-					// expression is located in the value
-
-					// get the innermost type of the target
-					boundType = getType(assign.getTarget().getVariable());
-					for (int i = 0; i < assign.getIndexes().size(); i++) {
-						if (boundType != null && boundType.isList()) {
-							boundType = ((TypeList) boundType).getType();
-						}
-					}
-				} else {
-					// expression is located in the indexes
-					boundType = findIndexType(assign.getTarget(),
-							assign.getIndexes(), expression);
-				}
-				break;
-			}
-
-			case CalPackage.STATEMENT_CALL: {
-				StatementCall call = (StatementCall) cter;
-				List<Variable> formal = call.getProcedure().getParameters();
-				List<AstExpression> actual = call.getParameters();
-				boundType = findParameter(formal, actual, expression);
-				break;
-			}
-
-			case CalPackage.STATEMENT_FOREACH:
-				StatementForeach foreach = (StatementForeach) cter;
-				boundType = getType(foreach.getVariable());
-				break;
-
-			case CalPackage.VARIABLE:
-				Variable variable = (Variable) cter;
-				boundType = getType(variable);
-				break;
-			}
-		}
 	}
 
 }
