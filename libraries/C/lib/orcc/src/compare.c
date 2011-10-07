@@ -109,3 +109,27 @@ void compare_NBytes(unsigned char * inTable, unsigned short nbTokenToRead){
 	}
 	free(outTable);
 }
+
+int compare_NBytesNext(unsigned char * inTable, unsigned short nbTokenToRead, unsigned short display){
+  unsigned char *outTable = (unsigned char *) malloc(nbTokenToRead);
+  int n;
+  int noEqual = 1;
+  while (noEqual == 1) {
+    n = fread(outTable, 1, nbTokenToRead, cmpFile);
+    if(n < nbTokenToRead) {
+      fprintf(stderr,"Problem when reading compare file.\n");
+      wait_for_key();
+      compare_close();
+      exit(-5);
+    }
+    noEqual = 0;
+    while(n>0) {
+      if( outTable[n-1] != inTable[n-1] ) {
+	noEqual = 1;
+      }
+      n--;
+    }
+    if (noEqual == 1 && display != 0) printf("%d \n",display);
+  }
+  free(outTable);
+}
