@@ -45,8 +45,9 @@ class Network:
 
     def compile(self, srcPath, libPath, args, debug):
         for instance in self.instances:
-            print ">> Instance " + instance.id + "."
-            instance.compile(srcPath, libPath, args, debug)
+            if not instance.isNative:
+                print ">> Instance " + instance.id + "."
+                instance.compile(srcPath, libPath, args, debug)
 
 
     def simulate(self, srcPath, tracePath):
@@ -67,9 +68,10 @@ class Network:
         dramAddrList = []
 
         for instance in self.instances:
-            instance.initializeMemories(srcPath)
-            iromAddrList.append(instance.irom.getAddr())
-            dramAddrList.append(instance.dram.getAddr())
+            if not instance.isNative:
+                instance.initializeMemories(srcPath)
+                iromAddrList.append(instance.irom.getAddr())
+                dramAddrList.append(instance.dram.getAddr())
 
         iromAddrMax = max(iromAddrList)
         dramAddrMax = max(dramAddrList)
@@ -80,5 +82,6 @@ class Network:
         shutil.copytree(os.path.join(libPath, "simulation"), os.path.join(buildPath, "simulation"))
 
         for instance in self.instances:
-            print ">> Instance " + instance.id + "."
-            instance.generate(srcPath, buildPath, libPath, iromAddrMax, dramAddrMax, args, debug)
+            if not instance.isNative:
+                print ">> Instance " + instance.id + "."
+                instance.generate(srcPath, buildPath, libPath, iromAddrMax, dramAddrMax, args, debug)
