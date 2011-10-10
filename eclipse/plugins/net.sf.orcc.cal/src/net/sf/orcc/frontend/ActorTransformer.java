@@ -209,7 +209,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	 *            an integer number of repeat (equals to one if there is no
 	 *            repeat)
 	 */
-	private void actionStoreTokens(AstTransformer transformer,
+	private void actionStoreTokens(StructTransformer transformer,
 			Procedure procedure, Var portVariable, List<AstExpression> values,
 			int repeat) {
 		if (repeat == 1) {
@@ -408,7 +408,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	 * @param result
 	 *            target local variable
 	 */
-	private void createActionTest(AstTransformer transformer,
+	private void createActionTest(StructTransformer transformer,
 			Procedure procedure, AstAction astAction, Pattern peekPattern,
 			Var result) {
 		List<AstExpression> guards = astAction.getGuards();
@@ -497,7 +497,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	 */
 	private void transformActionBody(AstAction astAction, Procedure body,
 			Pattern inputPattern, Pattern outputPattern) {
-		AstTransformer transformer = new AstTransformer(body);
+		StructTransformer transformer = new StructTransformer(body);
 
 		for (InputPattern pattern : astAction.getInputs()) {
 			transformPattern(transformer, body, pattern, inputPattern);
@@ -544,7 +544,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	 */
 	private void transformActionScheduler(AstAction astAction,
 			Procedure scheduler, Pattern peekPattern) {
-		AstTransformer transformer = new AstTransformer(scheduler);
+		StructTransformer transformer = new StructTransformer(scheduler);
 
 		Var result = scheduler.newTempLocalVariable(
 				IrFactory.eINSTANCE.createTypeBool(), "result");
@@ -571,7 +571,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	 * @param guards
 	 *            list of guard expressions
 	 */
-	private Expression transformGuards(AstTransformer transformer,
+	private Expression transformGuards(StructTransformer transformer,
 			List<AstExpression> guards) {
 		List<Expression> expressions = transformer.transformExpressions(guards);
 		Iterator<Expression> it = expressions.iterator();
@@ -593,7 +593,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	 * @param astAction
 	 *            an AST action
 	 */
-	private void transformInputPatternPeek(AstTransformer transformer,
+	private void transformInputPatternPeek(StructTransformer transformer,
 			Procedure scheduler, final AstAction astAction, Pattern peekPattern) {
 		final Set<InputPattern> patterns = new HashSet<InputPattern>();
 		VoidSwitch peekVariables = new VoidSwitch() {
@@ -634,7 +634,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	 * @param irPattern
 	 *            IR input or output pattern
 	 */
-	private void transformPattern(AstTransformer transformer,
+	private void transformPattern(StructTransformer transformer,
 			Procedure procedure, EObject astPattern, Pattern irPattern) {
 		Port port;
 		int totalConsumption;

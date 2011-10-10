@@ -121,7 +121,7 @@ public class Frontend {
 		// that's also why we don't use getOrCompute
 		EObject irObject = internalGetMapping(eObject);
 		if (irObject == null) {
-			irObject = new AstTransformer().doSwitch(eObject);
+			irObject = new StructTransformer().doSwitch(eObject);
 		}
 
 		return (T) irObject;
