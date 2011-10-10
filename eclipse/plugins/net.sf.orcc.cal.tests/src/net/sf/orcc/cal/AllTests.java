@@ -207,8 +207,8 @@ public class AllTests extends AbstractXtextTests {
 		// but because the expression is assigned to y whose type is int(...)
 		// it becomes int(size=5)
 		type = Typer.getType(y.getValue());
-		Assert.assertTrue("type of value of y should be int(size=5)",
-				EcoreUtil.equals(type, IrFactory.eINSTANCE.createTypeInt(5)));
+		Assert.assertTrue("type of value of y should be uint(size=4)",
+				EcoreUtil.equals(type, IrFactory.eINSTANCE.createTypeUint(4)));
 	}
 
 	@Test
