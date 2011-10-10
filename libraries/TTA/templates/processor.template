@@ -33,7 +33,7 @@ entity processor_{{id}} is
       clk          : in  std_logic;
 {{for input in inputs}}
 {{if input.isNative}}
-      {{input.name}}_in     : in  std_logic_vector({{input.size - 1}} downto 0);     
+      {{input.name}}     : in  std_logic_vector({{input.size - 1}} downto 0);     
 {{else}}
       data_{{input.index}}_in    : in  std_logic_vector(31 downto 0);
       status_{{input.index}}_in  : in  std_logic_vector(31 downto 0);
@@ -42,7 +42,7 @@ entity processor_{{id}} is
 {{endfor}}
 {{for output in outputs}}
 {{if output.isNative}}
-      {{output.name}}_out     : out  std_logic_vector({{output.size - 1}} downto 0);     
+      {{output.name}}     : out  std_logic_vector({{output.size - 1}} downto 0);     
 {{else}}
       data_{{output.index}}_out   : out std_logic_vector(31 downto 0);
       status_{{output.index}}_out : in  std_logic_vector(31 downto 0);
@@ -84,12 +84,12 @@ begin
 
 {{for input in inputs}}
 {{if input.isNative}}
-  {{input.name}}_in <= s_{{input.name}}({{output.size - 1}} downto 0);
+  {{input.name}} <= s_{{input.name}}({{output.size - 1}} downto 0);
 {{endif}}
 {{endfor}}
 {{for output in outputs}}
 {{if output.isNative}}
-  {{output.name}}_out <= s_{{output.name}}({{output.size - 1}} downto 0);
+  {{output.name}} <= s_{{output.name}}({{output.size - 1}} downto 0);
 {{endif}}
 {{endfor}}
 

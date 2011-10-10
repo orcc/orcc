@@ -185,20 +185,20 @@ assignNetworkPorts(network) ::= <<
 >>
 
 assignNetworkPort(connection) ::= <<
-<if(!connection.source)
-><network.sourceMap.(connection).port.name> \<= s_<indexConnection(connection)>;<
-elseif(!connection.target)
-><network.targetMap.(connection).port.name> \<= s_<indexConnection(connection)>;<
-endif>
+<if(!connection.source)>
+<network.sourceMap.(connection).port.name> \<= s_<indexConnection(connection)>;
+<elseif(!connection.target)>
+<network.targetMap.(connection).port.name> \<= s_<indexConnection(connection)>;
+<endif>
 >>
 
 assignFifos(connections) ::= <<
-<connections: assignFifo(); separator="\n\n">
+<connections: assignFifo()>
 >>
 
 assignFifo(connection) ::= <<
-<if(!connection.source.native && !connection.target.native)
->fifo_<indexConnection(connection)> : work.fifo
+<if(!connection.source.native && !connection.target.native)>
+fifo_<indexConnection(connection)> : work.fifo
   generic map(width =\> 32)
   port map(wrreq   =\> fifo_<indexConnection(connection)>_wrreq,
            reset_n =\> reset_n,
@@ -206,8 +206,9 @@ assignFifo(connection) ::= <<
            rdreq   =\> fifo_<indexConnection(connection)>_rdreq,
            data    =\> fifo_<indexConnection(connection)>_data(31 downto 0),
            q       =\> fifo_<indexConnection(connection)>_q(31 downto 0),
-           status  =\> fifo_<indexConnection(connection)>_status);<
-endif>
+           status  =\> fifo_<indexConnection(connection)>_status);
+           
+<endif>
 >>
 
 assignInstances(instances) ::= <<
@@ -215,7 +216,7 @@ assignInstances(instances) ::= <<
 >>
 
 assignInstance(instance) ::= <<
-<instance.id>_inst : work.processor_<instance.id>
+<instance.id>_inst : work.<if(!instance.actor.native)>processor_<endif><instance.id>
   port map(clk          =\> clk,
            <assignPorts(instance)>
            reset_n      =\> reset_n);
@@ -233,7 +234,7 @@ endif>
 
 assignInputPort(port) ::= <<
 <if(port.native)
-><port.name>_in   =\> s_<indexInputConnection(port)>,<
+><port.name>   =\> s_<indexInputConnection(port)>,<
 else
 >data_<indexPort(port)>_in    =\> fifo_<indexInputConnection(port)>_q,
 status_<indexPort(port)>_in  =\> fifo_<indexInputConnection(port)>_status,
@@ -243,7 +244,7 @@ endif>
 
 assignOutputPort(port) ::= <<
 <if(port.native)
-><port.name>_out   =\> s_<indexOutputConnection(port)>,<
+><port.name>   =\> s_<indexOutputConnection(port)>,<
 else
 >data_<indexPort(port)>_out   =\> fifo_<indexOutputConnection(port)>_data,
 status_<indexPort(port)>_out =\> fifo_<indexOutputConnection(port)>_status,

@@ -44,13 +44,13 @@ import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
 import net.sf.orcc.backends.llvm.transformations.GetElementPtrAdder;
 import net.sf.orcc.backends.llvm.transformations.PrintlnTransformation;
 import net.sf.orcc.backends.transformations.CastAdder;
+import net.sf.orcc.backends.transformations.InstPhiTransformation;
 import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.backends.transformations.tac.TacTransformation;
 import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.tta.architecture.TTA;
 import net.sf.orcc.backends.tta.transformations.ActorTypeResizer;
 import net.sf.orcc.backends.tta.transformations.BroadcastTypeResizer;
-import net.sf.orcc.backends.transformations.InstPhiTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.transformations.BlockCombine;
 import net.sf.orcc.ir.transformations.BuildCFG;
@@ -147,8 +147,9 @@ public class TTABackendImpl extends AbstractBackend {
 		StandardPrinter tbPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/tta/TTA_testbench.stg", !debugMode, false);
 
-		String instancePath = OrccUtil.createFolder(path, instance.getId());
+		String instancePath = null;
 		if (!(instance.isActor() && instance.getActor().isNative())) {
+			instancePath = OrccUtil.createFolder(path, instance.getId());
 			printProcessor(instance, instancePath);
 		}
 		tbPrinter.print(instance.getId() + "_tb.vhd", instancePath, instance);
