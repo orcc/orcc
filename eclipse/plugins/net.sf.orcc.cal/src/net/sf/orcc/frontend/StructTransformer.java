@@ -46,17 +46,14 @@ import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.Annotation;
-import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstReturn;
-import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.ecore.EObject;
@@ -87,17 +84,6 @@ public class StructTransformer extends CalSwitch<EObject> {
 	 */
 	public StructTransformer(Procedure procedure) {
 		this.procedure = procedure;
-	}
-
-	/**
-	 * Adds the given instruction to the last block of the current procedure.
-	 * 
-	 * @param instruction
-	 *            an instruction
-	 */
-	private void addInstruction(Instruction instruction) {
-		NodeBlock block = procedure.getLast();
-		block.add(instruction);
 	}
 
 	/**
@@ -190,8 +176,9 @@ public class StructTransformer extends CalSwitch<EObject> {
 		if (function.isNative()) {
 			value = null;
 		} else {
-			ExprTransformer transformer = new ExprTransformer(procedure);
-			value = (Expression) transformer.doSwitch(function.getExpression());
+			ExprTransformer transformer = new ExprTransformer(procedure,
+					procedure.getNodes());
+			value = transformer.doSwitch(function.getExpression());
 		}
 
 		addReturn(procedure, value);
@@ -256,34 +243,15 @@ public class StructTransformer extends CalSwitch<EObject> {
 
 		AstExpression value = variable.getValue();
 		if (value != null) {
-			ExprTransformer transformer = new ExprTransformer(procedure, local);
+			ExprTransformer transformer = new ExprTransformer(procedure,
+					procedure.getNodes(), local);
 			Expression expression = transformer.doSwitch(value);
-			createAssignOrStore(lineNumber, local, null, expression);
+			AstIrUtil.createAssignOrStore(procedure.getNodes(), lineNumber,
+					local, null, expression);
 		}
 
 		Frontend.putMapping(variable, local);
 		return local;
-	}
-
-	private void createAssignOrStore(int lineNumber, Var target,
-			List<Expression> indexes, Expression value) {
-		// special case for list expressions
-		if (value.isVarExpr()) {
-			Use use = ((ExprVar) value).getUse();
-			if (use.getVariable().getType().isList()) {
-				return;
-			}
-		}
-
-		Instruction instruction;
-		if (target.isLocal() && (indexes == null || indexes.isEmpty())) {
-			instruction = IrFactory.eINSTANCE.createInstAssign(lineNumber,
-					target, value);
-		} else {
-			instruction = IrFactory.eINSTANCE.createInstStore(lineNumber,
-					target, indexes, value);
-		}
-		addInstruction(instruction);
 	}
 
 	/**
@@ -307,6 +275,18 @@ public class StructTransformer extends CalSwitch<EObject> {
 	}
 
 	/**
+	 * Transforms the given AST expression to an IR expression.
+	 * 
+	 * @param expression
+	 *            an AST expression
+	 * @return an IR expression
+	 */
+	public Expression transformExpression(AstExpression value) {
+		return new ExprTransformer(procedure, procedure.getNodes())
+				.doSwitch(value);
+	}
+
+	/**
 	 * Transforms the given AST expressions to a list of IR expressions. In the
 	 * process nodes may be created and added to the current {@link #procedure},
 	 * since many RVC-CAL expressions are expressed with IR statements.
@@ -319,7 +299,8 @@ public class StructTransformer extends CalSwitch<EObject> {
 		int length = expressions.size();
 		List<Expression> irExpressions = new ArrayList<Expression>(length);
 		for (AstExpression expression : expressions) {
-			ExprTransformer transformer = new ExprTransformer(procedure);
+			ExprTransformer transformer = new ExprTransformer(procedure,
+					procedure.getNodes());
 			irExpressions.add(transformer.doSwitch(expression));
 		}
 		return irExpressions;
@@ -362,14 +343,8 @@ public class StructTransformer extends CalSwitch<EObject> {
 	 *            a list of AST statements
 	 */
 	public void transformStatements(List<Statement> statements) {
-		StmtTransformer transformer = new StmtTransformer(procedure);
-		for (Statement statement : statements) {
-			transformer.doSwitch(statement);
-		}
-	}
-
-	public Expression transformExpression(AstExpression value) {
-		return new ExprTransformer(procedure).doSwitch(value);
+		new StmtTransformer(procedure, procedure.getNodes())
+				.doSwitch(statements);
 	}
 
 }

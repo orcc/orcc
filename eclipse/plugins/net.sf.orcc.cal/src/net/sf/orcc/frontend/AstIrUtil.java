@@ -9,13 +9,15 @@ import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.IrUtil;
 
 public class AstIrUtil {
 
-	public static void createAssignOrStore(Procedure procedure, int lineNumber,
+	public static void createAssignOrStore(List<Node> nodes, int lineNumber,
 			Var target, List<Expression> indexes, Expression value) {
 		// special case for list expressions
 		if (value.isVarExpr()) {
@@ -34,7 +36,7 @@ public class AstIrUtil {
 					target, indexes, value);
 		}
 
-		procedure.getLast().add(instruction);
+		IrUtil.getLast(nodes).add(instruction);
 	}
 
 	/**
@@ -67,11 +69,11 @@ public class AstIrUtil {
 	 * @return a list of IR expressions
 	 */
 	public static List<Expression> transformExpressions(Procedure procedure,
-			List<AstExpression> expressions) {
+			List<Node> nodes, List<AstExpression> expressions) {
 		int length = expressions.size();
 		List<Expression> irExpressions = new ArrayList<Expression>(length);
 		for (AstExpression expression : expressions) {
-			ExprTransformer transformer = new ExprTransformer(procedure);
+			ExprTransformer transformer = new ExprTransformer(procedure, nodes);
 			irExpressions.add(transformer.doSwitch(expression));
 		}
 		return irExpressions;

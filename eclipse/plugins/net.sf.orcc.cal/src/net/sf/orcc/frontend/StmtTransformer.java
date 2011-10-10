@@ -48,8 +48,6 @@ import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
-import net.sf.orcc.ir.InstLoad;
-import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
@@ -94,7 +92,7 @@ public class StmtTransformer extends CalSwitch<EObject> {
 
 		@Override
 		public Object caseAstExpression(AstExpression astExpression) {
-			ExprTransformer transformer = new ExprTransformer(procedure);
+			ExprTransformer transformer = new ExprTransformer(procedure, nodes);
 			Expression expression = transformer.doSwitch(astExpression);
 			parameters.add(expression);
 
@@ -106,7 +104,8 @@ public class StmtTransformer extends CalSwitch<EObject> {
 			OpBinary op = OpBinary.getOperator(astExpression.getOperator());
 			if (op == OpBinary.PLUS) {
 				doSwitch(astExpression.getLeft());
-				ExprTransformer transformer = new ExprTransformer(procedure);
+				ExprTransformer transformer = new ExprTransformer(procedure,
+						nodes);
 				Expression expression = transformer.doSwitch(astExpression
 						.getRight());
 				parameters.add(expression);
@@ -120,6 +119,24 @@ public class StmtTransformer extends CalSwitch<EObject> {
 
 	}
 
+	private List<Node> nodes;
+
+	private Procedure print;
+
+	private Procedure procedure;
+
+	/**
+	 * Creates a new AST to IR transformer, which will append instructions and
+	 * nodes to the given procedure.
+	 * 
+	 * @param procedure
+	 *            a procedure
+	 */
+	public StmtTransformer(Procedure procedure, List<Node> nodes) {
+		this.procedure = procedure;
+		this.nodes = nodes;
+	}
+
 	@Override
 	public EObject caseStatementAssign(StatementAssign assign) {
 		int lineNumber = Util.getLocation(assign);
@@ -130,13 +147,13 @@ public class StmtTransformer extends CalSwitch<EObject> {
 
 		// transform indexes and value
 		List<Expression> indexes = AstIrUtil.transformExpressions(procedure,
-				assign.getIndexes());
+				nodes, assign.getIndexes());
 
-		ExprTransformer transformer = new ExprTransformer(procedure, target,
-				indexes);
+		ExprTransformer transformer = new ExprTransformer(procedure, nodes,
+				target, indexes);
 		Expression value = transformer.doSwitch(assign.getValue());
-		AstIrUtil.createAssignOrStore(procedure, lineNumber, target, indexes,
-				value);
+		AstIrUtil
+				.createAssignOrStore(nodes, lineNumber, target, indexes, value);
 
 		return null;
 	}
@@ -158,12 +175,12 @@ public class StmtTransformer extends CalSwitch<EObject> {
 
 		// transform parameters
 		List<Expression> parameters = AstIrUtil.transformExpressions(procedure,
-				stmtCall.getParameters());
+				nodes, stmtCall.getParameters());
 
 		// add call
 		InstCall call = IrFactory.eINSTANCE.createInstCall(lineNumber, null,
 				calledProc, parameters);
-		procedure.getLast().add(call);
+		IrUtil.getLast(nodes).add(call);
 
 		return null;
 	}
@@ -177,11 +194,11 @@ public class StmtTransformer extends CalSwitch<EObject> {
 		Var loopVar = AstIrUtil.getLocalByName(procedure, variable);
 
 		AstExpression astLower = foreach.getLower();
-		ExprTransformer transformer = new ExprTransformer(procedure);
+		ExprTransformer transformer = new ExprTransformer(procedure, nodes);
 		Expression lower = transformer.doSwitch(astLower);
 		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(lineNumber,
 				loopVar, lower);
-		procedure.getLast().add(assign);
+		IrUtil.getLast(nodes).add(assign);
 
 		// condition
 		AstExpression astHigher = foreach.getHigher();
@@ -190,24 +207,26 @@ public class StmtTransformer extends CalSwitch<EObject> {
 				IrFactory.eINSTANCE.createExprVar(loopVar), OpBinary.LE,
 				higher, IrFactory.eINSTANCE.createTypeBool());
 
+		// create while
+		NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
+		nodeWhile.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
+		nodeWhile.setLineNumber(lineNumber);
+		nodeWhile.setCondition(condition);
+
+		nodes.add(nodeWhile);
+
 		// body
-		List<Node> nodes = getNodes(foreach.getStatements());
-		NodeBlock block = IrUtil.getLast(nodes);
+		new StmtTransformer(procedure, nodeWhile.getNodes()).doSwitch(foreach
+				.getStatements());
+
+		// add increment
+		NodeBlock block = IrUtil.getLast(nodeWhile.getNodes());
 		assign = IrFactory.eINSTANCE.createInstAssign(lineNumber, loopVar,
 				IrFactory.eINSTANCE.createExprBinary(
 						IrFactory.eINSTANCE.createExprVar(loopVar),
 						OpBinary.PLUS, IrFactory.eINSTANCE.createExprInt(1),
 						loopVar.getType()));
 		block.add(assign);
-
-		// create while
-		NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
-		nodeWhile.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
-		nodeWhile.setLineNumber(lineNumber);
-		nodeWhile.setCondition(condition);
-		nodeWhile.getNodes().addAll(nodes);
-
-		procedure.getNodes().add(nodeWhile);
 
 		return null;
 	}
@@ -216,19 +235,20 @@ public class StmtTransformer extends CalSwitch<EObject> {
 	public EObject caseStatementIf(StatementIf stmtIf) {
 		int lineNumber = Util.getLocation(stmtIf);
 
-		ExprTransformer transformer = new ExprTransformer(procedure);
+		ExprTransformer transformer = new ExprTransformer(procedure, nodes);
 		Expression condition = transformer.doSwitch(stmtIf.getCondition());
-
-		// transforms "then" statements and "else" statements
-		List<Node> thenNodes = getNodes(stmtIf.getThen());
 
 		// creates if and adds it to procedure
 		NodeIf node = IrFactoryImpl.eINSTANCE.createNodeIf();
-		procedure.getNodes().add(node);
 		node.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 		node.setLineNumber(lineNumber);
 		node.setCondition(condition);
-		node.getThenNodes().addAll(thenNodes);
+
+		nodes.add(node);
+
+		// transforms "then" statements and "else" statements
+		new StmtTransformer(procedure, node.getThenNodes()).doSwitch(stmtIf
+				.getThen());
 
 		// add elsif statements
 		for (StatementElsif elsif : stmtIf.getElsifs()) {
@@ -240,17 +260,17 @@ public class StmtTransformer extends CalSwitch<EObject> {
 			node.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 			node.setLineNumber(lineNumber);
 
-			transformer = new ExprTransformer(procedure);
+			transformer = new ExprTransformer(procedure, nodes);
 			condition = transformer.doSwitch(elsif.getCondition());
 			node.setCondition(condition);
 
-			thenNodes = getNodes(elsif.getThen());
-			node.getThenNodes().addAll(thenNodes);
+			new StmtTransformer(procedure, node.getThenNodes()).doSwitch(elsif
+					.getThen());
 		}
 
 		// add else nodes to current if
-		List<Node> elseNodes = getNodes(stmtIf.getElse());
-		node.getElseNodes().addAll(elseNodes);
+		new StmtTransformer(procedure, node.getElseNodes()).doSwitch(stmtIf
+				.getElse());
 
 		return null;
 	}
@@ -259,67 +279,34 @@ public class StmtTransformer extends CalSwitch<EObject> {
 	public EObject caseStatementWhile(StatementWhile stmtWhile) {
 		int lineNumber = Util.getLocation(stmtWhile);
 
-		// to help track the instructions added
-		NodeBlock block = procedure.getLast();
-		List<Instruction> instructions = block.getInstructions();
-		int first = instructions.size();
-
-		ExprTransformer transformer = new ExprTransformer(procedure);
+		// to track the instructions created when condition was transformed
+		List<Node> tempNodes = new ArrayList<Node>();
+		ExprTransformer transformer = new ExprTransformer(procedure, tempNodes);
 		Expression condition = transformer.doSwitch(stmtWhile.getCondition());
-		int last = instructions.size();
-
-		// the body
-		List<Node> nodes = getNodes(stmtWhile.getStatements());
-
-		// copy load instructions
-		List<Instruction> subList = instructions.subList(first, last);
-		for (Instruction instruction : subList) {
-			if (instruction instanceof InstLoad) {
-				InstLoad load = (InstLoad) instruction;
-				load = IrFactory.eINSTANCE.createInstLoad(load.getLineNumber(),
-						load.getTarget().getVariable(), load.getSource()
-								.getVariable(), (List<Expression>) IrUtil
-								.copy(load.getIndexes()));
-				IrUtil.getLast(nodes).add(load);
-			}
-		}
 
 		// create the while
 		NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
 		nodeWhile.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 		nodeWhile.setLineNumber(lineNumber);
 		nodeWhile.setCondition(condition);
-		nodeWhile.getNodes().addAll(nodes);
 
-		procedure.getNodes().add(nodeWhile);
+		// the body
+		new StmtTransformer(procedure, nodeWhile.getNodes()).doSwitch(stmtWhile
+				.getStatements());
+
+		// copy instructions
+		nodeWhile.getNodes().addAll(IrUtil.copy(tempNodes));
+
+		nodes.addAll(tempNodes);
+		nodes.add(nodeWhile);
 
 		return null;
 	}
 
-	/**
-	 * Returns a list of CFG nodes from the given list of statements. This
-	 * method creates a new block node to hold the statements, transforms the
-	 * statements, and transfers the nodes created to a new list that is the
-	 * result.
-	 * 
-	 * @param statements
-	 *            a list of statements
-	 * @return a list of CFG nodes
-	 */
-	private List<Node> getNodes(List<Statement> statements) {
-		List<Node> nodes = procedure.getNodes();
-
-		int first = nodes.size();
-		nodes.add(IrFactoryImpl.eINSTANCE.createNodeBlock());
-		transformStatements(statements);
-		int last = nodes.size();
-
-		// moves selected CFG nodes from "nodes" list to resultNodes
-		List<Node> subList = nodes.subList(first, last);
-		List<Node> resultNodes = new ArrayList<Node>(subList);
-		subList.clear();
-
-		return resultNodes;
+	public void doSwitch(List<Statement> statements) {
+		for (Statement statement : statements) {
+			doSwitch(statement);
+		}
 	}
 
 	/**
@@ -357,42 +344,7 @@ public class StmtTransformer extends CalSwitch<EObject> {
 
 			InstCall call = IrFactory.eINSTANCE.createInstCall(lineNumber,
 					null, print, parameters);
-			procedure.getLast().add(call);
-		}
-	}
-
-	private Procedure print;
-
-	private Procedure procedure;
-
-	/**
-	 * Creates a new AST to IR transformer.
-	 */
-	public StmtTransformer() {
-	}
-
-	/**
-	 * Creates a new AST to IR transformer, which will append instructions and
-	 * nodes to the given procedure.
-	 * 
-	 * @param procedure
-	 *            a procedure
-	 */
-	public StmtTransformer(Procedure procedure) {
-		this.procedure = procedure;
-	}
-
-	/**
-	 * Transforms the given AST statements to IR instructions and/or nodes that
-	 * are added directly to the current {@link #procedure}.
-	 * 
-	 * @param statements
-	 *            a list of AST statements
-	 */
-	private void transformStatements(List<Statement> statements) {
-		StmtTransformer transformer = new StmtTransformer(procedure);
-		for (Statement statement : statements) {
-			transformer.doSwitch(statement);
+			IrUtil.getLast(nodes).add(call);
 		}
 	}
 

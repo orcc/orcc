@@ -22,12 +22,10 @@ import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.cal.util.Util;
-import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
-import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
@@ -38,7 +36,6 @@ import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
-import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.util.IrUtil;
@@ -57,19 +54,20 @@ public class ExprTransformer extends CalSwitch<Expression> {
 
 	private Procedure procedure;
 
-	public ExprTransformer(Procedure procedure) {
-		this.procedure = procedure;
-		indexes = new ArrayList<Expression>();
+	private List<Node> nodes;
+
+	public ExprTransformer(Procedure procedure, List<Node> nodes) {
+		this(procedure, nodes, null);
 	}
 
-	public ExprTransformer(Procedure procedure, Var target) {
-		this(procedure);
-		this.target = target;
+	public ExprTransformer(Procedure procedure, List<Node> nodes, Var target) {
+		this(procedure, nodes, target, new ArrayList<Expression>());
 	}
 
-	public ExprTransformer(Procedure procedure, Var target,
+	public ExprTransformer(Procedure procedure, List<Node> nodes, Var target,
 			List<Expression> indexes) {
 		this.procedure = procedure;
+		this.nodes = nodes;
 		this.target = target;
 		this.indexes = indexes;
 	}
@@ -105,12 +103,12 @@ public class ExprTransformer extends CalSwitch<Expression> {
 
 		// transform parameters
 		List<Expression> parameters = AstIrUtil.transformExpressions(procedure,
-				exprCall.getParameters());
+				nodes, exprCall.getParameters());
 
 		// add call
 		InstCall call = IrFactory.eINSTANCE.createInstCall(lineNumber, target,
 				calledProcedure, parameters);
-		procedure.getLast().add(call);
+		IrUtil.getLast(nodes).add(call);
 
 		// return local variable
 		Expression varExpr = IrFactory.eINSTANCE.createExprVar(target);
@@ -145,16 +143,21 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		}
 
 		// transforms "then" statements and "else" statements
-		List<Node> thenNodes = getNodes(expression.getThen());
-		List<Node> elseNodes = getNodes(expression.getElse());
-
 		NodeIf node = IrFactoryImpl.eINSTANCE.createNodeIf();
 		node.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 		node.setLineNumber(lineNumber);
 		node.setCondition(condition);
-		node.getThenNodes().addAll(thenNodes);
-		node.getElseNodes().addAll(elseNodes);
-		procedure.getNodes().add(node);
+
+		Expression value = new ExprTransformer(procedure, node.getThenNodes(),
+				target, indexes).doSwitch(expression.getThen());
+		AstIrUtil.createAssignOrStore(node.getThenNodes(), lineNumber, target,
+				indexes, value);
+		value = new ExprTransformer(procedure, node.getElseNodes(), target,
+				indexes).doSwitch(expression.getElse());
+		AstIrUtil.createAssignOrStore(node.getElseNodes(), lineNumber, target,
+				indexes, value);
+
+		nodes.add(node);
 
 		Expression varExpr = IrFactory.eINSTANCE.createExprVar(target);
 
@@ -174,14 +177,14 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		Var var = Frontend.getMapping(variable);
 
 		List<Expression> indexes = AstIrUtil.transformExpressions(procedure,
-				expression.getIndexes());
+				nodes, expression.getIndexes());
 
 		Var target = procedure.newTempLocalVariable(Typer.getType(expression),
 				"local_" + var.getName());
 
 		InstLoad load = IrFactory.eINSTANCE.createInstLoad(lineNumber, target,
 				var, indexes);
-		addInstruction(load);
+		IrUtil.getLast(nodes).add(load);
 
 		Expression varExpr = IrFactory.eINSTANCE.createExprVar(target);
 		return varExpr;
@@ -256,8 +259,9 @@ public class ExprTransformer extends CalSwitch<Expression> {
 						var = procedure.newTempLocalVariable(global.getType(),
 								"local_" + global.getName());
 					}
-					addInstruction(IrFactory.eINSTANCE.createInstLoad(var,
-							global));
+					InstLoad load = IrFactory.eINSTANCE.createInstLoad(var,
+							global);
+					IrUtil.getLast(nodes).add(load);
 				}
 			}
 
@@ -295,100 +299,6 @@ public class ExprTransformer extends CalSwitch<Expression> {
 
 		Type listType = IrFactory.eINSTANCE.createTypeList(size, type);
 		target = procedure.newTempLocalVariable(listType, "_list");
-	}
-
-	/**
-	 * Returns a list of CFG nodes from the given expression. This method
-	 * creates a new block node to hold the statements created when translating
-	 * the expression, transforms the expression, and transfers the nodes
-	 * created to a new list that is the result.
-	 * 
-	 * @param astExpression
-	 *            an AST expression
-	 * @return a list of CFG nodes
-	 */
-	private List<Node> getNodes(AstExpression astExpression) {
-		int lineNumber = Util.getLocation(astExpression);
-		List<Node> nodes = procedure.getNodes();
-
-		int first = nodes.size();
-		nodes.add(IrFactoryImpl.eINSTANCE.createNodeBlock());
-
-		Expression value = doSwitch(astExpression);
-		createAssignOrStore(lineNumber, target, indexes, value);
-
-		int last = nodes.size();
-
-		// moves selected CFG nodes from "nodes" list to resultNodes
-		List<Node> subList = nodes.subList(first, last);
-		List<Node> resultNodes = new ArrayList<Node>(subList);
-		subList.clear();
-
-		return resultNodes;
-	}
-
-	private void createAssignOrStore(int lineNumber, Var target,
-			List<Expression> indexes, Expression value) {
-		// special case for list expressions
-		if (value.isVarExpr()) {
-			Use use = ((ExprVar) value).getUse();
-			if (use.getVariable().getType().isList()) {
-				return;
-			}
-		}
-
-		Instruction instruction;
-		if (target.isLocal() && (indexes == null || indexes.isEmpty())) {
-			instruction = IrFactory.eINSTANCE.createInstAssign(lineNumber,
-					target, value);
-		} else {
-			instruction = IrFactory.eINSTANCE.createInstStore(lineNumber,
-					target, indexes, value);
-		}
-		addInstruction(instruction);
-	}
-
-	/**
-	 * Adds the given instruction to the last block of the current procedure.
-	 * 
-	 * @param instruction
-	 *            an instruction
-	 */
-	private void addInstruction(Instruction instruction) {
-		NodeBlock block = procedure.getLast();
-		block.add(instruction);
-	}
-
-	/**
-	 * Returns a list of CFG nodes from the given list of statements. This
-	 * method creates a new block node to hold the statements, transforms the
-	 * statements, and transfers the nodes created to a new list that is the
-	 * result.
-	 * 
-	 * @param statements
-	 *            a list of statements
-	 * @return a list of CFG nodes
-	 */
-	private List<Node> getNodes(List<AstExpression> astExpressions) {
-		List<Node> nodes = procedure.getNodes();
-
-		int first = nodes.size();
-		nodes.add(IrFactoryImpl.eINSTANCE.createNodeBlock());
-
-		for (AstExpression astExpression : astExpressions) {
-			int lineNumber = Util.getLocation(astExpression);
-			Expression value = doSwitch(astExpression);
-			createAssignOrStore(lineNumber, target, indexes, value);
-		}
-
-		int last = nodes.size();
-
-		// moves selected CFG nodes from "nodes" list to resultNodes
-		List<Node> subList = nodes.subList(first, last);
-		List<Node> resultNodes = new ArrayList<Node>(subList);
-		subList.clear();
-
-		return resultNodes;
 	}
 
 	/**
@@ -439,7 +349,15 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		indexes.add(index);
 
 		// translates the expression (this will form the innermost nodes)
-		List<Node> nodes = getNodes(expressions);
+		List<Node> innerNodes = new ArrayList<Node>();
+		ExprTransformer tfer = new ExprTransformer(procedure, innerNodes,
+				target, indexes);
+		for (AstExpression astExpression : expressions) {
+			int lineNumber = Util.getLocation(astExpression);
+			Expression value = tfer.doSwitch(astExpression);
+			AstIrUtil.createAssignOrStore(innerNodes, lineNumber, target,
+					indexes, value);
+		}
 
 		// build the loops from the inside out
 		ListIterator<Generator> it = generators.listIterator(generators.size());
@@ -459,23 +377,22 @@ public class ExprTransformer extends CalSwitch<Expression> {
 					higher, IrFactory.eINSTANCE.createTypeBool());
 
 			// add increment to body
-			NodeBlock block = IrUtil.getLast(nodes);
 			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
 					lineNumber, loopVar, IrFactory.eINSTANCE.createExprBinary(
 							IrFactory.eINSTANCE.createExprVar(loopVar),
 							OpBinary.PLUS,
 							IrFactory.eINSTANCE.createExprInt(1),
 							loopVar.getType()));
-			block.add(assign);
+			IrUtil.getLast(innerNodes).add(assign);
 
 			// create while
 			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
 			nodeWhile.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 			nodeWhile.setCondition(condition);
-			nodeWhile.getNodes().addAll(nodes);
+			nodeWhile.getNodes().addAll(innerNodes);
 
 			// create assign
-			block = IrFactoryImpl.eINSTANCE.createNodeBlock();
+			NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 			AstExpression astLower = generator.getLower();
 			Expression lower = doSwitch(astLower);
 			InstAssign assignInit = IrFactory.eINSTANCE.createInstAssign(
@@ -483,13 +400,13 @@ public class ExprTransformer extends CalSwitch<Expression> {
 			block.add(assignInit);
 
 			// nodes
-			nodes = new ArrayList<Node>(2);
-			nodes.add(block);
-			nodes.add(nodeWhile);
+			innerNodes = new ArrayList<Node>(2);
+			innerNodes.add(block);
+			innerNodes.add(nodeWhile);
 		}
 
 		// add the outer while node
-		procedure.getNodes().addAll(nodes);
+		nodes.addAll(innerNodes);
 
 		// restores target and indexes
 		target = currentTarget;
@@ -517,7 +434,8 @@ public class ExprTransformer extends CalSwitch<Expression> {
 
 			Expression value = doSwitch(expression);
 
-			createAssignOrStore(lineNumber, target, indexes, value);
+			AstIrUtil.createAssignOrStore(nodes, lineNumber, target, indexes,
+					value);
 		}
 
 		// restores target and indexes
