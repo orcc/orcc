@@ -252,20 +252,20 @@ public class StmtTransformer extends CalSwitch<EObject> {
 
 		// add elsif statements
 		for (StatementElsif elsif : stmtIf.getElsifs()) {
-			// saves outerIf, creates new if, and adds it to else nodes
-			NodeIf outerIf = node;
-			node = IrFactoryImpl.eINSTANCE.createNodeIf();
-			outerIf.getElseNodes().add(node);
-
-			node.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
-			node.setLineNumber(lineNumber);
-
-			transformer = new ExprTransformer(procedure, nodes);
+			transformer = new ExprTransformer(procedure, node.getElseNodes());
 			condition = transformer.doSwitch(elsif.getCondition());
-			node.setCondition(condition);
 
-			new StmtTransformer(procedure, node.getThenNodes()).doSwitch(elsif
-					.getThen());
+			// creates inner if
+			NodeIf innerIf = IrFactoryImpl.eINSTANCE.createNodeIf();
+			innerIf.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
+			innerIf.setLineNumber(lineNumber);
+			innerIf.setCondition(condition);
+			new StmtTransformer(procedure, innerIf.getThenNodes())
+					.doSwitch(elsif.getThen());
+
+			// adds elsif to node's else nodes, and assign elsif to node
+			node.getElseNodes().add(innerIf);
+			node = innerIf;
 		}
 
 		// add else nodes to current if
