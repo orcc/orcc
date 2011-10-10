@@ -217,6 +217,11 @@ public class AllTests extends AbstractXtextTests {
 	}
 
 	@Test
+	public void passExecElsifExpr() throws Exception {
+		assertExecution("result = 0", prefix + "pass/ElsifExpr.cal");
+	}
+
+	@Test
 	public void passExecElsifStateVar() throws Exception {
 		assertExecution("ok", prefix + "pass/ElsifStateVar.cal");
 	}

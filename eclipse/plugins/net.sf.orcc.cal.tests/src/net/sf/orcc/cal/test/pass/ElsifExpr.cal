@@ -1,0 +1,29 @@
+package net.sf.orcc.cal.test.pass;
+
+actor ElsifExpr() ==> :
+
+	int stateVar1 := 42;
+	int stateVar2 := 4242;
+	int stateVar3 := 424242;
+	int result;
+	
+	initialize ==>
+	do
+		stateVar1 := stateVar1 + 1;
+		stateVar2 := stateVar2 + 1;
+		stateVar3 := stateVar3 + 1;
+
+		result := 
+			if stateVar1 = 42 then
+				1
+			elsif stateVar2 = 4244 then
+				2
+			elsif stateVar3 = 424243 then
+				0
+			else
+				3
+			end;
+		print("result = " + result);
+	end
+
+end
