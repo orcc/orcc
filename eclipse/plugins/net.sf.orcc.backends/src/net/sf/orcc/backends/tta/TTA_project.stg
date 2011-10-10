@@ -30,6 +30,10 @@ set_global_assignment -name VHDL_FILE share/vhdl/add_and_eq_gt_gtu_ior_shl_shr_s
 set_global_assignment -name VHDL_FILE wrapper/fifo.vhd
 set_global_assignment -name VHDL_FILE wrapper/ram.vhd
 set_global_assignment -name VHDL_FILE wrapper/rom.vhd
+set_global_assignment -name VHDL_FILE interface/counter.vhd
+set_global_assignment -name VHDL_FILE interface/fps_eval.vhd
+set_global_assignment -name VHDL_FILE interface/segment_display_conv.vhd
+set_global_assignment -name VHDL_FILE interface/segment_display_sel.vhd
 
 # Pin assignments
 set_location_assignment PIN_F21 -to leds[0]
@@ -42,6 +46,16 @@ set_location_assignment PIN_F19 -to leds[6]
 set_location_assignment PIN_E19 -to leds[7]
 set_location_assignment PIN_AP5 -to reset_n
 set_location_assignment PIN_T33 -to clk
+
+set_location_assignment PIN_AE10 -to segment7[0]
+set_location_assignment PIN_AL5  -to segment7[1]
+set_location_assignment PIN_AC12 -to segment7[2]
+set_location_assignment PIN_AM5  -to segment7[3]
+set_location_assignment PIN_AF11 -to segment7[4]
+set_location_assignment PIN_AM6  -to segment7[5]
+set_location_assignment PIN_AP3  -to segment7[6]
+set_location_assignment PIN_AM4  -to segment7_sel[0]
+set_location_assignment PIN_AE12 -to segment7_sel[1]
 
 >>
 
