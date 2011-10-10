@@ -43,7 +43,8 @@ vsim -novopt -L altera_mf work.tb_top -t ps -do "view wave; add wave *;"
 >>
 
 instance(instance) ::= <<
-# Compile Instance <instance.id>
+<if(!instance.actor.native)
+># Compile Instance <instance.id>
 vcom -93 -quiet -work work <instance.id>/imem_mau_pkg.vhdl
 vcom -93 -quiet -work work <instance.id>/vhdl/globals_pkg.vhdl
 vcom -93 -quiet -work work <instance.id>/vhdl/processor_<instance.id>_tl_params_pkg.vhdl
@@ -58,11 +59,11 @@ vcom -93 -quiet -work work <instance.id>/gcu_ic/ic.vhdl
 vcom -93 -quiet -work work <instance.id>/gcu_ic/decoder.vhdl
 vcom -93 -quiet -work work <instance.id>/processor_<instance.id>.vhd
 
-<if(instance.actor && !instance.actor.native)
+<if(instance.actor)
 >#vcom -93 -quiet -work work <instance.id>/<instance.id>_tb.vhd<
 endif>
 
 exec cp -f wrapper/<instance.id>.mif . &
-exec cp -f wrapper/<instance.id>_data.mif . &
-
+exec cp -f wrapper/<instance.id>_data.mif . &<
+endif>
 >>

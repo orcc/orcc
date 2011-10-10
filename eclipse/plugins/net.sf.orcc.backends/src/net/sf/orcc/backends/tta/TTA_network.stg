@@ -216,10 +216,12 @@ assignInstances(instances) ::= <<
 >>
 
 assignInstance(instance) ::= <<
-<instance.id>_inst : work.<if(!instance.actor.native)>processor_<endif><instance.id>
+<if(!instance.actor.native)
+><instance.id>_inst : work.<if(!instance.actor.native)>processor_<endif><instance.id>
   port map(clk          =\> clk,
            <assignPorts(instance)>
-           reset_n      =\> reset_n);
+           reset_n      =\> reset_n);<
+endif>
 >>
 
 assignPorts(instance) ::= <<

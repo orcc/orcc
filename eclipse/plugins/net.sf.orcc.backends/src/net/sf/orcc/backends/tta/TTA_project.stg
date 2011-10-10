@@ -60,7 +60,8 @@ set_location_assignment PIN_AE12 -to segment7_sel[1]
 >>
 
 qsfInstance(instance) ::= <<
-# Instance <instance.id>
+<if(!instance.actor.native)
+># Instance <instance.id>
 set_global_assignment -name VHDL_FILE <instance.id>/vhdl/processor_<instance.id>_tl_params_pkg.vhdl
 set_global_assignment -name VHDL_FILE <instance.id>/vhdl/processor_<instance.id>_tl.vhdl
 set_global_assignment -name VHDL_FILE <instance.id>/vhdl/globals_pkg.vhdl
@@ -76,6 +77,7 @@ set_global_assignment -name VHDL_FILE <instance.id>/processor_<instance.id>.vhd
 set_global_assignment -name VHDL_FILE <instance.id>/imem_mau_pkg.vhdl
 set_global_assignment -name MIF_FILE <instance.id>/<instance.id>_data.mif
 set_global_assignment -name MIF_FILE <instance.id>/<instance.id>.mif
+<endif>
 >>
 
 qpfNetwork(network) ::= <<

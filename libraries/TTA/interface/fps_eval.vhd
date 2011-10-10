@@ -54,17 +54,17 @@ begin
     port map (
       rst   => rst,
       clk   => clk,
-      count => count_u
+      count => count_u,
       valid => top_frame,
       top   => top_u);
 
-  counter_t : work.cycle_counter
+  counter_t : work.counter
     generic map (
       nb_count => 10)
     port map (
       rst   => rst,
       clk   => clk,
-      count => count_t
+      count => count_t,
       valid => top_u,
       top   => top_t);
 
@@ -74,7 +74,7 @@ begin
     port map (
       rst   => rst,
       clk   => clk,
-      count => count_h
+      count => count_h,
       valid => top_t);
 
   segment_display_conv_u : work.segment_display_conv
