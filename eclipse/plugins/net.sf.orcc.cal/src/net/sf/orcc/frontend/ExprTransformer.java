@@ -309,14 +309,12 @@ public class ExprTransformer extends CalSwitch<Expression> {
 	@Override
 	public Expression caseExpressionUnary(ExpressionUnary expression) {
 		OpUnary op = OpUnary.getOperator(expression.getUnaryOperator());
-		Expression expr = new ExprTransformer(procedure, nodes)
-				.doSwitch(expression.getExpression());
-
 		if (OpUnary.NUM_ELTS == op) {
-			TypeList typeList = (TypeList) expr.getType();
-			return eINSTANCE.createExprInt(typeList.getSize());
+			return Evaluator.getValue(expression);
 		}
 
+		Expression expr = new ExprTransformer(procedure, nodes)
+				.doSwitch(expression.getExpression());
 		Expression value = eINSTANCE.createExprUnary(op, expr,
 				Typer.getType(expression));
 		return storeExpr(expression, value);
