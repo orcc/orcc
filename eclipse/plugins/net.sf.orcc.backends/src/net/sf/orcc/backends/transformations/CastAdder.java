@@ -195,6 +195,23 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 					IrFactory.eINSTANCE.createArgsByVal(newExpressions));
 
 			parentType = oldParentType;
+
+			if (call.getTarget() != null) {
+				Var target = call.getTarget().getVariable();
+				Type returnType = call.getProcedure().getReturnType();
+				if (needCast(target.getType(), returnType)) {
+					Var castedTarget = procedure.newTempLocalVariable(
+							target.getType(), "casted_" + target.getName());
+					castedTarget.setIndex(1);
+
+					target.setType(IrUtil.copy(returnType));
+
+					InstCast cast = InstructionsFactory.eINSTANCE
+							.createInstCast(target, castedTarget);
+
+					call.getBlock().add(indexInst + 1, cast);
+				}
+			}
 		}
 		return null;
 	}
