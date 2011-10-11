@@ -65,6 +65,7 @@ import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrUtil;
@@ -188,25 +189,19 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		List<Expression> parameters = AstIrUtil.transformExpressions(procedure,
 				nodes, exprCall.getParameters());
 
-		// generates a new target
-		Var callTarget;
-		if (target == null || indexes != null) {
-			callTarget = procedure.newTempLocalVariable(
-					calledProc.getReturnType(), "call_" + calledProc.getName());
-		} else {
-			callTarget = target;
-		}
-
-		// add call
+		// set call target and add call
+		Var callTarget = getScalar(calledProc.getReturnType(),
+				calledProc.getName());
 		InstCall call = eINSTANCE.createInstCall(lineNumber, callTarget,
 				calledProc, parameters);
 		IrUtil.getLast(nodes).add(call);
 
 		// return expr
-		if (target != null && indexes == null) {
-			return null;
-		} else {
+		if (callTarget != target) {
+			// need to store back into target
 			return storeExpr(exprCall, eINSTANCE.createExprVar(callTarget));
+		} else {
+			return null;
 		}
 	}
 
@@ -255,23 +250,18 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		List<Expression> indexes = AstIrUtil.transformExpressions(procedure,
 				nodes, expression.getIndexes());
 
-		Var loadTarget;
-		if (target == null || this.indexes != null) {
-			loadTarget = procedure.newTempLocalVariable(
-					Typer.getType(expression), "local_" + var.getName());
-		} else {
-			loadTarget = target;
-		}
-
+		// set load target and add load
+		Var loadTarget = getScalar(Typer.getType(expression), var.getName());
 		InstLoad load = eINSTANCE.createInstLoad(lineNumber, loadTarget, var,
 				indexes);
 		IrUtil.getLast(nodes).add(load);
 
 		// return expr
-		if (target != null && this.indexes == null) {
-			return null;
-		} else {
+		if (loadTarget != target) {
+			// need to store back into target
 			return storeExpr(expression, eINSTANCE.createExprVar(loadTarget));
+		} else {
+			return null;
 		}
 	}
 
@@ -421,6 +411,28 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		}
 
 		return null;
+	}
+
+	/**
+	 * If the current target is a local scalar variable, returns the current
+	 * target. Otherwise, creates a new temporary local variable to hold the
+	 * result of a Call or a Load.
+	 * 
+	 * @param type
+	 *            type of the temp variable to create
+	 * @param name
+	 *            indication for the variable name (will be prefixed with
+	 *            "tmp_")
+	 * @return a scalar variable that can be used as a target
+	 */
+	private Var getScalar(Type type, String name) {
+		if (target != null && target.isLocal() && indexes == null) {
+			// local scalar => ok
+			return target;
+		} else {
+			// otherwise, create temporary local scalar
+			return procedure.newTempLocalVariable(type, "tmp_" + name);
+		}
 	}
 
 	/**
