@@ -363,7 +363,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 	 * @return <code>null</code>
 	 */
 	private Expression copyList(Var var) {
-		TypeList typeList = (TypeList) var.getType();
+		TypeList typeList = (TypeList) target.getType();
 		List<Node> nodes = this.nodes;
 		List<NodeWhile> whiles = new ArrayList<NodeWhile>();
 		List<Var> loopVars = new ArrayList<Var>();
