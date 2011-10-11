@@ -98,7 +98,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 		Expression e1 = expr.getE1();
 		Expression e2 = expr.getE2();
 		if (isTypeReducer(expr.getOp())) {
-			// TOFIX: Probably a better solution
+			// FIXME: Probably a better solution
 			expr.setType(IrUtil.copy(getBigger(e1.getType(), e2.getType())));
 		}
 		if (expr.getOp().isComparison()) {
