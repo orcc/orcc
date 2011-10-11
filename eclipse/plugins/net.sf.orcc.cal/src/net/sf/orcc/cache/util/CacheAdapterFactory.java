@@ -50,16 +50,16 @@ public class CacheAdapterFactory extends AdapterFactoryImpl {
 				return createCacheManagerAdapter();
 			}
 			@Override
-			public Adapter caseEStringToExpressionMapEntry(Map.Entry<String, Expression> object) {
-				return createEStringToExpressionMapEntryAdapter();
+			public Adapter caseEObjectToExpressionMapEntry(Map.Entry<EObject, Expression> object) {
+				return createEObjectToExpressionMapEntryAdapter();
 			}
 			@Override
-			public Adapter caseEStringToEObjectMapEntry(Map.Entry<String, EObject> object) {
-				return createEStringToEObjectMapEntryAdapter();
+			public Adapter caseEObjectToEObjectMapEntry(Map.Entry<EObject, EObject> object) {
+				return createEObjectToEObjectMapEntryAdapter();
 			}
 			@Override
-			public Adapter caseEStringToTypeMapEntry(Map.Entry<String, Type> object) {
-				return createEStringToTypeMapEntryAdapter();
+			public Adapter caseEObjectToTypeMapEntry(Map.Entry<EObject, Type> object) {
+				return createEObjectToTypeMapEntryAdapter();
 			}
 			@Override
 			public Adapter defaultCase(EObject object) {
@@ -133,21 +133,7 @@ public class CacheAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>EString To Expression Map Entry</em>}'.
-	 * <!-- begin-user-doc --> This
-	 * default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases
-	 * anyway. <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see java.util.Map.Entry
-	 * @generated
-	 */
-	public Adapter createEStringToExpressionMapEntryAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>EString To EObject Map Entry</em>}'.
+	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>EObject To Expression Map Entry</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
@@ -156,21 +142,35 @@ public class CacheAdapterFactory extends AdapterFactoryImpl {
 	 * @see java.util.Map.Entry
 	 * @generated
 	 */
-	public Adapter createEStringToEObjectMapEntryAdapter() {
+	public Adapter createEObjectToExpressionMapEntryAdapter() {
 		return null;
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>EString To Type Map Entry</em>}'.
-	 * <!-- begin-user-doc --> This
-	 * default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases
-	 * anyway. <!-- end-user-doc -->
+	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>EObject To EObject Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
 	 * @return the new adapter.
 	 * @see java.util.Map.Entry
 	 * @generated
 	 */
-	public Adapter createEStringToTypeMapEntryAdapter() {
+	public Adapter createEObjectToEObjectMapEntryAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>EObject To Type Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see java.util.Map.Entry
+	 * @generated
+	 */
+	public Adapter createEObjectToTypeMapEntryAdapter() {
 		return null;
 	}
 

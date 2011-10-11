@@ -103,13 +103,6 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			outputFolder.delete(true, null);
 		}
 
-		// clear cache associated with removed files
-		for (Delta delta : context.getDeltas()) {
-			if (delta.getNew() == null) {
-				CacheManager.instance.removeCache(delta.getUri());
-			}
-		}
-
 		// store result of build
 		List<Entity> entities = new ArrayList<Entity>();
 		Set<IResourceDescription> builtDescs = new HashSet<IResourceDescription>();
@@ -120,6 +113,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		for (Delta delta : context.getDeltas()) {
 			if (delta.getNew() != null) {
 				IResourceDescription desc = delta.getNew();
+				monitor.subTask(desc.getURI().lastSegment());
 				builtDescs.add(desc);
 				Entity entity = build(set, desc);
 				if (entity != null) {
@@ -136,11 +130,13 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		// find out and build all entities that import things from the built
 		// entities
 		if (!entities.isEmpty()) {
-			buildDependentEntities(set, builtDescs, entities);
+			CacheManager.instance.unloadAllCaches();
+			buildDependentEntities(monitor, set, builtDescs, entities);
 		}
 
 		// to free up some memory
 		CacheManager.instance.unloadAllCaches();
+		Frontend.instance.getResourceSet().getResources().clear();
 
 		monitor.done();
 	}
@@ -164,9 +160,9 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		return null;
 	}
 
-	private void buildDependentEntities(ResourceSet set,
-			Set<IResourceDescription> builtDescs, List<Entity> entities)
-			throws CoreException {
+	private void buildDependentEntities(IProgressMonitor monitor,
+			ResourceSet set, Set<IResourceDescription> builtDescs,
+			List<Entity> entities) throws CoreException {
 		IResourceDescriptions descs = provider.createResourceDescriptions();
 
 		Set<IResourceDescription> dependentDescs = new HashSet<IResourceDescription>();
@@ -189,11 +185,11 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		}
 
 		// build dependent descs
+		monitor.beginTask("Building dependencies", dependentDescs.size());
 		for (IResourceDescription desc : dependentDescs) {
-			// remove cache associated with dependent entity
-			CacheManager.instance.removeCache(desc.getURI());
-
+			monitor.subTask(desc.getURI().lastSegment());
 			build(set, desc);
+			monitor.worked(1);
 		}
 	}
 

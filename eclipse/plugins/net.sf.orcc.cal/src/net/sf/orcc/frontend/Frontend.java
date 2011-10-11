@@ -45,6 +45,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.Switch;
 import org.eclipse.xtext.EcoreUtil2;
 
@@ -78,7 +79,7 @@ public class Frontend {
 		}
 
 		return (Entity) CacheManager.instance.getOrCompute(eObject, emfSwitch,
-				CachePackage.eINSTANCE.getCache_IrMap(), null);
+				CachePackage.eINSTANCE.getCache_IrMap());
 	}
 
 	/**
@@ -144,9 +145,8 @@ public class Frontend {
 	private static EObject internalGetMapping(EObject eObject) {
 		Resource resource = eObject.eResource();
 		if (resource != null) {
-			Cache cache = CacheManager.instance.getCache(resource.getURI());
-			String fragment = resource.getURIFragment(eObject);
-			return cache.getIrMap().get(fragment);
+			Cache cache = CacheManager.instance.getCache(resource);
+			return cache.getIrMap().get(eObject);
 		}
 
 		return null;
@@ -162,15 +162,18 @@ public class Frontend {
 	public static void putMapping(EObject astObject, EObject irObject) {
 		Resource resource = astObject.eResource();
 		if (resource != null) {
-			Cache cache = CacheManager.instance.getCache(resource.getURI());
-			String fragment = resource.getURIFragment(astObject);
-			cache.getIrMap().put(fragment, irObject);
+			Cache cache = CacheManager.instance.getCache(resource);
+			cache.getIrMap().put(astObject, irObject);
 		}
 	}
 
 	private IFolder outputFolder;
 
-	private final ResourceSet set = CacheManager.instance.getResourceSet();
+	private final ResourceSet set = new ResourceSetImpl();
+
+	public ResourceSet getResourceSet() {
+		return set;
+	}
 
 	/**
 	 * Serializes the given actor.

@@ -179,8 +179,7 @@ public class Typer extends CalSwitch<Type> {
 	 */
 	public static Type getType(EObject eObject) {
 		return CacheManager.instance.getOrCompute(eObject, new Typer(),
-				CachePackage.eINSTANCE.getCache_TypesMap(),
-				CachePackage.eINSTANCE.getCache_Types());
+				CachePackage.eINSTANCE.getCache_TypesMap());
 	}
 
 	/**

@@ -8,6 +8,8 @@ package net.sf.orcc.cache.impl;
 
 import net.sf.orcc.cache.CachePackage;
 
+import net.sf.orcc.ir.Type;
+
 import org.eclipse.emf.common.notify.Notification;
 
 import org.eclipse.emf.common.util.BasicEMap;
@@ -22,38 +24,28 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
 
 /**
  * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>EString To EObject Map Entry</b></em>'.
+ * An implementation of the model object '<em><b>EObject To Type Map Entry</b></em>'.
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.cache.impl.EStringToEObjectMapEntryImpl#getTypedKey <em>Key</em>}</li>
- *   <li>{@link net.sf.orcc.cache.impl.EStringToEObjectMapEntryImpl#getTypedValue <em>Value</em>}</li>
+ *   <li>{@link net.sf.orcc.cache.impl.EObjectToTypeMapEntryImpl#getTypedKey <em>Key</em>}</li>
+ *   <li>{@link net.sf.orcc.cache.impl.EObjectToTypeMapEntryImpl#getTypedValue <em>Value</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public class EStringToEObjectMapEntryImpl extends EObjectImpl implements BasicEMap.Entry<String,EObject> {
+public class EObjectToTypeMapEntryImpl extends EObjectImpl implements BasicEMap.Entry<EObject,Type> {
 	/**
-	 * The default value of the '{@link #getTypedKey() <em>Key</em>}' attribute.
+	 * The cached value of the '{@link #getTypedKey() <em>Key</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see #getTypedKey()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final String KEY_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getTypedKey() <em>Key</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getTypedKey()
-	 * @generated
-	 * @ordered
-	 */
-	protected String key = KEY_EDEFAULT;
+	protected EObject key;
 
 	/**
 	 * The cached value of the '{@link #getTypedValue() <em>Value</em>}' reference.
@@ -63,14 +55,14 @@ public class EStringToEObjectMapEntryImpl extends EObjectImpl implements BasicEM
 	 * @generated
 	 * @ordered
 	 */
-	protected EObject value;
+	protected Type value;
 
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected EStringToEObjectMapEntryImpl() {
+	protected EObjectToTypeMapEntryImpl() {
 		super();
 	}
 
@@ -81,7 +73,7 @@ public class EStringToEObjectMapEntryImpl extends EObjectImpl implements BasicEM
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return CachePackage.Literals.ESTRING_TO_EOBJECT_MAP_ENTRY;
+		return CachePackage.Literals.EOBJECT_TO_TYPE_MAP_ENTRY;
 	}
 
 	/**
@@ -89,7 +81,15 @@ public class EStringToEObjectMapEntryImpl extends EObjectImpl implements BasicEM
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public String getTypedKey() {
+	public EObject getTypedKey() {
+		if (key != null && key.eIsProxy()) {
+			InternalEObject oldKey = (InternalEObject)key;
+			key = eResolveProxy(oldKey);
+			if (key != oldKey) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, CachePackage.EOBJECT_TO_TYPE_MAP_ENTRY__KEY, oldKey, key));
+			}
+		}
 		return key;
 	}
 
@@ -98,11 +98,8 @@ public class EStringToEObjectMapEntryImpl extends EObjectImpl implements BasicEM
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setTypedKey(String newKey) {
-		String oldKey = key;
-		key = newKey;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, CachePackage.ESTRING_TO_EOBJECT_MAP_ENTRY__KEY, oldKey, key));
+	public EObject basicGetTypedKey() {
+		return key;
 	}
 
 	/**
@@ -110,13 +107,25 @@ public class EStringToEObjectMapEntryImpl extends EObjectImpl implements BasicEM
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EObject getTypedValue() {
+	public void setTypedKey(EObject newKey) {
+		EObject oldKey = key;
+		key = newKey;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, CachePackage.EOBJECT_TO_TYPE_MAP_ENTRY__KEY, oldKey, key));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Type getTypedValue() {
 		if (value != null && value.eIsProxy()) {
 			InternalEObject oldValue = (InternalEObject)value;
-			value = eResolveProxy(oldValue);
+			value = (Type)eResolveProxy(oldValue);
 			if (value != oldValue) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, CachePackage.ESTRING_TO_EOBJECT_MAP_ENTRY__VALUE, oldValue, value));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, CachePackage.EOBJECT_TO_TYPE_MAP_ENTRY__VALUE, oldValue, value));
 			}
 		}
 		return value;
@@ -127,7 +136,7 @@ public class EStringToEObjectMapEntryImpl extends EObjectImpl implements BasicEM
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EObject basicGetTypedValue() {
+	public Type basicGetTypedValue() {
 		return value;
 	}
 
@@ -136,11 +145,11 @@ public class EStringToEObjectMapEntryImpl extends EObjectImpl implements BasicEM
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setTypedValue(EObject newValue) {
-		EObject oldValue = value;
+	public void setTypedValue(Type newValue) {
+		Type oldValue = value;
 		value = newValue;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, CachePackage.ESTRING_TO_EOBJECT_MAP_ENTRY__VALUE, oldValue, value));
+			eNotify(new ENotificationImpl(this, Notification.SET, CachePackage.EOBJECT_TO_TYPE_MAP_ENTRY__VALUE, oldValue, value));
 	}
 
 	/**
@@ -151,9 +160,10 @@ public class EStringToEObjectMapEntryImpl extends EObjectImpl implements BasicEM
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case CachePackage.ESTRING_TO_EOBJECT_MAP_ENTRY__KEY:
-				return getTypedKey();
-			case CachePackage.ESTRING_TO_EOBJECT_MAP_ENTRY__VALUE:
+			case CachePackage.EOBJECT_TO_TYPE_MAP_ENTRY__KEY:
+				if (resolve) return getTypedKey();
+				return basicGetTypedKey();
+			case CachePackage.EOBJECT_TO_TYPE_MAP_ENTRY__VALUE:
 				if (resolve) return getTypedValue();
 				return basicGetTypedValue();
 		}
@@ -168,11 +178,11 @@ public class EStringToEObjectMapEntryImpl extends EObjectImpl implements BasicEM
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case CachePackage.ESTRING_TO_EOBJECT_MAP_ENTRY__KEY:
-				setTypedKey((String)newValue);
+			case CachePackage.EOBJECT_TO_TYPE_MAP_ENTRY__KEY:
+				setTypedKey((EObject)newValue);
 				return;
-			case CachePackage.ESTRING_TO_EOBJECT_MAP_ENTRY__VALUE:
-				setTypedValue((EObject)newValue);
+			case CachePackage.EOBJECT_TO_TYPE_MAP_ENTRY__VALUE:
+				setTypedValue((Type)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -186,11 +196,11 @@ public class EStringToEObjectMapEntryImpl extends EObjectImpl implements BasicEM
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case CachePackage.ESTRING_TO_EOBJECT_MAP_ENTRY__KEY:
-				setTypedKey(KEY_EDEFAULT);
+			case CachePackage.EOBJECT_TO_TYPE_MAP_ENTRY__KEY:
+				setTypedKey((EObject)null);
 				return;
-			case CachePackage.ESTRING_TO_EOBJECT_MAP_ENTRY__VALUE:
-				setTypedValue((EObject)null);
+			case CachePackage.EOBJECT_TO_TYPE_MAP_ENTRY__VALUE:
+				setTypedValue((Type)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -204,28 +214,12 @@ public class EStringToEObjectMapEntryImpl extends EObjectImpl implements BasicEM
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case CachePackage.ESTRING_TO_EOBJECT_MAP_ENTRY__KEY:
-				return KEY_EDEFAULT == null ? key != null : !KEY_EDEFAULT.equals(key);
-			case CachePackage.ESTRING_TO_EOBJECT_MAP_ENTRY__VALUE:
+			case CachePackage.EOBJECT_TO_TYPE_MAP_ENTRY__KEY:
+				return key != null;
+			case CachePackage.EOBJECT_TO_TYPE_MAP_ENTRY__VALUE:
 				return value != null;
 		}
 		return super.eIsSet(featureID);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public String toString() {
-		if (eIsProxy()) return super.toString();
-
-		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (key: ");
-		result.append(key);
-		result.append(')');
-		return result.toString();
 	}
 
 	/**
@@ -262,7 +256,7 @@ public class EStringToEObjectMapEntryImpl extends EObjectImpl implements BasicEM
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public String getKey() {
+	public EObject getKey() {
 		return getTypedKey();
 	}
 
@@ -271,7 +265,7 @@ public class EStringToEObjectMapEntryImpl extends EObjectImpl implements BasicEM
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setKey(String key) {
+	public void setKey(EObject key) {
 		setTypedKey(key);
 	}
 
@@ -280,7 +274,7 @@ public class EStringToEObjectMapEntryImpl extends EObjectImpl implements BasicEM
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EObject getValue() {
+	public Type getValue() {
 		return getTypedValue();
 	}
 
@@ -289,8 +283,8 @@ public class EStringToEObjectMapEntryImpl extends EObjectImpl implements BasicEM
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EObject setValue(EObject value) {
-		EObject oldValue = getValue();
+	public Type setValue(Type value) {
+		Type oldValue = getValue();
 		setTypedValue(value);
 		return oldValue;
 	}
@@ -301,9 +295,9 @@ public class EStringToEObjectMapEntryImpl extends EObjectImpl implements BasicEM
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
-	public EMap<String, EObject> getEMap() {
+	public EMap<EObject, Type> getEMap() {
 		EObject container = eContainer();
-		return container == null ? null : (EMap<String, EObject>)container.eGet(eContainmentFeature());
+		return container == null ? null : (EMap<EObject, Type>)container.eGet(eContainmentFeature());
 	}
 
-} //EStringToEObjectMapEntryImpl
+} //EObjectToTypeMapEntryImpl

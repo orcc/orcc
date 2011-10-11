@@ -75,9 +75,9 @@ public class CacheFactoryImpl extends EFactoryImpl implements CacheFactory {
 		switch (eClass.getClassifierID()) {
 			case CachePackage.CACHE: return createCache();
 			case CachePackage.CACHE_MANAGER: return createCacheManager();
-			case CachePackage.ESTRING_TO_EXPRESSION_MAP_ENTRY: return (EObject)createEStringToExpressionMapEntry();
-			case CachePackage.ESTRING_TO_EOBJECT_MAP_ENTRY: return (EObject)createEStringToEObjectMapEntry();
-			case CachePackage.ESTRING_TO_TYPE_MAP_ENTRY: return (EObject)createEStringToTypeMapEntry();
+			case CachePackage.EOBJECT_TO_EXPRESSION_MAP_ENTRY: return (EObject)createEObjectToExpressionMapEntry();
+			case CachePackage.EOBJECT_TO_EOBJECT_MAP_ENTRY: return (EObject)createEObjectToEObjectMapEntry();
+			case CachePackage.EOBJECT_TO_TYPE_MAP_ENTRY: return (EObject)createEObjectToTypeMapEntry();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -102,12 +102,13 @@ public class CacheFactoryImpl extends EFactoryImpl implements CacheFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Map.Entry<String, Expression> createEStringToExpressionMapEntry() {
-		EStringToExpressionMapEntryImpl eStringToExpressionMapEntry = new EStringToExpressionMapEntryImpl();
-		return eStringToExpressionMapEntry;
+	public Map.Entry<EObject, Expression> createEObjectToExpressionMapEntry() {
+		EObjectToExpressionMapEntryImpl eObjectToExpressionMapEntry = new EObjectToExpressionMapEntryImpl();
+		return eObjectToExpressionMapEntry;
 	}
 
 	/**
@@ -115,18 +116,19 @@ public class CacheFactoryImpl extends EFactoryImpl implements CacheFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Map.Entry<String, EObject> createEStringToEObjectMapEntry() {
-		EStringToEObjectMapEntryImpl eStringToEObjectMapEntry = new EStringToEObjectMapEntryImpl();
-		return eStringToEObjectMapEntry;
+	public Map.Entry<EObject, EObject> createEObjectToEObjectMapEntry() {
+		EObjectToEObjectMapEntryImpl eObjectToEObjectMapEntry = new EObjectToEObjectMapEntryImpl();
+		return eObjectToEObjectMapEntry;
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Map.Entry<String, Type> createEStringToTypeMapEntry() {
-		EStringToTypeMapEntryImpl eStringToTypeMapEntry = new EStringToTypeMapEntryImpl();
-		return eStringToTypeMapEntry;
+	public Map.Entry<EObject, Type> createEObjectToTypeMapEntry() {
+		EObjectToTypeMapEntryImpl eObjectToTypeMapEntry = new EObjectToTypeMapEntryImpl();
+		return eObjectToTypeMapEntry;
 	}
 
 	/**

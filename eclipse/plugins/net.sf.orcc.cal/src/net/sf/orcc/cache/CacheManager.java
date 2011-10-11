@@ -28,10 +28,9 @@
  */
 package net.sf.orcc.cache;
 
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.Switch;
 
 /**
@@ -50,13 +49,13 @@ public interface CacheManager extends EObject {
 			.createCacheManager();
 
 	/**
-	 * Returns the cache associated with the given resource URI.
+	 * Returns the cache associated with the given resource.
 	 * 
-	 * @param uri
-	 *            URI of a resource
-	 * @return the cache associated with the given resource URI
+	 * @param resource
+	 *            a resource
+	 * @return the cache associated with the given resource
 	 */
-	Cache getCache(URI uri);
+	Cache getCache(Resource resource);
 
 	/**
 	 * Returns an object of type T associated with the source object of type F.
@@ -73,35 +72,9 @@ public interface CacheManager extends EObject {
 	 *            an instance of a Switch to compute the object if necessary
 	 * @param featureMap
 	 *            the feature that returns a map to get/put the object
-	 * @param featureList
-	 *            the feature that returns a list to add the returned object to
-	 *            (possibly <code>null</code>)
 	 */
 	<F extends EObject, T> T getOrCompute(F eObject, Switch<T> switchInst,
-			EStructuralFeature featureMap, EStructuralFeature featureList);
-
-	/**
-	 * Returns the resource set used by this cache.
-	 * 
-	 * @return the resource set used by this cache
-	 */
-	ResourceSet getResourceSet();
-
-	/**
-	 * Removes the cache associated with the given resource URI.
-	 * 
-	 * @param uri
-	 *            URI of a resource
-	 */
-	void removeCache(URI uri);
-
-	/**
-	 * Saves the cache associated with the given resource URI.
-	 * 
-	 * @param uri
-	 *            URI of a resource
-	 */
-	void saveCache(URI uri);
+			EStructuralFeature featureMap);
 
 	/**
 	 * Unloads all caches (the underlying resources are NOT removed).

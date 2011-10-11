@@ -36,7 +36,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
@@ -382,7 +381,6 @@ public class ActorTransformer extends CalSwitch<Actor> {
 
 		// serialize actor and cache
 		Frontend.instance.serialize(actor);
-		CacheManager.instance.saveCache(astActor.eResource().getURI());
 
 		return actor;
 	}

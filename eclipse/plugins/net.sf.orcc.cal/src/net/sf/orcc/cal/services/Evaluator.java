@@ -64,7 +64,6 @@ import net.sf.orcc.ir.util.ExpressionEvaluator;
 import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.util.OrccUtil;
 
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -107,8 +106,7 @@ public class Evaluator extends CalSwitch<Expression> {
 	public static Expression getValue(EObject eObject) {
 		if (eObject instanceof Variable) {
 			return CacheManager.instance.getOrCompute(eObject, new Evaluator(),
-					CachePackage.eINSTANCE.getCache_ExpressionsMap(),
-					CachePackage.eINSTANCE.getCache_Expressions());
+					CachePackage.eINSTANCE.getCache_ExpressionsMap());
 		} else {
 			return new Evaluator().doSwitch(eObject);
 		}
@@ -117,11 +115,8 @@ public class Evaluator extends CalSwitch<Expression> {
 	private static void setValue(EObject eObject, Expression value) {
 		Resource resource = eObject.eResource();
 		if (resource != null) {
-			Cache cache = CacheManager.instance.getCache(resource.getURI());
-
-			URI uri = EcoreUtil.getURI(eObject);
-			String fragment = uri.fragment();
-			cache.getExpressionsMap().put(fragment, value);
+			Cache cache = CacheManager.instance.getCache(resource);
+			cache.getExpressionsMap().put(eObject, value);
 		}
 	}
 

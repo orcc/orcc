@@ -31,7 +31,6 @@ package net.sf.orcc.cal.validation;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.services.TypeCycleDetector;
 
@@ -78,9 +77,6 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			// mess things up
 			return;
 		}
-
-		// clean cache for this entity
-		CacheManager.instance.removeCache(entity.eResource().getURI());
 
 		// perform structural validation and type checking
 		structuralValidator.validate(entity, getChain(), getContext());

@@ -29,7 +29,6 @@
 package net.sf.orcc.frontend;
 
 import static net.sf.orcc.ir.IrFactory.eINSTANCE;
-import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstUnit;
@@ -89,7 +88,6 @@ public class UnitTransformer extends CalSwitch<Unit> {
 
 		// serialize unit and cache
 		Frontend.instance.serialize(unit);
-		CacheManager.instance.saveCache(astUnit.eResource().getURI());
 
 		return unit;
 	}
