@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.frontend;
 
+import static net.sf.orcc.ir.IrFactory.eINSTANCE;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +50,6 @@ import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
@@ -56,7 +57,6 @@ import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.ecore.EObject;
@@ -173,8 +173,8 @@ public class StmtTransformer extends CalSwitch<EObject> {
 				nodes, stmtCall.getParameters());
 
 		// add call
-		InstCall call = IrFactory.eINSTANCE.createInstCall(lineNumber, null,
-				calledProc, parameters);
+		InstCall call = eINSTANCE.createInstCall(lineNumber, null, calledProc,
+				parameters);
 		IrUtil.getLast(nodes).add(call);
 
 		return null;
@@ -195,13 +195,13 @@ public class StmtTransformer extends CalSwitch<EObject> {
 		AstExpression astHigher = foreach.getHigher();
 		Expression higher = new ExprTransformer(procedure, nodes)
 				.doSwitch(astHigher);
-		Expression condition = IrFactory.eINSTANCE.createExprBinary(
-				IrFactory.eINSTANCE.createExprVar(loopVar), OpBinary.LE,
-				higher, IrFactory.eINSTANCE.createTypeBool());
+		Expression condition = eINSTANCE.createExprBinary(
+				eINSTANCE.createExprVar(loopVar), OpBinary.LE, higher,
+				eINSTANCE.createTypeBool());
 
 		// create while
-		NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
-		nodeWhile.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
+		NodeWhile nodeWhile = eINSTANCE.createNodeWhile();
+		nodeWhile.setJoinNode(eINSTANCE.createNodeBlock());
 		nodeWhile.setLineNumber(lineNumber);
 		nodeWhile.setCondition(condition);
 
@@ -213,10 +213,9 @@ public class StmtTransformer extends CalSwitch<EObject> {
 
 		// add increment
 		NodeBlock block = IrUtil.getLast(nodeWhile.getNodes());
-		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(lineNumber,
-				loopVar, IrFactory.eINSTANCE.createExprBinary(
-						IrFactory.eINSTANCE.createExprVar(loopVar),
-						OpBinary.PLUS, IrFactory.eINSTANCE.createExprInt(1),
+		InstAssign assign = eINSTANCE.createInstAssign(lineNumber, loopVar,
+				eINSTANCE.createExprBinary(eINSTANCE.createExprVar(loopVar),
+						OpBinary.PLUS, eINSTANCE.createExprInt(1),
 						loopVar.getType()));
 		block.add(assign);
 
@@ -231,8 +230,8 @@ public class StmtTransformer extends CalSwitch<EObject> {
 		Expression condition = transformer.doSwitch(stmtIf.getCondition());
 
 		// creates if and adds it to procedure
-		NodeIf node = IrFactoryImpl.eINSTANCE.createNodeIf();
-		node.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
+		NodeIf node = eINSTANCE.createNodeIf();
+		node.setJoinNode(eINSTANCE.createNodeBlock());
 		node.setLineNumber(lineNumber);
 		node.setCondition(condition);
 
@@ -248,8 +247,8 @@ public class StmtTransformer extends CalSwitch<EObject> {
 			condition = transformer.doSwitch(elsif.getCondition());
 
 			// creates inner if
-			NodeIf innerIf = IrFactoryImpl.eINSTANCE.createNodeIf();
-			innerIf.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
+			NodeIf innerIf = eINSTANCE.createNodeIf();
+			innerIf.setJoinNode(eINSTANCE.createNodeBlock());
 			innerIf.setLineNumber(lineNumber);
 			innerIf.setCondition(condition);
 			new StmtTransformer(procedure, innerIf.getThenNodes())
@@ -277,8 +276,8 @@ public class StmtTransformer extends CalSwitch<EObject> {
 		Expression condition = transformer.doSwitch(stmtWhile.getCondition());
 
 		// create the while
-		NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
-		nodeWhile.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
+		NodeWhile nodeWhile = eINSTANCE.createNodeWhile();
+		nodeWhile.setJoinNode(eINSTANCE.createNodeBlock());
 		nodeWhile.setLineNumber(lineNumber);
 		nodeWhile.setCondition(condition);
 
@@ -295,6 +294,12 @@ public class StmtTransformer extends CalSwitch<EObject> {
 		return null;
 	}
 
+	/**
+	 * Transforms the given list of statements.
+	 * 
+	 * @param statements
+	 *            a list of Statement
+	 */
 	public void doSwitch(List<Statement> statements) {
 		for (Statement statement : statements) {
 			doSwitch(statement);
@@ -314,8 +319,8 @@ public class StmtTransformer extends CalSwitch<EObject> {
 		String name = stmtCall.getProcedure().getName();
 		if ("print".equals(name) || "println".equals(name)) {
 			if (print == null) {
-				print = IrFactory.eINSTANCE.createProcedure("print",
-						lineNumber, IrFactory.eINSTANCE.createTypeVoid());
+				print = eINSTANCE.createProcedure("print", lineNumber,
+						eINSTANCE.createTypeVoid());
 				print.setNative(true);
 
 				AstEntity entity = EcoreUtil2.getContainerOfType(stmtCall,
@@ -331,11 +336,11 @@ public class StmtTransformer extends CalSwitch<EObject> {
 			}
 
 			if ("println".equals(name)) {
-				parameters.add(IrFactory.eINSTANCE.createExprString("\\n"));
+				parameters.add(eINSTANCE.createExprString("\\n"));
 			}
 
-			InstCall call = IrFactory.eINSTANCE.createInstCall(lineNumber,
-					null, print, parameters);
+			InstCall call = eINSTANCE.createInstCall(lineNumber, null, print,
+					parameters);
 			IrUtil.getLast(nodes).add(call);
 		}
 	}

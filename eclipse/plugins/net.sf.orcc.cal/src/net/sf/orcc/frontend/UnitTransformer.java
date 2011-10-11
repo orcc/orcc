@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.frontend;
 
+import static net.sf.orcc.ir.IrFactory.eINSTANCE;
 import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstProcedure;
@@ -36,7 +37,6 @@ import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.util.Util;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Unit;
 import net.sf.orcc.ir.Var;
@@ -58,7 +58,7 @@ public class UnitTransformer extends CalSwitch<Unit> {
 	 */
 	@Override
 	public Unit caseAstUnit(AstUnit astUnit) {
-		Unit unit = IrFactory.eINSTANCE.createUnit();
+		Unit unit = eINSTANCE.createUnit();
 		Frontend.putMapping(astUnit, unit);
 
 		unit.setFileName(astUnit.eResource().getURI().toPlatformString(true));

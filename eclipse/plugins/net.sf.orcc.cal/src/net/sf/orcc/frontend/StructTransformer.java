@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.frontend;
 
+import static net.sf.orcc.ir.IrFactory.eINSTANCE;
+
 import java.util.List;
 
 import net.sf.orcc.cal.cal.AnnotationArgument;
@@ -47,7 +49,6 @@ import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.Annotation;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstReturn;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Port;
@@ -96,14 +97,14 @@ public class StructTransformer extends CalSwitch<EObject> {
 	 */
 	public void addReturn(Procedure procedure, Expression value) {
 		NodeBlock block = procedure.getLast();
-		InstReturn returnInstr = IrFactory.eINSTANCE.createInstReturn(value);
+		InstReturn returnInstr = eINSTANCE.createInstReturn(value);
 		block.add(returnInstr);
 	}
 
 	@Override
 	public EObject caseAstPort(AstPort astPort) {
 		Type type = EcoreUtil.copy(Typer.getType(astPort));
-		Port port = IrFactory.eINSTANCE.createPort(type, astPort.getName(),
+		Port port = eINSTANCE.createPort(type, astPort.getName(),
 				astPort.isNative());
 		Frontend.putMapping(astPort, port);
 		return port;
@@ -123,8 +124,8 @@ public class StructTransformer extends CalSwitch<EObject> {
 		int lineNumber = Util.getLocation(astProcedure);
 
 		// create procedure
-		procedure = IrFactory.eINSTANCE.createProcedure(name, lineNumber,
-				IrFactory.eINSTANCE.createTypeVoid());
+		procedure = eINSTANCE.createProcedure(name, lineNumber,
+				eINSTANCE.createTypeVoid());
 
 		// set native flag
 		if (astProcedure.isNative()) {
@@ -158,7 +159,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 		Type type = Typer.getType(function);
 
 		// create procedure
-		procedure = IrFactory.eINSTANCE.createProcedure(name, lineNumber, type);
+		procedure = eINSTANCE.createProcedure(name, lineNumber, type);
 
 		// set native flag
 		if (function.isNative()) {
@@ -214,8 +215,8 @@ public class StructTransformer extends CalSwitch<EObject> {
 		Expression initialValue = EcoreUtil.copy(Evaluator.getValue(variable));
 
 		// create state variable and put it in the map
-		Var var = IrFactory.eINSTANCE.createVar(lineNumber, type, name,
-				assignable, initialValue);
+		Var var = eINSTANCE.createVar(lineNumber, type, name, assignable,
+				initialValue);
 		transformAnnotations(var, variable.getAnnotations());
 		Frontend.putMapping(variable, var);
 
@@ -237,8 +238,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 		boolean assignable = !variable.isConstant();
 
 		// create local variable with the given name
-		Var local = IrFactory.eINSTANCE.createVar(lineNumber, type, name,
-				assignable, 0);
+		Var local = eINSTANCE.createVar(lineNumber, type, name, assignable, 0);
 
 		AstExpression value = variable.getValue();
 		if (value != null) {
@@ -261,8 +261,8 @@ public class StructTransformer extends CalSwitch<EObject> {
 	private void transformAnnotations(Var variable,
 			List<AstAnnotation> annotations) {
 		for (AstAnnotation astAnnotation : annotations) {
-			Annotation annotation = IrFactory.eINSTANCE
-					.createAnnotation(astAnnotation.getName());
+			Annotation annotation = eINSTANCE.createAnnotation(astAnnotation
+					.getName());
 			for (AnnotationArgument arg : astAnnotation.getArguments()) {
 				annotation.getAttributes().put(arg.getName(), arg.getValue());
 			}
@@ -295,7 +295,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 		List<Param> params = procedure.getParameters();
 		for (Variable astParameter : parameters) {
 			Var local = caseVariableLocal(astParameter);
-			params.add(IrFactory.eINSTANCE.createParam(local));
+			params.add(eINSTANCE.createParam(local));
 		}
 	}
 

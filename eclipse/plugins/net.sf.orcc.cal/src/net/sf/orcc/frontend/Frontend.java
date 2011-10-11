@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010, IETR/INSA of Rennes
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -39,16 +39,12 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Unit;
-import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.util.Switch;
 import org.eclipse.xtext.EcoreUtil2;
 
@@ -175,41 +171,6 @@ public class Frontend {
 	private IFolder outputFolder;
 
 	private final ResourceSet set = CacheManager.instance.getResourceSet();
-
-	/**
-	 * Warning: dirty hack! Removes uses that were created by the front-end but
-	 * subsequently ignored.
-	 * <p>
-	 * These uses are called "dangling" because they cannot be reached from the
-	 * top-level container (i.e. actor) through containment relations. Note that
-	 * as such, using actor.eAllContents() does NOT return these uses, which is
-	 * why this method is implemented as visiting the variables and their uses
-	 * rather than by calling the EcoreHelper.getUses method.
-	 * </p>
-	 * <p>
-	 * Removing allows IR actors to be serialized without errors. A long term
-	 * solution would probably be to write a cleaner AST to IR translator.
-	 * </p>
-	 * 
-	 * @param actor
-	 *            the IR of an actor
-	 */
-	public void removeDanglingUses(Actor actor) {
-		TreeIterator<EObject> it = actor.eAllContents();
-		while (it.hasNext()) {
-			EObject eObject = it.next();
-			if (eObject instanceof Var) {
-				Var var = (Var) eObject;
-				for (int i = 0; i < var.getUses().size(); i++) {
-					Use use = var.getUses().get(i);
-					if (!EcoreUtil.isAncestor(actor, use)) {
-						use.setVariable(null);
-						i--;
-					}
-				}
-			}
-		}
-	}
 
 	/**
 	 * Serializes the given actor.
