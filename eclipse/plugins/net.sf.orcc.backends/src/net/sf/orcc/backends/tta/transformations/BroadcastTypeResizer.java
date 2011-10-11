@@ -67,10 +67,8 @@ public class BroadcastTypeResizer implements INetworkTransformation {
 			return 8;
 		} else if (size <= 16) {
 			return 16;
-		} else if (size <= 32) {
-			return 32;
 		} else {
-			return 64;
+			return 32;
 		}
 	}
 
