@@ -26,9 +26,9 @@ vcom -93 -quiet -work work wrapper/fifo.vhd
 vcom -93 -quiet -work work wrapper/ram.vhd
 vcom -93 -quiet -work work wrapper/rom.vhd
 vcom -93 -quiet -work work interface/counter.vhd
-vcom -93 -quiet -work work interface/fps_eval.vhd
 vcom -93 -quiet -work work interface/segment_display_conv.vhd
 vcom -93 -quiet -work work interface/segment_display_sel.vhd
+vcom -93 -quiet -work work interface/fps_eval.vhd
 vcom -93 -quiet -work work simulation/sim_package.vhd
 
 <network.instances: instance(); separator="\n">

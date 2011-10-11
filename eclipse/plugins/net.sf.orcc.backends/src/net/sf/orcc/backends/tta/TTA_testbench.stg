@@ -340,10 +340,10 @@ begin
 
   top_orcc : entity work.top
     port map (
-      hw_clk      =\> clock,
+      clk     =\> clock,
       <if(network.inputs)><network.inputs: mapSignalInput(); separator="\n"><endif>
       <if(network.outputs)><network.outputs: mapSignalOutput(); separator="\n"><endif>
-      reset_n    =\> reset);
+      reset_n =\> reset);
       
     <init_process()>
 

@@ -29,7 +29,7 @@ library work;
 entity top is
   port
     (
-      clk : in  std_logic;
+      clk      : in  std_logic;
       <ports(network)>
       reset_n  : in  std_logic
       );
@@ -198,7 +198,7 @@ assignFifos(connections) ::= <<
 
 assignFifo(connection) ::= <<
 <if(!connection.source.native && !connection.target.native)>
-fifo_<indexConnection(connection)> : work.fifo
+fifo_<indexConnection(connection)> : entity work.fifo
   generic map(width =\> 32)
   port map(wrreq   =\> fifo_<indexConnection(connection)>_wrreq,
            reset_n =\> reset_n,
@@ -217,7 +217,7 @@ assignInstances(instances) ::= <<
 
 assignInstance(instance) ::= <<
 <if(!instance.actor.native)
-><instance.id>_inst : work.<if(!instance.actor.native)>processor_<endif><instance.id>
+><instance.id>_inst : entity work.<if(!instance.actor.native)>processor_<endif><instance.id>
   port map(clk          =\> clk,
            <assignPorts(instance)>
            reset_n      =\> reset_n);<

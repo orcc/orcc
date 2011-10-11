@@ -93,7 +93,7 @@ begin
 {{endif}}
 {{endfor}}
 
-  inst_dram_{{id}} : work.dram
+  inst_dram_{{id}} : entity work.dram
     generic map(size          => {{dram_depth}},
                 width         => {{dram_width}},
                 widthu		  => {{dram_addr}},
@@ -108,7 +108,7 @@ begin
 
   wren_wire <= not(wren_x_wire);
 
-  inst_irom_{{id}} : work.irom
+  inst_irom_{{id}} : entity work.irom
     generic map(size          => {{irom_depth}},
                 width         => {{irom_width}},
                 widthu		  => {{irom_addr}},
@@ -118,7 +118,7 @@ begin
              address => imem_addr({{irom_addr-1}} downto 0),
              q       => idata_wire);
 
-  processor_{{id}} : work.processor_{{id}}_tl
+  processor_{{id}} : entity work.processor_{{id}}_tl
     port map(clk                        => clk,
              busy                       => '0',
              imem_addr                  => imem_addr,
