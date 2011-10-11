@@ -718,7 +718,7 @@ printFirstNode(node) ::= <<
 <if(node.blockNode)
 ><printFirstBlockNode(node)><
 else
->printNode(node)<
+><printNode(node)><
 endif>
 >>
 
