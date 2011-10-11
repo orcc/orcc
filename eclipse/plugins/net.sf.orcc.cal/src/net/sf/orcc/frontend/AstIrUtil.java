@@ -5,39 +5,12 @@ import java.util.List;
 
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.Variable;
-import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.IrUtil;
 
 public class AstIrUtil {
-
-	public static void createAssignOrStore(List<Node> nodes, int lineNumber,
-			Var target, List<Expression> indexes, Expression value) {
-		// special case for list expressions
-		if (value.isVarExpr()) {
-			Use use = ((ExprVar) value).getUse();
-			if (use.getVariable().getType().isList()) {
-				return;
-			}
-		}
-
-		Instruction instruction;
-		if (target.isLocal() && (indexes == null || indexes.isEmpty())) {
-			instruction = IrFactory.eINSTANCE.createInstAssign(lineNumber,
-					target, value);
-		} else {
-			instruction = IrFactory.eINSTANCE.createInstStore(lineNumber,
-					target, indexes, value);
-		}
-
-		IrUtil.getLast(nodes).add(instruction);
-	}
 
 	/**
 	 * Returns the IR equivalent of the given AST variable using its name. This

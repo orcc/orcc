@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.frontend;
 
+import static net.sf.orcc.ir.IrFactory.eINSTANCE;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -130,6 +132,9 @@ public class ActorTransformer extends CalSwitch<Actor> {
 
 				i++;
 			}
+		} else if (tokens.size() == 1) {
+			Variable token = tokens.get(0);
+			Frontend.putMapping(token, portVariable);
 		} else {
 			// creates loop variable and initializes it
 			Var loopVar = procedure.newTempLocalVariable(
@@ -215,18 +220,18 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		if (repeat == 1) {
 			int i = 0;
 
-			for (AstExpression expression : values) {
-				int lineNumber = portVariable.getLineNumber();
+			for (AstExpression value : values) {
 				List<Expression> indexes = new ArrayList<Expression>(1);
 				indexes.add(IrFactory.eINSTANCE.createExprInt(i));
 
-				Expression value = transformer.transformExpression(expression);
-				InstStore store = IrFactory.eINSTANCE.createInstStore(
-						lineNumber, portVariable, indexes, value);
-				procedure.getLast().add(store);
-
+				new ExprTransformer(procedure, procedure.getNodes(),
+						portVariable, indexes).doSwitch(value);
 				i++;
 			}
+		} else if (values.size() == 1) {
+			AstExpression value = values.get(0);
+			new ExprTransformer(procedure, procedure.getNodes(), portVariable)
+					.doSwitch(value);
 		} else {
 			// creates loop variable and initializes it
 			Var loopVar = procedure.newTempLocalVariable(
@@ -248,7 +253,8 @@ public class ActorTransformer extends CalSwitch<Actor> {
 				// each expression of an output pattern must be of type list
 				// so they are necessarily variables
 				Var tmpVar = procedure.newTempLocalVariable(type, "token");
-				Expression expression = transformer.transformExpression(value);
+				Expression expression = new ExprTransformer(procedure,
+						procedure.getNodes(), tmpVar).doSwitch(value);
 				Use use = ((ExprVar) expression).getUse();
 
 				InstLoad load = IrFactory.eINSTANCE.createInstLoad(tmpVar,
@@ -256,43 +262,36 @@ public class ActorTransformer extends CalSwitch<Actor> {
 				block.add(load);
 
 				indexes = new ArrayList<Expression>(1);
-				indexes.add(IrFactory.eINSTANCE.createExprBinary(
-						IrFactory.eINSTANCE.createExprBinary(
-								IrFactory.eINSTANCE.createExprInt(numTokens),
+				indexes.add(eINSTANCE.createExprBinary(eINSTANCE
+						.createExprBinary(eINSTANCE.createExprInt(numTokens),
 								OpBinary.TIMES,
-								IrFactory.eINSTANCE.createExprVar(loopVar),
-								IrFactory.eINSTANCE.createTypeInt(32)),
-						OpBinary.PLUS, IrFactory.eINSTANCE.createExprInt(i),
-						IrFactory.eINSTANCE.createTypeInt(32)));
-				InstStore store = IrFactory.eINSTANCE.createInstStore(
-						lineNumber, portVariable, indexes,
-						IrFactory.eINSTANCE.createExprVar(tmpVar));
+								eINSTANCE.createExprVar(loopVar),
+								eINSTANCE.createTypeInt(32)), OpBinary.PLUS,
+						eINSTANCE.createExprInt(i), eINSTANCE.createTypeInt(32)));
+				InstStore store = eINSTANCE.createInstStore(lineNumber,
+						portVariable, indexes, eINSTANCE.createExprVar(tmpVar));
 				block.add(store);
 
 				i++;
 			}
 
 			// add increment
-			assign = IrFactory.eINSTANCE.createInstAssign(loopVar,
-					IrFactory.eINSTANCE.createExprBinary(
-							IrFactory.eINSTANCE.createExprVar(loopVar),
-							OpBinary.PLUS,
-							IrFactory.eINSTANCE.createExprInt(1),
+			assign = eINSTANCE.createInstAssign(loopVar, eINSTANCE
+					.createExprBinary(eINSTANCE.createExprVar(loopVar),
+							OpBinary.PLUS, eINSTANCE.createExprInt(1),
 							loopVar.getType()));
 			block.add(assign);
 
 			// create while node
-			Expression condition = IrFactory.eINSTANCE.createExprBinary(
-					IrFactory.eINSTANCE.createExprVar(loopVar), OpBinary.LT,
-					IrFactory.eINSTANCE.createExprInt(repeat),
-					IrFactory.eINSTANCE.createTypeBool());
-			List<Node> nodes = new ArrayList<Node>(1);
-			nodes.add(block);
+			Expression condition = eINSTANCE
+					.createExprBinary(eINSTANCE.createExprVar(loopVar),
+							OpBinary.LT, eINSTANCE.createExprInt(repeat),
+							eINSTANCE.createTypeBool());
 
-			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
-			nodeWhile.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
+			NodeWhile nodeWhile = eINSTANCE.createNodeWhile();
+			nodeWhile.setJoinNode(eINSTANCE.createNodeBlock());
 			nodeWhile.setCondition(condition);
-			nodeWhile.getNodes().addAll(nodes);
+			nodeWhile.getNodes().add(block);
 
 			procedure.getNodes().add(nodeWhile);
 		}
@@ -389,7 +388,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		actor.getInitializes().addAll(initializes.getAllActions());
 
 		// TODO clean up
-		Frontend.instance.removeDanglingUses(actor);
+		// Frontend.instance.removeDanglingUses(actor);
 
 		// serialize actor and cache
 		Frontend.instance.serialize(actor);
@@ -418,7 +417,8 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		} else {
 			transformInputPatternPeek(transformer, procedure, astAction,
 					peekPattern);
-			value = transformGuards(transformer, astAction.getGuards());
+			value = transformGuards(transformer, procedure,
+					astAction.getGuards());
 		}
 
 		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(result, value);
@@ -572,8 +572,9 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	 *            list of guard expressions
 	 */
 	private Expression transformGuards(StructTransformer transformer,
-			List<AstExpression> guards) {
-		List<Expression> expressions = transformer.transformExpressions(guards);
+			Procedure procedure, List<AstExpression> guards) {
+		List<Expression> expressions = AstIrUtil.transformExpressions(
+				procedure, procedure.getNodes(), guards);
 		Iterator<Expression> it = expressions.iterator();
 		Expression value = it.next();
 		while (it.hasNext()) {

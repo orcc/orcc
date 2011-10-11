@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.frontend;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.cal.cal.AnnotationArgument;
@@ -243,11 +242,8 @@ public class StructTransformer extends CalSwitch<EObject> {
 
 		AstExpression value = variable.getValue();
 		if (value != null) {
-			ExprTransformer transformer = new ExprTransformer(procedure,
-					procedure.getNodes(), local);
-			Expression expression = transformer.doSwitch(value);
-			AstIrUtil.createAssignOrStore(procedure.getNodes(), lineNumber,
-					local, null, expression);
+			new ExprTransformer(procedure, procedure.getNodes(), local)
+					.doSwitch(value);
 		}
 
 		Frontend.putMapping(variable, local);
@@ -272,38 +268,6 @@ public class StructTransformer extends CalSwitch<EObject> {
 			}
 			variable.getAnnotations().add(annotation);
 		}
-	}
-
-	/**
-	 * Transforms the given AST expression to an IR expression.
-	 * 
-	 * @param expression
-	 *            an AST expression
-	 * @return an IR expression
-	 */
-	public Expression transformExpression(AstExpression value) {
-		return new ExprTransformer(procedure, procedure.getNodes())
-				.doSwitch(value);
-	}
-
-	/**
-	 * Transforms the given AST expressions to a list of IR expressions. In the
-	 * process nodes may be created and added to the current {@link #procedure},
-	 * since many RVC-CAL expressions are expressed with IR statements.
-	 * 
-	 * @param expressions
-	 *            a list of AST expressions
-	 * @return a list of IR expressions
-	 */
-	public List<Expression> transformExpressions(List<AstExpression> expressions) {
-		int length = expressions.size();
-		List<Expression> irExpressions = new ArrayList<Expression>(length);
-		for (AstExpression expression : expressions) {
-			ExprTransformer transformer = new ExprTransformer(procedure,
-					procedure.getNodes());
-			irExpressions.add(transformer.doSwitch(expression));
-		}
-		return irExpressions;
 	}
 
 	/**

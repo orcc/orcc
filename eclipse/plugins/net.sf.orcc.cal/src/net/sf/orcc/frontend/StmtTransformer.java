@@ -139,8 +139,6 @@ public class StmtTransformer extends CalSwitch<EObject> {
 
 	@Override
 	public EObject caseStatementAssign(StatementAssign assign) {
-		int lineNumber = Util.getLocation(assign);
-
 		// get target
 		Variable variable = assign.getTarget().getVariable();
 		Var target = Frontend.getMapping(variable);
@@ -149,11 +147,8 @@ public class StmtTransformer extends CalSwitch<EObject> {
 		List<Expression> indexes = AstIrUtil.transformExpressions(procedure,
 				nodes, assign.getIndexes());
 
-		ExprTransformer transformer = new ExprTransformer(procedure, nodes,
-				target, indexes);
-		Expression value = transformer.doSwitch(assign.getValue());
-		AstIrUtil
-				.createAssignOrStore(nodes, lineNumber, target, indexes, value);
+		new ExprTransformer(procedure, nodes, target, indexes).doSwitch(assign
+				.getValue());
 
 		return null;
 	}
@@ -194,15 +189,12 @@ public class StmtTransformer extends CalSwitch<EObject> {
 		Var loopVar = AstIrUtil.getLocalByName(procedure, variable);
 
 		AstExpression astLower = foreach.getLower();
-		ExprTransformer transformer = new ExprTransformer(procedure, nodes);
-		Expression lower = transformer.doSwitch(astLower);
-		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(lineNumber,
-				loopVar, lower);
-		IrUtil.getLast(nodes).add(assign);
+		new ExprTransformer(procedure, nodes, loopVar).doSwitch(astLower);
 
 		// condition
 		AstExpression astHigher = foreach.getHigher();
-		Expression higher = transformer.doSwitch(astHigher);
+		Expression higher = new ExprTransformer(procedure, nodes)
+				.doSwitch(astHigher);
 		Expression condition = IrFactory.eINSTANCE.createExprBinary(
 				IrFactory.eINSTANCE.createExprVar(loopVar), OpBinary.LE,
 				higher, IrFactory.eINSTANCE.createTypeBool());
@@ -221,8 +213,8 @@ public class StmtTransformer extends CalSwitch<EObject> {
 
 		// add increment
 		NodeBlock block = IrUtil.getLast(nodeWhile.getNodes());
-		assign = IrFactory.eINSTANCE.createInstAssign(lineNumber, loopVar,
-				IrFactory.eINSTANCE.createExprBinary(
+		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(lineNumber,
+				loopVar, IrFactory.eINSTANCE.createExprBinary(
 						IrFactory.eINSTANCE.createExprVar(loopVar),
 						OpBinary.PLUS, IrFactory.eINSTANCE.createExprInt(1),
 						loopVar.getType()));
