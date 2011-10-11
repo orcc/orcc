@@ -144,8 +144,13 @@ public class StmtTransformer extends CalSwitch<EObject> {
 		Var target = Frontend.getMapping(variable);
 
 		// transform indexes and value
-		List<Expression> indexes = AstIrUtil.transformExpressions(procedure,
-				nodes, assign.getIndexes());
+		List<Expression> indexes;
+		if (assign.getIndexes().isEmpty()) {
+			indexes = null;
+		} else {
+			indexes = AstIrUtil.transformExpressions(procedure, nodes,
+					assign.getIndexes());
+		}
 
 		new ExprTransformer(procedure, nodes, target, indexes).doSwitch(assign
 				.getValue());

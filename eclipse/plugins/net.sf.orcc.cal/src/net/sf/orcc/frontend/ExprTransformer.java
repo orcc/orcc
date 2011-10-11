@@ -445,20 +445,26 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		if (target.isLocal() && indexes == null) {
 			instruction = eINSTANCE.createInstAssign(lineNumber, target, value);
 		} else {
-			boolean copyNeeded = false;
-			for (Expression index : indexes) {
-				if (index.eContainer() != null) {
-					copyNeeded = true;
-					break;
+			if (indexes == null) {
+				// a store with an empty list of indexes
+				instruction = eINSTANCE.createInstStore(lineNumber, target,
+						new ArrayList<Expression>(0), value);
+			} else {
+				boolean copyNeeded = false;
+				for (Expression index : indexes) {
+					if (index.eContainer() != null) {
+						copyNeeded = true;
+						break;
+					}
 				}
-			}
 
-			if (copyNeeded) {
-				indexes = new ArrayList<Expression>(IrUtil.copy(indexes));
-			}
+				if (copyNeeded) {
+					indexes = new ArrayList<Expression>(IrUtil.copy(indexes));
+				}
 
-			instruction = eINSTANCE.createInstStore(lineNumber, target,
-					indexes, value);
+				instruction = eINSTANCE.createInstStore(lineNumber, target,
+						indexes, value);
+			}
 		}
 
 		IrUtil.getLast(nodes).add(instruction);
