@@ -44,6 +44,7 @@ public class EmptyElseNodeAdder extends AbstractActorVisitor<Object> {
 		if (nodeIf.getElseNodes().isEmpty()) {
 			nodeIf.getElseNodes().add(IrFactory.eINSTANCE.createNodeBlock());
 		}
+		super.caseNodeIf(nodeIf);
 		return null;
 	}
 
