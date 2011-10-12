@@ -26,6 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+
 package net.sf.orcc.backends.promela;
 
 import java.util.HashMap;
@@ -37,6 +38,7 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.c.CExpressionPrinter;
 import net.sf.orcc.backends.promela.transformations.GuardsExtractor;
+import net.sf.orcc.backends.promela.transformations.NetworkStateDefExtractor;
 import net.sf.orcc.backends.transformations.Inliner;
 import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.ir.Action;
@@ -126,6 +128,8 @@ public class PromelaBackendImpl extends AbstractBackend {
 		instancePrinter.getOptions().put("loadPeeks", loadPeeks);
 		instancePrinter.getOptions().put("network", network);
 
+		new NetworkStateDefExtractor().transform(network);
+
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
 		printInstances(network);
@@ -155,5 +159,5 @@ public class PromelaBackendImpl extends AbstractBackend {
 		printer.setTypePrinter(new PromelaTypePrinter());
 		printer.print("main_" + network.getName() + ".pml", path, network);
 	}
-
+	
 }

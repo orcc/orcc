@@ -127,7 +127,7 @@ printParameter(parameter) ::= <<
 
 printCall(call) ::= << 
 //ERROR this function call must be removed, in this case we give a 1, it is OK if it is "data"
-<if(call.print)>printf(<call.parameters: {PrintFormat()}><call.parameters: {PrintParameter()}>);<
+<if(call.print)>printf(<call.parameters: printFormat()><call.parameters: printPrintfParam()>);<
 else
 ><if(call.target)><call.target.variable.name> = <endif> 1;<
 endif>
