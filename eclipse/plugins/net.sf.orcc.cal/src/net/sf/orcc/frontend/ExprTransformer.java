@@ -40,6 +40,7 @@ import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.ExpressionBinary;
 import net.sf.orcc.cal.cal.ExpressionBoolean;
 import net.sf.orcc.cal.cal.ExpressionCall;
+import net.sf.orcc.cal.cal.ExpressionElsif;
 import net.sf.orcc.cal.cal.ExpressionIf;
 import net.sf.orcc.cal.cal.ExpressionIndex;
 import net.sf.orcc.cal.cal.ExpressionInteger;
@@ -227,8 +228,29 @@ public class ExprTransformer extends CalSwitch<Expression> {
 			ifTarget = target;
 		}
 
+		// transforms "then" expression
 		new ExprTransformer(procedure, node.getThenNodes(), ifTarget, indexes)
 				.doSwitch(expression.getThen());
+
+		// add elsif expressions
+		for (ExpressionElsif elsif : expression.getElsifs()) {
+			condition = new ExprTransformer(procedure, node.getElseNodes())
+					.doSwitch(elsif.getCondition());
+
+			// creates inner if
+			lineNumber = Util.getLocation(elsif);
+			NodeIf innerIf = eINSTANCE.createNodeIf();
+			innerIf.setJoinNode(eINSTANCE.createNodeBlock());
+			innerIf.setLineNumber(lineNumber);
+			innerIf.setCondition(condition);
+			new ExprTransformer(procedure, innerIf.getThenNodes(), ifTarget,
+					indexes).doSwitch(elsif.getThen());
+
+			// adds elsif to node's else nodes, and assign elsif to node
+			node.getElseNodes().add(innerIf);
+			node = innerIf;
+		}
+
 		new ExprTransformer(procedure, node.getElseNodes(), ifTarget, indexes)
 				.doSwitch(expression.getElse());
 

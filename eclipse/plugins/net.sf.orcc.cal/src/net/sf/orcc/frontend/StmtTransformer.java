@@ -232,8 +232,8 @@ public class StmtTransformer extends CalSwitch<EObject> {
 	public EObject caseStatementIf(StatementIf stmtIf) {
 		int lineNumber = Util.getLocation(stmtIf);
 
-		ExprTransformer transformer = new ExprTransformer(procedure, nodes);
-		Expression condition = transformer.doSwitch(stmtIf.getCondition());
+		Expression condition = new ExprTransformer(procedure, nodes)
+				.doSwitch(stmtIf.getCondition());
 
 		// creates if and adds it to procedure
 		NodeIf node = eINSTANCE.createNodeIf();
@@ -243,16 +243,17 @@ public class StmtTransformer extends CalSwitch<EObject> {
 
 		nodes.add(node);
 
-		// transforms "then" statements and "else" statements
+		// transforms "then" statements
 		new StmtTransformer(procedure, node.getThenNodes()).doSwitch(stmtIf
 				.getThen());
 
 		// add elsif statements
 		for (StatementElsif elsif : stmtIf.getElsifs()) {
-			transformer = new ExprTransformer(procedure, node.getElseNodes());
-			condition = transformer.doSwitch(elsif.getCondition());
+			condition = new ExprTransformer(procedure, node.getElseNodes())
+					.doSwitch(elsif.getCondition());
 
 			// creates inner if
+			lineNumber = Util.getLocation(elsif);
 			NodeIf innerIf = eINSTANCE.createNodeIf();
 			innerIf.setJoinNode(eINSTANCE.createNodeBlock());
 			innerIf.setLineNumber(lineNumber);
