@@ -40,6 +40,7 @@ import java.util.Set;
 
 import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.AstTransition;
+import net.sf.orcc.cal.cal.ExternalTarget;
 import net.sf.orcc.cal.cal.Fsm;
 import net.sf.orcc.frontend.Frontend;
 import net.sf.orcc.ir.Action;
@@ -76,6 +77,16 @@ public class FSMBuilder {
 	 */
 	public FSMBuilder() {
 		graph = new DirectedMultigraph<AstState, UniqueEdge>(UniqueEdge.class);
+	}
+
+	/**
+	 * Parses the transitions of an FSM and builds the preliminary graph from
+	 * them.
+	 * 
+	 * @param tree
+	 *            an ANTLR tree whose root is TRANSITIONS
+	 */
+	public void addTransitions(Fsm fsm) {
 	}
 
 	/**
@@ -125,9 +136,13 @@ public class FSMBuilder {
 			Tag tag = IrFactory.eINSTANCE.createTag(transition.getTag()
 					.getIdentifiers());
 			AstState target = transition.getTarget();
-			graph.addVertex(source);
-			graph.addVertex(target);
-			graph.addEdge(source, target, new UniqueEdge(tag));
+			if (target == null) {
+				includeFsm(source, tag, transition.getExternalTarget());
+			} else {
+				graph.addVertex(source);
+				graph.addVertex(target);
+				graph.addEdge(source, target, new UniqueEdge(tag));
+			}
 		}
 
 		// fill rank
@@ -139,7 +154,7 @@ public class FSMBuilder {
 
 		// add IR states mapped from AST states
 		FSM fsm = IrFactory.eINSTANCE.createFSM();
-		for (AstState astState : astFsm.getStates()) {
+		for (AstState astState : graph.vertexSet()) {
 			State state = (State) Frontend.getMapping(astState, false);
 			fsm.getStates().add(state);
 		}
@@ -208,14 +223,9 @@ public class FSMBuilder {
 		return targets;
 	}
 
-	/**
-	 * Parses the transitions of an FSM and builds the preliminary graph from
-	 * them.
-	 * 
-	 * @param tree
-	 *            an ANTLR tree whose root is TRANSITIONS
-	 */
-	public void addTransitions(Fsm fsm) {
+	private void includeFsm(AstState source, Tag tag, ExternalTarget target) {
+		// TODO Auto-generated method stub
+
 	}
 
 	/**

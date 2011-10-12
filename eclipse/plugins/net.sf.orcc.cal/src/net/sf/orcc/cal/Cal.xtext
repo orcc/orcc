@@ -138,7 +138,10 @@ ScheduleFsm:
 Fsm: {Fsm} (transitions += AstTransition)*;
 
 AstTransition:
-	source=[AstState] '(' tag=AstTag ')' '-->' target=[AstState] ';';
+	source=[AstState] '(' tag=AstTag ')' '-->'
+	(target=[AstState] | externalTarget=ExternalTarget) ';';
+
+ExternalTarget: fsm=[LocalFsm] '.' state=[AstState] '(' from=[AstState] '=>' to=[AstState] ')';
 
 AstState: name=ID;
 

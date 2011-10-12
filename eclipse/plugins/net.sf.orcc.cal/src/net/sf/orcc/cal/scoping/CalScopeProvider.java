@@ -42,6 +42,7 @@ import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.ExpressionList;
+import net.sf.orcc.cal.cal.ExternalTarget;
 import net.sf.orcc.cal.cal.Fsm;
 import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.Generator;
@@ -52,6 +53,7 @@ import net.sf.orcc.cal.cal.Variable;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
+import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.nodemodel.ILeafNode;
 import org.eclipse.xtext.nodemodel.INode;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
@@ -105,6 +107,13 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 			List<Variable> variables, EReference reference) {
 		IScope outer = getScope(eObject.eContainer(), reference);
 		return Scopes.scopeFor(variables, Scopes.scopeFor(parameters, outer));
+	}
+
+	private IScope getScope(Fsm fsm) {
+		if (fsm.getStates().isEmpty()) {
+			buildStates(fsm);
+		}
+		return Scopes.scopeFor(fsm.getStates());
 	}
 
 	/**
@@ -171,10 +180,7 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 * @return a scope
 	 */
 	public IScope scope_AstTransition_source(Fsm fsm, EReference reference) {
-		if (fsm.getStates().isEmpty()) {
-			buildStates(fsm);
-		}
-		return Scopes.scopeFor(fsm.getStates());
+		return getScope(fsm);
 	}
 
 	/**
@@ -187,10 +193,28 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 * @return a scope
 	 */
 	public IScope scope_AstTransition_target(Fsm fsm, EReference reference) {
-		if (fsm.getStates().isEmpty()) {
-			buildStates(fsm);
-		}
-		return Scopes.scopeFor(fsm.getStates());
+		return getScope(fsm);
+	}
+
+	public IScope scope_ExternalTarget_from(ExternalTarget target,
+			EReference reference) {
+		return getScope(target.getFsm().getContents());
+	}
+
+	public IScope scope_ExternalTarget_fsm(ExternalTarget target,
+			EReference reference) {
+		AstActor actor = EcoreUtil2.getContainerOfType(target, AstActor.class);
+		return Scopes.scopeFor(actor.getLocalFsms());
+	}
+
+	public IScope scope_ExternalTarget_state(ExternalTarget target,
+			EReference reference) {
+		return getScope(target.getFsm().getContents());
+	}
+
+	public IScope scope_ExternalTarget_to(ExternalTarget target,
+			EReference reference) {
+		return getScope((Fsm) target.eContainer());
 	}
 
 	/**
@@ -261,11 +285,7 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 */
 	public IScope scope_ScheduleFsm_initialState(ScheduleFsm schedule,
 			EReference reference) {
-		Fsm fsm = schedule.getContents();
-		if (fsm.getStates().isEmpty()) {
-			buildStates(fsm);
-		}
-		return Scopes.scopeFor(fsm.getStates());
+		return getScope(schedule.getContents());
 	}
 
 	/**
