@@ -39,7 +39,7 @@ import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.Inequality;
 import net.sf.orcc.cal.cal.Priority;
-import net.sf.orcc.cal.cal.Schedule;
+import net.sf.orcc.cal.cal.ScheduleFsm;
 import net.sf.orcc.cal.cal.Variable;
 
 import org.eclipse.xtext.ui.IImageHelper;
@@ -90,10 +90,10 @@ public class CalOutlineTreeProvider extends DefaultOutlineTreeProvider {
 				CalPackage.eINSTANCE.getAstActor_Actions(), null, "actions",
 				false);
 
-		if (actor.getSchedule() != null) {
+		if (actor.getScheduleFsm() != null) {
 			createEStructuralFeatureNode(parentNode, actor,
-					CalPackage.eINSTANCE.getAstActor_Schedule(), null, "FSM",
-					false);
+					CalPackage.eINSTANCE.getAstActor_ScheduleFsm(), null,
+					"FSM", false);
 		}
 
 		if (!actor.getPriorities().isEmpty()) {
@@ -148,8 +148,8 @@ public class CalOutlineTreeProvider extends DefaultOutlineTreeProvider {
 		}
 	}
 
-	protected void _createNode(IOutlineNode parentNode, Schedule schedule) {
-		for (AstTransition transition : schedule.getTransitions()) {
+	protected void _createNode(IOutlineNode parentNode, ScheduleFsm schedule) {
+		for (AstTransition transition : schedule.getContents().getTransitions()) {
 			createNode(parentNode, transition);
 		}
 	}

@@ -47,7 +47,7 @@ import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.InputPattern;
 import net.sf.orcc.cal.cal.OutputPattern;
 import net.sf.orcc.cal.cal.RegExp;
-import net.sf.orcc.cal.cal.Schedule;
+import net.sf.orcc.cal.cal.ScheduleFsm;
 import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.VariableReference;
 import net.sf.orcc.cal.cal.util.CalSwitch;
@@ -352,14 +352,14 @@ public class ActorTransformer extends CalSwitch<Actor> {
 				.getPriorities());
 
 		// transform FSM
-		Schedule schedule = astActor.getSchedule();
+		ScheduleFsm schedule = astActor.getScheduleFsm();
 		RegExp scheduleRegExp = astActor.getScheduleRegExp();
 		if (schedule == null && scheduleRegExp == null) {
 			actor.getActionsOutsideFsm().addAll(sortedActions.getAllActions());
 		} else {
 			FSM fsm = null;
 			if (schedule != null) {
-				FSMBuilder builder = new FSMBuilder(astActor.getSchedule());
+				FSMBuilder builder = new FSMBuilder(schedule);
 				fsm = builder.buildFSM(sortedActions);
 			} else {
 				RegExpConverter converter = new RegExpConverter(scheduleRegExp);

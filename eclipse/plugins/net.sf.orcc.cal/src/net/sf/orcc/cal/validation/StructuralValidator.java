@@ -57,7 +57,7 @@ import net.sf.orcc.cal.cal.InputPattern;
 import net.sf.orcc.cal.cal.OutputPattern;
 import net.sf.orcc.cal.cal.Priority;
 import net.sf.orcc.cal.cal.RegExp;
-import net.sf.orcc.cal.cal.Schedule;
+import net.sf.orcc.cal.cal.ScheduleFsm;
 import net.sf.orcc.cal.cal.StatementCall;
 import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.VariableReference;
@@ -218,7 +218,7 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 		actionList.addActions(actor.getActions());
 
 		// check FSM and priorities
-		Schedule schedule = actor.getSchedule();
+		ScheduleFsm schedule = actor.getScheduleFsm();
 		if (schedule != null) {
 			Set<AstAction> actionSet = new HashSet<AstAction>(
 					actor.getActions());
@@ -379,12 +379,12 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 	 *            on input the set of all actions; on output the set of actions
 	 *            that are not referenced by the FSM
 	 */
-	private void checkFsm(CalActionList actionList, Schedule schedule,
+	private void checkFsm(CalActionList actionList, ScheduleFsm schedule,
 			Set<AstAction> actionsSet) {
 		// we use a map because the transitions departing from a given state can
 		// be scattered throughout the schedule
 		Map<AstState, List<AstAction>> stateActionMap = new HashMap<AstState, List<AstAction>>();
-		for (AstTransition transition : schedule.getTransitions()) {
+		for (AstTransition transition : schedule.getContents().getTransitions()) {
 			AstTag tag = transition.getTag();
 			if (tag != null) {
 				List<AstAction> actions = actionList.getTaggedActions(tag

@@ -44,7 +44,7 @@ import net.sf.orcc.cal.services.CalGrammarAccess.ExpressionPostfixElements;
 import net.sf.orcc.cal.services.CalGrammarAccess.FunctionElements;
 import net.sf.orcc.cal.services.CalGrammarAccess.InitializeElements;
 import net.sf.orcc.cal.services.CalGrammarAccess.PriorityElements;
-import net.sf.orcc.cal.services.CalGrammarAccess.ScheduleElements;
+import net.sf.orcc.cal.services.CalGrammarAccess.ScheduleFsmElements;
 import net.sf.orcc.cal.services.CalGrammarAccess.StateVariableElements;
 import net.sf.orcc.cal.services.CalGrammarAccess.StatementAssignElements;
 import net.sf.orcc.cal.services.CalGrammarAccess.StatementCallElements;
@@ -160,9 +160,10 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 		c.setLinewrap(2).before(access.getEndKeyword_11());
 		c.setLinewrap(2).after(access.getEndKeyword_11());
 
-		c.setLinewrap(2).after(access.getEndKeyword_9_2());
-		c.setIndentation(access.getFsmKeyword_9_1_0_0(),
-				access.getEndKeyword_9_2());
+		c.setLinewrap(2).after(access.getEndKeyword_11());
+
+		c.setIndentation(f.getScheduleFsmAccess().getFsmKeyword_1(),
+				access.getEndKeyword_11());
 	}
 
 	/**
@@ -401,9 +402,9 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	}
 
 	private void configureSchedule(FormattingConfig c) {
-		ScheduleElements access = f.getScheduleAccess();
+		ScheduleFsmElements access = f.getScheduleFsmAccess();
 
-		c.setLinewrap().after(access.getColonKeyword_1());
+		c.setLinewrap().after(access.getColonKeyword_3());
 
 		c.setNoSpace().before(
 				f.getAstTransitionAccess().getSemicolonKeyword_6());

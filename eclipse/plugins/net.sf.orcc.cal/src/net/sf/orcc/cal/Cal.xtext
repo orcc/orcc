@@ -57,9 +57,10 @@ AstActor: {AstActor}
 	| procedures += NativeProcedure
 	| actions += AstAction
 	| initializes += Initialize
-	| stateVariables += StateVariable)*
+	| stateVariables += StateVariable
+	| localFsms += LocalFsm)*
 
-	('schedule' ('fsm' schedule=Schedule | 'regexp' scheduleRegExp=RegExp) 'end')?
+	(scheduleFsm=ScheduleFsm | scheduleRegExp=ScheduleRegExp)?
 
 	(priorities += Priority)*
 
@@ -128,15 +129,22 @@ Priority:
 // schedule
 ///////////////////////////////////////////////////////////////////////////////
 
-Schedule:
-	initialState=[AstState] ':'
-		(transitions += AstTransition)*;
+// FSM schedule
+ScheduleFsm:
+	'schedule' 'fsm' initialState=[AstState] ':'
+		contents=Fsm
+	'end';
+
+Fsm: {Fsm} (transitions += AstTransition)*;
 
 AstTransition:
 	source=[AstState] '(' tag=AstTag ')' '-->' target=[AstState] ';';
 
 AstState: name=ID;
-	
+
+// regular expression schedule
+ScheduleRegExp returns RegExp: 'schedule' 'regexp' exp=RegExp 'end';
+
 RegExp:
 	RegExpConcatenation({RegExpBinary.left=current} operator=('|') right=RegExpConcatenation)*;
 RegExpConcatenation returns RegExp:
@@ -149,6 +157,12 @@ RegExpGrouping returns RegExp:
 
 RegExpTerminal returns RegExp:
 	{RegExpTag} tag=AstTag;
+
+// local FSM
+LocalFsm:
+	'local' 'fsm' name=ID ':'
+		contents=Fsm
+	'end';
 
 ///////////////////////////////////////////////////////////////////////////////
 // actions
