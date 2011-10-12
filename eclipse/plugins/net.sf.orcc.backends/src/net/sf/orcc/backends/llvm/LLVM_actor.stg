@@ -704,7 +704,7 @@ printGEP(gep) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 printNodes(nodes, printReturn=true) ::= <<
-<nodes:printNode()>
+<nodes:printNode(); separator="\n">
 >>
 
 printNode(node) ::= <<
@@ -727,7 +727,6 @@ printBlockNode(blockNode) ::= <<
 
 b<label(blockNode)>:
 	<printInstructions(blockNode.instructions)>
-	
 >>
 
 printFirstBlockNode(blockNode) ::= <<
