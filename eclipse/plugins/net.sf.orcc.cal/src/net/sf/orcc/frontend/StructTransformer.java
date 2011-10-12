@@ -38,6 +38,7 @@ import net.sf.orcc.cal.cal.AstAnnotation;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstProcedure;
+import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.Statement;
@@ -53,6 +54,7 @@ import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 
@@ -142,6 +144,13 @@ public class StructTransformer extends CalSwitch<EObject> {
 		addReturn(procedure, null);
 
 		return procedure;
+	}
+
+	@Override
+	public EObject caseAstState(AstState astState) {
+		State state = eINSTANCE.createState(astState.getName());
+		Frontend.putMapping(astState, state);
+		return state;
 	}
 
 	/**

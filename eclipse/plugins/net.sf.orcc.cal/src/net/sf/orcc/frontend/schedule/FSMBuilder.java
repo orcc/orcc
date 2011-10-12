@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -38,8 +38,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.AstTransition;
-import net.sf.orcc.cal.cal.ScheduleFsm;
+import net.sf.orcc.cal.cal.Fsm;
+import net.sf.orcc.frontend.Frontend;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.IrFactory;
@@ -50,6 +52,7 @@ import net.sf.orcc.ir.Transitions;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.UniqueEdge;
 
+import org.eclipse.emf.common.util.ECollections;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.ext.DOTExporter;
 import org.jgrapht.ext.StringEdgeNameProvider;
@@ -66,20 +69,13 @@ public class FSMBuilder {
 
 	private Map<Action, Integer> actionRank;
 
-	private DirectedGraph<String, UniqueEdge> graph;
-
-	private String initialState;
+	private DirectedGraph<AstState, UniqueEdge> graph;
 
 	/**
-	 * Creates a FSM builder and initializes it with the given FSM AST.
-	 * 
-	 * @param tree
-	 *            an ANTLR tree that represents the AST of an FSM.
+	 * Creates a FSM builder.
 	 */
-	public FSMBuilder(ScheduleFsm schedule) {
-		graph = new DirectedMultigraph<String, UniqueEdge>(UniqueEdge.class);
-		initialState = schedule.getInitialState().getName();
-		parseTransitions(schedule.getContents().getTransitions());
+	public FSMBuilder() {
+		graph = new DirectedMultigraph<AstState, UniqueEdge>(UniqueEdge.class);
 	}
 
 	/**
@@ -122,39 +118,53 @@ public class FSMBuilder {
 	 *            a sorted action list
 	 * @return an FSM
 	 */
-	public FSM buildFSM(ActionList actionList) {
+	public FSM buildFSM(Fsm astFsm, ActionList actionList) {
+		// build graph
+		for (AstTransition transition : astFsm.getTransitions()) {
+			AstState source = transition.getSource();
+			Tag tag = IrFactory.eINSTANCE.createTag(transition.getTag()
+					.getIdentifiers());
+			AstState target = transition.getTarget();
+			graph.addVertex(source);
+			graph.addVertex(target);
+			graph.addEdge(source, target, new UniqueEdge(tag));
+		}
+
+		// fill rank
 		actionRank = new HashMap<Action, Integer>();
 		int rank = 0;
 		for (Action action : actionList) {
 			actionRank.put(action, rank++);
 		}
 
-		List<String> states = new ArrayList<String>(graph.vertexSet());
-		Collections.sort(states);
-		Map<String, State> statesMap = new HashMap<String, State>();
+		// add IR states mapped from AST states
 		FSM fsm = IrFactory.eINSTANCE.createFSM();
-
-		// adds states by alphabetical order
-		for (String name : states) {
-			State state = IrFactory.eINSTANCE.createState(name);
+		for (AstState astState : astFsm.getStates()) {
+			State state = (State) Frontend.getMapping(astState, false);
 			fsm.getStates().add(state);
-			statesMap.put(name, state);
 		}
 
+		// sort states by name
+		ECollections.sort(fsm.getStates(), new Comparator<State>() {
+
+			@Override
+			public int compare(State s1, State s2) {
+				return s1.getName().compareTo(s2.getName());
+			}
+
+		});
+
 		// adds transitions
-		for (String source : states) {
-			Map<Action, State> targets = getTargets(fsm, statesMap, source,
-					actionList);
+		for (AstState astSource : astFsm.getStates()) {
+			Map<Action, State> targets = getTargets(astSource, actionList);
 
 			Transitions transitions = IrFactory.eINSTANCE.createTransitions();
-			transitions.setSourceState(statesMap.get(source));
+			State source = (State) Frontend.getMapping(astSource, false);
+			transitions.setSourceState(source);
 
 			addTransitions(transitions, targets);
 			fsm.getTransitions().add(transitions);
 		}
-
-		// set initial state
-		fsm.setInitialState(statesMap.get(initialState));
 
 		return fsm;
 	}
@@ -171,20 +181,19 @@ public class FSMBuilder {
 	 *     add (action, target) to the map
 	 * </pre>
 	 * 
-	 * @param fsm
-	 *            the FSM being created
 	 * @param source
 	 *            source state
 	 * @param actionList
 	 *            a list of actions
 	 * @return an (action, target state) map
 	 */
-	private Map<Action, State> getTargets(FSM fsm,
-			Map<String, State> statesMap, String source, ActionList actionList) {
+	private Map<Action, State> getTargets(AstState source, ActionList actionList) {
 		Map<Action, State> targets = new HashMap<Action, State>();
 		Set<UniqueEdge> edges = graph.outgoingEdgesOf(source);
 		for (UniqueEdge edge : edges) {
-			String target = graph.getEdgeTarget(edge);
+			AstState astTarget = graph.getEdgeTarget(edge);
+			State target = (State) Frontend.getMapping(astTarget, false);
+
 			Tag tag = (Tag) edge.getObject();
 			List<Action> actions = actionList.getTaggedActions(tag);
 			if (actions == null) {
@@ -192,7 +201,7 @@ public class FSMBuilder {
 				System.out.println("non-existent target state: " + edge);
 			} else {
 				for (Action action : actions) {
-					targets.put(action, statesMap.get(target));
+					targets.put(action, target);
 				}
 			}
 		}
@@ -206,16 +215,7 @@ public class FSMBuilder {
 	 * @param tree
 	 *            an ANTLR tree whose root is TRANSITIONS
 	 */
-	private void parseTransitions(List<AstTransition> transitions) {
-		for (AstTransition transition : transitions) {
-			String source = transition.getSource().getName();
-			Tag tag = IrFactory.eINSTANCE.createTag(transition.getTag()
-					.getIdentifiers());
-			String target = transition.getTarget().getName();
-			graph.addVertex(source);
-			graph.addVertex(target);
-			graph.addEdge(source, target, new UniqueEdge(tag));
-		}
+	public void addTransitions(Fsm fsm) {
 	}
 
 	/**
@@ -225,8 +225,8 @@ public class FSMBuilder {
 	 *            output stream
 	 */
 	public void printGraph(OutputStream out) {
-		DOTExporter<String, UniqueEdge> exporter = new DOTExporter<String, UniqueEdge>(
-				new StringNameProvider<String>(), null,
+		DOTExporter<AstState, UniqueEdge> exporter = new DOTExporter<AstState, UniqueEdge>(
+				new StringNameProvider<AstState>(), null,
 				new StringEdgeNameProvider<UniqueEdge>());
 		exporter.export(new OutputStreamWriter(out), graph);
 	}

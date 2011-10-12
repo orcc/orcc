@@ -42,6 +42,7 @@ import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstProcedure;
+import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.InputPattern;
@@ -72,6 +73,7 @@ import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
@@ -359,8 +361,13 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		} else {
 			FSM fsm = null;
 			if (schedule != null) {
-				FSMBuilder builder = new FSMBuilder(schedule);
-				fsm = builder.buildFSM(sortedActions);
+				FSMBuilder builder = new FSMBuilder();
+				fsm = builder.buildFSM(schedule.getContents(), sortedActions);
+
+				// set initial state
+				AstState initialState = schedule.getInitialState();
+				State state = (State) Frontend.getMapping(initialState, false);
+				fsm.setInitialState(state);
 			} else {
 				RegExpConverter converter = new RegExpConverter(scheduleRegExp);
 				fsm = converter.convert(sortedActions);

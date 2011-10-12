@@ -42,6 +42,7 @@ import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.ExpressionList;
+import net.sf.orcc.cal.cal.Fsm;
 import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.Generator;
 import net.sf.orcc.cal.cal.InputPattern;
@@ -67,8 +68,7 @@ import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider;
  */
 public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 
-	private void addState(ScheduleFsm schedule, Set<String> nameSet,
-			List<INode> nodes) {
+	private void addState(Fsm fsm, Set<String> nameSet, List<INode> nodes) {
 		ILeafNode leaf = (ILeafNode) nodes.get(0);
 		String name = leaf.getText();
 		if (!nameSet.contains(name)) {
@@ -76,18 +76,18 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 			state.setName(name);
 			state.setNode(leaf);
 
-			schedule.getContents().getStates().add(state);
+			fsm.getStates().add(state);
 			nameSet.add(name);
 		}
 	}
 
-	private void buildStates(ScheduleFsm schedule) {
+	private void buildStates(Fsm fsm) {
 		Set<String> nameSet = new HashSet<String>();
 		// source states
-		for (AstTransition transition : schedule.getContents().getTransitions()) {
+		for (AstTransition transition : fsm.getTransitions()) {
 			List<INode> nodes = NodeModelUtils.findNodesForFeature(transition,
 					CalPackage.eINSTANCE.getAstTransition_Source());
-			addState(schedule, nameSet, nodes);
+			addState(fsm, nameSet, nodes);
 		}
 	}
 
@@ -164,35 +164,33 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	/**
 	 * Returns the scope for a source state referenced inside a transition.
 	 * 
-	 * @param schedule
-	 *            a schedule
+	 * @param fsm
+	 *            a fsm
 	 * @param reference
 	 *            a variable reference
 	 * @return a scope
 	 */
-	public IScope scope_AstTransition_source(ScheduleFsm schedule,
-			EReference reference) {
-		if (schedule.getContents().getStates().isEmpty()) {
-			buildStates(schedule);
+	public IScope scope_AstTransition_source(Fsm fsm, EReference reference) {
+		if (fsm.getStates().isEmpty()) {
+			buildStates(fsm);
 		}
-		return Scopes.scopeFor(schedule.getContents().getStates());
+		return Scopes.scopeFor(fsm.getStates());
 	}
 
 	/**
 	 * Returns the scope for a source state referenced inside a transition.
 	 * 
-	 * @param schedule
-	 *            a schedule
+	 * @param fsm
+	 *            a fsm
 	 * @param reference
 	 *            a variable reference
 	 * @return a scope
 	 */
-	public IScope scope_AstTransition_target(ScheduleFsm schedule,
-			EReference reference) {
-		if (schedule.getContents().getStates().isEmpty()) {
-			buildStates(schedule);
+	public IScope scope_AstTransition_target(Fsm fsm, EReference reference) {
+		if (fsm.getStates().isEmpty()) {
+			buildStates(fsm);
 		}
-		return Scopes.scopeFor(schedule.getContents().getStates());
+		return Scopes.scopeFor(fsm.getStates());
 	}
 
 	/**
@@ -263,10 +261,11 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 */
 	public IScope scope_ScheduleFsm_initialState(ScheduleFsm schedule,
 			EReference reference) {
-		if (schedule.getContents().getStates().isEmpty()) {
-			buildStates(schedule);
+		Fsm fsm = schedule.getContents();
+		if (fsm.getStates().isEmpty()) {
+			buildStates(fsm);
 		}
-		return Scopes.scopeFor(schedule.getContents().getStates());
+		return Scopes.scopeFor(fsm.getStates());
 	}
 
 	/**
