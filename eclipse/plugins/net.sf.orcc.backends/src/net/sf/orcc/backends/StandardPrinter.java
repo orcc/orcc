@@ -115,7 +115,7 @@ public class StandardPrinter extends AbstractPrinter {
 				// if source file does not exist, force to generate
 				instanceModified = Long.MAX_VALUE;
 			} else {
-				instanceModified = actor.getFile().getLocalTimeStamp();
+				instanceModified = instance.getFile().getLocalTimeStamp();
 			}
 		} else if (instance.isNetwork()) {
 			Network network = instance.getNetwork();
