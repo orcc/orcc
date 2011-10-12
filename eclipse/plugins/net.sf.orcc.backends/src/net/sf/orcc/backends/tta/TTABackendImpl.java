@@ -161,6 +161,7 @@ public class TTABackendImpl extends AbstractBackend {
 	private void printNetwork(Network network) {
 		StandardPrinter networkPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/tta/TTA_network.stg");
+		networkPrinter.setExpressionPrinter(new LLVMExpressionPrinter());
 		StandardPrinter scriptPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/tta/TTA_script.stg");
 		StandardPrinter projectPrinter = new StandardPrinter(

@@ -49,7 +49,7 @@ entity processor_{{id}} is
       dv_{{output.index}}_out     : out std_logic;
 {{endif}}
 {{endfor}}
-      reset_n      : in  std_logic
+      rst          : in  std_logic
       );
 end processor_{{id}};
 
@@ -149,5 +149,5 @@ begin
              fu_STREAM_OUT_{{output.name}}_ext_dv(0)  => dv_{{output.index}}_out,
 {{endif}}
 {{endfor}}
-             rstx                       => reset_n);
+             rstx                       => rst);
 end bdf_type;

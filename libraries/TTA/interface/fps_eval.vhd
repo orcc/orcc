@@ -10,7 +10,7 @@ entity fps_eval is
   port (
     rst          : in  std_logic;
     clk          : in  std_logic;
-    top_frame    : in  std_logic;
+    top_frame    : in  std_logic_vector(0 downto 0);
     segment7     : out std_logic_vector(6 downto 0);
     segment7_sel : out std_logic_vector(1 downto 0)
     );
@@ -18,6 +18,7 @@ end fps_eval;
 
 
 architecture rtl_fps_eval of fps_eval is
+  signal top_frame2 : std_logic;
   signal top_ms     : std_logic;
   signal top_s      : std_logic;
   --
@@ -31,6 +32,8 @@ architecture rtl_fps_eval of fps_eval is
   signal segment7_t : std_logic_vector(6 downto 0);
   signal segment7_h : std_logic_vector(6 downto 0);
 begin
+
+  top_frame2 <= top_frame(0);
   
   counter_ms : entity work.counter
     generic map (
@@ -104,7 +107,7 @@ begin
       segment7_u   => segment7_u,
       segment7_t   => segment7_t,
       segment7_h   => segment7_h,
-      valid        => top_frame,
+      valid        => top_frame2,
       segment7     => segment7,
       segment7_sel => segment7_sel);
 

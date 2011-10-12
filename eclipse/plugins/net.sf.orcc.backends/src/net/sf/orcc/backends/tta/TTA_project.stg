@@ -44,7 +44,7 @@ set_location_assignment PIN_D19 -to leds[4]
 set_location_assignment PIN_C19 -to leds[5]
 set_location_assignment PIN_F19 -to leds[6]
 set_location_assignment PIN_E19 -to leds[7]
-set_location_assignment PIN_AP5 -to reset_n
+set_location_assignment PIN_AP5 -to rst
 set_location_assignment PIN_T33 -to clk
 
 set_location_assignment PIN_AE10 -to segment7[0]

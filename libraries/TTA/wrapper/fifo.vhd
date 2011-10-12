@@ -15,7 +15,7 @@ entity fifo is
   port
     (
       wrreq   : in  std_logic;
-      reset_n : in  std_logic;
+      rst     : in  std_logic;
       clk     : in  std_logic;
       rdreq   : in  std_logic;
       data    : in  std_logic_vector(width-1 downto 0);
@@ -32,7 +32,7 @@ architecture rtl_fifo of fifo is
 
 begin
 
-  s_clear <= not(reset_n);
+  s_clear <= not(rst);
 
   scfifo_component : altera_mf_components.scfifo
     generic map (
