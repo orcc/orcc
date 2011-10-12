@@ -164,7 +164,6 @@ public enum OpUnary implements Enumerator {
 			operators.put(op.getText(), op);
 		}
 
-		operators.put("bitnot", BITNOT);
 		operators.put("not", LOGIC_NOT);
 	}
 
