@@ -36,7 +36,6 @@ import java.util.Map;
 import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
-import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.Type;
 
 import org.eclipse.emf.common.util.URI;
@@ -44,6 +43,7 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.xtext.linking.impl.DefaultLinkingService;
 import org.eclipse.xtext.nodemodel.INode;
 
@@ -99,7 +99,7 @@ public class CalLinkingService extends DefaultLinkingService {
 	private List<EObject> builtinProcedure(EObject context, String name) {
 		AstProcedure procedure = procedures.get(name);
 		if (procedure != null) {
-			EObject cter = Util.getTopLevelContainer(context);
+			EObject cter = EcoreUtil.getRootContainer(context);
 
 			// Attach the stub to the resource that's being parsed
 			Resource res = makeResource(cter.eResource());

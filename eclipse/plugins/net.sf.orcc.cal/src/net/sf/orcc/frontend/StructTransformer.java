@@ -209,7 +209,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 		int lineNumber = Util.getLocation(variable);
 		Type type = EcoreUtil.copy(Typer.getType(variable));
 		String name = variable.getName();
-		boolean assignable = !variable.isConstant();
+		boolean assignable = Util.isAssignable(variable);
 
 		// retrieve initial value (may be null)
 		Expression initialValue = EcoreUtil.copy(Evaluator.getValue(variable));
@@ -235,7 +235,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 		int lineNumber = Util.getLocation(variable);
 		Type type = Typer.getType(variable);
 		String name = variable.getName();
-		boolean assignable = !variable.isConstant();
+		boolean assignable = Util.isAssignable(variable);
 
 		// create local variable with the given name
 		Var local = eINSTANCE.createVar(lineNumber, type, name, assignable, 0);

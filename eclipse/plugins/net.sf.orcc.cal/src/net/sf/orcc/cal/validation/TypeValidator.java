@@ -41,7 +41,6 @@ import net.sf.orcc.cal.cal.AstTypeInt;
 import net.sf.orcc.cal.cal.AstTypeList;
 import net.sf.orcc.cal.cal.AstTypeUint;
 import net.sf.orcc.cal.cal.CalFactory;
-import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.ExpressionBinary;
 import net.sf.orcc.cal.cal.ExpressionCall;
 import net.sf.orcc.cal.cal.ExpressionElsif;
@@ -59,6 +58,7 @@ import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.VariableReference;
 import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.cal.services.Typer;
+import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
@@ -314,8 +314,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 	@Check(CheckType.NORMAL)
 	public void checkStatementAssign(StatementAssign assign) {
 		Variable variable = assign.getTarget().getVariable();
-		if (variable.isConstant()
-				|| variable.eContainingFeature() == CalPackage.Literals.AST_ACTOR__PARAMETERS) {
+		if (!Util.isAssignable(variable)) {
 			error("The variable " + variable.getName() + " is not assignable",
 					eINSTANCE.getStatementAssign_Target());
 		}
@@ -436,7 +435,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		if (t1 == null || t2 == null) {
 			return;
 		}
-		
+
 		switch (op) {
 		case BITAND:
 			if (!t1.isInt() && !t1.isUint()) {

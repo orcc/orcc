@@ -38,7 +38,9 @@ AstUnit: {AstUnit} ':'
 	'end';
 
 ConstantVariable returns Variable:
-	VariableDeclaration (constant ?= '=') value=AstExpression ';';
+	'const' /* for backward compatibility we allow 'const' to be omitted */ ?
+	(annotations += AstAnnotation)* type = AstType name = ID ('[' dimensions += AstExpression ']')*
+	'=' value=AstExpression ';';
 
 ///////////////////////////////////////////////////////////////////////////////
 // actor
@@ -201,8 +203,14 @@ OutputPattern: port=[AstPort] ':' '[' values+=AstExpression (',' values+=AstExpr
 ///////////////////////////////////////////////////////////////////////////////
 
 StatementAssign:
-	target=VariableReference
-		('[' indexes += AstExpression ']')* ':=' value=AstExpression ';';
+	target=VariableReference ('[' indexes += AstExpression ']')*
+		(	(op='++' | op='--')
+		|	((op=':=' | op='=' | op=CompoundAssignOp) value=AstExpression))
+	';';
+
+terminal CompoundAssignOp:
+	'+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>='
+;
 
 StatementCall:
 	procedure=[AstProcedure|QualifiedName]
@@ -252,7 +260,7 @@ ExpressionBitxor returns AstExpression:
 ExpressionBitand returns AstExpression:
 	ExpressionEq ({ExpressionBinary.left=current} operator='&' right=ExpressionEq)*;
 ExpressionEq returns AstExpression:
-	ExpressionRelational ({ExpressionBinary.left=current} operator=('=' | '!=') right=ExpressionRelational)*;
+	ExpressionRelational ({ExpressionBinary.left=current} operator=('=' | '==' | '!=') right=ExpressionRelational)*;
 ExpressionRelational returns AstExpression:
 	ExpressionShift ({ExpressionBinary.left=current} operator=('<' | '<=' | '>' | '>=') right=ExpressionShift)*;
 ExpressionShift returns AstExpression:
@@ -260,12 +268,12 @@ ExpressionShift returns AstExpression:
 ExpressionAdditive returns AstExpression:
 	ExpressionMultiplicative ({ExpressionBinary.left=current} operator=('+' | '-') right=ExpressionMultiplicative)*;
 ExpressionMultiplicative returns AstExpression:
-	ExpressionExp ({ExpressionBinary.left=current} operator=('*' | '/' | 'div' | 'mod') right=ExpressionExp)*;
+	ExpressionExp ({ExpressionBinary.left=current} operator=('*' | '/' | '%' | 'div' | 'mod') right=ExpressionExp)*;
 ExpressionExp returns AstExpression:
 	ExpressionUnary ({ExpressionBinary.left=current} operator='**' right=ExpressionUnary)*;
 
 ExpressionUnary returns AstExpression:
-	{ExpressionUnary} unaryOperator=('~' | '-' | 'not' | '#') expression=ExpressionPostfix
+	{ExpressionUnary} unaryOperator=('~' | '!' | 'not' | '-' | '#') expression=ExpressionPostfix
 	| ExpressionPostfix;
 
 ExpressionPostfix returns AstExpression:
@@ -357,14 +365,16 @@ AstTypeUint: {AstTypeUint} 'uint' ('(' 'size' '=' size = AstExpression ')')?;
 ///////////////////////////////////////////////////////////////////////////////
 
 // any variable declaration may have annotations
-VariableDeclaration returns Variable: 
+VariableDeclaration returns Variable:
 	(annotations += AstAnnotation)*
 	type = AstType
 	name = ID
 	('[' dimensions += AstExpression ']')*;
 
 ValuedVariableDeclaration returns Variable:
-	VariableDeclaration ((constant ?= '=' | ':=') value=AstExpression)?;
+	(constant ?= 'const')?
+	(annotations += AstAnnotation)* type = AstType name = ID ('[' dimensions += AstExpression ']')*
+	(('=' | /* for backward compatibility */ ':=') value=AstExpression)? ;
 
 VariableReference: variable=[Variable|QualifiedName];
 

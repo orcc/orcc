@@ -599,6 +599,15 @@ public class StructuralValidator extends AbstractCalJavaValidator {
 	}
 
 	@Check(CheckType.NORMAL)
+	public void checkVariable(Variable variable) {
+		if (variable.isConstant() && variable.getValue() == null) {
+			String name = variable.getName();
+			error("The constant " + name + " must have a value", variable,
+					eINSTANCE.getVariable_Name(), -1);
+		}
+	}
+
+	@Check(CheckType.NORMAL)
 	public void checkVariableReference(VariableReference ref) {
 		Variable variable = ref.getVariable();
 		String name = variable.getName();

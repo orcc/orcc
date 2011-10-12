@@ -43,11 +43,13 @@ import net.sf.orcc.cal.cal.StatementCall;
 import net.sf.orcc.cal.cal.StatementForeach;
 import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.VariableReference;
+import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.cal.util.Util;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.validation.Check;
 import org.eclipse.xtext.validation.CheckType;
@@ -62,12 +64,6 @@ import org.eclipse.xtext.validation.CheckType;
 public class WarningValidator extends AbstractCalJavaValidator {
 
 	@Check(CheckType.NORMAL)
-	public void checkImport(Import import_) {
-		
-		
-	}
-	
-	@Check(CheckType.NORMAL)
 	public void checkAstProcedure(final AstProcedure procedure) {
 		boolean used = new BooleanSwitch() {
 
@@ -80,7 +76,7 @@ public class WarningValidator extends AbstractCalJavaValidator {
 				return false;
 			}
 
-		}.doSwitch(Util.getTopLevelContainer(procedure));
+		}.doSwitch(EcoreUtil.getRootContainer(procedure));
 
 		if (!used && procedure.eContainer() instanceof AstActor
 				&& !procedure.isNative()) {
@@ -107,12 +103,17 @@ public class WarningValidator extends AbstractCalJavaValidator {
 				return super.caseExpressionCall(expression);
 			}
 
-		}.doSwitch(Util.getTopLevelContainer(function));
+		}.doSwitch(EcoreUtil.getRootContainer(function));
 
 		if (!used && !function.isNative()) {
 			warning("The function " + function.getName() + " is never called",
 					function, eINSTANCE.getFunction_Name(), -1);
 		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkImport(Import import_) {
+
 	}
 
 	/**
@@ -179,18 +180,22 @@ public class WarningValidator extends AbstractCalJavaValidator {
 			warning("The variable " + variable.getName() + " is never used",
 					variable, eINSTANCE.getVariable_Name(), -1);
 		} else if (!isRead) {
+			if (reference == eINSTANCE.getAstProcedure_Parameters()
+					&& Typer.getType(variable).isList()) {
+				return;
+			}
+
 			warning("The variable " + variable.getName() + " is never read",
 					variable, eINSTANCE.getVariable_Name(), -1);
 		} else if (!isWritten) {
-			if (variable.isConstant()
-					|| reference == eINSTANCE.getAstActor_Parameters()
+			if (!Util.isAssignable(variable)
 					|| reference == eINSTANCE.getFunction_Parameters()
 					|| reference == eINSTANCE.getAstProcedure_Parameters()) {
 				return;
 			}
 
-			warning("The variable " + variable.getName() + " is never written",
-					variable, eINSTANCE.getVariable_Name(), -1);
+			// warning("The variable " + variable.getName() +
+			// " is never written", variable, eINSTANCE.getVariable_Name(), -1);
 		}
 	}
 

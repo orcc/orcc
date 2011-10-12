@@ -47,6 +47,7 @@ import net.sf.orcc.cal.cal.InputPattern;
 import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.cal.services.Typer;
+import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
@@ -202,7 +203,11 @@ public class CalLabelProvider extends DefaultEObjectLabelProvider {
 
 		// base type and name (prints C-like types)
 		String eltType = new ElementTypePrinter().doSwitch(type);
-		StringBuilder builder = new StringBuilder(eltType);
+		StringBuilder builder = new StringBuilder();
+		if (!Util.isAssignable(variable)) {
+			builder.append("const ");
+		}
+		builder.append(eltType);
 		builder.append(" ");
 		builder.append(variable.getName());
 
@@ -216,11 +221,7 @@ public class CalLabelProvider extends DefaultEObjectLabelProvider {
 		EStructuralFeature feature = variable.eContainingFeature();
 		if ((feature == eINSTANCE.getAstUnit_Variables() || feature == eINSTANCE
 				.getAstActor_StateVariables()) && variable.getValue() != null) {
-			builder.append(" ");
-			if (!variable.isConstant()) {
-				builder.append(":");
-			}
-			builder.append("= ");
+			builder.append(" = ");
 
 			// prints the evaluated value
 			Expression expr = Evaluator.getValue(variable);
