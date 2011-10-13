@@ -48,6 +48,10 @@
 	#endif
 #endif
 
+#define DISPLAY_DISABLE 0
+#define DISPLAY_READY 1
+#define DISPLAY_ENABLE 2
+
 extern char	*optarg;
 extern int getopt(int nargc, char * const *nargv, const char *ostr);
 

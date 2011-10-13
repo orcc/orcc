@@ -29,6 +29,8 @@
 #include "SDL.h"
 #include "orcc_util.h"
 
+#define DISPLAY_READY 1
+
 static SDL_Surface *m_screen;
 static SDL_Overlay *m_overlay;
 
