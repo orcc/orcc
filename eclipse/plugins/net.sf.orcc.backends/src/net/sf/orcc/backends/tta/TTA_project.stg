@@ -56,6 +56,8 @@ set_location_assignment PIN_AM6  -to segment7[5]
 set_location_assignment PIN_AP3  -to segment7[6]
 set_location_assignment PIN_AM4  -to segment7_sel[0]
 set_location_assignment PIN_AE12 -to segment7_sel[1]
+set_location_assignment PIN_AL4  -to segment7_sel[2]
+set_location_assignment PIN_AH8  -to segment7_sel[3]
 
 >>
 

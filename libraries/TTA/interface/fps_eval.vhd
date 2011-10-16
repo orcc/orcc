@@ -12,7 +12,7 @@ entity fps_eval is
     clk          : in  std_logic;
     top_frame    : in  std_logic_vector(0 downto 0);
     segment7     : out std_logic_vector(6 downto 0);
-    segment7_sel : out std_logic_vector(1 downto 0)
+    segment7_sel : out std_logic_vector(3 downto 0)
     );
 end fps_eval;
 
@@ -24,17 +24,20 @@ architecture rtl_fps_eval of fps_eval is
   --
   signal count_u    : std_logic_vector(15 downto 0);
   signal top_u      : std_logic;
-  signal count_t    : std_logic_vector(15 downto 0);
-  signal top_t      : std_logic;
+  signal count_d    : std_logic_vector(15 downto 0);
+  signal top_d      : std_logic;
   signal count_h    : std_logic_vector(15 downto 0);
+  signal top_h      : std_logic;
+  signal count_t    : std_logic_vector(15 downto 0);
   --
   signal segment7_u : std_logic_vector(6 downto 0);
-  signal segment7_t : std_logic_vector(6 downto 0);
+  signal segment7_d : std_logic_vector(6 downto 0);
   signal segment7_h : std_logic_vector(6 downto 0);
+  signal segment7_t : std_logic_vector(6 downto 0);
 begin
 
   top_frame2 <= top_frame(0);
-  
+
   counter_ms : entity work.counter
     generic map (
       nb_count => 1000*1000/period)
@@ -63,15 +66,15 @@ begin
       valid => top_ms,
       top   => top_u);
 
-  counter_t : entity work.counter
+  counter_d : entity work.counter
     generic map (
       nb_count => 10)
     port map (
       rst   => rst,
       clk   => clk,
-      count => count_t,
+      count => count_d,
       valid => top_u,
-      top   => top_t);
+      top   => top_d);
 
   counter_h : entity work.counter
     generic map (
@@ -80,7 +83,17 @@ begin
       rst   => rst,
       clk   => clk,
       count => count_h,
-      valid => top_t);
+      valid => top_d,
+      top   => top_h);
+
+  counter_t : entity work.counter
+    generic map (
+      nb_count => 10)
+    port map (
+      rst   => rst,
+      clk   => clk,
+      count => count_t,
+      valid => top_h);
 
   segment_display_conv_u : entity work.segment_display_conv
     port map (
@@ -88,11 +101,11 @@ begin
       bcd      => count_u(3 downto 0),
       segment7 => segment7_u);
 
-  segment_display_conv_t : entity work.segment_display_conv
+  segment_display_conv_d : entity work.segment_display_conv
     port map (
       clk      => clk,
-      bcd      => count_t(3 downto 0),
-      segment7 => segment7_t);
+      bcd      => count_d(3 downto 0),
+      segment7 => segment7_d);
 
   segment_display_conv_h : entity work.segment_display_conv
     port map (
@@ -100,13 +113,21 @@ begin
       bcd      => count_h(3 downto 0),
       segment7 => segment7_h);
 
+  segment_display_conv_t : entity work.segment_display_conv
+    port map (
+      clk      => clk,
+      bcd      => count_t(3 downto 0),
+      segment7 => segment7_t);
+
   segment_display_sel_component : entity work.segment_display_sel
     port map (
       clk          => clk,
       rst          => rst,
+      refresh      => top_s,
       segment7_u   => segment7_u,
-      segment7_t   => segment7_t,
+      segment7_d   => segment7_d,
       segment7_h   => segment7_h,
+      segment7_t   => segment7_t,
       valid        => top_frame2,
       segment7     => segment7,
       segment7_sel => segment7_sel);
