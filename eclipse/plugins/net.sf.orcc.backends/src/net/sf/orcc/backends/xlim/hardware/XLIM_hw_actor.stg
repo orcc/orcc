@@ -38,7 +38,7 @@ closeHwTransition() ::=<<
 \</module\>\</module\>
 >>
 
-//Adding FPGA Config typr for OpenForge BE
+//Adding FPGA Config type for OpenForge BE
 
 
 fpgaType() ::=<<
