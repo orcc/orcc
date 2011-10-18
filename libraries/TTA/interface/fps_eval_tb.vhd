@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
 -- Title      : Testbench for design "fps_eval"
--- Project    : 
+-- Project    : Orcc - TTA back-end
 -------------------------------------------------------------------------------
 -- File       : fps_eval_tb.vhd
--- Author     : Hervé Yviquel  <hyviquel@laptopy>
--- Company    : 
+-- Author     : Hervé Yviquel  <herve.yviquel@irisa.fr>
+-- Company    : IRISA
 -- Created    : 2011-10-13
--- Last update: 2011-10-13
+-- Last update: 2011-10-17
 -- Platform   : 
--- Standard   : VHDL'87
+-- Standard   : VHDL'93
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -37,10 +37,10 @@ architecture arch_fps_eval_tb of fps_eval_tb is
   signal   clk          : std_logic                    := '0';
   signal   top_frame    : std_logic_vector(0 downto 0) := "0";
   signal   segment7     : std_logic_vector(6 downto 0);
-  signal   segment7_sel : std_logic_vector(1 downto 0);
+  signal   segment7_sel : std_logic_vector(3 downto 0);
 
-begin  -- arch_fps_eval_tb
-
+begin
+  
   fps_eval_1 : entity work.fps_eval
     generic map (
       period => period2)
@@ -50,7 +50,6 @@ begin  -- arch_fps_eval_tb
       top_frame    => top_frame,
       segment7     => segment7,
       segment7_sel => segment7_sel);
-
 
   -- clock generation
   clk <= not clk after PERIOD/2;
@@ -67,9 +66,18 @@ begin  -- arch_fps_eval_tb
   -- top_frame generation
   top_proc : process
   begin
-    wait for 1 ms;
+    wait for 1625 us;
     top_frame <= "1";
-    top_frame <= not top_frame after PERIOD/2;
+    wait for 3*PERIOD;
+    top_frame <= "0";
+    wait for 3256 us;
+    top_frame <= "1";
+    wait for 3*PERIOD;
+    top_frame <= "0";
+    wait for 6478 us;
+    top_frame <= "1";
+    wait for 3*PERIOD;
+    top_frame <= "0";
   end process;
   
 end arch_fps_eval_tb;

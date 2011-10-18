@@ -1,7 +1,30 @@
+-------------------------------------------------------------------------------
+-- Title      : Performance evaluator
+-- Project    : Orcc - TTA back-end
+-------------------------------------------------------------------------------
+-- File       : fps_eval.vhd
+-- Author     : Hervé Yviquel  <herve.yviquel@irisa.fr>
+-- Company    : IRISA
+-- Created    : 2011-10-17
+-- Last update: 2011-10-18
+-- Platform   : FPGA
+-- Standard   : VHDL'93
+-------------------------------------------------------------------------------
+-- Description: 
+-------------------------------------------------------------------------------
+-- Copyright (c) 2011 
+-------------------------------------------------------------------------------
+-- Revisions  :
+-- Date        Version  Author  Description
+-- 2011-10-17  1.0      hyviquel        Created
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 
 library work;
+
+-------------------------------------------------------------------------------
 
 entity fps_eval is
   generic (
@@ -16,9 +39,11 @@ entity fps_eval is
     );
 end fps_eval;
 
+-------------------------------------------------------------------------------
 
 architecture rtl_fps_eval of fps_eval is
-  signal top_frame2 : std_logic;
+  signal top_frame2 : std_logic_vector(1 downto 0);
+  signal top_frame3 : std_logic;
   signal top_ms     : std_logic;
   signal top_s      : std_logic;
   --
@@ -36,7 +61,16 @@ architecture rtl_fps_eval of fps_eval is
   signal segment7_t : std_logic_vector(6 downto 0);
 begin
 
-  top_frame2 <= top_frame(0);
+  process (clk, rst)
+  begin  -- process
+    if rst = '0' then
+      top_frame2 <= (others => '0');
+    elsif clk'event and clk = '1' then
+      top_frame2 <= top_frame2(0) & top_frame(0);
+    end if;
+  end process;
+  
+  top_frame3 <= top_frame2(0) and not top_frame2(1);
 
   counter_ms : entity work.counter
     generic map (
@@ -98,24 +132,28 @@ begin
   segment_display_conv_u : entity work.segment_display_conv
     port map (
       clk      => clk,
+      rst      => rst,
       bcd      => count_u(3 downto 0),
       segment7 => segment7_u);
 
   segment_display_conv_d : entity work.segment_display_conv
     port map (
       clk      => clk,
+      rst      => rst,
       bcd      => count_d(3 downto 0),
       segment7 => segment7_d);
 
   segment_display_conv_h : entity work.segment_display_conv
     port map (
       clk      => clk,
+      rst      => rst,
       bcd      => count_h(3 downto 0),
       segment7 => segment7_h);
 
   segment_display_conv_t : entity work.segment_display_conv
     port map (
       clk      => clk,
+      rst      => rst,
       bcd      => count_t(3 downto 0),
       segment7 => segment7_t);
 
@@ -123,16 +161,18 @@ begin
     port map (
       clk          => clk,
       rst          => rst,
-      refresh      => top_s,
+      refresh      => top_ms,
       segment7_u   => segment7_u,
       segment7_d   => segment7_d,
       segment7_h   => segment7_h,
       segment7_t   => segment7_t,
-      valid        => top_frame2,
+      valid        => top_frame3,
       segment7     => segment7,
       segment7_sel => segment7_sel);
 
 end rtl_fps_eval;
+
+-------------------------------------------------------------------------------
 
 
 
