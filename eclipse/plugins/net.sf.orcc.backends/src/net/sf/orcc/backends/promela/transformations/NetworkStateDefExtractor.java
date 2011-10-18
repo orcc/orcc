@@ -56,7 +56,7 @@ import net.sf.orcc.network.transformations.INetworkTransformation;
 /**
  * This class extracts the variables/ports needed to schedule a network. The
  * resulting information is used by the promela backend to highlight the
- * variables that we need to observe in the scheduling.
+ * variables that we need to observe when generating schedules.
  * 
  * @author Johan Ersfolk
  * 
@@ -68,23 +68,25 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object>
 
 	private Set<Var> varsUsedInScheduling = new HashSet<Var>();
 
+	private Set<Port> portsUsedInScheduling = new HashSet<Port>();
+	
 	private Set<Port> inputPortsUsedInScheduling = new HashSet<Port>();
 
 	private Set<Port> outputPortsUsedInScheduling = new HashSet<Port>();
+
+	private Set<Var> variablesWithLoops = new HashSet<Var>();
 
 	// private List<Var> stateVarsInGrd;
 
 	// private List<Port> peekPortsInGrd;
 
-	private Set<Var> variablesWithLoops = new HashSet<Var>();
+	private Map<Port, Set<Port>> outputPortToInputPortMap = new HashMap<Port, Set<Port>>();
 
 	// private Map<Actor, List<Var>> stateVarsInGrdMap = new HashMap<Actor,
 	// List<Var>>();
 
 	// private Map<Actor, List<Port>> peekPortsInGrdMap = new HashMap<Actor,
 	// List<Port>>();
-
-	private Map<Port, Set<Port>> outputPortToInputPortMap = new HashMap<Port, Set<Port>>();
 
 	private Map<Port, Set<Var>> outputPortToVariableMap = new HashMap<Port, Set<Var>>();
 
@@ -119,7 +121,7 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object>
 	void analyzeVarDeps() {
 		visited.clear();
 		for (Var currentVar : variableDependency.keySet()) {
-			recursiveSearch(currentVar);
+			transitiveClosure(currentVar, visited);
 			if (visited.contains(currentVar)) {
 				variablesWithLoops.add(currentVar);
 			}
@@ -147,17 +149,16 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object>
 		for (Action action : actor.getActions()) {
 			doSwitch(action);
 		}
-
+		// Find self-loops in transitive closure (a var depending on itself)
 		analyzeVarDeps();
 		// System.out.println(actor.getName() + "---------------------");
-		// walk through the output ports of each action and trace back how the
-		// value is created from variables and input ports
+		// For each output port, find the variables and input ports used to produce the output value
 		for (Action action : actor.getActions()) {
 			for (Port port : action.getOutputPattern().getPorts()) {
 				// System.out.println("Port: " + port.getName());
 				visited.clear();
 				Var portVar = action.getOutputPattern().getVariable(port);
-				recursiveSearch(portVar);
+				transitiveClosure(portVar, visited);
 				if (!outputPortToInputPortMap.containsKey(port)) {
 					outputPortToVariableMap.put(port, new HashSet<Var>());
 					outputPortToInputPortMap.put(port, new HashSet<Port>());
@@ -265,6 +266,13 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object>
 		return null;
 	}
 
+	/**
+	 * @return the varsUsedInScheduling
+	 */
+	public Set<Var> getVarsUsedInScheduling() {
+		return varsUsedInScheduling;
+	}
+
 	/*
 	 * 1) Collects a map from Actor input ports to the output port the
 	 * corresponding fifo is connected to. The map describes where the inputs
@@ -298,6 +306,15 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object>
 				temp.clear();
 			}
 		}
+		portsUsedInScheduling.addAll(inputPortsUsedInScheduling);
+		portsUsedInScheduling.addAll(outputPortsUsedInScheduling);
+	}
+
+	/**
+	 * @return the portsUsedInScheduling
+	 */
+	public Set<Port> getPortsUsedInScheduling() {
+		return portsUsedInScheduling;
 	}
 
 	private void identifySchedulingVars() {
@@ -308,12 +325,12 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object>
 		}
 	}
 
-	private void recursiveSearch(Var current) {
-		if (variableDependency.containsKey(current)) {
-			for (Var v : variableDependency.get(current)) {
-				if (!visited.contains(v)) {
-					visited.add(v);
-					recursiveSearch(v);
+	private void transitiveClosure(Var variable, Set<Var> transitiveClosure) {
+		if (variableDependency.containsKey(variable)) {
+			for (Var v : variableDependency.get(variable)) {
+				if (!transitiveClosure.contains(v)) {
+					transitiveClosure.add(v);
+					transitiveClosure(v, transitiveClosure);
 				}
 			}
 		}
