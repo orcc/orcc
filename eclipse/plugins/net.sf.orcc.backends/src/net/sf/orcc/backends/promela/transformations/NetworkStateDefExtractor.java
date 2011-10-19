@@ -291,10 +291,12 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object>
 				if (fifoTargetToSourceMap.containsKey(port)) {
 					outputPortsUsedInScheduling.add(fifoTargetToSourceMap
 							.get(port));
-					for (Port in : outputPortToInputPortMap
+					if (fifoTargetToSourceMap.get(port) != null) {
+						for (Port in : outputPortToInputPortMap
 							.get(fifoTargetToSourceMap.get(port))) {
-						if (!inputPortsUsedInScheduling.contains(in)) {
-							temp.add(in);
+							if (!inputPortsUsedInScheduling.contains(in)) {
+								temp.add(in);
+							}
 						}
 					}
 				}
