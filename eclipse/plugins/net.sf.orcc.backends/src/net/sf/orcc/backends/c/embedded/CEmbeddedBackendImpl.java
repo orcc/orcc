@@ -36,6 +36,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.c.CExpressionPrinter;
+import net.sf.orcc.backends.c.CNetworkTemplateData;
 import net.sf.orcc.backends.c.CTypePrinter;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.network.Network;
@@ -63,6 +64,29 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 		// Transform all actors of the network
 		transformActors(network.getActors());
 		printActors(network.getActors());
+
+		StandardPrinter printer = new StandardPrinter(
+				"net/sf/orcc/backends/c/embedded/network.stg");
+		printer.setTypePrinter(new CTypePrinter());
+
+		// print network
+		
+		// This call is needed to associate instances to network vertices
+		network.computeTemplateMaps();
+
+		CNetworkTemplateData data = new CNetworkTemplateData();
+		data.computeHierarchicalTemplateMaps(network);
+		network.setTemplateData(data);
+
+		network.flatten();
+
+		// The classification gives production and consumption information from the graph
+		write("Starting classification of actors... ");
+		network.classify();
+		write("done\n");
+		
+		write("Printing network...\n");
+		printer.print(network.getName() + ".graphml", path, network);
 	}
 
 	/**

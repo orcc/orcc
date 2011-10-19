@@ -1,5 +1,32 @@
 import "net/sf/orcc/backends/c/C_actor.stg"
 
+// printing an actor in a C file
+
+printInputPortEmbd(port,action)  ::= <<
+<port.type>[<action.inputPattern.numTokensMap.(port)>] <port.name>
+>>
+
+printOutputPortEmbd(port,action)  ::= <<
+<port.type>[<action.outputPattern.numTokensMap.(port)>] <port.name>
+>>
+
+printActionEmbd(action)  ::= <<
+
+static void <action.body.name>(
+	<if (!action.inputPattern.ports.empty)>
+		<action.inputPattern.ports:printInputPortEmbd(action); separator=", "><
+		if (!action.outputPattern.ports.empty)>, <endif> // Inputs
+	<endif>
+	<if (!action.outputPattern.ports.empty)>
+		<action.outputPattern.ports: printOutputPortEmbd(action); separator=", "> // Outputs
+	<endif>
+)
+{
+	
+}
+
+>>
+
 actor(actor, options) ::= <<
 
 /**
@@ -8,7 +35,16 @@ actor(actor, options) ::= <<
 */
 
 ////////////////////////////////////////////////////////////////////////////////
+// State variables of the actor
+<actor.stateVars: stateVar()>
+
+////////////////////////////////////////////////////////////////////////////////
+// Functions/procedures
+<actor.procs: printProcedureDeclaration()>
+<actor.procs: printProcedure()>
+
+////////////////////////////////////////////////////////////////////////////////
 // Actions
-<actor.actions: printAction()>
+<actor.actions: printActionEmbd()>
 
 >>
