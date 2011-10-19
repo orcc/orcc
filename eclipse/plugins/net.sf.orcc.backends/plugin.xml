@@ -102,6 +102,16 @@
                id="net.sf.orcc.plugins.compileXDF">
          </option>
       </backend>
+      <backend
+            class="net.sf.orcc.backends.c.embedded.CEmbeddedBackendImpl"
+            name="CEmbedded">
+         <option
+               id="net.sf.orcc.plugins.compileXDF">
+         </option>
+         <option
+               id="net.sf.orcc.backends.classify">
+         </option>
+      </backend>
    </extension>
    <extension
          point="net.sf.orcc.core.options">
