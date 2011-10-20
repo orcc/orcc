@@ -39,6 +39,7 @@ import net.sf.orcc.backends.c.CExpressionPrinter;
 import net.sf.orcc.backends.c.CNetworkTemplateData;
 import net.sf.orcc.backends.c.CTypePrinter;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.moc.SDFMoC;
 import net.sf.orcc.network.Network;
 
 /**
@@ -85,8 +86,15 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 		network.classify();
 		write("done\n");
 		
-		write("Printing network...\n");
-		printer.print(network.getName() + ".graphml", path, network);
+		if(network.getMoC().isCSDF()){
+			SDFMoC moc = (SDFMoC)network.getActors().get(0).getMoC();
+			moc.toString();
+			write("Printing network...\n");
+			printer.print(network.getName() + ".graphml", path, network);
+		}
+		else{
+			write("The network is not SDF. Other models are not yet supported.");
+		}
 	}
 
 	/**
