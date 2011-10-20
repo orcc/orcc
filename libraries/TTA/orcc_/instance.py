@@ -67,7 +67,9 @@ class Instance:
         self._asmFile = self.id + ".tceasm"
         self._bemFile = self.id + ".bem"
         self._mifFile = self.id + ".mif"
+        self._coeFile = self.id + ".coe"
         self._mifDataFile = self.id + "_data" + ".mif"
+        self._coeDataFile = self.id + "_data" + ".coe"
         # Useful names
         self._entity = "processor_" + self.id + "_tl"
 
@@ -81,6 +83,7 @@ class Instance:
         if retcode >= 0 and debug: retcode = subprocess.call(["tcedisasm", "-n", "-o", self._asmFile, self._adfFile, self._tpefFile])
         if retcode >= 0: retcode = subprocess.call(["createbem", "-o", self._bemFile, self._adfFile])
         if retcode >= 0: retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", "images", "-f", "mif", "-o", "mif", self._adfFile])
+        if retcode >= 0: retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", "images", "-f", "coe", "-o", "coe", self._adfFile])
 
     def initializeMemories(self, srcPath):
         srcPath = os.path.join(srcPath, self.id)
@@ -111,6 +114,8 @@ class Instance:
         # Copy files to build directory
         shutil.copy(self._mifFile, wrapperPath)
         shutil.copy(self._mifDataFile, wrapperPath)
+        shutil.copy(self._coeFile, wrapperPath)
+        shutil.copy(self._coeDataFile, wrapperPath)
         shutil.copy("imem_mau_pkg.vhdl", buildPath)
         if not (self.isNative or self.isBroadcast):
             shutil.copy(self._tbFile, buildPath)
