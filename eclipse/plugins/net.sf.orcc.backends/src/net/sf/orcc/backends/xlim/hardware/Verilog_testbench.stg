@@ -1,4 +1,22 @@
-import "net/sf/orcc/backends/vhdl/VHDL_testbench.stg"
+///////////////////////////////////////////////////////////////////////////////
+// Common applet
+///////////////////////////////////////////////////////////////////////////////
+sendData(port) ::= <<
+<if(port.type.bool)
+>if (input_bit = 1) then
+  <port.name>_data  \<= '1';
+else
+  <port.name>_data  \<= '0';
+end if;<
+else
+><if(port.type.int)
+  ><port.name>_data  \<= std_logic_vector(to_signed(input_bit, <port.type.size>));<
+  else
+  ><port.name>_data  \<= std_logic_vector(to_unsigned(input_bit, <port.type.size>));<
+  endif><
+endif>
+>>
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Print signal and instanciation
@@ -78,6 +96,50 @@ begin
 end process WaveGen_Proc_In;
 
 >>
+
+case_define_in(port) ::= <<
+<if (!port.native)
+>--
+-- Input port: <port.name> Waveform Generation
+case tb_FSM_<port.name> is
+  when after_reset =\>
+    count \<= count + 1;
+    if (count = 15) then
+      tb_FSM_<port.name> \<= read_file;
+      count           \<= 0;
+    end if;
+
+  when read_file =\>
+    if (not endfile (sim_file_<instance.id>_<port.name>)) then
+      readline(sim_file_<instance.id>_<port.name>, line_number);
+      --
+      if (line_number'length \> 0 and line_number(1) /= '/') then
+        read(line_number, input_bit);
+        <sendData(port)>
+        <port.name>_send \<= '1';    
+        tb_FSM_<port.name> \<= CheckRead;
+      end if;
+    end if;
+
+  when CheckRead =\>
+    if (not endfile (sim_file_<instance.id>_<port.name>)) and <port.name>_ack = '1' then
+      readline(sim_file_<instance.id>_<port.name>, line_number);
+      --
+      if (line_number'length \> 0 and line_number(1) /= '/') then
+        read(line_number, input_bit);
+        <sendData(port)>
+        <port.name>_send \<= '1';      
+      end if;
+    elsif (endfile (sim_file_<instance.id>_<port.name>)) then
+      <port.name>_send \<= '0'; 
+    end if;
+
+  when others =\> null;
+end case;
+<endif>
+
+>>
+
 
 waveform_process_out(output) ::= <<
 -- Output(s) waveform Generation
