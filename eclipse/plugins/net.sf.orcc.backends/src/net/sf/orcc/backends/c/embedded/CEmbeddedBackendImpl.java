@@ -61,13 +61,12 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
-
 		// Transform all actors of the network
 		transformActors(network.getActors());
 		printActors(network.getActors());
 
 		StandardPrinter printer = new StandardPrinter(
-				"net/sf/orcc/backends/c/embedded/network.stg");
+				"net/sf/orcc/backends/c/embedded/Network.stg");
 		printer.setTypePrinter(new CTypePrinter());
 
 		// print network
@@ -104,7 +103,7 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 	@Override
 	protected boolean printActor(Actor actor) throws OrccException {
 		StandardPrinter printer = new StandardPrinter(
-				"net/sf/orcc/backends/c/embedded/actor.stg", false);
+				"net/sf/orcc/backends/c/embedded/Actor.stg", false);
 		printer.setExpressionPrinter(new CExpressionPrinter());
 		printer.setTypePrinter(new CTypePrinter());
 		return printer.print(actor.getSimpleName() + ".c", path, actor);
