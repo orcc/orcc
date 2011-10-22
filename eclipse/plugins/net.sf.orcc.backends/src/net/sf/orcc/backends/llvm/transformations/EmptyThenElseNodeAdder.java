@@ -33,14 +33,19 @@ import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
- * Create empty else node if needed.
+ * Create empty then and else node if needed.
  * 
  * @author Herve Yviquel
+ * @author Jerome Gorin
  */
-public class EmptyElseNodeAdder extends AbstractActorVisitor<Object> {
+public class EmptyThenElseNodeAdder extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseNodeIf(NodeIf nodeIf) {
+		if (nodeIf.getThenNodes().isEmpty()) {
+			nodeIf.getThenNodes().add(IrFactory.eINSTANCE.createNodeBlock());
+		}
+		
 		if (nodeIf.getElseNodes().isEmpty()) {
 			nodeIf.getElseNodes().add(IrFactory.eINSTANCE.createNodeBlock());
 		}

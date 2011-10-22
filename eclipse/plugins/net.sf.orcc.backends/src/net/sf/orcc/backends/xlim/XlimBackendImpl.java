@@ -42,7 +42,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.CustomPrinter;
 import net.sf.orcc.backends.StandardPrinter;
-import net.sf.orcc.backends.llvm.transformations.EmptyElseNodeAdder;
+import net.sf.orcc.backends.llvm.transformations.EmptyThenElseNodeAdder;
 import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.backends.transformations.DivisionSubstitution;
 import net.sf.orcc.backends.transformations.Inliner;
@@ -156,7 +156,7 @@ public class XlimBackendImpl extends AbstractBackend {
 				new ExpressionSplitter(true), /* new CopyPropagator(), */
 				new BuildCFG(), new InstPhiTransformation(),
 				new LiteralIntegersAdder(true), new CastAdder(true, true),
-				new XlimVariableRenamer(), new EmptyElseNodeAdder(), new BlockCombine() };
+				new XlimVariableRenamer(), new EmptyThenElseNodeAdder(), new BlockCombine() };
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);

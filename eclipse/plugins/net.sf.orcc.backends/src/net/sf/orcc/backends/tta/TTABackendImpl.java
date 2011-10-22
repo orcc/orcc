@@ -41,7 +41,7 @@ import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.llvm.LLVMExpressionPrinter;
 import net.sf.orcc.backends.llvm.LLVMTypePrinter;
 import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
-import net.sf.orcc.backends.llvm.transformations.EmptyElseNodeAdder;
+import net.sf.orcc.backends.llvm.transformations.EmptyThenElseNodeAdder;
 import net.sf.orcc.backends.llvm.transformations.GetElementPtrAdder;
 import net.sf.orcc.backends.llvm.transformations.PrintlnTransformation;
 import net.sf.orcc.backends.transformations.CastAdder;
@@ -108,7 +108,7 @@ public class TTABackendImpl extends AbstractBackend {
 				new RenameTransformation(this.transformations),
 				new TacTransformation(true), new InstPhiTransformation(),
 				new GetElementPtrAdder(), new CastAdder(true, false),
-				new EmptyElseNodeAdder(), new BlockCombine(), new BuildCFG() };
+				new EmptyThenElseNodeAdder(), new BlockCombine(), new BuildCFG() };
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);
