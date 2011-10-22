@@ -50,6 +50,7 @@ import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
 import net.sf.orcc.backends.llvm.transformations.EmptyElseNodeAdder;
 import net.sf.orcc.backends.llvm.transformations.GetElementPtrAdder;
+import net.sf.orcc.backends.llvm.transformations.ListInitializer;
 import net.sf.orcc.backends.llvm.transformations.PrintlnTransformation;
 import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.backends.transformations.InstPhiTransformation;
@@ -145,7 +146,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 				new TacTransformation(true), new InstPhiTransformation(),
 				new GetElementPtrAdder(), new TypeResizer(),
 				new CastAdder(true, false), new EmptyElseNodeAdder(),
-				new BlockCombine(), new BuildCFG() };
+				new BlockCombine(), new BuildCFG(), new ListInitializer() };
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);
