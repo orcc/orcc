@@ -320,7 +320,11 @@ map<string, Procedure*>* IRParser::parseProcs(Module* module){
 			
 			//Parse a procedure
 			Procedure* proc= parseProc(inputsMD->getOperand(i));
-			procedures->insert(pair<string, Procedure*>(proc->getName(), proc));
+			
+			if (proc != NULL){
+				// Insert procedure in case of success
+				procedures->insert(pair<string, Procedure*>(proc->getName(), proc));
+			}
 		}
 		
 	}
@@ -487,10 +491,14 @@ Action* IRParser::parseAction(MDNode* node){
 
 
 Procedure* IRParser::parseProc(MDNode* node){
+	if (node->getOperand(2) == NULL){
+		//procedure is unused
+		return NULL;
+	}
+
 	MDString* name = cast<MDString>(node->getOperand(0));
 	ConstantInt* isExtern = cast<ConstantInt>(node->getOperand(1));
 	Function* function = cast<Function>(node->getOperand(2));
-
 	return new Procedure(name->getString(), isExtern, function);
 }
 
