@@ -60,6 +60,9 @@ void wait_for_key();
 // print usage
 void print_usage();
 
+#define DISPLAY_DISABLE 0
+#define DISPLAY_READY 1
+#define DISPLAY_ENABLE 2
 
 // specific to Microsoft Visual Studio
 // disable warnings about fopen
