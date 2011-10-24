@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009, Artemis SudParis-IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,7 @@ package net.sf.orcc.backends.llvm;
 
 import static net.sf.orcc.OrccActivator.getDefault;
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
+import static net.sf.orcc.OrccLaunchConstants.MAPPING;
 import static net.sf.orcc.preferences.PreferenceConstants.P_JADE_TOOLBOX;
 
 import java.io.BufferedReader;
@@ -66,7 +67,10 @@ import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.util.ActorVisitor;
+import net.sf.orcc.network.Connection;
+import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.serialize.XDFWriter;
 import net.sf.orcc.tools.classifier.ActorClassifier;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
@@ -89,12 +93,19 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 	private boolean debugMode;
 
+	private Map<String, List<Instance>> instancesTarget;
+
 	/**
 	 * Path of JadeToolbox executable
 	 */
 	protected String jadeToolbox;
 
 	private String llvmGenMod;
+
+	/**
+	 * Configuration mapping
+	 */
+	private Map<String, String> mapping;
 
 	private boolean normalize;
 
@@ -118,6 +129,43 @@ public class LLVMBackendImpl extends AbstractBackend {
 		transformations.put("select", "select_");
 	}
 
+	private void computeMapping(Network network) {
+		// compute the different threads
+		instancesTarget = new HashMap<String, List<Instance>>();
+		for (Instance instance : network.getInstances()) {
+			String path = null;
+			if (instance.isActor()) {
+				path = instance.getHierarchicalPath();
+			} else if (instance.isBroadcast()) {
+				// use source instance for broadcasts
+				Set<Connection> edges = network.getGraph().incomingEdgesOf(
+						new Vertex(instance));
+				if (!edges.isEmpty()) {
+					Connection incoming = edges.iterator().next();
+					Vertex source = network.getGraph().getEdgeSource(incoming);
+					if (source.isInstance()) {
+						path = source.getInstance().getHierarchicalPath();
+					}
+				}
+			}
+
+			// get component
+			String component = mapping.get(path);
+			if (component != null) {
+				List<Instance> list = instancesTarget.get(component);
+				if (list == null) {
+					list = new ArrayList<Instance>();
+					instancesTarget.put(component, list);
+				}
+
+				list.add(instance);
+			} else {
+				write("Warning: The instance '" + instance.getId()
+						+ "' is not mapped.\n");
+			}
+		}
+	}
+
 	@Override
 	public void doInitializeOptions() {
 		llvmGenMod = getAttribute("net.sf.orcc.backends.llvmMode", "Assembly");
@@ -126,6 +174,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
 		jadeToolbox = getDefault().getPreference(P_JADE_TOOLBOX, "");
 		debugMode = getAttribute(DEBUG_MODE, true);
+		mapping = getAttribute(MAPPING, new HashMap<String, String>());
 	}
 
 	@Override
@@ -186,6 +235,18 @@ public class LLVMBackendImpl extends AbstractBackend {
 		write("Printing network...\n");
 		XDFWriter writer = new XDFWriter();
 		writer.write(new File(path), network);
+
+		instancesTarget = null;
+		for (String mappedThing : mapping.values()) {
+			if (!mappedThing.isEmpty()) {
+				computeMapping(network);
+				break;
+			}
+		}
+
+		if (instancesTarget != null) {
+			printMapping(network);
+		}
 	}
 
 	private void finalizeActors(List<Actor> actors) throws OrccException {
@@ -210,6 +271,13 @@ public class LLVMBackendImpl extends AbstractBackend {
 		new File(folder).mkdirs();
 
 		return printer.print(actor.getSimpleName(), folder, actor);
+	}
+
+	private void printMapping(Network network) {
+		StandardPrinter networkPrinter = new StandardPrinter(
+				"net/sf/orcc/backends/llvm/LLVM_mapping.stg");
+		networkPrinter.getOptions().put("mapping", instancesTarget);
+		networkPrinter.print(network.getName() + ".xcf", path, network);
 	}
 
 	private void runJadeToolBox(List<Actor> actors) throws OrccException {
