@@ -5,7 +5,9 @@ project (Jade)
 find_program(LLVM_CONFIG llvm-config ${LLVM_INSTDIR}/bin DOC "path to llvm-config tool")
 find_package(SDL REQUIRED)
 find_package(Threads REQUIRED)
+find_library(orcc_LIBRARY orcc)
 
+# PThread dependencies
 IF(NOT CMAKE_HAVE_PTHREAD_H)
 set(PHTREAD_DIR CACHE STRING "pthread directory")
 
@@ -15,6 +17,12 @@ set(CMAKE_THREAD_LIBS_INIT ${PHTREAD_DIR}/lib/pthreadVCE2.lib)
 include_directories(${PHTREAD_INCLUDE_DIRS})
 ENDIF(NOT CMAKE_HAVE_PTHREAD_H)
 
+# Orcc dependencies
+find_path(orcc_INCLUDE_DIR NAMES orcc_fifo.h orcc_types.h
+  PATH_SUFFIXES include/orcc)
+
+
+# LLVM dependencies
 IF(LLVM_CONFIG STREQUAL "LLVM_CONFIG-NOTFOUND" )
 	set(LLVM_DIR /where/llvm/lives CACHE STRING "llvm source directory")
 	set(LLVM_INST_DIR /where/llvm/is/installed CACHE STRING "llvm installation directory")
@@ -113,9 +121,6 @@ add_subdirectory(lib/RVCDecoder)
 include_directories(${JADE_MAIN_INCLUDE_DIR} ${LLVM_INCLUDE_DIRS} ${SDL_INCLUDE_DIR})
  
 add_definitions(${LLVM_CPP_FLAGS} ${JADE_CPP_FLAGS})
-
-# Orcc
-add_subdirectory(orcc)
 
 # Tools
 add_subdirectory(tools)
