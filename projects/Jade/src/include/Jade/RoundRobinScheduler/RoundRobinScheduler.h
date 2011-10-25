@@ -68,7 +68,7 @@ public:
 	 *
 	 *	@param decoder : the Decoder to insert the round robin scheduler into
      */
-	RoundRobinScheduler(llvm::LLVMContext& C, Decoder* decoder, bool noMultiCore = false, bool verbose = false);
+	RoundRobinScheduler(llvm::LLVMContext& C, Decoder* decoder, bool noMultiCore = false, bool verbose = false, bool debug = false);
 	~RoundRobinScheduler();
 
 	/**
@@ -166,6 +166,10 @@ private:
 
 	/** Print all actions made by LLVM execution engine*/
 	bool verbose;
+
+	/** Print debug information*/
+	bool debug;
+
 };
 
 #endif

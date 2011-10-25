@@ -63,12 +63,13 @@
 #include "Jade/Core/Variable.h"
 #include "Jade/Core/Network/Instance.h"
 #include "Jade/RoundRobinScheduler/RoundRobinScheduler.h"
+#include "Jade/Util/FunctionMng.h"
 //------------------------------
 
 using namespace std;
 using namespace llvm;
 
-RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, Decoder* decoder, bool noMultiCore, bool verbose): Context(C) {
+RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, Decoder* decoder, bool noMultiCore, bool verbose, bool debug): Context(C) {
 	this->decoder = decoder;
 	this->configuration = decoder->getConfiguration();
 	this->scheduler = NULL;
@@ -77,6 +78,7 @@ RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, Decoder* decoder,
 	this->schedInst = NULL;
 	this->stopGV = NULL;
 	this->verbose = verbose;
+	this->debug = debug;
 
 	createScheduler();	
 }
@@ -164,10 +166,19 @@ void RoundRobinScheduler::createCall(Instance* instance){
 		functionCall.insert(pair<Function*, CallInst*>(initialize, CallInit));
 	}
 
+	// Add debugging information if needed
+	if (debug){
+		string message = "firing ";
+		message.append(instance->getId());
+
+		FunctionMng::createPuts(decoder, message, schedInst);
+	}
+	
 	// Call scheduler function of the instance
 	Function* scheduler = actionScheduler->getSchedulerFunction();
 	CallInst* CallSched = CallInst::Create(scheduler, "", schedInst);
 	CallSched->setTailCall();
+	
 	
 
 	functionCall.insert(pair<Function*, CallInst*>(scheduler, CallSched));

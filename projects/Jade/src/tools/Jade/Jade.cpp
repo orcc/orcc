@@ -133,6 +133,10 @@ cl::opt<bool>
 nodisplay("nodisplay", desc("Deactivate display"),
 					   init(false));
 
+cl::opt<bool> 
+debug("debexec", desc("Display debugging information"),
+					   init(false));
+
 cl::opt<std::string> 
 MArch("march", desc("Architecture to generate assembly for (see --version)"));
 
@@ -309,7 +313,7 @@ int main(int argc, char **argv) {
 	setOptions();
 	
 	//Loading decoderEngine
-	engine = new RVCEngine(Context, VTLDir, Fifo, FifoSize, SystemDir, OutputDir, noMerging, disableMultiCore, Verbose);
+	engine = new RVCEngine(Context, VTLDir, Fifo, FifoSize, SystemDir, OutputDir, noMerging, disableMultiCore, Verbose, debug);
 
 	if (Verbose){
 		cout << "> Core preparation finished in " << (clock () - start) * 1000 / CLOCKS_PER_SEC <<" ms.\n";

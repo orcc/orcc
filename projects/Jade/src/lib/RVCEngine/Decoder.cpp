@@ -54,7 +54,7 @@
 using namespace llvm;
 using namespace std;
 
-Decoder::Decoder(LLVMContext& C, Configuration* configuration, bool verbose, bool noMultiCore): Context(C){
+Decoder::Decoder(LLVMContext& C, Configuration* configuration, bool verbose, bool noMultiCore, bool debug): Context(C){
 	
 	//Set property of the decoder
 	this->configuration = configuration;
@@ -65,6 +65,7 @@ Decoder::Decoder(LLVMContext& C, Configuration* configuration, bool verbose, boo
 	this->running = false;
 	this->scheduler = NULL;
 	this->noMultiCore = noMultiCore;
+	this->debug = debug;
 
 	//Create a new module that contains the current decoder
 	module = new Module("decoder", C);
@@ -77,7 +78,7 @@ Decoder::Decoder(LLVMContext& C, Configuration* configuration, bool verbose, boo
 	engine.configure(this);
 
 	//Set elements of the decoder
-	scheduler = new RoundRobinScheduler(Context, this);
+	scheduler = new RoundRobinScheduler(Context, this, noMultiCore, verbose, debug);
 
 	//Create execution engine
 	executionEngine = new LLVMExecution(Context, this, verbose);
