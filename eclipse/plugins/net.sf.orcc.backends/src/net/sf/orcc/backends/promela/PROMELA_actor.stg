@@ -133,6 +133,10 @@ else
 endif>
 >>
 
+printPrintfParam() ::= <<
+
+>>
+
 
 printLoad(load) ::= <<
 
