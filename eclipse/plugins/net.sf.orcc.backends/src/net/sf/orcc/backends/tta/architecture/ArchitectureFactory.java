@@ -85,9 +85,11 @@ public interface ArchitectureFactory extends EFactory {
 	 * 
 	 * @param tta
 	 *            the containing TTA
+	 * @param name
+	 *            the name of the ALU
 	 * @return a new ALU unit
 	 */
-	FunctionUnit createAluUnit(TTA tta);
+	FunctionUnit createAluUnit(TTA tta, String name);
 
 	/**
 	 * Returns a new object of class '<em>Bridge</em>'. <!-- begin-user-doc -->
@@ -619,11 +621,17 @@ public interface ArchitectureFactory extends EFactory {
 	 * 
 	 * @param name
 	 *            the name of the TTA
+	 * @param busNb
+	 *            the number of bus contained in the TTA
+	 * @param registerNb
+	 *            the number of register contained in the TTA
+	 * @param aluNb
+	 *            the number of alu contained in the TTA
 	 * @return a simple TTA
 	 */
-	TTA createTTADefault(String name);
+	TTA createTTADefault(String name, int busNb, int registerNb, int aluNb);
 
-	TTA createTTASpecialized(String name, Instance instance);
+	TTA createTTASpecialized(String name, Instance instance, int busNb, int registerNb, int aluNb);
 
 	/**
 	 * Returns a new object of class '<em>Writes</em>'. <!-- begin-user-doc -->

@@ -30,6 +30,7 @@ package net.sf.orcc.backends.tta;
 
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,6 +80,7 @@ public class TTABackendImpl extends AbstractBackend {
 	private boolean debugMode;
 
 	private final Map<String, String> transformations;
+	private final List<String> processorIntensiveActors;
 
 	/**
 	 * Creates a new instance of the TTA back-end. Initializes the
@@ -92,6 +94,10 @@ public class TTABackendImpl extends AbstractBackend {
 		transformations.put("min", "min_");
 		transformations.put("max", "max_");
 		transformations.put("select", "select_");
+		processorIntensiveActors = new ArrayList<String>();
+		processorIntensiveActors.add("fi.oulu.ee.mvg.Mgnt_Address");
+		processorIntensiveActors.add("org.mpeg4.part2.texture.Algo_IDCT2D_ISOIEC_23002_1");
+		processorIntensiveActors.add("fi.oulu.ee.mvg.Algo_IAP");
 	}
 
 	@Override
@@ -185,7 +191,8 @@ public class TTABackendImpl extends AbstractBackend {
 
 	private void printProcessor(Instance instance, String instancePath) {
 		TTA simpleTTA = ArchitectureFactory.eINSTANCE.createTTASpecialized(
-				instance.getId(), instance);
+				instance.getId(), instance, getBusNb(instance),
+				getRegNb(instance), getAluNb(instance));
 
 		CustomPrinter adfPrinter = new CustomPrinter(
 				"net/sf/orcc/backends/tta/TTA_processor_adf.stg");
@@ -196,6 +203,33 @@ public class TTABackendImpl extends AbstractBackend {
 				instancePath, "printTTA", "tta", simpleTTA);
 		idfPrinter.print("processor_" + instance.getId() + ".idf",
 				instancePath, "printTTA", "tta", simpleTTA);
+	}
+
+	private int getBusNb(Instance instance) {
+		if (instance.isActor()
+				&& processorIntensiveActors.contains(instance.getActor()
+						.getName())) {
+			return 6;
+		}
+		return 2;
+	}
+	
+	private int getAluNb(Instance instance) {
+		if (instance.isActor()
+				&& processorIntensiveActors.contains(instance.getActor()
+						.getName())) {
+			return 2;
+		}
+		return 1;
+	}
+	
+	private int getRegNb(Instance instance) {
+		if (instance.isActor()
+				&& processorIntensiveActors.contains(instance.getActor()
+						.getName())) {
+			return 4;
+		}
+		return 2;
 	}
 
 }

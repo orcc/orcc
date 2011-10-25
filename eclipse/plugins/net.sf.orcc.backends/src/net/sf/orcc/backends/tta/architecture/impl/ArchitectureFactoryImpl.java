@@ -266,14 +266,14 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public FunctionUnit createAluUnit(TTA tta) {
+	public FunctionUnit createAluUnit(TTA tta, String name) {
 		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
-		functionUnit.setName("ALU");
+		functionUnit.setName(name);
 		// Sockets
 		EList<Segment> segments = getAllSegments(tta.getBuses());
-		Socket i1 = createInputSocket("ALU_i1", segments);
-		Socket i2 = createInputSocket("ALU_i2", segments);
-		Socket o1 = createOutputSocket("ALU_o1", segments);
+		Socket i1 = createInputSocket(name + "_i1", segments);
+		Socket i2 = createInputSocket(name + "_i2", segments);
+		Socket o1 = createOutputSocket(name + "_o1", segments);
 		// Port
 		Port in1t = createPort("in1t", 32, true, true);
 		Port in2 = createPort("in2", 32, false, false);
@@ -1084,16 +1084,17 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public TTA createTTADefault(String name) {
+	public TTA createTTADefault(String name, int busNb, int registerNb,
+			int aluNb) {
 		TTA tta = createTTA(name);
 		// Address spaces
 		tta.setData(createAddressSpace("data", 8, 0, 131071));
 		tta.setProgram(createAddressSpace("instructions", 8, 0, 8191));
 		// Buses
-		Bus bus0 = createBusDefault(0, 32);
-		Bus bus1 = createBusDefault(1, 32);
-		tta.getBuses().add(bus0);
-		tta.getBuses().add(bus1);
+		for (int i = 0; i < busNb; i++) {
+			Bus bus = createBusDefault(i, 32);
+			tta.getBuses().add(bus);
+		}
 		// Global Control Unit
 		tta.setGcu(createGlobalControlUnitDefault(tta));
 		// Register files
@@ -1101,21 +1102,24 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 				"asic_130nm_1.5V.hdb", 96);
 		RegisterFile bool = createRegisterFileDefault(tta, "BOOL", 2, 1,
 				registerImpl);
-		RegisterFile rf1 = createRegisterFileDefault(tta, "RF_1", 12, 32,
-				registerImpl);
-		RegisterFile rf2 = createRegisterFileDefault(tta, "RF_2", 12, 32,
-				registerImpl);
-		tta.getHardwareDatabase().add(registerImpl);
 		tta.getRegisterFiles().add(bool);
-		tta.getRegisterFiles().add(rf1);
-		tta.getRegisterFiles().add(rf2);
+		for (int i = 0; i < registerNb; i++) {
+			RegisterFile rf = createRegisterFileDefault(tta, "RF_" + i, 12, 32,
+					registerImpl);
+			tta.getRegisterFiles().add(rf);
+		}
+		tta.getHardwareDatabase().add(registerImpl);
 		// Guards
-		bus0.getGuards().addAll(createGuardsDefault(bool));
-		bus1.getGuards().addAll(createGuardsDefault(bool));
+		for (Bus bus : tta.getBuses()) {
+			bus.getGuards().addAll(createGuardsDefault(bool));
+		}
 		// Functional units
 		EList<FunctionUnit> units = tta.getFunctionUnits();
 		// * ALU
-		units.add(createAluUnit(tta));
+		for (int i = 0; i < aluNb; i++) {
+			FunctionUnit alu = createAluUnit(tta, "ALU_" + i);
+			units.add(alu);
+		}
 		// * LSU
 		Implementation lsuImpl = createImplementation("stratixII.hdb", 2);
 		units.add(createLSU(tta, lsuImpl));
@@ -1135,9 +1139,10 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public TTA createTTASpecialized(String name, Instance instance) {
+	public TTA createTTASpecialized(String name, Instance instance, int busNb,
+			int registerNb, int aluNb) {
 		// Create default TTA processor
-		TTA tta = createTTADefault(name);
+		TTA tta = createTTADefault(name, busNb, registerNb, aluNb);
 		if (instance.isActor()) {
 			// Add needed stream units
 			for (net.sf.orcc.ir.Port input : instance.getActor().getInputs()) {
