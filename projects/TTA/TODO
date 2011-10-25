@@ -1,8 +1,12 @@
 
 - Permit the generation of several applications in subdirectories.
-- Add a Makefile to install the library on the system.
-- Add debugging and verbose options to the 'generate' script.
+- Add a Makefile to install the library and the script on the system.
+- Add verbose options to the 'generate' script.
 
 - Map several actors on the same processor.
 - Compute the precise memory consumption using an LLVM pass.
 - Reduce memory consumption of the actors.
+- Fix TCE simulation.
+- Fix actors testbench.
+- Customize stream-unit for performance.
+- Develop fast broadcast.
