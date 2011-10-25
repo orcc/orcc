@@ -42,6 +42,7 @@
 #include <list>
 #include <map>
 
+#include "Jade/Configuration/Partition.h"
 #include "Jade/Core/Actor.h"
 #include "Jade/Core/Network.h"
 #include "Jade/Core/Package.h"
@@ -177,6 +178,32 @@ public:
 	std::list<Actor*>* getSpecifics(){return &specificActors;};
 
 	/**
+     *  @brief Get partitions of the current configuration
+	 * 
+	 *  @return a list of partitions
+	 *
+     */
+	std::map<std::string, Partition*>* getPartitions(){return &partitions;};
+
+	/**
+     *  @brief Get partitions of the current configuration
+	 * 
+	 *  @return a list of partitions
+	 *
+     */
+	std::list<Instance*>* getUnpartitioned(){return &unpartitioned;};
+
+	/**
+     *  @brief Get partitions of the current configuration
+	 * 
+	 *  @return a list of partitions
+	 *
+     */
+	void addUnpartitioned(Instance* instance){
+		unpartitioned.push_back(instance);
+	};
+
+	/**
      *  @brief Erase specific actors and instances from the configuration
 	 *
      */
@@ -205,11 +232,20 @@ private:
      */
 	void setInstances();
 
+	
+	/*!
+     * @brief Set partition of the given instance
+     */
+	void setPartition(Instance* instance);
+
 	/** Original network */
 	Network* network;
 
 	/** Instances to instanciate  */
 	std::map<std::string, Instance*> instances;
+
+	/** Instances without partition  */
+	std::list<Instance*> unpartitioned;
 
 	/** Actors files of the configuration  */
 	std::list<std::string> actorFiles;
@@ -225,6 +261,9 @@ private:
 
 	/** Whether or not merging static actors */
 	bool noMerging;
+
+	/** Partitions of the configuration */
+	std::map<std::string, Partition*> partitions;
 };
 
 #endif

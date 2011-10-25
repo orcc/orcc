@@ -130,6 +130,27 @@ public:
 	std::list<Instance*>* getInstances();
 
 	/**
+	 * @brief Returns the mapping of the network.
+	 * 
+	 * @return a map of instances and their mapping
+	 */
+	std::map<std::string, std::string>* getMapping(){return mapping;};
+
+	/**
+	 * @brief Set the mapping of the network.
+	 * 
+	 * @param mapping: a map of instances and their mapping
+	 */
+	void setMapping(std::map<std::string, std::string>* mapping){this->mapping = mapping;};
+
+	/**
+	 * @brief Returns true if this network has a mapping.
+	 * 
+	 * @return true if the network has a mapping, otherwise false.
+	 */
+	bool hasMapping(){return this->mapping != NULL;};
+
+	/**
 	 * @brief Returns a list of instance that are connected the given instance.
 	 * 
 	 * @return a list of successor instances
@@ -229,6 +250,9 @@ private:
 
 	/** connections of the network  */
 	std::list<Connection*> connections;
+
+	/** mapping of the network */
+	std::map<std::string, std::string>* mapping;
 };
 
 #endif

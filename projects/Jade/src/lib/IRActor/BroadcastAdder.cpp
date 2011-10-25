@@ -126,6 +126,7 @@ void BroadcastAdder::examineConnections(Vertex* vertex, Connection** connections
 
 				//Insert broadcast in configuration
 				configuration->insertSpecific(actorBCast);
+				configuration->addUnpartitioned(newInstance);
 				
 				//Set a new vertex in the graph
 				Vertex* vertextBCast = new Vertex(newInstance);

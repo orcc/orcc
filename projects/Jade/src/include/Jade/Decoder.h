@@ -174,6 +174,16 @@ public:
 	LLVMExecution* getEE(){return executionEngine;};
 
 
+	/**
+     *  @brief Return partition's schedulers of the decoder
+	 *
+	 *  @return the partition's schedulers of the decoder
+     */
+	std::map<Partition*, Scheduler*>* getSchedParts(){return &procSchedulers;};
+
+
+	bool hasPartitions(){return !procSchedulers.empty();};
+
 	std::map<std::string, llvm::Function*>* getFifoFn(){return fifoFn;};
 private:
 	/**
@@ -188,8 +198,11 @@ private:
 	/** Configuration of the decoder */
 	Configuration* configuration;
 
-	/** Scheduler of the decoder */
+	/** Scheduler of unpartitionned instance of the decoder */
 	Scheduler* scheduler;
+
+	/** Scheduler of partitionned instance of the decoder */
+	std::map<Partition*, Scheduler*> procSchedulers;
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;

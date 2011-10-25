@@ -177,6 +177,23 @@ public:
      */
 	void linkExternalProc(std::list<Procedure*> externs);
 private:
+
+	/**
+     *  @brief Static method for launching processus in threads
+	 *
+     */
+	static void* threadProc( void* args );
+
+	/**
+     *  @brief Launch partitions of the decoder
+	 *
+	 *  @param parts : a map of partition and scheduler
+     */
+	void launchPartitions(std::map<Partition*, Scheduler*>* parts);
+
+	/** Sub thread of the decoder */
+	std::list<pthread_t*> threads;
+
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
 
@@ -198,6 +215,11 @@ private:
 	/** verbose */
 	bool verbose;
 
+	/** structure for launching threads */
+	struct procThread{
+		llvm::ExecutionEngine *EE;
+		llvm::Function* func;
+	};
 };
 
 #endif

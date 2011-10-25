@@ -53,6 +53,7 @@
 
 
 #include "Jade/XDFSerialize/XDFParser.h"
+#include "Jade/XCFSerialize/XCFParser.h"
 #include "Jade/RVCEngine.h"
 #include "Jade/Fifo/FifoSelection.h"
 #include "Jade/Scenario/Manager.h"
@@ -85,6 +86,10 @@ Fifo("fifo", CommaSeparated,
 // Jade options
 cl::opt<std::string>
 XDFFile("xdf", desc("XDF network file"), value_desc("XDF filename"));
+
+
+cl::opt<std::string>
+XCFFile("xcf", desc("XCF mapping file"), value_desc("XCF filename"));
 
 cl::opt<std::string> 
 BSDLFile("bsdl", desc("Bitstream description file"), value_desc("BSDL filename"));
@@ -261,10 +266,19 @@ void startCmdLine(){
 	//Parsing XDF file
 	std::cout << "Parsing file " << XDFFile.getValue() << ". \n";
 
-	XDFParser xdfParser(false);
+	XDFParser xdfParser(Verbose);
 	Network* network = xdfParser.parseFile(XDFFile, Context);
 
 	cout << "Network parsed in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC << " ms, start engine :\n";
+
+	//Parsing XCF file if needed
+	if(XCFFile != ""){
+		std::cout << "Parsing file " << XDFFile.getValue() << ". \n";
+
+		XCFParser xcfParser(Verbose);
+		map<string, string>* mapping = xcfParser.parseFile(XCFFile);
+		network->setMapping(mapping);
+	}
 
 	//Load network
 	engine->load(network, 3);
@@ -309,6 +323,7 @@ int main(int argc, char **argv) {
 	}
 
 	//Initialize context
+	llvm_start_multithreaded();	
 	InitializeNativeTarget();
 	setOptions();
 	
@@ -325,9 +340,8 @@ int main(int argc, char **argv) {
 			cout << "> Starting console mode :\n";
 		}
 		//Enter in console mode
-		llvm_start_multithreaded();	
 		startConsole();
-		llvm_stop_multithreaded();
+
 		if (Verbose){
 			cout << "> Exiting console mode.\n";
 		}
@@ -351,4 +365,6 @@ int main(int argc, char **argv) {
 		//Enter in command line mode
 		startCmdLine();
 	}
+
+	llvm_stop_multithreaded();
 }

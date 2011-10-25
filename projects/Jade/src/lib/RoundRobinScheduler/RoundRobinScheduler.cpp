@@ -69,9 +69,9 @@
 using namespace std;
 using namespace llvm;
 
-RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, Decoder* decoder, bool noMultiCore, bool verbose, bool debug): Context(C) {
+RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, Decoder* decoder, list<Instance*>* instances, bool optimized, bool noMultiCore, bool verbose, bool debug): Context(C) {
 	this->decoder = decoder;
-	this->configuration = decoder->getConfiguration();
+	this->instances = instances;
 	this->scheduler = NULL;
 	this->initialize = NULL;
 	this->initInst = NULL;
@@ -79,6 +79,7 @@ RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, Decoder* decoder,
 	this->stopGV = NULL;
 	this->verbose = verbose;
 	this->debug = debug;
+	this->optimized = optimized;
 
 	createScheduler();	
 }
@@ -92,10 +93,9 @@ void RoundRobinScheduler::createScheduler(){
 	createNetworkScheduler();
 
 	//Add the instance in the scheduler
-	map<string, Instance*>::iterator it;
-	map<string, Instance*>* instances = configuration->getInstances();
+	list<Instance*>::iterator it;
 	for (it = instances->begin(); it != instances->end(); it++){
-		addInstance(it->second);
+		addInstance(*it);
 	}
 }
 
@@ -111,12 +111,11 @@ void RoundRobinScheduler::createNetworkScheduler(){
 	LLVMContext &Context = getGlobalContext();
 
 	//Create a global value that stop the scheduler and set it to false
-	stopGV = (GlobalVariable*)module->getOrInsertGlobal("stop", Type::getInt32Ty(Context));
+	stopGV = new GlobalVariable(*module, Type::getInt32Ty(Context), false, GlobalValue::ExternalLinkage,0,"stop", 0, false);
 	
 	// create main scheduler function
-	scheduler = cast<Function>(module->getOrInsertFunction("main", Type::getInt32Ty(Context),
-                                          (Type *)0));
-										  
+	FunctionType *FT = FunctionType::get(Type::getInt32Ty(getGlobalContext()), false);
+	scheduler = Function::Create(FT,  Function::ExternalLinkage, "main", module);								  
 
 	// Add a basic block entry to the scheduler.
 	BasicBlock* initializeBB = BasicBlock::Create(Context, "entry", scheduler);
@@ -148,11 +147,14 @@ void RoundRobinScheduler::createNetworkInitialize(){
 	initialize = cast<Function>(module->getOrInsertFunction("initialize", Type::getVoidTy(Context),
                                           (Type *)0));
 										  
+	if (initialize->empty()){
+		// Add a basic block entry to the scheduler.
+		BasicBlock* initializeBB = BasicBlock::Create(Context, "entry", initialize);
 
-	// Add a basic block entry to the scheduler.
-	BasicBlock* initializeBB = BasicBlock::Create(Context, "entry", initialize);
-
-	initInst = ReturnInst::Create(Context, 0, initializeBB);
+		initInst = ReturnInst::Create(Context, 0, initializeBB);
+	}else{
+		initInst = initialize->getEntryBlock().begin();
+	}
 
 }
 
@@ -192,9 +194,9 @@ void RoundRobinScheduler::addInstance(Instance* instance){
 	
 	MoC* moc = instance->getMoC();
 		
-	if (moc->isQuasiStatic() && configuration->mergeActors()){
+	if (moc->isQuasiStatic() && optimized){
 		QSDFSchedulerAdder.transform(instance);
-	}else if (moc->isCSDF() && configuration->mergeActors()){
+	}else if (moc->isCSDF() && optimized){
 		CSDFSchedulerAdder.transform(instance);
 	}else{
 		DPNSchedulerAdder.transform(instance);

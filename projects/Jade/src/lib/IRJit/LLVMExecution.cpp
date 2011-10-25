@@ -169,6 +169,7 @@ void LLVMExecution::mapProcedure(Procedure* procedure, void *Addr) {
 	}
 }
 
+
 bool LLVMExecution::mapFifo(Port* port, AbstractFifo* fifo) {
 	void **portGV = (void**)EE->getPointerToGlobalIfAvailable(port->getFifoVar());
 	
@@ -209,16 +210,48 @@ void LLVMExecution::linkExternalProc(list<Procedure*> externs){
 
 }
 
+void LLVMExecution::launchPartitions(map<Partition*, Scheduler*>* parts) {
+	// Get scheduler's partition
+	map<Partition*, Scheduler*>::iterator it;
+	
+	for (it = parts->begin(); it != parts->end(); it++){
+		Scheduler* sched = it->second;
+		
+		pthread_t* thread = new pthread_t();
+		threads.push_back(thread);
+
+		procThread th = {EE,sched->getMainFunction()};
+	
+		pthread_create( thread, NULL, &LLVMExecution::threadProc, &th);
+	}
+}
 
 void LLVMExecution::run() {
-	// Get scheduler functions
+	stopVal = 0;
+	
+	if (decoder->hasPartitions()){
+		// Start partitions
+		launchPartitions(decoder->getSchedParts());
+	}
+
+	// Get main scheduler functions
 	Scheduler* scheduler = decoder->getScheduler();
 	Function* func = dyn_cast<Function>(scheduler->getMainFunction());
-
-	// Run scheduler
-	stopVal = 0;
+	
+	// Run main scheduler
 	std::vector<GenericValue> noargs;
 	GenericValue Result = EE->runFunction(func, noargs);
+}
+
+void* LLVMExecution::threadProc( void* args ){
+	procThread* th = static_cast<procThread*>(args);
+	Function* f = th->func;
+	ExecutionEngine* E = th->EE;
+
+	std::vector<GenericValue> noargs;
+	GenericValue Result = E->runFunction(f, noargs);
+
+	return NULL;
 }
 
 int* LLVMExecution::initialize(){
@@ -233,6 +266,20 @@ int* LLVMExecution::initialize(){
 	Scheduler* scheduler = decoder->getScheduler();
 	GlobalVariable* stopGV = scheduler->getStopGV();
 	EE->addGlobalMapping(stopGV, &stopVal);
+
+	if (decoder->hasPartitions()){
+		// Get scheduler's partition
+		map<Partition*, Scheduler*>::iterator it;
+		map<Partition*, Scheduler*>* parts = decoder->getSchedParts();
+
+		for (it = parts->begin(); it != parts->end(); it++){
+			int* test = new int();
+			Scheduler* sched = it->second;
+
+			GlobalVariable* stopGVpart = sched->getStopGV();
+			EE->addGlobalMapping(stopGVpart, &test);
+		}
+	}
 
 	// Run static constructors.
     EE->runStaticConstructorsDestructors(false);

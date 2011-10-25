@@ -28,7 +28,7 @@
  */
 
 /**
-@brief Implementation of class XDFNetwork
+@brief Implementation of XDF file keyword
 @author Olivier Labois
 @file XDFConstant.cpp
 @version 1.0

@@ -68,7 +68,7 @@ public:
 	 *
 	 *	@param decoder : the Decoder to insert the round robin scheduler into
      */
-	RoundRobinScheduler(llvm::LLVMContext& C, Decoder* decoder, bool noMultiCore = false, bool verbose = false, bool debug = false);
+	RoundRobinScheduler(llvm::LLVMContext& C, Decoder* decoder, std::list<Instance*>* instances, bool optimized = true, bool noMultiCore = false, bool verbose = false, bool debug = false);
 	~RoundRobinScheduler();
 
 	/**
@@ -139,8 +139,8 @@ private:
 	/** Decoder bound to the round robin scheduler */
 	Decoder* decoder;
 
-	/** Configuration of the decoder */
-	Configuration* configuration;
+	/** Instances managed by the scheduler */
+	std::list<Instance*>* instances;
 
 	/** Main scheduling function */
 	llvm::Function* scheduler;
@@ -169,6 +169,9 @@ private:
 
 	/** Print debug information*/
 	bool debug;
+
+	/** Optimized schedulers*/
+	bool optimized;
 
 };
 

@@ -77,8 +77,20 @@ Decoder::Decoder(LLVMContext& C, Configuration* configuration, bool verbose, boo
 	ConfigurationEngine engine(Context, verbose);
 	engine.configure(this);
 
-	//Set elements of the decoder
-	scheduler = new RoundRobinScheduler(Context, this, noMultiCore, verbose, debug);
+	//Set schedulers of the decoder
+	map<string, Partition*>::iterator itPartition;
+	map<string, Partition*>* partitions = configuration->getPartitions();
+
+	// Unpartitionned instance scheduler
+	scheduler = new RoundRobinScheduler(Context, this, configuration->getUnpartitioned(), configuration->mergeActors(), noMultiCore, verbose, debug);
+
+	// Partitionned instance scheduler
+	for(itPartition = partitions->begin(); itPartition != partitions->end(); itPartition++){
+		Partition* partition = itPartition->second;
+		Scheduler* procSchedul = new RoundRobinScheduler(Context, this, partition->getInstances(), configuration->mergeActors(), noMultiCore, verbose, debug);
+		procSchedulers.insert(pair<Partition*, Scheduler*>(partition, procSchedul));
+	}
+
 
 	//Create execution engine
 	executionEngine = new LLVMExecution(Context, this, verbose);

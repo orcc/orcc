@@ -72,6 +72,35 @@ void Configuration::update(){
 	setInstances();
 }
 
+void Configuration::setPartition(Instance* instance){
+	map<string, string>::iterator itMapping;
+	map<string, string>* mapping = network->getMapping();
+	
+	itMapping = mapping->find(instance->getId());
+
+	if (itMapping == mapping->end()){
+		// instance not partitioned
+		unpartitioned.push_back(instance);
+		return;
+	}
+
+	string partitionId = itMapping->second;
+	map<string, Partition*>::iterator itPartition;
+
+	itPartition = partitions.find(partitionId);
+	Partition* partition = NULL;
+	
+	if (itPartition == partitions.end()){
+		partition = new Partition(partitionId);
+		partitions.insert(pair<string, Partition*>(partitionId, partition));
+	}else{
+		partition = itPartition->second;
+	}
+	
+	partition->addInstance(instance);
+
+}
+
 void Configuration::setInstances(){
 	instances.clear();
 	
@@ -86,6 +115,12 @@ void Configuration::setInstances(){
 			Instance* instance = vertex->getInstance();
 			instances.insert(pair<string,Instance*>(instance->getId(), instance));
 			
+			if (network->hasMapping()){
+				setPartition(instance);
+			}else{
+				unpartitioned.push_back(instance);
+			}
+
 			//Reference the configuration in the instance
 			instance->setConfiguration(this);
 
