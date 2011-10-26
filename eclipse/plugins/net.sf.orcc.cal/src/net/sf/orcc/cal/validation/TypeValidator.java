@@ -334,11 +334,14 @@ public class TypeValidator extends AbstractCalJavaValidator {
 
 		// check types
 		Type targetType = Typer.getType(expression);
-		Type type = Typer.getType(assign.getValue());
-		if (!TypeUtil.isConvertibleTo(type, targetType)) {
-			error("Type mismatch: cannot convert from " + type + " to "
-					+ targetType, assign, eINSTANCE.getStatementAssign_Value(),
-					-1);
+		AstExpression value = assign.getValue();
+		if (value != null) {
+			Type type = Typer.getType(value);
+			if (!TypeUtil.isConvertibleTo(type, targetType)) {
+				error("Type mismatch: cannot convert from " + type + " to "
+						+ targetType, assign,
+						eINSTANCE.getStatementAssign_Value(), -1);
+			}
 		}
 	}
 
