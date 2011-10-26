@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
@@ -69,24 +70,14 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object>
 	private Set<Var> varsUsedInScheduling = new HashSet<Var>();
 
 	private Set<Port> portsUsedInScheduling = new HashSet<Port>();
-	
+
 	private Set<Port> inputPortsUsedInScheduling = new HashSet<Port>();
 
 	private Set<Port> outputPortsUsedInScheduling = new HashSet<Port>();
 
 	private Set<Var> variablesWithLoops = new HashSet<Var>();
 
-	// private List<Var> stateVarsInGrd;
-
-	// private List<Port> peekPortsInGrd;
-
 	private Map<Port, Set<Port>> outputPortToInputPortMap = new HashMap<Port, Set<Port>>();
-
-	// private Map<Actor, List<Var>> stateVarsInGrdMap = new HashMap<Actor,
-	// List<Var>>();
-
-	// private Map<Actor, List<Port>> peekPortsInGrdMap = new HashMap<Actor,
-	// List<Port>>();
 
 	private Map<Port, Set<Var>> outputPortToVariableMap = new HashMap<Port, Set<Var>>();
 
@@ -131,7 +122,7 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object>
 
 	@Override
 	public Object caseAction(Action action) {
-		// solve the port dependency
+		// solve the port dependency, procedures and functions should also be handled
 		doSwitch(action.getBody());
 		inScheduler = true;
 		doSwitch(action.getScheduler());
@@ -142,20 +133,15 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object>
 
 	@Override
 	public Object caseActor(Actor actor) {
-		// stateVarsInGrd = new ArrayList<Var>();
-		// peekPortsInGrd = new ArrayList<Port>();
-		// stateVarsInGrdMap.put(actor, stateVarsInGrd);
-		// peekPortsInGrdMap.put(actor, peekPortsInGrd);
 		for (Action action : actor.getActions()) {
 			doSwitch(action);
 		}
 		// Find self-loops in transitive closure (a var depending on itself)
 		analyzeVarDeps();
-		// System.out.println(actor.getName() + "---------------------");
-		// For each output port, find the variables and input ports used to produce the output value
+		// For each output port, find the variables and input ports used to
+		// produce the output value
 		for (Action action : actor.getActions()) {
 			for (Port port : action.getOutputPattern().getPorts()) {
-				// System.out.println("Port: " + port.getName());
 				visited.clear();
 				Var portVar = action.getOutputPattern().getVariable(port);
 				transitiveClosure(portVar, visited);
@@ -166,14 +152,10 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object>
 				for (Var var : visited) {
 					if (var.isGlobal()) {
 						outputPortToVariableMap.get(port).add(var);
-						// System.out.println("Depends on Var: "+ var.getName()
-						// +"  Loop: " +variablesWithLoops.contains(var));
 					}
 					if (action.getInputPattern().contains(var)) {
 						outputPortToInputPortMap.get(port).add(
 								action.getInputPattern().getPort(var));
-						// System.out.println("Depends on input: " +
-						// action.getInputPattern().getPort(var).getName());
 					}
 				}
 			}
@@ -267,6 +249,13 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object>
 	}
 
 	/**
+	 * @return the portsUsedInScheduling
+	 */
+	public Set<Port> getPortsUsedInScheduling() {
+		return portsUsedInScheduling;
+	}
+
+	/**
 	 * @return the varsUsedInScheduling
 	 */
 	public Set<Var> getVarsUsedInScheduling() {
@@ -293,7 +282,7 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object>
 							.get(port));
 					if (fifoTargetToSourceMap.get(port) != null) {
 						for (Port in : outputPortToInputPortMap
-							.get(fifoTargetToSourceMap.get(port))) {
+								.get(fifoTargetToSourceMap.get(port))) {
 							if (!inputPortsUsedInScheduling.contains(in)) {
 								temp.add(in);
 							}
@@ -312,28 +301,10 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object>
 		portsUsedInScheduling.addAll(outputPortsUsedInScheduling);
 	}
 
-	/**
-	 * @return the portsUsedInScheduling
-	 */
-	public Set<Port> getPortsUsedInScheduling() {
-		return portsUsedInScheduling;
-	}
-
 	private void identifySchedulingVars() {
 		for (Port port : outputPortsUsedInScheduling) {
 			if (outputPortToVariableMap.containsKey(port)) {
 				varsUsedInScheduling.addAll(outputPortToVariableMap.get(port));
-			}
-		}
-	}
-
-	private void transitiveClosure(Var variable, Set<Var> transitiveClosure) {
-		if (variableDependency.containsKey(variable)) {
-			for (Var v : variableDependency.get(variable)) {
-				if (!transitiveClosure.contains(v)) {
-					transitiveClosure.add(v);
-					transitiveClosure(v, transitiveClosure);
-				}
 			}
 		}
 	}
@@ -345,6 +316,17 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object>
 		}
 		identifyControlTokenPorts(network);
 		identifySchedulingVars();
+	}
+
+	private void transitiveClosure(Var variable, Set<Var> transitiveClosure) {
+		if (variableDependency.containsKey(variable)) {
+			for (Var v : variableDependency.get(variable)) {
+				if (!transitiveClosure.contains(v)) {
+					transitiveClosure.add(v);
+					transitiveClosure(v, transitiveClosure);
+				}
+			}
+		}
 	}
 
 }
