@@ -57,6 +57,7 @@ import net.sf.orcc.backends.xlim.transformations.InstTernaryAdder;
 import net.sf.orcc.backends.xlim.transformations.ListFlattener;
 import net.sf.orcc.backends.xlim.transformations.LiteralIntegersAdder;
 import net.sf.orcc.backends.xlim.transformations.LocalArrayRemoval;
+import net.sf.orcc.backends.xlim.transformations.ThrityTwoBitCaster;
 import net.sf.orcc.backends.xlim.transformations.UnaryListRemoval;
 import net.sf.orcc.backends.xlim.transformations.XlimDeadVariableRemoval;
 import net.sf.orcc.backends.xlim.transformations.XlimVariableRenamer;
@@ -147,7 +148,7 @@ public class XlimBackendImpl extends AbstractBackend {
 		}
 
 		ActorVisitor<?>[] transformations = { new UnitImporter(),
-				new SSATransformation(),
+				new SSATransformation(), new ThrityTwoBitCaster(),
 				new GlobalArrayInitializer(hardwareGen),
 				new InstTernaryAdder(), new Inliner(true, true),
 				new UnaryListRemoval(), new CustomPeekAdder(),
@@ -156,7 +157,8 @@ public class XlimBackendImpl extends AbstractBackend {
 				new ExpressionSplitter(true), /* new CopyPropagator(), */
 				new BuildCFG(), new InstPhiTransformation(),
 				new LiteralIntegersAdder(true), new CastAdder(true, true),
-				new XlimVariableRenamer(), new EmptyThenElseNodeAdder(), new BlockCombine() };
+				new XlimVariableRenamer(), new EmptyThenElseNodeAdder(),
+				new BlockCombine() };
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);
