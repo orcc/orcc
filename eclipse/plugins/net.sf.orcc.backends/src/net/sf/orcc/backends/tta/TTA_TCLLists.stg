@@ -1,6 +1,10 @@
 
 
 network(network, options) ::= <<
+# Remove old libraries
+vdel -all -lib work
+vdel -all -lib altera_mf
+
 # Create Working library
 vlib work
 
