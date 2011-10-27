@@ -36,8 +36,8 @@ WaveRestoreZoom {0 ps} {2911 ps}
 >>
 
 instance(instance) ::= <<
-
-add wave -noupdate -divider \<NULL\>
+<if(instance.actor && !instance.actor.native)
+>add wave -noupdate -divider \<NULL\>
 add wave -noupdate -divider <instance.id>
 add wave -noupdate -divider \<NULL\>
 
@@ -52,18 +52,30 @@ add wave -noupdate -format Literal /tb_top/top_orcc/<instance.id>_inst/dram_data
 add wave -noupdate -format Logic /tb_top/top_orcc/<instance.id>_inst/wren_x_wire
 add wave -noupdate -format Literal /tb_top/top_orcc/<instance.id>_inst/idata_wire
 
+
+<instance.actor.inputs: instanceInput(); separator="\n">
+<instance.actor.outputs: instanceOutput(); separator="\n"><
+endif>
 >>
 
 instanceInput(input) ::= <<
-add wave -noupdate -format Literal /tb_top/top_orcc/<instance.id>_inst/data_<indexPort(input)>_in
+<if(!input.native)
+>add wave -noupdate -format Literal /tb_top/top_orcc/<instance.id>_inst/data_<indexPort(input)>_in
 add wave -noupdate -format Literal /tb_top/top_orcc/<instance.id>_inst/status_<indexPort(input)>_in
-add wave -noupdate -format Logic /tb_top/top_orcc/<instance.id>_inst/ack_<indexPort(input)>_in
+add wave -noupdate -format Logic /tb_top/top_orcc/<instance.id>_inst/ack_<indexPort(input)>_in<
+else
+>add wave -noupdate -format Literal /tb_top/top_orcc/<instance.id>_inst/s_<input.name><
+endif>
 >>
 
 instanceOutput(output) ::= <<
-add wave -noupdate -format Literal /tb_top/top_orcc/<instance.id>_inst/data_<indexPort(output)>_out
+<if(!output.native)
+>add wave -noupdate -format Literal /tb_top/top_orcc/<instance.id>_inst/data_<indexPort(output)>_out
 add wave -noupdate -format Literal /tb_top/top_orcc/<instance.id>_inst/status_<indexPort(output)>_out
-add wave -noupdate -format Logic /tb_top/top_orcc/<instance.id>_inst/dv_<indexPort(output)>_out
+add wave -noupdate -format Logic /tb_top/top_orcc/<instance.id>_inst/dv_<indexPort(output)>_out<
+else
+>add wave -noupdate -format Literal /tb_top/top_orcc/<instance.id>_inst/s_<output.name><
+endif>
 >>
 
 indexPort(port) ::= <<
