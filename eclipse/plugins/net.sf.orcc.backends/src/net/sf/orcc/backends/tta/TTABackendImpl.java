@@ -49,7 +49,8 @@ import net.sf.orcc.backends.transformations.EmptyThenElseNodeAdder;
 import net.sf.orcc.backends.transformations.InstPhiTransformation;
 import net.sf.orcc.backends.transformations.TypeResizer;
 import net.sf.orcc.backends.transformations.UnitImporter;
-import net.sf.orcc.backends.transformations.tac.TacTransformation;
+import net.sf.orcc.backends.transformations.ssa.ConstantPropagator;
+import net.sf.orcc.backends.transformations.ssa.CopyPropagator;
 import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.tta.architecture.TTA;
 import net.sf.orcc.backends.tta.transformations.BroadcastTypeResizer;
@@ -58,6 +59,7 @@ import net.sf.orcc.ir.transformations.BlockCombine;
 import net.sf.orcc.ir.transformations.BuildCFG;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.ir.transformations.SSATransformation;
+import net.sf.orcc.ir.transformations.TacTransformation;
 import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -112,7 +114,8 @@ public class TTABackendImpl extends AbstractBackend {
 				new SSATransformation(), new BoolToIntTransformation(),
 				new TypeResizer(true, true), new PrintlnTransformation(),
 				new RenameTransformation(this.transformations),
-				new TacTransformation(true), new InstPhiTransformation(),
+				new TacTransformation(true), new CopyPropagator(),
+				new ConstantPropagator(), new InstPhiTransformation(),
 				new GetElementPtrAdder(), new CastAdder(true, false),
 				new EmptyThenElseNodeAdder(), new BlockCombine(),
 				new BuildCFG() };

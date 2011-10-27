@@ -51,7 +51,6 @@ import net.sf.orcc.backends.transformations.Multi2MonoToken;
 import net.sf.orcc.backends.transformations.StoreOnceTransformation;
 import net.sf.orcc.backends.transformations.TypeResizer;
 import net.sf.orcc.backends.transformations.UnitImporter;
-import net.sf.orcc.backends.transformations.tac.ExpressionSplitter;
 import net.sf.orcc.backends.xlim.transformations.CustomPeekAdder;
 import net.sf.orcc.backends.xlim.transformations.GlobalArrayInitializer;
 import net.sf.orcc.backends.xlim.transformations.InstTernaryAdder;
@@ -67,6 +66,7 @@ import net.sf.orcc.ir.transformations.BuildCFG;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
 import net.sf.orcc.ir.transformations.SSATransformation;
+import net.sf.orcc.ir.transformations.TacTransformation;
 import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.network.Instance;
@@ -155,7 +155,7 @@ public class XlimBackendImpl extends AbstractBackend {
 				new UnaryListRemoval(), new CustomPeekAdder(),
 				new DeadGlobalElimination(), new DeadCodeElimination(),
 				new XlimDeadVariableRemoval(), new ListFlattener(),
-				new ExpressionSplitter(true), /* new CopyPropagator(), */
+				new TacTransformation(true), /* new CopyPropagator(), */
 				new BuildCFG(), new InstPhiTransformation(),
 				new LiteralIntegersAdder(true), new CastAdder(true, true),
 				new XlimVariableRenamer(), new EmptyThenElseNodeAdder(),

@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.transformations.tac;
+package net.sf.orcc.ir.transformations;
 
 import java.util.List;
 
@@ -67,7 +67,7 @@ import org.eclipse.emf.common.util.EList;
  * @author Herve Yviquel
  * 
  */
-public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
+public class TacTransformation extends AbstractActorVisitor<Expression> {
 
 	private int complexityLevel = 0;
 	private boolean usePreviousJoinNode;
@@ -79,7 +79,7 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 	 *            <code>true</code> if the current IR form has join node before
 	 *            while node
 	 */
-	public ExpressionSplitter(boolean usePreviousJoinNode) {
+	public TacTransformation(boolean usePreviousJoinNode) {
 		super(true);
 		this.usePreviousJoinNode = usePreviousJoinNode;
 	}

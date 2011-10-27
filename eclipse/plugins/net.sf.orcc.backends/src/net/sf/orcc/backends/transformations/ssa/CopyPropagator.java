@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010, IETR/INSA of Rennes
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,56 +26,55 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.transformations.tac;
+package net.sf.orcc.backends.transformations.ssa;
 
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.ExprVar;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.ActorVisitor;
+import net.sf.orcc.ir.util.IrUtil;
+
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
- * Main transformation for applying three-address code form to actor IR.
- * <p>
- * This transformation is composed of 4 atomic transformations :
- * <ul>
- * 
- * <li>{@link #CopyPropagationTransformation()} that propagates copy of
- * variables.</li>
- * <li>{@link #ExpressionSplitterTransformation()} that splits complex
- * expressions into fundamental operations.</li>
- * <li>{@link #BuildCFG()} that builds a CFG of the actor IR.</li>
- * <li>
- * {@link #CastAdderTransformation()} that add cast in the IR when necessary.</li>
- * </ul>
- * </p>
+ * Replace occurrences with direct assignments to their corresponding values. A
+ * direct assignment is an assign instruction of form x = y, which simply
+ * assigns the value of y to x.
  * 
  * @author Jerome GORIN
+ * @author Herve Yviquel
  * 
  */
-public class TacTransformation extends AbstractActorVisitor<Object> {
+public class CopyPropagator extends AbstractActorVisitor<Object> {
 
-	private boolean usePreviousJoinNode;
-
-	/**
-	 * Creates a new three address code transformation
-	 * 
-	 * @param usePreviousJoinNode
-	 *            <code>true</code> if the current IR form has join node before
-	 *            while node
-	 */
-	public TacTransformation(boolean usePreviousJoinNode) {
-		this.usePreviousJoinNode = usePreviousJoinNode;
-	}
+	protected boolean changed;
 
 	@Override
-	public Object caseActor(Actor actor) {
-		ActorVisitor<?>[] transformations = {
-				new ExpressionSplitter(usePreviousJoinNode),
-				new CopyPropagator(), new ConstantPropagator() };
-
-		for (ActorVisitor<?> transformation : transformations) {
-			transformation.doSwitch(actor);
-		}
+	public Object caseProcedure(Procedure procedure) {
+		do {
+			changed = false;
+			super.caseProcedure(procedure);
+		} while (changed);
 		return null;
 	}
 
+	@Override
+	public Object caseInstAssign(InstAssign assign) {
+		if (assign.getValue().isVarExpr()) {
+			Var source = ((ExprVar) assign.getValue()).getUse().getVariable();
+			Var target = assign.getTarget().getVariable();
+			EList<Use> targetUses = target.getUses();
+			changed = true;
+			while (!targetUses.isEmpty()) {
+				targetUses.get(0).setVariable(source);
+			}
+			EcoreUtil.remove(target);
+			IrUtil.delete(assign);
+			indexInst--;
+		}
+		return null;
+	}
 }

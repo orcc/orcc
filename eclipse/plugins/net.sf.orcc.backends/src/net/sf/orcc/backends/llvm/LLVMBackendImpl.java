@@ -57,7 +57,8 @@ import net.sf.orcc.backends.transformations.EmptyThenElseNodeAdder;
 import net.sf.orcc.backends.transformations.InstPhiTransformation;
 import net.sf.orcc.backends.transformations.TypeResizer;
 import net.sf.orcc.backends.transformations.UnitImporter;
-import net.sf.orcc.backends.transformations.tac.TacTransformation;
+import net.sf.orcc.backends.transformations.ssa.ConstantPropagator;
+import net.sf.orcc.backends.transformations.ssa.CopyPropagator;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.transformations.BlockCombine;
 import net.sf.orcc.ir.transformations.BuildCFG;
@@ -66,6 +67,7 @@ import net.sf.orcc.ir.transformations.DeadGlobalElimination;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.ir.transformations.SSATransformation;
+import net.sf.orcc.ir.transformations.TacTransformation;
 import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
@@ -192,7 +194,8 @@ public class LLVMBackendImpl extends AbstractBackend {
 				new DeadCodeElimination(), new DeadVariableRemoval(),
 				new BoolToIntTransformation(), new PrintlnTransformation(),
 				new RenameTransformation(this.transformations),
-				new TacTransformation(true), new InstPhiTransformation(),
+				new TacTransformation(true), new CopyPropagator(),
+				new ConstantPropagator(), new InstPhiTransformation(),
 				new GetElementPtrAdder(), new TypeResizer(true, false),
 				new CastAdder(true, false), new EmptyThenElseNodeAdder(),
 				new BlockCombine(), new BuildCFG(), new ListInitializer() };
