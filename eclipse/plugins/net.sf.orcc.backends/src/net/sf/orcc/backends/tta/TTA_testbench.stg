@@ -343,7 +343,7 @@ begin
       clk     =\> clock,
       <if(network.inputs)><network.inputs: mapSignalInput(); separator="\n"><endif>
       <if(network.outputs)><network.outputs: mapSignalOutput(); separator="\n"><endif>
-      reset_n =\> reset);
+      rst_n =\> reset);
       
     <init_process()>
 

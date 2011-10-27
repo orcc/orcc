@@ -43,7 +43,7 @@ begin
 
   process (clk, rst)
   begin
-    if rst = '0' then
+    if rst = '1' then
       segment7 <= (others => '0');
     elsif (clk'event and clk = '1') then
       case bcd is

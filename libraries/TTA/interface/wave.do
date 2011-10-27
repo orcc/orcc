@@ -1,6 +1,6 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
-add wave -noupdate -format Logic -radix hexadecimal /fps_eval_tb/rst
+add wave -noupdate -format Logic -radix hexadecimal /fps_eval_tb/rst_n
 add wave -noupdate -format Logic -radix hexadecimal /fps_eval_tb/clk
 add wave -noupdate -format Literal -radix hexadecimal /fps_eval_tb/top_frame
 add wave -noupdate -format Literal -radix hexadecimal /fps_eval_tb/segment7
@@ -8,7 +8,7 @@ add wave -noupdate -format Literal -radix hexadecimal /fps_eval_tb/segment7_sel
 add wave -noupdate -divider <NULL>
 add wave -noupdate -divider fps_eval
 add wave -noupdate -divider <NULL>
-add wave -noupdate -format Logic -radix hexadecimal /fps_eval_tb/fps_eval_1/rst
+add wave -noupdate -format Logic -radix hexadecimal /fps_eval_tb/fps_eval_1/rst_n
 add wave -noupdate -format Logic -radix hexadecimal /fps_eval_tb/fps_eval_1/clk
 add wave -noupdate -format Literal -radix hexadecimal /fps_eval_tb/fps_eval_1/top_frame
 add wave -noupdate -format Literal -radix hexadecimal /fps_eval_tb/fps_eval_1/segment7

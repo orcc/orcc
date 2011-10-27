@@ -33,7 +33,7 @@ architecture arch_fps_eval_tb of fps_eval_tb is
   constant PERIOD       : time                         := 20 ns;
   constant period2      : integer                      := 20;
   --
-  signal   rst          : std_logic;
+  signal   rst_n        : std_logic;
   signal   clk          : std_logic                    := '0';
   signal   top_frame    : std_logic_vector(0 downto 0) := "0";
   signal   segment7     : std_logic_vector(6 downto 0);
@@ -45,7 +45,7 @@ begin
     generic map (
       period => period2)
     port map (
-      rst          => rst,
+      rst_n        => rst,
       clk          => clk,
       top_frame    => top_frame,
       segment7     => segment7,
@@ -57,9 +57,9 @@ begin
   -- reset generation
   rst_proc : process
   begin
-    rst <= '0';
+    rst_n <= '0';
     wait for 100 ns;
-    rst <= '1';
+    rst_n <= '1';
     wait;
   end process;
 

@@ -50,7 +50,7 @@ begin
   process (clk, rst)
     variable tmp : integer range 0 to 2**16-1;
   begin
-    if (rst = '0') then
+    if (rst = '1') then
       s_count <= (others => '0');
       tmp   := 0;
       top   <= '0';

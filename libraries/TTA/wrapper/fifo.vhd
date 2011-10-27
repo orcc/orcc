@@ -15,7 +15,7 @@ entity fifo is
   port
     (
       wrreq   : in  std_logic;
-      rst     : in  std_logic;
+      rst_n   : in  std_logic;
       clk     : in  std_logic;
       rdreq   : in  std_logic;
       data    : in  std_logic_vector(width-1 downto 0);
@@ -27,12 +27,13 @@ end fifo;
 
 architecture rtl_fifo of fifo is
 
-  signal s_status : std_logic_vector(31 downto 0) := (others => '0');
-  signal s_clear  : std_logic;
+  signal status_i : std_logic_vector(31 downto 0) := (others => '0');
+  signal clear    : std_logic;
 
 begin
 
-  s_clear <= not(rst);
+  clear  <= not(rst_n);
+  status <= status_i;
 
   scfifo_component : altera_mf_components.scfifo
     generic map (
@@ -51,13 +52,11 @@ begin
       clock => clk,
       data  => data,
       rdreq => rdreq,
-      sclr  => s_clear,
+      sclr  => clear,
       wrreq => wrreq,
-      usedw => s_status(widthu-1 downto 0),
+      usedw => status_i(widthu-1 downto 0),
       q     => q,
-      full  => s_status(widthu)
+      full  => status_i(widthu)
       );
-
-  status <= s_status;
   
 end rtl_fifo;

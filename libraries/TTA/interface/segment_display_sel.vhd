@@ -56,7 +56,7 @@ begin
 
   process (clk, rst)
   begin
-    if (rst = '0') then
+    if (rst = '1') then
       current_level      <= unit;
       next_level         <= unit;
       segment7_sel       <= (others => '0');

@@ -31,7 +31,7 @@ entity fps_eval is
     period : in integer
     );
   port (
-    rst          : in  std_logic;
+    rst_n          : in  std_logic;
     clk          : in  std_logic;
     top_frame    : in  std_logic_vector(0 downto 0);
     segment7     : out std_logic_vector(6 downto 0);
@@ -42,6 +42,8 @@ end fps_eval;
 -------------------------------------------------------------------------------
 
 architecture rtl_fps_eval of fps_eval is
+  signal rst        : std_logic;
+  --
   signal top_frame2 : std_logic_vector(1 downto 0);
   signal top_frame3 : std_logic;
   signal top_ms     : std_logic;
@@ -61,7 +63,9 @@ architecture rtl_fps_eval of fps_eval is
   signal segment7_t : std_logic_vector(6 downto 0);
 begin
 
-  process (clk, rst)
+  rst <= not rst_n;
+
+  process (clk, rst_n)
   begin  -- process
     if rst = '0' then
       top_frame2 <= (others => '0');

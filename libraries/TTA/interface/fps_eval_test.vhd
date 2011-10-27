@@ -25,7 +25,7 @@ use ieee.std_logic_1164.all;
 entity fps_eval_test is
   port (
     button       : in  std_logic;
-    rst          : in  std_logic;
+    rst_n        : in  std_logic;
     clk          : in  std_logic;
     segment7     : out std_logic_vector(6 downto 0);
     segment7_sel : out std_logic_vector(3 downto 0)
@@ -43,7 +43,7 @@ begin
     generic map (
       period => 20)
     port map (
-      rst          => rst,
+      rst_n        => rst_n,
       clk          => clk,
       top_frame    => top_frame,
       segment7     => segment7,

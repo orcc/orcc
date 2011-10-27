@@ -31,7 +31,7 @@ entity top is
     (
       clk      : in  std_logic;
       <ports(network)>
-      rst     : in  std_logic
+      rst_n    : in  std_logic
       );
 end top;
 
@@ -103,12 +103,13 @@ instanceSignals(instance, incomingMap, outgoingMap) ::= <<
 >>
 
 inputPortSignals(port, connection) ::= <<
----- Input port: <port.name>
 <if(!port.native)
->signal fifo_<indexConnection(connection)>_wrreq		: std_logic;
+>---- Input port: <port.name>
+signal fifo_<indexConnection(connection)>_wrreq		: std_logic;
 signal fifo_<indexConnection(connection)>_data		: std_logic_vector(31 downto 0) := (others =\> '0');<
 elseif(!connection.source)
->signal s_<indexConnection(connection)> 		: std_logic_vector(<port.type.size>-1 downto 0);<
+>---- Input port: <port.name>
+signal s_<indexConnection(connection)> 		: std_logic_vector(<port.type.size>-1 downto 0);<
 endif>
 >>
 
@@ -153,7 +154,7 @@ assignFifo(connection) ::= <<
 fifo_<indexConnection(connection)> : entity work.fifo
   generic map(width =\> 32)
   port map(wrreq   =\> fifo_<indexConnection(connection)>_wrreq,
-           rst     =\> rst,
+           rst_n     =\> rst_n,
            clk     =\> clk,
            rdreq   =\> fifo_<indexConnection(connection)>_rdreq,
            data    =\> fifo_<indexConnection(connection)>_data(31 downto 0),
@@ -174,7 +175,7 @@ assignInstance(instance) ::= <<
 <endif>
   port map(clk          =\> clk,
            <assignPorts(instance)>
-           rst          =\> rst);
+           rst_n          =\> rst_n);
 >>
 
 assignGenerics(instance) ::= <<
