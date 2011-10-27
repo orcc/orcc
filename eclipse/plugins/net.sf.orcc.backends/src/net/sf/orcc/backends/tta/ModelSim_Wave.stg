@@ -1,0 +1,75 @@
+
+network(network, options) ::= <<
+
+onerror {resume}
+quietly WaveActivateNextPane {} 0
+add wave -noupdate -divider \<NULL\>
+add wave -noupdate -divider Top
+add wave -noupdate -divider \<NULL\>
+add wave -noupdate -format Literal /tb_top/s_leds_native
+add wave -noupdate -format Literal /tb_top/s_segment7_native
+add wave -noupdate -format Literal /tb_top/s_segment7_sel_native
+add wave -noupdate -format Literal /tb_top/count
+add wave -noupdate -format Logic /tb_top/clock
+add wave -noupdate -format Logic /tb_top/reset
+
+<network.instances: instance(); separator="\n\n">
+
+TreeUpdate [SetDefaultTree]
+WaveRestoreCursors {{Cursor 1} {112 ps} 0}
+configure wave -namecolwidth 222
+configure wave -valuecolwidth 100
+configure wave -justifyvalue left
+configure wave -signalnamewidth 1
+configure wave -snapdistance 10
+configure wave -datasetprefix 0
+configure wave -rowmargin 4
+configure wave -childrowmargin 2
+configure wave -gridoffset 0
+configure wave -gridperiod 1
+configure wave -griddelta 40
+configure wave -timeline 0
+configure wave -timelineunits ns
+update
+WaveRestoreZoom {0 ps} {2911 ps}
+
+>>
+
+instance(instance) ::= <<
+
+add wave -noupdate -divider \<NULL\>
+add wave -noupdate -divider <instance.id>
+add wave -noupdate -divider \<NULL\>
+
+add wave -noupdate -format Logic /tb_top/top_orcc/<instance.id>_inst/clk
+add wave -noupdate -format Logic /tb_top/top_orcc/<instance.id>_inst/rst_n
+add wave -noupdate -format Literal /tb_top/top_orcc/<instance.id>_inst/dram_addr
+add wave -noupdate -format Literal /tb_top/top_orcc/<instance.id>_inst/imem_addr
+add wave -noupdate -format Logic /tb_top/top_orcc/<instance.id>_inst/wren_wire
+add wave -noupdate -format Literal /tb_top/top_orcc/<instance.id>_inst/bytemask_wire
+add wave -noupdate -format Literal /tb_top/top_orcc/<instance.id>_inst/dram_data_in_wire
+add wave -noupdate -format Literal /tb_top/top_orcc/<instance.id>_inst/dram_data_out_wire
+add wave -noupdate -format Logic /tb_top/top_orcc/<instance.id>_inst/wren_x_wire
+add wave -noupdate -format Literal /tb_top/top_orcc/<instance.id>_inst/idata_wire
+
+>>
+
+instanceInput(input) ::= <<
+add wave -noupdate -format Literal /tb_top/top_orcc/<instance.id>_inst/data_<indexPort(input)>_in
+add wave -noupdate -format Literal /tb_top/top_orcc/<instance.id>_inst/status_<indexPort(input)>_in
+add wave -noupdate -format Logic /tb_top/top_orcc/<instance.id>_inst/ack_<indexPort(input)>_in
+>>
+
+instanceOutput(output) ::= <<
+add wave -noupdate -format Literal /tb_top/top_orcc/<instance.id>_inst/data_<indexPort(output)>_out
+add wave -noupdate -format Literal /tb_top/top_orcc/<instance.id>_inst/status_<indexPort(output)>_out
+add wave -noupdate -format Logic /tb_top/top_orcc/<instance.id>_inst/dv_<indexPort(output)>_out
+>>
+
+indexPort(port) ::= <<
+<if(instance.actor)
+><instance.actor.templateData.portToIndexMap.(port)><
+elseif(instance.broadcast)
+><instance.broadcast.portMap.(port)><
+endif>
+>>

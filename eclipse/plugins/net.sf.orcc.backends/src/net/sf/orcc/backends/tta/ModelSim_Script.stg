@@ -42,7 +42,7 @@ vcom -93 -quiet -work work top.vhd
 vcom -93 -quiet -work work top_tb.vhd
 
 # Simulate
-vsim -novopt -L altera_mf work.tb_top -t ps -do "view wave; add wave *;"
+vsim -novopt -L altera_mf work.tb_top -t ps -do "do wave.do;"
 
 >>
 

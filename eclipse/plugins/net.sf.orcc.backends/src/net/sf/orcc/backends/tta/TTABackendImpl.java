@@ -176,13 +176,13 @@ public class TTABackendImpl extends AbstractBackend {
 				"net/sf/orcc/backends/tta/VHDL_Network.stg");
 		networkPrinter.setExpressionPrinter(new LLVMExpressionPrinter());
 		networkPrinter.print("top.vhd", path, network);
-		
+
 		// Python package
 		StandardPrinter pythonPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/tta/Python_Network.stg");
 		pythonPrinter.print("informations.py", path, network);
 		OrccUtil.createFile(path, "__init__.py");
-		
+
 		// Quartus
 		CustomPrinter projectQsfPrinter = new CustomPrinter(
 				"net/sf/orcc/backends/tta/Quartus_Project.stg");
@@ -196,8 +196,11 @@ public class TTABackendImpl extends AbstractBackend {
 				"net/sf/orcc/backends/tta/ModelSim_Script.stg");
 		StandardPrinter tbPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/tta/ModelSim_Testbench.stg");
+		StandardPrinter wavePrinter = new StandardPrinter(
+				"net/sf/orcc/backends/tta/ModelSim_Wave.stg");
 		tclPrinter.print("top.tcl", path, network);
 		tbPrinter.print("top_tb.vhd", path, network);
+		wavePrinter.print("wave.do", path, network);
 	}
 
 	private void printProcessor(Instance instance, String instancePath) {
