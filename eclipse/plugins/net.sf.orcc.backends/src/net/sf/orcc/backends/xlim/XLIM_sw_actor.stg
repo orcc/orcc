@@ -39,6 +39,8 @@ UnaryOp ::= [
 actorPort(port, dir) ::= <<
 <if (port.type.bool)
 >\<actor-port dir="<dir>" name="<port.name>" size="1" typeName="<port.type>"/\><
+elseif (port.type.float)
+>\<actor-port dir="<dir>" name="<port.name>" typeName="<port.type>"/\><
 else
 >\<actor-port dir="<dir>" name="<port.name>" size="<port.type.size>" typeName="<port.type>"/\><
 endif>
@@ -65,7 +67,7 @@ initVariable(type, value) ::= <<
 >\<initValue typeName="List"\>
 	<value: {elt | <initVariable(type=type.type, value=elt)>}; separator="">\</initValue\>
 <else
->\<initValue size="<if (type.bool)>1<else><type.size><endif>" typeName="<type>" value="<if (type.bool)><if (value)>1<else>0<endif><else><value><endif>"/\>
+>\<initValue <if(!type.float)>size="<if (type.bool)>1<else><type.size><endif>"<endif> typeName="<type>" value="<if (type.bool)><if (value)>1<else>0<endif><else><value><endif>"/\>
 <endif>
 >>
 
@@ -74,7 +76,7 @@ stateVar(var) ::= <<
 	<initVariable(type=var.type, value=var.value)>\</stateVar\>
 <else>
 <typeDefLocal(var)>
-\<stateVar name="<var.name>" sourceName="<var.name>" typeName="<if(var.type.list)><var.name>_typedef<else><var.type><endif>"<if(!var.type.list)> size="<if (var.type.bool)>1<else><var.type.size><endif>"<endif>/\>
+\<stateVar name="<var.name>" sourceName="<var.name>" typeName="<if(var.type.list)><var.name>_typedef<else><var.type><endif>"<if(!var.type.list)><if(!var.type.float)> size="<if (var.type.bool)>1<else><var.type.size><endif>"<endif><endif>/\>
 <endif>
 >>
 
@@ -92,6 +94,7 @@ expression(expr) ::= <<
 <if(expr.binaryExpr)><printBinaryExpr(expr)><
 elseif(expr.unaryExpr)><printUnaryExpr(expr)><
 elseif(expr.intExpr)><printIntExpr(expr)><
+elseif(expr.floatExpr)><printFloatExpr(expr)><
 elseif(expr.booleanExpr)><printBoolExpr(expr)><
 elseif(expr.varExpr)><printVarExpr(expr)><endif>
 >>
@@ -110,6 +113,12 @@ printUnaryExpr(expr) ::= <<
 >>
 
 printIntExpr(expr) ::= <<
+\<operation kind="$literal_Integer" value="<expr>"\>
+	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable)>
+\</operation\>
+>>
+
+printFloatExpr(expr) ::= <<
 \<operation kind="$literal_Integer" value="<expr>"\>
 	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable)>
 \</operation\>
@@ -138,7 +147,7 @@ untypedPort(dir, source, extension="") ::= <<
 
 typedPort(dir, type, source, extension="") ::= <<
 <if(!type.list || source.global)
->\<port dir="<dir>" size="<if(type.bool)>1<else><type.size><endif>" source="<source.indexedName><extension>" typeName="<type>"/\><
+>\<port dir="<dir>"<if(!type.float)> size="<if(type.bool)>1<else><type.size><endif>"<endif> source="<source.indexedName><extension>" typeName="<type>"/\><
 else
 >\<port dir="<dir>" source="<source.indexedName><extension>" typeName="<source.indexedName><extension>_typedef"/\><
 endif>
@@ -443,7 +452,7 @@ typeDefListElements(type) ::= <<
 	\</typePar\>
 \</type\><
 else><
-if(type.bool)
+if(type.bool || type.float || type.real)
 >\<type name="<type>"/\><
 else
 >\<type name="<type>"\>

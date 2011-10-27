@@ -162,6 +162,11 @@ public class ExprFloatImpl extends ExpressionImpl implements ExprFloat {
 		return new ExprFloatImpl(getValue().multiply(expr.getValue()));
 	}
 
+	@Override
+	public ExprFloat negate() {
+		return new ExprFloatImpl(getValue().negate());
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated

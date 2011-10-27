@@ -277,8 +277,8 @@ public class TypeValidator extends AbstractCalJavaValidator {
 			}
 			break;
 		case MINUS:
-			if (!type.isUint() && !type.isInt()) {
-				error("Cannot convert " + type + " to int", expression,
+			if (!type.isUint() && !type.isInt() && !type.isFloat()) {
+				error("Cannot convert " + type + " to int or float", expression,
 						eINSTANCE.getExpressionUnary_Expression(), -1);
 			}
 			break;
@@ -464,23 +464,23 @@ public class TypeValidator extends AbstractCalJavaValidator {
 			break;
 
 		case TIMES:
-			if (!t1.isInt() && !t1.isUint()) {
-				error("Cannot convert " + t1 + " to int/uint", source, feature,
+			if (!t1.isInt() && !t1.isUint() && !t1.isFloat()) {
+				error("Cannot convert " + t1 + " to int/uint/float", source, feature,
 						index);
 			}
-			if (!t2.isInt() && !t2.isUint()) {
-				error("Cannot convert " + t2 + " to int/uint", source, feature,
+			if (!t2.isInt() && !t2.isUint() && !t2.isFloat()) {
+				error("Cannot convert " + t2 + " to int/uint/float", source, feature,
 						index);
 			}
 			break;
 
 		case MINUS:
-			if (!t1.isInt() && !t1.isUint()) {
-				error("Cannot convert " + t1 + " to int/uint", source, feature,
+			if (!t1.isInt() && !t1.isUint() && !t1.isFloat()) {
+				error("Cannot convert " + t1 + " to int/uint/float", source, feature,
 						index);
 			}
-			if (!t2.isInt() && !t2.isUint()) {
-				error("Cannot convert " + t2 + " to int/uint", source, feature,
+			if (!t2.isInt() && !t2.isUint() && !t2.isFloat()) {
+				error("Cannot convert " + t2 + " to int/uint/float", source, feature,
 						index);
 			}
 			break;

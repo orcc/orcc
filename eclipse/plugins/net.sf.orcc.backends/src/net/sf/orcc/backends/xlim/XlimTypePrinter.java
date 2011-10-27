@@ -29,6 +29,7 @@
 package net.sf.orcc.backends.xlim;
 
 import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeFloat;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
@@ -51,6 +52,11 @@ public class XlimTypePrinter extends TypePrinter {
 	@Override
 	public String caseTypeInt(TypeInt type) {
 		return "int";
+	}
+
+	@Override
+	public String caseTypeFloat(TypeFloat type) {
+		return "real";
 	}
 
 	@Override

@@ -79,6 +79,15 @@ public interface ExprFloat extends Expression {
 	ExprFloat multiply(ExprFloat expr);
 
 	/**
+	 * Negates this float expression.
+	 * 
+	 * @param expr
+	 *            a float expression
+	 * @return the negation of this float expression
+	 */
+	ExprFloat negate();
+
+	/**
 	 * Sets the value of this float expression.
 	 * 
 	 * @param value

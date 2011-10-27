@@ -53,6 +53,7 @@ import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.ExprFloat;
 import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
@@ -271,6 +272,14 @@ public class Evaluator extends CalSwitch<Expression> {
 			Expression value = getValue(expression.getExpression());
 			if (value != null && value.isIntExpr()) {
 				ExprInt i = (ExprInt) value;
+				return i.negate();
+			}
+			if (value != null && value.isFloatExpr()) {
+				ExprFloat i = (ExprFloat) value;
+				return i.negate();
+			}
+			if (value != null && value.isFloatExpr()) {
+				ExprFloat i = (ExprFloat) value;
 				return i.negate();
 			}
 			return null;
