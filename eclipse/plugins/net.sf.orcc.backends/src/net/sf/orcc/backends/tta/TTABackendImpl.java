@@ -95,9 +95,9 @@ public class TTABackendImpl extends AbstractBackend {
 		transformations.put("max", "max_");
 		transformations.put("select", "select_");
 		processorIntensiveActors = new ArrayList<String>();
-		processorIntensiveActors.add("fi.oulu.ee.mvg.Mgnt_Address");
-		processorIntensiveActors.add("org.mpeg4.part2.texture.Algo_IDCT2D_ISOIEC_23002_1");
-		processorIntensiveActors.add("fi.oulu.ee.mvg.Algo_IAP");
+		//processorIntensiveActors.add("fi.oulu.ee.mvg.Mgnt_Address");
+		//processorIntensiveActors.add("org.mpeg4.part2.texture.Algo_IDCT2D_ISOIEC_23002_1");
+		//processorIntensiveActors.add("fi.oulu.ee.mvg.Algo_IAP");
 	}
 
 	@Override
