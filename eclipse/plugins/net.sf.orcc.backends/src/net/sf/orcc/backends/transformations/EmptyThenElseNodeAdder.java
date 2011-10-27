@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.llvm.transformations;
+package net.sf.orcc.backends.transformations;
 
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeIf;
