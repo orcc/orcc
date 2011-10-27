@@ -196,7 +196,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 				new RenameTransformation(this.transformations),
 				new TacTransformation(true), new CopyPropagator(),
 				new ConstantPropagator(), new InstPhiTransformation(),
-				new GetElementPtrAdder(), new TypeResizer(true, false),
+				new GetElementPtrAdder(), new TypeResizer(true, false, false),
 				new CastAdder(true, false), new EmptyThenElseNodeAdder(),
 				new BlockCombine(), new BuildCFG(), new ListInitializer() };
 

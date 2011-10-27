@@ -56,11 +56,14 @@ public class TypeResizer extends AbstractActorVisitor<Object> {
 
 	private boolean castToPow2bits;
 	private boolean castTo32bits;
+	private boolean castNativePort;
 
-	public TypeResizer(boolean castToPow2bits, boolean castTo32bits) {
+	public TypeResizer(boolean castToPow2bits, boolean castTo32bits,
+			boolean castNativePort) {
 		super(true);
 		this.castToPow2bits = castToPow2bits;
 		this.castTo32bits = castTo32bits;
+		this.castNativePort = castNativePort;
 	}
 
 	@Override
@@ -107,7 +110,9 @@ public class TypeResizer extends AbstractActorVisitor<Object> {
 
 	private void checkPorts(List<Port> ports) {
 		for (Port port : ports) {
-			checkType(port.getType());
+			if (castNativePort || !port.isNative()) {
+				checkType(port.getType());
+			}
 		}
 	}
 

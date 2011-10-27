@@ -112,7 +112,8 @@ public class TTABackendImpl extends AbstractBackend {
 
 		ActorVisitor<?>[] transformations = { new UnitImporter(),
 				new SSATransformation(), new BoolToIntTransformation(),
-				new TypeResizer(true, true), new PrintlnTransformation(),
+				new TypeResizer(true, true, false),
+				new PrintlnTransformation(),
 				new RenameTransformation(this.transformations),
 				new TacTransformation(true), new CopyPropagator(),
 				new ConstantPropagator(), new InstPhiTransformation(),

@@ -185,7 +185,7 @@ public class CBackendImpl extends AbstractBackend {
 		}
 
 		ActorVisitor<?>[] transformations = { new UnitImporter(),
-				new TypeResizer(true, false),
+				new TypeResizer(true, false, true),
 				new RenameTransformation(replacementMap) };
 
 		for (ActorVisitor<?> transformation : transformations) {
