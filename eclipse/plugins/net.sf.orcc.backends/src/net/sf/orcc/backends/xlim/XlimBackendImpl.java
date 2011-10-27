@@ -48,6 +48,7 @@ import net.sf.orcc.backends.transformations.DivisionSubstitution;
 import net.sf.orcc.backends.transformations.Inliner;
 import net.sf.orcc.backends.transformations.InstPhiTransformation;
 import net.sf.orcc.backends.transformations.Multi2MonoToken;
+import net.sf.orcc.backends.transformations.TypeResizer;
 import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.backends.transformations.tac.ExpressionSplitter;
 import net.sf.orcc.backends.vhdl.transformations.StoreOnceTransformation;
@@ -57,7 +58,6 @@ import net.sf.orcc.backends.xlim.transformations.InstTernaryAdder;
 import net.sf.orcc.backends.xlim.transformations.ListFlattener;
 import net.sf.orcc.backends.xlim.transformations.LiteralIntegersAdder;
 import net.sf.orcc.backends.xlim.transformations.LocalArrayRemoval;
-import net.sf.orcc.backends.xlim.transformations.ThrityTwoBitCaster;
 import net.sf.orcc.backends.xlim.transformations.UnaryListRemoval;
 import net.sf.orcc.backends.xlim.transformations.XlimDeadVariableRemoval;
 import net.sf.orcc.backends.xlim.transformations.XlimVariableRenamer;
@@ -139,6 +139,7 @@ public class XlimBackendImpl extends AbstractBackend {
 
 		if (hardwareGen) {
 			new StoreOnceTransformation().doSwitch(actor);
+			new TypeResizer(false, true);
 		}
 
 		if (multi2mono) {
@@ -148,7 +149,7 @@ public class XlimBackendImpl extends AbstractBackend {
 		}
 
 		ActorVisitor<?>[] transformations = { new UnitImporter(),
-				new SSATransformation(), new ThrityTwoBitCaster(),
+				new SSATransformation(),
 				new GlobalArrayInitializer(hardwareGen),
 				new InstTernaryAdder(), new Inliner(true, true),
 				new UnaryListRemoval(), new CustomPeekAdder(),

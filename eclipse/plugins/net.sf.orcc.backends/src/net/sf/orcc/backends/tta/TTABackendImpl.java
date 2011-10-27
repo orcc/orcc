@@ -47,11 +47,11 @@ import net.sf.orcc.backends.llvm.transformations.GetElementPtrAdder;
 import net.sf.orcc.backends.llvm.transformations.PrintlnTransformation;
 import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.backends.transformations.InstPhiTransformation;
+import net.sf.orcc.backends.transformations.TypeResizer;
 import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.backends.transformations.tac.TacTransformation;
 import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.tta.architecture.TTA;
-import net.sf.orcc.backends.tta.transformations.ActorTypeResizer;
 import net.sf.orcc.backends.tta.transformations.BroadcastTypeResizer;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.transformations.BlockCombine;
@@ -95,9 +95,9 @@ public class TTABackendImpl extends AbstractBackend {
 		transformations.put("max", "max_");
 		transformations.put("select", "select_");
 		processorIntensiveActors = new ArrayList<String>();
-		//processorIntensiveActors.add("fi.oulu.ee.mvg.Mgnt_Address");
-		//processorIntensiveActors.add("org.mpeg4.part2.texture.Algo_IDCT2D_ISOIEC_23002_1");
-		//processorIntensiveActors.add("fi.oulu.ee.mvg.Algo_IAP");
+		// processorIntensiveActors.add("fi.oulu.ee.mvg.Mgnt_Address");
+		// processorIntensiveActors.add("org.mpeg4.part2.texture.Algo_IDCT2D_ISOIEC_23002_1");
+		// processorIntensiveActors.add("fi.oulu.ee.mvg.Algo_IAP");
 	}
 
 	@Override
@@ -110,11 +110,12 @@ public class TTABackendImpl extends AbstractBackend {
 
 		ActorVisitor<?>[] transformations = { new UnitImporter(),
 				new SSATransformation(), new BoolToIntTransformation(),
-				new ActorTypeResizer(), new PrintlnTransformation(),
+				new TypeResizer(true, true), new PrintlnTransformation(),
 				new RenameTransformation(this.transformations),
 				new TacTransformation(true), new InstPhiTransformation(),
 				new GetElementPtrAdder(), new CastAdder(true, false),
-				new EmptyThenElseNodeAdder(), new BlockCombine(), new BuildCFG() };
+				new EmptyThenElseNodeAdder(), new BlockCombine(),
+				new BuildCFG() };
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);
@@ -213,7 +214,7 @@ public class TTABackendImpl extends AbstractBackend {
 		}
 		return 2;
 	}
-	
+
 	private int getAluNb(Instance instance) {
 		if (instance.isActor()
 				&& processorIntensiveActors.contains(instance.getActor()
@@ -222,7 +223,7 @@ public class TTABackendImpl extends AbstractBackend {
 		}
 		return 1;
 	}
-	
+
 	private int getRegNb(Instance instance) {
 		if (instance.isActor()
 				&& processorIntensiveActors.contains(instance.getActor()

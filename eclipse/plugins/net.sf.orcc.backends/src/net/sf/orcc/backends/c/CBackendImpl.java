@@ -185,7 +185,8 @@ public class CBackendImpl extends AbstractBackend {
 		}
 
 		ActorVisitor<?>[] transformations = { new UnitImporter(),
-				new TypeResizer(), new RenameTransformation(replacementMap) };
+				new TypeResizer(true, false),
+				new RenameTransformation(replacementMap) };
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);

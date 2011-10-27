@@ -54,8 +54,13 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  */
 public class TypeResizer extends AbstractActorVisitor<Object> {
 
-	public TypeResizer() {
+	private boolean castToPow2bits;
+	private boolean castTo32bits;
+
+	public TypeResizer(boolean castToPow2bits, boolean castTo32bits) {
 		super(true);
+		this.castToPow2bits = castToPow2bits;
+		this.castTo32bits = castTo32bits;
 	}
 
 	@Override
@@ -130,14 +135,26 @@ public class TypeResizer extends AbstractActorVisitor<Object> {
 	}
 
 	private int getIntSize(int size) {
-		if (size <= 8) {
-			return 8;
-		} else if (size <= 16) {
-			return 16;
-		} else if (size <= 32) {
-			return 32;
+		if (castToPow2bits) {
+			if (size <= 8) {
+				return 8;
+			} else if (size <= 16) {
+				return 16;
+			} else if (size <= 32 || castTo32bits) {
+				return 32;
+			} else {
+				return 64;
+			}
 		} else {
-			return 64;
+			if (size > 32) {
+				if (castTo32bits) {
+					return 32;
+				} else {
+					return 64;
+				}
+			} else {
+				return size;
+			}
 		}
 	}
 }
