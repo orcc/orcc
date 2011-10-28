@@ -452,7 +452,7 @@ typeDefListElements(type) ::= <<
 	\</typePar\>
 \</type\><
 else><
-if(type.bool || type.float || type.real)
+if(type.bool || type.float)
 >\<type name="<type>"/\><
 else
 >\<type name="<type>"\>
