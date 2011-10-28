@@ -278,10 +278,6 @@ public class Evaluator extends CalSwitch<Expression> {
 				ExprFloat i = (ExprFloat) value;
 				return i.negate();
 			}
-			if (value != null && value.isFloatExpr()) {
-				ExprFloat i = (ExprFloat) value;
-				return i.negate();
-			}
 			return null;
 		}
 		case NUM_ELTS:

@@ -503,12 +503,12 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		case DIV:
 		case DIV_INT:
 		case SHIFT_RIGHT:
-			if (!t1.isInt() && !t1.isUint()) {
-				error("Cannot convert " + t1 + " to int/uint", source, feature,
+			if (!t1.isInt() && !t1.isUint() && !t1.isFloat()) {
+				error("Cannot convert " + t1 + " to int/uint/float", source, feature,
 						index);
 			}
-			if (!t2.isInt() && !t2.isUint()) {
-				error("Cannot convert " + t2 + " to int/uint", source, feature,
+			if (!t2.isInt() && !t2.isUint() && !t2.isFloat()) {
+				error("Cannot convert " + t2 + " to int/uint/float", source, feature,
 						index);
 			}
 			break;
