@@ -478,6 +478,8 @@ public class Typer extends CalSwitch<Type> {
 	 * Returns the type of a binary expression whose left operand has type t1
 	 * and right operand has type t2, and whose operator is given.
 	 * 
+	 * TODO replace automatic int/uint to float casting with explicit casts
+	 * 
 	 * @param op
 	 *            operator
 	 * @param t1
@@ -505,20 +507,32 @@ public class Typer extends CalSwitch<Type> {
 			return createType(t1, t2, Lub.instance);
 
 		case TIMES:
+			if (((t1.isInt() || t1.isUint()) && t2.isFloat()) || ((t2.isInt() || t2.isUint()) && t1.isFloat())) {
+				return IrFactory.eINSTANCE.createTypeFloat();
+			}
 			return createType(t1, t2, LubSum.instance);
 
 		case MINUS:
+			if (((t1.isInt() || t1.isUint()) && t2.isFloat()) || ((t2.isInt() || t2.isUint()) && t1.isFloat())) {
+				return IrFactory.eINSTANCE.createTypeFloat();
+			}
 			return createType(t1, t2, LubPlus1.instance);
 
 		case PLUS:
 			if (t1.isString() && !t2.isList() || t2.isString() && !t1.isList()) {
 				return IrFactory.eINSTANCE.createTypeString();
 			}
+			if (((t1.isInt() || t1.isUint()) && t2.isFloat()) || ((t2.isInt() || t2.isUint()) && t1.isFloat())) {
+				return IrFactory.eINSTANCE.createTypeFloat();
+			}
 
 			return createType(t1, t2, LubPlus1.instance);
 
 		case DIV:
 		case DIV_INT:
+			if (((t1.isInt() || t1.isUint()) && t2.isFloat()) || ((t2.isInt() || t2.isUint()) && t1.isFloat())) {
+				return IrFactory.eINSTANCE.createTypeFloat();
+			}
 		case SHIFT_RIGHT:
 			return EcoreUtil.copy(t1);
 

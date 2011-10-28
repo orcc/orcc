@@ -44,6 +44,7 @@ import net.sf.orcc.cal.cal.ExpressionElsif;
 import net.sf.orcc.cal.cal.ExpressionIf;
 import net.sf.orcc.cal.cal.ExpressionIndex;
 import net.sf.orcc.cal.cal.ExpressionInteger;
+import net.sf.orcc.cal.cal.ExpressionFloat;
 import net.sf.orcc.cal.cal.ExpressionList;
 import net.sf.orcc.cal.cal.ExpressionString;
 import net.sf.orcc.cal.cal.ExpressionUnary;
@@ -290,6 +291,12 @@ public class ExprTransformer extends CalSwitch<Expression> {
 	@Override
 	public Expression caseExpressionInteger(ExpressionInteger expression) {
 		Expression value = eINSTANCE.createExprInt(expression.getValue());
+		return storeExpr(expression, value);
+	}
+
+	@Override
+	public Expression caseExpressionFloat(ExpressionFloat expression) {
+		Expression value = eINSTANCE.createExprFloat(expression.getValue());
 		return storeExpr(expression, value);
 	}
 

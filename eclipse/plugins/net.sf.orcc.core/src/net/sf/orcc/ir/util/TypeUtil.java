@@ -224,7 +224,9 @@ public class TypeUtil {
 		if (src.isBool() && dst.isBool() || src.isFloat() && dst.isFloat()
 				|| src.isString() && dst.isString()
 				|| (src.isInt() || src.isUint())
-				&& (dst.isInt() || dst.isUint())) {
+				&& (dst.isInt() || dst.isUint())
+				|| (src.isInt() || src.isUint())
+				&& dst.isFloat()) {
 			return true;
 		}
 
