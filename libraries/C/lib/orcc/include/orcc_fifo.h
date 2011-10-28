@@ -101,4 +101,8 @@ static struct FIFO_S(type) fifo_##count = { (size), array_##count, readersnb, re
 #include "orcc_generic_fifo.h"
 #undef T
 
+#define T float
+#include "orcc_generic_fifo.h"
+#undef T
+
 #endif
