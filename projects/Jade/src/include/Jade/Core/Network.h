@@ -80,6 +80,7 @@ public:
 		this->inputs = inputs;
 		this->outputs = outputs;
 		this->graph = graph;
+		this->mapping = NULL;
 	};
 
 
