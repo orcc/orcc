@@ -12,13 +12,7 @@ endif>
 ///////////////////////////////////////////////////////////////////////////////
 
 sendData(port) ::= <<
-<if(port.type.bool)
->if (input_bit = 1) then
-  s_<port.name>_q  \<= '1';
-else
-  s_<port.name>_q  \<= '0';
-end if;<
-elseif(port.type.int)
+<if(port.type.int)
 >s_<port.name>_q  \<= std_logic_vector(to_signed(input_bit, 32));<
 else
 >s_<port.name>_q  \<= std_logic_vector(to_unsigned(input_bit, 32));<
@@ -69,11 +63,11 @@ endif>
 
 mapSignalInput(port) ::= <<
 <if(port.native)
-><port.name>   =\> s_<port.name>_native,<
+><port.name> =\> s_<port.name>_native,<
 else
->data_<indexPort(port)>_in     =\> s_<port.name>_q,
-status_<indexPort(port)>_in   =\> s_<port.name>_status,
-ack_<indexPort(port)>_in      =\> s_<port.name>_rdreq,<
+>data_<indexPort(port)>_in    =\> s_<port.name>_q,
+status_<indexPort(port)>_in  =\> s_<port.name>_status,
+ack_<indexPort(port)>_in     =\> s_<port.name>_rdreq,<
 endif>
 >>
 
@@ -81,9 +75,9 @@ mapSignalOutput(port) ::= <<
 <if(port.native)
 ><port.name>   =\> s_<port.name>_native,<
 else
->data_<indexPort(port)>_out    =\> s_<port.name>_data,
-status_<indexPort(port)>_out  =\> s_<port.name>_status,
-dv_<indexPort(port)>_out      =\> s_<port.name>_wrreq,<
+>data_<indexPort(port)>_out   =\> s_<port.name>_data,
+status_<indexPort(port)>_out =\> s_<port.name>_status,
+dv_<indexPort(port)>_out     =\> s_<port.name>_wrreq,<
 endif>
 >>
 
@@ -91,7 +85,6 @@ sig_const(input, output) ::= <<
 constant PERIOD      : time := 10 ns;
 --
 type severity_level is (note, warning, error, failure);
-type tb_type is (after_reset, read_file, CheckRead);
 --
 -- Input and Output files
 <input: printTraceIn(); separator="\n">
@@ -102,22 +95,20 @@ type tb_type is (after_reset, read_file, CheckRead);
 <output: printSignalOutput(); separator="\n">
 --
 -- Configuration
-signal count       : integer range 255 downto 0;
-signal clock       : std_logic := '0';
-signal reset       : std_logic := '0';
+signal clk         : std_logic := '0';
+signal rst_n       : std_logic := '0';
 
 >>
 
 printTraceIn(port) ::= <<
 <if(!port.native)
->signal tb_FSM_<port.name>  : tb_type;
-file trace_<instance.id>_<port.name>  : text is "../../trace/<instance.id>_<port.name>.txt";<
+>file trace_<instance.id>_<port.name> : text is "../trace/<instance.id>_<port.name>.txt";<
 endif>
 >>
 
 printTraceOut(port) ::= <<
 <if(!port.native)
->file trace_<instance.id>_<port.name>  : text is "../../trace/<instance.id>_<port.name>.txt";<
+>file trace_<instance.id>_<port.name> : text is "../trace/<instance.id>_<port.name>.txt";<
 endif>
 >>
 
@@ -128,91 +119,60 @@ endif>
 
 init_process() ::= <<
 -- clock generation
-clock \<= not clock after PERIOD/2;
+clk \<= not clk after PERIOD/2;
 
-    
 -- reset generation
 reset_proc: process
 begin
-    reset \<= '0';
+    rst_n \<= '0';
     wait for 100 ns;
-    reset \<= '1';
+    rst_n \<= '1';
     wait;
 end process;
 >>
 
-waveform_process_in(inputs) ::= <<
+process_in(inputs) ::= <<
 --
 -- Input(s) Waveform Generation
-WaveGen_Proc_In : process (reset_n, clock)
+WaveGen_Proc_In : process (rst_n, clk)
   variable Input_bit   : integer;
   variable line_number : line;
 begin
-  if reset_n = '0' then
+  if rst_n = '0' then
     <inputs: signalInitInput(); separator="\n">
-    --
-    <inputs: {port|<if(!port.native)>tb_FSM_<port.name> \<= after_reset;<endif>}; separator="\n">    
-    count \<= 0;
   --  
-  elsif rising_edge(clock) then 
-    <inputs: case_define_in(); separator="\n">
+  elsif clk = '1' then 
+    <inputs: readAndSend(); separator="\n">
   end if;
 end process WaveGen_Proc_In;
-
 >>
 
 
-case_define_in(port) ::= <<
+readAndSend(port) ::= <<
 <if (!port.native)
 >-- Input port: <port.name> Waveform Generation
-case tb_FSM_<port.name> is
-  when after_reset =\>
-    count \<= count + 1;
-    if (count = 15) then
-      tb_FSM_<port.name> \<= read_file;
-      count           \<= 0;
-    end if;
-
-  when read_file =\>
-    if (not endfile (trace_<instance.id>_<port.name>)) then
-      readline(trace_<instance.id>_<port.name>, line_number);
-      --
-      if ((line_number'length \> 0 and line_number(1) /= '/') and s_<port.name>_rdreq = '1') then
-        read(line_number, input_bit);
-        <sendData(port)>
-        tb_FSM_<port.name> \<= CheckRead;
-      end if;
-    end if;
-
-  when CheckRead =\>
-    if (not endfile (trace_<instance.id>_<port.name>) and s_<port.name>_rdreq = '1') then
-      readline(trace_<instance.id>_<port.name>, line_number);
-      --
-      if (line_number'length \> 0 and line_number(1) /= '/') then
-        read(line_number, input_bit);
-        <sendData(port)>  
-      end if;
-    elsif (endfile (trace_<instance.id>_<port.name>)) then
-      s_<port.name>_status \<= (others => '0'); 
-    end if;
-
-  when others =\> null;
-end case;
-<endif>
-
+if (not endfile (trace_<instance.id>_<port.name>)) then
+  readline(trace_<instance.id>_<port.name>, line_number);
+  --
+  if ((line_number'length \> 0 and line_number(1) /= '/') and s_<port.name>_rdreq = '1') then
+    read(line_number, input_bit);
+    <sendData(port)>
+  end if;
+end if;<
+endif>
 >>
 
-waveform_process_out(outputs) ::= <<
+process_out(outputs) ::= <<
 -- Output(s) waveform Generation
 <outputs: {port|<if(!port.native)>s_<port.name>_status \<= (others => '0');<\n><endif>}>    
 --
-WaveGen_Proc_Out : process (reset_n, clock)
+WaveGen_Proc_Out : process (rst_n, clk)
   variable Input_bit   : integer;
   variable line_number : line;
 begin
-  if (reset_n = '0') then
+  if (rst_n = '0') then
     <outputs: signalInitOutput()>    --
-  elsif (rising_edge(clock)) then
+  elsif (rising_edge(clk)) then
     <outputs: case_define_out(); separator="\n">
   end if;
 end process WaveGen_Proc_Out;
@@ -294,18 +254,15 @@ begin
 
   <instance.id>_orcc : entity work.processor_<instance.id>
     port map (
-      clk         =\> clock,
+      clk          =\> clk,
       <if(instance.actor.inputs)><instance.actor.inputs: mapSignalInput(); separator="\n"><endif>
       <if(instance.actor.outputs)><instance.actor.outputs: mapSignalOutput(); separator="\n"><endif>
-      reset_n       =\> reset_n);
+      rst_n        =\> rst_n);
             
     <init_process()>
-    <if(instance.actor.inputs)
-    ><waveform_process_in(instance.actor.inputs)><
-    endif>
     
-    <if(instance.actor.outputs)
-    ><waveform_process_out(instance.actor.outputs)><
+    <if(instance.actor.inputs)
+    ><process_in(instance.actor.inputs)><
     endif>
 
 end architecture arch_tb_<instance.id>;
@@ -340,10 +297,10 @@ begin
 
   top_orcc : entity work.top
     port map (
-      clk     =\> clock,
+      clk     =\> clk,
       <if(network.inputs)><network.inputs: mapSignalInput(); separator="\n"><endif>
       <if(network.outputs)><network.outputs: mapSignalOutput(); separator="\n"><endif>
-      rst_n =\> reset);
+      rst_n   =\> rst_n);
       
     <init_process()>
 
