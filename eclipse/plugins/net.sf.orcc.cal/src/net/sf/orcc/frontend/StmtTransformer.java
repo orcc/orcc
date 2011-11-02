@@ -152,9 +152,8 @@ public class StmtTransformer extends CalSwitch<EObject> {
 					assign.getIndexes());
 		}
 
-		AstExpression value = Util.getAssignValue(assign);
-
-		new ExprTransformer(procedure, nodes, target, indexes).doSwitch(value);
+		new ExprTransformer(procedure, nodes, target, indexes).doSwitch(assign
+				.getValue());
 
 		return null;
 	}

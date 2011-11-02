@@ -424,8 +424,8 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 		c.setNoSpace().around(access.getLeftSquareBracketKeyword_1_0());
 		c.setNoSpace().before(access.getRightSquareBracketKeyword_1_2());
 
-		c.setLinewrap().after(access.getSemicolonKeyword_3());
-		c.setNoSpace().before(access.getSemicolonKeyword_3());
+		c.setLinewrap().after(access.getSemicolonKeyword_4());
+		c.setNoSpace().before(access.getSemicolonKeyword_4());
 	}
 
 	/**
