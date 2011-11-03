@@ -26,34 +26,25 @@ endif>
 
 printSignalInput(port) ::= <<
 <if(!port.native)
->signal s_<port.name>_q			: std_logic_vector(31 downto 0);
-signal s_<port.name>_status		: std_logic_vector(8 downto 0);
-signal s_<port.name>_rdreq		: std_logic;<
+>signal s_<port.name>_q      : std_logic_vector(31 downto 0);
+signal s_<port.name>_status : std_logic_vector(31 downto 0);
+signal s_<port.name>_rdreq  : std_logic;<
 else
->signal s_<port.name>_native	: std_logic_vector(<port.type.size>-1 downto 0);<
+>signal <port.name>_native : std_logic_vector(<port.type.size>-1 downto 0);<
 endif>
 >>
 
 printSignalOutput(port) ::= <<
 <if(!port.native)
->signal s_<port.name>_data		: std_logic_vector(31 downto 0);
-signal s_<port.name>_status		: std_logic_vector(8 downto 0);
-signal s_<port.name>_wrreq		: std_logic;<
+>signal s_<port.name>_data   : std_logic_vector(31 downto 0);
+signal s_<port.name>_status : std_logic_vector(31 downto 0);
+signal s_<port.name>_wrreq  : std_logic;<
 else
->signal s_<port.name>_native	: std_logic_vector(<port.type.size>-1 downto 0);<
+>signal <port.name>_native : std_logic_vector(<port.type.size>-1 downto 0);<
 endif>
 >>
 
-signalInitInput(port) ::=<<
-<if(!port.native)
->s_<port.name>_q       \<= (others =\> '0');
-s_<port.name>_status  \<= (others =\> '0');<
-else
->s_<port.name>_native  \<= 'Z';<
-endif>
->>
-
-signalInitOutput(port) ::=<<
+signalInitOutput(port) ::= <<
 <if(!port.native)
 >s_<port.name>_status   \<= (others =\> '0');<
 else
@@ -102,13 +93,36 @@ signal rst_n       : std_logic := '0';
 
 printTraceIn(port) ::= <<
 <if(!port.native)
->file trace_<instance.id>_<port.name> : text is "../trace/<instance.id>_<port.name>.txt";<
+>file trace_<port.name> : text is "../trace/<instance.id>_<port.name>.txt";<
 endif>
 >>
 
 printTraceOut(port) ::= <<
 <if(!port.native)
->file trace_<instance.id>_<port.name> : text is "../trace/<instance.id>_<port.name>.txt";<
+>file trace_<port.name> : text is "../trace/<instance.id>_<port.name>.txt";<
+endif>
+>>
+
+declareVariable(port) ::= <<
+variable current_status_<port.name> : integer;
+>>
+
+initializeInputProcess(port) ::= <<
+<if(!port.native)
+>-- Input port: <port.name> 
+file_close(trace_<port.name>);
+file_open(trace_<port.name>, "../trace/<instance.id>_<port.name>.txt", read_mode);
+current_status_<port.name> := 0;
+while not (endfile (trace_<port.name>)) loop
+  readline (trace_<port.name>, current_line);
+  current_status_<port.name> := current_status_<port.name> + 1;
+end loop;
+s_<port.name>_q       \<= (others =\> '0');
+s_<port.name>_status  \<= std_logic_vector(to_unsigned(current_status_<port.name>, 32));
+file_close(trace_<port.name>);
+file_open(trace_<port.name>, "../trace/<instance.id>_<port.name>.txt", read_mode);<
+else
+>s_<port.name>_native  \<= 'Z';<
 endif>
 >>
 
@@ -131,18 +145,20 @@ begin
 end process;
 >>
 
-process_in(inputs) ::= <<
+printInputProcess(inputs) ::= <<
 --
 -- Input(s) Waveform Generation
 WaveGen_Proc_In : process (rst_n, clk)
   variable Input_bit   : integer;
-  variable line_number : line;
+  variable current_line : line;
+  <inputs: declareVariable(); separator="\n">
+  
 begin
   if rst_n = '0' then
-    <inputs: signalInitInput(); separator="\n">
+    <inputs: initializeInputProcess(); separator="\n\n">
   --  
   elsif clk = '1' then 
-    <inputs: readAndSend(); separator="\n">
+    <inputs: readAndSend(); separator="\n\n">
   end if;
 end process WaveGen_Proc_In;
 >>
@@ -151,14 +167,18 @@ end process WaveGen_Proc_In;
 readAndSend(port) ::= <<
 <if (!port.native)
 >-- Input port: <port.name> Waveform Generation
-if (not endfile (trace_<instance.id>_<port.name>)) then
-  readline(trace_<instance.id>_<port.name>, line_number);
+if not (endfile (trace_<port.name>)) then
+  readline(trace_<port.name>, current_line);
   --
-  if ((line_number'length \> 0 and line_number(1) /= '/') and s_<port.name>_rdreq = '1') then
-    read(line_number, input_bit);
+  if ((current_line'length \> 0 and current_line(1) /= '/') and s_<port.name>_rdreq = '1') then
+    read(current_line, input_bit);
     <sendData(port)>
+    current_status_<port.name> := current_status_<port.name> - 1;
   end if;
-end if;<
+else
+  file_close(trace_<port.name>);
+end if;
+s_<port.name>_status  \<= std_logic_vector(to_unsigned(current_status_<port.name>, 32));<
 endif>
 >>
 
@@ -168,7 +188,7 @@ process_out(outputs) ::= <<
 --
 WaveGen_Proc_Out : process (rst_n, clk)
   variable Input_bit   : integer;
-  variable line_number : line;
+  variable current_line : line;
 begin
   if (rst_n = '0') then
     <outputs: signalInitOutput()>    --
@@ -183,11 +203,11 @@ end process WaveGen_Proc_Out;
 case_define_out(port) ::= <<
 <if (!port.native)
 >-- Output port: <port.name> Waveform Generation
-if (not endfile (trace_<instance.id>_<port.name>) and s_<port.name>_wrreq = '1') then
-  readline(trace_<instance.id>_<port.name>, line_number);
+if (not (endfile (trace_<port.name>)) and s_<port.name>_wrreq = '1') then
+  readline(trace_<port.name>, current_line);
   --
-  if (line_number'length \> 0 and line_number(1) /= '/') then
-    read(line_number, input_bit);
+  if (current_line'length \> 0 and current_line(1) /= '/') then
+    read(current_line, input_bit);
 <
 if(port.type.bool)
 >    if (input_bit = 1) then
@@ -259,11 +279,11 @@ begin
       <if(instance.actor.outputs)><instance.actor.outputs: mapSignalOutput(); separator="\n"><endif>
       rst_n        =\> rst_n);
             
-    <init_process()>
+  <init_process()>
     
-    <if(instance.actor.inputs)
-    ><process_in(instance.actor.inputs)><
-    endif>
+  <if(instance.actor.inputs)
+  ><printInputProcess(instance.actor.inputs)><
+  endif>
 
 end architecture arch_tb_<instance.id>;
 >>

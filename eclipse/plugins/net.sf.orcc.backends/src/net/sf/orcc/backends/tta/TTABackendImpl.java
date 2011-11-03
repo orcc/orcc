@@ -156,16 +156,22 @@ public class TTABackendImpl extends AbstractBackend {
 				"net/sf/orcc/backends/tta/LLVM_Actor.stg", !debugMode, true);
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
-		StandardPrinter tbPrinter = new StandardPrinter(
-				"net/sf/orcc/backends/tta/ModelSim_Testbench.stg", !debugMode,
-				false);
 
 		String instancePath = null;
 		if (!(instance.isActor() && instance.getActor().isNative())) {
 			instancePath = OrccUtil.createFolder(path, instance.getId());
 			printProcessor(instance, instancePath);
+
+			// ModelSim
+			StandardPrinter tbPrinter = new StandardPrinter(
+					"net/sf/orcc/backends/tta/ModelSim_Testbench.stg",
+					!debugMode, false);
+			StandardPrinter tclPrinter = new StandardPrinter(
+					"net/sf/orcc/backends/tta/ModelSim_Script.stg");
+			tbPrinter.print(instance.getId() + "_tb.vhd", instancePath,
+					instance);
+			tclPrinter.print(instance.getId() + ".tcl", path, instance);
 		}
-		tbPrinter.print(instance.getId() + "_tb.vhd", instancePath, instance);
 
 		return printer.print(instance.getId() + ".ll", instancePath, instance);
 	}

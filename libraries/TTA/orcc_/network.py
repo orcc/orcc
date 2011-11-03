@@ -64,6 +64,7 @@ class Network:
         shutil.copy(os.path.join(srcPath, "top.qpf"), buildPath)
         shutil.copy(os.path.join(srcPath, "top.tcl"), buildPath)
         os.chmod(os.path.join(buildPath, "top.tcl"), stat.S_IRWXU)
+        shutil.copy(os.path.join(srcPath, "wave.do"), buildPath)
         iromAddrList = []
         dramAddrList = []
 

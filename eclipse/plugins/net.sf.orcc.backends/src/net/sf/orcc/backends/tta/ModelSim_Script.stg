@@ -1,6 +1,43 @@
 
 
 network(network, options) ::= <<
+<initializeLibraries()>
+
+<compileOtherComponents()>
+
+<compileInterfaceComponents()>
+
+<compileSharedComponent()>
+
+<network.instances: compileInstance(); separator="\n">
+
+# Network
+vcom -93 -quiet -work work top.vhd
+vcom -93 -quiet -work work top_tb.vhd
+
+# Simulate
+vsim -novopt -L altera_mf work.tb_top -t ps -do "do wave.do;"
+
+>>
+
+instance(instance, options) ::= <<
+<initializeLibraries()>
+
+<compileOtherComponents()>
+
+<compileInterfaceComponents()>
+
+<compileSharedComponent()>
+
+<compileInstance(instance)>
+
+vcom -93 -quiet -work work <instance.id>/<instance.id>_tb.vhd
+
+# Simulate
+vsim -novopt -L altera_mf work.tb_<instance.id> -t ps
+>>
+
+initializeLibraries() ::= <<
 # Remove old libraries
 vdel -all -lib work
 vdel -all -lib altera_mf
@@ -13,40 +50,9 @@ vlib altera_mf
 vmap altera_mf altera_mf
 vcom -quiet -opt=-clkOpt -work altera_mf -93 -explicit simulation/altera_mf_components.vhd
 vcom -quiet -opt=-clkOpt -work altera_mf -93 -explicit simulation/altera_mf.vhd
-
-# Compile Shared components
-vcom -93 -quiet -work work share/vhdl/util_pkg.vhdl
-vcom -93 -quiet -work work share/vhdl/tce_util_pkg.vhdl
-vcom -93 -quiet -work work share/vhdl/cal_stream_in.vhdl
-vcom -93 -quiet -work work share/vhdl/cal_stream_out.vhdl
-vcom -93 -quiet -work work share/vhdl/rf_1wr_1rd_always_1_guarded_0.vhd
-vcom -93 -quiet -work work share/vhdl/mul.vhdl
-vcom -93 -quiet -work work share/vhdl/ldh_ldhu_ldq_ldqu_ldw_sth_stq_stw.vhdl
-vcom -93 -quiet -work work share/vhdl/and_ior_xor.vhdl
-vcom -93 -quiet -work work share/vhdl/add_and_eq_gt_gtu_ior_shl_shr_shru_sub_sxhw_sxqw_xor.vhdl
-
-# Compile Other components
-vcom -93 -quiet -work work wrapper/fifo.vhd
-vcom -93 -quiet -work work wrapper/ram.vhd
-vcom -93 -quiet -work work wrapper/rom.vhd
-vcom -93 -quiet -work work interface/counter.vhd
-vcom -93 -quiet -work work interface/segment_display_conv.vhd
-vcom -93 -quiet -work work interface/segment_display_sel.vhd
-vcom -93 -quiet -work work interface/fps_eval.vhd
-vcom -93 -quiet -work work simulation/sim_package.vhd
-
-<network.instances: instance(); separator="\n">
-
-# Network
-vcom -93 -quiet -work work top.vhd
-vcom -93 -quiet -work work top_tb.vhd
-
-# Simulate
-vsim -novopt -L altera_mf work.tb_top -t ps -do "do wave.do;"
-
 >>
 
-instance(instance) ::= <<
+compileInstance(instance) ::= <<
 <if(!instance.actor.native)
 ># Compile Instance <instance.id>
 vcom -93 -quiet -work work <instance.id>/imem_mau_pkg.vhdl
@@ -63,11 +69,36 @@ vcom -93 -quiet -work work <instance.id>/gcu_ic/ic.vhdl
 vcom -93 -quiet -work work <instance.id>/gcu_ic/decoder.vhdl
 vcom -93 -quiet -work work <instance.id>/processor_<instance.id>.vhd
 
-<if(instance.actor)
->#vcom -93 -quiet -work work <instance.id>/<instance.id>_tb.vhd<
-endif>
-
 exec cp -f wrapper/<instance.id>.mif . &
 exec cp -f wrapper/<instance.id>_data.mif . &<
 endif>
+>>
+
+compileOtherComponents() ::= <<
+# Compile other components
+vcom -93 -quiet -work work wrapper/fifo.vhd
+vcom -93 -quiet -work work wrapper/ram.vhd
+vcom -93 -quiet -work work wrapper/rom.vhd
+vcom -93 -quiet -work work simulation/sim_package.vhd
+>>
+
+compileInterfaceComponents() ::= <<
+# Compile interface components
+vcom -93 -quiet -work work interface/counter.vhd
+vcom -93 -quiet -work work interface/segment_display_conv.vhd
+vcom -93 -quiet -work work interface/segment_display_sel.vhd
+vcom -93 -quiet -work work interface/fps_eval.vhd
+>>
+
+compileSharedComponent() ::= <<
+# Compile Shared components
+vcom -93 -quiet -work work share/vhdl/util_pkg.vhdl
+vcom -93 -quiet -work work share/vhdl/tce_util_pkg.vhdl
+vcom -93 -quiet -work work share/vhdl/cal_stream_in.vhdl
+vcom -93 -quiet -work work share/vhdl/cal_stream_out.vhdl
+vcom -93 -quiet -work work share/vhdl/rf_1wr_1rd_always_1_guarded_0.vhd
+vcom -93 -quiet -work work share/vhdl/mul.vhdl
+vcom -93 -quiet -work work share/vhdl/ldh_ldhu_ldq_ldqu_ldw_sth_stq_stw.vhdl
+vcom -93 -quiet -work work share/vhdl/and_ior_xor.vhdl
+vcom -93 -quiet -work work share/vhdl/add_and_eq_gt_gtu_ior_shl_shr_shru_sub_sxhw_sxqw_xor.vhdl
 >>

@@ -36,6 +36,7 @@ import subprocess
 import shutil
 import tempita
 import math
+import stat
 
 from xml.dom.minidom import parse
 
@@ -58,6 +59,7 @@ class Instance:
         # Useful filenames
         self._processorFile = "processor_" + self.id + ".vhd"
         self._tbFile = self.id + "_tb.vhd"
+        self._tclFile = self.id + ".tcl"
         self._adfFile = "processor_" + self.id + ".adf"
         self._idfFile = "processor_" + self.id + ".idf"
         self._llFile = self.id + ".ll"
@@ -92,33 +94,35 @@ class Instance:
         self.dram = self._readAdf(self._adfFile)
 
     def generate(self, srcPath, buildPath, libPath, iromAddrMax, dramAddrMax, args, debug):
-        srcPath = os.path.join(srcPath, self.id)
+        instanceSrcPath = os.path.join(srcPath, self.id)
+        instanceBuildPath = os.path.join(buildPath, self.id)
         wrapperPath = os.path.join(buildPath, "wrapper")
         sharePath = os.path.join(buildPath, "share")
-        buildPath = os.path.join(buildPath, self.id)
-        os.chdir(srcPath)
+        os.chdir(instanceSrcPath)
         if debug: 
             print "ROM: " + str(self.irom.depth) + "x" + str(self.irom.width) + "bits"
             print "RAM: " + str(self.dram.depth) + "x" + str(self.dram.width) + "bits"
         # Copy libraries in working directory
-        shutil.copy(os.path.join(libPath, "stream", "stream_units.hdb"), srcPath)
+        shutil.copy(os.path.join(libPath, "stream", "stream_units.hdb"), instanceSrcPath)
         shutil.rmtree("vhdl", ignore_errors=True)
         shutil.copytree(os.path.join(libPath, "stream", "vhdl"), "vhdl")
         # Remove existing build directory
-        shutil.rmtree(buildPath, ignore_errors=True)
+        shutil.rmtree(instanceBuildPath, ignore_errors=True)
         # Generate the processor
-        subprocess.call(["generateprocessor"] + args + ["-o", buildPath, "-b", self._bemFile, "--shared-files-dir", sharePath,
+        subprocess.call(["generateprocessor"] + args + ["-o", instanceBuildPath, "-b", self._bemFile, "--shared-files-dir", sharePath,
                                         "-l", "vhdl", "-e", self._entity, "-i", self._idfFile, self._adfFile])
         # Generate processor files
-        self.generateProcessor(os.path.join(libPath, "templates", "processor.template"), os.path.join(buildPath, self._processorFile), iromAddrMax, dramAddrMax)
+        self.generateProcessor(os.path.join(libPath, "templates", "processor.template"), os.path.join(instanceBuildPath, self._processorFile), iromAddrMax, dramAddrMax)
         # Copy files to build directory
         shutil.copy(self._mifFile, wrapperPath)
         shutil.copy(self._mifDataFile, wrapperPath)
         shutil.copy(self._coeFile, wrapperPath)
         shutil.copy(self._coeDataFile, wrapperPath)
-        shutil.copy("imem_mau_pkg.vhdl", buildPath)
+        shutil.copy("imem_mau_pkg.vhdl", instanceBuildPath)
         if not (self.isNative or self.isBroadcast):
-            shutil.copy(self._tbFile, buildPath)
+            shutil.copy(self._tbFile, instanceBuildPath)
+            shutil.copy(os.path.join(srcPath, self._tclFile), buildPath)
+            os.chmod(os.path.join(buildPath, self._tclFile), stat.S_IRWXU)
 
         # Clean working directory
         os.remove("stream_units.hdb")
