@@ -145,38 +145,35 @@ begin
 end process;
 >>
 
-printInputProcess(inputs) ::= <<
---
--- Input(s) Waveform Generation
-WaveGen_Proc_In : process (rst_n, clk)
+printInputProcess(input) ::= <<
+-- Input "<input.name>" Generation
+Proc_in_<input.name> : process (rst_n, clk)
   variable Input_bit   : integer;
   variable current_line : line;
-  <inputs: declareVariable(); separator="\n">
+  <declareVariable(input)>
   
 begin
   if rst_n = '0' then
-    <inputs: initializeInputProcess(); separator="\n\n">
+    <initializeInputProcess(input)>
   --  
   elsif clk = '1' then 
-    <inputs: readAndSend(); separator="\n\n">
+    <readAndSend(input)>
   end if;
-end process WaveGen_Proc_In;
+end process Proc_in_<input.name>;
 >>
 
 
 readAndSend(port) ::= <<
 <if (!port.native)
 >-- Input port: <port.name> Waveform Generation
-if not (endfile (trace_<port.name>)) then
+if not (endfile (trace_<port.name>)) and s_<port.name>_rdreq = '1' then
   readline(trace_<port.name>, current_line);
   --
-  if ((current_line'length \> 0 and current_line(1) /= '/') and s_<port.name>_rdreq = '1') then
+  if current_line'length \> 0 and current_line(1) /= '/' then
     read(current_line, input_bit);
     <sendData(port)>
     current_status_<port.name> := current_status_<port.name> - 1;
   end if;
-else
-  file_close(trace_<port.name>);
 end if;
 s_<port.name>_status  \<= std_logic_vector(to_unsigned(current_status_<port.name>, 32));<
 endif>
@@ -282,7 +279,7 @@ begin
   <init_process()>
     
   <if(instance.actor.inputs)
-  ><printInputProcess(instance.actor.inputs)><
+  ><instance.actor.inputs: printInputProcess(); separator="\n\n"><
   endif>
 
 end architecture arch_tb_<instance.id>;
