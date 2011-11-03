@@ -278,8 +278,9 @@ public class TypeValidator extends AbstractCalJavaValidator {
 			break;
 		case MINUS:
 			if (!type.isUint() && !type.isInt() && !type.isFloat()) {
-				error("Cannot convert " + type + " to int or float", expression,
-						eINSTANCE.getExpressionUnary_Expression(), -1);
+				error("Cannot convert " + type + " to int or float",
+						expression, eINSTANCE.getExpressionUnary_Expression(),
+						-1);
 			}
 			break;
 		case NUM_ELTS:
@@ -296,7 +297,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 
 	@Check(CheckType.NORMAL)
 	public void checkFunction(final Function function) {
-		if (!function.isNative()) {
+		if (!Util.hasAnnotation("native", function.getAnnotations())) {
 			checkReturnType(function);
 		}
 	}
@@ -465,23 +466,23 @@ public class TypeValidator extends AbstractCalJavaValidator {
 
 		case TIMES:
 			if (!t1.isInt() && !t1.isUint() && !t1.isFloat()) {
-				error("Cannot convert " + t1 + " to int/uint/float", source, feature,
-						index);
+				error("Cannot convert " + t1 + " to int/uint/float", source,
+						feature, index);
 			}
 			if (!t2.isInt() && !t2.isUint() && !t2.isFloat()) {
-				error("Cannot convert " + t2 + " to int/uint/float", source, feature,
-						index);
+				error("Cannot convert " + t2 + " to int/uint/float", source,
+						feature, index);
 			}
 			break;
 
 		case MINUS:
 			if (!t1.isInt() && !t1.isUint() && !t1.isFloat()) {
-				error("Cannot convert " + t1 + " to int/uint/float", source, feature,
-						index);
+				error("Cannot convert " + t1 + " to int/uint/float", source,
+						feature, index);
 			}
 			if (!t2.isInt() && !t2.isUint() && !t2.isFloat()) {
-				error("Cannot convert " + t2 + " to int/uint/float", source, feature,
-						index);
+				error("Cannot convert " + t2 + " to int/uint/float", source,
+						feature, index);
 			}
 			break;
 
@@ -504,12 +505,12 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		case DIV_INT:
 		case SHIFT_RIGHT:
 			if (!t1.isInt() && !t1.isUint() && !t1.isFloat()) {
-				error("Cannot convert " + t1 + " to int/uint/float", source, feature,
-						index);
+				error("Cannot convert " + t1 + " to int/uint/float", source,
+						feature, index);
 			}
 			if (!t2.isInt() && !t2.isUint() && !t2.isFloat()) {
-				error("Cannot convert " + t2 + " to int/uint/float", source, feature,
-						index);
+				error("Cannot convert " + t2 + " to int/uint/float", source,
+						feature, index);
 			}
 			break;
 

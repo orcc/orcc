@@ -290,24 +290,24 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	private void configureFunction(FormattingConfig c) {
 		FunctionElements access = f.getFunctionAccess();
 
-		c.setNoSpace().around(access.getLeftParenthesisKeyword_2());
-		c.setNoSpace().before(access.getCommaKeyword_3_1_0());
-		c.setNoSpace().before(access.getRightParenthesisKeyword_4());
+		c.setNoSpace().around(access.getLeftParenthesisKeyword_3());
+		c.setNoSpace().before(access.getCommaKeyword_4_1_0());
+		c.setNoSpace().before(access.getRightParenthesisKeyword_5());
 
 		// "procedure" indents
-		c.setIndentation(access.getFunctionKeyword_0(), null);
+		c.setIndentation(access.getFunctionKeyword_1(), null);
 
 		// "var" unindents and indents, configure comma rules
-		keywordAndCommas(c, access.getVarKeyword_7_0(),
-				access.getCommaKeyword_7_2_0());
+		keywordAndCommas(c, access.getVarKeyword_8_0_0(),
+				access.getCommaKeyword_8_0_2_0());
 
-		c.setLinewrap().after(access.getColonKeyword_8());
+		c.setLinewrap().after(access.getColonKeyword_8_1());
 
 		// "end" unindents
-		c.setIndentation(null, access.getEndKeyword_11());
+		c.setIndentation(null, access.getEndKeyword_9());
 
-		c.setLinewrap().before(access.getEndKeyword_11());
-		c.setLinewrap(2).after(access.getEndKeyword_11());
+		c.setLinewrap().before(access.getEndKeyword_9());
+		c.setLinewrap(2).after(access.getEndKeyword_9());
 	}
 
 	/**
@@ -386,19 +386,19 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	private void configureProcedure(FormattingConfig c) {
 		AstProcedureElements access = f.getAstProcedureAccess();
 
-		c.setNoSpace().around(access.getLeftParenthesisKeyword_2());
-		c.setNoSpace().before(access.getCommaKeyword_3_1_0());
-		c.setNoSpace().before(access.getRightParenthesisKeyword_4());
-		c.setLinewrap().after(access.getRightParenthesisKeyword_4());
+		c.setNoSpace().around(access.getLeftParenthesisKeyword_3());
+		c.setNoSpace().before(access.getCommaKeyword_4_1_0());
+		c.setNoSpace().before(access.getRightParenthesisKeyword_5());
+		c.setLinewrap().after(access.getRightParenthesisKeyword_5());
 
 		// "procedure" indents
-		c.setIndentation(access.getProcedureKeyword_0(), null);
+		c.setIndentation(access.getProcedureKeyword_1(), null);
 
 		// "var" unindents and indents, configure comma rules
-		keywordAndCommas(c, access.getVarKeyword_5_0(),
-				access.getCommaKeyword_5_2_0());
+		keywordAndCommas(c, access.getVarKeyword_6_0_0(),
+				access.getCommaKeyword_6_0_2_0());
 
-		body(c, access.getBeginKeyword_6(), access.getEndKeyword_9());
+		body(c, access.getBeginKeyword_6_1(), access.getEndKeyword_7());
 	}
 
 	private void configureSchedule(FormattingConfig c) {

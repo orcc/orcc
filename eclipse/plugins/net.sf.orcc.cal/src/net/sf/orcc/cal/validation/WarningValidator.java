@@ -79,7 +79,7 @@ public class WarningValidator extends AbstractCalJavaValidator {
 		}.doSwitch(EcoreUtil.getRootContainer(procedure));
 
 		if (!used && procedure.eContainer() instanceof AstActor
-				&& !procedure.isNative()) {
+				&& !Util.hasAnnotation("native", procedure.getAnnotations())) {
 			warning("The procedure " + procedure.getName() + " is never called",
 					procedure, eINSTANCE.getAstProcedure_Name(), -1);
 		}
@@ -105,7 +105,7 @@ public class WarningValidator extends AbstractCalJavaValidator {
 
 		}.doSwitch(EcoreUtil.getRootContainer(function));
 
-		if (!used && !function.isNative()) {
+		if (!used && !Util.hasAnnotation("native", function.getAnnotations())) {
 			warning("The function " + function.getName() + " is never called",
 					function, eINSTANCE.getFunction_Name(), -1);
 		}
@@ -135,13 +135,13 @@ public class WarningValidator extends AbstractCalJavaValidator {
 			return;
 		} else if (container instanceof Function) {
 			Function function = (Function) variable.eContainer();
-			if (function.isNative()) {
+			if (Util.hasAnnotation("native", function.getAnnotations())) {
 				// parameters in native functions are not read in CAL
 				return;
 			}
 		} else if (container instanceof AstProcedure) {
 			AstProcedure procedure = (AstProcedure) variable.eContainer();
-			if (procedure.isNative()) {
+			if (Util.hasAnnotation("native", procedure.getAnnotations())) {
 				// parameters in native procedures are not read in CAL
 				return;
 			}
@@ -151,7 +151,7 @@ public class WarningValidator extends AbstractCalJavaValidator {
 		AstEntity entity = EcoreUtil2.getContainerOfType(variable,
 				AstEntity.class);
 		if (reference == eINSTANCE.getAstActor_Parameters()
-				&& entity.isNative()) {
+				&& Util.hasAnnotation("native", entity.getAnnotations())) {
 			// parameters in native actors are not read in CAL
 			return;
 		}

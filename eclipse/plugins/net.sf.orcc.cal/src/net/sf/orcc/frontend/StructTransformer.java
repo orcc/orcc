@@ -107,7 +107,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 	public EObject caseAstPort(AstPort astPort) {
 		Type type = EcoreUtil.copy(Typer.getType(astPort));
 		Port port = eINSTANCE.createPort(type, astPort.getName(),
-				astPort.isNative());
+				Util.hasAnnotation("native", astPort.getAnnotations()));
 		Frontend.putMapping(astPort, port);
 		return port;
 	}
@@ -130,7 +130,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 				eINSTANCE.createTypeVoid());
 
 		// set native flag
-		if (astProcedure.isNative()) {
+		if (Util.hasAnnotation("native", astProcedure.getAnnotations())) {
 			procedure.setNative(true);
 		}
 
@@ -171,7 +171,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 		procedure = eINSTANCE.createProcedure(name, lineNumber, type);
 
 		// set native flag
-		if (function.isNative()) {
+		if (Util.hasAnnotation("native", function.getAnnotations())) {
 			procedure.setNative(true);
 		}
 
@@ -182,7 +182,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 		transformLocalVariables(function.getVariables());
 
 		Expression value;
-		if (function.isNative()) {
+		if (procedure.isNative()) {
 			value = null;
 		} else {
 			ExprTransformer transformer = new ExprTransformer(procedure,

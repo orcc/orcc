@@ -12,7 +12,8 @@ AstEntity:
 	('package' package=QualifiedName ';')?
 	(imports += Import)*
 	
-	( ((native ?= 'native')? 'actor' name=ID actor=AstActor)
+	(annotations += AstAnnotation)*
+	( ('actor' name=ID actor=AstActor)
 	| ('unit' name=ID unit=AstUnit) );
 
 Import: 'import' importedNamespace=QualifiedNameWithWildCard ';';
@@ -30,9 +31,7 @@ QualifiedNameWithWildCard:
 AstUnit: {AstUnit} ':'
 
 	(functions += Function
-	| functions += NativeFunction
 	| procedures += AstProcedure
-	| procedures += NativeProcedure
 	| variables += ConstantVariable)*
 
 	'end';
@@ -50,9 +49,7 @@ AstActor: {AstActor}
 		(outputs += AstPort (',' outputs += AstPort)*)? ':'
 
 	(functions += Function
-	| functions += NativeFunction
 	| procedures += AstProcedure
-	| procedures += NativeProcedure
 	| actions += AstAction
 	| initializes += Initialize
 	| stateVariables += StateVariable
@@ -64,44 +61,40 @@ AstActor: {AstActor}
 
 	'end';
 
-AstPort: (native ?= 'native')? type=AstType name=ID;
+AstPort: (annotations += AstAnnotation)* type=AstType name=ID;
 
 Function:
+	(annotations += AstAnnotation)*
 	'function' name=ID
 	'('
 		(parameters += VariableDeclaration (',' parameters += VariableDeclaration)*)?
 	')' '-->' type=AstType
-	('var'
-		variables += ValuedVariableDeclaration
-		(',' variables += ValuedVariableDeclaration)*)? ':'
-	(variables += ValuedVariableDeclaration ';')*
-	expression=AstExpression
+	// body may be omitted if @native
+	(
+		('var'
+			variables += ValuedVariableDeclaration
+			(',' variables += ValuedVariableDeclaration)*)? ':'
+		(variables += ValuedVariableDeclaration ';')*
+		expression=AstExpression
+	)?
 	'end';
 
-NativeFunction returns Function:
-	native?='native' 'function' name=ID
-	'('
-		(parameters += VariableDeclaration (',' parameters += VariableDeclaration)*)?
-	')' '-->' type=AstType 'end';
-
 AstProcedure:
+	(annotations += AstAnnotation)*
 	'procedure' name=ID
 	'('
 		(parameters += VariableDeclaration (',' parameters += VariableDeclaration)*)?
 	')'
-	('var'
-		variables += ValuedVariableDeclaration
-		(',' variables += ValuedVariableDeclaration)*)?
-	'begin'
-		(variables += ValuedVariableDeclaration ';')*
-		(statements += Statement)*
+	// body may be omitted if @native
+	(
+		('var'
+			variables += ValuedVariableDeclaration
+			(',' variables += ValuedVariableDeclaration)*)?
+		'begin'
+			(variables += ValuedVariableDeclaration ';')*
+			(statements += Statement)*
+	)?
 	'end';
-
-NativeProcedure returns AstProcedure:
-	native ?= 'native' 'procedure' name=ID
-	'('
-		(parameters += VariableDeclaration (',' parameters += VariableDeclaration)*)?
-	')' 'end';
 
 ActorParameter returns Variable: VariableDeclaration ('=' value=AstExpression)?;
 

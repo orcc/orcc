@@ -29,6 +29,10 @@
 package net.sf.orcc.cal.util;
 
 import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
+
+import java.util.List;
+
+import net.sf.orcc.cal.cal.AstAnnotation;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.Variable;
 
@@ -44,23 +48,6 @@ import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
  * 
  */
 public class Util {
-
-	/**
-	 * Returns <code>true</code> if the variable can be assigned a value.
-	 * 
-	 * @param variable
-	 *            a variable
-	 * @return <code>true</code> if the variable can be assigned a value
-	 */
-	public static boolean isAssignable(Variable variable) {
-		EStructuralFeature feature = variable.eContainingFeature();
-		if (variable.isConstant()) {
-			return false;
-		} else {
-			return feature != eINSTANCE.getAstActor_Parameters()
-					&& feature != eINSTANCE.getAstUnit_Variables();
-		}
-	}
 
 	/**
 	 * Returns the line on which the given object is defined.
@@ -97,6 +84,44 @@ public class Util {
 		}
 
 		return name;
+	}
+
+	/**
+	 * Returns <code>true</code> if the given annotation list contains an
+	 * annotation whose name equals the given name.
+	 * 
+	 * @param name
+	 *            a name
+	 * @param annotations
+	 *            a list of annotations
+	 * @return <code>true</code> if the given annotation list contains an
+	 *         annotation whose name equals the given name
+	 */
+	public static boolean hasAnnotation(String name,
+			List<AstAnnotation> annotations) {
+		for (AstAnnotation annotation : annotations) {
+			if (name.equals(annotation.getName())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Returns <code>true</code> if the variable can be assigned a value.
+	 * 
+	 * @param variable
+	 *            a variable
+	 * @return <code>true</code> if the variable can be assigned a value
+	 */
+	public static boolean isAssignable(Variable variable) {
+		EStructuralFeature feature = variable.eContainingFeature();
+		if (variable.isConstant()) {
+			return false;
+		} else {
+			return feature != eINSTANCE.getAstActor_Parameters()
+					&& feature != eINSTANCE.getAstUnit_Variables();
+		}
 	}
 
 }
