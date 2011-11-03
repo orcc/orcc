@@ -223,6 +223,18 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
+	public Action createAction(String tagName, Procedure scheduler, Procedure body) {
+		ActionImpl action = new ActionImpl();
+		action.setBody(body);
+		action.setInputPattern(createPattern());
+		action.setOutputPattern(createPattern());
+		action.setPeekPattern(createPattern());
+		action.setScheduler(scheduler);
+		action.setTag(createTag(tagName));
+		return action;
+	}
+
+	@Override
 	public Action createAction(Tag tag, Pattern inputPattern,
 			Pattern outputPattern, Pattern peekedPattern, Procedure scheduler,
 			Procedure body) {
@@ -686,7 +698,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		instReturn.setValue(value);
 		return instReturn;
 	}
-
+	
 	@Override
 	public InstReturn createInstReturn(int lineNumber, Expression value) {
 		InstReturnImpl instReturn = new InstReturnImpl();
@@ -734,7 +746,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public InstStore createInstStore(Var target, int value) {
 		return createInstStore(target, createExprInt(value));
 	}
-	
+
 	@Override
 	public InstStore createInstStore(Var target, int index,
 			Expression source) {

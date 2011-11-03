@@ -36,10 +36,22 @@ public interface IrFactory extends EFactory {
 	Action createAction();
 
 	/**
-	 * Creates a new action.
+	 * Creates a new action with empty patterns, the given tag, scheduler and body.
 	 * 
 	 * @param tag
 	 *            action tag
+	 * @param scheduler
+	 *            procedure that computes scheduling information
+	 * @param body
+	 *            procedure that holds the body of the action
+	 */
+	Action createAction(String tag, Procedure scheduler, Procedure body);
+
+	/**
+	 * Creates a new action.
+	 * 
+	 * @param tag
+	 *            action tag name
 	 * @param inputPattern
 	 *            input pattern
 	 * @param outputPattern
@@ -51,7 +63,7 @@ public interface IrFactory extends EFactory {
 	 * @param body
 	 *            procedure that holds the body of the action
 	 */
-	Action createAction(Tag tag, Pattern inputPattern, Pattern outputPattern,
+	Action createAction(Tag tagName, Pattern inputPattern, Pattern outputPattern,
 			Pattern peekedPattern, Procedure scheduler, Procedure body);
 
 	/**
@@ -98,7 +110,7 @@ public interface IrFactory extends EFactory {
 	 * @generated
 	 */
 	ArgByVal createArgByVal();
-
+	
 	/**
 	 * Creates a new argument by value with the given expression.
 	 * 
@@ -107,7 +119,7 @@ public interface IrFactory extends EFactory {
 	 * @return a new argument by value with the given expression
 	 */
 	Arg createArgByVal(Expression value);
-	
+
 	/**
 	 * Creates a new argument by value whose value is the given variable.
 	 * 
@@ -264,9 +276,9 @@ public interface IrFactory extends EFactory {
 	ExprVar createExprVar();
 
 	ExprVar createExprVar(Use use);
-
-	ExprVar createExprVar(Var variable);
 	
+	ExprVar createExprVar(Var variable);
+
 	/**
 	 * Returns a new object of class '<em>FSM</em>'.
 	 * <!-- begin-user-doc -->
@@ -275,7 +287,7 @@ public interface IrFactory extends EFactory {
 	 * @generated
 	 */
 	FSM createFSM();
-
+	
 	/**
 	 * Returns a new object of class '<em>Inst Assign</em>'.
 	 * <!-- begin-user-doc
@@ -284,7 +296,7 @@ public interface IrFactory extends EFactory {
 	 * @generated
 	 */
 	InstAssign createInstAssign();
-	
+
 	/**
 	 * Creates an InstAssign with the given location, target and value.
 	 * 
@@ -491,7 +503,7 @@ public interface IrFactory extends EFactory {
 	 * @return a return
 	 */
 	InstReturn createInstReturn(int lineNumber, Expression value);
-
+	
 	/**
 	 * Returns a new object of class '<em>Inst Store</em>'.
 	 * <!-- begin-user-doc
@@ -500,7 +512,7 @@ public interface IrFactory extends EFactory {
 	 * @generated
 	 */
 	InstStore createInstStore();
-	
+
 	/**
 	 * Creates an InstStore with the given location, target, indexes, value.
 	 * 
@@ -512,7 +524,7 @@ public interface IrFactory extends EFactory {
 	 */
 	InstStore createInstStore(int lineNumber, Def target,
 			List<Expression> indexes, Expression value);
-
+	
 	/**
 	 * Creates an InstStore with the given location, target, indexes, value.
 	 * 
@@ -597,7 +609,7 @@ public interface IrFactory extends EFactory {
 	 */
 	InstStore createInstStore(Var target, List<Expression> indexes,
 			Var source);
-	
+
 	/**
 	 * Creates an InstStore with the given target and source.
 	 * 
@@ -919,7 +931,7 @@ public interface IrFactory extends EFactory {
 	 * @return a new use of the given variable
 	 */
 	Use createUse(Var variable);
-
+	
 	/**
 	 * Returns a new object of class '<em>Var</em>'.
 	 * <!-- begin-user-doc -->
@@ -946,7 +958,7 @@ public interface IrFactory extends EFactory {
 	 */
 	Var createVar(int lineNumber, Type type, String name, boolean global,
 			boolean assignable);
-	
+
 	/**
 	 * Creates a new global variable with the given location, type, name,
 	 * initial value. The variable may be assignable or not.
