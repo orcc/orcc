@@ -52,7 +52,6 @@ import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.attributes.IAttribute;
 import net.sf.orcc.df.attributes.IValueAttribute;
 import net.sf.orcc.df.impl.NetworkImpl;
-import net.sf.orcc.df.serialize.XDFParser;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Port;
@@ -68,6 +67,8 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.jgrapht.DirectedGraph;
@@ -258,10 +259,12 @@ public class SlowSimulator extends AbstractSimulator {
 			outputFifos = new HashMap<Port, List<Fifo>>();
 
 			IFile file = OrccUtil.getFile(project, xdfFile, "xdf");
-			Network network = new XDFParser(file).parseNetwork();
+			ResourceSet set = new ResourceSetImpl();
+			Resource resNetwork = set.getResource(URI.createPlatformResourceURI(
+					file.getFullPath().toString(), false), true);
+			Network network = (Network) resNetwork.getContents().get(0);
 
 			// Instantiate the network
-			ResourceSet set = new ResourceSetImpl();
 			network.instantiate(set, vtlFolders);
 			NetworkImpl.clearActorPool();
 

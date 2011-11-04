@@ -50,7 +50,6 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.impl.NetworkImpl;
-import net.sf.orcc.df.serialize.XDFParser;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.WriteListener;
@@ -149,17 +148,19 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	final public void compileXDF() throws OrccException {
 		// set FIFO size
 		this.fifoSize = getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
+		ResourceSet set = new ResourceSetImpl();
 
 		// parses top network
 		write("Parsing XDF network...\n");
-		Network network = new XDFParser(inputFile).parseNetwork();
+		Resource resNetwork = set.getResource(URI.createPlatformResourceURI(
+				inputFile.getFullPath().toString(), false), true);
+		Network network = (Network) resNetwork.getContents().get(0);
 		network.updateIdentifiers();
 		if (isCanceled()) {
 			return;
 		}
 
 		write("Instantiating actors...\n");
-		ResourceSet set = new ResourceSetImpl();
 		network.instantiate(set, vtlFolders);
 		NetworkImpl.clearActorPool();
 		write("Instantiation done\n");

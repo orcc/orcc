@@ -47,13 +47,16 @@ import java.util.List;
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.serialize.XDFParser;
 import net.sf.orcc.df.serialize.XDFWriter;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 
 /**
  * This class implements a simulator with the Just-In-Time Adaptive Decoder
@@ -111,7 +114,10 @@ public class JadeSimulatorImpl extends AbstractSimulator {
 	private File xdfFlattenFile;
 
 	private void flatten() {
-		Network network = new XDFParser(xdfFile).parseNetwork();
+		ResourceSet set = new ResourceSetImpl();
+		Resource resNetwork = set.getResource(URI.createPlatformResourceURI(
+				xdfFile.getFullPath().toString(), false), true);
+		Network network = (Network) resNetwork.getContents().get(0);
 		network.flatten();
 
 		XDFWriter writer = new XDFWriter();

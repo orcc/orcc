@@ -43,6 +43,10 @@
             class="net.sf.orcc.ir.impl.IrResourceFactoryImpl"
             type="ir">
       </parser>
+      <parser
+            class="net.sf.orcc.df.impl.XdfResourceFactoryImpl"
+            type="xdf">
+      </parser>
    </extension>
    <extension
          point="org.eclipse.emf.ecore.generated_package">

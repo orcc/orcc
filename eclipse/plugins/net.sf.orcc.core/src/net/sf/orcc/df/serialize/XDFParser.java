@@ -68,11 +68,7 @@ import net.sf.orcc.ir.util.Entry;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
 import net.sf.orcc.util.BinOpSeqParser;
 import net.sf.orcc.util.DomUtil;
-import net.sf.orcc.util.OrccUtil;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -221,15 +217,14 @@ public class XDFParser {
 						}
 						if (var == null) {
 							throw new OrccRuntimeException("In network \""
-									+ network.getName() + "\" defined in \""
-									+ file + "\": unknown variable: \"" + name
-									+ "\"");
+									+ network.getName()
+									+ "\": unknown variable: \"" + name + "\"");
 						}
 						expr = IrFactory.eINSTANCE.createExprVar(var);
 						break;
 					} else {
 						throw new OrccRuntimeException("In network \""
-								+ network.getName() + "\" defined in \"" + file
+								+ network.getName()
 								+ "\": Unsupported Expr kind: \"" + kind + "\"");
 					}
 				}
@@ -462,16 +457,7 @@ public class XDFParser {
 	 */
 	private final ExprParser exprParser;
 
-	/**
-	 * absolute file name of the XDF file
-	 */
-	private final IFile file;
-
-	private Map<String, Instance> instances;
-
 	private Network network;
-
-	private Instance parent;
 
 	/**
 	 * XDF type parser.
@@ -480,24 +466,10 @@ public class XDFParser {
 
 	/**
 	 * Creates a new network parser.
-	 * 
-	 * @param fileName
-	 *            absolute file name of an XDF file
 	 */
-	public XDFParser(IFile file) {
-		this.file = file;
+	public XDFParser() {
 		exprParser = new ExprParser();
 		typeParser = new TypeParser();
-	}
-
-	/**
-	 * 
-	 * @param fileName
-	 * @param parent
-	 */
-	private XDFParser(IFile file, Instance parent) {
-		this(file);
-		this.parent = parent;
 	}
 
 	/**
@@ -547,7 +519,7 @@ public class XDFParser {
 
 			return new Vertex(kind, port);
 		} else {
-			Instance instance = instances.get(vertexName);
+			Instance instance = network.getInstance(vertexName);
 			if (instance == null) {
 				throw new OrccRuntimeException(
 						"An Connection element has an invalid"
@@ -627,7 +599,6 @@ public class XDFParser {
 					parseDecl(element);
 				} else if (name.equals("Instance")) {
 					Instance instance = parseInstance(element);
-					instances.put(instance.getId(), instance);
 					network.getGraph().addVertex(new Vertex(instance));
 				} else if (name.equals("Package")) {
 					throw new OrccRuntimeException(
@@ -732,27 +703,8 @@ public class XDFParser {
 
 		// create instance
 		Instance newInst = new Instance(id, clasz);
-		if (parent == null) {
-			Instance parentInst = new Instance(network.getName(),
-					network.getName());
-			parentInst.setContents(network);
-			newInst.setParent(parentInst);
-		} else {
-			newInst.setParent(parent);
-		}
 		newInst.getAttributes().putAll(attributes);
 		newInst.getParameters().putAll(parameters);
-
-		// try to find network with the given name
-		IProject project = file.getProject();
-		IFile networkFile = OrccUtil.getFile(project, clasz, "xdf");
-
-		// if found, parse and set contents
-		if (networkFile != null) {
-			XDFParser parser = new XDFParser(networkFile, newInst);
-			Network network = parser.parseNetwork();
-			newInst.setContents(network);
-		}
 
 		return newInst;
 	}
@@ -762,25 +714,17 @@ public class XDFParser {
 	 * 
 	 * @return a network
 	 */
-	public Network parseNetwork() {
-		InputStream is;
-
-		try {
-			is = file.getContents();
-		} catch (CoreException e) {
-			throw new OrccRuntimeException("I/O error when parsing network", e);
-		}
-
+	public Network parseNetwork(InputStream inputStream) {
 		try {
 			// input
-			Document document = DomUtil.parseDocument(is);
+			Document document = DomUtil.parseDocument(inputStream);
 
 			// parse the input, return the network
 			parseXDF(document);
 			return network;
 		} finally {
 			try {
-				is.close();
+				inputStream.close();
 			} catch (IOException e) {
 				throw new OrccRuntimeException(
 						"I/O error when parsing network", e);
@@ -871,9 +815,7 @@ public class XDFParser {
 			throw new OrccRuntimeException("Expected a \"name\" attribute");
 		}
 
-		this.network = DfFactory.eINSTANCE.createNetwork(file.getFullPath()
-				.toString());
-		instances = new HashMap<String, Instance>();
+		this.network = DfFactory.eINSTANCE.createNetwork();
 		network.setName(name);
 
 		parseBody(root);

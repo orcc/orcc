@@ -136,6 +136,8 @@ public interface Network extends Entity {
 	 */
 	EList<Port> getInputs();
 
+	Instance getInstance(String id);
+
 	/**
 	 * Returns the list of instances referenced by the graph of this network.
 	 * 

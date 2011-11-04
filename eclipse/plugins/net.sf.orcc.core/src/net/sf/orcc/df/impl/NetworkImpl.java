@@ -595,6 +595,16 @@ public class NetworkImpl extends EntityImpl implements Network {
 		return inputs;
 	}
 
+	@Override
+	public Instance getInstance(String id) {
+		for (Instance instance : getInstances()) {
+			if (instance.getId().equals(id)) {
+				return instance;
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Returns the list of instances referenced by the graph of this network.
 	 * 
