@@ -30,6 +30,7 @@ package net.sf.orcc.df.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -42,6 +43,7 @@ import java.util.Set;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
@@ -57,12 +59,16 @@ import net.sf.orcc.moc.MoC;
 import net.sf.orcc.tools.merger.ActorMerger;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Path;
+import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.notify.NotificationChain;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.InternalEObject;
+import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.util.EObjectContainmentEList;
+import org.eclipse.emf.ecore.util.InternalEList;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DirectedMultigraph;
 
@@ -72,7 +78,7 @@ import org.jgrapht.graph.DirectedMultigraph;
  * 
  * @author Matthieu Wipliez
  * @author Herve Yviquel
- * 
+ * @generated
  */
 public class NetworkImpl extends EntityImpl implements Network {
 
@@ -122,24 +128,29 @@ public class NetworkImpl extends EntityImpl implements Network {
 	/**
 	 * @generated
 	 */
-	private List<Port> inputs;
+	protected EList<Port> inputs;
 
 	/**
+	 * The cached value of the '{@link #getMoC() <em>Mo C</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getMoC()
 	 * @generated
+	 * @ordered
 	 */
-	private MoC moc;
+	protected MoC moC;
 
 	private Map<Instance, Map<Port, List<Connection>>> outgoingMap;
 
 	/**
 	 * @generated
 	 */
-	private List<Port> outputs;
+	protected EList<Port> outputs;
 
 	/**
 	 * @generated
 	 */
-	private List<Var> parameters;
+	protected EList<Var> parameters;
 
 	private Map<Instance, Map<Port, Instance>> predecessorsMap;
 
@@ -152,14 +163,30 @@ public class NetworkImpl extends EntityImpl implements Network {
 	/**
 	 * @generated
 	 */
-	private List<Var> variables;
+	protected EList<Var> variables;
 
 	/**
-	 * Creates a new network.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
 	 */
-	public NetworkImpl(String file) {
-		this.fileName = file;
-		graph = new DirectedMultigraph<Vertex, Connection>(Connection.class);
+	protected NetworkImpl() {
+		super();
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetMoC(MoC newMoC, NotificationChain msgs) {
+		MoC oldMoC = moC;
+		moC = newMoC;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, DfPackage.NETWORK__MO_C, oldMoC, newMoC);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
 	}
 
 	/**
@@ -312,6 +339,141 @@ public class NetworkImpl extends EntityImpl implements Network {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+		switch (featureID) {
+			case DfPackage.NETWORK__INPUTS:
+				return getInputs();
+			case DfPackage.NETWORK__MO_C:
+				return getMoC();
+			case DfPackage.NETWORK__OUTPUTS:
+				return getOutputs();
+			case DfPackage.NETWORK__PARAMETERS:
+				return getParameters();
+			case DfPackage.NETWORK__VARIABLES:
+				return getVariables();
+		}
+		return super.eGet(featureID, resolve, coreType);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case DfPackage.NETWORK__INPUTS:
+				return ((InternalEList<?>)getInputs()).basicRemove(otherEnd, msgs);
+			case DfPackage.NETWORK__MO_C:
+				return basicSetMoC(null, msgs);
+			case DfPackage.NETWORK__OUTPUTS:
+				return ((InternalEList<?>)getOutputs()).basicRemove(otherEnd, msgs);
+			case DfPackage.NETWORK__PARAMETERS:
+				return ((InternalEList<?>)getParameters()).basicRemove(otherEnd, msgs);
+			case DfPackage.NETWORK__VARIABLES:
+				return ((InternalEList<?>)getVariables()).basicRemove(otherEnd, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public boolean eIsSet(int featureID) {
+		switch (featureID) {
+			case DfPackage.NETWORK__INPUTS:
+				return inputs != null && !inputs.isEmpty();
+			case DfPackage.NETWORK__MO_C:
+				return moC != null;
+			case DfPackage.NETWORK__OUTPUTS:
+				return outputs != null && !outputs.isEmpty();
+			case DfPackage.NETWORK__PARAMETERS:
+				return parameters != null && !parameters.isEmpty();
+			case DfPackage.NETWORK__VARIABLES:
+				return variables != null && !variables.isEmpty();
+		}
+		return super.eIsSet(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public void eSet(int featureID, Object newValue) {
+		switch (featureID) {
+			case DfPackage.NETWORK__INPUTS:
+				getInputs().clear();
+				getInputs().addAll((Collection<? extends Port>)newValue);
+				return;
+			case DfPackage.NETWORK__MO_C:
+				setMoC((MoC)newValue);
+				return;
+			case DfPackage.NETWORK__OUTPUTS:
+				getOutputs().clear();
+				getOutputs().addAll((Collection<? extends Port>)newValue);
+				return;
+			case DfPackage.NETWORK__PARAMETERS:
+				getParameters().clear();
+				getParameters().addAll((Collection<? extends Var>)newValue);
+				return;
+			case DfPackage.NETWORK__VARIABLES:
+				getVariables().clear();
+				getVariables().addAll((Collection<? extends Var>)newValue);
+				return;
+		}
+		super.eSet(featureID, newValue);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	protected EClass eStaticClass() {
+		return DfPackage.Literals.NETWORK;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void eUnset(int featureID) {
+		switch (featureID) {
+			case DfPackage.NETWORK__INPUTS:
+				getInputs().clear();
+				return;
+			case DfPackage.NETWORK__MO_C:
+				setMoC((MoC)null);
+				return;
+			case DfPackage.NETWORK__OUTPUTS:
+				getOutputs().clear();
+				return;
+			case DfPackage.NETWORK__PARAMETERS:
+				getParameters().clear();
+				return;
+			case DfPackage.NETWORK__VARIABLES:
+				getVariables().clear();
+				return;
+		}
+		super.eUnset(featureID);
+	}
+
+	/**
 	 * Flattens this network.
 	 */
 	public void flatten() {
@@ -382,30 +544,14 @@ public class NetworkImpl extends EntityImpl implements Network {
 	}
 
 	/**
-	 * Returns the file in which this network is defined.
-	 * 
-	 * @return the file in which this network is defined
-	 */
-	public IFile getFile() {
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		return root.getFile(new Path(getFileName()));
-	}
-
-	/**
-	 * Returns the name of the XDF file in which this network is defined.
-	 * 
-	 * @return the name of the XDF file in which this network is defined
-	 */
-	public String getFileName() {
-		return fileName;
-	}
-
-	/**
 	 * Returns a graph representing the network's contents
 	 * 
 	 * @return a graph representing the network's contents
 	 */
 	public DirectedGraph<Vertex, Connection> getGraph() {
+		if (graph == null) {
+			graph = new DirectedMultigraph<Vertex, Connection>(Connection.class);
+		}
 		return graph;
 	}
 
@@ -440,8 +586,12 @@ public class NetworkImpl extends EntityImpl implements Network {
 	 * Returns the list of this network's input ports
 	 * 
 	 * @return the list of this network's input ports
+	 * @generated
 	 */
-	public List<Port> getInputs() {
+	public EList<Port> getInputs() {
+		if (inputs == null) {
+			inputs = new EObjectContainmentEList<Port>(Port.class, this, DfPackage.NETWORK__INPUTS);
+		}
 		return inputs;
 	}
 
@@ -492,18 +642,10 @@ public class NetworkImpl extends EntityImpl implements Network {
 	 * Returns the MoC of the network.
 	 * 
 	 * @return the network MoC.
+	 * @generated
 	 */
 	public MoC getMoC() {
-		return moc;
-	}
-
-	/**
-	 * Returns the name of this network
-	 * 
-	 * @return the name of this network
-	 */
-	public String getName() {
-		return name;
+		return moC;
 	}
 
 	/**
@@ -566,8 +708,12 @@ public class NetworkImpl extends EntityImpl implements Network {
 	 * Returns the list of this network's output ports
 	 * 
 	 * @return the list of this network's output ports
+	 * @generated
 	 */
-	public List<Port> getOutputs() {
+	public EList<Port> getOutputs() {
+		if (outputs == null) {
+			outputs = new EObjectContainmentEList<Port>(Port.class, this, DfPackage.NETWORK__OUTPUTS);
+		}
 		return outputs;
 	}
 
@@ -577,7 +723,10 @@ public class NetworkImpl extends EntityImpl implements Network {
 	 * @return the list of this network's parameters
 	 * @generated
 	 */
-	public List<Var> getParameters() {
+	public EList<Var> getParameters() {
+		if (parameters == null) {
+			parameters = new EObjectContainmentEList<Var>(Var.class, this, DfPackage.NETWORK__PARAMETERS);
+		}
 		return parameters;
 	}
 
@@ -623,17 +772,11 @@ public class NetworkImpl extends EntityImpl implements Network {
 	 * @return the list of this network's variables
 	 * @generated
 	 */
-	public List<Var> getVariables() {
+	public EList<Var> getVariables() {
+		if (variables == null) {
+			variables = new EObjectContainmentEList<Var>(Var.class, this, DfPackage.NETWORK__VARIABLES);
+		}
 		return variables;
-	}
-
-	/**
-	 * Returns true if this network as a computed MoC
-	 * 
-	 * @return True if the network has MoC, otherwise false
-	 */
-	public Boolean hasMoc() {
-		return moc != null;
 	}
 
 	/**
@@ -678,9 +821,20 @@ public class NetworkImpl extends EntityImpl implements Network {
 	 * 
 	 * @param moc
 	 *            the new MoC of this network
+	 *            @generated
 	 */
-	public void setMoC(MoC moc) {
-		this.moc = moc;
+	public void setMoC(MoC newMoC) {
+		if (newMoC != moC) {
+			NotificationChain msgs = null;
+			if (moC != null)
+				msgs = ((InternalEObject)moC).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - DfPackage.NETWORK__MO_C, null, msgs);
+			if (newMoC != null)
+				msgs = ((InternalEObject)newMoC).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - DfPackage.NETWORK__MO_C, null, msgs);
+			msgs = basicSetMoC(newMoC, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.NETWORK__MO_C, newMoC, newMoC));
 	}
 
 	@Override

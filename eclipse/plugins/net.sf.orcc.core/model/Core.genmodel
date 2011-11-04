@@ -2,9 +2,19 @@
 <genmodel:GenModel xmi:version="2.0"
     xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
     xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/net.sf.orcc.core/src"
-    modelPluginID="net.sf.orcc.core" modelName="Ir" importerID="org.eclipse.emf.importer.java"
+    modelPluginID="net.sf.orcc.core" modelName="Core" rootImplementsInterface="" importerID="org.eclipse.emf.importer.java"
     complianceLevel="6.0" copyrightFields="false" usedGenPackages="platform:/plugin/org.eclipse.emf.ecore/model/Ecore.genmodel#//ecore">
   <foreignModel>@model</foreignModel>
+  <genPackages prefix="Df" basePackage="net.sf.orcc" disposableProviderFactory="true"
+      ecorePackage="Df.ecore#/">
+    <genClasses ecoreClass="Df.ecore#//Network">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Network/inputs"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Network/moC"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Network/outputs"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Network/parameters"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Network/variables"/>
+    </genClasses>
+  </genPackages>
   <genPackages prefix="Ir" basePackage="net.sf.orcc" disposableProviderFactory="true"
       ecorePackage="Ir.ecore#/">
     <genEnums typeSafeEnumCompatible="false" ecoreEnum="Ir.ecore#//OpBinary">

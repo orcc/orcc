@@ -37,6 +37,7 @@ import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
@@ -51,7 +52,6 @@ import net.sf.orcc.df.attributes.IValueAttribute;
 import net.sf.orcc.df.attributes.StringAttribute;
 import net.sf.orcc.df.attributes.TypeAttribute;
 import net.sf.orcc.df.attributes.ValueAttribute;
-import net.sf.orcc.df.impl.NetworkImpl;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
@@ -871,7 +871,8 @@ public class XDFParser {
 			throw new OrccRuntimeException("Expected a \"name\" attribute");
 		}
 
-		this.network = new NetworkImpl(file.getFullPath().toString());
+		this.network = DfFactory.eINSTANCE.createNetwork(file.getFullPath()
+				.toString());
 		instances = new HashMap<String, Instance>();
 		network.setName(name);
 

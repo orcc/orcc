@@ -38,6 +38,7 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
 
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.jgrapht.DirectedGraph;
@@ -48,7 +49,7 @@ import org.jgrapht.DirectedGraph;
  * 
  * @author Matthieu Wipliez
  * @author Herve Yviquel
- * @model
+ * @model extends="Entity"
  */
 public interface Network extends Entity {
 
@@ -133,7 +134,7 @@ public interface Network extends Entity {
 	 * @return the list of this network's input ports
 	 * @model containment="true"
 	 */
-	List<Port> getInputs();
+	EList<Port> getInputs();
 
 	/**
 	 * Returns the list of instances referenced by the graph of this network.
@@ -199,7 +200,7 @@ public interface Network extends Entity {
 	 * @return the list of this network's output ports
 	 * @model containment="true"
 	 */
-	List<Port> getOutputs();
+	EList<Port> getOutputs();
 
 	/**
 	 * Returns the list of this network's parameters
@@ -207,7 +208,7 @@ public interface Network extends Entity {
 	 * @return the list of this network's parameters
 	 * @model containment="true"
 	 */
-	List<Var> getParameters();
+	EList<Var> getParameters();
 
 	/**
 	 * Returns a map that associates a port to the list of its predecessors.
@@ -243,7 +244,7 @@ public interface Network extends Entity {
 	 * @return the list of this network's variables
 	 * @model containment="true"
 	 */
-	List<Var> getVariables();
+	EList<Var> getVariables();
 
 	/**
 	 * Walks through the hierarchy, instantiate actors, and checks that

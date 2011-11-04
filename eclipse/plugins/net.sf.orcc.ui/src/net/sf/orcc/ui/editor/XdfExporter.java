@@ -73,12 +73,12 @@ import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.services.CalGrammarAccess;
 import net.sf.orcc.cal.ui.internal.CalActivator;
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.attributes.IAttribute;
 import net.sf.orcc.df.attributes.IValueAttribute;
 import net.sf.orcc.df.attributes.ValueAttribute;
-import net.sf.orcc.df.impl.NetworkImpl;
 import net.sf.orcc.df.serialize.XDFWriter;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
@@ -453,7 +453,7 @@ public class XdfExporter extends CalSwitch<Object> {
 		portMap = new HashMap<Port, Vertex>();
 		vertexMap = new HashMap<Vertex, net.sf.orcc.df.Vertex>();
 
-		Network network = new NetworkImpl("");
+		Network network = DfFactory.eINSTANCE.createNetwork();
 		network.setName((String) graph.getValue(PARAMETER_ID));
 
 		addParameters(network, graph);
