@@ -134,12 +134,26 @@ begin
       current_status_<input.name> := current_status_<input.name> + 1;
     end loop;
     
-    -- Initialize signals
-    s_<input.name>_q      \<= (others =\> '0');
-    s_<input.name>_status \<= std_logic_vector(to_unsigned(current_status_<input.name>, 32));
-    
     file_close(trace_<input.name>);
     file_open(trace_<input.name>, "../trace/<instance.id>_<input.name>.txt", read_mode);
+    
+    -- Initialize signals
+    if not (endfile (trace_<input.name>)) then
+      readline(trace_<input.name>, current_line);
+      --
+      if current_line'length \> 0 and current_line(1) /= '/' then
+        read(current_line, input_value);
+        <sendData(input)>
+        current_status_<input.name> := current_status_<input.name> - 1;
+      else
+        s_<input.name>_q \<= (others =\> '0');
+      end if;
+    else
+      s_<input.name>_q \<= (others =\> '0');
+    end if;
+    
+    s_<input.name>_status \<= std_logic_vector(to_unsigned(current_status_<input.name>, 32));    
+    
     
   elsif clk'event and clk = '1' then 
     if not (endfile (trace_<input.name>)) and s_<input.name>_rdreq = '1' then
