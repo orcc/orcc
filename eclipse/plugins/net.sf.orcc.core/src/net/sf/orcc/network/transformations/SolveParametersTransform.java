@@ -46,7 +46,6 @@ import net.sf.orcc.ir.util.IrSwitch;
 import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
-import net.sf.orcc.util.OrderedMap;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -61,8 +60,6 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class SolveParametersTransform extends IrSwitch<Expression> implements
 		INetworkTransformation {
-
-	private Network network;
 
 	@Override
 	public Expression caseExprBinary(ExprBinary expr) {
@@ -99,9 +96,7 @@ public class SolveParametersTransform extends IrSwitch<Expression> implements
 	@Override
 	public Expression caseExprVar(ExprVar expr) {
 		Var var = expr.getUse().getVariable();
-		OrderedMap<String, Var> variables = network.getVariables();
-		Var variable = variables.get(var.getName());
-		Expression value = variable.getInitialValue();
+		Expression value = var.getInitialValue();
 		return EcoreUtil.copy(value);
 	}
 
@@ -135,7 +130,6 @@ public class SolveParametersTransform extends IrSwitch<Expression> implements
 	 *             if a network could not be closed
 	 */
 	public void transform(Network network) {
-		this.network = network;
 		for (Instance instance : network.getInstances()) {
 			solveParameters(instance.getParameters());
 

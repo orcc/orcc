@@ -42,6 +42,7 @@ import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IAttributeContainer;
+import net.sf.orcc.network.impl.NetworkImpl;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -321,7 +322,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 					+ "correct them and try again; otherwise, try to "
 					+ "refresh/clean projects.");
 		}
-		actor = Network.getActorFromPool(className);
+		actor = NetworkImpl.getActorFromPool(className);
 		if (actor == null) {
 			actor = (Actor) IrUtil.deserializeEntity(set, file);
 			if (actor == null) {
@@ -330,7 +331,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 						+ "correct them and try again; otherwise, try to "
 						+ "refresh/clean projects.");
 			}
-			Network.putActorInPool(className, actor);
+			NetworkImpl.putActorInPool(className, actor);
 		}
 
 		// replace path-based class by actor class

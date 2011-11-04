@@ -57,6 +57,7 @@ import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IValueAttribute;
+import net.sf.orcc.network.impl.NetworkImpl;
 import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.runtime.Fifo;
 import net.sf.orcc.runtime.impl.GenericSource;
@@ -262,7 +263,7 @@ public class SlowSimulator extends AbstractSimulator {
 			// Instantiate the network
 			ResourceSet set = new ResourceSetImpl();
 			network.instantiate(set, vtlFolders);
-			Network.clearActorPool();
+			NetworkImpl.clearActorPool();
 
 			// Flatten the hierarchical network
 			network.flatten();

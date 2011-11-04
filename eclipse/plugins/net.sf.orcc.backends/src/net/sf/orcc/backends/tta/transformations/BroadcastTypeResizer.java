@@ -20,8 +20,8 @@ public class BroadcastTypeResizer implements INetworkTransformation {
 		for (Instance instance : network.getInstances()) {
 			if (instance.isBroadcast()) {
 				Broadcast broadcast = instance.getBroadcast();
-				checkPorts(broadcast.getInputs().getList());
-				checkPorts(broadcast.getOutputs().getList());
+				checkPorts(broadcast.getInputs());
+				checkPorts(broadcast.getOutputs());
 			}
 		}
 	}

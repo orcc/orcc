@@ -50,6 +50,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.network.impl.NetworkImpl;
 import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.WriteListener;
@@ -160,7 +161,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		write("Instantiating actors...\n");
 		ResourceSet set = new ResourceSetImpl();
 		network.instantiate(set, vtlFolders);
-		Network.clearActorPool();
+		NetworkImpl.clearActorPool();
 		write("Instantiation done\n");
 
 		// because the UnitImporter will load additional resources, we filter

@@ -36,7 +36,6 @@ import java.util.Map;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.util.OrderedMap;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -50,13 +49,13 @@ public class Broadcast {
 
 	public static final String CLASS = "";
 
-	private OrderedMap<String, Port> inputs;
+	private List<Port> inputs;
 
 	private int numOutputs;
 
 	private List<Integer> outputList;
 
-	private OrderedMap<String, Port> outputs;
+	private List<Port> outputs;
 
 	private Map<Port, Integer> portMap;
 
@@ -80,27 +79,31 @@ public class Broadcast {
 		this.numOutputs = numOutputs;
 		this.type = EcoreUtil.copy(type);
 
-		inputs = new OrderedMap<String, Port>();
+		inputs = new ArrayList<Port>();
 		String name = "input";
-		inputs.put(name,
-				IrFactory.eINSTANCE.createPort(EcoreUtil.copy(type), name));
+		inputs.add(IrFactory.eINSTANCE.createPort(EcoreUtil.copy(type), name));
 
-		outputs = new OrderedMap<String, Port>();
+		outputs = new ArrayList<Port>();
 		for (int i = 0; i < numOutputs; i++) {
 			name = "output_" + i;
-			outputs.put(name,
-					IrFactory.eINSTANCE.createPort(EcoreUtil.copy(type), name));
+			outputs.add(IrFactory.eINSTANCE.createPort(EcoreUtil.copy(type),
+					name));
 		}
 
 		portMap = new HashMap<Port, Integer>();
 		portMap.put(getInput(), 1);
 		for (int i = 0; i < numOutputs; i++) {
-			portMap.put(getOutputs().getList().get(i), i + 1);
+			portMap.put(getOutputs().get(i), i + 1);
 		}
 	}
 
 	public Port getInput() {
-		return inputs.get("input");
+		for (Port port : inputs) {
+			if (port.getName().equals("input")) {
+				return port;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -108,7 +111,7 @@ public class Broadcast {
 	 * 
 	 * @return the ordered map of input ports
 	 */
-	public OrderedMap<String, Port> getInputs() {
+	public List<Port> getInputs() {
 		return inputs;
 	}
 
@@ -117,7 +120,12 @@ public class Broadcast {
 	}
 
 	public Port getOutput(String name) {
-		return outputs.get(name);
+		for (Port port : outputs) {
+			if (port.getName().equals(name)) {
+				return port;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -142,7 +150,7 @@ public class Broadcast {
 	 * 
 	 * @return the ordered map of output ports
 	 */
-	public OrderedMap<String, Port> getOutputs() {
+	public List<Port> getOutputs() {
 		return outputs;
 	}
 

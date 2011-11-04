@@ -33,7 +33,7 @@ import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 import java.util.Map;
 
 import net.sf.orcc.OrccActivator;
-import net.sf.orcc.network.Network;
+import net.sf.orcc.network.impl.NetworkImpl;
 import net.sf.orcc.simulators.SimulatorFactory;
 
 import org.eclipse.core.runtime.CoreException;
@@ -76,7 +76,7 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 			} catch (Exception e) {
 				// clear actor pool because it might not have been done if
 				// we got an error too soon
-				Network.clearActorPool();
+				NetworkImpl.clearActorPool();
 				monitor.setCanceled(true);
 				
 				e.printStackTrace();

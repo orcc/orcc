@@ -86,6 +86,7 @@ import net.sf.orcc.network.Network;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IValueAttribute;
 import net.sf.orcc.network.attributes.ValueAttribute;
+import net.sf.orcc.network.impl.NetworkImpl;
 import net.sf.orcc.network.serialize.XDFWriter;
 import net.sf.orcc.util.OrccUtil;
 
@@ -197,7 +198,7 @@ public class XdfExporter extends CalSwitch<Object> {
 			Var var = IrFactory.eINSTANCE.createVar(0, type, name, false, null);
 
 			varMap.put(variable.getName(), var);
-			network.getParameters().put(var.getName(), var);
+			network.getParameters().add(var);
 		}
 	}
 
@@ -214,7 +215,7 @@ public class XdfExporter extends CalSwitch<Object> {
 					expression);
 
 			varMap.put(variable.getName(), var);
-			network.getVariables().put(var.getName(), var);
+			network.getVariables().add(var);
 		}
 	}
 
@@ -452,7 +453,7 @@ public class XdfExporter extends CalSwitch<Object> {
 		portMap = new HashMap<Port, Vertex>();
 		vertexMap = new HashMap<Vertex, net.sf.orcc.network.Vertex>();
 
-		Network network = new Network("");
+		Network network = new NetworkImpl("");
 		network.setName((String) graph.getValue(PARAMETER_ID));
 
 		addParameters(network, graph);

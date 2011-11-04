@@ -68,7 +68,6 @@ import net.sf.orcc.network.attributes.ITypeAttribute;
 import net.sf.orcc.network.attributes.IValueAttribute;
 import net.sf.orcc.network.attributes.XmlElement;
 import net.sf.orcc.util.DomUtil;
-import net.sf.orcc.util.OrderedMap;
 
 import org.jgrapht.DirectedGraph;
 import org.w3c.dom.Document;
@@ -179,11 +178,11 @@ public class XDFWriter {
 
 			Element oldParent = parentElt;
 			parentElt = exprElt;
-			
+
 			for (Expression childExpr : expr.getValue()) {
 				doSwitch(childExpr);
 			}
-			
+
 			parentElt = oldParent;
 
 			return null;
@@ -456,8 +455,7 @@ public class XDFWriter {
 	 * @param variables
 	 *            an ordered map of global variables
 	 */
-	private void writeDecls(Element parent, String kind,
-			OrderedMap<String, Var> variables) {
+	private void writeDecls(Element parent, String kind, List<Var> variables) {
 		for (Var variable : variables) {
 			Element decl = document.createElement("Decl");
 			parent.appendChild(decl);

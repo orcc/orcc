@@ -65,6 +65,7 @@ import net.sf.orcc.network.attributes.IValueAttribute;
 import net.sf.orcc.network.attributes.StringAttribute;
 import net.sf.orcc.network.attributes.TypeAttribute;
 import net.sf.orcc.network.attributes.ValueAttribute;
+import net.sf.orcc.network.impl.NetworkImpl;
 import net.sf.orcc.util.BinOpSeqParser;
 import net.sf.orcc.util.DomUtil;
 import net.sf.orcc.util.OrccUtil;
@@ -211,7 +212,13 @@ public class XDFParser {
 						String name = elt.getAttribute("name");
 						// look up variable, in variables scope, and if not
 						// found in parameters scope
-						Var var = network.getVariables().get(name);
+						Var var = null;
+						for (Var variable : network.getVariables()) {
+							if (name.equals(variable.getName())) {
+								var = variable;
+								break;
+							}
+						}
 						if (var == null) {
 							throw new OrccRuntimeException("In network \""
 									+ network.getName() + "\" defined in \""
@@ -673,14 +680,14 @@ public class XDFParser {
 					.getFirstChild());
 			Type type = cont.getResult();
 			Var var = IrFactory.eINSTANCE.createVar(0, type, name, true, false);
-			network.getParameters().put(name, var);
+			network.getParameters().add(var);
 		} else if (kind.equals("Variable")) {
 			ParseContinuation<Type> cont = typeParser.parseType(decl
 					.getFirstChild());
 			Type type = cont.getResult();
 			Expression expr = exprParser.parseExpr(cont.getNode());
 			Var var = IrFactory.eINSTANCE.createVar(0, type, name, false, expr);
-			network.getVariables().put(name, var);
+			network.getVariables().add(var);
 		} else {
 			throw new OrccRuntimeException("unsupported Decl kind: \"" + kind
 					+ "\"");
@@ -864,7 +871,7 @@ public class XDFParser {
 			throw new OrccRuntimeException("Expected a \"name\" attribute");
 		}
 
-		this.network = new Network(file.getFullPath().toString());
+		this.network = new NetworkImpl(file.getFullPath().toString());
 		instances = new HashMap<String, Instance>();
 		network.setName(name);
 

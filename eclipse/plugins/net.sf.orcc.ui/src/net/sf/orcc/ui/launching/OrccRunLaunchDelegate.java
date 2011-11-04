@@ -34,7 +34,7 @@ import java.util.Map;
 
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.backends.BackendFactory;
-import net.sf.orcc.network.Network;
+import net.sf.orcc.network.impl.NetworkImpl;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -73,7 +73,7 @@ public class OrccRunLaunchDelegate implements ILaunchConfigurationDelegate {
 			} catch (Exception e) {
 				// clear actor pool because it might not have been done if we
 				// got an error too soon
-				Network.clearActorPool();
+				NetworkImpl.clearActorPool();
 				monitor.setCanceled(true);
 
 				IStatus status = new Status(IStatus.ERROR,

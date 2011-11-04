@@ -42,6 +42,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.network.impl.NetworkImpl;
 import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.WriteListener;
@@ -185,7 +186,7 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 
 		listener.writeText("Instantiating actors...\n");
 		network.instantiate(set, vtlFolders);
-		Network.clearActorPool();
+		NetworkImpl.clearActorPool();
 		listener.writeText("Instantiation done\n");
 
 		if (isCanceled()) {

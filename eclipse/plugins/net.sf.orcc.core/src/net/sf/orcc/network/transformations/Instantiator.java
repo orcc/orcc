@@ -89,7 +89,7 @@ public class Instantiator implements INetworkTransformation {
 			if (instance.isActor()) {
 				parameters = instance.getActor().getParameters();
 			} else {
-				parameters = instance.getNetwork().getParameters().getList();
+				parameters = instance.getNetwork().getParameters();
 			}
 
 			// check all parameters declared have a value
