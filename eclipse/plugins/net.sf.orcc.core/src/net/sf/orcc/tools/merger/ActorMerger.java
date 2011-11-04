@@ -37,6 +37,11 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Vertex;
+import net.sf.orcc.df.transformations.INetworkTransformation;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
@@ -60,11 +65,6 @@ import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.Invocation;
 import net.sf.orcc.moc.MocFactory;
 import net.sf.orcc.moc.SDFMoC;
-import net.sf.orcc.network.Connection;
-import net.sf.orcc.network.Instance;
-import net.sf.orcc.network.Network;
-import net.sf.orcc.network.Vertex;
-import net.sf.orcc.network.transformations.INetworkTransformation;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.jgrapht.DirectedGraph;

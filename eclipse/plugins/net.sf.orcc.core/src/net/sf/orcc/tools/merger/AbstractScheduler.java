@@ -32,9 +32,9 @@ package net.sf.orcc.tools.merger;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Vertex;
 import net.sf.orcc.moc.CSDFMoC;
-import net.sf.orcc.network.Connection;
-import net.sf.orcc.network.Vertex;
 
 import org.jgrapht.DirectedGraph;
 

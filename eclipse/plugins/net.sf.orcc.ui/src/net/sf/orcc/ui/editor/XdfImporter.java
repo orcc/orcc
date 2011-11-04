@@ -46,18 +46,18 @@ import net.sf.graphiti.model.Graph;
 import net.sf.graphiti.model.ObjectType;
 import net.sf.graphiti.model.Vertex;
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Network;
+import net.sf.orcc.df.attributes.IAttribute;
+import net.sf.orcc.df.attributes.IFlagAttribute;
+import net.sf.orcc.df.attributes.IValueAttribute;
+import net.sf.orcc.df.serialize.XDFParser;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.ExpressionPrinter;
-import net.sf.orcc.network.Connection;
-import net.sf.orcc.network.Instance;
-import net.sf.orcc.network.Network;
-import net.sf.orcc.network.attributes.IAttribute;
-import net.sf.orcc.network.attributes.IFlagAttribute;
-import net.sf.orcc.network.attributes.IValueAttribute;
-import net.sf.orcc.network.serialize.XDFParser;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -74,16 +74,16 @@ import org.jgrapht.DirectedGraph;
  */
 public class XdfImporter {
 
-	private Map<net.sf.orcc.network.Vertex, Vertex> vertexMap;
+	private Map<net.sf.orcc.df.Vertex, Vertex> vertexMap;
 
 	private void addConnections(Graph graph, ObjectType type,
-			DirectedGraph<net.sf.orcc.network.Vertex, Connection> networkGraph) {
+			DirectedGraph<net.sf.orcc.df.Vertex, Connection> networkGraph) {
 		for (Connection connection : networkGraph.edgeSet()) {
 			Port srcPort = connection.getSource();
 			Port tgtPort = connection.getTarget();
-			net.sf.orcc.network.Vertex srcVertex = networkGraph
+			net.sf.orcc.df.Vertex srcVertex = networkGraph
 					.getEdgeSource(connection);
-			net.sf.orcc.network.Vertex tgtVertex = networkGraph
+			net.sf.orcc.df.Vertex tgtVertex = networkGraph
 					.getEdgeTarget(connection);
 
 			Vertex source = vertexMap.get(srcVertex);
@@ -133,7 +133,7 @@ public class XdfImporter {
 
 	private void addVertices(Graph graph, Network network) {
 		Configuration configuration = graph.getConfiguration();
-		for (net.sf.orcc.network.Vertex networkVertex : network.getGraph()
+		for (net.sf.orcc.df.Vertex networkVertex : network.getGraph()
 				.vertexSet()) {
 			Vertex vertex;
 			if (networkVertex.isPort()) {
@@ -202,7 +202,7 @@ public class XdfImporter {
 	 * @return a graph
 	 */
 	public Graph transform(IFile file) {
-		vertexMap = new HashMap<net.sf.orcc.network.Vertex, Vertex>();
+		vertexMap = new HashMap<net.sf.orcc.df.Vertex, Vertex>();
 
 		XDFParser parser = new XDFParser(file);
 		Network network = parser.parseNetwork();

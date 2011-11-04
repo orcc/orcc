@@ -32,8 +32,8 @@ package net.sf.orcc.tools.merger;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.network.Connection;
-import net.sf.orcc.network.Vertex;
+import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Vertex;
 import net.sf.orcc.util.Rational;
 
 import org.jgrapht.DirectedGraph;

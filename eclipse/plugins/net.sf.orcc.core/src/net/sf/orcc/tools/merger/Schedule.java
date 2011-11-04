@@ -34,7 +34,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.orcc.network.Vertex;
+import net.sf.orcc.df.Vertex;
 
 /**
  * This class defines a schedule. A schedule is composed of a header

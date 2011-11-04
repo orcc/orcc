@@ -39,15 +39,15 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.cpp.transformations.SerDesAdder;
 import net.sf.orcc.backends.transformations.UnitImporter;
+import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Network;
+import net.sf.orcc.df.attributes.IAttribute;
+import net.sf.orcc.df.attributes.IValueAttribute;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.util.ActorVisitor;
-import net.sf.orcc.network.Connection;
-import net.sf.orcc.network.Instance;
-import net.sf.orcc.network.Network;
-import net.sf.orcc.network.attributes.IAttribute;
-import net.sf.orcc.network.attributes.IValueAttribute;
 
 import org.eclipse.core.resources.IFile;
 

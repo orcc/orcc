@@ -34,7 +34,7 @@ import java.util.Map;
 
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.backends.BackendFactory;
-import net.sf.orcc.network.impl.NetworkImpl;
+import net.sf.orcc.df.impl.NetworkImpl;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;

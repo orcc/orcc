@@ -29,8 +29,8 @@
 
 package net.sf.orcc.tools.merger;
 
-import net.sf.orcc.network.Connection;
-import net.sf.orcc.network.Vertex;
+import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Vertex;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.traverse.TopologicalOrderIterator;

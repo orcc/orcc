@@ -34,9 +34,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Network;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.network.Instance;
-import net.sf.orcc.network.Network;
 
 import org.stringtemplate.v4.ST;
 

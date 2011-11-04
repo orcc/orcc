@@ -40,11 +40,11 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.cpp.CppExprPrinter;
 import net.sf.orcc.backends.transformations.UnitImporter;
+import net.sf.orcc.df.Network;
+import net.sf.orcc.df.transformations.BroadcastAdder;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.ir.util.ActorVisitor;
-import net.sf.orcc.network.Network;
-import net.sf.orcc.network.transformations.BroadcastAdder;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;

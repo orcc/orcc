@@ -34,10 +34,10 @@ import java.util.Iterator;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Vertex;
 import net.sf.orcc.moc.CSDFMoC;
-import net.sf.orcc.network.Connection;
-import net.sf.orcc.network.Instance;
-import net.sf.orcc.network.Vertex;
 import net.sf.orcc.util.Rational;
 
 import org.jgrapht.DirectedGraph;

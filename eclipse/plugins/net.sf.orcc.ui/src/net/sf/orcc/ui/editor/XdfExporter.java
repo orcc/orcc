@@ -72,6 +72,14 @@ import net.sf.orcc.cal.cal.VariableReference;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.services.CalGrammarAccess;
 import net.sf.orcc.cal.ui.internal.CalActivator;
+import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Network;
+import net.sf.orcc.df.attributes.IAttribute;
+import net.sf.orcc.df.attributes.IValueAttribute;
+import net.sf.orcc.df.attributes.ValueAttribute;
+import net.sf.orcc.df.impl.NetworkImpl;
+import net.sf.orcc.df.serialize.XDFWriter;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
@@ -80,14 +88,6 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
-import net.sf.orcc.network.Connection;
-import net.sf.orcc.network.Instance;
-import net.sf.orcc.network.Network;
-import net.sf.orcc.network.attributes.IAttribute;
-import net.sf.orcc.network.attributes.IValueAttribute;
-import net.sf.orcc.network.attributes.ValueAttribute;
-import net.sf.orcc.network.impl.NetworkImpl;
-import net.sf.orcc.network.serialize.XDFWriter;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -137,11 +137,11 @@ public class XdfExporter extends CalSwitch<Object> {
 
 	private Map<String, Var> varMap;
 
-	private Map<Vertex, net.sf.orcc.network.Vertex> vertexMap;
+	private Map<Vertex, net.sf.orcc.df.Vertex> vertexMap;
 
 	private void addEdge(Network network, Edge edge) {
-		net.sf.orcc.network.Vertex source = vertexMap.get(edge.getSource());
-		net.sf.orcc.network.Vertex target = vertexMap.get(edge.getTarget());
+		net.sf.orcc.df.Vertex source = vertexMap.get(edge.getSource());
+		net.sf.orcc.df.Vertex target = vertexMap.get(edge.getTarget());
 
 		Port sourcePort = null;
 		if ("Instance".equals(edge.getSource().getType().getName())) {
@@ -221,7 +221,7 @@ public class XdfExporter extends CalSwitch<Object> {
 
 	private void addVertex(Network network, Vertex vertex) {
 		String name = (String) vertex.getValue(PARAMETER_ID);
-		net.sf.orcc.network.Vertex networkVertex;
+		net.sf.orcc.df.Vertex networkVertex;
 		if ("Input port".equals(vertex.getType().getName())) {
 			Type type = parseType(vertex.getValue("port type"));
 			boolean native_ = (Boolean) vertex.getValue("native");
@@ -229,7 +229,7 @@ public class XdfExporter extends CalSwitch<Object> {
 			portMap.put(port, vertex);
 
 			network.getInputs().add(port);
-			networkVertex = new net.sf.orcc.network.Vertex("Input", port);
+			networkVertex = new net.sf.orcc.df.Vertex("Input", port);
 		} else if ("Output port".equals(vertex.getType().getName())) {
 			Type type = parseType(vertex.getValue("port type"));
 			boolean native_ = (Boolean) vertex.getValue("native");
@@ -237,11 +237,11 @@ public class XdfExporter extends CalSwitch<Object> {
 			portMap.put(port, vertex);
 
 			network.getOutputs().add(port);
-			networkVertex = new net.sf.orcc.network.Vertex("Output", port);
+			networkVertex = new net.sf.orcc.df.Vertex("Output", port);
 		} else {
 			String clasz = (String) vertex.getValue(PARAMETER_REFINEMENT);
 			Instance instance = new Instance(name, clasz);
-			networkVertex = new net.sf.orcc.network.Vertex(instance);
+			networkVertex = new net.sf.orcc.df.Vertex(instance);
 
 			Map<?, ?> variables = (Map<?, ?>) vertex
 					.getValue("instance parameter");
@@ -451,7 +451,7 @@ public class XdfExporter extends CalSwitch<Object> {
 
 		varMap = new HashMap<String, Var>();
 		portMap = new HashMap<Port, Vertex>();
-		vertexMap = new HashMap<Vertex, net.sf.orcc.network.Vertex>();
+		vertexMap = new HashMap<Vertex, net.sf.orcc.df.Vertex>();
 
 		Network network = new NetworkImpl("");
 		network.setName((String) graph.getValue(PARAMETER_ID));

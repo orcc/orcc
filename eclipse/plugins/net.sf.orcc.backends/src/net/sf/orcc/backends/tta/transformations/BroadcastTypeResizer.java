@@ -3,15 +3,15 @@ package net.sf.orcc.backends.tta.transformations;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.df.Broadcast;
+import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Network;
+import net.sf.orcc.df.transformations.INetworkTransformation;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
-import net.sf.orcc.network.Broadcast;
-import net.sf.orcc.network.Instance;
-import net.sf.orcc.network.Network;
-import net.sf.orcc.network.transformations.INetworkTransformation;
 
 public class BroadcastTypeResizer implements INetworkTransformation {
 

@@ -38,8 +38,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.orcc.network.Connection;
-import net.sf.orcc.network.Vertex;
+import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Vertex;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.CycleDetector;

@@ -60,6 +60,8 @@ import net.sf.orcc.backends.xlim.transformations.LocalArrayRemoval;
 import net.sf.orcc.backends.xlim.transformations.UnaryListRemoval;
 import net.sf.orcc.backends.xlim.transformations.XlimDeadVariableRemoval;
 import net.sf.orcc.backends.xlim.transformations.XlimVariableRenamer;
+import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Network;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.transformations.BlockCombine;
 import net.sf.orcc.ir.transformations.BuildCFG;
@@ -69,8 +71,6 @@ import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.transformations.TacTransformation;
 import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
-import net.sf.orcc.network.Instance;
-import net.sf.orcc.network.Network;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.resource.ResourceSet;

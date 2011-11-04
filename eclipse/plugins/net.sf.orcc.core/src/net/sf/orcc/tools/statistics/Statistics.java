@@ -31,8 +31,8 @@ package net.sf.orcc.tools.statistics;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.network.Connection;
-import net.sf.orcc.network.Network;
+import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Network;
 import net.sf.orcc.tools.AbstractActorAnalyzer;
 import net.sf.orcc.tools.AbstractNetworkAnalyzer;
 

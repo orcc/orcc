@@ -37,18 +37,18 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.df.Broadcast;
+import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Network;
+import net.sf.orcc.df.SerDes;
+import net.sf.orcc.df.Vertex;
+import net.sf.orcc.df.attributes.IAttribute;
+import net.sf.orcc.df.attributes.IValueAttribute;
+import net.sf.orcc.df.transformations.INetworkTransformation;
 import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.network.Broadcast;
-import net.sf.orcc.network.Connection;
-import net.sf.orcc.network.Instance;
-import net.sf.orcc.network.Network;
-import net.sf.orcc.network.SerDes;
-import net.sf.orcc.network.Vertex;
-import net.sf.orcc.network.attributes.IAttribute;
-import net.sf.orcc.network.attributes.IValueAttribute;
-import net.sf.orcc.network.transformations.INetworkTransformation;
 
 import org.jgrapht.DirectedGraph;
 

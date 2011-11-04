@@ -62,7 +62,7 @@ import net.sf.orcc.backends.tta.architecture.TermBool;
 import net.sf.orcc.backends.tta.architecture.TermUnit;
 import net.sf.orcc.backends.tta.architecture.Writes;
 import net.sf.orcc.backends.tta.architecture.util.ArchitectureMemoryStats;
-import net.sf.orcc.network.Instance;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.BasicEList;

@@ -29,7 +29,7 @@
 
 package net.sf.orcc.tools.merger;
 
-import net.sf.orcc.network.Vertex;
+import net.sf.orcc.df.Vertex;
 
 /**
  * This class defines an element of the body of a schedule. An iterand can be

@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.tta.architecture;
 
-import net.sf.orcc.network.Instance;
+import net.sf.orcc.df.Instance;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EFactory;

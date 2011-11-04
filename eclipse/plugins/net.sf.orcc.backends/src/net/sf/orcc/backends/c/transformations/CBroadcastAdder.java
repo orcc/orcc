@@ -32,12 +32,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Vertex;
+import net.sf.orcc.df.transformations.BroadcastAdder;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.network.Connection;
-import net.sf.orcc.network.Instance;
-import net.sf.orcc.network.Network;
-import net.sf.orcc.network.Vertex;
-import net.sf.orcc.network.transformations.BroadcastAdder;
 import net.sf.orcc.util.WriteListener;
 
 /**

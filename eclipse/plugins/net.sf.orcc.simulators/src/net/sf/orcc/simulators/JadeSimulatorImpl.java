@@ -46,9 +46,9 @@ import java.util.List;
 
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.network.Network;
-import net.sf.orcc.network.serialize.XDFParser;
-import net.sf.orcc.network.serialize.XDFWriter;
+import net.sf.orcc.df.Network;
+import net.sf.orcc.df.serialize.XDFParser;
+import net.sf.orcc.df.serialize.XDFWriter;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;

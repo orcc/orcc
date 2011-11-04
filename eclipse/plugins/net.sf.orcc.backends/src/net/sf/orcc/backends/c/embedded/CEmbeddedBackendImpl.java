@@ -38,9 +38,9 @@ import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.c.CExpressionPrinter;
 import net.sf.orcc.backends.c.CNetworkTemplateData;
 import net.sf.orcc.backends.c.CTypePrinter;
+import net.sf.orcc.df.Network;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.moc.SDFMoC;
-import net.sf.orcc.network.Network;
 
 /**
  * C backend targetting embedded systems

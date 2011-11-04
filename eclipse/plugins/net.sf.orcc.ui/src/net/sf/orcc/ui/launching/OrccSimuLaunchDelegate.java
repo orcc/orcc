@@ -33,7 +33,7 @@ import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 import java.util.Map;
 
 import net.sf.orcc.OrccActivator;
-import net.sf.orcc.network.impl.NetworkImpl;
+import net.sf.orcc.df.impl.NetworkImpl;
 import net.sf.orcc.simulators.SimulatorFactory;
 
 import org.eclipse.core.runtime.CoreException;

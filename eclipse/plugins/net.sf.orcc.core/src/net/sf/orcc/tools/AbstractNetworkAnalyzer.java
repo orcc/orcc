@@ -39,11 +39,11 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.network.Connection;
-import net.sf.orcc.network.Instance;
-import net.sf.orcc.network.Network;
-import net.sf.orcc.network.impl.NetworkImpl;
-import net.sf.orcc.network.serialize.XDFParser;
+import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Network;
+import net.sf.orcc.df.impl.NetworkImpl;
+import net.sf.orcc.df.serialize.XDFParser;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.WriteListener;
 

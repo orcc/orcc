@@ -43,14 +43,14 @@ import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.c.transformations.CBroadcastAdder;
 import net.sf.orcc.backends.transformations.TypeResizer;
 import net.sf.orcc.backends.transformations.UnitImporter;
+import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Vertex;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
-import net.sf.orcc.network.Connection;
-import net.sf.orcc.network.Instance;
-import net.sf.orcc.network.Network;
-import net.sf.orcc.network.Vertex;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
 import net.sf.orcc.util.WriteListener;
 
