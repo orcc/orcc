@@ -194,8 +194,10 @@ public class TTABackendImpl extends AbstractBackend {
 				"net/sf/orcc/backends/tta/Quartus_Project.stg");
 		CustomPrinter projectQpfPrinter = new CustomPrinter(
 				"net/sf/orcc/backends/tta/Quartus_Project.stg");
-		projectQsfPrinter.print("top.qsf", path, "qsfNetwork", network);
-		projectQpfPrinter.print("top.qpf", path, "qpfNetwork", network);
+		projectQsfPrinter.print("top.qsf", path, "qsfNetwork", "network",
+				network);
+		projectQpfPrinter.print("top.qpf", path, "qpfNetwork", "network",
+				network);
 
 		// ModelSim
 		StandardPrinter tclPrinter = new StandardPrinter(
