@@ -67,8 +67,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.jgrapht.DirectedGraph;
@@ -260,9 +258,7 @@ public class SlowSimulator extends AbstractSimulator {
 
 			IFile file = OrccUtil.getFile(project, xdfFile, "xdf");
 			ResourceSet set = new ResourceSetImpl();
-			Resource resNetwork = set.getResource(URI.createPlatformResourceURI(
-					file.getFullPath().toString(), false), true);
-			Network network = (Network) resNetwork.getContents().get(0);
+			Network network = IrUtil.deserializeEntity(set, file);
 
 			// Instantiate the network
 			network.instantiate(set, vtlFolders);

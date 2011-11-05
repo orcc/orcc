@@ -43,6 +43,7 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.impl.NetworkImpl;
+import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.WriteListener;
 
@@ -52,8 +53,6 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.stringtemplate.v4.ST;
@@ -179,9 +178,7 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		IFile xdfFile = root.getFile(new Path(inputFile));
 
-		Resource resNetwork = set.getResource(URI.createPlatformResourceURI(
-				xdfFile.getFullPath().toString(), false), true);
-		Network network = (Network) resNetwork.getContents().get(0);
+		Network network = IrUtil.deserializeEntity(set, xdfFile);
 		network.updateIdentifiers();
 		if (isCanceled()) {
 			return;

@@ -57,13 +57,12 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.ExpressionPrinter;
+import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.jgrapht.DirectedGraph;
@@ -208,9 +207,7 @@ public class XdfImporter {
 		vertexMap = new HashMap<net.sf.orcc.df.Vertex, Vertex>();
 
 		ResourceSet set = new ResourceSetImpl();
-		Resource resNetwork = set.getResource(URI.createPlatformResourceURI(
-				file.getFullPath().toString(), false), true);
-		Network network = (Network) resNetwork.getContents().get(0);
+		Network network = IrUtil.deserializeEntity(set, file);
 
 		Configuration configuration = getDefault().getConfiguration("XDF");
 		ObjectType type = configuration.getGraphType("XML Dataflow Network");

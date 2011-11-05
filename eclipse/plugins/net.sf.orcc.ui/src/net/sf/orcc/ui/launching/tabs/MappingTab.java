@@ -43,6 +43,7 @@ import java.util.TreeSet;
 
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.ui.OrccUiActivator;
 import net.sf.orcc.util.OrccUtil;
 
@@ -54,8 +55,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.jface.viewers.CellEditor;
@@ -385,9 +384,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 
 		if (xdfFile != null) {
 			ResourceSet set = new ResourceSetImpl();
-			Resource resNetwork = set.getResource(URI.createPlatformResourceURI(
-					xdfFile.getFullPath().toString(), false), true);
-			network = (Network) resNetwork.getContents().get(0);
+			network = IrUtil.deserializeEntity(set, xdfFile);
 			network.updateIdentifiers();
 
 			Set<String> instances = new HashSet<String>();

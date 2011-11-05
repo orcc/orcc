@@ -48,13 +48,12 @@ import net.sf.orcc.OrccActivator;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.serialize.XDFWriter;
+import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 
@@ -115,9 +114,7 @@ public class JadeSimulatorImpl extends AbstractSimulator {
 
 	private void flatten() {
 		ResourceSet set = new ResourceSetImpl();
-		Resource resNetwork = set.getResource(URI.createPlatformResourceURI(
-				xdfFile.getFullPath().toString(), false), true);
-		Network network = (Network) resNetwork.getContents().get(0);
+		Network network = IrUtil.deserializeEntity(set, xdfFile);
 		network.flatten();
 
 		XDFWriter writer = new XDFWriter();

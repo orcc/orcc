@@ -51,6 +51,7 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.impl.NetworkImpl;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.WriteListener;
 
@@ -152,9 +153,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		// parses top network
 		write("Parsing XDF network...\n");
-		Resource resNetwork = set.getResource(URI.createPlatformResourceURI(
-				inputFile.getFullPath().toString(), false), true);
-		Network network = (Network) resNetwork.getContents().get(0);
+		Network network = IrUtil.deserializeEntity(set, inputFile);
 		network.updateIdentifiers();
 		if (isCanceled()) {
 			return;
