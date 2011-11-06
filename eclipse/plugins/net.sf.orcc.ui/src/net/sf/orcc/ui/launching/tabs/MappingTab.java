@@ -386,7 +386,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 		if (xdfFile != null) {
 			ResourceSet set = new ResourceSetImpl();
 			network = IrUtil.deserializeEntity(set, xdfFile);
-			EcoreUtil.resolveAll(network);
+			EcoreUtil.resolveAll(set);
 
 			Set<String> instances = new HashSet<String>();
 			for (Instance instance : network.getInstances()) {

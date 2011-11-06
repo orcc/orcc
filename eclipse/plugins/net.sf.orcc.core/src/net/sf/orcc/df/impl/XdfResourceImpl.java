@@ -34,10 +34,10 @@ import java.io.OutputStream;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.serialize.XDFParser;
 import net.sf.orcc.df.serialize.XDFWriter;
+import net.sf.orcc.ir.Actor;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -45,8 +45,8 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.impl.ResourceImpl;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class defines a resource implementation for the Df model which is used
@@ -62,6 +62,32 @@ public class XdfResourceImpl extends ResourceImpl {
 
 	public XdfResourceImpl(URI uri) {
 		super(uri);
+	}
+
+	@Override
+	public EObject getEObject(String uriFragment) {
+		EObject top = getContents().get(0);
+		EObject result = null;
+		if (uriFragment.startsWith("//@inputs.")) {
+			String name = uriFragment.substring(10);
+			if (top instanceof Actor) {
+				result = ((Actor) top).getInput(name);
+			} else if (top instanceof Network) {
+				result = ((Network) top).getInput(name);
+			}
+		} else if (uriFragment.startsWith("//@outputs.")) {
+			String name = uriFragment.substring(11);
+			if (top instanceof Actor) {
+				result = ((Actor) top).getOutput(name);
+			} else if (top instanceof Network) {
+				result = ((Network) top).getOutput(name);
+			}
+		}
+
+		if (result != null) {
+			return result;
+		}
+		return super.getEObject(uriFragment);
 	}
 
 	@Override

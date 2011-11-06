@@ -28,26 +28,53 @@
  */
 package net.sf.orcc.ir.impl;
 
+import net.sf.orcc.ir.Actor;
+
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.impl.ResourceFactoryImpl;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.xmi.XMLResource;
+import org.eclipse.emf.ecore.xmi.impl.URIHandlerImpl;
+import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
 
 /**
- * This class defines an XMI-based resource factory.
+ * This class defines a resource implementation for the Df model which is used
+ * to serialize to/deserialize from XDF.
  * 
- * @author Matthieu Wipliez
+ * @author mwipliez
  * 
  */
-public class IrResourceFactoryImpl extends ResourceFactoryImpl {
-	
-	public IrResourceFactoryImpl() {
-		super();
+public class IrResourceImpl extends XMIResourceImpl {
+
+	public IrResourceImpl() {
+	}
+
+	public IrResourceImpl(URI uri) {
+		super(uri);
+
+		setEncoding("UTF-8");
+
+		getDefaultSaveOptions().put(
+				XMLResource.OPTION_USE_ENCODED_ATTRIBUTE_STYLE, Boolean.TRUE);
+		getDefaultSaveOptions().put(XMLResource.OPTION_LINE_WIDTH, 80);
+		getDefaultSaveOptions().put(XMLResource.OPTION_URI_HANDLER,
+				new URIHandlerImpl.PlatformSchemeAware());
 	}
 
 	@Override
-	public Resource createResource(URI uri) {
-		IrResourceImpl result = new IrResourceImpl(uri);
-		return result;
+	public EObject getEObject(String uriFragment) {
+		if (uriFragment.startsWith("//@inputs.")
+				&& !Character.isDigit(uriFragment.charAt(10))) {
+			String name = uriFragment.substring(10);
+			Actor actor = (Actor) getContents().get(0);
+			return actor.getInput(name);
+		} else if (uriFragment.startsWith("//@outputs.")
+				&& !Character.isDigit(uriFragment.charAt(11))) {
+			String name = uriFragment.substring(11);
+			Actor actor = (Actor) getContents().get(0);
+			return actor.getOutput(name);
+		} else {
+			return super.getEObject(uriFragment);
+		}
 	}
 
 }

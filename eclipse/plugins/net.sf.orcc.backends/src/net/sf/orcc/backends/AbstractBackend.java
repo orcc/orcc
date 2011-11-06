@@ -159,7 +159,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		}
 
 		write("Instantiating actors...\n");
-		EcoreUtil.resolveAll(network);
+		EcoreUtil.resolveAll(set);
 		write("Instantiation done\n");
 
 		// because the UnitImporter will load additional resources, we filter

@@ -177,7 +177,7 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 		}
 
 		listener.writeText("Instantiating actors...\n");
-		EcoreUtil.resolveAll(network);
+		EcoreUtil.resolveAll(set);
 		listener.writeText("Instantiation done\n");
 
 		if (isCanceled()) {

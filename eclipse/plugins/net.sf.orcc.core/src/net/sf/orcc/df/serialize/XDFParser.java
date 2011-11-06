@@ -67,10 +67,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.emf.ecore.InternalEObject;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -487,11 +484,15 @@ public class XDFParser {
 	 *            the name of a port
 	 * @return a port, or <code>null</code> if no port should be returned
 	 */
-	private Port getPort(String vertexName, String portName) {
-		if (vertexName.isEmpty()) {
+	private Port getPort(Vertex vertex, String dir, String portName) {
+		if (vertex.isPort()) {
 			return null;
 		} else {
-			return IrFactory.eINSTANCE.createPort(null, portName);
+			URI uri = EcoreUtil.getURI(vertex.getInstance().getContents());
+			uri = uri.appendFragment("//@" + dir + "." + portName);
+			Port proxy = IrFactory.eINSTANCE.createPort();
+			((InternalEObject) proxy).eSetProxyURI(uri);
+			return proxy;
 		}
 	}
 
@@ -634,9 +635,9 @@ public class XDFParser {
 		String dst_port = connection.getAttribute("dst-port");
 
 		Vertex source = getVertex(src, src_port, "Input");
-		Port srcPort = getPort(src, src_port);
+		Port srcPort = getPort(source, "outputs", src_port);
 		Vertex target = getVertex(dst, dst_port, "Output");
-		Port dstPort = getPort(dst, dst_port);
+		Port dstPort = getPort(target, "inputs", dst_port);
 
 		Node child = connection.getFirstChild();
 		Connection conn = DfFactory.eINSTANCE

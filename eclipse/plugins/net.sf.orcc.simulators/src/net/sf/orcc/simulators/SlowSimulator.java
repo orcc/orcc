@@ -260,7 +260,7 @@ public class SlowSimulator extends AbstractSimulator {
 			Network network = IrUtil.deserializeEntity(set, file);
 
 			// Instantiate the network
-			EcoreUtil.resolveAll(network);
+			EcoreUtil.resolveAll(set);
 
 			// Flatten the hierarchical network
 			network.flatten();
