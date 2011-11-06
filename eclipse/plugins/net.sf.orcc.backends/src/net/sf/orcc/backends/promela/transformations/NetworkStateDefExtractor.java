@@ -272,7 +272,7 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object>
 	 */
 	private void identifyControlTokenPorts(Network network) {
 		for (Connection con : network.getConnections()) {
-			fifoTargetToSourceMap.put(con.getTarget(), con.getSource());
+			fifoTargetToSourceMap.put(con.getTargetPort(), con.getSourcePort());
 		}
 		Set<Port> temp = new HashSet<Port>();
 		while (true) {

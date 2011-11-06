@@ -66,8 +66,6 @@ import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.graph.DirectedMultigraph;
 
 /**
  * This class defines a hierarchical XDF network. It contains several maps so
@@ -83,8 +81,6 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	private Map<Connection, Integer> connectionMapWithoutBroadcast;
 
-	private DirectedGraph<Vertex, Connection> graph;
-
 	private Map<Instance, Map<Port, Connection>> incomingMap;
 
 	/**
@@ -94,8 +90,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * The cached value of the '{@link #getMoC() <em>Mo C</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getMoC()
 	 * @generated
 	 * @ordered
@@ -116,11 +111,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	private Map<Instance, Map<Port, Instance>> predecessorsMap;
 
-	private Map<Connection, Vertex> sourceMap;
-
 	private Map<Instance, Map<Port, List<Instance>>> successorsMap;
-
-	private Map<Connection, Vertex> targetMap;
 
 	/**
 	 * @generated
@@ -128,17 +119,50 @@ public class NetworkImpl extends EntityImpl implements Network {
 	protected EList<Var> variables;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The cached value of the '{@link #getConnections() <em>Connections</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getConnections()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Connection> connections;
+
+	/**
+	 * The cached value of the '{@link #getInstances() <em>Instances</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getInstances()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Instance> instances;
+
+	/**
+	 * The cached value of the '{@link #getVertices() <em>Vertices</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getVertices()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Vertex> vertices;
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected NetworkImpl() {
 		super();
 	}
 
+	@Override
+	public void addConnection(Vertex source, Vertex target,
+			Connection connection) {
+		connection.setSource(source);
+		connection.setTarget(target);
+		getConnections().add(connection);
+	}
+
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public NotificationChain basicSetMoC(MoC newMoC, NotificationChain msgs) {
@@ -164,21 +188,21 @@ public class NetworkImpl extends EntityImpl implements Network {
 	private void computeIncomingOutgoingMaps() {
 		incomingMap = new HashMap<Instance, Map<Port, Connection>>();
 		outgoingMap = new HashMap<Instance, Map<Port, List<Connection>>>();
-		for (Vertex vertex : graph.vertexSet()) {
+		for (Vertex vertex : getVertices()) {
 			if (vertex.isInstance()) {
 				// incoming edges
-				Set<Connection> connections = graph.incomingEdgesOf(vertex);
+				List<Connection> connections = vertex.getIncomingEdges();
 				Map<Port, Connection> incoming = new HashMap<Port, Connection>();
 				for (Connection connection : connections) {
-					incoming.put(connection.getTarget(), connection);
+					incoming.put(connection.getTargetPort(), connection);
 				}
 				incomingMap.put(vertex.getInstance(), incoming);
 
 				// outgoing edges
-				connections = graph.outgoingEdgesOf(vertex);
+				connections = vertex.getOutgoingEdges();
 				Map<Port, List<Connection>> outgoing = new HashMap<Port, List<Connection>>();
 				for (Connection connection : connections) {
-					Port source = connection.getSource();
+					Port source = connection.getSourcePort();
 					List<Connection> conns = outgoing.get(source);
 					if (conns == null) {
 						conns = new ArrayList<Connection>(1);
@@ -196,7 +220,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 		successorsMap = new HashMap<Instance, Map<Port, List<Instance>>>();
 
 		// for each instance
-		for (Vertex vertex : graph.vertexSet()) {
+		for (Vertex vertex : getVertices()) {
 			if (vertex.isInstance()) {
 				Instance instance = vertex.getInstance();
 				if (instance.isActor()) {
@@ -220,29 +244,27 @@ public class NetworkImpl extends EntityImpl implements Network {
 			List<Port> outputs) {
 		Map<Port, Instance> predMap = new LinkedHashMap<Port, Instance>();
 		predecessorsMap.put(vertex.getInstance(), predMap);
-		Set<Connection> incoming = graph.incomingEdgesOf(vertex);
+		List<Connection> incoming = vertex.getIncomingEdges();
 		for (Port port : inputs) {
 			for (Connection connection : incoming) {
-				if (port.equals(connection.getTarget())) {
-					predMap.put(port, graph.getEdgeSource(connection)
-							.getInstance());
+				if (port.equals(connection.getTargetPort())) {
+					predMap.put(port, connection.getSource().getInstance());
 				}
 			}
 		}
 
 		Map<Port, List<Instance>> succMap = new LinkedHashMap<Port, List<Instance>>();
 		successorsMap.put(vertex.getInstance(), succMap);
-		Set<Connection> outgoing = graph.outgoingEdgesOf(vertex);
+		List<Connection> outgoing = vertex.getOutgoingEdges();
 		for (Port port : outputs) {
 			for (Connection connection : outgoing) {
-				if (port.equals(connection.getSource())) {
+				if (port.equals(connection.getSourcePort())) {
 					List<Instance> instances = succMap.get(port);
 					if (instances == null) {
 						instances = new ArrayList<Instance>(1);
 						succMap.put(port, instances);
 					}
-					instances
-							.add(graph.getEdgeTarget(connection).getInstance());
+					instances.add(connection.getTarget().getInstance());
 				}
 			}
 		}
@@ -256,28 +278,15 @@ public class NetworkImpl extends EntityImpl implements Network {
 		int i, j;
 
 		// Compute template maps of subnetworks
-		for (Vertex vertex : getGraph().vertexSet()) {
-			if (vertex.isInstance()) {
-				Instance instance = vertex.getInstance();
-				if (instance.isNetwork()) {
-					instance.getNetwork().computeTemplateMaps();
-				}
+		for (Instance instance : getInstances()) {
+			if (instance.isNetwork()) {
+				instance.getNetwork().computeTemplateMaps();
 			}
-		}
-
-		sourceMap = new HashMap<Connection, Vertex>();
-		for (Connection connection : graph.edgeSet()) {
-			sourceMap.put(connection, graph.getEdgeSource(connection));
-		}
-
-		targetMap = new HashMap<Connection, Vertex>();
-		for (Connection connection : graph.edgeSet()) {
-			targetMap.put(connection, graph.getEdgeTarget(connection));
 		}
 
 		connectionMap = new HashMap<Connection, Integer>();
 		i = 0;
-		for (Connection connection : graph.edgeSet()) {
+		for (Connection connection : getConnections()) {
 			connectionMap.put(connection, i++);
 		}
 
@@ -301,8 +310,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -318,17 +326,23 @@ public class NetworkImpl extends EntityImpl implements Network {
 				return getParameters();
 			case DfPackage.NETWORK__VARIABLES:
 				return getVariables();
+			case DfPackage.NETWORK__CONNECTIONS:
+				return getConnections();
+			case DfPackage.NETWORK__INSTANCES:
+				return getInstances();
+			case DfPackage.NETWORK__VERTICES:
+				return getVertices();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
 		switch (featureID) {
 			case DfPackage.NETWORK__INPUTS:
 				return ((InternalEList<?>)getInputs()).basicRemove(otherEnd, msgs);
@@ -340,13 +354,18 @@ public class NetworkImpl extends EntityImpl implements Network {
 				return ((InternalEList<?>)getParameters()).basicRemove(otherEnd, msgs);
 			case DfPackage.NETWORK__VARIABLES:
 				return ((InternalEList<?>)getVariables()).basicRemove(otherEnd, msgs);
+			case DfPackage.NETWORK__CONNECTIONS:
+				return ((InternalEList<?>)getConnections()).basicRemove(otherEnd, msgs);
+			case DfPackage.NETWORK__INSTANCES:
+				return ((InternalEList<?>)getInstances()).basicRemove(otherEnd, msgs);
+			case DfPackage.NETWORK__VERTICES:
+				return ((InternalEList<?>)getVertices()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -362,13 +381,18 @@ public class NetworkImpl extends EntityImpl implements Network {
 				return parameters != null && !parameters.isEmpty();
 			case DfPackage.NETWORK__VARIABLES:
 				return variables != null && !variables.isEmpty();
+			case DfPackage.NETWORK__CONNECTIONS:
+				return connections != null && !connections.isEmpty();
+			case DfPackage.NETWORK__INSTANCES:
+				return instances != null && !instances.isEmpty();
+			case DfPackage.NETWORK__VERTICES:
+				return vertices != null && !vertices.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -394,13 +418,24 @@ public class NetworkImpl extends EntityImpl implements Network {
 				getVariables().clear();
 				getVariables().addAll((Collection<? extends Var>)newValue);
 				return;
+			case DfPackage.NETWORK__CONNECTIONS:
+				getConnections().clear();
+				getConnections().addAll((Collection<? extends Connection>)newValue);
+				return;
+			case DfPackage.NETWORK__INSTANCES:
+				getInstances().clear();
+				getInstances().addAll((Collection<? extends Instance>)newValue);
+				return;
+			case DfPackage.NETWORK__VERTICES:
+				getVertices().clear();
+				getVertices().addAll((Collection<? extends Vertex>)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -409,8 +444,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -430,6 +464,15 @@ public class NetworkImpl extends EntityImpl implements Network {
 				return;
 			case DfPackage.NETWORK__VARIABLES:
 				getVariables().clear();
+				return;
+			case DfPackage.NETWORK__CONNECTIONS:
+				getConnections().clear();
+				return;
+			case DfPackage.NETWORK__INSTANCES:
+				getInstances().clear();
+				return;
+			case DfPackage.NETWORK__VERTICES:
+				getVertices().clear();
 				return;
 		}
 		super.eUnset(featureID);
@@ -458,16 +501,13 @@ public class NetworkImpl extends EntityImpl implements Network {
 	 */
 	public List<Actor> getActors() {
 		Set<Actor> actors = new HashSet<Actor>();
-		for (Vertex vertex : getGraph().vertexSet()) {
-			if (vertex.isInstance()) {
-				Instance instance = vertex.getInstance();
-				if (instance.isActor()) {
-					Actor actor = instance.getActor();
-					actors.add(actor);
-				} else if (instance.isNetwork()) {
-					Network network = instance.getNetwork();
-					actors.addAll(network.getActors());
-				}
+		for (Instance instance : getInstances()) {
+			if (instance.isActor()) {
+				Actor actor = instance.getActor();
+				actors.add(actor);
+			} else if (instance.isNetwork()) {
+				Network network = instance.getNetwork();
+				actors.addAll(network.getActors());
 			}
 		}
 
@@ -497,24 +537,14 @@ public class NetworkImpl extends EntityImpl implements Network {
 	}
 
 	/**
-	 * Returns the list of this graph's connections.
-	 * 
-	 * @return the list of this graph's connections
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
 	 */
-	public List<Connection> getConnections() {
-		return Arrays.asList(graph.edgeSet().toArray(new Connection[0]));
-	}
-
-	/**
-	 * Returns a graph representing the network's contents
-	 * 
-	 * @return a graph representing the network's contents
-	 */
-	public DirectedGraph<Vertex, Connection> getGraph() {
-		if (graph == null) {
-			graph = new DirectedMultigraph<Vertex, Connection>(Connection.class);
+	public EList<Connection> getConnections() {
+		if (connections == null) {
+			connections = new EObjectContainmentEList<Connection>(Connection.class, this, DfPackage.NETWORK__CONNECTIONS);
 		}
-		return graph;
+		return connections;
 	}
 
 	/**
@@ -545,9 +575,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 	}
 
 	/**
-	 * Returns the list of this network's input ports
-	 * 
-	 * @return the list of this network's input ports
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EList<Port> getInputs() {
@@ -568,19 +596,13 @@ public class NetworkImpl extends EntityImpl implements Network {
 	}
 
 	/**
-	 * Returns the list of instances referenced by the graph of this network.
-	 * 
-	 * @return a list of instances
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
 	 */
-	public List<Instance> getInstances() {
-		List<Instance> instances = new ArrayList<Instance>();
-		for (Vertex vertex : getGraph().vertexSet()) {
-			if (vertex.isInstance()) {
-				Instance instance = vertex.getInstance();
-				instances.add(instance);
-			}
+	public EList<Instance> getInstances() {
+		if (instances == null) {
+			instances = new EObjectContainmentEList<Instance>(Instance.class, this, DfPackage.NETWORK__INSTANCES);
 		}
-
 		return instances;
 	}
 
@@ -595,15 +617,12 @@ public class NetworkImpl extends EntityImpl implements Network {
 	public List<Instance> getInstancesOf(Actor actor) {
 		List<Instance> instances = new ArrayList<Instance>();
 
-		for (Vertex vertex : getGraph().vertexSet()) {
-			if (vertex.isInstance()) {
-				Instance instance = vertex.getInstance();
-				if (instance.isActor() && instance.getActor() == actor) {
-					instances.add(instance);
-				} else if (instance.isNetwork()) {
-					Network network = instance.getNetwork();
-					instances.addAll(network.getInstancesOf(actor));
-				}
+		for (Instance instance : getInstances()) {
+			if (instance.isActor() && instance.getActor() == actor) {
+				instances.add(instance);
+			} else if (instance.isNetwork()) {
+				Network network = instance.getNetwork();
+				instances.addAll(network.getInstancesOf(actor));
 			}
 		}
 
@@ -635,14 +654,11 @@ public class NetworkImpl extends EntityImpl implements Network {
 	 */
 	public List<Network> getNetworks() {
 		Set<Network> networks = new HashSet<Network>();
-		for (Vertex vertex : getGraph().vertexSet()) {
-			if (vertex.isInstance()) {
-				Instance instance = vertex.getInstance();
-				if (instance.isNetwork()) {
-					Network network = instance.getNetwork();
-					networks.add(network);
-					networks.addAll(network.getNetworks());
-				}
+		for (Instance instance : getInstances()) {
+			if (instance.isNetwork()) {
+				Network network = instance.getNetwork();
+				networks.add(network);
+				networks.addAll(network.getNetworks());
 			}
 		}
 
@@ -712,30 +728,12 @@ public class NetworkImpl extends EntityImpl implements Network {
 	}
 
 	/**
-	 * Returns a map that associates each connection to its source vertex.
-	 * 
-	 * @return a map that associates each connection to its source vertex
-	 */
-	public Map<Connection, Vertex> getSourceMap() {
-		return sourceMap;
-	}
-
-	/**
 	 * Returns a map that associates a port to the list of its successors.
 	 * 
 	 * @return a map that associates a port to the list of its successors
 	 */
 	public Map<Instance, Map<Port, List<Instance>>> getSuccessorsMap() {
 		return successorsMap;
-	}
-
-	/**
-	 * Returns a map that associates each connection to its target vertex.
-	 * 
-	 * @return a map that associates each connection to its target vertex
-	 */
-	public Map<Connection, Vertex> getTargetMap() {
-		return targetMap;
 	}
 
 	/**
@@ -749,6 +747,17 @@ public class NetworkImpl extends EntityImpl implements Network {
 			variables = new EObjectContainmentEList<Var>(Var.class, this, DfPackage.NETWORK__VARIABLES);
 		}
 		return variables;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Vertex> getVertices() {
+		if (vertices == null) {
+			vertices = new EObjectContainmentEList<Vertex>(Vertex.class, this, DfPackage.NETWORK__VERTICES);
+		}
+		return vertices;
 	}
 
 	/**
@@ -781,7 +790,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 	 * 
 	 * @param moc
 	 *            the new MoC of this network
-	 *            @generated
+	 * @generated
 	 */
 	public void setMoC(MoC newMoC) {
 		if (newMoC != moC) {

@@ -140,11 +140,11 @@ public class LLVMBackendImpl extends AbstractBackend {
 				path = instance.getHierarchicalPath();
 			} else if (instance.isBroadcast()) {
 				// use source instance for broadcasts
-				Set<Connection> edges = network.getGraph().incomingEdgesOf(
-						new Vertex(instance));
+				List<Connection> edges = ((Vertex) instance.eContainer())
+						.getIncomingEdges();
 				if (!edges.isEmpty()) {
 					Connection incoming = edges.iterator().next();
-					Vertex source = network.getGraph().getEdgeSource(incoming);
+					Vertex source = incoming.getSource();
 					if (source.isInstance()) {
 						path = source.getInstance().getHierarchicalPath();
 					}

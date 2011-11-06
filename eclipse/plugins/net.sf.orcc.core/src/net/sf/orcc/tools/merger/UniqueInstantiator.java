@@ -56,16 +56,16 @@ public class UniqueInstantiator implements INetworkTransformation {
 
 		if (srcVertex.isInstance()) {
 			Instance source = srcVertex.getInstance();
-			String srcPortName = connection.getSource().getName();
+			String srcPortName = connection.getSourcePort().getName();
 			Port srcPort = source.getActor().getOutput(srcPortName);
-			connection.setSource(srcPort);
+			connection.setSourcePort(srcPort);
 		}
 
 		if (tgtVertex.isInstance()) {
 			Instance target = tgtVertex.getInstance();
-			String dstPortName = connection.getTarget().getName();
+			String dstPortName = connection.getTargetPort().getName();
 			Port dstPort = target.getActor().getInput(dstPortName);
-			connection.setTarget(dstPort);
+			connection.setTargetPort(dstPort);
 		}
 	}
 

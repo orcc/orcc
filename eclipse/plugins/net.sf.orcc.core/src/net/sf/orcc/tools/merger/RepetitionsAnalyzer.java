@@ -113,8 +113,8 @@ public class RepetitionsAnalyzer {
 			if (tgt.isInstance()) {
 				CSDFMoC tgtMoC = (CSDFMoC) tgt.getInstance().getMoC();
 				if (!rationals.containsKey(tgt)) {
-					int prd = moc.getNumTokensProduced(conn.getSource());
-					int cns = tgtMoC.getNumTokensConsumed(conn.getTarget());
+					int prd = moc.getNumTokensProduced(conn.getSourcePort());
+					int cns = tgtMoC.getNumTokensConsumed(conn.getTargetPort());
 					calculateRate(tgt, rate.mul(new Rational(prd, cns)));
 				}
 			}
@@ -125,8 +125,8 @@ public class RepetitionsAnalyzer {
 			if (src.isInstance()) {
 				CSDFMoC srcMoC = (CSDFMoC) src.getInstance().getMoC();
 				if (!rationals.containsKey(src)) {
-					int prd = srcMoC.getNumTokensProduced(conn.getSource());
-					int cns = moc.getNumTokensConsumed(conn.getTarget());
+					int prd = srcMoC.getNumTokensProduced(conn.getSourcePort());
+					int cns = moc.getNumTokensConsumed(conn.getTargetPort());
 					calculateRate(src, rate.mul(new Rational(cns, prd)));
 				}
 			}
@@ -147,8 +147,8 @@ public class RepetitionsAnalyzer {
 			CSDFMoC tgtMoc = (CSDFMoC) graph.getEdgeTarget(connection)
 					.getInstance().getMoC();
 
-			int prd = srcMoc.getNumTokensProduced(connection.getSource());
-			int cns = tgtMoc.getNumTokensConsumed(connection.getTarget());
+			int prd = srcMoc.getNumTokensProduced(connection.getSourcePort());
+			int cns = tgtMoc.getNumTokensConsumed(connection.getTargetPort());
 
 			if (srcRate * prd != tgtRate * cns) {
 				throw new OrccRuntimeException(

@@ -72,11 +72,11 @@ public class SerDesAdder implements INetworkTransformation {
 			Vertex vertexBCast) {
 		// creates new input port of broadcast
 		Port bcastInput = IrFactory.eINSTANCE
-				.createPort(connection.getTarget());
+				.createPort(connection.getTargetPort());
 		bcastInput.setName("input");
 
 		// creates a connection between the vertex and the broadcast
-		Port srcPort = connection.getSource();
+		Port srcPort = connection.getSourcePort();
 		Connection incoming = DfFactory.eINSTANCE.createConnection(srcPort,
 				bcastInput, connection.getAttributes());
 		graph.addEdge(vertex, vertexBCast, incoming);
@@ -95,18 +95,18 @@ public class SerDesAdder implements INetworkTransformation {
 		for (Connection connection : outList) {
 			// new connection
 			Vertex target = graph.getEdgeTarget(connection);
-			Port srcPort = connection.getSource();
+			Port srcPort = connection.getSourcePort();
 			Port outputPort = IrFactory.eINSTANCE.createPort(srcPort.getType(),
 					"output_" + i);
 			i++;
 
 			Connection connBcastTarget = DfFactory.eINSTANCE.createConnection(
-					outputPort, connection.getTarget(),
+					outputPort, connection.getTargetPort(),
 					connection.getAttributes());
 			graph.addEdge(vertexBCast, target, connBcastTarget);
 
 			// setting source to null so we don't examine it again
-			connection.setSource(null);
+			connection.setSourcePort(null);
 
 			// add this connection to the set of connections that are to be
 			// removed
@@ -130,7 +130,7 @@ public class SerDesAdder implements INetworkTransformation {
 			Map<Port, List<Connection>> outMap) throws OrccException {
 		Instance instance = vertex.getInstance();
 		for (Connection connection : connections) {
-			Port srcPort = connection.getSource();
+			Port srcPort = connection.getSourcePort();
 			if (srcPort != null) {
 				List<Connection> outList = outMap.get(srcPort);
 				int numOutput = outList.size();
@@ -161,7 +161,7 @@ public class SerDesAdder implements INetworkTransformation {
 
 		Map<Port, List<Connection>> outMap = new HashMap<Port, List<Connection>>();
 		for (Connection connection : connections) {
-			Port src = connection.getSource();
+			Port src = connection.getSourcePort();
 			List<Connection> outList = outMap.get(src);
 			if (outList == null) {
 				outList = new ArrayList<Connection>();
@@ -235,7 +235,7 @@ public class SerDesAdder implements INetworkTransformation {
 						// fan-in is not allowed
 						for (Connection connection : conns) {
 
-							Port srcPort = connection.getSource();
+							Port srcPort = connection.getSourcePort();
 							srcPort.setType(port.getType());
 							Port tgtPort = IrFactory.eINSTANCE.createPort(port);
 
@@ -261,7 +261,7 @@ public class SerDesAdder implements INetworkTransformation {
 
 						Connection connection = it.next();
 						Port srcPort = IrFactory.eINSTANCE.createPort(port);
-						Port tgtPort = connection.getTarget();
+						Port tgtPort = connection.getTargetPort();
 						tgtPort.setType(port.getType());
 						Vertex vTgt = graph.getEdgeTarget(connection);
 						Connection outgoing = DfFactory.eINSTANCE
@@ -279,7 +279,7 @@ public class SerDesAdder implements INetworkTransformation {
 
 						while (it.hasNext()) {
 							connection = it.next();
-							tgtPort = connection.getTarget();
+							tgtPort = connection.getTargetPort();
 							tgtPort.setType(port.getType());
 							vTgt = graph.getEdgeTarget(connection);
 							Connection newOutgoing = DfFactory.eINSTANCE

@@ -87,8 +87,6 @@ public class ActorMerger implements INetworkTransformation {
 
 	private Actor superActor;
 
-	private DirectedGraph<Vertex, Connection> graph;
-
 	private AbstractScheduler scheduler;
 
 	private int index;
@@ -106,6 +104,8 @@ public class ActorMerger implements INetworkTransformation {
 	private int depth;
 
 	private Map<Port, Var> buffersMap;
+
+	private Network network;
 
 	private void addBuffer(String name, int size, Type eltType) {
 		IrFactory factory = IrFactory.eINSTANCE;
@@ -366,7 +366,7 @@ public class ActorMerger implements INetworkTransformation {
 			Vertex tgt = graph.getEdgeTarget(connection);
 
 			if (!vertices.contains(src) && vertices.contains(tgt)) {
-				Port tgtPort = connection.getTarget();
+				Port tgtPort = connection.getTargetPort();
 				Port port = factory
 						.createPort(EcoreUtil.copy(tgtPort.getType()), "input_"
 								+ inIndex++);
@@ -382,7 +382,7 @@ public class ActorMerger implements INetworkTransformation {
 				portsMap.put(port, tgtPort);
 
 			} else if (vertices.contains(src) && !vertices.contains(tgt)) {
-				Port srcPort = connection.getSource();
+				Port srcPort = connection.getSourcePort();
 				Port port = factory.createPort(
 						EcoreUtil.copy(srcPort.getType()), "output_"
 								+ outIndex++);
@@ -487,11 +487,11 @@ public class ActorMerger implements INetworkTransformation {
 				.entrySet()) {
 			String name = "buffer_" + index++;
 			Connection conn = entry.getKey();
-			addBuffer(name, entry.getValue(), conn.getSource().getType());
+			addBuffer(name, entry.getValue(), conn.getSourcePort().getType());
 			addCounter(name + "_w");
 			addCounter(name + "_r");
-			buffersMap.put(conn.getSource(), superActor.getStateVar(name));
-			buffersMap.put(conn.getTarget(), superActor.getStateVar(name));
+			buffersMap.put(conn.getSourcePort(), superActor.getStateVar(name));
+			buffersMap.put(conn.getTargetPort(), superActor.getStateVar(name));
 		}
 	}
 
@@ -592,7 +592,7 @@ public class ActorMerger implements INetworkTransformation {
 
 	@Override
 	public void transform(Network network) throws OrccException {
-		graph = network.getGraph();
+		this.network = network;
 
 		// make instance unique in the network
 		new UniqueInstantiator().transform(network);
@@ -619,7 +619,7 @@ public class ActorMerger implements INetworkTransformation {
 			Instance instance = DfFactory.eINSTANCE.createInstance(
 					"superActor_" + index++, superActor);
 
-			Vertex mergeVertex = new Vertex(instance);
+			Vertex mergeVertex = DfFactory.eINSTANCE.createVertex(instance);
 			graph.addVertex(mergeVertex);
 			updateConnection(mergeVertex);
 			graph.removeAllVertices(vertices);
@@ -632,21 +632,22 @@ public class ActorMerger implements INetworkTransformation {
 	 * @param vertices
 	 */
 	private void updateConnection(Vertex merge) {
-		Set<Connection> connections = new HashSet<Connection>(graph.edgeSet());
+		List<Connection> connections = new ArrayList<Connection>(
+				network.getConnections());
 		for (Connection connection : connections) {
-			Vertex src = graph.getEdgeSource(connection);
-			Vertex tgt = graph.getEdgeTarget(connection);
+			Vertex src = network.getEdgeSource(connection);
+			Vertex tgt = network.getEdgeTarget(connection);
 
 			if (!vertices.contains(src) && vertices.contains(tgt)) {
 				Connection newConn = DfFactory.eINSTANCE.createConnection(
-						connection.getSource(), inputs.get(connection),
+						connection.getSourcePort(), inputs.get(connection),
 						connection.getAttributes());
-				graph.addEdge(graph.getEdgeSource(connection), merge, newConn);
+				network.addEdge(graph.getEdgeSource(connection), merge, newConn);
 			}
 
 			if (vertices.contains(src) && !vertices.contains(tgt)) {
 				Connection newConn = DfFactory.eINSTANCE.createConnection(
-						outputs.get(connection), connection.getTarget(),
+						outputs.get(connection), connection.getTargetPort(),
 						connection.getAttributes());
 				graph.addEdge(merge, graph.getEdgeTarget(connection), newConn);
 			}

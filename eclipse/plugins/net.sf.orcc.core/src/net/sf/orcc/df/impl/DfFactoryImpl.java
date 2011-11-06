@@ -17,6 +17,7 @@ import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.WrapperString;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Port;
@@ -88,6 +89,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 			case DfPackage.BROADCAST: return createBroadcast();
 			case DfPackage.WRAPPER_STRING: return createWrapperString();
 			case DfPackage.WRAPPER_XML: return createWrapperXml();
+			case DfPackage.VERTEX: return createVertex();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -153,16 +155,16 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	@Override
 	public Connection createConnection(Port source, Port target) {
 		ConnectionImpl connection = new ConnectionImpl();
-		connection.setSource(source);
-		connection.setTarget(target);
+		connection.setSourcePort(source);
+		connection.setTargetPort(target);
 		return connection;
 	}
 
 	@Override
 	public Connection createConnection(Port source, Port target, int size) {
 		ConnectionImpl connection = new ConnectionImpl();
-		connection.setSource(source);
-		connection.setTarget(target);
+		connection.setSourcePort(source);
+		connection.setTargetPort(target);
 		connection.getAttributes().add(
 				createAttribute(Connection.BUFFER_SIZE,
 						IrFactory.eINSTANCE.createExprInt(size)));
@@ -173,8 +175,8 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	public Connection createConnection(Port source, Port target,
 			List<Attribute> attributes) {
 		ConnectionImpl connection = new ConnectionImpl();
-		connection.setSource(source);
-		connection.setTarget(target);
+		connection.setSourcePort(source);
+		connection.setTargetPort(target);
 		connection.getAttributes().addAll(EcoreUtil.copyAll(attributes));
 		return connection;
 	}
@@ -210,6 +212,30 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 		NetworkImpl network = new NetworkImpl();
 		network.setFileName(fileName);
 		return network;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Vertex createVertex() {
+		VertexImpl vertex = new VertexImpl();
+		return vertex;
+	}
+
+	@Override
+	public Vertex createVertex(Instance instance) {
+		VertexImpl vertex = new VertexImpl();
+		vertex.setContents(instance);
+		return vertex;
+	}
+
+	@Override
+	public Vertex createVertex(Port port) {
+		VertexImpl vertex = new VertexImpl();
+		vertex.setContents(port);
+		return vertex;
 	}
 
 	/**

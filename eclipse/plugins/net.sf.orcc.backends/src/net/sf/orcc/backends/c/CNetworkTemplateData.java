@@ -141,16 +141,16 @@ public class CNetworkTemplateData {
 				// For all connections in the instance's input
 				for (Connection connection : network.getGraph()
 						.incomingEdgesOf(new Vertex(instance))) {
-					instancePorts.put(connection.getTarget(),
+					instancePorts.put(connection.getTargetPort(),
 							connection.getAttribute("commMedium"));
-					instancePortsUpperCase.put(connection.getTarget(),
+					instancePortsUpperCase.put(connection.getTargetPort(),
 							connection.getAttribute("commMediumUpperCase"));
 
 					// if the instance connected is in an other target
 					if (connection.getAttribute("commMedium") != null) {
 						connectionToInstance.put(connection, instance);
 						connectionToPort
-								.put(connection, connection.getTarget());
+								.put(connection, connection.getTargetPort());
 
 						// TODO what should we do here?
 						// mediumSet.add(connection.getAttribute("commMedium").getValue());
@@ -160,16 +160,16 @@ public class CNetworkTemplateData {
 				// For all connections in the instance's output
 				for (Connection connection : network.getGraph()
 						.outgoingEdgesOf(new Vertex(instance))) {
-					instancePorts.put(connection.getSource(),
+					instancePorts.put(connection.getSourcePort(),
 							connection.getAttribute("commMedium"));
-					instancePortsUpperCase.put(connection.getSource(),
+					instancePortsUpperCase.put(connection.getSourcePort(),
 							connection.getAttribute("commMediumUpperCase"));
 
 					// if the instance connected is in an other target
 					if (connection.getAttribute("commMedium") != null) {
 						connectionToInstance.put(connection, instance);
 						connectionToPort
-								.put(connection, connection.getSource());
+								.put(connection, connection.getSourcePort());
 
 						// TODO what should we do here?
 						// mediumSet.add(connection.getAttribute("commMedium").getValue());

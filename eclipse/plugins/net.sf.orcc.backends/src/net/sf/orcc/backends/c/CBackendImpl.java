@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
@@ -100,11 +99,11 @@ public class CBackendImpl extends AbstractBackend {
 				path = instance.getHierarchicalPath();
 			} else if (instance.isBroadcast()) {
 				// use source instance for broadcasts
-				Set<Connection> edges = network.getGraph().incomingEdgesOf(
-						new Vertex(instance));
+				List<Connection> edges = ((Vertex) instance.eContainer())
+						.getIncomingEdges();
 				if (!edges.isEmpty()) {
 					Connection incoming = edges.iterator().next();
-					Vertex source = network.getGraph().getEdgeSource(incoming);
+					Vertex source = incoming.getSource();
 					if (source.isInstance()) {
 						path = source.getInstance().getHierarchicalPath();
 					}

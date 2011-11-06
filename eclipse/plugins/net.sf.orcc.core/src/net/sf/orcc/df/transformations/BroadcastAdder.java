@@ -43,8 +43,6 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.ir.Port;
 
-import org.jgrapht.DirectedGraph;
-
 /**
  * Adds broadcast actors when needed.
  * 
@@ -54,9 +52,8 @@ import org.jgrapht.DirectedGraph;
  */
 public class BroadcastAdder implements INetworkTransformation {
 
-	protected DirectedGraph<Vertex, Connection> graph;
-
 	protected Set<Connection> toBeRemoved;
+	private Network network;
 
 	protected void createBroadcast(String id, Port port,
 			List<Connection> outList) {
@@ -65,12 +62,12 @@ public class BroadcastAdder implements INetworkTransformation {
 				port.getType());
 		String name = id + "_" + port.getName();
 		Instance newInst = DfFactory.eINSTANCE.createInstance(name, bcast);
-		Vertex vertexBCast = new Vertex(newInst);
-		graph.addVertex(vertexBCast);
+		Vertex vertexBCast = DfFactory.eINSTANCE.createVertex(newInst);
+		network.getVertices().add(vertexBCast);
 
 		// add connections
-		createIncomingConnection(outList.get(0),
-				graph.getEdgeSource(outList.get(0)), vertexBCast);
+		createIncomingConnection(outList.get(0), outList.get(0).getSource(),
+				vertexBCast);
 		createOutgoingConnections(vertexBCast, outList);
 	}
 
@@ -90,10 +87,10 @@ public class BroadcastAdder implements INetworkTransformation {
 		Port bcastInput = bcast.getInput();
 
 		// creates a connection between the vertex and the broadcast
-		Port srcPort = connection.getSource();
+		Port srcPort = connection.getSourcePort();
 		Connection incoming = DfFactory.eINSTANCE.createConnection(srcPort,
 				bcastInput, connection.getAttributes());
-		graph.addEdge(vertex, vertexBCast, incoming);
+		network.addConnection(vertex, vertexBCast, incoming);
 	}
 
 	/**
@@ -109,17 +106,17 @@ public class BroadcastAdder implements INetworkTransformation {
 		int i = 0;
 		for (Connection connection : outList) {
 			// new connection
-			Vertex target = graph.getEdgeTarget(connection);
+			Vertex target = connection.getTarget();
 			Port outputPort = bcast.getOutput("output_" + i);
 			i++;
 
 			Connection connBcastTarget = DfFactory.eINSTANCE.createConnection(
-					outputPort, connection.getTarget(),
+					outputPort, connection.getTargetPort(),
 					connection.getAttributes());
-			graph.addEdge(vertexBCast, target, connBcastTarget);
+			network.addConnection(vertexBCast, target, connBcastTarget);
 
 			// setting source to null so we don't examine it again
-			connection.setSource(null);
+			connection.setSourcePort(null);
 
 			// add this connection to the set of connections that are to be
 			// removed
@@ -139,12 +136,11 @@ public class BroadcastAdder implements INetworkTransformation {
 	 *            outgoing connections from P(i)
 	 */
 	protected void examineConnections(Vertex vertex,
-			Set<Connection> connections, Map<Port, List<Connection>> outMap,
-			Network network) {
+			Set<Connection> connections, Map<Port, List<Connection>> outMap) {
 		if (vertex.isInstance()) {
 			Instance instance = vertex.getInstance();
 			for (Connection connection : connections) {
-				Port srcPort = connection.getSource();
+				Port srcPort = connection.getSourcePort();
 				if (srcPort != null) {
 					List<Connection> outList = outMap.get(srcPort);
 					int numOutput = outList.size();
@@ -162,17 +158,17 @@ public class BroadcastAdder implements INetworkTransformation {
 		}
 	}
 
-	protected void examineVertex(Vertex vertex, Network network) {
+	protected void examineVertex(Vertex vertex) {
 		// make a copy of the existing outgoing connections of vertex because
 		// the set returned is modified when new edges are added
 		Set<Connection> connections = new HashSet<Connection>(
-				graph.outgoingEdgesOf(vertex));
+				vertex.getOutgoingEdges());
 
 		// for each connection, add it to a port => connection map
 		// port is a port of vertex
 		Map<Port, List<Connection>> outMap = new HashMap<Port, List<Connection>>();
 		for (Connection connection : connections) {
-			Port src = connection.getSource();
+			Port src = connection.getSourcePort();
 			List<Connection> outList = outMap.get(src);
 			if (outList == null) {
 				outList = new ArrayList<Connection>();
@@ -181,17 +177,17 @@ public class BroadcastAdder implements INetworkTransformation {
 			outList.add(connection);
 		}
 
-		examineConnections(vertex, connections, outMap, network);
+		examineConnections(vertex, connections, outMap);
 	}
 
 	@Override
 	public void transform(Network network) {
-		graph = network.getGraph();
+		this.network = network;
 		toBeRemoved = new HashSet<Connection>();
 
 		// make a copy of the existing vertex set because the set returned is
 		// modified when broadcasts are added
-		Set<Vertex> vertexSet = new HashSet<Vertex>(graph.vertexSet());
+		List<Vertex> vertexSet = new ArrayList<Vertex>(network.getVertices());
 
 		for (Vertex vertex : vertexSet) {
 			if (vertex.isInstance()) {
@@ -200,10 +196,10 @@ public class BroadcastAdder implements INetworkTransformation {
 					new BroadcastAdder().transform(instance.getNetwork());
 				}
 			}
-			examineVertex(vertex, network);
+			examineVertex(vertex);
 		}
 
 		// removes old connections
-		graph.removeAllEdges(toBeRemoved);
+		network.getConnections().removeAll(toBeRemoved);
 	}
 }

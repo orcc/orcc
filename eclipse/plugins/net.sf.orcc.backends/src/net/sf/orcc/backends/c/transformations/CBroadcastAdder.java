@@ -34,7 +34,6 @@ import java.util.Set;
 
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
-import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.transformations.BroadcastAdder;
 import net.sf.orcc.ir.Port;
@@ -49,8 +48,9 @@ import net.sf.orcc.util.WriteListener;
  */
 public class CBroadcastAdder extends BroadcastAdder {
 
-	private WriteListener writeListener;
 	private int defaultFifoSize;
+
+	private WriteListener writeListener;
 
 	public CBroadcastAdder(WriteListener writeListener, int defaultFifoSize) {
 		this.writeListener = writeListener;
@@ -59,11 +59,10 @@ public class CBroadcastAdder extends BroadcastAdder {
 
 	@Override
 	protected void examineConnections(Vertex vertex,
-			Set<Connection> connections, Map<Port, List<Connection>> outMap,
-			Network network) {
+			Set<Connection> connections, Map<Port, List<Connection>> outMap) {
 		Instance instance = vertex.getInstance();
 		for (Connection connection : connections) {
-			Port srcPort = connection.getSource();
+			Port srcPort = connection.getSourcePort();
 			if (srcPort != null) {
 				List<Connection> outList = outMap.get(srcPort);
 				int numOutput = outList.size();

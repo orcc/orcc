@@ -156,8 +156,8 @@ public class SlowSimulator extends AbstractSimulator {
 				// actors
 				Instance src = srcVertex.getInstance();
 				Instance tgt = tgtVertex.getInstance();
-				Port srcPort = connection.getSource();
-				Port tgtPort = connection.getTarget();
+				Port srcPort = connection.getSourcePort();
+				Port tgtPort = connection.getTargetPort();
 				// connect source and target actors
 				if ((srcPort != null) && (tgtPort != null)) {
 					connectActors(src, srcPort, tgt, tgtPort, size);
@@ -294,7 +294,7 @@ public class SlowSimulator extends AbstractSimulator {
 
 			if (srcVertex.isInstance()) {
 				Instance source = srcVertex.getInstance();
-				String srcPortName = connection.getSource().getName();
+				String srcPortName = connection.getSourcePort().getName();
 
 				Port srcPort;
 				if (source.isActor()) {
@@ -302,12 +302,12 @@ public class SlowSimulator extends AbstractSimulator {
 				} else {
 					srcPort = source.getBroadcast().getOutput(srcPortName);
 				}
-				connection.setSource(srcPort);
+				connection.setSourcePort(srcPort);
 			}
 
 			if (tgtVertex.isInstance()) {
 				Instance target = tgtVertex.getInstance();
-				String dstPortName = connection.getTarget().getName();
+				String dstPortName = connection.getTargetPort().getName();
 
 				Port dstPort;
 				if (target.isActor()) {
@@ -316,7 +316,7 @@ public class SlowSimulator extends AbstractSimulator {
 					dstPort = target.getBroadcast().getInput();
 				}
 
-				connection.setTarget(dstPort);
+				connection.setTargetPort(dstPort);
 			}
 		}
 	}

@@ -40,6 +40,7 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.SerDes;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.moc.MoC;
 
@@ -83,11 +84,6 @@ public class InstanceImpl extends EObjectImpl implements Instance {
 	 * @ordered
 	 */
 	protected EObject contents;
-
-	/**
-	 * the class of this instance
-	 */
-	private String clasz;
 
 	/**
 	 * The default value of the '{@link #getId() <em>Id</em>}' attribute.
@@ -203,7 +199,11 @@ public class InstanceImpl extends EObjectImpl implements Instance {
 	 * @return the class of this instance
 	 */
 	public String getClasz() {
-		return clasz;
+		if (contents instanceof Entity) {
+			return ((Entity) contents).getName();
+		} else {
+			return null;
+		}
 	}
 	/**
 	 * <!-- begin-user-doc -->
@@ -475,7 +475,7 @@ public class InstanceImpl extends EObjectImpl implements Instance {
 
 	@Override
 	public String toString() {
-		return "\"" + id + "\" instance of \"" + clasz + "\"";
+		return id + ": " + contents;
 	}
 
 }

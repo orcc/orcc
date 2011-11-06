@@ -14,6 +14,12 @@
         eType="ecore:EClass Ir.ecore#//Var" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="variables" upperBound="-1"
         eType="ecore:EClass Ir.ecore#//Var" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="connections" upperBound="-1"
+        eType="#//Connection" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="instances" upperBound="-1"
+        eType="#//Instance" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="vertices" upperBound="-1"
+        eType="#//Vertex" containment="true" resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Attribute">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -24,8 +30,12 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="attributes" upperBound="-1"
         eType="#//Attribute" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="fifoId" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="source" eType="ecore:EClass Ir.ecore#//Port"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="ecore:EClass Ir.ecore#//Port"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="source" eType="#//Vertex"
+        eOpposite="#//Vertex/outgoingEdges"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="#//Vertex"
+        eOpposite="#//Vertex/incomingEdges"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sourcePort" eType="ecore:EClass Ir.ecore#//Port"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="targetPort" eType="ecore:EClass Ir.ecore#//Port"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Instance">
     <eStructuralFeatures xsi:type="ecore:EReference" name="attributes" upperBound="-1"
@@ -44,5 +54,16 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="WrapperXml">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="xml" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Vertex">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="contents" eType="ecore:EClass platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EObject"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="predecessors" upperBound="-1"
+        eType="#//Vertex" eOpposite="#//Vertex/successors"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="successors" upperBound="-1"
+        eType="#//Vertex" eOpposite="#//Vertex/predecessors"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="incomingEdges" upperBound="-1"
+        eType="#//Connection" eOpposite="#//Connection/target"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="outgoingEdges" upperBound="-1"
+        eType="#//Connection" eOpposite="#//Connection/source"/>
   </eClassifiers>
 </ecore:EPackage>

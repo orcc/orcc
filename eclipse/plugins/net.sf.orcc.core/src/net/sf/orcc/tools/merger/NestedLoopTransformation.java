@@ -109,7 +109,7 @@ public class NestedLoopTransformation {
 						for (Connection connection : graph
 								.outgoingEdgesOf(vertex)) {
 							if (right.contains(graph.getEdgeTarget(connection))) {
-								cost += connection.getSource()
+								cost += connection.getSourcePort()
 										.getNumTokensProduced() * q / gcd;
 							}
 						}

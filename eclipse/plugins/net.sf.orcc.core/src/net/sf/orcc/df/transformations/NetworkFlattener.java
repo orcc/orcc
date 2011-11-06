@@ -67,13 +67,11 @@ public class NetworkFlattener implements INetworkTransformation {
 	 */
 	private void copySubGraph(List<Attribute> attrs, Network network,
 			Instance instance) {
-		DirectedGraph<Vertex, Connection> graph = network.getGraph();
-
 		Network subNetwork = instance.getNetwork();
-		DirectedGraph<Vertex, Connection> subGraph = subNetwork.getGraph();
 
-		List<Vertex> vertexSet = new ArrayList<Vertex>(subGraph.vertexSet());
-		List<Connection> edgeSet = new ArrayList<Connection>(subGraph.edgeSet());
+		List<Vertex> vertexSet = new ArrayList<Vertex>(subNetwork.getVertices());
+		List<Connection> edgeSet = new ArrayList<Connection>(
+				subNetwork.getConnections());
 
 		for (Vertex vertex : vertexSet) {
 			if (vertex.isInstance()) {
@@ -87,16 +85,16 @@ public class NetworkFlattener implements INetworkTransformation {
 				List<Attribute> vertexAttrs = subInstance.getAttributes();
 				vertexAttrs.addAll(attrs);
 
-				graph.addVertex(vertex);
+				network.getVertices().add(vertex);
 			}
 		}
 
 		for (Connection edge : edgeSet) {
-			Vertex srcVertex = subGraph.getEdgeSource(edge);
-			Vertex tgtVertex = subGraph.getEdgeTarget(edge);
+			Vertex srcVertex = edge.getSource();
+			Vertex tgtVertex = edge.getTarget();
 
 			if (srcVertex.isInstance() && tgtVertex.isInstance()) {
-				graph.addEdge(srcVertex, tgtVertex, edge);
+				network.addConnection(srcVertex, tgtVertex, edge);
 			}
 		}
 	}
@@ -172,12 +170,12 @@ public class NetworkFlattener implements INetworkTransformation {
 		List<Connection> incomingEdgeSet = new ArrayList<Connection>(
 				graph.incomingEdgesOf(vertex));
 		for (Connection edge : incomingEdgeSet) {
-			Vertex v = getPort(subNetwork, "Input", edge.getTarget());
+			Vertex v = getPort(subNetwork, "Input", edge.getTargetPort());
 			Set<Connection> outgoingEdgeSet = subGraph.outgoingEdgesOf(v);
 
 			for (Connection newEdge : outgoingEdgeSet) {
 				Connection incoming = DfFactory.eINSTANCE.createConnection(
-						edge.getSource(), newEdge.getTarget(),
+						edge.getSourcePort(), newEdge.getTargetPort(),
 						edge.getAttributes());
 				graph.addEdge(graph.getEdgeSource(edge),
 						subGraph.getEdgeTarget(newEdge), incoming);
@@ -203,12 +201,12 @@ public class NetworkFlattener implements INetworkTransformation {
 		List<Connection> outgoingEdgeSet = new ArrayList<Connection>(
 				graph.outgoingEdgesOf(vertex));
 		for (Connection edge : outgoingEdgeSet) {
-			Vertex v = getPort(subNetwork, "Output", edge.getSource());
+			Vertex v = getPort(subNetwork, "Output", edge.getSourcePort());
 			Set<Connection> incomingEdgeSet = subGraph.incomingEdgesOf(v);
 
 			for (Connection newEdge : incomingEdgeSet) {
 				Connection incoming = DfFactory.eINSTANCE.createConnection(
-						newEdge.getSource(), edge.getTarget(),
+						newEdge.getSourcePort(), edge.getTargetPort(),
 						edge.getAttributes());
 				graph.addEdge(subGraph.getEdgeSource(newEdge),
 						graph.getEdgeTarget(edge), incoming);

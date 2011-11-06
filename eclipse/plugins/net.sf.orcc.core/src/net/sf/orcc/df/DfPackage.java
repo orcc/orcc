@@ -144,13 +144,40 @@ public interface DfPackage extends EPackage {
 	int NETWORK__VARIABLES = IrPackage.ENTITY_FEATURE_COUNT + 4;
 
 	/**
+	 * The feature id for the '<em><b>Connections</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NETWORK__CONNECTIONS = IrPackage.ENTITY_FEATURE_COUNT + 5;
+
+	/**
+	 * The feature id for the '<em><b>Instances</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NETWORK__INSTANCES = IrPackage.ENTITY_FEATURE_COUNT + 6;
+
+	/**
+	 * The feature id for the '<em><b>Vertices</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NETWORK__VERTICES = IrPackage.ENTITY_FEATURE_COUNT + 7;
+
+	/**
 	 * The number of structural features of the '<em>Network</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK_FEATURE_COUNT = IrPackage.ENTITY_FEATURE_COUNT + 5;
+	int NETWORK_FEATURE_COUNT = IrPackage.ENTITY_FEATURE_COUNT + 8;
 
 
 	/**
@@ -237,13 +264,31 @@ public interface DfPackage extends EPackage {
 	int CONNECTION__TARGET = 3;
 
 	/**
+	 * The feature id for the '<em><b>Source Port</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CONNECTION__SOURCE_PORT = 4;
+
+	/**
+	 * The feature id for the '<em><b>Target Port</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CONNECTION__TARGET_PORT = 5;
+
+	/**
 	 * The number of structural features of the '<em>Connection</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int CONNECTION_FEATURE_COUNT = 4;
+	int CONNECTION_FEATURE_COUNT = 6;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.InstanceImpl <em>Instance</em>}' class.
@@ -388,6 +433,71 @@ public interface DfPackage extends EPackage {
 
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.df.impl.VertexImpl <em>Vertex</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.df.impl.VertexImpl
+	 * @see net.sf.orcc.df.impl.DfPackageImpl#getVertex()
+	 * @generated
+	 */
+	int VERTEX = 7;
+
+	/**
+	 * The feature id for the '<em><b>Contents</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VERTEX__CONTENTS = 0;
+
+	/**
+	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VERTEX__PREDECESSORS = 1;
+
+	/**
+	 * The feature id for the '<em><b>Successors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VERTEX__SUCCESSORS = 2;
+
+	/**
+	 * The feature id for the '<em><b>Incoming Edges</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VERTEX__INCOMING_EDGES = 3;
+
+	/**
+	 * The feature id for the '<em><b>Outgoing Edges</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VERTEX__OUTGOING_EDGES = 4;
+
+	/**
+	 * The number of structural features of the '<em>Vertex</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VERTEX_FEATURE_COUNT = 5;
+
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Network <em>Network</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -451,6 +561,39 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getNetwork_Variables();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.df.Network#getConnections <em>Connections</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Connections</em>'.
+	 * @see net.sf.orcc.df.Network#getConnections()
+	 * @see #getNetwork()
+	 * @generated
+	 */
+	EReference getNetwork_Connections();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.df.Network#getInstances <em>Instances</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Instances</em>'.
+	 * @see net.sf.orcc.df.Network#getInstances()
+	 * @see #getNetwork()
+	 * @generated
+	 */
+	EReference getNetwork_Instances();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.df.Network#getVertices <em>Vertices</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Vertices</em>'.
+	 * @see net.sf.orcc.df.Network#getVertices()
+	 * @see #getNetwork()
+	 * @generated
+	 */
+	EReference getNetwork_Vertices();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Attribute <em>Attribute</em>}'.
@@ -537,6 +680,28 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getConnection_Target();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.df.Connection#getSourcePort <em>Source Port</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Source Port</em>'.
+	 * @see net.sf.orcc.df.Connection#getSourcePort()
+	 * @see #getConnection()
+	 * @generated
+	 */
+	EReference getConnection_SourcePort();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.df.Connection#getTargetPort <em>Target Port</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Target Port</em>'.
+	 * @see net.sf.orcc.df.Connection#getTargetPort()
+	 * @see #getConnection()
+	 * @generated
+	 */
+	EReference getConnection_TargetPort();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Instance <em>Instance</em>}'.
@@ -656,6 +821,71 @@ public interface DfPackage extends EPackage {
 	EAttribute getWrapperXml_Xml();
 
 	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.df.Vertex <em>Vertex</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Vertex</em>'.
+	 * @see net.sf.orcc.df.Vertex
+	 * @generated
+	 */
+	EClass getVertex();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.df.Vertex#getContents <em>Contents</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Contents</em>'.
+	 * @see net.sf.orcc.df.Vertex#getContents()
+	 * @see #getVertex()
+	 * @generated
+	 */
+	EReference getVertex_Contents();
+
+	/**
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.df.Vertex#getPredecessors <em>Predecessors</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Predecessors</em>'.
+	 * @see net.sf.orcc.df.Vertex#getPredecessors()
+	 * @see #getVertex()
+	 * @generated
+	 */
+	EReference getVertex_Predecessors();
+
+	/**
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.df.Vertex#getSuccessors <em>Successors</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Successors</em>'.
+	 * @see net.sf.orcc.df.Vertex#getSuccessors()
+	 * @see #getVertex()
+	 * @generated
+	 */
+	EReference getVertex_Successors();
+
+	/**
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.df.Vertex#getIncomingEdges <em>Incoming Edges</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Incoming Edges</em>'.
+	 * @see net.sf.orcc.df.Vertex#getIncomingEdges()
+	 * @see #getVertex()
+	 * @generated
+	 */
+	EReference getVertex_IncomingEdges();
+
+	/**
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.df.Vertex#getOutgoingEdges <em>Outgoing Edges</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Outgoing Edges</em>'.
+	 * @see net.sf.orcc.df.Vertex#getOutgoingEdges()
+	 * @see #getVertex()
+	 * @generated
+	 */
+	EReference getVertex_OutgoingEdges();
+
+	/**
 	 * Returns the factory that creates the instances of the model.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -728,6 +958,30 @@ public interface DfPackage extends EPackage {
 		EReference NETWORK__VARIABLES = eINSTANCE.getNetwork_Variables();
 
 		/**
+		 * The meta object literal for the '<em><b>Connections</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference NETWORK__CONNECTIONS = eINSTANCE.getNetwork_Connections();
+
+		/**
+		 * The meta object literal for the '<em><b>Instances</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference NETWORK__INSTANCES = eINSTANCE.getNetwork_Instances();
+
+		/**
+		 * The meta object literal for the '<em><b>Vertices</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference NETWORK__VERTICES = eINSTANCE.getNetwork_Vertices();
+
+		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.AttributeImpl <em>Attribute</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -794,6 +1048,22 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EReference CONNECTION__TARGET = eINSTANCE.getConnection_Target();
+
+		/**
+		 * The meta object literal for the '<em><b>Source Port</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference CONNECTION__SOURCE_PORT = eINSTANCE.getConnection_SourcePort();
+
+		/**
+		 * The meta object literal for the '<em><b>Target Port</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference CONNECTION__TARGET_PORT = eINSTANCE.getConnection_TargetPort();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.InstanceImpl <em>Instance</em>}' class.
@@ -890,6 +1160,56 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute WRAPPER_XML__XML = eINSTANCE.getWrapperXml_Xml();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.df.impl.VertexImpl <em>Vertex</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.df.impl.VertexImpl
+		 * @see net.sf.orcc.df.impl.DfPackageImpl#getVertex()
+		 * @generated
+		 */
+		EClass VERTEX = eINSTANCE.getVertex();
+
+		/**
+		 * The meta object literal for the '<em><b>Contents</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference VERTEX__CONTENTS = eINSTANCE.getVertex_Contents();
+
+		/**
+		 * The meta object literal for the '<em><b>Predecessors</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference VERTEX__PREDECESSORS = eINSTANCE.getVertex_Predecessors();
+
+		/**
+		 * The meta object literal for the '<em><b>Successors</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference VERTEX__SUCCESSORS = eINSTANCE.getVertex_Successors();
+
+		/**
+		 * The meta object literal for the '<em><b>Incoming Edges</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference VERTEX__INCOMING_EDGES = eINSTANCE.getVertex_IncomingEdges();
+
+		/**
+		 * The meta object literal for the '<em><b>Outgoing Edges</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference VERTEX__OUTGOING_EDGES = eINSTANCE.getVertex_OutgoingEdges();
 
 	}
 

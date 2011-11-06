@@ -71,6 +71,19 @@ public interface DfFactory extends EFactory {
 	WrapperXml createWrapperXml();
 
 	/**
+	 * Returns a new object of class '<em>Vertex</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Vertex</em>'.
+	 * @generated
+	 */
+	Vertex createVertex();
+	
+	Vertex createVertex(Instance instance);
+	
+	Vertex createVertex(Port port);
+
+	/**
 	 * Creates a new broadcast with the given number of outputs and
 	 * type. Type is copied.
 	 * 

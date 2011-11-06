@@ -39,7 +39,6 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
 
 import org.eclipse.emf.common.util.EList;
-import org.jgrapht.DirectedGraph;
 
 /**
  * This class defines a hierarchical XDF network. It contains several maps so
@@ -50,6 +49,8 @@ import org.jgrapht.DirectedGraph;
  * @model extends="Entity"
  */
 public interface Network extends Entity {
+
+	void addConnection(Vertex source, Vertex target, Connection connection);
 
 	/**
 	 * Classifies this network.
@@ -98,15 +99,9 @@ public interface Network extends Entity {
 	 * Returns the list of this graph's connections.
 	 * 
 	 * @return the list of this graph's connections
+	 * @model containment="true"
 	 */
-	List<Connection> getConnections();
-
-	/**
-	 * Returns a graph representing the network's contents
-	 * 
-	 * @return a graph representing the network's contents
-	 */
-	DirectedGraph<Vertex, Connection> getGraph();
+	EList<Connection> getConnections();
 
 	/**
 	 * Returns a map that associates each instance to the list of its incoming
@@ -140,8 +135,9 @@ public interface Network extends Entity {
 	 * Returns the list of instances referenced by the graph of this network.
 	 * 
 	 * @return a list of instances
+	 * @model containment="true"
 	 */
-	List<Instance> getInstances();
+	EList<Instance> getInstances();
 
 	/**
 	 * Returns the list of instances of the given actor in the graph.
@@ -218,25 +214,11 @@ public interface Network extends Entity {
 	Map<Instance, Map<Port, Instance>> getPredecessorsMap();
 
 	/**
-	 * Returns a map that associates each connection to its source vertex.
-	 * 
-	 * @return a map that associates each connection to its source vertex
-	 */
-	Map<Connection, Vertex> getSourceMap();
-
-	/**
 	 * Returns a map that associates a port to the list of its successors.
 	 * 
 	 * @return a map that associates a port to the list of its successors
 	 */
 	Map<Instance, Map<Port, List<Instance>>> getSuccessorsMap();
-
-	/**
-	 * Returns a map that associates each connection to its target vertex.
-	 * 
-	 * @return a map that associates each connection to its target vertex
-	 */
-	Map<Connection, Vertex> getTargetMap();
 
 	/**
 	 * Returns the list of this network's variables
@@ -245,6 +227,14 @@ public interface Network extends Entity {
 	 * @model containment="true"
 	 */
 	EList<Var> getVariables();
+
+	/**
+	 * Returns the list of vertices of this network.
+	 * 
+	 * @return the list of vertices of this network
+	 * @model containment="true"
+	 */
+	EList<Vertex> getVertices();
 
 	/**
 	 * Merges actors of this network. Note that for this transformation to work

@@ -44,6 +44,11 @@ import org.eclipse.emf.ecore.EObject;
 public interface Connection extends EObject {
 
 	/**
+	 * the bufferSize attribute can be attached to a FIFO to specify its size
+	 */
+	static final String BUFFER_SIZE = "bufferSize";
+
+	/**
 	 * Returns the attribute associated with the given name.
 	 * 
 	 * @param name
@@ -62,11 +67,6 @@ public interface Connection extends EObject {
 	EList<Attribute> getAttributes();
 
 	/**
-	 * the bufferSize attribute can be attached to a FIFO to specify its size
-	 */
-	static final String BUFFER_SIZE = "bufferSize";
-
-	/**
 	 * @model
 	 */
 	int getFifoId();
@@ -79,22 +79,46 @@ public interface Connection extends EObject {
 	Integer getSize();
 
 	/**
-	 * Returns this connection's source port.
+	 * Returns this connection's source (may be <code>null</code>).
 	 * 
-	 * @return this connection's source port
+	 * @return this connection's source (may be <code>null</code>)
 	 * @model
 	 */
-	Port getSource();
+	Vertex getSource();
 
 	/**
-	 * Returns this connection's target port.
+	 * Returns this connection's source port (may be <code>null</code>).
 	 * 
-	 * @return this connection's target port
+	 * @return this connection's source port (may be <code>null</code>)
 	 * @model
 	 */
-	Port getTarget();
+	Port getSourcePort();
+
+	/**
+	 * Returns this connection's target (may be <code>null</code>).
+	 * 
+	 * @return this connection's target (may be <code>null</code>)
+	 * @model
+	 */
+	Vertex getTarget();
+
+	/**
+	 * Returns this connection's target port (may be <code>null</code>).
+	 * 
+	 * @return this connection's target port (may be <code>null</code>)
+	 * @model
+	 */
+	Port getTargetPort();
 
 	void setFifoId(int fifoId);
+
+	/**
+	 * Sets the source of this connection to the given vertex
+	 * 
+	 * @param vertex
+	 *            a vertex
+	 */
+	void setSource(Vertex vertex);
 
 	/**
 	 * Sets the source of this connection to the given port
@@ -102,7 +126,15 @@ public interface Connection extends EObject {
 	 * @param source
 	 *            a port
 	 */
-	void setSource(Port source);
+	void setSourcePort(Port source);
+
+	/**
+	 * Sets the target of this connection to the given vertex
+	 * 
+	 * @param vertex
+	 *            a vertex
+	 */
+	void setTarget(Vertex vertex);
 
 	/**
 	 * Sets the target of this connection to the given port
@@ -110,6 +142,6 @@ public interface Connection extends EObject {
 	 * @param target
 	 *            a port
 	 */
-	void setTarget(Port target);
+	void setTargetPort(Port target);
 
 }

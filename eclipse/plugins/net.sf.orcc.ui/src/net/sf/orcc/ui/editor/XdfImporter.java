@@ -46,10 +46,8 @@ import net.sf.graphiti.model.Graph;
 import net.sf.graphiti.model.ObjectType;
 import net.sf.graphiti.model.Vertex;
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Attribute;
-import net.sf.orcc.df.AttrFlag;
-import net.sf.orcc.df.AttrValue;
+import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.ir.Expression;
@@ -65,7 +63,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.jgrapht.DirectedGraph;
 
 /**
  * This class defines a transformation from a file containing an XDF network to
@@ -79,14 +76,12 @@ public class XdfImporter {
 	private Map<net.sf.orcc.df.Vertex, Vertex> vertexMap;
 
 	private void addConnections(Graph graph, ObjectType type,
-			DirectedGraph<net.sf.orcc.df.Vertex, Connection> networkGraph) {
-		for (Connection connection : networkGraph.edgeSet()) {
-			Port srcPort = connection.getSource();
-			Port tgtPort = connection.getTarget();
-			net.sf.orcc.df.Vertex srcVertex = networkGraph
-					.getEdgeSource(connection);
-			net.sf.orcc.df.Vertex tgtVertex = networkGraph
-					.getEdgeTarget(connection);
+			List<Connection> connections) {
+		for (Connection connection : connections) {
+			Port srcPort = connection.getSourcePort();
+			Port tgtPort = connection.getTargetPort();
+			net.sf.orcc.df.Vertex srcVertex = connection.getSource();
+			net.sf.orcc.df.Vertex tgtVertex = connection.getTarget();
 
 			Vertex source = vertexMap.get(srcVertex);
 			Vertex target = vertexMap.get(tgtVertex);
@@ -135,8 +130,7 @@ public class XdfImporter {
 
 	private void addVertices(Graph graph, Network network) {
 		Configuration configuration = graph.getConfiguration();
-		for (net.sf.orcc.df.Vertex networkVertex : network.getGraph()
-				.vertexSet()) {
+		for (net.sf.orcc.df.Vertex networkVertex : network.getVertices()) {
 			Vertex vertex;
 			if (networkVertex.isPort()) {
 				Port port = networkVertex.getPort();
@@ -177,19 +171,13 @@ public class XdfImporter {
 
 		// attributes
 		Attribute partName = instance.getAttribute("partName");
-		if (partName instanceof AttrValue) {
-			vertex.setValue("partName", new ExpressionPrinter()
-					.doSwitch(((AttrValue) partName).getValue()));
-		}
-
+		vertex.setValue("partName",
+				new ExpressionPrinter().doSwitch(partName.getValue()));
 		Attribute clockDomain = instance.getAttribute("clockDomain");
-		if (clockDomain instanceof AttrValue) {
-			vertex.setValue("clockDomain", new ExpressionPrinter()
-					.doSwitch(((AttrValue) clockDomain).getValue()));
-		}
-
+		vertex.setValue("clockDomain",
+				new ExpressionPrinter().doSwitch(clockDomain.getValue()));
 		Attribute skip = instance.getAttribute("skip");
-		if (skip instanceof AttrFlag) {
+		if (skip != null) {
 			vertex.setValue("skip", true);
 		}
 
@@ -220,7 +208,7 @@ public class XdfImporter {
 
 		addVertices(graph, network);
 		addConnections(graph, configuration.getEdgeType("Connection"),
-				network.getGraph());
+				network.getConnections());
 
 		// read layout
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();

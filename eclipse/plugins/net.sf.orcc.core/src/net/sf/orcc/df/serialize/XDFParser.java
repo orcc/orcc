@@ -519,7 +519,7 @@ public class XDFParser {
 								+ " \"src-port\" " + "attribute");
 			}
 
-			return new Vertex(kind, port);
+			return DfFactory.eINSTANCE.createVertex(port);
 		} else {
 			Instance instance = network.getInstance(vertexName);
 			if (instance == null) {
@@ -528,7 +528,7 @@ public class XDFParser {
 								+ " \"src-port\" " + "attribute");
 			}
 
-			return new Vertex(instance);
+			return DfFactory.eINSTANCE.createVertex(instance);
 		}
 	}
 
@@ -600,7 +600,8 @@ public class XDFParser {
 					parseDecl(element);
 				} else if (name.equals("Instance")) {
 					Instance instance = parseInstance(element);
-					network.getGraph().addVertex(new Vertex(instance));
+					network.getVertices().add(
+							DfFactory.eINSTANCE.createVertex(instance));
 				} else if (name.equals("Package")) {
 					throw new OrccRuntimeException(
 							"Package elements are not supported by Orcc yet");
@@ -638,7 +639,7 @@ public class XDFParser {
 		Connection conn = DfFactory.eINSTANCE
 				.createConnection(srcPort, dstPort);
 		parseAttributes(conn.getAttributes(), child);
-		network.getGraph().addEdge(source, target, conn);
+		network.addConnection(source, target, conn);
 	}
 
 	private void parseDecl(Element decl) {
@@ -741,6 +742,9 @@ public class XDFParser {
 		// instance parameters and attributes
 		Map<String, Expression> parameters = parseParameters(child);
 		parseAttributes(instance.getAttributes(), child);
+		
+		// add instance
+		network.getInstances().add(instance);
 
 		return instance;
 	}
@@ -832,7 +836,7 @@ public class XDFParser {
 					+ "\", invalid kind: \"" + kind + "\"");
 		}
 
-		network.getGraph().addVertex(new Vertex(kind, port));
+		network.getVertices().add(DfFactory.eINSTANCE.createVertex(port));
 	}
 
 	/**

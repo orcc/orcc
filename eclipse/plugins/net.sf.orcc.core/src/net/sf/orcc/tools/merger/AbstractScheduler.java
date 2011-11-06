@@ -71,14 +71,14 @@ public abstract class AbstractScheduler implements IScheduler {
 			if (iterand.isVertex()) {
 				Vertex vertex = iterand.getVertex();
 				for (Connection connection : graph.incomingEdgesOf(vertex)) {
-					int cns = connection.getTarget().getNumTokensConsumed();
+					int cns = connection.getTargetPort().getNumTokensConsumed();
 					tokens.put(connection, tokens.get(connection) - cns);
 				}
 				for (Connection connection : graph.outgoingEdgesOf(vertex)) {
 					int current = tokens.get(connection);
 					int max = maxTokens.get(connection);
 					CSDFMoC moc = (CSDFMoC) vertex.getInstance().getMoC();
-					int prd = moc.getNumTokensProduced(connection.getSource());
+					int prd = moc.getNumTokensProduced(connection.getSourcePort());
 					tokens.put(connection, current + prd);
 					if (max < current + prd) {
 						maxTokens.put(connection, current + prd);

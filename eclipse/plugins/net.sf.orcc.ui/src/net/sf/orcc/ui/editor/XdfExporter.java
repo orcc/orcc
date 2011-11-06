@@ -72,14 +72,11 @@ import net.sf.orcc.cal.cal.VariableReference;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.services.CalGrammarAccess;
 import net.sf.orcc.cal.ui.internal.CalActivator;
+import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.Attribute;
-import net.sf.orcc.df.AttrValue;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.impl.InstanceImpl;
-import net.sf.orcc.df.impl.ValueAttribute;
 import net.sf.orcc.df.serialize.XDFWriter;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
@@ -174,19 +171,17 @@ public class XdfExporter extends CalSwitch<Object> {
 		}
 
 		// buffer size
-		Map<String, Attribute> attributes = new HashMap<String, Attribute>();
+		Connection connection;
 		Integer bufferSize = (Integer) edge.getValue("buffer size");
-
-		if (bufferSize != null) {
-			Expression expr = IrFactory.eINSTANCE.createExprInt(bufferSize);
-			AttrValue attr = new ValueAttribute(expr);
-			attributes.put("bufferSize", attr);
+		if (bufferSize == null) {
+			connection = DfFactory.eINSTANCE.createConnection(sourcePort,
+					targetPort);
+		} else {
+			connection = DfFactory.eINSTANCE.createConnection(sourcePort,
+					targetPort, (int) bufferSize);
 		}
 
-		// connection
-		Connection connection = new Connection(sourcePort, targetPort,
-				attributes);
-		network.getGraph().addEdge(source, target, connection);
+		network.addConnection(source, target, connection);
 	}
 
 	private void addParameters(Network network, Graph graph) {
@@ -230,7 +225,7 @@ public class XdfExporter extends CalSwitch<Object> {
 			portMap.put(port, vertex);
 
 			network.getInputs().add(port);
-			networkVertex = new net.sf.orcc.df.Vertex("Input", port);
+			networkVertex = DfFactory.eINSTANCE.createVertex(port);
 		} else if ("Output port".equals(vertex.getType().getName())) {
 			Type type = parseType(vertex.getValue("port type"));
 			boolean native_ = (Boolean) vertex.getValue("native");
@@ -238,11 +233,12 @@ public class XdfExporter extends CalSwitch<Object> {
 			portMap.put(port, vertex);
 
 			network.getOutputs().add(port);
-			networkVertex = new net.sf.orcc.df.Vertex("Output", port);
+			networkVertex = DfFactory.eINSTANCE.createVertex(port);
 		} else {
 			String clasz = (String) vertex.getValue(PARAMETER_REFINEMENT);
-			Instance instance = new InstanceImpl(name, clasz);
-			networkVertex = new net.sf.orcc.df.Vertex(instance);
+			Instance instance = DfFactory.eINSTANCE.createInstance(name,
+					contents);
+			networkVertex = DfFactory.eINSTANCE.createVertex(instance);
 
 			Map<?, ?> variables = (Map<?, ?>) vertex
 					.getValue("instance parameter");
@@ -260,8 +256,9 @@ public class XdfExporter extends CalSwitch<Object> {
 					// remove extra quotes
 					Expression expr = IrFactory.eINSTANCE
 							.createExprString(partName);
-					AttrValue attr = new ValueAttribute(expr);
-					instance.getAttributes().put("partName", attr);
+					Attribute attr = DfFactory.eINSTANCE.createAttribute(
+							"partName", expr);
+					instance.getAttributes().add(attr);
 				}
 			}
 			// clokc domain attribute
@@ -272,14 +269,15 @@ public class XdfExporter extends CalSwitch<Object> {
 					// remove extra quotes
 					Expression expr = IrFactory.eINSTANCE
 							.createExprString(clockDomain);
-					AttrValue attr = new ValueAttribute(expr);
-					instance.getAttributes().put("clockDomain", attr);
+					Attribute attr = DfFactory.eINSTANCE.createAttribute(
+							"clockDomain", expr);
+					instance.getAttributes().add(attr);
 				}
 			}
 
 		}
 
-		network.getGraph().addVertex(networkVertex);
+		network.getVertices().add(networkVertex);
 		vertexMap.put(vertex, networkVertex);
 	}
 
