@@ -34,6 +34,7 @@ import java.io.OutputStream;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.serialize.XDFParser;
 import net.sf.orcc.df.serialize.XDFWriter;
@@ -45,6 +46,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.impl.ResourceImpl;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class defines a resource implementation for the Df model which is used
@@ -54,10 +56,10 @@ import org.eclipse.emf.ecore.resource.impl.ResourceImpl;
  * 
  */
 public class XdfResourceImpl extends ResourceImpl {
-	
+
 	public XdfResourceImpl() {
 	}
-	
+
 	public XdfResourceImpl(URI uri) {
 		super(uri);
 	}
@@ -70,7 +72,8 @@ public class XdfResourceImpl extends ResourceImpl {
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 			IFile file = root.getFile(new Path(uri.toPlatformString(true)));
 			IProject project = file.getProject();
-			Network network = new XDFParser().parseNetwork(project, inputStream);
+			Network network = new XDFParser()
+					.parseNetwork(project, inputStream);
 			getContents().add(network);
 		} catch (OrccRuntimeException e) {
 			throw new IOException(e);

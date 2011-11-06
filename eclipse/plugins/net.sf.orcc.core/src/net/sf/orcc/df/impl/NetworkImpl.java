@@ -808,6 +808,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	@Override
 	public String toString() {
+		if (eIsProxy()) return super.toString();
 		return name;
 	}
 

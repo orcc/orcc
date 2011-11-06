@@ -42,6 +42,7 @@ import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
+import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
@@ -69,6 +70,8 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.emf.ecore.InternalEObject;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -700,12 +703,14 @@ public class XDFParser {
 					+ "must have a valid \"Class\" child.");
 		}
 
+		Entity proxy = null;
 		List<IFolder> folders = OrccUtil.getOutputFolders(project);
 		IPath path = new Path(clasz.replace('.', '/'));
 		IFile file = null;
 		for (IFolder folder : folders) {
 			file = folder.getFile(path.addFileExtension("ir"));
 			if (file.exists()) {
+				proxy = IrFactory.eINSTANCE.createActor();
 				break;
 			}
 		}
@@ -714,18 +719,17 @@ public class XDFParser {
 			for (IFolder folder : folders) {
 				file = folder.getFile(path.addFileExtension("xdf"));
 				if (file.exists()) {
+					proxy = DfFactory.eINSTANCE.createNetwork();
 					break;
 				}
 			}
+		}
 
-			if (!file.exists()) {
-				throw new OrccRuntimeException(
-						"Actor or network \""
-								+ clasz
-								+ "\" not found!\nIf this actor/network has errors,"
-								+ " please correct them and try again; otherwise, try to "
-								+ "refresh/clean projects.");
-			}
+		if (proxy == null) {
+			throw new OrccRuntimeException("Actor or network \"" + clasz
+					+ "\" not found!\nIf this actor/network has errors,"
+					+ " please correct them and try again; otherwise, try to "
+					+ "refresh/clean projects.");
 		}
 
 		// create instance
@@ -735,14 +739,14 @@ public class XDFParser {
 		// create proxy
 		String pathName = file.getFullPath().toString();
 		URI uri = URI.createPlatformResourceURI(pathName, true);
-		EObject proxy = EcoreFactory.eINSTANCE.createEObject();
-		((InternalEObject) proxy).eSetProxyURI(uri);
+		uri = uri.appendFragment("/0");
 		instance.setContents(proxy);
+		((InternalEObject) proxy).eSetProxyURI(uri);
 
 		// instance parameters and attributes
 		Map<String, Expression> parameters = parseParameters(child);
 		parseAttributes(instance.getAttributes(), child);
-		
+
 		// add instance
 		network.getInstances().add(instance);
 
