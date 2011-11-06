@@ -36,22 +36,12 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
-import net.sf.orcc.df.attributes.CustomAttribute;
-import net.sf.orcc.df.attributes.FlagAttribute;
-import net.sf.orcc.df.attributes.IAttribute;
-import net.sf.orcc.df.attributes.ICustomAttribute;
-import net.sf.orcc.df.attributes.IFlagAttribute;
-import net.sf.orcc.df.attributes.IStringAttribute;
-import net.sf.orcc.df.attributes.ITypeAttribute;
-import net.sf.orcc.df.attributes.IValueAttribute;
-import net.sf.orcc.df.attributes.StringAttribute;
-import net.sf.orcc.df.attributes.TypeAttribute;
-import net.sf.orcc.df.attributes.ValueAttribute;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
@@ -68,7 +58,17 @@ import net.sf.orcc.ir.util.Entry;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
 import net.sf.orcc.util.BinOpSeqParser;
 import net.sf.orcc.util.DomUtil;
+import net.sf.orcc.util.OrccUtil;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EcoreFactory;
+import org.eclipse.emf.ecore.InternalEObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -464,6 +464,8 @@ public class XDFParser {
 	 */
 	private final TypeParser typeParser;
 
+	private IProject project;
+
 	/**
 	 * Creates a new network parser.
 	 */
@@ -531,17 +533,15 @@ public class XDFParser {
 	}
 
 	/**
-	 * Returns a map of attribute names -> values by parsing the "Attribute"
-	 * nodes.
+	 * Parses the "Attribute" nodes.
 	 * 
+	 * @param attributes
+	 *            a list of attributes to fill
 	 * @param node
 	 *            the first node of a node list, or <code>null</code> if the
 	 *            caller had no children.
-	 * @return a (possibly empty) map of attributes
 	 */
-	private Map<String, IAttribute> parseAttributes(Node node) {
-		Map<String, IAttribute> attributes = new HashMap<String, IAttribute>();
-
+	private void parseAttributes(List<Attribute> attributes, Node node) {
 		while (node != null) {
 			// only parses Attribute nodes, other nodes are ignored.
 			if (node.getNodeName().equals("Attribute")) {
@@ -549,34 +549,35 @@ public class XDFParser {
 				String kind = attribute.getAttribute("kind");
 				String attrName = attribute.getAttribute("name");
 
-				IAttribute attr;
-				if (kind.equals(ICustomAttribute.NAME)) {
-					attr = new CustomAttribute(attribute.getChildNodes());
-				} else if (kind.equals(IFlagAttribute.NAME)) {
-					attr = new FlagAttribute();
-				} else if (kind.equals(IStringAttribute.NAME)) {
+				Attribute attr;
+				if (kind.equals(Attribute.CUSTOM)) {
+					// TODO custom
+					attr = DfFactory.eINSTANCE.createAttribute(attrName,
+							DfFactory.eINSTANCE.createWrapperXml());
+				} else if (kind.equals(Attribute.FLAG)) {
+					attr = DfFactory.eINSTANCE.createAttribute(attrName, null);
+				} else if (kind.equals(Attribute.STRING)) {
 					String value = attribute.getAttribute("value");
-					attr = new StringAttribute(value);
-				} else if (kind.equals(ITypeAttribute.NAME)) {
+					attr = DfFactory.eINSTANCE.createAttribute(attrName,
+							DfFactory.eINSTANCE.createWrapperString(value));
+				} else if (kind.equals(Attribute.TYPE)) {
 					Type type = typeParser.parseType(attribute.getFirstChild())
 							.getResult();
-					attr = new TypeAttribute(type);
-				} else if (kind.equals(IValueAttribute.NAME)) {
+					attr = DfFactory.eINSTANCE.createAttribute(attrName, type);
+				} else if (kind.equals(Attribute.VALUE)) {
 					Expression expr = exprParser
 							.parseExpr(node.getFirstChild());
-					attr = new ValueAttribute(expr);
+					attr = DfFactory.eINSTANCE.createAttribute(attrName, expr);
 				} else {
 					throw new OrccRuntimeException(
 							"unsupported attribute kind: \"" + kind + "\"");
 				}
 
-				attributes.put(attrName, attr);
+				attributes.add(attr);
 			}
 
 			node = node.getNextSibling();
 		}
-
-		return attributes;
 	}
 
 	/**
@@ -634,8 +635,9 @@ public class XDFParser {
 		Port dstPort = getPort(dst, dst_port);
 
 		Node child = connection.getFirstChild();
-		Map<String, IAttribute> attributes = parseAttributes(child);
-		Connection conn = new Connection(srcPort, dstPort, attributes);
+		Connection conn = DfFactory.eINSTANCE
+				.createConnection(srcPort, dstPort);
+		parseAttributes(conn.getAttributes(), child);
 		network.getGraph().addEdge(source, target, conn);
 	}
 
@@ -672,9 +674,9 @@ public class XDFParser {
 	 *            a DOM element named "Instance".
 	 * @return an instance
 	 */
-	private Instance parseInstance(Element instance) {
+	private Instance parseInstance(Element element) {
 		// instance id
-		String id = instance.getAttribute("id");
+		String id = element.getAttribute("id");
 		if (id.isEmpty()) {
 			throw new OrccRuntimeException("An Instance element "
 					+ "must have a valid \"id\" attribute");
@@ -682,7 +684,7 @@ public class XDFParser {
 
 		// instance class
 		String clasz = null;
-		Node child = instance.getFirstChild();
+		Node child = element.getFirstChild();
 		while (child != null) {
 			if (child.getNodeName().equals("Class")) {
 				clasz = ((Element) child).getAttribute("name");
@@ -697,16 +699,50 @@ public class XDFParser {
 					+ "must have a valid \"Class\" child.");
 		}
 
-		// instance parameters and attributes
-		Map<String, Expression> parameters = parseParameters(child);
-		Map<String, IAttribute> attributes = parseAttributes(child);
+		List<IFolder> folders = OrccUtil.getOutputFolders(project);
+		IPath path = new Path(clasz.replace('.', '/'));
+		IFile file = null;
+		for (IFolder folder : folders) {
+			file = folder.getFile(path.addFileExtension("ir"));
+			if (file.exists()) {
+				break;
+			}
+		}
+		if (!file.exists()) {
+			folders = OrccUtil.getSourceFolders(project);
+			for (IFolder folder : folders) {
+				file = folder.getFile(path.addFileExtension("xdf"));
+				if (file.exists()) {
+					break;
+				}
+			}
+
+			if (!file.exists()) {
+				throw new OrccRuntimeException(
+						"Actor or network \""
+								+ clasz
+								+ "\" not found!\nIf this actor/network has errors,"
+								+ " please correct them and try again; otherwise, try to "
+								+ "refresh/clean projects.");
+			}
+		}
 
 		// create instance
-		Instance newInst = new Instance(id, clasz);
-		newInst.getAttributes().putAll(attributes);
-		newInst.getParameters().putAll(parameters);
+		Instance instance = DfFactory.eINSTANCE.createInstance();
+		instance.setId(id);
 
-		return newInst;
+		// create proxy
+		String pathName = file.getFullPath().toString();
+		URI uri = URI.createPlatformResourceURI(pathName, true);
+		EObject proxy = EcoreFactory.eINSTANCE.createEObject();
+		((InternalEObject) proxy).eSetProxyURI(uri);
+		instance.setContents(proxy);
+
+		// instance parameters and attributes
+		Map<String, Expression> parameters = parseParameters(child);
+		parseAttributes(instance.getAttributes(), child);
+
+		return instance;
 	}
 
 	/**
@@ -714,7 +750,8 @@ public class XDFParser {
 	 * 
 	 * @return a network
 	 */
-	public Network parseNetwork(InputStream inputStream) {
+	public Network parseNetwork(IProject project, InputStream inputStream) {
+		this.project = project;
 		try {
 			// input
 			Document document = DomUtil.parseDocument(inputStream);

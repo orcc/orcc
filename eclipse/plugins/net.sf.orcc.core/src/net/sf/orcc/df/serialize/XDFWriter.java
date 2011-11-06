@@ -32,23 +32,18 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
-import net.sf.orcc.df.attributes.IAttribute;
-import net.sf.orcc.df.attributes.ICustomAttribute;
-import net.sf.orcc.df.attributes.IFlagAttribute;
-import net.sf.orcc.df.attributes.IStringAttribute;
-import net.sf.orcc.df.attributes.ITypeAttribute;
-import net.sf.orcc.df.attributes.IValueAttribute;
-import net.sf.orcc.df.attributes.XmlElement;
+import net.sf.orcc.df.WrapperString;
+import net.sf.orcc.df.WrapperXml;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -69,6 +64,9 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.util.DomUtil;
 
+import org.eclipse.emf.common.util.ECollections;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
 import org.jgrapht.DirectedGraph;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -323,52 +321,43 @@ public class XDFWriter {
 	 * @param parent
 	 *            the parent parent
 	 * @param attributes
-	 *            a map of attributes
+	 *            a list of attributes
 	 */
-	private void writeAttributes(Element parent,
-			Map<String, IAttribute> attributes) {
+	private void writeAttributes(Element parent, EList<Attribute> attributes) {
 		// sort attributes by alphabetical order
-		attributes = new TreeMap<String, IAttribute>(attributes);
+		ECollections.sort(attributes, new Comparator<Attribute>() {
 
-		for (Entry<String, IAttribute> entry : attributes.entrySet()) {
+			@Override
+			public int compare(Attribute attr1, Attribute attr2) {
+				return attr1.getName().compareTo(attr2.getName());
+			}
+
+		});
+
+		for (Attribute attribute : attributes) {
 			Element attributeElt = document.createElement("Attribute");
-			attributeElt.setAttribute("name", entry.getKey());
+			attributeElt.setAttribute("name", attribute.getName());
 
-			IAttribute attribute = entry.getValue();
 			String kind;
-			switch (attribute.getType()) {
-			case IAttribute.CUSTOM: {
-				kind = ICustomAttribute.NAME;
-				List<XmlElement> children = ((ICustomAttribute) attribute)
-						.getValue();
-				for (XmlElement element : children) {
-					attributeElt.appendChild(element.getDOMElement(document));
-				}
-				break;
-			}
-			case IAttribute.FLAG:
-				kind = IFlagAttribute.NAME;
-				break;
-			case IAttribute.STRING: {
-				kind = IStringAttribute.NAME;
-				String value = ((IStringAttribute) attribute).getValue();
-				attributeElt.setAttribute("value", value);
-				break;
-			}
-			case IAttribute.TYPE: {
-				kind = ITypeAttribute.NAME;
-				Type type = ((ITypeAttribute) attribute).getValue();
+			EObject value = attribute.getValue();
+			if (value instanceof WrapperString) {
+				kind = Attribute.STRING;
+				String str = ((WrapperString) value).getString();
+				attributeElt.setAttribute("value", str);
+			} else if (value instanceof WrapperXml) {
+				// TODO custom
+				kind = Attribute.CUSTOM;
+			} else if (value instanceof Type) {
+				kind = Attribute.TYPE;
+				Type type = (Type) value;
 				attributeElt.appendChild(writeType(type));
-				break;
-			}
-			case IAttribute.VALUE: {
-				kind = IValueAttribute.NAME;
-				Expression expr = ((IValueAttribute) attribute).getValue();
+			} else if (value instanceof Expression) {
+				kind = Attribute.VALUE;
+				Expression expr = (Expression) value;
 				writeExpr(attributeElt, expr);
-				break;
-			}
-			default:
-				throw new OrccRuntimeException("unknown attribute type");
+			} else {
+				// default is flag
+				kind = Attribute.FLAG;
 			}
 
 			attributeElt.setAttribute("kind", kind);

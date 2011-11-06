@@ -28,105 +28,33 @@
  */
 package net.sf.orcc.df;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Port;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
 import net.sf.orcc.ir.Type;
-
-import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class defines a broadcast as a particular instance.
  * 
  * @author Matthieu Wipliez
- * 
+ * @model
  */
-public class Broadcast {
+public interface Broadcast extends EObject {
 
-	public static final String CLASS = "";
-
-	private List<Port> inputs;
-
-	private int numOutputs;
-
-	private List<Integer> outputList;
-
-	private List<Port> outputs;
-
-	private Map<Port, Integer> portMap;
-
-	private Type type;
+	public Port getInput();
 
 	/**
-	 * Creates a new broadcast whose name is composed from the given actor name
-	 * and port name. The broadcast will have the number of outputs given and
-	 * the given type. Type is copied.
+	 * Returns the list of input ports.
 	 * 
-	 * @param actorName
-	 *            name of the source actor
-	 * @param portName
-	 *            name of the source output port connected to this broadcast
-	 * @param numOutput
-	 *            number of outputs
-	 * @param type
-	 *            type of this broadcast
+	 * @return the list of input ports
+	 * @model containment="true"
 	 */
-	public Broadcast(int numOutputs, Type type) {
-		this.numOutputs = numOutputs;
-		this.type = EcoreUtil.copy(type);
+	EList<Port> getInputs();
 
-		inputs = new ArrayList<Port>();
-		String name = "input";
-		inputs.add(IrFactory.eINSTANCE.createPort(EcoreUtil.copy(type), name));
-
-		outputs = new ArrayList<Port>();
-		for (int i = 0; i < numOutputs; i++) {
-			name = "output_" + i;
-			outputs.add(IrFactory.eINSTANCE.createPort(EcoreUtil.copy(type),
-					name));
-		}
-
-		portMap = new HashMap<Port, Integer>();
-		portMap.put(getInput(), 1);
-		for (int i = 0; i < numOutputs; i++) {
-			portMap.put(getOutputs().get(i), i + 1);
-		}
-	}
-
-	public Port getInput() {
-		for (Port port : inputs) {
-			if (port.getName().equals("input")) {
-				return port;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Returns the ordered map of input ports.
-	 * 
-	 * @return the ordered map of input ports
-	 */
-	public List<Port> getInputs() {
-		return inputs;
-	}
-
-	public int getNumOutputs() {
-		return numOutputs;
-	}
-
-	public Port getOutput(String name) {
-		for (Port port : outputs) {
-			if (port.getName().equals(name)) {
-				return port;
-			}
-		}
-		return null;
-	}
+	Port getOutput(String name);
 
 	/**
 	 * Returns a list of integers containing [0, 1, ..., n - 1] where n is the
@@ -134,32 +62,18 @@ public class Broadcast {
 	 * 
 	 * @return a list of integers
 	 */
-	public List<Integer> getOutputList() {
-		if (outputList == null) {
-			outputList = new ArrayList<Integer>();
-			for (int i = 0; i < numOutputs; i++) {
-				outputList.add(i);
-			}
-		}
-
-		return outputList;
-	}
+	List<Integer> getOutputList();
 
 	/**
 	 * Returns the ordered map of output ports.
 	 * 
 	 * @return the ordered map of output ports
+	 * @model containment="true"
 	 */
-	public List<Port> getOutputs() {
-		return outputs;
-	}
+	EList<Port> getOutputs();
 
-	public Map<Port, Integer> getPortMap() {
-		return portMap;
-	}
+	Map<Port, Integer> getPortMap();
 
-	public Type getType() {
-		return type;
-	}
+	Type getType();
 
 }

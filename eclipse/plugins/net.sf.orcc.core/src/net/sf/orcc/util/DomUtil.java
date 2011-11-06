@@ -36,6 +36,7 @@ import net.sf.orcc.OrccRuntimeException;
 import org.w3c.dom.DOMConfiguration;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSInput;
@@ -106,7 +107,7 @@ public class DomUtil {
 		getImplementation();
 		DOMImplementationLS implLS = (DOMImplementationLS) impl;
 
-		// serialize to XML
+		// create input
 		LSInput input = implLS.createLSInput();
 		input.setByteStream(is);
 
@@ -118,6 +119,25 @@ public class DomUtil {
 		config.setParameter("element-content-whitespace", false);
 
 		return builder.parse(input);
+	}
+
+	/**
+	 * Writes the given document to the given output stream.
+	 * 
+	 * @param os
+	 *            an output stream
+	 * @param document
+	 *            a DOM document created by
+	 *            {@link #writeDocument(OutputStream, Document)}
+	 */
+	public static String writeToString(Node node) {
+		getImplementation();
+		DOMImplementationLS implLS = (DOMImplementationLS) impl;
+
+		// serialize the document, close the stream
+		LSSerializer serializer = implLS.createLSSerializer();
+		serializer.getDomConfig().setParameter("format-pretty-print", true);
+		return serializer.writeToString(node);
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,49 +26,31 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.df.attributes;
+package net.sf.orcc.df;
+
+import org.eclipse.emf.ecore.EObject;
 
 /**
- * This interface represents an attribute that can be put on instances or
- * connections in a network.
+ * This interface defines a wrapper for a string.
  * 
  * @author Matthieu Wipliez
- * 
+ * @model
  */
-public interface IAttribute {
+public interface WrapperString extends EObject {
 
 	/**
-	 * a custom attribute. This attribute can be cast to
-	 * {@link ICustomAttribute}.
+	 * @model
 	 */
-	public static final int CUSTOM = 1;
+	String getString();
 
 	/**
-	 * a flag attribute. This attribute can be cast to {@link IFlagAttribute}.
+	 * Sets the value of the '{@link net.sf.orcc.df.WrapperString#getString <em>String</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>String</em>' attribute.
+	 * @see #getString()
+	 * @generated
 	 */
-	public static final int FLAG = 2;
-
-	/**
-	 * a string attribute. This attribute can be cast to
-	 * {@link IStringAttribute}.
-	 */
-	public static final int STRING = 3;
-
-	/**
-	 * a type attribute. This attribute can be cast to {@link ITypeAttribute}.
-	 */
-	public static final int TYPE = 4;
-
-	/**
-	 * a value attribute. This attribute can be cast to {@link IValueAttribute}.
-	 */
-	public static final int VALUE = 5;
-
-	/**
-	 * Returns the type of this attribute.
-	 * 
-	 * @return the type of this attribute
-	 */
-	public int getType();
+	void setString(String value);
 
 }

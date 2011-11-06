@@ -57,6 +57,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.IContentProvider;
@@ -385,7 +386,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 		if (xdfFile != null) {
 			ResourceSet set = new ResourceSetImpl();
 			network = IrUtil.deserializeEntity(set, xdfFile);
-			network.updateIdentifiers();
+			EcoreUtil.resolveAll(network);
 
 			Set<String> instances = new HashSet<String>();
 			for (Instance instance : network.getInstances()) {

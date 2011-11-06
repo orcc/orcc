@@ -47,11 +47,11 @@ import net.sf.graphiti.model.ObjectType;
 import net.sf.graphiti.model.Vertex;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Attribute;
+import net.sf.orcc.df.AttrFlag;
+import net.sf.orcc.df.AttrValue;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.attributes.IAttribute;
-import net.sf.orcc.df.attributes.IFlagAttribute;
-import net.sf.orcc.df.attributes.IValueAttribute;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
@@ -176,20 +176,20 @@ public class XdfImporter {
 		}
 
 		// attributes
-		IAttribute partName = instance.getAttribute("partName");
-		if (partName instanceof IValueAttribute) {
+		Attribute partName = instance.getAttribute("partName");
+		if (partName instanceof AttrValue) {
 			vertex.setValue("partName", new ExpressionPrinter()
-					.doSwitch(((IValueAttribute) partName).getValue()));
+					.doSwitch(((AttrValue) partName).getValue()));
 		}
 
-		IAttribute clockDomain = instance.getAttribute("clockDomain");
-		if (clockDomain instanceof IValueAttribute) {
+		Attribute clockDomain = instance.getAttribute("clockDomain");
+		if (clockDomain instanceof AttrValue) {
 			vertex.setValue("clockDomain", new ExpressionPrinter()
-					.doSwitch(((IValueAttribute) clockDomain).getValue()));
+					.doSwitch(((AttrValue) clockDomain).getValue()));
 		}
 
-		IAttribute skip = instance.getAttribute("skip");
-		if (skip instanceof IFlagAttribute) {
+		Attribute skip = instance.getAttribute("skip");
+		if (skip instanceof AttrFlag) {
 			vertex.setValue("skip", true);
 		}
 

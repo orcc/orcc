@@ -74,11 +74,12 @@ import net.sf.orcc.cal.services.CalGrammarAccess;
 import net.sf.orcc.cal.ui.internal.CalActivator;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.Attribute;
+import net.sf.orcc.df.AttrValue;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.attributes.IAttribute;
-import net.sf.orcc.df.attributes.IValueAttribute;
-import net.sf.orcc.df.attributes.ValueAttribute;
+import net.sf.orcc.df.impl.InstanceImpl;
+import net.sf.orcc.df.impl.ValueAttribute;
 import net.sf.orcc.df.serialize.XDFWriter;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
@@ -173,12 +174,12 @@ public class XdfExporter extends CalSwitch<Object> {
 		}
 
 		// buffer size
-		Map<String, IAttribute> attributes = new HashMap<String, IAttribute>();
+		Map<String, Attribute> attributes = new HashMap<String, Attribute>();
 		Integer bufferSize = (Integer) edge.getValue("buffer size");
 
 		if (bufferSize != null) {
 			Expression expr = IrFactory.eINSTANCE.createExprInt(bufferSize);
-			IValueAttribute attr = new ValueAttribute(expr);
+			AttrValue attr = new ValueAttribute(expr);
 			attributes.put("bufferSize", attr);
 		}
 
@@ -240,7 +241,7 @@ public class XdfExporter extends CalSwitch<Object> {
 			networkVertex = new net.sf.orcc.df.Vertex("Output", port);
 		} else {
 			String clasz = (String) vertex.getValue(PARAMETER_REFINEMENT);
-			Instance instance = new Instance(name, clasz);
+			Instance instance = new InstanceImpl(name, clasz);
 			networkVertex = new net.sf.orcc.df.Vertex(instance);
 
 			Map<?, ?> variables = (Map<?, ?>) vertex
@@ -259,7 +260,7 @@ public class XdfExporter extends CalSwitch<Object> {
 					// remove extra quotes
 					Expression expr = IrFactory.eINSTANCE
 							.createExprString(partName);
-					IValueAttribute attr = new ValueAttribute(expr);
+					AttrValue attr = new ValueAttribute(expr);
 					instance.getAttributes().put("partName", attr);
 				}
 			}
@@ -271,7 +272,7 @@ public class XdfExporter extends CalSwitch<Object> {
 					// remove extra quotes
 					Expression expr = IrFactory.eINSTANCE
 							.createExprString(clockDomain);
-					IValueAttribute attr = new ValueAttribute(expr);
+					AttrValue attr = new ValueAttribute(expr);
 					instance.getAttributes().put("clockDomain", attr);
 				}
 			}

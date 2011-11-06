@@ -32,15 +32,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
-import net.sf.orcc.df.attributes.IAttribute;
 import net.sf.orcc.ir.Port;
 
 import org.jgrapht.DirectedGraph;
@@ -65,7 +65,7 @@ public class NetworkFlattener implements INetworkTransformation {
 	 * 
 	 * @throws OrccException
 	 */
-	private void copySubGraph(Map<String, IAttribute> attrs, Network network,
+	private void copySubGraph(List<Attribute> attrs, Network network,
 			Instance instance) {
 		DirectedGraph<Vertex, Connection> graph = network.getGraph();
 
@@ -84,13 +84,8 @@ public class NetworkFlattener implements INetworkTransformation {
 				subInstance.setId(id);
 
 				// copy attributes
-				Map<String, IAttribute> vertexAttrs = subInstance
-						.getAttributes();
-				for (Entry<String, IAttribute> attr : attrs.entrySet()) {
-					if (!vertexAttrs.containsKey(attr.getKey())) {
-						vertexAttrs.put(attr.getKey(), attr.getValue());
-					}
-				}
+				List<Attribute> vertexAttrs = subInstance.getAttributes();
+				vertexAttrs.addAll(attrs);
 
 				graph.addVertex(vertex);
 			}
@@ -181,8 +176,9 @@ public class NetworkFlattener implements INetworkTransformation {
 			Set<Connection> outgoingEdgeSet = subGraph.outgoingEdgesOf(v);
 
 			for (Connection newEdge : outgoingEdgeSet) {
-				Connection incoming = new Connection(edge.getSource(),
-						newEdge.getTarget(), edge.getAttributes());
+				Connection incoming = DfFactory.eINSTANCE.createConnection(
+						edge.getSource(), newEdge.getTarget(),
+						edge.getAttributes());
 				graph.addEdge(graph.getEdgeSource(edge),
 						subGraph.getEdgeTarget(newEdge), incoming);
 			}
@@ -211,8 +207,9 @@ public class NetworkFlattener implements INetworkTransformation {
 			Set<Connection> incomingEdgeSet = subGraph.incomingEdgesOf(v);
 
 			for (Connection newEdge : incomingEdgeSet) {
-				Connection incoming = new Connection(newEdge.getSource(),
-						edge.getTarget(), edge.getAttributes());
+				Connection incoming = DfFactory.eINSTANCE.createConnection(
+						newEdge.getSource(), edge.getTarget(),
+						edge.getAttributes());
 				graph.addEdge(subGraph.getEdgeSource(newEdge),
 						graph.getEdgeTarget(edge), incoming);
 			}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,29 +26,53 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.df.attributes;
+package net.sf.orcc.df;
 
-import java.util.List;
+import org.eclipse.emf.ecore.EObject;
 
 /**
- * This interface represents a custom attribute, which is an attribute with any
- * kind of information attached to it.
+ * This interface defines an attribute that can be put on instances or
+ * connections in a network.
  * 
  * @author Matthieu Wipliez
- * 
+ * @model
  */
-public interface ICustomAttribute extends IAttribute {
+public interface Attribute extends EObject {
+
+	String CUSTOM = "Custom";
+
+	String FLAG = "Flag";
+	
+	String STRING = "String";
+	
+	String TYPE = "Type";
+	
+	String VALUE = "Value";
 
 	/**
-	 * custom attribute name.
-	 */
-	public static final String NAME = "Custom";
-
-	/**
-	 * Returns the children of this attribute as a list of {@link XmlElement}s.
+	 * Returns the name of this attribute.
 	 * 
-	 * @return the children of this attribute as a list of {@link XmlElement}s
+	 * @return the name of this attribute
+	 * @model
 	 */
-	public List<XmlElement> getValue();
+	String getName();
+
+	/**
+	 * Returns the value of this attribute.
+	 * 
+	 * @return the value of this attribute
+	 * @model containment="true"
+	 */
+	EObject getValue();
+
+	/**
+	 * Sets the name of this attribute.
+	 */
+	void setName(String newName);
+
+	/**
+	 * Sets the value of this attribute.
+	 */
+	void setValue(EObject newValue);
 
 }

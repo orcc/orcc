@@ -39,8 +39,6 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
 
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.jgrapht.DirectedGraph;
 
 /**
@@ -249,16 +247,6 @@ public interface Network extends Entity {
 	EList<Var> getVariables();
 
 	/**
-	 * Walks through the hierarchy, instantiate actors, and checks that
-	 * connections actually point to ports defined in actors. Instantiating an
-	 * actor implies first loading it and then giving it the right parameters.
-	 * 
-	 * @param paths
-	 *            a list of paths
-	 */
-	void instantiate(ResourceSet set, List<IFolder> paths);
-
-	/**
 	 * Merges actors of this network. Note that for this transformation to work
 	 * properly, actors must have been classified and normalized first.
 	 * 
@@ -284,10 +272,5 @@ public interface Network extends Entity {
 	 *            the new MoC of this network
 	 */
 	void setMoC(MoC moc);
-
-	/**
-	 * Computes the hierarchical identifier of each instance.
-	 */
-	void updateIdentifiers();
 
 }

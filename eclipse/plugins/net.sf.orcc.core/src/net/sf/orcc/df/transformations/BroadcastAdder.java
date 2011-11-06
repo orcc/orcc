@@ -37,10 +37,10 @@ import java.util.Set;
 
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
-import net.sf.orcc.df.attributes.IAttribute;
 import net.sf.orcc.ir.Port;
 
 import org.jgrapht.DirectedGraph;
@@ -61,10 +61,10 @@ public class BroadcastAdder implements INetworkTransformation {
 	protected void createBroadcast(String id, Port port,
 			List<Connection> outList) {
 		// add broadcast vertex
-		Broadcast bcast = new Broadcast(outList.size(), port.getType());
+		Broadcast bcast = DfFactory.eINSTANCE.createBroadcast(outList.size(),
+				port.getType());
 		String name = id + "_" + port.getName();
-		Instance newInst = new Instance(name, "Broadcast");
-		newInst.setContents(bcast);
+		Instance newInst = DfFactory.eINSTANCE.createInstance(name, bcast);
 		Vertex vertexBCast = new Vertex(newInst);
 		graph.addVertex(vertexBCast);
 
@@ -90,9 +90,9 @@ public class BroadcastAdder implements INetworkTransformation {
 		Port bcastInput = bcast.getInput();
 
 		// creates a connection between the vertex and the broadcast
-		Map<String, IAttribute> attributes = connection.getAttributes();
 		Port srcPort = connection.getSource();
-		Connection incoming = new Connection(srcPort, bcastInput, attributes);
+		Connection incoming = DfFactory.eINSTANCE.createConnection(srcPort,
+				bcastInput, connection.getAttributes());
 		graph.addEdge(vertex, vertexBCast, incoming);
 	}
 
@@ -113,9 +113,9 @@ public class BroadcastAdder implements INetworkTransformation {
 			Port outputPort = bcast.getOutput("output_" + i);
 			i++;
 
-			Map<String, IAttribute> attributes = connection.getAttributes();
-			Connection connBcastTarget = new Connection(outputPort,
-					connection.getTarget(), attributes);
+			Connection connBcastTarget = DfFactory.eINSTANCE.createConnection(
+					outputPort, connection.getTarget(),
+					connection.getAttributes());
 			graph.addEdge(vertexBCast, target, connBcastTarget);
 
 			// setting source to null so we don't examine it again

@@ -60,6 +60,7 @@ import net.sf.orcc.backends.xlim.transformations.LocalArrayRemoval;
 import net.sf.orcc.backends.xlim.transformations.UnaryListRemoval;
 import net.sf.orcc.backends.xlim.transformations.XlimDeadVariableRemoval;
 import net.sf.orcc.backends.xlim.transformations.XlimVariableRenamer;
+import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.ir.Actor;
@@ -288,9 +289,8 @@ public class XlimBackendImpl extends AbstractBackend {
 			}
 			StandardPrinter instancePrinter = new StandardPrinter(
 					"net/sf/orcc/backends/xlim/hardware/Verilog_testbench.stg");
-			Instance instance = new Instance(network.getName(),
-					network.getName());
-			instance.setContents(network);
+			Instance instance = DfFactory.eINSTANCE.createInstance(
+					network.getName(), network);
 			printTestbench(instancePrinter, instance);
 			printTCL(instance);
 

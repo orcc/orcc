@@ -38,6 +38,7 @@ import java.util.Set;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
@@ -615,9 +616,8 @@ public class ActorMerger implements INetworkTransformation {
 			mergeActors();
 
 			// update the graph
-			Instance instance = new Instance("superActor_" + index,
-					"SuperActor_" + index++);
-			instance.setContents(superActor);
+			Instance instance = DfFactory.eINSTANCE.createInstance(
+					"superActor_" + index++, superActor);
 
 			Vertex mergeVertex = new Vertex(instance);
 			graph.addVertex(mergeVertex);
@@ -638,17 +638,18 @@ public class ActorMerger implements INetworkTransformation {
 			Vertex tgt = graph.getEdgeTarget(connection);
 
 			if (!vertices.contains(src) && vertices.contains(tgt)) {
-				Connection newConn = new Connection(connection.getSource(),
-						inputs.get(connection), connection.getAttributes());
+				Connection newConn = DfFactory.eINSTANCE.createConnection(
+						connection.getSource(), inputs.get(connection),
+						connection.getAttributes());
 				graph.addEdge(graph.getEdgeSource(connection), merge, newConn);
 			}
 
 			if (vertices.contains(src) && !vertices.contains(tgt)) {
-				Connection newConn = new Connection(outputs.get(connection),
-						connection.getTarget(), connection.getAttributes());
+				Connection newConn = DfFactory.eINSTANCE.createConnection(
+						outputs.get(connection), connection.getTarget(),
+						connection.getAttributes());
 				graph.addEdge(merge, graph.getEdgeTarget(connection), newConn);
 			}
 		}
 	}
-
 }

@@ -49,7 +49,6 @@ import java.util.concurrent.Future;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.impl.NetworkImpl;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.OrccUtil;
@@ -73,6 +72,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 
@@ -154,14 +154,12 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		// parses top network
 		write("Parsing XDF network...\n");
 		Network network = IrUtil.deserializeEntity(set, inputFile);
-		network.updateIdentifiers();
 		if (isCanceled()) {
 			return;
 		}
 
 		write("Instantiating actors...\n");
-		network.instantiate(set, vtlFolders);
-		NetworkImpl.clearActorPool();
+		EcoreUtil.resolveAll(network);
 		write("Instantiation done\n");
 
 		// because the UnitImporter will load additional resources, we filter

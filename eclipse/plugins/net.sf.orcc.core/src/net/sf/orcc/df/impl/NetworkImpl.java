@@ -47,7 +47,6 @@ import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
-import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.df.transformations.NetworkClassifier;
 import net.sf.orcc.df.transformations.NetworkFlattener;
 import net.sf.orcc.df.transformations.SolveParametersTransform;
@@ -59,14 +58,12 @@ import net.sf.orcc.moc.MoC;
 import net.sf.orcc.tools.merger.ActorMerger;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
 
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 import org.jgrapht.DirectedGraph;
@@ -81,41 +78,6 @@ import org.jgrapht.graph.DirectedMultigraph;
  * @generated
  */
 public class NetworkImpl extends EntityImpl implements Network {
-
-	private static Map<String, Actor> actorPool = new HashMap<String, Actor>();
-
-	/**
-	 * Clears the actor pool. Should be called after a network has been
-	 * instantiated.
-	 */
-	public static void clearActorPool() {
-		actorPool.clear();
-	}
-
-	/**
-	 * Returns the actor from the pool that has the given class, or
-	 * <code>null</code> if there is not.
-	 * 
-	 * @param actorClass
-	 *            the actor class name
-	 * @return the actor from the pool that has the given class, or
-	 *         <code>null</code> if there is not
-	 */
-	public static Actor getActorFromPool(String actorClass) {
-		return actorPool.get(actorClass);
-	}
-
-	/**
-	 * Puts the given actor in the pool that has the given class.
-	 * 
-	 * @param actorClass
-	 *            the actor class name
-	 * @param actor
-	 *            the actor
-	 */
-	public static void putActorInPool(String actorClass, Actor actor) {
-		actorPool.put(actorClass, actor);
-	}
 
 	private Map<Connection, Integer> connectionMap;
 
@@ -787,18 +749,6 @@ public class NetworkImpl extends EntityImpl implements Network {
 			variables = new EObjectContainmentEList<Var>(Var.class, this, DfPackage.NETWORK__VARIABLES);
 		}
 		return variables;
-	}
-
-	/**
-	 * Walks through the hierarchy, instantiate actors, and checks that
-	 * connections actually point to ports defined in actors. Instantiating an
-	 * actor implies first loading it and then giving it the right parameters.
-	 * 
-	 * @param paths
-	 *            a list of paths
-	 */
-	public void instantiate(ResourceSet set, List<IFolder> paths) {
-		new Instantiator(set, paths).transform(this);
 	}
 
 	/**

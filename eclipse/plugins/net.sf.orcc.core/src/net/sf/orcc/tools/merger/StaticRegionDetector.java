@@ -38,6 +38,7 @@ import java.util.Set;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
@@ -91,7 +92,7 @@ public class StaticRegionDetector {
 		for (Vertex vertex : graph.vertexSet()) {
 			clusteredGraph.addVertex(vertex);
 		}
-		
+
 		for (Connection connection : graph.edgeSet()) {
 			clusteredGraph.addEdge(graph.getEdgeSource(connection),
 					graph.getEdgeTarget(connection), connection);
@@ -100,8 +101,8 @@ public class StaticRegionDetector {
 		Actor cluster = IrFactory.eINSTANCE.createActor();
 		cluster.setName("cluster");
 
-		Instance inst = new Instance(cluster.getName(), cluster.getName());
-		inst.setContents(cluster);
+		Instance inst = DfFactory.eINSTANCE.createInstance(cluster.getName(),
+				cluster);
 		Vertex clusterVertex = new Vertex(inst);
 
 		clusteredGraph.addVertex(clusterVertex);
@@ -114,16 +115,16 @@ public class StaticRegionDetector {
 				Port tgtPort = IrFactory.eINSTANCE.createPort(edge.getTarget());
 				tgtPort.setName("input_" + outIndex++);
 				cluster.getInputs().add(tgtPort);
-				Connection incoming = new Connection(edge.getSource(), tgtPort,
-						edge.getAttributes());
+				Connection incoming = DfFactory.eINSTANCE.createConnection(
+						edge.getSource(), tgtPort, edge.getAttributes());
 				clusteredGraph.addEdge(srcVertex, clusterVertex, incoming);
 			} else if (vertices.contains(srcVertex)
 					&& !vertices.contains(tgtVertex)) {
 				Port srcPort = IrFactory.eINSTANCE.createPort(edge.getSource());
 				srcPort.setName("output_" + inIndex++);
 				cluster.getOutputs().add(srcPort);
-				Connection outgoing = new Connection(srcPort, edge.getTarget(),
-						edge.getAttributes());
+				Connection outgoing = DfFactory.eINSTANCE.createConnection(
+						srcPort, edge.getTarget(), edge.getAttributes());
 				clusteredGraph.addEdge(clusterVertex, tgtVertex, outgoing);
 			}
 		}
@@ -204,13 +205,13 @@ public class StaticRegionDetector {
 
 		List<Vertex> vertices = new TopologicalSorter(graph).topologicalSort();
 		for (Vertex vertex : vertices) {
-			if(vertex.isInstance()) {
+			if (vertex.isInstance()) {
 				MoC clasz = vertex.getInstance().getMoC();
 				if (!discovered.contains(vertex) && clasz.isCSDF()) {
 					List<Vertex> set = new LinkedList<Vertex>();
 					staticRegionList.add(set);
 					staticRegionAnalysis(graph, vertex, set);
-				}				
+				}
 			}
 		}
 

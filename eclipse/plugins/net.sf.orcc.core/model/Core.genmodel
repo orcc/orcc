@@ -14,6 +14,31 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Network/parameters"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Network/variables"/>
     </genClasses>
+    <genClasses image="false" ecoreClass="Df.ecore#//Attribute">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Attribute/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Attribute/value"/>
+    </genClasses>
+    <genClasses ecoreClass="Df.ecore#//Connection">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Connection/attributes"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Connection/fifoId"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Connection/source"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Connection/target"/>
+    </genClasses>
+    <genClasses ecoreClass="Df.ecore#//Instance">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Instance/attributes"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Instance/contents"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Instance/id"/>
+    </genClasses>
+    <genClasses ecoreClass="Df.ecore#//Broadcast">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Broadcast/inputs"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Broadcast/outputs"/>
+    </genClasses>
+    <genClasses ecoreClass="Df.ecore#//WrapperString">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//WrapperString/string"/>
+    </genClasses>
+    <genClasses ecoreClass="Df.ecore#//WrapperXml">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//WrapperXml/xml"/>
+    </genClasses>
   </genPackages>
   <genPackages prefix="Ir" basePackage="net.sf.orcc" disposableProviderFactory="true"
       ecorePackage="Ir.ecore#/">

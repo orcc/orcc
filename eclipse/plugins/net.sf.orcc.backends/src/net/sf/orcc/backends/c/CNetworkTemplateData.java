@@ -30,18 +30,19 @@ package net.sf.orcc.backends.c;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
-import net.sf.orcc.df.attributes.IAttribute;
-import net.sf.orcc.df.attributes.StringAttribute;
 import net.sf.orcc.ir.Port;
 
 import org.jgrapht.DirectedGraph;
@@ -62,7 +63,7 @@ public class CNetworkTemplateData {
 	/**
 	 * Contains a list of Id of all connections with an other target.
 	 */
-	private List<IAttribute> listConnectionId;
+	private List<Attribute> listConnectionId;
 
 	/**
 	 * Contains a list of instances corresponding to all connections with an
@@ -92,14 +93,14 @@ public class CNetworkTemplateData {
 	 * This map links instance's port with a StringAttribute. This
 	 * StringAttribute contains the medium connection when it exists.
 	 */
-	private Map<Instance, Map<Port, IAttribute>> portMedium;
+	private Map<Instance, Map<Port, Attribute>> portMedium;
 
 	/**
 	 * This map links instance's port with a StringAttribute. This
 	 * StringAttribute contains the medium (the string is in capital letters)
 	 * connection when it exists.
 	 */
-	private Map<Instance, Map<Port, IAttribute>> portMediumUpperCase;
+	private Map<Instance, Map<Port, Attribute>> portMediumUpperCase;
 
 	/**
 	 * This list contains all instance which will be launched at the beginning
@@ -134,8 +135,8 @@ public class CNetworkTemplateData {
 		for (Instance instance : network.getInstances()) {
 			if (instance.isActor() || instance.isBroadcast()) {
 				Set<String> mediumSet = new HashSet<String>();
-				Map<Port, IAttribute> instancePorts = new HashMap<Port, IAttribute>();
-				Map<Port, IAttribute> instancePortsUpperCase = new HashMap<Port, IAttribute>();
+				Map<Port, Attribute> instancePorts = new HashMap<Port, Attribute>();
+				Map<Port, Attribute> instancePortsUpperCase = new HashMap<Port, Attribute>();
 
 				// For all connections in the instance's input
 				for (Connection connection : network.getGraph()
@@ -146,14 +147,13 @@ public class CNetworkTemplateData {
 							connection.getAttribute("commMediumUpperCase"));
 
 					// if the instance connected is in an other target
-					if (connection.getAttributes().containsKey("commMedium")) {
+					if (connection.getAttribute("commMedium") != null) {
 						connectionToInstance.put(connection, instance);
 						connectionToPort
 								.put(connection, connection.getTarget());
 
-						StringAttribute connectionAttribute = (StringAttribute) connection
-								.getAttribute("commMedium");
-						mediumSet.add(connectionAttribute.getValue());
+						// TODO what should we do here?
+						// mediumSet.add(connection.getAttribute("commMedium").getValue());
 					}
 				}
 
@@ -166,14 +166,13 @@ public class CNetworkTemplateData {
 							connection.getAttribute("commMediumUpperCase"));
 
 					// if the instance connected is in an other target
-					if (connection.getAttributes().containsKey("commMedium")) {
+					if (connection.getAttribute("commMedium") != null) {
 						connectionToInstance.put(connection, instance);
 						connectionToPort
 								.put(connection, connection.getSource());
 
-						StringAttribute connectionAttribute = (StringAttribute) connection
-								.getAttribute("commMedium");
-						mediumSet.add(connectionAttribute.getValue());
+						// TODO what should we do here?
+						// mediumSet.add(connection.getAttribute("commMedium").getValue());
 					}
 				}
 				allMedium.addAll(mediumSet);
@@ -189,7 +188,17 @@ public class CNetworkTemplateData {
 
 		List<Connection> allConnections = new ArrayList<Connection>(
 				connectionToInstance.keySet());
-		Collections.sort(allConnections);
+		Collections.sort(allConnections, new Comparator<Connection>() {
+
+			@Override
+			public int compare(Connection c1, Connection c2) {
+				int i1 = c1.getFifoId();
+				int i2 = c2.getFifoId();
+				return (i1 < i2 ? -1 : (i1 == i2 ? 0 : 1));
+			}
+
+		});
+
 		for (Connection connection : allConnections) {
 			listMediumInstances.add(connectionToInstance.get(connection));
 			listMediumPorts.add(connectionToPort.get(connection));
@@ -297,8 +306,8 @@ public class CNetworkTemplateData {
 	public void computeHierarchicalTemplateMaps(Network network) {
 		instanceToGroupIdMap = new HashMap<Instance, Integer>();
 		numberOfGroups = 0;
-		Instance instance = new Instance("network", "");
-		instance.setContents(network);
+		Instance instance = DfFactory.eINSTANCE.createInstance("network",
+				network);
 		recursiveGroupsComputation(instance, 2);
 	}
 
@@ -309,12 +318,12 @@ public class CNetworkTemplateData {
 	 *            a network
 	 */
 	public void computeTemplateMaps(Network network) {
-		portMedium = new HashMap<Instance, Map<Port, IAttribute>>();
-		portMediumUpperCase = new HashMap<Instance, Map<Port, IAttribute>>();
+		portMedium = new HashMap<Instance, Map<Port, Attribute>>();
+		portMediumUpperCase = new HashMap<Instance, Map<Port, Attribute>>();
 		listMediumInstances = new ArrayList<Instance>();
 		listMediumPorts = new ArrayList<Port>();
 		listMediumUsed = new HashMap<Instance, List<String>>();
-		listConnectionId = new ArrayList<IAttribute>();
+		listConnectionId = new ArrayList<Attribute>();
 		listMediumUsedAllInstances = new ArrayList<String>();
 		sourceInstances = new ArrayList<Instance>();
 		instanceNameToGroupIdMap = new HashMap<String, Integer>();
@@ -356,7 +365,7 @@ public class CNetworkTemplateData {
 	 * 
 	 * @return a list of instances
 	 */
-	public List<IAttribute> getListConnectionId() {
+	public List<Attribute> getListConnectionId() {
 		return listConnectionId;
 	}
 
@@ -390,7 +399,7 @@ public class CNetworkTemplateData {
 	 * 
 	 * @return a map of instance's ports to communication medium
 	 */
-	public Map<Instance, Map<Port, IAttribute>> getPortMedium() {
+	public Map<Instance, Map<Port, Attribute>> getPortMedium() {
 		return portMedium;
 	}
 
@@ -411,7 +420,7 @@ public class CNetworkTemplateData {
 	 * @return a map of instance's ports to communication medium (the
 	 *         corresponding string is composed by capital letters)
 	 */
-	public Map<Instance, Map<Port, IAttribute>> getUpperCasePortMedium() {
+	public Map<Instance, Map<Port, Attribute>> getUpperCasePortMedium() {
 		return portMediumUpperCase;
 	}
 

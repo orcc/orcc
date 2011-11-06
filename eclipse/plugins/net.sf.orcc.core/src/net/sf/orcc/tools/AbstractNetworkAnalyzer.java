@@ -42,7 +42,6 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.impl.NetworkImpl;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.WriteListener;
@@ -55,6 +54,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 
@@ -119,11 +119,6 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 	 */
 	protected String path;
 
-	/**
-	 * Path of the folder that contains VTL under IR form.
-	 */
-	private List<IFolder> vtlFolders;
-
 	private ResourceSet set;
 
 	public AbstractNetworkAnalyzer(AbstractActorAnalyzer actorAnalyzer) {
@@ -162,8 +157,6 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 
 	@Override
 	public void analyzeVTL(List<IFolder> vtlFolders) throws OrccException {
-		this.vtlFolders = vtlFolders;
-
 		// lists actors
 		listener.writeText("Lists actors...\n");
 		List<IFile> vtlFiles = OrccUtil.getAllFiles("ir", vtlFolders);
@@ -179,14 +172,12 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 		IFile xdfFile = root.getFile(new Path(inputFile));
 
 		Network network = IrUtil.deserializeEntity(set, xdfFile);
-		network.updateIdentifiers();
 		if (isCanceled()) {
 			return;
 		}
 
 		listener.writeText("Instantiating actors...\n");
-		network.instantiate(set, vtlFolders);
-		NetworkImpl.clearActorPool();
+		EcoreUtil.resolveAll(network);
 		listener.writeText("Instantiation done\n");
 
 		if (isCanceled()) {

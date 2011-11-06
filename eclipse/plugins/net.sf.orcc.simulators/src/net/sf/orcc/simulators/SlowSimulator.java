@@ -45,13 +45,11 @@ import java.util.Set;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
-import net.sf.orcc.df.attributes.IAttribute;
-import net.sf.orcc.df.attributes.IValueAttribute;
-import net.sf.orcc.df.impl.NetworkImpl;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Port;
@@ -69,6 +67,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.jgrapht.DirectedGraph;
 
 /**
@@ -144,10 +143,10 @@ public class SlowSimulator extends AbstractSimulator {
 			if (srcVertex.isInstance() && tgtVertex.isInstance()) {
 				// get FIFO size (user-defined nor default)
 				int size;
-				IAttribute attr = connection
+				Attribute attr = connection
 						.getAttribute(Connection.BUFFER_SIZE);
-				if (attr != null && attr.getType() == IAttribute.VALUE) {
-					Expression expr = ((IValueAttribute) attr).getValue();
+				if (attr != null && attr.getType() == Attribute.VALUE) {
+					Expression expr = ((AttrValue) attr).getValue();
 					size = new ExpressionEvaluator().evaluateAsInteger(expr) + 1;
 				} else {
 					size = fifoSize;
@@ -261,8 +260,7 @@ public class SlowSimulator extends AbstractSimulator {
 			Network network = IrUtil.deserializeEntity(set, file);
 
 			// Instantiate the network
-			network.instantiate(set, vtlFolders);
-			NetworkImpl.clearActorPool();
+			EcoreUtil.resolveAll(network);
 
 			// Flatten the hierarchical network
 			network.flatten();

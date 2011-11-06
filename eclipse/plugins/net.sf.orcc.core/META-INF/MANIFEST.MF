@@ -18,7 +18,6 @@ Bundle-ClassPath: .
 Bundle-Vendor: IETR/INSA Rennes
 Export-Package: net.sf.orcc,
  net.sf.orcc.df,
- net.sf.orcc.df.attributes,
  net.sf.orcc.df.impl,
  net.sf.orcc.df.serialize,
  net.sf.orcc.df.transformations,

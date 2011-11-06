@@ -39,14 +39,12 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.cpp.transformations.SerDesAdder;
 import net.sf.orcc.backends.transformations.UnitImporter;
+import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.attributes.IAttribute;
-import net.sf.orcc.df.attributes.IValueAttribute;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprString;
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.util.ActorVisitor;
 
 import org.eclipse.core.resources.IFile;
@@ -86,7 +84,7 @@ public class CppBackendImpl extends AbstractBackend {
 			String srcName = getPartNameAttribute(src);
 			String tgtName = getPartNameAttribute(tgt);
 
-			if (src.isSerdes() || tgt.isSerdes()) {
+			if (src.isWrapper() || tgt.isWrapper()) {
 				needSerDes = true;
 
 				kind = 1;
@@ -173,10 +171,9 @@ public class CppBackendImpl extends AbstractBackend {
 
 	private String getPartNameAttribute(Instance instance) throws OrccException {
 		String partName = DEFAULT_PARTITION;
-		IAttribute attr = instance.getAttribute("partName");
+		Attribute attr = instance.getAttribute("partName");
 		if (attr != null) {
-			Expression expr = ((IValueAttribute) attr).getValue();
-			partName = ((ExprString) expr).getValue();
+			partName = ((ExprString) attr.getValue()).getValue();
 		}
 		return partName;
 	}

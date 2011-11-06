@@ -52,6 +52,7 @@ import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.vhdl.ram.RAMTransformation;
 import net.sf.orcc.backends.vhdl.transformations.BoolExprTransformation;
 import net.sf.orcc.backends.vhdl.transformations.ListDeclarationTransformation;
+import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transformations.BroadcastAdder;
@@ -309,7 +310,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 		StandardPrinter instancePrinter = new StandardPrinter(
 				"net/sf/orcc/backends/vhdl/VHDL_testbench.stg");
-		Instance instance = new Instance(network.getName(), network.getName());
+		Instance instance = DfFactory.eINSTANCE.createInstance(
+				network.getName(), network);
 		instance.setContents(network);
 		printTestbench(instancePrinter, instance);
 		printTCL(instance);

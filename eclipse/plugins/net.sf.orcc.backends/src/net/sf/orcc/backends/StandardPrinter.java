@@ -38,6 +38,7 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.ir.Actor;
 
+import org.eclipse.emf.ecore.EObject;
 import org.stringtemplate.v4.ST;
 
 /**
@@ -122,9 +123,10 @@ public class StandardPrinter extends AbstractPrinter {
 			instanceModified = network.getFile().getLocalTimeStamp();
 		}
 
-		Instance parent = instance.getParent();
-		if (parent != null) {
-			long parentModif = getLastModifiedHierarchy(parent);
+		EObject cter = instance.eContainer();
+		if (cter instanceof Network) {
+			Network network = instance.getNetwork();
+			long parentModif = network.getFile().getLocalTimeStamp();
 			return Math.max(parentModif, instanceModified);
 		} else {
 			return instanceModified;

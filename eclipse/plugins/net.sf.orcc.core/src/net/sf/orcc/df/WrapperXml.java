@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,20 +26,31 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.df.attributes;
+package net.sf.orcc.df;
+
+import org.eclipse.emf.ecore.EObject;
 
 /**
- * This interface represents an attribute that is a flag. A flag attribute has
- * no value.
+ * This interface defines a wrapper for XML content.
  * 
  * @author Matthieu Wipliez
- * 
+ * @model
  */
-public interface IFlagAttribute extends IAttribute {
+public interface WrapperXml extends EObject {
 
 	/**
-	 * flag attribute name.
+	 * @model
 	 */
-	public static final String NAME = "Flag";
+	String getXml();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.df.WrapperXml#getXml <em>Xml</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Xml</em>' attribute.
+	 * @see #getXml()
+	 * @generated
+	 */
+	void setXml(String value);
 
 }

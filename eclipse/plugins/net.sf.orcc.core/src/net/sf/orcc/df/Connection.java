@@ -28,17 +28,10 @@
  */
 package net.sf.orcc.df;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import net.sf.orcc.df.attributes.IAttribute;
-import net.sf.orcc.df.attributes.IAttributeContainer;
-import net.sf.orcc.df.attributes.IValueAttribute;
-import net.sf.orcc.df.attributes.ValueAttribute;
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.util.ExpressionEvaluator;
+
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class represents a connection in a network. A connection can have a
@@ -46,150 +39,62 @@ import net.sf.orcc.ir.util.ExpressionEvaluator;
  * 
  * @author Matthieu Wipliez
  * @author Herve Yviquel
- * 
+ * @model
  */
-public class Connection implements IAttributeContainer, Comparable<Connection> {
+public interface Connection extends EObject {
+
+	/**
+	 * Returns the attribute associated with the given name.
+	 * 
+	 * @param name
+	 *            an attribute name
+	 * @return the attribute associated with the given name, or if not found,
+	 *         <code>null</code>
+	 */
+	Attribute getAttribute(String name);
+
+	/**
+	 * Returns the map of attributes contained in this object.
+	 * 
+	 * @return the map of attributes contained in this object
+	 * @model containment="true"
+	 */
+	EList<Attribute> getAttributes();
 
 	/**
 	 * the bufferSize attribute can be attached to a FIFO to specify its size
 	 */
-	public static final String BUFFER_SIZE = "bufferSize";
+	static final String BUFFER_SIZE = "bufferSize";
 
 	/**
-	 * attributes
+	 * @model
 	 */
-	private Map<String, IAttribute> attributes;
-
-	/**
-	 * id of associate fifo
-	 */
-	private int fifoId;
-
-	/**
-	 * source port
-	 */
-	private Port source;
-
-	/**
-	 * target port
-	 */
-	private Port target;
-
-	/**
-	 * Creates a connection from source port to target port with the given size.
-	 * This will create a connection with the {@link #BUFFER_SIZE} attribute set
-	 * to size.
-	 * 
-	 * @param source
-	 *            source port
-	 * @param target
-	 *            target port
-	 * @param size
-	 *            the size of this FIFO
-	 */
-	public Connection(Port source, Port target, int size) {
-		this.attributes = new HashMap<String, IAttribute>();
-		attributes.put(BUFFER_SIZE,
-				new ValueAttribute(IrFactory.eINSTANCE.createExprInt(size)));
-		this.source = source;
-		this.target = target;
-	}
-
-	/**
-	 * Creates a connection from source port to target port with the given
-	 * attributes.
-	 * 
-	 * @param source
-	 *            source port
-	 * @param target
-	 *            target port
-	 * @param attributes
-	 *            a map of attributes
-	 */
-	public Connection(Port source, Port target,
-			Map<String, IAttribute> attributes) {
-		this.attributes = new HashMap<String, IAttribute>(attributes);
-		this.source = source;
-		this.target = target;
-	}
-
-	/**
-	 * Creates a connection from source port to target port with a single given
-	 * attribute.
-	 * 
-	 * @param source
-	 *            source port
-	 * @param target
-	 *            target port
-	 * @param name
-	 *            the attribute name
-	 * @param attribute
-	 *            an attribute
-	 */
-	public Connection(Port source, Port target, String name,
-			IAttribute attribute) {
-		this.attributes = new HashMap<String, IAttribute>();
-		attributes.put(name, attribute);
-		this.source = source;
-		this.target = target;
-	}
-
-	@Override
-	public int compareTo(Connection connection) {
-		Integer this_hashcode = new Integer(this.hashCode());
-		return this_hashcode.compareTo(new Integer(connection.hashCode()));
-	}
-
-	@Override
-	public IAttribute getAttribute(String name) {
-		return attributes.get(name);
-	}
-
-	@Override
-	public Map<String, IAttribute> getAttributes() {
-		return attributes;
-	}
-
-	public int getFifoId() {
-		return fifoId;
-	}
+	int getFifoId();
 
 	/**
 	 * Returns the size of this connection.
 	 * 
 	 * @return the size of this connection
 	 */
-	public Integer getSize() {
-		IAttribute attr = getAttribute(Connection.BUFFER_SIZE);
-		if (attr != null && attr.getType() == IAttribute.VALUE) {
-			Expression expr = ((IValueAttribute) attr).getValue();
-			return new ExpressionEvaluator().evaluateAsInteger(expr);
-		} else {
-			return null;
-		}
-	}
+	Integer getSize();
 
 	/**
 	 * Returns this connection's source port.
 	 * 
 	 * @return this connection's source port
+	 * @model
 	 */
-	public Port getSource() {
-		return source;
-	}
+	Port getSource();
 
 	/**
 	 * Returns this connection's target port.
 	 * 
 	 * @return this connection's target port
+	 * @model
 	 */
-	public Port getTarget() {
-		return target;
-	}
+	Port getTarget();
 
-	public void setFifoId(int fifoId) {
-		this.fifoId = fifoId;
-	}
+	void setFifoId(int fifoId);
 
 	/**
 	 * Sets the source of this connection to the given port
@@ -197,9 +102,7 @@ public class Connection implements IAttributeContainer, Comparable<Connection> {
 	 * @param source
 	 *            a port
 	 */
-	public void setSource(Port source) {
-		this.source = source;
-	}
+	void setSource(Port source);
 
 	/**
 	 * Sets the target of this connection to the given port
@@ -207,7 +110,6 @@ public class Connection implements IAttributeContainer, Comparable<Connection> {
 	 * @param target
 	 *            a port
 	 */
-	public void setTarget(Port target) {
-		this.target = target;
-	}
+	void setTarget(Port target);
+
 }
