@@ -32,7 +32,6 @@ package net.sf.orcc.backends.xlim;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
@@ -82,18 +81,15 @@ public class XlimNetworkTemplateData {
 	 */
 	public void computeNetworkInputPortBroadcast(Network network) {
 		List<Port> inputs = network.getInputs();
-		Set<Vertex> graphVertex = network.getGraph().vertexSet();
-
-		for (Vertex vertex : graphVertex) {
+		for (Vertex vertex : network.getVertices()) {
 			if (vertex.isPort()) {
 				Port port = vertex.getPort();
 				if (inputs.contains(port)) {
-					countNetwokPortBroadcastMap.put(port, network.getGraph()
-							.outDegreeOf(vertex));
+					countNetwokPortBroadcastMap.put(port, vertex
+							.getOutgoingEdges().size());
 				}
 				int cp = 0;
-				for (Connection connection : network.getGraph()
-						.outgoingEdgesOf(vertex)) {
+				for (Connection connection : vertex.getOutgoingEdges()) {
 					countBroadcastConnectionsMap.put(connection, cp++);
 				}
 
