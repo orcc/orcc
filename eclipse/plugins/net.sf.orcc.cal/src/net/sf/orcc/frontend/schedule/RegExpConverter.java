@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.frontend.schedule;
 
+import static net.sf.orcc.df.DfFactory.eINSTANCE;
+
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -38,11 +40,10 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import net.sf.orcc.cal.cal.RegExp;
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.State;
-import net.sf.orcc.ir.Tag;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.FSM;
+import net.sf.orcc.df.State;
+import net.sf.orcc.df.Tag;
 import net.sf.orcc.util.ActionList;
 
 import org.jgrapht.ext.DOTExporter;
@@ -103,7 +104,7 @@ public class RegExpConverter {
 	 * @return an FSM
 	 */
 	public FSM convert(ActionList actionList) {
-		FSM fsm = IrFactory.eINSTANCE.createFSM();
+		FSM fsm = eINSTANCE.createFSM();
 		ThompsonBuilder thompsonBuilder = new ThompsonBuilder();
 		Automaton eNFA = thompsonBuilder.build(regexp);
 		Automaton DFA = new eNFAtoDFA(eNFA).convert();
@@ -131,7 +132,7 @@ public class RegExpConverter {
 	}
 
 	private State formatState(Integer s) {
-		return IrFactory.eINSTANCE.createState("State" + s);
+		return eINSTANCE.createState("State" + s);
 	}
 
 	/**

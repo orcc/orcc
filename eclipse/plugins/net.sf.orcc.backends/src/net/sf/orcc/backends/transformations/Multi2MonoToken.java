@@ -38,10 +38,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.FSM;
+import net.sf.orcc.df.Pattern;
+import net.sf.orcc.df.Port;
+import net.sf.orcc.df.State;
+import net.sf.orcc.df.Tag;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
@@ -49,11 +54,7 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.OpBinary;
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.State;
-import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
@@ -196,7 +197,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	}
 
 	private List<Action> AddedUntaggedActions;
-	//private int bufferSize;
+	// private int bufferSize;
 	private Action done;
 	private Type entryType;
 	private FSM fsm;
@@ -219,7 +220,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	private Map<String, State> statesMap;
 	private Action write;
 	private List<Var> writeIndexes;
-	private List<Integer>bufferSizes;
+	private List<Integer> bufferSizes;
 
 	/**
 	 * transforms the transformed action to a transition action
@@ -247,7 +248,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 * 
 	 */
 	private void addFsm() {
-		fsm = factory.createFSM();
+		fsm = DfFactory.eINSTANCE.createFSM();
 		State initState = statesMap.get("init");
 		fsm.getStates().add(initState);
 		fsm.setInitialState(initState);
@@ -267,7 +268,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		visitedRenameIndex = 0;
 		repeatInput = false;
 		repeatOutput = false;
-		//bufferSize = 0;
+		// bufferSize = 0;
 		AddedUntaggedActions = new ArrayList<Action>();
 		inputBuffers = new ArrayList<Var>();
 		inputPorts = new ArrayList<Port>();
@@ -332,7 +333,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 * @return a new action created with the given name
 	 */
 	private Action createAction(Expression condition, String name) {
-		Tag tag = factory.createTag(name);
+		Tag tag = DfFactory.eINSTANCE.createTag(name);
 
 		// Scheduler building
 		Procedure scheduler = factory.createProcedure("isSchedulable_" + name,
@@ -353,9 +354,10 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		blockBody.add(factory.createInstReturn());
 		body.getNodes().add(blockBody);
 
-		Action action = factory.createAction(tag, factory.createPattern(),
-				factory.createPattern(), factory.createPattern(), scheduler,
-				body);
+		Action action = DfFactory.eINSTANCE.createAction(tag,
+				DfFactory.eINSTANCE.createPattern(),
+				DfFactory.eINSTANCE.createPattern(),
+				DfFactory.eINSTANCE.createPattern(), scheduler, body);
 		actor.getActions().add(action);
 		return action;
 	}
@@ -406,7 +408,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 * @return new done action
 	 */
 	private Action createDoneAction(String name, Var counter, int numTokens) {
-		Tag tag = factory.createTag(name);
+		Tag tag = DfFactory.eINSTANCE.createTag(name);
 
 		// Body building ;-)
 		Procedure body = factory.createProcedure(name, 0,
@@ -444,9 +446,10 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				.createExprVar(result)));
 		scheduler.getNodes().add(blockScheduler);
 
-		Action action = factory.createAction(tag, factory.createPattern(),
-				factory.createPattern(), factory.createPattern(), scheduler,
-				body);
+		Action action = DfFactory.eINSTANCE.createAction(tag,
+				DfFactory.eINSTANCE.createPattern(),
+				DfFactory.eINSTANCE.createPattern(),
+				DfFactory.eINSTANCE.createPattern(), scheduler, body);
 		this.actor.getActions().add(action);
 
 		return action;
@@ -909,7 +912,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 			}
 			if (transformOutFSM == true) {
 				// ////////
-				State initState = factory.createState("init");
+				State initState = DfFactory.eINSTANCE.createState("init");
 				statesMap.put("init", initState);
 				// statesMap.put("init", initState);
 				// no FSM: simply visit all the actions
@@ -922,28 +925,27 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 			}
 			// //////
 		} else {
-				List<Action> actions = new ArrayList<Action>(
-						actor.getActions());
-				boolean transformFSM = false;
-				for (Action verifAction : actions) {
-					for (Entry<Port, Integer> verifEntry : verifAction
-							.getInputPattern().getNumTokensMap().entrySet()) {
-						int verifNumTokens = verifEntry.getValue();
-						if (verifNumTokens > 1) {
-							transformFSM = true;
-							break;
-						}
-					}
-					for (Entry<Port, Integer> verifEntry : verifAction
-							.getOutputPattern().getNumTokensMap().entrySet()) {
-						int verifNumTokens = verifEntry.getValue();
-						if (verifNumTokens > 1) {
-							transformFSM = true;
-							break;
-						}
+			List<Action> actions = new ArrayList<Action>(actor.getActions());
+			boolean transformFSM = false;
+			for (Action verifAction : actions) {
+				for (Entry<Port, Integer> verifEntry : verifAction
+						.getInputPattern().getNumTokensMap().entrySet()) {
+					int verifNumTokens = verifEntry.getValue();
+					if (verifNumTokens > 1) {
+						transformFSM = true;
+						break;
 					}
 				}
-				if (transformFSM == true) {
+				for (Entry<Port, Integer> verifEntry : verifAction
+						.getOutputPattern().getNumTokensMap().entrySet()) {
+					int verifNumTokens = verifEntry.getValue();
+					if (verifNumTokens > 1) {
+						transformFSM = true;
+						break;
+					}
+				}
+			}
+			if (transformFSM == true) {
 				// with an FSM: visits all transitions
 				DirectedGraph<State, UniqueEdge> graph = fsm.getGraph();
 				Set<UniqueEdge> edges = graph.edgeSet();
@@ -1093,20 +1095,22 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				int processIndex = actionPosition(actions, processName);
 				process = actions.get(processIndex);
 
-				String updatestoreName = "newUpdateStateStore" + action.getName()
-						+ visitedRenameIndex;
-				State storeState = factory.createState(updatestoreName);
+				String updatestoreName = "newUpdateStateStore"
+						+ action.getName() + visitedRenameIndex;
+				State storeState = DfFactory.eINSTANCE
+						.createState(updatestoreName);
 				fsm.getStates().add(storeState);
-				String upDateProcessName = "newUpdateStateProcess" + action.getName()
-						+ visitedRenameIndex;
-				State processState = factory.createState(upDateProcessName);
+				String upDateProcessName = "newUpdateStateProcess"
+						+ action.getName() + visitedRenameIndex;
+				State processState = DfFactory.eINSTANCE
+						.createState(upDateProcessName);
 				statesMap.put(upDateProcessName, processState);
 				fsm.getStates().add(processState);
 				fsm.addTransition(processState, process, target);
 				fsm.addTransition(source, oldAction, storeState);
 
 				visitedRenameIndex++;
-				
+
 				for (Entry<Port, Integer> entry : action.getInputPattern()
 						.getNumTokensMap().entrySet()) {
 					inputIndex = inputIndex + 100;
@@ -1122,7 +1126,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 						Action done = actions.get(doneIndex);
 						fsm.addTransition(storeState, done, processState);
 					}
-					
+
 				}
 				break;
 			}
@@ -1138,7 +1142,8 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 
 				String updateWriteName = "newStateWrite" + action.getName()
 						+ visitedRenameIndex;
-				State writeState = factory.createState(updateWriteName);
+				State writeState = DfFactory.eINSTANCE
+						.createState(updateWriteName);
 				fsm.getStates().add(writeState);
 				// create new process action if not created while treating
 				// inputs
@@ -1200,10 +1205,11 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				// process.setOutputPattern(EcoreHelper.copy(action.getOutputPattern()));
 
 				String storeName = "newStateStore" + action.getName();
-				State storeState = factory.createState(storeName);
+				State storeState = DfFactory.eINSTANCE.createState(storeName);
 				fsm.getStates().add(storeState);
 				String processName = "newStateProcess" + action.getName();
-				State processState = factory.createState(processName);
+				State processState = DfFactory.eINSTANCE
+						.createState(processName);
 				statesMap.put(processName, processState);
 				fsm.getStates().add(processState);
 				fsm.addTransition(processState, process, targetState);
@@ -1223,7 +1229,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 					numTokens = entry.getValue();
 					inputIndex = inputIndex + 100;
 					port = entry.getKey();
-					int bufferSize =  OptimalBufferSize(action, port);
+					int bufferSize = OptimalBufferSize(action, port);
 					entryType = port.getType();
 
 					if (inputPorts.contains(port)) {
@@ -1310,7 +1316,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				repeatOutput = true;
 				String processName = "newStateProcess" + action.getName();
 				String writeName = "newStateWrite" + action.getName();
-				State writeState = factory.createState(writeName);
+				State writeState = DfFactory.eINSTANCE.createState(writeName);
 				fsm.getStates().add(writeState);
 				// create new process action if not created while treating
 				// inputs
@@ -1533,7 +1539,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 			}
 		}
 	}
-	
+
 	/**
 	 * this method returns the closest power of 2 of x --> optimal buffer size
 	 * 
@@ -1547,7 +1553,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		}
 		return p;
 	}
-	
+
 	/**
 	 * This method return the closest power of 2 of the maximum repeat value of
 	 * a port
@@ -1574,9 +1580,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	}
 
 	/**
-
-	/**
-	 * visits a transition characterized by its source name, target name and
+	 * /** visits a transition characterized by its source name, target name and
 	 * action
 	 * 
 	 * @param sourceName
@@ -1590,7 +1594,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 			Action action) {
 		verifVisitedActions(action, sourceState, targetState);
 		createActionsSet(action, sourceState, targetState);
-		
+
 		if (repeatInput && !repeatOutput) {
 			// output pattern already copied in process action
 			action.getOutputPattern().clear();

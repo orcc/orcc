@@ -31,8 +31,8 @@ package net.sf.orcc.tools.statistics;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.NodeIf;

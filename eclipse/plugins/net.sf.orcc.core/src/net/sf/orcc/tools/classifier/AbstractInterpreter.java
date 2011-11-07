@@ -32,13 +32,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Pattern;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;

@@ -33,9 +33,9 @@ import java.util.Collection;
 import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
 
 import org.eclipse.emf.common.notify.Notification;

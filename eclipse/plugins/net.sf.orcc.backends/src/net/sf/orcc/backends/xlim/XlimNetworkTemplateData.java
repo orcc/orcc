@@ -36,8 +36,8 @@ import java.util.Map;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
-import net.sf.orcc.ir.Port;
 
 /**
  * This class is giving the necessary information for the XLIM Network

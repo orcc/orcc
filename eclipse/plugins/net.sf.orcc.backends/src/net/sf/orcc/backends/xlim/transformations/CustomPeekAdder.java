@@ -35,13 +35,13 @@ import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.xlim.XlimActorTemplateData;
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Pattern;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;

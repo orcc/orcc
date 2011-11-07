@@ -6,10 +6,12 @@
  */
 package net.sf.orcc.df.util;
 
+import java.util.Map;
 import net.sf.orcc.df.*;
 
 import net.sf.orcc.ir.Entity;
 
+import net.sf.orcc.ir.Var;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notifier;
 
@@ -104,6 +106,54 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseVertex(Vertex object) {
 				return createVertexAdapter();
+			}
+			@Override
+			public Adapter caseAction(Action object) {
+				return createActionAdapter();
+			}
+			@Override
+			public Adapter caseActor(Actor object) {
+				return createActorAdapter();
+			}
+			@Override
+			public Adapter caseFSM(FSM object) {
+				return createFSMAdapter();
+			}
+			@Override
+			public Adapter casePattern(Pattern object) {
+				return createPatternAdapter();
+			}
+			@Override
+			public Adapter casePort(Port object) {
+				return createPortAdapter();
+			}
+			@Override
+			public Adapter caseState(State object) {
+				return createStateAdapter();
+			}
+			@Override
+			public Adapter caseTag(Tag object) {
+				return createTagAdapter();
+			}
+			@Override
+			public Adapter caseTransition(Transition object) {
+				return createTransitionAdapter();
+			}
+			@Override
+			public Adapter caseTransitions(Transitions object) {
+				return createTransitionsAdapter();
+			}
+			@Override
+			public Adapter casePortToEIntegerObjectMapEntry(Map.Entry<Port, Integer> object) {
+				return createPortToEIntegerObjectMapEntryAdapter();
+			}
+			@Override
+			public Adapter casePortToVarMapEntry(Map.Entry<Port, Var> object) {
+				return createPortToVarMapEntryAdapter();
+			}
+			@Override
+			public Adapter caseVarToPortMapEntry(Map.Entry<Var, Port> object) {
+				return createVarToPortMapEntryAdapter();
 			}
 			@Override
 			public Adapter caseEntity(Entity object) {
@@ -238,6 +288,174 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createVertexAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Action <em>Action</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.df.Action
+	 * @generated
+	 */
+	public Adapter createActionAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Actor <em>Actor</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.df.Actor
+	 * @generated
+	 */
+	public Adapter createActorAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.FSM <em>FSM</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.df.FSM
+	 * @generated
+	 */
+	public Adapter createFSMAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Pattern <em>Pattern</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.df.Pattern
+	 * @generated
+	 */
+	public Adapter createPatternAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Port <em>Port</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.df.Port
+	 * @generated
+	 */
+	public Adapter createPortAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.State <em>State</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.df.State
+	 * @generated
+	 */
+	public Adapter createStateAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Tag <em>Tag</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.df.Tag
+	 * @generated
+	 */
+	public Adapter createTagAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Transition <em>Transition</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.df.Transition
+	 * @generated
+	 */
+	public Adapter createTransitionAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Transitions <em>Transitions</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.df.Transitions
+	 * @generated
+	 */
+	public Adapter createTransitionsAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Port To EInteger Object Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see java.util.Map.Entry
+	 * @generated
+	 */
+	public Adapter createPortToEIntegerObjectMapEntryAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Port To Var Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see java.util.Map.Entry
+	 * @generated
+	 */
+	public Adapter createPortToVarMapEntryAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Var To Port Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see java.util.Map.Entry
+	 * @generated
+	 */
+	public Adapter createVarToPortMapEntryAdapter() {
 		return null;
 	}
 

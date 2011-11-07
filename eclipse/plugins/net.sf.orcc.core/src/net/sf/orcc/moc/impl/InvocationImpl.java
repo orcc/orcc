@@ -6,7 +6,7 @@
  */
 package net.sf.orcc.moc.impl;
 
-import net.sf.orcc.ir.Action;
+import net.sf.orcc.df.Action;
 
 import net.sf.orcc.moc.Invocation;
 import net.sf.orcc.moc.MocPackage;

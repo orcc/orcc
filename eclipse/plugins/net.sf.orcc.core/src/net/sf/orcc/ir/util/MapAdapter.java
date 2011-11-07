@@ -33,14 +33,15 @@ import static net.sf.orcc.ir.IrPackage.eINSTANCE;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Port;
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.Port;
+import net.sf.orcc.df.State;
+import net.sf.orcc.df.Transitions;
+import net.sf.orcc.df.impl.ActorImpl;
+import net.sf.orcc.df.impl.FSMImpl;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.State;
-import net.sf.orcc.ir.Transitions;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.impl.ActorImpl;
-import net.sf.orcc.ir.impl.FSMImpl;
 import net.sf.orcc.ir.impl.ProcedureImpl;
 
 import org.eclipse.emf.common.notify.Adapter;
@@ -69,27 +70,27 @@ public class MapAdapter implements Adapter {
 			map = ((ProcedureImpl) target).getLocalsMap();
 			key = ((Var) object).getIndexedName();
 			((Map<Object, Object>) map).put(key, object);
-		} else if (feature == eINSTANCE.getActor_Inputs()) {
+		} else if (feature == DfPackage.eINSTANCE.getActor_Inputs()) {
 			map = ((ActorImpl) target).getInputsMap();
 			key = ((Port) object).getName();
 			((Map<Object, Object>) map).put(key, object);
-		} else if (feature == eINSTANCE.getActor_Outputs()) {
+		} else if (feature == DfPackage.eINSTANCE.getActor_Outputs()) {
 			map = ((ActorImpl) target).getOutputsMap();
 			key = ((Port) object).getName();
 			((Map<Object, Object>) map).put(key, object);
-		} else if (feature == eINSTANCE.getActor_Parameters()) {
+		} else if (feature == DfPackage.eINSTANCE.getActor_Parameters()) {
 			map = ((ActorImpl) target).getParametersMap();
 			key = ((Var) object).getName();
 			((Map<Object, Object>) map).put(key, object);
-		} else if (feature == eINSTANCE.getActor_Procs()) {
+		} else if (feature == DfPackage.eINSTANCE.getActor_Procs()) {
 			map = ((ActorImpl) target).getProceduresMap();
 			key = ((Procedure) object).getName();
 			((Map<Object, Object>) map).put(key, object);
-		} else if (feature == eINSTANCE.getActor_StateVars()) {
+		} else if (feature == DfPackage.eINSTANCE.getActor_StateVars()) {
 			map = ((ActorImpl) target).getStateVariablesMap();
 			key = ((Var) object).getName();
 			((Map<Object, Object>) map).put(key, object);
-		} else if (feature == eINSTANCE.getFSM_Transitions()) {
+		} else if (feature == DfPackage.eINSTANCE.getFSM_Transitions()) {
 			map = ((FSMImpl) target).getTransitionsMap();
 			key = ((Transitions) object).getSourceState();
 			if (key != null) {
@@ -157,27 +158,27 @@ public class MapAdapter implements Adapter {
 			map = ((ProcedureImpl) target).getLocalsMap();
 			key = ((Var) object).getIndexedName();
 			((Map<Object, Object>) map).remove(key);
-		} else if (feature == eINSTANCE.getActor_Inputs()) {
+		} else if (feature == DfPackage.eINSTANCE.getActor_Inputs()) {
 			map = ((ActorImpl) target).getInputsMap();
 			key = ((Port) object).getName();
 			((Map<Object, Object>) map).remove(key);
-		} else if (feature == eINSTANCE.getActor_Outputs()) {
+		} else if (feature == DfPackage.eINSTANCE.getActor_Outputs()) {
 			map = ((ActorImpl) target).getOutputsMap();
 			key = ((Port) object).getName();
 			((Map<Object, Object>) map).remove(key);
-		} else if (feature == eINSTANCE.getActor_Parameters()) {
+		} else if (feature == DfPackage.eINSTANCE.getActor_Parameters()) {
 			map = ((ActorImpl) target).getParametersMap();
 			key = ((Var) object).getName();
 			((Map<Object, Object>) map).remove(key);
-		} else if (feature == eINSTANCE.getActor_Procs()) {
+		} else if (feature == DfPackage.eINSTANCE.getActor_Procs()) {
 			map = ((ActorImpl) target).getProceduresMap();
 			key = ((Procedure) object).getName();
 			((Map<Object, Object>) map).remove(key);
-		} else if (feature == eINSTANCE.getActor_StateVars()) {
+		} else if (feature == DfPackage.eINSTANCE.getActor_StateVars()) {
 			map = ((ActorImpl) target).getStateVariablesMap();
 			key = ((Var) object).getName();
 			((Map<Object, Object>) map).remove(key);
-		} else if (feature == eINSTANCE.getFSM_Transitions()) {
+		} else if (feature == DfPackage.eINSTANCE.getFSM_Transitions()) {
 			map = ((FSMImpl) target).getTransitionsMap();
 			key = ((Transitions) object).getSourceState();
 			if (key != null) {
@@ -188,7 +189,7 @@ public class MapAdapter implements Adapter {
 
 	private void set(Notification notification, Object object) {
 		Object feature = notification.getFeature();
-		if (feature == eINSTANCE.getTransitions_SourceState()) {
+		if (feature == DfPackage.eINSTANCE.getTransitions_SourceState()) {
 			Transitions transitions = (Transitions) target;
 			EObject cter = transitions.eContainer();
 			if (cter instanceof FSMImpl) {

@@ -42,14 +42,14 @@ import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.AstTransition;
 import net.sf.orcc.cal.cal.ExternalTarget;
 import net.sf.orcc.cal.cal.Fsm;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.FSM;
+import net.sf.orcc.df.State;
+import net.sf.orcc.df.Tag;
+import net.sf.orcc.df.Transition;
+import net.sf.orcc.df.Transitions;
 import net.sf.orcc.frontend.Frontend;
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.State;
-import net.sf.orcc.ir.Tag;
-import net.sf.orcc.ir.Transition;
-import net.sf.orcc.ir.Transitions;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.UniqueEdge;
 
@@ -115,7 +115,7 @@ public class FSMBuilder {
 		// add the transitions in the right order
 		for (Action action : nextActions) {
 			State target = targets.get(action);
-			Transition transition = IrFactory.eINSTANCE.createTransition(
+			Transition transition = DfFactory.eINSTANCE.createTransition(
 					action, target);
 			transitions.getList().add(transition);
 		}
@@ -133,7 +133,7 @@ public class FSMBuilder {
 		// build graph
 		for (AstTransition transition : astFsm.getTransitions()) {
 			AstState source = transition.getSource();
-			Tag tag = IrFactory.eINSTANCE.createTag(transition.getTag()
+			Tag tag = DfFactory.eINSTANCE.createTag(transition.getTag()
 					.getIdentifiers());
 			AstState target = transition.getTarget();
 			if (target == null) {
@@ -153,7 +153,7 @@ public class FSMBuilder {
 		}
 
 		// add IR states mapped from AST states
-		FSM fsm = IrFactory.eINSTANCE.createFSM();
+		FSM fsm = DfFactory.eINSTANCE.createFSM();
 		for (AstState astState : graph.vertexSet()) {
 			State state = (State) Frontend.getMapping(astState, false);
 			fsm.getStates().add(state);
@@ -173,7 +173,7 @@ public class FSMBuilder {
 		for (AstState astSource : astFsm.getStates()) {
 			Map<Action, State> targets = getTargets(astSource, actionList);
 
-			Transitions transitions = IrFactory.eINSTANCE.createTransitions();
+			Transitions transitions = DfFactory.eINSTANCE.createTransitions();
 			State source = (State) Frontend.getMapping(astSource, false);
 			transitions.setSourceState(source);
 

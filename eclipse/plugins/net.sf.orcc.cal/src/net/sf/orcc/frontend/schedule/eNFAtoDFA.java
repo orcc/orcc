@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import net.sf.orcc.ir.Tag;
+import net.sf.orcc.df.Tag;
 
 /**
  * This class performs e-closure and determinization in one step.

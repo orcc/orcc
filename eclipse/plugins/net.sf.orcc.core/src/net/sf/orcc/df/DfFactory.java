@@ -8,7 +8,7 @@ package net.sf.orcc.df;
 
 import java.util.List;
 
-import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 
 import org.eclipse.emf.ecore.EFactory;
@@ -31,6 +31,57 @@ public interface DfFactory extends EFactory {
 	DfFactory eINSTANCE = net.sf.orcc.df.impl.DfFactoryImpl.init();
 
 	/**
+	 * Returns a new object of class '<em>Action</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Action</em>'.
+	 * @generated
+	 */
+	Action createAction();
+
+	/**
+	 * Creates a new action with empty patterns, the given tag, scheduler and
+	 * body.
+	 * 
+	 * @param tag
+	 *            action tag
+	 * @param scheduler
+	 *            procedure that computes scheduling information
+	 * @param body
+	 *            procedure that holds the body of the action
+	 */
+	Action createAction(String tag, Procedure scheduler, Procedure body);
+
+	/**
+	 * Creates a new action.
+	 * 
+	 * @param tag
+	 *            action tag name
+	 * @param inputPattern
+	 *            input pattern
+	 * @param outputPattern
+	 *            output pattern
+	 * @param peekedPattern
+	 *            peeked pattern
+	 * @param scheduler
+	 *            procedure that computes scheduling information
+	 * @param body
+	 *            procedure that holds the body of the action
+	 */
+	Action createAction(Tag tagName, Pattern inputPattern,
+			Pattern outputPattern, Pattern peekedPattern, Procedure scheduler,
+			Procedure body);
+
+	/**
+	 * Returns a new object of class '<em>Actor</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Actor</em>'.
+	 * @generated
+	 */
+	Actor createActor();
+
+	/**
 	 * Returns a new object of class '<em>Attribute</em>'.
 	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
@@ -43,49 +94,16 @@ public interface DfFactory extends EFactory {
 
 	/**
 	 * Returns a new object of class '<em>Broadcast</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
 	 * @return a new object of class '<em>Broadcast</em>'.
 	 * @generated
 	 */
 	Broadcast createBroadcast();
 
 	/**
-	 * Returns a new object of class '<em>Wrapper String</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Wrapper String</em>'.
-	 * @generated
-	 */
-	WrapperString createWrapperString();
-
-	WrapperString createWrapperString(String value);
-
-	/**
-	 * Returns a new object of class '<em>Wrapper Xml</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Wrapper Xml</em>'.
-	 * @generated
-	 */
-	WrapperXml createWrapperXml();
-
-	/**
-	 * Returns a new object of class '<em>Vertex</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Vertex</em>'.
-	 * @generated
-	 */
-	Vertex createVertex();
-	
-	Vertex createVertex(Instance instance);
-	
-	Vertex createVertex(Port port);
-
-	/**
-	 * Creates a new broadcast with the given number of outputs and
-	 * type. Type is copied.
+	 * Creates a new broadcast with the given number of outputs and type. Type
+	 * is copied.
 	 * 
 	 * @param numOutput
 	 *            number of outputs
@@ -141,7 +159,16 @@ public interface DfFactory extends EFactory {
 	 */
 	Connection createConnection(Port source, Port target,
 			List<Attribute> attributes);
-	
+
+	/**
+	 * Returns a new object of class '<em>FSM</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>FSM</em>'.
+	 * @generated
+	 */
+	FSM createFSM();
+
 	/**
 	 * Returns a new object of class '<em>Instance</em>'.
 	 * <!-- begin-user-doc
@@ -169,6 +196,116 @@ public interface DfFactory extends EFactory {
 	 * @return a new network
 	 */
 	Network createNetwork(String fileName);
+
+	/**
+	 * Returns a new object of class '<em>Pattern</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Pattern</em>'.
+	 * @generated
+	 */
+	Pattern createPattern();
+
+	/**
+	 * Returns a new object of class '<em>Port</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Port</em>'.
+	 * @generated
+	 */
+	Port createPort();
+
+	Port createPort(Port port);
+
+	Port createPort(Type type, String name);
+
+	Port createPort(Type type, String name, boolean native_);
+
+	/**
+	 * Returns a new object of class '<em>State</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>State</em>'.
+	 * @generated
+	 */
+	State createState();
+
+	/**
+	 * Creates a state with the given name.
+	 * 
+	 * @param name
+	 *            name of the state
+	 * @return a state with the given name
+	 */
+	State createState(String name);
+
+	/**
+	 * Returns a new object of class '<em>Tag</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Tag</em>'.
+	 * @generated
+	 */
+	Tag createTag();
+
+	Tag createTag(List<String> identifiers);
+
+	Tag createTag(String tagName);
+
+	Tag createTag(Tag tag);
+
+	/**
+	 * Returns a new object of class '<em>Transition</em>'.
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
+	 * @return a new object of class '<em>Transition</em>'.
+	 * @generated
+	 */
+	Transition createTransition();
+
+	Transition createTransition(Action action, State target);
+
+	/**
+	 * Returns a new object of class '<em>Transitions</em>'.
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
+	 * @return a new object of class '<em>Transitions</em>'.
+	 * @generated
+	 */
+	Transitions createTransitions();
+
+	/**
+	 * Returns a new object of class '<em>Vertex</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Vertex</em>'.
+	 * @generated
+	 */
+	Vertex createVertex();
+
+	Vertex createVertex(Instance instance);
+
+	Vertex createVertex(Port port);
+
+	/**
+	 * Returns a new object of class '<em>Wrapper String</em>'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return a new object of class '<em>Wrapper String</em>'.
+	 * @generated
+	 */
+	WrapperString createWrapperString();
+
+	WrapperString createWrapperString(String value);
+
+	/**
+	 * Returns a new object of class '<em>Wrapper Xml</em>'.
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
+	 * @return a new object of class '<em>Wrapper Xml</em>'.
+	 * @generated
+	 */
+	WrapperXml createWrapperXml();
 
 	/**
 	 * Returns the package supported by this factory.

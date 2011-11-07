@@ -31,7 +31,7 @@ package net.sf.orcc.moc;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.orcc.ir.Action;
+import net.sf.orcc.df.Action;
 
 /**
  * This class defines a quasi-static dataflow (QSDF) MoC. QSDF is a model that

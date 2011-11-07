@@ -34,10 +34,10 @@ import java.io.OutputStream;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.serialize.XDFParser;
 import net.sf.orcc.df.serialize.XDFWriter;
-import net.sf.orcc.ir.Actor;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;

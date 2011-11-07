@@ -37,14 +37,13 @@ import java.util.List;
 import java.util.Set;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.moc.MoC;
 
 import org.jgrapht.DirectedGraph;
@@ -67,11 +66,10 @@ public class StaticRegionDetector {
 
 	private Set<Set<Vertex>> staticRegionSet;
 
-	private DirectedGraph<Vertex, Connection> graph;
+	private Network network;
 
 	public StaticRegionDetector(Network network) {
-
-		graph = network.getGraph();
+		this.network = network;
 	}
 
 	/**
@@ -80,8 +78,7 @@ public class StaticRegionDetector {
 	 * @param vertices
 	 * @return
 	 */
-	private boolean introduceCycle(DirectedGraph<Vertex, Connection> graph,
-			List<Vertex> vertices) {
+	private boolean introduceCycle(List<Vertex> vertices) {
 		boolean ret = false;
 		int inIndex = 0;
 		int outIndex = 0;
@@ -89,30 +86,31 @@ public class StaticRegionDetector {
 		DirectedGraph<Vertex, Connection> clusteredGraph = new DirectedMultigraph<Vertex, Connection>(
 				Connection.class);
 
-		for (Vertex vertex : graph.vertexSet()) {
+		for (Vertex vertex : network.getVertices()) {
 			clusteredGraph.addVertex(vertex);
 		}
 
-		for (Connection connection : graph.edgeSet()) {
-			clusteredGraph.addEdge(graph.getEdgeSource(connection),
-					graph.getEdgeTarget(connection), connection);
+		for (Connection connection : network.getConnections()) {
+			clusteredGraph.addEdge(connection.getSource(),
+					connection.getTarget(), connection);
 		}
 
-		Actor cluster = IrFactory.eINSTANCE.createActor();
+		Actor cluster = DfFactory.eINSTANCE.createActor();
 		cluster.setName("cluster");
 
 		Instance inst = DfFactory.eINSTANCE.createInstance(cluster.getName(),
 				cluster);
-		Vertex clusterVertex = new Vertex(inst);
+		Vertex clusterVertex = DfFactory.eINSTANCE.createVertex(inst);
 
 		clusteredGraph.addVertex(clusterVertex);
 
-		for (Connection edge : graph.edgeSet()) {
-			Vertex srcVertex = graph.getEdgeSource(edge);
-			Vertex tgtVertex = graph.getEdgeTarget(edge);
+		for (Connection edge : network.getConnections()) {
+			Vertex srcVertex = edge.getSource();
+			Vertex tgtVertex = edge.getTarget();
 
 			if (!vertices.contains(srcVertex) && vertices.contains(tgtVertex)) {
-				Port tgtPort = IrFactory.eINSTANCE.createPort(edge.getTargetPort());
+				Port tgtPort = DfFactory.eINSTANCE.createPort(edge
+						.getTargetPort());
 				tgtPort.setName("input_" + outIndex++);
 				cluster.getInputs().add(tgtPort);
 				Connection incoming = DfFactory.eINSTANCE.createConnection(
@@ -120,7 +118,8 @@ public class StaticRegionDetector {
 				clusteredGraph.addEdge(srcVertex, clusterVertex, incoming);
 			} else if (vertices.contains(srcVertex)
 					&& !vertices.contains(tgtVertex)) {
-				Port srcPort = IrFactory.eINSTANCE.createPort(edge.getSourcePort());
+				Port srcPort = DfFactory.eINSTANCE.createPort(edge
+						.getSourcePort());
 				srcPort.setName("output_" + inIndex++);
 				cluster.getOutputs().add(srcPort);
 				Connection outgoing = DfFactory.eINSTANCE.createConnection(
@@ -155,9 +154,7 @@ public class StaticRegionDetector {
 	 * @throws OrccException
 	 * 
 	 */
-	private void staticRegionAnalysis(DirectedGraph<Vertex, Connection> graph,
-			Vertex vertex, List<Vertex> vertices) {
-
+	private void staticRegionAnalysis(Vertex vertex, List<Vertex> vertices) {
 		LinkedList<Vertex> stack = new LinkedList<Vertex>(Arrays.asList(vertex));
 
 		while (!stack.isEmpty()) {
@@ -171,15 +168,15 @@ public class StaticRegionDetector {
 					}
 					stack.push(v);
 					finished.add(v);
-					for (Connection edge : graph.outgoingEdgesOf(v)) {
-						Vertex tgtVertex = graph.getEdgeTarget(edge);
+					for (Connection edge : v.getOutgoingEdges()) {
+						Vertex tgtVertex = edge.getTarget();
 						moc = tgtVertex.getInstance().getMoC();
 						if (!discovered.contains(tgtVertex) && moc.isCSDF()) {
 							if (vertices != null) {
 								List<Vertex> l = new LinkedList<Vertex>(
 										vertices);
 								l.add(tgtVertex);
-								if (!introduceCycle(graph, l)) {
+								if (!introduceCycle(l)) {
 									stack.push(tgtVertex);
 								}
 							}
@@ -203,14 +200,15 @@ public class StaticRegionDetector {
 		discovered = new HashSet<Vertex>();
 		finished = new HashSet<Vertex>();
 
-		List<Vertex> vertices = new TopologicalSorter(graph).topologicalSort();
+		List<Vertex> vertices = new TopologicalSorter(network)
+				.topologicalSort();
 		for (Vertex vertex : vertices) {
 			if (vertex.isInstance()) {
 				MoC clasz = vertex.getInstance().getMoC();
 				if (!discovered.contains(vertex) && clasz.isCSDF()) {
 					List<Vertex> set = new LinkedList<Vertex>();
 					staticRegionList.add(set);
-					staticRegionAnalysis(graph, vertex, set);
+					staticRegionAnalysis(vertex, set);
 				}
 			}
 		}

@@ -4,38 +4,36 @@
  *
  * $Id$
  */
-package net.sf.orcc.ir.impl;
+package net.sf.orcc.df.impl;
 
-import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Port;
+import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.Port;
+import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.common.notify.Notification;
-
 import org.eclipse.emf.common.util.BasicEMap;
 import org.eclipse.emf.common.util.EMap;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 
 /**
  * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Port To EInteger Object Map Entry</b></em>'.
+ * An implementation of the model object '<em><b>Port To Var Map Entry</b></em>'.
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.ir.impl.PortToEIntegerObjectMapEntryImpl#getTypedKey <em>Key</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.PortToEIntegerObjectMapEntryImpl#getTypedValue <em>Value</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.PortToVarMapEntryImpl#getTypedKey <em>Key</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.PortToVarMapEntryImpl#getTypedValue <em>Value</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements BasicEMap.Entry<Port,Integer> {
+public class PortToVarMapEntryImpl extends EObjectImpl implements BasicEMap.Entry<Port,Var> {
 	/**
 	 * The cached value of the '{@link #getTypedKey() <em>Key</em>}' reference.
 	 * <!-- begin-user-doc -->
@@ -47,31 +45,21 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements Bas
 	protected Port key;
 
 	/**
-	 * The default value of the '{@link #getTypedValue() <em>Value</em>}' attribute.
+	 * The cached value of the '{@link #getTypedValue() <em>Value</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see #getTypedValue()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final Integer VALUE_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getTypedValue() <em>Value</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getTypedValue()
-	 * @generated
-	 * @ordered
-	 */
-	protected Integer value = VALUE_EDEFAULT;
+	protected Var value;
 
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected PortToEIntegerObjectMapEntryImpl() {
+	protected PortToVarMapEntryImpl() {
 		super();
 	}
 
@@ -82,7 +70,7 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements Bas
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return IrPackage.Literals.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY;
+		return DfPackage.Literals.PORT_TO_VAR_MAP_ENTRY;
 	}
 
 	/**
@@ -96,7 +84,7 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements Bas
 			key = (Port)eResolveProxy(oldKey);
 			if (key != oldKey) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY, oldKey, key));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.PORT_TO_VAR_MAP_ENTRY__KEY, oldKey, key));
 			}
 		}
 		return key;
@@ -120,7 +108,7 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements Bas
 		Port oldKey = key;
 		key = newKey;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY, oldKey, key));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.PORT_TO_VAR_MAP_ENTRY__KEY, oldKey, key));
 	}
 
 	/**
@@ -128,7 +116,15 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements Bas
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Integer getTypedValue() {
+	public Var getTypedValue() {
+		if (value != null && value.eIsProxy()) {
+			InternalEObject oldValue = (InternalEObject)value;
+			value = (Var)eResolveProxy(oldValue);
+			if (value != oldValue) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.PORT_TO_VAR_MAP_ENTRY__VALUE, oldValue, value));
+			}
+		}
 		return value;
 	}
 
@@ -137,11 +133,20 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements Bas
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setTypedValue(Integer newValue) {
-		Integer oldValue = value;
+	public Var basicGetTypedValue() {
+		return value;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setTypedValue(Var newValue) {
+		Var oldValue = value;
 		value = newValue;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE, oldValue, value));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.PORT_TO_VAR_MAP_ENTRY__VALUE, oldValue, value));
 	}
 
 	/**
@@ -152,11 +157,12 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements Bas
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY:
+			case DfPackage.PORT_TO_VAR_MAP_ENTRY__KEY:
 				if (resolve) return getTypedKey();
 				return basicGetTypedKey();
-			case IrPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE:
-				return getTypedValue();
+			case DfPackage.PORT_TO_VAR_MAP_ENTRY__VALUE:
+				if (resolve) return getTypedValue();
+				return basicGetTypedValue();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -169,11 +175,11 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements Bas
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY:
+			case DfPackage.PORT_TO_VAR_MAP_ENTRY__KEY:
 				setTypedKey((Port)newValue);
 				return;
-			case IrPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE:
-				setTypedValue((Integer)newValue);
+			case DfPackage.PORT_TO_VAR_MAP_ENTRY__VALUE:
+				setTypedValue((Var)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -187,11 +193,11 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements Bas
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY:
+			case DfPackage.PORT_TO_VAR_MAP_ENTRY__KEY:
 				setTypedKey((Port)null);
 				return;
-			case IrPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE:
-				setTypedValue(VALUE_EDEFAULT);
+			case DfPackage.PORT_TO_VAR_MAP_ENTRY__VALUE:
+				setTypedValue((Var)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -205,28 +211,12 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements Bas
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY:
+			case DfPackage.PORT_TO_VAR_MAP_ENTRY__KEY:
 				return key != null;
-			case IrPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE:
-				return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT.equals(value);
+			case DfPackage.PORT_TO_VAR_MAP_ENTRY__VALUE:
+				return value != null;
 		}
 		return super.eIsSet(featureID);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public String toString() {
-		if (eIsProxy()) return super.toString();
-
-		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (value: ");
-		result.append(value);
-		result.append(')');
-		return result.toString();
 	}
 
 	/**
@@ -281,7 +271,7 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements Bas
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Integer getValue() {
+	public Var getValue() {
 		return getTypedValue();
 	}
 
@@ -290,8 +280,8 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements Bas
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Integer setValue(Integer value) {
-		Integer oldValue = getValue();
+	public Var setValue(Var value) {
+		Var oldValue = getValue();
 		setTypedValue(value);
 		return oldValue;
 	}
@@ -302,9 +292,9 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements Bas
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
-	public EMap<Port, Integer> getEMap() {
+	public EMap<Port, Var> getEMap() {
 		EObject container = eContainer();
-		return container == null ? null : (EMap<Port, Integer>)container.eGet(eContainmentFeature());
+		return container == null ? null : (EMap<Port, Var>)container.eGet(eContainmentFeature());
 	}
 
-} //PortToEIntegerObjectMapEntryImpl
+} //PortToVarMapEntryImpl

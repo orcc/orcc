@@ -36,7 +36,7 @@ import java.util.Map;
 
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.ir.Port;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.Type;
 
 import org.eclipse.emf.common.notify.NotificationChain;

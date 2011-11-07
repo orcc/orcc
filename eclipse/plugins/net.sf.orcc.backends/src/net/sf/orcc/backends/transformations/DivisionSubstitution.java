@@ -32,7 +32,7 @@ package net.sf.orcc.backends.transformations;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;

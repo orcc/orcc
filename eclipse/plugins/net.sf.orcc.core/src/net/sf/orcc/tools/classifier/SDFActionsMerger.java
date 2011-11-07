@@ -32,19 +32,20 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.FSM;
+import net.sf.orcc.df.Pattern;
+import net.sf.orcc.df.State;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.Param;
-import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.transformations.SSATransformation;
@@ -219,8 +220,8 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 		// merges actions
 		Procedure body = mergeSDFBodies(actions);
 
-		Action action = IrFactory.eINSTANCE.createAction(
-				IrFactory.eINSTANCE.createTag(), input, output, peek,
+		Action action = DfFactory.eINSTANCE.createAction(
+				DfFactory.eINSTANCE.createTag(), input, output, peek,
 				scheduler, body);
 
 		// removes the actions, add the action merged
@@ -315,7 +316,7 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 
 	private FSM updateFSM(State initialState,
 			DirectedGraph<State, UniqueEdge> graph) {
-		FSM fsm = IrFactory.eINSTANCE.createFSM();
+		FSM fsm = DfFactory.eINSTANCE.createFSM();
 
 		// Set states of the fsm
 		for (State state : graph.vertexSet()) {

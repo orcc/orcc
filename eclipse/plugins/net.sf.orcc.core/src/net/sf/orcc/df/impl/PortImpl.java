@@ -4,10 +4,10 @@
  *
  * $Id$
  */
-package net.sf.orcc.ir.impl;
+package net.sf.orcc.df.impl;
 
-import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Port;
+import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.Type;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -24,11 +24,11 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.ir.impl.PortImpl#getName <em>Name</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.PortImpl#isNative <em>Native</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.PortImpl#getNumTokensConsumed <em>Num Tokens Consumed</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.PortImpl#getNumTokensProduced <em>Num Tokens Produced</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.PortImpl#getType <em>Type</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.PortImpl#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.PortImpl#getNumTokensConsumed <em>Num Tokens Consumed</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.PortImpl#getNumTokensProduced <em>Num Tokens Produced</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.PortImpl#getType <em>Type</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.PortImpl#isNative <em>Native</em>}</li>
  * </ul>
  * </p>
  *
@@ -54,26 +54,6 @@ public class PortImpl extends EObjectImpl implements Port {
 	 * @ordered
 	 */
 	protected String name = NAME_EDEFAULT;
-
-	/**
-	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #isNative()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean NATIVE_EDEFAULT = false;
-
-	/**
-	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #isNative()
-	 * @generated
-	 * @ordered
-	 */
-	protected boolean native_ = NATIVE_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #getNumTokensConsumed() <em>Num Tokens Consumed</em>}' attribute.
@@ -126,6 +106,26 @@ public class PortImpl extends EObjectImpl implements Port {
 	protected Type type;
 
 	/**
+	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isNative()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean NATIVE_EDEFAULT = false;
+
+	/**
+	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isNative()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean native_ = NATIVE_EDEFAULT;
+
+	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -143,7 +143,7 @@ public class PortImpl extends EObjectImpl implements Port {
 		Type oldType = type;
 		type = newType;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.PORT__TYPE, oldType, newType);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, DfPackage.PORT__TYPE, oldType, newType);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
@@ -157,16 +157,16 @@ public class PortImpl extends EObjectImpl implements Port {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.PORT__NAME:
+			case DfPackage.PORT__NAME:
 				return getName();
-			case IrPackage.PORT__NATIVE:
-				return isNative();
-			case IrPackage.PORT__NUM_TOKENS_CONSUMED:
+			case DfPackage.PORT__NUM_TOKENS_CONSUMED:
 				return getNumTokensConsumed();
-			case IrPackage.PORT__NUM_TOKENS_PRODUCED:
+			case DfPackage.PORT__NUM_TOKENS_PRODUCED:
 				return getNumTokensProduced();
-			case IrPackage.PORT__TYPE:
+			case DfPackage.PORT__TYPE:
 				return getType();
+			case DfPackage.PORT__NATIVE:
+				return isNative();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -179,7 +179,7 @@ public class PortImpl extends EObjectImpl implements Port {
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrPackage.PORT__TYPE:
+			case DfPackage.PORT__TYPE:
 				return basicSetType(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
@@ -193,16 +193,16 @@ public class PortImpl extends EObjectImpl implements Port {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.PORT__NAME:
+			case DfPackage.PORT__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
-			case IrPackage.PORT__NATIVE:
-				return native_ != NATIVE_EDEFAULT;
-			case IrPackage.PORT__NUM_TOKENS_CONSUMED:
+			case DfPackage.PORT__NUM_TOKENS_CONSUMED:
 				return numTokensConsumed != NUM_TOKENS_CONSUMED_EDEFAULT;
-			case IrPackage.PORT__NUM_TOKENS_PRODUCED:
+			case DfPackage.PORT__NUM_TOKENS_PRODUCED:
 				return numTokensProduced != NUM_TOKENS_PRODUCED_EDEFAULT;
-			case IrPackage.PORT__TYPE:
+			case DfPackage.PORT__TYPE:
 				return type != null;
+			case DfPackage.PORT__NATIVE:
+				return native_ != NATIVE_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -215,20 +215,20 @@ public class PortImpl extends EObjectImpl implements Port {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.PORT__NAME:
+			case DfPackage.PORT__NAME:
 				setName((String)newValue);
 				return;
-			case IrPackage.PORT__NATIVE:
-				setNative((Boolean)newValue);
-				return;
-			case IrPackage.PORT__NUM_TOKENS_CONSUMED:
+			case DfPackage.PORT__NUM_TOKENS_CONSUMED:
 				setNumTokensConsumed((Integer)newValue);
 				return;
-			case IrPackage.PORT__NUM_TOKENS_PRODUCED:
+			case DfPackage.PORT__NUM_TOKENS_PRODUCED:
 				setNumTokensProduced((Integer)newValue);
 				return;
-			case IrPackage.PORT__TYPE:
+			case DfPackage.PORT__TYPE:
 				setType((Type)newValue);
+				return;
+			case DfPackage.PORT__NATIVE:
+				setNative((Boolean)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -241,7 +241,7 @@ public class PortImpl extends EObjectImpl implements Port {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return IrPackage.Literals.PORT;
+		return DfPackage.Literals.PORT;
 	}
 
 	/**
@@ -252,20 +252,20 @@ public class PortImpl extends EObjectImpl implements Port {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.PORT__NAME:
+			case DfPackage.PORT__NAME:
 				setName(NAME_EDEFAULT);
 				return;
-			case IrPackage.PORT__NATIVE:
-				setNative(NATIVE_EDEFAULT);
-				return;
-			case IrPackage.PORT__NUM_TOKENS_CONSUMED:
+			case DfPackage.PORT__NUM_TOKENS_CONSUMED:
 				setNumTokensConsumed(NUM_TOKENS_CONSUMED_EDEFAULT);
 				return;
-			case IrPackage.PORT__NUM_TOKENS_PRODUCED:
+			case DfPackage.PORT__NUM_TOKENS_PRODUCED:
 				setNumTokensProduced(NUM_TOKENS_PRODUCED_EDEFAULT);
 				return;
-			case IrPackage.PORT__TYPE:
+			case DfPackage.PORT__TYPE:
 				setType((Type)null);
+				return;
+			case DfPackage.PORT__NATIVE:
+				setNative(NATIVE_EDEFAULT);
 				return;
 		}
 		super.eUnset(featureID);
@@ -353,7 +353,7 @@ public class PortImpl extends EObjectImpl implements Port {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PORT__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.PORT__NAME, oldName, name));
 	}
 
 	/**
@@ -365,7 +365,7 @@ public class PortImpl extends EObjectImpl implements Port {
 		boolean oldNative = native_;
 		native_ = newNative;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PORT__NATIVE, oldNative, native_));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.PORT__NATIVE, oldNative, native_));
 	}
 
 	/**
@@ -377,7 +377,7 @@ public class PortImpl extends EObjectImpl implements Port {
 		int oldNumTokensConsumed = numTokensConsumed;
 		numTokensConsumed = newNumTokensConsumed;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PORT__NUM_TOKENS_CONSUMED, oldNumTokensConsumed, numTokensConsumed));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.PORT__NUM_TOKENS_CONSUMED, oldNumTokensConsumed, numTokensConsumed));
 	}
 
 	/**
@@ -389,7 +389,7 @@ public class PortImpl extends EObjectImpl implements Port {
 		int oldNumTokensProduced = numTokensProduced;
 		numTokensProduced = newNumTokensProduced;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PORT__NUM_TOKENS_PRODUCED, oldNumTokensProduced, numTokensProduced));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.PORT__NUM_TOKENS_PRODUCED, oldNumTokensProduced, numTokensProduced));
 	}
 
 	/**
@@ -401,14 +401,14 @@ public class PortImpl extends EObjectImpl implements Port {
 		if (newType != type) {
 			NotificationChain msgs = null;
 			if (type != null)
-				msgs = ((InternalEObject)type).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.PORT__TYPE, null, msgs);
+				msgs = ((InternalEObject)type).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - DfPackage.PORT__TYPE, null, msgs);
 			if (newType != null)
-				msgs = ((InternalEObject)newType).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.PORT__TYPE, null, msgs);
+				msgs = ((InternalEObject)newType).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - DfPackage.PORT__TYPE, null, msgs);
 			msgs = basicSetType(newType, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PORT__TYPE, newType, newType));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.PORT__TYPE, newType, newType));
 	}
 
 	/**
@@ -423,12 +423,12 @@ public class PortImpl extends EObjectImpl implements Port {
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (name: ");
 		result.append(name);
-		result.append(", native: ");
-		result.append(native_);
 		result.append(", numTokensConsumed: ");
 		result.append(numTokensConsumed);
 		result.append(", numTokensProduced: ");
 		result.append(numTokensProduced);
+		result.append(", native: ");
+		result.append(native_);
 		result.append(')');
 		return result.toString();
 	}

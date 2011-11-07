@@ -31,8 +31,8 @@ package net.sf.orcc.backends.transformations;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;

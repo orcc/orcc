@@ -26,8 +26,11 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir;
+package net.sf.orcc.df;
 
+import net.sf.orcc.ir.Entity;
+import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
 
 import org.eclipse.emf.common.util.EList;
@@ -233,7 +236,7 @@ public interface Actor extends Entity {
 	void setMoC(MoC moc);
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Actor#isNative
+	 * Sets the value of the '{@link net.sf.orcc.df.Actor#isNative
 	 * <em>Native</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc
 	 * -->
 	 * 

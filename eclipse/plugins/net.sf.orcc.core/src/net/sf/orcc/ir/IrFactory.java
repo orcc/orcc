@@ -27,58 +27,9 @@ public interface IrFactory extends EFactory {
 	IrFactory eINSTANCE = net.sf.orcc.ir.impl.IrFactoryImpl.init();
 
 	/**
-	 * Returns a new object of class '<em>Action</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Action</em>'.
-	 * @generated
-	 */
-	Action createAction();
-
-	/**
-	 * Creates a new action with empty patterns, the given tag, scheduler and body.
-	 * 
-	 * @param tag
-	 *            action tag
-	 * @param scheduler
-	 *            procedure that computes scheduling information
-	 * @param body
-	 *            procedure that holds the body of the action
-	 */
-	Action createAction(String tag, Procedure scheduler, Procedure body);
-
-	/**
-	 * Creates a new action.
-	 * 
-	 * @param tag
-	 *            action tag name
-	 * @param inputPattern
-	 *            input pattern
-	 * @param outputPattern
-	 *            output pattern
-	 * @param peekedPattern
-	 *            peeked pattern
-	 * @param scheduler
-	 *            procedure that computes scheduling information
-	 * @param body
-	 *            procedure that holds the body of the action
-	 */
-	Action createAction(Tag tagName, Pattern inputPattern, Pattern outputPattern,
-			Pattern peekedPattern, Procedure scheduler, Procedure body);
-
-	/**
-	 * Returns a new object of class '<em>Actor</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Actor</em>'.
-	 * @generated
-	 */
-	Actor createActor();
-
-	/**
 	 * Returns a new object of class '<em>Annotation</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
 	 * @return a new object of class '<em>Annotation</em>'.
 	 * @generated
 	 */
@@ -95,8 +46,8 @@ public interface IrFactory extends EFactory {
 
 	/**
 	 * Returns a new object of class '<em>Arg By Ref</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
 	 * @return a new object of class '<em>Arg By Ref</em>'.
 	 * @generated
 	 */
@@ -104,13 +55,13 @@ public interface IrFactory extends EFactory {
 
 	/**
 	 * Returns a new object of class '<em>Arg By Val</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
 	 * @return a new object of class '<em>Arg By Val</em>'.
 	 * @generated
 	 */
 	ArgByVal createArgByVal();
-	
+
 	/**
 	 * Creates a new argument by value with the given expression.
 	 * 
@@ -276,18 +227,9 @@ public interface IrFactory extends EFactory {
 	ExprVar createExprVar();
 
 	ExprVar createExprVar(Use use);
-	
+
 	ExprVar createExprVar(Var variable);
 
-	/**
-	 * Returns a new object of class '<em>FSM</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>FSM</em>'.
-	 * @generated
-	 */
-	FSM createFSM();
-	
 	/**
 	 * Returns a new object of class '<em>Inst Assign</em>'.
 	 * <!-- begin-user-doc
@@ -503,7 +445,7 @@ public interface IrFactory extends EFactory {
 	 * @return a return
 	 */
 	InstReturn createInstReturn(int lineNumber, Expression value);
-	
+
 	/**
 	 * Returns a new object of class '<em>Inst Store</em>'.
 	 * <!-- begin-user-doc
@@ -524,7 +466,7 @@ public interface IrFactory extends EFactory {
 	 */
 	InstStore createInstStore(int lineNumber, Def target,
 			List<Expression> indexes, Expression value);
-	
+
 	/**
 	 * Creates an InstStore with the given location, target, indexes, value.
 	 * 
@@ -536,7 +478,7 @@ public interface IrFactory extends EFactory {
 	 */
 	InstStore createInstStore(int lineNumber, Var target,
 			List<Expression> indexes, Expression value);
-	
+
 	/**
 	 * Creates an InstStore with the given target and source.
 	 * 
@@ -545,7 +487,7 @@ public interface IrFactory extends EFactory {
 	 * @return a store
 	 */
 	InstStore createInstStore(Var target, Expression value);
-	
+
 	/**
 	 * Creates an InstStore with the given target and value.
 	 * 
@@ -554,7 +496,7 @@ public interface IrFactory extends EFactory {
 	 * @return a store
 	 */
 	InstStore createInstStore(Var target, int value);
-	
+
 	/**
 	 * Creates an InstStore with the given target, index and source.
 	 * 
@@ -563,9 +505,8 @@ public interface IrFactory extends EFactory {
 	 * @param index
 	 * @return a store
 	 */
-	InstStore createInstStore(Var target, int index,
-			Expression source);
-	
+	InstStore createInstStore(Var target, int index, Expression source);
+
 	/**
 	 * Creates an InstStore with the given target, index and source.
 	 * 
@@ -574,9 +515,8 @@ public interface IrFactory extends EFactory {
 	 * @param index
 	 * @return a store
 	 */
-	InstStore createInstStore(Var target, int index,
-			Var source);
-	
+	InstStore createInstStore(Var target, int index, Var source);
+
 	/**
 	 * Creates an InstStore with the given target, indexes, value.
 	 * 
@@ -587,7 +527,7 @@ public interface IrFactory extends EFactory {
 	 */
 	InstStore createInstStore(Var target, List<Expression> indexes,
 			Expression value);
-	
+
 	/**
 	 * Creates an InstStore with the given target, indexes, value.
 	 * 
@@ -596,9 +536,8 @@ public interface IrFactory extends EFactory {
 	 * @param indexes
 	 * @return a store
 	 */
-	InstStore createInstStore(Var target, List<Expression> indexes,
-			int value);
-	
+	InstStore createInstStore(Var target, List<Expression> indexes, int value);
+
 	/**
 	 * Creates an InstStore with the given target, indexes, value.
 	 * 
@@ -607,8 +546,7 @@ public interface IrFactory extends EFactory {
 	 * @param indexes
 	 * @return a store
 	 */
-	InstStore createInstStore(Var target, List<Expression> indexes,
-			Var source);
+	InstStore createInstStore(Var target, List<Expression> indexes, Var source);
 
 	/**
 	 * Creates an InstStore with the given target and source.
@@ -627,8 +565,7 @@ public interface IrFactory extends EFactory {
 	 * @param index
 	 * @return a store
 	 */
-	InstStore createInstStore(Var target, Var index,
-			Expression source);
+	InstStore createInstStore(Var target, Var index, Expression source);
 
 	/**
 	 * Creates an InstStore with the given target, index and source.
@@ -638,8 +575,7 @@ public interface IrFactory extends EFactory {
 	 * @param index
 	 * @return a store
 	 */
-	InstStore createInstStore(Var target, Var index,
-			Var source);
+	InstStore createInstStore(Var target, Var index, Var source);
 
 	/**
 	 * Returns a new object of class '<em>Node Block</em>'.
@@ -687,30 +623,6 @@ public interface IrFactory extends EFactory {
 	Param createParam(Var variable);
 
 	/**
-	 * Returns a new object of class '<em>Pattern</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Pattern</em>'.
-	 * @generated
-	 */
-	Pattern createPattern();
-
-	/**
-	 * Returns a new object of class '<em>Port</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Port</em>'.
-	 * @generated
-	 */
-	Port createPort();
-
-	Port createPort(Port port);
-
-	Port createPort(Type type, String name);
-
-	Port createPort(Type type, String name, boolean native_);
-
-	/**
 	 * Returns a new object of class '<em>Predicate</em>'.
 	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
@@ -740,59 +652,6 @@ public interface IrFactory extends EFactory {
 	 *            The procedure return type.
 	 */
 	Procedure createProcedure(String name, int lineNumber, Type returnType);
-
-	/**
-	 * Returns a new object of class '<em>State</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>State</em>'.
-	 * @generated
-	 */
-	State createState();
-
-	/**
-	 * Creates a state with the given name.
-	 * 
-	 * @param name
-	 *            name of the state
-	 * @return a state with the given name
-	 */
-	State createState(String name);
-
-	/**
-	 * Returns a new object of class '<em>Tag</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Tag</em>'.
-	 * @generated
-	 */
-	Tag createTag();
-
-	Tag createTag(List<String> identifiers);
-
-	Tag createTag(String tagName);
-
-	Tag createTag(Tag tag);
-
-	/**
-	 * Returns a new object of class '<em>Transition</em>'.
-	 * <!-- begin-user-doc
-	 * --> <!-- end-user-doc -->
-	 * @return a new object of class '<em>Transition</em>'.
-	 * @generated
-	 */
-	Transition createTransition();
-
-	Transition createTransition(Action action, State target);
-
-	/**
-	 * Returns a new object of class '<em>Transitions</em>'.
-	 * <!-- begin-user-doc
-	 * --> <!-- end-user-doc -->
-	 * @return a new object of class '<em>Transitions</em>'.
-	 * @generated
-	 */
-	Transitions createTransitions();
 
 	/**
 	 * Returns a new object of class '<em>Type Bool</em>'.
@@ -931,7 +790,7 @@ public interface IrFactory extends EFactory {
 	 * @return a new use of the given variable
 	 */
 	Use createUse(Var variable);
-	
+
 	/**
 	 * Returns a new object of class '<em>Var</em>'.
 	 * <!-- begin-user-doc -->
@@ -940,7 +799,7 @@ public interface IrFactory extends EFactory {
 	 * @generated
 	 */
 	Var createVar();
-	
+
 	/**
 	 * Creates a new variable with the given location, type, and name. The
 	 * variable may be global or local, and assignable or not. Type is copied.
@@ -1024,8 +883,8 @@ public interface IrFactory extends EFactory {
 	Var createVarInt(String name, boolean assignable, int index);
 
 	/**
-	 * Creates a new local integer variable with the given name, size, index. The
-	 * variable may be assignable or not.
+	 * Creates a new local integer variable with the given name, size, index.
+	 * The variable may be assignable or not.
 	 * 
 	 * @param name
 	 *            the variable name

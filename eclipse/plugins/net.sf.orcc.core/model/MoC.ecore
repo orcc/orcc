@@ -5,10 +5,10 @@
     nsURI="http:///net/sf/orcc/moc.ecore" nsPrefix="net.sf.orcc.moc">
   <eClassifiers xsi:type="ecore:EClass" name="MoC" abstract="true"/>
   <eClassifiers xsi:type="ecore:EClass" name="CSDFMoC" eSuperTypes="#//MoC">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="inputPattern" eType="ecore:EClass Ir.ecore#//Pattern"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="inputPattern" eType="ecore:EClass Df.ecore#//Pattern"
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="numberOfPhases" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="outputPattern" eType="ecore:EClass Ir.ecore#//Pattern"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="outputPattern" eType="ecore:EClass Df.ecore#//Pattern"
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="invocations" upperBound="-1"
         eType="#//Invocation" containment="true" resolveProxies="false"/>
@@ -18,6 +18,6 @@
   <eClassifiers xsi:type="ecore:EClass" name="QSDFMoC" eSuperTypes="#//MoC"/>
   <eClassifiers xsi:type="ecore:EClass" name="SDFMoC" eSuperTypes="#//CSDFMoC"/>
   <eClassifiers xsi:type="ecore:EClass" name="Invocation">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="action" eType="ecore:EClass Ir.ecore#//Action"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="action" eType="ecore:EClass Df.ecore#//Action"/>
   </eClassifiers>
 </ecore:EPackage>

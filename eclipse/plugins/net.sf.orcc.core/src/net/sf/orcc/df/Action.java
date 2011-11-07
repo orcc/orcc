@@ -26,7 +26,9 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir;
+package net.sf.orcc.df;
+
+import net.sf.orcc.ir.Procedure;
 
 import org.eclipse.emf.ecore.EObject;
 
@@ -100,7 +102,7 @@ public interface Action extends EObject {
 	Tag getTag();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Action#getBody <em>Body</em>}' containment reference.
+	 * Sets the value of the '{@link net.sf.orcc.df.Action#getBody <em>Body</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Body</em>' containment reference.
@@ -134,7 +136,7 @@ public interface Action extends EObject {
 	void setPeekPattern(Pattern pattern);
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Action#getScheduler <em>Scheduler</em>}' containment reference.
+	 * Sets the value of the '{@link net.sf.orcc.df.Action#getScheduler <em>Scheduler</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Scheduler</em>' containment reference.
@@ -144,7 +146,7 @@ public interface Action extends EObject {
 	void setScheduler(Procedure value);
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Action#getTag <em>Tag</em>}' containment reference.
+	 * Sets the value of the '{@link net.sf.orcc.df.Action#getTag <em>Tag</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Tag</em>' containment reference.

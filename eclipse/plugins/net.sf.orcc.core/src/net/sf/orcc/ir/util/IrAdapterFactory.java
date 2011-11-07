@@ -8,10 +8,12 @@ package net.sf.orcc.ir.util;
 
 import java.util.Map;
 
-import net.sf.orcc.ir.*;
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Annotation;
+import net.sf.orcc.ir.Arg;
+import net.sf.orcc.ir.ArgByRef;
+import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.Def;
+import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -21,7 +23,6 @@ import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
@@ -35,14 +36,9 @@ import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.State;
-import net.sf.orcc.ir.Tag;
-import net.sf.orcc.ir.Transition;
-import net.sf.orcc.ir.Transitions;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeBool;
 import net.sf.orcc.ir.TypeFloat;
@@ -51,6 +47,7 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
+import net.sf.orcc.ir.Unit;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 
@@ -89,44 +86,8 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 				return createEntityAdapter();
 			}
 			@Override
-			public Adapter caseActor(Actor object) {
-				return createActorAdapter();
-			}
-			@Override
 			public Adapter caseUnit(Unit object) {
 				return createUnitAdapter();
-			}
-			@Override
-			public Adapter casePort(Port object) {
-				return createPortAdapter();
-			}
-			@Override
-			public Adapter caseFSM(FSM object) {
-				return createFSMAdapter();
-			}
-			@Override
-			public Adapter caseState(State object) {
-				return createStateAdapter();
-			}
-			@Override
-			public Adapter caseTransitions(Transitions object) {
-				return createTransitionsAdapter();
-			}
-			@Override
-			public Adapter caseTransition(Transition object) {
-				return createTransitionAdapter();
-			}
-			@Override
-			public Adapter caseAction(Action object) {
-				return createActionAdapter();
-			}
-			@Override
-			public Adapter caseTag(Tag object) {
-				return createTagAdapter();
-			}
-			@Override
-			public Adapter casePattern(Pattern object) {
-				return createPatternAdapter();
 			}
 			@Override
 			public Adapter caseProcedure(Procedure object) {
@@ -285,18 +246,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 				return createPredicateAdapter();
 			}
 			@Override
-			public Adapter casePortToEIntegerObjectMapEntry(Map.Entry<Port, Integer> object) {
-				return createPortToEIntegerObjectMapEntryAdapter();
-			}
-			@Override
-			public Adapter casePortToVarMapEntry(Map.Entry<Port, Var> object) {
-				return createPortToVarMapEntryAdapter();
-			}
-			@Override
-			public Adapter caseVarToPortMapEntry(Map.Entry<Var, Port> object) {
-				return createVarToPortMapEntryAdapter();
-			}
-			@Override
 			public Adapter caseEStringToEStringMapEntry(Map.Entry<String, String> object) {
 				return createEStringToEStringMapEntryAdapter();
 			}
@@ -316,34 +265,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 		if (modelPackage == null) {
 			modelPackage = IrPackage.eINSTANCE;
 		}
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Action <em>Action</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.Action
-	 * @generated
-	 */
-	public Adapter createActionAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Actor <em>Actor</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.Actor
-	 * @generated
-	 */
-	public Adapter createActorAdapter() {
-		return null;
 	}
 
 	/**
@@ -554,20 +475,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.FSM <em>FSM</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.FSM
-	 * @generated
-	 */
-	public Adapter createFSMAdapter() {
-		return null;
-	}
-
-	/**
 	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Predicate <em>Predicate</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
@@ -582,48 +489,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Port To EInteger Object Map Entry</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see java.util.Map.Entry
-	 * @generated
-	 */
-	public Adapter createPortToEIntegerObjectMapEntryAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Port To Var Map Entry</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see java.util.Map.Entry
-	 * @generated
-	 */
-	public Adapter createPortToVarMapEntryAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Var To Port Map Entry</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see java.util.Map.Entry
-	 * @generated
-	 */
-	public Adapter createVarToPortMapEntryAdapter() {
-		return null;
-	}
-
-	/**
 	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>EString To EString Map Entry</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
@@ -634,48 +499,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createEStringToEStringMapEntryAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.State <em>State</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.State
-	 * @generated
-	 */
-	public Adapter createStateAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Transitions <em>Transitions</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.Transitions
-	 * @generated
-	 */
-	public Adapter createTransitionsAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Transition <em>Transition</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.Transition
-	 * @generated
-	 */
-	public Adapter createTransitionAdapter() {
 		return null;
 	}
 
@@ -890,34 +713,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Pattern <em>Pattern</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.Pattern
-	 * @generated
-	 */
-	public Adapter createPatternAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Port <em>Port</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.Port
-	 * @generated
-	 */
-	public Adapter createPortAdapter() {
-		return null;
-	}
-
-	/**
 	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Procedure <em>Procedure</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
@@ -942,20 +737,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createParamAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Tag <em>Tag</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.Tag
-	 * @generated
-	 */
-	public Adapter createTagAdapter() {
 		return null;
 	}
 

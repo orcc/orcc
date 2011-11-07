@@ -47,9 +47,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.WriteListener;

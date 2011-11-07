@@ -6,8 +6,8 @@
  */
 package net.sf.orcc.moc.impl;
 
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.DPNMoC;
 import net.sf.orcc.moc.Invocation;
@@ -92,8 +92,8 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 	 */
 	public CSDFMoC createCSDFMoC() {
 		CSDFMoCImpl csdfMoC = new CSDFMoCImpl();
-		csdfMoC.setInputPattern(IrFactory.eINSTANCE.createPattern());
-		csdfMoC.setOutputPattern(IrFactory.eINSTANCE.createPattern());
+		csdfMoC.setInputPattern(DfFactory.eINSTANCE.createPattern());
+		csdfMoC.setOutputPattern(DfFactory.eINSTANCE.createPattern());
 		return csdfMoC;
 	}
 
@@ -145,8 +145,8 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 	 */
 	public SDFMoC createSDFMoC() {
 		SDFMoCImpl sdfMoC = new SDFMoCImpl();
-		sdfMoC.setInputPattern(IrFactory.eINSTANCE.createPattern());
-		sdfMoC.setOutputPattern(IrFactory.eINSTANCE.createPattern());
+		sdfMoC.setInputPattern(DfFactory.eINSTANCE.createPattern());
+		sdfMoC.setOutputPattern(DfFactory.eINSTANCE.createPattern());
 		sdfMoC.setNumberOfPhases(1);
 		return sdfMoC;
 	}

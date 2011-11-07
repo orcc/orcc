@@ -41,20 +41,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.df.Attribute;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.util.ActorInterpreter;
-import net.sf.orcc.ir.util.ExpressionEvaluator;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.runtime.Fifo;
 import net.sf.orcc.runtime.impl.GenericSource;
@@ -68,7 +64,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.jgrapht.DirectedGraph;
 
 /**
  * This class implements a simulator using a slow, visitor-based approach.
@@ -131,26 +126,17 @@ public class SlowSimulator extends AbstractSimulator {
 	 * 
 	 * @param graph
 	 */
-	public void connectNetwork(DirectedGraph<Vertex, Connection> graph) {
-		// Get edges from the graph has actors point-to-point connections.
-		Set<Connection> connections = graph.edgeSet();
+	public void connectNetwork(Network network) {
 		// Loop over the connections and ask for the source and target actors
 		// connection through specified I/O ports.
-		for (Connection connection : connections) {
-			Vertex srcVertex = graph.getEdgeSource(connection);
-			Vertex tgtVertex = graph.getEdgeTarget(connection);
+		for (Connection connection : network.getConnections()) {
+			Vertex srcVertex = connection.getSource();
+			Vertex tgtVertex = connection.getTarget();
 
 			if (srcVertex.isInstance() && tgtVertex.isInstance()) {
 				// get FIFO size (user-defined nor default)
-				int size;
-				Attribute attr = connection
-						.getAttribute(Connection.BUFFER_SIZE);
-				if (attr != null && attr.getType() == Attribute.VALUE) {
-					Expression expr = ((AttrValue) attr).getValue();
-					size = new ExpressionEvaluator().evaluateAsInteger(expr) + 1;
-				} else {
-					size = fifoSize;
-				}
+				Integer connectionSize = connection.getSize();
+				int size = (connectionSize == null) ? fifoSize : connectionSize;
 
 				// create the communication FIFO between source and target
 				// actors
@@ -198,30 +184,26 @@ public class SlowSimulator extends AbstractSimulator {
 	 * @throws OrccException
 	 * @throws FileNotFoundException
 	 */
-	protected void instantiateNetwork(DirectedGraph<Vertex, Connection> graph)
-			throws OrccException, FileNotFoundException {
+	protected void instantiateNetwork(Network network) throws OrccException,
+			FileNotFoundException {
 		// Loop over the graph vertexes and get instances definition for
 		// instantiating the network to simulate.
-		for (Vertex vertex : graph.vertexSet()) {
-			if (vertex.isInstance()) {
-				Instance instance = vertex.getInstance();
-				Actor actor = instance.getActor();
+		for (Instance instance : network.getInstances()) {
+			Actor actor = instance.getActor();
 
-				// copy actor with references (in case it references units)
-				Actor clonedActor = IrUtil.copy(actor);
-				instance.setContents(clonedActor);
+			// copy actor with references (in case it references units)
+			Actor clonedActor = IrUtil.copy(actor);
+			instance.setContents(clonedActor);
 
-				// add the cloned actor to the resource of the original actor.
-				// the interpreter will need that information
-				actor.eResource().getContents().add(clonedActor);
+			// add the cloned actor to the resource of the original actor.
+			// the interpreter will need that information
+			actor.eResource().getContents().add(clonedActor);
 
-				ConnectedActorInterpreter interpreter = new ConnectedActorInterpreter(
-						clonedActor, instance.getParameters(),
-						getWriteListener());
+			ConnectedActorInterpreter interpreter = new ConnectedActorInterpreter(
+					clonedActor, instance.getParameters(), getWriteListener());
 
-				interpreters.put(instance, interpreter);
-				interpreter.setFifos(inputFifos, outputFifos);
-			}
+			interpreters.put(instance, interpreter);
+			interpreter.setFifos(inputFifos, outputFifos);
 		}
 	}
 
@@ -267,10 +249,9 @@ public class SlowSimulator extends AbstractSimulator {
 
 			// Parse XDF file, do some transformations and return the
 			// graph corresponding to the flat network instantiation.
-			DirectedGraph<Vertex, Connection> graph = network.getGraph();
-			instantiateNetwork(graph);
-			updateConnections(graph);
-			connectNetwork(graph);
+			instantiateNetwork(network);
+			updateConnections(network);
+			connectNetwork(network);
 			initializeNetwork(network);
 			runNetwork(network);
 			SimulatorDescriptor.killDescriptors();
@@ -286,11 +267,10 @@ public class SlowSimulator extends AbstractSimulator {
 		}
 	}
 
-	protected void updateConnections(DirectedGraph<Vertex, Connection> graph)
-			throws OrccException {
-		for (Connection connection : graph.edgeSet()) {
-			Vertex srcVertex = graph.getEdgeSource(connection);
-			Vertex tgtVertex = graph.getEdgeTarget(connection);
+	protected void updateConnections(Network network) throws OrccException {
+		for (Connection connection : network.getConnections()) {
+			Vertex srcVertex = connection.getSource();
+			Vertex tgtVertex = connection.getTarget();
 
 			if (srcVertex.isInstance()) {
 				Instance source = srcVertex.getInstance();

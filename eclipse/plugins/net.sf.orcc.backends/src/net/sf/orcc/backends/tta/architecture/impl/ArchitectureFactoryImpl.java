@@ -1145,11 +1145,11 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		TTA tta = createTTADefault(name, busNb, registerNb, aluNb);
 		if (instance.isActor()) {
 			// Add needed stream units
-			for (net.sf.orcc.ir.Port input : instance.getActor().getInputs()) {
+			for (net.sf.orcc.df.Port input : instance.getActor().getInputs()) {
 				tta.getFunctionUnits().add(
 						createStreamInput(tta, input.getName()));
 			}
-			for (net.sf.orcc.ir.Port output : instance.getActor().getOutputs()) {
+			for (net.sf.orcc.df.Port output : instance.getActor().getOutputs()) {
 				tta.getFunctionUnits().add(
 						createStreamOutput(tta, output.getName()));
 			}
@@ -1167,7 +1167,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 			tta.getFunctionUnits().add(
 					createStreamInput(tta, instance.getBroadcast().getInput()
 							.getName()));
-			for (net.sf.orcc.ir.Port output : instance.getBroadcast()
+			for (net.sf.orcc.df.Port output : instance.getBroadcast()
 					.getOutputs()) {
 				tta.getFunctionUnits().add(
 						createStreamOutput(tta, output.getName()));

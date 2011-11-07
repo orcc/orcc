@@ -31,8 +31,8 @@ package net.sf.orcc.backends.xlim.transformations;
 import java.util.Collections;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;

@@ -49,10 +49,10 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Pattern;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.sexp.SExp;

@@ -34,9 +34,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;

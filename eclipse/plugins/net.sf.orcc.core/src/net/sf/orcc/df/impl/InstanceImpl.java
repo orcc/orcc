@@ -33,13 +33,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.SerDes;
-import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.moc.MoC;

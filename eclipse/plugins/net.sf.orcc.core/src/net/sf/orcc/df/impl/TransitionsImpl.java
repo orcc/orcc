@@ -4,14 +4,14 @@
  *
  * $Id$
  */
-package net.sf.orcc.ir.impl;
+package net.sf.orcc.df.impl;
 
 import java.util.Collection;
 
-import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.State;
-import net.sf.orcc.ir.Transition;
-import net.sf.orcc.ir.Transitions;
+import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.State;
+import net.sf.orcc.df.Transition;
+import net.sf.orcc.df.Transitions;
 import net.sf.orcc.ir.util.MapAdapter;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -30,8 +30,8 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.ir.impl.TransitionsImpl#getList <em>List</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.TransitionsImpl#getSourceState <em>Source State</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.TransitionsImpl#getList <em>List</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.TransitionsImpl#getSourceState <em>Source State</em>}</li>
  * </ul>
  * </p>
  *
@@ -74,9 +74,9 @@ public class TransitionsImpl extends EObjectImpl implements Transitions {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.TRANSITIONS__LIST:
+			case DfPackage.TRANSITIONS__LIST:
 				return getList();
-			case IrPackage.TRANSITIONS__SOURCE_STATE:
+			case DfPackage.TRANSITIONS__SOURCE_STATE:
 				if (resolve) return getSourceState();
 				return basicGetSourceState();
 		}
@@ -91,7 +91,7 @@ public class TransitionsImpl extends EObjectImpl implements Transitions {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrPackage.TRANSITIONS__LIST:
+			case DfPackage.TRANSITIONS__LIST:
 				return ((InternalEList<?>)getList()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
@@ -104,9 +104,9 @@ public class TransitionsImpl extends EObjectImpl implements Transitions {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.TRANSITIONS__LIST:
+			case DfPackage.TRANSITIONS__LIST:
 				return list != null && !list.isEmpty();
-			case IrPackage.TRANSITIONS__SOURCE_STATE:
+			case DfPackage.TRANSITIONS__SOURCE_STATE:
 				return sourceState != null;
 		}
 		return super.eIsSet(featureID);
@@ -120,11 +120,11 @@ public class TransitionsImpl extends EObjectImpl implements Transitions {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.TRANSITIONS__LIST:
+			case DfPackage.TRANSITIONS__LIST:
 				getList().clear();
 				getList().addAll((Collection<? extends Transition>)newValue);
 				return;
-			case IrPackage.TRANSITIONS__SOURCE_STATE:
+			case DfPackage.TRANSITIONS__SOURCE_STATE:
 				setSourceState((State)newValue);
 				return;
 		}
@@ -137,7 +137,7 @@ public class TransitionsImpl extends EObjectImpl implements Transitions {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return IrPackage.Literals.TRANSITIONS;
+		return DfPackage.Literals.TRANSITIONS;
 	}
 
 	/**
@@ -147,10 +147,10 @@ public class TransitionsImpl extends EObjectImpl implements Transitions {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.TRANSITIONS__LIST:
+			case DfPackage.TRANSITIONS__LIST:
 				getList().clear();
 				return;
-			case IrPackage.TRANSITIONS__SOURCE_STATE:
+			case DfPackage.TRANSITIONS__SOURCE_STATE:
 				setSourceState((State)null);
 				return;
 		}
@@ -163,7 +163,7 @@ public class TransitionsImpl extends EObjectImpl implements Transitions {
 	 */
 	public EList<Transition> getList() {
 		if (list == null) {
-			list = new EObjectContainmentEList<Transition>(Transition.class, this, IrPackage.TRANSITIONS__LIST);
+			list = new EObjectContainmentEList<Transition>(Transition.class, this, DfPackage.TRANSITIONS__LIST);
 		}
 		return list;
 	}
@@ -179,7 +179,7 @@ public class TransitionsImpl extends EObjectImpl implements Transitions {
 			sourceState = (State)eResolveProxy(oldSourceState);
 			if (sourceState != oldSourceState) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.TRANSITIONS__SOURCE_STATE, oldSourceState, sourceState));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.TRANSITIONS__SOURCE_STATE, oldSourceState, sourceState));
 			}
 		}
 		return sourceState;
@@ -203,7 +203,7 @@ public class TransitionsImpl extends EObjectImpl implements Transitions {
 		State oldSourceState = sourceState;
 		sourceState = newSourceState;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.TRANSITIONS__SOURCE_STATE, oldSourceState, sourceState));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.TRANSITIONS__SOURCE_STATE, oldSourceState, sourceState));
 	}
 
 } // TransitionsImpl

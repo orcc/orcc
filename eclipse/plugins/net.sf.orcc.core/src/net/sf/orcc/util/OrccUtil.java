@@ -37,7 +37,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.Entity;
 
 import org.eclipse.core.resources.IContainer;

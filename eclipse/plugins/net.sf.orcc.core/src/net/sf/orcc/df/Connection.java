@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.df;
 
-import net.sf.orcc.ir.Port;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;

@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.moc;
 
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
+import net.sf.orcc.df.Pattern;
+import net.sf.orcc.df.Port;
 
 import org.eclipse.emf.common.util.EList;
 

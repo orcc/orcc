@@ -12,8 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Annotation;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
@@ -29,7 +27,6 @@ import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
@@ -44,14 +41,8 @@ import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Param;
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.State;
-import net.sf.orcc.ir.Tag;
-import net.sf.orcc.ir.Transition;
-import net.sf.orcc.ir.Transitions;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeBool;
 import net.sf.orcc.ir.TypeFloat;
@@ -161,16 +152,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
 			case IrPackage.ENTITY: return createEntity();
-			case IrPackage.ACTOR: return createActor();
 			case IrPackage.UNIT: return createUnit();
-			case IrPackage.PORT: return createPort();
-			case IrPackage.FSM: return createFSM();
-			case IrPackage.STATE: return createState();
-			case IrPackage.TRANSITIONS: return createTransitions();
-			case IrPackage.TRANSITION: return createTransition();
-			case IrPackage.ACTION: return createAction();
-			case IrPackage.TAG: return createTag();
-			case IrPackage.PATTERN: return createPattern();
 			case IrPackage.PROCEDURE: return createProcedure();
 			case IrPackage.PARAM: return createParam();
 			case IrPackage.NODE_BLOCK: return createNodeBlock();
@@ -204,9 +186,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 			case IrPackage.VAR: return createVar();
 			case IrPackage.USE: return createUse();
 			case IrPackage.PREDICATE: return createPredicate();
-			case IrPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY: return (EObject)createPortToEIntegerObjectMapEntry();
-			case IrPackage.PORT_TO_VAR_MAP_ENTRY: return (EObject)createPortToVarMapEntry();
-			case IrPackage.VAR_TO_PORT_MAP_ENTRY: return (EObject)createVarToPortMapEntry();
 			case IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY: return (EObject)createEStringToEStringMapEntry();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
@@ -215,51 +194,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Action createAction() {
-		ActionImpl action = new ActionImpl();
-		return action;
-	}
-
-	@Override
-	public Action createAction(String tagName, Procedure scheduler, Procedure body) {
-		ActionImpl action = new ActionImpl();
-		action.setBody(body);
-		action.setInputPattern(createPattern());
-		action.setOutputPattern(createPattern());
-		action.setPeekPattern(createPattern());
-		action.setScheduler(scheduler);
-		action.setTag(createTag(tagName));
-		return action;
-	}
-
-	@Override
-	public Action createAction(Tag tag, Pattern inputPattern,
-			Pattern outputPattern, Pattern peekedPattern, Procedure scheduler,
-			Procedure body) {
-		ActionImpl action = new ActionImpl();
-		action.setBody(body);
-		action.setInputPattern(inputPattern);
-		action.setOutputPattern(outputPattern);
-		action.setPeekPattern(peekedPattern);
-		action.setScheduler(scheduler);
-		action.setTag(tag);
-		return action;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Actor createActor() {
-		ActorImpl actor = new ActorImpl();
-		return actor;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	public Annotation createAnnotation() {
@@ -275,8 +209,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public ArgByRef createArgByRef() {
@@ -285,8 +218,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public ArgByVal createArgByVal() {
@@ -332,8 +264,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public Entity createEntity() {
@@ -342,8 +273,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public Map.Entry<String, String> createEStringToEStringMapEntry() {
@@ -535,15 +465,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public FSM createFSM() {
-		FSMImpl fsm = new FSMImpl();
-		return fsm;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	public InstAssign createInstAssign() {
 		InstAssignImpl instAssign = new InstAssignImpl();
 		return instAssign;
@@ -698,7 +619,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		instReturn.setValue(value);
 		return instReturn;
 	}
-	
+
 	@Override
 	public InstReturn createInstReturn(int lineNumber, Expression value) {
 		InstReturnImpl instReturn = new InstReturnImpl();
@@ -706,7 +627,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		instReturn.setValue(value);
 		return instReturn;
 	}
-	
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -715,7 +636,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		InstStoreImpl instStore = new InstStoreImpl();
 		return instStore;
 	}
-	
+
 	@Override
 	public InstStore createInstStore(int lineNumber, Def target,
 			List<Expression> indexes, Expression value) {
@@ -726,14 +647,14 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		instStore.getIndexes().addAll(indexes);
 		return instStore;
 	}
-	
+
 	@Override
 	public InstStore createInstStore(int lineNumber, Var target,
 			List<Expression> indexes, Expression value) {
 		return createInstStore(lineNumber,
 				IrFactory.eINSTANCE.createDef(target), indexes, value);
 	}
-	
+
 	@Override
 	public InstStore createInstStore(Var target, Expression value) {
 		InstStoreImpl instStore = new InstStoreImpl();
@@ -741,23 +662,21 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		instStore.setValue(value);
 		return instStore;
 	}
-	
+
 	@Override
 	public InstStore createInstStore(Var target, int value) {
 		return createInstStore(target, createExprInt(value));
 	}
 
 	@Override
-	public InstStore createInstStore(Var target, int index,
-			Expression source) {
+	public InstStore createInstStore(Var target, int index, Expression source) {
 		List<Expression> indexes = new ArrayList<Expression>(1);
 		indexes.add(createExprInt(index));
 		return createInstStore(target, indexes, source);
 	}
 
 	@Override
-	public InstStore createInstStore(Var target, int index,
-			Var source) {
+	public InstStore createInstStore(Var target, int index, Var source) {
 		List<Expression> indexes = new ArrayList<Expression>(1);
 		indexes.add(createExprInt(index));
 		return createInstStore(target, indexes, createExprVar(source));
@@ -787,16 +706,14 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public InstStore createInstStore(Var target, Var index,
-			Expression source) {
+	public InstStore createInstStore(Var target, Var index, Expression source) {
 		List<Expression> indexes = new ArrayList<Expression>(1);
 		indexes.add(createExprVar(index));
 		return createInstStore(target, indexes, source);
 	}
 
 	@Override
-	public InstStore createInstStore(Var target, Var index,
-			Var source) {
+	public InstStore createInstStore(Var target, Var index, Var source) {
 		List<Expression> indexes = new ArrayList<Expression>(1);
 		indexes.add(createExprVar(index));
 		return createInstStore(target, indexes, createExprVar(source));
@@ -852,8 +769,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public Param createParam() {
@@ -866,64 +782,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		ParamImpl param = new ParamImpl();
 		param.setVariable(variable);
 		return param;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Pattern createPattern() {
-		PatternImpl pattern = new PatternImpl();
-		return pattern;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Port createPort() {
-		PortImpl port = new PortImpl();
-		return port;
-	}
-
-	@Override
-	public Port createPort(Port port) {
-		return EcoreUtil.copy(port);
-	}
-
-	@Override
-	public Port createPort(Type type, String name) {
-		PortImpl port = new PortImpl();
-		port.setName(name);
-		port.setType(type);
-		return port;
-	}
-
-	@Override
-	public Port createPort(Type type, String name, boolean native_) {
-		PortImpl port = new PortImpl();
-		port.setName(name);
-		port.setNative(native_);
-		port.setType(type);
-		return port;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Map.Entry<Port, Integer> createPortToEIntegerObjectMapEntry() {
-		PortToEIntegerObjectMapEntryImpl portToEIntegerObjectMapEntry = new PortToEIntegerObjectMapEntryImpl();
-		return portToEIntegerObjectMapEntry;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Map.Entry<Port, Var> createPortToVarMapEntry() {
-		PortToVarMapEntryImpl portToVarMapEntry = new PortToVarMapEntryImpl();
-		return portToVarMapEntry;
 	}
 
 	/**
@@ -954,78 +812,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		procedure.setReturnType(EcoreUtil.copy(returnType));
 
 		return procedure;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public State createState() {
-		StateImpl state = new StateImpl();
-		return state;
-	}
-
-	@Override
-	public State createState(String name) {
-		StateImpl state = new StateImpl();
-		state.setName(name);
-		return state;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Tag createTag() {
-		TagImpl tag = new TagImpl();
-		return tag;
-	}
-
-	@Override
-	public Tag createTag(List<String> identifiers) {
-		TagImpl tag = new TagImpl();
-		tag.getIdentifiers().addAll(identifiers);
-		return tag;
-	}
-
-	@Override
-	public Tag createTag(String tagName) {
-		TagImpl tag = new TagImpl();
-		tag.getIdentifiers().add(tagName);
-		return tag;
-	}
-
-	@Override
-	public Tag createTag(Tag tag) {
-		TagImpl newTag = new TagImpl();
-		newTag.getIdentifiers().addAll(tag.getIdentifiers());
-		return newTag;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Transition createTransition() {
-		TransitionImpl transition = new TransitionImpl();
-		return transition;
-	}
-
-	@Override
-	public Transition createTransition(Action action, State target) {
-		TransitionImpl transition = new TransitionImpl();
-		transition.setAction(action);
-		transition.setState(target);
-		return transition;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Transitions createTransitions() {
-		TransitionsImpl transitions = new TransitionsImpl();
-		return transitions;
 	}
 
 	/**
@@ -1132,8 +918,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public Unit createUnit() {
@@ -1217,15 +1002,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	@Override
 	public Var createVarInt(String name, int size, boolean assignable, int index) {
 		return createVar(createTypeInt(size), name, assignable, index);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Map.Entry<Var, Port> createVarToPortMapEntry() {
-		VarToPortMapEntryImpl varToPortMapEntry = new VarToPortMapEntryImpl();
-		return varToPortMapEntry;
 	}
 
 	/**

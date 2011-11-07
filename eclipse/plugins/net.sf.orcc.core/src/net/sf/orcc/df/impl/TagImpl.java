@@ -4,12 +4,12 @@
  *
  * $Id$
  */
-package net.sf.orcc.ir.impl;
+package net.sf.orcc.df.impl;
 
 import java.util.Collection;
 
-import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Tag;
+import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.Tag;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
@@ -22,7 +22,7 @@ import org.eclipse.emf.ecore.util.EDataTypeUniqueEList;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.ir.impl.TagImpl#getIdentifiers <em>Identifiers</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.TagImpl#getIdentifiers <em>Identifiers</em>}</li>
  * </ul>
  * </p>
  *
@@ -52,7 +52,7 @@ public class TagImpl extends EObjectImpl implements Tag {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return IrPackage.Literals.TAG;
+		return DfPackage.Literals.TAG;
 	}
 
 	/**
@@ -61,7 +61,7 @@ public class TagImpl extends EObjectImpl implements Tag {
 	 */
 	public EList<String> getIdentifiers() {
 		if (identifiers == null) {
-			identifiers = new EDataTypeUniqueEList<String>(String.class, this, IrPackage.TAG__IDENTIFIERS);
+			identifiers = new EDataTypeUniqueEList<String>(String.class, this, DfPackage.TAG__IDENTIFIERS);
 		}
 		return identifiers;
 	}
@@ -73,7 +73,7 @@ public class TagImpl extends EObjectImpl implements Tag {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.TAG__IDENTIFIERS:
+			case DfPackage.TAG__IDENTIFIERS:
 				return getIdentifiers();
 		}
 		return super.eGet(featureID, resolve, coreType);
@@ -87,7 +87,7 @@ public class TagImpl extends EObjectImpl implements Tag {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.TAG__IDENTIFIERS:
+			case DfPackage.TAG__IDENTIFIERS:
 				getIdentifiers().clear();
 				getIdentifiers().addAll((Collection<? extends String>)newValue);
 				return;
@@ -102,7 +102,7 @@ public class TagImpl extends EObjectImpl implements Tag {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.TAG__IDENTIFIERS:
+			case DfPackage.TAG__IDENTIFIERS:
 				getIdentifiers().clear();
 				return;
 		}
@@ -116,7 +116,7 @@ public class TagImpl extends EObjectImpl implements Tag {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.TAG__IDENTIFIERS:
+			case DfPackage.TAG__IDENTIFIERS:
 				return identifiers != null && !identifiers.isEmpty();
 		}
 		return super.eIsSet(featureID);

@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.tools.normalizer;
 
-import net.sf.orcc.ir.Action;
+import net.sf.orcc.df.Action;
 
 /**
  * This class defines a simple pattern. A simple pattern is the invocation of

@@ -6,7 +6,7 @@
  */
 package net.sf.orcc.moc;
 
-import net.sf.orcc.ir.Action;
+import net.sf.orcc.df.Action;
 
 import org.eclipse.emf.ecore.EFactory;
 

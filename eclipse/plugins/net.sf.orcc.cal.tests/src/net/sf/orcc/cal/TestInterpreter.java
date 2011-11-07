@@ -31,7 +31,7 @@ package net.sf.orcc.cal;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.ExprString;

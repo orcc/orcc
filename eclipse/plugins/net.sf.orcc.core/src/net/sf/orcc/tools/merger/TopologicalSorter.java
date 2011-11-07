@@ -39,10 +39,8 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
-
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.alg.CycleDetector;
 
 /**
  * This class computes a topological sort of the graph. The graph must be
@@ -57,14 +55,14 @@ public class TopologicalSorter {
 
 		private Set<Vertex> defined = new HashSet<Vertex>();
 
-		private DirectedGraph<Vertex, Connection> graph;
+		private Network network;
 
 		private Map<Vertex, TimeStamp> timeStamps = new HashMap<Vertex, TimeStamp>();
 
 		private int currentTime = 0;
 
-		public DFS(DirectedGraph<Vertex, Connection> graph) {
-			this.graph = graph;
+		public DFS(Network network) {
+			this.network = network;
 		}
 
 		private void dfsVisit(Vertex vertex) {
@@ -72,8 +70,8 @@ public class TopologicalSorter {
 			currentTime++;
 			timeStamps.put(vertex, new TimeStamp(currentTime, 0));
 
-			for (Connection connection : graph.outgoingEdgesOf(vertex)) {
-				Vertex tgtVertex = graph.getEdgeTarget(connection);
+			for (Connection connection : vertex.getOutgoingEdges()) {
+				Vertex tgtVertex = connection.getTarget();
 				if (!defined.contains(tgtVertex)) {
 					dfsVisit(tgtVertex);
 				}
@@ -83,7 +81,7 @@ public class TopologicalSorter {
 		}
 
 		private Map<Vertex, TimeStamp> getTimestamps() {
-			for (Vertex vertex : graph.vertexSet()) {
+			for (Vertex vertex : network.getVertices()) {
 				if (!defined.contains(vertex)) {
 					dfsVisit(vertex);
 				}
@@ -142,18 +140,13 @@ public class TopologicalSorter {
 
 	};
 
-	private DirectedGraph<Vertex, Connection> graph;
+	private Network network;
 
-	public TopologicalSorter(DirectedGraph<Vertex, Connection> graph) {
-		this.graph = graph;
-	}
-
-	@SuppressWarnings("unused")
-	private boolean isAcyclic() {
-		return !(new CycleDetector<Vertex, Connection>(graph).detectCycles());
+	public TopologicalSorter(Network network) {
+		this.network = network;
 	}
 
 	public List<Vertex> topologicalSort() {
-		return new DFS(graph).sortByFinishingTime();
+		return new DFS(network).sortByFinishingTime();
 	}
 }

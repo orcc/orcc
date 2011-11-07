@@ -32,10 +32,10 @@ import java.util.Map;
 
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.xlim.XlimActorTemplateData;
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Pattern;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.Var;
 
 /**

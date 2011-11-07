@@ -55,14 +55,19 @@ import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.cal.util.VoidSwitch;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.FSM;
+import net.sf.orcc.df.Pattern;
+import net.sf.orcc.df.Port;
+import net.sf.orcc.df.State;
+import net.sf.orcc.df.Tag;
 import net.sf.orcc.frontend.schedule.ActionSorter;
 import net.sf.orcc.frontend.schedule.FSMBuilder;
 import net.sf.orcc.frontend.schedule.RegExpConverter;
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
@@ -70,11 +75,7 @@ import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.OpBinary;
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.State;
-import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Use;
@@ -300,7 +301,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	 */
 	@Override
 	public Actor caseAstActor(AstActor astActor) {
-		Actor actor = eINSTANCE.createActor();
+		Actor actor = DfFactory.eINSTANCE.createActor();
 		Frontend.putMapping(astActor, actor);
 
 		actor.setFileName(astActor.eResource().getURI().toPlatformString(true));
@@ -452,17 +453,17 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		Tag tag;
 		String name;
 		if (astTag == null) {
-			tag = eINSTANCE.createTag();
+			tag = DfFactory.eINSTANCE.createTag();
 			name = "untagged_" + untaggedCount++;
 		} else {
-			tag = eINSTANCE.createTag();
+			tag = DfFactory.eINSTANCE.createTag();
 			tag.getIdentifiers().addAll(astAction.getTag().getIdentifiers());
 			name = OrccUtil.toString(tag.getIdentifiers(), "_");
 		}
 
-		Pattern inputPattern = eINSTANCE.createPattern();
-		Pattern outputPattern = eINSTANCE.createPattern();
-		Pattern peekPattern = eINSTANCE.createPattern();
+		Pattern inputPattern = DfFactory.eINSTANCE.createPattern();
+		Pattern outputPattern = DfFactory.eINSTANCE.createPattern();
+		Pattern peekPattern = DfFactory.eINSTANCE.createPattern();
 
 		// creates scheduler and body
 		Procedure scheduler = eINSTANCE
@@ -476,7 +477,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		transformActionScheduler(astAction, scheduler, peekPattern);
 
 		// creates IR action and add it to action list
-		Action action = eINSTANCE.createAction(tag, inputPattern,
+		Action action = DfFactory.eINSTANCE.createAction(tag, inputPattern,
 				outputPattern, peekPattern, scheduler, body);
 		actionList.add(action);
 	}

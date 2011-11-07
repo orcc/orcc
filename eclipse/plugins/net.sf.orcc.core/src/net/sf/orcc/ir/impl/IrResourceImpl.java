@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ir.impl;
 
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Actor;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;

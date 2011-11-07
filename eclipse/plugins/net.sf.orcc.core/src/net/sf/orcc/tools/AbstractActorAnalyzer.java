@@ -29,7 +29,7 @@
 package net.sf.orcc.tools;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.WriteListener;
 

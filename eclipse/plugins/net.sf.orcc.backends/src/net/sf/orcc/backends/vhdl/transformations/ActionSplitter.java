@@ -30,6 +30,8 @@ served.
  */
 package net.sf.orcc.backends.vhdl.transformations;
 
+import static net.sf.orcc.df.DfFactory.eINSTANCE;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,16 +40,17 @@ import java.util.Set;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.instructions.InstSplit;
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.FSM;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.FSM;
+import net.sf.orcc.df.State;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.EcoreHelper;
@@ -109,7 +112,7 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 	 *            action scheduler
 	 */
 	private void addFsm() {
-		fsm = IrFactory.eINSTANCE.createFSM();
+		fsm = DfFactory.eINSTANCE.createFSM();
 
 		State initState = statesMap.get("init");
 		fsm.getStates().add(initState);
@@ -189,10 +192,10 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 		block.add(inst);
 
 		// create action
-		Action action = fac.createAction(fac.createTag(name),
-				fac.createPattern(), currentAction.getOutputPattern(),
-				fac.createPattern(), scheduler, body);
-		currentAction.setOutputPattern(fac.createPattern());
+		Action action = eINSTANCE.createAction(eINSTANCE.createTag(name),
+				eINSTANCE.createPattern(), currentAction.getOutputPattern(),
+				eINSTANCE.createPattern(), scheduler, body);
+		currentAction.setOutputPattern(eINSTANCE.createPattern());
 
 		// add action to actor's actions
 		actor.getActions().add(action);
@@ -232,7 +235,7 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 
 		// add state and transitions
 		String newStateName = newAction.getName();
-		State newState = IrFactory.eINSTANCE.createState(newStateName);
+		State newState = eINSTANCE.createState(newStateName);
 		statesMap.put(newStateName, newState);
 		fsm.getStates().add(newState);
 
@@ -292,7 +295,7 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 			List<Action> actions = new ArrayList<Action>(
 					actor.getActionsOutsideFsm());
 
-			State initState = IrFactory.eINSTANCE.createState("init");
+			State initState = eINSTANCE.createState("init");
 			statesMap.put("init", initState);
 
 			for (Action action : actions) {

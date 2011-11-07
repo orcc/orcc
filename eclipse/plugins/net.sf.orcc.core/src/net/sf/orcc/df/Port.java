@@ -26,9 +26,12 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir;
+package net.sf.orcc.df;
 
 import java.lang.String;
+
+import net.sf.orcc.ir.Type;
+
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -128,7 +131,7 @@ public interface Port extends EObject {
 	void setNative(boolean newNative);
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Port#getNumTokensConsumed <em>Num Tokens Consumed</em>}' attribute.
+	 * Sets the value of the '{@link net.sf.orcc.df.Port#getNumTokensConsumed <em>Num Tokens Consumed</em>}' attribute.
 	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
 	 * @param value the new value of the '<em>Num Tokens Consumed</em>' attribute.
@@ -138,7 +141,7 @@ public interface Port extends EObject {
 	void setNumTokensConsumed(int value);
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Port#getNumTokensProduced <em>Num Tokens Produced</em>}' attribute.
+	 * Sets the value of the '{@link net.sf.orcc.df.Port#getNumTokensProduced <em>Num Tokens Produced</em>}' attribute.
 	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
 	 * @param value the new value of the '<em>Num Tokens Produced</em>' attribute.

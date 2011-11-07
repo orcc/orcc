@@ -32,8 +32,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.Pattern;
+import net.sf.orcc.df.Port;
+import net.sf.orcc.df.Tag;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
@@ -45,10 +49,7 @@ import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.OpBinary;
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
@@ -280,10 +281,10 @@ public class StaticActorNormalizer {
 
 		Pattern input = staticCls.getInputPattern();
 		Pattern output = staticCls.getOutputPattern();
-		Tag tag = IrFactory.eINSTANCE.createTag(ACTION_NAME);
+		Tag tag = DfFactory.eINSTANCE.createTag(ACTION_NAME);
 
-		return IrFactory.eINSTANCE.createAction(tag, input, output,
-				IrFactory.eINSTANCE.createPattern(), scheduler, body);
+		return DfFactory.eINSTANCE.createAction(tag, input, output,
+				DfFactory.eINSTANCE.createPattern(), scheduler, body);
 	}
 
 	/**

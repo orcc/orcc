@@ -3,7 +3,7 @@ package net.sf.orcc.frontend.schedule;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.sf.orcc.ir.Tag;
+import net.sf.orcc.df.Tag;
 
 import org.jgrapht.graph.DefaultDirectedGraph;
 

@@ -51,6 +51,72 @@
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Vertex/incomingEdges"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Vertex/outgoingEdges"/>
     </genClasses>
+    <genClasses ecoreClass="Df.ecore#//Action">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Action/body"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Action/inputPattern"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Action/outputPattern"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Action/peekPattern"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Action/scheduler"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Action/tag"/>
+    </genClasses>
+    <genClasses ecoreClass="Df.ecore#//Actor">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Actor/actions"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Actor/actionsOutsideFsm"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Actor/fsm"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Actor/initializes"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Actor/inputs"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Actor/moC"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Actor/outputs"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Actor/parameters"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Actor/procs"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Actor/stateVars"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Actor/native"/>
+    </genClasses>
+    <genClasses ecoreClass="Df.ecore#//FSM">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//FSM/initialState"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//FSM/states"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//FSM/transitions"/>
+    </genClasses>
+    <genClasses ecoreClass="Df.ecore#//Pattern">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Pattern/numTokensMap"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Pattern/ports"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Pattern/portToVarMap"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Pattern/variables"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Pattern/varToPortMap"/>
+    </genClasses>
+    <genClasses ecoreClass="Df.ecore#//Port">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Port/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Port/numTokensConsumed"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Port/numTokensProduced"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Port/type"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Port/native"/>
+    </genClasses>
+    <genClasses ecoreClass="Df.ecore#//State">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//State/name"/>
+    </genClasses>
+    <genClasses ecoreClass="Df.ecore#//Tag">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Tag/identifiers"/>
+    </genClasses>
+    <genClasses ecoreClass="Df.ecore#//Transition">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Transition/action"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Transition/state"/>
+    </genClasses>
+    <genClasses ecoreClass="Df.ecore#//Transitions">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Transitions/list"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Transitions/sourceState"/>
+    </genClasses>
+    <genClasses ecoreClass="Df.ecore#//PortToEIntegerObjectMapEntry">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//PortToEIntegerObjectMapEntry/key"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//PortToEIntegerObjectMapEntry/value"/>
+    </genClasses>
+    <genClasses ecoreClass="Df.ecore#//PortToVarMapEntry">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//PortToVarMapEntry/key"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//PortToVarMapEntry/value"/>
+    </genClasses>
+    <genClasses ecoreClass="Df.ecore#//VarToPortMapEntry">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//VarToPortMapEntry/key"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//VarToPortMapEntry/value"/>
+    </genClasses>
   </genPackages>
   <genPackages prefix="Ir" basePackage="net.sf.orcc" disposableProviderFactory="true"
       ecorePackage="Ir.ecore#/">
@@ -87,63 +153,9 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Entity/lineNumber"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Entity/name"/>
     </genClasses>
-    <genClasses ecoreClass="Ir.ecore#//Actor">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/actions"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/actionsOutsideFsm"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/fsm"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/initializes"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/inputs"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/moC"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Actor/native"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/outputs"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/parameters"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/procs"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/stateVars"/>
-    </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Unit">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Unit/constants"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Unit/procedures"/>
-    </genClasses>
-    <genClasses ecoreClass="Ir.ecore#//Port">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Port/name"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Port/native"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Port/numTokensConsumed"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Port/numTokensProduced"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Port/type"/>
-    </genClasses>
-    <genClasses ecoreClass="Ir.ecore#//FSM">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//FSM/initialState"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//FSM/states"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//FSM/transitions"/>
-    </genClasses>
-    <genClasses ecoreClass="Ir.ecore#//State">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//State/name"/>
-    </genClasses>
-    <genClasses ecoreClass="Ir.ecore#//Transitions">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Transitions/list"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Transitions/sourceState"/>
-    </genClasses>
-    <genClasses ecoreClass="Ir.ecore#//Transition">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Transition/action"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Transition/state"/>
-    </genClasses>
-    <genClasses ecoreClass="Ir.ecore#//Action">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Action/body"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Action/inputPattern"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Action/outputPattern"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Action/peekPattern"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Action/scheduler"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Action/tag"/>
-    </genClasses>
-    <genClasses ecoreClass="Ir.ecore#//Tag">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Tag/identifiers"/>
-    </genClasses>
-    <genClasses ecoreClass="Ir.ecore#//Pattern">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Pattern/ports"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Pattern/variables"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Pattern/numTokensMap"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Pattern/portToVarMap"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Pattern/varToPortMap"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Procedure">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Procedure/lineNumber"/>
@@ -287,18 +299,6 @@
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Predicate">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Predicate/expressions"/>
-    </genClasses>
-    <genClasses ecoreClass="Ir.ecore#//PortToEIntegerObjectMapEntry">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//PortToEIntegerObjectMapEntry/key"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//PortToEIntegerObjectMapEntry/value"/>
-    </genClasses>
-    <genClasses ecoreClass="Ir.ecore#//PortToVarMapEntry">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//PortToVarMapEntry/key"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//PortToVarMapEntry/value"/>
-    </genClasses>
-    <genClasses ecoreClass="Ir.ecore#//VarToPortMapEntry">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//VarToPortMapEntry/key"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//VarToPortMapEntry/value"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//EStringToEStringMapEntry">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//EStringToEStringMapEntry/key"/>

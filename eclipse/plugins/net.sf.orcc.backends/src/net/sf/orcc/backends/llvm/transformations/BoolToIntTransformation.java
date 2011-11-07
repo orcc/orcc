@@ -28,10 +28,10 @@
  */
 package net.sf.orcc.backends.llvm.transformations;
 
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Pattern;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;

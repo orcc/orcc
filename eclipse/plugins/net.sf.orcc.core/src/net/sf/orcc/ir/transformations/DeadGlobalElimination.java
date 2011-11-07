@@ -31,7 +31,7 @@ package net.sf.orcc.ir.transformations;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Use;

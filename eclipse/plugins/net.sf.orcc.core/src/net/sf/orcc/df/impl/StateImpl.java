@@ -4,15 +4,13 @@
  *
  * $Id$
  */
-package net.sf.orcc.ir.impl;
+package net.sf.orcc.df.impl;
 
-import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.State;
+import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.State;
 
 import org.eclipse.emf.common.notify.Notification;
-
 import org.eclipse.emf.ecore.EClass;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 
@@ -22,7 +20,7 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.ir.impl.StateImpl#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.StateImpl#getName <em>Name</em>}</li>
  * </ul>
  * </p>
  *
@@ -63,7 +61,7 @@ public class StateImpl extends EObjectImpl implements State {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.STATE__NAME:
+			case DfPackage.STATE__NAME:
 				return getName();
 		}
 		return super.eGet(featureID, resolve, coreType);
@@ -76,7 +74,7 @@ public class StateImpl extends EObjectImpl implements State {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.STATE__NAME:
+			case DfPackage.STATE__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 		}
 		return super.eIsSet(featureID);
@@ -89,7 +87,7 @@ public class StateImpl extends EObjectImpl implements State {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.STATE__NAME:
+			case DfPackage.STATE__NAME:
 				setName((String)newValue);
 				return;
 		}
@@ -102,7 +100,7 @@ public class StateImpl extends EObjectImpl implements State {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return IrPackage.Literals.STATE;
+		return DfPackage.Literals.STATE;
 	}
 
 	/**
@@ -112,7 +110,7 @@ public class StateImpl extends EObjectImpl implements State {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.STATE__NAME:
+			case DfPackage.STATE__NAME:
 				setName(NAME_EDEFAULT);
 				return;
 		}
@@ -135,7 +133,7 @@ public class StateImpl extends EObjectImpl implements State {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.STATE__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.STATE__NAME, oldName, name));
 	}
 
 	/**

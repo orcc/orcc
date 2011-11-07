@@ -32,10 +32,10 @@ package net.sf.orcc.backends.xlim;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.State;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Port;
+import net.sf.orcc.df.State;
 import net.sf.orcc.ir.Var;
 
 /**

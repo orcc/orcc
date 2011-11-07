@@ -4,13 +4,13 @@
  *
  * $Id$
  */
-package net.sf.orcc.ir.impl;
+package net.sf.orcc.df.impl;
 
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Pattern;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.Pattern;
+import net.sf.orcc.df.Tag;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Tag;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -25,12 +25,12 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getBody <em>Body</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getInputPattern <em>Input Pattern</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getOutputPattern <em>Output Pattern</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getPeekPattern <em>Peek Pattern</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getScheduler <em>Scheduler</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getTag <em>Tag</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.ActionImpl#getBody <em>Body</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.ActionImpl#getInputPattern <em>Input Pattern</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.ActionImpl#getOutputPattern <em>Output Pattern</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.ActionImpl#getPeekPattern <em>Peek Pattern</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.ActionImpl#getScheduler <em>Scheduler</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.ActionImpl#getTag <em>Tag</em>}</li>
  * </ul>
  * </p>
  *
@@ -112,7 +112,7 @@ public class ActionImpl extends EObjectImpl implements Action {
 		Procedure oldBody = body;
 		body = newBody;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__BODY, oldBody, newBody);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, DfPackage.ACTION__BODY, oldBody, newBody);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
@@ -127,7 +127,7 @@ public class ActionImpl extends EObjectImpl implements Action {
 		Pattern oldInputPattern = inputPattern;
 		inputPattern = newInputPattern;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__INPUT_PATTERN, oldInputPattern, newInputPattern);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, DfPackage.ACTION__INPUT_PATTERN, oldInputPattern, newInputPattern);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
@@ -142,7 +142,7 @@ public class ActionImpl extends EObjectImpl implements Action {
 		Pattern oldOutputPattern = outputPattern;
 		outputPattern = newOutputPattern;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__OUTPUT_PATTERN, oldOutputPattern, newOutputPattern);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, DfPackage.ACTION__OUTPUT_PATTERN, oldOutputPattern, newOutputPattern);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
@@ -157,7 +157,7 @@ public class ActionImpl extends EObjectImpl implements Action {
 		Pattern oldPeekPattern = peekPattern;
 		peekPattern = newPeekPattern;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__PEEK_PATTERN, oldPeekPattern, newPeekPattern);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, DfPackage.ACTION__PEEK_PATTERN, oldPeekPattern, newPeekPattern);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
@@ -172,7 +172,7 @@ public class ActionImpl extends EObjectImpl implements Action {
 		Procedure oldScheduler = scheduler;
 		scheduler = newScheduler;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__SCHEDULER, oldScheduler, newScheduler);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, DfPackage.ACTION__SCHEDULER, oldScheduler, newScheduler);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
@@ -186,7 +186,7 @@ public class ActionImpl extends EObjectImpl implements Action {
 		Tag oldTag = tag;
 		tag = newTag;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__TAG, oldTag, newTag);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, DfPackage.ACTION__TAG, oldTag, newTag);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
@@ -199,17 +199,17 @@ public class ActionImpl extends EObjectImpl implements Action {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.ACTION__BODY:
+			case DfPackage.ACTION__BODY:
 				return getBody();
-			case IrPackage.ACTION__INPUT_PATTERN:
+			case DfPackage.ACTION__INPUT_PATTERN:
 				return getInputPattern();
-			case IrPackage.ACTION__OUTPUT_PATTERN:
+			case DfPackage.ACTION__OUTPUT_PATTERN:
 				return getOutputPattern();
-			case IrPackage.ACTION__PEEK_PATTERN:
+			case DfPackage.ACTION__PEEK_PATTERN:
 				return getPeekPattern();
-			case IrPackage.ACTION__SCHEDULER:
+			case DfPackage.ACTION__SCHEDULER:
 				return getScheduler();
-			case IrPackage.ACTION__TAG:
+			case DfPackage.ACTION__TAG:
 				return getTag();
 		}
 		return super.eGet(featureID, resolve, coreType);
@@ -223,17 +223,17 @@ public class ActionImpl extends EObjectImpl implements Action {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrPackage.ACTION__BODY:
+			case DfPackage.ACTION__BODY:
 				return basicSetBody(null, msgs);
-			case IrPackage.ACTION__INPUT_PATTERN:
+			case DfPackage.ACTION__INPUT_PATTERN:
 				return basicSetInputPattern(null, msgs);
-			case IrPackage.ACTION__OUTPUT_PATTERN:
+			case DfPackage.ACTION__OUTPUT_PATTERN:
 				return basicSetOutputPattern(null, msgs);
-			case IrPackage.ACTION__PEEK_PATTERN:
+			case DfPackage.ACTION__PEEK_PATTERN:
 				return basicSetPeekPattern(null, msgs);
-			case IrPackage.ACTION__SCHEDULER:
+			case DfPackage.ACTION__SCHEDULER:
 				return basicSetScheduler(null, msgs);
-			case IrPackage.ACTION__TAG:
+			case DfPackage.ACTION__TAG:
 				return basicSetTag(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
@@ -246,17 +246,17 @@ public class ActionImpl extends EObjectImpl implements Action {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.ACTION__BODY:
+			case DfPackage.ACTION__BODY:
 				return body != null;
-			case IrPackage.ACTION__INPUT_PATTERN:
+			case DfPackage.ACTION__INPUT_PATTERN:
 				return inputPattern != null;
-			case IrPackage.ACTION__OUTPUT_PATTERN:
+			case DfPackage.ACTION__OUTPUT_PATTERN:
 				return outputPattern != null;
-			case IrPackage.ACTION__PEEK_PATTERN:
+			case DfPackage.ACTION__PEEK_PATTERN:
 				return peekPattern != null;
-			case IrPackage.ACTION__SCHEDULER:
+			case DfPackage.ACTION__SCHEDULER:
 				return scheduler != null;
-			case IrPackage.ACTION__TAG:
+			case DfPackage.ACTION__TAG:
 				return tag != null;
 		}
 		return super.eIsSet(featureID);
@@ -269,22 +269,22 @@ public class ActionImpl extends EObjectImpl implements Action {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.ACTION__BODY:
+			case DfPackage.ACTION__BODY:
 				setBody((Procedure)newValue);
 				return;
-			case IrPackage.ACTION__INPUT_PATTERN:
+			case DfPackage.ACTION__INPUT_PATTERN:
 				setInputPattern((Pattern)newValue);
 				return;
-			case IrPackage.ACTION__OUTPUT_PATTERN:
+			case DfPackage.ACTION__OUTPUT_PATTERN:
 				setOutputPattern((Pattern)newValue);
 				return;
-			case IrPackage.ACTION__PEEK_PATTERN:
+			case DfPackage.ACTION__PEEK_PATTERN:
 				setPeekPattern((Pattern)newValue);
 				return;
-			case IrPackage.ACTION__SCHEDULER:
+			case DfPackage.ACTION__SCHEDULER:
 				setScheduler((Procedure)newValue);
 				return;
-			case IrPackage.ACTION__TAG:
+			case DfPackage.ACTION__TAG:
 				setTag((Tag)newValue);
 				return;
 		}
@@ -297,7 +297,7 @@ public class ActionImpl extends EObjectImpl implements Action {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return IrPackage.Literals.ACTION;
+		return DfPackage.Literals.ACTION;
 	}
 
 	/**
@@ -307,22 +307,22 @@ public class ActionImpl extends EObjectImpl implements Action {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.ACTION__BODY:
+			case DfPackage.ACTION__BODY:
 				setBody((Procedure)null);
 				return;
-			case IrPackage.ACTION__INPUT_PATTERN:
+			case DfPackage.ACTION__INPUT_PATTERN:
 				setInputPattern((Pattern)null);
 				return;
-			case IrPackage.ACTION__OUTPUT_PATTERN:
+			case DfPackage.ACTION__OUTPUT_PATTERN:
 				setOutputPattern((Pattern)null);
 				return;
-			case IrPackage.ACTION__PEEK_PATTERN:
+			case DfPackage.ACTION__PEEK_PATTERN:
 				setPeekPattern((Pattern)null);
 				return;
-			case IrPackage.ACTION__SCHEDULER:
+			case DfPackage.ACTION__SCHEDULER:
 				setScheduler((Procedure)null);
 				return;
-			case IrPackage.ACTION__TAG:
+			case DfPackage.ACTION__TAG:
 				setTag((Tag)null);
 				return;
 		}
@@ -400,14 +400,14 @@ public class ActionImpl extends EObjectImpl implements Action {
 		if (newBody != body) {
 			NotificationChain msgs = null;
 			if (body != null)
-				msgs = ((InternalEObject)body).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__BODY, null, msgs);
+				msgs = ((InternalEObject)body).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - DfPackage.ACTION__BODY, null, msgs);
 			if (newBody != null)
-				msgs = ((InternalEObject)newBody).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__BODY, null, msgs);
+				msgs = ((InternalEObject)newBody).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - DfPackage.ACTION__BODY, null, msgs);
 			msgs = basicSetBody(newBody, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__BODY, newBody, newBody));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ACTION__BODY, newBody, newBody));
 	}
 
 	/**
@@ -418,14 +418,14 @@ public class ActionImpl extends EObjectImpl implements Action {
 		if (newInputPattern != inputPattern) {
 			NotificationChain msgs = null;
 			if (inputPattern != null)
-				msgs = ((InternalEObject)inputPattern).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__INPUT_PATTERN, null, msgs);
+				msgs = ((InternalEObject)inputPattern).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - DfPackage.ACTION__INPUT_PATTERN, null, msgs);
 			if (newInputPattern != null)
-				msgs = ((InternalEObject)newInputPattern).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__INPUT_PATTERN, null, msgs);
+				msgs = ((InternalEObject)newInputPattern).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - DfPackage.ACTION__INPUT_PATTERN, null, msgs);
 			msgs = basicSetInputPattern(newInputPattern, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__INPUT_PATTERN, newInputPattern, newInputPattern));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ACTION__INPUT_PATTERN, newInputPattern, newInputPattern));
 	}
 
 	/**
@@ -436,14 +436,14 @@ public class ActionImpl extends EObjectImpl implements Action {
 		if (newOutputPattern != outputPattern) {
 			NotificationChain msgs = null;
 			if (outputPattern != null)
-				msgs = ((InternalEObject)outputPattern).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__OUTPUT_PATTERN, null, msgs);
+				msgs = ((InternalEObject)outputPattern).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - DfPackage.ACTION__OUTPUT_PATTERN, null, msgs);
 			if (newOutputPattern != null)
-				msgs = ((InternalEObject)newOutputPattern).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__OUTPUT_PATTERN, null, msgs);
+				msgs = ((InternalEObject)newOutputPattern).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - DfPackage.ACTION__OUTPUT_PATTERN, null, msgs);
 			msgs = basicSetOutputPattern(newOutputPattern, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__OUTPUT_PATTERN, newOutputPattern, newOutputPattern));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ACTION__OUTPUT_PATTERN, newOutputPattern, newOutputPattern));
 	}
 
 	/**
@@ -454,14 +454,14 @@ public class ActionImpl extends EObjectImpl implements Action {
 		if (newPeekPattern != peekPattern) {
 			NotificationChain msgs = null;
 			if (peekPattern != null)
-				msgs = ((InternalEObject)peekPattern).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__PEEK_PATTERN, null, msgs);
+				msgs = ((InternalEObject)peekPattern).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - DfPackage.ACTION__PEEK_PATTERN, null, msgs);
 			if (newPeekPattern != null)
-				msgs = ((InternalEObject)newPeekPattern).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__PEEK_PATTERN, null, msgs);
+				msgs = ((InternalEObject)newPeekPattern).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - DfPackage.ACTION__PEEK_PATTERN, null, msgs);
 			msgs = basicSetPeekPattern(newPeekPattern, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__PEEK_PATTERN, newPeekPattern, newPeekPattern));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ACTION__PEEK_PATTERN, newPeekPattern, newPeekPattern));
 	}
 
 	/**
@@ -472,14 +472,14 @@ public class ActionImpl extends EObjectImpl implements Action {
 		if (newScheduler != scheduler) {
 			NotificationChain msgs = null;
 			if (scheduler != null)
-				msgs = ((InternalEObject)scheduler).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__SCHEDULER, null, msgs);
+				msgs = ((InternalEObject)scheduler).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - DfPackage.ACTION__SCHEDULER, null, msgs);
 			if (newScheduler != null)
-				msgs = ((InternalEObject)newScheduler).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__SCHEDULER, null, msgs);
+				msgs = ((InternalEObject)newScheduler).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - DfPackage.ACTION__SCHEDULER, null, msgs);
 			msgs = basicSetScheduler(newScheduler, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__SCHEDULER, newScheduler, newScheduler));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ACTION__SCHEDULER, newScheduler, newScheduler));
 	}
 
 	/**
@@ -490,14 +490,14 @@ public class ActionImpl extends EObjectImpl implements Action {
 		if (newTag != tag) {
 			NotificationChain msgs = null;
 			if (tag != null)
-				msgs = ((InternalEObject)tag).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__TAG, null, msgs);
+				msgs = ((InternalEObject)tag).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - DfPackage.ACTION__TAG, null, msgs);
 			if (newTag != null)
-				msgs = ((InternalEObject)newTag).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__TAG, null, msgs);
+				msgs = ((InternalEObject)newTag).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - DfPackage.ACTION__TAG, null, msgs);
 			msgs = basicSetTag(newTag, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__TAG, newTag, newTag));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ACTION__TAG, newTag, newTag));
 	}
 	
 	@Override

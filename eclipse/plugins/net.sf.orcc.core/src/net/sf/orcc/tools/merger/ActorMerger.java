@@ -37,14 +37,16 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Pattern;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.transformations.INetworkTransformation;
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstLoad;
@@ -55,8 +57,6 @@ import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.OpBinary;
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
@@ -307,14 +307,14 @@ public class ActorMerger implements INetworkTransformation {
 	 * @return ip
 	 */
 	private Pattern createInputPattern() {
-		IrFactory factory = IrFactory.eINSTANCE;
-		Pattern ip = factory.createPattern();
+		Pattern ip = DfFactory.eINSTANCE.createPattern();
 		SDFMoC moc = (SDFMoC) superActor.getMoC();
 		for (Port port : superActor.getInputs()) {
 			int numTokens = moc.getNumTokensConsumed(port);
-			Type type = factory.createTypeList(numTokens,
+			Type type = IrFactory.eINSTANCE.createTypeList(numTokens,
 					EcoreUtil.copy(port.getType()));
-			Var var = factory.createVar(0, type, port.getName(), false, true);
+			Var var = IrFactory.eINSTANCE.createVar(0, type, port.getName(),
+					false, true);
 			ip.setNumTokens(port, numTokens);
 			ip.setVariable(port, var);
 		}
@@ -328,7 +328,7 @@ public class ActorMerger implements INetworkTransformation {
 	 */
 	private Pattern createOutputPattern() {
 		IrFactory factory = IrFactory.eINSTANCE;
-		Pattern op = factory.createPattern();
+		Pattern op = DfFactory.eINSTANCE.createPattern();
 		SDFMoC moc = (SDFMoC) superActor.getMoC();
 		for (Port port : superActor.getOutputs()) {
 			int numTokens = moc.getNumTokensProduced(port);
@@ -346,9 +346,8 @@ public class ActorMerger implements INetworkTransformation {
 	 * 
 	 */
 	private void createPorts() {
-		IrFactory factory = IrFactory.eINSTANCE;
-		Pattern inputPattern = factory.createPattern();
-		Pattern outputPattern = factory.createPattern();
+		Pattern inputPattern = DfFactory.eINSTANCE.createPattern();
+		Pattern outputPattern = DfFactory.eINSTANCE.createPattern();
 
 		SDFMoC sdfMoC = MocFactory.eINSTANCE.createSDFMoC();
 		sdfMoC.setInputPattern(inputPattern);
@@ -367,7 +366,7 @@ public class ActorMerger implements INetworkTransformation {
 
 			if (!vertices.contains(src) && vertices.contains(tgt)) {
 				Port tgtPort = connection.getTargetPort();
-				Port port = factory
+				Port port = DfFactory.eINSTANCE
 						.createPort(EcoreUtil.copy(tgtPort.getType()), "input_"
 								+ inIndex++);
 
@@ -383,7 +382,7 @@ public class ActorMerger implements INetworkTransformation {
 
 			} else if (vertices.contains(src) && !vertices.contains(tgt)) {
 				Port srcPort = connection.getSourcePort();
-				Port port = factory.createPort(
+				Port port = DfFactory.eINSTANCE.createPort(
 						EcoreUtil.copy(srcPort.getType()), "output_"
 								+ outIndex++);
 
@@ -500,15 +499,14 @@ public class ActorMerger implements INetworkTransformation {
 	 * 
 	 */
 	private void createStaticAction() {
-		IrFactory factory = IrFactory.eINSTANCE;
-
 		Pattern ip = createInputPattern();
 		Pattern op = createOutputPattern();
 		Procedure scheduler = createScheduler();
 		Procedure body = createBody(ip, op);
 
-		Action action = factory.createAction(factory.createTag(), ip, op,
-				factory.createPattern(), scheduler, body);
+		Action action = DfFactory.eINSTANCE.createAction(
+				DfFactory.eINSTANCE.createTag(), ip, op,
+				DfFactory.eINSTANCE.createPattern(), scheduler, body);
 
 		superActor.getActions().add(action);
 		superActor.getActionsOutsideFsm().add(action);
@@ -578,7 +576,7 @@ public class ActorMerger implements INetworkTransformation {
 	 * 
 	 */
 	private void mergeActors() {
-		superActor = IrFactory.eINSTANCE.createActor();
+		superActor = DfFactory.eINSTANCE.createActor();
 		String name = "SuperActor_" + index;
 		superActor.setName(name);
 

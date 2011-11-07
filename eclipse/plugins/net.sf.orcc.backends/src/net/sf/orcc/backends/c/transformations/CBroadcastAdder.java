@@ -34,9 +34,9 @@ import java.util.Set;
 
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.transformations.BroadcastAdder;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.util.WriteListener;
 
 /**

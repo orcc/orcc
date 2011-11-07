@@ -31,6 +31,7 @@ package net.sf.orcc.ir.transformations;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
@@ -153,7 +154,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor<Object> {
 
 	protected void handleInstruction(Var target, Instruction instruction) {
 		// do not remove assign to variables of patterns
-		if (target.eContainmentFeature() == IrPackage.eINSTANCE
+		if (target.eContainmentFeature() == DfPackage.eINSTANCE
 				.getPattern_Variables()) {
 			return;
 		}

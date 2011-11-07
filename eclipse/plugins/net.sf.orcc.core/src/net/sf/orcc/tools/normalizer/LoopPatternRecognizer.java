@@ -31,7 +31,7 @@ package net.sf.orcc.tools.normalizer;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sf.orcc.ir.Action;
+import net.sf.orcc.df.Action;
 import net.sf.orcc.moc.Invocation;
 
 /**

@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.vhdl.transformations;
 
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;

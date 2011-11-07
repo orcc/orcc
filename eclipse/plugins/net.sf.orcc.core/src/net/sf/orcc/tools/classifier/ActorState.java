@@ -33,8 +33,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.IrPackage;
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
@@ -69,7 +69,7 @@ public class ActorState {
 				for (Use use : variable.getUses()) {
 					Procedure proc = EcoreHelper.getContainerOfType(use,
 							Procedure.class);
-					if (proc.eContainingFeature() == IrPackage.eINSTANCE
+					if (proc.eContainingFeature() == DfPackage.eINSTANCE
 							.getAction_Scheduler()) {
 						usedByGuard = true;
 						break;

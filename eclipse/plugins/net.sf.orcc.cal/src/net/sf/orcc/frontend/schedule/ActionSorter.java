@@ -36,9 +36,9 @@ import java.util.List;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.Inequality;
 import net.sf.orcc.cal.cal.Priority;
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Tag;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.Tag;
 import net.sf.orcc.util.ActionList;
 
 import org.jgrapht.DirectedGraph;
@@ -154,10 +154,10 @@ public class ActionSorter {
 			for (Inequality inequality : priority.getInequalities()) {
 				// the grammar requires there be at least two tags
 				Iterator<AstTag> it = inequality.getTags().iterator();
-				Tag previousTag = IrFactory.eINSTANCE.createTag(it.next()
+				Tag previousTag = DfFactory.eINSTANCE.createTag(it.next()
 						.getIdentifiers());
 				while (it.hasNext()) {
-					Tag tag = IrFactory.eINSTANCE.createTag(it.next()
+					Tag tag = DfFactory.eINSTANCE.createTag(it.next()
 							.getIdentifiers());
 					List<Action> sources = actionList
 							.getTaggedActions(previousTag);

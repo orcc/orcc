@@ -35,9 +35,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Tag;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.Tag;
 
 /**
  * A list of action is like an ordered map, except keys are tags (list of
@@ -80,7 +80,7 @@ public class ActionList implements Iterable<Action> {
 			// we add the action to the tagMap for entries:
 			// [a]; [a, b]; [a, b, c]
 
-			Tag currentTag = IrFactory.eINSTANCE.createTag();
+			Tag currentTag = DfFactory.eINSTANCE.createTag();
 			for (String id : tag.getIdentifiers()) {
 				currentTag.add(id);
 
@@ -95,7 +95,7 @@ public class ActionList implements Iterable<Action> {
 				actions.add(action);
 
 				// creates a new list and copies the tag in it
-				currentTag = IrFactory.eINSTANCE.createTag(currentTag);
+				currentTag = DfFactory.eINSTANCE.createTag(currentTag);
 			}
 		}
 	}

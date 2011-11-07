@@ -35,16 +35,16 @@ import java.util.Map;
 
 import org.eclipse.emf.ecore.EObject;
 
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Transition;
+import net.sf.orcc.df.Transitions;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Transition;
-import net.sf.orcc.ir.Transitions;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**

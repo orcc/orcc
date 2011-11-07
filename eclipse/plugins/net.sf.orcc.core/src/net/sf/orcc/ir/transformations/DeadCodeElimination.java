@@ -31,7 +31,7 @@ package net.sf.orcc.ir.transformations;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;

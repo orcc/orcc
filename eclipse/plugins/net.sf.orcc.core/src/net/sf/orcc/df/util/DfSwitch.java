@@ -6,10 +6,12 @@
  */
 package net.sf.orcc.df.util;
 
+import java.util.Map;
 import net.sf.orcc.df.*;
 
 import net.sf.orcc.ir.Entity;
 
+import net.sf.orcc.ir.Var;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 
@@ -118,6 +120,79 @@ public class DfSwitch<T> extends Switch<T> {
 			case DfPackage.VERTEX: {
 				Vertex vertex = (Vertex)theEObject;
 				T result = caseVertex(vertex);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case DfPackage.ACTION: {
+				Action action = (Action)theEObject;
+				T result = caseAction(action);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case DfPackage.ACTOR: {
+				Actor actor = (Actor)theEObject;
+				T result = caseActor(actor);
+				if (result == null) result = caseEntity(actor);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case DfPackage.FSM: {
+				FSM fsm = (FSM)theEObject;
+				T result = caseFSM(fsm);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case DfPackage.PATTERN: {
+				Pattern pattern = (Pattern)theEObject;
+				T result = casePattern(pattern);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case DfPackage.PORT: {
+				Port port = (Port)theEObject;
+				T result = casePort(port);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case DfPackage.STATE: {
+				State state = (State)theEObject;
+				T result = caseState(state);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case DfPackage.TAG: {
+				Tag tag = (Tag)theEObject;
+				T result = caseTag(tag);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case DfPackage.TRANSITION: {
+				Transition transition = (Transition)theEObject;
+				T result = caseTransition(transition);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case DfPackage.TRANSITIONS: {
+				Transitions transitions = (Transitions)theEObject;
+				T result = caseTransitions(transitions);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY: {
+				@SuppressWarnings("unchecked") Map.Entry<Port, Integer> portToEIntegerObjectMapEntry = (Map.Entry<Port, Integer>)theEObject;
+				T result = casePortToEIntegerObjectMapEntry(portToEIntegerObjectMapEntry);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case DfPackage.PORT_TO_VAR_MAP_ENTRY: {
+				@SuppressWarnings("unchecked") Map.Entry<Port, Var> portToVarMapEntry = (Map.Entry<Port, Var>)theEObject;
+				T result = casePortToVarMapEntry(portToVarMapEntry);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case DfPackage.VAR_TO_PORT_MAP_ENTRY: {
+				@SuppressWarnings("unchecked") Map.Entry<Var, Port> varToPortMapEntry = (Map.Entry<Var, Port>)theEObject;
+				T result = caseVarToPortMapEntry(varToPortMapEntry);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -242,6 +317,186 @@ public class DfSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseVertex(Vertex object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Action</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Action</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseAction(Action object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Actor</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Actor</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseActor(Actor object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>FSM</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>FSM</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseFSM(FSM object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Pattern</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Pattern</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T casePattern(Pattern object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Port</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Port</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T casePort(Port object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>State</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>State</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseState(State object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Tag</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Tag</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseTag(Tag object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Transition</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Transition</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseTransition(Transition object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Transitions</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Transitions</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseTransitions(Transitions object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Port To EInteger Object Map Entry</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Port To EInteger Object Map Entry</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T casePortToEIntegerObjectMapEntry(Map.Entry<Port, Integer> object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Port To Var Map Entry</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Port To Var Map Entry</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T casePortToVarMapEntry(Map.Entry<Port, Var> object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Var To Port Map Entry</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Var To Port Map Entry</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseVarToPortMapEntry(Map.Entry<Var, Port> object) {
 		return null;
 	}
 

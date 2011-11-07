@@ -39,15 +39,15 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.State;
-import net.sf.orcc.ir.Transition;
-import net.sf.orcc.ir.Transitions;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.FSM;
+import net.sf.orcc.df.Pattern;
+import net.sf.orcc.df.Port;
+import net.sf.orcc.df.State;
+import net.sf.orcc.df.Transition;
+import net.sf.orcc.df.Transitions;
 import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.Invocation;
@@ -514,7 +514,7 @@ public class ActorClassifier implements ActorVisitor<Object> {
 	private boolean isTimeDependent(List<Action> actions) {
 		Iterator<Action> it = actions.iterator();
 
-		Pattern higherPriorityPattern = IrFactory.eINSTANCE.createPattern();
+		Pattern higherPriorityPattern = DfFactory.eINSTANCE.createPattern();
 		List<Action> higherPriorityActions = new ArrayList<Action>();
 
 		if (it.hasNext()) {

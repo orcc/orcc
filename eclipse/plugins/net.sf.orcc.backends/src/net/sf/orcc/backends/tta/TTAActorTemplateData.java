@@ -32,12 +32,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.backends.instructions.InstCast;
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Pattern;
+import net.sf.orcc.df.Port;
+import net.sf.orcc.df.State;
 import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.common.util.TreeIterator;

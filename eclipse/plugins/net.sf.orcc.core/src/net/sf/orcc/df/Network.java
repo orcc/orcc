@@ -32,9 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Entity;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
 

@@ -4,19 +4,20 @@
  *
  * $Id$
  */
-package net.sf.orcc.ir.impl;
+package net.sf.orcc.df.impl;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Port;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.FSM;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.impl.EntityImpl;
 import net.sf.orcc.ir.util.MapAdapter;
 import net.sf.orcc.moc.MoC;
 
@@ -36,17 +37,17 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getActions <em>Actions</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getActionsOutsideFsm <em>Actions Outside Fsm</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getFsm <em>Fsm</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getInitializes <em>Initializes</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getInputs <em>Inputs</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getMoC <em>Mo C</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#isNative <em>Native</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getOutputs <em>Outputs</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getParameters <em>Parameters</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getProcs <em>Procs</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getStateVars <em>State Vars</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getActions <em>Actions</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getActionsOutsideFsm <em>Actions Outside Fsm</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getFsm <em>Fsm</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getInitializes <em>Initializes</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getInputs <em>Inputs</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getMoC <em>Mo C</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getOutputs <em>Outputs</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getParameters <em>Parameters</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getProcs <em>Procs</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getStateVars <em>State Vars</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.ActorImpl#isNative <em>Native</em>}</li>
  * </ul>
  * </p>
  *
@@ -119,24 +120,6 @@ public class ActorImpl extends EntityImpl implements Actor {
 	protected MoC moC;
 
 	/**
-	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isNative()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean NATIVE_EDEFAULT = false;
-
-	/**
-	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isNative()
-	 * @generated
-	 * @ordered
-	 */
-	protected boolean native_ = NATIVE_EDEFAULT;
-
-	/**
 	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getOutputs()
@@ -173,6 +156,24 @@ public class ActorImpl extends EntityImpl implements Actor {
 	protected EList<Var> stateVars;
 
 	/**
+	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #isNative()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean NATIVE_EDEFAULT = false;
+
+	/**
+	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #isNative()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean native_ = NATIVE_EDEFAULT;
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 */
 	protected ActorImpl() {
@@ -195,7 +196,7 @@ public class ActorImpl extends EntityImpl implements Actor {
 		FSM oldFsm = fsm;
 		fsm = newFsm;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.ACTOR__FSM, oldFsm, newFsm);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, DfPackage.ACTOR__FSM, oldFsm, newFsm);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
@@ -209,7 +210,7 @@ public class ActorImpl extends EntityImpl implements Actor {
 		MoC oldMoC = moC;
 		moC = newMoC;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.ACTOR__MO_C, oldMoC, newMoC);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, DfPackage.ACTOR__MO_C, oldMoC, newMoC);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
@@ -222,28 +223,28 @@ public class ActorImpl extends EntityImpl implements Actor {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.ACTOR__ACTIONS:
+			case DfPackage.ACTOR__ACTIONS:
 				return getActions();
-			case IrPackage.ACTOR__ACTIONS_OUTSIDE_FSM:
+			case DfPackage.ACTOR__ACTIONS_OUTSIDE_FSM:
 				return getActionsOutsideFsm();
-			case IrPackage.ACTOR__FSM:
+			case DfPackage.ACTOR__FSM:
 				return getFsm();
-			case IrPackage.ACTOR__INITIALIZES:
+			case DfPackage.ACTOR__INITIALIZES:
 				return getInitializes();
-			case IrPackage.ACTOR__INPUTS:
+			case DfPackage.ACTOR__INPUTS:
 				return getInputs();
-			case IrPackage.ACTOR__MO_C:
+			case DfPackage.ACTOR__MO_C:
 				return getMoC();
-			case IrPackage.ACTOR__NATIVE:
-				return isNative();
-			case IrPackage.ACTOR__OUTPUTS:
+			case DfPackage.ACTOR__OUTPUTS:
 				return getOutputs();
-			case IrPackage.ACTOR__PARAMETERS:
+			case DfPackage.ACTOR__PARAMETERS:
 				return getParameters();
-			case IrPackage.ACTOR__PROCS:
+			case DfPackage.ACTOR__PROCS:
 				return getProcs();
-			case IrPackage.ACTOR__STATE_VARS:
+			case DfPackage.ACTOR__STATE_VARS:
 				return getStateVars();
+			case DfPackage.ACTOR__NATIVE:
+				return isNative();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -256,23 +257,23 @@ public class ActorImpl extends EntityImpl implements Actor {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrPackage.ACTOR__ACTIONS:
+			case DfPackage.ACTOR__ACTIONS:
 				return ((InternalEList<?>)getActions()).basicRemove(otherEnd, msgs);
-			case IrPackage.ACTOR__FSM:
+			case DfPackage.ACTOR__FSM:
 				return basicSetFsm(null, msgs);
-			case IrPackage.ACTOR__INITIALIZES:
+			case DfPackage.ACTOR__INITIALIZES:
 				return ((InternalEList<?>)getInitializes()).basicRemove(otherEnd, msgs);
-			case IrPackage.ACTOR__INPUTS:
+			case DfPackage.ACTOR__INPUTS:
 				return ((InternalEList<?>)getInputs()).basicRemove(otherEnd, msgs);
-			case IrPackage.ACTOR__MO_C:
+			case DfPackage.ACTOR__MO_C:
 				return basicSetMoC(null, msgs);
-			case IrPackage.ACTOR__OUTPUTS:
+			case DfPackage.ACTOR__OUTPUTS:
 				return ((InternalEList<?>)getOutputs()).basicRemove(otherEnd, msgs);
-			case IrPackage.ACTOR__PARAMETERS:
+			case DfPackage.ACTOR__PARAMETERS:
 				return ((InternalEList<?>)getParameters()).basicRemove(otherEnd, msgs);
-			case IrPackage.ACTOR__PROCS:
+			case DfPackage.ACTOR__PROCS:
 				return ((InternalEList<?>)getProcs()).basicRemove(otherEnd, msgs);
-			case IrPackage.ACTOR__STATE_VARS:
+			case DfPackage.ACTOR__STATE_VARS:
 				return ((InternalEList<?>)getStateVars()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
@@ -285,28 +286,28 @@ public class ActorImpl extends EntityImpl implements Actor {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.ACTOR__ACTIONS:
+			case DfPackage.ACTOR__ACTIONS:
 				return actions != null && !actions.isEmpty();
-			case IrPackage.ACTOR__ACTIONS_OUTSIDE_FSM:
+			case DfPackage.ACTOR__ACTIONS_OUTSIDE_FSM:
 				return actionsOutsideFsm != null && !actionsOutsideFsm.isEmpty();
-			case IrPackage.ACTOR__FSM:
+			case DfPackage.ACTOR__FSM:
 				return fsm != null;
-			case IrPackage.ACTOR__INITIALIZES:
+			case DfPackage.ACTOR__INITIALIZES:
 				return initializes != null && !initializes.isEmpty();
-			case IrPackage.ACTOR__INPUTS:
+			case DfPackage.ACTOR__INPUTS:
 				return inputs != null && !inputs.isEmpty();
-			case IrPackage.ACTOR__MO_C:
+			case DfPackage.ACTOR__MO_C:
 				return moC != null;
-			case IrPackage.ACTOR__NATIVE:
-				return native_ != NATIVE_EDEFAULT;
-			case IrPackage.ACTOR__OUTPUTS:
+			case DfPackage.ACTOR__OUTPUTS:
 				return outputs != null && !outputs.isEmpty();
-			case IrPackage.ACTOR__PARAMETERS:
+			case DfPackage.ACTOR__PARAMETERS:
 				return parameters != null && !parameters.isEmpty();
-			case IrPackage.ACTOR__PROCS:
+			case DfPackage.ACTOR__PROCS:
 				return procs != null && !procs.isEmpty();
-			case IrPackage.ACTOR__STATE_VARS:
+			case DfPackage.ACTOR__STATE_VARS:
 				return stateVars != null && !stateVars.isEmpty();
+			case DfPackage.ACTOR__NATIVE:
+				return native_ != NATIVE_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -319,46 +320,46 @@ public class ActorImpl extends EntityImpl implements Actor {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.ACTOR__ACTIONS:
+			case DfPackage.ACTOR__ACTIONS:
 				getActions().clear();
 				getActions().addAll((Collection<? extends Action>)newValue);
 				return;
-			case IrPackage.ACTOR__ACTIONS_OUTSIDE_FSM:
+			case DfPackage.ACTOR__ACTIONS_OUTSIDE_FSM:
 				getActionsOutsideFsm().clear();
 				getActionsOutsideFsm().addAll((Collection<? extends Action>)newValue);
 				return;
-			case IrPackage.ACTOR__FSM:
+			case DfPackage.ACTOR__FSM:
 				setFsm((FSM)newValue);
 				return;
-			case IrPackage.ACTOR__INITIALIZES:
+			case DfPackage.ACTOR__INITIALIZES:
 				getInitializes().clear();
 				getInitializes().addAll((Collection<? extends Action>)newValue);
 				return;
-			case IrPackage.ACTOR__INPUTS:
+			case DfPackage.ACTOR__INPUTS:
 				getInputs().clear();
 				getInputs().addAll((Collection<? extends Port>)newValue);
 				return;
-			case IrPackage.ACTOR__MO_C:
+			case DfPackage.ACTOR__MO_C:
 				setMoC((MoC)newValue);
 				return;
-			case IrPackage.ACTOR__NATIVE:
-				setNative((Boolean)newValue);
-				return;
-			case IrPackage.ACTOR__OUTPUTS:
+			case DfPackage.ACTOR__OUTPUTS:
 				getOutputs().clear();
 				getOutputs().addAll((Collection<? extends Port>)newValue);
 				return;
-			case IrPackage.ACTOR__PARAMETERS:
+			case DfPackage.ACTOR__PARAMETERS:
 				getParameters().clear();
 				getParameters().addAll((Collection<? extends Var>)newValue);
 				return;
-			case IrPackage.ACTOR__PROCS:
+			case DfPackage.ACTOR__PROCS:
 				getProcs().clear();
 				getProcs().addAll((Collection<? extends Procedure>)newValue);
 				return;
-			case IrPackage.ACTOR__STATE_VARS:
+			case DfPackage.ACTOR__STATE_VARS:
 				getStateVars().clear();
 				getStateVars().addAll((Collection<? extends Var>)newValue);
+				return;
+			case DfPackage.ACTOR__NATIVE:
+				setNative((Boolean)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -370,7 +371,7 @@ public class ActorImpl extends EntityImpl implements Actor {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return IrPackage.Literals.ACTOR;
+		return DfPackage.Literals.ACTOR;
 	}
 
 	/**
@@ -380,38 +381,38 @@ public class ActorImpl extends EntityImpl implements Actor {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.ACTOR__ACTIONS:
+			case DfPackage.ACTOR__ACTIONS:
 				getActions().clear();
 				return;
-			case IrPackage.ACTOR__ACTIONS_OUTSIDE_FSM:
+			case DfPackage.ACTOR__ACTIONS_OUTSIDE_FSM:
 				getActionsOutsideFsm().clear();
 				return;
-			case IrPackage.ACTOR__FSM:
+			case DfPackage.ACTOR__FSM:
 				setFsm((FSM)null);
 				return;
-			case IrPackage.ACTOR__INITIALIZES:
+			case DfPackage.ACTOR__INITIALIZES:
 				getInitializes().clear();
 				return;
-			case IrPackage.ACTOR__INPUTS:
+			case DfPackage.ACTOR__INPUTS:
 				getInputs().clear();
 				return;
-			case IrPackage.ACTOR__MO_C:
+			case DfPackage.ACTOR__MO_C:
 				setMoC((MoC)null);
 				return;
-			case IrPackage.ACTOR__NATIVE:
-				setNative(NATIVE_EDEFAULT);
-				return;
-			case IrPackage.ACTOR__OUTPUTS:
+			case DfPackage.ACTOR__OUTPUTS:
 				getOutputs().clear();
 				return;
-			case IrPackage.ACTOR__PARAMETERS:
+			case DfPackage.ACTOR__PARAMETERS:
 				getParameters().clear();
 				return;
-			case IrPackage.ACTOR__PROCS:
+			case DfPackage.ACTOR__PROCS:
 				getProcs().clear();
 				return;
-			case IrPackage.ACTOR__STATE_VARS:
+			case DfPackage.ACTOR__STATE_VARS:
 				getStateVars().clear();
+				return;
+			case DfPackage.ACTOR__NATIVE:
+				setNative(NATIVE_EDEFAULT);
 				return;
 		}
 		super.eUnset(featureID);
@@ -423,7 +424,7 @@ public class ActorImpl extends EntityImpl implements Actor {
 	 */
 	public EList<Action> getActions() {
 		if (actions == null) {
-			actions = new EObjectContainmentEList<Action>(Action.class, this, IrPackage.ACTOR__ACTIONS);
+			actions = new EObjectContainmentEList<Action>(Action.class, this, DfPackage.ACTOR__ACTIONS);
 		}
 		return actions;
 	}
@@ -434,7 +435,7 @@ public class ActorImpl extends EntityImpl implements Actor {
 	 */
 	public EList<Action> getActionsOutsideFsm() {
 		if (actionsOutsideFsm == null) {
-			actionsOutsideFsm = new EObjectResolvingEList<Action>(Action.class, this, IrPackage.ACTOR__ACTIONS_OUTSIDE_FSM);
+			actionsOutsideFsm = new EObjectResolvingEList<Action>(Action.class, this, DfPackage.ACTOR__ACTIONS_OUTSIDE_FSM);
 		}
 		return actionsOutsideFsm;
 	}
@@ -453,7 +454,7 @@ public class ActorImpl extends EntityImpl implements Actor {
 	 */
 	public EList<Action> getInitializes() {
 		if (initializes == null) {
-			initializes = new EObjectContainmentEList<Action>(Action.class, this, IrPackage.ACTOR__INITIALIZES);
+			initializes = new EObjectContainmentEList<Action>(Action.class, this, DfPackage.ACTOR__INITIALIZES);
 		}
 		return initializes;
 	}
@@ -469,7 +470,7 @@ public class ActorImpl extends EntityImpl implements Actor {
 	 */
 	public EList<Port> getInputs() {
 		if (inputs == null) {
-			inputs = new EObjectContainmentEList<Port>(Port.class, this, IrPackage.ACTOR__INPUTS);
+			inputs = new EObjectContainmentEList<Port>(Port.class, this, DfPackage.ACTOR__INPUTS);
 		}
 		return inputs;
 	}
@@ -497,7 +498,7 @@ public class ActorImpl extends EntityImpl implements Actor {
 	 */
 	public EList<Port> getOutputs() {
 		if (outputs == null) {
-			outputs = new EObjectContainmentEList<Port>(Port.class, this, IrPackage.ACTOR__OUTPUTS);
+			outputs = new EObjectContainmentEList<Port>(Port.class, this, DfPackage.ACTOR__OUTPUTS);
 		}
 		return outputs;
 	}
@@ -517,7 +518,7 @@ public class ActorImpl extends EntityImpl implements Actor {
 	 */
 	public EList<Var> getParameters() {
 		if (parameters == null) {
-			parameters = new EObjectContainmentEList<Var>(Var.class, this, IrPackage.ACTOR__PARAMETERS);
+			parameters = new EObjectContainmentEList<Var>(Var.class, this, DfPackage.ACTOR__PARAMETERS);
 		}
 		return parameters;
 	}
@@ -551,7 +552,7 @@ public class ActorImpl extends EntityImpl implements Actor {
 	 */
 	public EList<Procedure> getProcs() {
 		if (procs == null) {
-			procs = new EObjectContainmentEList<Procedure>(Procedure.class, this, IrPackage.ACTOR__PROCS);
+			procs = new EObjectContainmentEList<Procedure>(Procedure.class, this, DfPackage.ACTOR__PROCS);
 		}
 		return procs;
 	}
@@ -571,7 +572,7 @@ public class ActorImpl extends EntityImpl implements Actor {
 	 */
 	public EList<Var> getStateVars() {
 		if (stateVars == null) {
-			stateVars = new EObjectContainmentEList<Var>(Var.class, this, IrPackage.ACTOR__STATE_VARS);
+			stateVars = new EObjectContainmentEList<Var>(Var.class, this, DfPackage.ACTOR__STATE_VARS);
 		}
 		return stateVars;
 	}
@@ -616,14 +617,14 @@ public class ActorImpl extends EntityImpl implements Actor {
 		if (newFsm != fsm) {
 			NotificationChain msgs = null;
 			if (fsm != null)
-				msgs = ((InternalEObject)fsm).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTOR__FSM, null, msgs);
+				msgs = ((InternalEObject)fsm).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - DfPackage.ACTOR__FSM, null, msgs);
 			if (newFsm != null)
-				msgs = ((InternalEObject)newFsm).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTOR__FSM, null, msgs);
+				msgs = ((InternalEObject)newFsm).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - DfPackage.ACTOR__FSM, null, msgs);
 			msgs = basicSetFsm(newFsm, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTOR__FSM, newFsm, newFsm));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ACTOR__FSM, newFsm, newFsm));
 	}
 
 	/**
@@ -634,14 +635,14 @@ public class ActorImpl extends EntityImpl implements Actor {
 		if (newMoC != moC) {
 			NotificationChain msgs = null;
 			if (moC != null)
-				msgs = ((InternalEObject)moC).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTOR__MO_C, null, msgs);
+				msgs = ((InternalEObject)moC).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - DfPackage.ACTOR__MO_C, null, msgs);
 			if (newMoC != null)
-				msgs = ((InternalEObject)newMoC).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTOR__MO_C, null, msgs);
+				msgs = ((InternalEObject)newMoC).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - DfPackage.ACTOR__MO_C, null, msgs);
 			msgs = basicSetMoC(newMoC, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTOR__MO_C, newMoC, newMoC));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ACTOR__MO_C, newMoC, newMoC));
 	}
 
 	/**
@@ -652,7 +653,7 @@ public class ActorImpl extends EntityImpl implements Actor {
 		boolean oldNative = native_;
 		native_ = newNative;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTOR__NATIVE, oldNative, native_));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ACTOR__NATIVE, oldNative, native_));
 	}
 
 	/**

@@ -31,7 +31,6 @@ package net.sf.orcc.df;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.ir.Port;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import net.sf.orcc.ir.Type;

@@ -77,12 +77,12 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.df.serialize.XDFWriter;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
@@ -146,7 +146,7 @@ public class XdfExporter extends CalSwitch<Object> {
 			String sourceName = (String) edge
 					.getValue(ObjectType.PARAMETER_SOURCE_PORT);
 			if (sourceName != null) {
-				sourcePort = IrFactory.eINSTANCE.createPort(null, sourceName);
+				sourcePort = DfFactory.eINSTANCE.createPort(null, sourceName);
 			}
 		}
 
@@ -155,7 +155,7 @@ public class XdfExporter extends CalSwitch<Object> {
 			String targetName = (String) edge
 					.getValue(ObjectType.PARAMETER_TARGET_PORT);
 			if (targetName != null) {
-				targetPort = IrFactory.eINSTANCE.createPort(null, targetName);
+				targetPort = DfFactory.eINSTANCE.createPort(null, targetName);
 			}
 		}
 
@@ -221,7 +221,7 @@ public class XdfExporter extends CalSwitch<Object> {
 		if ("Input port".equals(vertex.getType().getName())) {
 			Type type = parseType(vertex.getValue("port type"));
 			boolean native_ = (Boolean) vertex.getValue("native");
-			Port port = IrFactory.eINSTANCE.createPort(type, name, native_);
+			Port port = DfFactory.eINSTANCE.createPort(type, name, native_);
 			portMap.put(port, vertex);
 
 			network.getInputs().add(port);
@@ -229,15 +229,14 @@ public class XdfExporter extends CalSwitch<Object> {
 		} else if ("Output port".equals(vertex.getType().getName())) {
 			Type type = parseType(vertex.getValue("port type"));
 			boolean native_ = (Boolean) vertex.getValue("native");
-			Port port = IrFactory.eINSTANCE.createPort(type, name, native_);
+			Port port = DfFactory.eINSTANCE.createPort(type, name, native_);
 			portMap.put(port, vertex);
 
 			network.getOutputs().add(port);
 			networkVertex = DfFactory.eINSTANCE.createVertex(port);
 		} else {
 			String clasz = (String) vertex.getValue(PARAMETER_REFINEMENT);
-			Instance instance = DfFactory.eINSTANCE.createInstance(name,
-					contents);
+			Instance instance = DfFactory.eINSTANCE.createInstance(name, null);
 			networkVertex = DfFactory.eINSTANCE.createVertex(instance);
 
 			Map<?, ?> variables = (Map<?, ?>) vertex

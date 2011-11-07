@@ -30,7 +30,7 @@ package net.sf.orcc.backends.xlim.transformations;
 
 import java.util.ArrayList;
 
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Procedure;

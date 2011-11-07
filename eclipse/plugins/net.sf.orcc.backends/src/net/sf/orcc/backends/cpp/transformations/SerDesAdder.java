@@ -43,12 +43,12 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.df.SerDes;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.transformations.INetworkTransformation;
 import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Port;
 
 import org.jgrapht.DirectedGraph;
 
@@ -71,8 +71,8 @@ public class SerDesAdder implements INetworkTransformation {
 	private void createIncomingConnection(Connection connection, Vertex vertex,
 			Vertex vertexBCast) {
 		// creates new input port of broadcast
-		Port bcastInput = IrFactory.eINSTANCE
-				.createPort(connection.getTargetPort());
+		Port bcastInput = IrFactory.eINSTANCE.createPort(connection
+				.getTargetPort());
 		bcastInput.setName("input");
 
 		// creates a connection between the vertex and the broadcast
@@ -96,7 +96,7 @@ public class SerDesAdder implements INetworkTransformation {
 			// new connection
 			Vertex target = graph.getEdgeTarget(connection);
 			Port srcPort = connection.getSourcePort();
-			Port outputPort = IrFactory.eINSTANCE.createPort(srcPort.getType(),
+			Port outputPort = DfFactory.eINSTANCE.createPort(srcPort.getType(),
 					"output_" + i);
 			i++;
 
@@ -237,7 +237,7 @@ public class SerDesAdder implements INetworkTransformation {
 
 							Port srcPort = connection.getSourcePort();
 							srcPort.setType(port.getType());
-							Port tgtPort = IrFactory.eINSTANCE.createPort(port);
+							Port tgtPort = DfFactory.eINSTANCE.createPort(port);
 
 							Connection incoming = DfFactory.eINSTANCE
 									.createConnection(srcPort, tgtPort,
@@ -260,7 +260,7 @@ public class SerDesAdder implements INetworkTransformation {
 								.iterator();
 
 						Connection connection = it.next();
-						Port srcPort = IrFactory.eINSTANCE.createPort(port);
+						Port srcPort = DfFactory.eINSTANCE.createPort(port);
 						Port tgtPort = connection.getTargetPort();
 						tgtPort.setType(port.getType());
 						Vertex vTgt = graph.getEdgeTarget(connection);

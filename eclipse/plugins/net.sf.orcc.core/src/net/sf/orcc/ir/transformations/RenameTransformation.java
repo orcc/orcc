@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;

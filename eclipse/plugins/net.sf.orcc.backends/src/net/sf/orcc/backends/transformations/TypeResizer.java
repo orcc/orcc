@@ -30,12 +30,12 @@ package net.sf.orcc.backends.transformations;
 
 import java.util.List;
 
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Pattern;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.Param;
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;

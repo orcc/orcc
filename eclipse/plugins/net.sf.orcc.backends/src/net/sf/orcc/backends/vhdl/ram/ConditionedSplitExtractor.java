@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.vhdl.ram;
 
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.util.ActorVisitor;
 
 /**

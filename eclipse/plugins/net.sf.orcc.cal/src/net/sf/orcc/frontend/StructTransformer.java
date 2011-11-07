@@ -47,14 +47,15 @@ import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.cal.util.Util;
+import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.Port;
+import net.sf.orcc.df.State;
 import net.sf.orcc.ir.Annotation;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Param;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 
@@ -106,7 +107,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 	@Override
 	public EObject caseAstPort(AstPort astPort) {
 		Type type = EcoreUtil.copy(Typer.getType(astPort));
-		Port port = eINSTANCE.createPort(type, astPort.getName(),
+		Port port = DfFactory.eINSTANCE.createPort(type, astPort.getName(),
 				Util.hasAnnotation("native", astPort.getAnnotations()));
 		Frontend.putMapping(astPort, port);
 		return port;
@@ -148,7 +149,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 
 	@Override
 	public EObject caseAstState(AstState astState) {
-		State state = eINSTANCE.createState(astState.getName());
+		State state = DfFactory.eINSTANCE.createState(astState.getName());
 		Frontend.putMapping(astState, state);
 		return state;
 	}

@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ir.util;
 
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Actor;
 
 /**
  * This interface defines a visitor for an actor.

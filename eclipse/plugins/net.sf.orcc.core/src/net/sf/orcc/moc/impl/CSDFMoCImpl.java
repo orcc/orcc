@@ -8,8 +8,8 @@ package net.sf.orcc.moc.impl;
 
 import java.util.Collection;
 
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
+import net.sf.orcc.df.Pattern;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.Invocation;
 import net.sf.orcc.moc.MocPackage;

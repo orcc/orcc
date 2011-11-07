@@ -8,10 +8,12 @@ package net.sf.orcc.ir.util;
 
 import java.util.Map;
 
-import net.sf.orcc.ir.*;
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Annotation;
+import net.sf.orcc.ir.Arg;
+import net.sf.orcc.ir.ArgByRef;
+import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.Def;
+import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -21,7 +23,6 @@ import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
@@ -35,14 +36,9 @@ import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.State;
-import net.sf.orcc.ir.Tag;
-import net.sf.orcc.ir.Transition;
-import net.sf.orcc.ir.Transitions;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeBool;
 import net.sf.orcc.ir.TypeFloat;
@@ -51,6 +47,7 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
+import net.sf.orcc.ir.Unit;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 
@@ -103,36 +100,6 @@ public class IrSwitch<T> extends Switch<T> {
 	@Override
 	protected boolean isSwitchFor(EPackage ePackage) {
 		return ePackage == modelPackage;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Action</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Action</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseAction(Action object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Actor</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Actor</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseActor(Actor object) {
-		return null;
 	}
 
 	/**
@@ -316,21 +283,6 @@ public class IrSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>FSM</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>FSM</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseFSM(FSM object) {
-		return null;
-	}
-
-	/**
 	 * Returns the result of interpreting the object as an instance of '<em>Predicate</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
@@ -346,51 +298,6 @@ public class IrSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Port To EInteger Object Map Entry</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Port To EInteger Object Map Entry</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T casePortToEIntegerObjectMapEntry(Map.Entry<Port, Integer> object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Port To Var Map Entry</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Port To Var Map Entry</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T casePortToVarMapEntry(Map.Entry<Port, Var> object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Var To Port Map Entry</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Var To Port Map Entry</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseVarToPortMapEntry(Map.Entry<Var, Port> object) {
-		return null;
-	}
-
-	/**
 	 * Returns the result of interpreting the object as an instance of '<em>EString To EString Map Entry</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
@@ -402,51 +309,6 @@ public class IrSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseEStringToEStringMapEntry(Map.Entry<String, String> object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>State</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>State</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseState(State object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Transitions</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Transitions</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseTransitions(Transitions object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Transition</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Transition</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseTransition(Transition object) {
 		return null;
 	}
 
@@ -676,36 +538,6 @@ public class IrSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Pattern</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Pattern</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T casePattern(Pattern object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Port</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Port</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T casePort(Port object) {
-		return null;
-	}
-
-	/**
 	 * Returns the result of interpreting the object as an instance of '<em>Procedure</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
@@ -732,21 +564,6 @@ public class IrSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseParam(Param object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Tag</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Tag</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseTag(Tag object) {
 		return null;
 	}
 
@@ -932,65 +749,10 @@ public class IrSwitch<T> extends Switch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case IrPackage.ACTOR: {
-				Actor actor = (Actor)theEObject;
-				T result = caseActor(actor);
-				if (result == null) result = caseEntity(actor);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
 			case IrPackage.UNIT: {
 				Unit unit = (Unit)theEObject;
 				T result = caseUnit(unit);
 				if (result == null) result = caseEntity(unit);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.PORT: {
-				Port port = (Port)theEObject;
-				T result = casePort(port);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.FSM: {
-				FSM fsm = (FSM)theEObject;
-				T result = caseFSM(fsm);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.STATE: {
-				State state = (State)theEObject;
-				T result = caseState(state);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.TRANSITIONS: {
-				Transitions transitions = (Transitions)theEObject;
-				T result = caseTransitions(transitions);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.TRANSITION: {
-				Transition transition = (Transition)theEObject;
-				T result = caseTransition(transition);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.ACTION: {
-				Action action = (Action)theEObject;
-				T result = caseAction(action);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.TAG: {
-				Tag tag = (Tag)theEObject;
-				T result = caseTag(tag);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.PATTERN: {
-				Pattern pattern = (Pattern)theEObject;
-				T result = casePattern(pattern);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -1252,24 +1014,6 @@ public class IrSwitch<T> extends Switch<T> {
 			case IrPackage.PREDICATE: {
 				Predicate predicate = (Predicate)theEObject;
 				T result = casePredicate(predicate);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY: {
-				@SuppressWarnings("unchecked") Map.Entry<Port, Integer> portToEIntegerObjectMapEntry = (Map.Entry<Port, Integer>)theEObject;
-				T result = casePortToEIntegerObjectMapEntry(portToEIntegerObjectMapEntry);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.PORT_TO_VAR_MAP_ENTRY: {
-				@SuppressWarnings("unchecked") Map.Entry<Port, Var> portToVarMapEntry = (Map.Entry<Port, Var>)theEObject;
-				T result = casePortToVarMapEntry(portToVarMapEntry);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.VAR_TO_PORT_MAP_ENTRY: {
-				@SuppressWarnings("unchecked") Map.Entry<Var, Port> varToPortMapEntry = (Map.Entry<Var, Port>)theEObject;
-				T result = caseVarToPortMapEntry(varToPortMapEntry);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}

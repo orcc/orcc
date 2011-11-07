@@ -35,7 +35,7 @@ import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cache.CachePackage;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Unit;

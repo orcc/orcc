@@ -35,8 +35,8 @@ import net.sf.orcc.cal.cal.RegExpBinary;
 import net.sf.orcc.cal.cal.RegExpTag;
 import net.sf.orcc.cal.cal.RegExpUnary;
 import net.sf.orcc.cal.cal.util.CalSwitch;
-import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Tag;
+import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.Tag;
 
 public class ThompsonBuilder extends CalSwitch<Void> {
 
@@ -125,7 +125,7 @@ public class ThompsonBuilder extends CalSwitch<Void> {
 
 		eNFA.addVertex(initialCurrent);
 		eNFA.addVertex(finalCurrent);
-		Tag label = IrFactory.eINSTANCE.createTag(term.getTag()
+		Tag label = DfFactory.eINSTANCE.createTag(term.getTag()
 				.getIdentifiers());
 		eNFA.registerLetter(label);
 		eNFA.addEdge(initialCurrent, finalCurrent, new SimpleEdge(label));

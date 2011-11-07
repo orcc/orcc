@@ -41,13 +41,13 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeBool;
 import net.sf.orcc.ir.TypeInt;
@@ -490,7 +490,7 @@ public class XDFParser {
 		} else {
 			URI uri = EcoreUtil.getURI(vertex.getInstance().getContents());
 			uri = uri.appendFragment("//@" + dir + "." + portName);
-			Port proxy = IrFactory.eINSTANCE.createPort();
+			Port proxy = DfFactory.eINSTANCE.createPort();
 			((InternalEObject) proxy).eSetProxyURI(uri);
 			return proxy;
 		}
@@ -711,7 +711,7 @@ public class XDFParser {
 		for (IFolder folder : folders) {
 			file = folder.getFile(path.addFileExtension("ir"));
 			if (file.exists()) {
-				proxy = IrFactory.eINSTANCE.createActor();
+				proxy = DfFactory.eINSTANCE.createActor();
 				break;
 			}
 		}
@@ -828,7 +828,7 @@ public class XDFParser {
 		}
 
 		// creates a port
-		Port port = IrFactory.eINSTANCE.createPort(type, name, native_);
+		Port port = DfFactory.eINSTANCE.createPort(type, name, native_);
 
 		// adds the port to inputs or outputs depending on its kind
 		String kind = eltPort.getAttribute("kind");

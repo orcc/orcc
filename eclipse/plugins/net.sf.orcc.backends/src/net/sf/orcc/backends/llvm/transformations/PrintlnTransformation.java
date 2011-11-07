@@ -31,7 +31,7 @@ package net.sf.orcc.backends.llvm.transformations;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.ExprString;

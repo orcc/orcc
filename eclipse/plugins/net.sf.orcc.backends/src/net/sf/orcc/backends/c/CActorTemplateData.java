@@ -28,18 +28,19 @@
  */
 package net.sf.orcc.backends.c;
 
+import static net.sf.orcc.df.DfFactory.eINSTANCE;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.Transition;
-import net.sf.orcc.ir.Transitions;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.FSM;
+import net.sf.orcc.df.Pattern;
+import net.sf.orcc.df.Port;
+import net.sf.orcc.df.Transition;
+import net.sf.orcc.df.Transitions;
 
 /**
  * This class allows the string template accessing informations about
@@ -94,7 +95,7 @@ public class CActorTemplateData {
 		}
 
 		for (Transitions transitions : fsm.getTransitions()) {
-			Pattern pattern = IrFactory.eINSTANCE.createPattern();
+			Pattern pattern = eINSTANCE.createPattern();
 			for (Transition transition : transitions.getList()) {
 				Action action = transition.getAction();
 				Pattern actionPattern = action.getInputPattern();
@@ -120,7 +121,7 @@ public class CActorTemplateData {
 	 * port mask defines the port(s) read by actions in each transition.
 	 */
 	public void computeTemplateMaps(Actor actor) {
-		inputPattern = IrFactory.eINSTANCE.createPattern();
+		inputPattern = eINSTANCE.createPattern();
 		transitionPattern = new HashMap<Transitions, Pattern>();
 
 		buildInputPattern(actor);

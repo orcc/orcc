@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, Åbo Akademi University
+ * Copyright (c) 2011, ï¿½bo Akademi University
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the Åbo Akademi University nor the names of its
+ *   * Neither the name of the ï¿½bo Akademi University nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -33,11 +33,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;

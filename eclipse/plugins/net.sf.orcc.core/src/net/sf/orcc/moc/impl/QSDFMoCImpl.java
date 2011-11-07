@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import net.sf.orcc.ir.Action;
+import net.sf.orcc.df.Action;
 import net.sf.orcc.moc.MocPackage;
 import net.sf.orcc.moc.QSDFMoC;
 import net.sf.orcc.moc.SDFMoC;

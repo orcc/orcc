@@ -33,8 +33,8 @@ import java.util.Collection;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
-import net.sf.orcc.ir.Port;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;

@@ -29,9 +29,9 @@
 package net.sf.orcc.df.transformations;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.ir.Actor;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.moc.MocFactory;
 import net.sf.orcc.tools.classifier.ActorClassifier;

@@ -30,7 +30,7 @@ package net.sf.orcc.backends.xlim.transformations;
 
 import net.sf.orcc.backends.instructions.InstTernary;
 import net.sf.orcc.backends.instructions.InstructionsFactory;
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;

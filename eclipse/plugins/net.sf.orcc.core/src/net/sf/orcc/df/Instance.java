@@ -32,7 +32,6 @@ import org.eclipse.emf.common.util.EList;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.moc.MoC;
 

@@ -75,117 +75,6 @@ public interface IrPackage extends EPackage {
 		EAttribute ENTITY__NAME = eINSTANCE.getEntity_Name();
 
 		/**
-		 * The meta object literal for the '
-		 * {@link net.sf.orcc.ir.impl.ActionImpl <em>Action</em>}' class. <!--
-		 * begin-user-doc --> <!-- end-user-doc -->
-		 * 
-		 * @see net.sf.orcc.ir.impl.ActionImpl
-		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getAction()
-		 * @generated
-		 */
-		EClass ACTION = eINSTANCE.getAction();
-
-		/**
-		 * The meta object literal for the '<em><b>Body</b></em>' containment reference feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference ACTION__BODY = eINSTANCE.getAction_Body();
-
-		/**
-		 * The meta object literal for the '<em><b>Input Pattern</b></em>' containment reference feature.
-		 * <!-- begin-user-doc --> <!--
-		 * end-user-doc -->
-		 * @generated
-		 */
-		EReference ACTION__INPUT_PATTERN = eINSTANCE.getAction_InputPattern();
-
-		/**
-		 * The meta object literal for the '<em><b>Output Pattern</b></em>' containment reference feature.
-		 * <!-- begin-user-doc --> <!--
-		 * end-user-doc -->
-		 * @generated
-		 */
-		EReference ACTION__OUTPUT_PATTERN = eINSTANCE.getAction_OutputPattern();
-
-		/**
-		 * The meta object literal for the '<em><b>Peek Pattern</b></em>' containment reference feature.
-		 * <!-- begin-user-doc --> <!--
-		 * end-user-doc -->
-		 * @generated
-		 */
-		EReference ACTION__PEEK_PATTERN = eINSTANCE.getAction_PeekPattern();
-
-		/**
-		 * The meta object literal for the '<em><b>Scheduler</b></em>' containment reference feature.
-		 * <!-- begin-user-doc --> <!--
-		 * end-user-doc -->
-		 * @generated
-		 */
-		EReference ACTION__SCHEDULER = eINSTANCE.getAction_Scheduler();
-
-		/**
-		 * The meta object literal for the '<em><b>Tag</b></em>' containment reference feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference ACTION__TAG = eINSTANCE.getAction_Tag();
-
-		/**
-		 * The meta object literal for the '
-		 * {@link net.sf.orcc.ir.impl.ActorImpl <em>Actor</em>}' class. <!--
-		 * begin-user-doc --> <!-- end-user-doc -->
-		 * 
-		 * @see net.sf.orcc.ir.impl.ActorImpl
-		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getActor()
-		 * @generated
-		 */
-		EClass ACTOR = eINSTANCE.getActor();
-
-		/**
-		 * The meta object literal for the '<em><b>Actions</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference ACTOR__ACTIONS = eINSTANCE.getActor_Actions();
-
-		/**
-		 * The meta object literal for the '<em><b>Actions Outside Fsm</b></em>' reference list feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference ACTOR__ACTIONS_OUTSIDE_FSM = eINSTANCE.getActor_ActionsOutsideFsm();
-
-		/**
-		 * The meta object literal for the '<em><b>Fsm</b></em>' containment reference feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference ACTOR__FSM = eINSTANCE.getActor_Fsm();
-
-		/**
-		 * The meta object literal for the '<em><b>Initializes</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc --> <!--
-		 * end-user-doc -->
-		 * @generated
-		 */
-		EReference ACTOR__INITIALIZES = eINSTANCE.getActor_Initializes();
-
-		/**
-		 * The meta object literal for the '<em><b>Inputs</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference ACTOR__INPUTS = eINSTANCE.getActor_Inputs();
-
-		/**
-		 * The meta object literal for the '<em><b>Mo C</b></em>' containment reference feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference ACTOR__MO_C = eINSTANCE.getActor_MoC();
-
-		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.UnitImpl <em>Unit</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -210,43 +99,6 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EReference UNIT__CONSTANTS = eINSTANCE.getUnit_Constants();
-
-		/**
-		 * The meta object literal for the '<em><b>Native</b></em>' attribute feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute ACTOR__NATIVE = eINSTANCE.getActor_Native();
-
-		/**
-		 * The meta object literal for the '<em><b>Outputs</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference ACTOR__OUTPUTS = eINSTANCE.getActor_Outputs();
-
-		/**
-		 * The meta object literal for the '<em><b>Parameters</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc --> <!--
-		 * end-user-doc -->
-		 * @generated
-		 */
-		EReference ACTOR__PARAMETERS = eINSTANCE.getActor_Parameters();
-
-		/**
-		 * The meta object literal for the '<em><b>Procs</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference ACTOR__PROCS = eINSTANCE.getActor_Procs();
-
-		/**
-		 * The meta object literal for the '<em><b>State Vars</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc --> <!--
-		 * end-user-doc -->
-		 * @generated
-		 */
-		EReference ACTOR__STATE_VARS = eINSTANCE.getActor_StateVars();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.DefImpl <em>Def</em>}' class.
@@ -462,37 +314,6 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EClass EXPRESSION = eINSTANCE.getExpression();
-
-		/**
-		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.FSMImpl <em>FSM</em>}' class.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @see net.sf.orcc.ir.impl.FSMImpl
-		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getFSM()
-		 * @generated
-		 */
-		EClass FSM = eINSTANCE.getFSM();
-
-		/**
-		 * The meta object literal for the '<em><b>Initial State</b></em>' reference feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference FSM__INITIAL_STATE = eINSTANCE.getFSM_InitialState();
-
-		/**
-		 * The meta object literal for the '<em><b>States</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference FSM__STATES = eINSTANCE.getFSM_States();
-
-		/**
-		 * The meta object literal for the '<em><b>Transitions</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference FSM__TRANSITIONS = eINSTANCE.getFSM_Transitions();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.InstAssignImpl <em>Inst Assign</em>}' class.
@@ -761,84 +582,6 @@ public interface IrPackage extends EPackage {
 		EReference PREDICATE__EXPRESSIONS = eINSTANCE.getPredicate_Expressions();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.PortToEIntegerObjectMapEntryImpl <em>Port To EInteger Object Map Entry</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.ir.impl.PortToEIntegerObjectMapEntryImpl
-		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPortToEIntegerObjectMapEntry()
-		 * @generated
-		 */
-		EClass PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = eINSTANCE.getPortToEIntegerObjectMapEntry();
-
-		/**
-		 * The meta object literal for the '<em><b>Key</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY = eINSTANCE.getPortToEIntegerObjectMapEntry_Key();
-
-		/**
-		 * The meta object literal for the '<em><b>Value</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE = eINSTANCE.getPortToEIntegerObjectMapEntry_Value();
-
-		/**
-		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.PortToVarMapEntryImpl <em>Port To Var Map Entry</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.ir.impl.PortToVarMapEntryImpl
-		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPortToVarMapEntry()
-		 * @generated
-		 */
-		EClass PORT_TO_VAR_MAP_ENTRY = eINSTANCE.getPortToVarMapEntry();
-
-		/**
-		 * The meta object literal for the '<em><b>Key</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference PORT_TO_VAR_MAP_ENTRY__KEY = eINSTANCE.getPortToVarMapEntry_Key();
-
-		/**
-		 * The meta object literal for the '<em><b>Value</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference PORT_TO_VAR_MAP_ENTRY__VALUE = eINSTANCE.getPortToVarMapEntry_Value();
-
-		/**
-		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.VarToPortMapEntryImpl <em>Var To Port Map Entry</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.ir.impl.VarToPortMapEntryImpl
-		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getVarToPortMapEntry()
-		 * @generated
-		 */
-		EClass VAR_TO_PORT_MAP_ENTRY = eINSTANCE.getVarToPortMapEntry();
-
-		/**
-		 * The meta object literal for the '<em><b>Key</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference VAR_TO_PORT_MAP_ENTRY__KEY = eINSTANCE.getVarToPortMapEntry_Key();
-
-		/**
-		 * The meta object literal for the '<em><b>Value</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference VAR_TO_PORT_MAP_ENTRY__VALUE = eINSTANCE.getVarToPortMapEntry_Value();
-
-		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.EStringToEStringMapEntryImpl <em>EString To EString Map Entry</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -1004,101 +747,6 @@ public interface IrPackage extends EPackage {
 		EEnum OP_UNARY = eINSTANCE.getOpUnary();
 
 		/**
-		 * The meta object literal for the '
-		 * {@link net.sf.orcc.ir.impl.PatternImpl <em>Pattern</em>}' class. <!--
-		 * begin-user-doc --> <!-- end-user-doc -->
-		 * 
-		 * @see net.sf.orcc.ir.impl.PatternImpl
-		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPattern()
-		 * @generated
-		 */
-		EClass PATTERN = eINSTANCE.getPattern();
-
-		/**
-		 * The meta object literal for the '<em><b>Ports</b></em>' reference list feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference PATTERN__PORTS = eINSTANCE.getPattern_Ports();
-
-		/**
-		 * The meta object literal for the '<em><b>Variables</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference PATTERN__VARIABLES = eINSTANCE.getPattern_Variables();
-
-		/**
-		 * The meta object literal for the '<em><b>Num Tokens Map</b></em>' map feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference PATTERN__NUM_TOKENS_MAP = eINSTANCE.getPattern_NumTokensMap();
-
-		/**
-		 * The meta object literal for the '<em><b>Port To Var Map</b></em>' map feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference PATTERN__PORT_TO_VAR_MAP = eINSTANCE.getPattern_PortToVarMap();
-
-		/**
-		 * The meta object literal for the '<em><b>Var To Port Map</b></em>' map feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference PATTERN__VAR_TO_PORT_MAP = eINSTANCE.getPattern_VarToPortMap();
-
-		/**
-		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.PortImpl <em>Port</em>}' class.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @see net.sf.orcc.ir.impl.PortImpl
-		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPort()
-		 * @generated
-		 */
-		EClass PORT = eINSTANCE.getPort();
-
-		/**
-		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute PORT__NAME = eINSTANCE.getPort_Name();
-
-		/**
-		 * The meta object literal for the '<em><b>Num Tokens Consumed</b></em>' attribute feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute PORT__NUM_TOKENS_CONSUMED = eINSTANCE.getPort_NumTokensConsumed();
-
-		/**
-		 * The meta object literal for the '<em><b>Num Tokens Produced</b></em>' attribute feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute PORT__NUM_TOKENS_PRODUCED = eINSTANCE.getPort_NumTokensProduced();
-
-		/**
-		 * The meta object literal for the '<em><b>Type</b></em>' containment reference feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference PORT__TYPE = eINSTANCE.getPort_Type();
-
-		/**
-		 * The meta object literal for the '<em><b>Native</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute PORT__NATIVE = eINSTANCE.getPort_Native();
-
-		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.ProcedureImpl <em>Procedure</em>}' class.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.ProcedureImpl
@@ -1184,91 +832,6 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute PARAM__BY_REF = eINSTANCE.getParam_ByRef();
-
-		/**
-		 * The meta object literal for the '
-		 * {@link net.sf.orcc.ir.impl.StateImpl <em>State</em>}' class. <!--
-		 * begin-user-doc --> <!-- end-user-doc -->
-		 * 
-		 * @see net.sf.orcc.ir.impl.StateImpl
-		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getState()
-		 * @generated
-		 */
-		EClass STATE = eINSTANCE.getState();
-
-		/**
-		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute STATE__NAME = eINSTANCE.getState_Name();
-
-		/**
-		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TransitionsImpl <em>Transitions</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.ir.impl.TransitionsImpl
-		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTransitions()
-		 * @generated
-		 */
-		EClass TRANSITIONS = eINSTANCE.getTransitions();
-
-		/**
-		 * The meta object literal for the '<em><b>List</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference TRANSITIONS__LIST = eINSTANCE.getTransitions_List();
-
-		/**
-		 * The meta object literal for the '<em><b>Source State</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference TRANSITIONS__SOURCE_STATE = eINSTANCE.getTransitions_SourceState();
-
-		/**
-		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TagImpl <em>Tag</em>}' class.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @see net.sf.orcc.ir.impl.TagImpl
-		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTag()
-		 * @generated
-		 */
-		EClass TAG = eINSTANCE.getTag();
-
-		/**
-		 * The meta object literal for the '<em><b>Identifiers</b></em>' attribute list feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute TAG__IDENTIFIERS = eINSTANCE.getTag_Identifiers();
-
-		/**
-		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TransitionImpl <em>Transition</em>}' class.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @see net.sf.orcc.ir.impl.TransitionImpl
-		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTransition()
-		 * @generated
-		 */
-		EClass TRANSITION = eINSTANCE.getTransition();
-
-		/**
-		 * The meta object literal for the '<em><b>Action</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference TRANSITION__ACTION = eINSTANCE.getTransition_Action();
-
-		/**
-		 * The meta object literal for the '<em><b>State</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference TRANSITION__STATE = eINSTANCE.getTransition_State();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TypeImpl <em>Type</em>}' class.
@@ -1486,24 +1049,6 @@ public interface IrPackage extends EPackage {
 	}
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ActionImpl <em>Action</em>}' class.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see net.sf.orcc.ir.impl.ActionImpl
-	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getAction()
-	 * @generated
-	 */
-	int ACTION = 8;
-
-	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ActorImpl <em>Actor</em>}' class.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see net.sf.orcc.ir.impl.ActorImpl
-	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getActor()
-	 * @generated
-	 */
-	int ACTOR = 1;
-
-	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.UnitImpl <em>Unit</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1511,7 +1056,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getUnit()
 	 * @generated
 	 */
-	int UNIT = 2;
+	int UNIT = 1;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.DefImpl <em>Def</em>}' class.
@@ -1520,7 +1065,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getDef()
 	 * @generated
 	 */
-	int DEF = 45;
+	int DEF = 36;
 
 	/**
 	 * The singleton instance of the package.
@@ -1575,133 +1120,6 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int ENTITY_FEATURE_COUNT = 3;
-
-	/**
-	 * The feature id for the '<em><b>File Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__FILE_NAME = ENTITY__FILE_NAME;
-
-	/**
-	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__LINE_NUMBER = ENTITY__LINE_NUMBER;
-
-	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__NAME = ENTITY__NAME;
-
-	/**
-	 * The feature id for the '<em><b>Actions</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__ACTIONS = ENTITY_FEATURE_COUNT + 0;
-
-	/**
-	 * The feature id for the '<em><b>Actions Outside Fsm</b></em>' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__ACTIONS_OUTSIDE_FSM = ENTITY_FEATURE_COUNT + 1;
-
-	/**
-	 * The feature id for the '<em><b>Fsm</b></em>' containment reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__FSM = ENTITY_FEATURE_COUNT + 2;
-
-	/**
-	 * The feature id for the '<em><b>Initializes</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__INITIALIZES = ENTITY_FEATURE_COUNT + 3;
-
-	/**
-	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__INPUTS = ENTITY_FEATURE_COUNT + 4;
-
-	/**
-	 * The feature id for the '<em><b>Mo C</b></em>' containment reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__MO_C = ENTITY_FEATURE_COUNT + 5;
-
-	/**
-	 * The feature id for the '<em><b>Native</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__NATIVE = ENTITY_FEATURE_COUNT + 6;
-
-	/**
-	 * The feature id for the '<em><b>Outputs</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__OUTPUTS = ENTITY_FEATURE_COUNT + 7;
-
-	/**
-	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__PARAMETERS = ENTITY_FEATURE_COUNT + 8;
-
-	/**
-	 * The feature id for the '<em><b>Procs</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__PROCS = ENTITY_FEATURE_COUNT + 9;
-
-	/**
-	 * The feature id for the '<em><b>State Vars</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__STATE_VARS = ENTITY_FEATURE_COUNT + 10;
-
-	/**
-	 * The number of structural features of the '<em>Actor</em>' class. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR_FEATURE_COUNT = ENTITY_FEATURE_COUNT + 11;
 
 	/**
 	 * The feature id for the '<em><b>File Name</b></em>' attribute.
@@ -1787,7 +1205,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprBinary()
 	 * @generated
 	 */
-	int EXPR_BINARY = 29;
+	int EXPR_BINARY = 20;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprBoolImpl <em>Expr Bool</em>}' class.
@@ -1796,7 +1214,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprBool()
 	 * @generated
 	 */
-	int EXPR_BOOL = 30;
+	int EXPR_BOOL = 21;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprFloatImpl
@@ -1807,7 +1225,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprFloat()
 	 * @generated
 	 */
-	int EXPR_FLOAT = 31;
+	int EXPR_FLOAT = 22;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprIntImpl <em>Expr Int</em>}' class.
@@ -1816,7 +1234,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprInt()
 	 * @generated
 	 */
-	int EXPR_INT = 32;
+	int EXPR_INT = 23;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprListImpl <em>Expr List</em>}' class.
@@ -1825,7 +1243,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprList()
 	 * @generated
 	 */
-	int EXPR_LIST = 33;
+	int EXPR_LIST = 24;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprStringImpl
@@ -1836,7 +1254,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprString()
 	 * @generated
 	 */
-	int EXPR_STRING = 34;
+	int EXPR_STRING = 25;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprUnaryImpl
@@ -1847,7 +1265,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprUnary()
 	 * @generated
 	 */
-	int EXPR_UNARY = 35;
+	int EXPR_UNARY = 26;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprVarImpl <em>Expr Var</em>}' class.
@@ -1856,7 +1274,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprVar()
 	 * @generated
 	 */
-	int EXPR_VAR = 36;
+	int EXPR_VAR = 27;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExpressionImpl
@@ -1867,16 +1285,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExpression()
 	 * @generated
 	 */
-	int EXPRESSION = 28;
-
-	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.impl.FSMImpl <em>FSM</em>}' class.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see net.sf.orcc.ir.impl.FSMImpl
-	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getFSM()
-	 * @generated
-	 */
-	int FSM = 4;
+	int EXPRESSION = 19;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstructionImpl
@@ -1887,7 +1296,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstruction()
 	 * @generated
 	 */
-	int INSTRUCTION = 17;
+	int INSTRUCTION = 8;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstAssignImpl
@@ -1898,7 +1307,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstAssign()
 	 * @generated
 	 */
-	int INST_ASSIGN = 18;
+	int INST_ASSIGN = 9;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstCallImpl <em>Inst Call</em>}' class.
@@ -1907,7 +1316,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstCall()
 	 * @generated
 	 */
-	int INST_CALL = 19;
+	int INST_CALL = 10;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstLoadImpl <em>Inst Load</em>}' class.
@@ -1916,7 +1325,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstLoad()
 	 * @generated
 	 */
-	int INST_LOAD = 20;
+	int INST_LOAD = 11;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstPhiImpl <em>Inst Phi</em>}' class.
@@ -1925,7 +1334,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstPhi()
 	 * @generated
 	 */
-	int INST_PHI = 21;
+	int INST_PHI = 12;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstReturnImpl
@@ -1936,7 +1345,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstReturn()
 	 * @generated
 	 */
-	int INST_RETURN = 22;
+	int INST_RETURN = 13;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstSpecificImpl
@@ -1947,7 +1356,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstSpecific()
 	 * @generated
 	 */
-	int INST_SPECIFIC = 23;
+	int INST_SPECIFIC = 14;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstStoreImpl
@@ -1958,7 +1367,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstStore()
 	 * @generated
 	 */
-	int INST_STORE = 24;
+	int INST_STORE = 15;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeImpl <em>Node</em>}' class.
@@ -1967,7 +1376,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNode()
 	 * @generated
 	 */
-	int NODE = 13;
+	int NODE = 4;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeBlockImpl
@@ -1978,7 +1387,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNodeBlock()
 	 * @generated
 	 */
-	int NODE_BLOCK = 14;
+	int NODE_BLOCK = 5;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeIfImpl <em>Node If</em>}' class.
@@ -1987,7 +1396,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNodeIf()
 	 * @generated
 	 */
-	int NODE_IF = 15;
+	int NODE_IF = 6;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeWhileImpl
@@ -1998,7 +1407,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNodeWhile()
 	 * @generated
 	 */
-	int NODE_WHILE = 16;
+	int NODE_WHILE = 7;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpBinary <em>Op Binary</em>}' enum.
@@ -2007,7 +1416,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpBinary()
 	 * @generated
 	 */
-	int OP_BINARY = 54;
+	int OP_BINARY = 42;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpUnary <em>Op Unary</em>}' enum.
@@ -2016,7 +1425,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpUnary()
 	 * @generated
 	 */
-	int OP_UNARY = 55;
+	int OP_UNARY = 43;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Entity <em>Entity</em>}'.
@@ -2062,359 +1471,13 @@ public interface IrPackage extends EPackage {
 	EAttribute getEntity_Name();
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.impl.PatternImpl <em>Pattern</em>}' class.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see net.sf.orcc.ir.impl.PatternImpl
-	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPattern()
-	 * @generated
-	 */
-	int PATTERN = 10;
-
-	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.impl.PortImpl <em>Port</em>}' class.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see net.sf.orcc.ir.impl.PortImpl
-	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPort()
-	 * @generated
-	 */
-	int PORT = 3;
-
-	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int PORT__NAME = 0;
-
-	/**
-	 * The feature id for the '<em><b>Native</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PORT__NATIVE = 1;
-
-	/**
-	 * The feature id for the '<em><b>Num Tokens Consumed</b></em>' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PORT__NUM_TOKENS_CONSUMED = 2;
-
-	/**
-	 * The feature id for the '<em><b>Num Tokens Produced</b></em>' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PORT__NUM_TOKENS_PRODUCED = 3;
-
-	/**
-	 * The feature id for the '<em><b>Type</b></em>' containment reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int PORT__TYPE = 4;
-
-	/**
-	 * The number of structural features of the '<em>Port</em>' class. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int PORT_FEATURE_COUNT = 5;
-
-	/**
-	 * The feature id for the '<em><b>Initial State</b></em>' reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int FSM__INITIAL_STATE = 0;
-
-	/**
-	 * The feature id for the '<em><b>States</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int FSM__STATES = 1;
-
-	/**
-	 * The feature id for the '<em><b>Transitions</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int FSM__TRANSITIONS = 2;
-
-	/**
-	 * The number of structural features of the '<em>FSM</em>' class. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int FSM_FEATURE_COUNT = 3;
-
-	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ProcedureImpl <em>Procedure</em>}' class.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.ir.impl.ProcedureImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getProcedure()
 	 * @generated
 	 */
-	int PROCEDURE = 11;
-
-	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.impl.StateImpl <em>State</em>}' class.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see net.sf.orcc.ir.impl.StateImpl
-	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getState()
-	 * @generated
-	 */
-	int STATE = 5;
-
-	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int STATE__NAME = 0;
-
-	/**
-	 * The number of structural features of the '<em>State</em>' class. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int STATE_FEATURE_COUNT = 1;
-
-	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TransitionsImpl <em>Transitions</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.ir.impl.TransitionsImpl
-	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTransitions()
-	 * @generated
-	 */
-	int TRANSITIONS = 6;
-
-	/**
-	 * The feature id for the '<em><b>List</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int TRANSITIONS__LIST = 0;
-
-	/**
-	 * The feature id for the '<em><b>Source State</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int TRANSITIONS__SOURCE_STATE = 1;
-
-	/**
-	 * The number of structural features of the '<em>Transitions</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int TRANSITIONS_FEATURE_COUNT = 2;
-
-	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TagImpl <em>Tag</em>}' class.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see net.sf.orcc.ir.impl.TagImpl
-	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTag()
-	 * @generated
-	 */
-	int TAG = 9;
-
-	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TransitionImpl
-	 * <em>Transition</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
-	 * -->
-	 * 
-	 * @see net.sf.orcc.ir.impl.TransitionImpl
-	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTransition()
-	 * @generated
-	 */
-	int TRANSITION = 7;
-
-	/**
-	 * The feature id for the '<em><b>Action</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int TRANSITION__ACTION = 0;
-
-	/**
-	 * The feature id for the '<em><b>State</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int TRANSITION__STATE = 1;
-
-	/**
-	 * The number of structural features of the '<em>Transition</em>' class.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int TRANSITION_FEATURE_COUNT = 2;
-
-	/**
-	 * The feature id for the '<em><b>Body</b></em>' containment reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int ACTION__BODY = 0;
-
-	/**
-	 * The feature id for the '<em><b>Input Pattern</b></em>' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTION__INPUT_PATTERN = 1;
-
-	/**
-	 * The feature id for the '<em><b>Output Pattern</b></em>' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTION__OUTPUT_PATTERN = 2;
-
-	/**
-	 * The feature id for the '<em><b>Peek Pattern</b></em>' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTION__PEEK_PATTERN = 3;
-
-	/**
-	 * The feature id for the '<em><b>Scheduler</b></em>' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTION__SCHEDULER = 4;
-
-	/**
-	 * The feature id for the '<em><b>Tag</b></em>' containment reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int ACTION__TAG = 5;
-
-	/**
-	 * The number of structural features of the '<em>Action</em>' class. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int ACTION_FEATURE_COUNT = 6;
-
-	/**
-	 * The feature id for the '<em><b>Identifiers</b></em>' attribute list. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int TAG__IDENTIFIERS = 0;
-
-	/**
-	 * The number of structural features of the '<em>Tag</em>' class. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int TAG_FEATURE_COUNT = 1;
-
-	/**
-	 * The feature id for the '<em><b>Ports</b></em>' reference list. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int PATTERN__PORTS = 0;
-
-	/**
-	 * The feature id for the '<em><b>Variables</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PATTERN__VARIABLES = 1;
-
-	/**
-	 * The feature id for the '<em><b>Num Tokens Map</b></em>' map.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PATTERN__NUM_TOKENS_MAP = 2;
-
-	/**
-	 * The feature id for the '<em><b>Port To Var Map</b></em>' map.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PATTERN__PORT_TO_VAR_MAP = 3;
-
-	/**
-	 * The feature id for the '<em><b>Var To Port Map</b></em>' map.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PATTERN__VAR_TO_PORT_MAP = 4;
-
-	/**
-	 * The number of structural features of the '<em>Pattern</em>' class. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int PATTERN_FEATURE_COUNT = 5;
+	int PROCEDURE = 2;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -2492,7 +1555,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getParam()
 	 * @generated
 	 */
-	int PARAM = 12;
+	int PARAM = 3;
 
 	/**
 	 * The feature id for the '<em><b>Variable</b></em>' containment reference.
@@ -2671,7 +1734,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPredicate()
 	 * @generated
 	 */
-	int PREDICATE = 49;
+	int PREDICATE = 40;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -2994,7 +2057,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getArg()
 	 * @generated
 	 */
-	int ARG = 25;
+	int ARG = 16;
 
 	/**
 	 * The number of structural features of the '<em>Arg</em>' class.
@@ -3013,7 +2076,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getArgByRef()
 	 * @generated
 	 */
-	int ARG_BY_REF = 26;
+	int ARG_BY_REF = 17;
 
 	/**
 	 * The feature id for the '<em><b>Indexes</b></em>' containment reference list.
@@ -3050,7 +2113,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getArgByVal()
 	 * @generated
 	 */
-	int ARG_BY_VAL = 27;
+	int ARG_BY_VAL = 18;
 
 	/**
 	 * The feature id for the '<em><b>Value</b></em>' containment reference.
@@ -3269,7 +2332,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getType()
 	 * @generated
 	 */
-	int TYPE = 37;
+	int TYPE = 28;
 
 	/**
 	 * The number of structural features of the '<em>Type</em>' class. <!--
@@ -3287,7 +2350,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeBool()
 	 * @generated
 	 */
-	int TYPE_BOOL = 38;
+	int TYPE_BOOL = 29;
 
 	/**
 	 * The number of structural features of the '<em>Type Bool</em>' class. <!--
@@ -3307,7 +2370,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeFloat()
 	 * @generated
 	 */
-	int TYPE_FLOAT = 39;
+	int TYPE_FLOAT = 30;
 
 	/**
 	 * The number of structural features of the '<em>Type Float</em>' class.
@@ -3324,7 +2387,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeInt()
 	 * @generated
 	 */
-	int TYPE_INT = 40;
+	int TYPE_INT = 31;
 
 	/**
 	 * The feature id for the '<em><b>Size</b></em>' attribute. <!--
@@ -3351,7 +2414,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeList()
 	 * @generated
 	 */
-	int TYPE_LIST = 41;
+	int TYPE_LIST = 32;
 
 	/**
 	 * The feature id for the '<em><b>Size Expr</b></em>' containment reference.
@@ -3388,7 +2451,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeString()
 	 * @generated
 	 */
-	int TYPE_STRING = 42;
+	int TYPE_STRING = 33;
 
 	/**
 	 * The feature id for the '<em><b>Size</b></em>' attribute. <!--
@@ -3414,7 +2477,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeUint()
 	 * @generated
 	 */
-	int TYPE_UINT = 43;
+	int TYPE_UINT = 34;
 
 	/**
 	 * The feature id for the '<em><b>Size</b></em>' attribute. <!--
@@ -3441,7 +2504,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeVoid()
 	 * @generated
 	 */
-	int TYPE_VOID = 44;
+	int TYPE_VOID = 35;
 
 	/**
 	 * The number of structural features of the '<em>Type Void</em>' class. <!--
@@ -3478,7 +2541,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getAnnotation()
 	 * @generated
 	 */
-	int ANNOTATION = 46;
+	int ANNOTATION = 37;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' map.
@@ -3514,7 +2577,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getUse()
 	 * @generated
 	 */
-	int USE = 48;
+	int USE = 39;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.VarImpl <em>Var</em>}' class.
@@ -3523,7 +2586,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getVar()
 	 * @generated
 	 */
-	int VAR = 47;
+	int VAR = 38;
 
 	/**
 	 * The feature id for the '<em><b>Annotations</b></em>' containment reference list.
@@ -3668,117 +2731,6 @@ public interface IrPackage extends EPackage {
 	int PREDICATE_FEATURE_COUNT = 1;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.impl.PortToEIntegerObjectMapEntryImpl <em>Port To EInteger Object Map Entry</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.ir.impl.PortToEIntegerObjectMapEntryImpl
-	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPortToEIntegerObjectMapEntry()
-	 * @generated
-	 */
-	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = 50;
-
-	/**
-	 * The feature id for the '<em><b>Key</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY = 0;
-
-	/**
-	 * The feature id for the '<em><b>Value</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE = 1;
-
-	/**
-	 * The number of structural features of the '<em>Port To EInteger Object Map Entry</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY_FEATURE_COUNT = 2;
-
-	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.impl.PortToVarMapEntryImpl <em>Port To Var Map Entry</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.ir.impl.PortToVarMapEntryImpl
-	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPortToVarMapEntry()
-	 * @generated
-	 */
-	int PORT_TO_VAR_MAP_ENTRY = 51;
-
-	/**
-	 * The feature id for the '<em><b>Key</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PORT_TO_VAR_MAP_ENTRY__KEY = 0;
-
-	/**
-	 * The feature id for the '<em><b>Value</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PORT_TO_VAR_MAP_ENTRY__VALUE = 1;
-
-	/**
-	 * The number of structural features of the '<em>Port To Var Map Entry</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PORT_TO_VAR_MAP_ENTRY_FEATURE_COUNT = 2;
-
-	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.impl.VarToPortMapEntryImpl <em>Var To Port Map Entry</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.ir.impl.VarToPortMapEntryImpl
-	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getVarToPortMapEntry()
-	 * @generated
-	 */
-	int VAR_TO_PORT_MAP_ENTRY = 52;
-
-	/**
-	 * The feature id for the '<em><b>Key</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int VAR_TO_PORT_MAP_ENTRY__KEY = 0;
-
-	/**
-	 * The feature id for the '<em><b>Value</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int VAR_TO_PORT_MAP_ENTRY__VALUE = 1;
-
-	/**
-	 * The number of structural features of the '<em>Var To Port Map Entry</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int VAR_TO_PORT_MAP_ENTRY_FEATURE_COUNT = 2;
-
-	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.EStringToEStringMapEntryImpl <em>EString To EString Map Entry</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3786,7 +2738,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getEStringToEStringMapEntry()
 	 * @generated
 	 */
-	int ESTRING_TO_ESTRING_MAP_ENTRY = 53;
+	int ESTRING_TO_ESTRING_MAP_ENTRY = 41;
 
 	/**
 	 * The feature id for the '<em><b>Key</b></em>' attribute.
@@ -3814,167 +2766,6 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int ESTRING_TO_ESTRING_MAP_ENTRY_FEATURE_COUNT = 2;
-
-	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.ir.Action <em>Action</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Action</em>'.
-	 * @see net.sf.orcc.ir.Action
-	 * @generated
-	 */
-	EClass getAction();
-
-	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Action#getBody <em>Body</em>}'.
-	 * <!-- begin-user-doc
-	 * --> <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Body</em>'.
-	 * @see net.sf.orcc.ir.Action#getBody()
-	 * @see #getAction()
-	 * @generated
-	 */
-	EReference getAction_Body();
-
-	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Action#getInputPattern <em>Input Pattern</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Input Pattern</em>'.
-	 * @see net.sf.orcc.ir.Action#getInputPattern()
-	 * @see #getAction()
-	 * @generated
-	 */
-	EReference getAction_InputPattern();
-
-	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Action#getOutputPattern <em>Output Pattern</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Output Pattern</em>'.
-	 * @see net.sf.orcc.ir.Action#getOutputPattern()
-	 * @see #getAction()
-	 * @generated
-	 */
-	EReference getAction_OutputPattern();
-
-	/**
-	 * Returns the meta object for the containment reference '
-	 * {@link net.sf.orcc.ir.Action#getPeekPattern <em>Peek Pattern</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the containment reference '
-	 *         <em>Peek Pattern</em>'.
-	 * @see net.sf.orcc.ir.Action#getPeekPattern()
-	 * @see #getAction()
-	 * @generated
-	 */
-	EReference getAction_PeekPattern();
-
-	/**
-	 * Returns the meta object for the containment reference '
-	 * {@link net.sf.orcc.ir.Action#getScheduler <em>Scheduler</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the containment reference '<em>Scheduler</em>
-	 *         '.
-	 * @see net.sf.orcc.ir.Action#getScheduler()
-	 * @see #getAction()
-	 * @generated
-	 */
-	EReference getAction_Scheduler();
-
-	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Action#getTag <em>Tag</em>}'.
-	 * <!-- begin-user-doc
-	 * --> <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Tag</em>'.
-	 * @see net.sf.orcc.ir.Action#getTag()
-	 * @see #getAction()
-	 * @generated
-	 */
-	EReference getAction_Tag();
-
-	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.ir.Actor <em>Actor</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Actor</em>'.
-	 * @see net.sf.orcc.ir.Actor
-	 * @generated
-	 */
-	EClass getActor();
-
-	/**
-	 * Returns the meta object for the containment reference list '
-	 * {@link net.sf.orcc.ir.Actor#getActions <em>Actions</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the containment reference list '
-	 *         <em>Actions</em>'.
-	 * @see net.sf.orcc.ir.Actor#getActions()
-	 * @see #getActor()
-	 * @generated
-	 */
-	EReference getActor_Actions();
-
-	/**
-	 * Returns the meta object for the reference list '
-	 * {@link net.sf.orcc.ir.Actor#getActionsOutsideFsm
-	 * <em>Actions Outside Fsm</em>}'. <!-- begin-user-doc --> <!-- end-user-doc
-	 * -->
-	 * 
-	 * @return the meta object for the reference list '
-	 *         <em>Actions Outside Fsm</em>'.
-	 * @see net.sf.orcc.ir.Actor#getActionsOutsideFsm()
-	 * @see #getActor()
-	 * @generated
-	 */
-	EReference getActor_ActionsOutsideFsm();
-
-	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Actor#getFsm <em>Fsm</em>}'.
-	 * <!-- begin-user-doc
-	 * --> <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Fsm</em>'.
-	 * @see net.sf.orcc.ir.Actor#getFsm()
-	 * @see #getActor()
-	 * @generated
-	 */
-	EReference getActor_Fsm();
-
-	/**
-	 * Returns the meta object for the containment reference list '
-	 * {@link net.sf.orcc.ir.Actor#getInitializes <em>Initializes</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the containment reference list '
-	 *         <em>Initializes</em>'.
-	 * @see net.sf.orcc.ir.Actor#getInitializes()
-	 * @see #getActor()
-	 * @generated
-	 */
-	EReference getActor_Initializes();
-
-	/**
-	 * Returns the meta object for the containment reference list '
-	 * {@link net.sf.orcc.ir.Actor#getInputs <em>Inputs</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the containment reference list '
-	 *         <em>Inputs</em>'.
-	 * @see net.sf.orcc.ir.Actor#getInputs()
-	 * @see #getActor()
-	 * @generated
-	 */
-	EReference getActor_Inputs();
-
-	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Actor#getMoC <em>Mo C</em>}'.
-	 * <!-- begin-user-doc
-	 * --> <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Mo C</em>'.
-	 * @see net.sf.orcc.ir.Actor#getMoC()
-	 * @see #getActor()
-	 * @generated
-	 */
-	EReference getActor_MoC();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Unit <em>Unit</em>}'.
@@ -4007,70 +2798,6 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getUnit_Constants();
-
-	/**
-	 * Returns the meta object for the attribute '
-	 * {@link net.sf.orcc.ir.Actor#isNative <em>Native</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the attribute '<em>Native</em>'.
-	 * @see net.sf.orcc.ir.Actor#isNative()
-	 * @see #getActor()
-	 * @generated
-	 */
-	EAttribute getActor_Native();
-
-	/**
-	 * Returns the meta object for the containment reference list '
-	 * {@link net.sf.orcc.ir.Actor#getOutputs <em>Outputs</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the containment reference list '
-	 *         <em>Outputs</em>'.
-	 * @see net.sf.orcc.ir.Actor#getOutputs()
-	 * @see #getActor()
-	 * @generated
-	 */
-	EReference getActor_Outputs();
-
-	/**
-	 * Returns the meta object for the containment reference list '
-	 * {@link net.sf.orcc.ir.Actor#getParameters <em>Parameters</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the containment reference list '
-	 *         <em>Parameters</em>'.
-	 * @see net.sf.orcc.ir.Actor#getParameters()
-	 * @see #getActor()
-	 * @generated
-	 */
-	EReference getActor_Parameters();
-
-	/**
-	 * Returns the meta object for the containment reference list '
-	 * {@link net.sf.orcc.ir.Actor#getProcs <em>Procs</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the containment reference list '
-	 *         <em>Procs</em>'.
-	 * @see net.sf.orcc.ir.Actor#getProcs()
-	 * @see #getActor()
-	 * @generated
-	 */
-	EReference getActor_Procs();
-
-	/**
-	 * Returns the meta object for the containment reference list '
-	 * {@link net.sf.orcc.ir.Actor#getStateVars <em>State Vars</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the containment reference list '
-	 *         <em>State Vars</em>'.
-	 * @see net.sf.orcc.ir.Actor#getStateVars()
-	 * @see #getActor()
-	 * @generated
-	 */
-	EReference getActor_StateVars();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Def <em>Def</em>}'.
@@ -4358,51 +3085,6 @@ public interface IrPackage extends EPackage {
 	EReference getExprVar_Use();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.ir.FSM <em>FSM</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for class '<em>FSM</em>'.
-	 * @see net.sf.orcc.ir.FSM
-	 * @generated
-	 */
-	EClass getFSM();
-
-	/**
-	 * Returns the meta object for the reference '
-	 * {@link net.sf.orcc.ir.FSM#getInitialState <em>Initial State</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the reference '<em>Initial State</em>'.
-	 * @see net.sf.orcc.ir.FSM#getInitialState()
-	 * @see #getFSM()
-	 * @generated
-	 */
-	EReference getFSM_InitialState();
-
-	/**
-	 * Returns the meta object for the containment reference list '
-	 * {@link net.sf.orcc.ir.FSM#getStates <em>States</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the containment reference list '
-	 *         <em>States</em>'.
-	 * @see net.sf.orcc.ir.FSM#getStates()
-	 * @see #getFSM()
-	 * @generated
-	 */
-	EReference getFSM_States();
-
-	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.FSM#getTransitions <em>Transitions</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Transitions</em>'.
-	 * @see net.sf.orcc.ir.FSM#getTransitions()
-	 * @see #getFSM()
-	 * @generated
-	 */
-	EReference getFSM_Transitions();
-
-	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.InstAssign <em>Inst Assign</em>}'.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Inst Assign</em>'.
@@ -4643,108 +3325,6 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getPredicate_Expressions();
-
-	/**
-	 * Returns the meta object for class '{@link java.util.Map.Entry <em>Port To EInteger Object Map Entry</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Port To EInteger Object Map Entry</em>'.
-	 * @see java.util.Map.Entry
-	 * @model keyType="net.sf.orcc.ir.Port"
-	 *        valueDataType="org.eclipse.emf.ecore.EIntegerObject"
-	 * @generated
-	 */
-	EClass getPortToEIntegerObjectMapEntry();
-
-	/**
-	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Key</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Key</em>'.
-	 * @see java.util.Map.Entry
-	 * @see #getPortToEIntegerObjectMapEntry()
-	 * @generated
-	 */
-	EReference getPortToEIntegerObjectMapEntry_Key();
-
-	/**
-	 * Returns the meta object for the attribute '{@link java.util.Map.Entry <em>Value</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Value</em>'.
-	 * @see java.util.Map.Entry
-	 * @see #getPortToEIntegerObjectMapEntry()
-	 * @generated
-	 */
-	EAttribute getPortToEIntegerObjectMapEntry_Value();
-
-	/**
-	 * Returns the meta object for class '{@link java.util.Map.Entry <em>Port To Var Map Entry</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Port To Var Map Entry</em>'.
-	 * @see java.util.Map.Entry
-	 * @model keyType="net.sf.orcc.ir.Port"
-	 *        valueType="net.sf.orcc.ir.Var"
-	 * @generated
-	 */
-	EClass getPortToVarMapEntry();
-
-	/**
-	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Key</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Key</em>'.
-	 * @see java.util.Map.Entry
-	 * @see #getPortToVarMapEntry()
-	 * @generated
-	 */
-	EReference getPortToVarMapEntry_Key();
-
-	/**
-	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Value</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Value</em>'.
-	 * @see java.util.Map.Entry
-	 * @see #getPortToVarMapEntry()
-	 * @generated
-	 */
-	EReference getPortToVarMapEntry_Value();
-
-	/**
-	 * Returns the meta object for class '{@link java.util.Map.Entry <em>Var To Port Map Entry</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Var To Port Map Entry</em>'.
-	 * @see java.util.Map.Entry
-	 * @model keyType="net.sf.orcc.ir.Var"
-	 *        valueType="net.sf.orcc.ir.Port"
-	 * @generated
-	 */
-	EClass getVarToPortMapEntry();
-
-	/**
-	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Key</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Key</em>'.
-	 * @see java.util.Map.Entry
-	 * @see #getVarToPortMapEntry()
-	 * @generated
-	 */
-	EReference getVarToPortMapEntry_Key();
-
-	/**
-	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Value</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Value</em>'.
-	 * @see java.util.Map.Entry
-	 * @see #getVarToPortMapEntry()
-	 * @generated
-	 */
-	EReference getVarToPortMapEntry_Value();
 
 	/**
 	 * Returns the meta object for class '{@link java.util.Map.Entry <em>EString To EString Map Entry</em>}'.
@@ -5085,139 +3665,6 @@ public interface IrPackage extends EPackage {
 	EEnum getOpUnary();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.ir.Pattern <em>Pattern</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Pattern</em>'.
-	 * @see net.sf.orcc.ir.Pattern
-	 * @generated
-	 */
-	EClass getPattern();
-
-	/**
-	 * Returns the meta object for the reference list '
-	 * {@link net.sf.orcc.ir.Pattern#getPorts <em>Ports</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the reference list '<em>Ports</em>'.
-	 * @see net.sf.orcc.ir.Pattern#getPorts()
-	 * @see #getPattern()
-	 * @generated
-	 */
-	EReference getPattern_Ports();
-
-	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.Pattern#getVariables <em>Variables</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Variables</em>'.
-	 * @see net.sf.orcc.ir.Pattern#getVariables()
-	 * @see #getPattern()
-	 * @generated
-	 */
-	EReference getPattern_Variables();
-
-	/**
-	 * Returns the meta object for the map '{@link net.sf.orcc.ir.Pattern#getNumTokensMap <em>Num Tokens Map</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the map '<em>Num Tokens Map</em>'.
-	 * @see net.sf.orcc.ir.Pattern#getNumTokensMap()
-	 * @see #getPattern()
-	 * @generated
-	 */
-	EReference getPattern_NumTokensMap();
-
-	/**
-	 * Returns the meta object for the map '{@link net.sf.orcc.ir.Pattern#getPortToVarMap <em>Port To Var Map</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the map '<em>Port To Var Map</em>'.
-	 * @see net.sf.orcc.ir.Pattern#getPortToVarMap()
-	 * @see #getPattern()
-	 * @generated
-	 */
-	EReference getPattern_PortToVarMap();
-
-	/**
-	 * Returns the meta object for the map '{@link net.sf.orcc.ir.Pattern#getVarToPortMap <em>Var To Port Map</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the map '<em>Var To Port Map</em>'.
-	 * @see net.sf.orcc.ir.Pattern#getVarToPortMap()
-	 * @see #getPattern()
-	 * @generated
-	 */
-	EReference getPattern_VarToPortMap();
-
-	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.ir.Port <em>Port</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Port</em>'.
-	 * @see net.sf.orcc.ir.Port
-	 * @generated
-	 */
-	EClass getPort();
-
-	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Port#getName <em>Name</em>}'.
-	 * <!-- begin-user-doc
-	 * --> <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Name</em>'.
-	 * @see net.sf.orcc.ir.Port#getName()
-	 * @see #getPort()
-	 * @generated
-	 */
-	EAttribute getPort_Name();
-
-	/**
-	 * Returns the meta object for the attribute '
-	 * {@link net.sf.orcc.ir.Port#getNumTokensConsumed
-	 * <em>Num Tokens Consumed</em>}'. <!-- begin-user-doc --> <!-- end-user-doc
-	 * -->
-	 * 
-	 * @return the meta object for the attribute '<em>Num Tokens Consumed</em>'.
-	 * @see net.sf.orcc.ir.Port#getNumTokensConsumed()
-	 * @see #getPort()
-	 * @generated
-	 */
-	EAttribute getPort_NumTokensConsumed();
-
-	/**
-	 * Returns the meta object for the attribute '
-	 * {@link net.sf.orcc.ir.Port#getNumTokensProduced
-	 * <em>Num Tokens Produced</em>}'. <!-- begin-user-doc --> <!-- end-user-doc
-	 * -->
-	 * 
-	 * @return the meta object for the attribute '<em>Num Tokens Produced</em>'.
-	 * @see net.sf.orcc.ir.Port#getNumTokensProduced()
-	 * @see #getPort()
-	 * @generated
-	 */
-	EAttribute getPort_NumTokensProduced();
-
-	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Port#getType <em>Type</em>}'.
-	 * <!-- begin-user-doc
-	 * --> <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Type</em>'.
-	 * @see net.sf.orcc.ir.Port#getType()
-	 * @see #getPort()
-	 * @generated
-	 */
-	EReference getPort_Type();
-
-	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Port#isNative <em>Native</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Native</em>'.
-	 * @see net.sf.orcc.ir.Port#isNative()
-	 * @see #getPort()
-	 * @generated
-	 */
-	EAttribute getPort_Native();
-
-	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Procedure <em>Procedure</em>}'.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Procedure</em>'.
@@ -5341,110 +3788,6 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getParam_ByRef();
-
-	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.ir.State <em>State</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for class '<em>State</em>'.
-	 * @see net.sf.orcc.ir.State
-	 * @generated
-	 */
-	EClass getState();
-
-	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.State#getName <em>Name</em>}'.
-	 * <!-- begin-user-doc
-	 * --> <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Name</em>'.
-	 * @see net.sf.orcc.ir.State#getName()
-	 * @see #getState()
-	 * @generated
-	 */
-	EAttribute getState_Name();
-
-	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.ir.Transitions <em>Transitions</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Transitions</em>'.
-	 * @see net.sf.orcc.ir.Transitions
-	 * @generated
-	 */
-	EClass getTransitions();
-
-	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.Transitions#getList <em>List</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>List</em>'.
-	 * @see net.sf.orcc.ir.Transitions#getList()
-	 * @see #getTransitions()
-	 * @generated
-	 */
-	EReference getTransitions_List();
-
-	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.Transitions#getSourceState <em>Source State</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Source State</em>'.
-	 * @see net.sf.orcc.ir.Transitions#getSourceState()
-	 * @see #getTransitions()
-	 * @generated
-	 */
-	EReference getTransitions_SourceState();
-
-	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.ir.Tag <em>Tag</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Tag</em>'.
-	 * @see net.sf.orcc.ir.Tag
-	 * @generated
-	 */
-	EClass getTag();
-
-	/**
-	 * Returns the meta object for the attribute list '
-	 * {@link net.sf.orcc.ir.Tag#getIdentifiers <em>Identifiers</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the attribute list '<em>Identifiers</em>'.
-	 * @see net.sf.orcc.ir.Tag#getIdentifiers()
-	 * @see #getTag()
-	 * @generated
-	 */
-	EAttribute getTag_Identifiers();
-
-	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.ir.Transition <em>Transition</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Transition</em>'.
-	 * @see net.sf.orcc.ir.Transition
-	 * @generated
-	 */
-	EClass getTransition();
-
-	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.Transition#getAction <em>Action</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Action</em>'.
-	 * @see net.sf.orcc.ir.Transition#getAction()
-	 * @see #getTransition()
-	 * @generated
-	 */
-	EReference getTransition_Action();
-
-	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.Transition#getState <em>State</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>State</em>'.
-	 * @see net.sf.orcc.ir.Transition#getState()
-	 * @see #getTransition()
-	 * @generated
-	 */
-	EReference getTransition_State();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Type <em>Type</em>}'.
