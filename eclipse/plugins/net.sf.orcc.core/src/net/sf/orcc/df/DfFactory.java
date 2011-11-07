@@ -275,19 +275,6 @@ public interface DfFactory extends EFactory {
 	Transitions createTransitions();
 
 	/**
-	 * Returns a new object of class '<em>Vertex</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Vertex</em>'.
-	 * @generated
-	 */
-	Vertex createVertex();
-
-	Vertex createVertex(Instance instance);
-
-	Vertex createVertex(Port port);
-
-	/**
 	 * Returns a new object of class '<em>Wrapper String</em>'. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 

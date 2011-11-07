@@ -133,7 +133,7 @@ public class XdfImporter {
 		for (net.sf.orcc.df.Vertex networkVertex : network.getVertices()) {
 			Vertex vertex;
 			if (networkVertex.isPort()) {
-				Port port = networkVertex.getPort();
+				Port port = (Port) networkVertex;
 				String kind = (network.getInputs().contains(port)) ? "Input"
 						: "Output";
 				ObjectType type = configuration.getVertexType(kind + " port");
@@ -144,7 +144,7 @@ public class XdfImporter {
 				vertex.setValue(PARAMETER_ID, port.getName());
 				graph.addVertex(vertex);
 			} else {
-				Instance instance = networkVertex.getInstance();
+				Instance instance = (Instance) networkVertex;
 				vertex = getVertex(instance,
 						configuration.getVertexType("Instance"));
 			}

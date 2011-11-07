@@ -43,9 +43,9 @@ import org.eclipse.emf.ecore.EObject;
  * and attributes. The class of the instance points to an actor or a network.
  * 
  * @author Matthieu Wipliez
- * @model
+ * @model extends="Vertex"
  */
-public interface Instance extends EObject {
+public interface Instance extends Vertex {
 
 	/**
 	 * Returns the attribute associated with the given name.

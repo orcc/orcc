@@ -488,7 +488,7 @@ public class XDFParser {
 		if (vertex.isPort()) {
 			return null;
 		} else {
-			URI uri = EcoreUtil.getURI(vertex.getInstance().getContents());
+			URI uri = EcoreUtil.getURI(((Instance) vertex).getContents());
 			uri = uri.appendFragment("//@" + dir + "." + portName);
 			Port proxy = DfFactory.eINSTANCE.createPort();
 			((InternalEObject) proxy).eSetProxyURI(uri);
@@ -523,7 +523,7 @@ public class XDFParser {
 								+ " \"src-port\" " + "attribute");
 			}
 
-			return DfFactory.eINSTANCE.createVertex(port);
+			return port;
 		} else {
 			Instance instance = network.getInstance(vertexName);
 			if (instance == null) {
@@ -532,7 +532,7 @@ public class XDFParser {
 								+ " \"src-port\" " + "attribute");
 			}
 
-			return DfFactory.eINSTANCE.createVertex(instance);
+			return instance;
 		}
 	}
 
@@ -604,8 +604,7 @@ public class XDFParser {
 					parseDecl(element);
 				} else if (name.equals("Instance")) {
 					Instance instance = parseInstance(element);
-					network.getVertices().add(
-							DfFactory.eINSTANCE.createVertex(instance));
+					network.getVertices().add(instance);
 				} else if (name.equals("Package")) {
 					throw new OrccRuntimeException(
 							"Package elements are not supported by Orcc yet");
@@ -841,7 +840,7 @@ public class XDFParser {
 					+ "\", invalid kind: \"" + kind + "\"");
 		}
 
-		network.getVertices().add(DfFactory.eINSTANCE.createVertex(port));
+		network.getVertices().add(port);
 	}
 
 	/**

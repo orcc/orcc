@@ -28,26 +28,17 @@
  */
 package net.sf.orcc.df;
 
-
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 
 /**
- * This class defines a vertex in an XDF network. A vertex is either an input
- * port, an output port, or an instance.
+ * This class defines a vertex in a network. A vertex is either an input port,
+ * an output port, or an instance.
  * 
  * @author Matthieu Wipliez
- * @model
+ * @model abstract="true"
  */
 public interface Vertex extends EObject {
-
-	/**
-	 * Returns the object contained in this vertex.
-	 * 
-	 * @return the object contained in this vertex.
-	 * @model
-	 */
-	EObject getContents();
 
 	/**
 	 * @model type="Connection" opposite="target"
@@ -55,23 +46,9 @@ public interface Vertex extends EObject {
 	EList<Connection> getIncomingEdges();
 
 	/**
-	 * Returns the instance contained in this vertex.
-	 * 
-	 * @return the instance contained in this vertex.
-	 */
-	Instance getInstance();
-
-	/**
 	 * @model type="Connection" opposite="source"
 	 */
 	EList<Connection> getOutgoingEdges();
-
-	/**
-	 * Returns the port contained in this vertex.
-	 * 
-	 * @return the port contained in this vertex.
-	 */
-	Port getPort();
 
 	/**
 	 * @model type="Vertex" opposite="successors"
@@ -84,31 +61,18 @@ public interface Vertex extends EObject {
 	EList<Vertex> getSuccessors();
 
 	/**
-	 * Returns <code>true</code> if this vertex contains an instance, and
-	 * <code>false</code> otherwise. This method must be called to ensure a
-	 * vertex is an instance before calling {@link #getInstance()}.
+	 * Returns <code>true</code> if this vertex is an instance, and
+	 * <code>false</code> otherwise.
 	 * 
-	 * @return <code>true</code> if this vertex contains an instance, and
-	 *         <code>false</code> otherwise
+	 * @return <code>true</code> if this vertex is an instance
 	 */
 	boolean isInstance();
 
 	/**
-	 * Returns <code>true</code> if this vertex contains a port, and
-	 * <code>false</code> otherwise. This method must be called to ensure a
-	 * vertex is a port before calling {@link #getPort()}.
+	 * Returns <code>true</code> if this vertex is a port.
 	 * 
-	 * @return <code>true</code> if this vertex contains a port, and
-	 *         <code>false</code> otherwise
+	 * @return <code>true</code> if this vertex is a port
 	 */
 	boolean isPort();
-
-	/**
-	 * Sets the object contained in this vertex.
-	 * 
-	 * @param contents
-	 *            the object contained in this vertex.
-	 */
-	void setContents(EObject contents);
 
 }

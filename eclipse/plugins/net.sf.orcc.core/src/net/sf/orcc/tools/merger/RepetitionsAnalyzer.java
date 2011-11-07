@@ -98,7 +98,7 @@ public class RepetitionsAnalyzer {
 	 * 
 	 */
 	private void calculateRate(Vertex vertex, Rational rate) {
-		Instance instance = vertex.getInstance();
+		Instance instance = (Instance) vertex;
 		if (!instance.getMoC().isCSDF()) {
 			throw new OrccRuntimeException("actor" + instance.getClasz()
 					+ "is not SDF or CSDF!");
@@ -111,7 +111,7 @@ public class RepetitionsAnalyzer {
 		for (Connection conn : graph.outgoingEdgesOf(vertex)) {
 			Vertex tgt = graph.getEdgeTarget(conn);
 			if (tgt.isInstance()) {
-				CSDFMoC tgtMoC = (CSDFMoC) tgt.getInstance().getMoC();
+				CSDFMoC tgtMoC = (CSDFMoC) ((Instance) tgt).getMoC();
 				if (!rationals.containsKey(tgt)) {
 					int prd = moc.getNumTokensProduced(conn.getSourcePort());
 					int cns = tgtMoC.getNumTokensConsumed(conn.getTargetPort());
@@ -123,7 +123,7 @@ public class RepetitionsAnalyzer {
 		for (Connection conn : graph.incomingEdgesOf(vertex)) {
 			Vertex src = graph.getEdgeSource(conn);
 			if (src.isInstance()) {
-				CSDFMoC srcMoC = (CSDFMoC) src.getInstance().getMoC();
+				CSDFMoC srcMoC = (CSDFMoC) ((Instance) src).getMoC();
 				if (!rationals.containsKey(src)) {
 					int prd = srcMoC.getNumTokensProduced(conn.getSourcePort());
 					int cns = moc.getNumTokensConsumed(conn.getTargetPort());
@@ -142,10 +142,10 @@ public class RepetitionsAnalyzer {
 			int srcRate = repetitions.get(graph.getEdgeSource(connection));
 			int tgtRate = repetitions.get(graph.getEdgeTarget(connection));
 
-			CSDFMoC srcMoc = (CSDFMoC) graph.getEdgeSource(connection)
-					.getInstance().getMoC();
-			CSDFMoC tgtMoc = (CSDFMoC) graph.getEdgeTarget(connection)
-					.getInstance().getMoC();
+			CSDFMoC srcMoc = (CSDFMoC) ((Instance) graph
+					.getEdgeSource(connection)).getMoC();
+			CSDFMoC tgtMoc = (CSDFMoC) ((Instance) graph
+					.getEdgeTarget(connection)).getMoC();
 
 			int prd = srcMoc.getNumTokensProduced(connection.getSourcePort());
 			int cns = tgtMoc.getNumTokensConsumed(connection.getTargetPort());

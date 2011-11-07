@@ -25,7 +25,6 @@ import net.sf.orcc.df.State;
 import net.sf.orcc.df.Tag;
 import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.Transitions;
-import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.WrapperString;
 import net.sf.orcc.df.WrapperXml;
 import net.sf.orcc.ir.IrFactory;
@@ -99,7 +98,6 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 			case DfPackage.BROADCAST: return createBroadcast();
 			case DfPackage.WRAPPER_STRING: return createWrapperString();
 			case DfPackage.WRAPPER_XML: return createWrapperXml();
-			case DfPackage.VERTEX: return createVertex();
 			case DfPackage.ACTION: return createAction();
 			case DfPackage.ACTOR: return createActor();
 			case DfPackage.FSM: return createFSM();
@@ -425,29 +423,6 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	public Map.Entry<Var, Port> createVarToPortMapEntry() {
 		VarToPortMapEntryImpl varToPortMapEntry = new VarToPortMapEntryImpl();
 		return varToPortMapEntry;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Vertex createVertex() {
-		VertexImpl vertex = new VertexImpl();
-		return vertex;
-	}
-
-	@Override
-	public Vertex createVertex(Instance instance) {
-		VertexImpl vertex = new VertexImpl();
-		vertex.setContents(instance);
-		return vertex;
-	}
-
-	@Override
-	public Vertex createVertex(Port port) {
-		VertexImpl vertex = new VertexImpl();
-		vertex.setContents(port);
-		return vertex;
 	}
 
 	/**

@@ -96,6 +96,7 @@ public class DfSwitch<T> extends Switch<T> {
 			case DfPackage.INSTANCE: {
 				Instance instance = (Instance)theEObject;
 				T result = caseInstance(instance);
+				if (result == null) result = caseVertex(instance);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -151,6 +152,7 @@ public class DfSwitch<T> extends Switch<T> {
 			case DfPackage.PORT: {
 				Port port = (Port)theEObject;
 				T result = casePort(port);
+				if (result == null) result = caseVertex(port);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}

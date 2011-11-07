@@ -83,7 +83,7 @@ public class XlimNetworkTemplateData {
 		List<Port> inputs = network.getInputs();
 		for (Vertex vertex : network.getVertices()) {
 			if (vertex.isPort()) {
-				Port port = vertex.getPort();
+				Port port = (Port) vertex;
 				if (inputs.contains(port)) {
 					countNetwokPortBroadcastMap.put(port, vertex
 							.getOutgoingEdges().size());

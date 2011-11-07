@@ -65,6 +65,7 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
+import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
@@ -137,7 +138,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 	protected EList<Instance> instances;
 
 	/**
-	 * The cached value of the '{@link #getVertices() <em>Vertices</em>}' containment reference list.
+	 * The cached value of the '{@link #getVertices() <em>Vertices</em>}' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getVertices()
 	 * @generated
@@ -189,30 +190,28 @@ public class NetworkImpl extends EntityImpl implements Network {
 	private void computeIncomingOutgoingMaps() {
 		incomingMap = new HashMap<Instance, Map<Port, Connection>>();
 		outgoingMap = new HashMap<Instance, Map<Port, List<Connection>>>();
-		for (Vertex vertex : getVertices()) {
-			if (vertex.isInstance()) {
-				// incoming edges
-				List<Connection> connections = vertex.getIncomingEdges();
-				Map<Port, Connection> incoming = new HashMap<Port, Connection>();
-				for (Connection connection : connections) {
-					incoming.put(connection.getTargetPort(), connection);
-				}
-				incomingMap.put(vertex.getInstance(), incoming);
-
-				// outgoing edges
-				connections = vertex.getOutgoingEdges();
-				Map<Port, List<Connection>> outgoing = new HashMap<Port, List<Connection>>();
-				for (Connection connection : connections) {
-					Port source = connection.getSourcePort();
-					List<Connection> conns = outgoing.get(source);
-					if (conns == null) {
-						conns = new ArrayList<Connection>(1);
-						outgoing.put(source, conns);
-					}
-					conns.add(connection);
-				}
-				outgoingMap.put(vertex.getInstance(), outgoing);
+		for (Instance instance : getInstances()) {
+			// incoming edges
+			List<Connection> connections = instance.getIncomingEdges();
+			Map<Port, Connection> incoming = new HashMap<Port, Connection>();
+			for (Connection connection : connections) {
+				incoming.put(connection.getTargetPort(), connection);
 			}
+			incomingMap.put(instance, incoming);
+
+			// outgoing edges
+			connections = instance.getOutgoingEdges();
+			Map<Port, List<Connection>> outgoing = new HashMap<Port, List<Connection>>();
+			for (Connection connection : connections) {
+				Port source = connection.getSourcePort();
+				List<Connection> conns = outgoing.get(source);
+				if (conns == null) {
+					conns = new ArrayList<Connection>(1);
+					outgoing.put(source, conns);
+				}
+				conns.add(connection);
+			}
+			outgoingMap.put(instance, outgoing);
 		}
 	}
 
@@ -221,42 +220,37 @@ public class NetworkImpl extends EntityImpl implements Network {
 		successorsMap = new HashMap<Instance, Map<Port, List<Instance>>>();
 
 		// for each instance
-		for (Vertex vertex : getVertices()) {
-			if (vertex.isInstance()) {
-				Instance instance = vertex.getInstance();
-				if (instance.isActor()) {
-					Actor actor = instance.getActor();
-					computePredSucc(vertex, actor.getInputs(),
-							actor.getOutputs());
-				} else if (instance.isBroadcast()) {
-					Broadcast bcast = instance.getBroadcast();
-					computePredSucc(vertex, bcast.getInputs(),
-							bcast.getOutputs());
-				} else if (instance.isNetwork()) {
-					Network network = instance.getNetwork();
-					computePredSucc(vertex, network.getInputs(),
-							network.getOutputs());
-				}
+		for (Instance instance : getInstances()) {
+			if (instance.isActor()) {
+				Actor actor = instance.getActor();
+				computePredSucc(instance, actor.getInputs(), actor.getOutputs());
+			} else if (instance.isBroadcast()) {
+				Broadcast bcast = instance.getBroadcast();
+				computePredSucc(instance, bcast.getInputs(), bcast.getOutputs());
+			} else if (instance.isNetwork()) {
+				Network network = instance.getNetwork();
+				computePredSucc(instance, network.getInputs(),
+						network.getOutputs());
 			}
 		}
 	}
 
-	private void computePredSucc(Vertex vertex, List<Port> inputs,
+	private void computePredSucc(Instance instance, List<Port> inputs,
 			List<Port> outputs) {
 		Map<Port, Instance> predMap = new LinkedHashMap<Port, Instance>();
-		predecessorsMap.put(vertex.getInstance(), predMap);
-		List<Connection> incoming = vertex.getIncomingEdges();
+		predecessorsMap.put(instance, predMap);
+		List<Connection> incoming = instance.getIncomingEdges();
 		for (Port port : inputs) {
 			for (Connection connection : incoming) {
 				if (port.equals(connection.getTargetPort())) {
-					predMap.put(port, connection.getSource().getInstance());
+					predMap.put(port, (Instance) connection.getSource());
 				}
 			}
 		}
 
 		Map<Port, List<Instance>> succMap = new LinkedHashMap<Port, List<Instance>>();
-		successorsMap.put(vertex.getInstance(), succMap);
-		List<Connection> outgoing = vertex.getOutgoingEdges();
+		successorsMap.put(instance, succMap);
+		List<Connection> outgoing = instance.getOutgoingEdges();
 		for (Port port : outputs) {
 			for (Connection connection : outgoing) {
 				if (port.equals(connection.getSourcePort())) {
@@ -265,7 +259,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 						instances = new ArrayList<Instance>(1);
 						succMap.put(port, instances);
 					}
-					instances.add(connection.getTarget().getInstance());
+					instances.add((Instance) connection.getTarget());
 				}
 			}
 		}
@@ -359,8 +353,6 @@ public class NetworkImpl extends EntityImpl implements Network {
 				return ((InternalEList<?>)getConnections()).basicRemove(otherEnd, msgs);
 			case DfPackage.NETWORK__INSTANCES:
 				return ((InternalEList<?>)getInstances()).basicRemove(otherEnd, msgs);
-			case DfPackage.NETWORK__VERTICES:
-				return ((InternalEList<?>)getVertices()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -756,7 +748,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 	 */
 	public EList<Vertex> getVertices() {
 		if (vertices == null) {
-			vertices = new EObjectContainmentEList<Vertex>(Vertex.class, this, DfPackage.NETWORK__VERTICES);
+			vertices = new EObjectResolvingEList<Vertex>(Vertex.class, this, DfPackage.NETWORK__VERTICES);
 		}
 		return vertices;
 	}
@@ -809,7 +801,8 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 		return name;
 	}
 

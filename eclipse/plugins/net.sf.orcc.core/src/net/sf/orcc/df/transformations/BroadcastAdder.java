@@ -62,13 +62,12 @@ public class BroadcastAdder implements INetworkTransformation {
 				port.getType());
 		String name = id + "_" + port.getName();
 		Instance newInst = DfFactory.eINSTANCE.createInstance(name, bcast);
-		Vertex vertexBCast = DfFactory.eINSTANCE.createVertex(newInst);
-		network.getVertices().add(vertexBCast);
+		network.getVertices().add(newInst);
 
 		// add connections
 		createIncomingConnection(outList.get(0), outList.get(0).getSource(),
-				vertexBCast);
-		createOutgoingConnections(vertexBCast, outList);
+				newInst);
+		createOutgoingConnections(newInst, outList);
 	}
 
 	/**
@@ -83,7 +82,7 @@ public class BroadcastAdder implements INetworkTransformation {
 	 */
 	protected void createIncomingConnection(Connection connection,
 			Vertex vertex, Vertex vertexBCast) {
-		Broadcast bcast = vertexBCast.getInstance().getBroadcast();
+		Broadcast bcast = ((Instance) vertexBCast).getBroadcast();
 		Port bcastInput = bcast.getInput();
 
 		// creates a connection between the vertex and the broadcast
@@ -102,7 +101,7 @@ public class BroadcastAdder implements INetworkTransformation {
 	 */
 	private void createOutgoingConnections(Vertex vertexBCast,
 			List<Connection> outList) {
-		Broadcast bcast = vertexBCast.getInstance().getBroadcast();
+		Broadcast bcast = ((Instance) vertexBCast).getBroadcast();
 		int i = 0;
 		for (Connection connection : outList) {
 			// new connection
@@ -138,7 +137,7 @@ public class BroadcastAdder implements INetworkTransformation {
 	protected void examineConnections(Vertex vertex,
 			Set<Connection> connections, Map<Port, List<Connection>> outMap) {
 		if (vertex.isInstance()) {
-			Instance instance = vertex.getInstance();
+			Instance instance = (Instance) vertex;
 			for (Connection connection : connections) {
 				Port srcPort = connection.getSourcePort();
 				if (srcPort != null) {
@@ -151,7 +150,7 @@ public class BroadcastAdder implements INetworkTransformation {
 			}
 		} else {
 			if (connections.size() > 1) {
-				Port port = vertex.getPort();
+				Port port = (Port) vertex;
 				createBroadcast(network.getName(), port,
 						new ArrayList<Connection>(connections));
 			}
@@ -191,7 +190,7 @@ public class BroadcastAdder implements INetworkTransformation {
 
 		for (Vertex vertex : vertexSet) {
 			if (vertex.isInstance()) {
-				Instance instance = vertex.getInstance();
+				Instance instance = (Instance) vertex;
 				if (instance.isNetwork()) {
 					new BroadcastAdder().transform(instance.getNetwork());
 				}

@@ -161,12 +161,12 @@ public class XdfExporter extends CalSwitch<Object> {
 
 		if (source.isInstance() && sourcePort == null) {
 			throw new OrccRuntimeException("the source port of a connection "
-					+ "from instance " + source.getInstance().getId()
+					+ "from instance " + ((Instance) source).getId()
 					+ " must be specified");
 		}
 		if (target.isInstance() && targetPort == null) {
 			throw new OrccRuntimeException("the target port of a connection "
-					+ "to instance " + target.getInstance().getId()
+					+ "to instance " + ((Instance) target).getId()
 					+ " must be specified");
 		}
 
@@ -225,7 +225,7 @@ public class XdfExporter extends CalSwitch<Object> {
 			portMap.put(port, vertex);
 
 			network.getInputs().add(port);
-			networkVertex = DfFactory.eINSTANCE.createVertex(port);
+			networkVertex = port;
 		} else if ("Output port".equals(vertex.getType().getName())) {
 			Type type = parseType(vertex.getValue("port type"));
 			boolean native_ = (Boolean) vertex.getValue("native");
@@ -233,11 +233,11 @@ public class XdfExporter extends CalSwitch<Object> {
 			portMap.put(port, vertex);
 
 			network.getOutputs().add(port);
-			networkVertex = DfFactory.eINSTANCE.createVertex(port);
+			networkVertex = port;
 		} else {
 			String clasz = (String) vertex.getValue(PARAMETER_REFINEMENT);
 			Instance instance = DfFactory.eINSTANCE.createInstance(name, null);
-			networkVertex = DfFactory.eINSTANCE.createVertex(instance);
+			networkVertex = instance;
 
 			Map<?, ?> variables = (Map<?, ?>) vertex
 					.getValue("instance parameter");

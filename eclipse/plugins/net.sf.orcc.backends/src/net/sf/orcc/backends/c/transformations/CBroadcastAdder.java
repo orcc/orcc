@@ -60,7 +60,7 @@ public class CBroadcastAdder extends BroadcastAdder {
 	@Override
 	protected void examineConnections(Vertex vertex,
 			Set<Connection> connections, Map<Port, List<Connection>> outMap) {
-		Instance instance = vertex.getInstance();
+		Instance instance = (Instance) vertex;
 		for (Connection connection : connections) {
 			Port srcPort = connection.getSourcePort();
 			if (srcPort != null) {

@@ -36,13 +36,10 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
 
-import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
-import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 import org.eclipse.emf.ecore.util.EObjectWithInverseResolvingEList;
 import org.eclipse.emf.ecore.util.InternalEList;
@@ -54,17 +51,8 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * @author Matthieu Wipliez
  * @generated
  */
-public class VertexImpl extends EObjectImpl implements Vertex {
+public abstract class VertexImpl extends EObjectImpl implements Vertex {
 
-	/**
-	 * The cached value of the '{@link #getContents() <em>Contents</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getContents()
-	 * @generated
-	 * @ordered
-	 */
-	protected EObject contents;
 	/**
 	 * The cached value of the '{@link #getPredecessors() <em>Predecessors</em>}' reference list.
 	 * <!-- begin-user-doc -->
@@ -116,21 +104,9 @@ public class VertexImpl extends EObjectImpl implements Vertex {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EObject basicGetContents() {
-		return contents;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case DfPackage.VERTEX__CONTENTS:
-				if (resolve) return getContents();
-				return basicGetContents();
 			case DfPackage.VERTEX__PREDECESSORS:
 				return getPredecessors();
 			case DfPackage.VERTEX__SUCCESSORS:
@@ -192,8 +168,6 @@ public class VertexImpl extends EObjectImpl implements Vertex {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case DfPackage.VERTEX__CONTENTS:
-				return contents != null;
 			case DfPackage.VERTEX__PREDECESSORS:
 				return predecessors != null && !predecessors.isEmpty();
 			case DfPackage.VERTEX__SUCCESSORS:
@@ -206,17 +180,6 @@ public class VertexImpl extends EObjectImpl implements Vertex {
 		return super.eIsSet(featureID);
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof VertexImpl) {
-			VertexImpl vertex = (VertexImpl) obj;
-			// the == is deliberate
-			return contents == vertex.contents;
-		} else {
-			return false;
-		}
-	}
-
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -226,9 +189,6 @@ public class VertexImpl extends EObjectImpl implements Vertex {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case DfPackage.VERTEX__CONTENTS:
-				setContents((EObject)newValue);
-				return;
 			case DfPackage.VERTEX__PREDECESSORS:
 				getPredecessors().clear();
 				getPredecessors().addAll((Collection<? extends Vertex>)newValue);
@@ -267,9 +227,6 @@ public class VertexImpl extends EObjectImpl implements Vertex {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case DfPackage.VERTEX__CONTENTS:
-				setContents((EObject)null);
-				return;
 			case DfPackage.VERTEX__PREDECESSORS:
 				getPredecessors().clear();
 				return;
@@ -291,41 +248,11 @@ public class VertexImpl extends EObjectImpl implements Vertex {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EObject getContents() {
-		if (contents != null && contents.eIsProxy()) {
-			InternalEObject oldContents = (InternalEObject)contents;
-			contents = eResolveProxy(oldContents);
-			if (contents != oldContents) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.VERTEX__CONTENTS, oldContents, contents));
-			}
-		}
-		return contents;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EList<Connection> getIncomingEdges() {
 		if (incomingEdges == null) {
 			incomingEdges = new EObjectWithInverseResolvingEList<Connection>(Connection.class, this, DfPackage.VERTEX__INCOMING_EDGES, DfPackage.CONNECTION__TARGET);
 		}
 		return incomingEdges;
-	}
-
-	/**
-	 * Returns the instance contained in this vertex.
-	 * 
-	 * @return the instance contained in this vertex.
-	 */
-	public Instance getInstance() {
-		if (isInstance()) {
-			return (Instance) contents;
-		} else {
-			return null;
-		}
 	}
 
 
@@ -339,19 +266,6 @@ public class VertexImpl extends EObjectImpl implements Vertex {
 			outgoingEdges = new EObjectWithInverseResolvingEList<Connection>(Connection.class, this, DfPackage.VERTEX__OUTGOING_EDGES, DfPackage.CONNECTION__SOURCE);
 		}
 		return outgoingEdges;
-	}
-
-	/**
-	 * Returns the port contained in this vertex.
-	 * 
-	 * @return the port contained in this vertex.
-	 */
-	public Port getPort() {
-		if (isPort()) {
-			return (Port) contents;
-		} else {
-			return null;
-		}
 	}
 
 	/**
@@ -378,11 +292,6 @@ public class VertexImpl extends EObjectImpl implements Vertex {
 		return successors;
 	}
 
-	@Override
-	public int hashCode() {
-		return contents.hashCode();
-	}
-
 	/**
 	 * Returns <code>true</code> if this vertex contains an instance, and
 	 * <code>false</code> otherwise. This method must be called to ensure a
@@ -392,7 +301,7 @@ public class VertexImpl extends EObjectImpl implements Vertex {
 	 *         <code>false</code> otherwise
 	 */
 	public boolean isInstance() {
-		return (contents instanceof Instance);
+		return (this instanceof Instance);
 	}
 
 	/**
@@ -404,24 +313,7 @@ public class VertexImpl extends EObjectImpl implements Vertex {
 	 *         <code>false</code> otherwise
 	 */
 	public boolean isPort() {
-		return (contents instanceof Port);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setContents(EObject newContents) {
-		EObject oldContents = contents;
-		contents = newContents;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.VERTEX__CONTENTS, oldContents, contents));
-	}
-
-	@Override
-	public String toString() {
-		return String.valueOf(contents);
+		return (this instanceof Port);
 	}
 
 }

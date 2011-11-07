@@ -100,7 +100,7 @@ public class StaticRegionDetector {
 
 		Instance inst = DfFactory.eINSTANCE.createInstance(cluster.getName(),
 				cluster);
-		Vertex clusterVertex = DfFactory.eINSTANCE.createVertex(inst);
+		Vertex clusterVertex = inst;
 
 		clusteredGraph.addVertex(clusterVertex);
 
@@ -137,7 +137,7 @@ public class StaticRegionDetector {
 			if (scc.size() > 1) {
 				if (scc.remove(clusterVertex)) {
 					for (Vertex v : scc) {
-						MoC clasz = v.getInstance().getMoC();
+						MoC clasz = ((Instance) v).getMoC();
 						if (!clasz.isCSDF()) {
 							ret = true;
 						}
@@ -159,7 +159,7 @@ public class StaticRegionDetector {
 
 		while (!stack.isEmpty()) {
 			Vertex v = stack.pop();
-			MoC moc = v.getInstance().getMoC();
+			MoC moc = ((Instance) v).getMoC();
 			if (moc.isCSDF()) {
 				if (!discovered.contains(v)) {
 					discovered.add(v);
@@ -170,7 +170,7 @@ public class StaticRegionDetector {
 					finished.add(v);
 					for (Connection edge : v.getOutgoingEdges()) {
 						Vertex tgtVertex = edge.getTarget();
-						moc = tgtVertex.getInstance().getMoC();
+						moc = ((Instance) tgtVertex).getMoC();
 						if (!discovered.contains(tgtVertex) && moc.isCSDF()) {
 							if (vertices != null) {
 								List<Vertex> l = new LinkedList<Vertex>(
@@ -204,7 +204,7 @@ public class StaticRegionDetector {
 				.topologicalSort();
 		for (Vertex vertex : vertices) {
 			if (vertex.isInstance()) {
-				MoC clasz = vertex.getInstance().getMoC();
+				MoC clasz = ((Instance) vertex).getMoC();
 				if (!discovered.contains(vertex) && clasz.isCSDF()) {
 					List<Vertex> set = new LinkedList<Vertex>();
 					staticRegionList.add(set);

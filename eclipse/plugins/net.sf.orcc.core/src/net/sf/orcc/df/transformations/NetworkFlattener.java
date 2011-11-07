@@ -71,7 +71,7 @@ public class NetworkFlattener implements INetworkTransformation {
 
 		for (Vertex vertex : vertexSet) {
 			if (vertex.isInstance()) {
-				Instance subInstance = vertex.getInstance();
+				Instance subInstance = (Instance) vertex;
 
 				// get a unique identifier
 				String id = getUniqueIdentifier(instance.getId(), subInstance);
@@ -186,7 +186,7 @@ public class NetworkFlattener implements INetworkTransformation {
 		List<Vertex> vertices = new ArrayList<Vertex>(network.getVertices());
 		for (Vertex vertex : vertices) {
 			if (vertex.isInstance()) {
-				Instance instance = vertex.getInstance();
+				Instance instance = (Instance) vertex;
 				if (instance.isNetwork()) {
 					Network subNetwork = instance.getNetwork();
 

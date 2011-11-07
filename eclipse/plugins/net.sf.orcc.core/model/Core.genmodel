@@ -45,7 +45,6 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//WrapperXml/xml"/>
     </genClasses>
     <genClasses ecoreClass="Df.ecore#//Vertex">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Vertex/contents"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Vertex/predecessors"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Vertex/successors"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Vertex/incomingEdges"/>

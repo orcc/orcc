@@ -543,7 +543,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getVertex_Contents() {
+	public EReference getVertex_Predecessors() {
 		return (EReference)vertexEClass.getEStructuralFeatures().get(0);
 	}
 
@@ -552,7 +552,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getVertex_Predecessors() {
+	public EReference getVertex_Successors() {
 		return (EReference)vertexEClass.getEStructuralFeatures().get(1);
 	}
 
@@ -561,7 +561,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getVertex_Successors() {
+	public EReference getVertex_IncomingEdges() {
 		return (EReference)vertexEClass.getEStructuralFeatures().get(2);
 	}
 
@@ -570,17 +570,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getVertex_IncomingEdges() {
-		return (EReference)vertexEClass.getEStructuralFeatures().get(3);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EReference getVertex_OutgoingEdges() {
-		return (EReference)vertexEClass.getEStructuralFeatures().get(4);
+		return (EReference)vertexEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -1135,7 +1126,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEAttribute(wrapperXmlEClass, WRAPPER_XML__XML);
 
 		vertexEClass = createEClass(VERTEX);
-		createEReference(vertexEClass, VERTEX__CONTENTS);
 		createEReference(vertexEClass, VERTEX__PREDECESSORS);
 		createEReference(vertexEClass, VERTEX__SUCCESSORS);
 		createEReference(vertexEClass, VERTEX__INCOMING_EDGES);
@@ -1242,7 +1232,9 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 
 		// Add supertypes to classes
 		networkEClass.getESuperTypes().add(theIrPackage.getEntity());
+		instanceEClass.getESuperTypes().add(this.getVertex());
 		actorEClass.getESuperTypes().add(theIrPackage.getEntity());
+		portEClass.getESuperTypes().add(this.getVertex());
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(networkEClass, Network.class, "Network", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -1253,7 +1245,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		initEReference(getNetwork_Variables(), theIrPackage.getVar(), null, "variables", null, 0, -1, Network.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNetwork_Connections(), this.getConnection(), null, "connections", null, 0, -1, Network.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNetwork_Instances(), this.getInstance(), null, "instances", null, 0, -1, Network.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getNetwork_Vertices(), this.getVertex(), null, "vertices", null, 0, -1, Network.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getNetwork_Vertices(), this.getVertex(), null, "vertices", null, 0, -1, Network.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(attributeEClass, Attribute.class, "Attribute", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getAttribute_Name(), ecorePackage.getEString(), "name", null, 0, 1, Attribute.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -1282,8 +1274,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		initEClass(wrapperXmlEClass, WrapperXml.class, "WrapperXml", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getWrapperXml_Xml(), ecorePackage.getEString(), "xml", null, 0, 1, WrapperXml.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(vertexEClass, Vertex.class, "Vertex", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getVertex_Contents(), theEcorePackage.getEObject(), null, "contents", null, 0, 1, Vertex.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEClass(vertexEClass, Vertex.class, "Vertex", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getVertex_Predecessors(), this.getVertex(), this.getVertex_Successors(), "predecessors", null, 0, -1, Vertex.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getVertex_Successors(), this.getVertex(), this.getVertex_Predecessors(), "successors", null, 0, -1, Vertex.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getVertex_IncomingEdges(), this.getConnection(), this.getConnection_Target(), "incomingEdges", null, 0, -1, Vertex.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

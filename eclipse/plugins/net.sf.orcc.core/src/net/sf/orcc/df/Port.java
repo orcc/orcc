@@ -28,19 +28,15 @@
  */
 package net.sf.orcc.df;
 
-import java.lang.String;
-
 import net.sf.orcc.ir.Type;
-
-import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines a port. A port has a location, a type, a name.
  * 
  * @author Matthieu Wipliez
- * @model
+ * @model extends="Vertex"
  */
-public interface Port extends EObject {
+public interface Port extends Vertex {
 
 	/**
 	 * Returns the name of this port.

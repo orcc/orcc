@@ -76,8 +76,8 @@ public class CppBackendImpl extends AbstractBackend {
 		for (Connection connection : network.getConnections()) {
 			int kind = 0;
 
-			Instance src = connection.getSource().getInstance();
-			Instance tgt = connection.getTarget().getInstance();
+			Instance src = (Instance) connection.getSource();
+			Instance tgt = (Instance) connection.getTarget();
 
 			String srcName = getPartNameAttribute(src);
 			String tgtName = getPartNameAttribute(tgt);

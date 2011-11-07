@@ -71,7 +71,7 @@ public class SerDesAdder implements INetworkTransformation {
 	private void createIncomingConnection(Connection connection, Vertex vertex,
 			Vertex vertexBCast) {
 		// creates new input port of broadcast
-		Port bcastInput = IrFactory.eINSTANCE.createPort(connection
+		Port bcastInput = DfFactory.eINSTANCE.createPort(connection
 				.getTargetPort());
 		bcastInput.setName("input");
 
@@ -128,7 +128,7 @@ public class SerDesAdder implements INetworkTransformation {
 	 */
 	private void examineConnections(Vertex vertex, Set<Connection> connections,
 			Map<Port, List<Connection>> outMap) throws OrccException {
-		Instance instance = vertex.getInstance();
+		Instance instance = (Instance) vertex;
 		for (Connection connection : connections) {
 			Port srcPort = connection.getSourcePort();
 			if (srcPort != null) {
@@ -142,12 +142,11 @@ public class SerDesAdder implements INetworkTransformation {
 							+ srcPort.getName();
 					Instance newInst = DfFactory.eINSTANCE.createInstance(name,
 							bcast);
-					Vertex vertexBCast = new Vertex(newInst);
-					graph.addVertex(vertexBCast);
+					graph.addVertex(newInst);
 
 					// add connections
-					createIncomingConnection(connection, vertex, vertexBCast);
-					createOutgoingConnections(vertexBCast, outList);
+					createIncomingConnection(connection, vertex, newInst);
+					createOutgoingConnections(newInst, outList);
 				}
 			}
 		}
@@ -183,41 +182,35 @@ public class SerDesAdder implements INetworkTransformation {
 			for (Connection conn : graph.edgeSet()) {
 				if (graph.getEdgeSource(conn).isPort()) {
 					Attribute attr = conn.getAttribute("busRef");
-					AttrValue valAttr = (AttrValue) attr;
-					String attrName = ((ExprString) valAttr.getValue())
-							.getValue();
+					String attrName = ((ExprString) attr.getValue()).getValue();
 
 					if (serdesMap.containsKey(attrName)) {
 						Vertex v = serdesMap.get(attrName);
-						SerDes serdes = v.getInstance().getWrapper();
+						SerDes serdes = ((Instance) v).getWrapper();
 						int out = serdes.getNumOutputs();
 						serdes.setNumOutputs(out++);
 					} else {
 						Instance inst = DfFactory.eINSTANCE.createInstance(
 								attrName, new SerDes(0, 1));
-						Vertex serdes = new Vertex(inst);
-						serdesMap.put(attrName, serdes);
-						graph.addVertex(serdes);
+						serdesMap.put(attrName, inst);
+						graph.addVertex(inst);
 					}
 				}
 
 				if (graph.getEdgeTarget(conn).isPort()) {
 					Attribute attr = conn.getAttribute("busRef");
-					AttrValue valAttr = (AttrValue) attr;
-					String attrName = ((ExprString) valAttr.getValue())
-							.getValue();
+					String attrName = ((ExprString) attr.getValue()).getValue();
 
 					if (serdesMap.containsKey(attrName)) {
 						Vertex v = serdesMap.get(attrName);
-						SerDes serdes = v.getInstance().getWrapper();
+						SerDes serdes = ((Instance) v).getWrapper();
 						int in = serdes.getNumInputs();
 						serdes.setNumOutputs(in++);
 					} else {
 						Instance inst = DfFactory.eINSTANCE.createInstance(
 								attrName, new SerDes(1, 0));
-						Vertex serdes = new Vertex(inst);
-						serdesMap.put(attrName, serdes);
-						graph.addVertex(serdes);
+						serdesMap.put(attrName, inst);
+						graph.addVertex(inst);
 					}
 				}
 			}
@@ -226,7 +219,7 @@ public class SerDesAdder implements INetworkTransformation {
 
 			for (Vertex vertex : graph.vertexSet()) {
 				if (vertex.isPort()) {
-					Port port = vertex.getPort();
+					Port port = (Port) vertex;
 
 					if (outputs.contains(port)) {
 						Set<Connection> conns = graph.incomingEdgesOf(vertex);
@@ -245,8 +238,7 @@ public class SerDesAdder implements INetworkTransformation {
 							Vertex vSrc = graph.getEdgeSource(connection);
 
 							Attribute attr = connection.getAttribute("busRef");
-							AttrValue valAttr = (AttrValue) attr;
-							String attrName = ((ExprString) valAttr.getValue())
+							String attrName = ((ExprString) attr.getValue())
 									.getValue();
 
 							graph.addEdge(vSrc, serdesMap.get(attrName),
@@ -269,8 +261,7 @@ public class SerDesAdder implements INetworkTransformation {
 										connection.getAttributes());
 
 						Attribute attr = connection.getAttribute("busRef");
-						AttrValue valAttr = (AttrValue) attr;
-						String attrName = ((ExprString) valAttr.getValue())
+						String attrName = ((ExprString) attr.getValue())
 								.getValue();
 
 						graph.addEdge(serdesMap.get(attrName), vTgt, outgoing);
@@ -287,8 +278,7 @@ public class SerDesAdder implements INetworkTransformation {
 											connection.getAttributes());
 
 							attr = connection.getAttribute("busRef");
-							valAttr = (AttrValue) attr;
-							attrName = ((ExprString) valAttr.getValue())
+							attrName = ((ExprString) attr.getValue())
 									.getValue();
 
 							graph.addEdge(serdesMap.get(attrName), vTgt,

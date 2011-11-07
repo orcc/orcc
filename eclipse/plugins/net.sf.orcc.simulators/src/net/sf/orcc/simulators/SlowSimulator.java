@@ -140,8 +140,8 @@ public class SlowSimulator extends AbstractSimulator {
 
 				// create the communication FIFO between source and target
 				// actors
-				Instance src = srcVertex.getInstance();
-				Instance tgt = tgtVertex.getInstance();
+				Instance src = (Instance) srcVertex;
+				Instance tgt = (Instance) tgtVertex;
 				Port srcPort = connection.getSourcePort();
 				Port tgtPort = connection.getTargetPort();
 				// connect source and target actors
@@ -273,7 +273,7 @@ public class SlowSimulator extends AbstractSimulator {
 			Vertex tgtVertex = connection.getTarget();
 
 			if (srcVertex.isInstance()) {
-				Instance source = srcVertex.getInstance();
+				Instance source = (Instance) srcVertex;
 				String srcPortName = connection.getSourcePort().getName();
 
 				Port srcPort;
@@ -286,7 +286,7 @@ public class SlowSimulator extends AbstractSimulator {
 			}
 
 			if (tgtVertex.isInstance()) {
-				Instance target = tgtVertex.getInstance();
+				Instance target = (Instance) tgtVertex;
 				String dstPortName = connection.getTargetPort().getName();
 
 				Port dstPort;

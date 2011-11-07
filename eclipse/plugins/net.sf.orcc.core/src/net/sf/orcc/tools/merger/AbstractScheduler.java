@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.moc.CSDFMoC;
 
@@ -77,8 +78,9 @@ public abstract class AbstractScheduler implements IScheduler {
 				for (Connection connection : graph.outgoingEdgesOf(vertex)) {
 					int current = tokens.get(connection);
 					int max = maxTokens.get(connection);
-					CSDFMoC moc = (CSDFMoC) vertex.getInstance().getMoC();
-					int prd = moc.getNumTokensProduced(connection.getSourcePort());
+					CSDFMoC moc = (CSDFMoC) ((Instance) vertex).getMoC();
+					int prd = moc.getNumTokensProduced(connection
+							.getSourcePort());
 					tokens.put(connection, current + prd);
 					if (max < current + prd) {
 						maxTokens.put(connection, current + prd);

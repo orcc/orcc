@@ -29,6 +29,7 @@
 
 package net.sf.orcc.tools.merger;
 
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Vertex;
 
 /**
@@ -79,7 +80,7 @@ public class Iterand {
 	public String toString() {
 		Object obj;
 		if (isVertex()) {
-			obj = ((Vertex) contents).getInstance().getId();
+			obj = ((Instance) contents).getId();
 		} else {
 			obj = contents;
 		}

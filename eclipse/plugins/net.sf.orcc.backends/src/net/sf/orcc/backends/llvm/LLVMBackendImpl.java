@@ -146,7 +146,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 					Connection incoming = edges.iterator().next();
 					Vertex source = incoming.getSource();
 					if (source.isInstance()) {
-						path = source.getInstance().getHierarchicalPath();
+						path = ((Instance) source).getHierarchicalPath();
 					}
 				}
 			}

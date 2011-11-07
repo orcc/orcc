@@ -123,8 +123,8 @@ public class ActorMerger implements INetworkTransformation {
 
 	private void copyProcedures() {
 		for (Vertex vertex : vertices) {
-			String id = vertex.getInstance().getId();
-			Actor actor = vertex.getInstance().getActor();
+			String id = ((Instance) vertex).getId();
+			Actor actor = ((Instance) vertex).getActor();
 			for (Procedure proc : new ArrayList<Procedure>(actor.getProcs())) {
 				proc.setName(id + "_" + proc.getName());
 				superActor.getProcs().add(proc);
@@ -134,8 +134,8 @@ public class ActorMerger implements INetworkTransformation {
 
 	private void copyStateVariables() {
 		for (Vertex vertex : vertices) {
-			String id = vertex.getInstance().getId();
-			Actor actor = vertex.getInstance().getActor();
+			String id = ((Instance) vertex).getId();
+			Actor actor = ((Instance) vertex).getActor();
 			for (Var var : new ArrayList<Var>(actor.getStateVars())) {
 				String name = var.getName();
 				actor.getStateVar(name).setName(id + "_" + name);
@@ -370,7 +370,7 @@ public class ActorMerger implements INetworkTransformation {
 						.createPort(EcoreUtil.copy(tgtPort.getType()), "input_"
 								+ inIndex++);
 
-				CSDFMoC moc = (CSDFMoC) tgt.getInstance().getMoC();
+				CSDFMoC moc = (CSDFMoC) ((Instance) tgt).getMoC();
 				int cns = scheduler.getRepetitionsVector().get(tgt)
 						* moc.getNumTokensConsumed(tgtPort);
 
@@ -386,7 +386,7 @@ public class ActorMerger implements INetworkTransformation {
 						EcoreUtil.copy(srcPort.getType()), "output_"
 								+ outIndex++);
 
-				CSDFMoC moc = (CSDFMoC) src.getInstance().getMoC();
+				CSDFMoC moc = (CSDFMoC) ((Instance) src).getMoC();
 				int prd = scheduler.getRepetitionsVector().get(src)
 						* moc.getNumTokensProduced(srcPort);
 
@@ -406,7 +406,7 @@ public class ActorMerger implements INetworkTransformation {
 	private void createProcedures() {
 		IrFactory factory = IrFactory.eINSTANCE;
 		for (Vertex vertex : scheduler.getSchedule().getActors()) {
-			Instance instance = vertex.getInstance();
+			Instance instance = ((Instance) vertex);
 
 			CSDFMoC moc = (CSDFMoC) instance.getMoC();
 			Iterator<Invocation> it = moc.getInvocations().iterator();
@@ -524,7 +524,7 @@ public class ActorMerger implements INetworkTransformation {
 		IrFactory factory = IrFactory.eINSTANCE;
 		for (Iterand iterand : schedule.getIterands()) {
 			if (iterand.isVertex()) {
-				Instance instance = iterand.getVertex().getInstance();
+				Instance instance = (Instance) iterand.getVertex();
 				CSDFMoC moc = (CSDFMoC) instance.getMoC();
 				NodeBlock block = IrUtil.getLast(nodes);
 				for (Invocation invocation : moc.getInvocations()) {
@@ -617,9 +617,8 @@ public class ActorMerger implements INetworkTransformation {
 			Instance instance = DfFactory.eINSTANCE.createInstance(
 					"superActor_" + index++, superActor);
 
-			Vertex mergeVertex = DfFactory.eINSTANCE.createVertex(instance);
-			graph.addVertex(mergeVertex);
-			updateConnection(mergeVertex);
+			graph.addVertex(instance);
+			updateConnection(instance);
 			graph.removeAllVertices(vertices);
 		}
 	}

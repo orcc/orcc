@@ -230,7 +230,7 @@ public interface Network extends Entity {
 	 * Returns the list of vertices of this network.
 	 * 
 	 * @return the list of vertices of this network
-	 * @model containment="true"
+	 * @model
 	 */
 	EList<Vertex> getVertices();
 

@@ -162,7 +162,7 @@ public interface DfPackage extends EPackage {
 	int NETWORK__INSTANCES = IrPackage.ENTITY_FEATURE_COUNT + 6;
 
 	/**
-	 * The feature id for the '<em><b>Vertices</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Vertices</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -301,43 +301,6 @@ public interface DfPackage extends EPackage {
 	int INSTANCE = 3;
 
 	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INSTANCE__ATTRIBUTES = 0;
-
-	/**
-	 * The feature id for the '<em><b>Contents</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INSTANCE__CONTENTS = 1;
-
-	/**
-	 * The feature id for the '<em><b>Id</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INSTANCE__ID = 2;
-
-	/**
-	 * The number of structural features of the '<em>Instance</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INSTANCE_FEATURE_COUNT = 3;
-
-
-	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.BroadcastImpl <em>Broadcast</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -346,6 +309,153 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 */
 	int BROADCAST = 4;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.df.impl.WrapperStringImpl <em>Wrapper String</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.df.impl.WrapperStringImpl
+	 * @see net.sf.orcc.df.impl.DfPackageImpl#getWrapperString()
+	 * @generated
+	 */
+	int WRAPPER_STRING = 5;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.df.impl.WrapperXmlImpl <em>Wrapper Xml</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.df.impl.WrapperXmlImpl
+	 * @see net.sf.orcc.df.impl.DfPackageImpl#getWrapperXml()
+	 * @generated
+	 */
+	int WRAPPER_XML = 6;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.df.impl.VertexImpl <em>Vertex</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.df.impl.VertexImpl
+	 * @see net.sf.orcc.df.impl.DfPackageImpl#getVertex()
+	 * @generated
+	 */
+	int VERTEX = 7;
+
+	/**
+	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VERTEX__PREDECESSORS = 0;
+
+	/**
+	 * The feature id for the '<em><b>Successors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VERTEX__SUCCESSORS = 1;
+
+	/**
+	 * The feature id for the '<em><b>Incoming Edges</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VERTEX__INCOMING_EDGES = 2;
+
+	/**
+	 * The feature id for the '<em><b>Outgoing Edges</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VERTEX__OUTGOING_EDGES = 3;
+
+	/**
+	 * The number of structural features of the '<em>Vertex</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VERTEX_FEATURE_COUNT = 4;
+
+	/**
+	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INSTANCE__PREDECESSORS = VERTEX__PREDECESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Successors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INSTANCE__SUCCESSORS = VERTEX__SUCCESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Incoming Edges</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INSTANCE__INCOMING_EDGES = VERTEX__INCOMING_EDGES;
+
+	/**
+	 * The feature id for the '<em><b>Outgoing Edges</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INSTANCE__OUTGOING_EDGES = VERTEX__OUTGOING_EDGES;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INSTANCE__ATTRIBUTES = VERTEX_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>Contents</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INSTANCE__CONTENTS = VERTEX_FEATURE_COUNT + 1;
+
+	/**
+	 * The feature id for the '<em><b>Id</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INSTANCE__ID = VERTEX_FEATURE_COUNT + 2;
+
+	/**
+	 * The number of structural features of the '<em>Instance</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INSTANCE_FEATURE_COUNT = VERTEX_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
@@ -374,17 +484,6 @@ public interface DfPackage extends EPackage {
 	 */
 	int BROADCAST_FEATURE_COUNT = 2;
 
-
-	/**
-	 * The meta object id for the '{@link net.sf.orcc.df.impl.WrapperStringImpl <em>Wrapper String</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.df.impl.WrapperStringImpl
-	 * @see net.sf.orcc.df.impl.DfPackageImpl#getWrapperString()
-	 * @generated
-	 */
-	int WRAPPER_STRING = 5;
-
 	/**
 	 * The feature id for the '<em><b>String</b></em>' attribute.
 	 * <!-- begin-user-doc -->
@@ -404,16 +503,6 @@ public interface DfPackage extends EPackage {
 	int WRAPPER_STRING_FEATURE_COUNT = 1;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.df.impl.WrapperXmlImpl <em>Wrapper Xml</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.df.impl.WrapperXmlImpl
-	 * @see net.sf.orcc.df.impl.DfPackageImpl#getWrapperXml()
-	 * @generated
-	 */
-	int WRAPPER_XML = 6;
-
-	/**
 	 * The feature id for the '<em><b>Xml</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -430,71 +519,6 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int WRAPPER_XML_FEATURE_COUNT = 1;
-
-
-	/**
-	 * The meta object id for the '{@link net.sf.orcc.df.impl.VertexImpl <em>Vertex</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.df.impl.VertexImpl
-	 * @see net.sf.orcc.df.impl.DfPackageImpl#getVertex()
-	 * @generated
-	 */
-	int VERTEX = 7;
-
-	/**
-	 * The feature id for the '<em><b>Contents</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int VERTEX__CONTENTS = 0;
-
-	/**
-	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int VERTEX__PREDECESSORS = 1;
-
-	/**
-	 * The feature id for the '<em><b>Successors</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int VERTEX__SUCCESSORS = 2;
-
-	/**
-	 * The feature id for the '<em><b>Incoming Edges</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int VERTEX__INCOMING_EDGES = 3;
-
-	/**
-	 * The feature id for the '<em><b>Outgoing Edges</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int VERTEX__OUTGOING_EDGES = 4;
-
-	/**
-	 * The number of structural features of the '<em>Vertex</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int VERTEX_FEATURE_COUNT = 5;
 
 
 	/**
@@ -836,13 +860,49 @@ public interface DfPackage extends EPackage {
 	int PORT = 12;
 
 	/**
+	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT__PREDECESSORS = VERTEX__PREDECESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Successors</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT__SUCCESSORS = VERTEX__SUCCESSORS;
+
+	/**
+	 * The feature id for the '<em><b>Incoming Edges</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT__INCOMING_EDGES = VERTEX__INCOMING_EDGES;
+
+	/**
+	 * The feature id for the '<em><b>Outgoing Edges</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT__OUTGOING_EDGES = VERTEX__OUTGOING_EDGES;
+
+	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__NAME = 0;
+	int PORT__NAME = VERTEX_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Num Tokens Consumed</b></em>' attribute.
@@ -851,7 +911,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__NUM_TOKENS_CONSUMED = 1;
+	int PORT__NUM_TOKENS_CONSUMED = VERTEX_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Num Tokens Produced</b></em>' attribute.
@@ -860,7 +920,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__NUM_TOKENS_PRODUCED = 2;
+	int PORT__NUM_TOKENS_PRODUCED = VERTEX_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Type</b></em>' containment reference.
@@ -869,7 +929,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__TYPE = 3;
+	int PORT__TYPE = VERTEX_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Native</b></em>' attribute.
@@ -878,7 +938,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__NATIVE = 4;
+	int PORT__NATIVE = VERTEX_FEATURE_COUNT + 4;
 
 	/**
 	 * The number of structural features of the '<em>Port</em>' class.
@@ -887,7 +947,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT_FEATURE_COUNT = 5;
+	int PORT_FEATURE_COUNT = VERTEX_FEATURE_COUNT + 5;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.StateImpl <em>State</em>}' class.
@@ -1219,10 +1279,10 @@ public interface DfPackage extends EPackage {
 	EReference getNetwork_Instances();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.df.Network#getVertices <em>Vertices</em>}'.
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.df.Network#getVertices <em>Vertices</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Vertices</em>'.
+	 * @return the meta object for the reference list '<em>Vertices</em>'.
 	 * @see net.sf.orcc.df.Network#getVertices()
 	 * @see #getNetwork()
 	 * @generated
@@ -1463,17 +1523,6 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getVertex();
-
-	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.df.Vertex#getContents <em>Contents</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Contents</em>'.
-	 * @see net.sf.orcc.df.Vertex#getContents()
-	 * @see #getVertex()
-	 * @generated
-	 */
-	EReference getVertex_Contents();
 
 	/**
 	 * Returns the meta object for the reference list '{@link net.sf.orcc.df.Vertex#getPredecessors <em>Predecessors</em>}'.
@@ -2196,7 +2245,7 @@ public interface DfPackage extends EPackage {
 		EReference NETWORK__INSTANCES = eINSTANCE.getNetwork_Instances();
 
 		/**
-		 * The meta object literal for the '<em><b>Vertices</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Vertices</b></em>' reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
@@ -2392,14 +2441,6 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EClass VERTEX = eINSTANCE.getVertex();
-
-		/**
-		 * The meta object literal for the '<em><b>Contents</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference VERTEX__CONTENTS = eINSTANCE.getVertex_Contents();
 
 		/**
 		 * The meta object literal for the '<em><b>Predecessors</b></em>' reference list feature.

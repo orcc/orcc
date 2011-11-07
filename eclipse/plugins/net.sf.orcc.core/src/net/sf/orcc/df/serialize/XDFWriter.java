@@ -411,9 +411,9 @@ public class XDFWriter {
 
 		if (port == null) {
 			vertexAttr = "";
-			portAttr = vertex.getPort().getName();
+			portAttr = ((Port) vertex).getName();
 		} else {
-			vertexAttr = vertex.getInstance().getId();
+			vertexAttr = ((Instance) vertex).getId();
 			portAttr = port.getName();
 		}
 

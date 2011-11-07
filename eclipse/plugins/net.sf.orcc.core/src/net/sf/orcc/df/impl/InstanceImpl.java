@@ -52,7 +52,6 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.emf.ecore.impl.EObjectImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
@@ -63,7 +62,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * @author Matthieu Wipliez
  * @generated
  */
-public class InstanceImpl extends EObjectImpl implements Instance {
+public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * The cached value of the '{@link #getAttributes() <em>Attributes</em>}' containment reference list.
