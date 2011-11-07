@@ -48,7 +48,7 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 	 */
 	public static MocFactory init() {
 		try {
-			MocFactory theMocFactory = (MocFactory)EPackage.Registry.INSTANCE.getEFactory("http:///net/sf/orcc/moc.ecore"); 
+			MocFactory theMocFactory = (MocFactory)EPackage.Registry.INSTANCE.getEFactory("http://orcc.sf.net/model/2011/MoC"); 
 			if (theMocFactory != null) {
 				return theMocFactory;
 			}

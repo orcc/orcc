@@ -41,7 +41,7 @@ public interface MocPackage extends EPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	String eNS_URI = "http:///net/sf/orcc/moc.ecore";
+	String eNS_URI = "http://orcc.sf.net/model/2011/MoC";
 
 	/**
 	 * The package namespace name.

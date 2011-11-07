@@ -1194,7 +1194,7 @@ public interface IrPackage extends EPackage {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	String eNS_URI = "http://orcc.sf.net/ir/Ir";
+	String eNS_URI = "http://orcc.sf.net/model/2011/Ir";
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprBinaryImpl

@@ -2,7 +2,7 @@
 <ecore:EPackage xmi:version="2.0"
     xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="moc"
-    nsURI="http:///net/sf/orcc/moc.ecore" nsPrefix="net.sf.orcc.moc">
+    nsURI="http://orcc.sf.net/model/2011/MoC" nsPrefix="net.sf.orcc.moc">
   <eClassifiers xsi:type="ecore:EClass" name="MoC" abstract="true"/>
   <eClassifiers xsi:type="ecore:EClass" name="CSDFMoC" eSuperTypes="#//MoC">
     <eStructuralFeatures xsi:type="ecore:EReference" name="inputPattern" eType="ecore:EClass Df.ecore#//Pattern"

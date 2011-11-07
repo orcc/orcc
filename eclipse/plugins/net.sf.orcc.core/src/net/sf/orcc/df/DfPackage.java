@@ -43,7 +43,7 @@ public interface DfPackage extends EPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	String eNS_URI = "http:///net/sf/orcc/df.ecore";
+	String eNS_URI = "http://orcc.sf.net/model/2011/Df";
 
 	/**
 	 * The package namespace name.

@@ -89,7 +89,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 */
 	public static IrFactory init() {
 		try {
-			IrFactory theIrFactory = (IrFactory)EPackage.Registry.INSTANCE.getEFactory("http://orcc.sf.net/ir/Ir"); 
+			IrFactory theIrFactory = (IrFactory)EPackage.Registry.INSTANCE.getEFactory("http://orcc.sf.net/model/2011/Ir"); 
 			if (theIrFactory != null) {
 				return theIrFactory;
 			}

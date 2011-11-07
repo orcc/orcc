@@ -64,7 +64,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	 */
 	public static DfFactory init() {
 		try {
-			DfFactory theDfFactory = (DfFactory)EPackage.Registry.INSTANCE.getEFactory("http:///net/sf/orcc/df.ecore"); 
+			DfFactory theDfFactory = (DfFactory)EPackage.Registry.INSTANCE.getEFactory("http://orcc.sf.net/model/2011/Df"); 
 			if (theDfFactory != null) {
 				return theDfFactory;
 			}
