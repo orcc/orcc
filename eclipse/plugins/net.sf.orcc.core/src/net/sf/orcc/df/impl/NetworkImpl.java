@@ -158,6 +158,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 			Connection connection) {
 		connection.setSource(source);
 		connection.setTarget(target);
+		source.getSuccessors().add(target);
 		getConnections().add(connection);
 	}
 

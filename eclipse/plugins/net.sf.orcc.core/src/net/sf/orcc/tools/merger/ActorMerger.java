@@ -361,9 +361,9 @@ public class ActorMerger implements INetworkTransformation {
 
 		int inIndex = 0;
 		int outIndex = 0;
-		for (Connection connection : graph.edgeSet()) {
-			Vertex src = graph.getEdgeSource(connection);
-			Vertex tgt = graph.getEdgeTarget(connection);
+		for (Connection connection : network.getConnections()) {
+			Vertex src = connection.getSource();
+			Vertex tgt = connection.getTarget();
 
 			if (!vertices.contains(src) && vertices.contains(tgt)) {
 				Port tgtPort = connection.getTargetPort();
@@ -635,21 +635,21 @@ public class ActorMerger implements INetworkTransformation {
 		List<Connection> connections = new ArrayList<Connection>(
 				network.getConnections());
 		for (Connection connection : connections) {
-			Vertex src = network.getEdgeSource(connection);
-			Vertex tgt = network.getEdgeTarget(connection);
+			Vertex src = connection.getSource();
+			Vertex tgt = connection.getTarget();
 
 			if (!vertices.contains(src) && vertices.contains(tgt)) {
 				Connection newConn = DfFactory.eINSTANCE.createConnection(
 						connection.getSourcePort(), inputs.get(connection),
 						connection.getAttributes());
-				network.addEdge(graph.getEdgeSource(connection), merge, newConn);
+				network.addConnection(connection.getSource(), merge, newConn);
 			}
 
 			if (vertices.contains(src) && !vertices.contains(tgt)) {
 				Connection newConn = DfFactory.eINSTANCE.createConnection(
 						outputs.get(connection), connection.getTargetPort(),
 						connection.getAttributes());
-				graph.addEdge(merge, graph.getEdgeTarget(connection), newConn);
+				network.addConnection(merge, connection.getTarget(), newConn);
 			}
 		}
 	}

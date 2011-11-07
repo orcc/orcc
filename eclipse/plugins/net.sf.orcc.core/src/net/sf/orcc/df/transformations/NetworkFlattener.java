@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Attribute;
@@ -41,9 +40,6 @@ import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
-import net.sf.orcc.ir.Port;
-
-import org.jgrapht.DirectedGraph;
 
 /**
  * This class defines a transformation that flattens a given network in-place.
@@ -100,37 +96,6 @@ public class NetworkFlattener implements INetworkTransformation {
 	}
 
 	/**
-	 * Returns the port in the given sub-network that matches the given port
-	 * with the given direction. The port exists as-is in the sub-network if
-	 * network has been instantiated, otherwise it uses the input (or output,
-	 * depending on the direction argument) port of the sub-network.
-	 * 
-	 * @param subNetwork
-	 *            the sub-network
-	 * @param direction
-	 *            direction of port
-	 * @param port
-	 *            a port
-	 * @return a vertex that matches the port in the given sub-network
-	 */
-	private Vertex getPort(Network subNetwork, String direction, Port port) {
-		Vertex v = new Vertex(direction, port);
-		if (subNetwork.getGraph().containsVertex(v)) {
-			return v;
-		} else {
-			// this is the case when instantiation has not been done
-			// so we just pick up the port
-			if (direction.equals("Input")) {
-				port = subNetwork.getInput(port.getName());
-			} else {
-				port = subNetwork.getOutput(port.getName());
-			}
-
-			return new Vertex(direction, port);
-		}
-	}
-
-	/**
 	 * Returns a unique id in the given network.
 	 */
 	private String getUniqueIdentifier(String parentId, Instance instance) {
@@ -164,21 +129,20 @@ public class NetworkFlattener implements INetworkTransformation {
 	 *            the child network
 	 * @throws OrccException
 	 */
-	private void linkIncomingConnections(Vertex vertex,
-			DirectedGraph<Vertex, Connection> graph, Network subNetwork) {
-		DirectedGraph<Vertex, Connection> subGraph = subNetwork.getGraph();
-		List<Connection> incomingEdgeSet = new ArrayList<Connection>(
-				graph.incomingEdgesOf(vertex));
-		for (Connection edge : incomingEdgeSet) {
-			Vertex v = getPort(subNetwork, "Input", edge.getTargetPort());
-			Set<Connection> outgoingEdgeSet = subGraph.outgoingEdgesOf(v);
+	private void linkIncomingConnections(Vertex vertex, Network network,
+			Network subNetwork) {
+		List<Connection> incomingEdges = new ArrayList<Connection>(
+				vertex.getIncomingEdges());
+		for (Connection edge : incomingEdges) {
+			Vertex v = (Vertex) edge.getTargetPort();
+			List<Connection> outgoingEdges = v.getOutgoingEdges();
 
-			for (Connection newEdge : outgoingEdgeSet) {
+			for (Connection newEdge : outgoingEdges) {
 				Connection incoming = DfFactory.eINSTANCE.createConnection(
 						edge.getSourcePort(), newEdge.getTargetPort(),
 						edge.getAttributes());
-				graph.addEdge(graph.getEdgeSource(edge),
-						subGraph.getEdgeTarget(newEdge), incoming);
+				network.addConnection(edge.getSource(), newEdge.getTarget(),
+						incoming);
 			}
 		}
 	}
@@ -195,37 +159,32 @@ public class NetworkFlattener implements INetworkTransformation {
 	 *            the child network
 	 * @throws OrccException
 	 */
-	private void linkOutgoingConnections(Vertex vertex,
-			DirectedGraph<Vertex, Connection> graph, Network subNetwork) {
-		DirectedGraph<Vertex, Connection> subGraph = subNetwork.getGraph();
-		List<Connection> outgoingEdgeSet = new ArrayList<Connection>(
-				graph.outgoingEdgesOf(vertex));
-		for (Connection edge : outgoingEdgeSet) {
-			Vertex v = getPort(subNetwork, "Output", edge.getSourcePort());
-			Set<Connection> incomingEdgeSet = subGraph.incomingEdgesOf(v);
+	private void linkOutgoingConnections(Vertex vertex, Network network,
+			Network subNetwork) {
+		List<Connection> outgoingEdges = new ArrayList<Connection>(
+				vertex.getOutgoingEdges());
+		for (Connection edge : outgoingEdges) {
+			Vertex v = (Vertex) edge.getSourcePort();
+			List<Connection> incomingEdges = v.getIncomingEdges();
 
-			for (Connection newEdge : incomingEdgeSet) {
+			for (Connection newEdge : incomingEdges) {
 				Connection incoming = DfFactory.eINSTANCE.createConnection(
 						newEdge.getSourcePort(), edge.getTargetPort(),
 						edge.getAttributes());
-				graph.addEdge(subGraph.getEdgeSource(newEdge),
-						graph.getEdgeTarget(edge), incoming);
+				network.addConnection(newEdge.getSource(), edge.getTarget(),
+						incoming);
 			}
 		}
 	}
 
 	@Override
 	public void transform(Network network) {
-		List<Vertex> vertexSet = new ArrayList<Vertex>(network.getGraph()
-				.vertexSet());
-		for (Vertex vertex : vertexSet) {
-			if (vertex.isInstance()) {
-				Instance instance = vertex.getInstance();
-				identifiers.put(instance.getId(), 0);
-			}
+		for (Instance instance : network.getInstances()) {
+			identifiers.put(instance.getId(), 0);
 		}
 
-		for (Vertex vertex : vertexSet) {
+		List<Vertex> vertices = new ArrayList<Vertex>(network.getVertices());
+		for (Vertex vertex : vertices) {
 			if (vertex.isInstance()) {
 				Instance instance = vertex.getInstance();
 				if (instance.isNetwork()) {
@@ -236,13 +195,11 @@ public class NetworkFlattener implements INetworkTransformation {
 
 					// copy vertices and edges
 					copySubGraph(instance.getAttributes(), network, instance);
-					linkOutgoingConnections(vertex, network.getGraph(),
-							subNetwork);
-					linkIncomingConnections(vertex, network.getGraph(),
-							subNetwork);
+					linkOutgoingConnections(vertex, network, subNetwork);
+					linkIncomingConnections(vertex, network, subNetwork);
 
 					// remove vertex from this graph
-					network.getGraph().removeVertex(vertex);
+					network.getVertices().remove(vertex);
 				}
 			}
 		}
