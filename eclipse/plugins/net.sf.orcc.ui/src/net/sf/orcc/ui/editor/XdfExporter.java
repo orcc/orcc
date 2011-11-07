@@ -244,7 +244,8 @@ public class XdfExporter extends CalSwitch<Object> {
 			for (Entry<?, ?> entry : variables.entrySet()) {
 				Variable variable = parseVariable(entry.getKey());
 				Expression expression = parseExpression(entry.getValue());
-				instance.getParameters().put(variable.getName(), expression);
+				instance.getParameters().put(varMap.get(variable.getName()),
+						expression);
 			}
 
 			// part name attribute

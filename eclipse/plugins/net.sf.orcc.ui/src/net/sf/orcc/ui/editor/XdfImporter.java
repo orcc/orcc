@@ -163,9 +163,8 @@ public class XdfImporter {
 		// parameters
 		Map<String, String> parameters = new HashMap<String, String>();
 		vertex.setValue("instance parameter", parameters);
-		for (Entry<String, Expression> entry : instance.getParameters()
-				.entrySet()) {
-			parameters.put(entry.getKey(),
+		for (Entry<Var, Expression> entry : instance.getParameters().entrySet()) {
+			parameters.put(entry.getKey().getName(),
 					new ExpressionPrinter().doSwitch(entry.getValue()));
 		}
 

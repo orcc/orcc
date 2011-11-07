@@ -42,6 +42,8 @@
         eType="#//Attribute" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="contents" eType="ecore:EClass platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EObject"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="parameters" upperBound="-1"
+        eType="#//VarToExpressionMapEntry" containment="true" resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Broadcast">
     <eStructuralFeatures xsi:type="ecore:EReference" name="inputs" upperBound="-1"
@@ -156,5 +158,9 @@
   <eClassifiers xsi:type="ecore:EClass" name="VarToPortMapEntry" instanceClassName="java.util.Map$Entry">
     <eStructuralFeatures xsi:type="ecore:EReference" name="key" eType="ecore:EClass Ir.ecore#//Var"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="#//Port"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="VarToExpressionMapEntry" instanceClassName="java.util.Map$Entry">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="key" eType="ecore:EClass Ir.ecore#//Var"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="ecore:EClass Ir.ecore#//Expression"/>
   </eClassifiers>
 </ecore:EPackage>

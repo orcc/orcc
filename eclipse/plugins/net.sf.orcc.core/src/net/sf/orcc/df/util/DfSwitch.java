@@ -11,6 +11,7 @@ import net.sf.orcc.df.*;
 
 import net.sf.orcc.ir.Entity;
 
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Var;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
@@ -195,6 +196,12 @@ public class DfSwitch<T> extends Switch<T> {
 			case DfPackage.VAR_TO_PORT_MAP_ENTRY: {
 				@SuppressWarnings("unchecked") Map.Entry<Var, Port> varToPortMapEntry = (Map.Entry<Var, Port>)theEObject;
 				T result = caseVarToPortMapEntry(varToPortMapEntry);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case DfPackage.VAR_TO_EXPRESSION_MAP_ENTRY: {
+				@SuppressWarnings("unchecked") Map.Entry<Var, Expression> varToExpressionMapEntry = (Map.Entry<Var, Expression>)theEObject;
+				T result = caseVarToExpressionMapEntry(varToExpressionMapEntry);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -499,6 +506,21 @@ public class DfSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseVarToPortMapEntry(Map.Entry<Var, Port> object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Var To Expression Map Entry</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Var To Expression Map Entry</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseVarToExpressionMapEntry(Map.Entry<Var, Expression> object) {
 		return null;
 	}
 

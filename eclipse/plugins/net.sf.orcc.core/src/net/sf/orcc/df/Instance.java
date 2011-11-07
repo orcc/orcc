@@ -28,14 +28,15 @@
  */
 package net.sf.orcc.df;
 
-import org.eclipse.emf.common.util.EList;
 import java.util.List;
-import java.util.Map;
 
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -181,8 +182,9 @@ public interface Instance extends Vertex {
 	 * Returns the parameters of this instance. This is a reference, not a copy.
 	 * 
 	 * @return the parameters of this instance
+	 * @model keyType="Var" valueType="Expression"
 	 */
-	Map<String, Expression> getParameters();
+	EMap<Var, Expression> getParameters();
 
 	/**
 	 * Returns the wrapper referenced by this instance.

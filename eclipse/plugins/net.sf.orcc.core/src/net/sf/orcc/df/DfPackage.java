@@ -449,13 +449,22 @@ public interface DfPackage extends EPackage {
 	int INSTANCE__ID = VERTEX_FEATURE_COUNT + 2;
 
 	/**
+	 * The feature id for the '<em><b>Parameters</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INSTANCE__PARAMETERS = VERTEX_FEATURE_COUNT + 3;
+
+	/**
 	 * The number of structural features of the '<em>Instance</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INSTANCE_FEATURE_COUNT = VERTEX_FEATURE_COUNT + 3;
+	int INSTANCE_FEATURE_COUNT = VERTEX_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
@@ -1192,6 +1201,44 @@ public interface DfPackage extends EPackage {
 
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.df.impl.VarToExpressionMapEntryImpl <em>Var To Expression Map Entry</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.df.impl.VarToExpressionMapEntryImpl
+	 * @see net.sf.orcc.df.impl.DfPackageImpl#getVarToExpressionMapEntry()
+	 * @generated
+	 */
+	int VAR_TO_EXPRESSION_MAP_ENTRY = 20;
+
+	/**
+	 * The feature id for the '<em><b>Key</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VAR_TO_EXPRESSION_MAP_ENTRY__KEY = 0;
+
+	/**
+	 * The feature id for the '<em><b>Value</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VAR_TO_EXPRESSION_MAP_ENTRY__VALUE = 1;
+
+	/**
+	 * The number of structural features of the '<em>Var To Expression Map Entry</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VAR_TO_EXPRESSION_MAP_ENTRY_FEATURE_COUNT = 2;
+
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Network <em>Network</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1439,6 +1486,17 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getInstance_Id();
+
+	/**
+	 * Returns the meta object for the map '{@link net.sf.orcc.df.Instance#getParameters <em>Parameters</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the map '<em>Parameters</em>'.
+	 * @see net.sf.orcc.df.Instance#getParameters()
+	 * @see #getInstance()
+	 * @generated
+	 */
+	EReference getInstance_Parameters();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Broadcast <em>Broadcast</em>}'.
@@ -2157,6 +2215,40 @@ public interface DfPackage extends EPackage {
 	EReference getVarToPortMapEntry_Value();
 
 	/**
+	 * Returns the meta object for class '{@link java.util.Map.Entry <em>Var To Expression Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Var To Expression Map Entry</em>'.
+	 * @see java.util.Map.Entry
+	 * @model keyType="net.sf.orcc.ir.Var"
+	 *        valueType="net.sf.orcc.ir.Expression"
+	 * @generated
+	 */
+	EClass getVarToExpressionMapEntry();
+
+	/**
+	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Key</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Key</em>'.
+	 * @see java.util.Map.Entry
+	 * @see #getVarToExpressionMapEntry()
+	 * @generated
+	 */
+	EReference getVarToExpressionMapEntry_Key();
+
+	/**
+	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Value</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Value</em>'.
+	 * @see java.util.Map.Entry
+	 * @see #getVarToExpressionMapEntry()
+	 * @generated
+	 */
+	EReference getVarToExpressionMapEntry_Value();
+
+	/**
 	 * Returns the factory that creates the instances of the model.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2369,6 +2461,14 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute INSTANCE__ID = eINSTANCE.getInstance_Id();
+
+		/**
+		 * The meta object literal for the '<em><b>Parameters</b></em>' map feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference INSTANCE__PARAMETERS = eINSTANCE.getInstance_Parameters();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.BroadcastImpl <em>Broadcast</em>}' class.
@@ -2929,6 +3029,32 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EReference VAR_TO_PORT_MAP_ENTRY__VALUE = eINSTANCE.getVarToPortMapEntry_Value();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.df.impl.VarToExpressionMapEntryImpl <em>Var To Expression Map Entry</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.df.impl.VarToExpressionMapEntryImpl
+		 * @see net.sf.orcc.df.impl.DfPackageImpl#getVarToExpressionMapEntry()
+		 * @generated
+		 */
+		EClass VAR_TO_EXPRESSION_MAP_ENTRY = eINSTANCE.getVarToExpressionMapEntry();
+
+		/**
+		 * The meta object literal for the '<em><b>Key</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference VAR_TO_EXPRESSION_MAP_ENTRY__KEY = eINSTANCE.getVarToExpressionMapEntry_Key();
+
+		/**
+		 * The meta object literal for the '<em><b>Value</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference VAR_TO_EXPRESSION_MAP_ENTRY__VALUE = eINSTANCE.getVarToExpressionMapEntry_Value();
 
 	}
 

@@ -42,17 +42,21 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.SerDes;
 import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
+import org.eclipse.emf.ecore.util.EcoreEMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
@@ -103,6 +107,16 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 * @ordered
 	 */
 	protected String id = ID_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getParameters()
+	 * @generated
+	 * @ordered
+	 */
+	protected EMap<Var, Expression> parameters;
 
 	/**
 	 * the absolute path this instance is defined in
@@ -157,10 +171,6 @@ public class InstanceImpl extends VertexImpl implements Instance {
 		return contents;
 	}
 
-	/**
-	 * the parameters of this instance
-	 */
-	private Map<String, Expression> parameters;
 
 	/**
 	 * Returns the actor referenced by this instance.
@@ -247,6 +257,18 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EMap<Var, Expression> getParameters() {
+		if (parameters == null) {
+			parameters = new EcoreEMap<Var,Expression>(DfPackage.Literals.VAR_TO_EXPRESSION_MAP_ENTRY, VarToExpressionMapEntryImpl.class, this, DfPackage.INSTANCE__PARAMETERS);
+		}
+		return parameters;
+	}
+
+	/**
 	 * Returns the file in which this instance is defined. This file is only
 	 * valid for instances that refer to actors and were instantiated.
 	 * 
@@ -327,15 +349,6 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	}
 
 	/**
-	 * Returns the parameters of this instance. This is a reference, not a copy.
-	 * 
-	 * @return the parameters of this instance
-	 */
-	public Map<String, Expression> getParameters() {
-		return parameters;
-	}
-
-	/**
 	 * Returns the wrapper referenced by this instance.
 	 * 
 	 * @return the wrapper referenced by this instance, or <code>null</code> if
@@ -387,6 +400,8 @@ public class InstanceImpl extends VertexImpl implements Instance {
 		switch (featureID) {
 			case DfPackage.INSTANCE__ATTRIBUTES:
 				return ((InternalEList<?>)getAttributes()).basicRemove(otherEnd, msgs);
+			case DfPackage.INSTANCE__PARAMETERS:
+				return ((InternalEList<?>)getParameters()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -406,6 +421,9 @@ public class InstanceImpl extends VertexImpl implements Instance {
 				return basicGetContents();
 			case DfPackage.INSTANCE__ID:
 				return getId();
+			case DfPackage.INSTANCE__PARAMETERS:
+				if (coreType) return getParameters();
+				else return getParameters().map();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -429,6 +447,9 @@ public class InstanceImpl extends VertexImpl implements Instance {
 			case DfPackage.INSTANCE__ID:
 				setId((String)newValue);
 				return;
+			case DfPackage.INSTANCE__PARAMETERS:
+				((EStructuralFeature.Setting)getParameters()).set(newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -450,6 +471,9 @@ public class InstanceImpl extends VertexImpl implements Instance {
 			case DfPackage.INSTANCE__ID:
 				setId(ID_EDEFAULT);
 				return;
+			case DfPackage.INSTANCE__PARAMETERS:
+				getParameters().clear();
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -468,6 +492,8 @@ public class InstanceImpl extends VertexImpl implements Instance {
 				return contents != null;
 			case DfPackage.INSTANCE__ID:
 				return ID_EDEFAULT == null ? id != null : !ID_EDEFAULT.equals(id);
+			case DfPackage.INSTANCE__PARAMETERS:
+				return parameters != null && !parameters.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

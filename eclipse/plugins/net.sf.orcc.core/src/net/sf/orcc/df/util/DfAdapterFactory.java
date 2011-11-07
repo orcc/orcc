@@ -11,6 +11,7 @@ import net.sf.orcc.df.*;
 
 import net.sf.orcc.ir.Entity;
 
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Var;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notifier;
@@ -154,6 +155,10 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseVarToPortMapEntry(Map.Entry<Var, Port> object) {
 				return createVarToPortMapEntryAdapter();
+			}
+			@Override
+			public Adapter caseVarToExpressionMapEntry(Map.Entry<Var, Expression> object) {
+				return createVarToExpressionMapEntryAdapter();
 			}
 			@Override
 			public Adapter caseEntity(Entity object) {
@@ -456,6 +461,20 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createVarToPortMapEntryAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Var To Expression Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see java.util.Map.Entry
+	 * @generated
+	 */
+	public Adapter createVarToExpressionMapEntryAdapter() {
 		return null;
 	}
 

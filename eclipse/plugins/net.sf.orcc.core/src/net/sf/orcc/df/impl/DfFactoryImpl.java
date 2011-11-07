@@ -27,6 +27,7 @@ import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.Transitions;
 import net.sf.orcc.df.WrapperString;
 import net.sf.orcc.df.WrapperXml;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -110,6 +111,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 			case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY: return (EObject)createPortToEIntegerObjectMapEntry();
 			case DfPackage.PORT_TO_VAR_MAP_ENTRY: return (EObject)createPortToVarMapEntry();
 			case DfPackage.VAR_TO_PORT_MAP_ENTRY: return (EObject)createVarToPortMapEntry();
+			case DfPackage.VAR_TO_EXPRESSION_MAP_ENTRY: return (EObject)createVarToExpressionMapEntry();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -423,6 +425,16 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	public Map.Entry<Var, Port> createVarToPortMapEntry() {
 		VarToPortMapEntryImpl varToPortMapEntry = new VarToPortMapEntryImpl();
 		return varToPortMapEntry;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Map.Entry<Var, Expression> createVarToExpressionMapEntry() {
+		VarToExpressionMapEntryImpl varToExpressionMapEntry = new VarToExpressionMapEntryImpl();
+		return varToExpressionMapEntry;
 	}
 
 	/**

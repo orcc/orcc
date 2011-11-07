@@ -513,10 +513,10 @@ public class XDFWriter {
 		instanceElt.appendChild(classElt);
 
 		// parameters
-		for (Entry<String, Expression> parameter : instance.getParameters()
+		for (Entry<Var, Expression> parameter : instance.getParameters()
 				.entrySet()) {
 			Element parameterElt = document.createElement("Parameter");
-			parameterElt.setAttribute("name", parameter.getKey());
+			parameterElt.setAttribute("name", parameter.getKey().getName());
 			writeExpr(parameterElt, parameter.getValue());
 			instanceElt.appendChild(parameterElt);
 		}

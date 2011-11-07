@@ -51,7 +51,6 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.transformations.NetworkClassifier;
 import net.sf.orcc.df.transformations.NetworkFlattener;
-import net.sf.orcc.df.transformations.SolveParametersTransform;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.EntityImpl;
 import net.sf.orcc.moc.MoC;
@@ -475,7 +474,6 @@ public class NetworkImpl extends EntityImpl implements Network {
 	 * Flattens this network.
 	 */
 	public void flatten() {
-		new SolveParametersTransform().transform(this);
 		new NetworkFlattener().transform(this);
 	}
 
