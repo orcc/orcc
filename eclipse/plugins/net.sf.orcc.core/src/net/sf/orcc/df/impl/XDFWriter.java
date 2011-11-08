@@ -45,6 +45,7 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.WrapperString;
 import net.sf.orcc.df.WrapperXml;
+import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -509,7 +510,8 @@ public class XDFWriter {
 
 		// class
 		Element classElt = document.createElement("Class");
-		classElt.setAttribute("name", instance.getClasz());
+		classElt.setAttribute("name",
+				((Entity) instance.getContents()).getName());
 		instanceElt.appendChild(classElt);
 
 		// parameters
@@ -607,7 +609,7 @@ public class XDFWriter {
 	 *            the network
 	 */
 	private void writeXDF(Element xdf, Network network) {
-		xdf.setAttribute("name", network.getName());
+		xdf.setAttribute("name", network.getSimpleName());
 		writePorts(xdf, "Input", network.getInputs());
 		writePorts(xdf, "Output", network.getOutputs());
 		writeDecls(xdf, "Param", network.getParameters());

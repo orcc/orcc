@@ -73,6 +73,7 @@ import net.sf.orcc.cal.cal.VariableReference;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.services.CalGrammarAccess;
 import net.sf.orcc.cal.ui.internal.CalActivator;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Connection;
@@ -234,7 +235,9 @@ public class XdfExporter extends CalSwitch<Object> {
 			networkVertex = port;
 		} else {
 			String clasz = (String) vertex.getValue(PARAMETER_REFINEMENT);
-			Instance instance = DfFactory.eINSTANCE.createInstance(name, null);
+			Actor actor = DfFactory.eINSTANCE.createActor();
+			actor.setName(clasz);
+			Instance instance = DfFactory.eINSTANCE.createInstance(name, actor);
 			networkVertex = instance;
 
 			Map<?, ?> variables = (Map<?, ?>) vertex

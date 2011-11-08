@@ -65,10 +65,13 @@ import net.sf.orcc.util.OrccUtil;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.InternalEObject;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -81,7 +84,7 @@ import org.w3c.dom.Node;
  * 
  */
 public class XDFParser {
-	
+
 	/**
 	 * This class defines a parser of XDF expressions.
 	 * 
@@ -303,8 +306,8 @@ public class XDFParser {
 	}
 
 	/**
-	 * This class defines a parse continuation, by storing the next node that shall
-	 * be parsed along with the result already computed.
+	 * This class defines a parse continuation, by storing the next node that
+	 * shall be parsed along with the result already computed.
 	 * 
 	 * @author Matthieu Wipliez
 	 * 
@@ -316,12 +319,12 @@ public class XDFParser {
 		final private T result;
 
 		/**
-		 * Creates a new parse continuation with the given DOM node and result. The
-		 * constructor stores the next sibling of node.
+		 * Creates a new parse continuation with the given DOM node and result.
+		 * The constructor stores the next sibling of node.
 		 * 
 		 * @param node
-		 *            a node that will be used to resume parsing after the result
-		 *            has been stored
+		 *            a node that will be used to resume parsing after the
+		 *            result has been stored
 		 * @param result
 		 *            the result
 		 */
@@ -510,19 +513,23 @@ public class XDFParser {
 
 	private Network network;
 
-	private IProject project;
-
 	/**
 	 * XDF type parser.
 	 */
 	private final TypeParser typeParser;
 
+	private IFile file;
+
 	/**
 	 * Creates a new network parser.
 	 */
-	public XDFParser() {
+	public XDFParser(Resource resource) {
 		exprParser = new ExprParser();
 		typeParser = new TypeParser();
+
+		URI uri = resource.getURI();
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		file = root.getFile(new Path(uri.toPlatformString(true)));
 	}
 
 	/**
@@ -755,6 +762,7 @@ public class XDFParser {
 		}
 
 		Entity proxy = null;
+		IProject project = file.getProject();
 		List<IFolder> folders = OrccUtil.getOutputFolders(project);
 		IPath path = new Path(clasz.replace('.', '/'));
 		IFile file = null;
@@ -809,8 +817,7 @@ public class XDFParser {
 	 * 
 	 * @return a network
 	 */
-	public Network parseNetwork(IProject project, InputStream inputStream) {
-		this.project = project;
+	public Network parseNetwork(InputStream inputStream) {
 		try {
 			// input
 			Document document = DomUtil.parseDocument(inputStream);
@@ -920,7 +927,9 @@ public class XDFParser {
 		}
 
 		this.network = DfFactory.eINSTANCE.createNetwork();
-		network.setName(name);
+		String qName = OrccUtil.getQualifiedName(file);
+		network.setName(qName);
+		network.setFileName(file.getFullPath().toString());
 
 		parseBody(root);
 	}

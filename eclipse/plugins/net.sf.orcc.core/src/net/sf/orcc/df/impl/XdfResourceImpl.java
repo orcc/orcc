@@ -36,11 +36,6 @@ import java.util.Map;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Network;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.impl.ResourceImpl;
@@ -90,15 +85,7 @@ public class XdfResourceImpl extends ResourceImpl {
 	protected void doLoad(InputStream inputStream, Map<?, ?> options)
 			throws IOException {
 		try {
-			URI uri = getURI();
-			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-			IFile file = root.getFile(new Path(uri.toPlatformString(true)));
-			IProject project = file.getProject();
-			Network network = new XDFParser()
-					.parseNetwork(project, inputStream);
-
-			network.setFileName(getURI().toPlatformString(true));
-
+			Network network = new XDFParser(this).parseNetwork(inputStream);
 			getContents().add(network);
 		} catch (OrccRuntimeException e) {
 			e.printStackTrace();

@@ -88,13 +88,6 @@ public interface Instance extends Vertex {
 	Broadcast getBroadcast();
 
 	/**
-	 * Returns the class of this instance.
-	 * 
-	 * @return the class of this instance
-	 */
-	String getClasz();
-
-	/**
 	 * Returns the contents of this instance.
 	 * 
 	 * @model

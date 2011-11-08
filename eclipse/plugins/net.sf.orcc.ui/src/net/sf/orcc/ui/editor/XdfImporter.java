@@ -51,6 +51,7 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
@@ -158,7 +159,8 @@ public class XdfImporter {
 	private Vertex getVertex(Instance instance, ObjectType type) {
 		Vertex vertex = new Vertex(type);
 		vertex.setValue(PARAMETER_ID, instance.getId());
-		vertex.setValue(PARAMETER_REFINEMENT, instance.getClasz());
+		vertex.setValue(PARAMETER_REFINEMENT,
+				((Entity) instance.getContents()).getName());
 
 		// parameters
 		Map<String, String> parameters = new HashMap<String, String>();
@@ -170,11 +172,15 @@ public class XdfImporter {
 
 		// attributes
 		Attribute partName = instance.getAttribute("partName");
-		vertex.setValue("partName",
-				new ExpressionPrinter().doSwitch(partName.getValue()));
+		if (partName != null) {
+			vertex.setValue("partName",
+					new ExpressionPrinter().doSwitch(partName.getValue()));
+		}
 		Attribute clockDomain = instance.getAttribute("clockDomain");
-		vertex.setValue("clockDomain",
-				new ExpressionPrinter().doSwitch(clockDomain.getValue()));
+		if (clockDomain != null) {
+			vertex.setValue("clockDomain",
+					new ExpressionPrinter().doSwitch(clockDomain.getValue()));
+		}
 		Attribute skip = instance.getAttribute("skip");
 		if (skip != null) {
 			vertex.setValue("skip", true);
