@@ -33,16 +33,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Instance;
@@ -78,12 +75,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  */
 public class NetworkImpl extends EntityImpl implements Network {
 
-	private Map<Connection, Integer> connectionMap;
-
-	private Map<Connection, Integer> connectionMapWithoutBroadcast;
-
-	private Map<Instance, Map<Port, Connection>> incomingMap;
-
 	/**
 	 * @generated
 	 */
@@ -98,8 +89,6 @@ public class NetworkImpl extends EntityImpl implements Network {
 	 */
 	protected MoC moC;
 
-	private Map<Instance, Map<Port, List<Connection>>> outgoingMap;
-
 	/**
 	 * @generated
 	 */
@@ -109,10 +98,6 @@ public class NetworkImpl extends EntityImpl implements Network {
 	 * @generated
 	 */
 	protected EList<Var> parameters;
-
-	private Map<Instance, Map<Port, Instance>> predecessorsMap;
-
-	private Map<Instance, Map<Port, List<Instance>>> successorsMap;
 
 	/**
 	 * @generated
@@ -181,91 +166,11 @@ public class NetworkImpl extends EntityImpl implements Network {
 		new NetworkClassifier().transform(this);
 	}
 
-	private void computeIncomingOutgoingMaps() {
-		incomingMap = new HashMap<Instance, Map<Port, Connection>>();
-		outgoingMap = new HashMap<Instance, Map<Port, List<Connection>>>();
-		for (Instance instance : getInstances()) {
-			// incoming edges
-			List<Connection> connections = instance.getIncoming();
-			Map<Port, Connection> incoming = new HashMap<Port, Connection>();
-			for (Connection connection : connections) {
-				incoming.put(connection.getTargetPort(), connection);
-			}
-			incomingMap.put(instance, incoming);
-
-			// outgoing edges
-			connections = instance.getOutgoing();
-			Map<Port, List<Connection>> outgoing = new HashMap<Port, List<Connection>>();
-			for (Connection connection : connections) {
-				Port source = connection.getSourcePort();
-				List<Connection> conns = outgoing.get(source);
-				if (conns == null) {
-					conns = new ArrayList<Connection>(1);
-					outgoing.put(source, conns);
-				}
-				conns.add(connection);
-			}
-			outgoingMap.put(instance, outgoing);
-		}
-	}
-
-	private void computePredecessorsSuccessorsMaps() {
-		predecessorsMap = new HashMap<Instance, Map<Port, Instance>>();
-		successorsMap = new HashMap<Instance, Map<Port, List<Instance>>>();
-
-		// for each instance
-		for (Instance instance : getInstances()) {
-			if (instance.isActor()) {
-				Actor actor = instance.getActor();
-				computePredSucc(instance, actor.getInputs(), actor.getOutputs());
-			} else if (instance.isBroadcast()) {
-				Broadcast bcast = instance.getBroadcast();
-				computePredSucc(instance, bcast.getInputs(), bcast.getOutputs());
-			} else if (instance.isNetwork()) {
-				Network network = instance.getNetwork();
-				computePredSucc(instance, network.getInputs(),
-						network.getOutputs());
-			}
-		}
-	}
-
-	private void computePredSucc(Instance instance, List<Port> inputs,
-			List<Port> outputs) {
-		Map<Port, Instance> predMap = new LinkedHashMap<Port, Instance>();
-		predecessorsMap.put(instance, predMap);
-		List<Connection> incoming = instance.getIncoming();
-		for (Port port : inputs) {
-			for (Connection connection : incoming) {
-				if (port.equals(connection.getTargetPort())) {
-					predMap.put(port, (Instance) connection.getSource());
-				}
-			}
-		}
-
-		Map<Port, List<Instance>> succMap = new LinkedHashMap<Port, List<Instance>>();
-		successorsMap.put(instance, succMap);
-		List<Connection> outgoing = instance.getOutgoing();
-		for (Port port : outputs) {
-			for (Connection connection : outgoing) {
-				if (port.equals(connection.getSourcePort())) {
-					List<Instance> instances = succMap.get(port);
-					if (instances == null) {
-						instances = new ArrayList<Instance>(1);
-						succMap.put(port, instances);
-					}
-					instances.add((Instance) connection.getTarget());
-				}
-			}
-		}
-	}
-
 	/**
 	 * Computes the source map and target maps that associate each connection to
 	 * its source vertex (respectively target vertex).
 	 */
 	public void computeTemplateMaps() {
-		int i, j;
-
 		// Compute template maps of subnetworks
 		for (Instance instance : getInstances()) {
 			if (instance.isNetwork()) {
@@ -273,24 +178,19 @@ public class NetworkImpl extends EntityImpl implements Network {
 			}
 		}
 
-		connectionMap = new HashMap<Connection, Integer>();
-		i = 0;
+		int i = 0;
 		for (Connection connection : getConnections()) {
-			connectionMap.put(connection, i++);
+			connection.setAttribute("id", i++);
 		}
 
-		computeIncomingOutgoingMaps();
-
-		computePredecessorsSuccessorsMaps();
-
-		connectionMapWithoutBroadcast = new HashMap<Connection, Integer>();
 		i = 0;
-		for (Map<Port, List<Connection>> map : outgoingMap.values()) {
+		for (Instance instance : getInstances()) {
+			Map<Port, List<Connection>> map = instance.getOutgoingPortMap();
 			for (List<Connection> connections : map.values()) {
-				j = 0;
+				int j = 0;
 				for (Connection connection : connections) {
-					connectionMapWithoutBroadcast.put(connection, i);
-					connection.setFifoId(j);
+					connection.setAttribute("idNoBcast", i);
+					connection.setAttribute("fifoId", j);
 					j++;
 				}
 				i++;
@@ -510,19 +410,6 @@ public class NetworkImpl extends EntityImpl implements Network {
 	}
 
 	/**
-	 * Returns a map that associates each connection to a unique integer.
-	 * 
-	 * @return a map that associates each connection to a unique integer
-	 */
-	public Map<Connection, Integer> getConnectionMap() {
-		return connectionMap;
-	}
-
-	public Map<Connection, Integer> getConnectionMapWithoutBroadcast() {
-		return connectionMapWithoutBroadcast;
-	}
-
-	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -531,17 +418,6 @@ public class NetworkImpl extends EntityImpl implements Network {
 			connections = new EObjectContainmentEList<Connection>(Connection.class, this, DfPackage.NETWORK__CONNECTIONS);
 		}
 		return connections;
-	}
-
-	/**
-	 * Returns a map that associates each instance to the list of its incoming
-	 * edges.
-	 * 
-	 * @return a map that associates each instance to the list of its incoming
-	 *         edges
-	 */
-	public Map<Instance, Map<Port, Connection>> getIncomingMap() {
-		return incomingMap;
 	}
 
 	/**
@@ -652,17 +528,6 @@ public class NetworkImpl extends EntityImpl implements Network {
 	}
 
 	/**
-	 * Returns a map that associates each instance to the list of its outgoing
-	 * edges.
-	 * 
-	 * @return a map that associates each instance to the list of its outgoing
-	 *         edges
-	 */
-	public Map<Instance, Map<Port, List<Connection>>> getOutgoingMap() {
-		return outgoingMap;
-	}
-
-	/**
 	 * Returns the output port whose name matches the given name.
 	 * 
 	 * @param name
@@ -712,24 +577,6 @@ public class NetworkImpl extends EntityImpl implements Network {
 			parameters = new EObjectContainmentEList<Var>(Var.class, this, DfPackage.NETWORK__PARAMETERS);
 		}
 		return parameters;
-	}
-
-	/**
-	 * Returns a map that associates a port to the list of its predecessors.
-	 * 
-	 * @return a map that associates a port to the list of its predecessors
-	 */
-	public Map<Instance, Map<Port, Instance>> getPredecessorsMap() {
-		return predecessorsMap;
-	}
-
-	/**
-	 * Returns a map that associates a port to the list of its successors.
-	 * 
-	 * @return a map that associates a port to the list of its successors
-	 */
-	public Map<Instance, Map<Port, List<Instance>>> getSuccessorsMap() {
-		return successorsMap;
 	}
 
 	@Override

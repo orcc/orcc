@@ -29,7 +29,6 @@
 package net.sf.orcc.df;
 
 import java.util.List;
-import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Entity;
@@ -83,30 +82,12 @@ public interface Network extends Entity {
 	List<Actor> getActors();
 
 	/**
-	 * Returns a map that associates each connection to a unique integer.
-	 * 
-	 * @return a map that associates each connection to a unique integer
-	 */
-	Map<Connection, Integer> getConnectionMap();
-
-	Map<Connection, Integer> getConnectionMapWithoutBroadcast();
-
-	/**
 	 * Returns the list of this graph's connections.
 	 * 
 	 * @return the list of this graph's connections
 	 * @model containment="true"
 	 */
 	EList<Connection> getConnections();
-
-	/**
-	 * Returns a map that associates each instance to the list of its incoming
-	 * edges.
-	 * 
-	 * @return a map that associates each instance to the list of its incoming
-	 *         edges
-	 */
-	Map<Instance, Map<Port, Connection>> getIncomingMap();
 
 	/**
 	 * Returns the input port whose name matches the given name.
@@ -169,15 +150,6 @@ public interface Network extends Entity {
 	List<Network> getNetworks();
 
 	/**
-	 * Returns a map that associates each instance to the list of its outgoing
-	 * edges.
-	 * 
-	 * @return a map that associates each instance to the list of its outgoing
-	 *         edges
-	 */
-	Map<Instance, Map<Port, List<Connection>>> getOutgoingMap();
-
-	/**
 	 * Returns the output port whose name matches the given name.
 	 * 
 	 * @param name
@@ -210,20 +182,6 @@ public interface Network extends Entity {
 	 * @model containment="true"
 	 */
 	EList<Var> getParameters();
-
-	/**
-	 * Returns a map that associates a port to the list of its predecessors.
-	 * 
-	 * @return a map that associates a port to the list of its predecessors
-	 */
-	Map<Instance, Map<Port, Instance>> getPredecessorsMap();
-
-	/**
-	 * Returns a map that associates a port to the list of its successors.
-	 * 
-	 * @return a map that associates a port to the list of its successors
-	 */
-	Map<Instance, Map<Port, List<Instance>>> getSuccessorsMap();
 
 	/**
 	 * Returns the variable with the given name.

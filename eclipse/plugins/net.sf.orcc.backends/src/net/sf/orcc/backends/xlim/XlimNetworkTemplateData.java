@@ -26,7 +26,6 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-
 package net.sf.orcc.backends.xlim;
 
 import java.util.HashMap;
@@ -61,17 +60,21 @@ public class XlimNetworkTemplateData {
 	private Map<Port, Integer> countNetwokPortBroadcastMap;
 
 	/**
-	 * build all informations needed in the template data.
+	 * Count the Broadcast of an Actor Output port
 	 * 
 	 * @param network
-	 *            a network
 	 */
-	public void computeTemplateMaps(Network network) {
-		countNetwokPortBroadcastMap = new HashMap<Port, Integer>();
-		countBroadcastConnectionsMap = new HashMap<Connection, Integer>();
+	public void computeActorOutputPortBroadcast(Network network) {
+		for (Instance instance : network.getInstances()) {
+			Map<Port, List<Connection>> map = instance.getOutgoingPortMap();
+			for (List<Connection> ports : map.values()) {
+				int cp = 0;
+				for (Connection connection : ports) {
+					countBroadcastConnectionsMap.put(connection, cp++);
+				}
+			}
+		}
 
-		computeNetworkInputPortBroadcast(network);
-		computeActorOutputPortBroadcast(network);
 	}
 
 	/**
@@ -85,8 +88,8 @@ public class XlimNetworkTemplateData {
 			if (vertex.isPort()) {
 				Port port = (Port) vertex;
 				if (inputs.contains(port)) {
-					countNetwokPortBroadcastMap.put(port, vertex
-							.getOutgoing().size());
+					countNetwokPortBroadcastMap.put(port, vertex.getOutgoing()
+							.size());
 				}
 				int cp = 0;
 				for (Connection connection : vertex.getOutgoing()) {
@@ -98,24 +101,17 @@ public class XlimNetworkTemplateData {
 	}
 
 	/**
-	 * Count the Broadcast of an Actor Output port
+	 * build all informations needed in the template data.
 	 * 
 	 * @param network
+	 *            a network
 	 */
+	public void computeTemplateMaps(Network network) {
+		countNetwokPortBroadcastMap = new HashMap<Port, Integer>();
+		countBroadcastConnectionsMap = new HashMap<Connection, Integer>();
 
-	public void computeActorOutputPortBroadcast(Network network) {
-		Map<Instance, Map<Port, List<Connection>>> val = network
-				.getOutgoingMap();
-		for (Map<Port, List<Connection>> entry : val.values()) {
-			for (List<Connection> ports : entry.values()) {
-				int cp = 0;
-				for (Connection connection : ports) {
-					countBroadcastConnectionsMap.put(connection, cp++);
-				}
-			}
-
-		}
-
+		computeNetworkInputPortBroadcast(network);
+		computeActorOutputPortBroadcast(network);
 	}
 
 	/**

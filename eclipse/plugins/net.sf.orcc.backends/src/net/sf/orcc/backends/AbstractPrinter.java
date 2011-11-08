@@ -34,6 +34,9 @@ import java.io.IOException;
 import java.util.Locale;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.df.Attribute;
+import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.util.ExpressionPrinter;
@@ -60,6 +63,19 @@ import org.stringtemplate.v4.misc.STNoSuchPropertyException;
  */
 public abstract class AbstractPrinter {
 
+	protected static class ConnectionModelAdaptor implements ModelAdaptor {
+
+		@Override
+		public Object getProperty(Interpreter interp, ST st, Object o,
+				Object property, String propertyName)
+				throws STNoSuchPropertyException {
+			String name = String.valueOf(property);
+			Attribute attribute = ((Connection) o).getAttribute(name);
+			return (attribute == null) ? null : attribute.getValue();
+		}
+
+	}
+
 	protected static class EMapModelAdaptor implements ModelAdaptor {
 
 		@Override
@@ -76,6 +92,19 @@ public abstract class AbstractPrinter {
 		@Override
 		public String toString(Object o, String formatString, Locale locale) {
 			return expressionPrinter.doSwitch((Expression) o);
+		}
+
+	}
+
+	protected static class InstanceModelAdaptor implements ModelAdaptor {
+
+		@Override
+		public Object getProperty(Interpreter interp, ST st, Object o,
+				Object property, String propertyName)
+				throws STNoSuchPropertyException {
+			String name = String.valueOf(property);
+			Attribute attribute = ((Instance) o).getAttribute(name);
+			return (attribute == null) ? null : attribute.getValue();
 		}
 
 	}
@@ -108,6 +137,9 @@ public abstract class AbstractPrinter {
 		group.registerRenderer(Type.class, new TypeRenderer());
 
 		group.registerModelAdaptor(EMap.class, new EMapModelAdaptor());
+		group.registerModelAdaptor(Instance.class, new InstanceModelAdaptor());
+		group.registerModelAdaptor(Connection.class,
+				new ConnectionModelAdaptor());
 	}
 
 	protected void printTemplate(ST template, String fileName) {

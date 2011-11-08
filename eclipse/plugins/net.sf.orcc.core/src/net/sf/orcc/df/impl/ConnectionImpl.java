@@ -420,11 +420,7 @@ public class ConnectionImpl extends EObjectImpl implements Connection {
 		return fifoId;
 	}
 
-	/**
-	 * Returns the size of this connection.
-	 * 
-	 * @return the size of this connection
-	 */
+	@Override
 	public Integer getSize() {
 		Attribute attr = getAttribute(BUFFER_SIZE);
 		if (attr != null && attr.getValue() instanceof Expression) {
@@ -509,6 +505,18 @@ public class ConnectionImpl extends EObjectImpl implements Connection {
 		return targetPort;
 	}
 
+	@Override
+	public void setAttribute(String name, Expression value) {
+		getAttributes().add(DfFactory.eINSTANCE.createAttribute(name, value));
+	}
+
+	@Override
+	public void setAttribute(String name, int value) {
+		getAttributes().add(
+				DfFactory.eINSTANCE.createAttribute(name,
+						IrFactory.eINSTANCE.createExprInt(value)));
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -520,13 +528,6 @@ public class ConnectionImpl extends EObjectImpl implements Connection {
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
 					DfPackage.CONNECTION__FIFO_ID, oldFifoId, fifoId));
-	}
-
-	@Override
-	public void setSize(int size) {
-		getAttributes().add(
-				DfFactory.eINSTANCE.createAttribute(Connection.BUFFER_SIZE,
-						IrFactory.eINSTANCE.createExprInt(size)));
 	}
 
 	/**

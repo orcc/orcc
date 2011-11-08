@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.df;
 
+import net.sf.orcc.ir.Expression;
+
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 
@@ -63,11 +65,6 @@ public interface Connection extends EObject {
 	 * @model containment="true"
 	 */
 	EList<Attribute> getAttributes();
-
-	/**
-	 * @model
-	 */
-	int getFifoId();
 
 	/**
 	 * Returns the size of this connection.
@@ -108,15 +105,25 @@ public interface Connection extends EObject {
 	 */
 	Port getTargetPort();
 
-	void setFifoId(int fifoId);
+	/**
+	 * Adds an attribute with the given name and value
+	 * 
+	 * @param name
+	 *            attribute name
+	 * @param value
+	 *            value
+	 */
+	void setAttribute(String name, Expression value);
 
 	/**
-	 * Sets the size of this connection to the given size. This method is a mere
-	 * helper method, since the size is stored as a generic attribute.
+	 * Adds an attribute with the given name and value
 	 * 
-	 * @param size
+	 * @param name
+	 *            attribute name
+	 * @param value
+	 *            value
 	 */
-	void setSize(int size);
+	void setAttribute(String name, int value);
 
 	/**
 	 * Sets the source of this connection to the given vertex

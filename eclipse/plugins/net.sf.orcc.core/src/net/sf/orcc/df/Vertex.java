@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.df;
 
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 
@@ -46,19 +49,37 @@ public interface Vertex extends EObject {
 	EList<Connection> getIncoming();
 
 	/**
+	 * Builds on-the-fly and returns a map from ports to incoming connections.
+	 * 
+	 * @return a map from ports to incoming connections
+	 */
+	Map<Port, Connection> getIncomingPortMap();
+
+	/**
 	 * @model type="Connection" opposite="source"
 	 */
 	EList<Connection> getOutgoing();
 
 	/**
-	 * @model type="Vertex" opposite="successors"
+	 * Builds on-the-fly and returns a map from ports to outgoing connections.
+	 * 
+	 * @return a map from ports to outgoing connections
 	 */
-	EList<Vertex> getPredecessors();
+	Map<Port, List<Connection>> getOutgoingPortMap();
 
 	/**
-	 * @model type="Vertex" opposite="predecessors"
+	 * Builds on-the-fly and returns the list of predecessors of this vertex.
+	 * 
+	 * @return the list of predecessors of this vertex
 	 */
-	EList<Vertex> getSuccessors();
+	List<Vertex> getPredecessors();
+
+	/**
+	 * Builds the list of successors of this vertex on-the-fly.
+	 * 
+	 * @return the list of successors of this vertex
+	 */
+	List<Vertex> getSuccessors();
 
 	/**
 	 * Returns <code>true</code> if this vertex is an instance, and

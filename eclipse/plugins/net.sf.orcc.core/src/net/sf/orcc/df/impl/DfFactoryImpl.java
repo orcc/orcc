@@ -281,7 +281,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 			Vertex target, Port targetPort, int size) {
 		Connection connection = createConnection(source, sourcePort, target,
 				targetPort);
-		connection.setSize(size);
+		connection.setAttribute(Connection.BUFFER_SIZE, size);
 		return connection;
 	}
 
