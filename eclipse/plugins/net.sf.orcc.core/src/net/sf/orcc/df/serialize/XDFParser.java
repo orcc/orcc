@@ -744,7 +744,7 @@ public class XDFParser {
 		((InternalEObject) proxy).eSetProxyURI(uri);
 
 		// instance parameters and attributes
-		Map<String, Expression> parameters = parseParameters(child);
+		parseParameters(instance, child);
 		parseAttributes(instance.getAttributes(), child);
 
 		// add instance
@@ -777,8 +777,7 @@ public class XDFParser {
 		}
 	}
 
-	private Map<String, Expression> parseParameters(Node node) {
-		Map<String, Expression> parameters = new HashMap<String, Expression>();
+	private void parseParameters(Instance instance, Node node) {
 		while (node != null) {
 			if (node.getNodeName().equals("Parameter")) {
 				String name = ((Element) node).getAttribute("name");
@@ -788,13 +787,18 @@ public class XDFParser {
 				}
 
 				Expression expr = exprParser.parseExpr(node.getFirstChild());
-				parameters.put(name, expr);
+
+				// create proxy to variable
+				URI uri = EcoreUtil.getURI(instance.getContents());
+				uri = uri.appendFragment("//@parameters." + name);
+				Var proxy = IrFactory.eINSTANCE.createVar();
+				((InternalEObject) proxy).eSetProxyURI(uri);
+
+				instance.getParameters().put(proxy, expr);
 			}
 
 			node = node.getNextSibling();
 		}
-
-		return parameters;
 	}
 
 	/**

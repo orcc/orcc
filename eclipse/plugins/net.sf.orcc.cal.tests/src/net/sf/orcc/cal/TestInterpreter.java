@@ -37,6 +37,7 @@ import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.ActorInterpreter;
 import net.sf.orcc.util.OrccUtil;
 
@@ -52,7 +53,7 @@ public class TestInterpreter extends ActorInterpreter {
 
 	private StringBuilder builder;
 
-	public TestInterpreter(Actor actor, Map<String, Expression> parameters) {
+	public TestInterpreter(Actor actor, Map<Var, Expression> parameters) {
 		super(actor, parameters);
 		builder = new StringBuilder();
 	}

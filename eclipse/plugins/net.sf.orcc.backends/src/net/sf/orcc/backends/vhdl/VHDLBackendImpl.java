@@ -59,6 +59,7 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transformations.BroadcastAdder;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
@@ -236,7 +237,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 	 */
 	private void evaluateInitializeActions(Actor actor) {
 		// initializes the actor
-		Map<String, Expression> parameters = Collections.emptyMap();
+		Map<Var, Expression> parameters = Collections.emptyMap();
 		ActorInterpreter interpreter = new ActorInterpreter(actor, parameters);
 		try {
 			interpreter.initialize();

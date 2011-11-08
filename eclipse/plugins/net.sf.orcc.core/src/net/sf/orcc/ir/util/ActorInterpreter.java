@@ -90,7 +90,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	/**
 	 * Actor's constant parameters to be set at initialization time
 	 */
-	protected Map<String, Expression> parameters;
+	protected Map<Var, Expression> parameters;
 
 	/**
 	 * Creates a new interpreter with no actor and no parameters.
@@ -109,7 +109,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	 * @param parameters
 	 *            parameters of the instance of the given actor
 	 */
-	public ActorInterpreter(Actor actor, Map<String, Expression> parameters) {
+	public ActorInterpreter(Actor actor, Map<Var, Expression> parameters) {
 		this.parameters = parameters;
 		exprInterpreter = new ExpressionEvaluator();
 		setActor(actor);

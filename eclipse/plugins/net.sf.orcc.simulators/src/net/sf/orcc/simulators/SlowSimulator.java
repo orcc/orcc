@@ -200,7 +200,8 @@ public class SlowSimulator extends AbstractSimulator {
 			actor.eResource().getContents().add(clonedActor);
 
 			ConnectedActorInterpreter interpreter = new ConnectedActorInterpreter(
-					clonedActor, instance.getParameters(), getWriteListener());
+					clonedActor, instance.getParameters().map(),
+					getWriteListener());
 
 			interpreters.put(instance, interpreter);
 			interpreter.setFifos(inputFifos, outputFifos);

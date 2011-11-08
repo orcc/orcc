@@ -31,7 +31,6 @@ package net.sf.orcc.df.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Attribute;

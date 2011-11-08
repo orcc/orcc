@@ -73,7 +73,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 	private Map<Port, List<Fifo>> outputFifos;
 
 	public ConnectedActorInterpreter(Actor actor,
-			Map<String, Expression> parameters, WriteListener listener) {
+			Map<Var, Expression> parameters, WriteListener listener) {
 		super(actor, parameters);
 		this.listener = listener;
 	}

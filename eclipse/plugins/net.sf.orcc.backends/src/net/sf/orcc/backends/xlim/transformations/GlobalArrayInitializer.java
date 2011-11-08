@@ -56,7 +56,7 @@ public class GlobalArrayInitializer extends AbstractActorVisitor<Object> {
 		private boolean initToZero;
 
 		public XlimActorInitializer(Actor actor, boolean initToZero) {
-			super(actor, Collections.<String, Expression> emptyMap());
+			super(actor, Collections.<Var, Expression> emptyMap());
 			this.initToZero = initToZero;
 		}
 
