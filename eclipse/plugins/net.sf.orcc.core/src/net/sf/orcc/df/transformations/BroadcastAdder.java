@@ -87,9 +87,9 @@ public class BroadcastAdder implements INetworkTransformation {
 
 		// creates a connection between the vertex and the broadcast
 		Port srcPort = connection.getSourcePort();
-		Connection incoming = DfFactory.eINSTANCE.createConnection(srcPort,
-				bcastInput, connection.getAttributes());
-		network.addConnection(vertex, vertexBCast, incoming);
+		Connection incoming = DfFactory.eINSTANCE.createConnection(vertex,
+				srcPort, vertexBCast, bcastInput, connection.getAttributes());
+		network.getConnections().add(incoming);
 	}
 
 	/**
@@ -110,9 +110,9 @@ public class BroadcastAdder implements INetworkTransformation {
 			i++;
 
 			Connection connBcastTarget = DfFactory.eINSTANCE.createConnection(
-					outputPort, connection.getTargetPort(),
+					vertexBCast,outputPort, target,connection.getTargetPort(),
 					connection.getAttributes());
-			network.addConnection(vertexBCast, target, connBcastTarget);
+			network.getConnections().add(connBcastTarget);
 
 			// setting source to null so we don't examine it again
 			connection.setSourcePort(null);

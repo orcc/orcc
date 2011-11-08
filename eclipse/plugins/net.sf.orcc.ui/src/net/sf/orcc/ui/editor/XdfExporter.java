@@ -172,17 +172,14 @@ public class XdfExporter extends CalSwitch<Object> {
 		}
 
 		// buffer size
-		Connection connection;
+		Connection connection = DfFactory.eINSTANCE.createConnection(source,
+				sourcePort, target, targetPort);
 		Integer bufferSize = (Integer) edge.getValue("buffer size");
-		if (bufferSize == null) {
-			connection = DfFactory.eINSTANCE.createConnection(sourcePort,
-					targetPort);
-		} else {
-			connection = DfFactory.eINSTANCE.createConnection(sourcePort,
-					targetPort, (int) bufferSize);
+		if (bufferSize != null) {
+			connection.setSize((int) bufferSize);
 		}
 
-		network.addConnection(source, target, connection);
+		network.getConnections().add(connection);
 	}
 
 	private void addParameters(Network network, Graph graph) {
@@ -245,8 +242,8 @@ public class XdfExporter extends CalSwitch<Object> {
 			for (Entry<?, ?> entry : variables.entrySet()) {
 				Variable variable = parseVariable(entry.getKey());
 				Expression expression = parseExpression(entry.getValue());
-				Argument argument = DfFactory.eINSTANCE.createArgument(varMap.get(variable.getName()),
-						expression);
+				Argument argument = DfFactory.eINSTANCE.createArgument(
+						varMap.get(variable.getName()), expression);
 				instance.getArguments().add(argument);
 			}
 

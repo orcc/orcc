@@ -48,11 +48,26 @@ import org.eclipse.emf.common.notify.impl.AdapterImpl;
  */
 public class NetworkAdapter extends AdapterImpl {
 
+	private void add(Connection connection) {
+		Vertex source = connection.getSource();
+		Vertex target = connection.getTarget();
+		if (source != null && target != null) {
+			source.getSuccessors().add(target);
+		}
+	}
+
 	@Override
 	public void notifyChanged(Notification msg) {
+		Object feature = msg.getFeature();
 		switch (msg.getEventType()) {
+		case Notification.ADD:
+			if (feature == eINSTANCE.getNetwork_Connections()) {
+				Connection connection = (Connection) msg.getNewValue();
+				add(connection);
+			}
+			break;
+
 		case Notification.REMOVE:
-			Object feature = msg.getFeature();
 			if (feature == eINSTANCE.getNetwork_Inputs()
 					|| feature == eINSTANCE.getNetwork_Instances()
 					|| feature == eINSTANCE.getNetwork_Outputs()) {

@@ -77,8 +77,8 @@ public class SerDesAdder implements INetworkTransformation {
 
 		// creates a connection between the vertex and the broadcast
 		Port srcPort = connection.getSourcePort();
-		Connection incoming = DfFactory.eINSTANCE.createConnection(srcPort,
-				bcastInput, connection.getAttributes());
+		Connection incoming = DfFactory.eINSTANCE.createConnection(vertex,
+				srcPort, vertexBCast, bcastInput, connection.getAttributes());
 		graph.addEdge(vertex, vertexBCast, incoming);
 	}
 
@@ -101,8 +101,8 @@ public class SerDesAdder implements INetworkTransformation {
 			i++;
 
 			Connection connBcastTarget = DfFactory.eINSTANCE.createConnection(
-					outputPort, connection.getTargetPort(),
-					connection.getAttributes());
+					vertexBCast, outputPort, target,
+					connection.getTargetPort(), connection.getAttributes());
 			graph.addEdge(vertexBCast, target, connBcastTarget);
 
 			// setting source to null so we don't examine it again

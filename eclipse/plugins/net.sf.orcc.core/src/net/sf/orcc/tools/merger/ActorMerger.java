@@ -637,16 +637,17 @@ public class ActorMerger implements INetworkTransformation {
 
 			if (!vertices.contains(src) && vertices.contains(tgt)) {
 				Connection newConn = DfFactory.eINSTANCE.createConnection(
-						connection.getSourcePort(), inputs.get(connection),
+						connection.getSource(), connection.getSourcePort(),
+						merge, inputs.get(connection),
 						connection.getAttributes());
-				network.addConnection(connection.getSource(), merge, newConn);
+				network.getConnections().add(newConn);
 			}
 
 			if (vertices.contains(src) && !vertices.contains(tgt)) {
 				Connection newConn = DfFactory.eINSTANCE.createConnection(
-						outputs.get(connection), connection.getTargetPort(),
-						connection.getAttributes());
-				network.addConnection(merge, connection.getTarget(), newConn);
+						merge, outputs.get(connection), connection.getTarget(),
+						connection.getTargetPort(), connection.getAttributes());
+				network.getConnections().add(newConn);
 			}
 		}
 	}

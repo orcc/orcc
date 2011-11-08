@@ -48,8 +48,6 @@ import org.eclipse.emf.common.util.EList;
  */
 public interface Network extends Entity {
 
-	void addConnection(Vertex source, Vertex target, Connection connection);
-
 	/**
 	 * Classifies this network.
 	 * 

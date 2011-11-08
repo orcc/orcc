@@ -638,10 +638,10 @@ public class XDFParser {
 		Port dstPort = getPort(target, "inputs", dst_port);
 
 		Node child = connection.getFirstChild();
-		Connection conn = DfFactory.eINSTANCE
-				.createConnection(srcPort, dstPort);
+		Connection conn = DfFactory.eINSTANCE.createConnection(source, srcPort,
+				target, dstPort);
 		parseAttributes(conn.getAttributes(), child);
-		network.addConnection(source, target, conn);
+		network.getConnections().add(conn);
 	}
 
 	private void parseDecl(Element decl) {

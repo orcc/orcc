@@ -157,15 +157,6 @@ public class NetworkImpl extends EntityImpl implements Network {
 		eAdapters().add(new DfAdapterFactory().createNetworkAdapter());
 	}
 
-	@Override
-	public void addConnection(Vertex source, Vertex target,
-			Connection connection) {
-		connection.setSource(source);
-		connection.setTarget(target);
-		source.getSuccessors().add(target);
-		getConnections().add(connection);
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated

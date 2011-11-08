@@ -85,10 +85,10 @@ public class NetworkFlattener implements INetworkTransformation {
 
 			for (Connection newEdge : outgoingEdges) {
 				Connection incoming = DfFactory.eINSTANCE.createConnection(
-						edge.getSourcePort(), newEdge.getTargetPort(),
+						edge.getSource(), edge.getSourcePort(),
+						newEdge.getTarget(), newEdge.getTargetPort(),
 						edge.getAttributes());
-				network.addConnection(edge.getSource(), newEdge.getTarget(),
-						incoming);
+				network.getConnections().add(incoming);
 			}
 		}
 	}
@@ -111,10 +111,10 @@ public class NetworkFlattener implements INetworkTransformation {
 
 			for (Connection newEdge : incomingEdges) {
 				Connection incoming = DfFactory.eINSTANCE.createConnection(
-						newEdge.getSourcePort(), edge.getTargetPort(),
+						newEdge.getSource(), newEdge.getSourcePort(),
+						edge.getTarget(), edge.getTargetPort(),
 						edge.getAttributes());
-				network.addConnection(newEdge.getSource(), edge.getTarget(),
-						incoming);
+				network.getConnections().add(incoming);
 			}
 		}
 	}

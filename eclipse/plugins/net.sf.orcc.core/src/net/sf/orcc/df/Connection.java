@@ -111,6 +111,14 @@ public interface Connection extends EObject {
 	void setFifoId(int fifoId);
 
 	/**
+	 * Sets the size of this connection to the given size. This method is a mere
+	 * helper method, since the size is stored as a generic attribute.
+	 * 
+	 * @param size
+	 */
+	void setSize(int size);
+
+	/**
 	 * Sets the source of this connection to the given vertex
 	 * 
 	 * @param vertex
