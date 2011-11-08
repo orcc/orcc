@@ -50,6 +50,8 @@ import org.stringtemplate.v4.ModelAdaptor;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.misc.ErrorManager;
+import org.stringtemplate.v4.misc.MapModelAdaptor;
+import org.stringtemplate.v4.misc.ObjectModelAdaptor;
 import org.stringtemplate.v4.misc.STNoSuchPropertyException;
 
 /**
@@ -63,7 +65,7 @@ import org.stringtemplate.v4.misc.STNoSuchPropertyException;
  */
 public abstract class AbstractPrinter {
 
-	protected static class ConnectionModelAdaptor implements ModelAdaptor {
+	protected static class ConnectionModelAdaptor extends ObjectModelAdaptor {
 
 		@Override
 		public Object getProperty(Interpreter interp, ST st, Object o,
@@ -71,18 +73,23 @@ public abstract class AbstractPrinter {
 				throws STNoSuchPropertyException {
 			String name = String.valueOf(property);
 			Attribute attribute = ((Connection) o).getAttribute(name);
-			return (attribute == null) ? null : attribute.getValue();
+			if (attribute == null) {
+				return super.getProperty(interp, st, o, property, propertyName);
+			} else {
+				return attribute.getValue();
+			}
 		}
 
 	}
 
-	protected static class EMapModelAdaptor implements ModelAdaptor {
+	protected static class EMapModelAdaptor extends MapModelAdaptor {
 
 		@Override
 		public Object getProperty(Interpreter interp, ST st, Object o,
 				Object property, String propertyName)
 				throws STNoSuchPropertyException {
-			return ((EMap<?, ?>) o).get(property);
+			return super.getProperty(interp, st, ((EMap<?, ?>) o).map(),
+					property, propertyName);
 		}
 
 	}
@@ -96,7 +103,7 @@ public abstract class AbstractPrinter {
 
 	}
 
-	protected static class InstanceModelAdaptor implements ModelAdaptor {
+	protected static class InstanceModelAdaptor extends ObjectModelAdaptor {
 
 		@Override
 		public Object getProperty(Interpreter interp, ST st, Object o,
@@ -104,9 +111,12 @@ public abstract class AbstractPrinter {
 				throws STNoSuchPropertyException {
 			String name = String.valueOf(property);
 			Attribute attribute = ((Instance) o).getAttribute(name);
-			return (attribute == null) ? null : attribute.getValue();
+			if (attribute == null) {
+				return super.getProperty(interp, st, o, property, propertyName);
+			} else {
+				return attribute.getValue();
+			}
 		}
-
 	}
 
 	protected class TypeRenderer implements AttributeRenderer {

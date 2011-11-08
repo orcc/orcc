@@ -88,8 +88,6 @@ public class CBackendImpl extends AbstractBackend {
 
 	private int threadsNb;
 
-	private Network workingNetwork;
-
 	private void computeMapping(Network network) {
 		// compute the different threads
 		instancesTarget = new HashMap<String, List<Instance>>();
@@ -229,8 +227,6 @@ public class CBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
-
-		workingNetwork = network;
 		// Transform the network
 		doTransformNetwork(network);
 
@@ -283,7 +279,6 @@ public class CBackendImpl extends AbstractBackend {
 				"net/sf/orcc/backends/c/C_actor.stg", !debugMode);
 		printer.setExpressionPrinter(new CExpressionPrinter());
 		printer.setTypePrinter(new CTypePrinter());
-		printer.getOptions().put("network", workingNetwork);
 		printer.getOptions().put("fifoSize", fifoSize);
 		printer.getOptions().put("enableTrace", enableTrace);
 		printer.getOptions().put("ringTopology", ringTopology);
