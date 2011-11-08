@@ -33,6 +33,7 @@ import static net.sf.graphiti.model.ObjectType.PARAMETER_REFINEMENT;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
@@ -79,7 +80,6 @@ import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.serialize.XDFWriter;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
@@ -471,8 +471,11 @@ public class XdfExporter extends CalSwitch<Object> {
 			addEdge(network, edge);
 		}
 
-		XDFWriter writer = new XDFWriter();
-		writer.write(network, out);
+		try {
+			network.eResource().save(out, null);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		IFile file = graph.getFile();

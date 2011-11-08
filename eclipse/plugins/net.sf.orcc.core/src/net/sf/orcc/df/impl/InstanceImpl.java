@@ -114,11 +114,6 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	protected EList<Argument> arguments;
 
 	/**
-	 * the absolute path this instance is defined in
-	 */
-	private IFile file;
-
-	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -270,7 +265,13 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 * @return the file in which this instance is defined
 	 */
 	public IFile getFile() {
-		return file;
+		if (isActor()) {
+			return getActor().getFile();
+		} else if (isNetwork()) {
+			return getNetwork().getFile();
+		} else {
+			return null;
+		}
 	}
 
 	/**

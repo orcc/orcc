@@ -39,6 +39,7 @@ import static net.sf.orcc.util.OrccUtil.getFile;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -47,7 +48,6 @@ import java.util.List;
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.serialize.XDFWriter;
 import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -117,8 +117,12 @@ public class JadeSimulatorImpl extends AbstractSimulator {
 		Network network = IrUtil.deserializeEntity(set, xdfFile);
 		network.flatten();
 
-		XDFWriter writer = new XDFWriter();
-		xdfFlattenFile = writer.write(new File(vtlFolder), network);
+		xdfFlattenFile = new File(vtlFolder, network.getSimpleName() + ".xdf");
+		try {
+			network.eResource().save(new FileOutputStream(xdfFlattenFile), null);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override

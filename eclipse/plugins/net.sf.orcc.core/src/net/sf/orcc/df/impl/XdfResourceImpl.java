@@ -35,8 +35,6 @@ import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.serialize.XDFParser;
-import net.sf.orcc.df.serialize.XDFWriter;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -98,6 +96,9 @@ public class XdfResourceImpl extends ResourceImpl {
 			IProject project = file.getProject();
 			Network network = new XDFParser()
 					.parseNetwork(project, inputStream);
+
+			network.setFileName(getURI().toPlatformString(true));
+
 			getContents().add(network);
 		} catch (OrccRuntimeException e) {
 			e.printStackTrace();

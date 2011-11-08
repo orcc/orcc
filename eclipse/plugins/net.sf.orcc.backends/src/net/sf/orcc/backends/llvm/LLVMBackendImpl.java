@@ -35,6 +35,7 @@ import static net.sf.orcc.preferences.PreferenceConstants.P_JADE_TOOLBOX;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -64,7 +65,6 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
-import net.sf.orcc.df.serialize.XDFWriter;
 import net.sf.orcc.ir.transformations.BlockCombine;
 import net.sf.orcc.ir.transformations.BuildCFG;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
@@ -236,8 +236,12 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 		// print network
 		write("Printing network...\n");
-		XDFWriter writer = new XDFWriter();
-		writer.write(new File(path), network);
+		File file = new File(path, network.getSimpleName() + ".xdf");
+		try {
+			network.eResource().save(new FileOutputStream(file), null);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		instancesTarget = null;
 		for (String mappedThing : mapping.values()) {

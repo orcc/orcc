@@ -125,7 +125,7 @@ public class StandardPrinter extends AbstractPrinter {
 
 		EObject cter = instance.eContainer();
 		if (cter instanceof Network) {
-			Network network = instance.getNetwork();
+			Network network = (Network) cter;
 			long parentModif = network.getFile().getLocalTimeStamp();
 			return Math.max(parentModif, instanceModified);
 		} else {
