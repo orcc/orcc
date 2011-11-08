@@ -114,7 +114,8 @@ public class StaticRegionDetector {
 				tgtPort.setName("input_" + outIndex++);
 				cluster.getInputs().add(tgtPort);
 				Connection incoming = DfFactory.eINSTANCE.createConnection(
-						edge.getSourcePort(), tgtPort, edge.getAttributes());
+						srcVertex, edge.getSourcePort(), clusterVertex,
+						tgtPort, edge.getAttributes());
 				clusteredGraph.addEdge(srcVertex, clusterVertex, incoming);
 			} else if (vertices.contains(srcVertex)
 					&& !vertices.contains(tgtVertex)) {
@@ -123,7 +124,8 @@ public class StaticRegionDetector {
 				srcPort.setName("output_" + inIndex++);
 				cluster.getOutputs().add(srcPort);
 				Connection outgoing = DfFactory.eINSTANCE.createConnection(
-						srcPort, edge.getTargetPort(), edge.getAttributes());
+						clusterVertex, srcPort, tgtVertex,
+						edge.getTargetPort(), edge.getAttributes());
 				clusteredGraph.addEdge(clusterVertex, tgtVertex, outgoing);
 			}
 		}

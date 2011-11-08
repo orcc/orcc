@@ -601,7 +601,7 @@ public class ActorMerger implements INetworkTransformation {
 			this.vertices = vertices;
 
 			DirectedGraph<Vertex, Connection> subgraph = new DirectedSubgraph<Vertex, Connection>(
-					graph, vertices, null);
+					null/* graph */, vertices, null);
 
 			// create the static schedule of vertices
 			scheduler = new SASLoopScheduler(subgraph);
@@ -617,9 +617,9 @@ public class ActorMerger implements INetworkTransformation {
 			Instance instance = DfFactory.eINSTANCE.createInstance(
 					"superActor_" + index++, superActor);
 
-			graph.addVertex(instance);
+			// graph.addVertex(instance);
 			updateConnection(instance);
-			graph.removeAllVertices(vertices);
+			// graph.removeAllVertices(vertices);
 		}
 	}
 

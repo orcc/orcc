@@ -48,7 +48,6 @@ import net.sf.orcc.df.SerDes;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.transformations.INetworkTransformation;
 import net.sf.orcc.ir.ExprString;
-import net.sf.orcc.ir.IrFactory;
 
 import org.jgrapht.DirectedGraph;
 
@@ -173,7 +172,7 @@ public class SerDesAdder implements INetworkTransformation {
 	}
 
 	public void transform(Network network) throws OrccException {
-		graph = network.getGraph();
+		// graph = network.getGraph();
 
 		List<Port> inputs = network.getInputs();
 		List<Port> outputs = network.getOutputs();
@@ -190,10 +189,10 @@ public class SerDesAdder implements INetworkTransformation {
 						int out = serdes.getNumOutputs();
 						serdes.setNumOutputs(out++);
 					} else {
-						Instance inst = DfFactory.eINSTANCE.createInstance(
-								attrName, new SerDes(0, 1));
-						serdesMap.put(attrName, inst);
-						graph.addVertex(inst);
+						// Instance inst = DfFactory.eINSTANCE.createInstance(
+						// attrName, new SerDes(0, 1));
+						// serdesMap.put(attrName, inst);
+						// graph.addVertex(inst);
 					}
 				}
 
@@ -207,10 +206,10 @@ public class SerDesAdder implements INetworkTransformation {
 						int in = serdes.getNumInputs();
 						serdes.setNumOutputs(in++);
 					} else {
-						Instance inst = DfFactory.eINSTANCE.createInstance(
-								attrName, new SerDes(1, 0));
-						serdesMap.put(attrName, inst);
-						graph.addVertex(inst);
+						// Instance inst = DfFactory.eINSTANCE.createInstance(
+						// attrName, new SerDes(1, 0));
+						// serdesMap.put(attrName, inst);
+						// graph.addVertex(inst);
 					}
 				}
 			}
@@ -232,15 +231,16 @@ public class SerDesAdder implements INetworkTransformation {
 							srcPort.setType(port.getType());
 							Port tgtPort = DfFactory.eINSTANCE.createPort(port);
 
-							Connection incoming = DfFactory.eINSTANCE
-									.createConnection(srcPort, tgtPort,
-											connection.getAttributes());
 							Vertex vSrc = graph.getEdgeSource(connection);
 
 							Attribute attr = connection.getAttribute("busRef");
 							String attrName = ((ExprString) attr.getValue())
 									.getValue();
 
+							Connection incoming = DfFactory.eINSTANCE
+									.createConnection(vSrc, srcPort,
+											serdesMap.get(attrName), tgtPort,
+											connection.getAttributes());
 							graph.addEdge(vSrc, serdesMap.get(attrName),
 									incoming);
 
@@ -256,13 +256,14 @@ public class SerDesAdder implements INetworkTransformation {
 						Port tgtPort = connection.getTargetPort();
 						tgtPort.setType(port.getType());
 						Vertex vTgt = graph.getEdgeTarget(connection);
-						Connection outgoing = DfFactory.eINSTANCE
-								.createConnection(srcPort, tgtPort,
-										connection.getAttributes());
 
 						Attribute attr = connection.getAttribute("busRef");
 						String attrName = ((ExprString) attr.getValue())
 								.getValue();
+						Connection outgoing = DfFactory.eINSTANCE
+								.createConnection(serdesMap.get(attrName),
+										srcPort, vTgt, tgtPort,
+										connection.getAttributes());
 
 						graph.addEdge(serdesMap.get(attrName), vTgt, outgoing);
 						vertexToRemove.add(vertex);
@@ -274,7 +275,8 @@ public class SerDesAdder implements INetworkTransformation {
 							tgtPort.setType(port.getType());
 							vTgt = graph.getEdgeTarget(connection);
 							Connection newOutgoing = DfFactory.eINSTANCE
-									.createConnection(srcPort, tgtPort,
+									.createConnection(serdesMap.get(attrName),
+											srcPort, vTgt, tgtPort,
 											connection.getAttributes());
 
 							attr = connection.getAttribute("busRef");
