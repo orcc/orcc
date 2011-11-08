@@ -89,14 +89,14 @@ public class NetworkAdapter extends AdapterImpl {
 
 	private void remove(Vertex vertex) {
 		// removes incoming connections
-		List<Connection> connections = vertex.getIncomingEdges();
+		List<Connection> connections = vertex.getIncoming();
 		while (!connections.isEmpty()) {
 			Connection connection = connections.get(0);
 			((Network) target).getConnections().remove(connection);
 		}
 
 		// removes outgoing connections
-		connections = vertex.getOutgoingEdges();
+		connections = vertex.getOutgoing();
 		while (!connections.isEmpty()) {
 			Connection connection = connections.get(0);
 			((Network) target).getConnections().remove(connection);

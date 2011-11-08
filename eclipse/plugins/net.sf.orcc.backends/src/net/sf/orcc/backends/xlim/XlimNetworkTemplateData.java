@@ -86,10 +86,10 @@ public class XlimNetworkTemplateData {
 				Port port = (Port) vertex;
 				if (inputs.contains(port)) {
 					countNetwokPortBroadcastMap.put(port, vertex
-							.getOutgoingEdges().size());
+							.getOutgoing().size());
 				}
 				int cp = 0;
-				for (Connection connection : vertex.getOutgoingEdges()) {
+				for (Connection connection : vertex.getOutgoing()) {
 					countBroadcastConnectionsMap.put(connection, cp++);
 				}
 

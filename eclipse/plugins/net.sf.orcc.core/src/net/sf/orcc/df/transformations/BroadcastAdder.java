@@ -161,7 +161,7 @@ public class BroadcastAdder implements INetworkTransformation {
 		// make a copy of the existing outgoing connections of vertex because
 		// the set returned is modified when new edges are added
 		Set<Connection> connections = new HashSet<Connection>(
-				vertex.getOutgoingEdges());
+				vertex.getOutgoing());
 
 		// for each connection, add it to a port => connection map
 		// port is a port of vertex

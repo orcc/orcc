@@ -1608,7 +1608,7 @@ public interface DfPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the reference list '<em>Incoming Edges</em>'.
-	 * @see net.sf.orcc.df.Vertex#getIncomingEdges()
+	 * @see net.sf.orcc.df.Vertex#getIncoming()
 	 * @see #getVertex()
 	 * @generated
 	 */
@@ -1619,7 +1619,7 @@ public interface DfPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the reference list '<em>Outgoing Edges</em>'.
-	 * @see net.sf.orcc.df.Vertex#getOutgoingEdges()
+	 * @see net.sf.orcc.df.Vertex#getOutgoing()
 	 * @see #getVertex()
 	 * @generated
 	 */

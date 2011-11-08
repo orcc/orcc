@@ -72,19 +72,19 @@ public abstract class VertexImpl extends EObjectImpl implements Vertex {
 	 */
 	protected EList<Vertex> successors;
 	/**
-	 * The cached value of the '{@link #getIncomingEdges() <em>Incoming Edges</em>}' reference list.
+	 * The cached value of the '{@link #getIncoming() <em>Incoming Edges</em>}' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getIncomingEdges()
+	 * @see #getIncoming()
 	 * @generated
 	 * @ordered
 	 */
 	protected EList<Connection> incomingEdges;
 	/**
-	 * The cached value of the '{@link #getOutgoingEdges() <em>Outgoing Edges</em>}' reference list.
+	 * The cached value of the '{@link #getOutgoing() <em>Outgoing Edges</em>}' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getOutgoingEdges()
+	 * @see #getOutgoing()
 	 * @generated
 	 * @ordered
 	 */
@@ -112,9 +112,9 @@ public abstract class VertexImpl extends EObjectImpl implements Vertex {
 			case DfPackage.VERTEX__SUCCESSORS:
 				return getSuccessors();
 			case DfPackage.VERTEX__INCOMING_EDGES:
-				return getIncomingEdges();
+				return getIncoming();
 			case DfPackage.VERTEX__OUTGOING_EDGES:
-				return getOutgoingEdges();
+				return getOutgoing();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -133,9 +133,9 @@ public abstract class VertexImpl extends EObjectImpl implements Vertex {
 			case DfPackage.VERTEX__SUCCESSORS:
 				return ((InternalEList<InternalEObject>)(InternalEList<?>)getSuccessors()).basicAdd(otherEnd, msgs);
 			case DfPackage.VERTEX__INCOMING_EDGES:
-				return ((InternalEList<InternalEObject>)(InternalEList<?>)getIncomingEdges()).basicAdd(otherEnd, msgs);
+				return ((InternalEList<InternalEObject>)(InternalEList<?>)getIncoming()).basicAdd(otherEnd, msgs);
 			case DfPackage.VERTEX__OUTGOING_EDGES:
-				return ((InternalEList<InternalEObject>)(InternalEList<?>)getOutgoingEdges()).basicAdd(otherEnd, msgs);
+				return ((InternalEList<InternalEObject>)(InternalEList<?>)getOutgoing()).basicAdd(otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -153,9 +153,9 @@ public abstract class VertexImpl extends EObjectImpl implements Vertex {
 			case DfPackage.VERTEX__SUCCESSORS:
 				return ((InternalEList<?>)getSuccessors()).basicRemove(otherEnd, msgs);
 			case DfPackage.VERTEX__INCOMING_EDGES:
-				return ((InternalEList<?>)getIncomingEdges()).basicRemove(otherEnd, msgs);
+				return ((InternalEList<?>)getIncoming()).basicRemove(otherEnd, msgs);
 			case DfPackage.VERTEX__OUTGOING_EDGES:
-				return ((InternalEList<?>)getOutgoingEdges()).basicRemove(otherEnd, msgs);
+				return ((InternalEList<?>)getOutgoing()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -198,12 +198,12 @@ public abstract class VertexImpl extends EObjectImpl implements Vertex {
 				getSuccessors().addAll((Collection<? extends Vertex>)newValue);
 				return;
 			case DfPackage.VERTEX__INCOMING_EDGES:
-				getIncomingEdges().clear();
-				getIncomingEdges().addAll((Collection<? extends Connection>)newValue);
+				getIncoming().clear();
+				getIncoming().addAll((Collection<? extends Connection>)newValue);
 				return;
 			case DfPackage.VERTEX__OUTGOING_EDGES:
-				getOutgoingEdges().clear();
-				getOutgoingEdges().addAll((Collection<? extends Connection>)newValue);
+				getOutgoing().clear();
+				getOutgoing().addAll((Collection<? extends Connection>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -234,10 +234,10 @@ public abstract class VertexImpl extends EObjectImpl implements Vertex {
 				getSuccessors().clear();
 				return;
 			case DfPackage.VERTEX__INCOMING_EDGES:
-				getIncomingEdges().clear();
+				getIncoming().clear();
 				return;
 			case DfPackage.VERTEX__OUTGOING_EDGES:
-				getOutgoingEdges().clear();
+				getOutgoing().clear();
 				return;
 		}
 		super.eUnset(featureID);
@@ -248,7 +248,7 @@ public abstract class VertexImpl extends EObjectImpl implements Vertex {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Connection> getIncomingEdges() {
+	public EList<Connection> getIncoming() {
 		if (incomingEdges == null) {
 			incomingEdges = new EObjectWithInverseResolvingEList<Connection>(Connection.class, this, DfPackage.VERTEX__INCOMING_EDGES, DfPackage.CONNECTION__TARGET);
 		}
@@ -261,7 +261,7 @@ public abstract class VertexImpl extends EObjectImpl implements Vertex {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Connection> getOutgoingEdges() {
+	public EList<Connection> getOutgoing() {
 		if (outgoingEdges == null) {
 			outgoingEdges = new EObjectWithInverseResolvingEList<Connection>(Connection.class, this, DfPackage.VERTEX__OUTGOING_EDGES, DfPackage.CONNECTION__SOURCE);
 		}

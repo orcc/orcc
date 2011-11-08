@@ -70,7 +70,7 @@ public class TopologicalSorter {
 			currentTime++;
 			timeStamps.put(vertex, new TimeStamp(currentTime, 0));
 
-			for (Connection connection : vertex.getOutgoingEdges()) {
+			for (Connection connection : vertex.getOutgoing()) {
 				Vertex tgtVertex = connection.getTarget();
 				if (!defined.contains(tgtVertex)) {
 					dfsVisit(tgtVertex);

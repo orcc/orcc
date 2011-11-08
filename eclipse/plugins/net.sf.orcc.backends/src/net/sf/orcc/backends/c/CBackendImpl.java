@@ -100,7 +100,7 @@ public class CBackendImpl extends AbstractBackend {
 			} else if (instance.isBroadcast()) {
 				// use source instance for broadcasts
 				List<Connection> edges = ((Vertex) instance.eContainer())
-						.getIncomingEdges();
+						.getIncoming();
 				if (!edges.isEmpty()) {
 					Connection incoming = edges.iterator().next();
 					Vertex source = incoming.getSource();

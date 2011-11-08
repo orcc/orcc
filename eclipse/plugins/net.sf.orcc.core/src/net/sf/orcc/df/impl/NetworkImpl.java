@@ -186,7 +186,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 		outgoingMap = new HashMap<Instance, Map<Port, List<Connection>>>();
 		for (Instance instance : getInstances()) {
 			// incoming edges
-			List<Connection> connections = instance.getIncomingEdges();
+			List<Connection> connections = instance.getIncoming();
 			Map<Port, Connection> incoming = new HashMap<Port, Connection>();
 			for (Connection connection : connections) {
 				incoming.put(connection.getTargetPort(), connection);
@@ -194,7 +194,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 			incomingMap.put(instance, incoming);
 
 			// outgoing edges
-			connections = instance.getOutgoingEdges();
+			connections = instance.getOutgoing();
 			Map<Port, List<Connection>> outgoing = new HashMap<Port, List<Connection>>();
 			for (Connection connection : connections) {
 				Port source = connection.getSourcePort();
@@ -233,7 +233,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 			List<Port> outputs) {
 		Map<Port, Instance> predMap = new LinkedHashMap<Port, Instance>();
 		predecessorsMap.put(instance, predMap);
-		List<Connection> incoming = instance.getIncomingEdges();
+		List<Connection> incoming = instance.getIncoming();
 		for (Port port : inputs) {
 			for (Connection connection : incoming) {
 				if (port.equals(connection.getTargetPort())) {
@@ -244,7 +244,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 		Map<Port, List<Instance>> succMap = new LinkedHashMap<Port, List<Instance>>();
 		successorsMap.put(instance, succMap);
-		List<Connection> outgoing = instance.getOutgoingEdges();
+		List<Connection> outgoing = instance.getOutgoing();
 		for (Port port : outputs) {
 			for (Connection connection : outgoing) {
 				if (port.equals(connection.getSourcePort())) {

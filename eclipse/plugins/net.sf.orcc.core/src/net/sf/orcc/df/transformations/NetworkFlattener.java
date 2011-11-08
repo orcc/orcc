@@ -78,10 +78,10 @@ public class NetworkFlattener implements INetworkTransformation {
 	 */
 	private void linkIncomingConnections(Network network, Vertex vertex) {
 		List<Connection> incomingEdges = new ArrayList<Connection>(
-				vertex.getIncomingEdges());
+				vertex.getIncoming());
 		for (Connection edge : incomingEdges) {
 			Vertex v = (Vertex) edge.getTargetPort();
-			List<Connection> outgoingEdges = v.getOutgoingEdges();
+			List<Connection> outgoingEdges = v.getOutgoing();
 
 			for (Connection newEdge : outgoingEdges) {
 				Connection incoming = DfFactory.eINSTANCE.createConnection(
@@ -104,10 +104,10 @@ public class NetworkFlattener implements INetworkTransformation {
 	 */
 	private void linkOutgoingConnections(Network network, Vertex vertex) {
 		List<Connection> outgoingEdges = new ArrayList<Connection>(
-				vertex.getOutgoingEdges());
+				vertex.getOutgoing());
 		for (Connection edge : outgoingEdges) {
 			Vertex v = edge.getSourcePort();
-			List<Connection> incomingEdges = v.getIncomingEdges();
+			List<Connection> incomingEdges = v.getIncoming();
 
 			for (Connection newEdge : incomingEdges) {
 				Connection incoming = DfFactory.eINSTANCE.createConnection(

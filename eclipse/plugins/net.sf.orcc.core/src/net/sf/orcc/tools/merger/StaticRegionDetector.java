@@ -170,7 +170,7 @@ public class StaticRegionDetector {
 					}
 					stack.push(v);
 					finished.add(v);
-					for (Connection edge : v.getOutgoingEdges()) {
+					for (Connection edge : v.getOutgoing()) {
 						Vertex tgtVertex = edge.getTarget();
 						moc = ((Instance) tgtVertex).getMoC();
 						if (!discovered.contains(tgtVertex) && moc.isCSDF()) {

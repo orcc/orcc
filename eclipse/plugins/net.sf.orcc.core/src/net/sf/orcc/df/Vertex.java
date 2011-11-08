@@ -43,12 +43,12 @@ public interface Vertex extends EObject {
 	/**
 	 * @model type="Connection" opposite="target"
 	 */
-	EList<Connection> getIncomingEdges();
+	EList<Connection> getIncoming();
 
 	/**
 	 * @model type="Connection" opposite="source"
 	 */
-	EList<Connection> getOutgoingEdges();
+	EList<Connection> getOutgoing();
 
 	/**
 	 * @model type="Vertex" opposite="successors"
