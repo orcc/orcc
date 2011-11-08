@@ -3,7 +3,7 @@ GetInstanceId(instance) ::= <<
 >>
 
 BroadcastWrite(n,port) ::= <<
-fifo<printMedium(port,instance)>_<instance.broadcast.type>_write_1(<GetInstanceId(instance)>_output_<n>, tok_input);
+fifo_<instance.broadcast.type>_write_1(<GetInstanceId(instance)>_output_<n>, tok_input);
 >>
 
 printBroadcastWrite(OutputNum, OutputPorts) ::= <<
@@ -14,7 +14,7 @@ printBroadcastWrite(OutputNum, OutputPorts) ::= <<
 >>
 
 outputPatternPort(num, port) ::= <<
-if (!fifo<printMedium(port,instance)>_<instance.broadcast.type>_has_room(<GetInstanceId(instance)>_output_<num>, 1, 1)) {
+if (!fifo_<instance.broadcast.type>_has_room(<GetInstanceId(instance)>_output_<num>, 1, 1)) {
 	ports |= (1 \<\< <num>);
 }
 >>
@@ -46,10 +46,10 @@ void <GetInstanceId(instance)>_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 	<instance.broadcast.type> tok_input;
 
-	while (fifo<printMedium(instance.broadcast.input,instance)>_<instance.broadcast.type>_has_tokens(<GetInstanceId(instance)>_input, 0, 1)) {
+	while (fifo_<instance.broadcast.type>_has_tokens(<GetInstanceId(instance)>_input, 0, 1)) {
 		<printOutputPattern(instance.broadcast.outputList,instance.broadcast.outputs.list)>
 
-		tok_input = fifo<printMedium(instance.broadcast.input,instance)>_<instance.broadcast.type>_read_1(<GetInstanceId(instance)>_input, 0);
+		tok_input = fifo_<instance.broadcast.type>_read_1(<GetInstanceId(instance)>_input, 0);
 		<printBroadcastWrite(instance.broadcast.outputList,instance.broadcast.outputs.list)>
 		i++;
 	}
@@ -60,10 +60,6 @@ void <GetInstanceId(instance)>_scheduler(struct schedinfo_s *si) {
 }<
 endif>
 
->>
-
-declareBroadcasts(instances) ::= <<
-<instances: declareBroadcast()>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -100,26 +96,16 @@ int <GetInstanceId(instance)>_num_successors[] = {<goDeclareNumSuccessors(map,ou
 
 goDeclarePredSucc(network, inputs, outputs) ::= <<
 <if(!inputs.empty)
->struct actor_s *<GetInstanceId(instance)>_predecessors[] = {<predecessors(map=network.predecessorsMap.(instance), ports=inputs)>};
+>struct actor_s *<GetInstanceId(instance)>_predecessors[] = {<predecessors(instance.incomingPortMap, inputs)>};
 <endif><
 if(!outputs.empty)
-><goDeclareSuccs(network.successorsMap.(instance), outputs)>
+><goDeclareSuccs(instance.outgoingPortMap, outputs)>
 struct actor_s **<GetInstanceId(instance)>_successors[] = {<outputs: {port | <GetInstanceId(instance)>_<port.name>_successors}; separator=", ">};
 <endif>
 >>
 
-goDeclarePredsSuccs(instance) ::= <<
-<if (instance.actor)><goDeclarePredSucc(
-					inputs=instance.actor.inputs,
-                    outputs=instance.actor.outputs)>
-<elseif (instance.broadcast)><goDeclarePredSucc(
-					inputs=instance.broadcast.inputs.list,
-					outputs=instance.broadcast.outputs.list)>
-<endif>
->>
-
 declarePredsSuccs(instances) ::= <<
-<instances: {inst | <goDeclarePredsSuccs(instance=inst)>}>
+<instances: {instance | <goDeclarePredSucc(instance.contents.inputs, instance.contents.outputs)>}>
 >>
 
 
@@ -127,31 +113,21 @@ declarePredsSuccs(instances) ::= <<
 // allocates FIFOs
 
 allocateFifoType(type, size, count, port, instance) ::= <<
-DECLARE_FIFO<printUpperCaseMedium(port,instance)>(<type>, <if(size)><size><else>SIZE<endif>, <count>, <readers_nb>)
+DECLARE_FIFO(<type>, <if(size)><size><else>SIZE<endif>, <count>, <readers_nb>)
 >>
 
-doAllocateFifo(edge, source, sourcePort, target, targetPort) ::= <<
-<if (source.broadcast || source.actor)>
-<allocateFifoType(
-  sourcePort.type, edge.size, network.connectionMapWithoutBroadcast.(edge), sourcePort, source)><else>
-<allocateFifoType(
-  targetPort.type, edge.size, network.connectionMapWithoutBroadcast.(edge), targetPort, target)><endif>
->>
+allocateFifo(edge, readers_nb) ::= <%
+<if (edge.source.instance && edge.target.instance)>
+<if (edge.source.broadcast || edge.source.actor)>
+<allocateFifoType(edge.sourcePort.type, edge.size, edge.idNoBcast, edge.sourcePort, edge.source)>
+<else>
+<allocateFifoType(edge.targetPort.type, edge.size, edge.idNoBcast, edge.targetPort, edge.target)>
+<endif>
+<endif>
+%>
 
-tryAllocateFifo(edge, src, tgt) ::= <<
-<if (src.instance && tgt.instance)>
-<doAllocateFifo(
-  edge=edge,
-  source=src.instance, sourcePort=edge.source,
-  target=tgt.instance, targetPort=edge.target)><endif>
->>
-
-allocateFifo(edge, readers_nb) ::= <<
-<tryAllocateFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))>
->>
-
-allocateFifosWithMap(outgoingMap) ::= <<
-<outgoingMap.keys: { instance | <outgoingMap.(instance).keys: { port | <allocateFifo(first(outgoingMap.(instance).(port)), length(outgoingMap.(instance).(port)))> }> }>
+allocateFifos(instance) ::= <<
+<instance.outgoingPortMap.keys: { port | <allocateFifo(first(instance.outgoingPortMap.(port)), length(instance.outgoingPortMap.(port)))> }> }>
 >>
 
 
@@ -159,32 +135,30 @@ allocateFifosWithMap(outgoingMap) ::= <<
 // assigns FIFOs
 
 doAssignFifo(instance, port, count) ::= <<
-<if(instance.actor || instance.broadcast)>struct fifo<printMedium(port,instance)>_<port.type>_s *<GetInstanceId(instance)>_<port.name> = &fifo_<count>;<endif>
+<if(instance.actor || instance.broadcast)>struct fifo_<port.type>_s *<GetInstanceId(instance)>_<port.name> = &fifo_<count>;<endif>
 >>
 
-tryAssignFifoTgt(edge, src, tgt) ::= <<
-<if (src.instance && tgt.instance)>
-<doAssignFifo(
-  tgt.instance, edge.target,
-  network.connectionMapWithoutBroadcast.(edge))><endif>
+tryAssignFifoTgt(edge) ::= <<
+<if (edge.source.instance && edge.target.instance)>
+<doAssignFifo(edge.target, edge.targetPort, edge.idNoBcast)><endif>
 >>
 
 tryAssignFifoSrc(edge, src, tgt) ::= <<
 <if (src.instance && tgt.instance)>
 <doAssignFifo(
   src.instance, edge.source,
-  network.connectionMapWithoutBroadcast.(edge))><endif>
+  edge.idNoBcast)><endif>
 >>
 
-assignFifos(edges, readers_nb) ::= <<
+assignFifosN(edges, readers_nb) ::= <<
 
-<tryAssignFifoSrc(first(edges), network.sourceMap.(first(edges)), network.targetMap.(first(edges)))>
-<edges: {edge | <tryAssignFifoTgt(edge, network.sourceMap.(edge), network.targetMap.(edge))> }>
+<tryAssignFifoSrc(first(edges), (first(edges)).source, (first(edges)).target)>
+<edges: {edge | <tryAssignFifoTgt(edge)> }>
 
 >>
 
-assignFifosWithMap(outgoingMap) ::= <<
-<outgoingMap.keys: { instance | <outgoingMap.(instance).keys: { port | <assignFifos(outgoingMap.(instance).(port), length(outgoingMap.(instance).(port)))> }> }>
+assignFifos(instance) ::= <<
+<instance.outgoingPortMap.keys: { port | <assignFifosN(instance.outgoingPortMap.(port), length(instance.outgoingPortMap.(port)))> }>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -194,61 +168,34 @@ clearFifoType(type, size, count, port, instance) ::= <<
 fifo_<type>_clear(&fifo_<count>);
 >>
 
-doClearFifo(edge, source, sourcePort, target, targetPort) ::= <<
-<if (source.broadcast || source.actor)>
+doClearFifo(edge) ::= <%
+<if (edge.source.broadcast || edge.source.actor)>
 <clearFifoType(
-  sourcePort.type, edge.size, network.connectionMapWithoutBroadcast.(edge), sourcePort, source)><else>
+  edge.sourcePort.type, edge.size, edge.idNoBcast, edge.sourcePort, edge.source)>
+<else>
 <clearFifoType(
-  targetPort.type, edge.size, network.connectionMap.(edge), targetPort, target)><endif>
->>
+  edge.targetPort.type, edge.size, edge.id, edge.targetPort, edge.target)>
+<endif>
+%>
 
-tryClearFifo(edge, src, tgt) ::= <<
-<if (src.instance && tgt.instance)>
-<doClearFifo(
-  edge=edge,
-  source=src.instance, sourcePort=edge.source,
-  target=tgt.instance, targetPort=edge.target)><endif>
->>
+tryClearFifo(edge) ::= <%
+<if (edge.source.instance && edge.target.instance)>
+<doClearFifo(edge)>
+<endif>
+%>
 
-clearFifo(edge) ::= <<
-<tryClearFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))>
->>
-
-clearFifosWithMap(outgoingMap) ::= <<
-<outgoingMap.keys: { instance | <outgoingMap.(instance).keys: { port | <clearFifo(first(outgoingMap.(instance).(port)))> }> }>
+clearFifosWithMap(instance) ::= <<
+<instance.outgoingPortMap.keys: { port | <tryClearFifo(first(instance.outgoingPortMap.(port)))> }>
 >>
 
 printClearFifosFunction() ::= <<
 void clear_fifos(){
-	<clearFifosWithMap(network.outgoingMap)>
+	<network.instances: clearFifosWithMap()>
 }
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Declare actors
-
-printActor(instance, addComma) ::= <<
-<if(instance.actor || instance.broadcast)><if(addComma)>, <endif><GetInstanceId(instance)><endif>
->>
-
-
-declareActor(instances, addComma = false) ::= <<
-<if(rest(instances))
-><printActor(first(instances),addComma)
-><	if(first(instances).actor || first(instances).broadcast)
-><declareActor(rest(instances),"true")
-><	else
-><declareActor(rest(instances),addComma)
-	><endif
-><else
-><printActor(first(instances),addComma)
-><endif>
->>
-
-declareActors(instances) ::= <<
-struct actor_s <declareActor(instances)>;
-
->>
 
 printActorAddress(instance, addComma) ::= <<
 <if(instance.actor || instance.broadcast)><if(addComma)>, <endif>&<GetInstanceId(instance)><endif>
@@ -306,18 +253,10 @@ extern void <instance.id>_initialize(<instance.actor.inputs: { port | unsigned i
 <endif>
 >>
 
-declareInstancesInitializes(instances) ::= <<
-<instances: actorInitialize()>
->>
-
-actionSchedulers(instance) ::= <<
+actionScheduler(instance) ::= <<
 <if(instance.actor || instance.broadcast)>
 extern void <instance.id>_scheduler(struct schedinfo_s *si);
 <endif>
->>
-
-declareActionsSchedulers(instances) ::= <<
-<instances: actionSchedulers()>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -336,7 +275,7 @@ int is_timeout(){
 
 printInitialize(instance) ::= <<
 <if(instance.actor)>
-<instance.id>_initialize(<instance.actor.inputs: { port | <network.incomingMap.(instance).(port).fifoId>}; separator=",">);<
+<instance.id>_initialize(<instance.actor.inputs: { port | <instance.incomingPortMap.(port).fifoId>}; separator=",">);<
 endif>
 >>
 
@@ -396,40 +335,6 @@ printAllAddSchedulable(instances) ::= <<
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// main
-
-printMedium(port, instance) ::= <<
-<network.templateData.portMedium.(instance).(port).value>
->>
-
-printUpperCaseMedium(port, instance) ::= <<
-<network.templateData.upperCasePortMedium.(instance).(port).value>
->>
-
-fifoInit(instance, port, connectionId) ::= <<
-<if(instance.actor)
->fifo<printMedium(port,instance)>_<port.type>_init(<instance.id>_<port.name>, <connectionId.value>/*To complete !*/);<
-else
->fifo<printMedium(port,instance)>_<port.type>_init(bcast_<instance.id>_<port.name>, <connectionId.value>/*To complete !*/);<
-endif>
->>
-
-printFifoInit(instances, ports, connectionId) ::= <<
-<if(first(instances))
-><fifoInit(first(instances), first(ports), first(connectionId))>
-<printFifoInit(rest(instances), rest(ports), rest(connectionId))
-><endif>
->>
-
-///////////////////////////////////////////////////////////////////////////////
-
-MediumInclude(medium) ::= <<
-#include "orcc_fifo<medium>.h"
->>
-
-printMediumInclude(mediums) ::= <<
-<mediums : MediumInclude(); separator="\n">
->>
 
 // print network
 network(network, options) ::= <<
@@ -453,7 +358,6 @@ network(network, options) ::= <<
 
 #include "orcc_types.h"
 #include "orcc_fifo.h"
-<printMediumInclude(network.templateData.allMediumsAllInstances)>
 #include "orcc_scheduler.h"
 #include "orcc_util.h"
 <if (options.threads || options.useGeneticAlgorithm)>
@@ -492,26 +396,26 @@ network(network, options) ::= <<
 ////////////////////////////////////////////////////////////////////////////////
 // FIFO allocation
 
-<allocateFifosWithMap(network.outgoingMap)>
+<network.instances: allocateFifos()>
 
 ////////////////////////////////////////////////////////////////////////////////
 // FIFO pointer assignments
 
-<assignFifosWithMap(network.outgoingMap)>
+<network.instances: assignFifos()>
 
 ////////////////////////////////////////////////////////////////////////////////
-<declareBroadcasts(network.instances)>
+<network.instances: declareBroadcast()>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Action schedulers
 
-<declareInstancesInitializes(network.instances)>
-<declareActionsSchedulers(network.instances)>
+<network.instances: actorInitialize()>
+<network.instances: actionScheduler()>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Declaration of a struct actor for each actor
 
-<declareActors(network.instances)>
+<network.instances: {instance|struct actor_s <GetInstanceId(instance)>;<\n>}>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Declaration of the actors array
@@ -613,10 +517,6 @@ static void launcher() {
 
 int main(int argc, char *argv[]) {
   init_orcc(argc, argv);
-
-  <if(network.templateData.listMediumInstances)
-  ><printFifoInit(network.templateData.listMediumInstances, network.templateData.listMediumPorts, network.templateData.listConnectionId)
-  ><endif>
 
   launcher();
 

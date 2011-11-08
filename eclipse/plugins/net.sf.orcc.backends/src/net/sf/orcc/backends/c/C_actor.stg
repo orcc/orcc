@@ -347,7 +347,7 @@ if (<pattern.numTokensMap.(port)> \> SIZE_<port.name> - index_<port.name> + <get
 >>
 
 printOutputPatternsPort(port) ::= <<
-<options.network.successorsMap.(instance).(port): { successor | <printOutputPatternPort(port, successor, i0)> }; separator="\n">
+<instance.outgoingPortMap.(port): { successor | <printOutputPatternPort(port, successor, i0)> }; separator="\n">
 >>
 
 printOutputPattern(pattern) ::= <<
@@ -365,7 +365,7 @@ printReadTokensFunction(port) ::= <<
 
 static void read_<port.name>() {
 	index_<port.name> = <getPortName(port)>-\>read_inds[fifo_<getPortName(port)>_id];
-	numTokens_<port.name> = index_<port.name> + fifo<printMedium(port)>_<port.type>_get_num_tokens(<getPortName(port)>, fifo_<getPortName(port)>_id);
+	numTokens_<port.name> = index_<port.name> + fifo_<port.type>_get_num_tokens(<getPortName(port)>, fifo_<getPortName(port)>_id);
 }
 
 static void read_end_<port.name>() {
@@ -375,10 +375,9 @@ static void read_end_<port.name>() {
 
 printWriteTokensFunction(port) ::= <<
 
-
 static void write_<port.name>() {
 	index_<port.name> = <getPortName(port)>-\>write_ind;
-	numFree_<port.name> = index_<port.name> + fifo<printMedium(port)>_<port.type>_get_room(<getPortName(port)>, NUM_READERS_<port.name>);
+	numFree_<port.name> = index_<port.name> + fifo_<port.type>_get_room(<getPortName(port)>, NUM_READERS_<port.name>);
 }
 
 static void write_end_<port.name>() {
@@ -472,7 +471,7 @@ if (<checkInputPattern(transition.action.inputPattern)>isSchedulable_<transition
 printInputPatternPort(port) ::= <<
 if (index_<port.name> + <pattern.numTokensMap.(port)> \> numTokens_<port.name>) {
 	if(!<instance.id>.sched-\>round_robin || i \> 0) {
-		sched_add_schedulable(<instance.id>.sched, &<options.network.predecessorsMap.(instance).(port).id>, RING_TOPOLOGY);
+		sched_add_schedulable(<instance.id>.sched, &<instance.incomingPortMap.(port).source.id>, RING_TOPOLOGY);
 #ifdef PRINT_FIRINGS
 		printf("\tEmpty port: <port.name>\n");
 #endif
@@ -596,31 +595,19 @@ static <if (value.innermostType.uintType)>unsigned <endif>int <name><listSize(va
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-MediumInclude(medium) ::= <<
-#include "orcc_fifo<medium>.h"
->>
-
-printMediumInclude(mediums) ::= <<
-<mediums : MediumInclude(); separator="\n">
->>
-
-printMedium(port) ::= <<
-<options.network.templateData.portMedium.(instance).(port).value>
->>
-
 printFifoSize(size) ::= <<
 <if(size)><size><else>SIZE<endif>
 >>
 
 getNumReaders(instance, port) ::= <<
-<length(options.network.outgoingMap.(instance).(port))>
+<length(instance.outgoingPortMap.(port))>
 >>
 
 printInputPort(port) ::= <<
 static unsigned int index_<port.name>;
 static unsigned int numTokens_<port.name>;
-#define NUM_READERS_<port.name> <getNumReaders(instance=options.network.predecessorsMap.(instance).(port), port=options.network.incomingMap.(instance).(port).source)>
-#define SIZE_<port.name> <printFifoSize(options.network.incomingMap.(instance).(port).size)>
+#define NUM_READERS_<port.name> <getNumReaders(instance.incomingPortMap.(port).source, instance.incomingPortMap.(port).sourcePort)>
+#define SIZE_<port.name> <printFifoSize(instance.incomingPortMap.(port).size)>
 #define tokens_<port.name> <getPortName(port)>-\>contents
 
 
@@ -630,7 +617,7 @@ printOutputPort(port) ::= <<
 static unsigned int index_<port.name>;
 static unsigned int numFree_<port.name>;
 #define NUM_READERS_<port.name> <getNumReaders(instance, port)>
-#define SIZE_<port.name> <printFifoSize(first(options.network.outgoingMap.(instance).(port)).size)>
+#define SIZE_<port.name> <printFifoSize(first(instance.outgoingPortMap.(port)).size)>
 #define tokens_<port.name> <getPortName(port)>-\>contents
 
 
@@ -646,7 +633,6 @@ instance(instance, options) ::= <<
 #include "orcc_fifo.h"
 #include "orcc_util.h"
 #include "orcc_scheduler.h"
-<printMediumInclude(options.network.templateData.listAllMedium.(instance))>
 
 #define SIZE <options.("fifoSize")>
 
@@ -662,7 +648,7 @@ extern struct actor_s <instance.id>;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Input FIFOs
-<instance.actor.inputs: { port | extern struct fifo<printMedium(port)>_<port.type>_s *<getPortName(port)>;}; separator="\n">
+<instance.actor.inputs: { port | extern struct fifo_<port.type>_s *<getPortName(port)>;}; separator="\n">
 <instance.actor.inputs: printInputPort()>
 <if(options.enableTrace)>
 <instance.actor.inputs: { port | FILE *file_<port.name>;}; separator="\n">
@@ -670,11 +656,11 @@ extern struct actor_s <instance.id>;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Predecessors
-<instance.actor.inputs: { port | extern struct actor_s <options.network.predecessorsMap.(instance).(port).id>;}; separator="\n">
+<instance.actor.inputs: { port | extern struct actor_s <instance.incomingPortMap.(port).source.id>;}; separator="\n">
 
 ////////////////////////////////////////////////////////////////////////////////
 // Output FIFOs
-<instance.actor.outputs: { port | <if(!port.native)>extern struct fifo<printMedium(port)>_<port.type>_s *<getPortName(port)>;<endif>}; separator="\n">
+<instance.actor.outputs: { port | <if(!port.native)>extern struct fifo_<port.type>_s *<getPortName(port)>;<endif>}; separator="\n">
 <instance.actor.outputs: { port | <if(!port.native)><printOutputPort(port)><endif> }>
 <if(options.enableTrace)>
 <instance.actor.outputs: { port | FILE *file_<port.name>;}; separator="\n">
@@ -682,7 +668,7 @@ extern struct actor_s <instance.id>;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Successors
-<instance.actor.outputs: { port | <options.network.successorsMap.(instance).(port): { successor | extern struct actor_s <successor.id>;}; separator="\n">}; separator="\n">
+<instance.actor.outputs: { port | <instance.outgoingPortMap.(port): { successor | extern struct actor_s <successor.id>;}; separator="\n">}; separator="\n">
 
 ////////////////////////////////////////////////////////////////////////////////
 // Input FIFOs Id
