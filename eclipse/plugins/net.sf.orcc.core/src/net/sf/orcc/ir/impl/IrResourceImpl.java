@@ -62,6 +62,10 @@ public class IrResourceImpl extends XMIResourceImpl {
 
 	@Override
 	public EObject getEObject(String uriFragment) {
+		if (getContents().isEmpty()) {
+			return null;
+		}
+
 		if (uriFragment.startsWith("//@inputs.")
 				&& !Character.isDigit(uriFragment.charAt(10))) {
 			String name = uriFragment.substring(10);
@@ -72,9 +76,13 @@ public class IrResourceImpl extends XMIResourceImpl {
 			String name = uriFragment.substring(11);
 			Actor actor = (Actor) getContents().get(0);
 			return actor.getOutput(name);
+		} else if (uriFragment.startsWith("//@parameters.")
+				&& !Character.isDigit(uriFragment.charAt(14))) {
+			String name = uriFragment.substring(14);
+			Actor actor = (Actor) getContents().get(0);
+			return actor.getParameter(name);
 		} else {
 			return super.getEObject(uriFragment);
 		}
 	}
-
 }

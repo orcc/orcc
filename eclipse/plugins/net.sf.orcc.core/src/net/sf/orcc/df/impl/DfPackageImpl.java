@@ -9,6 +9,7 @@ package net.sf.orcc.df.impl;
 import java.util.Map;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
@@ -192,7 +193,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass varToExpressionMapEntryEClass = null;
+	private EClass argumentEClass = null;
 
 	/**
 	 * Creates an instance of the model <b>Package</b>, registered with
@@ -478,7 +479,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getInstance_Parameters() {
+	public EReference getInstance_Arguments() {
 		return (EReference)instanceEClass.getEStructuralFeatures().get(3);
 	}
 
@@ -1081,8 +1082,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getVarToExpressionMapEntry() {
-		return varToExpressionMapEntryEClass;
+	public EClass getArgument() {
+		return argumentEClass;
 	}
 
 	/**
@@ -1090,8 +1091,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getVarToExpressionMapEntry_Key() {
-		return (EReference)varToExpressionMapEntryEClass.getEStructuralFeatures().get(0);
+	public EReference getArgument_Value() {
+		return (EReference)argumentEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -1099,8 +1100,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getVarToExpressionMapEntry_Value() {
-		return (EReference)varToExpressionMapEntryEClass.getEStructuralFeatures().get(1);
+	public EReference getArgument_Variable() {
+		return (EReference)argumentEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -1157,7 +1158,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEReference(instanceEClass, INSTANCE__ATTRIBUTES);
 		createEReference(instanceEClass, INSTANCE__CONTENTS);
 		createEAttribute(instanceEClass, INSTANCE__ID);
-		createEReference(instanceEClass, INSTANCE__PARAMETERS);
+		createEReference(instanceEClass, INSTANCE__ARGUMENTS);
 
 		broadcastEClass = createEClass(BROADCAST);
 		createEReference(broadcastEClass, BROADCAST__INPUTS);
@@ -1241,9 +1242,9 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEReference(varToPortMapEntryEClass, VAR_TO_PORT_MAP_ENTRY__KEY);
 		createEReference(varToPortMapEntryEClass, VAR_TO_PORT_MAP_ENTRY__VALUE);
 
-		varToExpressionMapEntryEClass = createEClass(VAR_TO_EXPRESSION_MAP_ENTRY);
-		createEReference(varToExpressionMapEntryEClass, VAR_TO_EXPRESSION_MAP_ENTRY__KEY);
-		createEReference(varToExpressionMapEntryEClass, VAR_TO_EXPRESSION_MAP_ENTRY__VALUE);
+		argumentEClass = createEClass(ARGUMENT);
+		createEReference(argumentEClass, ARGUMENT__VALUE);
+		createEReference(argumentEClass, ARGUMENT__VARIABLE);
 	}
 
 	/**
@@ -1311,7 +1312,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		initEReference(getInstance_Attributes(), this.getAttribute(), null, "attributes", null, 0, -1, Instance.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getInstance_Contents(), theEcorePackage.getEObject(), null, "contents", null, 0, 1, Instance.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getInstance_Id(), ecorePackage.getEString(), "id", null, 0, 1, Instance.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getInstance_Parameters(), this.getVarToExpressionMapEntry(), null, "parameters", null, 0, -1, Instance.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getInstance_Arguments(), this.getArgument(), null, "arguments", null, 0, -1, Instance.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(broadcastEClass, Broadcast.class, "Broadcast", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getBroadcast_Inputs(), this.getPort(), null, "inputs", null, 0, -1, Broadcast.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -1395,9 +1396,9 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		initEReference(getVarToPortMapEntry_Key(), theIrPackage.getVar(), null, "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getVarToPortMapEntry_Value(), this.getPort(), null, "value", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(varToExpressionMapEntryEClass, Map.Entry.class, "VarToExpressionMapEntry", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getVarToExpressionMapEntry_Key(), theIrPackage.getVar(), null, "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getVarToExpressionMapEntry_Value(), theIrPackage.getExpression(), null, "value", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEClass(argumentEClass, Argument.class, "Argument", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getArgument_Value(), theIrPackage.getExpression(), null, "value", null, 0, 1, Argument.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getArgument_Variable(), theIrPackage.getVar(), null, "variable", null, 0, 1, Argument.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Create resource
 		createResource(eNS_URI);

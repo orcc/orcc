@@ -34,7 +34,6 @@ import java.io.OutputStream;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.serialize.XDFParser;
 import net.sf.orcc.df.serialize.XDFWriter;
@@ -66,22 +65,21 @@ public class XdfResourceImpl extends ResourceImpl {
 
 	@Override
 	public EObject getEObject(String uriFragment) {
+		if (getContents().isEmpty()) {
+			return null;
+		}
+
 		EObject top = getContents().get(0);
 		EObject result = null;
 		if (uriFragment.startsWith("//@inputs.")) {
 			String name = uriFragment.substring(10);
-			if (top instanceof Actor) {
-				result = ((Actor) top).getInput(name);
-			} else if (top instanceof Network) {
-				result = ((Network) top).getInput(name);
-			}
+			result = ((Network) top).getInput(name);
 		} else if (uriFragment.startsWith("//@outputs.")) {
 			String name = uriFragment.substring(11);
-			if (top instanceof Actor) {
-				result = ((Actor) top).getOutput(name);
-			} else if (top instanceof Network) {
-				result = ((Network) top).getOutput(name);
-			}
+			result = ((Network) top).getOutput(name);
+		} else if (uriFragment.startsWith("//@parameters.")) {
+			String name = uriFragment.substring(14);
+			result = ((Network) top).getParameter(name);
 		}
 
 		if (result != null) {
@@ -102,6 +100,7 @@ public class XdfResourceImpl extends ResourceImpl {
 					.parseNetwork(project, inputStream);
 			getContents().add(network);
 		} catch (OrccRuntimeException e) {
+			e.printStackTrace();
 			throw new IOException(e);
 		}
 	}

@@ -197,6 +197,15 @@ public interface Network extends Entity {
 	EList<Port> getOutputs();
 
 	/**
+	 * Returns the parameter with the given name.
+	 * 
+	 * @param name
+	 *            name of a parameter
+	 * @return the parameter with the given name
+	 */
+	Var getParameter(String name);
+
+	/**
 	 * Returns the list of this network's parameters
 	 * 
 	 * @return the list of this network's parameters
@@ -217,6 +226,15 @@ public interface Network extends Entity {
 	 * @return a map that associates a port to the list of its successors
 	 */
 	Map<Instance, Map<Port, List<Instance>>> getSuccessorsMap();
+
+	/**
+	 * Returns the variable with the given name.
+	 * 
+	 * @param name
+	 *            name of a variable
+	 * @return the variable with the given name
+	 */
+	Var getVariable(String name);
 
 	/**
 	 * Returns the list of this network's variables

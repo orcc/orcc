@@ -7,17 +7,32 @@
 package net.sf.orcc.df.util;
 
 import java.util.Map;
-import net.sf.orcc.df.*;
 
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Argument;
+import net.sf.orcc.df.Attribute;
+import net.sf.orcc.df.Broadcast;
+import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.FSM;
+import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Pattern;
+import net.sf.orcc.df.Port;
+import net.sf.orcc.df.State;
+import net.sf.orcc.df.Tag;
+import net.sf.orcc.df.Transition;
+import net.sf.orcc.df.Transitions;
+import net.sf.orcc.df.Vertex;
+import net.sf.orcc.df.WrapperString;
+import net.sf.orcc.df.WrapperXml;
 import net.sf.orcc.ir.Entity;
-
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Var;
+
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notifier;
-
 import org.eclipse.emf.common.notify.impl.AdapterFactoryImpl;
-
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -157,8 +172,8 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 				return createVarToPortMapEntryAdapter();
 			}
 			@Override
-			public Adapter caseVarToExpressionMapEntry(Map.Entry<Var, Expression> object) {
-				return createVarToExpressionMapEntryAdapter();
+			public Adapter caseArgument(Argument object) {
+				return createArgumentAdapter();
 			}
 			@Override
 			public Adapter caseEntity(Entity object) {
@@ -465,16 +480,16 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Var To Expression Map Entry</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Argument <em>Argument</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see java.util.Map.Entry
+	 * @see net.sf.orcc.df.Argument
 	 * @generated
 	 */
-	public Adapter createVarToExpressionMapEntryAdapter() {
+	public Adapter createArgumentAdapter() {
 		return null;
 	}
 

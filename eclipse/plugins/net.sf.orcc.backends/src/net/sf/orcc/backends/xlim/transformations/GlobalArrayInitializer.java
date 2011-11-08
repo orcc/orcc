@@ -33,6 +33,7 @@ import java.util.Collections;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Argument;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
@@ -56,7 +57,7 @@ public class GlobalArrayInitializer extends AbstractActorVisitor<Object> {
 		private boolean initToZero;
 
 		public XlimActorInitializer(Actor actor, boolean initToZero) {
-			super(actor, Collections.<Var, Expression> emptyMap());
+			super(actor, Collections.<Argument> emptyList());
 			this.initToZero = initToZero;
 		}
 

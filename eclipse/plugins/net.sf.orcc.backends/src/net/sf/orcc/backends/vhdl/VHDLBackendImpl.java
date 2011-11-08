@@ -53,13 +53,12 @@ import net.sf.orcc.backends.vhdl.ram.RAMTransformation;
 import net.sf.orcc.backends.vhdl.transformations.BoolExprTransformation;
 import net.sf.orcc.backends.vhdl.transformations.ListDeclarationTransformation;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transformations.BroadcastAdder;
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
@@ -237,8 +236,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 	 */
 	private void evaluateInitializeActions(Actor actor) {
 		// initializes the actor
-		Map<Var, Expression> parameters = Collections.emptyMap();
-		ActorInterpreter interpreter = new ActorInterpreter(actor, parameters);
+		List<Argument> arguments = Collections.emptyList();
+		ActorInterpreter interpreter = new ActorInterpreter(actor, arguments);
 		try {
 			interpreter.initialize();
 		} catch (Exception e) {

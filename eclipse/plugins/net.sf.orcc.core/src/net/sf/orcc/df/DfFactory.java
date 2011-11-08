@@ -8,8 +8,10 @@ package net.sf.orcc.df;
 
 import java.util.List;
 
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.ecore.EFactory;
 import org.eclipse.emf.ecore.EObject;
@@ -80,6 +82,17 @@ public interface DfFactory extends EFactory {
 	 * @generated
 	 */
 	Actor createActor();
+
+	/**
+	 * Returns a new object of class '<em>Argument</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Argument</em>'.
+	 * @generated
+	 */
+	Argument createArgument();
+
+	Argument createArgument(Var variable, Expression value);
 
 	/**
 	 * Returns a new object of class '<em>Attribute</em>'.

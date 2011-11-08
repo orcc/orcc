@@ -15,9 +15,9 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Network/variables"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Network/connections"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Network/instances"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Network/vertices"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Network/vertices"/>
     </genClasses>
-    <genClasses image="false" ecoreClass="Df.ecore#//Attribute">
+    <genClasses ecoreClass="Df.ecore#//Attribute">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Attribute/name"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Attribute/value"/>
     </genClasses>
@@ -33,7 +33,7 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Instance/attributes"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Instance/contents"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Instance/id"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EReference Df.ecore#//Instance/parameters"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Instance/arguments"/>
     </genClasses>
     <genClasses ecoreClass="Df.ecore#//Broadcast">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Broadcast/inputs"/>
@@ -45,7 +45,7 @@
     <genClasses ecoreClass="Df.ecore#//WrapperXml">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//WrapperXml/xml"/>
     </genClasses>
-    <genClasses ecoreClass="Df.ecore#//Vertex">
+    <genClasses image="false" ecoreClass="Df.ecore#//Vertex">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Vertex/predecessors"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Vertex/successors"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Vertex/incomingEdges"/>
@@ -117,9 +117,9 @@
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//VarToPortMapEntry/key"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//VarToPortMapEntry/value"/>
     </genClasses>
-    <genClasses ecoreClass="Df.ecore#//VarToExpressionMapEntry">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//VarToExpressionMapEntry/key"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//VarToExpressionMapEntry/value"/>
+    <genClasses ecoreClass="Df.ecore#//Argument">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Argument/value"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Argument/variable"/>
     </genClasses>
   </genPackages>
   <genPackages prefix="Ir" basePackage="net.sf.orcc" disposableProviderFactory="true"

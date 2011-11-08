@@ -34,9 +34,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map.Entry;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
@@ -513,11 +513,10 @@ public class XDFWriter {
 		instanceElt.appendChild(classElt);
 
 		// parameters
-		for (Entry<Var, Expression> parameter : instance.getParameters()
-				.entrySet()) {
+		for (Argument argument : instance.getArguments()) {
 			Element parameterElt = document.createElement("Parameter");
-			parameterElt.setAttribute("name", parameter.getKey().getName());
-			writeExpr(parameterElt, parameter.getValue());
+			parameterElt.setAttribute("name", argument.getVariable().getName());
+			writeExpr(parameterElt, argument.getValue());
 			instanceElt.appendChild(parameterElt);
 		}
 

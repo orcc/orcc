@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.List;
 
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.DfPackage;
@@ -40,22 +41,17 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.SerDes;
 import net.sf.orcc.ir.Entity;
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
-import org.eclipse.emf.ecore.util.EcoreEMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
@@ -108,14 +104,14 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	protected String id = ID_EDEFAULT;
 
 	/**
-	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}' map.
+	 * The cached value of the '{@link #getArguments() <em>Arguments</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getParameters()
+	 * @see #getArguments()
 	 * @generated
 	 * @ordered
 	 */
-	protected EMap<Var, Expression> parameters;
+	protected EList<Argument> arguments;
 
 	/**
 	 * the absolute path this instance is defined in
@@ -260,11 +256,11 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EMap<Var, Expression> getParameters() {
-		if (parameters == null) {
-			parameters = new EcoreEMap<Var,Expression>(DfPackage.Literals.VAR_TO_EXPRESSION_MAP_ENTRY, VarToExpressionMapEntryImpl.class, this, DfPackage.INSTANCE__PARAMETERS);
+	public EList<Argument> getArguments() {
+		if (arguments == null) {
+			arguments = new EObjectContainmentEList<Argument>(Argument.class, this, DfPackage.INSTANCE__ARGUMENTS);
 		}
-		return parameters;
+		return arguments;
 	}
 
 	/**
@@ -399,8 +395,8 @@ public class InstanceImpl extends VertexImpl implements Instance {
 		switch (featureID) {
 			case DfPackage.INSTANCE__ATTRIBUTES:
 				return ((InternalEList<?>)getAttributes()).basicRemove(otherEnd, msgs);
-			case DfPackage.INSTANCE__PARAMETERS:
-				return ((InternalEList<?>)getParameters()).basicRemove(otherEnd, msgs);
+			case DfPackage.INSTANCE__ARGUMENTS:
+				return ((InternalEList<?>)getArguments()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -420,9 +416,8 @@ public class InstanceImpl extends VertexImpl implements Instance {
 				return basicGetContents();
 			case DfPackage.INSTANCE__ID:
 				return getId();
-			case DfPackage.INSTANCE__PARAMETERS:
-				if (coreType) return getParameters();
-				else return getParameters().map();
+			case DfPackage.INSTANCE__ARGUMENTS:
+				return getArguments();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -446,8 +441,9 @@ public class InstanceImpl extends VertexImpl implements Instance {
 			case DfPackage.INSTANCE__ID:
 				setId((String)newValue);
 				return;
-			case DfPackage.INSTANCE__PARAMETERS:
-				((EStructuralFeature.Setting)getParameters()).set(newValue);
+			case DfPackage.INSTANCE__ARGUMENTS:
+				getArguments().clear();
+				getArguments().addAll((Collection<? extends Argument>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -470,8 +466,8 @@ public class InstanceImpl extends VertexImpl implements Instance {
 			case DfPackage.INSTANCE__ID:
 				setId(ID_EDEFAULT);
 				return;
-			case DfPackage.INSTANCE__PARAMETERS:
-				getParameters().clear();
+			case DfPackage.INSTANCE__ARGUMENTS:
+				getArguments().clear();
 				return;
 		}
 		super.eUnset(featureID);
@@ -491,8 +487,8 @@ public class InstanceImpl extends VertexImpl implements Instance {
 				return contents != null;
 			case DfPackage.INSTANCE__ID:
 				return ID_EDEFAULT == null ? id != null : !ID_EDEFAULT.equals(id);
-			case DfPackage.INSTANCE__PARAMETERS:
-				return parameters != null && !parameters.isEmpty();
+			case DfPackage.INSTANCE__ARGUMENTS:
+				return arguments != null && !arguments.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

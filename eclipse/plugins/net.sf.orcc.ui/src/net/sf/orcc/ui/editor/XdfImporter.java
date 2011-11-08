@@ -37,7 +37,6 @@ import static net.sf.graphiti.model.ObjectType.PARAMETER_TARGET_PORT;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import net.sf.graphiti.io.LayoutReader;
 import net.sf.graphiti.model.Configuration;
@@ -46,6 +45,7 @@ import net.sf.graphiti.model.Graph;
 import net.sf.graphiti.model.ObjectType;
 import net.sf.graphiti.model.Vertex;
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
@@ -163,9 +163,9 @@ public class XdfImporter {
 		// parameters
 		Map<String, String> parameters = new HashMap<String, String>();
 		vertex.setValue("instance parameter", parameters);
-		for (Entry<Var, Expression> entry : instance.getParameters().entrySet()) {
-			parameters.put(entry.getKey().getName(),
-					new ExpressionPrinter().doSwitch(entry.getValue()));
+		for (Argument argument : instance.getArguments()) {
+			parameters.put(argument.getVariable().getName(),
+					new ExpressionPrinter().doSwitch(argument.getValue()));
 		}
 
 		// attributes

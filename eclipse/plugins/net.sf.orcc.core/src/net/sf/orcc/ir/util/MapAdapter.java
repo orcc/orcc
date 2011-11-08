@@ -35,7 +35,6 @@ import java.util.Map;
 
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Transitions;
 import net.sf.orcc.df.impl.ActorImpl;
@@ -69,18 +68,6 @@ public class MapAdapter implements Adapter {
 		if (feature == eINSTANCE.getProcedure_Locals()) {
 			map = ((ProcedureImpl) target).getLocalsMap();
 			key = ((Var) object).getIndexedName();
-			((Map<Object, Object>) map).put(key, object);
-		} else if (feature == DfPackage.eINSTANCE.getActor_Inputs()) {
-			map = ((ActorImpl) target).getInputsMap();
-			key = ((Port) object).getName();
-			((Map<Object, Object>) map).put(key, object);
-		} else if (feature == DfPackage.eINSTANCE.getActor_Outputs()) {
-			map = ((ActorImpl) target).getOutputsMap();
-			key = ((Port) object).getName();
-			((Map<Object, Object>) map).put(key, object);
-		} else if (feature == DfPackage.eINSTANCE.getActor_Parameters()) {
-			map = ((ActorImpl) target).getParametersMap();
-			key = ((Var) object).getName();
 			((Map<Object, Object>) map).put(key, object);
 		} else if (feature == DfPackage.eINSTANCE.getActor_Procs()) {
 			map = ((ActorImpl) target).getProceduresMap();
@@ -157,18 +144,6 @@ public class MapAdapter implements Adapter {
 		if (feature == eINSTANCE.getProcedure_Locals()) {
 			map = ((ProcedureImpl) target).getLocalsMap();
 			key = ((Var) object).getIndexedName();
-			((Map<Object, Object>) map).remove(key);
-		} else if (feature == DfPackage.eINSTANCE.getActor_Inputs()) {
-			map = ((ActorImpl) target).getInputsMap();
-			key = ((Port) object).getName();
-			((Map<Object, Object>) map).remove(key);
-		} else if (feature == DfPackage.eINSTANCE.getActor_Outputs()) {
-			map = ((ActorImpl) target).getOutputsMap();
-			key = ((Port) object).getName();
-			((Map<Object, Object>) map).remove(key);
-		} else if (feature == DfPackage.eINSTANCE.getActor_Parameters()) {
-			map = ((ActorImpl) target).getParametersMap();
-			key = ((Var) object).getName();
 			((Map<Object, Object>) map).remove(key);
 		} else if (feature == DfPackage.eINSTANCE.getActor_Procs()) {
 			map = ((ActorImpl) target).getProceduresMap();

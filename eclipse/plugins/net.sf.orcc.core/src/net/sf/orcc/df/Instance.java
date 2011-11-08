@@ -30,13 +30,10 @@ package net.sf.orcc.df;
 
 import java.util.List;
 
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -49,6 +46,22 @@ import org.eclipse.emf.ecore.EObject;
 public interface Instance extends Vertex {
 
 	/**
+	 * Returns the actor referenced by this instance.
+	 * 
+	 * @return the actor referenced by this instance, or <code>null</code> if
+	 *         this instance does not reference an actor
+	 */
+	Actor getActor();
+
+	/**
+	 * Returns the list of argument of this instance.
+	 * 
+	 * @return the list of argument of this instance
+	 * @model containment="true"
+	 */
+	public EList<Argument> getArguments();
+
+	/**
 	 * Returns the attribute associated with the given name.
 	 * 
 	 * @param name
@@ -59,56 +72,13 @@ public interface Instance extends Vertex {
 	public Attribute getAttribute(String name);
 
 	/**
-	 * Returns the map of attributes contained in this object.
+	 * Returns the list of attributes of this instance.
 	 * 
-	 * @return the map of attributes contained in this object
+	 * @return the list of attributes of this instance
 	 * @model containment="true"
 	 */
 	public EList<Attribute> getAttributes();
-
-	/**
-	 * Returns the classification class of the instance.
-	 * 
-	 * @return the classification class of this instance
-	 */
-	MoC getMoC();
 	
-	/**
-	 * Returns the actor referenced by this instance.
-	 * 
-	 * @return the actor referenced by this instance, or <code>null</code> if
-	 *         this instance does not reference an actor
-	 */
-	Actor getActor();
-
-	/**
-	 * Returns <code>true</code> if this instance references an actor.
-	 * 
-	 * @return <code>true</code> if this instance references an actor
-	 */
-	boolean isActor();
-
-	/**
-	 * Returns <code>true</code> if this instance references a network.
-	 * 
-	 * @return <code>true</code> if this instance references a network
-	 */
-	boolean isNetwork();
-
-	/**
-	 * Returns <code>true</code> if this instance references a broadcast.
-	 * 
-	 * @return <code>true</code> if this instance references a broadcast
-	 */
-	boolean isBroadcast();
-
-	/**
-	 * Returns <code>true</code> if this instance references a wrapper.
-	 * 
-	 * @return <code>true</code> if this instance references a wrapper
-	 */
-	boolean isWrapper();
-
 	/**
 	 * Returns the broadcast referenced by this instance.
 	 * 
@@ -171,6 +141,13 @@ public interface Instance extends Vertex {
 	String getId();
 
 	/**
+	 * Returns the classification class of this instance.
+	 * 
+	 * @return the classification class of this instance
+	 */
+	MoC getMoC();
+
+	/**
 	 * Returns the network referenced by this instance.
 	 * 
 	 * @return the network referenced by this instance, or <code>null</code> if
@@ -179,20 +156,40 @@ public interface Instance extends Vertex {
 	Network getNetwork();
 
 	/**
-	 * Returns the parameters of this instance. This is a reference, not a copy.
-	 * 
-	 * @return the parameters of this instance
-	 * @model keyType="Var" valueType="Expression"
-	 */
-	EMap<Var, Expression> getParameters();
-
-	/**
 	 * Returns the wrapper referenced by this instance.
 	 * 
 	 * @return the wrapper referenced by this instance, or <code>null</code> if
 	 *         this instance does not reference a wrapper
 	 */
 	SerDes getWrapper();
+
+	/**
+	 * Returns <code>true</code> if this instance references an actor.
+	 * 
+	 * @return <code>true</code> if this instance references an actor
+	 */
+	boolean isActor();
+
+	/**
+	 * Returns <code>true</code> if this instance references a broadcast.
+	 * 
+	 * @return <code>true</code> if this instance references a broadcast
+	 */
+	boolean isBroadcast();
+
+	/**
+	 * Returns <code>true</code> if this instance references a network.
+	 * 
+	 * @return <code>true</code> if this instance references a network
+	 */
+	boolean isNetwork();
+
+	/**
+	 * Returns <code>true</code> if this instance references a wrapper.
+	 * 
+	 * @return <code>true</code> if this instance references a wrapper
+	 */
+	boolean isWrapper();
 
 	/**
 	 * Sets the contents of this instance to be that of an actor. Removes any

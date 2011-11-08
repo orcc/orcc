@@ -30,11 +30,11 @@ package net.sf.orcc.ir.util;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
@@ -90,14 +90,14 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	/**
 	 * Actor's constant parameters to be set at initialization time
 	 */
-	protected Map<Var, Expression> parameters;
+	protected List<Argument> arguments;
 
 	/**
 	 * Creates a new interpreter with no actor and no parameters.
 	 * 
 	 */
 	public ActorInterpreter() {
-		this.parameters = Collections.emptyMap();
+		this.arguments = Collections.emptyList();
 		exprInterpreter = new ExpressionEvaluator();
 	}
 
@@ -109,8 +109,8 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	 * @param parameters
 	 *            parameters of the instance of the given actor
 	 */
-	public ActorInterpreter(Actor actor, Map<Var, Expression> parameters) {
-		this.parameters = parameters;
+	public ActorInterpreter(Actor actor, List<Argument> arguments) {
+		this.arguments = arguments;
 		exprInterpreter = new ExpressionEvaluator();
 		setActor(actor);
 	}
@@ -443,9 +443,9 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	public void initialize() {
 		try {
 			// initializes actors parameters from instance map
-			for (Var param : actor.getParameters()) {
-				Expression value = parameters.get(param.getName());
-				param.setValue(exprInterpreter.doSwitch(value));
+			for (Argument argument : arguments) {
+				Object value = exprInterpreter.doSwitch(argument.getValue());
+				argument.getVariable().setValue(value);
 			}
 
 			// initializes state variables

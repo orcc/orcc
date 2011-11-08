@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, IETR/INSA of Rennes
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,65 +26,51 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.cal;
+package net.sf.orcc.df;
 
-import java.util.List;
-
-import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Argument;
-import net.sf.orcc.ir.Arg;
-import net.sf.orcc.ir.ArgByVal;
-import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.util.ActorInterpreter;
-import net.sf.orcc.util.OrccUtil;
+import net.sf.orcc.ir.Var;
+
+import org.eclipse.emf.ecore.EObject;
 
 /**
- * This interpreter implements
- * {@link #callPrintProcedure(net.sf.orcc.ir.Procedure, java.util.List)} to
- * check it gives the expected output.
+ * This interface defines an argument that can be given to an instance.
  * 
  * @author Matthieu Wipliez
- * 
+ * @model
  */
-public class TestInterpreter extends ActorInterpreter {
-
-	private StringBuilder builder;
-
-	public TestInterpreter(Actor actor, List<Argument> arguments) {
-		super(actor, arguments);
-		builder = new StringBuilder();
-	}
-
-	@Override
-	protected void callPrintProcedure(Procedure procedure, List<Arg> arguments) {
-		for (Arg arg : arguments) {
-			if (arg.isByVal()) {
-				Expression expr = ((ArgByVal) arg).getValue();
-				if (expr.isStringExpr()) {
-					// String characters rework for escaped control
-					// management
-					String str = ((ExprString) expr).getValue();
-					String unescaped = OrccUtil.getUnescapedString(str);
-					builder.append(unescaped);
-				} else {
-					Object value = exprInterpreter.doSwitch(expr);
-					builder.append(value);
-				}
-			}
-		}
-	}
+public interface Argument extends EObject {
 
 	/**
-	 * Returns a String that contains everything the actor has written to the
-	 * standard output.
+	 * Returns the value of this argument.
 	 * 
-	 * @return a String that contains everything the actor has written to the
-	 *         standard output.
+	 * @return the value of this argument
+	 * @model containment="true"
 	 */
-	public String getOutput() {
-		return builder.toString();
-	}
+	Expression getValue();
+
+	/**
+	 * Returns the variable to which this argument associates a value.
+	 * 
+	 * @return the variable to which this argument associates a value
+	 * @model
+	 */
+	Var getVariable();
+
+	/**
+	 * Sets the value of this attribute.
+	 * 
+	 * @param newValue
+	 *            a value
+	 */
+	void setValue(Expression newValue);
+
+	/**
+	 * Sets the variable to which this argument associates a value.
+	 * 
+	 * @param newVariable
+	 *            a variable
+	 */
+	void setVariable(Var newVariable);
 
 }

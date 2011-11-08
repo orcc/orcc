@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
@@ -208,13 +209,11 @@ public class XDFParser {
 						String name = elt.getAttribute("name");
 						// look up variable, in variables scope, and if not
 						// found in parameters scope
-						Var var = null;
-						for (Var variable : network.getVariables()) {
-							if (name.equals(variable.getName())) {
-								var = variable;
-								break;
-							}
+						Var var = network.getVariable(name);
+						if (var == null) {
+							var = network.getParameter(name);
 						}
+
 						if (var == null) {
 							throw new OrccRuntimeException("In network \""
 									+ network.getName()
@@ -794,7 +793,11 @@ public class XDFParser {
 				Var proxy = IrFactory.eINSTANCE.createVar();
 				((InternalEObject) proxy).eSetProxyURI(uri);
 
-				instance.getParameters().put(proxy, expr);
+				// create argument
+				Argument argument = DfFactory.eINSTANCE.createArgument(proxy,
+						expr);
+
+				instance.getArguments().add(argument);
 			}
 
 			node = node.getNextSibling();

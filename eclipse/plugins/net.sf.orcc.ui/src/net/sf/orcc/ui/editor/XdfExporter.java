@@ -72,6 +72,7 @@ import net.sf.orcc.cal.cal.VariableReference;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.services.CalGrammarAccess;
 import net.sf.orcc.cal.ui.internal.CalActivator;
+import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
@@ -244,8 +245,9 @@ public class XdfExporter extends CalSwitch<Object> {
 			for (Entry<?, ?> entry : variables.entrySet()) {
 				Variable variable = parseVariable(entry.getKey());
 				Expression expression = parseExpression(entry.getValue());
-				instance.getParameters().put(varMap.get(variable.getName()),
+				Argument argument = DfFactory.eINSTANCE.createArgument(varMap.get(variable.getName()),
 						expression);
+				instance.getArguments().add(argument);
 			}
 
 			// part name attribute

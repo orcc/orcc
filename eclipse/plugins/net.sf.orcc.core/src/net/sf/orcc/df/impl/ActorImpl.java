@@ -100,12 +100,6 @@ public class ActorImpl extends EntityImpl implements Actor {
 	 */
 	protected EList<Port> inputs;
 
-	private Map<String, Port> mapInputs;
-
-	private Map<String, Port> mapOutputs;
-
-	private Map<String, Var> mapParameters;
-
 	private Map<String, Procedure> mapProcedures;
 
 	private Map<String, Var> mapStateVars;
@@ -179,9 +173,6 @@ public class ActorImpl extends EntityImpl implements Actor {
 	protected ActorImpl() {
 		super();
 
-		mapInputs = new HashMap<String, Port>();
-		mapOutputs = new HashMap<String, Port>();
-		mapParameters = new HashMap<String, Var>();
 		mapProcedures = new HashMap<String, Procedure>();
 		mapStateVars = new HashMap<String, Var>();
 
@@ -461,7 +452,12 @@ public class ActorImpl extends EntityImpl implements Actor {
 
 	@Override
 	public Port getInput(String name) {
-		return mapInputs.get(name);
+		for (Port port : getInputs()) {
+			if (port.getName().equals(name)) {
+				return port;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -475,10 +471,6 @@ public class ActorImpl extends EntityImpl implements Actor {
 		return inputs;
 	}
 
-	public Map<String, Port> getInputsMap() {
-		return mapInputs;
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -489,7 +481,12 @@ public class ActorImpl extends EntityImpl implements Actor {
 
 	@Override
 	public Port getOutput(String name) {
-		return mapOutputs.get(name);
+		for (Port port : getOutputs()) {
+			if (port.getName().equals(name)) {
+				return port;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -503,13 +500,14 @@ public class ActorImpl extends EntityImpl implements Actor {
 		return outputs;
 	}
 
-	public Map<String, Port> getOutputsMap() {
-		return mapOutputs;
-	}
-
 	@Override
 	public Var getParameter(String name) {
-		return mapParameters.get(name);
+		for (Var var : getParameters()) {
+			if (var.getName().equals(name)) {
+				return var;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -521,10 +519,6 @@ public class ActorImpl extends EntityImpl implements Actor {
 			parameters = new EObjectContainmentEList<Var>(Var.class, this, DfPackage.ACTOR__PARAMETERS);
 		}
 		return parameters;
-	}
-
-	public Map<String, Var> getParametersMap() {
-		return mapParameters;
 	}
 
 	@Override

@@ -405,7 +405,7 @@ public class ConnectionImpl extends EObjectImpl implements Connection {
 	 */
 	public Integer getSize() {
 		Attribute attr = getAttribute(BUFFER_SIZE);
-		if (attr.getValue() instanceof Expression) {
+		if (attr != null && attr.getValue() instanceof Expression) {
 			Expression expr = (Expression) attr.getValue();
 			return new ExpressionEvaluator().evaluateAsInteger(expr);
 		} else {

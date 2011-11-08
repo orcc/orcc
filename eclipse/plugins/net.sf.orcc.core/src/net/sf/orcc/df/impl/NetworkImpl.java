@@ -81,12 +81,30 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	private Map<Connection, Integer> connectionMapWithoutBroadcast;
 
+	/**
+	 * The cached value of the '{@link #getConnections() <em>Connections</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getConnections()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Connection> connections;
+
 	private Map<Instance, Map<Port, Connection>> incomingMap;
 
 	/**
 	 * @generated
 	 */
 	protected EList<Port> inputs;
+
+	/**
+	 * The cached value of the '{@link #getInstances() <em>Instances</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getInstances()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Instance> instances;
 
 	/**
 	 * The cached value of the '{@link #getMoC() <em>Mo C</em>}' containment reference.
@@ -117,24 +135,6 @@ public class NetworkImpl extends EntityImpl implements Network {
 	 * @generated
 	 */
 	protected EList<Var> variables;
-
-	/**
-	 * The cached value of the '{@link #getConnections() <em>Connections</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getConnections()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Connection> connections;
-
-	/**
-	 * The cached value of the '{@link #getInstances() <em>Instances</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getInstances()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Instance> instances;
 
 	/**
 	 * The cached value of the '{@link #getVertices() <em>Vertices</em>}' reference list.
@@ -557,7 +557,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 	 * @return an input port whose name matches the given name
 	 */
 	public Port getInput(String name) {
-		for (Port port : inputs) {
+		for (Port port : getInputs()) {
 			if (port.getName().equals(name)) {
 				return port;
 			}
@@ -675,7 +675,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 	 * @return an output port whose name matches the given name
 	 */
 	public Port getOutput(String name) {
-		for (Port port : outputs) {
+		for (Port port : getOutputs()) {
 			if (port.getName().equals(name)) {
 				return port;
 			}
@@ -694,6 +694,16 @@ public class NetworkImpl extends EntityImpl implements Network {
 			outputs = new EObjectContainmentEList<Port>(Port.class, this, DfPackage.NETWORK__OUTPUTS);
 		}
 		return outputs;
+	}
+
+	@Override
+	public Var getParameter(String name) {
+		for (Var var : getParameters()) {
+			if (var.getName().equals(name)) {
+				return var;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -725,6 +735,16 @@ public class NetworkImpl extends EntityImpl implements Network {
 	 */
 	public Map<Instance, Map<Port, List<Instance>>> getSuccessorsMap() {
 		return successorsMap;
+	}
+
+	@Override
+	public Var getVariable(String name) {
+		for (Var var : getVariables()) {
+			if (var.getName().equals(name)) {
+				return var;
+			}
+		}
+		return null;
 	}
 
 	/**

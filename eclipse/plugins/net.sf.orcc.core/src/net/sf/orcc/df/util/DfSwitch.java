@@ -7,15 +7,31 @@
 package net.sf.orcc.df.util;
 
 import java.util.Map;
-import net.sf.orcc.df.*;
 
+import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Argument;
+import net.sf.orcc.df.Attribute;
+import net.sf.orcc.df.Broadcast;
+import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.FSM;
+import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Pattern;
+import net.sf.orcc.df.Port;
+import net.sf.orcc.df.State;
+import net.sf.orcc.df.Tag;
+import net.sf.orcc.df.Transition;
+import net.sf.orcc.df.Transitions;
+import net.sf.orcc.df.Vertex;
+import net.sf.orcc.df.WrapperString;
+import net.sf.orcc.df.WrapperXml;
 import net.sf.orcc.ir.Entity;
-
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Var;
+
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
-
 import org.eclipse.emf.ecore.util.Switch;
 
 /**
@@ -199,9 +215,9 @@ public class DfSwitch<T> extends Switch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case DfPackage.VAR_TO_EXPRESSION_MAP_ENTRY: {
-				@SuppressWarnings("unchecked") Map.Entry<Var, Expression> varToExpressionMapEntry = (Map.Entry<Var, Expression>)theEObject;
-				T result = caseVarToExpressionMapEntry(varToExpressionMapEntry);
+			case DfPackage.ARGUMENT: {
+				Argument argument = (Argument)theEObject;
+				T result = caseArgument(argument);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -510,17 +526,17 @@ public class DfSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Var To Expression Map Entry</em>'.
+	 * Returns the result of interpreting the object as an instance of '<em>Argument</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
 	 * returning a non-null result will terminate the switch.
 	 * <!-- end-user-doc -->
 	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Var To Expression Map Entry</em>'.
+	 * @return the result of interpreting the object as an instance of '<em>Argument</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseVarToExpressionMapEntry(Map.Entry<Var, Expression> object) {
+	public T caseArgument(Argument object) {
 		return null;
 	}
 
