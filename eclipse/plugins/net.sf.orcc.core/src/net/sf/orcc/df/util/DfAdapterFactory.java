@@ -207,10 +207,9 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
 	 * @see net.sf.orcc.df.Network
-	 * @generated
 	 */
 	public Adapter createNetworkAdapter() {
-		return null;
+		return new NetworkAdapter();
 	}
 
 	/**
@@ -305,6 +304,7 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
 	 * @see net.sf.orcc.df.Vertex
+	 * @generated
 	 */
 	public Adapter createVertexAdapter() {
 		return null;

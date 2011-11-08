@@ -157,13 +157,13 @@ public class IrUtil {
 	}
 
 	/**
-	 * Returns a deep copy of the given expression, and updates uses.
+	 * Returns a deep copy of the given object, and updates uses.
 	 * 
 	 * @param copier
 	 *            a copier
 	 * @param expression
 	 *            an expression
-	 * @return a deep copy of the given expression with uses correctly updated
+	 * @return a deep copy of the given object with uses correctly updated
 	 */
 	public static <T extends EObject> T copy(Copier copier, T eObject) {
 		@SuppressWarnings("unchecked")
@@ -193,11 +193,11 @@ public class IrUtil {
 	}
 
 	/**
-	 * Returns a deep copy of the given expression, and updates uses.
+	 * Returns a deep copy of the given object, and updates uses.
 	 * 
 	 * @param expression
 	 *            an expression
-	 * @return a deep copy of the given expression with uses correctly updated
+	 * @return a deep copy of the given object with uses correctly updated
 	 */
 	public static <T extends EObject> T copy(T eObject) {
 		return copy(new Copier(), eObject);

@@ -29,17 +29,16 @@
 package net.sf.orcc.df.transformations;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
+
+import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 
 /**
  * This class defines a transformation that flattens a given network in-place.
@@ -50,10 +49,7 @@ import net.sf.orcc.df.Vertex;
  */
 public class NetworkFlattener implements INetworkTransformation {
 
-	private Map<String, Integer> identifiers;
-
 	public NetworkFlattener() {
-		identifiers = new HashMap<String, Integer>();
 	}
 
 	/**
@@ -61,76 +57,26 @@ public class NetworkFlattener implements INetworkTransformation {
 	 * 
 	 * @throws OrccException
 	 */
-	private void copySubGraph(List<Attribute> attrs, Network network,
-			Instance instance) {
+	private void copySubGraph(Network network, Instance instance) {
 		Network subNetwork = instance.getNetwork();
-
-		List<Vertex> vertexSet = new ArrayList<Vertex>(subNetwork.getVertices());
-		List<Connection> edgeSet = new ArrayList<Connection>(
-				subNetwork.getConnections());
-
-		for (Vertex vertex : vertexSet) {
-			if (vertex.isInstance()) {
-				Instance subInstance = (Instance) vertex;
-
-				// get a unique identifier
-				String id = getUniqueIdentifier(instance.getId(), subInstance);
-				subInstance.setId(id);
-
-				// copy attributes
-				List<Attribute> vertexAttrs = subInstance.getAttributes();
-				vertexAttrs.addAll(attrs);
-
-				network.getVertices().add(vertex);
-			}
-		}
-
-		for (Connection edge : edgeSet) {
-			Vertex srcVertex = edge.getSource();
-			Vertex tgtVertex = edge.getTarget();
-
-			if (srcVertex.isInstance() && tgtVertex.isInstance()) {
-				network.addConnection(srcVertex, tgtVertex, edge);
-			}
-		}
+		Copier copier = new Copier();
+		network.getInstances()
+				.addAll(copier.copyAll(subNetwork.getInstances()));
+		network.getConnections().addAll(
+				copier.copyAll(subNetwork.getConnections()));
+		copier.copyReferences();
 	}
 
 	/**
-	 * Returns a unique id in the given network.
-	 */
-	private String getUniqueIdentifier(String parentId, Instance instance) {
-		String id = parentId + "_" + instance.getId();
-		if (identifiers.containsKey(id)) {
-			// identifier exists in the graph => generates a new one
-			int num = identifiers.get(id);
-			String newId = String.format(id + "_%02d", num);
-			while (identifiers.containsKey(newId)) {
-				num++;
-				newId = String.format(id + "_%02d", num);
-			}
-			identifiers.put(id, num + 1);
-			return newId;
-		} else {
-			// identifier does not exist in the graph: returns the original id
-			identifiers.put(id, 0);
-			return id;
-		}
-	}
-
-	/**
-	 * Links each predecessor of vertex to the successors of the input port in
-	 * subGraph
+	 * Adds edges in the network between predecessors of the vertex and
+	 * successors of the input port.
 	 * 
+	 * @param network
+	 *            the network
 	 * @param vertex
-	 *            the parent graph
-	 * @param graph
-	 *            the parent graph
-	 * @param subNetwork
-	 *            the child network
-	 * @throws OrccException
+	 *            the current vertex
 	 */
-	private void linkIncomingConnections(Vertex vertex, Network network,
-			Network subNetwork) {
+	private void linkIncomingConnections(Network network, Vertex vertex) {
 		List<Connection> incomingEdges = new ArrayList<Connection>(
 				vertex.getIncomingEdges());
 		for (Connection edge : incomingEdges) {
@@ -148,23 +94,19 @@ public class NetworkFlattener implements INetworkTransformation {
 	}
 
 	/**
-	 * Links each successor of vertex to the predecessors of the output port in
-	 * subGraph
+	 * Adds edges in the network between predecessors of the output port and
+	 * successors of the vertex.
 	 * 
+	 * @param network
+	 *            the network
 	 * @param vertex
 	 *            the current vertex
-	 * @param graph
-	 *            the parent graph
-	 * @param subNetwork
-	 *            the child network
-	 * @throws OrccException
 	 */
-	private void linkOutgoingConnections(Vertex vertex, Network network,
-			Network subNetwork) {
+	private void linkOutgoingConnections(Network network, Vertex vertex) {
 		List<Connection> outgoingEdges = new ArrayList<Connection>(
 				vertex.getOutgoingEdges());
 		for (Connection edge : outgoingEdges) {
-			Vertex v = (Vertex) edge.getSourcePort();
+			Vertex v = edge.getSourcePort();
 			List<Connection> incomingEdges = v.getIncomingEdges();
 
 			for (Connection newEdge : incomingEdges) {
@@ -179,10 +121,6 @@ public class NetworkFlattener implements INetworkTransformation {
 
 	@Override
 	public void transform(Network network) {
-		for (Instance instance : network.getInstances()) {
-			identifiers.put(instance.getId(), 0);
-		}
-
 		List<Instance> instances = new ArrayList<Instance>(
 				network.getInstances());
 		for (Instance instance : instances) {
@@ -193,18 +131,16 @@ public class NetworkFlattener implements INetworkTransformation {
 				subNetwork.flatten();
 
 				// copy vertices and edges
-				copySubGraph(instance.getAttributes(), network, instance);
-				linkOutgoingConnections(instance, network, subNetwork);
-				linkIncomingConnections(instance, network, subNetwork);
+				copySubGraph(network, instance);
+				linkOutgoingConnections(network, instance);
+				linkIncomingConnections(network, instance);
 
 				// remove instance from network
 				network.getInstances().remove(instance);
 			}
 		}
 
-		for (Instance instance : network.getInstances()) {
-			instance.getHierarchicalClass().add(0, network.getName());
-		}
+		// TODO renaming if necessary
 	}
 
 }
