@@ -51,6 +51,7 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.transformations.NetworkClassifier;
 import net.sf.orcc.df.transformations.NetworkFlattener;
+import net.sf.orcc.df.util.DfAdapterFactory;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.EntityImpl;
 import net.sf.orcc.moc.MoC;
@@ -81,30 +82,12 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	private Map<Connection, Integer> connectionMapWithoutBroadcast;
 
-	/**
-	 * The cached value of the '{@link #getConnections() <em>Connections</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getConnections()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Connection> connections;
-
 	private Map<Instance, Map<Port, Connection>> incomingMap;
 
 	/**
 	 * @generated
 	 */
 	protected EList<Port> inputs;
-
-	/**
-	 * The cached value of the '{@link #getInstances() <em>Instances</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getInstances()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Instance> instances;
 
 	/**
 	 * The cached value of the '{@link #getMoC() <em>Mo C</em>}' containment reference.
@@ -137,6 +120,24 @@ public class NetworkImpl extends EntityImpl implements Network {
 	protected EList<Var> variables;
 
 	/**
+	 * The cached value of the '{@link #getConnections() <em>Connections</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getConnections()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Connection> connections;
+
+	/**
+	 * The cached value of the '{@link #getInstances() <em>Instances</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getInstances()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Instance> instances;
+
+	/**
 	 * The cached value of the '{@link #getVertices() <em>Vertices</em>}' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getVertices()
@@ -147,10 +148,13 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
 	 */
 	protected NetworkImpl() {
 		super();
+
+		// add adapter to update the vertices and connections if an instance or
+		// a port is removed
+		eAdapters().add(new DfAdapterFactory().createNetworkAdapter());
 	}
 
 	@Override

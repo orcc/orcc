@@ -144,50 +144,8 @@ public class ConnectionImpl extends EObjectImpl implements Connection {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetSource(Vertex newSource, NotificationChain msgs) {
-		Vertex oldSource = source;
-		source = newSource;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, DfPackage.CONNECTION__SOURCE, oldSource, newSource);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
-		}
-		return msgs;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setSource(Vertex newSource) {
-		if (newSource != source) {
-			NotificationChain msgs = null;
-			if (source != null)
-				msgs = ((InternalEObject)source).eInverseRemove(this, DfPackage.VERTEX__OUTGOING_EDGES, Vertex.class, msgs);
-			if (newSource != null)
-				msgs = ((InternalEObject)newSource).eInverseAdd(this, DfPackage.VERTEX__OUTGOING_EDGES, Vertex.class, msgs);
-			msgs = basicSetSource(newSource, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.CONNECTION__SOURCE, newSource, newSource));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Vertex getTarget() {
-		if (target != null && target.eIsProxy()) {
-			InternalEObject oldTarget = (InternalEObject)target;
-			target = (Vertex)eResolveProxy(oldTarget);
-			if (target != oldTarget) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.CONNECTION__TARGET, oldTarget, target));
-			}
-		}
-		return target;
+	public Port basicGetSourcePort() {
+		return sourcePort;
 	}
 
 	/**
@@ -203,11 +161,20 @@ public class ConnectionImpl extends EObjectImpl implements Connection {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetTarget(Vertex newTarget, NotificationChain msgs) {
-		Vertex oldTarget = target;
-		target = newTarget;
+	public Port basicGetTargetPort() {
+		return targetPort;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetSource(Vertex newSource, NotificationChain msgs) {
+		Vertex oldSource = source;
+		source = newSource;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, DfPackage.CONNECTION__TARGET, oldTarget, newTarget);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, DfPackage.CONNECTION__SOURCE, oldSource, newSource);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
@@ -218,18 +185,14 @@ public class ConnectionImpl extends EObjectImpl implements Connection {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setTarget(Vertex newTarget) {
-		if (newTarget != target) {
-			NotificationChain msgs = null;
-			if (target != null)
-				msgs = ((InternalEObject)target).eInverseRemove(this, DfPackage.VERTEX__INCOMING_EDGES, Vertex.class, msgs);
-			if (newTarget != null)
-				msgs = ((InternalEObject)newTarget).eInverseAdd(this, DfPackage.VERTEX__INCOMING_EDGES, Vertex.class, msgs);
-			msgs = basicSetTarget(newTarget, msgs);
-			if (msgs != null) msgs.dispatch();
+	public NotificationChain basicSetTarget(Vertex newTarget, NotificationChain msgs) {
+		Vertex oldTarget = target;
+		target = newTarget;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, DfPackage.CONNECTION__TARGET, oldTarget, newTarget);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.CONNECTION__TARGET, newTarget, newTarget));
+		return msgs;
 	}
 
 	/**
@@ -257,6 +220,26 @@ public class ConnectionImpl extends EObjectImpl implements Connection {
 				return basicGetTargetPort();
 		}
 		return super.eGet(featureID, resolve, coreType);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case DfPackage.CONNECTION__SOURCE:
+				if (source != null)
+					msgs = ((InternalEObject)source).eInverseRemove(this, DfPackage.VERTEX__OUTGOING_EDGES, Vertex.class, msgs);
+				return basicSetSource((Vertex)otherEnd, msgs);
+			case DfPackage.CONNECTION__TARGET:
+				if (target != null)
+					msgs = ((InternalEObject)target).eInverseRemove(this, DfPackage.VERTEX__INCOMING_EDGES, Vertex.class, msgs);
+				return basicSetTarget((Vertex)otherEnd, msgs);
+		}
+		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
 
 	/**
@@ -414,67 +397,6 @@ public class ConnectionImpl extends EObjectImpl implements Connection {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Port getSourcePort() {
-		if (sourcePort != null && sourcePort.eIsProxy()) {
-			InternalEObject oldSourcePort = (InternalEObject)sourcePort;
-			sourcePort = (Port)eResolveProxy(oldSourcePort);
-			if (sourcePort != oldSourcePort) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.CONNECTION__SOURCE_PORT, oldSourcePort, sourcePort));
-			}
-		}
-		return sourcePort;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Port basicGetSourcePort() {
-		return sourcePort;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Port getTargetPort() {
-		if (targetPort != null && targetPort.eIsProxy()) {
-			InternalEObject oldTargetPort = (InternalEObject)targetPort;
-			targetPort = (Port)eResolveProxy(oldTargetPort);
-			if (targetPort != oldTargetPort) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.CONNECTION__TARGET_PORT, oldTargetPort, targetPort));
-			}
-		}
-		return targetPort;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Port basicGetTargetPort() {
-		return targetPort;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setFifoId(int newFifoId) {
-		int oldFifoId = fifoId;
-		fifoId = newFifoId;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.CONNECTION__FIFO_ID, oldFifoId, fifoId));
-	}
-
-	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -495,11 +417,109 @@ public class ConnectionImpl extends EObjectImpl implements Connection {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	public Port getSourcePort() {
+		if (sourcePort != null && sourcePort.eIsProxy()) {
+			InternalEObject oldSourcePort = (InternalEObject)sourcePort;
+			sourcePort = (Port)eResolveProxy(oldSourcePort);
+			if (sourcePort != oldSourcePort) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.CONNECTION__SOURCE_PORT, oldSourcePort, sourcePort));
+			}
+		}
+		return sourcePort;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Vertex getTarget() {
+		if (target != null && target.eIsProxy()) {
+			InternalEObject oldTarget = (InternalEObject)target;
+			target = (Vertex)eResolveProxy(oldTarget);
+			if (target != oldTarget) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.CONNECTION__TARGET, oldTarget, target));
+			}
+		}
+		return target;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Port getTargetPort() {
+		if (targetPort != null && targetPort.eIsProxy()) {
+			InternalEObject oldTargetPort = (InternalEObject)targetPort;
+			targetPort = (Port)eResolveProxy(oldTargetPort);
+			if (targetPort != oldTargetPort) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.CONNECTION__TARGET_PORT, oldTargetPort, targetPort));
+			}
+		}
+		return targetPort;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setFifoId(int newFifoId) {
+		int oldFifoId = fifoId;
+		fifoId = newFifoId;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.CONNECTION__FIFO_ID, oldFifoId, fifoId));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setSource(Vertex newSource) {
+		if (newSource != source) {
+			NotificationChain msgs = null;
+			if (source != null)
+				msgs = ((InternalEObject)source).eInverseRemove(this, DfPackage.VERTEX__OUTGOING_EDGES, Vertex.class, msgs);
+			if (newSource != null)
+				msgs = ((InternalEObject)newSource).eInverseAdd(this, DfPackage.VERTEX__OUTGOING_EDGES, Vertex.class, msgs);
+			msgs = basicSetSource(newSource, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.CONNECTION__SOURCE, newSource, newSource));
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
 	public void setSourcePort(Port newSourcePort) {
 		Port oldSourcePort = sourcePort;
 		sourcePort = newSourcePort;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.CONNECTION__SOURCE_PORT, oldSourcePort, sourcePort));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setTarget(Vertex newTarget) {
+		if (newTarget != target) {
+			NotificationChain msgs = null;
+			if (target != null)
+				msgs = ((InternalEObject)target).eInverseRemove(this, DfPackage.VERTEX__INCOMING_EDGES, Vertex.class, msgs);
+			if (newTarget != null)
+				msgs = ((InternalEObject)newTarget).eInverseAdd(this, DfPackage.VERTEX__INCOMING_EDGES, Vertex.class, msgs);
+			msgs = basicSetTarget(newTarget, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.CONNECTION__TARGET, newTarget, newTarget));
 	}
 
 	/**
@@ -511,26 +531,6 @@ public class ConnectionImpl extends EObjectImpl implements Connection {
 		targetPort = newTargetPort;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.CONNECTION__TARGET_PORT, oldTargetPort, targetPort));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
-		switch (featureID) {
-			case DfPackage.CONNECTION__SOURCE:
-				if (source != null)
-					msgs = ((InternalEObject)source).eInverseRemove(this, DfPackage.VERTEX__OUTGOING_EDGES, Vertex.class, msgs);
-				return basicSetSource((Vertex)otherEnd, msgs);
-			case DfPackage.CONNECTION__TARGET:
-				if (target != null)
-					msgs = ((InternalEObject)target).eInverseRemove(this, DfPackage.VERTEX__INCOMING_EDGES, Vertex.class, msgs);
-				return basicSetTarget((Vertex)otherEnd, msgs);
-		}
-		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
 
 	/**
@@ -547,4 +547,5 @@ public class ConnectionImpl extends EObjectImpl implements Connection {
 		result.append(')');
 		return result.toString();
 	}
+
 }

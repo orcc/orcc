@@ -183,24 +183,22 @@ public class NetworkFlattener implements INetworkTransformation {
 			identifiers.put(instance.getId(), 0);
 		}
 
-		List<Vertex> vertices = new ArrayList<Vertex>(network.getVertices());
-		for (Vertex vertex : vertices) {
-			if (vertex.isInstance()) {
-				Instance instance = (Instance) vertex;
-				if (instance.isNetwork()) {
-					Network subNetwork = instance.getNetwork();
+		List<Instance> instances = new ArrayList<Instance>(
+				network.getInstances());
+		for (Instance instance : instances) {
+			if (instance.isNetwork()) {
+				Network subNetwork = instance.getNetwork();
 
-					// flatten this sub-network
-					subNetwork.flatten();
+				// flatten this sub-network
+				subNetwork.flatten();
 
-					// copy vertices and edges
-					copySubGraph(instance.getAttributes(), network, instance);
-					linkOutgoingConnections(vertex, network, subNetwork);
-					linkIncomingConnections(vertex, network, subNetwork);
+				// copy vertices and edges
+				copySubGraph(instance.getAttributes(), network, instance);
+				linkOutgoingConnections(instance, network, subNetwork);
+				linkIncomingConnections(instance, network, subNetwork);
 
-					// remove vertex from this graph
-					network.getVertices().remove(vertex);
-				}
+				// remove instance from network
+				network.getInstances().remove(instance);
 			}
 		}
 

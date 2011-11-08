@@ -292,26 +292,12 @@ public abstract class VertexImpl extends EObjectImpl implements Vertex {
 		return successors;
 	}
 
-	/**
-	 * Returns <code>true</code> if this vertex contains an instance, and
-	 * <code>false</code> otherwise. This method must be called to ensure a
-	 * vertex is an instance before calling {@link #getInstance()}.
-	 * 
-	 * @return <code>true</code> if this vertex contains an instance, and
-	 *         <code>false</code> otherwise
-	 */
+	@Override
 	public boolean isInstance() {
 		return (this instanceof Instance);
 	}
 
-	/**
-	 * Returns <code>true</code> if this vertex contains a port, and
-	 * <code>false</code> otherwise. This method must be called to ensure a
-	 * vertex is a port before calling {@link #getPort()}.
-	 * 
-	 * @return <code>true</code> if this vertex contains a port, and
-	 *         <code>false</code> otherwise
-	 */
+	@Override
 	public boolean isPort() {
 		return (this instanceof Port);
 	}
