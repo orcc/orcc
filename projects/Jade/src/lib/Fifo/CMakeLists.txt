@@ -7,3 +7,7 @@ add_library (Fifo
   FifoTrace.cpp
   FifoUnprotected.cpp
  )
+ 
+if(UNIX)
+  set_target_properties(Fifo PROPERTIES COMPILE_FLAGS "-fPIC")
+endif(UNIX)

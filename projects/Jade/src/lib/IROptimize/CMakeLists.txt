@@ -6,3 +6,7 @@ add_library (IROptimize
 	InstanceInternalize.cpp
 	FifoFnRemoval.cpp
  )
+ 
+if(UNIX)
+  set_target_properties(IROptimize PROPERTIES COMPILE_FLAGS "-fPIC")
+endif(UNIX)

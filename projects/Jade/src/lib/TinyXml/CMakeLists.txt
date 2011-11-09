@@ -6,3 +6,7 @@ add_library (TinyXml
   tinyxmlerror.cpp
   tinyxmlparser.cpp
   )
+  
+if(UNIX)
+  set_target_properties(TinyXml PROPERTIES COMPILE_FLAGS "-fPIC")
+endif(UNIX)

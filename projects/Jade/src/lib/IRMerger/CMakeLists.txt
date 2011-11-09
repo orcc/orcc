@@ -10,3 +10,7 @@ add_library (IRMerger
 	Rational.h
 	SuperInstance.cpp
  )
+ 
+if(UNIX)
+  set_target_properties(IRMerger PROPERTIES COMPILE_FLAGS "-fPIC")
+endif(UNIX)

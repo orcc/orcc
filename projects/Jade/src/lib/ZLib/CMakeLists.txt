@@ -17,3 +17,7 @@ add_library(ZLib
 	trees.c
 	zutil.c
  )
+ 
+if(UNIX)
+  set_target_properties(ZLib PROPERTIES COMPILE_FLAGS "-fPIC")
+endif(UNIX)

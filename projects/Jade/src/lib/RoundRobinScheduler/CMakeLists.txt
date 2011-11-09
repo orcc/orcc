@@ -30,3 +30,7 @@ add_library (RoundRobinScheduler
 	QSDFScheduler.h
 	RoundRobinScheduler.cpp
  )
+ 
+if(UNIX)
+  set_target_properties(RoundRobinScheduler PROPERTIES COMPILE_FLAGS "-fPIC")
+endif(UNIX)

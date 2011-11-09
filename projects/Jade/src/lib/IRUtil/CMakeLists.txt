@@ -9,3 +9,7 @@ add_library (IRUtil
 	OptionMng.cpp
 	CompressionMng.cpp
  )
+ 
+if(UNIX)
+  set_target_properties(IRUtil PROPERTIES COMPILE_FLAGS "-fPIC")
+endif(UNIX)

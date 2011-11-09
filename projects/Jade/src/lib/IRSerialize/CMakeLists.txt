@@ -9,3 +9,7 @@ add_library (IRSerialize
   IRWriter.cpp
   IRUnwriter.cpp
  )
+ 
+if(UNIX)
+  set_target_properties(IRSerialize PROPERTIES COMPILE_FLAGS "-fPIC")
+endif(UNIX)

@@ -19,3 +19,6 @@ add_library (XDFSerialize
   XDFWriter.cpp
   )
   
+if(UNIX)
+  set_target_properties(XDFSerialize PROPERTIES COMPILE_FLAGS "-fPIC")
+endif(UNIX)

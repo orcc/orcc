@@ -15,3 +15,7 @@ add_library (IRCore
 	Pattern.cpp
 	Procedure.cpp
  )
+ 
+if(UNIX)
+  set_target_properties(IRCore PROPERTIES COMPILE_FLAGS "-fPIC")
+endif(UNIX)

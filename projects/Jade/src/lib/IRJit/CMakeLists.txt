@@ -10,3 +10,7 @@ add_library (IRJit
   LLVMWriter.cpp 
   NativeDecl.h
   )
+  
+if(UNIX)
+  set_target_properties(IRJit PROPERTIES COMPILE_FLAGS "-fPIC")
+endif(UNIX)

@@ -14,3 +14,7 @@ add_library (ConfigurationEngine
 	Reconfiguration.cpp
 	Reconfiguration.h
  )
+ 
+if(UNIX)
+  set_target_properties(ConfigurationEngine PROPERTIES COMPILE_FLAGS "-fPIC")
+endif(UNIX)

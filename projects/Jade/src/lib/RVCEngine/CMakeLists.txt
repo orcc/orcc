@@ -7,3 +7,7 @@ add_library (RVCEngine
   Decoder.cpp
   RVCEngine.cpp
  )
+
+if(UNIX)
+  set_target_properties(RVCEngine PROPERTIES COMPILE_FLAGS "-fPIC")
+endif(UNIX)

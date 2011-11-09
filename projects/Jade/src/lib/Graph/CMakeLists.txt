@@ -8,3 +8,7 @@ add_library (HDAGGraph
   HDAGVertex.cpp
   DotWriter.cpp
  )
+ 
+if(UNIX)
+  set_target_properties(HDAGGraph PROPERTIES COMPILE_FLAGS "-fPIC")
+endif(UNIX)

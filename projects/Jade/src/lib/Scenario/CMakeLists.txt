@@ -9,3 +9,7 @@ add_library (Scenario
 	ScenarioParser.cpp
 	ScenarioParser.h
  )
+ 
+if(UNIX)
+  set_target_properties(Scenario PROPERTIES COMPILE_FLAGS "-fPIC")
+endif(UNIX)
