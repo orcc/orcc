@@ -502,19 +502,19 @@ use ieee.std_logic_1164.all;
 -- Entity Declaration
 -- ----------------------------------------------------------------------------------
 
-entity <network.name> is
+entity <network.simpleName> is
 port(
 	<printNetworkPorts(network)>
 	
 	CLK:  	in std_logic;
 	RESET:	in std_logic);
-end entity <network.name>;
+end entity <network.simpleName>;
 
 -- ----------------------------------------------------------------------------------
 -- Architecture Declaration
 -- ----------------------------------------------------------------------------------
 
-architecture rtl of <network.name> is
+architecture rtl of <network.simpleName> is
 	
 	-- ----------------------------------------------------------------------------------
 	-- Signal Instantiation
