@@ -112,22 +112,21 @@ declarePredsSuccs(instances) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 // allocates FIFOs
 
-allocateFifoType(type, size, count, port, instance) ::= <<
-DECLARE_FIFO(<type>, <if(size)><size><else>SIZE<endif>, <count>, <readers_nb>)
->>
-
 allocateFifo(edge, readers_nb) ::= <%
 <if (edge.source.instance && edge.target.instance)>
 <if (edge.source.broadcast || edge.source.actor)>
-<allocateFifoType(edge.sourcePort.type, edge.size, edge.idNoBcast, edge.sourcePort, edge.source)>
+DECLARE_FIFO(<edge.sourcePort.type>, <if(edge.size)><edge.size><else>SIZE<endif>, <edge.idNoBcast>, <readers_nb>)
 <else>
-<allocateFifoType(edge.targetPort.type, edge.size, edge.idNoBcast, edge.targetPort, edge.target)>
+DECLARE_FIFO(<edge.targetPort.type>, <if(edge.size)><edge.size><else>SIZE<endif>, <edge.idNoBcast>, <readers_nb>)
 <endif>
+<else>
+<edge.source>
+<edge.target>
 <endif>
 %>
 
 allocateFifos(instance) ::= <<
-<instance.outgoingPortMap.keys: { port | <allocateFifo(first(instance.outgoingPortMap.(port)), length(instance.outgoingPortMap.(port)))> }> }>
+<instance.outgoingPortMap.keys: {port |<allocateFifo(first(instance.outgoingPortMap.(port)), length(instance.outgoingPortMap.(port)))><\n>}>
 >>
 
 

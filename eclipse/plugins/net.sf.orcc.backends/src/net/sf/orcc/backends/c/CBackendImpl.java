@@ -241,6 +241,7 @@ public class CBackendImpl extends AbstractBackend {
 
 		StandardPrinter printer = new StandardPrinter(
 				"net/sf/orcc/backends/c/C_network.stg");
+		printer.setExpressionPrinter(new CExpressionPrinter());
 		printer.setTypePrinter(new CTypePrinter());
 
 		instancesTarget = null;
