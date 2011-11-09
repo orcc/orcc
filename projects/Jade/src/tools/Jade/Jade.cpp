@@ -356,7 +356,7 @@ int main(int argc, char **argv) {
 		if (Verbose){
 			cout << "> Exiting scenario mode.\n";
 		}
-	}else {
+	} else {
 		if ((VidFile == "") || (VTLDir == "") || (XDFFile == "")){
 			cout << "An input stimulus (-i), a VTL directory (-L) and an XDF Network (-xdf) is mandatory to start Jade in command line mode.\n";
 			exit(1);
@@ -367,4 +367,5 @@ int main(int argc, char **argv) {
 	}
 
 	llvm_stop_multithreaded();
+	return 0;
 }

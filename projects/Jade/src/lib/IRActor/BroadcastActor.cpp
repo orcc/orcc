@@ -187,7 +187,7 @@ Procedure* BroadcastActor::createBody(){
 	//Return value
 	ReturnInst::Create(Context, NULL, BBEntry);
 
-	return new Procedure(name, ConstantInt::get(Type::getInt1Ty(Context), 0), NewF);;
+	return new Procedure(name, ConstantInt::get(Type::getInt1Ty(Context), 0), NewF);
 }
 
 Pattern* BroadcastActor::createPattern(map<string, Port*>* ports){
