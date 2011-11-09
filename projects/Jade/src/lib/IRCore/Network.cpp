@@ -148,14 +148,14 @@ list<Connection*>* Network::getConnections(){
 }
 
 list<Connection*>* Network::getAllConnections(Instance* source, Instance* target){	
-	return (list<Connection*>*)graph->getAllEdges(&Vertex(source), &Vertex(target));
+	return (list<Connection*>*)graph->getAllEdges(new Vertex(source), new Vertex(target));
 }
 
 list<Connection*> Network::getInConnections(Instance* instance){
 	list<Connection*> ins;
 	HDAGEdge* inEdges[MAX_CONNECTION];
 
-	int nbEdges = graph->getInputEdges(&Vertex(instance), inEdges);
+	int nbEdges = graph->getInputEdges(new Vertex(instance), inEdges);
 
 	// Insert edge found in result
 	for (int i = 0; i < nbEdges; i++){
@@ -170,7 +170,7 @@ list<Connection*> Network::getOutConnections(Instance* instance){
 
 	HDAGEdge* outEdges[MAX_CONNECTION];
 
-	int nbEdges = graph->getOutputEdges(&Vertex(instance), outEdges);
+	int nbEdges = graph->getOutputEdges(new Vertex(instance), outEdges);
 
 	// Insert edge found in result
 	for (int i = 0; i < nbEdges; i++){

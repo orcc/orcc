@@ -38,6 +38,8 @@
 //------------------------------
 #ifndef PATTERN_H
 #define PATTERN_H
+
+#include <cstddef>
 #include <set>
 #include <map>
 

@@ -39,6 +39,7 @@
 #ifndef NATIVEDECL_H
 #define NATIVEDECL_H
 
+#include <cstdio>
 #include <map>
 #include <string>
 //------------------------------

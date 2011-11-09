@@ -1,5 +1,5 @@
 /*********************************************************
-Copyright or © or Copr. IETR/INSA: Maxime Pelcat
+Copyright or ï¿½ or Copr. IETR/INSA: Maxime Pelcat
 
 Contact mpelcat for more information:
 mpelcat@insa-rennes.fr
@@ -12,6 +12,7 @@ parallel applications.
 #ifndef HDAG_GRAPH
 #define HDAG_GRAPH
 #include <list>
+#include <cstddef>
 
 #include "HDAGVertex.h"
 #include "HDAGEdge.h"
