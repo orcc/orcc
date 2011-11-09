@@ -29,7 +29,6 @@
 package net.sf.orcc.df.transformations;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +52,7 @@ import net.sf.orcc.df.Vertex;
 public class BroadcastAdder implements INetworkTransformation {
 
 	protected Set<Connection> toBeRemoved;
+
 	private Network network;
 
 	protected void createBroadcast(String id, Port port,
@@ -110,8 +110,8 @@ public class BroadcastAdder implements INetworkTransformation {
 			i++;
 
 			Connection connBcastTarget = DfFactory.eINSTANCE.createConnection(
-					vertexBCast,outputPort, target,connection.getTargetPort(),
-					connection.getAttributes());
+					vertexBCast, outputPort, target,
+					connection.getTargetPort(), connection.getAttributes());
 			network.getConnections().add(connBcastTarget);
 
 			// setting source to null so we don't examine it again
@@ -165,17 +165,7 @@ public class BroadcastAdder implements INetworkTransformation {
 
 		// for each connection, add it to a port => connection map
 		// port is a port of vertex
-		Map<Port, List<Connection>> outMap = new HashMap<Port, List<Connection>>();
-		for (Connection connection : connections) {
-			Port src = connection.getSourcePort();
-			List<Connection> outList = outMap.get(src);
-			if (outList == null) {
-				outList = new ArrayList<Connection>();
-				outMap.put(src, outList);
-			}
-			outList.add(connection);
-		}
-
+		Map<Port, List<Connection>> outMap = vertex.getOutgoingPortMap();
 		examineConnections(vertex, connections, outMap);
 	}
 
@@ -195,6 +185,7 @@ public class BroadcastAdder implements INetworkTransformation {
 					new BroadcastAdder().transform(instance.getNetwork());
 				}
 			}
+
 			examineVertex(vertex);
 		}
 
