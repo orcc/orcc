@@ -495,6 +495,11 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	}
 
 	@Override
+	public boolean isInstance() {
+		return true;
+	}
+
+	@Override
 	public String toString() {
 		return id + ": " + contents;
 	}

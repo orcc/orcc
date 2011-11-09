@@ -36,7 +36,6 @@ import java.util.Map;
 
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
 
@@ -263,12 +262,12 @@ public abstract class VertexImpl extends EObjectImpl implements Vertex {
 
 	@Override
 	public boolean isInstance() {
-		return (this instanceof Instance);
+		return false;
 	}
 
 	@Override
 	public boolean isPort() {
-		return (this instanceof Port);
+		return false;
 	}
 
 }

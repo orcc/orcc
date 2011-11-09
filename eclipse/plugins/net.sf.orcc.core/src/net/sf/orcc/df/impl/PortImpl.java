@@ -334,6 +334,11 @@ public class PortImpl extends VertexImpl implements Port {
 	}
 
 	@Override
+	public boolean isPort() {
+		return true;
+	}
+
+	@Override
 	public void resetTokenConsumption() {
 		numTokensConsumed = 0;
 	}
