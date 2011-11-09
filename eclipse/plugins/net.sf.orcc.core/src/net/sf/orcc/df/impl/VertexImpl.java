@@ -58,45 +58,24 @@ import org.eclipse.emf.ecore.util.InternalEList;
 public abstract class VertexImpl extends EObjectImpl implements Vertex {
 
 	/**
-	 * The cached value of the '{@link #getIncoming() <em>Incoming Edges</em>}'
-	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getIncoming() <em>Incoming</em>}' reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getIncoming()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Connection> incomingEdges;
+	protected EList<Connection> incoming;
 	/**
-	 * The cached value of the '{@link #getOutgoing() <em>Outgoing Edges</em>}'
-	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getOutgoing() <em>Outgoing</em>}' reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getOutgoing()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Connection> outgoingEdges;
-	/**
-	 * The cached value of the '{@link #getPredecessors() <em>Predecessors</em>}
-	 * ' reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @see #getPredecessors()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Vertex> predecessors;
-	/**
-	 * The cached value of the '{@link #getSuccessors() <em>Successors</em>}'
-	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @see #getSuccessors()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Vertex> successors;
+	protected EList<Connection> outgoing;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	protected VertexImpl() {
@@ -105,27 +84,21 @@ public abstract class VertexImpl extends EObjectImpl implements Vertex {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case DfPackage.VERTEX__PREDECESSORS:
-			return getPredecessors();
-		case DfPackage.VERTEX__SUCCESSORS:
-			return getSuccessors();
-		case DfPackage.VERTEX__INCOMING_EDGES:
-			return getIncoming();
-		case DfPackage.VERTEX__OUTGOING_EDGES:
-			return getOutgoing();
+			case DfPackage.VERTEX__INCOMING:
+				return getIncoming();
+			case DfPackage.VERTEX__OUTGOING:
+				return getOutgoing();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -133,99 +106,67 @@ public abstract class VertexImpl extends EObjectImpl implements Vertex {
 	public NotificationChain eInverseAdd(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-		case DfPackage.VERTEX__PREDECESSORS:
-			return ((InternalEList<InternalEObject>) (InternalEList<?>) getPredecessors())
-					.basicAdd(otherEnd, msgs);
-		case DfPackage.VERTEX__SUCCESSORS:
-			return ((InternalEList<InternalEObject>) (InternalEList<?>) getSuccessors())
-					.basicAdd(otherEnd, msgs);
-		case DfPackage.VERTEX__INCOMING_EDGES:
-			return ((InternalEList<InternalEObject>) (InternalEList<?>) getIncoming())
-					.basicAdd(otherEnd, msgs);
-		case DfPackage.VERTEX__OUTGOING_EDGES:
-			return ((InternalEList<InternalEObject>) (InternalEList<?>) getOutgoing())
-					.basicAdd(otherEnd, msgs);
+			case DfPackage.VERTEX__INCOMING:
+				return ((InternalEList<InternalEObject>)(InternalEList<?>)getIncoming()).basicAdd(otherEnd, msgs);
+			case DfPackage.VERTEX__OUTGOING:
+				return ((InternalEList<InternalEObject>)(InternalEList<?>)getOutgoing()).basicAdd(otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-		case DfPackage.VERTEX__PREDECESSORS:
-			return ((InternalEList<?>) getPredecessors()).basicRemove(otherEnd,
-					msgs);
-		case DfPackage.VERTEX__SUCCESSORS:
-			return ((InternalEList<?>) getSuccessors()).basicRemove(otherEnd,
-					msgs);
-		case DfPackage.VERTEX__INCOMING_EDGES:
-			return ((InternalEList<?>) getIncoming()).basicRemove(otherEnd,
-					msgs);
-		case DfPackage.VERTEX__OUTGOING_EDGES:
-			return ((InternalEList<?>) getOutgoing()).basicRemove(otherEnd,
-					msgs);
+			case DfPackage.VERTEX__INCOMING:
+				return ((InternalEList<?>)getIncoming()).basicRemove(otherEnd, msgs);
+			case DfPackage.VERTEX__OUTGOING:
+				return ((InternalEList<?>)getOutgoing()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case DfPackage.VERTEX__PREDECESSORS:
-			return predecessors != null && !predecessors.isEmpty();
-		case DfPackage.VERTEX__SUCCESSORS:
-			return successors != null && !successors.isEmpty();
-		case DfPackage.VERTEX__INCOMING_EDGES:
-			return incomingEdges != null && !incomingEdges.isEmpty();
-		case DfPackage.VERTEX__OUTGOING_EDGES:
-			return outgoingEdges != null && !outgoingEdges.isEmpty();
+			case DfPackage.VERTEX__INCOMING:
+				return incoming != null && !incoming.isEmpty();
+			case DfPackage.VERTEX__OUTGOING:
+				return outgoing != null && !outgoing.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case DfPackage.VERTEX__PREDECESSORS:
-			getPredecessors().clear();
-			getPredecessors().addAll((Collection<? extends Vertex>) newValue);
-			return;
-		case DfPackage.VERTEX__SUCCESSORS:
-			getSuccessors().clear();
-			getSuccessors().addAll((Collection<? extends Vertex>) newValue);
-			return;
-		case DfPackage.VERTEX__INCOMING_EDGES:
-			getIncoming().clear();
-			getIncoming().addAll((Collection<? extends Connection>) newValue);
-			return;
-		case DfPackage.VERTEX__OUTGOING_EDGES:
-			getOutgoing().clear();
-			getOutgoing().addAll((Collection<? extends Connection>) newValue);
-			return;
+			case DfPackage.VERTEX__INCOMING:
+				getIncoming().clear();
+				getIncoming().addAll((Collection<? extends Connection>)newValue);
+				return;
+			case DfPackage.VERTEX__OUTGOING:
+				getOutgoing().clear();
+				getOutgoing().addAll((Collection<? extends Connection>)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -235,40 +176,30 @@ public abstract class VertexImpl extends EObjectImpl implements Vertex {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case DfPackage.VERTEX__PREDECESSORS:
-			getPredecessors().clear();
-			return;
-		case DfPackage.VERTEX__SUCCESSORS:
-			getSuccessors().clear();
-			return;
-		case DfPackage.VERTEX__INCOMING_EDGES:
-			getIncoming().clear();
-			return;
-		case DfPackage.VERTEX__OUTGOING_EDGES:
-			getOutgoing().clear();
-			return;
+			case DfPackage.VERTEX__INCOMING:
+				getIncoming().clear();
+				return;
+			case DfPackage.VERTEX__OUTGOING:
+				getOutgoing().clear();
+				return;
 		}
 		super.eUnset(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<Connection> getIncoming() {
-		if (incomingEdges == null) {
-			incomingEdges = new EObjectWithInverseResolvingEList<Connection>(
-					Connection.class, this, DfPackage.VERTEX__INCOMING_EDGES,
-					DfPackage.CONNECTION__TARGET);
+		if (incoming == null) {
+			incoming = new EObjectWithInverseResolvingEList<Connection>(Connection.class, this, DfPackage.VERTEX__INCOMING, DfPackage.CONNECTION__TARGET);
 		}
-		return incomingEdges;
+		return incoming;
 	}
 
 	@Override
@@ -282,16 +213,13 @@ public abstract class VertexImpl extends EObjectImpl implements Vertex {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<Connection> getOutgoing() {
-		if (outgoingEdges == null) {
-			outgoingEdges = new EObjectWithInverseResolvingEList<Connection>(
-					Connection.class, this, DfPackage.VERTEX__OUTGOING_EDGES,
-					DfPackage.CONNECTION__SOURCE);
+		if (outgoing == null) {
+			outgoing = new EObjectWithInverseResolvingEList<Connection>(Connection.class, this, DfPackage.VERTEX__OUTGOING, DfPackage.CONNECTION__SOURCE);
 		}
-		return outgoingEdges;
+		return outgoing;
 	}
 
 	@Override
@@ -309,30 +237,26 @@ public abstract class VertexImpl extends EObjectImpl implements Vertex {
 		return map;
 	}
 
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 */
-	public EList<Vertex> getPredecessors() {
-		if (predecessors == null) {
-			predecessors = new EObjectWithInverseResolvingEList.ManyInverse<Vertex>(
-					Vertex.class, this, DfPackage.VERTEX__PREDECESSORS,
-					DfPackage.VERTEX__SUCCESSORS);
+	@Override
+	public List<Vertex> getPredecessors() {
+		List<Vertex> predecessors = new ArrayList<Vertex>();
+		for (Connection connection : getIncoming()) {
+			Vertex source = connection.getSource();
+			if (!predecessors.contains(source)) {
+				predecessors.add(source);
+			}
 		}
 		return predecessors;
 	}
 
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 */
-	public EList<Vertex> getSuccessors() {
-		if (successors == null) {
-			successors = new EObjectWithInverseResolvingEList.ManyInverse<Vertex>(
-					Vertex.class, this, DfPackage.VERTEX__SUCCESSORS,
-					DfPackage.VERTEX__PREDECESSORS);
+	@Override
+	public List<Vertex> getSuccessors() {
+		List<Vertex> successors = new ArrayList<Vertex>();
+		for (Connection connection : getOutgoing()) {
+			Vertex target = connection.getTarget();
+			if (!successors.contains(target)) {
+				successors.add(target);
+			}
 		}
 		return successors;
 	}

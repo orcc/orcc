@@ -398,17 +398,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getConnection_FifoId() {
-		return (EAttribute)connectionEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EReference getConnection_Source() {
-		return (EReference)connectionEClass.getEStructuralFeatures().get(2);
+		return (EReference)connectionEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -417,7 +408,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getConnection_Target() {
-		return (EReference)connectionEClass.getEStructuralFeatures().get(3);
+		return (EReference)connectionEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -426,7 +417,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getConnection_SourcePort() {
-		return (EReference)connectionEClass.getEStructuralFeatures().get(4);
+		return (EReference)connectionEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -435,7 +426,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getConnection_TargetPort() {
-		return (EReference)connectionEClass.getEStructuralFeatures().get(5);
+		return (EReference)connectionEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -560,7 +551,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getVertex_Predecessors() {
+	public EReference getVertex_Incoming() {
 		return (EReference)vertexEClass.getEStructuralFeatures().get(0);
 	}
 
@@ -569,26 +560,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getVertex_Successors() {
+	public EReference getVertex_Outgoing() {
 		return (EReference)vertexEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getVertex_IncomingEdges() {
-		return (EReference)vertexEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getVertex_OutgoingEdges() {
-		return (EReference)vertexEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -1148,7 +1121,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 
 		connectionEClass = createEClass(CONNECTION);
 		createEReference(connectionEClass, CONNECTION__ATTRIBUTES);
-		createEAttribute(connectionEClass, CONNECTION__FIFO_ID);
 		createEReference(connectionEClass, CONNECTION__SOURCE);
 		createEReference(connectionEClass, CONNECTION__TARGET);
 		createEReference(connectionEClass, CONNECTION__SOURCE_PORT);
@@ -1171,10 +1143,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEAttribute(wrapperXmlEClass, WRAPPER_XML__XML);
 
 		vertexEClass = createEClass(VERTEX);
-		createEReference(vertexEClass, VERTEX__PREDECESSORS);
-		createEReference(vertexEClass, VERTEX__SUCCESSORS);
-		createEReference(vertexEClass, VERTEX__INCOMING_EDGES);
-		createEReference(vertexEClass, VERTEX__OUTGOING_EDGES);
+		createEReference(vertexEClass, VERTEX__INCOMING);
+		createEReference(vertexEClass, VERTEX__OUTGOING);
 
 		actionEClass = createEClass(ACTION);
 		createEReference(actionEClass, ACTION__BODY);
@@ -1302,9 +1272,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 
 		initEClass(connectionEClass, Connection.class, "Connection", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getConnection_Attributes(), this.getAttribute(), null, "attributes", null, 0, -1, Connection.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getConnection_FifoId(), ecorePackage.getEInt(), "fifoId", null, 0, 1, Connection.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getConnection_Source(), this.getVertex(), this.getVertex_OutgoingEdges(), "source", null, 0, 1, Connection.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getConnection_Target(), this.getVertex(), this.getVertex_IncomingEdges(), "target", null, 0, 1, Connection.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getConnection_Source(), this.getVertex(), this.getVertex_Outgoing(), "source", null, 0, 1, Connection.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getConnection_Target(), this.getVertex(), this.getVertex_Incoming(), "target", null, 0, 1, Connection.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getConnection_SourcePort(), this.getPort(), null, "sourcePort", null, 0, 1, Connection.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getConnection_TargetPort(), this.getPort(), null, "targetPort", null, 0, 1, Connection.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
@@ -1325,10 +1294,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		initEAttribute(getWrapperXml_Xml(), ecorePackage.getEString(), "xml", null, 0, 1, WrapperXml.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(vertexEClass, Vertex.class, "Vertex", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getVertex_Predecessors(), this.getVertex(), this.getVertex_Successors(), "predecessors", null, 0, -1, Vertex.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getVertex_Successors(), this.getVertex(), this.getVertex_Predecessors(), "successors", null, 0, -1, Vertex.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getVertex_IncomingEdges(), this.getConnection(), this.getConnection_Target(), "incomingEdges", null, 0, -1, Vertex.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getVertex_OutgoingEdges(), this.getConnection(), this.getConnection_Source(), "outgoingEdges", null, 0, -1, Vertex.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getVertex_Incoming(), this.getConnection(), this.getConnection_Target(), "incoming", null, 0, -1, Vertex.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getVertex_Outgoing(), this.getConnection(), this.getConnection_Source(), "outgoing", null, 0, -1, Vertex.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(actionEClass, Action.class, "Action", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getAction_Body(), theIrPackage.getProcedure(), null, "body", null, 0, 1, Action.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

@@ -29,11 +29,10 @@
   <eClassifiers xsi:type="ecore:EClass" name="Connection">
     <eStructuralFeatures xsi:type="ecore:EReference" name="attributes" upperBound="-1"
         eType="#//Attribute" containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fifoId" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="source" eType="#//Vertex"
-        eOpposite="#//Vertex/outgoingEdges"/>
+        eOpposite="#//Vertex/outgoing"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="#//Vertex"
-        eOpposite="#//Vertex/incomingEdges"/>
+        eOpposite="#//Vertex/incoming"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="sourcePort" eType="#//Port"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="targetPort" eType="#//Port"/>
   </eClassifiers>
@@ -58,13 +57,9 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="xml" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Vertex" abstract="true">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="predecessors" upperBound="-1"
-        eType="#//Vertex" eOpposite="#//Vertex/successors"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="successors" upperBound="-1"
-        eType="#//Vertex" eOpposite="#//Vertex/predecessors"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="incomingEdges" upperBound="-1"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="incoming" upperBound="-1"
         eType="#//Connection" eOpposite="#//Connection/target"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="outgoingEdges" upperBound="-1"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="outgoing" upperBound="-1"
         eType="#//Connection" eOpposite="#//Connection/source"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Action">

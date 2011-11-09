@@ -23,7 +23,6 @@
     </genClasses>
     <genClasses ecoreClass="Df.ecore#//Connection">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Connection/attributes"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Connection/fifoId"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Connection/source"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Connection/target"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Connection/sourcePort"/>
@@ -46,10 +45,8 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//WrapperXml/xml"/>
     </genClasses>
     <genClasses image="false" ecoreClass="Df.ecore#//Vertex">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Vertex/predecessors"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Vertex/successors"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Vertex/incomingEdges"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Vertex/outgoingEdges"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Vertex/incoming"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Vertex/outgoing"/>
     </genClasses>
     <genClasses ecoreClass="Df.ecore#//Action">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Action/body"/>

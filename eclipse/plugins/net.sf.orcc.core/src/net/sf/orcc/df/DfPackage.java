@@ -237,22 +237,13 @@ public interface DfPackage extends EPackage {
 	int CONNECTION__ATTRIBUTES = 0;
 
 	/**
-	 * The feature id for the '<em><b>Fifo Id</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int CONNECTION__FIFO_ID = 1;
-
-	/**
 	 * The feature id for the '<em><b>Source</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int CONNECTION__SOURCE = 2;
+	int CONNECTION__SOURCE = 1;
 
 	/**
 	 * The feature id for the '<em><b>Target</b></em>' reference.
@@ -261,7 +252,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CONNECTION__TARGET = 3;
+	int CONNECTION__TARGET = 2;
 
 	/**
 	 * The feature id for the '<em><b>Source Port</b></em>' reference.
@@ -270,7 +261,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CONNECTION__SOURCE_PORT = 4;
+	int CONNECTION__SOURCE_PORT = 3;
 
 	/**
 	 * The feature id for the '<em><b>Target Port</b></em>' reference.
@@ -279,7 +270,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CONNECTION__TARGET_PORT = 5;
+	int CONNECTION__TARGET_PORT = 4;
 
 	/**
 	 * The number of structural features of the '<em>Connection</em>' class.
@@ -288,7 +279,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CONNECTION_FEATURE_COUNT = 6;
+	int CONNECTION_FEATURE_COUNT = 5;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.InstanceImpl <em>Instance</em>}' class.
@@ -341,40 +332,22 @@ public interface DfPackage extends EPackage {
 	int VERTEX = 7;
 
 	/**
-	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int VERTEX__PREDECESSORS = 0;
+	int VERTEX__INCOMING = 0;
 
 	/**
-	 * The feature id for the '<em><b>Successors</b></em>' reference list.
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int VERTEX__SUCCESSORS = 1;
-
-	/**
-	 * The feature id for the '<em><b>Incoming Edges</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int VERTEX__INCOMING_EDGES = 2;
-
-	/**
-	 * The feature id for the '<em><b>Outgoing Edges</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int VERTEX__OUTGOING_EDGES = 3;
+	int VERTEX__OUTGOING = 1;
 
 	/**
 	 * The number of structural features of the '<em>Vertex</em>' class.
@@ -383,43 +356,25 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VERTEX_FEATURE_COUNT = 4;
+	int VERTEX_FEATURE_COUNT = 2;
 
 	/**
-	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INSTANCE__PREDECESSORS = VERTEX__PREDECESSORS;
+	int INSTANCE__INCOMING = VERTEX__INCOMING;
 
 	/**
-	 * The feature id for the '<em><b>Successors</b></em>' reference list.
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INSTANCE__SUCCESSORS = VERTEX__SUCCESSORS;
-
-	/**
-	 * The feature id for the '<em><b>Incoming Edges</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INSTANCE__INCOMING_EDGES = VERTEX__INCOMING_EDGES;
-
-	/**
-	 * The feature id for the '<em><b>Outgoing Edges</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INSTANCE__OUTGOING_EDGES = VERTEX__OUTGOING_EDGES;
+	int INSTANCE__OUTGOING = VERTEX__OUTGOING;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -869,40 +824,22 @@ public interface DfPackage extends EPackage {
 	int PORT = 12;
 
 	/**
-	 * The feature id for the '<em><b>Predecessors</b></em>' reference list.
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__PREDECESSORS = VERTEX__PREDECESSORS;
+	int PORT__INCOMING = VERTEX__INCOMING;
 
 	/**
-	 * The feature id for the '<em><b>Successors</b></em>' reference list.
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__SUCCESSORS = VERTEX__SUCCESSORS;
-
-	/**
-	 * The feature id for the '<em><b>Incoming Edges</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PORT__INCOMING_EDGES = VERTEX__INCOMING_EDGES;
-
-	/**
-	 * The feature id for the '<em><b>Outgoing Edges</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PORT__OUTGOING_EDGES = VERTEX__OUTGOING_EDGES;
+	int PORT__OUTGOING = VERTEX__OUTGOING;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -1389,17 +1326,6 @@ public interface DfPackage extends EPackage {
 	EReference getConnection_Attributes();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.Connection#getFifoId <em>Fifo Id</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Fifo Id</em>'.
-	 * @see net.sf.orcc.df.Connection#getFifoId()
-	 * @see #getConnection()
-	 * @generated
-	 */
-	EAttribute getConnection_FifoId();
-
-	/**
 	 * Returns the meta object for the reference '{@link net.sf.orcc.df.Connection#getSource <em>Source</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1582,48 +1508,26 @@ public interface DfPackage extends EPackage {
 	EClass getVertex();
 
 	/**
-	 * Returns the meta object for the reference list '{@link net.sf.orcc.df.Vertex#getPredecessors <em>Predecessors</em>}'.
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.df.Vertex#getIncoming <em>Incoming</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference list '<em>Predecessors</em>'.
-	 * @see net.sf.orcc.df.Vertex#getPredecessors()
-	 * @see #getVertex()
-	 * @generated
-	 */
-	EReference getVertex_Predecessors();
-
-	/**
-	 * Returns the meta object for the reference list '{@link net.sf.orcc.df.Vertex#getSuccessors <em>Successors</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference list '<em>Successors</em>'.
-	 * @see net.sf.orcc.df.Vertex#getSuccessors()
-	 * @see #getVertex()
-	 * @generated
-	 */
-	EReference getVertex_Successors();
-
-	/**
-	 * Returns the meta object for the reference list '{@link net.sf.orcc.df.Vertex#getIncomingEdges <em>Incoming Edges</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference list '<em>Incoming Edges</em>'.
+	 * @return the meta object for the reference list '<em>Incoming</em>'.
 	 * @see net.sf.orcc.df.Vertex#getIncoming()
 	 * @see #getVertex()
 	 * @generated
 	 */
-	EReference getVertex_IncomingEdges();
+	EReference getVertex_Incoming();
 
 	/**
-	 * Returns the meta object for the reference list '{@link net.sf.orcc.df.Vertex#getOutgoingEdges <em>Outgoing Edges</em>}'.
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.df.Vertex#getOutgoing <em>Outgoing</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference list '<em>Outgoing Edges</em>'.
+	 * @return the meta object for the reference list '<em>Outgoing</em>'.
 	 * @see net.sf.orcc.df.Vertex#getOutgoing()
 	 * @see #getVertex()
 	 * @generated
 	 */
-	EReference getVertex_OutgoingEdges();
+	EReference getVertex_Outgoing();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Action <em>Action</em>}'.
@@ -2386,14 +2290,6 @@ public interface DfPackage extends EPackage {
 		EReference CONNECTION__ATTRIBUTES = eINSTANCE.getConnection_Attributes();
 
 		/**
-		 * The meta object literal for the '<em><b>Fifo Id</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute CONNECTION__FIFO_ID = eINSTANCE.getConnection_FifoId();
-
-		/**
 		 * The meta object literal for the '<em><b>Source</b></em>' reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -2540,36 +2436,20 @@ public interface DfPackage extends EPackage {
 		EClass VERTEX = eINSTANCE.getVertex();
 
 		/**
-		 * The meta object literal for the '<em><b>Predecessors</b></em>' reference list feature.
+		 * The meta object literal for the '<em><b>Incoming</b></em>' reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference VERTEX__PREDECESSORS = eINSTANCE.getVertex_Predecessors();
+		EReference VERTEX__INCOMING = eINSTANCE.getVertex_Incoming();
 
 		/**
-		 * The meta object literal for the '<em><b>Successors</b></em>' reference list feature.
+		 * The meta object literal for the '<em><b>Outgoing</b></em>' reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference VERTEX__SUCCESSORS = eINSTANCE.getVertex_Successors();
-
-		/**
-		 * The meta object literal for the '<em><b>Incoming Edges</b></em>' reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference VERTEX__INCOMING_EDGES = eINSTANCE.getVertex_IncomingEdges();
-
-		/**
-		 * The meta object literal for the '<em><b>Outgoing Edges</b></em>' reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference VERTEX__OUTGOING_EDGES = eINSTANCE.getVertex_OutgoingEdges();
+		EReference VERTEX__OUTGOING = eINSTANCE.getVertex_Outgoing();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.ActionImpl <em>Action</em>}' class.
