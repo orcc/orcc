@@ -40,6 +40,7 @@
 #define PARTITION_H
 
 #include <list>
+#include <string>
 
 class Instance;
 //------------------------------
@@ -57,7 +58,9 @@ public:
      *
 	 * Creates a new partition.
      */
-	Partition(std::string id){this->id = id;};
+	Partition(std::string id){
+	    this->id = id;
+	}
 
 	/*!
      *  @brief Destructor
