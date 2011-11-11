@@ -40,11 +40,11 @@ static void initNetwork(AbstractActorInstance ***pInstances, int *pNumberOfInsta
 
 	*pNumberOfInstances=numberOfInstances;
 
-	<network.instances : {instance | <declareActorInstance(actorInstance=instance)>}; separator="\n">
+	<network.instances : declareActorInstance(); separator="\n">
 
-	<network.instances : {instance | <initializeActorInstance(actorInstance=instance,outgoingMap=network.outgoingMap.(instance),localFifoSize=network.portToFiFoSizeMap.(instance),index=i0)>}; separator="\n">
+	<network.instances : {instance | <initializeActorInstance(instance=instance, localFifoSize=network.portToFiFoSizeMap.(instance), index=i0)>}; separator="\n">
 
-	<network.connections : {connection | <connectPorts(source=connection.source, idSource=network.sourceMap.(connection).instance.id, target=connection.target, idTarget=network.targetMap.(connection).instance.id)>}; separator="\n">
+	<network.connections : connectPorts(); separator="\n">
 }
 >>
 
@@ -52,18 +52,18 @@ static void initNetwork(AbstractActorInstance ***pInstances, int *pNumberOfInsta
 // Declaration
 /////////////////////////////
 
-declareActorInstance(actorInstance) ::= <<
-<if(actorInstance.actor.native)>
-extern ActorClass ActorClass_<actorInstance.actor.simpleName>;
+declareActorInstance(instance) ::= <<
+<if(instance.actor.native)>
+extern ActorClass ActorClass_<instance.actor.simpleName>;
 <else>
-extern ActorClass ActorClass_<actorInstance.id>;
+extern ActorClass ActorClass_<instance.id>;
 <endif>
-AbstractActorInstance *p<actorInstance.id>;
-<actorInstance.actor.inputs : {port|<declarePort(dir="In", port=port, id=actorInstance.id)>}; separator="\n">
-<actorInstance.actor.outputs : {port|<declarePort(dir="Out", port=port, id=actorInstance.id)>}; separator="\n">
+AbstractActorInstance *p<instance.id>;
+<instance.actor.inputs : {port|<declarePort(dir="In", port=port, id=instance.id)>}; separator="\n">
+<instance.actor.outputs : {port|<declarePort(dir="Out", port=port, id=instance.id)>}; separator="\n">
 >>
 
-declarePort(dir,port,id) ::= <<
+declarePort(dir, port, id) ::= <<
 <dir>putPort *p<id>_<port.name>;
 >>
 
@@ -71,23 +71,23 @@ declarePort(dir,port,id) ::= <<
 // Initialization
 /////////////////////////////
 
-initializeActorInstance(actorInstance,outgoingMap,localFifoSize,index) ::= <<
-<if(actorInstance.actor.native)>
-p<actorInstance.id> = createActorInstance(&ActorClass_<actorInstance.actor.simpleName>);
+initializeActorInstance(instance, localFifoSize, index) ::= <<
+<if(instance.actor.native)>
+p<instance.id> = createActorInstance(&ActorClass_<instance.actor.simpleName>);
 <else>
-p<actorInstance.id> = createActorInstance(&ActorClass_<actorInstance.id>);
+p<instance.id> = createActorInstance(&ActorClass_<instance.id>);
 <endif>
-<actorInstance.actor.inputs : {port | <if(localFifoSize.(port))><initializePort(dir="In",port=port,id=actorInstance.id,n=localFifoSize.(port))><else><initializePort(dir="In",port=port,id=actorInstance.id,n=options.fifoSize)><endif>}; separator="\n">
-<actorInstance.actor.outputs : {port | <initializePort(dir="Out",port=port,id=actorInstance.id,n=length(outgoingMap.(port)))>}; separator="\n">
-<actorInstance.actor.parameters : {parameter | <initializeParameter(parameter=parameter,value=actorInstance.parameters.(parameter.name),id=actorInstance.id)>}; separator="\n">
-actorInstances[<index>] = p<actorInstance.id>;
+<instance.actor.inputs : {port | <if(localFifoSize.(port))><initializePort(dir="In",port=port,id=instance.id,n=localFifoSize.(port))><else><initializePort(dir="In",port=port,id=instance.id,n=options.fifoSize)><endif>}; separator="\n">
+<instance.actor.outputs : {port | <initializePort(dir="Out",port=port,id=instance.id,n=length(instance.outgoingPortMap.(port)))>}; separator="\n">
+<instance.actor.parameters : {parameter | <initializeParameter(parameter=parameter,value=instance.parameters.(parameter.name),id=instance.id)>}; separator="\n">
+actorInstances[<index>] = p<instance.id>;
 >>
 
-initializePort(dir,port,id,n) ::= <<
+initializePort(dir, port, id, n) ::= <<
 p<id>_<port.name> = create<dir>putPort(p<id>, "<port.name>", <n>);
 >>
 
-initializeParameter(parameter,value,id) ::= <<
+initializeParameter(parameter, value, id) ::= <<
 setParameter(p<id>, "<parameter.name>",<if(value.stringExpr)><Constant(value)><else>"<Constant(value)>"<endif>);
 >>
 
@@ -95,8 +95,8 @@ setParameter(p<id>, "<parameter.name>",<if(value.stringExpr)><Constant(value)><e
 // Connection
 /////////////////////////////
 
-connectPorts(source,idSource,target,idTarget) ::= <<
-connectPorts(p<idSource>_<source.name>, p<idTarget>_<target.name>);
+connectPorts(connection) ::= <<
+connectPorts(p<connection.source.id>_<connection.sourcePort.name>, p<connection.target.id>_<connection.targetPort.name>);
 >>
 
 
@@ -112,11 +112,11 @@ elseif(constant.listExpr)><printExprList(constant)><endif>
 >>
 
 printExprBool(constant) ::= <<
-<if (constant.value)>1<else>0<endif>
+<if(constant.value)>1<else>0<endif>
 >>
 
 printExprInt(number) ::= <<
-<number><if (number.long)>L<endif>
+<number><if(number.long)>L<endif>
 >>
 
 printExprList(constant) ::= <<
