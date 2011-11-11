@@ -35,7 +35,7 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  *
  * @generated
  */
-public class EntityImpl extends EObjectImpl implements Entity {
+public abstract class EntityImpl extends EObjectImpl implements Entity {
 	/**
 	 * The default value of the '{@link #getFileName() <em>File Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -255,6 +255,21 @@ public class EntityImpl extends EObjectImpl implements Entity {
 		return templateData;
 	}
 
+	@Override
+	public boolean isActor() {
+		return false;
+	}
+
+	@Override
+	public boolean isNetwork() {
+		return false;
+	}
+
+	@Override
+	public boolean isUnit() {
+		return false;
+	}
+	
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated

@@ -174,4 +174,9 @@ public class UnitImpl extends EntityImpl implements Unit {
 		return procedures;
 	}
 
+	@Override
+	public boolean isUnit() {
+		return true;
+	}
+
 } // UnitImpl

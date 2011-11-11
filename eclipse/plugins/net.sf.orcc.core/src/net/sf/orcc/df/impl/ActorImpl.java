@@ -581,6 +581,11 @@ public class ActorImpl extends EntityImpl implements Actor {
 		return moC != null;
 	}
 
+	@Override
+	public boolean isActor() {
+		return true;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated

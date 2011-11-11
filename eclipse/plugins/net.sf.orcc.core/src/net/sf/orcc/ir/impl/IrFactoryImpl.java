@@ -17,7 +17,6 @@ import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.Def;
-import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -151,7 +150,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	@Override
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
-			case IrPackage.ENTITY: return createEntity();
 			case IrPackage.UNIT: return createUnit();
 			case IrPackage.PROCEDURE: return createProcedure();
 			case IrPackage.PARAM: return createParam();
@@ -261,15 +259,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		DefImpl def = new DefImpl();
 		def.setVariable(variable);
 		return def;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Entity createEntity() {
-		EntityImpl entity = new EntityImpl();
-		return entity;
 	}
 
 	/**

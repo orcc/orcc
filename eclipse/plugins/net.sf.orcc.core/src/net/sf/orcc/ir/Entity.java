@@ -38,7 +38,7 @@ import org.eclipse.emf.ecore.EObject;
  * either an actor or a unit.
  * 
  * @author Matthieu Wipliez
- * @model
+ * @model abstract="true"
  */
 public interface Entity extends EObject {
 
@@ -100,6 +100,27 @@ public interface Entity extends EObject {
 	 * @return an object with template-specific data
 	 */
 	Object getTemplateData();
+
+	/**
+	 * Returns <code>true</code> if this entity is an actor.
+	 * 
+	 * @return <code>true</code> if this entity is an actor
+	 */
+	boolean isActor();
+
+	/**
+	 * Returns <code>true</code> if this entity is a network.
+	 * 
+	 * @return <code>true</code> if this entity is a network
+	 */
+	boolean isNetwork();
+
+	/**
+	 * Returns <code>true</code> if this entity is a unit.
+	 * 
+	 * @return <code>true</code> if this entity is a unit
+	 */
+	boolean isUnit();
 
 	/**
 	 * Sets the name of the file in which this actor is defined.

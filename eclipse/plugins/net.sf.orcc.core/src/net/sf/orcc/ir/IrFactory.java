@@ -108,15 +108,6 @@ public interface IrFactory extends EFactory {
 	Def createDef(Var variable);
 
 	/**
-	 * Returns a new object of class '<em>Entity</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Entity</em>'.
-	 * @generated
-	 */
-	Entity createEntity();
-
-	/**
 	 * Returns a new object of class '<em>Expr Binary</em>'.
 	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
