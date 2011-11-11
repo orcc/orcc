@@ -37,10 +37,10 @@ import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.SerDes;
-import net.sf.orcc.ir.Entity;
 import net.sf.orcc.moc.MoC;
 
 import org.eclipse.core.resources.IFile;

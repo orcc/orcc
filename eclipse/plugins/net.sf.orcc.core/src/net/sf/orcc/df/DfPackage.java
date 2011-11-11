@@ -6,8 +6,6 @@
  */
 package net.sf.orcc.df;
 
-import net.sf.orcc.ir.IrPackage;
-
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
@@ -62,6 +60,52 @@ public interface DfPackage extends EPackage {
 	DfPackage eINSTANCE = net.sf.orcc.df.impl.DfPackageImpl.init();
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.df.impl.EntityImpl <em>Entity</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.df.impl.EntityImpl
+	 * @see net.sf.orcc.df.impl.DfPackageImpl#getEntity()
+	 * @generated
+	 */
+	int ENTITY = 21;
+
+	/**
+	 * The feature id for the '<em><b>File Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ENTITY__FILE_NAME = 0;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ENTITY__LINE_NUMBER = 1;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ENTITY__NAME = 2;
+
+	/**
+	 * The number of structural features of the '<em>Entity</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ENTITY_FEATURE_COUNT = 3;
+
+	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.NetworkImpl <em>Network</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -78,7 +122,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__FILE_NAME = IrPackage.ENTITY__FILE_NAME;
+	int NETWORK__FILE_NAME = ENTITY__FILE_NAME;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -87,7 +131,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__LINE_NUMBER = IrPackage.ENTITY__LINE_NUMBER;
+	int NETWORK__LINE_NUMBER = ENTITY__LINE_NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -96,7 +140,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__NAME = IrPackage.ENTITY__NAME;
+	int NETWORK__NAME = ENTITY__NAME;
 
 	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
@@ -105,7 +149,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__INPUTS = IrPackage.ENTITY_FEATURE_COUNT + 0;
+	int NETWORK__INPUTS = ENTITY_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Mo C</b></em>' containment reference.
@@ -114,7 +158,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__MO_C = IrPackage.ENTITY_FEATURE_COUNT + 1;
+	int NETWORK__MO_C = ENTITY_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Outputs</b></em>' containment reference list.
@@ -123,7 +167,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__OUTPUTS = IrPackage.ENTITY_FEATURE_COUNT + 2;
+	int NETWORK__OUTPUTS = ENTITY_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
@@ -132,7 +176,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__PARAMETERS = IrPackage.ENTITY_FEATURE_COUNT + 3;
+	int NETWORK__PARAMETERS = ENTITY_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Variables</b></em>' containment reference list.
@@ -141,7 +185,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__VARIABLES = IrPackage.ENTITY_FEATURE_COUNT + 4;
+	int NETWORK__VARIABLES = ENTITY_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>Connections</b></em>' containment reference list.
@@ -150,7 +194,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__CONNECTIONS = IrPackage.ENTITY_FEATURE_COUNT + 5;
+	int NETWORK__CONNECTIONS = ENTITY_FEATURE_COUNT + 5;
 
 	/**
 	 * The feature id for the '<em><b>Instances</b></em>' containment reference list.
@@ -159,7 +203,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__INSTANCES = IrPackage.ENTITY_FEATURE_COUNT + 6;
+	int NETWORK__INSTANCES = ENTITY_FEATURE_COUNT + 6;
 
 	/**
 	 * The feature id for the '<em><b>Vertices</b></em>' reference list.
@@ -168,7 +212,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__VERTICES = IrPackage.ENTITY_FEATURE_COUNT + 7;
+	int NETWORK__VERTICES = ENTITY_FEATURE_COUNT + 7;
 
 	/**
 	 * The number of structural features of the '<em>Network</em>' class.
@@ -177,7 +221,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK_FEATURE_COUNT = IrPackage.ENTITY_FEATURE_COUNT + 8;
+	int NETWORK_FEATURE_COUNT = ENTITY_FEATURE_COUNT + 8;
 
 
 	/**
@@ -575,7 +619,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__FILE_NAME = IrPackage.ENTITY__FILE_NAME;
+	int ACTOR__FILE_NAME = ENTITY__FILE_NAME;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -584,7 +628,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__LINE_NUMBER = IrPackage.ENTITY__LINE_NUMBER;
+	int ACTOR__LINE_NUMBER = ENTITY__LINE_NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -593,7 +637,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__NAME = IrPackage.ENTITY__NAME;
+	int ACTOR__NAME = ENTITY__NAME;
 
 	/**
 	 * The feature id for the '<em><b>Actions</b></em>' containment reference list.
@@ -602,7 +646,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__ACTIONS = IrPackage.ENTITY_FEATURE_COUNT + 0;
+	int ACTOR__ACTIONS = ENTITY_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Actions Outside Fsm</b></em>' reference list.
@@ -611,7 +655,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__ACTIONS_OUTSIDE_FSM = IrPackage.ENTITY_FEATURE_COUNT + 1;
+	int ACTOR__ACTIONS_OUTSIDE_FSM = ENTITY_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Fsm</b></em>' containment reference.
@@ -620,7 +664,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__FSM = IrPackage.ENTITY_FEATURE_COUNT + 2;
+	int ACTOR__FSM = ENTITY_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Initializes</b></em>' containment reference list.
@@ -629,7 +673,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__INITIALIZES = IrPackage.ENTITY_FEATURE_COUNT + 3;
+	int ACTOR__INITIALIZES = ENTITY_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
@@ -638,7 +682,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__INPUTS = IrPackage.ENTITY_FEATURE_COUNT + 4;
+	int ACTOR__INPUTS = ENTITY_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>Mo C</b></em>' containment reference.
@@ -647,7 +691,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__MO_C = IrPackage.ENTITY_FEATURE_COUNT + 5;
+	int ACTOR__MO_C = ENTITY_FEATURE_COUNT + 5;
 
 	/**
 	 * The feature id for the '<em><b>Outputs</b></em>' containment reference list.
@@ -656,7 +700,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__OUTPUTS = IrPackage.ENTITY_FEATURE_COUNT + 6;
+	int ACTOR__OUTPUTS = ENTITY_FEATURE_COUNT + 6;
 
 	/**
 	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
@@ -665,7 +709,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__PARAMETERS = IrPackage.ENTITY_FEATURE_COUNT + 7;
+	int ACTOR__PARAMETERS = ENTITY_FEATURE_COUNT + 7;
 
 	/**
 	 * The feature id for the '<em><b>Procs</b></em>' containment reference list.
@@ -674,7 +718,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__PROCS = IrPackage.ENTITY_FEATURE_COUNT + 8;
+	int ACTOR__PROCS = ENTITY_FEATURE_COUNT + 8;
 
 	/**
 	 * The feature id for the '<em><b>State Vars</b></em>' containment reference list.
@@ -683,7 +727,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__STATE_VARS = IrPackage.ENTITY_FEATURE_COUNT + 9;
+	int ACTOR__STATE_VARS = ENTITY_FEATURE_COUNT + 9;
 
 	/**
 	 * The feature id for the '<em><b>Native</b></em>' attribute.
@@ -692,7 +736,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__NATIVE = IrPackage.ENTITY_FEATURE_COUNT + 10;
+	int ACTOR__NATIVE = ENTITY_FEATURE_COUNT + 10;
 
 	/**
 	 * The number of structural features of the '<em>Actor</em>' class.
@@ -701,7 +745,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR_FEATURE_COUNT = IrPackage.ENTITY_FEATURE_COUNT + 11;
+	int ACTOR_FEATURE_COUNT = ENTITY_FEATURE_COUNT + 11;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.FSMImpl <em>FSM</em>}' class.
@@ -1173,6 +1217,70 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int ARGUMENT_FEATURE_COUNT = 2;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.df.impl.UnitImpl <em>Unit</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.df.impl.UnitImpl
+	 * @see net.sf.orcc.df.impl.DfPackageImpl#getUnit()
+	 * @generated
+	 */
+	int UNIT = 22;
+
+	/**
+	 * The feature id for the '<em><b>File Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int UNIT__FILE_NAME = ENTITY__FILE_NAME;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int UNIT__LINE_NUMBER = ENTITY__LINE_NUMBER;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int UNIT__NAME = ENTITY__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Constants</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int UNIT__CONSTANTS = ENTITY_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>Procedures</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int UNIT__PROCEDURES = ENTITY_FEATURE_COUNT + 1;
+
+	/**
+	 * The number of structural features of the '<em>Unit</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int UNIT_FEATURE_COUNT = ENTITY_FEATURE_COUNT + 2;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Network <em>Network</em>}'.
@@ -2150,6 +2258,81 @@ public interface DfPackage extends EPackage {
 	EReference getArgument_Variable();
 
 	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.df.Entity <em>Entity</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Entity</em>'.
+	 * @see net.sf.orcc.df.Entity
+	 * @generated
+	 */
+	EClass getEntity();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.Entity#getFileName <em>File Name</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>File Name</em>'.
+	 * @see net.sf.orcc.df.Entity#getFileName()
+	 * @see #getEntity()
+	 * @generated
+	 */
+	EAttribute getEntity_FileName();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.Entity#getLineNumber <em>Line Number</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Line Number</em>'.
+	 * @see net.sf.orcc.df.Entity#getLineNumber()
+	 * @see #getEntity()
+	 * @generated
+	 */
+	EAttribute getEntity_LineNumber();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.Entity#getName <em>Name</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Name</em>'.
+	 * @see net.sf.orcc.df.Entity#getName()
+	 * @see #getEntity()
+	 * @generated
+	 */
+	EAttribute getEntity_Name();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.df.Unit <em>Unit</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Unit</em>'.
+	 * @see net.sf.orcc.df.Unit
+	 * @generated
+	 */
+	EClass getUnit();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.df.Unit#getConstants <em>Constants</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Constants</em>'.
+	 * @see net.sf.orcc.df.Unit#getConstants()
+	 * @see #getUnit()
+	 * @generated
+	 */
+	EReference getUnit_Constants();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.df.Unit#getProcedures <em>Procedures</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Procedures</em>'.
+	 * @see net.sf.orcc.df.Unit#getProcedures()
+	 * @see #getUnit()
+	 * @generated
+	 */
+	EReference getUnit_Procedures();
+
+	/**
 	 * Returns the factory that creates the instances of the model.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2932,6 +3115,66 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EReference ARGUMENT__VARIABLE = eINSTANCE.getArgument_Variable();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.df.impl.EntityImpl <em>Entity</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.df.impl.EntityImpl
+		 * @see net.sf.orcc.df.impl.DfPackageImpl#getEntity()
+		 * @generated
+		 */
+		EClass ENTITY = eINSTANCE.getEntity();
+
+		/**
+		 * The meta object literal for the '<em><b>File Name</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute ENTITY__FILE_NAME = eINSTANCE.getEntity_FileName();
+
+		/**
+		 * The meta object literal for the '<em><b>Line Number</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute ENTITY__LINE_NUMBER = eINSTANCE.getEntity_LineNumber();
+
+		/**
+		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute ENTITY__NAME = eINSTANCE.getEntity_Name();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.df.impl.UnitImpl <em>Unit</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.df.impl.UnitImpl
+		 * @see net.sf.orcc.df.impl.DfPackageImpl#getUnit()
+		 * @generated
+		 */
+		EClass UNIT = eINSTANCE.getUnit();
+
+		/**
+		 * The meta object literal for the '<em><b>Constants</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference UNIT__CONSTANTS = eINSTANCE.getUnit_Constants();
+
+		/**
+		 * The meta object literal for the '<em><b>Procedures</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference UNIT__PROCEDURES = eINSTANCE.getUnit_Procedures();
 
 	}
 

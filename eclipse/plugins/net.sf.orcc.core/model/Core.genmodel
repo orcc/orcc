@@ -118,6 +118,15 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Argument/value"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Argument/variable"/>
     </genClasses>
+    <genClasses image="false" ecoreClass="Df.ecore#//Entity">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Entity/fileName"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Entity/lineNumber"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Entity/name"/>
+    </genClasses>
+    <genClasses ecoreClass="Df.ecore#//Unit">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Unit/constants"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Unit/procedures"/>
+    </genClasses>
   </genPackages>
   <genPackages prefix="Ir" basePackage="net.sf.orcc" disposableProviderFactory="true"
       ecorePackage="Ir.ecore#/">
@@ -149,15 +158,6 @@
       <genEnumLiterals ecoreEnumLiteral="Ir.ecore#//OpUnary/MINUS"/>
       <genEnumLiterals ecoreEnumLiteral="Ir.ecore#//OpUnary/NUM_ELTS"/>
     </genEnums>
-    <genClasses ecoreClass="Ir.ecore#//Entity">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Entity/fileName"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Entity/lineNumber"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Entity/name"/>
-    </genClasses>
-    <genClasses ecoreClass="Ir.ecore#//Unit">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Unit/constants"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Unit/procedures"/>
-    </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Procedure">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Procedure/lineNumber"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Procedure/locals"/>

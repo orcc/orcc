@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.df;
 
-import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;

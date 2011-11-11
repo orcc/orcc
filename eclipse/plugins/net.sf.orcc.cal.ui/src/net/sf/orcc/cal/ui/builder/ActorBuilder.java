@@ -37,8 +37,8 @@ import net.sf.orcc.OrccProjectNature;
 import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.CalPackage;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.frontend.Frontend;
-import net.sf.orcc.ir.Entity;
 import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.OrccUtil;
 

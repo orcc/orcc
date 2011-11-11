@@ -36,9 +36,9 @@ import net.sf.orcc.cache.CachePackage;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.ir.Entity;
+import net.sf.orcc.df.Entity;
+import net.sf.orcc.df.Unit;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Unit;
 import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.core.resources.IFolder;

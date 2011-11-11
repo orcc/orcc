@@ -8,6 +8,7 @@ package net.sf.orcc.df.util;
 
 import java.util.Map;
 
+import net.sf.orcc.df.*;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
@@ -15,6 +16,7 @@ import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -27,7 +29,6 @@ import net.sf.orcc.df.Transitions;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.WrapperString;
 import net.sf.orcc.df.WrapperXml;
-import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.common.notify.Adapter;
@@ -178,6 +179,10 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseEntity(Entity object) {
 				return createEntityAdapter();
+			}
+			@Override
+			public Adapter caseUnit(Unit object) {
+				return createUnitAdapter();
 			}
 			@Override
 			public Adapter defaultCase(EObject object) {
@@ -493,16 +498,30 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Entity <em>Entity</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Entity <em>Entity</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.Entity
+	 * @see net.sf.orcc.df.Entity
 	 * @generated
 	 */
 	public Adapter createEntityAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Unit <em>Unit</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.df.Unit
+	 * @generated
+	 */
+	public Adapter createUnitAdapter() {
 		return null;
 	}
 

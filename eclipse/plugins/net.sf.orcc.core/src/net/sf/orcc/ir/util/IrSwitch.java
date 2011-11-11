@@ -13,7 +13,6 @@ import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.Def;
-import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -47,7 +46,6 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
-import net.sf.orcc.ir.Unit;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 
@@ -100,21 +98,6 @@ public class IrSwitch<T> extends Switch<T> {
 	@Override
 	protected boolean isSwitchFor(EPackage ePackage) {
 		return ePackage == modelPackage;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Unit</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Unit</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseUnit(Unit object) {
-		return null;
 	}
 
 	/**
@@ -743,19 +726,6 @@ public class IrSwitch<T> extends Switch<T> {
 	@Override
 	protected T doSwitch(int classifierID, EObject theEObject) {
 		switch (classifierID) {
-			case IrPackage.ENTITY: {
-				Entity entity = (Entity)theEObject;
-				T result = caseEntity(entity);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.UNIT: {
-				Unit unit = (Unit)theEObject;
-				T result = caseUnit(unit);
-				if (result == null) result = caseEntity(unit);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
 			case IrPackage.PROCEDURE: {
 				Procedure procedure = (Procedure)theEObject;
 				T result = caseProcedure(procedure);
@@ -1025,21 +995,6 @@ public class IrSwitch<T> extends Switch<T> {
 			}
 			default: return defaultCase(theEObject);
 		}
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Entity</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Entity</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseEntity(Entity object) {
-		return null;
 	}
 
 } //IrSwitch

@@ -15,6 +15,7 @@ import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 
@@ -24,6 +25,7 @@ import net.sf.orcc.df.State;
 import net.sf.orcc.df.Tag;
 import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.Transitions;
+import net.sf.orcc.df.Unit;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.WrapperString;
 import net.sf.orcc.df.WrapperXml;
@@ -194,6 +196,20 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	private EClass argumentEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass entityEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass unitEClass = null;
 
 	/**
 	 * Creates an instance of the model <b>Package</b>, registered with
@@ -1082,6 +1098,69 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EClass getEntity() {
+		return entityEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getEntity_FileName() {
+		return (EAttribute)entityEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getEntity_LineNumber() {
+		return (EAttribute)entityEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getEntity_Name() {
+		return (EAttribute)entityEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getUnit() {
+		return unitEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getUnit_Constants() {
+		return (EReference)unitEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getUnit_Procedures() {
+		return (EReference)unitEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public DfFactory getDfFactory() {
 		return (DfFactory)getEFactoryInstance();
 	}
@@ -1215,6 +1294,15 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		argumentEClass = createEClass(ARGUMENT);
 		createEReference(argumentEClass, ARGUMENT__VALUE);
 		createEReference(argumentEClass, ARGUMENT__VARIABLE);
+
+		entityEClass = createEClass(ENTITY);
+		createEAttribute(entityEClass, ENTITY__FILE_NAME);
+		createEAttribute(entityEClass, ENTITY__LINE_NUMBER);
+		createEAttribute(entityEClass, ENTITY__NAME);
+
+		unitEClass = createEClass(UNIT);
+		createEReference(unitEClass, UNIT__CONSTANTS);
+		createEReference(unitEClass, UNIT__PROCEDURES);
 	}
 
 	/**
@@ -1241,8 +1329,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		setNsURI(eNS_URI);
 
 		// Obtain other dependent packages
-		IrPackage theIrPackage = (IrPackage)EPackage.Registry.INSTANCE.getEPackage(IrPackage.eNS_URI);
 		MocPackage theMocPackage = (MocPackage)EPackage.Registry.INSTANCE.getEPackage(MocPackage.eNS_URI);
+		IrPackage theIrPackage = (IrPackage)EPackage.Registry.INSTANCE.getEPackage(IrPackage.eNS_URI);
 		EcorePackage theEcorePackage = (EcorePackage)EPackage.Registry.INSTANCE.getEPackage(EcorePackage.eNS_URI);
 
 		// Create type parameters
@@ -1250,10 +1338,11 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		// Set bounds for type parameters
 
 		// Add supertypes to classes
-		networkEClass.getESuperTypes().add(theIrPackage.getEntity());
+		networkEClass.getESuperTypes().add(this.getEntity());
 		instanceEClass.getESuperTypes().add(this.getVertex());
-		actorEClass.getESuperTypes().add(theIrPackage.getEntity());
+		actorEClass.getESuperTypes().add(this.getEntity());
 		portEClass.getESuperTypes().add(this.getVertex());
+		unitEClass.getESuperTypes().add(this.getEntity());
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(networkEClass, Network.class, "Network", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -1366,6 +1455,15 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		initEClass(argumentEClass, Argument.class, "Argument", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getArgument_Value(), theIrPackage.getExpression(), null, "value", null, 0, 1, Argument.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getArgument_Variable(), theIrPackage.getVar(), null, "variable", null, 0, 1, Argument.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(entityEClass, Entity.class, "Entity", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getEntity_FileName(), theEcorePackage.getEString(), "fileName", null, 0, 1, Entity.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getEntity_LineNumber(), ecorePackage.getEInt(), "lineNumber", null, 0, 1, Entity.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getEntity_Name(), theEcorePackage.getEString(), "name", null, 0, 1, Entity.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(unitEClass, Unit.class, "Unit", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getUnit_Constants(), theIrPackage.getVar(), null, "constants", null, 0, -1, Unit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getUnit_Procedures(), theIrPackage.getProcedure(), null, "procedures", null, 0, -1, Unit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Create resource
 		createResource(eNS_URI);

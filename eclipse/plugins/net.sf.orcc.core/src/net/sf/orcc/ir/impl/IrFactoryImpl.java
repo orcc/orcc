@@ -50,7 +50,6 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
-import net.sf.orcc.ir.Unit;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.TypeUtil;
@@ -150,7 +149,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	@Override
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
-			case IrPackage.UNIT: return createUnit();
 			case IrPackage.PROCEDURE: return createProcedure();
 			case IrPackage.PARAM: return createParam();
 			case IrPackage.NODE_BLOCK: return createNodeBlock();
@@ -904,15 +902,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public TypeVoid createTypeVoid() {
 		TypeVoidImpl typeVoid = new TypeVoidImpl();
 		return typeVoid;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Unit createUnit() {
-		UnitImpl unit = new UnitImpl();
-		return unit;
 	}
 
 	/**

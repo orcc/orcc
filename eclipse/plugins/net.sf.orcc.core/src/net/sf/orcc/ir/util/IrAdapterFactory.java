@@ -13,7 +13,6 @@ import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.Def;
-import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -47,7 +46,6 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
-import net.sf.orcc.ir.Unit;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 
@@ -81,14 +79,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 */
 	protected IrSwitch<Adapter> modelSwitch =
 		new IrSwitch<Adapter>() {
-			@Override
-			public Adapter caseEntity(Entity object) {
-				return createEntityAdapter();
-			}
-			@Override
-			public Adapter caseUnit(Unit object) {
-				return createUnitAdapter();
-			}
 			@Override
 			public Adapter caseProcedure(Procedure object) {
 				return createProcedureAdapter();
@@ -268,20 +258,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Unit <em>Unit</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.Unit
-	 * @generated
-	 */
-	public Adapter createUnitAdapter() {
-		return null;
-	}
-
-	/**
 	 * Creates an adapter for the <code>target</code>.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -292,20 +268,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	@Override
 	public Adapter createAdapter(Notifier target) {
 		return modelSwitch.doSwitch((EObject)target);
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Entity <em>Entity</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.Entity
-	 * @generated
-	 */
-	public Adapter createEntityAdapter() {
-		return null;
 	}
 
 	/**

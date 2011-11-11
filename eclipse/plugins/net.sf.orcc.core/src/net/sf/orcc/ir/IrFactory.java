@@ -756,15 +756,6 @@ public interface IrFactory extends EFactory {
 	TypeVoid createTypeVoid();
 
 	/**
-	 * Returns a new object of class '<em>Unit</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Unit</em>'.
-	 * @generated
-	 */
-	Unit createUnit();
-
-	/**
 	 * Returns a new object of class '<em>Use</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

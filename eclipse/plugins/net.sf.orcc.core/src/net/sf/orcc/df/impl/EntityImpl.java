@@ -4,13 +4,13 @@
  *
  * $Id$
  */
-package net.sf.orcc.ir.impl;
+package net.sf.orcc.df.impl;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.ir.Entity;
-import net.sf.orcc.ir.IrPackage;
+import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.Entity;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -27,9 +27,9 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.ir.impl.EntityImpl#getFileName <em>File Name</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.EntityImpl#getLineNumber <em>Line Number</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.EntityImpl#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getFileName <em>File Name</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getLineNumber <em>Line Number</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getName <em>Name</em>}</li>
  * </ul>
  * </p>
  *
@@ -110,11 +110,11 @@ public abstract class EntityImpl extends EObjectImpl implements Entity {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.ENTITY__FILE_NAME:
+			case DfPackage.ENTITY__FILE_NAME:
 				return getFileName();
-			case IrPackage.ENTITY__LINE_NUMBER:
+			case DfPackage.ENTITY__LINE_NUMBER:
 				return getLineNumber();
-			case IrPackage.ENTITY__NAME:
+			case DfPackage.ENTITY__NAME:
 				return getName();
 		}
 		return super.eGet(featureID, resolve, coreType);
@@ -127,11 +127,11 @@ public abstract class EntityImpl extends EObjectImpl implements Entity {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.ENTITY__FILE_NAME:
+			case DfPackage.ENTITY__FILE_NAME:
 				return FILE_NAME_EDEFAULT == null ? fileName != null : !FILE_NAME_EDEFAULT.equals(fileName);
-			case IrPackage.ENTITY__LINE_NUMBER:
+			case DfPackage.ENTITY__LINE_NUMBER:
 				return lineNumber != LINE_NUMBER_EDEFAULT;
-			case IrPackage.ENTITY__NAME:
+			case DfPackage.ENTITY__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 		}
 		return super.eIsSet(featureID);
@@ -144,13 +144,13 @@ public abstract class EntityImpl extends EObjectImpl implements Entity {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.ENTITY__FILE_NAME:
+			case DfPackage.ENTITY__FILE_NAME:
 				setFileName((String)newValue);
 				return;
-			case IrPackage.ENTITY__LINE_NUMBER:
+			case DfPackage.ENTITY__LINE_NUMBER:
 				setLineNumber((Integer)newValue);
 				return;
-			case IrPackage.ENTITY__NAME:
+			case DfPackage.ENTITY__NAME:
 				setName((String)newValue);
 				return;
 		}
@@ -163,7 +163,7 @@ public abstract class EntityImpl extends EObjectImpl implements Entity {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return IrPackage.Literals.ENTITY;
+		return DfPackage.Literals.ENTITY;
 	}
 
 	/**
@@ -173,13 +173,13 @@ public abstract class EntityImpl extends EObjectImpl implements Entity {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.ENTITY__FILE_NAME:
+			case DfPackage.ENTITY__FILE_NAME:
 				setFileName(FILE_NAME_EDEFAULT);
 				return;
-			case IrPackage.ENTITY__LINE_NUMBER:
+			case DfPackage.ENTITY__LINE_NUMBER:
 				setLineNumber(LINE_NUMBER_EDEFAULT);
 				return;
-			case IrPackage.ENTITY__NAME:
+			case DfPackage.ENTITY__NAME:
 				setName(NAME_EDEFAULT);
 				return;
 		}
@@ -278,7 +278,7 @@ public abstract class EntityImpl extends EObjectImpl implements Entity {
 		String oldFileName = fileName;
 		fileName = newFileName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ENTITY__FILE_NAME, oldFileName, fileName));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ENTITY__FILE_NAME, oldFileName, fileName));
 	}
 
 	/**
@@ -289,7 +289,7 @@ public abstract class EntityImpl extends EObjectImpl implements Entity {
 		int oldLineNumber = lineNumber;
 		lineNumber = newLineNumber;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ENTITY__LINE_NUMBER, oldLineNumber, lineNumber));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ENTITY__LINE_NUMBER, oldLineNumber, lineNumber));
 	}
 
 	/**
@@ -300,7 +300,7 @@ public abstract class EntityImpl extends EObjectImpl implements Entity {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ENTITY__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ENTITY__NAME, oldName, name));
 	}
 
 	@Override

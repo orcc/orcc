@@ -15,7 +15,6 @@ import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.Def;
-import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -52,7 +51,6 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
-import net.sf.orcc.ir.Unit;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MocPackage;
@@ -73,13 +71,6 @@ import org.eclipse.emf.ecore.impl.EPackageImpl;
  * @generated
  */
 public class IrPackageImpl extends EPackageImpl implements IrPackage {
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass entityEClass = null;
-
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -345,13 +336,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass unitEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	private EClass predicateEClass = null;
 
 	/**
@@ -445,42 +429,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		// Update the registry and return the package
 		EPackage.Registry.INSTANCE.put(IrPackage.eNS_URI, theIrPackage);
 		return theIrPackage;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getEntity() {
-		return entityEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getEntity_FileName() {
-		return (EAttribute)entityEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getEntity_LineNumber() {
-		return (EAttribute)entityEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getEntity_Name() {
-		return (EAttribute)entityEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -1523,33 +1471,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getUnit() {
-		return unitEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getUnit_Procedures() {
-		return (EReference)unitEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getUnit_Constants() {
-		return (EReference)unitEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EEnum getOpBinary() {
 		return opBinaryEEnum;
 	}
@@ -1592,15 +1513,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		isCreated = true;
 
 		// Create classes and their features
-		entityEClass = createEClass(ENTITY);
-		createEAttribute(entityEClass, ENTITY__FILE_NAME);
-		createEAttribute(entityEClass, ENTITY__LINE_NUMBER);
-		createEAttribute(entityEClass, ENTITY__NAME);
-
-		unitEClass = createEClass(UNIT);
-		createEReference(unitEClass, UNIT__CONSTANTS);
-		createEReference(unitEClass, UNIT__PROCEDURES);
-
 		procedureEClass = createEClass(PROCEDURE);
 		createEAttribute(procedureEClass, PROCEDURE__LINE_NUMBER);
 		createEReference(procedureEClass, PROCEDURE__LOCALS);
@@ -1792,7 +1704,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		// Set bounds for type parameters
 
 		// Add supertypes to classes
-		unitEClass.getESuperTypes().add(this.getEntity());
 		nodeBlockEClass.getESuperTypes().add(this.getNode());
 		nodeIfEClass.getESuperTypes().add(this.getNode());
 		nodeWhileEClass.getESuperTypes().add(this.getNode());
@@ -1822,15 +1733,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		typeVoidEClass.getESuperTypes().add(this.getType());
 
 		// Initialize classes and features; add operations and parameters
-		initEClass(entityEClass, Entity.class, "Entity", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getEntity_FileName(), theEcorePackage.getEString(), "fileName", null, 0, 1, Entity.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getEntity_LineNumber(), ecorePackage.getEInt(), "lineNumber", null, 0, 1, Entity.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getEntity_Name(), theEcorePackage.getEString(), "name", null, 0, 1, Entity.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-		initEClass(unitEClass, Unit.class, "Unit", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getUnit_Constants(), this.getVar(), null, "constants", null, 0, -1, Unit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getUnit_Procedures(), this.getProcedure(), null, "procedures", null, 0, -1, Unit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
 		initEClass(procedureEClass, Procedure.class, "Procedure", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getProcedure_LineNumber(), ecorePackage.getEInt(), "lineNumber", null, 0, 1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getProcedure_Locals(), this.getVar(), null, "locals", null, 0, -1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

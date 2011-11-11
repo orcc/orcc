@@ -92,6 +92,15 @@ public interface DfFactory extends EFactory {
 	 */
 	Argument createArgument();
 
+	/**
+	 * Returns a new object of class '<em>Unit</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Unit</em>'.
+	 * @generated
+	 */
+	Unit createUnit();
+
 	Argument createArgument(Var variable, Expression value);
 
 	/**

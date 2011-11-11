@@ -34,8 +34,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.ir.Def;
-import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;

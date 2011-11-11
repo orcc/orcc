@@ -17,7 +17,6 @@ import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.impl.EntityImpl;
 import net.sf.orcc.ir.util.MapAdapter;
 import net.sf.orcc.moc.MoC;
 

@@ -40,6 +40,7 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.Transitions;
+import net.sf.orcc.df.Unit;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.ExprString;
@@ -57,7 +58,6 @@ import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
-import net.sf.orcc.ir.Unit;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.util.OrccUtil;
 

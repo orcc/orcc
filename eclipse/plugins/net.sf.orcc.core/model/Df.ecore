@@ -3,7 +3,7 @@
     xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="df"
     nsURI="http://orcc.sf.net/model/2011/Df" nsPrefix="net.sf.orcc.df">
-  <eClassifiers xsi:type="ecore:EClass" name="Network" eSuperTypes="Ir.ecore#//Entity">
+  <eClassifiers xsi:type="ecore:EClass" name="Network" eSuperTypes="#//Entity">
     <eStructuralFeatures xsi:type="ecore:EReference" name="inputs" upperBound="-1"
         eType="#//Port" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="moC" eType="ecore:EClass MoC.ecore#//MoC"
@@ -76,7 +76,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="tag" eType="#//Tag" containment="true"
         resolveProxies="false"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Actor" eSuperTypes="Ir.ecore#//Entity">
+  <eClassifiers xsi:type="ecore:EClass" name="Actor" eSuperTypes="#//Entity">
     <eStructuralFeatures xsi:type="ecore:EReference" name="actions" upperBound="-1"
         eType="#//Action" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="actionsOutsideFsm" upperBound="-1"
@@ -158,5 +158,16 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="ecore:EClass Ir.ecore#//Expression"
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="variable" eType="ecore:EClass Ir.ecore#//Var"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Entity" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fileName" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="lineNumber" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Unit" eSuperTypes="#//Entity">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="constants" upperBound="-1"
+        eType="ecore:EClass Ir.ecore#//Var" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="procedures" upperBound="-1"
+        eType="ecore:EClass Ir.ecore#//Procedure" containment="true" resolveProxies="false"/>
   </eClassifiers>
 </ecore:EPackage>

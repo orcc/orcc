@@ -4,13 +4,13 @@
  *
  * $Id$
  */
-package net.sf.orcc.ir.impl;
+package net.sf.orcc.df.impl;
 
 import java.util.Collection;
 
-import net.sf.orcc.ir.IrPackage;
+import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.Unit;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Unit;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -26,8 +26,8 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.ir.impl.UnitImpl#getConstants <em>Constants</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.UnitImpl#getProcedures <em>Procedures</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.UnitImpl#getConstants <em>Constants</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.UnitImpl#getProcedures <em>Procedures</em>}</li>
  * </ul>
  * </p>
  *
@@ -67,9 +67,9 @@ public class UnitImpl extends EntityImpl implements Unit {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.UNIT__CONSTANTS:
+			case DfPackage.UNIT__CONSTANTS:
 				return getConstants();
-			case IrPackage.UNIT__PROCEDURES:
+			case DfPackage.UNIT__PROCEDURES:
 				return getProcedures();
 		}
 		return super.eGet(featureID, resolve, coreType);
@@ -83,9 +83,9 @@ public class UnitImpl extends EntityImpl implements Unit {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrPackage.UNIT__CONSTANTS:
+			case DfPackage.UNIT__CONSTANTS:
 				return ((InternalEList<?>)getConstants()).basicRemove(otherEnd, msgs);
-			case IrPackage.UNIT__PROCEDURES:
+			case DfPackage.UNIT__PROCEDURES:
 				return ((InternalEList<?>)getProcedures()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
@@ -98,9 +98,9 @@ public class UnitImpl extends EntityImpl implements Unit {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.UNIT__CONSTANTS:
+			case DfPackage.UNIT__CONSTANTS:
 				return constants != null && !constants.isEmpty();
-			case IrPackage.UNIT__PROCEDURES:
+			case DfPackage.UNIT__PROCEDURES:
 				return procedures != null && !procedures.isEmpty();
 		}
 		return super.eIsSet(featureID);
@@ -114,11 +114,11 @@ public class UnitImpl extends EntityImpl implements Unit {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.UNIT__CONSTANTS:
+			case DfPackage.UNIT__CONSTANTS:
 				getConstants().clear();
 				getConstants().addAll((Collection<? extends Var>)newValue);
 				return;
-			case IrPackage.UNIT__PROCEDURES:
+			case DfPackage.UNIT__PROCEDURES:
 				getProcedures().clear();
 				getProcedures().addAll((Collection<? extends Procedure>)newValue);
 				return;
@@ -132,7 +132,7 @@ public class UnitImpl extends EntityImpl implements Unit {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return IrPackage.Literals.UNIT;
+		return DfPackage.Literals.UNIT;
 	}
 
 	/**
@@ -142,10 +142,10 @@ public class UnitImpl extends EntityImpl implements Unit {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.UNIT__CONSTANTS:
+			case DfPackage.UNIT__CONSTANTS:
 				getConstants().clear();
 				return;
-			case IrPackage.UNIT__PROCEDURES:
+			case DfPackage.UNIT__PROCEDURES:
 				getProcedures().clear();
 				return;
 		}
@@ -158,7 +158,7 @@ public class UnitImpl extends EntityImpl implements Unit {
 	 */
 	public EList<Var> getConstants() {
 		if (constants == null) {
-			constants = new EObjectContainmentEList<Var>(Var.class, this, IrPackage.UNIT__CONSTANTS);
+			constants = new EObjectContainmentEList<Var>(Var.class, this, DfPackage.UNIT__CONSTANTS);
 		}
 		return constants;
 	}
@@ -169,7 +169,7 @@ public class UnitImpl extends EntityImpl implements Unit {
 	 */
 	public EList<Procedure> getProcedures() {
 		if (procedures == null) {
-			procedures = new EObjectContainmentEList<Procedure>(Procedure.class, this, IrPackage.UNIT__PROCEDURES);
+			procedures = new EObjectContainmentEList<Procedure>(Procedure.class, this, DfPackage.UNIT__PROCEDURES);
 		}
 		return procedures;
 	}

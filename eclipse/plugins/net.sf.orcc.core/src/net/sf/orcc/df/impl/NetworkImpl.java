@@ -50,7 +50,6 @@ import net.sf.orcc.df.transformations.NetworkClassifier;
 import net.sf.orcc.df.transformations.NetworkFlattener;
 import net.sf.orcc.df.util.DfAdapterFactory;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.impl.EntityImpl;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.tools.merger.ActorMerger;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;

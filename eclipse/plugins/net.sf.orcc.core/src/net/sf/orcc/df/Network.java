@@ -31,7 +31,6 @@ package net.sf.orcc.df;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.Entity;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
 

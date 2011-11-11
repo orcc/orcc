@@ -9,6 +9,7 @@ package net.sf.orcc.df.impl;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.df.*;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
@@ -113,6 +114,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 			case DfPackage.PORT_TO_VAR_MAP_ENTRY: return (EObject)createPortToVarMapEntry();
 			case DfPackage.VAR_TO_PORT_MAP_ENTRY: return (EObject)createVarToPortMapEntry();
 			case DfPackage.ARGUMENT: return createArgument();
+			case DfPackage.UNIT: return createUnit();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -170,6 +172,16 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	public Argument createArgument() {
 		ArgumentImpl argument = new ArgumentImpl();
 		return argument;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Unit createUnit() {
+		UnitImpl unit = new UnitImpl();
+		return unit;
 	}
 
 	@Override
