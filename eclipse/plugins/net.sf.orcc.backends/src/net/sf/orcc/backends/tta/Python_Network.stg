@@ -17,7 +17,7 @@ initPorts(instance) ::= <<
 <instance.id>_outputs = [<instance.actor.outputs: port(); separator=", ">]<
 elseif(instance.broadcast)
 ><instance.id>_inputs = [<port(instance.broadcast.input)>]
-<instance.id>_outputs = [<instance.broadcast.outputs.list: port(); separator=", ">]<
+<instance.id>_outputs = [<instance.broadcast.outputs: port(); separator=", ">]<
 endif>
 >>
 

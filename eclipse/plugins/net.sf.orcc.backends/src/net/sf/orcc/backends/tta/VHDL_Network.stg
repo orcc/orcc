@@ -93,13 +93,13 @@ endif>
 ///////////////////////////////////////////////////////////////////////////////
 
 signals(network) ::= <<
-<network.instances: { instance | <instanceSignals(instance, network.incomingMap.(instance), network.outgoingMap.(instance))> }; separator="\n\n">
+<network.instances: instanceSignals(); separator="\n\n">
 >>
 
-instanceSignals(instance, incomingMap, outgoingMap) ::= <<
+instanceSignals(instance) ::= <<
 -- Instance: <instance.id> 
-<incomingMap.keys: { port | <inputPortSignals(port, incomingMap.(port))> }; separator="\n">
-<outgoingMap.keys: { port | <outputPortSignals(port, first(outgoingMap.(port)))> }; separator="\n">
+<instance.incomingPortMap.keys: { port | <inputPortSignals(port, instance.incomingPortMap.(port))> }; separator="\n">
+<instance.outgoingPortMap.keys: { port | <outputPortSignals(port, first(instance.outgoingPortMap.(port)))> }; separator="\n">
 >>
 
 inputPortSignals(port, connection) ::= <<
@@ -125,7 +125,7 @@ endif>
 >>
 
 indexConnection(connection) ::= <<
-<network.connectionMap.(connection)>
+<connection.id>
 >>
 
 
@@ -139,9 +139,9 @@ assignNetworkPorts(network) ::= <<
 
 assignNetworkPort(connection) ::= <<
 <if(!connection.source)>
-<network.sourceMap.(connection).port.name> \<= s_<indexConnection(connection)>;
+<connection.sourcePort.name> \<= s_<indexConnection(connection)>;
 <elseif(!connection.target)>
-<network.targetMap.(connection).port.name> \<= s_<indexConnection(connection)>;
+<connection.targetPort.name> \<= s_<indexConnection(connection)>;
 <endif>
 >>
 
@@ -153,13 +153,13 @@ assignFifo(connection) ::= <<
 <if(!connection.source.native && !connection.target.native)>
 fifo_<indexConnection(connection)> : entity work.fifo
   generic map(width =\> 32)
-  port map(wrreq   =\> fifo_<indexConnection(connection)>_wrreq,
-           rst_n     =\> rst_n,
-           clk     =\> clk,
+  port map(clk     =\> clk,
            rdreq   =\> fifo_<indexConnection(connection)>_rdreq,
            data    =\> fifo_<indexConnection(connection)>_data(31 downto 0),
            q       =\> fifo_<indexConnection(connection)>_q(31 downto 0),
-           status  =\> fifo_<indexConnection(connection)>_status);
+           status  =\> fifo_<indexConnection(connection)>_status,
+           wrreq   =\> fifo_<indexConnection(connection)>_wrreq,
+           rst_n     =\> rst_n);
            
 <endif>
 >>
@@ -175,7 +175,7 @@ assignInstance(instance) ::= <<
 <endif>
   port map(clk          =\> clk,
            <assignPorts(instance)>
-           rst_n          =\> rst_n);
+           rst_n        =\> rst_n);
 >>
 
 assignGenerics(instance) ::= <<
@@ -187,8 +187,8 @@ assignPorts(instance) ::= <<
 ><instance.actor.inputs: assignInputPort(); separator="\n">
 <instance.actor.outputs: assignOutputPort(); separator="\n"><
 elseif(instance.broadcast)
-><instance.broadcast.inputs.list: assignInputPort(); separator="\n">
-<instance.broadcast.outputs.list: assignOutputPort(); separator="\n"><
+><instance.broadcast.inputs: assignInputPort(); separator="\n">
+<instance.broadcast.outputs: assignOutputPort(); separator="\n"><
 endif>
 >>
 
