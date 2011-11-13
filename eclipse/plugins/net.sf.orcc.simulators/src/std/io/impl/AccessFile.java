@@ -91,6 +91,7 @@ public class AccessFile extends GenericSource {
 
 	public static void readBytes(Integer desc, byte buf[], Integer count) {
 		if (SimulatorDescriptor.contains(desc)) {
+			@SuppressWarnings("resource")
 			RandomAccessFile raf = randomAccessFiles.get(desc);
 			try {
 				for (int i = 0; i < count; i++) {
@@ -116,6 +117,7 @@ public class AccessFile extends GenericSource {
 
 	public static void writeBytes(Integer desc, byte buf[], Integer count) {
 		if (SimulatorDescriptor.contains(desc)) {
+			@SuppressWarnings("resource")
 			RandomAccessFile raf = randomAccessFiles.get(desc);
 			try {
 				for (int i = 0; i < count; i++) {

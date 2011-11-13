@@ -31,4 +31,5 @@ Export-Package: net.sf.orcc.cache,
  net.sf.orcc.cal.services,
  net.sf.orcc.cal.util,
  net.sf.orcc.cal.validation,
- net.sf.orcc.frontend
+ net.sf.orcc.frontend,
+ net.sf.orcc.cal.formatting
