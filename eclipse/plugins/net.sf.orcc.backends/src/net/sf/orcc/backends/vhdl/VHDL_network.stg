@@ -26,8 +26,8 @@ printNetworkPorts(network) ::= <<
 //////////////////////////////////////////////////////////////////////////////
 // Print signals
 //////////////////////////////////////////////////////////////////////////////
-tryPrintSignals(outgoingMap) ::= <<
-<outgoingMap.keys: {instance | <checkInstanceType(instance)>}>
+tryPrintSignals(network) ::= <<
+<network.instances: checkInstanceType(); separator="\n\n"> 
 >>
 
 checkInstanceType(instance) ::= <<
@@ -48,47 +48,24 @@ endif>
 
 printSignals(inputs, outputs) ::= <<
 <if(!inputs.empty)
-><network.incomingMap.(instance).values: printInSignals()><
-endif><
-if(!outputs.empty)
-><outgoingMap.(instance).values: {connections|<connections:{connection | <printOutSignals(connection=connection, map=network.successorsMap.(instance))>}>}><
+><instance.incomingPortMap.keys: { port | <inputPortSignals(port, instance.incomingPortMap.(port))> }; separator="\n"><
 endif>
 >>
 
-// print internal signals when necessary
-printInSignals(connection) ::= <<
-<if (instance.broadcast)
->
-<broadcastType(connection=connection, name=instance.id, direction="fromBroad")>
-<
-endif>
-<printInSignal(connection=connection, map=network.predecessorsMap.(instance))>
->>
-
-printInSignal(connection, map) ::= <<
-<if(map.(connection.target))
-><SignalType(instance=instance, port=connection.target, dataType="data")>
-signal <instance.id>_<connection.target.name>_send   : std_logic;
-signal <instance.id>_<connection.target.name>_ack    : std_logic;
-<endif>
->>
-
-printOutSignals(connection, map) ::= <<
-<if (instance.broadcast)
-><
+inputPortSignals(port, connection) ::= <<
+<if(connection.sourcePort)
+><if(port.native)
+><SignalType(instance=instance, port=port, dataType="")><
 else
-><printOutSignal(connection=connection, map=map)><
+><SignalType(instance=instance, port=port, dataType="data")>
+signal <instance.id>_<port.name>_send   : std_logic;
+signal <instance.id>_<port.name>_ack    : std_logic;<
+endif><
+endif><
+if (instance.broadcast)
+><broadcastType(connection=connection, name=instance.id, direction="fromBroad")><
 endif>
 >>
-
-printOutSignal(connection, map) ::= <<
-<if(map.(connection.source) && connection.attributes)
-><SignalType(instance=instance, port=connection.source, dataType="data")>
-signal <instance.id>_<connection.source.name>_send   : std_logic;
-signal <instance.id>_<connection.source.name>_ack    : std_logic;
-<endif>
->>
-
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -149,6 +126,7 @@ endif>
 ///////////////////////////////////////////////////////////////////////////////
 PrintNetworksAndActors(outgoingMap) ::= <<
 <outgoingMap.keys: {instance | <checkNetworkOrActors(instance=instance)>}>
+<network.instances: checkNetworkOrActors()>
 >>
 
 checkNetworkOrActors(instance) ::= <<
@@ -159,7 +137,7 @@ checkNetworkOrActors(instance) ::= <<
                  
                  <
 elseif (instance.network)
-><printInstances(name=instance.network.name,
+><printInstances(name=instance.network.simpleName,
 				 inputs=instance.network.inputs,
                  outputs=instance.network.outputs)>
                  
@@ -173,7 +151,11 @@ printInstances(name, inputs, outputs) ::= <<
   port map (
 <if(!inputs.empty)
 >
-    <network.incomingMap.(instance).values: {connection | <printInputs(connection=connection, portPredMap=network.predecessorsMap.(instance), 
+
+    <instance.incomingPortMap.keys: { port | <printInstanceInputs(port, instance.incomingPortMap.(port))> }; separator="\n">
+
+    
+    <network.incomingMap.(instance): {connection | <printInputs(connection=connection, portPredMap=network.predecessorsMap.(instance), 
 															srcVertex=network.sourceMap.(connection))>}; separator="\n">
 <
 endif><
@@ -194,8 +176,17 @@ endif>
  * portPredMap: a map that associates each port of an instance to the predecessor of this port
  * srcVertex: contain the source of the connection (e.g. a port of the network)
  * 
- */ 
+ */
+ printInstanceInputs(port, connection) ::= <<
+<connection>
+
+>>
+ 
+  
 printInputs(connection, portPredMap, srcVertex) ::= <<
+<connection>
+<portPredMap>
+<srcVertex>
 <if(!connection.target.native)
 ><if(portPredMap.(connection.target))
 ><if(portPredMap.(connection.target).broadcast)
@@ -349,10 +340,10 @@ endif>
 ///////////////////////////////////////////////////////////////////////////////
 network(network, options) ::= <<
 -------------------------------------------------------------------------------
--- Title      : Configuration: <network.name>
+-- Title      : Configuration: <network.simpleName>
 -- Project    : 
 -------------------------------------------------------------------------------
--- File       : <network.name>.vhd
+-- File       : <network.simpleName>.vhd
 -- Author     : Orcc - VHDL
 -- Company    : 
 -- Created    : 
@@ -372,21 +363,21 @@ use ieee.numeric_std.all;
 
 
 ------------------------------------------------------------------------------
-entity <network.name> is
+entity <network.simpleName> is
   port (
     clock    : in  std_logic;
     reset_n  : in  std_logic;
     <printNetworkPorts(network)>);  
-end <network.name>;
+end <network.simpleName>;
 
 
 ------------------------------------------------------------------------------
-architecture rtl_<network.name> of <network.name> is
+architecture rtl_<network.simpleName> of <network.simpleName> is
 
   ---------------------------------------------------------------------------
   -- Signals declaration
   ---------------------------------------------------------------------------
-  <tryPrintSignals(network.outgoingMap); separator="\n">
+  <tryPrintSignals(network); separator="\n">
   ---------------------------------------------------------------------------
 
 begin
@@ -402,6 +393,6 @@ begin
   <assignFifos(network.connections)>
   ---------------------------------------------------------------------------
 
-end architecture rtl_<network.name>;
+end architecture rtl_<network.simpleName>;
 
 >>

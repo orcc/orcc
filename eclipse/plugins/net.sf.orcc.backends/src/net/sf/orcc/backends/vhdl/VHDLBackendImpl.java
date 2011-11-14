@@ -324,11 +324,11 @@ public class VHDLBackendImpl extends AbstractBackend {
 		networkPrinter.setTypePrinter(new VHDLTypePrinter());
 		networkPrinter.getOptions().put("fifoSize", fifoSize);
 
-		networkPrinter.print(network.getName() + ".vhd", path + File.separator
+		networkPrinter.print(network.getSimpleName() + ".vhd", path + File.separator
 				+ "Design", network);
 
 		for (Network subNetwork : network.getNetworks()) {
-			networkPrinter.print(subNetwork.getName() + ".vhd", path
+			networkPrinter.print(subNetwork.getSimpleName() + ".vhd", path
 					+ File.separator + "Design", subNetwork);
 		}
 	}
