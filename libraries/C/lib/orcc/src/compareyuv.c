@@ -74,8 +74,16 @@ static int compareYUV_compareComponent(const int x_size, const int y_size,
 						error++;
 						if (error < 50)
 						{
-							printf("\nerror %3d instead of %3d at position : mb = (%d ; %d) , loc_in_mb = (%d ; %d)",
-								test_img_uchar[Idx_pix] , true_img_uchar[Idx_pix], blk_x, blk_y, pix_x, pix_y);
+							const unsigned int blkIdxX = pix_x*4 / SizeMbSide;
+							const unsigned int blkIdxY = pix_y*4 / SizeMbSide;
+							const unsigned int inverse4x4Tab[16] =
+								{0, 1, 4, 5, 2, 3, 6, 7, 8, 9,
+								12, 13, 10, 11, 14, 15};
+							const unsigned int blkIdx = inverse4x4Tab[blkIdxX +
+								4*blkIdxY];
+							printf("\nerror %3d instead of %3d at position : mb=(%d;%d) , loc_in_mb=(%d;%d) , blk: %d",
+								test_img_uchar[Idx_pix] , true_img_uchar
+								[Idx_pix], blk_x, blk_y, pix_x, pix_y, blkIdx);
 						}
 					}
 				}
