@@ -164,6 +164,8 @@ if(!outputs.empty)
     <outgoingMap.(instance).values:
     	{connections| <connections:{connection | <printOutputs(connection=connection, portSuccMap=network.successorsMap.(instance), 
 															tgtVertex=network.targetMap.(connection))>}; separator="\n">}; separator="\n">
+
+    <instance.outgoingPortMap.keys: { port | <printInstanceOutputs(port, instance.outgoingPortMap.(port))> }; separator="\n">
 <
 endif>
     clock     =\> clock, 
@@ -178,11 +180,31 @@ endif>
  * 
  */
  printInstanceInputs(port, connection) ::= <<
-<connection>
-
+ <if(connection.sourcePort.name)
+ ><port.name>_data =\> <instance.id>_<port.name>_data,
+<port.name>_send =\> <instance.id>_<port.name>_send,
+<port.name>_ack =\> <instance.id>_<port.name>_ack,<
+else
+>port <port.name> connected to network (TODO)<
+endif>
 >>
  
   
+ printInstanceOutputs(port, connection) ::= <<
+ <if(connection.sourcePort.name)
+ ><port.name>_data =\> <instance.id>_<port.name>_data,
+<port.name>_send =\> <instance.id>_<port.name>_send,
+<port.name>_ack =\> <instance.id>_<port.name>_ack,<
+else
+>port <port.name>
+<connection>
+sourcePort <connection.sourcePort.name>
+targetPort <connection.targetPort.name><
+endif>
+
+>>  
+
+
 printInputs(connection, portPredMap, srcVertex) ::= <<
 <connection>
 <portPredMap>
