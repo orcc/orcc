@@ -124,8 +124,7 @@ endif>
 ///////////////////////////////////////////////////////////////////////////////
 // print actors and networks instantiation
 ///////////////////////////////////////////////////////////////////////////////
-PrintNetworksAndActors(outgoingMap) ::= <<
-<outgoingMap.keys: {instance | <checkNetworkOrActors(instance=instance)>}>
+PrintNetworksAndActors(network) ::= <<
 <network.instances: checkNetworkOrActors()>
 >>
 
@@ -150,22 +149,16 @@ printInstances(name, inputs, outputs) ::= <<
 <instance.id> : entity work.<name>
   port map (
 <if(!inputs.empty)
->
-
-    <instance.incomingPortMap.keys: { port | <printInstanceInputs(port, instance.incomingPortMap.(port))> }; separator="\n">
-
-    
-    <network.incomingMap.(instance): {connection | <printInputs(connection=connection, portPredMap=network.predecessorsMap.(instance), 
-															srcVertex=network.sourceMap.(connection))>}; separator="\n">
-<
+><instance.incomingPortMap.keys: { port | <printInstanceInputs(port, instance.incomingPortMap.(port))> }; separator="\n"><
 endif><
 if(!outputs.empty)
 >
-    <outgoingMap.(instance).values:
+    <instance.outgoingMap.(instance).values:
     	{connections| <connections:{connection | <printOutputs(connection=connection, portSuccMap=network.successorsMap.(instance), 
 															tgtVertex=network.targetMap.(connection))>}; separator="\n">}; separator="\n">
 
     <instance.outgoingPortMap.keys: { port | <printInstanceOutputs(port, instance.outgoingPortMap.(port))> }; separator="\n">
+
 <
 endif>
     clock     =\> clock, 
@@ -181,62 +174,30 @@ endif>
  */
  printInstanceInputs(port, connection) ::= <<
  <if(connection.sourcePort.name)
- ><port.name>_data =\> <instance.id>_<port.name>_data,
-<port.name>_send =\> <instance.id>_<port.name>_send,
-<port.name>_ack =\> <instance.id>_<port.name>_ack,<
+ >   <port.name>_data   =\> <instance.id>_<port.name>_data,
+   <port.name>_send   =\> <instance.id>_<port.name>_send,
+   <port.name>_ack    =\> <instance.id>_<port.name>_ack,<
 else
->port <port.name> connected to network (TODO)<
+>   <port.name>_data   =\> <connection.source.name>_data,
+   <port.name>_send   =\> <connection.source.name>_send,
+   <port.name>_ack    =\> <connection.source.name>_ack,<
 endif>
 >>
- 
   
  printInstanceOutputs(port, connection) ::= <<
+port <port.name>
+<connection>
+sourcePort <connection.sourcePort.name>
+targetPort <connection.targetPort.name>
  <if(connection.sourcePort.name)
  ><port.name>_data =\> <instance.id>_<port.name>_data,
 <port.name>_send =\> <instance.id>_<port.name>_send,
 <port.name>_ack =\> <instance.id>_<port.name>_ack,<
 else
->port <port.name>
-<connection>
-sourcePort <connection.sourcePort.name>
-targetPort <connection.targetPort.name><
+><
 endif>
 
 >>  
-
-
-printInputs(connection, portPredMap, srcVertex) ::= <<
-<connection>
-<portPredMap>
-<srcVertex>
-<if(!connection.target.native)
-><if(portPredMap.(connection.target))
-><if(portPredMap.(connection.target).broadcast)
-><connection.target.name>_data     =\> <portPredMap.(connection.target).id>_fromBroad_data,
-<else
-><if(instance.broadcast && connection.target.type.bool)
-><connection.target.name>_data(0)  =\> <instance.id>_<connection.target.name>_data,
-<else
-><connection.target.name>_data     =\> <instance.id>_<connection.target.name>_data,
-<endif>
-<endif><
-if(!connection.target.native)
-><connection.target.name>_send     =\> <instance.id>_<connection.target.name>_send,
-<connection.target.name>_ack      =\> <instance.id>_<connection.target.name>_ack,<
-endif><
-else
-><if(instance.broadcast && connection.target.type.bool)
-><connection.target.name>_data(0)  =\> <srcVertex.port.name>_data,
-<else
-><connection.target.name>_data     =\> <srcVertex.port.name>_data,
-<endif>
-<connection.target.name>_send     =\> <srcVertex.port.name>_send,
-<connection.target.name>_ack      =\> <srcVertex.port.name>_ack,<
-endif><
-else
-><connection.target.name>     =\> <srcVertex.port.name>,<
-endif>
->>
 
 /** Print output connections of an instance according to the maps:
  * 
@@ -291,8 +252,8 @@ broadcast_<name> : entity work.broadcast
     size  =\> <instance.broadcast.numOutputs>)
   port map (
 <if(!inputs.empty)>
-    <network.incomingMap.(instance).values:{connection | <printInputs(connection=connection, portPredMap=network.predecessorsMap.(instance), 
-															srcVertex=network.sourceMap.(connection))>}; separator="\n">
+    <instance.incomingPortMap.keys: { port | <printInstanceInputs(port, instance.incomingPortMap.(port))> }; separator="\n   ">
+
 <endif>
 <if(!outputs.empty)>
 <if(last(outputs).type.bool)
@@ -362,7 +323,7 @@ endif>
 ///////////////////////////////////////////////////////////////////////////////
 network(network, options) ::= <<
 -------------------------------------------------------------------------------
--- Title      : Configuration: <network.simpleName>
+-- Title      : <network.simpleName>
 -- Project    : 
 -------------------------------------------------------------------------------
 -- File       : <network.simpleName>.vhd
@@ -407,7 +368,7 @@ begin
   ---------------------------------------------------------------------------
   -- Actors and Networks instantiation 
   ---------------------------------------------------------------------------
-  <PrintNetworksAndActors(network.outgoingMap)>
+  <PrintNetworksAndActors(network)>
   ---------------------------------------------------------------------------
   -- Broadcast and FIFO instantiation 
   --------------------------------------------------------------------------- 
