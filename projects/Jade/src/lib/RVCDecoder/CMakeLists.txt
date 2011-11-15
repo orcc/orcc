@@ -6,8 +6,10 @@ add_library(RVCDecoder SHARED
 	RVCDecoder.cpp
 	source.c
 	display.c
+	fpsPrint.c
 	compareyuv.c
 	writer.c
+	orcc_util.c
 	orcc_util.h
 	orcc_types.h
  )

@@ -40,6 +40,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "orcc_util.h"
 #include "source.h"
 
 // Start code
@@ -52,6 +53,9 @@ static int nbTokenSend;
 extern int nalState;
 
 extern int* stopVar;
+
+void printSpeed(void) {
+}
 
 // Called before any *_scheduler function.
 void source_init() {
@@ -74,8 +78,21 @@ int source_sizeOfFile() {
 void source_rewind() {
 }
 
+void source_exit(int exitCode) {
+    exit(exitCode);
+}
+
+unsigned int source_getNbLoop(void)
+{
+    return nbLoops;
+}
+
+unsigned int source_readByte(){
+    return 0;
+}
+
 void source_readNBytes(unsigned char *outTable, unsigned short nbTokenToRead){
-	//Set start code
+	// Set start code
 	if(startCodeSize > 0 && nbTokenSend == 0){
 		memcpy(outTable, StartCode, startCodeSize);
 		nbTokenToRead -= startCodeSize;
@@ -83,11 +100,11 @@ void source_readNBytes(unsigned char *outTable, unsigned short nbTokenToRead){
 		outTable += startCodeSize;
 	}
 
-	//Set data
+	// Set data
 	memcpy(outTable, data + nbTokenSend - startCodeSize, nbTokenToRead);
 	nbTokenSend += nbTokenToRead;
 
-	//Stop transfer
+	// Stop transfer
 	if (nbTokenSend == data_length + startCodeSize){
 		nalState = NAL_IS_READ;
 		data_length = 0;
