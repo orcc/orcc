@@ -79,7 +79,6 @@ void source_rewind() {
 }
 
 void source_exit(int exitCode) {
-    exit(exitCode);
 }
 
 unsigned int source_getNbLoop(void)
