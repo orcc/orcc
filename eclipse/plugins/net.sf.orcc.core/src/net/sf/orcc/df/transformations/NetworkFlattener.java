@@ -49,6 +49,8 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  */
 public class NetworkFlattener implements INetworkTransformation {
 
+	private Copier copier;
+
 	public NetworkFlattener() {
 	}
 
@@ -59,12 +61,23 @@ public class NetworkFlattener implements INetworkTransformation {
 	 */
 	private void copySubGraph(Network network, Instance instance) {
 		Network subNetwork = instance.getNetwork();
-		Copier copier = new Copier();
 		network.getInstances()
 				.addAll(copier.copyAll(subNetwork.getInstances()));
-		network.getConnections().addAll(
-				copier.copyAll(subNetwork.getConnections()));
 		copier.copyReferences();
+
+		for (Connection connection : subNetwork.getConnections()) {
+			Vertex source = connection.getSource();
+			Vertex target = connection.getTarget();
+			if (source.isInstance() && target.isInstance()) {
+				Vertex sourceCopy = (Vertex) copier.get(source);
+				Vertex targetCopy = (Vertex) copier.get(target);
+				Connection copy = DfFactory.eINSTANCE.createConnection(
+						sourceCopy, connection.getSourcePort(), targetCopy,
+						connection.getTargetPort(),
+						copier.copyAll(connection.getAttributes()));
+				network.getConnections().add(copy);
+			}
+		}
 	}
 
 	/**
@@ -73,21 +86,21 @@ public class NetworkFlattener implements INetworkTransformation {
 	 * 
 	 * @param network
 	 *            the network
-	 * @param vertex
-	 *            the current vertex
+	 * @param instance
+	 *            the current instance
 	 */
-	private void linkIncomingConnections(Network network, Vertex vertex) {
+	private void linkIncomingConnections(Network network, Instance instance) {
 		List<Connection> incomingEdges = new ArrayList<Connection>(
-				vertex.getIncoming());
+				instance.getIncoming());
 		for (Connection edge : incomingEdges) {
 			Vertex v = (Vertex) edge.getTargetPort();
 			List<Connection> outgoingEdges = v.getOutgoing();
 
 			for (Connection newEdge : outgoingEdges) {
+				Vertex target = (Vertex) copier.get(newEdge.getTarget());
 				Connection incoming = DfFactory.eINSTANCE.createConnection(
-						edge.getSource(), edge.getSourcePort(),
-						newEdge.getTarget(), newEdge.getTargetPort(),
-						edge.getAttributes());
+						edge.getSource(), edge.getSourcePort(), target,
+						newEdge.getTargetPort(), edge.getAttributes());
 				network.getConnections().add(incoming);
 			}
 		}
@@ -99,21 +112,21 @@ public class NetworkFlattener implements INetworkTransformation {
 	 * 
 	 * @param network
 	 *            the network
-	 * @param vertex
-	 *            the current vertex
+	 * @param instance
+	 *            the current instance
 	 */
-	private void linkOutgoingConnections(Network network, Vertex vertex) {
+	private void linkOutgoingConnections(Network network, Instance instance) {
 		List<Connection> outgoingEdges = new ArrayList<Connection>(
-				vertex.getOutgoing());
+				instance.getOutgoing());
 		for (Connection edge : outgoingEdges) {
 			Vertex v = edge.getSourcePort();
 			List<Connection> incomingEdges = v.getIncoming();
 
 			for (Connection newEdge : incomingEdges) {
+				Vertex source = (Vertex) copier.get(newEdge.getSource());
 				Connection incoming = DfFactory.eINSTANCE.createConnection(
-						newEdge.getSource(), newEdge.getSourcePort(),
-						edge.getTarget(), edge.getTargetPort(),
-						edge.getAttributes());
+						source, newEdge.getSourcePort(), edge.getTarget(),
+						edge.getTargetPort(), edge.getAttributes());
 				network.getConnections().add(incoming);
 			}
 		}
@@ -131,9 +144,11 @@ public class NetworkFlattener implements INetworkTransformation {
 				subNetwork.flatten();
 
 				// copy vertices and edges
+				copier = new Copier();
 				copySubGraph(network, instance);
 				linkOutgoingConnections(network, instance);
 				linkIncomingConnections(network, instance);
+				copier = null;
 
 				// remove instance from network
 				network.getInstances().remove(instance);

@@ -6,6 +6,7 @@
  */
 package net.sf.orcc.df;
 
+import java.util.Collection;
 import java.util.List;
 
 import net.sf.orcc.ir.Expression;
@@ -192,7 +193,7 @@ public interface DfFactory extends EFactory {
 	 *            attributes to associate with the new connection
 	 */
 	Connection createConnection(Vertex source, Port sourcePort, Vertex target,
-			Port targetPort, List<Attribute> attributes);
+			Port targetPort, Collection<Attribute> attributes);
 
 	/**
 	 * Returns a new object of class '<em>FSM</em>'.

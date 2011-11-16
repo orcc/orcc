@@ -137,21 +137,19 @@ doAssignFifo(instance, port, count) ::= <<
 <if(instance.actor || instance.broadcast)>struct fifo_<port.type>_s *<GetInstanceId(instance)>_<port.name> = &fifo_<count>;<endif>
 >>
 
+tryAssignFifoSrc(edge) ::= <<
+<if (edge.source.instance && edge.target.instance)>
+<doAssignFifo(edge.source, edge.sourcePort, edge.idNoBcast)><endif>
+>>
+
 tryAssignFifoTgt(edge) ::= <<
 <if (edge.source.instance && edge.target.instance)>
 <doAssignFifo(edge.target, edge.targetPort, edge.idNoBcast)><endif>
 >>
 
-tryAssignFifoSrc(edge, src, tgt) ::= <<
-<if (src.instance && tgt.instance)>
-<doAssignFifo(
-  src.instance, edge.source,
-  edge.idNoBcast)><endif>
->>
-
 assignFifosN(edges, readers_nb) ::= <<
 
-<tryAssignFifoSrc(first(edges), (first(edges)).source, (first(edges)).target)>
+<tryAssignFifoSrc(first(edges))>
 <edges: {edge | <tryAssignFifoTgt(edge)> }>
 
 >>

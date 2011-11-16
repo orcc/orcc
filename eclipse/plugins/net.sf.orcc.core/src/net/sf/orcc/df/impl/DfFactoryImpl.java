@@ -6,10 +6,10 @@
  */
 package net.sf.orcc.df.impl;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.df.*;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
@@ -27,6 +27,7 @@ import net.sf.orcc.df.State;
 import net.sf.orcc.df.Tag;
 import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.Transitions;
+import net.sf.orcc.df.Unit;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.WrapperString;
 import net.sf.orcc.df.WrapperXml;
@@ -269,7 +270,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 
 	@Override
 	public Connection createConnection(Vertex source, Port sourcePort,
-			Vertex target, Port targetPort, List<Attribute> attributes) {
+			Vertex target, Port targetPort, Collection<Attribute> attributes) {
 		Connection connection = createConnection(source, sourcePort, target,
 				targetPort);
 		connection.getAttributes().addAll(EcoreUtil.copyAll(attributes));

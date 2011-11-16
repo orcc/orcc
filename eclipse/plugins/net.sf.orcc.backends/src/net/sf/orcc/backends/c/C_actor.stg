@@ -668,7 +668,7 @@ extern struct actor_s <instance.id>;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Successors
-<instance.actor.outputs: { port | <instance.outgoingPortMap.(port): { successor | extern struct actor_s <successor.id>;}; separator="\n">}; separator="\n">
+<instance.actor.outputs: { port | <instance.outgoingPortMap.(port): { successor | extern struct actor_s <successor.target.id>;}; separator="\n">}; separator="\n">
 
 ////////////////////////////////////////////////////////////////////////////////
 // Input FIFOs Id
