@@ -50,7 +50,7 @@ public class HierarchyComputer implements INetworkTransformation {
 		instances = new ArrayList<Instance>();
 	}
 
-	public HierarchyComputer(List<Instance> instances, Instance instance) {
+	private HierarchyComputer(List<Instance> instances, Instance instance) {
 		this.instances = new ArrayList<Instance>(instances);
 		this.instances.add(instance);
 	}

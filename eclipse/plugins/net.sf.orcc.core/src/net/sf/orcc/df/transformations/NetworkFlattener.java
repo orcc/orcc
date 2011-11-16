@@ -141,7 +141,7 @@ public class NetworkFlattener implements INetworkTransformation {
 				Network subNetwork = instance.getNetwork();
 
 				// flatten this sub-network
-				subNetwork.flatten();
+				new NetworkFlattener().transform(subNetwork);
 
 				// copy vertices and edges
 				copier = new Copier();
@@ -154,8 +154,6 @@ public class NetworkFlattener implements INetworkTransformation {
 				network.getInstances().remove(instance);
 			}
 		}
-
-		// TODO renaming if necessary
 	}
 
 }
