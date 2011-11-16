@@ -272,7 +272,7 @@ int is_timeout(){
 
 printInitialize(instance) ::= <<
 <if(instance.actor)>
-<instance.id>_initialize(<instance.actor.inputs: { port | <instance.incomingPortMap.(port).fifoId>}; separator=",">);<
+<instance.id>_initialize(<instance.actor.inputs: { port | <if (instance.incomingPortMap.(port))><instance.incomingPortMap.(port).fifoId><else>-1<endif>}; separator=",">);<
 endif>
 >>
 

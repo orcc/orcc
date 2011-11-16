@@ -579,8 +579,8 @@ static char *stateNames[] = {
 static enum states _FSM_state;
 >>
 
-parameters(parameters) ::= <<
-<parameters.keys: {name|<printInstanceParameter(name, parameters.(name))>}>
+parameters(arguments) ::= <<
+<arguments: {argument|<printInstanceParameter(argument.variable.name, argument.value)>}>
 >>
 
 printInstanceParameter(name, value) ::= <<
@@ -676,7 +676,7 @@ extern struct actor_s <instance.id>;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Parameter values of the instance
-<parameters(instance.parameters)>
+<parameters(instance.arguments)>
 ////////////////////////////////////////////////////////////////////////////////
 // State variables of the actor
 <instance.actor.stateVars: stateVar()>
