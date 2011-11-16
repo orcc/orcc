@@ -52,6 +52,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
+import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
@@ -112,6 +113,16 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 * @ordered
 	 */
 	protected EList<Argument> arguments;
+
+	/**
+	 * The cached value of the '{@link #getHierarchy() <em>Hierarchy</em>}' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getHierarchy()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Instance> hierarchy;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -275,30 +286,16 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	}
 
 	/**
-	 * Returns the path of classes from the top-level to this instance.
-	 * 
-	 * @return the path of classes from the top-level to this instance
-	 */
-	public List<String> getHierarchicalClass() {
-		List<String> classes = new ArrayList<String>();
-		return classes;
-	}
-
-	/**
 	 * Returns the path of identifiers from the top-level to this instance.
 	 * 
 	 * @return the path of identifiers from the top-level to this instance
 	 */
 	public List<String> getHierarchicalId() {
 		List<String> ids = new ArrayList<String>();
-		ids.add(getId());
-		EObject cter = eContainer();
-		while (cter != null) {
-			if (cter instanceof Network) {
-				ids.add(0, ((Network) cter).getName());
-			}
-			cter = cter.eContainer();
+		for (Instance instance : getHierarchy()) {
+			ids.add(instance.getId());
 		}
+		ids.add(getId());
 		return ids;
 	}
 
@@ -317,6 +314,18 @@ public class InstanceImpl extends VertexImpl implements Instance {
 		}
 
 		return builder.toString();
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Instance> getHierarchy() {
+		if (hierarchy == null) {
+			hierarchy = new EObjectResolvingEList<Instance>(Instance.class, this, DfPackage.INSTANCE__HIERARCHY);
+		}
+		return hierarchy;
 	}
 
 	/**
@@ -419,6 +428,8 @@ public class InstanceImpl extends VertexImpl implements Instance {
 				return getId();
 			case DfPackage.INSTANCE__ARGUMENTS:
 				return getArguments();
+			case DfPackage.INSTANCE__HIERARCHY:
+				return getHierarchy();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -446,6 +457,10 @@ public class InstanceImpl extends VertexImpl implements Instance {
 				getArguments().clear();
 				getArguments().addAll((Collection<? extends Argument>)newValue);
 				return;
+			case DfPackage.INSTANCE__HIERARCHY:
+				getHierarchy().clear();
+				getHierarchy().addAll((Collection<? extends Instance>)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -470,6 +485,9 @@ public class InstanceImpl extends VertexImpl implements Instance {
 			case DfPackage.INSTANCE__ARGUMENTS:
 				getArguments().clear();
 				return;
+			case DfPackage.INSTANCE__HIERARCHY:
+				getHierarchy().clear();
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -490,6 +508,8 @@ public class InstanceImpl extends VertexImpl implements Instance {
 				return ID_EDEFAULT == null ? id != null : !ID_EDEFAULT.equals(id);
 			case DfPackage.INSTANCE__ARGUMENTS:
 				return arguments != null && !arguments.isEmpty();
+			case DfPackage.INSTANCE__HIERARCHY:
+				return hierarchy != null && !hierarchy.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

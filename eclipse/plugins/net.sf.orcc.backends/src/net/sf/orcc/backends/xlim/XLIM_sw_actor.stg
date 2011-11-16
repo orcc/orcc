@@ -792,7 +792,7 @@ printHierarchicalPath(path) ::= <<
 >>
 
 design(instance) ::= <<
-\<!-- /<first(instance.hierarchicalClass)>/<printHierarchicalPath(instance.hierarchicalId)> --\>
+\<!-- /<printHierarchicalPath(instance.hierarchicalId)> --\>
 \<!-- Source file is "<instance.actor.file>" --\>
 \<design name="<instance.id>"\>
 	<actorPorts()>

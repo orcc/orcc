@@ -457,13 +457,22 @@ public interface DfPackage extends EPackage {
 	int INSTANCE__ARGUMENTS = VERTEX_FEATURE_COUNT + 3;
 
 	/**
+	 * The feature id for the '<em><b>Hierarchy</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INSTANCE__HIERARCHY = VERTEX_FEATURE_COUNT + 4;
+
+	/**
 	 * The number of structural features of the '<em>Instance</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INSTANCE_FEATURE_COUNT = VERTEX_FEATURE_COUNT + 4;
+	int INSTANCE_FEATURE_COUNT = VERTEX_FEATURE_COUNT + 5;
 
 	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
@@ -1532,6 +1541,17 @@ public interface DfPackage extends EPackage {
 	EReference getInstance_Arguments();
 
 	/**
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.df.Instance#getHierarchy <em>Hierarchy</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Hierarchy</em>'.
+	 * @see net.sf.orcc.df.Instance#getHierarchy()
+	 * @see #getInstance()
+	 * @generated
+	 */
+	EReference getInstance_Hierarchy();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Broadcast <em>Broadcast</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2545,6 +2565,14 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EReference INSTANCE__ARGUMENTS = eINSTANCE.getInstance_Arguments();
+
+		/**
+		 * The meta object literal for the '<em><b>Hierarchy</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference INSTANCE__HIERARCHY = eINSTANCE.getInstance_Hierarchy();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.BroadcastImpl <em>Broadcast</em>}' class.

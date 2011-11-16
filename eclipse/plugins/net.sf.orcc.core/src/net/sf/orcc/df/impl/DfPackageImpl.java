@@ -495,6 +495,15 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getInstance_Hierarchy() {
+		return (EReference)instanceEClass.getEStructuralFeatures().get(4);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getBroadcast() {
 		return broadcastEClass;
 	}
@@ -1210,6 +1219,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEReference(instanceEClass, INSTANCE__CONTENTS);
 		createEAttribute(instanceEClass, INSTANCE__ID);
 		createEReference(instanceEClass, INSTANCE__ARGUMENTS);
+		createEReference(instanceEClass, INSTANCE__HIERARCHY);
 
 		broadcastEClass = createEClass(BROADCAST);
 		createEReference(broadcastEClass, BROADCAST__INPUTS);
@@ -1371,6 +1381,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		initEReference(getInstance_Contents(), theEcorePackage.getEObject(), null, "contents", null, 0, 1, Instance.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getInstance_Id(), ecorePackage.getEString(), "id", null, 0, 1, Instance.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getInstance_Arguments(), this.getArgument(), null, "arguments", null, 0, -1, Instance.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getInstance_Hierarchy(), this.getInstance(), null, "hierarchy", null, 0, -1, Instance.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(broadcastEClass, Broadcast.class, "Broadcast", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getBroadcast_Inputs(), this.getPort(), null, "inputs", null, 0, -1, Broadcast.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

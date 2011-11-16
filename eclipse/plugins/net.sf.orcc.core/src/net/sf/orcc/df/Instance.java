@@ -78,7 +78,7 @@ public interface Instance extends Vertex {
 	 * @model containment="true"
 	 */
 	public EList<Attribute> getAttributes();
-	
+
 	/**
 	 * Returns the broadcast referenced by this instance.
 	 * 
@@ -103,13 +103,6 @@ public interface Instance extends Vertex {
 	IFile getFile();
 
 	/**
-	 * Returns the path of classes from the top-level to this instance.
-	 * 
-	 * @return the path of classes from the top-level to this instance
-	 */
-	List<String> getHierarchicalClass();
-
-	/**
 	 * Returns the path of identifiers from the top-level to this instance.
 	 * 
 	 * @return the path of identifiers from the top-level to this instance
@@ -124,6 +117,14 @@ public interface Instance extends Vertex {
 	 *         path of the form /top/network/.../instance
 	 */
 	String getHierarchicalPath();
+
+	/**
+	 * Returns the hierarchy of instances that lead to this instance.
+	 * 
+	 * @return the hierarchy of instances that lead to this instance
+	 * @model
+	 */
+	EList<Instance> getHierarchy();
 
 	/**
 	 * Returns the identifier of this instance.
