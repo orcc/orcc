@@ -143,7 +143,7 @@ public class CppBackendImpl extends AbstractBackend {
 		}
 
 		// add wrapper if needed
-		new SerDesAdder().transform(network);
+		new SerDesAdder().doSwitch(network);
 	}
 
 	@Override

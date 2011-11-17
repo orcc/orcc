@@ -46,7 +46,7 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.SerDes;
 import net.sf.orcc.df.Vertex;
-import net.sf.orcc.df.transformations.INetworkTransformation;
+import net.sf.orcc.df.transformations.NetworkVisitor;
 import net.sf.orcc.ir.ExprString;
 
 import org.jgrapht.DirectedGraph;
@@ -59,7 +59,7 @@ import org.jgrapht.DirectedGraph;
  * @author Ghislain Roquier
  * 
  */
-public class SerDesAdder implements INetworkTransformation {
+public class SerDesAdder implements NetworkVisitor<Void> {
 
 	private DirectedGraph<Vertex, Connection> graph;
 
@@ -126,7 +126,7 @@ public class SerDesAdder implements INetworkTransformation {
 	 * @throws OrccException
 	 */
 	private void examineConnections(Vertex vertex, Set<Connection> connections,
-			Map<Port, List<Connection>> outMap) throws OrccException {
+			Map<Port, List<Connection>> outMap) {
 		Instance instance = (Instance) vertex;
 		for (Connection connection : connections) {
 			Port srcPort = connection.getSourcePort();
@@ -151,7 +151,7 @@ public class SerDesAdder implements INetworkTransformation {
 		}
 	}
 
-	private void examineVertex(Vertex vertex) throws OrccException {
+	private void examineVertex(Vertex vertex) {
 		// make a copy of the existing outgoing connections of vertex because
 		// the set returned is modified when new edges are added
 		Set<Connection> connections = new HashSet<Connection>(
@@ -171,7 +171,7 @@ public class SerDesAdder implements INetworkTransformation {
 		examineConnections(vertex, connections, outMap);
 	}
 
-	public void transform(Network network) throws OrccException {
+	public Void doSwitch(Network network) {
 		// graph = network.getGraph();
 
 		List<Port> inputs = network.getInputs();
@@ -296,5 +296,8 @@ public class SerDesAdder implements INetworkTransformation {
 			graph.removeAllVertices(vertexToRemove);
 			graph.removeAllEdges(toBeRemoved);
 		}
+
+		return null;
 	}
+
 }

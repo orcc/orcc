@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -47,7 +47,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  * @author Ghislain Roquier
  * 
  */
-public class NetworkFlattener implements INetworkTransformation {
+public class NetworkFlattener implements NetworkVisitor<Void> {
 
 	private Copier copier;
 
@@ -133,7 +133,7 @@ public class NetworkFlattener implements INetworkTransformation {
 	}
 
 	@Override
-	public void transform(Network network) {
+	public Void doSwitch(Network network) {
 		List<Instance> instances = new ArrayList<Instance>(
 				network.getInstances());
 		for (Instance instance : instances) {
@@ -141,7 +141,7 @@ public class NetworkFlattener implements INetworkTransformation {
 				Network subNetwork = instance.getNetwork();
 
 				// flatten this sub-network
-				new NetworkFlattener().transform(subNetwork);
+				new NetworkFlattener().doSwitch(subNetwork);
 
 				// copy vertices and edges
 				copier = new Copier();
@@ -154,6 +154,7 @@ public class NetworkFlattener implements INetworkTransformation {
 				network.getInstances().remove(instance);
 			}
 		}
+		return null;
 	}
 
 }

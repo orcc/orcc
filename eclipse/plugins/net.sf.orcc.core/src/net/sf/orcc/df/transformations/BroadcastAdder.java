@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,7 @@ import net.sf.orcc.df.Vertex;
  * @author Herve Yviquel
  * 
  */
-public class BroadcastAdder implements INetworkTransformation {
+public class BroadcastAdder implements NetworkVisitor<Void> {
 
 	protected Set<Connection> toBeRemoved;
 
@@ -170,7 +170,7 @@ public class BroadcastAdder implements INetworkTransformation {
 	}
 
 	@Override
-	public void transform(Network network) {
+	public Void doSwitch(Network network) {
 		this.network = network;
 		toBeRemoved = new HashSet<Connection>();
 
@@ -182,7 +182,7 @@ public class BroadcastAdder implements INetworkTransformation {
 			if (vertex.isInstance()) {
 				Instance instance = (Instance) vertex;
 				if (instance.isNetwork()) {
-					new BroadcastAdder().transform(instance.getNetwork());
+					new BroadcastAdder().doSwitch(instance.getNetwork());
 				}
 			}
 
@@ -191,5 +191,8 @@ public class BroadcastAdder implements INetworkTransformation {
 
 		// removes old connections
 		network.getConnections().removeAll(toBeRemoved);
+		
+		return null;
 	}
+	
 }

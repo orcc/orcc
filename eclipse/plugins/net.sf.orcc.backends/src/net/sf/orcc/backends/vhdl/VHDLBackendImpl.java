@@ -195,7 +195,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 	}
 
 	private void doTransformNetwork(Network network) throws OrccException {
-		new BroadcastAdder().transform(network);
+		new BroadcastAdder().doSwitch(network);
 	}
 
 	@Override

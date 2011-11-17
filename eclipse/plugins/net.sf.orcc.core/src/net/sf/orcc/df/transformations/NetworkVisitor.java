@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,23 +28,22 @@
  */
 package net.sf.orcc.df.transformations;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Network;
 
 /**
- * This interface defines how a transformation can be applied on a network.
+ * This interface defines a visitor for a network.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public interface INetworkTransformation {
+public interface NetworkVisitor<T> {
 
 	/**
-	 * Transforms the given network in-place.
+	 * Visits the given network.
 	 * 
 	 * @param network
 	 *            a network
 	 */
-	public void transform(Network network) throws OrccException;
+	public T doSwitch(Network network);
 
 }

@@ -217,7 +217,7 @@ public class CBackendImpl extends AbstractBackend {
 			public void writeText(String text) {
 				write(text);
 			}
-		}, fifoSize).transform(network);
+		}, fifoSize).doSwitch(network);
 	}
 
 	@Override

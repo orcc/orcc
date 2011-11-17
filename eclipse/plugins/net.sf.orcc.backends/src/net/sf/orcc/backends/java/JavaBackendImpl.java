@@ -87,7 +87,7 @@ public class JavaBackendImpl extends AbstractBackend {
 
 	private void doTransformNetwork(Network network) throws OrccException {
 		// Add broadcasts before printing
-		new BroadcastAdder().transform(network);
+		new BroadcastAdder().doSwitch(network);
 	}
 
 	@Override

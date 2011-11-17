@@ -49,6 +49,7 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.transformations.NetworkClassifier;
 import net.sf.orcc.df.transformations.NetworkFlattener;
+import net.sf.orcc.df.transformations.ArgumentEvaluator;
 import net.sf.orcc.df.util.DfAdapterFactory;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
@@ -172,7 +173,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 	 *             if something goes wrong
 	 */
 	public void classify() throws OrccException {
-		new NetworkClassifier().transform(this);
+		new NetworkClassifier().doSwitch(this);
 	}
 
 	/**
@@ -386,11 +387,13 @@ public class NetworkImpl extends EntityImpl implements Network {
 		super.eUnset(featureID);
 	}
 
-	/**
-	 * Flattens this network.
-	 */
+	@Override
 	public void flatten() {
-		new NetworkFlattener().transform(this);
+		// evaluates arguments
+		new ArgumentEvaluator().doSwitch(this);
+
+		// transforms network
+		new NetworkFlattener().doSwitch(this);
 
 		// update identifiers
 		Map<String, Integer> identifiers = new HashMap<String, Integer>();
@@ -398,7 +401,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 			String id = instance.getId();
 			Integer num = identifiers.get(id);
 			if (num == null) {
-				identifiers.put(id, 0);	
+				identifiers.put(id, 0);
 			} else {
 				num++;
 				instance.setId(id + "_" + num);
@@ -672,7 +675,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 	 *             if something goes wrong
 	 */
 	public void mergeActors() throws OrccException {
-		new ActorMerger().transform(this);
+		new ActorMerger().doSwitch(this);
 	}
 
 	/**

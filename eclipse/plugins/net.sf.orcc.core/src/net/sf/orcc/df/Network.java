@@ -61,7 +61,8 @@ public interface Network extends Entity {
 	void computeTemplateMaps();
 
 	/**
-	 * Flattens this network.
+	 * Flattens this network. Solves parameters and renames instances so that
+	 * two instances do not have the same identifier.
 	 */
 	void flatten();
 

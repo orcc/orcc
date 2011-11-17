@@ -135,13 +135,13 @@ public class PromelaBackendImpl extends AbstractBackend {
 		instancePrinter.getOptions().put("network", network);
 
 		netStateDef = new NetworkStateDefExtractor();
-		netStateDef.transform(network);
+		netStateDef.doSwitch(network);
 
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
 		printInstances(network);
 
-		new BroadcastAdder().transform(network);
+		new BroadcastAdder().doSwitch(network);
 
 		network.computeTemplateMaps();
 		printNetwork(network);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -36,13 +36,14 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 
 /**
- * This class defines a transformation that recursively sets the hierarchical
- * name of all instances of a network.
+ * This class defines a transformation that computes the hierarchy of all
+ * instances of a network. The hierarchy of an instance is defined as a list of
+ * the instances that lead to it from the top-level network.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class HierarchyComputer implements INetworkTransformation {
+public class HierarchyComputer implements NetworkVisitor<Void> {
 
 	private List<Instance> instances;
 
@@ -56,7 +57,7 @@ public class HierarchyComputer implements INetworkTransformation {
 	}
 
 	@Override
-	public void transform(Network network) {
+	public Void doSwitch(Network network) {
 		if (instances.isEmpty()) {
 			Instance instance = DfFactory.eINSTANCE.createInstance(
 					network.getSimpleName(), network);
@@ -67,11 +68,13 @@ public class HierarchyComputer implements INetworkTransformation {
 			if (instance.isNetwork()) {
 				Network subNetwork = instance.getNetwork();
 				new HierarchyComputer(instances, instance)
-						.transform(subNetwork);
+						.doSwitch(subNetwork);
 			}
 
 			instance.getHierarchy().addAll(instances);
 		}
+
+		return null;
 	}
 
 }

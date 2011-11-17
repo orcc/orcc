@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
@@ -46,7 +45,7 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
-import net.sf.orcc.df.transformations.INetworkTransformation;
+import net.sf.orcc.df.transformations.NetworkVisitor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstLoad;
@@ -79,7 +78,7 @@ import org.jgrapht.graph.DirectedSubgraph;
  * @author Ghislain Roquier
  * 
  */
-public class ActorMerger implements INetworkTransformation {
+public class ActorMerger implements NetworkVisitor<Void> {
 
 	private static final String ACTION_NAME = "static_schedule";
 
@@ -589,11 +588,11 @@ public class ActorMerger implements INetworkTransformation {
 	}
 
 	@Override
-	public void transform(Network network) throws OrccException {
+	public Void doSwitch(Network network) {
 		this.network = network;
 
 		// make instance unique in the network
-		new UniqueInstantiator().transform(network);
+		new UniqueInstantiator().doSwitch(network);
 
 		// static region detections
 		StaticRegionDetector detector = new StaticRegionDetector(network);
@@ -621,6 +620,7 @@ public class ActorMerger implements INetworkTransformation {
 			updateConnection(instance);
 			// graph.removeAllVertices(vertices);
 		}
+		return null;
 	}
 
 	/**

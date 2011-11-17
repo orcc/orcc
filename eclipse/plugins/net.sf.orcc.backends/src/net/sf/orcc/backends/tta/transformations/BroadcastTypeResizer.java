@@ -2,21 +2,20 @@ package net.sf.orcc.backends.tta.transformations;
 
 import java.util.List;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.transformations.INetworkTransformation;
+import net.sf.orcc.df.transformations.NetworkVisitor;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
 
-public class BroadcastTypeResizer implements INetworkTransformation {
+public class BroadcastTypeResizer implements NetworkVisitor<Void> {
 
 	@Override
-	public void transform(Network network) throws OrccException {
+	public Void doSwitch(Network network) {
 		for (Instance instance : network.getInstances()) {
 			if (instance.isBroadcast()) {
 				Broadcast broadcast = instance.getBroadcast();
@@ -24,6 +23,8 @@ public class BroadcastTypeResizer implements INetworkTransformation {
 				checkPorts(broadcast.getOutputs());
 			}
 		}
+
+		return null;
 	}
 
 	private void checkPorts(List<Port> ports) {
@@ -33,11 +34,11 @@ public class BroadcastTypeResizer implements INetworkTransformation {
 			}
 		}
 	}
-	
+
 	private void checkType(Type type) {
 		checkType(type, 0);
 	}
-	
+
 	private void checkType(Type type, int newSize) {
 		int size;
 		if (type.isInt()) {

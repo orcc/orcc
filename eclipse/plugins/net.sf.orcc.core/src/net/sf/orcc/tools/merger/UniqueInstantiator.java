@@ -3,22 +3,21 @@ package net.sf.orcc.tools.merger;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
-import net.sf.orcc.df.transformations.INetworkTransformation;
+import net.sf.orcc.df.transformations.NetworkVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 
-public class UniqueInstantiator implements INetworkTransformation {
+public class UniqueInstantiator implements NetworkVisitor<Void> {
 
 	private Map<Actor, Integer> actors = new HashMap<Actor, Integer>();
 
 	@Override
-	public void transform(Network network) throws OrccException {
+	public Void doSwitch(Network network) {
 		for (Instance instance : network.getInstances()) {
 			Actor actor = instance.getActor();
 			if (actors.containsKey(actor)) {
@@ -36,6 +35,7 @@ public class UniqueInstantiator implements INetworkTransformation {
 			updateConnection(connection);
 		}
 
+		return null;
 	}
 
 	private void updateConnection(Connection connection) {

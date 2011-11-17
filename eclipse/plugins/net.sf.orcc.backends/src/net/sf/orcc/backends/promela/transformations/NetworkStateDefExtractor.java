@@ -35,14 +35,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.transformations.INetworkTransformation;
+import net.sf.orcc.df.transformations.NetworkVisitor;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
@@ -63,7 +62,7 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * 
  */
 public class NetworkStateDefExtractor extends AbstractActorVisitor<Object>
-		implements INetworkTransformation {
+		implements NetworkVisitor<Void> {
 
 	private Map<Var, Set<Var>> variableDependency = new HashMap<Var, Set<Var>>();
 
@@ -122,7 +121,8 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object>
 
 	@Override
 	public Object caseAction(Action action) {
-		// solve the port dependency, procedures and functions should also be handled
+		// solve the port dependency, procedures and functions should also be
+		// handled
 		doSwitch(action.getBody());
 		inScheduler = true;
 		doSwitch(action.getScheduler());
@@ -310,12 +310,13 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object>
 	}
 
 	@Override
-	public void transform(Network network) throws OrccException {
+	public Void doSwitch(Network network) {
 		for (Actor actor : network.getActors()) {
 			doSwitch(actor);
 		}
 		identifyControlTokenPorts(network);
 		identifySchedulingVars();
+		return null;
 	}
 
 	private void transitiveClosure(Var variable, Set<Var> transitiveClosure) {
