@@ -47,8 +47,8 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
+import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.transformations.RenameTransformation;
-import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
 import net.sf.orcc.util.WriteListener;
@@ -181,11 +181,11 @@ public class CBackendImpl extends AbstractBackend {
 			new ActorNormalizer().doSwitch(actor);
 		}
 
-		ActorVisitor<?>[] transformations = { new UnitImporter(),
+		DfSwitch<?>[] transformations = { new UnitImporter(),
 				new TypeResizer(true, false, true),
 				new RenameTransformation(replacementMap) };
 
-		for (ActorVisitor<?> transformation : transformations) {
+		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 			ResourceSet set = new ResourceSetImpl();
 			if (debugMode && !IrUtil.serializeActor(set, path, actor)) {

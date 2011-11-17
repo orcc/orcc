@@ -47,13 +47,13 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transformations.BroadcastAdder;
+import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 import net.sf.orcc.ir.transformations.PhiRemoval;
 import net.sf.orcc.ir.transformations.RenameTransformation;
-import net.sf.orcc.ir.util.ActorVisitor;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.EObject;
@@ -98,7 +98,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		ActorVisitor<?>[] transformations = {
+		DfSwitch<?>[] transformations = {
 				new UnitImporter(),
 				new Inliner(true, false),
 				// new ListFlattener(), //Promela does not support multi
@@ -111,7 +111,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 						netStateDef.getPortsUsedInScheduling()),
 				new DeadCodeElimination(), new DeadVariableRemoval() };
 
-		for (ActorVisitor<?> transformation : transformations) {
+		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 		}
 	}

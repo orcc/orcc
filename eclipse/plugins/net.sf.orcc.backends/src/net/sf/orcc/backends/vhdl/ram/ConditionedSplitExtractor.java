@@ -29,7 +29,7 @@
 package net.sf.orcc.backends.vhdl.ram;
 
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.ir.util.ActorVisitor;
+import net.sf.orcc.df.util.DfSwitch;
 
 /**
  * This class defines a transformation that extracts the SplitInstructions from
@@ -38,10 +38,10 @@ import net.sf.orcc.ir.util.ActorVisitor;
  * @author Matthieu Wipliez
  * 
  */
-public class ConditionedSplitExtractor implements ActorVisitor<Object> {
+public class ConditionedSplitExtractor extends DfSwitch<Void> {
 
 	@Override
-	public Object doSwitch(Actor actor) {
+	public Void caseActor(Actor actor) {
 		return null;
 	}
 

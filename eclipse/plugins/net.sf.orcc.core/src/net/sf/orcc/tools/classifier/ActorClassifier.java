@@ -48,7 +48,7 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.Transitions;
-import net.sf.orcc.ir.util.ActorVisitor;
+import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.Invocation;
 import net.sf.orcc.moc.MoC;
@@ -71,7 +71,7 @@ import org.jgrapht.traverse.DepthFirstIterator;
  * @author Matthieu Wipliez
  * 
  */
-public class ActorClassifier implements ActorVisitor<Object> {
+public class ActorClassifier extends DfSwitch<Object> {
 
 	private Actor actor;
 
@@ -339,7 +339,7 @@ public class ActorClassifier implements ActorVisitor<Object> {
 	}
 
 	@Override
-	public Object doSwitch(Actor actor) {
+	public Object caseActor(Actor actor) {
 		try {
 			this.actor = actor;
 

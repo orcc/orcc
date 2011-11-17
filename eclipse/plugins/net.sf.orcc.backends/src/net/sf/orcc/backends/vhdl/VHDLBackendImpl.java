@@ -58,13 +58,13 @@ import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transformations.BroadcastAdder;
+import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.ir.util.ActorInterpreter;
-import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -144,7 +144,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 		actor.setTemplateData(templateData);
 
 		// transformations on the code
-		ActorVisitor<?>[] transformationsCodegen = {
+		DfSwitch<?>[] transformationsCodegen = {
 				new UnitImporter(),
 
 				// cleanup code
@@ -174,7 +174,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 				new RenameTransformation(adjacentUnderscores, "_") };
 
 		// applies transformations
-		for (ActorVisitor<?> transformation : transformationsCodegen) {
+		for (DfSwitch<?> transformation : transformationsCodegen) {
 			transformation.doSwitch(actor);
 
 			// serializes a clone of the actor so that we don't change the
@@ -324,8 +324,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 		networkPrinter.setTypePrinter(new VHDLTypePrinter());
 		networkPrinter.getOptions().put("fifoSize", fifoSize);
 
-		networkPrinter.print(network.getSimpleName() + ".vhd", path + File.separator
-				+ "Design", network);
+		networkPrinter.print(network.getSimpleName() + ".vhd", path
+				+ File.separator + "Design", network);
 
 		for (Network subNetwork : network.getNetworks()) {
 			networkPrinter.print(subNetwork.getSimpleName() + ".vhd", path

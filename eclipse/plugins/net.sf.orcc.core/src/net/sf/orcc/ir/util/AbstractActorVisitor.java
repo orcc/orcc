@@ -71,8 +71,7 @@ import org.eclipse.emf.ecore.EObject;
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractActorVisitor<T> extends DfSwitch<T> implements
-		ActorVisitor<T> {
+public abstract class AbstractActorVisitor<T> extends DfSwitch<T> {
 
 	protected class IrSwitchDelegate extends IrSwitch<T> {
 
@@ -421,11 +420,6 @@ public abstract class AbstractActorVisitor<T> extends DfSwitch<T> implements
 
 	public T caseVar(Var var) {
 		return null;
-	}
-
-	@Override
-	public final T doSwitch(Actor actor) {
-		return doSwitch((EObject) actor);
 	}
 
 	@Override

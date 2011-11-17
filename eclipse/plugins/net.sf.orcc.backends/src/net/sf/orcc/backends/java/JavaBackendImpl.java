@@ -43,8 +43,8 @@ import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transformations.BroadcastAdder;
+import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.transformations.RenameTransformation;
-import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -77,10 +77,10 @@ public class JavaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		ActorVisitor<?>[] transformations = { new UnitImporter(),
+		DfSwitch<?>[] transformations = { new UnitImporter(),
 				new RenameTransformation(this.transformations) };
 
-		for (ActorVisitor<?> transformation : transformations) {
+		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 		}
 	}

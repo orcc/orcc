@@ -44,8 +44,8 @@ import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.ExprString;
-import net.sf.orcc.ir.util.ActorVisitor;
 
 import org.eclipse.core.resources.IFile;
 
@@ -123,12 +123,10 @@ public class CppBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		ActorVisitor<?>[] transformations = { new UnitImporter() };
-
-		for (ActorVisitor<?> transformation : transformations) {
+		DfSwitch<?>[] transformations = { new UnitImporter() };
+		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 		}
-
 	}
 
 	private void doTransformNetwork(Network network) throws OrccException {

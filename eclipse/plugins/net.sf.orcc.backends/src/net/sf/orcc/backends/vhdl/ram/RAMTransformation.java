@@ -30,9 +30,9 @@ package net.sf.orcc.backends.vhdl.ram;
 
 import net.sf.orcc.backends.vhdl.transformations.ActionSplitter;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.transformations.IfConverter;
 import net.sf.orcc.ir.transformations.IfDeconverter;
-import net.sf.orcc.ir.util.ActorVisitor;
 
 /**
  * This class defines the transformation of IR to use RAMs.
@@ -40,11 +40,11 @@ import net.sf.orcc.ir.util.ActorVisitor;
  * @author Matthieu Wipliez
  * 
  */
-public class RAMTransformation implements ActorVisitor<Object> {
-
-	private final int numPortsRam;
+public class RAMTransformation extends DfSwitch<Object> {
 
 	private final int minSizeRam;
+
+	private final int numPortsRam;
 
 	public RAMTransformation(int numPortsRam, int minSizeRam) {
 		this.numPortsRam = numPortsRam;
@@ -52,7 +52,7 @@ public class RAMTransformation implements ActorVisitor<Object> {
 	}
 
 	@Override
-	public Object doSwitch(Actor actor) {
+	public Object caseActor(Actor actor) {
 		new IfConverter().doSwitch(actor);
 		new RAMInstructionScheduler(numPortsRam, minSizeRam).doSwitch(actor);
 		new ConditionedSplitExtractor().doSwitch(actor);

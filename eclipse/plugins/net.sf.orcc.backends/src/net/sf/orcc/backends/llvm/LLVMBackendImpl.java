@@ -65,6 +65,7 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
+import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.transformations.BlockCombine;
 import net.sf.orcc.ir.transformations.BuildCFG;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
@@ -73,7 +74,6 @@ import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.transformations.TacTransformation;
-import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.tools.classifier.ActorClassifier;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
 import net.sf.orcc.util.OrccUtil;
@@ -189,7 +189,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 			}
 		}
 
-		ActorVisitor<?>[] transformations = { new UnitImporter(),
+		DfSwitch<?>[] transformations = { new UnitImporter(),
 				new SSATransformation(), new DeadGlobalElimination(),
 				new DeadCodeElimination(), new DeadVariableRemoval(),
 				new BoolToIntTransformation(), new PrintlnTransformation(),
@@ -200,7 +200,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 				new CastAdder(true, false), new EmptyThenElseNodeAdder(),
 				new BlockCombine(), new BuildCFG(), new ListInitializer() };
 
-		for (ActorVisitor<?> transformation : transformations) {
+		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 		}
 

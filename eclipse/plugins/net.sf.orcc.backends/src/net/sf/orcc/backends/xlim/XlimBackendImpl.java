@@ -64,13 +64,13 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.transformations.BlockCombine;
 import net.sf.orcc.ir.transformations.BuildCFG;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
 import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.transformations.TacTransformation;
-import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -149,7 +149,7 @@ public class XlimBackendImpl extends AbstractBackend {
 			new DivisionSubstitution().doSwitch(actor);
 		}
 
-		ActorVisitor<?>[] transformations = { new UnitImporter(),
+		DfSwitch<?>[] transformations = { new UnitImporter(),
 				new SSATransformation(),
 				new GlobalArrayInitializer(hardwareGen),
 				new InstTernaryAdder(), new Inliner(true, true),
@@ -162,7 +162,7 @@ public class XlimBackendImpl extends AbstractBackend {
 				new XlimVariableRenamer(), new EmptyThenElseNodeAdder(),
 				new BlockCombine() };
 
-		for (ActorVisitor<?> transformation : transformations) {
+		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 			ResourceSet set = new ResourceSetImpl();
 			if (debugMode && !IrUtil.serializeActor(set, path, actor)) {

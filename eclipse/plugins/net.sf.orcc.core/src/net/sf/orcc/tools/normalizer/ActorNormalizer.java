@@ -29,7 +29,7 @@
 package net.sf.orcc.tools.normalizer;
 
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.ir.util.ActorVisitor;
+import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.tools.classifier.ActorClassifier;
 
@@ -41,7 +41,7 @@ import net.sf.orcc.tools.classifier.ActorClassifier;
  * @author Jerome Gorin
  * 
  */
-public class ActorNormalizer implements ActorVisitor<Object> {
+public class ActorNormalizer extends DfSwitch<Void> {
 
 	/**
 	 * Creates a new normalizer
@@ -50,7 +50,7 @@ public class ActorNormalizer implements ActorVisitor<Object> {
 	}
 
 	@Override
-	public Object doSwitch(Actor actor) {
+	public Void caseActor(Actor actor) {
 		if (!actor.hasMoC()) {
 			// Actor has not been classified
 			new ActorClassifier().doSwitch(actor);

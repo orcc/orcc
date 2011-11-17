@@ -58,12 +58,12 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transformations.BroadcastAdder;
+import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.transformations.BlockCombine;
 import net.sf.orcc.ir.transformations.BuildCFG;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.transformations.TacTransformation;
-import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -109,8 +109,7 @@ public class TTABackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-
-		ActorVisitor<?>[] transformations = { new UnitImporter(),
+		DfSwitch<?>[] transformations = { new UnitImporter(),
 				new SSATransformation(), new BoolToIntTransformation(),
 				new TypeResizer(true, true, false),
 				new PrintlnTransformation(),
@@ -121,7 +120,7 @@ public class TTABackendImpl extends AbstractBackend {
 				new EmptyThenElseNodeAdder(), new BlockCombine(),
 				new BuildCFG() };
 
-		for (ActorVisitor<?> transformation : transformations) {
+		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 		}
 
