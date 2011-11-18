@@ -337,7 +337,7 @@ if (<pattern.numTokensMap.(port)> \> SIZE_<port.name> - index_<port.name> + <get
 	stop = 1;
 	<if(options.newScheduler)>
 	if(!<instance.id>.sched-\>round_robin || i \> 0) {
-		sched_add_schedulable(<instance.id>.sched, &<successor.id>, RING_TOPOLOGY);
+		sched_add_schedulable(<instance.id>.sched, &<successor.target.id>, RING_TOPOLOGY);
 #ifdef PRINT_FIRINGS
 		printf("\tFull port: <port.name>\n");
 #endif
