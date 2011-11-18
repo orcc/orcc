@@ -34,21 +34,12 @@
 
 #define MAX_ACTORS 1024
 
-struct conn_s {
-	struct fifo_s *fifo;
-	struct actor_s *source;
-	struct actor_s *target;
-};
-
 struct actor_s {
 	char *name;
 	int group; /** id of his group. */
 	void (*sched_func)(struct schedinfo_s *);
 	int num_inputs; /** number of input ports */
 	int num_outputs; /** number of output ports */
-	struct actor_s **predecessors; /** predecessors: one pointer to an actor per port. */
-	int *num_successors; /** number of successors: one number per port. */
-	struct actor_s ***successors; /** successors: one pointer to a successors structure per port. */
 	int in_list; /** set to 1 when the actor is in the schedulable list. Used by add_schedulable to do the membership test in O(1). */
 	int in_waiting; /** idem with the waiting list. */
 	struct scheduler_s *sched; /** scheduler which execute this actor. */

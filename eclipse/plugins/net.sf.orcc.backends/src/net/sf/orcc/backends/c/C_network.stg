@@ -63,53 +63,6 @@ endif>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Declare predecessors and successors
-
-neighbour(instance) ::= <<
-<if(instance.actor || instance.broadcast)
-  >&<GetInstanceId(instance)
-><else
-  >NULL<
-endif>
->>
-
-predecessors(map, ports) ::= <<
-<ports: {port | <neighbour(map.(port))>}; separator=", ">
->>
-
-successors(instances) ::= <<
-<instances: neighbour(); separator=", ">
->>
-
-goDeclareNumSuccessors(map,outputs) ::= <<
-<outputs : {port | <length(map.(port))>}; separator=", ">
->>
-
-goDeclareSuccPerPort(port) ::= <<
-struct actor_s *<GetInstanceId(instance)>_<port.name>_successors[] = {<successors(map.(port))>};
->>
-
-goDeclareSuccs(map,outputs) ::= <<
-<outputs : goDeclareSuccPerPort(); separator="\n">
-int <GetInstanceId(instance)>_num_successors[] = {<goDeclareNumSuccessors(map,outputs)>};
->>
-
-goDeclarePredSucc(network, inputs, outputs) ::= <<
-<if(!inputs.empty)
->struct actor_s *<GetInstanceId(instance)>_predecessors[] = {<predecessors(instance.incomingPortMap, inputs)>};
-<endif><
-if(!outputs.empty)
-><goDeclareSuccs(instance.outgoingPortMap, outputs)>
-struct actor_s **<GetInstanceId(instance)>_successors[] = {<outputs: {port | <GetInstanceId(instance)>_<port.name>_successors}; separator=", ">};
-<endif>
->>
-
-declarePredsSuccs(instances) ::= <<
-<instances: {instance | <goDeclarePredSucc(instance.contents.inputs, instance.contents.outputs)>}>
->>
-
-
-///////////////////////////////////////////////////////////////////////////////
 // allocates FIFOs
 
 allocateFifo(edge, readers_nb) ::= <%
@@ -233,7 +186,7 @@ elseif (instance.broadcast)><instance.broadcast.numOutputs><else>0<endif>
 fillActorStruct(instance) ::= <<
 <if(instance.actor || instance.broadcast)>
 struct actor_s <GetInstanceId(instance)> = {"<GetInstanceId(instance)>", <if(network.templateData.instanceNameToGroupIdMap.(instance.id))> <network.templateData.instanceNameToGroupIdMap.(instance.id)> <else>0<endif>, <GetInstanceId(instance)>_scheduler, <
-NumInputs(instance)>, <NumOutputs(instance)>, NULL, NULL, NULL};
+NumInputs(instance)>, <NumOutputs(instance)>, 0, 0, NULL, 0};
 <endif>
 >>
 
@@ -524,7 +477,3 @@ int main(int argc, char *argv[]) {
 }
 
 >>
-
-
-
-
