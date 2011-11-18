@@ -152,28 +152,15 @@ printInstances(name, inputs, outputs) ::= <<
 ><instance.incomingPortMap.keys: { port | <printInstanceInputs(port, instance.incomingPortMap.(port))> }; separator="\n"><
 endif><
 if(!outputs.empty)
->
-    <instance.outgoingMap.(instance).values:
-    	{connections| <connections:{connection | <printOutputs(connection=connection, portSuccMap=network.successorsMap.(instance), 
-															tgtVertex=network.targetMap.(connection))>}; separator="\n">}; separator="\n">
-
-    <instance.outgoingPortMap.keys: { port | <printInstanceOutputs(port, instance.outgoingPortMap.(port))> }; separator="\n">
-
+><instance.outgoingPortMap.keys: { port | <printInstanceOutputs(port, instance.outgoingPortMap.(port))> }; separator="\n">
 <
 endif>
     clock     =\> clock, 
     reset_n   =\> reset_n);
 >>
 
-/** Print input connection of an instance according to the maps:
- * 
- * connection: connection of the instance (e.g. a connection between two instance)
- * portPredMap: a map that associates each port of an instance to the predecessor of this port
- * srcVertex: contain the source of the connection (e.g. a port of the network)
- * 
- */
  printInstanceInputs(port, connection) ::= <<
- <if(connection.sourcePort.name)
+ <if(connection.sourcePort)
  >   <port.name>_data   =\> <instance.id>_<port.name>_data,
    <port.name>_send   =\> <instance.id>_<port.name>_send,
    <port.name>_ack    =\> <instance.id>_<port.name>_ack,<
@@ -185,46 +172,18 @@ endif>
 >>
   
  printInstanceOutputs(port, connection) ::= <<
-port <port.name>
-<connection>
-sourcePort <connection.sourcePort.name>
-targetPort <connection.targetPort.name>
- <if(connection.sourcePort.name)
- ><port.name>_data =\> <instance.id>_<port.name>_data,
-<port.name>_send =\> <instance.id>_<port.name>_send,
-<port.name>_ack =\> <instance.id>_<port.name>_ack,<
-else
-><
-endif>
+<connection : printInstanceOutput()>
+>>
 
->>  
-
-/** Print output connections of an instance according to the maps:
- * 
- * connection: connection of the instance (e.g. a connection between two instance)
- * portSuccMap: a map that associates each port of an instance to the successors of this port
- * tgtVertex: target of the connection (e.g. a port of the network)
- * 
- */ 
-printOutputs(connection, portSuccMap, tgtVertex) ::= <<
-<if(first(portSuccMap.(connection.source)))
-><if(connection.attributes)
-><connection.source.name>_data     =\> <instance.id>_<connection.source.name>_data,
-<connection.source.name>_send     =\> <instance.id>_<connection.source.name>_send,
-<connection.source.name>_ack      =\> <instance.id>_<connection.source.name>_ack,<
+ printInstanceOutput(connection) ::= <<
+ <if(connection.target.actor)
+ >   <port.name>_data   =\> <connection.target.id>_<connection.targetPort.name>_data,
+   <port.name>_send   =\> <connection.target.id>_<connection.targetPort.name>_send,
+   <port.name>_ack    =\> <connection.target.id>_<connection.targetPort.name>_ack,<
 else
-><connection.source.name>_data     =\> <first(portSuccMap.(connection.source)).id>_<connection.target.name>_data,
-<connection.source.name>_send     =\> <first(portSuccMap.(connection.source)).id>_<connection.target.name>_send,
-<connection.source.name>_ack      =\> <first(portSuccMap.(connection.source)).id>_<connection.target.name>_ack,<
-endif><
-else
-><if(connection.source.native)
-><connection.source.name>         =\> <tgtVertex.port.name>,<
-else
-><connection.source.name>_data     =\> <tgtVertex.port.name>_data,
-<connection.source.name>_send     =\> <tgtVertex.port.name>_send,
-<connection.source.name>_ack      =\> <tgtVertex.port.name>_ack,<
-endif><
+>   <port.name>_data   =\> <connection.target.name>_data,
+   <port.name>_send   =\> <connection.target.name>_send,
+   <port.name>_ack    =\> <connection.target.name>_ack,<
 endif>
 >>
 
