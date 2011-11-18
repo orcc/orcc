@@ -151,10 +151,9 @@ printInstances(name, inputs, outputs) ::= <<
 <if(!inputs.empty)
 ><instance.incomingPortMap.keys: { port | <printInstanceInputs(port, instance.incomingPortMap.(port))> }; separator="\n"><
 endif><
-if(!outputs.empty)
-><instance.outgoingPortMap.keys: { port | <printInstanceOutputs(port, instance.outgoingPortMap.(port))> }; separator="\n">
-<
-endif>
+if(!outputs.empty)>
+<instance.outgoingPortMap.keys: { port | <printInstanceOutputs(port, instance.outgoingPortMap.(port))> }; separator="\n">
+<endif>
     clock     =\> clock, 
     reset_n   =\> reset_n);
 >>
@@ -180,6 +179,14 @@ endif>
  >   <port.name>_data   =\> <connection.target.id>_<connection.targetPort.name>_data,
    <port.name>_send   =\> <connection.target.id>_<connection.targetPort.name>_send,
    <port.name>_ack    =\> <connection.target.id>_<connection.targetPort.name>_ack,<
+elseif(connection.target.broadcast)
+>   <port.name>_data   =\> <connection.target.id>_<connection.targetPort.name>_data,
+   <port.name>_send   =\> <connection.target.id>_<connection.targetPort.name>_send,
+   <port.name>_ack    =\> <connection.target.id>_<connection.targetPort.name>_ack,<
+elseif(connection.target.network)
+>   <port.name>_data   =\> <connection.target.id>_<connection.targetPort.name>_data,
+   <port.name>_send   =\> <connection.target.id>_<connection.targetPort.name>_send,
+   <port.name>_ack    =\> <connection.target.id>_<connection.targetPort.name>_ack,<
 else
 >   <port.name>_data   =\> <connection.target.name>_data,
    <port.name>_send   =\> <connection.target.name>_send,
@@ -191,8 +198,8 @@ endif>
 ///////////////////////////////////////////////////////////////////////////////
 // print broadcasts instantiation
 ///////////////////////////////////////////////////////////////////////////////
-printBroadcasts(outgoingMap) ::= <<
-<outgoingMap.keys: {instance | <checkBroadcast(instance=instance)>}>
+printBroadcasts(network) ::= <<
+<network.instances: checkBroadcast(); separator="\n\n"> 
 >>
 
 checkBroadcast(instance) ::= <<
@@ -210,25 +217,16 @@ broadcast_<name> : entity work.broadcast
     width =\> <if(instance.broadcast.type.bool)>1<else><instance.broadcast.type.size><endif>,
     size  =\> <instance.broadcast.numOutputs>)
   port map (
-<if(!inputs.empty)>
-    <instance.incomingPortMap.keys: { port | <printInstanceInputs(port, instance.incomingPortMap.(port))> }; separator="\n   ">
-
+<if(!inputs.empty)
+><instance.incomingPortMap.keys: { port | <printInstanceInputs(port, instance.incomingPortMap.(port))> }; separator="\n"><
+endif><
+if(!outputs.empty)>
+<instance.outgoingPortMap.keys: { port | <printInstanceOutputs(port, instance.outgoingPortMap.(port))> }; separator="\n">
 <endif>
-<if(!outputs.empty)>
-<if(last(outputs).type.bool)
->    output_data(0) =\> <name>_fromBroad_data,
-<else
->    output_data    =\> <name>_fromBroad_data,
-<endif>
-    <outgoingMap.(instance).values: {connections | <printBroadcastOutputs(connections=connections, index=i0, network=network,
-    								instance=instance, control="send")>}; separator="\n">	
-    <outgoingMap.(instance).values: {connections | <printBroadcastOutputs(connections=connections, index=i0, network=network,
-    								instance=instance, control="ack")>}; separator="\n">
-<endif>
-    clock         =\> clock,
-    reset_n       =\> reset_n);
+    clock     =\> clock, 
+    reset_n   =\> reset_n);
     --
-    <outgoingMap.(instance).values: {connections|<connections:{connection | <printBroadToOut(tgtVertex=network.targetMap.(connection))>}>}>
+    <network.outgoingMap.(instance).values: {connections|<connections:{connection | <printBroadToOut(tgtVertex=network.targetMap.(connection))>}>}>
 >>
 
 /** Print connection between broadcast and output
@@ -331,7 +329,7 @@ begin
   ---------------------------------------------------------------------------
   -- Broadcast and FIFO instantiation 
   --------------------------------------------------------------------------- 
-  <printBroadcasts(network.outgoingMap)>
+  <printBroadcasts(network)>
   <assignFifos(network.connections)>
   ---------------------------------------------------------------------------
 
