@@ -51,6 +51,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
@@ -406,18 +407,21 @@ public class OrccUtil {
 	 */
 	public static String getQualifiedName(IFile file) {
 		IProject project = file.getProject();
-		IPath filePath = file.getFullPath();
-		for (IFolder folder : getSourceFolders(project)) {
-			IPath folderPath = folder.getFullPath();
-			if (folderPath.isPrefixOf(filePath)) {
-				// yay we found the folder!
-				IPath qualifiedPath = filePath.removeFirstSegments(
-						folderPath.segmentCount()).removeFileExtension();
-				return qualifiedPath.toString().replace('/', '.');
-			}
+
+		IJavaProject javaProject = JavaCore.create(project);
+		if (!javaProject.exists()) {
+			return null;
 		}
 
-		return null;
+		try {
+			IPath path = file.getParent().getFullPath();
+			IPackageFragment fragment = javaProject.findPackageFragment(path);
+			return fragment.getElementName() + "."
+					+ file.getFullPath().removeFileExtension().lastSegment();
+		} catch (JavaModelException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	/**
@@ -431,18 +435,20 @@ public class OrccUtil {
 	 */
 	public static String getQualifiedPackage(IFile file) {
 		IProject project = file.getProject();
-		IPath filePath = file.getFullPath();
-		for (IFolder folder : getSourceFolders(project)) {
-			IPath folderPath = folder.getFullPath();
-			if (folderPath.isPrefixOf(filePath)) {
-				// yay we found the folder!
-				IPath qualifiedPath = filePath.removeFirstSegments(
-						folderPath.segmentCount()).removeLastSegments(1);
-				return qualifiedPath.toString().replace('/', '.');
-			}
+
+		IJavaProject javaProject = JavaCore.create(project);
+		if (!javaProject.exists()) {
+			return null;
 		}
 
-		return null;
+		try {
+			IPath path = file.getParent().getFullPath();
+			IPackageFragment fragment = javaProject.findPackageFragment(path);
+			return fragment.getElementName();
+		} catch (JavaModelException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	/**
