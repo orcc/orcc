@@ -299,8 +299,9 @@ public class OrccUtil {
 	}
 
 	/**
-	 * Returns the network in the given project that has the given qualified
-	 * name.
+	 * Returns the file in the given project that has the given qualified name
+	 * and the given extension. Looks in source folders first and then output
+	 * folders.
 	 * 
 	 * @param project
 	 *            project
@@ -312,7 +313,15 @@ public class OrccUtil {
 			String extension) {
 		String name = qualifiedName.replace('.', '/');
 		IPath path = new Path(name).addFileExtension(extension);
+
 		for (IFolder folder : getAllSourceFolders(project)) {
+			IFile inputFile = folder.getFile(path);
+			if (inputFile != null && inputFile.exists()) {
+				return inputFile;
+			}
+		}
+
+		for (IFolder folder : getOutputFolders(project)) {
 			IFile inputFile = folder.getFile(path);
 			if (inputFile != null && inputFile.exists()) {
 				return inputFile;

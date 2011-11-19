@@ -63,11 +63,9 @@ import net.sf.orcc.util.DomUtil;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.InternalEObject;
@@ -763,24 +761,11 @@ public class XDFParser {
 
 		Entity proxy = null;
 		IProject project = file.getProject();
-		List<IFolder> folders = OrccUtil.getOutputFolders(project);
-		IPath path = new Path(clasz.replace('.', '/'));
-		IFile file = null;
-		for (IFolder folder : folders) {
-			file = folder.getFile(path.addFileExtension("ir"));
-			if (file.exists()) {
-				proxy = DfFactory.eINSTANCE.createActor();
-				break;
-			}
-		}
-		if (!file.exists()) {
-			folders = OrccUtil.getSourceFolders(project);
-			for (IFolder folder : folders) {
-				file = folder.getFile(path.addFileExtension("xdf"));
-				if (file.exists()) {
-					proxy = DfFactory.eINSTANCE.createNetwork();
-					break;
-				}
+		IFile file = OrccUtil.getFile(project, clasz, "ir");
+		if (file == null || !file.exists()) {
+			file = OrccUtil.getFile(project, clasz, "xdf");
+			if (file != null && file.exists()) {
+				proxy = DfFactory.eINSTANCE.createNetwork();
 			}
 		}
 
