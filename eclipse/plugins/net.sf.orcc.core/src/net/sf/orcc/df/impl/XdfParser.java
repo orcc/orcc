@@ -81,7 +81,7 @@ import org.w3c.dom.Node;
  * @author Matthieu Wipliez
  * 
  */
-public class XDFParser {
+public class XdfParser {
 
 	/**
 	 * This class defines a parser of XDF expressions.
@@ -521,7 +521,7 @@ public class XDFParser {
 	/**
 	 * Creates a new network parser.
 	 */
-	public XDFParser(Resource resource) {
+	public XdfParser(Resource resource) {
 		exprParser = new ExprParser();
 		typeParser = new TypeParser();
 

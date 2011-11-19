@@ -77,7 +77,7 @@ import org.w3c.dom.Element;
  * @author Matthieu Wipliez
  * 
  */
-public class XDFWriter {
+public class XdfWriter {
 
 	/**
 	 * This class defines a writer of binary operation sequences. This writer
@@ -369,7 +369,7 @@ public class XDFWriter {
 			if (instance.isNetwork()) {
 				// writes the network
 				Network child = instance.getNetwork();
-				new XDFWriter().write(path, child);
+				new XdfWriter().write(path, child);
 			}
 		}
 	}

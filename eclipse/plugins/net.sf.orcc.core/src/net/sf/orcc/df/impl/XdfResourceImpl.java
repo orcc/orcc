@@ -85,7 +85,7 @@ public class XdfResourceImpl extends ResourceImpl {
 	protected void doLoad(InputStream inputStream, Map<?, ?> options)
 			throws IOException {
 		try {
-			Network network = new XDFParser(this).parseNetwork(inputStream);
+			Network network = new XdfParser(this).parseNetwork(inputStream);
 			getContents().add(network);
 		} catch (OrccRuntimeException e) {
 			e.printStackTrace();
@@ -98,7 +98,7 @@ public class XdfResourceImpl extends ResourceImpl {
 			throws IOException {
 		try {
 			Network network = (Network) getContents().get(0);
-			new XDFWriter().write(network, outputStream);
+			new XdfWriter().write(network, outputStream);
 		} catch (OrccRuntimeException e) {
 			throw new IOException(e);
 		}
