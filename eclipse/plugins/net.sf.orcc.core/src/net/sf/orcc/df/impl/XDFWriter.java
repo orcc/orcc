@@ -509,10 +509,12 @@ public class XDFWriter {
 		instanceElt.setAttribute("id", instance.getId());
 
 		// class
-		Element classElt = document.createElement("Class");
-		classElt.setAttribute("name",
-				((Entity) instance.getContents()).getName());
-		instanceElt.appendChild(classElt);
+		EObject contents = instance.getContents();
+		if (contents instanceof Entity) {
+			Element classElt = document.createElement("Class");
+			classElt.setAttribute("name", ((Entity) contents).getName());
+			instanceElt.appendChild(classElt);
+		}
 
 		// parameters
 		for (Argument argument : instance.getArguments()) {
