@@ -33,6 +33,7 @@ import static net.sf.graphiti.model.ObjectType.PARAMETER_REFINEMENT;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
@@ -80,7 +81,6 @@ import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.impl.XdfWriter;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
@@ -96,7 +96,11 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.emf.common.util.TreeIterator;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.xtext.IGrammarAccess;
 import org.eclipse.xtext.nodemodel.ICompositeNode;
 import org.eclipse.xtext.nodemodel.ILeafNode;
@@ -472,18 +476,17 @@ public class XdfExporter extends CalSwitch<Object> {
 			addEdge(network, edge);
 		}
 
-		// necessary?
-		// ResourceSet set = new ResourceSetImpl();
-		// URI uri =
-		// URI.createPlatformResourceURI(graph.getFileName().toString(),
-		// true);
-		// Resource resource = set.createResource(uri);
-		// resource.getContents().add(network);
-
-		// use xdf writer directly to write contents to the given output stream
-		// rather than to the file directly
-		XdfWriter writer = new XdfWriter();
-		writer.write(network, out);
+		// saves to XDF
+		ResourceSet set = new ResourceSetImpl();
+		URI uri = URI.createPlatformResourceURI(graph.getFileName().toString(),
+				true);
+		Resource resource = set.createResource(uri);
+		resource.getContents().add(network);
+		try {
+			resource.save(out, null);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		// write layout
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
