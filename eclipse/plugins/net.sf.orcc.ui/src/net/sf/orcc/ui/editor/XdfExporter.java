@@ -33,7 +33,6 @@ import static net.sf.graphiti.model.ObjectType.PARAMETER_REFINEMENT;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
@@ -81,6 +80,7 @@ import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.impl.XdfWriter;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
@@ -216,7 +216,6 @@ public class XdfExporter extends CalSwitch<Object> {
 
 	private void addVertex(Network network, Vertex vertex) {
 		String name = (String) vertex.getValue(PARAMETER_ID);
-		net.sf.orcc.df.Vertex networkVertex;
 		if ("Input port".equals(vertex.getType().getName())) {
 			Type type = parseType(vertex.getValue("port type"));
 			boolean native_ = (Boolean) vertex.getValue("native");
@@ -224,7 +223,7 @@ public class XdfExporter extends CalSwitch<Object> {
 			portMap.put(port, vertex);
 
 			network.getInputs().add(port);
-			networkVertex = port;
+			vertexMap.put(vertex, port);
 		} else if ("Output port".equals(vertex.getType().getName())) {
 			Type type = parseType(vertex.getValue("port type"));
 			boolean native_ = (Boolean) vertex.getValue("native");
@@ -232,13 +231,15 @@ public class XdfExporter extends CalSwitch<Object> {
 			portMap.put(port, vertex);
 
 			network.getOutputs().add(port);
-			networkVertex = port;
+			vertexMap.put(vertex, port);
 		} else {
 			String clasz = (String) vertex.getValue(PARAMETER_REFINEMENT);
 			Actor actor = DfFactory.eINSTANCE.createActor();
 			actor.setName(clasz);
+
 			Instance instance = DfFactory.eINSTANCE.createInstance(name, actor);
-			networkVertex = instance;
+			network.getInstances().add(instance);
+			vertexMap.put(vertex, instance);
 
 			Map<?, ?> variables = (Map<?, ?>) vertex
 					.getValue("instance parameter");
@@ -278,9 +279,6 @@ public class XdfExporter extends CalSwitch<Object> {
 			}
 
 		}
-
-		network.getVertices().add(networkVertex);
-		vertexMap.put(vertex, networkVertex);
 	}
 
 	@Override
@@ -474,12 +472,20 @@ public class XdfExporter extends CalSwitch<Object> {
 			addEdge(network, edge);
 		}
 
-		try {
-			network.eResource().save(out, null);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		// necessary?
+		// ResourceSet set = new ResourceSetImpl();
+		// URI uri =
+		// URI.createPlatformResourceURI(graph.getFileName().toString(),
+		// true);
+		// Resource resource = set.createResource(uri);
+		// resource.getContents().add(network);
 
+		// use xdf writer directly to write contents to the given output stream
+		// rather than to the file directly
+		XdfWriter writer = new XdfWriter();
+		writer.write(network, out);
+
+		// write layout
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		IFile file = graph.getFile();
 		file = root.getFile(file.getFullPath().removeFileExtension()
