@@ -767,6 +767,8 @@ public class XdfParser {
 			if (file != null && file.exists()) {
 				proxy = DfFactory.eINSTANCE.createNetwork();
 			}
+		} else {
+			proxy = DfFactory.eINSTANCE.createActor();
 		}
 
 		if (proxy == null) {
