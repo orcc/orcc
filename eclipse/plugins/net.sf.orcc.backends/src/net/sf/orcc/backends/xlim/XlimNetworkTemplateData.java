@@ -36,7 +36,6 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.Vertex;
 
 /**
  * This class is giving the necessary information for the XLIM Network
@@ -51,26 +50,26 @@ public class XlimNetworkTemplateData {
 	 * Contains a Map which indicates the number of the broadcasted actor
 	 */
 
-	private Map<Connection, Integer> countBroadcastConnectionsMap;
+	private Map<Connection, Integer> networkPortConnectionFanout;
 
 	/**
 	 * Contains a Map which indicates the number of a Network Port broadcasted
 	 */
 
-	private Map<Port, Integer> countNetwokPortBroadcastMap;
+	private Map<Port, Integer> networkPortFanout;
 
 	/**
-	 * Count the Broadcast of an Actor Output port
+	 * Count the fanout of the actor's output port
 	 * 
 	 * @param network
 	 */
-	public void computeActorOutputPortBroadcast(Network network) {
+	public void computeActorOutputPortFanout(Network network) {
 		for (Instance instance : network.getInstances()) {
 			Map<Port, List<Connection>> map = instance.getOutgoingPortMap();
-			for (List<Connection> ports : map.values()) {
+			for (List<Connection> values : map.values()) {
 				int cp = 0;
-				for (Connection connection : ports) {
-					countBroadcastConnectionsMap.put(connection, cp++);
+				for (Connection connection : values) {
+					networkPortConnectionFanout.put(connection, cp++);
 				}
 			}
 		}
@@ -78,24 +77,20 @@ public class XlimNetworkTemplateData {
 	}
 
 	/**
-	 * Count the Broadcast of an Network Input Port
+	 * Count the fanout of the network's input port
 	 * 
 	 * @param network
 	 */
-	public void computeNetworkInputPortBroadcast(Network network) {
-		List<Port> inputs = network.getInputs();
-		for (Vertex vertex : network.getVertices()) {
-			if (vertex.isPort()) {
-				Port port = (Port) vertex;
-				if (inputs.contains(port)) {
-					countNetwokPortBroadcastMap.put(port, vertex.getOutgoing()
-							.size());
-				}
-				int cp = 0;
-				for (Connection connection : vertex.getOutgoing()) {
-					countBroadcastConnectionsMap.put(connection, cp++);
-				}
 
+	public void computeNetworkInputPortFanout(Network network) {
+		for (Port port : network.getInputs()) {
+			int cp = 0;
+			for (Connection connection : network.getConnections()) {
+				if (connection.getSource() == port) {
+					networkPortFanout.put(port, cp + 1);
+					networkPortConnectionFanout.put(connection, cp);
+					cp++;
+				}
 			}
 		}
 	}
@@ -107,24 +102,25 @@ public class XlimNetworkTemplateData {
 	 *            a network
 	 */
 	public void computeTemplateMaps(Network network) {
-		countNetwokPortBroadcastMap = new HashMap<Port, Integer>();
-		countBroadcastConnectionsMap = new HashMap<Connection, Integer>();
+		networkPortFanout = new HashMap<Port, Integer>();
+		networkPortConnectionFanout = new HashMap<Connection, Integer>();
 
-		computeNetworkInputPortBroadcast(network);
-		computeActorOutputPortBroadcast(network);
+		computeNetworkInputPortFanout(network);
+		computeActorOutputPortFanout(network);
 	}
 
 	/**
 	 * Return a Map which contains a connection and an associated number
 	 */
-	public Map<Connection, Integer> getCountBroadcastConnectionsMap() {
-		return countBroadcastConnectionsMap;
+	public Map<Connection, Integer> getNetworkPortConnectionFanout() {
+		return networkPortConnectionFanout;
 	}
 
 	/**
 	 * Return a Map which contains a connection and an associated number
 	 */
-	public Map<Port, Integer> getCountNetwokPortBroadcastMap() {
-		return countNetwokPortBroadcastMap;
+	public Map<Port, Integer> getNetworkPortFanout() {
+		return networkPortFanout;
 	}
+
 }
