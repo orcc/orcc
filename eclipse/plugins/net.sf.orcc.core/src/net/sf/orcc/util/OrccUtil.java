@@ -425,6 +425,9 @@ public class OrccUtil {
 		try {
 			IPath path = file.getParent().getFullPath();
 			IPackageFragment fragment = javaProject.findPackageFragment(path);
+			if (fragment == null) {
+				return null;
+			}
 			return fragment.getElementName() + "."
 					+ file.getFullPath().removeFileExtension().lastSegment();
 		} catch (JavaModelException e) {
