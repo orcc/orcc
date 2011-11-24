@@ -206,7 +206,7 @@ public class XdfImporter {
 		ObjectType type = configuration.getGraphType("XML Dataflow Network");
 		Graph graph = new Graph(configuration, type, true);
 
-		graph.setValue(ObjectType.PARAMETER_ID, network.getName());
+		graph.setValue(ObjectType.PARAMETER_ID, network.getSimpleName());
 
 		addParameters(graph, network);
 		addVariables(graph, network);
