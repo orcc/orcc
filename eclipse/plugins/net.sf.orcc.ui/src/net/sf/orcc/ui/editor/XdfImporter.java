@@ -176,11 +176,6 @@ public class XdfImporter {
 			vertex.setValue("partName",
 					new ExpressionPrinter().doSwitch(partName.getValue()));
 		}
-		Attribute clockDomain = instance.getAttribute("clockDomain");
-		if (clockDomain != null) {
-			vertex.setValue("clockDomain",
-					new ExpressionPrinter().doSwitch(clockDomain.getValue()));
-		}
 		Attribute skip = instance.getAttribute("skip");
 		if (skip != null) {
 			vertex.setValue("skip", true);
