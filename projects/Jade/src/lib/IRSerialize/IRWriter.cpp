@@ -88,6 +88,18 @@ bool IRWriter::writeSuperInterface(SuperInstance* superInstance){
 	return true;
 }
 
+void IRWriter::writeIntrisics(Actor* actor){
+	Module* module = actor->getModule();
+
+	for (Module::iterator FI = module->begin(), FE = module->end();
+           FI != FE; ++FI) {
+       
+		  if (FI->isIntrinsic())
+			  writer->addFunctionProtosExternal(FI);
+			
+	}
+}
+
 void IRWriter::writeInstance(Instance* instance){
 	this->instance = instance;
 	this->actor = instance->getActor();
@@ -95,7 +107,7 @@ void IRWriter::writeInstance(Instance* instance){
 	//Clear stored actions
 	actions.clear();
 	untaggedActions.clear();
-	
+
 	//LLVM writer
 	writer = new LLVMWriter(instance->getId()+"_", decoder);	
 
@@ -106,6 +118,10 @@ void IRWriter::writeInstance(Instance* instance){
 	//Write all instance property
 	writePortPtrs(actor->getInputs(), inputs);
 	writePortPtrs(actor->getOutputs(), outputs);
+
+
+	//Write instrisics
+	writeIntrisics(actor);
 
 
 	stateVars = writeStateVariables(actor->getStateVars());

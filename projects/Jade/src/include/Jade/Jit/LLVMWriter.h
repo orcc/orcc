@@ -176,7 +176,7 @@ private:
 	 * @return True if successfull, otherwise false
      */
 	bool LinkGlobalInits(llvm::GlobalVariable* variable);
-	
+
 	/**
      *  @brief Link the body of a Function in the decoder
 	 *

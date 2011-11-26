@@ -50,6 +50,7 @@
 extern "C" {
 	extern char* input_file;
 }
+
 //------------------------------
 
 using namespace std;

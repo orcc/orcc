@@ -52,6 +52,8 @@ LLVMWriter::LLVMWriter(string prefix, Decoder* decoder){
 	this->module = decoder->getModule();
 	this->prefix = prefix;
 	this->fifoFns = decoder->getFifoFn();
+	void createInstrisics();
+	
 }
 
 GlobalVariable* LLVMWriter::createVariable(GlobalVariable* variable){
@@ -181,7 +183,7 @@ void LLVMWriter::linkFunctionBody(Function *NewFunc, const Function *OldFunc,
                              bool ModuleLevelChanges,
                              SmallVectorImpl<ReturnInst*> &Returns,/* AbstractConnector* fifo,*/
                              const char *NameSuffix, ClonedCodeInfo *CodeInfo) {
-    // Clone any attributes.
+      // Clone any attributes.
   if (NewFunc->arg_size() == OldFunc->arg_size())
     NewFunc->copyAttributesFrom(OldFunc);
   else {

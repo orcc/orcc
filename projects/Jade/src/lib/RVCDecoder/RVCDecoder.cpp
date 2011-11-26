@@ -47,9 +47,10 @@
 
 #include "Jade/XDFSerialize/XDFParser.h"
 #include "Jade/Jit/LLVMExecution.h"
+#include "Jade/Jit/LLVMOptimizer.h"
+#include "Jade/Jit/LLVMUtility.h"
 #include "Jade/Util/FifoMng.h"
 #include "Jade/RVCEngine.h"
-
 
 #include "source.h"
 #include "display.h"
@@ -88,6 +89,7 @@ cl::opt<int> FifoSize(init(4096));
 
 
 Decoder* decoder;
+#include "llvm/Support/Threading.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -95,6 +97,7 @@ extern "C" {
 
 #include "Jade/RVCDecoder/RVCDecoder.h"
 #include "source.h"
+
 
 int nalState;
 
@@ -116,8 +119,10 @@ void print_usage(){
 void rvc_init(char *XDF, char* VTLFolder, int isAVCFile){
 
 	//Initialize context
-	LLVMContext &Context = getGlobalContext();
+	llvm_start_multithreaded();	
 	InitializeNativeTarget();
+	LLVMContext &Context = getGlobalContext();
+
 
 	//Parsing XDF
 	XDFParser xdfParser(false);
@@ -133,7 +138,13 @@ void rvc_init(char *XDF, char* VTLFolder, int isAVCFile){
 
 	//Create decoder
 	decoder = new Decoder(Context, configuration, verbose);
-	
+
+	LLVMOptimizer opt(decoder);
+	opt.optimize(3);
+
+	LLVMUtility utility;
+	utility.verify("error.txt", decoder);
+
 	//Initialize the execution engine
 	LLVMExecution* llvmEE = decoder->getEE();
 	stopVar = llvmEE->initialize();
@@ -175,6 +186,7 @@ int rvc_decode(unsigned char* nal, int nal_length, char* outBuffer, int newBuffe
 
 
 void rvc_close(){
+	llvm_stop_multithreaded();
 	delete decoder;
 }
 

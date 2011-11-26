@@ -104,9 +104,6 @@ private:
 	/** The current decoder  */
 	Decoder* decoder;
 
-	/** The decoder module */
-	llvm::Module* module;
-
 	/** Number of output of the broadcast */
 	int numOutputs;
 

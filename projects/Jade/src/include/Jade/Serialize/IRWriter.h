@@ -108,6 +108,13 @@ private:
 	void writeInstance(Instance* instance);
 
 	/**
+	 * @brief Write intrisics of the actor
+	 *
+	 * @param actor : the Actor to write intrisics from
+	 */
+	void writeIntrisics(Actor* actor);
+
+	/**
 	 * @brief Write a list of ports
 	 *
 	 * Writer a list of ports in the module
