@@ -72,11 +72,11 @@ void ConfigurationEngine::configure(Decoder* decoder){
 	broadAdder.transform();
 
 	//Merge static actors together if needed
-	if (configuration->mergeActors()){
+/*	if (configuration->mergeActors()){
 		Merger merger(Context, configuration, verbose);
 		merger.transform();
 	}
-
+*/
 	//Write instance
 	IRWriter writer(Context, decoder);
 	map<string, Instance*>* instances = configuration->getInstances();
