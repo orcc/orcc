@@ -116,6 +116,8 @@ char *write_file;
 void print_usage(){
 }
 
+using namespace std;
+
 void rvc_init(char *XDF, char* VTLFolder, int isAVCFile){
 
 	//Initialize context
@@ -139,11 +141,9 @@ void rvc_init(char *XDF, char* VTLFolder, int isAVCFile){
 	//Create decoder
 	decoder = new Decoder(Context, configuration, verbose);
 
+	// Optimize decoder
 	LLVMOptimizer opt(decoder);
 	opt.optimize(3);
-
-	LLVMUtility utility;
-	utility.verify("error.txt", decoder);
 
 	//Initialize the execution engine
 	LLVMExecution* llvmEE = decoder->getEE();
