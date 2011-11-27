@@ -103,8 +103,6 @@ int nalState;
 
 int bufferBusy;
 int safeguardFrameEmpty = 1;
-	
-int* stopVar;
 
 //Configure verbose mode
 bool verbose = true;
@@ -147,7 +145,7 @@ void rvc_init(char *XDF, char* VTLFolder, int isAVCFile){
 
 	//Initialize the execution engine
 	LLVMExecution* llvmEE = decoder->getEE();
-	stopVar = llvmEE->initialize();
+	llvmEE->initialize();
 
 	if (isAVCFile){
 		source_isAVCFile();

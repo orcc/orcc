@@ -79,6 +79,8 @@ extern "C"{
 	extern void fpsPrintInit();
 	extern void fpsPrintNewPicDecoded(void);
 
+	extern int* stopVar;
+
 }
 
 std::map<std::string, void*> createNativeMap()

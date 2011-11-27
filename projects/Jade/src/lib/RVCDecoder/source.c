@@ -52,7 +52,7 @@ static unsigned char* data;
 static int nbTokenSend;
 extern int nalState;
 
-extern int* stopVar;
+int* stopVar;
 
 void printSpeed(void) {
 }

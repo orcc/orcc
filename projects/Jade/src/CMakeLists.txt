@@ -5,7 +5,6 @@ project (Jade)
 find_program(LLVM_CONFIG llvm-config ${LLVM_INSTDIR}/bin DOC "path to llvm-config tool")
 find_package(SDL REQUIRED)
 find_package(Threads REQUIRED)
-find_library(orcc_LIBRARY orcc)
 
 # PThread dependencies
 IF(NOT CMAKE_HAVE_PTHREAD_H)
@@ -16,11 +15,6 @@ set(CMAKE_THREAD_LIBS_INIT ${PHTREAD_DIR}/lib/pthreadVCE2.lib)
 
 include_directories(${PHTREAD_INCLUDE_DIRS})
 ENDIF(NOT CMAKE_HAVE_PTHREAD_H)
-
-# Orcc dependencies
-find_path(orcc_INCLUDE_DIR NAMES orcc_fifo.h orcc_types.h
-  PATH_SUFFIXES include/orcc)
-
 
 # LLVM dependencies
 IF(LLVM_CONFIG STREQUAL "LLVM_CONFIG-NOTFOUND" )
@@ -85,7 +79,6 @@ set(JADE_MAIN_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(JADE_MAIN_INCLUDE_DIR ${JADE_MAIN_SRC_DIR}/include)
 set(JADE_TOOLS_DIR ${JADE_MAIN_SRC_DIR}/tools)
 set(JADE_VTL_DIR ${JADE_MAIN_SRC_DIR}/vtl)
-set(orcc_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Generate documentation option
 option(GENERATE_DOCS "Generate documentation using doxygen.")
@@ -117,6 +110,7 @@ add_subdirectory(lib/XCFSerialize)
 add_subdirectory(lib/XDFSerialize)
 add_subdirectory(lib/ZLib)
 add_subdirectory(lib/RVCDecoder)
+add_subdirectory(orcc)
 
 # Include directories
 include_directories(${JADE_MAIN_INCLUDE_DIR} ${LLVM_INCLUDE_DIRS} ${SDL_INCLUDE_DIR})

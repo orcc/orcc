@@ -299,7 +299,8 @@ int* LLVMExecution::initialize(){
 	std::vector<GenericValue> noargs;
 	EE->runFunction(init, noargs);
 
-	// Return stop variable
+	// Return and set stop variable
+	stopVar = &stopVal;
 	return &stopVal;
 }
 
