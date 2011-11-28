@@ -312,7 +312,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 				"net/sf/orcc/backends/vhdl/VHDL_testbench.stg");
 		Instance instance = DfFactory.eINSTANCE.createInstance(
 				network.getName(), network);
-		instance.setContents(network);
+		instance.setEntity(network);
 		printTestbench(instancePrinter, instance);
 		printTCL(instance);
 

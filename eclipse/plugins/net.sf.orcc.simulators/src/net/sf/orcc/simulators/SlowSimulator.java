@@ -193,7 +193,7 @@ public class SlowSimulator extends AbstractSimulator {
 
 			// copy actor with references (in case it references units)
 			Actor clonedActor = IrUtil.copy(actor);
-			instance.setContents(clonedActor);
+			instance.setEntity(clonedActor);
 
 			// add the cloned actor to the resource of the original actor.
 			// the interpreter will need that information

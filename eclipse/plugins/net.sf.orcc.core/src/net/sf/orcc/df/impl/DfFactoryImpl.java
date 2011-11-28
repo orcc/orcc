@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.df.*;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
@@ -296,10 +297,10 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	}
 
 	@Override
-	public Instance createInstance(String id, EObject contents) {
+	public Instance createInstance(String id, Entity entity) {
 		InstanceImpl instance = new InstanceImpl();
 		instance.setId(id);
-		instance.setContents(contents);
+		instance.setEntity(entity);
 		return instance;
 	}
 

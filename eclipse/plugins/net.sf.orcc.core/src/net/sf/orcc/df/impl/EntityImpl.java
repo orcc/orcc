@@ -188,8 +188,12 @@ public abstract class EntityImpl extends EObjectImpl implements Entity {
 
 	@Override
 	public IFile getFile() {
+		String fileName = getFileName();
+		if (fileName == null) {
+			return null;
+		}
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		return root.getFile(new Path(getFileName()));
+		return root.getFile(new Path(fileName));
 	}
 
 	/**
@@ -218,6 +222,9 @@ public abstract class EntityImpl extends EObjectImpl implements Entity {
 
 	@Override
 	public String getPackage() {
+		if (name == null) {
+			return null;
+		}
 		int index = name.lastIndexOf('.');
 		if (index == -1) {
 			return "";
@@ -228,7 +235,7 @@ public abstract class EntityImpl extends EObjectImpl implements Entity {
 
 	@Override
 	public List<String> getPackageAsList() {
-		String[] segments = name.split("\\.");
+		String[] segments = name == null ? new String[0] : name.split("\\.");
 		List<String> list = new ArrayList<String>(segments.length - 1);
 		for (int i = 0; i < segments.length - 1; i++) {
 			list.add(segments[i]);
@@ -238,6 +245,9 @@ public abstract class EntityImpl extends EObjectImpl implements Entity {
 
 	@Override
 	public String getSimpleName() {
+		if (name == null) {
+			return null;
+		}
 		int index = name.lastIndexOf('.');
 		if (index == -1) {
 			return name;

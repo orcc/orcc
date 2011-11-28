@@ -100,7 +100,7 @@ public class RepetitionsAnalyzer {
 	private void calculateRate(Vertex vertex, Rational rate) {
 		Instance instance = (Instance) vertex;
 		if (!instance.getMoC().isCSDF()) {
-			throw new OrccRuntimeException("actor" + instance.getContents()
+			throw new OrccRuntimeException("actor" + instance.getEntity()
 					+ "is not SDF or CSDF!");
 		}
 

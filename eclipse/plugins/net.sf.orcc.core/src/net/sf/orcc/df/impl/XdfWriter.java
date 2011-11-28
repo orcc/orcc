@@ -509,8 +509,8 @@ public class XdfWriter {
 		instanceElt.setAttribute("id", instance.getId());
 
 		// class
-		EObject contents = instance.getContents();
-		if (contents instanceof Entity) {
+		Entity contents = instance.getEntity();
+		if (contents != null) {
 			Element classElt = document.createElement("Class");
 			classElt.setAttribute("name", ((Entity) contents).getName());
 			instanceElt.appendChild(classElt);

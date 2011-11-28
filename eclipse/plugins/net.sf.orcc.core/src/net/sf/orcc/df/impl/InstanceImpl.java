@@ -48,7 +48,6 @@ import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
@@ -73,16 +72,6 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 * @ordered
 	 */
 	protected EList<Attribute> attributes;
-
-	/**
-	 * The cached value of the '{@link #getContents() <em>Contents</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getContents()
-	 * @generated
-	 * @ordered
-	 */
-	protected EObject contents;
 
 	/**
 	 * The default value of the '{@link #getId() <em>Id</em>}' attribute.
@@ -125,6 +114,16 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	protected EList<Instance> hierarchy;
 
 	/**
+	 * The cached value of the '{@link #getEntity() <em>Entity</em>}' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getEntity()
+	 * @generated
+	 * @ordered
+	 */
+	protected Entity entity;
+
+	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -160,18 +159,21 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EObject getContents() {
-		if (contents != null && contents.eIsProxy()) {
-			InternalEObject oldContents = (InternalEObject)contents;
-			contents = eResolveProxy(oldContents);
-			if (contents != oldContents) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.INSTANCE__CONTENTS, oldContents, contents));
-			}
-		}
-		return contents;
+	public Entity basicGetEntity() {
+		return entity;
 	}
 
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setEntity(Entity newEntity) {
+		Entity oldEntity = entity;
+		entity = newEntity;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.INSTANCE__ENTITY, oldEntity, entity));
+	}
 
 	/**
 	 * Returns the actor referenced by this instance.
@@ -180,7 +182,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 *         this instance does not reference an actor
 	 */
 	public Actor getActor() {
-		return (Actor) contents;
+		return (Actor) getEntity();
 	}
 
 	@Override
@@ -200,40 +202,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 *         if this instance does not reference a broadcasst
 	 */
 	public Broadcast getBroadcast() {
-		return (Broadcast) contents;
-	}
-
-	/**
-	 * Returns the class of this instance.
-	 * 
-	 * @return the class of this instance
-	 */
-	public String getClasz() {
-		if (contents instanceof Entity) {
-			return ((Entity) contents).getName();
-		} else {
-			return null;
-		}
-	}
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EObject basicGetContents() {
-		return contents;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setContents(EObject newContents) {
-		EObject oldContents = contents;
-		contents = newContents;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.INSTANCE__CONTENTS, oldContents, contents));
+		return (Broadcast) getEntity();
 	}
 
 	/**
@@ -329,6 +298,23 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Entity getEntity() {
+		if (entity != null && entity.eIsProxy()) {
+			InternalEObject oldEntity = (InternalEObject)entity;
+			entity = (Entity)eResolveProxy(oldEntity);
+			if (entity != oldEntity) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.INSTANCE__ENTITY, oldEntity, entity));
+			}
+		}
+		return entity;
+	}
+
+	/**
 	 * Returns the classification class of the instance.
 	 * 
 	 * @return the classification class of this instance
@@ -350,7 +336,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 *         this instance does not reference a network
 	 */
 	public Network getNetwork() {
-		return (Network) contents;
+		return (Network) getEntity();
 	}
 
 	/**
@@ -360,7 +346,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 *         this instance does not reference a wrapper
 	 */
 	public SerDes getWrapper() {
-		return (SerDes) contents;
+		return (SerDes) getEntity();
 	}
 
 	/**
@@ -369,7 +355,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 * @return true if this instance references an actor.
 	 */
 	public boolean isActor() {
-		return (contents instanceof Actor);
+		return (getEntity() instanceof Actor);
 	}
 
 	/**
@@ -378,7 +364,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 * @return true if this instance is a broadcast
 	 */
 	public boolean isBroadcast() {
-		return (contents instanceof Broadcast);
+		return (getEntity() instanceof Broadcast);
 	}
 
 	/**
@@ -387,12 +373,12 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 * @return true if this instance references a network.
 	 */
 	public boolean isNetwork() {
-		return (contents instanceof Network);
+		return (getEntity() instanceof Network);
 	}
 
 	@Override
 	public boolean isWrapper() {
-		return (contents instanceof SerDes);
+		return (getEntity() instanceof SerDes);
 	}
 
 	/**
@@ -421,15 +407,15 @@ public class InstanceImpl extends VertexImpl implements Instance {
 		switch (featureID) {
 			case DfPackage.INSTANCE__ATTRIBUTES:
 				return getAttributes();
-			case DfPackage.INSTANCE__CONTENTS:
-				if (resolve) return getContents();
-				return basicGetContents();
 			case DfPackage.INSTANCE__ID:
 				return getId();
 			case DfPackage.INSTANCE__ARGUMENTS:
 				return getArguments();
 			case DfPackage.INSTANCE__HIERARCHY:
 				return getHierarchy();
+			case DfPackage.INSTANCE__ENTITY:
+				if (resolve) return getEntity();
+				return basicGetEntity();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -447,9 +433,6 @@ public class InstanceImpl extends VertexImpl implements Instance {
 				getAttributes().clear();
 				getAttributes().addAll((Collection<? extends Attribute>)newValue);
 				return;
-			case DfPackage.INSTANCE__CONTENTS:
-				setContents((EObject)newValue);
-				return;
 			case DfPackage.INSTANCE__ID:
 				setId((String)newValue);
 				return;
@@ -460,6 +443,9 @@ public class InstanceImpl extends VertexImpl implements Instance {
 			case DfPackage.INSTANCE__HIERARCHY:
 				getHierarchy().clear();
 				getHierarchy().addAll((Collection<? extends Instance>)newValue);
+				return;
+			case DfPackage.INSTANCE__ENTITY:
+				setEntity((Entity)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -476,9 +462,6 @@ public class InstanceImpl extends VertexImpl implements Instance {
 			case DfPackage.INSTANCE__ATTRIBUTES:
 				getAttributes().clear();
 				return;
-			case DfPackage.INSTANCE__CONTENTS:
-				setContents((EObject)null);
-				return;
 			case DfPackage.INSTANCE__ID:
 				setId(ID_EDEFAULT);
 				return;
@@ -487,6 +470,9 @@ public class InstanceImpl extends VertexImpl implements Instance {
 				return;
 			case DfPackage.INSTANCE__HIERARCHY:
 				getHierarchy().clear();
+				return;
+			case DfPackage.INSTANCE__ENTITY:
+				setEntity((Entity)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -502,14 +488,14 @@ public class InstanceImpl extends VertexImpl implements Instance {
 		switch (featureID) {
 			case DfPackage.INSTANCE__ATTRIBUTES:
 				return attributes != null && !attributes.isEmpty();
-			case DfPackage.INSTANCE__CONTENTS:
-				return contents != null;
 			case DfPackage.INSTANCE__ID:
 				return ID_EDEFAULT == null ? id != null : !ID_EDEFAULT.equals(id);
 			case DfPackage.INSTANCE__ARGUMENTS:
 				return arguments != null && !arguments.isEmpty();
 			case DfPackage.INSTANCE__HIERARCHY:
 				return hierarchy != null && !hierarchy.isEmpty();
+			case DfPackage.INSTANCE__ENTITY:
+				return entity != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -521,7 +507,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	@Override
 	public String toString() {
-		return id + ": " + contents;
+		return id + ": " + getEntity();
 	}
 
 }

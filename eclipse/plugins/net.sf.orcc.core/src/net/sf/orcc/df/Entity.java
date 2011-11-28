@@ -34,8 +34,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.EObject;
 
 /**
- * This class defines an entity. An entity has a package, a name, and may be
- * either an actor or a unit.
+ * This class defines an entity. An entity has a package, a name, and may be an
+ * actor, a network, or a unit.
  * 
  * @author Matthieu Wipliez
  * @model abstract="true"
@@ -43,54 +43,54 @@ import org.eclipse.emf.ecore.EObject;
 public interface Entity extends EObject {
 
 	/**
-	 * Returns the file this actor is defined in.
+	 * Returns the file this entity is defined in.
 	 * 
-	 * @return the file this actor is defined in
+	 * @return the file this entity is defined in
 	 */
 	IFile getFile();
 
 	/**
-	 * Returns the name of the file this actor is defined in.
+	 * Returns the name of the file this entity is defined in.
 	 * 
-	 * @return the name of the file this actor is defined in
+	 * @return the name of the file this entity is defined in
 	 * @model dataType="org.eclipse.emf.ecore.EString"
 	 */
 	String getFileName();
 
 	/**
-	 * Returns the line number on which this actor starts.
+	 * Returns the line number on which this entity starts.
 	 * 
-	 * @return the line number on which this actor starts
+	 * @return the line number on which this entity starts
 	 * @model
 	 */
 	public int getLineNumber();
 
 	/**
-	 * Returns the name of this actor.
+	 * Returns the name of this entity.
 	 * 
-	 * @return the name of this actor
+	 * @return the name of this entity
 	 * @model dataType="org.eclipse.emf.ecore.EString"
 	 */
 	String getName();
 
 	/**
-	 * Returns the package of this actor.
+	 * Returns the package of this entity.
 	 * 
-	 * @return the package of this actor
+	 * @return the package of this entity
 	 */
 	String getPackage();
 
 	/**
-	 * Returns the package of this actor as a list of strings.
+	 * Returns the package of this entity as a list of strings.
 	 * 
-	 * @return the package of this actor as a list of strings
+	 * @return the package of this entity as a list of strings
 	 */
 	List<String> getPackageAsList();
 
 	/**
-	 * Returns the simple name of this actor.
+	 * Returns the simple name of this entity.
 	 * 
-	 * @return the simple name of this actor
+	 * @return the simple name of this entity
 	 */
 	String getSimpleName();
 
@@ -123,31 +123,31 @@ public interface Entity extends EObject {
 	boolean isUnit();
 
 	/**
-	 * Sets the name of the file in which this actor is defined.
+	 * Sets the name of the file in which this entity is defined.
 	 * 
 	 * @param fileName
-	 *            name of the file in which this actor is defined
+	 *            name of the file in which this entity is defined
 	 */
 	void setFileName(String fileName);
 
 	/**
-	 * Sets the line number on which this actor starts.
+	 * Sets the line number on which this entity starts.
 	 * 
 	 * @param newLineNumber
-	 *            the line number on which this actor starts
+	 *            the line number on which this entity starts
 	 */
 	public void setLineNumber(int newLineNumber);
 
 	/**
-	 * Sets the name of this actor.
+	 * Sets the name of this entity.
 	 * 
 	 * @param name
-	 *            the new name of this actor
+	 *            the new name of this entity
 	 */
 	void setName(String name);
 
 	/**
-	 * Sets the template data associated with this actor. Template data should
+	 * Sets the template data associated with this entity. Template data should
 	 * hold data that is specific to a given template.
 	 * 
 	 * @param templateData

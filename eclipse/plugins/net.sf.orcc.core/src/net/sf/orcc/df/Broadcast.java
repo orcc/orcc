@@ -31,17 +31,17 @@ package net.sf.orcc.df;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EObject;
 import net.sf.orcc.ir.Type;
 
+import org.eclipse.emf.common.util.EList;
+
 /**
- * This class defines a broadcast as a particular instance.
+ * This class defines a broadcast as a particular entity.
  * 
  * @author Matthieu Wipliez
- * @model
+ * @model extends="Entity"
  */
-public interface Broadcast extends EObject {
+public interface Broadcast extends Entity {
 
 	public Port getInput();
 

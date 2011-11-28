@@ -54,7 +54,7 @@ public class ArgumentEvaluator extends DfSwitch<Void> {
 			argument.setValue(ValueUtil.getExpression(value));
 		}
 
-		doSwitch(instance.getContents());
+		doSwitch(instance.getEntity());
 		return null;
 	}
 

@@ -34,7 +34,6 @@ import net.sf.orcc.moc.MoC;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines an instance. An instance has an id, a class, parameters
@@ -88,11 +87,11 @@ public interface Instance extends Vertex {
 	Broadcast getBroadcast();
 
 	/**
-	 * Returns the contents of this instance.
+	 * Returns the entity referenced by this instance.
 	 * 
 	 * @model
 	 */
-	EObject getContents();
+	Entity getEntity();
 
 	/**
 	 * Returns the file in which this instance is defined. This file is only
@@ -186,13 +185,12 @@ public interface Instance extends Vertex {
 	boolean isWrapper();
 
 	/**
-	 * Sets the contents of this instance to be that of an actor. Removes any
-	 * prior contents.
+	 * Sets the entity referenced by this instance.
 	 * 
-	 * @param actor
-	 *            an actor
+	 * @param entity
+	 *            an entity
 	 */
-	void setContents(EObject contents);
+	void setEntity(Entity entity);
 
 	/**
 	 * Changes the identifier of this instance.

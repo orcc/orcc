@@ -544,7 +544,7 @@ public class XdfParser {
 		if (vertex.isPort()) {
 			return null;
 		} else {
-			URI uri = EcoreUtil.getURI(((Instance) vertex).getContents());
+			URI uri = EcoreUtil.getURI(((Instance) vertex).getEntity());
 			uri = uri.appendFragment("//@" + dir + "." + portName);
 			Port proxy = DfFactory.eINSTANCE.createPort();
 			((InternalEObject) proxy).eSetProxyURI(uri);
@@ -786,7 +786,7 @@ public class XdfParser {
 		String pathName = file.getFullPath().toString();
 		URI uri = URI.createPlatformResourceURI(pathName, true);
 		uri = uri.appendFragment("/0");
-		instance.setContents(proxy);
+		instance.setEntity(proxy);
 		((InternalEObject) proxy).eSetProxyURI(uri);
 
 		// instance parameters and attributes
@@ -834,7 +834,7 @@ public class XdfParser {
 				Expression expr = exprParser.parseExpr(node.getFirstChild());
 
 				// create proxy to variable
-				URI uri = EcoreUtil.getURI(instance.getContents());
+				URI uri = EcoreUtil.getURI(instance.getEntity());
 				uri = uri.appendFragment("//@parameters." + name);
 				Var proxy = IrFactory.eINSTANCE.createVar();
 				((InternalEObject) proxy).eSetProxyURI(uri);

@@ -468,17 +468,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getInstance_Contents() {
-		return (EReference)instanceEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EAttribute getInstance_Id() {
-		return (EAttribute)instanceEClass.getEStructuralFeatures().get(2);
+		return (EAttribute)instanceEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -487,7 +478,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getInstance_Arguments() {
-		return (EReference)instanceEClass.getEStructuralFeatures().get(3);
+		return (EReference)instanceEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -496,6 +487,15 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getInstance_Hierarchy() {
+		return (EReference)instanceEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getInstance_Entity() {
 		return (EReference)instanceEClass.getEStructuralFeatures().get(4);
 	}
 
@@ -1216,10 +1216,10 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 
 		instanceEClass = createEClass(INSTANCE);
 		createEReference(instanceEClass, INSTANCE__ATTRIBUTES);
-		createEReference(instanceEClass, INSTANCE__CONTENTS);
 		createEAttribute(instanceEClass, INSTANCE__ID);
 		createEReference(instanceEClass, INSTANCE__ARGUMENTS);
 		createEReference(instanceEClass, INSTANCE__HIERARCHY);
+		createEReference(instanceEClass, INSTANCE__ENTITY);
 
 		broadcastEClass = createEClass(BROADCAST);
 		createEReference(broadcastEClass, BROADCAST__INPUTS);
@@ -1350,6 +1350,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		// Add supertypes to classes
 		networkEClass.getESuperTypes().add(this.getEntity());
 		instanceEClass.getESuperTypes().add(this.getVertex());
+		broadcastEClass.getESuperTypes().add(this.getEntity());
 		actorEClass.getESuperTypes().add(this.getEntity());
 		portEClass.getESuperTypes().add(this.getVertex());
 		unitEClass.getESuperTypes().add(this.getEntity());
@@ -1378,10 +1379,10 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 
 		initEClass(instanceEClass, Instance.class, "Instance", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getInstance_Attributes(), this.getAttribute(), null, "attributes", null, 0, -1, Instance.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getInstance_Contents(), theEcorePackage.getEObject(), null, "contents", null, 0, 1, Instance.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getInstance_Id(), ecorePackage.getEString(), "id", null, 0, 1, Instance.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getInstance_Arguments(), this.getArgument(), null, "arguments", null, 0, -1, Instance.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getInstance_Hierarchy(), this.getInstance(), null, "hierarchy", null, 0, -1, Instance.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getInstance_Entity(), this.getEntity(), null, "entity", null, 0, 1, Instance.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(broadcastEClass, Broadcast.class, "Broadcast", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getBroadcast_Inputs(), this.getPort(), null, "inputs", null, 0, -1, Broadcast.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

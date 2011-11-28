@@ -30,10 +30,10 @@
     </genClasses>
     <genClasses ecoreClass="Df.ecore#//Instance">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Instance/attributes"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Instance/contents"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Instance/id"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Instance/arguments"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Instance/hierarchy"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Instance/entity"/>
     </genClasses>
     <genClasses ecoreClass="Df.ecore#//Broadcast">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Broadcast/inputs"/>

@@ -430,22 +430,13 @@ public interface DfPackage extends EPackage {
 	int INSTANCE__ATTRIBUTES = VERTEX_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Contents</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INSTANCE__CONTENTS = VERTEX_FEATURE_COUNT + 1;
-
-	/**
 	 * The feature id for the '<em><b>Id</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INSTANCE__ID = VERTEX_FEATURE_COUNT + 2;
+	int INSTANCE__ID = VERTEX_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Arguments</b></em>' containment reference list.
@@ -454,7 +445,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INSTANCE__ARGUMENTS = VERTEX_FEATURE_COUNT + 3;
+	int INSTANCE__ARGUMENTS = VERTEX_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Hierarchy</b></em>' reference list.
@@ -463,7 +454,16 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INSTANCE__HIERARCHY = VERTEX_FEATURE_COUNT + 4;
+	int INSTANCE__HIERARCHY = VERTEX_FEATURE_COUNT + 3;
+
+	/**
+	 * The feature id for the '<em><b>Entity</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INSTANCE__ENTITY = VERTEX_FEATURE_COUNT + 4;
 
 	/**
 	 * The number of structural features of the '<em>Instance</em>' class.
@@ -475,13 +475,40 @@ public interface DfPackage extends EPackage {
 	int INSTANCE_FEATURE_COUNT = VERTEX_FEATURE_COUNT + 5;
 
 	/**
+	 * The feature id for the '<em><b>File Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int BROADCAST__FILE_NAME = ENTITY__FILE_NAME;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int BROADCAST__LINE_NUMBER = ENTITY__LINE_NUMBER;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int BROADCAST__NAME = ENTITY__NAME;
+
+	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int BROADCAST__INPUTS = 0;
+	int BROADCAST__INPUTS = ENTITY_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Outputs</b></em>' containment reference list.
@@ -490,7 +517,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int BROADCAST__OUTPUTS = 1;
+	int BROADCAST__OUTPUTS = ENTITY_FEATURE_COUNT + 1;
 
 	/**
 	 * The number of structural features of the '<em>Broadcast</em>' class.
@@ -499,7 +526,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int BROADCAST_FEATURE_COUNT = 2;
+	int BROADCAST_FEATURE_COUNT = ENTITY_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>String</b></em>' attribute.
@@ -1508,17 +1535,6 @@ public interface DfPackage extends EPackage {
 	EReference getInstance_Attributes();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.df.Instance#getContents <em>Contents</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Contents</em>'.
-	 * @see net.sf.orcc.df.Instance#getContents()
-	 * @see #getInstance()
-	 * @generated
-	 */
-	EReference getInstance_Contents();
-
-	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.Instance#getId <em>Id</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1550,6 +1566,17 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getInstance_Hierarchy();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.df.Instance#getEntity <em>Entity</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Entity</em>'.
+	 * @see net.sf.orcc.df.Instance#getEntity()
+	 * @see #getInstance()
+	 * @generated
+	 */
+	EReference getInstance_Entity();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Broadcast <em>Broadcast</em>}'.
@@ -2543,14 +2570,6 @@ public interface DfPackage extends EPackage {
 		EReference INSTANCE__ATTRIBUTES = eINSTANCE.getInstance_Attributes();
 
 		/**
-		 * The meta object literal for the '<em><b>Contents</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference INSTANCE__CONTENTS = eINSTANCE.getInstance_Contents();
-
-		/**
 		 * The meta object literal for the '<em><b>Id</b></em>' attribute feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -2573,6 +2592,14 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EReference INSTANCE__HIERARCHY = eINSTANCE.getInstance_Hierarchy();
+
+		/**
+		 * The meta object literal for the '<em><b>Entity</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference INSTANCE__ENTITY = eINSTANCE.getInstance_Entity();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.BroadcastImpl <em>Broadcast</em>}' class.

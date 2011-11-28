@@ -48,7 +48,6 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -159,8 +158,7 @@ public class XdfImporter {
 	private Vertex getVertex(Instance instance, ObjectType type) {
 		Vertex vertex = new Vertex(type);
 		vertex.setValue(PARAMETER_ID, instance.getId());
-		vertex.setValue(PARAMETER_REFINEMENT,
-				((Entity) instance.getContents()).getName());
+		vertex.setValue(PARAMETER_REFINEMENT, instance.getEntity().getName());
 
 		// parameters
 		Map<String, String> parameters = new HashMap<String, String>();

@@ -121,6 +121,7 @@ public class DfSwitch<T> extends Switch<T> {
 			case DfPackage.BROADCAST: {
 				Broadcast broadcast = (Broadcast)theEObject;
 				T result = caseBroadcast(broadcast);
+				if (result == null) result = caseEntity(broadcast);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
