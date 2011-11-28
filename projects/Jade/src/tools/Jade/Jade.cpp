@@ -273,7 +273,7 @@ void startCmdLine(){
 
 	//Parsing XCF file if needed
 	if(XCFFile != ""){
-		std::cout << "Parsing file " << XDFFile.getValue() << ". \n";
+		std::cout << "Parsing file " << XCFFile.getValue() << ". \n";
 
 		XCFParser xcfParser(Verbose);
 		map<string, string>* mapping = xcfParser.parseFile(XCFFile);

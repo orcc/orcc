@@ -220,9 +220,11 @@ void LLVMExecution::launchPartitions(map<Partition*, Scheduler*>* parts) {
 		pthread_t* thread = new pthread_t();
 		threads.push_back(thread);
 
-		procThread th = {EE,sched->getMainFunction()};
+		procThread* th = new procThread;
+		th->EE = EE;
+		th->func = sched->getMainFunction();
 	
-		pthread_create( thread, NULL, &LLVMExecution::threadProc, &th);
+		pthread_create( thread, NULL, &LLVMExecution::threadProc, th);
 	}
 }
 
