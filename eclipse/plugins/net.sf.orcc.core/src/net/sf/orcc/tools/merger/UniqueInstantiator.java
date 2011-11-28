@@ -9,15 +9,15 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
-import net.sf.orcc.df.transformations.NetworkVisitor;
+import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.util.IrUtil;
 
-public class UniqueInstantiator implements NetworkVisitor<Void> {
+public class UniqueInstantiator extends DfSwitch<Void> {
 
 	private Map<Actor, Integer> actors = new HashMap<Actor, Integer>();
 
 	@Override
-	public Void doSwitch(Network network) {
+	public Void caseNetwork(Network network) {
 		for (Instance instance : network.getInstances()) {
 			Actor actor = instance.getActor();
 			if (actors.containsKey(actor)) {

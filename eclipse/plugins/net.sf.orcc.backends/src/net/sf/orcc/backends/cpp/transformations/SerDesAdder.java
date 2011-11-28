@@ -46,7 +46,7 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.SerDes;
 import net.sf.orcc.df.Vertex;
-import net.sf.orcc.df.transformations.NetworkVisitor;
+import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.ExprString;
 
 import org.jgrapht.DirectedGraph;
@@ -59,7 +59,7 @@ import org.jgrapht.DirectedGraph;
  * @author Ghislain Roquier
  * 
  */
-public class SerDesAdder implements NetworkVisitor<Void> {
+public class SerDesAdder extends DfSwitch<Void> {
 
 	private DirectedGraph<Vertex, Connection> graph;
 
@@ -171,7 +171,8 @@ public class SerDesAdder implements NetworkVisitor<Void> {
 		examineConnections(vertex, connections, outMap);
 	}
 
-	public Void doSwitch(Network network) {
+	@Override
+	public Void caseNetwork(Network network) {
 		// graph = network.getGraph();
 
 		List<Port> inputs = network.getInputs();

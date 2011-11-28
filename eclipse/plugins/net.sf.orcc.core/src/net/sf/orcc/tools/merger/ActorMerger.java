@@ -45,7 +45,7 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
-import net.sf.orcc.df.transformations.NetworkVisitor;
+import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstLoad;
@@ -78,7 +78,7 @@ import org.jgrapht.graph.DirectedSubgraph;
  * @author Ghislain Roquier
  * 
  */
-public class ActorMerger implements NetworkVisitor<Void> {
+public class ActorMerger extends DfSwitch<Void> {
 
 	private static final String ACTION_NAME = "static_schedule";
 
@@ -588,7 +588,7 @@ public class ActorMerger implements NetworkVisitor<Void> {
 	}
 
 	@Override
-	public Void doSwitch(Network network) {
+	public Void caseNetwork(Network network) {
 		this.network = network;
 
 		// make instance unique in the network

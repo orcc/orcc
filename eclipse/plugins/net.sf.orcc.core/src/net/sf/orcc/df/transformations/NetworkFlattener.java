@@ -37,6 +37,7 @@ import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
+import net.sf.orcc.df.util.DfSwitch;
 
 import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 
@@ -47,11 +48,36 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  * @author Ghislain Roquier
  * 
  */
-public class NetworkFlattener implements NetworkVisitor<Void> {
+public class NetworkFlattener extends DfSwitch<Void> {
 
 	private Copier copier;
 
 	public NetworkFlattener() {
+	}
+
+	@Override
+	public Void caseNetwork(Network network) {
+		List<Instance> instances = new ArrayList<Instance>(
+				network.getInstances());
+		for (Instance instance : instances) {
+			if (instance.isNetwork()) {
+				Network subNetwork = instance.getNetwork();
+
+				// flatten this sub-network
+				new NetworkFlattener().doSwitch(subNetwork);
+
+				// copy vertices and edges
+				copier = new Copier();
+				copySubGraph(network, instance);
+				linkOutgoingConnections(network, instance);
+				linkIncomingConnections(network, instance);
+				copier = null;
+
+				// remove instance from network
+				network.getInstances().remove(instance);
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -130,31 +156,6 @@ public class NetworkFlattener implements NetworkVisitor<Void> {
 				network.getConnections().add(incoming);
 			}
 		}
-	}
-
-	@Override
-	public Void doSwitch(Network network) {
-		List<Instance> instances = new ArrayList<Instance>(
-				network.getInstances());
-		for (Instance instance : instances) {
-			if (instance.isNetwork()) {
-				Network subNetwork = instance.getNetwork();
-
-				// flatten this sub-network
-				new NetworkFlattener().doSwitch(subNetwork);
-
-				// copy vertices and edges
-				copier = new Copier();
-				copySubGraph(network, instance);
-				linkOutgoingConnections(network, instance);
-				linkIncomingConnections(network, instance);
-				copier = null;
-
-				// remove instance from network
-				network.getInstances().remove(instance);
-			}
-		}
-		return null;
 	}
 
 }

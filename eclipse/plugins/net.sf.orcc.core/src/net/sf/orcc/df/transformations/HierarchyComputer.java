@@ -34,6 +34,7 @@ import java.util.List;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.util.DfSwitch;
 
 /**
  * This class defines a transformation that computes the hierarchy of all
@@ -43,7 +44,7 @@ import net.sf.orcc.df.Network;
  * @author Matthieu Wipliez
  * 
  */
-public class HierarchyComputer implements NetworkVisitor<Void> {
+public class HierarchyComputer extends DfSwitch<Void> {
 
 	private List<Instance> instances;
 
@@ -57,7 +58,7 @@ public class HierarchyComputer implements NetworkVisitor<Void> {
 	}
 
 	@Override
-	public Void doSwitch(Network network) {
+	public Void caseNetwork(Network network) {
 		if (instances.isEmpty()) {
 			Instance instance = DfFactory.eINSTANCE.createInstance(
 					network.getSimpleName(), network);
@@ -67,8 +68,7 @@ public class HierarchyComputer implements NetworkVisitor<Void> {
 		for (Instance instance : network.getInstances()) {
 			if (instance.isNetwork()) {
 				Network subNetwork = instance.getNetwork();
-				new HierarchyComputer(instances, instance)
-						.doSwitch(subNetwork);
+				new HierarchyComputer(instances, instance).doSwitch(subNetwork);
 			}
 
 			instance.getHierarchy().addAll(instances);

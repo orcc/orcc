@@ -41,7 +41,6 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.transformations.NetworkVisitor;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
@@ -61,34 +60,33 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * @author Johan Ersfolk
  * 
  */
-public class NetworkStateDefExtractor extends AbstractActorVisitor<Object>
-		implements NetworkVisitor<Void> {
+public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 
-	private Map<Var, Set<Var>> variableDependency = new HashMap<Var, Set<Var>>();
+	private Stack<Set<Var>> conditionVars = new Stack<Set<Var>>();
 
-	private Set<Var> varsUsedInScheduling = new HashSet<Var>();
+	private Var currentDeps = null;
 
-	private Set<Port> portsUsedInScheduling = new HashSet<Port>();
+	private Map<Port, Port> fifoTargetToSourceMap = new HashMap<Port, Port>();
+
+	private boolean inCondition = false;
 
 	private Set<Port> inputPortsUsedInScheduling = new HashSet<Port>();
 
-	private Set<Port> outputPortsUsedInScheduling = new HashSet<Port>();
+	private boolean inScheduler = false;
 
-	private Set<Var> variablesWithLoops = new HashSet<Var>();
+	private Set<Port> outputPortsUsedInScheduling = new HashSet<Port>();
 
 	private Map<Port, Set<Port>> outputPortToInputPortMap = new HashMap<Port, Set<Port>>();
 
 	private Map<Port, Set<Var>> outputPortToVariableMap = new HashMap<Port, Set<Var>>();
 
-	private Var currentDeps = null;
+	private Set<Port> portsUsedInScheduling = new HashSet<Port>();
 
-	private Stack<Set<Var>> conditionVars = new Stack<Set<Var>>();
+	private Map<Var, Set<Var>> variableDependency = new HashMap<Var, Set<Var>>();
 
-	private boolean inCondition = false;
+	private Set<Var> variablesWithLoops = new HashSet<Var>();
 
-	private boolean inScheduler = false;
-
-	private Map<Port, Port> fifoTargetToSourceMap = new HashMap<Port, Port>();
+	private Set<Var> varsUsedInScheduling = new HashSet<Var>();
 
 	private Set<Var> visited = new HashSet<Var>();
 
@@ -215,6 +213,16 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object>
 	}
 
 	@Override
+	public Void caseNetwork(Network network) {
+		for (Actor actor : network.getActors()) {
+			doSwitch(actor);
+		}
+		identifyControlTokenPorts(network);
+		identifySchedulingVars();
+		return null;
+	}
+
+	@Override
 	public Object caseNodeIf(NodeIf nodeIf) {
 		conditionVars.push(new HashSet<Var>());
 		inCondition = true;
@@ -307,16 +315,6 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object>
 				varsUsedInScheduling.addAll(outputPortToVariableMap.get(port));
 			}
 		}
-	}
-
-	@Override
-	public Void doSwitch(Network network) {
-		for (Actor actor : network.getActors()) {
-			doSwitch(actor);
-		}
-		identifyControlTokenPorts(network);
-		identifySchedulingVars();
-		return null;
 	}
 
 	private void transitiveClosure(Var variable, Set<Var> transitiveClosure) {

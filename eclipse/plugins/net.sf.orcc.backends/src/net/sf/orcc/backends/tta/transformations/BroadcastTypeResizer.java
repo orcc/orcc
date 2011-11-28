@@ -6,16 +6,16 @@ import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.transformations.NetworkVisitor;
+import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
 
-public class BroadcastTypeResizer implements NetworkVisitor<Void> {
+public class BroadcastTypeResizer extends DfSwitch<Void> {
 
 	@Override
-	public Void doSwitch(Network network) {
+	public Void caseNetwork(Network network) {
 		for (Instance instance : network.getInstances()) {
 			if (instance.isBroadcast()) {
 				Broadcast broadcast = instance.getBroadcast();

@@ -41,6 +41,7 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
+import net.sf.orcc.df.util.DfSwitch;
 
 /**
  * Adds broadcast actors when needed.
@@ -49,11 +50,37 @@ import net.sf.orcc.df.Vertex;
  * @author Herve Yviquel
  * 
  */
-public class BroadcastAdder implements NetworkVisitor<Void> {
+public class BroadcastAdder extends DfSwitch<Void> {
+
+	private Network network;
 
 	protected Set<Connection> toBeRemoved;
 
-	private Network network;
+	@Override
+	public Void caseNetwork(Network network) {
+		this.network = network;
+		toBeRemoved = new HashSet<Connection>();
+
+		// make a copy of the existing vertex set because the set returned is
+		// modified when broadcasts are added
+		List<Vertex> vertexSet = new ArrayList<Vertex>(network.getVertices());
+
+		for (Vertex vertex : vertexSet) {
+			if (vertex.isInstance()) {
+				Instance instance = (Instance) vertex;
+				if (instance.isNetwork()) {
+					new BroadcastAdder().doSwitch(instance.getNetwork());
+				}
+			}
+
+			examineVertex(vertex);
+		}
+
+		// removes old connections
+		network.getConnections().removeAll(toBeRemoved);
+
+		return null;
+	}
 
 	protected void createBroadcast(String id, Port port,
 			List<Connection> outList) {
@@ -169,30 +196,4 @@ public class BroadcastAdder implements NetworkVisitor<Void> {
 		examineConnections(vertex, connections, outMap);
 	}
 
-	@Override
-	public Void doSwitch(Network network) {
-		this.network = network;
-		toBeRemoved = new HashSet<Connection>();
-
-		// make a copy of the existing vertex set because the set returned is
-		// modified when broadcasts are added
-		List<Vertex> vertexSet = new ArrayList<Vertex>(network.getVertices());
-
-		for (Vertex vertex : vertexSet) {
-			if (vertex.isInstance()) {
-				Instance instance = (Instance) vertex;
-				if (instance.isNetwork()) {
-					new BroadcastAdder().doSwitch(instance.getNetwork());
-				}
-			}
-
-			examineVertex(vertex);
-		}
-
-		// removes old connections
-		network.getConnections().removeAll(toBeRemoved);
-		
-		return null;
-	}
-	
 }

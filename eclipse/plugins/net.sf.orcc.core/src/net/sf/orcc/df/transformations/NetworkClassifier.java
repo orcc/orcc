@@ -31,6 +31,7 @@ package net.sf.orcc.df.transformations;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.moc.MocFactory;
 import net.sf.orcc.tools.classifier.ActorClassifier;
@@ -43,13 +44,19 @@ import net.sf.orcc.tools.classifier.ActorClassifier;
  * @author Jerome Gorin
  * 
  */
-public class NetworkClassifier implements NetworkVisitor<Void> {
+public class NetworkClassifier extends DfSwitch<Void> {
 
 	private static int CSDF = 1;
 
 	private static int DYNAMIC = 2;
 
 	private static int SDF = 0;
+
+	@Override
+	public Void caseNetwork(Network network) {
+		network.setMoC(getMoC(network));
+		return null;
+	}
 
 	private MoC getMoC(Network network) {
 		MoC moc = MocFactory.eINSTANCE.createSDFMoC();
@@ -82,12 +89,6 @@ public class NetworkClassifier implements NetworkVisitor<Void> {
 		}
 
 		return moc;
-	}
-
-	@Override
-	public Void doSwitch(Network network) {
-		network.setMoC(getMoC(network));
-		return null;
 	}
 
 }
