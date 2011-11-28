@@ -43,7 +43,6 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.SerDes;
 import net.sf.orcc.moc.MoC;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
@@ -64,16 +63,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
 public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
-	 * The cached value of the '{@link #getAttributes() <em>Attributes</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getAttributes()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Attribute> attributes;
-
-	/**
 	 * The default value of the '{@link #getId() <em>Id</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -82,16 +71,6 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 * @ordered
 	 */
 	protected static final String ID_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getId() <em>Id</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getId()
-	 * @generated
-	 * @ordered
-	 */
-	protected String id = ID_EDEFAULT;
 
 	/**
 	 * The cached value of the '{@link #getArguments() <em>Arguments</em>}' containment reference list.
@@ -104,14 +83,14 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	protected EList<Argument> arguments;
 
 	/**
-	 * The cached value of the '{@link #getHierarchy() <em>Hierarchy</em>}' reference list.
+	 * The cached value of the '{@link #getAttributes() <em>Attributes</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getHierarchy()
+	 * @see #getAttributes()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Instance> hierarchy;
+	protected EList<Attribute> attributes;
 
 	/**
 	 * The cached value of the '{@link #getEntity() <em>Entity</em>}' reference.
@@ -124,34 +103,32 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	protected Entity entity;
 
 	/**
+	 * The cached value of the '{@link #getHierarchy() <em>Hierarchy</em>}' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getHierarchy()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Instance> hierarchy;
+
+	/**
+	 * The cached value of the '{@link #getId() <em>Id</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getId()
+	 * @generated
+	 * @ordered
+	 */
+	protected String id = ID_EDEFAULT;
+
+	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected InstanceImpl() {
 		super();
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	protected EClass eStaticClass() {
-		return DfPackage.Literals.INSTANCE;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Attribute> getAttributes() {
-		if (attributes == null) {
-			attributes = new EObjectContainmentEList<Attribute>(Attribute.class, this, DfPackage.INSTANCE__ATTRIBUTES);
-		}
-		return attributes;
 	}
 
 	/**
@@ -168,217 +145,22 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setEntity(Entity newEntity) {
-		Entity oldEntity = entity;
-		entity = newEntity;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.INSTANCE__ENTITY, oldEntity, entity));
-	}
-
-	/**
-	 * Returns the actor referenced by this instance.
-	 * 
-	 * @return the actor referenced by this instance, or <code>null</code> if
-	 *         this instance does not reference an actor
-	 */
-	public Actor getActor() {
-		return (Actor) getEntity();
-	}
-
 	@Override
-	public Attribute getAttribute(String name) {
-		for (Attribute attribute : getAttributes()) {
-			if (name.equals(attribute.getName())) {
-				return attribute;
-			}
+	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+		switch (featureID) {
+			case DfPackage.INSTANCE__ATTRIBUTES:
+				return getAttributes();
+			case DfPackage.INSTANCE__ID:
+				return getId();
+			case DfPackage.INSTANCE__ARGUMENTS:
+				return getArguments();
+			case DfPackage.INSTANCE__HIERARCHY:
+				return getHierarchy();
+			case DfPackage.INSTANCE__ENTITY:
+				if (resolve) return getEntity();
+				return basicGetEntity();
 		}
-		return null;
-	}
-
-	/**
-	 * Returns the broadcast referenced by this instance.
-	 * 
-	 * @return the broadcast referenced by this instance, or <code>null</code>
-	 *         if this instance does not reference a broadcasst
-	 */
-	public Broadcast getBroadcast() {
-		return (Broadcast) getEntity();
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public String getId() {
-		return id;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setId(String newId) {
-		String oldId = id;
-		id = newId;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.INSTANCE__ID, oldId, id));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Argument> getArguments() {
-		if (arguments == null) {
-			arguments = new EObjectContainmentEList<Argument>(Argument.class, this, DfPackage.INSTANCE__ARGUMENTS);
-		}
-		return arguments;
-	}
-
-	/**
-	 * Returns the file in which this instance is defined. This file is only
-	 * valid for instances that refer to actors and were instantiated.
-	 * 
-	 * @return the file in which this instance is defined
-	 */
-	public IFile getFile() {
-		if (isActor()) {
-			return getActor().getFile();
-		} else if (isNetwork()) {
-			return getNetwork().getFile();
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * Returns the path of identifiers from the top-level to this instance.
-	 * 
-	 * @return the path of identifiers from the top-level to this instance
-	 */
-	public List<String> getHierarchicalId() {
-		List<String> ids = new ArrayList<String>();
-		for (Instance instance : getHierarchy()) {
-			ids.add(instance.getId());
-		}
-		ids.add(getId());
-		return ids;
-	}
-
-	/**
-	 * Returns the path of identifiers from the top-level to this instance as a
-	 * path of the form /top/network/.../instance.
-	 * 
-	 * @return the path of identifiers from the top-level to this instance as a
-	 *         path of the form /top/network/.../instance
-	 */
-	public String getHierarchicalPath() {
-		StringBuilder builder = new StringBuilder();
-		for (String id : getHierarchicalId()) {
-			builder.append('/');
-			builder.append(id);
-		}
-
-		return builder.toString();
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Instance> getHierarchy() {
-		if (hierarchy == null) {
-			hierarchy = new EObjectResolvingEList<Instance>(Instance.class, this, DfPackage.INSTANCE__HIERARCHY);
-		}
-		return hierarchy;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Entity getEntity() {
-		if (entity != null && entity.eIsProxy()) {
-			InternalEObject oldEntity = (InternalEObject)entity;
-			entity = (Entity)eResolveProxy(oldEntity);
-			if (entity != oldEntity) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.INSTANCE__ENTITY, oldEntity, entity));
-			}
-		}
-		return entity;
-	}
-
-	/**
-	 * Returns the classification class of the instance.
-	 * 
-	 * @return the classification class of this instance
-	 */
-	public MoC getMoC() {
-		if (isActor()) {
-			return getActor().getMoC();
-		} else if (isNetwork()) {
-			return getNetwork().getMoC();
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * Returns the network referenced by this instance.
-	 * 
-	 * @return the network referenced by this instance, or <code>null</code> if
-	 *         this instance does not reference a network
-	 */
-	public Network getNetwork() {
-		return (Network) getEntity();
-	}
-
-	/**
-	 * Returns the wrapper referenced by this instance.
-	 * 
-	 * @return the wrapper referenced by this instance, or <code>null</code> if
-	 *         this instance does not reference a wrapper
-	 */
-	public SerDes getWrapper() {
-		return (SerDes) getEntity();
-	}
-
-	/**
-	 * Returns true if this instance references an actor.
-	 * 
-	 * @return true if this instance references an actor.
-	 */
-	public boolean isActor() {
-		return (getEntity() instanceof Actor);
-	}
-
-	/**
-	 * Returns true if this instance is a broadcast.
-	 * 
-	 * @return true if this instance is a broadcast
-	 */
-	public boolean isBroadcast() {
-		return (getEntity() instanceof Broadcast);
-	}
-
-	/**
-	 * Returns true if this instance references a network.
-	 * 
-	 * @return true if this instance references a network.
-	 */
-	public boolean isNetwork() {
-		return (getEntity() instanceof Network);
-	}
-
-	@Override
-	public boolean isWrapper() {
-		return (getEntity() instanceof SerDes);
+		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
@@ -403,21 +185,20 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 * @generated
 	 */
 	@Override
-	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case DfPackage.INSTANCE__ATTRIBUTES:
-				return getAttributes();
+				return attributes != null && !attributes.isEmpty();
 			case DfPackage.INSTANCE__ID:
-				return getId();
+				return ID_EDEFAULT == null ? id != null : !ID_EDEFAULT.equals(id);
 			case DfPackage.INSTANCE__ARGUMENTS:
-				return getArguments();
+				return arguments != null && !arguments.isEmpty();
 			case DfPackage.INSTANCE__HIERARCHY:
-				return getHierarchy();
+				return hierarchy != null && !hierarchy.isEmpty();
 			case DfPackage.INSTANCE__ENTITY:
-				if (resolve) return getEntity();
-				return basicGetEntity();
+				return entity != null;
 		}
-		return super.eGet(featureID, resolve, coreType);
+		return super.eIsSet(featureID);
 	}
 
 	/**
@@ -457,6 +238,16 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 * @generated
 	 */
 	@Override
+	protected EClass eStaticClass() {
+		return DfPackage.Literals.INSTANCE;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case DfPackage.INSTANCE__ATTRIBUTES:
@@ -478,31 +269,181 @@ public class InstanceImpl extends VertexImpl implements Instance {
 		super.eUnset(featureID);
 	}
 
+	@Override
+	public Actor getActor() {
+		return (Actor) getEntity();
+	}
+
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-			case DfPackage.INSTANCE__ATTRIBUTES:
-				return attributes != null && !attributes.isEmpty();
-			case DfPackage.INSTANCE__ID:
-				return ID_EDEFAULT == null ? id != null : !ID_EDEFAULT.equals(id);
-			case DfPackage.INSTANCE__ARGUMENTS:
-				return arguments != null && !arguments.isEmpty();
-			case DfPackage.INSTANCE__HIERARCHY:
-				return hierarchy != null && !hierarchy.isEmpty();
-			case DfPackage.INSTANCE__ENTITY:
-				return entity != null;
+	public EList<Argument> getArguments() {
+		if (arguments == null) {
+			arguments = new EObjectContainmentEList<Argument>(Argument.class, this, DfPackage.INSTANCE__ARGUMENTS);
 		}
-		return super.eIsSet(featureID);
+		return arguments;
+	}
+
+	@Override
+	public Attribute getAttribute(String name) {
+		for (Attribute attribute : getAttributes()) {
+			if (name.equals(attribute.getName())) {
+				return attribute;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Attribute> getAttributes() {
+		if (attributes == null) {
+			attributes = new EObjectContainmentEList<Attribute>(Attribute.class, this, DfPackage.INSTANCE__ATTRIBUTES);
+		}
+		return attributes;
+	}
+
+	@Override
+	public Broadcast getBroadcast() {
+		return (Broadcast) getEntity();
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Entity getEntity() {
+		if (entity != null && entity.eIsProxy()) {
+			InternalEObject oldEntity = (InternalEObject)entity;
+			entity = (Entity)eResolveProxy(oldEntity);
+			if (entity != oldEntity) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.INSTANCE__ENTITY, oldEntity, entity));
+			}
+		}
+		return entity;
+	}
+
+	/**
+	 * Returns the path of identifiers from the top-level to this instance.
+	 * 
+	 * @return the path of identifiers from the top-level to this instance
+	 */
+	public List<String> getHierarchicalId() {
+		List<String> ids = new ArrayList<String>();
+		for (Instance instance : getHierarchy()) {
+			ids.add(instance.getId());
+		}
+		ids.add(getId());
+		return ids;
+	}
+
+	@Override
+	public String getHierarchicalPath() {
+		StringBuilder builder = new StringBuilder();
+		for (String id : getHierarchicalId()) {
+			builder.append('/');
+			builder.append(id);
+		}
+
+		return builder.toString();
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Instance> getHierarchy() {
+		if (hierarchy == null) {
+			hierarchy = new EObjectResolvingEList<Instance>(Instance.class, this, DfPackage.INSTANCE__HIERARCHY);
+		}
+		return hierarchy;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String getId() {
+		return id;
+	}
+
+	@Override
+	public MoC getMoC() {
+		if (isActor()) {
+			return getActor().getMoC();
+		} else if (isNetwork()) {
+			return getNetwork().getMoC();
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public Network getNetwork() {
+		return (Network) getEntity();
+	}
+
+	@Override
+	public SerDes getWrapper() {
+		return (SerDes) getEntity();
+	}
+
+	@Override
+	public boolean isActor() {
+		return (getEntity() instanceof Actor);
+	}
+
+	@Override
+	public boolean isBroadcast() {
+		return (getEntity() instanceof Broadcast);
 	}
 
 	@Override
 	public boolean isInstance() {
 		return true;
+	}
+
+	@Override
+	public boolean isNetwork() {
+		return (getEntity() instanceof Network);
+	}
+
+	@Override
+	public boolean isWrapper() {
+		return (getEntity() instanceof SerDes);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setEntity(Entity newEntity) {
+		Entity oldEntity = entity;
+		entity = newEntity;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.INSTANCE__ENTITY, oldEntity, entity));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setId(String newId) {
+		String oldId = id;
+		id = newId;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.INSTANCE__ID, oldId, id));
 	}
 
 	@Override

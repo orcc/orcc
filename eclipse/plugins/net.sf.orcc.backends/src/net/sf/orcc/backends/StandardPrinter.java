@@ -38,6 +38,7 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.EObject;
 import org.stringtemplate.v4.ST;
 
@@ -116,7 +117,15 @@ public class StandardPrinter extends AbstractPrinter {
 				// if source file does not exist, force to generate
 				instanceModified = Long.MAX_VALUE;
 			} else {
-				instanceModified = instance.getFile().getLocalTimeStamp();
+				IFile file;
+				if (instance.isActor()) {
+					file = instance.getActor().getFile();
+				} else if (instance.isNetwork()) {
+					file = instance.getNetwork().getFile();
+				} else {
+					return Long.MAX_VALUE;
+				}
+				instanceModified = file.getLocalTimeStamp();
 			}
 		} else if (instance.isNetwork()) {
 			Network network = instance.getNetwork();

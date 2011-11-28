@@ -32,7 +32,6 @@ import java.util.List;
 
 import net.sf.orcc.moc.MoC;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.EList;
 
 /**
@@ -92,14 +91,6 @@ public interface Instance extends Vertex {
 	 * @model
 	 */
 	Entity getEntity();
-
-	/**
-	 * Returns the file in which this instance is defined. This file is only
-	 * valid for instances that refer to actors and were instantiated.
-	 * 
-	 * @return the file in which this instance is defined
-	 */
-	IFile getFile();
 
 	/**
 	 * Returns the path of identifiers from the top-level to this instance.
