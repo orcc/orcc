@@ -61,6 +61,10 @@ using namespace std;
 
 ActionSchedulerAdder::ActionSchedulerAdder(llvm::LLVMContext& C, Decoder* decoder) : Context(C) {
 	this->decoder = decoder;
+	this->entryBB = NULL;
+	this->bb1 = NULL;
+	this->incBB = NULL;
+	this->returnBB = NULL;
 }
 
 void ActionSchedulerAdder::transform(Instance* instance) {
@@ -94,30 +98,31 @@ void ActionSchedulerAdder::createActionScheduler(Instance* instance){
 
 	
 	// Add a basic block entry to the scheduler.
-	BasicBlock* BBEntry = BasicBlock::Create(Context, "entry", scheduler);
+	entryBB = BasicBlock::Create(Context, "entry", scheduler);
 
 	//Create alloca on i and store 0
-	AllocaInst* iVar = new AllocaInst(Type::getInt32Ty(Context), "i", BBEntry);
-	StoreInst* storeInst = new StoreInst(Zero, iVar, BBEntry);
+	AllocaInst* iVar = new AllocaInst(Type::getInt32Ty(Context), "i", entryBB);
+	StoreInst* storeInst = new StoreInst(Zero, iVar, entryBB);
 
 	// Add a basic block to bb and branch entry to bb.
-	BasicBlock* BB = BasicBlock::Create(Context, "bb", scheduler);
-	BranchInst::Create(BB, BBEntry);
+	bb1 = BasicBlock::Create(Context, "bb", scheduler);
+	BranchInst::Create(bb1, entryBB);
 	
 	// Add a basic block return that return %i
-	BasicBlock* returnBB = BasicBlock::Create(Context, "return", scheduler);
+	returnBB = BasicBlock::Create(Context, "return", scheduler);
 	LoadInst* loadIRet = new LoadInst(iVar, "i_ret", returnBB);
 	ReturnInst::Create(Context, loadIRet, returnBB);
 
 
 	// Add a basic block inc that return %i and branch to bb
-	BasicBlock* incBB = BasicBlock::Create(Context, "inc_i", scheduler);
+	incBB = BasicBlock::Create(Context, "inc_i", scheduler);
 	LoadInst* loadIInc = new LoadInst(iVar, "i_load", incBB);
 	BinaryOperator* iAdd = BinaryOperator::CreateNSWAdd(loadIInc, One, "i_add", incBB);
 	new StoreInst(iAdd, iVar, incBB);
-	BranchInst::Create(BB, incBB);
+	BranchInst::Create(bb1, incBB);
 	
-	createScheduler(instance, BB, incBB, returnBB , scheduler);
+	createScheduler(instance, bb1, incBB, returnBB , scheduler);
+
 }
 
 void ActionSchedulerAdder::createInitialize(Instance* instance){
@@ -175,7 +180,7 @@ BasicBlock* ActionSchedulerAdder::checkInputPattern(Pattern* pattern, Function* 
 			continue;
 		}
 		
-		Value* hasTokenValue = createInputTest(port, it->second, BB);
+		Value* hasTokenValue = createInputTest(port, it->second, bb1);
 		TruncInst* truncTokenInst = new TruncInst(hasTokenValue, Type::getInt1Ty(Context),"", BB);
 		values.push_back(truncTokenInst);
 	}
@@ -222,7 +227,7 @@ BasicBlock* ActionSchedulerAdder::checkOutputPattern(Pattern* pattern, llvm::Fun
 			// Don't test internal ports
 			continue;
 		}
-		Value* hasRoomValue = createOutputTest(port, it->second, BB);
+		Value* hasRoomValue = createOutputTest(port, it->second, bb1);
 		TruncInst* truncRoomInst = new TruncInst(hasRoomValue, Type::getInt1Ty(Context),"", BB);
 		values.push_back(truncRoomInst);
 	}
@@ -269,23 +274,40 @@ void ActionSchedulerAdder::checkPeekPattern(Pattern* pattern, Function* function
 			continue;
 		}
 
-		createPeek(it->first, it->second, itToken->second, BB);
+		createPeek(it->first, it->second, itToken->second, bb1);
 	}
 }
 
 void ActionSchedulerAdder::createPeek(Port* port, Variable* variable, ConstantInt* numTokens, BasicBlock* BB){
-	//Load selected port
-	GlobalVariable* fifoVar = port->getFifoVar();
-	LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB);
-	
-	//Call peek function
-	Function* peekFn = FifoMng::getPeekFunction(port->getType(), decoder);
-	Value* peekArgs[] = { loadPort, numTokens};
-	CallInst* callInst = CallInst::Create(peekFn, peekArgs, peekArgs+2,"",  BB);
 
-	// Store fifo pointer in port pointer
-	GlobalVariable* portPtr = variable->getGlobalVariable();
-	new StoreInst(callInst, portPtr, BB);
+
+	if (BB->getTerminator() == NULL){
+			//Load selected port
+			GlobalVariable* fifoVar = port->getFifoVar();
+			LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB);
+	
+			//Call peek function
+			Function* peekFn = FifoMng::getPeekFunction(port->getType(), decoder);
+			Value* peekArgs[] = { loadPort, numTokens};
+			CallInst* callInst = CallInst::Create(peekFn, peekArgs, peekArgs+2,"",  BB);
+
+			// Store fifo pointer in port pointer
+			GlobalVariable* portPtr = variable->getGlobalVariable();
+			new StoreInst(callInst, portPtr, BB);
+	}else{			
+		//Load selected port
+		GlobalVariable* fifoVar = port->getFifoVar();
+		LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB->getTerminator());
+	
+		//Call peek function
+		Function* peekFn = FifoMng::getPeekFunction(port->getType(), decoder);
+		Value* peekArgs[] = { loadPort, numTokens};
+		CallInst* callInst = CallInst::Create(peekFn, peekArgs, peekArgs+2,"",  BB->getTerminator());
+
+		// Store fifo pointer in port pointer
+		GlobalVariable* portPtr = variable->getGlobalVariable();
+		new StoreInst(callInst, portPtr, BB->getTerminator());
+	}
 }
 
 void ActionSchedulerAdder::createWriteEnds(Pattern* pattern, llvm::BasicBlock* BB){
@@ -428,25 +450,50 @@ void ActionSchedulerAdder::createRead(Port* port, Variable* variable, ConstantIn
 }
 
 CallInst* ActionSchedulerAdder::createOutputTest(Port* port, ConstantInt* numTokens, BasicBlock* BB){
-	//Load selected port
-	LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB);
 	
-	//Call hasRoom function
-	Function* hasRoomFn = FifoMng::getHasRoomFunction(port->getType(), decoder);
-	Value* hasRoomArgs[] = { loadPort, numTokens};
-	CallInst* callInst = CallInst::Create(hasRoomFn, hasRoomArgs, hasRoomArgs+2,"",  BB);
+	if (BB->getTerminator() == NULL){
+		//Load selected port
+		LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB);
+	
+		//Call hasRoom function
+		Function* hasRoomFn = FifoMng::getHasRoomFunction(port->getType(), decoder);
+		Value* hasRoomArgs[] = { loadPort, numTokens};
+		CallInst* callInst = CallInst::Create(hasRoomFn, hasRoomArgs, hasRoomArgs+2,"",  BB);
 
-	return callInst;
+		return callInst;
+	}else{			
+		//Load selected port
+		LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB->getTerminator());
+	
+		//Call hasRoom function
+		Function* hasRoomFn = FifoMng::getHasRoomFunction(port->getType(), decoder);
+		Value* hasRoomArgs[] = { loadPort, numTokens};
+		CallInst* callInst = CallInst::Create(hasRoomFn, hasRoomArgs, hasRoomArgs+2,"",  BB->getTerminator());
+
+		return callInst;
+	}
+	
+
 }
 
 CallInst* ActionSchedulerAdder::createInputTest(Port* port, ConstantInt* numTokens, BasicBlock* BB){
-	//Load selected port
-	LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB);
+	if (BB->getTerminator() == NULL){
+		//Load selected port
+		LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB);
 	
-	//Call hasToken function
-	Function* hasTokenFn = FifoMng::getHasTokenFunction(port->getType(), decoder);
-	Value* hasTokenArgs[] = { loadPort, numTokens};
-	CallInst* callInst = CallInst::Create(hasTokenFn, hasTokenArgs, hasTokenArgs+2,"",  BB);
+		//Call hasToken function
+		Function* hasTokenFn = FifoMng::getHasTokenFunction(port->getType(), decoder);
+		Value* hasTokenArgs[] = { loadPort, numTokens};
+		CallInst* callInst = CallInst::Create(hasTokenFn, hasTokenArgs, hasTokenArgs+2,"",  BB);
 
-	return callInst;
+		return callInst;
+	}else{			
+		//Load selected port
+		LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB->getTerminator());
+	
+		//Call hasToken function
+		Function* hasTokenFn = FifoMng::getHasTokenFunction(port->getType(), decoder);
+		Value* hasTokenArgs[] = { loadPort, numTokens};
+		CallInst* callInst = CallInst::Create(hasTokenFn, hasTokenArgs, hasTokenArgs+2,"",  BB->getTerminator());
+	}
 }

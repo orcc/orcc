@@ -357,6 +357,12 @@ protected:
 
 	/** Current instance */
 	Instance* instance;
+
+	/** ActionScheduler BB */
+	llvm::BasicBlock* entryBB;
+	llvm::BasicBlock* bb1;
+	llvm::BasicBlock* incBB;
+	llvm::BasicBlock* returnBB;
 };
 
 #endif

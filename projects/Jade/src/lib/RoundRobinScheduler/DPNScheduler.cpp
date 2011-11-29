@@ -123,7 +123,9 @@ Function* DPNScheduler::createSchedulerOutsideFSM(Instance* instance){
 	BasicBlock* BBEntry = BasicBlock::Create(Context, "entry", outsideScheduler);
 	BasicBlock* BB1  = BasicBlock::Create(Context, "bb", outsideScheduler);
 	BranchInst::Create(BB1, BBEntry);
-		
+	bb1 = BB1;
+
+
 	//Iterate tough actions
 	list<Action*>::iterator it;
 	BasicBlock* BB = BB1;	
@@ -292,6 +294,7 @@ BasicBlock* DPNScheduler::createActionTestState(FSM::NextStateInfo* nextStateInf
 
 
 	//Test input firing condition of an action
+	bb1 = stateBB;
 	stateBB = checkInputPattern(action->getInputPattern(), function, skipStateBB, stateBB);
 	
 	//Test firing condition of an action
