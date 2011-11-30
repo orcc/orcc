@@ -292,6 +292,9 @@ public class LLVMBackendImpl extends AbstractBackend {
 		cmdList.add(jadeToolbox);
 		cmdList.add("-" + optLevel);
 		cmdList.add("-L");
+		if(!path.endsWith(File.separator)){
+			path = path + File.separator;
+		}
 		cmdList.add(path);
 
 		// Set generation mode
