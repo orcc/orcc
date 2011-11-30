@@ -46,7 +46,7 @@ endif>
 
 mapSignalInput(port) ::= <<
 <if(port.native)
-><port.name> =\> s_<port.name>_native,<
+><port.name> =\> <port.name>_native,<
 else
 >data_<indexPort(port)>_in    =\> s_<port.name>_q,
 status_<indexPort(port)>_in  =\> s_<port.name>_status,
@@ -56,7 +56,7 @@ endif>
 
 mapSignalOutput(port) ::= <<
 <if(port.native)
-><port.name>   =\> s_<port.name>_native,<
+><port.name>   =\> <port.name>_native,<
 else
 >data_<indexPort(port)>_out   =\> s_<port.name>_data,
 status_<indexPort(port)>_out =\> s_<port.name>_status,
