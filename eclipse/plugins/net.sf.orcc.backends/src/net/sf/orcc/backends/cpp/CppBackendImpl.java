@@ -37,7 +37,6 @@ import java.util.Map;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
-import net.sf.orcc.backends.cpp.transformations.SerDesAdder;
 import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Attribute;
@@ -135,9 +134,6 @@ public class CppBackendImpl extends AbstractBackend {
 				network.mergeActors();
 			}
 		}
-
-		// add wrapper if needed
-		new SerDesAdder().doSwitch(network);
 	}
 
 	@Override
