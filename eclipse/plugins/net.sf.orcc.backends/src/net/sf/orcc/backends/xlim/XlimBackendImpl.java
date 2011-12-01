@@ -217,7 +217,7 @@ public class XlimBackendImpl extends AbstractBackend {
 
 		printer.setExpressionPrinter(new XlimExprPrinter());
 		printer.setTypePrinter(new XlimTypePrinter());
-		return printer.print(instance.getId() + ".xlim", path, instance);
+		return printer.print(instance.getName() + ".xlim", path, instance);
 	}
 
 	private void printMapping(Network network, Map<String, String> mapping) {
@@ -230,7 +230,7 @@ public class XlimBackendImpl extends AbstractBackend {
 	}
 
 	private void printTestbench(StandardPrinter printer, Instance instance) {
-		printer.print(instance.getId() + "_tb.vhd", path + File.separator
+		printer.print(instance.getName() + "_tb.vhd", path + File.separator
 				+ "Testbench", instance);
 
 		if (instance.isNetwork()) {
@@ -255,13 +255,13 @@ public class XlimBackendImpl extends AbstractBackend {
 
 	private void computeEntityList(Instance instance) {
 		if (instance.isActor()) {
-			String name = instance.getId();
+			String name = instance.getName();
 			if (!entitySet.contains(name)) {
 				entitySet.add(name);
 				entities.add(name);
 			}
 		} else if (instance.isNetwork()) {
-			String name = instance.getId();
+			String name = instance.getName();
 			Network network = instance.getNetwork();
 			if (!entitySet.contains(name)) {
 				for (Instance subInstance : network.getInstances()) {

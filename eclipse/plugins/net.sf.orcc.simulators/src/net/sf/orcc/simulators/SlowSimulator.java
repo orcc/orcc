@@ -100,8 +100,8 @@ public class SlowSimulator extends AbstractSimulator {
 			Port tgtPort, int fifoSize) {
 		Fifo fifo = null;
 		if (enableTraces) {
-			String fifoName = src.getId() + "_" + srcPort.getName() + "_"
-					+ tgt.getId() + "_" + tgtPort.getName();
+			String fifoName = src.getName() + "_" + srcPort.getName() + "_"
+					+ tgt.getName() + "_" + tgtPort.getName();
 			fifo = new Fifo(srcPort.getType(), fifoSize, traceFolder, fifoName,
 					enableTraces);
 		} else {

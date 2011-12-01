@@ -394,13 +394,31 @@ public interface DfPackage extends EPackage {
 	int VERTEX__OUTGOING = 1;
 
 	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VERTEX__NAME = 2;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VERTEX__ATTRIBUTES = 3;
+
+	/**
 	 * The number of structural features of the '<em>Vertex</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int VERTEX_FEATURE_COUNT = 2;
+	int VERTEX_FEATURE_COUNT = 4;
 
 	/**
 	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
@@ -421,22 +439,22 @@ public interface DfPackage extends EPackage {
 	int INSTANCE__OUTGOING = VERTEX__OUTGOING;
 
 	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INSTANCE__NAME = VERTEX__NAME;
+
+	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INSTANCE__ATTRIBUTES = VERTEX_FEATURE_COUNT + 0;
-
-	/**
-	 * The feature id for the '<em><b>Id</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INSTANCE__ID = VERTEX_FEATURE_COUNT + 1;
+	int INSTANCE__ATTRIBUTES = VERTEX__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Arguments</b></em>' containment reference list.
@@ -445,7 +463,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INSTANCE__ARGUMENTS = VERTEX_FEATURE_COUNT + 2;
+	int INSTANCE__ARGUMENTS = VERTEX_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Hierarchy</b></em>' reference list.
@@ -454,7 +472,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INSTANCE__HIERARCHY = VERTEX_FEATURE_COUNT + 3;
+	int INSTANCE__HIERARCHY = VERTEX_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Entity</b></em>' reference.
@@ -463,7 +481,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INSTANCE__ENTITY = VERTEX_FEATURE_COUNT + 4;
+	int INSTANCE__ENTITY = VERTEX_FEATURE_COUNT + 2;
 
 	/**
 	 * The number of structural features of the '<em>Instance</em>' class.
@@ -472,7 +490,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INSTANCE_FEATURE_COUNT = VERTEX_FEATURE_COUNT + 5;
+	int INSTANCE_FEATURE_COUNT = VERTEX_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>File Name</b></em>' attribute.
@@ -928,7 +946,16 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__NAME = VERTEX_FEATURE_COUNT + 0;
+	int PORT__NAME = VERTEX__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT__ATTRIBUTES = VERTEX__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Num Tokens Consumed</b></em>' attribute.
@@ -937,7 +964,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__NUM_TOKENS_CONSUMED = VERTEX_FEATURE_COUNT + 1;
+	int PORT__NUM_TOKENS_CONSUMED = VERTEX_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Num Tokens Produced</b></em>' attribute.
@@ -946,7 +973,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__NUM_TOKENS_PRODUCED = VERTEX_FEATURE_COUNT + 2;
+	int PORT__NUM_TOKENS_PRODUCED = VERTEX_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Type</b></em>' containment reference.
@@ -955,7 +982,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__TYPE = VERTEX_FEATURE_COUNT + 3;
+	int PORT__TYPE = VERTEX_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Native</b></em>' attribute.
@@ -964,7 +991,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__NATIVE = VERTEX_FEATURE_COUNT + 4;
+	int PORT__NATIVE = VERTEX_FEATURE_COUNT + 3;
 
 	/**
 	 * The number of structural features of the '<em>Port</em>' class.
@@ -973,7 +1000,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT_FEATURE_COUNT = VERTEX_FEATURE_COUNT + 5;
+	int PORT_FEATURE_COUNT = VERTEX_FEATURE_COUNT + 4;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.StateImpl <em>State</em>}' class.
@@ -1524,28 +1551,6 @@ public interface DfPackage extends EPackage {
 	EClass getInstance();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.df.Instance#getAttributes <em>Attributes</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Attributes</em>'.
-	 * @see net.sf.orcc.df.Instance#getAttributes()
-	 * @see #getInstance()
-	 * @generated
-	 */
-	EReference getInstance_Attributes();
-
-	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.Instance#getId <em>Id</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Id</em>'.
-	 * @see net.sf.orcc.df.Instance#getId()
-	 * @see #getInstance()
-	 * @generated
-	 */
-	EAttribute getInstance_Id();
-
-	/**
 	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.df.Instance#getArguments <em>Arguments</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1683,6 +1688,28 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getVertex_Outgoing();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.Vertex#getName <em>Name</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Name</em>'.
+	 * @see net.sf.orcc.df.Vertex#getName()
+	 * @see #getVertex()
+	 * @generated
+	 */
+	EAttribute getVertex_Name();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.df.Vertex#getAttributes <em>Attributes</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Attributes</em>'.
+	 * @see net.sf.orcc.df.Vertex#getAttributes()
+	 * @see #getVertex()
+	 * @generated
+	 */
+	EReference getVertex_Attributes();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Action <em>Action</em>}'.
@@ -2008,17 +2035,6 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getPort();
-
-	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.Port#getName <em>Name</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Name</em>'.
-	 * @see net.sf.orcc.df.Port#getName()
-	 * @see #getPort()
-	 * @generated
-	 */
-	EAttribute getPort_Name();
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.Port#getNumTokensConsumed <em>Num Tokens Consumed</em>}'.
@@ -2562,22 +2578,6 @@ public interface DfPackage extends EPackage {
 		EClass INSTANCE = eINSTANCE.getInstance();
 
 		/**
-		 * The meta object literal for the '<em><b>Attributes</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference INSTANCE__ATTRIBUTES = eINSTANCE.getInstance_Attributes();
-
-		/**
-		 * The meta object literal for the '<em><b>Id</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute INSTANCE__ID = eINSTANCE.getInstance_Id();
-
-		/**
 		 * The meta object literal for the '<em><b>Arguments</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -2688,6 +2688,22 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EReference VERTEX__OUTGOING = eINSTANCE.getVertex_Outgoing();
+
+		/**
+		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute VERTEX__NAME = eINSTANCE.getVertex_Name();
+
+		/**
+		 * The meta object literal for the '<em><b>Attributes</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference VERTEX__ATTRIBUTES = eINSTANCE.getVertex_Attributes();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.ActionImpl <em>Action</em>}' class.
@@ -2938,14 +2954,6 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EClass PORT = eINSTANCE.getPort();
-
-		/**
-		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute PORT__NAME = eINSTANCE.getPort_Name();
 
 		/**
 		 * The meta object literal for the '<em><b>Num Tokens Consumed</b></em>' attribute feature.

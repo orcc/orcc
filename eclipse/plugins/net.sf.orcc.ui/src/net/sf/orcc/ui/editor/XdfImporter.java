@@ -157,7 +157,7 @@ public class XdfImporter {
 
 	private Vertex getVertex(Instance instance, ObjectType type) {
 		Vertex vertex = new Vertex(type);
-		vertex.setValue(PARAMETER_ID, instance.getId());
+		vertex.setValue(PARAMETER_ID, instance.getName());
 		vertex.setValue(PARAMETER_REFINEMENT, instance.getEntity().getName());
 
 		// parameters

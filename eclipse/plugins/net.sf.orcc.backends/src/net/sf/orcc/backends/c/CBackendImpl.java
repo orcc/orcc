@@ -88,6 +88,8 @@ public class CBackendImpl extends AbstractBackend {
 
 	private int threadsNb;
 
+	private StandardPrinter printer;
+
 	private void computeMapping(Network network) {
 		// compute the different threads
 		instancesTarget = new HashMap<String, List<Instance>>();
@@ -119,7 +121,7 @@ public class CBackendImpl extends AbstractBackend {
 
 				list.add(instance);
 			} else {
-				write("Warning: The instance '" + instance.getId()
+				write("Warning: The instance '" + instance.getName()
 						+ "' is not mapped.\n");
 			}
 		}
@@ -163,6 +165,15 @@ public class CBackendImpl extends AbstractBackend {
 		String topology = getAttribute(
 				"net.sf.orcc.backends.newScheduler.topology", "Ring");
 		ringTopology = topology.equals("Ring");
+
+		printer = new StandardPrinter("net/sf/orcc/backends/c/C_actor.stg",
+				!debugMode);
+		printer.setExpressionPrinter(new CExpressionPrinter());
+		printer.setTypePrinter(new CTypePrinter());
+		printer.getOptions().put("fifoSize", fifoSize);
+		printer.getOptions().put("enableTrace", enableTrace);
+		printer.getOptions().put("ringTopology", ringTopology);
+		printer.getOptions().put("newScheduler", newScheduler);
 	}
 
 	@Override
@@ -276,15 +287,7 @@ public class CBackendImpl extends AbstractBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) throws OrccException {
-		StandardPrinter printer = new StandardPrinter(
-				"net/sf/orcc/backends/c/C_actor.stg", !debugMode);
-		printer.setExpressionPrinter(new CExpressionPrinter());
-		printer.setTypePrinter(new CTypePrinter());
-		printer.getOptions().put("fifoSize", fifoSize);
-		printer.getOptions().put("enableTrace", enableTrace);
-		printer.getOptions().put("ringTopology", ringTopology);
-		printer.getOptions().put("newScheduler", newScheduler);
-		return printer.print(instance.getId() + ".c", path, instance);
+		return printer.print(instance.getName() + ".c", path, instance);
 	}
 
 	private void printMapping(Network network) {

@@ -149,7 +149,8 @@ public class PromelaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		return instancePrinter.print(instance.getId() + ".pml", path, instance);
+		return instancePrinter.print(instance.getName() + ".pml", path,
+				instance);
 	}
 
 	/**

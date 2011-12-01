@@ -80,7 +80,7 @@ public class Iterand {
 	public String toString() {
 		Object obj;
 		if (isVertex()) {
-			obj = ((Instance) contents).getId();
+			obj = ((Instance) contents).getName();
 		} else {
 			obj = contents;
 		}

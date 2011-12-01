@@ -44,6 +44,24 @@ import org.eclipse.emf.ecore.EObject;
 public interface Vertex extends EObject {
 
 	/**
+	 * Returns the attribute associated with the given name.
+	 * 
+	 * @param name
+	 *            an attribute name
+	 * @return the attribute associated with the given name, or if not found,
+	 *         <code>null</code>
+	 */
+	public Attribute getAttribute(String name);
+
+	/**
+	 * Returns the list of attributes of this instance.
+	 * 
+	 * @return the list of attributes of this instance
+	 * @model containment="true"
+	 */
+	public EList<Attribute> getAttributes();
+
+	/**
 	 * @model type="Connection" opposite="target"
 	 */
 	EList<Connection> getIncoming();
@@ -54,6 +72,14 @@ public interface Vertex extends EObject {
 	 * @return a map from ports to incoming connections
 	 */
 	Map<Port, Connection> getIncomingPortMap();
+
+	/**
+	 * Returns the name of this vertex.
+	 * 
+	 * @return the name of this vertex
+	 * @model
+	 */
+	String getName();
 
 	/**
 	 * @model type="Connection" opposite="source"
@@ -95,5 +121,13 @@ public interface Vertex extends EObject {
 	 * @return <code>true</code> if this vertex is a port
 	 */
 	boolean isPort();
+
+	/**
+	 * Changes the name of this vertex.
+	 * 
+	 * @param name
+	 *            a new name
+	 */
+	void setName(String name);
 
 }

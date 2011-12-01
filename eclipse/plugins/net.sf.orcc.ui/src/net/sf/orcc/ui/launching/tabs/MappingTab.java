@@ -227,7 +227,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 
 				if (element instanceof Instance) {
 					Instance instance = (Instance) element;
-					return instance.getId();
+					return instance.getName();
 				}
 			} else {
 				if (element instanceof Instance) {

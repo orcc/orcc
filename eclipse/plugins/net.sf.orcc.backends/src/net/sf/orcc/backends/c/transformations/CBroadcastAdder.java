@@ -70,12 +70,13 @@ public class CBroadcastAdder extends BroadcastAdder {
 					int size = getSize(outList.get(0));
 					for (Connection connec : outList) {
 						if (size != getSize(connec)) {
-							createBroadcast(instance.getId(), srcPort, outList);
+							createBroadcast(instance.getName(), srcPort,
+									outList);
 							writeListener
 									.writeText("Warning: Different-sized FIFOs connected to port '"
 											+ srcPort.getName()
 											+ "' from '"
-											+ instance.getId()
+											+ instance.getName()
 											+ "'. A broadcast is created.\n");
 							return;
 						}

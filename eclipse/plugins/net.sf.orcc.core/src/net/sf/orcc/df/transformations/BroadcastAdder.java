@@ -171,7 +171,7 @@ public class BroadcastAdder extends DfSwitch<Void> {
 					List<Connection> outList = outMap.get(srcPort);
 					int numOutput = outList.size();
 					if (numOutput > 1) {
-						createBroadcast(instance.getId(), srcPort, outList);
+						createBroadcast(instance.getName(), srcPort, outList);
 					}
 				}
 			}

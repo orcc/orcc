@@ -102,7 +102,7 @@ public class CppBackendImpl extends AbstractBackend {
 				}
 				list.add(instance);
 			} else {
-				throw new OrccException("instance " + instance.getId()
+				throw new OrccException("instance " + instance.getName()
 						+ " has no partName attribute!");
 			}
 		}

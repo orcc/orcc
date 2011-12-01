@@ -162,7 +162,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 				list.add(instance);
 			} else {
-				write("Warning: The instance '" + instance.getId()
+				write("Warning: The instance '" + instance.getName()
 						+ "' is not mapped.\n");
 			}
 		}
@@ -292,7 +292,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		cmdList.add(jadeToolbox);
 		cmdList.add("-" + optLevel);
 		cmdList.add("-L");
-		if(!path.endsWith(File.separator)){
+		if (!path.endsWith(File.separator)) {
 			path = path + File.separator;
 		}
 		cmdList.add(path);

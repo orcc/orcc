@@ -414,7 +414,7 @@ public class XdfWriter {
 			vertexAttr = "";
 			portAttr = ((Port) vertex).getName();
 		} else {
-			vertexAttr = ((Instance) vertex).getId();
+			vertexAttr = ((Instance) vertex).getName();
 			portAttr = port.getName();
 		}
 
@@ -506,7 +506,7 @@ public class XdfWriter {
 	 */
 	private Element writeInstance(Instance instance) {
 		Element instanceElt = document.createElement("Instance");
-		instanceElt.setAttribute("id", instance.getId());
+		instanceElt.setAttribute("id", instance.getName());
 
 		// class
 		Entity contents = instance.getEntity();

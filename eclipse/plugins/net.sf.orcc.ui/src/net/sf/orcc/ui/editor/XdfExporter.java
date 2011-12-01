@@ -167,13 +167,12 @@ public class XdfExporter extends CalSwitch<Object> {
 
 		if (source.isInstance() && sourcePort == null) {
 			throw new OrccRuntimeException("the source port of a connection "
-					+ "from instance " + ((Instance) source).getId()
+					+ "from instance " + source.getName()
 					+ " must be specified");
 		}
 		if (target.isInstance() && targetPort == null) {
 			throw new OrccRuntimeException("the target port of a connection "
-					+ "to instance " + ((Instance) target).getId()
-					+ " must be specified");
+					+ "to instance " + target.getName() + " must be specified");
 		}
 
 		// buffer size

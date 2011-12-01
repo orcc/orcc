@@ -122,7 +122,7 @@ public class ActorMerger extends DfSwitch<Void> {
 
 	private void copyProcedures() {
 		for (Vertex vertex : vertices) {
-			String id = ((Instance) vertex).getId();
+			String id = vertex.getName();
 			Actor actor = ((Instance) vertex).getActor();
 			for (Procedure proc : new ArrayList<Procedure>(actor.getProcs())) {
 				proc.setName(id + "_" + proc.getName());
@@ -133,7 +133,7 @@ public class ActorMerger extends DfSwitch<Void> {
 
 	private void copyStateVariables() {
 		for (Vertex vertex : vertices) {
-			String id = ((Instance) vertex).getId();
+			String id = vertex.getName();
 			Actor actor = ((Instance) vertex).getActor();
 			for (Var var : new ArrayList<Var>(actor.getStateVars())) {
 				String name = var.getName();
@@ -415,7 +415,7 @@ public class ActorMerger extends DfSwitch<Void> {
 				Action action = it.next().getAction();
 				if (!alreadyExists.contains(action)) {
 					alreadyExists.add(action);
-					String name = instance.getId() + "_" + action.getName();
+					String name = instance.getName() + "_" + action.getName();
 					Procedure proc = factory.createProcedure(name, 0,
 							factory.createTypeVoid());
 
@@ -528,7 +528,7 @@ public class ActorMerger extends DfSwitch<Void> {
 				NodeBlock block = IrUtil.getLast(nodes);
 				for (Invocation invocation : moc.getInvocations()) {
 					Action action = invocation.getAction();
-					Procedure proc = superActor.getProcedure(instance.getId()
+					Procedure proc = superActor.getProcedure(instance.getName()
 							+ "_" + action.getName());
 					block.add(factory.createInstCall(0, null, proc,
 							new ArrayList<Expression>()));

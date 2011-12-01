@@ -780,7 +780,7 @@ public class XdfParser {
 
 		// create instance
 		Instance instance = DfFactory.eINSTANCE.createInstance();
-		instance.setId(id);
+		instance.setName(id);
 
 		// create proxy
 		String pathName = file.getFullPath().toString();

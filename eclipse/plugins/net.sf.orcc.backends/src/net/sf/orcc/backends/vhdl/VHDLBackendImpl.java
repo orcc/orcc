@@ -353,7 +353,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 	}
 
 	private void printTestbench(StandardPrinter printer, Instance instance) {
-		printer.print(instance.getId() + "_tb.vhd", path + File.separator
+		printer.print(instance.getName() + "_tb.vhd", path + File.separator
 				+ "Testbench", instance);
 
 		if (instance.isNetwork()) {

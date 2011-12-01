@@ -60,24 +60,6 @@ public interface Instance extends Vertex {
 	public EList<Argument> getArguments();
 
 	/**
-	 * Returns the attribute associated with the given name.
-	 * 
-	 * @param name
-	 *            an attribute name
-	 * @return the attribute associated with the given name, or if not found,
-	 *         <code>null</code>
-	 */
-	public Attribute getAttribute(String name);
-
-	/**
-	 * Returns the list of attributes of this instance.
-	 * 
-	 * @return the list of attributes of this instance
-	 * @model containment="true"
-	 */
-	public EList<Attribute> getAttributes();
-
-	/**
 	 * Returns the broadcast referenced by this instance.
 	 * 
 	 * @return the broadcast referenced by this instance, or <code>null</code>
@@ -117,11 +99,11 @@ public interface Instance extends Vertex {
 	EList<Instance> getHierarchy();
 
 	/**
-	 * Returns the identifier of this instance.
+	 * Returns the identifier of this instance. Delegates to {@link #getName()}.
 	 * 
 	 * @return the identifier of this instance
-	 * @model
 	 */
+	@Deprecated
 	String getId();
 
 	/**
@@ -167,13 +149,5 @@ public interface Instance extends Vertex {
 	 *            an entity
 	 */
 	void setEntity(Entity entity);
-
-	/**
-	 * Changes the identifier of this instance.
-	 * 
-	 * @param id
-	 *            a new identifier
-	 */
-	public void setId(String id);
 
 }
