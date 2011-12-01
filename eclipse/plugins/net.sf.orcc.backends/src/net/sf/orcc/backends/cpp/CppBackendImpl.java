@@ -82,11 +82,7 @@ public class CppBackendImpl extends AbstractBackend {
 			String srcName = getPartNameAttribute(src);
 			String tgtName = getPartNameAttribute(tgt);
 
-			if (src.isWrapper() || tgt.isWrapper()) {
-				needSerDes = true;
-
-				kind = 1;
-			} else if (!srcName.equals(tgtName)) {
+			if (!srcName.equals(tgtName)) {
 				kind = 2;
 			}
 			fifoKind.put(connection, kind);
