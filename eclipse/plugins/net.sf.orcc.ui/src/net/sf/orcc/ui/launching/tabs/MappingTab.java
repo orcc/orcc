@@ -392,7 +392,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 			for (Instance instance : network.getInstances()) {
 				instances.add(instance.getHierarchicalPath());
 			}
-			for (Network subNetwork : network.getNetworks()) {
+			for (Network subNetwork : network.getAllNetworks()) {
 				for (Instance instance : subNetwork.getInstances()) {
 					instances.add(instance.getHierarchicalPath());
 				}

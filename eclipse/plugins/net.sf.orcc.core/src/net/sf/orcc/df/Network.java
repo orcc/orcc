@@ -83,6 +83,21 @@ public interface Network extends Vertex, Instantiable {
 	List<Actor> getActors();
 
 	/**
+	 * Returns the list of all networks referenced by this network. This is
+	 * different from the list of instances of this network: There are typically
+	 * more instances than there are networks, because a network may be
+	 * instantiated several times.
+	 * 
+	 * <p>
+	 * The list is computed on the fly by adding all the networks referenced in
+	 * a set.
+	 * </p>
+	 * 
+	 * @return a list of networks
+	 */
+	List<Network> getAllNetworks();
+
+	/**
 	 * Returns the list of this graph's connections.
 	 * 
 	 * @return the list of this graph's connections
@@ -149,21 +164,6 @@ public interface Network extends Vertex, Instantiable {
 	 * @model containment="true"
 	 */
 	MoC getMoC();
-
-	/**
-	 * Returns the list of networks referenced by the graph of this network.
-	 * This is different from the list of instances of this network: There are
-	 * typically more instances than there are networks, because a network may
-	 * be instantiated several times.
-	 * 
-	 * <p>
-	 * The list is computed on the fly by adding all the networks referenced in
-	 * a set.
-	 * </p>
-	 * 
-	 * @return a list of networks
-	 */
-	List<Network> getNetworks();
 
 	/**
 	 * Returns the output port whose name matches the given name.

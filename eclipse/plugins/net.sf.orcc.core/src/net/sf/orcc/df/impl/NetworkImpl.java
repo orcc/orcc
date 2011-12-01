@@ -80,9 +80,45 @@ import org.eclipse.emf.ecore.util.InternalEList;
  */
 public class NetworkImpl extends VertexImpl implements Network {
 	/**
+	 * The default value of the '{@link #getFileName() <em>File Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getFileName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String FILE_NAME_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getConnections() <em>Connections</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getConnections()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Connection> connections;
+
+	/**
+	 * The cached value of the '{@link #getFileName() <em>File Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getFileName()
+	 * @generated
+	 * @ordered
+	 */
+	protected String fileName = FILE_NAME_EDEFAULT;
+
+	/**
 	 * @generated
 	 */
 	protected EList<Port> inputs;
+
+	/**
+	 * The cached value of the '{@link #getInstances() <em>Instances</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getInstances()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Instance> instances;
 
 	/**
 	 * The cached value of the '{@link #getMoC() <em>Mo C</em>}' containment reference.
@@ -114,24 +150,6 @@ public class NetworkImpl extends VertexImpl implements Network {
 	protected EList<Var> variables;
 
 	/**
-	 * The cached value of the '{@link #getConnections() <em>Connections</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getConnections()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Connection> connections;
-
-	/**
-	 * The cached value of the '{@link #getInstances() <em>Instances</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getInstances()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Instance> instances;
-
-	/**
 	 * The cached value of the '{@link #getVertices() <em>Vertices</em>}' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getVertices()
@@ -139,24 +157,6 @@ public class NetworkImpl extends VertexImpl implements Network {
 	 * @ordered
 	 */
 	protected EList<Vertex> vertices;
-
-	/**
-	 * The default value of the '{@link #getFileName() <em>File Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getFileName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String FILE_NAME_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getFileName() <em>File Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getFileName()
-	 * @generated
-	 * @ordered
-	 */
-	protected String fileName = FILE_NAME_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -462,6 +462,20 @@ public class NetworkImpl extends VertexImpl implements Network {
 		return list;
 	}
 
+	@Override
+	public List<Network> getAllNetworks() {
+		Set<Network> networks = new HashSet<Network>();
+		for (Instance instance : getInstances()) {
+			if (instance.isNetwork()) {
+				Network network = instance.getNetwork();
+				networks.add(network);
+				networks.addAll(network.getAllNetworks());
+			}
+		}
+
+		return Arrays.asList(networks.toArray(new Network[0]));
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -570,32 +584,6 @@ public class NetworkImpl extends VertexImpl implements Network {
 	 */
 	public MoC getMoC() {
 		return moC;
-	}
-
-	/**
-	 * Returns the list of networks referenced by the graph of this network.
-	 * This is different from the list of instances of this network: There are
-	 * typically more instances than there are networks, because a network may
-	 * be instantiated several times.
-	 * 
-	 * <p>
-	 * The list is computed on the fly by adding all the networks referenced in
-	 * a set.
-	 * </p>
-	 * 
-	 * @return a list of networks
-	 */
-	public List<Network> getNetworks() {
-		Set<Network> networks = new HashSet<Network>();
-		for (Instance instance : getInstances()) {
-			if (instance.isNetwork()) {
-				Network network = instance.getNetwork();
-				networks.add(network);
-				networks.addAll(network.getNetworks());
-			}
-		}
-
-		return Arrays.asList(networks.toArray(new Network[0]));
 	}
 
 	/**
