@@ -140,14 +140,6 @@ public interface Instance extends Vertex {
 	Network getNetwork();
 
 	/**
-	 * Returns the wrapper referenced by this instance.
-	 * 
-	 * @return the wrapper referenced by this instance, or <code>null</code> if
-	 *         this instance does not reference a wrapper
-	 */
-	SerDes getWrapper();
-
-	/**
 	 * Returns <code>true</code> if this instance references an actor.
 	 * 
 	 * @return <code>true</code> if this instance references an actor
@@ -167,13 +159,6 @@ public interface Instance extends Vertex {
 	 * @return <code>true</code> if this instance references a network
 	 */
 	boolean isNetwork();
-
-	/**
-	 * Returns <code>true</code> if this instance references a wrapper.
-	 * 
-	 * @return <code>true</code> if this instance references a wrapper
-	 */
-	boolean isWrapper();
 
 	/**
 	 * Sets the entity referenced by this instance.
