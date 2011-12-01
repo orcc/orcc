@@ -43,7 +43,7 @@ import org.eclipse.emf.common.util.EList;
  * @author Matthieu Wipliez
  * @model extends="Entity"
  */
-public interface Actor extends Entity {
+public interface Actor extends Entity, Instantiable {
 
 	/**
 	 * Returns all the actions of this actor.

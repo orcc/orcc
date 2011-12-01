@@ -34,6 +34,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.EList;
 
 /**
@@ -44,7 +45,7 @@ import org.eclipse.emf.common.util.EList;
  * @author Herve Yviquel
  * @model extends="Entity"
  */
-public interface Network extends Entity {
+public interface Network extends Vertex, Instantiable {
 
 	/**
 	 * Classifies this network.
@@ -88,6 +89,21 @@ public interface Network extends Entity {
 	 * @model containment="true"
 	 */
 	EList<Connection> getConnections();
+
+	/**
+	 * Returns the file this entity is defined in.
+	 * 
+	 * @return the file this entity is defined in
+	 */
+	IFile getFile();
+
+	/**
+	 * Returns the name of the file this entity is defined in.
+	 * 
+	 * @return the name of the file this entity is defined in
+	 * @model
+	 */
+	String getFileName();
 
 	/**
 	 * Returns the input port whose name matches the given name.
@@ -167,6 +183,20 @@ public interface Network extends Entity {
 	EList<Port> getOutputs();
 
 	/**
+	 * Returns the package of this entity.
+	 * 
+	 * @return the package of this entity
+	 */
+	String getPackage();
+
+	/**
+	 * Returns the package of this entity as a list of strings.
+	 * 
+	 * @return the package of this entity as a list of strings
+	 */
+	List<String> getPackageAsList();
+
+	/**
 	 * Returns the parameter with the given name.
 	 * 
 	 * @param name
@@ -182,6 +212,20 @@ public interface Network extends Entity {
 	 * @model containment="true"
 	 */
 	EList<Var> getParameters();
+
+	/**
+	 * Returns the simple name of this entity.
+	 * 
+	 * @return the simple name of this entity
+	 */
+	String getSimpleName();
+
+	/**
+	 * Returns an object with template-specific data.
+	 * 
+	 * @return an object with template-specific data
+	 */
+	Object getTemplateData();
 
 	/**
 	 * Returns the variable with the given name.
@@ -228,11 +272,28 @@ public interface Network extends Entity {
 	void normalizeActors() throws OrccException;
 
 	/**
+	 * Sets the name of the file in which this entity is defined.
+	 * 
+	 * @param fileName
+	 *            name of the file in which this entity is defined
+	 */
+	void setFileName(String fileName);
+
+	/**
 	 * Sets the MoC of this network.
 	 * 
 	 * @param moc
 	 *            the new MoC of this network
 	 */
 	void setMoC(MoC moc);
+
+	/**
+	 * Sets the template data associated with this entity. Template data should
+	 * hold data that is specific to a given template.
+	 * 
+	 * @param templateData
+	 *            an object with template-specific data
+	 */
+	void setTemplateData(Object templateData);
 
 }

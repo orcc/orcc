@@ -95,7 +95,8 @@ public class DfSwitch<T> extends Switch<T> {
 			case DfPackage.NETWORK: {
 				Network network = (Network)theEObject;
 				T result = caseNetwork(network);
-				if (result == null) result = caseEntity(network);
+				if (result == null) result = caseVertex(network);
+				if (result == null) result = caseInstantiable(network);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -121,7 +122,7 @@ public class DfSwitch<T> extends Switch<T> {
 			case DfPackage.BROADCAST: {
 				Broadcast broadcast = (Broadcast)theEObject;
 				T result = caseBroadcast(broadcast);
-				if (result == null) result = caseEntity(broadcast);
+				if (result == null) result = caseInstantiable(broadcast);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -153,6 +154,7 @@ public class DfSwitch<T> extends Switch<T> {
 				Actor actor = (Actor)theEObject;
 				T result = caseActor(actor);
 				if (result == null) result = caseEntity(actor);
+				if (result == null) result = caseInstantiable(actor);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -233,6 +235,12 @@ public class DfSwitch<T> extends Switch<T> {
 				Unit unit = (Unit)theEObject;
 				T result = caseUnit(unit);
 				if (result == null) result = caseEntity(unit);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case DfPackage.INSTANTIABLE: {
+				Instantiable instantiable = (Instantiable)theEObject;
+				T result = caseInstantiable(instantiable);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -582,6 +590,21 @@ public class DfSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseUnit(Unit object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Instantiable</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Instantiable</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseInstantiable(Instantiable object) {
 		return null;
 	}
 

@@ -297,7 +297,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	}
 
 	@Override
-	public Instance createInstance(String id, Entity entity) {
+	public Instance createInstance(String id, Instantiable entity) {
 		InstanceImpl instance = new InstanceImpl();
 		instance.setName(id);
 		instance.setEntity(entity);

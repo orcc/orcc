@@ -68,11 +68,11 @@ public interface Instance extends Vertex {
 	Broadcast getBroadcast();
 
 	/**
-	 * Returns the entity referenced by this instance.
+	 * Returns the instantiable object referenced by this instance.
 	 * 
 	 * @model
 	 */
-	Entity getEntity();
+	Instantiable getEntity();
 
 	/**
 	 * Returns the path of identifiers from the top-level to this instance.
@@ -148,6 +148,6 @@ public interface Instance extends Vertex {
 	 * @param entity
 	 *            an entity
 	 */
-	void setEntity(Entity entity);
+	void setEntity(Instantiable entity);
 
 }

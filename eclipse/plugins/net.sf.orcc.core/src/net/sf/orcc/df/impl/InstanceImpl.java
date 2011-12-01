@@ -36,8 +36,8 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Instantiable;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.moc.MoC;
 
@@ -85,7 +85,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 * @generated
 	 * @ordered
 	 */
-	protected Entity entity;
+	protected Instantiable entity;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -99,8 +99,20 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Entity basicGetEntity() {
+	public Instantiable basicGetEntity() {
 		return entity;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setEntity(Instantiable newEntity) {
+		Instantiable oldEntity = entity;
+		entity = newEntity;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.INSTANCE__ENTITY, oldEntity, entity));
 	}
 
 	/**
@@ -169,7 +181,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 				getHierarchy().addAll((Collection<? extends Instance>)newValue);
 				return;
 			case DfPackage.INSTANCE__ENTITY:
-				setEntity((Entity)newValue);
+				setEntity((Instantiable)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -198,7 +210,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 				getHierarchy().clear();
 				return;
 			case DfPackage.INSTANCE__ENTITY:
-				setEntity((Entity)null);
+				setEntity((Instantiable)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -229,10 +241,10 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Entity getEntity() {
+	public Instantiable getEntity() {
 		if (entity != null && entity.eIsProxy()) {
 			InternalEObject oldEntity = (InternalEObject)entity;
-			entity = (Entity)eResolveProxy(oldEntity);
+			entity = (Instantiable)eResolveProxy(oldEntity);
 			if (entity != oldEntity) {
 				if (eNotificationRequired())
 					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.INSTANCE__ENTITY, oldEntity, entity));
@@ -316,17 +328,6 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	@Override
 	public boolean isNetwork() {
 		return (getEntity() instanceof Network);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setEntity(Entity newEntity) {
-		Entity oldEntity = entity;
-		entity = newEntity;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.INSTANCE__ENTITY, oldEntity, entity));
 	}
 
 	@Override

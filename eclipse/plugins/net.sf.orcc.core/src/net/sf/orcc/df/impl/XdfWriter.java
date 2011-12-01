@@ -36,11 +36,12 @@ import java.util.Comparator;
 import java.util.List;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Instantiable;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
@@ -509,10 +510,14 @@ public class XdfWriter {
 		instanceElt.setAttribute("id", instance.getName());
 
 		// class
-		Entity contents = instance.getEntity();
+		Instantiable contents = instance.getEntity();
 		if (contents != null) {
 			Element classElt = document.createElement("Class");
-			classElt.setAttribute("name", ((Entity) contents).getName());
+			if (contents instanceof Actor) {
+				classElt.setAttribute("name", ((Actor) contents).getName());
+			} else {
+				classElt.setAttribute("name", ((Network) contents).getName());
+			}
 			instanceElt.appendChild(classElt);
 		}
 

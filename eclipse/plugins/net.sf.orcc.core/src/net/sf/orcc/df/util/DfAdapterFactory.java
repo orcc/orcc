@@ -185,6 +185,10 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 				return createUnitAdapter();
 			}
 			@Override
+			public Adapter caseInstantiable(Instantiable object) {
+				return createInstantiableAdapter();
+			}
+			@Override
 			public Adapter defaultCase(EObject object) {
 				return createEObjectAdapter();
 			}
@@ -522,6 +526,20 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createUnitAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Instantiable <em>Instantiable</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.df.Instantiable
+	 * @generated
+	 */
+	public Adapter createInstantiableAdapter() {
 		return null;
 	}
 

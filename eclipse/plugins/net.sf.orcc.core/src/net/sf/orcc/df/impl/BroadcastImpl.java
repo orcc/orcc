@@ -49,7 +49,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
 /**
  * @generated
  */
-public class BroadcastImpl extends EntityImpl implements Broadcast {
+public class BroadcastImpl extends InstantiableImpl implements Broadcast {
 
 	public static final String CLASS = "";
 

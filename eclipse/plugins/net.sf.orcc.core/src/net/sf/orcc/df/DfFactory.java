@@ -213,7 +213,7 @@ public interface DfFactory extends EFactory {
 	 */
 	Instance createInstance();
 
-	Instance createInstance(String id, Entity entity);
+	Instance createInstance(String id, Instantiable entity);
 
 	/**
 	 * Returns a new object of class '<em>Network</em>'.

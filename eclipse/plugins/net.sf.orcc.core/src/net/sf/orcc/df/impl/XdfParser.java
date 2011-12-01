@@ -40,8 +40,8 @@ import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Instantiable;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
@@ -759,7 +759,7 @@ public class XdfParser {
 					+ "must have a valid \"Class\" child.");
 		}
 
-		Entity proxy = null;
+		Instantiable proxy = null;
 		IProject project = file.getProject();
 		IFile file = OrccUtil.getFile(project, clasz, "ir");
 		if (file == null || !file.exists()) {

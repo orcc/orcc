@@ -53,7 +53,7 @@ public interface Entity extends EObject {
 	 * Returns the name of the file this entity is defined in.
 	 * 
 	 * @return the name of the file this entity is defined in
-	 * @model dataType="org.eclipse.emf.ecore.EString"
+	 * @model
 	 */
 	String getFileName();
 
@@ -69,7 +69,7 @@ public interface Entity extends EObject {
 	 * Returns the name of this entity.
 	 * 
 	 * @return the name of this entity
-	 * @model dataType="org.eclipse.emf.ecore.EString"
+	 * @model
 	 */
 	String getName();
 

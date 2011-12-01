@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,51 +28,13 @@
  */
 package net.sf.orcc.df;
 
-import java.util.List;
-import java.util.Map;
-
-import net.sf.orcc.ir.Type;
-
-import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
 
 /**
- * This class defines a broadcast as a particular entity.
+ * This interface defines an object that can be instantiated.
  * 
- * @author Matthieu Wipliez
- * @model extends="Entity"
+ * @model abstract="true"
+ * @generated
  */
-public interface Broadcast extends Instantiable {
-
-	public Port getInput();
-
-	/**
-	 * Returns the list of input ports.
-	 * 
-	 * @return the list of input ports
-	 * @model containment="true"
-	 */
-	EList<Port> getInputs();
-
-	Port getOutput(String name);
-
-	/**
-	 * Returns a list of integers containing [0, 1, ..., n - 1] where n is the
-	 * number of ports of this broadcast.
-	 * 
-	 * @return a list of integers
-	 */
-	List<Integer> getOutputList();
-
-	/**
-	 * Returns the ordered map of output ports.
-	 * 
-	 * @return the ordered map of output ports
-	 * @model containment="true"
-	 */
-	EList<Port> getOutputs();
-
-	Map<Port, Integer> getPortMap();
-
-	Type getType();
-
+public interface Instantiable extends EObject {
 }
