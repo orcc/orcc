@@ -16,7 +16,7 @@ import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.Entity;
+import net.sf.orcc.df.Nameable;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -93,8 +93,40 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	protected DfSwitch<Adapter> modelSwitch =
 		new DfSwitch<Adapter>() {
 			@Override
+			public Adapter caseNameable(Nameable object) {
+				return createNameableAdapter();
+			}
+			@Override
+			public Adapter caseUnit(Unit object) {
+				return createUnitAdapter();
+			}
+			@Override
+			public Adapter caseVertex(Vertex object) {
+				return createVertexAdapter();
+			}
+			@Override
+			public Adapter casePort(Port object) {
+				return createPortAdapter();
+			}
+			@Override
+			public Adapter caseInstance(Instance object) {
+				return createInstanceAdapter();
+			}
+			@Override
+			public Adapter caseEntity(Entity object) {
+				return createEntityAdapter();
+			}
+			@Override
+			public Adapter caseActor(Actor object) {
+				return createActorAdapter();
+			}
+			@Override
 			public Adapter caseNetwork(Network object) {
 				return createNetworkAdapter();
+			}
+			@Override
+			public Adapter caseBroadcast(Broadcast object) {
+				return createBroadcastAdapter();
 			}
 			@Override
 			public Adapter caseAttribute(Attribute object) {
@@ -105,14 +137,6 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 				return createConnectionAdapter();
 			}
 			@Override
-			public Adapter caseInstance(Instance object) {
-				return createInstanceAdapter();
-			}
-			@Override
-			public Adapter caseBroadcast(Broadcast object) {
-				return createBroadcastAdapter();
-			}
-			@Override
 			public Adapter caseWrapperString(WrapperString object) {
 				return createWrapperStringAdapter();
 			}
@@ -121,16 +145,8 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 				return createWrapperXmlAdapter();
 			}
 			@Override
-			public Adapter caseVertex(Vertex object) {
-				return createVertexAdapter();
-			}
-			@Override
 			public Adapter caseAction(Action object) {
 				return createActionAdapter();
-			}
-			@Override
-			public Adapter caseActor(Actor object) {
-				return createActorAdapter();
 			}
 			@Override
 			public Adapter caseFSM(FSM object) {
@@ -139,10 +155,6 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter casePattern(Pattern object) {
 				return createPatternAdapter();
-			}
-			@Override
-			public Adapter casePort(Port object) {
-				return createPortAdapter();
 			}
 			@Override
 			public Adapter caseState(State object) {
@@ -175,18 +187,6 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseArgument(Argument object) {
 				return createArgumentAdapter();
-			}
-			@Override
-			public Adapter caseEntity(Entity object) {
-				return createEntityAdapter();
-			}
-			@Override
-			public Adapter caseUnit(Unit object) {
-				return createUnitAdapter();
-			}
-			@Override
-			public Adapter caseInstantiable(Instantiable object) {
-				return createInstantiableAdapter();
 			}
 			@Override
 			public Adapter defaultCase(EObject object) {
@@ -530,16 +530,16 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Instantiable <em>Instantiable</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Nameable <em>Nameable</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.orcc.df.Instantiable
+	 * @see net.sf.orcc.df.Nameable
 	 * @generated
 	 */
-	public Adapter createInstantiableAdapter() {
+	public Adapter createNameableAdapter() {
 		return null;
 	}
 

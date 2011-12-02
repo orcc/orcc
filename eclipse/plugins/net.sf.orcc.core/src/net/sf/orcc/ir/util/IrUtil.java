@@ -34,7 +34,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.df.Entity;
+import net.sf.orcc.df.Nameable;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
@@ -237,7 +237,7 @@ public class IrUtil {
 	 * @return the actor serialized with XMI in the given file
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends Entity> T deserializeEntity(ResourceSet set,
+	public static <T extends Nameable> T deserializeEntity(ResourceSet set,
 			IFile file) {
 		Resource resource = set.getResource(URI.createPlatformResourceURI(file
 				.getFullPath().toString(), true), true);
@@ -350,7 +350,7 @@ public class IrUtil {
 	 * @return <code>true</code> if the serialization succeeded
 	 */
 	public static boolean serializeActor(ResourceSet set, IFolder outputFolder,
-			Entity entity) {
+			Nameable entity) {
 		try {
 			OrccUtil.createFolder(outputFolder);
 		} catch (CoreException e) {
@@ -373,7 +373,7 @@ public class IrUtil {
 	 * @return <code>true</code> if the serialization succeeded
 	 */
 	public static boolean serializeActor(ResourceSet set, String outputFolder,
-			Entity entity) {
+			Nameable entity) {
 		String pathName = outputFolder + File.separator
 				+ OrccUtil.getFile(entity) + ".ir";
 		URI uri = URI.createFileURI(pathName);
@@ -390,7 +390,7 @@ public class IrUtil {
 	 * @return <code>true</code> if the serialization succeeded
 	 */
 	private static boolean serializeActor(ResourceSet set, URI uri,
-			Entity entity) {
+			Nameable entity) {
 		// check that the factory is registered
 		// (only happens in command-line mode)
 		// ...

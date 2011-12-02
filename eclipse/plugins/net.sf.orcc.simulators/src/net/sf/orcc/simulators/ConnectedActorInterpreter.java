@@ -36,7 +36,7 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
-import net.sf.orcc.df.Entity;
+import net.sf.orcc.df.Nameable;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.Arg;
@@ -109,7 +109,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		try {
 			// get packageName and containerName for calling the correct native
 			// function
-			Entity entity = (Entity) procedure.eContainer();
+			Nameable entity = (Nameable) procedure.eContainer();
 			String packageName = entity.getPackage() + ".impl";
 			String containerName = entity.getSimpleName();
 

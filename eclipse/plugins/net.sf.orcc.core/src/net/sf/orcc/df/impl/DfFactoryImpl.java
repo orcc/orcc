@@ -96,18 +96,19 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	@Override
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
+			case DfPackage.UNIT: return createUnit();
+			case DfPackage.PORT: return createPort();
+			case DfPackage.INSTANCE: return createInstance();
+			case DfPackage.ACTOR: return createActor();
 			case DfPackage.NETWORK: return createNetwork();
+			case DfPackage.BROADCAST: return createBroadcast();
 			case DfPackage.ATTRIBUTE: return createAttribute();
 			case DfPackage.CONNECTION: return createConnection();
-			case DfPackage.INSTANCE: return createInstance();
-			case DfPackage.BROADCAST: return createBroadcast();
 			case DfPackage.WRAPPER_STRING: return createWrapperString();
 			case DfPackage.WRAPPER_XML: return createWrapperXml();
 			case DfPackage.ACTION: return createAction();
-			case DfPackage.ACTOR: return createActor();
 			case DfPackage.FSM: return createFSM();
 			case DfPackage.PATTERN: return createPattern();
-			case DfPackage.PORT: return createPort();
 			case DfPackage.STATE: return createState();
 			case DfPackage.TAG: return createTag();
 			case DfPackage.TRANSITION: return createTransition();
@@ -116,7 +117,6 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 			case DfPackage.PORT_TO_VAR_MAP_ENTRY: return (EObject)createPortToVarMapEntry();
 			case DfPackage.VAR_TO_PORT_MAP_ENTRY: return (EObject)createVarToPortMapEntry();
 			case DfPackage.ARGUMENT: return createArgument();
-			case DfPackage.UNIT: return createUnit();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -297,7 +297,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	}
 
 	@Override
-	public Instance createInstance(String id, Instantiable entity) {
+	public Instance createInstance(String id, Entity entity) {
 		InstanceImpl instance = new InstanceImpl();
 		instance.setName(id);
 		instance.setEntity(entity);

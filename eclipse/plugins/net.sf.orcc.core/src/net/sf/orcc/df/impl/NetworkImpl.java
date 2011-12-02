@@ -43,6 +43,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -78,48 +79,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * @author Herve Yviquel
  * @generated
  */
-public class NetworkImpl extends VertexImpl implements Network {
-	/**
-	 * The default value of the '{@link #getFileName() <em>File Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getFileName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String FILE_NAME_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getConnections() <em>Connections</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getConnections()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Connection> connections;
-
-	/**
-	 * The cached value of the '{@link #getFileName() <em>File Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getFileName()
-	 * @generated
-	 * @ordered
-	 */
-	protected String fileName = FILE_NAME_EDEFAULT;
-
-	/**
-	 * @generated
-	 */
-	protected EList<Port> inputs;
-
-	/**
-	 * The cached value of the '{@link #getInstances() <em>Instances</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getInstances()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Instance> instances;
-
+public class NetworkImpl extends EntityImpl implements Network {
 	/**
 	 * The cached value of the '{@link #getMoC() <em>Mo C</em>}' containment reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -128,16 +88,6 @@ public class NetworkImpl extends VertexImpl implements Network {
 	 * @ordered
 	 */
 	protected MoC moC;
-
-	/**
-	 * @generated
-	 */
-	protected EList<Port> outputs;
-
-	/**
-	 * @generated
-	 */
-	protected EList<Var> parameters;
 
 	/**
 	 * holds template-specific data.
@@ -150,6 +100,24 @@ public class NetworkImpl extends VertexImpl implements Network {
 	protected EList<Var> variables;
 
 	/**
+	 * The cached value of the '{@link #getConnections() <em>Connections</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getConnections()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Connection> connections;
+
+	/**
+	 * The cached value of the '{@link #getInstances() <em>Instances</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getInstances()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Instance> instances;
+
+	/**
 	 * The cached value of the '{@link #getVertices() <em>Vertices</em>}' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getVertices()
@@ -157,6 +125,34 @@ public class NetworkImpl extends VertexImpl implements Network {
 	 * @ordered
 	 */
 	protected EList<Vertex> vertices;
+
+	/**
+	 * The default value of the '{@link #getFileName() <em>File Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getFileName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String FILE_NAME_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getFileName() <em>File Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getFileName()
+	 * @generated
+	 * @ordered
+	 */
+	protected String fileName = FILE_NAME_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getEntities() <em>Entities</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getEntities()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Entity> entities;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -232,14 +228,8 @@ public class NetworkImpl extends VertexImpl implements Network {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case DfPackage.NETWORK__INPUTS:
-				return getInputs();
 			case DfPackage.NETWORK__MO_C:
 				return getMoC();
-			case DfPackage.NETWORK__OUTPUTS:
-				return getOutputs();
-			case DfPackage.NETWORK__PARAMETERS:
-				return getParameters();
 			case DfPackage.NETWORK__VARIABLES:
 				return getVariables();
 			case DfPackage.NETWORK__CONNECTIONS:
@@ -250,6 +240,8 @@ public class NetworkImpl extends VertexImpl implements Network {
 				return getVertices();
 			case DfPackage.NETWORK__FILE_NAME:
 				return getFileName();
+			case DfPackage.NETWORK__ENTITIES:
+				return getEntities();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -262,20 +254,16 @@ public class NetworkImpl extends VertexImpl implements Network {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case DfPackage.NETWORK__INPUTS:
-				return ((InternalEList<?>)getInputs()).basicRemove(otherEnd, msgs);
 			case DfPackage.NETWORK__MO_C:
 				return basicSetMoC(null, msgs);
-			case DfPackage.NETWORK__OUTPUTS:
-				return ((InternalEList<?>)getOutputs()).basicRemove(otherEnd, msgs);
-			case DfPackage.NETWORK__PARAMETERS:
-				return ((InternalEList<?>)getParameters()).basicRemove(otherEnd, msgs);
 			case DfPackage.NETWORK__VARIABLES:
 				return ((InternalEList<?>)getVariables()).basicRemove(otherEnd, msgs);
 			case DfPackage.NETWORK__CONNECTIONS:
 				return ((InternalEList<?>)getConnections()).basicRemove(otherEnd, msgs);
 			case DfPackage.NETWORK__INSTANCES:
 				return ((InternalEList<?>)getInstances()).basicRemove(otherEnd, msgs);
+			case DfPackage.NETWORK__ENTITIES:
+				return ((InternalEList<?>)getEntities()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -287,14 +275,8 @@ public class NetworkImpl extends VertexImpl implements Network {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case DfPackage.NETWORK__INPUTS:
-				return inputs != null && !inputs.isEmpty();
 			case DfPackage.NETWORK__MO_C:
 				return moC != null;
-			case DfPackage.NETWORK__OUTPUTS:
-				return outputs != null && !outputs.isEmpty();
-			case DfPackage.NETWORK__PARAMETERS:
-				return parameters != null && !parameters.isEmpty();
 			case DfPackage.NETWORK__VARIABLES:
 				return variables != null && !variables.isEmpty();
 			case DfPackage.NETWORK__CONNECTIONS:
@@ -305,6 +287,8 @@ public class NetworkImpl extends VertexImpl implements Network {
 				return vertices != null && !vertices.isEmpty();
 			case DfPackage.NETWORK__FILE_NAME:
 				return FILE_NAME_EDEFAULT == null ? fileName != null : !FILE_NAME_EDEFAULT.equals(fileName);
+			case DfPackage.NETWORK__ENTITIES:
+				return entities != null && !entities.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -317,20 +301,8 @@ public class NetworkImpl extends VertexImpl implements Network {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case DfPackage.NETWORK__INPUTS:
-				getInputs().clear();
-				getInputs().addAll((Collection<? extends Port>)newValue);
-				return;
 			case DfPackage.NETWORK__MO_C:
 				setMoC((MoC)newValue);
-				return;
-			case DfPackage.NETWORK__OUTPUTS:
-				getOutputs().clear();
-				getOutputs().addAll((Collection<? extends Port>)newValue);
-				return;
-			case DfPackage.NETWORK__PARAMETERS:
-				getParameters().clear();
-				getParameters().addAll((Collection<? extends Var>)newValue);
 				return;
 			case DfPackage.NETWORK__VARIABLES:
 				getVariables().clear();
@@ -350,6 +322,10 @@ public class NetworkImpl extends VertexImpl implements Network {
 				return;
 			case DfPackage.NETWORK__FILE_NAME:
 				setFileName((String)newValue);
+				return;
+			case DfPackage.NETWORK__ENTITIES:
+				getEntities().clear();
+				getEntities().addAll((Collection<? extends Entity>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -371,17 +347,8 @@ public class NetworkImpl extends VertexImpl implements Network {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case DfPackage.NETWORK__INPUTS:
-				getInputs().clear();
-				return;
 			case DfPackage.NETWORK__MO_C:
 				setMoC((MoC)null);
-				return;
-			case DfPackage.NETWORK__OUTPUTS:
-				getOutputs().clear();
-				return;
-			case DfPackage.NETWORK__PARAMETERS:
-				getParameters().clear();
 				return;
 			case DfPackage.NETWORK__VARIABLES:
 				getVariables().clear();
@@ -397,6 +364,9 @@ public class NetworkImpl extends VertexImpl implements Network {
 				return;
 			case DfPackage.NETWORK__FILE_NAME:
 				setFileName(FILE_NAME_EDEFAULT);
+				return;
+			case DfPackage.NETWORK__ENTITIES:
+				getEntities().clear();
 				return;
 		}
 		super.eUnset(featureID);
@@ -487,6 +457,18 @@ public class NetworkImpl extends VertexImpl implements Network {
 		return connections;
 	}
 
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Entity> getEntities() {
+		if (entities == null) {
+			entities = new EObjectContainmentEList<Entity>(Entity.class, this, DfPackage.NETWORK__ENTITIES);
+		}
+		return entities;
+	}
+
 	@Override
 	public IFile getFile() {
 		String fileName = getFileName();
@@ -503,33 +485,6 @@ public class NetworkImpl extends VertexImpl implements Network {
 	 */
 	public String getFileName() {
 		return fileName;
-	}
-
-	/**
-	 * Returns the input port whose name matches the given name.
-	 * 
-	 * @param name
-	 *            the port name
-	 * @return an input port whose name matches the given name
-	 */
-	public Port getInput(String name) {
-		for (Port port : getInputs()) {
-			if (port.getName().equals(name)) {
-				return port;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Port> getInputs() {
-		if (inputs == null) {
-			inputs = new EObjectContainmentEList<Port>(Port.class, this, DfPackage.NETWORK__INPUTS);
-		}
-		return inputs;
 	}
 
 	@Override
@@ -586,35 +541,6 @@ public class NetworkImpl extends VertexImpl implements Network {
 		return moC;
 	}
 
-	/**
-	 * Returns the output port whose name matches the given name.
-	 * 
-	 * @param name
-	 *            the port name
-	 * @return an output port whose name matches the given name
-	 */
-	public Port getOutput(String name) {
-		for (Port port : getOutputs()) {
-			if (port.getName().equals(name)) {
-				return port;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Returns the list of this network's output ports
-	 * 
-	 * @return the list of this network's output ports
-	 * @generated
-	 */
-	public EList<Port> getOutputs() {
-		if (outputs == null) {
-			outputs = new EObjectContainmentEList<Port>(Port.class, this, DfPackage.NETWORK__OUTPUTS);
-		}
-		return outputs;
-	}
-
 	@Override
 	public String getPackage() {
 		if (name == null) {
@@ -637,30 +563,7 @@ public class NetworkImpl extends VertexImpl implements Network {
 		}
 		return list;
 	}
-
-	@Override
-	public Var getParameter(String name) {
-		for (Var var : getParameters()) {
-			if (var.getName().equals(name)) {
-				return var;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Returns the list of this network's parameters
-	 * 
-	 * @return the list of this network's parameters
-	 * @generated
-	 */
-	public EList<Var> getParameters() {
-		if (parameters == null) {
-			parameters = new EObjectContainmentEList<Var>(Var.class, this, DfPackage.NETWORK__PARAMETERS);
-		}
-		return parameters;
-	}
-
+	
 	@Override
 	public String getSimpleName() {
 		if (name == null) {
@@ -673,7 +576,7 @@ public class NetworkImpl extends VertexImpl implements Network {
 			return name.substring(index + 1);
 		}
 	}
-	
+
 	/**
 	 * Returns an object with template-specific data.
 	 * 

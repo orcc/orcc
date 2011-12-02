@@ -29,7 +29,6 @@
 package net.sf.orcc.df.impl;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,41 +38,16 @@ import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.Type;
 
-import org.eclipse.emf.common.notify.NotificationChain;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.InternalEObject;
-import org.eclipse.emf.ecore.util.EObjectContainmentEList;
-import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
  * @generated
  */
-public class BroadcastImpl extends InstantiableImpl implements Broadcast {
+public class BroadcastImpl extends EntityImpl implements Broadcast {
 
 	public static final String CLASS = "";
 
-	/**
-	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getInputs()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Port> inputs;
-
 	private List<Integer> outputList;
-
-	/**
-	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getOutputs()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Port> outputs;
 
 	private Map<Port, Integer> portMap;
 
@@ -94,123 +68,14 @@ public class BroadcastImpl extends InstantiableImpl implements Broadcast {
 	 * @generated
 	 */
 	@Override
-	public Object eGet(int featureID, boolean resolve, boolean coreType) {
-		switch (featureID) {
-			case DfPackage.BROADCAST__INPUTS:
-				return getInputs();
-			case DfPackage.BROADCAST__OUTPUTS:
-				return getOutputs();
-		}
-		return super.eGet(featureID, resolve, coreType);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
-		switch (featureID) {
-			case DfPackage.BROADCAST__INPUTS:
-				return ((InternalEList<?>)getInputs()).basicRemove(otherEnd, msgs);
-			case DfPackage.BROADCAST__OUTPUTS:
-				return ((InternalEList<?>)getOutputs()).basicRemove(otherEnd, msgs);
-		}
-		return super.eInverseRemove(otherEnd, featureID, msgs);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-			case DfPackage.BROADCAST__INPUTS:
-				return inputs != null && !inputs.isEmpty();
-			case DfPackage.BROADCAST__OUTPUTS:
-				return outputs != null && !outputs.isEmpty();
-		}
-		return super.eIsSet(featureID);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public void eSet(int featureID, Object newValue) {
-		switch (featureID) {
-			case DfPackage.BROADCAST__INPUTS:
-				getInputs().clear();
-				getInputs().addAll((Collection<? extends Port>)newValue);
-				return;
-			case DfPackage.BROADCAST__OUTPUTS:
-				getOutputs().clear();
-				getOutputs().addAll((Collection<? extends Port>)newValue);
-				return;
-		}
-		super.eSet(featureID, newValue);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
 	protected EClass eStaticClass() {
 		return DfPackage.Literals.BROADCAST;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public void eUnset(int featureID) {
-		switch (featureID) {
-			case DfPackage.BROADCAST__INPUTS:
-				getInputs().clear();
-				return;
-			case DfPackage.BROADCAST__OUTPUTS:
-				getOutputs().clear();
-				return;
-		}
-		super.eUnset(featureID);
 	}
 
 	@Override
 	public Port getInput() {
 		for (Port port : inputs) {
 			if (port.getName().equals("input")) {
-				return port;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Port> getInputs() {
-		if (inputs == null) {
-			inputs = new EObjectContainmentEList<Port>(Port.class, this, DfPackage.BROADCAST__INPUTS);
-		}
-		return inputs;
-	}
-
-	@Override
-	public Port getOutput(String name) {
-		for (Port port : getOutputs()) {
-			if (port.getName().equals(name)) {
 				return port;
 			}
 		}
@@ -232,18 +97,6 @@ public class BroadcastImpl extends InstantiableImpl implements Broadcast {
 		}
 
 		return outputList;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Port> getOutputs() {
-		if (outputs == null) {
-			outputs = new EObjectContainmentEList<Port>(Port.class, this, DfPackage.BROADCAST__OUTPUTS);
-		}
-		return outputs;
 	}
 
 	@Override

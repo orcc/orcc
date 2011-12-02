@@ -16,7 +16,7 @@ import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.Entity;
+import net.sf.orcc.df.Nameable;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -92,11 +92,74 @@ public class DfSwitch<T> extends Switch<T> {
 	@Override
 	protected T doSwitch(int classifierID, EObject theEObject) {
 		switch (classifierID) {
+			case DfPackage.NAMEABLE: {
+				Nameable nameable = (Nameable)theEObject;
+				T result = caseNameable(nameable);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case DfPackage.UNIT: {
+				Unit unit = (Unit)theEObject;
+				T result = caseUnit(unit);
+				if (result == null) result = caseNameable(unit);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case DfPackage.VERTEX: {
+				Vertex vertex = (Vertex)theEObject;
+				T result = caseVertex(vertex);
+				if (result == null) result = caseNameable(vertex);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case DfPackage.PORT: {
+				Port port = (Port)theEObject;
+				T result = casePort(port);
+				if (result == null) result = caseVertex(port);
+				if (result == null) result = caseNameable(port);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case DfPackage.INSTANCE: {
+				Instance instance = (Instance)theEObject;
+				T result = caseInstance(instance);
+				if (result == null) result = caseVertex(instance);
+				if (result == null) result = caseNameable(instance);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case DfPackage.ENTITY: {
+				Entity entity = (Entity)theEObject;
+				T result = caseEntity(entity);
+				if (result == null) result = caseVertex(entity);
+				if (result == null) result = caseNameable(entity);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case DfPackage.ACTOR: {
+				Actor actor = (Actor)theEObject;
+				T result = caseActor(actor);
+				if (result == null) result = caseEntity(actor);
+				if (result == null) result = caseVertex(actor);
+				if (result == null) result = caseNameable(actor);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
 			case DfPackage.NETWORK: {
 				Network network = (Network)theEObject;
 				T result = caseNetwork(network);
+				if (result == null) result = caseEntity(network);
 				if (result == null) result = caseVertex(network);
-				if (result == null) result = caseInstantiable(network);
+				if (result == null) result = caseNameable(network);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case DfPackage.BROADCAST: {
+				Broadcast broadcast = (Broadcast)theEObject;
+				T result = caseBroadcast(broadcast);
+				if (result == null) result = caseEntity(broadcast);
+				if (result == null) result = caseVertex(broadcast);
+				if (result == null) result = caseNameable(broadcast);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -112,20 +175,6 @@ public class DfSwitch<T> extends Switch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case DfPackage.INSTANCE: {
-				Instance instance = (Instance)theEObject;
-				T result = caseInstance(instance);
-				if (result == null) result = caseVertex(instance);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.BROADCAST: {
-				Broadcast broadcast = (Broadcast)theEObject;
-				T result = caseBroadcast(broadcast);
-				if (result == null) result = caseInstantiable(broadcast);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
 			case DfPackage.WRAPPER_STRING: {
 				WrapperString wrapperString = (WrapperString)theEObject;
 				T result = caseWrapperString(wrapperString);
@@ -138,23 +187,9 @@ public class DfSwitch<T> extends Switch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case DfPackage.VERTEX: {
-				Vertex vertex = (Vertex)theEObject;
-				T result = caseVertex(vertex);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
 			case DfPackage.ACTION: {
 				Action action = (Action)theEObject;
 				T result = caseAction(action);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.ACTOR: {
-				Actor actor = (Actor)theEObject;
-				T result = caseActor(actor);
-				if (result == null) result = caseEntity(actor);
-				if (result == null) result = caseInstantiable(actor);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -167,13 +202,6 @@ public class DfSwitch<T> extends Switch<T> {
 			case DfPackage.PATTERN: {
 				Pattern pattern = (Pattern)theEObject;
 				T result = casePattern(pattern);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.PORT: {
-				Port port = (Port)theEObject;
-				T result = casePort(port);
-				if (result == null) result = caseVertex(port);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -222,25 +250,6 @@ public class DfSwitch<T> extends Switch<T> {
 			case DfPackage.ARGUMENT: {
 				Argument argument = (Argument)theEObject;
 				T result = caseArgument(argument);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.ENTITY: {
-				Entity entity = (Entity)theEObject;
-				T result = caseEntity(entity);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.UNIT: {
-				Unit unit = (Unit)theEObject;
-				T result = caseUnit(unit);
-				if (result == null) result = caseEntity(unit);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.INSTANTIABLE: {
-				Instantiable instantiable = (Instantiable)theEObject;
-				T result = caseInstantiable(instantiable);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -594,17 +603,17 @@ public class DfSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Instantiable</em>'.
+	 * Returns the result of interpreting the object as an instance of '<em>Nameable</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
 	 * returning a non-null result will terminate the switch.
 	 * <!-- end-user-doc -->
 	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Instantiable</em>'.
+	 * @return the result of interpreting the object as an instance of '<em>Nameable</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseInstantiable(Instantiable object) {
+	public T caseNameable(Nameable object) {
 		return null;
 	}
 

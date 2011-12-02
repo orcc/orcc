@@ -31,6 +31,7 @@ package net.sf.orcc.df;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.EList;
 
 /**
@@ -39,7 +40,7 @@ import org.eclipse.emf.common.util.EList;
  * @author Matthieu Wipliez
  * @model extends="Entity"
  */
-public interface Unit extends Entity {
+public interface Unit extends Nameable {
 
 	/**
 	 * Returns the constants contained in this unit.
@@ -50,11 +51,62 @@ public interface Unit extends Entity {
 	EList<Var> getConstants();
 
 	/**
+	 * Returns the file this unit is defined in.
+	 * 
+	 * @return the file this unit is defined in
+	 */
+	IFile getFile();
+
+	/**
+	 * Returns the name of the file this unit is defined in.
+	 * 
+	 * @return the name of the file this unit is defined in
+	 * @model
+	 */
+	String getFileName();
+
+	/**
+	 * Returns the value of the '<em><b>Line Number</b></em>' attribute. <!--
+	 * begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Line Number</em>' attribute isn't clear, there
+	 * really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * 
+	 * @return the value of the '<em>Line Number</em>' attribute.
+	 * @see #setLineNumber(int)
+	 * @see net.sf.orcc.df.DfPackage#getUnit_LineNumber()
+	 * @model
+	 * @generated
+	 */
+	int getLineNumber();
+
+	/**
 	 * Returns the functions/procedures contained in this unit.
 	 * 
 	 * @return the functions/procedures contained in this unit
 	 * @model containment="true"
 	 */
 	EList<Procedure> getProcedures();
+
+	/**
+	 * Sets the name of the file this unit is defined in.
+	 * 
+	 * @param name
+	 *            the name of the file this unit is defined in
+	 * @generated
+	 */
+	void setFileName(String value);
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.df.Unit#getLineNumber <em>Line Number</em>}' attribute.
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
+	 * @param value the new value of the '<em>Line Number</em>' attribute.
+	 * @see #getLineNumber()
+	 * @generated
+	 */
+	void setLineNumber(int value);
 
 }

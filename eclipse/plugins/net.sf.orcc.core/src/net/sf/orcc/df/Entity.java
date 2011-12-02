@@ -28,78 +28,78 @@
  */
 package net.sf.orcc.df;
 
-import java.util.List;
+import net.sf.orcc.ir.Var;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.common.util.EList;
 
 /**
- * This class defines an entity. An entity has a package, a name, and may be an
- * actor, a network, or a unit.
+ * This interface defines an entity that can be instantiated by an Instance, or
+ * contained in a Network.
  * 
- * @author Matthieu Wipliez
- * @model abstract="true"
+ * @model abstract="true" extends="Vertex"
+ * @generated
  */
-public interface Entity extends EObject {
+public interface Entity extends Vertex {
 
 	/**
-	 * Returns the file this entity is defined in.
+	 * Returns the input port whose name matches the given name.
 	 * 
-	 * @return the file this entity is defined in
+	 * @param name
+	 *            the port name
+	 * @return an input port whose name matches the given name
 	 */
-	IFile getFile();
+	Port getInput(String name);
 
 	/**
-	 * Returns the name of the file this entity is defined in.
+	 * Returns the list of this entity's input ports
 	 * 
-	 * @return the name of the file this entity is defined in
-	 * @model
+	 * @return the list of this entity's input ports
+	 * @model containment="true"
 	 */
-	String getFileName();
+	EList<Port> getInputs();
 
 	/**
-	 * Returns the line number on which this entity starts.
+	 * Returns the output port whose name matches the given name.
 	 * 
-	 * @return the line number on which this entity starts
-	 * @model
+	 * @param name
+	 *            the port name
+	 * @return an output port whose name matches the given name
 	 */
-	public int getLineNumber();
+	Port getOutput(String name);
 
 	/**
-	 * Returns the name of this entity.
+	 * Returns the list of this entity's output ports
 	 * 
-	 * @return the name of this entity
-	 * @model
+	 * @return the list of this entity's output ports
+	 * @model containment="true"
 	 */
-	String getName();
+	EList<Port> getOutputs();
 
 	/**
-	 * Returns the package of this entity.
+	 * Returns the parameter with the given name.
 	 * 
-	 * @return the package of this entity
+	 * @param name
+	 *            name of a parameter
+	 * @return the parameter with the given name
 	 */
-	String getPackage();
+	Var getParameter(String name);
 
 	/**
-	 * Returns the package of this entity as a list of strings.
+	 * Returns the list of this entity's parameters
 	 * 
-	 * @return the package of this entity as a list of strings
+	 * @return the list of this entity's parameters
+	 * @model containment="true"
 	 */
-	List<String> getPackageAsList();
+	EList<Var> getParameters();
 
 	/**
-	 * Returns the simple name of this entity.
+	 * Returns the port whose name matches the given name.
 	 * 
-	 * @return the simple name of this entity
+	 * @param name
+	 *            the port name
+	 * @return a port whose name matches the given name
 	 */
-	String getSimpleName();
-
-	/**
-	 * Returns an object with template-specific data.
-	 * 
-	 * @return an object with template-specific data
-	 */
-	Object getTemplateData();
+	Port getPort(String name);
 
 	/**
 	 * Returns <code>true</code> if this entity is an actor.
@@ -109,50 +109,17 @@ public interface Entity extends EObject {
 	boolean isActor();
 
 	/**
+	 * Returns <code>true</code> if this entity is a broadcast.
+	 * 
+	 * @return <code>true</code> if this entity is a broadcast
+	 */
+	boolean isBroadcast();
+
+	/**
 	 * Returns <code>true</code> if this entity is a network.
 	 * 
 	 * @return <code>true</code> if this entity is a network
 	 */
 	boolean isNetwork();
-
-	/**
-	 * Returns <code>true</code> if this entity is a unit.
-	 * 
-	 * @return <code>true</code> if this entity is a unit
-	 */
-	boolean isUnit();
-
-	/**
-	 * Sets the name of the file in which this entity is defined.
-	 * 
-	 * @param fileName
-	 *            name of the file in which this entity is defined
-	 */
-	void setFileName(String fileName);
-
-	/**
-	 * Sets the line number on which this entity starts.
-	 * 
-	 * @param newLineNumber
-	 *            the line number on which this entity starts
-	 */
-	public void setLineNumber(int newLineNumber);
-
-	/**
-	 * Sets the name of this entity.
-	 * 
-	 * @param name
-	 *            the new name of this entity
-	 */
-	void setName(String name);
-
-	/**
-	 * Sets the template data associated with this entity. Template data should
-	 * hold data that is specific to a given template.
-	 * 
-	 * @param templateData
-	 *            an object with template-specific data
-	 */
-	void setTemplateData(Object templateData);
 
 }

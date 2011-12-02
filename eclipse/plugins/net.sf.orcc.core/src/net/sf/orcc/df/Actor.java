@@ -32,6 +32,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.EList;
 
 /**
@@ -43,7 +44,7 @@ import org.eclipse.emf.common.util.EList;
  * @author Matthieu Wipliez
  * @model extends="Entity"
  */
-public interface Actor extends Entity, Instantiable {
+public interface Actor extends Entity {
 
 	/**
 	 * Returns all the actions of this actor.
@@ -64,6 +65,21 @@ public interface Actor extends Entity, Instantiable {
 	EList<Action> getActionsOutsideFsm();
 
 	/**
+	 * Returns the file this actor is defined in.
+	 * 
+	 * @return the file this actor is defined in
+	 */
+	IFile getFile();
+
+	/**
+	 * Returns the name of the file this actor is defined in.
+	 * 
+	 * @return the name of the file this actor is defined in
+	 * @model
+	 */
+	String getFileName();
+
+	/**
 	 * Returns the FSM of this actor, or <code>null</code> if it does not have
 	 * one.
 	 * 
@@ -81,21 +97,21 @@ public interface Actor extends Entity, Instantiable {
 	EList<Action> getInitializes();
 
 	/**
-	 * Returns the input port whose name matches the given name.
+	 * Returns the value of the '<em><b>Line Number</b></em>' attribute. <!--
+	 * begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Line Number</em>' attribute isn't clear, there
+	 * really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
 	 * 
-	 * @param name
-	 *            the port name
-	 * @return an input port whose name matches the given name
+	 * @return the value of the '<em>Line Number</em>' attribute.
+	 * @see #setLineNumber(int)
+	 * @see net.sf.orcc.df.DfPackage#getActor_LineNumber()
+	 * @model
+	 * @generated
 	 */
-	Port getInput(String name);
-
-	/**
-	 * Returns the ordered map of input ports.
-	 * 
-	 * @return the ordered map of input ports
-	 * @model containment="true"
-	 */
-	EList<Port> getInputs();
+	int getLineNumber();
 
 	/**
 	 * Returns the MoC of this actor.
@@ -104,49 +120,6 @@ public interface Actor extends Entity, Instantiable {
 	 * @model containment="true"
 	 */
 	MoC getMoC();
-
-	/**
-	 * Returns the output port whose name matches the given name.
-	 * 
-	 * @param name
-	 *            the port name
-	 * @return an output port whose name matches the given name
-	 */
-	Port getOutput(String name);
-
-	/**
-	 * Returns the ordered map of output ports.
-	 * 
-	 * @return the ordered map of output ports
-	 * @model containment="true"
-	 */
-	EList<Port> getOutputs();
-
-	/**
-	 * Returns the parameter with the given name.
-	 * 
-	 * @param name
-	 *            name of a parameter
-	 * @return the parameter with the given name
-	 */
-	Var getParameter(String name);
-
-	/**
-	 * Returns the ordered map of parameters.
-	 * 
-	 * @return the ordered map of parameters
-	 * @model containment="true"
-	 */
-	EList<Var> getParameters();
-
-	/**
-	 * Returns the port whose name matches the given name.
-	 * 
-	 * @param name
-	 *            the port name
-	 * @return a port whose name matches the given name
-	 */
-	Port getPort(String name);
 
 	/**
 	 * Returns the procedure with the given name.
@@ -219,12 +192,34 @@ public interface Actor extends Entity, Instantiable {
 	void resetTokenProduction();
 
 	/**
+	 * Sets the value of the '{@link net.sf.orcc.df.Actor#getFileName
+	 * <em>File Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
+	 * @param value
+	 *            the new value of the '<em>File Name</em>' attribute.
+	 * @see #getFileName()
+	 * @generated
+	 */
+	void setFileName(String value);
+
+	/**
 	 * Sets the FSM of this actor to the given FSM.
 	 * 
 	 * @param fsm
 	 *            an FSM
 	 */
 	void setFsm(FSM fsm);
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.df.Actor#getLineNumber <em>Line Number</em>}' attribute.
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
+	 * @param value the new value of the '<em>Line Number</em>' attribute.
+	 * @see #getLineNumber()
+	 * @generated
+	 */
+	void setLineNumber(int value);
 
 	/**
 	 * Sets the MoC of this actor.

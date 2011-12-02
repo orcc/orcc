@@ -36,7 +36,7 @@ import net.sf.orcc.cache.CachePackage;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Entity;
+import net.sf.orcc.df.Nameable;
 import net.sf.orcc.df.Unit;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.util.IrUtil;
@@ -66,10 +66,10 @@ public class Frontend {
 	 *            an AST entity
 	 * @return the IR of the given AST entity
 	 */
-	public static Entity getEntity(AstEntity entity) {
+	public static Nameable getEntity(AstEntity entity) {
 		AstActor actor = entity.getActor();
 		EObject eObject;
-		Switch<? extends Entity> emfSwitch;
+		Switch<? extends Nameable> emfSwitch;
 		if (actor == null) {
 			eObject = entity.getUnit();
 			emfSwitch = new UnitTransformer();
@@ -78,7 +78,7 @@ public class Frontend {
 			emfSwitch = new ActorTransformer();
 		}
 
-		return (Entity) CacheManager.instance.getOrCompute(eObject, emfSwitch,
+		return (Nameable) CacheManager.instance.getOrCompute(eObject, emfSwitch,
 				CachePackage.eINSTANCE.getCache_IrMap());
 	}
 
@@ -125,7 +125,7 @@ public class Frontend {
 	}
 
 	public static List<Procedure> getProcedures(AstEntity astEntity) {
-		Entity entity = getEntity(astEntity);
+		Nameable entity = getEntity(astEntity);
 		if (entity instanceof Actor) {
 			return ((Actor) entity).getProcs();
 		} else if (entity instanceof Unit) {
@@ -181,7 +181,7 @@ public class Frontend {
 	 * @param actor
 	 *            an actor
 	 */
-	public void serialize(Entity entity) {
+	public void serialize(Nameable entity) {
 		IrUtil.serializeActor(set, outputFolder, entity);
 	}
 

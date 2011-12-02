@@ -33,27 +33,15 @@ import java.util.Map;
 
 import net.sf.orcc.ir.Type;
 
-import org.eclipse.emf.common.util.EList;
-
 /**
  * This class defines a broadcast as a particular entity.
  * 
  * @author Matthieu Wipliez
  * @model extends="Entity"
  */
-public interface Broadcast extends Instantiable {
+public interface Broadcast extends Entity {
 
 	public Port getInput();
-
-	/**
-	 * Returns the list of input ports.
-	 * 
-	 * @return the list of input ports
-	 * @model containment="true"
-	 */
-	EList<Port> getInputs();
-
-	Port getOutput(String name);
 
 	/**
 	 * Returns a list of integers containing [0, 1, ..., n - 1] where n is the
@@ -62,14 +50,6 @@ public interface Broadcast extends Instantiable {
 	 * @return a list of integers
 	 */
 	List<Integer> getOutputList();
-
-	/**
-	 * Returns the ordered map of output ports.
-	 * 
-	 * @return the ordered map of output ports
-	 * @model containment="true"
-	 */
-	EList<Port> getOutputs();
 
 	Map<Port, Integer> getPortMap();
 

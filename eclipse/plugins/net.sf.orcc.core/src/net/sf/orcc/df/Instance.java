@@ -72,7 +72,7 @@ public interface Instance extends Vertex {
 	 * 
 	 * @model
 	 */
-	Instantiable getEntity();
+	Entity getEntity();
 
 	/**
 	 * Returns the path of identifiers from the top-level to this instance.
@@ -89,14 +89,6 @@ public interface Instance extends Vertex {
 	 *         path of the form /top/network/.../instance
 	 */
 	String getHierarchicalPath();
-
-	/**
-	 * Returns the hierarchy of instances that lead to this instance.
-	 * 
-	 * @return the hierarchy of instances that lead to this instance
-	 * @model
-	 */
-	EList<Instance> getHierarchy();
 
 	/**
 	 * Returns the identifier of this instance. Delegates to {@link #getName()}.
@@ -148,6 +140,6 @@ public interface Instance extends Vertex {
 	 * @param entity
 	 *            an entity
 	 */
-	void setEntity(Instantiable entity);
+	void setEntity(Entity entity);
 
 }

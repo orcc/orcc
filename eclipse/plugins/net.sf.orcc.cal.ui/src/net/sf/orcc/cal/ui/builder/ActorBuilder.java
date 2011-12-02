@@ -37,7 +37,7 @@ import net.sf.orcc.OrccProjectNature;
 import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.CalPackage;
-import net.sf.orcc.df.Entity;
+import net.sf.orcc.df.Nameable;
 import net.sf.orcc.frontend.Frontend;
 import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.OrccUtil;
@@ -104,7 +104,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		}
 
 		// store result of build
-		List<Entity> entities = new ArrayList<Entity>();
+		List<Nameable> entities = new ArrayList<Nameable>();
 		Set<IResourceDescription> builtDescs = new HashSet<IResourceDescription>();
 
 		// build actors/units
@@ -115,7 +115,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 				IResourceDescription desc = delta.getNew();
 				monitor.subTask(desc.getURI().lastSegment());
 				builtDescs.add(desc);
-				Entity entity = build(set, desc);
+				Nameable entity = build(set, desc);
 				if (entity != null) {
 					entities.add(entity);
 				}
@@ -141,7 +141,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		monitor.done();
 	}
 
-	private Entity build(ResourceSet set, IResourceDescription desc)
+	private Nameable build(ResourceSet set, IResourceDescription desc)
 			throws CoreException {
 		// load resource and compile
 		Resource resource = set.getResource(desc.getURI(), true);
@@ -162,11 +162,11 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 
 	private void buildDependentEntities(IProgressMonitor monitor,
 			ResourceSet set, Set<IResourceDescription> builtDescs,
-			List<Entity> entities) throws CoreException {
+			List<Nameable> entities) throws CoreException {
 		IResourceDescriptions descs = provider.createResourceDescriptions();
 
 		Set<IResourceDescription> dependentDescs = new HashSet<IResourceDescription>();
-		for (Entity entity : entities) {
+		for (Nameable entity : entities) {
 			String entityName = entity.getName().toLowerCase();
 			for (IResourceDescription desc : descs.getAllResourceDescriptions()) {
 				try {

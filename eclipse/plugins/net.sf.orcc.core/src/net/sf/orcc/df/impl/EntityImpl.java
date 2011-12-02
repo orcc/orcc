@@ -6,20 +6,19 @@
  */
 package net.sf.orcc.df.impl;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Entity;
+import net.sf.orcc.df.Port;
+import net.sf.orcc.ir.Var;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.notify.NotificationChain;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.emf.ecore.impl.EObjectImpl;
+import org.eclipse.emf.ecore.InternalEObject;
+import org.eclipse.emf.ecore.util.EObjectContainmentEList;
+import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
  * <!-- begin-user-doc --> An implementation of the model object '
@@ -27,73 +26,41 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getFileName <em>File Name</em>}</li>
- *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getLineNumber <em>Line Number</em>}</li>
- *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getInputs <em>Inputs</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getOutputs <em>Outputs</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getParameters <em>Parameters</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public abstract class EntityImpl extends EObjectImpl implements Entity {
+public abstract class EntityImpl extends VertexImpl implements Entity {
+
 	/**
-	 * The default value of the '{@link #getFileName() <em>File Name</em>}' attribute.
+	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getFileName()
+	 * @see #getInputs()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final String FILE_NAME_EDEFAULT = null;
-
+	protected EList<Port> inputs;
 	/**
-	 * The cached value of the '{@link #getFileName() <em>File Name</em>}' attribute.
+	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getFileName()
+	 * @see #getOutputs()
 	 * @generated
 	 * @ordered
 	 */
-	protected String fileName = FILE_NAME_EDEFAULT;
+	protected EList<Port> outputs;
 
 	/**
-	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
+	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getLineNumber()
+	 * @see #getParameters()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final int LINE_NUMBER_EDEFAULT = 0;
-
-	/**
-	 * The cached value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getLineNumber()
-	 * @generated
-	 * @ordered
-	 */
-	protected int lineNumber = LINE_NUMBER_EDEFAULT;
-
-	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String NAME_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected String name = NAME_EDEFAULT;
-
-	/**
-	 * holds template-specific data.
-	 */
-	private Object templateData;
+	protected EList<Var> parameters;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -110,12 +77,12 @@ public abstract class EntityImpl extends EObjectImpl implements Entity {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case DfPackage.ENTITY__FILE_NAME:
-				return getFileName();
-			case DfPackage.ENTITY__LINE_NUMBER:
-				return getLineNumber();
-			case DfPackage.ENTITY__NAME:
-				return getName();
+			case DfPackage.ENTITY__INPUTS:
+				return getInputs();
+			case DfPackage.ENTITY__OUTPUTS:
+				return getOutputs();
+			case DfPackage.ENTITY__PARAMETERS:
+				return getParameters();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -125,14 +92,32 @@ public abstract class EntityImpl extends EObjectImpl implements Entity {
 	 * @generated
 	 */
 	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case DfPackage.ENTITY__INPUTS:
+				return ((InternalEList<?>)getInputs()).basicRemove(otherEnd, msgs);
+			case DfPackage.ENTITY__OUTPUTS:
+				return ((InternalEList<?>)getOutputs()).basicRemove(otherEnd, msgs);
+			case DfPackage.ENTITY__PARAMETERS:
+				return ((InternalEList<?>)getParameters()).basicRemove(otherEnd, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case DfPackage.ENTITY__FILE_NAME:
-				return FILE_NAME_EDEFAULT == null ? fileName != null : !FILE_NAME_EDEFAULT.equals(fileName);
-			case DfPackage.ENTITY__LINE_NUMBER:
-				return lineNumber != LINE_NUMBER_EDEFAULT;
-			case DfPackage.ENTITY__NAME:
-				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
+			case DfPackage.ENTITY__INPUTS:
+				return inputs != null && !inputs.isEmpty();
+			case DfPackage.ENTITY__OUTPUTS:
+				return outputs != null && !outputs.isEmpty();
+			case DfPackage.ENTITY__PARAMETERS:
+				return parameters != null && !parameters.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -141,17 +126,21 @@ public abstract class EntityImpl extends EObjectImpl implements Entity {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case DfPackage.ENTITY__FILE_NAME:
-				setFileName((String)newValue);
+			case DfPackage.ENTITY__INPUTS:
+				getInputs().clear();
+				getInputs().addAll((Collection<? extends Port>)newValue);
 				return;
-			case DfPackage.ENTITY__LINE_NUMBER:
-				setLineNumber((Integer)newValue);
+			case DfPackage.ENTITY__OUTPUTS:
+				getOutputs().clear();
+				getOutputs().addAll((Collection<? extends Port>)newValue);
 				return;
-			case DfPackage.ENTITY__NAME:
-				setName((String)newValue);
+			case DfPackage.ENTITY__PARAMETERS:
+				getParameters().clear();
+				getParameters().addAll((Collection<? extends Var>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -173,96 +162,90 @@ public abstract class EntityImpl extends EObjectImpl implements Entity {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case DfPackage.ENTITY__FILE_NAME:
-				setFileName(FILE_NAME_EDEFAULT);
+			case DfPackage.ENTITY__INPUTS:
+				getInputs().clear();
 				return;
-			case DfPackage.ENTITY__LINE_NUMBER:
-				setLineNumber(LINE_NUMBER_EDEFAULT);
+			case DfPackage.ENTITY__OUTPUTS:
+				getOutputs().clear();
 				return;
-			case DfPackage.ENTITY__NAME:
-				setName(NAME_EDEFAULT);
+			case DfPackage.ENTITY__PARAMETERS:
+				getParameters().clear();
 				return;
 		}
 		super.eUnset(featureID);
 	}
 
 	@Override
-	public IFile getFile() {
-		String fileName = getFileName();
-		if (fileName == null) {
-			return null;
+	public Port getInput(String name) {
+		for (Port port : getInputs()) {
+			if (port.getName().equals(name)) {
+				return port;
+			}
 		}
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		return root.getFile(new Path(fileName));
+		return null;
+	}
+
+	@Override
+	public Port getPort(String name) {
+		Port port = getInput(name);
+		if (port != null) {
+			return port;
+		}
+
+		return getOutput(name);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public String getFileName() {
-		return fileName;
+	public EList<Port> getInputs() {
+		if (inputs == null) {
+			inputs = new EObjectContainmentEList<Port>(Port.class, this, DfPackage.ENTITY__INPUTS);
+		}
+		return inputs;
+	}
+
+	@Override
+	public Port getOutput(String name) {
+		for (Port port : getOutputs()) {
+			if (port.getName().equals(name)) {
+				return port;
+			}
+		}
+		return null;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public int getLineNumber() {
-		return lineNumber;
+	public EList<Port> getOutputs() {
+		if (outputs == null) {
+			outputs = new EObjectContainmentEList<Port>(Port.class, this, DfPackage.ENTITY__OUTPUTS);
+		}
+		return outputs;
+	}
+
+	@Override
+	public Var getParameter(String name) {
+		for (Var var : getParameters()) {
+			if (var.getName().equals(name)) {
+				return var;
+			}
+		}
+		return null;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public String getName() {
-		return name;
-	}
-
-	@Override
-	public String getPackage() {
-		if (name == null) {
-			return null;
+	public EList<Var> getParameters() {
+		if (parameters == null) {
+			parameters = new EObjectContainmentEList<Var>(Var.class, this, DfPackage.ENTITY__PARAMETERS);
 		}
-		int index = name.lastIndexOf('.');
-		if (index == -1) {
-			return "";
-		} else {
-			return name.substring(0, index);
-		}
-	}
-
-	@Override
-	public List<String> getPackageAsList() {
-		String[] segments = name == null ? new String[0] : name.split("\\.");
-		List<String> list = new ArrayList<String>(segments.length - 1);
-		for (int i = 0; i < segments.length - 1; i++) {
-			list.add(segments[i]);
-		}
-		return list;
-	}
-
-	@Override
-	public String getSimpleName() {
-		if (name == null) {
-			return null;
-		}
-		int index = name.lastIndexOf('.');
-		if (index == -1) {
-			return name;
-		} else {
-			return name.substring(index + 1);
-		}
-	}
-
-	/**
-	 * Returns an object with template-specific data.
-	 * 
-	 * @return an object with template-specific data
-	 */
-	public Object getTemplateData() {
-		return templateData;
+		return parameters;
 	}
 
 	@Override
@@ -271,70 +254,13 @@ public abstract class EntityImpl extends EObjectImpl implements Entity {
 	}
 
 	@Override
+	public boolean isBroadcast() {
+		return false;
+	}
+
+	@Override
 	public boolean isNetwork() {
 		return false;
-	}
-
-	@Override
-	public boolean isUnit() {
-		return false;
-	}
-	
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setFileName(String newFileName) {
-		String oldFileName = fileName;
-		fileName = newFileName;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ENTITY__FILE_NAME, oldFileName, fileName));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setLineNumber(int newLineNumber) {
-		int oldLineNumber = lineNumber;
-		lineNumber = newLineNumber;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ENTITY__LINE_NUMBER, oldLineNumber, lineNumber));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setName(String newName) {
-		String oldName = name;
-		name = newName;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ENTITY__NAME, oldName, name));
-	}
-
-	@Override
-	public void setTemplateData(Object templateData) {
-		this.templateData = templateData;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public String toString() {
-		if (eIsProxy()) return super.toString();
-
-		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (fileName: ");
-		result.append(fileName);
-		result.append(", lineNumber: ");
-		result.append(lineNumber);
-		result.append(", name: ");
-		result.append(name);
-		result.append(')');
-		return result.toString();
 	}
 
 } // EntityImpl

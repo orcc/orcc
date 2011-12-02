@@ -41,7 +41,7 @@ import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
-import net.sf.orcc.df.Instantiable;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
@@ -510,7 +510,7 @@ public class XdfWriter {
 		instanceElt.setAttribute("id", instance.getName());
 
 		// class
-		Instantiable contents = instance.getEntity();
+		Entity contents = instance.getEntity();
 		if (contents != null) {
 			Element classElt = document.createElement("Class");
 			if (contents instanceof Actor) {

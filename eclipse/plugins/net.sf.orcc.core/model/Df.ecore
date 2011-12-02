@@ -1,15 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="df" nsURI="http://orcc.sf.net/model/2011/Df" nsPrefix="net.sf.orcc.df">
-  <eClassifiers xsi:type="ecore:EClass" name="Network" eSuperTypes="#//Vertex #//Instantiable">
+  <eClassifiers xsi:type="ecore:EClass" name="Nameable" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Unit" eSuperTypes="#//Nameable">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="constants" upperBound="-1"
+        eType="ecore:EClass Ir.ecore#//Var" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="procedures" upperBound="-1"
+        eType="ecore:EClass Ir.ecore#//Procedure" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fileName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="lineNumber" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Vertex" abstract="true" eSuperTypes="#//Nameable">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="incoming" upperBound="-1"
+        eType="#//Connection" eOpposite="#//Connection/target"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="outgoing" upperBound="-1"
+        eType="#//Connection" eOpposite="#//Connection/source"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="attributes" upperBound="-1"
+        eType="#//Attribute" containment="true" resolveProxies="false"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Port" eSuperTypes="#//Vertex">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="numTokensConsumed" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="numTokensProduced" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="ecore:EClass Ir.ecore#//Type"
+        containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="native" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Instance" eSuperTypes="#//Vertex">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="arguments" upperBound="-1"
+        eType="#//Argument" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="entity" eType="#//Entity"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Entity" abstract="true" eSuperTypes="#//Vertex">
     <eStructuralFeatures xsi:type="ecore:EReference" name="inputs" upperBound="-1"
         eType="#//Port" containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="moC" eType="ecore:EClass MoC.ecore#//MoC"
-        containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="outputs" upperBound="-1"
         eType="#//Port" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="parameters" upperBound="-1"
         eType="ecore:EClass Ir.ecore#//Var" containment="true" resolveProxies="false"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Actor" eSuperTypes="#//Entity">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="actions" upperBound="-1"
+        eType="#//Action" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="actionsOutsideFsm" upperBound="-1"
+        eType="#//Action"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="fsm" eType="#//FSM" containment="true"
+        resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="initializes" upperBound="-1"
+        eType="#//Action" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="moC" eType="ecore:EClass MoC.ecore#//MoC"
+        containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="procs" upperBound="-1"
+        eType="ecore:EClass Ir.ecore#//Procedure" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="stateVars" upperBound="-1"
+        eType="ecore:EClass Ir.ecore#//Var" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="native" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fileName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="lineNumber" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Network" eSuperTypes="#//Entity">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="moC" eType="ecore:EClass MoC.ecore#//MoC"
+        containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="variables" upperBound="-1"
         eType="ecore:EClass Ir.ecore#//Var" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="connections" upperBound="-1"
@@ -19,7 +71,10 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="vertices" upperBound="-1"
         eType="#//Vertex"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="fileName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="entities" upperBound="-1"
+        eType="#//Entity" containment="true" resolveProxies="false"/>
   </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Broadcast" eSuperTypes="#//Entity"/>
   <eClassifiers xsi:type="ecore:EClass" name="Attribute">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="ecore:EClass platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EObject"
@@ -35,33 +90,11 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="sourcePort" eType="#//Port"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="targetPort" eType="#//Port"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Instance" eSuperTypes="#//Vertex">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="arguments" upperBound="-1"
-        eType="#//Argument" containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="hierarchy" upperBound="-1"
-        eType="#//Instance"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="entity" eType="#//Instantiable"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Broadcast" eSuperTypes="#//Instantiable">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="inputs" upperBound="-1"
-        eType="#//Port" containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="outputs" upperBound="-1"
-        eType="#//Port" containment="true" resolveProxies="false"/>
-  </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="WrapperString">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="string" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="WrapperXml">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="xml" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Vertex" abstract="true">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="incoming" upperBound="-1"
-        eType="#//Connection" eOpposite="#//Connection/target"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="outgoing" upperBound="-1"
-        eType="#//Connection" eOpposite="#//Connection/source"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="attributes" upperBound="-1"
-        eType="#//Attribute" containment="true" resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Action">
     <eStructuralFeatures xsi:type="ecore:EReference" name="body" eType="ecore:EClass Ir.ecore#//Procedure"
@@ -76,29 +109,6 @@
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="tag" eType="#//Tag" containment="true"
         resolveProxies="false"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Actor" eSuperTypes="#//Entity #//Instantiable">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="actions" upperBound="-1"
-        eType="#//Action" containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="actionsOutsideFsm" upperBound="-1"
-        eType="#//Action"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="fsm" eType="#//FSM" containment="true"
-        resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="initializes" upperBound="-1"
-        eType="#//Action" containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="inputs" upperBound="-1"
-        eType="#//Port" containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="moC" eType="ecore:EClass MoC.ecore#//MoC"
-        containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="outputs" upperBound="-1"
-        eType="#//Port" containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="parameters" upperBound="-1"
-        eType="ecore:EClass Ir.ecore#//Var" containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="procs" upperBound="-1"
-        eType="ecore:EClass Ir.ecore#//Procedure" containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="stateVars" upperBound="-1"
-        eType="ecore:EClass Ir.ecore#//Var" containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="native" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="FSM">
     <eStructuralFeatures xsi:type="ecore:EReference" name="initialState" eType="#//State"/>
@@ -118,13 +128,6 @@
         eType="ecore:EClass Ir.ecore#//Var" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="varToPortMap" upperBound="-1"
         eType="#//VarToPortMapEntry" containment="true" resolveProxies="false"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Port" eSuperTypes="#//Vertex">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="numTokensConsumed" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="numTokensProduced" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="ecore:EClass Ir.ecore#//Type"
-        containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="native" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="State">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
@@ -159,16 +162,4 @@
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="variable" eType="ecore:EClass Ir.ecore#//Var"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Entity" abstract="true">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fileName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="lineNumber" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Unit" eSuperTypes="#//Entity">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="constants" upperBound="-1"
-        eType="ecore:EClass Ir.ecore#//Var" containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="procedures" upperBound="-1"
-        eType="ecore:EClass Ir.ecore#//Procedure" containment="true" resolveProxies="false"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Instantiable" abstract="true"/>
 </ecore:EPackage>

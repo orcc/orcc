@@ -20,6 +20,10 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.MapAdapter;
 import net.sf.orcc.moc.MoC;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
@@ -40,13 +44,12 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getActionsOutsideFsm <em>Actions Outside Fsm</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getFsm <em>Fsm</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getInitializes <em>Initializes</em>}</li>
- *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getInputs <em>Inputs</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getMoC <em>Mo C</em>}</li>
- *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getOutputs <em>Outputs</em>}</li>
- *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getParameters <em>Parameters</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getProcs <em>Procs</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getStateVars <em>State Vars</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.ActorImpl#isNative <em>Native</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getFileName <em>File Name</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getLineNumber <em>Line Number</em>}</li>
  * </ul>
  * </p>
  *
@@ -90,15 +93,6 @@ public class ActorImpl extends EntityImpl implements Actor {
 	 */
 	protected EList<Action> initializes;
 
-	/**
-	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getInputs()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Port> inputs;
-
 	private Map<String, Procedure> mapProcedures;
 
 	private Map<String, Var> mapStateVars;
@@ -111,24 +105,6 @@ public class ActorImpl extends EntityImpl implements Actor {
 	 * @ordered
 	 */
 	protected MoC moC;
-
-	/**
-	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getOutputs()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Port> outputs;
-
-	/**
-	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getParameters()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Var> parameters;
 
 	/**
 	 * The cached value of the '{@link #getProcs() <em>Procs</em>}' containment reference list.
@@ -147,7 +123,6 @@ public class ActorImpl extends EntityImpl implements Actor {
 	 * @ordered
 	 */
 	protected EList<Var> stateVars;
-
 	/**
 	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -156,7 +131,6 @@ public class ActorImpl extends EntityImpl implements Actor {
 	 * @ordered
 	 */
 	protected static final boolean NATIVE_EDEFAULT = false;
-
 	/**
 	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -165,6 +139,38 @@ public class ActorImpl extends EntityImpl implements Actor {
 	 * @ordered
 	 */
 	protected boolean native_ = NATIVE_EDEFAULT;
+	/**
+	 * The default value of the '{@link #getFileName() <em>File Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getFileName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String FILE_NAME_EDEFAULT = null;
+	/**
+	 * The cached value of the '{@link #getFileName() <em>File Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getFileName()
+	 * @generated
+	 * @ordered
+	 */
+	protected String fileName = FILE_NAME_EDEFAULT;
+	/**
+	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getLineNumber()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final int LINE_NUMBER_EDEFAULT = 0;
+	/**
+	 * The cached value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getLineNumber()
+	 * @generated
+	 * @ordered
+	 */
+	protected int lineNumber = LINE_NUMBER_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -221,20 +227,18 @@ public class ActorImpl extends EntityImpl implements Actor {
 				return getFsm();
 			case DfPackage.ACTOR__INITIALIZES:
 				return getInitializes();
-			case DfPackage.ACTOR__INPUTS:
-				return getInputs();
 			case DfPackage.ACTOR__MO_C:
 				return getMoC();
-			case DfPackage.ACTOR__OUTPUTS:
-				return getOutputs();
-			case DfPackage.ACTOR__PARAMETERS:
-				return getParameters();
 			case DfPackage.ACTOR__PROCS:
 				return getProcs();
 			case DfPackage.ACTOR__STATE_VARS:
 				return getStateVars();
 			case DfPackage.ACTOR__NATIVE:
 				return isNative();
+			case DfPackage.ACTOR__FILE_NAME:
+				return getFileName();
+			case DfPackage.ACTOR__LINE_NUMBER:
+				return getLineNumber();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -253,14 +257,8 @@ public class ActorImpl extends EntityImpl implements Actor {
 				return basicSetFsm(null, msgs);
 			case DfPackage.ACTOR__INITIALIZES:
 				return ((InternalEList<?>)getInitializes()).basicRemove(otherEnd, msgs);
-			case DfPackage.ACTOR__INPUTS:
-				return ((InternalEList<?>)getInputs()).basicRemove(otherEnd, msgs);
 			case DfPackage.ACTOR__MO_C:
 				return basicSetMoC(null, msgs);
-			case DfPackage.ACTOR__OUTPUTS:
-				return ((InternalEList<?>)getOutputs()).basicRemove(otherEnd, msgs);
-			case DfPackage.ACTOR__PARAMETERS:
-				return ((InternalEList<?>)getParameters()).basicRemove(otherEnd, msgs);
 			case DfPackage.ACTOR__PROCS:
 				return ((InternalEList<?>)getProcs()).basicRemove(otherEnd, msgs);
 			case DfPackage.ACTOR__STATE_VARS:
@@ -284,20 +282,18 @@ public class ActorImpl extends EntityImpl implements Actor {
 				return fsm != null;
 			case DfPackage.ACTOR__INITIALIZES:
 				return initializes != null && !initializes.isEmpty();
-			case DfPackage.ACTOR__INPUTS:
-				return inputs != null && !inputs.isEmpty();
 			case DfPackage.ACTOR__MO_C:
 				return moC != null;
-			case DfPackage.ACTOR__OUTPUTS:
-				return outputs != null && !outputs.isEmpty();
-			case DfPackage.ACTOR__PARAMETERS:
-				return parameters != null && !parameters.isEmpty();
 			case DfPackage.ACTOR__PROCS:
 				return procs != null && !procs.isEmpty();
 			case DfPackage.ACTOR__STATE_VARS:
 				return stateVars != null && !stateVars.isEmpty();
 			case DfPackage.ACTOR__NATIVE:
 				return native_ != NATIVE_EDEFAULT;
+			case DfPackage.ACTOR__FILE_NAME:
+				return FILE_NAME_EDEFAULT == null ? fileName != null : !FILE_NAME_EDEFAULT.equals(fileName);
+			case DfPackage.ACTOR__LINE_NUMBER:
+				return lineNumber != LINE_NUMBER_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -325,20 +321,8 @@ public class ActorImpl extends EntityImpl implements Actor {
 				getInitializes().clear();
 				getInitializes().addAll((Collection<? extends Action>)newValue);
 				return;
-			case DfPackage.ACTOR__INPUTS:
-				getInputs().clear();
-				getInputs().addAll((Collection<? extends Port>)newValue);
-				return;
 			case DfPackage.ACTOR__MO_C:
 				setMoC((MoC)newValue);
-				return;
-			case DfPackage.ACTOR__OUTPUTS:
-				getOutputs().clear();
-				getOutputs().addAll((Collection<? extends Port>)newValue);
-				return;
-			case DfPackage.ACTOR__PARAMETERS:
-				getParameters().clear();
-				getParameters().addAll((Collection<? extends Var>)newValue);
 				return;
 			case DfPackage.ACTOR__PROCS:
 				getProcs().clear();
@@ -350,6 +334,12 @@ public class ActorImpl extends EntityImpl implements Actor {
 				return;
 			case DfPackage.ACTOR__NATIVE:
 				setNative((Boolean)newValue);
+				return;
+			case DfPackage.ACTOR__FILE_NAME:
+				setFileName((String)newValue);
+				return;
+			case DfPackage.ACTOR__LINE_NUMBER:
+				setLineNumber((Integer)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -383,17 +373,8 @@ public class ActorImpl extends EntityImpl implements Actor {
 			case DfPackage.ACTOR__INITIALIZES:
 				getInitializes().clear();
 				return;
-			case DfPackage.ACTOR__INPUTS:
-				getInputs().clear();
-				return;
 			case DfPackage.ACTOR__MO_C:
 				setMoC((MoC)null);
-				return;
-			case DfPackage.ACTOR__OUTPUTS:
-				getOutputs().clear();
-				return;
-			case DfPackage.ACTOR__PARAMETERS:
-				getParameters().clear();
 				return;
 			case DfPackage.ACTOR__PROCS:
 				getProcs().clear();
@@ -403,6 +384,12 @@ public class ActorImpl extends EntityImpl implements Actor {
 				return;
 			case DfPackage.ACTOR__NATIVE:
 				setNative(NATIVE_EDEFAULT);
+				return;
+			case DfPackage.ACTOR__FILE_NAME:
+				setFileName(FILE_NAME_EDEFAULT);
+				return;
+			case DfPackage.ACTOR__LINE_NUMBER:
+				setLineNumber(LINE_NUMBER_EDEFAULT);
 				return;
 		}
 		super.eUnset(featureID);
@@ -430,6 +417,24 @@ public class ActorImpl extends EntityImpl implements Actor {
 		return actionsOutsideFsm;
 	}
 
+	@Override
+	public IFile getFile() {
+		String fileName = getFileName();
+		if (fileName == null) {
+			return null;
+		}
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		return root.getFile(new Path(fileName));
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String getFileName() {
+		return fileName;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -449,25 +454,12 @@ public class ActorImpl extends EntityImpl implements Actor {
 		return initializes;
 	}
 
-	@Override
-	public Port getInput(String name) {
-		for (Port port : getInputs()) {
-			if (port.getName().equals(name)) {
-				return port;
-			}
-		}
-		return null;
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Port> getInputs() {
-		if (inputs == null) {
-			inputs = new EObjectContainmentEList<Port>(Port.class, this, DfPackage.ACTOR__INPUTS);
-		}
-		return inputs;
+	public int getLineNumber() {
+		return lineNumber;
 	}
 
 	/**
@@ -476,58 +468,6 @@ public class ActorImpl extends EntityImpl implements Actor {
 	 */
 	public MoC getMoC() {
 		return moC;
-	}
-
-	@Override
-	public Port getOutput(String name) {
-		for (Port port : getOutputs()) {
-			if (port.getName().equals(name)) {
-				return port;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Port> getOutputs() {
-		if (outputs == null) {
-			outputs = new EObjectContainmentEList<Port>(Port.class, this, DfPackage.ACTOR__OUTPUTS);
-		}
-		return outputs;
-	}
-
-	@Override
-	public Var getParameter(String name) {
-		for (Var var : getParameters()) {
-			if (var.getName().equals(name)) {
-				return var;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Var> getParameters() {
-		if (parameters == null) {
-			parameters = new EObjectContainmentEList<Var>(Var.class, this, DfPackage.ACTOR__PARAMETERS);
-		}
-		return parameters;
-	}
-
-	@Override
-	public Port getPort(String name) {
-		Port port = getInput(name);
-		if (port != null) {
-			return port;
-		}
-
-		return getOutput(name);
 	}
 
 	@Override
@@ -611,6 +551,17 @@ public class ActorImpl extends EntityImpl implements Actor {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	public void setFileName(String newFileName) {
+		String oldFileName = fileName;
+		fileName = newFileName;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ACTOR__FILE_NAME, oldFileName, fileName));
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
 	public void setFsm(FSM newFsm) {
 		if (newFsm != fsm) {
 			NotificationChain msgs = null;
@@ -623,6 +574,17 @@ public class ActorImpl extends EntityImpl implements Actor {
 		}
 		else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ACTOR__FSM, newFsm, newFsm));
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setLineNumber(int newLineNumber) {
+		int oldLineNumber = lineNumber;
+		lineNumber = newLineNumber;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ACTOR__LINE_NUMBER, oldLineNumber, lineNumber));
 	}
 
 	/**
@@ -665,6 +627,10 @@ public class ActorImpl extends EntityImpl implements Actor {
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (native: ");
 		result.append(native_);
+		result.append(", fileName: ");
+		result.append(fileName);
+		result.append(", lineNumber: ");
+		result.append(lineNumber);
 		result.append(')');
 		return result.toString();
 	}

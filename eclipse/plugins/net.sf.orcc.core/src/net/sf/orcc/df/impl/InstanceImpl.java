@@ -36,8 +36,8 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
-import net.sf.orcc.df.Instantiable;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.moc.MoC;
 
@@ -48,7 +48,6 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
-import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
@@ -70,22 +69,13 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	protected EList<Argument> arguments;
 
 	/**
-	 * The cached value of the '{@link #getHierarchy() <em>Hierarchy</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getHierarchy()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Instance> hierarchy;
-
-	/**
 	 * The cached value of the '{@link #getEntity() <em>Entity</em>}' reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getEntity()
 	 * @generated
 	 * @ordered
 	 */
-	protected Instantiable entity;
+	protected Entity entity;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -99,17 +89,16 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Instantiable basicGetEntity() {
+	public Entity basicGetEntity() {
 		return entity;
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setEntity(Instantiable newEntity) {
-		Instantiable oldEntity = entity;
+	public void setEntity(Entity newEntity) {
+		Entity oldEntity = entity;
 		entity = newEntity;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.INSTANCE__ENTITY, oldEntity, entity));
@@ -124,8 +113,6 @@ public class InstanceImpl extends VertexImpl implements Instance {
 		switch (featureID) {
 			case DfPackage.INSTANCE__ARGUMENTS:
 				return getArguments();
-			case DfPackage.INSTANCE__HIERARCHY:
-				return getHierarchy();
 			case DfPackage.INSTANCE__ENTITY:
 				if (resolve) return getEntity();
 				return basicGetEntity();
@@ -156,8 +143,6 @@ public class InstanceImpl extends VertexImpl implements Instance {
 		switch (featureID) {
 			case DfPackage.INSTANCE__ARGUMENTS:
 				return arguments != null && !arguments.isEmpty();
-			case DfPackage.INSTANCE__HIERARCHY:
-				return hierarchy != null && !hierarchy.isEmpty();
 			case DfPackage.INSTANCE__ENTITY:
 				return entity != null;
 		}
@@ -176,12 +161,8 @@ public class InstanceImpl extends VertexImpl implements Instance {
 				getArguments().clear();
 				getArguments().addAll((Collection<? extends Argument>)newValue);
 				return;
-			case DfPackage.INSTANCE__HIERARCHY:
-				getHierarchy().clear();
-				getHierarchy().addAll((Collection<? extends Instance>)newValue);
-				return;
 			case DfPackage.INSTANCE__ENTITY:
-				setEntity((Instantiable)newValue);
+				setEntity((Entity)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -206,11 +187,8 @@ public class InstanceImpl extends VertexImpl implements Instance {
 			case DfPackage.INSTANCE__ARGUMENTS:
 				getArguments().clear();
 				return;
-			case DfPackage.INSTANCE__HIERARCHY:
-				getHierarchy().clear();
-				return;
 			case DfPackage.INSTANCE__ENTITY:
-				setEntity((Instantiable)null);
+				setEntity((Entity)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -241,10 +219,10 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Instantiable getEntity() {
+	public Entity getEntity() {
 		if (entity != null && entity.eIsProxy()) {
 			InternalEObject oldEntity = (InternalEObject)entity;
-			entity = (Instantiable)eResolveProxy(oldEntity);
+			entity = (Entity)eResolveProxy(oldEntity);
 			if (entity != oldEntity) {
 				if (eNotificationRequired())
 					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.INSTANCE__ENTITY, oldEntity, entity));
@@ -260,9 +238,10 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 */
 	public List<String> getHierarchicalId() {
 		List<String> ids = new ArrayList<String>();
-		for (Instance instance : getHierarchy()) {
-			ids.add(instance.getName());
-		}
+		// TODO
+		// for (Instance instance : getHierarchy()) {
+		// ids.add(instance.getName());
+		// }
 		ids.add(getId());
 		return ids;
 	}
@@ -276,17 +255,6 @@ public class InstanceImpl extends VertexImpl implements Instance {
 		}
 
 		return builder.toString();
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Instance> getHierarchy() {
-		if (hierarchy == null) {
-			hierarchy = new EObjectResolvingEList<Instance>(Instance.class, this, DfPackage.INSTANCE__HIERARCHY);
-		}
-		return hierarchy;
 	}
 
 	@Override

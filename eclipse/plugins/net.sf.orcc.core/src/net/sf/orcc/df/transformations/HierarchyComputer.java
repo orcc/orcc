@@ -71,7 +71,8 @@ public class HierarchyComputer extends DfSwitch<Void> {
 				new HierarchyComputer(instances, instance).doSwitch(subNetwork);
 			}
 
-			instance.getHierarchy().addAll(instances);
+			// TODO
+			// instance.getHierarchy().addAll(instances);
 		}
 
 		return null;

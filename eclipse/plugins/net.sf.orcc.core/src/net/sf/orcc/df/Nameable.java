@@ -28,13 +28,54 @@
  */
 package net.sf.orcc.df;
 
+import java.util.List;
+
 import org.eclipse.emf.ecore.EObject;
 
 /**
- * This interface defines an object that can be instantiated.
+ * This class defines an entity. An entity has a package, a name, and may be an
+ * actor, a network, or a unit.
  * 
+ * @author Matthieu Wipliez
  * @model abstract="true"
- * @generated
  */
-public interface Instantiable extends EObject {
+public interface Nameable extends EObject {
+
+	/**
+	 * Returns the name of this entity.
+	 * 
+	 * @return the name of this entity
+	 * @model
+	 */
+	String getName();
+	
+	/**
+	 * Returns the package of this vertex.
+	 * 
+	 * @return the package of this vertex
+	 */
+	String getPackage();
+
+	/**
+	 * Returns the simple name of this vertex.
+	 * 
+	 * @return the simple name of this vertex
+	 */
+	String getSimpleName();
+
+	/**
+	 * Returns the package of this vertex as a list of strings.
+	 * 
+	 * @return the package of this vertex as a list of strings
+	 */
+	List<String> getPackageAsList();
+
+	/**
+	 * Sets the name of this entity.
+	 * 
+	 * @param name
+	 *            the new name of this entity
+	 */
+	void setName(String name);
+
 }

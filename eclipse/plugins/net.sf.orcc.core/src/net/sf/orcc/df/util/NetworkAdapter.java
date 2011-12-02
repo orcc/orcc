@@ -53,9 +53,9 @@ public class NetworkAdapter extends AdapterImpl {
 		Object feature = msg.getFeature();
 		switch (msg.getEventType()) {
 		case Notification.REMOVE:
-			if (feature == eINSTANCE.getNetwork_Inputs()
-					|| feature == eINSTANCE.getNetwork_Instances()
-					|| feature == eINSTANCE.getNetwork_Outputs()) {
+			if (feature == eINSTANCE.getEntity_Inputs()
+					|| feature == eINSTANCE.getEntity_Outputs()
+					|| feature == eINSTANCE.getNetwork_Instances()) {
 				// when removing an instance or a port, remove it from vertices
 				Vertex vertex = (Vertex) msg.getOldValue();
 				((Network) target).getVertices().remove(vertex);

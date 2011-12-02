@@ -32,16 +32,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EObject;
 
 /**
- * This class defines a vertex in a network. A vertex is either an input port,
- * an output port, or an instance.
+ * This class defines a vertex in a network. A vertex is extended by Port,
+ * Instance, Entity.
  * 
  * @author Matthieu Wipliez
  * @model abstract="true"
  */
-public interface Vertex extends EObject {
+public interface Vertex extends Nameable {
 
 	/**
 	 * Returns the attribute associated with the given name.
@@ -74,14 +73,6 @@ public interface Vertex extends EObject {
 	Map<Port, Connection> getIncomingPortMap();
 
 	/**
-	 * Returns the name of this vertex.
-	 * 
-	 * @return the name of this vertex
-	 * @model
-	 */
-	String getName();
-
-	/**
 	 * @model type="Connection" opposite="source"
 	 */
 	EList<Connection> getOutgoing();
@@ -108,6 +99,13 @@ public interface Vertex extends EObject {
 	List<Vertex> getSuccessors();
 
 	/**
+	 * Returns an object with template-specific data.
+	 * 
+	 * @return an object with template-specific data
+	 */
+	Object getTemplateData();
+
+	/**
 	 * Returns <code>true</code> if this vertex is an instance, and
 	 * <code>false</code> otherwise.
 	 * 
@@ -123,11 +121,12 @@ public interface Vertex extends EObject {
 	boolean isPort();
 
 	/**
-	 * Changes the name of this vertex.
+	 * Sets the template data associated with this vertex. Template data should
+	 * hold data that is specific to a given template.
 	 * 
-	 * @param name
-	 *            a new name
+	 * @param templateData
+	 *            an object with template-specific data
 	 */
-	void setName(String name);
+	void setTemplateData(Object templateData);
 
 }

@@ -11,7 +11,7 @@ import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Entity;
+import net.sf.orcc.df.Nameable;
 import net.sf.orcc.frontend.Frontend;
 import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.Expression;
@@ -83,7 +83,7 @@ public class AllTests extends AbstractXtextTests {
 	 *            name of a .cal file that contains an entity
 	 */
 	private void assertExecution(String expected, String name) {
-		Entity entity = generateCode(name);
+		Nameable entity = generateCode(name);
 		Assert.assertNotNull("expected parsing, validation, and code "
 				+ "generation to be correct for " + name, entity);
 
@@ -105,7 +105,7 @@ public class AllTests extends AbstractXtextTests {
 	 * @return an IR entity if the file could be parsed, validated, and
 	 *         translated to IR, otherwise <code>null</code>
 	 */
-	private Entity generateCode(String name) {
+	private Nameable generateCode(String name) {
 		AstEntity entity = parseAndValidate(name);
 		if (entity == null) {
 			return null;

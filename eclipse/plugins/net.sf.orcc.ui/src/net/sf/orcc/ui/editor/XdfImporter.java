@@ -50,7 +50,7 @@ import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
-import net.sf.orcc.df.Instantiable;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.Expression;
@@ -160,7 +160,7 @@ public class XdfImporter {
 	private Vertex getVertex(Instance instance, ObjectType type) {
 		Vertex vertex = new Vertex(type);
 		vertex.setValue(PARAMETER_ID, instance.getName());
-		Instantiable inst = instance.getEntity();
+		Entity inst = instance.getEntity();
 		if (inst instanceof Actor) {
 			vertex.setValue(PARAMETER_REFINEMENT, ((Actor) inst).getName());
 		} else if (inst instanceof Network) {

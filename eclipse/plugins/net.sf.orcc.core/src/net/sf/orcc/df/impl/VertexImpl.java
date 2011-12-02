@@ -40,13 +40,10 @@ import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
 
-import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.emf.ecore.impl.EObjectImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.EObjectWithInverseResolvingEList;
 import org.eclipse.emf.ecore.util.InternalEList;
@@ -58,7 +55,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * @author Matthieu Wipliez
  * @generated
  */
-public abstract class VertexImpl extends EObjectImpl implements Vertex {
+public abstract class VertexImpl extends NameableImpl implements Vertex {
 
 	/**
 	 * The cached value of the '{@link #getIncoming() <em>Incoming</em>}' reference list.
@@ -68,7 +65,6 @@ public abstract class VertexImpl extends EObjectImpl implements Vertex {
 	 * @ordered
 	 */
 	protected EList<Connection> incoming;
-
 	/**
 	 * The cached value of the '{@link #getOutgoing() <em>Outgoing</em>}' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -78,33 +74,18 @@ public abstract class VertexImpl extends EObjectImpl implements Vertex {
 	 */
 	protected EList<Connection> outgoing;
 	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String NAME_EDEFAULT = null;
-	/**
-	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected String name = NAME_EDEFAULT;
-
-	/**
 	 * The cached value of the '{@link #getAttributes() <em>Attributes</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getAttributes()
 	 * @generated
 	 * @ordered
 	 */
 	protected EList<Attribute> attributes;
+
+	/**
+	 * holds template-specific data.
+	 */
+	private Object templateData;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -125,8 +106,6 @@ public abstract class VertexImpl extends EObjectImpl implements Vertex {
 				return getIncoming();
 			case DfPackage.VERTEX__OUTGOING:
 				return getOutgoing();
-			case DfPackage.VERTEX__NAME:
-				return getName();
 			case DfPackage.VERTEX__ATTRIBUTES:
 				return getAttributes();
 		}
@@ -179,8 +158,6 @@ public abstract class VertexImpl extends EObjectImpl implements Vertex {
 				return incoming != null && !incoming.isEmpty();
 			case DfPackage.VERTEX__OUTGOING:
 				return outgoing != null && !outgoing.isEmpty();
-			case DfPackage.VERTEX__NAME:
-				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 			case DfPackage.VERTEX__ATTRIBUTES:
 				return attributes != null && !attributes.isEmpty();
 		}
@@ -202,9 +179,6 @@ public abstract class VertexImpl extends EObjectImpl implements Vertex {
 			case DfPackage.VERTEX__OUTGOING:
 				getOutgoing().clear();
 				getOutgoing().addAll((Collection<? extends Connection>)newValue);
-				return;
-			case DfPackage.VERTEX__NAME:
-				setName((String)newValue);
 				return;
 			case DfPackage.VERTEX__ATTRIBUTES:
 				getAttributes().clear();
@@ -236,9 +210,6 @@ public abstract class VertexImpl extends EObjectImpl implements Vertex {
 			case DfPackage.VERTEX__OUTGOING:
 				getOutgoing().clear();
 				return;
-			case DfPackage.VERTEX__NAME:
-				setName(NAME_EDEFAULT);
-				return;
 			case DfPackage.VERTEX__ATTRIBUTES:
 				getAttributes().clear();
 				return;
@@ -266,7 +237,7 @@ public abstract class VertexImpl extends EObjectImpl implements Vertex {
 		}
 		return attributes;
 	}
-	
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -285,15 +256,6 @@ public abstract class VertexImpl extends EObjectImpl implements Vertex {
 			map.put(connection.getTargetPort(), connection);
 		}
 		return map;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public String getName() {
-		return name;
 	}
 
 	/**
@@ -346,6 +308,15 @@ public abstract class VertexImpl extends EObjectImpl implements Vertex {
 		return successors;
 	}
 
+	/**
+	 * Returns an object with template-specific data.
+	 * 
+	 * @return an object with template-specific data
+	 */
+	public Object getTemplateData() {
+		return templateData;
+	}
+
 	@Override
 	public boolean isInstance() {
 		return false;
@@ -356,32 +327,9 @@ public abstract class VertexImpl extends EObjectImpl implements Vertex {
 		return false;
 	}
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setName(String newName) {
-		String oldName = name;
-		name = newName;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.VERTEX__NAME, oldName, name));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	@Override
-	public String toString() {
-		if (eIsProxy()) return super.toString();
-
-		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (name: ");
-		result.append(name);
-		result.append(')');
-		return result.toString();
+	public void setTemplateData(Object templateData) {
+		this.templateData = templateData;
 	}
 
 }
