@@ -97,19 +97,10 @@ public interface Actor extends Entity {
 	EList<Action> getInitializes();
 
 	/**
-	 * Returns the value of the '<em><b>Line Number</b></em>' attribute. <!--
-	 * begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Line Number</em>' attribute isn't clear, there
-	 * really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
+	 * Returns the line number on which this actor starts.
 	 * 
-	 * @return the value of the '<em>Line Number</em>' attribute.
-	 * @see #setLineNumber(int)
-	 * @see net.sf.orcc.df.DfPackage#getActor_LineNumber()
+	 * @return the line number on which this actor starts
 	 * @model
-	 * @generated
 	 */
 	int getLineNumber();
 
@@ -192,16 +183,12 @@ public interface Actor extends Entity {
 	void resetTokenProduction();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.df.Actor#getFileName
-	 * <em>File Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc
-	 * -->
+	 * Sets the name of the file in which this unit is defined.
 	 * 
-	 * @param value
-	 *            the new value of the '<em>File Name</em>' attribute.
-	 * @see #getFileName()
-	 * @generated
+	 * @param fileName
+	 *            name of the file in which this unit is defined
 	 */
-	void setFileName(String value);
+	void setFileName(String fileName);
 
 	/**
 	 * Sets the FSM of this actor to the given FSM.
@@ -212,14 +199,12 @@ public interface Actor extends Entity {
 	void setFsm(FSM fsm);
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.df.Actor#getLineNumber <em>Line Number</em>}' attribute.
-	 * <!-- begin-user-doc --> <!--
-	 * end-user-doc -->
-	 * @param value the new value of the '<em>Line Number</em>' attribute.
-	 * @see #getLineNumber()
-	 * @generated
+	 * Sets the line number on which this unit starts.
+	 * 
+	 * @param newLineNumber
+	 *            the line number on which this unit starts
 	 */
-	void setLineNumber(int value);
+	void setLineNumber(int newLineNumber);
 
 	/**
 	 * Sets the MoC of this actor.

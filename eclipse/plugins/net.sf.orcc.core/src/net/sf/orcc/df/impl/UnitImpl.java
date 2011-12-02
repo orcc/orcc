@@ -43,24 +43,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  */
 public class UnitImpl extends NameableImpl implements Unit {
 	/**
-	 * The cached value of the '{@link #getConstants() <em>Constants</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getConstants()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Var> constants;
-
-	/**
-	 * The cached value of the '{@link #getProcedures() <em>Procedures</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getProcedures()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Procedure> procedures;
-
-	/**
 	 * The default value of the '{@link #getFileName() <em>File Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -69,16 +51,6 @@ public class UnitImpl extends NameableImpl implements Unit {
 	 * @ordered
 	 */
 	protected static final String FILE_NAME_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getFileName() <em>File Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getFileName()
-	 * @generated
-	 * @ordered
-	 */
-	protected String fileName = FILE_NAME_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
@@ -91,6 +63,25 @@ public class UnitImpl extends NameableImpl implements Unit {
 	protected static final int LINE_NUMBER_EDEFAULT = 0;
 
 	/**
+	 * The cached value of the '{@link #getConstants() <em>Constants</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getConstants()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Var> constants;
+
+	/**
+	 * The cached value of the '{@link #getFileName() <em>File Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getFileName()
+	 * @generated
+	 * @ordered
+	 */
+	protected String fileName = FILE_NAME_EDEFAULT;
+
+	/**
 	 * The cached value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -99,6 +90,15 @@ public class UnitImpl extends NameableImpl implements Unit {
 	 * @ordered
 	 */
 	protected int lineNumber = LINE_NUMBER_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getProcedures() <em>Procedures</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getProcedures()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Procedure> procedures;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -163,24 +163,6 @@ public class UnitImpl extends NameableImpl implements Unit {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public String toString() {
-		if (eIsProxy()) return super.toString();
-
-		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (fileName: ");
-		result.append(fileName);
-		result.append(", lineNumber: ");
-		result.append(lineNumber);
-		result.append(')');
-		return result.toString();
-	}
-
-	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -237,15 +219,6 @@ public class UnitImpl extends NameableImpl implements Unit {
 		}
 		super.eUnset(featureID);
 	}
-	@Override
-	public IFile getFile() {
-		String fileName = getFileName();
-		if (fileName == null) {
-			return null;
-		}
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		return root.getFile(new Path(fileName));
-	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -257,6 +230,33 @@ public class UnitImpl extends NameableImpl implements Unit {
 		}
 		return constants;
 	}
+	@Override
+	public IFile getFile() {
+		String fileName = getFileName();
+		if (fileName == null) {
+			return null;
+		}
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		return root.getFile(new Path(fileName));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String getFileName() {
+		return fileName;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public int getLineNumber() {
+		return lineNumber;
+	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -267,15 +267,6 @@ public class UnitImpl extends NameableImpl implements Unit {
 			procedures = new EObjectContainmentEList<Procedure>(Procedure.class, this, DfPackage.UNIT__PROCEDURES);
 		}
 		return procedures;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public String getFileName() {
-		return fileName;
 	}
 
 	/**
@@ -295,8 +286,11 @@ public class UnitImpl extends NameableImpl implements Unit {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public int getLineNumber() {
-		return lineNumber;
+	public void setLineNumber(int newLineNumber) {
+		int oldLineNumber = lineNumber;
+		lineNumber = newLineNumber;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.UNIT__LINE_NUMBER, oldLineNumber, lineNumber));
 	}
 
 	/**
@@ -304,11 +298,17 @@ public class UnitImpl extends NameableImpl implements Unit {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setLineNumber(int newLineNumber) {
-		int oldLineNumber = lineNumber;
-		lineNumber = newLineNumber;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.UNIT__LINE_NUMBER, oldLineNumber, lineNumber));
+	@Override
+	public String toString() {
+		if (eIsProxy()) return super.toString();
+
+		StringBuffer result = new StringBuffer(super.toString());
+		result.append(" (fileName: ");
+		result.append(fileName);
+		result.append(", lineNumber: ");
+		result.append(lineNumber);
+		result.append(')');
+		return result.toString();
 	}
 
 } // UnitImpl
