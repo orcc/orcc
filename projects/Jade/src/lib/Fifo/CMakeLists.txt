@@ -6,6 +6,7 @@ add_library (Fifo
   FifoCircular.cpp
   FifoTrace.cpp
   FifoUnprotected.cpp
+  FifoOpt.cpp
  )
  
 if(UNIX)

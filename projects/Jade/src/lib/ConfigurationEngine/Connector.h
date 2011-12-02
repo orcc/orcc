@@ -122,13 +122,13 @@ private:
 	void setConnection(Connection* connection, LLVMExecution* executionEngine);
 
 	/**
-	 * @brief Create a new global variable for the given port
+	 * @brief Connect a port to a fifo
 	 * 
-	 * @param port : the initial port
+	 * @param port : the port to connect
 	 *
-	 * @return the corresponding GlobalVariable
+	 * @param fifo : the fifo to connect
 	 */
-	llvm::GlobalVariable* createPortVar(Port* port);
+	void connect(Port* port, AbstractFifo* fifo);
 	
 	/** LLVM Context */
 	llvm::LLVMContext &Context;

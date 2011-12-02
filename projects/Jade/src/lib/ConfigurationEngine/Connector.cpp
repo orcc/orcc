@@ -38,6 +38,8 @@
 //------------------------------
 #include <iostream>
 
+#include "llvm/Constants.h"
+
 #include "Connector.h"
 #include "Jade/Decoder.h"
 #include "Jade/Configuration/Configuration.h"
@@ -81,38 +83,34 @@ void Connector::unsetConnections(Configuration* configuration){
 	}
 }
 
-GlobalVariable* Connector::createPortVar(Port* port){
-	if (port->getFifoVar() != NULL){
-		// Port has already a fifo assigned
-		return port->getFifoVar();
+void Connector::connect(Port* port, AbstractFifo* fifo){
+	GlobalVariable* var = port->getFifoVar();
+	
+	if (var == NULL){
+		//Get fifo structure type
+		const Type* portStruct = fifo->getGV()->getType();
+
+		//Return new variable
+		var =  new GlobalVariable(*module, portStruct, true,  GlobalValue::InternalLinkage, /*init*/0, port->getName(), 0, false);;
+
+		// Store the generated variable
+		port->setFifoVar(var);
 	}
 	
-	//Get fifo structure type
-	const PointerType* portStruct = FifoMng::getFifoType(port->getType())->getPointerTo();
-
-	//Return new variable
-	GlobalVariable* var =  new GlobalVariable(*module, portStruct, true,  GlobalValue::InternalLinkage, /*init*/0, port->getName(), 0, false);;
-
-	// Store the generated variable
-	port->setFifoVar(var);
-
-	return var;
+	// Initialize variable
+	var->setInitializer(fifo->getGV());
 }
 
 void Connector::setConnection(Connection* connection){
 	//Source port is choosen as the reference type
 	Port* src = connection->getSourcePort();
 	Port* dst = connection->getDestinationPort();
-	
-	//Create port variables
-	GlobalVariable* srcVar = createPortVar(src);
-	GlobalVariable* dstVar = createPortVar(dst);
 
 	//Initialize ports with a new fifo
 	AbstractFifo* fifo = FifoMng::getFifo(Context, decoder, src->getType(), connection);
-	srcVar->setInitializer(fifo->getGV());
-	dstVar->setInitializer(fifo->getGV());
-
+	connect(src, fifo);
+	connect(dst, fifo);
+	
 	// Set the new fifo to the connection
 	connection->setFifo(fifo);
 }

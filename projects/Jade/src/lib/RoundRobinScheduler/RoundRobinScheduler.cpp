@@ -54,6 +54,7 @@
 #include "DPNScheduler.h"
 #include "CSDFScheduler.h"
 #include "QSDFScheduler.h"
+#include "OPTScheduler.h"
 
 #include "Jade/Decoder.h"
 #include "Jade/Configuration/Configuration.h"
@@ -191,6 +192,7 @@ void RoundRobinScheduler::addInstance(Instance* instance){
 	DPNScheduler DPNSchedulerAdder(Context, decoder);
 	CSDFScheduler CSDFSchedulerAdder(Context, decoder);
 	QSDFScheduler QSDFSchedulerAdder(Context, decoder);
+	OPTScheduler OPTFSchedulerAdder(Context, decoder);
 	
 	MoC* moc = instance->getMoC();
 		
@@ -199,7 +201,12 @@ void RoundRobinScheduler::addInstance(Instance* instance){
 	}else if (moc->isCSDF() && optimized){
 		CSDFSchedulerAdder.transform(instance);
 	}else{
-		DPNSchedulerAdder.transform(instance);
+
+		//if ((instance->getId().compare("source")!=0)&& (instance->getId().compare("serialize")!=0)){
+			DPNSchedulerAdder.transform(instance);
+	/*	}else{
+			OPTFSchedulerAdder.transform(instance);
+		}*/
 	}
 
 	// Call the action scheduler

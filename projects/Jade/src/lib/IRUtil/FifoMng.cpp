@@ -45,6 +45,7 @@
 #include "Jade/Decoder.h"
 #include "Jade/Core/Actor.h"
 #include "Jade/Fifo/FifoCircular.h"
+#include "Jade/Fifo/FifoOpt.h"
 #include "Jade/Fifo/FifoTrace.h"
 #include "Jade/Fifo/FifoUnprotected.h"
 #include "Jade/Jit/LLVMParser.h"
@@ -146,6 +147,11 @@ pair<string, StructType*> FifoMng::parseFifoStruct(llvm::MDNode* structMD){
 
 AbstractFifo* FifoMng::getFifo(LLVMContext& C, Decoder* decoder, Type* type, Connection* connection){
 	int size = connection->getSize();
+	/*
+	char* name = connection->getSource()->getName();
+	if (strcmp (name,"source") == 0){
+		return new FifoOpt(C, decoder->getModule(), type, size);
+	}*/
 
 	//Todo : implement static class in fifo for creation
 	if (fifoTy == trace){

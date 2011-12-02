@@ -288,17 +288,16 @@ void startCmdLine(){
 		engine->optimize(network, optLevel);
 	}
 
-	// Print the given decoder if needed
-	if (OutputDir != ""){
-		engine->print(network, "module.txt");
-	}
-
 	// Verify the given decoder if needed
 	if (Verify){
 		engine->verify(network, "error.txt");
 	}
 
-
+	// Print the given decoder if needed
+	if (OutputDir != ""){
+		engine->print(network, "module.txt");
+	}
+	
 	// Set input file
 	input_file = (char*)VidFile.c_str();
 

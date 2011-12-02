@@ -122,7 +122,6 @@ void ActionSchedulerAdder::createActionScheduler(Instance* instance){
 	BranchInst::Create(bb1, incBB);
 	
 	createScheduler(instance, bb1, incBB, returnBB , scheduler);
-
 }
 
 void ActionSchedulerAdder::createInitialize(Instance* instance){
