@@ -40,6 +40,7 @@
 #include "Jade/Jit/LLVMWriter.h"
 #include "Jade/Util/FifoMng.h"
 
+#include "llvm/Constants.h"
 #include "llvm/Instructions.h"
 #include "llvm/Transforms/Utils/Cloning.h"
 //------------------------------
@@ -65,7 +66,7 @@ GlobalVariable* LLVMWriter::createVariable(GlobalVariable* variable){
 
 GlobalVariable* LLVMWriter::createPortVariable(Port* port){
 	GlobalVariable* portVar = port->getFifoVar();
-	const PointerType* portStruct = FifoMng::getFifoType(port->getType())->getPointerTo();
+	PointerType* portStruct = FifoMng::getFifoType(port->getType())->getPointerTo();
 
 	GlobalVariable *newPortVar =  new GlobalVariable(*module, portStruct,
                           true, portVar->getLinkage(), ConstantPointerNull::get(portStruct),
@@ -228,7 +229,7 @@ void LLVMWriter::linkFunctionBody(Function *NewFunc, const Function *OldFunc,
                        ModuleLevelChanges ? RF_None : RF_NoModuleLevelChanges);
 }
 
-bool LLVMWriter::addType(string name, const Type* type){
+bool LLVMWriter::addType(string name, StructType* type){
 	Module* module = decoder->getModule();
-	return module->addTypeName(name, type);
+	return StructType::create(name, type);
 }

@@ -39,6 +39,7 @@
 #include <iostream>
 #include <sstream>
 
+#include "llvm/Constants.h"
 #include "llvm/LLVMContext.h"
 #include "llvm/Linker.h"
 
@@ -65,7 +66,7 @@ string FifoMng::packageFolder;
 string FifoMng::outputDir;
 Module* FifoMng::headerMd;
 map<int, FifoMng::FifoAccess*> FifoMng::fifoAccesses;
-map<string, const StructType*> FifoMng::fifoStructs;
+map<string, StructType*> FifoMng::fifoStructs;
 int FifoMng::defaultFifoSize = 10000;
 
 
@@ -180,7 +181,7 @@ void FifoMng::addFifoType(Decoder* decoder){
 	LLVMWriter writer("", decoder);
 	
 	//Get fifos
-	map<string,const StructType*>::iterator it;
+	map<string, StructType*>::iterator it;
 
 	for (it = fifoStructs.begin(); it != fifoStructs.end(); ++it){
 		writer.addType(it->first, it->second);

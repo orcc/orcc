@@ -1,3 +1,4 @@
+
 # Common include directories
 include_directories(${SDL_INCLUDE_DIR} ${SDLIMAGE_INCLUDE_DIR})
 

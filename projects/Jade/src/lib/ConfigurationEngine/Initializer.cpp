@@ -175,13 +175,11 @@ void Initializer::initializeListExpr(GlobalVariable* var, ListExpr* expr){
 			exit(1);
 		}
 
-		const Type *Int32Ty = Type::getInt32Ty(Context);
-
 		Value *Idxs[2];
-		Idxs[0] = ConstantInt::get(Int32Ty, 0);
-		Idxs[1] = ConstantInt::get(Int32Ty, elt);
+		Idxs[0] = ConstantInt::get(Context, APInt(32, 0));
+		Idxs[1] = ConstantInt::get(Context, APInt(32, elt));
 		
-		GetElementPtrInst* getInst = GetElementPtrInst::Create(var, Idxs, Idxs + 2, "", entryBB);
+		GetElementPtrInst* getInst = GetElementPtrInst::Create(var, Idxs, "", entryBB);
 			
 		new StoreInst( Elt, getInst, entryBB);
 	}

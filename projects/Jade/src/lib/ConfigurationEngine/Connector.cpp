@@ -88,7 +88,7 @@ void Connector::connect(Port* port, AbstractFifo* fifo){
 	
 	if (var == NULL){
 		//Get fifo structure type
-		const Type* portStruct = fifo->getGV()->getType();
+		Type* portStruct = fifo->getGV()->getType();
 
 		//Return new variable
 		var =  new GlobalVariable(*module, portStruct, true,  GlobalValue::InternalLinkage, /*init*/0, port->getName(), 0, false);;

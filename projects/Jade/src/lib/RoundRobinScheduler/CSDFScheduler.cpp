@@ -39,6 +39,7 @@
 #include <iostream>
 #include "CSDFScheduler.h"
 
+#include "llvm/Constants.h"
 #include "llvm/DerivedTypes.h"
 #include "llvm/Instructions.h"
 #include "llvm/LLVMContext.h"
@@ -145,7 +146,7 @@ void CSDFScheduler::initializeStateVars(map<Port*, StateVar*>* stateVars, BasicB
 		// Get zero element of the state var
 		ConstantInt* zero = ConstantInt::get(Type::getInt32Ty(Context), 0);
 		Value* values[] = {zero, zero};
-		GetElementPtrInst* gepInst = GetElementPtrInst::Create(stateVar->getGlobalVariable(), values, values + 2, "", BB);
+		GetElementPtrInst* gepInst = GetElementPtrInst::Create(stateVar->getGlobalVariable(), values, "", BB);
 
 		//Store to port pointer
 		new StoreInst(gepInst, port->getPtrVar()->getGlobalVariable(), BB);
@@ -197,7 +198,7 @@ void CSDFScheduler::updatePattern(Pattern* pattern, BasicBlock* BB){
 		// Get next elements in pointer
 		ConstantInt* Zero = ConstantInt::get(Type::getInt32Ty(Context), 0);
 		Value* values[]={Zero, numTokens};
-		GetElementPtrInst* getElementPtrInst = GetElementPtrInst::Create(bitCastInst, values, values+2, "", BB);
+		GetElementPtrInst* getElementPtrInst = GetElementPtrInst::Create(bitCastInst, values, "", BB);
 
 		//Store next pointer into fifo counter
 		StoreInst* storeInst = new StoreInst(getElementPtrInst, ptrVar->getGlobalVariable(), BB);

@@ -39,9 +39,8 @@
 #include <time.h>
 #include <iostream>
 
-//#include "llvm/Constants.h"
-#include "llvm/Support/CommandLine.h"
-#include "llvm/Support/StandardPasses.h"
+#include "llvm/PassManager.h"
+
 #include "Jade/Util/FifoMng.h"
 #include "Jade/Decoder.h"
 #include "Jade/RVCEngine.h"
@@ -286,7 +285,7 @@ map<string, Actor*>* RVCEngine::parseActors(Configuration* Configuration) {
 
 void RVCEngine::doOptimizeDecoder(Decoder* decoder){
 //TODO : add CFGSimplification and mem2reg
-	InstanceInternalize internalize;
+/*	InstanceInternalize internalize;
 	internalize.transform(decoder);
 	
 	PassManager Passes;
@@ -294,7 +293,7 @@ void RVCEngine::doOptimizeDecoder(Decoder* decoder){
 	Passes.run(*decoder->getModule());
 
 	FifoFnRemoval removeFifo;
-	removeFifo.transform(decoder);
+	removeFifo.transform(decoder);*/
 }
 
 int RVCEngine::print(Network* network, string outputFile){

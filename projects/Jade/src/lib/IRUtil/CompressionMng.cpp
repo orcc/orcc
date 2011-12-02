@@ -167,5 +167,5 @@ void CompressionMng::error(string msg){
 
 void CompressionMng::addTmpFile(sys::Path file){
 	CompressionMng::tmpFiles.push_back(FileRemover());
-	CompressionMng::tmpFiles.back().setFile(file);
+	CompressionMng::tmpFiles.back().setFile(file.str());
 }

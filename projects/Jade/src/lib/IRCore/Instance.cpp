@@ -163,9 +163,9 @@ void Instance::solveParameters(){
 		if (expr->isIntExpr()){
 			//Get corresponding parameter value with the correct size
 			GlobalVariable* GV = cast<GlobalVariable>(variable);
-			const Type* type = GV->getType()->getElementType();	
+			Type* type = GV->getType()->getElementType();	
 
-			value = ConstantInt::get(type, expr->evaluateAsInteger());
+			value = ConstantInt::get(type, APInt(32, expr->evaluateAsInteger()));
 		}else{
 			value = expr->getConstant();
 		}

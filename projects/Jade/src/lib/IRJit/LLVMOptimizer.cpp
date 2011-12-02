@@ -41,14 +41,18 @@
 #include "Jade/Decoder.h"
 #include "Jade/Jit/LLVMOptimizer.h"
 
+#include "llvm/LinkAllPasses.h"
+#include "llvm/LinkAllVMCore.h"
 #include "llvm/Module.h"
+#include "llvm/PassManager.h"
 #include "llvm/ADT/Triple.h"
+#include "llvm/Analysis/Verifier.h"
 #include "llvm/Support/PassNameParser.h"
-#include "llvm/Support/StandardPasses.h"
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Target/TargetData.h"
 #include "llvm/Target/TargetLibraryInfo.h"
 #include "llvm/Target/TargetMachine.h"
+#include "llvm/Transforms/IPO/PassManagerBuilder.h"
 //------------------------------
 using namespace llvm;
 using namespace std;
@@ -118,9 +122,9 @@ void LLVMOptimizer::optimize(int optLevel){
   if (TD)
     Passes.add(TD);
 
-   OwningPtr<PassManager> FPasses;
+  OwningPtr<FunctionPassManager> FPasses;
   if (optLevel > 0) {
-    FPasses.reset(new PassManager());
+    FPasses.reset(new FunctionPassManager(module));
     if (TD)
       FPasses->add(new TargetData(*TD));
   }
@@ -174,39 +178,16 @@ void LLVMOptimizer::optimize(int optLevel){
   }
   */
  
-
-  if (optLevel > 0)
-    FPasses->run(*module);
-
+   if (optLevel > 0) {
+    FPasses->doInitialization();
+    for (Module::iterator F = module->begin(), E = module->end(); F != E; ++F)
+      FPasses->run(*F);
+    FPasses->doFinalization();
+  }
 
   // Now that we have all of the passes ready, run them.
   Passes.run(*module);
 
-}
-
-void LLVMOptimizer::addPass(PassManagerBase &PM, Pass *P) {
-  // Add the pass to the pass manager...
-  PM.add(P);
-
-  // If we are verifying all of the intermediate steps, add the verifier...
-  if (VerifyEach) PM.add(createVerifierPass());
-}
-
-void LLVMOptimizer::AddStandardCompilePasses(PassManagerBase &PM) {
-  PM.add(createVerifierPass());                  // Verify that input is correct
-
-  addPass(PM, createLowerSetJmpPass());          // Lower llvm.setjmp/.longjmp
-
-  llvm::Pass *InliningPass = !DisableInline ? createFunctionInliningPass() : 0;
-
-  // -std-compile-opts adds the same module passes as -O3.
-  createStandardModulePasses(&PM, 3,
-                             /*OptimizeSize=*/ false,
-                             /*UnitAtATime=*/ true,
-                             /*UnrollLoops=*/ true,
-                             /*SimplifyLibCalls=*/ true,
-                             /*HaveExceptions=*/ true,
-                             InliningPass);
 }
 
 
@@ -215,36 +196,26 @@ void LLVMOptimizer::AddStandardCompilePasses(PassManagerBase &PM) {
 /// duplicates llvm-gcc behaviour.
 ///
 /// OptLevel - Optimization Level
-void LLVMOptimizer::AddOptimizationPasses(PassManagerBase &MPM, PassManagerBase &FPM,
-                           unsigned OptLevel) {
-  createStandardFunctionPasses(&FPM, OptLevel);
+void LLVMOptimizer::AddOptimizationPasses(PassManagerBase &MPM,FunctionPassManager &FPM,
+                                  unsigned OptLevel) {
+  PassManagerBuilder Builder;
+  Builder.OptLevel = OptLevel;
 
-  llvm::Pass *InliningPass = 0;
   if (DisableInline) {
     // No inlining pass
-  } else if (OptLevel) {
+  } else if (OptLevel > 1) {
     unsigned Threshold = 225;
     if (OptLevel > 2)
       Threshold = 275;
-    InliningPass = createFunctionInliningPass(Threshold);
+    Builder.Inliner = createFunctionInliningPass(Threshold);
   } else {
-    InliningPass = createAlwaysInlinerPass();
+    Builder.Inliner = createAlwaysInlinerPass();
   }
-  createStandardModulePasses(&MPM, OptLevel,
-                             /*OptimizeSize=*/ false,
-                             UnitAtATime,
-                             /*UnrollLoops=*/ OptLevel > 1,
-                             !DisableSimplifyLibCalls,
-                             /*HaveExceptions=*/ true,
-                             InliningPass);
-}
-
-
-void LLVMOptimizer::AddStandardLinkPasses(PassManagerBase &PM) {
-  PM.add(createVerifierPass());                  // Verify that input is correct
-
-  createStandardLTOPasses(&PM, /*Internalize=*/ !DisableInternalize,
-                          /*RunInliner=*/ !DisableInline,
-                          /*VerifyEach=*/ VerifyEach);
+  Builder.DisableUnitAtATime = !UnitAtATime;
+  Builder.DisableUnrollLoops = OptLevel == 0;
+  Builder.DisableSimplifyLibCalls = DisableSimplifyLibCalls;
+  
+  Builder.populateFunctionPassManager(FPM);
+  Builder.populateModulePassManager(MPM);
 }
 

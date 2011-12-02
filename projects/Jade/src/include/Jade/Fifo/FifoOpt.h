@@ -65,7 +65,7 @@ class FifoOpt : public AbstractFifo {
 
 		virtual void createConnection();
 
-		const llvm::StructType* getOrInserFifoStruct(llvm::IntegerType* connectionType);
+		llvm::StructType* getOrInserFifoStruct(llvm::IntegerType* connectionType);
 };
 
 #endif

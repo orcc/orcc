@@ -57,17 +57,14 @@ void FifoCircular::createConnection(){
 	StructType* structType = FifoMng::getFifoType(connectionType);
 
 	//Get fifo array structure
-	PATypeHolder EltTy(connectionType);
-	const ArrayType* arrayType = ArrayType::get(EltTy, fifoSize);
+	ArrayType* arrayType = ArrayType::get(structType, fifoSize);
 
 	// Initialize array for content
-	Constant* arrayCt = ConstantArray::get(arrayType, NULL,0);
-	ArrayContent = new GlobalVariable(*module, arrayType, false, GlobalVariable::InternalLinkage, arrayCt, "content");
+	ArrayContent = new GlobalVariable(*module, arrayType, false, GlobalVariable::InternalLinkage, ConstantAggregateZero::get(arrayType), "content");
 	ArrayContent->setAlignment(32);
 	
 	// Initialize array for fifo buffer
-	Constant* arrayBuffer = ConstantArray::get(arrayType, NULL,0);
-	ArrayFifoBuffer = new GlobalVariable(*module, arrayType, false, GlobalVariable::InternalLinkage, arrayBuffer, "buffer");
+	ArrayFifoBuffer = new GlobalVariable(*module, arrayType, false, GlobalVariable::InternalLinkage, ConstantAggregateZero::get(arrayType), "buffer");
 	ArrayFifoBuffer->setAlignment(32);
 
 	// Initialize fifo elements

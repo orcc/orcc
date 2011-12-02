@@ -39,10 +39,10 @@
 //------------------------------
 
 #include "llvm/LLVMContext.h"
-#include "llvm/Target/TargetSelect.h"
 #include "llvm/Support/CommandLine.h"
-#include "llvm/Support/Signals.h"
 #include "llvm/Support/PassNameParser.h"
+#include "llvm/Support/Signals.h"
+#include "llvm/Support/TargetSelect.h"
 #include "llvm/PassSupport.h"
 
 #include "Jade/XDFSerialize/XDFParser.h"
@@ -121,6 +121,7 @@ void rvc_init(char *XDF, char* VTLFolder, int isAVCFile){
 	//Initialize context
 	llvm_start_multithreaded();	
 	InitializeNativeTarget();
+	InitializeNativeTargetAsmPrinter();
 	LLVMContext &Context = getGlobalContext();
 
 

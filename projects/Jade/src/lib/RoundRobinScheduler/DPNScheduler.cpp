@@ -37,6 +37,7 @@
 
 //------------------------------
 #include <iostream>
+#include "llvm/Constants.h"
 #include "llvm/DerivedTypes.h"
 #include "llvm/Instructions.h"
 #include "llvm/LLVMContext.h"
@@ -86,7 +87,7 @@ void DPNScheduler::createSchedulerFSM(Instance* instance, BasicBlock* BB, BasicB
 	
 	//Set initial state to the state variable
 	FSM::State* state = fsm->getInitialState();
-	stateVar->setInitializer(ConstantInt::get(Type::getInt32Ty(Context), state->getIndex()));
+	stateVar->setInitializer(ConstantInt::get(Context, APInt(32, state->getIndex())));
 
 	//Load state variable
 	LoadInst* loadStateVar = new LoadInst(stateVar, "", BB);

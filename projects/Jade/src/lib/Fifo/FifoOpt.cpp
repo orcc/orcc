@@ -61,11 +61,10 @@ void FifoOpt::createConnection(){
 	IntegerType* connectionType = cast<IntegerType>(fifoType);
 
 	//Get fifo structure
-	const StructType* structType = getOrInserFifoStruct(connectionType);
+	StructType* structType = getOrInserFifoStruct(connectionType);
 
 	// Initialize array content
-	PATypeHolder EltTy(connectionType);
-	const ArrayType* arrayType = ArrayType::get(EltTy, fifoSize);
+	ArrayType* arrayType = ArrayType::get(connectionType, fifoSize);
 	GlobalVariable* gv_array = new GlobalVariable(*module, arrayType, false, GlobalValue::InternalLinkage, ConstantAggregateZero::get(arrayType), "array");
 	gv_array->setAlignment(16);
 
@@ -85,9 +84,9 @@ void FifoOpt::createConnection(){
 	// Initialize fifo elements
 	std::vector<Constant*> elts;
 	elts.push_back(ConstantInt::get(Type::getInt32Ty(Context), fifoSize)); // size of the ringbuffer
-	elts.push_back(ConstantExpr::getGetElementPtr(gv_array, &indices[0], indices.size())); // the memory containing the ringbuffer
+	elts.push_back(ConstantExpr::getGetElementPtr(gv_array, indices)); // the memory containing the ringbuffer
 	elts.push_back(One); // the number of fifo's readers
-	elts.push_back(ConstantExpr::getGetElementPtr(gv_read_inds, &indices[0], indices.size())); // the current position of the reader
+	elts.push_back(ConstantExpr::getGetElementPtr(gv_read_inds, indices)); // the current position of the reader
 	elts.push_back(Zero); //the current position of the writer
 	Constant* fifoStruct = ConstantStruct::get(structType, elts);
 
@@ -96,7 +95,7 @@ void FifoOpt::createConnection(){
 	fifoGV->setAlignment(8);
 }
 
-const StructType* FifoOpt::getOrInserFifoStruct(IntegerType* connectionType){	
+StructType* FifoOpt::getOrInserFifoStruct(IntegerType* connectionType){	
 	int size = connectionType->getBitWidth();
 
 	// Set structure name
@@ -104,14 +103,14 @@ const StructType* FifoOpt::getOrInserFifoStruct(IntegerType* connectionType){
 	name << "fifo_i" << size;
 
 
-	const Type* fifoType = module->getTypeByName(name.str());
+	Type* fifoType = module->getTypeByName(name.str());
 	
 	if (fifoType != NULL){
 		return cast<StructType>(fifoType);
 	}
 
 	// Create a new fifo structure
-	std::vector<const llvm::Type*> StructFields;
+	std::vector<llvm::Type*> StructFields;
 	StructFields.push_back(IntegerType::get(module->getContext(), 32)); // size of the ringbuffer
 	StructFields.push_back(PointerType::get(IntegerType::get(module->getContext(), size), 0)); // the memory containing the ringbuffer
 	StructFields.push_back(IntegerType::get(module->getContext(), 32)); // the number of fifo's readers
@@ -119,10 +118,7 @@ const StructType* FifoOpt::getOrInserFifoStruct(IntegerType* connectionType){
 	StructFields.push_back(IntegerType::get(module->getContext(), 32)); // the current position of the writer
 	
 	//Insert fifo structure in module
-	fifoType = StructType::get(module->getContext(), StructFields, false);
-	module->addTypeName(name.str(), fifoType);
-
-	return cast<StructType>(fifoType);
+	return StructType::create(module->getContext(), StructFields, name.str(), false);
 }
 
 FifoOpt::~FifoOpt(){

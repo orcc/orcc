@@ -42,6 +42,7 @@
 namespace llvm{
 	class Pass;
 	class PassManagerBase;
+	class FunctionPassManager;
 	class Function;
 	class ExecutionEngine;
 	class Module;
@@ -84,11 +85,8 @@ public:
 	void optimize(int optLevel);
 private:
 
-	void AddOptimizationPasses(llvm::PassManagerBase &MPM, llvm::PassManagerBase &FPM, unsigned OptLevel);
-	void AddStandardCompilePasses(llvm::PassManagerBase &PM);
-	void AddStandardLinkPasses(llvm::PassManagerBase &PM);
-	void addPass(llvm::PassManagerBase &PM, llvm::Pass *P);
-
+	void AddOptimizationPasses(llvm::PassManagerBase &MPM, llvm::FunctionPassManager &FPM,
+                                  unsigned OptLevel);
 	Decoder* decoder;
 };
 

@@ -44,13 +44,11 @@
 #include "Console.h"
 
 #include "llvm/LLVMContext.h"
-#include "llvm/Target/TargetSelect.h"
 #include "llvm/Support/PassNameParser.h"
-#include "llvm/Support/StandardPasses.h"
 #include "llvm/Support/PrettyStackTrace.h"
 #include "llvm/Support/Signals.h"
 #include "llvm/Support/Threading.h"
-
+#include "llvm/Support/TargetSelect.h"
 
 #include "Jade/XDFSerialize/XDFParser.h"
 #include "Jade/XCFSerialize/XCFParser.h"
@@ -324,6 +322,7 @@ int main(int argc, char **argv) {
 	//Initialize context
 	llvm_start_multithreaded();	
 	InitializeNativeTarget();
+	InitializeNativeTargetAsmPrinter();
 	setOptions();
 	
 	//Loading decoderEngine

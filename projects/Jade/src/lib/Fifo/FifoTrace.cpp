@@ -62,18 +62,17 @@ void FifoTrace::createConnection(){
 	StructType* structType = FifoMng::getFifoType(connectionType);
 
 	//Get fifo array structure
-	PATypeHolder EltTy(connectionType);
-	const ArrayType* arrayType = ArrayType::get(EltTy, connection->getSize());
+	ArrayType* arrayType = ArrayType::get(connectionType, connection->getSize());
 
 	// Initialize array for content
-	Constant* arrayContent = ConstantArray::get(arrayType, NULL,0);
+	Constant* arrayContent = ConstantArray::get(arrayType, NULL);
 	GlobalVariable *NewArrayContents =
         new GlobalVariable(*module, arrayType,
 		false, GlobalVariable::InternalLinkage, arrayContent,  "content");
 	NewArrayContents->setAlignment(32);
 	
 	// Initialize array for fifo buffer
-	Constant* arrayFifoBuffer = ConstantArray::get(arrayType, NULL,0);
+	Constant* arrayFifoBuffer = ConstantArray::get(arrayType, NULL);
 	GlobalVariable *NewArrayFifoBuffer =
         new GlobalVariable(*module, arrayType,
 		false, GlobalVariable::InternalLinkage, arrayFifoBuffer, "buffer");

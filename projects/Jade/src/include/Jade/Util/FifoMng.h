@@ -309,7 +309,7 @@ private:
 	static std::list<llvm::Function*> externStruct;
 
 	/** Fifo structs and their corresponding llvm::struct */
-	static std::map<std::string, const llvm::StructType*> fifoStructs;
+	static std::map<std::string, llvm::StructType*> fifoStructs;
 
 	/**Fifo functions and their corresponding llvm::function */
 	static std::map<int, FifoAccess*> fifoAccesses;

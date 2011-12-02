@@ -36,6 +36,7 @@
 */
 
 //------------------------------
+#include "llvm/Constants.h"
 #include "llvm/LLVMContext.h"
 #include "llvm/Instructions.h"
 #include "llvm/Module.h"
@@ -57,7 +58,7 @@ void FunctionMng::createPuts(Decoder* decoder, string message, Instruction* inst
 		// Puts does'nt exist, create it
 		PointerType* PointerTy_4 = PointerType::get(IntegerType::get(module->getContext(), 8), 0);
 
-		vector<const Type*>FuncTy_6_args;
+		vector<Type*>FuncTy_6_args;
 		FuncTy_6_args.push_back(PointerTy_4);
 		FunctionType* FuncTy_6 = FunctionType::get(IntegerType::get(module->getContext(), 32), FuncTy_6_args, false);
 
@@ -84,7 +85,7 @@ void FunctionMng::createPuts(Decoder* decoder, string message, Instruction* inst
 	 ConstantInt* const_int64_9 = ConstantInt::get(module->getContext(), APInt(64, StringRef("0"), 10));
 	 const_ptr_8_indices.push_back(const_int64_9);
 	 const_ptr_8_indices.push_back(const_int64_9);
-	 Constant* const_ptr_8 = ConstantExpr::getGetElementPtr(gvar_array_str, &const_ptr_8_indices[0], const_ptr_8_indices.size());
+	 Constant* const_ptr_8 = ConstantExpr::getGetElementPtr(gvar_array_str, const_ptr_8_indices);
 	 ConstantInt* const_int32_10 = ConstantInt::get(module->getContext(), APInt(32, StringRef("0"), 10));
 	 gvar_array_str->setInitializer(const_array_7);
 

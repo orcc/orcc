@@ -44,7 +44,6 @@
 #include "llvm/LinkAllPasses.h"
 #include "llvm/Bitcode/ReaderWriter.h"
 #include "llvm/Support/PassNameParser.h"
-#include "llvm/Support/StandardPasses.h"
 #include "llvm/Target/TargetData.h"
 //------------------------------
 

@@ -38,6 +38,7 @@
 //------------------------------
 #ifndef LLVMWRITER_H
 #define LLVMWRITER_H
+#include <map>
 
 namespace llvm{
 	struct ClonedCodeInfo;
@@ -45,6 +46,9 @@ namespace llvm{
 
 class AbstractFifo;
 class Decoder;
+class Port;
+
+
 
 #include "llvm/Module.h"
 #include "llvm/DerivedTypes.h"
@@ -141,7 +145,7 @@ public:
 	 * @return True ff there is already an entry for this name, otherwise false.
 	 *
      */
-	bool addType(std::string name, const llvm::Type* type);
+	bool addType(std::string name, llvm::StructType* type);
 
 private:
 

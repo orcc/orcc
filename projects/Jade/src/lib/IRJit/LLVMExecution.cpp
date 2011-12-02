@@ -56,7 +56,6 @@
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/Signals.h"
 #include "llvm/Support/Process.h"
-#include "llvm/Target/TargetSelect.h"
 
 #include "Jade/Decoder.h"
 #include "Jade/Core/Port.h"

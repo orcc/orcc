@@ -80,7 +80,7 @@ BroadcastActor::~BroadcastActor(){
 }
 
 void BroadcastActor::createActor(){
-	const PointerType* fifoType = type->getPointerTo();
+	PointerType* fifoType = type->getPointerTo();
 
 	// Creating input variable of name input
 	string inputPortName = "input";
@@ -216,7 +216,7 @@ Value* BroadcastActor::createHasTokenTest(Port* port, BasicBlock* current){
 	vector.push_back(ConstantInt::get(Type::getInt32Ty(Context), 1));
 
 	Function* hasTokenFn = FifoMng::getHasTokenFunction(port->getType(), decoder);
-	CallInst* retVal = CallInst::Create(hasTokenFn, vector.begin(), vector.end(), "c"+port->getName(), current);
+	CallInst* retVal = CallInst::Create(hasTokenFn, vector, "c"+port->getName(), current);
 	TruncInst* truncInst = new TruncInst(retVal, Type::getInt1Ty(Context), "t"+port->getName(), current);
 
 	//Return the result
@@ -238,7 +238,7 @@ Value* BroadcastActor::createReadFifo(Port* port, BasicBlock* current){
 	Idxs[0] = Zero;
     Idxs[1] = Zero;
 	
-	GetElementPtrInst* getInstr = GetElementPtrInst::Create(bitcastInst, Idxs, Idxs+2, "", current);
+	GetElementPtrInst* getInstr = GetElementPtrInst::Create(bitcastInst, Idxs, "", current);
 	
 	//Return token value
 	return new LoadInst(getInstr,"token", current);
@@ -258,7 +258,7 @@ void BroadcastActor::createWriteFifo(Port* port, Value* token ,BasicBlock* curre
 	Idxs[0] = Zero;
     Idxs[1] = Zero;
 	
-	GetElementPtrInst* getInstr = GetElementPtrInst::Create(bitcastInst, Idxs, Idxs+2, "", current);
+	GetElementPtrInst* getInstr = GetElementPtrInst::Create(bitcastInst, Idxs, "", current);
 
 	//Return token value
 	new StoreInst(token,getInstr, current);
@@ -274,5 +274,5 @@ void BroadcastActor::createSetReadEnd(Port* port, BasicBlock* current){
 	vector.push_back(ConstantInt::get(Type::getInt32Ty(Context), 1));
 
 	Function* readEndFn = FifoMng::getReadEndFunction(port->getType(), decoder);
-	CallInst::Create(readEndFn, vector.begin(), vector.end(), "", current);
+	CallInst::Create(readEndFn, vector, "", current);
 }
