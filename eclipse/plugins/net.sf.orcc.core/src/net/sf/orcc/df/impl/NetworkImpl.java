@@ -620,6 +620,11 @@ public class NetworkImpl extends EntityImpl implements Network {
 		return vertices;
 	}
 
+	@Override
+	public boolean isNetwork() {
+		return true;
+	}
+
 	/**
 	 * Merges actors of this network. Note that for this transformation to work
 	 * properly, actors must have been classified and normalized first.

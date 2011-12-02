@@ -50,7 +50,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.transformations.HierarchyComputer;
+import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.WriteListener;
@@ -161,7 +161,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		write("Instantiating actors...\n");
 		EcoreUtil.resolveAll(set);
-		new HierarchyComputer().doSwitch(network);
+		new Instantiator().doSwitch(network);
 		write("Instantiation done\n");
 
 		// because the UnitImporter will load additional resources, we filter

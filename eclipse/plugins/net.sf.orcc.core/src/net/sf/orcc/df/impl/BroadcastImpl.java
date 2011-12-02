@@ -112,4 +112,9 @@ public class BroadcastImpl extends EntityImpl implements Broadcast {
 		return type;
 	}
 
+	@Override
+	public boolean isBroadcast() {
+		return true;
+	}
+
 }

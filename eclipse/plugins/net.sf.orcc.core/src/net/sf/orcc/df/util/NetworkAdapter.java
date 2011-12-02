@@ -49,12 +49,35 @@ import org.eclipse.emf.common.notify.impl.AdapterImpl;
 public class NetworkAdapter extends AdapterImpl {
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void notifyChanged(Notification msg) {
 		Object feature = msg.getFeature();
 		switch (msg.getEventType()) {
+		case Notification.REMOVE_MANY:
+			if (feature == eINSTANCE.getEntity_Inputs()
+			|| feature == eINSTANCE.getEntity_Outputs()
+			|| feature == eINSTANCE.getNetwork_Entities()
+			|| feature == eINSTANCE.getNetwork_Instances()) {
+				List<Vertex> vertices = (List<Vertex>) msg.getOldValue();
+				((Network) target).getVertices().removeAll(vertices);
+			} else if (feature == eINSTANCE.getNetwork_Vertices()) {
+				List<Vertex> vertices = (List<Vertex>) msg.getOldValue();
+				for (Vertex vertex : vertices) {
+					remove(vertex);
+				}
+			} else if (feature == eINSTANCE.getNetwork_Connections()) {
+				List<Connection> connections = (List<Connection>) msg.getOldValue();
+				for (Connection connection : connections) {
+					connection.setSource(null);
+					connection.setTarget(null);
+				}
+			}
+			break;
+			
 		case Notification.REMOVE:
 			if (feature == eINSTANCE.getEntity_Inputs()
 					|| feature == eINSTANCE.getEntity_Outputs()
+					|| feature == eINSTANCE.getNetwork_Entities()
 					|| feature == eINSTANCE.getNetwork_Instances()) {
 				// when removing an instance or a port, remove it from vertices
 				Vertex vertex = (Vertex) msg.getOldValue();
@@ -87,4 +110,5 @@ public class NetworkAdapter extends AdapterImpl {
 			((Network) target).getConnections().remove(connection);
 		}
 	}
+
 }
