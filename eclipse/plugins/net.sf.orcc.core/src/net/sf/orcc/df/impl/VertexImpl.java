@@ -308,11 +308,7 @@ public abstract class VertexImpl extends NameableImpl implements Vertex {
 		return successors;
 	}
 
-	/**
-	 * Returns an object with template-specific data.
-	 * 
-	 * @return an object with template-specific data
-	 */
+	@Override
 	public Object getTemplateData() {
 		return templateData;
 	}

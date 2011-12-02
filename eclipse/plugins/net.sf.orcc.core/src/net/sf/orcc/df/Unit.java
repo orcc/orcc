@@ -82,6 +82,13 @@ public interface Unit extends Nameable {
 	EList<Procedure> getProcedures();
 
 	/**
+	 * Returns an object with template-specific data.
+	 * 
+	 * @return an object with template-specific data
+	 */
+	Object getTemplateData();
+
+	/**
 	 * Sets the name of the file in which this unit is defined.
 	 * 
 	 * @param fileName
@@ -96,5 +103,14 @@ public interface Unit extends Nameable {
 	 *            the line number on which this unit starts
 	 */
 	void setLineNumber(int newLineNumber);
+
+	/**
+	 * Sets the template data associated with this vertex. Template data should
+	 * hold data that is specific to a given template.
+	 * 
+	 * @param templateData
+	 *            an object with template-specific data
+	 */
+	void setTemplateData(Object templateData);
 
 }

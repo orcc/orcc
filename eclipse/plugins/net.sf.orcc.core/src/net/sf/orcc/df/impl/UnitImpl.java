@@ -101,6 +101,11 @@ public class UnitImpl extends NameableImpl implements Unit {
 	protected EList<Procedure> procedures;
 
 	/**
+	 * holds template-specific data.
+	 */
+	private Object templateData;
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -269,6 +274,11 @@ public class UnitImpl extends NameableImpl implements Unit {
 		return procedures;
 	}
 
+	@Override
+	public Object getTemplateData() {
+		return templateData;
+	}
+
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -291,6 +301,11 @@ public class UnitImpl extends NameableImpl implements Unit {
 		lineNumber = newLineNumber;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.UNIT__LINE_NUMBER, oldLineNumber, lineNumber));
+	}
+
+	@Override
+	public void setTemplateData(Object templateData) {
+		this.templateData = templateData;
 	}
 
 	/**
