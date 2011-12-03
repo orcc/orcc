@@ -341,17 +341,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getNetwork_Vertices() {
-		return (EReference)networkEClass.getEStructuralFeatures().get(4);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EAttribute getNetwork_FileName() {
-		return (EAttribute)networkEClass.getEStructuralFeatures().get(5);
+		return (EAttribute)networkEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -360,7 +351,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getNetwork_Entities() {
-		return (EReference)networkEClass.getEStructuralFeatures().get(6);
+		return (EReference)networkEClass.getEStructuralFeatures().get(5);
 	}
 
 	/**
@@ -1220,7 +1211,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEReference(networkEClass, NETWORK__VARIABLES);
 		createEReference(networkEClass, NETWORK__CONNECTIONS);
 		createEReference(networkEClass, NETWORK__INSTANCES);
-		createEReference(networkEClass, NETWORK__VERTICES);
 		createEAttribute(networkEClass, NETWORK__FILE_NAME);
 		createEReference(networkEClass, NETWORK__ENTITIES);
 
@@ -1383,7 +1373,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		initEReference(getNetwork_Variables(), theIrPackage.getVar(), null, "variables", null, 0, -1, Network.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNetwork_Connections(), this.getConnection(), null, "connections", null, 0, -1, Network.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNetwork_Instances(), this.getInstance(), null, "instances", null, 0, -1, Network.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getNetwork_Vertices(), this.getVertex(), null, "vertices", null, 0, -1, Network.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getNetwork_FileName(), ecorePackage.getEString(), "fileName", null, 0, 1, Network.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNetwork_Entities(), this.getEntity(), null, "entities", null, 0, -1, Network.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 

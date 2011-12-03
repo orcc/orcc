@@ -659,8 +659,7 @@ public class XdfParser {
 				} else if (name.equals("Decl")) {
 					parseDecl(element);
 				} else if (name.equals("Instance")) {
-					Instance instance = parseInstance(element);
-					network.getVertices().add(instance);
+					parseInstance(element);
 				} else if (name.equals("Package")) {
 					throw new OrccRuntimeException(
 							"Package elements are not supported by Orcc yet");
@@ -734,7 +733,7 @@ public class XdfParser {
 	 *            a DOM element named "Instance".
 	 * @return an instance
 	 */
-	private Instance parseInstance(Element element) {
+	private void parseInstance(Element element) {
 		// instance id
 		String id = element.getAttribute("id");
 		if (id.isEmpty()) {
@@ -795,8 +794,6 @@ public class XdfParser {
 
 		// add instance
 		network.getInstances().add(instance);
-
-		return instance;
 	}
 
 	/**
@@ -892,8 +889,6 @@ public class XdfParser {
 			throw new OrccRuntimeException("Port \"" + name
 					+ "\", invalid kind: \"" + kind + "\"");
 		}
-
-		network.getVertices().add(port);
 	}
 
 	/**

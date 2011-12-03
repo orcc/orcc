@@ -196,12 +196,12 @@ public interface Network extends Entity {
 	EList<Var> getVariables();
 
 	/**
-	 * Returns the list of vertices of this network.
+	 * Returns an Iterable over this network's vertices (concatenation of
+	 * inputs, outputs, instances, and entities).
 	 * 
-	 * @return the list of vertices of this network
-	 * @model
+	 * @return an Iterable over this network's vertices
 	 */
-	EList<Vertex> getVertices();
+	Iterable<Vertex> getVertices();
 
 	/**
 	 * Merges actors of this network. Note that for this transformation to work

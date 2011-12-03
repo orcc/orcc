@@ -66,6 +66,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 
+import com.google.common.collect.Iterables;
+
 /**
  * This class defines a transformation from a file containing an XDF network to
  * a Graphiti graph.
@@ -132,27 +134,25 @@ public class XdfImporter {
 
 	private void addVertices(Graph graph, Network network) {
 		Configuration configuration = graph.getConfiguration();
-		for (net.sf.orcc.df.Vertex networkVertex : network.getVertices()) {
-			Vertex vertex;
-			if (networkVertex.isPort()) {
-				Port port = (Port) networkVertex;
-				String kind = (network.getInputs().contains(port)) ? "Input"
-						: "Output";
-				ObjectType type = configuration.getVertexType(kind + " port");
+		for (Port port : Iterables.concat(network.getInputs(),
+				network.getOutputs())) {
+			String kind = (network.getInputs().contains(port)) ? "Input"
+					: "Output";
+			ObjectType type = configuration.getVertexType(kind + " port");
 
-				vertex = new Vertex(type);
-				vertex.setValue("port type", port.getType().toString());
-				vertex.setValue("native", port.isNative());
-				vertex.setValue(PARAMETER_ID, port.getName());
-				graph.addVertex(vertex);
-			} else {
-				Instance instance = (Instance) networkVertex;
-				vertex = getVertex(instance,
-						configuration.getVertexType("Instance"));
-			}
+			Vertex vertex = new Vertex(type);
+			vertex.setValue("port type", port.getType().toString());
+			vertex.setValue("native", port.isNative());
+			vertex.setValue(PARAMETER_ID, port.getName());
+			graph.addVertex(vertex);
+		}
+
+		for (Instance instance : network.getInstances()) {
+			Vertex vertex = getVertex(instance,
+					configuration.getVertexType("Instance"));
 
 			// add vertex
-			vertexMap.put(networkVertex, vertex);
+			vertexMap.put(instance, vertex);
 			graph.addVertex(vertex);
 		}
 	}

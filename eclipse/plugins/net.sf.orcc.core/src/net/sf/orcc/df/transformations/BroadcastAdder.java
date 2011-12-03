@@ -43,6 +43,8 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.util.DfSwitch;
 
+import com.google.common.collect.Iterables;
+
 /**
  * Adds broadcast actors when needed.
  * 
@@ -63,7 +65,8 @@ public class BroadcastAdder extends DfSwitch<Void> {
 
 		// make a copy of the existing vertex set because the set returned is
 		// modified when broadcasts are added
-		List<Vertex> vertexSet = new ArrayList<Vertex>(network.getVertices());
+		List<Vertex> vertexSet = new ArrayList<Vertex>();
+		Iterables.addAll(vertexSet, network.getVertices());
 
 		for (Vertex vertex : vertexSet) {
 			if (vertex.isInstance()) {
@@ -89,7 +92,7 @@ public class BroadcastAdder extends DfSwitch<Void> {
 				port.getType());
 		String name = id + "_" + port.getName();
 		Instance newInst = DfFactory.eINSTANCE.createInstance(name, bcast);
-		network.getVertices().add(newInst);
+		network.getInstances().add(newInst);
 
 		// add connections
 		createIncomingConnection(outList.get(0), outList.get(0).getSource(),

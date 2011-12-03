@@ -894,22 +894,13 @@ public interface DfPackage extends EPackage {
 	int NETWORK__INSTANCES = ENTITY_FEATURE_COUNT + 3;
 
 	/**
-	 * The feature id for the '<em><b>Vertices</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NETWORK__VERTICES = ENTITY_FEATURE_COUNT + 4;
-
-	/**
 	 * The feature id for the '<em><b>File Name</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__FILE_NAME = ENTITY_FEATURE_COUNT + 5;
+	int NETWORK__FILE_NAME = ENTITY_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>Entities</b></em>' containment reference list.
@@ -918,7 +909,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__ENTITIES = ENTITY_FEATURE_COUNT + 6;
+	int NETWORK__ENTITIES = ENTITY_FEATURE_COUNT + 5;
 
 	/**
 	 * The number of structural features of the '<em>Network</em>' class.
@@ -927,7 +918,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK_FEATURE_COUNT = ENTITY_FEATURE_COUNT + 7;
+	int NETWORK_FEATURE_COUNT = ENTITY_FEATURE_COUNT + 6;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -1522,17 +1513,6 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getNetwork_Instances();
-
-	/**
-	 * Returns the meta object for the reference list '{@link net.sf.orcc.df.Network#getVertices <em>Vertices</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference list '<em>Vertices</em>'.
-	 * @see net.sf.orcc.df.Network#getVertices()
-	 * @see #getNetwork()
-	 * @generated
-	 */
-	EReference getNetwork_Vertices();
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.Network#getFileName <em>File Name</em>}'.
@@ -2559,14 +2539,6 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EReference NETWORK__INSTANCES = eINSTANCE.getNetwork_Instances();
-
-		/**
-		 * The meta object literal for the '<em><b>Vertices</b></em>' reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference NETWORK__VERTICES = eINSTANCE.getNetwork_Vertices();
 
 		/**
 		 * The meta object literal for the '<em><b>File Name</b></em>' attribute feature.

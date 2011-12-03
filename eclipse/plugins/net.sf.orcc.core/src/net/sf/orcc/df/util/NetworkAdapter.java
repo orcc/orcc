@@ -55,35 +55,29 @@ public class NetworkAdapter extends AdapterImpl {
 		switch (msg.getEventType()) {
 		case Notification.REMOVE_MANY:
 			if (feature == eINSTANCE.getEntity_Inputs()
-			|| feature == eINSTANCE.getEntity_Outputs()
-			|| feature == eINSTANCE.getNetwork_Entities()
-			|| feature == eINSTANCE.getNetwork_Instances()) {
-				List<Vertex> vertices = (List<Vertex>) msg.getOldValue();
-				((Network) target).getVertices().removeAll(vertices);
-			} else if (feature == eINSTANCE.getNetwork_Vertices()) {
+					|| feature == eINSTANCE.getEntity_Outputs()
+					|| feature == eINSTANCE.getNetwork_Entities()
+					|| feature == eINSTANCE.getNetwork_Instances()) {
 				List<Vertex> vertices = (List<Vertex>) msg.getOldValue();
 				for (Vertex vertex : vertices) {
 					remove(vertex);
 				}
 			} else if (feature == eINSTANCE.getNetwork_Connections()) {
-				List<Connection> connections = (List<Connection>) msg.getOldValue();
+				List<Connection> connections = (List<Connection>) msg
+						.getOldValue();
 				for (Connection connection : connections) {
 					connection.setSource(null);
 					connection.setTarget(null);
 				}
 			}
 			break;
-			
+
 		case Notification.REMOVE:
 			if (feature == eINSTANCE.getEntity_Inputs()
 					|| feature == eINSTANCE.getEntity_Outputs()
 					|| feature == eINSTANCE.getNetwork_Entities()
 					|| feature == eINSTANCE.getNetwork_Instances()) {
 				// when removing an instance or a port, remove it from vertices
-				Vertex vertex = (Vertex) msg.getOldValue();
-				((Network) target).getVertices().remove(vertex);
-			} else if (feature == eINSTANCE.getNetwork_Vertices()) {
-				// when removing a vertex, remove its connections
 				Vertex vertex = (Vertex) msg.getOldValue();
 				remove(vertex);
 			} else if (feature == eINSTANCE.getNetwork_Connections()) {
@@ -96,19 +90,10 @@ public class NetworkAdapter extends AdapterImpl {
 	}
 
 	private void remove(Vertex vertex) {
-		// removes incoming connections
-		List<Connection> connections = vertex.getIncoming();
-		while (!connections.isEmpty()) {
-			Connection connection = connections.get(0);
-			((Network) target).getConnections().remove(connection);
-		}
-
-		// removes outgoing connections
-		connections = vertex.getOutgoing();
-		while (!connections.isEmpty()) {
-			Connection connection = connections.get(0);
-			((Network) target).getConnections().remove(connection);
-		}
+		// removes incoming and outgoing connections
+		List<Connection> connections = ((Network) target).getConnections();
+		connections.removeAll(vertex.getIncoming());
+		connections.removeAll(vertex.getOutgoing());
 	}
 
 }
