@@ -218,7 +218,9 @@ public class CBackendImpl extends AbstractBackend {
 		network.setTemplateData(data);
 
 		// instantiate and flattens network
+		write("Instantiating... ");
 		new Instantiator().doSwitch(network);
+		write("done\n");
 		new NetworkFlattener().doSwitch(network);
 
 		if (classify) {
