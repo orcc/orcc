@@ -50,6 +50,8 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
+import net.sf.orcc.df.transformations.Instantiator;
+import net.sf.orcc.df.transformations.NetworkFlattener;
 import net.sf.orcc.ir.util.ActorInterpreter;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.runtime.Fifo;
@@ -244,8 +246,9 @@ public class SlowSimulator extends AbstractSimulator {
 			// Instantiate the network
 			EcoreUtil.resolveAll(set);
 
-			// Flatten the hierarchical network
-			network.flatten();
+			// instantiate and flattens network
+			new Instantiator().doSwitch(network);
+			new NetworkFlattener().doSwitch(network);
 
 			// Parse XDF file, do some transformations and return the
 			// graph corresponding to the flat network instantiation.

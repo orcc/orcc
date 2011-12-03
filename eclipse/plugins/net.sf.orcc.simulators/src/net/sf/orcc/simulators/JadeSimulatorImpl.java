@@ -48,6 +48,8 @@ import java.util.List;
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.transformations.Instantiator;
+import net.sf.orcc.df.transformations.NetworkFlattener;
 import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -115,11 +117,14 @@ public class JadeSimulatorImpl extends AbstractSimulator {
 	private void flatten() {
 		ResourceSet set = new ResourceSetImpl();
 		Network network = IrUtil.deserializeEntity(set, xdfFile);
-		network.flatten();
+		// instantiate networks (but not actors) and flattens network
+		new Instantiator(false).doSwitch(network);
+		new NetworkFlattener().doSwitch(network);
 
 		xdfFlattenFile = new File(vtlFolder, network.getSimpleName() + ".xdf");
 		try {
-			network.eResource().save(new FileOutputStream(xdfFlattenFile), null);
+			network.eResource()
+					.save(new FileOutputStream(xdfFlattenFile), null);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -127,7 +132,6 @@ public class JadeSimulatorImpl extends AbstractSimulator {
 
 	@Override
 	public void initializeOptions() {
-
 		// Get project
 		String name = getAttribute(PROJECT, "");
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();

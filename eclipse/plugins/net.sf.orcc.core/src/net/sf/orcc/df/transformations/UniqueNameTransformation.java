@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2011, IETR/INSA of Rennes
+ * Copyright (c) 2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,51 +28,47 @@
  */
 package net.sf.orcc.df.transformations;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.util.DfSwitch;
 
 /**
- * This class defines a transformation that computes the hierarchy of all
- * instances of a network. The hierarchy of an instance is defined as a list of
- * the instances that lead to it from the top-level network.
+ * This class defines a transformation that updates the name of all entities of
+ * a network to make them unique.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class HierarchyComputer extends DfSwitch<Void> {
+public class UniqueNameTransformation extends DfSwitch<Void> {
 
-	private List<Instance> instances;
+	private Map<String, Integer> identifiers;
 
-	public HierarchyComputer() {
-		instances = new ArrayList<Instance>();
+	public UniqueNameTransformation() {
+		identifiers = new HashMap<String, Integer>();
 	}
 
-	private HierarchyComputer(List<Instance> instances, Instance instance) {
-		this.instances = new ArrayList<Instance>(instances);
-		this.instances.add(instance);
+	@Override
+	public Void caseEntity(Entity entity) {
+		String id = entity.getName();
+		Integer num = identifiers.get(id);
+		if (num == null) {
+			identifiers.put(id, 0);
+		} else {
+			num++;
+			entity.setName(id + "_" + num);
+			identifiers.put(id, num);
+		}
+
+		return null;
 	}
 
 	@Override
 	public Void caseNetwork(Network network) {
-		if (instances.isEmpty()) {
-			Instance instance = DfFactory.eINSTANCE.createInstance(
-					network.getSimpleName(), network);
-			instances.add(instance);
-		}
-
-		for (Instance instance : network.getInstances()) {
-			if (instance.isNetwork()) {
-				Network subNetwork = instance.getNetwork();
-				new HierarchyComputer(instances, instance).doSwitch(subNetwork);
-			}
-
-			// TODO
-			// instance.getHierarchy().addAll(instances);
+		for (Entity entity : network.getEntities()) {
+			doSwitch(entity);
 		}
 
 		return null;

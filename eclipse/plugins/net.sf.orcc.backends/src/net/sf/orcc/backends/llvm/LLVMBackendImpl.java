@@ -65,6 +65,8 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
+import net.sf.orcc.df.transformations.Instantiator;
+import net.sf.orcc.df.transformations.NetworkFlattener;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.transformations.BlockCombine;
 import net.sf.orcc.ir.transformations.BuildCFG;
@@ -232,7 +234,9 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
-		network.flatten();
+		// instantiate and flattens network
+		new Instantiator().doSwitch(network);
+		new NetworkFlattener().doSwitch(network);
 
 		// print network
 		write("Printing network...\n");

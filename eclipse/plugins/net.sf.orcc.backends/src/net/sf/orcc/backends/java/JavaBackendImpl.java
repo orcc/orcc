@@ -43,6 +43,8 @@ import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transformations.BroadcastAdder;
+import net.sf.orcc.df.transformations.Instantiator;
+import net.sf.orcc.df.transformations.NetworkFlattener;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.util.OrccUtil;
@@ -86,6 +88,10 @@ public class JavaBackendImpl extends AbstractBackend {
 	}
 
 	private void doTransformNetwork(Network network) throws OrccException {
+		// instantiate and flattens network
+		new Instantiator().doSwitch(network);
+		new NetworkFlattener().doSwitch(network);
+
 		// Add broadcasts before printing
 		new BroadcastAdder().doSwitch(network);
 	}
@@ -105,8 +111,6 @@ public class JavaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
-		// transform network
-		network.flatten();
 		doTransformNetwork(network);
 
 		// print network

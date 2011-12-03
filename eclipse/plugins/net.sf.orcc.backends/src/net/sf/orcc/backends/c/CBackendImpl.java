@@ -47,6 +47,8 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
+import net.sf.orcc.df.transformations.Instantiator;
+import net.sf.orcc.df.transformations.NetworkFlattener;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.ir.util.IrUtil;
@@ -215,7 +217,9 @@ public class CBackendImpl extends AbstractBackend {
 		data.computeHierarchicalTemplateMaps(network);
 		network.setTemplateData(data);
 
-		network.flatten();
+		// instantiate and flattens network
+		new Instantiator().doSwitch(network);
+		new NetworkFlattener().doSwitch(network);
 
 		if (classify) {
 			write("Starting classification of actors... ");

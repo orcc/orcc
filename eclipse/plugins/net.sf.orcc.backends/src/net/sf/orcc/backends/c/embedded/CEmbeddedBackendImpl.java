@@ -40,6 +40,8 @@ import net.sf.orcc.backends.c.CNetworkTemplateData;
 import net.sf.orcc.backends.c.CTypePrinter;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.transformations.Instantiator;
+import net.sf.orcc.df.transformations.NetworkFlattener;
 import net.sf.orcc.moc.SDFMoC;
 
 /**
@@ -70,7 +72,7 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 		printer.setTypePrinter(new CTypePrinter());
 
 		// print network
-		
+
 		// This call is needed to associate instances to network vertices
 		network.computeTemplateMaps();
 
@@ -78,27 +80,29 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 		data.computeHierarchicalTemplateMaps(network);
 		network.setTemplateData(data);
 
-		network.flatten();
+		// instantiate and flattens network
+		new Instantiator().doSwitch(network);
+		new NetworkFlattener().doSwitch(network);
 
-		// The classification gives production and consumption information from the graph
+		// The classification gives production and consumption information from
+		// the graph
 		write("Starting classification of actors... ");
 		network.classify();
 		write("done\n");
-		
-		if(network.getMoC().isCSDF()){
-			SDFMoC moc = (SDFMoC)network.getActors().get(0).getMoC();
+
+		if (network.getMoC().isCSDF()) {
+			SDFMoC moc = (SDFMoC) network.getActors().get(0).getMoC();
 			moc.toString();
 			write("Printing network...\n");
 			printer.print(network.getName() + ".graphml", path, network);
-		}
-		else{
+		} else {
 			write("The network is not SDF. Other models are not yet supported.");
 		}
 	}
 
 	/**
-	 * Instead of printing actors' instances like in the C backend, we
-	 * wish to print actors and reference them from the network generated code.
+	 * Instead of printing actors' instances like in the C backend, we wish to
+	 * print actors and reference them from the network generated code.
 	 */
 	@Override
 	protected boolean printActor(Actor actor) throws OrccException {

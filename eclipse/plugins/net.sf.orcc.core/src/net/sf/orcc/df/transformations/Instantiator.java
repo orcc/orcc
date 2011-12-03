@@ -54,18 +54,49 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  */
 public class Instantiator extends DfSwitch<Void> {
 
+	private boolean skipActors;
+
+	/**
+	 * Creates a default instantiator, that will replace instances of networks
+	 * by instantiated networks, and instances of actors by instantiated actors.
+	 */
+	public Instantiator() {
+	}
+
+	/**
+	 * Creates an instantiator that will replace instances of networks by
+	 * instantiated networks, and if <code>instantiateActors</code> is true,
+	 * will also replace instances of actors by instantiated actors.
+	 * 
+	 * @param instantiateActors
+	 *            a flag
+	 */
+	public Instantiator(boolean instantiateActors) {
+		this.skipActors = !instantiateActors;
+	}
+
 	@Override
 	public Void caseNetwork(Network network) {
 		Copier copier = new Copier();
+		List<Instance> instances = new ArrayList<Instance>();
 		for (Instance instance : network.getInstances()) {
 			Entity entity = instance.getEntity();
 			if (entity.isNetwork()) {
 				Network subNetwork = instance.getNetwork();
-				new Instantiator().doSwitch(subNetwork);
+				new Instantiator(skipActors).doSwitch(subNetwork);
 			}
 
-			// copy entity
+			// if the entity is an actor and we should skip them
+			if (entity.isActor() && skipActors) {
+				continue;
+			}
+
+			// add instance to list of instances to remove
+			instances.add(instance);
+
+			// copy entity and add to the network's entities
 			Entity copy = (Entity) copier.copy(entity);
+			network.getEntities().add(copy);
 			copier.copyReferences();
 
 			// set name, attributes, arguments
@@ -78,9 +109,6 @@ public class Instantiator extends DfSwitch<Void> {
 
 				var.setInitialValue(value);
 			}
-
-			// add to entities
-			network.getEntities().add(copy);
 		}
 
 		// copy connections
@@ -97,7 +125,7 @@ public class Instantiator extends DfSwitch<Void> {
 		}
 
 		// remove all instances (automatically removes connections too)
-		network.getInstances().clear();
+		network.getInstances().removeAll(instances);
 
 		return null;
 	}

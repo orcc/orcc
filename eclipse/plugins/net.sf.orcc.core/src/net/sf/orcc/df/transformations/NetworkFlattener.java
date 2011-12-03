@@ -31,10 +31,9 @@ package net.sf.orcc.df.transformations;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.util.DfSwitch;
@@ -43,6 +42,8 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 
 /**
  * This class defines a transformation that flattens a given network in-place.
+ * The network must have been instantiated first, otherwise this transformation
+ * will not flatten anything.
  * 
  * @author Matthieu Wipliez
  * @author Ghislain Roquier
@@ -57,38 +58,39 @@ public class NetworkFlattener extends DfSwitch<Void> {
 
 	@Override
 	public Void caseNetwork(Network network) {
-		List<Instance> instances = new ArrayList<Instance>(
-				network.getInstances());
-		for (Instance instance : instances) {
-			if (instance.isNetwork()) {
-				Network subNetwork = instance.getNetwork();
+		List<Entity> entities = new ArrayList<Entity>(network.getEntities());
+		for (Entity entity : entities) {
+			if (entity.isNetwork()) {
+				Network subNetwork = (Network) entity;
 
 				// flatten this sub-network
 				new NetworkFlattener().doSwitch(subNetwork);
 
 				// copy vertices and edges
 				copier = new Copier();
-				copySubGraph(network, instance);
-				linkOutgoingConnections(network, instance);
-				linkIncomingConnections(network, instance);
+				copySubGraph(network, subNetwork);
+				linkOutgoingConnections(network, subNetwork);
+				linkIncomingConnections(network, subNetwork);
 				copier = null;
 
 				// remove instance from network
-				network.getInstances().remove(instance);
+				network.getEntities().remove(entity);
 			}
 		}
+
+		// if network is top-level, rename all entities
+		if (network.eContainer() == null) {
+			new UniqueNameTransformation().doSwitch(network);
+		}
+
 		return null;
 	}
 
 	/**
-	 * Copies all instances and edges between them of subGraph in graph
-	 * 
-	 * @throws OrccException
+	 * Copies all instances and edges between them of subNetwork in network.
 	 */
-	private void copySubGraph(Network network, Instance instance) {
-		Network subNetwork = instance.getNetwork();
-		network.getInstances()
-				.addAll(copier.copyAll(subNetwork.getInstances()));
+	private void copySubGraph(Network network, Network subNetwork) {
+		network.getEntities().addAll(copier.copyAll(subNetwork.getEntities()));
 		copier.copyReferences();
 
 		for (Connection connection : subNetwork.getConnections()) {
@@ -112,12 +114,12 @@ public class NetworkFlattener extends DfSwitch<Void> {
 	 * 
 	 * @param network
 	 *            the network
-	 * @param instance
-	 *            the current instance
+	 * @param subNetwork
+	 *            the sub network
 	 */
-	private void linkIncomingConnections(Network network, Instance instance) {
+	private void linkIncomingConnections(Network network, Network subNetwork) {
 		List<Connection> incomingEdges = new ArrayList<Connection>(
-				instance.getIncoming());
+				subNetwork.getIncoming());
 		for (Connection edge : incomingEdges) {
 			Vertex v = (Vertex) edge.getTargetPort();
 			List<Connection> outgoingEdges = v.getOutgoing();
@@ -138,12 +140,12 @@ public class NetworkFlattener extends DfSwitch<Void> {
 	 * 
 	 * @param network
 	 *            the network
-	 * @param instance
-	 *            the current instance
+	 * @param subNetwork
+	 *            the sub network
 	 */
-	private void linkOutgoingConnections(Network network, Instance instance) {
+	private void linkOutgoingConnections(Network network, Network subNetwork) {
 		List<Connection> outgoingEdges = new ArrayList<Connection>(
-				instance.getOutgoing());
+				subNetwork.getOutgoing());
 		for (Connection edge : outgoingEdges) {
 			Vertex v = edge.getSourcePort();
 			List<Connection> incomingEdges = v.getIncoming();

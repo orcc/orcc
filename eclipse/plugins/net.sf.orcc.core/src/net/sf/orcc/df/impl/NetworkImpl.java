@@ -33,7 +33,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -49,8 +48,6 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.transformations.NetworkClassifier;
-import net.sf.orcc.df.transformations.NetworkFlattener;
-import net.sf.orcc.df.transformations.ArgumentEvaluator;
 import net.sf.orcc.df.util.DfAdapterFactory;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
@@ -370,29 +367,6 @@ public class NetworkImpl extends EntityImpl implements Network {
 				return;
 		}
 		super.eUnset(featureID);
-	}
-
-	@Override
-	public void flatten() {
-		// evaluates arguments
-		new ArgumentEvaluator().doSwitch(this);
-
-		// transforms network
-		new NetworkFlattener().doSwitch(this);
-
-		// update identifiers
-		Map<String, Integer> identifiers = new HashMap<String, Integer>();
-		for (Instance instance : getInstances()) {
-			String id = instance.getName();
-			Integer num = identifiers.get(id);
-			if (num == null) {
-				identifiers.put(id, 0);
-			} else {
-				num++;
-				instance.setName(id + "_" + num);
-				identifiers.put(id, num);
-			}
-		}
 	}
 
 	/**

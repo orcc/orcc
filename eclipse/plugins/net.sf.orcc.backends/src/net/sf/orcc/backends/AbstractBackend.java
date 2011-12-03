@@ -50,7 +50,6 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.WriteListener;
@@ -153,16 +152,14 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		ResourceSet set = new ResourceSetImpl();
 
 		// parses top network
-		write("Parsing XDF network...\n");
 		Network network = IrUtil.deserializeEntity(set, inputFile);
 		if (isCanceled()) {
 			return;
 		}
 
-		write("Instantiating actors...\n");
+		write("Loading networks and actors... ");
 		EcoreUtil.resolveAll(set);
-		new Instantiator().doSwitch(network);
-		write("Instantiation done\n");
+		write("done\n");
 
 		// because the UnitImporter will load additional resources, we filter
 		// only actors

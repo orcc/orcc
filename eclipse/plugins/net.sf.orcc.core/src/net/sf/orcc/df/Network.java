@@ -62,12 +62,6 @@ public interface Network extends Entity {
 	void computeTemplateMaps();
 
 	/**
-	 * Flattens this network. Solves parameters and renames instances so that
-	 * two instances do not have the same identifier.
-	 */
-	void flatten();
-
-	/**
 	 * Returns the list of actors referenced by the graph of this network. This
 	 * is different from the list of instances of this network: There are
 	 * typically more instances than there are actors, because an actor may be
@@ -104,6 +98,14 @@ public interface Network extends Entity {
 	 * @model containment="true"
 	 */
 	EList<Connection> getConnections();
+
+	/**
+	 * Returns the list of entities contained in this network.
+	 * 
+	 * @return the list of entities contained in this network
+	 * @model containment="true"
+	 */
+	EList<Entity> getEntities();
 
 	/**
 	 * Returns the file this network is defined in.
@@ -227,22 +229,6 @@ public interface Network extends Entity {
 	 *            name of the file in which this entity is defined
 	 */
 	void setFileName(String fileName);
-
-	/**
-	 * Returns the value of the '<em><b>Entities</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.df.Entity}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Entities</em>' containment reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Entities</em>' containment reference list.
-	 * @see net.sf.orcc.df.DfPackage#getNetwork_Entities()
-	 * @model containment="true"
-	 * @generated
-	 */
-	EList<Entity> getEntities();
 
 	/**
 	 * Sets the MoC of this network.
