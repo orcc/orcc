@@ -144,6 +144,9 @@ public class XdfImporter {
 			vertex.setValue("port type", port.getType().toString());
 			vertex.setValue("native", port.isNative());
 			vertex.setValue(PARAMETER_ID, port.getName());
+			
+			// add vertex
+			vertexMap.put(port, vertex);
 			graph.addVertex(vertex);
 		}
 
