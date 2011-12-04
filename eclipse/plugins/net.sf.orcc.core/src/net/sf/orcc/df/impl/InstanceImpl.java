@@ -280,12 +280,12 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	@Override
 	public boolean isActor() {
-		return (getEntity() instanceof Actor);
+		return getEntity().isActor();
 	}
 
 	@Override
 	public boolean isBroadcast() {
-		return (getEntity() instanceof Broadcast);
+		return getEntity().isBroadcast();
 	}
 
 	@Override
@@ -295,7 +295,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	@Override
 	public boolean isNetwork() {
-		return (getEntity() instanceof Network);
+		return getEntity().isNetwork();
 	}
 
 	@Override

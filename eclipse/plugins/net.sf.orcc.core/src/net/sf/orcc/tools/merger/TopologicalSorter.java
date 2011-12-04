@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +82,9 @@ public class TopologicalSorter {
 		}
 
 		private Map<Vertex, TimeStamp> getTimestamps() {
-			for (Vertex vertex : network.getVertices()) {
+			Iterator<Vertex> it = network.getVertices();
+			while (it.hasNext()) {
+				Vertex vertex = it.next();
 				if (!defined.contains(vertex)) {
 					dfsVisit(vertex);
 				}

@@ -34,6 +34,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -543,9 +544,9 @@ public class NetworkImpl extends EntityImpl implements Network {
 	}
 
 	@Override
-	public Iterable<Vertex> getVertices() {
+	public Iterator<Vertex> getVertices() {
 		return Iterables.concat(getInputs(), getOutputs(), getInstances(),
-				getEntities());
+				getEntities()).iterator();
 	}
 
 	@Override

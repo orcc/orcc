@@ -32,6 +32,7 @@ package net.sf.orcc.tools.merger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -86,8 +87,9 @@ public class StaticRegionDetector {
 		DirectedGraph<Vertex, Connection> clusteredGraph = new DirectedMultigraph<Vertex, Connection>(
 				Connection.class);
 
-		for (Vertex vertex : network.getVertices()) {
-			clusteredGraph.addVertex(vertex);
+		Iterator<Vertex> it = network.getVertices();
+		while (it.hasNext()) {
+			clusteredGraph.addVertex(it.next());
 		}
 
 		for (Connection connection : network.getConnections()) {

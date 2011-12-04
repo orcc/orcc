@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.df;
 
+import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
@@ -168,12 +169,12 @@ public interface Network extends Entity {
 	EList<Var> getVariables();
 
 	/**
-	 * Returns an Iterable over this network's vertices (concatenation of
-	 * inputs, outputs, instances, and entities).
+	 * Returns the list of this network's vertices (concatenation of inputs,
+	 * outputs, instances, and entities).
 	 * 
-	 * @return an Iterable over this network's vertices
+	 * @return the list of this network's vertices
 	 */
-	Iterable<Vertex> getVertices();
+	Iterator<Vertex> getVertices();
 
 	/**
 	 * Merges actors of this network. Note that for this transformation to work

@@ -45,7 +45,7 @@ import net.sf.orcc.df.util.DfSwitch;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
-import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 /**
  * Adds broadcast actors when needed.
@@ -67,8 +67,7 @@ public class BroadcastAdder extends DfSwitch<Void> {
 
 		// make a copy of the existing vertex set because the set returned is
 		// modified when broadcasts are added
-		List<Vertex> vertexSet = new ArrayList<Vertex>();
-		Iterables.addAll(vertexSet, network.getVertices());
+		List<Vertex> vertexSet = Lists.newArrayList(network.getVertices());
 
 		for (Vertex vertex : vertexSet) {
 			if (vertex.isEntity()) {
