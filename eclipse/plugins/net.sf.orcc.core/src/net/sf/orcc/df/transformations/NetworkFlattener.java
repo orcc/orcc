@@ -96,7 +96,7 @@ public class NetworkFlattener extends DfSwitch<Void> {
 		for (Connection connection : subNetwork.getConnections()) {
 			Vertex source = connection.getSource();
 			Vertex target = connection.getTarget();
-			if (source.isInstance() && target.isInstance()) {
+			if (!source.isPort() && !target.isPort()) {
 				Vertex sourceCopy = (Vertex) copier.get(source);
 				Vertex targetCopy = (Vertex) copier.get(target);
 				Connection copy = DfFactory.eINSTANCE.createConnection(

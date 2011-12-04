@@ -131,7 +131,7 @@ public class TTABackendImpl extends AbstractBackend {
 
 	private void doTransformNetwork(Network network) throws OrccException {
 		// instantiate and flattens network
-		new Instantiator().doSwitch(network);
+		network = new Instantiator().doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
 
 		new BroadcastAdder().doSwitch(network);

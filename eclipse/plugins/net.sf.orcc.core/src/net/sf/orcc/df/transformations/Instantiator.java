@@ -28,11 +28,6 @@
  */
 package net.sf.orcc.df.transformations;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
@@ -44,30 +39,30 @@ import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.moc.MoC;
 
 import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 
 /**
- * This class defines a transformation that instantiates actors and networks in
- * a network.
+ * This class defines a transformation that transforms a network into a new
+ * network where instances of actors and networks are replaced by new actors and
+ * networks where the value of parameters have been appropriately replaced.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class Instantiator extends DfSwitch<Void> {
+public class Instantiator extends DfSwitch<Network> {
 
 	private Copier copier;
-
-	private Map<Instance, Entity> map;
 
 	private boolean skipActors;
 
 	/**
-	 * Creates a default instantiator, which replaces instances of networks by
-	 * instantiated networks, and instances of actors by instantiated actors.
+	 * Creates a default instantiator, equivalent to
+	 * <code>Instantiator(false)</code>.
 	 */
 	public Instantiator() {
+		this(false);
 	}
 
 	/**
@@ -81,94 +76,97 @@ public class Instantiator extends DfSwitch<Void> {
 	 */
 	public Instantiator(boolean skipActors) {
 		this.skipActors = skipActors;
+		copier = new Copier();
 	}
 
 	@Override
-	public Void caseNetwork(Network network) {
-		copier = new Copier();
-		map = new HashMap<Instance, Entity>();
+	public Network caseNetwork(Network network) {
+		Network networkCopy = DfFactory.eINSTANCE.createNetwork();
 
-		List<Instance> instances = new ArrayList<Instance>();
+		// copy name, filename, moc
+		networkCopy.setFileName(network.getFileName());
+		networkCopy.setName(network.getName());
+		networkCopy.setMoC((MoC) copier.copy(network.getMoC()));
+
+		// copy ports, parameters, variables
+		networkCopy.getInputs().addAll(copier.copyAll(network.getInputs()));
+		networkCopy.getOutputs().addAll(copier.copyAll(network.getOutputs()));
+		networkCopy.getParameters().addAll(
+				copier.copyAll(network.getParameters()));
+		networkCopy.getVariables().addAll(
+				copier.copyAll(network.getVariables()));
+
+		// copy instances to entities/instances
 		for (Instance instance : network.getInstances()) {
 			Entity entity = instance.getEntity();
-			if (entity.isNetwork()) {
-				Network subNetwork = instance.getNetwork();
-				new Instantiator(skipActors).doSwitch(subNetwork);
-			}
-
-			// if the entity is an actor and we should skip them
 			if (entity.isActor() && skipActors) {
-				continue;
-			}
+				Instance copy = (Instance) copier.copy(instance);
+				networkCopy.getInstances().add(copy);
+			} else {
+				if (entity.isNetwork()) {
+					entity = doSwitch(entity);
+				} else {
+					entity = (Entity) copier.copy(entity);
+				}
 
-			// add instance to list of instances to remove
-			instances.add(instance);
+				// add entity to the network's entities
+				networkCopy.getEntities().add(entity);
 
-			// copy entity and add to the network's entities
-			Entity copy = (Entity) copier.copy(entity);
-			network.getEntities().add(copy);
-			copier.copyReferences();
-			map.put(instance, copy);
+				// set name, attributes, arguments
+				entity.setName(instance.getName());
+				entity.getAttributes().addAll(
+						copier.copyAll(instance.getAttributes()));
+				for (Argument argument : instance.getArguments()) {
+					Var var = argument.getVariable();
+					var = entity.getParameter(var.getName());
 
-			// set name, attributes, arguments
-			copy.setName(instance.getName());
-			copy.getAttributes().addAll(
-					copier.copyAll(instance.getAttributes()));
-			for (Argument argument : instance.getArguments()) {
-				Var var = (Var) copier.get(argument.getVariable());
-				Expression value = IrUtil.copy(argument.getValue());
+					Expression value = argument.getValue();
+					Expression copyValue = (Expression) copier.copy(value);
 
-				var.setInitialValue(value);
+					var.setInitialValue(copyValue);
+				}
 			}
 		}
+		copier.copyReferences();
 
 		// copy connections
-		List<Connection> connections = new ArrayList<Connection>(
-				network.getConnections());
-		for (Connection connection : connections) {
+		for (Connection connection : network.getConnections()) {
 			Vertex source = getCopy(connection.getSource());
 			Vertex target = getCopy(connection.getTarget());
 
-			Port sourcePort = getPort(connection.getSource(),
-					connection.getSourcePort());
-			Port targetPort = getPort(connection.getTarget(),
-					connection.getTargetPort());
+			Port sourcePort = getPort(source, connection.getSourcePort());
+			Port targetPort = getPort(target, connection.getTargetPort());
 
 			Connection copy = DfFactory.eINSTANCE.createConnection(source,
 					sourcePort, target, targetPort,
 					copier.copyAll(connection.getAttributes()));
-			network.getConnections().add(copy);
+			networkCopy.getConnections().add(copy);
 		}
 
-		// remove all instances (automatically removes connections too)
-		network.getInstances().removeAll(instances);
-
-		return null;
+		return networkCopy;
 	}
 
-	private Port getPort(Vertex vertex, Port port) {
-		if (!vertex.isInstance() || port == null) {
-			return null;
-		}
-
-		Instance instance = (Instance) vertex;
-		Entity entity = (Entity) map.get(instance);
-		if (entity == null) {
-			return port;
-		}
-
-		return entity.getPort(port.getName());
-	}
-
-	private Vertex getCopy(Vertex source) {
-		Vertex result = source;
-		if (source.isInstance()) {
-			Entity copy = map.get((Instance) source);
-			if (copy != null) {
-				result = copy;
+	private Vertex getCopy(Vertex vertex) {
+		Vertex result = (Vertex) copier.get(vertex);
+		if (result == null) {
+			// instance was not copied
+			Entity entity = ((Instance) vertex).getEntity();
+			if (entity.isNetwork()) {
+				result = entity;
+			} else {
+				result = (Entity) copier.get(entity);
 			}
 		}
 		return result;
+	}
+
+	private Port getPort(Vertex vertex, Port port) {
+		if (vertex.isEntity()) {
+			Entity entity = (Entity) vertex;
+			return entity.getPort(port.getName());
+		} else {
+			return port;
+		}
 	}
 
 }

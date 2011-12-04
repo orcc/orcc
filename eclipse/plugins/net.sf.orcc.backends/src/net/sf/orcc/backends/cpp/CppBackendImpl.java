@@ -146,7 +146,7 @@ public class CppBackendImpl extends AbstractBackend {
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		// instantiate and flattens network
-		new Instantiator().doSwitch(network);
+		network = new Instantiator().doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
 
 		transformActors(network.getActors());

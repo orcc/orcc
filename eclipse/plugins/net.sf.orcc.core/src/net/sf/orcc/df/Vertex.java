@@ -106,6 +106,14 @@ public interface Vertex extends Nameable {
 	Object getTemplateData();
 
 	/**
+	 * Returns <code>true</code> if this vertex is an Entity, and
+	 * <code>false</code> otherwise.
+	 * 
+	 * @return <code>true</code> if this vertex is an Entity
+	 */
+	boolean isEntity();
+
+	/**
 	 * Returns <code>true</code> if this vertex is an instance, and
 	 * <code>false</code> otherwise.
 	 * 

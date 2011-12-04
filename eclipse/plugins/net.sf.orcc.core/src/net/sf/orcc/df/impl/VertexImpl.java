@@ -314,6 +314,11 @@ public abstract class VertexImpl extends NameableImpl implements Vertex {
 	}
 
 	@Override
+	public boolean isEntity() {
+		return false;
+	}
+
+	@Override
 	public boolean isInstance() {
 		return false;
 	}

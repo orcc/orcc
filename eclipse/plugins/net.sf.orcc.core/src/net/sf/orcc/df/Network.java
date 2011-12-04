@@ -151,34 +151,6 @@ public interface Network extends Entity {
 	MoC getMoC();
 
 	/**
-	 * Returns the package of this entity.
-	 * 
-	 * @return the package of this entity
-	 */
-	String getPackage();
-
-	/**
-	 * Returns the package of this entity as a list of strings.
-	 * 
-	 * @return the package of this entity as a list of strings
-	 */
-	List<String> getPackageAsList();
-
-	/**
-	 * Returns the simple name of this entity.
-	 * 
-	 * @return the simple name of this entity
-	 */
-	String getSimpleName();
-
-	/**
-	 * Returns an object with template-specific data.
-	 * 
-	 * @return an object with template-specific data
-	 */
-	Object getTemplateData();
-
-	/**
 	 * Returns the variable with the given name.
 	 * 
 	 * @param name
@@ -237,14 +209,5 @@ public interface Network extends Entity {
 	 *            the new MoC of this network
 	 */
 	void setMoC(MoC moc);
-
-	/**
-	 * Sets the template data associated with this entity. Template data should
-	 * hold data that is specific to a given template.
-	 * 
-	 * @param templateData
-	 *            an object with template-specific data
-	 */
-	void setTemplateData(Object templateData);
 
 }

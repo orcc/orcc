@@ -89,11 +89,6 @@ public class NetworkImpl extends EntityImpl implements Network {
 	protected MoC moC;
 
 	/**
-	 * holds template-specific data.
-	 */
-	private Object templateData;
-
-	/**
 	 * @generated
 	 */
 	protected EList<Var> variables;
@@ -525,51 +520,6 @@ public class NetworkImpl extends EntityImpl implements Network {
 	}
 
 	@Override
-	public String getPackage() {
-		if (name == null) {
-			return null;
-		}
-		int index = name.lastIndexOf('.');
-		if (index == -1) {
-			return "";
-		} else {
-			return name.substring(0, index);
-		}
-	}
-
-	@Override
-	public List<String> getPackageAsList() {
-		String[] segments = name == null ? new String[0] : name.split("\\.");
-		List<String> list = new ArrayList<String>(segments.length - 1);
-		for (int i = 0; i < segments.length - 1; i++) {
-			list.add(segments[i]);
-		}
-		return list;
-	}
-
-	@Override
-	public String getSimpleName() {
-		if (name == null) {
-			return null;
-		}
-		int index = name.lastIndexOf('.');
-		if (index == -1) {
-			return name;
-		} else {
-			return name.substring(index + 1);
-		}
-	}
-
-	/**
-	 * Returns an object with template-specific data.
-	 * 
-	 * @return an object with template-specific data
-	 */
-	public Object getTemplateData() {
-		return templateData;
-	}
-
-	@Override
 	public Var getVariable(String name) {
 		for (Var var : getVariables()) {
 			if (var.getName().equals(name)) {
@@ -666,11 +616,6 @@ public class NetworkImpl extends EntityImpl implements Network {
 		} else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
 					DfPackage.NETWORK__MO_C, newMoC, newMoC));
-	}
-
-	@Override
-	public void setTemplateData(Object templateData) {
-		this.templateData = templateData;
 	}
 
 	@Override

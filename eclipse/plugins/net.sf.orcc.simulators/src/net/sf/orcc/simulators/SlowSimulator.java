@@ -247,7 +247,7 @@ public class SlowSimulator extends AbstractSimulator {
 			EcoreUtil.resolveAll(set);
 
 			// instantiate and flattens network
-			new Instantiator().doSwitch(network);
+			network = new Instantiator().doSwitch(network);
 			new NetworkFlattener().doSwitch(network);
 
 			// Parse XDF file, do some transformations and return the

@@ -259,6 +259,11 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 	}
 
 	@Override
+	public boolean isEntity() {
+		return true;
+	}
+
+	@Override
 	public boolean isNetwork() {
 		return false;
 	}
