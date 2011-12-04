@@ -28,12 +28,11 @@
  */
 package net.sf.orcc.backends.c.transformations;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.transformations.BroadcastAdder;
@@ -58,9 +57,10 @@ public class CBroadcastAdder extends BroadcastAdder {
 	}
 
 	@Override
-	protected void examineConnections(Vertex vertex,
-			Set<Connection> connections, Map<Port, List<Connection>> outMap) {
-		Instance instance = (Instance) vertex;
+	public Void caseVertex(Vertex vertex) {
+		List<Connection> connections = new ArrayList<Connection>(
+				vertex.getOutgoing());
+		Map<Port, List<Connection>> outMap = vertex.getOutgoingPortMap();
 		for (Connection connection : connections) {
 			Port srcPort = connection.getSourcePort();
 			if (srcPort != null) {
@@ -70,24 +70,26 @@ public class CBroadcastAdder extends BroadcastAdder {
 					int size = getSize(outList.get(0));
 					for (Connection connec : outList) {
 						if (size != getSize(connec)) {
-							createBroadcast(instance.getName(), srcPort,
-									outList);
+							createBroadcast(vertex.getName(), srcPort, outList);
 							writeListener
 									.writeText("Warning: Different-sized FIFOs connected to port '"
 											+ srcPort.getName()
 											+ "' from '"
-											+ instance.getName()
+											+ vertex.getName()
 											+ "'. A broadcast is created.\n");
-							return;
+							return null;
 						}
 					}
 				}
 			}
 		}
+
+		return null;
 	}
 
 	private int getSize(Connection connection) {
 		return connection.getSize() == null ? defaultFifoSize : connection
 				.getSize();
 	}
+
 }

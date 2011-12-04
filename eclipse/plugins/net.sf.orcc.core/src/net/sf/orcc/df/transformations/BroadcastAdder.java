@@ -29,19 +29,21 @@
 package net.sf.orcc.df.transformations;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
+import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.util.DfSwitch;
+
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 import com.google.common.collect.Iterables;
 
@@ -56,12 +58,12 @@ public class BroadcastAdder extends DfSwitch<Void> {
 
 	private Network network;
 
-	protected Set<Connection> toBeRemoved;
+	protected List<Connection> toBeRemoved;
 
 	@Override
 	public Void caseNetwork(Network network) {
 		this.network = network;
-		toBeRemoved = new HashSet<Connection>();
+		toBeRemoved = new ArrayList<Connection>();
 
 		// make a copy of the existing vertex set because the set returned is
 		// modified when broadcasts are added
@@ -69,14 +71,15 @@ public class BroadcastAdder extends DfSwitch<Void> {
 		Iterables.addAll(vertexSet, network.getVertices());
 
 		for (Vertex vertex : vertexSet) {
-			if (vertex.isInstance()) {
-				Instance instance = (Instance) vertex;
-				if (instance.isNetwork()) {
-					new BroadcastAdder().doSwitch(instance.getNetwork());
+			if (vertex.isEntity()) {
+				Entity entity = (Entity) vertex;
+				if (entity.isNetwork()) {
+					new BroadcastAdder().doSwitch(entity);
 				}
+				caseVertex(vertex);
+			} else {
+				doSwitch(vertex);
 			}
-
-			examineVertex(vertex);
 		}
 
 		// removes old connections
@@ -90,36 +93,22 @@ public class BroadcastAdder extends DfSwitch<Void> {
 		// add broadcast vertex
 		Broadcast bcast = DfFactory.eINSTANCE.createBroadcast(outList.size(),
 				port.getType());
-		String name = id + "_" + port.getName();
-		Instance newInst = DfFactory.eINSTANCE.createInstance(name, bcast);
-		network.getInstances().add(newInst);
+		bcast.setName(id + "_" + port.getName());
+		network.getEntities().add(bcast);
 
 		// add connections
-		createIncomingConnection(outList.get(0), outList.get(0).getSource(),
-				newInst);
-		createOutgoingConnections(newInst, outList);
-	}
-
-	/**
-	 * Creates a connection between the source vertex and the broadcast.
-	 * 
-	 * @param connection
-	 *            the connection outgoing of vertex
-	 * @param vertex
-	 *            the vertex
-	 * @param vertexBCast
-	 *            the vertex that contains the broadcast
-	 */
-	protected void createIncomingConnection(Connection connection,
-			Vertex vertex, Vertex vertexBCast) {
-		Broadcast bcast = ((Instance) vertexBCast).getBroadcast();
-		Port bcastInput = bcast.getInput();
+		Connection conn = outList.get(0);
+		Vertex vertex = conn.getSource();
+		Port sourcePort = conn.getSourcePort();
+		Collection<Attribute> attributes = EcoreUtil.copyAll(conn
+				.getAttributes());
 
 		// creates a connection between the vertex and the broadcast
-		Port srcPort = connection.getSourcePort();
 		Connection incoming = DfFactory.eINSTANCE.createConnection(vertex,
-				srcPort, vertexBCast, bcastInput, connection.getAttributes());
+				sourcePort, bcast, bcast.getInput(), attributes);
 		network.getConnections().add(incoming);
+
+		createOutgoingConnections(bcast, outList);
 	}
 
 	/**
@@ -129,9 +118,8 @@ public class BroadcastAdder extends DfSwitch<Void> {
 	 * @param vertexBCast
 	 * @param outList
 	 */
-	private void createOutgoingConnections(Vertex vertexBCast,
+	private void createOutgoingConnections(Broadcast bcast,
 			List<Connection> outList) {
-		Broadcast bcast = ((Instance) vertexBCast).getBroadcast();
 		int i = 0;
 		for (Connection connection : outList) {
 			// new connection
@@ -140,8 +128,8 @@ public class BroadcastAdder extends DfSwitch<Void> {
 			i++;
 
 			Connection connBcastTarget = DfFactory.eINSTANCE.createConnection(
-					vertexBCast, outputPort, target,
-					connection.getTargetPort(), connection.getAttributes());
+					bcast, outputPort, target, connection.getTargetPort(),
+					connection.getAttributes());
 			network.getConnections().add(connBcastTarget);
 
 			// setting source to null so we don't examine it again
@@ -153,50 +141,33 @@ public class BroadcastAdder extends DfSwitch<Void> {
 		}
 	}
 
-	/**
-	 * Examine the outgoing connections of vertex.
-	 * 
-	 * @param vertex
-	 *            a vertex
-	 * @param connections
-	 *            the outgoing connections of vertex
-	 * @param outMap
-	 *            a map from each output port P(i) of vertex to a list of
-	 *            outgoing connections from P(i)
-	 */
-	protected void examineConnections(Vertex vertex,
-			Set<Connection> connections, Map<Port, List<Connection>> outMap) {
-		if (vertex.isInstance()) {
-			Instance instance = (Instance) vertex;
-			for (Connection connection : connections) {
-				Port srcPort = connection.getSourcePort();
-				if (srcPort != null) {
-					List<Connection> outList = outMap.get(srcPort);
-					int numOutput = outList.size();
-					if (numOutput > 1) {
-						createBroadcast(instance.getName(), srcPort, outList);
-					}
-				}
-			}
-		} else {
-			if (connections.size() > 1) {
-				Port port = (Port) vertex;
-				createBroadcast(network.getName(), port,
-						new ArrayList<Connection>(connections));
-			}
+	@Override
+	public Void casePort(Port port) {
+		List<Connection> connections = new ArrayList<Connection>(
+				port.getOutgoing());
+		if (connections.size() > 1) {
+			createBroadcast(network.getName(), port, connections);
 		}
+		return (Void) new Object();
 	}
 
-	protected void examineVertex(Vertex vertex) {
-		// make a copy of the existing outgoing connections of vertex because
-		// the set returned is modified when new edges are added
-		Set<Connection> connections = new HashSet<Connection>(
+	@Override
+	public Void caseVertex(Vertex vertex) {
+		List<Connection> connections = new ArrayList<Connection>(
 				vertex.getOutgoing());
-
-		// for each connection, add it to a port => connection map
-		// port is a port of vertex
 		Map<Port, List<Connection>> outMap = vertex.getOutgoingPortMap();
-		examineConnections(vertex, connections, outMap);
+		for (Connection connection : connections) {
+			Port srcPort = connection.getSourcePort();
+			if (srcPort != null) {
+				List<Connection> outList = outMap.get(srcPort);
+				int numOutput = outList.size();
+				if (numOutput > 1) {
+					createBroadcast(vertex.getName(), srcPort, outList);
+				}
+			}
+		}
+
+		return null;
 	}
 
 }
