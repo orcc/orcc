@@ -38,8 +38,6 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.util.DfSwitch;
 
-import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
-
 /**
  * This class defines a transformation that flattens a given network in-place.
  * The network must have been instantiated first, otherwise this transformation
@@ -50,8 +48,6 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  * 
  */
 public class NetworkFlattener extends DfSwitch<Void> {
-
-	private Copier copier;
 
 	public NetworkFlattener() {
 	}
@@ -66,14 +62,12 @@ public class NetworkFlattener extends DfSwitch<Void> {
 				// flatten this sub-network
 				new NetworkFlattener().doSwitch(subNetwork);
 
-				// copy vertices and edges
-				copier = new Copier();
-				copySubGraph(network, subNetwork);
+				moveEntitiesAndConnections(network, subNetwork);
+
 				linkOutgoingConnections(network, subNetwork);
 				linkIncomingConnections(network, subNetwork);
-				copier = null;
 
-				// remove instance from network
+				// remove entity from network
 				network.getEntities().remove(entity);
 			}
 		}
@@ -87,30 +81,8 @@ public class NetworkFlattener extends DfSwitch<Void> {
 	}
 
 	/**
-	 * Copies all instances and edges between them of subNetwork in network.
-	 */
-	private void copySubGraph(Network network, Network subNetwork) {
-		network.getEntities().addAll(copier.copyAll(subNetwork.getEntities()));
-		copier.copyReferences();
-
-		for (Connection connection : subNetwork.getConnections()) {
-			Vertex source = connection.getSource();
-			Vertex target = connection.getTarget();
-			if (!source.isPort() && !target.isPort()) {
-				Vertex sourceCopy = (Vertex) copier.get(source);
-				Vertex targetCopy = (Vertex) copier.get(target);
-				Connection copy = DfFactory.eINSTANCE.createConnection(
-						sourceCopy, connection.getSourcePort(), targetCopy,
-						connection.getTargetPort(),
-						copier.copyAll(connection.getAttributes()));
-				network.getConnections().add(copy);
-			}
-		}
-	}
-
-	/**
-	 * Adds edges in the network between predecessors of the vertex and
-	 * successors of the input port.
+	 * Adds edges in the network between predecessors of the sub-network and
+	 * successors of its input ports.
 	 * 
 	 * @param network
 	 *            the network
@@ -121,22 +93,21 @@ public class NetworkFlattener extends DfSwitch<Void> {
 		List<Connection> incomingEdges = new ArrayList<Connection>(
 				subNetwork.getIncoming());
 		for (Connection edge : incomingEdges) {
-			Vertex v = (Vertex) edge.getTargetPort();
-			List<Connection> outgoingEdges = v.getOutgoing();
+			List<Connection> outgoingEdges = edge.getTargetPort().getOutgoing();
 
-			for (Connection newEdge : outgoingEdges) {
-				Vertex target = (Vertex) copier.get(newEdge.getTarget());
+			for (Connection outgoingEdge : outgoingEdges) {
 				Connection incoming = DfFactory.eINSTANCE.createConnection(
-						edge.getSource(), edge.getSourcePort(), target,
-						newEdge.getTargetPort(), edge.getAttributes());
+						edge.getSource(), edge.getSourcePort(),
+						outgoingEdge.getTarget(), outgoingEdge.getTargetPort(),
+						edge.getAttributes());
 				network.getConnections().add(incoming);
 			}
 		}
 	}
 
 	/**
-	 * Adds edges in the network between predecessors of the output port and
-	 * successors of the vertex.
+	 * Adds edges in the network between successors of the sub-network and
+	 * predecessors of its output ports.
 	 * 
 	 * @param network
 	 *            the network
@@ -147,17 +118,37 @@ public class NetworkFlattener extends DfSwitch<Void> {
 		List<Connection> outgoingEdges = new ArrayList<Connection>(
 				subNetwork.getOutgoing());
 		for (Connection edge : outgoingEdges) {
-			Vertex v = edge.getSourcePort();
-			List<Connection> incomingEdges = v.getIncoming();
+			List<Connection> incomingEdges = edge.getSourcePort().getIncoming();
 
-			for (Connection newEdge : incomingEdges) {
-				Vertex source = (Vertex) copier.get(newEdge.getSource());
+			for (Connection incomingEdge : incomingEdges) {
 				Connection incoming = DfFactory.eINSTANCE.createConnection(
-						source, newEdge.getSourcePort(), edge.getTarget(),
-						edge.getTargetPort(), edge.getAttributes());
+						incomingEdge.getSource(), incomingEdge.getSourcePort(),
+						edge.getTarget(), edge.getTargetPort(),
+						edge.getAttributes());
 				network.getConnections().add(incoming);
 			}
 		}
+	}
+
+	private void moveEntitiesAndConnections(Network network, Network subNetwork) {
+		// remove adapter of subNetwork
+		// so that connections are not automatically updated
+		subNetwork.eAdapters().clear();
+
+		// move entities in this network
+		network.getEntities().addAll(subNetwork.getEntities());
+
+		// move connections between entities in this network
+		List<Connection> connections = new ArrayList<Connection>();
+		for (Connection connection : subNetwork.getConnections()) {
+			Vertex source = connection.getSource();
+			Vertex target = connection.getTarget();
+			if (!source.isPort() && !target.isPort()) {
+				connections.add(connection);
+			}
+		}
+
+		network.getConnections().addAll(connections);
 	}
 
 }

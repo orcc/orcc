@@ -149,8 +149,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 	protected NetworkImpl() {
 		super();
 
-		// add adapter to update the vertices and connections if an instance or
-		// a port is removed
+		// add adapter to update connections when a Vertex is added/removed
 		eAdapters().add(new DfAdapterFactory().createNetworkAdapter());
 	}
 

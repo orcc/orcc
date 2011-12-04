@@ -488,4 +488,21 @@ public class ConnectionImpl extends EObjectImpl implements Connection {
 			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.CONNECTION__TARGET_PORT, oldTargetPort, targetPort));
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(getSource().getName());
+		if (getSourcePort() != null) {
+			builder.append('.');
+			builder.append(getSourcePort().getName());
+		}
+		builder.append(" --> ");
+		builder.append(getTarget().getName());
+		if (getTargetPort() != null) {
+			builder.append('.');
+			builder.append(getTargetPort().getName());
+		}
+		return builder.toString();
+	}
+
 }
