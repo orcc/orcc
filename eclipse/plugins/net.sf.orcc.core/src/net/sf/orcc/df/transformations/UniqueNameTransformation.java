@@ -29,10 +29,11 @@
 package net.sf.orcc.df.transformations;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
-import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.util.DfSwitch;
 
 /**
@@ -51,24 +52,25 @@ public class UniqueNameTransformation extends DfSwitch<Void> {
 	}
 
 	@Override
-	public Void caseEntity(Entity entity) {
-		String id = entity.getName();
-		Integer num = identifiers.get(id);
-		if (num == null) {
-			identifiers.put(id, 0);
-		} else {
-			num++;
-			entity.setName(id + "_" + num);
-			identifiers.put(id, num);
+	public Void caseNetwork(Network network) {
+		Iterator<Vertex> it = network.getVertices();
+		while (it.hasNext()) {
+			doSwitch(it.next());
 		}
 
 		return null;
 	}
 
 	@Override
-	public Void caseNetwork(Network network) {
-		for (Entity entity : network.getEntities()) {
-			doSwitch(entity);
+	public Void caseVertex(Vertex vertex) {
+		String id = vertex.getName();
+		Integer num = identifiers.get(id);
+		if (num == null) {
+			identifiers.put(id, 0);
+		} else {
+			num++;
+			vertex.setName(id + "_" + num);
+			identifiers.put(id, num);
 		}
 
 		return null;

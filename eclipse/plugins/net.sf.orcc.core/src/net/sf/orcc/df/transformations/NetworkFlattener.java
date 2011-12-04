@@ -142,7 +142,6 @@ public class NetworkFlattener extends DfSwitch<Void> {
 	}
 
 	private void moveEntitiesAndConnections(Network network, Network subNetwork) {
-
 		// move entities in this network
 		network.getEntities().addAll(subNetwork.getEntities());
 		network.getInstances().addAll(subNetwork.getInstances());
