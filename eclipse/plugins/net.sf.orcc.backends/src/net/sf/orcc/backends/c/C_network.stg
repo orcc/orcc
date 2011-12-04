@@ -1,9 +1,9 @@
-GetInstanceId(instance) ::= <<
-<if (instance.broadcast)>bcast_<endif><instance.id>
+GetInstanceId(vertex) ::= <<
+<if (vertex.broadcast)>bcast_<endif><vertex.name>
 >>
 
-BroadcastWrite(n,port) ::= <<
-fifo_<instance.broadcast.type>_write_1(<GetInstanceId(instance)>_output_<n>, tok_input);
+BroadcastWrite(n, port) ::= <<
+fifo_<vertex.type>_write_1(<GetInstanceId(vertex)>_output_<n>, tok_input);
 >>
 
 printBroadcastWrite(OutputNum, OutputPorts) ::= <<
@@ -14,7 +14,7 @@ printBroadcastWrite(OutputNum, OutputPorts) ::= <<
 >>
 
 outputPatternPort(num, port) ::= <<
-if (!fifo_<instance.broadcast.type>_has_room(<GetInstanceId(instance)>_output_<num>, 1, 1)) {
+if (!fifo_<vertex.type>_has_room(<GetInstanceId(vertex)>_output_<num>, 1, 1)) {
 	ports |= (1 \<\< <num>);
 }
 >>
@@ -39,18 +39,18 @@ if (ports != 0) {
 <endif>
 >>
 
-declareBroadcast(instance) ::= <<
-<if (instance.broadcast)
+declareBroadcast(vertex) ::= <<
+<if (vertex.broadcast)
 >
-void <GetInstanceId(instance)>_scheduler(struct schedinfo_s *si) {
+void <GetInstanceId(vertex)>_scheduler(struct schedinfo_s *si) {
 	int i = 0;
-	<instance.broadcast.type> tok_input;
+	<vertex.type> tok_input;
 
-	while (fifo_<instance.broadcast.type>_has_tokens(<GetInstanceId(instance)>_input, 0, 1)) {
-		<printOutputPattern(instance.broadcast.outputList,instance.broadcast.outputs.list)>
+	while (fifo_<vertex.type>_has_tokens(<GetInstanceId(vertex)>_input, 0, 1)) {
+		<printOutputPattern(vertex.outputList, vertex.outputs.list)>
 
-		tok_input = fifo_<instance.broadcast.type>_read_1(<GetInstanceId(instance)>_input, 0);
-		<printBroadcastWrite(instance.broadcast.outputList,instance.broadcast.outputs.list)>
+		tok_input = fifo_<vertex.type>_read_1(<GetInstanceId(vertex)>_input, 0);
+		<printBroadcastWrite(vertex.outputList, vertex.outputs.list)>
 		i++;
 	}
 
@@ -66,32 +66,33 @@ endif>
 // allocates FIFOs
 
 allocateFifo(edge, readers_nb) ::= <%
-<if (edge.source.instance && edge.target.instance)>
+<if (!edge.source.port && !edge.target.port)>
 <if (edge.source.broadcast || edge.source.actor)>
 DECLARE_FIFO(<edge.sourcePort.type>, <if(edge.size)><edge.size><else>SIZE<endif>, <edge.idNoBcast>, <readers_nb>)
 <else>
 DECLARE_FIFO(<edge.targetPort.type>, <if(edge.size)><edge.size><else>SIZE<endif>, <edge.idNoBcast>, <readers_nb>)
 <endif>
 <else>
+// not sure why this is printed?
 <edge.source>
 <edge.target>
 <endif>
 %>
 
-allocateFifos(instance) ::= <<
-<instance.outgoingPortMap.keys: {port |<allocateFifo(first(instance.outgoingPortMap.(port)), length(instance.outgoingPortMap.(port)))><\n>}>
+allocateFifos(vertex) ::= <<
+<vertex.outgoingPortMap.keys: {port |<allocateFifo(first(vertex.outgoingPortMap.(port)), length(vertex.outgoingPortMap.(port)))><\n>}>
 >>
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // assigns FIFOs
 
-doAssignFifo(instance, port, count) ::= <<
-<if(instance.actor || instance.broadcast)>struct fifo_<port.type>_s *<GetInstanceId(instance)>_<port.name> = &fifo_<count>;<endif>
+doAssignFifo(source, port, count) ::= <<
+<if(source.actor || source.broadcast)>struct fifo_<port.type>_s *<GetInstanceId(source)>_<port.name> = &fifo_<count>;<endif>
 >>
 
 tryAssignFifoSrc(edge) ::= <<
-<if (edge.source.instance && edge.target.instance)>
+<if (!edge.source.port && !edge.target.port)>
 <doAssignFifo(edge.source, edge.sourcePort, edge.idNoBcast)><endif>
 >>
 
@@ -107,8 +108,8 @@ assignFifosN(edges, readers_nb) ::= <<
 
 >>
 
-assignFifos(instance) ::= <<
-<instance.outgoingPortMap.keys: { port | <assignFifosN(instance.outgoingPortMap.(port), length(instance.outgoingPortMap.(port)))> }>
+assignFifos(vertex) ::= <<
+<vertex.outgoingPortMap.keys: { port | <assignFifosN(vertex.outgoingPortMap.(port), length(vertex.outgoingPortMap.(port)))> }>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -346,15 +347,15 @@ network(network, options) ::= <<
 ////////////////////////////////////////////////////////////////////////////////
 // FIFO allocation
 
-<network.instances: allocateFifos()>
+<network.vertices: allocateFifos()>
 
 ////////////////////////////////////////////////////////////////////////////////
 // FIFO pointer assignments
 
-<network.instances: assignFifos()>
+<network.vertices: assignFifos()>
 
 ////////////////////////////////////////////////////////////////////////////////
-<network.instances: declareBroadcast()>
+<network.entities: declareBroadcast()>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Action schedulers
