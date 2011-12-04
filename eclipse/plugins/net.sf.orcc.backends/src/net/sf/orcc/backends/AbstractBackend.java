@@ -148,7 +148,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	@Override
 	final public void compileXDF() throws OrccException {
 		// set FIFO size
-		this.fifoSize = getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 		ResourceSet set = new ResourceSetImpl();
 
 		// parses top network
@@ -507,8 +506,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		project = root.getProject(name);
 		vtlFolders = OrccUtil.getOutputFolders(project);
-
+		
 		inputFile = getFile(project, getAttribute(XDF_FILE, ""), "xdf");
+		
+		fifoSize = getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 
 		String outputFolder;
 		Object obj = options.get(OUTPUT_FOLDER);
