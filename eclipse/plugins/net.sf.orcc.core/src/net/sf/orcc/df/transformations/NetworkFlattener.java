@@ -38,6 +38,8 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.util.DfSwitch;
 
+import org.eclipse.emf.common.notify.Adapter;
+
 /**
  * This class defines a transformation that flattens a given network in-place.
  * The network must have been instantiated first, otherwise this transformation
@@ -62,6 +64,10 @@ public class NetworkFlattener extends DfSwitch<Void> {
 				// flatten this sub-network
 				new NetworkFlattener().doSwitch(subNetwork);
 
+				// remove adapter of subNetwork
+				// so that connections are not automatically updated
+				Adapter adapter = subNetwork.eAdapters().remove(0);
+
 				moveEntitiesAndConnections(network, subNetwork);
 
 				linkOutgoingConnections(network, subNetwork);
@@ -69,6 +75,11 @@ public class NetworkFlattener extends DfSwitch<Void> {
 
 				// remove entity from network
 				network.getEntities().remove(entity);
+
+				// restore adapter, remove connections to clean up
+				// incoming/outgoing of instances
+				subNetwork.eAdapters().add(adapter);
+				subNetwork.getConnections().clear();
 			}
 		}
 
@@ -131,9 +142,6 @@ public class NetworkFlattener extends DfSwitch<Void> {
 	}
 
 	private void moveEntitiesAndConnections(Network network, Network subNetwork) {
-		// remove adapter of subNetwork
-		// so that connections are not automatically updated
-		subNetwork.eAdapters().clear();
 
 		// move entities in this network
 		network.getEntities().addAll(subNetwork.getEntities());
