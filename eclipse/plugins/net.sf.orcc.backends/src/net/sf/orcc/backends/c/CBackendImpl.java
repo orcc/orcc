@@ -212,7 +212,7 @@ public class CBackendImpl extends AbstractBackend {
 		actor.setTemplateData(data);
 	}
 
-	private void doTransformNetwork(Network network) throws OrccException {
+	private Network doTransformNetwork(Network network) throws OrccException {
 		CNetworkTemplateData data = new CNetworkTemplateData();
 		data.computeHierarchicalTemplateMaps(network);
 		network.setTemplateData(data);
@@ -235,6 +235,8 @@ public class CBackendImpl extends AbstractBackend {
 				write(text);
 			}
 		}, fifoSize).doSwitch(network);
+		
+		return network;
 	}
 
 	@Override
@@ -245,7 +247,7 @@ public class CBackendImpl extends AbstractBackend {
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		// Transform the network
-		doTransformNetwork(network);
+		network = doTransformNetwork(network);
 
 		if (merge) {
 			network.mergeActors();
