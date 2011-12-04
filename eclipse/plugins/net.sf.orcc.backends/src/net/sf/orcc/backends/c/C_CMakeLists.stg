@@ -1,12 +1,12 @@
-printActor(id, actor) ::= <<
+printActor(name, actor) ::= <<
 <if (!actor.native)
-><id>.c
+><name>.c
 <endif>
 >>
 
 printInstance(instance) ::= <<
 <if (instance.actor)
-><printActor(id=instance.id, actor=instance.actor)><
+><printActor(instance.name, instance.actor)><
 endif>
 >>
 
