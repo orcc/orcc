@@ -261,7 +261,7 @@ printThreads(threads) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 // network
 
-network(network, options) ::= <<
+printNetwork(network, options) ::= <<
 // Generated from "$network.name$"
 
 #include "fifofactory.h"

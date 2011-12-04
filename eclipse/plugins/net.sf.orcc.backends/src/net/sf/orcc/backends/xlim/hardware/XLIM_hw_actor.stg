@@ -46,7 +46,7 @@ fpgaType() ::=<<
 >>
 
 // Adding the fpgaType ST to the design
-design(instance) ::= <<
+printDesign(instance) ::= <<
 \<!-- /<printHierarchicalPath(instance.hierarchicalId)> --\>
 \<!-- Source file is "<instance.actor.file>" --\>
 \<design name="<instance.id>"\>

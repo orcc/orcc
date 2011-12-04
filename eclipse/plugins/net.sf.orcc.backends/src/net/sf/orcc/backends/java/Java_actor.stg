@@ -299,7 +299,7 @@ public int schedule() {
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-actor(actor, options) ::= <<
+printActor(actor, options) ::= <<
 /**
  * Generated from "<actor.name>"
  */

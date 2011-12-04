@@ -1,5 +1,5 @@
 
-network(network, options) ::= <<
+printNetwork(network, options) ::= <<
 
 onerror {resume}
 quietly WaveActivateNextPane {} 0
@@ -13,7 +13,7 @@ add wave -noupdate -format Literal /tb_top/count
 add wave -noupdate -format Logic /tb_top/clock
 add wave -noupdate -format Logic /tb_top/reset
 
-<network.instances: instance(); separator="\n\n">
+<network.instances: printInstance(); separator="\n\n">
 
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {112 ps} 0}
@@ -35,7 +35,7 @@ WaveRestoreZoom {0 ps} {2911 ps}
 
 >>
 
-instance(instance) ::= <<
+printInstance(instance) ::= <<
 <if(instance.actor && !instance.actor.native)
 >add wave -noupdate -divider \<NULL\>
 add wave -noupdate -divider <instance.id>

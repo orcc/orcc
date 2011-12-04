@@ -436,7 +436,7 @@ destructor(stateVars) ::= <<
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-actor(actor, options) ::= <<
+printActor(actor, options) ::= <<
 #include \<iostream\>
 #include \<string.h\>
 

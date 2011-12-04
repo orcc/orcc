@@ -303,7 +303,7 @@ insancesInformation(instance) ::=<<
 --    <instance.id> (<instance.actor.simpleName>) --\> CLK
 >>
 
-network(network, options) ::= <<
+printNetwork(network, options) ::= <<
 <networkInformation(network)>
 
 library ieee, SystemBuilder;--, SystemActors;

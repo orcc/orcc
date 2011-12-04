@@ -111,7 +111,7 @@ endNamespace(namespace) ::= <<
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-actor(actor, options) ::= <<
+printActor(actor, options) ::= <<
 
 #ifndef __ACTOR_<actor.packageAsList; separator="_">_<actor.simpleName>_H__
 #define __ACTOR_<actor.packageAsList; separator="_">_<actor.simpleName>_H__

@@ -8,7 +8,7 @@ addActor(actor) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 // Cpp_CMakeLists
 
-network(network, options) ::= <<
+printNetwork(network, options) ::= <<
 # Generated from $network.name$
 
 cmake_minimum_required (VERSION 2.8)

@@ -791,7 +791,7 @@ printHierarchicalPath(path) ::= <<
 <path; separator="/">
 >>
 
-design(instance) ::= <<
+printDesign(instance) ::= <<
 \<!-- /<printHierarchicalPath(instance.hierarchicalId)> --\>
 \<!-- Source file is "<instance.actor.file>" --\>
 \<design name="<instance.id>"\>
@@ -809,8 +809,8 @@ design(instance) ::= <<
 \</design\>
 >>
 
-instance(instance, options) ::= <<
+printInstance(instance, options) ::= <<
 
 \<?xml version="1.0" encoding="UTF-8"?\>
-<design(instance)>
+<printDesign(instance)>
 >>

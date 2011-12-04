@@ -176,7 +176,7 @@ public class StandardPrinter extends AbstractPrinter {
 				}
 			}
 
-			ST template = group.getInstanceOf("actor");
+			ST template = group.getInstanceOf("printActor");
 			template.add("actor", actor);
 			template.add("options", options);
 			printTemplate(template, file);
@@ -210,7 +210,7 @@ public class StandardPrinter extends AbstractPrinter {
 				}
 			}
 
-			ST template = group.getInstanceOf("instance");
+			ST template = group.getInstanceOf("printInstance");
 			template.add("instance", instance);
 			template.add("options", options);
 			printTemplate(template, file);
@@ -244,7 +244,7 @@ public class StandardPrinter extends AbstractPrinter {
 			}
 		}
 
-		ST template = group.getInstanceOf("network");
+		ST template = group.getInstanceOf("printNetwork");
 		template.add("network", network);
 		template.add("options", options);
 		printTemplate(template, file);

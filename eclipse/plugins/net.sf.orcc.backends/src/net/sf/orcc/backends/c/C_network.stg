@@ -288,7 +288,7 @@ printAllAddSchedulable(instances) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 // print network
-network(network, options) ::= <<
+printNetwork(network, options) ::= <<
 
 // Generated from "<network.name>"
 

@@ -87,7 +87,7 @@ assignFifos(edges) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 // print network
 
-network(network, options) ::= <<
+printNetwork(network, options) ::= <<
 // Generated from "<network.name>"
 
 #define uint int

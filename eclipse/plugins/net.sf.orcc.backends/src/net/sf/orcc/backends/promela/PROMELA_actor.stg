@@ -465,11 +465,11 @@ proctype <instance.id>(<actor.parameters.list: varDecl(); wrap, separator=", ">)
 >>
 
 
-instance(instance, options) ::= <<
+printInstance(instance, options) ::= <<
 /*state need to be global in order to reach it from never claims*/
 int <instance.id>_state;
 
 /* Process */
-<proctype(instance=instance, actor=instance.actor)>
+<proctype(instance, instance.actor)>
 
 >>

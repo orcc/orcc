@@ -28,7 +28,7 @@ printConnection(connection, network) ::= <<
 	\</edge\>
 >>
 
-network(network, options) ::= <<
+printNetwork(network, options) ::= <<
 \<?xml version="1.0" encoding="UTF-8"?\>
 \<graphml xmlns="http://graphml.graphdrawing.org/xmlns"\>
     \<key attr.name="graph_desc" attr.type="string" for="node" id="graph_desc"/\>

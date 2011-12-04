@@ -1,6 +1,6 @@
 
 
-network(network, options) ::= <<
+printNetwork(network, options) ::= <<
 -------------------------------------------------------------------------------
 -- Title      : Network: <network.name>
 -- Project    : 

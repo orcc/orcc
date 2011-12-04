@@ -2,7 +2,7 @@
 // Root procedure
 /////////////////////////////
 
-network(network, options) ::= <<
+printNetwork(network, options) ::= <<
 
 	#include \<stdlib.h\>
 	#include "actors-config.h"

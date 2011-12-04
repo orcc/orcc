@@ -434,7 +434,7 @@ actorParameter(var, expr) ::= <<
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-actor(actor) ::= <<
+printActor(actor) ::= <<
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Source file is "<actor.file>"
 
@@ -517,9 +517,9 @@ endif>
 // Instance
 ///////////////////////////////////////////////////////////////////////////////
 
-instance(instance, options) ::= <<
+printInstance(instance, options) ::= <<
 <if(instance.actor)
-><actor(instance.actor)><
+><printActor(instance.actor)><
 elseif(instance.broadcast)
 ><broadcast(instance.broadcast)><
 endif>

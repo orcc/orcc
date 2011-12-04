@@ -623,7 +623,7 @@ static unsigned int numFree_<port.name>;
 
 >>
 
-instance(instance, options) ::= <<
+printInstance(instance, options) ::= <<
 // Source file is "<instance.actor.file>"
 
 #include \<stdio.h\>

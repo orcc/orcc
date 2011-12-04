@@ -815,7 +815,7 @@ actorParameter(parameter) ::= <<
 @<parameter.name> = global <parameter.type> undef
 >>
 
-actor(actor, options) ::= <<
+printActor(actor, options) ::= <<
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Generated from "<actor.name>"

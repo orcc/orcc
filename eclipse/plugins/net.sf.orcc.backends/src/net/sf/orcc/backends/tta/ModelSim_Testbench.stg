@@ -208,7 +208,7 @@ end process Proc_in_<output.name>;
 // Testbench
 ///////////////////////////////////////////////////////////////////////////////
 
-instance(instance, options) ::= <<
+printInstance(instance, options) ::= <<
 ------------------------------------------------------------------------------
 -- Generated from <instance.id>
 ------------------------------------------------------------------------------
@@ -256,7 +256,7 @@ begin
 end architecture arch_tb_<instance.id>;
 >>
 
-network(network, options) ::= <<
+printNetwork(network, options) ::= <<
 ------------------------------------------------------------------------------
 -- Generated from top
 ------------------------------------------------------------------------------
