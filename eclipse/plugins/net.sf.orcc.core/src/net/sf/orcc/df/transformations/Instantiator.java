@@ -59,10 +59,10 @@ public class Instantiator extends DfSwitch<Network> {
 
 	/**
 	 * Creates a default instantiator, equivalent to
-	 * <code>Instantiator(false)</code>.
+	 * <code>Instantiator(true)</code>.
 	 */
 	public Instantiator() {
-		this(false);
+		this(true);
 	}
 
 	/**
@@ -143,6 +143,7 @@ public class Instantiator extends DfSwitch<Network> {
 			networkCopy.getConnections().add(copy);
 		}
 
+		copier.put(network, networkCopy);
 		return networkCopy;
 	}
 
@@ -151,11 +152,7 @@ public class Instantiator extends DfSwitch<Network> {
 		if (result == null) {
 			// instance was not copied
 			Entity entity = ((Instance) vertex).getEntity();
-			if (entity.isNetwork()) {
-				result = entity;
-			} else {
-				result = (Entity) copier.get(entity);
-			}
+			result = (Vertex) copier.get(entity);
 		}
 		return result;
 	}
