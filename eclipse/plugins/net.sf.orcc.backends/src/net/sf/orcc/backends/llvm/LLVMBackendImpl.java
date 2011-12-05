@@ -196,10 +196,10 @@ public class LLVMBackendImpl extends AbstractBackend {
 				new DeadCodeElimination(), new DeadVariableRemoval(),
 				new BoolToIntTransformation(), new PrintlnTransformation(),
 				new RenameTransformation(this.transformations),
-				new TacTransformation(true), new CopyPropagator(),
+				new TacTransformation(), new CopyPropagator(),
 				new ConstantPropagator(), new InstPhiTransformation(),
 				new GetElementPtrAdder(), new TypeResizer(true, false, false),
-				new CastAdder(true, false), new EmptyThenElseNodeAdder(),
+				new CastAdder(false), new EmptyThenElseNodeAdder(),
 				new BlockCombine(), new BuildCFG(), new ListInitializer() };
 
 		for (DfSwitch<?> transformation : transformations) {

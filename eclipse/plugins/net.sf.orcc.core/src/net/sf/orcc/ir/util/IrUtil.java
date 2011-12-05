@@ -71,49 +71,45 @@ public class IrUtil {
 	/**
 	 * Add the given instruction before the given expression. If the expression
 	 * is contained by an instruction then the instruction to add is put
-	 * directly before, else the instruction is put to the previous nodeblock
-	 * which is created if needed. Return <code>true</code> if the given
-	 * instruction is added in the current block.
+	 * directly before, else the instruction is put to the previous block which
+	 * is created if needed. Return <code>true</code> if the given instruction
+	 * is added in the current block.
 	 * 
 	 * @param expression
 	 *            an expression
 	 * @param instruction
 	 *            the instruction to add before the given expression
-	 * @param usePreviousJoinNode
-	 *            <code>true</code> if the current IR form has join node before
-	 *            while node
 	 * @return <code>true</code> if the given instruction is added in the
 	 *         current block
 	 */
 	public static boolean addInstBeforeExpr(Expression expression,
-			Instruction instruction, boolean usePreviousJoinNode) {
-		Instruction instContainer = EcoreHelper.getContainerOfType(expression,
+			Instruction instruction) {
+		Instruction containingInst = EcoreHelper.getContainerOfType(expression,
 				Instruction.class);
-		Node nodeContainer = EcoreHelper.getContainerOfType(expression,
+		Node containingNode = EcoreHelper.getContainerOfType(expression,
 				Node.class);
-		if (instContainer != null) {
-			if (usePreviousJoinNode && instContainer.isPhi()
-					&& isWhileJoinNode(nodeContainer)) {
+		if (containingInst != null) {
+			if (containingInst.isPhi() && isWhileJoinNode(containingNode)) {
 				NodeWhile nodeWhile = EcoreHelper.getContainerOfType(
-						nodeContainer, NodeWhile.class);
+						containingNode, NodeWhile.class);
 				addToPreviousNodeBlock(nodeWhile, instruction);
 				return false;
 			} else {
 				List<Instruction> instructions = EcoreHelper
-						.getContainingList(instContainer);
-				instructions.add(instructions.indexOf(instContainer),
+						.getContainingList(containingInst);
+				instructions.add(instructions.indexOf(containingInst),
 						instruction);
 				return true;
 			}
 		} else {
-			if (usePreviousJoinNode && nodeContainer.isWhileNode()) {
-				NodeBlock joinNode = ((NodeWhile) nodeContainer).getJoinNode();
+			// The given expression is contained in the condition of If/While
+			if (containingNode.isWhileNode()) {
+				NodeBlock joinNode = ((NodeWhile) containingNode).getJoinNode();
 				joinNode.add(instruction);
-				return false;
 			} else {
-				addToPreviousNodeBlock(nodeContainer, instruction);
-				return false;
+				addToPreviousNodeBlock(containingNode, instruction);
 			}
+			return false;
 		}
 	}
 

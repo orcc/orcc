@@ -90,15 +90,15 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
  */
 public class XlimBackendImpl extends AbstractBackend {
 
-	private boolean debugMode;
+	private boolean useDebug;
 
 	private String fpgaType;
 
-	private boolean hardwareGen;
+	private boolean useHw;
 
 	private Map<String, String> mapping;
 
-	private boolean multi2mono;
+	private boolean useMulti2mono;
 
 	private List<String> entities;
 
@@ -127,12 +127,14 @@ public class XlimBackendImpl extends AbstractBackend {
 
 	@Override
 	public void doInitializeOptions() {
-		hardwareGen = getAttribute("net.sf.orcc.backends.xlimHard", true);
+		// General options
+		useDebug = getAttribute(DEBUG_MODE, false);
+		mapping = getAttribute(MAPPING, new HashMap<String, String>());
+		// Backend options
+		useHw = getAttribute("net.sf.orcc.backends.xlimHard", false);
 		fpgaType = getAttribute("net.sf.orcc.backends.xlimFpgaType",
 				"xc2vp30-7-ff1152");
-		multi2mono = getAttribute("net.sf.orcc.backends.multi2mono", true);
-		mapping = getAttribute(MAPPING, new HashMap<String, String>());
-		debugMode = getAttribute(DEBUG_MODE, true);
+		useMulti2mono = getAttribute("net.sf.orcc.backends.multi2mono", false);
 	}
 
 	@Override
@@ -140,34 +142,33 @@ public class XlimBackendImpl extends AbstractBackend {
 		XlimActorTemplateData data = new XlimActorTemplateData();
 		actor.setTemplateData(data);
 
-		if (hardwareGen) {
+		if (useHw) {
 			new StoreOnceTransformation().doSwitch(actor);
 			new TypeResizer(false, true, false);
 		}
 
-		if (multi2mono) {
+		if (useMulti2mono) {
 			new Multi2MonoToken().doSwitch(actor);
 			new LocalArrayRemoval().doSwitch(actor);
 			new DivisionSubstitution().doSwitch(actor);
 		}
 
 		DfSwitch<?>[] transformations = { new UnitImporter(),
-				new SSATransformation(),
-				new GlobalArrayInitializer(hardwareGen),
+				new SSATransformation(), new GlobalArrayInitializer(useHw),
 				new InstTernaryAdder(), new Inliner(true, true),
 				new UnaryListRemoval(), new CustomPeekAdder(),
 				new DeadGlobalElimination(), new DeadCodeElimination(),
 				new XlimDeadVariableRemoval(), new ListFlattener(),
-				new TacTransformation(true), /* new CopyPropagator(), */
+				new TacTransformation(), /* new CopyPropagator(), */
 				new BuildCFG(), new InstPhiTransformation(),
-				new LiteralIntegersAdder(true), new CastAdder(true, true),
+				new LiteralIntegersAdder(), new CastAdder(true),
 				new XlimVariableRenamer(), new EmptyThenElseNodeAdder(),
 				new BlockCombine() };
 
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 			ResourceSet set = new ResourceSetImpl();
-			if (debugMode && !IrUtil.serializeActor(set, path, actor)) {
+			if (useDebug && !IrUtil.serializeActor(set, path, actor)) {
 				System.out.println("oops " + transformation + " "
 						+ actor.getName());
 			}
@@ -202,21 +203,20 @@ public class XlimBackendImpl extends AbstractBackend {
 
 	private void printCMake(Network network) {
 		StandardPrinter networkPrinter = new StandardPrinter(
-				"net/sf/orcc/backends/xlim/XLIM_sw_CMakeLists.stg");
+				"net/sf/orcc/backends/xlim/sw/CMakeLists.stg");
 		networkPrinter.print("CMakeLists.txt", path, network);
 	}
 
 	@Override
 	protected boolean printInstance(Instance instance) {
 		StandardPrinter printer;
-		if (hardwareGen) {
+		if (useHw) {
 			printer = new StandardPrinter(
-					"net/sf/orcc/backends/xlim/hardware/XLIM_hw_actor.stg",
-					!debugMode);
+					"net/sf/orcc/backends/xlim/hw/Actor.stg", !useDebug);
 			printer.getOptions().put("fpgaType", fpgaType);
 		} else {
 			printer = new StandardPrinter(
-					"net/sf/orcc/backends/xlim/XLIM_sw_actor.stg", !debugMode);
+					"net/sf/orcc/backends/xlim/sw/Actor.stg", !useDebug);
 		}
 
 		printer.setExpressionPrinter(new XlimExprPrinter());
@@ -226,7 +226,7 @@ public class XlimBackendImpl extends AbstractBackend {
 
 	private void printMapping(Network network, Map<String, String> mapping) {
 		StandardPrinter networkPrinter = new StandardPrinter(
-				"net/sf/orcc/backends/xlim/XLIM_sw_mapping.stg");
+				"net/sf/orcc/backends/xlim/sw/Mapping.stg");
 		networkPrinter.getOptions().put("mapping",
 				computeMapping(network, mapping));
 		networkPrinter.getOptions().put("fifoSize", fifoSize);
@@ -247,7 +247,7 @@ public class XlimBackendImpl extends AbstractBackend {
 
 	private void printTCL(Instance instance) {
 		CustomPrinter printer = new CustomPrinter(
-				"net/sf/orcc/backends/xlim/hardware/Verilog_TCLLists.stg");
+				"net/sf/orcc/backends/xlim/hw/ModelSim_Script.stg");
 
 		entities = new ArrayList<String>();
 		entitySet = new HashSet<String>();
@@ -279,8 +279,8 @@ public class XlimBackendImpl extends AbstractBackend {
 
 	private void printNetwork(Network network) {
 		StandardPrinter printer;
-		String file = network.getName();
-		if (hardwareGen) {
+		String file = network.getSimpleName();
+		if (useHw) {
 			// create a folder where to put .v files generated with openforge
 			File sourceFolder = new File(path + File.separator + "Design");
 			if (!sourceFolder.exists()) {
@@ -292,7 +292,7 @@ public class XlimBackendImpl extends AbstractBackend {
 				folder.mkdir();
 			}
 			StandardPrinter instancePrinter = new StandardPrinter(
-					"net/sf/orcc/backends/xlim/hardware/Verilog_testbench.stg");
+					"net/sf/orcc/backends/xlim/hw/ModelSim_Testbench.stg");
 			Instance instance = DfFactory.eINSTANCE.createInstance(
 					network.getName(), network);
 			printTestbench(instancePrinter, instance);
@@ -300,18 +300,18 @@ public class XlimBackendImpl extends AbstractBackend {
 
 			file += ".vhd";
 			printer = new StandardPrinter(
-					"net/sf/orcc/backends/xlim/hardware/XLIM_hw_network.stg");
+					"net/sf/orcc/backends/xlim/hw/Network.stg");
 		} else {
 			file += ".c";
 			printer = new StandardPrinter(
-					"net/sf/orcc/backends/xlim/XLIM_sw_network.stg");
+					"net/sf/orcc/backends/xlim/sw/Network.stg");
 		}
 
 		printer.setExpressionPrinter(new XlimExprPrinter());
 		printer.setTypePrinter(new XlimTypePrinter());
 		printer.getOptions().put("fifoSize", fifoSize);
 		printer.print(file, path, network);
-		if (!hardwareGen) {
+		if (!useHw) {
 			printCMake(network);
 			if (!mapping.isEmpty()) {
 				printMapping(network, mapping);
@@ -324,6 +324,6 @@ public class XlimBackendImpl extends AbstractBackend {
 	}
 
 	public void setHardwareGen(Boolean hardwareGen) {
-		this.hardwareGen = hardwareGen;
+		this.useHw = hardwareGen;
 	}
 }

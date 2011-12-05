@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010, IETR/INSA of Rennes
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -69,20 +69,9 @@ import org.eclipse.emf.common.util.EList;
  */
 public class TacTransformation extends AbstractActorVisitor<Expression> {
 
-	private int complexityLevel = 0;
-	private boolean usePreviousJoinNode;
+	private static IrFactory factory = IrFactory.eINSTANCE;
 
-	/**
-	 * Creates a new transformation which splits complex expressions
-	 * 
-	 * @param usePreviousJoinNode
-	 *            <code>true</code> if the current IR form has join node before
-	 *            while node
-	 */
-	public TacTransformation(boolean usePreviousJoinNode) {
-		super(true);
-		this.usePreviousJoinNode = usePreviousJoinNode;
-	}
+	private int complexityLevel = 0;
 
 	@Override
 	public Expression caseExprBinary(ExprBinary expr) {
@@ -95,16 +84,16 @@ public class TacTransformation extends AbstractActorVisitor<Expression> {
 			// Make a new assignment to the binary expression
 			Var target = procedure.newTempLocalVariable(
 					IrUtil.copy(expr.getType()), "splitted_expr");
-			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
+			InstAssign assign = factory.createInstAssign(target,
 					IrUtil.copy(expr));
 
 			// Add assignment to instruction's list
-			if (IrUtil.addInstBeforeExpr(expr, assign, usePreviousJoinNode)) {
+			if (IrUtil.addInstBeforeExpr(expr, assign)) {
 				indexInst++;
 			}
 
 			IrUtil.delete(expr);
-			return IrFactory.eINSTANCE.createExprVar(target);
+			return factory.createExprVar(target);
 		} else {
 			return expr;
 		}
@@ -146,20 +135,19 @@ public class TacTransformation extends AbstractActorVisitor<Expression> {
 
 		switch (expr.getOp()) {
 		case MINUS:
-			newExpr = IrFactory.eINSTANCE.createExprBinary(
-					IrFactory.eINSTANCE.createExprInt(0), OpBinary.MINUS,
-					IrUtil.copy(expr.getExpr()), IrUtil.copy(expr.getType()));
+			newExpr = factory.createExprBinary(factory.createExprInt(0),
+					OpBinary.MINUS, IrUtil.copy(expr.getExpr()),
+					IrUtil.copy(expr.getType()));
 			break;
 		case LOGIC_NOT:
-			newExpr = IrFactory.eINSTANCE.createExprBinary(
-					IrUtil.copy(expr.getExpr()), OpBinary.EQ,
-					IrFactory.eINSTANCE.createExprBool(false),
+			newExpr = factory.createExprBinary(IrUtil.copy(expr.getExpr()),
+					OpBinary.EQ, factory.createExprBool(false),
 					IrUtil.copy(expr.getType()));
 			break;
 		case BITNOT:
-			newExpr = IrFactory.eINSTANCE.createExprBinary(
-					IrUtil.copy(expr.getExpr()), OpBinary.BITXOR,
-					IrUtil.copy(expr.getExpr()), IrUtil.copy(expr.getType()));
+			newExpr = factory.createExprBinary(IrUtil.copy(expr.getExpr()),
+					OpBinary.BITXOR, IrUtil.copy(expr.getExpr()),
+					IrUtil.copy(expr.getType()));
 			break;
 		default:
 			throw new OrccRuntimeException("unsupported operator");
@@ -168,17 +156,16 @@ public class TacTransformation extends AbstractActorVisitor<Expression> {
 		if (complexityLevel > 0) {
 			// Make a new assignment to the binary expression
 			Var target = procedure.newTempLocalVariable(
-					IrUtil.copy(expr.getType()), "splittedExpr");
-			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
-					newExpr);
+					IrUtil.copy(expr.getType()), "splitted_expr");
+			InstAssign assign = factory.createInstAssign(target, newExpr);
 
 			// Add assignment to instruction's list
-			if (IrUtil.addInstBeforeExpr(expr, assign, usePreviousJoinNode)) {
+			if (IrUtil.addInstBeforeExpr(expr, assign)) {
 				indexInst++;
 			}
 
 			IrUtil.delete(expr);
-			return IrFactory.eINSTANCE.createExprVar(target);
+			return factory.createExprVar(target);
 		} else {
 			IrUtil.delete(expr);
 			return newExpr;
@@ -202,8 +189,7 @@ public class TacTransformation extends AbstractActorVisitor<Expression> {
 		List<Expression> newArgs = splitExpressionList(EcoreHelper.getObjects(
 				call, Expression.class));
 		call.getParameters().clear();
-		call.getParameters().addAll(
-				IrFactory.eINSTANCE.createArgsByVal(newArgs));
+		call.getParameters().addAll(factory.createArgsByVal(newArgs));
 		complexityLevel--;
 		return null;
 	}

@@ -42,7 +42,6 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
-//import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
@@ -105,9 +104,9 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 
 			InstCall call = factory.createInstCall(varResult, divProc,
 					parameters);
-			IrUtil.addInstBeforeExpr(expr, assign0, true);
-			IrUtil.addInstBeforeExpr(expr, assign1, true);
-			IrUtil.addInstBeforeExpr(expr, call, true);
+			IrUtil.addInstBeforeExpr(expr, assign0);
+			IrUtil.addInstBeforeExpr(expr, assign1);
+			IrUtil.addInstBeforeExpr(expr, call);
 
 			EcoreUtil.replace(expr, factory.createExprVar(varResult));
 		}
@@ -153,8 +152,8 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 
 		// Create procedural code
 		EList<Node> nodes = divProc.getNodes();
-		nodes.add(createInitBlock(result, flipResult, denom,
-				 numer,  mask, remainder));
+		nodes.add(createInitBlock(result, flipResult, denom, numer, mask,
+				remainder));
 		nodes.add(createNodeIf(varNum, flipResult));
 		nodes.add(createNodeIf(varDenum, flipResult));
 		nodes.add(createAssignmentBlock(varDenum, remainder, varNum, denom,
@@ -315,7 +314,7 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 
 		NodeBlock nodeBlk_0 = factory.createNodeBlock();
 		NodeBlock nodeBlk_1 = factory.createNodeBlock();
-	
+
 		Expression andExpr = factory.createExprBinary(
 				factory.createExprVar(remainder), OpBinary.BITAND,
 				factory.createExprInt(0x0000FFFF), factory.createTypeInt());

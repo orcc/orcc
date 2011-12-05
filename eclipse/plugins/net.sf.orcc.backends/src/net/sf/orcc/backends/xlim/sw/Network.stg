@@ -79,7 +79,7 @@ p<instance.id> = createActorInstance(&ActorClass_<instance.id>);
 <endif>
 <instance.actor.inputs : {port | <if(localFifoSize.(port))><initializePort(dir="In",port=port,id=instance.id,n=localFifoSize.(port))><else><initializePort(dir="In",port=port,id=instance.id,n=options.fifoSize)><endif>}; separator="\n">
 <instance.actor.outputs : {port | <initializePort(dir="Out",port=port,id=instance.id,n=length(instance.outgoingPortMap.(port)))>}; separator="\n">
-<instance.actor.parameters : {parameter | <initializeParameter(parameter=parameter,value=instance.parameters.(parameter.name),id=instance.id)>}; separator="\n">
+<instance.arguments : initializeParameter(); separator="\n">
 actorInstances[<index>] = p<instance.id>;
 >>
 
@@ -87,8 +87,8 @@ initializePort(dir, port, id, n) ::= <<
 p<id>_<port.name> = create<dir>putPort(p<id>, "<port.name>", <n>);
 >>
 
-initializeParameter(parameter, value, id) ::= <<
-setParameter(p<id>, "<parameter.name>",<if(value.stringExpr)><Constant(value)><else>"<Constant(value)>"<endif>);
+initializeParameter(argument) ::= <<
+setParameter(p<instance.id>, "<argument.variable.name>", <if(argument.value.stringExpr)><Constant(argument.value)><else>"<Constant(argument.value)>"<endif>);
 >>
 
 /////////////////////////////

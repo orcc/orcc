@@ -1,4 +1,4 @@
-import "net/sf/orcc/backends/xlim/XLIM_sw_actor.stg"
+import "net/sf/orcc/backends/xlim/sw/Actor.stg"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Override XLIM Templates For XLIM Hardware Generation

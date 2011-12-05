@@ -78,17 +78,15 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 
 	private boolean castToUnsigned;
 	private Type parentType;
-	private boolean usePreviousJoinNode;
 
 	/**
 	 * Creates a new cast transformation
 	 * 
-	 * @param usePreviousJoinNode
-	 *            <code>true</code> if the current IR form has join node before
-	 *            while node
+	 * @param castToUnsigned
+	 *            <code>true</code> if an explicit cast is needed between signed
+	 *            and unsigned
 	 */
-	public CastAdder(boolean usePreviousJoinNode, boolean castToUnsigned) {
-		this.usePreviousJoinNode = usePreviousJoinNode;
+	public CastAdder(boolean castToUnsigned) {
 		this.castToUnsigned = castToUnsigned;
 	}
 
@@ -350,7 +348,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 						"expr_" + procedure.getName());
 				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
 						oldVar, IrUtil.copy(expr));
-				IrUtil.addInstBeforeExpr(expr, assign, usePreviousJoinNode);
+				IrUtil.addInstBeforeExpr(expr, assign);
 			}
 
 			Var newVar = procedure.newTempLocalVariable(
@@ -358,7 +356,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 					"castedExpr_" + procedure.getName());
 			InstCast cast = InstructionsFactory.eINSTANCE.createInstCast(
 					oldVar, newVar);
-			if (IrUtil.addInstBeforeExpr(expr, cast, usePreviousJoinNode)) {
+			if (IrUtil.addInstBeforeExpr(expr, cast)) {
 				indexInst++;
 			}
 			IrUtil.delete(expr);

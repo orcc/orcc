@@ -116,9 +116,9 @@ public class TTABackendImpl extends AbstractBackend {
 				new TypeResizer(true, true, false),
 				new PrintlnTransformation(),
 				new RenameTransformation(this.transformations),
-				new TacTransformation(true), new CopyPropagator(),
+				new TacTransformation(), new CopyPropagator(),
 				new ConstantPropagator(), new InstPhiTransformation(),
-				new GetElementPtrAdder(), new CastAdder(true, false),
+				new GetElementPtrAdder(), new CastAdder(false),
 				new EmptyThenElseNodeAdder(), new BlockCombine(),
 				new BuildCFG() };
 

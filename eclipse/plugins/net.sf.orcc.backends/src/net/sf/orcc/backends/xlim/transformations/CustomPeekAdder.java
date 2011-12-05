@@ -103,7 +103,7 @@ public class CustomPeekAdder extends AbstractActorVisitor<Object> {
 				}
 				IrUtil.delete(load);
 			}
-			EcoreUtil.remove(oldTarget);
+			EcoreUtil.delete(oldTarget);
 			customPeekedMap.put(port, indexToVariableMap);
 		}
 		return null;

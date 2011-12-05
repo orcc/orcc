@@ -69,20 +69,6 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 
-	private boolean usePreviousJoinNode;
-
-	/**
-	 * Creates a new transformation which put literals into variables
-	 * 
-	 * @param usePreviousJoinNode
-	 *            <code>true</code> if the current IR form has join node before
-	 *            while node
-	 */
-	public LiteralIntegersAdder(boolean usePreviousJoinNode) {
-		super(true);
-		this.usePreviousJoinNode = usePreviousJoinNode;
-	}
-
 	@Override
 	public Expression caseExprBinary(ExprBinary expr) {
 		expr.setE1(doSwitch(expr.getE1()));
@@ -206,7 +192,7 @@ public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 
 		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
 				IrUtil.copy(expr));
-		IrUtil.addInstBeforeExpr(expr, assign, usePreviousJoinNode);
+		IrUtil.addInstBeforeExpr(expr, assign);
 
 		return IrFactory.eINSTANCE.createExprVar(target);
 	}
