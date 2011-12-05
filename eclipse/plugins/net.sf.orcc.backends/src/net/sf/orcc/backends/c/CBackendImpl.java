@@ -68,29 +68,32 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
  */
 public class CBackendImpl extends AbstractBackend {
 
-	private boolean classify;
-
-	private boolean debugMode;
-
+	/**
+	 * Backend options
+	 */
+	
+	private boolean debug;
 	private boolean enableTrace;
 
-	private boolean geneticAlgorithm;
-
-	private Map<String, List<Instance>> instancesTarget;
-
-	private Map<String, String> mapping;
-
-	private boolean merge;
-
-	private boolean newScheduler;
-
 	private boolean normalize;
-
+	private boolean classify;
+	private boolean merge;
+	
+	private boolean newScheduler;
 	private boolean ringTopology;
-
+	private boolean useGeneticAlgo;
 	private int threadsNb;
 
+
+	/**
+	 * Configuration mapping
+	 */
+	private Map<String, List<Instance>> instancesTarget;
+	private Map<String, String> mapping;
+
+
 	private StandardPrinter printer;
+	
 
 	private void computeMapping(Network network) {
 		// compute the different threads
@@ -134,8 +137,8 @@ public class CBackendImpl extends AbstractBackend {
 		options.put("ringTopology", ringTopology);
 		options.put("fifoSize", fifoSize);
 
-		if (geneticAlgorithm) {
-			options.put("useGeneticAlgorithm", geneticAlgorithm);
+		if (useGeneticAlgo) {
+			options.put("useGeneticAlgorithm", useGeneticAlgo);
 			options.put("threadsNb", threadsNb);
 		} else {
 			if (instancesTarget != null) {
@@ -157,10 +160,10 @@ public class CBackendImpl extends AbstractBackend {
 			merge = false;
 		}
 
-		geneticAlgorithm = getAttribute(
+		useGeneticAlgo = getAttribute(
 				"net.sf.orcc.backends.geneticAlgorithm", false);
 		newScheduler = getAttribute("net.sf.orcc.backends.newScheduler", false);
-		debugMode = getAttribute(DEBUG_MODE, true);
+		debug = getAttribute(DEBUG_MODE, true);
 		threadsNb = Integer.parseInt(getAttribute(
 				"net.sf.orcc.backends.processorsNumber", "1"));
 		enableTrace = getAttribute("net.sf.orcc.backends.enableTrace", false);
@@ -168,8 +171,8 @@ public class CBackendImpl extends AbstractBackend {
 				"net.sf.orcc.backends.newScheduler.topology", "Ring");
 		ringTopology = topology.equals("Ring");
 
-		printer = new StandardPrinter("net/sf/orcc/backends/c/C_actor.stg",
-				!debugMode);
+		printer = new StandardPrinter("net/sf/orcc/backends/c/Actor.stg",
+				!debug);
 		printer.setExpressionPrinter(new CExpressionPrinter());
 		printer.setTypePrinter(new CTypePrinter());
 		printer.getOptions().put("fifoSize", fifoSize);
@@ -201,7 +204,7 @@ public class CBackendImpl extends AbstractBackend {
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 			ResourceSet set = new ResourceSetImpl();
-			if (debugMode && !IrUtil.serializeActor(set, path, actor)) {
+			if (debug && !IrUtil.serializeActor(set, path, actor)) {
 				System.out.println("oops " + transformation + " "
 						+ actor.getName());
 			}
@@ -259,7 +262,7 @@ public class CBackendImpl extends AbstractBackend {
 		network.computeTemplateMaps();
 
 		StandardPrinter printer = new StandardPrinter(
-				"net/sf/orcc/backends/c/C_network.stg");
+				"net/sf/orcc/backends/c/Network.stg");
 		printer.setExpressionPrinter(new CExpressionPrinter());
 		printer.setTypePrinter(new CTypePrinter());
 
@@ -282,14 +285,14 @@ public class CBackendImpl extends AbstractBackend {
 
 		// print CMakeLists
 		printCMake(network);
-		if (!geneticAlgorithm && instancesTarget != null) {
+		if (!useGeneticAlgo && instancesTarget != null) {
 			printMapping(network);
 		}
 	}
 
 	private void printCMake(Network network) {
 		StandardPrinter networkPrinter = new StandardPrinter(
-				"net/sf/orcc/backends/c/C_CMakeLists.stg");
+				"net/sf/orcc/backends/c/CMakeLists.stg");
 		networkPrinter.print("CMakeLists.txt", path, network);
 	}
 
@@ -300,7 +303,7 @@ public class CBackendImpl extends AbstractBackend {
 
 	private void printMapping(Network network) {
 		StandardPrinter networkPrinter = new StandardPrinter(
-				"net/sf/orcc/backends/c/C_mapping.stg");
+				"net/sf/orcc/backends/c/Mapping.stg");
 		networkPrinter.getOptions().put("mapping", instancesTarget);
 		networkPrinter.print(network.getName() + ".xcf", path, network);
 	}

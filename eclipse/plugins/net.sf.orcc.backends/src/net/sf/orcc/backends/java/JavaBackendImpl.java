@@ -63,7 +63,7 @@ public class JavaBackendImpl extends AbstractBackend {
 
 	private final Map<String, String> transformations;
 
-	private boolean debugMode;
+	private boolean debug;
 
 	public JavaBackendImpl() {
 		transformations = new HashMap<String, String>();
@@ -74,7 +74,7 @@ public class JavaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doInitializeOptions() {
-		debugMode = getAttribute(DEBUG_MODE, true);
+		debug = getAttribute(DEBUG_MODE, true);
 	}
 
 	@Override
@@ -101,7 +101,7 @@ public class JavaBackendImpl extends AbstractBackend {
 		List<Actor> actors = parseActors(files);
 
 		actorPrinter = new StandardPrinter(
-				"net/sf/orcc/backends/java/Java_actor.stg", !debugMode);
+				"net/sf/orcc/backends/java/Actor.stg", !debug);
 		actorPrinter.setExpressionPrinter(new CppExprPrinter());
 		actorPrinter.setTypePrinter(new JavaTypePrinter());
 
@@ -138,7 +138,7 @@ public class JavaBackendImpl extends AbstractBackend {
 	 */
 	protected void printNetwork(Network network) throws OrccException {
 		StandardPrinter printer = new StandardPrinter(
-				"net/sf/orcc/backends/java/Java_network.stg");
+				"net/sf/orcc/backends/java/Network.stg");
 		printer.setExpressionPrinter(new CppExprPrinter());
 		printer.setTypePrinter(new JavaTypePrinter());
 		printer.getOptions().put("fifoSize", fifoSize);

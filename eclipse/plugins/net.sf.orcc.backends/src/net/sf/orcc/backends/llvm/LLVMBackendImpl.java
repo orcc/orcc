@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Artemis SudParis-IETR/INSA of Rennes
+ * Copyright (c) 2009-2011, Artemis SudParis-IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -86,6 +86,7 @@ import org.eclipse.core.resources.IFile;
  * LLVM back-end.
  * 
  * @author Jerome GORIN
+ * @author Herve Yviquel
  * 
  */
 public class LLVMBackendImpl extends AbstractBackend {
@@ -94,30 +95,24 @@ public class LLVMBackendImpl extends AbstractBackend {
 	 * Backend options
 	 */
 	private boolean classify;
-
-	private boolean debugMode;
-
-	private Map<String, List<Instance>> instancesTarget;
+	private boolean debug;
+	private boolean normalize;
+	private String optLevel;
+	private String llvmGenMod;
 
 	/**
 	 * Path of JadeToolbox executable
 	 */
-	protected String jadeToolbox;
-
-	private String llvmGenMod;
+	private String jadeToolbox;
 
 	/**
 	 * Configuration mapping
 	 */
 	private Map<String, String> mapping;
-
-	private boolean normalize;
-
-	private String optLevel;
-
-	private StandardPrinter printer;
+	private Map<String, List<Instance>> instancesTarget;
 
 	private final Map<String, String> transformations;
+	private StandardPrinter printer;
 
 	/**
 	 * Creates a new instance of the LLVM back-end. Initializes the
@@ -177,7 +172,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		classify = getAttribute("net.sf.orcc.backends.classify", false);
 		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
 		jadeToolbox = getDefault().getPreference(P_JADE_TOOLBOX, "");
-		debugMode = getAttribute(DEBUG_MODE, true);
+		debug = getAttribute(DEBUG_MODE, true);
 		mapping = getAttribute(MAPPING, new HashMap<String, String>());
 	}
 
@@ -214,8 +209,8 @@ public class LLVMBackendImpl extends AbstractBackend {
 	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
 		List<Actor> actors = parseActors(files);
 
-		printer = new StandardPrinter(
-				"net/sf/orcc/backends/llvm/LLVM_actor.stg", !debugMode);
+		printer = new StandardPrinter("net/sf/orcc/backends/llvm/Actor.stg",
+				!debug);
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
 
@@ -286,7 +281,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 	private void printMapping(Network network) {
 		StandardPrinter networkPrinter = new StandardPrinter(
-				"net/sf/orcc/backends/llvm/LLVM_mapping.stg");
+				"net/sf/orcc/backends/llvm/Mapping.stg");
 		networkPrinter.getOptions().put("mapping", instancesTarget);
 		networkPrinter.print(network.getName() + ".xcf", path, network);
 	}

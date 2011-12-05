@@ -1,4 +1,4 @@
-import "net/sf/orcc/backends/llvm/LLVM_actor.stg"
+import "net/sf/orcc/backends/llvm/Actor.stg"
 
 
 

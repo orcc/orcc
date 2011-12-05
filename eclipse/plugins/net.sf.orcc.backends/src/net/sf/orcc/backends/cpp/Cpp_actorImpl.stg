@@ -1,4 +1,4 @@
-import "net/sf/orcc/backends/c/C_actor.stg"
+import "net/sf/orcc/backends/c/Actor.stg"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Types and variables

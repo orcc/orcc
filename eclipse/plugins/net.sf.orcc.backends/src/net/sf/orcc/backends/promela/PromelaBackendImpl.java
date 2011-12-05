@@ -130,7 +130,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 		new NetworkFlattener().doSwitch(network);
 
 		instancePrinter = new StandardPrinter(
-				"net/sf/orcc/backends/promela/PROMELA_actor.stg");
+				"net/sf/orcc/backends/promela/Actor.stg");
 		instancePrinter.setExpressionPrinter(new CExpressionPrinter());
 		instancePrinter.setTypePrinter(new PromelaTypePrinter());
 		instancePrinter.getOptions().put("guards", guards);
@@ -167,7 +167,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 	 */
 	private void printNetwork(Network network) {
 		StandardPrinter printer = new StandardPrinter(
-				"net/sf/orcc/backends/promela/PROMELA_network.stg");
+				"net/sf/orcc/backends/promela/Network.stg");
 		printer.setTypePrinter(new PromelaTypePrinter());
 		printer.print("main_" + network.getName() + ".pml", path, network);
 	}

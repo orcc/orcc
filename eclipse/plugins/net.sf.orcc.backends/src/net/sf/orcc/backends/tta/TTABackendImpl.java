@@ -81,7 +81,7 @@ public class TTABackendImpl extends AbstractBackend {
 	/**
 	 * Backend options
 	 */
-	private boolean debugMode;
+	private boolean debug;
 
 	private final Map<String, String> transformations;
 	private final List<String> processorIntensiveActors;
@@ -106,7 +106,7 @@ public class TTABackendImpl extends AbstractBackend {
 
 	@Override
 	public void doInitializeOptions() {
-		debugMode = getAttribute(DEBUG_MODE, true);
+		debug = getAttribute(DEBUG_MODE, true);
 	}
 
 	@Override
@@ -157,7 +157,7 @@ public class TTABackendImpl extends AbstractBackend {
 	@Override
 	protected boolean printInstance(Instance instance) throws OrccException {
 		StandardPrinter printer = new StandardPrinter(
-				"net/sf/orcc/backends/tta/LLVM_Actor.stg", !debugMode, true);
+				"net/sf/orcc/backends/tta/LLVM_Actor.stg", !debug, true);
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
 
@@ -169,7 +169,7 @@ public class TTABackendImpl extends AbstractBackend {
 			// ModelSim
 			StandardPrinter tbPrinter = new StandardPrinter(
 					"net/sf/orcc/backends/tta/ModelSim_Testbench.stg",
-					!debugMode, false);
+					!debug, false);
 			StandardPrinter tclPrinter = new StandardPrinter(
 					"net/sf/orcc/backends/tta/ModelSim_Script.stg");
 			tbPrinter.print(instance.getName() + "_tb.vhd", instancePath,
