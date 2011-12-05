@@ -44,7 +44,7 @@ else
 endif>
 >>
 
-mapSignalInput(port) ::= <<
+mapSignalInput(port, instance=false) ::= <<
 <if(port.native)
 ><port.name> =\> <port.name>_native,<
 else
@@ -54,7 +54,7 @@ ack_<indexPort(port)>_in     =\> s_<port.name>_rdreq,<
 endif>
 >>
 
-mapSignalOutput(port) ::= <<
+mapSignalOutput(port, instance=false) ::= <<
 <if(port.native)
 ><port.name>   =\> <port.name>_native,<
 else
@@ -64,14 +64,14 @@ dv_<indexPort(port)>_out     =\> s_<port.name>_wrreq,<
 endif>
 >>
 
-sig_const(input, output) ::= <<
+sig_const(input, output, instance=false) ::= <<
 constant PERIOD      : time := 10 ns;
 --
 type severity_level is (note, warning, error, failure);
 --
 -- Input and Output files
-<input: printTraceIn(); separator="\n">
-<output: printTraceOut(); separator="\n">
+<input: printTrace(); separator="\n">
+<output: printTrace(); separator="\n">
 --
 -- Input and Output signals
 <input: printSignalInput(); separator="\n">
@@ -83,15 +83,9 @@ signal rst_n       : std_logic := '0';
 
 >>
 
-printTraceIn(port) ::= <<
+printTrace(port) ::= <<
 <if(!port.native)
->file trace_<port.name> : text is "../trace/<instance.id>_<port.name>.txt";<
-endif>
->>
-
-printTraceOut(port) ::= <<
-<if(!port.native)
->file trace_<port.name> : text is "../trace/<instance.id>_<port.name>.txt";<
+>file trace_<port.name> : text is "../trace/<if(instance)><instance.id>_<endif><port.name>.txt";<
 endif>
 >>
 
@@ -231,7 +225,7 @@ architecture arch_tb_<instance.id> of tb_<instance.id> is
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
   --------------------------------------------------------------------------- 
-  <sig_const(input=instance.actor.inputs,output=instance.actor.outputs)>
+  <sig_const(input=instance.actor.inputs, output=instance.actor.outputs, instance=instance)>
   ---------------------------------------------------------------------------
 
 begin
@@ -239,8 +233,8 @@ begin
   <instance.id>_orcc : entity work.processor_<instance.id>
     port map (
       clk          =\> clk,
-      <if(instance.actor.inputs)><instance.actor.inputs: mapSignalInput(); separator="\n"><endif>
-      <if(instance.actor.outputs)><instance.actor.outputs: mapSignalOutput(); separator="\n"><endif>
+      <if(instance.actor.inputs)><instance.actor.inputs: { input | <mapSignalInput(input, instance)> }; separator="\n"><endif>
+      <if(instance.actor.outputs)><instance.actor.outputs: { output | <mapSignalOutput(output, instance)> }; separator="\n"><endif>
       rst_n        =\> rst_n);
             
   <init_process()>
@@ -278,7 +272,7 @@ architecture arch_tb_top of tb_top is
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
   --------------------------------------------------------------------------- 
-  <sig_const(input=network.inputs,output=network.outputs)>
+  <sig_const(input=network.inputs, output=network.outputs)>
   ---------------------------------------------------------------------------
 
 begin
