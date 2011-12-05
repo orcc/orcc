@@ -143,22 +143,9 @@ printLoad(load) ::= <<
 <load.target.variable.indexedName> = <load.source.variable.indexedName><load.indexes : {index | [<index>]}>;
 >>
 
-
-printRead(read) ::= <<
-
-<if (read.target)>
-chan_<instance.id>_<read.port>?<read.target>[0];
-<endif>
->>
-
 printStore(store) ::= <<
 
 <store.target.variable.name><store.indexes : {index | [<index>]}> = <store.value>;
->>
-
-Write(write) ::= <<
-
-chan_<instance.id>_<write.port>!<write.target>[0];
 >>
 
 printReturn(return) ::= <<
