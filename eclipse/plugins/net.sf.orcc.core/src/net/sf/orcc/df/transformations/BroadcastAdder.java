@@ -147,7 +147,7 @@ public class BroadcastAdder extends DfSwitch<Void> {
 		if (connections.size() > 1) {
 			createBroadcast(network.getName(), port, connections);
 		}
-		return (Void) new Object();
+		return null;
 	}
 
 	@Override
