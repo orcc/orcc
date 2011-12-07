@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.df.transformations;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
@@ -55,6 +58,8 @@ public class Instantiator extends DfSwitch<Network> {
 
 	private Copier copier;
 
+	private Map<Instance, Vertex> map;
+
 	private boolean skipActors;
 
 	/**
@@ -77,6 +82,7 @@ public class Instantiator extends DfSwitch<Network> {
 	public Instantiator(boolean skipActors) {
 		this.skipActors = skipActors;
 		copier = new Copier();
+		map = new HashMap<Instance, Vertex>();
 	}
 
 	@Override
@@ -108,6 +114,7 @@ public class Instantiator extends DfSwitch<Network> {
 				} else {
 					entity = (Entity) copier.copy(entity);
 				}
+				map.put(instance, entity);
 
 				// add entity to the network's entities
 				networkCopy.getEntities().add(entity);
@@ -143,16 +150,15 @@ public class Instantiator extends DfSwitch<Network> {
 			networkCopy.getConnections().add(copy);
 		}
 
-		copier.put(network, networkCopy);
 		return networkCopy;
 	}
 
 	private Vertex getCopy(Vertex vertex) {
+		// assume vertex is port or instance of actor
 		Vertex result = (Vertex) copier.get(vertex);
 		if (result == null) {
-			// instance was not copied
-			Entity entity = ((Instance) vertex).getEntity();
-			result = (Vertex) copier.get(entity);
+			// if not, get mapping from instance to entity
+			result = map.get((Instance) vertex);
 		}
 		return result;
 	}
