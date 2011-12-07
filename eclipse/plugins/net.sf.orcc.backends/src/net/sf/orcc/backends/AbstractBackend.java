@@ -72,7 +72,6 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 
@@ -155,10 +154,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		if (isCanceled()) {
 			return;
 		}
-
-		write("Loading networks and actors... ");
-		EcoreUtil.resolveAll(set);
-		write("done\n");
 
 		// because the UnitImporter will load additional resources, we filter
 		// only actors

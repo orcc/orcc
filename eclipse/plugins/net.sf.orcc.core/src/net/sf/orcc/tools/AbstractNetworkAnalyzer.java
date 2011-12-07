@@ -42,6 +42,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.WriteListener;
@@ -54,7 +55,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 
@@ -177,7 +177,7 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 		}
 
 		listener.writeText("Instantiating actors...\n");
-		EcoreUtil.resolveAll(set);
+		network = new Instantiator().doSwitch(network);
 		listener.writeText("Instantiation done\n");
 
 		if (isCanceled()) {

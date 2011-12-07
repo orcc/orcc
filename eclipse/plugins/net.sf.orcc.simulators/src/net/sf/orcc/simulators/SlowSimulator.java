@@ -65,7 +65,6 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class implements a simulator using a slow, visitor-based approach.
@@ -242,9 +241,6 @@ public class SlowSimulator extends AbstractSimulator {
 			IFile file = OrccUtil.getFile(project, xdfFile, "xdf");
 			ResourceSet set = new ResourceSetImpl();
 			Network network = IrUtil.deserializeEntity(set, file);
-
-			// Instantiate the network
-			EcoreUtil.resolveAll(set);
 
 			// instantiate and flattens network
 			network = new Instantiator().doSwitch(network);
