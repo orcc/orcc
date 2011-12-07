@@ -136,6 +136,15 @@ public class DfSwitch<T> extends Switch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
+			case DfPackage.ENTITY_SPECIFIC: {
+				EntitySpecific entitySpecific = (EntitySpecific)theEObject;
+				T result = caseEntitySpecific(entitySpecific);
+				if (result == null) result = caseEntity(entitySpecific);
+				if (result == null) result = caseVertex(entitySpecific);
+				if (result == null) result = caseNameable(entitySpecific);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
 			case DfPackage.ACTOR: {
 				Actor actor = (Actor)theEObject;
 				T result = caseActor(actor);
@@ -584,6 +593,21 @@ public class DfSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseEntity(Entity object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Entity Specific</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Entity Specific</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseEntitySpecific(EntitySpecific object) {
 		return null;
 	}
 

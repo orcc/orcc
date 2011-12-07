@@ -99,6 +99,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 			case DfPackage.UNIT: return createUnit();
 			case DfPackage.PORT: return createPort();
 			case DfPackage.INSTANCE: return createInstance();
+			case DfPackage.ENTITY_SPECIFIC: return createEntitySpecific();
 			case DfPackage.ACTOR: return createActor();
 			case DfPackage.NETWORK: return createNetwork();
 			case DfPackage.BROADCAST: return createBroadcast();
@@ -294,6 +295,16 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	public Instance createInstance() {
 		InstanceImpl instance = new InstanceImpl();
 		return instance;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EntitySpecific createEntitySpecific() {
+		EntitySpecificImpl entitySpecific = new EntitySpecificImpl();
+		return entitySpecific;
 	}
 
 	@Override

@@ -22,6 +22,7 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Entity;
+import net.sf.orcc.df.EntitySpecific;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Tag;
 import net.sf.orcc.df.Transition;
@@ -204,6 +205,13 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	private EClass entityEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass entitySpecificEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -1079,6 +1087,15 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EClass getEntitySpecific() {
+		return entitySpecificEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getUnit() {
 		return unitEClass;
 	}
@@ -1193,6 +1210,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEReference(entityEClass, ENTITY__INPUTS);
 		createEReference(entityEClass, ENTITY__OUTPUTS);
 		createEReference(entityEClass, ENTITY__PARAMETERS);
+
+		entitySpecificEClass = createEClass(ENTITY_SPECIFIC);
 
 		actorEClass = createEClass(ACTOR);
 		createEReference(actorEClass, ACTOR__ACTIONS);
@@ -1322,6 +1341,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		portEClass.getESuperTypes().add(this.getVertex());
 		instanceEClass.getESuperTypes().add(this.getVertex());
 		entityEClass.getESuperTypes().add(this.getVertex());
+		entitySpecificEClass.getESuperTypes().add(this.getEntity());
 		actorEClass.getESuperTypes().add(this.getEntity());
 		networkEClass.getESuperTypes().add(this.getEntity());
 		broadcastEClass.getESuperTypes().add(this.getEntity());
@@ -1355,6 +1375,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		initEReference(getEntity_Inputs(), this.getPort(), null, "inputs", null, 0, -1, Entity.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getEntity_Outputs(), this.getPort(), null, "outputs", null, 0, -1, Entity.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getEntity_Parameters(), theIrPackage.getVar(), null, "parameters", null, 0, -1, Entity.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(entitySpecificEClass, EntitySpecific.class, "EntitySpecific", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(actorEClass, Actor.class, "Actor", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getActor_Actions(), this.getAction(), null, "actions", null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

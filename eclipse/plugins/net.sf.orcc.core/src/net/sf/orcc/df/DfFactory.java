@@ -213,6 +213,15 @@ public interface DfFactory extends EFactory {
 	 */
 	Instance createInstance();
 
+	/**
+	 * Returns a new object of class '<em>Entity Specific</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Entity Specific</em>'.
+	 * @generated
+	 */
+	EntitySpecific createEntitySpecific();
+
 	Instance createInstance(String id, Entity entity);
 
 	/**

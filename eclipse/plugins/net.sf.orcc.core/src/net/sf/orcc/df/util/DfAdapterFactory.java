@@ -117,6 +117,10 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 				return createEntityAdapter();
 			}
 			@Override
+			public Adapter caseEntitySpecific(EntitySpecific object) {
+				return createEntitySpecificAdapter();
+			}
+			@Override
 			public Adapter caseActor(Actor object) {
 				return createActorAdapter();
 			}
@@ -512,6 +516,20 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createEntityAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.EntitySpecific <em>Entity Specific</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.df.EntitySpecific
+	 * @generated
+	 */
+	public Adapter createEntitySpecificAdapter() {
 		return null;
 	}
 

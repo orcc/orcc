@@ -105,7 +105,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getNetwork()
 	 * @generated
 	 */
-	int NETWORK = 7;
+	int NETWORK = 8;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.AttributeImpl <em>Attribute</em>}' class.
@@ -115,7 +115,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getAttribute()
 	 * @generated
 	 */
-	int ATTRIBUTE = 9;
+	int ATTRIBUTE = 10;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.ConnectionImpl <em>Connection</em>}' class.
@@ -125,7 +125,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getConnection()
 	 * @generated
 	 */
-	int CONNECTION = 10;
+	int CONNECTION = 11;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.InstanceImpl <em>Instance</em>}' class.
@@ -145,7 +145,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getBroadcast()
 	 * @generated
 	 */
-	int BROADCAST = 8;
+	int BROADCAST = 9;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.WrapperStringImpl <em>Wrapper String</em>}' class.
@@ -155,7 +155,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getWrapperString()
 	 * @generated
 	 */
-	int WRAPPER_STRING = 11;
+	int WRAPPER_STRING = 12;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.WrapperXmlImpl <em>Wrapper Xml</em>}' class.
@@ -165,7 +165,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getWrapperXml()
 	 * @generated
 	 */
-	int WRAPPER_XML = 12;
+	int WRAPPER_XML = 13;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.VertexImpl <em>Vertex</em>}' class.
@@ -185,7 +185,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getAction()
 	 * @generated
 	 */
-	int ACTION = 13;
+	int ACTION = 14;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.ActorImpl <em>Actor</em>}' class.
@@ -195,7 +195,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getActor()
 	 * @generated
 	 */
-	int ACTOR = 6;
+	int ACTOR = 7;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.FSMImpl <em>FSM</em>}' class.
@@ -205,7 +205,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getFSM()
 	 * @generated
 	 */
-	int FSM = 14;
+	int FSM = 15;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.PatternImpl <em>Pattern</em>}' class.
@@ -215,7 +215,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getPattern()
 	 * @generated
 	 */
-	int PATTERN = 15;
+	int PATTERN = 16;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.PortImpl <em>Port</em>}' class.
@@ -235,7 +235,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getState()
 	 * @generated
 	 */
-	int STATE = 16;
+	int STATE = 17;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.TagImpl <em>Tag</em>}' class.
@@ -245,7 +245,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getTag()
 	 * @generated
 	 */
-	int TAG = 17;
+	int TAG = 18;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.TransitionImpl <em>Transition</em>}' class.
@@ -255,7 +255,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getTransition()
 	 * @generated
 	 */
-	int TRANSITION = 18;
+	int TRANSITION = 19;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.TransitionsImpl <em>Transitions</em>}' class.
@@ -265,7 +265,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getTransitions()
 	 * @generated
 	 */
-	int TRANSITIONS = 19;
+	int TRANSITIONS = 20;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.PortToEIntegerObjectMapEntryImpl <em>Port To EInteger Object Map Entry</em>}' class.
@@ -275,7 +275,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getPortToEIntegerObjectMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = 20;
+	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = 21;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.PortToVarMapEntryImpl <em>Port To Var Map Entry</em>}' class.
@@ -285,7 +285,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getPortToVarMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_VAR_MAP_ENTRY = 21;
+	int PORT_TO_VAR_MAP_ENTRY = 22;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.VarToPortMapEntryImpl <em>Var To Port Map Entry</em>}' class.
@@ -295,7 +295,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getVarToPortMapEntry()
 	 * @generated
 	 */
-	int VAR_TO_PORT_MAP_ENTRY = 22;
+	int VAR_TO_PORT_MAP_ENTRY = 23;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.ArgumentImpl <em>Argument</em>}' class.
@@ -305,7 +305,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getArgument()
 	 * @generated
 	 */
-	int ARGUMENT = 23;
+	int ARGUMENT = 24;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.UnitImpl <em>Unit</em>}' class.
@@ -631,6 +631,88 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int ENTITY_FEATURE_COUNT = VERTEX_FEATURE_COUNT + 3;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.df.impl.EntitySpecificImpl <em>Entity Specific</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.df.impl.EntitySpecificImpl
+	 * @see net.sf.orcc.df.impl.DfPackageImpl#getEntitySpecific()
+	 * @generated
+	 */
+	int ENTITY_SPECIFIC = 6;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ENTITY_SPECIFIC__NAME = ENTITY__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ENTITY_SPECIFIC__INCOMING = ENTITY__INCOMING;
+
+	/**
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ENTITY_SPECIFIC__OUTGOING = ENTITY__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ENTITY_SPECIFIC__ATTRIBUTES = ENTITY__ATTRIBUTES;
+
+	/**
+	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ENTITY_SPECIFIC__INPUTS = ENTITY__INPUTS;
+
+	/**
+	 * The feature id for the '<em><b>Outputs</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ENTITY_SPECIFIC__OUTPUTS = ENTITY__OUTPUTS;
+
+	/**
+	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ENTITY_SPECIFIC__PARAMETERS = ENTITY__PARAMETERS;
+
+	/**
+	 * The number of structural features of the '<em>Entity Specific</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ENTITY_SPECIFIC_FEATURE_COUNT = ENTITY_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -2402,6 +2484,16 @@ public interface DfPackage extends EPackage {
 	EReference getEntity_Parameters();
 
 	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.df.EntitySpecific <em>Entity Specific</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Entity Specific</em>'.
+	 * @see net.sf.orcc.df.EntitySpecific
+	 * @generated
+	 */
+	EClass getEntitySpecific();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Unit <em>Unit</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3237,6 +3329,16 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EReference ENTITY__PARAMETERS = eINSTANCE.getEntity_Parameters();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.df.impl.EntitySpecificImpl <em>Entity Specific</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.df.impl.EntitySpecificImpl
+		 * @see net.sf.orcc.df.impl.DfPackageImpl#getEntitySpecific()
+		 * @generated
+		 */
+		EClass ENTITY_SPECIFIC = eINSTANCE.getEntitySpecific();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.UnitImpl <em>Unit</em>}' class.
