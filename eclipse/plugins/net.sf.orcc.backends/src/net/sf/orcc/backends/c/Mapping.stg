@@ -11,7 +11,7 @@ printNetwork(network, options) ::= <<
 
 core(id, instances) ::= <<
 \<Partition id="<id>"\>
-	<instances : {instance | \<Instance id="<instance.id>"/\>}; separator="\n">
+	<instances : {instance | \<Instance id="<instance.name>"/\>}; separator="\n">
 \</Partition\>
 >>
 

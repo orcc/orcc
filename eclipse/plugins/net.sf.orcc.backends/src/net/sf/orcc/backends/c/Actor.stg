@@ -13,7 +13,7 @@ varDecl(variable, sep="") ::= <<
 >>
 
 getPortName(port) ::= <<
-<instance.id>_<port.name>
+<instance.name>_<port.name>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -97,7 +97,7 @@ finished:
 }
 
 <endif>
-void <instance.id>_initialize(<instance.actor.inputs: { port | unsigned int fifo_<port.name>_id}; separator=", ">) {
+void <instance.name>_initialize(<instance.actor.inputs: { port | unsigned int fifo_<port.name>_id}; separator=", ">) {
 	<if(instance.actor.initializes)>
 	struct schedinfo_s si;
 	si.num_firings = 0;
@@ -336,8 +336,8 @@ printOutputPatternPort(port, successor, readerId) ::= <<
 if (<pattern.numTokensMap.(port)> \> SIZE_<port.name> - index_<port.name> + <getPortName(port)>-\>read_inds[<readerId>] ) {
 	stop = 1;
 	<if(options.newScheduler)>
-	if(!<instance.id>.sched-\>round_robin || i \> 0) {
-		sched_add_schedulable(<instance.id>.sched, &<successor.target.id>, RING_TOPOLOGY);
+	if(!<instance.name>.sched-\>round_robin || i \> 0) {
+		sched_add_schedulable(<instance.name>.sched, &<successor.target.name>, RING_TOPOLOGY);
 #ifdef PRINT_FIRINGS
 		printf("\tFull port: <port.name>\n");
 #endif
@@ -470,8 +470,8 @@ if (<checkInputPattern(transition.action.inputPattern)>isSchedulable_<transition
 
 printInputPatternPort(port) ::= <<
 if (index_<port.name> + <pattern.numTokensMap.(port)> \> numTokens_<port.name>) {
-	if(!<instance.id>.sched-\>round_robin || i \> 0) {
-		sched_add_schedulable(<instance.id>.sched, &<instance.incomingPortMap.(port).source.id>, RING_TOPOLOGY);
+	if(!<instance.name>.sched-\>round_robin || i \> 0) {
+		sched_add_schedulable(<instance.name>.sched, &<instance.incomingPortMap.(port).source.name>, RING_TOPOLOGY);
 #ifdef PRINT_FIRINGS
 		printf("\tEmpty port: <port.name>\n");
 #endif
@@ -502,11 +502,11 @@ printTransition(transitions) ::= <<
 
 l_<transitions.sourceState.name>:
 	<if (actions)>
-	<instance.id>_outside_FSM_scheduler(si);
+	<instance.name>_outside_FSM_scheduler(si);
 	i += si-\>num_firings;
 	<endif>
 	<if (transitions.list.empty)>
-	printf("stuck in state \"<transitions.sourceState.name>\" in the instance <instance.id>\n");
+	printf("stuck in state \"<transitions.sourceState.name>\" in the instance <instance.name>\n");
 	wait_for_key();
 	exit(1);
 	<else>
@@ -524,7 +524,7 @@ printSwitch(transitions) ::= <<
 switch (_FSM_state) {
 <transitions: switchTransition()>
 default:
-	printf("unknown state in <instance.id>.c : %s\n", stateNames[_FSM_state]);
+	printf("unknown state in <instance.name>.c : %s\n", stateNames[_FSM_state]);
 	wait_for_key();
 	exit(1);
 }
@@ -532,7 +532,7 @@ default:
 
 schedulerFSM(actions, fsm) ::= <<
 <if(actions)>
-void <instance.id>_outside_FSM_scheduler(struct schedinfo_s *si) {
+void <instance.name>_outside_FSM_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 
 	<printActionLoop(actions)>
@@ -543,7 +543,7 @@ finished:
 }
 <endif>
 
-void <instance.id>_scheduler(struct schedinfo_s *si) {
+void <instance.name>_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 
 	<printCallTokenFunctions()>
@@ -644,7 +644,7 @@ printInstance(instance, options) ::= <<
 
 ////////////////////////////////////////////////////////////////////////////////
 // Instance
-extern struct actor_s <instance.id>;
+extern struct actor_s <instance.name>;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Input FIFOs
@@ -656,7 +656,7 @@ extern struct actor_s <instance.id>;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Predecessors
-<instance.actor.inputs: { port | extern struct actor_s <instance.incomingPortMap.(port).source.id>;}; separator="\n">
+<instance.actor.inputs: { port | extern struct actor_s <instance.incomingPortMap.(port).source.name>;}; separator="\n">
 
 ////////////////////////////////////////////////////////////////////////////////
 // Output FIFOs
@@ -668,7 +668,7 @@ extern struct actor_s <instance.id>;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Successors
-<instance.actor.outputs: { port | <instance.outgoingPortMap.(port): { successor | extern struct actor_s <successor.target.id>;}; separator="\n">}; separator="\n">
+<instance.actor.outputs: { port | <instance.outgoingPortMap.(port): { successor | extern struct actor_s <successor.target.name>;}; separator="\n">}; separator="\n">
 
 ////////////////////////////////////////////////////////////////////////////////
 // Input FIFOs Id
@@ -706,7 +706,7 @@ extern struct actor_s <instance.id>;
 <if(instance.actor.fsm)>
 <schedulerFSM(actions=instance.actor.actionsOutsideFsm, fsm=instance.actor.fsm)>
 <else>
-void <instance.id>_scheduler(struct schedinfo_s *si) {
+void <instance.name>_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 	si-\>ports = 0;
 
