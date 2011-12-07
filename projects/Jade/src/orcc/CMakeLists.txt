@@ -10,8 +10,8 @@ orcc/src/compare.c
 orcc/src/compareyuv.c
 orcc/src/display.c
 orcc/src/getopt.c
-# orcc/src/img_display.c
-# orcc/src/img_read.c
+orcc/src/img_display.c
+orcc/src/img_read.c
 orcc/src/source.c
 orcc/src/writer.c
 orcc/src/source_no_loop.c

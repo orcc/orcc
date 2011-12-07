@@ -64,14 +64,14 @@ Module* LLVMParser::loadModule(Package* package, string file) {
 	//Get filename of the actor
 	sys::Path Filename(directory + package->getDirectory() + "/" + file);
 
-	//Load the bitcode
+	/*//Load the bitcode
 	if(!Filename.exists()){
 		//Archive case
 		Mod = ParseArchive(package, Filename);
-	}else{
+	}else{*/
 		//Bitecode and Assembly case
 		Mod = ParseIRFile(Filename.c_str(), Err, Context);
-	}
+	//}
 
 	if (verbose) cout << "Loading '" << Filename.c_str() << "'\n";	
 
