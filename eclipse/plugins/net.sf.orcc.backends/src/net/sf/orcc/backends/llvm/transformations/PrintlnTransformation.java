@@ -113,7 +113,9 @@ public class PrintlnTransformation extends AbstractActorVisitor<Object> {
 		strCnt = 0;
 		stateVars = actor.getStateVars();
 
-		actor.getProcs().remove(actor.getProcedure("print"));
+		while (actor.getProcedure("print") != null ){
+			actor.getProcs().remove(actor.getProcedure("print"));
+		}
 
 		return super.caseActor(actor);
 	}

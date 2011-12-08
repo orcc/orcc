@@ -61,9 +61,6 @@ cl::list<string>
 Packages(cl::Positional, cl::OneOrMore, cl::desc("Input actors"));
 
 cl::opt<bool> 
-OutputAssembly("S", cl::desc("Generate LLVM in assembly representation"));
-
-cl::opt<bool> 
 OutputBitcode("c", cl::desc("Generate LLVM in bytecode representation"));
 
 cl::opt<bool> 

@@ -40,10 +40,6 @@ PassList(cl::desc("Optimizations available:"));
 // Other command line options...
 //
 static cl::opt<std::string>
-InputFilename(cl::Positional, cl::desc("<input bitcode file>"),
-    cl::init("-"), cl::value_desc("filename"));
-
-static cl::opt<std::string>
 OutputFilename("o", cl::desc("Override output filename"),
                cl::value_desc("filename"));
 
@@ -88,6 +84,10 @@ StandardCompileOpts("std-compile-opts",
 static cl::opt<bool>
 StandardLinkOpts("std-link-opts",
                  cl::desc("Include the standard link time optimizations"));
+
+static cl::opt<bool>
+OptLevelO0("O0",
+           cl::desc("No Optimization"));
 
 static cl::opt<bool>
 OptLevelO1("O1",
