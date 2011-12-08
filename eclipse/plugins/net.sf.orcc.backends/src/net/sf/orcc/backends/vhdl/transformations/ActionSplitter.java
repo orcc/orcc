@@ -1,8 +1,6 @@
 /*
  * Copyright (c) 2011, IETR/INSA of Rennes
- * All rights re
-import net.sf.orcc.util.EcoreHelper;
-served.
+ * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
