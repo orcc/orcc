@@ -35,7 +35,6 @@ import static net.sf.orcc.preferences.PreferenceConstants.P_JADE_TOOLBOX;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -81,6 +80,10 @@ import net.sf.orcc.tools.normalizer.ActorNormalizer;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 
 /**
  * LLVM back-end.
@@ -235,9 +238,13 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 		// print network
 		write("Printing network...\n");
-		File file = new File(path, network.getSimpleName() + ".xdf");
+		String pathName = path + "/" + network.getSimpleName() + ".xdf";
+		URI uri = URI.createFileURI(pathName);
+		ResourceSet set = new ResourceSetImpl();
+		Resource resource = set.createResource(uri);
+		resource.getContents().add(network);
 		try {
-			network.eResource().save(new FileOutputStream(file), null);
+			resource.save(null);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
