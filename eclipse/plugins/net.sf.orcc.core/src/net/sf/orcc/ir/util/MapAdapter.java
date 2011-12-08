@@ -43,9 +43,8 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.ProcedureImpl;
 
-import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.common.notify.Notifier;
+import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -55,9 +54,7 @@ import org.eclipse.emf.ecore.EObject;
  * @author Matthieu Wipliez
  * 
  */
-public class MapAdapter implements Adapter {
-
-	private Notifier target;
+public class MapAdapter extends AdapterImpl {
 
 	@SuppressWarnings("unchecked")
 	private void add(Notification notification, Object object) {
@@ -68,10 +65,6 @@ public class MapAdapter implements Adapter {
 		if (feature == eINSTANCE.getProcedure_Locals()) {
 			map = ((ProcedureImpl) target).getLocalsMap();
 			key = ((Var) object).getIndexedName();
-			((Map<Object, Object>) map).put(key, object);
-		} else if (feature == DfPackage.eINSTANCE.getActor_Procs()) {
-			map = ((ActorImpl) target).getProceduresMap();
-			key = ((Procedure) object).getName();
 			((Map<Object, Object>) map).put(key, object);
 		} else if (feature == DfPackage.eINSTANCE.getActor_StateVars()) {
 			map = ((ActorImpl) target).getStateVariablesMap();
@@ -84,11 +77,6 @@ public class MapAdapter implements Adapter {
 				((Map<Object, Object>) map).put(key, object);
 			}
 		}
-	}
-
-	@Override
-	public Notifier getTarget() {
-		return target;
 	}
 
 	@Override
@@ -145,10 +133,6 @@ public class MapAdapter implements Adapter {
 			map = ((ProcedureImpl) target).getLocalsMap();
 			key = ((Var) object).getIndexedName();
 			((Map<Object, Object>) map).remove(key);
-		} else if (feature == DfPackage.eINSTANCE.getActor_Procs()) {
-			map = ((ActorImpl) target).getProceduresMap();
-			key = ((Procedure) object).getName();
-			((Map<Object, Object>) map).remove(key);
 		} else if (feature == DfPackage.eINSTANCE.getActor_StateVars()) {
 			map = ((ActorImpl) target).getStateVariablesMap();
 			key = ((Var) object).getName();
@@ -173,11 +157,6 @@ public class MapAdapter implements Adapter {
 				map.put((State) object, transitions);
 			}
 		}
-	}
-
-	@Override
-	public void setTarget(Notifier newTarget) {
-		this.target = newTarget;
 	}
 
 }

@@ -113,13 +113,13 @@ public interface Actor extends Entity {
 	MoC getMoC();
 
 	/**
-	 * Returns the procedure with the given name.
+	 * Returns a procedure of this actor whose name matches the given name.
 	 * 
 	 * @param name
-	 *            name of a procedure
-	 * @return the procedure with the given name
+	 *            the procedure name
+	 * @return a procedure whose name matches the given name
 	 */
-	Procedure getProcedure(String string);
+	Procedure getProcedure(String name);
 
 	/**
 	 * Returns the list of functions and procedures defined in this actor.

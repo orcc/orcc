@@ -59,7 +59,6 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transformations.BroadcastAdder;
 import net.sf.orcc.df.util.DfSwitch;
-import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
@@ -246,12 +245,6 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 		// remove initialize actions
 		IrUtil.delete(actor.getInitializes());
-
-		// remove initialization procedure (we could do better)
-		Procedure initProc = actor.getProcedure("_initialize");
-		if (initProc != null) {
-			IrUtil.delete(initProc);
-		}
 	}
 
 	/**

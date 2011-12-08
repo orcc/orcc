@@ -525,16 +525,12 @@ public class ActorImpl extends EntityImpl implements Actor {
 
 	@Override
 	public Procedure getProcedure(String name) {
-		return getProceduresMap().get(name);
-	}
-
-	public Map<String, Procedure> getProceduresMap() {
-		Map<String, Procedure> mapProcedures = new HashMap<String, Procedure>();
-		for (Procedure proc : getProcs()) {
-			mapProcedures.put(proc.getName(), proc);
+		for (Procedure procedure : getProcs()) {
+			if (procedure.getName().equals(name)) {
+				return procedure;
+			}
 		}
-
-		return mapProcedures;
+		return null;
 	}
 
 	/**
