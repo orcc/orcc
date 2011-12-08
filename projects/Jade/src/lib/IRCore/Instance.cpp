@@ -165,7 +165,7 @@ void Instance::solveParameters(){
 			GlobalVariable* GV = cast<GlobalVariable>(variable);
 			Type* type = GV->getType()->getElementType();	
 
-			value = ConstantInt::get(type, APInt(32, expr->evaluateAsInteger()));
+			value = ConstantInt::get(type, APInt(type->getScalarSizeInBits(), expr->evaluateAsInteger()));
 		}else{
 			value = expr->getConstant();
 		}

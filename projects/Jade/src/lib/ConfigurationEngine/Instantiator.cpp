@@ -142,13 +142,14 @@ void Instantiator::updateConnection(Connection* connection){
 		// Get same port from the actor 
 		Actor* actor = target->getActor();
 		Port* dstPort = actor->getInput(dstPortInst->getName());
-		targetString = dstPort->getName();
-		dstPortType = dstPort->getType();
 
 		if (dstPort == NULL){
 			cerr << "A Connection refers to non-existent destination port: " << dstPort->getName() << " of instance " << target->getId();
 			exit(0);
 		}
+
+		targetString = dstPort->getName();
+		dstPortType = dstPort->getType();
 
 		// Bound GlobalVariable to port from instance
 		dstPortInst->setType(dstPortType);

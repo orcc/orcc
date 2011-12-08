@@ -55,29 +55,21 @@ using namespace llvm;
 using namespace std;
 
 void FifoTrace::createConnection(){
-	//Get fifo structure
 	IntegerType* connectionType = cast<IntegerType>(fifoType);
 
 	//Get fifo structure
 	StructType* structType = FifoMng::getFifoType(connectionType);
 
 	//Get fifo array structure
-	ArrayType* arrayType = ArrayType::get(connectionType, connection->getSize());
+	ArrayType* arrayType = ArrayType::get(structType, fifoSize);
 
 	// Initialize array for content
-	Constant* arrayContent = ConstantArray::get(arrayType, NULL);
-	GlobalVariable *NewArrayContents =
-        new GlobalVariable(*module, arrayType,
-		false, GlobalVariable::InternalLinkage, arrayContent,  "content");
-	NewArrayContents->setAlignment(32);
+	GlobalVariable * ArrayContent = new GlobalVariable(*module, arrayType, false, GlobalVariable::InternalLinkage, ConstantAggregateZero::get(arrayType), "content");
+	ArrayContent->setAlignment(32);
 	
 	// Initialize array for fifo buffer
-	Constant* arrayFifoBuffer = ConstantArray::get(arrayType, NULL);
-	GlobalVariable *NewArrayFifoBuffer =
-        new GlobalVariable(*module, arrayType,
-		false, GlobalVariable::InternalLinkage, arrayFifoBuffer, "buffer");
-	NewArrayFifoBuffer->setAlignment(32);
-
+	GlobalVariable * ArrayFifoBuffer = new GlobalVariable(*module, arrayType, false, GlobalVariable::InternalLinkage, ConstantAggregateZero::get(arrayType), "buffer");
+	ArrayFifoBuffer->setAlignment(32);
 	
 	//Creating file string
 	ostringstream fileName;
@@ -101,8 +93,8 @@ void FifoTrace::createConnection(){
 	Constant* read_ind = ConstantInt::get(Type::getInt32Ty(Context), 0);
 	Constant* write_ind = ConstantInt::get(Type::getInt32Ty(Context), 0);
 	Constant* fill_count = ConstantInt::get(Type::getInt32Ty(Context), 0);
-	Constant* contents = ConstantExpr::getBitCast(NewArrayContents, structType->getElementType(1));
-	Constant* fifo_buffer = ConstantExpr::getBitCast(NewArrayFifoBuffer, structType->getElementType(2));
+	Constant* contents = ConstantExpr::getBitCast(ArrayContent, structType->getElementType(1));
+	Constant* fifo_buffer = ConstantExpr::getBitCast(ArrayFifoBuffer, structType->getElementType(2));
 	Constant* file =  ConstantExpr::getBitCast(GV, structType->getElementType(3));
 	
 	// Add initialization vector 
