@@ -150,7 +150,7 @@ assignFifos(connections) ::= <<
 >>
 
 assignFifo(connection) ::= <<
-<if(!connection.source.native && !connection.target.native)>
+<if(!connection.sourcePort.native && !connection.targetPort.native)>
 fifo_<indexConnection(connection)> : entity work.fifo
   generic map(width =\> 32)
   port map(clk     =\> clk,
