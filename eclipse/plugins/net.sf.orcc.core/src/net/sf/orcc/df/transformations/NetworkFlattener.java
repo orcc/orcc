@@ -37,8 +37,15 @@ import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.ir.ExprVar;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.Var;
+import net.sf.orcc.util.EcoreHelper;
 
 import org.eclipse.emf.common.notify.Adapter;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class defines a transformation that flattens a given network in-place.
@@ -69,6 +76,8 @@ public class NetworkFlattener extends DfSwitch<Void> {
 				Adapter adapter = subNetwork.eAdapters().remove(0);
 
 				moveEntitiesAndConnections(network, subNetwork);
+				propagateVariables(subNetwork.getParameters());
+				propagateVariables(subNetwork.getVariables());
 
 				linkOutgoingConnections(network, subNetwork);
 				linkIncomingConnections(network, subNetwork);
@@ -157,6 +166,23 @@ public class NetworkFlattener extends DfSwitch<Void> {
 		}
 
 		network.getConnections().addAll(connections);
+	}
+
+	/**
+	 * Propagate the values of the given variables to their uses
+	 * 
+	 * @param variables
+	 *            the variables to propagate
+	 */
+	private void propagateVariables(EList<Var> variables) {
+		for (Var var : variables) {
+			for (Use use : var.getUses()) {
+				Expression oldExpr = EcoreHelper.getContainerOfType(use,
+						ExprVar.class);
+				Expression newExpr = EcoreUtil.copy(var.getInitialValue());
+				EcoreUtil.replace(oldExpr, newExpr);
+			}
+		}
 	}
 
 }
