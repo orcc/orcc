@@ -54,12 +54,10 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * 
  * @author Matthieu Wipliez
  * @author Ghislain Roquier
+ * @author Herve Yviquel
  * 
  */
 public class NetworkFlattener extends DfSwitch<Void> {
-
-	public NetworkFlattener() {
-	}
 
 	@Override
 	public Void caseNetwork(Network network) {
