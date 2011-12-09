@@ -179,7 +179,7 @@ assignInstance(instance) ::= <<
 >>
 
 assignGenerics(instance) ::= <<
-<instance.parameters.keys: { param |<param> =\> <instance.parameters.(param)>}; separator=",\n              ">
+<instance.arguments: { arg | <arg.variable.name> =\> <arg.value>}; separator=",\n              ">
 >>
 
 assignPorts(instance) ::= <<
