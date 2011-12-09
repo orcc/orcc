@@ -129,13 +129,17 @@ public class TTABackendImpl extends AbstractBackend {
 		actor.setTemplateData(new TTAActorTemplateData(actor));
 	}
 
-	private void doTransformNetwork(Network network) throws OrccException {
-		// instantiate and flattens network
+	private Network doTransformNetwork(Network network) throws OrccException {
+		write("Instantiating... ");
 		network = new Instantiator().doSwitch(network);
+		write("done\n");
+		write("Flattening... ");
 		new NetworkFlattener().doSwitch(network);
+		write("done\n");
 
 		new BroadcastAdder().doSwitch(network);
 		new BroadcastTypeResizer().doSwitch(network);
+		return network;
 	}
 
 	@Override
@@ -145,7 +149,7 @@ public class TTABackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
-		doTransformNetwork(network);
+		network = doTransformNetwork(network);
 
 		transformActors(network.getActors());
 		printInstances(network);
@@ -168,8 +172,8 @@ public class TTABackendImpl extends AbstractBackend {
 
 			// ModelSim
 			StandardPrinter tbPrinter = new StandardPrinter(
-					"net/sf/orcc/backends/tta/ModelSim_Testbench.stg",
-					!debug, false);
+					"net/sf/orcc/backends/tta/ModelSim_Testbench.stg", !debug,
+					false);
 			StandardPrinter tclPrinter = new StandardPrinter(
 					"net/sf/orcc/backends/tta/ModelSim_Script.stg");
 			tbPrinter.print(instance.getName() + "_tb.vhd", instancePath,
