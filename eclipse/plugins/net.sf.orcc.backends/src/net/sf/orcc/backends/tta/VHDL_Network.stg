@@ -213,9 +213,9 @@ endif>
 >>
 
 indexInputConnection(port) ::= <<
-<indexConnection(network.incomingMap.(instance).(port))>
+<indexConnection(instance.incomingPortMap.(port))>
 >>
 
 indexOutputConnection(port) ::= <<
-<indexConnection(first(network.outgoingMap.(instance).(port)))>
+<indexConnection(first(instance.outgoingPortMap.(port)))>
 >>
