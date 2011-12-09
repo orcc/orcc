@@ -373,7 +373,7 @@ printNetwork(network, options) ::= <<
 
 <fillActorsStructs(network.instances)>
 
-<declareActorsArray(instances=network.instances)>
+<declareActorsArray(network.instances)>
 
 <if (options.useGeneticAlgorithm)>
 extern int source_is_stopped();
