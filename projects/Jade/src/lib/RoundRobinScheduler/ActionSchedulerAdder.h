@@ -45,10 +45,11 @@
 
 namespace llvm{
 	class BasicBlock;
+	class CallInst;
 	class ConstantInt;
 	class Function;
 	class LLVMContext;
-	class CallInst;
+	class Module;
 	class Value;
 }
 
@@ -310,7 +311,7 @@ protected:
 	 *
 	 * @param function : llvm::Function where the test is added
 	 */
-	virtual llvm::CallInst* createOutputTest(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+	virtual llvm::Value* createOutputTest(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
 
 	/**
 	 * @brief Check input pattern of an action
@@ -341,7 +342,7 @@ protected:
 	 *
 	 * @param function : llvm::Function where the test is added
 	 */
-	virtual llvm::CallInst* createInputTest(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+	virtual llvm::Value* createInputTest(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
@@ -357,6 +358,9 @@ protected:
 
 	/** Current instance */
 	Instance* instance;
+
+	/** Current module */
+	llvm::Module* module;
 
 	/** ActionScheduler BB */
 	llvm::BasicBlock* entryBB;

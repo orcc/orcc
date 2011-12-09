@@ -64,8 +64,16 @@ class FifoOpt : public AbstractFifo {
 		llvm::GlobalVariable* ArrayContent;
 
 		virtual void createConnection();
+	
+	public:
+		static llvm::StructType* getOrInsertFifoStruct(llvm::Module* module, llvm::IntegerType* connectionType);
+		static llvm::Function* getOrInsertRoomFn(llvm::Module* module, llvm::IntegerType* connectionType);
+		static llvm::Function* getOrInsertNumTokensFn(llvm::Module* module, llvm::IntegerType* connectionType);
+		static llvm::Function* initializeIn(llvm::Module* module, Port* port);
+		static llvm::Function* initializeOut(llvm::Module* module, Port* port);
 
-		llvm::StructType* getOrInserFifoStruct(llvm::IntegerType* connectionType);
+		static llvm::Function* closeIn(llvm::Module* module, Port* port);
+		static llvm::Function* closeOut(llvm::Module* module, Port* port);
 };
 
 #endif

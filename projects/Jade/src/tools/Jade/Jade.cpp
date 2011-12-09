@@ -177,7 +177,7 @@ cl::opt<bool> OptLevelO3("O3",
 
 cl::opt<int> FifoSize("default-fifo-size",
          cl::desc("Defaut size of fifos"),
-         cl::init(10000));
+         cl::init(512));
 
 cl::opt<int> StopAt("stop-at-frame",
          cl::desc("Stop decoder after a given number of frame decoded."),

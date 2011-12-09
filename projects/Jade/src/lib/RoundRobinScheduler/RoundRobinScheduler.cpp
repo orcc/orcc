@@ -195,18 +195,15 @@ void RoundRobinScheduler::addInstance(Instance* instance){
 	OPTScheduler OPTFSchedulerAdder(Context, decoder);
 	
 	MoC* moc = instance->getMoC();
-		
+	
+	//OPTFSchedulerAdder.transform(instance);
+
 	if (moc->isQuasiStatic() && optimized){
 		QSDFSchedulerAdder.transform(instance);
 	}else if (moc->isCSDF() && optimized){
 		CSDFSchedulerAdder.transform(instance);
 	}else{
-
-		//if ((instance->getId().compare("source")!=0)&& (instance->getId().compare("serialize")!=0)){
-			DPNSchedulerAdder.transform(instance);
-	/*	}else{
-			OPTFSchedulerAdder.transform(instance);
-		}*/
+		DPNSchedulerAdder.transform(instance);
 	}
 
 	// Call the action scheduler

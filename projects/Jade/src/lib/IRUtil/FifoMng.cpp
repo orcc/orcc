@@ -67,7 +67,7 @@ string FifoMng::outputDir;
 Module* FifoMng::headerMd;
 map<int, FifoMng::FifoAccess*> FifoMng::fifoAccesses;
 map<string, StructType*> FifoMng::fifoStructs;
-int FifoMng::defaultFifoSize = 10000;
+int FifoMng::defaultFifoSize = 512;
 
 
 void FifoMng::setFifoTy(FifoTy fifoTy, std::string packageFld, int defaultFifoSize, std::string outputDir){
@@ -148,11 +148,9 @@ pair<string, StructType*> FifoMng::parseFifoStruct(llvm::MDNode* structMD){
 
 AbstractFifo* FifoMng::getFifo(LLVMContext& C, Decoder* decoder, Type* type, Connection* connection){
 	int size = connection->getSize();
-	/*
-	char* name = connection->getSource()->getName();
-	if (strcmp (name,"source") == 0){
-		return new FifoOpt(C, decoder->getModule(), type, size);
-	}*/
+	
+	//return new FifoOpt(C, decoder->getModule(), type, size);
+	
 
 	//Todo : implement static class in fifo for creation
 	if (fifoTy == trace){

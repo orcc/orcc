@@ -45,6 +45,7 @@ namespace llvm {
 	class IntegerType;
 	class StringRef;
 	class GlobalVariable;
+	class Value;
 }
 
 #include "Jade/Core/IRType.h"
@@ -79,6 +80,8 @@ public:
 		this->type = type; 
 		this->ptrVar = NULL;
 		this->fifoVar = NULL;
+		this->index = NULL;
+		this->numTokenFree = NULL;
 		this->intern = false;
 	};
 
@@ -125,10 +128,18 @@ public:
 	 *
 	 * Add a new fifo connectioned to this port
 	 * 
-	 * @return ir::Type of the port
+	 * @param fifo: the new fifo to add
 	 *
 	 */
 	void addFifoConnection(AbstractConnector* fifo){fifos.push_back(fifo);};
+
+	/**
+	 * @brief Get fifo connections to the port
+	 * 
+	 * @return a list of fifos
+	 *
+	 */
+	std::list<AbstractConnector*>* getFifoConnections(){return &fifos;};
 
 	/**
 	 * @brief Get the number of fifo connected to this port
@@ -189,6 +200,73 @@ public:
 	 */
 	void setFifoVar(llvm::GlobalVariable* fifoVar){this->fifoVar = fifoVar;};
 
+	/**
+	 * @brief Setter of the index pointer
+	 * 
+	 * Set the llvm::GlobalVariable that corresponds to the index variable
+	 *
+	 * @param variable : llvm::GlobalVariable that corresponds to the index
+	 */
+	void setIndex(llvm::GlobalVariable* index){this->index = index;};
+
+	/**
+	 * @brief getter of the index pointer
+	 * 
+	 * Get the llvm::GlobalVariable that corresponds to the index variable
+	 *
+	 * @return llvm::GlobalVariable that corresponds to the index
+	 */
+	llvm::GlobalVariable* getIndex(){return index;};
+
+	/**
+	 * @brief Setter of the room/hasToken pointer
+	 * 
+	 * Set the llvm::GlobalVariable that corresponds to the room or hasToken variable
+	 *
+	 * @param variable : llvm::GlobalVariable that corresponds to the room or hasToken
+	 */
+	void setRoomToken(llvm::GlobalVariable* roomToken){this->numTokenFree = roomToken;};
+
+	/**
+	 * @brief Setter of the room/hasToken pointer
+	 * 
+	 * Get the llvm::GlobalVariable that corresponds to the room or hasToken variable
+	 *
+	 * @return llvm::GlobalVariable that corresponds to the room or hasToken
+	 */
+	llvm::GlobalVariable* getRoomToken(){return numTokenFree;};
+
+	/**
+	 * @brief Setter of the id pointer
+	 * 
+	 * Set the llvm::GlobalVariable that corresponds to the id of the port
+	 *
+	 * @param variable : llvm::GlobalVariable that corresponds to the id of the port
+	 */
+	void setId(llvm::GlobalVariable* id){this->id = id;};
+
+	/**
+	 * @brief Getter of the id pointer
+	 * 
+	 * Get the llvm::GlobalVariable that corresponds to the id of the port
+	 *
+	 * @return llvm::GlobalVariable that corresponds to the id of the port
+	 */
+	llvm::GlobalVariable* getId(){return id;}
+
+	/**
+	 * @brief Set of the fifo size of the port
+	 *
+	 * @param size : fifo size
+	 */
+	void setSize(int size){this->size = size;}
+
+	/**
+	 * @brief Get of the fifo size of the port
+	 *
+	 * @return fifo size
+	 */
+	int getSize(){return size;}
 
 protected:
 	
@@ -209,6 +287,20 @@ protected:
 	
 	/** Corresponding global variable pointer */
 	Variable* ptrVar;
+
+	/** Corresponding global variable index */
+	llvm::GlobalVariable* index;
+
+	/** Corresponding global variable numFree/TokenFree */
+	llvm::GlobalVariable* numTokenFree;
+
+	/** Corresponding global variable id */
+	llvm::GlobalVariable* id;
+
+
+	/** Corresponding fifo size */
+	int size;
+
 
 	/** Internal port */
 	bool intern;

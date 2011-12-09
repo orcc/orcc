@@ -53,6 +53,7 @@
 #include "Jade/Core/Port.h"
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Core/Network/Instance.h"
+#include "Jade/Fifo/FifoOpt.h"
 #include "Jade/Util/FifoMng.h"
 //------------------------------
 
@@ -64,5 +65,74 @@ OPTScheduler::OPTScheduler(llvm::LLVMContext& C, Decoder* decoder) : DPNSchedule
 }
 
 void OPTScheduler::createScheduler(Instance* instance, BasicBlock* BB, BasicBlock* incBB, BasicBlock* returnBB, Function* scheduler){
+	map<string,Port*>::iterator it;
+
+	//Initialize inputs
+	map<string,Port*>* inputs = instance->getInputs();
+	for (it = inputs->begin(); it != inputs->end(); it++){
+		Function* init = FifoOpt::initializeIn(module, it->second);
+		CallInst::Create(init, "", entryBB);
+	}
+
+	//Initialize outputs
+	map<string,Port*>* outputs = instance->getOutputs();
+	for (it = outputs->begin(); it != outputs->end(); it++){
+		Function* init = FifoOpt::initializeOut(module, it->second);
+		CallInst::Create(init, "", entryBB);
+	}
+
+
+	if (actionScheduler->hasFsm()){
+		createSchedulerFSM(instance, BB, incBB, returnBB , scheduler);
+	}else{
+		createSchedulerNoFSM(instance, BB, incBB, returnBB, scheduler);
+	}
+
+	//Close inputs
+	for (it = inputs->begin(); it != inputs->end(); it++){
+		Function* close = FifoOpt::closeIn(module, it->second);
+		CallInst::Create(close, "", returnBB->getTerminator());
+	}
+
+	//Close outputs
+	for (it = outputs->begin(); it != outputs->end(); it++){
+		Function* close = FifoOpt::closeOut(module, it->second);
+		CallInst::Create(close, "", returnBB->getTerminator());
+	}
+}
+
+void OPTScheduler::createRead(Port* port, Variable* variable, ConstantInt* numTokens, BasicBlock* BB){
+
+}
+
+Value* OPTScheduler::createInputTest(Port* port, ConstantInt* numTokens, BasicBlock* BB){
+	return NULL;
+}
+
+Value* OPTScheduler::createOutputTest(Port* port, ConstantInt* numTokens, BasicBlock* BB){
+	
+	int test = port->getSize();
+	/*
+	LoadInst* indexVal = new LoadInst(port->getIndex(), "", false, BB);
+	BinaryOperator* subVal = BinaryOperator::Create(Instruction::Sub, const_int32_11, int32_24, "", label_14);*/
+
+
+	return NULL;
+}
+
+void OPTScheduler::createWrite(Port* port, Variable* variable, ConstantInt* numTokens, BasicBlock* BB){
+
+}
+
+void OPTScheduler::createReadEnd(Port* port, ConstantInt* numTokens, BasicBlock* BB){
+
+}
+
+void OPTScheduler::createWriteEnd(Port* port, ConstantInt* numTokens, BasicBlock* BB){
+
+}
+
+void OPTScheduler::createPeek(Port* port, Variable* variable, ConstantInt* numTokens, BasicBlock* BB){
+
 
 }

@@ -61,6 +61,7 @@ using namespace llvm;
 using namespace std;
 
 ActionSchedulerAdder::ActionSchedulerAdder(llvm::LLVMContext& C, Decoder* decoder) : Context(C) {
+	this->module = decoder->getModule();
 	this->decoder = decoder;
 	this->entryBB = NULL;
 	this->bb1 = NULL;
@@ -449,7 +450,7 @@ void ActionSchedulerAdder::createRead(Port* port, Variable* variable, ConstantIn
 	new StoreInst(callInst, portPtr, BB);
 }
 
-CallInst* ActionSchedulerAdder::createOutputTest(Port* port, ConstantInt* numTokens, BasicBlock* BB){
+Value* ActionSchedulerAdder::createOutputTest(Port* port, ConstantInt* numTokens, BasicBlock* BB){
 	
 	if (BB->getTerminator() == NULL){
 		//Load selected port
@@ -476,7 +477,7 @@ CallInst* ActionSchedulerAdder::createOutputTest(Port* port, ConstantInt* numTok
 
 }
 
-CallInst* ActionSchedulerAdder::createInputTest(Port* port, ConstantInt* numTokens, BasicBlock* BB){
+Value* ActionSchedulerAdder::createInputTest(Port* port, ConstantInt* numTokens, BasicBlock* BB){
 	if (BB->getTerminator() == NULL){
 		//Load selected port
 		LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB);

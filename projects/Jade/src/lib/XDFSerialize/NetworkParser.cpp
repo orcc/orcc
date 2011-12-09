@@ -235,6 +235,10 @@ void NetworkParser::parseConnection(TiXmlElement* connection){
 	Connection* conn = new Connection(srcPort, dstPort, attributes);
 	
 	graph->addEdge(source, target, conn);
+
+	// Set size of ports
+	srcPort->setSize(conn->getSize());
+	dstPort->setSize(conn->getSize());
 }
 
 map<string, IRAttribute*>* NetworkParser::parseAttributes(TiXmlNode* node){

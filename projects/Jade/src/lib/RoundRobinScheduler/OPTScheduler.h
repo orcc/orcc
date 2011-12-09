@@ -99,6 +99,97 @@ protected:
 	 */
 	virtual void createScheduler(Instance* instance, llvm::BasicBlock* BB, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::Function* scheduler);
 
+		/**
+	 * @brief Create a peek for an Action
+	 * 
+	 * @param port : the port to peek
+	 *
+	 * @param variable : the Variable where peek is stored
+	 *
+	 * @param numToken : ConstantInt representing the number of tokens to peek
+	 *
+	 * @param BB : llvm::BasicBlock where instructions are added
+	 */
+	virtual void createPeek(Port* port, Variable* variable, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+
+	/**
+	 * @brief Create a read for an Action
+	 * 
+	 * @param port : the port to read
+	 *
+	 * @param variable : the Variable where read is stored
+	 *
+	 * @param numToken : ConstantInt representing the number of tokens to read
+	 *
+	 * @param BB : llvm::BasicBlock where instructions are added
+	 */
+	virtual void createRead(Port* port, Variable* variable, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+
+	/**
+	 * @brief Create a ReadEnd for an Action
+	 * 
+	 * @param port : the port to set to ReadEnd
+	 *
+	 * @param numToken : ConstantInt representing the number of tokens that has been read
+	 *
+	 * @param BB : llvm::BasicBlock where instructions are added
+	 */
+	virtual void createReadEnd(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+
+	/**
+	 * @brief Create a WriteEnd for an Action
+	 * 
+	 * @param port : the port to set to WriteEnd
+	 *
+	 * @param numToken : ConstantInt representing the number of tokens that has been read
+	 *
+	 * @param BB : llvm::BasicBlock where instructions are added
+	 */
+	virtual void createWriteEnd(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+
+	/**
+	 * @brief Create a write for an Action
+	 * 
+	 * @param port : the port to write
+	 *
+	 * @param variable : the Variable where write is stored
+	 *
+	 * @param numToken : ConstantInt representing the number of tokens to write
+	 *
+	 * @param BB : llvm::BasicBlock where instructions are added
+	 */
+	void createWrite(Port* port, Variable* variable, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+
+
+	/**
+	 * @brief Creates a hasToken test for a Port
+	 * 
+	 * @param port : the Port to test
+	 *
+	 * @param BB : llvm::BasicBlock where test is add
+	 *
+	 * @param incBB : llvm::BasicBlock where test has to branch in case of success
+	 *
+	 * @param returnBB : llvm::BasicBlock where test has to branch in case of return
+	 *
+	 * @param function : llvm::Function where the test is added
+	 */
+	virtual llvm::Value* createInputTest(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+
+	/**
+	 * @brief Creates a hasRoom test for a Port
+	 * 
+	 * @param port : the Port to test
+	 *
+	 * @param BB : llvm::BasicBlock where test is added
+	 *
+	 * @param incBB : llvm::BasicBlock where test has to branch in case of success
+	 *
+	 * @param returnBB : llvm::BasicBlock where test has to branch in case of return
+	 *
+	 * @param function : llvm::Function where the test is added
+	 */
+	virtual llvm::Value* createOutputTest(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
 };
 
 #endif
