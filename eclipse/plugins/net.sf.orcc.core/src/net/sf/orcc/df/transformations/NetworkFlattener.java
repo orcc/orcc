@@ -34,6 +34,7 @@ import java.util.List;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Entity;
+import net.sf.orcc.df.Nameable;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.util.DfSwitch;
@@ -90,11 +91,6 @@ public class NetworkFlattener extends DfSwitch<Void> {
 			}
 		}
 
-		// if network is top-level, rename all entities
-		if (network.eContainer() == null) {
-			new UniqueNameTransformation().doSwitch(network);
-		}
-
 		return null;
 	}
 
@@ -149,6 +145,14 @@ public class NetworkFlattener extends DfSwitch<Void> {
 	}
 
 	private void moveEntitiesAndConnections(Network network, Network subNetwork) {
+		// Rename subNetwork entities
+		for (Nameable nameable : subNetwork.getEntities()) {
+			nameable.setName(subNetwork.getName() + "_" + nameable.getName());
+		}
+		for (Nameable nameable : subNetwork.getInstances()) {
+			nameable.setName(subNetwork.getName() + "_" + nameable.getName());
+		}
+
 		// move entities in this network
 		network.getEntities().addAll(subNetwork.getEntities());
 		network.getInstances().addAll(subNetwork.getInstances());
