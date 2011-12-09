@@ -93,34 +93,18 @@ endif>
 ///////////////////////////////////////////////////////////////////////////////
 
 signals(network) ::= <<
-<network.instances: instanceSignals(); separator="\n\n">
+<network.connections: declareFifoSignals(); separator="\n\n">
 >>
 
-instanceSignals(instance) ::= <<
--- Instance: <instance.id> 
-<instance.incomingPortMap.keys: { port | <inputPortSignals(port, instance.incomingPortMap.(port))> }; separator="\n">
-<instance.outgoingPortMap.keys: { port | <outputPortSignals(port, first(instance.outgoingPortMap.(port)))> }; separator="\n">
->>
-
-inputPortSignals(port, connection) ::= <<
-<if(!port.native)
->---- Input port: <port.name>
-signal fifo_<indexConnection(connection)>_wrreq		: std_logic;
-signal fifo_<indexConnection(connection)>_data		: std_logic_vector(31 downto 0) := (others =\> '0');<
-elseif(!connection.source)
->---- Input port: <port.name>
-signal s_<indexConnection(connection)> 		: std_logic_vector(<port.type.size>-1 downto 0);<
-endif>
->>
-
-outputPortSignals(port, connection) ::= <<
----- Output port: <port.name>
-<if(!port.native)
->signal fifo_<indexConnection(connection)>_rdreq		: std_logic;
-signal fifo_<indexConnection(connection)>_q			: std_logic_vector(31 downto 0) := (others =\> '0');
-signal fifo_<indexConnection(connection)>_status		: std_logic_vector(31 downto 0);<
+declareFifoSignals(connection) ::= <<
+<if(connection.sourcePort.native)
+>signal s_<indexConnection(connection)> : std_logic_vector(<connection.sourcePort.type.size>-1 downto 0);<
 else
->signal s_<indexConnection(connection)> 		: std_logic_vector(<port.type.size>-1 downto 0);<
+>signal fifo_<indexConnection(connection)>_data		: std_logic_vector(31 downto 0);
+signal fifo_<indexConnection(connection)>_q			: std_logic_vector(31 downto 0);
+signal fifo_<indexConnection(connection)>_rdreq		: std_logic;
+signal fifo_<indexConnection(connection)>_wrreq		: std_logic;
+signal fifo_<indexConnection(connection)>_status    : std_logic_vector(31 downto 0);<
 endif>
 >>
 
@@ -138,10 +122,10 @@ assignNetworkPorts(network) ::= <<
 >>
 
 assignNetworkPort(connection) ::= <<
-<if(!connection.source)>
-<connection.sourcePort.name> \<= s_<indexConnection(connection)>;
-<elseif(!connection.target)>
-<connection.targetPort.name> \<= s_<indexConnection(connection)>;
+<if(connection.source.port)>
+<connection.source.name> \<= s_<indexConnection(connection)>;
+<elseif(connection.target.port)>
+<connection.target.name> \<= s_<indexConnection(connection)>;
 <endif>
 >>
 
