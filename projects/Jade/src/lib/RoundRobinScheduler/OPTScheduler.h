@@ -60,6 +60,7 @@ class Actor;
 class Instance;
 class Decoder;
 class Port;
+class Procedure;
 //------------------------------
 
 /**
@@ -79,7 +80,7 @@ public:
 	 *
 	 *	@param decoder : the Decoder where dynamic action scheduler is inserted
      */
-	OPTScheduler(llvm::LLVMContext& C, Decoder* decoder);
+	OPTScheduler(llvm::LLVMContext& C, Decoder* decoder, bool debug);
 	~OPTScheduler(){};
 
 protected:
@@ -190,6 +191,49 @@ protected:
 	 * @param function : llvm::Function where the test is added
 	 */
 	virtual llvm::Value* createOutputTest(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+
+	/**
+	 * @brief Creates read/write/peek accesses
+	 *
+	 * @param action : action where accesses are added
+	 */
+	void createReadWritePeek(Action* action);
+
+	/**
+	 * @brief Creates write accesses
+	 *
+	 * @param procedure : procedure where write is added
+	 *
+	 * @parm pattern : the writing pattern
+	 */
+	void createWrites (Procedure* procedure, Pattern* pattern);
+
+	/**
+	 * @brief Creates read accesses
+	 *
+	 * @param procedure : procedure where read is added
+	 *
+	 * @parm pattern : the read pattern
+	 */
+	void createReads (Procedure* procedure, Pattern* pattern);
+
+	/**
+	 * @brief Creates peek accesses
+	 *
+	 * @param procedure : procedure where peek is added
+	 *
+	 * @parm pattern : the peek pattern
+	 */
+	void createPeeks (Procedure* procedure, Pattern* pattern);
+
+	/**
+	 * @brief Port procedure variable
+	 *
+	 * @param port : the port to get the variable from
+	 *
+	 * @parm procedure : the procedure to get var from
+	 */
+	llvm::Value* replaceAccess (Port* port, Procedure* proc);
 };
 
 #endif

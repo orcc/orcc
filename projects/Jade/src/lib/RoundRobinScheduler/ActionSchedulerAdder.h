@@ -81,7 +81,7 @@ public:
 	 *
 	 *	@param decoder : the Decoder to insert the round robin scheduler into
      */
-	ActionSchedulerAdder(llvm::LLVMContext& C, Decoder* decoder);
+	ActionSchedulerAdder(llvm::LLVMContext& C, Decoder* decoder, bool debug = false);
 	~ActionSchedulerAdder(){};
 
 	/**
@@ -361,6 +361,9 @@ protected:
 
 	/** Current module */
 	llvm::Module* module;
+
+	/** debug mode */
+	bool debug;
 
 	/** ActionScheduler BB */
 	llvm::BasicBlock* entryBB;

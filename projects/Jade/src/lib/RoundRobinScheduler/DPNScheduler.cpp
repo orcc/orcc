@@ -55,12 +55,13 @@
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Core/Network/Instance.h"
 #include "Jade/Util/FifoMng.h"
+#include "Jade/Util/FunctionMng.h"
 //------------------------------
 
 using namespace llvm;
 using namespace std;
 
-DPNScheduler::DPNScheduler(llvm::LLVMContext& C, Decoder* decoder) : ActionSchedulerAdder(C, decoder) {
+DPNScheduler::DPNScheduler(llvm::LLVMContext& C, Decoder* decoder, bool debug) : ActionSchedulerAdder(C, decoder, debug) {
 
 }
 
@@ -200,6 +201,14 @@ void DPNScheduler::createActionCall(Action* action, BasicBlock* BB){
 	//Launch action body
 	Procedure* body = action->getBody();
 	CallInst* bodyInst = CallInst::Create(body->getFunction(), "",  BB);
+
+	// Add debugging information if needed
+	if (debug){
+		string message = "--> firing action ";
+		message.append(action->getName());
+
+		FunctionMng::createPuts(decoder, message, bodyInst);
+	}
 
 	//Create ReadEnd/WriteEnd
 	createReadEnds(action->getInputPattern(), BB);

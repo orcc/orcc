@@ -54,7 +54,7 @@
 using namespace llvm;
 using namespace std;
 
-CSDFScheduler::CSDFScheduler(llvm::LLVMContext& C, Decoder* decoder) : DPNScheduler(C, decoder) {
+CSDFScheduler::CSDFScheduler(llvm::LLVMContext& C, Decoder* decoder, bool debug) : DPNScheduler(C, decoder, debug) {
 
 }
 

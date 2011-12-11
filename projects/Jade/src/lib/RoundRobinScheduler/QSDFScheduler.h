@@ -59,7 +59,7 @@ public:
 	 *
 	 *	@param decoder : the Decoder where dynamic action scheduler is inserted
      */
-	QSDFScheduler(llvm::LLVMContext& C, Decoder* decoder);
+	QSDFScheduler(llvm::LLVMContext& C, Decoder* decoder, bool debug);
 	~QSDFScheduler(){};
 
 protected:

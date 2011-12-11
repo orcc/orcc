@@ -171,7 +171,7 @@ void RoundRobinScheduler::createCall(Instance* instance){
 
 	// Add debugging information if needed
 	if (debug){
-		string message = "firing ";
+		string message = "-> firing ";
 		message.append(instance->getId());
 
 		FunctionMng::createPuts(decoder, message, schedInst);
@@ -189,22 +189,22 @@ void RoundRobinScheduler::createCall(Instance* instance){
 
 void RoundRobinScheduler::addInstance(Instance* instance){
 	// Create an action scheduler for the instance
-	DPNScheduler DPNSchedulerAdder(Context, decoder);
-	CSDFScheduler CSDFSchedulerAdder(Context, decoder);
-	QSDFScheduler QSDFSchedulerAdder(Context, decoder);
-	OPTScheduler OPTFSchedulerAdder(Context, decoder);
+	DPNScheduler DPNSchedulerAdder(Context, decoder, debug);
+	CSDFScheduler CSDFSchedulerAdder(Context, decoder, debug);
+	QSDFScheduler QSDFSchedulerAdder(Context, decoder, debug);
+	OPTScheduler OPTFSchedulerAdder(Context, decoder, debug);
 	
 	MoC* moc = instance->getMoC();
 	
-	//OPTFSchedulerAdder.transform(instance);
-
+	OPTFSchedulerAdder.transform(instance);
+/*
 	if (moc->isQuasiStatic() && optimized){
 		QSDFSchedulerAdder.transform(instance);
 	}else if (moc->isCSDF() && optimized){
 		CSDFSchedulerAdder.transform(instance);
 	}else{
 		DPNSchedulerAdder.transform(instance);
-	}
+	}*/
 
 	// Call the action scheduler
 	createCall(instance);

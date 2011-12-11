@@ -149,7 +149,7 @@ pair<string, StructType*> FifoMng::parseFifoStruct(llvm::MDNode* structMD){
 AbstractFifo* FifoMng::getFifo(LLVMContext& C, Decoder* decoder, Type* type, Connection* connection){
 	int size = connection->getSize();
 	
-	//return new FifoOpt(C, decoder->getModule(), type, size);
+	return new FifoOpt(C, decoder->getModule(), type, size);
 	
 
 	//Todo : implement static class in fifo for creation

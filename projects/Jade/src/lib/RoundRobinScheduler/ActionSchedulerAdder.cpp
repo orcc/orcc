@@ -60,13 +60,14 @@
 using namespace llvm;
 using namespace std;
 
-ActionSchedulerAdder::ActionSchedulerAdder(llvm::LLVMContext& C, Decoder* decoder) : Context(C) {
+ActionSchedulerAdder::ActionSchedulerAdder(llvm::LLVMContext& C, Decoder* decoder, bool debug) : Context(C) {
 	this->module = decoder->getModule();
 	this->decoder = decoder;
 	this->entryBB = NULL;
 	this->bb1 = NULL;
 	this->incBB = NULL;
 	this->returnBB = NULL;
+	this->debug = debug;
 }
 
 void ActionSchedulerAdder::transform(Instance* instance) {
@@ -181,9 +182,10 @@ BasicBlock* ActionSchedulerAdder::checkInputPattern(Pattern* pattern, Function* 
 			continue;
 		}
 		
-		Value* hasTokenValue = createInputTest(port, it->second, bb1);
-		TruncInst* truncTokenInst = new TruncInst(hasTokenValue, Type::getInt1Ty(Context),"", BB);
-		values.push_back(truncTokenInst);
+		Value* hasTokenValue = createInputTest(port, it->second, BB);
+		// Todo: TruncInst* truncTokenInst = new TruncInst(hasTokenValue, Type::getInt1Ty(Context),"", BB);
+		//values.push_back(truncTokenInst);
+		values.push_back(hasTokenValue);
 	}
 	
 	// No test to do, return basic block
@@ -228,9 +230,10 @@ BasicBlock* ActionSchedulerAdder::checkOutputPattern(Pattern* pattern, llvm::Fun
 			// Don't test internal ports
 			continue;
 		}
-		Value* hasRoomValue = createOutputTest(port, it->second, bb1);
-		TruncInst* truncRoomInst = new TruncInst(hasRoomValue, Type::getInt1Ty(Context),"", BB);
-		values.push_back(truncRoomInst);
+		Value* hasRoomValue = createOutputTest(port, it->second, BB); // Todo : Value* hasRoomValue = createOutputTest(port, it->second, bb1);
+		//Todo : TruncInst* truncRoomInst = new TruncInst(hasRoomValue, Type::getInt1Ty(Context),"", BB);
+		// values.push_back(truncRoomInst);
+		values.push_back(hasRoomValue);
 	}
 
 	// No test to do, return basic block

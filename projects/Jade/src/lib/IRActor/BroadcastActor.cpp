@@ -90,6 +90,7 @@ void BroadcastActor::createActor(){
 	Port* inputPort = new Port(inputPortName, type);
 	Variable* inputVar = new Variable(type, inputPortName, true, true, inputGlobalVar);
 	inputPort->setPtrVar(inputVar);
+	inputPort->setSize(FifoMng::getDefaultFifoSize());
 	
 	
 	inputs->insert(pair<string, Port*>(inputPort->getName(), inputPort));
@@ -106,6 +107,7 @@ void BroadcastActor::createActor(){
 		Port* outputPort = new Port(outputPortName.str(), type);
 		Variable* outputVar = new Variable(type, outputPortName.str(), true, true, outputGlobalVar);
 		
+		outputPort->setSize(FifoMng::getDefaultFifoSize());
 		outputPort->setPtrVar(outputVar);
 		outputs->insert(pair<string, Port*>(outputPort->getName(), outputPort));
 	}

@@ -63,7 +63,7 @@ public:
 	 *
 	 *	@param decoder : the Decoder where dynamic action scheduler is inserted
      */
-	CSDFScheduler(llvm::LLVMContext& C, Decoder* decoder);
+	CSDFScheduler(llvm::LLVMContext& C, Decoder* decoder, bool debug);
 	~CSDFScheduler(){};
 
 protected:

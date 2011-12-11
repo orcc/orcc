@@ -79,7 +79,7 @@ public:
 	 *
 	 *	@param decoder : the Decoder where dynamic action scheduler is inserted
      */
-	DPNScheduler(llvm::LLVMContext& C, Decoder* decoder);
+	DPNScheduler(llvm::LLVMContext& C, Decoder* decoder, bool debug);
 	~DPNScheduler(){};
 
 protected:

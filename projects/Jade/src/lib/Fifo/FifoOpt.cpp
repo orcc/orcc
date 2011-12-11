@@ -102,12 +102,14 @@ Function* FifoOpt::initializeIn(llvm::Module* module, Port* port){
 	ConstantInt* three = ConstantInt::get(module->getContext(), APInt(32, 3));
 
   	// Create Fifo access elements
-	GlobalVariable* index = new GlobalVariable(*module, IntegerType::get(module->getContext(), 32), false, GlobalValue::InternalLinkage, 0, "index");
+	GlobalVariable* index = new GlobalVariable(*module, IntegerType::get(module->getContext(), 32), false, GlobalValue::InternalLinkage, zero, "index");
+	GlobalVariable* numFreeVar = new GlobalVariable(*module, IntegerType::get(module->getContext(), 32), false, GlobalValue::InternalLinkage, zero, "numFreeVar");
+	GlobalVariable* id = new GlobalVariable(*module, IntegerType::get(module->getContext(), 32), false, GlobalValue::InternalLinkage, zero, "id");
+	
 	index->setAlignment(4);
-	GlobalVariable* numFreeVar = new GlobalVariable(*module, IntegerType::get(module->getContext(), 32), false, GlobalValue::InternalLinkage, 0, "numFreeVar");
 	numFreeVar->setAlignment(4);
-	GlobalVariable* id = new GlobalVariable(*module, IntegerType::get(module->getContext(), 32), false, GlobalValue::InternalLinkage, one, "numFreeVar");
-	numFreeVar->setAlignment(4);
+	id->setAlignment(4);
+	
 	port->setIndex(index);
 	port->setRoomToken(numFreeVar);
 	port->setId(id);
@@ -148,7 +150,18 @@ Function* FifoOpt::initializeIn(llvm::Module* module, Port* port){
 
       BinaryOperator* binRes = BinaryOperator::Create(Instruction::Add, read_indiceVal, numTokenRes, "", bb);
       new StoreInst(binRes, numFreeVar, false, bb);
-      ReturnInst::Create(module->getContext(), bb);
+      
+
+	  // Load content in FIFO ptr
+	  std::vector<Value*> content_indices;
+      content_indices.push_back(zero);
+      content_indices.push_back(one);
+      Instruction* contentsPtr = GetElementPtrInst::Create(fifoVarPtr, content_indices, "", bb);
+	  LoadInst* contentsAdr = new LoadInst(contentsPtr, "", false, bb);
+	  new StoreInst(contentsAdr, port->getPtrVar()->getGlobalVariable(), bb);
+
+	  // Return from function
+	  ReturnInst::Create(module->getContext(), bb);
 
 	return readFn_port;
 }
@@ -162,9 +175,9 @@ Function* FifoOpt::initializeOut(llvm::Module* module, Port* port){
 	ConstantInt* four = ConstantInt::get(module->getContext(), APInt(32, 4));
 
 	// Create Fifo access elements
-	GlobalVariable* index = new GlobalVariable(*module, IntegerType::get(module->getContext(), 32), false, GlobalValue::InternalLinkage, 0, "index");
+	GlobalVariable* index = new GlobalVariable(*module, IntegerType::get(module->getContext(), 32), false, GlobalValue::InternalLinkage, zero, "index");
 	index->setAlignment(4);
-	GlobalVariable* numFreeVar = new GlobalVariable(*module, IntegerType::get(module->getContext(), 32), false, GlobalValue::InternalLinkage, 0, "numFreeVar");
+	GlobalVariable* numFreeVar = new GlobalVariable(*module, IntegerType::get(module->getContext(), 32), false, GlobalValue::InternalLinkage, zero, "numFreeVar");
 	numFreeVar->setAlignment(4);
 	port->setIndex(index);
 	port->setRoomToken(numFreeVar);
@@ -203,6 +216,15 @@ Function* FifoOpt::initializeOut(llvm::Module* module, Port* port){
 	  // Add results
 	  BinaryOperator* addOp = BinaryOperator::Create(Instruction::Add, writeElt, roomValue, "", bb);
 	  new StoreInst(addOp, numFreeVar, false, bb);
+
+	  // Load content in FIFO ptr
+	  std::vector<Value*> content_indices;
+      content_indices.push_back(zero);
+      content_indices.push_back(one);
+      Instruction* contentsPtr = GetElementPtrInst::Create(ptr_74, content_indices, "", bb);
+	  LoadInst* contentsAdr = new LoadInst(contentsPtr, "", false, bb);
+	  new StoreInst(contentsAdr, port->getPtrVar()->getGlobalVariable(), bb);
+
 	  ReturnInst::Create(module->getContext(), bb);
 
 	return writeFn_port;

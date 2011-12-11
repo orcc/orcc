@@ -50,7 +50,7 @@
 using namespace llvm;
 using namespace std;
 
-QSDFScheduler::QSDFScheduler(llvm::LLVMContext& C, Decoder* decoder) : CSDFScheduler(C, decoder) {
+QSDFScheduler::QSDFScheduler(llvm::LLVMContext& C, Decoder* decoder, bool debug) : CSDFScheduler(C, decoder, debug) {
 
 }
 
