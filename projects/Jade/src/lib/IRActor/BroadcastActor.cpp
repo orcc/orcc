@@ -44,6 +44,7 @@
 #include "llvm/LLVMContext.h"
 #include "llvm/Instructions.h"
 #include "llvm/Module.h"
+#include "llvm/Support/CommandLine.h"
 
 #include "Jade/Decoder.h"
 #include "Jade/Actor/BroadcastActor.h"
@@ -52,11 +53,12 @@
 #include "Jade/Core/MoC/SDFMoC.h"
 #include "Jade/Core/MoC/DPNMoC.h"
 #include "Jade/Core/Network/Instance.h"
-#include "Jade/Util/FifoMng.h"
 //------------------------------
 
 using namespace std;
 using namespace llvm;
+
+extern cl::opt<int> FifoSize;
 
 BroadcastActor::BroadcastActor(llvm::LLVMContext& C, Decoder* decoder, string name, int numOutputs, IntegerType* type): Actor(name, module, "",
 		  new map<string, Port*>(), new map<string, Port*>(), new map<string, StateVar*>(), new map<string, Variable*>(), new map<string, Procedure*>(), new list<Action*> (),
@@ -90,7 +92,7 @@ void BroadcastActor::createActor(){
 	Port* inputPort = new Port(inputPortName, type);
 	Variable* inputVar = new Variable(type, inputPortName, true, true, inputGlobalVar);
 	inputPort->setPtrVar(inputVar);
-	inputPort->setSize(FifoMng::getDefaultFifoSize());
+	inputPort->setSize(FifoSize);
 	
 	
 	inputs->insert(pair<string, Port*>(inputPort->getName(), inputPort));
@@ -107,7 +109,7 @@ void BroadcastActor::createActor(){
 		Port* outputPort = new Port(outputPortName.str(), type);
 		Variable* outputVar = new Variable(type, outputPortName.str(), true, true, outputGlobalVar);
 		
-		outputPort->setSize(FifoMng::getDefaultFifoSize());
+		outputPort->setSize(FifoSize);
 		outputPort->setPtrVar(outputVar);
 		outputs->insert(pair<string, Port*>(outputPort->getName(), outputPort));
 	}
@@ -208,24 +210,6 @@ Pattern* BroadcastActor::createPattern(map<string, Port*>* ports){
 	return pattern;
 }
 
-Value* BroadcastActor::createHasTokenTest(Port* port, BasicBlock* current){
-	//Load port structure
-	LoadInst* inputStruct = new LoadInst(port->getPtrVar()->getGlobalVariable(), "l"+ port->getName(), current);
-	
-	// Call hasToken
-	vector<Value*> vector;
-	vector.push_back(inputStruct);
-	vector.push_back(ConstantInt::get(Type::getInt32Ty(Context), 1));
-
-	Function* hasTokenFn = FifoMng::getHasTokenFunction(port->getType(), decoder);
-	CallInst* retVal = CallInst::Create(hasTokenFn, vector, "c"+port->getName(), current);
-	TruncInst* truncInst = new TruncInst(retVal, Type::getInt1Ty(Context), "t"+port->getName(), current);
-
-	//Return the result
-	return truncInst;
-
-}
-
 Value* BroadcastActor::createReadFifo(Port* port, BasicBlock* current){
 	GlobalVariable* var = port->getPtrVar()->getGlobalVariable();
 	
@@ -264,17 +248,4 @@ void BroadcastActor::createWriteFifo(Port* port, Value* token ,BasicBlock* curre
 
 	//Return token value
 	new StoreInst(token,getInstr, current);
-}
-
-void BroadcastActor::createSetReadEnd(Port* port, BasicBlock* current){
-	//Load port structure
-	LoadInst* inputStruct = new LoadInst(port->getPtrVar()->getGlobalVariable(), "l"+ port->getName(), current);
-
-	// Call readPtr
-	vector<Value*> vector;
-	vector.push_back(inputStruct);
-	vector.push_back(ConstantInt::get(Type::getInt32Ty(Context), 1));
-
-	Function* readEndFn = FifoMng::getReadEndFunction(port->getType(), decoder);
-	CallInst::Create(readEndFn, vector, "", current);
 }

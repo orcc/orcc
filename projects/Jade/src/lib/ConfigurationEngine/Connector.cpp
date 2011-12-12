@@ -39,13 +39,14 @@
 #include <iostream>
 
 #include "llvm/Constants.h"
+#include "llvm/DerivedTypes.h"
+#include "llvm/Module.h"
 
 #include "Connector.h"
 #include "Jade/Decoder.h"
 #include "Jade/Configuration/Configuration.h"
 #include "Jade/Core/Network.h"
 #include "Jade/Jit/LLVMExecution.h"
-#include "Jade/Util/FifoMng.h"
 //------------------------------
 
 using namespace std;
@@ -83,12 +84,12 @@ void Connector::unsetConnections(Configuration* configuration){
 	}
 }
 
-void Connector::connect(Port* port, AbstractFifo* fifo){
+void Connector::connect(Port* port, FifoOpt* fifo){
 	GlobalVariable* var = port->getFifoVar();
 	
 	if (var == NULL){
 		//Get fifo structure type
-		Type* portStruct = fifo->getGV()->getType();
+		Type* portStruct = cast<Type>(fifo->getGV()->getType());
 
 		//Return new variable
 		var =  new GlobalVariable(*module, portStruct, true,  GlobalValue::InternalLinkage, /*init*/0, port->getName(), 0, false);;
@@ -107,7 +108,7 @@ void Connector::setConnection(Connection* connection){
 	Port* dst = connection->getDestinationPort();
 
 	//Initialize ports with a new fifo
-	AbstractFifo* fifo = FifoMng::getFifo(Context, decoder, src->getType(), connection);
+	FifoOpt* fifo = new FifoOpt(Context, decoder->getModule(), cast<Type>(src->getType()), connection->getSize());
 	connect(src, fifo);
 	connect(dst, fifo);
 	

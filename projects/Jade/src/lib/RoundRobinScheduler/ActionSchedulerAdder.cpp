@@ -54,11 +54,12 @@
 #include "Jade/Core/Port.h"
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Core/Network/Instance.h"
-#include "Jade/Util/FifoMng.h"
+#include "Jade/RoundRobinScheduler/FIFO.h"
 //------------------------------
 
 using namespace llvm;
 using namespace std;
+
 
 ActionSchedulerAdder::ActionSchedulerAdder(llvm::LLVMContext& C, Decoder* decoder, bool debug) : Context(C) {
 	this->module = decoder->getModule();
@@ -124,6 +125,7 @@ void ActionSchedulerAdder::createActionScheduler(Instance* instance){
 	new StoreInst(iAdd, iVar, incBB);
 	BranchInst::Create(bb1, incBB);
 	
+	initializeFIFO (instance);
 	createScheduler(instance, bb1, incBB, returnBB , scheduler);
 }
 
@@ -162,6 +164,43 @@ void ActionSchedulerAdder::createInitialize(Instance* instance){
 	BranchInst::Create(returnBB, BB);
 }
 
+void ActionSchedulerAdder::initializeFIFO (Instance* instance){
+	map<string,Port*>::iterator it;
+
+	//Initialize inputs
+	map<string,Port*>* inputs = instance->getInputs();
+	for (it = inputs->begin(); it != inputs->end(); it++){
+		Function* init = FifoOpt::initializeIn(module, it->second);
+		CallInst::Create(init, "", entryBB->getTerminator());
+	}
+
+	//Initialize outputs
+	map<string,Port*>* outputs = instance->getOutputs();
+	for (it = outputs->begin(); it != outputs->end(); it++){
+		Function* init = FifoOpt::initializeOut(module, it->second);
+		CallInst::Create(init, "", entryBB->getTerminator());
+	}
+
+	// Add read/write/peek access
+	std::list<Action*>::iterator itAct;
+	std::list<Action*>* actions = instance->getActions();
+	for (itAct = actions->begin(); itAct != actions->end(); itAct++){
+		FifoOpt::createReadWritePeek(*itAct);
+	}
+
+	//Close inputs
+	for (it = inputs->begin(); it != inputs->end(); it++){
+		Function* close = FifoOpt::closeIn(module, it->second);
+		CallInst::Create(close, "", returnBB->getTerminator());
+	}
+
+	//Close outputs
+	for (it = outputs->begin(); it != outputs->end(); it++){
+		Function* close = FifoOpt::closeOut(module, it->second);
+		CallInst::Create(close, "", returnBB->getTerminator());
+	}
+}
+
 BasicBlock* ActionSchedulerAdder::checkInputPattern(Pattern* pattern, Function* function, BasicBlock* skipBB, BasicBlock* BB){	
 	//Pattern is empty, return current basic block
 	if (pattern->isEmpty()){
@@ -182,9 +221,7 @@ BasicBlock* ActionSchedulerAdder::checkInputPattern(Pattern* pattern, Function* 
 			continue;
 		}
 		
-		Value* hasTokenValue = createInputTest(port, it->second, BB);
-		// Todo: TruncInst* truncTokenInst = new TruncInst(hasTokenValue, Type::getInt1Ty(Context),"", BB);
-		//values.push_back(truncTokenInst);
+		Value* hasTokenValue = FifoOpt::createInputTest(port, it->second, BB);
 		values.push_back(hasTokenValue);
 	}
 	
@@ -230,9 +267,7 @@ BasicBlock* ActionSchedulerAdder::checkOutputPattern(Pattern* pattern, llvm::Fun
 			// Don't test internal ports
 			continue;
 		}
-		Value* hasRoomValue = createOutputTest(port, it->second, BB); // Todo : Value* hasRoomValue = createOutputTest(port, it->second, bb1);
-		//Todo : TruncInst* truncRoomInst = new TruncInst(hasRoomValue, Type::getInt1Ty(Context),"", BB);
-		// values.push_back(truncRoomInst);
+		Value* hasRoomValue = FifoOpt::createOutputTest(port, it->second, BB);
 		values.push_back(hasRoomValue);
 	}
 
@@ -257,247 +292,4 @@ BasicBlock* ActionSchedulerAdder::checkOutputPattern(Pattern* pattern, llvm::Fun
 	BranchInst* brInst = BranchInst::Create(roomBB, skipBB, value1, BB);
 
 	return roomBB;
-}
-
-void ActionSchedulerAdder::checkPeekPattern(Pattern* pattern, Function* function, BasicBlock* BB){
-	//Test if rooms are available on output
-	map<Port*, Variable*>::iterator it;
-	map<Port*, Variable*>* peeked = pattern->getVariableMap();
-	map<Port*, ConstantInt*>* numTokensMap = pattern->getNumTokensMap();
-
-	for ( it=peeked->begin() ; it != peeked->end(); it++ ){
-		Port* port = it->first;
-
-		// Get number of tokens to peek
-		map<Port*, ConstantInt*>::iterator itToken;
-
-		itToken = numTokensMap->find(port);
-
-		if ( itToken == numTokensMap->end() || port->getFifoVar() == NULL){
-			// No peek
-			continue;
-		}
-
-		createPeek(it->first, it->second, itToken->second, bb1);
-	}
-}
-
-void ActionSchedulerAdder::createPeek(Port* port, Variable* variable, ConstantInt* numTokens, BasicBlock* BB){
-
-
-	if (BB->getTerminator() == NULL){
-			//Load selected port
-			GlobalVariable* fifoVar = port->getFifoVar();
-			LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB);
-	
-			//Call peek function
-			Function* peekFn = FifoMng::getPeekFunction(port->getType(), decoder);
-			Value* peekArgs[] = { loadPort, numTokens};
-			CallInst* callInst = CallInst::Create(peekFn, peekArgs,"",  BB);
-
-			// Store fifo pointer in port pointer
-			GlobalVariable* portPtr = variable->getGlobalVariable();
-			new StoreInst(callInst, portPtr, BB);
-	}else{			
-		//Load selected port
-		GlobalVariable* fifoVar = port->getFifoVar();
-		LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB->getTerminator());
-	
-		//Call peek function
-		Function* peekFn = FifoMng::getPeekFunction(port->getType(), decoder);
-		Value* peekArgs[] = { loadPort, numTokens};
-		CallInst* callInst = CallInst::Create(peekFn, peekArgs, "",  BB->getTerminator());
-
-		// Store fifo pointer in port pointer
-		GlobalVariable* portPtr = variable->getGlobalVariable();
-		new StoreInst(callInst, portPtr, BB->getTerminator());
-	}
-}
-
-void ActionSchedulerAdder::createWriteEnds(Pattern* pattern, llvm::BasicBlock* BB){
-
-	//Get tokens and var
-	map<Port*, ConstantInt*>::iterator it;
-	map<Port*, ConstantInt*>* numTokensMap = pattern->getNumTokensMap();
-
-	for (it = numTokensMap->begin(); it != numTokensMap->end(); it++){
-		Port* port = it->first;
-		
-		//Create write end
-		if (port->isInternal()){
-			createInternalWriteEnd(port, it->second, BB);
-		}else if (port->getFifoVar() != NULL){
-			createWriteEnd(port, it->second, BB);
-		}
-	}
-}
-
-void ActionSchedulerAdder::createReadEnds(Pattern* pattern, llvm::BasicBlock* BB){
-	//Get tokens and var
-	map<Port*, ConstantInt*>::iterator it;
-	map<Port*, ConstantInt*>* numTokensMap = pattern->getNumTokensMap();
-
-	for (it = numTokensMap->begin(); it != numTokensMap->end(); it++){
-		Port* port = it->first;
-		
-		//Create read end
-		if (port->isInternal()){
-			createInternalReadEnd(port, it->second, BB);
-		}else if (port->getFifoVar() != NULL){
-			createReadEnd(port, it->second, BB);
-		}
-	}
-}
-
-void ActionSchedulerAdder::createInternalReadEnd(Port* port, ConstantInt* numTokens, BasicBlock* BB){
-
-}
-
-void ActionSchedulerAdder::createInternalWriteEnd(Port* port, ConstantInt* numTokens, BasicBlock* BB){
-
-}
-
-void ActionSchedulerAdder::createReadEnd(Port* port, ConstantInt* numTokens, BasicBlock* BB){
-	//Load selected port
-	GlobalVariable* fifoVar = port->getFifoVar();
-	LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB);
-	
-	//Call peek function
-	Function* readEndFn = FifoMng::getReadEndFunction(port->getType(), decoder);
-	Value* readEndArgs[] = { loadPort, numTokens};
-	CallInst::Create(readEndFn, readEndArgs, "",  BB);
-}
-
-void ActionSchedulerAdder::createWriteEnd(Port* port, ConstantInt* numTokens, BasicBlock* BB){
-	//Load selected port
-	GlobalVariable* fifoVar = port->getFifoVar();
-	LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB);
-	
-	//Call peek function
-	Function* writeEndFn = FifoMng::getWriteEndFunction(port->getType(), decoder);
-	Value* writeEndArgs[] = { loadPort, numTokens};
-	CallInst::Create(writeEndFn, writeEndArgs, "",  BB);
-}
-
-
-void ActionSchedulerAdder::createWrites(Pattern* pattern, llvm::BasicBlock* BB){
-	//Get tokens and var
-	map<Port*, ConstantInt*>::iterator it;
-	map<Port*, Variable*>::iterator itVar;
-	map<Port*, ConstantInt*>* numTokensMap = pattern->getNumTokensMap();
-
-	for (it = numTokensMap->begin(); it != numTokensMap->end(); it++){
-		//Create write
-		Port* port = it->first;
-		if (port->isInternal()){
-			createInternalWrite(port, port->getPtrVar(), it->second, BB);
-		}else if (port->getFifoVar() != NULL){
-			createWrite(port, port->getPtrVar(), it->second, BB);
-		}
-	}
-}
-
-void ActionSchedulerAdder::createReads(Pattern* pattern, llvm::BasicBlock* BB){
-	//Get tokens and var
-	map<Port*, ConstantInt*>::iterator it;
-	map<Port*, Variable*>::iterator itVar;
-	map<Port*, ConstantInt*>* numTokensMap = pattern->getNumTokensMap();
-
-	for (it = numTokensMap->begin(); it != numTokensMap->end(); it++){
-		// Get associated port variable
-		Port* port = it->first;
-		if (port->isInternal()){
-			createInternalRead(port, port->getPtrVar(), it->second, BB);
-		}else if (port->getFifoVar() != NULL){
-			createRead(port, port->getPtrVar(), it->second, BB);
-		}
-	}
-}
-
-void ActionSchedulerAdder::createInternalWrite(Port* port, Variable* variable, ConstantInt* numTokens, BasicBlock* BB){
-
-}
-
-void ActionSchedulerAdder::createInternalRead(Port* port, Variable* variable, ConstantInt* numTokens, BasicBlock* BB){
-
-}
-
-void ActionSchedulerAdder::createWrite(Port* port, Variable* variable, ConstantInt* numTokens, BasicBlock* BB){
-	//Load selected port
-	GlobalVariable* fifoVar = port->getFifoVar();
-	LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB);
-	
-	//Call peek function
-	Function* writeFn = FifoMng::getWriteFunction(port->getType(), decoder);
-	Value* writeArgs[] = { loadPort, numTokens};
-	CallInst* callInst = CallInst::Create(writeFn, writeArgs,"",  BB);
-
-	// Store fifo pointer in port pointer
-	GlobalVariable* portPtr = variable->getGlobalVariable();
-	new StoreInst(callInst, portPtr, BB);
-}
-
-
-void ActionSchedulerAdder::createRead(Port* port, Variable* variable, ConstantInt* numTokens, BasicBlock* BB){
-	//Load selected port
-	GlobalVariable* fifoVar = port->getFifoVar();
-	LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB);
-	
-	//Call peek function
-	Function* readFn = FifoMng::getReadFunction(port->getType(), decoder);
-	Value* readArgs[] = { loadPort, numTokens};
-	CallInst* callInst = CallInst::Create(readFn, readArgs,"",  BB);
-
-	// Store fifo pointer in port pointer
-	GlobalVariable* portPtr = variable->getGlobalVariable();
-	new StoreInst(callInst, portPtr, BB);
-}
-
-Value* ActionSchedulerAdder::createOutputTest(Port* port, ConstantInt* numTokens, BasicBlock* BB){
-	
-	if (BB->getTerminator() == NULL){
-		//Load selected port
-		LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB);
-	
-		//Call hasRoom function
-		Function* hasRoomFn = FifoMng::getHasRoomFunction(port->getType(), decoder);
-		Value* hasRoomArgs[] = { loadPort, numTokens};
-		CallInst* callInst = CallInst::Create(hasRoomFn, hasRoomArgs,"",  BB);
-
-		return callInst;
-	}else{			
-		//Load selected port
-		LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB->getTerminator());
-	
-		//Call hasRoom function
-		Function* hasRoomFn = FifoMng::getHasRoomFunction(port->getType(), decoder);
-		Value* hasRoomArgs[] = { loadPort, numTokens};
-		CallInst* callInst = CallInst::Create(hasRoomFn, hasRoomArgs,"",  BB->getTerminator());
-
-		return callInst;
-	}
-	
-
-}
-
-Value* ActionSchedulerAdder::createInputTest(Port* port, ConstantInt* numTokens, BasicBlock* BB){
-	if (BB->getTerminator() == NULL){
-		//Load selected port
-		LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB);
-	
-		//Call hasToken function
-		Function* hasTokenFn = FifoMng::getHasTokenFunction(port->getType(), decoder);
-		Value* hasTokenArgs[] = { loadPort, numTokens};
-		CallInst* callInst = CallInst::Create(hasTokenFn, hasTokenArgs,"",  BB);
-
-		return callInst;
-	}else{			
-		//Load selected port
-		LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB->getTerminator());
-	
-		//Call hasToken function
-		Function* hasTokenFn = FifoMng::getHasTokenFunction(port->getType(), decoder);
-		Value* hasTokenArgs[] = { loadPort, numTokens};
-		CallInst* callInst = CallInst::Create(hasTokenFn, hasTokenArgs,"",  BB->getTerminator());
-	}
 }

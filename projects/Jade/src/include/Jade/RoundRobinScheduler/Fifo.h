@@ -40,10 +40,23 @@
 #define FIFOOPT_H
 
 namespace llvm{
+	class BasicBlock;
 	class Constant;
+	class ConstantInt;
+	class IntegerType;
+	class GlobalVariable;
+	class Function;
+	class LLVMContext;
+	class Module;
+	class StructType;
+	class Type;
+	class Value;
 }
 
-#include "Jade/Fifo/AbstractFifo.h"
+class Action;
+class Pattern;
+class Procedure;
+class Port;
 //------------------------------
 
 /**
@@ -53,7 +66,7 @@ namespace llvm{
  * 
  */
 
-class FifoOpt : public AbstractFifo {
+class FifoOpt {
 	public:
 		FifoOpt(llvm::LLVMContext& C, llvm::Module* module, llvm::Type* type, int size);
 
@@ -62,8 +75,6 @@ class FifoOpt : public AbstractFifo {
 	protected:
 		llvm::GlobalVariable* ArrayFifoBuffer;
 		llvm::GlobalVariable* ArrayContent;
-
-		virtual void createConnection();
 	
 	public:
 		static llvm::StructType* getOrInsertFifoStruct(llvm::Module* module, llvm::IntegerType* connectionType);
@@ -74,6 +85,85 @@ class FifoOpt : public AbstractFifo {
 
 		static llvm::Function* closeIn(llvm::Module* module, Port* port);
 		static llvm::Function* closeOut(llvm::Module* module, Port* port);
+		llvm::GlobalVariable* getGV(){return fifoGV;}
+
+	/**
+	 * @brief Creates read/write/peek accesses
+	 *
+	 * @param action : action where accesses are added
+	 */
+	static void createReadWritePeek(Action* action);
+
+	/**
+	 * @brief Creates a hasToken test for a Port
+	 * 
+	 * @param port : the Port to test
+	 *
+	 * @param BB : llvm::BasicBlock where test is add
+	 *
+	 * @param incBB : llvm::BasicBlock where test has to branch in case of success
+	 *
+	 * @param returnBB : llvm::BasicBlock where test has to branch in case of return
+	 *
+	 * @param function : llvm::Function where the test is added
+	 */
+	static llvm::Value* createInputTest(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+
+	/**
+	 * @brief Creates a hasRoom test for a Port
+	 * 
+	 * @param port : the Port to test
+	 *
+	 * @param BB : llvm::BasicBlock where test is added
+	 *
+	 * @param incBB : llvm::BasicBlock where test has to branch in case of success
+	 *
+	 * @param returnBB : llvm::BasicBlock where test has to branch in case of return
+	 *
+	 * @param function : llvm::Function where the test is added
+	 */
+	static llvm::Value* createOutputTest(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+
+private:
+
+	/**
+	 * @brief Creates write accesses
+	 *
+	 * @param procedure : procedure where write is added
+	 *
+	 * @parm pattern : the writing pattern
+	 */
+	static void createWrites (Procedure* procedure, Pattern* pattern);
+
+	/**
+	 * @brief Creates read accesses
+	 *
+	 * @param procedure : procedure where read is added
+	 *
+	 * @parm pattern : the read pattern
+	 */
+	static void createReads (Procedure* procedure, Pattern* pattern);
+
+	/**
+	 * @brief Creates peek accesses
+	 *
+	 * @param procedure : procedure where peek is added
+	 *
+	 * @parm pattern : the peek pattern
+	 */
+	static void createPeeks (Procedure* procedure, Pattern* pattern);
+
+	/**
+	 * @brief Port procedure variable
+	 *
+	 * @param port : the port to get the variable from
+	 *
+	 * @parm procedure : the procedure to get var from
+	 */
+	static llvm::Value* replaceAccess (Port* port, Procedure* proc);
+
+private:
+	llvm::GlobalVariable* fifoGV;
 };
 
 #endif

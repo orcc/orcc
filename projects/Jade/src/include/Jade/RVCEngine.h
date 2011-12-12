@@ -57,7 +57,7 @@ class Configuration;
 #include <string>
 #include <pthread.h>
 
-#include "Jade/Fifo/FifoSelection.h"
+#include "Jade/RoundRobinScheduler/FIFO.h"
 #include "Jade/RVCDecoder/RVCDecoder.h"
 //------------------------------
 
@@ -78,7 +78,7 @@ public:
 	 *   
 	 *  @param C : the LLVM Context used by JIT
      */
-	RVCEngine(llvm::LLVMContext& C, std::string library, FifoTy fifo, int defaultFifoSize, std::string system = "", std::string outputDir="", bool noMerging = false, bool noMultiCore = false, bool verbose = false, bool debug = false);
+	RVCEngine(llvm::LLVMContext& C, std::string library, int defaultFifoSize, std::string system = "", std::string outputDir="", bool noMerging = false, bool noMultiCore = false, bool verbose = false, bool debug = false);
 	~RVCEngine();
 
 	/*!
@@ -190,9 +190,6 @@ private:
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
-
-	/** Fifo type of the decoder */
-	FifoTy fifoty;
 
 	/** Library location */
 	std::string library;

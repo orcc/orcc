@@ -28,9 +28,8 @@ add_library (RoundRobinScheduler
 	DPNScheduler.h
 	QSDFScheduler.cpp
 	QSDFScheduler.h
-	OPTScheduler.cpp
-	OPTScheduler.h
 	RoundRobinScheduler.cpp
+	FIFO.cpp
  )
  
 if(UNIX)

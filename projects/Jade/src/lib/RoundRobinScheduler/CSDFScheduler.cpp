@@ -155,9 +155,6 @@ void CSDFScheduler::initializeStateVars(map<Port*, StateVar*>* stateVars, BasicB
 }
 
 void CSDFScheduler::createActionsCall(CSDFMoC* moc, BasicBlock* BB){
-	// Create read/write for the action
-	createReads(moc->getInputPattern(), BB);
-	createWrites(moc->getOutputPattern(), BB);
 	
 	// Call actions successively
 	list<Action*>::iterator it;
@@ -167,40 +164,5 @@ void CSDFScheduler::createActionsCall(CSDFMoC* moc, BasicBlock* BB){
 		Action* action = *it;
 		Procedure* body = action->getBody();
 		CallInst* schedInst = CallInst::Create(body->getFunction(), "",  BB);
-		updatePattern(action->getInputPattern(), BB);
-		updatePattern(action->getOutputPattern(), BB);
-	}
-
-	//Create ReadEnd/WriteEnd
-	createReadEnds(moc->getInputPattern(), BB);
-	createWriteEnds(moc->getOutputPattern(), BB);
-}
-
-void CSDFScheduler::updatePattern(Pattern* pattern, BasicBlock* BB){
-	//Get tokens and var
-	map<Port*, ConstantInt*>::iterator it;
-	map<Port*, Variable*>::iterator itVar;
-	map<Port*, ConstantInt*>* numTokensMap = pattern->getNumTokensMap();
-
-	for (it = numTokensMap->begin(); it != numTokensMap->end(); it++){
-		// Get associated port variable
-		Port* port = it->first;
-		ConstantInt* numTokens = it->second;
-
-		//Load selected port
-		Variable* ptrVar = port->getPtrVar();
-		LoadInst* loadPort = new LoadInst(ptrVar->getGlobalVariable(), "", BB);
-		
-		// Bitcast the given port
-		ArrayType* type = ArrayType::get(port->getType(), numTokens->getLimitedValue());
-		BitCastInst* bitCastInst = new BitCastInst(loadPort, type->getPointerTo(), "", BB);
-
-		// Get next elements in pointer
-		ConstantInt* Zero = ConstantInt::get(Type::getInt32Ty(Context), 0);
-		Value* values[]={Zero, numTokens};
-		GetElementPtrInst* getElementPtrInst = GetElementPtrInst::Create(bitCastInst, values, "", BB);
-
-		//Store next pointer into fifo counter
-		StoreInst* storeInst = new StoreInst(getElementPtrInst, ptrVar->getGlobalVariable(), BB);
 	}
 }

@@ -64,7 +64,6 @@
 #include "Jade/Core/MoC/SDFMoC.h"
 #include "Jade/Jit/LLVMParser.h"
 #include "Jade/Serialize/IRParser.h"
-#include "Jade/Util/FifoMng.h"
 #include "Jade/Util/PackageMng.h"
 
 

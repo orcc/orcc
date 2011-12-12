@@ -38,7 +38,6 @@
 //------------------------------
 #include "Jade/Decoder.h"
 #include "Jade/Jit/LLVMWriter.h"
-#include "Jade/Util/FifoMng.h"
 
 #include "llvm/Constants.h"
 #include "llvm/Instructions.h"
@@ -66,10 +65,9 @@ GlobalVariable* LLVMWriter::createVariable(GlobalVariable* variable){
 
 GlobalVariable* LLVMWriter::createPortVariable(Port* port){
 	GlobalVariable* portVar = port->getFifoVar();
-	PointerType* portStruct = FifoMng::getFifoType(port->getType())->getPointerTo();
 
-	GlobalVariable *newPortVar =  new GlobalVariable(*module, portStruct,
-                          true, portVar->getLinkage(), ConstantPointerNull::get(portStruct),
+	GlobalVariable *newPortVar =  new GlobalVariable(*module, portVar->getType(),
+                          true, portVar->getLinkage(), ConstantPointerNull::get(portVar->getType()),
                            prefix + portVar->getName(), 0, false);
 
 	return newPortVar;

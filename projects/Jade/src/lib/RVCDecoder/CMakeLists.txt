@@ -15,7 +15,7 @@ add_library(RVCDecoder SHARED
  )
 
 # Library required
-target_link_libraries(RVCDecoder RVCEngine ConfigurationEngine XDFSerialize IRMerger Scenario IROptimize IRSerialize RoundRobinScheduler IRJit IRActor IRUtil Fifo IRCore HDAGGraph TinyXml ZLib ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(RVCDecoder RVCEngine ConfigurationEngine XDFSerialize IRMerger Scenario IROptimize IRSerialize RoundRobinScheduler IRJit IRActor IRUtil IRCore HDAGGraph TinyXml ZLib ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS} ${CMAKE_THREAD_LIBS_INIT})
 
 INSTALL(TARGETS RVCDecoder DESTINATION lib PERMISSIONS
 OWNER_READ OWNER_WRITE OWNER_EXECUTE

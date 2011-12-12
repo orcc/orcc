@@ -10,7 +10,7 @@ add_executable( JadeToolbox
 
 
 # Library requiered
-target_link_libraries(JadeToolbox RVCEngine XDFSerialize IRCore IRUtil IRCore HDAGGraph Fifo IRJit TinyXml ZLib ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS})
+target_link_libraries(JadeToolbox XDFSerialize RoundRobinScheduler IRUtil IRCore HDAGGraph TinyXml ZLib ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS})
 
 INSTALL(TARGETS JadeToolbox
 RUNTIME DESTINATION bin

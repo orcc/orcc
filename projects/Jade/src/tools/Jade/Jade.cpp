@@ -53,7 +53,6 @@
 #include "Jade/XDFSerialize/XDFParser.h"
 #include "Jade/XCFSerialize/XCFParser.h"
 #include "Jade/RVCEngine.h"
-#include "Jade/Fifo/FifoSelection.h"
 #include "Jade/Scenario/Manager.h"
 #include "Jade/Util/OptionMng.h"
 #include "Jade/Util/CompressionMng.h"
@@ -69,17 +68,6 @@ using namespace std;
 using namespace llvm;
 using namespace llvm::cl;
 using namespace llvm::sys;
-
-cl::opt<FifoTy> 
-Fifo("fifo", CommaSeparated,
-			 desc("Specify fifo to be used in the decoder"),
-			 value_desc("trace, circular, fast"),
-			 values(clEnumVal(trace,   "trace"),
-                    clEnumVal(circular,  "circular"),
-                    clEnumVal(unprotected, "fast"),
-                    clEnumValEnd),
-			 init(circular),
-			 cl::Optional);
 
 // Jade options
 cl::opt<std::string>
@@ -326,7 +314,7 @@ int main(int argc, char **argv) {
 	setOptions();
 	
 	//Loading decoderEngine
-	engine = new RVCEngine(Context, VTLDir, Fifo, FifoSize, SystemDir, OutputDir, noMerging, disableMultiCore, Verbose, debug);
+	engine = new RVCEngine(Context, VTLDir, FifoSize, SystemDir, OutputDir, noMerging, disableMultiCore, Verbose, debug);
 
 	if (Verbose){
 		cout << "> Core preparation finished in " << (clock () - start) * 1000 / CLOCKS_PER_SEC <<" ms.\n";

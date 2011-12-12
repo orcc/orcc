@@ -50,8 +50,7 @@ class LLVMExecution;
 class Port;
 
 #include "llvm/LLVMContext.h"
-
-#include "Jade/Fifo/AbstractFifo.h"
+#include "Jade/RoundRobinScheduler/FIFO.h"
 //------------------------------
 
 /**
@@ -128,7 +127,7 @@ private:
 	 *
 	 * @param fifo : the fifo to connect
 	 */
-	void connect(Port* port, AbstractFifo* fifo);
+	void connect(Port* port, FifoOpt* fifo);
 	
 	/** LLVM Context */
 	llvm::LLVMContext &Context;

@@ -49,7 +49,6 @@
 #include "Jade/Jit/LLVMExecution.h"
 #include "Jade/Jit/LLVMOptimizer.h"
 #include "Jade/Jit/LLVMUtility.h"
-#include "Jade/Util/FifoMng.h"
 #include "Jade/RVCEngine.h"
 
 #include "source.h"
@@ -59,12 +58,6 @@ using namespace std;
 using namespace llvm;
 using namespace llvm::cl;
 
-
-cl::opt<FifoTy> Fifo(values(clEnumVal(trace,   "trace"),
-							clEnumVal(circular,  "circular"),
-							clEnumVal(unprotected, "fast"),
-							clEnumValEnd),
-					 init(circular));
 
 // Jade options
 cl::opt<std::string> VTLDir(init(""));
@@ -133,7 +126,7 @@ void rvc_init(char *XDF, char* VTLFolder, int isAVCFile){
 	Configuration* configuration = new Configuration(network);
 
 	// Parsing actor and bound it to the configuration
-	RVCEngine engine(Context, VTLFolder, Fifo, FifoSize, "", "", false, false, verbose);
+	RVCEngine engine(Context, VTLFolder, FifoSize, "", "", false, false, verbose);
 	map<string, Actor*>* requieredActors = engine.parseActors(configuration);
 	configuration->setActors(requieredActors);
 

@@ -41,7 +41,6 @@
 
 #include "llvm/PassManager.h"
 
-#include "Jade/Util/FifoMng.h"
 #include "Jade/Decoder.h"
 #include "Jade/RVCEngine.h"
 #include "Jade/Serialize/IRParser.h"
@@ -62,8 +61,7 @@ using namespace llvm;
 //extern cl::list<const PassInfo*, bool, PassNameParser> PassList;
 
 RVCEngine::RVCEngine(llvm::LLVMContext& C,
-							 string library, 
-							 FifoTy fifo,
+							 string library,
 							 int defaultFifoSize,
 							 string system, 
 							 string outputDir, 
@@ -74,14 +72,10 @@ RVCEngine::RVCEngine(llvm::LLVMContext& C,
 	this->library = library;
 	this->systemPackage = system;
 	this->verbose = verbose;
-	this->fifoty = fifoty;
 	this->noMerging = noMerging;
 	this->outputDir = outputDir;
 	this->noMultiCore = noMultiCore;
 	this->debug = debug;
-
-	//Select the fifo used
-	FifoMng::setFifoTy(fifo, library, defaultFifoSize, outputDir);
 
 	//Load IR Parser
 	irParser = new IRParser(C, library);

@@ -54,7 +54,6 @@
 #include "Jade/Core/Port.h"
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Core/Network/Instance.h"
-#include "Jade/Util/FifoMng.h"
 #include "Jade/Util/FunctionMng.h"
 //------------------------------
 
@@ -176,7 +175,6 @@ BasicBlock* DPNScheduler::createActionTest(Action* action, BasicBlock* BB, Basic
 	BB = checkInputPattern(action->getInputPattern(), function, skipBB, BB);
 	
 	//Test firing condition of an action
-	checkPeekPattern(action->getPeekPattern(), function, BB);
 	Procedure* scheduler = action->getScheduler();
 	CallInst* schedInst = CallInst::Create(scheduler->getFunction(), "",  BB);
 	BranchInst* branchInst	= BranchInst::Create(fireBB, skipBB, schedInst, BB);
@@ -194,10 +192,6 @@ BasicBlock* DPNScheduler::createActionTest(Action* action, BasicBlock* BB, Basic
 }
 
 void DPNScheduler::createActionCall(Action* action, BasicBlock* BB){
-	// Create read/write for the action
-	createReads(action->getInputPattern(), BB);
-	createWrites(action->getOutputPattern(), BB);
-	
 	//Launch action body
 	Procedure* body = action->getBody();
 	CallInst* bodyInst = CallInst::Create(body->getFunction(), "",  BB);
@@ -209,10 +203,6 @@ void DPNScheduler::createActionCall(Action* action, BasicBlock* BB){
 
 		FunctionMng::createPuts(decoder, message, bodyInst);
 	}
-
-	//Create ReadEnd/WriteEnd
-	createReadEnds(action->getInputPattern(), BB);
-	createWriteEnds(action->getOutputPattern(), BB);
 }
 
 map<FSM::State*, BasicBlock*>* DPNScheduler::createStates(map<string, FSM::State*>* states, Function* function){
@@ -308,7 +298,6 @@ BasicBlock* DPNScheduler::createActionTestState(FSM::NextStateInfo* nextStateInf
 	stateBB = checkInputPattern(action->getInputPattern(), function, skipStateBB, stateBB);
 	
 	//Test firing condition of an action
-	checkPeekPattern(action->getPeekPattern(), function, stateBB);
 	Procedure* scheduler = action->getScheduler();
 	CallInst* callInst = CallInst::Create(scheduler->getFunction(), "",  stateBB);
 	BranchInst::Create(fireStateBB, skipStateBB, callInst, stateBB);

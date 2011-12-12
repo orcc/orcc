@@ -60,7 +60,7 @@
 #include "Jade/Decoder.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Core/Actor/Procedure.h"
-#include "Jade/Fifo/AbstractFifo.h"
+#include "Jade/RoundRobinScheduler/FIFO.h"
 #include "Jade/Jit/LLVMExecution.h"
 //------------------------------
 
@@ -169,7 +169,7 @@ void LLVMExecution::mapProcedure(Procedure* procedure, void *Addr) {
 }
 
 
-bool LLVMExecution::mapFifo(Port* port, AbstractFifo* fifo) {
+bool LLVMExecution::mapFifo(Port* port, FifoOpt* fifo) {
 	void **portGV = (void**)EE->getPointerToGlobalIfAvailable(port->getFifoVar());
 	
 	//Port has already been compiled

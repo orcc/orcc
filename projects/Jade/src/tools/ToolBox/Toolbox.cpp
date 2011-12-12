@@ -56,6 +56,10 @@
 using namespace llvm;
 using namespace std;
 
+cl::opt<int> FifoSize("default-fifo-size",
+         cl::desc("Defaut size of fifos"),
+         cl::init(512));
+
 
 cl::list<string>
 Packages(cl::Positional, cl::OneOrMore, cl::desc("Input actors"));
