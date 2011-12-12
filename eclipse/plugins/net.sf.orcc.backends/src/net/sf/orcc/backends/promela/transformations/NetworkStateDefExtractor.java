@@ -214,7 +214,7 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Void caseNetwork(Network network) {
-		for (Actor actor : network.getActors()) {
+		for (Actor actor : network.getAllActors()) {
 			doSwitch(actor);
 		}
 		identifyControlTokenPorts(network);

@@ -380,13 +380,13 @@ public class NetworkImpl extends EntityImpl implements Network {
 	 * 
 	 * @return a list of actors
 	 */
-	public List<Actor> getActors() {
+	public List<Actor> getAllActors() {
 		Set<Actor> actors = new HashSet<Actor>();
 		for (Entity entity : getAllEntities()) {
 			if (entity.isActor()) {
 				actors.add((Actor) entity);
 			} else if (entity.isNetwork()) {
-				actors.addAll(((Network) entity).getActors());
+				actors.addAll(((Network) entity).getAllActors());
 			}
 		}
 
@@ -590,7 +590,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 	 *             if something goes wrong
 	 */
 	public void normalizeActors() throws OrccException {
-		for (Actor actor : getActors()) {
+		for (Actor actor : getAllActors()) {
 			new ActorNormalizer().doSwitch(actor);
 		}
 	}

@@ -151,7 +151,7 @@ public class TTABackendImpl extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network = doTransformNetwork(network);
 
-		transformActors(network.getActors());
+		transformActors(network.getAllActors());
 		printInstances(network);
 
 		network.computeTemplateMaps();

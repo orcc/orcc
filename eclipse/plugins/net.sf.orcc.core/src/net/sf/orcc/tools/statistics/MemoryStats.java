@@ -151,7 +151,7 @@ public class MemoryStats {
 
 	public void computeMemoryStats(Network network) {
 		memoryStatsMap = new HashMap<Actor, MemoryStats.MemoryStatsElement>();
-		for (Actor actor : network.getActors()) {
+		for (Actor actor : network.getAllActors()) {
 			MemoryStatsElement statsElement = new MemoryStatsElement();
 			computeMemorySize(actor, statsElement);
 			memoryStatsMap.put(actor, statsElement);

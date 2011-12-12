@@ -257,7 +257,7 @@ public class CBackendImpl extends AbstractBackend {
 		}
 
 		// Transform all actors of the network
-		transformActors(network.getActors());
+		transformActors(network.getAllActors());
 
 		network.computeTemplateMaps();
 

@@ -63,10 +63,10 @@ public interface Network extends Entity {
 	void computeTemplateMaps();
 
 	/**
-	 * Returns the list of actors referenced by the graph of this network. This
-	 * is different from the list of instances of this network: There are
-	 * typically more instances than there are actors, because an actor may be
-	 * instantiated several times.
+	 * Returns the list of actors referenced by or contained in this network,
+	 * and its sub-networks. This is different from the list of instances of
+	 * this network: There are typically more instances than there are actors,
+	 * because an actor may be instantiated several times.
 	 * 
 	 * <p>
 	 * The list is computed on the fly by adding all the actors referenced in a
@@ -75,13 +75,13 @@ public interface Network extends Entity {
 	 * 
 	 * @return a list of actors
 	 */
-	List<Actor> getActors();
+	List<Actor> getAllActors();
 
 	/**
-	 * Returns the list of all networks referenced by this network. This is
-	 * different from the list of instances of this network: There are typically
-	 * more instances than there are networks, because a network may be
-	 * instantiated several times.
+	 * Returns the list of networks referenced by or contained in this network,
+	 * and its sub-networks. This is different from the list of instances of
+	 * this network: There are typically more instances than there are networks,
+	 * because a network may be instantiated several times.
 	 * 
 	 * <p>
 	 * The list is computed on the fly by adding all the networks referenced in

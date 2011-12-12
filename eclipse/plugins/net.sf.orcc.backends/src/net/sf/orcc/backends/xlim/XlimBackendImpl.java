@@ -188,7 +188,7 @@ public class XlimBackendImpl extends AbstractBackend {
 		network = new Instantiator().doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
 
-		transformActors(network.getActors());
+		transformActors(network.getAllActors());
 
 		printInstances(network);
 

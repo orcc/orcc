@@ -160,7 +160,7 @@ public class InstructionStats {
 	}
 
 	public void computeInstructionStats(Network network) {
-		for (Actor actor : network.getActors()) {
+		for (Actor actor : network.getAllActors()) {
 			InstructionStatsElement statsElement = new InstructionStatsElement();
 			instrStatsBuilder.buildInstructionStats(actor, statsElement);
 			instructionStatsMap.put(actor, statsElement);

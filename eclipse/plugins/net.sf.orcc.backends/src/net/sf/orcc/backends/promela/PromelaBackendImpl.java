@@ -141,7 +141,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 		netStateDef = new NetworkStateDefExtractor();
 		netStateDef.doSwitch(network);
 
-		List<Actor> actors = network.getActors();
+		List<Actor> actors = network.getAllActors();
 		transformActors(actors);
 		printInstances(network);
 

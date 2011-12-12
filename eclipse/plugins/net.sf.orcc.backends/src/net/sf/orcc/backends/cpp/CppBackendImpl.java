@@ -149,11 +149,11 @@ public class CppBackendImpl extends AbstractBackend {
 		network = new Instantiator().doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
 
-		transformActors(network.getActors());
+		transformActors(network.getAllActors());
 
 		doTransformNetwork(network);
 
-		printActors(network.getActors());
+		printActors(network.getAllActors());
 
 		// print network
 		write("Printing network...\n");

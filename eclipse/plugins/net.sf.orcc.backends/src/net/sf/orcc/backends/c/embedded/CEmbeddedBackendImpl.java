@@ -64,8 +64,8 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		// Transform all actors of the network
-		transformActors(network.getActors());
-		printActors(network.getActors());
+		transformActors(network.getAllActors());
+		printActors(network.getAllActors());
 
 		StandardPrinter printer = new StandardPrinter(
 				"net/sf/orcc/backends/c/embedded/Network.stg");
@@ -91,7 +91,7 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 		write("done\n");
 
 		if (network.getMoC().isCSDF()) {
-			SDFMoC moc = (SDFMoC) network.getActors().get(0).getMoC();
+			SDFMoC moc = (SDFMoC) network.getAllActors().get(0).getMoC();
 			moc.toString();
 			write("Printing network...\n");
 			printer.print(network.getName() + ".graphml", path, network);
