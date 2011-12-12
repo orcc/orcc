@@ -357,7 +357,7 @@ if (stop != 0) {
 >>
 
 checkInputPattern(pattern) ::= <<
-<pattern.ports: { port | index_<port.name> + <pattern.numTokensMap.(port)> \<= numTokens_<port.name> && }>
+<pattern.ports: { port | index_<port.name> + <pattern.numTokensMap.(port)> - numTokens_<port.name> - 1 \> SIZE_<port.name> && }>
 >>
 
 printReadTokensFunction(port) ::= <<
@@ -469,7 +469,7 @@ if (<checkInputPattern(transition.action.inputPattern)>isSchedulable_<transition
 >>
 
 printInputPatternPort(port) ::= <<
-if (index_<port.name> + <pattern.numTokensMap.(port)> \> numTokens_<port.name>) {
+if (index_<port.name> + <pattern.numTokensMap.(port)> - numTokens_<port.name> - 1 \<= SIZE_<port.name>) {
 	if(!<instance.name>.sched-\>round_robin || i \> 0) {
 		sched_add_schedulable(<instance.name>.sched, &<instance.incomingPortMap.(port).source.name>, RING_TOPOLOGY);
 #ifdef PRINT_FIRINGS
