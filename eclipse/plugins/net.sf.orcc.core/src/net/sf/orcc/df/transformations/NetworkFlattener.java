@@ -42,6 +42,7 @@ import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.EcoreHelper;
 
 import org.eclipse.emf.common.notify.Adapter;
@@ -181,7 +182,7 @@ public class NetworkFlattener extends DfSwitch<Void> {
 			for (Use use : var.getUses()) {
 				Expression oldExpr = EcoreHelper.getContainerOfType(use,
 						ExprVar.class);
-				Expression newExpr = EcoreUtil.copy(var.getInitialValue());
+				Expression newExpr = IrUtil.copy(var.getInitialValue());
 				EcoreUtil.replace(oldExpr, newExpr);
 			}
 		}
