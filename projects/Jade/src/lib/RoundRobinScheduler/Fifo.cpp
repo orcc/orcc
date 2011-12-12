@@ -59,13 +59,13 @@ FifoOpt::FifoOpt(llvm::LLVMContext& C, llvm::Module* module, llvm::Type* type, i
 
 	// Initialize array content
 	ArrayType* arrayType = ArrayType::get(connectionType, size);
-	GlobalVariable* gv_array = new GlobalVariable(*module, arrayType, false, GlobalValue::InternalLinkage, ConstantAggregateZero::get(arrayType), "array");
+	gv_array = new GlobalVariable(*module, arrayType, false, GlobalValue::InternalLinkage, ConstantAggregateZero::get(arrayType), "array");
 	gv_array->setAlignment(16);
 
 
 	// Initialize read_ind
 	ArrayType* read_indTy = ArrayType::get(IntegerType::get(module->getContext(), 32), 1);
-	GlobalVariable* gv_read_inds = new GlobalVariable(*module, read_indTy, false, GlobalValue::InternalLinkage, ConstantAggregateZero::get(read_indTy), "read_inds");
+	gv_read_inds = new GlobalVariable(*module, read_indTy, false, GlobalValue::InternalLinkage, ConstantAggregateZero::get(read_indTy), "read_inds");
 	gv_read_inds->setAlignment(4);
 
 	//Usefull values
@@ -405,7 +405,7 @@ Function* FifoOpt::initializeOut(llvm::Module* module, Port* port){
 	  roomValue->setTailCall(false);
   
 	  // Add results
-	  BinaryOperator* addOp = BinaryOperator::Create(Instruction::Add, writeElt, roomValue, "", bb);
+	  BinaryOperator* addOp = BinaryOperator::Create(Instruction::Add, writeElt, writeElt, "", bb);
 	  new StoreInst(addOp, numFreeVar, false, bb);
 
 	  // Load content in FIFO ptr
@@ -483,8 +483,8 @@ Function* FifoOpt::closeOut(llvm::Module* module, Port* port){
 FifoOpt::~FifoOpt(){
 	//Erase fifo elements
 	fifoGV->eraseFromParent();
-	ArrayContent->eraseFromParent();
-	ArrayFifoBuffer->eraseFromParent();
+	gv_array->eraseFromParent();
+	gv_read_inds->eraseFromParent();
 }
 
 

@@ -71,10 +71,6 @@ class FifoOpt {
 		FifoOpt(llvm::LLVMContext& C, llvm::Module* module, llvm::Type* type, int size);
 
 		~FifoOpt();
-
-	protected:
-		llvm::GlobalVariable* ArrayFifoBuffer;
-		llvm::GlobalVariable* ArrayContent;
 	
 	public:
 		static llvm::StructType* getOrInsertFifoStruct(llvm::Module* module, llvm::IntegerType* connectionType);
@@ -164,6 +160,8 @@ private:
 
 private:
 	llvm::GlobalVariable* fifoGV;
+	llvm::GlobalVariable* gv_array;
+	llvm::GlobalVariable* gv_read_inds;
 };
 
 #endif
