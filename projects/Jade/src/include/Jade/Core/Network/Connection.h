@@ -35,6 +35,7 @@
 @date 15/11/2010
 */
 
+
 //------------------------------
 #ifndef Connection_H
 #define Connection_H
@@ -45,7 +46,7 @@
 
 #include "Jade/Core/IRAttribute.h"
 #include "Jade/Core/Port.h"
-#include "Jade/RoundRobinScheduler/FIFO.h"
+#include "Jade/RoundRobinScheduler/Fifo.h"
 #include "Jade/Graph/HDAGEdge.h"
 
 namespace llvm{
@@ -56,7 +57,6 @@ namespace llvm{
 
 class Expr;
 
-#define SIZE 10000
 //------------------------------
 
 /**
