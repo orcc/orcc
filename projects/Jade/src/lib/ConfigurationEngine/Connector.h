@@ -50,7 +50,7 @@ class LLVMExecution;
 class Port;
 
 #include "llvm/LLVMContext.h"
-#include "Jade/RoundRobinScheduler/FIFO.h"
+#include "Jade/RoundRobinScheduler/Fifo.h"
 //------------------------------
 
 /**

@@ -60,7 +60,7 @@
 #include "Jade/Decoder.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Core/Actor/Procedure.h"
-#include "Jade/RoundRobinScheduler/FIFO.h"
+#include "Jade/RoundRobinScheduler/Fifo.h"
 #include "Jade/Jit/LLVMExecution.h"
 //------------------------------
 

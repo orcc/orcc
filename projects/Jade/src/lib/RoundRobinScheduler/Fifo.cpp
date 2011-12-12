@@ -45,7 +45,7 @@
 #include "llvm/Instructions.h"
 
 #include "Jade/Decoder.h"
-#include "Jade/RoundRobinScheduler/FIFO.h"
+#include "Jade/RoundRobinScheduler/Fifo.h"
 //------------------------------
 
 using namespace llvm;
