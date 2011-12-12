@@ -38,6 +38,7 @@ import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Nameable;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.moc.MoC;
 
@@ -45,6 +46,7 @@ import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
@@ -60,8 +62,9 @@ import org.eclipse.emf.ecore.util.InternalEList;
 public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
-	 * The cached value of the '{@link #getArguments() <em>Arguments</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getArguments() <em>Arguments</em>}'
+	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getArguments()
 	 * @generated
 	 * @ordered
@@ -71,6 +74,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	/**
 	 * The cached value of the '{@link #getEntity() <em>Entity</em>}' reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getEntity()
 	 * @generated
 	 * @ordered
@@ -79,6 +83,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected InstanceImpl() {
@@ -87,6 +92,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Entity basicGetEntity() {
@@ -95,81 +101,90 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void setEntity(Entity newEntity) {
 		Entity oldEntity = entity;
 		entity = newEntity;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.INSTANCE__ENTITY, oldEntity, entity));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.INSTANCE__ENTITY, oldEntity, entity));
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case DfPackage.INSTANCE__ARGUMENTS:
-				return getArguments();
-			case DfPackage.INSTANCE__ENTITY:
-				if (resolve) return getEntity();
-				return basicGetEntity();
+		case DfPackage.INSTANCE__ARGUMENTS:
+			return getArguments();
+		case DfPackage.INSTANCE__ENTITY:
+			if (resolve)
+				return getEntity();
+			return basicGetEntity();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case DfPackage.INSTANCE__ARGUMENTS:
-				return ((InternalEList<?>)getArguments()).basicRemove(otherEnd, msgs);
+		case DfPackage.INSTANCE__ARGUMENTS:
+			return ((InternalEList<?>) getArguments()).basicRemove(otherEnd,
+					msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case DfPackage.INSTANCE__ARGUMENTS:
-				return arguments != null && !arguments.isEmpty();
-			case DfPackage.INSTANCE__ENTITY:
-				return entity != null;
+		case DfPackage.INSTANCE__ARGUMENTS:
+			return arguments != null && !arguments.isEmpty();
+		case DfPackage.INSTANCE__ENTITY:
+			return entity != null;
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case DfPackage.INSTANCE__ARGUMENTS:
-				getArguments().clear();
-				getArguments().addAll((Collection<? extends Argument>)newValue);
-				return;
-			case DfPackage.INSTANCE__ENTITY:
-				setEntity((Entity)newValue);
-				return;
+		case DfPackage.INSTANCE__ARGUMENTS:
+			getArguments().clear();
+			getArguments().addAll((Collection<? extends Argument>) newValue);
+			return;
+		case DfPackage.INSTANCE__ENTITY:
+			setEntity((Entity) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -179,17 +194,18 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case DfPackage.INSTANCE__ARGUMENTS:
-				getArguments().clear();
-				return;
-			case DfPackage.INSTANCE__ENTITY:
-				setEntity((Entity)null);
-				return;
+		case DfPackage.INSTANCE__ARGUMENTS:
+			getArguments().clear();
+			return;
+		case DfPackage.INSTANCE__ENTITY:
+			setEntity((Entity) null);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -201,11 +217,13 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Argument> getArguments() {
 		if (arguments == null) {
-			arguments = new EObjectContainmentEList<Argument>(Argument.class, this, DfPackage.INSTANCE__ARGUMENTS);
+			arguments = new EObjectContainmentEList<Argument>(Argument.class,
+					this, DfPackage.INSTANCE__ARGUMENTS);
 		}
 		return arguments;
 	}
@@ -217,15 +235,17 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Entity getEntity() {
 		if (entity != null && entity.eIsProxy()) {
-			InternalEObject oldEntity = (InternalEObject)entity;
-			entity = (Entity)eResolveProxy(oldEntity);
+			InternalEObject oldEntity = (InternalEObject) entity;
+			entity = (Entity) eResolveProxy(oldEntity);
 			if (entity != oldEntity) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.INSTANCE__ENTITY, oldEntity, entity));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							DfPackage.INSTANCE__ENTITY, oldEntity, entity));
 			}
 		}
 		return entity;
@@ -238,11 +258,12 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 */
 	public List<String> getHierarchicalId() {
 		List<String> ids = new ArrayList<String>();
-		// TODO
-		// for (Instance instance : getHierarchy()) {
-		// ids.add(instance.getName());
-		// }
-		ids.add(getId());
+		EObject obj = this;
+		do {
+			String name = ((Nameable) obj).getName();
+			ids.add(0, name);
+			obj = obj.eContainer();
+		} while (obj != null);
 		return ids;
 	}
 
