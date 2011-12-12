@@ -405,7 +405,7 @@ Function* FifoOpt::initializeOut(llvm::Module* module, Port* port){
 	  roomValue->setTailCall(false);
   
 	  // Add results
-	  BinaryOperator* addOp = BinaryOperator::Create(Instruction::Add, writeElt, writeElt, "", bb);
+	  BinaryOperator* addOp = BinaryOperator::Create(Instruction::Add, writeElt, roomValue, "", bb);
 	  new StoreInst(addOp, numFreeVar, false, bb);
 
 	  // Load content in FIFO ptr
@@ -597,10 +597,8 @@ Function* FifoOpt::getOrInsertRoomFn(Module* module, IntegerType* connectionType
 	}
 
 
-	PointerType* fifoStructPtrTy = PointerType::get(fifoStruct, 0);
-
 	std::vector<Type*> FuncRoomTy;
-	FuncRoomTy.push_back(fifoStructPtrTy);
+	FuncRoomTy.push_back(fifoStruct->getPointerTo());
 	FuncRoomTy.push_back(IntegerType::get(module->getContext(), 32));
 	FunctionType* RoomTys = FunctionType::get(IntegerType::get(module->getContext(), 32), FuncRoomTy, false);
 	
@@ -626,7 +624,7 @@ Function* FifoOpt::getOrInsertRoomFn(Module* module, IntegerType* connectionType
   ConstantInt* four = ConstantInt::get(module->getContext(), APInt(32, 4));
 
   // Block  (label_15)
-  AllocaInst* ptr_23 = new AllocaInst(fifoStructPtrTy, "", label_15);
+  AllocaInst* ptr_23 = new AllocaInst(fifoStruct->getPointerTo(), "", label_15);
   ptr_23->setAlignment(8);
   AllocaInst* ptr_24 = new AllocaInst(IntegerType::get(module->getContext(), 32), "", label_15);
   ptr_24->setAlignment(4);

@@ -89,7 +89,7 @@ void Connector::connect(Port* port, FifoOpt* fifo){
 	
 	if (var == NULL){
 		//Get fifo structure type
-		Type* portStruct = cast<Type>(fifo->getGV()->getType());
+		Type* portStruct = fifo->getGV()->getType();
 
 		//Return new variable
 		var =  new GlobalVariable(*module, portStruct, true,  GlobalValue::InternalLinkage, /*init*/0, port->getName(), 0, false);;
@@ -108,7 +108,7 @@ void Connector::setConnection(Connection* connection){
 	Port* dst = connection->getDestinationPort();
 
 	//Initialize ports with a new fifo
-	FifoOpt* fifo = new FifoOpt(Context, decoder->getModule(), cast<Type>(src->getType()), connection->getSize());
+	FifoOpt* fifo = new FifoOpt(Context, decoder->getModule(), src->getType(), connection->getSize());
 	connect(src, fifo);
 	connect(dst, fifo);
 	
