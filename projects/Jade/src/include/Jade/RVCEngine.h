@@ -57,7 +57,7 @@ class Configuration;
 #include <string>
 #include <pthread.h>
 
-#include "Jade/RoundRobinScheduler/FIFO.h"
+#include "Jade/RoundRobinScheduler/Fifo.h"
 #include "Jade/RVCDecoder/RVCDecoder.h"
 //------------------------------
 
