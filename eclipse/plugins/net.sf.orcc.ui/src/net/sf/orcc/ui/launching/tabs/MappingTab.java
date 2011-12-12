@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -34,15 +34,14 @@ import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.ui.OrccUiActivator;
@@ -56,6 +55,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
+import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.jface.viewers.CellEditor;
@@ -82,6 +83,7 @@ import org.eclipse.swt.widgets.TreeColumn;
  * This class defines a tab for mapping a network onto an architecture.
  * 
  * @author Matthieu Wipliez
+ * @author Herve Yviquel
  * 
  */
 public class MappingTab extends AbstractLaunchConfigurationTab {
@@ -90,6 +92,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 	 * This class provides content for the mapping tree.
 	 * 
 	 * @author Matthieu Wipliez
+	 * @author Herve Yviquel
 	 * 
 	 */
 	private static class TreeContentProvider implements ITreeContentProvider {
@@ -100,21 +103,18 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 
 		@Override
 		public Object[] getChildren(Object parentElement) {
-			if (parentElement instanceof Instance) {
-				Instance instance = (Instance) parentElement;
-				return instance.getNetwork().getInstances().toArray();
-			}
-
-			return new Object[0];
+			return getElements(parentElement);
 		}
 
 		@Override
 		public Object[] getElements(Object inputElement) {
 			if (inputElement instanceof Network) {
 				Network network = (Network) inputElement;
-				return network.getInstances().toArray();
+				EList<Vertex> vertices = new BasicEList<Vertex>();
+				vertices.addAll(network.getInstances());
+				vertices.addAll(network.getEntities());
+				return vertices.toArray();
 			}
-
 			return new Object[0];
 		}
 
@@ -127,12 +127,9 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 		public boolean hasChildren(Object element) {
 			if (element instanceof Network) {
 				return true;
-			} else if (element instanceof Instance) {
-				Instance instance = (Instance) element;
-				return instance.isNetwork();
+			} else {
+				return false;
 			}
-
-			return false;
 		}
 
 		@Override
@@ -145,6 +142,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 	 * This class defines editing support for the "component" column.
 	 * 
 	 * @author Matthieu Wipliez
+	 * @author Herve Yviquel
 	 * 
 	 */
 	private class TreeEditingSupport extends EditingSupport {
@@ -170,31 +168,33 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 		protected Object getValue(Object element) {
 			String component = labelProvider.getColumnText(element, 1);
 			if (component != null) {
-				return component;
+				return mapping.get(component);
 			}
-
 			return "";
 		}
 
-		private void setMapping(Instance instance, String component) {
-			mapping.put(instance.getHierarchicalPath(), component);
-			if (instance.isNetwork()) {
-				Network network = instance.getNetwork();
+		private void setMapping(Vertex vertex, String component) {
+			if(component.isEmpty()){
+				return;
+			}
+			mapping.put(vertex.getName(), component);
+			/*if (vertex.isEntity()) {
+				Network network = (Network) vertex;
+				for (Entity subEntity : network.getEntities()) {
+					setMapping(subEntity, component);
+				}
 				for (Instance subInstance : network.getInstances()) {
 					setMapping(subInstance, component);
 				}
-			}
+			}*/
 		}
 
 		@Override
 		protected void setValue(Object element, Object value) {
-			if (element instanceof Instance) {
-				Instance instance = (Instance) element;
+			if (element instanceof Vertex) {
+				Vertex vertex = (Vertex) element;
 				String component = (String) value;
-				if (component == null || component.contains(",")) {
-					return;
-				}
-				setMapping(instance, component);
+				setMapping(vertex, component);
 			}
 
 			getViewer().refresh();
@@ -220,25 +220,18 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 		@Override
 		public String getColumnText(Object element, int columnIndex) {
 			if (columnIndex == 0) {
-				if (element instanceof Network) {
-					Network network = (Network) element;
-					return network.getName();
-				}
-
-				if (element instanceof Instance) {
-					Instance instance = (Instance) element;
-					return instance.getName();
-				}
+				Vertex vertex = (Vertex) element;
+				return vertex.getName();
 			} else {
 				if (element instanceof Instance) {
 					Instance instance = (Instance) element;
-					if (instance.isNetwork()) {
-						Set<String> subComponents = new TreeSet<String>();
-						getComponents(subComponents, instance);
-						return OrccUtil.toString(subComponents, ", ");
-					} else {
-						return mapping.get(instance.getHierarchicalPath());
-					}
+					return mapping.get(instance.getName());
+				}
+				if (element instanceof Network) {
+					Network network = (Network) element;
+					Set<String> subComponents = new TreeSet<String>();
+					getComponents(subComponents, network);
+					return OrccUtil.toString(subComponents, ", ");
 				}
 			}
 
@@ -254,17 +247,16 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 		 * @param instance
 		 *            an instance
 		 */
-		private void getComponents(Set<String> components, Instance instance) {
-			String component = mapping.get(instance.getHierarchicalPath());
-			if (component != null) {
-				components.add(component);
-			}
-
-			if (instance.isNetwork()) {
-				Network network = instance.getNetwork();
-				for (Instance subInstance : network.getInstances()) {
-					getComponents(components, subInstance);
+		private void getComponents(Set<String> components, Network network) {
+			for (Instance instance : network.getInstances()) {
+				String component = mapping.get(instance.getName());
+				if (component != null) {
+					components.add(component);
 				}
+			}
+			for (Entity entity : network.getEntities()) {
+				Network subNetwork = (Network) entity;
+				getComponents(components, subNetwork);
 			}
 		}
 
@@ -387,24 +379,6 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 			ResourceSet set = new ResourceSetImpl();
 			network = IrUtil.deserializeEntity(set, xdfFile);
 			network = new Instantiator().doSwitch(network);
-
-			Set<String> instances = new HashSet<String>();
-			for (Instance instance : network.getInstances()) {
-				instances.add(instance.getHierarchicalPath());
-			}
-			for (Network subNetwork : network.getAllNetworks()) {
-				for (Instance instance : subNetwork.getInstances()) {
-					instances.add(instance.getHierarchicalPath());
-				}
-			}
-
-			Iterator<Entry<String, String>> it = mapping.entrySet().iterator();
-			while (it.hasNext()) {
-				Entry<String, String> entry = it.next();
-				if (!instances.contains(entry.getKey())) {
-					it.remove();
-				}
-			}
 		}
 
 		viewer.setInput(network);
