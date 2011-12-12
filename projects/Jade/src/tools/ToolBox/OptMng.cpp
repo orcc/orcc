@@ -56,6 +56,9 @@ NoOutput("disable-output",
 static cl::opt<bool>
 OutputAssembly("S", cl::desc("Write output as LLVM assembly"));
 
+cl::opt<bool> 
+OutputBitcode("c", cl::desc("Generate LLVM in bytecode representation"));
+
 static cl::opt<bool>
 NoVerify("disable-verify", cl::desc("Do not verify result module"), cl::Hidden);
 
@@ -433,8 +436,6 @@ void opt(string file, Module* M){
 
   // Enable debug stream buffering.
   EnableDebugBuffering = true;
-
-  llvm_shutdown_obj Y;  // Call llvm_shutdown() on exit.
   LLVMContext &Context = getGlobalContext();
 
   // Initialize passes
@@ -603,12 +604,10 @@ void opt(string file, Module* M){
     Passes.add(createVerifierPass());
 
   // Write bitcode or assembly to the output as the last step...
-  if (!NoOutput && !AnalyzeOnly) {
-    if (OutputAssembly)
-      Passes.add(createPrintModulePass(&Out));
-    else
+   if (OutputBitcode)
       Passes.add(createBitcodeWriterPass(Out));
-  }
+   else
+	  Passes.add(createPrintModulePass(&Out));      
 
   // Before executing passes, print the final values of the LLVM options.
   cl::PrintOptionValues();

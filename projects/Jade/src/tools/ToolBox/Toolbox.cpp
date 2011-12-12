@@ -43,8 +43,6 @@
 #include "llvm/Support/PrettyStackTrace.h"
 
 #include "Jade/XDFSerialize/InstanceIdRemoval.h"
-#include "Jade/XDFSerialize/XDFParser.h"
-#include "Jade/XDFSerialize/XDFWriter.h"
 #include "Jade/Util/OptionMng.h"
 #include "Jade/Util/CompressionMng.h"
 #include "llvm/Support/TargetSelect.h"
@@ -65,9 +63,6 @@ cl::list<string>
 Packages(cl::Positional, cl::OneOrMore, cl::desc("Input actors"));
 
 cl::opt<bool> 
-OutputBitcode("c", cl::desc("Generate LLVM in bytecode representation"));
-
-cl::opt<bool> 
 OutputArchive("a", cl::desc("Generate package in archives"));
 
 cl::opt<bool> 
@@ -75,9 +70,6 @@ OutputCompressedArchive("ca", cl::desc("Generate package in compressed archives"
 
 cl::opt<string> 
 LibraryFolder("L", cl::Required, cl::ValueRequired, cl::desc("Input folder of Video Tool Library"));
-
-cl::opt<string> 
-XDFFile("xdf", cl::desc("Compress XDF file"), cl::value_desc("XDF file"), cl::init(""));
 
 
 
@@ -94,25 +86,6 @@ int main(int argc, char **argv) {
 
 	//Verify options
 	OptionMng::setDirectory(&LibraryFolder);
-
-	//Compress XDF
-	if(XDFFile != ""){
-		//Parse XDF
-		LLVMContext &Context = getGlobalContext();
-		XDFParser xdfParser(false);
-		Network* network = xdfParser.parseFile(XDFFile, Context);
-
-		//Remove all instance id
-		InstanceIdRemoveAll instanceIdRemoveAll(network);
-		instanceIdRemoveAll.removal();
-
-		//Write new XDF
-		XDFWriter xdfWriter(XDFFile, network);
-		xdfWriter.writeXDF();
-
-		//Create a XDF GZip file
-		CompressionMng::compressFile(XDFFile);
-	}
 
 	//Build files Path
 	map<sys::Path,string> filesPath;

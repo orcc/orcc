@@ -93,10 +93,6 @@ void parseFiles(map<sys::Path,string>* filesPath, map<string,Module*>* modules){
 			continue;
 		}
 
-		if (itPath->first.str().compare("D:/projet/orcc/trunk/projects/Jade/VTL/ch/epfl/mpeg4/part10/frext/synParser/modular/decodePicture/MgntAndVLDecoding")==0){
-			int test = 0;
-		}
-
 		//Parse IR file
 		Module* mod = ParseIRFile(itPath->first.c_str(), Err, Context);
 
