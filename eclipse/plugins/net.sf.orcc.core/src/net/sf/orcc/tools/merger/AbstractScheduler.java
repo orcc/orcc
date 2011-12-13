@@ -34,10 +34,9 @@ import java.util.Map;
 
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.moc.CSDFMoC;
-
-import org.jgrapht.DirectedGraph;
 
 /**
  * This interface defines a scheduler.
@@ -47,7 +46,7 @@ import org.jgrapht.DirectedGraph;
  */
 public abstract class AbstractScheduler implements IScheduler {
 
-	protected DirectedGraph<Vertex, Connection> graph;
+	protected Network network;
 
 	protected Schedule schedule;
 
@@ -61,21 +60,21 @@ public abstract class AbstractScheduler implements IScheduler {
 
 	Map<Connection, Integer> tokens;
 
-	public AbstractScheduler(DirectedGraph<Vertex, Connection> graph) {
-		this.graph = graph;
+	public AbstractScheduler(Network network) {
+		this.network = network;
 
-		repetitionsVector = new RepetitionsAnalyzer(graph).getRepetitions();
+		repetitionsVector = new RepetitionsAnalyzer(network).getRepetitions();
 	}
 
 	private void computeMemoryBound(Schedule schedule) {
 		for (Iterand iterand : schedule.getIterands()) {
 			if (iterand.isVertex()) {
 				Vertex vertex = iterand.getVertex();
-				for (Connection connection : graph.incomingEdgesOf(vertex)) {
+				for (Connection connection : vertex.getIncoming()) {
 					int cns = connection.getTargetPort().getNumTokensConsumed();
 					tokens.put(connection, tokens.get(connection) - cns);
 				}
-				for (Connection connection : graph.outgoingEdgesOf(vertex)) {
+				for (Connection connection : vertex.getOutgoing()) {
 					int current = tokens.get(connection);
 					int max = maxTokens.get(connection);
 					CSDFMoC moc = (CSDFMoC) ((Instance) vertex).getMoC();
@@ -114,7 +113,7 @@ public abstract class AbstractScheduler implements IScheduler {
 			maxTokens = new HashMap<Connection, Integer>();
 			tokens = new HashMap<Connection, Integer>();
 
-			for (Connection connection : graph.edgeSet()) {
+			for (Connection connection : network.getConnections()) {
 				maxTokens.put(connection, 0);
 				tokens.put(connection, 0);
 			}

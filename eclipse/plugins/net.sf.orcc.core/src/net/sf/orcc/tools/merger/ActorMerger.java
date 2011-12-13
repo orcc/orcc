@@ -67,8 +67,7 @@ import net.sf.orcc.moc.MocFactory;
 import net.sf.orcc.moc.SDFMoC;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.graph.DirectedSubgraph;
+import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 
 /**
  * This class defines a network transformation that merges SDF actors.
@@ -83,6 +82,8 @@ public class ActorMerger extends DfSwitch<Void> {
 	private static final String ACTION_NAME = "static_schedule";
 
 	private static final String SCHEDULER_NAME = "isSchedulable_" + ACTION_NAME;
+
+	private Copier copier;
 
 	private Actor superActor;
 
@@ -360,10 +361,10 @@ public class ActorMerger extends DfSwitch<Void> {
 		int inIndex = 0;
 		int outIndex = 0;
 		for (Connection connection : network.getConnections()) {
-			Vertex src = connection.getSource();
-			Vertex tgt = connection.getTarget();
+			Vertex src = (Vertex) copier.get(connection.getSource());
+			Vertex tgt = (Vertex) copier.get(connection.getTarget());
 
-			if (!vertices.contains(src) && vertices.contains(tgt)) {
+			if (src == null && tgt != null) {
 				Port tgtPort = connection.getTargetPort();
 				Port port = DfFactory.eINSTANCE
 						.createPort(EcoreUtil.copy(tgtPort.getType()), "input_"
@@ -379,7 +380,7 @@ public class ActorMerger extends DfSwitch<Void> {
 				inputs.put(connection, port);
 				portsMap.put(port, tgtPort);
 
-			} else if (vertices.contains(src) && !vertices.contains(tgt)) {
+			} else if (src != null && tgt == null) {
 				Port srcPort = connection.getSourcePort();
 				Port port = DfFactory.eINSTANCE.createPort(
 						EcoreUtil.copy(srcPort.getType()), "output_"
@@ -590,7 +591,7 @@ public class ActorMerger extends DfSwitch<Void> {
 	@Override
 	public Void caseNetwork(Network network) {
 		this.network = network;
-
+		copier = new Copier();
 		// make instance unique in the network
 		new UniqueInstantiator().doSwitch(network);
 
@@ -599,11 +600,31 @@ public class ActorMerger extends DfSwitch<Void> {
 		for (Set<Vertex> vertices : detector.staticRegionSets()) {
 			this.vertices = vertices;
 
-			DirectedGraph<Vertex, Connection> subgraph = new DirectedSubgraph<Vertex, Connection>(
-					null/* graph */, vertices, null);
+			Network subNetwork = DfFactory.eINSTANCE.createNetwork();
+			Set<Instance> instances = new HashSet<Instance>();
 
+			copier.copyAll(vertices);
+			copier.copyReferences();
+
+			for (Connection connection : network.getConnections()) {
+				Vertex srcVertex = connection.getSource();
+				Vertex tgtVertex = connection.getTarget();
+				if (vertices.contains(srcVertex)
+						&& vertices.contains(tgtVertex)) {
+					Instance src = (Instance) copier.get(srcVertex);
+					Instance tgt = (Instance) copier.get(tgtVertex);
+					instances.add(src);
+					instances.add(tgt);
+					subNetwork.getConnections().add(
+							DfFactory.eINSTANCE.createConnection(src,
+									connection.getSourcePort(), tgt,
+									connection.getTargetPort(),
+									connection.getAttributes()));
+				}
+			}
+			subNetwork.getInstances().addAll(instances);
 			// create the static schedule of vertices
-			scheduler = new SASLoopScheduler(subgraph);
+			scheduler = new SASLoopScheduler(subNetwork);
 			scheduler.schedule();
 
 			System.out.println("Schedule of superActor_" + index + " is "
@@ -616,10 +637,11 @@ public class ActorMerger extends DfSwitch<Void> {
 			Instance instance = DfFactory.eINSTANCE.createInstance(
 					"superActor_" + index++, superActor);
 
-			// graph.addVertex(instance);
+			network.getInstances().add(instance);
 			updateConnection(instance);
-			// graph.removeAllVertices(vertices);
+			network.getInstances().removeAll(vertices);
 		}
+		copier = null;
 		return null;
 	}
 
@@ -632,10 +654,10 @@ public class ActorMerger extends DfSwitch<Void> {
 		List<Connection> connections = new ArrayList<Connection>(
 				network.getConnections());
 		for (Connection connection : connections) {
-			Vertex src = connection.getSource();
-			Vertex tgt = connection.getTarget();
+			Instance src = (Instance) copier.get(connection.getSource());
+			Instance tgt = (Instance) copier.get(connection.getTarget());
 
-			if (!vertices.contains(src) && vertices.contains(tgt)) {
+			if (src == null && tgt != null) {
 				Connection newConn = DfFactory.eINSTANCE.createConnection(
 						connection.getSource(), connection.getSourcePort(),
 						merge, inputs.get(connection),
@@ -643,7 +665,7 @@ public class ActorMerger extends DfSwitch<Void> {
 				network.getConnections().add(newConn);
 			}
 
-			if (vertices.contains(src) && !vertices.contains(tgt)) {
+			if (src != null && tgt == null) {
 				Connection newConn = DfFactory.eINSTANCE.createConnection(
 						merge, outputs.get(connection), connection.getTarget(),
 						connection.getTargetPort(), connection.getAttributes());

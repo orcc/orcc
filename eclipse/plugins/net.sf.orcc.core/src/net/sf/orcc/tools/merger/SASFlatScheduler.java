@@ -29,11 +29,8 @@
 
 package net.sf.orcc.tools.merger;
 
-import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
-
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.traverse.TopologicalOrderIterator;
 
 /**
  * This class computes a flat single appearance schedule (SAS) from the given
@@ -44,8 +41,8 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
  */
 public class SASFlatScheduler extends AbstractScheduler {
 
-	public SASFlatScheduler(DirectedGraph<Vertex, Connection> graph) {
-		super(graph);
+	public SASFlatScheduler(Network network) {
+		super(network);
 	}
 
 	@Override
@@ -53,12 +50,10 @@ public class SASFlatScheduler extends AbstractScheduler {
 		schedule = new Schedule();
 
 		schedule.setIterationCount(1);
-		TopologicalOrderIterator<Vertex, Connection> it = new TopologicalOrderIterator<Vertex, Connection>(
-				graph);
 
-		while (it.hasNext()) {
-			Vertex vertex = it.next();
+		TopologicalSorter sort = new TopologicalSorter(network);
 
+		for (Vertex vertex : sort.topologicalSort()) {
 			if (vertex.isInstance()) {
 				int rep = repetitionsVector.get(vertex);
 				Iterand iterand = null;

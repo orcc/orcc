@@ -36,11 +36,10 @@ import java.util.Map;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.util.Rational;
-
-import org.jgrapht.DirectedGraph;
 
 /**
  * This class computes the repetition vector of the graph. All instances of the
@@ -52,14 +51,14 @@ import org.jgrapht.DirectedGraph;
  */
 public class RepetitionsAnalyzer {
 
-	private DirectedGraph<Vertex, Connection> graph;
+	private Network network;
 
 	private Map<Vertex, Rational> rationals = new HashMap<Vertex, Rational>();
 
 	private Map<Vertex, Integer> repetitions = new HashMap<Vertex, Integer>();
 
-	public RepetitionsAnalyzer(DirectedGraph<Vertex, Connection> graph) {
-		this.graph = graph;
+	public RepetitionsAnalyzer(Network network) {
+		this.network = network;
 
 		analyze();
 	}
@@ -70,7 +69,7 @@ public class RepetitionsAnalyzer {
 	 */
 	private void analyze() {
 		// must be an instance's vertex
-		Vertex initialVertex = graph.vertexSet().iterator().next();
+		Instance initialVertex = network.getInstances().iterator().next();
 
 		calculateRate(initialVertex, new Rational(1, 1));
 
@@ -108,8 +107,8 @@ public class RepetitionsAnalyzer {
 
 		rationals.put(vertex, rate);
 
-		for (Connection conn : graph.outgoingEdgesOf(vertex)) {
-			Vertex tgt = graph.getEdgeTarget(conn);
+		for (Connection conn : vertex.getOutgoing()) {
+			Vertex tgt = conn.getTarget();
 			if (tgt.isInstance()) {
 				CSDFMoC tgtMoC = (CSDFMoC) ((Instance) tgt).getMoC();
 				if (!rationals.containsKey(tgt)) {
@@ -120,8 +119,8 @@ public class RepetitionsAnalyzer {
 			}
 		}
 
-		for (Connection conn : graph.incomingEdgesOf(vertex)) {
-			Vertex src = graph.getEdgeSource(conn);
+		for (Connection conn : vertex.getIncoming()) {
+			Vertex src = conn.getSource();
 			if (src.isInstance()) {
 				CSDFMoC srcMoC = (CSDFMoC) ((Instance) src).getMoC();
 				if (!rationals.containsKey(src)) {
@@ -138,14 +137,14 @@ public class RepetitionsAnalyzer {
 	 * 
 	 */
 	private void checkConsistency() {
-		for (Connection connection : graph.edgeSet()) {
-			int srcRate = repetitions.get(graph.getEdgeSource(connection));
-			int tgtRate = repetitions.get(graph.getEdgeTarget(connection));
+		for (Connection connection : network.getConnections()) {
+			int srcRate = repetitions.get(connection.getSource());
+			int tgtRate = repetitions.get(connection.getTarget());
 
-			CSDFMoC srcMoc = (CSDFMoC) ((Instance) graph
-					.getEdgeSource(connection)).getMoC();
-			CSDFMoC tgtMoc = (CSDFMoC) ((Instance) graph
-					.getEdgeTarget(connection)).getMoC();
+			CSDFMoC srcMoc = (CSDFMoC) ((Instance) connection.getSource())
+					.getMoC();
+			CSDFMoC tgtMoc = (CSDFMoC) ((Instance) connection.getTarget())
+					.getMoC();
 
 			int prd = srcMoc.getNumTokensProduced(connection.getSourcePort());
 			int cns = tgtMoc.getNumTokensConsumed(connection.getTargetPort());
