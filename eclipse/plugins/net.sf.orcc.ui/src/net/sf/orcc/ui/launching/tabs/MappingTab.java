@@ -168,17 +168,14 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 		protected Object getValue(Object element) {
 			String component = labelProvider.getColumnText(element, 1);
 			if (component != null) {
-				return mapping.get(component);
+				return component;
 			}
 			return "";
 		}
 
 		private void setMapping(Vertex vertex, String component) {
-			if(component.isEmpty()){
-				return;
-			}
 			mapping.put(vertex.getName(), component);
-			/*if (vertex.isEntity()) {
+			if (vertex.isEntity()) {
 				Network network = (Network) vertex;
 				for (Entity subEntity : network.getEntities()) {
 					setMapping(subEntity, component);
@@ -186,7 +183,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 				for (Instance subInstance : network.getInstances()) {
 					setMapping(subInstance, component);
 				}
-			}*/
+			}
 		}
 
 		@Override
@@ -194,11 +191,14 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 			if (element instanceof Vertex) {
 				Vertex vertex = (Vertex) element;
 				String component = (String) value;
+				if (component == null || component.contains(",")
+						|| component.isEmpty()) {
+					return;
+				}
 				setMapping(vertex, component);
+				getViewer().refresh();
+				updateLaunchConfigurationDialog();
 			}
-
-			getViewer().refresh();
-			updateLaunchConfigurationDialog();
 		}
 
 	}
@@ -234,7 +234,6 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 					return OrccUtil.toString(subComponents, ", ");
 				}
 			}
-
 			return null;
 		}
 
