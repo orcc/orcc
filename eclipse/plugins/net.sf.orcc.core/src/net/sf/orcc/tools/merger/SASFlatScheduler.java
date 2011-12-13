@@ -55,7 +55,7 @@ public class SASFlatScheduler extends AbstractScheduler {
 
 		for (Vertex vertex : sort.topologicalSort()) {
 			if (vertex.isInstance()) {
-				int rep = repetitionsVector.get(vertex);
+				int rep = repetitions.get(vertex);
 				Iterand iterand = null;
 				for (int i = 0; i < rep; i++) {
 					iterand = new Iterand(vertex);

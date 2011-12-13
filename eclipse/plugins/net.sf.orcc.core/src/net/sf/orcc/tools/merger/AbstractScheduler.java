@@ -52,7 +52,7 @@ public abstract class AbstractScheduler implements IScheduler {
 
 	protected Map<Connection, Integer> maxTokens;
 
-	protected Map<Vertex, Integer> repetitionsVector;
+	protected Map<Instance, Integer> repetitions;
 
 	private int depth;
 
@@ -63,7 +63,7 @@ public abstract class AbstractScheduler implements IScheduler {
 	public AbstractScheduler(Network network) {
 		this.network = network;
 
-		repetitionsVector = new RepetitionsAnalyzer(network).getRepetitions();
+		repetitions = new RepetitionsAnalyzer(network).getRepetitions();
 	}
 
 	private void computeMemoryBound(Schedule schedule) {
@@ -136,8 +136,8 @@ public abstract class AbstractScheduler implements IScheduler {
 	 * 
 	 * @return
 	 */
-	public Map<Vertex, Integer> getRepetitionsVector() {
-		return repetitionsVector;
+	public Map<Instance, Integer> getRepetitions() {
+		return repetitions;
 	}
 
 	/**

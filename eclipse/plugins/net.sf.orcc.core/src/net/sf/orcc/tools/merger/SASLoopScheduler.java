@@ -54,11 +54,11 @@ public class SASLoopScheduler extends AbstractScheduler {
 
 		for (Vertex vertex : sort.topologicalSort()) {
 			if (vertex.isInstance()) {
-				int rep = repetitionsVector.get(vertex);
+				int rep = repetitions.get(vertex);
 				Iterand iterand = null;
 				if (rep > 1) {
 					Schedule subSched = new Schedule();
-					subSched.setIterationCount(repetitionsVector.get(vertex));
+					subSched.setIterationCount(repetitions.get(vertex));
 					subSched.add(new Iterand(vertex));
 					iterand = new Iterand(subSched);
 				} else {

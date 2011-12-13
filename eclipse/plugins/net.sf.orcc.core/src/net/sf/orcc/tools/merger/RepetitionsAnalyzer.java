@@ -37,7 +37,6 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.Vertex;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.util.Rational;
 
@@ -53,9 +52,9 @@ public class RepetitionsAnalyzer {
 
 	private Network network;
 
-	private Map<Vertex, Rational> rationals = new HashMap<Vertex, Rational>();
+	private Map<Instance, Rational> rationals = new HashMap<Instance, Rational>();
 
-	private Map<Vertex, Integer> repetitions = new HashMap<Vertex, Integer>();
+	private Map<Instance, Integer> repetitions = new HashMap<Instance, Integer>();
 
 	public RepetitionsAnalyzer(Network network) {
 		this.network = network;
@@ -79,8 +78,8 @@ public class RepetitionsAnalyzer {
 			lcm = Rational.lcm(lcm, it.next().getDenominator());
 		}
 
-		for (Map.Entry<Vertex, Rational> entry : rationals.entrySet()) {
-			Vertex vertex = entry.getKey();
+		for (Map.Entry<Instance, Rational> entry : rationals.entrySet()) {
+			Instance vertex = entry.getKey();
 			Rational rat = entry.getValue();
 			int rep = rat.getNumerator() * lcm / rat.getDenominator();
 			repetitions.put(vertex, rep);
@@ -96,8 +95,7 @@ public class RepetitionsAnalyzer {
 	 * @param rate
 	 * 
 	 */
-	private void calculateRate(Vertex vertex, Rational rate) {
-		Instance instance = (Instance) vertex;
+	private void calculateRate(Instance instance, Rational rate) {
 		if (!instance.getMoC().isCSDF()) {
 			throw new OrccRuntimeException("actor" + instance.getEntity()
 					+ "is not SDF or CSDF!");
@@ -105,29 +103,25 @@ public class RepetitionsAnalyzer {
 
 		CSDFMoC moc = (CSDFMoC) instance.getMoC();
 
-		rationals.put(vertex, rate);
+		rationals.put(instance, rate);
 
-		for (Connection conn : vertex.getOutgoing()) {
-			Vertex tgt = conn.getTarget();
-			if (tgt.isInstance()) {
-				CSDFMoC tgtMoC = (CSDFMoC) ((Instance) tgt).getMoC();
-				if (!rationals.containsKey(tgt)) {
-					int prd = moc.getNumTokensProduced(conn.getSourcePort());
-					int cns = tgtMoC.getNumTokensConsumed(conn.getTargetPort());
-					calculateRate(tgt, rate.mul(new Rational(prd, cns)));
-				}
+		for (Connection conn : instance.getOutgoing()) {
+			Instance tgt = (Instance) conn.getTarget();
+			CSDFMoC tgtMoC = (CSDFMoC) ((Instance) tgt).getMoC();
+			if (!rationals.containsKey(tgt)) {
+				int prd = moc.getNumTokensProduced(conn.getSourcePort());
+				int cns = tgtMoC.getNumTokensConsumed(conn.getTargetPort());
+				calculateRate(tgt, rate.mul(new Rational(prd, cns)));
 			}
 		}
 
-		for (Connection conn : vertex.getIncoming()) {
-			Vertex src = conn.getSource();
-			if (src.isInstance()) {
-				CSDFMoC srcMoC = (CSDFMoC) ((Instance) src).getMoC();
-				if (!rationals.containsKey(src)) {
-					int prd = srcMoC.getNumTokensProduced(conn.getSourcePort());
-					int cns = moc.getNumTokensConsumed(conn.getTargetPort());
-					calculateRate(src, rate.mul(new Rational(cns, prd)));
-				}
+		for (Connection conn : instance.getIncoming()) {
+			Instance src = (Instance) conn.getSource();
+			CSDFMoC srcMoC = (CSDFMoC) ((Instance) src).getMoC();
+			if (!rationals.containsKey(src)) {
+				int prd = srcMoC.getNumTokensProduced(conn.getSourcePort());
+				int cns = moc.getNumTokensConsumed(conn.getTargetPort());
+				calculateRate(src, rate.mul(new Rational(cns, prd)));
 			}
 		}
 	}
@@ -156,7 +150,11 @@ public class RepetitionsAnalyzer {
 		}
 	}
 
-	public Map<Vertex, Integer> getRepetitions() {
+	public Integer getRepetition(Instance instance) {
+		return repetitions.get(instance);
+	}
+
+	public Map<Instance, Integer> getRepetitions() {
 		return repetitions;
 	}
 

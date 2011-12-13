@@ -371,7 +371,7 @@ public class ActorMerger extends DfSwitch<Void> {
 								+ inIndex++);
 
 				CSDFMoC moc = (CSDFMoC) ((Instance) tgt).getMoC();
-				int cns = scheduler.getRepetitionsVector().get(tgt)
+				int cns = scheduler.getRepetitions().get(tgt)
 						* moc.getNumTokensConsumed(tgtPort);
 
 				inputPattern.setNumTokens(port, cns);
@@ -387,7 +387,7 @@ public class ActorMerger extends DfSwitch<Void> {
 								+ outIndex++);
 
 				CSDFMoC moc = (CSDFMoC) ((Instance) src).getMoC();
-				int prd = scheduler.getRepetitionsVector().get(src)
+				int prd = scheduler.getRepetitions().get(src)
 						* moc.getNumTokensProduced(srcPort);
 
 				outputPattern.setNumTokens(port, prd);
@@ -600,29 +600,7 @@ public class ActorMerger extends DfSwitch<Void> {
 		for (Set<Vertex> vertices : detector.staticRegionSets()) {
 			this.vertices = vertices;
 
-			Network subNetwork = DfFactory.eINSTANCE.createNetwork();
-			Set<Instance> instances = new HashSet<Instance>();
-
-			copier.copyAll(vertices);
-			copier.copyReferences();
-
-			for (Connection connection : network.getConnections()) {
-				Vertex srcVertex = connection.getSource();
-				Vertex tgtVertex = connection.getTarget();
-				if (vertices.contains(srcVertex)
-						&& vertices.contains(tgtVertex)) {
-					Instance src = (Instance) copier.get(srcVertex);
-					Instance tgt = (Instance) copier.get(tgtVertex);
-					instances.add(src);
-					instances.add(tgt);
-					subNetwork.getConnections().add(
-							DfFactory.eINSTANCE.createConnection(src,
-									connection.getSourcePort(), tgt,
-									connection.getTargetPort(),
-									connection.getAttributes()));
-				}
-			}
-			subNetwork.getInstances().addAll(instances);
+			Network subNetwork = getSubNetwork();
 			// create the static schedule of vertices
 			scheduler = new SASLoopScheduler(subNetwork);
 			scheduler.schedule();
@@ -643,6 +621,37 @@ public class ActorMerger extends DfSwitch<Void> {
 		}
 		copier = null;
 		return null;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	private Network getSubNetwork() {
+		Network subNetwork = DfFactory.eINSTANCE.createNetwork();
+		Set<Instance> instances = new HashSet<Instance>();
+
+		copier.copyAll(vertices);
+		copier.copyReferences();
+
+		for (Connection connection : network.getConnections()) {
+			Vertex srcVertex = connection.getSource();
+			Vertex tgtVertex = connection.getTarget();
+			if (vertices.contains(srcVertex) && vertices.contains(tgtVertex)) {
+				Instance src = (Instance) copier.get(srcVertex);
+				Instance tgt = (Instance) copier.get(tgtVertex);
+				instances.add(src);
+				instances.add(tgt);
+				subNetwork.getConnections().add(
+						DfFactory.eINSTANCE.createConnection(src,
+								connection.getSourcePort(), tgt,
+								connection.getTargetPort(),
+								connection.getAttributes()));
+			}
+		}
+		subNetwork.getInstances().addAll(instances);
+		return subNetwork;
+
 	}
 
 	/**
