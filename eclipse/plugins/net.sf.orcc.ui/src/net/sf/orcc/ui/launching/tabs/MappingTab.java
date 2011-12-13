@@ -174,9 +174,12 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 		}
 
 		private void setMapping(Vertex vertex, String component) {
-			mapping.put(vertex.getName(), component);
-			if (vertex.isEntity()) {
+			if (vertex.isInstance()) {
+				Instance instance = (Instance) vertex;
+				mapping.put(instance.getHierarchicalPath(), component);
+			} else if (vertex.isEntity()) {
 				Network network = (Network) vertex;
+				mapping.put(vertex.getName(), component);
 				for (Entity subEntity : network.getEntities()) {
 					setMapping(subEntity, component);
 				}
@@ -225,7 +228,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 			} else {
 				if (element instanceof Instance) {
 					Instance instance = (Instance) element;
-					return mapping.get(instance.getName());
+					return mapping.get(instance.getHierarchicalPath());
 				}
 				if (element instanceof Network) {
 					Network network = (Network) element;
@@ -248,7 +251,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 		 */
 		private void getComponents(Set<String> components, Network network) {
 			for (Instance instance : network.getInstances()) {
-				String component = mapping.get(instance.getName());
+				String component = mapping.get(instance.getHierarchicalPath());
 				if (component != null) {
 					components.add(component);
 				}
