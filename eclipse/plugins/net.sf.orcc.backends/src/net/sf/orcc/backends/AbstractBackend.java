@@ -48,6 +48,7 @@ import java.util.concurrent.Future;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.ir.util.IrUtil;
@@ -443,6 +444,59 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	/**
+	 * Print entities of the given network.
+	 * 
+	 * @param entities
+	 *            a list of entities
+	 * @throws OrccException
+	 */
+	final public void printEntities(List<Entity> entities) throws OrccException {
+		write("Printing entities...\n");
+		long t0 = System.currentTimeMillis();
+
+		// creates a list of tasks: each task will print an actor when called
+		List<Callable<Boolean>> tasks = new ArrayList<Callable<Boolean>>();
+		for (final Entity entity : entities) {
+			tasks.add(new Callable<Boolean>() {
+
+				@Override
+				public Boolean call() throws OrccException {
+					if (isCanceled()) {
+						return false;
+					}
+					return printEntity(entity);
+				}
+
+			});
+		}
+
+		// executes the tasks
+		int numCached = executeTasks(tasks);
+
+		long t1 = System.currentTimeMillis();
+		write("Done in " + ((float) (t1 - t0) / (float) 1000) + "s\n");
+
+		if (numCached > 0) {
+			write("*******************************************************************************\n");
+			write("* NOTE: " + numCached + " entities were not regenerated "
+					+ "because they were already up-to-date. *\n");
+			write("*******************************************************************************\n");
+		}
+	}
+
+	/**
+	 * Prints the given entity. Should be overridden by back-ends that wish to
+	 * print the given entity.
+	 * 
+	 * @param entity
+	 *            the entity
+	 * @return <code>true</code> if the actor was cached
+	 */
+	protected boolean printEntity(Entity entity) throws OrccException {
+		return false;
+	}
+
+	/**
 	 * Prints the given instance. Should be overridden by back-ends that wish to
 	 * print the given instance.
 	 * 
@@ -501,9 +555,9 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		project = root.getProject(name);
 		vtlFolders = OrccUtil.getOutputFolders(project);
-		
+
 		inputFile = getFile(project, getAttribute(XDF_FILE, ""), "xdf");
-		
+
 		fifoSize = getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 
 		String outputFolder;
