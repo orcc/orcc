@@ -28,15 +28,9 @@
  */
 package net.sf.orcc.df.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.ir.Type;
 
 import org.eclipse.emf.ecore.EClass;
 
@@ -45,17 +39,9 @@ import org.eclipse.emf.ecore.EClass;
  */
 public class BroadcastImpl extends EntityImpl implements Broadcast {
 
-	public static final String CLASS = "";
-
-	private List<Integer> outputList;
-
-	private Map<Port, Integer> portMap;
-
-	private Type type;
-
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected BroadcastImpl() {
@@ -63,8 +49,8 @@ public class BroadcastImpl extends EntityImpl implements Broadcast {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -73,48 +59,13 @@ public class BroadcastImpl extends EntityImpl implements Broadcast {
 	}
 
 	@Override
-	public Port getInput() {
-		for (Port port : inputs) {
-			if (port.getName().equals("input")) {
-				return port;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Returns a list of integers containing [0, 1, ..., n - 1] where n is the
-	 * number of ports of this broadcast.
-	 * 
-	 * @return a list of integers
-	 */
-	public List<Integer> getOutputList() {
-		if (outputList == null) {
-			outputList = new ArrayList<Integer>();
-			for (int i = 0; i < outputs.size(); i++) {
-				outputList.add(i);
-			}
-		}
-
-		return outputList;
-	}
-
-	@Override
-	public Map<Port, Integer> getPortMap() {
-		if (portMap == null) {
-			portMap = new HashMap<Port, Integer>();
-		}
-		return portMap;
-	}
-
-	@Override
-	public Type getType() {
-		return type;
-	}
-
-	@Override
 	public boolean isBroadcast() {
 		return true;
+	}
+
+	@Override
+	public Port getInput() {
+		return getInputs().get(0);
 	}
 
 }

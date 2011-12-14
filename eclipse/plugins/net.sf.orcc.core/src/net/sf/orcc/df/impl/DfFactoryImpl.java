@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.df.*;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
@@ -19,6 +18,8 @@ import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.Entity;
+import net.sf.orcc.df.EntitySpecific;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -224,18 +225,11 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	@Override
 	public Broadcast createBroadcast(int numOutputs, Type type) {
 		BroadcastImpl broadcast = new BroadcastImpl();
-		type = EcoreUtil.copy(type);
 
 		broadcast.getInputs().add(createPort(EcoreUtil.copy(type), "input"));
 		for (int i = 0; i < numOutputs; i++) {
 			String name = "output_" + i;
 			broadcast.getOutputs().add(createPort(EcoreUtil.copy(type), name));
-		}
-
-		Map<Port, Integer> portMap = broadcast.getPortMap();
-		portMap.put(broadcast.getInput(), 1);
-		for (int i = 0; i < numOutputs; i++) {
-			portMap.put(broadcast.getOutputs().get(i), i + 1);
 		}
 
 		return broadcast;

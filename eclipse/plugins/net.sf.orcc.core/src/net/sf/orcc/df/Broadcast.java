@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,31 +28,15 @@
  */
 package net.sf.orcc.df;
 
-import java.util.List;
-import java.util.Map;
-
-import net.sf.orcc.ir.Type;
-
 /**
  * This class defines a broadcast as a particular entity.
  * 
  * @author Matthieu Wipliez
+ * @author Herve Yviquel
  * @model extends="Entity"
  */
 public interface Broadcast extends Entity {
 
-	public Port getInput();
-
-	/**
-	 * Returns a list of integers containing [0, 1, ..., n - 1] where n is the
-	 * number of ports of this broadcast.
-	 * 
-	 * @return a list of integers
-	 */
-	List<Integer> getOutputList();
-
-	Map<Port, Integer> getPortMap();
-
-	Type getType();
+	Port getInput();
 
 }
