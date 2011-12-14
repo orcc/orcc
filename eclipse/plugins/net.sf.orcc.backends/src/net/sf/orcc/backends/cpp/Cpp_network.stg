@@ -76,13 +76,13 @@ initializeInstances(instances) ::= <<
 // declare FIFOs
 
 
-doDeclareFifo(edge, src, tgt, kind) ::= <<
-FifoAPI * fifo_<network.connectionMap.(edge)> = FifoFactory\<<edge.source.type>\>::allocateFifo(<if(edge.size)><edge.size><else>SIZE<endif>, <kind>);
+doDeclareFifo(edge, kind) ::= <<
+FifoAPI * fifo_<edge.id> = FifoFactory\<<edge.sourcePort.type>\>::allocateFifo(<if(edge.size)><edge.size><else>SIZE<endif>, <kind>);
 
 >>
 
 declareFifo(edge) ::= <<
-<doDeclareFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge), kind=options.fifoKind.(edge))>
+<doDeclareFifo(edge=edge, kind=options.fifoKind.(edge))>
 >>
 
 declareFifos(connections) ::= <<
@@ -95,27 +95,20 @@ declareFifos(connections) ::= <<
 
 doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
 <if (source.actor)
-><source.id>.connect(ACTOR_PORT_OUT, <source.actor.packageAsList; separator="::">::<source.actor.simpleName>_<sourcePort.name>, fifo_<count>);<
+><source.name>.connect(ACTOR_PORT_OUT, <source.actor.packageAsList; separator="::">::<source.actor.simpleName>_<sourcePort.name>, fifo_<count>);<
 else
-><source.id>.connect(ACTOR_PORT_OUT, <edge.attributes.("fifoId").value>, fifo_<count>);<
+><source.name>.connect(ACTOR_PORT_OUT, <edge.attributes.("fifoId").value>, fifo_<count>);<
 endif>
 
 <if (target.actor)
-><target.id>.connect(ACTOR_PORT_IN, <target.actor.packageAsList; separator="::">::<target.actor.simpleName>_<targetPort.name>, fifo_<count>);<
+><target.name>.connect(ACTOR_PORT_IN, <target.actor.packageAsList; separator="::">::<target.actor.simpleName>_<targetPort.name>, fifo_<count>);<
 else
-><target.id>.connect(ACTOR_PORT_IN, <edge.attributes.("fifoId").value>, fifo_<count>);<
+><target.name>.connect(ACTOR_PORT_IN, <edge.attributes.("fifoId").value>, fifo_<count>);<
 endif>
 >>
 
-tryAssignFifo(edge, src, tgt) ::= <<
-<doAssignFifo(
-  source=src.instance, sourcePort=edge.source,
-  target=tgt.instance, targetPort=edge.target,
-  count=network.connectionMap.(edge))>
->>
-
 assignFifo(edge) ::= <<
-<tryAssignFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))>
+<doAssignFifo(source=edge.source, sourcePort=edge.sourcePort, target=edge.target, targetPort=edge.targetPort, count=edge.id)>
 >>
 
 assignFifos(edges) ::= <<
@@ -128,9 +121,9 @@ assignFifos(edges) ::= <<
 
 declareInstance(instance) ::= <<
 <if(instance.serdes)
->WrapperAka <instance.id>("<instance.id>");<
+>WrapperAka <instance.name>("<instance.name>");<
 else
-><instance.actor.packageAsList; separator="::">::<instance.actor.simpleName> <instance.id><initializeInstance(instance)>;<
+><instance.actor.packageAsList; separator="::">::<instance.actor.simpleName> <instance.name><initializeInstance(instance)>;<
 endif>
 >>
 
@@ -145,7 +138,7 @@ declareInstances(instances) ::= <<
 printInitialize(instance) ::= <<
 <if (instance.actor)>
 <if (!instance.actor.initializes.empty)>
-<instance.id>.initialize();
+<instance.name>.initialize();
 <endif>
 <endif>
 >>
@@ -156,7 +149,7 @@ printInitializes(instances) ::= <<
 
 printInitializeActor(instance) ::= <<
 <if (instance.actor)>
-<instance.id>.initializeActor();
+<instance.name>.initializeActor();
 <endif>
 >>
 
@@ -165,7 +158,7 @@ printInitializeActors(instances) ::= <<
 >>
 
 printScheduler(instance) ::= <<
-<if (!instance.serdes)>res += <instance.id>.schedule();<endif>
+<if (!instance.serdes)>res += <instance.name>.schedule();<endif>
 >>
 
 printSchedulers(instances) ::= <<
@@ -211,8 +204,8 @@ public:
 
 startWrapper(instance) ::= <<
 <if (instance.serdes)>
-<instance.id>.initializeActor();
-<instance.id>.start();
+<instance.name>.initializeActor();
+<instance.name>.start();
 <endif>
 >>
 
@@ -291,7 +284,7 @@ TraceAka g_oTracer;
 #undef min
 #undef max
 
-<includeActors(network.actors)>
+<includeActors(network.allActors)>
 
 #define SIZE 10000
 

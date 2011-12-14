@@ -67,7 +67,7 @@ ${includes}
 
 add_executable (<network.name>
 <network.name>.cpp
-<network.actors : addActor()>
+<network.allActors : addActor()>
 )
 
 target_link_libraries(<network.name>
