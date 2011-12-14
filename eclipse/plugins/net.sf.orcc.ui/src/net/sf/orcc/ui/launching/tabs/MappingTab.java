@@ -34,7 +34,10 @@ import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -176,7 +179,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 		private void setMapping(Vertex vertex, String component) {
 			if (vertex.isInstance()) {
 				Instance instance = (Instance) vertex;
-				mapping.put(instance.getHierarchicalPath(), component);
+				mapping.put(instance.getHierarchicalName(), component);
 			} else if (vertex.isEntity()) {
 				Network network = (Network) vertex;
 				mapping.put(vertex.getName(), component);
@@ -228,7 +231,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 			} else {
 				if (element instanceof Instance) {
 					Instance instance = (Instance) element;
-					return mapping.get(instance.getHierarchicalPath());
+					return mapping.get(instance.getHierarchicalName());
 				}
 				if (element instanceof Network) {
 					Network network = (Network) element;
@@ -251,7 +254,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 		 */
 		private void getComponents(Set<String> components, Network network) {
 			for (Instance instance : network.getInstances()) {
-				String component = mapping.get(instance.getHierarchicalPath());
+				String component = mapping.get(instance.getHierarchicalName());
 				if (component != null) {
 					components.add(component);
 				}
@@ -381,6 +384,24 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 			ResourceSet set = new ResourceSetImpl();
 			network = IrUtil.deserializeEntity(set, xdfFile);
 			network = new Instantiator().doSwitch(network);
+
+			Set<String> instances = new HashSet<String>();
+			for (Instance instance : network.getInstances()) {
+				instances.add(instance.getHierarchicalName());
+			}
+			for (Network subNetwork : network.getAllNetworks()) {
+				for (Instance instance : subNetwork.getInstances()) {
+					instances.add(instance.getHierarchicalName());
+				}
+			}
+
+			Iterator<Entry<String, String>> it = mapping.entrySet().iterator();
+			while (it.hasNext()) {
+				Entry<String, String> entry = it.next();
+				if (!instances.contains(entry.getKey())) {
+					it.remove();
+				}
+			}
 		}
 
 		viewer.setInput(network);
