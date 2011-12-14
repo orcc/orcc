@@ -42,11 +42,10 @@ import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.c.transformations.CBroadcastAdder;
 import net.sf.orcc.backends.transformations.TypeResizer;
 import net.sf.orcc.backends.transformations.UnitImporter;
+import net.sf.orcc.backends.util.MappingUtil;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.df.transformations.NetworkFlattener;
 import net.sf.orcc.df.util.DfSwitch;
@@ -71,66 +70,26 @@ public class CBackendImpl extends AbstractBackend {
 	/**
 	 * Backend options
 	 */
-	
+
 	private boolean debug;
 	private boolean enableTrace;
 
 	private boolean normalize;
 	private boolean classify;
 	private boolean merge;
-	
+
 	private boolean newScheduler;
 	private boolean ringTopology;
 	private boolean useGeneticAlgo;
 	private int threadsNb;
 
-
 	/**
 	 * Configuration mapping
 	 */
-	private Map<String, List<Instance>> instancesTarget;
+	private Map<String, List<Instance>> targetToInstancesMap;
 	private Map<String, String> mapping;
 
-
 	private StandardPrinter printer;
-	
-
-	private void computeMapping(Network network) {
-		// compute the different threads
-		instancesTarget = new HashMap<String, List<Instance>>();
-		for (Instance instance : network.getInstances()) {
-			String path = null;
-			if (instance.isActor()) {
-				path = instance.getHierarchicalPath();
-			} else if (instance.isBroadcast()) {
-				// use source instance for broadcasts
-				List<Connection> edges = ((Vertex) instance.eContainer())
-						.getIncoming();
-				if (!edges.isEmpty()) {
-					Connection incoming = edges.iterator().next();
-					Vertex source = incoming.getSource();
-					if (source.isInstance()) {
-						path = ((Instance) source).getHierarchicalPath();
-					}
-				}
-			}
-
-			// get component
-			String component = mapping.get(path);
-			if (component != null) {
-				List<Instance> list = instancesTarget.get(component);
-				if (list == null) {
-					list = new ArrayList<Instance>();
-					instancesTarget.put(component, list);
-				}
-
-				list.add(instance);
-			} else {
-				write("Warning: The instance '" + instance.getName()
-						+ "' is not mapped.\n");
-			}
-		}
-	}
 
 	private void computeOptions(Map<String, Object> options) {
 		options.put("newScheduler", newScheduler);
@@ -141,9 +100,9 @@ public class CBackendImpl extends AbstractBackend {
 			options.put("useGeneticAlgorithm", useGeneticAlgo);
 			options.put("threadsNb", threadsNb);
 		} else {
-			if (instancesTarget != null) {
-				options.put("threads", instancesTarget);
-				options.put("threadsNb", instancesTarget.size());
+			if (targetToInstancesMap != null) {
+				options.put("threads", targetToInstancesMap);
+				options.put("threadsNb", targetToInstancesMap.size());
 			}
 		}
 	}
@@ -160,8 +119,8 @@ public class CBackendImpl extends AbstractBackend {
 			merge = false;
 		}
 
-		useGeneticAlgo = getAttribute(
-				"net.sf.orcc.backends.geneticAlgorithm", false);
+		useGeneticAlgo = getAttribute("net.sf.orcc.backends.geneticAlgorithm",
+				false);
 		newScheduler = getAttribute("net.sf.orcc.backends.newScheduler", false);
 		debug = getAttribute(DEBUG_MODE, true);
 		threadsNb = Integer.parseInt(getAttribute(
@@ -238,7 +197,7 @@ public class CBackendImpl extends AbstractBackend {
 				write(text);
 			}
 		}, fifoSize).doSwitch(network);
-		
+
 		return network;
 	}
 
@@ -266,10 +225,16 @@ public class CBackendImpl extends AbstractBackend {
 		printer.setExpressionPrinter(new CExpressionPrinter());
 		printer.setTypePrinter(new CTypePrinter());
 
-		instancesTarget = null;
-		for (String mappedThing : mapping.values()) {
-			if (!mappedThing.isEmpty()) {
-				computeMapping(network);
+		for (String component : mapping.values()) {
+			if (!component.isEmpty()) {
+				targetToInstancesMap = new HashMap<String, List<Instance>>();
+				List<Instance> unmappedInstances = new ArrayList<Instance>();
+				MappingUtil.computeMapping(network, mapping,
+						targetToInstancesMap, unmappedInstances);
+				for (Instance instance : unmappedInstances) {
+					write("Warning: The instance '" + instance.getName()
+							+ "' is not mapped.\n");
+				}
 				break;
 			}
 		}
@@ -285,7 +250,7 @@ public class CBackendImpl extends AbstractBackend {
 
 		// print CMakeLists
 		printCMake(network);
-		if (!useGeneticAlgo && instancesTarget != null) {
+		if (!useGeneticAlgo && targetToInstancesMap != null) {
 			printMapping(network);
 		}
 	}
@@ -304,7 +269,7 @@ public class CBackendImpl extends AbstractBackend {
 	private void printMapping(Network network) {
 		StandardPrinter networkPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/c/Mapping.stg");
-		networkPrinter.getOptions().put("mapping", instancesTarget);
+		networkPrinter.getOptions().put("mapping", targetToInstancesMap);
 		networkPrinter.print(network.getName() + ".xcf", path, network);
 	}
 

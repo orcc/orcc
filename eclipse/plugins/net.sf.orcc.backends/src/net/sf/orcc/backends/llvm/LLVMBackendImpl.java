@@ -59,11 +59,10 @@ import net.sf.orcc.backends.transformations.TypeResizer;
 import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.backends.transformations.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transformations.ssa.CopyPropagator;
+import net.sf.orcc.backends.util.MappingUtil;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.df.transformations.NetworkFlattener;
 import net.sf.orcc.df.util.DfSwitch;
@@ -112,7 +111,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 	 * Configuration mapping
 	 */
 	private Map<String, String> mapping;
-	private Map<String, List<Instance>> instancesTarget;
+	private Map<String, List<Instance>> targetToInstancesMap;
 
 	private final Map<String, String> transformations;
 	private StandardPrinter printer;
@@ -129,43 +128,6 @@ public class LLVMBackendImpl extends AbstractBackend {
 		transformations.put("min", "min_");
 		transformations.put("max", "max_");
 		transformations.put("select", "select_");
-	}
-
-	private void computeMapping(Network network) {
-		// compute the different threads
-		instancesTarget = new HashMap<String, List<Instance>>();
-		for (Instance instance : network.getInstances()) {
-			String path = null;
-			if (instance.isActor()) {
-				path = instance.getHierarchicalPath();
-			} else if (instance.isBroadcast()) {
-				// use source instance for broadcasts
-				List<Connection> edges = ((Vertex) instance.eContainer())
-						.getIncoming();
-				if (!edges.isEmpty()) {
-					Connection incoming = edges.iterator().next();
-					Vertex source = incoming.getSource();
-					if (source.isInstance()) {
-						path = ((Instance) source).getHierarchicalPath();
-					}
-				}
-			}
-
-			// get component
-			String component = mapping.get(path);
-			if (component != null) {
-				List<Instance> list = instancesTarget.get(component);
-				if (list == null) {
-					list = new ArrayList<Instance>();
-					instancesTarget.put(component, list);
-				}
-
-				list.add(instance);
-			} else {
-				write("Warning: The instance '" + instance.getName()
-						+ "' is not mapped.\n");
-			}
-		}
 	}
 
 	@Override
@@ -249,15 +211,21 @@ public class LLVMBackendImpl extends AbstractBackend {
 			e.printStackTrace();
 		}
 
-		instancesTarget = null;
-		for (String mappedThing : mapping.values()) {
-			if (!mappedThing.isEmpty()) {
-				computeMapping(network);
+		for (String component : mapping.values()) {
+			if (!component.isEmpty()) {
+				targetToInstancesMap = new HashMap<String, List<Instance>>();
+				List<Instance> unmappedInstances = new ArrayList<Instance>();
+				MappingUtil.computeMapping(network, mapping,
+						targetToInstancesMap, unmappedInstances);
+				for (Instance instance : unmappedInstances) {
+					write("Warning: The instance '" + instance.getName()
+							+ "' is not mapped.\n");
+				}
 				break;
 			}
 		}
 
-		if (instancesTarget != null) {
+		if (targetToInstancesMap != null) {
 			printMapping(network);
 		}
 	}
@@ -289,7 +257,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 	private void printMapping(Network network) {
 		StandardPrinter networkPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/llvm/Mapping.stg");
-		networkPrinter.getOptions().put("mapping", instancesTarget);
+		networkPrinter.getOptions().put("mapping", targetToInstancesMap);
 		networkPrinter.print(network.getName() + ".xcf", path, network);
 	}
 

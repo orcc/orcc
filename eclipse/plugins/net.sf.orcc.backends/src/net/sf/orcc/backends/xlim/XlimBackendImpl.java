@@ -109,7 +109,7 @@ public class XlimBackendImpl extends AbstractBackend {
 		Map<Integer, List<Instance>> computedMap = new HashMap<Integer, List<Instance>>();
 
 		for (Instance instance : network.getInstances()) {
-			String path = instance.getHierarchicalPath();
+			String path = instance.getHierarchicalName();
 			String component = mapping.get(path);
 			if (component != null) {
 				int coreId = Integer.parseInt(component.substring(1));
