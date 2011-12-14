@@ -52,7 +52,7 @@ public abstract class AbstractScheduler implements IScheduler {
 
 	protected Map<Connection, Integer> maxTokens;
 
-	protected Map<Instance, Integer> repetitions;
+	protected Map<Vertex, Integer> repetitions;
 
 	private int depth;
 
@@ -71,18 +71,23 @@ public abstract class AbstractScheduler implements IScheduler {
 			if (iterand.isVertex()) {
 				Vertex vertex = iterand.getVertex();
 				for (Connection connection : vertex.getIncoming()) {
-					int cns = connection.getTargetPort().getNumTokensConsumed();
-					tokens.put(connection, tokens.get(connection) - cns);
+					if (connection.getSource().isInstance()) {
+						int cns = connection.getTargetPort()
+								.getNumTokensConsumed();
+						tokens.put(connection, tokens.get(connection) - cns);
+					}
 				}
 				for (Connection connection : vertex.getOutgoing()) {
-					int current = tokens.get(connection);
-					int max = maxTokens.get(connection);
-					CSDFMoC moc = (CSDFMoC) ((Instance) vertex).getMoC();
-					int prd = moc.getNumTokensProduced(connection
-							.getSourcePort());
-					tokens.put(connection, current + prd);
-					if (max < current + prd) {
-						maxTokens.put(connection, current + prd);
+					if (connection.getTarget().isInstance()) {
+						int current = tokens.get(connection);
+						int max = maxTokens.get(connection);
+						CSDFMoC moc = (CSDFMoC) ((Instance) vertex).getMoC();
+						int prd = moc.getNumTokensProduced(connection
+								.getSourcePort());
+						tokens.put(connection, current + prd);
+						if (max < current + prd) {
+							maxTokens.put(connection, current + prd);
+						}
 					}
 				}
 			} else {
@@ -114,7 +119,9 @@ public abstract class AbstractScheduler implements IScheduler {
 			tokens = new HashMap<Connection, Integer>();
 
 			for (Connection connection : network.getConnections()) {
-				maxTokens.put(connection, 0);
+				if (connection.getSource().isInstance()
+						&& connection.getTarget().isInstance())
+					maxTokens.put(connection, 0);
 				tokens.put(connection, 0);
 			}
 			computeMemoryBound(schedule);
@@ -136,7 +143,7 @@ public abstract class AbstractScheduler implements IScheduler {
 	 * 
 	 * @return
 	 */
-	public Map<Instance, Integer> getRepetitions() {
+	public Map<Vertex, Integer> getRepetitions() {
 		return repetitions;
 	}
 
