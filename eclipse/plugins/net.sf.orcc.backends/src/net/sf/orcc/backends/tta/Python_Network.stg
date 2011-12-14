@@ -1,28 +1,23 @@
 
-indexPort(port) ::= <<
+printPort(port, index) ::= <<
+Port("<port.name>", <index>, <if(port.native)>True<else>False<endif>, <port.type.sizeInBits>)
+>>
+
+initPorts(name, inputs, outputs) ::= <<
+<name>_inputs = [<inputs: { port | <printPort(port, i0)> }; separator=", ">]
+<name>_outputs = [<outputs: { port | <printPort(port, i0)> }; separator=", ">]
+>>
+
+initInstancePort(instance) ::= <<
 <if(instance.actor)
-><instance.actor.templateData.portToIndexMap.(port)><
+><initPorts(instance.name, instance.actor.inputs, instance.actor.outputs)><
 elseif(instance.broadcast)
-><instance.broadcast.portMap.(port)><
+><initPorts(instance.name, instance.broadcast.inputs, instance.broadcast.outputs)><
 endif>
 >>
 
-port(port) ::= <<
-Port("<port.name>", <indexPort(port)>, <if(port.native)>True<else>False<endif>, <port.type.sizeInBits>)
->>
-
-initPorts(instance) ::= <<
-<if(instance.actor)
-><instance.id>_inputs = [<instance.actor.inputs: port(); separator=", ">]
-<instance.id>_outputs = [<instance.actor.outputs: port(); separator=", ">]<
-elseif(instance.broadcast)
-><instance.id>_inputs = [<port(instance.broadcast.input)>]
-<instance.id>_outputs = [<instance.broadcast.outputs: port(); separator=", ">]<
-endif>
->>
-
-initInstance(instance) ::= <<
-Instance("<instance.id>", <instance.id>_inputs, <instance.id>_outputs, <if(instance.actor.native)>True<else>False<endif>, <if(instance.broadcast)>True<else>False<endif>)
+initInstance(vertex) ::= <<
+Instance("<vertex.name>", <vertex.name>_inputs, <vertex.name>_outputs, <if(vertex.actor.native)>True<else>False<endif>, <if(vertex.broadcast)>True<else>False<endif>)
 >>
 
 printNetwork(network, options) ::= <<
@@ -34,10 +29,12 @@ printNetwork(network, options) ::= <<
 from orcc_ import *
 
 ## Ports initialization
-<network.instances: initPorts(); separator="\n">
+<network.instances: initInstancePort(); separator="\n">
 
 ## Instances initialization
-instances = [<network.instances: initInstance(); wrap, separator=", ">]
+instances = [
+	<network.instances: initInstance(); separator=",\n">
+]
 
 ## Network initialization
 network = Network("<network.name>", instances)

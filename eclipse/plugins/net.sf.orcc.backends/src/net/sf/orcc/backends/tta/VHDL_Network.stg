@@ -49,17 +49,16 @@ begin
   ---------------------------------------------------------------------------
   -- Ports instantiation 
   ---------------------------------------------------------------------------
-  <assignNetworkPorts(network)>
+  <network.connections: assignNetworkPort()>
   ---------------------------------------------------------------------------
   -- FIFOs instantiation 
   --------------------------------------------------------------------------- 
-  <assignFifos(network.connections)>
+  <network.connections: assignFifo()>
   ---------------------------------------------------------------------------
   -- Actors instantiation 
   ---------------------------------------------------------------------------
-  <assignInstances(network.instances)>
-  ---------------------------------------------------------------------------
-  
+  <network.instances: assignInstance(); separator="\n\n">
+  ---------------------------------------------------------------------------  
 
 
 end bdf_type;
@@ -77,14 +76,6 @@ ports(network) ::= <<
 
 port(port, dir) ::= <<
 <port.name> : <dir> <if(port.type.bool)>std_logic<else>std_logic_vector(<port.type.size>-1 downto 0)<endif>
->>
-
-indexPort(port) ::= <<
-<if(instance.actor)
-><instance.actor.templateData.portToIndexMap.(port)><
-elseif(instance.broadcast)
-><instance.broadcast.portMap.(port)><
-endif>
 >>
 
 
@@ -117,20 +108,12 @@ indexConnection(connection) ::= <<
 // Instantiation
 ///////////////////////////////////////////////////////////////////////////////
 
-assignNetworkPorts(network) ::= <<
-<network.connections: assignNetworkPort()>
->>
-
 assignNetworkPort(connection) ::= <<
 <if(connection.source.port)>
 <connection.source.name> \<= s_<indexConnection(connection)>;
 <elseif(connection.target.port)>
 <connection.target.name> \<= s_<indexConnection(connection)>;
 <endif>
->>
-
-assignFifos(connections) ::= <<
-<connections: assignFifo()>
 >>
 
 assignFifo(connection) ::= <<
@@ -148,58 +131,46 @@ fifo_<indexConnection(connection)> : entity work.fifo
 <endif>
 >>
 
-assignInstances(instances) ::= <<
-<instances: assignInstance(); separator="\n\n">
->>
-
 assignInstance(instance) ::= <<
 <instance.id>_inst : entity work.<if(!instance.actor.native)>processor_<endif><instance.id>
 <if(instance.actor.native)
 >  generic map(<assignGenerics(instance)>)  
 <endif>
   port map(clk          =\> clk,
-           <assignPorts(instance)>
+  	       <assignPort(instance)>
            rst_n        =\> rst_n);
+>>
+
+assignPort(instance) ::= <<
+<if(instance.actor)
+><instance.actor.inputs: { input | <assignInputPort(input, instance.incomingPortMap.(input), i0)> }; separator="\n">
+<instance.actor.outputs: { output | <assignOutputPort(output, first(instance.outgoingPortMap.(output)), i0)> }; separator="\n"><
+else
+><instance.broadcast.inputs: { input | <assignInputPort(input, instance.broadcast.incomingPortMap.(input), i0)> }; separator="\n">
+<instance.broadcast.outputs: { output | <assignOutputPort(output, first(instance.broadcast.outgoingPortMap.(output)), i0)> }; separator="\n"><
+endif>
 >>
 
 assignGenerics(instance) ::= <<
 <instance.arguments: { arg | <arg.variable.name> =\> <arg.value>}; separator=",\n              ">
 >>
 
-assignPorts(instance) ::= <<
-<if(instance.actor)
-><instance.actor.inputs: assignInputPort(); separator="\n">
-<instance.actor.outputs: assignOutputPort(); separator="\n"><
-elseif(instance.broadcast)
-><instance.broadcast.inputs: assignInputPort(); separator="\n">
-<instance.broadcast.outputs: assignOutputPort(); separator="\n"><
-endif>
->>
-
-assignInputPort(port) ::= <<
+assignInputPort(port, connection, index) ::= <<
 <if(port.native)
-><port.name>   =\> s_<indexInputConnection(port)>,<
+><port.name>   =\> s_<indexConnection(connection)>,<
 else
->data_<indexPort(port)>_in    =\> fifo_<indexInputConnection(port)>_q,
-status_<indexPort(port)>_in  =\> fifo_<indexInputConnection(port)>_status,
-ack_<indexPort(port)>_in     =\> fifo_<indexInputConnection(port)>_rdreq,<
+>data_<index>_in    =\> fifo_<indexConnection(connection)>_q,
+status_<index>_in  =\> fifo_<indexConnection(connection)>_status,
+ack_<index>_in     =\> fifo_<indexConnection(connection)>_rdreq,<
 endif>
 >>
 
-assignOutputPort(port) ::= <<
+assignOutputPort(port, connection, index) ::= <<
 <if(port.native)
-><port.name>   =\> s_<indexOutputConnection(port)>,<
+><port.name>   =\> s_<indexConnection(connection)>,<
 else
->data_<indexPort(port)>_out   =\> fifo_<indexOutputConnection(port)>_data,
-status_<indexPort(port)>_out =\> fifo_<indexOutputConnection(port)>_status,
-dv_<indexPort(port)>_out     =\> fifo_<indexOutputConnection(port)>_wrreq,<
+>data_<index>_out   =\> fifo_<indexConnection(connection)>_data,
+status_<index>_out =\> fifo_<indexConnection(connection)>_status,
+dv_<index>_out     =\> fifo_<indexConnection(connection)>_wrreq,<
 endif>
->>
-
-indexInputConnection(port) ::= <<
-<indexConnection(instance.incomingPortMap.(port))>
->>
-
-indexOutputConnection(port) ::= <<
-<indexConnection(first(instance.outgoingPortMap.(port)))>
 >>

@@ -6,14 +6,6 @@ import "net/sf/orcc/backends/llvm/Actor.stg"
 // FIFO functions
 ///////////////////////////////////////////////////////////////////////////////
 
-indexPort(port) ::= <<
-<if(instance.actor)
-><instance.actor.templateData.portToIndexMap.(port)><
-elseif(instance.broadcast)
-><instance.broadcast.portMap.(port)><
-endif>
->>
-
 printStatus(dir, port) ::= <<
 %local_status_<port.name> = tail call i32 asm sideeffect "STREAM_<dir>_<port.name>.CAL_STREAM_<dir>_STATUS", "=r,ir"(i32 0) nounwind
 store i32 %local_status_<port.name>, i32* @status_<port.name>
@@ -370,26 +362,26 @@ call <initialize.body.returnType> @<initialize.body.name> ()
 ///////////////////////////////////////////////////////////////////////////////
 
 printBcastOutputConditions(lastPort, currentPort, restPorts) ::= <<
-<if(restPorts)>%free_room_output_<indexPort(currentPort)> = sub i32 256, %status_<currentPort.name>
-%available_output_<indexPort(currentPort)> = icmp sge i32 %free_room_output_<indexPort(currentPort)>, 1
-%has_valid_output_<indexPort(currentPort)> = and i1 %has_valid_output_<indexPort(lastPort)>, %available_output_<indexPort(currentPort)>
+<if(restPorts)>%free_room_<currentPort.name> = sub i32 256, %status_<currentPort.name>
+%available_<currentPort.name> = icmp sge i32 %free_room_<currentPort.name>, 1
+%has_valid_<currentPort.name> = and i1 %has_valid_<lastPort.name>, %available_<currentPort.name>
 <printBcastOutputConditions(currentPort, first(restPorts), rest(restPorts))><
 else
->%free_room_output_<indexPort(currentPort)> = sub i32 256, %status_<currentPort.name>
-%available_output_<indexPort(currentPort)> = icmp sge i32 %free_room_output_<indexPort(currentPort)>, 1
-%can_copy_next_token = and i1 %has_valid_output_<indexPort(lastPort)>, %available_output_<indexPort(currentPort)><
+>%free_room_<currentPort.name> = sub i32 256, %status_<currentPort.name>
+%available_<currentPort.name> = icmp sge i32 %free_room_<currentPort.name>, 1
+%can_copy_next_token = and i1 %has_valid_<lastPort.name>, %available_<currentPort.name><
 endif>
 >>
 
 printBcastCondition(broadcast) ::= <<
 %has_valid_input = icmp sge i32 %status_input, 1
-%free_room_output_1 = sub i32 256, %status_<first(broadcast.outputs.list).name>
-%available_output_1 = icmp sge i32 %free_room_output_1, 1
-%has_valid_output_1 = and i1 %has_valid_input, %available_output_1
-<printBcastOutputConditions(first(broadcast.outputs.list), first(rest(broadcast.outputs.list)), rest(rest(broadcast.outputs.list)))>
+%free_room_output_0 = sub i32 256, %status_<first(broadcast.outputs).name>
+%available_output_0 = icmp sge i32 %free_room_output_0, 1
+%has_valid_output_0 = and i1 %has_valid_input, %available_output_0
+<printBcastOutputConditions(first(broadcast.outputs), first(rest(broadcast.outputs)), rest(rest(broadcast.outputs)))>
 >>
 
-broadcast(broadcast) ::= <<
+printBroadcast(broadcast) ::= <<
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Broadcast file
 
@@ -399,7 +391,7 @@ broadcast(broadcast) ::= <<
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Output FIFOs
-<broadcast.outputs.list: printWriteFunction(); separator="\n\n">
+<broadcast.outputs: printWriteFunction(); separator="\n\n">
 
 
 define void @main() noreturn nounwind noinline {
@@ -411,14 +403,14 @@ entry:
 
 bb_broadcast_start:
 	<printBcastStatus("IN", broadcast.input)>
-	<printBcastPortsStatus("OUT", broadcast.outputs.list)>
+	<printBcastPortsStatus("OUT", broadcast.outputs)>
 	<printBcastCondition(broadcast)>
 	
 	br i1 %can_copy_next_token, label %bb_broadcast_copy, label %bb_broadcast_start
 	
 bb_broadcast_copy:
 	call void @_read_<broadcast.input.name>(<broadcast.input.type>* %token_ptr, i32 1)
-	<broadcast.outputs.list: { port | call void @_write_<port.name>(<port.type>* %token_ptr, i32 1) }; separator="\n">
+	<broadcast.outputs: { port | call void @_write_<port.name>(<port.type>* %token_ptr, i32 1) }; separator="\n">
 	
 	br label %bb_broadcast_start
 }
@@ -429,19 +421,18 @@ actorParameter(var, expr) ::= <<
 @<var.name> = global <var.type> <Constant(expr, var.type)>
 >>
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Actor
+// Instance
 ///////////////////////////////////////////////////////////////////////////////
 
-printActor(actor) ::= <<
+printActor(actor, options) ::= <<
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Source file is "<actor.file>"
+; Source file is "<instance.actor.file>"
 
-<if(actor.parameters)>
+<if(instance.actor.parameters)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Parameter values of the instance
-<actor.parameters: { var | <actorParameter(var, instance.parameters.(var.name))> }; separator="\n">
+<instance.actor.parameters: { var | <actorParameter(var, instance.parameters.(var.name))> }; separator="\n">
 <endif>
 
 <printStatusVars(actor.inputs)>
@@ -509,18 +500,12 @@ else
 ><schedulerWithoutFSM(actor.actionsOutsideFsm)><
 endif>
 }
-
 >>
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Instance
-///////////////////////////////////////////////////////////////////////////////
-
 printInstance(instance, options) ::= <<
-<if(instance.actor)
-><printActor(instance.actor)><
-elseif(instance.broadcast)
-><broadcast(instance.broadcast)><
-endif>
+<if(instance.actor)><
+printActor(instance.actor, options)
+><elseif(instance.broadcast)><
+printBroadcast(instance.broadcast)
+><endif>
 >>

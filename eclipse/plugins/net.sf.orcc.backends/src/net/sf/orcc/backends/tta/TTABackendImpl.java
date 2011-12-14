@@ -55,6 +55,8 @@ import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.tta.architecture.TTA;
 import net.sf.orcc.backends.tta.transformations.BroadcastTypeResizer;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transformations.BroadcastAdder;
@@ -139,6 +141,13 @@ public class TTABackendImpl extends AbstractBackend {
 
 		new BroadcastAdder().doSwitch(network);
 		new BroadcastTypeResizer().doSwitch(network);
+
+		for (Entity entity : network.getEntities()) {
+			Instance instance = DfFactory.eINSTANCE.createInstance(
+					entity.getName(), entity);
+			network.getInstances().add(instance);
+		}
+
 		return network;
 	}
 
