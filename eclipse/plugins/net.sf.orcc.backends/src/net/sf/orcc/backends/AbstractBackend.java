@@ -450,13 +450,13 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 *            a list of entities
 	 * @throws OrccException
 	 */
-	final public void printEntities(List<Entity> entities) throws OrccException {
+	final public void printEntities(Network network) throws OrccException {
 		write("Printing entities...\n");
 		long t0 = System.currentTimeMillis();
 
 		// creates a list of tasks: each task will print an actor when called
 		List<Callable<Boolean>> tasks = new ArrayList<Callable<Boolean>>();
-		for (final Entity entity : entities) {
+		for (final Entity entity : network.getEntities()) {
 			tasks.add(new Callable<Boolean>() {
 
 				@Override
