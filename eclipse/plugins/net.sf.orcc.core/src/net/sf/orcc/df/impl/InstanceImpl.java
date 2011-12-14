@@ -256,6 +256,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 * 
 	 * @return the path of identifiers from the top-level to this instance
 	 */
+	@Override
 	public List<String> getHierarchicalId() {
 		List<String> ids = new ArrayList<String>();
 		EObject obj = this;
@@ -265,6 +266,23 @@ public class InstanceImpl extends VertexImpl implements Instance {
 			obj = obj.eContainer();
 		} while (obj != null);
 		return ids;
+	}
+	
+	
+	/**
+	 * Returns the hierarchical name of this instance.
+	 * 
+	 * @return the hierarchical name of this instance
+	 */
+	@Override
+	public String getHierarchicalName() {
+		String name = this.getName();
+		EObject obj = this.eContainer();
+		while (obj.eContainer() != null) {
+			name = ((Nameable) obj).getName() + "_" + name;
+			obj = obj.eContainer();
+		}
+		return name;
 	}
 
 	@Override
