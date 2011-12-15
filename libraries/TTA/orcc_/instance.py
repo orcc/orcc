@@ -83,9 +83,6 @@ class Instance:
         if retcode >= 0 and debug: retcode = subprocess.call(["tcecc", "-O3", "-o", self._bcFile, self._llFile, "--emit-llvm"])
         if retcode >= 0 and debug: retcode = subprocess.call(["llvm-dis", "-o", self._llOptFile, self._bcFile])
         if retcode >= 0 and debug: retcode = subprocess.call(["tcedisasm", "-n", "-o", self._asmFile, self._adfFile, self._tpefFile])
-        if retcode >= 0: retcode = subprocess.call(["createbem", "-o", self._bemFile, self._adfFile])
-        if retcode >= 0: retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", "images", "-f", "mif", "-o", "mif", self._adfFile])
-        if retcode >= 0: retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", "images", "-f", "coe", "-o", "coe", self._adfFile])
 
     def initializeMemories(self):
         self.irom = self._readMif(self._mifFile)
@@ -93,9 +90,11 @@ class Instance:
 
     def generate(self, srcPath, buildPath, libPath, args, debug):
         instanceSrcPath = os.path.join(srcPath, self.id)
-        instanceBuildPath = os.path.join(buildPath, self.id)
-        wrapperPath = os.path.join(buildPath, "wrapper")
-        sharePath = os.path.join(buildPath, "share")
+        ttaPath = os.path.join(instanceSrcPath, "tta")
+        vhdlPath = os.path.join(ttaPath, "vhdl")
+        memoryPath = os.path.join(ttaPath, "memory")
+        wrapperPath = os.path.join(srcPath, "wrapper")
+        sharePath = os.path.join(srcPath, "share")
         os.chdir(instanceSrcPath)
         if debug: 
             print "ROM: " + str(self.irom.depth) + "x" + str(self.irom.width) + "bits"
@@ -105,23 +104,27 @@ class Instance:
         shutil.rmtree("vhdl", ignore_errors=True)
         shutil.copytree(os.path.join(libPath, "stream", "vhdl"), "vhdl")
         # Remove existing build directory
-        shutil.rmtree(instanceBuildPath, ignore_errors=True)
-        # Generate the processor
-        self.initializeMemories()
-        subprocess.call(["generateprocessor"] + args + ["-o", instanceBuildPath, "-b", self._bemFile, "--shared-files-dir", sharePath,
+        shutil.rmtree(ttaPath, ignore_errors=True)
+        # Generate the TTA processor        
+        retcode = subprocess.call(["generateprocessor"] + args + ["-o", ttaPath, "-b", self._bemFile, "--shared-files-dir", sharePath,
                                         "-l", "vhdl", "-e", self._entity, "-i", self._idfFile, self._adfFile])
+        if retcode >= 0: retcode = subprocess.call(["createbem", "-o", self._bemFile, self._adfFile])
+        if retcode >= 0: retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", vhdlPath, "-f", "mif", "-o", "mif", self._adfFile])
+        if retcode >= 0: retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", vhdlPath, "-f", "coe", "-o", "coe", self._adfFile])
+
         # Generate processor files
-        self.generateProcessor(os.path.join(libPath, "templates", "processor.template"), os.path.join(instanceBuildPath, self._processorFile))
+        self.initializeMemories()
+        self.generateProcessor(os.path.join(libPath, "templates", "processor.template"), os.path.join(vhdlPath, self._processorFile))
         # Copy files to build directory
         shutil.copy(self._mifFile, wrapperPath)
         shutil.copy(self._mifDataFile, wrapperPath)
         shutil.copy(self._coeFile, wrapperPath)
         shutil.copy(self._coeDataFile, wrapperPath)
-        shutil.copy("imem_mau_pkg.vhdl", instanceBuildPath)
+        shutil.copy("imem_mau_pkg.vhdl", vhdlPath)
         if not (self.isNative or self.isBroadcast):
-            shutil.copy(self._tbFile, instanceBuildPath)
-            shutil.copy(os.path.join(srcPath, self._tclFile), buildPath)
-            os.chmod(os.path.join(buildPath, self._tclFile), stat.S_IRWXU)
+            shutil.copy(self._tbFile, vhdlPath)
+            shutil.copy(os.path.join(srcPath, self._tclFile), vhdlPath)
+            os.chmod(vhdlPath, stat.S_IRWXU)
 
         # Clean working directory
         os.remove("stream_units.hdb")
