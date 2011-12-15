@@ -4,8 +4,8 @@ Port("<port.name>", <index>, <if(port.native)>True<else>False<endif>, <port.type
 >>
 
 initPorts(name, inputs, outputs) ::= <<
-<name>_inputs = [<inputs: { port | <printPort(port, i0)> }; separator=", ">]
-<name>_outputs = [<outputs: { port | <printPort(port, i0)> }; separator=", ">]
+<name>_inputs = [<inputs: { port | <printPort(port, i)> }; separator=", ">]
+<name>_outputs = [<outputs: { port | <printPort(port, i)> }; separator=", ">]
 >>
 
 initInstancePort(instance) ::= <<

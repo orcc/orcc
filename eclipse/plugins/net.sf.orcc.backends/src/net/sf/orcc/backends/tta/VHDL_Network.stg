@@ -143,11 +143,11 @@ assignInstance(instance) ::= <<
 
 assignPort(instance) ::= <<
 <if(instance.actor)
-><instance.actor.inputs: { input | <assignInputPort(input, instance.incomingPortMap.(input), i0)> }; separator="\n">
-<instance.actor.outputs: { output | <assignOutputPort(output, first(instance.outgoingPortMap.(output)), i0)> }; separator="\n"><
+><instance.actor.inputs: { input | <assignInputPort(input, instance.incomingPortMap.(input), i)> }; separator="\n">
+<instance.actor.outputs: { output | <assignOutputPort(output, first(instance.outgoingPortMap.(output)), i)> }; separator="\n"><
 else
-><instance.broadcast.inputs: { input | <assignInputPort(input, instance.broadcast.incomingPortMap.(input), i0)> }; separator="\n">
-<instance.broadcast.outputs: { output | <assignOutputPort(output, first(instance.broadcast.outgoingPortMap.(output)), i0)> }; separator="\n"><
+><instance.broadcast.inputs: { input | <assignInputPort(input, instance.broadcast.incomingPortMap.(input), i)> }; separator="\n">
+<instance.broadcast.outputs: { output | <assignOutputPort(output, first(instance.broadcast.outgoingPortMap.(output)), i)> }; separator="\n"><
 endif>
 >>
 
