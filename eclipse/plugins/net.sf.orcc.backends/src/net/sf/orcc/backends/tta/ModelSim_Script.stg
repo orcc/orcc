@@ -55,10 +55,11 @@ vcom -quiet -opt=-clkOpt -work altera_mf -93 -explicit simulation/altera_mf.vhd
 compileInstance(instance) ::= <<
 <if(!instance.actor.native)
 ># Compile Instance <instance.id>
-vcom -93 -quiet -work work <instance.id>/imem_mau_pkg.vhdl
+vcom -93 -quiet -work work <instance.id>/vhdl/imem_mau_pkg.vhdl
 vcom -93 -quiet -work work <instance.id>/vhdl/globals_pkg.vhdl
 vcom -93 -quiet -work work <instance.id>/vhdl/processor_<instance.id>_tl_params_pkg.vhdl
 vcom -93 -quiet -work work <instance.id>/vhdl/processor_<instance.id>_tl.vhdl
+vcom -93 -quiet -work work <instance.id>/vhdl/processor_<instance.id>.vhd
 vcom -93 -quiet -work work <instance.id>/gcu_ic/gcu_opcodes_pkg.vhdl
 vcom -93 -quiet -work work <instance.id>/gcu_ic/output_socket_2_1.vhdl
 vcom -93 -quiet -work work <instance.id>/gcu_ic/output_socket_1_1.vhdl
@@ -67,10 +68,9 @@ vcom -93 -quiet -work work <instance.id>/gcu_ic/ifetch.vhdl
 vcom -93 -quiet -work work <instance.id>/gcu_ic/idecompressor.vhdl
 vcom -93 -quiet -work work <instance.id>/gcu_ic/ic.vhdl
 vcom -93 -quiet -work work <instance.id>/gcu_ic/decoder.vhdl
-vcom -93 -quiet -work work <instance.id>/processor_<instance.id>.vhd
 
-exec cp -f wrapper/<instance.id>.mif . &
-exec cp -f wrapper/<instance.id>_data.mif . &<
+exec cp -f <instance.id>/memory/<instance.id>.mif . &
+exec cp -f <instance.id>/memory/<instance.id>_data.mif . &<
 endif>
 >>
 

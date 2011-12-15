@@ -105,10 +105,10 @@ class Instance:
         shutil.copytree(os.path.join(libPath, "stream", "vhdl"), "vhdl")
         # Remove existing build directory
         shutil.rmtree(ttaPath, ignore_errors=True)
-        # Generate the TTA processor        
-        retcode = subprocess.call(["generateprocessor"] + args + ["-o", ttaPath, "-b", self._bemFile, "--shared-files-dir", sharePath,
+        # Generate the TTA processor
+        retcode = subprocess.call(["createbem", "-o", self._bemFile, self._adfFile])    
+        if retcode >= 0: retcode = subprocess.call(["generateprocessor"] + args + ["-o", ttaPath, "-b", self._bemFile, "--shared-files-dir", sharePath,
                                         "-l", "vhdl", "-e", self._entity, "-i", self._idfFile, self._adfFile])
-        if retcode >= 0: retcode = subprocess.call(["createbem", "-o", self._bemFile, self._adfFile])
         if retcode >= 0: retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", vhdlPath, "-f", "mif", "-o", "mif", self._adfFile])
         if retcode >= 0: retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", vhdlPath, "-f", "coe", "-o", "coe", self._adfFile])
 
@@ -116,11 +116,11 @@ class Instance:
         self.initializeMemories()
         self.generateProcessor(os.path.join(libPath, "templates", "processor.template"), os.path.join(vhdlPath, self._processorFile))
         # Copy files to build directory
-        shutil.copy(self._mifFile, wrapperPath)
-        shutil.copy(self._mifDataFile, wrapperPath)
-        shutil.copy(self._coeFile, wrapperPath)
-        shutil.copy(self._coeDataFile, wrapperPath)
-        shutil.copy("imem_mau_pkg.vhdl", vhdlPath)
+        shutil.move(self._mifFile, memoryPath)
+        shutil.move(self._mifDataFile, memoryPath)
+        shutil.move(self._coeFile, memoryPath)
+        shutil.move(self._coeDataFile, memoryPath)
+        shutil.move("imem_mau_pkg.vhdl", vhdlPath)
         if not (self.isNative or self.isBroadcast):
             shutil.copy(self._tbFile, vhdlPath)
             shutil.copy(os.path.join(srcPath, self._tclFile), vhdlPath)
@@ -128,6 +128,7 @@ class Instance:
 
         # Clean working directory
         os.remove("stream_units.hdb")
+        os.remove(self._bemFile)
         shutil.rmtree("vhdl", ignore_errors=True)
 
 

@@ -67,6 +67,8 @@ qsfInstance(instance) ::= <<
 set_global_assignment -name VHDL_FILE <instance.id>/vhdl/processor_<instance.id>_tl_params_pkg.vhdl
 set_global_assignment -name VHDL_FILE <instance.id>/vhdl/processor_<instance.id>_tl.vhdl
 set_global_assignment -name VHDL_FILE <instance.id>/vhdl/globals_pkg.vhdl
+set_global_assignment -name VHDL_FILE <instance.id>/vhdl/processor_<instance.id>.vhd
+set_global_assignment -name VHDL_FILE <instance.id>/vhdl/imem_mau_pkg.vhdl
 set_global_assignment -name VHDL_FILE <instance.id>/gcu_ic/output_socket_2_1.vhdl
 set_global_assignment -name VHDL_FILE <instance.id>/gcu_ic/output_socket_1_1.vhdl
 set_global_assignment -name VHDL_FILE <instance.id>/gcu_ic/input_socket_2.vhdl
@@ -75,10 +77,8 @@ set_global_assignment -name VHDL_FILE <instance.id>/gcu_ic/idecompressor.vhdl
 set_global_assignment -name VHDL_FILE <instance.id>/gcu_ic/ic.vhdl
 set_global_assignment -name VHDL_FILE <instance.id>/gcu_ic/gcu_opcodes_pkg.vhdl
 set_global_assignment -name VHDL_FILE <instance.id>/gcu_ic/decoder.vhdl
-set_global_assignment -name VHDL_FILE <instance.id>/processor_<instance.id>.vhd
-set_global_assignment -name VHDL_FILE <instance.id>/imem_mau_pkg.vhdl
-set_global_assignment -name MIF_FILE <instance.id>/<instance.id>_data.mif
-set_global_assignment -name MIF_FILE <instance.id>/<instance.id>.mif
+set_global_assignment -name MIF_FILE <instance.id>/memory/<instance.id>_data.mif
+set_global_assignment -name MIF_FILE <instance.id>/memory/<instance.id>.mif
 <endif>
 >>
 
