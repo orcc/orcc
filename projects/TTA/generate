@@ -47,7 +47,6 @@ def main():
     debug = False
 
     for o, a in opts:
-        #print o, a
         if o in ("-v", "--verbose"):
             verbose = True
         if o in ("-d", "--debug"):
@@ -61,7 +60,7 @@ def main():
             
     for o, a in opts:
         if o in ("-c", "--compile"):
-            compile(a, debug)
+            compile(a, debug, args[0])
 
     for o, a in opts:
         if o in ("-s", "--simulate"):
@@ -69,13 +68,13 @@ def main():
 
     for o, a in opts:
         if o in ("-g", "--generate"):
-            generate(a, debug)
+            generate(a, debug, args[0])
 
 
 def usage():
     print "Open RVC-CAL Compiler - TTA backend"
     print "generate - Software/Hardware Generator for Transport Trigger Architecture"
-    print "Usage: generate [options]"
+    print "Usage: generate [options] input_directory"
     print ""
     print "Options:"
     print "-c, --compile=[options]  \t Compile the application from the generated LLVM assembly code into TTA binary"
@@ -102,14 +101,14 @@ def clean():
     print "-- Build directory is cleaned."
     
 
-def compile(arg, debug):
+def compile(arg, debug, target):
     start = time.time()
 
     print "*********************************************************************"
     print "* Compile the application for TTA"
     print "*********************************************************************"
 
-    network.compile(srcPath, libPath, arg.split(), debug)
+    network.compile(os.path.abspath(target), libPath, arg.split(), debug)
 
     print "* Compilation of %d instances done in %f seconds." % (len(network.instances), time.time() - start)
 
@@ -126,14 +125,14 @@ def simulate():
     print "* Simulation of %d instances done in %f seconds." % (len(network.instances), time.time() - start)
 
 
-def generate(arg, debug):
+def generate(arg, debug, target):
     start = time.time()
 
     print "*********************************************************************"
     print "* Generate the TTA processors"
     print "*********************************************************************"
     
-    network.generate(srcPath, buildPath, libPath, arg.split(), debug)
+    network.generate(srcPath, libPath, arg.split(), debug)
 
     print "* Generation of %d instances done in %f seconds." % (len(network.instances), time.time() - start)
 

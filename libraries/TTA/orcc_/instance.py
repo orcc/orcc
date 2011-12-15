@@ -88,7 +88,7 @@ class Instance:
         self.irom = self._readMif(self._mifFile)
         self.dram = self._readAdf(self._adfFile)
 
-    def generate(self, srcPath, buildPath, libPath, args, debug):
+    def generate(self, srcPath, libPath, args, debug):
         instanceSrcPath = os.path.join(srcPath, self.id)
         ttaPath = os.path.join(instanceSrcPath, "tta")
         vhdlPath = os.path.join(ttaPath, "vhdl")
