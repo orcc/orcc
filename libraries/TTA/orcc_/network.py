@@ -58,20 +58,13 @@ class Network:
 
     def generate(self, srcPath, buildPath, libPath, args, debug):
         print "* Initialize the generation."
-        shutil.copy(os.path.join(srcPath, "top.vhd"), buildPath)
-        shutil.copy(os.path.join(srcPath, "top_tb.vhd"), buildPath)
-        shutil.copy(os.path.join(srcPath, "top.qsf"), buildPath)
-        shutil.copy(os.path.join(srcPath, "top.qpf"), buildPath)
-        shutil.copy(os.path.join(srcPath, "top.tcl"), buildPath)
-        os.chmod(os.path.join(buildPath, "top.tcl"), stat.S_IRWXU)
-        shutil.copy(os.path.join(srcPath, "wave.do"), buildPath)
-
-        shutil.rmtree(os.path.join(buildPath, "wrapper"), ignore_errors=True)
-        shutil.copytree(os.path.join(libPath, "wrapper"), os.path.join(buildPath, "wrapper"))
-        shutil.rmtree(os.path.join(buildPath, "interface"), ignore_errors=True)
-        shutil.copytree(os.path.join(libPath, "interface"), os.path.join(buildPath, "interface"))
-        shutil.rmtree(os.path.join(buildPath, "simulation"), ignore_errors=True)
-        shutil.copytree(os.path.join(libPath, "simulation"), os.path.join(buildPath, "simulation"))
+        os.chmod(os.path.join(srcPath, "top.tcl"), stat.S_IRWXU)
+        shutil.rmtree(os.path.join(srcPath, "wrapper"), ignore_errors=True)
+        shutil.copytree(os.path.join(libPath, "wrapper"), os.path.join(srcPath, "wrapper"))
+        shutil.rmtree(os.path.join(srcPath, "interface"), ignore_errors=True)
+        shutil.copytree(os.path.join(libPath, "interface"), os.path.join(srcPath, "interface"))
+        shutil.rmtree(os.path.join(srcPath, "simulation"), ignore_errors=True)
+        shutil.copytree(os.path.join(libPath, "simulation"), os.path.join(srcPath, "simulation"))
 
         for instance in self.instances:
             if not instance.isNative:
