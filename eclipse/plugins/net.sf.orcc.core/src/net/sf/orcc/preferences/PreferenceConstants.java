@@ -46,5 +46,9 @@ public class PreferenceConstants {
 	public static final String P_SOLVER_TYPE = "solverType";
 
 	public static final String P_VHDL_LIB = "vhdlLibraryPath";
+	
+	public static final String P_TTA_LIB = "ttaLibraryPath";
+	
+	public static final String P_TTA_SCRIPT = "ttaScriptPath";
 
 }

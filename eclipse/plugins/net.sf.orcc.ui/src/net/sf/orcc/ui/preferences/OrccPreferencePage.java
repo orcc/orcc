@@ -33,6 +33,8 @@ import static net.sf.orcc.preferences.PreferenceConstants.P_JADE_TOOLBOX;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_OPTIONS;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_TYPE;
+import static net.sf.orcc.preferences.PreferenceConstants.P_TTA_LIB;
+import static net.sf.orcc.preferences.PreferenceConstants.P_TTA_SCRIPT;
 import static net.sf.orcc.preferences.PreferenceConstants.P_VHDL_LIB;
 import net.sf.orcc.OrccActivator;
 
@@ -132,6 +134,7 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 		createJadeFieldEditors(parent);
 		createSolverFieldEditors(parent);
 		createVHDLFieldEditors(parent);
+		createTtaFieldEditors(parent);
 	}
 
 	/**
@@ -150,6 +153,24 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 		addField(new FileFieldEditor(P_JADE, "Path of Jade executable:", group));
 		addField(new FileFieldEditor(P_JADE_TOOLBOX, "Path of Jade toolbox:",
 				group));
+	}
+
+	/**
+	 * Creates field editors for the TTA backend preferences.
+	 * 
+	 * @param parent
+	 *            parent composite
+	 */
+	private void createTtaFieldEditors(Composite parent) {
+		Group group = new Group(parent, SWT.NONE);
+		group.setFont(getFont());
+		group.setLayout(new GridLayout(3, false));
+		group.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+		group.setText("TTA backend");
+
+		addField(new FileFieldEditor(P_TTA_LIB, "Path of TTA library:", group));
+		addField(new FileFieldEditor(P_TTA_SCRIPT,
+				"Path of TTA generation script:", group));
 	}
 
 	/**
