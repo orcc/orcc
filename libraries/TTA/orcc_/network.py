@@ -65,17 +65,6 @@ class Network:
         shutil.copy(os.path.join(srcPath, "top.tcl"), buildPath)
         os.chmod(os.path.join(buildPath, "top.tcl"), stat.S_IRWXU)
         shutil.copy(os.path.join(srcPath, "wave.do"), buildPath)
-        iromAddrList = []
-        dramAddrList = []
-
-        for instance in self.instances:
-            if not instance.isNative:
-                instance.initializeMemories(srcPath)
-                iromAddrList.append(instance.irom.getAddr())
-                dramAddrList.append(instance.dram.getAddr())
-
-        iromAddrMax = max(iromAddrList)
-        dramAddrMax = max(dramAddrList)
 
         shutil.rmtree(os.path.join(buildPath, "wrapper"), ignore_errors=True)
         shutil.copytree(os.path.join(libPath, "wrapper"), os.path.join(buildPath, "wrapper"))
@@ -87,4 +76,4 @@ class Network:
         for instance in self.instances:
             if not instance.isNative:
                 print ">> Instance " + instance.id + "."
-                instance.generate(srcPath, buildPath, libPath, iromAddrMax, dramAddrMax, args, debug)
+                instance.generate(srcPath, buildPath, libPath, args, debug)
