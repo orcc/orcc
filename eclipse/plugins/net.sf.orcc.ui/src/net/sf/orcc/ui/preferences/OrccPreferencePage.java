@@ -34,7 +34,6 @@ import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_OPTIONS;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_TYPE;
 import static net.sf.orcc.preferences.PreferenceConstants.P_TTA_LIB;
-import static net.sf.orcc.preferences.PreferenceConstants.P_TTA_SCRIPT;
 import static net.sf.orcc.preferences.PreferenceConstants.P_VHDL_LIB;
 import net.sf.orcc.OrccActivator;
 
@@ -169,8 +168,6 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 		group.setText("TTA backend");
 
 		addField(new FileFieldEditor(P_TTA_LIB, "Path of TTA library:", group));
-		addField(new FileFieldEditor(P_TTA_SCRIPT,
-				"Path of TTA generation script:", group));
 	}
 
 	/**
