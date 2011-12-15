@@ -181,7 +181,7 @@ public class TTABackendImpl extends AbstractBackend {
 
 			// ModelSim
 			StandardPrinter tbPrinter = new StandardPrinter(
-					"net/sf/orcc/backends/tta/ModelSim_Testbench.stg", !debug,
+					"net/sf/orcc/backends/tta/VHDL_Testbench.stg", !debug,
 					false);
 			StandardPrinter tclPrinter = new StandardPrinter(
 					"net/sf/orcc/backends/tta/ModelSim_Script.stg");
@@ -221,7 +221,7 @@ public class TTABackendImpl extends AbstractBackend {
 		StandardPrinter tclPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/tta/ModelSim_Script.stg");
 		StandardPrinter tbPrinter = new StandardPrinter(
-				"net/sf/orcc/backends/tta/ModelSim_Testbench.stg");
+				"net/sf/orcc/backends/tta/VHDL_Testbench.stg");
 		StandardPrinter wavePrinter = new StandardPrinter(
 				"net/sf/orcc/backends/tta/ModelSim_Wave.stg");
 		tclPrinter.print("top.tcl", path, network);
