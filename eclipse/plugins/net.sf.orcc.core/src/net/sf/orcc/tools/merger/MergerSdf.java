@@ -41,7 +41,7 @@ import net.sf.orcc.moc.SDFMoC;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 
-public class SdfMerger extends DfSwitch<Actor> {
+public class MergerSdf extends DfSwitch<Actor> {
 
 	private static int index;
 
@@ -65,7 +65,7 @@ public class SdfMerger extends DfSwitch<Actor> {
 
 	private Copier copier;
 
-	public SdfMerger(AbstractScheduler scheduler, Copier copier) {
+	public MergerSdf(AbstractScheduler scheduler, Copier copier) {
 		this.copier = copier;
 		this.scheduler = scheduler;
 	}
