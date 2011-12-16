@@ -12,25 +12,23 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeWhile;
-import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.Invocation;
 import net.sf.orcc.moc.MocFactory;
 import net.sf.orcc.moc.SDFMoC;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 
 public class SdfToHsdf extends DfSwitch<Network> {
 
@@ -42,7 +40,9 @@ public class SdfToHsdf extends DfSwitch<Network> {
 
 	private Actor actor;
 
-	private Copier copier;
+	private Pattern inputPattern;
+
+	private Pattern outputPattern;
 
 	public SdfToHsdf(Map<Vertex, Integer> repetitions) {
 		this.repetitions = repetitions;
@@ -56,35 +56,29 @@ public class SdfToHsdf extends DfSwitch<Network> {
 	private Procedure createJoinBody() {
 		final IrFactory factory = IrFactory.eINSTANCE;
 		Procedure body = factory.createProcedure();
-		// init counter
-		Var inIdx = factory.createVar(0, factory.createTypeInt(32), "inIdx",
-				false, true);
-		Var outIdx = factory.createVar(0, factory.createTypeInt(32), "outIdx",
-				false, true);
-		body.getLocals().add(inIdx);
-		body.getLocals().add(outIdx);
-		List<Node> nodes = body.getNodes();
-		NodeBlock block = IrUtil.getLast(body.getNodes());
+		Var outVar = outputPattern.getVariable(actor.getOutput("out"));
 
-		block.add(factory.createInstAssign(outIdx, factory.createExprInt(0)));
+		int ind = 0;
 		for (Port input : actor.getInputs()) {
-			SDFMoC moc = (SDFMoC) actor.getMoC();
-			int cns = moc.getNumTokensConsumed(input);
-			NodeBlock newBlock = factory.createNodeBlock();
-			newBlock.add(factory.createInstAssign(inIdx, factory.createExprInt(0)));
-			nodes.add(newBlock);
-			// while loop
-			Expression condition = factory.createExprBinary(
-					factory.createExprVar(inIdx), OpBinary.LT,
-					factory.createExprInt(moc.getNumTokensConsumed(input)),
-					factory.createTypeBool());
-
-			NodeWhile nodeWhile = factory.createNodeWhile();
-			nodeWhile.setJoinNode(factory.createNodeBlock());
-			nodeWhile.setCondition(condition);
-			nodes.add(nodeWhile);
-
+			int cns = inputPattern.getNumTokens(input);
+			NodeBlock block = body.getLast();
 			for (int i = 0; i < cns; i++) {
+				Var tmp = factory.createVar(0, EcoreUtil.copy(input.getType()),
+						"tmp_" + ind, false, true);
+				body.getLocals().add(tmp);
+
+				Var var = inputPattern.getVariable(input);
+				List<Expression> indexes = new ArrayList<Expression>();
+				indexes.add(factory.createExprInt(i));
+				InstLoad load = factory.createInstLoad(tmp, var, indexes);
+				block.add(load);
+
+				indexes = new ArrayList<Expression>();
+				indexes.add(factory.createExprInt(ind));
+				InstStore store = factory.createInstStore(0, outVar, indexes,
+						factory.createExprVar(tmp));
+				block.add(store);
+				ind++;
 			}
 		}
 		return body;
@@ -93,13 +87,43 @@ public class SdfToHsdf extends DfSwitch<Network> {
 	private Action createJoinAction() {
 		Action action = DfFactory.eINSTANCE.createAction();
 		action.setTag(DfFactory.eINSTANCE.createTag("join"));
-		SDFMoC moc = (SDFMoC) copier.copy(actor.getMoC());
-		action.setInputPattern(moc.getInputPattern());
-		action.setOutputPattern(moc.getOutputPattern());
+
+		setPattern(action);
 
 		action.setScheduler(createJoinScheduler());
 		action.setBody(createJoinBody());
+
 		return action;
+	}
+
+	private void setPattern(Action action) {
+		// set sdf moc
+		SDFMoC moc = (SDFMoC) actor.getMoC();
+		inputPattern = EcoreUtil.copy(moc.getInputPattern());
+		outputPattern = EcoreUtil.copy(moc.getOutputPattern());
+		action.setInputPattern(inputPattern);
+		action.setOutputPattern(outputPattern);
+
+		Port output = actor.getOutput("out");
+		int prd = outputPattern.getNumTokens(output);
+		Var outVar = IrFactory.eINSTANCE.createVar(
+				0,
+				IrFactory.eINSTANCE.createTypeList(
+						IrFactory.eINSTANCE.createExprInt(prd),
+						output.getType()), "out", true, 0);
+		outputPattern.setNumTokens(output, prd);
+		outputPattern.setVariable(output, outVar);
+		for (Port input : actor.getInputs()) {
+			int cns = inputPattern.getNumTokens(input);
+			// add input var
+			Var var = IrFactory.eINSTANCE.createVar(
+					0,
+					IrFactory.eINSTANCE.createTypeList(
+							IrFactory.eINSTANCE.createExprInt(cns),
+							input.getType()), input.getName(), false, true);
+			inputPattern.setNumTokens(input, cns);
+			inputPattern.setVariable(input, var);
+		}
 	}
 
 	/**
@@ -181,8 +205,6 @@ public class SdfToHsdf extends DfSwitch<Network> {
 	 */
 	@Override
 	public Network caseNetwork(Network network) {
-		copier = new Copier();
-
 		List<Instance> instancesToRemove = new ArrayList<Instance>();
 		List<Connection> connections = new ArrayList<Connection>(
 				network.getConnections());
@@ -255,7 +277,6 @@ public class SdfToHsdf extends DfSwitch<Network> {
 
 		network.getInstances().removeAll(instancesToRemove);
 
-		copier = null;
 		return network;
 	}
 }
