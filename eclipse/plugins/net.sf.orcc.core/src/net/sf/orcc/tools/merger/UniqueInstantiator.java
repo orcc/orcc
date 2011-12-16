@@ -25,7 +25,7 @@ public class UniqueInstantiator extends DfSwitch<Void> {
 				instance.setEntity(copy);
 				int val = actors.get(actor);
 				copy.setName(actor.getName() + "_" + val);
-				actors.put(actor, val++);
+				actors.put(actor, ++val);
 			} else {
 				actors.put(actor, 0);
 			}

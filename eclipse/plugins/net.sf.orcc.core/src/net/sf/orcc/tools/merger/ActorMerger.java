@@ -164,7 +164,7 @@ public class ActorMerger extends DfSwitch<Void> {
 					+ scheduler.getSchedule());
 
 			// merge vertices inside a single actor
-			Actor superActor = new MergerSdf(scheduler, copier)
+			Actor superActor = new MergerHsdf(scheduler, copier)
 					.doSwitch(subNetwork);
 
 			// update parent network
