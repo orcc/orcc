@@ -38,9 +38,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.TreeIterator;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 
 /**
  * This class contains helper methods for Ecore models.
@@ -101,6 +103,21 @@ public class EcoreHelper {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Deserializes the EObject stored in the given file, and returns it.
+	 * 
+	 * @param file
+	 *            a file whose extension is registered within EMF
+	 * @return the EObject serialized in the given file
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getEObject(ResourceSet set, IFile file) {
+		Resource resource = set.getResource(URI.createPlatformResourceURI(file
+				.getFullPath().toString(), true), true);
+		T eObject = (T) resource.getContents().get(0);
+		return eObject;
 	}
 
 	/**

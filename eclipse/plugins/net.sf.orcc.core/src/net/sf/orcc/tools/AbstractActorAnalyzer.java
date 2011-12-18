@@ -30,7 +30,7 @@ package net.sf.orcc.tools;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.WriteListener;
 
 import org.eclipse.core.resources.IFile;
@@ -92,11 +92,9 @@ public abstract class AbstractActorAnalyzer implements ActorAnalyzer {
 			throws OrccException {
 		listener.writeText("Parsing Actor...\n");
 
-		Actor actor;
-
 		IFile file = null;
 		ResourceSet set = new ResourceSetImpl();
-		actor = (Actor) IrUtil.deserializeEntity(set, file);
+		Actor actor = EcoreHelper.getEObject(set, file);
 
 		if (isCanceled()) {
 			return;

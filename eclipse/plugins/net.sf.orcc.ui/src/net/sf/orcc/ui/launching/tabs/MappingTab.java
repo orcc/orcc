@@ -46,8 +46,8 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.transformations.Instantiator;
-import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.ui.OrccUiActivator;
+import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -382,7 +382,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 
 		if (xdfFile != null) {
 			ResourceSet set = new ResourceSetImpl();
-			network = IrUtil.deserializeEntity(set, xdfFile);
+			network = EcoreHelper.getEObject(set, xdfFile);
 			network = new Instantiator().doSwitch(network);
 
 			Set<String> instances = new HashSet<String>();

@@ -56,6 +56,7 @@ import net.sf.orcc.ir.util.ActorInterpreter;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.runtime.Fifo;
 import net.sf.orcc.runtime.impl.GenericSource;
+import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -240,7 +241,7 @@ public class SlowSimulator extends AbstractSimulator {
 
 			IFile file = OrccUtil.getFile(project, xdfFile, "xdf");
 			ResourceSet set = new ResourceSetImpl();
-			Network network = IrUtil.deserializeEntity(set, file);
+			Network network = EcoreHelper.getEObject(set, file);
 
 			// instantiate and flattens network
 			network = new Instantiator().doSwitch(network);

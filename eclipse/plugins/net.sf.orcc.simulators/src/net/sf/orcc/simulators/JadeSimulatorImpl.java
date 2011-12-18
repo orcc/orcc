@@ -50,7 +50,7 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.df.transformations.NetworkFlattener;
-import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.EcoreHelper;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -116,7 +116,7 @@ public class JadeSimulatorImpl extends AbstractSimulator {
 
 	private void flatten() {
 		ResourceSet set = new ResourceSetImpl();
-		Network network = IrUtil.deserializeEntity(set, xdfFile);
+		Network network = EcoreHelper.getEObject(set, xdfFile);
 		// instantiate networks (but not actors) and flattens network
 		network = new Instantiator(true).doSwitch(network);
 		new NetworkFlattener().doSwitch(network);

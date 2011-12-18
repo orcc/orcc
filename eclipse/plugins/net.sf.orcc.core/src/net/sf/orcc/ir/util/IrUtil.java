@@ -48,7 +48,6 @@ import net.sf.orcc.ir.impl.IrResourceFactoryImpl;
 import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.OrccUtil;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.util.TreeIterator;
@@ -222,23 +221,6 @@ public class IrUtil {
 		while (!eObjects.isEmpty()) {
 			delete(eObjects.get(0));
 		}
-	}
-
-	/**
-	 * Deserializes the XMI representation of an actor/unit stored in the given
-	 * file, and returns this actor/unit.
-	 * 
-	 * @param file
-	 *            a .ir file
-	 * @return the actor serialized with XMI in the given file
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T extends Nameable> T deserializeEntity(ResourceSet set,
-			IFile file) {
-		Resource resource = set.getResource(URI.createPlatformResourceURI(file
-				.getFullPath().toString(), true), true);
-		T actor = (T) resource.getContents().get(0);
-		return actor;
 	}
 
 	/**

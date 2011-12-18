@@ -43,7 +43,7 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transformations.Instantiator;
-import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.WriteListener;
 
@@ -171,7 +171,7 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		IFile xdfFile = root.getFile(new Path(inputFile));
 
-		Network network = IrUtil.deserializeEntity(set, xdfFile);
+		Network network = EcoreHelper.getEObject(set, xdfFile);
 		if (isCanceled()) {
 			return;
 		}

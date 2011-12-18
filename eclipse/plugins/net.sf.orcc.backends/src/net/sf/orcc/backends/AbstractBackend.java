@@ -51,7 +51,7 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.WriteListener;
 
@@ -151,7 +151,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		ResourceSet set = new ResourceSetImpl();
 
 		// parses top network
-		Network network = IrUtil.deserializeEntity(set, inputFile);
+		Network network = EcoreHelper.getEObject(set, inputFile);
 		if (isCanceled()) {
 			return;
 		}

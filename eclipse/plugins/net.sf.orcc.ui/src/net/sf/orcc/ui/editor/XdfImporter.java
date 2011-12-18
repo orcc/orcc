@@ -49,15 +49,15 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Entity;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.ExpressionPrinter;
-import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.EcoreHelper;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -144,7 +144,7 @@ public class XdfImporter {
 			vertex.setValue("port type", port.getType().toString());
 			vertex.setValue("native", port.isNative());
 			vertex.setValue(PARAMETER_ID, port.getName());
-			
+
 			// add vertex
 			vertexMap.put(port, vertex);
 			graph.addVertex(vertex);
@@ -203,7 +203,7 @@ public class XdfImporter {
 		vertexMap = new HashMap<net.sf.orcc.df.Vertex, Vertex>();
 
 		ResourceSet set = new ResourceSetImpl();
-		Network network = IrUtil.deserializeEntity(set, file);
+		Network network = EcoreHelper.getEObject(set, file);
 
 		Configuration configuration = getDefault().getConfiguration("XDF");
 		ObjectType type = configuration.getGraphType("XML Dataflow Network");
