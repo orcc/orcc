@@ -428,23 +428,19 @@ public class MergerHsdf extends DfSwitch<Actor> {
 	 * Create the static schedule of the action
 	 * 
 	 * @param procedure
-	 * @param schedule
-	 * @param nodes
 	 */
-	private void createStaticSchedule(Procedure procedure, Schedule schedule,
-			List<Node> nodes) {
-		for (Iterand iterand : schedule.getIterands()) {
-			if (iterand.isVertex()) {
-				Instance instance = (Instance) iterand.getVertex();
-				CSDFMoC moc = (CSDFMoC) instance.getMoC();
-				NodeBlock block = IrUtil.getLast(nodes);
-				for (Invocation invocation : moc.getInvocations()) {
-					Action action = invocation.getAction();
-					Procedure proc = superActor.getProcedure(instance.getName()
-							+ "_" + action.getName());
-					block.add(IrFactory.eINSTANCE.createInstCall(0, null, proc,
-							new ArrayList<Expression>()));
-				}
+	private void createStaticSchedule(Procedure procedure) {
+		TopologicalSorter sorter = new TopologicalSorter(network);
+		for (Vertex vertex : sorter.topologicalSort()) {
+			Instance instance = (Instance) vertex;
+			CSDFMoC moc = (CSDFMoC) instance.getMoC();
+			NodeBlock block = procedure.getLast();
+			for (Invocation invocation : moc.getInvocations()) {
+				Action action = invocation.getAction();
+				Procedure proc = superActor.getProcedure(instance.getName()
+						+ "_" + action.getName());
+				block.add(IrFactory.eINSTANCE.createInstCall(0, null, proc,
+						new ArrayList<Expression>()));
 			}
 		}
 	}
@@ -487,8 +483,7 @@ public class MergerHsdf extends DfSwitch<Actor> {
 
 		createCopiesFromInputs(procedure, ip);
 
-		createStaticSchedule(procedure, scheduler.getSchedule(),
-				procedure.getNodes());
+		createStaticSchedule(procedure);
 
 		createCopiesToOutputs(procedure, op);
 

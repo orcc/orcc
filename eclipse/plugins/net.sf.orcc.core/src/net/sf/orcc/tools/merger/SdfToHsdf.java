@@ -17,12 +17,17 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.ExpressionEvaluator;
+import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.Invocation;
 import net.sf.orcc.moc.MocFactory;
@@ -58,29 +63,63 @@ public class SdfToHsdf extends DfSwitch<Network> {
 		Procedure body = factory.createProcedure();
 		Var outVar = outputPattern.getVariable(actor.getOutput("out"));
 
+		Var loop = factory.createVar(0, factory.createTypeInt(32), "idx",
+				false, true);
+
+		body.getLast().add(
+				factory.createInstAssign(loop, factory.createExprInt(0)));
+
+		int cns = inputPattern.getNumTokens(actor.getInputs().get(0));
+
+		Expression condition = factory.createExprBinary(
+				factory.createExprVar(loop), OpBinary.LT,
+				factory.createExprInt(cns), factory.createTypeBool());
+
+		NodeWhile nodeWhile = factory.createNodeWhile();
+		nodeWhile.setJoinNode(factory.createNodeBlock());
+		nodeWhile.setCondition(condition);
+		body.getNodes().add(nodeWhile);
+
+		NodeBlock whileBlock = IrUtil.getLast(nodeWhile.getNodes());
+
 		int ind = 0;
 		for (Port input : actor.getInputs()) {
-			int cns = inputPattern.getNumTokens(input);
-			NodeBlock block = body.getLast();
-			for (int i = 0; i < cns; i++) {
-				Var tmp = factory.createVar(0, EcoreUtil.copy(input.getType()),
-						"tmp_" + ind, false, true);
-				body.getLocals().add(tmp);
+			Var tmp = factory.createVar(0, EcoreUtil.copy(input.getType()),
+					"tmp_" + ind, false, true);
+			body.getLocals().add(tmp);
 
-				Var var = inputPattern.getVariable(input);
-				List<Expression> indexes = new ArrayList<Expression>();
-				indexes.add(factory.createExprInt(i));
-				InstLoad load = factory.createInstLoad(tmp, var, indexes);
-				block.add(load);
+			Var var = inputPattern.getVariable(input);
+			List<Expression> indexes = new ArrayList<Expression>();
+			indexes.add(factory.createExprVar(loop));
+			InstLoad load = factory.createInstLoad(tmp, var, indexes);
 
-				indexes = new ArrayList<Expression>();
-				indexes.add(factory.createExprInt(ind));
-				InstStore store = factory.createInstStore(0, outVar, indexes,
-						factory.createExprVar(tmp));
-				block.add(store);
-				ind++;
-			}
+			whileBlock.add(load);
+
+			Expression offset = IrFactory.eINSTANCE.createExprBinary(
+					factory.createExprInt(ind), OpBinary.TIMES,
+					factory.createExprInt(cns), factory.createTypeInt(32));
+
+			offset = factory.createExprInt((Integer) new ExpressionEvaluator()
+					.doSwitch(offset));
+
+			Expression index = IrFactory.eINSTANCE.createExprBinary(
+					factory.createExprVar(loop), OpBinary.PLUS, offset,
+					factory.createTypeInt(32));
+
+			indexes = new ArrayList<Expression>();
+			indexes.add(index);
+
+			InstStore store = factory.createInstStore(0, outVar, indexes,
+					factory.createExprVar(tmp));
+			whileBlock.add(store);
+			ind++;
 		}
+		Expression expr = factory.createExprBinary(factory.createExprVar(loop),
+				OpBinary.PLUS, factory.createExprInt(1),
+				factory.createTypeInt(32));
+		InstAssign assign = factory.createInstAssign(loop, expr);
+		whileBlock.add(assign);
+
 		return body;
 	}
 
