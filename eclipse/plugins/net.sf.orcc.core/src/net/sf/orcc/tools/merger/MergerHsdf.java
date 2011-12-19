@@ -125,10 +125,7 @@ public class MergerHsdf extends DfSwitch<Actor> {
 
 	private Map<Port, Var> buffersMap = new HashMap<Port, Var>();
 
-	private Copier copier;
-
-	public MergerHsdf(AbstractScheduler scheduler, Copier copier) {
-		this.copier = copier;
+	public MergerHsdf(AbstractScheduler scheduler) {
 		this.scheduler = scheduler;
 	}
 
@@ -144,6 +141,7 @@ public class MergerHsdf extends DfSwitch<Actor> {
 	 * 
 	 */
 	private void createPorts() {
+		Copier copier = new Copier();
 		SDFMoC sdfMoC = MocFactory.eINSTANCE.createSDFMoC();
 		superActor.setMoC(sdfMoC);
 		superActor.getInputs().addAll(copier.copyAll(network.getInputs()));
@@ -456,15 +454,6 @@ public class MergerHsdf extends DfSwitch<Actor> {
 
 		Procedure procedure = factory.createProcedure(ACTION_NAME, 0,
 				IrFactory.eINSTANCE.createTypeVoid());
-
-		// Add loop counter(s)
-		int i = 0;
-		do { // one loop var is required even if the schedule as a depth of 0
-			Var counter = factory.createVar(0, factory.createTypeInt(32),
-					"idx_" + i, false, true);
-			procedure.getLocals().add(counter);
-			i++;
-		} while (i < scheduler.getDepth());
 
 		// Add temp vars to load/store data from ports to buffers
 		for (Port port : ip.getPorts()) {

@@ -77,6 +77,7 @@ public abstract class AbstractScheduler implements IScheduler {
 						tokens.put(connection, tokens.get(connection) - cns);
 					}
 				}
+				
 				for (Connection connection : vertex.getOutgoing()) {
 					if (connection.getTarget().isInstance()) {
 						int current = tokens.get(connection);

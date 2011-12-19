@@ -61,25 +61,18 @@ public class SdfToHsdf extends DfSwitch<Network> {
 	private Procedure createJoinBody() {
 		final IrFactory factory = IrFactory.eINSTANCE;
 		Procedure body = factory.createProcedure();
-		Var outVar = outputPattern.getVariable(actor.getOutput("out"));
-
 		Var loop = factory.createVar(0, factory.createTypeInt(32), "idx",
 				false, true);
-
 		body.getLast().add(
 				factory.createInstAssign(loop, factory.createExprInt(0)));
-
 		int cns = inputPattern.getNumTokens(actor.getInputs().get(0));
-
 		Expression condition = factory.createExprBinary(
 				factory.createExprVar(loop), OpBinary.LT,
 				factory.createExprInt(cns), factory.createTypeBool());
-
 		NodeWhile nodeWhile = factory.createNodeWhile();
 		nodeWhile.setJoinNode(factory.createNodeBlock());
 		nodeWhile.setCondition(condition);
 		body.getNodes().add(nodeWhile);
-
 		NodeBlock whileBlock = IrUtil.getLast(nodeWhile.getNodes());
 
 		int ind = 0;
@@ -88,15 +81,15 @@ public class SdfToHsdf extends DfSwitch<Network> {
 					"tmp_" + ind, false, true);
 			body.getLocals().add(tmp);
 
-			Var var = inputPattern.getVariable(input);
 			List<Expression> indexes = new ArrayList<Expression>();
 			indexes.add(factory.createExprVar(loop));
-			InstLoad load = factory.createInstLoad(tmp, var, indexes);
+			InstLoad load = factory.createInstLoad(tmp,
+					inputPattern.getVariable(input), indexes);
 
 			whileBlock.add(load);
 
 			Expression offset = IrFactory.eINSTANCE.createExprBinary(
-					factory.createExprInt(ind), OpBinary.TIMES,
+					factory.createExprInt(ind++), OpBinary.TIMES,
 					factory.createExprInt(cns), factory.createTypeInt(32));
 
 			offset = factory.createExprInt((Integer) new ExpressionEvaluator()
@@ -105,14 +98,12 @@ public class SdfToHsdf extends DfSwitch<Network> {
 			Expression index = IrFactory.eINSTANCE.createExprBinary(
 					factory.createExprVar(loop), OpBinary.PLUS, offset,
 					factory.createTypeInt(32));
-
 			indexes = new ArrayList<Expression>();
 			indexes.add(index);
-
-			InstStore store = factory.createInstStore(0, outVar, indexes,
+			InstStore store = factory.createInstStore(0,
+					outputPattern.getVariable(actor.getOutput("out")), indexes,
 					factory.createExprVar(tmp));
 			whileBlock.add(store);
-			ind++;
 		}
 		Expression expr = factory.createExprBinary(factory.createExprVar(loop),
 				OpBinary.PLUS, factory.createExprInt(1),
@@ -126,17 +117,15 @@ public class SdfToHsdf extends DfSwitch<Network> {
 	private Action createJoinAction() {
 		Action action = DfFactory.eINSTANCE.createAction();
 		action.setTag(DfFactory.eINSTANCE.createTag("join"));
-
-		setPattern(action);
-
+		setJoinPattern(action);
 		action.setScheduler(createJoinScheduler());
 		action.setBody(createJoinBody());
-
 		return action;
 	}
 
-	private void setPattern(Action action) {
-		// set sdf moc
+	private void setJoinPattern(Action action) {
+		final IrFactory factory = IrFactory.eINSTANCE;
+
 		SDFMoC moc = (SDFMoC) actor.getMoC();
 		inputPattern = EcoreUtil.copy(moc.getInputPattern());
 		outputPattern = EcoreUtil.copy(moc.getOutputPattern());
@@ -145,20 +134,18 @@ public class SdfToHsdf extends DfSwitch<Network> {
 
 		Port output = actor.getOutput("out");
 		int prd = outputPattern.getNumTokens(output);
-		Var outVar = IrFactory.eINSTANCE.createVar(
+		Var outVar = factory.createVar(
 				0,
-				IrFactory.eINSTANCE.createTypeList(
-						IrFactory.eINSTANCE.createExprInt(prd),
+				factory.createTypeList(factory.createExprInt(prd),
 						output.getType()), "out", true, 0);
 		outputPattern.setNumTokens(output, prd);
 		outputPattern.setVariable(output, outVar);
 		for (Port input : actor.getInputs()) {
 			int cns = inputPattern.getNumTokens(input);
 			// add input var
-			Var var = IrFactory.eINSTANCE.createVar(
+			Var var = factory.createVar(
 					0,
-					IrFactory.eINSTANCE.createTypeList(
-							IrFactory.eINSTANCE.createExprInt(cns),
+					factory.createTypeList(factory.createExprInt(cns),
 							input.getType()), input.getName(), false, true);
 			inputPattern.setNumTokens(input, cns);
 			inputPattern.setVariable(input, var);
@@ -205,6 +192,105 @@ public class SdfToHsdf extends DfSwitch<Network> {
 		return join;
 	}
 
+	private void setSplitPattern(Action action) {
+		final IrFactory factory = IrFactory.eINSTANCE;
+
+		SDFMoC moc = (SDFMoC) actor.getMoC();
+		inputPattern = EcoreUtil.copy(moc.getInputPattern());
+		outputPattern = EcoreUtil.copy(moc.getOutputPattern());
+		action.setInputPattern(inputPattern);
+		action.setOutputPattern(outputPattern);
+
+		Port input = actor.getInput("in");
+		int cns = inputPattern.getNumTokens(input);
+		Var outVar = factory.createVar(
+				0,
+				factory.createTypeList(factory.createExprInt(cns),
+						input.getType()), "in", true, 0);
+		inputPattern.setNumTokens(input, cns);
+		inputPattern.setVariable(input, outVar);
+		for (Port output : actor.getOutputs()) {
+			int prd = outputPattern.getNumTokens(output);
+			Var var = factory.createVar(
+					0,
+					factory.createTypeList(factory.createExprInt(prd),
+							input.getType()), output.getName(), false, true);
+			outputPattern.setNumTokens(output, prd);
+			outputPattern.setVariable(output, var);
+		}
+	}
+
+	private Procedure createSplitScheduler() {
+		Procedure sched = IrFactory.eINSTANCE.createProcedure();
+		return sched;
+	}
+
+	private Procedure createSplitBody() {
+		final IrFactory factory = IrFactory.eINSTANCE;
+		Procedure body = factory.createProcedure();
+		Var loop = factory.createVar(0, factory.createTypeInt(32), "idx",
+				false, true);
+		body.getLast().add(
+				factory.createInstAssign(loop, factory.createExprInt(0)));
+		int prd = outputPattern.getNumTokens(actor.getOutputs().get(0));
+
+		Expression condition = factory.createExprBinary(
+				factory.createExprVar(loop), OpBinary.LT,
+				factory.createExprInt(prd), factory.createTypeBool());
+		NodeWhile nodeWhile = factory.createNodeWhile();
+		nodeWhile.setJoinNode(factory.createNodeBlock());
+		nodeWhile.setCondition(condition);
+		body.getNodes().add(nodeWhile);
+		NodeBlock whileBlock = IrUtil.getLast(nodeWhile.getNodes());
+
+		int ind = 0;
+		for (Port output : actor.getOutputs()) {
+			Var tmp = factory.createVar(0, EcoreUtil.copy(output.getType()),
+					"tmp_" + ind, false, true);
+			body.getLocals().add(tmp);
+
+			List<Expression> indexes = new ArrayList<Expression>();
+			indexes.add(factory.createExprVar(loop));
+			InstLoad load = factory.createInstLoad(tmp,
+					inputPattern.getVariable(actor.getInput("in")), indexes);
+
+			whileBlock.add(load);
+
+			Expression offset = factory.createExprBinary(
+					factory.createExprInt(ind++), OpBinary.TIMES,
+					factory.createExprInt(prd), factory.createTypeInt(32));
+
+			offset = factory.createExprInt((Integer) new ExpressionEvaluator()
+					.doSwitch(offset));
+
+			Expression index = factory.createExprBinary(
+					factory.createExprVar(loop), OpBinary.PLUS, offset,
+					factory.createTypeInt(32));
+			indexes = new ArrayList<Expression>();
+			indexes.add(index);
+			InstStore store = factory.createInstStore(0,
+					outputPattern.getVariable(output), indexes,
+					factory.createExprVar(tmp));
+			whileBlock.add(store);
+		}
+		Expression expr = factory.createExprBinary(factory.createExprVar(loop),
+				OpBinary.PLUS, factory.createExprInt(1),
+				factory.createTypeInt(32));
+		InstAssign assign = factory.createInstAssign(loop, expr);
+		whileBlock.add(assign);
+
+		return body;
+	}
+
+	private Action createSplitAction() {
+		Action action = DfFactory.eINSTANCE.createAction();
+		action.setTag(DfFactory.eINSTANCE.createTag("split"));
+		setSplitPattern(action);
+		action.setScheduler(createSplitScheduler());
+		action.setBody(createSplitBody());
+		return action;
+	}
+
 	/**
 	 * 
 	 * @param connection
@@ -236,6 +322,11 @@ public class SdfToHsdf extends DfSwitch<Network> {
 			splitMoc.getOutputPattern().setNumTokens(srcPort, cns);
 		}
 
+		actor = split;
+		Action action = createSplitAction();
+		split.getActions().add(action);
+		Invocation invocation = eINSTANCE.createInvocation(action);
+		splitMoc.getInvocations().add(invocation);
 		return split;
 	}
 
@@ -318,4 +409,5 @@ public class SdfToHsdf extends DfSwitch<Network> {
 
 		return network;
 	}
+
 }

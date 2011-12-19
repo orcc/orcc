@@ -30,7 +30,6 @@
 package net.sf.orcc.tools.merger;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
@@ -68,22 +67,18 @@ public class RepetitionsAnalyzer {
 	 * 
 	 */
 	private void analyze() {
-		// must be an instance's vertex
-		Instance initialVertex = network.getInstances().iterator().next();
+		calculateRate(network.getInstances().get(0), new Rational(1, 1));
 
-		calculateRate(initialVertex, new Rational(1, 1));
-
-		Iterator<Rational> it = rationals.values().iterator();
-		int lcm = it.next().getDenominator();
-		while (it.hasNext()) {
-			lcm = Rational.lcm(lcm, it.next().getDenominator());
+		// get least common denominator
+		int lcm = 1;
+		for (Rational rat : rationals.values()) {
+			lcm = Rational.lcm(lcm, rat.getDenominator());
 		}
 
-		for (Map.Entry<Vertex, Rational> entry : rationals.entrySet()) {
-			Vertex vertex = entry.getKey();
-			Rational rat = entry.getValue();
-			int rep = rat.getNumerator() * lcm / rat.getDenominator();
-			repetitions.put(vertex, rep);
+		for (Vertex vertex : rationals.keySet()) {
+			Rational rat = rationals.get(vertex);
+			repetitions.put(vertex,
+					rat.getNumerator() * lcm / rat.getDenominator());
 		}
 
 		checkConsistency();
