@@ -63,10 +63,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 
 	private Map<Port, Var> buffersMap = new HashMap<Port, Var>();
 
-	private Copier copier;
-
-	public MergerSdf(AbstractScheduler scheduler, Copier copier) {
-		this.copier = copier;
+	public MergerSdf(AbstractScheduler scheduler) {
 		this.scheduler = scheduler;
 	}
 
@@ -89,6 +86,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 	 * 
 	 */
 	private void createPorts() {
+		Copier copier = new Copier();
 		SDFMoC sdfMoC = MocFactory.eINSTANCE.createSDFMoC();
 		superActor.setMoC(sdfMoC);
 		superActor.getInputs().addAll(copier.copyAll(network.getInputs()));
