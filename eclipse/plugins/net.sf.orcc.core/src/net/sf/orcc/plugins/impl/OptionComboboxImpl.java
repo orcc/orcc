@@ -39,7 +39,6 @@ import net.sf.orcc.plugins.Option;
  * This class defines the implementation of a combox option.
  * 
  * @author Jerome Gorin
- * 
  */
 public class OptionComboboxImpl extends PluginOptionImpl implements
 		OptionComboBox {

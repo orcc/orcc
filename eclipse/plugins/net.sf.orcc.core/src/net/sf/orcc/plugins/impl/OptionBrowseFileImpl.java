@@ -34,7 +34,6 @@ import net.sf.orcc.plugins.OptionBrowseFile;
  * This class defines the implementation of a plugin option.
  * 
  * @author Matthieu Wipliez
- * 
  */
 public class OptionBrowseFileImpl extends PluginOptionImpl implements
 		OptionBrowseFile {

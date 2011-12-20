@@ -154,6 +154,19 @@
    </element>
 
    <element name="selectNetwork" type="string">
+      <annotation>
+         <documentation>
+            This option contains the top network of an application
+         </documentation>
+      </annotation>
+   </element>
+
+   <element name="selectNetworks" type="string">
+      <annotation>
+         <documentation>
+            This option contains several networks that can be given to a back-end.
+         </documentation>
+      </annotation>
    </element>
 
    <element name="optionRef">

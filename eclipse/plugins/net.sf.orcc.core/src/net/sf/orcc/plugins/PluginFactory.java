@@ -41,6 +41,7 @@ import net.sf.orcc.plugins.impl.OptionBrowseFileImpl;
 import net.sf.orcc.plugins.impl.OptionCheckboxImpl;
 import net.sf.orcc.plugins.impl.OptionComboboxImpl;
 import net.sf.orcc.plugins.impl.OptionSelectNetworkImpl;
+import net.sf.orcc.plugins.impl.OptionSelectNetworksImpl;
 import net.sf.orcc.plugins.impl.OptionTextBoxImpl;
 import net.sf.orcc.plugins.impl.PluginOptionImpl;
 
@@ -237,7 +238,9 @@ public class PluginFactory {
 			} else if (type.equals("comboBox")) {
 				option = parseCombobox(child);
 			} else if (type.equals("selectNetwork")) {
-				option = parseSelectNetwork(child);
+				option = new OptionSelectNetworkImpl();
+			} else if (type.equals("selectNetworks")) {
+				option = new OptionSelectNetworksImpl();
 			} else if (type.equals("textBox")) {
 				option = parseTexbox(child);
 			} else {
@@ -309,10 +312,6 @@ public class PluginFactory {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	private Option parseSelectNetwork(IConfigurationElement child) {
-		return new OptionSelectNetworkImpl();
 	}
 
 	/**

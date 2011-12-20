@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IRISA
+ * Copyright (c) 2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the IRISA nor the names of its
+ *   * Neither the name of the IETR/INSA of Rennes nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -26,36 +26,14 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.plugins.impl;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import net.sf.orcc.plugins.Option;
-import net.sf.orcc.plugins.OptionTextBox;
+package net.sf.orcc.plugins;
 
 /**
- * This class defines the implementation of a textbox option.
+ * This interface defines the option "selectNetworks".
  * 
- * @author Herve Yviquel
+ * @author Matthieu Wipliez
+ * 
  */
-public class OptionTextBoxImpl extends PluginOptionImpl implements
-		OptionTextBox {
-
-	private List<Option> options;
-
-	public OptionTextBoxImpl() {
-		options = new ArrayList<Option>(0);
-	}
-
-	@Override
-	public List<Option> getOptions() {
-		return options;
-	}
-
-	@Override
-	public String toString() {
-		return super.toString() + ", options: " + getOptions();
-	}
+public interface OptionSelectNetworks extends Option {
 
 }

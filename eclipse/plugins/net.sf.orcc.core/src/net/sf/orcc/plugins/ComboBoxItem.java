@@ -30,7 +30,7 @@ package net.sf.orcc.plugins;
 
 import java.util.List;
 
-public interface ComboBoxItem extends Option {
+public interface ComboBoxItem {
 
 	/**
 	 * Returns the id of the item.

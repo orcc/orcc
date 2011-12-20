@@ -34,7 +34,6 @@ import net.sf.orcc.plugins.Option;
  * This class defines the implementation of a plugin option.
  * 
  * @author Matthieu Wipliez
- * 
  */
 public class PluginOptionImpl implements Option {
 

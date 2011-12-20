@@ -34,7 +34,7 @@ import java.util.List;
 import net.sf.orcc.plugins.ComboBoxItem;
 import net.sf.orcc.plugins.Option;
 
-public class ComboboxItemImpl extends PluginOptionImpl implements ComboBoxItem {
+public class ComboboxItemImpl implements ComboBoxItem {
 
 	private String id;
 

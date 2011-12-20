@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2010-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -31,11 +31,12 @@ package net.sf.orcc.ui.launching.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.plugins.Option;
 import net.sf.orcc.plugins.OptionBrowseFile;
 import net.sf.orcc.plugins.OptionCheckbox;
 import net.sf.orcc.plugins.OptionComboBox;
-import net.sf.orcc.plugins.Option;
 import net.sf.orcc.plugins.OptionSelectNetwork;
+import net.sf.orcc.plugins.OptionSelectNetworks;
 import net.sf.orcc.plugins.OptionTextBox;
 import net.sf.orcc.ui.launching.OptionWidget;
 import net.sf.orcc.ui.launching.tabs.OrccAbstractSettingsTab;
@@ -50,7 +51,6 @@ import org.eclipse.swt.widgets.Composite;
  * 
  * @author Matthieu Wipliez
  * @author Herve Yviquel
- * 
  */
 public class OptionWidgetManager {
 
@@ -66,10 +66,11 @@ public class OptionWidgetManager {
 			return new ComboBoxOptionWidget(tab, (OptionComboBox) option,
 					parent);
 		} else if (option instanceof OptionTextBox) {
-			return new TextBoxOptionWidget(tab, (OptionTextBox) option, parent);
+			return new TextBoxOptionWidget(tab, option, parent);
 		} else if (option instanceof OptionSelectNetwork) {
-			return new SelectNetworkOptionWidget(tab,
-					(OptionSelectNetwork) option, parent);
+			return new SelectNetworkOptionWidget(tab, option, parent);
+		} else if (option instanceof OptionSelectNetworks) {
+			return new SelectNetworksOptionWidget(tab, option, parent);
 		} else {
 			return null;
 		}

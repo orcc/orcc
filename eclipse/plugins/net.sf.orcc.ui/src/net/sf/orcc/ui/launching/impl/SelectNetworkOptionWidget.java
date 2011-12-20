@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2010-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,21 +28,16 @@
  */
 package net.sf.orcc.ui.launching.impl;
 
-import net.sf.orcc.plugins.OptionSelectNetwork;
+import net.sf.orcc.plugins.Option;
 import net.sf.orcc.ui.editor.FilteredRefinementDialog;
-import net.sf.orcc.ui.launching.OptionWidget;
 import net.sf.orcc.ui.launching.tabs.OrccAbstractSettingsTab;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
@@ -55,64 +50,34 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * 
- * Class that create input file interface into plugin options.
+ * This class defines the select network option widget.
  * 
  * @author Jerome Gorin
  * @author Matthieu Wipliez
- * 
  */
-public class SelectNetworkOptionWidget implements ModifyListener, OptionWidget {
+public class SelectNetworkOptionWidget extends TextBoxOptionWidget {
 
 	/**
-	 * composite that contains the components of this option
-	 */
-	private Composite composite;
-
-	private OrccAbstractSettingsTab launchConfigurationTab;
-
-	private OptionSelectNetwork option;
-
-	/**
-	 * Text connected with the option
-	 */
-	private Text text;
-
-	private boolean updateLaunchConfiguration;
-
-	/**
-	 * The value of this option.
-	 */
-	private String value;
-
-	/**
-	 * Creates a new input file option.
+	 * Creates a new selectNetwork option widget.
 	 */
 	public SelectNetworkOptionWidget(OrccAbstractSettingsTab tab,
-			OptionSelectNetwork option, Composite parent) {
-		this.launchConfigurationTab = tab;
-		this.option = option;
-		this.value = "";
-
-		createInputFile(parent);
+			Option option, Composite parent) {
+		super(tab, option, parent);
 	}
 
-	/**
-	 * Creates the interface of the BrowseFile text into the given group
-	 * 
-	 * @param font
-	 *            Font used in the interface
-	 * @param composite
-	 *            Group to add the input file interface
-	 */
-	private void createInputFile(Composite parent) {
-		composite = new Composite(parent, SWT.NONE);
+	final protected boolean checkNetworkExists(IProject project, String name) {
+		IResource file = OrccUtil.getFile(project, name, "xdf");
+		return (file != null && file.exists());
+	}
+
+	@Override
+	protected Composite createControl(Composite parent) {
+		final Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new GridLayout(3, false));
 
 		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
 		data.horizontalSpan = 3;
 		composite.setLayoutData(data);
-		hide();
 
 		Font font = parent.getFont();
 
@@ -128,7 +93,6 @@ public class SelectNetworkOptionWidget implements ModifyListener, OptionWidget {
 		text.setFont(font);
 		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		text.setLayoutData(data);
-		text.setText(value);
 		text.addModifyListener(this);
 
 		Button buttonBrowse = new Button(composite, SWT.PUSH);
@@ -148,62 +112,23 @@ public class SelectNetworkOptionWidget implements ModifyListener, OptionWidget {
 			}
 		});
 
+		return composite;
 	}
 
 	@Override
-	public void hide() {
-		composite.setVisible(false);
-		((GridData) composite.getLayoutData()).exclude = true;
-		launchConfigurationTab.updateSize();
-	}
-
-	@Override
-	public void initializeFrom(ILaunchConfiguration configuration)
-			throws CoreException {
-		updateLaunchConfiguration = false;
-		text.setText(configuration.getAttribute(option.getIdentifier(),
-				option.getDefaultValue()));
-		updateLaunchConfiguration = true;
-	}
-
-	/**
-	 * Tests if the option is valid
-	 * 
-	 * @return a boolean representing the validation of the option
-	 */
 	public boolean isValid(ILaunchConfiguration launchConfig) {
-		if (value.isEmpty()) {
-			launchConfigurationTab.setErrorMessage("The \"" + option.getName()
-					+ "\" field is empty");
-			return false;
-		}
+		if (super.isValid(launchConfig)) {
+			IProject project = launchConfigurationTab.getProjectFromText();
+			String name = text.getText();
+			if (checkNetworkExists(project, name)) {
+				return true;
+			}
 
-		IProject project = launchConfigurationTab.getProjectFromText();
-		IResource file = OrccUtil.getFile(project, text.getText(), "xdf");
-		if (file == null || !file.exists()) {
-			launchConfigurationTab.setErrorMessage(option.getName()
-					+ " refers to a non-existent network");
-			return false;
-		} else {
-			return true;
+			launchConfigurationTab.setErrorMessage("The network \"" + name
+					+ "\" specified by option \"" + option.getName()
+					+ "\" does not exist");
 		}
-	}
-
-	@Override
-	public void modifyText(ModifyEvent e) {
-		value = text.getText();
-		if (updateLaunchConfiguration) {
-			launchConfigurationTab.updateLaunchConfigurationDialog();
-		}
-	}
-
-	/**
-	 * Apply option to the specificied ILaunchConfigurationWorkingCopy * @param
-	 * configuration ILaunchConfigurationWorkingCopy of configuration tab
-	 */
-	@Override
-	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(option.getIdentifier(), value);
+		return false;
 	}
 
 	/**
@@ -215,7 +140,7 @@ public class SelectNetworkOptionWidget implements ModifyListener, OptionWidget {
 	 *            shell
 	 * @return the qualified identifier of a network
 	 */
-	private String selectNetwork(IProject project, Shell shell) {
+	final protected String selectNetwork(IProject project, Shell shell) {
 		FilteredRefinementDialog dialog = new FilteredRefinementDialog(project,
 				shell, "xdf");
 		dialog.setTitle("Select network");
@@ -230,13 +155,6 @@ public class SelectNetworkOptionWidget implements ModifyListener, OptionWidget {
 		}
 
 		return null;
-	}
-
-	@Override
-	public void show() {
-		composite.setVisible(true);
-		((GridData) composite.getLayoutData()).exclude = false;
-		launchConfigurationTab.updateSize();
 	}
 
 }

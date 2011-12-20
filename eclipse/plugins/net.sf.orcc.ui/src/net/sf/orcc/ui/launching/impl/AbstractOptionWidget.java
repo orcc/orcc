@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IRISA
+ * Copyright (c) 2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the IRISA nor the names of its
+ *   * Neither the name of the IETR/INSA of Rennes nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -26,36 +26,59 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.plugins.impl;
-
-import java.util.ArrayList;
-import java.util.List;
+package net.sf.orcc.ui.launching.impl;
 
 import net.sf.orcc.plugins.Option;
-import net.sf.orcc.plugins.OptionTextBox;
+import net.sf.orcc.ui.launching.OptionWidget;
+import net.sf.orcc.ui.launching.tabs.OrccAbstractSettingsTab;
+
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Composite;
 
 /**
- * This class defines the implementation of a textbox option.
+ * This abstract class defines an abstract implementation of option widget.
  * 
- * @author Herve Yviquel
+ * @author Matthieu Wipliez
  */
-public class OptionTextBoxImpl extends PluginOptionImpl implements
-		OptionTextBox {
+public abstract class AbstractOptionWidget implements OptionWidget {
 
-	private List<Option> options;
+	/**
+	 * composite that contains the components of this option
+	 */
+	protected final Composite composite;
 
-	public OptionTextBoxImpl() {
-		options = new ArrayList<Option>(0);
+	protected final OrccAbstractSettingsTab launchConfigurationTab;
+
+	protected final Option option;
+
+	protected boolean updateLaunchConfiguration;
+
+	/**
+	 * Creates a new input file option.
+	 */
+	public AbstractOptionWidget(OrccAbstractSettingsTab tab, Option option,
+			Composite parent) {
+		this.launchConfigurationTab = tab;
+		this.option = option;
+
+		composite = createControl(parent);
+		hide();
+	}
+
+	protected abstract Composite createControl(Composite parent);
+
+	@Override
+	public void hide() {
+		composite.setVisible(false);
+		((GridData) composite.getLayoutData()).exclude = true;
+		launchConfigurationTab.updateSize();
 	}
 
 	@Override
-	public List<Option> getOptions() {
-		return options;
-	}
-
-	@Override
-	public String toString() {
-		return super.toString() + ", options: " + getOptions();
+	public void show() {
+		composite.setVisible(true);
+		((GridData) composite.getLayoutData()).exclude = false;
+		launchConfigurationTab.updateSize();
 	}
 
 }

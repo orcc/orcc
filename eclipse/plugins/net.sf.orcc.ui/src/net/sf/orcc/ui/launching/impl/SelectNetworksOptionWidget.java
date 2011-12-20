@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2010, IRISA
- * Copyright (c) 2011, IETR/INSA Rennes
+ * Copyright (c) 2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -11,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the IRISA nor the names of its
+ *   * Neither the name of the IETR/INSA of Rennes nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -32,45 +31,41 @@ package net.sf.orcc.ui.launching.impl;
 import net.sf.orcc.plugins.Option;
 import net.sf.orcc.ui.launching.tabs.OrccAbstractSettingsTab;
 
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * This class defines a text box input.
+ * This class defines the select networks option widget.
  * 
- * @author Herve Yviquel
  * @author Matthieu Wipliez
  */
-public class TextBoxOptionWidget extends AbstractOptionWidget implements
-		ModifyListener {
+public class SelectNetworksOptionWidget extends SelectNetworkOptionWidget {
 
-	protected Text text;
-
-	protected String value;
-
-	public TextBoxOptionWidget(OrccAbstractSettingsTab tab, Option option,
-			Composite parent) {
+	/**
+	 * Creates a new selectNetworks option widget.
+	 */
+	public SelectNetworksOptionWidget(OrccAbstractSettingsTab tab,
+			Option option, Composite parent) {
 		super(tab, option, parent);
-		this.value = "";
 	}
 
 	@Override
 	protected Composite createControl(Composite parent) {
-		Composite composite = new Composite(parent, SWT.NONE);
-		composite.setLayout(new GridLayout(2, false));
+		final Composite composite = new Composite(parent, SWT.NONE);
+		composite.setLayout(new GridLayout(3, false));
 
 		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
-		data.horizontalSpan = 2;
+		data.horizontalSpan = 3;
 		composite.setLayoutData(data);
 
 		Font font = parent.getFont();
@@ -88,41 +83,48 @@ public class TextBoxOptionWidget extends AbstractOptionWidget implements
 		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		text.setLayoutData(data);
 		text.addModifyListener(this);
-		
+
+		Button buttonBrowse = new Button(composite, SWT.PUSH);
+		buttonBrowse.setFont(font);
+		data = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		buttonBrowse.setLayoutData(data);
+		buttonBrowse.setText("&Add...");
+		buttonBrowse.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				IProject project = launchConfigurationTab.getProjectFromText();
+				String network = selectNetwork(project, composite.getShell());
+				if (network != null) {
+					String value = text.getText();
+					if (!value.isEmpty()) {
+						value += ", ";
+					}
+					value += network;
+					text.setText(value);
+				}
+			}
+		});
+
 		return composite;
 	}
 
 	@Override
-	public void initializeFrom(ILaunchConfiguration configuration)
-			throws CoreException {
-		updateLaunchConfiguration = false;
-		text.setText(configuration.getAttribute(option.getIdentifier(),
-				option.getDefaultValue()));
-		updateLaunchConfiguration = true;
-	}
-
-	@Override
 	public boolean isValid(ILaunchConfiguration launchConfig) {
-		if (value.isEmpty()) {
-			launchConfigurationTab.setErrorMessage("The \"" + option.getName()
-					+ "\" field is empty");
+		if (!super.isValid(launchConfig)) {
 			return false;
 		}
+		IProject project = launchConfigurationTab.getProjectFromText();
 
-		return true;
-	}
-
-	@Override
-	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(option.getIdentifier(), value);
-	}
-
-	@Override
-	public void modifyText(ModifyEvent e) {
-		value = text.getText();
-		if (updateLaunchConfiguration) {
-			launchConfigurationTab.updateLaunchConfigurationDialog();
+		String[] networks = text.getText().split("\\s*,\\s*");
+		for (String network : networks) {
+			if (!checkNetworkExists(project, network)) {
+				launchConfigurationTab.setErrorMessage("The network \""
+						+ network + "\" specified by option \""
+						+ option.getName() + "\" does not exist");
+				return false;
+			}
 		}
+		return true;
 	}
 
 }

@@ -38,13 +38,12 @@ import net.sf.orcc.plugins.Option;
  * This class defines the implementation of a plugin option.
  * 
  * @author Matthieu Wipliez
- * 
  */
 public class OptionCheckboxImpl extends PluginOptionImpl implements
 		OptionCheckbox {
 
 	private List<Option> options;
-	
+
 	public OptionCheckboxImpl() {
 		options = new ArrayList<Option>(0);
 	}

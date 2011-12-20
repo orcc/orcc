@@ -34,7 +34,6 @@ import net.sf.orcc.plugins.OptionSelectNetwork;
  * This interface defines the option "selectNetwork".
  * 
  * @author Matthieu Wipliez
- * 
  */
 public class OptionSelectNetworkImpl extends PluginOptionImpl implements
 		OptionSelectNetwork {
