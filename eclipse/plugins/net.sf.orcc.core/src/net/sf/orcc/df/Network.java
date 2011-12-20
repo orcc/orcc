@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.df;
 
-import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
@@ -174,7 +173,7 @@ public interface Network extends Entity {
 	 * 
 	 * @return the list of this network's vertices
 	 */
-	Iterator<Vertex> getVertices();
+	List<Vertex> getVertices();
 
 	/**
 	 * Merges actors of this network. Note that for this transformation to work

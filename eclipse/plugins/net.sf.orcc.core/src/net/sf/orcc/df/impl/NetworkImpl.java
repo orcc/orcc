@@ -33,7 +33,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -66,9 +65,6 @@ import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
-
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
 
 /**
  * This class defines a hierarchical XDF network. It contains several maps so
@@ -408,16 +404,12 @@ public class NetworkImpl extends EntityImpl implements Network {
 	 * 
 	 * @return an iterable of Entity
 	 */
-	private Iterable<Entity> getAllEntities() {
-		return Iterables.concat(getEntities(), Iterables.transform(
-				getInstances(), new Function<Instance, Entity>() {
-
-					@Override
-					public Entity apply(Instance from) {
-						return from.getEntity();
-					}
-
-				}));
+	private List<Entity> getAllEntities() {
+		List<Entity> entities = new ArrayList<Entity>(getEntities());
+		for (Instance instance : getInstances()) {
+			entities.add(instance.getEntity());
+		}
+		return entities;
 	}
 
 	@Override
@@ -560,9 +552,12 @@ public class NetworkImpl extends EntityImpl implements Network {
 	}
 
 	@Override
-	public Iterator<Vertex> getVertices() {
-		return Iterables.concat(getInputs(), getOutputs(), getInstances(),
-				getEntities()).iterator();
+	public List<Vertex> getVertices() {
+		List<Vertex> vertices = new ArrayList<Vertex>(getInputs());
+		vertices.addAll(getOutputs());
+		vertices.addAll(getInstances());
+		vertices.addAll(getEntities());
+		return vertices;
 	}
 
 	@Override
