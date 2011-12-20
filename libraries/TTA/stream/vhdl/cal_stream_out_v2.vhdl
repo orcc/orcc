@@ -6,8 +6,8 @@ use IEEE.Std_Logic_1164.all;
 
 package opcodes_cal_stream_out_v2 is
 
-  constant CAL_STREAM_OUT_STATUS : std_logic_vector(1-1 downto 0) := "0";
-  constant CAL_STREAM_OUT_WRITE  : std_logic_vector(1-1 downto 0) := "1";
+  constant CAL_STREAM_OUT_STATUS_V2 : std_logic_vector(1-1 downto 0) := "0";
+  constant CAL_STREAM_OUT_WRITE_V2  : std_logic_vector(1-1 downto 0) := "1";
   
 end opcodes_cal_stream_out_v2;
 
@@ -150,11 +150,11 @@ begin
           index := to_integer(unsigned(o1data));
 
           case t1opcode is
-            when CAL_STREAM_OUT_WRITE =>
+            when CAL_STREAM_OUT_WRITE_V2 =>
               ext_data_current(index) <= t1data;
               ext_dv_current(index)   <= (0 => '1', others => '0');
               -- enable the datavalid signal for a while
-            when CAL_STREAM_OUT_STATUS =>
+            when CAL_STREAM_OUT_STATUS_V2 =>
               r1data <= ext_status_current(index);
             when others => null;
           end case;

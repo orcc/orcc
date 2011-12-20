@@ -6,9 +6,9 @@ use IEEE.Std_Logic_1164.all;
 
 package opcodes_cal_stream_in_v2 is
 
-  constant CAL_STREAM_IN_PEEK   : std_logic_vector(2-1 downto 0) := "00";
-  constant CAL_STREAM_IN_READ   : std_logic_vector(2-1 downto 0) := "01";
-  constant CAL_STREAM_IN_STATUS : std_logic_vector(2-1 downto 0) := "10";
+  constant CAL_STREAM_IN_PEEK_V2   : std_logic_vector(2-1 downto 0) := "00";
+  constant CAL_STREAM_IN_READ_V2   : std_logic_vector(2-1 downto 0) := "01";
+  constant CAL_STREAM_IN_STATUS_V2 : std_logic_vector(2-1 downto 0) := "10";
   
 end opcodes_cal_stream_in_v2;
 
@@ -144,13 +144,13 @@ begin
         if t1load = '1' then
           index := to_integer(unsigned(o1data));
           case t1opcode is
-            when CAL_STREAM_IN_READ =>
+            when CAL_STREAM_IN_READ_V2 =>
               r1reg                  <= ext_data_current(index);
               ext_ack_current(index) <= (0 => '1');
-            when CAL_STREAM_IN_STATUS =>
+            when CAL_STREAM_IN_STATUS_V2 =>
               -- stream_in_status is placed in the least significant bits of r1reg
               r1reg <= ext_status_current(index);
-            when CAL_STREAM_IN_PEEK =>
+            when CAL_STREAM_IN_PEEK_V2 =>
               r1reg <= ext_data_current(index);
             when others => null;
           end case;
