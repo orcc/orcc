@@ -38,7 +38,6 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -95,6 +94,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.emf.common.util.ECollections;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -453,8 +453,8 @@ public class XdfExporter extends CalSwitch<Object> {
 		}
 
 		// sort ports based on their position in the window (top to bottom)
-		Collections.sort(network.getInputs(), new PortComparator());
-		Collections.sort(network.getOutputs(), new PortComparator());
+		ECollections.sort(network.getInputs(), new PortComparator());
+		ECollections.sort(network.getOutputs(), new PortComparator());
 
 		// add edges
 		for (Edge edge : graph.edgeSet()) {
