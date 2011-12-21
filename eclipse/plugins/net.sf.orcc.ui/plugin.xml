@@ -473,19 +473,6 @@
       </editor>
    </extension>
    <extension
-         point="org.eclipse.ui.editorActions">
-      <editorContribution
-            id="net.sf.orcc.CalEditor.BreakpointRulerActions"
-            targetID="net.sf.orcc.cal.Cal">
-         <action
-               actionID="RulerDoubleClick"
-               class="org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
-               id="net.sf.orcc.ui.actions.ManageBreakpointRulerAction"
-               label="Add breakpoint">
-         </action>
-      </editorContribution>
-   </extension>
-   <extension
          point="org.eclipse.ui.newWizards">
       <category
             id="net.sf.orcc.ui.OrccCategory"
