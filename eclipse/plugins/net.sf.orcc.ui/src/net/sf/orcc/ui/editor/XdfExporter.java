@@ -190,6 +190,11 @@ public class XdfExporter extends CalSwitch<Object> {
 		List<?> parameters = (List<?>) graph.getValue("network parameter");
 		for (Object parameter : parameters) {
 			Variable variable = parseVariable(parameter);
+			if (variable == null) {
+				throw new OrccRuntimeException(
+						"The network parameter declaration \"" + parameter
+								+ "\" is not valid");
+			}
 
 			Type type = (Type) doSwitch(variable.getType());
 			String name = variable.getName();
@@ -205,7 +210,18 @@ public class XdfExporter extends CalSwitch<Object> {
 				.getValue("network variable declaration");
 		for (Entry<?, ?> entry : variables.entrySet()) {
 			Variable variable = parseVariable(entry.getKey());
+			if (variable == null) {
+				throw new OrccRuntimeException(
+						"The network variable declaration \"" + entry.getKey()
+								+ "\" is not valid");
+			}
+
 			Expression expression = parseExpression(entry.getValue());
+			if (expression == null) {
+				throw new OrccRuntimeException("The expression \""
+						+ entry.getValue() + "\" associated with variable \""
+						+ entry.getKey() + "\" is not valid");
+			}
 
 			Type type = (Type) doSwitch(variable.getType());
 			String name = variable.getName();
@@ -247,10 +263,17 @@ public class XdfExporter extends CalSwitch<Object> {
 			Map<?, ?> variables = (Map<?, ?>) vertex
 					.getValue("instance parameter");
 			for (Entry<?, ?> entry : variables.entrySet()) {
-				Variable variable = parseVariable(entry.getKey());
+				String varName = (String) entry.getKey();
 				Expression expression = parseExpression(entry.getValue());
+				if (expression == null) {
+					throw new OrccRuntimeException("The expression \""
+							+ entry.getValue()
+							+ "\" associated with parameter \""
+							+ entry.getKey() + "\" is not valid");
+				}
+
 				Argument argument = DfFactory.eINSTANCE.createArgument(
-						varMap.get(variable.getName()), expression);
+						varMap.get(varName), expression);
 				instance.getArguments().add(argument);
 			}
 
@@ -398,6 +421,10 @@ public class XdfExporter extends CalSwitch<Object> {
 		Reader reader = new StringReader((String) value);
 		IParseResult result = parser.parse(access.getAstExpressionRule(),
 				reader);
+		if (result.hasSyntaxErrors()) {
+			return null;
+		}
+
 		AstExpression expression = (AstExpression) result.getRootASTElement();
 
 		linkModel(expression);
@@ -420,6 +447,9 @@ public class XdfExporter extends CalSwitch<Object> {
 		Reader reader = new StringReader((String) parameter);
 		IParseResult result = parser.parse(access.getVariableDeclarationRule(),
 				reader);
+		if (result.hasSyntaxErrors()) {
+			return null;
+		}
 		return (T) result.getRootASTElement();
 	}
 
