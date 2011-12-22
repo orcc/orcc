@@ -110,7 +110,9 @@ public class SelectNetworksOptionWidget extends SelectNetworkOptionWidget {
 
 	@Override
 	public boolean isValid(ILaunchConfiguration launchConfig) {
-		if (!super.isValid(launchConfig)) {
+		if (value.isEmpty()) {
+			launchConfigurationTab.setErrorMessage("The \"" + option.getName()
+					+ "\" field is empty");
 			return false;
 		}
 		IProject project = launchConfigurationTab.getProjectFromText();

@@ -55,6 +55,7 @@
             <element ref="comboBox"/>
             <element ref="textBox"/>
             <element ref="selectNetwork"/>
+            <element ref="selectNetworks"/>
          </choice>
          <attribute name="id" type="string" use="required">
             <annotation>
