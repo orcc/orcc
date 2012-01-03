@@ -79,10 +79,14 @@ class Instance:
     def compile(self, srcPath, libPath, args, debug):
         instancePath = os.path.join(srcPath, self.id)
         os.chdir(instancePath)
+        shutil.copy(os.path.join(libPath, "stream", "opset", "stream_units.opb"), instancePath)
+        shutil.copy(os.path.join(libPath, "stream", "opset", "stream_units.opp"), instancePath)
         retcode = subprocess.call(["tcecc"] + args + ["-o", self._tpefFile, "-a", self._adfFile, self._llFile])
         if retcode >= 0 and debug: retcode = subprocess.call(["tcecc", "-O3", "-o", self._bcFile, self._llFile, "--emit-llvm"])
         if retcode >= 0 and debug: retcode = subprocess.call(["llvm-dis", "-o", self._llOptFile, self._bcFile])
         if retcode >= 0 and debug: retcode = subprocess.call(["tcedisasm", "-n", "-o", self._asmFile, self._adfFile, self._tpefFile])
+        os.remove("stream_units.opp")
+        os.remove("stream_units.opb")
 
     def initializeMemories(self):
         self.irom = self._readMif(self._mifFile)
@@ -103,6 +107,8 @@ class Instance:
         shutil.copy(os.path.join(libPath, "stream", "stream_units.hdb"), instanceSrcPath)
         shutil.rmtree("vhdl", ignore_errors=True)
         shutil.copytree(os.path.join(libPath, "stream", "vhdl"), "vhdl")
+        shutil.copy(os.path.join(libPath, "stream", "opset", "stream_units.opb"), instanceSrcPath)
+        shutil.copy(os.path.join(libPath, "stream", "opset", "stream_units.opp"), instanceSrcPath)
         # Remove existing build directory
         shutil.rmtree(ttaPath, ignore_errors=True)
         # Generate the TTA processor
@@ -130,6 +136,8 @@ class Instance:
         os.remove("stream_units.hdb")
         os.remove(self._bemFile)
         shutil.rmtree("vhdl", ignore_errors=True)
+        os.remove("stream_units.opp")
+        os.remove("stream_units.opb")
 
 
     def simulate(self, srcPath, tracePath):
