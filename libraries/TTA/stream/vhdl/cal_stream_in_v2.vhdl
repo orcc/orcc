@@ -4,13 +4,13 @@
 library IEEE;
 use IEEE.Std_Logic_1164.all;
 
-package opcodes_cal_stream_in_v2 is
+package opcodes_cal_stream_in is
 
-  constant CAL_STREAM_IN_PEEK_V2   : std_logic_vector(2-1 downto 0) := "00";
-  constant CAL_STREAM_IN_READ_V2   : std_logic_vector(2-1 downto 0) := "01";
-  constant CAL_STREAM_IN_STATUS_V2 : std_logic_vector(2-1 downto 0) := "10";
+  constant CAL_STREAM_IN_PEEK   : std_logic_vector(2-1 downto 0) := "00";
+  constant CAL_STREAM_IN_READ   : std_logic_vector(2-1 downto 0) := "01";
+  constant CAL_STREAM_IN_STATUS : std_logic_vector(2-1 downto 0) := "10";
   
-end opcodes_cal_stream_in_v2;
+end opcodes_cal_stream_in;
 
 -------------------------------------------------------------------------------
 -- Stream In unit
@@ -18,16 +18,14 @@ end opcodes_cal_stream_in_v2;
 library IEEE;
 use IEEE.Std_Logic_1164.all;
 use IEEE.numeric_std.all;
-use work.opcodes_cal_stream_in_v2.all;
+use work.opcodes_cal_stream_in.all;
 
-entity cal_stream_in_v2 is
+entity cal_stream_in is
   
   port (
     t1data   : in  std_logic_vector(31 downto 0);
     t1load   : in  std_logic;
     t1opcode : in  std_logic_vector(2-1 downto 0);
-    o1data   : in  std_logic_vector(31 downto 0);
-    o1load   : in  std_logic;
     r1data   : out std_logic_vector(31 downto 0);
     clk      : in  std_logic;
     rstx     : in  std_logic;
@@ -68,10 +66,10 @@ entity cal_stream_in_v2 is
     ext_ack7    : out std_logic_vector(0 downto 0)
     );
 
-end cal_stream_in_v2;
+end cal_stream_in;
 
 
-architecture rtl of cal_stream_in_v2 is
+architecture rtl of cal_stream_in is
   
   signal r1reg  : std_logic_vector(31 downto 0);
   signal ackreg : std_logic_vector(0 downto 0);
@@ -142,15 +140,15 @@ begin
         ext_ack_current(7) <= (others => '0');
 
         if t1load = '1' then
-          index := to_integer(unsigned(o1data));
+          index := to_integer(unsigned(t1data));
           case t1opcode is
-            when CAL_STREAM_IN_READ_V2 =>
+            when CAL_STREAM_IN_READ =>
               r1reg                  <= ext_data_current(index);
               ext_ack_current(index) <= (0 => '1');
-            when CAL_STREAM_IN_STATUS_V2 =>
+            when CAL_STREAM_IN_STATUS =>
               -- stream_in_status is placed in the least significant bits of r1reg
               r1reg <= ext_status_current(index);
-            when CAL_STREAM_IN_PEEK_V2 =>
+            when CAL_STREAM_IN_PEEK =>
               r1reg <= ext_data_current(index);
             when others => null;
           end case;

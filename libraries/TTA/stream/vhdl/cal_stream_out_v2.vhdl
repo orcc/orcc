@@ -4,12 +4,12 @@
 library IEEE;
 use IEEE.Std_Logic_1164.all;
 
-package opcodes_cal_stream_out_v2 is
+package opcodes_cal_stream_out is
 
-  constant CAL_STREAM_OUT_STATUS_V2 : std_logic_vector(1-1 downto 0) := "0";
-  constant CAL_STREAM_OUT_WRITE_V2  : std_logic_vector(1-1 downto 0) := "1";
+  constant CAL_STREAM_OUT_STATUS : std_logic_vector(1-1 downto 0) := "0";
+  constant CAL_STREAM_OUT_WRITE  : std_logic_vector(1-1 downto 0) := "1";
   
-end opcodes_cal_stream_out_v2;
+end opcodes_cal_stream_out;
 
 -------------------------------------------------------------------------------
 -- Stream out unit
@@ -17,9 +17,9 @@ end opcodes_cal_stream_out_v2;
 library IEEE;
 use IEEE.Std_Logic_1164.all;
 use IEEE.numeric_std.all;
-use work.opcodes_cal_stream_out_v2.all;
+use work.opcodes_cal_stream_out.all;
 
-entity cal_stream_out_v2 is
+entity cal_stream_out is
 
   port (
     t1data   : in  std_logic_vector(31 downto 0);
@@ -67,10 +67,10 @@ entity cal_stream_out_v2 is
     ext_dv7     : out std_logic_vector(0 downto 0)
     );
 
-end cal_stream_out_v2;
+end cal_stream_out;
 
 
-architecture rtl of cal_stream_out_v2 is
+architecture rtl of cal_stream_out is
   signal r1reg   : std_logic_vector(31 downto 0);
   signal datareg : std_logic_vector(31 downto 0);
   signal dvreg   : std_logic_vector(0 downto 0);
@@ -147,14 +147,14 @@ begin
         ext_dv_current(7) <= (others => '0');
 
         if t1load = '1' then
-          index := to_integer(unsigned(o1data));
+          index := to_integer(unsigned(t1data));
 
           case t1opcode is
-            when CAL_STREAM_OUT_WRITE_V2 =>
-              ext_data_current(index) <= t1data;
+            when CAL_STREAM_OUT_WRITE =>
+              ext_data_current(index) <= o1data;
               ext_dv_current(index)   <= (0 => '1', others => '0');
               -- enable the datavalid signal for a while
-            when CAL_STREAM_OUT_STATUS_V2 =>
+            when CAL_STREAM_OUT_STATUS =>
               r1data <= ext_status_current(index);
             when others => null;
           end case;

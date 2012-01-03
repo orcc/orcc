@@ -699,8 +699,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return operation;
 	}
 
-	private Operation createOperationIn(String name, Port in, Port out) {
-		Operation operation = createOperation(name);
+	@SuppressWarnings("unused")
+	private Operation createOperationIn(Port in, Port out) {
+		Operation operation = createOperation("cal_stream_in_read");
 		operation.setControl(false);
 		operation.getPipeline().add(createResource("res0", 0, 3));
 		operation.getPipeline().add(createReads(in, 0, 1));
@@ -708,8 +709,18 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return operation;
 	}
 
-	private Operation createOperationInPeek(String name, Port in, Port out) {
-		Operation operation = createOperation(name);
+	private Operation createOperationInV2(Port in1, Port out) {
+		Operation operation = createOperation("cal_stream_in_read");
+		operation.setControl(false);
+		operation.getPipeline().add(createResource("res0", 0, 3));
+		operation.getPipeline().add(createReads(in1, 0, 1));
+		operation.getPipeline().add(createWrites(out, 1, 1));
+		return operation;
+	}
+
+	@SuppressWarnings("unused")
+	private Operation createOperationInPeek(Port in, Port out) {
+		Operation operation = createOperation("cal_stream_in_peek");
 		operation.setControl(false);
 		operation.getPipeline().add(createResource("res0", 0, 3));
 		operation.getPipeline().add(createReads(in, 0, 1));
@@ -717,11 +728,28 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return operation;
 	}
 
-	private Operation createOperationInStatus(String name, Port in, Port out) {
-		Operation operation = createOperation(name);
+	private Operation createOperationInPeekV2(Port in1, Port out) {
+		Operation operation = createOperation("cal_stream_in_peek");
 		operation.setControl(false);
 		operation.getPipeline().add(createResource("res0", 0, 3));
+		operation.getPipeline().add(createReads(in1, 0, 1));
+		operation.getPipeline().add(createWrites(out, 1, 1));
+		return operation;
+	}
+
+	@SuppressWarnings("unused")
+	private Operation createOperationInStatus(Port in, Port out) {
+		Operation operation = createOperation("cal_stream_in_status");
+		operation.setControl(false);
 		operation.getPipeline().add(createReads(in, 0, 1));
+		operation.getPipeline().add(createWrites(out, 1, 1));
+		return operation;
+	}
+
+	private Operation createOperationInStatusV2(Port in1, Port out) {
+		Operation operation = createOperation("cal_stream_in_status");
+		operation.setControl(false);
+		operation.getPipeline().add(createReads(in1, 0, 1));
 		operation.getPipeline().add(createWrites(out, 1, 1));
 		return operation;
 	}
@@ -740,19 +768,38 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return operation;
 	}
 
-	private Operation createOperationOut(String name, Port in, Port out) {
-		Operation operation = createOperation(name);
+	@SuppressWarnings("unused")
+	private Operation createOperationOut(Port in, Port out) {
+		Operation operation = createOperation("cal_stream_out_write");
 		operation.setControl(false);
 		operation.getPipeline().add(createResource("res0", 0, 3));
 		operation.getPipeline().add(createReads(in, 0, 1));
 		return operation;
 	}
 
-	private Operation createOperationOutStatus(String name, Port in, Port out) {
-		Operation operation = createOperation(name);
+	private Operation createOperationOutV2(Port in1, Port in2) {
+		Operation operation = createOperation("cal_stream_out_write");
+		operation.setControl(false);
+		operation.getPipeline().add(createResource("res0", 0, 3));
+		operation.getPipeline().add(createReads(in1, 0, 1));
+		operation.getPipeline().add(createReads(in2, 0, 1));
+		return operation;
+	}
+
+	@SuppressWarnings("unused")
+	private Operation createOperationOutStatus(Port in, Port out) {
+		Operation operation = createOperation("cal_stream_out_status");
 		operation.setControl(false);
 		operation.getPipeline().add(createReads(in, 0, 1));
-		operation.getPipeline().add(createWrites(out, 0, 1));
+		operation.getPipeline().add(createWrites(out, 1, 1));
+		return operation;
+	}
+
+	private Operation createOperationOutStatusV2(Port in1, Port out) {
+		Operation operation = createOperation("cal_stream_out_status");
+		operation.setControl(false);
+		operation.getPipeline().add(createReads(in1, 0, 1));
+		operation.getPipeline().add(createWrites(out, 1, 1));
 		return operation;
 	}
 
@@ -973,9 +1020,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public FunctionUnit createStreamInput(TTA tta, String portName) {
+	public FunctionUnit createStreamInput(TTA tta, int index) {
 		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
-		String name = "STREAM_IN_" + portName;
+		String name = "STREAM_IN_" + index;
 		functionUnit.setName(name);
 		// Sockets
 		EList<Segment> segments = getAllSegments(tta.getBuses());
@@ -989,42 +1036,42 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		functionUnit.getPorts().add(in1t);
 		functionUnit.getPorts().add(out1);
 		// Operations
-		functionUnit.getOperations().add(
-				createOperationIn("cal_stream_in_read", in1t, out1));
-		functionUnit.getOperations().add(
-				createOperationInPeek("cal_stream_in_peek", in1t, out1));
-		functionUnit.getOperations().add(
-				createOperationInStatus("cal_stream_in_status", in1t, out1));
+		functionUnit.getOperations().add(createOperationInV2(in1t, out1));
+		functionUnit.getOperations().add(createOperationInPeekV2(in1t, out1));
+		functionUnit.getOperations().add(createOperationInStatusV2(in1t, out1));
 		// Implementation
-		Implementation streamImpl = createImplementation("stream_units.hdb", 1);
+		Implementation streamImpl = createImplementation("stream_units.hdb", 3);
 		functionUnit.setImplementation(streamImpl);
 		tta.getHardwareDatabase().add(streamImpl);
 		return functionUnit;
 	}
 
 	@Override
-	public FunctionUnit createStreamOutput(TTA tta, String portName) {
+	public FunctionUnit createStreamOutput(TTA tta, int index) {
 		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
-		String name = "STREAM_OUT_" + portName;
+		String name = "STREAM_OUT_" + index;
 		functionUnit.setName(name);
 		// Sockets
 		EList<Segment> segments = getAllSegments(tta.getBuses());
 		Socket i1 = createInputSocket(name + "_i1", segments);
+		Socket i2 = createInputSocket(name + "_i2", segments);
 		Socket o1 = createOutputSocket(name + "_o1", segments);
 		// Port
 		Port in1t = createPort("in1t", 32, true, true);
+		Port in2 = createPort("in2", 32, false, false);
 		Port out1 = createPort("out1", 32, false, false);
 		in1t.connect(i1);
+		in2.connect(i2);
 		out1.connect(o1);
 		functionUnit.getPorts().add(in1t);
+		functionUnit.getPorts().add(in2);
 		functionUnit.getPorts().add(out1);
 		// Operations
-		functionUnit.getOperations().add(
-				createOperationOut("cal_stream_out_write", in1t, out1));
-		functionUnit.getOperations().add(
-				createOperationOutStatus("cal_stream_out_status", in1t, out1));
+		functionUnit.getOperations().add(createOperationOutV2(in1t, in2));
+		functionUnit.getOperations()
+				.add(createOperationOutStatusV2(in1t, out1));
 		// Implementation
-		Implementation streamImpl = createImplementation("stream_units.hdb", 2);
+		Implementation streamImpl = createImplementation("stream_units.hdb", 5);
 		functionUnit.setImplementation(streamImpl);
 		tta.getHardwareDatabase().add(streamImpl);
 		return functionUnit;
@@ -1145,13 +1192,11 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		TTA tta = createTTADefault(name, busNb, registerNb, aluNb);
 		if (instance.isActor()) {
 			// Add needed stream units
-			for (net.sf.orcc.df.Port input : instance.getActor().getInputs()) {
-				tta.getFunctionUnits().add(
-						createStreamInput(tta, input.getName()));
+			for (int i = 0; i < instance.getActor().getInputs().size(); i++) {
+				tta.getFunctionUnits().add(createStreamInput(tta, i));
 			}
-			for (net.sf.orcc.df.Port output : instance.getActor().getOutputs()) {
-				tta.getFunctionUnits().add(
-						createStreamOutput(tta, output.getName()));
+			for (int i = 0; i < instance.getActor().getOutputs().size(); i++) {
+				tta.getFunctionUnits().add(createStreamOutput(tta, i));
 			}
 			// Set ram size = memory estimation / word size + error margin
 			int ramSize = ArchitectureMemoryStats
@@ -1164,13 +1209,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 		} else if (instance.isBroadcast()) {
 			// Add needed stream units
-			tta.getFunctionUnits().add(
-					createStreamInput(tta, instance.getBroadcast().getInput()
-							.getName()));
-			for (net.sf.orcc.df.Port output : instance.getBroadcast()
-					.getOutputs()) {
-				tta.getFunctionUnits().add(
-						createStreamOutput(tta, output.getName()));
+			tta.getFunctionUnits().add(createStreamInput(tta, 0));
+			for (int i = 0; i < instance.getBroadcast().getOutputs().size(); i++) {
+				tta.getFunctionUnits().add(createStreamOutput(tta, i));
 			}
 			// Set ram size = memory estimation / word size + error margin
 			tta.getData().setMaxAddress(64);

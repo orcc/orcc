@@ -1,25 +1,24 @@
 import "net/sf/orcc/backends/llvm/Actor.stg"
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // FIFO functions
 ///////////////////////////////////////////////////////////////////////////////
 
-printStatus(dir, port) ::= <<
-%local_status_<port.name> = tail call i32 asm sideeffect "STREAM_<dir>_<port.name>.CAL_STREAM_<dir>_STATUS", "=r,ir"(i32 0) nounwind
+printStatus(dir, port, index) ::= <<
+%local_status_<port.name> = tail call i32 asm sideeffect "CAL_STREAM_<dir>_STATUS", "=r,ir"(i32 <index>) nounwind
 store i32 %local_status_<port.name>, i32* @status_<port.name>
 >>
 
-printBcastStatus(dir, port) ::= <<
-%status_<port.name> = tail call i32 asm sideeffect "STREAM_<dir>_<port.name>.CAL_STREAM_<dir>_STATUS", "=r,ir"(i32 0) nounwind
+printBcastStatus(dir, port, index) ::= <<
+%status_<port.name> = tail call i32 asm sideeffect "CAL_STREAM_<dir>_STATUS", "=r,ir"(i32 <index>) nounwind
 >>
 
 printStatusVar(port) ::= <<
 @status_<port.name> = global i32 0
 >>
 
-printReadFunction(port) ::= <<
+printReadFunction(port, index) ::= <<
 define internal void @_read_<port.name>(<port.type>* %data, i32 %numTokens) nounwind {
 entry:
 	%cond = icmp sgt i32 %numTokens, 0
@@ -32,7 +31,7 @@ bb0:
 	
 bb1:
 	%indvar = phi i32 [ 0, %bb0 ], [ %indvar.next, %bb1 ]
-	%value = tail call <port.type> asm sideeffect "STREAM_IN_<port.name>.CAL_STREAM_IN_READ", "=r,ir"(i32 0) nounwind
+	%value = tail call <port.type> asm sideeffect "CAL_STREAM_IN_READ", "=r,ir"(i32 <index>) nounwind
 	%scevgep = getelementptr <port.type>* %data, i32 %indvar
 	store <port.type> %value, <port.type>* %scevgep
 	%indvar.next = add i32 %indvar, 1
@@ -45,7 +44,7 @@ bb2:
 }
 >>
 
-printWriteFunction(port) ::= <<
+printWriteFunction(port, index) ::= <<
 define internal void @_write_<port.name>(<port.type>* %data, i32 %numTokens) nounwind {
 entry:
   %cond = icmp sgt i32 %numTokens, 0
@@ -60,7 +59,7 @@ bb1:
   %indvar = phi i32 [ 0, %bb0 ], [ %indvar.next, %bb1 ]
   %scevgep = getelementptr <port.type>* %data, i32 %indvar
   %value = load <port.type>* %scevgep
-  tail call void asm sideeffect "STREAM_OUT_<port.name>.CAL_STREAM_OUT_WRITE", "ir"(<port.type> %value) nounwind
+  tail call void asm sideeffect "CAL_STREAM_OUT_WRITE", "ir,ir"(i32 <index>, <port.type> %value) nounwind
   %indvar.next = add i32 %indvar, 1
   %exitcond = icmp eq i32 %indvar.next, %numTokens
   
@@ -71,7 +70,7 @@ bb2:
 }
 >>
 
-printPeekFunction(port) ::= <<
+printPeekFunction(port, index) ::= <<
 define internal void @_peek_<port.name>(<port.type>* %data, i32 %numTokens) nounwind {
 entry:
 	%cond = icmp sgt i32 %numTokens, 0
@@ -84,7 +83,7 @@ bb0:
 	
 bb1:
 	%indvar = phi i32 [ 0, %bb0 ], [ %indvar.next, %bb1 ]
-	%value = tail call <port.type> asm sideeffect "STREAM_IN_<port.name>.CAL_STREAM_IN_PEEK", "=r,ir"(i32 0) nounwind
+	%value = tail call <port.type> asm sideeffect "CAL_STREAM_IN_PEEK", "=r,ir"(i32 <index>) nounwind
 	%scevgep = getelementptr <port.type>* %data, i32 %indvar
 	store <port.type> %value, <port.type>* %scevgep
 	%indvar.next = add i32 %indvar, 1
@@ -130,11 +129,11 @@ printPeekCalls(peekPattern) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 printPortsStatus(dir, ports) ::= <<
-<ports: { port | <printStatus(dir, port)> }; separator="\n">
+<ports: { port | <printStatus(dir, port, i0)> }; separator="\n">
 >>
 
 printBcastPortsStatus(dir, ports) ::= <<
-<ports: { port | <printBcastStatus(dir, port)> }; separator="\n">
+<ports: { port | <printBcastStatus(dir, port, i0)> }; separator="\n">
 >>
 
 printStatusVars(ports) ::= <<
@@ -387,11 +386,11 @@ printBroadcast(broadcast) ::= <<
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Input FIFO
-<printReadFunction(broadcast.input)>
+<broadcast.inputs: { input | <printReadFunction(input, i0)> }; separator="\n\n">
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Output FIFOs
-<broadcast.outputs: printWriteFunction(); separator="\n\n">
+<broadcast.outputs: { output | <printWriteFunction(output, i0)> }; separator="\n\n">
 
 
 define void @main() noreturn nounwind noinline {
@@ -402,7 +401,7 @@ entry:
 	br label %bb_broadcast_start
 
 bb_broadcast_start:
-	<printBcastStatus("IN", broadcast.input)>
+	<printBcastPortsStatus("IN", broadcast.inputs)>
 	<printBcastPortsStatus("OUT", broadcast.outputs)>
 	<printBcastCondition(broadcast)>
 	
@@ -447,15 +446,15 @@ printActor(actor, options) ::= <<
 <if(actor.inputs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Input FIFOs
-<actor.inputs: printReadFunction(); separator="\n\n">
+<actor.inputs: { input | <printReadFunction(input, i0)> }; separator="\n\n">
 
-<actor.inputs: printPeekFunction(); separator="\n\n">
+<actor.inputs: { input | <printPeekFunction(input, i0)> }; separator="\n\n">
 <endif>
 
 <if(actor.outputs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Output FIFOs
-<actor.outputs: printWriteFunction(); separator="\n\n">
+<actor.outputs: { output | <printWriteFunction(output, i0)> }; separator="\n\n">
 <endif>
 
 <if(actor.procs)>
