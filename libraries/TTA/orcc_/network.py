@@ -56,7 +56,7 @@ class Network:
             instance.simulate(srcPath, tracePath)
 
 
-    def generate(self, srcPath, buildPath, libPath, args, debug):
+    def generate(self, srcPath, libPath, args, debug):
         print "* Initialize the generation."
         os.chmod(os.path.join(srcPath, "top.tcl"), stat.S_IRWXU)
         shutil.rmtree(os.path.join(srcPath, "wrapper"), ignore_errors=True)
@@ -69,4 +69,4 @@ class Network:
         for instance in self.instances:
             if not instance.isNative:
                 print ">> Instance " + instance.id + "."
-                instance.generate(srcPath, buildPath, libPath, args, debug)
+                instance.generate(srcPath, libPath, args, debug)
