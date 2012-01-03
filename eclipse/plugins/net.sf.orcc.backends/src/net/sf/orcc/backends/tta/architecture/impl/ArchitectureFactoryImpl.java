@@ -1040,7 +1040,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		functionUnit.getOperations().add(createOperationInPeekV2(in1t, out1));
 		functionUnit.getOperations().add(createOperationInStatusV2(in1t, out1));
 		// Implementation
-		Implementation streamImpl = createImplementation("stream_units.hdb", 3);
+		Implementation streamImpl = createImplementation("stream_units.hdb", 2);
 		functionUnit.setImplementation(streamImpl);
 		tta.getHardwareDatabase().add(streamImpl);
 		return functionUnit;
@@ -1071,7 +1071,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		functionUnit.getOperations()
 				.add(createOperationOutStatusV2(in1t, out1));
 		// Implementation
-		Implementation streamImpl = createImplementation("stream_units.hdb", 5);
+		Implementation streamImpl = createImplementation("stream_units.hdb", 3);
 		functionUnit.setImplementation(streamImpl);
 		tta.getHardwareDatabase().add(streamImpl);
 		return functionUnit;
