@@ -62,6 +62,8 @@ public class TTAActorTemplateData {
 	private Map<Pattern, Map<Port, Integer>> portToIndexByPatternMap;
 
 	private Map<Port, Integer> portToIndexMap;
+	
+	private Map<Port, Boolean> portToNeedCastMap;
 
 	private Map<State, Integer> stateToLabelMap;
 
@@ -71,6 +73,7 @@ public class TTAActorTemplateData {
 		stateToLabelMap = new HashMap<State, Integer>();
 		portToIndexByPatternMap = new HashMap<Pattern, Map<Port, Integer>>();
 		portToIndexMap = new HashMap<Port, Integer>();
+		portToNeedCastMap = new HashMap<Port, Boolean>();
 
 		computeTemplateMaps(actor);
 	}
@@ -134,6 +137,15 @@ public class TTAActorTemplateData {
 		}
 	}
 
+	private void computePortToNeedCastMap(Actor actor) {
+		for (Port input: actor.getInputs()) {
+			portToNeedCastMap.put(input, input.getType().getSizeInBits() < 32);
+		}
+		for (Port output: actor.getOutputs()) {
+			portToNeedCastMap.put(output, output.getType().getSizeInBits() < 32);
+		}
+	}
+	
 	private void computeStateToLabelMap(Actor actor) {
 		if (actor.hasFsm()) {
 			for (int i = 0; i < actor.getFsm().getStates().size(); i++) {
@@ -148,10 +160,7 @@ public class TTAActorTemplateData {
 		computeStateToLabelMap(actor);
 		computePortToIndexByPatternMap(actor);
 		computePortToIndexMap(actor);
-	}
-	
-	public void computeRamSize(Actor actor) {
-		
+		computePortToNeedCastMap(actor);
 	}
 
 	public Map<Var, Var> getCastedListReferences() {
@@ -168,6 +177,10 @@ public class TTAActorTemplateData {
 
 	public Map<Port, Integer> getPortToIndexMap() {
 		return portToIndexMap;
+	}
+
+	public Map<Port, Boolean> getPortToNeedCastMap() {
+		return portToNeedCastMap;
 	}
 
 	public Map<State, Integer> getStateToLabelMap() {

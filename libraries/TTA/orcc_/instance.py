@@ -236,6 +236,6 @@ class Instance:
             j += 1
 
         if i!=j:
-            print "ERROR: Wrong generated data on '" + port.name + "' (line " + str(i) + ")."
+            print "ERROR: Wrong generated data on '" + port.name + "' (index " + str(port.index) + " - line " + str(i) + ")."
 
 

@@ -18,7 +18,7 @@ printStatusVar(port) ::= <<
 @status_<port.name> = global i32 0
 >>
 
-printReadFunction(port, index) ::= <<
+printReadFunction(port, index, needCast) ::= <<
 define internal void @_read_<port.name>(<port.type>* %data, i32 %numTokens) nounwind {
 entry:
 	%cond = icmp sgt i32 %numTokens, 0
@@ -31,9 +31,10 @@ bb0:
 	
 bb1:
 	%indvar = phi i32 [ 0, %bb0 ], [ %indvar.next, %bb1 ]
-	%value = tail call <port.type> asm sideeffect "CAL_STREAM_IN_READ", "=r,ir"(i32 <index>) nounwind
+	%value = tail call i32 asm sideeffect "CAL_STREAM_IN_READ", "=r,ir"(i32 <index>) nounwind
+	<if(needCast)>%casted_value = trunc i32 %value to <port.type><endif>
 	%scevgep = getelementptr <port.type>* %data, i32 %indvar
-	store <port.type> %value, <port.type>* %scevgep
+	store <port.type> %<if(needCast)>casted_<endif>value, <port.type>* %scevgep
 	%indvar.next = add i32 %indvar, 1
 	%exitcond = icmp eq i32 %indvar.next, %numTokens
 
@@ -44,7 +45,7 @@ bb2:
 }
 >>
 
-printWriteFunction(port, index) ::= <<
+printWriteFunction(port, index, needCast) ::= <<
 define internal void @_write_<port.name>(<port.type>* %data, i32 %numTokens) nounwind {
 entry:
   %cond = icmp sgt i32 %numTokens, 0
@@ -59,7 +60,8 @@ bb1:
   %indvar = phi i32 [ 0, %bb0 ], [ %indvar.next, %bb1 ]
   %scevgep = getelementptr <port.type>* %data, i32 %indvar
   %value = load <port.type>* %scevgep
-  tail call void asm sideeffect "CAL_STREAM_OUT_WRITE", "ir,ir"(i32 <index>, <port.type> %value) nounwind
+  <if(needCast)>%casted_value = <if(port.type.int)>sext<else>zext<endif> <port.type> %value to i32<endif>
+  tail call void asm sideeffect "CAL_STREAM_OUT_WRITE", "ir,ir"(i32 <index>, i32 %<if(needCast)>casted_<endif>value) nounwind
   %indvar.next = add i32 %indvar, 1
   %exitcond = icmp eq i32 %indvar.next, %numTokens
   
@@ -386,11 +388,11 @@ printBroadcast(broadcast) ::= <<
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Input FIFO
-<broadcast.inputs: { input | <printReadFunction(input, i0)> }; separator="\n\n">
+<broadcast.inputs: { input | <printReadFunction(input, i0, true)> }; separator="\n\n">
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Output FIFOs
-<broadcast.outputs: { output | <printWriteFunction(output, i0)> }; separator="\n\n">
+<broadcast.outputs: { output | <printWriteFunction(output, i0, true)> }; separator="\n\n">
 
 
 define void @main() noreturn nounwind noinline {
@@ -446,7 +448,7 @@ printActor(actor, options) ::= <<
 <if(actor.inputs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Input FIFOs
-<actor.inputs: { input | <printReadFunction(input, i0)> }; separator="\n\n">
+<actor.inputs: { input | <printReadFunction(input, i0, actor.templateData.portToNeedCastMap.(input))> }; separator="\n\n">
 
 <actor.inputs: { input | <printPeekFunction(input, i0)> }; separator="\n\n">
 <endif>
@@ -454,7 +456,7 @@ printActor(actor, options) ::= <<
 <if(actor.outputs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Output FIFOs
-<actor.outputs: { output | <printWriteFunction(output, i0)> }; separator="\n\n">
+<actor.outputs: { output | <printWriteFunction(output, i0, actor.templateData.portToNeedCastMap.(output))> }; separator="\n\n">
 <endif>
 
 <if(actor.procs)>
