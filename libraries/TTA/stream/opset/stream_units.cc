@@ -53,11 +53,11 @@ END_FINALIZE_STATE;
 END_DEFINE_STATE
 
 //////////////////////////////////////////////////////////////////////////////
-// CAL_STREAM_IN - Reads a sample from the default input stream.
+// CAL_STREAM_IN_READ - Reads a sample from the default input stream.
 //
 //////////////////////////////////////////////////////////////////////////////
 
-OPERATION_WITH_STATE(CAL_STREAM_IN, INPUT_STREAM)
+OPERATION_WITH_STATE(CAL_STREAM_IN_READ, INPUT_STREAM)
 
 TRIGGER
 	int index = INT(1);
@@ -94,7 +94,7 @@ TRIGGER
     IO(2) = inum;
 END_TRIGGER;
 
-END_OPERATION_WITH_STATE(CAL_STREAM_IN)
+END_OPERATION_WITH_STATE(CAL_STREAM_IN_READ)
 
 //////////////////////////////////////////////////////////////////////////////
 // STREAM_IN_STATUS - Reads the status of the input buffer.
@@ -221,10 +221,10 @@ END_FINALIZE_STATE;
 END_DEFINE_STATE
 
 //////////////////////////////////////////////////////////////////////////////
-// STREAM_OUT - Writes a sample to the default output stream.
+// CAL_STREAM_OUT_WRITE - Writes a sample to the default output stream.
 //////////////////////////////////////////////////////////////////////////////
 
-OPERATION_WITH_STATE(STREAM_OUT, OUTPUT_STREAM)
+OPERATION_WITH_STATE(CAL_STREAM_OUT_WRITE, OUTPUT_STREAM)
 
 TRIGGER
 	int index = INT(1);
@@ -258,7 +258,7 @@ TRIGGER
     }
 END_TRIGGER;
 
-END_OPERATION_WITH_STATE(STREAM_OUT)
+END_OPERATION_WITH_STATE(CAL_STREAM_OUT_WRITE)
 
 //////////////////////////////////////////////////////////////////////////////
 // STREAM_OUT_STATUS - Reads the status of the output buffer.
@@ -267,11 +267,11 @@ END_OPERATION_WITH_STATE(STREAM_OUT)
 // is empty and can be written to.
 //////////////////////////////////////////////////////////////////////////////
 
-OPERATION_WITH_STATE(STREAM_OUT_STATUS, OUTPUT_STREAM)
+OPERATION_WITH_STATE(CAL_STREAM_OUT_STATUS, OUTPUT_STREAM)
 
 TRIGGER
     IO(2) = 0;
 END_TRIGGER;
 
-END_OPERATION_WITH_STATE(STREAM_OUT_STATUS)
+END_OPERATION_WITH_STATE(CAL_STREAM_OUT_STATUS)
 
