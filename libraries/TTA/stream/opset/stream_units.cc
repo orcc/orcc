@@ -54,7 +54,6 @@ END_DEFINE_STATE
 
 //////////////////////////////////////////////////////////////////////////////
 // CAL_STREAM_IN_READ - Reads a sample from the default input stream.
-//
 //////////////////////////////////////////////////////////////////////////////
 
 OPERATION_WITH_STATE(CAL_STREAM_IN_READ, INPUT_STREAM)
@@ -148,13 +147,35 @@ END_OPERATION_WITH_STATE(CAL_STREAM_IN_STATUS)
 OPERATION_WITH_STATE(CAL_STREAM_IN_PEEK, INPUT_STREAM)
 
 TRIGGER
+	int index = INT(1);
+    std::ifstream *inputFile;
+    
+    switch (index) {
+		case 0:
+			inputFile = &(STATE.inputFile0);
+		case 1:
+			inputFile = &(STATE.inputFile1);
+		case 2:
+			inputFile = &(STATE.inputFile2);
+		case 3:
+			inputFile = &(STATE.inputFile3);
+		case 4:
+			inputFile = &(STATE.inputFile4);
+		case 5:
+			inputFile = &(STATE.inputFile5);
+		case 6:
+			inputFile = &(STATE.inputFile6);
+		case 7:
+			inputFile = &(STATE.inputFile7);
+	}  
+
 	int inum, i, present_pos;
     char input[12];
-    present_pos = STATE.inputFile.tellg();
-    STATE.inputFile.getline(input, 12);
+    present_pos = inputFile->tellg();
+    inputFile->getline(input, 12);
 	std::istringstream iss(input);
     iss >> std::dec >> inum;
-    STATE.inputFile.seekg(present_pos, std::ios_base::beg);
+    inputFile->seekg(present_pos, std::ios_base::beg);
     IO(2) = inum;
 END_TRIGGER;
 
