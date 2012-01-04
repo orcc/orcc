@@ -18,26 +18,36 @@
 //////////////////////////////////////////////////////////////////////////////
 
 DEFINE_STATE(INPUT_STREAM)
-    std::ifstream inputFile;
+    std::ifstream inputFile0;
+    std::ifstream inputFile1;
+    std::ifstream inputFile2;
+    std::ifstream inputFile3;
+    std::ifstream inputFile4;
+    std::ifstream inputFile5;
+    std::ifstream inputFile6;
+    std::ifstream inputFile7;
+    
 
 INIT_STATE(INPUT_STREAM)
-    const char* fileNameFromEnv = getenv("TTASIM_STREAM_IN_FILE_V1");
-    std::string fileName = "";
-    if (fileNameFromEnv == NULL) {
-        fileName = "tta_stream_v1.in";
-    } else {
-        fileName = fileNameFromEnv;
-    }
-    inputFile.open(fileName.c_str(), std::ios_base::binary);
-    if (!inputFile.is_open()) {
-        OUTPUT_STREAM 
-            << "Cannot open input stream file " 
-            << fileName << std::endl;
-    }
+    inputFile0.open("tta_stream_0.in", std::ios_base::binary);
+    inputFile1.open("tta_stream_1.in", std::ios_base::binary);
+    inputFile2.open("tta_stream_2.in", std::ios_base::binary);
+    inputFile3.open("tta_stream_3.in", std::ios_base::binary);
+    inputFile4.open("tta_stream_4.in", std::ios_base::binary);
+    inputFile5.open("tta_stream_5.in", std::ios_base::binary);
+    inputFile6.open("tta_stream_6.in", std::ios_base::binary);
+    inputFile7.open("tta_stream_7.in", std::ios_base::binary);
 END_INIT_STATE;
 
 FINALIZE_STATE(INPUT_STREAM)
-    inputFile.close();
+	if(inputFile0.is_open()) inputFile0.close();
+	if(inputFile1.is_open()) inputFile1.close();
+	if(inputFile2.is_open()) inputFile2.close();
+	if(inputFile3.is_open()) inputFile3.close();
+	if(inputFile4.is_open()) inputFile4.close();
+	if(inputFile5.is_open()) inputFile5.close();
+	if(inputFile6.is_open()) inputFile6.close();
+	if(inputFile7.is_open()) inputFile7.close();
 END_FINALIZE_STATE;
 
 END_DEFINE_STATE
@@ -50,18 +60,35 @@ END_DEFINE_STATE
 OPERATION_WITH_STATE(CAL_STREAM_IN, INPUT_STREAM)
 
 TRIGGER
-    if (BWIDTH(2) != 32) {
-        Application::logStream() 
-            << "CAL_STREAM_IN works with 32 bit signed integers only at the moment." 
-            << std::endl;
-    }
-    if (!STATE.inputFile.is_open()) {
+	int index = INT(1);
+    std::ifstream *inputFile;
+    
+    switch (index) {
+		case 0:
+			inputFile = &(STATE.inputFile0);
+		case 1:
+			inputFile = &(STATE.inputFile1);
+		case 2:
+			inputFile = &(STATE.inputFile2);
+		case 3:
+			inputFile = &(STATE.inputFile3);
+		case 4:
+			inputFile = &(STATE.inputFile4);
+		case 5:
+			inputFile = &(STATE.inputFile5);
+		case 6:
+			inputFile = &(STATE.inputFile6);
+		case 7:
+			inputFile = &(STATE.inputFile7);
+	}  
+
+    if (!inputFile->is_open()) {
         IO(2) = 0;
-        return true;
+        return;
     }
 	int inum;
     char input[12];
-    STATE.inputFile.getline(input, 12);
+    inputFile->getline(input, 12);
 	std::istringstream iss(input);
     iss >> std::dec >> inum;
     IO(2) = inum;
@@ -76,17 +103,39 @@ END_OPERATION_WITH_STATE(CAL_STREAM_IN)
 OPERATION_WITH_STATE(CAL_STREAM_IN_STATUS, INPUT_STREAM)
 
 TRIGGER
+	int index = INT(1);
+    std::ifstream *inputFile;
+    
+    switch (index) {
+		case 0:
+			inputFile = &(STATE.inputFile0);
+		case 1:
+			inputFile = &(STATE.inputFile1);
+		case 2:
+			inputFile = &(STATE.inputFile2);
+		case 3:
+			inputFile = &(STATE.inputFile3);
+		case 4:
+			inputFile = &(STATE.inputFile4);
+		case 5:
+			inputFile = &(STATE.inputFile5);
+		case 6:
+			inputFile = &(STATE.inputFile6);
+		case 7:
+			inputFile = &(STATE.inputFile7);
+	}  
+
 	unsigned int fifo_size, tokens_remaining, present_pos;
 	int limit;
-	present_pos = STATE.inputFile.tellg();
-	STATE.inputFile.seekg(0, std::ios_base::end);
-	fifo_size = STATE.inputFile.tellg();
-	STATE.inputFile.seekg(present_pos, std::ios_base::beg);
-	tokens_remaining = fifo_size - STATE.inputFile.tellg();
+	present_pos = inputFile->tellg();
+	inputFile->seekg(0, std::ios_base::end);
+	fifo_size = inputFile->tellg();
+	inputFile->seekg(present_pos, std::ios_base::beg);
+	tokens_remaining = fifo_size - inputFile->tellg();
 	tokens_remaining /= 10;
 	limit = (int)sqrt((double)fifo_size);
 	if(tokens_remaining <= limit)
-		RUNTIME_ERROR("Stream 1 out of data.")
+		RUNTIME_ERROR("Stream out of data.")
     IO(2) = tokens_remaining;
 END_TRIGGER;
 
@@ -114,79 +163,115 @@ END_OPERATION_WITH_STATE(CAL_STREAM_IN_PEEK)
 
 
 //////////////////////////////////////////////////////////////////////////////
-// OUTPUT_STREAM_V1 - State definition for the STREAM_OUT_V1.
+// OUTPUT_STREAM - State definition for the STREAM_OUT.
 //
 // Opens a file simulating the output stream. Default filename is 
 // tta_stream.out, and can be changed with the environment variable 
-// TTASIM_STREAM_IN_FILE_V1.
+// TTASIM_STREAM_IN_FILE.
 //////////////////////////////////////////////////////////////////////////////
 
-DEFINE_STATE(OUTPUT_STREAM_V1)
-    std::ofstream outputFile;
+DEFINE_STATE(OUTPUT_STREAM)
+    std::ofstream outputFile0;
+    std::ofstream outputFile1;
+    std::ofstream outputFile2;
+    std::ofstream outputFile3;
+    std::ofstream outputFile4;
+    std::ofstream outputFile5;
+    std::ofstream outputFile6;
+    std::ofstream outputFile7;
 
-INIT_STATE(OUTPUT_STREAM_V1)
- 
-    const char* fileNameFromEnv = getenv("TTASIM_STREAM_OUT_FILE_V1");
-    std::string fileName = "";
-    if (fileNameFromEnv == NULL) {
-        fileName = "tta_stream_v1.out";
-    } else {
-        fileName = fileNameFromEnv;
-    }
+INIT_STATE(OUTPUT_STREAM)
     outputFile.open(
-        fileName.c_str(), 
+        "tta_stream_0.out", 
         std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
-    if (!outputFile.is_open()) {
-        OUTPUT_STREAM 
-            << "Cannot open output file!" 
-            << fileName << std::endl;
-    }
+    outputFile.open(
+        "tta_stream_1.out", 
+        std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
+    outputFile.open(
+        "tta_stream_2.out", 
+        std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
+    outputFile.open(
+        "tta_stream_3.out", 
+        std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
+    outputFile.open(
+        "tta_stream_4.out", 
+        std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
+    outputFile.open(
+        "tta_stream_5.out", 
+        std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
+    outputFile.open(
+        "tta_stream_6.out", 
+        std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
+    outputFile.open(
+        "tta_stream_7.out", 
+        std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
 END_INIT_STATE;
 
-FINALIZE_STATE(OUTPUT_STREAM_V1)
-    outputFile.close();
+FINALIZE_STATE(OUTPUT_STREAM)
+	if(outputFile0.is_open()) outputFile0.close();
+	if(outputFile1.is_open()) outputFile1.close();
+	if(outputFile2.is_open()) outputFile2.close();
+	if(outputFile3.is_open()) outputFile3.close();
+	if(outputFile4.is_open()) outputFile4.close();
+	if(outputFile5.is_open()) outputFile5.close();
+	if(outputFile6.is_open()) outputFile6.close();
+	if(outputFile7.is_open()) outputFile7.close();
 END_FINALIZE_STATE;
 
 END_DEFINE_STATE
 
 //////////////////////////////////////////////////////////////////////////////
-// STREAM_OUT_V1 - Writes a sample to the default output stream.
-//
-// @todo: Support for other sample sizes than 32.
+// STREAM_OUT - Writes a sample to the default output stream.
 //////////////////////////////////////////////////////////////////////////////
 
-OPERATION_WITH_STATE(STREAM_OUT_V1, OUTPUT_STREAM_V1)
+OPERATION_WITH_STATE(STREAM_OUT, OUTPUT_STREAM)
 
 TRIGGER
+	int index = INT(1);
+    int data = INT(2);
+    std::ofstream *outputFile;
+    
+    switch (index) {
+		case 0:
+			outputFile = &(STATE.outputFile0);
+		case 1:
+			outputFile = &(STATE.outputFile1);
+		case 2:
+			outputFile = &(STATE.outputFile2);
+		case 3:
+			outputFile = &(STATE.outputFile3);
+		case 4:
+			outputFile = &(STATE.outputFile4);
+		case 5:
+			outputFile = &(STATE.outputFile5);
+		case 6:
+			outputFile = &(STATE.outputFile6);
+		case 7:
+			outputFile = &(STATE.outputFile7);
+	}    
+    
+	*outputFile << data << std::endl;
+    *outputFile << std::flush;
 
-    if (BWIDTH(1) != 32) 
-        Application::logStream() 
-            << "STREAM_OUT_V1 works with signed integers only at the moment." 
-            << std::endl;
-
-    int data = UINT(1);
-	STATE.outputFile << data << std::endl;
-    STATE.outputFile << std::flush;
-
-    if (STATE.outputFile.fail()) {
+    if (outputFile->fail()) {
         OUTPUT_STREAM << "error while writing the output file" << std::endl;
     }
 END_TRIGGER;
 
-END_OPERATION_WITH_STATE(STREAM_OUT_V1)
+END_OPERATION_WITH_STATE(STREAM_OUT)
 
 //////////////////////////////////////////////////////////////////////////////
-// STREAM_OUT_STATUS_V1 - Reads the status of the output buffer.
+// STREAM_OUT_STATUS - Reads the status of the output buffer.
 //
 // This simulation behavior always returns 1, which means output buffer
 // is empty and can be written to.
 //////////////////////////////////////////////////////////////////////////////
 
-OPERATION_WITH_STATE(STREAM_OUT_STATUS_V1, OUTPUT_STREAM_V1)
+OPERATION_WITH_STATE(STREAM_OUT_STATUS, OUTPUT_STREAM)
 
 TRIGGER
     IO(2) = 0;
 END_TRIGGER;
 
-END_OPERATION_WITH_STATE(STREAM_OUT_STATUS_V1)
+END_OPERATION_WITH_STATE(STREAM_OUT_STATUS)
 
