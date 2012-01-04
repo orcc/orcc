@@ -141,7 +141,7 @@ class Instance:
 
 
     def simulate(self, srcPath, libPath, tracePath):
-        if not (self.isNative or self.isBroadcast) :
+        if not (self.isNative or self.isBroadcast) and self.inputs and not self._hasNativePort() :
             instancePath = os.path.join(srcPath, self.id)
             os.chdir(instancePath)
             
@@ -158,7 +158,7 @@ class Instance:
                 shutil.copy(srcTrace, tgtTrace)
 
             # Launch the simulation
-            retcode = subprocess.call(["ttasim", "--no-debugmode", "-a", self._adfFile, "-p", self._tpefFile])
+            retcode = subprocess.call(["ttasim", "--no-debugmode", "-v", "-a", self._adfFile, "-p", self._tpefFile])
 
             # Check generated data
             i = 0
@@ -200,6 +200,15 @@ class Instance:
                 maxAddress = int(node.getElementsByTagName("max-address")[0].childNodes[0].nodeValue)
                 depth = int((maxAddress - minAddress) / 4)
         return Memory(width, depth)
+        
+    def _hasNativePort(self):
+        for input in self.inputs:
+            if(input.isNative):
+                return True;
+        for output in self.outputs:
+            if(output.isNative):
+                return True;
+        return False        
 
     def generateProcessor(self, templateFile, targetFile):
         template = tempita.Template.from_filename(templateFile, namespace={}, encoding=None)

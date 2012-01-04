@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <math.h> // isnan()
+using namespace std;
 
 #include "OSAL.hh"
 #include "OperationGlobals.hh"
@@ -29,14 +30,15 @@ DEFINE_STATE(INPUT_STREAM)
     
 
 INIT_STATE(INPUT_STREAM)
-    inputFile0.open("tta_stream_0.in", std::ios_base::binary);
-    inputFile1.open("tta_stream_1.in", std::ios_base::binary);
-    inputFile2.open("tta_stream_2.in", std::ios_base::binary);
-    inputFile3.open("tta_stream_3.in", std::ios_base::binary);
-    inputFile4.open("tta_stream_4.in", std::ios_base::binary);
-    inputFile5.open("tta_stream_5.in", std::ios_base::binary);
-    inputFile6.open("tta_stream_6.in", std::ios_base::binary);
-    inputFile7.open("tta_stream_7.in", std::ios_base::binary);
+    inputFile0.open("tta_stream_0.in");
+    inputFile1.open("tta_stream_1.in");
+    inputFile2.open("tta_stream_2.in");
+    inputFile3.open("tta_stream_3.in");
+    inputFile4.open("tta_stream_4.in");
+    inputFile5.open("tta_stream_5.in");
+    inputFile6.open("tta_stream_6.in");
+    inputFile7.open("tta_stream_7.in");
+    
 END_INIT_STATE;
 
 FINALIZE_STATE(INPUT_STREAM)
@@ -65,26 +67,34 @@ TRIGGER
     switch (index) {
 		case 0:
 			inputFile = &(STATE.inputFile0);
+			break;
 		case 1:
 			inputFile = &(STATE.inputFile1);
+			break;
 		case 2:
 			inputFile = &(STATE.inputFile2);
+			break;
 		case 3:
 			inputFile = &(STATE.inputFile3);
+			break;
 		case 4:
 			inputFile = &(STATE.inputFile4);
+			break;
 		case 5:
 			inputFile = &(STATE.inputFile5);
+			break;
 		case 6:
 			inputFile = &(STATE.inputFile6);
+			break;
 		case 7:
 			inputFile = &(STATE.inputFile7);
-	}  
+	}
 
     if (!inputFile->is_open()) {
         IO(2) = 0;
-        return;
+        return true;
     }
+    
 	int inum;
     char input[12];
     inputFile->getline(input, 12);
@@ -108,18 +118,25 @@ TRIGGER
     switch (index) {
 		case 0:
 			inputFile = &(STATE.inputFile0);
+			break;
 		case 1:
 			inputFile = &(STATE.inputFile1);
+			break;
 		case 2:
 			inputFile = &(STATE.inputFile2);
+			break;
 		case 3:
 			inputFile = &(STATE.inputFile3);
+			break;
 		case 4:
 			inputFile = &(STATE.inputFile4);
+			break;
 		case 5:
 			inputFile = &(STATE.inputFile5);
+			break;
 		case 6:
 			inputFile = &(STATE.inputFile6);
+			break;
 		case 7:
 			inputFile = &(STATE.inputFile7);
 	}  
@@ -131,8 +148,8 @@ TRIGGER
 	fifo_size = inputFile->tellg();
 	inputFile->seekg(present_pos, std::ios_base::beg);
 	tokens_remaining = fifo_size - inputFile->tellg();
-	tokens_remaining /= 10;
 	limit = (int)sqrt((double)fifo_size);
+
 	if(tokens_remaining <= limit)
 		RUNTIME_ERROR("Stream out of data.")
     IO(2) = tokens_remaining;
@@ -153,18 +170,25 @@ TRIGGER
     switch (index) {
 		case 0:
 			inputFile = &(STATE.inputFile0);
+			break;
 		case 1:
 			inputFile = &(STATE.inputFile1);
+			break;
 		case 2:
 			inputFile = &(STATE.inputFile2);
+			break;
 		case 3:
 			inputFile = &(STATE.inputFile3);
+			break;
 		case 4:
 			inputFile = &(STATE.inputFile4);
+			break;
 		case 5:
 			inputFile = &(STATE.inputFile5);
+			break;
 		case 6:
 			inputFile = &(STATE.inputFile6);
+			break;
 		case 7:
 			inputFile = &(STATE.inputFile7);
 	}  
@@ -202,30 +226,14 @@ DEFINE_STATE(OUTPUT_STREAM)
     std::ofstream outputFile7;
 
 INIT_STATE(OUTPUT_STREAM)
-    outputFile.open(
-        "tta_stream_0.out", 
-        std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
-    outputFile.open(
-        "tta_stream_1.out", 
-        std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
-    outputFile.open(
-        "tta_stream_2.out", 
-        std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
-    outputFile.open(
-        "tta_stream_3.out", 
-        std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
-    outputFile.open(
-        "tta_stream_4.out", 
-        std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
-    outputFile.open(
-        "tta_stream_5.out", 
-        std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
-    outputFile.open(
-        "tta_stream_6.out", 
-        std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
-    outputFile.open(
-        "tta_stream_7.out", 
-        std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
+    outputFile0.open("tta_stream_0.out");
+    outputFile1.open("tta_stream_1.out");
+    outputFile2.open("tta_stream_2.out");
+    outputFile3.open("tta_stream_3.out");
+    outputFile4.open("tta_stream_4.out");
+    outputFile5.open("tta_stream_5.out");
+    outputFile6.open("tta_stream_6.out");
+    outputFile7.open("tta_stream_7.out");
 END_INIT_STATE;
 
 FINALIZE_STATE(OUTPUT_STREAM)
@@ -255,28 +263,36 @@ TRIGGER
     switch (index) {
 		case 0:
 			outputFile = &(STATE.outputFile0);
+			break;
 		case 1:
 			outputFile = &(STATE.outputFile1);
+			break;
 		case 2:
 			outputFile = &(STATE.outputFile2);
+			break;
 		case 3:
 			outputFile = &(STATE.outputFile3);
+			break;
 		case 4:
 			outputFile = &(STATE.outputFile4);
+			break;
 		case 5:
 			outputFile = &(STATE.outputFile5);
+			break;
 		case 6:
 			outputFile = &(STATE.outputFile6);
+			break;
 		case 7:
 			outputFile = &(STATE.outputFile7);
-	}    
-    
+	}
+	
 	*outputFile << data << std::endl;
-    *outputFile << std::flush;
+	*outputFile << std::flush;
 
-    if (outputFile->fail()) {
-        OUTPUT_STREAM << "error while writing the output file" << std::endl;
-    }
+	if (outputFile->fail()) {
+		OUTPUT_STREAM << "error while writing the output file" << std::endl;
+	}
+			
 END_TRIGGER;
 
 END_OPERATION_WITH_STATE(CAL_STREAM_OUT_WRITE)

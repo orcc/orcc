@@ -3,8 +3,8 @@
   
     <operation>
     <name>CAL_STREAM_IN_READ</name>
-    <description>
-</description>    <inputs>1</inputs>
+    <description></description>    
+    <inputs>1</inputs>
     <outputs>1</outputs>
     <side-effects/>
     <affects>
@@ -17,8 +17,8 @@
 
   <operation>
     <name>CAL_STREAM_IN_STATUS</name>
-    <description>
-</description>    <inputs>1</inputs>
+    <description></description>    
+    <inputs>1</inputs>
     <outputs>1</outputs>
     <affected-by>
       <operation name="CAL_STREAM_IN_READ"/>
@@ -30,8 +30,8 @@
 
   <operation>
     <name>CAL_STREAM_IN_PEEK</name>
-    <description>
-</description>    <inputs>1</inputs>
+    <description></description>
+    <inputs>1</inputs>
     <outputs>1</outputs>
     <affected-by>
       <operation name="CAL_STREAM_IN_READ"/>
