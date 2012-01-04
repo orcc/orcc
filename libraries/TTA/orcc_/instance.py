@@ -140,15 +140,19 @@ class Instance:
         os.remove("stream_units.opb")
 
 
-    def simulate(self, srcPath, tracePath):
+    def simulate(self, srcPath, libPath, tracePath):
         if not (self.isNative or self.isBroadcast) :
             instancePath = os.path.join(srcPath, self.id)
             os.chdir(instancePath)
+            
+            shutil.copy(os.path.join(libPath, "stream", "opset", "stream_units.opb"), instancePath)
+            shutil.copy(os.path.join(libPath, "stream", "opset", "stream_units.opp"), instancePath)
+            shutil.copy(os.path.join(libPath, "stream", "opset", "stream_units.cc"), instancePath)
 
             # Copy trace to the instance folder
             for input in self.inputs:
                 traceName = self.id + "_" + input.name + ".txt"
-                fifoName = "tta_stream_v%d.in" % (input.index)
+                fifoName = "tta_stream_%d.in" % (input.index)
                 srcTrace = os.path.join(tracePath, traceName)
                 tgtTrace = os.path.join(instancePath, fifoName)
                 shutil.copy(srcTrace, tgtTrace)
@@ -161,10 +165,14 @@ class Instance:
             for output in self.outputs:
                 i+= 1
                 traceName = self.id + "_" + output.name + ".txt"
-                fifoName = "tta_stream_v%d.out" % (output.index)
+                fifoName = "tta_stream_%d.out" % (output.index)
                 srcTrace = os.path.join(tracePath, traceName)
                 tgtTrace = os.path.join(instancePath, fifoName)
                 self.diff(srcTrace, tgtTrace, output)
+                
+            os.remove("stream_units.opp")
+            os.remove("stream_units.opb")
+            os.remove("stream_units.cc")
 
 
     def _readMif(self, fileName):

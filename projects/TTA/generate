@@ -120,7 +120,7 @@ def simulate():
     print "* Simulate the execution of the application on  each TTA"
     print "*********************************************************************"
 
-    network.simulate(srcPath, tracePath)
+    network.simulate(srcPath, libPath, tracePath)
 
     print "* Simulation of %d instances done in %f seconds." % (len(network.instances), time.time() - start)
 

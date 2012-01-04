@@ -50,10 +50,10 @@ class Network:
                 instance.compile(srcPath, libPath, args, debug)
 
 
-    def simulate(self, srcPath, tracePath):
+    def simulate(self, srcPath, libPath, tracePath):
         for instance in self.instances:
             print ">> Instance " + instance.id + "."
-            instance.simulate(srcPath, tracePath)
+            instance.simulate(srcPath, libPath, tracePath)
 
 
     def generate(self, srcPath, libPath, args, debug):
