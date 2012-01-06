@@ -158,7 +158,7 @@ class Instance:
                 shutil.copy(srcTrace, tgtTrace)
 
             # Launch the simulation
-            retcode = subprocess.call(["ttasim", "--no-debugmode", "-v", "-a", self._adfFile, "-p", self._tpefFile])
+            retcode = subprocess.call(["ttasim", "--no-debugmode", "-e", "run; set filename stats.txt; set fileId [open $filename w]; puts $fileId [info proc cycles]; puts $fileId [info proc stats]; puts $fileId [info proc mapping]; close $fileId; exit;", "-a", self._adfFile, "-p", self._tpefFile])
 
             # Check generated data
             i = 0
