@@ -287,18 +287,6 @@ public class OrccUtil {
 	}
 
 	/**
-	 * Returns the file name that corresponds to the qualified name of the
-	 * actor/unit.
-	 * 
-	 * @param entity
-	 *            an actor/unit
-	 * @return the file name that corresponds to the qualified name of the actor
-	 */
-	public static String getFile(Nameable entity) {
-		return entity.getName().replace('.', '/');
-	}
-
-	/**
 	 * Returns the file in the given project that has the given qualified name
 	 * and the given extension. Looks in source folders first and then output
 	 * folders.
@@ -329,6 +317,18 @@ public class OrccUtil {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Returns the file name that corresponds to the qualified name of the
+	 * actor/unit.
+	 * 
+	 * @param entity
+	 *            an actor/unit
+	 * @return the file name that corresponds to the qualified name of the actor
+	 */
+	public static String getFile(Nameable entity) {
+		return entity.getName().replace('.', '/');
 	}
 
 	/**
@@ -542,6 +542,19 @@ public class OrccUtil {
 	}
 
 	/**
+	 * Loads the given group and recursively loads the groups it imports.
+	 * 
+	 * @param group
+	 *            a ST group
+	 */
+	private static void loadGroup(STGroup group) {
+		group.load();
+		for (STGroup importedGroup : group.getImportedGroups()) {
+			loadGroup(importedGroup);
+		}
+	}
+
+	/**
 	 * Loads a template group.
 	 * 
 	 * @param groupName
@@ -553,7 +566,7 @@ public class OrccUtil {
 		Thread.currentThread().setContextClassLoader(cl);
 
 		STGroup group = new STGroupFile(fullPath);
-		group.load();
+		loadGroup(group);
 
 		Thread.currentThread().setContextClassLoader(oldCl);
 
