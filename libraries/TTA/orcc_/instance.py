@@ -88,10 +88,6 @@ class Instance:
         os.remove("stream_units.opp")
         os.remove("stream_units.opb")
 
-    def initializeMemories(self):
-        self.irom = self._readMif(self._mifFile)
-        self.dram = self._readAdf(self._adfFile)
-
     def generate(self, srcPath, libPath, args, debug):
         instanceSrcPath = os.path.join(srcPath, self.id)
         ttaPath = os.path.join(instanceSrcPath, "tta")
@@ -100,9 +96,7 @@ class Instance:
         wrapperPath = os.path.join(srcPath, "wrapper")
         sharePath = os.path.join(srcPath, "share")
         os.chdir(instanceSrcPath)
-        if debug: 
-            print "ROM: " + str(self.irom.depth) + "x" + str(self.irom.width) + "bits"
-            print "RAM: " + str(self.dram.depth) + "x" + str(self.dram.width) + "bits"
+
         # Copy libraries in working directory
         shutil.copy(os.path.join(libPath, "stream", "stream_units.hdb"), instanceSrcPath)
         shutil.rmtree("vhdl", ignore_errors=True)
@@ -119,13 +113,21 @@ class Instance:
         if retcode >= 0: retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", vhdlPath, "-f", "coe", "-o", "coe", self._adfFile])
 
         # Generate processor files
-        self.initializeMemories()
+        self.irom = self._readMif(self._mifFile)
+        self.dram = self._readAdf(self._adfFile)
+        if debug: 
+            print "ROM: " + str(self.irom.depth) + "x" + str(self.irom.width) + "bits"
+            print "RAM: " + str(self.dram.depth) + "x" + str(self.dram.width) + "bits"
+            
         self.generateProcessor(os.path.join(libPath, "templates", "processor.template"), os.path.join(vhdlPath, self._processorFile))
+        
         # Copy files to build directory
-        shutil.move(self._mifFile, memoryPath)
-        shutil.move(self._mifDataFile, memoryPath)
-        shutil.move(self._coeFile, memoryPath)
-        shutil.move(self._coeDataFile, memoryPath)
+        shutil.rmtree(memoryPath, ignore_errors=True)
+        os.mkdir(memoryPath)
+        shutil.move(self._mifFile, os.path.join(memoryPath, self._mifFile))
+        shutil.move(self._mifDataFile, os.path.join(memoryPath, self._mifDataFile))
+        shutil.move(self._coeFile, os.path.join(memoryPath, self._coeFile))
+        shutil.move(self._coeDataFile, os.path.join(memoryPath, self._coeDataFile))
         shutil.move("imem_mau_pkg.vhdl", vhdlPath)
         if not (self.isNative or self.isBroadcast):
             shutil.copy(self._tbFile, vhdlPath)
