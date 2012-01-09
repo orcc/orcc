@@ -6,16 +6,11 @@ import "net/sf/orcc/backends/llvm/Actor.stg"
 ///////////////////////////////////////////////////////////////////////////////
 
 printStatus(dir, port, index) ::= <<
-%local_status_<port.name> = tail call i32 asm sideeffect "CAL_STREAM_<dir>_STATUS", "=r,ir"(i32 <index>) nounwind
-store i32 %local_status_<port.name>, i32* @status_<port.name>
+%status_<port.name> = tail call i32 asm sideeffect "CAL_STREAM_<dir>_STATUS", "=r,ir"(i32 <index>) nounwind
 >>
 
 printBcastStatus(dir, port, index) ::= <<
 %status_<port.name> = tail call i32 asm sideeffect "CAL_STREAM_<dir>_STATUS", "=r,ir"(i32 <index>) nounwind
->>
-
-printStatusVar(port) ::= <<
-@status_<port.name> = global i32 0
 >>
 
 printReadFunction(port, index, needCast) ::= <<
@@ -138,17 +133,11 @@ printBcastPortsStatus(dir, ports) ::= <<
 <ports: { port | <printBcastStatus(dir, port, i0)> }; separator="\n">
 >>
 
-printStatusVars(ports) ::= <<
-<ports: { port | <printStatusVar(port)> }; separator="\n">
->>
-
 checkOutputPorts(bb_name, action, port, restPorts, portToIndexMap, state, lastPort=false) ::= <<
 <if(!lastPort)>
-%<bb_name>_<action.name>_status_<port.name> = load i32* @status_<port.name>
-%has_valid_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = icmp sge i32 %<bb_name>_<action.name>_status_<port.name>, <pattern.numTokensMap.(port)>
+%has_valid_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = icmp sge i32 %status_<port.name>, <pattern.numTokensMap.(port)>
 <else>
-%<bb_name>_<action.name>_status_<port.name> = load i32* @status_<port.name>
-%available_output_<if(state)><state.name>_<endif><action.name>_<port.name> = icmp sge i32 %<bb_name>_<action.name>_status_<port.name>, <pattern.numTokensMap.(port)>
+%available_output_<if(state)><state.name>_<endif><action.name>_<port.name> = icmp sge i32 %status_<port.name>, <pattern.numTokensMap.(port)>
 %has_valid_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = and i1 %has_valid_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(lastPort)>, %available_output_<if(state)><state.name>_<endif><action.name>_<port.name><
 endif><
 if(restPorts)>
@@ -162,11 +151,9 @@ checkOutputPattern(state_name, action, pattern, state=false) ::= <<
 
 checkInputPorts(bb_name, action, port, restPorts, portToIndexMap, state, lastPort=false) ::= <<
 <if(!lastPort)>
-%<bb_name>_<action.name>_status_<port.name> = load i32* @status_<port.name>
-%has_valid_inputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = icmp sge i32 %<bb_name>_<action.name>_status_<port.name>, <pattern.numTokensMap.(port)>
+%has_valid_inputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = icmp sge i32 %status_<port.name>, <pattern.numTokensMap.(port)>
 <else>
-%<bb_name>_<action.name>_status_<port.name> = load i32* @status_<port.name>
-%available_input_<if(state)><state.name>_<endif><action.name>_<port.name> = icmp sge i32 %<bb_name>_<action.name>_status_<port.name>, <pattern.numTokensMap.(port)>
+%available_input_<if(state)><state.name>_<endif><action.name>_<port.name> = icmp sge i32 %status_<port.name>, <pattern.numTokensMap.(port)>
 %has_valid_inputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = and i1 %has_valid_inputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(lastPort)>, %available_input_<if(state)><state.name>_<endif><action.name>_<port.name><
 endif><
 if(restPorts)>
@@ -280,9 +267,6 @@ schedulingStates(sourceState, transitionsList) ::= <<
 printTransition(transitions) ::= <<
 ; STATE <transitions.sourceState.name>
 bb_s_<transitions.sourceState.name>:
-
-call void @refresh_fifos ()
-
 <schedulingStates(transitions.sourceState, transitions.list)>
 >>
 
@@ -432,9 +416,6 @@ printActor(actor, options) ::= <<
 <instance.actor.parameters: { var | <actorParameter(var, instance.parameters.(var.name))> }; separator="\n">
 <endif>
 
-<printStatusVars(actor.inputs)>
-<printStatusVars(actor.outputs)>
-
 <if(actor.stateVars)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; State variables of the actor
@@ -477,12 +458,6 @@ printActor(actor, options) ::= <<
 @_FSM_state = global i32 <actor.templateData.stateToLabelMap.(actor.fsm.initialState)>
 <endif>
 
-define internal void @refresh_fifos() nounwind noinline {
-	<printPortsStatus("IN", actor.inputs)>
-	<printPortsStatus("OUT", actor.outputs)>
-	ret void
-}
-
 define void @main() noreturn nounwind noinline {
 entry:
 	<actor.initializes: callInitialize(); separator="\n">
@@ -490,7 +465,8 @@ entry:
 	br label %bb_scheduler_start
 
 	bb_scheduler_start:
-	call void @refresh_fifos ()
+	<printPortsStatus("IN", actor.inputs)>
+	<printPortsStatus("OUT", actor.outputs)>
 <if(actor.fsm)
 ><schedulerWithFSM(actor.actionsOutsideFsm, actor.fsm)><
 else
