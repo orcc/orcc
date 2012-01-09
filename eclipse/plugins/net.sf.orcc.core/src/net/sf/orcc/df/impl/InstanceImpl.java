@@ -38,7 +38,6 @@ import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
-import net.sf.orcc.df.Nameable;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.moc.MoC;
 
@@ -251,49 +250,36 @@ public class InstanceImpl extends VertexImpl implements Instance {
 		return entity;
 	}
 
-	/**
-	 * Returns the path of identifiers from the top-level to this instance.
-	 * 
-	 * @return the path of identifiers from the top-level to this instance
-	 */
 	@Override
 	public List<String> getHierarchicalId() {
 		List<String> ids = new ArrayList<String>();
-		EObject obj = this;
-		do {
-			String name = ((Nameable) obj).getName();
-			ids.add(0, name);
-			obj = obj.eContainer();
-		} while (obj != null);
+		for (Entity entity : getHierarchy()) {
+			ids.add(entity.getName());
+		}
+		ids.add(getName());
 		return ids;
 	}
-	
-	
-	/**
-	 * Returns the hierarchical name of this instance.
-	 * 
-	 * @return the hierarchical name of this instance
-	 */
+
 	@Override
 	public String getHierarchicalName() {
-		String name = this.getName();
-		EObject obj = this.eContainer();
-		while (obj.eContainer() != null) {
-			name = ((Nameable) obj).getName() + "_" + name;
-			obj = obj.eContainer();
+		StringBuilder builder = new StringBuilder();
+		for (Entity entity : getHierarchy()) {
+			builder.append(entity.getName());
+			builder.append('_');
 		}
-		return name;
+		builder.append(getName());
+		return builder.toString();
 	}
 
 	@Override
-	public String getHierarchicalPath() {
-		StringBuilder builder = new StringBuilder();
-		for (String id : getHierarchicalId()) {
-			builder.append('/');
-			builder.append(id);
-		}
-
-		return builder.toString();
+	public List<Entity> getHierarchy() {
+		List<Entity> entities = new ArrayList<Entity>();
+		EObject obj = eContainer();
+		do {
+			entities.add(0, (Entity) obj);
+			obj = obj.eContainer();
+		} while (obj != null);
+		return entities;
 	}
 
 	@Override

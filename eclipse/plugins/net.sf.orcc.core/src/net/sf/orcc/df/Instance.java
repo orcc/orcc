@@ -80,7 +80,7 @@ public interface Instance extends Vertex {
 	 * @return the path of identifiers from the top-level to this instance
 	 */
 	List<String> getHierarchicalId();
-	
+
 	/**
 	 * Returns the hierarchical name of this instance.
 	 * 
@@ -89,13 +89,11 @@ public interface Instance extends Vertex {
 	String getHierarchicalName();
 
 	/**
-	 * Returns the path of identifiers from the top-level to this instance as a
-	 * path of the form /top/network/.../instance.
+	 * Returns the list of entities from the top-level to this instance.
 	 * 
-	 * @return the path of identifiers from the top-level to this instance as a
-	 *         path of the form /top/network/.../instance
+	 * @return the list of entities from the top-level to this instance
 	 */
-	String getHierarchicalPath();
+	List<Entity> getHierarchy();
 
 	/**
 	 * Returns the identifier of this instance. Delegates to {@link #getName()}.
