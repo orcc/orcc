@@ -1,5 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 library altera_mf;
 use altera_mf.all;
@@ -20,7 +21,7 @@ entity fifo is
       rdreq        : in  std_logic;
       data         : in  std_logic_vector(width-1 downto 0);
       q            : out std_logic_vector(width-1 downto 0);
-      status_full  : out std_logic_vector(31 downto 0)
+      status_full  : out std_logic_vector(31 downto 0);
       status_empty : out std_logic_vector(31 downto 0)
       );
 end fifo;
@@ -35,7 +36,7 @@ begin
 
   clear        <= not(rst_n);
   status_full  <= status_full_i;
-  status_empty <= std_logic_vector(to_unsigned(to_integer(unsigned(t1data)) - size), 32);
+  status_empty <= std_logic_vector(to_unsigned(to_integer(unsigned(status_full_i)) - size, 32));
 
   scfifo_component : altera_mf_components.scfifo
     generic map (
