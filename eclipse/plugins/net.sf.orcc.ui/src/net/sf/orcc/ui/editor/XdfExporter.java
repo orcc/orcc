@@ -273,7 +273,8 @@ public class XdfExporter extends CalSwitch<Object> {
 				}
 
 				Argument argument = DfFactory.eINSTANCE.createArgument(
-						varMap.get(varName), expression);
+						IrFactory.eINSTANCE.createVar(expression.getType(),
+								varName, true, 0), expression);
 				instance.getArguments().add(argument);
 			}
 
