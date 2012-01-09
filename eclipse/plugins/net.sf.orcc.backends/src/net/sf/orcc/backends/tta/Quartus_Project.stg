@@ -18,8 +18,8 @@ set_global_assignment -name VHDL_FILE top.vhd
 # Shared components
 set_global_assignment -name VHDL_FILE share/vhdl/util_pkg.vhdl
 set_global_assignment -name VHDL_FILE share/vhdl/tce_util_pkg.vhdl
-set_global_assignment -name VHDL_FILE share/vhdl/cal_stream_in.vhdl
-set_global_assignment -name VHDL_FILE share/vhdl/cal_stream_out.vhdl
+set_global_assignment -name VHDL_FILE share/vhdl/cal_stream_in_v2.vhdl
+set_global_assignment -name VHDL_FILE share/vhdl/cal_stream_out_v2.vhdl
 set_global_assignment -name VHDL_FILE share/vhdl/rf_1wr_1rd_always_1_guarded_0.vhd
 set_global_assignment -name VHDL_FILE share/vhdl/mul.vhdl
 set_global_assignment -name VHDL_FILE share/vhdl/ldh_ldhu_ldq_ldqu_ldw_sth_stq_stw.vhdl
@@ -64,21 +64,21 @@ set_location_assignment PIN_AH8  -to segment7_sel[3]
 qsfInstance(instance) ::= <<
 <if(!instance.actor.native)
 ># Instance <instance.id>
-set_global_assignment -name VHDL_FILE <instance.id>/vhdl/processor_<instance.id>_tl_params_pkg.vhdl
-set_global_assignment -name VHDL_FILE <instance.id>/vhdl/processor_<instance.id>_tl.vhdl
-set_global_assignment -name VHDL_FILE <instance.id>/vhdl/globals_pkg.vhdl
-set_global_assignment -name VHDL_FILE <instance.id>/vhdl/processor_<instance.id>.vhd
-set_global_assignment -name VHDL_FILE <instance.id>/vhdl/imem_mau_pkg.vhdl
-set_global_assignment -name VHDL_FILE <instance.id>/gcu_ic/output_socket_2_1.vhdl
-set_global_assignment -name VHDL_FILE <instance.id>/gcu_ic/output_socket_1_1.vhdl
-set_global_assignment -name VHDL_FILE <instance.id>/gcu_ic/input_socket_2.vhdl
-set_global_assignment -name VHDL_FILE <instance.id>/gcu_ic/ifetch.vhdl
-set_global_assignment -name VHDL_FILE <instance.id>/gcu_ic/idecompressor.vhdl
-set_global_assignment -name VHDL_FILE <instance.id>/gcu_ic/ic.vhdl
-set_global_assignment -name VHDL_FILE <instance.id>/gcu_ic/gcu_opcodes_pkg.vhdl
-set_global_assignment -name VHDL_FILE <instance.id>/gcu_ic/decoder.vhdl
-set_global_assignment -name MIF_FILE <instance.id>/memory/<instance.id>_data.mif
-set_global_assignment -name MIF_FILE <instance.id>/memory/<instance.id>.mif
+set_global_assignment -name VHDL_FILE <instance.id>/tta/vhdl/processor_<instance.id>_tl_params_pkg.vhdl
+set_global_assignment -name VHDL_FILE <instance.id>/tta/vhdl/processor_<instance.id>_tl.vhdl
+set_global_assignment -name VHDL_FILE <instance.id>/tta/vhdl/globals_pkg.vhdl
+set_global_assignment -name VHDL_FILE <instance.id>/tta/vhdl/processor_<instance.id>.vhd
+set_global_assignment -name VHDL_FILE <instance.id>/tta/vhdl/imem_mau_pkg.vhdl
+set_global_assignment -name VHDL_FILE <instance.id>/tta/gcu_ic/output_socket_2_1.vhdl
+set_global_assignment -name VHDL_FILE <instance.id>/tta/gcu_ic/output_socket_1_1.vhdl
+set_global_assignment -name VHDL_FILE <instance.id>/tta/gcu_ic/input_socket_2.vhdl
+set_global_assignment -name VHDL_FILE <instance.id>/tta/gcu_ic/ifetch.vhdl
+set_global_assignment -name VHDL_FILE <instance.id>/tta/gcu_ic/idecompressor.vhdl
+set_global_assignment -name VHDL_FILE <instance.id>/tta/gcu_ic/ic.vhdl
+set_global_assignment -name VHDL_FILE <instance.id>/tta/gcu_ic/gcu_opcodes_pkg.vhdl
+set_global_assignment -name VHDL_FILE <instance.id>/tta/gcu_ic/decoder.vhdl
+set_global_assignment -name MIF_FILE <instance.id>/tta/memory/<instance.id>_data.mif
+set_global_assignment -name MIF_FILE <instance.id>/tta/memory/<instance.id>.mif
 <endif>
 >>
 

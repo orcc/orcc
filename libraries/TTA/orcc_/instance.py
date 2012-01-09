@@ -131,8 +131,7 @@ class Instance:
         shutil.move("imem_mau_pkg.vhdl", vhdlPath)
         if not (self.isNative or self.isBroadcast):
             shutil.copy(self._tbFile, vhdlPath)
-            shutil.copy(os.path.join(srcPath, self._tclFile), vhdlPath)
-            os.chmod(vhdlPath, stat.S_IRWXU)
+            os.chmod(os.path.join(srcPath, self._tclFile), stat.S_IRWXU)
 
         # Clean working directory
         os.remove("stream_units.hdb")
