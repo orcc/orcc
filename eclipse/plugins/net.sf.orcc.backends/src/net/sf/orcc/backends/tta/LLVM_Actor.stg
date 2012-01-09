@@ -145,12 +145,10 @@ printStatusVars(ports) ::= <<
 checkOutputPorts(bb_name, action, port, restPorts, portToIndexMap, state, lastPort=false) ::= <<
 <if(!lastPort)>
 %<bb_name>_<action.name>_status_<port.name> = load i32* @status_<port.name>
-%free_room_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = sub i32 256, %<bb_name>_<action.name>_status_<port.name>
-%has_valid_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = icmp sge i32 %free_room_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)>, <pattern.numTokensMap.(port)>
+%has_valid_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = icmp sge i32 %<bb_name>_<action.name>_status_<port.name>, <pattern.numTokensMap.(port)>
 <else>
 %<bb_name>_<action.name>_status_<port.name> = load i32* @status_<port.name>
-%free_room_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = sub i32 256, %<bb_name>_<action.name>_status_<port.name>
-%available_output_<if(state)><state.name>_<endif><action.name>_<port.name> = icmp sge i32 %free_room_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)>, <pattern.numTokensMap.(port)>
+%available_output_<if(state)><state.name>_<endif><action.name>_<port.name> = icmp sge i32 %<bb_name>_<action.name>_status_<port.name>, <pattern.numTokensMap.(port)>
 %has_valid_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = and i1 %has_valid_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(lastPort)>, %available_output_<if(state)><state.name>_<endif><action.name>_<port.name><
 endif><
 if(restPorts)>
@@ -368,16 +366,14 @@ printBcastOutputConditions(lastPort, currentPort, restPorts) ::= <<
 %has_valid_<currentPort.name> = and i1 %has_valid_<lastPort.name>, %available_<currentPort.name>
 <printBcastOutputConditions(currentPort, first(restPorts), rest(restPorts))><
 else
->%free_room_<currentPort.name> = sub i32 256, %status_<currentPort.name>
-%available_<currentPort.name> = icmp sge i32 %free_room_<currentPort.name>, 1
+>%available_<currentPort.name> = icmp sge i32 %status_<currentPort.name>, 1
 %can_copy_next_token = and i1 %has_valid_<lastPort.name>, %available_<currentPort.name><
 endif>
 >>
 
 printBcastCondition(broadcast) ::= <<
 %has_valid_input = icmp sge i32 %status_input, 1
-%free_room_output_0 = sub i32 256, %status_<first(broadcast.outputs).name>
-%available_output_0 = icmp sge i32 %free_room_output_0, 1
+%available_output_0 = icmp sge i32 %status_<first(broadcast.outputs).name>, 1
 %has_valid_output_0 = and i1 %has_valid_input, %available_output_0
 <printBcastOutputConditions(first(broadcast.outputs), first(rest(broadcast.outputs)), rest(rest(broadcast.outputs)))>
 >>

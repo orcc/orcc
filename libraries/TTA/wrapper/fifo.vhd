@@ -14,26 +14,28 @@ entity fifo is
       );
   port
     (
-      wrreq   : in  std_logic;
-      rst_n   : in  std_logic;
-      clk     : in  std_logic;
-      rdreq   : in  std_logic;
-      data    : in  std_logic_vector(width-1 downto 0);
-      q       : out std_logic_vector(width-1 downto 0);
-      status  : out std_logic_vector(31 downto 0)
+      wrreq        : in  std_logic;
+      rst_n        : in  std_logic;
+      clk          : in  std_logic;
+      rdreq        : in  std_logic;
+      data         : in  std_logic_vector(width-1 downto 0);
+      q            : out std_logic_vector(width-1 downto 0);
+      status_full  : out std_logic_vector(31 downto 0)
+      status_empty : out std_logic_vector(31 downto 0)
       );
 end fifo;
 
 
 architecture rtl_fifo of fifo is
 
-  signal status_i : std_logic_vector(31 downto 0) := (others => '0');
-  signal clear    : std_logic;
+  signal status_full_i : std_logic_vector(31 downto 0) := (others => '0');
+  signal clear         : std_logic;
 
 begin
 
-  clear  <= not(rst_n);
-  status <= status_i;
+  clear        <= not(rst_n);
+  status_full  <= status_full_i;
+  status_empty <= std_logic_vector(to_unsigned(to_integer(unsigned(t1data)) - size), 32);
 
   scfifo_component : altera_mf_components.scfifo
     generic map (
@@ -54,9 +56,9 @@ begin
       rdreq => rdreq,
       sclr  => clear,
       wrreq => wrreq,
-      usedw => status_i(widthu-1 downto 0),
+      usedw => status_full_i(widthu-1 downto 0),
       q     => q,
-      full  => status_i(widthu)
+      full  => status_full_i(widthu)
       );
-  
+
 end rtl_fifo;
