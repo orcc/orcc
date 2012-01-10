@@ -201,7 +201,7 @@ void DPNScheduler::createActionCall(Action* action, BasicBlock* BB){
 		string message = "--> firing action ";
 		message.append(action->getName());
 
-		FunctionMng::createPuts(decoder, message, bodyInst);
+		FunctionMng::createPuts(decoder->getModule(), message, bodyInst);
 	}
 }
 

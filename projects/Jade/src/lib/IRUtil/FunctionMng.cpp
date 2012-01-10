@@ -49,9 +49,7 @@ using namespace std;
 using namespace llvm;
 
 
-void FunctionMng::createPuts(Decoder* decoder, string message, Instruction* instr){
-	Module* module = decoder->getModule();
-	
+void FunctionMng::createPuts(Module* module, string message, Instruction* instr, Value* value){
 	Function* func_puts = module->getFunction("puts");
 
 	if (func_puts == NULL){

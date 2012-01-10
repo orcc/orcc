@@ -38,6 +38,7 @@
 //------------------------------
 #ifndef SUPERINSTANCE_H
 #define SUPERINSTANCE_H
+#include <set>
 
 #include "Jade/Core/Network/Instance.h"
 class CSDFMoC;

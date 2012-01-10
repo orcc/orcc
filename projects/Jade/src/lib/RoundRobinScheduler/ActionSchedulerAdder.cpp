@@ -185,7 +185,7 @@ void ActionSchedulerAdder::initializeFIFO (Instance* instance){
 	std::list<Action*>::iterator itAct;
 	std::list<Action*>* actions = instance->getActions();
 	for (itAct = actions->begin(); itAct != actions->end(); itAct++){
-		FifoOpt::createReadWritePeek(*itAct);
+		FifoOpt::createReadWritePeek(*itAct, debug);
 	}
 
 	//Close inputs

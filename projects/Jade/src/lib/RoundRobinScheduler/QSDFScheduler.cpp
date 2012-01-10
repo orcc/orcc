@@ -45,6 +45,7 @@
 
 #include "Jade/Core/Network/Instance.h"
 #include "Jade/Core/MoC/QSDFMoC.h"
+#include "Jade/Core/Actor.h"
 //------------------------------
 
 using namespace llvm;

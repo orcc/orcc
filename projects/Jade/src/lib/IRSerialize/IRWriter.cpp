@@ -156,10 +156,11 @@ void IRWriter::writePortPtrs(map<string, Port*>* srcPorts, map<string, Port*>* d
 		itDst = dstPorts->find(itSrc->first);
 		Port* dst;
 		if (itDst == dstPorts->end()){
-			dst = new Port(src->getName(), src->getType());
+			dst = new Port(src->getName(), src->getType(), instance);
 			dstPorts->insert(pair<string, Port*>(itSrc->first, dst));
 		}else{
 			dst = itDst->second;
+			dst->setInstance(instance);
 		}
 
 		Variable* srcVar = src->getPtrVar();
@@ -255,7 +256,7 @@ Action* IRWriter::writeAction(Action* action){
 		Pattern* peekPattern = writePattern(action->getPeekPattern(), inputs);
 
 		//Create the action
-		return new Action(action->getTag(), inputPattern, outputPattern, peekPattern, newScheduler, newBody, instance);
+		return new Action(action->getTag(), inputPattern, outputPattern, peekPattern, newScheduler, newBody);
 }
 
 Procedure* IRWriter::writeProcedure(Procedure* procedure){
@@ -280,10 +281,11 @@ Pattern* IRWriter::writePattern(Pattern* pattern, map<string, Port*>* ports){
 		Port* dst;
 		itPort = ports->find(src->getName());
 		if (itPort == ports->end()){
-			dst = new Port(src->getName(), src->getType());
+			dst = new Port(src->getName(), src->getType(), instance);
 			ports->insert(pair<string, Port*>(src->getName(), dst));
 		}else{
 			dst = itPort->second;
+			dst->setInstance(instance);
 		}
 
 		newPattern->setNumTokens(dst, itTokens->second);
@@ -304,10 +306,11 @@ Pattern* IRWriter::writePattern(Pattern* pattern, map<string, Port*>* ports){
 		Port* dst;
 		itPort = ports->find(src->getName());
 		if (itPort == ports->end()){
-			dst = new Port(src->getName(), src->getType());
+			dst = new Port(src->getName(), src->getType(), instance);
 			ports->insert(pair<string, Port*>(src->getName(), dst));
 		}else{
 			dst = itPort->second;
+			dst->setInstance(instance);
 		}
 
 		// Add variable to pattern

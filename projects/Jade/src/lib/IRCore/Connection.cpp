@@ -46,6 +46,8 @@
 #include "Jade/Core/Network/Connection.h"
 #include "Jade/Core/Expression.h"
 #include "Jade/Core/Attribute/ValueAttribute.h"
+#include "Jade/Core/Network/Vertex.h"
+#include "Jade/Graph/HDAGGraph.h"
 //------------------------------
 
 using namespace std;
@@ -53,11 +55,22 @@ using namespace llvm;
 
 extern cl::opt<int> FifoSize;
 
-Connection::Connection(Port* source, Port* target, std::map<std::string, IRAttribute*>* attributes): HDAGEdge()
-{	this->attributes = attributes; 
-	this->source = source;	
-	this->target = target;
+Connection::Connection(HDAGGraph* graph, Vertex* source, Port* srcPort, Vertex* target, Port* tgtPort, std::map<std::string, IRAttribute*>* attributes): HDAGEdge()
+{	
+	this->parent = graph;
+	this->attributes = attributes; 
+	this->srcPort = srcPort;	
+	this->tgtPort = tgtPort;
 	this->fifo = NULL;
+	this->source = source;
+	this->target = target;
+
+	// Update graph
+	graph->addEdge(source, target, this);
+
+	// Set properties of the ports
+	srcPort->setAccess(false, true);
+	tgtPort->setAccess(true, false);
 }
 
 
@@ -91,8 +104,8 @@ IRAttribute* Connection::getAttribute(std::string name){
 
 void Connection::unsetFifo(){
 	//Get GV of the port
-	GlobalVariable* srcVar = source->getFifoVar();
-	GlobalVariable* dstVar = target->getFifoVar();
+	GlobalVariable* srcVar = srcPort->getFifoVar();
+	GlobalVariable* dstVar = tgtPort->getFifoVar();
 	
 	//Remove GV initializer
 	srcVar->setInitializer(NULL);

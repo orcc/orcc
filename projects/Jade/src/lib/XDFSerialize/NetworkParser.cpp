@@ -58,10 +58,10 @@ NetworkParser::NetworkParser (llvm::LLVMContext& C, bool verbose){
 	
 	this->Connections = new list<Connection*>();
 
-	/* Xml type parser */
+	// Xml type parser
 	this->typeParser = new TypeParser(C);
 
-	/** XDF expression parser. */
+	// XDF expression parser
 	this->exprParser = new ExprParser(C);
 }
 
@@ -75,7 +75,7 @@ Network* NetworkParser::parseNetworkFile (string filename){
 	// Initialize XDF document
 	this->xdfDoc = new TiXmlDocument (filename.c_str());
 
-	/* Parsing XML file error */
+	// Parsing XML file error
 	if (!xdfDoc->LoadFile()) {
 		cerr << "Error : the given file does not exist. \n";
 		return NULL;
@@ -118,10 +118,10 @@ Network* NetworkParser::parseXDFDoc(){
 	outputs = new map<string, Port*>();
 	instances = new map<string, Instance*>();
 
-	/* Parse root_element */
+	// Parse root_element
 	parseBody(root_element);
 
-	/* Initialize network */
+	// Initialize network
 	network = new Network(name, inputs, outputs, graph);
 
 	return network;
@@ -159,7 +159,7 @@ Instance* NetworkParser::parseInstance(TiXmlElement* instance){
 	// Get attributes 
 	map<string, IRAttribute*>* attributes = parseAttributes(child);
 
-	return new Instance(string(id.c_str()), string(clasz.c_str()), parameters, attributes);
+	return new Instance(graph, string(id.c_str()), string(clasz.c_str()), parameters, attributes);
 }
 
 
@@ -200,7 +200,6 @@ void  NetworkParser::parseBody(TiXmlElement* root){
 			}else if (name == XDFNetwork::INSTANCE) {
 				Instance* instance = parseInstance(element);
 				instances->insert(pair<string, Instance*>(instance->getId(), instance));
-				graph->addVertex(new Vertex(instance));
 			}else if (name == XDFNetwork::PACKAGE) {
 				cerr << "Package elements are not supported yet";
 				exit(1);
@@ -232,13 +231,7 @@ void NetworkParser::parseConnection(TiXmlElement* connection){
 
 	// Get attributes 
 	map<string, IRAttribute*>* attributes = parseAttributes(connection->FirstChild());
-	Connection* conn = new Connection(srcPort, dstPort, attributes);
-	
-	graph->addEdge(source, target, conn);
-
-	// Set size of ports
-	srcPort->setSize(conn->getSize());
-	dstPort->setSize(conn->getSize());
+	Connection* conn = new Connection(graph, source, srcPort, target, dstPort, attributes);
 }
 
 map<string, IRAttribute*>* NetworkParser::parseAttributes(TiXmlNode* node){
@@ -283,7 +276,7 @@ Port* NetworkParser::getPort(string vertexName, string portName) {
 	if (vertexName.empty()){
 		return NULL;
 	}else{
-		return new Port(portName, NULL);
+		return new Port(portName, NULL, graph);
 	}
 }
 

@@ -152,10 +152,7 @@ void BroadcastAdder::createIncomingConnection(Connection* connection, Vertex* ve
 	//Bound it to the instance
 	instance->setAsInput(bcastInput);
 
-	Connection* incoming = new Connection(srcPort,bcastInput, IRAttributes);
-
-	graph->addEdge(vertex, vertexBCast, incoming);
-
+	Connection* incoming = new Connection(graph, vertex, srcPort, vertexBCast, bcastInput, IRAttributes);
 }
 
 void BroadcastAdder::createOutgoingConnections(Vertex* vertexBCast, list<Connection*>* outList, Instance* instance){
@@ -179,10 +176,7 @@ void BroadcastAdder::createOutgoingConnections(Vertex* vertexBCast, list<Connect
 			i++;
 
 			map<string, IRAttribute*>* attributes = (*it)->getAttributes();
-			Connection* connBcastTarget = new Connection(outputPort, (*it)->getDestinationPort(), attributes);
-
-			//Add the connection into the graph
-			graph->addEdge(vertexBCast, target, connBcastTarget);
+			Connection* connBcastTarget = new Connection(graph, vertexBCast, outputPort, target, (*it)->getDestinationPort(), attributes);
 
 			// setting source to null so we don't examine it again
 			(*it)->setSink(NULL);

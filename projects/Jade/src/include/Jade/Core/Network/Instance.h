@@ -46,15 +46,23 @@ namespace llvm{
 	class Constant;
 }
 
-#include "Jade/Core/Actor.h"
 #include "Jade/Core/Expression.h"
 #include "Jade/Core/MoC.h"
 #include "Jade/Core/Attribute/TypeAttribute.h"
 #include "Jade/Core/Attribute/ValueAttribute.h"
 
+class Action;
+class Actor;
+class ActionScheduler;
 class BroadcastActor;
-class Network;
 class Configuration;
+class HDAGGraph;
+class Network;
+class Port;
+class Procedure;
+class StateVar;
+class Variable;
+class Vertex;
 //------------------------------
 
 /**
@@ -68,7 +76,7 @@ class Configuration;
  * @author Jerome Gorin
  * 
  */
-class Instance  : public Parent {
+class Instance {
 public:
 	/*!
      *  @brief Constructor
@@ -80,21 +88,8 @@ public:
 	 * @param parameters : list of Expr representif parameters of this instance
      *
      */
-	Instance(std::string id, std::string clasz, std::map<std::string, Expr*>* parameterValues, 
-			 std::map<std::string, IRAttribute*>* attributes){
-		this->id = id;
-		this->clasz = clasz;
-		this->parameterValues = parameterValues;
-		this->attributes = attributes;
-		this->actor = NULL;
-		this->configuration = NULL;
-		this->stateVars = NULL;
-		this->parameters = NULL;
-		this->procedures = NULL;
-		this->initializes = NULL;
-		this->actions = NULL;
-		this->actionScheduler = NULL;
-	}
+	Instance(HDAGGraph* graph, std::string id, std::string clasz, std::map<std::string, Expr*>* parameterValues, 
+			 std::map<std::string, IRAttribute*>* attributes);
 
 	/*!
      *  @brief Constructor
@@ -140,6 +135,13 @@ public:
 	 * @return MoC of the Instance
      */
 	virtual MoC* getMoC(){return moc;};
+
+	/**
+     *  @brief Get the Vertex of the instance
+     *
+	 * @return the vertex of the instance
+     */
+	Vertex* getVertex(){return vertex;};
 
 	/**
      * @brief Get the internal state variable corresponding to a port
@@ -486,6 +488,9 @@ protected:
 	 */
 	Network* network;
 
+	/** Vertex in the network */
+	Vertex* vertex;
+
 	/**
 	 * The configuration that references this instance.
 	 */
@@ -518,6 +523,9 @@ protected:
 
 	/** MoC of the instance */
 	MoC* moc;
+
+	/** Parent graph of the instance */
+	HDAGGraph* parent;
 };
 
 #endif

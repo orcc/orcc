@@ -180,7 +180,7 @@ bool LLVMWriter::linkProcedureBody(Function* function){
 void LLVMWriter::linkFunctionBody(Function *NewFunc, const Function *OldFunc,
                              ValueToValueMapTy &VMap,
                              bool ModuleLevelChanges,
-                             SmallVectorImpl<ReturnInst*> &Returns,/* AbstractConnector* fifo,*/
+                             SmallVectorImpl<ReturnInst*> &Returns,
                              const char *NameSuffix, ClonedCodeInfo *CodeInfo) {
       // Clone any attributes.
   if (NewFunc->arg_size() == OldFunc->arg_size())

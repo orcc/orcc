@@ -89,10 +89,10 @@ void BroadcastActor::createActor(){
 	GlobalVariable* inputGlobalVar = new GlobalVariable(*module, fifoType, false, GlobalValue::InternalLinkage, ConstantPointerNull::get(fifoType), name+"_"+inputPortName+"_ptr");
 	
 	//Create a new port
-	Port* inputPort = new Port(inputPortName, type);
+	Port* inputPort = new Port(inputPortName, type, this);
 	Variable* inputVar = new Variable(type, inputPortName, true, true, inputGlobalVar);
 	inputPort->setPtrVar(inputVar);
-	inputPort->setSize(FifoSize);
+	inputPort->setAccess(true, false);
 	
 	
 	inputs->insert(pair<string, Port*>(inputPort->getName(), inputPort));
@@ -106,10 +106,10 @@ void BroadcastActor::createActor(){
 		GlobalVariable* outputGlobalVar = new GlobalVariable(*module, fifoType, false, GlobalValue::InternalLinkage, ConstantPointerNull::get(fifoType), outputPortName.str()+"_ptr");
 
 		//Create a new port
-		Port* outputPort = new Port(outputPortName.str(), type);
+		Port* outputPort = new Port(outputPortName.str(), type, this);
 		Variable* outputVar = new Variable(type, outputPortName.str(), true, true, outputGlobalVar);
 		
-		outputPort->setSize(FifoSize);
+		outputPort->setAccess(false, true);
 		outputPort->setPtrVar(outputVar);
 		outputs->insert(pair<string, Port*>(outputPort->getName(), outputPort));
 	}
@@ -147,7 +147,7 @@ void BroadcastActor::createAction(){
 	Pattern* peekPattern = createPattern(inputs);
 	
 	//Add action to the actor
-	Action* action = new Action(actionTag, inputPattern, outputPattern, peekPattern, scheduler, body, this);
+	Action* action = new Action(actionTag, inputPattern, outputPattern, peekPattern, scheduler, body);
 
 	actions->push_back(action);
 }

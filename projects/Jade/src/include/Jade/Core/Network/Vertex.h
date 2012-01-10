@@ -30,7 +30,7 @@
 /**
 @brief Description of the Vertex class interface
 @author Jerome Gorin
-@file Entry.h
+@file Vertex.h
 @version 1.0
 @date 15/11/2010
 */
@@ -39,8 +39,8 @@
 #ifndef VERTEX_H
 #define VERTEX_H
 
-#include "Jade/Graph/HDAGVertex.h"
 #include "Jade/Core/Network/Instance.h"
+#include "Jade/Graph/HDAGVertex.h"
 
 class Port;
 //------------------------------

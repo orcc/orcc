@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,54 +28,21 @@
  */
 
 /**
-@brief Description of the Parent class interface
+@brief Implementation of class Port
 @author Jerome Gorin
-@file Parent.h
+@file Port.cpp
 @version 1.0
-@date 25/03/2011
+@date 31/12/2011
 */
 
 //------------------------------
-#ifndef PARENT_H
-#define PARENT_H
-
+#include "Jade/Core/Port.h"
 //------------------------------
 
+using namespace std;
 
-/**
- * @class Parent
- *
- * @brief  This class defines a Parent
- *
- * This class represents Parent, which can be an instance, an actor or a network. This class
- *  is can be used to go though the hierarchy of an actor
- * 
- * @author Jerome Gorin
- * 
- */
-
-class Parent {
-public:
-
-	/**
-     *  @brief Return true if this class is an instance
-	 *
-	 *  @return Return true if this class is an instance, otherwise false
-     */
-	virtual bool isInstance(){return false;};
-
-	/**
-     *  @brief Return true if this class is an actor
-	 *
-	 *  @return Return true if this class is an actor, otherwise false
-     */
-	virtual bool isActor(){return false;};
+set<Connection*>* Port::getConnections(){
+	Vertex* vertex = instance->getVertex();
 	
-	/**
-     *  @brief Return true if this class is a network
-	 *
-	 *  @return Return true if this class is an network, otherwise false
-     */
-	virtual bool isNetwork(){return false;};
-};
-#endif
+	return NULL;
+}

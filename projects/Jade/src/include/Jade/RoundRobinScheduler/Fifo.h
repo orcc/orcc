@@ -30,7 +30,7 @@
 /**
 @brief Description of the FifoCircular class interface
 @author Jerome Gorin
-@file FifoOpt.h
+@file Fifo.h
 @version 1.0
 @date 15/11/2010
 */
@@ -45,6 +45,7 @@ namespace llvm{
 	class ConstantInt;
 	class IntegerType;
 	class GlobalVariable;
+	class GetElementPtrInst;
 	class Function;
 	class LLVMContext;
 	class Module;
@@ -88,7 +89,7 @@ class FifoOpt {
 	 *
 	 * @param action : action where accesses are added
 	 */
-	static void createReadWritePeek(Action* action);
+	static void createReadWritePeek(Action* action, bool debug = false);
 
 	/**
 	 * @brief Creates a hasToken test for a Port
@@ -158,10 +159,23 @@ private:
 	 */
 	static llvm::Value* replaceAccess (Port* port, Procedure* proc);
 
+	
+	/**
+	 * @brief Trace value in port
+	 *
+	 * @param port : the port to trace
+	 *
+	 * @parm gep : the gep instruction that contains the value
+	 */
+	static void createFifoTrace(llvm::Module* module, Port* port, llvm::GetElementPtrInst* gep);
+
 private:
 	llvm::GlobalVariable* fifoGV;
 	llvm::GlobalVariable* gv_array;
 	llvm::GlobalVariable* gv_read_inds;
+
+	// Display debugging information
+	static bool debug;
 };
 
 #endif

@@ -58,6 +58,7 @@
 #include "Jade/Decoder.h"
 #include "Jade/Configuration/Configuration.h"
 #include "Jade/Core/Actor.h"
+#include "Jade/Core/Network/Instance.h"
 #include "Jade/Core/Actor/ActionScheduler.h"
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Core/Variable.h"
@@ -173,15 +174,13 @@ void RoundRobinScheduler::createCall(Instance* instance){
 		string message = "-> firing ";
 		message.append(instance->getId());
 
-		FunctionMng::createPuts(decoder, message, schedInst);
+		FunctionMng::createPuts(decoder->getModule(), message, schedInst);
 	}
 	
 	// Call scheduler function of the instance
 	Function* scheduler = actionScheduler->getSchedulerFunction();
 	CallInst* CallSched = CallInst::Create(scheduler, "", schedInst);
 	CallSched->setTailCall();
-	
-	
 
 	functionCall.insert(pair<Function*, CallInst*>(scheduler, CallSched));
 }

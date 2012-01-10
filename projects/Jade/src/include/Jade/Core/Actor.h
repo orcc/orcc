@@ -48,7 +48,6 @@
 #include "Jade/Core/Actor/Action.h"
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Core/MoC.h"
-#include "Jade/Core/Parent.h"
 
 namespace llvm{
 	class Module;
@@ -77,7 +76,7 @@ class Variable;
  * @author Jerome Gorin
  * 
  */
-class Actor : public Parent {
+class Actor {
 public:
 	
 	/**

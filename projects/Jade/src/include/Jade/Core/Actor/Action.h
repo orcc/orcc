@@ -52,7 +52,6 @@ namespace llvm{
 
 class Port;
 class Procedure;
-class Parent;
 //------------------------------
 
 /**
@@ -80,14 +79,13 @@ public:
 	 *
 	 * @param parent : Parent of the action
 	 */
-	Action(ActionTag* tag, Pattern* inputPattern, Pattern* outputPattern, Pattern* peekPattern, Procedure* scheduler, Procedure* body, Parent* parent = NULL) {
+	Action(ActionTag* tag, Pattern* inputPattern, Pattern* outputPattern, Pattern* peekPattern, Procedure* scheduler, Procedure* body) {
 		this->tag = tag;
 		this->body = body;
 		this->scheduler = scheduler;
 		this->inputPattern = inputPattern;
 		this->outputPattern = outputPattern;
 		this->peekPattern = peekPattern;
-		this->parent = parent;
 	}
 
 	~Action();
@@ -119,13 +117,6 @@ public:
 	 *  @return the tag of the action
      */
 	ActionTag* getTag(){return tag;};
-
-	/**
-     *  @brief Get parent of the action
-   	 *
-	 *  @return the parent of the action
-     */
-	Parent* getParent(){return parent;};
 
 	/**
      *  @brief Setter of the scheduler of the action
@@ -169,7 +160,6 @@ private:
 	Pattern* inputPattern;
 	Pattern* outputPattern;
 	Pattern* peekPattern;
-	Parent* parent;
 };
 
 #endif

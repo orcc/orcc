@@ -303,6 +303,12 @@ map<string, Port*>* IRParser::parsePorts(string key, Module* module){
 	
 	 for (unsigned i = 0, e = inputsMD->getNumOperands(); i != e; ++i) {
 		 Port* port = parsePort(inputsMD->getOperand(i));
+
+		 if(key == IRConstant::KEY_INPUTS){
+			 port->setAccess(true, false);
+		 }else {
+			 port->setAccess(false, true);
+		 }
 		 ports->insert(pair<string,Port*>(port->getName(), port));
 	 }
 
@@ -481,7 +487,7 @@ Action* IRParser::parseAction(MDNode* node){
 
 	Procedure* scheduler = parseProc(cast<MDNode>(node->getOperand(4)));
 	Procedure* body = parseProc(cast<MDNode>(node->getOperand(5)));
-	Action* action = new Action(tag, ip, op, pp, scheduler, body, actor);
+	Action* action = new Action(tag, ip, op, pp, scheduler, body);
 
 	putAction(tag, action);
 
@@ -513,7 +519,7 @@ Port* IRParser::parsePort(MDNode* node){
 	GlobalVariable* var = cast<GlobalVariable>(node->getOperand(2));
 	
 	//Create the new port
-	Port* newPort = new Port(name->getString(), (IntegerType*)type);
+	Port* newPort = new Port(name->getString(), (IntegerType*)type, actor);
 	newPort->setPtrVar(new Variable(type, name->getString(), true, true, var));
 
 	return newPort;

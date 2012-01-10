@@ -47,6 +47,7 @@ namespace llvm {
 }
 
 class Location;
+class Expr;
 //------------------------------
 
 /**

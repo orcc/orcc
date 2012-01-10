@@ -47,10 +47,13 @@
 
 namespace llvm{
 	class BasicBlock;
+	class Function;
+	class GlobalVariable;
 }
 class Decoder;
 class Instance;
 class LLVMExecution;
+class FSM;
 //------------------------------
 
 /**

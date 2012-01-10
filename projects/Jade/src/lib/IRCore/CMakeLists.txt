@@ -13,6 +13,7 @@ add_library (IRCore
 	Network.cpp
 	Package.cpp
 	Pattern.cpp
+	Port.cpp
 	Procedure.cpp
  )
  

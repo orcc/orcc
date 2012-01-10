@@ -28,9 +28,9 @@
  */
 
 /**
-@brief Description of the Connection class interface
+@brief Description of the Port class
 @author Jerome Gorin
-@file Connection.h
+@file Port.h
 @version 1.0
 @date 15/11/2010
 */
@@ -41,6 +41,8 @@
 
 #include <string>
 #include <list>
+#include <set>
+
 namespace llvm {
 	class IntegerType;
 	class StringRef;
@@ -49,9 +51,12 @@ namespace llvm {
 }
 
 #include "Jade/Core/IRType.h"
+#include "Jade/Core/Network/Vertex.h"
 
 class Actor;
 class AbstractConnector;
+class Connection;
+class HDAGGraph;
 class Variable;
 //------------------------------
 
@@ -68,14 +73,13 @@ class Variable;
 class Port {
 public:
 	/**
-	 * @brief Constructor
+	 * @brief Creates a new port in a graph
 	 *
-	 * Creates a new Port on an actor with the given location, Type, name.
-	 *
-	 * @param Type		:	the Port Type
-	 * @param name		:	the Port name
+	 * @param name	:  name of the port
+	 * @param type	:  type of the port
+	 * @param graph :  parent graph of the port
 	 */
-	Port(std::string name, llvm::IntegerType* type){
+	Port(std::string name, llvm::IntegerType* type, HDAGGraph* graph) {
 		this->name = name; 
 		this->type = type; 
 		this->ptrVar = NULL;
@@ -83,7 +87,57 @@ public:
 		this->index = NULL;
 		this->numTokenFree = NULL;
 		this->intern = false;
+		this->read = false;
+		this->write = false;
+		this->graph = graph;
+		this->instance = NULL;
+		this->actor = NULL;
 	};
+
+	/**
+	 * @brief Creates a new port in an actor
+	 *
+	 * @param name	:  name of the port
+	 * @param type	:  type of the port
+	 * @param actor :  parent actor of the port
+	 */
+	Port(std::string name, llvm::IntegerType* type, Actor* actor) {
+		this->name = name; 
+		this->type = type; 
+		this->ptrVar = NULL;
+		this->fifoVar = NULL;
+		this->index = NULL;
+		this->numTokenFree = NULL;
+		this->intern = false;
+		this->read = false;
+		this->write = false;
+		this->graph = NULL;
+		this->instance = NULL;
+		this->actor = actor;
+	};
+
+	/**
+	 * @brief Creates a new port in an instance
+	 *
+	 * @param name	:  name of the port
+	 * @param type	:  type of the port
+	 * @param actor :  parent actor of the port
+	 */
+	Port(std::string name, llvm::IntegerType* type, Instance* instance) {
+		this->name = name; 
+		this->type = type; 
+		this->ptrVar = NULL;
+		this->fifoVar = NULL;
+		this->index = NULL;
+		this->numTokenFree = NULL;
+		this->intern = false;
+		this->read = false;
+		this->write = false;
+		this->graph = NULL;
+		this->instance = instance;
+		this->actor = NULL;
+	};
+
 
 	/**
 	 * @brief Destructor
@@ -93,9 +147,7 @@ public:
 
 
 	/**
-	 * @brief Getter of name
-	 *
-	 * Get the name of the port
+	 * @brief Get name of the port
 	 * 
 	 * @return name of the port
 	 *
@@ -103,25 +155,32 @@ public:
 	std::string getName(){return name;};
 
 	/**
-	 * @brief Getter of type
-	 *
-	 * Get the type of the port
+	 * @brief Get the type of the port
 	 * 
 	 * @return Type of the port
-	 *
 	 */
 	llvm::IntegerType* getType(){return type;};
 
 	/**
-	 * @brief Setter of type
-	 *
-	 * Set the type of the port
+	 * @brief Set the type of the port
 	 * 
 	 * @param type : llvm::Type of the port
-	 *
 	 */
 	void setType(llvm::IntegerType* type){this->type = type;};
 
+	/**
+	 * @brief Get instance bound to the port
+	 * 
+	 * @return the instance bound to the port
+	 */
+	Instance* getInstance(){return instance;};
+
+	/**
+	 * @brief Set instance bound to the port
+	 * 
+	 * @param instance : the instance bound to the port
+	 */
+	void setInstance(Instance* instance){this->instance = instance;};
 
 	/**
 	 * @brief Add a fifo connection to the port
@@ -255,19 +314,32 @@ public:
 	llvm::GlobalVariable* getId(){return id;}
 
 	/**
-	 * @brief Set of the fifo size of the port
+	 * @brief Set access of the port
 	 *
-	 * @param size : fifo size
+	 * @param read : whether or not this port has read access
+	 *
+	 * @param write : whether or not this port has write acces
 	 */
-	void setSize(int size){this->size = size;}
+	void setAccess(bool read, bool write){
+		this->read = read;
+		this->write = write;
+	}
 
 	/**
-	 * @brief Get of the fifo size of the port
+	 * @brief Return true if the port can be read 
 	 *
-	 * @return fifo size
+	 * @return true if the port can be read
 	 */
-	int getSize(){return size;}
+	bool isReadable(){ return read;};
+	
+	/**
+	 * @brief Return true if we can write into the port
+	 *
+	 * @return true if the port can be writen
+	 */
+	bool isWritable(){ return write;};
 
+	std::set<Connection*>* getConnections();
 protected:
 	
 	/** name of this port. */
@@ -297,15 +369,26 @@ protected:
 	/** Corresponding global variable id */
 	llvm::GlobalVariable* id;
 
+	/** Whether or not this port can be read*/
+	bool read;
 
-	/** Corresponding fifo size */
-	int size;
-
+	/** Whether or not this port can be writen */
+	bool write;
 
 	/** Internal port */
 	bool intern;
 
 	/** Corresponding global variable fifo*/
 	llvm::GlobalVariable* fifoVar;
+
+	/** Parent graph of the port */
+	HDAGGraph* graph;
+
+	/** Parent instance of the port */
+	Instance* instance;
+
+	/** Parent actor of the port */
+	Actor* actor;
 };
+
 #endif

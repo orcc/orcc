@@ -56,7 +56,7 @@ namespace llvm{
 }
 
 class Expr;
-
+class Vertex;
 //------------------------------
 
 /**
@@ -86,7 +86,7 @@ public:
 	 * @param parameters : map of Attr that contains actor parameters
 	 *
      */
-	Connection (Port* source, Port* target, std::map<std::string, IRAttribute*>* attributes);
+	Connection (HDAGGraph* graph, Vertex* source, Port* srcPort, Vertex* target, Port* tgtPort, std::map<std::string, IRAttribute*>* attributes);
 
 	~Connection ();
 
@@ -96,7 +96,7 @@ public:
 	 *  @return source port.
      *
      */
-	Port* getSourcePort(){return source;};
+	Port* getSourcePort(){return srcPort;};
 
     /*!
      *  @brief Getter of the source port
@@ -104,7 +104,7 @@ public:
 	 *  @return source port.
      *
      */
-	void getSourcePort(Port* source){this->source = source;};
+	void getSourcePort(Port* source){this->srcPort = source;};
 
 	/*!
      *  @brief Getter of the destination port
@@ -112,7 +112,7 @@ public:
 	 *  @return destination port.
      *
      */
-	Port* getDestinationPort(){return target;};
+	Port* getDestinationPort(){return tgtPort;};
 
 
 	/*!
@@ -120,14 +120,14 @@ public:
      *
 	 *  @param target: the destination Port.
      */
-	void setDestinationPort(Port* target){this->target = target;};
+	void setDestinationPort(Port* target){this->tgtPort = target;};
 
 	/*!
      *  @brief Setter of the source port
      *
 	 *  @param source: the source Port.
      */
-	void setSourcePort(Port* source){this->source = source;};
+	void setSourcePort(Port* source){this->srcPort = source;};
 
 
 	/*!
@@ -180,9 +180,12 @@ public:
 
 private:
 	std::map<std::string, IRAttribute*>* attributes;	/** Map of attributes */
-	Port* source;				/** Source Port */
-	Port* target;				/** Destination Port */
-	FifoOpt* fifo;			/** Fifo of the connection */
+	Vertex* source;             /** Source vertex */
+	Vertex* target;				/** Target vertex */
+	Port* srcPort;				/** Source Port */
+	Port* tgtPort;				/** Destination Port */
+	FifoOpt* fifo;			    /** Fifo of the connection */
+	HDAGGraph* parent;          /** Graph of this connection */
 };
 
 #endif

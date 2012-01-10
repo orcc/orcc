@@ -40,12 +40,36 @@
 #include "llvm/DerivedTypes.h"
 #include "llvm/GlobalVariable.h"
 
-#include "Jade/Core/Network/Instance.h"
+#include "Jade/Core/Actor.h"
 #include "Jade/Core/Variable.h"
+#include "Jade/Graph/HDAGGraph.h"
+#include "Jade/Core/Network/Instance.h"
+#include "Jade/Core/Network/Vertex.h"
 //------------------------------
 
 using namespace std;
 using namespace llvm;
+
+Instance::Instance(HDAGGraph* graph, std::string id, std::string clasz, std::map<std::string, Expr*>* parameterValues, 
+			 std::map<std::string, IRAttribute*>* attributes){
+	this->id = id;
+	this->clasz = clasz;
+	this->parameterValues = parameterValues;
+	this->attributes = attributes;
+	this->actor = NULL;
+	this->configuration = NULL;
+	this->stateVars = NULL;
+	this->parameters = NULL;
+	this->procedures = NULL;
+	this->initializes = NULL;
+	this->actions = NULL;
+	this->actionScheduler = NULL;
+	this->parent = graph;
+
+	// Add instance into graph
+	this->vertex = new Vertex(this);
+	graph->addVertex(vertex);
+}
 
 Instance::~Instance(){
 	//Remove the instance from its parent

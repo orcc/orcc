@@ -46,10 +46,14 @@
 
 #include "Jade/Decoder.h"
 #include "Jade/RoundRobinScheduler/Fifo.h"
+#include "Jade/Util/FunctionMng.h"
 //------------------------------
 
 using namespace llvm;
 using namespace std;
+
+//Initialize static elements
+bool FifoOpt::debug = false;
 
 FifoOpt::FifoOpt(llvm::LLVMContext& C, llvm::Module* module, llvm::Type* type, int size){
 	IntegerType* connectionType = cast<IntegerType>(type);
@@ -90,8 +94,9 @@ FifoOpt::FifoOpt(llvm::LLVMContext& C, llvm::Module* module, llvm::Type* type, i
 }
 
 
-void FifoOpt::createReadWritePeek(Action* action){
-	
+void FifoOpt::createReadWritePeek(Action* action, bool debug){
+	FifoOpt::debug = debug;
+
 	// Create read accesses
 	Pattern* input = action->getInputPattern();
 
@@ -179,10 +184,12 @@ void FifoOpt::createPeeks (Procedure* procedure, Pattern* pattern){
 
 Value* FifoOpt::replaceAccess (Port* port, Procedure* proc){
 	Function* function = proc->getFunction();
-	ConstantInt* sizeVal = ConstantInt::get(function->getContext(), APInt(32, port->getSize()));
+	int size = 512;	
+	port->getConnections();
+	//ConstantInt* sizeVal = ConstantInt::get(function->getContext(), APInt(32, port->getSize()));
+	ConstantInt* sizeVal = ConstantInt::get(function->getContext(), APInt(32, size));
 	ConstantInt* zero = ConstantInt::get(function->getContext(), APInt(32, 0));
 	
-
 	//Get load instruction on port
 	GlobalVariable* portPtr = port->getPtrVar()->getGlobalVariable();
 	for (Value::use_iterator UI = portPtr->use_begin(), UE = portPtr->use_end();
@@ -190,7 +197,7 @@ Value* FifoOpt::replaceAccess (Port* port, Procedure* proc){
 			Use *U = &UI.getUse();
 			Instruction *I = cast<Instruction>(U->getUser());
 			BasicBlock* BB = I->getParent();
-			if (BB->getParent() == function){
+			if ((BB->getParent() == function)&& (isa<LoadInst>(I))){
 				LoadInst* loadInst = cast<LoadInst>(I);
 				
 				//Get bitcast instruction on load
@@ -199,7 +206,8 @@ Value* FifoOpt::replaceAccess (Port* port, Procedure* proc){
 					Use* CastU = &LI.getUse();
 					if (isa<BitCastInst>(CastU->getUser())){
 						BitCastInst* CastInst = cast<BitCastInst>(CastU->getUser());
-						ArrayType* arrayTy = ArrayType::get(port->getType(), port->getSize());
+						//ArrayType* arrayTy = ArrayType::get(port->getType(), port->getSize());
+						ArrayType* arrayTy = ArrayType::get(port->getType(), size);
 
 						// Load index and create a new cast
 						LoadInst* indexVal = new LoadInst(port->getIndex(), "", loadInst);
@@ -233,6 +241,11 @@ Value* FifoOpt::replaceAccess (Port* port, Procedure* proc){
 									  GetElementPtrInst* newGEPInst = GetElementPtrInst::Create(newCastInst, GEPIdx, "", GEPInst);
 									  GEPInst->replaceAllUsesWith(newGEPInst);
 
+									  // Add debugging information if needed
+									  if (debug){
+										FifoOpt::createFifoTrace(function->getParent(), port, GEPInst);
+									 }
+
 									  // Remove old GEP
 									  GEPs.push_back(GEPInst);
 								}
@@ -253,6 +266,40 @@ Value* FifoOpt::replaceAccess (Port* port, Procedure* proc){
 	}
 }
 
+void FifoOpt::createFifoTrace(Module* module, Port* port, GetElementPtrInst* gep){
+	string message ("---->");
+	Value* value = NULL;
+
+	if (port->isReadable()){
+		message.append("Reading port ");	
+		for (Value::use_iterator LI = gep->use_begin(), LE = gep->use_end();
+					LI != LE; ++LI) {
+			Use* use = &LI.getUse();
+			if (isa<LoadInst>(use->getUser())){
+				int test = 1;
+
+			}
+		}
+	}else{
+		message.append("Writing port ");
+
+		for (Value::use_iterator LI = gep->use_begin(), LE = gep->use_end();
+					LI != LE; ++LI) {
+			Use* use = &LI.getUse();
+			if (isa<StoreInst>(use->getUser())){
+				int test = 2;
+			}
+		}
+	}
+	
+	
+
+	message.append(port->getName());
+
+	FunctionMng::createPuts(module, message, gep);   
+
+}
+
 Value* FifoOpt::createInputTest(Port* port, ConstantInt* numTokens, BasicBlock* BB){
 	LoadInst* indexVal = new LoadInst(port->getIndex(), "", false, BB);
 	BinaryOperator* addVal = BinaryOperator::Create(Instruction::Add, indexVal, numTokens, "", BB);
@@ -261,8 +308,10 @@ Value* FifoOpt::createInputTest(Port* port, ConstantInt* numTokens, BasicBlock* 
 }
 
 Value* FifoOpt::createOutputTest(Port* port, ConstantInt* numTokens, BasicBlock* BB){
+	int size = 512;
+	
 	// Usefull constants
-	Constant* fifoSizeCst = ConstantInt::get(Type::getInt32Ty(BB->getContext()), port->getSize());
+	Constant* fifoSizeCst = ConstantInt::get(Type::getInt32Ty(BB->getContext()), size);
 	ConstantInt* zero = ConstantInt::get(BB->getContext(), APInt(32, 0));
 	ConstantInt* three = ConstantInt::get(BB->getContext(), APInt(32, 3));
 
