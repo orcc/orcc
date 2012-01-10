@@ -48,8 +48,56 @@
 using namespace std;
 using namespace llvm;
 
+void FunctionMng::createPrintf(Module* module, string message, Instruction* instr, Value* value){
+	Function* func_printf = module->getFunction("printf");
+	if (!func_printf) {
+		 // Printf does'nt exist, create it
+		 PointerType* PointerTy_0 = PointerType::get(IntegerType::get(module->getContext(), 8), 0);
+		 
+		 std::vector<Type*>FuncTy_8_args;
+		 FuncTy_8_args.push_back(PointerTy_0);
+		 FunctionType* FuncTy_8 = FunctionType::get(IntegerType::get(module->getContext(), 32), FuncTy_8_args, true);
+		
+		func_printf = Function::Create(FuncTy_8, GlobalValue::ExternalLinkage, "printf", module); // (external, no body)
+		func_printf->setCallingConv(CallingConv::C);
+		
+		AttrListPtr func_printf_PAL;
+		func_printf->setAttributes(func_printf_PAL);
+   }
 
-void FunctionMng::createPuts(Module* module, string message, Instruction* instr, Value* value){
+	// Create the message
+	Value* messageExpr = createStdMessage(module, message);
+
+	
+	// Create arguments
+	 if (value != NULL){
+		 Type* type = value->getType();
+		 if (type->isIntegerTy()){
+			
+			 IntegerType* intTy = cast<IntegerType>(type);
+			 if (intTy->getBitWidth() < 32){
+				 value = new ZExtInst(value, Type::getInt32Ty(module->getContext()), "", instr);
+			 }else if (intTy->getBitWidth() > 32){
+				 value = new TruncInst (value, Type::getInt32Ty(module->getContext()), "", instr);
+			 }
+		 }
+		 
+	 }
+	  
+	 
+	 std::vector<Value*> params;
+	  params.push_back(messageExpr);
+	  params.push_back(value);
+	  CallInst* int32_25 = CallInst::Create(func_printf, params, "", instr);
+	  int32_25->setCallingConv(CallingConv::C);
+	  int32_25->setTailCall(false);
+	  AttrListPtr int32_25_PAL;
+	  int32_25->setAttributes(int32_25_PAL);
+
+
+}
+
+void FunctionMng::createPuts(Module* module, string message, Instruction* instr){
 	Function* func_puts = module->getFunction("puts");
 
 	if (func_puts == NULL){
@@ -76,6 +124,19 @@ void FunctionMng::createPuts(Module* module, string message, Instruction* instr,
 	}
 	 
 	// Create the message
+	Value* messageExpr = createStdMessage(module, message);
+
+
+	// Call puts
+	CallInst* int32_puts = CallInst::Create(func_puts, messageExpr, "puts", instr);
+	int32_puts->setCallingConv(CallingConv::C);
+	int32_puts->setTailCall(true);
+	AttrListPtr int32_puts_PAL;
+	int32_puts->setAttributes(int32_puts_PAL);
+}
+
+
+Constant* FunctionMng::createStdMessage(Module* module, string message){
 	ArrayType* ArrayTy_0 = ArrayType::get(IntegerType::get(module->getContext(), 8), message.size()+1);
 	GlobalVariable* gvar_array_str = new GlobalVariable(*module, ArrayTy_0, true, GlobalValue::InternalLinkage, 0, "str");
 	 Constant* const_array_7 = ConstantArray::get(module->getContext(), message, true);
@@ -83,15 +144,10 @@ void FunctionMng::createPuts(Module* module, string message, Instruction* instr,
 	 ConstantInt* const_int64_9 = ConstantInt::get(module->getContext(), APInt(64, StringRef("0"), 10));
 	 const_ptr_8_indices.push_back(const_int64_9);
 	 const_ptr_8_indices.push_back(const_int64_9);
-	 Constant* const_ptr_8 = ConstantExpr::getGetElementPtr(gvar_array_str, const_ptr_8_indices);
+	
+	 Constant* expr = ConstantExpr::getGetElementPtr(gvar_array_str, const_ptr_8_indices);
 	 ConstantInt* const_int32_10 = ConstantInt::get(module->getContext(), APInt(32, StringRef("0"), 10));
 	 gvar_array_str->setInitializer(const_array_7);
-
-
-	// Call puts
-	CallInst* int32_puts = CallInst::Create(func_puts, const_ptr_8, "puts", instr);
-	int32_puts->setCallingConv(CallingConv::C);
-	int32_puts->setTailCall(true);
-	AttrListPtr int32_puts_PAL;
-	int32_puts->setAttributes(int32_puts_PAL);
+	 
+	 return expr;
 }
