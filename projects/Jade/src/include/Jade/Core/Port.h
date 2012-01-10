@@ -54,7 +54,6 @@ namespace llvm {
 #include "Jade/Core/Network/Vertex.h"
 
 class Actor;
-class AbstractConnector;
 class Connection;
 class HDAGGraph;
 class Variable;
@@ -183,30 +182,19 @@ public:
 	void setInstance(Instance* instance){this->instance = instance;};
 
 	/**
-	 * @brief Add a fifo connection to the port
-	 *
-	 * Add a new fifo connectioned to this port
+	 * @brief Refers a new connection to this port
 	 * 
-	 * @param fifo: the new fifo to add
-	 *
+	 * @param connection : the new connection
 	 */
-	void addFifoConnection(AbstractConnector* fifo){fifos.push_back(fifo);};
+	void addConnection(Connection* connection);
 
 	/**
-	 * @brief Get fifo connections to the port
+	 * @brief Get the size of the fifo connected to the port
 	 * 
-	 * @return a list of fifos
+	 * @return the fifo size
 	 *
 	 */
-	std::list<AbstractConnector*>* getFifoConnections(){return &fifos;};
-
-	/**
-	 * @brief Get the number of fifo connected to this port
-	 * 
-	 * @return Number of fifo connected to the port
-	 *
-	 */
-	int getFifoConnectionNb(){return fifos.size();};
+	int getFifoSize();
 
 	/**
 	 * @brief Getter the port pointer
@@ -320,10 +308,7 @@ public:
 	 *
 	 * @param write : whether or not this port has write acces
 	 */
-	void setAccess(bool read, bool write){
-		this->read = read;
-		this->write = write;
-	}
+	void setAccess(bool read, bool write);
 
 	/**
 	 * @brief Return true if the port can be read 
@@ -339,7 +324,6 @@ public:
 	 */
 	bool isWritable(){ return write;};
 
-	std::set<Connection*>* getConnections();
 protected:
 	
 	/** name of this port. */
@@ -353,9 +337,6 @@ protected:
 
 	/** the number of tokens produced by this port. */
 	int tokensProduced;
-
-	/** Fifos bound to the port */
-	std::list<AbstractConnector*> fifos;
 	
 	/** Corresponding global variable pointer */
 	Variable* ptrVar;
@@ -389,6 +370,9 @@ protected:
 
 	/** Parent actor of the port */
 	Actor* actor;
+
+	/** Connections bound to the port */
+	std::list<Connection*> connections;
 };
 
 #endif

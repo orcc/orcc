@@ -37,12 +37,24 @@
 
 //------------------------------
 #include "Jade/Core/Port.h"
+#include "Jade/Core/Network/Connection.h"
 //------------------------------
 
 using namespace std;
 
-set<Connection*>* Port::getConnections(){
-	Vertex* vertex = instance->getVertex();
-	
-	return NULL;
+int Port::getFifoSize(){
+	if (connections.empty()){
+		return 0;
+	}
+
+	return connections.front()->getSize();
+}
+
+void Port::setAccess(bool read, bool write){
+	this->read = read;
+	this->write = write;
+}
+
+void Port::addConnection(Connection* connection){
+	connections.push_back(connection);
 }

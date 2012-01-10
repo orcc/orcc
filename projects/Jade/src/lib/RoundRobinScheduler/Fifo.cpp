@@ -184,10 +184,7 @@ void FifoOpt::createPeeks (Procedure* procedure, Pattern* pattern){
 
 Value* FifoOpt::replaceAccess (Port* port, Procedure* proc){
 	Function* function = proc->getFunction();
-	int size = 512;	
-	port->getConnections();
-	//ConstantInt* sizeVal = ConstantInt::get(function->getContext(), APInt(32, port->getSize()));
-	ConstantInt* sizeVal = ConstantInt::get(function->getContext(), APInt(32, size));
+	ConstantInt* sizeVal = ConstantInt::get(function->getContext(), APInt(32, port->getFifoSize()));
 	ConstantInt* zero = ConstantInt::get(function->getContext(), APInt(32, 0));
 	
 	//Get load instruction on port
@@ -206,8 +203,7 @@ Value* FifoOpt::replaceAccess (Port* port, Procedure* proc){
 					Use* CastU = &LI.getUse();
 					if (isa<BitCastInst>(CastU->getUser())){
 						BitCastInst* CastInst = cast<BitCastInst>(CastU->getUser());
-						//ArrayType* arrayTy = ArrayType::get(port->getType(), port->getSize());
-						ArrayType* arrayTy = ArrayType::get(port->getType(), size);
+						ArrayType* arrayTy = ArrayType::get(port->getType(), port->getFifoSize());
 
 						// Load index and create a new cast
 						LoadInst* indexVal = new LoadInst(port->getIndex(), "", loadInst);
@@ -308,10 +304,9 @@ Value* FifoOpt::createInputTest(Port* port, ConstantInt* numTokens, BasicBlock* 
 }
 
 Value* FifoOpt::createOutputTest(Port* port, ConstantInt* numTokens, BasicBlock* BB){
-	int size = 512;
 	
 	// Usefull constants
-	Constant* fifoSizeCst = ConstantInt::get(Type::getInt32Ty(BB->getContext()), size);
+	Constant* fifoSizeCst = ConstantInt::get(Type::getInt32Ty(BB->getContext()), port->getFifoSize());
 	ConstantInt* zero = ConstantInt::get(BB->getContext(), APInt(32, 0));
 	ConstantInt* three = ConstantInt::get(BB->getContext(), APInt(32, 3));
 

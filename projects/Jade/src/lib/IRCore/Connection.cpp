@@ -71,6 +71,10 @@ Connection::Connection(HDAGGraph* graph, Vertex* source, Port* srcPort, Vertex* 
 	// Set properties of the ports
 	srcPort->setAccess(false, true);
 	tgtPort->setAccess(true, false);
+
+	// Bound connection to the port
+	srcPort->addConnection(this);
+	tgtPort->addConnection(this);
 }
 
 
