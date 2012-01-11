@@ -152,7 +152,6 @@ public class ActorMerger extends DfSwitch<Void> {
 		// static region detections
 		StaticRegionDetector detector = new StaticRegionDetector(network);
 		for (Set<Vertex> vertices : detector.staticRegionSets()) {
-
 			// transform the parent network and return the child network
 			Network subNetwork = transformNetwork(vertices);
 

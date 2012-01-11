@@ -512,7 +512,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 	public Actor caseNetwork(Network network) {
 		this.network = network;
 		superActor = DfFactory.eINSTANCE.createActor();
-		String name = "cluster" + index;
+		String name = "Cluster" + index++;
 		superActor.setName(name);
 
 		createPorts();
