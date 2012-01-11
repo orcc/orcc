@@ -180,15 +180,18 @@ public class CBackendImpl extends AbstractBackend {
 		network.setTemplateData(data);
 
 		// instantiate and flattens network
-		write("Instantiating... ");
+		write("Instantiating...\n");
 		network = new Instantiator().doSwitch(network);
-		write("done\n");
+		write("Flattening...\n");
 		new NetworkFlattener().doSwitch(network);
 
 		if (classify) {
-			write("Starting classification of actors... ");
+			write("Classification of actors...\n");
 			network.classify();
-			write("done\n");
+			if (merge) {
+				write("Merging of actors...\n");
+				network.mergeActors();
+			}
 		}
 
 		new CBroadcastAdder(new WriteListener() {
@@ -208,14 +211,7 @@ public class CBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
-		// Transform the network
 		network = doTransformNetwork(network);
-
-		if (merge) {
-			network.mergeActors();
-		}
-
-		// Transform all actors of the network
 		transformActors(network.getAllActors());
 
 		network.computeTemplateMaps();
