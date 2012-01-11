@@ -597,19 +597,15 @@ public class ActorImpl extends EntityImpl implements Actor {
 
 	@Override
 	public void resetTokenConsumption() {
-		if (inputs != null) {
-			for (Port port : inputs) {
-				port.resetTokenConsumption();
-			}
+		for (Port port : getInputs()) {
+			port.resetTokenConsumption();
 		}
 	}
 
 	@Override
 	public void resetTokenProduction() {
-		if (outputs != null) {
-			for (Port port : outputs) {
-				port.resetTokenProduction();
-			}
+		for (Port port : getOutputs()) {
+			port.resetTokenProduction();
 		}
 	}
 
