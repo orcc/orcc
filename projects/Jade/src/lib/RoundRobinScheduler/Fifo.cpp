@@ -53,13 +53,13 @@ using namespace llvm;
 using namespace std;
 
 //Initialize static elements
-bool FifoOpt::debug = false;
+bool Fifo::debug = false;
 
-FifoOpt::FifoOpt(llvm::LLVMContext& C, llvm::Module* module, llvm::Type* type, int size){
+Fifo::Fifo(llvm::LLVMContext& C, llvm::Module* module, llvm::Type* type, int size){
 	IntegerType* connectionType = cast<IntegerType>(type);
 
 	//Get fifo structure
-	StructType* structType = FifoOpt::getOrInsertFifoStruct(module, connectionType);
+	StructType* structType = Fifo::getOrInsertFifoStruct(module, connectionType);
 
 	// Initialize array content
 	ArrayType* arrayType = ArrayType::get(connectionType, size);
@@ -94,8 +94,8 @@ FifoOpt::FifoOpt(llvm::LLVMContext& C, llvm::Module* module, llvm::Type* type, i
 }
 
 
-void FifoOpt::createReadWritePeek(Action* action, bool debug){
-	FifoOpt::debug = debug;
+void Fifo::createReadWritePeek(Action* action, bool debug){
+	Fifo::debug = debug;
 
 	// Create read accesses
 	Pattern* input = action->getInputPattern();
@@ -120,7 +120,7 @@ void FifoOpt::createReadWritePeek(Action* action, bool debug){
 
 }
 
-void FifoOpt::createWrites (Procedure* procedure, Pattern* pattern){
+void Fifo::createWrites (Procedure* procedure, Pattern* pattern){
 	Function* function = procedure->getFunction();
 	BasicBlock* BB = &function->back();
 	
@@ -142,7 +142,7 @@ void FifoOpt::createWrites (Procedure* procedure, Pattern* pattern){
 }
 
 
-void FifoOpt::createReads (Procedure* procedure, Pattern* pattern){
+void Fifo::createReads (Procedure* procedure, Pattern* pattern){
 	Function* function = procedure->getFunction();
 	BasicBlock* BB = &function->back();
 	
@@ -164,7 +164,7 @@ void FifoOpt::createReads (Procedure* procedure, Pattern* pattern){
 }
 
 
-void FifoOpt::createPeeks (Procedure* procedure, Pattern* pattern){
+void Fifo::createPeeks (Procedure* procedure, Pattern* pattern){
 	Function* function = procedure->getFunction();
 	BasicBlock* BB = &function->back();
 	
@@ -182,7 +182,7 @@ void FifoOpt::createPeeks (Procedure* procedure, Pattern* pattern){
 	}
 }
 
-Value* FifoOpt::replaceAccess (Port* port, Procedure* proc){
+Value* Fifo::replaceAccess (Port* port, Procedure* proc){
 	Function* function = proc->getFunction();
 	ConstantInt* sizeVal = ConstantInt::get(function->getContext(), APInt(32, port->getFifoSize()));
 	ConstantInt* zero = ConstantInt::get(function->getContext(), APInt(32, 0));
@@ -246,7 +246,7 @@ Value* FifoOpt::replaceAccess (Port* port, Procedure* proc){
 											  idxs.push_back(*I);
 										  }
 
-										  FifoOpt::createFifoTrace(function->getParent(), port, newGEPInst, idxs);
+										  Fifo::createFifoTrace(function->getParent(), port, newGEPInst, idxs);
 									 }
 
 									  // Remove old GEP
@@ -269,7 +269,7 @@ Value* FifoOpt::replaceAccess (Port* port, Procedure* proc){
 	}
 }
 
-void FifoOpt::createFifoTrace(Module* module, Port* port, GetElementPtrInst* gep, vector<Value*> idxs){
+void Fifo::createFifoTrace(Module* module, Port* port, GetElementPtrInst* gep, vector<Value*> idxs){
 	stringstream message;
 	vector<Value*>::iterator it;
 	vector<Value*> values;
@@ -338,14 +338,14 @@ void FifoOpt::createFifoTrace(Module* module, Port* port, GetElementPtrInst* gep
 	FunctionMng::createPrintf(module, message.str(), instr, values);
 }
 
-Value* FifoOpt::createInputTest(Port* port, ConstantInt* numTokens, BasicBlock* BB){
+Value* Fifo::createInputTest(Port* port, ConstantInt* numTokens, BasicBlock* BB){
 	LoadInst* indexVal = new LoadInst(port->getIndex(), "", false, BB);
 	BinaryOperator* addVal = BinaryOperator::Create(Instruction::Add, indexVal, numTokens, "", BB);
 	LoadInst* tokenVal = new LoadInst(port->getRoomToken(), "", false, BB);
 	return new ICmpInst(*BB, ICmpInst::ICMP_ULE, addVal, tokenVal, "");
 }
 
-Value* FifoOpt::createOutputTest(Port* port, ConstantInt* numTokens, BasicBlock* BB){
+Value* Fifo::createOutputTest(Port* port, ConstantInt* numTokens, BasicBlock* BB){
 	
 	// Usefull constants
 	Constant* fifoSizeCst = ConstantInt::get(Type::getInt32Ty(BB->getContext()), port->getFifoSize());
@@ -372,7 +372,7 @@ Value* FifoOpt::createOutputTest(Port* port, ConstantInt* numTokens, BasicBlock*
 	return compVal;
 }
 
-Function* FifoOpt::initializeIn(llvm::Module* module, Port* port){
+Function* Fifo::initializeIn(llvm::Module* module, Port* port){
 	//Usefull constant
 	ConstantInt* zero = ConstantInt::get(module->getContext(), APInt(32, 0));
 	ConstantInt* one = ConstantInt::get(module->getContext(), APInt(32, 1));
@@ -444,7 +444,7 @@ Function* FifoOpt::initializeIn(llvm::Module* module, Port* port){
 }
 
 
-Function* FifoOpt::initializeOut(llvm::Module* module, Port* port){
+Function* Fifo::initializeOut(llvm::Module* module, Port* port){
 	
 	//Usefull constant
 	ConstantInt* zero = ConstantInt::get(module->getContext(), APInt(32, 0));
@@ -507,7 +507,7 @@ Function* FifoOpt::initializeOut(llvm::Module* module, Port* port){
 	return writeFn_port;
 }
 
-Function* FifoOpt::closeIn(llvm::Module* module, Port* port){
+Function* Fifo::closeIn(llvm::Module* module, Port* port){
 	//Usefull constant
 	ConstantInt* zero = ConstantInt::get(module->getContext(), APInt(32, 0));
 	ConstantInt* one = ConstantInt::get(module->getContext(), APInt(32, 1));
@@ -538,7 +538,7 @@ Function* FifoOpt::closeIn(llvm::Module* module, Port* port){
 	return readEndFn_port;
 }
 
-Function* FifoOpt::closeOut(llvm::Module* module, Port* port){
+Function* Fifo::closeOut(llvm::Module* module, Port* port){
 	//Usefull constant
 	ConstantInt* zero = ConstantInt::get(module->getContext(), APInt(32, 0));
 	ConstantInt* four = ConstantInt::get(module->getContext(), APInt(32, 4));
@@ -566,7 +566,7 @@ Function* FifoOpt::closeOut(llvm::Module* module, Port* port){
 }
 
 
-FifoOpt::~FifoOpt(){
+Fifo::~Fifo(){
 	//Erase fifo elements
 	fifoGV->eraseFromParent();
 	gv_array->eraseFromParent();
@@ -574,7 +574,7 @@ FifoOpt::~FifoOpt(){
 }
 
 
-StructType* FifoOpt::getOrInsertFifoStruct(Module* module, IntegerType* connectionType){	
+StructType* Fifo::getOrInsertFifoStruct(Module* module, IntegerType* connectionType){	
 	int size = connectionType->getBitWidth();
 
 	// Set structure name
@@ -601,7 +601,7 @@ StructType* FifoOpt::getOrInsertFifoStruct(Module* module, IntegerType* connecti
 }
 
 
-Function* FifoOpt::getOrInsertNumTokensFn(llvm::Module* module, llvm::IntegerType* connectionType){
+Function* Fifo::getOrInsertNumTokensFn(llvm::Module* module, llvm::IntegerType* connectionType){
 	StructType* fifoStruct = getOrInsertFifoStruct(module, connectionType);
 
 	// Set function name
@@ -668,7 +668,7 @@ Function* FifoOpt::getOrInsertNumTokensFn(llvm::Module* module, llvm::IntegerTyp
 }
 
 
-Function* FifoOpt::getOrInsertRoomFn(Module* module, IntegerType* connectionType){	
+Function* Fifo::getOrInsertRoomFn(Module* module, IntegerType* connectionType){	
 	StructType* fifoStruct = getOrInsertFifoStruct(module, connectionType);
 
 	// Set function name

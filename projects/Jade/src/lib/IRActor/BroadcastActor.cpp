@@ -147,7 +147,7 @@ void BroadcastActor::createAction(){
 	Pattern* peekPattern = createPattern(inputs);
 	
 	//Add action to the actor
-	Action* action = new Action(actionTag, inputPattern, outputPattern, peekPattern, scheduler, body);
+	Action* action = new Action(actionTag, inputPattern, outputPattern, peekPattern, scheduler, body, this);
 
 	actions->push_back(action);
 }

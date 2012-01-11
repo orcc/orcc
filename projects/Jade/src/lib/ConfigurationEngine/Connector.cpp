@@ -84,7 +84,7 @@ void Connector::unsetConnections(Configuration* configuration){
 	}
 }
 
-void Connector::connect(Port* port, FifoOpt* fifo){
+void Connector::connect(Port* port, Fifo* fifo){
 	GlobalVariable* var = port->getFifoVar();
 	
 	if (var == NULL){
@@ -108,7 +108,7 @@ void Connector::setConnection(Connection* connection){
 	Port* dst = connection->getDestinationPort();
 
 	//Initialize ports with a new fifo
-	FifoOpt* fifo = new FifoOpt(Context, decoder->getModule(), src->getType(), connection->getSize());
+	Fifo* fifo = new Fifo(Context, decoder->getModule(), src->getType(), connection->getSize());
 	connect(src, fifo);
 	connect(dst, fifo);
 	

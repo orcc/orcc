@@ -165,7 +165,7 @@ public:
 	 *
 	 *	@return true if the port has been compiled, false otherwise
      */
-	bool mapFifo(Port* port, FifoOpt* fifo);
+	bool mapFifo(Port* port, Fifo* fifo);
 
 	void* getExit(); 
 	void recompile(llvm::Function* function);

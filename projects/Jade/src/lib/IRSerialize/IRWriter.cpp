@@ -256,7 +256,7 @@ Action* IRWriter::writeAction(Action* action){
 		Pattern* peekPattern = writePattern(action->getPeekPattern(), inputs);
 
 		//Create the action
-		return new Action(action->getTag(), inputPattern, outputPattern, peekPattern, newScheduler, newBody);
+		return new Action(action->getTag(), inputPattern, outputPattern, peekPattern, newScheduler, newBody, instance);
 }
 
 Procedure* IRWriter::writeProcedure(Procedure* procedure){

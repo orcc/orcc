@@ -46,6 +46,7 @@ namespace llvm{
 	class ConstantInt;
 }
 
+#include "Jade/Core/Entity.h"
 #include "Jade/Core/Actor/ActionTag.h"
 #include "Jade/Core/Actor/ActionScheduler.h"
 #include "Jade/Core/Actor/Pattern.h"
@@ -77,15 +78,16 @@ public:
 	 *
 	 * @param body : Procedure that holds the body of the action
 	 *
-	 * @param parent : Parent of the action
+	 * @param parent : parent entity of the action
 	 */
-	Action(ActionTag* tag, Pattern* inputPattern, Pattern* outputPattern, Pattern* peekPattern, Procedure* scheduler, Procedure* body) {
+	Action(ActionTag* tag, Pattern* inputPattern, Pattern* outputPattern, Pattern* peekPattern, Procedure* scheduler, Procedure* body, Entity* parent) {
 		this->tag = tag;
 		this->body = body;
 		this->scheduler = scheduler;
 		this->inputPattern = inputPattern;
 		this->outputPattern = outputPattern;
 		this->peekPattern = peekPattern;
+		this->parent = parent;
 	}
 
 	~Action();
@@ -160,6 +162,13 @@ public:
 	 */
 	std::string getCalName();
 
+	/**
+	 *  brief Returns the parent of the action
+	 * 
+	 * @return parent of the action
+	 */
+	Entity* getParent(){return parent;};
+
 private:
 	ActionTag* tag;
 	Procedure* body;
@@ -167,6 +176,7 @@ private:
 	Pattern* inputPattern;
 	Pattern* outputPattern;
 	Pattern* peekPattern;
+	Entity* parent;
 };
 
 #endif

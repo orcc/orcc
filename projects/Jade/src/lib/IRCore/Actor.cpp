@@ -47,7 +47,7 @@ using namespace std;
 using namespace llvm;
 
 
-Actor::Actor(std::string name, llvm::Module* module, std::string file){
+Actor::Actor(std::string name, llvm::Module* module, std::string file) : Entity(new map<std::string, Port*>() , new map<std::string, Port*>(), NULL, NULL) {
 	this->name = name;
 	this->module = module;
 	this->file = file;
@@ -62,14 +62,10 @@ Actor::Actor(std::string name, llvm::Module* module, std::string file){
 Actor::Actor(string name, Module* module, string file, map<string, Port*>* inputs, 
 		     map<string, Port*>* outputs, map<string, StateVar*>* stateVars,
 			 std::map<std::string, Variable*>* parameters, std::map<std::string, Procedure*>* procedures,
-			 list<Action*>* initializes, list<Action*>* actions, ActionScheduler* actionScheduler){
+			 list<Action*>* initializes, list<Action*>* actions, ActionScheduler* actionScheduler): Entity(inputs, outputs, initializes, actions){
 	this->name = name;
 	this->module = module;
 	this->file = file;
-	this->inputs = inputs;
-	this->outputs = outputs;
-	this->initializes = initializes;
-	this->actions = actions;
 	this->stateVars = stateVars;
 	this->parameters = parameters;
 	this->procedures = procedures;
@@ -84,14 +80,10 @@ Actor::Actor(string name, Module* module, string file, map<string, Port*>* input
 Actor::Actor(string name, Module* module, string file, map<string, Port*>* inputs, 
 		     map<string, Port*>* outputs, map<string, StateVar*>* stateVars,
 			 std::map<std::string, Variable*>* parameters, std::map<std::string, Procedure*>* procedures,
-			 list<Action*>* initializes, list<Action*>* actions, ActionScheduler* actionScheduler, MoC* moc){
+			 list<Action*>* initializes, list<Action*>* actions, ActionScheduler* actionScheduler, MoC* moc): Entity(inputs, outputs, initializes, actions) {
 	this->name = name;
 	this->module = module;
 	this->file = file;
-	this->inputs = inputs;
-	this->outputs = outputs;
-	this->initializes = initializes;
-	this->actions = actions;
 	this->stateVars = stateVars;
 	this->parameters = parameters;
 	this->procedures = procedures;
@@ -125,45 +117,6 @@ void Actor::remInstance(Instance* instance){
 	instances.remove(instance);
 }
 
-Port* Actor::getPort(string portName){
-	Port* port = getInput(portName);
-
-	// Search inside input ports 
-	if (port!= NULL){
-		return port;
-	}
-
-	// Search inside output ports 
-	return getOutput(portName);
-}
-
-Procedure* Actor::getProcedure(string name){
-	map<string, Procedure*>::iterator it;
-	
-	it = procedures->find(name);
-
-	if(it == procedures->end()){
-		return NULL;
-	}
-
-	return (*it).second;
-}
-
-Port* Actor::getInput(string portName){
-	if (inputs->empty()){
-		return NULL;
-	}
-
-	std::map<std::string, Port*>::iterator it;
-	
-	it = inputs->find(portName);
-
-	if(it == inputs->end()){
-		return NULL;
-	}
-
-	return (*it).second;
-}
 
 string Actor::getPackage() {
 	return PackageMng::getPackagesName(this);
@@ -171,44 +124,6 @@ string Actor::getPackage() {
 
 string Actor::getSimpleName() {
 	return PackageMng::getSimpleName(this);
-}
-
-Port* Actor::getOutput(string portName){
-	if (outputs->empty()){
-		return NULL;
-	}
-
-	std::map<std::string, Port*>::iterator it;
-	
-	it = outputs->find(portName);
-
-	if(it == outputs->end()){
-		return NULL;
-	}
-
-	return (*it).second;
-}
-
-Variable* Actor::getParameter(std::string name){
-	std::map<std::string, Variable*>::iterator it;
-	it = parameters->find(name);
-
-	if(it == parameters->end()){
-		return NULL;
-	}
-
-	return (*it).second;
-}
-
-StateVar* Actor::getStateVar(std::string name){
-	map<string, StateVar*>::iterator it;
-	it = stateVars->find(name);
-
-	if(it == stateVars->end()){
-		return NULL;
-	}
-
-	return (*it).second;
 }
 
 bool Actor::isNative(){

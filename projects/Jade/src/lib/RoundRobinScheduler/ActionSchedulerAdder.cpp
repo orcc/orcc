@@ -201,6 +201,10 @@ void ActionSchedulerAdder::createActionTrace(Action* action, Instruction* instru
 
 		FunctionMng::createPuts(decoder->getModule(), message.str(), instruction);
 }
+/*
+void ActionSchedulerAdder::createStateVarTrace(Action* action, Instruction* instruction){
+
+}*/
 
 void ActionSchedulerAdder::createInitialize(Instance* instance){
 	
@@ -243,14 +247,14 @@ void ActionSchedulerAdder::initializeFIFO (Instance* instance){
 	//Initialize inputs
 	map<string,Port*>* inputs = instance->getInputs();
 	for (it = inputs->begin(); it != inputs->end(); it++){
-		Function* init = FifoOpt::initializeIn(module, it->second);
+		Function* init = Fifo::initializeIn(module, it->second);
 		CallInst::Create(init, "", entryBB->getTerminator());
 	}
 
 	//Initialize outputs
 	map<string,Port*>* outputs = instance->getOutputs();
 	for (it = outputs->begin(); it != outputs->end(); it++){
-		Function* init = FifoOpt::initializeOut(module, it->second);
+		Function* init = Fifo::initializeOut(module, it->second);
 		CallInst::Create(init, "", entryBB->getTerminator());
 	}
 
@@ -258,18 +262,18 @@ void ActionSchedulerAdder::initializeFIFO (Instance* instance){
 	std::list<Action*>::iterator itAct;
 	std::list<Action*>* actions = instance->getActions();
 	for (itAct = actions->begin(); itAct != actions->end(); itAct++){
-		FifoOpt::createReadWritePeek(*itAct, debug);
+		Fifo::createReadWritePeek(*itAct, debug);
 	}
 
 	//Close inputs
 	for (it = inputs->begin(); it != inputs->end(); it++){
-		Function* close = FifoOpt::closeIn(module, it->second);
+		Function* close = Fifo::closeIn(module, it->second);
 		CallInst::Create(close, "", returnBB->getTerminator());
 	}
 
 	//Close outputs
 	for (it = outputs->begin(); it != outputs->end(); it++){
-		Function* close = FifoOpt::closeOut(module, it->second);
+		Function* close = Fifo::closeOut(module, it->second);
 		CallInst::Create(close, "", returnBB->getTerminator());
 	}
 }
@@ -294,7 +298,7 @@ BasicBlock* ActionSchedulerAdder::checkInputPattern(Pattern* pattern, Function* 
 			continue;
 		}
 		
-		Value* hasTokenValue = FifoOpt::createInputTest(port, it->second, BB);
+		Value* hasTokenValue = Fifo::createInputTest(port, it->second, BB);
 		values.push_back(hasTokenValue);
 	}
 	
@@ -340,7 +344,7 @@ BasicBlock* ActionSchedulerAdder::checkOutputPattern(Pattern* pattern, llvm::Fun
 			// Don't test internal ports
 			continue;
 		}
-		Value* hasRoomValue = FifoOpt::createOutputTest(port, it->second, BB);
+		Value* hasRoomValue = Fifo::createOutputTest(port, it->second, BB);
 		values.push_back(hasRoomValue);
 	}
 

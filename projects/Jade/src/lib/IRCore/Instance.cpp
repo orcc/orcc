@@ -51,7 +51,7 @@ using namespace std;
 using namespace llvm;
 
 Instance::Instance(HDAGGraph* graph, std::string id, std::string clasz, std::map<std::string, Expr*>* parameterValues, 
-			 std::map<std::string, IRAttribute*>* attributes){
+			 std::map<std::string, IRAttribute*>* attributes) : Entity(new map<std::string, Port*>() , new map<std::string, Port*>(), NULL, NULL){
 	this->id = id;
 	this->clasz = clasz;
 	this->parameterValues = parameterValues;
@@ -61,14 +61,28 @@ Instance::Instance(HDAGGraph* graph, std::string id, std::string clasz, std::map
 	this->stateVars = NULL;
 	this->parameters = NULL;
 	this->procedures = NULL;
-	this->initializes = NULL;
-	this->actions = NULL;
 	this->actionScheduler = NULL;
 	this->parent = graph;
 
 	// Add instance into graph
 	this->vertex = new Vertex(this);
 	graph->addVertex(vertex);
+}
+
+Instance::Instance(std::string id, Actor* actor)  : Entity(new map<std::string, Port*>() , new map<std::string, Port*>(), NULL, NULL) {
+	this->id = id;
+	this->actor = actor;
+	this->configuration = NULL;
+	this->stateVars = NULL;
+	this->parameters = NULL;
+	this->procedures = NULL;
+	this->actionScheduler = NULL;
+	this->parameterValues = new map<string, Expr*>();
+	this->attributes = new map<string, IRAttribute*>();
+		
+	if (actor != NULL){
+		actor->addInstance(this);
+	}
 }
 
 Instance::~Instance(){
@@ -78,71 +92,7 @@ Instance::~Instance(){
 	}
 }
 
-Port* Instance::getPort(string portName){
-	Port* port = getInput(portName);
 
-	// Search inside input ports 
-	if (port!= NULL){
-		return port;
-	}
-
-	// Search inside output ports 
-	return getOutput(portName);
-}
-
-
-Port* Instance::getInput(string portName){
-	std::map<std::string, Port*>::iterator it;
-	
-	//Look for the given name in input
-	it = inputs.find(portName);
-
-	//Port not found
-	if(it == inputs.end()){
-		return NULL;
-	}
-
-	//Port found
-	return (*it).second;
-}
-
-Port* Instance::getOutput(string portName){
-	std::map<std::string, Port*>::iterator it;
-	
-	//Look for the given name in output
-	it = outputs.find(portName);
-
-	//Port not found
-	if(it == outputs.end()){
-		return NULL;
-	}
-
-	//Port found
-	return (*it).second;
-}
-
-StateVar* Instance::getStateVar(std::string name){
-	map<string, StateVar*>::iterator it;
-	it = stateVars->find(name);
-
-	if(it == stateVars->end()){
-		return NULL;
-	}
-
-	return (*it).second;
-}
-
-Procedure* Instance::getProcedure(string name){
-	map<string, Procedure*>::iterator it;
-	
-	it = procedures->find(name);
-
-	if(it == procedures->end()){
-		return NULL;
-	}
-
-	return (*it).second;
-}
 string Instance::getMapping(){
 	map<string, IRAttribute*>::iterator it;
 
@@ -165,11 +115,11 @@ void Instance::setActor(Actor* actor){
 }
 
 void Instance::setAsInput(Port* port) {
-	inputs.insert(pair<string, Port*>(port->getName(), port));
+	inputs->insert(pair<string, Port*>(port->getName(), port));
 }
 
 void Instance::setAsOutput(Port* port) {
-	outputs.insert(pair<string, Port*>(port->getName(), port));
+	outputs->insert(pair<string, Port*>(port->getName(), port));
 }
 
 void Instance::solveParameters(){
@@ -195,23 +145,5 @@ void Instance::solveParameters(){
 		}
 
 		variable->setInitializer(value);
-	}
-}
-
-Instance::Instance(std::string id, Actor* actor){
-	this->id = id;
-	this->actor = actor;
-	this->configuration = NULL;
-	this->stateVars = NULL;
-	this->parameters = NULL;
-	this->procedures = NULL;
-	this->initializes = NULL;
-	this->actions = NULL;
-	this->actionScheduler = NULL;
-	this->parameterValues = new map<string, Expr*>();
-	this->attributes = new map<string, IRAttribute*>();
-		
-	if (actor != NULL){
-		actor->addInstance(this);
 	}
 }

@@ -28,7 +28,7 @@
  */
 
 /**
-@brief Description of the FifoCircular class interface
+@brief Description of the fifo class interface
 @author Jerome Gorin
 @file Fifo.h
 @version 1.0
@@ -36,8 +36,8 @@
 */
 
 //------------------------------
-#ifndef FIFOOPT_H
-#define FIFOOPT_H
+#ifndef FIFO_H
+#define FIFO_H
 #include <vector>
 
 namespace llvm{
@@ -62,17 +62,17 @@ class Port;
 //------------------------------
 
 /**
- * @brief  This class defines a Circular Opt.
+ * @brief  This class defines a fifo.
  * 
  * @author Jerome Gorin
  * 
  */
 
-class FifoOpt {
+class Fifo {
 	public:
-		FifoOpt(llvm::LLVMContext& C, llvm::Module* module, llvm::Type* type, int size);
+		Fifo(llvm::LLVMContext& C, llvm::Module* module, llvm::Type* type, int size);
 
-		~FifoOpt();
+		~Fifo();
 	
 	public:
 		static llvm::StructType* getOrInsertFifoStruct(llvm::Module* module, llvm::IntegerType* connectionType);

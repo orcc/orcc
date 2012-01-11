@@ -487,7 +487,7 @@ Action* IRParser::parseAction(MDNode* node){
 
 	Procedure* scheduler = parseProc(cast<MDNode>(node->getOperand(4)));
 	Procedure* body = parseProc(cast<MDNode>(node->getOperand(5)));
-	Action* action = new Action(tag, ip, op, pp, scheduler, body);
+	Action* action = new Action(tag, ip, op, pp, scheduler, body, actor);
 
 	putAction(tag, action);
 

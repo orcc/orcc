@@ -152,7 +152,7 @@ public:
 	 *  @return a llvm::GlobalVariable representing the fifo of the connection
      *
      */
-	FifoOpt* getFifo(){return fifo;};
+	Fifo* getFifo(){return fifo;};
 
 	/*!
      *  @brief Get fifo bound to the connection
@@ -160,7 +160,7 @@ public:
 	 *  @return a llvm::GlobalVariable representing the fifo of the connection
      *
      */
-	void setFifo(FifoOpt* fifo){this->fifo = fifo;};
+	void setFifo(Fifo* fifo){this->fifo = fifo;};
 
 	 /*!
 	 *  @brief unset the fifo bound to the connection
@@ -184,7 +184,7 @@ private:
 	Vertex* target;				/** Target vertex */
 	Port* srcPort;				/** Source Port */
 	Port* tgtPort;				/** Destination Port */
-	FifoOpt* fifo;			    /** Fifo of the connection */
+	Fifo* fifo;			    /** Fifo of the connection */
 	HDAGGraph* parent;          /** Graph of this connection */
 };
 

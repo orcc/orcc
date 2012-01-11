@@ -43,8 +43,9 @@
 #include<map>
 #include<list>
 
-#include "Jade/Core/StateVariable.h"
+#include "Jade/Core/Entity.h"
 #include "Jade/Core/Port.h"
+#include "Jade/Core/StateVariable.h"
 #include "Jade/Core/Actor/Action.h"
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Core/MoC.h"
@@ -76,7 +77,7 @@ class Variable;
  * @author Jerome Gorin
  * 
  */
-class Actor {
+class Actor : public Entity {
 public:
 	
 	/**
@@ -172,27 +173,12 @@ public:
 	void remInstance(Instance* instance);
 	
 	/**
-     *  @brief Return parameters of actor
-	 *
-	 *  @return a map of Variable that contains actor parameters
-	 *
-     */
-	std::map<std::string, Variable*>* getParameters(){return parameters;};
+	 * @brief Returns true if this entity is an actor.
+	 * 
+	 * @return true if this entity is actor
+	 */
+	virtual bool isActor(){return true;};
 
-	/**
-     *  @brief Set parameters of actor
-	 *
-	 *  @param parameters : a map of Variable that contains actor parameters
-     */
-	 void setParameters(std::map<std::string, Variable*>* parameters){this->parameters = parameters;};
-
-	/**
-     *  @brief Return the package of this actor
-	 *
-	 *  @return the package of this actor
-	 *
-     */
-	Variable* getParameter(std::string name);
 
 	/**
      *  @brief Return the llvm::Module of the Actor
@@ -209,9 +195,6 @@ public:
 	 *
      */
 	std::string getPackage();
-
-	bool isActor(){return true;};
-	virtual bool isBroadcast(){return false;};
 
 	/**
      *  @brief Returns the simple name of this actor
@@ -230,47 +213,11 @@ public:
 	std::string getName(){return name;};
 
 	/**
-     *  @brief get the input Port corresponding to string name
-	 *
-	 *  @param portName : Name of the input port
-	 *
-	 *  @return the corresponding Port if port found, otherwise NULL 
-	 *
-     */
-	Port* getInput(std::string portName);
-
-	/**
-     *  @brief get the Port corresponding to string name
-	 *
-	 *  @param portName : Name of the port
-	 *
-	 *  @return the corresponding Port if port found, otherwise NULL 
-	 *
-     */
-	Port* getPort(std::string portName);
-
-	/**
-     *  @brief getter of input ports
-	 *
-	 *  @return a map of Port representing inputs of the actor
-	 *
-     */
-	std::map<std::string, Port*>* getInputs() {return inputs;};
-
-	/**
      *  @brief setter of input ports
 	 *
 	 *  @param inputs : a map of Port representing inputs of the actor
      */
 	void setInputs(std::map<std::string, Port*>* inputs) {this->inputs = inputs;};
-
-	/**
-     *  @brief getter of output ports
-	 *
-	 *  @return a map of Port representing inputs of the actor
-	 *
-     */
-	std::map<std::string, Port*>* getOutputs() {return outputs;};
 
 	/**
      *  @brief setter of output ports
@@ -279,51 +226,6 @@ public:
      */
 	void setOutputs(std::map<std::string, Port*>* outputs) {this->outputs = outputs;};
 
-
-	/**
-     *  @brief getter of actions
-	 *
-	 *  @return a list of actions
-	 *
-     */
-	std::list<Action*>* getActions() {return actions;};
-
-	/***
-     *  @brief setter of actions
-	 *
-	 *  @param actions : a list of actions
-     */
-	void setActions(std::list<Action*>* actions) {this->actions = actions;};
-
-	/**
-     *  @brief getter of initialize actions
-	 *
-	 *  @return a list of initialize actions
-	 *
-     */
-	std::list<Action*>* getInitializes() {return initializes;};
-
-	/**
-     *  @brief Setter of initialize actions
-	 *
-	 *  @param initializes : a list of initialize actions
-	 *
-     */
-	 void setInitializes(std::list<Action*>* initializes) {this->initializes = initializes;};
-
-	/**
-     *  @brief return true if actior has initialize actions
-	 *
-	 *  @return true if actor has initializes actions
-	 *
-     */
-	bool hasInitializes() {
-		if (initializes != NULL){
-			return !initializes->empty();
-		}
-		
-		return false;
-	};
 
 	/**
      *  @brief Create an input port
@@ -338,16 +240,6 @@ public:
 	void createInput(std::string name, Port* port);
 
 	/**
-     *  @brief get the output Port corresponding to string name
-	 *
-	 *  @param portName : Name of the input port
-	 *
-	 *  @return the corresponding Port if port found, otherwise NULL 
-	 *
-     */
-	Port* getOutput(std::string portName);
-
-	/**
      *  @brief Create an output port
 	 *
 	 *  Create an output port inside the actor similar to the given Port
@@ -358,36 +250,6 @@ public:
 	 *
      */
 	void createOutput(std::string name, Port* port);
-
-
-	/**
-	 * @brief Getter of stateVars
-	 *
-	 * Returns a map of state variables.
-	 * 
-	 * @return a map of state variables
-	 */
-	std::map<std::string, StateVar*>* getStateVars() {
-		return stateVars;
-	}
-
-	/**
-	 * @brief Setter of stateVars
-	 * 
-	 * @param  a map of state variables
-	 */
-	void setStateVars(std::map<std::string, StateVar*>* stateVars) {
-		this->stateVars = stateVars;
-	}
-
-	/**
-	 * @brief Getter of a state variable
-	 *
-	 *  @param name : name of string of the port identifier
-	 * 
-	 * @return the corresponding state variable
-	 */
-	StateVar* getStateVar(std::string name);
 
 
 	/**
@@ -409,37 +271,6 @@ public:
 	 void setActionScheduler(ActionScheduler* actionScheduler) {
 		this->actionScheduler = actionScheduler;
 	}
-
-	/**
-	 * @brief Getter of procedures
-	 *
-	 * Returns a map of procedure of this actor.
-	 * 
-	 * @return a map of Procedure of this actor
-	 */
-	std::map<std::string, Procedure*>* getProcs() {
-		return procedures;
-	}
-
-	/**
-	 * @brief Setter of procedures
-	 * 
-	 * @param procs  : a map of Procedure of this actor
-	 */
-	void setProcs(std::map<std::string, Procedure*>* procs) {
-		this->procedures = procs;
-	}
-
-	/**
-	 * @brief Getter of a procedure
-	 *
-	 * Returns the procedure corresponding to the given name
-	 * 
-	 * @param name: std::string of the procedure
-	 *
-	 * @return the corresponding procedure
-	 */
-	Procedure* getProcedure(std::string name);
 
 	/**
 	 * @brief Get instances of the actor
@@ -483,23 +314,6 @@ public:
      */
 	virtual bool isParseable(){return true;};
 
-	/**
-	 * @brief Returns the MoC of this actor.
-	 * 
-	 * @return an MoC
-	 */
-	MoC* getMoC() {
-		return moc;
-	}
-
-	/**
-	 * Sets the MoC of this actor.
-	 * 
-	 * @param moc : a MoC
-	 */
-	void setMoC(MoC* moc) {
-		this->moc = moc;
-	}
 
 	/**
 	 * @brief Returns true if this actor is a native actor.
@@ -519,35 +333,8 @@ protected:
 	/** Location of the actor */
 	std::string file;
 
-	/** A map of the parameters of this actor */
-	std::map<std::string, Variable*>* parameters;
-
-	/** MoC of this Actor */
-	MoC* moc;
-
-	/** A map of the initialize action of this actor */
-	std::list<Action*>* initializes;
-
-	/** A map of the action of this actor */
-	std::list<Action*>* actions;
-	
 	/** Instances of this actor */
 	std::list<Instance*> instances;
-
-	/** Input ports of this actor */
-	std::map<std::string, Port*>* inputs;
-	
-	/** Output ports of this actor */
-	std::map<std::string, Port*>* outputs;
-
-	/** State variables of this actor */
-	std::map<std::string, StateVar*>* stateVars;
-
-	/** Procedures of this actor */
-	std::map<std::string, Procedure*>* procedures;
-
-	/** Action scheduler of this actor */
-	ActionScheduler* actionScheduler;
 };
 
 #endif

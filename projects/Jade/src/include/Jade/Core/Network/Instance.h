@@ -46,8 +46,8 @@ namespace llvm{
 	class Constant;
 }
 
+#include "Jade/Core/Entity.h"
 #include "Jade/Core/Expression.h"
-#include "Jade/Core/MoC.h"
 #include "Jade/Core/Attribute/TypeAttribute.h"
 #include "Jade/Core/Attribute/ValueAttribute.h"
 
@@ -76,7 +76,7 @@ class Vertex;
  * @author Jerome Gorin
  * 
  */
-class Instance {
+class Instance : public Entity {
 public:
 	/*!
      *  @brief Constructor
@@ -120,21 +120,12 @@ public:
      */
 	virtual bool isSuperInstance(){return false;};
 
-	bool isInstance(){return true;}
-
 	/*!
      *  @brief Getter of clasz
      *
 	 * @return clasz of the Instance
      */
 	std::string getClasz(){return clasz;};
-
-	/**
-     *  @brief Get the MoC of the instance
-     *
-	 * @return MoC of the Instance
-     */
-	virtual MoC* getMoC(){return moc;};
 
 	/**
      *  @brief Get the Vertex of the instance
@@ -153,6 +144,13 @@ public:
 	virtual StateVar* getInternalVar(Port* port){return NULL;};
 
 	/**
+	 * @brief Returns true if this entity is an instance.
+	 * 
+	 * @return true if this entity is an instance
+	 */
+	bool isInstance(){return true;};
+
+	/**
      * @brief Get the internal state variables of the instance
 	 *
 	 * @return a list of state variable
@@ -165,13 +163,6 @@ public:
 	 * @return true if this instance has internal port, otherwise false
      */
 	virtual bool hasInternalPort(){return false;};
-
-	/*!
-     *  @brief Set the MoC of the instance
-     *
-	 * @param moc : the MoC of the Instance
-     */
-	void setMoC(MoC* moc){this->moc = moc;};
 
 	/*!
      *  @brief Setter of clasz
@@ -217,166 +208,12 @@ public:
 	Configuration* getConfiguration(){return configuration;};
 
 	/**
-     *  @brief get the Port corresponding to string name
-	 *
-	 *  @param portName : Name of the port
-	 *
-	 *  @return the corresponding Port if port found, otherwise NULL 
-	 *
-     */
-	Port* getPort(std::string portName);
-
-	/**
-     *  @brief get the input Port corresponding to string name
-	 *
-	 *  @param portName : Name of the input port
-	 *
-	 *  @return the corresponding Port if port found, otherwise NULL 
-	 *
-     */
-	Port* getInput(std::string portName);
-
-	/**
-     *  @brief get the output Port corresponding to string name
-	 *
-	 *  @param portName : Name of the input port
-	 *
-	 *  @return the corresponding Port if port found, otherwise NULL 
-	 *
-     */
-	Port* getOutput(std::string portName);
-
-
-	/**
-     * @brief Get the internal state variables of the instance
-	 *
-	 * @return a list of state variable
-     */
-	virtual std::map<Port*, StateVar*>* getInternalVars(){return NULL;};
-
-	/**
      *  @brief Getter of paramters
      *
 	 * @return a map on the Instance paramter
      *
      */
 	std::map<std::string, Expr*>* getParameterValues(){return parameterValues;};
-
-	/**
-     *  @brief Getter of the action scheduler of this instanced functional unit
-   	 *
-	 *  @return ActionScheduler of the instanced functional unit
-     */
-	ActionScheduler* getActionScheduler(){return actionScheduler;};
-
-	/**
-     *  @brief Set the action scheduler of this instance
-   	 *
-	 *  @param actionScheduler : ActionScheduler of the instanced functional unit
-     */
-	void setActionScheduler(ActionScheduler* actionScheduler){this->actionScheduler = actionScheduler;};
-
-	/**
-	 * @brief Getter of stateVars
-	 *
-	 * Returns a map of state variables.
-	 * 
-	 * @return a map of state variables
-	 */
-	std::map<std::string, StateVar*>* getStateVars() {return stateVars;}
-
-
-	/**
-	 * @brief Setter of stateVars
-	 *
-	 * Set the map of state variables.
-	 * 
-	 * @param stateVars : a map of state variables
-	 */
-	void setStateVars(std::map<std::string, StateVar*>* stateVars) {this->stateVars = stateVars;}
-
-	/**
-	 * @brief Getter of a state variable
-	 *
-	 * Return the state var corresponding to the given name
-	 *
-	 * @param name : string name of the state var
-	 * 
-	 * @return the corresponding state variable
-	 */
-	StateVar* getStateVar(std::string name);
-
-	/**
-	 * @brief Getter of procedures
-	 *
-	 * Returns a map of procedure of this instance.
-	 * 
-	 * @return a map of ProcedureActionScheduler of this instance
-	 */
-	virtual std::map<std::string, Procedure*>* getProcs() {return procedures;}
-
-	/**
-	 * @brief Setter of procedures
-	 *
-	 * Set the map of procedure of this instance.
-	 * 
-	 * @return procedures : a map of Procedure.
-	 */
-	void setProcs(std::map<std::string, Procedure*>* procedures) {this->procedures = procedures;};
-
-	/**
-	 * @brief Getter of a procedure
-	 *
-	 * Returns the procedure corresponding to the given name
-	 * 
-	 * @param name: std::string of the procedure
-	 *
-	 * @return the corresponding procedure
-	 */
-	Procedure* getProcedure(std::string name);
-
-	/**
-     *  @brief get initializes actions of the instance
-	 *
-	 *  @return a list of initializes actions
-	 *
-     */
-	std::list<Action*>* getInitializes(){return initializes;};
-
-	/**
-	 * @brief Returns all the actions of this instance.
-	 * 
-	 * @return all the actions of this instance
-	 */
-	std::list<Action*>* getActions() {return actions;};
-
-	/**
-	 * @brief Set the actions of this instance.
-	 * 
-	 * @return all the actions of this instance
-	 */
-	void setActions(std::list<Action*>* actions) {this->actions = actions;};
-
-	/**
-     *  @brief set initializes actions of the instance
-	 *
-	 *  @param initializes : a list of initializes actions
-	 *
-     */
-	 void setInitializes(std::list<Action*>* initializes){this->initializes = initializes;};
-
-	/**
-     *  @brief return true if the instance has initialize actions
-	 *
-	 *  @return true if instance has initializes actions, otherwise false
-	 *
-     */
-	bool hasInitializes() { 
-		if (initializes == NULL){
-			return false;
-		}		
-		return !initializes->empty();
-	};
 
 	/**
      *  @brief Set a new input port for the instance
@@ -397,36 +234,6 @@ public:
 	 *
      */
 	void setAsOutput(Port* port);
-
-	/**
-     *  @brief getter of input ports
-	 *
-	 *  @return a map of Port representing inputs of the instance
-	 *
-     */
-	std::map<std::string, Port*>* getInputs() {return &inputs;};
-
-	/**
-     *  @brief getter of input ports
-	 *
-	 *  @return a map of Port representing inputs of the instance
-	 *
-     */
-	std::map<std::string, Port*>* getOutputs() {return &outputs;};
-
-	/**
-	 * @brief Returns a map of parameters.
-	 * 
-	 * @return a map of parameters
-	 */
-	std::map<std::string, Variable*>* getParameters() {return parameters;};
-
-	/**
-	 * @brief Set the map of parameters of this instance.
-	 * 
-	 * @param parameters: a map of parameters
-	 */
-	 void setParameters(std::map<std::string, Variable*>* parameters) {this->parameters = parameters;};
 
 	 /**
 	 * @brief Returns a map of attributes.
@@ -496,33 +303,8 @@ protected:
 	 */
 	Configuration* configuration;
 
-	/** Port of the instance */
-	std::map<std::string, Port*> inputs;
-	std::map<std::string, Port*> outputs;
-
-	/** A map of the parameters of this actor */
-	std::map<std::string, Variable*>* parameters;
-
 	/** A map of the attributes of this actor */
 	std::map<std::string, IRAttribute*>* attributes;
-
-	/** State variables of this actor */
-	std::map<std::string, StateVar*>* stateVars;
-
-	/** Procedures of this actor */
-	std::map<std::string, Procedure*>* procedures;
-
-	/** Actions of the instance */
-	std::list<Action*>* actions;
-	
-	/** Action scheduler of the instance */
-	ActionScheduler* actionScheduler;
-
-	/** Initialize actions of the instance */
-	std::list<Action*>* initializes;
-
-	/** MoC of the instance */
-	MoC* moc;
 
 	/** Parent graph of the instance */
 	HDAGGraph* parent;

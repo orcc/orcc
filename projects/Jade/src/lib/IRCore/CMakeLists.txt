@@ -7,6 +7,7 @@ add_library (IRCore
 	ActionScheduler.cpp 
 	Actor.cpp
 	Connection.cpp
+	Entity.cpp
 	Expression.cpp
 	FSM.cpp
 	Instance.cpp

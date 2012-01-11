@@ -127,7 +127,7 @@ private:
 	 *
 	 * @param fifo : the fifo to connect
 	 */
-	void connect(Port* port, FifoOpt* fifo);
+	void connect(Port* port, Fifo* fifo);
 	
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
