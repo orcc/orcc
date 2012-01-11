@@ -38,6 +38,7 @@
 //------------------------------
 #ifndef FIFOOPT_H
 #define FIFOOPT_H
+#include <vector>
 
 namespace llvm{
 	class BasicBlock;
@@ -166,8 +167,10 @@ private:
 	 * @param port : the port to trace
 	 *
 	 * @parm gep : the gep instruction that contains the value
+	 *
+	 * @parm idxs : the gep indexes
 	 */
-	static void createFifoTrace(llvm::Module* module, Port* port, llvm::GetElementPtrInst* gep);
+	static void createFifoTrace(llvm::Module* module, Port* port, llvm::GetElementPtrInst* gep, std::vector<llvm::Value*> idxs);
 
 private:
 	llvm::GlobalVariable* fifoGV;

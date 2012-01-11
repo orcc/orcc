@@ -218,7 +218,7 @@ Value* FifoOpt::replaceAccess (Port* port, Procedure* proc){
 									GetElementPtrInst* GEPInst = cast<GetElementPtrInst>(user);
 
 									// Set new GEP idx
-									 std::vector<Value*> GEPIdx;
+									 vector<Value*> GEPIdx;
 									 GEPIdx.push_back(zero);
 									  for (User::op_iterator I = GEPInst->idx_begin()+1, E = GEPInst->idx_end(); I != E; ++I) {
 										  Value *OpC = cast<Value>(*I);
@@ -239,7 +239,14 @@ Value* FifoOpt::replaceAccess (Port* port, Procedure* proc){
 
 									  // Add debugging information if needed
 									  if (debug){
-										FifoOpt::createFifoTrace(function->getParent(), port, newGEPInst);
+										  // Get fifo index
+										  vector<Value*> idxs;
+										  User::op_iterator I = GEPInst->idx_begin();
+										  for (I++; I != GEPInst->idx_end(); ++I) {
+											  idxs.push_back(*I);
+										  }
+
+										  FifoOpt::createFifoTrace(function->getParent(), port, newGEPInst, idxs);
 									 }
 
 									  // Remove old GEP
@@ -262,44 +269,73 @@ Value* FifoOpt::replaceAccess (Port* port, Procedure* proc){
 	}
 }
 
-void FifoOpt::createFifoTrace(Module* module, Port* port, GetElementPtrInst* gep){
-	string message ("---->");
-	Value* value = NULL;
+void FifoOpt::createFifoTrace(Module* module, Port* port, GetElementPtrInst* gep, vector<Value*> idxs){
+	stringstream message;
+	vector<Value*>::iterator it;
+	vector<Value*> values;
 	Instruction* instr = NULL;
-
+	
 	if (port->isReadable()){
-		message.append("Reading %d in port ");	
+			
 		for (Value::use_iterator LI = gep->use_begin(), LE = gep->use_end();
 					LI != LE; ++LI) {
 			Use* use = &LI.getUse();
 			if (isa<LoadInst>(use->getUser())){
+				
+				// Get value read in the fifo
 				LoadInst* loadInst = cast<LoadInst>(use->getUser());
-				value = loadInst;
 				instr = loadInst->getParent()->getTerminator();
 
+				// Create message
+				message << port->getName() << ":[";
+				for (it = idxs.begin(); it != idxs.end(); ++it){
+					
+					// Separators
+					if (it != idxs.begin()){
+						message << ", ";
+					}
+					
+					// printf arguments
+					values.push_back(*it);
+					message << "%d";
+				}
+				
+				values.push_back(loadInst);
+				message << "] ==> %d \n";
 			}
 		}
 	}else{
-		message.append("Writing %d to port ");
-
 		for (Value::use_iterator LI = gep->use_begin(), LE = gep->use_end();
 					LI != LE; ++LI) {
 			Use* use = &LI.getUse();
 			
 			if (isa<StoreInst>(use->getUser())){
+				// Get value writen in the fifo
 				StoreInst* storeInst = cast<StoreInst>(use->getUser());
-				value = storeInst->getValueOperand();
-				instr = storeInst;
+				instr = storeInst->getParent()->getTerminator();
+
+				// Create message
+				values.push_back(storeInst->getValueOperand());
+				message << "%d ==> "<< port->getName() << ":[";
+
+				for (it = idxs.begin(); it != idxs.end(); ++it){
+					
+					// Separators
+					if (it != idxs.begin()){
+						message << ", ";
+					}
+					
+					// printf arguments
+					values.push_back(*it);
+					message << "%d";
+				}
+
+				message << "] \n";
 			}
 		}
 	}
 
-	message.append(port->getName());
-	message.append("\n");
-
-	if (instr != NULL){
-		FunctionMng::createPrintf(module, message, instr, value);   
-	}
+	FunctionMng::createPrintf(module, message.str(), instr, values);
 }
 
 Value* FifoOpt::createInputTest(Port* port, ConstantInt* numTokens, BasicBlock* BB){

@@ -171,7 +171,7 @@ void RoundRobinScheduler::createCall(Instance* instance){
 
 	// Add debugging information if needed
 	if (debug){
-		string message = "-> firing ";
+		string message = "---> enabling ";
 		message.append(instance->getId());
 
 		FunctionMng::createPuts(decoder->getModule(), message, schedInst);

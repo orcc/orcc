@@ -51,9 +51,32 @@ string Action::getName(){
 	string str;
 	list<string>::iterator it;
 	list<string>* identifiers = tag->getIdentifiers();
-	for ( it= identifiers->begin() ; it != identifiers->end(); it++ ){
+	for ( it = identifiers->begin() ; it != identifiers->end(); it++ ){
+		if ( it != identifiers->begin()){
+			str.append("_");
+		}
+		
 		str.append(*it);
-		str.append("_");
+	}
+
+	return str;
+}
+
+string Action::getCalName(){
+	string str;
+
+	if(tag->isEmpty()){
+		return "";
+	}
+
+	list<string>::iterator it;
+	list<string>* identifiers = tag->getIdentifiers();
+	for ( it = identifiers->begin() ; it != identifiers->end(); it++ ){
+		if ( it != identifiers->begin()){
+			str.append(".");
+		}
+		
+		str.append(*it);
 	}
 
 	return str;

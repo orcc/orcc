@@ -49,6 +49,16 @@ using namespace std;
 using namespace llvm;
 
 void FunctionMng::createPrintf(Module* module, string message, Instruction* instr, Value* value){
+	vector<Value*> values;
+	
+	if (value != NULL){
+		values.push_back(value);
+	}
+	
+	createPrintf(module, message, instr, values);
+}
+
+void FunctionMng::createPrintf(Module* module, string message, Instruction* instr, vector<Value*> values){
 	Function* func_printf = module->getFunction("printf");
 	if (!func_printf) {
 		 // Printf does'nt exist, create it
@@ -70,24 +80,30 @@ void FunctionMng::createPrintf(Module* module, string message, Instruction* inst
 
 	
 	// Create arguments
-	 if (value != NULL){
-		 Type* type = value->getType();
-		 if (type->isIntegerTy()){
+	std::vector<Value*> params;
+	params.push_back(messageExpr);
+	
+	if (!values.empty()){
+		vector<Value*>::iterator it;
+		
+		for (it = values.begin(); it != values.end(); ++it){
+			Value* value = *it; 
+			Type* type = value->getType();
+			 if (type->isIntegerTy()){
 			
-			 IntegerType* intTy = cast<IntegerType>(type);
-			 if (intTy->getBitWidth() < 32){
-				 value = new ZExtInst(value, Type::getInt32Ty(module->getContext()), "", instr);
-			 }else if (intTy->getBitWidth() > 32){
-				 value = new TruncInst (value, Type::getInt32Ty(module->getContext()), "", instr);
+				 IntegerType* intTy = cast<IntegerType>(type);
+				 if (intTy->getBitWidth() < 32){
+					 value = new ZExtInst(value, Type::getInt32Ty(module->getContext()), "", instr);
+				 }else if (intTy->getBitWidth() > 32){
+					 value = new TruncInst (value, Type::getInt32Ty(module->getContext()), "", instr);
+				 }
+
+				 params.push_back(value);
 			 }
-		 }
+		}
 		 
 	 }
 	  
-	 
-	 std::vector<Value*> params;
-	  params.push_back(messageExpr);
-	  params.push_back(value);
 	  CallInst* int32_25 = CallInst::Create(func_printf, params, "", instr);
 	  int32_25->setCallingConv(CallingConv::C);
 	  int32_25->setTailCall(false);

@@ -39,6 +39,7 @@
 #ifndef FUNCTIONMNG_H
 #define FUNCTIONMNG_H
 #include <string>
+#include <vector>
 
 class Decoder;
 
@@ -65,6 +66,8 @@ public:
 	 *
      */
 	static void createPrintf(llvm::Module* module, std::string message, llvm::Instruction* instr, llvm::Value* value);
+
+	static void createPrintf(llvm::Module* module, std::string message, llvm::Instruction* instr, std::vector<llvm::Value*> values);
 
 	static void createPuts(llvm::Module* module, std::string message, llvm::Instruction* instr);
 

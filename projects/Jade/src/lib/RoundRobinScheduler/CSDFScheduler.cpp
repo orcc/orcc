@@ -164,5 +164,10 @@ void CSDFScheduler::createActionsCall(CSDFMoC* moc, BasicBlock* BB){
 		Action* action = *it;
 		Procedure* body = action->getBody();
 		CallInst* schedInst = CallInst::Create(body->getFunction(), "",  BB);
+		
+		// Add debugging information if needed
+		if (debug){
+			createActionTrace(action, schedInst);
+		}
 	}
 }

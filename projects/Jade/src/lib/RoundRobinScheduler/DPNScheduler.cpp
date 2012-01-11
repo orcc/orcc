@@ -37,6 +37,7 @@
 
 //------------------------------
 #include <iostream>
+
 #include "llvm/Constants.h"
 #include "llvm/DerivedTypes.h"
 #include "llvm/Instructions.h"
@@ -54,7 +55,6 @@
 #include "Jade/Core/Port.h"
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Core/Network/Instance.h"
-#include "Jade/Util/FunctionMng.h"
 //------------------------------
 
 using namespace llvm;
@@ -198,10 +198,7 @@ void DPNScheduler::createActionCall(Action* action, BasicBlock* BB){
 
 	// Add debugging information if needed
 	if (debug){
-		string message = "--> firing action ";
-		message.append(action->getName());
-
-		FunctionMng::createPuts(decoder->getModule(), message, bodyInst);
+		createActionTrace(action, bodyInst);
 	}
 }
 

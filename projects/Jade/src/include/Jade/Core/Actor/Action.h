@@ -153,6 +153,13 @@ public:
 	 */
 	std::string getName();
 
+	/**
+	 *  brief Returns the right CAL action name
+	 * 
+	 * @return CAL action string name
+	 */
+	std::string getCalName();
+
 private:
 	ActionTag* tag;
 	Procedure* body;

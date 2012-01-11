@@ -37,6 +37,8 @@
 
 //------------------------------
 #include <iostream>
+#include <sstream>
+
 #include "llvm/Constants.h"
 #include "llvm/DerivedTypes.h"
 #include "llvm/Instructions.h"
@@ -55,6 +57,7 @@
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Core/Network/Instance.h"
 #include "Jade/RoundRobinScheduler/Fifo.h"
+#include "Jade/Util/FunctionMng.h"
 //------------------------------
 
 using namespace llvm;
@@ -127,6 +130,76 @@ void ActionSchedulerAdder::createActionScheduler(Instance* instance){
 	
 	initializeFIFO (instance);
 	createScheduler(instance, bb1, incBB, returnBB , scheduler);
+}
+
+void ActionSchedulerAdder::createActionTrace(Action* action, Instruction* instruction){
+	// Print action fired
+		stringstream message;
+		
+		message << "-> firing ";
+		if (!action->getTag()->isEmpty()){
+			message << action->getCalName() << ": ";
+		}
+		
+		message << "action ";
+
+		// Print pattern
+		map<Port*, llvm::ConstantInt*>::iterator it;
+
+		Pattern* input = action->getInputPattern();
+		if (!input->isEmpty()){
+			map<Port*, llvm::ConstantInt*>* inputNumToken = input->getNumTokensMap();
+
+			for (it = inputNumToken->begin(); it != inputNumToken->end(); ){
+							
+				// Print port name
+				Port* port = it->first;
+				ConstantInt* tokens = it->second;
+				message << port->getName() << ":[]";
+
+				if (!tokens->isOne()){
+					// Print port consumption
+					message << " repeat "<< tokens->getValue().getLimitedValue();
+
+				}
+
+				// Port separation
+				if (++it != inputNumToken->end()){
+					message << ", ";
+				}
+			}
+
+		}
+
+		message << "==> ";
+
+		Pattern* output = action->getOutputPattern();
+		if (!output->isEmpty()){
+			map<Port*, llvm::ConstantInt*>* outputNumToken = output->getNumTokensMap();
+
+			for (it = outputNumToken->begin(); it != outputNumToken->end();){
+				
+				// Print port name
+				Port* port = it->first;
+				ConstantInt* tokens = it->second;
+				message << port->getName() << ":[]";
+
+				if (!tokens->isOne()){
+					// Print port production
+					message << " repeat "<< tokens->getValue().getLimitedValue();
+
+				}
+
+				// Port separation
+				if (++it != outputNumToken->end()){
+					message << ", ";
+
+				}
+			}
+
+		}
+
+		FunctionMng::createPuts(decoder->getModule(), message.str(), instruction);
 }
 
 void ActionSchedulerAdder::createInitialize(Instance* instance){
