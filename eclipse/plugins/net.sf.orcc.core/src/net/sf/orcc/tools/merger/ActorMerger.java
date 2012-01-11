@@ -163,7 +163,8 @@ public class ActorMerger extends DfSwitch<Void> {
 					+ scheduler.getSchedule());
 
 			// merge vertices inside a single actor
-			Actor superActor = new MergerSdf(scheduler).doSwitch(subNetwork);
+			Actor superActor = new MergerSdf(scheduler, copier)
+					.doSwitch(subNetwork);
 
 			// update parent network
 			Instance instance = network.getInstance("cluster" + index);
