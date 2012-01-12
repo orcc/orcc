@@ -28,9 +28,7 @@
  */
 package net.sf.orcc.df.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
@@ -45,7 +43,6 @@ import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
@@ -248,38 +245,6 @@ public class InstanceImpl extends VertexImpl implements Instance {
 			}
 		}
 		return entity;
-	}
-
-	@Override
-	public List<String> getHierarchicalId() {
-		List<String> ids = new ArrayList<String>();
-		for (Entity entity : getHierarchy()) {
-			ids.add(entity.getName());
-		}
-		ids.add(getName());
-		return ids;
-	}
-
-	@Override
-	public String getHierarchicalName() {
-		StringBuilder builder = new StringBuilder();
-		for (Entity entity : getHierarchy()) {
-			builder.append(entity.getName());
-			builder.append('_');
-		}
-		builder.append(getName());
-		return builder.toString();
-	}
-
-	@Override
-	public List<Entity> getHierarchy() {
-		List<Entity> entities = new ArrayList<Entity>();
-		EObject obj = eContainer();
-		do {
-			entities.add(0, (Entity) obj);
-			obj = obj.eContainer();
-		} while (obj != null);
-		return entities;
 	}
 
 	@Override

@@ -37,12 +37,14 @@ import java.util.Map;
 import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
 
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.EObjectWithInverseResolvingEList;
@@ -236,6 +238,38 @@ public abstract class VertexImpl extends NameableImpl implements Vertex {
 			attributes = new EObjectContainmentEList<Attribute>(Attribute.class, this, DfPackage.VERTEX__ATTRIBUTES);
 		}
 		return attributes;
+	}
+
+	@Override
+	public List<String> getHierarchicalId() {
+		List<String> ids = new ArrayList<String>();
+		for (Entity entity : getHierarchy()) {
+			ids.add(entity.getName());
+		}
+		ids.add(getName());
+		return ids;
+	}
+
+	@Override
+	public String getHierarchicalName() {
+		StringBuilder builder = new StringBuilder();
+		for (Entity entity : getHierarchy()) {
+			builder.append(entity.getName());
+			builder.append('_');
+		}
+		builder.append(getName());
+		return builder.toString();
+	}
+
+	@Override
+	public List<Entity> getHierarchy() {
+		List<Entity> entities = new ArrayList<Entity>();
+		EObject obj = eContainer();
+		while (obj != null) {
+			entities.add(0, (Entity) obj);
+			obj = obj.eContainer();
+		}
+		return entities;
 	}
 
 	/**

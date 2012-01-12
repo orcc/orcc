@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.df;
 
-import java.util.List;
-
 import net.sf.orcc.moc.MoC;
 
 import org.eclipse.emf.common.util.EList;
@@ -73,27 +71,6 @@ public interface Instance extends Vertex {
 	 * @model
 	 */
 	Entity getEntity();
-
-	/**
-	 * Returns the path of identifiers from the top-level to this instance.
-	 * 
-	 * @return the path of identifiers from the top-level to this instance
-	 */
-	List<String> getHierarchicalId();
-
-	/**
-	 * Returns the hierarchical name of this instance.
-	 * 
-	 * @return the hierarchical name of this instance
-	 */
-	String getHierarchicalName();
-
-	/**
-	 * Returns the list of entities from the top-level to this instance.
-	 * 
-	 * @return the list of entities from the top-level to this instance
-	 */
-	List<Entity> getHierarchy();
 
 	/**
 	 * Returns the identifier of this instance. Delegates to {@link #getName()}.

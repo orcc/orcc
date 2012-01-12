@@ -61,6 +61,27 @@ public interface Vertex extends Nameable {
 	public EList<Attribute> getAttributes();
 
 	/**
+	 * Returns the path of identifiers from the root container to this vertex.
+	 * 
+	 * @return the path of identifiers from the root container to this vertex
+	 */
+	List<String> getHierarchicalId();
+
+	/**
+	 * Returns the hierarchical name of this vertex.
+	 * 
+	 * @return the hierarchical name of this vertex
+	 */
+	String getHierarchicalName();
+
+	/**
+	 * Returns the list of entities from the root container to this vertex.
+	 * 
+	 * @return the list of entities from the root container to this vertex
+	 */
+	List<Entity> getHierarchy();
+
+	/**
 	 * @model type="Connection" opposite="target"
 	 */
 	EList<Connection> getIncoming();
