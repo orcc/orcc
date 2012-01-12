@@ -82,17 +82,18 @@ OPERATION_WITH_STATE(CAL_STREAM_IN_STATUS, INPUT_STREAM)
 TRIGGER
 	int index = INT(1);
 
-	unsigned int fifo_size, tokens_remaining, present_pos;
+	unsigned int fifo_size, tokens_remaining, present_pos, test_limit;
 	int limit;
 	present_pos = inputFile[index].tellg();
 	inputFile[index].seekg(0, std::ios_base::end);
 	fifo_size = inputFile[index].tellg();
 	inputFile[index].seekg(present_pos, std::ios_base::beg);
 	tokens_remaining = fifo_size - inputFile[index].tellg();
-	tokens_remaining /= 10;
+	test_limit = tokens_remaining / 10;
 	limit = (int)sqrt((double)fifo_size);
-	if(tokens_remaining <= limit)
+	if(test_limit <= limit)
 		RUNTIME_ERROR("Stream out of data.")
+	tokens_remaining = tokens_remaining > 256 ? 256 : tokens_remaining;
 		
     IO(2) = tokens_remaining;
 END_TRIGGER;
