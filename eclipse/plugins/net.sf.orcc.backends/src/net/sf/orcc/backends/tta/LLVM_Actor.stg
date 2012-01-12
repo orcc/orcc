@@ -6,11 +6,11 @@ import "net/sf/orcc/backends/llvm/Actor.stg"
 ///////////////////////////////////////////////////////////////////////////////
 
 printStatus(dir, port, index) ::= <<
-%status_<port.name> = tail call i32 asm sideeffect "CAL_STREAM_<dir>_STATUS", "=r,ir"(i32 <index>) nounwind
+%status_<port.name> = tail call i32 asm sideeffect "STREAM_<dir>_<index>.CAL_STREAM_<dir>_STATUS", "=r,ir"(i32 <index>) nounwind
 >>
 
 printBcastStatus(dir, port, index) ::= <<
-%status_<port.name> = tail call i32 asm sideeffect "CAL_STREAM_<dir>_STATUS", "=r,ir"(i32 <index>) nounwind
+%status_<port.name> = tail call i32 asm sideeffect "STREAM_<dir>_<index>.CAL_STREAM_<dir>_STATUS", "=r,ir"(i32 <index>) nounwind
 >>
 
 printReadFunction(port, index, needCast) ::= <<
@@ -26,7 +26,7 @@ bb0:
 	
 bb1:
 	%indvar = phi i32 [ 0, %bb0 ], [ %indvar.next, %bb1 ]
-	%value = tail call i32 asm sideeffect "CAL_STREAM_IN_READ", "=r,ir"(i32 <index>) nounwind
+	%value = tail call i32 asm sideeffect "STREAM_IN_<index>.CAL_STREAM_IN_READ", "=r,ir"(i32 <index>) nounwind
 	<if(needCast)>%casted_value = trunc i32 %value to <port.type><endif>
 	%scevgep = getelementptr <port.type>* %data, i32 %indvar
 	store <port.type> %<if(needCast)>casted_<endif>value, <port.type>* %scevgep
@@ -56,7 +56,7 @@ bb1:
   %scevgep = getelementptr <port.type>* %data, i32 %indvar
   %value = load <port.type>* %scevgep
   <if(needCast)>%casted_value = <if(port.type.int)>sext<else>zext<endif> <port.type> %value to i32<endif>
-  tail call void asm sideeffect "CAL_STREAM_OUT_WRITE", "ir,ir"(i32 <index>, i32 %<if(needCast)>casted_<endif>value) nounwind
+  tail call void asm sideeffect "STREAM_OUT_<index>.CAL_STREAM_OUT_WRITE", "ir,ir"(i32 <index>, i32 %<if(needCast)>casted_<endif>value) nounwind
   %indvar.next = add i32 %indvar, 1
   %exitcond = icmp eq i32 %indvar.next, %numTokens
   
@@ -80,7 +80,7 @@ bb0:
 	
 bb1:
 	%indvar = phi i32 [ 0, %bb0 ], [ %indvar.next, %bb1 ]
-	%value = tail call <port.type> asm sideeffect "CAL_STREAM_IN_PEEK", "=r,ir"(i32 <index>) nounwind
+	%value = tail call <port.type> asm sideeffect "STREAM_IN_<index>.CAL_STREAM_IN_PEEK", "=r,ir"(i32 <index>) nounwind
 	%scevgep = getelementptr <port.type>* %data, i32 %indvar
 	store <port.type> %value, <port.type>* %scevgep
 	%indvar.next = add i32 %indvar, 1
