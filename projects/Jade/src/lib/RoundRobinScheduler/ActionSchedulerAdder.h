@@ -63,6 +63,7 @@ class Port;
 class Variable;
 class MoC;
 class Pattern;
+class StateVar;
 //------------------------------
 
 /**
@@ -157,15 +158,6 @@ protected:
 	 * @return the last llvm::BasicBlock to add instruction
 	 */
 	virtual llvm::BasicBlock* checkInputPattern(Pattern* pattern, llvm::Function* function, llvm::BasicBlock* skipBB, llvm::BasicBlock* BB);
-
-	/**
-	 * @brief Create traces for the given action
-	 *
-	 * @param action : the Action to trace
-	 *
-	 * @param instruction : the instruction where trace are added
-	 */
-	virtual void createActionTrace (Action* action, llvm::Instruction* instruction);
 
 	virtual void initializeFIFO (Instance* instance);
 

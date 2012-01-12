@@ -55,6 +55,7 @@
 #include "Jade/Core/Port.h"
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Core/Network/Instance.h"
+#include "Jade/Util/TraceMng.h"
 //------------------------------
 
 using namespace llvm;
@@ -198,7 +199,8 @@ void DPNScheduler::createActionCall(Action* action, BasicBlock* BB){
 
 	// Add debugging information if needed
 	if (debug){
-		createActionTrace(action, bodyInst);
+		TraceMng::createActionTrace(decoder->getModule(), action, bodyInst);
+		TraceMng::createStateVarTrace(decoder->getModule(), action->getParent()->getStateVars(), &bodyInst->getParent()->back());
 	}
 }
 

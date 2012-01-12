@@ -7,6 +7,7 @@ add_library (IRUtil
 	PackageMng.cpp
 	OptionMng.cpp
 	CompressionMng.cpp
+	TraceMng.cpp
  )
  
 if(UNIX)

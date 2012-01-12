@@ -49,6 +49,7 @@
 #include "Jade/Core/MoC/CSDFMoC.h"
 #include "Jade/Core/Network/Instance.h"
 #include "Jade/Merger/SuperInstance.h"
+#include "Jade/Util/TraceMng.h"
 //------------------------------
 
 using namespace llvm;
@@ -167,7 +168,8 @@ void CSDFScheduler::createActionsCall(CSDFMoC* moc, BasicBlock* BB){
 		
 		// Add debugging information if needed
 		if (debug){
-			createActionTrace(action, schedInst);
+			TraceMng::createActionTrace(decoder->getModule(), action, schedInst);
+			TraceMng::createStateVarTrace(decoder->getModule(), action->getParent()->getStateVars(), schedInst->getParent()->getTerminator());
 		}
 	}
 }

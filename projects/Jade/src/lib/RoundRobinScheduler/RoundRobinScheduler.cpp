@@ -64,7 +64,7 @@
 #include "Jade/Core/Variable.h"
 #include "Jade/Core/Network/Instance.h"
 #include "Jade/RoundRobinScheduler/RoundRobinScheduler.h"
-#include "Jade/Util/FunctionMng.h"
+#include "Jade/Util/TraceMng.h"
 //------------------------------
 
 using namespace std;
@@ -169,18 +169,16 @@ void RoundRobinScheduler::createCall(Instance* instance){
 		functionCall.insert(pair<Function*, CallInst*>(initialize, CallInit));
 	}
 
-	// Add debugging information if needed
-	if (debug){
-		string message = "---> enabling ";
-		message.append(instance->getId());
 
-		FunctionMng::createPuts(decoder->getModule(), message, schedInst);
-	}
-	
 	// Call scheduler function of the instance
 	Function* scheduler = actionScheduler->getSchedulerFunction();
 	CallInst* CallSched = CallInst::Create(scheduler, "", schedInst);
 	CallSched->setTailCall();
+
+	// Add debugging information if needed
+	if (debug){
+		TraceMng::createCallTrace(decoder->getModule(), instance, CallSched);
+	}
 
 	functionCall.insert(pair<Function*, CallInst*>(scheduler, CallSched));
 }
