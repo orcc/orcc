@@ -64,6 +64,26 @@ dv_<indexPort(port)>_out     =\> s_<port.name>_wrreq,<
 endif>
 >>
 
+mapSignalInstanceInput(port, index) ::= <<
+<if(port.native)
+><port.name> =\> <port.name>_native,<
+else
+>data_<index>_in    =\> s_<port.name>_q,
+status_<index>_in  =\> s_<port.name>_status,
+ack_<index>_in     =\> s_<port.name>_rdreq,<
+endif>
+>>
+
+mapSignalInstanceOutput(port, index) ::= <<
+<if(port.native)
+><port.name>   =\> <port.name>_native,<
+else
+>data_<index>_out   =\> s_<port.name>_data,
+status_<index>_out =\> s_<port.name>_status,
+dv_<index>_out     =\> s_<port.name>_wrreq,<
+endif>
+>>
+
 sig_const(input, output, instance=false) ::= <<
 constant PERIOD      : time := 10 ns;
 --
@@ -233,8 +253,8 @@ begin
   <instance.id>_orcc : entity work.processor_<instance.id>
     port map (
       clk          =\> clk,
-      <if(instance.actor.inputs)><instance.actor.inputs: { input | <mapSignalInput(input, instance)> }; separator="\n"><endif>
-      <if(instance.actor.outputs)><instance.actor.outputs: { output | <mapSignalOutput(output, instance)> }; separator="\n"><endif>
+      <if(instance.actor.inputs)><instance.actor.inputs: { input | <mapSignalInstanceInput(input, i0)> }; separator="\n"><endif>
+      <if(instance.actor.outputs)><instance.actor.outputs: { output | <mapSignalInstanceOutput(output, i0)> }; separator="\n"><endif>
       rst_n        =\> rst_n);
             
   <init_process()>
