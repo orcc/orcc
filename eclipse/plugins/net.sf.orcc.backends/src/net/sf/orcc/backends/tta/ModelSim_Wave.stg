@@ -62,8 +62,8 @@ endif>
 
 printInstanceInput(input, index) ::= <<
 <if(!input.native)
->add wave -noupdate -format Literal /tb_top/top_orcc/<instance.id>_inst/data_<index>_in
-add wave -noupdate -format Literal /tb_top/top_orcc/<instance.id>_inst/status_<index>_in
+>add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/<instance.id>_inst/data_<index>_in
+add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/<instance.id>_inst/status_<index>_in
 add wave -noupdate -format Logic /tb_top/top_orcc/<instance.id>_inst/ack_<index>_in<
 else
 >add wave -noupdate -format Literal /tb_top/top_orcc/<instance.id>_inst/s_<input.name><
@@ -72,8 +72,8 @@ endif>
 
 printInstanceOutput(output, index) ::= <<
 <if(!output.native)
->add wave -noupdate -format Literal /tb_top/top_orcc/<instance.id>_inst/data_<index>_out
-add wave -noupdate -format Literal /tb_top/top_orcc/<instance.id>_inst/status_<index>_out
+>add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/<instance.id>_inst/data_<index>_out
+add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/<instance.id>_inst/status_<index>_out
 add wave -noupdate -format Logic /tb_top/top_orcc/<instance.id>_inst/dv_<index>_out<
 else
 >add wave -noupdate -format Literal /tb_top/top_orcc/<instance.id>_inst/s_<output.name><
