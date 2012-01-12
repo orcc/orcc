@@ -71,9 +71,6 @@ end cal_stream_out;
 
 
 architecture rtl of cal_stream_out is
-  signal r1reg   : std_logic_vector(31 downto 0);
-  signal datareg : std_logic_vector(31 downto 0);
-  signal dvreg   : std_logic_vector(0 downto 0);
 
   type data_array is array (0 to 7) of std_logic_vector(31 downto 0);
   type ack_array is array (0 to 7) of std_logic_vector(0 downto 0);
@@ -115,36 +112,13 @@ begin
     variable index : integer := 0;
   begin  -- process regs
     if rstx = '0' then
-      ext_data_current(0) <= (others => '0');
-      ext_data_current(1) <= (others => '0');
-      ext_data_current(2) <= (others => '0');
-      ext_data_current(3) <= (others => '0');
-      ext_data_current(4) <= (others => '0');
-      ext_data_current(5) <= (others => '0');
-      ext_data_current(6) <= (others => '0');
-      ext_data_current(7) <= (others => '0');
-
-      ext_dv0 <= (others => '0');
-      ext_dv1 <= (others => '0');
-      ext_dv2 <= (others => '0');
-      ext_dv3 <= (others => '0');
-      ext_dv4 <= (others => '0');
-      ext_dv5 <= (others => '0');
-      ext_dv6 <= (others => '0');
-      ext_dv7 <= (others => '0');
+      ext_data_current <= (others => (others => '0'));
+      ext_dv_current   <= (others => (others => '0'));
       
     elsif clk'event and clk = '1' then
       if glock = '0' then
-
         -- reset the datavalid signal
-        ext_dv_current(0) <= (others => '0');
-        ext_dv_current(1) <= (others => '0');
-        ext_dv_current(2) <= (others => '0');
-        ext_dv_current(3) <= (others => '0');
-        ext_dv_current(4) <= (others => '0');
-        ext_dv_current(5) <= (others => '0');
-        ext_dv_current(6) <= (others => '0');
-        ext_dv_current(7) <= (others => '0');
+        ext_dv_current   <= (others => (others => '0'));
 
         if t1load = '1' then
           index := to_integer(unsigned(t1data));

@@ -122,12 +122,10 @@ class Instance:
         self.generateProcessor(os.path.join(libPath, "templates", "processor.template"), os.path.join(vhdlPath, self._processorFile))
         
         # Copy files to build directory
-        shutil.rmtree(memoryPath, ignore_errors=True)
-        os.mkdir(memoryPath)
-        shutil.move(self._mifFile, os.path.join(memoryPath, self._mifFile))
-        shutil.move(self._mifDataFile, os.path.join(memoryPath, self._mifDataFile))
-        shutil.move(self._coeFile, os.path.join(memoryPath, self._coeFile))
-        shutil.move(self._coeDataFile, os.path.join(memoryPath, self._coeDataFile))
+        shutil.move(self._mifFile, os.path.join(wrapperPath, self._mifFile))
+        shutil.move(self._mifDataFile, os.path.join(wrapperPath, self._mifDataFile))
+        shutil.move(self._coeFile, os.path.join(wrapperPath, self._coeFile))
+        shutil.move(self._coeDataFile, os.path.join(wrapperPath, self._coeDataFile))
         shutil.move("imem_mau_pkg.vhdl", vhdlPath)
         if not (self.isNative or self.isBroadcast):
             shutil.copy(self._tbFile, vhdlPath)

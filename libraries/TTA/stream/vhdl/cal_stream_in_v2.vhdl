@@ -72,7 +72,6 @@ end cal_stream_in;
 architecture rtl of cal_stream_in is
   
   signal r1reg  : std_logic_vector(31 downto 0);
-  signal ackreg : std_logic_vector(0 downto 0);
 
   type data_array is array (0 to 7) of std_logic_vector(31 downto 0);
   type ack_array is array (0 to 7) of std_logic_vector(0 downto 0);
@@ -115,29 +114,14 @@ begin
     variable index : integer := 0;
   begin  -- process regs
     if rstx = '0' then
-      r1reg <= (others => '0');
-
-      ext_ack_current(0) <= (others => '0');
-      ext_ack_current(1) <= (others => '0');
-      ext_ack_current(2) <= (others => '0');
-      ext_ack_current(3) <= (others => '0');
-      ext_ack_current(4) <= (others => '0');
-      ext_ack_current(5) <= (others => '0');
-      ext_ack_current(6) <= (others => '0');
-      ext_ack_current(7) <= (others => '0');
+      r1reg           <= (others => '0');
+      ext_ack_current <= (others => (others => '0'));
       
     elsif clk'event and clk = '1' then
       if glock = '0' then
 
         -- reset the acknowledge signal after a while
-        ext_ack_current(0) <= (others => '0');
-        ext_ack_current(1) <= (others => '0');
-        ext_ack_current(2) <= (others => '0');
-        ext_ack_current(3) <= (others => '0');
-        ext_ack_current(4) <= (others => '0');
-        ext_ack_current(5) <= (others => '0');
-        ext_ack_current(6) <= (others => '0');
-        ext_ack_current(7) <= (others => '0');
+        ext_ack_current <= (others => (others => '0'));
 
         if t1load = '1' then
           index := to_integer(unsigned(t1data));
