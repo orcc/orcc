@@ -52,8 +52,13 @@
          point="org.eclipse.emf.ecore.generated_package">
       <package
             class="net.sf.orcc.ir.IrPackage"
-            genModel="model/Ir.genmodel"
-            uri="http://orcc.sf.net/ir/Ir">
+            genModel="model/Core.genmodel"
+            uri="http://orcc.sf.net/model/2011/Ir">
+      </package>
+      <package
+            class="net.sf.orcc.df.DfPackage"
+            genModel="model/Core.genmodel"
+            uri="http://orcc.sf.net/model/2011/Df">
       </package>
    </extension>
 
