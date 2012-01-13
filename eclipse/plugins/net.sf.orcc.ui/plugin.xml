@@ -571,6 +571,20 @@
             </adapt>
          </enablement>
       </renameParticipant>
+      <renameParticipant
+            class="net.sf.orcc.ui.refactoring.CalRenameParticipant"
+            id="net.sf.orcc.ui.calRenameParticipant"
+            name="Cal rename participant">
+         <enablement>
+            <adapt
+                  type="org.eclipse.core.resources.IFile">
+               <test
+                     property="org.eclipse.core.resources.extension"
+                     value="cal">
+               </test>
+            </adapt>
+         </enablement>
+      </renameParticipant>
    </extension>
    <extension
          point="org.eclipse.ltk.core.refactoring.moveParticipants">

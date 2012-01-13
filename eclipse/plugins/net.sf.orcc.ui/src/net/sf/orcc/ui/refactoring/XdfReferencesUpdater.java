@@ -84,6 +84,11 @@ public class XdfReferencesUpdater {
 		IProject project = networkFile.getProject();
 		List<IFolder> folders = OrccUtil.getSourceFolders(project);
 		List<IFile> files = OrccUtil.getAllFiles("xdf", folders);
+		for(IProject relativeProject : project.getReferencingProjects()){
+			folders = OrccUtil.getSourceFolders(relativeProject);
+			files.addAll(OrccUtil.getAllFiles("xdf", folders));
+		}
+			
 		try {
 			for (IFile file : files) {
 				InputStream in = file.getContents();
