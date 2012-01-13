@@ -94,6 +94,12 @@
          <option
                id="net.sf.orcc.plugins.compileXDF">
          </option>
+         <option
+               id="net.sf.orcc.backends.fpgaBrand">
+         </option>
+         <option
+               id="net.sf.orcc.backends.fpgaFamily">
+         </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.promela.PromelaBackendImpl"
@@ -284,6 +290,27 @@
                id="net.sf.orcc.backends.vhdl.minSizeRam"
                name="Minimum size of inferred RAM">
             <textBox></textBox>
+         </option>
+         <option
+               defaultValue="Altera"
+               description="Name of the manufacturer of your FPGA device"
+               id="net.sf.orcc.backends.fpgaBrand"
+               name="FPGA manufacturer">
+            <comboBox>
+               <comboBoxItem
+                  id="Altera">
+               </comboBoxItem>
+               <comboBoxItem
+                  id="Xilinx">
+               </comboBoxItem>
+            </comboBox>
+         </option>
+         <option
+               defaultValue="Stratix III"
+               description="Name of the family of your FPGA device"
+               id="net.sf.orcc.backends.fpgaFamily"
+               name="FPGA family">
+               <textBox></textBox>
          </option>
    </extension>
    <extension
