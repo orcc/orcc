@@ -59,6 +59,9 @@ public class EmptyNodeRemover extends AbstractActorVisitor<Object> {
 		if (nodeWhile.getNodes().isEmpty()) {
 			nodeWhile.getNodes().add(IrFactory.eINSTANCE.createNodeBlock());
 		}
+		
+		super.caseNodeWhile(nodeWhile);
+		
 		return null;
 	}
 
