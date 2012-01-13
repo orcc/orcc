@@ -30,15 +30,16 @@ package net.sf.orcc.backends.transformations;
 
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeIf;
+import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
- * Create empty then and else node if needed.
+ * Remove empty node from if and while node.
  * 
  * @author Herve Yviquel
  * @author Jerome Gorin
  */
-public class EmptyThenElseNodeAdder extends AbstractActorVisitor<Object> {
+public class EmptyNodeRemover extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseNodeIf(NodeIf nodeIf) {
@@ -50,6 +51,14 @@ public class EmptyThenElseNodeAdder extends AbstractActorVisitor<Object> {
 			nodeIf.getElseNodes().add(IrFactory.eINSTANCE.createNodeBlock());
 		}
 		super.caseNodeIf(nodeIf);
+		return null;
+	}
+	
+	@Override
+	public Object caseNodeWhile(NodeWhile nodeWhile) {
+		if (nodeWhile.getNodes().isEmpty()) {
+			nodeWhile.getNodes().add(IrFactory.eINSTANCE.createNodeBlock());
+		}
 		return null;
 	}
 

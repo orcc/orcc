@@ -83,7 +83,8 @@ public class BuildCFG extends AbstractActorVisitor<Node> {
 		last = node;
 		last = doSwitch(node.getElseNodes());
 		graph.addEdge(last, join);
-
+		last = join;
+		
 		return join;
 	}
 
@@ -102,7 +103,8 @@ public class BuildCFG extends AbstractActorVisitor<Node> {
 		last = join;
 		last = doSwitch(node.getNodes());
 		graph.addEdge(last, join);
-
+		last = node;
+		
 		return node;
 	}
 

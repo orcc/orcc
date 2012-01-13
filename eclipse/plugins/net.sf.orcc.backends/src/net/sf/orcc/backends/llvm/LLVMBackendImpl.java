@@ -53,7 +53,7 @@ import net.sf.orcc.backends.llvm.transformations.GetElementPtrAdder;
 import net.sf.orcc.backends.llvm.transformations.ListInitializer;
 import net.sf.orcc.backends.llvm.transformations.PrintlnTransformation;
 import net.sf.orcc.backends.transformations.CastAdder;
-import net.sf.orcc.backends.transformations.EmptyThenElseNodeAdder;
+import net.sf.orcc.backends.transformations.EmptyNodeRemover;
 import net.sf.orcc.backends.transformations.InstPhiTransformation;
 import net.sf.orcc.backends.transformations.TypeResizer;
 import net.sf.orcc.backends.transformations.UnitImporter;
@@ -159,7 +159,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 				new TacTransformation(), new CopyPropagator(),
 				new ConstantPropagator(), new InstPhiTransformation(),
 				new GetElementPtrAdder(), new TypeResizer(true, false, false),
-				new CastAdder(false), new EmptyThenElseNodeAdder(),
+				new CastAdder(false), new EmptyNodeRemover(),
 				new BlockCombine(), new BuildCFG(), new ListInitializer() };
 
 		for (DfSwitch<?> transformation : transformations) {

@@ -44,7 +44,7 @@ import net.sf.orcc.backends.CustomPrinter;
 import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.backends.transformations.DivisionSubstitution;
-import net.sf.orcc.backends.transformations.EmptyThenElseNodeAdder;
+import net.sf.orcc.backends.transformations.EmptyNodeRemover;
 import net.sf.orcc.backends.transformations.Inliner;
 import net.sf.orcc.backends.transformations.InstPhiTransformation;
 import net.sf.orcc.backends.transformations.Multi2MonoToken;
@@ -162,7 +162,7 @@ public class XlimBackendImpl extends AbstractBackend {
 				new TacTransformation(), /* new CopyPropagator(), */
 				new BuildCFG(), new InstPhiTransformation(),
 				new LiteralIntegersAdder(), new CastAdder(true),
-				new XlimVariableRenamer(), new EmptyThenElseNodeAdder(),
+				new XlimVariableRenamer(), new EmptyNodeRemover(),
 				new BlockCombine() };
 
 		for (DfSwitch<?> transformation : transformations) {
