@@ -307,6 +307,18 @@
       </application>
    </extension>
    <extension
+         id="java"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="true">
+         <run
+               class="net.sf.orcc.backends.java.JavaBackendImpl">
+         </run>
+      </application>
+   </extension>
+   <extension
          id="vhdl"
          point="org.eclipse.core.runtime.applications">
       <application
@@ -354,4 +366,5 @@
          </run>
       </application>
    </extension>
+
 </plugin>
