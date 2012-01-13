@@ -22,7 +22,7 @@ IF(LLVM_CONFIG STREQUAL "LLVM_CONFIG-NOTFOUND" )
 	set(LLVM_INST_DIR /where/llvm/is/installed CACHE STRING "llvm installation directory")
 	if( MSVC )
 		set(LLVM_INCLUDE_DIRS ${LLVM_DIR}/include ${LLVM_INST_DIR}/include)
-		set(LLVM_LIBRARY ${LLVM_INST_DIR}/lib/${CMAKE_CFG_INTDIR})
+		set(LLVM_LIBRARY ${LLVM_INST_DIR}/lib)
 		set(LLVM_CPP_FLAGS "/D __STDC_CONSTANT_MACROS";
 							"/D _CRT_SECURE_NO_DEPRECATE";
 							"/D _CRT_SECURE_NO_WARNINGS";
