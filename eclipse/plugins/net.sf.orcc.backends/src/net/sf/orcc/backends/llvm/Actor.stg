@@ -714,53 +714,34 @@ elseif(node.whileNode)><printWhileNode(node)><
 endif>
 >>
 
-printFirstNode(node) ::= <<
-<if(node.blockNode)
-><printFirstBlockNode(node)><
-else
-><printNode(node)><
-endif>
->>
-
 printBlockNode(blockNode) ::= <<
-	br label %b<label(blockNode)>
-
 b<label(blockNode)>:
 	<printInstructions(blockNode.instructions)>
->>
-
-printFirstBlockNode(blockNode) ::= <<
-	<printInstructions(blockNode.instructions)> 
+	<if(blockNode.successors)>
+	br label %b<label(first(blockNode.successors))>
+	<endif>
 >>
 
 printIfNode(ifNode) ::= <<
-	br i1 <Expr(ifNode.condition)>, label %b<label(first(ifNode.thenNodes))>, label %b<if(ifNode.elseNodes)><label(first(ifNode.elseNodes))><else><label(ifNode.joinNode)><endif>
+b<label(ifNode)>:
+	br i1 <Expr(ifNode.condition)>, label %b<label(first(ifNode.thenNodes))>, label %b<label(first(ifNode.elseNodes))>
 
-b<label(first(ifNode.thenNodes))>: 
-<printFirstNode(first(ifNode.thenNodes))> <printNodes(rest(ifNode.thenNodes))>
-	br label %b<label(ifNode.joinNode)>
+<printNodes(ifNode.thenNodes)>
 
-<if(ifNode.elseNodes)>
-b<label(first(ifNode.elseNodes))>:
-<printFirstNode(first(ifNode.elseNodes))> <printNodes(rest(ifNode.elseNodes))>
-	br label %b<label(ifNode.joinNode)>
-<endif>
+<printNodes(ifNode.elseNodes)>
 
-b<label(ifNode.joinNode)>:
-<printFirstNode(first(ifNode.joinNode))>
-<printNodes(rest(ifNode.joinNode))>
+<printNodes(ifNode.joinNode)>
 >>
 
 printWhileNode(whileNode) ::= <<
-<printBlockNode(whileNode.joinNode)>
-	br i1 <Expr(whileNode.condition)>, label %b<label(first(whileNode.Nodes))>, label %b<label(first(whileNode.joinNode.successors))>
+b<label(whileNode.joinNode)>:
+	<printInstructions(whileNode.joinNode.instructions)>
+	br i1 <Expr(whileNode.condition)>, label %b<label(first(whileNode.Nodes))>, label %b<label(whileNode)>
 
-b<label(first(whileNode.nodes))>:
-<printFirstNode(first(whileNode.nodes))>
-<printNodes(rest(whileNode.nodes))>
-	br label %b<label(whileNode.joinNode)>
+<printNodes(whileNode.nodes)>
 
-b<label(first(whileNode.joinNode.successors))>:
+b<label(whileNode)>:
+	br label %b<label(first(whileNode.successors))>
 >>
 
 label(node) ::= "b<actor.templateData.nodeToLabelMap.(node)>"
@@ -779,6 +760,8 @@ entry:
 <if(procedure.locals)>
 	<procedure.locals: variableDeclaration()>
 <endif>
+	br label %b<label(first(procedure.nodes))>
+	
 <printNodes(procedure.nodes)>
 }
 <endif>
@@ -794,6 +777,8 @@ define <action.scheduler.returnType> @<action.scheduler.name>(<action.scheduler.
 entry:
 	<action.scheduler.locals: variableDeclaration()>
 	<action.peekPattern.ports: { port | <fifoVar(port, action.inputPattern.portToVarMap.(port))>}; separator="\n">
+	br label %b<label(first(action.scheduler.nodes))>
+	
 <printNodes(action.scheduler.nodes)>
 }
 
@@ -802,6 +787,8 @@ entry:
 	<action.body.locals: variableDeclaration()>
 	<action.inputPattern.ports: { port | <fifoVar(port, action.inputPattern.portToVarMap.(port))>}; separator="\n">
 	<action.outputPattern.ports: { port | <fifoVar(port, action.outputPattern.portToVarMap.(port))>}; separator="\n">
+	br label %b<label(first(action.body.nodes))>
+
 <printNodes(action.body.nodes)>
 }
 >>
