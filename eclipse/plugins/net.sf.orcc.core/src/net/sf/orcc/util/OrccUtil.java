@@ -407,7 +407,8 @@ public class OrccUtil {
 
 	/**
 	 * Returns the qualified name of the given file, i.e. qualified.name.of.File
-	 * for <code>/project/sourceFolder/qualified/name/of/File.fileExt</code>
+	 * for <code>/project/sourceFolder/qualified/name/of/File.fileExt</code> or
+	 * <code>/project/outputFolder/qualified/name/of/File.fileExt</code>.
 	 * 
 	 * @param file
 	 *            a file
@@ -424,7 +425,25 @@ public class OrccUtil {
 
 		try {
 			IPath path = file.getParent().getFullPath();
-			IPackageFragment fragment = javaProject.findPackageFragment(path);
+			IPackageFragment fragment = null;
+			if (javaProject.getOutputLocation().isPrefixOf(path)) {
+				// create relative path
+				int count = path.matchingFirstSegments(javaProject
+						.getOutputLocation());
+				IPath relPath = path.removeFirstSegments(count);
+
+				// creates full path to source
+				for (IFolder folder : getSourceFolders(project)) {
+					path = folder.getFullPath().append(relPath);
+					fragment = javaProject.findPackageFragment(path);
+					if (fragment != null) {
+						break;
+					}
+				}
+			} else {
+				fragment = javaProject.findPackageFragment(path);
+			}
+
 			if (fragment == null) {
 				return null;
 			}
