@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.util;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -113,7 +114,7 @@ public class EcoreHelper {
 	 * @return the EObject serialized in the given file
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T getEObject(ResourceSet set, IFile file) {
+	public static <T extends EObject> T getEObject(ResourceSet set, IFile file) {
 		Resource resource = set.getResource(URI.createPlatformResourceURI(file
 				.getFullPath().toString(), true), true);
 		T eObject = (T) resource.getContents().get(0);
@@ -188,6 +189,37 @@ public class EcoreHelper {
 			}
 
 		};
+	}
+
+	/**
+	 * Puts the given EObject in the resource that belongs to the given resource
+	 * set as identified by the given URI.
+	 * 
+	 * @param set
+	 *            a resource set
+	 * @param uri
+	 *            URI of a resource
+	 * @param object
+	 *            an EObject
+	 * @return <code>true</code> if serialization succeeded
+	 */
+	public static <T extends EObject> boolean putEObject(ResourceSet set,
+			URI uri, T object) {
+		Resource resource = set.getResource(uri, false);
+		if (resource == null) {
+			resource = set.createResource(uri);
+		} else {
+			resource.getContents().clear();
+		}
+
+		resource.getContents().add(object);
+		try {
+			resource.save(null);
+			return true;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 }

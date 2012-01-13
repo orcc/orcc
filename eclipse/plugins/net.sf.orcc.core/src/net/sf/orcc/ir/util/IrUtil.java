@@ -29,7 +29,6 @@
 package net.sf.orcc.ir.util;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -381,17 +380,7 @@ public class IrUtil {
 			extToFactoryMap.put("ir", instance);
 		}
 
-		// serialization
-		Resource resource = set.createResource(uri);
-		resource.getContents().add(entity);
-		try {
-			resource.save(null);
-			return true;
-		} catch (IOException e) {
-			// uncomment to see details of exception
-			e.printStackTrace();
-			return false;
-		}
+		return EcoreHelper.putEObject(set, uri, entity);
 	}
 
 }
