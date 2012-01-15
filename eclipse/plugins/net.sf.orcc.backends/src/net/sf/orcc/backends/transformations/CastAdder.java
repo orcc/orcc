@@ -54,6 +54,7 @@ import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.OpBinary;
+import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
@@ -183,9 +184,20 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 
 			EList<Expression> newExpressions = new BasicEList<Expression>();
 			for (int i = 0; i < oldExpressions.size(); i++) {
-				parentType = call.getProcedure().getParameters().get(i)
-						.getVariable().getType();
-				newExpressions.add(doSwitch(oldExpressions.get(i)));
+				
+				// Check call parameter type coherence
+				Param param = call.getProcedure().getParameters().get(i);
+				Var variable = param.getVariable();
+				
+				parentType = variable.getType();
+				Expression expr= oldExpressions.get(i);
+				
+				// Check argument if it's not a string
+				if (!parentType.isString()){
+					expr = doSwitch(expr);
+				}
+				
+				newExpressions.add(expr);
 			}
 
 			call.getParameters().clear();

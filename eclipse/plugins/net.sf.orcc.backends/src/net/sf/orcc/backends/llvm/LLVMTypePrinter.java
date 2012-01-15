@@ -62,7 +62,11 @@ public class LLVMTypePrinter extends TypePrinter {
 
 	@Override
 	public String caseTypeString(TypeString type) {
-		return "[" + type.getSize() + " x i8]";
+		if (type.getSize() == 0 ){
+			return "i8";
+		}else{
+			return "[" + type.getSize() + " x i8]";
+		}
 	}
 
 	@Override

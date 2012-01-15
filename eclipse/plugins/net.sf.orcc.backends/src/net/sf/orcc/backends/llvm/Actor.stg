@@ -538,7 +538,13 @@ c<constant>
 ///////////////////////////////////////////////////////////////////////////////
 
 argumentTypeDeclaration(param) ::= <<
-<param.variable.type><if(param.variable.type.list)>*<endif>
+<if(param.variable.type.string)
+> i8* <
+elseif(param.variable.type.list)
+> <param.variable.type>* <
+else
+> <param.variable.type> <
+endif>
 >>
 
 
@@ -566,16 +572,24 @@ printParameters(arguments, parameters) ::= <<
 <arguments, parameters: { arg, param | <printParameter(arg.variable.type, param)>}; separator=", ">
 >>
 
-printParameter(type, param) ::= <%
-<if (param.byRef)>
-TODO
-<else>
-<type><if(type.list)>*<endif> <Expr(param.value)>
-<endif>
-%>
+printParameter(type, param) ::= <<
+<if (param.byRef)
+>TODO <
+elseif(type.string)
+> i8* <if(param.value.use.variable.local)> <Expr(param.value)> <else> noalias getelementptr inbounds (<param.value.type>* <Expr(param.value)>, i64 0, i64 0) <endif><
+else
+> <type><if(type.list)>*<endif> <Expr(param.value)> <
+endif>
+>>
 
 argumentDeclaration(param) ::= <<
-<param.variable.type><if(param.variable.type.list)>*<endif> %<param.variable.name>
+<if(param.variable.type.string)
+> i8* %<param.variable.name><
+elseif(param.variable.type.list)
+><param.variable.type>* %<param.variable.name><
+else
+><param.variable.type> %<param.variable.name><
+endif>
 >>
 
 
@@ -601,17 +615,8 @@ initializeStateVar(variable) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 PrintInstr(parameters) ::= <<
-call i32 (i8*, ...)* @printf(<parameters:{param | <PrintParameter(param.value)>}; separator=", ">)
+call i32 (i8*, ...)* @printf(<parameters:{param | <printParameter(param.value.type, param)>}; separator=", ">)
 >>
-
-PrintParameter(parameter) ::= <<
-<if (parameter.type.string)
-> i8* noalias getelementptr inbounds (<parameter.type>* @<parameter>, i64 0, i64 0) <
-else
-><parameter.type> <Expr(parameter)><
-endif>
->>
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // ORCC IR Instructions

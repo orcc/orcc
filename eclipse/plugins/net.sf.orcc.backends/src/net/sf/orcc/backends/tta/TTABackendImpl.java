@@ -43,7 +43,7 @@ import net.sf.orcc.backends.llvm.LLVMExpressionPrinter;
 import net.sf.orcc.backends.llvm.LLVMTypePrinter;
 import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
 import net.sf.orcc.backends.llvm.transformations.GetElementPtrAdder;
-import net.sf.orcc.backends.llvm.transformations.PrintlnTransformation;
+import net.sf.orcc.backends.llvm.transformations.StringTransformation;
 import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.backends.transformations.EmptyNodeRemover;
 import net.sf.orcc.backends.transformations.InstPhiTransformation;
@@ -116,7 +116,7 @@ public class TTABackendImpl extends AbstractBackend {
 		DfSwitch<?>[] transformations = { new UnitImporter(),
 				new SSATransformation(), new BoolToIntTransformation(),
 				new TypeResizer(true, true, false),
-				new PrintlnTransformation(),
+				new StringTransformation(),
 				new RenameTransformation(this.transformations),
 				new TacTransformation(), new CopyPropagator(),
 				new ConstantPropagator(), new InstPhiTransformation(),

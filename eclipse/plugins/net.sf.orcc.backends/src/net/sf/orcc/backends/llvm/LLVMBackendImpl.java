@@ -51,7 +51,7 @@ import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
 import net.sf.orcc.backends.llvm.transformations.GetElementPtrAdder;
 import net.sf.orcc.backends.llvm.transformations.ListInitializer;
-import net.sf.orcc.backends.llvm.transformations.PrintlnTransformation;
+import net.sf.orcc.backends.llvm.transformations.StringTransformation;
 import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.backends.transformations.EmptyNodeRemover;
 import net.sf.orcc.backends.transformations.InstPhiTransformation;
@@ -154,7 +154,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		DfSwitch<?>[] transformations = { new UnitImporter(),
 				new SSATransformation(), new DeadGlobalElimination(),
 				new DeadCodeElimination(), new DeadVariableRemoval(),
-				new BoolToIntTransformation(), new PrintlnTransformation(),
+				new BoolToIntTransformation(), new StringTransformation(),
 				new RenameTransformation(this.transformations),
 				new TacTransformation(), new CopyPropagator(),
 				new ConstantPropagator(), new InstPhiTransformation(),
