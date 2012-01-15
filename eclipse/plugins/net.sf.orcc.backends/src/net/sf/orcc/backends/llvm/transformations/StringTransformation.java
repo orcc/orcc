@@ -55,7 +55,7 @@ import org.eclipse.emf.common.util.EList;
  * @author Jerome GORIN
  * 
  */
-public class PrintlnTransformation extends AbstractActorVisitor<Object> {
+public class StringTransformation extends AbstractActorVisitor<Object> {
 
 	/**
 	 * Change characters in strings to fit LLVM constraints
