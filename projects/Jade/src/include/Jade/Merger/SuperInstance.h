@@ -111,13 +111,6 @@ public:
 	std::map<Instance*, int>* getInstances(){return &instances;};
 
 	/**
-     *  @brief Get the MoC of the super instance
-     *
-	 * @return MoC of the super Instance
-     */
-	MoC* getMoC();
-
-	/**
 	 * @brief Getter of procedures
 	 *
 	 * Returns a map of procedure of this superinstance.
