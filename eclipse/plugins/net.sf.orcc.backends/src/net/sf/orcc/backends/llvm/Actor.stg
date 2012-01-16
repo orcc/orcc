@@ -723,13 +723,13 @@ printBlockNode(blockNode) ::= <<
 b<label(blockNode)>:
 	<printInstructions(blockNode.instructions)>
 	<if(blockNode.successors)>
-	br label %b<label(first(blockNode.successors))>
+	br label %b<printNextLabel(blockNode.successors)>
 	<endif>
 >>
 
 printIfNode(ifNode) ::= <<
 b<label(ifNode)>:
-	br i1 <Expr(ifNode.condition)>, label %b<label(first(ifNode.thenNodes))>, label %b<label(first(ifNode.elseNodes))>
+	br i1 <Expr(ifNode.condition)>, label %b<printNextLabel(ifNode.thenNodes)>, label %b<printNextLabel(ifNode.elseNodes)>
 
 <printNodes(ifNode.thenNodes)>
 
@@ -746,11 +746,14 @@ b<label(whileNode.joinNode)>:
 <printNodes(whileNode.nodes)>
 
 b<label(whileNode)>:
-	br label %b<label(first(whileNode.successors))>
+	br label %b<printNextLabel(whileNode.successors)>
 >>
 
 label(node) ::= "b<actor.templateData.nodeToLabelMap.(node)>"
 
+printNextLabel(node)::=<<
+<if(first(node).whileNode)><label(first(node).joinNode)><else><label(first(node))><endif>
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Procedure
