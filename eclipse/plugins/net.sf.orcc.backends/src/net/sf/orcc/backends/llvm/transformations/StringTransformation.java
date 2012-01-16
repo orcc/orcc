@@ -48,7 +48,7 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
 import org.eclipse.emf.common.util.EList;
 
 /**
- * Change prinln instruction into printf llvm function fashion. Parameters of
+ * Change string into global constant. Parameters of
  * println becomes state variables into the current actor
  * 
  * 
@@ -120,79 +120,121 @@ public class StringTransformation extends AbstractActorVisitor<Object> {
 		return super.caseActor(actor);
 	}
 
+	private void transformPrint(InstCall print){
+		String value = "";
+		List<Arg> newParameters = new ArrayList<Arg>();
+		List<Arg> parameters = print.getParameters();
+		String name = "str" + strCnt++;
+
+		// Iterate though all the println arguments to provide an only
+		// string value
+		for (Arg arg : parameters) {
+			if (arg.isByVal()) {
+				Expression expr = ((ArgByVal) arg).getValue();
+				if (expr.isStringExpr()) {
+					String strExprVal = (((ExprString) expr).getValue());
+					value += strExprVal;
+				} else {
+					Type type = expr.getType();
+					if (type.isBool()) {
+						value += "%i";
+					} else if (type.isFloat()) {
+						value += "%f";
+					} else if (type.isInt()) {
+						TypeInt intType = (TypeInt) type;
+						if (intType.isLong()) {
+							value += "%ll";
+						} else {
+							value += "%i";
+						}
+					} else if (type.isList()) {
+						value += "%p";
+					} else if (type.isString()) {
+						value += "%s";
+					} else if (type.isUint()) {
+						TypeUint uintType = (TypeUint) type;
+						if (uintType.isLong()) {
+							value += "%ll";
+						} else {
+							value += "%u";
+						}
+					} else if (type.isVoid()) {
+						value += "%p";
+					}
+				}
+			}
+		}
+
+		LLVMString llvmStr = new LLVMString(value);
+
+		// Create state variable that contains println arguments
+		TypeString type = IrFactory.eINSTANCE.createTypeString();
+		type.setSize(llvmStr.getSize());
+
+		Var variable = IrFactory.eINSTANCE.createVar(print.getLineNumber(),
+				type, name, true, false);
+		variable.setInitialValue(IrFactory.eINSTANCE
+				.createExprString(llvmStr.getStr()));
+
+		// Set the created state variable into call argument
+		stateVars.add(variable);
+		newParameters.add(IrFactory.eINSTANCE.createArgByVal(variable));
+
+		for (Arg arg : parameters) {
+			if (arg.isByVal()) {
+				Expression expr = ((ArgByVal) arg).getValue();
+				if (!expr.isStringExpr()) {
+					newParameters.add(arg);
+				}
+			}
+		}
+		parameters.clear();
+		parameters.addAll(newParameters);
+	}
+	
+	
 	@Override
 	public Object caseInstCall(InstCall call) {
 		if (call.isPrint()) {
-			String value = "";
+			transformPrint(call);
+		}else{
 			List<Arg> newParameters = new ArrayList<Arg>();
 			List<Arg> parameters = call.getParameters();
-			String name = "str" + strCnt++;
-
-			// Iterate though all the println arguments to provide an only
-			// string value
+			
 			for (Arg arg : parameters) {
 				if (arg.isByVal()) {
 					Expression expr = ((ArgByVal) arg).getValue();
 					if (expr.isStringExpr()) {
-						String strExprVal = (((ExprString) expr).getValue());
-						value += strExprVal;
-					} else {
-						Type type = expr.getType();
-						if (type.isBool()) {
-							value += "%i";
-						} else if (type.isFloat()) {
-							value += "%f";
-						} else if (type.isInt()) {
-							TypeInt intType = (TypeInt) type;
-							if (intType.isLong()) {
-								value += "%ll";
-							} else {
-								value += "%i";
-							}
-						} else if (type.isList()) {
-							value += "%p";
-						} else if (type.isString()) {
-							value += "%s";
-						} else if (type.isUint()) {
-							TypeUint uintType = (TypeUint) type;
-							if (uintType.isLong()) {
-								value += "%ll";
-							} else {
-								value += "%u";
-							}
-						} else if (type.isVoid()) {
-							value += "%p";
-						}
-					}
-				}
-			}
+						String strExprVal = (((ExprString) expr).getValue());						
+						LLVMString llvmStr = new LLVMString(strExprVal);
+						
+						// Create state variable that contains println arguments
+						String name = "str" + strCnt++;
+						
+						TypeString type = IrFactory.eINSTANCE.createTypeString();
+						type.setSize(llvmStr.getSize());
 
-			LLVMString llvmStr = new LLVMString(value);
-
-			// Create state variable that contains println arguments
-			TypeString type = IrFactory.eINSTANCE.createTypeString();
-			type.setSize(llvmStr.getSize());
-
-			Var variable = IrFactory.eINSTANCE.createVar(call.getLineNumber(),
-					type, name, true, false);
-			variable.setInitialValue(IrFactory.eINSTANCE
-					.createExprString(llvmStr.getStr()));
-
-			// Set the created state variable into call argument
-			stateVars.add(variable);
-			newParameters.add(IrFactory.eINSTANCE.createArgByVal(variable));
-
-			for (Arg arg : parameters) {
-				if (arg.isByVal()) {
-					Expression expr = ((ArgByVal) arg).getValue();
-					if (!expr.isStringExpr()) {
+						Var variable = IrFactory.eINSTANCE.createVar(call.getLineNumber(),
+								type, name, true, false);
+						variable.setInitialValue(IrFactory.eINSTANCE
+								.createExprString(llvmStr.getStr()));
+						stateVars.add(variable);
+						
+						newParameters.add(IrFactory.eINSTANCE.createArgByVal(variable));
+						
+					}else{
 						newParameters.add(arg);
 					}
+				}else{
+					newParameters.add(arg);
+					
 				}
 			}
+			
 			parameters.clear();
 			parameters.addAll(newParameters);
 		}
+		
 		return null;
 	}
 
