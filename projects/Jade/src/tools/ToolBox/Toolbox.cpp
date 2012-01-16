@@ -48,7 +48,6 @@
 #include "llvm/Support/TargetSelect.h"
 
 #include "FilesMng.h"
-#include "OptMng.h"
 #include "ArMng.h"
 //------------------------------
 using namespace llvm;
@@ -71,7 +70,21 @@ OutputCompressedArchive("ca", cl::desc("Generate package in compressed archives"
 cl::opt<string> 
 LibraryFolder("L", cl::Required, cl::ValueRequired, cl::desc("Input folder of Video Tool Library"));
 
+static cl::opt<bool>
+OptLevelO0("O0",
+           cl::desc("No Optimization"));
 
+static cl::opt<bool>
+OptLevelO1("O1",
+           cl::desc("Optimization level 1. Similar to llvm-gcc -O1"));
+
+static cl::opt<bool>
+OptLevelO2("O2",
+           cl::desc("Optimization level 2. Similar to llvm-gcc -O2"));
+
+static cl::opt<bool>
+OptLevelO3("O3",
+           cl::desc("Optimization level 3. Similar to llvm-gcc -O3"));
 
 
 //main function of Jade toolbox
@@ -95,11 +108,11 @@ int main(int argc, char **argv) {
 	map<string,Module*> modules;
 	parseFiles(&filesPath, &modules);
 
-	//Make optimizations
-	map<string,Module*>::iterator itModule;
+	//Make optimizations -- deprecated
+	/*map<string,Module*>::iterator itModule;
 	for (itModule=modules.begin() ; itModule != modules.end(); itModule++){
 		opt(itModule->first, itModule->second);
-	}
+	}*/
 
 	//Create archives
 	if(OutputArchive || OutputCompressedArchive){

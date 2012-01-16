@@ -4,8 +4,6 @@ add_executable( JadeToolbox
 	ArMng.h
 	FilesMng.cpp
 	FilesMng.h
-	OptMng.cpp
-	OptMng.h
 )
 
 
