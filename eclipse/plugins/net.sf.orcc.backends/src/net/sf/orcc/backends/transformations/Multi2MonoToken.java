@@ -146,8 +146,8 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 
 		public ModifyProcessActionStore(Var tab, Var writeIndex, int bufferSize) {
 			this.tab = tab;
-			this.writeIndex= writeIndex;
-			this.bufferSize=bufferSize;
+			this.writeIndex = writeIndex;
+			this.bufferSize = bufferSize;
 		}
 
 		@Override
@@ -161,14 +161,14 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 					// change tab Name
 					load.getSource().setVariable(tab);
 					Expression indexInit = load.getIndexes().get(0);
-					Expression indexFinal = factory.createExprBinary(
-							indexInit, OpBinary.PLUS, factory.createExprVar(writeIndex),
+					Expression indexFinal = factory.createExprBinary(indexInit,
+							OpBinary.PLUS, factory.createExprVar(writeIndex),
 							factory.createTypeInt(32));
 					Expression exprMask = factory.createExprInt(bufferSize - 1);
-					Expression maskValue = factory.createExprBinary(
-							indexFinal, OpBinary.BITAND, exprMask,
+					Expression maskValue = factory.createExprBinary(indexFinal,
+							OpBinary.BITAND, exprMask,
 							factory.createTypeInt(32));
-					
+
 					load.getIndexes().add(maskValue);
 				}
 			}
@@ -315,7 +315,6 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		bodyNode.add(factory.createInstStore(writeIndex, value));
 	}
 
-
 	/**
 	 * This method creates an action with the given name.
 	 * 
@@ -446,7 +445,6 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		return action;
 	}
 
-	
 	/**
 	 * This method creates a global variable counter for data storing (writing)
 	 * 
@@ -777,7 +775,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 			// check repeats on all actions
 			boolean transformOutFSM = false;
 			for (Action verifAction : actions) {
-				// check repeats on input ports 
+				// check repeats on input ports
 				for (Entry<Port, Integer> verifEntry : verifAction
 						.getInputPattern().getNumTokensMap().entrySet()) {
 					int verifNumTokens = verifEntry.getValue();
@@ -809,7 +807,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				modifyNoRepeatActionsInFSM();
 				transformOutFSM = false;
 			}
-			
+
 		} else {
 			List<Action> actions = new ArrayList<Action>(actor.getActions());
 			boolean transformFSM = false;
@@ -956,7 +954,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				.getNumTokensMap().entrySet()) {
 			int verifNumTokens = verifEntry.getValue();
 			if (verifNumTokens > 1) {
-				
+
 				String updateWriteName = "newStateWrite" + action.getName()
 						+ visitedRenameIndex;
 				State writeState = DfFactory.eINSTANCE
@@ -964,9 +962,9 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				fsm.getStates().add(writeState);
 				// create new process action if not created while treating
 				// inputs
-					fsm.replaceTarget(source, oldAction, writeState);
-					oldAction.getOutputPattern().clear();
-					
+				fsm.replaceTarget(source, oldAction, writeState);
+				oldAction.getOutputPattern().clear();
+
 				visitedRenameIndex++;
 				for (Entry<Port, Integer> entry : action.getOutputPattern()
 						.getNumTokensMap().entrySet()) {
@@ -1028,9 +1026,9 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 					numTokens = entry.getValue();
 					inputIndex = inputIndex + 100;
 					port = entry.getKey();
-					int bufferSize = OptimalBufferSize(action, port);
+					int bufferSize = OptimalBufferSize(port);
 					entryType = port.getType();
-					
+
 					if (inputPorts.contains(port)) {
 						int position = portPosition(inputPorts, port);
 						untagBuffer = inputBuffers.get(position);
@@ -1052,24 +1050,26 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 						createUntaggedAction(untagReadIndex, untagWriteIndex,
 								untagBuffer, port, true, bufferSize);
 					}
-					
+
 					Procedure body = action.getBody();
 					NodeBlock bodyNode = body.getFirst();
-					Var index = body.newTempLocalVariable(factory.createTypeInt(32),
-							"writeIndex");
+					Var index = body.newTempLocalVariable(
+							factory.createTypeInt(32), "writeIndex");
 					index.setIndex(1);
 					bodyNode.add(factory.createInstLoad(index, untagWriteIndex));
 					ModifyProcessActionStore modifyProcessAction = new ModifyProcessActionStore(
-							untagBuffer,untagWriteIndex, bufferSize);
+							untagBuffer, untagWriteIndex, bufferSize);
 					modifyProcessAction.doSwitch(action.getBody());
 					actionToTransition(port, action, untagBuffer,
 							untagWriteIndex, untagReadIndex, bufferSize);
 					Expression value = factory.createExprBinary(
 							factory.createExprVar(index), OpBinary.PLUS,
-							factory.createExprInt(numTokens), factory.createTypeInt(32));
+							factory.createExprInt(numTokens),
+							factory.createTypeInt(32));
 					NodeBlock lastNode = body.getLast();
-					lastNode.add(factory.createInstStore(untagWriteIndex, value));
-					
+					lastNode.add(factory
+							.createInstStore(untagWriteIndex, value));
+
 				}
 
 				action.getInputPattern().clear();
@@ -1099,9 +1099,9 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				String writeName = "newStateWrite" + action.getName();
 				State writeState = DfFactory.eINSTANCE.createState(writeName);
 				fsm.getStates().add(writeState);
-				
+
 				fsm.replaceTarget(sourceState, action, writeState);
-				
+
 				for (Entry<Port, Integer> entry : action.getOutputPattern()
 						.getNumTokensMap().entrySet()) {
 					numTokens = entry.getValue();
@@ -1116,11 +1116,11 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 					Var tab = createTab(listName, entryType, numTokens);
 					write = createWriteAction(action.getName(), counter, tab);
 					write.getOutputPattern().setNumTokens(port, 1);
-					
+
 					ModifyProcessActionWrite modifyProcessActionWrite = new ModifyProcessActionWrite(
-								tab);
+							tab);
 					modifyProcessActionWrite.doSwitch(action.getBody());
-					
+
 					fsm.addTransition(writeState, write, writeState);
 
 					// create a new write done action once
@@ -1153,7 +1153,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 			int verifNumTokens = verifEntry.getValue();
 			Port verifPort = verifEntry.getKey();
 			Type entryType = verifPort.getType();
-			int bufferSize = OptimalBufferSize(action, verifPort);
+			int bufferSize = OptimalBufferSize(verifPort);
 			if (inputPorts.contains(verifPort)) {
 				int position = portPosition(inputPorts, verifPort);
 				Var buffer = inputBuffers.get(position);
@@ -1337,14 +1337,17 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 *            repeat port
 	 * @return optimal buffer size
 	 */
-	private int OptimalBufferSize(Action action, Port port) {
+	private int OptimalBufferSize(Port port) {
 		int size = 0;
 		int optimalSize = 0;
-		for (Entry<Port, Integer> entry : action.getInputPattern()
-				.getNumTokensMap().entrySet()) {
-			if (entry.getKey() == port) {
-				if (entry.getValue() > size) {
-					size = entry.getValue();
+		List<Action> actions = new ArrayList<Action>(actor.getActions());
+		for (Action action : actions) {
+			for (Entry<Port, Integer> entry : action.getInputPattern()
+					.getNumTokensMap().entrySet()) {
+				if (entry.getKey() == port) {
+					if (entry.getValue() > size) {
+						size = entry.getValue();
+					}
 				}
 			}
 		}
@@ -1368,7 +1371,6 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		// verify if the action is already transformed ==> update FSM
 		verifVisitedActions(action, sourceState, targetState);
 
-		
 		if (!repeatInput && !noRepeatActions.contains(action)) {
 			noRepeatActions.add(action);
 		}
