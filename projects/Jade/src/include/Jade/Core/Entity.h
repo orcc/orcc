@@ -103,7 +103,7 @@ public:
 	 *
 	 *  @return a map of port representing inputs of the entity
      */
-	std::map<std::string, Port*>* getInputs() {return inputs;};
+	virtual std::map<std::string, Port*>* getInputs() {return inputs;};
 
 		/**
      *  @brief getter of input ports
@@ -111,7 +111,7 @@ public:
 	 *  @return a map of port representing outputs of the entity
 	 *
      */
-	std::map<std::string, Port*>* getOutputs() {return outputs;};
+	virtual std::map<std::string, Port*>* getOutputs() {return outputs;};
 
 	/**
      *  @brief get the input port corresponding to string name
@@ -121,7 +121,7 @@ public:
 	 *  @return the corresponding port if found, otherwise NULL 
 	 *
      */
-	Port* getInput(std::string name);
+	virtual Port* getInput(std::string name);
 
 	/**
      *  @brief get the output port corresponding to string name
@@ -131,7 +131,7 @@ public:
 	 *  @return the corresponding port if found, otherwise NULL 
 	 *
      */
-	Port* getOutput(std::string name);
+	virtual Port* getOutput(std::string name);
 
 	/**
      *  @brief get initializes actions of the entity
@@ -139,21 +139,21 @@ public:
 	 *  @return a list of initializes actions
 	 *
      */
-	std::list<Action*>* getInitializes(){return initializes;};
+	virtual std::list<Action*>* getInitializes(){return initializes;};
 
 	/**
 	 * @brief Returns all the actions of this entity.
 	 * 
 	 * @return all the actions of this entity
 	 */
-	std::list<Action*>* getActions() {return actions;};
+	virtual std::list<Action*>* getActions() {return actions;};
 
 	/**
 	 * @brief Set the actions of this entity.
 	 * 
 	 * @param actions : a list of actions of this entity
 	 */
-	void setActions(std::list<Action*>* actions) {this->actions = actions;};
+	virtual void setActions(std::list<Action*>* actions) {this->actions = actions;};
 
 	/**
      *  @brief set initializes actions of this entity
@@ -161,7 +161,7 @@ public:
 	 *  @param initializes : a list of initializing actions
 	 *
      */
-	 void setInitializes(std::list<Action*>* initializes){this->initializes = initializes;};
+	 virtual void setInitializes(std::list<Action*>* initializes){this->initializes = initializes;};
 
 	 /**
      *  @brief return true if the instance has initializing actions
@@ -169,7 +169,7 @@ public:
 	 *  @return true if instance has initializing actions, otherwise false
 	 *
      */
-	bool hasInitializes() { 
+	virtual bool hasInitializes() { 
 		if (initializes == NULL){
 			return false;
 		}		
@@ -181,14 +181,14 @@ public:
 	 * 
 	 * @return a map of parameters
 	 */
-	std::map<std::string, Variable*>* getParameters() {return parameters;};
+	virtual std::map<std::string, Variable*>* getParameters() {return parameters;};
 
 	/**
 	 * @brief Set the map of parameters of this entity.
 	 * 
 	 * @param parameters: a map of parameters
 	 */
-	 void setParameters(std::map<std::string, Variable*>* parameters) {this->parameters = parameters;};
+	 virtual void setParameters(std::map<std::string, Variable*>* parameters) {this->parameters = parameters;};
 
 	 /**
 	 * @brief Get procedures of this entity
@@ -199,7 +199,7 @@ public:
 	 *
 	 * @return the corresponding procedure
 	 */
-	Procedure* getProcedure(std::string name);
+	virtual Procedure* getProcedure(std::string name);
 
 	/**
      *  @brief Return the parameter with the given name in this entity
@@ -209,21 +209,21 @@ public:
 	 *  @return the package of this actor
 	 *
      */
-	Variable* getParameter(std::string name);
+	virtual Variable* getParameter(std::string name);
 
 	/**
      *  @brief Getter of the action scheduler of this instanced functional unit
    	 *
 	 *  @return ActionScheduler of the instanced functional unit
      */
-	ActionScheduler* getActionScheduler(){return actionScheduler;};
+	virtual ActionScheduler* getActionScheduler(){return actionScheduler;};
 
 	/**
      *  @brief Set the action scheduler of this instance
    	 *
 	 *  @param actionScheduler : ActionScheduler of the instanced functional unit
      */
-	void setActionScheduler(ActionScheduler* actionScheduler){this->actionScheduler = actionScheduler;};
+	virtual void setActionScheduler(ActionScheduler* actionScheduler){this->actionScheduler = actionScheduler;};
 
 	/**
 	 * @brief Getter of stateVars
@@ -232,7 +232,7 @@ public:
 	 * 
 	 * @return a map of state variables
 	 */
-	std::map<std::string, StateVar*>* getStateVars() {return stateVars;}
+	virtual std::map<std::string, StateVar*>* getStateVars() {return stateVars;}
 
 
 	/**
@@ -242,7 +242,7 @@ public:
 	 * 
 	 * @param stateVars : a map of state variables
 	 */
-	void setStateVars(std::map<std::string, StateVar*>* stateVars) {this->stateVars = stateVars;}
+	virtual void setStateVars(std::map<std::string, StateVar*>* stateVars) {this->stateVars = stateVars;}
 
 	/**
 	 * @brief Getter of a state variable
@@ -253,7 +253,7 @@ public:
 	 * 
 	 * @return the corresponding state variable
 	 */
-	StateVar* getStateVar(std::string name);
+	virtual StateVar* getStateVar(std::string name);
 
 	/**
 	 * @brief Getter of procedures
@@ -271,7 +271,7 @@ public:
 	 * 
 	 * @return procedures : a map of Procedure.
 	 */
-	void setProcs(std::map<std::string, Procedure*>* procedures) {this->procedures = procedures;};
+	virtual void setProcs(std::map<std::string, Procedure*>* procedures) {this->procedures = procedures;};
 
 	/**
      *  @brief get the port corresponding to string name
@@ -281,7 +281,7 @@ public:
 	 *  @return the corresponding Port if port found, otherwise NULL 
 	 *
      */
-	Port* getPort(std::string portName);
+	virtual Port* getPort(std::string portName);
 
 	/**
      * @brief Get the internal state variables of this entity
@@ -295,14 +295,14 @@ public:
      *
 	 * @param moc : the MoC of the Instance
      */
-	void setMoC(MoC* moc){this->moc = moc;};
+	virtual void setMoC(MoC* moc){this->moc = moc;};
 
 	/**
      *  @brief Get the MoC of this entity
      *
 	 * @return MoC of the Instance
      */
-	MoC* getMoC(){return moc;};
+	virtual MoC* getMoC(){return moc;};
 
 protected:
 
