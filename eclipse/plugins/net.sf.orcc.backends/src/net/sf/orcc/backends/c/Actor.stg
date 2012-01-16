@@ -189,7 +189,7 @@ endif>
 printLoad(load) ::= <<
 
 <if (action.inputPattern.varToPortMap.(load.source.variable) || action.outputPattern.varToPortMap.(load.source.variable) || action.peekPattern.varToPortMap.(load.source.variable))
-><load.target.variable.indexedName> = tokens_<getPort(load.source.variable)>[(index_<getPort(load.source.variable)> + <first(load.indexes)>) % SIZE_<getPort(load.source.variable)>];<
+><load.target.variable.indexedName> = tokens_<getPort(load.source.variable)>[(index_<getPort(load.source.variable)> + (<first(load.indexes)>)) % SIZE_<getPort(load.source.variable)>];<
 else
 ><load.target.variable.indexedName> = <load.source.variable.name><load.indexes : {index | [<index>]}>;<
 endif>
@@ -221,7 +221,7 @@ printStore(store) ::= <<
 ><if(action.outputPattern.varToPortMap.(store.target.variable).native)
 >printf("<getPort(store.target.variable)> = %i\n", <store.value>);<
 else
->tokens_<getPort(store.target.variable)>[(index_<getPort(store.target.variable)> + <first(store.indexes)>) % SIZE_<getPort(store.target.variable)>] = <store.value>;<
+>tokens_<getPort(store.target.variable)>[(index_<getPort(store.target.variable)> + (<first(store.indexes)>)) % SIZE_<getPort(store.target.variable)>] = <store.value>;<
 endif
 ><else
 ><store.target.variable.name><store.indexes : {index | [<index>]}> = <store.value>;<
