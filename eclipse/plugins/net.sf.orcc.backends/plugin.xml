@@ -61,6 +61,9 @@
          <option
                id="net.sf.orcc.backends.classify">
          </option>
+         <option
+               id="net.sf.orcc.backends.byteexact">
+         </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.vhdl.VHDLBackendImpl"
@@ -290,6 +293,12 @@
                id="net.sf.orcc.backends.vhdl.minSizeRam"
                name="Minimum size of inferred RAM">
             <textBox></textBox>
+         </option>
+         <option
+               defaultValue="false"
+               id="net.sf.orcc.backends.byteexact"
+               name="Generate byte exact code">
+            <checkBox></checkBox>
          </option>
          <option
                defaultValue="Altera"

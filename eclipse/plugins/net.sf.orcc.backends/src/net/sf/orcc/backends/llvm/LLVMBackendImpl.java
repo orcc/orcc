@@ -99,6 +99,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 	private boolean classify;
 	private boolean debug;
 	private boolean normalize;
+	private boolean byteexact;
 	private String optLevel;
 	private String llvmGenMod;
 
@@ -136,6 +137,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		optLevel = getAttribute("net.sf.orcc.backends.optLevel", "O0");
 		classify = getAttribute("net.sf.orcc.backends.classify", false);
 		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
+		byteexact = getAttribute("net.sf.orcc.backends.byteexact", false);
 		jadeToolbox = getDefault().getPreference(P_JADE_TOOLBOX, "");
 		debug = getAttribute(DEBUG_MODE, true);
 		mapping = getAttribute(MAPPING, new HashMap<String, String>());
@@ -158,10 +160,13 @@ public class LLVMBackendImpl extends AbstractBackend {
 				new RenameTransformation(this.transformations),
 				new TacTransformation(), new CopyPropagator(),
 				new ConstantPropagator(), new InstPhiTransformation(),
-				new GetElementPtrAdder(), new TypeResizer(true, false, false),
-				new CastAdder(false), new EmptyNodeRemover(),
+				new GetElementPtrAdder(), new CastAdder(false), new EmptyNodeRemover(),
 				new BlockCombine(), new BuildCFG(), new ListInitializer() };
 
+		if (!byteexact){
+			new TypeResizer(true, false, false).doSwitch(actor);
+		}
+		
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 		}
