@@ -47,6 +47,7 @@
 #include "Jade/Core/MoC/KPNMoC.h"
 #include "Jade/Jit/LLVMWriter.h"
 #include "Jade/Serialize/IRWriter.h"
+#include "Jade/Util/FunctionMng.h"
 
 #include "llvm/Module.h"
 
@@ -94,9 +95,11 @@ void IRWriter::writeIntrisics(Actor* actor){
 	for (Module::iterator FI = module->begin(), FE = module->end();
            FI != FE; ++FI) {
        
-		  if (FI->isIntrinsic())
+		  if (FI->isIntrinsic()) {
 			  writer->addFunctionProtosExternal(FI);
-			
+		  }else if (FI->getName().compare("printf")==0){
+			  writer->linkExternalFunction(FI, FunctionMng::createPrintf(decoder->getModule()));
+		  }
 	}
 }
 

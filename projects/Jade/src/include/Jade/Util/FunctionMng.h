@@ -65,9 +65,9 @@ public:
      *  @brief Create a puts to display the given message
 	 *
      */
-	static void createPrintf(llvm::Module* module, std::string message, llvm::Instruction* instr, llvm::Value* value);
+	static llvm::Function* createPrintf(llvm::Module* module, std::string message = "", llvm::Instruction* instr = NULL, llvm::Value* value = NULL);
 
-	static void createPrintf(llvm::Module* module, std::string message, llvm::Instruction* instr, std::vector<llvm::Value*> values);
+	static llvm::Function* createPrintf(llvm::Module* module, std::string message, llvm::Instruction* instr, std::vector<llvm::Value*> values);
 
 	static void createPuts(llvm::Module* module, std::string message, llvm::Instruction* instr);
 

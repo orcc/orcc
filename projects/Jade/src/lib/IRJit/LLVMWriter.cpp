@@ -155,6 +155,11 @@ Function* LLVMWriter::addFunctionProtosExternal(const Function* function){
 	return NF;
 }
 
+void LLVMWriter::linkExternalFunction(Function* srcFunction, Function* dstFunction){
+	ValueMap[srcFunction] = dstFunction;
+
+}
+
 
 bool LLVMWriter::linkProcedureBody(Function* function){
 	Function *F = cast<Function>(ValueMap[function]);

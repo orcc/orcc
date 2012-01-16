@@ -147,6 +147,18 @@ public:
      */
 	bool addType(std::string name, llvm::StructType* type);
 
+	/**
+     *  @brief Link two functions in a two separates modules
+	 *
+	 * @param srcFunction : the source function
+	 *
+	 * @param dstFunction : the destination function
+	 *
+	 * @return True ff there is already an entry for this name, otherwise false.
+	 *
+     */
+	void linkExternalFunction(llvm::Function* srcFunction, llvm::Function* dstFunction);
+
 private:
 
 	/**

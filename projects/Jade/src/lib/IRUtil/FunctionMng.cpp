@@ -48,17 +48,17 @@
 using namespace std;
 using namespace llvm;
 
-void FunctionMng::createPrintf(Module* module, string message, Instruction* instr, Value* value){
+Function* FunctionMng::createPrintf(Module* module, string message, Instruction* instr, Value* value){
 	vector<Value*> values;
 	
 	if (value != NULL){
 		values.push_back(value);
 	}
 	
-	createPrintf(module, message, instr, values);
+	return createPrintf(module, message, instr, values);
 }
 
-void FunctionMng::createPrintf(Module* module, string message, Instruction* instr, vector<Value*> values){
+Function* FunctionMng::createPrintf(Module* module, string message, Instruction* instr, vector<Value*> values){
 	Function* func_printf = module->getFunction("printf");
 	if (!func_printf) {
 		 // Printf does'nt exist, create it
@@ -74,6 +74,10 @@ void FunctionMng::createPrintf(Module* module, string message, Instruction* inst
 		AttrListPtr func_printf_PAL;
 		func_printf->setAttributes(func_printf_PAL);
    }
+
+	if (instr== NULL){
+		return func_printf;
+	}
 
 	// Create the message
 	Value* messageExpr = createStdMessage(module, message);
@@ -110,7 +114,7 @@ void FunctionMng::createPrintf(Module* module, string message, Instruction* inst
 	  AttrListPtr int32_25_PAL;
 	  int32_25->setAttributes(int32_25_PAL);
 
-
+	  return func_printf;
 }
 
 void FunctionMng::createPuts(Module* module, string message, Instruction* instr){
