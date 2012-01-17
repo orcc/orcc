@@ -312,6 +312,8 @@ entry:
 	<action.peekPattern.variables: variableDeclaration()>
 	<printPeekCalls(action.peekPattern)>
 <endif>
+	br label %bb1
+	
 <printNodes(action.scheduler.nodes)>
 }
 
@@ -327,6 +329,8 @@ entry:
 <if(action.inputPattern)>
 	<printReadCalls(action.inputPattern)>
 <endif>
+	br label %bb1
+	
 <printNodes(action.body.nodes, false)>
 <if(action.outputPattern)>
 	<printWriteCalls(action.outputPattern)>
