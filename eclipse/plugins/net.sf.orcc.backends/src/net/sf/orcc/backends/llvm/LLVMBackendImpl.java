@@ -155,18 +155,16 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 		DfSwitch<?>[] transformations = { new UnitImporter(),
 				new SSATransformation(), new DeadGlobalElimination(),
-				new DeadCodeElimination(), new DeadVariableRemoval(),
-				new BoolToIntTransformation(), new StringTransformation(),
+				new TypeResizer(true, false, false), new DeadCodeElimination(),
+				new DeadVariableRemoval(), new BoolToIntTransformation(),
+				new StringTransformation(),
 				new RenameTransformation(this.transformations),
 				new TacTransformation(), new CopyPropagator(),
 				new ConstantPropagator(), new InstPhiTransformation(),
-				new GetElementPtrAdder(), new CastAdder(false), new EmptyNodeRemover(),
-				new BlockCombine(), new BuildCFG(), new ListInitializer() };
+				new GetElementPtrAdder(), new CastAdder(false),
+				new EmptyNodeRemover(), new BlockCombine(), new BuildCFG(),
+				new ListInitializer() };
 
-		if (!byteexact){
-			new TypeResizer(true, false, false).doSwitch(actor);
-		}
-		
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 		}
