@@ -65,7 +65,6 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.df.transformations.NetworkFlattener;
-import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.transformations.BlockCombine;
 import net.sf.orcc.ir.transformations.BuildCFG;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
@@ -147,27 +146,31 @@ public class LLVMBackendImpl extends AbstractBackend {
 	protected void doTransformActor(Actor actor) throws OrccException {
 		if (classify) {
 			new ActorClassifier().doSwitch(actor);
-
 			if (normalize) {
 				new ActorNormalizer().doSwitch(actor);
 			}
 		}
-
-		DfSwitch<?>[] transformations = { new UnitImporter(),
-				new SSATransformation(), new DeadGlobalElimination(),
-				new TypeResizer(true, false, false), new DeadCodeElimination(),
-				new DeadVariableRemoval(), new BoolToIntTransformation(),
-				new StringTransformation(),
-				new RenameTransformation(this.transformations),
-				new TacTransformation(), new CopyPropagator(),
-				new ConstantPropagator(), new InstPhiTransformation(),
-				new GetElementPtrAdder(), new CastAdder(false),
-				new EmptyNodeRemover(), new BlockCombine(), new BuildCFG(),
-				new ListInitializer() };
-
-		for (DfSwitch<?> transformation : transformations) {
-			transformation.doSwitch(actor);
+		new UnitImporter().doSwitch(actor);
+		new SSATransformation().doSwitch(actor);
+		new DeadGlobalElimination().doSwitch(actor);
+		if (!byteexact) {
+			new TypeResizer(true, false, false).doSwitch(actor);
 		}
+		new DeadCodeElimination().doSwitch(actor);
+		new DeadVariableRemoval().doSwitch(actor);
+		new BoolToIntTransformation().doSwitch(actor);
+		new StringTransformation().doSwitch(actor);
+		new RenameTransformation(this.transformations).doSwitch(actor);
+		new TacTransformation().doSwitch(actor);
+		new CopyPropagator().doSwitch(actor);
+		new ConstantPropagator().doSwitch(actor);
+		new InstPhiTransformation().doSwitch(actor);
+		new GetElementPtrAdder().doSwitch(actor);
+		new CastAdder(false).doSwitch(actor);
+		new EmptyNodeRemover().doSwitch(actor);
+		new BlockCombine().doSwitch(actor);
+		new BuildCFG().doSwitch(actor);
+		new ListInitializer().doSwitch(actor);
 
 		// Organize metadata information for the current actor
 		actor.setTemplateData(new LLVMTemplateData(actor));
