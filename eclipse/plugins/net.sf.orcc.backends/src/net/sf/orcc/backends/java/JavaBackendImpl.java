@@ -87,13 +87,18 @@ public class JavaBackendImpl extends AbstractBackend {
 		}
 	}
 
-	private void doTransformNetwork(Network network) throws OrccException {
+	private Network doTransformNetwork(Network network) throws OrccException {
 		// instantiate and flattens network
+		write("Instantiating...\n");
 		network = new Instantiator().doSwitch(network);
+
+		write("Flattening...\n");
 		new NetworkFlattener().doSwitch(network);
 
 		// Add broadcasts before printing
 		new BroadcastAdder().doSwitch(network);
+
+		return network;
 	}
 
 	@Override
@@ -111,7 +116,7 @@ public class JavaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
-		doTransformNetwork(network);
+		network = doTransformNetwork(network);
 
 		// print network
 		write("Printing network...\n");
@@ -144,10 +149,13 @@ public class JavaBackendImpl extends AbstractBackend {
 		printer.getOptions().put("fifoSize", fifoSize);
 
 		// create folder if necessary
-		String packageName = OrccUtil.getQualifiedPackage(network.getFile());
-		String folder = path + File.separator + packageName.replace('.', '/');
+		String folder = path + File.separator
+				+ network.getPackage().replace('.', '/');
 		new File(folder).mkdirs();
-		printer.print(network.getName() + ".java", folder, network);
+
+		String fileName = network.getSimpleName() + ".java";
+
+		printer.print(fileName, folder, network);
 	}
 
 }

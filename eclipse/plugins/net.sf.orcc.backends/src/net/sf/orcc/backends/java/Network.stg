@@ -31,9 +31,9 @@ private IActor actor_<instance.id>;
 constructActor(instance) ::= <<
 <if (instance.actor)>
 <if(instance.actor.native)>
-actor_<instance.id> = new Actor_<instance.actor.simpleName>(<parameters(instance.actor.parameters.list)>);
+actor_<instance.id> = new <instance.actor.package>.<instance.actor.simpleName>(<parameters(instance.actor.parameters.list)>);
 <else>
-actor_<instance.id> = new net.sf.orcc.generated.<instance.actor.package>.Actor_<instance.actor.simpleName>(<parameters(instance.actor.parameters.list)>);
+actor_<instance.id> = new <instance.actor.package>.<instance.actor.simpleName>(<parameters(instance.actor.parameters.list)>);
 <endif>
 <endif>
 >>
@@ -66,57 +66,13 @@ actor_<instance.id>.initialize();
 // allocates FIFOs
 ///////////////////////////////////////////////////////////////////////////////
 
-allocateFifoType(type, size, count) ::= <<
-private Fifo_<type> fifo_<count> = new Fifo_<type>(<if(size)><size><else>SIZE<endif>);
+setupFifo(connection) ::= <<
+
+f = new Fifo(SIZE);
+actor_<connection.source.simpleName>.setFifo("<connection.sourcePort.simpleName>", f);
+actor_<connection.target.simpleName>.setFifo("<connection.targetPort.simpleName>", f);
 >>
 
-doAllocateFifo(edge, source, sourcePort, target, targetPort) ::= <<
-<if (source.broadcast)>
-<allocateFifoType(
-  type=targetPort.type, size=edge.size, count=network.connectionMap.(edge))><else>
-<allocateFifoType(
-  type=sourcePort.type, size=edge.size, count=network.connectionMap.(edge))><endif>
->>
-
-tryAllocateFifo(edge, src, tgt) ::= <<
-<if (src.instance && tgt.instance)>
-<doAllocateFifo(
-  edge=edge,
-  source=src.instance, sourcePort=edge.source,
-  target=tgt.instance, targetPort=edge.target)><endif>
->>
-
-allocateFifo(edge) ::= <<
-<tryAllocateFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))>
->>
-
-allocateFifos(edges) ::= <<
-<edges: allocateFifo()>
->>
-
-///////////////////////////////////////////////////////////////////////////////
-// assigns FIFOs
-///////////////////////////////////////////////////////////////////////////////
-
-doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
-actor_<source.id>.setFifo("<sourcePort.name>", fifo_<count>);
-actor_<target.id>.setFifo("<targetPort.name>", fifo_<count>);
->>
-
-tryAssignFifo(edge, src, tgt) ::= <<
-<doAssignFifo(
-  source=src.instance, sourcePort=edge.source,
-  target=tgt.instance, targetPort=edge.target,
-  count=network.connectionMap.(edge))>
->>
-
-assignFifo(edge) ::= <<
-<tryAssignFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))>
->>
-
-assignFifos(edges) ::= <<
-<edges: assignFifo(); separator="\n">
->>
 
 ///////////////////////////////////////////////////////////////////////////////
 // print network
@@ -124,28 +80,27 @@ printNetwork(network, options) ::= <<
 /**
  * Generated from "<network.name>"
  */
-package net.sf.orcc.generated;
+package <network.package>;
 
 import net.sf.orcc.runtime.*;
 import net.sf.orcc.runtime.actors.*;
 
-public class Network_<network.name> implements IScheduler {
+public class <network.simpleName> implements IScheduler {
 
 	public static final int SIZE = <options.fifoSize>;
 
-	// FIFO declarations
-	<allocateFifos(network.connections)>
 	// Actors
 	<network.instances: declareActor()>
 	// Broadcasts
 	<network.instances: declareBroadcast()>
-
+	
 	@Override
 	public void initialize() {
 		<network.instances: constructActor()>
 		<network.instances: createBroadcast()>
 
-		<assignFifos(network.connections)>
+		Fifo f;
+		<network.connections: setupFifo()>
 	}
 
 	@Override
@@ -161,18 +116,20 @@ public class Network_<network.name> implements IScheduler {
 	}
 	
 	public void setDisplayOutputStream(Object displayOstream) {
-		Actor_Display.setOutputStreamProxy(displayOstream);
+		//Actor_Display.setOutputStreamProxy(displayOstream);
 	}
 	
 	public void runNetwork(String sourceFilename, Object displayOutputStreamProxy) {
-		String[] args = new String[1];
-		args[0] = sourceFilename;
+		// Setup arguments for launch
+		String[] args = {sourceFilename};
 		CLIParameters.getInstance().setArguments(args);
-		IScheduler scheduler = new Network_<network.name>();
+		
+		IScheduler scheduler = new <network.simpleName>();
 		scheduler.initialize();
-		Actor_Display.setOutputStreamProxy(displayOutputStreamProxy);
 		scheduler.schedule();
-		Actor_Display.closeDisplay();
+		
+		//Actor_Display.setOutputStreamProxy(displayOutputStreamProxy);
+		//Actor_Display.closeDisplay();
 	}
 	
 	/**
@@ -181,15 +138,19 @@ public class Network_<network.name> implements IScheduler {
 	 */
 	public static void main(String[] args) {
 		CLIParameters.getInstance().setArguments(args);
-		IScheduler scheduler = new Network_<network.name>();
+		
+		IScheduler scheduler = new <network.simpleName>();
 		scheduler.initialize();
 		scheduler.schedule();
-		Actor_Display.closeDisplay();
+		
+		//Actor_Display.closeDisplay();
 	}
 
 }
 
 >>
 
-
+debug(value) ::= <<
+// <value>
+>>
 
