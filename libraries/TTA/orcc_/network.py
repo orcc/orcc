@@ -33,6 +33,7 @@
 import os
 import shutil
 import stat
+import sys
 
 from .instance import *
 
@@ -47,7 +48,8 @@ class Network:
         for instance in self.instances:
             if not instance.isNative:
                 print ">> Instance " + instance.id + "."
-                instance.compile(srcPath, libPath, args, debug)
+                retcode = instance.compile(srcPath, libPath, args, debug)
+                if retcode != 0: sys.exit(retcode)
 
 
     def simulate(self, srcPath, libPath, tracePath):
@@ -69,4 +71,5 @@ class Network:
         for instance in self.instances:
             if not instance.isNative:
                 print ">> Instance " + instance.id + "."
-                instance.generate(srcPath, libPath, args, debug)
+                retcode = instance.generate(srcPath, libPath, args, debug)
+                if retcode != 0: sys.exit(retcode)

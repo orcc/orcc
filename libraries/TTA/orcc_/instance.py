@@ -82,11 +82,12 @@ class Instance:
         shutil.copy(os.path.join(libPath, "stream", "opset", "stream_units.opb"), instancePath)
         shutil.copy(os.path.join(libPath, "stream", "opset", "stream_units.opp"), instancePath)
         retcode = subprocess.call(["tcecc"] + args + ["-o", self._tpefFile, "-a", self._adfFile, self._llFile])
-        if retcode >= 0 and debug: retcode = subprocess.call(["tcecc", "-O3", "-o", self._bcFile, self._llFile, "--emit-llvm"])
-        if retcode >= 0 and debug: retcode = subprocess.call(["llvm-dis", "-o", self._llOptFile, self._bcFile])
-        if retcode >= 0 and debug: retcode = subprocess.call(["tcedisasm", "-n", "-o", self._asmFile, self._adfFile, self._tpefFile])
+        if retcode == 0 and debug: retcode = subprocess.call(["tcecc", "-O3", "-o", self._bcFile, self._llFile, "--emit-llvm"])
+        if retcode == 0 and debug: retcode = subprocess.call(["llvm-dis", "-o", self._llOptFile, self._bcFile])
+        if retcode == 0 and debug: retcode = subprocess.call(["tcedisasm", "-n", "-o", self._asmFile, self._adfFile, self._tpefFile])
         os.remove("stream_units.opp")
         os.remove("stream_units.opb")
+        return retcode
 
     def generate(self, srcPath, libPath, args, debug):
         instanceSrcPath = os.path.join(srcPath, self.id)
@@ -107,10 +108,10 @@ class Instance:
         shutil.rmtree(ttaPath, ignore_errors=True)
         # Generate the TTA processor
         retcode = subprocess.call(["createbem", "-o", self._bemFile, self._adfFile])    
-        if retcode >= 0: retcode = subprocess.call(["generateprocessor"] + args + ["-o", ttaPath, "-b", self._bemFile, "--shared-files-dir", sharePath,
+        if retcode == 0: retcode = subprocess.call(["generateprocessor"] + args + ["-o", ttaPath, "-b", self._bemFile, "--shared-files-dir", sharePath,
                                         "-l", "vhdl", "-e", self._entity, "-i", self._idfFile, self._adfFile])
-        if retcode >= 0: retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", vhdlPath, "-f", "mif", "-o", "mif", self._adfFile])
-        if retcode >= 0: retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", vhdlPath, "-f", "coe", "-o", "coe", self._adfFile])
+        if retcode == 0: retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", vhdlPath, "-f", "mif", "-o", "mif", self._adfFile])
+        if retcode == 0: retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", vhdlPath, "-f", "coe", "-o", "coe", self._adfFile])
 
         # Generate processor files
         self.irom = self._readMif(self._mifFile)
@@ -137,6 +138,8 @@ class Instance:
         shutil.rmtree("vhdl", ignore_errors=True)
         os.remove("stream_units.opp")
         os.remove("stream_units.opb")
+        
+        return retcode
 
 
     def simulate(self, srcPath, libPath, tracePath):
