@@ -28,7 +28,7 @@ architecture rtl_dram of dram is
 
 begin
 
-  ram_component : entity altera_mf_components.altsyncram
+  ram_component : altera_mf_components.altsyncram
     generic map (
       byte_size                     => 8,
       clock_enable_input_a          => "BYPASS",

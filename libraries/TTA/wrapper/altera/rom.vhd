@@ -25,7 +25,7 @@ architecture rtl_irom of irom is
 
 begin
 
-  rom_component : entity altera_mf_components.altsyncram
+  rom_component : altera_mf_components.altsyncram
     generic map (
       address_aclr_a         => "NONE",
       clock_enable_input_a   => "BYPASS",
