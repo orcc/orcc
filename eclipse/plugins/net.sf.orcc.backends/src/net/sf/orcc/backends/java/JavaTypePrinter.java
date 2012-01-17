@@ -45,12 +45,17 @@ public class JavaTypePrinter extends TypePrinter {
 
 	@Override
 	public String caseTypeBool(TypeBool type) {
-		return "boolean";
+		return "Boolean";
 	}
 
 	@Override
 	public String caseTypeInt(TypeInt type) {
-		return "int";
+		if (type.isLong()) {
+			return "Long";
+		}
+		else {
+			return "Integer";
+		}
 	}
 
 	@Override
@@ -67,7 +72,12 @@ public class JavaTypePrinter extends TypePrinter {
 	@Override
 	public String caseTypeUint(TypeUint type) {
 		// no unsigned in Java, and size is not taken in consideration anyway
-		return "int";
+		if (type.isLong()) {
+			return "Long";
+		}
+		else {
+			return "Integer";
+		}
 	}
 
 }
