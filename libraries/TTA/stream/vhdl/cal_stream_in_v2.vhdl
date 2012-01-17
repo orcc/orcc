@@ -70,8 +70,6 @@ end cal_stream_in;
 
 
 architecture rtl of cal_stream_in is
-  
-  signal r1reg  : std_logic_vector(31 downto 0);
 
   type data_array is array (0 to 7) of std_logic_vector(31 downto 0);
   type ack_array is array (0 to 7) of std_logic_vector(0 downto 0);
@@ -81,7 +79,6 @@ architecture rtl of cal_stream_in is
   signal ext_ack_current    : ack_array;
 
 begin
-  r1data <= r1reg;
   
   ext_data_current(0) <= ext_data0;
   ext_data_current(1) <= ext_data1;
@@ -114,7 +111,7 @@ begin
     variable index : integer := 0;
   begin  -- process regs
     if rstx = '0' then
-      r1reg           <= (others => '0');
+      r1data          <= (others => '0');
       ext_ack_current <= (others => (others => '0'));
       
     elsif clk'event and clk = '1' then
@@ -127,13 +124,13 @@ begin
           index := to_integer(unsigned(t1data));
           case t1opcode is
             when CAL_STREAM_IN_READ =>
-              r1reg                  <= ext_data_current(index);
+              r1data                 <= ext_data_current(index);
               ext_ack_current(index) <= (0 => '1');
             when CAL_STREAM_IN_STATUS =>
               -- stream_in_status is placed in the least significant bits of r1reg
-              r1reg <= ext_status_current(index);
+              r1data <= ext_status_current(index);
             when CAL_STREAM_IN_PEEK =>
-              r1reg <= ext_data_current(index);
+              r1data <= ext_data_current(index);
             when others => null;
           end case;
         end if;
