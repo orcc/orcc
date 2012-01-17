@@ -51,16 +51,16 @@ import net.sf.orcc.ir.util.ValueUtil;
  */
 public class Fifo {
 
-	private BlockingQueue<Object> m_content;
-	private Type m_type;
+	private BlockingQueue<Object> content;
+	private Type type;
 
-	private String m_name;
-	private int m_size;
+	private String name;
+	private int size;
 
-	private FileOutputStream m_fos;
-	private PrintWriter m_writer;
+	private FileOutputStream fos;
+	private PrintWriter writer;
 
-	private boolean m_enableTraces;
+	private boolean enableTraces;
 
 	/**
 	 * Creates a new FIFO with the given size and a file for tracing exchanged
@@ -76,23 +76,21 @@ public class Fifo {
 	public Fifo(Type type, int size, String folderName, String fifoName,
 			boolean enableTraces) {
 		this(type, size);
-		m_name = fifoName;
-		m_enableTraces = enableTraces;
+		this.name = fifoName;
+		this.enableTraces = enableTraces;
 
-		if (m_enableTraces) {
+		if (enableTraces) {
 			// Create network communication tracing file
 			File file = new File(folderName);
 			try {
-				m_fos = new FileOutputStream(new File(file, fifoName
+				fos = new FileOutputStream(new File(file, fifoName
 						+ "_traces.txt"));
-				m_writer = new PrintWriter(new OutputStreamWriter(m_fos,
-						"UTF-8"), true);
-			}
-			catch (FileNotFoundException e) {
+				writer = new PrintWriter(new OutputStreamWriter(fos, "UTF-8"),
+						true);
+			} catch (FileNotFoundException e) {
 				String msg = "folder not found: \"" + folderName + "\"";
 				throw new RuntimeException(msg, e);
-			}
-			catch (UnsupportedEncodingException e) {
+			} catch (UnsupportedEncodingException e) {
 				String msg = "unsupported utf8 encoding for folder : \""
 						+ folderName + "\"";
 				throw new RuntimeException(msg, e);
@@ -117,20 +115,19 @@ public class Fifo {
 	 *            the size of the FIFO
 	 */
 	public Fifo(Type type, int size) {
-		m_size = size;
-		m_type = type;
-		m_content = new ArrayBlockingQueue<Object>(size);
+		this.size = size;
+		this.type = type;
+		content = new ArrayBlockingQueue<Object>(size);
 	}
 
 	public void closePrinter() {
-		if (m_writer != null) {
-			m_writer.close();
+		if (writer != null) {
+			writer.close();
 		}
-		if (m_fos != null) {
+		if (fos != null) {
 			try {
-				m_fos.close();
-			}
-			catch (IOException e) {
+				fos.close();
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
@@ -143,7 +140,7 @@ public class Fifo {
 	 * @return the FIFO name
 	 */
 	public String getName() {
-		return m_name;
+		return name;
 	}
 
 	/**
@@ -152,7 +149,7 @@ public class Fifo {
 	 * @return FIFO size
 	 */
 	public int getSize() {
-		return m_size;
+		return size;
 	}
 
 	/**
@@ -165,7 +162,7 @@ public class Fifo {
 	 *         tokens in this FIFO
 	 */
 	final public boolean hasRoom(int numTokens) {
-		return m_content.remainingCapacity() >= numTokens;
+		return content.remainingCapacity() >= numTokens;
 	}
 
 	/**
@@ -178,7 +175,7 @@ public class Fifo {
 	 *         of tokens
 	 */
 	final public boolean hasTokens(int numTokens) {
-		return m_content.size() > numTokens;
+		return content.size() > numTokens;
 	}
 
 	/**
@@ -188,12 +185,11 @@ public class Fifo {
 	 */
 	public Object peek(int offset) {
 		Object[] result = new Object[offset + 1];
-		
+
 		if (offset == 0) {
-			result[0] = m_content.peek();
-		}
-		else {
-			Iterator<Object> it = m_content.iterator();
+			result[0] = content.peek();
+		} else {
+			Iterator<Object> it = content.iterator();
 			for (int i = 0; i < offset && it.hasNext(); ++i) {
 				result[i] = it.next();
 			}
@@ -208,12 +204,12 @@ public class Fifo {
 	 * @return the token read
 	 */
 	public Object read() {
-		return m_content.poll();
+		return content.poll();
 	}
 
 	@Override
 	public String toString() {
-		return "Fifo[" + m_size + "] : " + m_content.size() + " elements";
+		return "Fifo[" + size + "] : " + content.size() + " elements";
 	}
 
 	/**
@@ -222,46 +218,43 @@ public class Fifo {
 	 * @return the token read
 	 */
 	public void write(Object value) {
-		m_content.offer(value);
+		content.offer(value);
 
-		if (m_enableTraces) {
+		if (enableTraces) {
 			writePrinter(value);
 		}
 	}
 
 	private void writePrinter(Object value) {
 		// Useless function when used without simulator
-		if (m_type == null)
+		if (type == null)
 			return;
 
-		if (m_type.isBool()) {
-			m_writer.println((Boolean) value);
-		}
-		else if (m_type.isFloat()) {
-			m_writer.println((Float) value);
-		}
-		else if (m_type.isInt()) {
-			int size = m_type.getSizeInBits();
+		if (type.isBool()) {
+			writer.println((Boolean) value);
+		} else if (type.isFloat()) {
+			writer.println((Float) value);
+		} else if (type.isInt()) {
+			int size = type.getSizeInBits();
 			if (size <= 8) {
-				m_writer.println(ValueUtil.getByteValue(value));
+				writer.println(ValueUtil.getByteValue(value));
 			} else if (size <= 16) {
-				m_writer.println(ValueUtil.getShortValue(value));
+				writer.println(ValueUtil.getShortValue(value));
 			} else if (size <= 32) {
-				m_writer.println(ValueUtil.getIntValue(value));
+				writer.println(ValueUtil.getIntValue(value));
 			} else if (size <= 64) {
-				m_writer.println(ValueUtil.getLongValue(value));
+				writer.println(ValueUtil.getLongValue(value));
 			}
-		}
-		else if (m_type.isUint()) {
-			int size = m_type.getSizeInBits();
+		} else if (type.isUint()) {
+			int size = type.getSizeInBits();
 			if (size < 8) {
-				m_writer.println(ValueUtil.getByteValue(value));
+				writer.println(ValueUtil.getByteValue(value));
 			} else if (size < 16) {
-				m_writer.println(ValueUtil.getShortValue(value));
+				writer.println(ValueUtil.getShortValue(value));
 			} else if (size < 32) {
-				m_writer.println(ValueUtil.getIntValue(value));
+				writer.println(ValueUtil.getIntValue(value));
 			} else if (size < 64) {
-				m_writer.println(ValueUtil.getLongValue(value));
+				writer.println(ValueUtil.getLongValue(value));
 			}
 		}
 	}
