@@ -2,15 +2,15 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Orcc UI
 Bundle-SymbolicName: net.sf.orcc.ui;singleton:=true
-Bundle-Version: 0.9.8.v20111108
+Bundle-Version: 0.9.9.v20120120
 Bundle-Activator: net.sf.orcc.ui.OrccUiActivator
 Require-Bundle: net.sf.graphiti.model;bundle-version="1.3.7",
  net.sf.graphiti.ui;bundle-version="1.3.7",
- net.sf.orcc.backends;bundle-version="0.9.7",
- net.sf.orcc.cal;bundle-version="0.9.7",
- net.sf.orcc.cal.ui;bundle-version="0.9.7",
- net.sf.orcc.core;bundle-version="0.9.7",
- net.sf.orcc.simulators;bundle-version="0.9.7",
+ net.sf.orcc.backends;bundle-version="0.9.9",
+ net.sf.orcc.cal;bundle-version="0.9.9",
+ net.sf.orcc.cal.ui;bundle-version="0.9.9",
+ net.sf.orcc.core;bundle-version="0.9.9",
+ net.sf.orcc.simulators;bundle-version="0.9.9",
  org.ietr.libs;bundle-version="1.3.7",
  org.eclipse.core.resources,
  org.eclipse.core.runtime,
