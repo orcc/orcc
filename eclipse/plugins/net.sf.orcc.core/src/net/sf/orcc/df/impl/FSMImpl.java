@@ -96,10 +96,11 @@ public class FSMImpl extends EObjectImpl implements FSM {
 	}
 
 	@Override
-	public void addTransition(State source, Action action, State target) {
+	public Transition addTransition(State source, Action action, State target) {
 		Transition transition = DfFactory.eINSTANCE.createTransition(source,
 				action, target);
 		getTransitions().add(transition);
+		return transition;
 	}
 
 	/**

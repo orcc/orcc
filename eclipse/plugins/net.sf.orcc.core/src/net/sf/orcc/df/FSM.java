@@ -55,8 +55,9 @@ public interface FSM extends EObject {
 	 *            an action
 	 * @param target
 	 *            target state
+	 * @return the transition created
 	 */
-	void addTransition(State source, Action action, State target);
+	Transition addTransition(State source, Action action, State target);
 
 	/**
 	 * Creates and returns a graph representation of this FSM. Note that the
