@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
@@ -61,7 +60,6 @@ import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.EList;
-import org.jgrapht.DirectedGraph;
 
 /**
  * This class defines a visitor that transforms multi-token to mono-token data
@@ -71,8 +69,6 @@ import org.jgrapht.DirectedGraph;
  * 
  */
 public class Multi2MonoToken extends AbstractActorVisitor<Object> {
-
-	IrFactory factory = IrFactory.eINSTANCE;
 
 	/**
 	 * This class defines a visitor that substitutes the peek from the port to
@@ -140,9 +136,9 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 * 
 	 */
 	private class ModifyProcessActionStore extends AbstractActorVisitor<Object> {
+		private int bufferSize;
 		private Var tab;
 		private Var writeIndex;
-		private int bufferSize;
 
 		public ModifyProcessActionStore(Var tab, Var writeIndex, int bufferSize) {
 			this.tab = tab;
@@ -209,27 +205,71 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	}
 
 	private List<Action> AddedUntaggedActions;
+
+	private List<Integer> bufferSizes;
 	// private int bufferSize;
 	private Action done;
 	private Type entryType;
+	IrFactory factory = IrFactory.eINSTANCE;
 	private FSM fsm;
 	private List<Var> inputBuffers;
 	private int inputIndex;
 	private List<Port> inputPorts;
 	private List<Action> noRepeatActions;
-	private List<Action> visitedActions;
-	private List<String> visitedActionsNames;
 	private int numTokens;
 	private int outputIndex;
-	private int visitedRenameIndex;
 	private Port port;
 	private List<Var> readIndexes;
 	private boolean repeatInput;
 	private Var result;
 	private Map<String, State> statesMap;
+	private List<Action> visitedActions;
+	private List<String> visitedActionsNames;
+	private int visitedRenameIndex;
 	private Action write;
 	private List<Var> writeIndexes;
-	private List<Integer> bufferSizes;
+
+	/**
+	 * returns the position of an action name in an actions names list
+	 * 
+	 * @param list
+	 *            list of actions names
+	 * @param seek
+	 *            action researched action
+	 * @return position of the seek action in the list
+	 */
+	private int actionNamePosition(List<String> list, String seekAction) {
+		int position = 0;
+		for (String action : list) {
+			if (action.equals(seekAction)) {
+				break;
+			} else {
+				position++;
+			}
+		}
+		return position;
+	}
+
+	/**
+	 * returns the position of an action name in an actions names list
+	 * 
+	 * @param list
+	 *            list of actions names
+	 * @param seek
+	 *            action researched action
+	 * @return position of the seek action in the list
+	 */
+	private int actionPosition(List<Action> list, String seekAction) {
+		int position = 0;
+		for (Action action : list) {
+			if (action.getName().equals(seekAction)) {
+				break;
+			} else {
+				position++;
+			}
+		}
+		return position;
+	}
 
 	/**
 	 * transforms the transformed action to a transition action
@@ -290,6 +330,20 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		modifyRepeatActionsInFSM();
 		modifyUntaggedActions(actor);
 		return null;
+	}
+
+	/**
+	 * this method returns the closest power of 2 of x --> optimal buffer size
+	 * 
+	 * @param x
+	 * @return closest power of 2 of x
+	 */
+	private int closestPow_2(int x) {
+		int p = 1;
+		while (p < x) {
+			p = p * 2;
+		}
+		return p;
 	}
 
 	/**
@@ -723,10 +777,8 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 * 
 	 */
 	private void modifyNoRepeatActionsInFSM() {
-		DirectedGraph<State, Transition> graph = fsm.getGraph();
-		Set<Transition> edges = graph.edgeSet();
-		for (Transition edge : edges) {
-			Action action = edge.getAction();
+		for (Transition transition : fsm.getTransitions()) {
+			Action action = transition.getAction();
 			if (noRepeatActions.contains(action)) {
 				ListIterator<Port> it = action.getInputPattern().getPorts()
 						.listIterator();
@@ -833,12 +885,10 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 			}
 			if (transformFSM == true) {
 				// with an FSM: visits all transitions
-				DirectedGraph<State, Transition> graph = fsm.getGraph();
-				Set<Transition> edges = graph.edgeSet();
-				for (Transition edge : edges) {
-					State source = graph.getEdgeSource(edge);
-					State target = graph.getEdgeTarget(edge);
-					Action action = edge.getAction();
+				for (Transition transition : fsm.getTransitions()) {
+					State source = (State) transition.getSource();
+					State target = (State) transition.getTarget();
+					Action action = transition.getAction();
 					visitTransition(source, target, action);
 				}
 				modifyNoRepeatActionsInFSM();
@@ -866,6 +916,34 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	}
 
 	/**
+	 * This method return the closest power of 2 of the maximum repeat value of
+	 * a port
+	 * 
+	 * @param action
+	 *            action containing the port
+	 * @param port
+	 *            repeat port
+	 * @return optimal buffer size
+	 */
+	private int OptimalBufferSize(Port port) {
+		int size = 0;
+		int optimalSize = 0;
+		List<Action> actions = new ArrayList<Action>(actor.getActions());
+		for (Action action : actions) {
+			for (Entry<Port, Integer> entry : action.getInputPattern()
+					.getNumTokensMap().entrySet()) {
+				if (entry.getKey() == port) {
+					if (entry.getValue() > size) {
+						size = entry.getValue();
+					}
+				}
+			}
+		}
+		optimalSize = closestPow_2(size + 1);
+		return optimalSize;
+	}
+
+	/**
 	 * returns the position of a port in a port list
 	 * 
 	 * @param list
@@ -884,113 +962,6 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 			}
 		}
 		return position;
-	}
-
-	/**
-	 * returns the position of an action name in an actions names list
-	 * 
-	 * @param list
-	 *            list of actions names
-	 * @param seek
-	 *            action researched action
-	 * @return position of the seek action in the list
-	 */
-	private int actionNamePosition(List<String> list, String seekAction) {
-		int position = 0;
-		for (String action : list) {
-			if (action.equals(seekAction)) {
-				break;
-			} else {
-				position++;
-			}
-		}
-		return position;
-	}
-
-	/**
-	 * returns the position of an action name in an actions names list
-	 * 
-	 * @param list
-	 *            list of actions names
-	 * @param seek
-	 *            action researched action
-	 * @return position of the seek action in the list
-	 */
-	private int actionPosition(List<Action> list, String seekAction) {
-		int position = 0;
-		for (Action action : list) {
-			if (action.getName().equals(seekAction)) {
-				break;
-			} else {
-				position++;
-			}
-		}
-		return position;
-	}
-
-	/**
-	 * 
-	 * 
-	 * @param action
-	 * @param source
-	 * @param target
-	 */
-	private void updateFSM(Action action, Action oldAction, State source,
-			State target) {
-		List<Action> actions = actor.getActions();
-		for (Entry<Port, Integer> verifEntry : action.getInputPattern()
-				.getNumTokensMap().entrySet()) {
-			int verifNumTokens = verifEntry.getValue();
-			if (verifNumTokens > 1) {
-				repeatInput = true;
-				fsm.addTransition(source, oldAction, target);
-				visitedRenameIndex++;
-				break;
-			}
-			inputIndex = 0;
-		}
-
-		for (Entry<Port, Integer> verifEntry : action.getOutputPattern()
-				.getNumTokensMap().entrySet()) {
-			int verifNumTokens = verifEntry.getValue();
-			if (verifNumTokens > 1) {
-
-				String updateWriteName = "newStateWrite" + action.getName()
-						+ visitedRenameIndex;
-				State writeState = DfFactory.eINSTANCE
-						.createState(updateWriteName);
-				fsm.getStates().add(writeState);
-				// create new process action if not created while treating
-				// inputs
-				fsm.replaceTarget(source, oldAction, writeState);
-				oldAction.getOutputPattern().clear();
-
-				visitedRenameIndex++;
-				for (Entry<Port, Integer> entry : action.getOutputPattern()
-						.getNumTokensMap().entrySet()) {
-					outputIndex = outputIndex + 100;
-					port = entry.getKey();
-
-					String writeName = action.getName() + port.getName()
-							+ "_NewWrite";
-					int writeIndex = actionPosition(actions, writeName);
-					Action write = actions.get(writeIndex);
-					fsm.addTransition(writeState, write, writeState);
-
-					// create a new write done action once
-					if (outputIndex == 100) {
-						String doneName = action.getName() + "newWriteDone";
-						int doneIndex = actionPosition(actions, doneName);
-						Action done = actions.get(doneIndex);
-						fsm.addTransition(writeState, done, target);
-					}
-
-				}
-				break;
-			}
-			outputIndex = 0;
-		}
-		repeatInput = false;
 	}
 
 	/**
@@ -1262,6 +1233,71 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	}
 
 	/**
+	 * 
+	 * 
+	 * @param action
+	 * @param source
+	 * @param target
+	 */
+	private void updateFSM(Action action, Action oldAction, State source,
+			State target) {
+		List<Action> actions = actor.getActions();
+		for (Entry<Port, Integer> verifEntry : action.getInputPattern()
+				.getNumTokensMap().entrySet()) {
+			int verifNumTokens = verifEntry.getValue();
+			if (verifNumTokens > 1) {
+				repeatInput = true;
+				fsm.addTransition(source, oldAction, target);
+				visitedRenameIndex++;
+				break;
+			}
+			inputIndex = 0;
+		}
+
+		for (Entry<Port, Integer> verifEntry : action.getOutputPattern()
+				.getNumTokensMap().entrySet()) {
+			int verifNumTokens = verifEntry.getValue();
+			if (verifNumTokens > 1) {
+
+				String updateWriteName = "newStateWrite" + action.getName()
+						+ visitedRenameIndex;
+				State writeState = DfFactory.eINSTANCE
+						.createState(updateWriteName);
+				fsm.getStates().add(writeState);
+				// create new process action if not created while treating
+				// inputs
+				fsm.replaceTarget(source, oldAction, writeState);
+				oldAction.getOutputPattern().clear();
+
+				visitedRenameIndex++;
+				for (Entry<Port, Integer> entry : action.getOutputPattern()
+						.getNumTokensMap().entrySet()) {
+					outputIndex = outputIndex + 100;
+					port = entry.getKey();
+
+					String writeName = action.getName() + port.getName()
+							+ "_NewWrite";
+					int writeIndex = actionPosition(actions, writeName);
+					Action write = actions.get(writeIndex);
+					fsm.addTransition(writeState, write, writeState);
+
+					// create a new write done action once
+					if (outputIndex == 100) {
+						String doneName = action.getName() + "newWriteDone";
+						int doneIndex = actionPosition(actions, doneName);
+						Action done = actions.get(doneIndex);
+						fsm.addTransition(writeState, done, target);
+					}
+
+				}
+				break;
+			}
+			outputIndex = 0;
+		}
+		repeatInput = false;
+	}
+
+	/**
 	 * This method updates the write index of the buffer after reading tokens
 	 * 
 	 * @param action
@@ -1311,48 +1347,6 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				createActionsSet(action, source, target);
 			}
 		}
-	}
-
-	/**
-	 * this method returns the closest power of 2 of x --> optimal buffer size
-	 * 
-	 * @param x
-	 * @return closest power of 2 of x
-	 */
-	private int closestPow_2(int x) {
-		int p = 1;
-		while (p < x) {
-			p = p * 2;
-		}
-		return p;
-	}
-
-	/**
-	 * This method return the closest power of 2 of the maximum repeat value of
-	 * a port
-	 * 
-	 * @param action
-	 *            action containing the port
-	 * @param port
-	 *            repeat port
-	 * @return optimal buffer size
-	 */
-	private int OptimalBufferSize(Port port) {
-		int size = 0;
-		int optimalSize = 0;
-		List<Action> actions = new ArrayList<Action>(actor.getActions());
-		for (Action action : actions) {
-			for (Entry<Port, Integer> entry : action.getInputPattern()
-					.getNumTokensMap().entrySet()) {
-				if (entry.getKey() == port) {
-					if (entry.getValue() > size) {
-						size = entry.getValue();
-					}
-				}
-			}
-		}
-		optimalSize = closestPow_2(size + 1);
-		return optimalSize;
 	}
 
 	/**

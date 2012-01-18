@@ -6,17 +6,11 @@
  */
 package net.sf.orcc.df.impl;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.DfPackage;
@@ -35,9 +29,6 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 import org.jgrapht.DirectedGraph;
-import org.jgrapht.ext.DOTExporter;
-import org.jgrapht.ext.StringEdgeNameProvider;
-import org.jgrapht.ext.StringNameProvider;
 import org.jgrapht.graph.DirectedMultigraph;
 
 /**
@@ -295,19 +286,6 @@ public class FSMImpl extends EObjectImpl implements FSM {
 					Transition.class, this, DfPackage.FSM__TRANSITIONS);
 		}
 		return transitions;
-	}
-
-	@Override
-	public void printGraph(File file) throws OrccException {
-		try {
-			OutputStream out = new FileOutputStream(file);
-			DOTExporter<State, Transition> exporter = new DOTExporter<State, Transition>(
-					new StringNameProvider<State>(), null,
-					new StringEdgeNameProvider<Transition>());
-			exporter.export(new OutputStreamWriter(out), getGraph());
-		} catch (IOException e) {
-			throw new OrccException("I/O error", e);
-		}
 	}
 
 	@Override

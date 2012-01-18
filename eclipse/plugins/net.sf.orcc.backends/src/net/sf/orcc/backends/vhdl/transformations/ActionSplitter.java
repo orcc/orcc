@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.instructions.InstSplit;
@@ -53,8 +52,6 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.EcoreHelper;
-
-import org.jgrapht.DirectedGraph;
 
 /**
  * This class defines a transformation that splits actions each time a
@@ -304,12 +301,10 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 			}
 		} else {
 			// with an FSM: visits all transitions
-			DirectedGraph<State, Transition> graph = fsm.getGraph();
-			Set<Transition> edges = graph.edgeSet();
-			for (Transition edge : edges) {
-				State source = graph.getEdgeSource(edge);
-				State target = graph.getEdgeTarget(edge);
-				Action action = edge.getAction();
+			for (Transition transition : fsm.getTransitions()) {
+				State source = (State) transition.getSource();
+				State target = (State) transition.getTarget();
+				Action action = transition.getAction();
 				visit(source, target, action);
 			}
 		}

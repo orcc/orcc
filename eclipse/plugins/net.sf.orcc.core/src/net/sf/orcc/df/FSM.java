@@ -28,10 +28,7 @@
  */
 package net.sf.orcc.df;
 
-import java.io.File;
 import java.util.List;
-
-import net.sf.orcc.OrccException;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
@@ -101,16 +98,6 @@ public interface FSM extends EObject {
 	 * @model containment="true"
 	 */
 	EList<Transition> getTransitions();
-
-	/**
-	 * Prints a graph representation of this FSM.
-	 * 
-	 * @param file
-	 *            output file
-	 * @throws OrccException
-	 *             if something goes wrong (most probably I/O error)
-	 */
-	void printGraph(File file) throws OrccException;
 
 	/**
 	 * Removes the transition from the given <code>source</code> state that is
