@@ -40,6 +40,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.Edge;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -172,7 +173,7 @@ public class StaticRegionDetector {
 					}
 					stack.push(v);
 					finished.add(v);
-					for (Connection edge : v.getOutgoing()) {
+					for (Edge edge : v.getOutgoing()) {
 						Vertex tgtVertex = edge.getTarget();
 						moc = ((Instance) tgtVertex).getMoC();
 						if (!discovered.contains(tgtVertex) && moc.isCSDF()) {

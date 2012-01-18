@@ -31,7 +31,6 @@ package net.sf.orcc.df;
 import net.sf.orcc.ir.Expression;
 
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class represents a connection in a network. A connection can have a
@@ -41,7 +40,7 @@ import org.eclipse.emf.ecore.EObject;
  * @author Herve Yviquel
  * @model
  */
-public interface Connection extends EObject {
+public interface Connection extends Edge {
 
 	/**
 	 * the bufferSize attribute can be attached to a FIFO to specify its size
@@ -74,28 +73,12 @@ public interface Connection extends EObject {
 	Integer getSize();
 
 	/**
-	 * Returns this connection's source (may be <code>null</code>).
-	 * 
-	 * @return this connection's source (may be <code>null</code>)
-	 * @model
-	 */
-	Vertex getSource();
-
-	/**
 	 * Returns this connection's source port (may be <code>null</code>).
 	 * 
 	 * @return this connection's source port (may be <code>null</code>)
 	 * @model
 	 */
 	Port getSourcePort();
-
-	/**
-	 * Returns this connection's target (may be <code>null</code>).
-	 * 
-	 * @return this connection's target (may be <code>null</code>)
-	 * @model
-	 */
-	Vertex getTarget();
 
 	/**
 	 * Returns this connection's target port (may be <code>null</code>).
@@ -126,28 +109,12 @@ public interface Connection extends EObject {
 	void setAttribute(String name, int value);
 
 	/**
-	 * Sets the source of this connection to the given vertex
-	 * 
-	 * @param vertex
-	 *            a vertex
-	 */
-	void setSource(Vertex vertex);
-
-	/**
 	 * Sets the source of this connection to the given port
 	 * 
 	 * @param source
 	 *            a port
 	 */
 	void setSourcePort(Port source);
-
-	/**
-	 * Sets the target of this connection to the given vertex
-	 * 
-	 * @param vertex
-	 *            a vertex
-	 */
-	void setTarget(Vertex vertex);
 
 	/**
 	 * Sets the target of this connection to the given port

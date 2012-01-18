@@ -123,16 +123,16 @@ Transitions_decl_MD(actor) ::= <<
 !<actor.templateData.actionScheduler.(actor.fsm.transitions)>
 >>
 
-Transition_decl_MD(actor, transition) ::= <<
+Transition_decl_MD(actor, state) ::= <<
+!<actor.templateData.actionScheduler.(state)>
+>>
+
+NextStates_decl_MD(actor, transitions) ::= <<
+!<actor.templateData.actionScheduler.(transitions)>
+>>
+
+NextState_decl_MD(actor, transition) ::= <<
 !<actor.templateData.actionScheduler.(transition)>
->>
-
-NextStates_decl_MD(actor, nextStates) ::= <<
-!<actor.templateData.actionScheduler.(nextStates)>
->>
-
-NextState_decl_MD(actor, nextState) ::= <<
-!<actor.templateData.actionScheduler.(nextState)>
 >>
 
 Sched_decl_MD(actor, action) ::= <<
@@ -312,27 +312,27 @@ State_MD(actor) ::= <<
 >>
 
 Transitions_MD(actor) ::= <<
-<Transitions_decl_MD(actor)> = metadata !{<actor.fsm.transitions: {transitions | metadata <Transition_decl_MD(actor, transitions)>}; separator=", ">}
-<actor.fsm.transitions: {transitions | <Transition_MD(actor, transitions)>}; separator="\n">
+<Transitions_decl_MD(actor)> = metadata !{<actor.fsm.states: {state | metadata <Transition_decl_MD(actor, state)>}; separator=", ">}
+<actor.fsm.states: {state | <Transition_MD(actor, state)>}; separator="\n">
 >>
 
-Transition_MD(actor, transitions) ::= <<
-;;;; Transitions from <transitions.sourceState.name>
-<if(transitions.list.empty)
-><Transition_decl_MD(actor, transitions)> = metadata !{<varState_MD(transitions.sourceState)>, null}<
+Transition_MD(actor, state) ::= <<
+;;;; Transitions from <state.name>
+<if(state.outgoing.empty)
+><Transition_decl_MD(actor, state)> = metadata !{<varState_MD(state)>, null}<
 else
-><Transition_decl_MD(actor, transitions)> = metadata !{<varState_MD(transitions.sourceState)>, metadata <NextStates_decl_MD(actor, transitions.list)>}
-<NextStates_MD(actor, transitions.list)><
+><Transition_decl_MD(actor, state)> = metadata !{<varState_MD(state)>, metadata <NextStates_decl_MD(actor, state.outgoing)>}
+<NextStates_MD(actor, state.outgoing)><
 endif>
 >>
 
-NextStates_MD(actor, transitionList) ::= <<
-<NextStates_decl_MD(actor, transitionList)> = metadata !{<transitionList: { transition | metadata <NextState_decl_MD(actor, transition)>}; separator=", ">}
-<transitionList: {transition | <NextState_MD(actor, transition)>}; separator="\n">
+NextStates_MD(actor, transitions) ::= <<
+<NextStates_decl_MD(actor, transitions)> = metadata !{<transitions: { transition | metadata <NextState_decl_MD(actor, transition)>}; separator=", ">}
+<transitions: {transition | <NextState_MD(actor, transition)>}; separator="\n">
 >>
 
 NextState_MD(actor, transition) ::= <<
-<NextState_decl_MD(actor, transition)> = metadata !{metadata <action_decl_MD(actor, transition.action)>, <varState_MD(transition.state)>}
+<NextState_decl_MD(actor, transition)> = metadata !{metadata <action_decl_MD(actor, transition.action)>, <varState_MD(transition.target)>}
 >>
 
 Type_MD(actor, var) ::= <<

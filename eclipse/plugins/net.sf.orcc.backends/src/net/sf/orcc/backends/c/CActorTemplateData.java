@@ -36,11 +36,12 @@ import java.util.Map;
 
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Edge;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.State;
 import net.sf.orcc.df.Transition;
-import net.sf.orcc.df.Transitions;
 
 /**
  * This class allows the string template accessing informations about
@@ -61,7 +62,7 @@ public class CActorTemplateData {
 	 * Map that associates a transition with the minimum input pattern that
 	 * allows all actions in the transition to fire
 	 */
-	private Map<Transitions, Pattern> transitionPattern;
+	private Map<State, Pattern> transitionPattern;
 
 	/**
 	 * Builds the input pattern
@@ -94,9 +95,10 @@ public class CActorTemplateData {
 			return;
 		}
 
-		for (Transitions transitions : fsm.getTransitions()) {
+		for (State state : fsm.getStates()) {
 			Pattern pattern = eINSTANCE.createPattern();
-			for (Transition transition : transitions.getList()) {
+			for (Edge edge : state.getOutgoing()) {
+				Transition transition = (Transition) edge;
 				Action action = transition.getAction();
 				Pattern actionPattern = action.getInputPattern();
 				for (Port port : actionPattern.getPorts()) {
@@ -112,7 +114,7 @@ public class CActorTemplateData {
 				}
 			}
 
-			transitionPattern.put(transitions, pattern);
+			transitionPattern.put(state, pattern);
 		}
 	}
 
@@ -122,7 +124,7 @@ public class CActorTemplateData {
 	 */
 	public void computeTemplateMaps(Actor actor) {
 		inputPattern = eINSTANCE.createPattern();
-		transitionPattern = new HashMap<Transitions, Pattern>();
+		transitionPattern = new HashMap<State, Pattern>();
 
 		buildInputPattern(actor);
 		buildTransitionPattern(actor);
@@ -145,7 +147,7 @@ public class CActorTemplateData {
 	 * 
 	 * @return a map of transitions to pattern
 	 */
-	public Map<Transitions, Pattern> getTransitionPattern() {
+	public Map<State, Pattern> getTransitionPattern() {
 		return transitionPattern;
 	}
 

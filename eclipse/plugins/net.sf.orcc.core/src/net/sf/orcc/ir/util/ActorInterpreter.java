@@ -35,11 +35,11 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
+import net.sf.orcc.df.Edge;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Transition;
-import net.sf.orcc.df.Transitions;
 import net.sf.orcc.df.Unit;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByVal;
@@ -418,13 +418,13 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 
 		if (actor.hasFsm()) {
 			// Then check for next FSM transition
-			Transitions transitions = actor.getFsm().getTransitions(fsmState);
-			for (Transition transition : transitions.getList()) {
+			for (Edge edge : fsmState.getOutgoing()) {
+				Transition transition = (Transition) edge;
 				Action action = transition.getAction();
 				if (isSchedulable(action)) {
 					// Update FSM state
 					if (checkOutputPattern(action.getOutputPattern())) {
-						fsmState = transition.getState();
+						fsmState = (State) transition.getTarget();
 						return action;
 					}
 					return null;

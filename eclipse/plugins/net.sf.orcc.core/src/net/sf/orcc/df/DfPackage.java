@@ -115,7 +115,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getAttribute()
 	 * @generated
 	 */
-	int ATTRIBUTE = 10;
+	int ATTRIBUTE = 11;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.ConnectionImpl <em>Connection</em>}' class.
@@ -125,7 +125,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getConnection()
 	 * @generated
 	 */
-	int CONNECTION = 11;
+	int CONNECTION = 12;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.InstanceImpl <em>Instance</em>}' class.
@@ -155,7 +155,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getWrapperString()
 	 * @generated
 	 */
-	int WRAPPER_STRING = 12;
+	int WRAPPER_STRING = 13;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.WrapperXmlImpl <em>Wrapper Xml</em>}' class.
@@ -165,7 +165,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getWrapperXml()
 	 * @generated
 	 */
-	int WRAPPER_XML = 13;
+	int WRAPPER_XML = 14;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.VertexImpl <em>Vertex</em>}' class.
@@ -185,7 +185,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getAction()
 	 * @generated
 	 */
-	int ACTION = 14;
+	int ACTION = 15;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.ActorImpl <em>Actor</em>}' class.
@@ -205,7 +205,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getFSM()
 	 * @generated
 	 */
-	int FSM = 15;
+	int FSM = 16;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.PatternImpl <em>Pattern</em>}' class.
@@ -215,7 +215,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getPattern()
 	 * @generated
 	 */
-	int PATTERN = 16;
+	int PATTERN = 17;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.PortImpl <em>Port</em>}' class.
@@ -235,7 +235,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getState()
 	 * @generated
 	 */
-	int STATE = 17;
+	int STATE = 18;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.TagImpl <em>Tag</em>}' class.
@@ -245,7 +245,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getTag()
 	 * @generated
 	 */
-	int TAG = 18;
+	int TAG = 19;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.TransitionImpl <em>Transition</em>}' class.
@@ -255,17 +255,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getTransition()
 	 * @generated
 	 */
-	int TRANSITION = 19;
-
-	/**
-	 * The meta object id for the '{@link net.sf.orcc.df.impl.TransitionsImpl <em>Transitions</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.df.impl.TransitionsImpl
-	 * @see net.sf.orcc.df.impl.DfPackageImpl#getTransitions()
-	 * @generated
-	 */
-	int TRANSITIONS = 20;
+	int TRANSITION = 20;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.PortToEIntegerObjectMapEntryImpl <em>Port To EInteger Object Map Entry</em>}' class.
@@ -1075,6 +1065,43 @@ public interface DfPackage extends EPackage {
 	int BROADCAST_FEATURE_COUNT = ENTITY_FEATURE_COUNT + 0;
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.df.impl.EdgeImpl <em>Edge</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.df.impl.EdgeImpl
+	 * @see net.sf.orcc.df.impl.DfPackageImpl#getEdge()
+	 * @generated
+	 */
+	int EDGE = 10;
+
+	/**
+	 * The feature id for the '<em><b>Source</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EDGE__SOURCE = 0;
+
+	/**
+	 * The feature id for the '<em><b>Target</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EDGE__TARGET = 1;
+
+	/**
+	 * The number of structural features of the '<em>Edge</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EDGE_FEATURE_COUNT = 2;
+
+	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1102,22 +1129,13 @@ public interface DfPackage extends EPackage {
 	int ATTRIBUTE_FEATURE_COUNT = 2;
 
 	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int CONNECTION__ATTRIBUTES = 0;
-
-	/**
 	 * The feature id for the '<em><b>Source</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int CONNECTION__SOURCE = 1;
+	int CONNECTION__SOURCE = EDGE__SOURCE;
 
 	/**
 	 * The feature id for the '<em><b>Target</b></em>' reference.
@@ -1126,7 +1144,16 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CONNECTION__TARGET = 2;
+	int CONNECTION__TARGET = EDGE__TARGET;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CONNECTION__ATTRIBUTES = EDGE_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Source Port</b></em>' reference.
@@ -1135,7 +1162,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CONNECTION__SOURCE_PORT = 3;
+	int CONNECTION__SOURCE_PORT = EDGE_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Target Port</b></em>' reference.
@@ -1144,7 +1171,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CONNECTION__TARGET_PORT = 4;
+	int CONNECTION__TARGET_PORT = EDGE_FEATURE_COUNT + 2;
 
 	/**
 	 * The number of structural features of the '<em>Connection</em>' class.
@@ -1153,7 +1180,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CONNECTION_FEATURE_COUNT = 5;
+	int CONNECTION_FEATURE_COUNT = EDGE_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>String</b></em>' attribute.
@@ -1351,7 +1378,34 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int STATE__NAME = 0;
+	int STATE__NAME = VERTEX__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int STATE__INCOMING = VERTEX__INCOMING;
+
+	/**
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int STATE__OUTGOING = VERTEX__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int STATE__ATTRIBUTES = VERTEX__ATTRIBUTES;
 
 	/**
 	 * The number of structural features of the '<em>State</em>' class.
@@ -1360,7 +1414,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int STATE_FEATURE_COUNT = 1;
+	int STATE_FEATURE_COUNT = VERTEX_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Identifiers</b></em>' attribute list.
@@ -1381,22 +1435,31 @@ public interface DfPackage extends EPackage {
 	int TAG_FEATURE_COUNT = 1;
 
 	/**
+	 * The feature id for the '<em><b>Source</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRANSITION__SOURCE = EDGE__SOURCE;
+
+	/**
+	 * The feature id for the '<em><b>Target</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRANSITION__TARGET = EDGE__TARGET;
+
+	/**
 	 * The feature id for the '<em><b>Action</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TRANSITION__ACTION = 0;
-
-	/**
-	 * The feature id for the '<em><b>State</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int TRANSITION__STATE = 1;
+	int TRANSITION__ACTION = EDGE_FEATURE_COUNT + 0;
 
 	/**
 	 * The number of structural features of the '<em>Transition</em>' class.
@@ -1405,34 +1468,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int TRANSITION_FEATURE_COUNT = 2;
-
-	/**
-	 * The feature id for the '<em><b>List</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int TRANSITIONS__LIST = 0;
-
-	/**
-	 * The feature id for the '<em><b>Source State</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int TRANSITIONS__SOURCE_STATE = 1;
-
-	/**
-	 * The number of structural features of the '<em>Transitions</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int TRANSITIONS_FEATURE_COUNT = 2;
+	int TRANSITION_FEATURE_COUNT = EDGE_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Key</b></em>' reference.
@@ -1670,28 +1706,6 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getConnection_Attributes();
-
-	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.df.Connection#getSource <em>Source</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Source</em>'.
-	 * @see net.sf.orcc.df.Connection#getSource()
-	 * @see #getConnection()
-	 * @generated
-	 */
-	EReference getConnection_Source();
-
-	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.df.Connection#getTarget <em>Target</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Target</em>'.
-	 * @see net.sf.orcc.df.Connection#getTarget()
-	 * @see #getConnection()
-	 * @generated
-	 */
-	EReference getConnection_Target();
 
 	/**
 	 * Returns the meta object for the reference '{@link net.sf.orcc.df.Connection#getSourcePort <em>Source Port</em>}'.
@@ -2211,17 +2225,6 @@ public interface DfPackage extends EPackage {
 	EClass getState();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.State#getName <em>Name</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Name</em>'.
-	 * @see net.sf.orcc.df.State#getName()
-	 * @see #getState()
-	 * @generated
-	 */
-	EAttribute getState_Name();
-
-	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Tag <em>Tag</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2262,49 +2265,6 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getTransition_Action();
-
-	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.df.Transition#getState <em>State</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>State</em>'.
-	 * @see net.sf.orcc.df.Transition#getState()
-	 * @see #getTransition()
-	 * @generated
-	 */
-	EReference getTransition_State();
-
-	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.df.Transitions <em>Transitions</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Transitions</em>'.
-	 * @see net.sf.orcc.df.Transitions
-	 * @generated
-	 */
-	EClass getTransitions();
-
-	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.df.Transitions#getList <em>List</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>List</em>'.
-	 * @see net.sf.orcc.df.Transitions#getList()
-	 * @see #getTransitions()
-	 * @generated
-	 */
-	EReference getTransitions_List();
-
-	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.df.Transitions#getSourceState <em>Source State</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Source State</em>'.
-	 * @see net.sf.orcc.df.Transitions#getSourceState()
-	 * @see #getTransitions()
-	 * @generated
-	 */
-	EReference getTransitions_SourceState();
 
 	/**
 	 * Returns the meta object for class '{@link java.util.Map.Entry <em>Port To EInteger Object Map Entry</em>}'.
@@ -2439,6 +2399,38 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getArgument_Variable();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.df.Edge <em>Edge</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Edge</em>'.
+	 * @see net.sf.orcc.df.Edge
+	 * @generated
+	 */
+	EClass getEdge();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.df.Edge#getSource <em>Source</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Source</em>'.
+	 * @see net.sf.orcc.df.Edge#getSource()
+	 * @see #getEdge()
+	 * @generated
+	 */
+	EReference getEdge_Source();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.df.Edge#getTarget <em>Target</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Target</em>'.
+	 * @see net.sf.orcc.df.Edge#getTarget()
+	 * @see #getEdge()
+	 * @generated
+	 */
+	EReference getEdge_Target();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Entity <em>Entity</em>}'.
@@ -2691,22 +2683,6 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EReference CONNECTION__ATTRIBUTES = eINSTANCE.getConnection_Attributes();
-
-		/**
-		 * The meta object literal for the '<em><b>Source</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference CONNECTION__SOURCE = eINSTANCE.getConnection_Source();
-
-		/**
-		 * The meta object literal for the '<em><b>Target</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference CONNECTION__TARGET = eINSTANCE.getConnection_Target();
 
 		/**
 		 * The meta object literal for the '<em><b>Source Port</b></em>' reference feature.
@@ -3115,14 +3091,6 @@ public interface DfPackage extends EPackage {
 		EClass STATE = eINSTANCE.getState();
 
 		/**
-		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute STATE__NAME = eINSTANCE.getState_Name();
-
-		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.TagImpl <em>Tag</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -3157,40 +3125,6 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EReference TRANSITION__ACTION = eINSTANCE.getTransition_Action();
-
-		/**
-		 * The meta object literal for the '<em><b>State</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference TRANSITION__STATE = eINSTANCE.getTransition_State();
-
-		/**
-		 * The meta object literal for the '{@link net.sf.orcc.df.impl.TransitionsImpl <em>Transitions</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.df.impl.TransitionsImpl
-		 * @see net.sf.orcc.df.impl.DfPackageImpl#getTransitions()
-		 * @generated
-		 */
-		EClass TRANSITIONS = eINSTANCE.getTransitions();
-
-		/**
-		 * The meta object literal for the '<em><b>List</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference TRANSITIONS__LIST = eINSTANCE.getTransitions_List();
-
-		/**
-		 * The meta object literal for the '<em><b>Source State</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference TRANSITIONS__SOURCE_STATE = eINSTANCE.getTransitions_SourceState();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.PortToEIntegerObjectMapEntryImpl <em>Port To EInteger Object Map Entry</em>}' class.
@@ -3295,6 +3229,32 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EReference ARGUMENT__VARIABLE = eINSTANCE.getArgument_Variable();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.df.impl.EdgeImpl <em>Edge</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.df.impl.EdgeImpl
+		 * @see net.sf.orcc.df.impl.DfPackageImpl#getEdge()
+		 * @generated
+		 */
+		EClass EDGE = eINSTANCE.getEdge();
+
+		/**
+		 * The meta object literal for the '<em><b>Source</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference EDGE__SOURCE = eINSTANCE.getEdge_Source();
+
+		/**
+		 * The meta object literal for the '<em><b>Target</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference EDGE__TARGET = eINSTANCE.getEdge_Target();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.EntityImpl <em>Entity</em>}' class.

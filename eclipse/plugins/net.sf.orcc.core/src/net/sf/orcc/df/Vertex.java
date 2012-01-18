@@ -82,9 +82,9 @@ public interface Vertex extends Nameable {
 	List<Entity> getHierarchy();
 
 	/**
-	 * @model type="Connection" opposite="target"
+	 * @model type="Edge" opposite="target"
 	 */
-	EList<Connection> getIncoming();
+	EList<Edge> getIncoming();
 
 	/**
 	 * Builds on-the-fly and returns a map from ports to incoming connections.
@@ -94,9 +94,9 @@ public interface Vertex extends Nameable {
 	Map<Port, Connection> getIncomingPortMap();
 
 	/**
-	 * @model type="Connection" opposite="source"
+	 * @model type="Edge" opposite="source"
 	 */
-	EList<Connection> getOutgoing();
+	EList<Edge> getOutgoing();
 
 	/**
 	 * Builds on-the-fly and returns a map from ports to outgoing connections.

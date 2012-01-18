@@ -35,6 +35,7 @@ import java.util.Map;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.Edge;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -76,7 +77,7 @@ public class BroadcastAdder extends DfSwitch<Void> {
 	}
 
 	protected void createBroadcast(String id, Port port,
-			List<Connection> outList) {
+			List<? extends Edge> outList) {
 		// Add broadcast vertex
 		Broadcast bcast = DfFactory.eINSTANCE.createBroadcast(outList.size(),
 				port.getType());
@@ -84,7 +85,7 @@ public class BroadcastAdder extends DfSwitch<Void> {
 		network.getEntities().add(bcast);
 
 		// Creates a connection between the vertex and the broadcast
-		Connection conn = outList.get(0);
+		Connection conn = (Connection) outList.get(0);
 		Connection incoming = DfFactory.eINSTANCE.createConnection(
 				conn.getSource(), conn.getSourcePort(), bcast,
 				bcast.getInput(), EcoreUtil.copyAll(conn.getAttributes()));
@@ -92,9 +93,10 @@ public class BroadcastAdder extends DfSwitch<Void> {
 
 		// Change the source of the other connections
 		int i = 0;
-		for (Connection connection : outList) {
+		for (Edge edge : outList) {
 			Port outputPort = bcast.getOutput("output_" + i);
 			i++;
+			Connection connection = (Connection) edge;
 			connection.setSourcePort(outputPort);
 			connection.setSource(bcast);
 		}
@@ -102,8 +104,7 @@ public class BroadcastAdder extends DfSwitch<Void> {
 
 	@Override
 	public Void casePort(Port port) {
-		List<Connection> connections = new ArrayList<Connection>(
-				port.getOutgoing());
+		List<Edge> connections = new ArrayList<Edge>(port.getOutgoing());
 		if (connections.size() > 1) {
 			createBroadcast(network.getName(), port, connections);
 		}

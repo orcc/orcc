@@ -33,12 +33,11 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import org.eclipse.emf.ecore.EObject;
-
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Edge;
+import net.sf.orcc.df.State;
 import net.sf.orcc.df.Transition;
-import net.sf.orcc.df.Transitions;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
@@ -46,6 +45,8 @@ import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
+
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * 
@@ -56,66 +57,26 @@ public class GuardsExtractor extends AbstractActorVisitor<Object> {
 
 	private Action currAction;
 
-	private Map<Action, List<Expression>> guards;
-	
-	private Map<EObject, List<Action>> priority;
-	
-	private Map<Action, List<InstLoad>> loadPeeks;
-
 	private List<Expression> guardList;
 
+	private Map<Action, List<Expression>> guards;
+
 	private List<InstLoad> loadList;
-	
-	private List<InstLoad> usedLoadsList;
-	
+
+	private Map<Action, List<InstLoad>> loadPeeks;
+
 	private int peekCnt = 0;
 
-	public GuardsExtractor(Map<Action, List<Expression>> guards, Map<EObject, List<Action>> priority, Map<Action, List<InstLoad>> loadPeeks) {
+	private Map<EObject, List<Action>> priority;
+
+	private List<InstLoad> usedLoadsList;
+
+	public GuardsExtractor(Map<Action, List<Expression>> guards,
+			Map<EObject, List<Action>> priority,
+			Map<Action, List<InstLoad>> loadPeeks) {
 		this.guards = guards;
 		this.priority = priority;
 		this.loadPeeks = loadPeeks;
-	}
-
-
-	// If the local variable derived from this variable is used in an expression
-	// then the variable is put directly in the expression instead
-	private void removeLoads() {
-		ListIterator<InstLoad> loadIter = loadList.listIterator();
-		while (loadIter.hasNext()) {
-			InstLoad ld = loadIter.next();
-			// do not remove the Loads related to Peeks
-			if (isFromPeek(ld)) {
-				usedLoadsList.add(ld);
-				ld.getTarget().getVariable().setName(
-						ld.getTarget().getVariable().getName() + "_peek_" + peekCnt++);
-				continue;
-			}
-			ListIterator<Expression> itr = guardList.listIterator();
-			while (itr.hasNext()) {
-				Expression element = itr.next();
-				replaceVarInExpr(element, ld);
-			}
-		}
-	}
-
-
-	private boolean isFromPeek(InstLoad ld) {
-		return currAction.getPeekPattern().contains(ld.getSource().getVariable());
-	}
-
-
-	// recursively searches through the expression and finds if the local
-	// variable derived from the Load is present
-	private void replaceVarInExpr(Expression expr, InstLoad ld) {
-		if (expr.isBinaryExpr()) {
-			replaceVarInExpr(((ExprBinary) expr).getE1(), ld);
-			replaceVarInExpr(((ExprBinary) expr).getE2(), ld);
-		} else if (expr.isVarExpr()) {
-			if (((ExprVar) expr).getUse().getVariable() == ld.getTarget().getVariable()) {
-				((ExprVar) expr).setUse(IrFactory.eINSTANCE.createUse(ld
-						.getSource().getVariable()));
-			}
-		}
 	}
 
 	@Override
@@ -149,9 +110,10 @@ public class GuardsExtractor extends AbstractActorVisitor<Object> {
 		// actionScheduler->transition<List> also in order
 		// of priority
 		if (actor.hasFsm()) {
-			for (Transitions transitions : actor.getFsm().getTransitions()) {
+			for (State state : actor.getFsm().getStates()) {
 				List<Action> prevActions = new ArrayList<Action>();
-				for (Transition trans : transitions.getList()) {
+				for (Edge edge : state.getOutgoing()) {
+					Transition trans = (Transition) edge;
 					priority.put(trans, new ArrayList<Action>());
 					for (Action a : prevActions) {
 						priority.get(trans).add(a);
@@ -160,7 +122,7 @@ public class GuardsExtractor extends AbstractActorVisitor<Object> {
 				}
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -177,6 +139,50 @@ public class GuardsExtractor extends AbstractActorVisitor<Object> {
 	public Object caseInstLoad(InstLoad load) {
 		loadList.add(load);
 		return null;
+	}
+
+	private boolean isFromPeek(InstLoad ld) {
+		return currAction.getPeekPattern().contains(
+				ld.getSource().getVariable());
+	}
+
+	// If the local variable derived from this variable is used in an expression
+	// then the variable is put directly in the expression instead
+	private void removeLoads() {
+		ListIterator<InstLoad> loadIter = loadList.listIterator();
+		while (loadIter.hasNext()) {
+			InstLoad ld = loadIter.next();
+			// do not remove the Loads related to Peeks
+			if (isFromPeek(ld)) {
+				usedLoadsList.add(ld);
+				ld.getTarget()
+						.getVariable()
+						.setName(
+								ld.getTarget().getVariable().getName()
+										+ "_peek_" + peekCnt++);
+				continue;
+			}
+			ListIterator<Expression> itr = guardList.listIterator();
+			while (itr.hasNext()) {
+				Expression element = itr.next();
+				replaceVarInExpr(element, ld);
+			}
+		}
+	}
+
+	// recursively searches through the expression and finds if the local
+	// variable derived from the Load is present
+	private void replaceVarInExpr(Expression expr, InstLoad ld) {
+		if (expr.isBinaryExpr()) {
+			replaceVarInExpr(((ExprBinary) expr).getE1(), ld);
+			replaceVarInExpr(((ExprBinary) expr).getE2(), ld);
+		} else if (expr.isVarExpr()) {
+			if (((ExprVar) expr).getUse().getVariable() == ld.getTarget()
+					.getVariable()) {
+				((ExprVar) expr).setUse(IrFactory.eINSTANCE.createUse(ld
+						.getSource().getVariable()));
+			}
+		}
 	}
 
 }

@@ -34,6 +34,7 @@ import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Edge;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
@@ -102,8 +103,9 @@ public class RepetitionsAnalyzer {
 
 		rationals.put(vertex, rate);
 
-		for (Connection conn : vertex.getOutgoing()) {
-			Vertex tgt = conn.getTarget();
+		for (Edge edge : vertex.getOutgoing()) {
+			Connection conn = (Connection) edge;
+			Vertex tgt = edge.getTarget();
 			if (tgt.isInstance()) {
 				CSDFMoC tgtMoC = (CSDFMoC) ((Instance) tgt).getMoC();
 				if (!rationals.containsKey(tgt)) {
@@ -114,8 +116,9 @@ public class RepetitionsAnalyzer {
 			}
 		}
 
-		for (Connection conn : vertex.getIncoming()) {
-			Vertex src = conn.getSource();
+		for (Edge edge : vertex.getIncoming()) {
+			Connection conn = (Connection) edge;
+			Vertex src = edge.getSource();
 			if (src.isInstance()) {
 				CSDFMoC srcMoC = (CSDFMoC) ((Instance) src).getMoC();
 				if (!rationals.containsKey(src)) {

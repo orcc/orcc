@@ -43,6 +43,7 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.State;
+import net.sf.orcc.df.Transition;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
@@ -52,7 +53,6 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.EcoreHelper;
-import net.sf.orcc.util.UniqueEdge;
 
 import org.jgrapht.DirectedGraph;
 
@@ -304,12 +304,12 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 			}
 		} else {
 			// with an FSM: visits all transitions
-			DirectedGraph<State, UniqueEdge> graph = fsm.getGraph();
-			Set<UniqueEdge> edges = graph.edgeSet();
-			for (UniqueEdge edge : edges) {
+			DirectedGraph<State, Transition> graph = fsm.getGraph();
+			Set<Transition> edges = graph.edgeSet();
+			for (Transition edge : edges) {
 				State source = graph.getEdgeSource(edge);
 				State target = graph.getEdgeTarget(edge);
-				Action action = (Action) edge.getObject();
+				Action action = edge.getAction();
 				visit(source, target, action);
 			}
 		}

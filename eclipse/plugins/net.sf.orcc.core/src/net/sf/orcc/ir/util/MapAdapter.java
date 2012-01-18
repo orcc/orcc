@@ -35,17 +35,13 @@ import java.util.Map;
 
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.State;
-import net.sf.orcc.df.Transitions;
 import net.sf.orcc.df.impl.ActorImpl;
-import net.sf.orcc.df.impl.FSMImpl;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.ProcedureImpl;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
-import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines an adapter that maintains a map of variables from a list
@@ -70,12 +66,6 @@ public class MapAdapter extends AdapterImpl {
 			map = ((ActorImpl) target).getStateVariablesMap();
 			key = ((Var) object).getName();
 			((Map<Object, Object>) map).put(key, object);
-		} else if (feature == DfPackage.eINSTANCE.getFSM_Transitions()) {
-			map = ((FSMImpl) target).getTransitionsMap();
-			key = ((Transitions) object).getSourceState();
-			if (key != null) {
-				((Map<Object, Object>) map).put(key, object);
-			}
 		}
 	}
 
@@ -116,10 +106,6 @@ public class MapAdapter extends AdapterImpl {
 			}
 			break;
 		}
-
-		case Notification.SET:
-			set(notification, notification.getNewValue());
-			break;
 		}
 	}
 
@@ -137,25 +123,6 @@ public class MapAdapter extends AdapterImpl {
 			map = ((ActorImpl) target).getStateVariablesMap();
 			key = ((Var) object).getName();
 			((Map<Object, Object>) map).remove(key);
-		} else if (feature == DfPackage.eINSTANCE.getFSM_Transitions()) {
-			map = ((FSMImpl) target).getTransitionsMap();
-			key = ((Transitions) object).getSourceState();
-			if (key != null) {
-				((Map<Object, Object>) map).remove(key);
-			}
-		}
-	}
-
-	private void set(Notification notification, Object object) {
-		Object feature = notification.getFeature();
-		if (feature == DfPackage.eINSTANCE.getTransitions_SourceState()) {
-			Transitions transitions = (Transitions) target;
-			EObject cter = transitions.eContainer();
-			if (cter instanceof FSMImpl) {
-				Map<State, Transitions> map = ((FSMImpl) cter)
-						.getTransitionsMap();
-				map.put((State) object, transitions);
-			}
 		}
 	}
 

@@ -94,6 +94,15 @@ public interface DfFactory extends EFactory {
 	Argument createArgument();
 
 	/**
+	 * Returns a new object of class '<em>Edge</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Edge</em>'.
+	 * @generated
+	 */
+	Edge createEdge();
+
+	/**
 	 * Returns a new object of class '<em>Unit</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -307,16 +316,7 @@ public interface DfFactory extends EFactory {
 	 */
 	Transition createTransition();
 
-	Transition createTransition(Action action, State target);
-
-	/**
-	 * Returns a new object of class '<em>Transitions</em>'.
-	 * <!-- begin-user-doc
-	 * --> <!-- end-user-doc -->
-	 * @return a new object of class '<em>Transitions</em>'.
-	 * @generated
-	 */
-	Transitions createTransitions();
+	Transition createTransition(State source, Action action, State target);
 
 	/**
 	 * Returns a new object of class '<em>Wrapper String</em>'. <!--

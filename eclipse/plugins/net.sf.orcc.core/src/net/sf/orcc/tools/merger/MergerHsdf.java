@@ -149,7 +149,7 @@ public class MergerHsdf extends DfSwitch<Actor> {
 		copier.copyReferences();
 
 		for (Port port : network.getInputs()) {
-			Connection connection = port.getOutgoing().get(0);
+			Connection connection = (Connection) port.getOutgoing().get(0);
 			Vertex tgt = connection.getTarget();
 			CSDFMoC moc = (CSDFMoC) ((Instance) tgt).getMoC();
 			int cns = moc.getNumTokensConsumed(connection.getTargetPort());
@@ -159,7 +159,7 @@ public class MergerHsdf extends DfSwitch<Actor> {
 		}
 
 		for (Port port : network.getOutputs()) {
-			Connection connection = port.getIncoming().get(0);
+			Connection connection = (Connection) port.getIncoming().get(0);
 			Vertex src = connection.getSource();
 			CSDFMoC moc = (CSDFMoC) ((Instance) src).getMoC();
 			int prd = moc.getNumTokensProduced(connection.getSourcePort());

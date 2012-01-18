@@ -42,12 +42,12 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.Edge;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Transition;
-import net.sf.orcc.df.Transitions;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.Invocation;
@@ -55,7 +55,6 @@ import net.sf.orcc.moc.MoC;
 import net.sf.orcc.moc.MocFactory;
 import net.sf.orcc.moc.QSDFMoC;
 import net.sf.orcc.moc.SDFMoC;
-import net.sf.orcc.util.UniqueEdge;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -431,9 +430,9 @@ public class ActorClassifier extends DfSwitch<Object> {
 	 * @return <code>true</code> if the given FSM has cyclo-static form
 	 */
 	private boolean isCycloStaticFsm(FSM fsm) {
-		DirectedGraph<State, UniqueEdge> graph = fsm.getGraph();
-		ConnectivityInspector<State, UniqueEdge> inspector;
-		inspector = new ConnectivityInspector<State, UniqueEdge>(graph);
+		DirectedGraph<State, Transition> graph = fsm.getGraph();
+		ConnectivityInspector<State, Transition> inspector;
+		inspector = new ConnectivityInspector<State, Transition>(graph);
 		State initial = fsm.getInitialState();
 		return inspector.pathExists(initial, initial);
 	}
@@ -449,14 +448,14 @@ public class ActorClassifier extends DfSwitch<Object> {
 	 * @return <code>true</code> if the given FSM has quasi-static form
 	 */
 	private boolean isQuasiStaticFsm(FSM fsm) {
-		DirectedGraph<State, UniqueEdge> graph = fsm.getGraph();
+		DirectedGraph<State, Transition> graph = fsm.getGraph();
 		State initialState = fsm.getInitialState();
-		Set<UniqueEdge> edges = graph.outgoingEdgesOf(initialState);
-		for (UniqueEdge edge : edges) {
+		Set<Transition> edges = graph.outgoingEdgesOf(initialState);
+		for (Transition edge : edges) {
 			State target = graph.getEdgeTarget(edge);
 
-			DepthFirstIterator<State, UniqueEdge> it;
-			it = new DepthFirstIterator<State, UniqueEdge>(graph, target);
+			DepthFirstIterator<State, Transition> it;
+			it = new DepthFirstIterator<State, Transition>(graph, target);
 
 			boolean cyclesBackToInitialState = false;
 			while (it.hasNext()) {
@@ -483,11 +482,12 @@ public class ActorClassifier extends DfSwitch<Object> {
 	private boolean isTimeDependent() {
 		if (actor.hasFsm()) {
 			FSM fsm = actor.getFsm();
-			for (Transitions transitions : fsm.getTransitions()) {
+			for (State state : fsm.getStates()) {
 				// add anonymous actions
 				List<Action> actions = new ArrayList<Action>(
 						actor.getActionsOutsideFsm());
-				for (Transition transition : transitions.getList()) {
+				for (Edge edge : state.getOutgoing()) {
+					Transition transition = (Transition) edge;
 					actions.add(transition.getAction());
 				}
 

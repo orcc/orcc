@@ -462,7 +462,7 @@ if (<checkInputPattern(transition.action.inputPattern)>isSchedulable_<transition
 	<endif>
 	<transition.action.body.name>();
 	i++;
-	goto l_<transition.state.name>;
+	goto l_<transition.target.name>;
 } else {
 	<schedulingStates(sourceState, restTransitions)>
 }
@@ -489,40 +489,36 @@ si-\>reason = starved;
 
 schedulingStates(sourceState, transitionsList) ::= <<
 <if (first(transitionsList))
-><actionTestState(sourceState=sourceState, transition=first(transitionsList), restTransitions=rest(transitionsList))><
+><actionTestState(sourceState, first(transitionsList), rest(transitionsList))><
 else
-><printTransitionPattern(pattern=instance.actor.templateData.transitionPattern.(transitions))>
+><printTransitionPattern(instance.actor.templateData.transitionPattern.(sourceState))>
 _FSM_state = my_state_<sourceState.name>;
 goto finished;<
 endif>
 >>
 
-printTransition(transitions) ::= <<
+printTransition(state) ::= <<
 
 
-l_<transitions.sourceState.name>:
+l_<state.name>:
 	<if (actions)>
 	<instance.name>_outside_FSM_scheduler(si);
 	i += si-\>num_firings;
 	<endif>
-	<if (transitions.list.empty)>
-	printf("stuck in state \"<transitions.sourceState.name>\" in the instance <instance.name>\n");
+	<if (state.outgoing.empty)>
+	printf("stuck in state \"<state.name>\" in the instance <instance.name>\n");
 	wait_for_key();
 	exit(1);
 	<else>
-	<schedulingStates(transitions.sourceState, transitions.list)>
+	<schedulingStates(state, state.outgoing)>
 	<endif>
 >>
 
-switchTransition(transitions) ::= <<
-
-case my_state_<transitions.sourceState.name>:
-	goto l_<transitions.sourceState.name>;
->>
-
-printSwitch(transitions) ::= <<
+printSwitch(states) ::= <<
 switch (_FSM_state) {
-<transitions: switchTransition()>
+<states: {state|
+case my_state_<state.name>:
+	goto l_<state.name>;<\n>}>
 default:
 	printf("unknown state in <instance.name>.c : %s\n", stateNames[_FSM_state]);
 	wait_for_key();
@@ -552,10 +548,10 @@ void <instance.name>_scheduler(struct schedinfo_s *si) {
 <endif>
 
 	// jump to FSM state 
-	<printSwitch(fsm.transitions)>
+	<printSwitch(fsm.states)>
 
 	// FSM transitions
-<fsm.transitions: printTransition()>
+<fsm.states: printTransition()>
 finished:
 <if(options.enableTrace)>
 	<printCloseFiles()>

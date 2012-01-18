@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Edge;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Vertex;
 
@@ -70,8 +70,8 @@ public class TopologicalSorter {
 			currentTime++;
 			timeStamps.put(vertex, new TimeStamp(currentTime, 0));
 
-			for (Connection connection : vertex.getOutgoing()) {
-				Vertex tgtVertex = connection.getTarget();
+			for (Edge edge : vertex.getOutgoing()) {
+				Vertex tgtVertex = edge.getTarget();
 				if (!defined.contains(tgtVertex)) {
 					dfsVisit(tgtVertex);
 				}

@@ -28,16 +28,13 @@
  */
 package net.sf.orcc.df;
 
-
-import org.eclipse.emf.ecore.EObject;
-
 /**
  * This class defines a transition of a Finite State Machine.
  * 
  * @author Matthieu Wipliez
  * @model
  */
-public interface Transition extends EObject {
+public interface Transition extends Edge {
 
 	/**
 	 * Returns the list of actions that are the target of this transition.
@@ -48,27 +45,11 @@ public interface Transition extends EObject {
 	Action getAction();
 
 	/**
-	 * Returns the list of states that are the target of this transition.
-	 * 
-	 * @return the list of states that are the target of this transition
-	 * @model
-	 */
-	State getState();
-
-	/**
 	 * Sets the action that is the target of this transition.
 	 * 
 	 * @param action
 	 *            the action that is the target of this transition
 	 */
 	void setAction(Action action);
-
-	/**
-	 * Sets the state that is the target of this transition.
-	 * 
-	 * @param state
-	 *            the state that is the target of this transition
-	 */
-	void setState(State state);
 
 }

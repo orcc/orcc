@@ -28,30 +28,11 @@
  */
 package net.sf.orcc.df;
 
-import org.eclipse.emf.ecore.EObject;
-
 /**
  * This class defines a state of a Finite State Machine.
  * 
  * @author Matthieu Wipliez
  * @model
  */
-public interface State extends EObject {
-
-	/**
-	 * Returns the name of this state.
-	 * 
-	 * @return the name of this state
-	 * @model dataType="org.eclipse.emf.ecore.EString"
-	 */
-	String getName();
-
-	/**
-	 * Sets the name of this state.
-	 * 
-	 * @param name
-	 *            the name of this state
-	 */
-	void setName(String name);
-
+public interface State extends Vertex {
 }

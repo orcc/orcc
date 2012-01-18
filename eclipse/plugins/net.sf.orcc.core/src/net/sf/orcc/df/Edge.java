@@ -26,44 +26,50 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.df.impl;
+package net.sf.orcc.df;
 
-import net.sf.orcc.df.Broadcast;
-import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.Port;
-
-import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EObject;
 
 /**
- * @generated
+ * This class represents an edge of a graph. An edge has a source and a target
+ * vertex.
+ * 
+ * @author Matthieu Wipliez
+ * @author Herve Yviquel
+ * @model
  */
-public class BroadcastImpl extends EntityImpl implements Broadcast {
+public interface Edge extends EObject {
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
+	 * Returns this connection's source (may be <code>null</code>).
+	 * 
+	 * @return this connection's source (may be <code>null</code>)
+	 * @model
 	 */
-	protected BroadcastImpl() {
-		super();
-	}
+	Vertex getSource();
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
+	 * Returns this connection's target (may be <code>null</code>).
+	 * 
+	 * @return this connection's target (may be <code>null</code>)
+	 * @model
 	 */
-	@Override
-	protected EClass eStaticClass() {
-		return DfPackage.Literals.BROADCAST;
-	}
+	Vertex getTarget();
 
-	@Override
-	public boolean isBroadcast() {
-		return true;
-	}
+	/**
+	 * Sets the source of this connection to the given vertex
+	 * 
+	 * @param vertex
+	 *            a vertex
+	 */
+	void setSource(Vertex vertex);
 
-	@Override
-	public Port getInput() {
-		return getInputs().get(0);
-	}
+	/**
+	 * Sets the target of this connection to the given vertex
+	 * 
+	 * @param vertex
+	 *            a vertex
+	 */
+	void setTarget(Vertex vertex);
 
 }

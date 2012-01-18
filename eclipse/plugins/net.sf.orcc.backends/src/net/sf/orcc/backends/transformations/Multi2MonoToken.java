@@ -45,6 +45,7 @@ import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Tag;
+import net.sf.orcc.df.Transition;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstReturn;
@@ -58,7 +59,6 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.EcoreHelper;
-import net.sf.orcc.util.UniqueEdge;
 
 import org.eclipse.emf.common.util.EList;
 import org.jgrapht.DirectedGraph;
@@ -723,10 +723,10 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 * 
 	 */
 	private void modifyNoRepeatActionsInFSM() {
-		DirectedGraph<State, UniqueEdge> graph = fsm.getGraph();
-		Set<UniqueEdge> edges = graph.edgeSet();
-		for (UniqueEdge edge : edges) {
-			Action action = (Action) edge.getObject();
+		DirectedGraph<State, Transition> graph = fsm.getGraph();
+		Set<Transition> edges = graph.edgeSet();
+		for (Transition edge : edges) {
+			Action action = edge.getAction();
 			if (noRepeatActions.contains(action)) {
 				ListIterator<Port> it = action.getInputPattern().getPorts()
 						.listIterator();
@@ -833,12 +833,12 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 			}
 			if (transformFSM == true) {
 				// with an FSM: visits all transitions
-				DirectedGraph<State, UniqueEdge> graph = fsm.getGraph();
-				Set<UniqueEdge> edges = graph.edgeSet();
-				for (UniqueEdge edge : edges) {
+				DirectedGraph<State, Transition> graph = fsm.getGraph();
+				Set<Transition> edges = graph.edgeSet();
+				for (Transition edge : edges) {
 					State source = graph.getEdgeSource(edge);
 					State target = graph.getEdgeTarget(edge);
-					Action action = (Action) edge.getObject();
+					Action action = edge.getAction();
 					visitTransition(source, target, action);
 				}
 				modifyNoRepeatActionsInFSM();

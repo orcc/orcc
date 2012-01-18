@@ -37,6 +37,7 @@ import java.util.Map;
 import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.Edge;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
@@ -66,7 +67,7 @@ public abstract class VertexImpl extends NameableImpl implements Vertex {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Connection> incoming;
+	protected EList<Edge> incoming;
 	/**
 	 * The cached value of the '{@link #getOutgoing() <em>Outgoing</em>}' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -74,7 +75,7 @@ public abstract class VertexImpl extends NameableImpl implements Vertex {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Connection> outgoing;
+	protected EList<Edge> outgoing;
 	/**
 	 * The cached value of the '{@link #getAttributes() <em>Attributes</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -176,11 +177,11 @@ public abstract class VertexImpl extends NameableImpl implements Vertex {
 		switch (featureID) {
 			case DfPackage.VERTEX__INCOMING:
 				getIncoming().clear();
-				getIncoming().addAll((Collection<? extends Connection>)newValue);
+				getIncoming().addAll((Collection<? extends Edge>)newValue);
 				return;
 			case DfPackage.VERTEX__OUTGOING:
 				getOutgoing().clear();
-				getOutgoing().addAll((Collection<? extends Connection>)newValue);
+				getOutgoing().addAll((Collection<? extends Edge>)newValue);
 				return;
 			case DfPackage.VERTEX__ATTRIBUTES:
 				getAttributes().clear();
@@ -276,9 +277,9 @@ public abstract class VertexImpl extends NameableImpl implements Vertex {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Connection> getIncoming() {
+	public EList<Edge> getIncoming() {
 		if (incoming == null) {
-			incoming = new EObjectWithInverseResolvingEList<Connection>(Connection.class, this, DfPackage.VERTEX__INCOMING, DfPackage.CONNECTION__TARGET);
+			incoming = new EObjectWithInverseResolvingEList<Edge>(Edge.class, this, DfPackage.VERTEX__INCOMING, DfPackage.EDGE__TARGET);
 		}
 		return incoming;
 	}
@@ -286,8 +287,11 @@ public abstract class VertexImpl extends NameableImpl implements Vertex {
 	@Override
 	public Map<Port, Connection> getIncomingPortMap() {
 		Map<Port, Connection> map = new HashMap<Port, Connection>();
-		for (Connection connection : getIncoming()) {
-			map.put(connection.getTargetPort(), connection);
+		for (Edge edge : getIncoming()) {
+			if (edge instanceof Connection) {
+				Connection connection = (Connection) edge;
+				map.put(connection.getTargetPort(), connection);
+			}
 		}
 		return map;
 	}
@@ -296,9 +300,9 @@ public abstract class VertexImpl extends NameableImpl implements Vertex {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Connection> getOutgoing() {
+	public EList<Edge> getOutgoing() {
 		if (outgoing == null) {
-			outgoing = new EObjectWithInverseResolvingEList<Connection>(Connection.class, this, DfPackage.VERTEX__OUTGOING, DfPackage.CONNECTION__SOURCE);
+			outgoing = new EObjectWithInverseResolvingEList<Edge>(Edge.class, this, DfPackage.VERTEX__OUTGOING, DfPackage.EDGE__SOURCE);
 		}
 		return outgoing;
 	}
@@ -306,14 +310,17 @@ public abstract class VertexImpl extends NameableImpl implements Vertex {
 	@Override
 	public Map<Port, List<Connection>> getOutgoingPortMap() {
 		Map<Port, List<Connection>> map = new HashMap<Port, List<Connection>>();
-		for (Connection connection : getOutgoing()) {
-			Port source = connection.getSourcePort();
-			List<Connection> conns = map.get(source);
-			if (conns == null) {
-				conns = new ArrayList<Connection>(1);
-				map.put(source, conns);
+		for (Edge edge : getOutgoing()) {
+			if (edge instanceof Connection) {
+				Connection connection = (Connection) edge;
+				Port source = connection.getSourcePort();
+				List<Connection> conns = map.get(source);
+				if (conns == null) {
+					conns = new ArrayList<Connection>(1);
+					map.put(source, conns);
+				}
+				conns.add(connection);
 			}
-			conns.add(connection);
 		}
 		return map;
 	}
@@ -321,8 +328,8 @@ public abstract class VertexImpl extends NameableImpl implements Vertex {
 	@Override
 	public List<Vertex> getPredecessors() {
 		List<Vertex> predecessors = new ArrayList<Vertex>();
-		for (Connection connection : getIncoming()) {
-			Vertex source = connection.getSource();
+		for (Edge edge : getIncoming()) {
+			Vertex source = edge.getSource();
 			if (!predecessors.contains(source)) {
 				predecessors.add(source);
 			}
@@ -333,8 +340,8 @@ public abstract class VertexImpl extends NameableImpl implements Vertex {
 	@Override
 	public List<Vertex> getSuccessors() {
 		List<Vertex> successors = new ArrayList<Vertex>();
-		for (Connection connection : getOutgoing()) {
-			Vertex target = connection.getTarget();
+		for (Edge edge : getOutgoing()) {
+			Vertex target = edge.getTarget();
 			if (!successors.contains(target)) {
 				successors.add(target);
 			}

@@ -35,6 +35,7 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Entity/outputs"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Entity/parameters"/>
     </genClasses>
+    <genClasses ecoreClass="Df.ecore#//EntitySpecific"/>
     <genClasses ecoreClass="Df.ecore#//Actor">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Actor/actions"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Actor/actionsOutsideFsm"/>
@@ -62,8 +63,6 @@
     </genClasses>
     <genClasses ecoreClass="Df.ecore#//Connection">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Connection/attributes"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Connection/source"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Connection/target"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Connection/sourcePort"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Connection/targetPort"/>
     </genClasses>
@@ -93,19 +92,12 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Pattern/variables"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Pattern/varToPortMap"/>
     </genClasses>
-    <genClasses ecoreClass="Df.ecore#//State">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//State/name"/>
-    </genClasses>
+    <genClasses ecoreClass="Df.ecore#//State"/>
     <genClasses ecoreClass="Df.ecore#//Tag">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Tag/identifiers"/>
     </genClasses>
     <genClasses ecoreClass="Df.ecore#//Transition">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Transition/action"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Transition/state"/>
-    </genClasses>
-    <genClasses ecoreClass="Df.ecore#//Transitions">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Transitions/list"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Transitions/sourceState"/>
     </genClasses>
     <genClasses ecoreClass="Df.ecore#//PortToEIntegerObjectMapEntry">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//PortToEIntegerObjectMapEntry/key"/>
@@ -122,6 +114,10 @@
     <genClasses ecoreClass="Df.ecore#//Argument">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Argument/value"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Argument/variable"/>
+    </genClasses>
+    <genClasses ecoreClass="Df.ecore#//Edge">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Edge/source"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Edge/target"/>
     </genClasses>
   </genPackages>
   <genPackages prefix="Ir" basePackage="net.sf.orcc" disposableProviderFactory="true"

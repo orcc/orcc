@@ -32,7 +32,6 @@ import java.io.File;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.util.UniqueEdge;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
@@ -65,7 +64,7 @@ public interface FSM extends EObject {
 	 * 
 	 * @return a graph representation of this FSM
 	 */
-	DirectedGraph<State, UniqueEdge> getGraph();
+	DirectedGraph<State, Transition> getGraph();
 
 	/**
 	 * Returns the initial state.
@@ -95,21 +94,12 @@ public interface FSM extends EObject {
 	List<Action> getTargetActions(State source);
 
 	/**
-	 * Returns the transition associated with the given state.
-	 * 
-	 * @param state
-	 *            a state
-	 * @return the transition associated with the given state
-	 */
-	Transitions getTransitions(State state);
-
-	/**
 	 * Returns a list of transitions.
 	 * 
 	 * @return a list of transitions.
 	 * @model containment="true"
 	 */
-	EList<Transitions> getTransitions();
+	EList<Transition> getTransitions();
 
 	/**
 	 * Prints a graph representation of this FSM.

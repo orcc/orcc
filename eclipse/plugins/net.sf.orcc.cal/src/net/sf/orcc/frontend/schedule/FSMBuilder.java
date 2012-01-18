@@ -47,8 +47,6 @@ import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Tag;
-import net.sf.orcc.df.Transition;
-import net.sf.orcc.df.Transitions;
 import net.sf.orcc.frontend.Frontend;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.UniqueEdge;
@@ -98,7 +96,7 @@ public class FSMBuilder {
 	 * @param targets
 	 *            an (action, state) map of targets
 	 */
-	private void addTransitions(Transitions transitions,
+	private void addTransitions(FSM fsm, State source,
 			Map<Action, State> targets) {
 		// Note: The higher the priority the lower the rank
 		List<Action> nextActions = new ArrayList<Action>(targets.keySet());
@@ -115,9 +113,7 @@ public class FSMBuilder {
 		// add the transitions in the right order
 		for (Action action : nextActions) {
 			State target = targets.get(action);
-			Transition transition = DfFactory.eINSTANCE.createTransition(
-					action, target);
-			transitions.getList().add(transition);
+			fsm.addTransition(source, action, target);
 		}
 	}
 
@@ -173,12 +169,8 @@ public class FSMBuilder {
 		for (AstState astSource : astFsm.getStates()) {
 			Map<Action, State> targets = getTargets(astSource, actionList);
 
-			Transitions transitions = DfFactory.eINSTANCE.createTransitions();
 			State source = (State) Frontend.getMapping(astSource, false);
-			transitions.setSourceState(source);
-
-			addTransitions(transitions, targets);
-			fsm.getTransitions().add(transitions);
+			addTransitions(fsm, source, targets);
 		}
 
 		return fsm;

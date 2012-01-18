@@ -34,11 +34,11 @@ import java.util.Map;
 import net.sf.orcc.backends.instructions.InstCast;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Edge;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.Transition;
-import net.sf.orcc.df.Transitions;
+import net.sf.orcc.df.State;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -193,11 +193,11 @@ public class LLVMTemplateData {
 			actionScheduler.put(fsm.getStates(), id++);
 			actionScheduler.put(fsm.getTransitions(), id++);
 
-			for (Transitions transitions : fsm.getTransitions()) {
-				actionScheduler.put(transitions, id++);
-				actionScheduler.put(transitions.getList(), id++);
-				for (Transition transition : transitions.getList()) {
-					actionScheduler.put(transition, id++);
+			for (State state : fsm.getStates()) {
+				actionScheduler.put(state, id++);
+				actionScheduler.put(state.getOutgoing(), id++);
+				for (Edge edge : state.getOutgoing()) {
+					actionScheduler.put(edge, id++);
 				}
 			}
 		}

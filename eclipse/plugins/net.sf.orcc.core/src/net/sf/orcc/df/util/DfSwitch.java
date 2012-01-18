@@ -8,7 +8,6 @@ package net.sf.orcc.df.util;
 
 import java.util.Map;
 
-import net.sf.orcc.df.*;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
@@ -16,16 +15,19 @@ import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.Nameable;
+import net.sf.orcc.df.Edge;
+import net.sf.orcc.df.Entity;
+import net.sf.orcc.df.EntitySpecific;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Nameable;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Tag;
 import net.sf.orcc.df.Transition;
-import net.sf.orcc.df.Transitions;
+import net.sf.orcc.df.Unit;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.WrapperString;
 import net.sf.orcc.df.WrapperXml;
@@ -172,6 +174,12 @@ public class DfSwitch<T> extends Switch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
+			case DfPackage.EDGE: {
+				Edge edge = (Edge)theEObject;
+				T result = caseEdge(edge);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
 			case DfPackage.ATTRIBUTE: {
 				Attribute attribute = (Attribute)theEObject;
 				T result = caseAttribute(attribute);
@@ -181,6 +189,7 @@ public class DfSwitch<T> extends Switch<T> {
 			case DfPackage.CONNECTION: {
 				Connection connection = (Connection)theEObject;
 				T result = caseConnection(connection);
+				if (result == null) result = caseEdge(connection);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -217,6 +226,8 @@ public class DfSwitch<T> extends Switch<T> {
 			case DfPackage.STATE: {
 				State state = (State)theEObject;
 				T result = caseState(state);
+				if (result == null) result = caseVertex(state);
+				if (result == null) result = caseNameable(state);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -229,12 +240,7 @@ public class DfSwitch<T> extends Switch<T> {
 			case DfPackage.TRANSITION: {
 				Transition transition = (Transition)theEObject;
 				T result = caseTransition(transition);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.TRANSITIONS: {
-				Transitions transitions = (Transitions)theEObject;
-				T result = caseTransitions(transitions);
+				if (result == null) result = caseEdge(transition);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -507,21 +513,6 @@ public class DfSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Transitions</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Transitions</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseTransitions(Transitions object) {
-		return null;
-	}
-
-	/**
 	 * Returns the result of interpreting the object as an instance of '<em>Port To EInteger Object Map Entry</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
@@ -578,6 +569,21 @@ public class DfSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseArgument(Argument object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Edge</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Edge</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseEdge(Edge object) {
 		return null;
 	}
 

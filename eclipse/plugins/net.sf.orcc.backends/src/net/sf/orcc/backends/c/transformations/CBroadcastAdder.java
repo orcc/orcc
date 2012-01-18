@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Edge;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.transformations.BroadcastAdder;
@@ -58,10 +59,10 @@ public class CBroadcastAdder extends BroadcastAdder {
 
 	@Override
 	public Void caseVertex(Vertex vertex) {
-		List<Connection> connections = new ArrayList<Connection>(
-				vertex.getOutgoing());
+		List<Edge> edges = new ArrayList<Edge>(vertex.getOutgoing());
 		Map<Port, List<Connection>> outMap = vertex.getOutgoingPortMap();
-		for (Connection connection : connections) {
+		for (Edge edge : edges) {
+			Connection connection = (Connection) edge;
 			Port srcPort = connection.getSourcePort();
 			if (srcPort != null) {
 				List<Connection> outList = outMap.get(srcPort);

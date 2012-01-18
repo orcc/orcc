@@ -18,6 +18,7 @@ import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.Edge;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.EntitySpecific;
 import net.sf.orcc.df.FSM;
@@ -28,7 +29,6 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Tag;
 import net.sf.orcc.df.Transition;
-import net.sf.orcc.df.Transitions;
 import net.sf.orcc.df.Unit;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.WrapperString;
@@ -104,6 +104,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 			case DfPackage.ACTOR: return createActor();
 			case DfPackage.NETWORK: return createNetwork();
 			case DfPackage.BROADCAST: return createBroadcast();
+			case DfPackage.EDGE: return createEdge();
 			case DfPackage.ATTRIBUTE: return createAttribute();
 			case DfPackage.CONNECTION: return createConnection();
 			case DfPackage.WRAPPER_STRING: return createWrapperString();
@@ -114,7 +115,6 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 			case DfPackage.STATE: return createState();
 			case DfPackage.TAG: return createTag();
 			case DfPackage.TRANSITION: return createTransition();
-			case DfPackage.TRANSITIONS: return createTransitions();
 			case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY: return (EObject)createPortToEIntegerObjectMapEntry();
 			case DfPackage.PORT_TO_VAR_MAP_ENTRY: return (EObject)createPortToVarMapEntry();
 			case DfPackage.VAR_TO_PORT_MAP_ENTRY: return (EObject)createVarToPortMapEntry();
@@ -176,6 +176,16 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	public Argument createArgument() {
 		ArgumentImpl argument = new ArgumentImpl();
 		return argument;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Edge createEdge() {
+		EdgeImpl edge = new EdgeImpl();
+		return edge;
 	}
 
 	/**
@@ -439,20 +449,12 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	}
 
 	@Override
-	public Transition createTransition(Action action, State target) {
+	public Transition createTransition(State source, Action action, State target) {
 		TransitionImpl transition = new TransitionImpl();
+		transition.setSource(source);
 		transition.setAction(action);
-		transition.setState(target);
+		transition.setTarget(target);
 		return transition;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Transitions createTransitions() {
-		TransitionsImpl transitions = new TransitionsImpl();
-		return transitions;
 	}
 
 	/**

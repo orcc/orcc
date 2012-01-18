@@ -7,6 +7,7 @@
 package net.sf.orcc.df.impl;
 
 import java.util.Map;
+
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
@@ -15,28 +16,24 @@ import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.Nameable;
-import net.sf.orcc.df.Instance;
-import net.sf.orcc.df.Network;
-
-import net.sf.orcc.df.Pattern;
-import net.sf.orcc.df.Port;
+import net.sf.orcc.df.Edge;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.EntitySpecific;
+import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Nameable;
+import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Pattern;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Tag;
 import net.sf.orcc.df.Transition;
-import net.sf.orcc.df.Transitions;
 import net.sf.orcc.df.Unit;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.WrapperString;
 import net.sf.orcc.df.WrapperXml;
 import net.sf.orcc.ir.IrPackage;
-
 import net.sf.orcc.ir.impl.IrPackageImpl;
-
 import net.sf.orcc.moc.MocPackage;
-
 import net.sf.orcc.moc.impl.MocPackageImpl;
 
 import org.eclipse.emf.ecore.EAttribute;
@@ -44,7 +41,6 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EcorePackage;
-
 import org.eclipse.emf.ecore.impl.EPackageImpl;
 
 /**
@@ -169,13 +165,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass transitionsEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	private EClass portToEIntegerObjectMapEntryEClass = null;
 
 	/**
@@ -198,6 +187,13 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	private EClass argumentEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass edgeEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -412,7 +408,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getConnection_Source() {
+	public EReference getConnection_SourcePort() {
 		return (EReference)connectionEClass.getEStructuralFeatures().get(1);
 	}
 
@@ -421,26 +417,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getConnection_Target() {
-		return (EReference)connectionEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getConnection_SourcePort() {
-		return (EReference)connectionEClass.getEStructuralFeatures().get(3);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EReference getConnection_TargetPort() {
-		return (EReference)connectionEClass.getEStructuralFeatures().get(4);
+		return (EReference)connectionEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -862,15 +840,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getState_Name() {
-		return (EAttribute)stateEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EClass getTag() {
 		return tagEClass;
 	}
@@ -900,42 +869,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 */
 	public EReference getTransition_Action() {
 		return (EReference)transitionEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getTransition_State() {
-		return (EReference)transitionEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getTransitions() {
-		return transitionsEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getTransitions_List() {
-		return (EReference)transitionsEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getTransitions_SourceState() {
-		return (EReference)transitionsEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -1044,6 +977,33 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 */
 	public EReference getArgument_Variable() {
 		return (EReference)argumentEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getEdge() {
+		return edgeEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getEdge_Source() {
+		return (EReference)edgeEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getEdge_Target() {
+		return (EReference)edgeEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -1235,14 +1195,16 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 
 		broadcastEClass = createEClass(BROADCAST);
 
+		edgeEClass = createEClass(EDGE);
+		createEReference(edgeEClass, EDGE__SOURCE);
+		createEReference(edgeEClass, EDGE__TARGET);
+
 		attributeEClass = createEClass(ATTRIBUTE);
 		createEAttribute(attributeEClass, ATTRIBUTE__NAME);
 		createEReference(attributeEClass, ATTRIBUTE__VALUE);
 
 		connectionEClass = createEClass(CONNECTION);
 		createEReference(connectionEClass, CONNECTION__ATTRIBUTES);
-		createEReference(connectionEClass, CONNECTION__SOURCE);
-		createEReference(connectionEClass, CONNECTION__TARGET);
 		createEReference(connectionEClass, CONNECTION__SOURCE_PORT);
 		createEReference(connectionEClass, CONNECTION__TARGET_PORT);
 
@@ -1273,18 +1235,12 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEReference(patternEClass, PATTERN__VAR_TO_PORT_MAP);
 
 		stateEClass = createEClass(STATE);
-		createEAttribute(stateEClass, STATE__NAME);
 
 		tagEClass = createEClass(TAG);
 		createEAttribute(tagEClass, TAG__IDENTIFIERS);
 
 		transitionEClass = createEClass(TRANSITION);
 		createEReference(transitionEClass, TRANSITION__ACTION);
-		createEReference(transitionEClass, TRANSITION__STATE);
-
-		transitionsEClass = createEClass(TRANSITIONS);
-		createEReference(transitionsEClass, TRANSITIONS__LIST);
-		createEReference(transitionsEClass, TRANSITIONS__SOURCE_STATE);
 
 		portToEIntegerObjectMapEntryEClass = createEClass(PORT_TO_EINTEGER_OBJECT_MAP_ENTRY);
 		createEReference(portToEIntegerObjectMapEntryEClass, PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY);
@@ -1345,6 +1301,9 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		actorEClass.getESuperTypes().add(this.getEntity());
 		networkEClass.getESuperTypes().add(this.getEntity());
 		broadcastEClass.getESuperTypes().add(this.getEntity());
+		connectionEClass.getESuperTypes().add(this.getEdge());
+		stateEClass.getESuperTypes().add(this.getVertex());
+		transitionEClass.getESuperTypes().add(this.getEdge());
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(nameableEClass, Nameable.class, "Nameable", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -1357,8 +1316,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		initEAttribute(getUnit_LineNumber(), ecorePackage.getEInt(), "lineNumber", null, 0, 1, Unit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(vertexEClass, Vertex.class, "Vertex", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getVertex_Incoming(), this.getConnection(), this.getConnection_Target(), "incoming", null, 0, -1, Vertex.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getVertex_Outgoing(), this.getConnection(), this.getConnection_Source(), "outgoing", null, 0, -1, Vertex.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getVertex_Incoming(), this.getEdge(), this.getEdge_Target(), "incoming", null, 0, -1, Vertex.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getVertex_Outgoing(), this.getEdge(), this.getEdge_Source(), "outgoing", null, 0, -1, Vertex.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getVertex_Attributes(), this.getAttribute(), null, "attributes", null, 0, -1, Vertex.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(portEClass, Port.class, "Port", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -1400,14 +1359,16 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 
 		initEClass(broadcastEClass, Broadcast.class, "Broadcast", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
+		initEClass(edgeEClass, Edge.class, "Edge", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getEdge_Source(), this.getVertex(), this.getVertex_Outgoing(), "source", null, 0, 1, Edge.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getEdge_Target(), this.getVertex(), this.getVertex_Incoming(), "target", null, 0, 1, Edge.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
 		initEClass(attributeEClass, Attribute.class, "Attribute", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getAttribute_Name(), ecorePackage.getEString(), "name", null, 0, 1, Attribute.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getAttribute_Value(), theEcorePackage.getEObject(), null, "value", null, 0, 1, Attribute.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(connectionEClass, Connection.class, "Connection", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getConnection_Attributes(), this.getAttribute(), null, "attributes", null, 0, -1, Connection.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getConnection_Source(), this.getVertex(), this.getVertex_Outgoing(), "source", null, 0, 1, Connection.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getConnection_Target(), this.getVertex(), this.getVertex_Incoming(), "target", null, 0, 1, Connection.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getConnection_SourcePort(), this.getPort(), null, "sourcePort", null, 0, 1, Connection.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getConnection_TargetPort(), this.getPort(), null, "targetPort", null, 0, 1, Connection.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
@@ -1428,7 +1389,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		initEClass(fsmEClass, net.sf.orcc.df.FSM.class, "FSM", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getFSM_InitialState(), this.getState(), null, "initialState", null, 0, 1, net.sf.orcc.df.FSM.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getFSM_States(), this.getState(), null, "states", null, 0, -1, net.sf.orcc.df.FSM.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getFSM_Transitions(), this.getTransitions(), null, "transitions", null, 0, -1, net.sf.orcc.df.FSM.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getFSM_Transitions(), this.getTransition(), null, "transitions", null, 0, -1, net.sf.orcc.df.FSM.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(patternEClass, Pattern.class, "Pattern", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getPattern_NumTokensMap(), this.getPortToEIntegerObjectMapEntry(), null, "numTokensMap", null, 0, -1, Pattern.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -1438,18 +1399,12 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		initEReference(getPattern_VarToPortMap(), this.getVarToPortMapEntry(), null, "varToPortMap", null, 0, -1, Pattern.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(stateEClass, State.class, "State", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getState_Name(), theEcorePackage.getEString(), "name", null, 0, 1, State.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(tagEClass, Tag.class, "Tag", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getTag_Identifiers(), theEcorePackage.getEString(), "identifiers", null, 0, -1, Tag.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(transitionEClass, Transition.class, "Transition", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getTransition_Action(), this.getAction(), null, "action", null, 0, 1, Transition.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getTransition_State(), this.getState(), null, "state", null, 0, 1, Transition.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-		initEClass(transitionsEClass, Transitions.class, "Transitions", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getTransitions_List(), this.getTransition(), null, "list", null, 0, -1, Transitions.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getTransitions_SourceState(), this.getState(), null, "sourceState", null, 0, 1, Transitions.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(portToEIntegerObjectMapEntryEClass, Map.Entry.class, "PortToEIntegerObjectMapEntry", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getPortToEIntegerObjectMapEntry_Key(), this.getPort(), null, "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

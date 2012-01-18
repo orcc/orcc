@@ -247,7 +247,7 @@ endif>
 
 bb_<sourceState.name>_<transition.action.name>_fire:
 	call void @<transition.action.body.name> ()
-	store i32 <instance.actor.templateData.stateToLabelMap.(transition.state)>, i32* @_FSM_state
+	store i32 <instance.actor.templateData.stateToLabelMap.(transition.target)>, i32* @_FSM_state
 	
 	br label %bb_scheduler_start
 
@@ -264,10 +264,10 @@ schedulingStates(sourceState, transitionsList) ::= <<
 <actionTestState(sourceState, first(transitionsList), rest(transitionsList))>
 >>
 
-printTransition(transitions) ::= <<
-; STATE <transitions.sourceState.name>
-bb_s_<transitions.sourceState.name>:
-<schedulingStates(transitions.sourceState, transitions.list)>
+printTransition(state) ::= <<
+; STATE <state.name>
+bb_s_<state.name>:
+<schedulingStates(state, state.outgoing)>
 >>
 
 printFsmState(state) ::= <<
@@ -296,7 +296,7 @@ default:
 	; TODO: print error
 	br label %bb_scheduler_start
 
-<fsm.transitions: printTransition(); separator="\n">
+<fsm.states: printTransition(); separator="\n">
 >>
 
 

@@ -8,7 +8,6 @@ package net.sf.orcc.df.util;
 
 import java.util.Map;
 
-import net.sf.orcc.df.*;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
@@ -16,16 +15,19 @@ import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.Nameable;
+import net.sf.orcc.df.Edge;
+import net.sf.orcc.df.Entity;
+import net.sf.orcc.df.EntitySpecific;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Nameable;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Tag;
 import net.sf.orcc.df.Transition;
-import net.sf.orcc.df.Transitions;
+import net.sf.orcc.df.Unit;
 import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.WrapperString;
 import net.sf.orcc.df.WrapperXml;
@@ -133,6 +135,10 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 				return createBroadcastAdapter();
 			}
 			@Override
+			public Adapter caseEdge(Edge object) {
+				return createEdgeAdapter();
+			}
+			@Override
 			public Adapter caseAttribute(Attribute object) {
 				return createAttributeAdapter();
 			}
@@ -171,10 +177,6 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseTransition(Transition object) {
 				return createTransitionAdapter();
-			}
-			@Override
-			public Adapter caseTransitions(Transitions object) {
-				return createTransitionsAdapter();
 			}
 			@Override
 			public Adapter casePortToEIntegerObjectMapEntry(Map.Entry<Port, Integer> object) {
@@ -436,20 +438,6 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Transitions <em>Transitions</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.df.Transitions
-	 * @generated
-	 */
-	public Adapter createTransitionsAdapter() {
-		return null;
-	}
-
-	/**
 	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Port To EInteger Object Map Entry</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
@@ -502,6 +490,20 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createArgumentAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Edge <em>Edge</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.df.Edge
+	 * @generated
+	 */
+	public Adapter createEdgeAdapter() {
 		return null;
 	}
 

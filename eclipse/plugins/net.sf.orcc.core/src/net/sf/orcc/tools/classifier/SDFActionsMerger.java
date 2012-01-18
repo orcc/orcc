@@ -38,6 +38,7 @@ import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.State;
+import net.sf.orcc.df.Transition;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.IrFactory;
@@ -51,7 +52,6 @@ import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
-import net.sf.orcc.util.UniqueEdge;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.jgrapht.DirectedGraph;
@@ -145,16 +145,16 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 		return procedure;
 	}
 
-	private void examineState(DirectedGraph<State, UniqueEdge> graph,
+	private void examineState(DirectedGraph<State, Transition> graph,
 			State source) {
-		Iterator<UniqueEdge> it = graph.outgoingEdgesOf(source).iterator();
+		Iterator<Transition> it = graph.outgoingEdgesOf(source).iterator();
 		if (it.hasNext()) {
 			boolean mergeActions = true;
 			List<Action> actions = new ArrayList<Action>();
 
-			UniqueEdge edge = it.next();
+			Transition edge = it.next();
 			State target = graph.getEdgeTarget(edge);
-			actions.add((Action) edge.getObject());
+			actions.add(edge.getAction());
 
 			while (it.hasNext()) {
 				edge = it.next();
@@ -162,7 +162,7 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 					mergeActions = false;
 					break;
 				}
-				actions.add((Action) edge.getObject());
+				actions.add(edge.getAction());
 			}
 
 			if (mergeActions) {
@@ -175,23 +175,23 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 					// transition
 					// than need a merged action in the list as a unique action
 					// Update graph with the new action
-					List<UniqueEdge> upEdges = new ArrayList<UniqueEdge>();
-					for (UniqueEdge checkEdge : graph.edgeSet()) {
-						if (actions.contains(checkEdge.getObject())) {
+					List<Transition> upEdges = new ArrayList<Transition>();
+					for (Transition checkEdge : graph.edgeSet()) {
+						if (actions.contains(checkEdge.getAction())) {
 							upEdges.add(checkEdge);
 						}
 					}
 
-					UniqueEdge newEdge = new UniqueEdge(newActions.get(0));
-
 					// Remove all transitions and create a new one
-					for (UniqueEdge upEdge : upEdges) {
+					for (Transition upEdge : upEdges) {
 						State sourceState = graph.getEdgeSource(upEdge);
 						State targetState = graph.getEdgeTarget(upEdge);
 						graph.removeEdge(upEdge);
 
+						Transition newEdge = DfFactory.eINSTANCE
+								.createTransition(sourceState,
+										newActions.get(0), targetState);
 						graph.addEdge(sourceState, targetState, newEdge);
-
 					}
 				}
 			}
@@ -315,7 +315,7 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 	}
 
 	private FSM updateFSM(State initialState,
-			DirectedGraph<State, UniqueEdge> graph) {
+			DirectedGraph<State, Transition> graph) {
 		FSM fsm = DfFactory.eINSTANCE.createFSM();
 
 		// Set states of the fsm
@@ -327,10 +327,10 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 		fsm.setInitialState(initialState);
 
 		// Set transitions of the fsm
-		for (UniqueEdge edge : graph.edgeSet()) {
+		for (Transition edge : graph.edgeSet()) {
 			State source = graph.getEdgeSource(edge);
 			State target = graph.getEdgeTarget(edge);
-			Action action = (Action) edge.getObject();
+			Action action = edge.getAction();
 			fsm.addTransition(source, action, target);
 		}
 
@@ -348,7 +348,7 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 			actions.clear();
 			actions.addAll(mergedActions);
 		} else {
-			DirectedGraph<State, UniqueEdge> graph = fsm.getGraph();
+			DirectedGraph<State, Transition> graph = fsm.getGraph();
 			for (State state : graph.vertexSet()) {
 				examineState(graph, state);
 			}

@@ -33,6 +33,7 @@ import java.util.List;
 
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.Edge;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Nameable;
 import net.sf.orcc.df.Network;
@@ -105,16 +106,18 @@ public class NetworkFlattener extends DfSwitch<Void> {
 	 *            the sub network
 	 */
 	private void linkIncomingConnections(Network network, Network subNetwork) {
-		List<Connection> incomingEdges = new ArrayList<Connection>(
-				subNetwork.getIncoming());
-		for (Connection edge : incomingEdges) {
-			List<Connection> outgoingEdges = edge.getTargetPort().getOutgoing();
+		List<Edge> incomingEdges = new ArrayList<Edge>(subNetwork.getIncoming());
+		for (Edge edge : incomingEdges) {
+			Connection connection = (Connection) edge;
+			List<Edge> outgoingEdges = connection.getTargetPort().getOutgoing();
 
-			for (Connection outgoingEdge : outgoingEdges) {
+			for (Edge outgoingEdge : outgoingEdges) {
+				Connection outgoingConnection = (Connection) outgoingEdge;
 				Connection incoming = DfFactory.eINSTANCE.createConnection(
-						edge.getSource(), edge.getSourcePort(),
-						outgoingEdge.getTarget(), outgoingEdge.getTargetPort(),
-						edge.getAttributes());
+						edge.getSource(), connection.getSourcePort(),
+						outgoingEdge.getTarget(),
+						outgoingConnection.getTargetPort(),
+						connection.getAttributes());
 				network.getConnections().add(incoming);
 			}
 		}
@@ -130,16 +133,17 @@ public class NetworkFlattener extends DfSwitch<Void> {
 	 *            the sub network
 	 */
 	private void linkOutgoingConnections(Network network, Network subNetwork) {
-		List<Connection> outgoingEdges = new ArrayList<Connection>(
-				subNetwork.getOutgoing());
-		for (Connection edge : outgoingEdges) {
-			List<Connection> incomingEdges = edge.getSourcePort().getIncoming();
+		List<Edge> outgoingEdges = new ArrayList<Edge>(subNetwork.getOutgoing());
+		for (Edge edge : outgoingEdges) {
+			Connection connection = (Connection) edge;
+			List<Edge> incomingEdges = connection.getSourcePort().getIncoming();
 
-			for (Connection incomingEdge : incomingEdges) {
+			for (Edge incomingEdge : incomingEdges) {
+				Connection incomingConnection = (Connection) incomingEdge;
 				Connection incoming = DfFactory.eINSTANCE.createConnection(
-						incomingEdge.getSource(), incomingEdge.getSourcePort(),
-						edge.getTarget(), edge.getTargetPort(),
-						edge.getAttributes());
+						incomingEdge.getSource(),
+						incomingConnection.getSourcePort(), edge.getTarget(),
+						connection.getTargetPort(), connection.getAttributes());
 				network.getConnections().add(incoming);
 			}
 		}

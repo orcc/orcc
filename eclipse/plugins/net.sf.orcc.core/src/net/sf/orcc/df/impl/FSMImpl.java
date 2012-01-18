@@ -13,21 +13,17 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.Edge;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Transition;
-import net.sf.orcc.df.Transitions;
-import net.sf.orcc.ir.util.MapAdapter;
-import net.sf.orcc.util.UniqueEdge;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -50,43 +46,46 @@ import org.jgrapht.graph.DirectedMultigraph;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.df.impl.FSMImpl#getInitialState <em>Initial State</em>}</li>
- *   <li>{@link net.sf.orcc.df.impl.FSMImpl#getStates <em>States</em>}</li>
- *   <li>{@link net.sf.orcc.df.impl.FSMImpl#getTransitions <em>Transitions</em>}</li>
+ * <li>{@link net.sf.orcc.df.impl.FSMImpl#getInitialState <em>Initial State
+ * </em>}</li>
+ * <li>{@link net.sf.orcc.df.impl.FSMImpl#getStates <em>States</em>}</li>
+ * <li>{@link net.sf.orcc.df.impl.FSMImpl#getTransitions <em>Transitions</em>}</li>
  * </ul>
  * </p>
- *
+ * 
  * @generated
  */
 public class FSMImpl extends EObjectImpl implements FSM {
 
 	/**
-	 * The cached value of the '{@link #getInitialState() <em>Initial State</em>}' reference.
-	 * <!-- begin-user-doc --> <!--
+	 * The cached value of the '{@link #getInitialState()
+	 * <em>Initial State</em>}' reference. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
+	 * 
 	 * @see #getInitialState()
 	 * @generated
 	 * @ordered
 	 */
 	protected State initialState;
+
 	/**
-	 * The cached value of the '{@link #getStates() <em>States</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getStates() <em>States</em>}'
+	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getStates()
 	 * @generated
 	 * @ordered
 	 */
 	protected EList<State> states;
 	/**
-	 * The cached value of the '{@link #getTransitions() <em>Transitions</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getTransitions() <em>Transitions</em>}'
+	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getTransitions()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Transitions> transitions;
-
-	private Map<State, Transitions> transitionsMap;
+	protected EList<Transition> transitions;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -94,27 +93,18 @@ public class FSMImpl extends EObjectImpl implements FSM {
 	 */
 	protected FSMImpl() {
 		super();
-
-		transitionsMap = new HashMap<State, Transitions>();
-		eAdapters().add(new MapAdapter());
 	}
 
 	@Override
 	public void addTransition(State source, Action action, State target) {
-		Transitions transitions = getTransitions(source);
-		if (transitions == null) {
-			transitions = DfFactory.eINSTANCE.createTransitions();
-			transitions.setSourceState(source);
-			getTransitions().add(transitions);
-		}
-
-		Transition transition = DfFactory.eINSTANCE.createTransition(action,
-				target);
-		transitions.getList().add(transition);
+		Transition transition = DfFactory.eINSTANCE.createTransition(source,
+				action, target);
+		getTransitions().add(transition);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public State basicGetInitialState() {
@@ -123,80 +113,88 @@ public class FSMImpl extends EObjectImpl implements FSM {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case DfPackage.FSM__INITIAL_STATE:
-				if (resolve) return getInitialState();
-				return basicGetInitialState();
-			case DfPackage.FSM__STATES:
-				return getStates();
-			case DfPackage.FSM__TRANSITIONS:
-				return getTransitions();
+		case DfPackage.FSM__INITIAL_STATE:
+			if (resolve)
+				return getInitialState();
+			return basicGetInitialState();
+		case DfPackage.FSM__STATES:
+			return getStates();
+		case DfPackage.FSM__TRANSITIONS:
+			return getTransitions();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case DfPackage.FSM__STATES:
-				return ((InternalEList<?>)getStates()).basicRemove(otherEnd, msgs);
-			case DfPackage.FSM__TRANSITIONS:
-				return ((InternalEList<?>)getTransitions()).basicRemove(otherEnd, msgs);
+		case DfPackage.FSM__STATES:
+			return ((InternalEList<?>) getStates()).basicRemove(otherEnd, msgs);
+		case DfPackage.FSM__TRANSITIONS:
+			return ((InternalEList<?>) getTransitions()).basicRemove(otherEnd,
+					msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case DfPackage.FSM__INITIAL_STATE:
-				return initialState != null;
-			case DfPackage.FSM__STATES:
-				return states != null && !states.isEmpty();
-			case DfPackage.FSM__TRANSITIONS:
-				return transitions != null && !transitions.isEmpty();
+		case DfPackage.FSM__INITIAL_STATE:
+			return initialState != null;
+		case DfPackage.FSM__STATES:
+			return states != null && !states.isEmpty();
+		case DfPackage.FSM__TRANSITIONS:
+			return transitions != null && !transitions.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case DfPackage.FSM__INITIAL_STATE:
-				setInitialState((State)newValue);
-				return;
-			case DfPackage.FSM__STATES:
-				getStates().clear();
-				getStates().addAll((Collection<? extends State>)newValue);
-				return;
-			case DfPackage.FSM__TRANSITIONS:
-				getTransitions().clear();
-				getTransitions().addAll((Collection<? extends Transitions>)newValue);
-				return;
+		case DfPackage.FSM__INITIAL_STATE:
+			setInitialState((State) newValue);
+			return;
+		case DfPackage.FSM__STATES:
+			getStates().clear();
+			getStates().addAll((Collection<? extends State>) newValue);
+			return;
+		case DfPackage.FSM__TRANSITIONS:
+			getTransitions().clear();
+			getTransitions()
+					.addAll((Collection<? extends Transition>) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -206,37 +204,37 @@ public class FSMImpl extends EObjectImpl implements FSM {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case DfPackage.FSM__INITIAL_STATE:
-				setInitialState((State)null);
-				return;
-			case DfPackage.FSM__STATES:
-				getStates().clear();
-				return;
-			case DfPackage.FSM__TRANSITIONS:
-				getTransitions().clear();
-				return;
+		case DfPackage.FSM__INITIAL_STATE:
+			setInitialState((State) null);
+			return;
+		case DfPackage.FSM__STATES:
+			getStates().clear();
+			return;
+		case DfPackage.FSM__TRANSITIONS:
+			getTransitions().clear();
+			return;
 		}
 		super.eUnset(featureID);
 	}
 
 	@Override
-	public DirectedGraph<State, UniqueEdge> getGraph() {
-		DirectedGraph<State, UniqueEdge> graph = new DirectedMultigraph<State, UniqueEdge>(
-				UniqueEdge.class);
+	public DirectedGraph<State, Transition> getGraph() {
+		DirectedGraph<State, Transition> graph = new DirectedMultigraph<State, Transition>(
+				Transition.class);
 		for (State source : getStates()) {
 			graph.addVertex(source);
-			Transitions transitions = getTransitions(source);
 
-			for (Transition transition : transitions.getList()) {
-				State target = transition.getState();
+			for (Edge edge : source.getOutgoing()) {
+				Transition transition = (Transition) edge;
+				State target = (State) transition.getTarget();
 				graph.addVertex(target);
-				graph.addEdge(source, target,
-						new UniqueEdge(transition.getAction()));
+				graph.addEdge(source, target, transition);
 			}
 		}
 
@@ -245,15 +243,18 @@ public class FSMImpl extends EObjectImpl implements FSM {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public State getInitialState() {
 		if (initialState != null && initialState.eIsProxy()) {
-			InternalEObject oldInitialState = (InternalEObject)initialState;
-			initialState = (State)eResolveProxy(oldInitialState);
+			InternalEObject oldInitialState = (InternalEObject) initialState;
+			initialState = (State) eResolveProxy(oldInitialState);
 			if (initialState != oldInitialState) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.FSM__INITIAL_STATE, oldInitialState, initialState));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							DfPackage.FSM__INITIAL_STATE, oldInitialState,
+							initialState));
 			}
 		}
 		return initialState;
@@ -261,54 +262,47 @@ public class FSMImpl extends EObjectImpl implements FSM {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<State> getStates() {
 		if (states == null) {
-			states = new EObjectContainmentEList<State>(State.class, this, DfPackage.FSM__STATES);
+			states = new EObjectContainmentEList<State>(State.class, this,
+					DfPackage.FSM__STATES);
 		}
 		return states;
 	}
 
 	@Override
 	public List<Action> getTargetActions(State source) {
-		Transitions transitions = getTransitions(source);
 		List<Action> actions = new ArrayList<Action>();
-		if (transitions != null) {
-			for (Transition transition : transitions.getList()) {
-				actions.add(transition.getAction());
-			}
+		for (Edge edge : source.getOutgoing()) {
+			Transition transition = (Transition) edge;
+			actions.add(transition.getAction());
 		}
 		return actions;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
-	public EList<Transitions> getTransitions() {
+	public EList<Transition> getTransitions() {
 		if (transitions == null) {
-			transitions = new EObjectContainmentEList<Transitions>(Transitions.class, this, DfPackage.FSM__TRANSITIONS);
+			transitions = new EObjectContainmentEList<Transition>(
+					Transition.class, this, DfPackage.FSM__TRANSITIONS);
 		}
 		return transitions;
-	}
-
-	@Override
-	public Transitions getTransitions(State state) {
-		return transitionsMap.get(state);
-	}
-
-	public Map<State, Transitions> getTransitionsMap() {
-		return transitionsMap;
 	}
 
 	@Override
 	public void printGraph(File file) throws OrccException {
 		try {
 			OutputStream out = new FileOutputStream(file);
-			DOTExporter<State, UniqueEdge> exporter = new DOTExporter<State, UniqueEdge>(
+			DOTExporter<State, Transition> exporter = new DOTExporter<State, Transition>(
 					new StringNameProvider<State>(), null,
-					new StringEdgeNameProvider<UniqueEdge>());
+					new StringEdgeNameProvider<Transition>());
 			exporter.export(new OutputStreamWriter(out), getGraph());
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
@@ -317,10 +311,9 @@ public class FSMImpl extends EObjectImpl implements FSM {
 
 	@Override
 	public void removeTransition(State source, Action action) {
-		Transitions transitions = getTransitions(source);
-		Iterator<Transition> it = transitions.getList().iterator();
+		Iterator<Edge> it = source.getOutgoing().iterator();
 		while (it.hasNext()) {
-			Transition transition = it.next();
+			Transition transition = (Transition) it.next();
 			Action candidate = transition.getAction();
 			if (candidate == action) {
 				it.remove();
@@ -331,14 +324,13 @@ public class FSMImpl extends EObjectImpl implements FSM {
 
 	@Override
 	public void replaceTarget(State source, Action action, State target) {
-		Transitions transitions = getTransitions(source);
-		Iterator<Transition> it = transitions.getList().iterator();
+		Iterator<Edge> it = source.getOutgoing().iterator();
 		while (it.hasNext()) {
-			Transition transition = it.next();
+			Transition transition = (Transition) it.next();
 			Action candidate = transition.getAction();
 			if (candidate == action) {
 				// updates target state of this transition
-				transition.setState(target);
+				transition.setTarget(target);
 				return;
 			}
 		}
@@ -346,13 +338,15 @@ public class FSMImpl extends EObjectImpl implements FSM {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void setInitialState(State newInitialState) {
 		State oldInitialState = initialState;
 		initialState = newInitialState;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.FSM__INITIAL_STATE, oldInitialState, initialState));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.FSM__INITIAL_STATE, oldInitialState, initialState));
 	}
 
 } // FSMImpl
