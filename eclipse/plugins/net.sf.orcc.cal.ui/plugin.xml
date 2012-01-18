@@ -190,18 +190,9 @@
    <extension
          point="org.eclipse.compare.contentViewers">
       <viewer
-            class="net.sf.orcc.cal.ui.CalExecutableExtensionFactory:org.eclipse.xtext.ui.compare.InjectableViewerCreator"
+            class="net.sf.orcc.cal.ui.CalExecutableExtensionFactory:org.eclipse.xtext.ui.compare.DefaultViewerCreator"
             extensions="cal"
-            id="org.eclipse.xtext.Cal.compare.contentViewers">
-      </viewer>
-   </extension>
-   <extension
-         point="org.eclipse.compare.contentMergeViewers">
-      <viewer
-            class="net.sf.orcc.cal.ui.CalExecutableExtensionFactory:org.eclipse.xtext.ui.compare.InjectableViewerCreator"
-            extensions="cal"
-            id="org.eclipse.xtext.Cal.compare.contentMergeViewers"
-            label="Cal Compare">
+            id="org.eclipse.xtext.ui.compare.DefaultViewerCreator">
       </viewer>
    </extension>
 
