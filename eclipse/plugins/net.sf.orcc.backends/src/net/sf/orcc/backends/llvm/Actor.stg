@@ -678,7 +678,7 @@ printPhiExpr(expr, type, node) ::= <<
 >>
 
 printReturn(return) ::= <<
-<if(printReturn)
+<if(removeReturn)
 ><if(return.value)
 >ret <return.value.type> <Expr(return.value)><
 else
@@ -708,7 +708,7 @@ printGEP(gep) ::= <<
 // Nodes
 ///////////////////////////////////////////////////////////////////////////////
 
-printNodes(nodes, printReturn=true) ::= <<
+printNodes(nodes, removeReturn=true) ::= <<
 <nodes:printNode(); separator="\n">
 >>
 
@@ -731,11 +731,11 @@ printIfNode(ifNode) ::= <<
 b<label(ifNode)>:
 	br i1 <Expr(ifNode.condition)>, label %b<printNextLabel(ifNode.thenNodes)>, label %b<printNextLabel(ifNode.elseNodes)>
 
-<printNodes(ifNode.thenNodes)>
+<printNodes(ifNode.thenNodes, removeReturn)>
 
-<printNodes(ifNode.elseNodes)>
+<printNodes(ifNode.elseNodes, removeReturn)>
 
-<printNodes(ifNode.joinNode)>
+<printNodes(ifNode.joinNode, removeReturn)>
 >>
 
 printWhileNode(whileNode) ::= <<
@@ -743,7 +743,7 @@ b<label(whileNode.joinNode)>:
 	<printInstructions(whileNode.joinNode.instructions)>
 	br i1 <Expr(whileNode.condition)>, label %b<label(first(whileNode.Nodes))>, label %b<label(whileNode)>
 
-<printNodes(whileNode.nodes)>
+<printNodes(whileNode.nodes, removeReturn)>
 
 b<label(whileNode)>:
 	br label %b<printNextLabel(whileNode.successors)>
