@@ -98,12 +98,17 @@ public class UnitImporter extends AbstractActorVisitor<Object> {
 		Use use = load.getSource();
 		Var var = use.getVariable();
 		if (var.eContainer() instanceof Unit) {
-			Var varInActor = (Var) copier.get(var);
+			Var varInActor = actor.getStateVar(var.getName());
 			if (varInActor == null) {
-				varInActor = (Var) copier.copy(var);
-				actor.getStateVars().add(indexVar++, varInActor);
+				varInActor = (Var) copier.get(var);
+				if (varInActor == null) {
+					varInActor = (Var) copier.copy(var);
+					actor.getStateVars().add(indexVar++, varInActor);
+				}
+
 			}
 			use.setVariable(varInActor);
+
 		}
 
 		return null;
