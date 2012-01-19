@@ -134,7 +134,7 @@ begin
 {{if i == input.index}}
 {{if input.isNative}}
              fu_STREAM_IN_{{input.index}}_ext_data{{i}}    => s_{{input.name}},
-             fu_STREAM_IN_{{input.index}}_ext_status{{i}}  => (others => '0'),
+             fu_STREAM_IN_{{input.index}}_ext_status{{i}}  => (0=>'1', others => '0'),
 {{else}}
              fu_STREAM_IN_{{input.index}}_ext_data{{i}}    => data_{{i}}_in,
              fu_STREAM_IN_{{input.index}}_ext_status{{i}}  => status_{{i}}_in,
@@ -151,7 +151,7 @@ begin
 {{if i == output.index}}
 {{if output.isNative}}
              fu_STREAM_OUT_{{output.index}}_ext_data{{i}}   => s_{{output.name}},
-             fu_STREAM_OUT_{{output.index}}_ext_status{{i}} => (others => '0'),
+             fu_STREAM_OUT_{{output.index}}_ext_status{{i}} => (0=>'1', others => '0'),
 {{else}}
              fu_STREAM_OUT_{{output.index}}_ext_data{{i}}   => data_{{i}}_out,
              fu_STREAM_OUT_{{output.index}}_ext_status{{i}} => status_{{i}}_out,
