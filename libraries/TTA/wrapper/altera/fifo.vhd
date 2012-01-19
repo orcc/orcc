@@ -36,7 +36,7 @@ begin
 
   clear        <= not(rst_n);
   status_full  <= status_full_i;
-  status_empty <= std_logic_vector(to_unsigned(to_integer(unsigned(status_full_i)) - size, 32));
+  status_empty <= std_logic_vector(to_unsigned(size - to_integer(unsigned(status_full_i)), 32));
 
   fifo_component : altera_mf_components.scfifo
     generic map (
