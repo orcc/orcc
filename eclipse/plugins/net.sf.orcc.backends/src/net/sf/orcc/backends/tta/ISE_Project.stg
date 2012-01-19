@@ -1,0 +1,171 @@
+// Quartus project
+
+xiseNetwork(network, options) ::= <<
+
+\<?xml version="1.0" encoding="UTF-8" standalone="no" ?\>
+\<project xmlns="http://www.xilinx.com/XMLSchema" xmlns:xil_pn="http://www.xilinx.com/XMLSchema"\>
+
+  \<header\>
+    \<!-- ISE source project file created by the Open RVC-CAL Compiler      --\>
+    \<!--                                                                   --\>
+    \<!-- This file contains project source information including a list of --\>
+    \<!-- project source files, project and process properties.  This file, --\>
+    \<!-- along with the project source files, is sufficient to open and    --\>
+    \<!-- implement in ISE Project Navigator.                               --\>
+    \<!--                                                                   --\>
+  \</header\>
+
+  \<version xil_pn:ise_version="12.1" xil_pn:schema_version="2"/\>
+
+  \<files\>
+
+    \<file xil_pn:name="top.vhd" xil_pn:type="FILE_VHDL"\>
+      \<association xil_pn:name="BehavioralSimulation"/\>
+      \<association xil_pn:name="Implementation"/\>
+    \</file\>
+
+    <network.instances: xiseInstance(); separator="\n">
+
+    \<!--                   --\>
+    \<!-- Shared components.--\>
+    \<!--                   --\>
+    \<file xil_pn:name="share/vhdl/util_pkg.vhdl" xil_pn:type="FILE_VHDL"\>
+      \<association xil_pn:name="BehavioralSimulation"/\>
+      \<association xil_pn:name="Implementation"/\>
+    \</file\>
+    \<file xil_pn:name="share/vhdl/tce_util_pkg.vhdl" xil_pn:type="FILE_VHDL"\>
+      \<association xil_pn:name="BehavioralSimulation"/\>
+      \<association xil_pn:name="Implementation"/\>
+    \</file\>
+    \<file xil_pn:name="share/vhdl/cal_stream_in_v2.vhdl" xil_pn:type="FILE_VHDL"\>
+      \<association xil_pn:name="BehavioralSimulation"/\>
+      \<association xil_pn:name="Implementation"/\>
+    \</file\>
+    \<file xil_pn:name="share/vhdl/cal_stream_out_v2.vhdl" xil_pn:type="FILE_VHDL"\>
+      \<association xil_pn:name="BehavioralSimulation"/\>
+      \<association xil_pn:name="Implementation"/\>
+    \</file\>
+    \<file xil_pn:name="share/vhdl/rf_1wr_1rd_always_1_guarded_0.vhd" xil_pn:type="FILE_VHDL"\>
+      \<association xil_pn:name="BehavioralSimulation"/\>
+      \<association xil_pn:name="Implementation"/\>
+    \</file\>
+    \<file xil_pn:name="share/vhdl/mul.vhdl" xil_pn:type="FILE_VHDL"\>
+      \<association xil_pn:name="BehavioralSimulation"/\>
+      \<association xil_pn:name="Implementation"/\>
+    \</file\>
+    \<file xil_pn:name="share/vhdl/ldh_ldhu_ldq_ldqu_ldw_sth_stq_stw.vhdl" xil_pn:type="FILE_VHDL"\>
+      \<association xil_pn:name="BehavioralSimulation"/\>
+      \<association xil_pn:name="Implementation"/\>
+    \</file\>
+    \<file xil_pn:name="share/vhdl/and_ior_xor.vhdl" xil_pn:type="FILE_VHDL"\>
+      \<association xil_pn:name="BehavioralSimulation"/\>
+      \<association xil_pn:name="Implementation"/\>
+    \</file\>
+    \<file xil_pn:name="share/vhdl/add_and_eq_gt_gtu_ior_shl_shr_shru_sub_sxhw_sxqw_xor.vhdl" xil_pn:type="FILE_VHDL"\>
+      \<association xil_pn:name="BehavioralSimulation"/\>
+      \<association xil_pn:name="Implementation"/\>
+    \</file\>
+
+    \<!--                  --\>
+    \<!-- Other components.--\>
+    \<!--                  --\>
+    \<file xil_pn:name="wrapper/xilinx_fifo.vhd" xil_pn:type="FILE_VHDL"\>
+      \<association xil_pn:name="BehavioralSimulation"/\>
+      \<association xil_pn:name="Implementation"/\>
+    \</file\>
+    \<file xil_pn:name="wrapper/xilinx_ram.vhd" xil_pn:type="FILE_VHDL"\>
+      \<association xil_pn:name="BehavioralSimulation"/\>
+      \<association xil_pn:name="Implementation"/\>
+    \</file\>
+    \<file xil_pn:name="wrapper/xilinx_rom.vhd" xil_pn:type="FILE_VHDL"\>
+      \<association xil_pn:name="BehavioralSimulation"/\>
+      \<association xil_pn:name="Implementation"/\>
+    \</file\>
+    \<file xil_pn:name="interface/counter.vhd" xil_pn:type="FILE_VHDL"\>
+      \<association xil_pn:name="BehavioralSimulation"/\>
+      \<association xil_pn:name="Implementation"/\>
+    \</file\>
+    \<file xil_pn:name="interface/fps_eval.vhd" xil_pn:type="FILE_VHDL"\>
+      \<association xil_pn:name="BehavioralSimulation"/\>
+      \<association xil_pn:name="Implementation"/\>
+    \</file\>
+    \<file xil_pn:name="interface/segment_display_conv.vhd" xil_pn:type="FILE_VHDL"\>
+      \<association xil_pn:name="BehavioralSimulation"/\>
+      \<association xil_pn:name="Implementation"/\>
+    \</file\>
+    \<file xil_pn:name="interface/segment_display_sel.vhd" xil_pn:type="FILE_VHDL"\>
+      \<association xil_pn:name="BehavioralSimulation"/\>
+      \<association xil_pn:name="Implementation"/\>
+    \</file\>
+
+  \</files\>
+
+  \<properties/\>
+
+  \<bindings/\>
+
+  \<libraries/\>
+
+  \<autoManagedFiles\>
+
+\</project\>
+
+>>
+
+xiseInstance(instance) ::= <<
+<if(!instance.actor.native)
+>\<!-- Instance <instance.id>.--\>
+\<file xil_pn:name="<instance.id>/tta/vhdl/processor_<instance.id>_tl_params_pkg.vhdl" xil_pn:type="FILE_VHDL"\>
+  \<association xil_pn:name="BehavioralSimulation"/\>
+  \<association xil_pn:name="Implementation"/\>
+\</file\>
+\<file xil_pn:name="<instance.id>/tta/vhdl/processor_<instance.id>_tl.vhdl" xil_pn:type="FILE_VHDL"\>
+  \<association xil_pn:name="BehavioralSimulation"/\>
+  \<association xil_pn:name="Implementation"/\>
+\</file\>
+\<file xil_pn:name="<instance.id>/tta/vhdl/globals_pkg.vhdl" xil_pn:type="FILE_VHDL"\>
+  \<association xil_pn:name="BehavioralSimulation"/\>
+  \<association xil_pn:name="Implementation"/\>
+\</file\>
+\<file xil_pn:name="<instance.id>/tta/vhdl/processor_<instance.id>.vhd" xil_pn:type="FILE_VHDL"\>
+  \<association xil_pn:name="BehavioralSimulation"/\>
+  \<association xil_pn:name="Implementation"/\>
+\</file\>
+\<file xil_pn:name="<instance.id>/tta/vhdl/imem_mau_pkg.vhdl" xil_pn:type="FILE_VHDL"\>
+  \<association xil_pn:name="BehavioralSimulation"/\>
+  \<association xil_pn:name="Implementation"/\>
+\</file\>
+\<file xil_pn:name="<instance.id>/tta/gcu_ic/output_socket_2_1.vhdl" xil_pn:type="FILE_VHDL"\>
+  \<association xil_pn:name="BehavioralSimulation"/\>
+  \<association xil_pn:name="Implementation"/\>
+\</file\>
+\<file xil_pn:name="<instance.id>/tta/gcu_ic/output_socket_1_1.vhdl" xil_pn:type="FILE_VHDL"\>
+  \<association xil_pn:name="BehavioralSimulation"/\>
+  \<association xil_pn:name="Implementation"/\>
+\</file\>
+\<file xil_pn:name="<instance.id>/tta/gcu_ic/input_socket_2.vhdl" xil_pn:type="FILE_VHDL"\>
+  \<association xil_pn:name="BehavioralSimulation"/\>
+  \<association xil_pn:name="Implementation"/\>
+\</file\>
+\<file xil_pn:name="<instance.id>/tta/gcu_ic/ifetch.vhdl" xil_pn:type="FILE_VHDL"\>
+  \<association xil_pn:name="BehavioralSimulation"/\>
+  \<association xil_pn:name="Implementation"/\>
+\</file\>
+\<file xil_pn:name="<instance.id>/tta/gcu_ic/idecompressor.vhdl" xil_pn:type="FILE_VHDL"\>
+  \<association xil_pn:name="BehavioralSimulation"/\>
+  \<association xil_pn:name="Implementation"/\>
+\</file\>
+\<file xil_pn:name="<instance.id>/tta/gcu_ic/ic.vhdl" xil_pn:type="FILE_VHDL"\>
+  \<association xil_pn:name="BehavioralSimulation"/\>
+  \<association xil_pn:name="Implementation"/\>
+\</file\>
+\<file xil_pn:name="<instance.id>/tta/gcu_ic/gcu_opcodes_pkg.vhdl" xil_pn:type="FILE_VHDL"\>
+  \<association xil_pn:name="BehavioralSimulation"/\>
+  \<association xil_pn:name="Implementation"/\>
+\</file\>
+\<file xil_pn:name="<instance.id>/tta/gcu_ic/decoder.vhdl" xil_pn:type="FILE_VHDL"\>
+  \<association xil_pn:name="BehavioralSimulation"/\>
+  \<association xil_pn:name="Implementation"/\>
+\</file\>
+<endif>
+>>

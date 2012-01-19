@@ -115,14 +115,12 @@ public class TTABackendImpl extends AbstractBackend {
 	protected void doTransformActor(Actor actor) throws OrccException {
 		DfSwitch<?>[] transformations = { new UnitImporter(),
 				new SSATransformation(), new BoolToIntTransformation(),
-				new TypeResizer(true, true, false),
-				new StringTransformation(),
+				new TypeResizer(true, true, false), new StringTransformation(),
 				new RenameTransformation(this.transformations),
 				new TacTransformation(), new CopyPropagator(),
 				new ConstantPropagator(), new InstPhiTransformation(),
 				new GetElementPtrAdder(), new CastAdder(false),
-				new EmptyNodeRemover(), new BlockCombine(),
-				new BuildCFG() };
+				new EmptyNodeRemover(), new BlockCombine(), new BuildCFG() };
 
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
@@ -213,6 +211,12 @@ public class TTABackendImpl extends AbstractBackend {
 		projectQsfPrinter.print("top.qsf", path, "qsfNetwork", "network",
 				network);
 		projectQpfPrinter.print("top.qpf", path, "qpfNetwork", "network",
+				network);
+
+		// ISE
+		CustomPrinter projectXisePrinter = new CustomPrinter(
+				"net/sf/orcc/backends/tta/ISE_Project.stg");
+		projectXisePrinter.print("top.xise", path, "xiseNetwork", "network",
 				network);
 
 		// ModelSim
