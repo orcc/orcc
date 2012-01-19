@@ -102,7 +102,7 @@ public class TTABackendImpl extends AbstractBackend {
 		transformations.put("select", "select_");
 		processorIntensiveActors = new ArrayList<String>();
 		// processorIntensiveActors.add("fi.oulu.ee.mvg.Mgnt_Address");
-		// processorIntensiveActors.add("org.mpeg4.part2.texture.Algo_IDCT2D_ISOIEC_23002_1");
+		// processorIntensiveActors.add("org.sc29.wg11.mpeg4.part2.texture.Algo_IDCT2D_ISOIEC_23002_1");
 		// processorIntensiveActors.add("fi.oulu.ee.mvg.Algo_IAP");
 	}
 
@@ -132,12 +132,10 @@ public class TTABackendImpl extends AbstractBackend {
 	}
 
 	private Network doTransformNetwork(Network network) throws OrccException {
-		write("Instantiating... ");
+		write("Instantiating...\n");
 		network = new Instantiator().doSwitch(network);
-		write("done\n");
-		write("Flattening... ");
+		write("Flattening...\n");
 		new NetworkFlattener().doSwitch(network);
-		write("done\n");
 
 		new BroadcastAdder().doSwitch(network);
 		new BroadcastTypeResizer().doSwitch(network);
@@ -249,7 +247,7 @@ public class TTABackendImpl extends AbstractBackend {
 		if (instance.isActor()
 				&& processorIntensiveActors.contains(instance.getActor()
 						.getName())) {
-			return 6;
+			return 8;
 		}
 		return 2;
 	}
@@ -258,7 +256,7 @@ public class TTABackendImpl extends AbstractBackend {
 		if (instance.isActor()
 				&& processorIntensiveActors.contains(instance.getActor()
 						.getName())) {
-			return 2;
+			return 4;
 		}
 		return 1;
 	}
@@ -267,7 +265,7 @@ public class TTABackendImpl extends AbstractBackend {
 		if (instance.isActor()
 				&& processorIntensiveActors.contains(instance.getActor()
 						.getName())) {
-			return 4;
+			return 8;
 		}
 		return 2;
 	}

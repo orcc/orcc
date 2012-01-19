@@ -76,9 +76,9 @@ endif>
 
 compileOtherComponents() ::= <<
 # Compile other components
-vcom -93 -quiet -work work wrapper/altera/fifo.vhd
-vcom -93 -quiet -work work wrapper/altera/ram.vhd
-vcom -93 -quiet -work work wrapper/altera/rom.vhd
+vcom -93 -quiet -work work wrapper/altera_fifo.vhd
+vcom -93 -quiet -work work wrapper/altera_ram.vhd
+vcom -93 -quiet -work work wrapper/altera_rom.vhd
 vcom -93 -quiet -work work simulation/sim_package.vhd
 >>
 
