@@ -652,13 +652,13 @@ actionTestState(sourceState, transition) ::= <<
 		<outputPatternDecisionState(length(transition.action.outputPattern.ports), transition.action, sourceState); separator="\n">
 			\<module kind="then"\>
 				<actionCall(transition.action)>
-				<actionCallState(transition.state)>
+				<actionCallState(transition.target)>
 			\</module\>
 		\</module\>
 		<else>
 		\<!-- no ouput pattern--\>
 		<actionCall(transition.action)>
-		<actionCallState(transition.state)>
+		<actionCallState(transition.target)>
 		<endif>
 	\</module\>
 	\<module kind="else"\>
@@ -669,18 +669,18 @@ schedulingTestState(sourceState, transitionsList) ::= <<
 <transitionsList: {transition| \</module\>\</module\> }; separator="\n">
 >>
 
-printTransition(transitions) ::= <<
-\<!-- State s_<transitions.sourceState.name> --\>
+printTransition(state) ::= <<
+\<!-- State s_<state.name> --\>
 \<module kind="if"\>
-	\<module decision="s_<transitions.sourceState.name>_enabled" kind="test"\>
+	\<module decision="s_<state.name>_enabled" kind="test"\>
 		\<operation kind="$eq"\>
-			\<port dir="in" source="s_<transitions.sourceState.name>"/\>
+			\<port dir="in" source="s_<state.name>"/\>
 			\<port dir="in" source="currentState"/\>
-			\<port dir="out" size="1" source="s_<transitions.sourceState.name>_enabled" typeName="bool"/\>
+			\<port dir="out" size="1" source="s_<state.name>_enabled" typeName="bool"/\>
 		\</operation\>
 	\</module\>
 	\<module kind="then"\>
-		<schedulingTestState(transitions.sourceState, transitions.list)>
+		<schedulingTestState(state, state.outgoing)>
 	\</module\>
 	\<module kind="else"\>
 	<closeHwTransition()>
@@ -721,9 +721,9 @@ printTransitions(actions, transitionsList) ::= <<
 <transitionsList: {transitions| \</module\>\</module\> }; separator="\n">
 >>
 
-enumStates(transition)::= <<
-\<operation kind="$literal_Integer" value="<instance.actor.templateData.stateToIndexMap.(transition.sourceState)>"\>
-	\<port dir="out" size="32" source="s_<transition.sourceState.name>" typeName="int"/\>
+enumStates(states)::= <<
+\<operation kind="$literal_Integer" value="<instance.actor.templateData.stateToIndexMap.(states)>"\>
+	\<port dir="out" size="32" source="s_<states.name>" typeName="int"/\>
 \</operation\>
 >>
 
@@ -738,7 +738,7 @@ schedulerFSM(actions, fsm) ::= <<
 		\<port dir="out" size="1" source="var_<instance.id>_sched" typeName="bool"/\>
 	\</operation\>
 	\<!-- enumerate states --\>
-	<fsm.transitions : {transition | <enumStates(transition=transition)>}; separator="\n">
+	<fsm.states : {states | <enumStates(states=states)>}; separator="\n">
 	\<!-- infinite loop --\>
 	\<module kind="loop"\>
 	  \<module decision="var_<instance.id>_loop" kind="test"\>
@@ -761,7 +761,7 @@ schedulerFSM(actions, fsm) ::= <<
 			<schedulingTest(actions)>  	 
 			<endif>
 			\<!-- FSM transitions --\>
-			<printTransitions(actions, fsm.transitions)>
+			<printTransitions(actions, fsm.states)>
 			<if(actions)>
 			\<!--Close modules for untagged actions --\>
 			<actions:{action|\</module\>\</module\>}; separator="\n">

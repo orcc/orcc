@@ -17,10 +17,10 @@ run_xlim2c(<instance.id>)
 
 
 printNetwork(network, options) ::= <<
-# Generated from <network.name>
+# Generated from <network.simpleName>
 
 cmake_minimum_required (VERSION 2.8)
-project (<network.name>)
+project (<network.simpleName>)
 
 # If the user specifies -DCMAKE_BUILD_TYPE on the command line take their definition,
 # otherwise set CMAKE_BUILD_TYPE to Release
@@ -50,15 +50,15 @@ endmacro(run_xlim2c)
 set(filenames
 ${ACTORS}/share/sysactors/c/display-sdl.c
 <network.instances: printInstance()>
-<network.name>.c
+<network.simpleName>.c
 )
 
 set(ORCC_C_FLAGS "-DORCC")
 
 add_definitions(${ORCC_C_FLAGS})
 
-add_executable(<network.name> ${filenames})
+add_executable(<network.simpleName> ${filenames})
 
-target_link_libraries(<network.name> ${ACTORS}/lib/libactors-rts.a ${SDL_LIBRARY} ${LIBXML2_LIBRARIES})
+target_link_libraries(<network.simpleName> ${ACTORS}/lib/libactors-rts.a ${SDL_LIBRARY} ${LIBXML2_LIBRARIES})
 
 >>
