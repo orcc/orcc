@@ -9,9 +9,9 @@ entity dram is
     (
       size          : integer;
       width         : integer := 32;
-      widthu		: integer;
-	  init_file     : string;
-	  device_family : string  := "Stratix III"
+      widthu        : integer;
+      init_file     : string;
+      device_family : string  := "Stratix III"
       );
   port
     (
@@ -56,5 +56,5 @@ begin
       wren_a    => wren,
       q_a       => q
       );
-  
+
 end rtl_dram;

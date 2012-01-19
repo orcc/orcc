@@ -6,7 +6,7 @@ library XilinxCoreLib;
 -- synthesis translate_on
 
 library UNISIM;
-use UNISIM.VCOMPONENTS.ALL;
+use UNISIM.VCOMPONENTS.all;
 
 entity dram is
   generic
@@ -50,7 +50,7 @@ begin
       c_prim_type                 => 1,
       c_read_width_b              => width,
       c_initb_val                 => "0",
-      c_family                    => "virtex5",
+      c_family                    => device_family,
       c_read_width_a              => width,
       c_disable_warn_bhv_coll     => 0,
       c_use_softecc               => 0,

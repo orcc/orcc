@@ -95,8 +95,8 @@ else
 signal fifo_<indexConnection(connection)>_q			   : std_logic_vector(31 downto 0);
 signal fifo_<indexConnection(connection)>_rdreq		   : std_logic;
 signal fifo_<indexConnection(connection)>_wrreq		   : std_logic;
-signal fifo_<indexConnection(connection)>_status_full  : std_logic_vector(31 downto 0);
-signal fifo_<indexConnection(connection)>_status_empty : std_logic_vector(31 downto 0);<
+signal fifo_<indexConnection(connection)>_nb_tokens    : std_logic_vector(31 downto 0);
+signal fifo_<indexConnection(connection)>_nb_freerooms : std_logic_vector(31 downto 0);<
 endif>
 >>
 
@@ -125,8 +125,8 @@ fifo_<indexConnection(connection)> : entity work.fifo
            rdreq        =\> fifo_<indexConnection(connection)>_rdreq,
            data         =\> fifo_<indexConnection(connection)>_data(31 downto 0),
            q            =\> fifo_<indexConnection(connection)>_q(31 downto 0),
-           status_full  =\> fifo_<indexConnection(connection)>_status_full,
-           status_empty =\> fifo_<indexConnection(connection)>_status_empty,
+           nb_tokens    =\> fifo_<indexConnection(connection)>_nb_tokens,
+           nb_freerooms =\> fifo_<indexConnection(connection)>_nb_freerooms,
            wrreq        =\> fifo_<indexConnection(connection)>_wrreq,
            rst_n        =\> rst_n);
            
@@ -162,7 +162,7 @@ assignInputPort(port, connection, index) ::= <<
 ><port.name>   =\> s_<indexConnection(connection)>,<
 else
 >data_<index>_in    =\> fifo_<indexConnection(connection)>_q,
-status_<index>_in  =\> fifo_<indexConnection(connection)>_status_full,
+status_<index>_in  =\> fifo_<indexConnection(connection)>_nb_tokens,
 ack_<index>_in     =\> fifo_<indexConnection(connection)>_rdreq,<
 endif>
 >>
@@ -172,7 +172,7 @@ assignOutputPort(port, connection, index) ::= <<
 ><port.name>   =\> s_<indexConnection(connection)>,<
 else
 >data_<index>_out   =\> fifo_<indexConnection(connection)>_data,
-status_<index>_out =\> fifo_<indexConnection(connection)>_status_empty,
+status_<index>_out =\> fifo_<indexConnection(connection)>_nb_freerooms,
 dv_<index>_out     =\> fifo_<indexConnection(connection)>_wrreq,<
 endif>
 >>

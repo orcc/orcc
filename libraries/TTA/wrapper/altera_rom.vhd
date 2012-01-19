@@ -9,9 +9,9 @@ entity irom is
     (
       size          : integer;
       width         : integer := 32;
-      widthu		: integer;
-	  init_file     : string;
-	  device_family : string  := "Stratix III"
+      widthu        : integer;
+      init_file     : string;
+      device_family : string  := "Stratix III"
       );
   port
     (
@@ -48,5 +48,5 @@ begin
       clock0    => clock,
       q_a       => q
       );
-  
+
 end rtl_irom;

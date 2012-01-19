@@ -20,43 +20,45 @@ entity fifo is
       );
   port
     (
-      wrreq  : in  std_logic;
-      rst_n  : in  std_logic;
-      clk    : in  std_logic;
-      rdreq  : in  std_logic;
-      data   : in  std_logic_vector(width-1 downto 0);
-      q      : out std_logic_vector(width-1 downto 0);
-      status : out std_logic_vector(31 downto 0)
+      wrreq        : in  std_logic;
+      rst_n        : in  std_logic;
+      clk          : in  std_logic;
+      rdreq        : in  std_logic;
+      data         : in  std_logic_vector(width-1 downto 0);
+      q            : out std_logic_vector(width-1 downto 0);
+      nb_freerooms : out std_logic_vector(31 downto 0);
+      nb_tokens    : out std_logic_vector(31 downto 0)
       );
 end fifo;
 
 
 architecture rtl_fifo of fifo is
 
-  signal status_i : std_logic_vector(31 downto 0) := (others => '0');
-  signal rst      : std_logic;
-  signal empty    : std_logic;
+  signal nb_tokens_i : std_logic_vector(31 downto 0) := (others => '0');
+  signal rst         : std_logic;
+  signal empty       : std_logic;
 
 begin
 
-  rst    <= not(rst_n);
-  status <= status_i;
-  
-  data_count : process(clk)
+  rst          <= not(rst_n);
+  nb_tokens    <= nb_tokens_i;
+  nb_freerooms <= std_logic_vector(to_unsigned(size - to_integer(unsigned(nb_tokens_i)), 32));
+
+  token_count : process(clk)
   begin
     if (clk'event and clk = '1') then
-      if ((wrreq = '1' and status_i(widthu) = '0') and (rdreq = '1' and empty = '0')) then
-        status_i(widthu-1 downto 0) <= status_i(widthu-1 downto 0);
+      if ((wrreq = '1' and nb_tokens_i(widthu) = '0') and (rdreq = '1' and empty = '0')) then
+        nb_tokens_i(widthu-1 downto 0) <= nb_tokens_i(widthu-1 downto 0);
       else
         if (wrreq = '1' and s_status(widthu) = '0') then
-          status_i(widthu-1 downto 0) <= status_i(widthu-1 downto 0) + 1;
+          nb_tokens_i(widthu-1 downto 0) <= nb_tokens_i(widthu-1 downto 0) + 1;
         end if;
         if (rdreq = '1' and empty = '0') then
-          status_i(widthu-1 downto 0) <= status_i(widthu-1 downto 0) - 1;
+          nb_tokens_i(widthu-1 downto 0) <= nb_tokens_i(widthu-1 downto 0) - 1;
         end if;
       end if;
     end if;
-  end process data_count;
+  end process token_count;
 
   fifo_component : XilinxCoreLib.fifo_generator_v6_1(behavioral)
     generic map(
@@ -70,7 +72,7 @@ begin
       c_has_wr_data_count            => 0,
       c_full_flags_rst_val           => 1,
       c_implementation_type          => 0,
-      c_family                       => "device_family",
+      c_family                       => device_family,
       c_use_embedded_reg             => 0,
       c_has_wr_rst                   => 0,
       c_wr_freq                      => 1,
@@ -128,8 +130,8 @@ begin
       wr_en => wrreq,
       rd_en => rdreq,
       dout  => q,
-      full  => status_i(widthu),
+      full  => nb_tokens_i(widthu),
       empty => empty
       );
-  
+
 end rtl_fifo;
