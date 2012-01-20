@@ -57,21 +57,26 @@ public class TypeResizer extends AbstractActorVisitor<Object> {
 	private boolean castToPow2bits;
 	private boolean castTo32bits;
 	private boolean castNativePort;
+	private boolean castPort;
 
 	public TypeResizer(boolean castToPow2bits, boolean castTo32bits,
-			boolean castNativePort) {
+			boolean castNativePort, boolean castPort) {
 		super(true);
 		this.castToPow2bits = castToPow2bits;
 		this.castTo32bits = castTo32bits;
 		this.castNativePort = castNativePort;
+		this.castPort = castPort;
 	}
 
 	@Override
 	public Object caseActor(Actor actor) {
 		checkVariables(actor.getParameters());
 		checkVariables(actor.getStateVars());
-		checkPorts(actor.getInputs());
-		checkPorts(actor.getOutputs());
+		
+		if (castPort) {
+			checkPorts(actor.getInputs());
+			checkPorts(actor.getOutputs());
+		}
 
 		return super.caseActor(actor);
 	}

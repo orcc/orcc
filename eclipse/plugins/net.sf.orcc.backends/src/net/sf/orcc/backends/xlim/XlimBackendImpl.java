@@ -144,7 +144,7 @@ public class XlimBackendImpl extends AbstractBackend {
 
 		if (useHw) {
 			new StoreOnceTransformation().doSwitch(actor);
-			new TypeResizer(false, true, false);
+			new TypeResizer(false, true, false, true);
 		}
 
 		if (useMulti2mono) {

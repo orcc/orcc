@@ -125,11 +125,11 @@ list<Procedure*> Decoder::getExternalProcs(){
 
 void Decoder::setConfiguration(Configuration* newConfiguration){
 	clock_t start = clock ();
-	if (running){
+	/*if (running){
 		//Decoder is currently running
 		cout << "Can't set a configuration, the decoder is currently running.";
 		exit(1);
-	}
+	}*/
 
 	//Reconfigure the decoder
 	ConfigurationEngine engine(Context, verbose);

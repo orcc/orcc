@@ -157,7 +157,7 @@ public class CBackendImpl extends AbstractBackend {
 		}
 
 		DfSwitch<?>[] transformations = { new UnitImporter(),
-				new TypeResizer(true, false, true),
+				new TypeResizer(true, false, true, true),
 				new RenameTransformation(replacementMap) };
 
 		for (DfSwitch<?> transformation : transformations) {

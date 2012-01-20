@@ -150,12 +150,15 @@ public class LLVMBackendImpl extends AbstractBackend {
 				new ActorNormalizer().doSwitch(actor);
 			}
 		}
+		
 		new UnitImporter().doSwitch(actor);
 		new SSATransformation().doSwitch(actor);
 		new DeadGlobalElimination().doSwitch(actor);
+		
 		if (!byteexact) {
-			new TypeResizer(true, false, false).doSwitch(actor);
+			new TypeResizer(true, false, false, true).doSwitch(actor);
 		}
+		
 		new DeadCodeElimination().doSwitch(actor);
 		new DeadVariableRemoval().doSwitch(actor);
 		new BoolToIntTransformation().doSwitch(actor);

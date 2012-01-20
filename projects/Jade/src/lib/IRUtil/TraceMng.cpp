@@ -148,6 +148,7 @@ void TraceMng::createStateVarTrace(Module* module, map<std::string, StateVar*>* 
 			
 			// Create message
 			string message(name);
+
 			message.append(" = %d \n");
 			FunctionMng::createPrintf(module, message, instruction, loadInst);
 		}
