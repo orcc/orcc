@@ -198,10 +198,11 @@ public class TTABackendImpl extends AbstractBackend {
 		networkPrinter.print("top.vhd", path, network);
 
 		// Python package
+		String pythonPath = OrccUtil.createFolder(path, "informations_");
 		StandardPrinter pythonPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/tta/Python_Network.stg");
-		pythonPrinter.print("informations.py", path, network);
-		OrccUtil.createFile(path, "__init__.py");
+		pythonPrinter.print("informations.py", pythonPath, network);
+		OrccUtil.createFile(pythonPath, "__init__.py");
 
 		// Quartus
 		CustomPrinter projectQsfPrinter = new CustomPrinter(
