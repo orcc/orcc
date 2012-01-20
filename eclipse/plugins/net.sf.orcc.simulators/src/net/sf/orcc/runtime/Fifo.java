@@ -184,14 +184,16 @@ public class Fifo {
 	 * @return the token read
 	 */
 	public Object peek(int offset) {
-		Object[] result = new Object[offset + 1];
+		Object result = null;
 
 		if (offset == 0) {
-			result[0] = content.peek();
+			result = content.peek();
 		} else {
 			Iterator<Object> it = content.iterator();
-			for (int i = 0; i < offset && it.hasNext(); ++i) {
-				result[i] = it.next();
+			while (it.hasNext()) {
+				result = it.next();
+				if (--offset == 0)
+					break;
 			}
 		}
 
