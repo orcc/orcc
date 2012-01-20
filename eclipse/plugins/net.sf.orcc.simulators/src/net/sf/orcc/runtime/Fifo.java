@@ -175,7 +175,7 @@ public class Fifo {
 	 *         of tokens
 	 */
 	final public boolean hasTokens(int numTokens) {
-		return content.size() > numTokens;
+		return content.size() >= numTokens;
 	}
 
 	/**
