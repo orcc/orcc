@@ -11,10 +11,10 @@ endif>
 >>
 
 printNetwork(network, options) ::= <<
-# Generated from <network.name>
+# Generated from <network.simpleName>
 
 cmake_minimum_required (VERSION 2.6)
-project (<network.name>)
+project (<network.simpleName>)
 
 # Common packages required
 find_library(orcc_LIBRARY orcc)
@@ -32,11 +32,11 @@ find_package(Threads REQUIRED)
 include_directories(${orcc_INCLUDE_DIR} ${roxml_INCLUDE_DIR} ${SDL_INCLUDE_DIR})
 
 set(filenames
-<network.name>.c
+<network.simpleName>.c
 <network.instances: printInstance()>)
 
-add_executable(<network.name> ${filenames})
+add_executable(<network.simpleName> ${filenames})
 
-target_link_libraries(<network.name> ${orcc_LIBRARY} ${roxml_LIBRARY} ${SDL_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(<network.simpleName> ${orcc_LIBRARY} ${roxml_LIBRARY} ${SDL_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
 
 >>

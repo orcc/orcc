@@ -242,7 +242,7 @@ public class CBackendImpl extends AbstractBackend {
 
 		// print network
 		write("Printing network...\n");
-		printer.print(network.getName() + ".c", path, network);
+		printer.print(network.getSimpleName() + ".c", path, network);
 
 		// print CMakeLists
 		printCMake(network);
