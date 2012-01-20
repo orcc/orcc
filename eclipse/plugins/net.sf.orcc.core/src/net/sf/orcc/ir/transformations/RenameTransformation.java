@@ -32,7 +32,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.eclipse.emf.common.util.EList;
+
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
@@ -90,6 +94,14 @@ public class RenameTransformation extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
+	public Object caseNetwork(Network network) {
+		checkPorts(network.getInputs());
+		checkPorts(network.getOutputs());
+
+		return super.caseNetwork(network);
+	}
+
+	@Override
 	public Object caseProcedure(Procedure procedure) {
 		String name = procedure.getName();
 		if (transformations != null && transformations.containsKey(name)) {
@@ -101,6 +113,21 @@ public class RenameTransformation extends AbstractActorVisitor<Object> {
 		checkParameters(procedure.getParameters());
 		checkVariables(procedure.getLocals());
 		return null;
+	}
+
+	private void checkPorts(EList<Port> inputs) {
+		for (Port port : inputs) {
+			checkport(port);
+		}
+	}
+
+	private void checkport(Port port) {
+		String name = port.getName().toLowerCase();
+		if (transformations != null && transformations.containsKey(name)) {
+			port.setName(transformations.get(name));
+		} else if (pattern != null) {
+			port.setName(pattern.matcher(name).replaceAll(replacement));
+		}
 	}
 
 	private void checkParameters(List<Param> parameters) {
