@@ -159,11 +159,11 @@ end process WaveGen_Proc_Out;
 
 printFSMIn(port) ::= <<
 signal tb_FSM_<port.name>  : tb_type;
-file sim_file_<instance.id>_<port.name>  : text is "decoder_<instance.id>_<port.name>.txt";
+file sim_file_<instance.id>_<port.name>  : text is "<instance.id>_<port.name>.txt";
 >>
 
 printFSMOut(port) ::= <<
-file sim_file_<instance.id>_<port.name>  : text is "decoder_<instance.id>_<port.name>.txt";
+file sim_file_<instance.id>_<port.name>  : text is "<instance.id>_<port.name>.txt";
 >>
 
 case_define_out(port) ::= <<
