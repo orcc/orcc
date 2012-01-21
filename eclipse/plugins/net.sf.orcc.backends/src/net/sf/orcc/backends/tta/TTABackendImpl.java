@@ -177,6 +177,33 @@ public class TTABackendImpl extends AbstractBackend {
 		}
 	}
 
+	private int getAluNb(Instance instance) {
+		if (instance.isActor()
+				&& processorIntensiveActors.contains(instance.getActor()
+						.getName())) {
+			return 4;
+		}
+		return 1;
+	}
+
+	private int getBusNb(Instance instance) {
+		if (instance.isActor()
+				&& processorIntensiveActors.contains(instance.getActor()
+						.getName())) {
+			return 8;
+		}
+		return 2;
+	}
+
+	private int getRegNb(Instance instance) {
+		if (instance.isActor()
+				&& processorIntensiveActors.contains(instance.getActor()
+						.getName())) {
+			return 8;
+		}
+		return 2;
+	}
+
 	@Override
 	protected boolean printInstance(Instance instance) throws OrccException {
 		StandardPrinter printer = new StandardPrinter(
@@ -260,33 +287,6 @@ public class TTABackendImpl extends AbstractBackend {
 				instancePath, "printTTA", "tta", simpleTTA);
 		idfPrinter.print("processor_" + instance.getName() + ".idf",
 				instancePath, "printTTA", "tta", simpleTTA);
-	}
-
-	private int getBusNb(Instance instance) {
-		if (instance.isActor()
-				&& processorIntensiveActors.contains(instance.getActor()
-						.getName())) {
-			return 8;
-		}
-		return 2;
-	}
-
-	private int getAluNb(Instance instance) {
-		if (instance.isActor()
-				&& processorIntensiveActors.contains(instance.getActor()
-						.getName())) {
-			return 4;
-		}
-		return 1;
-	}
-
-	private int getRegNb(Instance instance) {
-		if (instance.isActor()
-				&& processorIntensiveActors.contains(instance.getActor()
-						.getName())) {
-			return 8;
-		}
-		return 2;
 	}
 
 	private void runPythonScript() throws OrccException {
