@@ -33,10 +33,8 @@ import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.OrccLaunchConstants.MAPPING;
 import static net.sf.orcc.preferences.PreferenceConstants.P_JADE_TOOLBOX;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -59,7 +57,7 @@ import net.sf.orcc.backends.transformations.TypeResizer;
 import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.backends.transformations.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transformations.ssa.CopyPropagator;
-import net.sf.orcc.backends.util.MappingUtil;
+import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -150,15 +148,15 @@ public class LLVMBackendImpl extends AbstractBackend {
 				new ActorNormalizer().doSwitch(actor);
 			}
 		}
-		
+
 		new UnitImporter().doSwitch(actor);
 		new SSATransformation().doSwitch(actor);
 		new DeadGlobalElimination().doSwitch(actor);
-		
+
 		if (!byteexact) {
 			new TypeResizer(true, false, false, true).doSwitch(actor);
 		}
-		
+
 		new DeadCodeElimination().doSwitch(actor);
 		new DeadVariableRemoval().doSwitch(actor);
 		new BoolToIntTransformation().doSwitch(actor);
@@ -224,7 +222,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 			if (!component.isEmpty()) {
 				targetToInstancesMap = new HashMap<String, List<Instance>>();
 				List<Instance> unmappedInstances = new ArrayList<Instance>();
-				MappingUtil.computeMapping(network, mapping,
+				BackendUtil.computeMapping(network, mapping,
 						targetToInstancesMap, unmappedInstances);
 				for (Instance instance : unmappedInstances) {
 					write("Warning: The instance '" + instance.getName()
@@ -301,41 +299,9 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 		// Launch application
 		try {
-			startExec(cmd);
+			BackendUtil.startExec(this, cmd);
 		} catch (IOException e) {
 			System.err.println("Jade toolbox error : ");
-			e.printStackTrace();
-		}
-	}
-
-	private void startExec(String[] cmd) throws IOException {
-		Runtime run = Runtime.getRuntime();
-		final Process process = run.exec(cmd);
-
-		// Output error message
-		new Thread() {
-			@Override
-			public void run() {
-				try {
-					BufferedReader reader = new BufferedReader(
-							new InputStreamReader(process.getErrorStream()));
-					try {
-						String line = reader.readLine();
-						if (line != null) {
-							write("Generation error :" + line + "\n");
-						}
-					} finally {
-						reader.close();
-					}
-				} catch (IOException ioe) {
-					ioe.printStackTrace();
-				}
-			}
-		}.start();
-
-		try {
-			process.waitFor();
-		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}

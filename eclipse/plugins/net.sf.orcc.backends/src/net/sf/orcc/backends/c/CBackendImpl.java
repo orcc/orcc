@@ -42,7 +42,7 @@ import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.c.transformations.CBroadcastAdder;
 import net.sf.orcc.backends.transformations.TypeResizer;
 import net.sf.orcc.backends.transformations.UnitImporter;
-import net.sf.orcc.backends.util.MappingUtil;
+import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -225,7 +225,7 @@ public class CBackendImpl extends AbstractBackend {
 			if (!component.isEmpty()) {
 				targetToInstancesMap = new HashMap<String, List<Instance>>();
 				List<Instance> unmappedInstances = new ArrayList<Instance>();
-				MappingUtil.computeMapping(network, mapping,
+				BackendUtil.computeMapping(network, mapping,
 						targetToInstancesMap, unmappedInstances);
 				for (Instance instance : unmappedInstances) {
 					write("Warning: The instance '" + instance.getName()
