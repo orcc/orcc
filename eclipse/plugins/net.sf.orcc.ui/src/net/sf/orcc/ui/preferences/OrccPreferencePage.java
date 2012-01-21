@@ -167,7 +167,8 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 		group.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 		group.setText("TTA backend");
 
-		addField(new FileFieldEditor(P_TTA_LIB, "Path of TTA library:", group));
+		addField(new DirectoryFieldEditor(P_TTA_LIB, "Path of TTA library:",
+				group));
 	}
 
 	/**

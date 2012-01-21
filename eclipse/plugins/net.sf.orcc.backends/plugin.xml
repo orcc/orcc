@@ -98,6 +98,9 @@
                id="net.sf.orcc.plugins.compileXDF">
          </option>
          <option
+               id="net.sf.orcc.backends.finalizeGeneration">
+         </option>
+         <option
                id="net.sf.orcc.backends.fpgaBrand">
          </option>
          <option
@@ -298,6 +301,13 @@
                defaultValue="false"
                id="net.sf.orcc.backends.byteexact"
                name="Generate byte exact code">
+            <checkBox></checkBox>
+         </option>
+         <option
+               defaultValue="false"
+               description="Finalize the generation of the design in VHDL description using TCE tools"
+               id="net.sf.orcc.backends.finalizeGeneration"
+               name="Finalize the generation">
             <checkBox></checkBox>
          </option>
          <option

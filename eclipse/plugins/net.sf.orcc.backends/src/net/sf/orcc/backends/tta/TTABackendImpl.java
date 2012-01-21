@@ -28,8 +28,12 @@
  */
 package net.sf.orcc.backends.tta;
 
+import static net.sf.orcc.OrccActivator.getDefault;
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
+import static net.sf.orcc.preferences.PreferenceConstants.P_TTA_LIB;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,6 +58,7 @@ import net.sf.orcc.backends.transformations.ssa.CopyPropagator;
 import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.tta.architecture.TTA;
 import net.sf.orcc.backends.tta.transformations.BroadcastTypeResizer;
+import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Entity;
@@ -84,6 +89,8 @@ public class TTABackendImpl extends AbstractBackend {
 	 * Backend options
 	 */
 	private boolean debug;
+	private boolean finalize;
+	private String libPath;
 
 	private final Map<String, String> transformations;
 	private final List<String> processorIntensiveActors;
@@ -109,13 +116,16 @@ public class TTABackendImpl extends AbstractBackend {
 	@Override
 	public void doInitializeOptions() {
 		debug = getAttribute(DEBUG_MODE, true);
+		finalize = getAttribute("net.sf.orcc.backends.finalizeGeneration", true);
+		libPath = getDefault().getPreference(P_TTA_LIB, "");
 	}
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		DfSwitch<?>[] transformations = { new UnitImporter(),
 				new SSATransformation(), new BoolToIntTransformation(),
-				new TypeResizer(true, true, false, true), new StringTransformation(),
+				new TypeResizer(true, true, false, true),
+				new StringTransformation(),
 				new RenameTransformation(this.transformations),
 				new TacTransformation(), new CopyPropagator(),
 				new ConstantPropagator(), new InstPhiTransformation(),
@@ -161,6 +171,10 @@ public class TTABackendImpl extends AbstractBackend {
 
 		network.computeTemplateMaps();
 		printNetwork(network);
+
+		if (finalize) {
+			runPythonScript();
+		}
 	}
 
 	@Override
@@ -273,6 +287,24 @@ public class TTABackendImpl extends AbstractBackend {
 			return 8;
 		}
 		return 2;
+	}
+
+	private void runPythonScript() throws OrccException {
+		List<String> cmdList = new ArrayList<String>();
+		cmdList.add(libPath + File.separator + "generate");
+		cmdList.add("-cg");
+		if (debug) {
+			cmdList.add("--debug");
+		}
+		cmdList.add(path);
+
+		String[] cmd = cmdList.toArray(new String[] {});
+		try {
+			BackendUtil.startExec(this, cmd);
+		} catch (IOException e) {
+			System.err.println("TCE error: ");
+			e.printStackTrace();
+		}
 	}
 
 }
