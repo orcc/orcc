@@ -58,7 +58,6 @@ import net.sf.orcc.backends.transformations.ssa.CopyPropagator;
 import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.tta.architecture.TTA;
 import net.sf.orcc.backends.tta.transformations.BroadcastTypeResizer;
-import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Entity;
@@ -116,7 +115,8 @@ public class TTABackendImpl extends AbstractBackend {
 	@Override
 	public void doInitializeOptions() {
 		debug = getAttribute(DEBUG_MODE, true);
-		finalize = getAttribute("net.sf.orcc.backends.finalizeGeneration", true);
+		finalize = getAttribute("net.sf.orcc.backends.finalizeGeneration",
+				false);
 		libPath = getDefault().getPreference(P_TTA_LIB, "");
 	}
 
@@ -300,9 +300,16 @@ public class TTABackendImpl extends AbstractBackend {
 
 		String[] cmd = cmdList.toArray(new String[] {});
 		try {
-			BackendUtil.startExec(this, cmd);
+			write("Generating design...\n");
+			long t0 = System.currentTimeMillis();
+			final Process process = Runtime.getRuntime().exec(cmd);
+			process.waitFor();
+			long t1 = System.currentTimeMillis();
+			write("Done in " + ((float) (t1 - t0) / (float) 1000) + "s\n");
 		} catch (IOException e) {
 			System.err.println("TCE error: ");
+			e.printStackTrace();
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
