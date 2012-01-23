@@ -113,6 +113,7 @@ if len(args) == 0:
 pathname = os.path.dirname(sys.argv[0])
 libPath = os.path.abspath(pathname)
 srcPath = os.path.abspath(args[0])
+tracePath = os.path.join(srcPath, "trace")
 	
 sys.path.insert(0, libPath)
 sys.path.insert(0, srcPath)
