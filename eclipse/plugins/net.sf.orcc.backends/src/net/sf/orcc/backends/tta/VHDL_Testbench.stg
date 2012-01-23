@@ -194,7 +194,7 @@ Proc_in_<output.name> : process (rst_n, clk)
 begin
 
   if (rst_n = '0') then
-    s_<output.name>_status \<= (others => '0');
+    s_<output.name>_status \<= std_logic_vector(to_unsigned(256, 32));
     
   elsif clk'event and clk = '1' then
     if (not (endfile (trace_<output.name>)) and s_<output.name>_wrreq = '1') then
