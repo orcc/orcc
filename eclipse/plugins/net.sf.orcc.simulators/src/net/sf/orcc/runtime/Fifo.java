@@ -187,7 +187,7 @@ public class Fifo {
 		Object result = null;
 
 		if (offset == 0) {
-			result = content.peek();
+			return content.peek();
 		} else {
 			Iterator<Object> it = content.iterator();
 			while (it.hasNext()) {
