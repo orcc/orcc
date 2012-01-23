@@ -482,7 +482,9 @@ if (<checkInputPattern(transition.action.inputPattern)>isSchedulable_<transition
 printInputPatternPort(port) ::= <<
 if (index_<port.name> + <pattern.numTokensMap.(port)> - numTokens_<port.name> - 1 \<= SIZE_<port.name>) {
 	if(!<instance.name>.sched-\>round_robin || i \> 0) {
+		<if(instance.incomingPortMap.(port).source.name)>
 		sched_add_schedulable(<instance.name>.sched, &<instance.incomingPortMap.(port).source.name>, RING_TOPOLOGY);
+		<endif>
 #ifdef PRINT_FIRINGS
 		printf("\tEmpty port: <port.name>\n");
 #endif
