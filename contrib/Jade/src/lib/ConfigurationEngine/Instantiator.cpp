@@ -160,7 +160,7 @@ void Instantiator::updateConnection(Connection* connection){
 	IntegerType* srcType = cast<IntegerType>(srcPortType);
 	IntegerType* dstType = cast<IntegerType>(dstPortType);
 	if (srcType->getBitWidth() != dstType->getBitWidth()) {
-		cerr << "Type error: size of port " << sourceString.c_str() << " is " << srcType->getBitWidth() << " and different from port " << targetString.c_str() << " of size " << dstType->getBitWidth() << ".\n";
+		cerr << "A connection refers to an output port " << sourceString.c_str()  << " of size "<< srcType->getBitWidth() << " in instance "<< srcVertex->getName() << " which differs to the target port " << targetString.c_str() << " of size " << dstType->getBitWidth() << " in  "<<dstVertex->getName() << ".\n";
 		exit(0);
 	}
 	
