@@ -51,7 +51,10 @@
  */
 class MoC {
 public:
-	MoC(){};
+	MoC(Entity* parent){
+		this->parent = parent;
+	};
+
 	~MoC(){};
 
 	/**
@@ -94,7 +97,16 @@ public:
 	 * @return true if this MoC is SDF
 	 */
 	virtual bool isSDF(){return false;};
-	
+
+	/**
+	 * @brief Returns the parent of the given MoC.
+	 * 
+	 * @return the parent of the given MoC
+	 */
+	Entity* getParent(){return parent;};
+
+protected:
+	Entity* parent;
 };
 
 #endif

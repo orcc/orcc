@@ -190,7 +190,7 @@ StateVar* SuperInstance::getInternalVar(Port* port){
 };
 
 CSDFMoC* SuperInstance::createMoC(CSDFMoC* srcMoc, int srcFactor, CSDFMoC* dstMoc, int dstFactor, set<Port*>* in, set<Port*>* out){
-	CSDFMoC* moc = new CSDFMoC();
+	CSDFMoC* moc = new CSDFMoC(this);
 
 	// Merges patterns of actors
 	Pattern* inputPattern = createPattern(srcMoc->getInputPattern(), srcFactor, dstMoc->getInputPattern(), dstFactor, in);

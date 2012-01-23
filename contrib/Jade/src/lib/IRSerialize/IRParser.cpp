@@ -152,7 +152,7 @@ MoC* IRParser::parseMoC(Module* module){
 	NamedMDNode* mocKeyMD =  module->getNamedMetadata(IRConstant::KEY_MOC);
 	
 	if (mocKeyMD == NULL) {
-		return new DPNMoC();
+		return new DPNMoC(actor);
 	}
 
 	//Parse MoC type
@@ -167,9 +167,9 @@ MoC* IRParser::parseMoC(Module* module){
 	}else if(nameStr == "QuasiStatic"){
 		return parseQSDF(node);
 	}else if(nameStr == "KPN"){
-		return new KPNMoC();
+		return new KPNMoC(actor);
 	}else if(nameStr == "DPN"){
-		return new DPNMoC();
+		return new DPNMoC(actor);
 	}
 	
 	cout << "Unsupported type of MoC \n";
@@ -184,9 +184,9 @@ CSDFMoC* IRParser::parseCSDF(MDNode* csdfNode){
 	int phasesNb = value->getValue().getLimitedValue();
 
 	if (phasesNb == 1){
-		csfMoC = new SDFMoC();
+		csfMoC = new SDFMoC(actor);
 	}else{
-		csfMoC = new CSDFMoC();
+		csfMoC = new CSDFMoC(actor);
 	}
 	
 	// Parse patterns
@@ -211,7 +211,7 @@ void IRParser::parseCSDFActions(MDNode* actionsNode, CSDFMoC* csfMoC){
 }
 
 MoC* IRParser::parseQSDF(MDNode* qsdfNode){
-	QSDFMoC* qsdfMoC = new QSDFMoC();
+	QSDFMoC* qsdfMoC = new QSDFMoC(actor);
 	
 	// Parse configurations of the QSDF MoC
 	for (unsigned i = 1, e = qsdfNode->getNumOperands(); i != e; ++i) {

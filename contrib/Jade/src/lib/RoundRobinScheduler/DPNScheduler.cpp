@@ -61,7 +61,7 @@
 using namespace llvm;
 using namespace std;
 
-DPNScheduler::DPNScheduler(llvm::LLVMContext& C, Decoder* decoder, bool debug) : ActionSchedulerAdder(C, decoder, debug) {
+DPNScheduler::DPNScheduler(llvm::LLVMContext& C, Decoder* decoder) : ActionSchedulerAdder(C, decoder) {
 
 }
 
@@ -196,9 +196,9 @@ void DPNScheduler::createActionCall(Action* action, BasicBlock* BB){
 	//Launch action body
 	Procedure* body = action->getBody();
 	CallInst* bodyInst = CallInst::Create(body->getFunction(), "",  BB);
-
+	Entity* parent = action->getParent();
 	// Add debugging information if needed
-	if (debug){
+	if (parent->isInstance() && ((Instance*)parent)->isTraceActivate()){
 		TraceMng::createActionTrace(decoder->getModule(), action, bodyInst);
 		TraceMng::createStateVarTrace(decoder->getModule(), action->getParent()->getStateVars(), &bodyInst->getParent()->back());
 	}

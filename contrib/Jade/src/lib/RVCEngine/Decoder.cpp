@@ -53,7 +53,7 @@
 using namespace llvm;
 using namespace std;
 
-Decoder::Decoder(LLVMContext& C, Configuration* configuration, bool verbose, bool noMultiCore, bool debug): Context(C){
+Decoder::Decoder(LLVMContext& C, Configuration* configuration, bool verbose, bool noMultiCore): Context(C){
 	
 	//Set property of the decoder
 	this->configuration = configuration;
@@ -64,7 +64,6 @@ Decoder::Decoder(LLVMContext& C, Configuration* configuration, bool verbose, boo
 	this->running = false;
 	this->scheduler = NULL;
 	this->noMultiCore = noMultiCore;
-	this->debug = debug;
 
 	//Create a new module that contains the current decoder
 	module = new Module("decoder", C);
@@ -78,12 +77,12 @@ Decoder::Decoder(LLVMContext& C, Configuration* configuration, bool verbose, boo
 	map<string, Partition*>* partitions = configuration->getPartitions();
 
 	// Unpartitionned instance scheduler
-	scheduler = new RoundRobinScheduler(Context, this, configuration->getUnpartitioned(), configuration->mergeActors(), noMultiCore, verbose, debug);
+	scheduler = new RoundRobinScheduler(Context, this, configuration->getUnpartitioned(), configuration->mergeActors(), noMultiCore, verbose);
 
 	// Partitionned instance scheduler
 	for(itPartition = partitions->begin(); itPartition != partitions->end(); itPartition++){
 		Partition* partition = itPartition->second;
-		Scheduler* procSchedul = new RoundRobinScheduler(Context, this, partition->getInstances(), configuration->mergeActors(), noMultiCore, verbose, debug);
+		Scheduler* procSchedul = new RoundRobinScheduler(Context, this, partition->getInstances(), configuration->mergeActors(), noMultiCore, verbose);
 		procSchedulers.insert(pair<Partition*, Scheduler*>(partition, procSchedul));
 	}
 

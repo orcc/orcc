@@ -124,9 +124,9 @@ cl::opt<bool>
 nodisplay("nodisplay", desc("Deactivate display"),
 					   init(false));
 
-cl::opt<bool> 
-debug("debexec", desc("Display debugging information"),
-					   init(false));
+cl::list<std::string> 
+debexec("debexec", desc("Display debugging information for the given instances"),
+					   cl::value_desc("A list of instance id"));
 
 cl::opt<std::string> 
 MArch("march", desc("Architecture to generate assembly for (see --version)"));
@@ -180,6 +180,8 @@ static cl::opt<bool> Console("console", cl::desc("Enter in console mode"), cl::i
 static cl::opt<bool> noMerging("nomerging", cl::desc("Deactivate merging of static actors"), cl::init(false));
 
 cl::list<const PassInfo*, bool, PassNameParser> PassList(cl::desc("Optimizations available:"));
+
+bool enableTrace = false;
 
 void clean_exit(int sig){
 	exit(0);
@@ -236,6 +238,30 @@ void setOptions(){
 		display_flags = DISPLAY_DISABLE;
 	}
 
+	if (!debexec.empty()){
+		enableTrace = true;
+	}
+
+}
+
+void setTraces(Network* network){
+	std::list<Instance*>::iterator it;
+	std::list<Instance*>* instances = network->getInstances();
+	
+	bool traceAll = false;
+
+	// Check if "all" option is activate
+	if (debexec.begin()->compare("all")==0){
+		traceAll = true;
+	}
+
+	for (it = instances->begin(); it != instances->end(); it++){
+		Instance* instance = *it;
+
+		if (traceAll || (debexec.end() != find(debexec.begin(), debexec.end(), instance->getId()))){
+			instance->setTrace(true);
+		}
+	}
 }
 
 //Command line decoder control
@@ -266,8 +292,14 @@ void startCmdLine(){
 		network->setMapping(mapping);
 	}
 
+	if (enableTrace){
+		setTraces(network);
+	}
+	
 	//Load network
 	engine->load(network, 3);
+
+	
 
 	// Optimizing decoder
 	if (optLevel > 0){
@@ -314,7 +346,7 @@ int main(int argc, char **argv) {
 	setOptions();
 	
 	//Loading decoderEngine
-	engine = new RVCEngine(Context, VTLDir, FifoSize, SystemDir, OutputDir, noMerging, disableMultiCore, Verbose, debug);
+	engine = new RVCEngine(Context, VTLDir, FifoSize, SystemDir, OutputDir, noMerging, disableMultiCore, Verbose);
 
 	if (Verbose){
 		cout << "> Core preparation finished in " << (clock () - start) * 1000 / CLOCKS_PER_SEC <<" ms.\n";

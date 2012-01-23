@@ -126,7 +126,7 @@ void BroadcastActor::createActor(){
 
 MoC* BroadcastActor::createMoC(){
 	// Set broadcast actor as SDF
-	SDFMoC* sdfMoC = new SDFMoC();
+	SDFMoC* sdfMoC = new SDFMoC(this);
 
 	//Set properties of the MoC
 	Action* action = actions->front();

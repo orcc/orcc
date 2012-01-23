@@ -85,7 +85,7 @@ public:
 	 * @param verbose : whether or not print message
 	 *
 	 */
-	Decoder(llvm::LLVMContext& C, Configuration* configuration, bool verbose = false, bool noMultiCore = false, bool debug = false);
+	Decoder(llvm::LLVMContext& C, Configuration* configuration, bool verbose = false, bool noMultiCore = false);
 	~Decoder();
 	
 	/**
@@ -224,9 +224,6 @@ private:
 
 	/** print message */
 	bool verbose;
-
-	/** print debug message */
-	bool debug;
 };
 
 #endif

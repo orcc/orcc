@@ -61,7 +61,7 @@ public:
 	/**
 	 * @brief Creates a new DPN MoC.
 	 */
-	QSDFMoC(){
+	QSDFMoC(Entity* parent) : MoC(parent){
 	};
 	
 	~QSDFMoC(){};

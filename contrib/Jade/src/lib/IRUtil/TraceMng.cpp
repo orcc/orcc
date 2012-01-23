@@ -57,7 +57,7 @@ void TraceMng::createActionTrace(Module* module, Action* action, Instruction* in
 	// Print action fired
 		stringstream message;
 		
-		message << "-> firing ";
+		message << "\n\n -> firing ";
 		if (!action->getTag()->isEmpty()){
 			message << action->getCalName() << ": ";
 		}

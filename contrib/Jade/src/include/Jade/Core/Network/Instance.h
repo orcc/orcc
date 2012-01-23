@@ -271,6 +271,22 @@ public:
 	* @name : the new Id of instance
 	*/
 	void setId(std::string name){this->id = name;};
+
+	/**
+	*
+	* @brief Activate or deactivate trace for the given instance
+	*
+	* @activate : whether or not trace must be activated
+	*/
+	void setTrace(bool activate){this->enableTrace = activate;};
+
+	/**
+	*
+	* @brief Activate or deactivate trace for the given instance
+	*
+	* @activate : whether or not trace must be activated
+	*/
+	bool isTraceActivate(){return enableTrace;};
 	
 protected:
 
@@ -308,6 +324,9 @@ protected:
 
 	/** Parent graph of the instance */
 	HDAGGraph* parent;
+
+	/** Traces are enabled for the given instance */
+	bool enableTrace;
 };
 
 #endif

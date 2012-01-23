@@ -67,7 +67,7 @@ RVCEngine::RVCEngine(llvm::LLVMContext& C,
 							 string outputDir, 
 							 bool noMerging,
 							 bool noMultiCore,
-							 bool verbose, bool debug): Context(C) {	
+							 bool verbose): Context(C) {	
 	//Set properties	
 	this->library = library;
 	this->systemPackage = system;
@@ -75,7 +75,6 @@ RVCEngine::RVCEngine(llvm::LLVMContext& C,
 	this->noMerging = noMerging;
 	this->outputDir = outputDir;
 	this->noMultiCore = noMultiCore;
-	this->debug = debug;
 
 	//Load IR Parser
 	irParser = new IRParser(C, library);
@@ -103,7 +102,7 @@ int RVCEngine::load(Network* network, int optLevel) {
 	}
 	
 	//Create decoder
-	Decoder* decoder = new Decoder(Context, configuration, verbose, noMultiCore, debug);
+	Decoder* decoder = new Decoder(Context, configuration, verbose, noMultiCore);
 	
 	if (verbose){
 		cout << "--> Decoder created in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";

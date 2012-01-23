@@ -60,7 +60,7 @@ class Pattern;
  */
 class CSDFMoC : public MoC {
 public:
-	CSDFMoC(){};
+	CSDFMoC(Entity* parent) : MoC(parent){};
 	~CSDFMoC(){};
 
 	/**

@@ -63,6 +63,7 @@ Instance::Instance(HDAGGraph* graph, std::string id, std::string clasz, std::map
 	this->procedures = NULL;
 	this->actionScheduler = NULL;
 	this->parent = graph;
+	this->enableTrace = false;
 
 	// Add instance into graph
 	this->vertex = new Vertex(this);

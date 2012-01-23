@@ -56,7 +56,7 @@
  */
 class SDFMoC : public CSDFMoC {
 public:
-	SDFMoC(){
+	SDFMoC(Entity* parent) : CSDFMoC(parent){
 		numberOfPhases = 1;
 	};
 	

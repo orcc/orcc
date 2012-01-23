@@ -78,7 +78,7 @@ public:
 	 *   
 	 *  @param C : the LLVM Context used by JIT
      */
-	RVCEngine(llvm::LLVMContext& C, std::string library, int defaultFifoSize, std::string system = "", std::string outputDir="", bool noMerging = false, bool noMultiCore = false, bool verbose = false, bool debug = false);
+	RVCEngine(llvm::LLVMContext& C, std::string library, int defaultFifoSize, std::string system = "", std::string outputDir="", bool noMerging = false, bool noMultiCore = false, bool verbose = false);
 	~RVCEngine();
 
 	/*!
@@ -208,9 +208,6 @@ private:
 
 	/** Whether or not activate multicore */
 	bool noMultiCore;
-
-	/** Whether or not display debug information */
-	bool debug;
 
 	/** Print all actions made by decoder engine*/
 	bool verbose;

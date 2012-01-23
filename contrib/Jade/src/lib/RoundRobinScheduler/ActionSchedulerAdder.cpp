@@ -64,14 +64,13 @@ using namespace llvm;
 using namespace std;
 
 
-ActionSchedulerAdder::ActionSchedulerAdder(llvm::LLVMContext& C, Decoder* decoder, bool debug) : Context(C) {
+ActionSchedulerAdder::ActionSchedulerAdder(llvm::LLVMContext& C, Decoder* decoder) : Context(C) {
 	this->module = decoder->getModule();
 	this->decoder = decoder;
 	this->entryBB = NULL;
 	this->bb1 = NULL;
 	this->incBB = NULL;
 	this->returnBB = NULL;
-	this->debug = debug;
 }
 
 void ActionSchedulerAdder::transform(Instance* instance) {
@@ -179,7 +178,7 @@ void ActionSchedulerAdder::initializeFIFO (Instance* instance){
 			Function* init = Fifo::initializeIn(module, input);
 			CallInst::Create(init, "", entryBB->getTerminator());
 		}else{
-			cout << "Warning! Input port " << it->first << " of instance " << instance->getId() << " is not connected in the network";
+			cout << "Warning! Input port " << it->first << " of instance " << instance->getId() << " is not connected in the network. \n";
 		}
 	}
 
@@ -192,7 +191,7 @@ void ActionSchedulerAdder::initializeFIFO (Instance* instance){
 			Function* init = Fifo::initializeOut(module, it->second);
 			CallInst::Create(init, "", entryBB->getTerminator());
 		}else{
-			cout << "Warning! Output port " << it->first << " of instance " << instance->getId() << "is not connected in the network";
+			cout << "Warning! Output port " << it->first << " of instance " << instance->getId() << "is not connected in the network. \n";
 		}
 	}
 
@@ -218,7 +217,7 @@ void ActionSchedulerAdder::initializeFIFO (Instance* instance){
 
 		if (connected){
 			// Create fifo accesses
-			Fifo::createReadWritePeek(action, debug);
+			Fifo::createReadWritePeek(action, instance->isTraceActivate());
 		}else{
 			// Deactivate action
 			Procedure* sched = action->getScheduler();

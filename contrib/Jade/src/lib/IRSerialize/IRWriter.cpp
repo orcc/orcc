@@ -437,16 +437,16 @@ MoC* IRWriter::writeMoC(MoC* moc){
 	}else if (moc->isQuasiStatic()){
 		return writeQSDFMoC((QSDFMoC*)moc);
 	}else if (moc->isKPN()){
-		return new KPNMoC();
+		return new KPNMoC(instance);
 	}else if (moc->isDPN()){
-		return new DPNMoC();
+		return new DPNMoC(instance);
 	}
 
 	return NULL;
 }
 
 QSDFMoC* IRWriter::writeQSDFMoC(QSDFMoC* csdfMoC){
-	QSDFMoC* newqsdfMoC = new QSDFMoC();
+	QSDFMoC* newqsdfMoC = new QSDFMoC(instance);
 	
 	// Copy configurations of the QSDFMoC
 	list<pair<Action*, CSDFMoC*> >::iterator it;
@@ -472,9 +472,9 @@ CSDFMoC* IRWriter::writeCSDFMoC(CSDFMoC* csdfMoC){
 		
 	// Dupplicat moc
 	if (csdfMoC->isSDF()){
-		newCsdfMoC = new SDFMoC();
+		newCsdfMoC = new SDFMoC(instance);
 	}else{
-		newCsdfMoC = new CSDFMoC();
+		newCsdfMoC = new CSDFMoC(instance);
 		
 		int nbPhases = csdfMoC->getNumberOfPhases();
 		newCsdfMoC->setNumberOfPhases(nbPhases);

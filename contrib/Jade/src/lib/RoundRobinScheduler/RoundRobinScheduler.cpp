@@ -70,7 +70,7 @@
 using namespace std;
 using namespace llvm;
 
-RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, Decoder* decoder, list<Instance*>* instances, bool optimized, bool noMultiCore, bool verbose, bool debug): Context(C) {
+RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, Decoder* decoder, list<Instance*>* instances, bool optimized, bool noMultiCore, bool verbose): Context(C) {
 	this->decoder = decoder;
 	this->instances = instances;
 	this->scheduler = NULL;
@@ -79,7 +79,6 @@ RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, Decoder* decoder,
 	this->schedInst = NULL;
 	this->stopGV = NULL;
 	this->verbose = verbose;
-	this->debug = debug;
 	this->optimized = optimized;
 
 	createScheduler();	
@@ -176,7 +175,7 @@ void RoundRobinScheduler::createCall(Instance* instance){
 	CallSched->setTailCall();
 
 	// Add debugging information if needed
-	if (debug){
+	if (instance->isTraceActivate()){
 		TraceMng::createCallTrace(decoder->getModule(), instance, CallSched);
 	}
 
@@ -185,9 +184,9 @@ void RoundRobinScheduler::createCall(Instance* instance){
 
 void RoundRobinScheduler::addInstance(Instance* instance){
 	// Create an action scheduler for the instance
-	DPNScheduler DPNSchedulerAdder(Context, decoder, debug);
-	CSDFScheduler CSDFSchedulerAdder(Context, decoder, debug);
-	QSDFScheduler QSDFSchedulerAdder(Context, decoder, debug);
+	DPNScheduler DPNSchedulerAdder(Context, decoder);
+	CSDFScheduler CSDFSchedulerAdder(Context, decoder);
+	QSDFScheduler QSDFSchedulerAdder(Context, decoder);
 	
 	MoC* moc = instance->getMoC();
 

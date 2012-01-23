@@ -60,7 +60,7 @@ public:
 	/**
 	 * @brief Creates a new DPN MoC.
 	 */
-	DPNMoC(){
+	DPNMoC(Entity* parent) : MoC(parent){
 	};
 	
 	~DPNMoC(){};

@@ -55,7 +55,7 @@
 using namespace llvm;
 using namespace std;
 
-CSDFScheduler::CSDFScheduler(llvm::LLVMContext& C, Decoder* decoder, bool debug) : DPNScheduler(C, decoder, debug) {
+CSDFScheduler::CSDFScheduler(llvm::LLVMContext& C, Decoder* decoder) : DPNScheduler(C, decoder) {
 
 }
 
@@ -167,7 +167,9 @@ void CSDFScheduler::createActionsCall(CSDFMoC* moc, BasicBlock* BB){
 		CallInst* schedInst = CallInst::Create(body->getFunction(), "",  BB);
 		
 		// Add debugging information if needed
-		if (debug){
+		Entity* entity = moc->getParent();
+		
+		if (entity->isInstance() && ((Instance*)entity)->isTraceActivate()){
 			TraceMng::createActionTrace(decoder->getModule(), action, schedInst);
 			TraceMng::createStateVarTrace(decoder->getModule(), action->getParent()->getStateVars(), schedInst->getParent()->getTerminator());
 		}
