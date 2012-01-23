@@ -222,9 +222,12 @@ public class TTABackendImpl extends AbstractBackend {
 					false);
 			StandardPrinter tclPrinter = new StandardPrinter(
 					"net/sf/orcc/backends/tta/ModelSim_Script.stg");
+			StandardPrinter wavePrinter = new StandardPrinter(
+					"net/sf/orcc/backends/tta/ModelSim_Wave.stg");
 			tbPrinter.print(instance.getName() + "_tb.vhd", instancePath,
 					instance);
 			tclPrinter.print(instance.getName() + ".tcl", path, instance);
+			wavePrinter.print("wave.do", instancePath, instance);
 		}
 
 		return printer

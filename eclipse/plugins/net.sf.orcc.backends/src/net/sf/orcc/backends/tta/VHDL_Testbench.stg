@@ -105,7 +105,7 @@ signal rst_n       : std_logic := '0';
 
 printTrace(port) ::= <<
 <if(!port.native)
->file trace_<port.name> : text is "../trace/<if(instance)><instance.id>_<endif><port.name>.txt";<
+>file trace_<port.name> : text is "trace/<if(instance)><instance.id>_<endif><port.name>.txt";<
 endif>
 >>
 
@@ -139,7 +139,7 @@ begin
 
   if rst_n = '0' then
     file_close(trace_<input.name>);
-    file_open(trace_<input.name>, "../trace/<instance.id>_<input.name>.txt", read_mode);
+    file_open(trace_<input.name>, "trace/<instance.id>_<input.name>.txt", read_mode);
     
     -- Compute initial status
     current_status_<input.name> := 0;
@@ -149,7 +149,7 @@ begin
     end loop;
     
     file_close(trace_<input.name>);
-    file_open(trace_<input.name>, "../trace/<instance.id>_<input.name>.txt", read_mode);
+    file_open(trace_<input.name>, "trace/<instance.id>_<input.name>.txt", read_mode);
     
     -- Initialize signals
     if not (endfile (trace_<input.name>)) then
@@ -250,7 +250,7 @@ architecture arch_tb_<instance.id> of tb_<instance.id> is
 
 begin
 
-  <instance.id>_orcc : entity work.processor_<instance.id>
+  <instance.id>_inst : entity work.processor_<instance.id>
     port map (
       clk          =\> clk,
       <if(instance.actor.inputs)><instance.actor.inputs: { input | <mapSignalInstanceInput(input, i0)> }; separator="\n"><endif>

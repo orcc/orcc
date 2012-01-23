@@ -31,10 +31,10 @@ printInstance(instance, options) ::= <<
 
 <compileInstance(instance)>
 
-vcom -93 -quiet -work work <instance.id>/<instance.id>_tb.vhd
+vcom -93 -quiet -work work <instance.id>/tta/simulation/<instance.id>_tb.vhd
 
 # Simulate
-vsim -novopt -L altera_mf work.tb_<instance.id> -t ps
+vsim -novopt -L altera_mf work.tb_<instance.id> -t ps -do "do <instance.id>/tta/simulation/wave.do;"
 >>
 
 initializeLibraries() ::= <<

@@ -72,6 +72,7 @@ class Instance:
         self._coeFile = self.id + ".coe"
         self._mifDataFile = self.id + "_data" + ".mif"
         self._coeDataFile = self.id + "_data" + ".coe"
+        self._waveFile = "wave.do"
         # Useful names
         self._entity = "processor_" + self.id + "_tl"
 
@@ -93,10 +94,14 @@ class Instance:
         instanceSrcPath = os.path.join(srcPath, self.id)
         ttaPath = os.path.join(instanceSrcPath, "tta")
         vhdlPath = os.path.join(ttaPath, "vhdl")
+        simuPath = os.path.join(ttaPath, "simulation")
         memoryPath = os.path.join(ttaPath, "memory")
         wrapperPath = os.path.join(srcPath, "wrapper")
         sharePath = os.path.join(srcPath, "share")
         os.chdir(instanceSrcPath)
+        
+        # Clean old generation
+        shutil.rmtree(ttaPath, ignore_errors=True)
 
         # Copy libraries in working directory
         shutil.copy(os.path.join(libPath, "stream", "stream_units.hdb"), instanceSrcPath)
@@ -128,9 +133,15 @@ class Instance:
         shutil.move(self._coeFile, os.path.join(wrapperPath, self._coeFile))
         shutil.move(self._coeDataFile, os.path.join(wrapperPath, self._coeDataFile))
         shutil.move("imem_mau_pkg.vhdl", vhdlPath)
+        
+        # Manage simulation files
         if not (self.isNative or self.isBroadcast):
-            shutil.copy(self._tbFile, vhdlPath)
             os.chmod(os.path.join(srcPath, self._tclFile), stat.S_IRWXU)
+            shutil.rmtree(simuPath, ignore_errors=True)
+            os.mkdir(simuPath)
+            shutil.move(self._waveFile, simuPath)
+            shutil.move(self._tbFile, simuPath)
+        
 
         # Clean working directory
         os.remove("stream_units.hdb")
