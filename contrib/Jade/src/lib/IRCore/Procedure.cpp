@@ -40,7 +40,10 @@
 
 #include "llvm/Constants.h"
 #include "llvm/Function.h"
+#include "llvm/Instructions.h"
 //------------------------------
+
+using namespace llvm;
 
 Procedure::~Procedure(){	
 
@@ -49,4 +52,22 @@ Procedure::~Procedure(){
 
 bool Procedure::isExternal(){
 	return external->isOne();
+}
+
+void Procedure::setEmpty(){
+	if (function == NULL){
+		return;
+	}
+
+	function->deleteBody();
+	BasicBlock* BB = BasicBlock::Create(function->getContext(), "entry", function);
+	
+
+	if (function->doesNotReturn()){
+		ReturnInst::Create(function->getContext(), NULL, BB);
+	}else{
+		
+		Constant* constant = ConstantInt::getNullValue(function->getReturnType());
+		ReturnInst::Create(function->getContext(), constant, BB);
+	}
 }

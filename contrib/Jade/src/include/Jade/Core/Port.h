@@ -324,6 +324,16 @@ public:
 	 */
 	bool isWritable(){ return write;};
 
+
+	/**
+	 * @brief Return true if the port is bound to a connection
+	 *
+	 * Return true if the port contains at least one connection
+	 *
+	 * @return true if the port is connected
+	 */
+	bool isConnected(){ return !connections.empty();};
+
 protected:
 	
 	/** name of this port. */

@@ -173,34 +173,77 @@ void ActionSchedulerAdder::initializeFIFO (Instance* instance){
 	//Initialize inputs
 	map<string,Port*>* inputs = instance->getInputs();
 	for (it = inputs->begin(); it != inputs->end(); it++){
-		Function* init = Fifo::initializeIn(module, it->second);
-		CallInst::Create(init, "", entryBB->getTerminator());
+		Port* input = it->second;
+
+		if (input->isConnected()){
+			Function* init = Fifo::initializeIn(module, input);
+			CallInst::Create(init, "", entryBB->getTerminator());
+		}else{
+			cout << "Warning! Input port " << it->first << " of instance " << instance->getId() << " is not connected in the network";
+		}
 	}
 
 	//Initialize outputs
 	map<string,Port*>* outputs = instance->getOutputs();
 	for (it = outputs->begin(); it != outputs->end(); it++){
-		Function* init = Fifo::initializeOut(module, it->second);
-		CallInst::Create(init, "", entryBB->getTerminator());
+		Port* output = it->second;
+
+		if (output->isConnected()){
+			Function* init = Fifo::initializeOut(module, it->second);
+			CallInst::Create(init, "", entryBB->getTerminator());
+		}else{
+			cout << "Warning! Output port " << it->first << " of instance " << instance->getId() << "is not connected in the network";
+		}
 	}
 
 	// Add read/write/peek access
 	std::list<Action*>::iterator itAct;
 	std::list<Action*>* actions = instance->getActions();
 	for (itAct = actions->begin(); itAct != actions->end(); itAct++){
-		Fifo::createReadWritePeek(*itAct, debug);
+		bool connected = true;
+		Action* action = *itAct;
+		set<Port*>::iterator itPort;
+		
+		// Check if all inputs of the given action are connected
+		set<Port*>* inputs = action->getInputPattern()->getPorts();
+		for (itPort = inputs->begin(); itPort != inputs->end(); itPort++){
+			connected &= (*itPort)->isConnected();
+		}
+
+		// Check if all outputs of the given action are connected
+		set<Port*>* outputs = action->getOutputPattern()->getPorts();
+		for (itPort = outputs->begin(); itPort != outputs->end(); itPort++){
+			connected &= (*itPort)->isConnected();
+		}
+
+		if (connected){
+			// Create fifo accesses
+			Fifo::createReadWritePeek(action, debug);
+		}else{
+			// Deactivate action
+			Procedure* sched = action->getScheduler();
+			sched->setEmpty();
+		}
 	}
 
 	//Close inputs
 	for (it = inputs->begin(); it != inputs->end(); it++){
-		Function* close = Fifo::closeIn(module, it->second);
-		CallInst::Create(close, "", returnBB->getTerminator());
+		Port* input = it->second;
+
+		if (input->isConnected()){
+			Function* close = Fifo::closeIn(module, it->second);
+			CallInst::Create(close, "", returnBB->getTerminator());
+		}
 	}
 
 	//Close outputs
 	for (it = outputs->begin(); it != outputs->end(); it++){
-		Function* close = Fifo::closeOut(module, it->second);
-		CallInst::Create(close, "", returnBB->getTerminator());
+		Port* output = it->second;
+
+		if (output->isConnected()){
+			Function* close = Fifo::closeOut(module, it->second);
+			CallInst::Create(close, "", returnBB->getTerminator());
+		}
 	}
 }
 

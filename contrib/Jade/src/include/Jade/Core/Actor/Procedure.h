@@ -106,6 +106,14 @@ public:
      */
 	bool isExternal();
 
+	/**
+     *  @brief Clear the procedure from its instructions
+	 *
+	 *  Remove all instructions from the procedure but keep the function.
+	 *  If the procedure must return a value, it always will return false.
+     */
+	void setEmpty();
+
 private:
 	std::string name;
 	llvm::ConstantInt* external;
