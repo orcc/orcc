@@ -97,6 +97,7 @@ finished:
 }
 
 <endif>
+static unsigned int read_inds_dummy[1];
 void <instance.name>_initialize(<instance.actor.inputs: { port | unsigned int fifo_<port.name>_id}; separator=", ">) {
 	<if(instance.actor.initializes)>
 	struct schedinfo_s si;
@@ -112,7 +113,7 @@ void <instance.name>_initialize(<instance.actor.inputs: { port | unsigned int fi
 	<instance.actor.stateVars: initializeStateVar()>
 	
 	/* Initialize input FIFOs id */
-	<instance.actor.inputs: { port | fifo_<getPortName(port)>_id = fifo_<port.name>_id; }; separator="\n"> 
+	<instance.actor.inputs: { port | <initializeFifoId(port)>  }; separator="\n"> 
 	<if(instance.actor.initializes)>
 	
 	/* Launch CAL initialize procedure */
@@ -121,6 +122,16 @@ void <instance.name>_initialize(<instance.actor.inputs: { port | unsigned int fi
 }
 >>
 
+initializeFifoId(port) ::= <<
+if (fifo_<port.name>_id == -1) { //input port not connected
+	<getPortName(port)> = (struct fifo_<port.type>_s *) malloc(sizeof(struct fifo_<port.type>_s));
+	fifo_<getPortName(port)>_id = 0;
+	<getPortName(port)>->read_inds = read_inds_dummy;
+	<getPortName(port)>->write_ind = 0;
+} else {
+	fifo_<getPortName(port)>_id = fifo_<port.name>_id;
+}
+>>
 ///////////////////////////////////////////////////////////////////////////////
 // Instructions
 ///////////////////////////////////////////////////////////////////////////////
@@ -644,7 +655,7 @@ extern struct actor_s <instance.name>;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Input FIFOs
-<instance.actor.inputs: { port | extern struct fifo_<port.type>_s *<getPortName(port)>;}; separator="\n">
+<instance.actor.inputs: { port | struct fifo_<port.type>_s *<getPortName(port)>;}; separator="\n">
 <instance.actor.inputs: printInputPort()>
 <if(options.enableTrace)>
 <instance.actor.inputs: { port | FILE *file_<port.name>;}; separator="\n">

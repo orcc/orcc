@@ -88,7 +88,7 @@ allocateFifos(vertex) ::= <<
 // assigns FIFOs
 
 doAssignFifo(source, port, count) ::= <<
-<if(source.actor || source.broadcast)>struct fifo_<port.type>_s *<GetInstanceId(source)>_<port.name> = &fifo_<count>;<endif>
+<if(source.actor || source.broadcast)>extern struct fifo_<port.type>_s *<GetInstanceId(source)>_<port.name> = &fifo_<count>;<endif>
 >>
 
 tryAssignFifoSrc(edge) ::= <<
