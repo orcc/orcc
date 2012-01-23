@@ -64,7 +64,7 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 
 	private Stack<Set<Var>> conditionVars = new Stack<Set<Var>>();
 
-	private Var currentDeps = null;
+	private Var currentTargetVar = null;
 
 	private Map<Port, Port> fifoTargetToSourceMap = new HashMap<Port, Port>();
 
@@ -78,7 +78,7 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 
 	private Map<Port, Set<Port>> outputPortToInputPortMap = new HashMap<Port, Set<Port>>();
 
-	private Map<Port, Set<Var>> outputPortToVariableMap = new HashMap<Port, Set<Var>>();
+	private Map<Port, Set<Var>> outputPortToDepVariablesMap = new HashMap<Port, Set<Var>>();
 
 	private Set<Port> portsUsedInScheduling = new HashSet<Port>();
 
@@ -94,22 +94,35 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 		super(true);
 	}
 
+	/*
+	 * Adds the "target" 'depends on' "source" to the relation. 
+	 * 
+	 */
 	private void addVariableDep(Var target, Var source) {
 		if (!variableDependency.containsKey(target)) {
 			variableDependency.put(target, new HashSet<Var>());
 		}
 		variableDependency.get(target).add(source);
+	}
+	
+	/* Also adds "target" 'depends on' condition, this is used if the variable in set
+	 * within a loop or if-statement as the value of the target variable the
+	 * also depends on the condition.
+	 */
+	private void addTargetVar(Var target) {
+		currentTargetVar = target;
+		if (!variableDependency.containsKey(target)) {
+			variableDependency.put(target, new HashSet<Var>());
+		}
 		for (Set<Var> s : conditionVars) {
-			for (Var var : s) {
-				variableDependency.get(target).add(var);
-			}
+			variableDependency.get(target).addAll(s);
 		}
 	}
 
 	void analyzeVarDeps() {
 		visited.clear();
 		for (Var currentVar : variableDependency.keySet()) {
-			transitiveClosure(currentVar, visited);
+			getTransitiveClosure(currentVar, visited);
 			if (visited.contains(currentVar)) {
 				variablesWithLoops.add(currentVar);
 			}
@@ -142,15 +155,13 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 			for (Port port : action.getOutputPattern().getPorts()) {
 				visited.clear();
 				Var portVar = action.getOutputPattern().getVariable(port);
-				transitiveClosure(portVar, visited);
+				getTransitiveClosure(portVar, visited);
 				if (!outputPortToInputPortMap.containsKey(port)) {
-					outputPortToVariableMap.put(port, new HashSet<Var>());
+					outputPortToDepVariablesMap.put(port, new HashSet<Var>());
 					outputPortToInputPortMap.put(port, new HashSet<Port>());
 				}
 				for (Var var : visited) {
-					if (var.isGlobal()) {
-						outputPortToVariableMap.get(port).add(var);
-					}
+					outputPortToDepVariablesMap.get(port).add(var);
 					if (action.getInputPattern().contains(var)) {
 						outputPortToInputPortMap.get(port).add(
 								action.getInputPattern().getPort(var));
@@ -166,14 +177,14 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 		if (inCondition) {
 			conditionVars.peek().add(var.getUse().getVariable());
 		} else {
-			addVariableDep(currentDeps, var.getUse().getVariable());
+			addVariableDep(currentTargetVar, var.getUse().getVariable());
 		}
 		return null;
 	}
 
 	@Override
 	public Object caseInstAssign(InstAssign assign) {
-		currentDeps = assign.getTarget().getVariable();
+		addTargetVar(assign.getTarget().getVariable());
 		super.caseInstAssign(assign);
 		return null;
 	}
@@ -181,7 +192,7 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 	@Override
 	public Object caseInstCall(InstCall call) {
 		if (call.hasResult()) {
-			currentDeps = call.getTarget().getVariable();
+			addTargetVar(call.getTarget().getVariable());
 		}
 		super.caseInstCall(call);
 		return null;
@@ -192,7 +203,7 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 		addVariableDep(load.getTarget().getVariable(), load.getSource()
 				.getVariable());
 		if (inScheduler) {
-			// stateVarsInGrd.add(load.getSource().getVariable());
+			// this might not be needed as 'casePattern' should do the same
 			varsUsedInScheduling.add(load.getSource().getVariable());
 		}
 		return null;
@@ -200,14 +211,14 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseInstPhi(InstPhi phi) {
-		currentDeps = phi.getTarget().getVariable();
+		addTargetVar(phi.getTarget().getVariable());
 		super.caseInstPhi(phi);
 		return null;
 	}
 
 	@Override
 	public Object caseInstStore(InstStore store) {
-		currentDeps = store.getTarget().getVariable();
+		addTargetVar(store.getTarget().getVariable());
 		doSwitch(store.getValue());
 		return null;
 	}
@@ -249,10 +260,9 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object casePattern(Pattern pattern) {
-		for (Port port : pattern.getPorts()) {
-			// peekPortsInGrd.add(port);
-			inputPortsUsedInScheduling.add(port);
-		}
+		// Only Peek patterns will end up here
+		inputPortsUsedInScheduling.addAll(pattern.getPorts());
+		varsUsedInScheduling.addAll(pattern.getVariables());
 		return null;
 	}
 
@@ -268,6 +278,13 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 	 */
 	public Set<Var> getVarsUsedInScheduling() {
 		return varsUsedInScheduling;
+	}
+
+	/**
+	 * @return the variableDependency
+	 */
+	public Map<Var, Set<Var>> getVariableDependency() {
+		return variableDependency;
 	}
 
 	/*
@@ -311,18 +328,18 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 
 	private void identifySchedulingVars() {
 		for (Port port : outputPortsUsedInScheduling) {
-			if (outputPortToVariableMap.containsKey(port)) {
-				varsUsedInScheduling.addAll(outputPortToVariableMap.get(port));
+			if (outputPortToDepVariablesMap.containsKey(port)) {
+				varsUsedInScheduling.addAll(outputPortToDepVariablesMap.get(port));
 			}
 		}
 	}
 
-	private void transitiveClosure(Var variable, Set<Var> transitiveClosure) {
+	public void getTransitiveClosure(Var variable, Set<Var> transitiveClosure) {
 		if (variableDependency.containsKey(variable)) {
 			for (Var v : variableDependency.get(variable)) {
 				if (!transitiveClosure.contains(v)) {
 					transitiveClosure.add(v);
-					transitiveClosure(v, transitiveClosure);
+					getTransitiveClosure(v, transitiveClosure);
 				}
 			}
 		}

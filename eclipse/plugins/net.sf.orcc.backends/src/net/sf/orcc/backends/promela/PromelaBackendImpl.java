@@ -37,6 +37,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.c.CExpressionPrinter;
+//import net.sf.orcc.backends.promela.transformations.ControlTokenAnalyzer;
 import net.sf.orcc.backends.promela.transformations.GuardsExtractor;
 import net.sf.orcc.backends.promela.transformations.NetworkStateDefExtractor;
 import net.sf.orcc.backends.promela.transformations.PromelaDeadGlobalElimination;
@@ -79,6 +80,8 @@ public class PromelaBackendImpl extends AbstractBackend {
 	private final Map<String, String> transformations;
 
 	private NetworkStateDefExtractor netStateDef;
+	
+	private boolean firstTransform = true;
 
 	/**
 	 * Creates a new instance of the Promela back-end. Initializes the
@@ -100,21 +103,30 @@ public class PromelaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
+		if (firstTransform) {
 		DfSwitch<?>[] transformations = {
 				new UnitImporter(),
-				new Inliner(true, false),
+				new Inliner(true, true),
 				// new ListFlattener(), //Promela does not support multi
 				// dimensional arrays
 				new RenameTransformation(this.transformations),
-				new GuardsExtractor(guards, priority, loadPeeks),
 				new PhiRemoval(),
+				};
+		for (DfSwitch<?> transformation : transformations) {
+			transformation.doSwitch(actor);
+		} 
+		}else {
+		DfSwitch<?>[] transformations = {
 				new PromelaDeadGlobalElimination(
 						netStateDef.getVarsUsedInScheduling(),
 						netStateDef.getPortsUsedInScheduling()),
-				new DeadCodeElimination(), new DeadVariableRemoval() };
-
+				/*new ControlTokenAnalyzer(netStateDef),*/
+				new GuardsExtractor(guards, priority, loadPeeks),
+				new DeadCodeElimination(), new DeadVariableRemoval()
+				};
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
+		}
 		}
 	}
 
@@ -129,6 +141,8 @@ public class PromelaBackendImpl extends AbstractBackend {
 		network = new Instantiator().doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
 
+		network.computeTemplateMaps();
+		
 		instancePrinter = new StandardPrinter(
 				"net/sf/orcc/backends/promela/Actor.stg");
 		instancePrinter.setExpressionPrinter(new CExpressionPrinter());
@@ -138,16 +152,18 @@ public class PromelaBackendImpl extends AbstractBackend {
 		instancePrinter.getOptions().put("loadPeeks", loadPeeks);
 		instancePrinter.getOptions().put("network", network);
 
+		List<Actor> actors = network.getAllActors();
+		transformActors(actors);
+		firstTransform = false;
+		
 		netStateDef = new NetworkStateDefExtractor();
 		netStateDef.doSwitch(network);
 
-		List<Actor> actors = network.getAllActors();
 		transformActors(actors);
 		printInstances(network);
 
 		new BroadcastAdder().doSwitch(network);
 
-		network.computeTemplateMaps();
 		printNetwork(network);
 	}
 
@@ -169,6 +185,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 		StandardPrinter printer = new StandardPrinter(
 				"net/sf/orcc/backends/promela/Network.stg");
 		printer.setTypePrinter(new PromelaTypePrinter());
+		printer.setExpressionPrinter(new CExpressionPrinter());
 		printer.print("main_" + network.getName() + ".pml", path, network);
 	}
 

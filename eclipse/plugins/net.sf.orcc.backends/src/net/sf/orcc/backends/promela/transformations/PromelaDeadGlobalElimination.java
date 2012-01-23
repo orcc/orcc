@@ -113,6 +113,7 @@ public class PromelaDeadGlobalElimination extends DeadGlobalElimination {
 					Instruction.class);
 			IrUtil.delete(instruction);
 		}
+		
 	}
 
 }
