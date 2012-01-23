@@ -40,7 +40,7 @@ import org.eclipse.emf.ecore.EObject;
  * @model abstract="true"
  * 
  */
-public interface Type extends EObject {
+public interface Type extends EObject, Comparable<Type> {
 
 	/**
 	 * Returns a list of dimensions of this type. Returns an empty list if the
