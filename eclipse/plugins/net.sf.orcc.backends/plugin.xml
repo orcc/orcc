@@ -34,19 +34,6 @@
          </option>
       </backend>
       <backend
-            class="net.sf.orcc.backends.cpp.CppBackendImpl"
-            name="C++">
-         <option
-               id="net.sf.orcc.plugins.compileXDF">
-         </option>
-         <option
-               id="net.sf.orcc.backends.classify">
-         </option>
-         <option
-               id="net.sf.orcc.backends.normalize">
-         </option>
-      </backend>
-      <backend
             class="net.sf.orcc.backends.llvm.LLVMBackendImpl"
             name="LLVM">
          <option

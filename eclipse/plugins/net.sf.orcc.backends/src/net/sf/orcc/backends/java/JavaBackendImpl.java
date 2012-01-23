@@ -38,7 +38,6 @@ import java.util.Map;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
-import net.sf.orcc.backends.cpp.CppExprPrinter;
 import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
@@ -107,7 +106,7 @@ public class JavaBackendImpl extends AbstractBackend {
 
 		actorPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/java/Actor.stg", !debug);
-		actorPrinter.setExpressionPrinter(new CppExprPrinter());
+		actorPrinter.setExpressionPrinter(new JavaExprPrinter());
 		actorPrinter.setTypePrinter(new JavaTypePrinter());
 
 		transformActors(actors);
@@ -144,7 +143,7 @@ public class JavaBackendImpl extends AbstractBackend {
 	protected void printNetwork(Network network) throws OrccException {
 		StandardPrinter printer = new StandardPrinter(
 				"net/sf/orcc/backends/java/Network.stg");
-		printer.setExpressionPrinter(new CppExprPrinter());
+		printer.setExpressionPrinter(new JavaExprPrinter());
 		printer.setTypePrinter(new JavaTypePrinter());
 		printer.getOptions().put("fifoSize", fifoSize);
 
