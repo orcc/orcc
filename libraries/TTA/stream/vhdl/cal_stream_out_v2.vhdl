@@ -78,8 +78,8 @@ architecture rtl of cal_stream_out is
   signal ext_data_current   : data_array;
   signal ext_status_current : data_array;
   signal ext_dv_current     : ack_array;
-  
-  signal reg_o1data			: std_logic_vector(31 downto 0);
+
+  signal reg_o1data : std_logic_vector(31 downto 0);
 
 begin
   
@@ -111,7 +111,8 @@ begin
   ext_dv7 <= ext_dv_current(7);
 
   regs : process (clk, rstx)
-    variable index : integer := 0;
+    variable index    : integer := 0;
+    variable o1data_v : std_logic_vector(31 downto 0);
   begin  -- process regs
     if rstx = '0' then
       ext_data_current <= (others => (others => '0'));
@@ -121,18 +122,21 @@ begin
     elsif clk'event and clk = '1' then
       if glock = '0' then
         -- reset the datavalid signal
-        ext_dv_current   <= (others => (others => '0'));
-        
-        if o1load = '1' then
-		  reg_o1data <= o1data;
+        ext_dv_current <= (others => (others => '0'));
+
+        o1data_v := reg_o1data;
+        if o1load = '1' and t1load = '1' then
+          o1data_v := o1data;
+        elsif o1load = '1' then
+          reg_o1data <= o1data;
         end if;
 
         if t1load = '1' then
           index := to_integer(unsigned(t1data));
-          
+
           case t1opcode is
             when CAL_STREAM_OUT_WRITE =>
-              ext_data_current(index) <= reg_o1data;
+              ext_data_current(index) <= o1data_v;
               ext_dv_current(index)   <= (0 => '1', others => '0');
               -- enable the datavalid signal for a while
             when CAL_STREAM_OUT_STATUS =>
