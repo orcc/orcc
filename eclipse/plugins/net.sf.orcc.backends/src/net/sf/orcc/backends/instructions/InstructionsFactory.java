@@ -65,49 +65,6 @@ public interface InstructionsFactory extends EFactory {
 			List<Expression> indexes);
 
 	/**
-	 * Returns a new object of class '<em>Inst Ram Read</em>'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return a new object of class '<em>Inst Ram Read</em>'.
-	 * @generated
-	 */
-	InstRamRead createInstRamRead();
-
-	InstRamRead createInstRamRead(int port, Var variable, Var target);
-
-	/**
-	 * Returns a new object of class '<em>Inst Ram Set Address</em>'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return a new object of class '<em>Inst Ram Set Address</em>'.
-	 * @generated
-	 */
-	InstRamSetAddress createInstRamSetAddress();
-
-	InstRamSetAddress createInstRamSetAddress(int port, Var variable,
-			List<Expression> indexes);
-
-	/**
-	 * Returns a new object of class '<em>Inst Ram Write</em>'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return a new object of class '<em>Inst Ram Write</em>'.
-	 * @generated
-	 */
-	InstRamWrite createInstRamWrite();
-
-	InstRamWrite createInstRamWrite(int port, Var variable, Expression value);
-
-	/**
-	 * Returns a new object of class '<em>Inst Split</em>'.
-	 * <!-- begin-user-doc
-	 * --> <!-- end-user-doc -->
-	 * @return a new object of class '<em>Inst Split</em>'.
-	 * @generated
-	 */
-	InstSplit createInstSplit();
-
-	/**
 	 * Returns a new object of class '<em>Inst Ternary</em>'. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 

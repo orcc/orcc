@@ -33,10 +33,6 @@ import java.util.List;
 import net.sf.orcc.backends.instructions.InstAssignIndex;
 import net.sf.orcc.backends.instructions.InstCast;
 import net.sf.orcc.backends.instructions.InstGetElementPtr;
-import net.sf.orcc.backends.instructions.InstRamRead;
-import net.sf.orcc.backends.instructions.InstRamSetAddress;
-import net.sf.orcc.backends.instructions.InstRamWrite;
-import net.sf.orcc.backends.instructions.InstSplit;
 import net.sf.orcc.backends.instructions.InstTernary;
 import net.sf.orcc.backends.instructions.InstructionsFactory;
 import net.sf.orcc.backends.instructions.InstructionsPackage;
@@ -107,10 +103,6 @@ public class InstructionsFactoryImpl extends EFactoryImpl implements
 			case InstructionsPackage.INST_ASSIGN_INDEX: return createInstAssignIndex();
 			case InstructionsPackage.INST_CAST: return createInstCast();
 			case InstructionsPackage.INST_GET_ELEMENT_PTR: return createInstGetElementPtr();
-			case InstructionsPackage.INST_RAM_READ: return createInstRamRead();
-			case InstructionsPackage.INST_RAM_SET_ADDRESS: return createInstRamSetAddress();
-			case InstructionsPackage.INST_RAM_WRITE: return createInstRamWrite();
-			case InstructionsPackage.INST_SPLIT: return createInstSplit();
 			case InstructionsPackage.INST_TERNARY: return createInstTernary();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
@@ -170,71 +162,6 @@ public class InstructionsFactoryImpl extends EFactoryImpl implements
 		instGetElementPtr.setTarget(IrFactory.eINSTANCE.createDef(target));
 		instGetElementPtr.getIndexes().addAll(indexes);
 		return instGetElementPtr;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public InstRamRead createInstRamRead() {
-		InstRamReadImpl instRamRead = new InstRamReadImpl();
-		return instRamRead;
-	}
-
-	@Override
-	public InstRamRead createInstRamRead(int port, Var variable, Var target) {
-		InstRamReadImpl instRamRead = new InstRamReadImpl();
-		instRamRead.setPort(port);
-		instRamRead.setSource(IrFactory.eINSTANCE.createUse(variable));
-		instRamRead.setTarget(IrFactory.eINSTANCE.createDef(target));
-		return instRamRead;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public InstRamSetAddress createInstRamSetAddress() {
-		InstRamSetAddressImpl instRamSetAddress = new InstRamSetAddressImpl();
-		return instRamSetAddress;
-	}
-
-	@Override
-	public InstRamSetAddress createInstRamSetAddress(int port, Var variable,
-			List<Expression> indexes) {
-		InstRamSetAddressImpl instRamSetAddress = new InstRamSetAddressImpl();
-		instRamSetAddress.setPort(port);
-		instRamSetAddress.setSource(IrFactory.eINSTANCE.createUse(variable));
-		instRamSetAddress.getIndexes().addAll(indexes);
-		return instRamSetAddress;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public InstRamWrite createInstRamWrite() {
-		InstRamWriteImpl instRamWrite = new InstRamWriteImpl();
-		return instRamWrite;
-	}
-
-	@Override
-	public InstRamWrite createInstRamWrite(int port, Var variable,
-			Expression value) {
-		InstRamWriteImpl instRamWrite = new InstRamWriteImpl();
-		instRamWrite.setPort(port);
-		instRamWrite.setSource(IrFactory.eINSTANCE.createUse(variable));
-		instRamWrite.setValue(value);
-		return instRamWrite;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public InstSplit createInstSplit() {
-		InstSplitImpl instSplit = new InstSplitImpl();
-		return instSplit;
 	}
 
 	/**

@@ -1,45 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<genmodel:GenModel xmi:version="2.0"
-    xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
-    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/net.sf.orcc.backends/src"
-    modelPluginID="net.sf.orcc.backends" modelName="Instructions" importerID="org.eclipse.emf.importer.java"
-    complianceLevel="6.0" copyrightFields="false" usedGenPackages="../../net.sf.orcc.core/model/Ir.genmodel#//ir platform:/plugin/org.eclipse.emf.ecore/model/Ecore.genmodel#//ecore ../../net.sf.orcc.core/model/Ir.genmodel#//moc">
-  <foreignModel>@model</foreignModel>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/net.sf.orcc.backends/src" modelPluginID="net.sf.orcc.backends"
+    modelName="Instructions" importerID="org.eclipse.emf.importer.ecore" complianceLevel="6.0"
+    copyrightFields="false" usedGenPackages="../../net.sf.orcc.core/model/Core.genmodel#//ir platform:/plugin/org.eclipse.emf.ecore/model/Ecore.genmodel#//ecore">
+  <foreignModel>Instructions.ecore</foreignModel>
+  <foreignModel>../../net.sf.orcc.core/model/Ir.ecore</foreignModel>
   <genPackages prefix="Instructions" basePackage="net.sf.orcc.backends" disposableProviderFactory="true"
       ecorePackage="Instructions.ecore#/">
-    <genClasses ecoreClass="Instructions.ecore#//InstTernary">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstTernary/conditionValue"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstTernary/trueValue"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstTernary/falseValue"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstTernary/target"/>
-    </genClasses>
     <genClasses ecoreClass="Instructions.ecore#//InstAssignIndex">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstAssignIndex/indexes"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstAssignIndex/target"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstAssignIndex/listType"/>
     </genClasses>
-    <genClasses ecoreClass="Instructions.ecore#//InstSplit"/>
-    <genClasses ecoreClass="Instructions.ecore#//InstRam">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Instructions.ecore#//InstRam/port"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstRam/source"/>
-    </genClasses>
-    <genClasses ecoreClass="Instructions.ecore#//InstRamRead">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstRamRead/target"/>
-    </genClasses>
-    <genClasses ecoreClass="Instructions.ecore#//InstRamSetAddress">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstRamSetAddress/indexes"/>
-    </genClasses>
-    <genClasses ecoreClass="Instructions.ecore#//InstRamWrite">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstRamWrite/value"/>
+    <genClasses ecoreClass="Instructions.ecore#//InstCast">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstCast/target"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstCast/source"/>
     </genClasses>
     <genClasses ecoreClass="Instructions.ecore#//InstGetElementPtr">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstGetElementPtr/indexes"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstGetElementPtr/target"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstGetElementPtr/source"/>
     </genClasses>
-    <genClasses ecoreClass="Instructions.ecore#//InstCast">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstCast/target"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstCast/source"/>
+    <genClasses ecoreClass="Instructions.ecore#//InstTernary">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstTernary/conditionValue"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstTernary/trueValue"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstTernary/falseValue"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstTernary/target"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

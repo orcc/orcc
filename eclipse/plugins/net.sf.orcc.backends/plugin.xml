@@ -53,19 +53,6 @@
          </option>
       </backend>
       <backend
-            class="net.sf.orcc.backends.vhdl.VHDLBackendImpl"
-            name="VHDL">
-         <option
-               id="net.sf.orcc.plugins.compileXDF">
-         </option>
-         <option
-               id="net.sf.orcc.backends.vhdl.numPortsRam">
-         </option>
-         <option
-               id="net.sf.orcc.backends.vhdl.minSizeRam">
-         </option>
-      </backend>
-      <backend
             class="net.sf.orcc.backends.xlim.XlimBackendImpl"
             name="XLIM">
          <option
@@ -270,21 +257,6 @@
             <checkBox></checkBox>
          </option>
          <option
-               defaultValue="2"
-               id="net.sf.orcc.backends.vhdl.numPortsRam"
-               name="Number of ports of inferred RAM">
-            <textBox>
-               
-            </textBox>
-         </option>
-         <option
-               defaultValue="256"
-               description="Minimum size in bits for a list to be translated as a RAM instead of registers"
-               id="net.sf.orcc.backends.vhdl.minSizeRam"
-               name="Minimum size of inferred RAM">
-            <textBox></textBox>
-         </option>
-         <option
                defaultValue="false"
                id="net.sf.orcc.backends.byteexact"
                name="Generate byte exact code">
@@ -348,18 +320,6 @@
             visible="true">
          <run
                class="net.sf.orcc.backends.java.JavaBackendImpl">
-         </run>
-      </application>
-   </extension>
-   <extension
-         id="vhdl"
-         point="org.eclipse.core.runtime.applications">
-      <application
-            cardinality="singleton-global"
-            thread="main"
-            visible="true">
-         <run
-               class="net.sf.orcc.backends.vhdl.VHDLBackendImpl">
          </run>
       </application>
    </extension>

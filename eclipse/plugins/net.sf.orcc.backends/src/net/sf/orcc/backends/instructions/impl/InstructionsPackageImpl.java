@@ -31,23 +31,14 @@ package net.sf.orcc.backends.instructions.impl;
 import net.sf.orcc.backends.instructions.InstAssignIndex;
 import net.sf.orcc.backends.instructions.InstCast;
 import net.sf.orcc.backends.instructions.InstGetElementPtr;
-import net.sf.orcc.backends.instructions.InstRam;
-import net.sf.orcc.backends.instructions.InstRamRead;
-import net.sf.orcc.backends.instructions.InstRamSetAddress;
-import net.sf.orcc.backends.instructions.InstRamWrite;
+import net.sf.orcc.backends.instructions.InstTernary;
 import net.sf.orcc.backends.instructions.InstructionsFactory;
 import net.sf.orcc.backends.instructions.InstructionsPackage;
-import net.sf.orcc.backends.instructions.InstSplit;
-import net.sf.orcc.backends.instructions.InstTernary;
-
 import net.sf.orcc.ir.IrPackage;
 
-import net.sf.orcc.moc.MocPackage;
-import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
-
 import org.eclipse.emf.ecore.impl.EPackageImpl;
 
 /**
@@ -70,41 +61,6 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * @generated
 	 */
 	private EClass instAssignIndexEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass instSplitEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass instRamEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass instRamReadEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass instRamSetAddressEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass instRamWriteEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -168,7 +124,6 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 
 		// Initialize simple dependencies
 		IrPackage.eINSTANCE.eClass();
-		MocPackage.eINSTANCE.eClass();
 
 		// Create package meta-data objects
 		theInstructionsPackage.createPackageContents();
@@ -264,96 +219,6 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 */
 	public EReference getInstAssignIndex_ListType() {
 		return (EReference)instAssignIndexEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getInstSplit() {
-		return instSplitEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getInstRam() {
-		return instRamEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getInstRam_Port() {
-		return (EAttribute)instRamEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getInstRam_Source() {
-		return (EReference)instRamEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getInstRamRead() {
-		return instRamReadEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getInstRamRead_Target() {
-		return (EReference)instRamReadEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getInstRamSetAddress() {
-		return instRamSetAddressEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getInstRamSetAddress_Indexes() {
-		return (EReference)instRamSetAddressEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getInstRamWrite() {
-		return instRamWriteEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getInstRamWrite_Value() {
-		return (EReference)instRamWriteEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -461,21 +326,6 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 		createEReference(instGetElementPtrEClass, INST_GET_ELEMENT_PTR__TARGET);
 		createEReference(instGetElementPtrEClass, INST_GET_ELEMENT_PTR__SOURCE);
 
-		instRamEClass = createEClass(INST_RAM);
-		createEAttribute(instRamEClass, INST_RAM__PORT);
-		createEReference(instRamEClass, INST_RAM__SOURCE);
-
-		instRamReadEClass = createEClass(INST_RAM_READ);
-		createEReference(instRamReadEClass, INST_RAM_READ__TARGET);
-
-		instRamSetAddressEClass = createEClass(INST_RAM_SET_ADDRESS);
-		createEReference(instRamSetAddressEClass, INST_RAM_SET_ADDRESS__INDEXES);
-
-		instRamWriteEClass = createEClass(INST_RAM_WRITE);
-		createEReference(instRamWriteEClass, INST_RAM_WRITE__VALUE);
-
-		instSplitEClass = createEClass(INST_SPLIT);
-
 		instTernaryEClass = createEClass(INST_TERNARY);
 		createEReference(instTernaryEClass, INST_TERNARY__CONDITION_VALUE);
 		createEReference(instTernaryEClass, INST_TERNARY__TRUE_VALUE);
@@ -517,11 +367,6 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 		instAssignIndexEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
 		instCastEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
 		instGetElementPtrEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
-		instRamEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
-		instRamReadEClass.getESuperTypes().add(this.getInstRam());
-		instRamSetAddressEClass.getESuperTypes().add(this.getInstRam());
-		instRamWriteEClass.getESuperTypes().add(this.getInstRam());
-		instSplitEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
 		instTernaryEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
 
 		// Initialize classes and features; add operations and parameters
@@ -538,21 +383,6 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 		initEReference(getInstGetElementPtr_Indexes(), theIrPackage.getExpression(), null, "indexes", null, 0, -1, InstGetElementPtr.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getInstGetElementPtr_Target(), theIrPackage.getDef(), null, "target", null, 0, 1, InstGetElementPtr.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getInstGetElementPtr_Source(), theIrPackage.getUse(), null, "source", null, 0, 1, InstGetElementPtr.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-		initEClass(instRamEClass, InstRam.class, "InstRam", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getInstRam_Port(), ecorePackage.getEInt(), "port", null, 0, 1, InstRam.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getInstRam_Source(), theIrPackage.getUse(), null, "source", null, 0, 1, InstRam.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-		initEClass(instRamReadEClass, InstRamRead.class, "InstRamRead", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getInstRamRead_Target(), theIrPackage.getDef(), null, "target", null, 0, 1, InstRamRead.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-		initEClass(instRamSetAddressEClass, InstRamSetAddress.class, "InstRamSetAddress", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getInstRamSetAddress_Indexes(), theIrPackage.getExpression(), null, "indexes", null, 0, -1, InstRamSetAddress.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-		initEClass(instRamWriteEClass, InstRamWrite.class, "InstRamWrite", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getInstRamWrite_Value(), theIrPackage.getExpression(), null, "value", null, 0, 1, InstRamWrite.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-		initEClass(instSplitEClass, InstSplit.class, "InstSplit", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(instTernaryEClass, InstTernary.class, "InstTernary", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getInstTernary_ConditionValue(), theIrPackage.getExpression(), null, "conditionValue", null, 0, 1, InstTernary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

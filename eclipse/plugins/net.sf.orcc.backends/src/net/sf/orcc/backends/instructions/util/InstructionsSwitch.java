@@ -31,11 +31,6 @@ package net.sf.orcc.backends.instructions.util;
 import net.sf.orcc.backends.instructions.InstAssignIndex;
 import net.sf.orcc.backends.instructions.InstCast;
 import net.sf.orcc.backends.instructions.InstGetElementPtr;
-import net.sf.orcc.backends.instructions.InstRam;
-import net.sf.orcc.backends.instructions.InstRamRead;
-import net.sf.orcc.backends.instructions.InstRamSetAddress;
-import net.sf.orcc.backends.instructions.InstRamWrite;
-import net.sf.orcc.backends.instructions.InstSplit;
 import net.sf.orcc.backends.instructions.InstTernary;
 import net.sf.orcc.backends.instructions.InstructionsPackage;
 import net.sf.orcc.ir.InstSpecific;
@@ -122,49 +117,6 @@ public class InstructionsSwitch<T> extends Switch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case InstructionsPackage.INST_RAM: {
-				InstRam instRam = (InstRam)theEObject;
-				T result = caseInstRam(instRam);
-				if (result == null) result = caseInstSpecific(instRam);
-				if (result == null) result = caseInstruction(instRam);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case InstructionsPackage.INST_RAM_READ: {
-				InstRamRead instRamRead = (InstRamRead)theEObject;
-				T result = caseInstRamRead(instRamRead);
-				if (result == null) result = caseInstRam(instRamRead);
-				if (result == null) result = caseInstSpecific(instRamRead);
-				if (result == null) result = caseInstruction(instRamRead);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case InstructionsPackage.INST_RAM_SET_ADDRESS: {
-				InstRamSetAddress instRamSetAddress = (InstRamSetAddress)theEObject;
-				T result = caseInstRamSetAddress(instRamSetAddress);
-				if (result == null) result = caseInstRam(instRamSetAddress);
-				if (result == null) result = caseInstSpecific(instRamSetAddress);
-				if (result == null) result = caseInstruction(instRamSetAddress);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case InstructionsPackage.INST_RAM_WRITE: {
-				InstRamWrite instRamWrite = (InstRamWrite)theEObject;
-				T result = caseInstRamWrite(instRamWrite);
-				if (result == null) result = caseInstRam(instRamWrite);
-				if (result == null) result = caseInstSpecific(instRamWrite);
-				if (result == null) result = caseInstruction(instRamWrite);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case InstructionsPackage.INST_SPLIT: {
-				InstSplit instSplit = (InstSplit)theEObject;
-				T result = caseInstSplit(instSplit);
-				if (result == null) result = caseInstSpecific(instSplit);
-				if (result == null) result = caseInstruction(instSplit);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
 			case InstructionsPackage.INST_TERNARY: {
 				InstTernary instTernary = (InstTernary)theEObject;
 				T result = caseInstTernary(instTernary);
@@ -202,76 +154,6 @@ public class InstructionsSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseInstAssignIndex(InstAssignIndex object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Inst Split</em>'.
-	 * <!-- begin-user-doc --> This implementation returns
-	 * null; returning a non-null result will terminate the switch. <!--
-	 * end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Inst Split</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseInstSplit(InstSplit object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Inst Ram</em>'.
-	 * <!-- begin-user-doc --> This implementation returns
-	 * null; returning a non-null result will terminate the switch. <!--
-	 * end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Inst Ram</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseInstRam(InstRam object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Inst Ram Read</em>'.
-	 * <!-- begin-user-doc --> This implementation
-	 * returns null; returning a non-null result will terminate the switch. <!--
-	 * end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Inst Ram Read</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseInstRamRead(InstRamRead object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Inst Ram Set Address</em>'.
-	 * <!-- begin-user-doc --> This
-	 * implementation returns null; returning a non-null result will terminate
-	 * the switch. <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Inst Ram Set Address</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseInstRamSetAddress(InstRamSetAddress object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Inst Ram Write</em>'.
-	 * <!-- begin-user-doc --> This implementation
-	 * returns null; returning a non-null result will terminate the switch. <!--
-	 * end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Inst Ram Write</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseInstRamWrite(InstRamWrite object) {
 		return null;
 	}
 
