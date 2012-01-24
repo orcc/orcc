@@ -49,7 +49,7 @@ import net.sf.orcc.ir.util.ValueUtil;
  * @author Antoine Lorence
  * 
  */
-public class Fifo {
+public class SimulatorFifo {
 
 	private BlockingQueue<Object> content;
 	private Type type;
@@ -66,6 +66,8 @@ public class Fifo {
 	 * Creates a new FIFO with the given size and a file for tracing exchanged
 	 * data.
 	 * 
+	 * @param type
+	 *            type of data in the FIFO
 	 * @param size
 	 *            the size of the FIFO
 	 * @param folderName
@@ -73,7 +75,7 @@ public class Fifo {
 	 * @param fifoName
 	 *            name of the FIFO (and the trace file)
 	 */
-	public Fifo(Type type, int size, String folderName, String fifoName,
+	public SimulatorFifo(Type type, int size, String folderName, String fifoName,
 			boolean enableTraces) {
 		this(type, size);
 		this.name = fifoName;
@@ -104,17 +106,19 @@ public class Fifo {
 	 * @param size
 	 *            the size of the FIFO
 	 */
-	public Fifo(int size) {
+	public SimulatorFifo(int size) {
 		this(null, size);
 	}
 
 	/**
 	 * Creates a new FIFO with the given type and size.
 	 * 
+	 * @param type
+	 *            type of data in the FIFO
 	 * @param size
 	 *            the size of the FIFO
 	 */
-	public Fifo(Type type, int size) {
+	public SimulatorFifo(Type type, int size) {
 		this.size = size;
 		this.type = type;
 		content = new ArrayBlockingQueue<Object>(size);
@@ -175,7 +179,7 @@ public class Fifo {
 	 *         of tokens
 	 */
 	final public boolean hasTokens(int numTokens) {
-		return content.size() >= numTokens;
+		return content.size() > numTokens;
 	}
 
 	/**
@@ -187,7 +191,7 @@ public class Fifo {
 		Object result = null;
 
 		if (offset == 0) {
-			return content.peek();
+			result = content.peek();
 		} else {
 			Iterator<Object> it = content.iterator();
 			while (it.hasNext()) {

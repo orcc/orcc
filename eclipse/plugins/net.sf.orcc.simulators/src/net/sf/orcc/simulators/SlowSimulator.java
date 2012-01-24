@@ -54,7 +54,7 @@ import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.df.transformations.NetworkFlattener;
 import net.sf.orcc.ir.util.ActorInterpreter;
 import net.sf.orcc.ir.util.IrUtil;
-import net.sf.orcc.runtime.Fifo;
+import net.sf.orcc.runtime.SimulatorFifo;
 import net.sf.orcc.runtime.impl.GenericSource;
 import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.OrccUtil;
@@ -76,11 +76,11 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
  */
 public class SlowSimulator extends AbstractSimulator {
 
-	protected List<Fifo> fifoList;
+	protected List<SimulatorFifo> fifoList;
 
-	protected Map<Port, Fifo> inputFifos;
+	protected Map<Port, SimulatorFifo> inputFifos;
 
-	protected Map<Port, List<Fifo>> outputFifos;
+	protected Map<Port, List<SimulatorFifo>> outputFifos;
 
 	private int fifoSize;
 
@@ -100,21 +100,21 @@ public class SlowSimulator extends AbstractSimulator {
 
 	protected void connectActors(Instance src, Port srcPort, Instance tgt,
 			Port tgtPort, int fifoSize) {
-		Fifo fifo = null;
+		SimulatorFifo fifo = null;
 		if (enableTraces) {
 			String fifoName = src.getName() + "_" + srcPort.getName() + "_"
 					+ tgt.getName() + "_" + tgtPort.getName();
-			fifo = new Fifo(srcPort.getType(), fifoSize, traceFolder, fifoName,
+			fifo = new SimulatorFifo(srcPort.getType(), fifoSize, traceFolder, fifoName,
 					enableTraces);
 		} else {
-			fifo = new Fifo(srcPort.getType(), fifoSize);
+			fifo = new SimulatorFifo(srcPort.getType(), fifoSize);
 		}
 
 		inputFifos.put(tgtPort, fifo);
 
-		List<Fifo> fifos = outputFifos.get(srcPort);
+		List<SimulatorFifo> fifos = outputFifos.get(srcPort);
 		if (fifos == null) {
-			fifos = new ArrayList<Fifo>();
+			fifos = new ArrayList<SimulatorFifo>();
 			outputFifos.put(srcPort, fifos);
 		}
 		fifos.add(fifo);
@@ -236,8 +236,8 @@ public class SlowSimulator extends AbstractSimulator {
 	public void start(String mode) {
 		try {
 			interpreters = new HashMap<Instance, ActorInterpreter>();
-			inputFifos = new HashMap<Port, Fifo>();
-			outputFifos = new HashMap<Port, List<Fifo>>();
+			inputFifos = new HashMap<Port, SimulatorFifo>();
+			outputFifos = new HashMap<Port, List<SimulatorFifo>>();
 
 			IFile file = OrccUtil.getFile(project, xdfFile, "xdf");
 			ResourceSet set = new ResourceSetImpl();

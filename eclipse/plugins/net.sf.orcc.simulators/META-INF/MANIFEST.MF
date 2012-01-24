@@ -14,7 +14,6 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: IETR/INSA Rennes
 Export-Package: net.sf.orcc.runtime,
- net.sf.orcc.runtime.actors,
  net.sf.orcc.runtime.impl,
  net.sf.orcc.simulators,
  std.io.impl,
