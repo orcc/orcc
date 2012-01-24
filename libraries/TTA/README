@@ -15,6 +15,5 @@ TCE				1.5+
 Generation procedure
 ====================
 
-- Generate the application using Orcc in the 'generated' directory.
 - Build this application using the 'generate' script (More informations with '-h' option).
-- Open the Quartus project from 'build-generated' directory and synthesis the application.
+- Open the ModelSim/Quartus project and simule/synthesis the application.

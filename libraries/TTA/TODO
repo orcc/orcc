@@ -1,9 +1,10 @@
 
-- Permit the generation of several applications in subdirectories.
-- Add a Makefile to install the library and the script on the system.
 - Add verbose options to the 'generate' script.
 
 - Map several actors on the same processor.
 - Compute the precise memory consumption using an LLVM pass.
 - Customize stream-unit for performance.
 - Develop fast broadcast.
+- Reduce READ/WRITE latency.
+- Improve action-scheduling code.
+- Implement transformation to remove useless copies.
