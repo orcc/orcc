@@ -89,19 +89,15 @@ signals(network) ::= <<
 
 declareFifoSignals(connection) ::= <<
 <if(connection.sourcePort.native)
->signal s_<indexConnection(connection)> : std_logic_vector(<connection.sourcePort.type.size>-1 downto 0);<
+>signal s_<connection.id> : std_logic_vector(<connection.sourcePort.type.size>-1 downto 0);<
 else
->signal fifo_<indexConnection(connection)>_data		    : std_logic_vector(31 downto 0);
-signal fifo_<indexConnection(connection)>_q			   : std_logic_vector(31 downto 0);
-signal fifo_<indexConnection(connection)>_rdreq		   : std_logic;
-signal fifo_<indexConnection(connection)>_wrreq		   : std_logic;
-signal fifo_<indexConnection(connection)>_nb_tokens    : std_logic_vector(31 downto 0);
-signal fifo_<indexConnection(connection)>_nb_freerooms : std_logic_vector(31 downto 0);<
+>signal fifo_<connection.id>_data		    : std_logic_vector(31 downto 0);
+signal fifo_<connection.id>_q			   : std_logic_vector(31 downto 0);
+signal fifo_<connection.id>_rdreq		   : std_logic;
+signal fifo_<connection.id>_wrreq		   : std_logic;
+signal fifo_<connection.id>_nb_tokens    : std_logic_vector(31 downto 0);
+signal fifo_<connection.id>_nb_freerooms : std_logic_vector(31 downto 0);<
 endif>
->>
-
-indexConnection(connection) ::= <<
-<connection.id>
 >>
 
 
@@ -111,23 +107,23 @@ indexConnection(connection) ::= <<
 
 assignNetworkPort(connection) ::= <<
 <if(connection.source.port)>
-<connection.source.name> \<= s_<indexConnection(connection)>;
+<connection.source.name> \<= s_<connection.id>;
 <elseif(connection.target.port)>
-<connection.target.name> \<= s_<indexConnection(connection)>;
+<connection.target.name> \<= s_<connection.id>;
 <endif>
 >>
 
 assignFifo(connection) ::= <<
 <if(!connection.sourcePort.native && !connection.targetPort.native)>
-fifo_<indexConnection(connection)> : entity work.fifo
+fifo_<connection.id> : entity work.fifo
   generic map(width =\> 32)
   port map(clk          =\> clk,
-           rdreq        =\> fifo_<indexConnection(connection)>_rdreq,
-           data         =\> fifo_<indexConnection(connection)>_data(31 downto 0),
-           q            =\> fifo_<indexConnection(connection)>_q(31 downto 0),
-           nb_tokens    =\> fifo_<indexConnection(connection)>_nb_tokens,
-           nb_freerooms =\> fifo_<indexConnection(connection)>_nb_freerooms,
-           wrreq        =\> fifo_<indexConnection(connection)>_wrreq,
+           rdreq        =\> fifo_<connection.id>_rdreq,
+           data         =\> fifo_<connection.id>_data(31 downto 0),
+           q            =\> fifo_<connection.id>_q(31 downto 0),
+           nb_tokens    =\> fifo_<connection.id>_nb_tokens,
+           nb_freerooms =\> fifo_<connection.id>_nb_freerooms,
+           wrreq        =\> fifo_<connection.id>_wrreq,
            rst_n        =\> rst_n);
            
 <endif>
@@ -159,20 +155,20 @@ assignGenerics(instance) ::= <<
 
 assignInputPort(port, connection, index) ::= <<
 <if(port.native)
-><port.name>   =\> s_<indexConnection(connection)>,<
+><port.name>   =\> s_<connection.id>,<
 else
->data_<index>_in    =\> fifo_<indexConnection(connection)>_q,
-status_<index>_in  =\> fifo_<indexConnection(connection)>_nb_tokens,
-ack_<index>_in     =\> fifo_<indexConnection(connection)>_rdreq,<
+>data_<index>_in    =\> fifo_<connection.id>_q,
+status_<index>_in  =\> fifo_<connection.id>_nb_tokens,
+ack_<index>_in     =\> fifo_<connection.id>_rdreq,<
 endif>
 >>
 
 assignOutputPort(port, connection, index) ::= <<
 <if(port.native)
-><port.name>   =\> s_<indexConnection(connection)>,<
+><port.name>   =\> s_<connection.id>,<
 else
->data_<index>_out   =\> fifo_<indexConnection(connection)>_data,
-status_<index>_out =\> fifo_<indexConnection(connection)>_nb_freerooms,
-dv_<index>_out     =\> fifo_<indexConnection(connection)>_wrreq,<
+>data_<index>_out   =\> fifo_<connection.id>_data,
+status_<index>_out =\> fifo_<connection.id>_nb_freerooms,
+dv_<index>_out     =\> fifo_<connection.id>_wrreq,<
 endif>
 >>
