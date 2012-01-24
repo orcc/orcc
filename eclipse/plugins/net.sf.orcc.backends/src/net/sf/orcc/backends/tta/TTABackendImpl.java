@@ -60,6 +60,7 @@ import net.sf.orcc.backends.tta.architecture.TTA;
 import net.sf.orcc.backends.tta.transformations.BroadcastTypeResizer;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.Edge;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -75,6 +76,7 @@ import net.sf.orcc.ir.transformations.TacTransformation;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.emf.common.util.BasicEList;
 
 /**
  * TTA back-end.
@@ -152,6 +154,12 @@ public class TTABackendImpl extends AbstractBackend {
 			Instance instance = DfFactory.eINSTANCE.createInstance(
 					entity.getName(), entity);
 			network.getInstances().add(instance);
+			for (Edge edge : new BasicEList<Edge>(entity.getIncoming())) {
+				edge.setTarget(instance);
+			}
+			for (Edge edge : new BasicEList<Edge>(entity.getOutgoing())) {
+				edge.setSource(instance);
+			}
 		}
 
 		return network;
@@ -271,6 +279,7 @@ public class TTABackendImpl extends AbstractBackend {
 				"net/sf/orcc/backends/tta/VHDL_Testbench.stg");
 		StandardPrinter wavePrinter = new StandardPrinter(
 				"net/sf/orcc/backends/tta/ModelSim_Wave.stg");
+		wavePrinter.setExpressionPrinter(new LLVMExpressionPrinter());
 		tclPrinter.print("top.tcl", path, network);
 		tbPrinter.print("top_tb.vhd", path, network);
 		wavePrinter.print("wave.do", path, network);

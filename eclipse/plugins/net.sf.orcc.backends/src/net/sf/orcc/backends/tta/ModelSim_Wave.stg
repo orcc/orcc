@@ -12,6 +12,7 @@ add wave -noupdate -format Logic /tb_top/rst_n
 <network.outputs: addNetworkPort(); separator="\n">
 
 <network.instances: { instance | <addInstanceSignals(instance, true)> }; separator="\n\n">
+<network.connections: addConnectionSignals(); separator="\n\n">
 
 <printOptions()>
 >>
@@ -65,6 +66,24 @@ add wave -noupdate -format Literal -radix decimal /<if(choosePrefix)>tb_top/top_
 add wave -noupdate -format Logic /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<instance.id><endif>/<instance.id>_inst/dv_<index>_out<
 else
 >add wave -noupdate -format Literal /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<instance.id><endif>/<instance.id>_inst/s_<output.name><
+endif>
+>>
+
+addConnectionSignals(connection) ::= <<
+<if(!connection.sourcePort.native && !connection.targetPort.native)
+>add wave -noupdate -divider \<NULL\>
+add wave -noupdate -divider fifo_<connection.id>:_<connection.source.id>_\>\>_<connection.target.id>
+add wave -noupdate -divider \<NULL\>
+add wave -noupdate -format Logic /tb_top/top_orcc/fifo_<connection.id>/clk
+add wave -noupdate -format Logic /tb_top/top_orcc/fifo_<connection.id>/rst_n
+add wave -noupdate -format Logic /tb_top/top_orcc/fifo_<connection.id>/clear
+add wave -noupdate -format Logic /tb_top/top_orcc/fifo_<connection.id>/wrreq
+add wave -noupdate -format Logic /tb_top/top_orcc/fifo_<connection.id>/rdreq
+add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/fifo_<connection.id>/data
+add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/fifo_<connection.id>/q
+add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/fifo_<connection.id>/nb_freerooms
+add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/fifo_<connection.id>/nb_tokens
+add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/fifo_<connection.id>/nb_tokens_i<
 endif>
 >>
 
