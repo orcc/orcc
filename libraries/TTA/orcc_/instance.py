@@ -94,7 +94,6 @@ class Instance:
         instanceSrcPath = os.path.join(srcPath, self.id)
         ttaPath = os.path.join(instanceSrcPath, "tta")
         vhdlPath = os.path.join(ttaPath, "vhdl")
-        simuPath = os.path.join(ttaPath, "simulation")
         memoryPath = os.path.join(ttaPath, "memory")
         wrapperPath = os.path.join(srcPath, "wrapper")
         sharePath = os.path.join(srcPath, "share")
@@ -136,12 +135,7 @@ class Instance:
         
         # Manage simulation files
         if not (self.isNative or self.isBroadcast):
-            os.chmod(os.path.join(srcPath, self._tclFile), stat.S_IRWXU)
-            shutil.rmtree(simuPath, ignore_errors=True)
-            os.mkdir(simuPath)
-            shutil.move(self._waveFile, simuPath)
-            shutil.move(self._tbFile, simuPath)
-        
+            os.chmod(os.path.join(instanceSrcPath, self._tclFile), stat.S_IRWXU)        
 
         # Clean working directory
         os.remove("stream_units.hdb")

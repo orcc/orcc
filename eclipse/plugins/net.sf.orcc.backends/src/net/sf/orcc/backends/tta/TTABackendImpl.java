@@ -225,6 +225,8 @@ public class TTABackendImpl extends AbstractBackend {
 			printProcessor(instance, instancePath);
 
 			// ModelSim
+			String simPath = OrccUtil.createFolder(instancePath,
+					"simulation");
 			StandardPrinter tbPrinter = new StandardPrinter(
 					"net/sf/orcc/backends/tta/VHDL_Testbench.stg", !debug,
 					false);
@@ -232,10 +234,11 @@ public class TTABackendImpl extends AbstractBackend {
 					"net/sf/orcc/backends/tta/ModelSim_Script.stg");
 			StandardPrinter wavePrinter = new StandardPrinter(
 					"net/sf/orcc/backends/tta/ModelSim_Wave.stg");
-			tbPrinter.print(instance.getName() + "_tb.vhd", instancePath,
+			tbPrinter.print(instance.getName() + "_tb.vhd", simPath,
 					instance);
-			tclPrinter.print(instance.getName() + ".tcl", path, instance);
-			wavePrinter.print("wave.do", instancePath, instance);
+			tclPrinter.print(instance.getName() + ".tcl", instancePath,
+					instance);
+			wavePrinter.print("wave.do", simPath, instance);
 		}
 
 		return printer
