@@ -30,7 +30,7 @@ add wave -noupdate -format Literal /tb_top/<port.name>_native
 >>
 
 addInstanceSignals(instance, choosePrefix) ::= <<
-<if(instance.actor && !instance.actor.native)
+<if(!instance.actor.native)
 >add wave -noupdate -divider \<NULL\>
 add wave -noupdate -divider <instance.id>
 add wave -noupdate -divider \<NULL\>
@@ -38,8 +38,13 @@ add wave -noupdate -divider \<NULL\>
 add wave -noupdate -format Logic /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<instance.id><endif>/<instance.id>_inst/clk
 add wave -noupdate -format Logic /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<instance.id><endif>/<instance.id>_inst/rst_n
 
+<if(instance.actor)>
 <instance.actor.inputs: { input | <addInstanceInput(input, i0, choosePrefix)> }; separator="\n">
-<instance.actor.outputs: { output | <addInstanceOutput(output, i0, choosePrefix)> }; separator="\n"><
+<instance.actor.outputs: { output | <addInstanceOutput(output, i0, choosePrefix)> }; separator="\n">
+<elseif(instance.broadcast)>
+<instance.broadcast.inputs: { input | <addInstanceInput(input, i0, choosePrefix)> }; separator="\n">
+<instance.broadcast.outputs: { output | <addInstanceOutput(output, i0, choosePrefix)> }; separator="\n">
+<endif><
 endif>
 >>
 
