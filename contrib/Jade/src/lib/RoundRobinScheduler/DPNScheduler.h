@@ -168,7 +168,7 @@ protected:
 	 * @param function : llvm::Function where the test is added
 	 */
 	virtual llvm::BasicBlock* createActionTest(Action* action, llvm::BasicBlock* BB, 
-										llvm::BasicBlock* incBB, llvm::Function* function);
+										llvm::BasicBlock* incBB, llvm::BasicBlock* retBB, llvm::Function* function);
 
 	/**
 	 * @brief Create a Action execution

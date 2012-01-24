@@ -80,6 +80,7 @@ Instance::Instance(std::string id, Actor* actor)  : Entity(new map<std::string, 
 	this->actionScheduler = NULL;
 	this->parameterValues = new map<string, Expr*>();
 	this->attributes = new map<string, IRAttribute*>();
+	this->enableTrace = false;
 		
 	if (actor != NULL){
 		actor->addInstance(this);

@@ -124,6 +124,7 @@ Function* DPNScheduler::createSchedulerOutsideFSM(Instance* instance){
 	// Add a basic block entry and BB to the outside scheduler.
 	BasicBlock* BBEntry = BasicBlock::Create(Context, "entry", outsideScheduler);
 	BasicBlock* BB1  = BasicBlock::Create(Context, "bb", outsideScheduler);
+	BasicBlock* retBB  = BasicBlock::Create(Context, "return", outsideScheduler);
 	BranchInst::Create(BB1, BBEntry);
 	bb1 = BB1;
 
@@ -132,11 +133,13 @@ Function* DPNScheduler::createSchedulerOutsideFSM(Instance* instance){
 	list<Action*>::iterator it;
 	BasicBlock* BB = BB1;	
 	for ( it=actions->begin() ; it != actions->end(); it++ ){
-		BB = createActionTest(*it, BB, BB1, outsideScheduler);
+		BB = createActionTest(*it, BB, BB1, retBB, outsideScheduler);
 	}
 
+	BranchInst::Create(retBB, BB);
+
 	//Return if no action can be fired
-	ReturnInst::Create(Context, BB);
+	ReturnInst::Create(Context, retBB);
 
 	return outsideScheduler;
 }
@@ -147,14 +150,14 @@ void DPNScheduler::createSchedulerNoFSM(Instance* instance, BasicBlock* BB, Basi
 	list<Action*>* actions = actionScheduler->getActions();
 
 	for ( it=actions->begin() ; it != actions->end(); it++ ){
-		BB = createActionTest(*it, BB, incBB, function);
+		BB = createActionTest(*it, BB, incBB, returnBB, function);
 	}
 
 	//Create branch from skip to return
 	BranchInst::Create(returnBB, BB);
 }
 
-BasicBlock* DPNScheduler::createActionTest(Action* action, BasicBlock* BB, BasicBlock* incBB, Function* function){
+BasicBlock* DPNScheduler::createActionTest(Action* action, BasicBlock* BB, BasicBlock* incBB, llvm::BasicBlock* retBB, Function* function){
 	map<Port*, ConstantInt*>::iterator it;
 	string name = action->getName();
 	string skipBrName = "skip_";
@@ -181,7 +184,7 @@ BasicBlock* DPNScheduler::createActionTest(Action* action, BasicBlock* BB, Basic
 	BranchInst* branchInst	= BranchInst::Create(fireBB, skipBB, schedInst, BB);
 
 	//Create output pattern
-	fireBB = checkOutputPattern(action->getOutputPattern(), function, skipBB, fireBB);
+	fireBB = checkOutputPattern(action->getOutputPattern(), function, retBB, fireBB);
 	
 	//Execute the action
 	createActionCall(action, fireBB);
@@ -197,6 +200,7 @@ void DPNScheduler::createActionCall(Action* action, BasicBlock* BB){
 	Procedure* body = action->getBody();
 	CallInst* bodyInst = CallInst::Create(body->getFunction(), "",  BB);
 	Entity* parent = action->getParent();
+	
 	// Add debugging information if needed
 	if (parent->isInstance() && ((Instance*)parent)->isTraceActivate()){
 		TraceMng::createActionTrace(decoder->getModule(), action, bodyInst);
