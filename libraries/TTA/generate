@@ -58,7 +58,7 @@ def compile(arg, debug, target):
     print "* Compile the application for TTA"
     print "*********************************************************************"
 
-    network.compile(os.path.abspath(target), libPath, arg.split(), debug)
+    network.compile(target, libPath, arg.split(), debug)
 
     print "* Compilation of %d instances done in %f seconds." % (len(network.instances), time.time() - start)
 
@@ -70,7 +70,7 @@ def simulate(debug, target):
     print "* Simulate the execution of the application on  each TTA"
     print "*********************************************************************"
 
-    network.simulate(os.path.abspath(target), libPath, tracePath)
+    network.simulate(target, libPath, tracePath)
 
     print "* Simulation of %d instances done in %f seconds." % (len(network.instances), time.time() - start)
 
@@ -82,7 +82,7 @@ def generate(arg, debug, target):
     print "* Generate the TTA processors"
     print "*********************************************************************"
     
-    network.generate(os.path.abspath(target), libPath, arg.split(), debug)
+    network.generate(target, libPath, arg.split(), debug)
 
     print "* Generation of %d instances done in %f seconds." % (len(network.instances), time.time() - start)
 
@@ -123,14 +123,14 @@ from informations_.informations import *
 			
 for o, a in opts:
 	if o in ("-c", "--compile"):
-		compile(a, debug, args[0])
+		compile(a, debug, srcPath)
 
 for o, a in opts:
 	if o in ("-s", "--simulate"):
-		simulate(debug, args[0])
+		simulate(debug, srcPath)
 
 for o, a in opts:
 	if o in ("-g", "--generate"):
-		generate(a, debug, args[0])
+		generate(a, debug, srcPath)
 
 
