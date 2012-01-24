@@ -45,6 +45,7 @@ import net.sf.orcc.df.transformations.BroadcastAdder;
 import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.df.transformations.NetworkFlattener;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.util.OrccUtil;
 
@@ -66,9 +67,15 @@ public class JavaBackendImpl extends AbstractBackend {
 
 	public JavaBackendImpl() {
 		transformations = new HashMap<String, String>();
-		transformations.put("initialize", "initialize_");
+		transformations.put("initialize", "my_initialize");
 		transformations.put("isSchedulable_initialize",
-				"isSchedulable_initialize_");
+				"my_isSchedulable_initialize");
+		
+		transformations.put("byte", "my_byte");
+		transformations.put("int", "my_int");
+		transformations.put("boolean", "my_boolean");
+		transformations.put("long", "my_long");
+		transformations.put("short", "my_short");
 	}
 
 	@Override
@@ -84,6 +91,8 @@ public class JavaBackendImpl extends AbstractBackend {
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 		}
+
+		actor.setTemplateData(new JavaTemplateData(actor));
 	}
 
 	private Network doTransformNetwork(Network network) throws OrccException {
@@ -127,6 +136,15 @@ public class JavaBackendImpl extends AbstractBackend {
 		// create folder if necessary
 		String folder = path + File.separator + OrccUtil.getFolder(actor);
 		new File(folder).mkdirs();
+
+		boolean usingNativeProcedure = false;
+		for (Procedure p : actor.getProcs()) {
+			if (p.isNative() && ! p.getName().equals("print")) {
+				usingNativeProcedure = true;
+				break;
+			}
+		}
+		actorPrinter.getOptions().put("usingNativeProc", usingNativeProcedure);
 
 		return actorPrinter.print(actor.getSimpleName() + ".java", folder,
 				actor);

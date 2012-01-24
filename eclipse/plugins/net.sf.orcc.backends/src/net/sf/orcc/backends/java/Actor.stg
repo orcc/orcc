@@ -6,12 +6,12 @@ import "net/sf/orcc/backends/c/Actor.stg"
 
 fifo(port) ::= <<
 
-private Fifo fifo_<port.name>;
+private Fifo\<<port.type>\> fifo_<port.name>;
 >>
 
 setFifo(port) ::= <<
 if ("<port.name>".equals(portName)) {
-	fifo_<port.name> = fifo;
+	fifo_<port.name> = (Fifo\<<port.type>\>) fifo;
 } else 
 >>
 
@@ -19,25 +19,17 @@ if ("<port.name>".equals(portName)) {
 // Types and variables
 ///////////////////////////////////////////////////////////////////////////////
 
-// the dimensions of a list: [][]...[]
-// does not output anything if <value> is empty
-// differs from inherited listSize because this one does not print any size
-// information.
-listDim(value) ::= <<
-<value : {val | []} >
->>
-
 // a variable definition
 // called by "function parameter", or "state variable with value"
 variableDeclaration(variable) ::= <<
-<variable.type><listDim(variable.type.dimensions)> <variable.name>
+<variable.type> <variable.name>
 >>
 
 // a variable definition with initialization
 // called by "local variable", or "state variable with no value"
 variableDeclarationInit(variable) ::= <%
 <variableDeclaration(variable)>
-<if(variable.type.dimensions)> = new <variable.type><listSize(variable.type.dimensions)>
+<if(variable.type.dimensions)> = new <variable.type.innermostType><listSize(variable.type.dimensions)>
 <endif>
 %>
 
@@ -73,16 +65,6 @@ else
 endif>
 >>
 
-getPortType(variable) ::= <<
-<if (action.inputPattern.varToPortMap.(variable))
-><action.inputPattern.varToPortMap.(variable).type><
-elseif (action.outputPattern.varToPortMap.(variable))
-><action.outputPattern.varToPortMap.(variable).type><
-else
-><action.peekPattern.varToPortMap.(variable).type><
-endif>
->>
-
 printExpressionParameter(arg) ::= <%
 <if (arg.value.booleanExpr || arg.value.intExpr || arg.value.floatExpr || arg.value.listExpr)>
 <Constant(arg.value)>
@@ -100,19 +82,32 @@ printExpressionParameter(arg)
 ><arg.use.variable.name><endif>
 %>
 
-printCall(call) ::= <<
+printCallParam(param, actor) ::= <%
+<if (param.byRef)>
+&<param.use.variable><param.indexes : {index | [<index>]}>
+<else>
+<if (actor.templateData.castedListReferences.(param))>(<actor.templateData.castedListReferences.(param)>)(<param.value>)<else><param.value><endif>
+<endif>
+%>
+
+printCallProcedure(call, actor) ::= <%
+<if (call.procedure.native)>NativeProcedure.<endif>
+<call.procedure.name>(<call.parameters: printCallParam(actor); separator=", ">);
+%>
+
+printCall(call, actor) ::= <<
 
 <if(call.print)>System.out.print(<call.parameters: printParameter(); separator=" + ">);<
 else
-><if(call.target)><call.target.variable.indexedName> = <endif><call.procedure.name>(<call.parameters: printCallParam(); separator=", ">);<
-endif>
+><if(call.target)><call.target.variable.indexedName> = <endif
+><printCallProcedure(call, actor)><endif>
 >>
 
 printLoad(load) ::= <<
 
 <if (action.inputPattern.varToPortMap.(load.source.variable) || action.outputPattern.varToPortMap.(load.source.variable) || action.peekPattern.varToPortMap.(load.source.variable))
-><load.target.variable.indexedName> = (<getPortType(load.source.variable)>) fifo_<getPortName(load.source.variable, action)>.read();
-<else><load.target.variable.indexedName> = <load.source.variable.name><load.indexes : {index | [<index>]}>;
+><load.target.variable.indexedName> = fifo_<getPortName(load.source.variable, action)>.read();
+<else><load.target.variable.indexedName> = <load.source.variable.name><load.indexes : {index | <printLoadIndex(index)>}>;
 <endif>
 >>
 
@@ -132,7 +127,7 @@ printStore(store) ::= <<
 < if (action.inputPattern.varToPortMap.(store.target.variable) || action.outputPattern.varToPortMap.(store.target.variable) || action.peekPattern.varToPortMap.(store.target.variable))
 >fifo_<getPortName(store.target.variable, action)>.write(<store.value>);<
 else
-><store.target.variable.name><store.indexes : {index | [<index>]}> = <store.value>;<endif>
+><store.target.variable.name><store.indexes : {index | <printLoadIndex(index)>}> = <store.value>;<endif>
 >>
 
 // write instruction
@@ -140,6 +135,44 @@ printWrite(write) ::= <<
 
 <write.target> = fifo_<write.port.name>.getWriteArray(<write.numTokens>);
 int <write.port>_Index = fifo_<write.port.name>.getWriteIndex(<write.numTokens>);
+>>
+
+
+printReturn(return) ::= <<
+<if(return.value)>
+return (<return.block.procedure.returnType>) (<return.value>);<
+endif>
+>>
+
+printLoadIndex(index) ::= <<
+[<if (index.type.long)>(int) <if (index.binaryExpr)> (<index>) <else><index><endif><else><index><endif>]
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Nodes
+///////////////////////////////////////////////////////////////////////////////
+
+printNodes(nodes) ::= <<
+<nodes: {node | <if (node.blockNode)><printBlockNode(node)><
+elseif (node.ifNode)><printIfNode(node)><
+elseif (node.whileNode)><printWhileNode(node)><
+endif>}>
+>>
+
+// block node
+printBlockNode(blockNode) ::= <<
+<printInstructions(blockNode.instructions)>
+>>
+
+printInstructions(instructions) ::= <<
+<instructions: {instr | <
+if (instr.assign)><printAssign(assign=instr)><
+elseif (instr.call)><printCall(call=instr,actor=actor)><
+elseif (instr.load)><printLoad(load=instr)><
+elseif (instr.return)><printReturn(return=instr)><
+elseif (instr.store)><printStore(store=instr)><
+endif>}>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -233,7 +266,7 @@ public int schedule() {
 
 actionCallState(transition) ::= <<
 <transition.action>();
-_FSM_state = States.s_<transition.state.name>;
+_FSM_state = States.s_<transition.target.name>;
 res = true;
 >>
 
@@ -252,27 +285,28 @@ schedulingTestState(transitionsList) ::= <<
 <transitionsList: actionTestState(); separator=" else ">
 >>
 
-stateScheduler(transitions) ::= <<
-private boolean stateScheduler_<transitions.sourceState.name>() {
+stateScheduler(state) ::= <<
+private boolean stateScheduler_<state.name>() {
 	boolean res = false;
-	<schedulingTestState(transitions.list)>
+	<schedulingTestState(state.outgoing)>
 	return res;
 }
 
 >>
 
-switchTransition(transition) ::= <<
-case s_<transition.sourceState.name>:
-	res = stateScheduler_<transition.sourceState.name>();
+switchState(state) ::= <<
+
+case s_<state.name>:
+	res = stateScheduler_<state.name>();
 	if (res) {
 		i++;
 	}
 	break;
 >>
 
-printSwitch(transitions) ::= <<
+printSwitch(states) ::= <<
 switch (_FSM_state) {
-<transitions: switchTransition()>
+<states: switchState()>
 default:
 	System.out.println("unknown state: %s\n" + _FSM_state);
 	break;
@@ -294,9 +328,8 @@ private boolean outside_FSM_scheduler() {
 	return res;
 }
 
-
 <endif>
-<fsm.transitions: stateScheduler(); separator="\n">
+<fsm.states: stateScheduler(); separator="\n">
 @Override
 public int schedule() {
 	boolean res = true;
@@ -309,10 +342,10 @@ public int schedule() {
 			res = true;
 			i++;
 		} else {
-			<printSwitch(fsm.transitions)>
+			<printSwitch(fsm.states)>
 		}
 		<else>
-		<printSwitch(fsm.transitions)>
+		<printSwitch(fsm.states)>
 		<endif>
 	}
 
@@ -331,8 +364,9 @@ printActor(actor, options) ::= <<
  */
 package <actor.package>;
 
-import net.sf.orcc.runtime.*;
+import net.sf.orcc.runtime.Fifo;
 import net.sf.orcc.runtime.actors.IActor;
+<if (options.usingNativeProc)>import net.sf.orcc.runtime.NativeProcedure;<endif> 
 
 public class <actor.simpleName> implements IActor {
 
@@ -370,19 +404,19 @@ public class <actor.simpleName> implements IActor {
 	}
 
 	@Override
-	public void setFifo(String portName, Fifo fifo) {
+	@SuppressWarnings("unchecked")
+	public \<T\> void setFifo(String portName, Fifo\<T\> fifo) {
 		<actor.inputs: setFifo()><actor.outputs: setFifo()>{
 			String msg = "unknown port \"" + portName + "\"";
 			throw new IllegalArgumentException(msg);
 		}
 	}
 
-	// Action scheduler
 <if(actor.fsm)>
-	// Scheduler fsm
+	// Action scheduler (FSM)
 	<schedulerFSM(actor.actionsOutsideFsm, actor.fsm)>
 <else>
-	// Scheduler (simple)
+	// Action scheduler (simple)
 	<scheduler(actor.actionsOutsideFsm)>
 <endif>
 

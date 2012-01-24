@@ -1,51 +1,41 @@
-parameter(param) ::= <<
-/* $param$ */ <instance.parameters.(param)>
->>
-
-parameters(parameters) ::= <<
-<parameters: parameter(); wrap, separator=", ">
->>
-
 ///////////////////////////////////////////////////////////////////////////////
 // declaration() and scheduler()
 //////////////////////////////////////////////////////////////////////////////
 
-declareBroadcast(instance) ::= <<
-<if (instance.broadcast)>
-private Broadcast_<instance.broadcast.type> actor_<instance.id>;
+declareBroadcast(entity) ::= <<
+<if (entity.broadcast)>
+private Broadcast\<<entity.input.type>\> actor_<entity.name>;
 <endif>
 >>
 
-createBroadcast(instance) ::= <<
-<if (instance.broadcast)>
-actor_<instance.id> = new Broadcast_<instance.broadcast.type>(<length(instance.broadcast.outputList)>);
+createBroadcast(entity) ::= <<
+<if (entity.broadcast)>
+actor_<entity.name> = new Broadcast\<<entity.input.type>\>(<length(entity.outputs)>);
 <endif>
 >>
 
 declareActor(instance) ::= <<
 <if (instance.actor)>
-private IActor actor_<instance.id>;
+private IActor actor_<instance.name>;
 <endif>
+>>
+
+args(arguments) ::= <<
+<arguments: {a | <a.value>}; wrap, separator=", ">
 >>
 
 constructActor(instance) ::= <<
 <if (instance.actor)>
-<if(instance.actor.native)>
-actor_<instance.id> = new <instance.actor.package>.<instance.actor.simpleName>(<parameters(instance.actor.parameters.list)>);
+<if (instance.actor.native)>
+actor_<instance.name> = new <instance.actor.hierarchicalName>(<args(instance.arguments)>);
 <else>
-actor_<instance.id> = new <instance.actor.package>.<instance.actor.simpleName>(<parameters(instance.actor.parameters.list)>);
+actor_<instance.name> = new <instance.actor.hierarchicalName>(<args(instance.arguments)>);
 <endif>
 <endif>
 >>
 
-scheduleActor(instance) ::= <<
-<if (instance.actor || instance.broadcast)>
-nbOfFiredActions = actor_<instance.id>.schedule();
-if (nbOfFiredActions \< 0)
-	stop = true;
-else
-	i += nbOfFiredActions;
-<endif>
+scheduleActor(vertex) ::= <<
+i += actor_<vertex.name>.schedule();
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -58,7 +48,7 @@ printInitializes(instances) ::= <<
 
 printInitialize(instance) ::= <<
 <if (instance.actor && !instance.actor.initializes.empty)>
-actor_<instance.id>.initialize();
+actor_<instance.name>.initialize();
 <endif>
 >>
 
@@ -68,11 +58,10 @@ actor_<instance.id>.initialize();
 
 setupFifo(connection) ::= <<
 
-f = new Fifo(SIZE);
-actor_<connection.source.simpleName>.setFifo("<connection.sourcePort.simpleName>", f);
-actor_<connection.target.simpleName>.setFifo("<connection.targetPort.simpleName>", f);
+f = new Fifo\<<connection.targetPort.type>\>(SIZE);
+actor_<connection.source.name>.setFifo("<connection.sourcePort.simpleName>", f);
+actor_<connection.target.name>.setFifo("<connection.targetPort.simpleName>", f);
 >>
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // print network
@@ -84,21 +73,24 @@ package <network.package>;
 
 import net.sf.orcc.runtime.*;
 import net.sf.orcc.runtime.actors.*;
+import net.sf.orcc.runtime.source.GenericSource;
 
 public class <network.simpleName> implements IScheduler {
 
 	public static final int SIZE = <options.fifoSize>;
-
+	
 	// Actors
 	<network.instances: declareActor()>
 	// Broadcasts
-	<network.instances: declareBroadcast()>
-	
+	<network.entities: declareBroadcast()>
 	@Override
+	@SuppressWarnings("unchecked")
 	public void initialize() {
+		// Instantiate actors
 		<network.instances: constructActor()>
-		<network.instances: createBroadcast()>
-
+		// Instantiate broadcast
+		<network.entities: createBroadcast()>
+		@SuppressWarnings("rawtypes")
 		Fifo f;
 		<network.connections: setupFifo()>
 	}
@@ -106,17 +98,13 @@ public class <network.simpleName> implements IScheduler {
 	@Override
 	public void schedule() {
 		<printInitializes(network.instances)>
-		int i = 1;
-		boolean stop = false;
-		int nbOfFiredActions = 0;
-		while ((i \> 0) && (!stop)) {
+		int i;
+		do {
 			i = 0;
-			<network.instances: scheduleActor()>
-		}
-	}
-	
-	public void setDisplayOutputStream(Object displayOstream) {
-		//Actor_Display.setOutputStreamProxy(displayOstream);
+			<network.instances: scheduleActor(); separator="\n">
+			<network.entities: scheduleActor(); separator="\n">
+		} while (i \> 0);
+		System.out.println("No more action to launch, exit the application.");
 	}
 	
 	public void runNetwork(String sourceFilename, Object displayOutputStreamProxy) {
@@ -127,9 +115,6 @@ public class <network.simpleName> implements IScheduler {
 		IScheduler scheduler = new <network.simpleName>();
 		scheduler.initialize();
 		scheduler.schedule();
-		
-		//Actor_Display.setOutputStreamProxy(displayOutputStreamProxy);
-		//Actor_Display.closeDisplay();
 	}
 	
 	/**
@@ -138,19 +123,14 @@ public class <network.simpleName> implements IScheduler {
 	 */
 	public static void main(String[] args) {
 		CLIParameters.getInstance().setArguments(args);
+		GenericSource.setFileName(CLIParameters.getInstance().getSourceFile());
+
 		
 		IScheduler scheduler = new <network.simpleName>();
 		scheduler.initialize();
 		scheduler.schedule();
-		
-		//Actor_Display.closeDisplay();
 	}
 
 }
 
 >>
-
-debug(value) ::= <<
-// <value>
->>
-

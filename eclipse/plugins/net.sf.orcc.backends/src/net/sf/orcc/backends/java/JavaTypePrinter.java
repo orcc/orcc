@@ -28,12 +28,14 @@
  */
 package net.sf.orcc.backends.java;
 
+import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.TypeBool;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.util.TypePrinter;
+import net.sf.orcc.util.EcoreHelper;
 
 /**
  * This class defines a Java type printer.
@@ -45,23 +47,38 @@ public class JavaTypePrinter extends TypePrinter {
 
 	@Override
 	public String caseTypeBool(TypeBool type) {
-		return "Boolean";
+		Port p = EcoreHelper.getContainerOfType(type, Port.class);
+
+		if (p == null) {
+			return "boolean";
+		} else {
+			return "Boolean";
+		}
 	}
 
 	@Override
 	public String caseTypeInt(TypeInt type) {
-		if (type.isLong()) {
-			return "Long";
-		}
-		else {
-			return "Integer";
+		Port p = EcoreHelper.getContainerOfType(type, Port.class);
+		int s = type.getSizeInBits();
+
+		if (p == null) {
+			if (s <= 32) {
+				return "int";
+			} else {
+				return "long";
+			}
+		} else {
+			if (s <= 32) {
+				return "Integer";
+			} else {
+				return "Long";
+			}
 		}
 	}
 
 	@Override
 	public String caseTypeList(TypeList type) {
-		// size will be printed later
-		return doSwitch(type.getType());
+		return doSwitch(type.getType()) + "[]";
 	}
 
 	@Override
@@ -72,11 +89,21 @@ public class JavaTypePrinter extends TypePrinter {
 	@Override
 	public String caseTypeUint(TypeUint type) {
 		// no unsigned in Java, and size is not taken in consideration anyway
-		if (type.isLong()) {
-			return "Long";
-		}
-		else {
-			return "Integer";
+		Port p = EcoreHelper.getContainerOfType(type, Port.class);
+		int s = type.getSizeInBits();
+
+		if (p == null) {
+			if (s <= 32) {
+				return "int";
+			} else {
+				return "long";
+			}
+		} else {
+			if (s <= 32) {
+				return "Integer";
+			} else {
+				return "Long";
+			}
 		}
 	}
 
