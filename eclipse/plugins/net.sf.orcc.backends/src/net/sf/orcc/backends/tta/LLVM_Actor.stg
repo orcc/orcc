@@ -349,8 +349,7 @@ call <initialize.body.returnType> @<initialize.body.name> ()
 ///////////////////////////////////////////////////////////////////////////////
 
 printBcastOutputConditions(lastPort, currentPort, restPorts) ::= <<
-<if(restPorts)>%free_room_<currentPort.name> = sub i32 256, %status_<currentPort.name>
-%available_<currentPort.name> = icmp sge i32 %free_room_<currentPort.name>, 1
+<if(restPorts)>%available_<currentPort.name> = icmp sge i32 %status_<currentPort.name>, 1
 %has_valid_<currentPort.name> = and i1 %has_valid_<lastPort.name>, %available_<currentPort.name>
 <printBcastOutputConditions(currentPort, first(restPorts), rest(restPorts))><
 else
