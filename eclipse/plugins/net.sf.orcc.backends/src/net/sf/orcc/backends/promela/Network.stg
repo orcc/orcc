@@ -1,18 +1,18 @@
-GetInstanceId(instance) ::= <<
-<if (instance.broadcast)>bcast_<endif><instance.id>
+GetInstanceId(vertex) ::= <<
+<if (vertex.broadcast)>bcast_<endif><vertex.simpleName>
 >>
 
-declareBroadcast(instance) ::= <<
-<if (instance.broadcast)
+declareBroadcast(vertex) ::= <<
+<if (vertex.broadcast)
 >
-proctype <GetInstanceId(instance)> (){
-	<instance.broadcast.type> temp = 0;
+proctype <GetInstanceId(vertex)> (){
+	<vertex.input.type> temp = 0;
 	do
-	::	atomic{ nempty(chan_<GetInstanceId(instance)>_input) -\> 
-			chan_<GetInstanceId(instance)>_input?\<temp\>;
-			<instance.broadcast.outputList: { n | chan_<GetInstanceId(instance)>_output_<n>!temp;}; separator="\n">
-			<instance.broadcast.outputList: { n | nfull(chan_<GetInstanceId(instance)>_output_<n>);}; separator="\n">
-			chan_<GetInstanceId(instance)>_input?temp;
+	::	atomic{ nempty(chan_<GetInstanceId(vertex)>_input) -\> 
+			chan_<GetInstanceId(vertex)>_input?\<temp\>;
+			<vertex.outputs: { n | chan_<GetInstanceId(vertex)>_<n.name>!temp;}; separator="\n">
+			<vertex.outputs: { n | nfull(chan_<GetInstanceId(vertex)>_<n.name>);}; separator="\n">
+			chan_<GetInstanceId(vertex)>_input?temp;
 		}
 		
 	od
@@ -22,9 +22,6 @@ endif>
 
 >>
 
-declareBroadcasts(instances) ::= <<
-<instances: declareBroadcast()>
->>
 
 ///////////////////////////////////////////////////////////////////////////////
 // allocates FIFOs
@@ -78,7 +75,7 @@ printNetwork(network, options) ::= <<
 <network.connections: assignFifos()>
 
 // Declear Broadcasts
-<declareBroadcasts(network.instances)>
+<network.entities: declareBroadcast()>
 
 // Include the actors
 <network.Instances: {instance | <if (!instance.broadcast)>#include "<instance.id>.pml"<endif>}; separator="\n">

@@ -140,8 +140,6 @@ public class PromelaBackendImpl extends AbstractBackend {
 		// instantiate and flattens network
 		network = new Instantiator().doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
-
-		network.computeTemplateMaps();
 		
 		instancePrinter = new StandardPrinter(
 				"net/sf/orcc/backends/promela/Actor.stg");
@@ -164,6 +162,8 @@ public class PromelaBackendImpl extends AbstractBackend {
 
 		new BroadcastAdder().doSwitch(network);
 
+		network.computeTemplateMaps();
+		
 		printNetwork(network);
 	}
 
