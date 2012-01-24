@@ -134,6 +134,7 @@ Proc_in_<input.name> : process (rst_n, clk)
   variable input_value  : integer;
   variable current_line : line;
   variable current_status_<input.name> : integer;
+  variable given_status_<input.name> : integer;
   
 begin
 
@@ -159,6 +160,11 @@ begin
         read(current_line, input_value);
         <sendData(input)>
         current_status_<input.name> := current_status_<input.name> - 1;
+        if current_status_<input.name> > 256 then
+          given_status_<input.name> := 256;
+        else
+          given_status_<input.name> := current_status_<input.name>;
+        end if;
       else
         s_<input.name>_q \<= (others =\> '0');
       end if;
@@ -179,7 +185,7 @@ begin
         current_status_<input.name> := current_status_<input.name> - 1;
       end if;
     end if;
-    s_<input.name>_status  \<= std_logic_vector(to_unsigned(current_status_<input.name>, 32));
+    s_<input.name>_status  \<= std_logic_vector(to_unsigned(given_status_<input.name>, 32));
   end if;
   
 end process Proc_in_<input.name>;
