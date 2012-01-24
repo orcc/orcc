@@ -37,15 +37,6 @@ add wave -noupdate -divider \<NULL\>
 
 add wave -noupdate -format Logic /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<instance.id><endif>/<instance.id>_inst/clk
 add wave -noupdate -format Logic /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<instance.id><endif>/<instance.id>_inst/rst_n
-add wave -noupdate -format Literal /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<instance.id><endif>/<instance.id>_inst/dram_addr
-add wave -noupdate -format Literal /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<instance.id><endif>/<instance.id>_inst/imem_addr
-add wave -noupdate -format Logic /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<instance.id><endif>/<instance.id>_inst/wren_wire
-add wave -noupdate -format Literal /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<instance.id><endif>/<instance.id>_inst/bytemask_wire
-add wave -noupdate -format Literal /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<instance.id><endif>/<instance.id>_inst/dram_data_in_wire
-add wave -noupdate -format Literal /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<instance.id><endif>/<instance.id>_inst/dram_data_out_wire
-add wave -noupdate -format Logic /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<instance.id><endif>/<instance.id>_inst/wren_x_wire
-add wave -noupdate -format Literal /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<instance.id><endif>/<instance.id>_inst/idata_wire
-
 
 <instance.actor.inputs: { input | <addInstanceInput(input, i0, choosePrefix)> }; separator="\n">
 <instance.actor.outputs: { output | <addInstanceOutput(output, i0, choosePrefix)> }; separator="\n"><
