@@ -28,6 +28,10 @@ use work.processor_{{id}}_tl_params.all;
 
 ------------------------------------------------------------------------------
 entity processor_{{id}} is
+  generic
+    (
+      device_family : string  := "Stratix III"
+      );
   port
     (
       clk          : in  std_logic;
@@ -98,7 +102,7 @@ begin
                 width         => {{dram_width}},
                 widthu		  => {{dram_addr}},
                 init_file     => "{{id}}_data.mif",
-                device_family => "Stratix III")
+                device_family => device_family)
     port map(clock   => clk,
              wren    => wren_wire,
              address => dram_addr({{dram_addr-1}} downto 0),
@@ -113,7 +117,7 @@ begin
                 width         => {{irom_width}},
                 widthu		  => {{irom_addr}},
                 init_file     => "{{id}}.mif",
-                device_family => "Stratix III")
+                device_family => device_family)
     port map(clock   => clk,
              address => imem_addr({{irom_addr-1}} downto 0),
              q       => idata_wire);

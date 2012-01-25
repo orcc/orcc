@@ -30,6 +30,7 @@ package net.sf.orcc.backends.tta;
 
 import static net.sf.orcc.OrccActivator.getDefault;
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
+import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.preferences.PreferenceConstants.P_TTA_LIB;
 
 import java.io.File;
@@ -91,7 +92,10 @@ public class TTABackendImpl extends AbstractBackend {
 	 */
 	private boolean debug;
 	private boolean finalize;
+	private String fpgaBrand;
+	private String fpgaFamily;
 	private String libPath;
+	private int fifoWidthu;
 
 	private final Map<String, String> transformations;
 	private final List<String> processorIntensiveActors;
@@ -117,9 +121,15 @@ public class TTABackendImpl extends AbstractBackend {
 	@Override
 	public void doInitializeOptions() {
 		debug = getAttribute(DEBUG_MODE, true);
-		finalize = getAttribute("net.sf.orcc.backends.finalizeGeneration",
+		finalize = getAttribute("net.sf.orcc.backends.tta.finalizeGeneration",
 				false);
 		libPath = getDefault().getPreference(P_TTA_LIB, "");
+		fpgaBrand = getAttribute("net.sf.orcc.backends.tta.fpgaBrand", "Altera");
+		fpgaFamily = getAttribute("net.sf.orcc.backends.tta.fpgaFamily",
+				"Stratix III");
+		// Set default FIFO size to 256
+		fifoSize = getAttribute(FIFO_SIZE, 256);
+		fifoWidthu = (int) Math.ceil(Math.log(fifoSize) / Math.log(2));
 	}
 
 	@Override
@@ -225,8 +235,7 @@ public class TTABackendImpl extends AbstractBackend {
 			printProcessor(instance, instancePath);
 
 			// ModelSim
-			String simPath = OrccUtil.createFolder(instancePath,
-					"simulation");
+			String simPath = OrccUtil.createFolder(instancePath, "simulation");
 			StandardPrinter tbPrinter = new StandardPrinter(
 					"net/sf/orcc/backends/tta/VHDL_Testbench.stg", !debug,
 					false);
@@ -234,8 +243,7 @@ public class TTABackendImpl extends AbstractBackend {
 					"net/sf/orcc/backends/tta/ModelSim_Script.stg");
 			StandardPrinter wavePrinter = new StandardPrinter(
 					"net/sf/orcc/backends/tta/ModelSim_Wave.stg");
-			tbPrinter.print(instance.getName() + "_tb.vhd", simPath,
-					instance);
+			tbPrinter.print(instance.getName() + "_tb.vhd", simPath, instance);
 			tclPrinter.print(instance.getName() + ".tcl", instancePath,
 					instance);
 			wavePrinter.print("wave.do", simPath, instance);
@@ -250,6 +258,13 @@ public class TTABackendImpl extends AbstractBackend {
 		StandardPrinter networkPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/tta/VHDL_Network.stg");
 		networkPrinter.setExpressionPrinter(new LLVMExpressionPrinter());
+		networkPrinter.getOptions().put("fifoSize", fifoSize);
+		networkPrinter.getOptions().put("fifoWidthu", fifoWidthu);
+		networkPrinter.getOptions()
+				.put("useAltera", fpgaBrand.equals("Altera"));
+		networkPrinter.getOptions()
+				.put("useXilinx", fpgaBrand.equals("Xilinx"));
+		networkPrinter.getOptions().put("fpgaFamily", fpgaFamily);
 		networkPrinter.print("top.vhd", path, network);
 
 		// Python package

@@ -72,13 +72,13 @@
                id="net.sf.orcc.plugins.compileXDF">
          </option>
          <option
-               id="net.sf.orcc.backends.finalizeGeneration">
+               id="net.sf.orcc.backends.tta.finalizeGeneration">
          </option>
          <option
-               id="net.sf.orcc.backends.fpgaBrand">
+               id="net.sf.orcc.backends.tta.fpgaBrand">
          </option>
          <option
-               id="net.sf.orcc.backends.fpgaFamily">
+               id="net.sf.orcc.backends.tta.fpgaFamily">
          </option>
       </backend>
       <backend
@@ -265,14 +265,14 @@
          <option
                defaultValue="false"
                description="Finalize the generation of the design in VHDL description using TCE tools"
-               id="net.sf.orcc.backends.finalizeGeneration"
+               id="net.sf.orcc.backends.tta.finalizeGeneration"
                name="Finalize the generation">
             <checkBox></checkBox>
          </option>
          <option
                defaultValue="Altera"
                description="Name of the manufacturer of your FPGA device"
-               id="net.sf.orcc.backends.fpgaBrand"
+               id="net.sf.orcc.backends.tta.fpgaBrand"
                name="FPGA manufacturer">
             <comboBox>
                <comboBoxItem
@@ -286,7 +286,7 @@
          <option
                defaultValue="Stratix III"
                description="Name of the family of your FPGA device"
-               id="net.sf.orcc.backends.fpgaFamily"
+               id="net.sf.orcc.backends.tta.fpgaFamily"
                name="FPGA family">
                <textBox></textBox>
          </option>
