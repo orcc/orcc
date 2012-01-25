@@ -67,7 +67,7 @@ bb2:
 }
 >>
 
-printPeekFunction(port, index) ::= <<
+printPeekFunction(port, index, needCast) ::= <<
 define internal void @_peek_<port.name>(<port.type>* %data, i32 %numTokens) nounwind {
 entry:
 	%cond = icmp sgt i32 %numTokens, 0
@@ -80,9 +80,10 @@ bb0:
 	
 bb1:
 	%indvar = phi i32 [ 0, %bb0 ], [ %indvar.next, %bb1 ]
-	%value = tail call <port.type> asm sideeffect "STREAM_IN_<index>.CAL_STREAM_IN_PEEK", "=r,ir"(i32 <index>) nounwind
+	%value = tail call i32 asm sideeffect "STREAM_IN_<index>.CAL_STREAM_IN_PEEK", "=r,ir"(i32 <index>) nounwind
+	<if(needCast)>%casted_value = trunc i32 %value to <port.type><endif>
 	%scevgep = getelementptr <port.type>* %data, i32 %indvar
-	store <port.type> %value, <port.type>* %scevgep
+	store <port.type> %<if(needCast)>casted_<endif>value, <port.type>* %scevgep
 	%indvar.next = add i32 %indvar, 1
 	%exitcond = icmp eq i32 %indvar.next, %numTokens
 
@@ -432,7 +433,7 @@ printActor(actor, options) ::= <<
 ; Input FIFOs
 <actor.inputs: { input | <printReadFunction(input, i0, actor.templateData.portToNeedCastMap.(input))> }; separator="\n\n">
 
-<actor.inputs: { input | <printPeekFunction(input, i0)> }; separator="\n\n">
+<actor.inputs: { input | <printPeekFunction(input, i0, actor.templateData.portToNeedCastMap.(input))> }; separator="\n\n">
 <endif>
 
 <if(actor.outputs)>
