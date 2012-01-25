@@ -179,7 +179,7 @@ public class SimulatorFifo {
 	 *         of tokens
 	 */
 	final public boolean hasTokens(int numTokens) {
-		return content.size() > numTokens;
+		return content.size() >= numTokens;
 	}
 
 	/**
@@ -196,7 +196,7 @@ public class SimulatorFifo {
 			Iterator<Object> it = content.iterator();
 			while (it.hasNext()) {
 				result = it.next();
-				if (--offset == 0)
+				if (offset-- == 0)
 					break;
 			}
 		}
