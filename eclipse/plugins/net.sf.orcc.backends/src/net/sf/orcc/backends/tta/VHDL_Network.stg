@@ -91,10 +91,10 @@ declareFifoSignals(connection) ::= <<
 <if(connection.sourcePort.native)
 >signal s_<connection.id> : std_logic_vector(<connection.sourcePort.type.size>-1 downto 0);<
 else
->signal fifo_<connection.id>_data		    : std_logic_vector(31 downto 0);
-signal fifo_<connection.id>_q			   : std_logic_vector(31 downto 0);
-signal fifo_<connection.id>_rdreq		   : std_logic;
-signal fifo_<connection.id>_wrreq		   : std_logic;
+>signal fifo_<connection.id>_data         : std_logic_vector(31 downto 0);
+signal fifo_<connection.id>_q            : std_logic_vector(31 downto 0);
+signal fifo_<connection.id>_rdreq        : std_logic;
+signal fifo_<connection.id>_wrreq        : std_logic;
 signal fifo_<connection.id>_nb_tokens    : std_logic_vector(31 downto 0);
 signal fifo_<connection.id>_nb_freerooms : std_logic_vector(31 downto 0);<
 endif>
