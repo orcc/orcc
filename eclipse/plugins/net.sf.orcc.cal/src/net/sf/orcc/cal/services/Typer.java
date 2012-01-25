@@ -516,7 +516,8 @@ public class Typer extends CalSwitch<Type> {
 			if (((t1.isInt() || t1.isUint()) && t2.isFloat()) || ((t2.isInt() || t2.isUint()) && t1.isFloat())) {
 				return IrFactory.eINSTANCE.createTypeFloat();
 			}
-			return createType(t1, t2, LubPlus1.instance);
+			Type type = createType(t1, t2, LubPlus1.instance);
+			return IrFactory.eINSTANCE.createTypeInt(type.getSizeInBits());
 
 		case PLUS:
 			if (t1.isString() && !t2.isList() || t2.isString() && !t1.isList()) {
