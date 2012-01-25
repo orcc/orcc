@@ -123,14 +123,11 @@ void <instance.name>_initialize(<instance.actor.inputs: { port | unsigned int fi
 >>
 
 initializeFifoId(port) ::= <<
-if (fifo_<port.name>_id == -1) { //input port not connected
-	<getPortName(port)> = (struct fifo_<port.type>_s *) malloc(sizeof(struct fifo_<port.type>_s));
-	fifo_<getPortName(port)>_id = 0;
-	<getPortName(port)>->read_inds = read_inds_dummy;
-	<getPortName(port)>->write_ind = 0;
-} else {
+<if(instance.incomingPortMap.(port))>
 	fifo_<getPortName(port)>_id = fifo_<port.name>_id;
-}
+<else>
+	/* input port getPortName(port) not connected */
+<endif>
 >>
 ///////////////////////////////////////////////////////////////////////////////
 // Instructions
@@ -375,12 +372,22 @@ printReadTokensFunction(port) ::= <<
 
 
 static void read_<port.name>() {
+<if(instance.incomingPortMap.(port))>
 	index_<port.name> = <getPortName(port)>-\>read_inds[fifo_<getPortName(port)>_id];
 	numTokens_<port.name> = index_<port.name> + fifo_<port.type>_get_num_tokens(<getPortName(port)>, fifo_<getPortName(port)>_id);
+<else>
+	/* Input port <getPortName(port)> not connected */
+	index_<port.name> = 0;
+	numTokens_<port.name> = 0;
+<endif>
 }
 
 static void read_end_<port.name>() {
+<if(instance.incomingPortMap.(port))>
 	<getPortName(port)>-\>read_inds[fifo_<getPortName(port)>_id] = index_<port.name>;
+<else>
+	/* Input port <getPortName(port)> not connected */<
+endif>
 }
 >>
 
@@ -482,7 +489,7 @@ if (<checkInputPattern(transition.action.inputPattern)>isSchedulable_<transition
 printInputPatternPort(port) ::= <<
 if (index_<port.name> + <pattern.numTokensMap.(port)> - numTokens_<port.name> - 1 \<= SIZE_<port.name>) {
 	if(!<instance.name>.sched-\>round_robin || i \> 0) {
-		<if(instance.incomingPortMap.(port).source.name)>
+		<if(instance.incomingPortMap.(port))>
 		sched_add_schedulable(<instance.name>.sched, &<instance.incomingPortMap.(port).source.name>, RING_TOPOLOGY);
 		<endif>
 #ifdef PRINT_FIRINGS
@@ -657,7 +664,7 @@ extern struct actor_s <instance.name>;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Input FIFOs
-<instance.actor.inputs: { port | struct fifo_<port.type>_s *<getPortName(port)>;}; separator="\n">
+<instance.actor.inputs: { port | <if(instance.incomingPortMap.(port))>extern<endif> struct fifo_<port.type>_s *<getPortName(port)>;}; separator="\n">
 <instance.actor.inputs: printInputPort()>
 <if(options.enableTrace)>
 <instance.actor.inputs: { port | FILE *file_<port.name>;}; separator="\n">
@@ -665,7 +672,7 @@ extern struct actor_s <instance.name>;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Predecessors
-<instance.actor.inputs: { port | extern struct actor_s <instance.incomingPortMap.(port).source.name>;}; separator="\n">
+<instance.actor.inputs: { port | <if(instance.incomingPortMap.(port))>extern struct actor_s <instance.incomingPortMap.(port).source.name>;<endif>}; separator="\n">
 
 ////////////////////////////////////////////////////////////////////////////////
 // Output FIFOs
