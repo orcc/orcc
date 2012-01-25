@@ -10,14 +10,14 @@ initPorts(name, inputs, outputs) ::= <<
 
 initInstancePort(instance) ::= <<
 <if(instance.actor)
-><initPorts(instance.name, instance.actor.inputs, instance.actor.outputs)><
+><initPorts(instance.simpleName, instance.actor.inputs, instance.actor.outputs)><
 elseif(instance.broadcast)
-><initPorts(instance.name, instance.broadcast.inputs, instance.broadcast.outputs)><
+><initPorts(instance.simpleName, instance.broadcast.inputs, instance.broadcast.outputs)><
 endif>
 >>
 
 initInstance(vertex) ::= <<
-Instance("<vertex.name>", <vertex.name>_inputs, <vertex.name>_outputs, <if(vertex.actor.native)>True<else>False<endif>, <if(vertex.broadcast)>True<else>False<endif>)
+Instance("<vertex.simpleName>", <vertex.simpleName>_inputs, <vertex.simpleName>_outputs, <if(vertex.actor.native)>True<else>False<endif>, <if(vertex.broadcast)>True<else>False<endif>)
 >>
 
 printNetwork(network, options) ::= <<
@@ -37,6 +37,6 @@ instances = [
 ]
 
 ## Network initialization
-network = Network("<network.name>", instances)
+network = Network("<network.simpleName>", instances)
 		
 >>

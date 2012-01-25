@@ -162,7 +162,7 @@ public class TTABackendImpl extends AbstractBackend {
 
 		for (Entity entity : network.getEntities()) {
 			Instance instance = DfFactory.eINSTANCE.createInstance(
-					entity.getName(), entity);
+					entity.getSimpleName(), entity);
 			network.getInstances().add(instance);
 			for (Edge edge : new BasicEList<Edge>(entity.getIncoming())) {
 				edge.setTarget(instance);
@@ -231,7 +231,8 @@ public class TTABackendImpl extends AbstractBackend {
 
 		String instancePath = null;
 		if (!(instance.isActor() && instance.getActor().isNative())) {
-			instancePath = OrccUtil.createFolder(path, instance.getName());
+			instancePath = OrccUtil
+					.createFolder(path, instance.getSimpleName());
 			printProcessor(instance, instancePath);
 
 			// ModelSim
@@ -243,14 +244,15 @@ public class TTABackendImpl extends AbstractBackend {
 					"net/sf/orcc/backends/tta/ModelSim_Script.stg");
 			StandardPrinter wavePrinter = new StandardPrinter(
 					"net/sf/orcc/backends/tta/ModelSim_Wave.stg");
-			tbPrinter.print(instance.getName() + "_tb.vhd", simPath, instance);
-			tclPrinter.print(instance.getName() + ".tcl", instancePath,
+			tbPrinter.print(instance.getSimpleName() + "_tb.vhd", simPath,
+					instance);
+			tclPrinter.print(instance.getSimpleName() + ".tcl", instancePath,
 					instance);
 			wavePrinter.print("wave.do", simPath, instance);
 		}
 
-		return printer
-				.print(instance.getName() + ".ll", instancePath, instance);
+		return printer.print(instance.getSimpleName() + ".ll", instancePath,
+				instance);
 	}
 
 	private void printNetwork(Network network) {
@@ -305,7 +307,7 @@ public class TTABackendImpl extends AbstractBackend {
 
 	private void printProcessor(Instance instance, String instancePath) {
 		TTA simpleTTA = ArchitectureFactory.eINSTANCE.createTTASpecialized(
-				instance.getName(), instance, getBusNb(instance),
+				instance.getSimpleName(), instance, getBusNb(instance),
 				getRegNb(instance), getAluNb(instance));
 
 		CustomPrinter adfPrinter = new CustomPrinter(
@@ -313,9 +315,9 @@ public class TTABackendImpl extends AbstractBackend {
 		CustomPrinter idfPrinter = new CustomPrinter(
 				"net/sf/orcc/backends/tta/TCE_Processor_IDF.stg");
 
-		adfPrinter.print("processor_" + instance.getName() + ".adf",
+		adfPrinter.print("processor_" + instance.getSimpleName() + ".adf",
 				instancePath, "printTTA", "tta", simpleTTA);
-		idfPrinter.print("processor_" + instance.getName() + ".idf",
+		idfPrinter.print("processor_" + instance.getSimpleName() + ".idf",
 				instancePath, "printTTA", "tta", simpleTTA);
 	}
 
