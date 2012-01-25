@@ -1,30 +1,124 @@
+///////////////////////////////////////////////////////////////////////////////
+// Testbench
+///////////////////////////////////////////////////////////////////////////////
 
-indexPort(port) ::= <<
-<if(instance.actor)
-><instance.actor.templateData.portToIndexMap.(port)><
-elseif(instance.broadcast)
-><instance.broadcast.portMap.(port)><
-endif>
+printNetwork(network, options) ::= <<
+<printHeader(network)>
+
+entity tb_top is
+
+end tb_top;
+
+
+architecture arch_tb_top of tb_top is 
+
+  ---------------------------------------------------------------------------
+  -- Signal & constant declaration
+  --------------------------------------------------------------------------- 
+  <declareVertexSigAndConst(network)>
+  ---------------------------------------------------------------------------
+
+begin
+
+  top_orcc : entity work.top
+    port map (
+      clk =\> clk,
+      <mapVertexSignals(network)>
+      rst_n =\> rst_n);
+      
+  <printInitProcess()>
+    
+  <printFifoProcess(network)>
+
+end architecture arch_tb_top;
 >>
 
+printInstance(instance, options) ::= <<
+<printHeader(instance)>
+
+entity tb_<instance.simpleName> is
+
+end tb_<instance.simpleName>;
+
+
+architecture arch_tb_<instance.simpleName> of tb_<instance.simpleName> is 
+
+  ---------------------------------------------------------------------------
+  -- Signal & constant declaration
+  --------------------------------------------------------------------------- 
+  <declareVertexSigAndConst(instance)>
+  ---------------------------------------------------------------------------
+
+begin
+
+  <instance.simpleName>_inst : entity work.processor_<instance.simpleName>
+    port map (
+      clk =\> clk,
+      <mapVertexSignals(instance)>
+      rst_n =\> rst_n);
+            
+  <printInitProcess()>
+    
+  <printFifoProcess(instance)>
+
+end architecture arch_tb_<instance.simpleName>;
+>>
+
+
 ///////////////////////////////////////////////////////////////////////////////
-// Common applet
+// Print header
 ///////////////////////////////////////////////////////////////////////////////
 
-sendData(port) ::= <<
-<if(port.type.int)
->s_<port.name>_q  \<= std_logic_vector(to_signed(input_value, 32));<
+printHeader(vertex) ::= <<
+------------------------------------------------------------------------------
+-- Generated from <vertex.simpleName>
+------------------------------------------------------------------------------
+
+library ieee;
+use ieee.std_logic_1164.all; 
+use std.textio.all;
+use ieee.numeric_std.all;
+
+library work;
+use work.sim_package.all;
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Print declaration and instanciation
+///////////////////////////////////////////////////////////////////////////////
+
+declareVertexSigAndConst(vertex) ::= <<
+constant PERIOD : time := 10 ns;
+--
+type severity_level is (note, warning, error, failure);
+--
+-- Input and Output files
+<if(vertex.actor)
+><vertex.actor.inputs: printTrace(); separator="\n">
+<vertex.actor.outputs: printTrace(); separator="\n"><
 else
->s_<port.name>_q  \<= std_logic_vector(to_unsigned(input_value, 32));<
+><vertex.inputs: printTrace(); separator="\n">
+<vertex.outputs: printTrace(); separator="\n"><
 endif>
+
+--
+-- Input and Output signals
+<if(vertex.actor)
+><vertex.actor.inputs: declareSignalsInput(); separator="\n">
+<vertex.actor.outputs: declareSignalsOutput(); separator="\n"><
+else
+><vertex.inputs: declareSignalsInput(); separator="\n">
+<vertex.outputs: declareSignalsOutput(); separator="\n"><
+endif>
+
+--
+-- Configuration
+signal clk   : std_logic := '0';
+signal rst_n : std_logic := '0';
 >>
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Print signal and instanciation
-///////////////////////////////////////////////////////////////////////////////
-
-printSignalInput(port) ::= <<
+declareSignalsInput(port) ::= <<
 <if(!port.native)
 >signal s_<port.name>_q      : std_logic_vector(31 downto 0);
 signal s_<port.name>_status : std_logic_vector(31 downto 0);
@@ -34,7 +128,7 @@ else
 endif>
 >>
 
-printSignalOutput(port) ::= <<
+declareSignalsOutput(port) ::= <<
 <if(!port.native)
 >signal s_<port.name>_data   : std_logic_vector(31 downto 0);
 signal s_<port.name>_status : std_logic_vector(31 downto 0);
@@ -44,27 +138,23 @@ else
 endif>
 >>
 
-mapSignalInput(port, instance=false) ::= <<
-<if(port.native)
-><port.name> =\> <port.name>_native,<
-else
->data_<indexPort(port)>_in    =\> s_<port.name>_q,
-status_<indexPort(port)>_in  =\> s_<port.name>_status,
-ack_<indexPort(port)>_in     =\> s_<port.name>_rdreq,<
+printTrace(port) ::= <<
+<if(!port.native)
+>file trace_<port.name> : text is "<if(vertex.instance)>../<endif>trace/<vertex.simpleName>_<port.name>.txt";<
 endif>
 >>
 
-mapSignalOutput(port, instance=false) ::= <<
-<if(port.native)
-><port.name>   =\> <port.name>_native,<
+mapVertexSignals(vertex) ::= <<
+<if(vertex.actor)
+><if(vertex.actor.inputs)><vertex.actor.inputs: { input | <mapSignalInput(input, i0)> }; separator="\n"><endif>
+<if(vertex.actor.outputs)><vertex.actor.outputs: { output | <mapSignalOutput(output, i0)> }; separator="\n"><endif><
 else
->data_<indexPort(port)>_out   =\> s_<port.name>_data,
-status_<indexPort(port)>_out =\> s_<port.name>_status,
-dv_<indexPort(port)>_out     =\> s_<port.name>_wrreq,<
+><if(vertex.inputs)><vertex.inputs: { input | <mapSignalInput(input, i0)> }; separator="\n"><endif>
+<if(vertex.outputs)><vertex.outputs: { output | <mapSignalOutput(output, i0)> }; separator="\n"><endif><
 endif>
 >>
 
-mapSignalInstanceInput(port, index) ::= <<
+mapSignalInput(port, index) ::= <<
 <if(port.native)
 ><port.name> =\> <port.name>_native,<
 else
@@ -74,38 +164,13 @@ ack_<index>_in     =\> s_<port.name>_rdreq,<
 endif>
 >>
 
-mapSignalInstanceOutput(port, index) ::= <<
+mapSignalOutput(port, index) ::= <<
 <if(port.native)
-><port.name>   =\> <port.name>_native,<
+><port.name> =\> <port.name>_native,<
 else
 >data_<index>_out   =\> s_<port.name>_data,
 status_<index>_out =\> s_<port.name>_status,
 dv_<index>_out     =\> s_<port.name>_wrreq,<
-endif>
->>
-
-sig_const(input, output, instance=false) ::= <<
-constant PERIOD      : time := 10 ns;
---
-type severity_level is (note, warning, error, failure);
---
--- Input and Output files
-<input: printTrace(); separator="\n">
-<output: printTrace(); separator="\n">
---
--- Input and Output signals
-<input: printSignalInput(); separator="\n">
-<output: printSignalOutput(); separator="\n">
---
--- Configuration
-signal clk         : std_logic := '0';
-signal rst_n       : std_logic := '0';
-
->>
-
-printTrace(port) ::= <<
-<if(!port.native)
->file trace_<port.name> : text is "../trace/<if(instance)><instance.id>_<endif><port.name>.txt";<
 endif>
 >>
 
@@ -114,7 +179,7 @@ endif>
 // Print processes
 ///////////////////////////////////////////////////////////////////////////////
 
-init_process() ::= <<
+printInitProcess() ::= <<
 -- clock generation
 clk \<= not clk after PERIOD/2;
 
@@ -128,8 +193,21 @@ begin
 end process;
 >>
 
+printFifoProcess(vertex) ::= <<
+<if(vertex.actor)
+><if(vertex.actor.inputs)><vertex.actor.inputs: printInputProcess(); separator="\n\n"><endif>
+  
+<if(vertex.actor.outputs)><vertex.actor.outputs: printOutputProcess(); separator="\n\n"><endif><
+else
+><if(vertex.inputs)><vertex.inputs: printInputProcess(); separator="\n\n"><endif>
+  
+<if(vertex.outputs)><vertex.outputs: printOutputProcess(); separator="\n\n"><endif><
+endif>
+>>
+
 printInputProcess(input) ::= <<
--- Input "<input.name>" Generation
+<if(!input.native)
+>-- Input "<input.name>" Generation
 Proc_in_<input.name> : process (rst_n, clk)
   variable input_value  : integer;
   variable current_line : line;
@@ -140,7 +218,7 @@ begin
 
   if rst_n = '0' then
     file_close(trace_<input.name>);
-    file_open(trace_<input.name>, "../trace/<instance.id>_<input.name>.txt", read_mode);
+    file_open(trace_<input.name>, "<if(vertex.instance)>../<endif>trace/<vertex.simpleName>_<input.name>.txt", read_mode);
     
     -- Compute initial status
     current_status_<input.name> := 0;
@@ -150,7 +228,7 @@ begin
     end loop;
     
     file_close(trace_<input.name>);
-    file_open(trace_<input.name>, "../trace/<instance.id>_<input.name>.txt", read_mode);
+    file_open(trace_<input.name>, "<if(vertex.instance)>../<endif>trace/<vertex.simpleName>_<input.name>.txt", read_mode);
     
     -- Initialize signals
     if not (endfile (trace_<input.name>)) then
@@ -174,7 +252,6 @@ begin
     
     s_<input.name>_status \<= std_logic_vector(to_unsigned(current_status_<input.name>, 32));    
     
-    
   elsif clk'event and clk = '1' then 
     if not (endfile (trace_<input.name>)) and s_<input.name>_rdreq = '1' then
       readline(trace_<input.name>, current_line);
@@ -188,11 +265,13 @@ begin
     s_<input.name>_status  \<= std_logic_vector(to_unsigned(given_status_<input.name>, 32));
   end if;
   
-end process Proc_in_<input.name>;
+end process Proc_in_<input.name>;<
+endif>
 >>
 
 printOutputProcess(output) ::= <<
--- Output "<output.name>" Generation
+<if(!output.native)
+>-- Output "<output.name>" Generation
 Proc_in_<output.name> : process (rst_n, clk)
   variable output_value : integer;
   variable current_line : line;
@@ -220,98 +299,16 @@ begin
     end if;
   end if;
   
-end process Proc_in_<output.name>;
+end process Proc_in_<output.name>;<
+endif>
+>>
+
+sendData(port) ::= <<
+<if(port.type.int)
+>s_<port.name>_q  \<= std_logic_vector(to_signed(input_value, 32));<
+else
+>s_<port.name>_q  \<= std_logic_vector(to_unsigned(input_value, 32));<
+endif>
 >>
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Testbench
-///////////////////////////////////////////////////////////////////////////////
-
-printInstance(instance, options) ::= <<
-------------------------------------------------------------------------------
--- Generated from <instance.id>
-------------------------------------------------------------------------------
-
-library ieee;
-use ieee.std_logic_1164.all; 
-use std.textio.all;
-use ieee.numeric_std.all;
-
-library work;
-use work.sim_package.all;
-
-entity tb_<instance.id> is
-
-end tb_<instance.id>;
-
-
-architecture arch_tb_<instance.id> of tb_<instance.id> is 
-
-  ---------------------------------------------------------------------------
-  -- Signal & constant declaration
-  --------------------------------------------------------------------------- 
-  <sig_const(input=instance.actor.inputs, output=instance.actor.outputs, instance=instance)>
-  ---------------------------------------------------------------------------
-
-begin
-
-  <instance.id>_inst : entity work.processor_<instance.id>
-    port map (
-      clk          =\> clk,
-      <if(instance.actor.inputs)><instance.actor.inputs: { input | <mapSignalInstanceInput(input, i0)> }; separator="\n"><endif>
-      <if(instance.actor.outputs)><instance.actor.outputs: { output | <mapSignalInstanceOutput(output, i0)> }; separator="\n"><endif>
-      rst_n        =\> rst_n);
-            
-  <init_process()>
-    
-  <if(instance.actor.inputs)
-  ><instance.actor.inputs: printInputProcess(); separator="\n\n"><
-  endif>
-  
-  <if(instance.actor.outputs)
-  ><instance.actor.outputs: printOutputProcess(); separator="\n\n"><
-  endif>
-
-end architecture arch_tb_<instance.id>;
->>
-
-printNetwork(network, options) ::= <<
-------------------------------------------------------------------------------
--- Generated from top
-------------------------------------------------------------------------------
-
-library ieee;
-use ieee.std_logic_1164.all; 
-use std.textio.all;
-use ieee.numeric_std.all;
-
-library work;
-
-entity tb_top is
-
-end tb_top;
-
-
-architecture arch_tb_top of tb_top is 
-
-  ---------------------------------------------------------------------------
-  -- Signal & constant declaration
-  --------------------------------------------------------------------------- 
-  <sig_const(input=network.inputs, output=network.outputs)>
-  ---------------------------------------------------------------------------
-
-begin
-
-  top_orcc : entity work.top
-    port map (
-      clk     =\> clk,
-      <if(network.inputs)><network.inputs: mapSignalInput(); separator="\n"><endif>
-      <if(network.outputs)><network.outputs: mapSignalOutput(); separator="\n"><endif>
-      rst_n   =\> rst_n);
-      
-    <init_process()>
-
-
-end architecture arch_tb_top;
->>
