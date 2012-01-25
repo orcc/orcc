@@ -29,9 +29,9 @@ library work;
 entity top is
   port
     (
-      clk      : in  std_logic;
-      <ports(network)>
-      rst_n    : in  std_logic
+      clk          : in  std_logic;
+      <declarePorts(network)>
+      rst_n        : in  std_logic
       );
 end top;
 
@@ -41,7 +41,7 @@ architecture bdf_type of top is
   ---------------------------------------------------------------------------
   -- Signals declaration
   ---------------------------------------------------------------------------  
-  <signals(network)>
+  <declareFifosSignals(network)>
   ---------------------------------------------------------------------------
   
 begin
@@ -49,7 +49,8 @@ begin
   ---------------------------------------------------------------------------
   -- Ports instantiation 
   ---------------------------------------------------------------------------
-  <network.connections: assignNetworkPort()>
+  <network.inputs: { input | <assignNetworkInputPort(input, i0)> }>
+  <network.outputs: { output | <assignNetworkOutputPort(output, i0)> }>
   ---------------------------------------------------------------------------
   -- FIFOs instantiation 
   --------------------------------------------------------------------------- 
@@ -69,13 +70,33 @@ end bdf_type;
 // Network ports
 ///////////////////////////////////////////////////////////////////////////////
 
-ports(network) ::= <<
-<if(network.inputs)><network.inputs: {port|<port(port, "in")>}; separator=";\n">;<endif>
-<if(network.outputs)><network.outputs: {port|<port(port, "out")>}; separator=";\n">;<endif>
+declarePorts(network) ::= <<
+<if(network.inputs)><network.inputs: {input|<declareInput(input, "in", i0)>}; separator="\n"><endif>
+<if(network.outputs)><network.outputs: {output|<declareOutput(output, "out", i0)>}; separator="\n"><endif>
 >>
 
-port(port, dir) ::= <<
-<port.name> : <dir> <if(port.type.bool)>std_logic<else>std_logic_vector(<port.type.size>-1 downto 0)<endif>
+declareInput(port, dir, index) ::= <<
+<if(port.native)
+><declareNative(port, dir)><
+else
+>data_<index>_in    : in std_logic_vector(31 downto 0);
+status_<index>_in  : in std_logic_vector(31 downto 0);
+ack_<index>_in     : out std_logic;<
+endif>
+>>
+
+declareOutput(port, dir, index) ::= <<
+<if(port.native)
+><declareNative(port, dir)><
+else
+>data_<index>_out   : out std_logic_vector(31 downto 0);
+status_<index>_out : in std_logic_vector(31 downto 0);
+dv_<index>_out     : out std_logic;<
+endif>
+>>
+
+declareNative(port, dir) ::= <<
+<port.name>  : <dir> <if(port.type.bool)>std_logic<else>std_logic_vector(<port.type.size>-1 downto 0)<endif>;
 >>
 
 
@@ -83,21 +104,28 @@ port(port, dir) ::= <<
 // Signals
 ///////////////////////////////////////////////////////////////////////////////
 
-signals(network) ::= <<
+declareFifosSignals(network) ::= <<
 <network.connections: declareFifoSignals(); separator="\n\n">
 >>
 
 declareFifoSignals(connection) ::= <<
 <if(connection.sourcePort.native)
 >signal s_<connection.id> : std_logic_vector(<connection.sourcePort.type.size>-1 downto 0);<
-else
+elseif(!connection.source.port && !connection.target.port)
 >signal fifo_<connection.id>_data         : std_logic_vector(31 downto 0);
 signal fifo_<connection.id>_q            : std_logic_vector(31 downto 0);
 signal fifo_<connection.id>_rdreq        : std_logic;
 signal fifo_<connection.id>_wrreq        : std_logic;
 signal fifo_<connection.id>_nb_tokens    : std_logic_vector(31 downto 0);
 signal fifo_<connection.id>_nb_freerooms : std_logic_vector(31 downto 0);<
-endif>
+elseif(connection.source.port)
+>signal fifo_<connection.id>_q            : std_logic_vector(31 downto 0);
+signal fifo_<connection.id>_rdreq        : std_logic;
+signal fifo_<connection.id>_nb_tokens    : std_logic_vector(31 downto 0);<
+elseif(connection.target.port)
+>signal fifo_<connection.id>_data         : std_logic_vector(31 downto 0);
+signal fifo_<connection.id>_wrreq        : std_logic;
+signal fifo_<connection.id>_nb_freerooms : std_logic_vector(31 downto 0);<endif>
 >>
 
 
@@ -105,16 +133,28 @@ endif>
 // Instantiation
 ///////////////////////////////////////////////////////////////////////////////
 
-assignNetworkPort(connection) ::= <<
-<if(connection.source.port)>
-<connection.source.name> \<= s_<connection.id>;
-<elseif(connection.target.port)>
-<connection.target.name> \<= s_<connection.id>;
-<endif>
+assignNetworkInputPort(port, index) ::= <<
+<if(port.native)
+><port.name> \<= s_<first(port.outgoing).id>;<
+else
+>fifo_<first(port.outgoing).id>_q \<= data_<index>_in;
+fifo_<first(port.outgoing).id>_nb_tokens \<= status_<index>_in;
+ack_<index>_in \<= fifo_<first(port.outgoing).id>_rdreq;<
+endif>
+>>
+
+assignNetworkOutputPort(port, index) ::= <<
+<if(port.native)
+><port.name> \<= s_<first(port.incoming).id>;<
+else
+>data_<index>_out \<= fifo_<first(port.incoming).id>_data;
+fifo_<first(port.incoming).id>_nb_freerooms \<= status_<index>_out;
+dv_<index>_out \<= fifo_<first(port.incoming).id>_wrreq;<
+endif>
 >>
 
 assignFifo(connection) ::= <<
-<if(!connection.sourcePort.native && !connection.targetPort.native)>
+<if(!connection.source.port && !connection.target.port)>
 fifo_<connection.id> : entity work.fifo
   generic map(size          =\> <options.("fifoSize")>,
               widthu        =\> <options.("fifoWidthu")>,
