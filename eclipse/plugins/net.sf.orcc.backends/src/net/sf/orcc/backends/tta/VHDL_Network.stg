@@ -154,7 +154,7 @@ endif>
 >>
 
 assignFifo(connection) ::= <<
-<if(!connection.source.port && !connection.target.port)>
+<if(!connection.sourcePort.native && !connection.targetPort.native && !connection.source.port && !connection.target.port)>
 fifo_<connection.id> : entity work.fifo
   generic map(size          =\> <options.("fifoSize")>,
               widthu        =\> <options.("fifoWidthu")>,
