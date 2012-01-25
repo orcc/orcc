@@ -135,6 +135,18 @@ public class Typer extends CalSwitch<Type> {
 
 	}
 
+	private static class SignedLubPlus1 extends LubPlus1 {
+
+		public static SignedLubPlus1 instance = new SignedLubPlus1();
+
+		@Override
+		public Type getType(Type t1, Type t2) {
+			type = IrFactory.eINSTANCE.createTypeInt(getSize(t1, t2));
+			return type;
+		}
+
+	}
+
 	private static class LubSum extends Lub {
 
 		public static LubSum instance = new LubSum();
@@ -507,23 +519,25 @@ public class Typer extends CalSwitch<Type> {
 			return createType(t1, t2, Lub.instance);
 
 		case TIMES:
-			if (((t1.isInt() || t1.isUint()) && t2.isFloat()) || ((t2.isInt() || t2.isUint()) && t1.isFloat())) {
+			if (((t1.isInt() || t1.isUint()) && t2.isFloat())
+					|| ((t2.isInt() || t2.isUint()) && t1.isFloat())) {
 				return IrFactory.eINSTANCE.createTypeFloat();
 			}
 			return createType(t1, t2, LubSum.instance);
 
 		case MINUS:
-			if (((t1.isInt() || t1.isUint()) && t2.isFloat()) || ((t2.isInt() || t2.isUint()) && t1.isFloat())) {
+			if (((t1.isInt() || t1.isUint()) && t2.isFloat())
+					|| ((t2.isInt() || t2.isUint()) && t1.isFloat())) {
 				return IrFactory.eINSTANCE.createTypeFloat();
 			}
-			Type type = createType(t1, t2, LubPlus1.instance);
-			return IrFactory.eINSTANCE.createTypeInt(type.getSizeInBits());
+			return createType(t1, t2, SignedLubPlus1.instance);
 
 		case PLUS:
 			if (t1.isString() && !t2.isList() || t2.isString() && !t1.isList()) {
 				return IrFactory.eINSTANCE.createTypeString();
 			}
-			if (((t1.isInt() || t1.isUint()) && t2.isFloat()) || ((t2.isInt() || t2.isUint()) && t1.isFloat())) {
+			if (((t1.isInt() || t1.isUint()) && t2.isFloat())
+					|| ((t2.isInt() || t2.isUint()) && t1.isFloat())) {
 				return IrFactory.eINSTANCE.createTypeFloat();
 			}
 
@@ -531,7 +545,8 @@ public class Typer extends CalSwitch<Type> {
 
 		case DIV:
 		case DIV_INT:
-			if (((t1.isInt() || t1.isUint()) && t2.isFloat()) || ((t2.isInt() || t2.isUint()) && t1.isFloat())) {
+			if (((t1.isInt() || t1.isUint()) && t2.isFloat())
+					|| ((t2.isInt() || t2.isUint()) && t1.isFloat())) {
 				return IrFactory.eINSTANCE.createTypeFloat();
 			}
 		case SHIFT_RIGHT:
