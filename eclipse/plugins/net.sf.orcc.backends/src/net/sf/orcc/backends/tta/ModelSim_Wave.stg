@@ -8,8 +8,8 @@ add wave -noupdate -divider Top
 add wave -noupdate -divider \<NULL\>
 add wave -noupdate -format Logic /tb_top/clk
 add wave -noupdate -format Logic /tb_top/rst_n
-<network.inputs: addNetworkPort(); separator="\n">
-<network.outputs: addNetworkPort(); separator="\n">
+<network.inputs: addNetworkInputPort(); separator="\n">
+<network.outputs: addNetworkOutputPort(); separator="\n">
 
 <network.instances: { instance | <addInstanceSignals(instance, true)> }; separator="\n\n">
 <network.connections: addConnectionSignals(); separator="\n\n">
@@ -26,7 +26,27 @@ quietly WaveActivateNextPane {} 0
 <printOptions()>
 >>
 
-addNetworkPort(port) ::= <<
+addNetworkInputPort(port) ::= <<
+<if(port.native)
+><addNetworkNativePort(port)><
+else
+>add wave -noupdate -format Literal -radix decimal /tb_top/s_<port.name>_q
+add wave -noupdate -format Literal -radix decimal /tb_top/s_<port.name>_status
+add wave -noupdate -format Logic /tb_top/s_<port.name>_rdreq<
+endif>
+>>
+
+addNetworkOutputPort(port) ::= <<
+<if(port.native)
+><addNetworkNativePort(port)><
+else
+>add wave -noupdate -format Literal -radix decimal /tb_top/s_<port.name>_data
+add wave -noupdate -format Literal -radix decimal /tb_top/s_<port.name>_status
+add wave -noupdate -format Logic /tb_top/s_<port.name>_wrreq<
+endif>
+>>
+
+addNetworkNativePort(port) ::= <<
 add wave -noupdate -format Literal /tb_top/<port.name>_native
 >>
 
@@ -70,7 +90,7 @@ endif>
 >>
 
 addConnectionSignals(connection) ::= <<
-<if(!connection.sourcePort.native && !connection.targetPort.native)
+<if(!connection.sourcePort.native && !connection.targetPort.native && !connection.source.port && !connection.target.port)
 >add wave -noupdate -divider \<NULL\>
 add wave -noupdate -divider fifo_<connection.id>:_<connection.source.id>_\>\>_<connection.target.id>
 add wave -noupdate -divider \<NULL\>
