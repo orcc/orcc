@@ -42,6 +42,7 @@
 
 #include "llvm/LLVMContext.h"
 #include "llvm/Module.h"
+#include "llvm/Support/Host.h"
 
 #include "Jade/Decoder.h"
 #include "Jade/Core/Network.h"
@@ -67,6 +68,9 @@ Decoder::Decoder(LLVMContext& C, Configuration* configuration, bool verbose, boo
 
 	//Create a new module that contains the current decoder
 	module = new Module("decoder", C);
+	
+	// Deactivate cross compilation yet
+	module->setTargetTriple(sys::getHostTriple());
 
 	//Configure the decoder
 	ConfigurationEngine engine(Context, verbose);
