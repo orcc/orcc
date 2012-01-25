@@ -5,8 +5,8 @@ import "net/sf/orcc/backends/llvm/Actor.stg"
 // FIFO functions
 ///////////////////////////////////////////////////////////////////////////////
 
-printStatus(dir, port, index) ::= <<
-%status_<port.name> = tail call i32 asm sideeffect "STREAM_<dir>_<index>.CAL_STREAM_<dir>_STATUS", "=r,ir"(i32 <index>) nounwind
+printStatus(dir, port, index, state) ::= <<
+%status_<port.name><if(state)>_<state.name><endif> = tail call i32 asm sideeffect "STREAM_<dir>_<index>.CAL_STREAM_<dir>_STATUS", "=r,ir"(i32 <index>) nounwind
 >>
 
 printBcastStatus(dir, port, index) ::= <<
@@ -125,8 +125,8 @@ printPeekCalls(peekPattern) ::= <<
 // Scheduler
 ///////////////////////////////////////////////////////////////////////////////
 
-printPortsStatus(dir, ports) ::= <<
-<ports: { port | <printStatus(dir, port, i0)> }; separator="\n">
+printPortsStatus(dir, ports, state=false) ::= <<
+<ports: { port | <printStatus(dir, port, i0, state)> }; separator="\n">
 >>
 
 printBcastPortsStatus(dir, ports) ::= <<
@@ -135,9 +135,9 @@ printBcastPortsStatus(dir, ports) ::= <<
 
 checkOutputPorts(bb_name, action, port, restPorts, portToIndexMap, state, lastPort=false) ::= <<
 <if(!lastPort)>
-%has_valid_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = icmp sge i32 %status_<port.name>, <pattern.numTokensMap.(port)>
+%has_valid_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = icmp sge i32 %status_<port.name><if(state)>_<state.name><endif>, <pattern.numTokensMap.(port)>
 <else>
-%available_output_<if(state)><state.name>_<endif><action.name>_<port.name> = icmp sge i32 %status_<port.name>, <pattern.numTokensMap.(port)>
+%available_output_<if(state)><state.name>_<endif><action.name>_<port.name> = icmp sge i32 %status_<port.name><if(state)>_<state.name><endif>, <pattern.numTokensMap.(port)>
 %has_valid_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = and i1 %has_valid_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(lastPort)>, %available_output_<if(state)><state.name>_<endif><action.name>_<port.name><
 endif><
 if(restPorts)>
@@ -151,9 +151,9 @@ checkOutputPattern(state_name, action, pattern, state=false) ::= <<
 
 checkInputPorts(bb_name, action, port, restPorts, portToIndexMap, state, lastPort=false) ::= <<
 <if(!lastPort)>
-%has_valid_inputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = icmp sge i32 %status_<port.name>, <pattern.numTokensMap.(port)>
+%has_valid_inputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = icmp sge i32 %status_<port.name><if(state)>_<state.name><endif>, <pattern.numTokensMap.(port)>
 <else>
-%available_input_<if(state)><state.name>_<endif><action.name>_<port.name> = icmp sge i32 %status_<port.name>, <pattern.numTokensMap.(port)>
+%available_input_<if(state)><state.name>_<endif><action.name>_<port.name> = icmp sge i32 %status_<port.name><if(state)>_<state.name><endif>, <pattern.numTokensMap.(port)>
 %has_valid_inputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = and i1 %has_valid_inputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(lastPort)>, %available_input_<if(state)><state.name>_<endif><action.name>_<port.name><
 endif><
 if(restPorts)>
@@ -267,6 +267,8 @@ schedulingStates(sourceState, transitionsList) ::= <<
 printTransition(state) ::= <<
 ; STATE <state.name>
 bb_s_<state.name>:
+	<printPortsStatus("IN", actor.inputs, state)>
+	<printPortsStatus("OUT", actor.outputs, state)>
 <schedulingStates(state, state.outgoing)>
 >>
 
