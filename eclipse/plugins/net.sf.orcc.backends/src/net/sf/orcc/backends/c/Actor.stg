@@ -97,7 +97,6 @@ finished:
 }
 
 <endif>
-static unsigned int read_inds_dummy[1];
 void <instance.name>_initialize(<instance.actor.inputs: { port | unsigned int fifo_<port.name>_id}; separator=", ">) {
 	<if(instance.actor.initializes)>
 	struct schedinfo_s si;
