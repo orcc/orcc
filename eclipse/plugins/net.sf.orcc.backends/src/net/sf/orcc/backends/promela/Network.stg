@@ -85,7 +85,8 @@ init {
 
 	/*Start processes*/
 	atomic{
-		<network.Instances: {instance | run <GetInstanceId(instance)>(/*init_state*/);}; separator="\n">
+		<network.instances: {instances | run <GetInstanceId(instances)>(/*init_state*/);}; separator="\n">
+		<network.entities: {entities | run <GetInstanceId(entities)>(/*init_state*/);}; separator="\n">
 	}	
 }
 

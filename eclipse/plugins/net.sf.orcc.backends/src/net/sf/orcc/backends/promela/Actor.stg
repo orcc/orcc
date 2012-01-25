@@ -245,10 +245,10 @@ parameters(parameters) ::= <<
 // Scheduler with fsm
 ///////////////////////////////////////////////////////////////////////////////
 
-newState() ::= << 
-::	<instance.id>_state == state_<fsm_trans.SourceState.name> -\> {
+newState(fsm_state) ::= << 
+::	<instance.id>_state == state_<fsm_state.name> -\> {
 	if
-	<fsm_trans.list: {
+	<fsm_state.Outgoing: {
 			tr|
 <peekPattern(pattern=tr.action.peekPattern, action=tr.action)>
 ::	<tr.action: schedulerFSM(); separator="\n"> }>
@@ -274,7 +274,7 @@ schedulerFSM(action) ::= <<
 	
 	<outputPattern(action.outputPattern)>
 	
-	<instance.id>_state = state_<tr.state.name>;
+	<instance.id>_state = state_<tr.target.name>;
 	
 	<options.loadPeeks.(action): {ld | <ld.target.variable.name>_done = 0; }>
 	
@@ -437,7 +437,7 @@ proctype <instance.id>(<actor.parameters.list: varDecl(); wrap, separator=", ">)
 	<instance.id>_state = state_<actor.fsm.initialState.name>;
 	
 	do
-	<actor.fsm.transitions: { fsm_trans| <newState()> }>
+	<actor.fsm.states: newState()>
 	od;
 	<else>
 	do
