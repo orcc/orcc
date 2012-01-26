@@ -76,7 +76,7 @@ printParameter(arg) ::= <%
 <endif>
 %>
 
-printCallParam(param) ::= <%
+printCallParam(param, actor) ::= <%
 <if (param.byRef)>
 &<param.use.variable><param.indexes : {index | [<index>]}>
 <else>
@@ -88,19 +88,19 @@ printCallParam(param) ::= <%
 <endif>
 %>
 
-printCallProcedure(call) ::= <%
+printCallProcedure(call, actor) ::= <%
 <if (call.procedure.native)>NativeProcedure.<endif>
-<call.procedure.name>(<call.parameters: printCallParam(); separator=", ">);
+<call.procedure.name>(<call.parameters: printCallParam(actor); separator=", ">);
 %>
 
-printCall(call) ::= <%
+printCall(call, actor) ::= <%
 <if(call.print)>
 	System.out.print(<call.parameters: printParameter(); separator=" + ">);
 <else>
 	<if(call.target)>
 		<call.target.variable.indexedName> = 
 	<endif>
-	<printCallProcedure(call)>
+	<printCallProcedure(call, actor)>
 <endif>
 %>
 
@@ -158,21 +158,41 @@ printIndex(index) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 printNodes(nodes) ::= <<
-<nodes: {node | <if (node.blockNode)><printBlockNode(node)><
-elseif (node.ifNode)><printIfNode(node)><
-elseif (node.whileNode)><printWhileNode(node)><
+<nodes: {node | <if (node.blockNode)><printBlockNode(node, actor)><
+elseif (node.ifNode)><printIfNode(node, actor)><
+elseif (node.whileNode)><printWhileNode(node, actor)><
 endif>}; separator="\n">
 >>
 
 // block node
-printBlockNode(blockNode) ::= <<
-<printInstructions(blockNode.instructions)>
+printBlockNode(blockNode, actor) ::= <<
+<printInstructions(blockNode.instructions, actor)>
 >>
 
-printInstructions(instructions) ::= <<
+// if node
+printIfNode(ifNode, actor) ::= <<
+
+if (<ifNode.condition>) {
+	<printNodes(ifNode.thenNodes)>
+}<if(ifNode.elseNodes)> else {
+	<printNodes(ifNode.elseNodes)>
+}<endif>
+<printBlockNode(ifNode.joinNode, actor)>
+>>
+
+// while node
+printWhileNode(whileNode, actor) ::= <<
+
+while (<whileNode.condition>) {
+	<printNodes(whileNode.nodes)>
+}
+<printBlockNode(whileNode.joinNode, actor)>
+>>
+
+printInstructions(instructions, actor) ::= <<
 <instructions: {instr | <
 if (instr.assign)><printAssign(instr)><
-elseif (instr.call)><printCall(instr)><
+elseif (instr.call)><printCall(instr, actor)><
 elseif (instr.load)><printLoad(instr)><
 elseif (instr.return)><printReturn(instr)><
 elseif (instr.store)><printStore(instr)><
