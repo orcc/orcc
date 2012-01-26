@@ -57,7 +57,7 @@ actor_<instance.name>.initialize();
 ///////////////////////////////////////////////////////////////////////////////
 
 setupFifo(connection) ::= <<
-f = new Fifo\<<connection.targetPort.type>\>(SIZE);
+f = new Fifo\<<connection.targetPort.type>\>(<if (connection.size)><connection.size><else>SIZE<endif>);
 actor_<connection.source.name>.setFifo("<connection.sourcePort.simpleName>", f);
 actor_<connection.target.name>.setFifo("<connection.targetPort.simpleName>", f);
 >>
