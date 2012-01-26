@@ -30,15 +30,12 @@ printf("state = state_<tr.state.name>;\n");
 // Port declaration
 ///////////////////////////////////////////////////////////////////////////////
 
-// TODO: the [1] is not OK, it did not work with the "port.type.dimensions"
-
-
-printFifoSize(size) ::= <<
-<if(size)><size><else>SIZE<endif>
+inPortDeclaration(port) ::= <<
+<port.type> <port.name>[<port.NumTokensConsumed>];
 >>
 
-portDeclaration(port) ::= <<
-	<port.type> <port.name>[<printFifoSize(options.network.incomingMap.(instance).(port).size)>];
+outPortDeclaration(port) ::= <<
+<port.type> <port.name>[<port.NumTokensProduced>];
 >>
 
 
@@ -231,7 +228,7 @@ initializeStateVar(variable) ::= <<
 <if(!variable.type.list)>
 <variable.name> = <Constant(variable.initialValue)>;
 <else>
-memcpy(<variable.name>, <variable.name>_backup, sizeof(<variable.name>_backup));
+//memcpy(<variable.name>, <variable.name>_backup, sizeof(<variable.name>_backup));
 <endif>
 <endif>
 >>
@@ -430,7 +427,9 @@ proctype <instance.id>(<actor.parameters.list: varDecl(); wrap, separator=", ">)
 	<parameters(instance.parameters)>
 	
 	/* Ports */
-    < [instance.actor.inputs, instance.actor.outputs] : portDeclaration(); separator="\n">
+	<instance.actor.inputs  : inPortDeclaration(); separator="\n">
+	<instance.actor.outputs : outPortDeclaration(); separator="\n">
+
 
 	<if (actor.fsm)>
 	/* Initial State */

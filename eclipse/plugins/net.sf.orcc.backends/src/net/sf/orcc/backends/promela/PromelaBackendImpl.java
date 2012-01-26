@@ -37,7 +37,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.c.CExpressionPrinter;
-//import net.sf.orcc.backends.promela.transformations.ControlTokenAnalyzer;
+import net.sf.orcc.backends.promela.transformations.PromelaTokenAnalyzer;
 import net.sf.orcc.backends.promela.transformations.GuardsExtractor;
 import net.sf.orcc.backends.promela.transformations.NetworkStateDefExtractor;
 import net.sf.orcc.backends.promela.transformations.PromelaDeadGlobalElimination;
@@ -120,7 +120,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 				new PromelaDeadGlobalElimination(
 						netStateDef.getVarsUsedInScheduling(),
 						netStateDef.getPortsUsedInScheduling()),
-				/*new ControlTokenAnalyzer(netStateDef),*/
+				new PromelaTokenAnalyzer(netStateDef),
 				new GuardsExtractor(guards, priority, loadPeeks),
 				new DeadCodeElimination(), new DeadVariableRemoval()
 				};
