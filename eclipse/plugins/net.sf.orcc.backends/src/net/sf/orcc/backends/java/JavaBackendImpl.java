@@ -122,6 +122,7 @@ public class JavaBackendImpl extends AbstractBackend {
 		// print network
 		write("Printing network...\n");
 		printNetwork(network);
+		write("Done\n");
 	}
 
 	@Override
