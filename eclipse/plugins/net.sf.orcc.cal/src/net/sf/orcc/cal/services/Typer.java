@@ -135,18 +135,6 @@ public class Typer extends CalSwitch<Type> {
 
 	}
 
-	private static class SignedLubPlus1 extends LubPlus1 {
-
-		public static SignedLubPlus1 instance = new SignedLubPlus1();
-
-		@Override
-		public Type getType(Type t1, Type t2) {
-			type = IrFactory.eINSTANCE.createTypeInt(getSize(t1, t2));
-			return type;
-		}
-
-	}
-
 	private static class LubSum extends Lub {
 
 		public static LubSum instance = new LubSum();
@@ -170,6 +158,22 @@ public class Typer extends CalSwitch<Type> {
 				shift = 6;
 			}
 			return t1.getSizeInBits() + (1 << shift) - 1;
+		}
+
+	}
+
+	private static class SignedLub extends Lub {
+
+		public static SignedLub instance = new SignedLub();
+
+		@Override
+		public Type getType(Type t1, Type t2) {
+			super.getType(t1, t2);
+			if (type.isUint()) {
+				type = IrFactory.eINSTANCE
+						.createTypeInt(type.getSizeInBits() + 1);
+			}
+			return type;
 		}
 
 	}
@@ -530,7 +534,7 @@ public class Typer extends CalSwitch<Type> {
 					|| ((t2.isInt() || t2.isUint()) && t1.isFloat())) {
 				return IrFactory.eINSTANCE.createTypeFloat();
 			}
-			return createType(t1, t2, SignedLubPlus1.instance);
+			return createType(t1, t2, SignedLub.instance);
 
 		case PLUS:
 			if (t1.isString() && !t2.isList() || t2.isString() && !t1.isList()) {
