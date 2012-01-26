@@ -159,29 +159,28 @@ public class Fifo<T> {
 	 *         of tokens
 	 */
 	final public boolean hasTokens(int numTokens) {
-		return content.size() > numTokens;
+		return content.size() >= numTokens;
 	}
 
 	/**
 	 * Peeks one token from the FIFO (but don't remove it).
 	 * 
 	 * @return the token read
-	 
-	public T[] peek(int offset) {
-		T[] result = new T[offset + 1];
+	 */
+	@SuppressWarnings("unchecked")
+	public T peek(int offset) {
+		T result;
 
 		if (offset == 0) {
-			result[0] = content.peek();
+			result = content.peek();
 		} else {
-			Iterator<T> it = content.iterator();
-			for (int i = 0; i < offset && it.hasNext(); ++i) {
-				result[i] = it.next();
-			}
+			Object[] tempArray = content.toArray();
+			result = (T) tempArray[offset];
 		}
 
 		return result;
 	}
-	*/
+
 
 	/**
 	 * Reads one token and remove it from the FIFO.
