@@ -4,12 +4,11 @@ import "net/sf/orcc/backends/c/Actor.stg"
 // FIFO declaration
 ///////////////////////////////////////////////////////////////////////////////
 
-fifo(port) ::= <<
-
+declareFifo(port) ::= <<
 private Fifo\<<port.type>\> fifo_<port.name>;
 >>
 
-setFifo(port) ::= <<
+assignFifo(port) ::= <<
 if ("<port.name>".equals(portName)) {
 	fifo_<port.name> = (Fifo\<<port.type>\>) fifo;
 } else 
@@ -21,25 +20,29 @@ if ("<port.name>".equals(portName)) {
 
 // a variable definition
 // called by "function parameter", or "state variable with value"
-variableDeclaration(variable) ::= <<
-<variable.type> <variable.name>
+variableDeclaration(variable, prefix="") ::= <<
+<variable.type> <prefix><variable.name>
 >>
 
 // a variable definition with initialization
 // called by "local variable", or "state variable with no value"
-variableDeclarationInit(variable) ::= <%
-<variableDeclaration(variable)>
+variableDeclarationInit(variable, prefix="") ::= <%
+<variableDeclaration(variable, prefix)>
 <if(variable.type.dimensions)> = new <variable.type.innermostType><listSize(variable.type.dimensions)>
-<endif>
+<endif>;
 %>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constants
 ///////////////////////////////////////////////////////////////////////////////
 
-printBool(boolean) ::= <<
-<if (boolean)>true<else>false<endif>
->>
+printBool(boolean) ::= <%
+<if (boolean)>
+	true
+<else>
+	false
+<endif>
+%>
 
 // a state variable
 stateVar(variable) ::= <%
@@ -55,16 +58,6 @@ private <if(variable.initialized)>
 // Instructions
 ///////////////////////////////////////////////////////////////////////////////
 
-getPortName(variable, action) ::= <<
-<if (action.inputPattern.varToPortMap.(variable))
-><action.inputPattern.varToPortMap.(variable).name><
-elseif (action.outputPattern.varToPortMap.(variable))
-><action.outputPattern.varToPortMap.(variable).name><
-else
-><action.peekPattern.varToPortMap.(variable).name><
-endif>
->>
-
 printExpressionParameter(arg) ::= <%
 <if (arg.value.booleanExpr || arg.value.intExpr || arg.value.floatExpr || arg.value.listExpr)>
 <Constant(arg.value)>
@@ -76,67 +69,78 @@ printExpressionParameter(arg) ::= <%
 %>
 
 printParameter(arg) ::= <%
-<if (arg.byVal)><
-printExpressionParameter(arg)
-><else
-><arg.use.variable.name><endif>
+<if (arg.byVal)>
+	<printExpressionParameter(arg)>
+<else>
+	<arg.use.variable.name>
+<endif>
 %>
 
-printCallParam(param, actor) ::= <%
+printCallParam(param) ::= <%
 <if (param.byRef)>
 &<param.use.variable><param.indexes : {index | [<index>]}>
 <else>
-<if (actor.templateData.castedListReferences.(param))>(<actor.templateData.castedListReferences.(param)>)(<param.value>)<else><param.value><endif>
+	<if (actor.templateData.castedListReferences.(param))>
+		(<actor.templateData.castedListReferences.(param)>)(<param.value>)
+	<else>
+		<param.value>
+	<endif>
 <endif>
 %>
 
-printCallProcedure(call, actor) ::= <%
+printCallProcedure(call) ::= <%
 <if (call.procedure.native)>NativeProcedure.<endif>
-<call.procedure.name>(<call.parameters: printCallParam(actor); separator=", ">);
+<call.procedure.name>(<call.parameters: printCallParam(); separator=", ">);
 %>
 
-printCall(call, actor) ::= <<
-
-<if(call.print)>System.out.print(<call.parameters: printParameter(); separator=" + ">);<
-else
-><if(call.target)><call.target.variable.indexedName> = <endif
-><printCallProcedure(call, actor)><endif>
->>
-
-printLoad(load) ::= <<
-
-<if (action.inputPattern.varToPortMap.(load.source.variable) || action.outputPattern.varToPortMap.(load.source.variable) || action.peekPattern.varToPortMap.(load.source.variable))
-><load.target.variable.indexedName> = fifo_<getPortName(load.source.variable, action)>.read();
-<else><load.target.variable.indexedName> = <load.source.variable.name><load.indexes : {index | <printLoadIndex(index)>}>;
+printCall(call) ::= <%
+<if(call.print)>
+	System.out.print(<call.parameters: printParameter(); separator=" + ">);
+<else>
+	<if(call.target)>
+		<call.target.variable.indexedName> = 
+	<endif>
+	<printCallProcedure(call)>
 <endif>
->>
+%>
 
-// read instruction
-printRead(read) ::= <<
-
-<if (read.target)
->int <read.port.name>_Index = fifo_<read.port.name>.getReadIndex(<read.numTokens>);
-<read.target> = fifo_<read.port.name>.getReadArray(<read.numTokens>);<
-else
->fifo_<read.port.name>.getReadIndex(<read.numTokens>);
-fifo_<read.port.name>.getReadArray(<read.numTokens>);<endif>
->>
+printLoad(load) ::= <%
+<load.target.variable.name> = 
+<if(action.inputPattern.varToPortMap.(load.source.variable))>
+read_
+<elseif(action.outputPattern.varToPortMap.(load.source.variable))>
+write_
+<elseif(action.peekPattern.varToPortMap.(load.source.variable))>
+peek_
+<endif>
+<load.source.variable.name><load.indexes : printIndex()>;
+%>
 
 printStore(store) ::= <<
-
-< if (action.inputPattern.varToPortMap.(store.target.variable) || action.outputPattern.varToPortMap.(store.target.variable) || action.peekPattern.varToPortMap.(store.target.variable))
->fifo_<getPortName(store.target.variable, action)>.write(<store.value>);<
-else
-><store.target.variable.name><store.indexes : {index | <printLoadIndex(index)>}> = <store.value>;<endif>
+<if(action.inputPattern.varToPortMap.(store.target.variable))>read_<
+elseif(action.outputPattern.varToPortMap.(store.target.variable))>write_<
+elseif(action.peekPattern.varToPortMap.(store.target.variable))>peek_<
+endif><store.target.variable.name><store.indexes : printIndex()> = <store.value>;
 >>
 
-// write instruction
-printWrite(write) ::= <<
-
-<write.target> = fifo_<write.port.name>.getWriteArray(<write.numTokens>);
-int <write.port>_Index = fifo_<write.port.name>.getWriteIndex(<write.numTokens>);
+printWrite(port, source, numTokens) ::= <<
+for(int fifo_index = 0 ; fifo_index \< <numTokens> ; ++fifo_index) {
+	fifo_<port.name>.write(write_<source.name>[fifo_index]);
+}
 >>
 
+printRead(port, target, numTokens) ::= <<
+for(int fifo_index = 0 ; fifo_index \< <numTokens> ; ++fifo_index) {
+	read_<target.name>[fifo_index] = fifo_<port.name>.read();
+}
+>>
+
+printPeek(port, target, numTokens) ::= <<
+<target.type> peek_<target.name> = new <target.type.innermostType><listSize(target.type.dimensions)>;
+for(int fifo_index = 0 ; fifo_index \< <numTokens> ; ++fifo_index) {
+	peek_<target.name>[fifo_index] = fifo_<port.name>.peek(fifo_index);
+}
+>>
 
 printReturn(return) ::= <<
 <if(return.value)>
@@ -144,7 +148,7 @@ return (<return.block.procedure.returnType>) (<return.value>);<
 endif>
 >>
 
-printLoadIndex(index) ::= <<
+printIndex(index) ::= <<
 [<if (index.type.long)>(int) <if (index.binaryExpr)> (<index>) <else><index><endif><else><index><endif>]
 >>
 
@@ -157,7 +161,7 @@ printNodes(nodes) ::= <<
 <nodes: {node | <if (node.blockNode)><printBlockNode(node)><
 elseif (node.ifNode)><printIfNode(node)><
 elseif (node.whileNode)><printWhileNode(node)><
-endif>}>
+endif>}; separator="\n">
 >>
 
 // block node
@@ -167,40 +171,43 @@ printBlockNode(blockNode) ::= <<
 
 printInstructions(instructions) ::= <<
 <instructions: {instr | <
-if (instr.assign)><printAssign(assign=instr)><
-elseif (instr.call)><printCall(call=instr,actor=actor)><
-elseif (instr.load)><printLoad(load=instr)><
-elseif (instr.return)><printReturn(return=instr)><
-elseif (instr.store)><printStore(store=instr)><
-endif>}>
+if (instr.assign)><printAssign(instr)><
+elseif (instr.call)><printCall(instr)><
+elseif (instr.load)><printLoad(instr)><
+elseif (instr.return)><printReturn(instr)><
+elseif (instr.store)><printStore(instr)><
+endif>}; separator="\n">
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Procedure and actions
 ///////////////////////////////////////////////////////////////////////////////
 
-printProcedure(procedure, action=false) ::= <<
+printProcedure(procedure, action="") ::= <<
 <if(!procedure.native)>
-
 private <procedure.returnType> <procedure.name>(<procedure.parameters: {parameter | <variableDeclaration(parameter.variable)>}; wrap, anchor, separator=", ">) {
-<if(procedure.locals)>
-	<procedure.locals: {local | <variableDeclarationInit(local)>;<\n>}>
-<endif>
+	<procedure.locals: {local | <variableDeclarationInit(local)>};separator="\n">
 	<printNodes(procedure.nodes)>
 }
-
 <endif>
 >>
 
 printAction(action) ::= <<
-private void <action.name>() {
-<if(action.body.locals)>
-	<action.body.locals: {local | <variableDeclarationInit(local)>;<\n>}>
-<endif>
-	<printNodes(action.body.nodes)>
+private <action.scheduler.returnType> <action.scheduler.name>() {
+	<action.scheduler.locals: {local | <variableDeclarationInit(local)>};separator="\n">
+	<action.peekPattern.ports : { port | <printPeek(port, action.peekPattern.portToVarMap.(port), action.peekPattern.numTokensMap.(port))>};separator="\n">
+	<printNodes(action.scheduler.nodes)>
 }
 
-<printProcedure(action.scheduler, action)>
+private void <action.name>() {
+	<action.body.locals: {local | <variableDeclarationInit(local)>};separator="\n">
+	<action.inputPattern.ports : { port | <variableDeclarationInit(action.inputPattern.portToVarMap.(port), "read_")> };separator="\n">
+	<action.outputPattern.ports : { port | <variableDeclarationInit(action.outputPattern.portToVarMap.(port), "write_")> };separator="\n">
+	
+	<action.inputPattern.ports : { port | <printRead(port, action.inputPattern.portToVarMap.(port), action.inputPattern.numTokensMap.(port))> }; separator="\n">
+	<printNodes(action.body.nodes)>
+	<action.outputPattern.ports : { port | <printWrite(port, action.outputPattern.portToVarMap.(port), action.outputPattern.numTokensMap.(port))> }; separator="\n">
+}
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -237,7 +244,8 @@ if (<checkInputPattern(action.inputPattern)>isSchedulable_<action.name>()) {
 	<else>
 	<actionCall(action)>
 	<endif>
-}>>
+}
+>>
 
 schedulingTest(actions) ::= <<
 <actions: actionTest(); separator=" else ">
@@ -279,7 +287,8 @@ if (<checkInputPattern(transition.action.inputPattern)>isSchedulable_<transition
 	<else>
 	<actionCallState(transition)>
 	<endif>
-}>>
+}
+>>
 
 schedulingTestState(transitionsList) ::= <<
 <transitionsList: actionTestState(); separator=" else ">
@@ -291,7 +300,6 @@ private boolean stateScheduler_<state.name>() {
 	<schedulingTestState(state.outgoing)>
 	return res;
 }
-
 >>
 
 switchState(state) ::= <<
@@ -371,11 +379,11 @@ import net.sf.orcc.runtime.actors.IActor;
 public class <actor.simpleName> implements IActor {
 
 	// Input FIFOs
-	<actor.inputs: fifo()>
+	<actor.inputs: declareFifo();separator="\n">
 	// Output FIFOs
-	<actor.outputs: fifo()>
+	<actor.outputs: declareFifo();separator="\n">
 	// Parameters of the actor
-	<actor.parameters: {param|private <variableDeclarationInit(param)>;}>
+	<actor.parameters: {param|private <variableDeclarationInit(param)>;};separator="\n">
 	// State variables of the actor
 	<actor.stateVars: stateVar(); separator="\n">
 	
@@ -384,9 +392,9 @@ public class <actor.simpleName> implements IActor {
 	}
 	
 	// Functions/procedures
-	<actor.procs: printProcedure()>
+	<actor.procs: printProcedure();separator="\n">
 	// Actions
-	<actor.actions: printAction()>
+	<actor.actions: printAction();separator="\n">
 <if(actor.initializes)>
 	// Initializes
 	<actor.initializes: printAction()>
@@ -406,7 +414,8 @@ public class <actor.simpleName> implements IActor {
 	@Override
 	@SuppressWarnings("unchecked")
 	public \<T\> void setFifo(String portName, Fifo\<T\> fifo) {
-		<actor.inputs: setFifo()><actor.outputs: setFifo()>{
+		<actor.inputs: assignFifo()>
+		<actor.outputs: assignFifo()>{
 			String msg = "unknown port \"" + portName + "\"";
 			throw new IllegalArgumentException(msg);
 		}

@@ -57,7 +57,6 @@ actor_<instance.name>.initialize();
 ///////////////////////////////////////////////////////////////////////////////
 
 setupFifo(connection) ::= <<
-
 f = new Fifo\<<connection.targetPort.type>\>(SIZE);
 actor_<connection.source.name>.setFifo("<connection.sourcePort.simpleName>", f);
 actor_<connection.target.name>.setFifo("<connection.targetPort.simpleName>", f);
@@ -92,7 +91,7 @@ public class <network.simpleName> implements IScheduler {
 		<network.entities: createBroadcast()>
 		@SuppressWarnings("rawtypes")
 		Fifo f;
-		<network.connections: setupFifo()>
+		<network.connections: setupFifo(); separator="\n">
 	}
 
 	@Override
@@ -125,7 +124,6 @@ public class <network.simpleName> implements IScheduler {
 		CLIParameters.getInstance().setArguments(args);
 		GenericSource.setFileName(CLIParameters.getInstance().getSourceFile());
 
-		
 		IScheduler scheduler = new <network.simpleName>();
 		scheduler.initialize();
 		scheduler.schedule();

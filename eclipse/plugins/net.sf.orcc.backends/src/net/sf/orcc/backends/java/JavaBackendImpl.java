@@ -59,8 +59,6 @@ import org.eclipse.core.resources.IFile;
  */
 public class JavaBackendImpl extends AbstractBackend {
 
-	private StandardPrinter actorPrinter;
-
 	private final Map<String, String> transformations;
 
 	private boolean debug;
@@ -70,7 +68,7 @@ public class JavaBackendImpl extends AbstractBackend {
 		transformations.put("initialize", "my_initialize");
 		transformations.put("isSchedulable_initialize",
 				"my_isSchedulable_initialize");
-		
+
 		transformations.put("byte", "my_byte");
 		transformations.put("int", "my_int");
 		transformations.put("boolean", "my_boolean");
@@ -113,11 +111,6 @@ public class JavaBackendImpl extends AbstractBackend {
 	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
 		List<Actor> actors = parseActors(files);
 
-		actorPrinter = new StandardPrinter(
-				"net/sf/orcc/backends/java/Actor.stg", !debug);
-		actorPrinter.setExpressionPrinter(new JavaExprPrinter());
-		actorPrinter.setTypePrinter(new JavaTypePrinter());
-
 		transformActors(actors);
 		printActors(actors);
 	}
@@ -133,18 +126,22 @@ public class JavaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected boolean printActor(Actor actor) {
+		StandardPrinter actorPrinter = new StandardPrinter(
+				"net/sf/orcc/backends/java/Actor.stg", !debug);
+		actorPrinter.setExpressionPrinter(new JavaExprPrinter());
+		actorPrinter.setTypePrinter(new JavaTypePrinter());
+
 		// create folder if necessary
 		String folder = path + File.separator + OrccUtil.getFolder(actor);
 		new File(folder).mkdirs();
 
-		boolean usingNativeProcedure = false;
+		// transfer to template usage status of native procedures
 		for (Procedure p : actor.getProcs()) {
-			if (p.isNative() && ! p.getName().equals("print")) {
-				usingNativeProcedure = true;
+			if (!p.getName().equals("print") && p.isNative()) {
+				actorPrinter.getOptions().put("usingNativeProc", true);
 				break;
 			}
 		}
-		actorPrinter.getOptions().put("usingNativeProc", usingNativeProcedure);
 
 		return actorPrinter.print(actor.getSimpleName() + ".java", folder,
 				actor);
