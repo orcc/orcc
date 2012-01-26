@@ -37,7 +37,7 @@ variableDeclarationInit(variable, prefix="") ::= <%
 ///////////////////////////////////////////////////////////////////////////////
 
 printBool(boolean) ::= <%
-<if (boolean)>
+<if (boolean.value)>
 	true
 <else>
 	false
