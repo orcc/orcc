@@ -154,7 +154,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		new DeadGlobalElimination().doSwitch(actor);
 
 		if (!byteexact) {
-			new TypeResizer(true, false, false, false).doSwitch(actor);
+			new TypeResizer(true, false, false, true).doSwitch(actor);
 		}
 
 		new DeadCodeElimination().doSwitch(actor);
