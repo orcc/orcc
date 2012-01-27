@@ -31,11 +31,13 @@ package net.sf.orcc.backends.promela.transformations;
 
 //import java.util.HashMap;
 //import java.util.HashSet;
-//import java.util.Map;
 //import java.util.Set;
+import java.util.List;
+import java.util.Map;
+
 import net.sf.orcc.df.Action;
-import net.sf.orcc.df.Actor;
-//import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Instance;
 //import net.sf.orcc.df.Edge;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
@@ -73,9 +75,9 @@ public class PromelaTokenAnalyzer extends AbstractActorVisitor<Object>{
 			//if (schedulingPorts.contains(port)) {
 			//	System.out.println("Action "+action.getName()+" contributes to the output "+port.getName());
 			//}
-			int num_tokens = pattern.getVariable(port).getType().getDimensions().get(0);
-			if (num_tokens > port.getNumTokensProduced()) {
-				port.setNumTokensProduced(num_tokens);
+			int numTokens = pattern.getVariable(port).getType().getDimensions().get(0);
+			if (numTokens > port.getNumTokensProduced()) {
+				port.setNumTokensProduced(numTokens);
 			}
 		}
 		pattern = action.getInputPattern();
@@ -89,16 +91,26 @@ public class PromelaTokenAnalyzer extends AbstractActorVisitor<Object>{
 	}
 
 	@Override
-	public Object caseActor(Actor actor) {
-		//System.out.println("Actor: " + actor.getName());
-		for (Action action : actor.getActions()) {
+	public Object caseInstance(Instance instance) {
+		for (Action action : instance.getActor().getActions()) {
 			doSwitch(action);
 		}
-		//for (Var var : actor.getStateVars()) {
-			//Set<Var> tc = new HashSet<Var>();
-			//netStateDef.getTransitiveClosure(var, tc);
-			//System.out.println(var+ " " + tc);
-		//}
+		// Set the FIFO sizes according to the token consumtion/production
+		Map<Port,Connection> inMap = instance.getIncomingPortMap();
+		for (Port port : inMap.keySet()) {
+			Connection connection = inMap.get(port);
+			if (connection.getSize() == null || port.getNumTokensConsumed() > connection.getSize()) {
+				inMap.get(port).setAttribute(Connection.BUFFER_SIZE, (int)port.getNumTokensConsumed());
+			}
+		}
+		Map<Port,List<Connection>> outMap = instance.getOutgoingPortMap();
+		for (Port port : outMap.keySet()) {
+			for (Connection connection : outMap.get(port)) {
+				if (connection.getSize() == null || port.getNumTokensProduced() > connection.getSize()) {
+					connection.setAttribute(Connection.BUFFER_SIZE, (int)port.getNumTokensProduced());
+				}
+			}
+		}
 		return null;
 	}
 

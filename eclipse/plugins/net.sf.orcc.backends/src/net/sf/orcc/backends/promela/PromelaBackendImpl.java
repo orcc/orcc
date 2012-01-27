@@ -80,8 +80,6 @@ public class PromelaBackendImpl extends AbstractBackend {
 	private final Map<String, String> transformations;
 
 	private NetworkStateDefExtractor netStateDef;
-	
-	private boolean firstTransform = true;
 
 	/**
 	 * Creates a new instance of the Promela back-end. Initializes the
@@ -103,7 +101,6 @@ public class PromelaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		if (firstTransform) {
 		DfSwitch<?>[] transformations = {
 				new UnitImporter(),
 				new Inliner(true, true),
@@ -114,19 +111,27 @@ public class PromelaBackendImpl extends AbstractBackend {
 				};
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
-		} 
-		}else {
+		}
+	}
+		
+	private void transformInstance(Instance instance) throws OrccException{
 		DfSwitch<?>[] transformations = {
 				new PromelaDeadGlobalElimination(
 						netStateDef.getVarsUsedInScheduling(),
 						netStateDef.getPortsUsedInScheduling()),
-				new PromelaTokenAnalyzer(netStateDef),
 				new GuardsExtractor(guards, priority, loadPeeks),
 				new DeadCodeElimination(), new DeadVariableRemoval()
 				};
 		for (DfSwitch<?> transformation : transformations) {
-			transformation.doSwitch(actor);
+			transformation.doSwitch(instance.getActor());
 		}
+		new PromelaTokenAnalyzer(netStateDef).doSwitch(instance);
+	}
+	
+	private void transformInstances(List<Instance> instances) throws OrccException {
+		write("Transforming instances...\n");
+		for (Instance instance : instances) {
+			transformInstance(instance);
 		}
 	}
 
@@ -152,12 +157,11 @@ public class PromelaBackendImpl extends AbstractBackend {
 
 		List<Actor> actors = network.getAllActors();
 		transformActors(actors);
-		firstTransform = false;
 		
 		netStateDef = new NetworkStateDefExtractor();
 		netStateDef.doSwitch(network);
 
-		transformActors(actors);
+		transformInstances(network.getInstances());
 		printInstances(network);
 
 		new BroadcastAdder().doSwitch(network);
