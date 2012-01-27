@@ -5,12 +5,12 @@ import "net/sf/orcc/backends/llvm/Actor.stg"
 // FIFO functions
 ///////////////////////////////////////////////////////////////////////////////
 
-printStatus(dir, port, index, state) ::= <<
-%status_<port.name><if(state)>_<state.name><endif> = tail call i32 asm sideeffect "STREAM_<dir>_<index>.CAL_STREAM_<dir>_STATUS", "=r,ir"(i32 <index>) nounwind
+printStatus(dir, port, index, action, state) ::= <<
+%status_<port.name><if(action)>_<action.name><endif><if(state)>_<state.name><endif> = tail call i32 asm sideeffect "STREAM_<dir>_<index>.CAL_STREAM_<dir>_STATUS", "=r,ir"(i32 <index>) nounwind
 >>
 
-printBcastStatus(dir, port, index) ::= <<
-%status_<port.name> = tail call i32 asm sideeffect "STREAM_<dir>_<index>.CAL_STREAM_<dir>_STATUS", "=r,ir"(i32 <index>) nounwind
+printPortsStatus(dir, ports, action=false, state=false) ::= <<
+<ports: { port | <printStatus(dir, port, i0, action, state)> }; separator="\n">
 >>
 
 printReadFunction(port, index, needCast) ::= <<
@@ -126,51 +126,43 @@ printPeekCalls(peekPattern) ::= <<
 // Scheduler
 ///////////////////////////////////////////////////////////////////////////////
 
-printPortsStatus(dir, ports, state=false) ::= <<
-<ports: { port | <printStatus(dir, port, i0, state)> }; separator="\n">
->>
-
-printBcastPortsStatus(dir, ports) ::= <<
-<ports: { port | <printBcastStatus(dir, port, i0)> }; separator="\n">
->>
-
-checkOutputPorts(bb_name, action, port, restPorts, portToIndexMap, state, lastPort=false) ::= <<
+checkOutputPorts(action, port, restPorts, portToIndexMap, state, lastPort=false) ::= <<
 <if(!lastPort)>
-%has_valid_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = icmp sge i32 %status_<port.name><if(state)>_<state.name><endif>, <pattern.numTokensMap.(port)>
+%has_valid_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = icmp sge i32 %status_<port.name>_<action.name><if(state)>_<state.name><endif>, <pattern.numTokensMap.(port)>
 <else>
-%available_output_<if(state)><state.name>_<endif><action.name>_<port.name> = icmp sge i32 %status_<port.name><if(state)>_<state.name><endif>, <pattern.numTokensMap.(port)>
+%available_output_<if(state)><state.name>_<endif><action.name>_<port.name> = icmp sge i32 %status_<port.name>_<action.name><if(state)>_<state.name><endif>, <pattern.numTokensMap.(port)>
 %has_valid_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = and i1 %has_valid_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(lastPort)>, %available_output_<if(state)><state.name>_<endif><action.name>_<port.name><
 endif><
 if(restPorts)>
-<checkOutputPorts(bb_name, action, first(restPorts), rest(restPorts), portToIndexMap, state, port)><
+<checkOutputPorts(action, first(restPorts), rest(restPorts), portToIndexMap, state, port)><
 endif>
 >>
 
-checkOutputPattern(state_name, action, pattern, state=false) ::= <<
-<checkOutputPorts(state_name, action, first(pattern.ports), rest(pattern.ports), instance.actor.templateData.portToIndexByPatternMap.(pattern), state)>
+checkOutputPattern(action, pattern, state=false) ::= <<
+<checkOutputPorts(action, first(pattern.ports), rest(pattern.ports), instance.actor.templateData.portToIndexByPatternMap.(pattern), state)>
 >>
 
-checkInputPorts(bb_name, action, port, restPorts, portToIndexMap, state, lastPort=false) ::= <<
+checkInputPorts(action, port, restPorts, portToIndexMap, state, lastPort=false) ::= <<
 <if(!lastPort)>
-%has_valid_inputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = icmp sge i32 %status_<port.name><if(state)>_<state.name><endif>, <pattern.numTokensMap.(port)>
+%has_valid_inputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = icmp sge i32 %status_<port.name>, <pattern.numTokensMap.(port)>
 <else>
-%available_input_<if(state)><state.name>_<endif><action.name>_<port.name> = icmp sge i32 %status_<port.name><if(state)>_<state.name><endif>, <pattern.numTokensMap.(port)>
+%available_input_<if(state)><state.name>_<endif><action.name>_<port.name> = icmp sge i32 %status_<port.name>, <pattern.numTokensMap.(port)>
 %has_valid_inputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = and i1 %has_valid_inputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(lastPort)>, %available_input_<if(state)><state.name>_<endif><action.name>_<port.name><
 endif><
 if(restPorts)>
-<checkInputPorts(bb_name, action, first(restPorts), rest(restPorts), portToIndexMap, state, port)><
+<checkInputPorts(action, first(restPorts), rest(restPorts), portToIndexMap, state, port)><
 endif>
 >>
 
-checkInputPattern(state_name, action, pattern, state=false) ::= <<
-<checkInputPorts(state_name, action, first(pattern.ports), rest(pattern.ports), instance.actor.templateData.portToIndexByPatternMap.(pattern), state)>
+checkInputPattern(action, pattern, state=false) ::= <<
+<checkInputPorts(action, first(pattern.ports), rest(pattern.ports), instance.actor.templateData.portToIndexByPatternMap.(pattern), state)>
 >>
 
 actionTest(action) ::= <<
 	; ACTION <action.name>
 <if(!action.inputPattern.empty)
 >	;; Input pattern
-	<checkInputPattern("nostate", action, action.inputPattern)>
+	<checkInputPattern(action, action.inputPattern)>
 	%is_schedulable_<action.name> = call i1 @<action.scheduler.name> ()
 	%is_fireable_<action.name> = and i1 %is_schedulable_<action.name>, %has_valid_inputs_<action.name>_<length(action.inputPattern.ports)>
 	
@@ -186,9 +178,10 @@ endif>
 bb_<action.name>_check_outputs:
 <if(!action.outputPattern.empty)
 >	;; Output pattern
-	<checkOutputPattern("nostate", action, action.outputPattern)>
+	<printPortsStatus("OUT", actor.outputs, action)>
+	<checkOutputPattern(action, action.outputPattern)>
 	
-	br i1 %has_valid_outputs_<action.name>_<length(action.outputPattern.ports)>, label %bb_<action.name>_fire, label %bb_scheduler_start<
+	br i1 %has_valid_outputs_<action.name>_<length(action.outputPattern.ports)>, label %bb_<action.name>_fire, label %bb_<action.name>_check_outputs<
 else
 >	;; Empty output pattern
 	
@@ -220,7 +213,7 @@ actionTestState(sourceState, transition, restTransitionsList) ::= <<
 	; ACTION <transition.action.name>
 <if(!transition.action.inputPattern.empty)
 >	;; Input pattern
-	<checkInputPattern(sourceState.name, transition.action, transition.action.inputPattern, sourceState)>
+	<checkInputPattern(transition.action, transition.action.inputPattern, sourceState)>
 	%is_schedulable_<sourceState.name>_<transition.action.name> = call i1 @<transition.action.scheduler.name> ()
 	%is_fireable_<sourceState.name>_<transition.action.name> = and i1 %is_schedulable_<sourceState.name>_<transition.action.name>, %has_valid_inputs_<sourceState.name>_<transition.action.name>_<length(transition.action.inputPattern.ports)>
 	
@@ -236,9 +229,10 @@ endif>
 bb_<sourceState.name>_<transition.action.name>_check_outputs:
 <if(!transition.action.outputPattern.empty)
 >	;; Output pattern
-	<checkOutputPattern(sourceState.name, transition.action, transition.action.outputPattern, sourceState)>
+	<printPortsStatus("OUT", actor.outputs, transition.action, sourceState)>
+	<checkOutputPattern(transition.action, transition.action.outputPattern, sourceState)>
 	
-	br i1 %has_valid_outputs_<sourceState.name>_<transition.action.name>_<length(transition.action.outputPattern.ports)>, label %bb_<sourceState.name>_<transition.action.name>_fire, label %bb_s_<sourceState.name><
+	br i1 %has_valid_outputs_<sourceState.name>_<transition.action.name>_<length(transition.action.outputPattern.ports)>, label %bb_<sourceState.name>_<transition.action.name>_fire, label %bb_<sourceState.name>_<transition.action.name>_check_outputs<
 else
 >	;; Empty output pattern
 	
@@ -268,8 +262,6 @@ schedulingStates(sourceState, transitionsList) ::= <<
 printTransition(state) ::= <<
 ; STATE <state.name>
 bb_s_<state.name>:
-	<printPortsStatus("IN", actor.inputs, state)>
-	<printPortsStatus("OUT", actor.outputs, state)>
 <schedulingStates(state, state.outgoing)>
 >>
 
@@ -389,8 +381,8 @@ entry:
 	br label %bb_broadcast_start
 
 bb_broadcast_start:
-	<printBcastPortsStatus("IN", broadcast.inputs)>
-	<printBcastPortsStatus("OUT", broadcast.outputs)>
+	<printPortsStatus("IN", broadcast.inputs)>
+	<printPortsStatus("OUT", broadcast.outputs)>
 	<printBcastCondition(broadcast)>
 	
 	br i1 %can_copy_next_token, label %bb_broadcast_copy, label %bb_broadcast_start
@@ -472,7 +464,6 @@ entry:
 
 	bb_scheduler_start:
 	<printPortsStatus("IN", actor.inputs)>
-	<printPortsStatus("OUT", actor.outputs)>
 <if(actor.fsm)
 ><schedulerWithFSM(actor.actionsOutsideFsm, actor.fsm)><
 else
