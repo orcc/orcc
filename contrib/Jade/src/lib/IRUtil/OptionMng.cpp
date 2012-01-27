@@ -44,6 +44,6 @@ using namespace std;
 void OptionMng::setDirectory(string* dir){
 	size_t found = dir->find_last_of("/\\");
 	if(found != dir->length()-1){
-		dir->insert(dir->length(),"\\");
+		dir->insert(dir->length(),"/");
 	}
 }
