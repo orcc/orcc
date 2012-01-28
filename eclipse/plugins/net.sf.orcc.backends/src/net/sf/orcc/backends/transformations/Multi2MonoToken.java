@@ -228,6 +228,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	private int visitedRenameIndex;
 	private Action write;
 	private List<Var> writeIndexes;
+	private List<Transition> transitionsList;
 
 	/**
 	 * returns the position of an action name in an actions names list
@@ -327,8 +328,9 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		bufferSizes = new ArrayList<Integer>();
 		visitedActions = new ArrayList<Action>();
 		visitedActionsNames = new ArrayList<String>();
+		transitionsList = new ArrayList<Transition>();
 		modifyRepeatActionsInFSM();
-		modifyUntaggedActions(actor);
+		// modifyUntaggedActions(actor);
 		return null;
 	}
 
@@ -885,12 +887,19 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 			}
 			if (transformFSM == true) {
 				// with an FSM: visits all transitions
+
 				for (Transition transition : fsm.getTransitions()) {
 					State source = (State) transition.getSource();
 					State target = (State) transition.getTarget();
 					Action action = transition.getAction();
 					visitTransition(source, target, action);
 				}
+				if (!transitionsList.isEmpty()) {
+					for (Transition t : transitionsList) {
+						fsm.getTransitions().add(t);
+					}
+				}
+				transitionsList.clear();
 				modifyNoRepeatActionsInFSM();
 				transformFSM = false;
 			}
@@ -1092,13 +1101,17 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 							tab);
 					modifyProcessActionWrite.doSwitch(action.getBody());
 
-					fsm.addTransition(writeState, write, writeState);
+					Transition transitionWrite = DfFactory.eINSTANCE
+							.createTransition(writeState, write, writeState);
+					transitionsList.add(transitionWrite);
 
 					// create a new write done action once
 					if (outputIndex == 100) {
 						done = createDoneAction(action.getName()
 								+ "newWriteDone", counter, numTokens);
-						fsm.addTransition(writeState, done, targetState);
+						Transition transitionDone = DfFactory.eINSTANCE
+								.createTransition(writeState, done, targetState);
+						transitionsList.add(transitionDone);
 
 					} else {
 						modifyDoneAction(counter, outputIndex, port.getName());
@@ -1362,14 +1375,12 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 */
 	private void visitTransition(State sourceState, State targetState,
 			Action action) {
-		if (action != null) {
-			// verify if the action is already transformed ==> update FSM
-			verifVisitedActions(action, sourceState, targetState);
+		// verify if the action is already transformed ==> update FSM
+		verifVisitedActions(action, sourceState, targetState);
 
-			if (!repeatInput && !noRepeatActions.contains(action)) {
-				noRepeatActions.add(action);
-			}
-			repeatInput = false;
+		if (!repeatInput && !noRepeatActions.contains(action)) {
+			noRepeatActions.add(action);
 		}
+		repeatInput = false;
 	}
 }
