@@ -330,7 +330,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		visitedActionsNames = new ArrayList<String>();
 		transitionsList = new ArrayList<Transition>();
 		modifyRepeatActionsInFSM();
-		// modifyUntaggedActions(actor);
+		modifyUntaggedActions(actor);
 		return null;
 	}
 
@@ -1260,7 +1260,8 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 			int verifNumTokens = verifEntry.getValue();
 			if (verifNumTokens > 1) {
 				repeatInput = true;
-				fsm.addTransition(source, oldAction, target);
+				Transition transition = DfFactory.eINSTANCE.createTransition(source, oldAction, target);
+				transitionsList.add(transition);
 				visitedRenameIndex++;
 				break;
 			}
@@ -1292,14 +1293,16 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 							+ "_NewWrite";
 					int writeIndex = actionPosition(actions, writeName);
 					Action write = actions.get(writeIndex);
-					fsm.addTransition(writeState, write, writeState);
+					Transition writeTransition = DfFactory.eINSTANCE.createTransition(writeState, write, writeState);
+					transitionsList.add(writeTransition);
 
 					// create a new write done action once
 					if (outputIndex == 100) {
 						String doneName = action.getName() + "newWriteDone";
 						int doneIndex = actionPosition(actions, doneName);
 						Action done = actions.get(doneIndex);
-						fsm.addTransition(writeState, done, target);
+						Transition doneTransition = DfFactory.eINSTANCE.createTransition(writeState, done, target);
+						transitionsList.add(doneTransition);
 					}
 
 				}
