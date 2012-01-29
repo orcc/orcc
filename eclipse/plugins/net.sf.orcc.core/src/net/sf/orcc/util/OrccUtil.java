@@ -447,8 +447,14 @@ public class OrccUtil {
 			if (fragment == null) {
 				return null;
 			}
-			return fragment.getElementName() + "."
-					+ file.getFullPath().removeFileExtension().lastSegment();
+
+			String name = file.getFullPath().removeFileExtension()
+					.lastSegment();
+			if (fragment.isDefaultPackage()) {
+				// handles the default package case
+				return name;
+			}
+			return fragment.getElementName() + "." + name;
 		} catch (JavaModelException e) {
 			e.printStackTrace();
 			return null;
