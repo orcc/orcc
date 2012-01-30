@@ -411,7 +411,7 @@ printActor(actor, options) ::= <<
 <if(instance.actor.parameters)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Parameter values of the instance
-<instance.actor.parameters: { var | <actorParameter(var, instance.parameters.(var.name))> }; separator="\n">
+<instance.arguments: { argument | <actorParameter(argument.variable, argument.value)> }; separator="\n">
 <endif>
 
 <if(actor.stateVars)>
