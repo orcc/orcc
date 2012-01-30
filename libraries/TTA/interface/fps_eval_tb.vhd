@@ -45,7 +45,7 @@ begin
     generic map (
       period => period2)
     port map (
-      rst_n        => rst,
+      rst_n        => rst_n,
       clk          => clk,
       top_frame    => top_frame,
       segment7     => segment7,

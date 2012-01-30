@@ -14,7 +14,7 @@ set_global_assignment -name VHDL_FILE segment_display_conv.vhd
 set_global_assignment -name VHDL_FILE segment_display_sel.vhd
 
 # Pin assignments
-set_location_assignment PIN_AP5 -to rst
+set_location_assignment PIN_AP5 -to rst_n
 set_location_assignment PIN_T33 -to clk
 set_location_assignment PIN_AE10 -to segment7[0]
 set_location_assignment PIN_AL5 -to segment7[1]
@@ -34,4 +34,5 @@ set_global_assignment -name LAST_QUARTUS_VERSION 11.0
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

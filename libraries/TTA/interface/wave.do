@@ -118,7 +118,6 @@ add wave -noupdate -format Literal -radix hexadecimal /fps_eval_tb/fps_eval_1/se
 add wave -noupdate -format Literal -radix hexadecimal /fps_eval_tb/fps_eval_1/segment_display_sel_component/current_segment7_d
 add wave -noupdate -format Literal -radix hexadecimal /fps_eval_tb/fps_eval_1/segment_display_sel_component/current_segment7_h
 add wave -noupdate -format Literal -radix hexadecimal /fps_eval_tb/fps_eval_1/segment_display_sel_component/current_segment7_t
-add wave -noupdate -format Logic -radix hexadecimal /fps_eval_tb/fps_eval_1/segment_display_sel_component/refreshing
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {19854982678 ps} 0}
 configure wave -namecolwidth 185

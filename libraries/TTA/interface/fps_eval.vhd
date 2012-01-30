@@ -67,7 +67,7 @@ begin
 
   process (clk, rst_n)
   begin  -- process
-    if rst = '0' then
+    if rst_n = '0' then
       top_frame2 <= (others => '0');
     elsif clk'event and clk = '1' then
       top_frame2 <= top_frame2(0) & top_frame(0);
