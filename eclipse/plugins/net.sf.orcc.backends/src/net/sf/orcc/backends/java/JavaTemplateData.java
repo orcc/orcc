@@ -35,6 +35,7 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Type;
@@ -44,11 +45,10 @@ import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
 
 /**
- * This class computes a map for inserting metadata information into Java
- * template.
+ * This class computes a map for inserting cast information in some call
+ * instructions arguments.
  * 
- * @author Jerome GORIN
- * @author Herve Yviquel
+ * @author Antoine Lorence
  * 
  */
 public class JavaTemplateData {
@@ -94,8 +94,10 @@ public class JavaTemplateData {
 								: ((ArgByVal) callArgs.get(i)).getValue()
 										.getType();
 
+						Expression e = ((ArgByVal) callArgs.get(i)).getValue();
+
+
 						if (!callParamType.equals(procParamType)) {
-							// Difference de type entre l'appel et la definition
 							castedListReferences.put(callArgs.get(i),
 									procParamType);
 							break;
