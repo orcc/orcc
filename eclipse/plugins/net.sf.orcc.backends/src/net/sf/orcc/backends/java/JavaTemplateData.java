@@ -35,7 +35,6 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Type;
@@ -93,9 +92,6 @@ public class JavaTemplateData {
 								.get(i)).getUse().getVariable().getType()
 								: ((ArgByVal) callArgs.get(i)).getValue()
 										.getType();
-
-						Expression e = ((ArgByVal) callArgs.get(i)).getValue();
-
 
 						if (!callParamType.equals(procParamType)) {
 							castedListReferences.put(callArgs.get(i),
