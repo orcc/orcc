@@ -30,80 +30,6 @@
                workspace="false">
          </browseFile>
       </option>
-      <option
-            defaultValue="false"
-            description="Compare the generated decoder with the reference video"
-            id="net.sf.orcc.simulators.enableComparison"
-            name="Verify output">
-         <checkBox>
-            <option
-                  description="Path of the reference video"
-                  id="net.sf.orcc.simulators.compareFile"
-                  name="Reference video">
-               <browseFile
-                     folder="false"
-                     workspace="false">
-               </browseFile>
-            </option>
-         </checkBox>
-      </option>
-      <option
-            defaultValue="O3"
-            description="Set level of optimization"
-            id="net.sf.orcc.simulators.optLevel"
-            name="Optimization level:">
-         <comboBox>
-            <comboBoxItem
-                  id="O0">
-            </comboBoxItem>
-            <comboBoxItem
-                  id="O1">
-            </comboBoxItem>
-            <comboBoxItem
-                  id="O2">
-            </comboBoxItem>
-            <comboBoxItem
-                  id="O3">
-            </comboBoxItem>
-         </comboBox>
-      </option>
-      <option
-            defaultValue="Round-Robin"
-            description="Select a model of execution for the given network"
-            id="net.sf.orcc.simulators.scheduler"
-            name="Select a scheduler:">
-         <comboBox>
-            <comboBoxItem
-                  id="Round-Robin">
-            </comboBoxItem>
-            <comboBoxItem
-                  id="Data-driven">
-            </comboBoxItem>
-         </comboBox>
-      </option>
-      <option
-            defaultValue="true"
-            description="Transform actors to higher-level"
-            id="net.sf.orcc.simulators.normalize"
-            name="Use normalized actors">
-         <checkBox></checkBox>
-      </option>
-      <option
-            defaultValue="true"
-            description="When activated, static actors will be merged together"
-            id="net.sf.orcc.simulators.merger2"
-            name="Allow merging of actors">
-         <checkBox></checkBox>
-      </option>
-      <option
-            description="Path of the LLVM representation of the VTL"
-            id="net.sf.orcc.simulators.VTLFolder"
-            name="VTL Folder">
-         <browseFile
-               folder="true"
-               workspace="false">
-         </browseFile>
-      </option>
    </extension>
    <extension
          point="net.sf.orcc.simulators.simulators">
@@ -118,37 +44,6 @@
          </option>
          <option
                id="net.sf.orcc.simulators.inputStimulus">
-         </option>
-      </simulator>
-      <simulator
-            class="net.sf.orcc.simulators.JadeSimulatorImpl"
-            name="Jade">
-         <option
-               id="net.sf.orcc.simulators.VTLFolder">
-         </option>
-         <option
-               id="net.sf.orcc.core.xdfFile">
-         </option>
-         <option
-               id="net.sf.orcc.simulators.inputStimulus">
-         </option>
-         <option
-               id="net.sf.orcc.simulators.enableTraces">
-         </option>
-         <option
-               id="net.sf.orcc.simulators.scheduler">
-         </option>
-         <option
-               id="net.sf.orcc.simulators.optLevel">
-         </option>
-         <option
-               id="net.sf.orcc.simulators.enableComparison">
-         </option>
-         <option
-               id="net.sf.orcc.simulators.normalize">
-         </option>
-         <option
-               id="net.sf.orcc.simulators.merger2">
          </option>
       </simulator>
    </extension>
