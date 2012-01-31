@@ -1,5 +1,5 @@
 /*********************************************************
-Copyright or © or Copr. IETR/INSA: Maxime Pelcat
+Copyright or ï¿½ or Copr. IETR/INSA: Maxime Pelcat
 
 Contact mpelcat for more information:
 mpelcat@insa-rennes.fr
@@ -30,7 +30,7 @@ parallel applications.
 #define MAX_SLAVE_NAME_SIZE 10// The maximum number of slaves
 
 // Coomon to all types of graphs
-#define MAX_VERTEX_NAME_SIZE 32
+#define MAX_VERTEX_NAME_SIZE 256
 
 // CSDAG
 #define MAX_TIMING_EXPRESSION 32 // The maximum size in char of an expression defining a timing
