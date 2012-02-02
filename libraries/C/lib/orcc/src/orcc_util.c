@@ -56,7 +56,7 @@ extern char	*optarg;
 extern int getopt(int nargc, char * const *nargv, const char *ostr);
 
 //Nb Loops
-unsigned int nbLoops = 1;
+unsigned int nbLoops = 0; // 0: infinite loop.
 
 // input file
 char *input_file;
@@ -145,9 +145,6 @@ void init_orcc(int argc, char *argv[]) {
 			break;
 		case 'l':
 			nbLoops = strtoul(optarg, NULL, 10);
-			if(nbLoops == 0) {
-				nbLoops = 1;
-			}
 			break;
 		case 'm':
 			mapping_file = strdup(optarg);
