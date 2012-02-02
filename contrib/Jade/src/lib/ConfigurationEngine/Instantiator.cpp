@@ -118,15 +118,15 @@ void Instantiator::updateConnection(Connection* connection){
 		// Get same port from the actor
 		Actor* actor = source->getActor();
 		Port* srcPort = actor->getOutput(srcPortInst->getName());
-		sourceString = srcPort->getName();
-		srcPortType = srcPort->getType();
 
 		if (srcPort == NULL){
 			cerr << "A Connection refers to non-existent source port: " << srcPortInst->getName() << "of instance " << source->getId();
 			exit(0);
 		}
+		
 
 		// Set port information
+		srcPortType = srcPort->getType();
 		srcPortInst->setType(srcPortType);
 		source->setAsOutput(srcPortInst);
 	}
