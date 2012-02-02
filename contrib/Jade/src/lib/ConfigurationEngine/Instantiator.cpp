@@ -126,6 +126,7 @@ void Instantiator::updateConnection(Connection* connection){
 		
 
 		// Set port information
+		sourceString = srcPort->getName();
 		srcPortType = srcPort->getType();
 		srcPortInst->setType(srcPortType);
 		source->setAsOutput(srcPortInst);
