@@ -105,7 +105,7 @@ public:
 	 *  Initialize and run the decoder in an infinite loop. 
 	 *    No need to call the initialize function of LLVM execution.
      */
-	void run();
+	virtual void run();
 
 	/**
      *  @brief Initialize the decoder before the execution
@@ -176,7 +176,8 @@ public:
 	 *	@param externs : a list of external procedures
      */
 	void linkExternalProc(std::list<Procedure*> externs);
-private:
+
+protected:
 
 	/**
      *  @brief Static method for launching processus in threads

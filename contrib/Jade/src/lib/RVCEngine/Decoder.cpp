@@ -48,13 +48,14 @@
 #include "Jade/Core/Network.h"
 #include "Jade/Configuration/ConfigurationEngine.h"
 #include "Jade/Jit/LLVMExecution.h"
+#include "Jade/Jit/LLVMArmFix.h"
 #include "Jade/RoundRobinScheduler/RoundRobinScheduler.h"
 //------------------------------
 
 using namespace llvm;
 using namespace std;
 
-Decoder::Decoder(LLVMContext& C, Configuration* configuration, bool verbose, bool noMultiCore): Context(C){
+Decoder::Decoder(LLVMContext& C, Configuration* configuration, bool verbose, bool noMultiCore, bool armFix): Context(C){
 	
 	//Set property of the decoder
 	this->configuration = configuration;
@@ -65,13 +66,11 @@ Decoder::Decoder(LLVMContext& C, Configuration* configuration, bool verbose, boo
 	this->running = false;
 	this->scheduler = NULL;
 	this->noMultiCore = noMultiCore;
+	this->armFix = armFix;
 
 	//Create a new module that contains the current decoder
 	module = new Module("decoder", C);
 	
-	// Deactivate cross compilation yet
-	module->setTargetTriple(sys::getHostTriple());
-
 	//Configure the decoder
 	ConfigurationEngine engine(Context, verbose);
 	engine.configure(this);
@@ -90,9 +89,12 @@ Decoder::Decoder(LLVMContext& C, Configuration* configuration, bool verbose, boo
 		procSchedulers.insert(pair<Partition*, Scheduler*>(partition, procSchedul));
 	}
 
-
 	//Create execution engine
-	executionEngine = new LLVMExecution(Context, this, verbose);
+	if (armFix){
+		executionEngine = new LLVMArmFix(Context, this, verbose);
+	}else{
+		executionEngine = new LLVMExecution(Context, this, verbose);
+	}
 }
 
 Decoder::~Decoder (){

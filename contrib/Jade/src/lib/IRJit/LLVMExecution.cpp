@@ -105,8 +105,8 @@ LLVMExecution::LLVMExecution(LLVMContext& C, Decoder* decoder, bool verbose): Co
   }
   
   EngineBuilder builder(module);
-  builder.setMArch(MArch);
-  builder.setMCPU(MCPU);
+  builder.setMArch(StringRef(MArch));
+  builder.setMCPU(StringRef(MCPU));
   builder.setMAttrs(MAttrs);
   builder.setErrorStr(&ErrorMsg);
   builder.setEngineKind(ForceInterpreter

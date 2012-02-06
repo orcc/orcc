@@ -181,7 +181,10 @@ static cl::opt<bool> noMerging("nomerging", cl::desc("Deactivate merging of stat
 
 cl::list<const PassInfo*, bool, PassNameParser> PassList(cl::desc("Optimizations available:"));
 
+cl::opt<bool> ArmFix("arm-fix", cl::desc("Fix execution for ARM platform (Linux only)"));
+
 bool enableTrace = false;
+char **environnement;
 
 void clean_exit(int sig){
 	exit(0);
@@ -311,24 +314,26 @@ void startCmdLine(){
 		engine->verify(network, "error.txt");
 	}
 
-	// Print the given decoder if needed
-	if (OutputDir != ""){
-		engine->print(network, "module.txt");
-	}
-	
 	// Set input file
 	input_file = (char*)VidFile.c_str();
 
 	//Run network
 	engine->run(network);
 
+	// Print the given decoder if needed
+	if (OutputDir != ""){
+		engine->print(network, "module.txt");
+	}
+
+
 	cout << "End of Jade:" << (clock () - timer) * 1000 / CLOCKS_PER_SEC;
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv, char **envp) {
 	clock_t start = clock ();
 	LLVMContext &Context = getGlobalContext();
-	
+	environnement = envp;
+
 	// Print a stack trace if we signal out.
 	PrintStackTraceOnErrorSignal();
 	PrettyStackTraceProgram X(argc, argv);
@@ -346,7 +351,7 @@ int main(int argc, char **argv) {
 	setOptions();
 	
 	//Loading decoderEngine
-	engine = new RVCEngine(Context, VTLDir, FifoSize, SystemDir, OutputDir, noMerging, disableMultiCore, Verbose);
+	engine = new RVCEngine(Context, VTLDir, FifoSize, SystemDir, OutputDir, noMerging, disableMultiCore, Verbose, ArmFix);
 
 	if (Verbose){
 		cout << "> Core preparation finished in " << (clock () - start) * 1000 / CLOCKS_PER_SEC <<" ms.\n";

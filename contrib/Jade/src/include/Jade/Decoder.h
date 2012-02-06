@@ -85,7 +85,7 @@ public:
 	 * @param verbose : whether or not print message
 	 *
 	 */
-	Decoder(llvm::LLVMContext& C, Configuration* configuration, bool verbose = false, bool noMultiCore = false);
+	Decoder(llvm::LLVMContext& C, Configuration* configuration, bool verbose = false, bool noMultiCore = false, bool armFix = false);
 	~Decoder();
 	
 	/**
@@ -224,6 +224,9 @@ private:
 
 	/** print message */
 	bool verbose;
+
+	/** Fix execution for ARM */
+	bool armFix;
 };
 
 #endif
