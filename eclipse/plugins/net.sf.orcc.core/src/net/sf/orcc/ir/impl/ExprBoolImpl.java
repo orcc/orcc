@@ -127,7 +127,7 @@ public class ExprBoolImpl extends ExpressionImpl implements ExprBool {
 	}
 
 	@Override
-	public boolean isBooleanExpr() {
+	public boolean isExprBool() {
 		return true;
 	}
 	

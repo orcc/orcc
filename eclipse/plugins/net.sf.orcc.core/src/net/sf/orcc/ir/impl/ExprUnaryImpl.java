@@ -235,7 +235,7 @@ public class ExprUnaryImpl extends ExpressionImpl implements ExprUnary {
 	}
 
 	@Override
-	public boolean isUnaryExpr() {
+	public boolean isExprUnary() {
 		return true;
 	}
 

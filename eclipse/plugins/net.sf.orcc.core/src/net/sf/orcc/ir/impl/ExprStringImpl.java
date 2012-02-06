@@ -130,7 +130,7 @@ public class ExprStringImpl extends ExpressionImpl implements ExprString {
 	}
 
 	@Override
-	public boolean isStringExpr() {
+	public boolean isExprString() {
 		return true;
 	}
 

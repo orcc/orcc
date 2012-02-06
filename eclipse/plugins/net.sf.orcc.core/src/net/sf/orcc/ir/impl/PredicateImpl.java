@@ -173,13 +173,13 @@ public class PredicateImpl extends EObjectImpl implements Predicate {
 		// one is a "not" of the other
 		Expression e1 = thisExprs.get(0);
 		Expression e2 = otherExprs.get(0);
-		if (e1.isUnaryExpr()) {
+		if (e1.isExprUnary()) {
 			ExprUnary unary = (ExprUnary) e1;
 			if (unary.getOp() == OpUnary.LOGIC_NOT
 					&& EcoreUtil.equals(unary.getExpr(), e2)) {
 				return true;
 			}
-		} else if (e2.isUnaryExpr()) {
+		} else if (e2.isExprUnary()) {
 			ExprUnary unary = (ExprUnary) e2;
 			if (unary.getOp() == OpUnary.LOGIC_NOT
 					&& EcoreUtil.equals(unary.getExpr(), e1)) {

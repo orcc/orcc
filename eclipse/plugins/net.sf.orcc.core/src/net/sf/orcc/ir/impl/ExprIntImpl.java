@@ -175,7 +175,7 @@ public class ExprIntImpl extends ExpressionImpl implements ExprInt {
 	}
 
 	@Override
-	public boolean isIntExpr() {
+	public boolean isExprInt() {
 		return true;
 	}
 

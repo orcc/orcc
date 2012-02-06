@@ -50,8 +50,8 @@ public class ConstantPropagator extends AbstractActorVisitor<Object> {
 	@Override
 	public Object caseInstAssign(InstAssign assign) {
 		Expression value = assign.getValue();
-		if (value.isBooleanExpr() || value.isFloatExpr() || value.isIntExpr()
-				|| value.isStringExpr()) {
+		if (value.isExprBool() || value.isExprFloat() || value.isExprInt()
+				|| value.isExprString()) {
 			EList<Use> targetUses = assign.getTarget().getVariable().getUses();
 			while (!targetUses.isEmpty()) {
 				ExprVar expr = EcoreHelper.getContainerOfType(

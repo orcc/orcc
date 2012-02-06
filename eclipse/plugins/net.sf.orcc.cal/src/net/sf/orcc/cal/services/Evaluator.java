@@ -86,7 +86,7 @@ public class Evaluator extends CalSwitch<Expression> {
 	 */
 	public static int getIntValue(EObject eObject) {
 		Expression value = getValue(eObject);
-		if (value != null && value.isIntExpr()) {
+		if (value != null && value.isExprInt()) {
 			ExprInt intExpr = (ExprInt) value;
 			if (!intExpr.isLong()) {
 				return intExpr.getIntValue();
@@ -177,13 +177,13 @@ public class Evaluator extends CalSwitch<Expression> {
 	public Expression caseExpressionIf(ExpressionIf expression) {
 		Expression condition = getValue(expression.getCondition());
 
-		if (condition != null && condition.isBooleanExpr()) {
+		if (condition != null && condition.isExprBool()) {
 			if (((ExprBool) condition).isValue()) {
 				return getValue(expression.getThen());
 			} else {
 				for (ExpressionElsif elsif : expression.getElsifs()) {
 					condition = getValue(elsif.getCondition());
-					if (condition != null && condition.isBooleanExpr()) {
+					if (condition != null && condition.isExprBool()) {
 						if (((ExprBool) condition).isValue()) {
 							return getValue(elsif.getThen());
 						}
@@ -208,9 +208,9 @@ public class Evaluator extends CalSwitch<Expression> {
 		List<AstExpression> indexes = expression.getIndexes();
 		for (AstExpression index : indexes) {
 			Expression indexValue = getValue(index);
-			if (value != null && value.isListExpr()) {
+			if (value != null && value.isExprList()) {
 				ExprList list = (ExprList) value;
-				if (indexValue != null && indexValue.isIntExpr()) {
+				if (indexValue != null && indexValue.isExprInt()) {
 					ExprInt intExpr = (ExprInt) indexValue;
 					if (!intExpr.isLong()) {
 						try {
@@ -255,7 +255,7 @@ public class Evaluator extends CalSwitch<Expression> {
 		switch (op) {
 		case BITNOT: {
 			Expression value = getValue(expression.getExpression());
-			if (value != null && value.isIntExpr()) {
+			if (value != null && value.isExprInt()) {
 				ExprInt i = (ExprInt) value;
 				return i.not();
 			}
@@ -263,18 +263,18 @@ public class Evaluator extends CalSwitch<Expression> {
 		}
 		case LOGIC_NOT: {
 			Expression value = getValue(expression.getExpression());
-			if (value != null && value.isBooleanExpr()) {
+			if (value != null && value.isExprBool()) {
 				return ((ExprBool) value).not();
 			}
 			return null;
 		}
 		case MINUS: {
 			Expression value = getValue(expression.getExpression());
-			if (value != null && value.isIntExpr()) {
+			if (value != null && value.isExprInt()) {
 				ExprInt i = (ExprInt) value;
 				return i.negate();
 			}
-			if (value != null && value.isFloatExpr()) {
+			if (value != null && value.isExprFloat()) {
 				ExprFloat i = (ExprFloat) value;
 				return i.negate();
 			}

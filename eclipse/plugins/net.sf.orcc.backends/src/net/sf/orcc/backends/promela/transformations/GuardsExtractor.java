@@ -129,7 +129,7 @@ public class GuardsExtractor extends AbstractActorVisitor<Object> {
 	@Override
 	public Object caseInstAssign(InstAssign assign) {
 		// we should also consider other cases but this is enough for now
-		if (!assign.getValue().isBooleanExpr()) {
+		if (!assign.getValue().isExprBool()) {
 			guardList.add(assign.getValue());
 		}
 		return null;
@@ -173,10 +173,10 @@ public class GuardsExtractor extends AbstractActorVisitor<Object> {
 	// recursively searches through the expression and finds if the local
 	// variable derived from the Load is present
 	private void replaceVarInExpr(Expression expr, InstLoad ld) {
-		if (expr.isBinaryExpr()) {
+		if (expr.isExprBinary()) {
 			replaceVarInExpr(((ExprBinary) expr).getE1(), ld);
 			replaceVarInExpr(((ExprBinary) expr).getE2(), ld);
-		} else if (expr.isVarExpr()) {
+		} else if (expr.isExprVar()) {
 			if (((ExprVar) expr).getUse().getVariable() == ld.getTarget()
 					.getVariable()) {
 				((ExprVar) expr).setUse(IrFactory.eINSTANCE.createUse(ld

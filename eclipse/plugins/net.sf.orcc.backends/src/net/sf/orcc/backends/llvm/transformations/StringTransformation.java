@@ -131,7 +131,7 @@ public class StringTransformation extends AbstractActorVisitor<Object> {
 		for (Arg arg : parameters) {
 			if (arg.isByVal()) {
 				Expression expr = ((ArgByVal) arg).getValue();
-				if (expr.isStringExpr()) {
+				if (expr.isExprString()) {
 					String strExprVal = (((ExprString) expr).getValue());
 					value += strExprVal;
 				} else {
@@ -183,7 +183,7 @@ public class StringTransformation extends AbstractActorVisitor<Object> {
 		for (Arg arg : parameters) {
 			if (arg.isByVal()) {
 				Expression expr = ((ArgByVal) arg).getValue();
-				if (!expr.isStringExpr()) {
+				if (!expr.isExprString()) {
 					newParameters.add(arg);
 				}
 			}
@@ -204,7 +204,7 @@ public class StringTransformation extends AbstractActorVisitor<Object> {
 			for (Arg arg : parameters) {
 				if (arg.isByVal()) {
 					Expression expr = ((ArgByVal) arg).getValue();
-					if (expr.isStringExpr()) {
+					if (expr.isExprString()) {
 						String strExprVal = (((ExprString) expr).getValue());						
 						LLVMString llvmStr = new LLVMString(strExprVal);
 						

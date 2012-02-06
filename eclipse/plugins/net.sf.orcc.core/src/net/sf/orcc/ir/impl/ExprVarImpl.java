@@ -153,7 +153,7 @@ public class ExprVarImpl extends ExpressionImpl implements ExprVar {
 	}
 
 	@Override
-	public boolean isVarExpr() {
+	public boolean isExprVar() {
 		return true;
 	}
 

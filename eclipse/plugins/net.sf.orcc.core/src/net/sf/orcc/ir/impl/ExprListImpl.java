@@ -168,7 +168,7 @@ public class ExprListImpl extends ExpressionImpl implements ExprList {
 	}
 
 	@Override
-	public boolean isListExpr() {
+	public boolean isExprList() {
 		return true;
 	}
 

@@ -106,7 +106,7 @@ public class DeadCodeElimination extends AbstractActorVisitor<Object> {
 	@Override
 	public Object caseNodeIf(NodeIf node) {
 		Expression condition = node.getCondition();
-		if (condition.isBooleanExpr()) {
+		if (condition.isExprBool()) {
 			if (((ExprBool) condition).isValue()) {
 				addNodes(node.getThenNodes(), node.getJoinNode(), 0);
 			} else {

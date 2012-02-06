@@ -131,7 +131,7 @@ port map(
 >>
 
 systemActorParameter(parameter, value) ::=<<
-<if (value.stringExpr)><parameter> =\> "<value>"<else><parameter> =\> <value><endif>
+<if (value.exprString)><parameter> =\> "<value>"<else><parameter> =\> <value><endif>
 >>
 
 actorIOPorts(port,dir) ::= <<

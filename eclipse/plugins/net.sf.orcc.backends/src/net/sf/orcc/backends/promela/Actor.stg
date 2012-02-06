@@ -59,10 +59,10 @@ varDecl(variable, sep="") ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 Constant(constant) ::= <<
-<if (constant.booleanExpr)><printBool(constant)><
-elseif (constant.intExpr)><printInt(constant)><
-elseif (constant.listExpr)><printList(constant)><
-elseif (constant.stringExpr)><printString(constant)><
+<if (constant.exprBool)><printBool(constant)><
+elseif (constant.exprInt)><printInt(constant)><
+elseif (constant.exprList)><printList(constant)><
+elseif (constant.exprString)><printString(constant)><
 endif>
 >>
 
@@ -111,7 +111,7 @@ endif>
 >>
 
 printFormat(parameter) ::= <<
-<if (parameter.stringExpr)
+<if (parameter.exprString)
 >"<parameter>"<
 else
 > "%<printFormatType(parameter.type)>" <
@@ -119,7 +119,7 @@ endif>
 >>
 
 printParameter(parameter) ::= <<
-<if (!parameter.stringExpr)>, <parameter><endif>
+<if (!parameter.exprString)>, <parameter><endif>
 >>
 
 printCall(call) ::= << 

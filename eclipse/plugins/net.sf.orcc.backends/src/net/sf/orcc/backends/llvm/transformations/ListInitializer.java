@@ -51,7 +51,7 @@ public class ListInitializer extends AbstractActorVisitor<Object> {
 			TypeList type = (TypeList) var.getType();
 			Expression init = var.getInitialValue();
 
-			if (init.isListExpr()) {
+			if (init.isExprList()) {
 				checkSize(type.getDimensions(), ((ExprList) init).getValue(), 0);
 			}
 		}
@@ -68,7 +68,7 @@ public class ListInitializer extends AbstractActorVisitor<Object> {
 		}
 
 		for (Expression init : inits) {
-			if (init.isListExpr()) {
+			if (init.isExprList()) {
 				checkSize(dims, ((ExprList) init).getValue(), idx + 1);
 			}
 		}

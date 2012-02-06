@@ -92,7 +92,7 @@ public class UnaryListRemoval extends AbstractActorVisitor<Object> {
 							.getDefs().get(0), InstStore.class);
 
 					Expression expr = store.getValue();
-					if (expr.isVarExpr()) {
+					if (expr.isExprVar()) {
 						newTarget = ((ExprVar) expr).getUse().getVariable();
 						newTarget.setName("scalar_" + newTarget.getName());
 					} else {

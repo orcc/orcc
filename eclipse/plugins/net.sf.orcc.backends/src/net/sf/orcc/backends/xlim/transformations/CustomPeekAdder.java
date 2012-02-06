@@ -87,7 +87,7 @@ public class CustomPeekAdder extends AbstractActorVisitor<Object> {
 				Var newVar = load.getTarget().getVariable();
 
 				Expression indexExpr = load.getIndexes().get(0);
-				if (indexExpr.isIntExpr()) {
+				if (indexExpr.isExprInt()) {
 					indexToVariableMap.put(((ExprInt) indexExpr).getIntValue(),
 							newVar);
 				} else {

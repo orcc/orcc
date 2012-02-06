@@ -59,9 +59,9 @@ private <if(variable.initialized)>
 ///////////////////////////////////////////////////////////////////////////////
 
 printExpressionParameter(arg) ::= <%
-<if (arg.value.booleanExpr || arg.value.intExpr || arg.value.floatExpr || arg.value.listExpr)>
+<if (arg.value.exprBool || arg.value.exprInt || arg.value.exprFloat || arg.value.exprList)>
 <Constant(arg.value)>
-<elseif (arg.value.binaryExpr)>
+<elseif (arg.value.exprBinary)>
 (<arg.value>)
 <else>
 <arg.value>
@@ -149,7 +149,7 @@ endif>
 >>
 
 printIndex(index) ::= <<
-[<if (index.type.long)>(int) <if (index.binaryExpr)> (<index>) <else><index><endif><else><index><endif>]
+[<if (index.type.long)>(int) <if (index.exprBinary)> (<index>) <else><index><endif><else><index><endif>]
 >>
 
 

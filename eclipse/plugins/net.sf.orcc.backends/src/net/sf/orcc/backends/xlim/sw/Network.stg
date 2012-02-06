@@ -88,7 +88,7 @@ p<id>_<port.name> = create<dir>putPort(p<id>, "<port.name>", <n>);
 >>
 
 initializeParameter(argument) ::= <<
-setParameter(p<instance.id>, "<argument.variable.name>", <if(argument.value.stringExpr)><Constant(argument.value)><else>"<Constant(argument.value)>"<endif>);
+setParameter(p<instance.id>, "<argument.variable.name>", <if(argument.value.exprString)><Constant(argument.value)><else>"<Constant(argument.value)>"<endif>);
 >>
 
 /////////////////////////////
@@ -105,10 +105,10 @@ connectPorts(p<connection.source.id>_<connection.sourcePort.name>, p<connection.
 ///////////////////////////////////////////////////////////////////////////////
 
 Constant(constant) ::= <<
-<if(constant.intExpr)><printExprInt(constant)><
-elseif(constant.booleanExpr)><printExprBool(constant)><
-elseif(constant.stringExpr)><printExprString(constant)><
-elseif(constant.listExpr)><printExprList(constant)><endif>
+<if(constant.exprInt)><printExprInt(constant)><
+elseif(constant.exprBool)><printExprBool(constant)><
+elseif(constant.exprString)><printExprString(constant)><
+elseif(constant.exprList)><printExprList(constant)><endif>
 >>
 
 printExprBool(constant) ::= <<

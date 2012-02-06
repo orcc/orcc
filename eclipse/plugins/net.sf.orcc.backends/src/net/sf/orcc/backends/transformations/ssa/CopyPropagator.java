@@ -63,7 +63,7 @@ public class CopyPropagator extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseInstAssign(InstAssign assign) {
-		if (assign.getValue().isVarExpr()) {
+		if (assign.getValue().isExprVar()) {
 			Var source = ((ExprVar) assign.getValue()).getUse().getVariable();
 			Var target = assign.getTarget().getVariable();
 			EList<Use> targetUses = target.getUses();

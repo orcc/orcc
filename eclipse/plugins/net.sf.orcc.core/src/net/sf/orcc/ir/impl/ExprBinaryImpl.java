@@ -276,7 +276,7 @@ public class ExprBinaryImpl extends ExpressionImpl implements ExprBinary {
 	}
 
 	@Override
-	public boolean isBinaryExpr() {
+	public boolean isExprBinary() {
 		return true;
 	}
 

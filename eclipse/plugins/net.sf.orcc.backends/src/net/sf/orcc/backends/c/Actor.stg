@@ -21,11 +21,11 @@ getPortName(port) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 Constant(constant) ::= <<
-<if (constant.booleanExpr)><printBool(constant)><
-elseif (constant.intExpr)><printInt(constant)><
-elseif (constant.floatExpr)><printFloat(constant)><
-elseif (constant.listExpr)><printList(constant)><
-elseif (constant.stringExpr)><printString(constant)><
+<if (constant.exprBool)><printBool(constant)><
+elseif (constant.exprInt)><printInt(constant)><
+elseif (constant.exprFloat)><printFloat(constant)><
+elseif (constant.exprList)><printList(constant)><
+elseif (constant.exprString)><printString(constant)><
 endif>
 >>
 
@@ -156,7 +156,7 @@ endif>
 >>
 
 printFormat(parameter) ::= <<
-<if (parameter.value.stringExpr)
+<if (parameter.value.exprString)
 ><parameter.value><
 else
 > "%<printFormatType(parameter.value.type)>" <
@@ -164,7 +164,7 @@ endif>
 >>
 
 printPrintfParam(parameter) ::= <<
-<if (!parameter.value.stringExpr)>, <parameter.value><endif>
+<if (!parameter.value.exprString)>, <parameter.value><endif>
 >>
 
 printCall(call) ::= <<
@@ -599,7 +599,7 @@ parameters(arguments) ::= <<
 >>
 
 printInstanceParameter(name, value) ::= <<
-<if (value.listExpr)>
+<if (value.exprList)>
 static <if (value.innermostType.uintType)>unsigned <endif>int <name><listSize(value.type.dimensions)> = <Constant(value)>;
 <else>
 #define <name> <Constant(value)>

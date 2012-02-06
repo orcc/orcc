@@ -340,26 +340,26 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 		Expression value1 = phi.getValues().get(1);
 		if (containingNode.isIfNode()) {
 			NodeIf nodeIf = (NodeIf) containingNode;
-			if (value0.isVarExpr()) {
+			if (value0.isExprVar()) {
 				NodeBlock block0 = IrFactory.eINSTANCE.createNodeBlock();
 				nodeIf.getThenNodes().add(block0);
 				values.set(0, castExpression(value0, block0, 0));
 			}
-			if (value1.isVarExpr()) {
+			if (value1.isExprVar()) {
 				NodeBlock block1 = IrFactory.eINSTANCE.createNodeBlock();
 				nodeIf.getElseNodes().add(block1);
 				values.set(1, castExpression(value1, block1, 0));
 			}
 		} else {
 			NodeWhile nodeWhile = (NodeWhile) containingNode;
-			if (value0.isVarExpr()) {
+			if (value0.isExprVar()) {
 				NodeBlock block = IrFactory.eINSTANCE.createNodeBlock();
 				EcoreHelper.getContainingList(containingNode).add(indexNode,
 						block);
 				indexNode++;
 				values.set(0, castExpression(value0, block, 0));
 			}
-			if (value1.isVarExpr()) {
+			if (value1.isExprVar()) {
 				NodeBlock block = IrFactory.eINSTANCE.createNodeBlock();
 				nodeWhile.getNodes().add(block);
 				values.set(1, castExpression(value1, block, 0));
@@ -424,7 +424,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 	private Expression castExpression(Expression expr) {
 		if (needCast(expr.getType(), parentType)) {
 			Var oldVar;
-			if (expr.isVarExpr()) {
+			if (expr.isExprVar()) {
 				oldVar = ((ExprVar) expr).getUse().getVariable();
 			} else {
 				oldVar = procedure.newTempLocalVariable(
@@ -453,7 +453,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 	private Expression castExpression(Expression expr, NodeBlock node, int index) {
 		if (needCast(expr.getType(), parentType)) {
 			Var oldVar;
-			if (expr.isVarExpr()) {
+			if (expr.isExprVar()) {
 				oldVar = ((ExprVar) expr).getUse().getVariable();
 			} else {
 				oldVar = procedure.newTempLocalVariable(

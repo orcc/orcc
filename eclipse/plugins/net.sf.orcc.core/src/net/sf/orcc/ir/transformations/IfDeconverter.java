@@ -144,7 +144,7 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 					&& parentNodes == nodes) {
 				return nodeIf.getThenNodes();
 			} else {
-				if (condition.isUnaryExpr()) {
+				if (condition.isExprUnary()) {
 					ExprUnary unary = (ExprUnary) condition;
 					Expression expr = unary.getExpr();
 

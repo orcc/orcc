@@ -91,12 +91,12 @@ stateVars() ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 expression(expr) ::= <<
-<if(expr.binaryExpr)><printBinaryExpr(expr)><
-elseif(expr.unaryExpr)><printUnaryExpr(expr)><
-elseif(expr.intExpr)><printIntExpr(expr)><
-elseif(expr.floatExpr)><printFloatExpr(expr)><
-elseif(expr.booleanExpr)><printBoolExpr(expr)><
-elseif(expr.varExpr)><printVarExpr(expr)><endif>
+<if(expr.exprBinary)><printBinaryExpr(expr)><
+elseif(expr.exprUnary)><printUnaryExpr(expr)><
+elseif(expr.exprInt)><printIntExpr(expr)><
+elseif(expr.exprFloat)><printFloatExpr(expr)><
+elseif(expr.exprBool)><printBoolExpr(expr)><
+elseif(expr.exprVar)><printVarExpr(expr)><endif>
 >>
 
 

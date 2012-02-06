@@ -118,7 +118,7 @@ public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 	@Override
 	public Expression caseInstAssign(InstAssign assign) {
 		Expression value = assign.getValue();
-		if (value.isBinaryExpr() || value.isUnaryExpr()) {
+		if (value.isExprBinary() || value.isExprUnary()) {
 			assign.setValue(doSwitch(value));
 		}
 		return null;

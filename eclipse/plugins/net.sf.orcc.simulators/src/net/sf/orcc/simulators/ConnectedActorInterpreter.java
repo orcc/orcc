@@ -129,7 +129,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		for (Arg arg : arguments) {
 			if (arg.isByVal()) {
 				Expression expr = ((ArgByVal) arg).getValue();
-				if (expr.isStringExpr()) {
+				if (expr.isExprString()) {
 					// String characters rework for escaped control
 					// management
 					String str = ((ExprString) expr).getValue();

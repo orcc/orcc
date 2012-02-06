@@ -52,55 +52,55 @@ public interface Expression extends EObject {
 	 * 
 	 * @return true if the expression is a binary expression
 	 */
-	public boolean isBinaryExpr();
+	public boolean isExprBinary();
 
 	/**
 	 * Returns true if the expression is a boolean expression.
 	 * 
 	 * @return true if the expression is a boolean expression
 	 */
-	public boolean isBooleanExpr();
+	public boolean isExprBool();
 
 	/**
 	 * Returns true if the expression is a float expression.
 	 * 
 	 * @return true if the expression is a float expression
 	 */
-	public boolean isFloatExpr();
+	public boolean isExprFloat();
 
 	/**
 	 * Returns true if the expression is an integer expression.
 	 * 
 	 * @return true if the expression is an integer expression
 	 */
-	public boolean isIntExpr();
+	public boolean isExprInt();
 
 	/**
 	 * Returns true if the expression is a list expression.
 	 * 
 	 * @return true if the expression is a list expression
 	 */
-	public boolean isListExpr();
+	public boolean isExprList();
 
 	/**
 	 * Returns true if the expression is a string expression.
 	 * 
 	 * @return true if the expression is a string expression
 	 */
-	public boolean isStringExpr();
+	public boolean isExprString();
 
 	/**
 	 * Returns true if the expression is a unary expression.
 	 * 
 	 * @return true if the expression is a unary expression
 	 */
-	public boolean isUnaryExpr();
+	public boolean isExprUnary();
 
 	/**
 	 * Returns true if the expression is a variable expression.
 	 * 
 	 * @return true if the expression is a variable expression
 	 */
-	public boolean isVarExpr();
+	public boolean isExprVar();
 
 }

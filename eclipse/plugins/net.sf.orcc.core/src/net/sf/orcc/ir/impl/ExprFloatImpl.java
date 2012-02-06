@@ -153,7 +153,7 @@ public class ExprFloatImpl extends ExpressionImpl implements ExprFloat {
 	}
 
 	@Override
-	public boolean isFloatExpr() {
+	public boolean isExprFloat() {
 		return true;
 	}
 

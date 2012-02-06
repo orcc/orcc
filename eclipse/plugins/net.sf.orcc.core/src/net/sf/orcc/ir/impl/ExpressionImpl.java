@@ -61,42 +61,42 @@ public abstract class ExpressionImpl extends EObjectImpl implements Expression {
 	}
 
 	@Override
-	public boolean isBinaryExpr() {
+	public boolean isExprBinary() {
 		return false;
 	}
 
 	@Override
-	public boolean isBooleanExpr() {
+	public boolean isExprBool() {
 		return false;
 	}
 
 	@Override
-	public boolean isFloatExpr() {
+	public boolean isExprFloat() {
 		return false;
 	}
 
 	@Override
-	public boolean isIntExpr() {
+	public boolean isExprInt() {
 		return false;
 	}
 
 	@Override
-	public boolean isListExpr() {
+	public boolean isExprList() {
 		return false;
 	}
 
 	@Override
-	public boolean isStringExpr() {
+	public boolean isExprString() {
 		return false;
 	}
 
 	@Override
-	public boolean isUnaryExpr() {
+	public boolean isExprUnary() {
 		return false;
 	}
 
 	@Override
-	public boolean isVarExpr() {
+	public boolean isExprVar() {
 		return false;
 	}
 

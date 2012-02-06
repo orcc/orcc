@@ -59,7 +59,7 @@ public class InstPhiTransformation extends AbstractActorVisitor<Object> {
 
 		// Remove local variable with index = 0 from value
 		for (Expression value : values) {
-			if (value.isVarExpr()) {
+			if (value.isExprVar()) {
 				Var source = ((ExprVar) value).getUse().getVariable();
 
 				// Local variable must not be a parameter of the procedure
@@ -94,7 +94,7 @@ public class InstPhiTransformation extends AbstractActorVisitor<Object> {
 	}
 
 	public Expression clean(Expression oldExpr) {
-		if (oldExpr.isVarExpr()) {
+		if (oldExpr.isExprVar()) {
 			Var var = ((ExprVar) oldExpr).getUse().getVariable();
 
 			// Local variable must not be a parameter of the procedure

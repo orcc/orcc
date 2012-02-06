@@ -508,10 +508,10 @@ fifo(port) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 Constant(constant, type) ::= <<
-<if (constant.booleanExpr)><printBool(constant)><
-elseif(constant.intExpr)><printInt(constant)><
-elseif(constant.listExpr)><printList(constant, type)><
-elseif(constant.stringExpr)><printString(constant)><
+<if (constant.exprBool)><printBool(constant)><
+elseif(constant.exprInt)><printInt(constant)><
+elseif(constant.exprList)><printList(constant, type)><
+elseif(constant.exprString)><printString(constant)><
 endif>
 >>
 
@@ -557,7 +557,7 @@ Var(var) ::= <<
 >>
 
 Expr(expr) ::= <<
-<if(expr.varExpr)><Var(expr.use.variable)><else><Constant(expr, expr.type)><endif>
+<if(expr.exprVar)><Var(expr.use.variable)><else><Constant(expr, expr.type)><endif>
 >>
 
 indexes(indexes) ::= <<
@@ -688,7 +688,7 @@ endif>
 >>
 
 printStore(store) ::= <<
-<if(store.value.intExpr || store.value.booleanExpr)
+<if(store.value.exprInt || store.value.exprBool)
 >store <store.target.variable.type> <store.value>, <store.target.variable.type>* <Var(store.target.variable)><
 else
 >store <store.value.type> <Expr(store.value)>, <store.target.variable.type>* <Var(store.target.variable)><
