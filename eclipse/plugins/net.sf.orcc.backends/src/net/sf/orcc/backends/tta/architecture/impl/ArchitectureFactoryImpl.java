@@ -535,9 +535,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		Socket gcu_o1 = createOutputSocket("gcu_o1", segments);
 
 		// Ports
-		Port pc = createPort("pc", 13, true, true);
+		Port pc = createPort("pc", 32, true, true);
 		pc.connect(gcu_i1);
-		Port ra = createPort("ra", 13, false, false);
+		Port ra = createPort("ra", 32, false, false);
 		ra.connect(gcu_i2);
 		ra.connect(gcu_o1);
 
@@ -1135,8 +1135,8 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 			int aluNb) {
 		TTA tta = createTTA(name);
 		// Address spaces
-		tta.setData(createAddressSpace("data", 8, 0, 131071));
-		tta.setProgram(createAddressSpace("instructions", 8, 0, 8191));
+		tta.setData(createAddressSpace("data", 8, 0, 1));
+		tta.setProgram(createAddressSpace("instructions", 8, 0, 60000));
 		// Buses
 		for (int i = 0; i < busNb; i++) {
 			Bus bus = createBusDefault(i, 32);
