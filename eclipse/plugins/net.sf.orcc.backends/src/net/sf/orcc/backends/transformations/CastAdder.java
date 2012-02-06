@@ -28,10 +28,13 @@
  */
 package net.sf.orcc.backends.transformations;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.backends.instructions.InstCast;
 import net.sf.orcc.backends.instructions.InstructionsFactory;
+import net.sf.orcc.ir.Arg;
+import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -56,7 +59,9 @@ import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
@@ -221,6 +226,73 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 
 					call.getBlock().add(indexInst + 1, cast);
 				}
+			}
+		} else {
+			// Call to print procedure : see if integer parameter cast is
+			// necessary (LLVM only)
+			EList<Arg> arguments = call.getParameters();
+			List<Instruction> castInstrToAdd = new ArrayList<Instruction>();
+			List<String> varCasted = new ArrayList<String>();
+
+			// Evaluate every argument of call instruction
+			for (Arg callArg : arguments) {
+
+				Expression exprArg = null;
+				if (callArg.isByVal()) {
+					exprArg = ((ArgByVal) callArg).getValue();
+
+					if (!(exprArg instanceof ExprVar)) {
+						System.out
+								.println("[Error] unable to add a cast for a non ExprVar call parameter : "
+										+ exprArg.getClass());
+					} else if ((exprArg.getType().isInt() || exprArg.getType()
+							.isUint())
+							&& exprArg.getType().getSizeInBits() != 32) {
+
+						Var source = ((ExprVar) exprArg).getUse().getVariable();
+
+						// If variable is used more than one time in call
+						// arguments list, we add a cast instruction only for
+						// the first occurence
+						if (varCasted.contains(source.getName())) {
+							continue;
+						} else {
+							// Add var name to the list of alredy casted vars
+							varCasted.add(source.getName());
+						}
+
+						// target type must be now on 32 bits
+						Type targetType = IrUtil.copy(exprArg.getType());
+						if (targetType.isInt()) {
+							((TypeInt) targetType).setSize(32);
+						} else if (targetType.isUint()) {
+							((TypeUint) targetType).setSize(32);
+						}
+
+						// target name and type are updated
+						Var target = IrUtil.copy(source);
+						target.setType(targetType);
+						target.setName(source.getName() + "_32");
+
+						// Update variable used in call parameter
+						((ExprVar) exprArg).getUse().setVariable(target);
+
+						// Create the concrete cast instruction
+						Instruction castInstr = InstructionsFactory.eINSTANCE
+								.createInstCast(source, target);
+
+						// Append cast instruction to tempoary list
+						castInstrToAdd.add(castInstr);
+					}
+				} else {
+					System.out
+							.println("[Error] ArgByRef : unsupported print argument");
+				}
+			}
+			// Add cast instructions just before call
+			NodeBlock debugBlock = call.getBlock();
+			for (Instruction instr : castInstrToAdd) {
+				debugBlock.add(indexInst++, instr);
 			}
 		}
 		return null;
