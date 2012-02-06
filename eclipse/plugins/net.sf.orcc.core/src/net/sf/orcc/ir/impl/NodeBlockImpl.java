@@ -159,7 +159,7 @@ public class NodeBlockImpl extends NodeImpl implements NodeBlock {
 	}
 
 	@Override
-	public boolean isBlockNode() {
+	public boolean isNodeBlock() {
 		return true;
 	}
 

@@ -101,7 +101,7 @@ public class IrUtil {
 			}
 		} else {
 			// The given expression is contained in the condition of If/While
-			if (containingNode.isWhileNode()) {
+			if (containingNode.isNodeWhile()) {
 				NodeBlock joinNode = ((NodeWhile) containingNode).getJoinNode();
 				joinNode.add(instruction);
 			} else {
@@ -237,7 +237,7 @@ public class IrUtil {
 			nodes.add(block);
 		} else {
 			Node node = nodes.get(0);
-			if (node.isBlockNode()) {
+			if (node.isNodeBlock()) {
 				block = (NodeBlock) node;
 			} else {
 				block = IrFactoryImpl.eINSTANCE.createNodeBlock();
@@ -263,7 +263,7 @@ public class IrUtil {
 			nodes.add(block);
 		} else {
 			Node node = nodes.get(nodes.size() - 1);
-			if (node.isBlockNode()) {
+			if (node.isNodeBlock()) {
 				block = (NodeBlock) node;
 			} else {
 				block = IrFactoryImpl.eINSTANCE.createNodeBlock();
@@ -275,7 +275,7 @@ public class IrUtil {
 	}
 
 	private static boolean isWhileJoinNode(Node node) {
-		if (node.isBlockNode()) {
+		if (node.isNodeBlock()) {
 			NodeWhile nodeWhile = EcoreHelper.getContainerOfType(node,
 					NodeWhile.class);
 			return (nodeWhile != null && nodeWhile.getJoinNode() == node);

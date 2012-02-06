@@ -339,9 +339,9 @@ printNodes(nodes) ::= <<
 >>
 
 printNode(node) ::= <<
-<if(node.blockNode)><printBlockNode(node)><
-elseif(node.ifNode)><printIfNode(node)><
-elseif(node.whileNode)><printWhileNode(node)><endif>
+<if(node.nodeBlock)><printBlockNode(node)><
+elseif(node.nodeIf)><printIfNode(node)><
+elseif(node.nodeWhile)><printWhileNode(node)><endif>
 >>
 
 printBlockNode(blkNode) ::= <<

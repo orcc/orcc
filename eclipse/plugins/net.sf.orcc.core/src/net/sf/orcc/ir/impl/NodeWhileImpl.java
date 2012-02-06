@@ -283,7 +283,7 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	}
 
 	@Override
-	public boolean isWhileNode() {
+	public boolean isNodeWhile() {
 		return true;
 	}
 

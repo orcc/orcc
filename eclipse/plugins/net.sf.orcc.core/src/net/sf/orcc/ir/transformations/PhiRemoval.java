@@ -123,7 +123,7 @@ public class PhiRemoval extends AbstractActorVisitor<Object> {
 		// the node before the while.
 		if (indexNode > 0) {
 			Node previousNode = nodes.get(indexNode - 1);
-			if (previousNode.isBlockNode()) {
+			if (previousNode.isNodeBlock()) {
 				targetBlock = (NodeBlock) previousNode;
 			} else {
 				targetBlock = IrFactory.eINSTANCE.createNodeBlock();

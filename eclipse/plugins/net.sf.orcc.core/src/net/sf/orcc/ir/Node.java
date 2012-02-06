@@ -66,20 +66,20 @@ public interface Node extends EObject {
 	 * 
 	 * @return <code>true</code> if this node is a NodeBlock
 	 */
-	boolean isBlockNode();
+	boolean isNodeBlock();
 
 	/**
 	 * Returns <code>true</code> if this node is an NodeIf.
 	 * 
 	 * @return <code>true</code> if this node is an NodeIf
 	 */
-	boolean isIfNode();
+	boolean isNodeIf();
 
 	/**
 	 * Returns <code>true</code> if this node is a NodeWhile.
 	 * 
 	 * @return <code>true</code> if this node is a NodeWhile
 	 */
-	boolean isWhileNode();
+	boolean isNodeWhile();
 
 }

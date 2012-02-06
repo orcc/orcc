@@ -93,17 +93,17 @@ public abstract class NodeImpl extends EObjectImpl implements Node {
 	}
 
 	@Override
-	public boolean isBlockNode() {
+	public boolean isNodeBlock() {
 		return false;
 	}
 
 	@Override
-	public boolean isIfNode() {
+	public boolean isNodeIf() {
 		return false;
 	}
 
 	@Override
-	public boolean isWhileNode() {
+	public boolean isNodeWhile() {
 		return false;
 	}
 

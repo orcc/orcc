@@ -319,7 +319,7 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 			return false;
 		} else if (nodes.size() == 1) {
 			Node node = nodes.get(0);
-			if (node.isBlockNode()) {
+			if (node.isNodeBlock()) {
 				return !((NodeBlock) node).getInstructions().isEmpty();
 			}
 		}
@@ -329,7 +329,7 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 	}
 
 	@Override
-	public boolean isIfNode() {
+	public boolean isNodeIf() {
 		return true;
 	}
 

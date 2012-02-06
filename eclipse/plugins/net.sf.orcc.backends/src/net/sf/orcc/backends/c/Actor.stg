@@ -264,9 +264,9 @@ endif>}>
 >>
 
 printNodes(nodes) ::= <<
-<nodes: {node | <if (node.blockNode)><printBlockNode(node)><
-elseif (node.ifNode)><printIfNode(node)><
-elseif (node.whileNode)><printWhileNode(node)><
+<nodes: {node | <if (node.nodeBlock)><printBlockNode(node)><
+elseif (node.nodeIf)><printIfNode(node)><
+elseif (node.nodeWhile)><printWhileNode(node)><
 endif>}>
 >>
 

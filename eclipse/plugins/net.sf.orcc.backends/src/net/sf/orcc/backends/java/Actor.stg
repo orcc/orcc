@@ -158,18 +158,16 @@ printIndex(index) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 printNodes(nodes) ::= <<
-<nodes: {node | <if (node.blockNode)><printBlockNode(node, actor)><
-elseif (node.ifNode)><printIfNode(node, actor)><
-elseif (node.whileNode)><printWhileNode(node, actor)><
+<nodes: {node | <if (node.nodeBlock)><printBlockNode(node, actor)><
+elseif (node.nodeIf)><printIfNode(node, actor)><
+elseif (node.nodeWhile)><printWhileNode(node, actor)><
 endif>}; separator="\n">
 >>
 
-// block node
 printBlockNode(blockNode, actor) ::= <<
 <printInstructions(blockNode.instructions, actor)>
 >>
 
-// if node
 printIfNode(ifNode, actor) ::= <<
 
 if (<ifNode.condition>) {
@@ -180,7 +178,6 @@ if (<ifNode.condition>) {
 <printBlockNode(ifNode.joinNode, actor)>
 >>
 
-// while node
 printWhileNode(whileNode, actor) ::= <<
 
 while (<whileNode.condition>) {

@@ -338,7 +338,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 		Node containingNode = (Node) phi.eContainer().eContainer();
 		Expression value0 = phi.getValues().get(0);
 		Expression value1 = phi.getValues().get(1);
-		if (containingNode.isIfNode()) {
+		if (containingNode.isNodeIf()) {
 			NodeIf nodeIf = (NodeIf) containingNode;
 			if (value0.isExprVar()) {
 				NodeBlock block0 = IrFactory.eINSTANCE.createNodeBlock();
