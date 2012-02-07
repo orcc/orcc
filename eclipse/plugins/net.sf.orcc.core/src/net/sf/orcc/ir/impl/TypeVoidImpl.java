@@ -29,7 +29,6 @@
 package net.sf.orcc.ir.impl;
 
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeVoid;
 
 import org.eclipse.emf.ecore.EClass;
@@ -44,28 +43,11 @@ import org.eclipse.emf.ecore.EClass;
 public class TypeVoidImpl extends TypeImpl implements TypeVoid {
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected TypeVoidImpl() {
 		super();
-	}
-
-	/**
-	 * Return -2 if obj is not an instance of TypeVoid, 0 if it is
-	 * 
-	 * @param obj
-	 *            Type to compare to
-	 * @return 0 or -2
-	 */
-	@Override
-	public int compareTo(Type obj) {
-		if (obj instanceof TypeVoid) {
-			return 0;
-		} else {
-			return -2;
-		}
 	}
 
 	@Override
@@ -74,15 +56,14 @@ public class TypeVoidImpl extends TypeImpl implements TypeVoid {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
 	protected EClass eStaticClass() {
 		return IrPackage.Literals.TYPE_VOID;
 	}
-	
+
 	@Override
 	public int getSizeInBits() {
 		return 0;

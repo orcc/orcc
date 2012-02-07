@@ -7,7 +7,6 @@
 package net.sf.orcc.ir.impl;
 
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeBool;
 
 import org.eclipse.emf.ecore.EClass;
@@ -27,25 +26,6 @@ public class TypeBoolImpl extends TypeImpl implements TypeBool {
 	 */
 	protected TypeBoolImpl() {
 		super();
-	}
-
-	/**
-	 * Return 0 if obj is an instance of TypeBool, -2 if not
-	 * 
-	 * @param obj
-	 *            Type to compare to
-	 * @return 0 or -2
-	 */
-	@Override
-	public int compareTo(Type obj) {
-		int result;
-		if (obj instanceof TypeBool) {
-			result = 0;
-		} else {
-			result = -2;
-		}
-
-		return result;
 	}
 
 	@Override

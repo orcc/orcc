@@ -29,7 +29,6 @@
 package net.sf.orcc.ir.impl;
 
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeFloat;
 
 import org.eclipse.emf.ecore.EClass;
@@ -43,36 +42,11 @@ import org.eclipse.emf.ecore.EClass;
 public class TypeFloatImpl extends TypeImpl implements TypeFloat {
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected TypeFloatImpl() {
 		super();
-	}
-
-	/**
-	 * Return -2 if obj is not an instance of TypeFloat. If it is, return -1 if
-	 * its size (in bits) is greater than this size, 0 if it is equal, and 1 if
-	 * its size is lesser.
-	 * 
-	 * @param obj
-	 *            Type to compare to
-	 * @return int
-	 */
-	@Override
-	public int compareTo(Type obj) {
-		if (obj instanceof TypeFloat) {
-			if (this.getSizeInBits() < obj.getSizeInBits()) {
-				return -1;
-			} else if (this.getSizeInBits() == obj.getSizeInBits()) {
-				return 0;
-			} else {
-				return 1;
-			}
-		} else {
-			return -2;
-		}
 	}
 
 	@Override
@@ -81,15 +55,14 @@ public class TypeFloatImpl extends TypeImpl implements TypeFloat {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
 	protected EClass eStaticClass() {
 		return IrPackage.Literals.TYPE_FLOAT;
 	}
-	
+
 	@Override
 	public int getSizeInBits() {
 		return 32;

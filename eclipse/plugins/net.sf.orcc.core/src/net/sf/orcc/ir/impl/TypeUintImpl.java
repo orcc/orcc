@@ -29,7 +29,6 @@
 package net.sf.orcc.ir.impl;
 
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeUint;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -62,30 +61,6 @@ public class TypeUintImpl extends TypeImpl implements TypeUint {
 	 */
 	protected TypeUintImpl() {
 		super();
-	}
-
-	/**
-	 * Return -2 if obj is not an instance of TypeUint. If it is, return -1 if
-	 * its size (in bits) is greater than this size, 0 if it is equal, and 1 if
-	 * its size is lesser.
-	 * 
-	 * @param obj
-	 *            Type to compare to
-	 * @return int
-	 */
-	@Override
-	public int compareTo(Type obj) {
-		if (obj instanceof TypeUint) {
-			if (this.getSizeInBits() < obj.getSizeInBits()) {
-				return -1;
-			} else if (this.getSizeInBits() == obj.getSizeInBits()) {
-				return 0;
-			} else {
-				return 1;
-			}
-		} else {
-			return -2;
-		}
 	}
 
 	/**

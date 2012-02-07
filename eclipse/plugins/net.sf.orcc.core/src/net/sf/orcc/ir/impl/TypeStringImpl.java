@@ -29,7 +29,6 @@
 package net.sf.orcc.ir.impl;
 
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeString;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -68,22 +67,6 @@ public class TypeStringImpl extends TypeImpl implements TypeString {
 	 */
 	protected TypeStringImpl() {
 		super();
-	}
-
-	/**
-	 * Return -2 if obj is not an instance of TypeString, 0 if it is
-	 * 
-	 * @param obj
-	 *            Type to compare to
-	 * @return 0 or -2
-	 */
-	@Override
-	public int compareTo(Type obj) {
-		if (obj instanceof TypeString) {
-			return 0;
-		} else {
-			return -2;
-		}
 	}
 
 	/**

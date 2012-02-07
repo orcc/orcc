@@ -110,30 +110,6 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 	}
 
 	/**
-	 * Return -2 if obj is not an instance of TypeList. If it is, return -1 if
-	 * its size (in bits) is greater than this size, 0 if it is equal, and 1 if
-	 * its size is lesser.
-	 * 
-	 * @param obj
-	 *            Type to compare to
-	 * @return int
-	 */
-	@Override
-	public int compareTo(Type obj) {
-		if (obj instanceof TypeList && type.equals(obj)) {
-			if (this.getSize() < ((TypeList) obj).getSize()) {
-				return -1;
-			} else if (this.getSize() == ((TypeList) obj).getSize()) {
-				return 0;
-			} else {
-				return 1;
-			}
-		} else {
-			return -2;
-		}
-	}
-
-	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
