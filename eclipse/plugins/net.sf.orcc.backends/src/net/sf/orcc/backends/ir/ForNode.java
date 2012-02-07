@@ -161,5 +161,12 @@ public interface ForNode extends NodeSpecific {
 	 * @generated
 	 */
 	EList<Expression> getInit();
+	
+	/**
+	 * Return <code>true</code> if the node is a for node
+	 * 
+	 * @return <code>true</code> if the instruction is a for node
+	 */
+	public boolean isForNode();
 
 } // ForNode

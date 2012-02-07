@@ -10,6 +10,8 @@ import net.sf.orcc.backends.ir.InstCast;
 import net.sf.orcc.backends.ir.IrSpecificPackage;
 
 import net.sf.orcc.ir.Def;
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Use;
 
 import net.sf.orcc.ir.impl.InstSpecificImpl;
@@ -141,6 +143,88 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
+	}
+
+
+	@Override
+	public boolean isInstCast() {
+		return true;
+	}
+
+	/**
+	 * Return true if the target type is different from the source type.
+	 * 
+	 * @return a boolean indicating if target type is different from the source
+	 *         type
+	 */
+	@Override
+	public boolean isDifferent() {
+		Type targetType = target.getVariable().getType();
+		Type sourceType = source.getVariable().getType();
+		if (targetType.isList()) {
+			return sourceType.getClass() != ((TypeList) targetType)
+					.getInnermostType().getClass();
+		} else {
+			return sourceType.getClass() != targetType.getClass();
+		}
+	}
+
+	/**
+	 * Return true if the target type is extended from the source type.
+	 * 
+	 * @return a boolean indicating if target type is extended from the source
+	 *         type
+	 */
+	@Override
+	public boolean isExtended() {
+		Type targetType = target.getVariable().getType();
+		Type sourceType = source.getVariable().getType();
+
+		return sourceType.getSizeInBits() < targetType.getSizeInBits();
+	}
+
+	/**
+	 * Return true if the source type is signed
+	 * 
+	 * @return a boolean indicating if source is signed type
+	 */
+	@Override
+	public boolean isSigned() {
+		Type targetType = target.getVariable().getType();
+		Type sourceType = source.getVariable().getType();
+		if (sourceType.isUint() || targetType.isUint()) {
+			return false;
+		}
+		if (sourceType.isBool() || targetType.isBool()) {
+			return false;
+		}
+		if (sourceType.isList()) {
+			Type elementType = ((TypeList) source).getInnermostType();
+			if (elementType.isUint() || elementType.isBool()) {
+				return false;
+			}
+		}
+		if (targetType.isList()) {
+			Type elementType = ((TypeList) targetType).getInnermostType();
+			if (elementType.isUint() || elementType.isBool()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Return true if the target type is trunced from the source type.
+	 * 
+	 * @return a boolean indicating if target type is trunced from the source
+	 *         type
+	 */
+	@Override
+	public boolean isTrunced() {
+		Type targetType = target.getVariable().getType();
+		Type sourceType = source.getVariable().getType();
+
+		return sourceType.getSizeInBits() > targetType.getSizeInBits();
 	}
 
 	/**

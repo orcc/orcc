@@ -358,6 +358,11 @@ public class InstTernaryImpl extends InstSpecificImpl implements InstTernary {
 		super.eUnset(featureID);
 	}
 
+	@Override
+	public boolean isInstTernary() {
+		return true;
+	}
+	
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

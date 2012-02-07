@@ -290,5 +290,15 @@ public class InstGetElementPtrImpl extends InstSpecificImpl implements InstGetEl
 		}
 		return super.eIsSet(featureID);
 	}
+	
+	@Override
+	public boolean isGep() {
+		return true;
+	}
+
+	@Override
+	public boolean isLoad() {
+		return true;
+	}
 
 } //InstGetElementPtrImpl

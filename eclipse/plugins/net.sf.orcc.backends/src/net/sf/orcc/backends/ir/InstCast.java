@@ -44,6 +44,46 @@ public interface InstCast extends InstSpecific {
 	 */
 	Def getTarget();
 
+
+	/**
+	 * Return <code>true</code> if the instruction is a cast
+	 * 
+	 * @return <code>true</code> if the instruction is a cast
+	 */
+	public boolean isInstCast();
+
+	/**
+	 * Return <code>true</code> if the target type is different from the source
+	 * type.
+	 * 
+	 * @return <code>true</code> if target type is different from the source
+	 *         type
+	 */
+	public boolean isDifferent();
+
+	/**
+	 * Return <code>true</code> if the target type is extended from the source
+	 * type.
+	 * 
+	 * @return <code>true</code> if target type is extended from the source type
+	 */
+	public boolean isExtended();
+
+	/**
+	 * Return <code>true</code> if the source type is signed
+	 * 
+	 * @return <code>true</code> if source is signed type
+	 */
+	public boolean isSigned();
+
+	/**
+	 * Return <code>true</code> if the target type is trunced from the source
+	 * type.
+	 * 
+	 * @return <code>true</code> if target type is trunced from the source type
+	 */
+	public boolean isTrunced();
+	
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.backends.ir.InstCast#getTarget <em>Target</em>}' containment reference.
 	 * <!-- begin-user-doc -->

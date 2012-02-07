@@ -415,6 +415,11 @@ public class ForNodeImpl extends NodeSpecificImpl implements ForNode {
 		return super.eIsSet(featureID);
 	}
 
+	@Override
+	public boolean isForNode() {
+		return true;
+	}
+	
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

@@ -75,6 +75,15 @@ public interface InstAssignIndex extends InstSpecific {
 	void setTarget(Def value);
 
 	/**
+	 * Return <code>true</code> if the instruction is an assign index
+	 * instruction
+	 * 
+	 * @return <code>true</code> if the instruction is an assign index
+	 *         instruction
+	 */
+	public boolean isInstAssignIndex();
+	
+	/**
 	 * Returns the value of the '<em><b>List Type</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <p>

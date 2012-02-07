@@ -273,6 +273,11 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements InstAssignI
 		super.eUnset(featureID);
 	}
 
+	@Override
+	public boolean isInstAssignIndex() {
+		return true;
+	}
+	
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
