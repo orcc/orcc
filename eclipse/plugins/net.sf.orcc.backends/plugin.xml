@@ -292,14 +292,6 @@
          </option>
    </extension>
    <extension
-         point="org.eclipse.emf.ecore.generated_package">
-      <package
-            class="net.sf.orcc.backends.instructions.InstructionsPackage"
-            genModel="model/Instructions.genmodel"
-            uri="platform:/resource/net.sf.orcc.backends/model/Instructions.ecore">
-      </package>
-   </extension>
-   <extension
          id="c"
          point="org.eclipse.core.runtime.applications">
       <application

@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.backends.xlim.transformations;
 
-import net.sf.orcc.backends.instructions.InstTernary;
-import net.sf.orcc.backends.instructions.InstructionsFactory;
+import net.sf.orcc.backends.ir.InstTernary;
+import net.sf.orcc.backends.ir.IrSpecificFactory;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
@@ -94,7 +94,7 @@ public class InstTernaryAdder extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseInstPhi(InstPhi phi) {
-		InstTernary ternaryOp = InstructionsFactory.eINSTANCE
+		InstTernary ternaryOp = IrSpecificFactory.eINSTANCE
 				.createInstTernary(phi.getTarget().getVariable(),
 						IrFactory.eINSTANCE.createExprVar(condVar),
 						IrUtil.copy(phi.getValues().get(0)),

@@ -37,6 +37,7 @@ import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
+import net.sf.orcc.ir.NodeSpecific;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
@@ -350,6 +351,13 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	private EClass nodeSpecificEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	private EEnum opBinaryEEnum = null;
 
 	/**
@@ -627,6 +635,15 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 */
 	public EAttribute getEStringToEStringMapEntry_Value() {
 		return (EAttribute)eStringToEStringMapEntryEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getNodeSpecific() {
+		return nodeSpecificEClass;
 	}
 
 	/**
@@ -1668,6 +1685,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEAttribute(eStringToEStringMapEntryEClass, ESTRING_TO_ESTRING_MAP_ENTRY__KEY);
 		createEAttribute(eStringToEStringMapEntryEClass, ESTRING_TO_ESTRING_MAP_ENTRY__VALUE);
 
+		nodeSpecificEClass = createEClass(NODE_SPECIFIC);
+
 		// Create enums
 		opBinaryEEnum = createEEnum(OP_BINARY);
 		opUnaryEEnum = createEEnum(OP_UNARY);
@@ -1731,6 +1750,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		typeStringEClass.getESuperTypes().add(this.getType());
 		typeUintEClass.getESuperTypes().add(this.getType());
 		typeVoidEClass.getESuperTypes().add(this.getType());
+		nodeSpecificEClass.getESuperTypes().add(this.getNode());
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(procedureEClass, Procedure.class, "Procedure", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -1887,6 +1907,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEClass(eStringToEStringMapEntryEClass, Map.Entry.class, "EStringToEStringMapEntry", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getEStringToEStringMapEntry_Key(), theEcorePackage.getEString(), "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getEStringToEStringMapEntry_Value(), theEcorePackage.getEString(), "value", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(nodeSpecificEClass, NodeSpecific.class, "NodeSpecific", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		// Initialize enums and add enum literals
 		initEEnum(opBinaryEEnum, OpBinary.class, "OpBinary");

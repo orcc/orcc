@@ -4,7 +4,7 @@
  *
  * $Id$
  */
-package net.sf.orcc.backends.instructions;
+package net.sf.orcc.backends.ir;
 
 import java.util.List;
 
@@ -15,47 +15,48 @@ import net.sf.orcc.ir.Var;
 import org.eclipse.emf.ecore.EFactory;
 
 /**
- * <!-- begin-user-doc --> The <b>Factory</b> for the model. It provides a
- * create method for each non-abstract class of the model. <!-- end-user-doc -->
- * @see net.sf.orcc.backends.instructions.InstructionsPackage
+ * <!-- begin-user-doc -->
+ * The <b>Factory</b> for the model.
+ * It provides a create method for each non-abstract class of the model.
+ * <!-- end-user-doc -->
+ * @see net.sf.orcc.backends.ir.IrSpecificPackage
  * @generated
  */
-public interface InstructionsFactory extends EFactory {
+public interface IrSpecificFactory extends EFactory {
 	/**
 	 * The singleton instance of the factory.
-	 * <!-- begin-user-doc --> <!--
-	 * end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	InstructionsFactory eINSTANCE = net.sf.orcc.backends.instructions.impl.InstructionsFactoryImpl.init();
+	IrSpecificFactory eINSTANCE = net.sf.orcc.backends.ir.impl.IrSpecificFactoryImpl.init();
 
 	/**
-	 * Returns a new object of class '<em>Inst Assign Index</em>'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * Returns a new object of class '<em>Inst Assign Index</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @return a new object of class '<em>Inst Assign Index</em>'.
 	 * @generated
 	 */
 	InstAssignIndex createInstAssignIndex();
-
+	
 	InstAssignIndex createInstAssignIndex(Var indexVar,
 			List<Expression> listIndex, Type listType);
-
 	/**
 	 * Returns a new object of class '<em>Inst Cast</em>'.
-	 * <!-- begin-user-doc
-	 * --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @return a new object of class '<em>Inst Cast</em>'.
 	 * @generated
 	 */
 	InstCast createInstCast();
 
 	InstCast createInstCast(Var source, Var target);
-
+	
 	/**
-	 * Returns a new object of class '<em>Inst Get Element Ptr</em>'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * Returns a new object of class '<em>Inst Get Element Ptr</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @return a new object of class '<em>Inst Get Element Ptr</em>'.
 	 * @generated
 	 */
@@ -63,11 +64,11 @@ public interface InstructionsFactory extends EFactory {
 
 	InstGetElementPtr createInstGetElementPtr(Var source, Var target,
 			List<Expression> indexes);
-
+	
 	/**
-	 * Returns a new object of class '<em>Inst Ternary</em>'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * Returns a new object of class '<em>Inst Ternary</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @return a new object of class '<em>Inst Ternary</em>'.
 	 * @generated
 	 */
@@ -75,6 +76,15 @@ public interface InstructionsFactory extends EFactory {
 
 	InstTernary createInstTernary(Var target, Expression condition,
 			Expression trueValue, Expression falseValue);
+	
+	/**
+	 * Returns a new object of class '<em>For Node</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>For Node</em>'.
+	 * @generated
+	 */
+	ForNode createForNode();
 
 	/**
 	 * Returns the package supported by this factory.
@@ -83,6 +93,6 @@ public interface InstructionsFactory extends EFactory {
 	 * @return the package supported by this factory.
 	 * @generated
 	 */
-	InstructionsPackage getInstructionsPackage();
+	IrSpecificPackage getIrSpecificPackage();
 
-} // InstructionsFactory
+} //IrSpecificFactory

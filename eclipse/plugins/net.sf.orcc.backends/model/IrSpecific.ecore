@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="instructions" nsURI="http://orcc.sf.net/backends/instructions/Instructions"
-    nsPrefix="net.sf.orcc.backends.instructions">
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="ir"
+    nsURI="http://orcc.sf.net/backends/ir" nsPrefix="net.sf.orcc.backends.ir">
   <eClassifiers xsi:type="ecore:EClass" name="InstAssignIndex" eSuperTypes="../../net.sf.orcc.core/model/Ir.ecore#//InstSpecific">
     <eStructuralFeatures xsi:type="ecore:EReference" name="indexes" upperBound="-1"
         eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Expression" containment="true"
@@ -35,5 +36,19 @@
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Def"
         containment="true" resolveProxies="false"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ForNode" eSuperTypes="../../net.sf.orcc.core/model/Ir.ecore#//NodeSpecific">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="condition" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Expression"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="joinNode" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//NodeBlock"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="lineNumber" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EInt"
+        defaultValueLiteral="0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="nodes" upperBound="-1"
+        eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Node" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="loopCounter" upperBound="-1"
+        eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Expression" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="init" upperBound="-1" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Expression"
+        containment="true"/>
   </eClassifiers>
 </ecore:EPackage>

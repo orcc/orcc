@@ -31,8 +31,8 @@ package net.sf.orcc.backends.transformations;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.backends.instructions.InstCast;
-import net.sf.orcc.backends.instructions.InstructionsFactory;
+import net.sf.orcc.backends.ir.InstCast;
+import net.sf.orcc.backends.ir.IrSpecificFactory;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.ExprBinary;
@@ -221,7 +221,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 
 					target.setType(IrUtil.copy(returnType));
 
-					InstCast cast = InstructionsFactory.eINSTANCE
+					InstCast cast = IrSpecificFactory.eINSTANCE
 							.createInstCast(target, castedTarget);
 
 					call.getBlock().add(indexInst + 1, cast);
@@ -278,7 +278,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 						((ExprVar) exprArg).getUse().setVariable(target);
 
 						// Create the concrete cast instruction
-						Instruction castInstr = InstructionsFactory.eINSTANCE
+						Instruction castInstr = IrSpecificFactory.eINSTANCE
 								.createInstCast(source, target);
 
 						// Append cast instruction to tempoary list
@@ -322,7 +322,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 
 			target.setType(uncastedType);
 
-			InstCast cast = InstructionsFactory.eINSTANCE.createInstCast(
+			InstCast cast = IrSpecificFactory.eINSTANCE.createInstCast(
 					target, castedTarget);
 
 			load.getBlock().add(indexInst + 1, cast);
@@ -438,7 +438,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 			Var newVar = procedure.newTempLocalVariable(
 					EcoreUtil.copy(parentType),
 					"castedExpr_" + procedure.getName());
-			InstCast cast = InstructionsFactory.eINSTANCE.createInstCast(
+			InstCast cast = IrSpecificFactory.eINSTANCE.createInstCast(
 					oldVar, newVar);
 			if (IrUtil.addInstBeforeExpr(expr, cast)) {
 				indexInst++;
@@ -468,7 +468,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 			Var newVar = procedure.newTempLocalVariable(
 					EcoreUtil.copy(parentType),
 					"castedExpr_" + procedure.getName());
-			InstCast cast = InstructionsFactory.eINSTANCE.createInstCast(
+			InstCast cast = IrSpecificFactory.eINSTANCE.createInstCast(
 					oldVar, newVar);
 			node.add(index, cast);
 			return IrFactory.eINSTANCE.createExprVar(newVar);

@@ -31,7 +31,7 @@ package net.sf.orcc.backends.tta;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.backends.instructions.InstCast;
+import net.sf.orcc.backends.ir.InstCast;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;

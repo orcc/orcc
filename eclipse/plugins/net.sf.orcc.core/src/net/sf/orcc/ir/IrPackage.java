@@ -548,6 +548,16 @@ public interface IrPackage extends EPackage {
 		EAttribute ESTRING_TO_ESTRING_MAP_ENTRY__VALUE = eINSTANCE.getEStringToEStringMapEntry_Value();
 
 		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.NodeSpecificImpl <em>Node Specific</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.NodeSpecificImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNodeSpecific()
+		 * @generated
+		 */
+		EClass NODE_SPECIFIC = eINSTANCE.getNodeSpecific();
+
+		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.NodeImpl <em>Node</em>}' class.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.NodeImpl
@@ -1246,7 +1256,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpBinary()
 	 * @generated
 	 */
-	int OP_BINARY = 40;
+	int OP_BINARY = 41;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpUnary <em>Op Unary</em>}' enum.
@@ -1255,7 +1265,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpUnary()
 	 * @generated
 	 */
-	int OP_UNARY = 41;
+	int OP_UNARY = 42;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ProcedureImpl <em>Procedure</em>}' class.
@@ -2555,6 +2565,25 @@ public interface IrPackage extends EPackage {
 	int ESTRING_TO_ESTRING_MAP_ENTRY_FEATURE_COUNT = 2;
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeSpecificImpl <em>Node Specific</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.NodeSpecificImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNodeSpecific()
+	 * @generated
+	 */
+	int NODE_SPECIFIC = 40;
+
+	/**
+	 * The number of structural features of the '<em>Node Specific</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NODE_SPECIFIC_FEATURE_COUNT = NODE_FEATURE_COUNT + 0;
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Def <em>Def</em>}'.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Def</em>'.
@@ -3114,6 +3143,16 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getEStringToEStringMapEntry_Value();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.NodeSpecific <em>Node Specific</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Node Specific</em>'.
+	 * @see net.sf.orcc.ir.NodeSpecific
+	 * @generated
+	 */
+	EClass getNodeSpecific();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.InstSpecific <em>Inst Specific</em>}'.

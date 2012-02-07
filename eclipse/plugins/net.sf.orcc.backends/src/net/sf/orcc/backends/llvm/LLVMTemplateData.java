@@ -31,7 +31,7 @@ package net.sf.orcc.backends.llvm;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.backends.instructions.InstCast;
+import net.sf.orcc.backends.ir.InstCast;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Edge;

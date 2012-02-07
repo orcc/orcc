@@ -30,7 +30,7 @@ package net.sf.orcc.backends.transformations;
 
 import java.util.List;
 
-import net.sf.orcc.backends.instructions.InstTernary;
+import net.sf.orcc.backends.ir.InstTernary;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstPhi;

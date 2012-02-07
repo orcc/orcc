@@ -8,6 +8,7 @@ package net.sf.orcc.ir.util;
 
 import java.util.Map;
 
+import net.sf.orcc.ir.*;
 import net.sf.orcc.ir.Annotation;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
@@ -240,6 +241,10 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 				return createEStringToEStringMapEntryAdapter();
 			}
 			@Override
+			public Adapter caseNodeSpecific(NodeSpecific object) {
+				return createNodeSpecificAdapter();
+			}
+			@Override
 			public Adapter defaultCase(EObject object) {
 				return createEObjectAdapter();
 			}
@@ -461,6 +466,20 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createEStringToEStringMapEntryAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.NodeSpecific <em>Node Specific</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.NodeSpecific
+	 * @generated
+	 */
+	public Adapter createNodeSpecificAdapter() {
 		return null;
 	}
 

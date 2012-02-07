@@ -1,37 +1,17 @@
-/*
- * Copyright (c) 2010-2011, IETR/INSA of Rennes
- * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- *   * Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright notice,
- *     this list of conditions and the following disclaimer in the documentation
- *     and/or other materials provided with the distribution.
- *   * Neither the name of the IETR/INSA of Rennes nor the names of its
- *     contributors may be used to endorse or promote products derived from this
- *     software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
- * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+/**
+ * <copyright>
+ * </copyright>
+ *
+ * $Id$
  */
-package net.sf.orcc.backends.instructions.util;
+package net.sf.orcc.backends.ir.util;
 
-import net.sf.orcc.backends.instructions.*;
+import net.sf.orcc.backends.ir.*;
 
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.Node;
+import net.sf.orcc.ir.NodeSpecific;
 
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notifier;
@@ -45,17 +25,17 @@ import org.eclipse.emf.ecore.EObject;
  * The <b>Adapter Factory</b> for the model.
  * It provides an adapter <code>createXXX</code> method for each class of the model.
  * <!-- end-user-doc -->
- * @see net.sf.orcc.backends.instructions.InstructionsPackage
+ * @see net.sf.orcc.backends.ir.IrSpecificPackage
  * @generated
  */
-public class InstructionsAdapterFactory extends AdapterFactoryImpl {
+public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 	/**
 	 * The cached model package.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected static InstructionsPackage modelPackage;
+	protected static IrSpecificPackage modelPackage;
 
 	/**
 	 * Creates an instance of the adapter factory.
@@ -63,9 +43,9 @@ public class InstructionsAdapterFactory extends AdapterFactoryImpl {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public InstructionsAdapterFactory() {
+	public IrSpecificAdapterFactory() {
 		if (modelPackage == null) {
-			modelPackage = InstructionsPackage.eINSTANCE;
+			modelPackage = IrSpecificPackage.eINSTANCE;
 		}
 	}
 
@@ -94,8 +74,8 @@ public class InstructionsAdapterFactory extends AdapterFactoryImpl {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected InstructionsSwitch<Adapter> modelSwitch =
-		new InstructionsSwitch<Adapter>() {
+	protected IrSpecificSwitch<Adapter> modelSwitch =
+		new IrSpecificSwitch<Adapter>() {
 			@Override
 			public Adapter caseInstAssignIndex(InstAssignIndex object) {
 				return createInstAssignIndexAdapter();
@@ -113,12 +93,24 @@ public class InstructionsAdapterFactory extends AdapterFactoryImpl {
 				return createInstTernaryAdapter();
 			}
 			@Override
+			public Adapter caseForNode(ForNode object) {
+				return createForNodeAdapter();
+			}
+			@Override
 			public Adapter caseInstruction(Instruction object) {
 				return createInstructionAdapter();
 			}
 			@Override
 			public Adapter caseInstSpecific(InstSpecific object) {
 				return createInstSpecificAdapter();
+			}
+			@Override
+			public Adapter caseNode(Node object) {
+				return createNodeAdapter();
+			}
+			@Override
+			public Adapter caseNodeSpecific(NodeSpecific object) {
+				return createNodeSpecificAdapter();
 			}
 			@Override
 			public Adapter defaultCase(EObject object) {
@@ -141,27 +133,13 @@ public class InstructionsAdapterFactory extends AdapterFactoryImpl {
 
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.instructions.InstTernary <em>Inst Ternary</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.ir.InstAssignIndex <em>Inst Assign Index</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.orcc.backends.instructions.InstTernary
-	 * @generated
-	 */
-	public Adapter createInstTernaryAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.instructions.InstAssignIndex <em>Inst Assign Index</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.backends.instructions.InstAssignIndex
+	 * @see net.sf.orcc.backends.ir.InstAssignIndex
 	 * @generated
 	 */
 	public Adapter createInstAssignIndexAdapter() {
@@ -169,13 +147,27 @@ public class InstructionsAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.instructions.InstGetElementPtr <em>Inst Get Element Ptr</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.ir.InstCast <em>Inst Cast</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.orcc.backends.instructions.InstGetElementPtr
+	 * @see net.sf.orcc.backends.ir.InstCast
+	 * @generated
+	 */
+	public Adapter createInstCastAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.ir.InstGetElementPtr <em>Inst Get Element Ptr</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.ir.InstGetElementPtr
 	 * @generated
 	 */
 	public Adapter createInstGetElementPtrAdapter() {
@@ -183,16 +175,30 @@ public class InstructionsAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.instructions.InstCast <em>Inst Cast</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.ir.InstTernary <em>Inst Ternary</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.orcc.backends.instructions.InstCast
+	 * @see net.sf.orcc.backends.ir.InstTernary
 	 * @generated
 	 */
-	public Adapter createInstCastAdapter() {
+	public Adapter createInstTernaryAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.ir.ForNode <em>For Node</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.ir.ForNode
+	 * @generated
+	 */
+	public Adapter createForNodeAdapter() {
 		return null;
 	}
 
@@ -225,6 +231,34 @@ public class InstructionsAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Node <em>Node</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.Node
+	 * @generated
+	 */
+	public Adapter createNodeAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.NodeSpecific <em>Node Specific</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.NodeSpecific
+	 * @generated
+	 */
+	public Adapter createNodeSpecificAdapter() {
+		return null;
+	}
+
+	/**
 	 * Creates a new adapter for the default case.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null.
@@ -236,4 +270,4 @@ public class InstructionsAdapterFactory extends AdapterFactoryImpl {
 		return null;
 	}
 
-} //InstructionsAdapterFactory
+} //IrSpecificAdapterFactory

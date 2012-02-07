@@ -30,8 +30,8 @@ package net.sf.orcc.backends.llvm.transformations;
 
 import java.util.List;
 
-import net.sf.orcc.backends.instructions.InstGetElementPtr;
-import net.sf.orcc.backends.instructions.InstructionsFactory;
+import net.sf.orcc.backends.ir.InstGetElementPtr;
+import net.sf.orcc.backends.ir.IrSpecificFactory;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
@@ -60,7 +60,7 @@ public class GetElementPtrAdder extends AbstractActorVisitor<Object> {
 		Var eltVar = procedure.newTempLocalVariable(IrUtil.copy(type),
 				array.getName() + "_" + "elt");
 
-		InstGetElementPtr gep = InstructionsFactory.eINSTANCE
+		InstGetElementPtr gep = IrSpecificFactory.eINSTANCE
 				.createInstGetElementPtr(array, eltVar, indexes);
 		currentNode.add(indexInst, gep);
 

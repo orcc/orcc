@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.xlim.transformations;
 
-import net.sf.orcc.backends.instructions.InstTernary;
+import net.sf.orcc.backends.ir.InstTernary;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;

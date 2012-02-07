@@ -1,44 +1,27 @@
-/*
- * Copyright (c) 2010-2011, IETR/INSA of Rennes
- * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- *   * Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright notice,
- *     this list of conditions and the following disclaimer in the documentation
- *     and/or other materials provided with the distribution.
- *   * Neither the name of the IETR/INSA of Rennes nor the names of its
- *     contributors may be used to endorse or promote products derived from this
- *     software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
- * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+/**
+ * <copyright>
+ * </copyright>
+ *
+ * $Id$
  */
-package net.sf.orcc.backends.instructions.impl;
+package net.sf.orcc.backends.ir.impl;
 
-import net.sf.orcc.backends.instructions.InstAssignIndex;
-import net.sf.orcc.backends.instructions.InstCast;
-import net.sf.orcc.backends.instructions.InstGetElementPtr;
-import net.sf.orcc.backends.instructions.InstTernary;
-import net.sf.orcc.backends.instructions.InstructionsFactory;
-import net.sf.orcc.backends.instructions.InstructionsPackage;
+import net.sf.orcc.backends.ir.ForNode;
+import net.sf.orcc.backends.ir.InstAssignIndex;
+import net.sf.orcc.backends.ir.InstCast;
+import net.sf.orcc.backends.ir.InstGetElementPtr;
+import net.sf.orcc.backends.ir.InstTernary;
+import net.sf.orcc.backends.ir.IrSpecificFactory;
+import net.sf.orcc.backends.ir.IrSpecificPackage;
+
 import net.sf.orcc.ir.IrPackage;
 
+import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
+import org.eclipse.emf.ecore.EcorePackage;
+
 import org.eclipse.emf.ecore.impl.EPackageImpl;
 
 /**
@@ -47,20 +30,20 @@ import org.eclipse.emf.ecore.impl.EPackageImpl;
  * <!-- end-user-doc -->
  * @generated
  */
-public class InstructionsPackageImpl extends EPackageImpl implements InstructionsPackage {
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass instTernaryEClass = null;
-
+public class IrSpecificPackageImpl extends EPackageImpl implements IrSpecificPackage {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	private EClass instAssignIndexEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass instCastEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -74,7 +57,14 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass instCastEClass = null;
+	private EClass instTernaryEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass forNodeEClass = null;
 
 	/**
 	 * Creates an instance of the model <b>Package</b>, registered with
@@ -87,12 +77,12 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.eclipse.emf.ecore.EPackage.Registry
-	 * @see net.sf.orcc.backends.instructions.InstructionsPackage#eNS_URI
+	 * @see net.sf.orcc.backends.ir.IrSpecificPackage#eNS_URI
 	 * @see #init()
 	 * @generated
 	 */
-	private InstructionsPackageImpl() {
-		super(eNS_URI, InstructionsFactory.eINSTANCE);
+	private IrSpecificPackageImpl() {
+		super(eNS_URI, IrSpecificFactory.eINSTANCE);
 	}
 
 	/**
@@ -105,7 +95,7 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	/**
 	 * Creates, registers, and initializes the <b>Package</b> for this model, and for any others upon which it depends.
 	 * 
-	 * <p>This method is used to initialize {@link InstructionsPackage#eINSTANCE} when that field is accessed.
+	 * <p>This method is used to initialize {@link IrSpecificPackage#eINSTANCE} when that field is accessed.
 	 * Clients should not invoke it directly. Instead, they should simply access that field to obtain the package.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -114,11 +104,11 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * @see #initializePackageContents()
 	 * @generated
 	 */
-	public static InstructionsPackage init() {
-		if (isInited) return (InstructionsPackage)EPackage.Registry.INSTANCE.getEPackage(InstructionsPackage.eNS_URI);
+	public static IrSpecificPackage init() {
+		if (isInited) return (IrSpecificPackage)EPackage.Registry.INSTANCE.getEPackage(IrSpecificPackage.eNS_URI);
 
 		// Obtain or create and register package
-		InstructionsPackageImpl theInstructionsPackage = (InstructionsPackageImpl)(EPackage.Registry.INSTANCE.get(eNS_URI) instanceof InstructionsPackageImpl ? EPackage.Registry.INSTANCE.get(eNS_URI) : new InstructionsPackageImpl());
+		IrSpecificPackageImpl theIrSpecificPackage = (IrSpecificPackageImpl)(EPackage.Registry.INSTANCE.get(eNS_URI) instanceof IrSpecificPackageImpl ? EPackage.Registry.INSTANCE.get(eNS_URI) : new IrSpecificPackageImpl());
 
 		isInited = true;
 
@@ -126,18 +116,117 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 		IrPackage.eINSTANCE.eClass();
 
 		// Create package meta-data objects
-		theInstructionsPackage.createPackageContents();
+		theIrSpecificPackage.createPackageContents();
 
 		// Initialize created meta-data
-		theInstructionsPackage.initializePackageContents();
+		theIrSpecificPackage.initializePackageContents();
 
 		// Mark meta-data to indicate it can't be changed
-		theInstructionsPackage.freeze();
+		theIrSpecificPackage.freeze();
 
   
 		// Update the registry and return the package
-		EPackage.Registry.INSTANCE.put(InstructionsPackage.eNS_URI, theInstructionsPackage);
-		return theInstructionsPackage;
+		EPackage.Registry.INSTANCE.put(IrSpecificPackage.eNS_URI, theIrSpecificPackage);
+		return theIrSpecificPackage;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getInstAssignIndex() {
+		return instAssignIndexEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getInstAssignIndex_Indexes() {
+		return (EReference)instAssignIndexEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getInstAssignIndex_Target() {
+		return (EReference)instAssignIndexEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getInstAssignIndex_ListType() {
+		return (EReference)instAssignIndexEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getInstCast() {
+		return instCastEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getInstCast_Target() {
+		return (EReference)instCastEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getInstCast_Source() {
+		return (EReference)instCastEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getInstGetElementPtr() {
+		return instGetElementPtrEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getInstGetElementPtr_Indexes() {
+		return (EReference)instGetElementPtrEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getInstGetElementPtr_Target() {
+		return (EReference)instGetElementPtrEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getInstGetElementPtr_Source() {
+		return (EReference)instGetElementPtrEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -190,8 +279,8 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getInstAssignIndex() {
-		return instAssignIndexEClass;
+	public EClass getForNode() {
+		return forNodeEClass;
 	}
 
 	/**
@@ -199,8 +288,8 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getInstAssignIndex_Indexes() {
-		return (EReference)instAssignIndexEClass.getEStructuralFeatures().get(0);
+	public EReference getForNode_Condition() {
+		return (EReference)forNodeEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -208,8 +297,8 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getInstAssignIndex_Target() {
-		return (EReference)instAssignIndexEClass.getEStructuralFeatures().get(1);
+	public EReference getForNode_JoinNode() {
+		return (EReference)forNodeEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -217,8 +306,8 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getInstAssignIndex_ListType() {
-		return (EReference)instAssignIndexEClass.getEStructuralFeatures().get(2);
+	public EAttribute getForNode_LineNumber() {
+		return (EAttribute)forNodeEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -226,8 +315,8 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getInstGetElementPtr() {
-		return instGetElementPtrEClass;
+	public EReference getForNode_Nodes() {
+		return (EReference)forNodeEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -235,8 +324,8 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getInstGetElementPtr_Indexes() {
-		return (EReference)instGetElementPtrEClass.getEStructuralFeatures().get(0);
+	public EReference getForNode_LoopCounter() {
+		return (EReference)forNodeEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -244,8 +333,8 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getInstGetElementPtr_Target() {
-		return (EReference)instGetElementPtrEClass.getEStructuralFeatures().get(1);
+	public EReference getForNode_Init() {
+		return (EReference)forNodeEClass.getEStructuralFeatures().get(5);
 	}
 
 	/**
@@ -253,44 +342,8 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getInstGetElementPtr_Source() {
-		return (EReference)instGetElementPtrEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getInstCast() {
-		return instCastEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getInstCast_Target() {
-		return (EReference)instCastEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getInstCast_Source() {
-		return (EReference)instCastEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public InstructionsFactory getInstructionsFactory() {
-		return (InstructionsFactory)getEFactoryInstance();
+	public IrSpecificFactory getIrSpecificFactory() {
+		return (IrSpecificFactory)getEFactoryInstance();
 	}
 
 	/**
@@ -331,6 +384,14 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 		createEReference(instTernaryEClass, INST_TERNARY__TRUE_VALUE);
 		createEReference(instTernaryEClass, INST_TERNARY__FALSE_VALUE);
 		createEReference(instTernaryEClass, INST_TERNARY__TARGET);
+
+		forNodeEClass = createEClass(FOR_NODE);
+		createEReference(forNodeEClass, FOR_NODE__CONDITION);
+		createEReference(forNodeEClass, FOR_NODE__JOIN_NODE);
+		createEAttribute(forNodeEClass, FOR_NODE__LINE_NUMBER);
+		createEReference(forNodeEClass, FOR_NODE__NODES);
+		createEReference(forNodeEClass, FOR_NODE__LOOP_COUNTER);
+		createEReference(forNodeEClass, FOR_NODE__INIT);
 	}
 
 	/**
@@ -358,6 +419,7 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 
 		// Obtain other dependent packages
 		IrPackage theIrPackage = (IrPackage)EPackage.Registry.INSTANCE.getEPackage(IrPackage.eNS_URI);
+		EcorePackage theEcorePackage = (EcorePackage)EPackage.Registry.INSTANCE.getEPackage(EcorePackage.eNS_URI);
 
 		// Create type parameters
 
@@ -368,6 +430,7 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 		instCastEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
 		instGetElementPtrEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
 		instTernaryEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
+		forNodeEClass.getESuperTypes().add(theIrPackage.getNodeSpecific());
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(instAssignIndexEClass, InstAssignIndex.class, "InstAssignIndex", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -390,8 +453,16 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 		initEReference(getInstTernary_FalseValue(), theIrPackage.getExpression(), null, "falseValue", null, 0, 1, InstTernary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getInstTernary_Target(), theIrPackage.getDef(), null, "target", null, 0, 1, InstTernary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
+		initEClass(forNodeEClass, ForNode.class, "ForNode", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getForNode_Condition(), theIrPackage.getExpression(), null, "condition", null, 0, 1, ForNode.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getForNode_JoinNode(), theIrPackage.getNodeBlock(), null, "joinNode", null, 0, 1, ForNode.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getForNode_LineNumber(), theEcorePackage.getEInt(), "lineNumber", "0", 0, 1, ForNode.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getForNode_Nodes(), theIrPackage.getNode(), null, "nodes", null, 0, -1, ForNode.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getForNode_LoopCounter(), theIrPackage.getExpression(), null, "loopCounter", null, 0, -1, ForNode.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getForNode_Init(), theIrPackage.getExpression(), null, "init", null, 0, -1, ForNode.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
 		// Create resource
 		createResource(eNS_URI);
 	}
 
-} //InstructionsPackageImpl
+} //IrSpecificPackageImpl

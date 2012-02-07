@@ -31,8 +31,8 @@ package net.sf.orcc.backends.xlim.transformations;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.backends.instructions.InstAssignIndex;
-import net.sf.orcc.backends.instructions.InstructionsFactory;
+import net.sf.orcc.backends.ir.InstAssignIndex;
+import net.sf.orcc.backends.ir.IrSpecificFactory;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstLoad;
@@ -86,7 +86,7 @@ public class ListFlattener extends AbstractActorVisitor<Object> {
 
 		// add a special assign instruction that assigns the index variable the
 		// concatenation of index expressions
-		InstAssignIndex assignIndex = InstructionsFactory.eINSTANCE
+		InstAssignIndex assignIndex = IrSpecificFactory.eINSTANCE
 				.createInstAssignIndex(indexVar, listIndex, listType);
 		currentBlock.add(indexInst, assignIndex);
 		indexInst++;
