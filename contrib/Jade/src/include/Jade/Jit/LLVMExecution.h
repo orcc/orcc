@@ -112,7 +112,7 @@ public:
 	 *
 	 *  @return address of the stop variable
      */
-	int* initialize();
+	virtual int* initialize();
 
 	/**
      *  @brief run a specific function of the current decoder

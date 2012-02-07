@@ -89,6 +89,13 @@ public:
 	void run();
 
 	/**
+     *  @brief Initialize the decoder before the execution
+	 *
+	 *  @return address of the stop variable
+     */
+	int* initialize() {};
+
+	/**
      *  @brief Generate native code for the current decoder
 	 *
      */
