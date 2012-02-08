@@ -15,26 +15,26 @@ import org.eclipse.emf.common.util.EList;
 
 /**
  * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>For Node</b></em>'.
+ * A representation of the model object '<em><b>Node For</b></em>'.
  * <!-- end-user-doc -->
  *
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link net.sf.orcc.backends.ir.ForNode#getCondition <em>Condition</em>}</li>
- *   <li>{@link net.sf.orcc.backends.ir.ForNode#getJoinNode <em>Join Node</em>}</li>
- *   <li>{@link net.sf.orcc.backends.ir.ForNode#getLineNumber <em>Line Number</em>}</li>
- *   <li>{@link net.sf.orcc.backends.ir.ForNode#getNodes <em>Nodes</em>}</li>
- *   <li>{@link net.sf.orcc.backends.ir.ForNode#getLoopCounter <em>Loop Counter</em>}</li>
- *   <li>{@link net.sf.orcc.backends.ir.ForNode#getInit <em>Init</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.ir.NodeFor#getCondition <em>Condition</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.ir.NodeFor#getJoinNode <em>Join Node</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.ir.NodeFor#getLineNumber <em>Line Number</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.ir.NodeFor#getNodes <em>Nodes</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.ir.NodeFor#getLoopCounter <em>Loop Counter</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.ir.NodeFor#getInit <em>Init</em>}</li>
  * </ul>
  * </p>
  *
- * @see net.sf.orcc.backends.ir.IrSpecificPackage#getForNode()
+ * @see net.sf.orcc.backends.ir.IrSpecificPackage#getNodeFor()
  * @model
  * @generated
  */
-public interface ForNode extends NodeSpecific {
+public interface NodeFor extends NodeSpecific {
 	/**
 	 * Returns the value of the '<em><b>Condition</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
@@ -45,14 +45,14 @@ public interface ForNode extends NodeSpecific {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Condition</em>' containment reference.
 	 * @see #setCondition(Expression)
-	 * @see net.sf.orcc.backends.ir.IrSpecificPackage#getForNode_Condition()
+	 * @see net.sf.orcc.backends.ir.IrSpecificPackage#getNodeFor_Condition()
 	 * @model containment="true"
 	 * @generated
 	 */
 	Expression getCondition();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.ir.ForNode#getCondition <em>Condition</em>}' containment reference.
+	 * Sets the value of the '{@link net.sf.orcc.backends.ir.NodeFor#getCondition <em>Condition</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Condition</em>' containment reference.
@@ -71,14 +71,14 @@ public interface ForNode extends NodeSpecific {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Join Node</em>' containment reference.
 	 * @see #setJoinNode(NodeBlock)
-	 * @see net.sf.orcc.backends.ir.IrSpecificPackage#getForNode_JoinNode()
+	 * @see net.sf.orcc.backends.ir.IrSpecificPackage#getNodeFor_JoinNode()
 	 * @model containment="true"
 	 * @generated
 	 */
 	NodeBlock getJoinNode();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.ir.ForNode#getJoinNode <em>Join Node</em>}' containment reference.
+	 * Sets the value of the '{@link net.sf.orcc.backends.ir.NodeFor#getJoinNode <em>Join Node</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Join Node</em>' containment reference.
@@ -98,14 +98,14 @@ public interface ForNode extends NodeSpecific {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Line Number</em>' attribute.
 	 * @see #setLineNumber(int)
-	 * @see net.sf.orcc.backends.ir.IrSpecificPackage#getForNode_LineNumber()
+	 * @see net.sf.orcc.backends.ir.IrSpecificPackage#getNodeFor_LineNumber()
 	 * @model default="0"
 	 * @generated
 	 */
 	int getLineNumber();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.ir.ForNode#getLineNumber <em>Line Number</em>}' attribute.
+	 * Sets the value of the '{@link net.sf.orcc.backends.ir.NodeFor#getLineNumber <em>Line Number</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Line Number</em>' attribute.
@@ -124,7 +124,7 @@ public interface ForNode extends NodeSpecific {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Nodes</em>' containment reference list.
-	 * @see net.sf.orcc.backends.ir.IrSpecificPackage#getForNode_Nodes()
+	 * @see net.sf.orcc.backends.ir.IrSpecificPackage#getNodeFor_Nodes()
 	 * @model containment="true"
 	 * @generated
 	 */
@@ -140,7 +140,7 @@ public interface ForNode extends NodeSpecific {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Loop Counter</em>' containment reference list.
-	 * @see net.sf.orcc.backends.ir.IrSpecificPackage#getForNode_LoopCounter()
+	 * @see net.sf.orcc.backends.ir.IrSpecificPackage#getNodeFor_LoopCounter()
 	 * @model containment="true"
 	 * @generated
 	 */
@@ -156,17 +156,12 @@ public interface ForNode extends NodeSpecific {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Init</em>' containment reference list.
-	 * @see net.sf.orcc.backends.ir.IrSpecificPackage#getForNode_Init()
+	 * @see net.sf.orcc.backends.ir.IrSpecificPackage#getNodeFor_Init()
 	 * @model containment="true"
 	 * @generated
 	 */
 	EList<Expression> getInit();
 	
-	/**
-	 * Return <code>true</code> if the node is a for node
-	 * 
-	 * @return <code>true</code> if the instruction is a for node
-	 */
-	public boolean isForNode();
+	public boolean isNodeFor();
 
-} // ForNode
+} // NodeFor

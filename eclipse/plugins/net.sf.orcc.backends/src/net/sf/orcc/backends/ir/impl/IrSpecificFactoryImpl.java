@@ -70,7 +70,7 @@ public class IrSpecificFactoryImpl extends EFactoryImpl implements IrSpecificFac
 			case IrSpecificPackage.INST_CAST: return createInstCast();
 			case IrSpecificPackage.INST_GET_ELEMENT_PTR: return createInstGetElementPtr();
 			case IrSpecificPackage.INST_TERNARY: return createInstTernary();
-			case IrSpecificPackage.FOR_NODE: return createForNode();
+			case IrSpecificPackage.NODE_FOR: return createNodeFor();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -145,6 +145,16 @@ public class IrSpecificFactoryImpl extends EFactoryImpl implements IrSpecificFac
 		return instTernary;
 	}
 
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NodeFor createNodeFor() {
+		NodeForImpl nodeFor = new NodeForImpl();
+		return nodeFor;
+	}
+
 	@Override
 	public InstTernary createInstTernary(Var target, Expression condition,
 			Expression trueValue, Expression falseValue) {
@@ -156,16 +166,6 @@ public class IrSpecificFactoryImpl extends EFactoryImpl implements IrSpecificFac
 		return instTernary;
 	}
 	
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public ForNode createForNode() {
-		ForNodeImpl forNode = new ForNodeImpl();
-		return forNode;
-	}
-
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

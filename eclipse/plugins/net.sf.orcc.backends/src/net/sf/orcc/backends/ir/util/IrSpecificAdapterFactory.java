@@ -93,8 +93,8 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 				return createInstTernaryAdapter();
 			}
 			@Override
-			public Adapter caseForNode(ForNode object) {
-				return createForNodeAdapter();
+			public Adapter caseNodeFor(NodeFor object) {
+				return createNodeForAdapter();
 			}
 			@Override
 			public Adapter caseInstruction(Instruction object) {
@@ -189,16 +189,16 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.ir.ForNode <em>For Node</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.ir.NodeFor <em>Node For</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.orcc.backends.ir.ForNode
+	 * @see net.sf.orcc.backends.ir.NodeFor
 	 * @generated
 	 */
-	public Adapter createForNodeAdapter() {
+	public Adapter createNodeForAdapter() {
 		return null;
 	}
 

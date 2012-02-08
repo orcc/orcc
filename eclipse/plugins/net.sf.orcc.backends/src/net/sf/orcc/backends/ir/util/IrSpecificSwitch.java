@@ -107,11 +107,11 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case IrSpecificPackage.FOR_NODE: {
-				ForNode forNode = (ForNode)theEObject;
-				T result = caseForNode(forNode);
-				if (result == null) result = caseNodeSpecific(forNode);
-				if (result == null) result = caseNode(forNode);
+			case IrSpecificPackage.NODE_FOR: {
+				NodeFor nodeFor = (NodeFor)theEObject;
+				T result = caseNodeFor(nodeFor);
+				if (result == null) result = caseNodeSpecific(nodeFor);
+				if (result == null) result = caseNode(nodeFor);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -180,17 +180,17 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>For Node</em>'.
+	 * Returns the result of interpreting the object as an instance of '<em>Node For</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
 	 * returning a non-null result will terminate the switch.
 	 * <!-- end-user-doc -->
 	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>For Node</em>'.
+	 * @return the result of interpreting the object as an instance of '<em>Node For</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseForNode(ForNode object) {
+	public T caseNodeFor(NodeFor object) {
 		return null;
 	}
 
