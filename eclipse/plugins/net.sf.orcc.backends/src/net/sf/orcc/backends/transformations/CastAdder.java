@@ -189,19 +189,19 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 
 			EList<Expression> newExpressions = new BasicEList<Expression>();
 			for (int i = 0; i < oldExpressions.size(); i++) {
-				
+
 				// Check call parameter type coherence
 				Param param = call.getProcedure().getParameters().get(i);
 				Var variable = param.getVariable();
-				
+
 				parentType = variable.getType();
-				Expression expr= oldExpressions.get(i);
-				
+				Expression expr = oldExpressions.get(i);
+
 				// Check argument if it's not a string
-				if (!parentType.isString()){
+				if (!parentType.isString()) {
 					expr = doSwitch(expr);
 				}
-				
+
 				newExpressions.add(expr);
 			}
 
@@ -242,9 +242,19 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 					exprArg = ((ArgByVal) callArg).getValue();
 
 					if (!(exprArg instanceof ExprVar)) {
-						System.out
-								.println("[Error] unable to add a cast for a non ExprVar call parameter : "
-										+ exprArg.getClass());
+						/*
+						 * Nothing to do, cast is added only for print arguments
+						 * which are variables. If a verbose mode is added to
+						 * backends in the future, this msg can be used to
+						 * prevent useless print calls :
+						 * 
+						 * String msg =
+						 * "[Warn] Parameter of print call is not a String or a Variable : \n\tParameter type : "
+						 * + exprArg.getClass().getName() + "\n\tActor : " +
+						 * EcoreHelper.getContainerOfType(call,
+						 * Actor.class).getName() + "\n\tLine number : " +
+						 * call.getLineNumber();
+						 */
 					} else if ((exprArg.getType().isInt() || exprArg.getType()
 							.isUint())
 							&& exprArg.getType().getSizeInBits() != 32) {
