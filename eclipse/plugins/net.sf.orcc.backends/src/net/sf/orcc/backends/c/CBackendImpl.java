@@ -31,6 +31,7 @@ package net.sf.orcc.backends.c;
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.OrccLaunchConstants.MAPPING;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -67,29 +68,29 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
  */
 public class CBackendImpl extends AbstractBackend {
 
+	private boolean classify;
 	/**
 	 * Backend options
 	 */
 
 	private boolean debug;
-	private boolean enableTrace;
 
-	private boolean normalize;
-	private boolean classify;
+	private boolean enableTrace;
+	private Map<String, String> mapping;
 	private boolean merge;
 
 	private boolean newScheduler;
+	private boolean normalize;
+	private StandardPrinter printer;
 	private boolean ringTopology;
-	private boolean useGeneticAlgo;
-	private int threadsNb;
 
 	/**
 	 * Configuration mapping
 	 */
 	private Map<String, List<Instance>> targetToInstancesMap;
-	private Map<String, String> mapping;
+	private int threadsNb;
 
-	private StandardPrinter printer;
+	private boolean useGeneticAlgo;
 
 	private void computeOptions(Map<String, Object> options) {
 		options.put("newScheduler", newScheduler);
@@ -138,6 +139,23 @@ public class CBackendImpl extends AbstractBackend {
 		printer.getOptions().put("enableTrace", enableTrace);
 		printer.getOptions().put("ringTopology", ringTopology);
 		printer.getOptions().put("newScheduler", newScheduler);
+
+		// Set build and src directory
+		File srcDir = new File(path + "/src");
+		File buildDir = new File(path + "/build");
+
+		// If directories don't exist, create them
+		if (!srcDir.exists()) {
+			srcDir.mkdirs();
+		}
+
+		// If directories don't exist, create them
+		if (!buildDir.exists()) {
+			buildDir.mkdirs();
+		}
+
+		// Set src directory as path
+		path = srcDir.getAbsolutePath();
 	}
 
 	@Override
