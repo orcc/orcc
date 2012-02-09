@@ -18,8 +18,8 @@ set_global_assignment -name VHDL_FILE top.vhd
 # Shared components
 set_global_assignment -name VHDL_FILE share/vhdl/util_pkg.vhdl
 set_global_assignment -name VHDL_FILE share/vhdl/tce_util_pkg.vhdl
-set_global_assignment -name VHDL_FILE share/vhdl/cal_stream_in_v2.vhdl
-set_global_assignment -name VHDL_FILE share/vhdl/cal_stream_out_v2.vhdl
+set_global_assignment -name VHDL_FILE share/vhdl/cal_stream_in_8fifos.vhdl
+set_global_assignment -name VHDL_FILE share/vhdl/cal_stream_out_8fifos.vhdl
 set_global_assignment -name VHDL_FILE share/vhdl/rf_1wr_1rd_always_1_guarded_0.vhd
 set_global_assignment -name VHDL_FILE share/vhdl/mul.vhdl
 set_global_assignment -name VHDL_FILE share/vhdl/ldh_ldhu_ldq_ldqu_ldw_sth_stq_stw.vhdl

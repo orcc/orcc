@@ -94,8 +94,8 @@ compileSharedComponent(callByNetwork) ::= <<
 # Compile Shared components
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>share/vhdl/util_pkg.vhdl
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>share/vhdl/tce_util_pkg.vhdl
-vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>share/vhdl/cal_stream_in_v2.vhdl
-vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>share/vhdl/cal_stream_out_v2.vhdl
+vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>share/vhdl/cal_stream_in_8fifos.vhdl
+vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>share/vhdl/cal_stream_out_8fifos.vhdl
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>share/vhdl/rf_1wr_1rd_always_1_guarded_0.vhd
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>share/vhdl/mul.vhdl
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>share/vhdl/ldh_ldhu_ldq_ldqu_ldw_sth_stq_stw.vhdl

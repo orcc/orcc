@@ -712,9 +712,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	private Operation createOperationInV2(Port in1, Port out) {
 		Operation operation = createOperation("cal_stream_in_read");
 		operation.setControl(false);
-		operation.getPipeline().add(createResource("res0", 0, 3));
+		operation.getPipeline().add(createResource("res0", 0, 2));
 		operation.getPipeline().add(createReads(in1, 0, 1));
-		operation.getPipeline().add(createWrites(out, 1, 1));
+		operation.getPipeline().add(createWrites(out, 0, 1));
 		return operation;
 	}
 
@@ -731,9 +731,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	private Operation createOperationInPeekV2(Port in1, Port out) {
 		Operation operation = createOperation("cal_stream_in_peek");
 		operation.setControl(false);
-		operation.getPipeline().add(createResource("res0", 0, 3));
+		operation.getPipeline().add(createResource("res0", 0, 2));
 		operation.getPipeline().add(createReads(in1, 0, 1));
-		operation.getPipeline().add(createWrites(out, 1, 1));
+		operation.getPipeline().add(createWrites(out, 0, 1));
 		return operation;
 	}
 
@@ -749,8 +749,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	private Operation createOperationInStatusV2(Port in1, Port out) {
 		Operation operation = createOperation("cal_stream_in_status");
 		operation.setControl(false);
+		operation.getPipeline().add(createResource("res0", 0, 2));
 		operation.getPipeline().add(createReads(in1, 0, 1));
-		operation.getPipeline().add(createWrites(out, 1, 1));
+		operation.getPipeline().add(createWrites(out, 0, 1));
 		return operation;
 	}
 
@@ -780,7 +781,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	private Operation createOperationOutV2(Port in1, Port in2) {
 		Operation operation = createOperation("cal_stream_out_write");
 		operation.setControl(false);
-		operation.getPipeline().add(createResource("res0", 0, 3));
+		operation.getPipeline().add(createResource("res0", 0, 2));
 		operation.getPipeline().add(createReads(in1, 0, 1));
 		operation.getPipeline().add(createReads(in2, 0, 1));
 		return operation;
@@ -798,8 +799,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	private Operation createOperationOutStatusV2(Port in1, Port out) {
 		Operation operation = createOperation("cal_stream_out_status");
 		operation.setControl(false);
+		operation.getPipeline().add(createResource("res0", 0, 2));
 		operation.getPipeline().add(createReads(in1, 0, 1));
-		operation.getPipeline().add(createWrites(out, 1, 1));
+		operation.getPipeline().add(createWrites(out, 0, 1));
 		return operation;
 	}
 
@@ -1040,7 +1042,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		functionUnit.getOperations().add(createOperationInPeekV2(in1t, out1));
 		functionUnit.getOperations().add(createOperationInStatusV2(in1t, out1));
 		// Implementation
-		Implementation streamImpl = createImplementation("stream_units.hdb", 2);
+		Implementation streamImpl = createImplementation("stream_units.hdb", 1);
 		functionUnit.setImplementation(streamImpl);
 		tta.getHardwareDatabase().add(streamImpl);
 		return functionUnit;
@@ -1071,7 +1073,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		functionUnit.getOperations()
 				.add(createOperationOutStatusV2(in1t, out1));
 		// Implementation
-		Implementation streamImpl = createImplementation("stream_units.hdb", 3);
+		Implementation streamImpl = createImplementation("stream_units.hdb", 2);
 		functionUnit.setImplementation(streamImpl);
 		tta.getHardwareDatabase().add(streamImpl);
 		return functionUnit;

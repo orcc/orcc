@@ -199,7 +199,7 @@ public class TTABackendImpl extends AbstractBackend {
 		if (instance.isActor()
 				&& processorIntensiveActors.contains(instance.getActor()
 						.getName())) {
-			return 4;
+			return 2;
 		}
 		return 1;
 	}
@@ -208,7 +208,7 @@ public class TTABackendImpl extends AbstractBackend {
 		if (instance.isActor()
 				&& processorIntensiveActors.contains(instance.getActor()
 						.getName())) {
-			return 8;
+			return 6;
 		}
 		return 2;
 	}
@@ -217,7 +217,7 @@ public class TTABackendImpl extends AbstractBackend {
 		if (instance.isActor()
 				&& processorIntensiveActors.contains(instance.getActor()
 						.getName())) {
-			return 8;
+			return 6;
 		}
 		return 2;
 	}

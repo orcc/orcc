@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <osal version="0.1">
   
-    <operation>
+   <operation>
     <name>CAL_STREAM_IN_READ</name>
     <description></description>    
     <inputs>1</inputs>
     <outputs>1</outputs>
     <side-effects/>
-    <affects>
-      <operation name="CAL_STREAM_IN_STATUS"/>
-      <operation name="CAL_STREAM_IN_PEEK"/>
-    </affects>
     <in id="1" type="SIntWord"/>
     <out id="2" type="SIntWord"/>
   </operation>
@@ -22,7 +18,6 @@
     <outputs>1</outputs>
     <affected-by>
       <operation name="CAL_STREAM_IN_READ"/>
-      <operation name="CAL_STREAM_IN_PEEK"/>
     </affected-by>
     <in id="1" type="SIntWord"/>
     <out id="2" type="SIntWord"/>
@@ -35,7 +30,6 @@
     <outputs>1</outputs>
     <affected-by>
       <operation name="CAL_STREAM_IN_READ"/>
-      <operation name="CAL_STREAM_IN_STATUS"/>
     </affected-by>
     <in id="1" type="SIntWord"/>
     <out id="2" type="SIntWord"/>
@@ -48,9 +42,6 @@
     <inputs>2</inputs>
     <outputs>0</outputs>
     <side-effects/>
-    <affects>
-      <operation name="CAL_STREAM_OUT_STATUS"/>
-    </affects>
     <in id="1" type="SIntWord"/>
     <in id="2" type="SIntWord"/>
   </operation>
@@ -60,7 +51,6 @@
     <description></description>
     <inputs>1</inputs>
     <outputs>1</outputs>
-    <side-effects/>
     <affected-by>
       <operation name="CAL_STREAM_OUT_WRITE"/>
     </affected-by>
