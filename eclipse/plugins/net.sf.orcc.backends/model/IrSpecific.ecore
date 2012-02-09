@@ -47,8 +47,8 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="nodes" upperBound="-1"
         eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Node" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="loopCounter" upperBound="-1"
-        eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Expression" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="init" upperBound="-1" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Expression"
+        eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Instruction" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="init" upperBound="-1" eType="ecore:EClass ../../net.sf.orcc.core/model/Ir.ecore#//Instruction"
         containment="true"/>
   </eClassifiers>
 </ecore:EPackage>

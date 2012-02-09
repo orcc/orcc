@@ -7,6 +7,7 @@
 package net.sf.orcc.backends.ir;
 
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeSpecific;
@@ -132,7 +133,7 @@ public interface NodeFor extends NodeSpecific {
 
 	/**
 	 * Returns the value of the '<em><b>Loop Counter</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.ir.Expression}.
+	 * The list contents are of type {@link net.sf.orcc.ir.Instruction}.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Loop Counter</em>' containment reference list isn't clear,
@@ -144,11 +145,11 @@ public interface NodeFor extends NodeSpecific {
 	 * @model containment="true"
 	 * @generated
 	 */
-	EList<Expression> getLoopCounter();
+	EList<Instruction> getLoopCounter();
 
 	/**
 	 * Returns the value of the '<em><b>Init</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.ir.Expression}.
+	 * The list contents are of type {@link net.sf.orcc.ir.Instruction}.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Init</em>' containment reference list isn't clear,
@@ -160,7 +161,7 @@ public interface NodeFor extends NodeSpecific {
 	 * @model containment="true"
 	 * @generated
 	 */
-	EList<Expression> getInit();
+	EList<Instruction> getInit();
 	
 	public boolean isNodeFor();
 

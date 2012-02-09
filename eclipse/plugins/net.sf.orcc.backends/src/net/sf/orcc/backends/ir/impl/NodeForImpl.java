@@ -12,6 +12,7 @@ import net.sf.orcc.backends.ir.IrSpecificPackage;
 import net.sf.orcc.backends.ir.NodeFor;
 
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 
@@ -107,7 +108,7 @@ public class NodeForImpl extends NodeSpecificImpl implements NodeFor {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Expression> loopCounter;
+	protected EList<Instruction> loopCounter;
 
 	/**
 	 * The cached value of the '{@link #getInit() <em>Init</em>}' containment reference list.
@@ -117,7 +118,7 @@ public class NodeForImpl extends NodeSpecificImpl implements NodeFor {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Expression> init;
+	protected EList<Instruction> init;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -262,9 +263,9 @@ public class NodeForImpl extends NodeSpecificImpl implements NodeFor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Expression> getLoopCounter() {
+	public EList<Instruction> getLoopCounter() {
 		if (loopCounter == null) {
-			loopCounter = new EObjectContainmentEList<Expression>(Expression.class, this, IrSpecificPackage.NODE_FOR__LOOP_COUNTER);
+			loopCounter = new EObjectContainmentEList<Instruction>(Instruction.class, this, IrSpecificPackage.NODE_FOR__LOOP_COUNTER);
 		}
 		return loopCounter;
 	}
@@ -274,9 +275,9 @@ public class NodeForImpl extends NodeSpecificImpl implements NodeFor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Expression> getInit() {
+	public EList<Instruction> getInit() {
 		if (init == null) {
-			init = new EObjectContainmentEList<Expression>(Expression.class, this, IrSpecificPackage.NODE_FOR__INIT);
+			init = new EObjectContainmentEList<Instruction>(Instruction.class, this, IrSpecificPackage.NODE_FOR__INIT);
 		}
 		return init;
 	}
@@ -351,11 +352,11 @@ public class NodeForImpl extends NodeSpecificImpl implements NodeFor {
 				return;
 			case IrSpecificPackage.NODE_FOR__LOOP_COUNTER:
 				getLoopCounter().clear();
-				getLoopCounter().addAll((Collection<? extends Expression>)newValue);
+				getLoopCounter().addAll((Collection<? extends Instruction>)newValue);
 				return;
 			case IrSpecificPackage.NODE_FOR__INIT:
 				getInit().clear();
-				getInit().addAll((Collection<? extends Expression>)newValue);
+				getInit().addAll((Collection<? extends Instruction>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);

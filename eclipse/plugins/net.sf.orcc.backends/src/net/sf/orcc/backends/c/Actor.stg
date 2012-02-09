@@ -267,6 +267,7 @@ printNodes(nodes) ::= <<
 <nodes: {node | <if (node.nodeBlock)><printBlockNode(node)><
 elseif (node.nodeIf)><printIfNode(node)><
 elseif (node.nodeWhile)><printWhileNode(node)><
+elseif (node.nodeFor)><printForNode(node)><
 endif>}>
 >>
 
@@ -293,6 +294,15 @@ while (<whileNode.condition>) {
 	<printNodes(whileNode.nodes)>
 }
 <printBlockNode(whileNode.joinNode)>
+>>
+
+// for node
+printForNode(forNode) ::= <<
+
+for(<forNode.init:{assign | <assign.target.variable.indexedName> = <assign.value>} ; separator=", "> ;<forNode.condition>; <forNode.loopCounter:{assign | <assign.target.variable.indexedName> = <assign.value>}; separator=", ">) {
+	<printNodes(forNode.nodes)>
+}
+<printBlockNode(forNode.joinNode)>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
