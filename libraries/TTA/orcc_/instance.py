@@ -115,7 +115,6 @@ class Instance:
         if retcode == 0: retcode = subprocess.call(["generateprocessor"] + args + ["-o", ttaPath, "-b", self._bemFile, "--shared-files-dir", sharePath,
                                         "-l", "vhdl", "-e", self._entity, "-i", self._idfFile, self._adfFile])
         if retcode == 0: retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", vhdlPath, "-f", "mif", "-o", "mif", self._adfFile])
-        if retcode == 0: retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", vhdlPath, "-f", "coe", "-o", "coe", self._adfFile])
 
         # Generate processor files
         self.irom = self._readMif(self._mifFile)
@@ -129,8 +128,6 @@ class Instance:
         # Copy files to build directory
         shutil.move(self._mifFile, os.path.join(wrapperPath, self._mifFile))
         shutil.move(self._mifDataFile, os.path.join(wrapperPath, self._mifDataFile))
-        shutil.move(self._coeFile, os.path.join(wrapperPath, self._coeFile))
-        shutil.move(self._coeDataFile, os.path.join(wrapperPath, self._coeDataFile))
         shutil.move("imem_mau_pkg.vhdl", vhdlPath)
         
         # Manage simulation files
