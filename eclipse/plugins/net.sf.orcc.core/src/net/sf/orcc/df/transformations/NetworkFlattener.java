@@ -186,8 +186,10 @@ public class NetworkFlattener extends DfSwitch<Void> {
 			for (Use use : var.getUses()) {
 				Expression oldExpr = EcoreHelper.getContainerOfType(use,
 						ExprVar.class);
-				Expression newExpr = IrUtil.copy(var.getInitialValue());
-				EcoreUtil.replace(oldExpr, newExpr);
+				Expression initialValue = var.getInitialValue();
+				if (initialValue != null) {
+					EcoreUtil.replace(oldExpr, IrUtil.copy(initialValue));
+				}
 			}
 		}
 	}
