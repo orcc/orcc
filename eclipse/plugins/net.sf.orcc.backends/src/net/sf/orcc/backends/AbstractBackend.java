@@ -35,8 +35,15 @@ import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 import static net.sf.orcc.util.OrccUtil.getFile;
 
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +52,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Actor;
@@ -67,6 +76,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -170,6 +180,180 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			return;
 		}
 		doXdfCodeGeneration(network);
+	}
+
+	/**
+	 * Copy <i>source</i> file at <i>destination</i> path. If <i>destination</i>
+	 * parents folder does not exists, they will be created
+	 * 
+	 * @param source
+	 *            Resource file path starting with '/'. Must be an existing path
+	 *            relative to classpath (JAR file root or project classpath)
+	 * @param destination
+	 *            Path of the target file
+	 */
+	protected boolean copyFileToFilesystem(final String source,
+			final String dest) {
+		int bufferSize = 512;
+
+		assert source != null;
+		assert dest != null;
+		assert source.startsWith("/");
+
+		File fileOut = new File(dest);
+		if (!fileOut.exists()) {
+			try {
+				File parentDir = fileOut.getParentFile();
+				if (parentDir != null) {
+					parentDir.mkdirs();
+				}
+				fileOut.createNewFile();
+			} catch (IOException e) {
+				write("Unable to write " + dest + " file\n");
+				return false;
+			}
+		}
+
+		if (!fileOut.isFile()) {
+			write(dest + " is not a file path\n");
+			fileOut.delete();
+			return false;
+		}
+
+		InputStream is = this.getClass().getResourceAsStream(source);
+		if (is == null) {
+			write("Unable to find " + source + "\n");
+			return false;
+		}
+		DataInputStream dis;
+		dis = new DataInputStream(is);
+
+		FileOutputStream out;
+		try {
+			out = new FileOutputStream(fileOut);
+		} catch (FileNotFoundException e1) {
+			write("File " + dest + " not found !" + "\n");
+			return false;
+		}
+
+		try {
+			byte[] b = new byte[bufferSize];
+			int i = is.read(b);
+			while (i != -1) {
+				out.write(b, 0, i);
+				i = is.read(b);
+			}
+			dis.close();
+			out.close();
+		} catch (IOException e) {
+			write("IOError : " + e.getMessage() + "\n");
+		}
+		return true;
+	}
+
+	/**
+	 * Copy <i>source</i> folder and all its content under <i>destination</i>.
+	 * Final '/' is not required for both parameters. If <i>destination</i> does
+	 * not exists, it will be created
+	 * 
+	 * @param source
+	 *            Resource folder path starting with '/'. Must be an existing
+	 *            path relative to classpath (JAR file root or project
+	 *            classpath)
+	 * @param destination
+	 *            Filesystem folder path
+	 */
+	protected boolean copyFolderToFileSystem(final String source,
+			final String destination) {
+
+		assert source != null;
+		assert destination != null;
+		assert source.startsWith("/");
+
+		File outputDir = new File(destination);
+
+		if (!outputDir.exists()) {
+			if (!outputDir.mkdirs()) {
+				write("Unable to create " + outputDir + " folder\n");
+				return false;
+			}
+		}
+
+		if (!outputDir.isDirectory()) {
+			write(outputDir + " does not exists or is not a directory." + "\n");
+			return false;
+		}
+
+		String inputDir;
+		// Remove '/' end character (if needed)
+		if (source.charAt(source.length() - 1) == '/') {
+			inputDir = source.substring(0, source.length() - 1);
+		} else {
+			inputDir = source;
+		}
+
+		try {
+			URL toto = this.getClass().getResource(inputDir);
+			URL inputURL = FileLocator.resolve(toto);
+			String inputPath = inputURL.toString();
+
+			if (inputPath.startsWith("jar:file:")) {
+				// Backend running from jar file
+
+				inputPath = inputPath.substring(9, inputPath.indexOf('!'));
+
+				JarFile jar = new JarFile(inputPath);
+
+				Enumeration<JarEntry> jarEntries = jar.entries();
+				if (jarEntries == null) {
+					write("Unable to list content from " + jar.getName()
+							+ " file.\n");
+					return false;
+				}
+
+				String sourceMinusSlash = source.substring(1);
+				JarEntry elt;
+				while (jarEntries.hasMoreElements()) {
+
+					elt = jarEntries.nextElement();
+
+					if (elt.isDirectory()
+							|| !elt.getName().startsWith(sourceMinusSlash)) {
+						continue;
+					}
+
+					String newInPath = "/" + elt.getName();
+					String newOutPath = outputDir
+							+ File.separator
+							+ elt.getName()
+									.substring(sourceMinusSlash.length());
+					copyFileToFilesystem(newInPath, newOutPath);
+				}
+
+			} else {
+				// Backend running from filesystem
+				File[] listDir = new File(inputPath.substring(5)).listFiles();
+
+				for (File elt : listDir) {
+					String newInPath = inputDir + File.separator
+							+ elt.getName();
+
+					String newOutPath = outputDir + File.separator
+							+ elt.getName();
+
+					if (elt.isDirectory()) {
+						copyFolderToFileSystem(newInPath, newOutPath);
+					} else {
+						copyFileToFilesystem(newInPath, newOutPath);
+					}
+				}
+			}
+		} catch (IOException e) {
+			write("IOError" + e.getMessage() + "\n");
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
