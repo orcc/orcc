@@ -36,15 +36,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.dftools.graph.Edge;
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.Edge;
+import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.Vertex;
 import net.sf.orcc.moc.MoC;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -208,12 +209,13 @@ public class StaticRegionDetector {
 		List<Vertex> vertices = new TopologicalSorter(network)
 				.topologicalSort();
 		for (Vertex vertex : vertices) {
-			if (vertex.isInstance()) {
-				MoC clasz = ((Instance) vertex).getMoC();
-				if (!discovered.contains(vertex) && clasz.isCSDF()) {
+			DfVertex vert = (DfVertex) vertex;
+			if (vert.isInstance()) {
+				MoC clasz = ((Instance) vert).getMoC();
+				if (!discovered.contains(vert) && clasz.isCSDF()) {
 					List<Vertex> set = new LinkedList<Vertex>();
 					staticRegionList.add(set);
-					staticRegionAnalysis(vertex, set);
+					staticRegionAnalysis(vert, set);
 				}
 			}
 		}

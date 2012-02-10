@@ -34,11 +34,11 @@ import java.util.Map;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Var;
@@ -58,7 +58,7 @@ public class Instantiator extends DfSwitch<Network> {
 
 	private Copier copier;
 
-	private Map<Instance, Vertex> map;
+	private Map<Instance, DfVertex> map;
 
 	private boolean skipActors;
 
@@ -82,7 +82,7 @@ public class Instantiator extends DfSwitch<Network> {
 	public Instantiator(boolean skipActors) {
 		this.skipActors = skipActors;
 		copier = new Copier();
-		map = new HashMap<Instance, Vertex>();
+		map = new HashMap<Instance, DfVertex>();
 	}
 
 	@Override
@@ -138,8 +138,8 @@ public class Instantiator extends DfSwitch<Network> {
 
 		// copy connections
 		for (Connection connection : network.getConnections()) {
-			Vertex source = getCopy(connection.getSource());
-			Vertex target = getCopy(connection.getTarget());
+			DfVertex source = getCopy(connection.getSource());
+			DfVertex target = getCopy(connection.getTarget());
 
 			Port sourcePort = getPort(source, connection.getSourcePort());
 			Port targetPort = getPort(target, connection.getTargetPort());
@@ -153,9 +153,9 @@ public class Instantiator extends DfSwitch<Network> {
 		return networkCopy;
 	}
 
-	private Vertex getCopy(Vertex vertex) {
+	private DfVertex getCopy(DfVertex vertex) {
 		// assume vertex is port or instance of actor
-		Vertex result = (Vertex) copier.get(vertex);
+		DfVertex result = (DfVertex) copier.get(vertex);
 		if (result == null) {
 			// if not, get mapping from instance to entity
 			result = map.get((Instance) vertex);
@@ -163,7 +163,7 @@ public class Instantiator extends DfSwitch<Network> {
 		return result;
 	}
 
-	private Port getPort(Vertex vertex, Port port) {
+	private Port getPort(DfVertex vertex, Port port) {
 		if (vertex.isEntity()) {
 			Entity entity = (Entity) vertex;
 			return entity.getPort(port.getName());

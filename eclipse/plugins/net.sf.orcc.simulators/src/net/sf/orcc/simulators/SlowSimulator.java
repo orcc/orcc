@@ -46,10 +46,10 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.df.transformations.NetworkFlattener;
 import net.sf.orcc.ir.util.ActorInterpreter;
@@ -104,8 +104,8 @@ public class SlowSimulator extends AbstractSimulator {
 		if (enableTraces) {
 			String fifoName = src.getName() + "_" + srcPort.getName() + "_"
 					+ tgt.getName() + "_" + tgtPort.getName();
-			fifo = new SimulatorFifo(srcPort.getType(), fifoSize, traceFolder, fifoName,
-					enableTraces);
+			fifo = new SimulatorFifo(srcPort.getType(), fifoSize, traceFolder,
+					fifoName, enableTraces);
 		} else {
 			fifo = new SimulatorFifo(srcPort.getType(), fifoSize);
 		}
@@ -132,8 +132,8 @@ public class SlowSimulator extends AbstractSimulator {
 		// Loop over the connections and ask for the source and target actors
 		// connection through specified I/O ports.
 		for (Connection connection : network.getConnections()) {
-			Vertex srcVertex = connection.getSource();
-			Vertex tgtVertex = connection.getTarget();
+			DfVertex srcVertex = connection.getSource();
+			DfVertex tgtVertex = connection.getTarget();
 
 			if (srcVertex.isInstance() && tgtVertex.isInstance()) {
 				// get FIFO size (user-defined nor default)
@@ -269,8 +269,8 @@ public class SlowSimulator extends AbstractSimulator {
 
 	protected void updateConnections(Network network) throws OrccException {
 		for (Connection connection : network.getConnections()) {
-			Vertex srcVertex = connection.getSource();
-			Vertex tgtVertex = connection.getTarget();
+			DfVertex srcVertex = connection.getSource();
+			DfVertex tgtVertex = connection.getTarget();
 
 			if (srcVertex.isInstance()) {
 				Instance source = (Instance) srcVertex;

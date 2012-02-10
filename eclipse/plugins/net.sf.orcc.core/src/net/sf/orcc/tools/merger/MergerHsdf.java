@@ -8,15 +8,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
@@ -222,8 +223,8 @@ public class MergerHsdf extends DfSwitch<Actor> {
 
 		// Create buffers for connections inside the sub-graph
 		for (Connection connection : network.getConnections()) {
-			Vertex src = connection.getSource();
-			Vertex tgt = connection.getTarget();
+			DfVertex src = connection.getSource();
+			DfVertex tgt = connection.getTarget();
 			if (src.isInstance() && tgt.isInstance()) {
 				String name = "buffer_" + index++;
 				Port srcPort = connection.getSourcePort();

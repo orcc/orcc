@@ -41,11 +41,11 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.transformations.NetworkClassifier;
 import net.sf.orcc.df.util.DfAdapterFactory;
 import net.sf.orcc.ir.Var;
@@ -521,8 +521,8 @@ public class NetworkImpl extends EntityImpl implements Network {
 	}
 
 	@Override
-	public List<Vertex> getVertices() {
-		List<Vertex> vertices = new ArrayList<Vertex>(getInputs());
+	public List<DfVertex> getVertices() {
+		List<DfVertex> vertices = new ArrayList<DfVertex>(getInputs());
 		vertices.addAll(getOutputs());
 		vertices.addAll(getInstances());
 		vertices.addAll(getEntities());

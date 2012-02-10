@@ -31,13 +31,13 @@ package net.sf.orcc.df.transformations;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.dftools.graph.Edge;
+import net.sf.dftools.graph.Nameable;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.Edge;
+import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Entity;
-import net.sf.orcc.df.Nameable;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
@@ -165,8 +165,8 @@ public class NetworkFlattener extends DfSwitch<Void> {
 		// move connections between entities in this network
 		List<Connection> connections = new ArrayList<Connection>();
 		for (Connection connection : subNetwork.getConnections()) {
-			Vertex source = connection.getSource();
-			Vertex target = connection.getTarget();
+			DfVertex source = connection.getSource();
+			DfVertex target = connection.getTarget();
 			if (!source.isPort() && !target.isPort()) {
 				connections.add(connection);
 			}

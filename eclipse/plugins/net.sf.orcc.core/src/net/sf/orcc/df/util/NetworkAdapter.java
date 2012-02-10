@@ -32,9 +32,10 @@ import static net.sf.orcc.df.DfPackage.eINSTANCE;
 
 import java.util.List;
 
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.Vertex;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
@@ -58,8 +59,8 @@ public class NetworkAdapter extends AdapterImpl {
 					|| feature == eINSTANCE.getEntity_Outputs()
 					|| feature == eINSTANCE.getNetwork_Entities()
 					|| feature == eINSTANCE.getNetwork_Instances()) {
-				List<Vertex> vertices = (List<Vertex>) msg.getOldValue();
-				for (Vertex vertex : vertices) {
+				List<DfVertex> vertices = (List<DfVertex>) msg.getOldValue();
+				for (DfVertex vertex : vertices) {
 					remove(vertex);
 				}
 			} else if (feature == eINSTANCE.getNetwork_Connections()) {
@@ -78,7 +79,7 @@ public class NetworkAdapter extends AdapterImpl {
 					|| feature == eINSTANCE.getNetwork_Entities()
 					|| feature == eINSTANCE.getNetwork_Instances()) {
 				// when removing an instance or a port, remove it from vertices
-				Vertex vertex = (Vertex) msg.getOldValue();
+				DfVertex vertex = (DfVertex) msg.getOldValue();
 				remove(vertex);
 			} else if (feature == eINSTANCE.getNetwork_Connections()) {
 				// when removing a connection, set its source/target to null

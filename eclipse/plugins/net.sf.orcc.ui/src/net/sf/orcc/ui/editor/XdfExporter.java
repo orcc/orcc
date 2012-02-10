@@ -44,6 +44,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import net.sf.dftools.graph.Attribute;
+import net.sf.dftools.graph.GraphFactory;
 import net.sf.graphiti.io.LayoutWriter;
 import net.sf.graphiti.model.Edge;
 import net.sf.graphiti.model.Graph;
@@ -74,9 +76,9 @@ import net.sf.orcc.cal.services.CalGrammarAccess;
 import net.sf.orcc.cal.ui.internal.CalActivator;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
-import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -141,11 +143,11 @@ public class XdfExporter extends CalSwitch<Object> {
 
 	private Map<String, Var> varMap;
 
-	private Map<Vertex, net.sf.orcc.df.Vertex> vertexMap;
+	private Map<Vertex, DfVertex> vertexMap;
 
 	private void addEdge(Network network, Edge edge) {
-		net.sf.orcc.df.Vertex source = vertexMap.get(edge.getSource());
-		net.sf.orcc.df.Vertex target = vertexMap.get(edge.getTarget());
+		DfVertex source = vertexMap.get(edge.getSource());
+		DfVertex target = vertexMap.get(edge.getTarget());
 
 		Port sourcePort = null;
 		if ("Instance".equals(edge.getSource().getType().getName())) {
@@ -286,7 +288,7 @@ public class XdfExporter extends CalSwitch<Object> {
 					// remove extra quotes
 					Expression expr = IrFactory.eINSTANCE
 							.createExprString(partName);
-					Attribute attr = DfFactory.eINSTANCE.createAttribute(
+					Attribute attr = GraphFactory.eINSTANCE.createAttribute(
 							"partName", expr);
 					instance.getAttributes().add(attr);
 				}
@@ -470,7 +472,7 @@ public class XdfExporter extends CalSwitch<Object> {
 
 		varMap = new HashMap<String, Var>();
 		portMap = new HashMap<Port, Vertex>();
-		vertexMap = new HashMap<Vertex, net.sf.orcc.df.Vertex>();
+		vertexMap = new HashMap<Vertex, DfVertex>();
 
 		Network network = DfFactory.eINSTANCE.createNetwork();
 		network.setName((String) graph.getValue(PARAMETER_ID));

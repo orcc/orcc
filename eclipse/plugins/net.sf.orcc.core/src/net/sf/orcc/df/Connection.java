@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.df;
 
+import net.sf.dftools.graph.Attribute;
+import net.sf.dftools.graph.Edge;
 import net.sf.orcc.ir.Expression;
 
 import org.eclipse.emf.common.util.EList;
@@ -79,6 +81,10 @@ public interface Connection extends Edge {
 	 * @model
 	 */
 	Port getSourcePort();
+	
+	DfVertex getSource();
+	
+	DfVertex getTarget();
 
 	/**
 	 * Returns this connection's target port (may be <code>null</code>).

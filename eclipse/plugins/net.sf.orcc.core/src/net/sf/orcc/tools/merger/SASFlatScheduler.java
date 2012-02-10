@@ -29,8 +29,9 @@
 
 package net.sf.orcc.tools.merger;
 
+import net.sf.dftools.graph.Vertex;
+import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.Vertex;
 
 /**
  * This class computes a flat single appearance schedule (SAS) from the given
@@ -54,11 +55,12 @@ public class SASFlatScheduler extends AbstractScheduler {
 		TopologicalSorter sort = new TopologicalSorter(network);
 
 		for (Vertex vertex : sort.topologicalSort()) {
-			if (vertex.isInstance()) {
-				int rep = repetitions.get(vertex);
+			DfVertex vert = (DfVertex) vertex;
+			if (vert.isInstance()) {
+				int rep = repetitions.get(vert);
 				Iterand iterand = null;
 				for (int i = 0; i < rep; i++) {
-					iterand = new Iterand(vertex);
+					iterand = new Iterand(vert);
 					schedule.add(iterand);
 				}
 			}

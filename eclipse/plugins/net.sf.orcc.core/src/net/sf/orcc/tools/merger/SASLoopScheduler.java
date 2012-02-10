@@ -29,8 +29,9 @@
 
 package net.sf.orcc.tools.merger;
 
+import net.sf.dftools.graph.Vertex;
+import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.Vertex;
 
 /**
  * This class computes a single appearance schedule (SAS) with 1-level nested
@@ -53,16 +54,17 @@ public class SASLoopScheduler extends AbstractScheduler {
 		TopologicalSorter sort = new TopologicalSorter(network);
 
 		for (Vertex vertex : sort.topologicalSort()) {
-			if (vertex.isInstance()) {
-				int rep = repetitions.get(vertex);
+			DfVertex vert = (DfVertex) vertex;
+			if (vert.isInstance()) {
+				int rep = repetitions.get(vert);
 				Iterand iterand = null;
 				if (rep > 1) {
 					Schedule subSched = new Schedule();
-					subSched.setIterationCount(repetitions.get(vertex));
-					subSched.add(new Iterand(vertex));
+					subSched.setIterationCount(repetitions.get(vert));
+					subSched.add(new Iterand(vert));
 					iterand = new Iterand(subSched);
 				} else {
-					iterand = new Iterand(vertex);
+					iterand = new Iterand(vert);
 				}
 				schedule.add(iterand);
 			}

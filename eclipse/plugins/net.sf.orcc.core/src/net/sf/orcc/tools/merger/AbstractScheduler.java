@@ -32,11 +32,12 @@ package net.sf.orcc.tools.merger;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.dftools.graph.Edge;
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.Edge;
+import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.Vertex;
 import net.sf.orcc.moc.CSDFMoC;
 
 /**
@@ -70,9 +71,10 @@ public abstract class AbstractScheduler implements IScheduler {
 	private void computeMemoryBound(Schedule schedule) {
 		for (Iterand iterand : schedule.getIterands()) {
 			if (iterand.isVertex()) {
-				Vertex vertex = iterand.getVertex();
+				DfVertex vertex = iterand.getVertex();
 				for (Edge edge : vertex.getIncoming()) {
-					if (edge.getSource().isInstance()) {
+					Connection conn = (Connection) edge;
+					if (conn.getSource().isInstance()) {
 						Connection connection = (Connection) edge;
 						int cns = connection.getTargetPort()
 								.getNumTokensConsumed();
@@ -81,7 +83,8 @@ public abstract class AbstractScheduler implements IScheduler {
 				}
 
 				for (Edge edge : vertex.getOutgoing()) {
-					if (edge.getTarget().isInstance()) {
+					Connection conn = (Connection) edge;
+					if (conn.getTarget().isInstance()) {
 						Connection connection = (Connection) edge;
 						int current = tokens.get(connection);
 						int max = maxTokens.get(connection);

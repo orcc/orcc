@@ -31,13 +31,13 @@ package net.sf.orcc.tools.merger;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.util.DfSwitch;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;

@@ -33,9 +33,9 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import net.sf.dftools.graph.Edge;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Edge;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Transition;
 import net.sf.orcc.ir.ExprBinary;

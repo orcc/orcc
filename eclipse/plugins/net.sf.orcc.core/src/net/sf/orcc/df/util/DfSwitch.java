@@ -8,19 +8,20 @@ package net.sf.orcc.df.util;
 
 import java.util.Map;
 
+import net.sf.dftools.graph.Edge;
+import net.sf.dftools.graph.Nameable;
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
-import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.Edge;
+import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.EntitySpecific;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Instance;
-import net.sf.orcc.df.Nameable;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
@@ -28,7 +29,6 @@ import net.sf.orcc.df.State;
 import net.sf.orcc.df.Tag;
 import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.Unit;
-import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.WrapperString;
 import net.sf.orcc.df.WrapperXml;
 import net.sf.orcc.ir.Var;
@@ -94,9 +94,11 @@ public class DfSwitch<T> extends Switch<T> {
 	@Override
 	protected T doSwitch(int classifierID, EObject theEObject) {
 		switch (classifierID) {
-			case DfPackage.NAMEABLE: {
-				Nameable nameable = (Nameable)theEObject;
-				T result = caseNameable(nameable);
+			case DfPackage.DF_VERTEX: {
+				DfVertex dfVertex = (DfVertex)theEObject;
+				T result = caseDfVertex(dfVertex);
+				if (result == null) result = caseVertex(dfVertex);
+				if (result == null) result = caseNameable(dfVertex);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -107,16 +109,10 @@ public class DfSwitch<T> extends Switch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case DfPackage.VERTEX: {
-				Vertex vertex = (Vertex)theEObject;
-				T result = caseVertex(vertex);
-				if (result == null) result = caseNameable(vertex);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
 			case DfPackage.PORT: {
 				Port port = (Port)theEObject;
 				T result = casePort(port);
+				if (result == null) result = caseDfVertex(port);
 				if (result == null) result = caseVertex(port);
 				if (result == null) result = caseNameable(port);
 				if (result == null) result = defaultCase(theEObject);
@@ -125,6 +121,7 @@ public class DfSwitch<T> extends Switch<T> {
 			case DfPackage.INSTANCE: {
 				Instance instance = (Instance)theEObject;
 				T result = caseInstance(instance);
+				if (result == null) result = caseDfVertex(instance);
 				if (result == null) result = caseVertex(instance);
 				if (result == null) result = caseNameable(instance);
 				if (result == null) result = defaultCase(theEObject);
@@ -133,6 +130,7 @@ public class DfSwitch<T> extends Switch<T> {
 			case DfPackage.ENTITY: {
 				Entity entity = (Entity)theEObject;
 				T result = caseEntity(entity);
+				if (result == null) result = caseDfVertex(entity);
 				if (result == null) result = caseVertex(entity);
 				if (result == null) result = caseNameable(entity);
 				if (result == null) result = defaultCase(theEObject);
@@ -142,6 +140,7 @@ public class DfSwitch<T> extends Switch<T> {
 				EntitySpecific entitySpecific = (EntitySpecific)theEObject;
 				T result = caseEntitySpecific(entitySpecific);
 				if (result == null) result = caseEntity(entitySpecific);
+				if (result == null) result = caseDfVertex(entitySpecific);
 				if (result == null) result = caseVertex(entitySpecific);
 				if (result == null) result = caseNameable(entitySpecific);
 				if (result == null) result = defaultCase(theEObject);
@@ -151,6 +150,7 @@ public class DfSwitch<T> extends Switch<T> {
 				Actor actor = (Actor)theEObject;
 				T result = caseActor(actor);
 				if (result == null) result = caseEntity(actor);
+				if (result == null) result = caseDfVertex(actor);
 				if (result == null) result = caseVertex(actor);
 				if (result == null) result = caseNameable(actor);
 				if (result == null) result = defaultCase(theEObject);
@@ -160,6 +160,7 @@ public class DfSwitch<T> extends Switch<T> {
 				Network network = (Network)theEObject;
 				T result = caseNetwork(network);
 				if (result == null) result = caseEntity(network);
+				if (result == null) result = caseDfVertex(network);
 				if (result == null) result = caseVertex(network);
 				if (result == null) result = caseNameable(network);
 				if (result == null) result = defaultCase(theEObject);
@@ -169,20 +170,9 @@ public class DfSwitch<T> extends Switch<T> {
 				Broadcast broadcast = (Broadcast)theEObject;
 				T result = caseBroadcast(broadcast);
 				if (result == null) result = caseEntity(broadcast);
+				if (result == null) result = caseDfVertex(broadcast);
 				if (result == null) result = caseVertex(broadcast);
 				if (result == null) result = caseNameable(broadcast);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.EDGE: {
-				Edge edge = (Edge)theEObject;
-				T result = caseEdge(edge);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.ATTRIBUTE: {
-				Attribute attribute = (Attribute)theEObject;
-				T result = caseAttribute(attribute);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -273,6 +263,21 @@ public class DfSwitch<T> extends Switch<T> {
 	}
 
 	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Vertex</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Vertex</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseDfVertex(DfVertex object) {
+		return null;
+	}
+
+	/**
 	 * Returns the result of interpreting the object as an instance of '<em>Network</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
@@ -284,21 +289,6 @@ public class DfSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseNetwork(Network object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Attribute</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Attribute</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseAttribute(Attribute object) {
 		return null;
 	}
 

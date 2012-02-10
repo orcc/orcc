@@ -9,13 +9,14 @@ package net.sf.orcc.df;
 import java.util.Collection;
 import java.util.List;
 
+import net.sf.dftools.graph.Attribute;
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.ecore.EFactory;
-import org.eclipse.emf.ecore.EObject;
 
 /**
  * <!-- begin-user-doc --> The <b>Factory</b> for the model. It provides a
@@ -94,15 +95,6 @@ public interface DfFactory extends EFactory {
 	Argument createArgument();
 
 	/**
-	 * Returns a new object of class '<em>Edge</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Edge</em>'.
-	 * @generated
-	 */
-	Edge createEdge();
-
-	/**
 	 * Returns a new object of class '<em>Unit</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -112,17 +104,6 @@ public interface DfFactory extends EFactory {
 	Unit createUnit();
 
 	Argument createArgument(Var variable, Expression value);
-
-	/**
-	 * Returns a new object of class '<em>Attribute</em>'.
-	 * <!-- begin-user-doc
-	 * --> <!-- end-user-doc -->
-	 * @return a new object of class '<em>Attribute</em>'.
-	 * @generated
-	 */
-	Attribute createAttribute();
-
-	Attribute createAttribute(String name, EObject value);
 
 	/**
 	 * Returns a new object of class '<em>Broadcast</em>'.
@@ -346,5 +327,6 @@ public interface DfFactory extends EFactory {
 	 * @generated
 	 */
 	DfPackage getDfPackage();
+
 
 } // DfFactory

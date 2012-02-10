@@ -6,15 +6,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
@@ -341,7 +342,7 @@ public class SdfToHsdf extends DfSwitch<Network> {
 
 		DfFactory factory = DfFactory.eINSTANCE;
 		for (Connection connection : connections) {
-			Vertex src = connection.getSource();
+			DfVertex src = connection.getSource();
 			if (src.isInstance()) {
 				int rep = repetitions.get(src);
 				if (rep > 1) {
@@ -373,7 +374,7 @@ public class SdfToHsdf extends DfSwitch<Network> {
 				}
 			}
 
-			Vertex tgt = connection.getTarget();
+			DfVertex tgt = connection.getTarget();
 			if (tgt.isInstance()) {
 				int rep = repetitions.get(tgt);
 				if (rep > 1) {

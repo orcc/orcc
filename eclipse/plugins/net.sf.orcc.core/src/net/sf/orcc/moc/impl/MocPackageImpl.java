@@ -6,6 +6,7 @@
  */
 package net.sf.orcc.moc.impl;
 
+import net.sf.dftools.graph.GraphPackage;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.impl.DfPackageImpl;
 import net.sf.orcc.ir.IrPackage;
@@ -122,6 +123,7 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 
 		// Initialize simple dependencies
 		EcorePackage.eINSTANCE.eClass();
+		GraphPackage.eINSTANCE.eClass();
 
 		// Obtain or create and register interdependencies
 		DfPackageImpl theDfPackage = (DfPackageImpl)(EPackage.Registry.INSTANCE.getEPackage(DfPackage.eNS_URI) instanceof DfPackageImpl ? EPackage.Registry.INSTANCE.getEPackage(DfPackage.eNS_URI) : DfPackage.eINSTANCE);

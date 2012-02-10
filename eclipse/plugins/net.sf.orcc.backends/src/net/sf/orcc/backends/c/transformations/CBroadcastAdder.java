@@ -32,10 +32,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.dftools.graph.Edge;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.Edge;
+import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.transformations.BroadcastAdder;
 import net.sf.orcc.util.WriteListener;
 
@@ -58,7 +58,7 @@ public class CBroadcastAdder extends BroadcastAdder {
 	}
 
 	@Override
-	public Void caseVertex(Vertex vertex) {
+	public Void caseDfVertex(DfVertex vertex) {
 		List<Edge> edges = new ArrayList<Edge>(vertex.getOutgoing());
 		Map<Port, List<Connection>> outMap = vertex.getOutgoingPortMap();
 		for (Edge edge : edges) {

@@ -31,11 +31,11 @@ package net.sf.orcc.ir.util;
 import java.util.Collections;
 import java.util.List;
 
+import net.sf.dftools.graph.Edge;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
-import net.sf.orcc.df.Edge;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;

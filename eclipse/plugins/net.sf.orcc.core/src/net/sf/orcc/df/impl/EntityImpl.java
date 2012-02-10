@@ -34,7 +34,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *
  * @generated
  */
-public abstract class EntityImpl extends VertexImpl implements Entity {
+public abstract class EntityImpl extends DfVertexImpl implements Entity {
 
 	/**
 	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' containment reference list.
@@ -184,6 +184,7 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 		}
 		return null;
 	}
+
 
 	@Override
 	public Port getPort(String name) {

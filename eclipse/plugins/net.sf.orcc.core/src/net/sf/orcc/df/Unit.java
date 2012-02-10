@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.df;
 
+import net.sf.dftools.graph.Nameable;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 

@@ -8,19 +8,20 @@ package net.sf.orcc.df.util;
 
 import java.util.Map;
 
+import net.sf.dftools.graph.Edge;
+import net.sf.dftools.graph.Nameable;
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
-import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.Edge;
+import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.EntitySpecific;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Instance;
-import net.sf.orcc.df.Nameable;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
@@ -28,7 +29,6 @@ import net.sf.orcc.df.State;
 import net.sf.orcc.df.Tag;
 import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.Unit;
-import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.WrapperString;
 import net.sf.orcc.df.WrapperXml;
 import net.sf.orcc.ir.Var;
@@ -95,16 +95,12 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	protected DfSwitch<Adapter> modelSwitch =
 		new DfSwitch<Adapter>() {
 			@Override
-			public Adapter caseNameable(Nameable object) {
-				return createNameableAdapter();
+			public Adapter caseDfVertex(DfVertex object) {
+				return createDfVertexAdapter();
 			}
 			@Override
 			public Adapter caseUnit(Unit object) {
 				return createUnitAdapter();
-			}
-			@Override
-			public Adapter caseVertex(Vertex object) {
-				return createVertexAdapter();
 			}
 			@Override
 			public Adapter casePort(Port object) {
@@ -133,14 +129,6 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseBroadcast(Broadcast object) {
 				return createBroadcastAdapter();
-			}
-			@Override
-			public Adapter caseEdge(Edge object) {
-				return createEdgeAdapter();
-			}
-			@Override
-			public Adapter caseAttribute(Attribute object) {
-				return createAttributeAdapter();
 			}
 			@Override
 			public Adapter caseConnection(Connection object) {
@@ -195,6 +183,18 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 				return createArgumentAdapter();
 			}
 			@Override
+			public Adapter caseNameable(Nameable object) {
+				return createNameableAdapter();
+			}
+			@Override
+			public Adapter caseVertex(Vertex object) {
+				return createVertexAdapter();
+			}
+			@Override
+			public Adapter caseEdge(Edge object) {
+				return createEdgeAdapter();
+			}
+			@Override
 			public Adapter defaultCase(EObject object) {
 				return createEObjectAdapter();
 			}
@@ -213,6 +213,20 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 		return modelSwitch.doSwitch((EObject)target);
 	}
 
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.DfVertex <em>Vertex</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.df.DfVertex
+	 * @generated
+	 */
+	public Adapter createDfVertexAdapter() {
+		return null;
+	}
 
 	/**
 	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Network <em>Network</em>}'.
@@ -312,13 +326,13 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Vertex <em>Vertex</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.dftools.graph.Vertex <em>Vertex</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.orcc.df.Vertex
+	 * @see net.sf.dftools.graph.Vertex
 	 * @generated
 	 */
 	public Adapter createVertexAdapter() {
@@ -494,13 +508,13 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Edge <em>Edge</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.dftools.graph.Edge <em>Edge</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.orcc.df.Edge
+	 * @see net.sf.dftools.graph.Edge
 	 * @generated
 	 */
 	public Adapter createEdgeAdapter() {
@@ -550,13 +564,13 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Nameable <em>Nameable</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.dftools.graph.Nameable <em>Nameable</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.orcc.df.Nameable
+	 * @see net.sf.dftools.graph.Nameable
 	 * @generated
 	 */
 	public Adapter createNameableAdapter() {

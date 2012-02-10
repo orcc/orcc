@@ -41,10 +41,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.ui.OrccUiActivator;
 import net.sf.orcc.util.EcoreHelper;
@@ -113,7 +113,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 		public Object[] getElements(Object inputElement) {
 			if (inputElement instanceof Network) {
 				Network network = (Network) inputElement;
-				EList<Vertex> vertices = new BasicEList<Vertex>();
+				EList<DfVertex> vertices = new BasicEList<DfVertex>();
 				vertices.addAll(network.getInstances());
 				vertices.addAll(network.getEntities());
 				return vertices.toArray();
@@ -176,7 +176,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 			return "";
 		}
 
-		private void setMapping(Vertex vertex, String component) {
+		private void setMapping(DfVertex vertex, String component) {
 			if (vertex.isInstance()) {
 				Instance instance = (Instance) vertex;
 				mapping.put(instance.getHierarchicalName(), component);
@@ -194,8 +194,8 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 
 		@Override
 		protected void setValue(Object element, Object value) {
-			if (element instanceof Vertex) {
-				Vertex vertex = (Vertex) element;
+			if (element instanceof DfVertex) {
+				DfVertex vertex = (DfVertex) element;
 				String component = (String) value;
 				if (component == null || component.contains(",")
 						|| component.isEmpty()) {
@@ -226,7 +226,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 		@Override
 		public String getColumnText(Object element, int columnIndex) {
 			if (columnIndex == 0) {
-				Vertex vertex = (Vertex) element;
+				DfVertex vertex = (DfVertex) element;
 				return vertex.getName();
 			} else {
 				if (element instanceof Instance) {

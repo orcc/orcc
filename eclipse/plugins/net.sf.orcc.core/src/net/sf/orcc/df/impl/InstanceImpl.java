@@ -55,13 +55,12 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * @author Matthieu Wipliez
  * @generated
  */
-public class InstanceImpl extends VertexImpl implements Instance {
+public class InstanceImpl extends DfVertexImpl implements Instance {
 
 	/**
 	 * The cached value of the '{@link #getArguments() <em>Arguments</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getArguments()
-	 * @generated
 	 * @ordered
 	 */
 	protected EList<Argument> arguments;

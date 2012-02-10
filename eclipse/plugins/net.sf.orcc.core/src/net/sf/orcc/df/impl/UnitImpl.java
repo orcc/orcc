@@ -8,6 +8,7 @@ package net.sf.orcc.df.impl;
 
 import java.util.Collection;
 
+import net.sf.dftools.graph.impl.NameableImpl;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Unit;
 import net.sf.orcc.ir.Procedure;

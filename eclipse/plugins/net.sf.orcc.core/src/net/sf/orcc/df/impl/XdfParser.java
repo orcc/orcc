@@ -35,16 +35,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.dftools.graph.Attribute;
+import net.sf.dftools.graph.GraphFactory;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Argument;
-import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Entity;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.Vertex;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
@@ -67,6 +68,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -540,7 +542,7 @@ public class XdfParser {
 	 *            the name of a port
 	 * @return a port, or <code>null</code> if no port should be returned
 	 */
-	private Port getPort(Vertex vertex, String dir, String portName) {
+	private Port getPort(DfVertex vertex, String dir, String portName) {
 		if (vertex.isPort()) {
 			return null;
 		} else {
@@ -565,7 +567,7 @@ public class XdfParser {
 	 *            the kind of port
 	 * @return a vertex that contains a port or an instance
 	 */
-	private Vertex getVertex(String vertexName, String portName, String kind) {
+	private DfVertex getVertex(String vertexName, String portName, String kind) {
 		if (vertexName.isEmpty()) {
 			Port port;
 			if ("Input".equals(kind)) {
@@ -601,33 +603,34 @@ public class XdfParser {
 	 *            the first node of a node list, or <code>null</code> if the
 	 *            caller had no children.
 	 */
-	private void parseAttributes(List<Attribute> attributes, Node node) {
+	private void parseAttributes(EList<Attribute> attributes, Node node) {
 		while (node != null) {
 			// only parses Attribute nodes, other nodes are ignored.
 			if (node.getNodeName().equals("Attribute")) {
 				Element attribute = (Element) node;
 				String kind = attribute.getAttribute("kind");
 				String attrName = attribute.getAttribute("name");
+				GraphFactory factory = GraphFactory.eINSTANCE;
 
 				Attribute attr;
 				if (kind.equals(Attribute.CUSTOM)) {
 					// TODO custom
-					attr = DfFactory.eINSTANCE.createAttribute(attrName,
+					attr = factory.createAttribute(attrName,
 							DfFactory.eINSTANCE.createWrapperXml());
 				} else if (kind.equals(Attribute.FLAG)) {
-					attr = DfFactory.eINSTANCE.createAttribute(attrName, null);
+					attr = factory.createAttribute(attrName, null);
 				} else if (kind.equals(Attribute.STRING)) {
 					String value = attribute.getAttribute("value");
-					attr = DfFactory.eINSTANCE.createAttribute(attrName,
+					attr = factory.createAttribute(attrName,
 							DfFactory.eINSTANCE.createWrapperString(value));
 				} else if (kind.equals(Attribute.TYPE)) {
 					Type type = typeParser.parseType(attribute.getFirstChild())
 							.getResult();
-					attr = DfFactory.eINSTANCE.createAttribute(attrName, type);
+					attr = factory.createAttribute(attrName, type);
 				} else if (kind.equals(Attribute.VALUE)) {
 					Expression expr = exprParser
 							.parseExpr(node.getFirstChild());
-					attr = DfFactory.eINSTANCE.createAttribute(attrName, expr);
+					attr = factory.createAttribute(attrName, expr);
 				} else {
 					throw new OrccRuntimeException(
 							"unsupported attribute kind: \"" + kind + "\"");
@@ -688,9 +691,9 @@ public class XdfParser {
 		String dst = connection.getAttribute("dst");
 		String dst_port = connection.getAttribute("dst-port");
 
-		Vertex source = getVertex(src, src_port, "Input");
+		DfVertex source = getVertex(src, src_port, "Input");
 		Port srcPort = getPort(source, "outputs", src_port);
-		Vertex target = getVertex(dst, dst_port, "Output");
+		DfVertex target = getVertex(dst, dst_port, "Output");
 		Port dstPort = getPort(target, "inputs", dst_port);
 
 		Node child = connection.getFirstChild();

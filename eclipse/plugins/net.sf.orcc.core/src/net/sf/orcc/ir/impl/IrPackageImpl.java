@@ -8,6 +8,7 @@ package net.sf.orcc.ir.impl;
 
 import java.util.Map;
 
+import net.sf.dftools.graph.GraphPackage;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.impl.DfPackageImpl;
 import net.sf.orcc.ir.Annotation;
@@ -415,6 +416,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		// Initialize simple dependencies
 		EcorePackage.eINSTANCE.eClass();
+		GraphPackage.eINSTANCE.eClass();
 
 		// Obtain or create and register interdependencies
 		DfPackageImpl theDfPackage = (DfPackageImpl)(EPackage.Registry.INSTANCE.getEPackage(DfPackage.eNS_URI) instanceof DfPackageImpl ? EPackage.Registry.INSTANCE.getEPackage(DfPackage.eNS_URI) : DfPackage.eINSTANCE);
@@ -1781,7 +1783,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEClass(nodeWhileEClass, NodeWhile.class, "NodeWhile", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getNodeWhile_Condition(), this.getExpression(), null, "condition", null, 0, 1, NodeWhile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNodeWhile_JoinNode(), this.getNodeBlock(), null, "joinNode", null, 0, 1, NodeWhile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getNodeWhile_LineNumber(), ecorePackage.getEInt(), "lineNumber", null, 0, 1, NodeWhile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getNodeWhile_LineNumber(), ecorePackage.getEInt(), "lineNumber", "0", 0, 1, NodeWhile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNodeWhile_Nodes(), this.getNode(), null, "nodes", null, 0, -1, NodeWhile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(instructionEClass, Instruction.class, "Instruction", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);

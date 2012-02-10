@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.dftools.graph.Edge;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.CustomPrinter;
@@ -61,7 +62,6 @@ import net.sf.orcc.backends.tta.architecture.TTA;
 import net.sf.orcc.backends.tta.transformations.BroadcastTypeResizer;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.Edge;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -114,8 +114,11 @@ public class TTABackendImpl extends AbstractBackend {
 		transformations.put("select", "select_");
 		processorIntensiveActors = new ArrayList<String>();
 		// processorIntensiveActors.add("fi.oulu.ee.mvg.Mgnt_Address");
+		// processorIntensiveActors.add("com.xilinx.Add");
+		// processorIntensiveActors.add("org.mpeg4.part2.motion.Algo_Interpolation_halfpel");
 		// processorIntensiveActors.add("org.sc29.wg11.mpeg4.part2.texture.Algo_IDCT2D_ISOIEC_23002_1");
 		// processorIntensiveActors.add("fi.oulu.ee.mvg.Algo_IAP");
+		processorIntensiveActors.add("fi.oulu.ee.mvg.Framebuffer");
 	}
 
 	@Override
@@ -199,7 +202,7 @@ public class TTABackendImpl extends AbstractBackend {
 		if (instance.isActor()
 				&& processorIntensiveActors.contains(instance.getActor()
 						.getName())) {
-			return 2;
+			return 4;
 		}
 		return 1;
 	}
@@ -208,7 +211,7 @@ public class TTABackendImpl extends AbstractBackend {
 		if (instance.isActor()
 				&& processorIntensiveActors.contains(instance.getActor()
 						.getName())) {
-			return 6;
+			return 8;
 		}
 		return 2;
 	}

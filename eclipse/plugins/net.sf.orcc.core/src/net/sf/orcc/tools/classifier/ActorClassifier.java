@@ -38,11 +38,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.dftools.graph.Edge;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.Edge;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;

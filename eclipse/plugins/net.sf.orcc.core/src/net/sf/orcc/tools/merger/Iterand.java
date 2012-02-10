@@ -29,8 +29,8 @@
 
 package net.sf.orcc.tools.merger;
 
+import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Instance;
-import net.sf.orcc.df.Vertex;
 
 /**
  * This class defines an element of the body of a schedule. An iterand can be
@@ -55,7 +55,7 @@ public class Iterand {
 		type = Type.SCHEDULE;
 	}
 
-	public Iterand(Vertex vertex) {
+	public Iterand(DfVertex vertex) {
 		contents = vertex;
 		type = Type.VERTEX;
 	}
@@ -64,8 +64,8 @@ public class Iterand {
 		return (Schedule) contents;
 	}
 
-	public Vertex getVertex() {
-		return (Vertex) contents;
+	public DfVertex getVertex() {
+		return (DfVertex) contents;
 	}
 
 	public boolean isSchedule() {

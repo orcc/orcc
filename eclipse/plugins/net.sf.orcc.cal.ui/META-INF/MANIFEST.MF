@@ -17,7 +17,8 @@ Require-Bundle: net.sf.orcc.cal;bundle-version="0.9.9";visibility:=reexport,
  org.eclipse.xtext.common.types.ui;bundle-version="2.0.0",
  org.eclipse.xtext.ui;bundle-version="2.0.0",
  org.eclipse.xtext.ui.shared;bundle-version="2.0.0",
- org.apache.commons.lang;bundle-version="2.4.0"
+ org.apache.commons.lang;bundle-version="2.4.0",
+ net.sf.dftools.graph;bundle-version="0.1.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Activator: net.sf.orcc.cal.ui.internal.CalActivator
 Import-Package: org.apache.log4j

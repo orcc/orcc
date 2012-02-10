@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.Assert;
+import net.sf.dftools.graph.Nameable;
 import net.sf.orcc.OrccProjectNature;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Nameable;
 import net.sf.orcc.frontend.Frontend;
 import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.Expression;

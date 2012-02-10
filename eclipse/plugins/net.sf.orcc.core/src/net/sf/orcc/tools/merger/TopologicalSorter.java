@@ -38,9 +38,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.orcc.df.Edge;
+import net.sf.dftools.graph.Edge;
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.Vertex;
 
 /**
  * This class computes a topological sort of the graph. The graph must be

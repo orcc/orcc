@@ -28,25 +28,21 @@
  */
 package net.sf.orcc.df.impl;
 
-import java.util.Collection;
-
-import net.sf.orcc.df.Attribute;
+import net.sf.dftools.graph.Attribute;
+import net.sf.dftools.graph.GraphFactory;
+import net.sf.dftools.graph.impl.EdgeImpl;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
 
 import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.common.notify.NotificationChain;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.emf.ecore.util.EObjectContainmentEList;
-import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
  * This class represents a connection in a network. A connection can have a
@@ -59,26 +55,27 @@ import org.eclipse.emf.ecore.util.InternalEList;
 public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
-	 * The cached value of the '{@link #getAttributes() <em>Attributes</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getAttributes()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Attribute> attributes;
-
-	/**
-	 * The cached value of the '{@link #getSourcePort() <em>Source Port</em>}' reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getSourcePort() <em>Source Port</em>}'
+	 * reference. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getSourcePort()
 	 * @generated
 	 * @ordered
 	 */
 	protected Port sourcePort;
 
+	public DfVertex getSource() {
+		return (DfVertex) source;
+	}
+
+	public DfVertex getTarget() {
+		return (DfVertex) target;
+	}
+
 	/**
-	 * The cached value of the '{@link #getTargetPort() <em>Target Port</em>}' reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getTargetPort() <em>Target Port</em>}'
+	 * reference. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getTargetPort()
 	 * @generated
 	 * @ordered
@@ -87,6 +84,7 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected ConnectionImpl() {
@@ -95,6 +93,7 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Port basicGetSourcePort() {
@@ -103,6 +102,7 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Port basicGetTargetPort() {
@@ -111,78 +111,61 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case DfPackage.CONNECTION__ATTRIBUTES:
-				return getAttributes();
-			case DfPackage.CONNECTION__SOURCE_PORT:
-				if (resolve) return getSourcePort();
-				return basicGetSourcePort();
-			case DfPackage.CONNECTION__TARGET_PORT:
-				if (resolve) return getTargetPort();
-				return basicGetTargetPort();
+		case DfPackage.CONNECTION__SOURCE_PORT:
+			if (resolve)
+				return getSourcePort();
+			return basicGetSourcePort();
+		case DfPackage.CONNECTION__TARGET_PORT:
+			if (resolve)
+				return getTargetPort();
+			return basicGetTargetPort();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
-		switch (featureID) {
-			case DfPackage.CONNECTION__ATTRIBUTES:
-				return ((InternalEList<?>)getAttributes()).basicRemove(otherEnd, msgs);
-		}
-		return super.eInverseRemove(otherEnd, featureID, msgs);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case DfPackage.CONNECTION__ATTRIBUTES:
-				return attributes != null && !attributes.isEmpty();
-			case DfPackage.CONNECTION__SOURCE_PORT:
-				return sourcePort != null;
-			case DfPackage.CONNECTION__TARGET_PORT:
-				return targetPort != null;
+		case DfPackage.CONNECTION__SOURCE_PORT:
+			return sourcePort != null;
+		case DfPackage.CONNECTION__TARGET_PORT:
+			return targetPort != null;
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case DfPackage.CONNECTION__ATTRIBUTES:
-				getAttributes().clear();
-				getAttributes().addAll((Collection<? extends Attribute>)newValue);
-				return;
-			case DfPackage.CONNECTION__SOURCE_PORT:
-				setSourcePort((Port)newValue);
-				return;
-			case DfPackage.CONNECTION__TARGET_PORT:
-				setTargetPort((Port)newValue);
-				return;
+		case DfPackage.CONNECTION__SOURCE_PORT:
+			setSourcePort((Port) newValue);
+			return;
+		case DfPackage.CONNECTION__TARGET_PORT:
+			setTargetPort((Port) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -192,20 +175,18 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case DfPackage.CONNECTION__ATTRIBUTES:
-				getAttributes().clear();
-				return;
-			case DfPackage.CONNECTION__SOURCE_PORT:
-				setSourcePort((Port)null);
-				return;
-			case DfPackage.CONNECTION__TARGET_PORT:
-				setTargetPort((Port)null);
-				return;
+		case DfPackage.CONNECTION__SOURCE_PORT:
+			setSourcePort((Port) null);
+			return;
+		case DfPackage.CONNECTION__TARGET_PORT:
+			setTargetPort((Port) null);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -218,17 +199,6 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Attribute> getAttributes() {
-		if (attributes == null) {
-			attributes = new EObjectContainmentEList<Attribute>(Attribute.class, this, DfPackage.CONNECTION__ATTRIBUTES);
-		}
-		return attributes;
 	}
 
 	@Override
@@ -244,15 +214,18 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Port getSourcePort() {
 		if (sourcePort != null && sourcePort.eIsProxy()) {
-			InternalEObject oldSourcePort = (InternalEObject)sourcePort;
-			sourcePort = (Port)eResolveProxy(oldSourcePort);
+			InternalEObject oldSourcePort = (InternalEObject) sourcePort;
+			sourcePort = (Port) eResolveProxy(oldSourcePort);
 			if (sourcePort != oldSourcePort) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.CONNECTION__SOURCE_PORT, oldSourcePort, sourcePort));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							DfPackage.CONNECTION__SOURCE_PORT, oldSourcePort,
+							sourcePort));
 			}
 		}
 		return sourcePort;
@@ -260,15 +233,18 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Port getTargetPort() {
 		if (targetPort != null && targetPort.eIsProxy()) {
-			InternalEObject oldTargetPort = (InternalEObject)targetPort;
-			targetPort = (Port)eResolveProxy(oldTargetPort);
+			InternalEObject oldTargetPort = (InternalEObject) targetPort;
+			targetPort = (Port) eResolveProxy(oldTargetPort);
 			if (targetPort != oldTargetPort) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.CONNECTION__TARGET_PORT, oldTargetPort, targetPort));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							DfPackage.CONNECTION__TARGET_PORT, oldTargetPort,
+							targetPort));
 			}
 		}
 		return targetPort;
@@ -276,36 +252,43 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	@Override
 	public void setAttribute(String name, Expression value) {
-		getAttributes().add(DfFactory.eINSTANCE.createAttribute(name, value));
+		getAttributes()
+				.add(GraphFactory.eINSTANCE.createAttribute(name, value));
 	}
 
 	@Override
 	public void setAttribute(String name, int value) {
 		getAttributes().add(
-				DfFactory.eINSTANCE.createAttribute(name,
+				GraphFactory.eINSTANCE.createAttribute(name,
 						IrFactory.eINSTANCE.createExprInt(value)));
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void setSourcePort(Port newSourcePort) {
 		Port oldSourcePort = sourcePort;
 		sourcePort = newSourcePort;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.CONNECTION__SOURCE_PORT, oldSourcePort, sourcePort));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.CONNECTION__SOURCE_PORT, oldSourcePort,
+					sourcePort));
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void setTargetPort(Port newTargetPort) {
 		Port oldTargetPort = targetPort;
 		targetPort = newTargetPort;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.CONNECTION__TARGET_PORT, oldTargetPort, targetPort));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.CONNECTION__TARGET_PORT, oldTargetPort,
+					targetPort));
 	}
 
 	@Override

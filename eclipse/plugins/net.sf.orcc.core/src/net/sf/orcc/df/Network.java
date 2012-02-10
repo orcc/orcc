@@ -173,7 +173,7 @@ public interface Network extends Entity {
 	 * 
 	 * @return the list of this network's vertices
 	 */
-	List<Vertex> getVertices();
+	List<DfVertex> getVertices();
 
 	/**
 	 * Merges actors of this network. Note that for this transformation to work

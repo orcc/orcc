@@ -9,7 +9,8 @@ Require-Bundle: org.apache.commons.cli;bundle-version="1.0.0",
  org.eclipse.core.resources;bundle-version="3.6.0",
  org.eclipse.emf.ecore,
  net.sf.orcc.core;bundle-version="1.0.0",
- org.ietr.libs;bundle-version="1.3.7"
+ org.ietr.libs;bundle-version="1.3.7",
+ net.sf.dftools.graph;bundle-version="0.1.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .

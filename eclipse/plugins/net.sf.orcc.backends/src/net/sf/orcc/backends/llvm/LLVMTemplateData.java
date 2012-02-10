@@ -31,10 +31,10 @@ package net.sf.orcc.backends.llvm;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.dftools.graph.Edge;
 import net.sf.orcc.backends.ir.InstCast;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Edge;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;

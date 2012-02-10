@@ -39,7 +39,7 @@ import org.eclipse.emf.common.util.EList;
  * @author Matthieu Wipliez
  * @model extends="Vertex"
  */
-public interface Instance extends Vertex {
+public interface Instance extends DfVertex {
 
 	/**
 	 * Returns the actor referenced by this instance.

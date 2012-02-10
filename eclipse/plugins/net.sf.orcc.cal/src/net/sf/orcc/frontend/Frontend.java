@@ -30,13 +30,13 @@ package net.sf.orcc.frontend;
 
 import java.util.List;
 
+import net.sf.dftools.graph.Nameable;
 import net.sf.orcc.cache.Cache;
 import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cache.CachePackage;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Nameable;
 import net.sf.orcc.df.Unit;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.util.IrUtil;

@@ -10,15 +10,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.dftools.graph.Attribute;
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
-import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.Edge;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.EntitySpecific;
 import net.sf.orcc.df.FSM;
@@ -30,7 +30,6 @@ import net.sf.orcc.df.State;
 import net.sf.orcc.df.Tag;
 import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.Unit;
-import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.WrapperString;
 import net.sf.orcc.df.WrapperXml;
 import net.sf.orcc.ir.Expression;
@@ -48,11 +47,13 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 /**
  * <!-- begin-user-doc --> An implementation of the model <b>Factory</b>. <!--
  * end-user-doc -->
+ * 
  * @generated
  */
 public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @deprecated
 	 * @generated
 	 */
@@ -62,28 +63,28 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	}
 
 	/**
-	 * Creates the default factory implementation.
-	 * <!-- begin-user-doc --> <!--
+	 * Creates the default factory implementation. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public static DfFactory init() {
 		try {
-			DfFactory theDfFactory = (DfFactory)EPackage.Registry.INSTANCE.getEFactory("http://orcc.sf.net/model/2011/Df"); 
+			DfFactory theDfFactory = (DfFactory) EPackage.Registry.INSTANCE
+					.getEFactory("http://orcc.sf.net/model/2011/Df");
 			if (theDfFactory != null) {
 				return theDfFactory;
 			}
-		}
-		catch (Exception exception) {
+		} catch (Exception exception) {
 			EcorePlugin.INSTANCE.log(exception);
 		}
 		return new DfFactoryImpl();
 	}
 
 	/**
-	 * Creates an instance of the factory.
-	 * <!-- begin-user-doc --> <!--
+	 * Creates an instance of the factory. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public DfFactoryImpl() {
@@ -92,40 +93,61 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
-			case DfPackage.UNIT: return createUnit();
-			case DfPackage.PORT: return createPort();
-			case DfPackage.INSTANCE: return createInstance();
-			case DfPackage.ENTITY_SPECIFIC: return createEntitySpecific();
-			case DfPackage.ACTOR: return createActor();
-			case DfPackage.NETWORK: return createNetwork();
-			case DfPackage.BROADCAST: return createBroadcast();
-			case DfPackage.EDGE: return createEdge();
-			case DfPackage.ATTRIBUTE: return createAttribute();
-			case DfPackage.CONNECTION: return createConnection();
-			case DfPackage.WRAPPER_STRING: return createWrapperString();
-			case DfPackage.WRAPPER_XML: return createWrapperXml();
-			case DfPackage.ACTION: return createAction();
-			case DfPackage.FSM: return createFSM();
-			case DfPackage.PATTERN: return createPattern();
-			case DfPackage.STATE: return createState();
-			case DfPackage.TAG: return createTag();
-			case DfPackage.TRANSITION: return createTransition();
-			case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY: return (EObject)createPortToEIntegerObjectMapEntry();
-			case DfPackage.PORT_TO_VAR_MAP_ENTRY: return (EObject)createPortToVarMapEntry();
-			case DfPackage.VAR_TO_PORT_MAP_ENTRY: return (EObject)createVarToPortMapEntry();
-			case DfPackage.ARGUMENT: return createArgument();
-			default:
-				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
+		case DfPackage.UNIT:
+			return createUnit();
+		case DfPackage.PORT:
+			return createPort();
+		case DfPackage.INSTANCE:
+			return createInstance();
+		case DfPackage.ENTITY_SPECIFIC:
+			return createEntitySpecific();
+		case DfPackage.ACTOR:
+			return createActor();
+		case DfPackage.NETWORK:
+			return createNetwork();
+		case DfPackage.BROADCAST:
+			return createBroadcast();
+		case DfPackage.CONNECTION:
+			return createConnection();
+		case DfPackage.WRAPPER_STRING:
+			return createWrapperString();
+		case DfPackage.WRAPPER_XML:
+			return createWrapperXml();
+		case DfPackage.ACTION:
+			return createAction();
+		case DfPackage.FSM:
+			return createFSM();
+		case DfPackage.PATTERN:
+			return createPattern();
+		case DfPackage.STATE:
+			return createState();
+		case DfPackage.TAG:
+			return createTag();
+		case DfPackage.TRANSITION:
+			return createTransition();
+		case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY:
+			return (EObject) createPortToEIntegerObjectMapEntry();
+		case DfPackage.PORT_TO_VAR_MAP_ENTRY:
+			return (EObject) createPortToVarMapEntry();
+		case DfPackage.VAR_TO_PORT_MAP_ENTRY:
+			return (EObject) createVarToPortMapEntry();
+		case DfPackage.ARGUMENT:
+			return createArgument();
+		default:
+			throw new IllegalArgumentException("The class '" + eClass.getName()
+					+ "' is not a valid classifier");
 		}
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Action createAction() {
@@ -162,6 +184,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Actor createActor() {
@@ -171,6 +194,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Argument createArgument() {
@@ -179,18 +203,8 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Edge createEdge() {
-		EdgeImpl edge = new EdgeImpl();
-		return edge;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Unit createUnit() {
@@ -208,23 +222,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Attribute createAttribute() {
-		AttributeImpl attribute = new AttributeImpl();
-		return attribute;
-	}
-
-	@Override
-	public Attribute createAttribute(String name, EObject value) {
-		AttributeImpl attribute = new AttributeImpl();
-		attribute.setName(name);
-		attribute.setValue(value);
-		return attribute;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Broadcast createBroadcast() {
@@ -247,6 +245,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Connection createConnection() {
@@ -285,6 +284,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public FSM createFSM() {
@@ -294,6 +294,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Instance createInstance() {
@@ -302,8 +303,8 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EntitySpecific createEntitySpecific() {
@@ -321,6 +322,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Network createNetwork() {
@@ -337,6 +339,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Pattern createPattern() {
@@ -346,6 +349,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Port createPort() {
@@ -377,6 +381,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Map.Entry<Port, Integer> createPortToEIntegerObjectMapEntry() {
@@ -386,6 +391,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Map.Entry<Port, Var> createPortToVarMapEntry() {
@@ -395,6 +401,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public State createState() {
@@ -411,6 +418,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Tag createTag() {
@@ -441,6 +449,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Transition createTransition() {
@@ -459,6 +468,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Map.Entry<Var, Port> createVarToPortMapEntry() {
@@ -468,6 +478,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public WrapperString createWrapperString() {
@@ -484,6 +495,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public WrapperXml createWrapperXml() {
@@ -493,10 +505,11 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public DfPackage getDfPackage() {
-		return (DfPackage)getEPackage();
+		return (DfPackage) getEPackage();
 	}
 
 } // DfFactoryImpl

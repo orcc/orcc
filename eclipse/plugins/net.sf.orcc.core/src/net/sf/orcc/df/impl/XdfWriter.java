@@ -35,15 +35,15 @@ import java.io.OutputStream;
 import java.util.Comparator;
 import java.util.List;
 
+import net.sf.dftools.graph.Attribute;
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Argument;
-import net.sf.orcc.df.Attribute;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.WrapperString;
 import net.sf.orcc.df.WrapperXml;
 import net.sf.orcc.ir.ExprBinary;

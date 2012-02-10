@@ -32,7 +32,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  *
  * @generated
  */
-public class PortImpl extends VertexImpl implements Port {
+public class PortImpl extends DfVertexImpl implements Port {
 	/**
 	 * The default value of the '{@link #getNumTokensConsumed() <em>Num Tokens Consumed</em>}' attribute.
 	 * <!-- begin-user-doc -->

@@ -31,17 +31,18 @@ package net.sf.orcc.backends.c;
 import static net.sf.orcc.df.DfFactory.eINSTANCE;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import net.sf.dftools.graph.Edge;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Edge;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Transition;
+
+import org.eclipse.emf.common.util.EList;
 
 /**
  * This class allows the string template accessing informations about
@@ -68,7 +69,7 @@ public class CActorTemplateData {
 	 * Builds the input pattern
 	 */
 	private void buildInputPattern(Actor actor) {
-		List<Action> actions = actor.getActionsOutsideFsm();
+		EList<Action> actions = actor.getActionsOutsideFsm();
 
 		for (Action action : actions) {
 			Pattern actionPattern = action.getInputPattern();

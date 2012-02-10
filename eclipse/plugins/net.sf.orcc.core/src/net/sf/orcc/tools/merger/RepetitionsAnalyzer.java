@@ -32,12 +32,13 @@ package net.sf.orcc.tools.merger;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.dftools.graph.Edge;
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.Edge;
+import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.Vertex;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.util.Rational;
 
@@ -53,7 +54,7 @@ public class RepetitionsAnalyzer {
 
 	private Network network;
 
-	private Map<Vertex, Rational> rationals = new HashMap<Vertex, Rational>();
+	private Map<DfVertex, Rational> rationals = new HashMap<DfVertex, Rational>();
 
 	private Map<Vertex, Integer> repetitions = new HashMap<Vertex, Integer>();
 
@@ -76,7 +77,7 @@ public class RepetitionsAnalyzer {
 			lcm = Rational.lcm(lcm, rat.getDenominator());
 		}
 
-		for (Vertex vertex : rationals.keySet()) {
+		for (DfVertex vertex : rationals.keySet()) {
 			Rational rat = rationals.get(vertex);
 			repetitions.put(vertex,
 					rat.getNumerator() * lcm / rat.getDenominator());
@@ -92,7 +93,7 @@ public class RepetitionsAnalyzer {
 	 * @param rate
 	 * 
 	 */
-	private void calculateRate(Vertex vertex, Rational rate) {
+	private void calculateRate(DfVertex vertex, Rational rate) {
 		Instance instance = (Instance) vertex;
 		if (!instance.getMoC().isCSDF()) {
 			throw new OrccRuntimeException("actor" + instance.getEntity()
@@ -105,7 +106,7 @@ public class RepetitionsAnalyzer {
 
 		for (Edge edge : vertex.getOutgoing()) {
 			Connection conn = (Connection) edge;
-			Vertex tgt = edge.getTarget();
+			DfVertex tgt = conn.getTarget();
 			if (tgt.isInstance()) {
 				CSDFMoC tgtMoC = (CSDFMoC) ((Instance) tgt).getMoC();
 				if (!rationals.containsKey(tgt)) {
@@ -118,7 +119,7 @@ public class RepetitionsAnalyzer {
 
 		for (Edge edge : vertex.getIncoming()) {
 			Connection conn = (Connection) edge;
-			Vertex src = edge.getSource();
+			DfVertex src = conn.getSource();
 			if (src.isInstance()) {
 				CSDFMoC srcMoC = (CSDFMoC) ((Instance) src).getMoC();
 				if (!rationals.containsKey(src)) {

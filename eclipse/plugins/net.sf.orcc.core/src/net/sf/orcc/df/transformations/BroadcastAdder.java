@@ -32,14 +32,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.dftools.graph.Edge;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.Edge;
+import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.Vertex;
 import net.sf.orcc.df.util.DfSwitch;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -60,9 +60,9 @@ public class BroadcastAdder extends DfSwitch<Void> {
 		this.network = network;
 		// make a copy of the existing vertex set because the set returned is
 		// modified when broadcasts are added
-		List<Vertex> vertexSet = network.getVertices();
+		List<DfVertex> vertexSet = network.getVertices();
 
-		for (Vertex vertex : vertexSet) {
+		for (DfVertex vertex : vertexSet) {
 			if (vertex.isEntity()) {
 				Entity entity = (Entity) vertex;
 				if (entity.isNetwork()) {
@@ -112,7 +112,7 @@ public class BroadcastAdder extends DfSwitch<Void> {
 	}
 
 	@Override
-	public Void caseVertex(Vertex vertex) {
+	public Void caseDfVertex(DfVertex vertex) {
 		Map<Port, List<Connection>> outMap = vertex.getOutgoingPortMap();
 		for (Port srcPort : outMap.keySet()) {
 			List<Connection> outList = outMap.get(srcPort);

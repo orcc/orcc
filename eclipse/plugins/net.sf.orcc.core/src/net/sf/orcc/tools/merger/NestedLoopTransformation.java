@@ -32,8 +32,9 @@ package net.sf.orcc.tools.merger;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.Vertex;
+import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.util.Rational;
 
 import org.jgrapht.DirectedGraph;
@@ -127,7 +128,7 @@ public class NestedLoopTransformation {
 
 	private void computeOptimalParens(Schedule schedule, int i, int j) {
 		if (i == j) {
-			Vertex vertex = getVertex(this.schedule.getIterands().get(i));
+			DfVertex vertex = getVertex(this.schedule.getIterands().get(i));
 			schedule.add(new Iterand(vertex));
 		} else {
 
@@ -156,8 +157,8 @@ public class NestedLoopTransformation {
 		}
 	}
 
-	private Vertex getVertex(Iterand iterand) {
-		Vertex vertex = null;
+	private DfVertex getVertex(Iterand iterand) {
+		DfVertex vertex = null;
 		if (iterand.isSchedule()) {
 			vertex = iterand.getSchedule().getIterands().get(0).getVertex();
 		} else {

@@ -36,7 +36,7 @@ import net.sf.orcc.ir.Type;
  * @author Matthieu Wipliez
  * @model extends="Vertex"
  */
-public interface Port extends Vertex {
+public interface Port extends DfVertex {
 
 	/**
 	 * Returns the number of tokens consumed by this port.

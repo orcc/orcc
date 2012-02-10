@@ -14,4 +14,5 @@ Require-Bundle: net.sf.orcc.cal,
  org.eclipse.xtext.junit4,
  org.eclipse.xtext.ui.junit,
  org.junit4,
- org.eclipse.jdt.core;bundle-version="3.7.0"
+ org.eclipse.jdt.core;bundle-version="3.7.0",
+ net.sf.dftools.graph;bundle-version="0.1.0"

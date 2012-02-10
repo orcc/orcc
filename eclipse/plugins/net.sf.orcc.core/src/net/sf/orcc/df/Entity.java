@@ -39,7 +39,7 @@ import org.eclipse.emf.common.util.EList;
  * @model abstract="true" extends="Vertex"
  * @generated
  */
-public interface Entity extends Vertex {
+public interface Entity extends DfVertex {
 
 	/**
 	 * Returns the input port whose name matches the given name.
