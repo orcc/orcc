@@ -105,11 +105,13 @@ import org.eclipse.equinox.app.IApplicationContext;
  * </p>
  * 
  * The following methods may be extended by back-ends, if they print actors or
- * instances respectively.
+ * instances respectively, or if a library must be exported with source file
+ * produced.
  * <ul>
  * <li>{@link #printActor(Actor)} is called by {@link #printActors(List)}.</li>
  * <li>{@link #printInstance(Instance)} is called by
  * {@link #printInstances(Network)}.</li>
+ * <li>{@link #exportRuntimeLibrary()} is called by {@link #start}.</li>
  * </ul>
  * 
  * The other methods declared <code>final</code> may be called by back-ends.
@@ -436,6 +438,17 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		} catch (InterruptedException e) {
 			throw new OrccException("actors could not be printed", e);
 		}
+	}
+
+	/**
+	 * Export runtime library used by source produced. Should be overridden by
+	 * back-ends that produce code source which need third party libraries at
+	 * runtime.
+	 * 
+	 * @return <code>true</code> if the libraries were correctly exported
+	 */
+	protected boolean exportRuntimeLibrary() throws OrccException {
+		return false;
 	}
 
 	/**
@@ -820,6 +833,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				setOptions(optionMap);
 				compileVTL();
 				compileXDF();
+				exportRuntimeLibrary();
 				return IApplication.EXIT_OK;
 			} catch (Exception e) {
 				System.err.println("Could not run the back-end with \""
