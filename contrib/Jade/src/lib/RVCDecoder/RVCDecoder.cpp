@@ -79,8 +79,10 @@ cl::list<std::string> MAttrs("");
 cl::opt<std::string> MCPU(init(""));
 
 cl::opt<int> FifoSize(init(4096));
+cl::opt<bool> ArmFix(init(false));
+cl::opt<std::string> VidFile(init(""));
 
-
+char** environnement;
 Decoder* decoder;
 #include "llvm/Support/Threading.h"
 
