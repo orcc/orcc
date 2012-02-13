@@ -30,12 +30,12 @@
 #
 # @author Herve Yviquel
 
+from .instance import *
 import os
 import shutil
 import stat
 import sys
 
-from .instance import *
 
 class Network:
 

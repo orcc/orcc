@@ -29,19 +29,17 @@
 #
 # @author Herve Yviquel
 
-
-import os
-import commands
-import subprocess
-import shutil
-import tempita
-import math
-import stat
-
-from xml.dom.minidom import parse
-
-from .port import *
 from .memory import *
+from .port import *
+from xml.dom.minidom import parse
+import commands
+import math
+import os
+import shutil
+import stat
+import subprocess
+import tempita
+
 
 class Instance:
 
@@ -167,7 +165,7 @@ class Instance:
             # Check generated data
             i = 0
             for output in self.outputs:
-                i+= 1
+                i += 1
                 traceName = self.id + "_" + output.name + ".txt"
                 fifoName = "tta_stream_%d.out" % (output.index)
                 srcTrace = os.path.join(tracePath, traceName)
@@ -187,11 +185,11 @@ class Instance:
             if line.find("WIDTH") > -1:
                 content = line.split()
                 width = content[2]
-                width = width[:len(width)-1]
+                width = width[:len(width) - 1]
             if line.find("DEPTH") > -1:
                 content = line.split()
                 depth = content[2]
-                depth = depth[:len(depth)-1]
+                depth = depth[:len(depth) - 1]
         
         return Memory(int(width), int(depth))
 
@@ -239,7 +237,7 @@ class Instance:
         for ligne1 in f_gen:
             j += 1
 
-        if i!=j:
+        if i != j:
             print "ERROR: Wrong generated data on '" + port.name + "' (index " + str(port.index) + " - line " + str(i) + ")."
 
 

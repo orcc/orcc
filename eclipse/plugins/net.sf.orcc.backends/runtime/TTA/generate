@@ -30,12 +30,13 @@
 #
 # @author Herve Yviquel
 
-import sys
-import os
-import time
+from informations_.informations import *
+from orcc_ import *
 import getopt
+import os
 import shutil
-
+import sys
+import time
 
 
 def usage():
@@ -88,8 +89,6 @@ def generate(arg, debug, target):
 
 
 
-
-
 try:
 	opts, args = getopt.getopt(sys.argv[1:], "hcsgdx:v", ["help", "compile=", "simulate", "generate=", "debug"])
 except getopt.GetoptError, err:
@@ -118,8 +117,6 @@ tracePath = os.path.join(srcPath, "trace")
 sys.path.insert(0, libPath)
 sys.path.insert(0, srcPath)
 
-from orcc_ import *
-from informations_.informations import *
 			
 for o, a in opts:
 	if o in ("-c", "--compile"):

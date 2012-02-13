@@ -29,9 +29,10 @@
 #
 # @author Herve Yviquel
 
-import string
 import math
+import string
 import tempita
+
 
 class Memory:
 
