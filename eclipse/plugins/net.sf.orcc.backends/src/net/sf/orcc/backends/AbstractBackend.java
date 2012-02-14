@@ -193,6 +193,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 *            relative to classpath (JAR file root or project classpath)
 	 * @param destination
 	 *            Path of the target file
+	 * @return <code>true</code> if the file has been successfully copied
 	 */
 	protected boolean copyFileToFilesystem(final String source,
 			final String dest) {
@@ -249,6 +250,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			out.close();
 		} catch (IOException e) {
 			write("IOError : " + e.getMessage() + "\n");
+			return false;
 		}
 		return true;
 	}
@@ -264,10 +266,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 *            classpath)
 	 * @param destination
 	 *            Filesystem folder path
+	 * @return <code>true</code> if the folder has been successfully copied
 	 */
 	protected boolean copyFolderToFileSystem(final String source,
 			final String destination) {
-
 		assert source != null;
 		assert destination != null;
 		assert source.startsWith("/");
@@ -287,7 +289,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		}
 
 		String inputDir;
-		// Remove '/' end character (if needed)
+		// Remove last '/' character (if needed)
 		if (source.charAt(source.length() - 1) == '/') {
 			inputDir = source.substring(0, source.length() - 1);
 		} else {
@@ -299,9 +301,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			URL inputURL = FileLocator.resolve(toto);
 			String inputPath = inputURL.toString();
 
+			boolean result = true;
+
 			if (inputPath.startsWith("jar:file:")) {
 				// Backend running from jar file
-
 				inputPath = inputPath.substring(9, inputPath.indexOf('!'));
 
 				JarFile jar = new JarFile(inputPath);
@@ -313,12 +316,15 @@ public abstract class AbstractBackend implements Backend, IApplication {
 					return false;
 				}
 
+				// "source" value without starting '/' char
 				String sourceMinusSlash = source.substring(1);
+
 				JarEntry elt;
 				while (jarEntries.hasMoreElements()) {
 
 					elt = jarEntries.nextElement();
 
+					// Only deal with sub-files of 'source' path
 					if (elt.isDirectory()
 							|| !elt.getName().startsWith(sourceMinusSlash)) {
 						continue;
@@ -329,8 +335,9 @@ public abstract class AbstractBackend implements Backend, IApplication {
 							+ File.separator
 							+ elt.getName()
 									.substring(sourceMinusSlash.length());
-					copyFileToFilesystem(newInPath, newOutPath);
+					result &= copyFileToFilesystem(newInPath, newOutPath);
 				}
+				return result;
 
 			} else {
 				// Backend running from filesystem
@@ -344,18 +351,17 @@ public abstract class AbstractBackend implements Backend, IApplication {
 							+ elt.getName();
 
 					if (elt.isDirectory()) {
-						copyFolderToFileSystem(newInPath, newOutPath);
+						result &= copyFolderToFileSystem(newInPath, newOutPath);
 					} else {
-						copyFileToFilesystem(newInPath, newOutPath);
+						result &= copyFileToFilesystem(newInPath, newOutPath);
 					}
 				}
+				return result;
 			}
 		} catch (IOException e) {
 			write("IOError" + e.getMessage() + "\n");
 			return false;
 		}
-
-		return true;
 	}
 
 	/**
