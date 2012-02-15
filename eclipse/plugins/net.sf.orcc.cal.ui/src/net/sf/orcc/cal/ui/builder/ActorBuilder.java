@@ -33,7 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.dftools.graph.Nameable;
+import net.sf.dftools.util.Nameable;
 import net.sf.orcc.OrccProjectNature;
 import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstEntity;

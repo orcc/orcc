@@ -32,7 +32,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.dftools.graph.Nameable;
+import net.sf.dftools.util.Nameable;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;

@@ -44,8 +44,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.sf.dftools.graph.Attribute;
-import net.sf.dftools.graph.GraphFactory;
+import net.sf.dftools.util.Attribute;
+import net.sf.dftools.util.UtilFactory;
 import net.sf.graphiti.io.LayoutWriter;
 import net.sf.graphiti.model.Edge;
 import net.sf.graphiti.model.Graph;
@@ -288,7 +288,7 @@ public class XdfExporter extends CalSwitch<Object> {
 					// remove extra quotes
 					Expression expr = IrFactory.eINSTANCE
 							.createExprString(partName);
-					Attribute attr = GraphFactory.eINSTANCE.createAttribute(
+					Attribute attr = UtilFactory.eINSTANCE.createAttribute(
 							"partName", expr);
 					instance.getAttributes().add(attr);
 				}

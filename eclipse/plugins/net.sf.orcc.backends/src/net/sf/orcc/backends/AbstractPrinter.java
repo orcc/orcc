@@ -33,7 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
 
-import net.sf.dftools.graph.Attribute;
+import net.sf.dftools.util.Attribute;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;

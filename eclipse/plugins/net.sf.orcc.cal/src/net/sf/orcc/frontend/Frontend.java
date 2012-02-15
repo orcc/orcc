@@ -30,7 +30,7 @@ package net.sf.orcc.frontend;
 
 import java.util.List;
 
-import net.sf.dftools.graph.Nameable;
+import net.sf.dftools.util.Nameable;
 import net.sf.orcc.cache.Cache;
 import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cache.CachePackage;

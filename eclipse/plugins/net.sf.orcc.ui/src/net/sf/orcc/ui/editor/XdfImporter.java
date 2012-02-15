@@ -38,7 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.dftools.graph.Attribute;
+import net.sf.dftools.util.Attribute;
 import net.sf.graphiti.io.LayoutReader;
 import net.sf.graphiti.model.Configuration;
 import net.sf.graphiti.model.Edge;
