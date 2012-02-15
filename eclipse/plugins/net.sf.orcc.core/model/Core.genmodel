@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
     xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/net.sf.orcc.core/src" modelPluginID="net.sf.orcc.core"
-    templateDirectory="" redirection="" modelName="Core" rootImplementsInterface=""
-    codeFormatting="true" importerID="org.eclipse.emf.importer.ecore" complianceLevel="6.0"
-    copyrightFields="false" usedGenPackages="platform:/plugin/org.eclipse.emf.ecore/model/Ecore.genmodel#//ecore ../../net.sf.dftools.graph/model/Graph.genmodel#//graph">
+    templateDirectory="/net.sf.dftools.graph/templates" dynamicTemplates="true" redirection=""
+    modelName="Core" rootImplementsInterface="" codeFormatting="true" importerID="org.eclipse.emf.importer.ecore"
+    complianceLevel="6.0" copyrightFields="false" usedGenPackages="platform:/plugin/org.eclipse.emf.ecore/model/Ecore.genmodel#//ecore ../../net.sf.dftools.graph/model/Graph.genmodel#//graph">
   <foreignModel>Df.ecore</foreignModel>
   <foreignModel>Ir.ecore</foreignModel>
   <foreignModel>MoC.ecore</foreignModel>
@@ -24,8 +24,6 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Port/native"/>
     </genClasses>
     <genClasses ecoreClass="Df.ecore#//Instance">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Instance/outputs"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Instance/inputs"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Instance/arguments"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Instance/entity"/>
     </genClasses>
