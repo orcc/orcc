@@ -153,12 +153,18 @@ public class NodeForImpl extends NodeSpecificImpl implements NodeFor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetCondition(Expression newCondition, NotificationChain msgs) {
+	public NotificationChain basicSetCondition(Expression newCondition,
+			NotificationChain msgs) {
 		Expression oldCondition = condition;
 		condition = newCondition;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrSpecificPackage.NODE_FOR__CONDITION, oldCondition, newCondition);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrSpecificPackage.NODE_FOR__CONDITION,
+					oldCondition, newCondition);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -172,14 +178,22 @@ public class NodeForImpl extends NodeSpecificImpl implements NodeFor {
 		if (newCondition != condition) {
 			NotificationChain msgs = null;
 			if (condition != null)
-				msgs = ((InternalEObject)condition).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrSpecificPackage.NODE_FOR__CONDITION, null, msgs);
+				msgs = ((InternalEObject) condition).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE
+								- IrSpecificPackage.NODE_FOR__CONDITION, null,
+						msgs);
 			if (newCondition != null)
-				msgs = ((InternalEObject)newCondition).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrSpecificPackage.NODE_FOR__CONDITION, null, msgs);
+				msgs = ((InternalEObject) newCondition).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE
+								- IrSpecificPackage.NODE_FOR__CONDITION, null,
+						msgs);
 			msgs = basicSetCondition(newCondition, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrSpecificPackage.NODE_FOR__CONDITION, newCondition, newCondition));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrSpecificPackage.NODE_FOR__CONDITION, newCondition,
+					newCondition));
 	}
 
 	/**
@@ -196,12 +210,18 @@ public class NodeForImpl extends NodeSpecificImpl implements NodeFor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetJoinNode(NodeBlock newJoinNode, NotificationChain msgs) {
+	public NotificationChain basicSetJoinNode(NodeBlock newJoinNode,
+			NotificationChain msgs) {
 		NodeBlock oldJoinNode = joinNode;
 		joinNode = newJoinNode;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrSpecificPackage.NODE_FOR__JOIN_NODE, oldJoinNode, newJoinNode);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrSpecificPackage.NODE_FOR__JOIN_NODE,
+					oldJoinNode, newJoinNode);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -215,14 +235,22 @@ public class NodeForImpl extends NodeSpecificImpl implements NodeFor {
 		if (newJoinNode != joinNode) {
 			NotificationChain msgs = null;
 			if (joinNode != null)
-				msgs = ((InternalEObject)joinNode).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrSpecificPackage.NODE_FOR__JOIN_NODE, null, msgs);
+				msgs = ((InternalEObject) joinNode).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE
+								- IrSpecificPackage.NODE_FOR__JOIN_NODE, null,
+						msgs);
 			if (newJoinNode != null)
-				msgs = ((InternalEObject)newJoinNode).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrSpecificPackage.NODE_FOR__JOIN_NODE, null, msgs);
+				msgs = ((InternalEObject) newJoinNode).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE
+								- IrSpecificPackage.NODE_FOR__JOIN_NODE, null,
+						msgs);
 			msgs = basicSetJoinNode(newJoinNode, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrSpecificPackage.NODE_FOR__JOIN_NODE, newJoinNode, newJoinNode));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrSpecificPackage.NODE_FOR__JOIN_NODE, newJoinNode,
+					newJoinNode));
 	}
 
 	/**
@@ -243,7 +271,9 @@ public class NodeForImpl extends NodeSpecificImpl implements NodeFor {
 		int oldLineNumber = lineNumber;
 		lineNumber = newLineNumber;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrSpecificPackage.NODE_FOR__LINE_NUMBER, oldLineNumber, lineNumber));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrSpecificPackage.NODE_FOR__LINE_NUMBER, oldLineNumber,
+					lineNumber));
 	}
 
 	/**
@@ -253,7 +283,8 @@ public class NodeForImpl extends NodeSpecificImpl implements NodeFor {
 	 */
 	public EList<Node> getNodes() {
 		if (nodes == null) {
-			nodes = new EObjectContainmentEList<Node>(Node.class, this, IrSpecificPackage.NODE_FOR__NODES);
+			nodes = new EObjectContainmentEList<Node>(Node.class, this,
+					IrSpecificPackage.NODE_FOR__NODES);
 		}
 		return nodes;
 	}
@@ -265,7 +296,9 @@ public class NodeForImpl extends NodeSpecificImpl implements NodeFor {
 	 */
 	public EList<Instruction> getLoopCounter() {
 		if (loopCounter == null) {
-			loopCounter = new EObjectContainmentEList<Instruction>(Instruction.class, this, IrSpecificPackage.NODE_FOR__LOOP_COUNTER);
+			loopCounter = new EObjectContainmentEList<Instruction>(
+					Instruction.class, this,
+					IrSpecificPackage.NODE_FOR__LOOP_COUNTER);
 		}
 		return loopCounter;
 	}
@@ -277,7 +310,8 @@ public class NodeForImpl extends NodeSpecificImpl implements NodeFor {
 	 */
 	public EList<Instruction> getInit() {
 		if (init == null) {
-			init = new EObjectContainmentEList<Instruction>(Instruction.class, this, IrSpecificPackage.NODE_FOR__INIT);
+			init = new EObjectContainmentEList<Instruction>(Instruction.class,
+					this, IrSpecificPackage.NODE_FOR__INIT);
 		}
 		return init;
 	}
@@ -288,18 +322,20 @@ public class NodeForImpl extends NodeSpecificImpl implements NodeFor {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrSpecificPackage.NODE_FOR__CONDITION:
-				return basicSetCondition(null, msgs);
-			case IrSpecificPackage.NODE_FOR__JOIN_NODE:
-				return basicSetJoinNode(null, msgs);
-			case IrSpecificPackage.NODE_FOR__NODES:
-				return ((InternalEList<?>)getNodes()).basicRemove(otherEnd, msgs);
-			case IrSpecificPackage.NODE_FOR__LOOP_COUNTER:
-				return ((InternalEList<?>)getLoopCounter()).basicRemove(otherEnd, msgs);
-			case IrSpecificPackage.NODE_FOR__INIT:
-				return ((InternalEList<?>)getInit()).basicRemove(otherEnd, msgs);
+		case IrSpecificPackage.NODE_FOR__CONDITION:
+			return basicSetCondition(null, msgs);
+		case IrSpecificPackage.NODE_FOR__JOIN_NODE:
+			return basicSetJoinNode(null, msgs);
+		case IrSpecificPackage.NODE_FOR__NODES:
+			return ((InternalEList<?>) getNodes()).basicRemove(otherEnd, msgs);
+		case IrSpecificPackage.NODE_FOR__LOOP_COUNTER:
+			return ((InternalEList<?>) getLoopCounter()).basicRemove(otherEnd,
+					msgs);
+		case IrSpecificPackage.NODE_FOR__INIT:
+			return ((InternalEList<?>) getInit()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -312,18 +348,18 @@ public class NodeForImpl extends NodeSpecificImpl implements NodeFor {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrSpecificPackage.NODE_FOR__CONDITION:
-				return getCondition();
-			case IrSpecificPackage.NODE_FOR__JOIN_NODE:
-				return getJoinNode();
-			case IrSpecificPackage.NODE_FOR__LINE_NUMBER:
-				return getLineNumber();
-			case IrSpecificPackage.NODE_FOR__NODES:
-				return getNodes();
-			case IrSpecificPackage.NODE_FOR__LOOP_COUNTER:
-				return getLoopCounter();
-			case IrSpecificPackage.NODE_FOR__INIT:
-				return getInit();
+		case IrSpecificPackage.NODE_FOR__CONDITION:
+			return getCondition();
+		case IrSpecificPackage.NODE_FOR__JOIN_NODE:
+			return getJoinNode();
+		case IrSpecificPackage.NODE_FOR__LINE_NUMBER:
+			return getLineNumber();
+		case IrSpecificPackage.NODE_FOR__NODES:
+			return getNodes();
+		case IrSpecificPackage.NODE_FOR__LOOP_COUNTER:
+			return getLoopCounter();
+		case IrSpecificPackage.NODE_FOR__INIT:
+			return getInit();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -337,27 +373,28 @@ public class NodeForImpl extends NodeSpecificImpl implements NodeFor {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrSpecificPackage.NODE_FOR__CONDITION:
-				setCondition((Expression)newValue);
-				return;
-			case IrSpecificPackage.NODE_FOR__JOIN_NODE:
-				setJoinNode((NodeBlock)newValue);
-				return;
-			case IrSpecificPackage.NODE_FOR__LINE_NUMBER:
-				setLineNumber((Integer)newValue);
-				return;
-			case IrSpecificPackage.NODE_FOR__NODES:
-				getNodes().clear();
-				getNodes().addAll((Collection<? extends Node>)newValue);
-				return;
-			case IrSpecificPackage.NODE_FOR__LOOP_COUNTER:
-				getLoopCounter().clear();
-				getLoopCounter().addAll((Collection<? extends Instruction>)newValue);
-				return;
-			case IrSpecificPackage.NODE_FOR__INIT:
-				getInit().clear();
-				getInit().addAll((Collection<? extends Instruction>)newValue);
-				return;
+		case IrSpecificPackage.NODE_FOR__CONDITION:
+			setCondition((Expression) newValue);
+			return;
+		case IrSpecificPackage.NODE_FOR__JOIN_NODE:
+			setJoinNode((NodeBlock) newValue);
+			return;
+		case IrSpecificPackage.NODE_FOR__LINE_NUMBER:
+			setLineNumber((Integer) newValue);
+			return;
+		case IrSpecificPackage.NODE_FOR__NODES:
+			getNodes().clear();
+			getNodes().addAll((Collection<? extends Node>) newValue);
+			return;
+		case IrSpecificPackage.NODE_FOR__LOOP_COUNTER:
+			getLoopCounter().clear();
+			getLoopCounter().addAll(
+					(Collection<? extends Instruction>) newValue);
+			return;
+		case IrSpecificPackage.NODE_FOR__INIT:
+			getInit().clear();
+			getInit().addAll((Collection<? extends Instruction>) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -370,24 +407,24 @@ public class NodeForImpl extends NodeSpecificImpl implements NodeFor {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrSpecificPackage.NODE_FOR__CONDITION:
-				setCondition((Expression)null);
-				return;
-			case IrSpecificPackage.NODE_FOR__JOIN_NODE:
-				setJoinNode((NodeBlock)null);
-				return;
-			case IrSpecificPackage.NODE_FOR__LINE_NUMBER:
-				setLineNumber(LINE_NUMBER_EDEFAULT);
-				return;
-			case IrSpecificPackage.NODE_FOR__NODES:
-				getNodes().clear();
-				return;
-			case IrSpecificPackage.NODE_FOR__LOOP_COUNTER:
-				getLoopCounter().clear();
-				return;
-			case IrSpecificPackage.NODE_FOR__INIT:
-				getInit().clear();
-				return;
+		case IrSpecificPackage.NODE_FOR__CONDITION:
+			setCondition((Expression) null);
+			return;
+		case IrSpecificPackage.NODE_FOR__JOIN_NODE:
+			setJoinNode((NodeBlock) null);
+			return;
+		case IrSpecificPackage.NODE_FOR__LINE_NUMBER:
+			setLineNumber(LINE_NUMBER_EDEFAULT);
+			return;
+		case IrSpecificPackage.NODE_FOR__NODES:
+			getNodes().clear();
+			return;
+		case IrSpecificPackage.NODE_FOR__LOOP_COUNTER:
+			getLoopCounter().clear();
+			return;
+		case IrSpecificPackage.NODE_FOR__INIT:
+			getInit().clear();
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -400,18 +437,18 @@ public class NodeForImpl extends NodeSpecificImpl implements NodeFor {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrSpecificPackage.NODE_FOR__CONDITION:
-				return condition != null;
-			case IrSpecificPackage.NODE_FOR__JOIN_NODE:
-				return joinNode != null;
-			case IrSpecificPackage.NODE_FOR__LINE_NUMBER:
-				return lineNumber != LINE_NUMBER_EDEFAULT;
-			case IrSpecificPackage.NODE_FOR__NODES:
-				return nodes != null && !nodes.isEmpty();
-			case IrSpecificPackage.NODE_FOR__LOOP_COUNTER:
-				return loopCounter != null && !loopCounter.isEmpty();
-			case IrSpecificPackage.NODE_FOR__INIT:
-				return init != null && !init.isEmpty();
+		case IrSpecificPackage.NODE_FOR__CONDITION:
+			return condition != null;
+		case IrSpecificPackage.NODE_FOR__JOIN_NODE:
+			return joinNode != null;
+		case IrSpecificPackage.NODE_FOR__LINE_NUMBER:
+			return lineNumber != LINE_NUMBER_EDEFAULT;
+		case IrSpecificPackage.NODE_FOR__NODES:
+			return nodes != null && !nodes.isEmpty();
+		case IrSpecificPackage.NODE_FOR__LOOP_COUNTER:
+			return loopCounter != null && !loopCounter.isEmpty();
+		case IrSpecificPackage.NODE_FOR__INIT:
+			return init != null && !init.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -423,7 +460,8 @@ public class NodeForImpl extends NodeSpecificImpl implements NodeFor {
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (lineNumber: ");
@@ -431,10 +469,10 @@ public class NodeForImpl extends NodeSpecificImpl implements NodeFor {
 		result.append(')');
 		return result.toString();
 	}
-	
+
 	@Override
-	public boolean isNodeFor(){
-		return true;	
+	public boolean isNodeFor() {
+		return true;
 	}
 
 } //NodeForImpl

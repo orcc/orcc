@@ -159,9 +159,9 @@ public class AddressSpaceImpl extends EObjectImpl implements AddressSpace {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.ADDRESS_SPACE__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.ADDRESS_SPACE__NAME, oldName, name));
 	}
-
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -172,7 +172,8 @@ public class AddressSpaceImpl extends EObjectImpl implements AddressSpace {
 		int oldWidth = width;
 		width = newWidth;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.ADDRESS_SPACE__WIDTH, oldWidth, width));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.ADDRESS_SPACE__WIDTH, oldWidth, width));
 	}
 
 	/**
@@ -191,7 +192,9 @@ public class AddressSpaceImpl extends EObjectImpl implements AddressSpace {
 		int oldMinAddress = minAddress;
 		minAddress = newMinAddress;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.ADDRESS_SPACE__MIN_ADDRESS, oldMinAddress, minAddress));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.ADDRESS_SPACE__MIN_ADDRESS,
+					oldMinAddress, minAddress));
 	}
 
 	/**
@@ -210,7 +213,9 @@ public class AddressSpaceImpl extends EObjectImpl implements AddressSpace {
 		int oldMaxAddress = maxAddress;
 		maxAddress = newMaxAddress;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.ADDRESS_SPACE__MAX_ADDRESS, oldMaxAddress, maxAddress));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.ADDRESS_SPACE__MAX_ADDRESS,
+					oldMaxAddress, maxAddress));
 	}
 
 	/**
@@ -229,14 +234,14 @@ public class AddressSpaceImpl extends EObjectImpl implements AddressSpace {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case ArchitecturePackage.ADDRESS_SPACE__NAME:
-				return getName();
-			case ArchitecturePackage.ADDRESS_SPACE__MIN_ADDRESS:
-				return getMinAddress();
-			case ArchitecturePackage.ADDRESS_SPACE__MAX_ADDRESS:
-				return getMaxAddress();
-			case ArchitecturePackage.ADDRESS_SPACE__WIDTH:
-				return getWidth();
+		case ArchitecturePackage.ADDRESS_SPACE__NAME:
+			return getName();
+		case ArchitecturePackage.ADDRESS_SPACE__MIN_ADDRESS:
+			return getMinAddress();
+		case ArchitecturePackage.ADDRESS_SPACE__MAX_ADDRESS:
+			return getMaxAddress();
+		case ArchitecturePackage.ADDRESS_SPACE__WIDTH:
+			return getWidth();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -248,18 +253,18 @@ public class AddressSpaceImpl extends EObjectImpl implements AddressSpace {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case ArchitecturePackage.ADDRESS_SPACE__NAME:
-				setName((String)newValue);
-				return;
-			case ArchitecturePackage.ADDRESS_SPACE__MIN_ADDRESS:
-				setMinAddress((Integer)newValue);
-				return;
-			case ArchitecturePackage.ADDRESS_SPACE__MAX_ADDRESS:
-				setMaxAddress((Integer)newValue);
-				return;
-			case ArchitecturePackage.ADDRESS_SPACE__WIDTH:
-				setWidth((Integer)newValue);
-				return;
+		case ArchitecturePackage.ADDRESS_SPACE__NAME:
+			setName((String) newValue);
+			return;
+		case ArchitecturePackage.ADDRESS_SPACE__MIN_ADDRESS:
+			setMinAddress((Integer) newValue);
+			return;
+		case ArchitecturePackage.ADDRESS_SPACE__MAX_ADDRESS:
+			setMaxAddress((Integer) newValue);
+			return;
+		case ArchitecturePackage.ADDRESS_SPACE__WIDTH:
+			setWidth((Integer) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -271,18 +276,18 @@ public class AddressSpaceImpl extends EObjectImpl implements AddressSpace {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.ADDRESS_SPACE__NAME:
-				setName(NAME_EDEFAULT);
-				return;
-			case ArchitecturePackage.ADDRESS_SPACE__MIN_ADDRESS:
-				setMinAddress(MIN_ADDRESS_EDEFAULT);
-				return;
-			case ArchitecturePackage.ADDRESS_SPACE__MAX_ADDRESS:
-				setMaxAddress(MAX_ADDRESS_EDEFAULT);
-				return;
-			case ArchitecturePackage.ADDRESS_SPACE__WIDTH:
-				setWidth(WIDTH_EDEFAULT);
-				return;
+		case ArchitecturePackage.ADDRESS_SPACE__NAME:
+			setName(NAME_EDEFAULT);
+			return;
+		case ArchitecturePackage.ADDRESS_SPACE__MIN_ADDRESS:
+			setMinAddress(MIN_ADDRESS_EDEFAULT);
+			return;
+		case ArchitecturePackage.ADDRESS_SPACE__MAX_ADDRESS:
+			setMaxAddress(MAX_ADDRESS_EDEFAULT);
+			return;
+		case ArchitecturePackage.ADDRESS_SPACE__WIDTH:
+			setWidth(WIDTH_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -294,14 +299,15 @@ public class AddressSpaceImpl extends EObjectImpl implements AddressSpace {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.ADDRESS_SPACE__NAME:
-				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
-			case ArchitecturePackage.ADDRESS_SPACE__MIN_ADDRESS:
-				return minAddress != MIN_ADDRESS_EDEFAULT;
-			case ArchitecturePackage.ADDRESS_SPACE__MAX_ADDRESS:
-				return maxAddress != MAX_ADDRESS_EDEFAULT;
-			case ArchitecturePackage.ADDRESS_SPACE__WIDTH:
-				return width != WIDTH_EDEFAULT;
+		case ArchitecturePackage.ADDRESS_SPACE__NAME:
+			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
+					.equals(name);
+		case ArchitecturePackage.ADDRESS_SPACE__MIN_ADDRESS:
+			return minAddress != MIN_ADDRESS_EDEFAULT;
+		case ArchitecturePackage.ADDRESS_SPACE__MAX_ADDRESS:
+			return maxAddress != MAX_ADDRESS_EDEFAULT;
+		case ArchitecturePackage.ADDRESS_SPACE__WIDTH:
+			return width != WIDTH_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -312,7 +318,8 @@ public class AddressSpaceImpl extends EObjectImpl implements AddressSpace {
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (name: ");

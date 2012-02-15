@@ -44,7 +44,6 @@ public interface InstCast extends InstSpecific {
 	 */
 	Def getTarget();
 
-
 	/**
 	 * Return <code>true</code> if the instruction is a cast
 	 * 
@@ -83,7 +82,7 @@ public interface InstCast extends InstSpecific {
 	 * @return <code>true</code> if target type is trunced from the source type
 	 */
 	public boolean isTrunced();
-	
+
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.backends.ir.InstCast#getTarget <em>Target</em>}' containment reference.
 	 * <!-- begin-user-doc -->

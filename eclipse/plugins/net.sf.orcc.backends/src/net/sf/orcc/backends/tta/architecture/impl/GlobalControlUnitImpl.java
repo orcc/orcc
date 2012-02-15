@@ -164,7 +164,8 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	 */
 	public EList<Port> getPorts() {
 		if (ports == null) {
-			ports = new EObjectContainmentEList<Port>(Port.class, this, ArchitecturePackage.GLOBAL_CONTROL_UNIT__PORTS);
+			ports = new EObjectContainmentEList<Port>(Port.class, this,
+					ArchitecturePackage.GLOBAL_CONTROL_UNIT__PORTS);
 		}
 		return ports;
 	}
@@ -182,12 +183,19 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetReturnAddress(Port newReturnAddress, NotificationChain msgs) {
+	public NotificationChain basicSetReturnAddress(Port newReturnAddress,
+			NotificationChain msgs) {
 		Port oldReturnAddress = returnAddress;
 		returnAddress = newReturnAddress;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS, oldReturnAddress, newReturnAddress);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET,
+					ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS,
+					oldReturnAddress, newReturnAddress);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -200,14 +208,26 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 		if (newReturnAddress != returnAddress) {
 			NotificationChain msgs = null;
 			if (returnAddress != null)
-				msgs = ((InternalEObject)returnAddress).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS, null, msgs);
+				msgs = ((InternalEObject) returnAddress)
+						.eInverseRemove(
+								this,
+								EOPPOSITE_FEATURE_BASE
+										- ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS,
+								null, msgs);
 			if (newReturnAddress != null)
-				msgs = ((InternalEObject)newReturnAddress).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS, null, msgs);
+				msgs = ((InternalEObject) newReturnAddress)
+						.eInverseAdd(
+								this,
+								EOPPOSITE_FEATURE_BASE
+										- ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS,
+								null, msgs);
 			msgs = basicSetReturnAddress(newReturnAddress, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS, newReturnAddress, newReturnAddress));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS,
+					newReturnAddress, newReturnAddress));
 	}
 
 	/**
@@ -216,11 +236,15 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	 */
 	public AddressSpace getAddressSpace() {
 		if (addressSpace != null && addressSpace.eIsProxy()) {
-			InternalEObject oldAddressSpace = (InternalEObject)addressSpace;
-			addressSpace = (AddressSpace)eResolveProxy(oldAddressSpace);
+			InternalEObject oldAddressSpace = (InternalEObject) addressSpace;
+			addressSpace = (AddressSpace) eResolveProxy(oldAddressSpace);
 			if (addressSpace != oldAddressSpace) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ArchitecturePackage.GLOBAL_CONTROL_UNIT__ADDRESS_SPACE, oldAddressSpace, addressSpace));
+					eNotify(new ENotificationImpl(
+							this,
+							Notification.RESOLVE,
+							ArchitecturePackage.GLOBAL_CONTROL_UNIT__ADDRESS_SPACE,
+							oldAddressSpace, addressSpace));
 			}
 		}
 		return addressSpace;
@@ -242,7 +266,9 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 		AddressSpace oldAddressSpace = addressSpace;
 		addressSpace = newAddressSpace;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.GLOBAL_CONTROL_UNIT__ADDRESS_SPACE, oldAddressSpace, addressSpace));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.GLOBAL_CONTROL_UNIT__ADDRESS_SPACE,
+					oldAddressSpace, addressSpace));
 	}
 
 	/**
@@ -251,7 +277,9 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	 */
 	public EList<Operation> getOperations() {
 		if (operations == null) {
-			operations = new EObjectContainmentEList<Operation>(Operation.class, this, ArchitecturePackage.GLOBAL_CONTROL_UNIT__OPERATIONS);
+			operations = new EObjectContainmentEList<Operation>(
+					Operation.class, this,
+					ArchitecturePackage.GLOBAL_CONTROL_UNIT__OPERATIONS);
 		}
 		return operations;
 	}
@@ -272,7 +300,9 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 		int oldDelaySlots = delaySlots;
 		delaySlots = newDelaySlots;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.GLOBAL_CONTROL_UNIT__DELAY_SLOTS, oldDelaySlots, delaySlots));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.GLOBAL_CONTROL_UNIT__DELAY_SLOTS,
+					oldDelaySlots, delaySlots));
 	}
 
 	/**
@@ -291,7 +321,9 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 		int oldGuardLatency = guardLatency;
 		guardLatency = newGuardLatency;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.GLOBAL_CONTROL_UNIT__GUARD_LATENCY, oldGuardLatency, guardLatency));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.GLOBAL_CONTROL_UNIT__GUARD_LATENCY,
+					oldGuardLatency, guardLatency));
 	}
 
 	/**
@@ -302,12 +334,13 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__PORTS:
-				return ((InternalEList<?>)getPorts()).basicRemove(otherEnd, msgs);
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS:
-				return basicSetReturnAddress(null, msgs);
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__OPERATIONS:
-				return ((InternalEList<?>)getOperations()).basicRemove(otherEnd, msgs);
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__PORTS:
+			return ((InternalEList<?>) getPorts()).basicRemove(otherEnd, msgs);
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS:
+			return basicSetReturnAddress(null, msgs);
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__OPERATIONS:
+			return ((InternalEList<?>) getOperations()).basicRemove(otherEnd,
+					msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -319,19 +352,20 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__PORTS:
-				return getPorts();
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS:
-				return getReturnAddress();
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__ADDRESS_SPACE:
-				if (resolve) return getAddressSpace();
-				return basicGetAddressSpace();
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__OPERATIONS:
-				return getOperations();
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__DELAY_SLOTS:
-				return getDelaySlots();
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__GUARD_LATENCY:
-				return getGuardLatency();
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__PORTS:
+			return getPorts();
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS:
+			return getReturnAddress();
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__ADDRESS_SPACE:
+			if (resolve)
+				return getAddressSpace();
+			return basicGetAddressSpace();
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__OPERATIONS:
+			return getOperations();
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__DELAY_SLOTS:
+			return getDelaySlots();
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__GUARD_LATENCY:
+			return getGuardLatency();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -344,26 +378,26 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__PORTS:
-				getPorts().clear();
-				getPorts().addAll((Collection<? extends Port>)newValue);
-				return;
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS:
-				setReturnAddress((Port)newValue);
-				return;
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__ADDRESS_SPACE:
-				setAddressSpace((AddressSpace)newValue);
-				return;
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__OPERATIONS:
-				getOperations().clear();
-				getOperations().addAll((Collection<? extends Operation>)newValue);
-				return;
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__DELAY_SLOTS:
-				setDelaySlots((Integer)newValue);
-				return;
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__GUARD_LATENCY:
-				setGuardLatency((Integer)newValue);
-				return;
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__PORTS:
+			getPorts().clear();
+			getPorts().addAll((Collection<? extends Port>) newValue);
+			return;
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS:
+			setReturnAddress((Port) newValue);
+			return;
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__ADDRESS_SPACE:
+			setAddressSpace((AddressSpace) newValue);
+			return;
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__OPERATIONS:
+			getOperations().clear();
+			getOperations().addAll((Collection<? extends Operation>) newValue);
+			return;
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__DELAY_SLOTS:
+			setDelaySlots((Integer) newValue);
+			return;
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__GUARD_LATENCY:
+			setGuardLatency((Integer) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -375,24 +409,24 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__PORTS:
-				getPorts().clear();
-				return;
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS:
-				setReturnAddress((Port)null);
-				return;
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__ADDRESS_SPACE:
-				setAddressSpace((AddressSpace)null);
-				return;
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__OPERATIONS:
-				getOperations().clear();
-				return;
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__DELAY_SLOTS:
-				setDelaySlots(DELAY_SLOTS_EDEFAULT);
-				return;
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__GUARD_LATENCY:
-				setGuardLatency(GUARD_LATENCY_EDEFAULT);
-				return;
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__PORTS:
+			getPorts().clear();
+			return;
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS:
+			setReturnAddress((Port) null);
+			return;
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__ADDRESS_SPACE:
+			setAddressSpace((AddressSpace) null);
+			return;
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__OPERATIONS:
+			getOperations().clear();
+			return;
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__DELAY_SLOTS:
+			setDelaySlots(DELAY_SLOTS_EDEFAULT);
+			return;
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__GUARD_LATENCY:
+			setGuardLatency(GUARD_LATENCY_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -404,18 +438,18 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__PORTS:
-				return ports != null && !ports.isEmpty();
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS:
-				return returnAddress != null;
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__ADDRESS_SPACE:
-				return addressSpace != null;
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__OPERATIONS:
-				return operations != null && !operations.isEmpty();
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__DELAY_SLOTS:
-				return delaySlots != DELAY_SLOTS_EDEFAULT;
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__GUARD_LATENCY:
-				return guardLatency != GUARD_LATENCY_EDEFAULT;
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__PORTS:
+			return ports != null && !ports.isEmpty();
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS:
+			return returnAddress != null;
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__ADDRESS_SPACE:
+			return addressSpace != null;
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__OPERATIONS:
+			return operations != null && !operations.isEmpty();
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__DELAY_SLOTS:
+			return delaySlots != DELAY_SLOTS_EDEFAULT;
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__GUARD_LATENCY:
+			return guardLatency != GUARD_LATENCY_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -426,7 +460,8 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (delaySlots: ");

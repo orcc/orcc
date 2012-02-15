@@ -151,7 +151,9 @@ public class ResourceImpl extends EObjectImpl implements Resource {
 		int oldStartCycle = startCycle;
 		startCycle = newStartCycle;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.RESOURCE__START_CYCLE, oldStartCycle, startCycle));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.RESOURCE__START_CYCLE, oldStartCycle,
+					startCycle));
 	}
 
 	/**
@@ -172,7 +174,8 @@ public class ResourceImpl extends EObjectImpl implements Resource {
 		int oldCycles = cycles;
 		cycles = newCycles;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.RESOURCE__CYCLES, oldCycles, cycles));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.RESOURCE__CYCLES, oldCycles, cycles));
 	}
 
 	/**
@@ -193,7 +196,8 @@ public class ResourceImpl extends EObjectImpl implements Resource {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.RESOURCE__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.RESOURCE__NAME, oldName, name));
 	}
 
 	/**
@@ -228,12 +232,12 @@ public class ResourceImpl extends EObjectImpl implements Resource {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case ArchitecturePackage.RESOURCE__START_CYCLE:
-				return getStartCycle();
-			case ArchitecturePackage.RESOURCE__CYCLES:
-				return getCycles();
-			case ArchitecturePackage.RESOURCE__NAME:
-				return getName();
+		case ArchitecturePackage.RESOURCE__START_CYCLE:
+			return getStartCycle();
+		case ArchitecturePackage.RESOURCE__CYCLES:
+			return getCycles();
+		case ArchitecturePackage.RESOURCE__NAME:
+			return getName();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -246,15 +250,15 @@ public class ResourceImpl extends EObjectImpl implements Resource {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case ArchitecturePackage.RESOURCE__START_CYCLE:
-				setStartCycle((Integer)newValue);
-				return;
-			case ArchitecturePackage.RESOURCE__CYCLES:
-				setCycles((Integer)newValue);
-				return;
-			case ArchitecturePackage.RESOURCE__NAME:
-				setName((String)newValue);
-				return;
+		case ArchitecturePackage.RESOURCE__START_CYCLE:
+			setStartCycle((Integer) newValue);
+			return;
+		case ArchitecturePackage.RESOURCE__CYCLES:
+			setCycles((Integer) newValue);
+			return;
+		case ArchitecturePackage.RESOURCE__NAME:
+			setName((String) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -267,15 +271,15 @@ public class ResourceImpl extends EObjectImpl implements Resource {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.RESOURCE__START_CYCLE:
-				setStartCycle(START_CYCLE_EDEFAULT);
-				return;
-			case ArchitecturePackage.RESOURCE__CYCLES:
-				setCycles(CYCLES_EDEFAULT);
-				return;
-			case ArchitecturePackage.RESOURCE__NAME:
-				setName(NAME_EDEFAULT);
-				return;
+		case ArchitecturePackage.RESOURCE__START_CYCLE:
+			setStartCycle(START_CYCLE_EDEFAULT);
+			return;
+		case ArchitecturePackage.RESOURCE__CYCLES:
+			setCycles(CYCLES_EDEFAULT);
+			return;
+		case ArchitecturePackage.RESOURCE__NAME:
+			setName(NAME_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -288,12 +292,13 @@ public class ResourceImpl extends EObjectImpl implements Resource {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.RESOURCE__START_CYCLE:
-				return startCycle != START_CYCLE_EDEFAULT;
-			case ArchitecturePackage.RESOURCE__CYCLES:
-				return cycles != CYCLES_EDEFAULT;
-			case ArchitecturePackage.RESOURCE__NAME:
-				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
+		case ArchitecturePackage.RESOURCE__START_CYCLE:
+			return startCycle != START_CYCLE_EDEFAULT;
+		case ArchitecturePackage.RESOURCE__CYCLES:
+			return cycles != CYCLES_EDEFAULT;
+		case ArchitecturePackage.RESOURCE__NAME:
+			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
+					.equals(name);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -305,7 +310,8 @@ public class ResourceImpl extends EObjectImpl implements Resource {
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (startCycle: ");

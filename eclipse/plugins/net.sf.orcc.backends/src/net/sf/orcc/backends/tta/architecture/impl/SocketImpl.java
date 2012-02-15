@@ -146,7 +146,8 @@ public class SocketImpl extends EObjectImpl implements Socket {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.SOCKET__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.SOCKET__NAME, oldName, name));
 	}
 
 	/**
@@ -156,7 +157,9 @@ public class SocketImpl extends EObjectImpl implements Socket {
 	 */
 	public EList<Segment> getConnectedSegments() {
 		if (connectedSegments == null) {
-			connectedSegments = new EObjectResolvingEList<Segment>(Segment.class, this, ArchitecturePackage.SOCKET__CONNECTED_SEGMENTS);
+			connectedSegments = new EObjectResolvingEList<Segment>(
+					Segment.class, this,
+					ArchitecturePackage.SOCKET__CONNECTED_SEGMENTS);
 		}
 		return connectedSegments;
 	}
@@ -179,7 +182,8 @@ public class SocketImpl extends EObjectImpl implements Socket {
 		SocketType oldType = type;
 		type = newType == null ? TYPE_EDEFAULT : newType;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.SOCKET__TYPE, oldType, type));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.SOCKET__TYPE, oldType, type));
 	}
 
 	/**
@@ -206,12 +210,12 @@ public class SocketImpl extends EObjectImpl implements Socket {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case ArchitecturePackage.SOCKET__NAME:
-				return getName();
-			case ArchitecturePackage.SOCKET__CONNECTED_SEGMENTS:
-				return getConnectedSegments();
-			case ArchitecturePackage.SOCKET__TYPE:
-				return getType();
+		case ArchitecturePackage.SOCKET__NAME:
+			return getName();
+		case ArchitecturePackage.SOCKET__CONNECTED_SEGMENTS:
+			return getConnectedSegments();
+		case ArchitecturePackage.SOCKET__TYPE:
+			return getType();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -225,16 +229,17 @@ public class SocketImpl extends EObjectImpl implements Socket {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case ArchitecturePackage.SOCKET__NAME:
-				setName((String)newValue);
-				return;
-			case ArchitecturePackage.SOCKET__CONNECTED_SEGMENTS:
-				getConnectedSegments().clear();
-				getConnectedSegments().addAll((Collection<? extends Segment>)newValue);
-				return;
-			case ArchitecturePackage.SOCKET__TYPE:
-				setType((SocketType)newValue);
-				return;
+		case ArchitecturePackage.SOCKET__NAME:
+			setName((String) newValue);
+			return;
+		case ArchitecturePackage.SOCKET__CONNECTED_SEGMENTS:
+			getConnectedSegments().clear();
+			getConnectedSegments().addAll(
+					(Collection<? extends Segment>) newValue);
+			return;
+		case ArchitecturePackage.SOCKET__TYPE:
+			setType((SocketType) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -247,15 +252,15 @@ public class SocketImpl extends EObjectImpl implements Socket {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.SOCKET__NAME:
-				setName(NAME_EDEFAULT);
-				return;
-			case ArchitecturePackage.SOCKET__CONNECTED_SEGMENTS:
-				getConnectedSegments().clear();
-				return;
-			case ArchitecturePackage.SOCKET__TYPE:
-				setType(TYPE_EDEFAULT);
-				return;
+		case ArchitecturePackage.SOCKET__NAME:
+			setName(NAME_EDEFAULT);
+			return;
+		case ArchitecturePackage.SOCKET__CONNECTED_SEGMENTS:
+			getConnectedSegments().clear();
+			return;
+		case ArchitecturePackage.SOCKET__TYPE:
+			setType(TYPE_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -268,12 +273,13 @@ public class SocketImpl extends EObjectImpl implements Socket {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.SOCKET__NAME:
-				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
-			case ArchitecturePackage.SOCKET__CONNECTED_SEGMENTS:
-				return connectedSegments != null && !connectedSegments.isEmpty();
-			case ArchitecturePackage.SOCKET__TYPE:
-				return type != TYPE_EDEFAULT;
+		case ArchitecturePackage.SOCKET__NAME:
+			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
+					.equals(name);
+		case ArchitecturePackage.SOCKET__CONNECTED_SEGMENTS:
+			return connectedSegments != null && !connectedSegments.isEmpty();
+		case ArchitecturePackage.SOCKET__TYPE:
+			return type != TYPE_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -285,7 +291,8 @@ public class SocketImpl extends EObjectImpl implements Socket {
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (name: ");

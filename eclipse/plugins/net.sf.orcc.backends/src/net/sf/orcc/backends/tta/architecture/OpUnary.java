@@ -100,11 +100,8 @@ public enum OpUnary implements Enumerator {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private static final OpUnary[] VALUES_ARRAY =
-		new OpUnary[] {
-			SIMPLE,
-			INVERTED,
-		};
+	private static final OpUnary[] VALUES_ARRAY = new OpUnary[] { SIMPLE,
+			INVERTED, };
 
 	/**
 	 * A public read-only list of all the '<em><b>Op Unary</b></em>' enumerators.
@@ -112,7 +109,8 @@ public enum OpUnary implements Enumerator {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static final List<OpUnary> VALUES = Collections.unmodifiableList(Arrays.asList(VALUES_ARRAY));
+	public static final List<OpUnary> VALUES = Collections
+			.unmodifiableList(Arrays.asList(VALUES_ARRAY));
 
 	/**
 	 * Returns the '<em><b>Op Unary</b></em>' literal with the specified literal value.
@@ -154,8 +152,10 @@ public enum OpUnary implements Enumerator {
 	 */
 	public static OpUnary get(int value) {
 		switch (value) {
-			case SIMPLE_VALUE: return SIMPLE;
-			case INVERTED_VALUE: return INVERTED;
+		case SIMPLE_VALUE:
+			return SIMPLE;
+		case INVERTED_VALUE:
+			return INVERTED;
 		}
 		return null;
 	}
@@ -199,7 +199,7 @@ public enum OpUnary implements Enumerator {
 	 * @generated
 	 */
 	public int getValue() {
-	  return value;
+		return value;
 	}
 
 	/**
@@ -208,7 +208,7 @@ public enum OpUnary implements Enumerator {
 	 * @generated
 	 */
 	public String getName() {
-	  return name;
+		return name;
 	}
 
 	/**
@@ -217,7 +217,7 @@ public enum OpUnary implements Enumerator {
 	 * @generated
 	 */
 	public String getLiteral() {
-	  return literal;
+		return literal;
 	}
 
 	/**
@@ -230,5 +230,5 @@ public enum OpUnary implements Enumerator {
 	public String toString() {
 		return literal;
 	}
-	
+
 } //OpUnary

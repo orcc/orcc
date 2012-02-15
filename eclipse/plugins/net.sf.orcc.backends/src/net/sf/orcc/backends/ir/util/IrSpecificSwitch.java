@@ -6,8 +6,12 @@
  */
 package net.sf.orcc.backends.ir.util;
 
-import net.sf.orcc.backends.ir.*;
-
+import net.sf.orcc.backends.ir.InstAssignIndex;
+import net.sf.orcc.backends.ir.InstCast;
+import net.sf.orcc.backends.ir.InstGetElementPtr;
+import net.sf.orcc.backends.ir.InstTernary;
+import net.sf.orcc.backends.ir.IrSpecificPackage;
+import net.sf.orcc.backends.ir.NodeFor;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Node;
@@ -15,7 +19,6 @@ import net.sf.orcc.ir.NodeSpecific;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
-
 import org.eclipse.emf.ecore.util.Switch;
 
 /**
@@ -75,47 +78,63 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 	@Override
 	protected T doSwitch(int classifierID, EObject theEObject) {
 		switch (classifierID) {
-			case IrSpecificPackage.INST_ASSIGN_INDEX: {
-				InstAssignIndex instAssignIndex = (InstAssignIndex)theEObject;
-				T result = caseInstAssignIndex(instAssignIndex);
-				if (result == null) result = caseInstSpecific(instAssignIndex);
-				if (result == null) result = caseInstruction(instAssignIndex);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrSpecificPackage.INST_CAST: {
-				InstCast instCast = (InstCast)theEObject;
-				T result = caseInstCast(instCast);
-				if (result == null) result = caseInstSpecific(instCast);
-				if (result == null) result = caseInstruction(instCast);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrSpecificPackage.INST_GET_ELEMENT_PTR: {
-				InstGetElementPtr instGetElementPtr = (InstGetElementPtr)theEObject;
-				T result = caseInstGetElementPtr(instGetElementPtr);
-				if (result == null) result = caseInstSpecific(instGetElementPtr);
-				if (result == null) result = caseInstruction(instGetElementPtr);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrSpecificPackage.INST_TERNARY: {
-				InstTernary instTernary = (InstTernary)theEObject;
-				T result = caseInstTernary(instTernary);
-				if (result == null) result = caseInstSpecific(instTernary);
-				if (result == null) result = caseInstruction(instTernary);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrSpecificPackage.NODE_FOR: {
-				NodeFor nodeFor = (NodeFor)theEObject;
-				T result = caseNodeFor(nodeFor);
-				if (result == null) result = caseNodeSpecific(nodeFor);
-				if (result == null) result = caseNode(nodeFor);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			default: return defaultCase(theEObject);
+		case IrSpecificPackage.INST_ASSIGN_INDEX: {
+			InstAssignIndex instAssignIndex = (InstAssignIndex) theEObject;
+			T result = caseInstAssignIndex(instAssignIndex);
+			if (result == null)
+				result = caseInstSpecific(instAssignIndex);
+			if (result == null)
+				result = caseInstruction(instAssignIndex);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrSpecificPackage.INST_CAST: {
+			InstCast instCast = (InstCast) theEObject;
+			T result = caseInstCast(instCast);
+			if (result == null)
+				result = caseInstSpecific(instCast);
+			if (result == null)
+				result = caseInstruction(instCast);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrSpecificPackage.INST_GET_ELEMENT_PTR: {
+			InstGetElementPtr instGetElementPtr = (InstGetElementPtr) theEObject;
+			T result = caseInstGetElementPtr(instGetElementPtr);
+			if (result == null)
+				result = caseInstSpecific(instGetElementPtr);
+			if (result == null)
+				result = caseInstruction(instGetElementPtr);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrSpecificPackage.INST_TERNARY: {
+			InstTernary instTernary = (InstTernary) theEObject;
+			T result = caseInstTernary(instTernary);
+			if (result == null)
+				result = caseInstSpecific(instTernary);
+			if (result == null)
+				result = caseInstruction(instTernary);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrSpecificPackage.NODE_FOR: {
+			NodeFor nodeFor = (NodeFor) theEObject;
+			T result = caseNodeFor(nodeFor);
+			if (result == null)
+				result = caseNodeSpecific(nodeFor);
+			if (result == null)
+				result = caseNode(nodeFor);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		default:
+			return defaultCase(theEObject);
 		}
 	}
 

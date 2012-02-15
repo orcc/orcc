@@ -59,7 +59,8 @@ public interface IrSpecificPackage extends EPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	IrSpecificPackage eINSTANCE = net.sf.orcc.backends.ir.impl.IrSpecificPackageImpl.init();
+	IrSpecificPackage eINSTANCE = net.sf.orcc.backends.ir.impl.IrSpecificPackageImpl
+			.init();
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.ir.impl.InstAssignIndexImpl <em>Inst Assign Index</em>}' class.
@@ -676,7 +677,8 @@ public interface IrSpecificPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INST_ASSIGN_INDEX__INDEXES = eINSTANCE.getInstAssignIndex_Indexes();
+		EReference INST_ASSIGN_INDEX__INDEXES = eINSTANCE
+				.getInstAssignIndex_Indexes();
 
 		/**
 		 * The meta object literal for the '<em><b>Target</b></em>' containment reference feature.
@@ -684,7 +686,8 @@ public interface IrSpecificPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INST_ASSIGN_INDEX__TARGET = eINSTANCE.getInstAssignIndex_Target();
+		EReference INST_ASSIGN_INDEX__TARGET = eINSTANCE
+				.getInstAssignIndex_Target();
 
 		/**
 		 * The meta object literal for the '<em><b>List Type</b></em>' containment reference feature.
@@ -692,7 +695,8 @@ public interface IrSpecificPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INST_ASSIGN_INDEX__LIST_TYPE = eINSTANCE.getInstAssignIndex_ListType();
+		EReference INST_ASSIGN_INDEX__LIST_TYPE = eINSTANCE
+				.getInstAssignIndex_ListType();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.ir.impl.InstCastImpl <em>Inst Cast</em>}' class.
@@ -736,7 +740,8 @@ public interface IrSpecificPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INST_GET_ELEMENT_PTR__INDEXES = eINSTANCE.getInstGetElementPtr_Indexes();
+		EReference INST_GET_ELEMENT_PTR__INDEXES = eINSTANCE
+				.getInstGetElementPtr_Indexes();
 
 		/**
 		 * The meta object literal for the '<em><b>Target</b></em>' containment reference feature.
@@ -744,7 +749,8 @@ public interface IrSpecificPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INST_GET_ELEMENT_PTR__TARGET = eINSTANCE.getInstGetElementPtr_Target();
+		EReference INST_GET_ELEMENT_PTR__TARGET = eINSTANCE
+				.getInstGetElementPtr_Target();
 
 		/**
 		 * The meta object literal for the '<em><b>Source</b></em>' containment reference feature.
@@ -752,7 +758,8 @@ public interface IrSpecificPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INST_GET_ELEMENT_PTR__SOURCE = eINSTANCE.getInstGetElementPtr_Source();
+		EReference INST_GET_ELEMENT_PTR__SOURCE = eINSTANCE
+				.getInstGetElementPtr_Source();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.ir.impl.InstTernaryImpl <em>Inst Ternary</em>}' class.
@@ -770,7 +777,8 @@ public interface IrSpecificPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INST_TERNARY__CONDITION_VALUE = eINSTANCE.getInstTernary_ConditionValue();
+		EReference INST_TERNARY__CONDITION_VALUE = eINSTANCE
+				.getInstTernary_ConditionValue();
 
 		/**
 		 * The meta object literal for the '<em><b>True Value</b></em>' containment reference feature.
@@ -778,7 +786,8 @@ public interface IrSpecificPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INST_TERNARY__TRUE_VALUE = eINSTANCE.getInstTernary_TrueValue();
+		EReference INST_TERNARY__TRUE_VALUE = eINSTANCE
+				.getInstTernary_TrueValue();
 
 		/**
 		 * The meta object literal for the '<em><b>False Value</b></em>' containment reference feature.
@@ -786,7 +795,8 @@ public interface IrSpecificPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INST_TERNARY__FALSE_VALUE = eINSTANCE.getInstTernary_FalseValue();
+		EReference INST_TERNARY__FALSE_VALUE = eINSTANCE
+				.getInstTernary_FalseValue();
 
 		/**
 		 * The meta object literal for the '<em><b>Target</b></em>' containment reference feature.

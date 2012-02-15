@@ -226,7 +226,8 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.REGISTER_FILE__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.REGISTER_FILE__NAME, oldName, name));
 	}
 
 	/**
@@ -247,7 +248,8 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 		int oldSize = size;
 		size = newSize;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.REGISTER_FILE__SIZE, oldSize, size));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.REGISTER_FILE__SIZE, oldSize, size));
 	}
 
 	/**
@@ -268,7 +270,8 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 		int oldWidth = width;
 		width = newWidth;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.REGISTER_FILE__WIDTH, oldWidth, width));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.REGISTER_FILE__WIDTH, oldWidth, width));
 	}
 
 	/**
@@ -289,7 +292,9 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 		int oldMaxReads = maxReads;
 		maxReads = newMaxReads;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.REGISTER_FILE__MAX_READS, oldMaxReads, maxReads));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.REGISTER_FILE__MAX_READS, oldMaxReads,
+					maxReads));
 	}
 
 	/**
@@ -310,7 +315,9 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 		int oldMaxWrites = maxWrites;
 		maxWrites = newMaxWrites;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.REGISTER_FILE__MAX_WRITES, oldMaxWrites, maxWrites));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.REGISTER_FILE__MAX_WRITES,
+					oldMaxWrites, maxWrites));
 	}
 
 	/**
@@ -320,7 +327,8 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	 */
 	public EList<Port> getPorts() {
 		if (ports == null) {
-			ports = new EObjectContainmentEList<Port>(Port.class, this, ArchitecturePackage.REGISTER_FILE__PORTS);
+			ports = new EObjectContainmentEList<Port>(Port.class, this,
+					ArchitecturePackage.REGISTER_FILE__PORTS);
 		}
 		return ports;
 	}
@@ -332,11 +340,13 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	 */
 	public Implementation getImplementation() {
 		if (implementation != null && implementation.eIsProxy()) {
-			InternalEObject oldImplementation = (InternalEObject)implementation;
-			implementation = (Implementation)eResolveProxy(oldImplementation);
+			InternalEObject oldImplementation = (InternalEObject) implementation;
+			implementation = (Implementation) eResolveProxy(oldImplementation);
 			if (implementation != oldImplementation) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ArchitecturePackage.REGISTER_FILE__IMPLEMENTATION, oldImplementation, implementation));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							ArchitecturePackage.REGISTER_FILE__IMPLEMENTATION,
+							oldImplementation, implementation));
 			}
 		}
 		return implementation;
@@ -360,7 +370,9 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 		Implementation oldImplementation = implementation;
 		implementation = newImplementation;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.REGISTER_FILE__IMPLEMENTATION, oldImplementation, implementation));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.REGISTER_FILE__IMPLEMENTATION,
+					oldImplementation, implementation));
 	}
 
 	/**
@@ -369,10 +381,11 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case ArchitecturePackage.REGISTER_FILE__PORTS:
-				return ((InternalEList<?>)getPorts()).basicRemove(otherEnd, msgs);
+		case ArchitecturePackage.REGISTER_FILE__PORTS:
+			return ((InternalEList<?>) getPorts()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -385,21 +398,22 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case ArchitecturePackage.REGISTER_FILE__NAME:
-				return getName();
-			case ArchitecturePackage.REGISTER_FILE__SIZE:
-				return getSize();
-			case ArchitecturePackage.REGISTER_FILE__WIDTH:
-				return getWidth();
-			case ArchitecturePackage.REGISTER_FILE__MAX_READS:
-				return getMaxReads();
-			case ArchitecturePackage.REGISTER_FILE__MAX_WRITES:
-				return getMaxWrites();
-			case ArchitecturePackage.REGISTER_FILE__PORTS:
-				return getPorts();
-			case ArchitecturePackage.REGISTER_FILE__IMPLEMENTATION:
-				if (resolve) return getImplementation();
-				return basicGetImplementation();
+		case ArchitecturePackage.REGISTER_FILE__NAME:
+			return getName();
+		case ArchitecturePackage.REGISTER_FILE__SIZE:
+			return getSize();
+		case ArchitecturePackage.REGISTER_FILE__WIDTH:
+			return getWidth();
+		case ArchitecturePackage.REGISTER_FILE__MAX_READS:
+			return getMaxReads();
+		case ArchitecturePackage.REGISTER_FILE__MAX_WRITES:
+			return getMaxWrites();
+		case ArchitecturePackage.REGISTER_FILE__PORTS:
+			return getPorts();
+		case ArchitecturePackage.REGISTER_FILE__IMPLEMENTATION:
+			if (resolve)
+				return getImplementation();
+			return basicGetImplementation();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -413,28 +427,28 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case ArchitecturePackage.REGISTER_FILE__NAME:
-				setName((String)newValue);
-				return;
-			case ArchitecturePackage.REGISTER_FILE__SIZE:
-				setSize((Integer)newValue);
-				return;
-			case ArchitecturePackage.REGISTER_FILE__WIDTH:
-				setWidth((Integer)newValue);
-				return;
-			case ArchitecturePackage.REGISTER_FILE__MAX_READS:
-				setMaxReads((Integer)newValue);
-				return;
-			case ArchitecturePackage.REGISTER_FILE__MAX_WRITES:
-				setMaxWrites((Integer)newValue);
-				return;
-			case ArchitecturePackage.REGISTER_FILE__PORTS:
-				getPorts().clear();
-				getPorts().addAll((Collection<? extends Port>)newValue);
-				return;
-			case ArchitecturePackage.REGISTER_FILE__IMPLEMENTATION:
-				setImplementation((Implementation)newValue);
-				return;
+		case ArchitecturePackage.REGISTER_FILE__NAME:
+			setName((String) newValue);
+			return;
+		case ArchitecturePackage.REGISTER_FILE__SIZE:
+			setSize((Integer) newValue);
+			return;
+		case ArchitecturePackage.REGISTER_FILE__WIDTH:
+			setWidth((Integer) newValue);
+			return;
+		case ArchitecturePackage.REGISTER_FILE__MAX_READS:
+			setMaxReads((Integer) newValue);
+			return;
+		case ArchitecturePackage.REGISTER_FILE__MAX_WRITES:
+			setMaxWrites((Integer) newValue);
+			return;
+		case ArchitecturePackage.REGISTER_FILE__PORTS:
+			getPorts().clear();
+			getPorts().addAll((Collection<? extends Port>) newValue);
+			return;
+		case ArchitecturePackage.REGISTER_FILE__IMPLEMENTATION:
+			setImplementation((Implementation) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -447,27 +461,27 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.REGISTER_FILE__NAME:
-				setName(NAME_EDEFAULT);
-				return;
-			case ArchitecturePackage.REGISTER_FILE__SIZE:
-				setSize(SIZE_EDEFAULT);
-				return;
-			case ArchitecturePackage.REGISTER_FILE__WIDTH:
-				setWidth(WIDTH_EDEFAULT);
-				return;
-			case ArchitecturePackage.REGISTER_FILE__MAX_READS:
-				setMaxReads(MAX_READS_EDEFAULT);
-				return;
-			case ArchitecturePackage.REGISTER_FILE__MAX_WRITES:
-				setMaxWrites(MAX_WRITES_EDEFAULT);
-				return;
-			case ArchitecturePackage.REGISTER_FILE__PORTS:
-				getPorts().clear();
-				return;
-			case ArchitecturePackage.REGISTER_FILE__IMPLEMENTATION:
-				setImplementation((Implementation)null);
-				return;
+		case ArchitecturePackage.REGISTER_FILE__NAME:
+			setName(NAME_EDEFAULT);
+			return;
+		case ArchitecturePackage.REGISTER_FILE__SIZE:
+			setSize(SIZE_EDEFAULT);
+			return;
+		case ArchitecturePackage.REGISTER_FILE__WIDTH:
+			setWidth(WIDTH_EDEFAULT);
+			return;
+		case ArchitecturePackage.REGISTER_FILE__MAX_READS:
+			setMaxReads(MAX_READS_EDEFAULT);
+			return;
+		case ArchitecturePackage.REGISTER_FILE__MAX_WRITES:
+			setMaxWrites(MAX_WRITES_EDEFAULT);
+			return;
+		case ArchitecturePackage.REGISTER_FILE__PORTS:
+			getPorts().clear();
+			return;
+		case ArchitecturePackage.REGISTER_FILE__IMPLEMENTATION:
+			setImplementation((Implementation) null);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -480,20 +494,21 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.REGISTER_FILE__NAME:
-				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
-			case ArchitecturePackage.REGISTER_FILE__SIZE:
-				return size != SIZE_EDEFAULT;
-			case ArchitecturePackage.REGISTER_FILE__WIDTH:
-				return width != WIDTH_EDEFAULT;
-			case ArchitecturePackage.REGISTER_FILE__MAX_READS:
-				return maxReads != MAX_READS_EDEFAULT;
-			case ArchitecturePackage.REGISTER_FILE__MAX_WRITES:
-				return maxWrites != MAX_WRITES_EDEFAULT;
-			case ArchitecturePackage.REGISTER_FILE__PORTS:
-				return ports != null && !ports.isEmpty();
-			case ArchitecturePackage.REGISTER_FILE__IMPLEMENTATION:
-				return implementation != null;
+		case ArchitecturePackage.REGISTER_FILE__NAME:
+			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
+					.equals(name);
+		case ArchitecturePackage.REGISTER_FILE__SIZE:
+			return size != SIZE_EDEFAULT;
+		case ArchitecturePackage.REGISTER_FILE__WIDTH:
+			return width != WIDTH_EDEFAULT;
+		case ArchitecturePackage.REGISTER_FILE__MAX_READS:
+			return maxReads != MAX_READS_EDEFAULT;
+		case ArchitecturePackage.REGISTER_FILE__MAX_WRITES:
+			return maxWrites != MAX_WRITES_EDEFAULT;
+		case ArchitecturePackage.REGISTER_FILE__PORTS:
+			return ports != null && !ports.isEmpty();
+		case ArchitecturePackage.REGISTER_FILE__IMPLEMENTATION:
+			return implementation != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -505,7 +520,8 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (name: ");

@@ -35,7 +35,8 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  *
  * @generated
  */
-public class PortToIndexMapEntryImpl extends EObjectImpl implements BasicEMap.Entry<Port,Integer> {
+public class PortToIndexMapEntryImpl extends EObjectImpl implements
+		BasicEMap.Entry<Port, Integer> {
 	/**
 	 * The cached value of the '{@link #getTypedKey() <em>Key</em>}' reference.
 	 * <!-- begin-user-doc -->
@@ -92,11 +93,13 @@ public class PortToIndexMapEntryImpl extends EObjectImpl implements BasicEMap.En
 	 */
 	public Port getTypedKey() {
 		if (key != null && key.eIsProxy()) {
-			InternalEObject oldKey = (InternalEObject)key;
-			key = (Port)eResolveProxy(oldKey);
+			InternalEObject oldKey = (InternalEObject) key;
+			key = (Port) eResolveProxy(oldKey);
 			if (key != oldKey) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY__KEY, oldKey, key));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY__KEY,
+							oldKey, key));
 			}
 		}
 		return key;
@@ -120,7 +123,9 @@ public class PortToIndexMapEntryImpl extends EObjectImpl implements BasicEMap.En
 		Port oldKey = key;
 		key = newKey;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY__KEY, oldKey, key));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY__KEY, oldKey,
+					key));
 	}
 
 	/**
@@ -141,7 +146,9 @@ public class PortToIndexMapEntryImpl extends EObjectImpl implements BasicEMap.En
 		Integer oldValue = value;
 		value = newValue;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY__VALUE, oldValue, value));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY__VALUE,
+					oldValue, value));
 	}
 
 	/**
@@ -152,11 +159,12 @@ public class PortToIndexMapEntryImpl extends EObjectImpl implements BasicEMap.En
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY__KEY:
-				if (resolve) return getTypedKey();
-				return basicGetTypedKey();
-			case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY__VALUE:
-				return getTypedValue();
+		case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY__KEY:
+			if (resolve)
+				return getTypedKey();
+			return basicGetTypedKey();
+		case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY__VALUE:
+			return getTypedValue();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -169,12 +177,12 @@ public class PortToIndexMapEntryImpl extends EObjectImpl implements BasicEMap.En
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY__KEY:
-				setTypedKey((Port)newValue);
-				return;
-			case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY__VALUE:
-				setTypedValue((Integer)newValue);
-				return;
+		case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY__KEY:
+			setTypedKey((Port) newValue);
+			return;
+		case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY__VALUE:
+			setTypedValue((Integer) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -187,12 +195,12 @@ public class PortToIndexMapEntryImpl extends EObjectImpl implements BasicEMap.En
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY__KEY:
-				setTypedKey((Port)null);
-				return;
-			case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY__VALUE:
-				setTypedValue(VALUE_EDEFAULT);
-				return;
+		case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY__KEY:
+			setTypedKey((Port) null);
+			return;
+		case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY__VALUE:
+			setTypedValue(VALUE_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -205,10 +213,11 @@ public class PortToIndexMapEntryImpl extends EObjectImpl implements BasicEMap.En
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY__KEY:
-				return key != null;
-			case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY__VALUE:
-				return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT.equals(value);
+		case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY__KEY:
+			return key != null;
+		case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY__VALUE:
+			return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT
+					.equals(value);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -220,7 +229,8 @@ public class PortToIndexMapEntryImpl extends EObjectImpl implements BasicEMap.En
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (value: ");
@@ -304,7 +314,8 @@ public class PortToIndexMapEntryImpl extends EObjectImpl implements BasicEMap.En
 	@SuppressWarnings("unchecked")
 	public EMap<Port, Integer> getEMap() {
 		EObject container = eContainer();
-		return container == null ? null : (EMap<Port, Integer>)container.eGet(eContainmentFeature());
+		return container == null ? null : (EMap<Port, Integer>) container
+				.eGet(eContainmentFeature());
 	}
 
 } //PortToIndexMapEntryImpl

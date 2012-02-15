@@ -6,8 +6,12 @@
  */
 package net.sf.orcc.backends.ir.util;
 
-import net.sf.orcc.backends.ir.*;
-
+import net.sf.orcc.backends.ir.InstAssignIndex;
+import net.sf.orcc.backends.ir.InstCast;
+import net.sf.orcc.backends.ir.InstGetElementPtr;
+import net.sf.orcc.backends.ir.InstTernary;
+import net.sf.orcc.backends.ir.IrSpecificPackage;
+import net.sf.orcc.backends.ir.NodeFor;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Node;
@@ -15,9 +19,7 @@ import net.sf.orcc.ir.NodeSpecific;
 
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notifier;
-
 import org.eclipse.emf.common.notify.impl.AdapterFactoryImpl;
-
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -63,7 +65,7 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 			return true;
 		}
 		if (object instanceof EObject) {
-			return ((EObject)object).eClass().getEPackage() == modelPackage;
+			return ((EObject) object).eClass().getEPackage() == modelPackage;
 		}
 		return false;
 	}
@@ -74,49 +76,57 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected IrSpecificSwitch<Adapter> modelSwitch =
-		new IrSpecificSwitch<Adapter>() {
-			@Override
-			public Adapter caseInstAssignIndex(InstAssignIndex object) {
-				return createInstAssignIndexAdapter();
-			}
-			@Override
-			public Adapter caseInstCast(InstCast object) {
-				return createInstCastAdapter();
-			}
-			@Override
-			public Adapter caseInstGetElementPtr(InstGetElementPtr object) {
-				return createInstGetElementPtrAdapter();
-			}
-			@Override
-			public Adapter caseInstTernary(InstTernary object) {
-				return createInstTernaryAdapter();
-			}
-			@Override
-			public Adapter caseNodeFor(NodeFor object) {
-				return createNodeForAdapter();
-			}
-			@Override
-			public Adapter caseInstruction(Instruction object) {
-				return createInstructionAdapter();
-			}
-			@Override
-			public Adapter caseInstSpecific(InstSpecific object) {
-				return createInstSpecificAdapter();
-			}
-			@Override
-			public Adapter caseNode(Node object) {
-				return createNodeAdapter();
-			}
-			@Override
-			public Adapter caseNodeSpecific(NodeSpecific object) {
-				return createNodeSpecificAdapter();
-			}
-			@Override
-			public Adapter defaultCase(EObject object) {
-				return createEObjectAdapter();
-			}
-		};
+	protected IrSpecificSwitch<Adapter> modelSwitch = new IrSpecificSwitch<Adapter>() {
+		@Override
+		public Adapter caseInstAssignIndex(InstAssignIndex object) {
+			return createInstAssignIndexAdapter();
+		}
+
+		@Override
+		public Adapter caseInstCast(InstCast object) {
+			return createInstCastAdapter();
+		}
+
+		@Override
+		public Adapter caseInstGetElementPtr(InstGetElementPtr object) {
+			return createInstGetElementPtrAdapter();
+		}
+
+		@Override
+		public Adapter caseInstTernary(InstTernary object) {
+			return createInstTernaryAdapter();
+		}
+
+		@Override
+		public Adapter caseNodeFor(NodeFor object) {
+			return createNodeForAdapter();
+		}
+
+		@Override
+		public Adapter caseInstruction(Instruction object) {
+			return createInstructionAdapter();
+		}
+
+		@Override
+		public Adapter caseInstSpecific(InstSpecific object) {
+			return createInstSpecificAdapter();
+		}
+
+		@Override
+		public Adapter caseNode(Node object) {
+			return createNodeAdapter();
+		}
+
+		@Override
+		public Adapter caseNodeSpecific(NodeSpecific object) {
+			return createNodeSpecificAdapter();
+		}
+
+		@Override
+		public Adapter defaultCase(EObject object) {
+			return createEObjectAdapter();
+		}
+	};
 
 	/**
 	 * Creates an adapter for the <code>target</code>.
@@ -128,9 +138,8 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 	 */
 	@Override
 	public Adapter createAdapter(Notifier target) {
-		return modelSwitch.doSwitch((EObject)target);
+		return modelSwitch.doSwitch((EObject) target);
 	}
-
 
 	/**
 	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.ir.InstAssignIndex <em>Inst Assign Index</em>}'.

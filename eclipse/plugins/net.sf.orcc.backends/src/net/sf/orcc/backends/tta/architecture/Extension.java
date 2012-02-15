@@ -100,11 +100,8 @@ public enum Extension implements Enumerator {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private static final Extension[] VALUES_ARRAY =
-		new Extension[] {
-			SIGN,
-			ZERO,
-		};
+	private static final Extension[] VALUES_ARRAY = new Extension[] { SIGN,
+			ZERO, };
 
 	/**
 	 * A public read-only list of all the '<em><b>Extension</b></em>' enumerators.
@@ -112,7 +109,8 @@ public enum Extension implements Enumerator {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static final List<Extension> VALUES = Collections.unmodifiableList(Arrays.asList(VALUES_ARRAY));
+	public static final List<Extension> VALUES = Collections
+			.unmodifiableList(Arrays.asList(VALUES_ARRAY));
 
 	/**
 	 * Returns the '<em><b>Extension</b></em>' literal with the specified literal value.
@@ -154,8 +152,10 @@ public enum Extension implements Enumerator {
 	 */
 	public static Extension get(int value) {
 		switch (value) {
-			case SIGN_VALUE: return SIGN;
-			case ZERO_VALUE: return ZERO;
+		case SIGN_VALUE:
+			return SIGN;
+		case ZERO_VALUE:
+			return ZERO;
 		}
 		return null;
 	}
@@ -199,7 +199,7 @@ public enum Extension implements Enumerator {
 	 * @generated
 	 */
 	public int getValue() {
-	  return value;
+		return value;
 	}
 
 	/**
@@ -208,7 +208,7 @@ public enum Extension implements Enumerator {
 	 * @generated
 	 */
 	public String getName() {
-	  return name;
+		return name;
 	}
 
 	/**
@@ -217,7 +217,7 @@ public enum Extension implements Enumerator {
 	 * @generated
 	 */
 	public String getLiteral() {
-	  return literal;
+		return literal;
 	}
 
 	/**
@@ -230,5 +230,5 @@ public enum Extension implements Enumerator {
 	public String toString() {
 		return literal;
 	}
-	
+
 } //Extension

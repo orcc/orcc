@@ -172,7 +172,8 @@ public class BusImpl extends EObjectImpl implements Bus {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.BUS__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.BUS__NAME, oldName, name));
 	}
 
 	/**
@@ -193,7 +194,8 @@ public class BusImpl extends EObjectImpl implements Bus {
 		int oldWidth = width;
 		width = newWidth;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.BUS__WIDTH, oldWidth, width));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.BUS__WIDTH, oldWidth, width));
 	}
 
 	/**
@@ -203,7 +205,8 @@ public class BusImpl extends EObjectImpl implements Bus {
 	 */
 	public EList<Guard> getGuards() {
 		if (guards == null) {
-			guards = new EObjectContainmentEList<Guard>(Guard.class, this, ArchitecturePackage.BUS__GUARDS);
+			guards = new EObjectContainmentEList<Guard>(Guard.class, this,
+					ArchitecturePackage.BUS__GUARDS);
 		}
 		return guards;
 	}
@@ -215,7 +218,8 @@ public class BusImpl extends EObjectImpl implements Bus {
 	 */
 	public EList<Segment> getSegments() {
 		if (segments == null) {
-			segments = new EObjectContainmentEList<Segment>(Segment.class, this, ArchitecturePackage.BUS__SEGMENTS);
+			segments = new EObjectContainmentEList<Segment>(Segment.class,
+					this, ArchitecturePackage.BUS__SEGMENTS);
 		}
 		return segments;
 	}
@@ -234,12 +238,18 @@ public class BusImpl extends EObjectImpl implements Bus {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetShortImmediate(ShortImmediate newShortImmediate, NotificationChain msgs) {
+	public NotificationChain basicSetShortImmediate(
+			ShortImmediate newShortImmediate, NotificationChain msgs) {
 		ShortImmediate oldShortImmediate = shortImmediate;
 		shortImmediate = newShortImmediate;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, ArchitecturePackage.BUS__SHORT_IMMEDIATE, oldShortImmediate, newShortImmediate);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, ArchitecturePackage.BUS__SHORT_IMMEDIATE,
+					oldShortImmediate, newShortImmediate);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -253,14 +263,22 @@ public class BusImpl extends EObjectImpl implements Bus {
 		if (newShortImmediate != shortImmediate) {
 			NotificationChain msgs = null;
 			if (shortImmediate != null)
-				msgs = ((InternalEObject)shortImmediate).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - ArchitecturePackage.BUS__SHORT_IMMEDIATE, null, msgs);
+				msgs = ((InternalEObject) shortImmediate).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE
+								- ArchitecturePackage.BUS__SHORT_IMMEDIATE,
+						null, msgs);
 			if (newShortImmediate != null)
-				msgs = ((InternalEObject)newShortImmediate).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - ArchitecturePackage.BUS__SHORT_IMMEDIATE, null, msgs);
+				msgs = ((InternalEObject) newShortImmediate).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE
+								- ArchitecturePackage.BUS__SHORT_IMMEDIATE,
+						null, msgs);
 			msgs = basicSetShortImmediate(newShortImmediate, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.BUS__SHORT_IMMEDIATE, newShortImmediate, newShortImmediate));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.BUS__SHORT_IMMEDIATE,
+					newShortImmediate, newShortImmediate));
 	}
 
 	/**
@@ -269,14 +287,16 @@ public class BusImpl extends EObjectImpl implements Bus {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case ArchitecturePackage.BUS__GUARDS:
-				return ((InternalEList<?>)getGuards()).basicRemove(otherEnd, msgs);
-			case ArchitecturePackage.BUS__SEGMENTS:
-				return ((InternalEList<?>)getSegments()).basicRemove(otherEnd, msgs);
-			case ArchitecturePackage.BUS__SHORT_IMMEDIATE:
-				return basicSetShortImmediate(null, msgs);
+		case ArchitecturePackage.BUS__GUARDS:
+			return ((InternalEList<?>) getGuards()).basicRemove(otherEnd, msgs);
+		case ArchitecturePackage.BUS__SEGMENTS:
+			return ((InternalEList<?>) getSegments()).basicRemove(otherEnd,
+					msgs);
+		case ArchitecturePackage.BUS__SHORT_IMMEDIATE:
+			return basicSetShortImmediate(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -289,16 +309,16 @@ public class BusImpl extends EObjectImpl implements Bus {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case ArchitecturePackage.BUS__NAME:
-				return getName();
-			case ArchitecturePackage.BUS__WIDTH:
-				return getWidth();
-			case ArchitecturePackage.BUS__GUARDS:
-				return getGuards();
-			case ArchitecturePackage.BUS__SEGMENTS:
-				return getSegments();
-			case ArchitecturePackage.BUS__SHORT_IMMEDIATE:
-				return getShortImmediate();
+		case ArchitecturePackage.BUS__NAME:
+			return getName();
+		case ArchitecturePackage.BUS__WIDTH:
+			return getWidth();
+		case ArchitecturePackage.BUS__GUARDS:
+			return getGuards();
+		case ArchitecturePackage.BUS__SEGMENTS:
+			return getSegments();
+		case ArchitecturePackage.BUS__SHORT_IMMEDIATE:
+			return getShortImmediate();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -312,23 +332,23 @@ public class BusImpl extends EObjectImpl implements Bus {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case ArchitecturePackage.BUS__NAME:
-				setName((String)newValue);
-				return;
-			case ArchitecturePackage.BUS__WIDTH:
-				setWidth((Integer)newValue);
-				return;
-			case ArchitecturePackage.BUS__GUARDS:
-				getGuards().clear();
-				getGuards().addAll((Collection<? extends Guard>)newValue);
-				return;
-			case ArchitecturePackage.BUS__SEGMENTS:
-				getSegments().clear();
-				getSegments().addAll((Collection<? extends Segment>)newValue);
-				return;
-			case ArchitecturePackage.BUS__SHORT_IMMEDIATE:
-				setShortImmediate((ShortImmediate)newValue);
-				return;
+		case ArchitecturePackage.BUS__NAME:
+			setName((String) newValue);
+			return;
+		case ArchitecturePackage.BUS__WIDTH:
+			setWidth((Integer) newValue);
+			return;
+		case ArchitecturePackage.BUS__GUARDS:
+			getGuards().clear();
+			getGuards().addAll((Collection<? extends Guard>) newValue);
+			return;
+		case ArchitecturePackage.BUS__SEGMENTS:
+			getSegments().clear();
+			getSegments().addAll((Collection<? extends Segment>) newValue);
+			return;
+		case ArchitecturePackage.BUS__SHORT_IMMEDIATE:
+			setShortImmediate((ShortImmediate) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -341,21 +361,21 @@ public class BusImpl extends EObjectImpl implements Bus {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.BUS__NAME:
-				setName(NAME_EDEFAULT);
-				return;
-			case ArchitecturePackage.BUS__WIDTH:
-				setWidth(WIDTH_EDEFAULT);
-				return;
-			case ArchitecturePackage.BUS__GUARDS:
-				getGuards().clear();
-				return;
-			case ArchitecturePackage.BUS__SEGMENTS:
-				getSegments().clear();
-				return;
-			case ArchitecturePackage.BUS__SHORT_IMMEDIATE:
-				setShortImmediate((ShortImmediate)null);
-				return;
+		case ArchitecturePackage.BUS__NAME:
+			setName(NAME_EDEFAULT);
+			return;
+		case ArchitecturePackage.BUS__WIDTH:
+			setWidth(WIDTH_EDEFAULT);
+			return;
+		case ArchitecturePackage.BUS__GUARDS:
+			getGuards().clear();
+			return;
+		case ArchitecturePackage.BUS__SEGMENTS:
+			getSegments().clear();
+			return;
+		case ArchitecturePackage.BUS__SHORT_IMMEDIATE:
+			setShortImmediate((ShortImmediate) null);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -368,16 +388,17 @@ public class BusImpl extends EObjectImpl implements Bus {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.BUS__NAME:
-				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
-			case ArchitecturePackage.BUS__WIDTH:
-				return width != WIDTH_EDEFAULT;
-			case ArchitecturePackage.BUS__GUARDS:
-				return guards != null && !guards.isEmpty();
-			case ArchitecturePackage.BUS__SEGMENTS:
-				return segments != null && !segments.isEmpty();
-			case ArchitecturePackage.BUS__SHORT_IMMEDIATE:
-				return shortImmediate != null;
+		case ArchitecturePackage.BUS__NAME:
+			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
+					.equals(name);
+		case ArchitecturePackage.BUS__WIDTH:
+			return width != WIDTH_EDEFAULT;
+		case ArchitecturePackage.BUS__GUARDS:
+			return guards != null && !guards.isEmpty();
+		case ArchitecturePackage.BUS__SEGMENTS:
+			return segments != null && !segments.isEmpty();
+		case ArchitecturePackage.BUS__SHORT_IMMEDIATE:
+			return shortImmediate != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -389,7 +410,8 @@ public class BusImpl extends EObjectImpl implements Bus {
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (name: ");

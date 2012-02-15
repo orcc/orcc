@@ -143,7 +143,9 @@ public class WritesImpl extends EObjectImpl implements Writes {
 		int oldStartCycle = startCycle;
 		startCycle = newStartCycle;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.WRITES__START_CYCLE, oldStartCycle, startCycle));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.WRITES__START_CYCLE, oldStartCycle,
+					startCycle));
 	}
 
 	/**
@@ -164,7 +166,8 @@ public class WritesImpl extends EObjectImpl implements Writes {
 		int oldCycles = cycles;
 		cycles = newCycles;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.WRITES__CYCLES, oldCycles, cycles));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.WRITES__CYCLES, oldCycles, cycles));
 	}
 
 	/**
@@ -174,11 +177,12 @@ public class WritesImpl extends EObjectImpl implements Writes {
 	 */
 	public Port getPort() {
 		if (port != null && port.eIsProxy()) {
-			InternalEObject oldPort = (InternalEObject)port;
-			port = (Port)eResolveProxy(oldPort);
+			InternalEObject oldPort = (InternalEObject) port;
+			port = (Port) eResolveProxy(oldPort);
 			if (port != oldPort) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ArchitecturePackage.WRITES__PORT, oldPort, port));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							ArchitecturePackage.WRITES__PORT, oldPort, port));
 			}
 		}
 		return port;
@@ -202,7 +206,8 @@ public class WritesImpl extends EObjectImpl implements Writes {
 		Port oldPort = port;
 		port = newPort;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.WRITES__PORT, oldPort, port));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.WRITES__PORT, oldPort, port));
 	}
 
 	/**
@@ -237,13 +242,14 @@ public class WritesImpl extends EObjectImpl implements Writes {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case ArchitecturePackage.WRITES__START_CYCLE:
-				return getStartCycle();
-			case ArchitecturePackage.WRITES__CYCLES:
-				return getCycles();
-			case ArchitecturePackage.WRITES__PORT:
-				if (resolve) return getPort();
-				return basicGetPort();
+		case ArchitecturePackage.WRITES__START_CYCLE:
+			return getStartCycle();
+		case ArchitecturePackage.WRITES__CYCLES:
+			return getCycles();
+		case ArchitecturePackage.WRITES__PORT:
+			if (resolve)
+				return getPort();
+			return basicGetPort();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -256,15 +262,15 @@ public class WritesImpl extends EObjectImpl implements Writes {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case ArchitecturePackage.WRITES__START_CYCLE:
-				setStartCycle((Integer)newValue);
-				return;
-			case ArchitecturePackage.WRITES__CYCLES:
-				setCycles((Integer)newValue);
-				return;
-			case ArchitecturePackage.WRITES__PORT:
-				setPort((Port)newValue);
-				return;
+		case ArchitecturePackage.WRITES__START_CYCLE:
+			setStartCycle((Integer) newValue);
+			return;
+		case ArchitecturePackage.WRITES__CYCLES:
+			setCycles((Integer) newValue);
+			return;
+		case ArchitecturePackage.WRITES__PORT:
+			setPort((Port) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -277,15 +283,15 @@ public class WritesImpl extends EObjectImpl implements Writes {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.WRITES__START_CYCLE:
-				setStartCycle(START_CYCLE_EDEFAULT);
-				return;
-			case ArchitecturePackage.WRITES__CYCLES:
-				setCycles(CYCLES_EDEFAULT);
-				return;
-			case ArchitecturePackage.WRITES__PORT:
-				setPort((Port)null);
-				return;
+		case ArchitecturePackage.WRITES__START_CYCLE:
+			setStartCycle(START_CYCLE_EDEFAULT);
+			return;
+		case ArchitecturePackage.WRITES__CYCLES:
+			setCycles(CYCLES_EDEFAULT);
+			return;
+		case ArchitecturePackage.WRITES__PORT:
+			setPort((Port) null);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -298,12 +304,12 @@ public class WritesImpl extends EObjectImpl implements Writes {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.WRITES__START_CYCLE:
-				return startCycle != START_CYCLE_EDEFAULT;
-			case ArchitecturePackage.WRITES__CYCLES:
-				return cycles != CYCLES_EDEFAULT;
-			case ArchitecturePackage.WRITES__PORT:
-				return port != null;
+		case ArchitecturePackage.WRITES__START_CYCLE:
+			return startCycle != START_CYCLE_EDEFAULT;
+		case ArchitecturePackage.WRITES__CYCLES:
+			return cycles != CYCLES_EDEFAULT;
+		case ArchitecturePackage.WRITES__PORT:
+			return port != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -315,7 +321,8 @@ public class WritesImpl extends EObjectImpl implements Writes {
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (startCycle: ");

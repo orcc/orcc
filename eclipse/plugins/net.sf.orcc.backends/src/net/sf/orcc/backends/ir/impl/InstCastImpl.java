@@ -92,12 +92,18 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetTarget(Def newTarget, NotificationChain msgs) {
+	public NotificationChain basicSetTarget(Def newTarget,
+			NotificationChain msgs) {
 		Def oldTarget = target;
 		target = newTarget;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrSpecificPackage.INST_CAST__TARGET, oldTarget, newTarget);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrSpecificPackage.INST_CAST__TARGET,
+					oldTarget, newTarget);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -111,14 +117,21 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 		if (newTarget != target) {
 			NotificationChain msgs = null;
 			if (target != null)
-				msgs = ((InternalEObject)target).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrSpecificPackage.INST_CAST__TARGET, null, msgs);
+				msgs = ((InternalEObject) target).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE
+								- IrSpecificPackage.INST_CAST__TARGET, null,
+						msgs);
 			if (newTarget != null)
-				msgs = ((InternalEObject)newTarget).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrSpecificPackage.INST_CAST__TARGET, null, msgs);
+				msgs = ((InternalEObject) newTarget).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE
+								- IrSpecificPackage.INST_CAST__TARGET, null,
+						msgs);
 			msgs = basicSetTarget(newTarget, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrSpecificPackage.INST_CAST__TARGET, newTarget, newTarget));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrSpecificPackage.INST_CAST__TARGET, newTarget, newTarget));
 	}
 
 	/**
@@ -135,16 +148,21 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetSource(Use newSource, NotificationChain msgs) {
+	public NotificationChain basicSetSource(Use newSource,
+			NotificationChain msgs) {
 		Use oldSource = source;
 		source = newSource;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrSpecificPackage.INST_CAST__SOURCE, oldSource, newSource);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrSpecificPackage.INST_CAST__SOURCE,
+					oldSource, newSource);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
-
 
 	@Override
 	public boolean isInstCast() {
@@ -236,14 +254,21 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 		if (newSource != source) {
 			NotificationChain msgs = null;
 			if (source != null)
-				msgs = ((InternalEObject)source).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrSpecificPackage.INST_CAST__SOURCE, null, msgs);
+				msgs = ((InternalEObject) source).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE
+								- IrSpecificPackage.INST_CAST__SOURCE, null,
+						msgs);
 			if (newSource != null)
-				msgs = ((InternalEObject)newSource).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrSpecificPackage.INST_CAST__SOURCE, null, msgs);
+				msgs = ((InternalEObject) newSource).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE
+								- IrSpecificPackage.INST_CAST__SOURCE, null,
+						msgs);
 			msgs = basicSetSource(newSource, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrSpecificPackage.INST_CAST__SOURCE, newSource, newSource));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrSpecificPackage.INST_CAST__SOURCE, newSource, newSource));
 	}
 
 	/**
@@ -252,12 +277,13 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrSpecificPackage.INST_CAST__TARGET:
-				return basicSetTarget(null, msgs);
-			case IrSpecificPackage.INST_CAST__SOURCE:
-				return basicSetSource(null, msgs);
+		case IrSpecificPackage.INST_CAST__TARGET:
+			return basicSetTarget(null, msgs);
+		case IrSpecificPackage.INST_CAST__SOURCE:
+			return basicSetSource(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -270,10 +296,10 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrSpecificPackage.INST_CAST__TARGET:
-				return getTarget();
-			case IrSpecificPackage.INST_CAST__SOURCE:
-				return getSource();
+		case IrSpecificPackage.INST_CAST__TARGET:
+			return getTarget();
+		case IrSpecificPackage.INST_CAST__SOURCE:
+			return getSource();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -286,12 +312,12 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrSpecificPackage.INST_CAST__TARGET:
-				setTarget((Def)newValue);
-				return;
-			case IrSpecificPackage.INST_CAST__SOURCE:
-				setSource((Use)newValue);
-				return;
+		case IrSpecificPackage.INST_CAST__TARGET:
+			setTarget((Def) newValue);
+			return;
+		case IrSpecificPackage.INST_CAST__SOURCE:
+			setSource((Use) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -304,12 +330,12 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrSpecificPackage.INST_CAST__TARGET:
-				setTarget((Def)null);
-				return;
-			case IrSpecificPackage.INST_CAST__SOURCE:
-				setSource((Use)null);
-				return;
+		case IrSpecificPackage.INST_CAST__TARGET:
+			setTarget((Def) null);
+			return;
+		case IrSpecificPackage.INST_CAST__SOURCE:
+			setSource((Use) null);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -322,10 +348,10 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrSpecificPackage.INST_CAST__TARGET:
-				return target != null;
-			case IrSpecificPackage.INST_CAST__SOURCE:
-				return source != null;
+		case IrSpecificPackage.INST_CAST__TARGET:
+			return target != null;
+		case IrSpecificPackage.INST_CAST__SOURCE:
+			return source != null;
 		}
 		return super.eIsSet(featureID);
 	}

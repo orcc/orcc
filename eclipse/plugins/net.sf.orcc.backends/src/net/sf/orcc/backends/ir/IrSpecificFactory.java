@@ -29,7 +29,8 @@ public interface IrSpecificFactory extends EFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	IrSpecificFactory eINSTANCE = net.sf.orcc.backends.ir.impl.IrSpecificFactoryImpl.init();
+	IrSpecificFactory eINSTANCE = net.sf.orcc.backends.ir.impl.IrSpecificFactoryImpl
+			.init();
 
 	/**
 	 * Returns a new object of class '<em>Inst Assign Index</em>'.
@@ -39,9 +40,10 @@ public interface IrSpecificFactory extends EFactory {
 	 * @generated
 	 */
 	InstAssignIndex createInstAssignIndex();
-	
+
 	InstAssignIndex createInstAssignIndex(Var indexVar,
 			List<Expression> listIndex, Type listType);
+
 	/**
 	 * Returns a new object of class '<em>Inst Cast</em>'.
 	 * <!-- begin-user-doc -->
@@ -52,7 +54,7 @@ public interface IrSpecificFactory extends EFactory {
 	InstCast createInstCast();
 
 	InstCast createInstCast(Var source, Var target);
-	
+
 	/**
 	 * Returns a new object of class '<em>Inst Get Element Ptr</em>'.
 	 * <!-- begin-user-doc -->
@@ -64,7 +66,7 @@ public interface IrSpecificFactory extends EFactory {
 
 	InstGetElementPtr createInstGetElementPtr(Var source, Var target,
 			List<Expression> indexes);
-	
+
 	/**
 	 * Returns a new object of class '<em>Inst Ternary</em>'.
 	 * <!-- begin-user-doc -->
@@ -85,7 +87,7 @@ public interface IrSpecificFactory extends EFactory {
 
 	InstTernary createInstTernary(Var target, Expression condition,
 			Expression trueValue, Expression falseValue);
-	
+
 	/**
 	 * Returns the package supported by this factory.
 	 * <!-- begin-user-doc -->

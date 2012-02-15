@@ -100,11 +100,7 @@ public enum OpBinary implements Enumerator {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private static final OpBinary[] VALUES_ARRAY =
-		new OpBinary[] {
-			AND,
-			OR,
-		};
+	private static final OpBinary[] VALUES_ARRAY = new OpBinary[] { AND, OR, };
 
 	/**
 	 * A public read-only list of all the '<em><b>Op Binary</b></em>' enumerators.
@@ -112,7 +108,8 @@ public enum OpBinary implements Enumerator {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static final List<OpBinary> VALUES = Collections.unmodifiableList(Arrays.asList(VALUES_ARRAY));
+	public static final List<OpBinary> VALUES = Collections
+			.unmodifiableList(Arrays.asList(VALUES_ARRAY));
 
 	/**
 	 * Returns the '<em><b>Op Binary</b></em>' literal with the specified literal value.
@@ -154,8 +151,10 @@ public enum OpBinary implements Enumerator {
 	 */
 	public static OpBinary get(int value) {
 		switch (value) {
-			case AND_VALUE: return AND;
-			case OR_VALUE: return OR;
+		case AND_VALUE:
+			return AND;
+		case OR_VALUE:
+			return OR;
 		}
 		return null;
 	}
@@ -199,7 +198,7 @@ public enum OpBinary implements Enumerator {
 	 * @generated
 	 */
 	public int getValue() {
-	  return value;
+		return value;
 	}
 
 	/**
@@ -208,7 +207,7 @@ public enum OpBinary implements Enumerator {
 	 * @generated
 	 */
 	public String getName() {
-	  return name;
+		return name;
 	}
 
 	/**
@@ -217,7 +216,7 @@ public enum OpBinary implements Enumerator {
 	 * @generated
 	 */
 	public String getLiteral() {
-	  return literal;
+		return literal;
 	}
 
 	/**
@@ -230,5 +229,5 @@ public enum OpBinary implements Enumerator {
 	public String toString() {
 		return literal;
 	}
-	
+
 } //OpBinary

@@ -140,7 +140,8 @@ public class OperationImpl extends EObjectImpl implements Operation {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.OPERATION__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.OPERATION__NAME, oldName, name));
 	}
 
 	/**
@@ -149,7 +150,8 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	 */
 	public EList<Element> getPipeline() {
 		if (pipeline == null) {
-			pipeline = new EObjectResolvingEList<Element>(Element.class, this, ArchitecturePackage.OPERATION__PIPELINE);
+			pipeline = new EObjectResolvingEList<Element>(Element.class, this,
+					ArchitecturePackage.OPERATION__PIPELINE);
 		}
 		return pipeline;
 	}
@@ -160,7 +162,7 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	public EMap<Port, Integer> getPortToIndexMap() {
 		EMap<Port, Integer> portToIndexMap = new BasicEMap<Port, Integer>(1);
 		int i = 1;
-		for(Port port: getPorts()){
+		for (Port port : getPorts()) {
 			portToIndexMap.put(port, i++);
 		}
 		return portToIndexMap;
@@ -182,7 +184,8 @@ public class OperationImpl extends EObjectImpl implements Operation {
 		boolean oldControl = control;
 		control = newControl;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.OPERATION__CONTROL, oldControl, control));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.OPERATION__CONTROL, oldControl, control));
 	}
 
 	/**
@@ -207,12 +210,12 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case ArchitecturePackage.OPERATION__NAME:
-				return getName();
-			case ArchitecturePackage.OPERATION__PIPELINE:
-				return getPipeline();
-			case ArchitecturePackage.OPERATION__CONTROL:
-				return isControl();
+		case ArchitecturePackage.OPERATION__NAME:
+			return getName();
+		case ArchitecturePackage.OPERATION__PIPELINE:
+			return getPipeline();
+		case ArchitecturePackage.OPERATION__CONTROL:
+			return isControl();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -225,16 +228,16 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case ArchitecturePackage.OPERATION__NAME:
-				setName((String)newValue);
-				return;
-			case ArchitecturePackage.OPERATION__PIPELINE:
-				getPipeline().clear();
-				getPipeline().addAll((Collection<? extends Element>)newValue);
-				return;
-			case ArchitecturePackage.OPERATION__CONTROL:
-				setControl((Boolean)newValue);
-				return;
+		case ArchitecturePackage.OPERATION__NAME:
+			setName((String) newValue);
+			return;
+		case ArchitecturePackage.OPERATION__PIPELINE:
+			getPipeline().clear();
+			getPipeline().addAll((Collection<? extends Element>) newValue);
+			return;
+		case ArchitecturePackage.OPERATION__CONTROL:
+			setControl((Boolean) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -246,15 +249,15 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.OPERATION__NAME:
-				setName(NAME_EDEFAULT);
-				return;
-			case ArchitecturePackage.OPERATION__PIPELINE:
-				getPipeline().clear();
-				return;
-			case ArchitecturePackage.OPERATION__CONTROL:
-				setControl(CONTROL_EDEFAULT);
-				return;
+		case ArchitecturePackage.OPERATION__NAME:
+			setName(NAME_EDEFAULT);
+			return;
+		case ArchitecturePackage.OPERATION__PIPELINE:
+			getPipeline().clear();
+			return;
+		case ArchitecturePackage.OPERATION__CONTROL:
+			setControl(CONTROL_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -266,12 +269,13 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.OPERATION__NAME:
-				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
-			case ArchitecturePackage.OPERATION__PIPELINE:
-				return pipeline != null && !pipeline.isEmpty();
-			case ArchitecturePackage.OPERATION__CONTROL:
-				return control != CONTROL_EDEFAULT;
+		case ArchitecturePackage.OPERATION__NAME:
+			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
+					.equals(name);
+		case ArchitecturePackage.OPERATION__PIPELINE:
+			return pipeline != null && !pipeline.isEmpty();
+		case ArchitecturePackage.OPERATION__CONTROL:
+			return control != CONTROL_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -282,7 +286,8 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (name: ");

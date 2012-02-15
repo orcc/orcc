@@ -131,7 +131,9 @@ public class ShortImmediateImpl extends EObjectImpl implements ShortImmediate {
 		Extension oldExtension = extension;
 		extension = newExtension == null ? EXTENSION_EDEFAULT : newExtension;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.SHORT_IMMEDIATE__EXTENSION, oldExtension, extension));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.SHORT_IMMEDIATE__EXTENSION,
+					oldExtension, extension));
 	}
 
 	/**
@@ -152,7 +154,8 @@ public class ShortImmediateImpl extends EObjectImpl implements ShortImmediate {
 		int oldWidth = width;
 		width = newWidth;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.SHORT_IMMEDIATE__WIDTH, oldWidth, width));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.SHORT_IMMEDIATE__WIDTH, oldWidth, width));
 	}
 
 	/**
@@ -163,10 +166,10 @@ public class ShortImmediateImpl extends EObjectImpl implements ShortImmediate {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case ArchitecturePackage.SHORT_IMMEDIATE__EXTENSION:
-				return getExtension();
-			case ArchitecturePackage.SHORT_IMMEDIATE__WIDTH:
-				return getWidth();
+		case ArchitecturePackage.SHORT_IMMEDIATE__EXTENSION:
+			return getExtension();
+		case ArchitecturePackage.SHORT_IMMEDIATE__WIDTH:
+			return getWidth();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -179,12 +182,12 @@ public class ShortImmediateImpl extends EObjectImpl implements ShortImmediate {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case ArchitecturePackage.SHORT_IMMEDIATE__EXTENSION:
-				setExtension((Extension)newValue);
-				return;
-			case ArchitecturePackage.SHORT_IMMEDIATE__WIDTH:
-				setWidth((Integer)newValue);
-				return;
+		case ArchitecturePackage.SHORT_IMMEDIATE__EXTENSION:
+			setExtension((Extension) newValue);
+			return;
+		case ArchitecturePackage.SHORT_IMMEDIATE__WIDTH:
+			setWidth((Integer) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -197,12 +200,12 @@ public class ShortImmediateImpl extends EObjectImpl implements ShortImmediate {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.SHORT_IMMEDIATE__EXTENSION:
-				setExtension(EXTENSION_EDEFAULT);
-				return;
-			case ArchitecturePackage.SHORT_IMMEDIATE__WIDTH:
-				setWidth(WIDTH_EDEFAULT);
-				return;
+		case ArchitecturePackage.SHORT_IMMEDIATE__EXTENSION:
+			setExtension(EXTENSION_EDEFAULT);
+			return;
+		case ArchitecturePackage.SHORT_IMMEDIATE__WIDTH:
+			setWidth(WIDTH_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -215,10 +218,10 @@ public class ShortImmediateImpl extends EObjectImpl implements ShortImmediate {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.SHORT_IMMEDIATE__EXTENSION:
-				return extension != EXTENSION_EDEFAULT;
-			case ArchitecturePackage.SHORT_IMMEDIATE__WIDTH:
-				return width != WIDTH_EDEFAULT;
+		case ArchitecturePackage.SHORT_IMMEDIATE__EXTENSION:
+			return extension != EXTENSION_EDEFAULT;
+		case ArchitecturePackage.SHORT_IMMEDIATE__WIDTH:
+			return width != WIDTH_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -230,7 +233,8 @@ public class ShortImmediateImpl extends EObjectImpl implements ShortImmediate {
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (extension: ");

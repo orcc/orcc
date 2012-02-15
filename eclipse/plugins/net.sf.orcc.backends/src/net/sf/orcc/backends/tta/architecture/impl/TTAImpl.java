@@ -208,7 +208,8 @@ public class TTAImpl extends EObjectImpl implements TTA {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.TTA__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.TTA__NAME, oldName, name));
 	}
 
 	/**
@@ -228,8 +229,13 @@ public class TTAImpl extends EObjectImpl implements TTA {
 		GlobalControlUnit oldGcu = gcu;
 		gcu = newGcu;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, ArchitecturePackage.TTA__GCU, oldGcu, newGcu);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, ArchitecturePackage.TTA__GCU, oldGcu,
+					newGcu);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -242,14 +248,19 @@ public class TTAImpl extends EObjectImpl implements TTA {
 		if (newGcu != gcu) {
 			NotificationChain msgs = null;
 			if (gcu != null)
-				msgs = ((InternalEObject)gcu).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - ArchitecturePackage.TTA__GCU, null, msgs);
+				msgs = ((InternalEObject) gcu).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE - ArchitecturePackage.TTA__GCU,
+						null, msgs);
 			if (newGcu != null)
-				msgs = ((InternalEObject)newGcu).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - ArchitecturePackage.TTA__GCU, null, msgs);
+				msgs = ((InternalEObject) newGcu).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE - ArchitecturePackage.TTA__GCU,
+						null, msgs);
 			msgs = basicSetGcu(newGcu, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.TTA__GCU, newGcu, newGcu));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.TTA__GCU, newGcu, newGcu));
 	}
 
 	/**
@@ -258,7 +269,8 @@ public class TTAImpl extends EObjectImpl implements TTA {
 	 */
 	public EList<Bus> getBuses() {
 		if (buses == null) {
-			buses = new EObjectContainmentEList<Bus>(Bus.class, this, ArchitecturePackage.TTA__BUSES);
+			buses = new EObjectContainmentEList<Bus>(Bus.class, this,
+					ArchitecturePackage.TTA__BUSES);
 		}
 		return buses;
 	}
@@ -269,7 +281,8 @@ public class TTAImpl extends EObjectImpl implements TTA {
 	 */
 	public EList<Bridge> getBridges() {
 		if (bridges == null) {
-			bridges = new EObjectContainmentEList<Bridge>(Bridge.class, this, ArchitecturePackage.TTA__BRIDGES);
+			bridges = new EObjectContainmentEList<Bridge>(Bridge.class, this,
+					ArchitecturePackage.TTA__BRIDGES);
 		}
 		return bridges;
 	}
@@ -280,7 +293,8 @@ public class TTAImpl extends EObjectImpl implements TTA {
 	 */
 	public EList<Socket> getSockets() {
 		if (sockets == null) {
-			sockets = new EObjectContainmentEList<Socket>(Socket.class, this, ArchitecturePackage.TTA__SOCKETS);
+			sockets = new EObjectContainmentEList<Socket>(Socket.class, this,
+					ArchitecturePackage.TTA__SOCKETS);
 		}
 		return sockets;
 	}
@@ -291,7 +305,9 @@ public class TTAImpl extends EObjectImpl implements TTA {
 	 */
 	public EList<FunctionUnit> getFunctionUnits() {
 		if (functionUnits == null) {
-			functionUnits = new EObjectContainmentEList<FunctionUnit>(FunctionUnit.class, this, ArchitecturePackage.TTA__FUNCTION_UNITS);
+			functionUnits = new EObjectContainmentEList<FunctionUnit>(
+					FunctionUnit.class, this,
+					ArchitecturePackage.TTA__FUNCTION_UNITS);
 		}
 		return functionUnits;
 	}
@@ -302,7 +318,9 @@ public class TTAImpl extends EObjectImpl implements TTA {
 	 */
 	public EList<RegisterFile> getRegisterFiles() {
 		if (registerFiles == null) {
-			registerFiles = new EObjectContainmentEList<RegisterFile>(RegisterFile.class, this, ArchitecturePackage.TTA__REGISTER_FILES);
+			registerFiles = new EObjectContainmentEList<RegisterFile>(
+					RegisterFile.class, this,
+					ArchitecturePackage.TTA__REGISTER_FILES);
 		}
 		return registerFiles;
 	}
@@ -324,8 +342,13 @@ public class TTAImpl extends EObjectImpl implements TTA {
 		AddressSpace oldProgram = program;
 		program = newProgram;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, ArchitecturePackage.TTA__PROGRAM, oldProgram, newProgram);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, ArchitecturePackage.TTA__PROGRAM,
+					oldProgram, newProgram);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -338,14 +361,19 @@ public class TTAImpl extends EObjectImpl implements TTA {
 		if (newProgram != program) {
 			NotificationChain msgs = null;
 			if (program != null)
-				msgs = ((InternalEObject)program).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - ArchitecturePackage.TTA__PROGRAM, null, msgs);
+				msgs = ((InternalEObject) program).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE
+								- ArchitecturePackage.TTA__PROGRAM, null, msgs);
 			if (newProgram != null)
-				msgs = ((InternalEObject)newProgram).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - ArchitecturePackage.TTA__PROGRAM, null, msgs);
+				msgs = ((InternalEObject) newProgram).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE
+								- ArchitecturePackage.TTA__PROGRAM, null, msgs);
 			msgs = basicSetProgram(newProgram, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.TTA__PROGRAM, newProgram, newProgram));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.TTA__PROGRAM, newProgram, newProgram));
 	}
 
 	/**
@@ -365,8 +393,13 @@ public class TTAImpl extends EObjectImpl implements TTA {
 		AddressSpace oldData = data;
 		data = newData;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, ArchitecturePackage.TTA__DATA, oldData, newData);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, ArchitecturePackage.TTA__DATA, oldData,
+					newData);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -379,14 +412,19 @@ public class TTAImpl extends EObjectImpl implements TTA {
 		if (newData != data) {
 			NotificationChain msgs = null;
 			if (data != null)
-				msgs = ((InternalEObject)data).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - ArchitecturePackage.TTA__DATA, null, msgs);
+				msgs = ((InternalEObject) data).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE - ArchitecturePackage.TTA__DATA,
+						null, msgs);
 			if (newData != null)
-				msgs = ((InternalEObject)newData).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - ArchitecturePackage.TTA__DATA, null, msgs);
+				msgs = ((InternalEObject) newData).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE - ArchitecturePackage.TTA__DATA,
+						null, msgs);
 			msgs = basicSetData(newData, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.TTA__DATA, newData, newData));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.TTA__DATA, newData, newData));
 	}
 
 	/**
@@ -396,7 +434,9 @@ public class TTAImpl extends EObjectImpl implements TTA {
 	 */
 	public EList<Implementation> getHardwareDatabase() {
 		if (hardwareDatabase == null) {
-			hardwareDatabase = new EObjectContainmentEList<Implementation>(Implementation.class, this, ArchitecturePackage.TTA__HARDWARE_DATABASE);
+			hardwareDatabase = new EObjectContainmentEList<Implementation>(
+					Implementation.class, this,
+					ArchitecturePackage.TTA__HARDWARE_DATABASE);
 		}
 		return hardwareDatabase;
 	}
@@ -409,24 +449,29 @@ public class TTAImpl extends EObjectImpl implements TTA {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case ArchitecturePackage.TTA__GCU:
-				return basicSetGcu(null, msgs);
-			case ArchitecturePackage.TTA__BUSES:
-				return ((InternalEList<?>)getBuses()).basicRemove(otherEnd, msgs);
-			case ArchitecturePackage.TTA__BRIDGES:
-				return ((InternalEList<?>)getBridges()).basicRemove(otherEnd, msgs);
-			case ArchitecturePackage.TTA__SOCKETS:
-				return ((InternalEList<?>)getSockets()).basicRemove(otherEnd, msgs);
-			case ArchitecturePackage.TTA__FUNCTION_UNITS:
-				return ((InternalEList<?>)getFunctionUnits()).basicRemove(otherEnd, msgs);
-			case ArchitecturePackage.TTA__REGISTER_FILES:
-				return ((InternalEList<?>)getRegisterFiles()).basicRemove(otherEnd, msgs);
-			case ArchitecturePackage.TTA__PROGRAM:
-				return basicSetProgram(null, msgs);
-			case ArchitecturePackage.TTA__DATA:
-				return basicSetData(null, msgs);
-			case ArchitecturePackage.TTA__HARDWARE_DATABASE:
-				return ((InternalEList<?>)getHardwareDatabase()).basicRemove(otherEnd, msgs);
+		case ArchitecturePackage.TTA__GCU:
+			return basicSetGcu(null, msgs);
+		case ArchitecturePackage.TTA__BUSES:
+			return ((InternalEList<?>) getBuses()).basicRemove(otherEnd, msgs);
+		case ArchitecturePackage.TTA__BRIDGES:
+			return ((InternalEList<?>) getBridges())
+					.basicRemove(otherEnd, msgs);
+		case ArchitecturePackage.TTA__SOCKETS:
+			return ((InternalEList<?>) getSockets())
+					.basicRemove(otherEnd, msgs);
+		case ArchitecturePackage.TTA__FUNCTION_UNITS:
+			return ((InternalEList<?>) getFunctionUnits()).basicRemove(
+					otherEnd, msgs);
+		case ArchitecturePackage.TTA__REGISTER_FILES:
+			return ((InternalEList<?>) getRegisterFiles()).basicRemove(
+					otherEnd, msgs);
+		case ArchitecturePackage.TTA__PROGRAM:
+			return basicSetProgram(null, msgs);
+		case ArchitecturePackage.TTA__DATA:
+			return basicSetData(null, msgs);
+		case ArchitecturePackage.TTA__HARDWARE_DATABASE:
+			return ((InternalEList<?>) getHardwareDatabase()).basicRemove(
+					otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -438,26 +483,26 @@ public class TTAImpl extends EObjectImpl implements TTA {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case ArchitecturePackage.TTA__NAME:
-				return getName();
-			case ArchitecturePackage.TTA__GCU:
-				return getGcu();
-			case ArchitecturePackage.TTA__BUSES:
-				return getBuses();
-			case ArchitecturePackage.TTA__BRIDGES:
-				return getBridges();
-			case ArchitecturePackage.TTA__SOCKETS:
-				return getSockets();
-			case ArchitecturePackage.TTA__FUNCTION_UNITS:
-				return getFunctionUnits();
-			case ArchitecturePackage.TTA__REGISTER_FILES:
-				return getRegisterFiles();
-			case ArchitecturePackage.TTA__PROGRAM:
-				return getProgram();
-			case ArchitecturePackage.TTA__DATA:
-				return getData();
-			case ArchitecturePackage.TTA__HARDWARE_DATABASE:
-				return getHardwareDatabase();
+		case ArchitecturePackage.TTA__NAME:
+			return getName();
+		case ArchitecturePackage.TTA__GCU:
+			return getGcu();
+		case ArchitecturePackage.TTA__BUSES:
+			return getBuses();
+		case ArchitecturePackage.TTA__BRIDGES:
+			return getBridges();
+		case ArchitecturePackage.TTA__SOCKETS:
+			return getSockets();
+		case ArchitecturePackage.TTA__FUNCTION_UNITS:
+			return getFunctionUnits();
+		case ArchitecturePackage.TTA__REGISTER_FILES:
+			return getRegisterFiles();
+		case ArchitecturePackage.TTA__PROGRAM:
+			return getProgram();
+		case ArchitecturePackage.TTA__DATA:
+			return getData();
+		case ArchitecturePackage.TTA__HARDWARE_DATABASE:
+			return getHardwareDatabase();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -470,42 +515,45 @@ public class TTAImpl extends EObjectImpl implements TTA {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case ArchitecturePackage.TTA__NAME:
-				setName((String)newValue);
-				return;
-			case ArchitecturePackage.TTA__GCU:
-				setGcu((GlobalControlUnit)newValue);
-				return;
-			case ArchitecturePackage.TTA__BUSES:
-				getBuses().clear();
-				getBuses().addAll((Collection<? extends Bus>)newValue);
-				return;
-			case ArchitecturePackage.TTA__BRIDGES:
-				getBridges().clear();
-				getBridges().addAll((Collection<? extends Bridge>)newValue);
-				return;
-			case ArchitecturePackage.TTA__SOCKETS:
-				getSockets().clear();
-				getSockets().addAll((Collection<? extends Socket>)newValue);
-				return;
-			case ArchitecturePackage.TTA__FUNCTION_UNITS:
-				getFunctionUnits().clear();
-				getFunctionUnits().addAll((Collection<? extends FunctionUnit>)newValue);
-				return;
-			case ArchitecturePackage.TTA__REGISTER_FILES:
-				getRegisterFiles().clear();
-				getRegisterFiles().addAll((Collection<? extends RegisterFile>)newValue);
-				return;
-			case ArchitecturePackage.TTA__PROGRAM:
-				setProgram((AddressSpace)newValue);
-				return;
-			case ArchitecturePackage.TTA__DATA:
-				setData((AddressSpace)newValue);
-				return;
-			case ArchitecturePackage.TTA__HARDWARE_DATABASE:
-				getHardwareDatabase().clear();
-				getHardwareDatabase().addAll((Collection<? extends Implementation>)newValue);
-				return;
+		case ArchitecturePackage.TTA__NAME:
+			setName((String) newValue);
+			return;
+		case ArchitecturePackage.TTA__GCU:
+			setGcu((GlobalControlUnit) newValue);
+			return;
+		case ArchitecturePackage.TTA__BUSES:
+			getBuses().clear();
+			getBuses().addAll((Collection<? extends Bus>) newValue);
+			return;
+		case ArchitecturePackage.TTA__BRIDGES:
+			getBridges().clear();
+			getBridges().addAll((Collection<? extends Bridge>) newValue);
+			return;
+		case ArchitecturePackage.TTA__SOCKETS:
+			getSockets().clear();
+			getSockets().addAll((Collection<? extends Socket>) newValue);
+			return;
+		case ArchitecturePackage.TTA__FUNCTION_UNITS:
+			getFunctionUnits().clear();
+			getFunctionUnits().addAll(
+					(Collection<? extends FunctionUnit>) newValue);
+			return;
+		case ArchitecturePackage.TTA__REGISTER_FILES:
+			getRegisterFiles().clear();
+			getRegisterFiles().addAll(
+					(Collection<? extends RegisterFile>) newValue);
+			return;
+		case ArchitecturePackage.TTA__PROGRAM:
+			setProgram((AddressSpace) newValue);
+			return;
+		case ArchitecturePackage.TTA__DATA:
+			setData((AddressSpace) newValue);
+			return;
+		case ArchitecturePackage.TTA__HARDWARE_DATABASE:
+			getHardwareDatabase().clear();
+			getHardwareDatabase().addAll(
+					(Collection<? extends Implementation>) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -517,36 +565,36 @@ public class TTAImpl extends EObjectImpl implements TTA {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.TTA__NAME:
-				setName(NAME_EDEFAULT);
-				return;
-			case ArchitecturePackage.TTA__GCU:
-				setGcu((GlobalControlUnit)null);
-				return;
-			case ArchitecturePackage.TTA__BUSES:
-				getBuses().clear();
-				return;
-			case ArchitecturePackage.TTA__BRIDGES:
-				getBridges().clear();
-				return;
-			case ArchitecturePackage.TTA__SOCKETS:
-				getSockets().clear();
-				return;
-			case ArchitecturePackage.TTA__FUNCTION_UNITS:
-				getFunctionUnits().clear();
-				return;
-			case ArchitecturePackage.TTA__REGISTER_FILES:
-				getRegisterFiles().clear();
-				return;
-			case ArchitecturePackage.TTA__PROGRAM:
-				setProgram((AddressSpace)null);
-				return;
-			case ArchitecturePackage.TTA__DATA:
-				setData((AddressSpace)null);
-				return;
-			case ArchitecturePackage.TTA__HARDWARE_DATABASE:
-				getHardwareDatabase().clear();
-				return;
+		case ArchitecturePackage.TTA__NAME:
+			setName(NAME_EDEFAULT);
+			return;
+		case ArchitecturePackage.TTA__GCU:
+			setGcu((GlobalControlUnit) null);
+			return;
+		case ArchitecturePackage.TTA__BUSES:
+			getBuses().clear();
+			return;
+		case ArchitecturePackage.TTA__BRIDGES:
+			getBridges().clear();
+			return;
+		case ArchitecturePackage.TTA__SOCKETS:
+			getSockets().clear();
+			return;
+		case ArchitecturePackage.TTA__FUNCTION_UNITS:
+			getFunctionUnits().clear();
+			return;
+		case ArchitecturePackage.TTA__REGISTER_FILES:
+			getRegisterFiles().clear();
+			return;
+		case ArchitecturePackage.TTA__PROGRAM:
+			setProgram((AddressSpace) null);
+			return;
+		case ArchitecturePackage.TTA__DATA:
+			setData((AddressSpace) null);
+			return;
+		case ArchitecturePackage.TTA__HARDWARE_DATABASE:
+			getHardwareDatabase().clear();
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -558,26 +606,27 @@ public class TTAImpl extends EObjectImpl implements TTA {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.TTA__NAME:
-				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
-			case ArchitecturePackage.TTA__GCU:
-				return gcu != null;
-			case ArchitecturePackage.TTA__BUSES:
-				return buses != null && !buses.isEmpty();
-			case ArchitecturePackage.TTA__BRIDGES:
-				return bridges != null && !bridges.isEmpty();
-			case ArchitecturePackage.TTA__SOCKETS:
-				return sockets != null && !sockets.isEmpty();
-			case ArchitecturePackage.TTA__FUNCTION_UNITS:
-				return functionUnits != null && !functionUnits.isEmpty();
-			case ArchitecturePackage.TTA__REGISTER_FILES:
-				return registerFiles != null && !registerFiles.isEmpty();
-			case ArchitecturePackage.TTA__PROGRAM:
-				return program != null;
-			case ArchitecturePackage.TTA__DATA:
-				return data != null;
-			case ArchitecturePackage.TTA__HARDWARE_DATABASE:
-				return hardwareDatabase != null && !hardwareDatabase.isEmpty();
+		case ArchitecturePackage.TTA__NAME:
+			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
+					.equals(name);
+		case ArchitecturePackage.TTA__GCU:
+			return gcu != null;
+		case ArchitecturePackage.TTA__BUSES:
+			return buses != null && !buses.isEmpty();
+		case ArchitecturePackage.TTA__BRIDGES:
+			return bridges != null && !bridges.isEmpty();
+		case ArchitecturePackage.TTA__SOCKETS:
+			return sockets != null && !sockets.isEmpty();
+		case ArchitecturePackage.TTA__FUNCTION_UNITS:
+			return functionUnits != null && !functionUnits.isEmpty();
+		case ArchitecturePackage.TTA__REGISTER_FILES:
+			return registerFiles != null && !registerFiles.isEmpty();
+		case ArchitecturePackage.TTA__PROGRAM:
+			return program != null;
+		case ArchitecturePackage.TTA__DATA:
+			return data != null;
+		case ArchitecturePackage.TTA__HARDWARE_DATABASE:
+			return hardwareDatabase != null && !hardwareDatabase.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -588,7 +637,8 @@ public class TTAImpl extends EObjectImpl implements TTA {
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (name: ");

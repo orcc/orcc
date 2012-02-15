@@ -112,12 +112,19 @@ public class InstTernaryImpl extends InstSpecificImpl implements InstTernary {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetConditionValue(Expression newConditionValue, NotificationChain msgs) {
+	public NotificationChain basicSetConditionValue(
+			Expression newConditionValue, NotificationChain msgs) {
 		Expression oldConditionValue = conditionValue;
 		conditionValue = newConditionValue;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrSpecificPackage.INST_TERNARY__CONDITION_VALUE, oldConditionValue, newConditionValue);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET,
+					IrSpecificPackage.INST_TERNARY__CONDITION_VALUE,
+					oldConditionValue, newConditionValue);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -131,14 +138,26 @@ public class InstTernaryImpl extends InstSpecificImpl implements InstTernary {
 		if (newConditionValue != conditionValue) {
 			NotificationChain msgs = null;
 			if (conditionValue != null)
-				msgs = ((InternalEObject)conditionValue).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrSpecificPackage.INST_TERNARY__CONDITION_VALUE, null, msgs);
+				msgs = ((InternalEObject) conditionValue)
+						.eInverseRemove(
+								this,
+								EOPPOSITE_FEATURE_BASE
+										- IrSpecificPackage.INST_TERNARY__CONDITION_VALUE,
+								null, msgs);
 			if (newConditionValue != null)
-				msgs = ((InternalEObject)newConditionValue).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrSpecificPackage.INST_TERNARY__CONDITION_VALUE, null, msgs);
+				msgs = ((InternalEObject) newConditionValue)
+						.eInverseAdd(
+								this,
+								EOPPOSITE_FEATURE_BASE
+										- IrSpecificPackage.INST_TERNARY__CONDITION_VALUE,
+								null, msgs);
 			msgs = basicSetConditionValue(newConditionValue, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrSpecificPackage.INST_TERNARY__CONDITION_VALUE, newConditionValue, newConditionValue));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrSpecificPackage.INST_TERNARY__CONDITION_VALUE,
+					newConditionValue, newConditionValue));
 	}
 
 	/**
@@ -155,12 +174,19 @@ public class InstTernaryImpl extends InstSpecificImpl implements InstTernary {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetTrueValue(Expression newTrueValue, NotificationChain msgs) {
+	public NotificationChain basicSetTrueValue(Expression newTrueValue,
+			NotificationChain msgs) {
 		Expression oldTrueValue = trueValue;
 		trueValue = newTrueValue;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrSpecificPackage.INST_TERNARY__TRUE_VALUE, oldTrueValue, newTrueValue);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET,
+					IrSpecificPackage.INST_TERNARY__TRUE_VALUE, oldTrueValue,
+					newTrueValue);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -174,14 +200,22 @@ public class InstTernaryImpl extends InstSpecificImpl implements InstTernary {
 		if (newTrueValue != trueValue) {
 			NotificationChain msgs = null;
 			if (trueValue != null)
-				msgs = ((InternalEObject)trueValue).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrSpecificPackage.INST_TERNARY__TRUE_VALUE, null, msgs);
+				msgs = ((InternalEObject) trueValue).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE
+								- IrSpecificPackage.INST_TERNARY__TRUE_VALUE,
+						null, msgs);
 			if (newTrueValue != null)
-				msgs = ((InternalEObject)newTrueValue).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrSpecificPackage.INST_TERNARY__TRUE_VALUE, null, msgs);
+				msgs = ((InternalEObject) newTrueValue).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE
+								- IrSpecificPackage.INST_TERNARY__TRUE_VALUE,
+						null, msgs);
 			msgs = basicSetTrueValue(newTrueValue, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrSpecificPackage.INST_TERNARY__TRUE_VALUE, newTrueValue, newTrueValue));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrSpecificPackage.INST_TERNARY__TRUE_VALUE, newTrueValue,
+					newTrueValue));
 	}
 
 	/**
@@ -198,12 +232,19 @@ public class InstTernaryImpl extends InstSpecificImpl implements InstTernary {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetFalseValue(Expression newFalseValue, NotificationChain msgs) {
+	public NotificationChain basicSetFalseValue(Expression newFalseValue,
+			NotificationChain msgs) {
 		Expression oldFalseValue = falseValue;
 		falseValue = newFalseValue;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrSpecificPackage.INST_TERNARY__FALSE_VALUE, oldFalseValue, newFalseValue);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET,
+					IrSpecificPackage.INST_TERNARY__FALSE_VALUE, oldFalseValue,
+					newFalseValue);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -217,14 +258,22 @@ public class InstTernaryImpl extends InstSpecificImpl implements InstTernary {
 		if (newFalseValue != falseValue) {
 			NotificationChain msgs = null;
 			if (falseValue != null)
-				msgs = ((InternalEObject)falseValue).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrSpecificPackage.INST_TERNARY__FALSE_VALUE, null, msgs);
+				msgs = ((InternalEObject) falseValue).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE
+								- IrSpecificPackage.INST_TERNARY__FALSE_VALUE,
+						null, msgs);
 			if (newFalseValue != null)
-				msgs = ((InternalEObject)newFalseValue).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrSpecificPackage.INST_TERNARY__FALSE_VALUE, null, msgs);
+				msgs = ((InternalEObject) newFalseValue).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE
+								- IrSpecificPackage.INST_TERNARY__FALSE_VALUE,
+						null, msgs);
 			msgs = basicSetFalseValue(newFalseValue, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrSpecificPackage.INST_TERNARY__FALSE_VALUE, newFalseValue, newFalseValue));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrSpecificPackage.INST_TERNARY__FALSE_VALUE, newFalseValue,
+					newFalseValue));
 	}
 
 	/**
@@ -241,12 +290,18 @@ public class InstTernaryImpl extends InstSpecificImpl implements InstTernary {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetTarget(Def newTarget, NotificationChain msgs) {
+	public NotificationChain basicSetTarget(Def newTarget,
+			NotificationChain msgs) {
 		Def oldTarget = target;
 		target = newTarget;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrSpecificPackage.INST_TERNARY__TARGET, oldTarget, newTarget);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrSpecificPackage.INST_TERNARY__TARGET,
+					oldTarget, newTarget);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -260,14 +315,22 @@ public class InstTernaryImpl extends InstSpecificImpl implements InstTernary {
 		if (newTarget != target) {
 			NotificationChain msgs = null;
 			if (target != null)
-				msgs = ((InternalEObject)target).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrSpecificPackage.INST_TERNARY__TARGET, null, msgs);
+				msgs = ((InternalEObject) target).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE
+								- IrSpecificPackage.INST_TERNARY__TARGET, null,
+						msgs);
 			if (newTarget != null)
-				msgs = ((InternalEObject)newTarget).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrSpecificPackage.INST_TERNARY__TARGET, null, msgs);
+				msgs = ((InternalEObject) newTarget).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE
+								- IrSpecificPackage.INST_TERNARY__TARGET, null,
+						msgs);
 			msgs = basicSetTarget(newTarget, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrSpecificPackage.INST_TERNARY__TARGET, newTarget, newTarget));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrSpecificPackage.INST_TERNARY__TARGET, newTarget,
+					newTarget));
 	}
 
 	/**
@@ -276,16 +339,17 @@ public class InstTernaryImpl extends InstSpecificImpl implements InstTernary {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrSpecificPackage.INST_TERNARY__CONDITION_VALUE:
-				return basicSetConditionValue(null, msgs);
-			case IrSpecificPackage.INST_TERNARY__TRUE_VALUE:
-				return basicSetTrueValue(null, msgs);
-			case IrSpecificPackage.INST_TERNARY__FALSE_VALUE:
-				return basicSetFalseValue(null, msgs);
-			case IrSpecificPackage.INST_TERNARY__TARGET:
-				return basicSetTarget(null, msgs);
+		case IrSpecificPackage.INST_TERNARY__CONDITION_VALUE:
+			return basicSetConditionValue(null, msgs);
+		case IrSpecificPackage.INST_TERNARY__TRUE_VALUE:
+			return basicSetTrueValue(null, msgs);
+		case IrSpecificPackage.INST_TERNARY__FALSE_VALUE:
+			return basicSetFalseValue(null, msgs);
+		case IrSpecificPackage.INST_TERNARY__TARGET:
+			return basicSetTarget(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -298,14 +362,14 @@ public class InstTernaryImpl extends InstSpecificImpl implements InstTernary {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrSpecificPackage.INST_TERNARY__CONDITION_VALUE:
-				return getConditionValue();
-			case IrSpecificPackage.INST_TERNARY__TRUE_VALUE:
-				return getTrueValue();
-			case IrSpecificPackage.INST_TERNARY__FALSE_VALUE:
-				return getFalseValue();
-			case IrSpecificPackage.INST_TERNARY__TARGET:
-				return getTarget();
+		case IrSpecificPackage.INST_TERNARY__CONDITION_VALUE:
+			return getConditionValue();
+		case IrSpecificPackage.INST_TERNARY__TRUE_VALUE:
+			return getTrueValue();
+		case IrSpecificPackage.INST_TERNARY__FALSE_VALUE:
+			return getFalseValue();
+		case IrSpecificPackage.INST_TERNARY__TARGET:
+			return getTarget();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -318,18 +382,18 @@ public class InstTernaryImpl extends InstSpecificImpl implements InstTernary {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrSpecificPackage.INST_TERNARY__CONDITION_VALUE:
-				setConditionValue((Expression)newValue);
-				return;
-			case IrSpecificPackage.INST_TERNARY__TRUE_VALUE:
-				setTrueValue((Expression)newValue);
-				return;
-			case IrSpecificPackage.INST_TERNARY__FALSE_VALUE:
-				setFalseValue((Expression)newValue);
-				return;
-			case IrSpecificPackage.INST_TERNARY__TARGET:
-				setTarget((Def)newValue);
-				return;
+		case IrSpecificPackage.INST_TERNARY__CONDITION_VALUE:
+			setConditionValue((Expression) newValue);
+			return;
+		case IrSpecificPackage.INST_TERNARY__TRUE_VALUE:
+			setTrueValue((Expression) newValue);
+			return;
+		case IrSpecificPackage.INST_TERNARY__FALSE_VALUE:
+			setFalseValue((Expression) newValue);
+			return;
+		case IrSpecificPackage.INST_TERNARY__TARGET:
+			setTarget((Def) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -342,18 +406,18 @@ public class InstTernaryImpl extends InstSpecificImpl implements InstTernary {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrSpecificPackage.INST_TERNARY__CONDITION_VALUE:
-				setConditionValue((Expression)null);
-				return;
-			case IrSpecificPackage.INST_TERNARY__TRUE_VALUE:
-				setTrueValue((Expression)null);
-				return;
-			case IrSpecificPackage.INST_TERNARY__FALSE_VALUE:
-				setFalseValue((Expression)null);
-				return;
-			case IrSpecificPackage.INST_TERNARY__TARGET:
-				setTarget((Def)null);
-				return;
+		case IrSpecificPackage.INST_TERNARY__CONDITION_VALUE:
+			setConditionValue((Expression) null);
+			return;
+		case IrSpecificPackage.INST_TERNARY__TRUE_VALUE:
+			setTrueValue((Expression) null);
+			return;
+		case IrSpecificPackage.INST_TERNARY__FALSE_VALUE:
+			setFalseValue((Expression) null);
+			return;
+		case IrSpecificPackage.INST_TERNARY__TARGET:
+			setTarget((Def) null);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -362,7 +426,7 @@ public class InstTernaryImpl extends InstSpecificImpl implements InstTernary {
 	public boolean isInstTernary() {
 		return true;
 	}
-	
+
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -371,14 +435,14 @@ public class InstTernaryImpl extends InstSpecificImpl implements InstTernary {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrSpecificPackage.INST_TERNARY__CONDITION_VALUE:
-				return conditionValue != null;
-			case IrSpecificPackage.INST_TERNARY__TRUE_VALUE:
-				return trueValue != null;
-			case IrSpecificPackage.INST_TERNARY__FALSE_VALUE:
-				return falseValue != null;
-			case IrSpecificPackage.INST_TERNARY__TARGET:
-				return target != null;
+		case IrSpecificPackage.INST_TERNARY__CONDITION_VALUE:
+			return conditionValue != null;
+		case IrSpecificPackage.INST_TERNARY__TRUE_VALUE:
+			return trueValue != null;
+		case IrSpecificPackage.INST_TERNARY__FALSE_VALUE:
+			return falseValue != null;
+		case IrSpecificPackage.INST_TERNARY__TARGET:
+			return target != null;
 		}
 		return super.eIsSet(featureID);
 	}

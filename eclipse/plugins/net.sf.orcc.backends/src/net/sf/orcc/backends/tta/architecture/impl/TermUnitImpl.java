@@ -102,11 +102,13 @@ public class TermUnitImpl extends EObjectImpl implements TermUnit {
 	 */
 	public FunctionUnit getFunctionUnit() {
 		if (functionUnit != null && functionUnit.eIsProxy()) {
-			InternalEObject oldFunctionUnit = (InternalEObject)functionUnit;
-			functionUnit = (FunctionUnit)eResolveProxy(oldFunctionUnit);
+			InternalEObject oldFunctionUnit = (InternalEObject) functionUnit;
+			functionUnit = (FunctionUnit) eResolveProxy(oldFunctionUnit);
 			if (functionUnit != oldFunctionUnit) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ArchitecturePackage.TERM_UNIT__FUNCTION_UNIT, oldFunctionUnit, functionUnit));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							ArchitecturePackage.TERM_UNIT__FUNCTION_UNIT,
+							oldFunctionUnit, functionUnit));
 			}
 		}
 		return functionUnit;
@@ -130,7 +132,9 @@ public class TermUnitImpl extends EObjectImpl implements TermUnit {
 		FunctionUnit oldFunctionUnit = functionUnit;
 		functionUnit = newFunctionUnit;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.TERM_UNIT__FUNCTION_UNIT, oldFunctionUnit, functionUnit));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.TERM_UNIT__FUNCTION_UNIT,
+					oldFunctionUnit, functionUnit));
 	}
 
 	/**
@@ -140,11 +144,12 @@ public class TermUnitImpl extends EObjectImpl implements TermUnit {
 	 */
 	public Port getPort() {
 		if (port != null && port.eIsProxy()) {
-			InternalEObject oldPort = (InternalEObject)port;
-			port = (Port)eResolveProxy(oldPort);
+			InternalEObject oldPort = (InternalEObject) port;
+			port = (Port) eResolveProxy(oldPort);
 			if (port != oldPort) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ArchitecturePackage.TERM_UNIT__PORT, oldPort, port));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							ArchitecturePackage.TERM_UNIT__PORT, oldPort, port));
 			}
 		}
 		return port;
@@ -168,7 +173,8 @@ public class TermUnitImpl extends EObjectImpl implements TermUnit {
 		Port oldPort = port;
 		port = newPort;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.TERM_UNIT__PORT, oldPort, port));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.TERM_UNIT__PORT, oldPort, port));
 	}
 
 	/**
@@ -195,12 +201,14 @@ public class TermUnitImpl extends EObjectImpl implements TermUnit {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case ArchitecturePackage.TERM_UNIT__FUNCTION_UNIT:
-				if (resolve) return getFunctionUnit();
-				return basicGetFunctionUnit();
-			case ArchitecturePackage.TERM_UNIT__PORT:
-				if (resolve) return getPort();
-				return basicGetPort();
+		case ArchitecturePackage.TERM_UNIT__FUNCTION_UNIT:
+			if (resolve)
+				return getFunctionUnit();
+			return basicGetFunctionUnit();
+		case ArchitecturePackage.TERM_UNIT__PORT:
+			if (resolve)
+				return getPort();
+			return basicGetPort();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -213,12 +221,12 @@ public class TermUnitImpl extends EObjectImpl implements TermUnit {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case ArchitecturePackage.TERM_UNIT__FUNCTION_UNIT:
-				setFunctionUnit((FunctionUnit)newValue);
-				return;
-			case ArchitecturePackage.TERM_UNIT__PORT:
-				setPort((Port)newValue);
-				return;
+		case ArchitecturePackage.TERM_UNIT__FUNCTION_UNIT:
+			setFunctionUnit((FunctionUnit) newValue);
+			return;
+		case ArchitecturePackage.TERM_UNIT__PORT:
+			setPort((Port) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -231,12 +239,12 @@ public class TermUnitImpl extends EObjectImpl implements TermUnit {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.TERM_UNIT__FUNCTION_UNIT:
-				setFunctionUnit((FunctionUnit)null);
-				return;
-			case ArchitecturePackage.TERM_UNIT__PORT:
-				setPort((Port)null);
-				return;
+		case ArchitecturePackage.TERM_UNIT__FUNCTION_UNIT:
+			setFunctionUnit((FunctionUnit) null);
+			return;
+		case ArchitecturePackage.TERM_UNIT__PORT:
+			setPort((Port) null);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -249,10 +257,10 @@ public class TermUnitImpl extends EObjectImpl implements TermUnit {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.TERM_UNIT__FUNCTION_UNIT:
-				return functionUnit != null;
-			case ArchitecturePackage.TERM_UNIT__PORT:
-				return port != null;
+		case ArchitecturePackage.TERM_UNIT__FUNCTION_UNIT:
+			return functionUnit != null;
+		case ArchitecturePackage.TERM_UNIT__PORT:
+			return port != null;
 		}
 		return super.eIsSet(featureID);
 	}

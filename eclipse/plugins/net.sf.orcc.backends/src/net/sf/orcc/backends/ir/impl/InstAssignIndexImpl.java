@@ -33,23 +33,19 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- * <li>{@link net.sf.orcc.backends.ir.impl.InstAssignIndexImpl#getIndexes <em>
- * Indexes</em>}</li>
- * <li>{@link net.sf.orcc.backends.ir.impl.InstAssignIndexImpl#getTarget <em>
- * Target</em>}</li>
- * <li>{@link net.sf.orcc.backends.ir.impl.InstAssignIndexImpl#getListType <em>
- * List Type</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.ir.impl.InstAssignIndexImpl#getIndexes <em>Indexes</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.ir.impl.InstAssignIndexImpl#getTarget <em>Target</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.ir.impl.InstAssignIndexImpl#getListType <em>List Type</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class InstAssignIndexImpl extends InstSpecificImpl implements
 		InstAssignIndex {
 	/**
-	 * The cached value of the '{@link #getIndexes() <em>Indexes</em>}'
-	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getIndexes() <em>Indexes</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getIndexes()
 	 * @generated
 	 * @ordered
@@ -57,19 +53,8 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 	protected EList<Expression> indexes;
 
 	/**
-	 * The cached value of the '{@link #getListType() <em>List Type</em>}'
-	 * containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @see #getListType()
-	 * @generated
-	 * @ordered
-	 */
-	protected Type listType;
-
-	/**
-	 * The cached value of the '{@link #getTarget() <em>Target</em>}'
-	 * containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getTarget() <em>Target</em>}' containment reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getTarget()
 	 * @generated
 	 * @ordered
@@ -77,8 +62,16 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 	protected Def target;
 
 	/**
+	 * The cached value of the '{@link #getListType() <em>List Type</em>}' containment reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * @see #getListType()
+	 * @generated
+	 * @ordered
+	 */
+	protected Type listType;
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected InstAssignIndexImpl() {
@@ -87,7 +80,6 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public NotificationChain basicSetListType(Type newListType,
@@ -109,7 +101,6 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public NotificationChain basicSetTarget(Def newTarget,
@@ -131,7 +122,6 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -149,7 +139,6 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -169,7 +158,6 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -187,7 +175,6 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -210,7 +197,6 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -220,7 +206,6 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -250,7 +235,6 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -264,7 +248,6 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -274,7 +257,6 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -289,7 +271,6 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -321,7 +302,6 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override

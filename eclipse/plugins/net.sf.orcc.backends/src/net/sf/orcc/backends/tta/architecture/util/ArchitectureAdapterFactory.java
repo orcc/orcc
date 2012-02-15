@@ -29,13 +29,37 @@
 package net.sf.orcc.backends.tta.architecture.util;
 
 import java.util.Map;
-import net.sf.orcc.backends.tta.architecture.*;
+
+import net.sf.orcc.backends.tta.architecture.AddressSpace;
+import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
+import net.sf.orcc.backends.tta.architecture.Bridge;
+import net.sf.orcc.backends.tta.architecture.Bus;
+import net.sf.orcc.backends.tta.architecture.Element;
+import net.sf.orcc.backends.tta.architecture.ExprBinary;
+import net.sf.orcc.backends.tta.architecture.ExprFalse;
+import net.sf.orcc.backends.tta.architecture.ExprTrue;
+import net.sf.orcc.backends.tta.architecture.ExprUnary;
+import net.sf.orcc.backends.tta.architecture.FunctionUnit;
+import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
+import net.sf.orcc.backends.tta.architecture.Guard;
+import net.sf.orcc.backends.tta.architecture.Implementation;
+import net.sf.orcc.backends.tta.architecture.Operation;
+import net.sf.orcc.backends.tta.architecture.Port;
+import net.sf.orcc.backends.tta.architecture.Reads;
+import net.sf.orcc.backends.tta.architecture.RegisterFile;
+import net.sf.orcc.backends.tta.architecture.Resource;
+import net.sf.orcc.backends.tta.architecture.Segment;
+import net.sf.orcc.backends.tta.architecture.ShortImmediate;
+import net.sf.orcc.backends.tta.architecture.Socket;
+import net.sf.orcc.backends.tta.architecture.TTA;
+import net.sf.orcc.backends.tta.architecture.Term;
+import net.sf.orcc.backends.tta.architecture.TermBool;
+import net.sf.orcc.backends.tta.architecture.TermUnit;
+import net.sf.orcc.backends.tta.architecture.Writes;
 
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notifier;
-
 import org.eclipse.emf.common.notify.impl.AdapterFactoryImpl;
-
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -81,7 +105,7 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 			return true;
 		}
 		if (object instanceof EObject) {
-			return ((EObject)object).eClass().getEPackage() == modelPackage;
+			return ((EObject) object).eClass().getEPackage() == modelPackage;
 		}
 		return false;
 	}
@@ -92,117 +116,142 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected ArchitectureSwitch<Adapter> modelSwitch =
-		new ArchitectureSwitch<Adapter>() {
-			@Override
-			public Adapter caseTTA(TTA object) {
-				return createTTAAdapter();
-			}
-			@Override
-			public Adapter caseBus(Bus object) {
-				return createBusAdapter();
-			}
-			@Override
-			public Adapter caseBridge(Bridge object) {
-				return createBridgeAdapter();
-			}
-			@Override
-			public Adapter caseSegment(Segment object) {
-				return createSegmentAdapter();
-			}
-			@Override
-			public Adapter caseGlobalControlUnit(GlobalControlUnit object) {
-				return createGlobalControlUnitAdapter();
-			}
-			@Override
-			public Adapter caseFunctionUnit(FunctionUnit object) {
-				return createFunctionUnitAdapter();
-			}
-			@Override
-			public Adapter caseRegisterFile(RegisterFile object) {
-				return createRegisterFileAdapter();
-			}
-			@Override
-			public Adapter casePort(Port object) {
-				return createPortAdapter();
-			}
-			@Override
-			public Adapter caseSocket(Socket object) {
-				return createSocketAdapter();
-			}
-			@Override
-			public Adapter caseOperation(Operation object) {
-				return createOperationAdapter();
-			}
-			@Override
-			public Adapter caseAddressSpace(AddressSpace object) {
-				return createAddressSpaceAdapter();
-			}
-			@Override
-			public Adapter caseElement(Element object) {
-				return createElementAdapter();
-			}
-			@Override
-			public Adapter caseReads(Reads object) {
-				return createReadsAdapter();
-			}
-			@Override
-			public Adapter caseWrites(Writes object) {
-				return createWritesAdapter();
-			}
-			@Override
-			public Adapter caseResource(Resource object) {
-				return createResourceAdapter();
-			}
-			@Override
-			public Adapter caseShortImmediate(ShortImmediate object) {
-				return createShortImmediateAdapter();
-			}
-			@Override
-			public Adapter caseGuard(Guard object) {
-				return createGuardAdapter();
-			}
-			@Override
-			public Adapter caseExprUnary(ExprUnary object) {
-				return createExprUnaryAdapter();
-			}
-			@Override
-			public Adapter caseExprBinary(ExprBinary object) {
-				return createExprBinaryAdapter();
-			}
-			@Override
-			public Adapter caseExprTrue(ExprTrue object) {
-				return createExprTrueAdapter();
-			}
-			@Override
-			public Adapter caseExprFalse(ExprFalse object) {
-				return createExprFalseAdapter();
-			}
-			@Override
-			public Adapter caseTerm(Term object) {
-				return createTermAdapter();
-			}
-			@Override
-			public Adapter caseTermBool(TermBool object) {
-				return createTermBoolAdapter();
-			}
-			@Override
-			public Adapter caseTermUnit(TermUnit object) {
-				return createTermUnitAdapter();
-			}
-			@Override
-			public Adapter caseImplementation(Implementation object) {
-				return createImplementationAdapter();
-			}
-			@Override
-			public Adapter casePortToIndexMapEntry(Map.Entry<Port, Integer> object) {
-				return createPortToIndexMapEntryAdapter();
-			}
-			@Override
-			public Adapter defaultCase(EObject object) {
-				return createEObjectAdapter();
-			}
-		};
+	protected ArchitectureSwitch<Adapter> modelSwitch = new ArchitectureSwitch<Adapter>() {
+		@Override
+		public Adapter caseTTA(TTA object) {
+			return createTTAAdapter();
+		}
+
+		@Override
+		public Adapter caseBus(Bus object) {
+			return createBusAdapter();
+		}
+
+		@Override
+		public Adapter caseBridge(Bridge object) {
+			return createBridgeAdapter();
+		}
+
+		@Override
+		public Adapter caseSegment(Segment object) {
+			return createSegmentAdapter();
+		}
+
+		@Override
+		public Adapter caseGlobalControlUnit(GlobalControlUnit object) {
+			return createGlobalControlUnitAdapter();
+		}
+
+		@Override
+		public Adapter caseFunctionUnit(FunctionUnit object) {
+			return createFunctionUnitAdapter();
+		}
+
+		@Override
+		public Adapter caseRegisterFile(RegisterFile object) {
+			return createRegisterFileAdapter();
+		}
+
+		@Override
+		public Adapter casePort(Port object) {
+			return createPortAdapter();
+		}
+
+		@Override
+		public Adapter caseSocket(Socket object) {
+			return createSocketAdapter();
+		}
+
+		@Override
+		public Adapter caseOperation(Operation object) {
+			return createOperationAdapter();
+		}
+
+		@Override
+		public Adapter caseAddressSpace(AddressSpace object) {
+			return createAddressSpaceAdapter();
+		}
+
+		@Override
+		public Adapter caseElement(Element object) {
+			return createElementAdapter();
+		}
+
+		@Override
+		public Adapter caseReads(Reads object) {
+			return createReadsAdapter();
+		}
+
+		@Override
+		public Adapter caseWrites(Writes object) {
+			return createWritesAdapter();
+		}
+
+		@Override
+		public Adapter caseResource(Resource object) {
+			return createResourceAdapter();
+		}
+
+		@Override
+		public Adapter caseShortImmediate(ShortImmediate object) {
+			return createShortImmediateAdapter();
+		}
+
+		@Override
+		public Adapter caseGuard(Guard object) {
+			return createGuardAdapter();
+		}
+
+		@Override
+		public Adapter caseExprUnary(ExprUnary object) {
+			return createExprUnaryAdapter();
+		}
+
+		@Override
+		public Adapter caseExprBinary(ExprBinary object) {
+			return createExprBinaryAdapter();
+		}
+
+		@Override
+		public Adapter caseExprTrue(ExprTrue object) {
+			return createExprTrueAdapter();
+		}
+
+		@Override
+		public Adapter caseExprFalse(ExprFalse object) {
+			return createExprFalseAdapter();
+		}
+
+		@Override
+		public Adapter caseTerm(Term object) {
+			return createTermAdapter();
+		}
+
+		@Override
+		public Adapter caseTermBool(TermBool object) {
+			return createTermBoolAdapter();
+		}
+
+		@Override
+		public Adapter caseTermUnit(TermUnit object) {
+			return createTermUnitAdapter();
+		}
+
+		@Override
+		public Adapter caseImplementation(Implementation object) {
+			return createImplementationAdapter();
+		}
+
+		@Override
+		public Adapter casePortToIndexMapEntry(Map.Entry<Port, Integer> object) {
+			return createPortToIndexMapEntryAdapter();
+		}
+
+		@Override
+		public Adapter defaultCase(EObject object) {
+			return createEObjectAdapter();
+		}
+	};
 
 	/**
 	 * Creates an adapter for the <code>target</code>.
@@ -214,9 +263,8 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	 */
 	@Override
 	public Adapter createAdapter(Notifier target) {
-		return modelSwitch.doSwitch((EObject)target);
+		return modelSwitch.doSwitch((EObject) target);
 	}
-
 
 	/**
 	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.TTA <em>TTA</em>}'.

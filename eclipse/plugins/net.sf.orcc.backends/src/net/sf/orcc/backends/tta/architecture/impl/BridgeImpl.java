@@ -101,11 +101,13 @@ public class BridgeImpl extends EObjectImpl implements Bridge {
 	 */
 	public Bus getInputBus() {
 		if (inputBus != null && inputBus.eIsProxy()) {
-			InternalEObject oldInputBus = (InternalEObject)inputBus;
-			inputBus = (Bus)eResolveProxy(oldInputBus);
+			InternalEObject oldInputBus = (InternalEObject) inputBus;
+			inputBus = (Bus) eResolveProxy(oldInputBus);
 			if (inputBus != oldInputBus) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ArchitecturePackage.BRIDGE__INPUT_BUS, oldInputBus, inputBus));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							ArchitecturePackage.BRIDGE__INPUT_BUS, oldInputBus,
+							inputBus));
 			}
 		}
 		return inputBus;
@@ -129,7 +131,9 @@ public class BridgeImpl extends EObjectImpl implements Bridge {
 		Bus oldInputBus = inputBus;
 		inputBus = newInputBus;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.BRIDGE__INPUT_BUS, oldInputBus, inputBus));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.BRIDGE__INPUT_BUS, oldInputBus,
+					inputBus));
 	}
 
 	/**
@@ -139,11 +143,13 @@ public class BridgeImpl extends EObjectImpl implements Bridge {
 	 */
 	public Bus getOutputBus() {
 		if (outputBus != null && outputBus.eIsProxy()) {
-			InternalEObject oldOutputBus = (InternalEObject)outputBus;
-			outputBus = (Bus)eResolveProxy(oldOutputBus);
+			InternalEObject oldOutputBus = (InternalEObject) outputBus;
+			outputBus = (Bus) eResolveProxy(oldOutputBus);
 			if (outputBus != oldOutputBus) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ArchitecturePackage.BRIDGE__OUTPUT_BUS, oldOutputBus, outputBus));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							ArchitecturePackage.BRIDGE__OUTPUT_BUS,
+							oldOutputBus, outputBus));
 			}
 		}
 		return outputBus;
@@ -167,7 +173,9 @@ public class BridgeImpl extends EObjectImpl implements Bridge {
 		Bus oldOutputBus = outputBus;
 		outputBus = newOutputBus;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.BRIDGE__OUTPUT_BUS, oldOutputBus, outputBus));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.BRIDGE__OUTPUT_BUS, oldOutputBus,
+					outputBus));
 	}
 
 	/**
@@ -178,12 +186,14 @@ public class BridgeImpl extends EObjectImpl implements Bridge {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case ArchitecturePackage.BRIDGE__INPUT_BUS:
-				if (resolve) return getInputBus();
-				return basicGetInputBus();
-			case ArchitecturePackage.BRIDGE__OUTPUT_BUS:
-				if (resolve) return getOutputBus();
-				return basicGetOutputBus();
+		case ArchitecturePackage.BRIDGE__INPUT_BUS:
+			if (resolve)
+				return getInputBus();
+			return basicGetInputBus();
+		case ArchitecturePackage.BRIDGE__OUTPUT_BUS:
+			if (resolve)
+				return getOutputBus();
+			return basicGetOutputBus();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -196,12 +206,12 @@ public class BridgeImpl extends EObjectImpl implements Bridge {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case ArchitecturePackage.BRIDGE__INPUT_BUS:
-				setInputBus((Bus)newValue);
-				return;
-			case ArchitecturePackage.BRIDGE__OUTPUT_BUS:
-				setOutputBus((Bus)newValue);
-				return;
+		case ArchitecturePackage.BRIDGE__INPUT_BUS:
+			setInputBus((Bus) newValue);
+			return;
+		case ArchitecturePackage.BRIDGE__OUTPUT_BUS:
+			setOutputBus((Bus) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -214,12 +224,12 @@ public class BridgeImpl extends EObjectImpl implements Bridge {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.BRIDGE__INPUT_BUS:
-				setInputBus((Bus)null);
-				return;
-			case ArchitecturePackage.BRIDGE__OUTPUT_BUS:
-				setOutputBus((Bus)null);
-				return;
+		case ArchitecturePackage.BRIDGE__INPUT_BUS:
+			setInputBus((Bus) null);
+			return;
+		case ArchitecturePackage.BRIDGE__OUTPUT_BUS:
+			setOutputBus((Bus) null);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -232,10 +242,10 @@ public class BridgeImpl extends EObjectImpl implements Bridge {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.BRIDGE__INPUT_BUS:
-				return inputBus != null;
-			case ArchitecturePackage.BRIDGE__OUTPUT_BUS:
-				return outputBus != null;
+		case ArchitecturePackage.BRIDGE__INPUT_BUS:
+			return inputBus != null;
+		case ArchitecturePackage.BRIDGE__OUTPUT_BUS:
+			return outputBus != null;
 		}
 		return super.eIsSet(featureID);
 	}

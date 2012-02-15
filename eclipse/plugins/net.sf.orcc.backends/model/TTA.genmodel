@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<genmodel:GenModel xmi:version="2.0"
-    xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
-    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/net.sf.orcc.backends/src"
-    modelPluginID="net.sf.orcc.backends" modelName="TTA" importerID="org.eclipse.emf.importer.ecore"
-    complianceLevel="6.0" copyrightFields="false">
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/net.sf.orcc.backends/src" modelPluginID="net.sf.orcc.backends"
+    templateDirectory="" dynamicTemplates="true" redirection="" modelName="TTA" codeFormatting="true"
+    importerID="org.eclipse.emf.importer.ecore" complianceLevel="6.0" copyrightFields="false">
   <foreignModel>TTA.ecore</foreignModel>
   <genPackages prefix="Architecture" basePackage="net.sf.orcc.backends.tta" disposableProviderFactory="true"
       ecorePackage="TTA.ecore#/">
@@ -33,6 +32,7 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//TTA/registerFiles"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//TTA/program"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//TTA/data"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//TTA/hardwareDatabase"/>
     </genClasses>
     <genClasses ecoreClass="TTA.ecore#//Bus">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//Bus/name"/>
@@ -62,6 +62,7 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//FunctionUnit/operations"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//FunctionUnit/ports"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//FunctionUnit/addressSpace"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//FunctionUnit/implementation"/>
     </genClasses>
     <genClasses ecoreClass="TTA.ecore#//RegisterFile">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//RegisterFile/name"/>
@@ -70,6 +71,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//RegisterFile/maxReads"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//RegisterFile/maxWrites"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//RegisterFile/ports"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//RegisterFile/implementation"/>
     </genClasses>
     <genClasses ecoreClass="TTA.ecore#//Port">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//Port/name"/>
@@ -154,6 +156,10 @@
     <genClasses ecoreClass="TTA.ecore#//TermUnit">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//TermUnit/functionUnit"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//TermUnit/port"/>
+    </genClasses>
+    <genClasses ecoreClass="TTA.ecore#//Implementation">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//Implementation/hdbFile"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//Implementation/id"/>
     </genClasses>
     <genClasses ecoreClass="TTA.ecore#//PortToIndexMapEntry">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//PortToIndexMapEntry/key"/>

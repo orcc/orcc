@@ -29,7 +29,33 @@
 package net.sf.orcc.backends.tta.architecture.util;
 
 import java.util.Map;
-import net.sf.orcc.backends.tta.architecture.*;
+
+import net.sf.orcc.backends.tta.architecture.AddressSpace;
+import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
+import net.sf.orcc.backends.tta.architecture.Bridge;
+import net.sf.orcc.backends.tta.architecture.Bus;
+import net.sf.orcc.backends.tta.architecture.Element;
+import net.sf.orcc.backends.tta.architecture.ExprBinary;
+import net.sf.orcc.backends.tta.architecture.ExprFalse;
+import net.sf.orcc.backends.tta.architecture.ExprTrue;
+import net.sf.orcc.backends.tta.architecture.ExprUnary;
+import net.sf.orcc.backends.tta.architecture.FunctionUnit;
+import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
+import net.sf.orcc.backends.tta.architecture.Guard;
+import net.sf.orcc.backends.tta.architecture.Implementation;
+import net.sf.orcc.backends.tta.architecture.Operation;
+import net.sf.orcc.backends.tta.architecture.Port;
+import net.sf.orcc.backends.tta.architecture.Reads;
+import net.sf.orcc.backends.tta.architecture.RegisterFile;
+import net.sf.orcc.backends.tta.architecture.Resource;
+import net.sf.orcc.backends.tta.architecture.Segment;
+import net.sf.orcc.backends.tta.architecture.ShortImmediate;
+import net.sf.orcc.backends.tta.architecture.Socket;
+import net.sf.orcc.backends.tta.architecture.TTA;
+import net.sf.orcc.backends.tta.architecture.Term;
+import net.sf.orcc.backends.tta.architecture.TermBool;
+import net.sf.orcc.backends.tta.architecture.TermUnit;
+import net.sf.orcc.backends.tta.architecture.Writes;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
@@ -92,172 +118,209 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 	@Override
 	protected T doSwitch(int classifierID, EObject theEObject) {
 		switch (classifierID) {
-			case ArchitecturePackage.TTA: {
-				TTA tta = (TTA)theEObject;
-				T result = caseTTA(tta);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case ArchitecturePackage.BUS: {
-				Bus bus = (Bus)theEObject;
-				T result = caseBus(bus);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case ArchitecturePackage.BRIDGE: {
-				Bridge bridge = (Bridge)theEObject;
-				T result = caseBridge(bridge);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case ArchitecturePackage.SEGMENT: {
-				Segment segment = (Segment)theEObject;
-				T result = caseSegment(segment);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT: {
-				GlobalControlUnit globalControlUnit = (GlobalControlUnit)theEObject;
-				T result = caseGlobalControlUnit(globalControlUnit);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case ArchitecturePackage.FUNCTION_UNIT: {
-				FunctionUnit functionUnit = (FunctionUnit)theEObject;
-				T result = caseFunctionUnit(functionUnit);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case ArchitecturePackage.REGISTER_FILE: {
-				RegisterFile registerFile = (RegisterFile)theEObject;
-				T result = caseRegisterFile(registerFile);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case ArchitecturePackage.PORT: {
-				Port port = (Port)theEObject;
-				T result = casePort(port);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case ArchitecturePackage.SOCKET: {
-				Socket socket = (Socket)theEObject;
-				T result = caseSocket(socket);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case ArchitecturePackage.OPERATION: {
-				Operation operation = (Operation)theEObject;
-				T result = caseOperation(operation);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case ArchitecturePackage.ADDRESS_SPACE: {
-				AddressSpace addressSpace = (AddressSpace)theEObject;
-				T result = caseAddressSpace(addressSpace);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case ArchitecturePackage.ELEMENT: {
-				Element element = (Element)theEObject;
-				T result = caseElement(element);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case ArchitecturePackage.READS: {
-				Reads reads = (Reads)theEObject;
-				T result = caseReads(reads);
-				if (result == null) result = caseElement(reads);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case ArchitecturePackage.WRITES: {
-				Writes writes = (Writes)theEObject;
-				T result = caseWrites(writes);
-				if (result == null) result = caseElement(writes);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case ArchitecturePackage.RESOURCE: {
-				Resource resource = (Resource)theEObject;
-				T result = caseResource(resource);
-				if (result == null) result = caseElement(resource);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case ArchitecturePackage.SHORT_IMMEDIATE: {
-				ShortImmediate shortImmediate = (ShortImmediate)theEObject;
-				T result = caseShortImmediate(shortImmediate);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case ArchitecturePackage.GUARD: {
-				Guard guard = (Guard)theEObject;
-				T result = caseGuard(guard);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case ArchitecturePackage.EXPR_UNARY: {
-				ExprUnary exprUnary = (ExprUnary)theEObject;
-				T result = caseExprUnary(exprUnary);
-				if (result == null) result = caseGuard(exprUnary);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case ArchitecturePackage.EXPR_BINARY: {
-				ExprBinary exprBinary = (ExprBinary)theEObject;
-				T result = caseExprBinary(exprBinary);
-				if (result == null) result = caseGuard(exprBinary);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case ArchitecturePackage.EXPR_TRUE: {
-				ExprTrue exprTrue = (ExprTrue)theEObject;
-				T result = caseExprTrue(exprTrue);
-				if (result == null) result = caseGuard(exprTrue);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case ArchitecturePackage.EXPR_FALSE: {
-				ExprFalse exprFalse = (ExprFalse)theEObject;
-				T result = caseExprFalse(exprFalse);
-				if (result == null) result = caseGuard(exprFalse);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case ArchitecturePackage.TERM: {
-				Term term = (Term)theEObject;
-				T result = caseTerm(term);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case ArchitecturePackage.TERM_BOOL: {
-				TermBool termBool = (TermBool)theEObject;
-				T result = caseTermBool(termBool);
-				if (result == null) result = caseTerm(termBool);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case ArchitecturePackage.TERM_UNIT: {
-				TermUnit termUnit = (TermUnit)theEObject;
-				T result = caseTermUnit(termUnit);
-				if (result == null) result = caseTerm(termUnit);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case ArchitecturePackage.IMPLEMENTATION: {
-				Implementation implementation = (Implementation)theEObject;
-				T result = caseImplementation(implementation);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY: {
-				@SuppressWarnings("unchecked") Map.Entry<Port, Integer> portToIndexMapEntry = (Map.Entry<Port, Integer>)theEObject;
-				T result = casePortToIndexMapEntry(portToIndexMapEntry);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			default: return defaultCase(theEObject);
+		case ArchitecturePackage.TTA: {
+			TTA tta = (TTA) theEObject;
+			T result = caseTTA(tta);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.BUS: {
+			Bus bus = (Bus) theEObject;
+			T result = caseBus(bus);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.BRIDGE: {
+			Bridge bridge = (Bridge) theEObject;
+			T result = caseBridge(bridge);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.SEGMENT: {
+			Segment segment = (Segment) theEObject;
+			T result = caseSegment(segment);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT: {
+			GlobalControlUnit globalControlUnit = (GlobalControlUnit) theEObject;
+			T result = caseGlobalControlUnit(globalControlUnit);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.FUNCTION_UNIT: {
+			FunctionUnit functionUnit = (FunctionUnit) theEObject;
+			T result = caseFunctionUnit(functionUnit);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.REGISTER_FILE: {
+			RegisterFile registerFile = (RegisterFile) theEObject;
+			T result = caseRegisterFile(registerFile);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.PORT: {
+			Port port = (Port) theEObject;
+			T result = casePort(port);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.SOCKET: {
+			Socket socket = (Socket) theEObject;
+			T result = caseSocket(socket);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.OPERATION: {
+			Operation operation = (Operation) theEObject;
+			T result = caseOperation(operation);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.ADDRESS_SPACE: {
+			AddressSpace addressSpace = (AddressSpace) theEObject;
+			T result = caseAddressSpace(addressSpace);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.ELEMENT: {
+			Element element = (Element) theEObject;
+			T result = caseElement(element);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.READS: {
+			Reads reads = (Reads) theEObject;
+			T result = caseReads(reads);
+			if (result == null)
+				result = caseElement(reads);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.WRITES: {
+			Writes writes = (Writes) theEObject;
+			T result = caseWrites(writes);
+			if (result == null)
+				result = caseElement(writes);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.RESOURCE: {
+			Resource resource = (Resource) theEObject;
+			T result = caseResource(resource);
+			if (result == null)
+				result = caseElement(resource);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.SHORT_IMMEDIATE: {
+			ShortImmediate shortImmediate = (ShortImmediate) theEObject;
+			T result = caseShortImmediate(shortImmediate);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.GUARD: {
+			Guard guard = (Guard) theEObject;
+			T result = caseGuard(guard);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.EXPR_UNARY: {
+			ExprUnary exprUnary = (ExprUnary) theEObject;
+			T result = caseExprUnary(exprUnary);
+			if (result == null)
+				result = caseGuard(exprUnary);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.EXPR_BINARY: {
+			ExprBinary exprBinary = (ExprBinary) theEObject;
+			T result = caseExprBinary(exprBinary);
+			if (result == null)
+				result = caseGuard(exprBinary);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.EXPR_TRUE: {
+			ExprTrue exprTrue = (ExprTrue) theEObject;
+			T result = caseExprTrue(exprTrue);
+			if (result == null)
+				result = caseGuard(exprTrue);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.EXPR_FALSE: {
+			ExprFalse exprFalse = (ExprFalse) theEObject;
+			T result = caseExprFalse(exprFalse);
+			if (result == null)
+				result = caseGuard(exprFalse);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.TERM: {
+			Term term = (Term) theEObject;
+			T result = caseTerm(term);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.TERM_BOOL: {
+			TermBool termBool = (TermBool) theEObject;
+			T result = caseTermBool(termBool);
+			if (result == null)
+				result = caseTerm(termBool);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.TERM_UNIT: {
+			TermUnit termUnit = (TermUnit) theEObject;
+			T result = caseTermUnit(termUnit);
+			if (result == null)
+				result = caseTerm(termUnit);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.IMPLEMENTATION: {
+			Implementation implementation = (Implementation) theEObject;
+			T result = caseImplementation(implementation);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY: {
+			@SuppressWarnings("unchecked")
+			Map.Entry<Port, Integer> portToIndexMapEntry = (Map.Entry<Port, Integer>) theEObject;
+			T result = casePortToIndexMapEntry(portToIndexMapEntry);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		default:
+			return defaultCase(theEObject);
 		}
 	}
 

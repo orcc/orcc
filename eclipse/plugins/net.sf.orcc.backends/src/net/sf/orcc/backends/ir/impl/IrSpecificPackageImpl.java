@@ -30,7 +30,8 @@ import org.eclipse.emf.ecore.impl.EPackageImpl;
  * <!-- end-user-doc -->
  * @generated
  */
-public class IrSpecificPackageImpl extends EPackageImpl implements IrSpecificPackage {
+public class IrSpecificPackageImpl extends EPackageImpl implements
+		IrSpecificPackage {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -105,10 +106,14 @@ public class IrSpecificPackageImpl extends EPackageImpl implements IrSpecificPac
 	 * @generated
 	 */
 	public static IrSpecificPackage init() {
-		if (isInited) return (IrSpecificPackage)EPackage.Registry.INSTANCE.getEPackage(IrSpecificPackage.eNS_URI);
+		if (isInited)
+			return (IrSpecificPackage) EPackage.Registry.INSTANCE
+					.getEPackage(IrSpecificPackage.eNS_URI);
 
 		// Obtain or create and register package
-		IrSpecificPackageImpl theIrSpecificPackage = (IrSpecificPackageImpl)(EPackage.Registry.INSTANCE.get(eNS_URI) instanceof IrSpecificPackageImpl ? EPackage.Registry.INSTANCE.get(eNS_URI) : new IrSpecificPackageImpl());
+		IrSpecificPackageImpl theIrSpecificPackage = (IrSpecificPackageImpl) (EPackage.Registry.INSTANCE
+				.get(eNS_URI) instanceof IrSpecificPackageImpl ? EPackage.Registry.INSTANCE
+				.get(eNS_URI) : new IrSpecificPackageImpl());
 
 		isInited = true;
 
@@ -124,9 +129,9 @@ public class IrSpecificPackageImpl extends EPackageImpl implements IrSpecificPac
 		// Mark meta-data to indicate it can't be changed
 		theIrSpecificPackage.freeze();
 
-  
 		// Update the registry and return the package
-		EPackage.Registry.INSTANCE.put(IrSpecificPackage.eNS_URI, theIrSpecificPackage);
+		EPackage.Registry.INSTANCE.put(IrSpecificPackage.eNS_URI,
+				theIrSpecificPackage);
 		return theIrSpecificPackage;
 	}
 
@@ -145,7 +150,8 @@ public class IrSpecificPackageImpl extends EPackageImpl implements IrSpecificPac
 	 * @generated
 	 */
 	public EReference getInstAssignIndex_Indexes() {
-		return (EReference)instAssignIndexEClass.getEStructuralFeatures().get(0);
+		return (EReference) instAssignIndexEClass.getEStructuralFeatures().get(
+				0);
 	}
 
 	/**
@@ -154,7 +160,8 @@ public class IrSpecificPackageImpl extends EPackageImpl implements IrSpecificPac
 	 * @generated
 	 */
 	public EReference getInstAssignIndex_Target() {
-		return (EReference)instAssignIndexEClass.getEStructuralFeatures().get(1);
+		return (EReference) instAssignIndexEClass.getEStructuralFeatures().get(
+				1);
 	}
 
 	/**
@@ -163,7 +170,8 @@ public class IrSpecificPackageImpl extends EPackageImpl implements IrSpecificPac
 	 * @generated
 	 */
 	public EReference getInstAssignIndex_ListType() {
-		return (EReference)instAssignIndexEClass.getEStructuralFeatures().get(2);
+		return (EReference) instAssignIndexEClass.getEStructuralFeatures().get(
+				2);
 	}
 
 	/**
@@ -181,7 +189,7 @@ public class IrSpecificPackageImpl extends EPackageImpl implements IrSpecificPac
 	 * @generated
 	 */
 	public EReference getInstCast_Target() {
-		return (EReference)instCastEClass.getEStructuralFeatures().get(0);
+		return (EReference) instCastEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -190,7 +198,7 @@ public class IrSpecificPackageImpl extends EPackageImpl implements IrSpecificPac
 	 * @generated
 	 */
 	public EReference getInstCast_Source() {
-		return (EReference)instCastEClass.getEStructuralFeatures().get(1);
+		return (EReference) instCastEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -208,7 +216,8 @@ public class IrSpecificPackageImpl extends EPackageImpl implements IrSpecificPac
 	 * @generated
 	 */
 	public EReference getInstGetElementPtr_Indexes() {
-		return (EReference)instGetElementPtrEClass.getEStructuralFeatures().get(0);
+		return (EReference) instGetElementPtrEClass.getEStructuralFeatures()
+				.get(0);
 	}
 
 	/**
@@ -217,7 +226,8 @@ public class IrSpecificPackageImpl extends EPackageImpl implements IrSpecificPac
 	 * @generated
 	 */
 	public EReference getInstGetElementPtr_Target() {
-		return (EReference)instGetElementPtrEClass.getEStructuralFeatures().get(1);
+		return (EReference) instGetElementPtrEClass.getEStructuralFeatures()
+				.get(1);
 	}
 
 	/**
@@ -226,7 +236,8 @@ public class IrSpecificPackageImpl extends EPackageImpl implements IrSpecificPac
 	 * @generated
 	 */
 	public EReference getInstGetElementPtr_Source() {
-		return (EReference)instGetElementPtrEClass.getEStructuralFeatures().get(2);
+		return (EReference) instGetElementPtrEClass.getEStructuralFeatures()
+				.get(2);
 	}
 
 	/**
@@ -244,7 +255,7 @@ public class IrSpecificPackageImpl extends EPackageImpl implements IrSpecificPac
 	 * @generated
 	 */
 	public EReference getInstTernary_ConditionValue() {
-		return (EReference)instTernaryEClass.getEStructuralFeatures().get(0);
+		return (EReference) instTernaryEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -253,7 +264,7 @@ public class IrSpecificPackageImpl extends EPackageImpl implements IrSpecificPac
 	 * @generated
 	 */
 	public EReference getInstTernary_TrueValue() {
-		return (EReference)instTernaryEClass.getEStructuralFeatures().get(1);
+		return (EReference) instTernaryEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -262,7 +273,7 @@ public class IrSpecificPackageImpl extends EPackageImpl implements IrSpecificPac
 	 * @generated
 	 */
 	public EReference getInstTernary_FalseValue() {
-		return (EReference)instTernaryEClass.getEStructuralFeatures().get(2);
+		return (EReference) instTernaryEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -271,7 +282,7 @@ public class IrSpecificPackageImpl extends EPackageImpl implements IrSpecificPac
 	 * @generated
 	 */
 	public EReference getInstTernary_Target() {
-		return (EReference)instTernaryEClass.getEStructuralFeatures().get(3);
+		return (EReference) instTernaryEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -289,7 +300,7 @@ public class IrSpecificPackageImpl extends EPackageImpl implements IrSpecificPac
 	 * @generated
 	 */
 	public EReference getNodeFor_Condition() {
-		return (EReference)nodeForEClass.getEStructuralFeatures().get(0);
+		return (EReference) nodeForEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -298,7 +309,7 @@ public class IrSpecificPackageImpl extends EPackageImpl implements IrSpecificPac
 	 * @generated
 	 */
 	public EReference getNodeFor_JoinNode() {
-		return (EReference)nodeForEClass.getEStructuralFeatures().get(1);
+		return (EReference) nodeForEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -307,7 +318,7 @@ public class IrSpecificPackageImpl extends EPackageImpl implements IrSpecificPac
 	 * @generated
 	 */
 	public EAttribute getNodeFor_LineNumber() {
-		return (EAttribute)nodeForEClass.getEStructuralFeatures().get(2);
+		return (EAttribute) nodeForEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -316,7 +327,7 @@ public class IrSpecificPackageImpl extends EPackageImpl implements IrSpecificPac
 	 * @generated
 	 */
 	public EReference getNodeFor_Nodes() {
-		return (EReference)nodeForEClass.getEStructuralFeatures().get(3);
+		return (EReference) nodeForEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -325,7 +336,7 @@ public class IrSpecificPackageImpl extends EPackageImpl implements IrSpecificPac
 	 * @generated
 	 */
 	public EReference getNodeFor_LoopCounter() {
-		return (EReference)nodeForEClass.getEStructuralFeatures().get(4);
+		return (EReference) nodeForEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -334,7 +345,7 @@ public class IrSpecificPackageImpl extends EPackageImpl implements IrSpecificPac
 	 * @generated
 	 */
 	public EReference getNodeFor_Init() {
-		return (EReference)nodeForEClass.getEStructuralFeatures().get(5);
+		return (EReference) nodeForEClass.getEStructuralFeatures().get(5);
 	}
 
 	/**
@@ -343,7 +354,7 @@ public class IrSpecificPackageImpl extends EPackageImpl implements IrSpecificPac
 	 * @generated
 	 */
 	public IrSpecificFactory getIrSpecificFactory() {
-		return (IrSpecificFactory)getEFactoryInstance();
+		return (IrSpecificFactory) getEFactoryInstance();
 	}
 
 	/**
@@ -361,7 +372,8 @@ public class IrSpecificPackageImpl extends EPackageImpl implements IrSpecificPac
 	 * @generated
 	 */
 	public void createPackageContents() {
-		if (isCreated) return;
+		if (isCreated)
+			return;
 		isCreated = true;
 
 		// Create classes and their features
@@ -409,7 +421,8 @@ public class IrSpecificPackageImpl extends EPackageImpl implements IrSpecificPac
 	 * @generated
 	 */
 	public void initializePackageContents() {
-		if (isInitialized) return;
+		if (isInitialized)
+			return;
 		isInitialized = true;
 
 		// Initialize package
@@ -418,48 +431,122 @@ public class IrSpecificPackageImpl extends EPackageImpl implements IrSpecificPac
 		setNsURI(eNS_URI);
 
 		// Obtain other dependent packages
-		IrPackage theIrPackage = (IrPackage)EPackage.Registry.INSTANCE.getEPackage(IrPackage.eNS_URI);
-		EcorePackage theEcorePackage = (EcorePackage)EPackage.Registry.INSTANCE.getEPackage(EcorePackage.eNS_URI);
+		IrPackage theIrPackage = (IrPackage) EPackage.Registry.INSTANCE
+				.getEPackage(IrPackage.eNS_URI);
+		EcorePackage theEcorePackage = (EcorePackage) EPackage.Registry.INSTANCE
+				.getEPackage(EcorePackage.eNS_URI);
 
 		// Create type parameters
 
 		// Set bounds for type parameters
 
 		// Add supertypes to classes
-		instAssignIndexEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
+		instAssignIndexEClass.getESuperTypes().add(
+				theIrPackage.getInstSpecific());
 		instCastEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
-		instGetElementPtrEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
+		instGetElementPtrEClass.getESuperTypes().add(
+				theIrPackage.getInstSpecific());
 		instTernaryEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
 		nodeForEClass.getESuperTypes().add(theIrPackage.getNodeSpecific());
 
 		// Initialize classes and features; add operations and parameters
-		initEClass(instAssignIndexEClass, InstAssignIndex.class, "InstAssignIndex", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getInstAssignIndex_Indexes(), theIrPackage.getExpression(), null, "indexes", null, 0, -1, InstAssignIndex.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getInstAssignIndex_Target(), theIrPackage.getDef(), null, "target", null, 0, 1, InstAssignIndex.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getInstAssignIndex_ListType(), theIrPackage.getType(), null, "listType", null, 0, 1, InstAssignIndex.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEClass(instAssignIndexEClass, InstAssignIndex.class,
+				"InstAssignIndex", !IS_ABSTRACT, !IS_INTERFACE,
+				IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getInstAssignIndex_Indexes(),
+				theIrPackage.getExpression(), null, "indexes", null, 0, -1,
+				InstAssignIndex.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getInstAssignIndex_Target(), theIrPackage.getDef(),
+				null, "target", null, 0, 1, InstAssignIndex.class,
+				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE,
+				!IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
+		initEReference(getInstAssignIndex_ListType(), theIrPackage.getType(),
+				null, "listType", null, 0, 1, InstAssignIndex.class,
+				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE,
+				!IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
 
-		initEClass(instCastEClass, InstCast.class, "InstCast", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getInstCast_Target(), theIrPackage.getDef(), null, "target", null, 0, 1, InstCast.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getInstCast_Source(), theIrPackage.getUse(), null, "source", null, 0, 1, InstCast.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEClass(instCastEClass, InstCast.class, "InstCast", !IS_ABSTRACT,
+				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getInstCast_Target(), theIrPackage.getDef(), null,
+				"target", null, 0, 1, InstCast.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getInstCast_Source(), theIrPackage.getUse(), null,
+				"source", null, 0, 1, InstCast.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(instGetElementPtrEClass, InstGetElementPtr.class, "InstGetElementPtr", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getInstGetElementPtr_Indexes(), theIrPackage.getExpression(), null, "indexes", null, 0, -1, InstGetElementPtr.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getInstGetElementPtr_Target(), theIrPackage.getDef(), null, "target", null, 0, 1, InstGetElementPtr.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getInstGetElementPtr_Source(), theIrPackage.getUse(), null, "source", null, 0, 1, InstGetElementPtr.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEClass(instGetElementPtrEClass, InstGetElementPtr.class,
+				"InstGetElementPtr", !IS_ABSTRACT, !IS_INTERFACE,
+				IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getInstGetElementPtr_Indexes(),
+				theIrPackage.getExpression(), null, "indexes", null, 0, -1,
+				InstGetElementPtr.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getInstGetElementPtr_Target(), theIrPackage.getDef(),
+				null, "target", null, 0, 1, InstGetElementPtr.class,
+				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE,
+				!IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
+		initEReference(getInstGetElementPtr_Source(), theIrPackage.getUse(),
+				null, "source", null, 0, 1, InstGetElementPtr.class,
+				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE,
+				!IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
 
-		initEClass(instTernaryEClass, InstTernary.class, "InstTernary", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getInstTernary_ConditionValue(), theIrPackage.getExpression(), null, "conditionValue", null, 0, 1, InstTernary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getInstTernary_TrueValue(), theIrPackage.getExpression(), null, "trueValue", null, 0, 1, InstTernary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getInstTernary_FalseValue(), theIrPackage.getExpression(), null, "falseValue", null, 0, 1, InstTernary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getInstTernary_Target(), theIrPackage.getDef(), null, "target", null, 0, 1, InstTernary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEClass(instTernaryEClass, InstTernary.class, "InstTernary",
+				!IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getInstTernary_ConditionValue(),
+				theIrPackage.getExpression(), null, "conditionValue", null, 0,
+				1, InstTernary.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getInstTernary_TrueValue(),
+				theIrPackage.getExpression(), null, "trueValue", null, 0, 1,
+				InstTernary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
+		initEReference(getInstTernary_FalseValue(),
+				theIrPackage.getExpression(), null, "falseValue", null, 0, 1,
+				InstTernary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
+		initEReference(getInstTernary_Target(), theIrPackage.getDef(), null,
+				"target", null, 0, 1, InstTernary.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(nodeForEClass, NodeFor.class, "NodeFor", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getNodeFor_Condition(), theIrPackage.getExpression(), null, "condition", null, 0, 1, NodeFor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getNodeFor_JoinNode(), theIrPackage.getNodeBlock(), null, "joinNode", null, 0, 1, NodeFor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getNodeFor_LineNumber(), theEcorePackage.getEInt(), "lineNumber", "0", 0, 1, NodeFor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getNodeFor_Nodes(), theIrPackage.getNode(), null, "nodes", null, 0, -1, NodeFor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getNodeFor_LoopCounter(), theIrPackage.getInstruction(), null, "loopCounter", null, 0, -1, NodeFor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getNodeFor_Init(), theIrPackage.getInstruction(), null, "init", null, 0, -1, NodeFor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEClass(nodeForEClass, NodeFor.class, "NodeFor", !IS_ABSTRACT,
+				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getNodeFor_Condition(), theIrPackage.getExpression(),
+				null, "condition", null, 0, 1, NodeFor.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getNodeFor_JoinNode(), theIrPackage.getNodeBlock(),
+				null, "joinNode", null, 0, 1, NodeFor.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getNodeFor_LineNumber(), theEcorePackage.getEInt(),
+				"lineNumber", "0", 0, 1, NodeFor.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
+		initEReference(getNodeFor_Nodes(), theIrPackage.getNode(), null,
+				"nodes", null, 0, -1, NodeFor.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getNodeFor_LoopCounter(), theIrPackage.getInstruction(),
+				null, "loopCounter", null, 0, -1, NodeFor.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getNodeFor_Init(), theIrPackage.getInstruction(), null,
+				"init", null, 0, -1, NodeFor.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Create resource
 		createResource(eNS_URI);

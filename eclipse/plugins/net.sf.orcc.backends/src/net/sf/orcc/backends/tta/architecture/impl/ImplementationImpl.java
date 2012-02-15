@@ -108,7 +108,9 @@ public class ImplementationImpl extends EObjectImpl implements Implementation {
 		String oldHdbFile = hdbFile;
 		hdbFile = newHdbFile;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.IMPLEMENTATION__HDB_FILE, oldHdbFile, hdbFile));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.IMPLEMENTATION__HDB_FILE, oldHdbFile,
+					hdbFile));
 	}
 
 	/**
@@ -129,7 +131,8 @@ public class ImplementationImpl extends EObjectImpl implements Implementation {
 		int oldId = id;
 		id = newId;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.IMPLEMENTATION__ID, oldId, id));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.IMPLEMENTATION__ID, oldId, id));
 	}
 
 	/**
@@ -140,10 +143,10 @@ public class ImplementationImpl extends EObjectImpl implements Implementation {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case ArchitecturePackage.IMPLEMENTATION__HDB_FILE:
-				return getHdbFile();
-			case ArchitecturePackage.IMPLEMENTATION__ID:
-				return getId();
+		case ArchitecturePackage.IMPLEMENTATION__HDB_FILE:
+			return getHdbFile();
+		case ArchitecturePackage.IMPLEMENTATION__ID:
+			return getId();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -156,12 +159,12 @@ public class ImplementationImpl extends EObjectImpl implements Implementation {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case ArchitecturePackage.IMPLEMENTATION__HDB_FILE:
-				setHdbFile((String)newValue);
-				return;
-			case ArchitecturePackage.IMPLEMENTATION__ID:
-				setId((Integer)newValue);
-				return;
+		case ArchitecturePackage.IMPLEMENTATION__HDB_FILE:
+			setHdbFile((String) newValue);
+			return;
+		case ArchitecturePackage.IMPLEMENTATION__ID:
+			setId((Integer) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -174,12 +177,12 @@ public class ImplementationImpl extends EObjectImpl implements Implementation {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.IMPLEMENTATION__HDB_FILE:
-				setHdbFile(HDB_FILE_EDEFAULT);
-				return;
-			case ArchitecturePackage.IMPLEMENTATION__ID:
-				setId(ID_EDEFAULT);
-				return;
+		case ArchitecturePackage.IMPLEMENTATION__HDB_FILE:
+			setHdbFile(HDB_FILE_EDEFAULT);
+			return;
+		case ArchitecturePackage.IMPLEMENTATION__ID:
+			setId(ID_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -192,10 +195,11 @@ public class ImplementationImpl extends EObjectImpl implements Implementation {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.IMPLEMENTATION__HDB_FILE:
-				return HDB_FILE_EDEFAULT == null ? hdbFile != null : !HDB_FILE_EDEFAULT.equals(hdbFile);
-			case ArchitecturePackage.IMPLEMENTATION__ID:
-				return id != ID_EDEFAULT;
+		case ArchitecturePackage.IMPLEMENTATION__HDB_FILE:
+			return HDB_FILE_EDEFAULT == null ? hdbFile != null
+					: !HDB_FILE_EDEFAULT.equals(hdbFile);
+		case ArchitecturePackage.IMPLEMENTATION__ID:
+			return id != ID_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -207,7 +211,8 @@ public class ImplementationImpl extends EObjectImpl implements Implementation {
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (hdbFile: ");

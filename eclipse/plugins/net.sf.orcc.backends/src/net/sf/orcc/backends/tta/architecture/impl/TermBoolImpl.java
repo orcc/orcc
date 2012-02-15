@@ -102,11 +102,13 @@ public class TermBoolImpl extends EObjectImpl implements TermBool {
 	 */
 	public RegisterFile getRegister() {
 		if (register != null && register.eIsProxy()) {
-			InternalEObject oldRegister = (InternalEObject)register;
-			register = (RegisterFile)eResolveProxy(oldRegister);
+			InternalEObject oldRegister = (InternalEObject) register;
+			register = (RegisterFile) eResolveProxy(oldRegister);
 			if (register != oldRegister) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ArchitecturePackage.TERM_BOOL__REGISTER, oldRegister, register));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							ArchitecturePackage.TERM_BOOL__REGISTER,
+							oldRegister, register));
 			}
 		}
 		return register;
@@ -128,7 +130,9 @@ public class TermBoolImpl extends EObjectImpl implements TermBool {
 		RegisterFile oldRegister = register;
 		register = newRegister;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.TERM_BOOL__REGISTER, oldRegister, register));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.TERM_BOOL__REGISTER, oldRegister,
+					register));
 	}
 
 	/**
@@ -147,7 +151,8 @@ public class TermBoolImpl extends EObjectImpl implements TermBool {
 		int oldIndex = index;
 		index = newIndex;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.TERM_BOOL__INDEX, oldIndex, index));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.TERM_BOOL__INDEX, oldIndex, index));
 	}
 
 	/**
@@ -171,11 +176,12 @@ public class TermBoolImpl extends EObjectImpl implements TermBool {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case ArchitecturePackage.TERM_BOOL__REGISTER:
-				if (resolve) return getRegister();
-				return basicGetRegister();
-			case ArchitecturePackage.TERM_BOOL__INDEX:
-				return getIndex();
+		case ArchitecturePackage.TERM_BOOL__REGISTER:
+			if (resolve)
+				return getRegister();
+			return basicGetRegister();
+		case ArchitecturePackage.TERM_BOOL__INDEX:
+			return getIndex();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -187,12 +193,12 @@ public class TermBoolImpl extends EObjectImpl implements TermBool {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case ArchitecturePackage.TERM_BOOL__REGISTER:
-				setRegister((RegisterFile)newValue);
-				return;
-			case ArchitecturePackage.TERM_BOOL__INDEX:
-				setIndex((Integer)newValue);
-				return;
+		case ArchitecturePackage.TERM_BOOL__REGISTER:
+			setRegister((RegisterFile) newValue);
+			return;
+		case ArchitecturePackage.TERM_BOOL__INDEX:
+			setIndex((Integer) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -204,12 +210,12 @@ public class TermBoolImpl extends EObjectImpl implements TermBool {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.TERM_BOOL__REGISTER:
-				setRegister((RegisterFile)null);
-				return;
-			case ArchitecturePackage.TERM_BOOL__INDEX:
-				setIndex(INDEX_EDEFAULT);
-				return;
+		case ArchitecturePackage.TERM_BOOL__REGISTER:
+			setRegister((RegisterFile) null);
+			return;
+		case ArchitecturePackage.TERM_BOOL__INDEX:
+			setIndex(INDEX_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -221,10 +227,10 @@ public class TermBoolImpl extends EObjectImpl implements TermBool {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.TERM_BOOL__REGISTER:
-				return register != null;
-			case ArchitecturePackage.TERM_BOOL__INDEX:
-				return index != INDEX_EDEFAULT;
+		case ArchitecturePackage.TERM_BOOL__REGISTER:
+			return register != null;
+		case ArchitecturePackage.TERM_BOOL__INDEX:
+			return index != INDEX_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -235,7 +241,8 @@ public class TermBoolImpl extends EObjectImpl implements TermBool {
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (index: ");

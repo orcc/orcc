@@ -99,7 +99,7 @@ public interface InstGetElementPtr extends InstSpecific {
 	 * @generated
 	 */
 	void setSource(Use value);
-	
+
 	/**
 	 * Returns true if the current instruction is GEP (which is always true for
 	 * the current instruction). This method is only useable to detect this

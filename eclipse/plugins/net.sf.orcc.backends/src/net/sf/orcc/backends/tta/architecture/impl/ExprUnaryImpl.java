@@ -113,7 +113,9 @@ public class ExprUnaryImpl extends EObjectImpl implements ExprUnary {
 		OpUnary oldOperator = operator;
 		operator = newOperator == null ? OPERATOR_EDEFAULT : newOperator;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.EXPR_UNARY__OPERATOR, oldOperator, operator));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.EXPR_UNARY__OPERATOR, oldOperator,
+					operator));
 	}
 
 	/**
@@ -122,11 +124,12 @@ public class ExprUnaryImpl extends EObjectImpl implements ExprUnary {
 	 */
 	public Term getTerm() {
 		if (term != null && term.eIsProxy()) {
-			InternalEObject oldTerm = (InternalEObject)term;
-			term = (Term)eResolveProxy(oldTerm);
+			InternalEObject oldTerm = (InternalEObject) term;
+			term = (Term) eResolveProxy(oldTerm);
 			if (term != oldTerm) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ArchitecturePackage.EXPR_UNARY__TERM, oldTerm, term));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							ArchitecturePackage.EXPR_UNARY__TERM, oldTerm, term));
 			}
 		}
 		return term;
@@ -148,7 +151,8 @@ public class ExprUnaryImpl extends EObjectImpl implements ExprUnary {
 		Term oldTerm = term;
 		term = newTerm;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.EXPR_UNARY__TERM, oldTerm, term));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.EXPR_UNARY__TERM, oldTerm, term));
 	}
 
 	/**
@@ -200,11 +204,12 @@ public class ExprUnaryImpl extends EObjectImpl implements ExprUnary {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case ArchitecturePackage.EXPR_UNARY__OPERATOR:
-				return getOperator();
-			case ArchitecturePackage.EXPR_UNARY__TERM:
-				if (resolve) return getTerm();
-				return basicGetTerm();
+		case ArchitecturePackage.EXPR_UNARY__OPERATOR:
+			return getOperator();
+		case ArchitecturePackage.EXPR_UNARY__TERM:
+			if (resolve)
+				return getTerm();
+			return basicGetTerm();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -216,12 +221,12 @@ public class ExprUnaryImpl extends EObjectImpl implements ExprUnary {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case ArchitecturePackage.EXPR_UNARY__OPERATOR:
-				setOperator((OpUnary)newValue);
-				return;
-			case ArchitecturePackage.EXPR_UNARY__TERM:
-				setTerm((Term)newValue);
-				return;
+		case ArchitecturePackage.EXPR_UNARY__OPERATOR:
+			setOperator((OpUnary) newValue);
+			return;
+		case ArchitecturePackage.EXPR_UNARY__TERM:
+			setTerm((Term) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -233,12 +238,12 @@ public class ExprUnaryImpl extends EObjectImpl implements ExprUnary {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.EXPR_UNARY__OPERATOR:
-				setOperator(OPERATOR_EDEFAULT);
-				return;
-			case ArchitecturePackage.EXPR_UNARY__TERM:
-				setTerm((Term)null);
-				return;
+		case ArchitecturePackage.EXPR_UNARY__OPERATOR:
+			setOperator(OPERATOR_EDEFAULT);
+			return;
+		case ArchitecturePackage.EXPR_UNARY__TERM:
+			setTerm((Term) null);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -250,10 +255,10 @@ public class ExprUnaryImpl extends EObjectImpl implements ExprUnary {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.EXPR_UNARY__OPERATOR:
-				return operator != OPERATOR_EDEFAULT;
-			case ArchitecturePackage.EXPR_UNARY__TERM:
-				return term != null;
+		case ArchitecturePackage.EXPR_UNARY__OPERATOR:
+			return operator != OPERATOR_EDEFAULT;
+		case ArchitecturePackage.EXPR_UNARY__TERM:
+			return term != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -264,7 +269,8 @@ public class ExprUnaryImpl extends EObjectImpl implements ExprUnary {
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (operator: ");

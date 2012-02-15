@@ -200,7 +200,8 @@ public class PortImpl extends EObjectImpl implements Port {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.PORT__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.PORT__NAME, oldName, name));
 	}
 
 	/**
@@ -209,11 +210,13 @@ public class PortImpl extends EObjectImpl implements Port {
 	 */
 	public Socket getInputSocket() {
 		if (inputSocket != null && inputSocket.eIsProxy()) {
-			InternalEObject oldInputSocket = (InternalEObject)inputSocket;
-			inputSocket = (Socket)eResolveProxy(oldInputSocket);
+			InternalEObject oldInputSocket = (InternalEObject) inputSocket;
+			inputSocket = (Socket) eResolveProxy(oldInputSocket);
 			if (inputSocket != oldInputSocket) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ArchitecturePackage.PORT__INPUT_SOCKET, oldInputSocket, inputSocket));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							ArchitecturePackage.PORT__INPUT_SOCKET,
+							oldInputSocket, inputSocket));
 			}
 		}
 		return inputSocket;
@@ -237,7 +240,9 @@ public class PortImpl extends EObjectImpl implements Port {
 		boolean oldInputSocketESet = inputSocketESet;
 		inputSocketESet = true;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.PORT__INPUT_SOCKET, oldInputSocket, inputSocket, !oldInputSocketESet));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.PORT__INPUT_SOCKET, oldInputSocket,
+					inputSocket, !oldInputSocketESet));
 	}
 
 	/**
@@ -250,7 +255,9 @@ public class PortImpl extends EObjectImpl implements Port {
 		inputSocket = null;
 		inputSocketESet = false;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, ArchitecturePackage.PORT__INPUT_SOCKET, oldInputSocket, null, oldInputSocketESet));
+			eNotify(new ENotificationImpl(this, Notification.UNSET,
+					ArchitecturePackage.PORT__INPUT_SOCKET, oldInputSocket,
+					null, oldInputSocketESet));
 	}
 
 	/**
@@ -267,11 +274,13 @@ public class PortImpl extends EObjectImpl implements Port {
 	 */
 	public Socket getOutputSocket() {
 		if (outputSocket != null && outputSocket.eIsProxy()) {
-			InternalEObject oldOutputSocket = (InternalEObject)outputSocket;
-			outputSocket = (Socket)eResolveProxy(oldOutputSocket);
+			InternalEObject oldOutputSocket = (InternalEObject) outputSocket;
+			outputSocket = (Socket) eResolveProxy(oldOutputSocket);
 			if (outputSocket != oldOutputSocket) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ArchitecturePackage.PORT__OUTPUT_SOCKET, oldOutputSocket, outputSocket));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							ArchitecturePackage.PORT__OUTPUT_SOCKET,
+							oldOutputSocket, outputSocket));
 			}
 		}
 		return outputSocket;
@@ -295,7 +304,9 @@ public class PortImpl extends EObjectImpl implements Port {
 		boolean oldOutputSocketESet = outputSocketESet;
 		outputSocketESet = true;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.PORT__OUTPUT_SOCKET, oldOutputSocket, outputSocket, !oldOutputSocketESet));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.PORT__OUTPUT_SOCKET, oldOutputSocket,
+					outputSocket, !oldOutputSocketESet));
 	}
 
 	/**
@@ -308,7 +319,9 @@ public class PortImpl extends EObjectImpl implements Port {
 		outputSocket = null;
 		outputSocketESet = false;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, ArchitecturePackage.PORT__OUTPUT_SOCKET, oldOutputSocket, null, oldOutputSocketESet));
+			eNotify(new ENotificationImpl(this, Notification.UNSET,
+					ArchitecturePackage.PORT__OUTPUT_SOCKET, oldOutputSocket,
+					null, oldOutputSocketESet));
 	}
 
 	/**
@@ -335,7 +348,8 @@ public class PortImpl extends EObjectImpl implements Port {
 		int oldWidth = width;
 		width = newWidth;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.PORT__WIDTH, oldWidth, width));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.PORT__WIDTH, oldWidth, width));
 	}
 
 	/**
@@ -354,7 +368,8 @@ public class PortImpl extends EObjectImpl implements Port {
 		boolean oldTrigger = trigger;
 		trigger = newTrigger;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.PORT__TRIGGER, oldTrigger, trigger));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.PORT__TRIGGER, oldTrigger, trigger));
 	}
 
 	/**
@@ -373,7 +388,9 @@ public class PortImpl extends EObjectImpl implements Port {
 		boolean oldOpcodeSelector = opcodeSelector;
 		opcodeSelector = newOpcodeSelector;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.PORT__OPCODE_SELECTOR, oldOpcodeSelector, opcodeSelector));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.PORT__OPCODE_SELECTOR,
+					oldOpcodeSelector, opcodeSelector));
 	}
 
 	/**
@@ -394,20 +411,22 @@ public class PortImpl extends EObjectImpl implements Port {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case ArchitecturePackage.PORT__NAME:
-				return getName();
-			case ArchitecturePackage.PORT__INPUT_SOCKET:
-				if (resolve) return getInputSocket();
-				return basicGetInputSocket();
-			case ArchitecturePackage.PORT__OUTPUT_SOCKET:
-				if (resolve) return getOutputSocket();
-				return basicGetOutputSocket();
-			case ArchitecturePackage.PORT__WIDTH:
-				return getWidth();
-			case ArchitecturePackage.PORT__TRIGGER:
-				return isTrigger();
-			case ArchitecturePackage.PORT__OPCODE_SELECTOR:
-				return isOpcodeSelector();
+		case ArchitecturePackage.PORT__NAME:
+			return getName();
+		case ArchitecturePackage.PORT__INPUT_SOCKET:
+			if (resolve)
+				return getInputSocket();
+			return basicGetInputSocket();
+		case ArchitecturePackage.PORT__OUTPUT_SOCKET:
+			if (resolve)
+				return getOutputSocket();
+			return basicGetOutputSocket();
+		case ArchitecturePackage.PORT__WIDTH:
+			return getWidth();
+		case ArchitecturePackage.PORT__TRIGGER:
+			return isTrigger();
+		case ArchitecturePackage.PORT__OPCODE_SELECTOR:
+			return isOpcodeSelector();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -419,24 +438,24 @@ public class PortImpl extends EObjectImpl implements Port {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case ArchitecturePackage.PORT__NAME:
-				setName((String)newValue);
-				return;
-			case ArchitecturePackage.PORT__INPUT_SOCKET:
-				setInputSocket((Socket)newValue);
-				return;
-			case ArchitecturePackage.PORT__OUTPUT_SOCKET:
-				setOutputSocket((Socket)newValue);
-				return;
-			case ArchitecturePackage.PORT__WIDTH:
-				setWidth((Integer)newValue);
-				return;
-			case ArchitecturePackage.PORT__TRIGGER:
-				setTrigger((Boolean)newValue);
-				return;
-			case ArchitecturePackage.PORT__OPCODE_SELECTOR:
-				setOpcodeSelector((Boolean)newValue);
-				return;
+		case ArchitecturePackage.PORT__NAME:
+			setName((String) newValue);
+			return;
+		case ArchitecturePackage.PORT__INPUT_SOCKET:
+			setInputSocket((Socket) newValue);
+			return;
+		case ArchitecturePackage.PORT__OUTPUT_SOCKET:
+			setOutputSocket((Socket) newValue);
+			return;
+		case ArchitecturePackage.PORT__WIDTH:
+			setWidth((Integer) newValue);
+			return;
+		case ArchitecturePackage.PORT__TRIGGER:
+			setTrigger((Boolean) newValue);
+			return;
+		case ArchitecturePackage.PORT__OPCODE_SELECTOR:
+			setOpcodeSelector((Boolean) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -448,24 +467,24 @@ public class PortImpl extends EObjectImpl implements Port {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.PORT__NAME:
-				setName(NAME_EDEFAULT);
-				return;
-			case ArchitecturePackage.PORT__INPUT_SOCKET:
-				unsetInputSocket();
-				return;
-			case ArchitecturePackage.PORT__OUTPUT_SOCKET:
-				unsetOutputSocket();
-				return;
-			case ArchitecturePackage.PORT__WIDTH:
-				setWidth(WIDTH_EDEFAULT);
-				return;
-			case ArchitecturePackage.PORT__TRIGGER:
-				setTrigger(TRIGGER_EDEFAULT);
-				return;
-			case ArchitecturePackage.PORT__OPCODE_SELECTOR:
-				setOpcodeSelector(OPCODE_SELECTOR_EDEFAULT);
-				return;
+		case ArchitecturePackage.PORT__NAME:
+			setName(NAME_EDEFAULT);
+			return;
+		case ArchitecturePackage.PORT__INPUT_SOCKET:
+			unsetInputSocket();
+			return;
+		case ArchitecturePackage.PORT__OUTPUT_SOCKET:
+			unsetOutputSocket();
+			return;
+		case ArchitecturePackage.PORT__WIDTH:
+			setWidth(WIDTH_EDEFAULT);
+			return;
+		case ArchitecturePackage.PORT__TRIGGER:
+			setTrigger(TRIGGER_EDEFAULT);
+			return;
+		case ArchitecturePackage.PORT__OPCODE_SELECTOR:
+			setOpcodeSelector(OPCODE_SELECTOR_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -477,18 +496,19 @@ public class PortImpl extends EObjectImpl implements Port {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.PORT__NAME:
-				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
-			case ArchitecturePackage.PORT__INPUT_SOCKET:
-				return isSetInputSocket();
-			case ArchitecturePackage.PORT__OUTPUT_SOCKET:
-				return isSetOutputSocket();
-			case ArchitecturePackage.PORT__WIDTH:
-				return width != WIDTH_EDEFAULT;
-			case ArchitecturePackage.PORT__TRIGGER:
-				return trigger != TRIGGER_EDEFAULT;
-			case ArchitecturePackage.PORT__OPCODE_SELECTOR:
-				return opcodeSelector != OPCODE_SELECTOR_EDEFAULT;
+		case ArchitecturePackage.PORT__NAME:
+			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
+					.equals(name);
+		case ArchitecturePackage.PORT__INPUT_SOCKET:
+			return isSetInputSocket();
+		case ArchitecturePackage.PORT__OUTPUT_SOCKET:
+			return isSetOutputSocket();
+		case ArchitecturePackage.PORT__WIDTH:
+			return width != WIDTH_EDEFAULT;
+		case ArchitecturePackage.PORT__TRIGGER:
+			return trigger != TRIGGER_EDEFAULT;
+		case ArchitecturePackage.PORT__OPCODE_SELECTOR:
+			return opcodeSelector != OPCODE_SELECTOR_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -499,7 +519,8 @@ public class PortImpl extends EObjectImpl implements Port {
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (name: ");

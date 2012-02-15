@@ -100,11 +100,8 @@ public enum SocketType implements Enumerator {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private static final SocketType[] VALUES_ARRAY =
-		new SocketType[] {
-			INPUT,
-			OUTPUT,
-		};
+	private static final SocketType[] VALUES_ARRAY = new SocketType[] { INPUT,
+			OUTPUT, };
 
 	/**
 	 * A public read-only list of all the '<em><b>Socket Type</b></em>' enumerators.
@@ -112,7 +109,8 @@ public enum SocketType implements Enumerator {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static final List<SocketType> VALUES = Collections.unmodifiableList(Arrays.asList(VALUES_ARRAY));
+	public static final List<SocketType> VALUES = Collections
+			.unmodifiableList(Arrays.asList(VALUES_ARRAY));
 
 	/**
 	 * Returns the '<em><b>Socket Type</b></em>' literal with the specified literal value.
@@ -154,8 +152,10 @@ public enum SocketType implements Enumerator {
 	 */
 	public static SocketType get(int value) {
 		switch (value) {
-			case INPUT_VALUE: return INPUT;
-			case OUTPUT_VALUE: return OUTPUT;
+		case INPUT_VALUE:
+			return INPUT;
+		case OUTPUT_VALUE:
+			return OUTPUT;
 		}
 		return null;
 	}
@@ -199,7 +199,7 @@ public enum SocketType implements Enumerator {
 	 * @generated
 	 */
 	public int getValue() {
-	  return value;
+		return value;
 	}
 
 	/**
@@ -208,7 +208,7 @@ public enum SocketType implements Enumerator {
 	 * @generated
 	 */
 	public String getName() {
-	  return name;
+		return name;
 	}
 
 	/**
@@ -217,7 +217,7 @@ public enum SocketType implements Enumerator {
 	 * @generated
 	 */
 	public String getLiteral() {
-	  return literal;
+		return literal;
 	}
 
 	/**
@@ -230,5 +230,5 @@ public enum SocketType implements Enumerator {
 	public String toString() {
 		return literal;
 	}
-	
+
 } //SocketType

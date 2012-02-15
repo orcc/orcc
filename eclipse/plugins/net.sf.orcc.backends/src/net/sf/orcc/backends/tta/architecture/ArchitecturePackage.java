@@ -80,7 +80,8 @@ public interface ArchitecturePackage extends EPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	ArchitecturePackage eINSTANCE = net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl.init();
+	ArchitecturePackage eINSTANCE = net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl
+			.init();
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.TTAImpl <em>TTA</em>}' class.
@@ -2634,7 +2635,8 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference GLOBAL_CONTROL_UNIT__PORTS = eINSTANCE.getGlobalControlUnit_Ports();
+		EReference GLOBAL_CONTROL_UNIT__PORTS = eINSTANCE
+				.getGlobalControlUnit_Ports();
 
 		/**
 		 * The meta object literal for the '<em><b>Return Address</b></em>' containment reference feature.
@@ -2642,7 +2644,8 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference GLOBAL_CONTROL_UNIT__RETURN_ADDRESS = eINSTANCE.getGlobalControlUnit_ReturnAddress();
+		EReference GLOBAL_CONTROL_UNIT__RETURN_ADDRESS = eINSTANCE
+				.getGlobalControlUnit_ReturnAddress();
 
 		/**
 		 * The meta object literal for the '<em><b>Address Space</b></em>' reference feature.
@@ -2650,7 +2653,8 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference GLOBAL_CONTROL_UNIT__ADDRESS_SPACE = eINSTANCE.getGlobalControlUnit_AddressSpace();
+		EReference GLOBAL_CONTROL_UNIT__ADDRESS_SPACE = eINSTANCE
+				.getGlobalControlUnit_AddressSpace();
 
 		/**
 		 * The meta object literal for the '<em><b>Operations</b></em>' containment reference list feature.
@@ -2658,7 +2662,8 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference GLOBAL_CONTROL_UNIT__OPERATIONS = eINSTANCE.getGlobalControlUnit_Operations();
+		EReference GLOBAL_CONTROL_UNIT__OPERATIONS = eINSTANCE
+				.getGlobalControlUnit_Operations();
 
 		/**
 		 * The meta object literal for the '<em><b>Delay Slots</b></em>' attribute feature.
@@ -2666,7 +2671,8 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute GLOBAL_CONTROL_UNIT__DELAY_SLOTS = eINSTANCE.getGlobalControlUnit_DelaySlots();
+		EAttribute GLOBAL_CONTROL_UNIT__DELAY_SLOTS = eINSTANCE
+				.getGlobalControlUnit_DelaySlots();
 
 		/**
 		 * The meta object literal for the '<em><b>Guard Latency</b></em>' attribute feature.
@@ -2674,7 +2680,8 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute GLOBAL_CONTROL_UNIT__GUARD_LATENCY = eINSTANCE.getGlobalControlUnit_GuardLatency();
+		EAttribute GLOBAL_CONTROL_UNIT__GUARD_LATENCY = eINSTANCE
+				.getGlobalControlUnit_GuardLatency();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.FunctionUnitImpl <em>Function Unit</em>}' class.
@@ -2700,7 +2707,8 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference FUNCTION_UNIT__OPERATIONS = eINSTANCE.getFunctionUnit_Operations();
+		EReference FUNCTION_UNIT__OPERATIONS = eINSTANCE
+				.getFunctionUnit_Operations();
 
 		/**
 		 * The meta object literal for the '<em><b>Ports</b></em>' containment reference list feature.
@@ -2716,7 +2724,8 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference FUNCTION_UNIT__ADDRESS_SPACE = eINSTANCE.getFunctionUnit_AddressSpace();
+		EReference FUNCTION_UNIT__ADDRESS_SPACE = eINSTANCE
+				.getFunctionUnit_AddressSpace();
 
 		/**
 		 * The meta object literal for the '<em><b>Implementation</b></em>' reference feature.
@@ -2724,7 +2733,8 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference FUNCTION_UNIT__IMPLEMENTATION = eINSTANCE.getFunctionUnit_Implementation();
+		EReference FUNCTION_UNIT__IMPLEMENTATION = eINSTANCE
+				.getFunctionUnit_Implementation();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.RegisterFileImpl <em>Register File</em>}' class.
@@ -2766,7 +2776,8 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute REGISTER_FILE__MAX_READS = eINSTANCE.getRegisterFile_MaxReads();
+		EAttribute REGISTER_FILE__MAX_READS = eINSTANCE
+				.getRegisterFile_MaxReads();
 
 		/**
 		 * The meta object literal for the '<em><b>Max Writes</b></em>' attribute feature.
@@ -2774,7 +2785,8 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute REGISTER_FILE__MAX_WRITES = eINSTANCE.getRegisterFile_MaxWrites();
+		EAttribute REGISTER_FILE__MAX_WRITES = eINSTANCE
+				.getRegisterFile_MaxWrites();
 
 		/**
 		 * The meta object literal for the '<em><b>Ports</b></em>' containment reference list feature.
@@ -2790,7 +2802,8 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference REGISTER_FILE__IMPLEMENTATION = eINSTANCE.getRegisterFile_Implementation();
+		EReference REGISTER_FILE__IMPLEMENTATION = eINSTANCE
+				.getRegisterFile_Implementation();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.PortImpl <em>Port</em>}' class.
@@ -2874,7 +2887,8 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference SOCKET__CONNECTED_SEGMENTS = eINSTANCE.getSocket_ConnectedSegments();
+		EReference SOCKET__CONNECTED_SEGMENTS = eINSTANCE
+				.getSocket_ConnectedSegments();
 
 		/**
 		 * The meta object literal for the '<em><b>Type</b></em>' attribute feature.
@@ -2942,7 +2956,8 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute ADDRESS_SPACE__MIN_ADDRESS = eINSTANCE.getAddressSpace_MinAddress();
+		EAttribute ADDRESS_SPACE__MIN_ADDRESS = eINSTANCE
+				.getAddressSpace_MinAddress();
 
 		/**
 		 * The meta object literal for the '<em><b>Max Address</b></em>' attribute feature.
@@ -2950,7 +2965,8 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute ADDRESS_SPACE__MAX_ADDRESS = eINSTANCE.getAddressSpace_MaxAddress();
+		EAttribute ADDRESS_SPACE__MAX_ADDRESS = eINSTANCE
+				.getAddressSpace_MaxAddress();
 
 		/**
 		 * The meta object literal for the '<em><b>Width</b></em>' attribute feature.
@@ -3102,7 +3118,8 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference TERM_UNIT__FUNCTION_UNIT = eINSTANCE.getTermUnit_FunctionUnit();
+		EReference TERM_UNIT__FUNCTION_UNIT = eINSTANCE
+				.getTermUnit_FunctionUnit();
 
 		/**
 		 * The meta object literal for the '<em><b>Port</b></em>' reference feature.
@@ -3128,7 +3145,8 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute IMPLEMENTATION__HDB_FILE = eINSTANCE.getImplementation_HdbFile();
+		EAttribute IMPLEMENTATION__HDB_FILE = eINSTANCE
+				.getImplementation_HdbFile();
 
 		/**
 		 * The meta object literal for the '<em><b>Id</b></em>' attribute feature.
@@ -3234,7 +3252,8 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PORT_TO_INDEX_MAP_ENTRY__KEY = eINSTANCE.getPortToIndexMapEntry_Key();
+		EReference PORT_TO_INDEX_MAP_ENTRY__KEY = eINSTANCE
+				.getPortToIndexMapEntry_Key();
 
 		/**
 		 * The meta object literal for the '<em><b>Value</b></em>' attribute feature.
@@ -3242,7 +3261,8 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute PORT_TO_INDEX_MAP_ENTRY__VALUE = eINSTANCE.getPortToIndexMapEntry_Value();
+		EAttribute PORT_TO_INDEX_MAP_ENTRY__VALUE = eINSTANCE
+				.getPortToIndexMapEntry_Value();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.ShortImmediateImpl <em>Short Immediate</em>}' class.
@@ -3260,7 +3280,8 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute SHORT_IMMEDIATE__EXTENSION = eINSTANCE.getShortImmediate_Extension();
+		EAttribute SHORT_IMMEDIATE__EXTENSION = eINSTANCE
+				.getShortImmediate_Extension();
 
 		/**
 		 * The meta object literal for the '<em><b>Width</b></em>' attribute feature.

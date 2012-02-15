@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.tta.architecture;
 
-
 /**
  * <!-- begin-user-doc -->
  * A representation of the model object '<em><b>Expr False</b></em>'.
