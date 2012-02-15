@@ -50,13 +50,11 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="fileName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="lineNumber" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Network" eSuperTypes="#//Entity">
+  <eClassifiers xsi:type="ecore:EClass" name="Network" eSuperTypes="#//Entity ../../net.sf.dftools.models/model/Graph.ecore#//Graph">
     <eStructuralFeatures xsi:type="ecore:EReference" name="moC" eType="ecore:EClass MoC.ecore#//MoC"
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="variables" upperBound="-1"
         eType="ecore:EClass Ir.ecore#//Var" containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="connections" upperBound="-1"
-        eType="#//Connection" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="instances" upperBound="-1"
         eType="#//Instance" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="fileName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>

@@ -30,6 +30,8 @@ package net.sf.orcc.df;
 
 import java.util.List;
 
+import net.sf.dftools.graph.Edge;
+import net.sf.dftools.graph.Graph;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
@@ -38,14 +40,14 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.EList;
 
 /**
- * This class defines a hierarchical XDF network. It contains several maps so
- * templates can walk through the graph of the network.
+ * This class defines a hierarchical XDF network. It extends both entity and
+ * graph.
  * 
  * @author Matthieu Wipliez
  * @author Herve Yviquel
  * @model extends="Entity"
  */
-public interface Network extends Entity {
+public interface Network extends Entity, Graph {
 
 	/**
 	 * Classifies this network.
@@ -92,10 +94,11 @@ public interface Network extends Entity {
 	List<Network> getAllNetworks();
 
 	/**
-	 * Returns the list of this graph's connections.
+	 * Returns the list of this graph's connections. This returns the same as
+	 * {@link #getEdges()} but as a list of {@link Connection}s rather than as a
+	 * list of {@link Edge}s.
 	 * 
 	 * @return the list of this graph's connections
-	 * @model containment="true"
 	 */
 	EList<Connection> getConnections();
 
@@ -166,14 +169,6 @@ public interface Network extends Entity {
 	 * @model containment="true"
 	 */
 	EList<Var> getVariables();
-
-	/**
-	 * Returns the list of this network's vertices (concatenation of inputs,
-	 * outputs, instances, and entities).
-	 * 
-	 * @return the list of this network's vertices
-	 */
-	List<DfVertex> getVertices();
 
 	/**
 	 * Merges actors of this network. Note that for this transformation to work

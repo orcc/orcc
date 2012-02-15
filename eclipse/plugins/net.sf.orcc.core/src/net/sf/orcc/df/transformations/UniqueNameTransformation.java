@@ -31,6 +31,7 @@ package net.sf.orcc.df.transformations;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.util.DfSwitch;
@@ -52,7 +53,7 @@ public class UniqueNameTransformation extends DfSwitch<Void> {
 
 	@Override
 	public Void caseNetwork(Network network) {
-		for (DfVertex vertex : network.getVertices()) {
+		for (Vertex vertex : network.getVertices()) {
 			doSwitch(vertex);
 		}
 

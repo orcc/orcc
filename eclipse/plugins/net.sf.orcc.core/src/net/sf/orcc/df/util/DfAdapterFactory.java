@@ -9,6 +9,7 @@ package net.sf.orcc.df.util;
 import java.util.Map;
 
 import net.sf.dftools.graph.Edge;
+import net.sf.dftools.graph.Graph;
 import net.sf.dftools.graph.Vertex;
 import net.sf.dftools.util.Nameable;
 import net.sf.orcc.df.Action;
@@ -203,6 +204,11 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 		}
 
 		@Override
+		public Adapter caseGraph(Graph object) {
+			return createGraphAdapter();
+		}
+
+		@Override
 		public Adapter caseEdge(Edge object) {
 			return createEdgeAdapter();
 		}
@@ -306,6 +312,20 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createVertexAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.dftools.graph.Graph <em>Graph</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.dftools.graph.Graph
+	 * @generated
+	 */
+	public Adapter createGraphAdapter() {
 		return null;
 	}
 

@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.dftools.graph.Edge;
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
@@ -60,10 +61,10 @@ public class BroadcastAdder extends DfSwitch<Void> {
 		this.network = network;
 		// make a copy of the existing vertex set because the set returned is
 		// modified when broadcasts are added
-		List<DfVertex> vertexSet = network.getVertices();
+		List<Vertex> vertexSet = network.getVertices();
 
-		for (DfVertex vertex : vertexSet) {
-			if (vertex.isEntity()) {
+		for (Vertex vertex : vertexSet) {
+			if (vertex instanceof Entity) {
 				Entity entity = (Entity) vertex;
 				if (entity.isNetwork()) {
 					new BroadcastAdder().doSwitch(entity);

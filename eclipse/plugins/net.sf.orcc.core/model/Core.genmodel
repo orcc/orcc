@@ -45,7 +45,6 @@
     <genClasses ecoreClass="Df.ecore#//Network">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Network/moC"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Network/variables"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Network/connections"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Network/instances"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Network/fileName"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Network/entities"/>

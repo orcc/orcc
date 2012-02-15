@@ -32,69 +32,60 @@ import static net.sf.orcc.df.DfPackage.eINSTANCE;
 
 import java.util.List;
 
-import net.sf.dftools.graph.Vertex;
-import net.sf.orcc.df.Connection;
+import net.sf.dftools.graph.Graph;
+import net.sf.dftools.graph.util.GraphAdapter;
 import net.sf.orcc.df.DfVertex;
-import net.sf.orcc.df.Network;
 
 import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.common.notify.impl.AdapterImpl;
 
 /**
- * This class defines an adapter for a network that updates connections and
- * vertices.
+ * This class defines an adapter for a network that automatically adds an
+ * entity/instance/port to the vertices list when it is added to a containment
+ * list, and automatically removes an entity/instance/port from the vertices
+ * list when it is removed from its containment list.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class NetworkAdapter extends AdapterImpl {
+public class NetworkAdapter extends GraphAdapter {
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public void notifyChanged(Notification msg) {
 		Object feature = msg.getFeature();
-		switch (msg.getEventType()) {
-		case Notification.REMOVE_MANY:
-			if (feature == eINSTANCE.getEntity_Inputs()
-					|| feature == eINSTANCE.getEntity_Outputs()
-					|| feature == eINSTANCE.getNetwork_Entities()
-					|| feature == eINSTANCE.getNetwork_Instances()) {
-				List<DfVertex> vertices = (List<DfVertex>) msg.getOldValue();
-				for (DfVertex vertex : vertices) {
-					remove(vertex);
-				}
-			} else if (feature == eINSTANCE.getNetwork_Connections()) {
-				List<Connection> connections = (List<Connection>) msg
-						.getOldValue();
-				for (Connection connection : connections) {
-					connection.setSource(null);
-					connection.setTarget(null);
-				}
+		if (feature == eINSTANCE.getEntity_Inputs()
+				|| feature == eINSTANCE.getEntity_Outputs()
+				|| feature == eINSTANCE.getNetwork_Entities()
+				|| feature == eINSTANCE.getNetwork_Instances()) {
+			switch (msg.getEventType()) {
+			case Notification.ADD: {
+				DfVertex vertex = (DfVertex) msg.getNewValue();
+				((Graph) target).getVertices().add(vertex);
+				return;
 			}
-			break;
 
-		case Notification.REMOVE:
-			if (feature == eINSTANCE.getEntity_Inputs()
-					|| feature == eINSTANCE.getEntity_Outputs()
-					|| feature == eINSTANCE.getNetwork_Entities()
-					|| feature == eINSTANCE.getNetwork_Instances()) {
-				// when removing an instance or a port, remove it from vertices
+			case Notification.ADD_MANY: {
+				List<DfVertex> vertices = (List<DfVertex>) msg.getNewValue();
+				((Graph) target).getVertices().addAll(vertices);
+				return;
+			}
+
+			case Notification.REMOVE_MANY: {
+				List<DfVertex> vertices = (List<DfVertex>) msg.getOldValue();
+				((Graph) target).getVertices().removeAll(vertices);
+				return;
+			}
+
+			case Notification.REMOVE: {
 				DfVertex vertex = (DfVertex) msg.getOldValue();
-				remove(vertex);
-			} else if (feature == eINSTANCE.getNetwork_Connections()) {
-				// when removing a connection, set its source/target to null
-				Connection connection = (Connection) msg.getOldValue();
-				connection.setSource(null);
-				connection.setTarget(null);
+				((Graph) target).getVertices().remove(vertex);
+				return;
+			}
 			}
 		}
-	}
 
-	private void remove(Vertex vertex) {
-		// removes incoming and outgoing connections
-		List<Connection> connections = ((Network) target).getConnections();
-		connections.removeAll(vertex.getIncoming());
-		connections.removeAll(vertex.getOutgoing());
+		// delegates to super if not applicable here
+		super.notifyChanged(msg);
 	}
 
 }

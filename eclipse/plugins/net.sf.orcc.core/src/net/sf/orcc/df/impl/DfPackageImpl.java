@@ -283,7 +283,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getNetwork_Connections() {
+	public EReference getNetwork_Instances() {
 		return (EReference) networkEClass.getEStructuralFeatures().get(2);
 	}
 
@@ -291,16 +291,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getNetwork_Instances() {
-		return (EReference) networkEClass.getEStructuralFeatures().get(3);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EAttribute getNetwork_FileName() {
-		return (EAttribute) networkEClass.getEStructuralFeatures().get(4);
+		return (EAttribute) networkEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -308,7 +300,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getNetwork_Entities() {
-		return (EReference) networkEClass.getEStructuralFeatures().get(5);
+		return (EReference) networkEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -920,7 +912,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		networkEClass = createEClass(NETWORK);
 		createEReference(networkEClass, NETWORK__MO_C);
 		createEReference(networkEClass, NETWORK__VARIABLES);
-		createEReference(networkEClass, NETWORK__CONNECTIONS);
 		createEReference(networkEClass, NETWORK__INSTANCES);
 		createEAttribute(networkEClass, NETWORK__FILE_NAME);
 		createEReference(networkEClass, NETWORK__ENTITIES);
@@ -1026,6 +1017,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		entitySpecificEClass.getESuperTypes().add(this.getEntity());
 		actorEClass.getESuperTypes().add(this.getEntity());
 		networkEClass.getESuperTypes().add(this.getEntity());
+		networkEClass.getESuperTypes().add(theGraphPackage.getGraph());
 		broadcastEClass.getESuperTypes().add(this.getEntity());
 		connectionEClass.getESuperTypes().add(theGraphPackage.getEdge());
 		stateEClass.getESuperTypes().add(theGraphPackage.getVertex());
@@ -1154,10 +1146,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNetwork_Variables(), theIrPackage.getVar(), null,
 				"variables", null, 0, -1, Network.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getNetwork_Connections(), this.getConnection(), null,
-				"connections", null, 0, -1, Network.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNetwork_Instances(), this.getInstance(), null,

@@ -9,6 +9,7 @@ package net.sf.orcc.df.util;
 import java.util.Map;
 
 import net.sf.dftools.graph.Edge;
+import net.sf.dftools.graph.Graph;
 import net.sf.dftools.graph.Vertex;
 import net.sf.dftools.util.Nameable;
 import net.sf.orcc.df.Action;
@@ -186,6 +187,8 @@ public class DfSwitch<T> extends Switch<T> {
 			T result = caseNetwork(network);
 			if (result == null)
 				result = caseEntity(network);
+			if (result == null)
+				result = caseGraph(network);
 			if (result == null)
 				result = caseDfVertex(network);
 			if (result == null)
@@ -391,6 +394,21 @@ public class DfSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseVertex(Vertex object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Graph</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Graph</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseGraph(Graph object) {
 		return null;
 	}
 

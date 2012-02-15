@@ -77,13 +77,12 @@ public interface DfPackage extends EPackage {
 	int DF_VERTEX__NAME = GraphPackage.VERTEX__NAME;
 
 	/**
-	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int DF_VERTEX__OUTGOING = GraphPackage.VERTEX__OUTGOING;
+	int DF_VERTEX__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Incoming</b></em>' reference list. <!--
@@ -95,12 +94,13 @@ public interface DfPackage extends EPackage {
 	int DF_VERTEX__INCOMING = GraphPackage.VERTEX__INCOMING;
 
 	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int DF_VERTEX__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
+	int DF_VERTEX__OUTGOING = GraphPackage.VERTEX__OUTGOING;
 
 	/**
 	 * The number of structural features of the '<em>Vertex</em>' class. <!--
@@ -342,13 +342,12 @@ public interface DfPackage extends EPackage {
 	int PORT__NAME = DF_VERTEX__NAME;
 
 	/**
-	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__OUTGOING = DF_VERTEX__OUTGOING;
+	int PORT__ATTRIBUTES = DF_VERTEX__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Incoming</b></em>' reference list. <!--
@@ -360,12 +359,13 @@ public interface DfPackage extends EPackage {
 	int PORT__INCOMING = DF_VERTEX__INCOMING;
 
 	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__ATTRIBUTES = DF_VERTEX__ATTRIBUTES;
+	int PORT__OUTGOING = DF_VERTEX__OUTGOING;
 
 	/**
 	 * The feature id for the '<em><b>Num Tokens Consumed</b></em>' attribute.
@@ -420,13 +420,12 @@ public interface DfPackage extends EPackage {
 	int INSTANCE__NAME = DF_VERTEX__NAME;
 
 	/**
-	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INSTANCE__OUTGOING = DF_VERTEX__OUTGOING;
+	int INSTANCE__ATTRIBUTES = DF_VERTEX__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Incoming</b></em>' reference list. <!--
@@ -438,12 +437,13 @@ public interface DfPackage extends EPackage {
 	int INSTANCE__INCOMING = DF_VERTEX__INCOMING;
 
 	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int INSTANCE__ATTRIBUTES = DF_VERTEX__ATTRIBUTES;
+	int INSTANCE__OUTGOING = DF_VERTEX__OUTGOING;
 
 	/**
 	 * The feature id for the '<em><b>Arguments</b></em>' containment reference list.
@@ -481,13 +481,12 @@ public interface DfPackage extends EPackage {
 	int ENTITY__NAME = DF_VERTEX__NAME;
 
 	/**
-	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ENTITY__OUTGOING = DF_VERTEX__OUTGOING;
+	int ENTITY__ATTRIBUTES = DF_VERTEX__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Incoming</b></em>' reference list. <!--
@@ -499,12 +498,13 @@ public interface DfPackage extends EPackage {
 	int ENTITY__INCOMING = DF_VERTEX__INCOMING;
 
 	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int ENTITY__ATTRIBUTES = DF_VERTEX__ATTRIBUTES;
+	int ENTITY__OUTGOING = DF_VERTEX__OUTGOING;
 
 	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
@@ -558,13 +558,12 @@ public interface DfPackage extends EPackage {
 	int ENTITY_SPECIFIC__NAME = ENTITY__NAME;
 
 	/**
-	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ENTITY_SPECIFIC__OUTGOING = ENTITY__OUTGOING;
+	int ENTITY_SPECIFIC__ATTRIBUTES = ENTITY__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Incoming</b></em>' reference list. <!--
@@ -576,12 +575,13 @@ public interface DfPackage extends EPackage {
 	int ENTITY_SPECIFIC__INCOMING = ENTITY__INCOMING;
 
 	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int ENTITY_SPECIFIC__ATTRIBUTES = ENTITY__ATTRIBUTES;
+	int ENTITY_SPECIFIC__OUTGOING = ENTITY__OUTGOING;
 
 	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
@@ -625,13 +625,12 @@ public interface DfPackage extends EPackage {
 	int ACTOR__NAME = ENTITY__NAME;
 
 	/**
-	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__OUTGOING = ENTITY__OUTGOING;
+	int ACTOR__ATTRIBUTES = ENTITY__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Incoming</b></em>' reference list. <!--
@@ -643,12 +642,13 @@ public interface DfPackage extends EPackage {
 	int ACTOR__INCOMING = ENTITY__INCOMING;
 
 	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__ATTRIBUTES = ENTITY__ATTRIBUTES;
+	int ACTOR__OUTGOING = ENTITY__OUTGOING;
 
 	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
@@ -778,13 +778,12 @@ public interface DfPackage extends EPackage {
 	int NETWORK__NAME = ENTITY__NAME;
 
 	/**
-	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__OUTGOING = ENTITY__OUTGOING;
+	int NETWORK__ATTRIBUTES = ENTITY__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Incoming</b></em>' reference list. <!--
@@ -796,12 +795,13 @@ public interface DfPackage extends EPackage {
 	int NETWORK__INCOMING = ENTITY__INCOMING;
 
 	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__ATTRIBUTES = ENTITY__ATTRIBUTES;
+	int NETWORK__OUTGOING = ENTITY__OUTGOING;
 
 	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
@@ -828,13 +828,31 @@ public interface DfPackage extends EPackage {
 	int NETWORK__PARAMETERS = ENTITY__PARAMETERS;
 
 	/**
+	 * The feature id for the '<em><b>Edges</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NETWORK__EDGES = ENTITY_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>Vertices</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NETWORK__VERTICES = ENTITY_FEATURE_COUNT + 1;
+
+	/**
 	 * The feature id for the '<em><b>Mo C</b></em>' containment reference. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__MO_C = ENTITY_FEATURE_COUNT + 0;
+	int NETWORK__MO_C = ENTITY_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Variables</b></em>' containment reference list.
@@ -842,15 +860,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__VARIABLES = ENTITY_FEATURE_COUNT + 1;
-
-	/**
-	 * The feature id for the '<em><b>Connections</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NETWORK__CONNECTIONS = ENTITY_FEATURE_COUNT + 2;
+	int NETWORK__VARIABLES = ENTITY_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Instances</b></em>' containment reference list.
@@ -858,7 +868,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__INSTANCES = ENTITY_FEATURE_COUNT + 3;
+	int NETWORK__INSTANCES = ENTITY_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>File Name</b></em>' attribute. <!--
@@ -867,7 +877,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__FILE_NAME = ENTITY_FEATURE_COUNT + 4;
+	int NETWORK__FILE_NAME = ENTITY_FEATURE_COUNT + 5;
 
 	/**
 	 * The feature id for the '<em><b>Entities</b></em>' containment reference list.
@@ -875,7 +885,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__ENTITIES = ENTITY_FEATURE_COUNT + 5;
+	int NETWORK__ENTITIES = ENTITY_FEATURE_COUNT + 6;
 
 	/**
 	 * The number of structural features of the '<em>Network</em>' class. <!--
@@ -884,7 +894,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK_FEATURE_COUNT = ENTITY_FEATURE_COUNT + 6;
+	int NETWORK_FEATURE_COUNT = ENTITY_FEATURE_COUNT + 7;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -896,13 +906,12 @@ public interface DfPackage extends EPackage {
 	int BROADCAST__NAME = ENTITY__NAME;
 
 	/**
-	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int BROADCAST__OUTGOING = ENTITY__OUTGOING;
+	int BROADCAST__ATTRIBUTES = ENTITY__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Incoming</b></em>' reference list. <!--
@@ -914,12 +923,13 @@ public interface DfPackage extends EPackage {
 	int BROADCAST__INCOMING = ENTITY__INCOMING;
 
 	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int BROADCAST__ATTRIBUTES = ENTITY__ATTRIBUTES;
+	int BROADCAST__OUTGOING = ENTITY__OUTGOING;
 
 	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
@@ -955,6 +965,14 @@ public interface DfPackage extends EPackage {
 	int BROADCAST_FEATURE_COUNT = ENTITY_FEATURE_COUNT + 0;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CONNECTION__ATTRIBUTES = GraphPackage.EDGE__ATTRIBUTES;
+
+	/**
 	 * The feature id for the '<em><b>Source</b></em>' reference. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -971,14 +989,6 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int CONNECTION__TARGET = GraphPackage.EDGE__TARGET;
-
-	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int CONNECTION__ATTRIBUTES = GraphPackage.EDGE__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Source Port</b></em>' reference. <!--
@@ -1162,13 +1172,12 @@ public interface DfPackage extends EPackage {
 	int STATE__NAME = GraphPackage.VERTEX__NAME;
 
 	/**
-	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int STATE__OUTGOING = GraphPackage.VERTEX__OUTGOING;
+	int STATE__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Incoming</b></em>' reference list. <!--
@@ -1180,12 +1189,13 @@ public interface DfPackage extends EPackage {
 	int STATE__INCOMING = GraphPackage.VERTEX__INCOMING;
 
 	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int STATE__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
+	int STATE__OUTGOING = GraphPackage.VERTEX__OUTGOING;
 
 	/**
 	 * The number of structural features of the '<em>State</em>' class. <!--
@@ -1215,6 +1225,14 @@ public interface DfPackage extends EPackage {
 	int TAG_FEATURE_COUNT = 1;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRANSITION__ATTRIBUTES = GraphPackage.EDGE__ATTRIBUTES;
+
+	/**
 	 * The feature id for the '<em><b>Source</b></em>' reference. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -1231,14 +1249,6 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int TRANSITION__TARGET = GraphPackage.EDGE__TARGET;
-
-	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int TRANSITION__ATTRIBUTES = GraphPackage.EDGE__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Action</b></em>' reference. <!--
@@ -1403,19 +1413,6 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getNetwork_Variables();
-
-	/**
-	 * Returns the meta object for the containment reference list '
-	 * {@link net.sf.orcc.df.Network#getConnections <em>Connections</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the containment reference list '
-	 *         <em>Connections</em>'.
-	 * @see net.sf.orcc.df.Network#getConnections()
-	 * @see #getNetwork()
-	 * @generated
-	 */
-	EReference getNetwork_Connections();
 
 	/**
 	 * Returns the meta object for the containment reference list '
@@ -2260,14 +2257,6 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EReference NETWORK__VARIABLES = eINSTANCE.getNetwork_Variables();
-
-		/**
-		 * The meta object literal for the '<em><b>Connections</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc --> <!--
-		 * end-user-doc -->
-		 * @generated
-		 */
-		EReference NETWORK__CONNECTIONS = eINSTANCE.getNetwork_Connections();
 
 		/**
 		 * The meta object literal for the '<em><b>Instances</b></em>' containment reference list feature.
