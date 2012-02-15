@@ -32,8 +32,8 @@ import java.util.Map;
 
 import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.Graph;
-import net.sf.dftools.graph.Nameable;
 import net.sf.dftools.graph.Vertex;
+import net.sf.dftools.util.Nameable;
 import net.sf.orcc.backends.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.Bridge;
