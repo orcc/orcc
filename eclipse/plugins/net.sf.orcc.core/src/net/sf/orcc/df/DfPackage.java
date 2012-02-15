@@ -466,30 +466,12 @@ public interface DfPackage extends EPackage {
 	int INSTANCE__ATTRIBUTES = DF_VERTEX__ATTRIBUTES;
 
 	/**
-	 * The feature id for the '<em><b>Outputs</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INSTANCE__OUTPUTS = DF_VERTEX_FEATURE_COUNT + 0;
-
-	/**
-	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INSTANCE__INPUTS = DF_VERTEX_FEATURE_COUNT + 1;
-
-	/**
 	 * The feature id for the '<em><b>Arguments</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INSTANCE__ARGUMENTS = DF_VERTEX_FEATURE_COUNT + 2;
+	int INSTANCE__ARGUMENTS = DF_VERTEX_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Entity</b></em>' reference. <!--
@@ -498,7 +480,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INSTANCE__ENTITY = DF_VERTEX_FEATURE_COUNT + 3;
+	int INSTANCE__ENTITY = DF_VERTEX_FEATURE_COUNT + 1;
 
 	/**
 	 * The number of structural features of the '<em>Instance</em>' class. <!--
@@ -507,7 +489,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INSTANCE_FEATURE_COUNT = DF_VERTEX_FEATURE_COUNT + 4;
+	int INSTANCE_FEATURE_COUNT = DF_VERTEX_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -1566,28 +1548,6 @@ public interface DfPackage extends EPackage {
 	EClass getInstance();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.df.Instance#getOutputs <em>Outputs</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Outputs</em>'.
-	 * @see net.sf.orcc.df.Instance#getOutputs()
-	 * @see #getInstance()
-	 * @generated
-	 */
-	EReference getInstance_Outputs();
-
-	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.df.Instance#getInputs <em>Inputs</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Inputs</em>'.
-	 * @see net.sf.orcc.df.Instance#getInputs()
-	 * @see #getInstance()
-	 * @generated
-	 */
-	EReference getInstance_Inputs();
-
-	/**
 	 * Returns the meta object for the containment reference list '
 	 * {@link net.sf.orcc.df.Instance#getArguments <em>Arguments</em>}'. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
@@ -2461,22 +2421,6 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EClass INSTANCE = eINSTANCE.getInstance();
-
-		/**
-		 * The meta object literal for the '<em><b>Outputs</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference INSTANCE__OUTPUTS = eINSTANCE.getInstance_Outputs();
-
-		/**
-		 * The meta object literal for the '<em><b>Inputs</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference INSTANCE__INPUTS = eINSTANCE.getInstance_Inputs();
 
 		/**
 		 * The meta object literal for the '<em><b>Arguments</b></em>' containment reference list feature.

@@ -8,7 +8,6 @@ package net.sf.orcc.ir.util;
 
 import java.util.Map;
 
-import net.sf.orcc.ir.*;
 import net.sf.orcc.ir.Annotation;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
@@ -35,6 +34,7 @@ import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
+import net.sf.orcc.ir.NodeSpecific;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Predicate;

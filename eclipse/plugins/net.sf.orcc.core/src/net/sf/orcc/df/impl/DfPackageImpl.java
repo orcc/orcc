@@ -357,29 +357,11 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getInstance_Outputs() {
-		return (EReference) instanceEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getInstance_Inputs() {
-		return (EReference) instanceEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getInstance_Arguments() {
-		return (EReference) instanceEClass.getEStructuralFeatures().get(2);
+		return (EReference) instanceEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -387,7 +369,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getInstance_Entity() {
-		return (EReference) instanceEClass.getEStructuralFeatures().get(3);
+		return (EReference) instanceEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -958,8 +940,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEAttribute(portEClass, PORT__NATIVE);
 
 		instanceEClass = createEClass(INSTANCE);
-		createEReference(instanceEClass, INSTANCE__OUTPUTS);
-		createEReference(instanceEClass, INSTANCE__INPUTS);
 		createEReference(instanceEClass, INSTANCE__ARGUMENTS);
 		createEReference(instanceEClass, INSTANCE__ENTITY);
 
@@ -1144,14 +1124,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 
 		initEClass(instanceEClass, Instance.class, "Instance", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getInstance_Outputs(), this.getPort(), null, "outputs",
-				null, 0, -1, Instance.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getInstance_Inputs(), this.getPort(), null, "inputs",
-				null, 0, -1, Instance.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getInstance_Arguments(), this.getArgument(), null,
 				"arguments", null, 0, -1, Instance.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
