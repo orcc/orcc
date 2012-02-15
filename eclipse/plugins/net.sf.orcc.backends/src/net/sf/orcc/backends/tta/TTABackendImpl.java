@@ -312,15 +312,12 @@ public class TTABackendImpl extends AbstractBackend {
 	private void printProcessor(Instance instance, String instancePath) {
 		int ramSize = instance.isActor() ? ArchitectureMemoryStats
 				.computeNeededMemorySize(instance.getActor()) : 1;
-		int inputNb = instance.isActor() ? instance.getActor().getInputs()
-				.size() : 1;
-		int outputNb = instance.isActor() ? instance.getActor().getOutputs()
-				.size() : instance.getBroadcast().getOutputs().size();
 
 		Processor tta = ArchitectureFactory.eINSTANCE.createProcessor(
 				instance.getSimpleName(), getBusNb(instance),
-				getRegNb(instance), getAluNb(instance), inputNb, outputNb,
-				ramSize);
+				getRegNb(instance), getAluNb(instance), instance.getEntity()
+						.getInputs().size(), instance.getEntity().getOutputs()
+						.size(), ramSize);
 
 		CustomPrinter adfPrinter = new CustomPrinter(
 				"net/sf/orcc/backends/tta/TCE_Processor_ADF.stg");
