@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.backends.tta.architecture;
 
+import net.sf.dftools.graph.GraphPackage;
+
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EEnum;
@@ -35,14 +37,13 @@ import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 
 /**
- * <!-- begin-user-doc -->
- * The <b>Package</b> for the model.
- * It contains accessors for the meta objects to represent
+ * <!-- begin-user-doc --> The <b>Package</b> for the model. It contains
+ * accessors for the meta objects to represent
  * <ul>
- *   <li>each class,</li>
- *   <li>each feature of each class,</li>
- *   <li>each enum,</li>
- *   <li>and each data type</li>
+ * <li>each class,</li>
+ * <li>each feature of each class,</li>
+ * <li>each enum,</li>
+ * <li>and each data type</li>
  * </ul>
  * <!-- end-user-doc -->
  * @see net.sf.orcc.backends.tta.architecture.ArchitectureFactory
@@ -52,169 +53,261 @@ import org.eclipse.emf.ecore.EReference;
 public interface ArchitecturePackage extends EPackage {
 	/**
 	 * The package name.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	String eNAME = "architecture";
 
 	/**
 	 * The package namespace URI.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	String eNS_URI = "http://orcc.sf.net/backends/tta/architecture/TTA_architecture";
 
 	/**
 	 * The package namespace name.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	String eNS_PREFIX = "net.sf.orcc.backends.tta.architecture";
 
 	/**
 	 * The singleton instance of the package.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @generated
 	 */
 	ArchitecturePackage eINSTANCE = net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl
 			.init();
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.TTAImpl <em>TTA</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.backends.tta.architecture.impl.TTAImpl
-	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTTA()
+	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl <em>Design</em>}' class.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.tta.architecture.impl.DesignImpl
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getDesign()
 	 * @generated
 	 */
-	int TTA = 0;
+	int DESIGN = 0;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Vertices</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TTA__NAME = 0;
+	int DESIGN__VERTICES = GraphPackage.GRAPH__VERTICES;
 
 	/**
-	 * The feature id for the '<em><b>Gcu</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Edges</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TTA__GCU = 1;
+	int DESIGN__EDGES = GraphPackage.GRAPH__EDGES;
+
+	/**
+	 * The number of structural features of the '<em>Design</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int DESIGN_FEATURE_COUNT = GraphPackage.GRAPH_FEATURE_COUNT + 0;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.HwFifoImpl <em>Hw Fifo</em>}' class.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.tta.architecture.impl.HwFifoImpl
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getHwFifo()
+	 * @generated
+	 */
+	int HW_FIFO = 1;
+
+	/**
+	 * The feature id for the '<em><b>Source</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int HW_FIFO__SOURCE = GraphPackage.EDGE__SOURCE;
+
+	/**
+	 * The feature id for the '<em><b>Target</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int HW_FIFO__TARGET = GraphPackage.EDGE__TARGET;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int HW_FIFO__ATTRIBUTES = GraphPackage.EDGE__ATTRIBUTES;
+
+	/**
+	 * The number of structural features of the '<em>Hw Fifo</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int HW_FIFO_FEATURE_COUNT = GraphPackage.EDGE_FEATURE_COUNT + 0;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl <em>Processor</em>}' class.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getProcessor()
+	 * @generated
+	 */
+	int PROCESSOR = 2;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int PROCESSOR__NAME = GraphPackage.VERTEX__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int PROCESSOR__OUTGOING = GraphPackage.VERTEX__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int PROCESSOR__INCOMING = GraphPackage.VERTEX__INCOMING;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCESSOR__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
+
+	/**
+	 * The feature id for the '<em><b>Gcu</b></em>' containment reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int PROCESSOR__GCU = GraphPackage.VERTEX_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Buses</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TTA__BUSES = 2;
+	int PROCESSOR__BUSES = GraphPackage.VERTEX_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Bridges</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TTA__BRIDGES = 3;
+	int PROCESSOR__BRIDGES = GraphPackage.VERTEX_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Sockets</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TTA__SOCKETS = 4;
+	int PROCESSOR__SOCKETS = GraphPackage.VERTEX_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Function Units</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TTA__FUNCTION_UNITS = 5;
+	int PROCESSOR__FUNCTION_UNITS = GraphPackage.VERTEX_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>Register Files</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TTA__REGISTER_FILES = 6;
+	int PROCESSOR__REGISTER_FILES = GraphPackage.VERTEX_FEATURE_COUNT + 5;
 
 	/**
 	 * The feature id for the '<em><b>Program</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TTA__PROGRAM = 7;
+	int PROCESSOR__PROGRAM = GraphPackage.VERTEX_FEATURE_COUNT + 6;
 
 	/**
-	 * The feature id for the '<em><b>Data</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Data</b></em>' containment reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int TTA__DATA = 8;
+	int PROCESSOR__DATA = GraphPackage.VERTEX_FEATURE_COUNT + 7;
 
 	/**
 	 * The feature id for the '<em><b>Hardware Database</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TTA__HARDWARE_DATABASE = 9;
+	int PROCESSOR__HARDWARE_DATABASE = GraphPackage.VERTEX_FEATURE_COUNT + 8;
 
 	/**
-	 * The number of structural features of the '<em>TTA</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Processor</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int TTA_FEATURE_COUNT = 10;
+	int PROCESSOR_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 9;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.BusImpl <em>Bus</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.backends.tta.architecture.impl.BusImpl
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getBus()
 	 * @generated
 	 */
-	int BUS = 1;
+	int BUS = 3;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int BUS__NAME = 0;
 
 	/**
-	 * The feature id for the '<em><b>Width</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Width</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -222,8 +315,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Guards</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -231,8 +323,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Segments</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -240,17 +331,16 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Short Immediate</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int BUS__SHORT_IMMEDIATE = 4;
 
 	/**
-	 * The number of structural features of the '<em>Bus</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Bus</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -258,36 +348,35 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.BridgeImpl <em>Bridge</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.backends.tta.architecture.impl.BridgeImpl
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getBridge()
 	 * @generated
 	 */
-	int BRIDGE = 2;
+	int BRIDGE = 4;
 
 	/**
-	 * The feature id for the '<em><b>Input Bus</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Input Bus</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int BRIDGE__INPUT_BUS = 0;
 
 	/**
-	 * The feature id for the '<em><b>Output Bus</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Output Bus</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int BRIDGE__OUTPUT_BUS = 1;
 
 	/**
-	 * The number of structural features of the '<em>Bridge</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Bridge</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -295,27 +384,26 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.SegmentImpl <em>Segment</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.backends.tta.architecture.impl.SegmentImpl
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getSegment()
 	 * @generated
 	 */
-	int SEGMENT = 3;
+	int SEGMENT = 5;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int SEGMENT__NAME = 0;
 
 	/**
-	 * The number of structural features of the '<em>Segment</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Segment</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -323,18 +411,17 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.GlobalControlUnitImpl <em>Global Control Unit</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @see net.sf.orcc.backends.tta.architecture.impl.GlobalControlUnitImpl
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getGlobalControlUnit()
 	 * @generated
 	 */
-	int GLOBAL_CONTROL_UNIT = 4;
+	int GLOBAL_CONTROL_UNIT = 6;
 
 	/**
 	 * The feature id for the '<em><b>Ports</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -342,17 +429,16 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Return Address</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int GLOBAL_CONTROL_UNIT__RETURN_ADDRESS = 1;
 
 	/**
-	 * The feature id for the '<em><b>Address Space</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Address Space</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -360,26 +446,25 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Operations</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int GLOBAL_CONTROL_UNIT__OPERATIONS = 3;
 
 	/**
-	 * The feature id for the '<em><b>Delay Slots</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Delay Slots</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int GLOBAL_CONTROL_UNIT__DELAY_SLOTS = 4;
 
 	/**
-	 * The feature id for the '<em><b>Guard Latency</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Guard Latency</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -387,27 +472,28 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The number of structural features of the '<em>Global Control Unit</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int GLOBAL_CONTROL_UNIT_FEATURE_COUNT = 6;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.FunctionUnitImpl <em>Function Unit</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The meta object id for the '
+	 * {@link net.sf.orcc.backends.tta.architecture.impl.FunctionUnitImpl
+	 * <em>Function Unit</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
 	 * @see net.sf.orcc.backends.tta.architecture.impl.FunctionUnitImpl
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getFunctionUnit()
 	 * @generated
 	 */
-	int FUNCTION_UNIT = 5;
+	int FUNCTION_UNIT = 7;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -415,8 +501,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Operations</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -424,26 +509,25 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Ports</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int FUNCTION_UNIT__PORTS = 2;
 
 	/**
-	 * The feature id for the '<em><b>Address Space</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Address Space</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int FUNCTION_UNIT__ADDRESS_SPACE = 3;
 
 	/**
-	 * The feature id for the '<em><b>Implementation</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Implementation</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -451,63 +535,64 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The number of structural features of the '<em>Function Unit</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int FUNCTION_UNIT_FEATURE_COUNT = 5;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.RegisterFileImpl <em>Register File</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The meta object id for the '
+	 * {@link net.sf.orcc.backends.tta.architecture.impl.RegisterFileImpl
+	 * <em>Register File</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
 	 * @see net.sf.orcc.backends.tta.architecture.impl.RegisterFileImpl
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getRegisterFile()
 	 * @generated
 	 */
-	int REGISTER_FILE = 6;
+	int REGISTER_FILE = 8;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int REGISTER_FILE__NAME = 0;
 
 	/**
-	 * The feature id for the '<em><b>Size</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Size</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int REGISTER_FILE__SIZE = 1;
 
 	/**
-	 * The feature id for the '<em><b>Width</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Width</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int REGISTER_FILE__WIDTH = 2;
 
 	/**
-	 * The feature id for the '<em><b>Max Reads</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Max Reads</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int REGISTER_FILE__MAX_READS = 3;
 
 	/**
-	 * The feature id for the '<em><b>Max Writes</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Max Writes</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -515,17 +600,16 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Ports</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int REGISTER_FILE__PORTS = 5;
 
 	/**
-	 * The feature id for the '<em><b>Implementation</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Implementation</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -533,8 +617,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The number of structural features of the '<em>Register File</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -542,72 +625,71 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.PortImpl <em>Port</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.backends.tta.architecture.impl.PortImpl
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getPort()
 	 * @generated
 	 */
-	int PORT = 7;
+	int PORT = 9;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int PORT__NAME = 0;
 
 	/**
-	 * The feature id for the '<em><b>Input Socket</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Input Socket</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int PORT__INPUT_SOCKET = 1;
 
 	/**
-	 * The feature id for the '<em><b>Output Socket</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Output Socket</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int PORT__OUTPUT_SOCKET = 2;
 
 	/**
-	 * The feature id for the '<em><b>Width</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Width</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int PORT__WIDTH = 3;
 
 	/**
-	 * The feature id for the '<em><b>Trigger</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Trigger</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int PORT__TRIGGER = 4;
 
 	/**
-	 * The feature id for the '<em><b>Opcode Selector</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Opcode Selector</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int PORT__OPCODE_SELECTOR = 5;
 
 	/**
-	 * The number of structural features of the '<em>Port</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Port</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -615,18 +697,17 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.SocketImpl <em>Socket</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.backends.tta.architecture.impl.SocketImpl
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getSocket()
 	 * @generated
 	 */
-	int SOCKET = 8;
+	int SOCKET = 10;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -634,26 +715,25 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Connected Segments</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int SOCKET__CONNECTED_SEGMENTS = 1;
 
 	/**
-	 * The feature id for the '<em><b>Type</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Type</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int SOCKET__TYPE = 2;
 
 	/**
-	 * The number of structural features of the '<em>Socket</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Socket</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -661,91 +741,92 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.OperationImpl <em>Operation</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.backends.tta.architecture.impl.OperationImpl
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getOperation()
 	 * @generated
 	 */
-	int OPERATION = 9;
+	int OPERATION = 11;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int OPERATION__NAME = 0;
 
 	/**
-	 * The feature id for the '<em><b>Pipeline</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Pipeline</b></em>' reference list. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int OPERATION__PIPELINE = 1;
 
 	/**
-	 * The feature id for the '<em><b>Control</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Control</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int OPERATION__CONTROL = 2;
 
 	/**
-	 * The number of structural features of the '<em>Operation</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Operation</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int OPERATION_FEATURE_COUNT = 3;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.AddressSpaceImpl <em>Address Space</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The meta object id for the '
+	 * {@link net.sf.orcc.backends.tta.architecture.impl.AddressSpaceImpl
+	 * <em>Address Space</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
 	 * @see net.sf.orcc.backends.tta.architecture.impl.AddressSpaceImpl
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getAddressSpace()
 	 * @generated
 	 */
-	int ADDRESS_SPACE = 10;
+	int ADDRESS_SPACE = 12;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int ADDRESS_SPACE__NAME = 0;
 
 	/**
-	 * The feature id for the '<em><b>Min Address</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Min Address</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int ADDRESS_SPACE__MIN_ADDRESS = 1;
 
 	/**
-	 * The feature id for the '<em><b>Max Address</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Max Address</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int ADDRESS_SPACE__MAX_ADDRESS = 2;
 
 	/**
-	 * The feature id for the '<em><b>Width</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Width</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -753,8 +834,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The number of structural features of the '<em>Address Space</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -762,116 +842,116 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.Guard <em>Guard</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.backends.tta.architecture.Guard
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getGuard()
 	 * @generated
 	 */
-	int GUARD = 16;
+	int GUARD = 18;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ExprUnaryImpl <em>Expr Unary</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The meta object id for the '
+	 * {@link net.sf.orcc.backends.tta.architecture.impl.ExprUnaryImpl
+	 * <em>Expr Unary</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ExprUnaryImpl
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprUnary()
 	 * @generated
 	 */
-	int EXPR_UNARY = 17;
+	int EXPR_UNARY = 19;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ExprBinaryImpl <em>Expr Binary</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The meta object id for the '
+	 * {@link net.sf.orcc.backends.tta.architecture.impl.ExprBinaryImpl
+	 * <em>Expr Binary</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ExprBinaryImpl
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprBinary()
 	 * @generated
 	 */
-	int EXPR_BINARY = 18;
+	int EXPR_BINARY = 20;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ExprTrueImpl <em>Expr True</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ExprTrueImpl
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprTrue()
 	 * @generated
 	 */
-	int EXPR_TRUE = 19;
+	int EXPR_TRUE = 21;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ExprFalseImpl <em>Expr False</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The meta object id for the '
+	 * {@link net.sf.orcc.backends.tta.architecture.impl.ExprFalseImpl
+	 * <em>Expr False</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ExprFalseImpl
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprFalse()
 	 * @generated
 	 */
-	int EXPR_FALSE = 20;
+	int EXPR_FALSE = 22;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.Term <em>Term</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.backends.tta.architecture.Term
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTerm()
 	 * @generated
 	 */
-	int TERM = 21;
+	int TERM = 23;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.TermBoolImpl <em>Term Bool</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.backends.tta.architecture.impl.TermBoolImpl
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTermBool()
 	 * @generated
 	 */
-	int TERM_BOOL = 22;
+	int TERM_BOOL = 24;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.TermUnitImpl <em>Term Unit</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.backends.tta.architecture.impl.TermUnitImpl
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTermUnit()
 	 * @generated
 	 */
-	int TERM_UNIT = 23;
+	int TERM_UNIT = 25;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.Element <em>Element</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.backends.tta.architecture.Element
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getElement()
 	 * @generated
 	 */
-	int ELEMENT = 11;
+	int ELEMENT = 13;
 
 	/**
-	 * The feature id for the '<em><b>Start Cycle</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Start Cycle</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int ELEMENT__START_CYCLE = 0;
 
 	/**
-	 * The feature id for the '<em><b>Cycles</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Cycles</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int ELEMENT__CYCLES = 1;
 
 	/**
-	 * The number of structural features of the '<em>Element</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Element</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -879,45 +959,44 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ReadsImpl <em>Reads</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ReadsImpl
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getReads()
 	 * @generated
 	 */
-	int READS = 12;
+	int READS = 14;
 
 	/**
-	 * The feature id for the '<em><b>Start Cycle</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Start Cycle</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int READS__START_CYCLE = ELEMENT__START_CYCLE;
 
 	/**
-	 * The feature id for the '<em><b>Cycles</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Cycles</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int READS__CYCLES = ELEMENT__CYCLES;
 
 	/**
-	 * The feature id for the '<em><b>Port</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Port</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int READS__PORT = ELEMENT_FEATURE_COUNT + 0;
 
 	/**
-	 * The number of structural features of the '<em>Reads</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Reads</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -925,45 +1004,44 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.WritesImpl <em>Writes</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.backends.tta.architecture.impl.WritesImpl
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getWrites()
 	 * @generated
 	 */
-	int WRITES = 13;
+	int WRITES = 15;
 
 	/**
-	 * The feature id for the '<em><b>Start Cycle</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Start Cycle</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int WRITES__START_CYCLE = ELEMENT__START_CYCLE;
 
 	/**
-	 * The feature id for the '<em><b>Cycles</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Cycles</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int WRITES__CYCLES = ELEMENT__CYCLES;
 
 	/**
-	 * The feature id for the '<em><b>Port</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Port</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int WRITES__PORT = ELEMENT_FEATURE_COUNT + 0;
 
 	/**
-	 * The number of structural features of the '<em>Writes</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Writes</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -971,45 +1049,44 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ResourceImpl <em>Resource</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ResourceImpl
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getResource()
 	 * @generated
 	 */
-	int RESOURCE = 14;
+	int RESOURCE = 16;
 
 	/**
-	 * The feature id for the '<em><b>Start Cycle</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Start Cycle</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int RESOURCE__START_CYCLE = ELEMENT__START_CYCLE;
 
 	/**
-	 * The feature id for the '<em><b>Cycles</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Cycles</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int RESOURCE__CYCLES = ELEMENT__CYCLES;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int RESOURCE__NAME = ELEMENT_FEATURE_COUNT + 0;
 
 	/**
-	 * The number of structural features of the '<em>Resource</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Resource</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -1017,37 +1094,37 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.PortToIndexMapEntryImpl <em>Port To Index Map Entry</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @see net.sf.orcc.backends.tta.architecture.impl.PortToIndexMapEntryImpl
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getPortToIndexMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_INDEX_MAP_ENTRY = 25;
+	int PORT_TO_INDEX_MAP_ENTRY = 27;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ShortImmediateImpl <em>Short Immediate</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ShortImmediateImpl
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getShortImmediate()
 	 * @generated
 	 */
-	int SHORT_IMMEDIATE = 15;
+	int SHORT_IMMEDIATE = 17;
 
 	/**
-	 * The feature id for the '<em><b>Extension</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Extension</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int SHORT_IMMEDIATE__EXTENSION = 0;
 
 	/**
-	 * The feature id for the '<em><b>Width</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Width</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -1055,35 +1132,34 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The number of structural features of the '<em>Short Immediate</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int SHORT_IMMEDIATE_FEATURE_COUNT = 2;
 
 	/**
-	 * The number of structural features of the '<em>Guard</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Guard</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int GUARD_FEATURE_COUNT = 0;
 
 	/**
-	 * The feature id for the '<em><b>Operator</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Operator</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int EXPR_UNARY__OPERATOR = GUARD_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Term</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Term</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -1091,35 +1167,34 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The number of structural features of the '<em>Expr Unary</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int EXPR_UNARY_FEATURE_COUNT = GUARD_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>Operator</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Operator</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int EXPR_BINARY__OPERATOR = GUARD_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>E1</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>E1</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int EXPR_BINARY__E1 = GUARD_FEATURE_COUNT + 1;
 
 	/**
-	 * The feature id for the '<em><b>E2</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>E2</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -1127,17 +1202,16 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The number of structural features of the '<em>Expr Binary</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int EXPR_BINARY_FEATURE_COUNT = GUARD_FEATURE_COUNT + 3;
 
 	/**
-	 * The number of structural features of the '<em>Expr True</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Expr True</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -1145,71 +1219,70 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The number of structural features of the '<em>Expr False</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int EXPR_FALSE_FEATURE_COUNT = GUARD_FEATURE_COUNT + 0;
 
 	/**
-	 * The number of structural features of the '<em>Term</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Term</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int TERM_FEATURE_COUNT = 0;
 
 	/**
-	 * The feature id for the '<em><b>Register</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Register</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int TERM_BOOL__REGISTER = TERM_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Index</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Index</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int TERM_BOOL__INDEX = TERM_FEATURE_COUNT + 1;
 
 	/**
-	 * The number of structural features of the '<em>Term Bool</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Term Bool</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int TERM_BOOL_FEATURE_COUNT = TERM_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>Function Unit</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Function Unit</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int TERM_UNIT__FUNCTION_UNIT = TERM_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Port</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Port</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int TERM_UNIT__PORT = TERM_FEATURE_COUNT + 1;
 
 	/**
-	 * The number of structural features of the '<em>Term Unit</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Term Unit</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -1217,27 +1290,27 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ImplementationImpl <em>Implementation</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ImplementationImpl
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getImplementation()
 	 * @generated
 	 */
-	int IMPLEMENTATION = 24;
+	int IMPLEMENTATION = 26;
 
 	/**
-	 * The feature id for the '<em><b>Hdb File</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Hdb File</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int IMPLEMENTATION__HDB_FILE = 0;
 
 	/**
-	 * The feature id for the '<em><b>Id</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Id</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -1245,26 +1318,25 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The number of structural features of the '<em>Implementation</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int IMPLEMENTATION_FEATURE_COUNT = 2;
 
 	/**
-	 * The feature id for the '<em><b>Key</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Key</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int PORT_TO_INDEX_MAP_ENTRY__KEY = 0;
 
 	/**
-	 * The feature id for the '<em><b>Value</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Value</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -1272,177 +1344,178 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * The number of structural features of the '<em>Port To Index Map Entry</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int PORT_TO_INDEX_MAP_ENTRY_FEATURE_COUNT = 2;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.SocketType <em>Socket Type</em>}' enum.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The meta object id for the '
+	 * {@link net.sf.orcc.backends.tta.architecture.SocketType
+	 * <em>Socket Type</em>}' enum. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
 	 * @see net.sf.orcc.backends.tta.architecture.SocketType
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getSocketType()
 	 * @generated
 	 */
-	int SOCKET_TYPE = 26;
+	int SOCKET_TYPE = 28;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.Extension <em>Extension</em>}' enum.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.backends.tta.architecture.Extension
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExtension()
 	 * @generated
 	 */
-	int EXTENSION = 27;
+	int EXTENSION = 29;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.OpUnary <em>Op Unary</em>}' enum.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.backends.tta.architecture.OpUnary
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getOpUnary()
 	 * @generated
 	 */
-	int OP_UNARY = 28;
+	int OP_UNARY = 30;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.OpBinary <em>Op Binary</em>}' enum.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.backends.tta.architecture.OpBinary
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getOpBinary()
 	 * @generated
 	 */
-	int OP_BINARY = 29;
+	int OP_BINARY = 31;
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.TTA <em>TTA</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>TTA</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.TTA
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Design <em>Design</em>}'.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Design</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Design
 	 * @generated
 	 */
-	EClass getTTA();
+	EClass getDesign();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.TTA#getName <em>Name</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Name</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.TTA#getName()
-	 * @see #getTTA()
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.HwFifo <em>Hw Fifo</em>}'.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Hw Fifo</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.HwFifo
 	 * @generated
 	 */
-	EAttribute getTTA_Name();
+	EClass getHwFifo();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.tta.architecture.TTA#getGcu <em>Gcu</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Processor <em>Processor</em>}'.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Processor</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Processor
+	 * @generated
+	 */
+	EClass getProcessor();
+
+	/**
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.tta.architecture.Processor#getGcu <em>Gcu</em>}'.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the containment reference '<em>Gcu</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.TTA#getGcu()
-	 * @see #getTTA()
+	 * @see net.sf.orcc.backends.tta.architecture.Processor#getGcu()
+	 * @see #getProcessor()
 	 * @generated
 	 */
-	EReference getTTA_Gcu();
+	EReference getProcessor_Gcu();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.tta.architecture.TTA#getBuses <em>Buses</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.tta.architecture.Processor#getBuses <em>Buses</em>}'.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the containment reference list '<em>Buses</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.TTA#getBuses()
-	 * @see #getTTA()
+	 * @see net.sf.orcc.backends.tta.architecture.Processor#getBuses()
+	 * @see #getProcessor()
 	 * @generated
 	 */
-	EReference getTTA_Buses();
+	EReference getProcessor_Buses();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.tta.architecture.TTA#getBridges <em>Bridges</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.tta.architecture.Processor#getBridges <em>Bridges</em>}'.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the containment reference list '<em>Bridges</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.TTA#getBridges()
-	 * @see #getTTA()
+	 * @see net.sf.orcc.backends.tta.architecture.Processor#getBridges()
+	 * @see #getProcessor()
 	 * @generated
 	 */
-	EReference getTTA_Bridges();
+	EReference getProcessor_Bridges();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.tta.architecture.TTA#getSockets <em>Sockets</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.tta.architecture.Processor#getSockets <em>Sockets</em>}'.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the containment reference list '<em>Sockets</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.TTA#getSockets()
-	 * @see #getTTA()
+	 * @see net.sf.orcc.backends.tta.architecture.Processor#getSockets()
+	 * @see #getProcessor()
 	 * @generated
 	 */
-	EReference getTTA_Sockets();
+	EReference getProcessor_Sockets();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.tta.architecture.TTA#getFunctionUnits <em>Function Units</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.tta.architecture.Processor#getFunctionUnits <em>Function Units</em>}'.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the containment reference list '<em>Function Units</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.TTA#getFunctionUnits()
-	 * @see #getTTA()
+	 * @see net.sf.orcc.backends.tta.architecture.Processor#getFunctionUnits()
+	 * @see #getProcessor()
 	 * @generated
 	 */
-	EReference getTTA_FunctionUnits();
+	EReference getProcessor_FunctionUnits();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.tta.architecture.TTA#getRegisterFiles <em>Register Files</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.tta.architecture.Processor#getRegisterFiles <em>Register Files</em>}'.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the containment reference list '<em>Register Files</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.TTA#getRegisterFiles()
-	 * @see #getTTA()
+	 * @see net.sf.orcc.backends.tta.architecture.Processor#getRegisterFiles()
+	 * @see #getProcessor()
 	 * @generated
 	 */
-	EReference getTTA_RegisterFiles();
+	EReference getProcessor_RegisterFiles();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.tta.architecture.TTA#getProgram <em>Program</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.tta.architecture.Processor#getProgram <em>Program</em>}'.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the containment reference '<em>Program</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.TTA#getProgram()
-	 * @see #getTTA()
+	 * @see net.sf.orcc.backends.tta.architecture.Processor#getProgram()
+	 * @see #getProcessor()
 	 * @generated
 	 */
-	EReference getTTA_Program();
+	EReference getProcessor_Program();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.tta.architecture.TTA#getData <em>Data</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.tta.architecture.Processor#getData <em>Data</em>}'.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the containment reference '<em>Data</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.TTA#getData()
-	 * @see #getTTA()
+	 * @see net.sf.orcc.backends.tta.architecture.Processor#getData()
+	 * @see #getProcessor()
 	 * @generated
 	 */
-	EReference getTTA_Data();
+	EReference getProcessor_Data();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.tta.architecture.TTA#getHardwareDatabase <em>Hardware Database</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Hardware Database</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.TTA#getHardwareDatabase()
-	 * @see #getTTA()
+	 * Returns the meta object for the containment reference list '
+	 * {@link net.sf.orcc.backends.tta.architecture.Processor#getHardwareDatabase
+	 * <em>Hardware Database</em>}'. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
+	 * @return the meta object for the containment reference list '
+	 *         <em>Hardware Database</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Processor#getHardwareDatabase()
+	 * @see #getProcessor()
 	 * @generated
 	 */
-	EReference getTTA_HardwareDatabase();
+	EReference getProcessor_HardwareDatabase();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Bus <em>Bus</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for class '
+	 * {@link net.sf.orcc.backends.tta.architecture.Bus <em>Bus</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for class '<em>Bus</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Bus
 	 * @generated
@@ -1451,8 +1524,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Bus#getName <em>Name</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Name</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Bus#getName()
 	 * @see #getBus()
@@ -1462,8 +1534,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Bus#getWidth <em>Width</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Width</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Bus#getWidth()
 	 * @see #getBus()
@@ -1473,8 +1544,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.tta.architecture.Bus#getGuards <em>Guards</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the containment reference list '<em>Guards</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Bus#getGuards()
 	 * @see #getBus()
@@ -1484,8 +1554,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.tta.architecture.Bus#getSegments <em>Segments</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the containment reference list '<em>Segments</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Bus#getSegments()
 	 * @see #getBus()
@@ -1495,8 +1564,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.tta.architecture.Bus#getShortImmediate <em>Short Immediate</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the containment reference '<em>Short Immediate</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Bus#getShortImmediate()
 	 * @see #getBus()
@@ -1506,8 +1574,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Bridge <em>Bridge</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Bridge</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Bridge
 	 * @generated
@@ -1516,8 +1583,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.Bridge#getInputBus <em>Input Bus</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the reference '<em>Input Bus</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Bridge#getInputBus()
 	 * @see #getBridge()
@@ -1527,8 +1593,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.Bridge#getOutputBus <em>Output Bus</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the reference '<em>Output Bus</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Bridge#getOutputBus()
 	 * @see #getBridge()
@@ -1538,8 +1603,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Segment <em>Segment</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Segment</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Segment
 	 * @generated
@@ -1548,8 +1612,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Segment#getName <em>Name</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Name</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Segment#getName()
 	 * @see #getSegment()
@@ -1558,9 +1621,11 @@ public interface ArchitecturePackage extends EPackage {
 	EAttribute getSegment_Name();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.GlobalControlUnit <em>Global Control Unit</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for class '
+	 * {@link net.sf.orcc.backends.tta.architecture.GlobalControlUnit
+	 * <em>Global Control Unit</em>}'. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
 	 * @return the meta object for class '<em>Global Control Unit</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.GlobalControlUnit
 	 * @generated
@@ -1569,8 +1634,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getPorts <em>Ports</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the containment reference list '<em>Ports</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getPorts()
 	 * @see #getGlobalControlUnit()
@@ -1580,8 +1644,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getReturnAddress <em>Return Address</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the containment reference '<em>Return Address</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getReturnAddress()
 	 * @see #getGlobalControlUnit()
@@ -1591,8 +1654,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getAddressSpace <em>Address Space</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the reference '<em>Address Space</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getAddressSpace()
 	 * @see #getGlobalControlUnit()
@@ -1602,8 +1664,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getOperations <em>Operations</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the containment reference list '<em>Operations</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getOperations()
 	 * @see #getGlobalControlUnit()
@@ -1613,8 +1674,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getDelaySlots <em>Delay Slots</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Delay Slots</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getDelaySlots()
 	 * @see #getGlobalControlUnit()
@@ -1624,8 +1684,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getGuardLatency <em>Guard Latency</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Guard Latency</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getGuardLatency()
 	 * @see #getGlobalControlUnit()
@@ -1635,8 +1694,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.FunctionUnit <em>Function Unit</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Function Unit</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.FunctionUnit
 	 * @generated
@@ -1645,8 +1703,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.FunctionUnit#getName <em>Name</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Name</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.FunctionUnit#getName()
 	 * @see #getFunctionUnit()
@@ -1656,8 +1713,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.tta.architecture.FunctionUnit#getOperations <em>Operations</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the containment reference list '<em>Operations</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.FunctionUnit#getOperations()
 	 * @see #getFunctionUnit()
@@ -1667,8 +1723,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.tta.architecture.FunctionUnit#getPorts <em>Ports</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the containment reference list '<em>Ports</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.FunctionUnit#getPorts()
 	 * @see #getFunctionUnit()
@@ -1678,8 +1733,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.FunctionUnit#getAddressSpace <em>Address Space</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the reference '<em>Address Space</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.FunctionUnit#getAddressSpace()
 	 * @see #getFunctionUnit()
@@ -1689,8 +1743,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.FunctionUnit#getImplementation <em>Implementation</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the reference '<em>Implementation</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.FunctionUnit#getImplementation()
 	 * @see #getFunctionUnit()
@@ -1700,8 +1753,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.RegisterFile <em>Register File</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Register File</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.RegisterFile
 	 * @generated
@@ -1710,8 +1762,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.RegisterFile#getName <em>Name</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Name</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.RegisterFile#getName()
 	 * @see #getRegisterFile()
@@ -1721,8 +1772,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.RegisterFile#getSize <em>Size</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Size</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.RegisterFile#getSize()
 	 * @see #getRegisterFile()
@@ -1732,8 +1782,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.RegisterFile#getWidth <em>Width</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Width</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.RegisterFile#getWidth()
 	 * @see #getRegisterFile()
@@ -1743,8 +1792,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.RegisterFile#getMaxReads <em>Max Reads</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Max Reads</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.RegisterFile#getMaxReads()
 	 * @see #getRegisterFile()
@@ -1754,8 +1802,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.RegisterFile#getMaxWrites <em>Max Writes</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Max Writes</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.RegisterFile#getMaxWrites()
 	 * @see #getRegisterFile()
@@ -1765,8 +1812,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.tta.architecture.RegisterFile#getPorts <em>Ports</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the containment reference list '<em>Ports</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.RegisterFile#getPorts()
 	 * @see #getRegisterFile()
@@ -1776,8 +1822,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.RegisterFile#getImplementation <em>Implementation</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the reference '<em>Implementation</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.RegisterFile#getImplementation()
 	 * @see #getRegisterFile()
@@ -1786,9 +1831,10 @@ public interface ArchitecturePackage extends EPackage {
 	EReference getRegisterFile_Implementation();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Port <em>Port</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for class '
+	 * {@link net.sf.orcc.backends.tta.architecture.Port <em>Port</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for class '<em>Port</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Port
 	 * @generated
@@ -1797,8 +1843,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Port#getName <em>Name</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Name</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Port#getName()
 	 * @see #getPort()
@@ -1808,8 +1853,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.Port#getInputSocket <em>Input Socket</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the reference '<em>Input Socket</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Port#getInputSocket()
 	 * @see #getPort()
@@ -1819,8 +1863,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.Port#getOutputSocket <em>Output Socket</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the reference '<em>Output Socket</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Port#getOutputSocket()
 	 * @see #getPort()
@@ -1830,8 +1873,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Port#getWidth <em>Width</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Width</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Port#getWidth()
 	 * @see #getPort()
@@ -1841,8 +1883,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Port#isTrigger <em>Trigger</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Trigger</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Port#isTrigger()
 	 * @see #getPort()
@@ -1852,8 +1893,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Port#isOpcodeSelector <em>Opcode Selector</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Opcode Selector</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Port#isOpcodeSelector()
 	 * @see #getPort()
@@ -1863,8 +1903,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Socket <em>Socket</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Socket</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Socket
 	 * @generated
@@ -1873,8 +1912,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Socket#getName <em>Name</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Name</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Socket#getName()
 	 * @see #getSocket()
@@ -1883,10 +1921,13 @@ public interface ArchitecturePackage extends EPackage {
 	EAttribute getSocket_Name();
 
 	/**
-	 * Returns the meta object for the reference list '{@link net.sf.orcc.backends.tta.architecture.Socket#getConnectedSegments <em>Connected Segments</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference list '<em>Connected Segments</em>'.
+	 * Returns the meta object for the reference list '
+	 * {@link net.sf.orcc.backends.tta.architecture.Socket#getConnectedSegments
+	 * <em>Connected Segments</em>}'. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
+	 * @return the meta object for the reference list '
+	 *         <em>Connected Segments</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Socket#getConnectedSegments()
 	 * @see #getSocket()
 	 * @generated
@@ -1895,8 +1936,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Socket#getType <em>Type</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Type</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Socket#getType()
 	 * @see #getSocket()
@@ -1906,8 +1946,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Operation <em>Operation</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Operation</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Operation
 	 * @generated
@@ -1916,8 +1955,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Operation#getName <em>Name</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Name</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Operation#getName()
 	 * @see #getOperation()
@@ -1927,8 +1965,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the reference list '{@link net.sf.orcc.backends.tta.architecture.Operation#getPipeline <em>Pipeline</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the reference list '<em>Pipeline</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Operation#getPipeline()
 	 * @see #getOperation()
@@ -1938,8 +1975,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Operation#isControl <em>Control</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Control</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Operation#isControl()
 	 * @see #getOperation()
@@ -1949,8 +1985,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.AddressSpace <em>Address Space</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Address Space</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.AddressSpace
 	 * @generated
@@ -1959,8 +1994,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.AddressSpace#getName <em>Name</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Name</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.AddressSpace#getName()
 	 * @see #getAddressSpace()
@@ -1970,8 +2004,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.AddressSpace#getMinAddress <em>Min Address</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Min Address</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.AddressSpace#getMinAddress()
 	 * @see #getAddressSpace()
@@ -1981,8 +2014,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.AddressSpace#getMaxAddress <em>Max Address</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Max Address</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.AddressSpace#getMaxAddress()
 	 * @see #getAddressSpace()
@@ -1992,8 +2024,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.AddressSpace#getWidth <em>Width</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Width</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.AddressSpace#getWidth()
 	 * @see #getAddressSpace()
@@ -2002,9 +2033,10 @@ public interface ArchitecturePackage extends EPackage {
 	EAttribute getAddressSpace_Width();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Guard <em>Guard</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for class '
+	 * {@link net.sf.orcc.backends.tta.architecture.Guard <em>Guard</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for class '<em>Guard</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Guard
 	 * @generated
@@ -2013,8 +2045,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.ExprUnary <em>Expr Unary</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Expr Unary</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.ExprUnary
 	 * @generated
@@ -2023,8 +2054,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.ExprUnary#getOperator <em>Operator</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Operator</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.ExprUnary#getOperator()
 	 * @see #getExprUnary()
@@ -2034,8 +2064,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.ExprUnary#getTerm <em>Term</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the reference '<em>Term</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.ExprUnary#getTerm()
 	 * @see #getExprUnary()
@@ -2045,8 +2074,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.ExprBinary <em>Expr Binary</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Expr Binary</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.ExprBinary
 	 * @generated
@@ -2055,8 +2083,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.ExprBinary#getOperator <em>Operator</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Operator</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.ExprBinary#getOperator()
 	 * @see #getExprBinary()
@@ -2066,8 +2093,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.ExprBinary#getE1 <em>E1</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the reference '<em>E1</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.ExprBinary#getE1()
 	 * @see #getExprBinary()
@@ -2077,8 +2103,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.ExprBinary#getE2 <em>E2</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the reference '<em>E2</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.ExprBinary#getE2()
 	 * @see #getExprBinary()
@@ -2088,8 +2113,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.ExprTrue <em>Expr True</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Expr True</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.ExprTrue
 	 * @generated
@@ -2098,8 +2122,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.ExprFalse <em>Expr False</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Expr False</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.ExprFalse
 	 * @generated
@@ -2107,9 +2130,10 @@ public interface ArchitecturePackage extends EPackage {
 	EClass getExprFalse();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Term <em>Term</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for class '
+	 * {@link net.sf.orcc.backends.tta.architecture.Term <em>Term</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for class '<em>Term</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Term
 	 * @generated
@@ -2118,8 +2142,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.TermBool <em>Term Bool</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Term Bool</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.TermBool
 	 * @generated
@@ -2128,8 +2151,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.TermBool#getRegister <em>Register</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the reference '<em>Register</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.TermBool#getRegister()
 	 * @see #getTermBool()
@@ -2139,8 +2161,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.TermBool#getIndex <em>Index</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Index</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.TermBool#getIndex()
 	 * @see #getTermBool()
@@ -2150,8 +2171,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.TermUnit <em>Term Unit</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Term Unit</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.TermUnit
 	 * @generated
@@ -2160,8 +2180,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.TermUnit#getFunctionUnit <em>Function Unit</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the reference '<em>Function Unit</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.TermUnit#getFunctionUnit()
 	 * @see #getTermUnit()
@@ -2171,8 +2190,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.TermUnit#getPort <em>Port</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the reference '<em>Port</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.TermUnit#getPort()
 	 * @see #getTermUnit()
@@ -2182,8 +2200,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Implementation <em>Implementation</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Implementation</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Implementation
 	 * @generated
@@ -2192,8 +2209,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Implementation#getHdbFile <em>Hdb File</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Hdb File</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Implementation#getHdbFile()
 	 * @see #getImplementation()
@@ -2203,8 +2219,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Implementation#getId <em>Id</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Id</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Implementation#getId()
 	 * @see #getImplementation()
@@ -2214,8 +2229,8 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link java.util.Map.Entry <em>Port To Index Map Entry</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @return the meta object for class '<em>Port To Index Map Entry</em>'.
 	 * @see java.util.Map.Entry
 	 * @model keyType="net.sf.orcc.backends.tta.architecture.Port"
@@ -2226,8 +2241,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Key</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the reference '<em>Key</em>'.
 	 * @see java.util.Map.Entry
 	 * @see #getPortToIndexMapEntry()
@@ -2237,8 +2251,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link java.util.Map.Entry <em>Value</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Value</em>'.
 	 * @see java.util.Map.Entry
 	 * @see #getPortToIndexMapEntry()
@@ -2248,8 +2261,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Element <em>Element</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Element</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Element
 	 * @generated
@@ -2258,8 +2270,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Element#getStartCycle <em>Start Cycle</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Start Cycle</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Element#getStartCycle()
 	 * @see #getElement()
@@ -2269,8 +2280,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Element#getCycles <em>Cycles</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Cycles</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Element#getCycles()
 	 * @see #getElement()
@@ -2279,9 +2289,10 @@ public interface ArchitecturePackage extends EPackage {
 	EAttribute getElement_Cycles();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Reads <em>Reads</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for class '
+	 * {@link net.sf.orcc.backends.tta.architecture.Reads <em>Reads</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for class '<em>Reads</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Reads
 	 * @generated
@@ -2290,8 +2301,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.Reads#getPort <em>Port</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the reference '<em>Port</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Reads#getPort()
 	 * @see #getReads()
@@ -2301,8 +2311,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Writes <em>Writes</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Writes</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Writes
 	 * @generated
@@ -2311,8 +2320,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.Writes#getPort <em>Port</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the reference '<em>Port</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Writes#getPort()
 	 * @see #getWrites()
@@ -2322,8 +2330,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Resource <em>Resource</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Resource</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Resource
 	 * @generated
@@ -2332,8 +2339,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Resource#getName <em>Name</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Name</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Resource#getName()
 	 * @see #getResource()
@@ -2343,8 +2349,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.ShortImmediate <em>Short Immediate</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Short Immediate</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.ShortImmediate
 	 * @generated
@@ -2353,8 +2358,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.ShortImmediate#getExtension <em>Extension</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Extension</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.ShortImmediate#getExtension()
 	 * @see #getShortImmediate()
@@ -2364,8 +2368,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.ShortImmediate#getWidth <em>Width</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Width</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.ShortImmediate#getWidth()
 	 * @see #getShortImmediate()
@@ -2375,8 +2378,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for enum '{@link net.sf.orcc.backends.tta.architecture.SocketType <em>Socket Type</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for enum '<em>Socket Type</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.SocketType
 	 * @generated
@@ -2385,8 +2387,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for enum '{@link net.sf.orcc.backends.tta.architecture.Extension <em>Extension</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for enum '<em>Extension</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Extension
 	 * @generated
@@ -2395,8 +2396,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for enum '{@link net.sf.orcc.backends.tta.architecture.OpUnary <em>Op Unary</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for enum '<em>Op Unary</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.OpUnary
 	 * @generated
@@ -2405,8 +2405,7 @@ public interface ArchitecturePackage extends EPackage {
 
 	/**
 	 * Returns the meta object for enum '{@link net.sf.orcc.backends.tta.architecture.OpBinary <em>Op Binary</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for enum '<em>Op Binary</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.OpBinary
 	 * @generated
@@ -2414,121 +2413,135 @@ public interface ArchitecturePackage extends EPackage {
 	EEnum getOpBinary();
 
 	/**
-	 * Returns the factory that creates the instances of the model.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the factory that creates the instances of the model. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the factory that creates the instances of the model.
 	 * @generated
 	 */
 	ArchitectureFactory getArchitectureFactory();
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * Defines literals for the meta objects that represent
+	 * <!-- begin-user-doc --> Defines literals for the meta objects that
+	 * represent
 	 * <ul>
-	 *   <li>each class,</li>
-	 *   <li>each feature of each class,</li>
-	 *   <li>each enum,</li>
-	 *   <li>and each data type</li>
+	 * <li>each class,</li>
+	 * <li>each feature of each class,</li>
+	 * <li>each enum,</li>
+	 * <li>and each data type</li>
 	 * </ul>
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	interface Literals {
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.TTAImpl <em>TTA</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.backends.tta.architecture.impl.TTAImpl
-		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTTA()
+		 * The meta object literal for the '
+		 * {@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl
+		 * <em>Design</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+		 * -->
+		 * 
+		 * @see net.sf.orcc.backends.tta.architecture.impl.DesignImpl
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getDesign()
 		 * @generated
 		 */
-		EClass TTA = eINSTANCE.getTTA();
+		EClass DESIGN = eINSTANCE.getDesign();
 
 		/**
-		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * The meta object literal for the '
+		 * {@link net.sf.orcc.backends.tta.architecture.impl.HwFifoImpl
+		 * <em>Hw Fifo</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+		 * -->
+		 * 
+		 * @see net.sf.orcc.backends.tta.architecture.impl.HwFifoImpl
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getHwFifo()
 		 * @generated
 		 */
-		EAttribute TTA__NAME = eINSTANCE.getTTA_Name();
+		EClass HW_FIFO = eINSTANCE.getHwFifo();
+
+		/**
+		 * The meta object literal for the '
+		 * {@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl
+		 * <em>Processor</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+		 * -->
+		 * 
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getProcessor()
+		 * @generated
+		 */
+		EClass PROCESSOR = eINSTANCE.getProcessor();
 
 		/**
 		 * The meta object literal for the '<em><b>Gcu</b></em>' containment reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference TTA__GCU = eINSTANCE.getTTA_Gcu();
+		EReference PROCESSOR__GCU = eINSTANCE.getProcessor_Gcu();
 
 		/**
 		 * The meta object literal for the '<em><b>Buses</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference TTA__BUSES = eINSTANCE.getTTA_Buses();
+		EReference PROCESSOR__BUSES = eINSTANCE.getProcessor_Buses();
 
 		/**
 		 * The meta object literal for the '<em><b>Bridges</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference TTA__BRIDGES = eINSTANCE.getTTA_Bridges();
+		EReference PROCESSOR__BRIDGES = eINSTANCE.getProcessor_Bridges();
 
 		/**
 		 * The meta object literal for the '<em><b>Sockets</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference TTA__SOCKETS = eINSTANCE.getTTA_Sockets();
+		EReference PROCESSOR__SOCKETS = eINSTANCE.getProcessor_Sockets();
 
 		/**
 		 * The meta object literal for the '<em><b>Function Units</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @generated
 		 */
-		EReference TTA__FUNCTION_UNITS = eINSTANCE.getTTA_FunctionUnits();
+		EReference PROCESSOR__FUNCTION_UNITS = eINSTANCE
+				.getProcessor_FunctionUnits();
 
 		/**
 		 * The meta object literal for the '<em><b>Register Files</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @generated
 		 */
-		EReference TTA__REGISTER_FILES = eINSTANCE.getTTA_RegisterFiles();
+		EReference PROCESSOR__REGISTER_FILES = eINSTANCE
+				.getProcessor_RegisterFiles();
 
 		/**
 		 * The meta object literal for the '<em><b>Program</b></em>' containment reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference TTA__PROGRAM = eINSTANCE.getTTA_Program();
+		EReference PROCESSOR__PROGRAM = eINSTANCE.getProcessor_Program();
 
 		/**
 		 * The meta object literal for the '<em><b>Data</b></em>' containment reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference TTA__DATA = eINSTANCE.getTTA_Data();
+		EReference PROCESSOR__DATA = eINSTANCE.getProcessor_Data();
 
 		/**
 		 * The meta object literal for the '<em><b>Hardware Database</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @generated
 		 */
-		EReference TTA__HARDWARE_DATABASE = eINSTANCE.getTTA_HardwareDatabase();
+		EReference PROCESSOR__HARDWARE_DATABASE = eINSTANCE
+				.getProcessor_HardwareDatabase();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.BusImpl <em>Bus</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.backends.tta.architecture.impl.BusImpl
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getBus()
 		 * @generated
@@ -2537,48 +2550,47 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute BUS__NAME = eINSTANCE.getBus_Name();
 
 		/**
 		 * The meta object literal for the '<em><b>Width</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute BUS__WIDTH = eINSTANCE.getBus_Width();
 
 		/**
 		 * The meta object literal for the '<em><b>Guards</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference BUS__GUARDS = eINSTANCE.getBus_Guards();
 
 		/**
 		 * The meta object literal for the '<em><b>Segments</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @generated
 		 */
 		EReference BUS__SEGMENTS = eINSTANCE.getBus_Segments();
 
 		/**
 		 * The meta object literal for the '<em><b>Short Immediate</b></em>' containment reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @generated
 		 */
 		EReference BUS__SHORT_IMMEDIATE = eINSTANCE.getBus_ShortImmediate();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.BridgeImpl <em>Bridge</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * The meta object literal for the '
+		 * {@link net.sf.orcc.backends.tta.architecture.impl.BridgeImpl
+		 * <em>Bridge</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+		 * -->
+		 * 
 		 * @see net.sf.orcc.backends.tta.architecture.impl.BridgeImpl
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getBridge()
 		 * @generated
@@ -2587,24 +2599,24 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Input Bus</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference BRIDGE__INPUT_BUS = eINSTANCE.getBridge_InputBus();
 
 		/**
 		 * The meta object literal for the '<em><b>Output Bus</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference BRIDGE__OUTPUT_BUS = eINSTANCE.getBridge_OutputBus();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.SegmentImpl <em>Segment</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * The meta object literal for the '
+		 * {@link net.sf.orcc.backends.tta.architecture.impl.SegmentImpl
+		 * <em>Segment</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+		 * -->
+		 * 
 		 * @see net.sf.orcc.backends.tta.architecture.impl.SegmentImpl
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getSegment()
 		 * @generated
@@ -2613,16 +2625,15 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute SEGMENT__NAME = eINSTANCE.getSegment_Name();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.GlobalControlUnitImpl <em>Global Control Unit</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @see net.sf.orcc.backends.tta.architecture.impl.GlobalControlUnitImpl
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getGlobalControlUnit()
 		 * @generated
@@ -2631,8 +2642,7 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Ports</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference GLOBAL_CONTROL_UNIT__PORTS = eINSTANCE
@@ -2640,8 +2650,8 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Return Address</b></em>' containment reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @generated
 		 */
 		EReference GLOBAL_CONTROL_UNIT__RETURN_ADDRESS = eINSTANCE
@@ -2649,8 +2659,7 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Address Space</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference GLOBAL_CONTROL_UNIT__ADDRESS_SPACE = eINSTANCE
@@ -2658,8 +2667,8 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Operations</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @generated
 		 */
 		EReference GLOBAL_CONTROL_UNIT__OPERATIONS = eINSTANCE
@@ -2667,8 +2676,7 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Delay Slots</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute GLOBAL_CONTROL_UNIT__DELAY_SLOTS = eINSTANCE
@@ -2676,8 +2684,7 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Guard Latency</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute GLOBAL_CONTROL_UNIT__GUARD_LATENCY = eINSTANCE
@@ -2685,8 +2692,8 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.FunctionUnitImpl <em>Function Unit</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @see net.sf.orcc.backends.tta.architecture.impl.FunctionUnitImpl
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getFunctionUnit()
 		 * @generated
@@ -2695,16 +2702,15 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute FUNCTION_UNIT__NAME = eINSTANCE.getFunctionUnit_Name();
 
 		/**
 		 * The meta object literal for the '<em><b>Operations</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @generated
 		 */
 		EReference FUNCTION_UNIT__OPERATIONS = eINSTANCE
@@ -2712,16 +2718,14 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Ports</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference FUNCTION_UNIT__PORTS = eINSTANCE.getFunctionUnit_Ports();
 
 		/**
 		 * The meta object literal for the '<em><b>Address Space</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference FUNCTION_UNIT__ADDRESS_SPACE = eINSTANCE
@@ -2729,8 +2733,7 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Implementation</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference FUNCTION_UNIT__IMPLEMENTATION = eINSTANCE
@@ -2738,8 +2741,8 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.RegisterFileImpl <em>Register File</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @see net.sf.orcc.backends.tta.architecture.impl.RegisterFileImpl
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getRegisterFile()
 		 * @generated
@@ -2748,32 +2751,28 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute REGISTER_FILE__NAME = eINSTANCE.getRegisterFile_Name();
 
 		/**
 		 * The meta object literal for the '<em><b>Size</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute REGISTER_FILE__SIZE = eINSTANCE.getRegisterFile_Size();
 
 		/**
 		 * The meta object literal for the '<em><b>Width</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute REGISTER_FILE__WIDTH = eINSTANCE.getRegisterFile_Width();
 
 		/**
 		 * The meta object literal for the '<em><b>Max Reads</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute REGISTER_FILE__MAX_READS = eINSTANCE
@@ -2781,8 +2780,7 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Max Writes</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute REGISTER_FILE__MAX_WRITES = eINSTANCE
@@ -2790,16 +2788,14 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Ports</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference REGISTER_FILE__PORTS = eINSTANCE.getRegisterFile_Ports();
 
 		/**
 		 * The meta object literal for the '<em><b>Implementation</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference REGISTER_FILE__IMPLEMENTATION = eINSTANCE
@@ -2807,8 +2803,7 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.PortImpl <em>Port</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.backends.tta.architecture.impl.PortImpl
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getPort()
 		 * @generated
@@ -2817,56 +2812,52 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute PORT__NAME = eINSTANCE.getPort_Name();
 
 		/**
 		 * The meta object literal for the '<em><b>Input Socket</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference PORT__INPUT_SOCKET = eINSTANCE.getPort_InputSocket();
 
 		/**
 		 * The meta object literal for the '<em><b>Output Socket</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference PORT__OUTPUT_SOCKET = eINSTANCE.getPort_OutputSocket();
 
 		/**
 		 * The meta object literal for the '<em><b>Width</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute PORT__WIDTH = eINSTANCE.getPort_Width();
 
 		/**
 		 * The meta object literal for the '<em><b>Trigger</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute PORT__TRIGGER = eINSTANCE.getPort_Trigger();
 
 		/**
 		 * The meta object literal for the '<em><b>Opcode Selector</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute PORT__OPCODE_SELECTOR = eINSTANCE.getPort_OpcodeSelector();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.SocketImpl <em>Socket</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * The meta object literal for the '
+		 * {@link net.sf.orcc.backends.tta.architecture.impl.SocketImpl
+		 * <em>Socket</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+		 * -->
+		 * 
 		 * @see net.sf.orcc.backends.tta.architecture.impl.SocketImpl
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getSocket()
 		 * @generated
@@ -2875,16 +2866,14 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute SOCKET__NAME = eINSTANCE.getSocket_Name();
 
 		/**
 		 * The meta object literal for the '<em><b>Connected Segments</b></em>' reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference SOCKET__CONNECTED_SEGMENTS = eINSTANCE
@@ -2892,16 +2881,17 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Type</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute SOCKET__TYPE = eINSTANCE.getSocket_Type();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.OperationImpl <em>Operation</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * The meta object literal for the '
+		 * {@link net.sf.orcc.backends.tta.architecture.impl.OperationImpl
+		 * <em>Operation</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+		 * -->
+		 * 
 		 * @see net.sf.orcc.backends.tta.architecture.impl.OperationImpl
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getOperation()
 		 * @generated
@@ -2910,32 +2900,29 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute OPERATION__NAME = eINSTANCE.getOperation_Name();
 
 		/**
 		 * The meta object literal for the '<em><b>Pipeline</b></em>' reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference OPERATION__PIPELINE = eINSTANCE.getOperation_Pipeline();
 
 		/**
 		 * The meta object literal for the '<em><b>Control</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute OPERATION__CONTROL = eINSTANCE.getOperation_Control();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.AddressSpaceImpl <em>Address Space</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @see net.sf.orcc.backends.tta.architecture.impl.AddressSpaceImpl
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getAddressSpace()
 		 * @generated
@@ -2944,16 +2931,14 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute ADDRESS_SPACE__NAME = eINSTANCE.getAddressSpace_Name();
 
 		/**
 		 * The meta object literal for the '<em><b>Min Address</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute ADDRESS_SPACE__MIN_ADDRESS = eINSTANCE
@@ -2961,8 +2946,7 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Max Address</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute ADDRESS_SPACE__MAX_ADDRESS = eINSTANCE
@@ -2970,16 +2954,14 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Width</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute ADDRESS_SPACE__WIDTH = eINSTANCE.getAddressSpace_Width();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.Guard <em>Guard</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.backends.tta.architecture.Guard
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getGuard()
 		 * @generated
@@ -2988,8 +2970,8 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.ExprUnaryImpl <em>Expr Unary</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ExprUnaryImpl
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprUnary()
 		 * @generated
@@ -2998,24 +2980,22 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Operator</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute EXPR_UNARY__OPERATOR = eINSTANCE.getExprUnary_Operator();
 
 		/**
 		 * The meta object literal for the '<em><b>Term</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference EXPR_UNARY__TERM = eINSTANCE.getExprUnary_Term();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.ExprBinaryImpl <em>Expr Binary</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ExprBinaryImpl
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprBinary()
 		 * @generated
@@ -3024,32 +3004,31 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Operator</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute EXPR_BINARY__OPERATOR = eINSTANCE.getExprBinary_Operator();
 
 		/**
 		 * The meta object literal for the '<em><b>E1</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference EXPR_BINARY__E1 = eINSTANCE.getExprBinary_E1();
 
 		/**
 		 * The meta object literal for the '<em><b>E2</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference EXPR_BINARY__E2 = eINSTANCE.getExprBinary_E2();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.ExprTrueImpl <em>Expr True</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * The meta object literal for the '
+		 * {@link net.sf.orcc.backends.tta.architecture.impl.ExprTrueImpl
+		 * <em>Expr True</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+		 * -->
+		 * 
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ExprTrueImpl
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprTrue()
 		 * @generated
@@ -3058,8 +3037,8 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.ExprFalseImpl <em>Expr False</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ExprFalseImpl
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprFalse()
 		 * @generated
@@ -3068,8 +3047,7 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.Term <em>Term</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.backends.tta.architecture.Term
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTerm()
 		 * @generated
@@ -3077,9 +3055,11 @@ public interface ArchitecturePackage extends EPackage {
 		EClass TERM = eINSTANCE.getTerm();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.TermBoolImpl <em>Term Bool</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * The meta object literal for the '
+		 * {@link net.sf.orcc.backends.tta.architecture.impl.TermBoolImpl
+		 * <em>Term Bool</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+		 * -->
+		 * 
 		 * @see net.sf.orcc.backends.tta.architecture.impl.TermBoolImpl
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTermBool()
 		 * @generated
@@ -3088,24 +3068,24 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Register</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference TERM_BOOL__REGISTER = eINSTANCE.getTermBool_Register();
 
 		/**
 		 * The meta object literal for the '<em><b>Index</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute TERM_BOOL__INDEX = eINSTANCE.getTermBool_Index();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.TermUnitImpl <em>Term Unit</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * The meta object literal for the '
+		 * {@link net.sf.orcc.backends.tta.architecture.impl.TermUnitImpl
+		 * <em>Term Unit</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+		 * -->
+		 * 
 		 * @see net.sf.orcc.backends.tta.architecture.impl.TermUnitImpl
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTermUnit()
 		 * @generated
@@ -3114,8 +3094,7 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Function Unit</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference TERM_UNIT__FUNCTION_UNIT = eINSTANCE
@@ -3123,16 +3102,15 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Port</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference TERM_UNIT__PORT = eINSTANCE.getTermUnit_Port();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.ImplementationImpl <em>Implementation</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ImplementationImpl
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getImplementation()
 		 * @generated
@@ -3141,8 +3119,7 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Hdb File</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute IMPLEMENTATION__HDB_FILE = eINSTANCE
@@ -3150,16 +3127,17 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Id</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute IMPLEMENTATION__ID = eINSTANCE.getImplementation_Id();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.Element <em>Element</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * The meta object literal for the '
+		 * {@link net.sf.orcc.backends.tta.architecture.Element
+		 * <em>Element</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+		 * -->
+		 * 
 		 * @see net.sf.orcc.backends.tta.architecture.Element
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getElement()
 		 * @generated
@@ -3168,24 +3146,21 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Start Cycle</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute ELEMENT__START_CYCLE = eINSTANCE.getElement_StartCycle();
 
 		/**
 		 * The meta object literal for the '<em><b>Cycles</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute ELEMENT__CYCLES = eINSTANCE.getElement_Cycles();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.ReadsImpl <em>Reads</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ReadsImpl
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getReads()
 		 * @generated
@@ -3194,16 +3169,17 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Port</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference READS__PORT = eINSTANCE.getReads_Port();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.WritesImpl <em>Writes</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * The meta object literal for the '
+		 * {@link net.sf.orcc.backends.tta.architecture.impl.WritesImpl
+		 * <em>Writes</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+		 * -->
+		 * 
 		 * @see net.sf.orcc.backends.tta.architecture.impl.WritesImpl
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getWrites()
 		 * @generated
@@ -3212,16 +3188,17 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Port</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference WRITES__PORT = eINSTANCE.getWrites_Port();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.ResourceImpl <em>Resource</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * The meta object literal for the '
+		 * {@link net.sf.orcc.backends.tta.architecture.impl.ResourceImpl
+		 * <em>Resource</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+		 * -->
+		 * 
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ResourceImpl
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getResource()
 		 * @generated
@@ -3230,8 +3207,7 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute RESOURCE__NAME = eINSTANCE.getResource_Name();
@@ -3248,8 +3224,7 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Key</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference PORT_TO_INDEX_MAP_ENTRY__KEY = eINSTANCE
@@ -3257,8 +3232,7 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Value</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute PORT_TO_INDEX_MAP_ENTRY__VALUE = eINSTANCE
@@ -3266,8 +3240,8 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.ShortImmediateImpl <em>Short Immediate</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ShortImmediateImpl
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getShortImmediate()
 		 * @generated
@@ -3276,8 +3250,7 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Extension</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute SHORT_IMMEDIATE__EXTENSION = eINSTANCE
@@ -3285,16 +3258,15 @@ public interface ArchitecturePackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Width</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute SHORT_IMMEDIATE__WIDTH = eINSTANCE.getShortImmediate_Width();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.SocketType <em>Socket Type</em>}' enum.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @see net.sf.orcc.backends.tta.architecture.SocketType
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getSocketType()
 		 * @generated
@@ -3302,9 +3274,11 @@ public interface ArchitecturePackage extends EPackage {
 		EEnum SOCKET_TYPE = eINSTANCE.getSocketType();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.Extension <em>Extension</em>}' enum.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * The meta object literal for the '
+		 * {@link net.sf.orcc.backends.tta.architecture.Extension
+		 * <em>Extension</em>}' enum. <!-- begin-user-doc --> <!-- end-user-doc
+		 * -->
+		 * 
 		 * @see net.sf.orcc.backends.tta.architecture.Extension
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExtension()
 		 * @generated
@@ -3312,9 +3286,11 @@ public interface ArchitecturePackage extends EPackage {
 		EEnum EXTENSION = eINSTANCE.getExtension();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.OpUnary <em>Op Unary</em>}' enum.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * The meta object literal for the '
+		 * {@link net.sf.orcc.backends.tta.architecture.OpUnary
+		 * <em>Op Unary</em>}' enum. <!-- begin-user-doc --> <!-- end-user-doc
+		 * -->
+		 * 
 		 * @see net.sf.orcc.backends.tta.architecture.OpUnary
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getOpUnary()
 		 * @generated
@@ -3322,9 +3298,11 @@ public interface ArchitecturePackage extends EPackage {
 		EEnum OP_UNARY = eINSTANCE.getOpUnary();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.OpBinary <em>Op Binary</em>}' enum.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * The meta object literal for the '
+		 * {@link net.sf.orcc.backends.tta.architecture.OpBinary
+		 * <em>Op Binary</em>}' enum. <!-- begin-user-doc --> <!-- end-user-doc
+		 * -->
+		 * 
 		 * @see net.sf.orcc.backends.tta.architecture.OpBinary
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getOpBinary()
 		 * @generated
@@ -3333,4 +3311,4 @@ public interface ArchitecturePackage extends EPackage {
 
 	}
 
-} //ArchitecturePackage
+} // ArchitecturePackage

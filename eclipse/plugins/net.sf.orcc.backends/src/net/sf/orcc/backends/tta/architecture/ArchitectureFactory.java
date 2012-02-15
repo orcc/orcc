@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.backends.tta.architecture;
 
-import net.sf.orcc.df.Instance;
-
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EFactory;
 
@@ -54,6 +52,33 @@ public interface ArchitectureFactory extends EFactory {
 	 */
 	ArchitectureFactory eINSTANCE = net.sf.orcc.backends.tta.architecture.impl.ArchitectureFactoryImpl
 			.init();
+
+	/**
+	 * Returns a new object of class '<em>Design</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Design</em>'.
+	 * @generated
+	 */
+	Design createDesign();
+
+	/**
+	 * Returns a new object of class '<em>Hw Fifo</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Hw Fifo</em>'.
+	 * @generated
+	 */
+	HwFifo createHwFifo();
+
+	/**
+	 * Returns a new object of class '<em>Processor</em>'.
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
+	 * @return a new object of class '<em>Processor</em>'.
+	 * @generated
+	 */
+	Processor createProcessor();
 
 	/**
 	 * Returns a new object of class '<em>Address Space</em>'. <!--
@@ -89,7 +114,7 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the name of the ALU
 	 * @return a new ALU unit
 	 */
-	FunctionUnit createAluUnit(TTA tta, String name);
+	FunctionUnit createAluUnit(Processor tta, String name);
 
 	/**
 	 * Returns a new object of class '<em>Bridge</em>'.
@@ -212,7 +237,7 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the name of the function unit
 	 * @return a simple FunctionUnit
 	 */
-	FunctionUnit createFunctionUnit(TTA tta, String name,
+	FunctionUnit createFunctionUnit(Processor tta, String name,
 			Implementation implementation);
 
 	/**
@@ -229,8 +254,9 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the names of 2-input/1-output operations
 	 * @return a simple FunctionUnit
 	 */
-	FunctionUnit createFunctionUnit(TTA tta, String name, String[] operations1,
-			String[] operations2, Implementation implementation);
+	FunctionUnit createFunctionUnit(Processor tta, String name,
+			String[] operations1, String[] operations2,
+			Implementation implementation);
 
 	/**
 	 * Returns a new object of class '<em>Global Control Unit</em>'. <!--
@@ -260,7 +286,7 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the containing TTA processor
 	 * @return a simple GlobalControlUnit
 	 */
-	GlobalControlUnit createGlobalControlUnitDefault(TTA tta);
+	GlobalControlUnit createGlobalControlUnitDefault(Processor tta);
 
 	/**
 	 * Returns a new list of guards corresponding to default TTA processor
@@ -299,7 +325,7 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the containing TTA processor
 	 * @return an LSU with the given parameters
 	 */
-	FunctionUnit createLSU(TTA tta, Implementation implementation);
+	FunctionUnit createLSU(Processor tta, Implementation implementation);
 
 	/**
 	 * Return a new multiplier unit with the given parameters
@@ -308,7 +334,7 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the containing TTA processor
 	 * @return a multiplier with the given parameters
 	 */
-	FunctionUnit createMultiplier(TTA tta, Implementation implementation);
+	FunctionUnit createMultiplier(Processor tta, Implementation implementation);
 
 	/**
 	 * Returns a new object of class '<em>Operation</em>'.
@@ -447,8 +473,8 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the width of the register file
 	 * @return a new simple RegisterFile
 	 */
-	RegisterFile createRegisterFileDefault(TTA tta, String name, int size,
-			int width, Implementation implementation);
+	RegisterFile createRegisterFileDefault(Processor tta, String name,
+			int size, int width, Implementation implementation);
 
 	/**
 	 * Returns a new object of class '<em>Resource</em>'.
@@ -542,7 +568,7 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the unit's index
 	 * @return a new input Stream unit
 	 */
-	FunctionUnit createStreamInput(TTA tta, int index);
+	FunctionUnit createStreamInput(Processor tta, int index);
 
 	/**
 	 * Return a new output Stream unit
@@ -553,7 +579,7 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the unit's index
 	 * @return a new output Stream unit
 	 */
-	FunctionUnit createStreamOutput(TTA tta, int index);
+	FunctionUnit createStreamOutput(Processor tta, int index);
 
 	/**
 	 * Returns a new object of class '<em>Term Bool</em>'.
@@ -598,24 +624,6 @@ public interface ArchitectureFactory extends EFactory {
 	TermUnit createTermUnit(FunctionUnit unit, Port port);
 
 	/**
-	 * Returns a new object of class '<em>TTA</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>TTA</em>'.
-	 * @generated
-	 */
-	TTA createTTA();
-
-	/**
-	 * Returns a new named TTA processor
-	 * 
-	 * @param name
-	 *            the name of the TTA processor
-	 * @return a name TTA
-	 */
-	TTA createTTA(String name);
-
-	/**
 	 * Returns a simple TTA processor corresponding to default TTA processor
 	 * include in the TCE tools
 	 * 
@@ -629,10 +637,8 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the number of alu contained in the TTA
 	 * @return a simple TTA
 	 */
-	TTA createTTADefault(String name, int busNb, int registerNb, int aluNb);
-
-	TTA createTTASpecialized(String name, Instance instance, int busNb,
-			int registerNb, int aluNb);
+	Processor createProcessor(String name, int busNb, int registerNb,
+			int aluNb, int inputNb, int outputNb, int ramSize);
 
 	/**
 	 * Returns a new object of class '<em>Writes</em>'.

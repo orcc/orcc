@@ -35,6 +35,7 @@ import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.Bridge;
 import net.sf.orcc.backends.tta.architecture.Bus;
+import net.sf.orcc.backends.tta.architecture.Design;
 import net.sf.orcc.backends.tta.architecture.Element;
 import net.sf.orcc.backends.tta.architecture.ExprBinary;
 import net.sf.orcc.backends.tta.architecture.ExprFalse;
@@ -44,11 +45,13 @@ import net.sf.orcc.backends.tta.architecture.Extension;
 import net.sf.orcc.backends.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
 import net.sf.orcc.backends.tta.architecture.Guard;
+import net.sf.orcc.backends.tta.architecture.HwFifo;
 import net.sf.orcc.backends.tta.architecture.Implementation;
 import net.sf.orcc.backends.tta.architecture.OpBinary;
 import net.sf.orcc.backends.tta.architecture.OpUnary;
 import net.sf.orcc.backends.tta.architecture.Operation;
 import net.sf.orcc.backends.tta.architecture.Port;
+import net.sf.orcc.backends.tta.architecture.Processor;
 import net.sf.orcc.backends.tta.architecture.Reads;
 import net.sf.orcc.backends.tta.architecture.RegisterFile;
 import net.sf.orcc.backends.tta.architecture.Resource;
@@ -61,8 +64,6 @@ import net.sf.orcc.backends.tta.architecture.Term;
 import net.sf.orcc.backends.tta.architecture.TermBool;
 import net.sf.orcc.backends.tta.architecture.TermUnit;
 import net.sf.orcc.backends.tta.architecture.Writes;
-import net.sf.orcc.backends.tta.architecture.util.ArchitectureMemoryStats;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.BasicEList;
@@ -181,11 +182,42 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	public Design createDesign() {
+		DesignImpl design = new DesignImpl();
+		return design;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public HwFifo createHwFifo() {
+		HwFifoImpl hwFifo = new HwFifoImpl();
+		return hwFifo;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Processor createProcessor() {
+		ProcessorImpl processor = new ProcessorImpl();
+		return processor;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
-		case ArchitecturePackage.TTA:
-			return createTTA();
+		case ArchitecturePackage.DESIGN:
+			return createDesign();
+		case ArchitecturePackage.HW_FIFO:
+			return createHwFifo();
+		case ArchitecturePackage.PROCESSOR:
+			return createProcessor();
 		case ArchitecturePackage.BUS:
 			return createBus();
 		case ArchitecturePackage.BRIDGE:
@@ -257,7 +289,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public FunctionUnit createAluUnit(TTA tta, String name) {
+	public FunctionUnit createAluUnit(Processor tta, String name) {
 		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
 		functionUnit.setName(name);
 		// Sockets
@@ -437,7 +469,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public FunctionUnit createFunctionUnit(TTA tta, String name,
+	public FunctionUnit createFunctionUnit(Processor tta, String name,
 			Implementation implementation) {
 		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
 		functionUnit.setName(name);
@@ -462,7 +494,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public FunctionUnit createFunctionUnit(TTA tta, String name,
+	public FunctionUnit createFunctionUnit(Processor tta, String name,
 			String[] operations1, String[] operations2,
 			Implementation implementation) {
 		FunctionUnit functionUnit = createFunctionUnit(tta, name,
@@ -505,7 +537,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public GlobalControlUnit createGlobalControlUnitDefault(TTA tta) {
+	public GlobalControlUnit createGlobalControlUnitDefault(Processor tta) {
 		GlobalControlUnit gcu = createGlobalControlUnit(3, 1);
 		gcu.setAddressSpace(tta.getProgram());
 
@@ -567,7 +599,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public FunctionUnit createLSU(TTA tta, Implementation implementation) {
+	public FunctionUnit createLSU(Processor tta, Implementation implementation) {
 		FunctionUnit LSU = createFunctionUnit(tta, "LSU", implementation);
 		// Operations
 		EList<Port> ports = LSU.getPorts();
@@ -588,7 +620,8 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public FunctionUnit createMultiplier(TTA tta, Implementation implementation) {
+	public FunctionUnit createMultiplier(Processor tta,
+			Implementation implementation) {
 		FunctionUnit multiplier = createFunctionUnit(tta, "Mul", implementation);
 		multiplier.getOperations().add(
 				createOperationMul("mul", multiplier.getPorts().get(0),
@@ -884,7 +917,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public RegisterFile createRegisterFileDefault(TTA tta, String name,
+	public RegisterFile createRegisterFileDefault(Processor tta, String name,
 			int size, int width, Implementation implementation) {
 		RegisterFile registerFile = createRegisterFile(name, size, width, 1, 1,
 				implementation);
@@ -990,7 +1023,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public FunctionUnit createStreamInput(TTA tta, int index) {
+	public FunctionUnit createStreamInput(Processor tta, int index) {
 		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
 		String name = "STREAM_IN_" + index;
 		functionUnit.setName(name);
@@ -1017,7 +1050,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public FunctionUnit createStreamOutput(TTA tta, int index) {
+	public FunctionUnit createStreamOutput(Processor tta, int index) {
 		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
 		String name = "STREAM_OUT_" + index;
 		functionUnit.setName(name);
@@ -1081,28 +1114,14 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return termUnit;
 	}
 
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public TTA createTTA() {
-		TTAImpl tta = new TTAImpl();
-		return tta;
-	}
-
 	@Override
-	public TTA createTTA(String name) {
-		TTAImpl tta = new TTAImpl();
+	public Processor createProcessor(String name, int busNb, int registerNb,
+			int aluNb, int inputNb, int outputNb, int ramSize) {
+		Processor tta = createProcessor();
 		tta.setName(name);
-		return tta;
-	}
-
-	@Override
-	public TTA createTTADefault(String name, int busNb, int registerNb,
-			int aluNb) {
-		TTA tta = createTTA(name);
 		// Address spaces
-		tta.setData(createAddressSpace("data", 8, 0, 1));
+		tta.setData(createAddressSpace("data", 8, 0,
+				quantizeUp(ramSize / 8 + 256)));
 		tta.setProgram(createAddressSpace("instructions", 8, 0, 60000));
 		// Buses
 		for (int i = 0; i < busNb; i++) {
@@ -1149,40 +1168,14 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		units.add(createFunctionUnit(tta, "And_ior_xor", null, aixOperations2,
 				logicImpl));
 		tta.getHardwareDatabase().add(logicImpl);
-		return tta;
-	}
-
-	@Override
-	public TTA createTTASpecialized(String name, Instance instance, int busNb,
-			int registerNb, int aluNb) {
-		// Create default TTA processor
-		TTA tta = createTTADefault(name, busNb, registerNb, aluNb);
-		if (instance.isActor()) {
-			// Add needed stream units
-			for (int i = 0; i < instance.getActor().getInputs().size(); i++) {
-				tta.getFunctionUnits().add(createStreamInput(tta, i));
-			}
-			for (int i = 0; i < instance.getActor().getOutputs().size(); i++) {
-				tta.getFunctionUnits().add(createStreamOutput(tta, i));
-			}
-			// Set ram size = memory estimation / word size + error margin
-			int ramSize = ArchitectureMemoryStats
-					.computeNeededMemorySize(instance.getActor());
-			if (ramSize == 0) {
-				tta.getData().setMaxAddress(256);
-			} else {
-				tta.getData().setMaxAddress(quantizeUp(ramSize / 8 + 256));
-			}
-
-		} else if (instance.isBroadcast()) {
-			// Add needed stream units
-			tta.getFunctionUnits().add(createStreamInput(tta, 0));
-			for (int i = 0; i < instance.getBroadcast().getOutputs().size(); i++) {
-				tta.getFunctionUnits().add(createStreamOutput(tta, i));
-			}
-			// Set ram size = memory estimation / word size + error margin
-			tta.getData().setMaxAddress(64);
+		// * Stream-units
+		for (int i = 0; i < inputNb; i++) {
+			tta.getFunctionUnits().add(createStreamInput(tta, i));
 		}
+		for (int i = 0; i < outputNb; i++) {
+			tta.getFunctionUnits().add(createStreamOutput(tta, i));
+		}
+
 		return tta;
 	}
 

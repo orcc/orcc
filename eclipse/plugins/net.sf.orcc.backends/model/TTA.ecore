@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ecore:EPackage xmi:version="2.0"
-    xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="architecture"
-    nsURI="http://orcc.sf.net/backends/tta/architecture/TTA_architecture" nsPrefix="net.sf.orcc.backends.tta.architecture">
-  <eClassifiers xsi:type="ecore:EClass" name="TTA">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="architecture" nsURI="http://orcc.sf.net/backends/tta/architecture/TTA_architecture"
+    nsPrefix="net.sf.orcc.backends.tta.architecture">
+  <eClassifiers xsi:type="ecore:EClass" name="Design" eSuperTypes="../../net.sf.dftools.graph/model/Graph.ecore#//Graph"/>
+  <eClassifiers xsi:type="ecore:EClass" name="HwFifo" eSuperTypes="../../net.sf.dftools.graph/model/Graph.ecore#//Edge"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Processor" eSuperTypes="../../net.sf.dftools.graph/model/Graph.ecore#//Vertex">
     <eStructuralFeatures xsi:type="ecore:EReference" name="gcu" eType="#//GlobalControlUnit"
         containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="buses" upperBound="-1"

@@ -58,7 +58,8 @@ import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.backends.transformations.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transformations.ssa.CopyPropagator;
 import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
-import net.sf.orcc.backends.tta.architecture.TTA;
+import net.sf.orcc.backends.tta.architecture.Processor;
+import net.sf.orcc.backends.tta.architecture.util.ArchitectureMemoryStats;
 import net.sf.orcc.backends.tta.transformations.BroadcastTypeResizer;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.DfFactory;
@@ -309,9 +310,17 @@ public class TTABackendImpl extends AbstractBackend {
 	}
 
 	private void printProcessor(Instance instance, String instancePath) {
-		TTA simpleTTA = ArchitectureFactory.eINSTANCE.createTTASpecialized(
-				instance.getSimpleName(), instance, getBusNb(instance),
-				getRegNb(instance), getAluNb(instance));
+		int ramSize = instance.isActor() ? ArchitectureMemoryStats
+				.computeNeededMemorySize(instance.getActor()) : 1;
+		int inputNb = instance.isActor() ? instance.getActor().getInputs()
+				.size() : 1;
+		int outputNb = instance.isActor() ? instance.getActor().getOutputs()
+				.size() : instance.getBroadcast().getOutputs().size();
+
+		Processor tta = ArchitectureFactory.eINSTANCE.createProcessor(
+				instance.getSimpleName(), getBusNb(instance),
+				getRegNb(instance), getAluNb(instance), inputNb, outputNb,
+				ramSize);
 
 		CustomPrinter adfPrinter = new CustomPrinter(
 				"net/sf/orcc/backends/tta/TCE_Processor_ADF.stg");
@@ -319,9 +328,9 @@ public class TTABackendImpl extends AbstractBackend {
 				"net/sf/orcc/backends/tta/TCE_Processor_IDF.stg");
 
 		adfPrinter.print("processor_" + instance.getSimpleName() + ".adf",
-				instancePath, "printTTA", "tta", simpleTTA);
+				instancePath, "printTTA", "tta", tta);
 		idfPrinter.print("processor_" + instance.getSimpleName() + ".idf",
-				instancePath, "printTTA", "tta", simpleTTA);
+				instancePath, "printTTA", "tta", tta);
 	}
 
 	private void runPythonScript() throws OrccException {
