@@ -29,8 +29,6 @@ import net.sf.orcc.df.State;
 import net.sf.orcc.df.Tag;
 import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.Unit;
-import net.sf.orcc.df.WrapperString;
-import net.sf.orcc.df.WrapperXml;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.impl.IrPackageImpl;
 import net.sf.orcc.moc.MocPackage;
@@ -77,18 +75,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	private EClass broadcastEClass = null;
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass wrapperStringEClass = null;
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass wrapperXmlEClass = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -387,38 +373,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 */
 	public EClass getBroadcast() {
 		return broadcastEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getWrapperString() {
-		return wrapperStringEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getWrapperString_String() {
-		return (EAttribute) wrapperStringEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getWrapperXml() {
-		return wrapperXmlEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getWrapperXml_Xml() {
-		return (EAttribute) wrapperXmlEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -994,12 +948,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEReference(connectionEClass, CONNECTION__SOURCE_PORT);
 		createEReference(connectionEClass, CONNECTION__TARGET_PORT);
 
-		wrapperStringEClass = createEClass(WRAPPER_STRING);
-		createEAttribute(wrapperStringEClass, WRAPPER_STRING__STRING);
-
-		wrapperXmlEClass = createEClass(WRAPPER_XML);
-		createEAttribute(wrapperXmlEClass, WRAPPER_XML__XML);
-
 		actionEClass = createEClass(ACTION);
 		createEReference(actionEClass, ACTION__BODY);
 		createEReference(actionEClass, ACTION__INPUT_PATTERN);
@@ -1258,20 +1206,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				"targetPort", null, 0, 1, Connection.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-		initEClass(wrapperStringEClass, WrapperString.class, "WrapperString",
-				!IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getWrapperString_String(), ecorePackage.getEString(),
-				"string", null, 0, 1, WrapperString.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
-
-		initEClass(wrapperXmlEClass, WrapperXml.class, "WrapperXml",
-				!IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getWrapperXml_Xml(), ecorePackage.getEString(), "xml",
-				null, 0, 1, WrapperXml.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
 
 		initEClass(actionEClass, Action.class, "Action", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);

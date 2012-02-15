@@ -30,8 +30,6 @@ import net.sf.orcc.df.State;
 import net.sf.orcc.df.Tag;
 import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.Unit;
-import net.sf.orcc.df.WrapperString;
-import net.sf.orcc.df.WrapperXml;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.common.notify.Adapter;
@@ -142,16 +140,6 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 		@Override
 		public Adapter caseConnection(Connection object) {
 			return createConnectionAdapter();
-		}
-
-		@Override
-		public Adapter caseWrapperString(WrapperString object) {
-			return createWrapperStringAdapter();
-		}
-
-		@Override
-		public Adapter caseWrapperXml(WrapperXml object) {
-			return createWrapperXmlAdapter();
 		}
 
 		@Override
@@ -310,34 +298,6 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createBroadcastAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.WrapperString <em>Wrapper String</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.df.WrapperString
-	 * @generated
-	 */
-	public Adapter createWrapperStringAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.WrapperXml <em>Wrapper Xml</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.df.WrapperXml
-	 * @generated
-	 */
-	public Adapter createWrapperXmlAdapter() {
 		return null;
 	}
 

@@ -55,12 +55,6 @@
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Connection/sourcePort"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Connection/targetPort"/>
     </genClasses>
-    <genClasses ecoreClass="Df.ecore#//WrapperString">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//WrapperString/string"/>
-    </genClasses>
-    <genClasses ecoreClass="Df.ecore#//WrapperXml">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//WrapperXml/xml"/>
-    </genClasses>
     <genClasses ecoreClass="Df.ecore#//Action">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Action/body"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Action/inputPattern"/>

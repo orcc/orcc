@@ -30,8 +30,6 @@ import net.sf.orcc.df.State;
 import net.sf.orcc.df.Tag;
 import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.Unit;
-import net.sf.orcc.df.WrapperString;
-import net.sf.orcc.df.WrapperXml;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -112,10 +110,6 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 			return createBroadcast();
 		case DfPackage.CONNECTION:
 			return createConnection();
-		case DfPackage.WRAPPER_STRING:
-			return createWrapperString();
-		case DfPackage.WRAPPER_XML:
-			return createWrapperXml();
 		case DfPackage.ACTION:
 			return createAction();
 		case DfPackage.FSM:
@@ -453,31 +447,6 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	public Map.Entry<Var, Port> createVarToPortMapEntry() {
 		VarToPortMapEntryImpl varToPortMapEntry = new VarToPortMapEntryImpl();
 		return varToPortMapEntry;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public WrapperString createWrapperString() {
-		WrapperStringImpl wrapperString = new WrapperStringImpl();
-		return wrapperString;
-	}
-
-	@Override
-	public WrapperString createWrapperString(String value) {
-		WrapperStringImpl wrapperString = new WrapperStringImpl();
-		wrapperString.setString(value);
-		return wrapperString;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public WrapperXml createWrapperXml() {
-		WrapperXmlImpl wrapperXml = new WrapperXmlImpl();
-		return wrapperXml;
 	}
 
 	/**

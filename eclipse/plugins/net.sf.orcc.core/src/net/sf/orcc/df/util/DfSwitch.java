@@ -30,8 +30,6 @@ import net.sf.orcc.df.State;
 import net.sf.orcc.df.Tag;
 import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.Unit;
-import net.sf.orcc.df.WrapperString;
-import net.sf.orcc.df.WrapperXml;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.ecore.EObject;
@@ -223,20 +221,6 @@ public class DfSwitch<T> extends Switch<T> {
 				result = defaultCase(theEObject);
 			return result;
 		}
-		case DfPackage.WRAPPER_STRING: {
-			WrapperString wrapperString = (WrapperString) theEObject;
-			T result = caseWrapperString(wrapperString);
-			if (result == null)
-				result = defaultCase(theEObject);
-			return result;
-		}
-		case DfPackage.WRAPPER_XML: {
-			WrapperXml wrapperXml = (WrapperXml) theEObject;
-			T result = caseWrapperXml(wrapperXml);
-			if (result == null)
-				result = defaultCase(theEObject);
-			return result;
-		}
 		case DfPackage.ACTION: {
 			Action action = (Action) theEObject;
 			T result = caseAction(action);
@@ -404,36 +388,6 @@ public class DfSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseBroadcast(Broadcast object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Wrapper String</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Wrapper String</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseWrapperString(WrapperString object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Wrapper Xml</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Wrapper Xml</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseWrapperXml(WrapperXml object) {
 		return null;
 	}
 

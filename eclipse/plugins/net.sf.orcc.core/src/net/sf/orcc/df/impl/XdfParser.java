@@ -616,13 +616,13 @@ public class XdfParser {
 				if (kind.equals(Attribute.CUSTOM)) {
 					// TODO custom
 					attr = factory.createAttribute(attrName,
-							DfFactory.eINSTANCE.createWrapperXml());
+							factory.createWrapperXml());
 				} else if (kind.equals(Attribute.FLAG)) {
 					attr = factory.createAttribute(attrName, null);
 				} else if (kind.equals(Attribute.STRING)) {
 					String value = attribute.getAttribute("value");
 					attr = factory.createAttribute(attrName,
-							DfFactory.eINSTANCE.createWrapperString(value));
+							factory.createWrapperString(value));
 				} else if (kind.equals(Attribute.TYPE)) {
 					Type type = typeParser.parseType(attribute.getFirstChild())
 							.getResult();

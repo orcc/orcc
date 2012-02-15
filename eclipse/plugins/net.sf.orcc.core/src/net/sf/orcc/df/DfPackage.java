@@ -159,34 +159,13 @@ public interface DfPackage extends EPackage {
 	int BROADCAST = 8;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.df.impl.WrapperStringImpl <em>Wrapper String</em>}' class.
-	 * <!-- begin-user-doc --> <!--
-	 * end-user-doc -->
-	 * @see net.sf.orcc.df.impl.WrapperStringImpl
-	 * @see net.sf.orcc.df.impl.DfPackageImpl#getWrapperString()
-	 * @generated
-	 */
-	int WRAPPER_STRING = 10;
-
-	/**
-	 * The meta object id for the '{@link net.sf.orcc.df.impl.WrapperXmlImpl
-	 * <em>Wrapper Xml</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
-	 * -->
-	 * 
-	 * @see net.sf.orcc.df.impl.WrapperXmlImpl
-	 * @see net.sf.orcc.df.impl.DfPackageImpl#getWrapperXml()
-	 * @generated
-	 */
-	int WRAPPER_XML = 11;
-
-	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.ActionImpl <em>Action</em>}' class.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.df.impl.ActionImpl
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getAction()
 	 * @generated
 	 */
-	int ACTION = 12;
+	int ACTION = 10;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.ActorImpl <em>Actor</em>}' class.
@@ -204,7 +183,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getFSM()
 	 * @generated
 	 */
-	int FSM = 13;
+	int FSM = 11;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.PatternImpl <em>Pattern</em>}' class.
@@ -213,7 +192,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getPattern()
 	 * @generated
 	 */
-	int PATTERN = 14;
+	int PATTERN = 12;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.PortImpl <em>Port</em>}' class.
@@ -231,7 +210,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getState()
 	 * @generated
 	 */
-	int STATE = 15;
+	int STATE = 13;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.TagImpl <em>Tag</em>}' class.
@@ -240,7 +219,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getTag()
 	 * @generated
 	 */
-	int TAG = 16;
+	int TAG = 14;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.TransitionImpl
@@ -251,7 +230,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getTransition()
 	 * @generated
 	 */
-	int TRANSITION = 17;
+	int TRANSITION = 15;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.PortToEIntegerObjectMapEntryImpl <em>Port To EInteger Object Map Entry</em>}' class.
@@ -261,7 +240,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getPortToEIntegerObjectMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = 18;
+	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = 16;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.PortToVarMapEntryImpl <em>Port To Var Map Entry</em>}' class.
@@ -271,7 +250,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getPortToVarMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_VAR_MAP_ENTRY = 19;
+	int PORT_TO_VAR_MAP_ENTRY = 17;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.VarToPortMapEntryImpl <em>Var To Port Map Entry</em>}' class.
@@ -281,7 +260,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getVarToPortMapEntry()
 	 * @generated
 	 */
-	int VAR_TO_PORT_MAP_ENTRY = 20;
+	int VAR_TO_PORT_MAP_ENTRY = 18;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.ArgumentImpl <em>Argument</em>}' class.
@@ -290,7 +269,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getArgument()
 	 * @generated
 	 */
-	int ARGUMENT = 21;
+	int ARGUMENT = 19;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.UnitImpl <em>Unit</em>}' class.
@@ -1028,40 +1007,6 @@ public interface DfPackage extends EPackage {
 	int CONNECTION_FEATURE_COUNT = GraphPackage.EDGE_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>String</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int WRAPPER_STRING__STRING = 0;
-
-	/**
-	 * The number of structural features of the '<em>Wrapper String</em>' class.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int WRAPPER_STRING_FEATURE_COUNT = 1;
-
-	/**
-	 * The feature id for the '<em><b>Xml</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int WRAPPER_XML__XML = 0;
-
-	/**
-	 * The number of structural features of the '<em>Wrapper Xml</em>' class.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int WRAPPER_XML_FEATURE_COUNT = 1;
-
-	/**
 	 * The feature id for the '<em><b>Body</b></em>' containment reference. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -1425,7 +1370,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getElement()
 	 * @generated
 	 */
-	int ELEMENT = 22;
+	int ELEMENT = 20;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -1636,48 +1581,6 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getBroadcast();
-
-	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.df.WrapperString <em>Wrapper String</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Wrapper String</em>'.
-	 * @see net.sf.orcc.df.WrapperString
-	 * @generated
-	 */
-	EClass getWrapperString();
-
-	/**
-	 * Returns the meta object for the attribute '
-	 * {@link net.sf.orcc.df.WrapperString#getString <em>String</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the attribute '<em>String</em>'.
-	 * @see net.sf.orcc.df.WrapperString#getString()
-	 * @see #getWrapperString()
-	 * @generated
-	 */
-	EAttribute getWrapperString_String();
-
-	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.df.WrapperXml <em>Wrapper Xml</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Wrapper Xml</em>'.
-	 * @see net.sf.orcc.df.WrapperXml
-	 * @generated
-	 */
-	EClass getWrapperXml();
-
-	/**
-	 * Returns the meta object for the attribute '
-	 * {@link net.sf.orcc.df.WrapperXml#getXml <em>Xml</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the attribute '<em>Xml</em>'.
-	 * @see net.sf.orcc.df.WrapperXml#getXml()
-	 * @see #getWrapperXml()
-	 * @generated
-	 */
-	EAttribute getWrapperXml_Xml();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Action <em>Action</em>}'.
@@ -2511,38 +2414,6 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EClass BROADCAST = eINSTANCE.getBroadcast();
-
-		/**
-		 * The meta object literal for the '{@link net.sf.orcc.df.impl.WrapperStringImpl <em>Wrapper String</em>}' class.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @see net.sf.orcc.df.impl.WrapperStringImpl
-		 * @see net.sf.orcc.df.impl.DfPackageImpl#getWrapperString()
-		 * @generated
-		 */
-		EClass WRAPPER_STRING = eINSTANCE.getWrapperString();
-
-		/**
-		 * The meta object literal for the '<em><b>String</b></em>' attribute feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute WRAPPER_STRING__STRING = eINSTANCE.getWrapperString_String();
-
-		/**
-		 * The meta object literal for the '{@link net.sf.orcc.df.impl.WrapperXmlImpl <em>Wrapper Xml</em>}' class.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @see net.sf.orcc.df.impl.WrapperXmlImpl
-		 * @see net.sf.orcc.df.impl.DfPackageImpl#getWrapperXml()
-		 * @generated
-		 */
-		EClass WRAPPER_XML = eINSTANCE.getWrapperXml();
-
-		/**
-		 * The meta object literal for the '<em><b>Xml</b></em>' attribute feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute WRAPPER_XML__XML = eINSTANCE.getWrapperXml_Xml();
 
 		/**
 		 * The meta object literal for the '
