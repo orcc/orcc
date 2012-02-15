@@ -18,7 +18,6 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.DfVertex;
-import net.sf.orcc.df.Element;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.EntitySpecific;
 import net.sf.orcc.df.Instance;
@@ -147,13 +146,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	private EClass argumentEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass elementEClass = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -782,15 +774,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getElement() {
-		return elementEClass;
-	}
-
-	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -993,8 +976,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		argumentEClass = createEClass(ARGUMENT);
 		createEReference(argumentEClass, ARGUMENT__VALUE);
 		createEReference(argumentEClass, ARGUMENT__VARIABLE);
-
-		elementEClass = createEClass(ELEMENT);
 	}
 
 	/**
@@ -1049,7 +1030,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		connectionEClass.getESuperTypes().add(theGraphPackage.getEdge());
 		stateEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		transitionEClass.getESuperTypes().add(theGraphPackage.getEdge());
-		elementEClass.getESuperTypes().add(theGraphPackage.getVertex());
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(dfVertexEClass, DfVertex.class, "DfVertex", IS_ABSTRACT,
@@ -1340,9 +1320,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				"variable", null, 0, 1, Argument.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-		initEClass(elementEClass, Element.class, "Element", IS_ABSTRACT,
-				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		// Create resource
 		createResource(eNS_URI);

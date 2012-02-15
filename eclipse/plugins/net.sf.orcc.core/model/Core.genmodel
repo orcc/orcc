@@ -98,7 +98,6 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Argument/value"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Argument/variable"/>
     </genClasses>
-    <genClasses image="false" ecoreClass="Df.ecore#//Element"/>
   </genPackages>
   <genPackages prefix="Ir" basePackage="net.sf.orcc" disposableProviderFactory="true"
       ecorePackage="Ir.ecore#/">

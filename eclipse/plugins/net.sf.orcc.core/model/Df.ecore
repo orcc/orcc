@@ -126,5 +126,4 @@
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="variable" eType="ecore:EClass Ir.ecore#//Var"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Element" abstract="true" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Vertex"/>
 </ecore:EPackage>
