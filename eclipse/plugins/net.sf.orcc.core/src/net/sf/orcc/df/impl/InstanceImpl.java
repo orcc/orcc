@@ -36,6 +36,7 @@ import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.moc.MoC;
 
@@ -56,6 +57,26 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * @generated
  */
 public class InstanceImpl extends DfVertexImpl implements Instance {
+
+	/**
+	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getOutputs()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Port> outputs;
+
+	/**
+	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getInputs()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Port> inputs;
 
 	/**
 	 * The cached value of the '{@link #getArguments() <em>Arguments</em>}' containment reference list.
@@ -108,6 +129,10 @@ public class InstanceImpl extends DfVertexImpl implements Instance {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
+			case DfPackage.INSTANCE__OUTPUTS:
+				return getOutputs();
+			case DfPackage.INSTANCE__INPUTS:
+				return getInputs();
 			case DfPackage.INSTANCE__ARGUMENTS:
 				return getArguments();
 			case DfPackage.INSTANCE__ENTITY:
@@ -125,6 +150,10 @@ public class InstanceImpl extends DfVertexImpl implements Instance {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
+			case DfPackage.INSTANCE__OUTPUTS:
+				return ((InternalEList<?>)getOutputs()).basicRemove(otherEnd, msgs);
+			case DfPackage.INSTANCE__INPUTS:
+				return ((InternalEList<?>)getInputs()).basicRemove(otherEnd, msgs);
 			case DfPackage.INSTANCE__ARGUMENTS:
 				return ((InternalEList<?>)getArguments()).basicRemove(otherEnd, msgs);
 		}
@@ -138,6 +167,10 @@ public class InstanceImpl extends DfVertexImpl implements Instance {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
+			case DfPackage.INSTANCE__OUTPUTS:
+				return outputs != null && !outputs.isEmpty();
+			case DfPackage.INSTANCE__INPUTS:
+				return inputs != null && !inputs.isEmpty();
 			case DfPackage.INSTANCE__ARGUMENTS:
 				return arguments != null && !arguments.isEmpty();
 			case DfPackage.INSTANCE__ENTITY:
@@ -154,6 +187,14 @@ public class InstanceImpl extends DfVertexImpl implements Instance {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
+			case DfPackage.INSTANCE__OUTPUTS:
+				getOutputs().clear();
+				getOutputs().addAll((Collection<? extends Port>)newValue);
+				return;
+			case DfPackage.INSTANCE__INPUTS:
+				getInputs().clear();
+				getInputs().addAll((Collection<? extends Port>)newValue);
+				return;
 			case DfPackage.INSTANCE__ARGUMENTS:
 				getArguments().clear();
 				getArguments().addAll((Collection<? extends Argument>)newValue);
@@ -175,12 +216,42 @@ public class InstanceImpl extends DfVertexImpl implements Instance {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Port> getOutputs() {
+		if (outputs == null) {
+			outputs = new EObjectContainmentEList<Port>(Port.class, this, DfPackage.INSTANCE__OUTPUTS);
+		}
+		return outputs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Port> getInputs() {
+		if (inputs == null) {
+			inputs = new EObjectContainmentEList<Port>(Port.class, this, DfPackage.INSTANCE__INPUTS);
+		}
+		return inputs;
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
+			case DfPackage.INSTANCE__OUTPUTS:
+				getOutputs().clear();
+				return;
+			case DfPackage.INSTANCE__INPUTS:
+				getInputs().clear();
+				return;
 			case DfPackage.INSTANCE__ARGUMENTS:
 				getArguments().clear();
 				return;

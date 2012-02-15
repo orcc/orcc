@@ -55,9 +55,8 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
 public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
-	 * The cached value of the '{@link #getSourcePort() <em>Source Port</em>}'
-	 * reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getSourcePort() <em>Source Port</em>}' reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getSourcePort()
 	 * @generated
 	 * @ordered
@@ -73,9 +72,8 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 	}
 
 	/**
-	 * The cached value of the '{@link #getTargetPort() <em>Target Port</em>}'
-	 * reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getTargetPort() <em>Target Port</em>}' reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getTargetPort()
 	 * @generated
 	 * @ordered
@@ -84,7 +82,6 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	protected ConnectionImpl() {
@@ -93,7 +90,6 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Port basicGetSourcePort() {
@@ -102,7 +98,6 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Port basicGetTargetPort() {
@@ -111,61 +106,55 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case DfPackage.CONNECTION__SOURCE_PORT:
-			if (resolve)
-				return getSourcePort();
-			return basicGetSourcePort();
-		case DfPackage.CONNECTION__TARGET_PORT:
-			if (resolve)
-				return getTargetPort();
-			return basicGetTargetPort();
+			case DfPackage.CONNECTION__SOURCE_PORT:
+				if (resolve) return getSourcePort();
+				return basicGetSourcePort();
+			case DfPackage.CONNECTION__TARGET_PORT:
+				if (resolve) return getTargetPort();
+				return basicGetTargetPort();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case DfPackage.CONNECTION__SOURCE_PORT:
-			return sourcePort != null;
-		case DfPackage.CONNECTION__TARGET_PORT:
-			return targetPort != null;
+			case DfPackage.CONNECTION__SOURCE_PORT:
+				return sourcePort != null;
+			case DfPackage.CONNECTION__TARGET_PORT:
+				return targetPort != null;
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case DfPackage.CONNECTION__SOURCE_PORT:
-			setSourcePort((Port) newValue);
-			return;
-		case DfPackage.CONNECTION__TARGET_PORT:
-			setTargetPort((Port) newValue);
-			return;
+			case DfPackage.CONNECTION__SOURCE_PORT:
+				setSourcePort((Port)newValue);
+				return;
+			case DfPackage.CONNECTION__TARGET_PORT:
+				setTargetPort((Port)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -175,18 +164,17 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case DfPackage.CONNECTION__SOURCE_PORT:
-			setSourcePort((Port) null);
-			return;
-		case DfPackage.CONNECTION__TARGET_PORT:
-			setTargetPort((Port) null);
-			return;
+			case DfPackage.CONNECTION__SOURCE_PORT:
+				setSourcePort((Port)null);
+				return;
+			case DfPackage.CONNECTION__TARGET_PORT:
+				setTargetPort((Port)null);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -214,18 +202,15 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Port getSourcePort() {
 		if (sourcePort != null && sourcePort.eIsProxy()) {
-			InternalEObject oldSourcePort = (InternalEObject) sourcePort;
-			sourcePort = (Port) eResolveProxy(oldSourcePort);
+			InternalEObject oldSourcePort = (InternalEObject)sourcePort;
+			sourcePort = (Port)eResolveProxy(oldSourcePort);
 			if (sourcePort != oldSourcePort) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							DfPackage.CONNECTION__SOURCE_PORT, oldSourcePort,
-							sourcePort));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.CONNECTION__SOURCE_PORT, oldSourcePort, sourcePort));
 			}
 		}
 		return sourcePort;
@@ -233,18 +218,15 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Port getTargetPort() {
 		if (targetPort != null && targetPort.eIsProxy()) {
-			InternalEObject oldTargetPort = (InternalEObject) targetPort;
-			targetPort = (Port) eResolveProxy(oldTargetPort);
+			InternalEObject oldTargetPort = (InternalEObject)targetPort;
+			targetPort = (Port)eResolveProxy(oldTargetPort);
 			if (targetPort != oldTargetPort) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							DfPackage.CONNECTION__TARGET_PORT, oldTargetPort,
-							targetPort));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.CONNECTION__TARGET_PORT, oldTargetPort, targetPort));
 			}
 		}
 		return targetPort;
@@ -265,30 +247,24 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public void setSourcePort(Port newSourcePort) {
 		Port oldSourcePort = sourcePort;
 		sourcePort = newSourcePort;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.CONNECTION__SOURCE_PORT, oldSourcePort,
-					sourcePort));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.CONNECTION__SOURCE_PORT, oldSourcePort, sourcePort));
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public void setTargetPort(Port newTargetPort) {
 		Port oldTargetPort = targetPort;
 		targetPort = newTargetPort;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.CONNECTION__TARGET_PORT, oldTargetPort,
-					targetPort));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.CONNECTION__TARGET_PORT, oldTargetPort, targetPort));
 	}
 
 	@Override
