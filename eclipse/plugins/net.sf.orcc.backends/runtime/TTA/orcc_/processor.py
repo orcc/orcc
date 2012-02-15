@@ -41,7 +41,7 @@ import subprocess
 import tempita
 
 
-class Instance:
+class Processor:
 
     def __init__(self, name, inputs, outputs, isNative, isBroadcast):
         # General

@@ -30,8 +30,6 @@
 #
 # @author Herve Yviquel
 
-from informations_.informations import *
-from orcc_ import *
 import getopt
 import os
 import shutil
@@ -56,36 +54,36 @@ def compile(arg, debug, target):
     start = time.time()
 
     print "*********************************************************************"
-    print "* Compile the application for TTA"
+    print "* Compile the application for the TTA processors network"
     print "*********************************************************************"
 
-    network.compile(target, libPath, arg.split(), debug)
+    design.compile(target, libPath, arg.split(), debug)
 
-    print "* Compilation of %d instances done in %f seconds." % (len(network.instances), time.time() - start)
+    print "* Compilation of code for %d processors done in %f seconds." % (len(design.processors), time.time() - start)
 
 
 def simulate(debug, target):
     start = time.time()
 
     print "*********************************************************************"
-    print "* Simulate the execution of the application on  each TTA"
+    print "* Simulate the execution of the application on  each TTA processor"
     print "*********************************************************************"
 
-    network.simulate(target, libPath, tracePath)
+    design.simulate(target, libPath, tracePath)
 
-    print "* Simulation of %d instances done in %f seconds." % (len(network.instances), time.time() - start)
+    print "* Simulation of %d processors done in %f seconds." % (len(design.processors), time.time() - start)
 
 
 def generate(arg, debug, target):
     start = time.time()
 
     print "*********************************************************************"
-    print "* Generate the TTA processors"
+    print "* Generate each TTA processors"
     print "*********************************************************************"
     
-    network.generate(target, libPath, arg.split(), debug)
+    design.generate(target, libPath, arg.split(), debug)
 
-    print "* Generation of %d instances done in %f seconds." % (len(network.instances), time.time() - start)
+    print "* Generation of %d processors done in %f seconds." % (len(design.processors), time.time() - start)
 
 
 
@@ -117,6 +115,8 @@ tracePath = os.path.join(srcPath, "trace")
 sys.path.insert(0, libPath)
 sys.path.insert(0, srcPath)
 
+from orcc_ import *
+from informations_.informations import *
 			
 for o, a in opts:
 	if o in ("-c", "--compile"):

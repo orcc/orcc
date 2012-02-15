@@ -17,7 +17,7 @@ endif>
 >>
 
 initInstance(vertex) ::= <<
-Instance("<vertex.simpleName>", <vertex.simpleName>_inputs, <vertex.simpleName>_outputs, <if(vertex.actor.native)>True<else>False<endif>, <if(vertex.broadcast)>True<else>False<endif>)
+Processor("<vertex.simpleName>", <vertex.simpleName>_inputs, <vertex.simpleName>_outputs, <if(vertex.actor.native)>True<else>False<endif>, <if(vertex.broadcast)>True<else>False<endif>)
 >>
 
 printNetwork(network, options) ::= <<
@@ -32,11 +32,11 @@ from orcc_ import *
 <network.instances: initInstancePort(); separator="\n">
 
 ## Instances initialization
-instances = [
+processors = [
 	<network.instances: initInstance(); separator=",\n">
 ]
 
 ## Network initialization
-network = Network("<network.simpleName>", instances)
+design = Design("<network.simpleName>", processors, <if(options.targetAltera)>True<else>False<endif>)
 		
 >>

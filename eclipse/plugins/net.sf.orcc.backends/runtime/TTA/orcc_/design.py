@@ -30,32 +30,33 @@
 #
 # @author Herve Yviquel
 
-from .instance import *
+from .processor import *
 import os
 import shutil
 import stat
 import sys
 
 
-class Network:
+class Design:
 
-    def __init__(self, name, instances):
+    def __init__(self, name, processors, targetAltera):
         self.name = name
-        self.instances = instances
+        self.processors = processors
+        self.targetAltera = targetAltera
 
 
     def compile(self, srcPath, libPath, args, debug):
-        for instance in self.instances:
-            if not instance.isNative:
-                print ">> Instance " + instance.id + "."
-                retcode = instance.compile(srcPath, libPath, args, debug)
+        for processor in self.processors:
+            if not processor.isNative:
+                print ">> Compile code of " + processor.id + "."
+                retcode = processor.compile(srcPath, libPath, args, debug)
                 if retcode != 0: sys.exit(retcode)
 
 
     def simulate(self, srcPath, libPath, tracePath):
-        for instance in self.instances:
-            print ">> Instance " + instance.id + "."
-            instance.simulate(srcPath, libPath, tracePath)
+        for processor in self.processors:
+            print ">> Simulate the execution of " + processor.id + "."
+            processor.simulate(srcPath, libPath, tracePath)
 
 
     def generate(self, srcPath, libPath, args, debug):
@@ -68,8 +69,8 @@ class Network:
         shutil.rmtree(os.path.join(srcPath, "simulation"), ignore_errors=True)
         shutil.copytree(os.path.join(libPath, "simulation"), os.path.join(srcPath, "simulation"))
 
-        for instance in self.instances:
-            if not instance.isNative:
-                print ">> Instance " + instance.id + "."
-                retcode = instance.generate(srcPath, libPath, args, debug)
+        for processor in self.processors:
+            if not processor.isNative:
+                print ">> Generate " + processor.id + "."
+                retcode = processor.generate(srcPath, libPath, args, debug)
                 if retcode != 0: sys.exit(retcode)

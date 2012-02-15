@@ -95,6 +95,7 @@ public class TTABackendImpl extends AbstractBackend {
 	private boolean finalize;
 	private String fpgaBrand;
 	private String fpgaFamily;
+	private boolean targetAltera;
 	private String libPath;
 	private int fifoWidthu;
 
@@ -131,6 +132,7 @@ public class TTABackendImpl extends AbstractBackend {
 		fpgaBrand = getAttribute("net.sf.orcc.backends.tta.fpgaBrand", "Altera");
 		fpgaFamily = getAttribute("net.sf.orcc.backends.tta.fpgaFamily",
 				"Stratix III");
+		targetAltera = fpgaBrand.equals("Altera");
 		// Set default FIFO size to 256
 		fifoSize = getAttribute(FIFO_SIZE, 256);
 		fifoWidthu = (int) Math.ceil(Math.log(fifoSize) / Math.log(2));
@@ -266,10 +268,7 @@ public class TTABackendImpl extends AbstractBackend {
 		networkPrinter.setExpressionPrinter(new LLVMExpressionPrinter());
 		networkPrinter.getOptions().put("fifoSize", fifoSize);
 		networkPrinter.getOptions().put("fifoWidthu", fifoWidthu);
-		networkPrinter.getOptions()
-				.put("useAltera", fpgaBrand.equals("Altera"));
-		networkPrinter.getOptions()
-				.put("useXilinx", fpgaBrand.equals("Xilinx"));
+		networkPrinter.getOptions().put("targetAltera", targetAltera);
 		networkPrinter.getOptions().put("fpgaFamily", fpgaFamily);
 		networkPrinter.print("top.vhd", path, network);
 
@@ -277,24 +276,27 @@ public class TTABackendImpl extends AbstractBackend {
 		String pythonPath = OrccUtil.createFolder(path, "informations_");
 		StandardPrinter pythonPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/tta/Python_Network.stg");
+		pythonPrinter.getOptions().put("targetAltera", targetAltera);
 		pythonPrinter.print("informations.py", pythonPath, network);
 		OrccUtil.createFile(pythonPath, "__init__.py");
 
-		// Quartus
-		CustomPrinter projectQsfPrinter = new CustomPrinter(
-				"net/sf/orcc/backends/tta/Quartus_Project.stg");
-		CustomPrinter projectQpfPrinter = new CustomPrinter(
-				"net/sf/orcc/backends/tta/Quartus_Project.stg");
-		projectQsfPrinter.print("top.qsf", path, "qsfNetwork", "network",
-				network);
-		projectQpfPrinter.print("top.qpf", path, "qpfNetwork", "network",
-				network);
-
-		// ISE
-		CustomPrinter projectXisePrinter = new CustomPrinter(
-				"net/sf/orcc/backends/tta/ISE_Project.stg");
-		projectXisePrinter.print("top.xise", path, "xiseNetwork", "network",
-				network);
+		if (targetAltera) {
+			// Quartus
+			CustomPrinter projectQsfPrinter = new CustomPrinter(
+					"net/sf/orcc/backends/tta/Quartus_Project.stg");
+			CustomPrinter projectQpfPrinter = new CustomPrinter(
+					"net/sf/orcc/backends/tta/Quartus_Project.stg");
+			projectQsfPrinter.print("top.qsf", path, "qsfNetwork", "network",
+					network);
+			projectQpfPrinter.print("top.qpf", path, "qpfNetwork", "network",
+					network);
+		} else {
+			// ISE
+			CustomPrinter projectXisePrinter = new CustomPrinter(
+					"net/sf/orcc/backends/tta/ISE_Project.stg");
+			projectXisePrinter.print("top.xise", path, "xiseNetwork",
+					"network", network);
+		}
 
 		// ModelSim
 		StandardPrinter tclPrinter = new StandardPrinter(

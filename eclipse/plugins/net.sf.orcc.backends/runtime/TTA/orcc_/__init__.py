@@ -30,14 +30,12 @@
 # @author Herve Yviquel
 # @package orcc_
 
-import network
-import instance
+import design
+import processor
 import memory
 import port
-import util
 
-Network = network.Network
-Instance = instance.Instance
+Design = design.Design
+Processor = processor.Processor
 Memory = memory.Memory
 Port = port.Port
-Util = util.Util
