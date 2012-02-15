@@ -9,8 +9,8 @@ package net.sf.orcc.df.util;
 import java.util.Map;
 
 import net.sf.dftools.graph.Edge;
-import net.sf.dftools.graph.Nameable;
 import net.sf.dftools.graph.Vertex;
+import net.sf.dftools.util.Nameable;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
@@ -18,6 +18,7 @@ import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.DfVertex;
+import net.sf.orcc.df.Element;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.EntitySpecific;
 import net.sf.orcc.df.FSM;
@@ -311,6 +312,17 @@ public class DfSwitch<T> extends Switch<T> {
 		case DfPackage.ARGUMENT: {
 			Argument argument = (Argument) theEObject;
 			T result = caseArgument(argument);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case DfPackage.ELEMENT: {
+			Element element = (Element) theEObject;
+			T result = caseElement(element);
+			if (result == null)
+				result = caseVertex(element);
+			if (result == null)
+				result = caseNameable(element);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -617,6 +629,21 @@ public class DfSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseArgument(Argument object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Element</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Element</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseElement(Element object) {
 		return null;
 	}
 

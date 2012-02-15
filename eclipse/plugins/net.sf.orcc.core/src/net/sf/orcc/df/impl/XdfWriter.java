@@ -35,8 +35,8 @@ import java.io.OutputStream;
 import java.util.Comparator;
 import java.util.List;
 
-import net.sf.dftools.graph.Attribute;
 import net.sf.dftools.graph.Vertex;
+import net.sf.dftools.util.Attribute;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;

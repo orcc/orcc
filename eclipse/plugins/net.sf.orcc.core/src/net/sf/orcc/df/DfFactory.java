@@ -9,8 +9,8 @@ package net.sf.orcc.df;
 import java.util.Collection;
 import java.util.List;
 
-import net.sf.dftools.graph.Attribute;
 import net.sf.dftools.graph.Vertex;
+import net.sf.dftools.util.Attribute;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;

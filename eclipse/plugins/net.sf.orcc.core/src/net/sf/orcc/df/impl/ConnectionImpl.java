@@ -28,9 +28,9 @@
  */
 package net.sf.orcc.df.impl;
 
-import net.sf.dftools.graph.Attribute;
-import net.sf.dftools.graph.GraphFactory;
 import net.sf.dftools.graph.impl.EdgeImpl;
+import net.sf.dftools.util.Attribute;
+import net.sf.dftools.util.UtilFactory;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.DfVertex;
@@ -182,16 +182,6 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 	}
 
 	@Override
-	public Attribute getAttribute(String name) {
-		for (Attribute attribute : getAttributes()) {
-			if (name.equals(attribute.getName())) {
-				return attribute;
-			}
-		}
-		return null;
-	}
-
-	@Override
 	public Integer getSize() {
 		Attribute attr = getAttribute(BUFFER_SIZE);
 		if (attr != null && attr.getValue() instanceof Expression) {
@@ -240,14 +230,13 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	@Override
 	public void setAttribute(String name, Expression value) {
-		getAttributes()
-				.add(GraphFactory.eINSTANCE.createAttribute(name, value));
+		getAttributes().add(UtilFactory.eINSTANCE.createAttribute(name, value));
 	}
 
 	@Override
 	public void setAttribute(String name, int value) {
 		getAttributes().add(
-				GraphFactory.eINSTANCE.createAttribute(name,
+				UtilFactory.eINSTANCE.createAttribute(name,
 						IrFactory.eINSTANCE.createExprInt(value)));
 	}
 

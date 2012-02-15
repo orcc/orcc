@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.dftools.graph.Edge;
-import net.sf.dftools.graph.Nameable;
+import net.sf.dftools.util.Nameable;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.DfVertex;

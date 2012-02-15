@@ -9,6 +9,7 @@ package net.sf.orcc.ir.impl;
 import java.util.Map;
 
 import net.sf.dftools.graph.GraphPackage;
+import net.sf.dftools.util.UtilPackage;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.impl.DfPackageImpl;
 import net.sf.orcc.ir.Annotation;
@@ -419,8 +420,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		isInited = true;
 
 		// Initialize simple dependencies
-		EcorePackage.eINSTANCE.eClass();
 		GraphPackage.eINSTANCE.eClass();
+		UtilPackage.eINSTANCE.eClass();
 
 		// Obtain or create and register interdependencies
 		DfPackageImpl theDfPackage = (DfPackageImpl) (EPackage.Registry.INSTANCE
@@ -1855,7 +1856,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getNodeWhile_LineNumber(), ecorePackage.getEInt(),
-				"lineNumber", "0", 0, 1, NodeWhile.class, !IS_TRANSIENT,
+				"lineNumber", null, 0, 1, NodeWhile.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
 		initEReference(getNodeWhile_Nodes(), this.getNode(), null, "nodes",

@@ -37,7 +37,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sf.dftools.graph.Nameable;
+import net.sf.dftools.util.Nameable;
 import net.sf.orcc.df.Actor;
 
 import org.eclipse.core.resources.IContainer;

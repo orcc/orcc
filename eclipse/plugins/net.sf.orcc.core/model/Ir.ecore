@@ -40,8 +40,7 @@
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="joinNode" eType="#//NodeBlock"
         containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="lineNumber" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
-        defaultValueLiteral="0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="lineNumber" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="nodes" upperBound="-1"
         eType="#//Node" containment="true" resolveProxies="false"/>
   </eClassifiers>
@@ -198,6 +197,7 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
   </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="NodeSpecific" abstract="true" eSuperTypes="#//Node"/>
   <eClassifiers xsi:type="ecore:EEnum" name="OpBinary">
     <eLiterals name="BITAND"/>
     <eLiterals name="BITOR" value="1"/>
@@ -226,5 +226,4 @@
     <eLiterals name="MINUS" value="2"/>
     <eLiterals name="NUM_ELTS" value="3"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="NodeSpecific" abstract="true" eSuperTypes="#//Node"/>
 </ecore:EPackage>

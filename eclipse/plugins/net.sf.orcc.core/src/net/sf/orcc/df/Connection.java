@@ -28,11 +28,8 @@
  */
 package net.sf.orcc.df;
 
-import net.sf.dftools.graph.Attribute;
 import net.sf.dftools.graph.Edge;
 import net.sf.orcc.ir.Expression;
-
-import org.eclipse.emf.common.util.EList;
 
 /**
  * This class represents a connection in a network. A connection can have a
@@ -48,24 +45,6 @@ public interface Connection extends Edge {
 	 * the bufferSize attribute can be attached to a FIFO to specify its size
 	 */
 	static final String BUFFER_SIZE = "bufferSize";
-
-	/**
-	 * Returns the attribute associated with the given name.
-	 * 
-	 * @param name
-	 *            an attribute name
-	 * @return the attribute associated with the given name, or if not found,
-	 *         <code>null</code>
-	 */
-	Attribute getAttribute(String name);
-
-	/**
-	 * Returns the map of attributes contained in this object.
-	 * 
-	 * @return the map of attributes contained in this object
-	 * @model containment="true"
-	 */
-	EList<Attribute> getAttributes();
 
 	/**
 	 * Returns the size of this connection.

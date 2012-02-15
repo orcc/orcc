@@ -9,8 +9,8 @@ package net.sf.orcc.df.util;
 import java.util.Map;
 
 import net.sf.dftools.graph.Edge;
-import net.sf.dftools.graph.Nameable;
 import net.sf.dftools.graph.Vertex;
+import net.sf.dftools.util.Nameable;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
@@ -18,6 +18,7 @@ import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.DfVertex;
+import net.sf.orcc.df.Element;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.EntitySpecific;
 import net.sf.orcc.df.FSM;
@@ -202,6 +203,11 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 		@Override
 		public Adapter caseArgument(Argument object) {
 			return createArgumentAdapter();
+		}
+
+		@Override
+		public Adapter caseElement(Element object) {
+			return createElementAdapter();
 		}
 
 		@Override
@@ -518,6 +524,20 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Element <em>Element</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.df.Element
+	 * @generated
+	 */
+	public Adapter createElementAdapter() {
+		return null;
+	}
+
+	/**
 	 * Creates a new adapter for an object of class '{@link net.sf.dftools.graph.Edge <em>Edge</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
@@ -574,13 +594,13 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.dftools.graph.Nameable <em>Nameable</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.dftools.util.Nameable <em>Nameable</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.dftools.graph.Nameable
+	 * @see net.sf.dftools.util.Nameable
 	 * @generated
 	 */
 	public Adapter createNameableAdapter() {

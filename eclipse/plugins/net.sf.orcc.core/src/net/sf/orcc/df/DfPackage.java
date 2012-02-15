@@ -8,6 +8,7 @@ package net.sf.orcc.df;
 
 import net.sf.dftools.graph.GraphPackage;
 
+import net.sf.dftools.util.UtilPackage;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
@@ -307,7 +308,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int UNIT__NAME = GraphPackage.NAMEABLE__NAME;
+	int UNIT__NAME = UtilPackage.NAMEABLE__NAME;
 
 	/**
 	 * The feature id for the '<em><b>Constants</b></em>' containment reference list.
@@ -315,7 +316,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int UNIT__CONSTANTS = GraphPackage.NAMEABLE_FEATURE_COUNT + 0;
+	int UNIT__CONSTANTS = UtilPackage.NAMEABLE_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Procedures</b></em>' containment reference list.
@@ -323,7 +324,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int UNIT__PROCEDURES = GraphPackage.NAMEABLE_FEATURE_COUNT + 1;
+	int UNIT__PROCEDURES = UtilPackage.NAMEABLE_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>File Name</b></em>' attribute. <!--
@@ -332,7 +333,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int UNIT__FILE_NAME = GraphPackage.NAMEABLE_FEATURE_COUNT + 2;
+	int UNIT__FILE_NAME = UtilPackage.NAMEABLE_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute. <!--
@@ -341,7 +342,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int UNIT__LINE_NUMBER = GraphPackage.NAMEABLE_FEATURE_COUNT + 3;
+	int UNIT__LINE_NUMBER = UtilPackage.NAMEABLE_FEATURE_COUNT + 3;
 
 	/**
 	 * The number of structural features of the '<em>Unit</em>' class. <!--
@@ -350,7 +351,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int UNIT_FEATURE_COUNT = GraphPackage.NAMEABLE_FEATURE_COUNT + 4;
+	int UNIT_FEATURE_COUNT = UtilPackage.NAMEABLE_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -1417,6 +1418,61 @@ public interface DfPackage extends EPackage {
 	int ARGUMENT_FEATURE_COUNT = 2;
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.df.impl.ElementImpl <em>Element</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.df.impl.ElementImpl
+	 * @see net.sf.orcc.df.impl.DfPackageImpl#getElement()
+	 * @generated
+	 */
+	int ELEMENT = 22;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ELEMENT__NAME = GraphPackage.VERTEX__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ELEMENT__OUTGOING = GraphPackage.VERTEX__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ELEMENT__INCOMING = GraphPackage.VERTEX__INCOMING;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ELEMENT__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
+
+	/**
+	 * The number of structural features of the '<em>Element</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ELEMENT_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 0;
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.DfVertex <em>Vertex</em>}'.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Vertex</em>'.
@@ -2183,6 +2239,16 @@ public interface DfPackage extends EPackage {
 	EReference getArgument_Variable();
 
 	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.df.Element <em>Element</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Element</em>'.
+	 * @see net.sf.orcc.df.Element
+	 * @generated
+	 */
+	EClass getElement();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Entity <em>Entity</em>}'.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Entity</em>'.
@@ -2885,6 +2951,16 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EReference ARGUMENT__VARIABLE = eINSTANCE.getArgument_Variable();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.df.impl.ElementImpl <em>Element</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.df.impl.ElementImpl
+		 * @see net.sf.orcc.df.impl.DfPackageImpl#getElement()
+		 * @generated
+		 */
+		EClass ELEMENT = eINSTANCE.getElement();
 
 		/**
 		 * The meta object literal for the '

@@ -35,8 +35,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.dftools.graph.Attribute;
-import net.sf.dftools.graph.GraphFactory;
+import net.sf.dftools.util.Attribute;
+import net.sf.dftools.util.UtilFactory;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
@@ -610,7 +610,7 @@ public class XdfParser {
 				Element attribute = (Element) node;
 				String kind = attribute.getAttribute("kind");
 				String attrName = attribute.getAttribute("name");
-				GraphFactory factory = GraphFactory.eINSTANCE;
+				UtilFactory factory = UtilFactory.eINSTANCE;
 
 				Attribute attr;
 				if (kind.equals(Attribute.CUSTOM)) {

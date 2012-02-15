@@ -7,6 +7,7 @@
 package net.sf.orcc.moc.impl;
 
 import net.sf.dftools.graph.GraphPackage;
+import net.sf.dftools.util.UtilPackage;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.impl.DfPackageImpl;
 import net.sf.orcc.ir.IrPackage;
@@ -25,7 +26,6 @@ import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
-import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.impl.EPackageImpl;
 
 /**
@@ -126,8 +126,8 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 		isInited = true;
 
 		// Initialize simple dependencies
-		EcorePackage.eINSTANCE.eClass();
 		GraphPackage.eINSTANCE.eClass();
+		UtilPackage.eINSTANCE.eClass();
 
 		// Obtain or create and register interdependencies
 		DfPackageImpl theDfPackage = (DfPackageImpl) (EPackage.Registry.INSTANCE

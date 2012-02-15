@@ -2,7 +2,7 @@
 <ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="df" nsURI="http://orcc.sf.net/model/2011/Df" nsPrefix="net.sf.orcc.df">
   <eClassifiers xsi:type="ecore:EClass" name="DfVertex" abstract="true" eSuperTypes="../../net.sf.dftools.graph/model/Graph.ecore#//Vertex"/>
-  <eClassifiers xsi:type="ecore:EClass" name="Unit" eSuperTypes="../../net.sf.dftools.graph/model/Graph.ecore#//Nameable">
+  <eClassifiers xsi:type="ecore:EClass" name="Unit" eSuperTypes="../../net.sf.dftools.graph/model/Util.ecore#//Nameable">
     <eStructuralFeatures xsi:type="ecore:EReference" name="constants" upperBound="-1"
         eType="ecore:EClass Ir.ecore#//Var" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="procedures" upperBound="-1"
@@ -132,4 +132,5 @@
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="variable" eType="ecore:EClass Ir.ecore#//Var"/>
   </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Element" abstract="true" eSuperTypes="../../net.sf.dftools.graph/model/Graph.ecore#//Vertex"/>
 </ecore:EPackage>

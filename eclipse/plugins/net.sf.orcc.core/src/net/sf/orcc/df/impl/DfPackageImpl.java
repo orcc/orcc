@@ -9,6 +9,7 @@ package net.sf.orcc.df.impl;
 import java.util.Map;
 
 import net.sf.dftools.graph.GraphPackage;
+import net.sf.dftools.util.UtilPackage;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
@@ -17,6 +18,7 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.DfVertex;
+import net.sf.orcc.df.Element;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.EntitySpecific;
 import net.sf.orcc.df.Instance;
@@ -161,6 +163,13 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	private EClass argumentEClass = null;
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass elementEClass = null;
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -231,8 +240,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		isInited = true;
 
 		// Initialize simple dependencies
-		EcorePackage.eINSTANCE.eClass();
 		GraphPackage.eINSTANCE.eClass();
+		UtilPackage.eINSTANCE.eClass();
 
 		// Obtain or create and register interdependencies
 		IrPackageImpl theIrPackage = (IrPackageImpl) (EPackage.Registry.INSTANCE
@@ -819,6 +828,15 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getElement() {
+		return elementEClass;
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -1027,6 +1045,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		argumentEClass = createEClass(ARGUMENT);
 		createEReference(argumentEClass, ARGUMENT__VALUE);
 		createEReference(argumentEClass, ARGUMENT__VARIABLE);
+
+		elementEClass = createEClass(ELEMENT);
 	}
 
 	/**
@@ -1055,6 +1075,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		// Obtain other dependent packages
 		GraphPackage theGraphPackage = (GraphPackage) EPackage.Registry.INSTANCE
 				.getEPackage(GraphPackage.eNS_URI);
+		UtilPackage theUtilPackage = (UtilPackage) EPackage.Registry.INSTANCE
+				.getEPackage(UtilPackage.eNS_URI);
 		IrPackage theIrPackage = (IrPackage) EPackage.Registry.INSTANCE
 				.getEPackage(IrPackage.eNS_URI);
 		MocPackage theMocPackage = (MocPackage) EPackage.Registry.INSTANCE
@@ -1068,7 +1090,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 
 		// Add supertypes to classes
 		dfVertexEClass.getESuperTypes().add(theGraphPackage.getVertex());
-		unitEClass.getESuperTypes().add(theGraphPackage.getNameable());
+		unitEClass.getESuperTypes().add(theUtilPackage.getNameable());
 		portEClass.getESuperTypes().add(this.getDfVertex());
 		instanceEClass.getESuperTypes().add(this.getDfVertex());
 		entityEClass.getESuperTypes().add(this.getDfVertex());
@@ -1079,6 +1101,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		connectionEClass.getESuperTypes().add(theGraphPackage.getEdge());
 		stateEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		transitionEClass.getESuperTypes().add(theGraphPackage.getEdge());
+		elementEClass.getESuperTypes().add(theGraphPackage.getVertex());
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(dfVertexEClass, DfVertex.class, "DfVertex", IS_ABSTRACT,
@@ -1383,6 +1406,9 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				"variable", null, 0, 1, Argument.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(elementEClass, Element.class, "Element", IS_ABSTRACT,
+				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		// Create resource
 		createResource(eNS_URI);

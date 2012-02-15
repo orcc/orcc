@@ -10,8 +10,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.dftools.graph.Attribute;
 import net.sf.dftools.graph.Vertex;
+import net.sf.dftools.util.Attribute;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
