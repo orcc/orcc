@@ -107,6 +107,13 @@ xiseNetwork(network, options) ::= <<
   \<libraries/\>
 
   \<autoManagedFiles\>
+    \<!-- The following files are identified by `include statements in verilog --\>
+    \<!-- source files and are automatically managed by Project Navigator.     --\>
+    \<!--                                                                      --\>
+    \<!-- Do not hand-edit this section, as it will be overwritten when the    --\>
+    \<!-- project is analyzed based on files automatically identified as       --\>
+    \<!-- include files.                                                       --\>
+  \</autoManagedFiles\>
 
 \</project\>
 
