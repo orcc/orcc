@@ -63,7 +63,7 @@ public class MocAdapterFactory extends AdapterFactoryImpl {
 			return true;
 		}
 		if (object instanceof EObject) {
-			return ((EObject)object).eClass().getEPackage() == modelPackage;
+			return ((EObject) object).eClass().getEPackage() == modelPackage;
 		}
 		return false;
 	}
@@ -74,41 +74,47 @@ public class MocAdapterFactory extends AdapterFactoryImpl {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected MocSwitch<Adapter> modelSwitch =
-		new MocSwitch<Adapter>() {
-			@Override
-			public Adapter caseMoC(MoC object) {
-				return createMoCAdapter();
-			}
-			@Override
-			public Adapter caseCSDFMoC(CSDFMoC object) {
-				return createCSDFMoCAdapter();
-			}
-			@Override
-			public Adapter caseDPNMoC(DPNMoC object) {
-				return createDPNMoCAdapter();
-			}
-			@Override
-			public Adapter caseKPNMoC(KPNMoC object) {
-				return createKPNMoCAdapter();
-			}
-			@Override
-			public Adapter caseQSDFMoC(QSDFMoC object) {
-				return createQSDFMoCAdapter();
-			}
-			@Override
-			public Adapter caseSDFMoC(SDFMoC object) {
-				return createSDFMoCAdapter();
-			}
-			@Override
-			public Adapter caseInvocation(Invocation object) {
-				return createInvocationAdapter();
-			}
-			@Override
-			public Adapter defaultCase(EObject object) {
-				return createEObjectAdapter();
-			}
-		};
+	protected MocSwitch<Adapter> modelSwitch = new MocSwitch<Adapter>() {
+		@Override
+		public Adapter caseMoC(MoC object) {
+			return createMoCAdapter();
+		}
+
+		@Override
+		public Adapter caseCSDFMoC(CSDFMoC object) {
+			return createCSDFMoCAdapter();
+		}
+
+		@Override
+		public Adapter caseDPNMoC(DPNMoC object) {
+			return createDPNMoCAdapter();
+		}
+
+		@Override
+		public Adapter caseKPNMoC(KPNMoC object) {
+			return createKPNMoCAdapter();
+		}
+
+		@Override
+		public Adapter caseQSDFMoC(QSDFMoC object) {
+			return createQSDFMoCAdapter();
+		}
+
+		@Override
+		public Adapter caseSDFMoC(SDFMoC object) {
+			return createSDFMoCAdapter();
+		}
+
+		@Override
+		public Adapter caseInvocation(Invocation object) {
+			return createInvocationAdapter();
+		}
+
+		@Override
+		public Adapter defaultCase(EObject object) {
+			return createEObjectAdapter();
+		}
+	};
 
 	/**
 	 * Creates an adapter for the <code>target</code>.
@@ -120,9 +126,8 @@ public class MocAdapterFactory extends AdapterFactoryImpl {
 	 */
 	@Override
 	public Adapter createAdapter(Notifier target) {
-		return modelSwitch.doSwitch((EObject)target);
+		return modelSwitch.doSwitch((EObject) target);
 	}
-
 
 	/**
 	 * Creates a new adapter for an object of class '{@link net.sf.orcc.moc.MoC <em>Mo C</em>}'.

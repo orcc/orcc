@@ -87,12 +87,12 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 */
 	public static IrFactory init() {
 		try {
-			IrFactory theIrFactory = (IrFactory)EPackage.Registry.INSTANCE.getEFactory("http://orcc.sf.net/model/2011/Ir"); 
+			IrFactory theIrFactory = (IrFactory) EPackage.Registry.INSTANCE
+					.getEFactory("http://orcc.sf.net/model/2011/Ir");
 			if (theIrFactory != null) {
 				return theIrFactory;
 			}
-		}
-		catch (Exception exception) {
+		} catch (Exception exception) {
 			EcorePlugin.INSTANCE.log(exception);
 		}
 		return new IrFactoryImpl();
@@ -133,12 +133,13 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	@Override
 	public String convertToString(EDataType eDataType, Object instanceValue) {
 		switch (eDataType.getClassifierID()) {
-			case IrPackage.OP_BINARY:
-				return convertOpBinaryToString(eDataType, instanceValue);
-			case IrPackage.OP_UNARY:
-				return convertOpUnaryToString(eDataType, instanceValue);
-			default:
-				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
+		case IrPackage.OP_BINARY:
+			return convertOpBinaryToString(eDataType, instanceValue);
+		case IrPackage.OP_UNARY:
+			return convertOpUnaryToString(eDataType, instanceValue);
+		default:
+			throw new IllegalArgumentException("The datatype '"
+					+ eDataType.getName() + "' is not a valid classifier");
 		}
 	}
 
@@ -149,42 +150,77 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	@Override
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
-			case IrPackage.PROCEDURE: return createProcedure();
-			case IrPackage.PARAM: return createParam();
-			case IrPackage.NODE_BLOCK: return createNodeBlock();
-			case IrPackage.NODE_IF: return createNodeIf();
-			case IrPackage.NODE_WHILE: return createNodeWhile();
-			case IrPackage.INST_ASSIGN: return createInstAssign();
-			case IrPackage.INST_CALL: return createInstCall();
-			case IrPackage.INST_LOAD: return createInstLoad();
-			case IrPackage.INST_PHI: return createInstPhi();
-			case IrPackage.INST_RETURN: return createInstReturn();
-			case IrPackage.INST_STORE: return createInstStore();
-			case IrPackage.ARG_BY_REF: return createArgByRef();
-			case IrPackage.ARG_BY_VAL: return createArgByVal();
-			case IrPackage.EXPR_BINARY: return createExprBinary();
-			case IrPackage.EXPR_BOOL: return createExprBool();
-			case IrPackage.EXPR_FLOAT: return createExprFloat();
-			case IrPackage.EXPR_INT: return createExprInt();
-			case IrPackage.EXPR_LIST: return createExprList();
-			case IrPackage.EXPR_STRING: return createExprString();
-			case IrPackage.EXPR_UNARY: return createExprUnary();
-			case IrPackage.EXPR_VAR: return createExprVar();
-			case IrPackage.TYPE_BOOL: return createTypeBool();
-			case IrPackage.TYPE_FLOAT: return createTypeFloat();
-			case IrPackage.TYPE_INT: return createTypeInt();
-			case IrPackage.TYPE_LIST: return createTypeList();
-			case IrPackage.TYPE_STRING: return createTypeString();
-			case IrPackage.TYPE_UINT: return createTypeUint();
-			case IrPackage.TYPE_VOID: return createTypeVoid();
-			case IrPackage.DEF: return createDef();
-			case IrPackage.ANNOTATION: return createAnnotation();
-			case IrPackage.VAR: return createVar();
-			case IrPackage.USE: return createUse();
-			case IrPackage.PREDICATE: return createPredicate();
-			case IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY: return (EObject)createEStringToEStringMapEntry();
-			default:
-				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
+		case IrPackage.PROCEDURE:
+			return createProcedure();
+		case IrPackage.PARAM:
+			return createParam();
+		case IrPackage.NODE_BLOCK:
+			return createNodeBlock();
+		case IrPackage.NODE_IF:
+			return createNodeIf();
+		case IrPackage.NODE_WHILE:
+			return createNodeWhile();
+		case IrPackage.INST_ASSIGN:
+			return createInstAssign();
+		case IrPackage.INST_CALL:
+			return createInstCall();
+		case IrPackage.INST_LOAD:
+			return createInstLoad();
+		case IrPackage.INST_PHI:
+			return createInstPhi();
+		case IrPackage.INST_RETURN:
+			return createInstReturn();
+		case IrPackage.INST_STORE:
+			return createInstStore();
+		case IrPackage.ARG_BY_REF:
+			return createArgByRef();
+		case IrPackage.ARG_BY_VAL:
+			return createArgByVal();
+		case IrPackage.EXPR_BINARY:
+			return createExprBinary();
+		case IrPackage.EXPR_BOOL:
+			return createExprBool();
+		case IrPackage.EXPR_FLOAT:
+			return createExprFloat();
+		case IrPackage.EXPR_INT:
+			return createExprInt();
+		case IrPackage.EXPR_LIST:
+			return createExprList();
+		case IrPackage.EXPR_STRING:
+			return createExprString();
+		case IrPackage.EXPR_UNARY:
+			return createExprUnary();
+		case IrPackage.EXPR_VAR:
+			return createExprVar();
+		case IrPackage.TYPE_BOOL:
+			return createTypeBool();
+		case IrPackage.TYPE_FLOAT:
+			return createTypeFloat();
+		case IrPackage.TYPE_INT:
+			return createTypeInt();
+		case IrPackage.TYPE_LIST:
+			return createTypeList();
+		case IrPackage.TYPE_STRING:
+			return createTypeString();
+		case IrPackage.TYPE_UINT:
+			return createTypeUint();
+		case IrPackage.TYPE_VOID:
+			return createTypeVoid();
+		case IrPackage.DEF:
+			return createDef();
+		case IrPackage.ANNOTATION:
+			return createAnnotation();
+		case IrPackage.VAR:
+			return createVar();
+		case IrPackage.USE:
+			return createUse();
+		case IrPackage.PREDICATE:
+			return createPredicate();
+		case IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY:
+			return (EObject) createEStringToEStringMapEntry();
+		default:
+			throw new IllegalArgumentException("The class '" + eClass.getName()
+					+ "' is not a valid classifier");
 		}
 	}
 
@@ -439,12 +475,13 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	@Override
 	public Object createFromString(EDataType eDataType, String initialValue) {
 		switch (eDataType.getClassifierID()) {
-			case IrPackage.OP_BINARY:
-				return createOpBinaryFromString(eDataType, initialValue);
-			case IrPackage.OP_UNARY:
-				return createOpUnaryFromString(eDataType, initialValue);
-			default:
-				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
+		case IrPackage.OP_BINARY:
+			return createOpBinaryFromString(eDataType, initialValue);
+		case IrPackage.OP_UNARY:
+			return createOpUnaryFromString(eDataType, initialValue);
+		default:
+			throw new IllegalArgumentException("The datatype '"
+					+ eDataType.getName() + "' is not a valid classifier");
 		}
 	}
 
@@ -740,7 +777,10 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public OpBinary createOpBinaryFromString(EDataType eDataType,
 			String initialValue) {
 		OpBinary result = OpBinary.get(initialValue);
-		if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
+		if (result == null)
+			throw new IllegalArgumentException("The value '" + initialValue
+					+ "' is not a valid enumerator of '" + eDataType.getName()
+					+ "'");
 		return result;
 	}
 
@@ -751,7 +791,10 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public OpUnary createOpUnaryFromString(EDataType eDataType,
 			String initialValue) {
 		OpUnary result = OpUnary.get(initialValue);
-		if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
+		if (result == null)
+			throw new IllegalArgumentException("The value '" + initialValue
+					+ "' is not a valid enumerator of '" + eDataType.getName()
+					+ "'");
 		return result;
 	}
 
@@ -987,7 +1030,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 * @generated
 	 */
 	public IrPackage getIrPackage() {
-		return (IrPackage)getEPackage();
+		return (IrPackage) getEPackage();
 	}
 
 } // IrFactoryImpl

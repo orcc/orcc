@@ -55,9 +55,10 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case DfPackage.TRANSITION__ACTION:
-				if (resolve) return getAction();
-				return basicGetAction();
+		case DfPackage.TRANSITION__ACTION:
+			if (resolve)
+				return getAction();
+			return basicGetAction();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -69,8 +70,8 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case DfPackage.TRANSITION__ACTION:
-				return action != null;
+		case DfPackage.TRANSITION__ACTION:
+			return action != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -82,9 +83,9 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case DfPackage.TRANSITION__ACTION:
-				setAction((Action)newValue);
-				return;
+		case DfPackage.TRANSITION__ACTION:
+			setAction((Action) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -105,11 +106,12 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 	 */
 	public Action getAction() {
 		if (action != null && action.eIsProxy()) {
-			InternalEObject oldAction = (InternalEObject)action;
-			action = (Action)eResolveProxy(oldAction);
+			InternalEObject oldAction = (InternalEObject) action;
+			action = (Action) eResolveProxy(oldAction);
 			if (action != oldAction) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.TRANSITION__ACTION, oldAction, action));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							DfPackage.TRANSITION__ACTION, oldAction, action));
 			}
 		}
 		return action;
@@ -133,7 +135,8 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 		Action oldAction = action;
 		action = newAction;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.TRANSITION__ACTION, oldAction, action));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.TRANSITION__ACTION, oldAction, action));
 	}
 
 	/**
@@ -143,9 +146,9 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case DfPackage.TRANSITION__ACTION:
-				setAction((Action)null);
-				return;
+		case DfPackage.TRANSITION__ACTION:
+			setAction((Action) null);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -158,7 +161,7 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 		}
 		builder.append(" (");
 		if (getAction() != null) {
-			builder.append(getAction().getName());	
+			builder.append(getAction().getName());
 		}
 		builder.append(") --> ");
 		if (getSource() != null) {

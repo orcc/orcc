@@ -105,13 +105,14 @@ public class FSMImpl extends EObjectImpl implements FSM {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case DfPackage.FSM__INITIAL_STATE:
-				if (resolve) return getInitialState();
-				return basicGetInitialState();
-			case DfPackage.FSM__STATES:
-				return getStates();
-			case DfPackage.FSM__TRANSITIONS:
-				return getTransitions();
+		case DfPackage.FSM__INITIAL_STATE:
+			if (resolve)
+				return getInitialState();
+			return basicGetInitialState();
+		case DfPackage.FSM__STATES:
+			return getStates();
+		case DfPackage.FSM__TRANSITIONS:
+			return getTransitions();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -124,10 +125,11 @@ public class FSMImpl extends EObjectImpl implements FSM {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case DfPackage.FSM__STATES:
-				return ((InternalEList<?>)getStates()).basicRemove(otherEnd, msgs);
-			case DfPackage.FSM__TRANSITIONS:
-				return ((InternalEList<?>)getTransitions()).basicRemove(otherEnd, msgs);
+		case DfPackage.FSM__STATES:
+			return ((InternalEList<?>) getStates()).basicRemove(otherEnd, msgs);
+		case DfPackage.FSM__TRANSITIONS:
+			return ((InternalEList<?>) getTransitions()).basicRemove(otherEnd,
+					msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -139,12 +141,12 @@ public class FSMImpl extends EObjectImpl implements FSM {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case DfPackage.FSM__INITIAL_STATE:
-				return initialState != null;
-			case DfPackage.FSM__STATES:
-				return states != null && !states.isEmpty();
-			case DfPackage.FSM__TRANSITIONS:
-				return transitions != null && !transitions.isEmpty();
+		case DfPackage.FSM__INITIAL_STATE:
+			return initialState != null;
+		case DfPackage.FSM__STATES:
+			return states != null && !states.isEmpty();
+		case DfPackage.FSM__TRANSITIONS:
+			return transitions != null && !transitions.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -157,17 +159,18 @@ public class FSMImpl extends EObjectImpl implements FSM {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case DfPackage.FSM__INITIAL_STATE:
-				setInitialState((State)newValue);
-				return;
-			case DfPackage.FSM__STATES:
-				getStates().clear();
-				getStates().addAll((Collection<? extends State>)newValue);
-				return;
-			case DfPackage.FSM__TRANSITIONS:
-				getTransitions().clear();
-				getTransitions().addAll((Collection<? extends Transition>)newValue);
-				return;
+		case DfPackage.FSM__INITIAL_STATE:
+			setInitialState((State) newValue);
+			return;
+		case DfPackage.FSM__STATES:
+			getStates().clear();
+			getStates().addAll((Collection<? extends State>) newValue);
+			return;
+		case DfPackage.FSM__TRANSITIONS:
+			getTransitions().clear();
+			getTransitions()
+					.addAll((Collection<? extends Transition>) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -188,15 +191,15 @@ public class FSMImpl extends EObjectImpl implements FSM {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case DfPackage.FSM__INITIAL_STATE:
-				setInitialState((State)null);
-				return;
-			case DfPackage.FSM__STATES:
-				getStates().clear();
-				return;
-			case DfPackage.FSM__TRANSITIONS:
-				getTransitions().clear();
-				return;
+		case DfPackage.FSM__INITIAL_STATE:
+			setInitialState((State) null);
+			return;
+		case DfPackage.FSM__STATES:
+			getStates().clear();
+			return;
+		case DfPackage.FSM__TRANSITIONS:
+			getTransitions().clear();
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -225,11 +228,13 @@ public class FSMImpl extends EObjectImpl implements FSM {
 	 */
 	public State getInitialState() {
 		if (initialState != null && initialState.eIsProxy()) {
-			InternalEObject oldInitialState = (InternalEObject)initialState;
-			initialState = (State)eResolveProxy(oldInitialState);
+			InternalEObject oldInitialState = (InternalEObject) initialState;
+			initialState = (State) eResolveProxy(oldInitialState);
 			if (initialState != oldInitialState) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.FSM__INITIAL_STATE, oldInitialState, initialState));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							DfPackage.FSM__INITIAL_STATE, oldInitialState,
+							initialState));
 			}
 		}
 		return initialState;
@@ -241,7 +246,8 @@ public class FSMImpl extends EObjectImpl implements FSM {
 	 */
 	public EList<State> getStates() {
 		if (states == null) {
-			states = new EObjectContainmentEList<State>(State.class, this, DfPackage.FSM__STATES);
+			states = new EObjectContainmentEList<State>(State.class, this,
+					DfPackage.FSM__STATES);
 		}
 		return states;
 	}
@@ -262,7 +268,8 @@ public class FSMImpl extends EObjectImpl implements FSM {
 	 */
 	public EList<Transition> getTransitions() {
 		if (transitions == null) {
-			transitions = new EObjectContainmentEList<Transition>(Transition.class, this, DfPackage.FSM__TRANSITIONS);
+			transitions = new EObjectContainmentEList<Transition>(
+					Transition.class, this, DfPackage.FSM__TRANSITIONS);
 		}
 		return transitions;
 	}
@@ -302,7 +309,8 @@ public class FSMImpl extends EObjectImpl implements FSM {
 		State oldInitialState = initialState;
 		initialState = newInitialState;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.FSM__INITIAL_STATE, oldInitialState, initialState));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.FSM__INITIAL_STATE, oldInitialState, initialState));
 	}
 
 } // FSMImpl

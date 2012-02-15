@@ -32,7 +32,8 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  *
  * @generated
  */
-public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements BasicEMap.Entry<Port,Integer> {
+public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements
+		BasicEMap.Entry<Port, Integer> {
 	/**
 	 * The cached value of the '{@link #getTypedKey() <em>Key</em>}' reference.
 	 * <!-- begin-user-doc -->
@@ -89,11 +90,13 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements Bas
 	 */
 	public Port getTypedKey() {
 		if (key != null && key.eIsProxy()) {
-			InternalEObject oldKey = (InternalEObject)key;
-			key = (Port)eResolveProxy(oldKey);
+			InternalEObject oldKey = (InternalEObject) key;
+			key = (Port) eResolveProxy(oldKey);
 			if (key != oldKey) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY, oldKey, key));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY,
+							oldKey, key));
 			}
 		}
 		return key;
@@ -117,7 +120,9 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements Bas
 		Port oldKey = key;
 		key = newKey;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY, oldKey, key));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY, oldKey,
+					key));
 	}
 
 	/**
@@ -138,7 +143,9 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements Bas
 		Integer oldValue = value;
 		value = newValue;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE, oldValue, value));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE,
+					oldValue, value));
 	}
 
 	/**
@@ -149,11 +156,12 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements Bas
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY:
-				if (resolve) return getTypedKey();
-				return basicGetTypedKey();
-			case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE:
-				return getTypedValue();
+		case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY:
+			if (resolve)
+				return getTypedKey();
+			return basicGetTypedKey();
+		case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE:
+			return getTypedValue();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -166,12 +174,12 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements Bas
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY:
-				setTypedKey((Port)newValue);
-				return;
-			case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE:
-				setTypedValue((Integer)newValue);
-				return;
+		case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY:
+			setTypedKey((Port) newValue);
+			return;
+		case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE:
+			setTypedValue((Integer) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -184,12 +192,12 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements Bas
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY:
-				setTypedKey((Port)null);
-				return;
-			case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE:
-				setTypedValue(VALUE_EDEFAULT);
-				return;
+		case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY:
+			setTypedKey((Port) null);
+			return;
+		case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE:
+			setTypedValue(VALUE_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -202,10 +210,11 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements Bas
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY:
-				return key != null;
-			case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE:
-				return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT.equals(value);
+		case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY:
+			return key != null;
+		case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE:
+			return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT
+					.equals(value);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -217,7 +226,8 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements Bas
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (value: ");
@@ -301,7 +311,8 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements Bas
 	@SuppressWarnings("unchecked")
 	public EMap<Port, Integer> getEMap() {
 		EObject container = eContainer();
-		return container == null ? null : (EMap<Port, Integer>)container.eGet(eContainmentFeature());
+		return container == null ? null : (EMap<Port, Integer>) container
+				.eGet(eContainmentFeature());
 	}
 
 } //PortToEIntegerObjectMapEntryImpl

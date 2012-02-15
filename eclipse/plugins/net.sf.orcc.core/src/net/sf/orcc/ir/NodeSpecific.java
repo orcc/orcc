@@ -6,7 +6,6 @@
  */
 package net.sf.orcc.ir;
 
-
 /**
  * This interface defines a node that is specific to a given back-end
  *

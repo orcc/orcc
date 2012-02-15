@@ -100,12 +100,18 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetCondition(Expression newCondition, NotificationChain msgs) {
+	public NotificationChain basicSetCondition(Expression newCondition,
+			NotificationChain msgs) {
 		Expression oldCondition = condition;
 		condition = newCondition;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.NODE_WHILE__CONDITION, oldCondition, newCondition);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.NODE_WHILE__CONDITION,
+					oldCondition, newCondition);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -119,8 +125,13 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 		NodeBlock oldJoinNode = joinNode;
 		joinNode = newJoinNode;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.NODE_WHILE__JOIN_NODE, oldJoinNode, newJoinNode);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.NODE_WHILE__JOIN_NODE,
+					oldJoinNode, newJoinNode);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -132,14 +143,14 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.NODE_WHILE__CONDITION:
-				return getCondition();
-			case IrPackage.NODE_WHILE__JOIN_NODE:
-				return getJoinNode();
-			case IrPackage.NODE_WHILE__LINE_NUMBER:
-				return getLineNumber();
-			case IrPackage.NODE_WHILE__NODES:
-				return getNodes();
+		case IrPackage.NODE_WHILE__CONDITION:
+			return getCondition();
+		case IrPackage.NODE_WHILE__JOIN_NODE:
+			return getJoinNode();
+		case IrPackage.NODE_WHILE__LINE_NUMBER:
+			return getLineNumber();
+		case IrPackage.NODE_WHILE__NODES:
+			return getNodes();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -152,12 +163,12 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrPackage.NODE_WHILE__CONDITION:
-				return basicSetCondition(null, msgs);
-			case IrPackage.NODE_WHILE__JOIN_NODE:
-				return basicSetJoinNode(null, msgs);
-			case IrPackage.NODE_WHILE__NODES:
-				return ((InternalEList<?>)getNodes()).basicRemove(otherEnd, msgs);
+		case IrPackage.NODE_WHILE__CONDITION:
+			return basicSetCondition(null, msgs);
+		case IrPackage.NODE_WHILE__JOIN_NODE:
+			return basicSetJoinNode(null, msgs);
+		case IrPackage.NODE_WHILE__NODES:
+			return ((InternalEList<?>) getNodes()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -169,14 +180,14 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.NODE_WHILE__CONDITION:
-				return condition != null;
-			case IrPackage.NODE_WHILE__JOIN_NODE:
-				return joinNode != null;
-			case IrPackage.NODE_WHILE__LINE_NUMBER:
-				return lineNumber != LINE_NUMBER_EDEFAULT;
-			case IrPackage.NODE_WHILE__NODES:
-				return nodes != null && !nodes.isEmpty();
+		case IrPackage.NODE_WHILE__CONDITION:
+			return condition != null;
+		case IrPackage.NODE_WHILE__JOIN_NODE:
+			return joinNode != null;
+		case IrPackage.NODE_WHILE__LINE_NUMBER:
+			return lineNumber != LINE_NUMBER_EDEFAULT;
+		case IrPackage.NODE_WHILE__NODES:
+			return nodes != null && !nodes.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -188,7 +199,8 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (lineNumber: ");
@@ -205,19 +217,19 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.NODE_WHILE__CONDITION:
-				setCondition((Expression)newValue);
-				return;
-			case IrPackage.NODE_WHILE__JOIN_NODE:
-				setJoinNode((NodeBlock)newValue);
-				return;
-			case IrPackage.NODE_WHILE__LINE_NUMBER:
-				setLineNumber((Integer)newValue);
-				return;
-			case IrPackage.NODE_WHILE__NODES:
-				getNodes().clear();
-				getNodes().addAll((Collection<? extends Node>)newValue);
-				return;
+		case IrPackage.NODE_WHILE__CONDITION:
+			setCondition((Expression) newValue);
+			return;
+		case IrPackage.NODE_WHILE__JOIN_NODE:
+			setJoinNode((NodeBlock) newValue);
+			return;
+		case IrPackage.NODE_WHILE__LINE_NUMBER:
+			setLineNumber((Integer) newValue);
+			return;
+		case IrPackage.NODE_WHILE__NODES:
+			getNodes().clear();
+			getNodes().addAll((Collection<? extends Node>) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -238,18 +250,18 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.NODE_WHILE__CONDITION:
-				setCondition((Expression)null);
-				return;
-			case IrPackage.NODE_WHILE__JOIN_NODE:
-				setJoinNode((NodeBlock)null);
-				return;
-			case IrPackage.NODE_WHILE__LINE_NUMBER:
-				setLineNumber(LINE_NUMBER_EDEFAULT);
-				return;
-			case IrPackage.NODE_WHILE__NODES:
-				getNodes().clear();
-				return;
+		case IrPackage.NODE_WHILE__CONDITION:
+			setCondition((Expression) null);
+			return;
+		case IrPackage.NODE_WHILE__JOIN_NODE:
+			setJoinNode((NodeBlock) null);
+			return;
+		case IrPackage.NODE_WHILE__LINE_NUMBER:
+			setLineNumber(LINE_NUMBER_EDEFAULT);
+			return;
+		case IrPackage.NODE_WHILE__NODES:
+			getNodes().clear();
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -277,7 +289,8 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	 */
 	public EList<Node> getNodes() {
 		if (nodes == null) {
-			nodes = new EObjectContainmentEList<Node>(Node.class, this, IrPackage.NODE_WHILE__NODES);
+			nodes = new EObjectContainmentEList<Node>(Node.class, this,
+					IrPackage.NODE_WHILE__NODES);
 		}
 		return nodes;
 	}
@@ -296,14 +309,19 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 		if (newCondition != condition) {
 			NotificationChain msgs = null;
 			if (condition != null)
-				msgs = ((InternalEObject)condition).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.NODE_WHILE__CONDITION, null, msgs);
+				msgs = ((InternalEObject) condition).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE
+								- IrPackage.NODE_WHILE__CONDITION, null, msgs);
 			if (newCondition != null)
-				msgs = ((InternalEObject)newCondition).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.NODE_WHILE__CONDITION, null, msgs);
+				msgs = ((InternalEObject) newCondition).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE
+								- IrPackage.NODE_WHILE__CONDITION, null, msgs);
 			msgs = basicSetCondition(newCondition, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.NODE_WHILE__CONDITION, newCondition, newCondition));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.NODE_WHILE__CONDITION, newCondition, newCondition));
 	}
 
 	/**
@@ -324,7 +342,9 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 		int oldLineNumber = lineNumber;
 		lineNumber = newLineNumber;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.NODE_WHILE__LINE_NUMBER, oldLineNumber, lineNumber));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.NODE_WHILE__LINE_NUMBER, oldLineNumber,
+					lineNumber));
 	}
 
 	/**
@@ -335,14 +355,19 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 		if (newJoinNode != joinNode) {
 			NotificationChain msgs = null;
 			if (joinNode != null)
-				msgs = ((InternalEObject)joinNode).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.NODE_WHILE__JOIN_NODE, null, msgs);
+				msgs = ((InternalEObject) joinNode).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE
+								- IrPackage.NODE_WHILE__JOIN_NODE, null, msgs);
 			if (newJoinNode != null)
-				msgs = ((InternalEObject)newJoinNode).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.NODE_WHILE__JOIN_NODE, null, msgs);
+				msgs = ((InternalEObject) newJoinNode).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE
+								- IrPackage.NODE_WHILE__JOIN_NODE, null, msgs);
 			msgs = basicSetJoinNode(newJoinNode, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.NODE_WHILE__JOIN_NODE, newJoinNode, newJoinNode));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.NODE_WHILE__JOIN_NODE, newJoinNode, newJoinNode));
 	}
 
 } // NodeWhileImpl

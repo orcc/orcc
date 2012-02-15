@@ -78,7 +78,6 @@ public interface MocPackage extends EPackage {
 	 */
 	int MO_C_FEATURE_COUNT = 0;
 
-
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.moc.impl.CSDFMoCImpl <em>CSDF Mo C</em>}' class.
 	 * <!-- begin-user-doc -->
@@ -445,21 +444,24 @@ public interface MocPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference CSDF_MO_C__INPUT_PATTERN = eINSTANCE.getCSDFMoC_InputPattern();
+		EReference CSDF_MO_C__INPUT_PATTERN = eINSTANCE
+				.getCSDFMoC_InputPattern();
 		/**
 		 * The meta object literal for the '<em><b>Number Of Phases</b></em>' attribute feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute CSDF_MO_C__NUMBER_OF_PHASES = eINSTANCE.getCSDFMoC_NumberOfPhases();
+		EAttribute CSDF_MO_C__NUMBER_OF_PHASES = eINSTANCE
+				.getCSDFMoC_NumberOfPhases();
 		/**
 		 * The meta object literal for the '<em><b>Output Pattern</b></em>' containment reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference CSDF_MO_C__OUTPUT_PATTERN = eINSTANCE.getCSDFMoC_OutputPattern();
+		EReference CSDF_MO_C__OUTPUT_PATTERN = eINSTANCE
+				.getCSDFMoC_OutputPattern();
 		/**
 		 * The meta object literal for the '<em><b>Invocations</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->

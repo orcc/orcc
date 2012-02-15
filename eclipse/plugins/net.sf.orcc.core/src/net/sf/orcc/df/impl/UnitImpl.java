@@ -121,14 +121,14 @@ public class UnitImpl extends NameableImpl implements Unit {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case DfPackage.UNIT__CONSTANTS:
-				return getConstants();
-			case DfPackage.UNIT__PROCEDURES:
-				return getProcedures();
-			case DfPackage.UNIT__FILE_NAME:
-				return getFileName();
-			case DfPackage.UNIT__LINE_NUMBER:
-				return getLineNumber();
+		case DfPackage.UNIT__CONSTANTS:
+			return getConstants();
+		case DfPackage.UNIT__PROCEDURES:
+			return getProcedures();
+		case DfPackage.UNIT__FILE_NAME:
+			return getFileName();
+		case DfPackage.UNIT__LINE_NUMBER:
+			return getLineNumber();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -141,10 +141,12 @@ public class UnitImpl extends NameableImpl implements Unit {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case DfPackage.UNIT__CONSTANTS:
-				return ((InternalEList<?>)getConstants()).basicRemove(otherEnd, msgs);
-			case DfPackage.UNIT__PROCEDURES:
-				return ((InternalEList<?>)getProcedures()).basicRemove(otherEnd, msgs);
+		case DfPackage.UNIT__CONSTANTS:
+			return ((InternalEList<?>) getConstants()).basicRemove(otherEnd,
+					msgs);
+		case DfPackage.UNIT__PROCEDURES:
+			return ((InternalEList<?>) getProcedures()).basicRemove(otherEnd,
+					msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -156,14 +158,15 @@ public class UnitImpl extends NameableImpl implements Unit {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case DfPackage.UNIT__CONSTANTS:
-				return constants != null && !constants.isEmpty();
-			case DfPackage.UNIT__PROCEDURES:
-				return procedures != null && !procedures.isEmpty();
-			case DfPackage.UNIT__FILE_NAME:
-				return FILE_NAME_EDEFAULT == null ? fileName != null : !FILE_NAME_EDEFAULT.equals(fileName);
-			case DfPackage.UNIT__LINE_NUMBER:
-				return lineNumber != LINE_NUMBER_EDEFAULT;
+		case DfPackage.UNIT__CONSTANTS:
+			return constants != null && !constants.isEmpty();
+		case DfPackage.UNIT__PROCEDURES:
+			return procedures != null && !procedures.isEmpty();
+		case DfPackage.UNIT__FILE_NAME:
+			return FILE_NAME_EDEFAULT == null ? fileName != null
+					: !FILE_NAME_EDEFAULT.equals(fileName);
+		case DfPackage.UNIT__LINE_NUMBER:
+			return lineNumber != LINE_NUMBER_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -176,20 +179,20 @@ public class UnitImpl extends NameableImpl implements Unit {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case DfPackage.UNIT__CONSTANTS:
-				getConstants().clear();
-				getConstants().addAll((Collection<? extends Var>)newValue);
-				return;
-			case DfPackage.UNIT__PROCEDURES:
-				getProcedures().clear();
-				getProcedures().addAll((Collection<? extends Procedure>)newValue);
-				return;
-			case DfPackage.UNIT__FILE_NAME:
-				setFileName((String)newValue);
-				return;
-			case DfPackage.UNIT__LINE_NUMBER:
-				setLineNumber((Integer)newValue);
-				return;
+		case DfPackage.UNIT__CONSTANTS:
+			getConstants().clear();
+			getConstants().addAll((Collection<? extends Var>) newValue);
+			return;
+		case DfPackage.UNIT__PROCEDURES:
+			getProcedures().clear();
+			getProcedures().addAll((Collection<? extends Procedure>) newValue);
+			return;
+		case DfPackage.UNIT__FILE_NAME:
+			setFileName((String) newValue);
+			return;
+		case DfPackage.UNIT__LINE_NUMBER:
+			setLineNumber((Integer) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -210,18 +213,18 @@ public class UnitImpl extends NameableImpl implements Unit {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case DfPackage.UNIT__CONSTANTS:
-				getConstants().clear();
-				return;
-			case DfPackage.UNIT__PROCEDURES:
-				getProcedures().clear();
-				return;
-			case DfPackage.UNIT__FILE_NAME:
-				setFileName(FILE_NAME_EDEFAULT);
-				return;
-			case DfPackage.UNIT__LINE_NUMBER:
-				setLineNumber(LINE_NUMBER_EDEFAULT);
-				return;
+		case DfPackage.UNIT__CONSTANTS:
+			getConstants().clear();
+			return;
+		case DfPackage.UNIT__PROCEDURES:
+			getProcedures().clear();
+			return;
+		case DfPackage.UNIT__FILE_NAME:
+			setFileName(FILE_NAME_EDEFAULT);
+			return;
+		case DfPackage.UNIT__LINE_NUMBER:
+			setLineNumber(LINE_NUMBER_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -232,10 +235,12 @@ public class UnitImpl extends NameableImpl implements Unit {
 	 */
 	public EList<Var> getConstants() {
 		if (constants == null) {
-			constants = new EObjectContainmentEList<Var>(Var.class, this, DfPackage.UNIT__CONSTANTS);
+			constants = new EObjectContainmentEList<Var>(Var.class, this,
+					DfPackage.UNIT__CONSTANTS);
 		}
 		return constants;
 	}
+
 	@Override
 	public IFile getFile() {
 		String fileName = getFileName();
@@ -270,7 +275,8 @@ public class UnitImpl extends NameableImpl implements Unit {
 	 */
 	public EList<Procedure> getProcedures() {
 		if (procedures == null) {
-			procedures = new EObjectContainmentEList<Procedure>(Procedure.class, this, DfPackage.UNIT__PROCEDURES);
+			procedures = new EObjectContainmentEList<Procedure>(
+					Procedure.class, this, DfPackage.UNIT__PROCEDURES);
 		}
 		return procedures;
 	}
@@ -289,7 +295,8 @@ public class UnitImpl extends NameableImpl implements Unit {
 		String oldFileName = fileName;
 		fileName = newFileName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.UNIT__FILE_NAME, oldFileName, fileName));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.UNIT__FILE_NAME, oldFileName, fileName));
 	}
 
 	/**
@@ -301,7 +308,8 @@ public class UnitImpl extends NameableImpl implements Unit {
 		int oldLineNumber = lineNumber;
 		lineNumber = newLineNumber;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.UNIT__LINE_NUMBER, oldLineNumber, lineNumber));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.UNIT__LINE_NUMBER, oldLineNumber, lineNumber));
 	}
 
 	@Override
@@ -316,7 +324,8 @@ public class UnitImpl extends NameableImpl implements Unit {
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (fileName: ");

@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir;
 
-
 /**
  * This class defines a String type.
  * 

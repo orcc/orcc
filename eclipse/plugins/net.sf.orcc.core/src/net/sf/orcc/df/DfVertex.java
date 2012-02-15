@@ -22,7 +22,7 @@ import net.sf.dftools.graph.Vertex;
  * @generated
  */
 public interface DfVertex extends Vertex {
-	
+
 	List<String> getHierarchicalId();
 
 	String getHierarchicalName();
@@ -32,7 +32,6 @@ public interface DfVertex extends Vertex {
 	Map<Port, Connection> getIncomingPortMap();
 
 	Map<Port, List<Connection>> getOutgoingPortMap();
-
 
 	Object getTemplateData();
 

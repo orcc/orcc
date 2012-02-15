@@ -2442,14 +2442,16 @@ public interface DfPackage extends EPackage {
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference CONNECTION__SOURCE_PORT = eINSTANCE.getConnection_SourcePort();
+		EReference CONNECTION__SOURCE_PORT = eINSTANCE
+				.getConnection_SourcePort();
 
 		/**
 		 * The meta object literal for the '<em><b>Target Port</b></em>' reference feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference CONNECTION__TARGET_PORT = eINSTANCE.getConnection_TargetPort();
+		EReference CONNECTION__TARGET_PORT = eINSTANCE
+				.getConnection_TargetPort();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.InstanceImpl <em>Instance</em>}' class.
@@ -2612,7 +2614,8 @@ public interface DfPackage extends EPackage {
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference ACTOR__ACTIONS_OUTSIDE_FSM = eINSTANCE.getActor_ActionsOutsideFsm();
+		EReference ACTOR__ACTIONS_OUTSIDE_FSM = eINSTANCE
+				.getActor_ActionsOutsideFsm();
 
 		/**
 		 * The meta object literal for the '<em><b>Fsm</b></em>' containment reference feature.
@@ -2719,7 +2722,8 @@ public interface DfPackage extends EPackage {
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PATTERN__NUM_TOKENS_MAP = eINSTANCE.getPattern_NumTokensMap();
+		EReference PATTERN__NUM_TOKENS_MAP = eINSTANCE
+				.getPattern_NumTokensMap();
 
 		/**
 		 * The meta object literal for the '<em><b>Ports</b></em>' reference list feature.
@@ -2733,7 +2737,8 @@ public interface DfPackage extends EPackage {
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PATTERN__PORT_TO_VAR_MAP = eINSTANCE.getPattern_PortToVarMap();
+		EReference PATTERN__PORT_TO_VAR_MAP = eINSTANCE
+				.getPattern_PortToVarMap();
 
 		/**
 		 * The meta object literal for the '<em><b>Variables</b></em>' containment reference list feature.
@@ -2748,7 +2753,8 @@ public interface DfPackage extends EPackage {
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PATTERN__VAR_TO_PORT_MAP = eINSTANCE.getPattern_VarToPortMap();
+		EReference PATTERN__VAR_TO_PORT_MAP = eINSTANCE
+				.getPattern_VarToPortMap();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.PortImpl <em>Port</em>}' class.
@@ -2764,14 +2770,16 @@ public interface DfPackage extends EPackage {
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute PORT__NUM_TOKENS_CONSUMED = eINSTANCE.getPort_NumTokensConsumed();
+		EAttribute PORT__NUM_TOKENS_CONSUMED = eINSTANCE
+				.getPort_NumTokensConsumed();
 
 		/**
 		 * The meta object literal for the '<em><b>Num Tokens Produced</b></em>' attribute feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute PORT__NUM_TOKENS_PRODUCED = eINSTANCE.getPort_NumTokensProduced();
+		EAttribute PORT__NUM_TOKENS_PRODUCED = eINSTANCE
+				.getPort_NumTokensProduced();
 
 		/**
 		 * The meta object literal for the '<em><b>Type</b></em>' containment reference feature.
@@ -2840,21 +2848,24 @@ public interface DfPackage extends EPackage {
 		 * @see net.sf.orcc.df.impl.DfPackageImpl#getPortToEIntegerObjectMapEntry()
 		 * @generated
 		 */
-		EClass PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = eINSTANCE.getPortToEIntegerObjectMapEntry();
+		EClass PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = eINSTANCE
+				.getPortToEIntegerObjectMapEntry();
 
 		/**
 		 * The meta object literal for the '<em><b>Key</b></em>' reference feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY = eINSTANCE.getPortToEIntegerObjectMapEntry_Key();
+		EReference PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY = eINSTANCE
+				.getPortToEIntegerObjectMapEntry_Key();
 
 		/**
 		 * The meta object literal for the '<em><b>Value</b></em>' attribute feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE = eINSTANCE.getPortToEIntegerObjectMapEntry_Value();
+		EAttribute PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE = eINSTANCE
+				.getPortToEIntegerObjectMapEntry_Value();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.PortToVarMapEntryImpl <em>Port To Var Map Entry</em>}' class.
@@ -2871,14 +2882,16 @@ public interface DfPackage extends EPackage {
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PORT_TO_VAR_MAP_ENTRY__KEY = eINSTANCE.getPortToVarMapEntry_Key();
+		EReference PORT_TO_VAR_MAP_ENTRY__KEY = eINSTANCE
+				.getPortToVarMapEntry_Key();
 
 		/**
 		 * The meta object literal for the '<em><b>Value</b></em>' reference feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PORT_TO_VAR_MAP_ENTRY__VALUE = eINSTANCE.getPortToVarMapEntry_Value();
+		EReference PORT_TO_VAR_MAP_ENTRY__VALUE = eINSTANCE
+				.getPortToVarMapEntry_Value();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.VarToPortMapEntryImpl <em>Var To Port Map Entry</em>}' class.
@@ -2895,14 +2908,16 @@ public interface DfPackage extends EPackage {
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference VAR_TO_PORT_MAP_ENTRY__KEY = eINSTANCE.getVarToPortMapEntry_Key();
+		EReference VAR_TO_PORT_MAP_ENTRY__KEY = eINSTANCE
+				.getVarToPortMapEntry_Key();
 
 		/**
 		 * The meta object literal for the '<em><b>Value</b></em>' reference feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference VAR_TO_PORT_MAP_ENTRY__VALUE = eINSTANCE.getVarToPortMapEntry_Value();
+		EReference VAR_TO_PORT_MAP_ENTRY__VALUE = eINSTANCE
+				.getVarToPortMapEntry_Value();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.ArgumentImpl <em>Argument</em>}' class.

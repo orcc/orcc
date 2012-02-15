@@ -86,12 +86,18 @@ public class ArgumentImpl extends EObjectImpl implements Argument {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetValue(Expression newValue, NotificationChain msgs) {
+	public NotificationChain basicSetValue(Expression newValue,
+			NotificationChain msgs) {
 		Expression oldValue = value;
 		value = newValue;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, DfPackage.ARGUMENT__VALUE, oldValue, newValue);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, DfPackage.ARGUMENT__VALUE, oldValue,
+					newValue);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -105,14 +111,19 @@ public class ArgumentImpl extends EObjectImpl implements Argument {
 		if (newValue != value) {
 			NotificationChain msgs = null;
 			if (value != null)
-				msgs = ((InternalEObject)value).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - DfPackage.ARGUMENT__VALUE, null, msgs);
+				msgs = ((InternalEObject) value).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE - DfPackage.ARGUMENT__VALUE,
+						null, msgs);
 			if (newValue != null)
-				msgs = ((InternalEObject)newValue).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - DfPackage.ARGUMENT__VALUE, null, msgs);
+				msgs = ((InternalEObject) newValue).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE - DfPackage.ARGUMENT__VALUE,
+						null, msgs);
 			msgs = basicSetValue(newValue, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ARGUMENT__VALUE, newValue, newValue));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.ARGUMENT__VALUE, newValue, newValue));
 	}
 
 	/**
@@ -122,11 +133,12 @@ public class ArgumentImpl extends EObjectImpl implements Argument {
 	 */
 	public Var getVariable() {
 		if (variable != null && variable.eIsProxy()) {
-			InternalEObject oldVariable = (InternalEObject)variable;
-			variable = (Var)eResolveProxy(oldVariable);
+			InternalEObject oldVariable = (InternalEObject) variable;
+			variable = (Var) eResolveProxy(oldVariable);
 			if (variable != oldVariable) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.ARGUMENT__VARIABLE, oldVariable, variable));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							DfPackage.ARGUMENT__VARIABLE, oldVariable, variable));
 			}
 		}
 		return variable;
@@ -150,7 +162,8 @@ public class ArgumentImpl extends EObjectImpl implements Argument {
 		Var oldVariable = variable;
 		variable = newVariable;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ARGUMENT__VARIABLE, oldVariable, variable));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.ARGUMENT__VARIABLE, oldVariable, variable));
 	}
 
 	/**
@@ -159,10 +172,11 @@ public class ArgumentImpl extends EObjectImpl implements Argument {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case DfPackage.ARGUMENT__VALUE:
-				return basicSetValue(null, msgs);
+		case DfPackage.ARGUMENT__VALUE:
+			return basicSetValue(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -175,11 +189,12 @@ public class ArgumentImpl extends EObjectImpl implements Argument {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case DfPackage.ARGUMENT__VALUE:
-				return getValue();
-			case DfPackage.ARGUMENT__VARIABLE:
-				if (resolve) return getVariable();
-				return basicGetVariable();
+		case DfPackage.ARGUMENT__VALUE:
+			return getValue();
+		case DfPackage.ARGUMENT__VARIABLE:
+			if (resolve)
+				return getVariable();
+			return basicGetVariable();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -192,12 +207,12 @@ public class ArgumentImpl extends EObjectImpl implements Argument {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case DfPackage.ARGUMENT__VALUE:
-				setValue((Expression)newValue);
-				return;
-			case DfPackage.ARGUMENT__VARIABLE:
-				setVariable((Var)newValue);
-				return;
+		case DfPackage.ARGUMENT__VALUE:
+			setValue((Expression) newValue);
+			return;
+		case DfPackage.ARGUMENT__VARIABLE:
+			setVariable((Var) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -210,12 +225,12 @@ public class ArgumentImpl extends EObjectImpl implements Argument {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case DfPackage.ARGUMENT__VALUE:
-				setValue((Expression)null);
-				return;
-			case DfPackage.ARGUMENT__VARIABLE:
-				setVariable((Var)null);
-				return;
+		case DfPackage.ARGUMENT__VALUE:
+			setValue((Expression) null);
+			return;
+		case DfPackage.ARGUMENT__VARIABLE:
+			setVariable((Var) null);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -228,10 +243,10 @@ public class ArgumentImpl extends EObjectImpl implements Argument {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case DfPackage.ARGUMENT__VALUE:
-				return value != null;
-			case DfPackage.ARGUMENT__VARIABLE:
-				return variable != null;
+		case DfPackage.ARGUMENT__VALUE:
+			return value != null;
+		case DfPackage.ARGUMENT__VARIABLE:
+			return variable != null;
 		}
 		return super.eIsSet(featureID);
 	}

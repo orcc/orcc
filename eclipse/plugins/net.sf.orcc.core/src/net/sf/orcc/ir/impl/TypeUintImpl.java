@@ -70,8 +70,8 @@ public class TypeUintImpl extends TypeImpl implements TypeUint {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.TYPE_UINT__SIZE:
-				return getSize();
+		case IrPackage.TYPE_UINT__SIZE:
+			return getSize();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -83,8 +83,8 @@ public class TypeUintImpl extends TypeImpl implements TypeUint {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.TYPE_UINT__SIZE:
-				return size != SIZE_EDEFAULT;
+		case IrPackage.TYPE_UINT__SIZE:
+			return size != SIZE_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -105,9 +105,9 @@ public class TypeUintImpl extends TypeImpl implements TypeUint {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.TYPE_UINT__SIZE:
-				setSize((Integer)newValue);
-				return;
+		case IrPackage.TYPE_UINT__SIZE:
+			setSize((Integer) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -128,9 +128,9 @@ public class TypeUintImpl extends TypeImpl implements TypeUint {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.TYPE_UINT__SIZE:
-				setSize(SIZE_EDEFAULT);
-				return;
+		case IrPackage.TYPE_UINT__SIZE:
+			setSize(SIZE_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -171,7 +171,8 @@ public class TypeUintImpl extends TypeImpl implements TypeUint {
 		int oldSize = size;
 		size = newSize;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.TYPE_UINT__SIZE, oldSize, size));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.TYPE_UINT__SIZE, oldSize, size));
 	}
 
 	@Override

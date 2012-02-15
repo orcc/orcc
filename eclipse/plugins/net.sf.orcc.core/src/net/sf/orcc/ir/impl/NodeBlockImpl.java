@@ -70,8 +70,8 @@ public class NodeBlockImpl extends NodeImpl implements NodeBlock {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.NODE_BLOCK__INSTRUCTIONS:
-				return getInstructions();
+		case IrPackage.NODE_BLOCK__INSTRUCTIONS:
+			return getInstructions();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -84,8 +84,9 @@ public class NodeBlockImpl extends NodeImpl implements NodeBlock {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrPackage.NODE_BLOCK__INSTRUCTIONS:
-				return ((InternalEList<?>)getInstructions()).basicRemove(otherEnd, msgs);
+		case IrPackage.NODE_BLOCK__INSTRUCTIONS:
+			return ((InternalEList<?>) getInstructions()).basicRemove(otherEnd,
+					msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -97,8 +98,8 @@ public class NodeBlockImpl extends NodeImpl implements NodeBlock {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.NODE_BLOCK__INSTRUCTIONS:
-				return instructions != null && !instructions.isEmpty();
+		case IrPackage.NODE_BLOCK__INSTRUCTIONS:
+			return instructions != null && !instructions.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -111,10 +112,11 @@ public class NodeBlockImpl extends NodeImpl implements NodeBlock {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.NODE_BLOCK__INSTRUCTIONS:
-				getInstructions().clear();
-				getInstructions().addAll((Collection<? extends Instruction>)newValue);
-				return;
+		case IrPackage.NODE_BLOCK__INSTRUCTIONS:
+			getInstructions().clear();
+			getInstructions().addAll(
+					(Collection<? extends Instruction>) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -135,9 +137,9 @@ public class NodeBlockImpl extends NodeImpl implements NodeBlock {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.NODE_BLOCK__INSTRUCTIONS:
-				getInstructions().clear();
-				return;
+		case IrPackage.NODE_BLOCK__INSTRUCTIONS:
+			getInstructions().clear();
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -148,7 +150,8 @@ public class NodeBlockImpl extends NodeImpl implements NodeBlock {
 	 */
 	public EList<Instruction> getInstructions() {
 		if (instructions == null) {
-			instructions = new EObjectContainmentEList<Instruction>(Instruction.class, this, IrPackage.NODE_BLOCK__INSTRUCTIONS);
+			instructions = new EObjectContainmentEList<Instruction>(
+					Instruction.class, this, IrPackage.NODE_BLOCK__INSTRUCTIONS);
 		}
 		return instructions;
 	}

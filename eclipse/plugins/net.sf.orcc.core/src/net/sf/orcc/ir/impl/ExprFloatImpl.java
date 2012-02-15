@@ -83,8 +83,8 @@ public class ExprFloatImpl extends ExpressionImpl implements ExprFloat {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.EXPR_FLOAT__VALUE:
-				return getValue();
+		case IrPackage.EXPR_FLOAT__VALUE:
+			return getValue();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -96,8 +96,9 @@ public class ExprFloatImpl extends ExpressionImpl implements ExprFloat {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.EXPR_FLOAT__VALUE:
-				return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT.equals(value);
+		case IrPackage.EXPR_FLOAT__VALUE:
+			return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT
+					.equals(value);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -109,9 +110,9 @@ public class ExprFloatImpl extends ExpressionImpl implements ExprFloat {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.EXPR_FLOAT__VALUE:
-				setValue((BigDecimal)newValue);
-				return;
+		case IrPackage.EXPR_FLOAT__VALUE:
+			setValue((BigDecimal) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -132,9 +133,9 @@ public class ExprFloatImpl extends ExpressionImpl implements ExprFloat {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.EXPR_FLOAT__VALUE:
-				setValue(VALUE_EDEFAULT);
-				return;
+		case IrPackage.EXPR_FLOAT__VALUE:
+			setValue(VALUE_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -175,7 +176,8 @@ public class ExprFloatImpl extends ExpressionImpl implements ExprFloat {
 		BigDecimal oldValue = value;
 		value = newValue;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_FLOAT__VALUE, oldValue, value));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.EXPR_FLOAT__VALUE, oldValue, value));
 	}
 
 	@Override
@@ -189,7 +191,8 @@ public class ExprFloatImpl extends ExpressionImpl implements ExprFloat {
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (value: ");

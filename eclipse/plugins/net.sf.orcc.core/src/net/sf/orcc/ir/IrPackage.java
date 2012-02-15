@@ -72,7 +72,8 @@ public interface IrPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference ANNOTATION__ATTRIBUTES = eINSTANCE.getAnnotation_Attributes();
+		EReference ANNOTATION__ATTRIBUTES = eINSTANCE
+				.getAnnotation_Attributes();
 
 		/**
 		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
@@ -493,7 +494,8 @@ public interface IrPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INSTRUCTION__PREDICATE = eINSTANCE.getInstruction_Predicate();
+		EReference INSTRUCTION__PREDICATE = eINSTANCE
+				.getInstruction_Predicate();
 
 		/**
 		 * The meta object literal for the '<em><b>Line Number</b></em>' attribute feature.
@@ -501,7 +503,8 @@ public interface IrPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute INSTRUCTION__LINE_NUMBER = eINSTANCE.getInstruction_LineNumber();
+		EAttribute INSTRUCTION__LINE_NUMBER = eINSTANCE
+				.getInstruction_LineNumber();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.PredicateImpl <em>Predicate</em>}' class.
@@ -519,7 +522,8 @@ public interface IrPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PREDICATE__EXPRESSIONS = eINSTANCE.getPredicate_Expressions();
+		EReference PREDICATE__EXPRESSIONS = eINSTANCE
+				.getPredicate_Expressions();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.EStringToEStringMapEntryImpl <em>EString To EString Map Entry</em>}' class.
@@ -529,7 +533,8 @@ public interface IrPackage extends EPackage {
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getEStringToEStringMapEntry()
 		 * @generated
 		 */
-		EClass ESTRING_TO_ESTRING_MAP_ENTRY = eINSTANCE.getEStringToEStringMapEntry();
+		EClass ESTRING_TO_ESTRING_MAP_ENTRY = eINSTANCE
+				.getEStringToEStringMapEntry();
 
 		/**
 		 * The meta object literal for the '<em><b>Key</b></em>' attribute feature.
@@ -537,7 +542,8 @@ public interface IrPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute ESTRING_TO_ESTRING_MAP_ENTRY__KEY = eINSTANCE.getEStringToEStringMapEntry_Key();
+		EAttribute ESTRING_TO_ESTRING_MAP_ENTRY__KEY = eINSTANCE
+				.getEStringToEStringMapEntry_Key();
 
 		/**
 		 * The meta object literal for the '<em><b>Value</b></em>' attribute feature.
@@ -545,7 +551,8 @@ public interface IrPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute ESTRING_TO_ESTRING_MAP_ENTRY__VALUE = eINSTANCE.getEStringToEStringMapEntry_Value();
+		EAttribute ESTRING_TO_ESTRING_MAP_ENTRY__VALUE = eINSTANCE
+				.getEStringToEStringMapEntry_Value();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.NodeSpecificImpl <em>Node Specific</em>}' class.
@@ -581,7 +588,8 @@ public interface IrPackage extends EPackage {
 		 * end-user-doc -->
 		 * @generated
 		 */
-		EReference NODE_BLOCK__INSTRUCTIONS = eINSTANCE.getNodeBlock_Instructions();
+		EReference NODE_BLOCK__INSTRUCTIONS = eINSTANCE
+				.getNodeBlock_Instructions();
 
 		/**
 		 * The meta object literal for the '
@@ -657,7 +665,8 @@ public interface IrPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute NODE_WHILE__LINE_NUMBER = eINSTANCE.getNodeWhile_LineNumber();
+		EAttribute NODE_WHILE__LINE_NUMBER = eINSTANCE
+				.getNodeWhile_LineNumber();
 
 		/**
 		 * The meta object literal for the '<em><b>Join Node</b></em>' containment reference feature.

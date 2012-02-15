@@ -76,55 +76,69 @@ public class MocSwitch<T> extends Switch<T> {
 	@Override
 	protected T doSwitch(int classifierID, EObject theEObject) {
 		switch (classifierID) {
-			case MocPackage.MO_C: {
-				MoC moC = (MoC)theEObject;
-				T result = caseMoC(moC);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case MocPackage.CSDF_MO_C: {
-				CSDFMoC csdfMoC = (CSDFMoC)theEObject;
-				T result = caseCSDFMoC(csdfMoC);
-				if (result == null) result = caseMoC(csdfMoC);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case MocPackage.DPN_MO_C: {
-				DPNMoC dpnMoC = (DPNMoC)theEObject;
-				T result = caseDPNMoC(dpnMoC);
-				if (result == null) result = caseMoC(dpnMoC);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case MocPackage.KPN_MO_C: {
-				KPNMoC kpnMoC = (KPNMoC)theEObject;
-				T result = caseKPNMoC(kpnMoC);
-				if (result == null) result = caseMoC(kpnMoC);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case MocPackage.QSDF_MO_C: {
-				QSDFMoC qsdfMoC = (QSDFMoC)theEObject;
-				T result = caseQSDFMoC(qsdfMoC);
-				if (result == null) result = caseMoC(qsdfMoC);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case MocPackage.SDF_MO_C: {
-				SDFMoC sdfMoC = (SDFMoC)theEObject;
-				T result = caseSDFMoC(sdfMoC);
-				if (result == null) result = caseCSDFMoC(sdfMoC);
-				if (result == null) result = caseMoC(sdfMoC);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case MocPackage.INVOCATION: {
-				Invocation invocation = (Invocation)theEObject;
-				T result = caseInvocation(invocation);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			default: return defaultCase(theEObject);
+		case MocPackage.MO_C: {
+			MoC moC = (MoC) theEObject;
+			T result = caseMoC(moC);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case MocPackage.CSDF_MO_C: {
+			CSDFMoC csdfMoC = (CSDFMoC) theEObject;
+			T result = caseCSDFMoC(csdfMoC);
+			if (result == null)
+				result = caseMoC(csdfMoC);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case MocPackage.DPN_MO_C: {
+			DPNMoC dpnMoC = (DPNMoC) theEObject;
+			T result = caseDPNMoC(dpnMoC);
+			if (result == null)
+				result = caseMoC(dpnMoC);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case MocPackage.KPN_MO_C: {
+			KPNMoC kpnMoC = (KPNMoC) theEObject;
+			T result = caseKPNMoC(kpnMoC);
+			if (result == null)
+				result = caseMoC(kpnMoC);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case MocPackage.QSDF_MO_C: {
+			QSDFMoC qsdfMoC = (QSDFMoC) theEObject;
+			T result = caseQSDFMoC(qsdfMoC);
+			if (result == null)
+				result = caseMoC(qsdfMoC);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case MocPackage.SDF_MO_C: {
+			SDFMoC sdfMoC = (SDFMoC) theEObject;
+			T result = caseSDFMoC(sdfMoC);
+			if (result == null)
+				result = caseCSDFMoC(sdfMoC);
+			if (result == null)
+				result = caseMoC(sdfMoC);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case MocPackage.INVOCATION: {
+			Invocation invocation = (Invocation) theEObject;
+			T result = caseInvocation(invocation);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		default:
+			return defaultCase(theEObject);
 		}
 	}
 

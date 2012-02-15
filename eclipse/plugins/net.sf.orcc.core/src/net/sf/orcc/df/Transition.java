@@ -30,7 +30,6 @@ package net.sf.orcc.df;
 
 import net.sf.dftools.graph.Edge;
 
-
 /**
  * This class defines a transition of a Finite State Machine.
  * 

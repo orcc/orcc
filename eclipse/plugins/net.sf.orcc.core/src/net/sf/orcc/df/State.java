@@ -30,7 +30,6 @@ package net.sf.orcc.df;
 
 import net.sf.dftools.graph.Vertex;
 
-
 /**
  * This class defines a state of a Finite State Machine.
  * 

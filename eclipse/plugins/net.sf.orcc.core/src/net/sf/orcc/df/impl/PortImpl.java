@@ -121,8 +121,12 @@ public class PortImpl extends DfVertexImpl implements Port {
 		Type oldType = type;
 		type = newType;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, DfPackage.PORT__TYPE, oldType, newType);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, DfPackage.PORT__TYPE, oldType, newType);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -135,14 +139,14 @@ public class PortImpl extends DfVertexImpl implements Port {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case DfPackage.PORT__NUM_TOKENS_CONSUMED:
-				return getNumTokensConsumed();
-			case DfPackage.PORT__NUM_TOKENS_PRODUCED:
-				return getNumTokensProduced();
-			case DfPackage.PORT__TYPE:
-				return getType();
-			case DfPackage.PORT__NATIVE:
-				return isNative();
+		case DfPackage.PORT__NUM_TOKENS_CONSUMED:
+			return getNumTokensConsumed();
+		case DfPackage.PORT__NUM_TOKENS_PRODUCED:
+			return getNumTokensProduced();
+		case DfPackage.PORT__TYPE:
+			return getType();
+		case DfPackage.PORT__NATIVE:
+			return isNative();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -153,10 +157,11 @@ public class PortImpl extends DfVertexImpl implements Port {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case DfPackage.PORT__TYPE:
-				return basicSetType(null, msgs);
+		case DfPackage.PORT__TYPE:
+			return basicSetType(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -169,14 +174,14 @@ public class PortImpl extends DfVertexImpl implements Port {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case DfPackage.PORT__NUM_TOKENS_CONSUMED:
-				return numTokensConsumed != NUM_TOKENS_CONSUMED_EDEFAULT;
-			case DfPackage.PORT__NUM_TOKENS_PRODUCED:
-				return numTokensProduced != NUM_TOKENS_PRODUCED_EDEFAULT;
-			case DfPackage.PORT__TYPE:
-				return type != null;
-			case DfPackage.PORT__NATIVE:
-				return native_ != NATIVE_EDEFAULT;
+		case DfPackage.PORT__NUM_TOKENS_CONSUMED:
+			return numTokensConsumed != NUM_TOKENS_CONSUMED_EDEFAULT;
+		case DfPackage.PORT__NUM_TOKENS_PRODUCED:
+			return numTokensProduced != NUM_TOKENS_PRODUCED_EDEFAULT;
+		case DfPackage.PORT__TYPE:
+			return type != null;
+		case DfPackage.PORT__NATIVE:
+			return native_ != NATIVE_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -189,18 +194,18 @@ public class PortImpl extends DfVertexImpl implements Port {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case DfPackage.PORT__NUM_TOKENS_CONSUMED:
-				setNumTokensConsumed((Integer)newValue);
-				return;
-			case DfPackage.PORT__NUM_TOKENS_PRODUCED:
-				setNumTokensProduced((Integer)newValue);
-				return;
-			case DfPackage.PORT__TYPE:
-				setType((Type)newValue);
-				return;
-			case DfPackage.PORT__NATIVE:
-				setNative((Boolean)newValue);
-				return;
+		case DfPackage.PORT__NUM_TOKENS_CONSUMED:
+			setNumTokensConsumed((Integer) newValue);
+			return;
+		case DfPackage.PORT__NUM_TOKENS_PRODUCED:
+			setNumTokensProduced((Integer) newValue);
+			return;
+		case DfPackage.PORT__TYPE:
+			setType((Type) newValue);
+			return;
+		case DfPackage.PORT__NATIVE:
+			setNative((Boolean) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -223,18 +228,18 @@ public class PortImpl extends DfVertexImpl implements Port {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case DfPackage.PORT__NUM_TOKENS_CONSUMED:
-				setNumTokensConsumed(NUM_TOKENS_CONSUMED_EDEFAULT);
-				return;
-			case DfPackage.PORT__NUM_TOKENS_PRODUCED:
-				setNumTokensProduced(NUM_TOKENS_PRODUCED_EDEFAULT);
-				return;
-			case DfPackage.PORT__TYPE:
-				setType((Type)null);
-				return;
-			case DfPackage.PORT__NATIVE:
-				setNative(NATIVE_EDEFAULT);
-				return;
+		case DfPackage.PORT__NUM_TOKENS_CONSUMED:
+			setNumTokensConsumed(NUM_TOKENS_CONSUMED_EDEFAULT);
+			return;
+		case DfPackage.PORT__NUM_TOKENS_PRODUCED:
+			setNumTokensProduced(NUM_TOKENS_PRODUCED_EDEFAULT);
+			return;
+		case DfPackage.PORT__TYPE:
+			setType((Type) null);
+			return;
+		case DfPackage.PORT__NATIVE:
+			setNative(NATIVE_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -317,7 +322,8 @@ public class PortImpl extends DfVertexImpl implements Port {
 		boolean oldNative = native_;
 		native_ = newNative;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.PORT__NATIVE, oldNative, native_));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.PORT__NATIVE, oldNative, native_));
 	}
 
 	/**
@@ -329,7 +335,9 @@ public class PortImpl extends DfVertexImpl implements Port {
 		int oldNumTokensConsumed = numTokensConsumed;
 		numTokensConsumed = newNumTokensConsumed;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.PORT__NUM_TOKENS_CONSUMED, oldNumTokensConsumed, numTokensConsumed));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.PORT__NUM_TOKENS_CONSUMED, oldNumTokensConsumed,
+					numTokensConsumed));
 	}
 
 	/**
@@ -341,7 +349,9 @@ public class PortImpl extends DfVertexImpl implements Port {
 		int oldNumTokensProduced = numTokensProduced;
 		numTokensProduced = newNumTokensProduced;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.PORT__NUM_TOKENS_PRODUCED, oldNumTokensProduced, numTokensProduced));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.PORT__NUM_TOKENS_PRODUCED, oldNumTokensProduced,
+					numTokensProduced));
 	}
 
 	/**
@@ -353,14 +363,19 @@ public class PortImpl extends DfVertexImpl implements Port {
 		if (newType != type) {
 			NotificationChain msgs = null;
 			if (type != null)
-				msgs = ((InternalEObject)type).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - DfPackage.PORT__TYPE, null, msgs);
+				msgs = ((InternalEObject) type).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE - DfPackage.PORT__TYPE, null,
+						msgs);
 			if (newType != null)
-				msgs = ((InternalEObject)newType).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - DfPackage.PORT__TYPE, null, msgs);
+				msgs = ((InternalEObject) newType).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE - DfPackage.PORT__TYPE, null,
+						msgs);
 			msgs = basicSetType(newType, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.PORT__TYPE, newType, newType));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.PORT__TYPE, newType, newType));
 	}
 
 	/**
@@ -370,7 +385,8 @@ public class PortImpl extends DfVertexImpl implements Port {
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (numTokensConsumed: ");

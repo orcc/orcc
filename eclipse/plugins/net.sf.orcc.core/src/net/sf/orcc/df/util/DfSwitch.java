@@ -94,171 +94,229 @@ public class DfSwitch<T> extends Switch<T> {
 	@Override
 	protected T doSwitch(int classifierID, EObject theEObject) {
 		switch (classifierID) {
-			case DfPackage.DF_VERTEX: {
-				DfVertex dfVertex = (DfVertex)theEObject;
-				T result = caseDfVertex(dfVertex);
-				if (result == null) result = caseVertex(dfVertex);
-				if (result == null) result = caseNameable(dfVertex);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.UNIT: {
-				Unit unit = (Unit)theEObject;
-				T result = caseUnit(unit);
-				if (result == null) result = caseNameable(unit);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.PORT: {
-				Port port = (Port)theEObject;
-				T result = casePort(port);
-				if (result == null) result = caseDfVertex(port);
-				if (result == null) result = caseVertex(port);
-				if (result == null) result = caseNameable(port);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.INSTANCE: {
-				Instance instance = (Instance)theEObject;
-				T result = caseInstance(instance);
-				if (result == null) result = caseDfVertex(instance);
-				if (result == null) result = caseVertex(instance);
-				if (result == null) result = caseNameable(instance);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.ENTITY: {
-				Entity entity = (Entity)theEObject;
-				T result = caseEntity(entity);
-				if (result == null) result = caseDfVertex(entity);
-				if (result == null) result = caseVertex(entity);
-				if (result == null) result = caseNameable(entity);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.ENTITY_SPECIFIC: {
-				EntitySpecific entitySpecific = (EntitySpecific)theEObject;
-				T result = caseEntitySpecific(entitySpecific);
-				if (result == null) result = caseEntity(entitySpecific);
-				if (result == null) result = caseDfVertex(entitySpecific);
-				if (result == null) result = caseVertex(entitySpecific);
-				if (result == null) result = caseNameable(entitySpecific);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.ACTOR: {
-				Actor actor = (Actor)theEObject;
-				T result = caseActor(actor);
-				if (result == null) result = caseEntity(actor);
-				if (result == null) result = caseDfVertex(actor);
-				if (result == null) result = caseVertex(actor);
-				if (result == null) result = caseNameable(actor);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.NETWORK: {
-				Network network = (Network)theEObject;
-				T result = caseNetwork(network);
-				if (result == null) result = caseEntity(network);
-				if (result == null) result = caseDfVertex(network);
-				if (result == null) result = caseVertex(network);
-				if (result == null) result = caseNameable(network);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.BROADCAST: {
-				Broadcast broadcast = (Broadcast)theEObject;
-				T result = caseBroadcast(broadcast);
-				if (result == null) result = caseEntity(broadcast);
-				if (result == null) result = caseDfVertex(broadcast);
-				if (result == null) result = caseVertex(broadcast);
-				if (result == null) result = caseNameable(broadcast);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.CONNECTION: {
-				Connection connection = (Connection)theEObject;
-				T result = caseConnection(connection);
-				if (result == null) result = caseEdge(connection);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.WRAPPER_STRING: {
-				WrapperString wrapperString = (WrapperString)theEObject;
-				T result = caseWrapperString(wrapperString);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.WRAPPER_XML: {
-				WrapperXml wrapperXml = (WrapperXml)theEObject;
-				T result = caseWrapperXml(wrapperXml);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.ACTION: {
-				Action action = (Action)theEObject;
-				T result = caseAction(action);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.FSM: {
-				FSM fsm = (FSM)theEObject;
-				T result = caseFSM(fsm);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.PATTERN: {
-				Pattern pattern = (Pattern)theEObject;
-				T result = casePattern(pattern);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.STATE: {
-				State state = (State)theEObject;
-				T result = caseState(state);
-				if (result == null) result = caseVertex(state);
-				if (result == null) result = caseNameable(state);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.TAG: {
-				Tag tag = (Tag)theEObject;
-				T result = caseTag(tag);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.TRANSITION: {
-				Transition transition = (Transition)theEObject;
-				T result = caseTransition(transition);
-				if (result == null) result = caseEdge(transition);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY: {
-				@SuppressWarnings("unchecked") Map.Entry<Port, Integer> portToEIntegerObjectMapEntry = (Map.Entry<Port, Integer>)theEObject;
-				T result = casePortToEIntegerObjectMapEntry(portToEIntegerObjectMapEntry);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.PORT_TO_VAR_MAP_ENTRY: {
-				@SuppressWarnings("unchecked") Map.Entry<Port, Var> portToVarMapEntry = (Map.Entry<Port, Var>)theEObject;
-				T result = casePortToVarMapEntry(portToVarMapEntry);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.VAR_TO_PORT_MAP_ENTRY: {
-				@SuppressWarnings("unchecked") Map.Entry<Var, Port> varToPortMapEntry = (Map.Entry<Var, Port>)theEObject;
-				T result = caseVarToPortMapEntry(varToPortMapEntry);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case DfPackage.ARGUMENT: {
-				Argument argument = (Argument)theEObject;
-				T result = caseArgument(argument);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			default: return defaultCase(theEObject);
+		case DfPackage.DF_VERTEX: {
+			DfVertex dfVertex = (DfVertex) theEObject;
+			T result = caseDfVertex(dfVertex);
+			if (result == null)
+				result = caseVertex(dfVertex);
+			if (result == null)
+				result = caseNameable(dfVertex);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case DfPackage.UNIT: {
+			Unit unit = (Unit) theEObject;
+			T result = caseUnit(unit);
+			if (result == null)
+				result = caseNameable(unit);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case DfPackage.PORT: {
+			Port port = (Port) theEObject;
+			T result = casePort(port);
+			if (result == null)
+				result = caseDfVertex(port);
+			if (result == null)
+				result = caseVertex(port);
+			if (result == null)
+				result = caseNameable(port);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case DfPackage.INSTANCE: {
+			Instance instance = (Instance) theEObject;
+			T result = caseInstance(instance);
+			if (result == null)
+				result = caseDfVertex(instance);
+			if (result == null)
+				result = caseVertex(instance);
+			if (result == null)
+				result = caseNameable(instance);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case DfPackage.ENTITY: {
+			Entity entity = (Entity) theEObject;
+			T result = caseEntity(entity);
+			if (result == null)
+				result = caseDfVertex(entity);
+			if (result == null)
+				result = caseVertex(entity);
+			if (result == null)
+				result = caseNameable(entity);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case DfPackage.ENTITY_SPECIFIC: {
+			EntitySpecific entitySpecific = (EntitySpecific) theEObject;
+			T result = caseEntitySpecific(entitySpecific);
+			if (result == null)
+				result = caseEntity(entitySpecific);
+			if (result == null)
+				result = caseDfVertex(entitySpecific);
+			if (result == null)
+				result = caseVertex(entitySpecific);
+			if (result == null)
+				result = caseNameable(entitySpecific);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case DfPackage.ACTOR: {
+			Actor actor = (Actor) theEObject;
+			T result = caseActor(actor);
+			if (result == null)
+				result = caseEntity(actor);
+			if (result == null)
+				result = caseDfVertex(actor);
+			if (result == null)
+				result = caseVertex(actor);
+			if (result == null)
+				result = caseNameable(actor);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case DfPackage.NETWORK: {
+			Network network = (Network) theEObject;
+			T result = caseNetwork(network);
+			if (result == null)
+				result = caseEntity(network);
+			if (result == null)
+				result = caseDfVertex(network);
+			if (result == null)
+				result = caseVertex(network);
+			if (result == null)
+				result = caseNameable(network);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case DfPackage.BROADCAST: {
+			Broadcast broadcast = (Broadcast) theEObject;
+			T result = caseBroadcast(broadcast);
+			if (result == null)
+				result = caseEntity(broadcast);
+			if (result == null)
+				result = caseDfVertex(broadcast);
+			if (result == null)
+				result = caseVertex(broadcast);
+			if (result == null)
+				result = caseNameable(broadcast);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case DfPackage.CONNECTION: {
+			Connection connection = (Connection) theEObject;
+			T result = caseConnection(connection);
+			if (result == null)
+				result = caseEdge(connection);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case DfPackage.WRAPPER_STRING: {
+			WrapperString wrapperString = (WrapperString) theEObject;
+			T result = caseWrapperString(wrapperString);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case DfPackage.WRAPPER_XML: {
+			WrapperXml wrapperXml = (WrapperXml) theEObject;
+			T result = caseWrapperXml(wrapperXml);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case DfPackage.ACTION: {
+			Action action = (Action) theEObject;
+			T result = caseAction(action);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case DfPackage.FSM: {
+			FSM fsm = (FSM) theEObject;
+			T result = caseFSM(fsm);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case DfPackage.PATTERN: {
+			Pattern pattern = (Pattern) theEObject;
+			T result = casePattern(pattern);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case DfPackage.STATE: {
+			State state = (State) theEObject;
+			T result = caseState(state);
+			if (result == null)
+				result = caseVertex(state);
+			if (result == null)
+				result = caseNameable(state);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case DfPackage.TAG: {
+			Tag tag = (Tag) theEObject;
+			T result = caseTag(tag);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case DfPackage.TRANSITION: {
+			Transition transition = (Transition) theEObject;
+			T result = caseTransition(transition);
+			if (result == null)
+				result = caseEdge(transition);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY: {
+			@SuppressWarnings("unchecked")
+			Map.Entry<Port, Integer> portToEIntegerObjectMapEntry = (Map.Entry<Port, Integer>) theEObject;
+			T result = casePortToEIntegerObjectMapEntry(portToEIntegerObjectMapEntry);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case DfPackage.PORT_TO_VAR_MAP_ENTRY: {
+			@SuppressWarnings("unchecked")
+			Map.Entry<Port, Var> portToVarMapEntry = (Map.Entry<Port, Var>) theEObject;
+			T result = casePortToVarMapEntry(portToVarMapEntry);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case DfPackage.VAR_TO_PORT_MAP_ENTRY: {
+			@SuppressWarnings("unchecked")
+			Map.Entry<Var, Port> varToPortMapEntry = (Map.Entry<Var, Port>) theEObject;
+			T result = caseVarToPortMapEntry(varToPortMapEntry);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case DfPackage.ARGUMENT: {
+			Argument argument = (Argument) theEObject;
+			T result = caseArgument(argument);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		default:
+			return defaultCase(theEObject);
 		}
 	}
 

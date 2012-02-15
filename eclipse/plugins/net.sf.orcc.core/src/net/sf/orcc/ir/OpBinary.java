@@ -599,35 +599,17 @@ public enum OpBinary implements Enumerator {
 	 * 
 	 * @generated
 	 */
-	private static final OpBinary[] VALUES_ARRAY = new OpBinary[] {
-			BITAND,
-			BITOR,
-			BITXOR,
-			DIV,
-			DIV_INT,
-			EQ,
-			EXP,
-			GE,
-			GT,
-			LE,
-			LOGIC_AND,
-			LOGIC_OR,
-			LT,
-			MINUS,
-			MOD,
-			NE,
-			PLUS,
-			SHIFT_LEFT,
-			SHIFT_RIGHT,
-			TIMES,
-		};
+	private static final OpBinary[] VALUES_ARRAY = new OpBinary[] { BITAND,
+			BITOR, BITXOR, DIV, DIV_INT, EQ, EXP, GE, GT, LE, LOGIC_AND,
+			LOGIC_OR, LT, MINUS, MOD, NE, PLUS, SHIFT_LEFT, SHIFT_RIGHT, TIMES, };
 
 	/**
 	 * A public read-only list of all the '<em><b>Op Binary</b></em>' enumerators.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static final List<OpBinary> VALUES = Collections.unmodifiableList(Arrays.asList(VALUES_ARRAY));
+	public static final List<OpBinary> VALUES = Collections
+			.unmodifiableList(Arrays.asList(VALUES_ARRAY));
 
 	static {
 		for (OpBinary op : OpBinary.values()) {
@@ -647,26 +629,46 @@ public enum OpBinary implements Enumerator {
 	 */
 	public static OpBinary get(int value) {
 		switch (value) {
-			case BITAND_VALUE: return BITAND;
-			case BITOR_VALUE: return BITOR;
-			case BITXOR_VALUE: return BITXOR;
-			case DIV_VALUE: return DIV;
-			case DIV_INT_VALUE: return DIV_INT;
-			case EQ_VALUE: return EQ;
-			case EXP_VALUE: return EXP;
-			case GE_VALUE: return GE;
-			case GT_VALUE: return GT;
-			case LE_VALUE: return LE;
-			case LOGIC_AND_VALUE: return LOGIC_AND;
-			case LOGIC_OR_VALUE: return LOGIC_OR;
-			case LT_VALUE: return LT;
-			case MINUS_VALUE: return MINUS;
-			case MOD_VALUE: return MOD;
-			case NE_VALUE: return NE;
-			case PLUS_VALUE: return PLUS;
-			case SHIFT_LEFT_VALUE: return SHIFT_LEFT;
-			case SHIFT_RIGHT_VALUE: return SHIFT_RIGHT;
-			case TIMES_VALUE: return TIMES;
+		case BITAND_VALUE:
+			return BITAND;
+		case BITOR_VALUE:
+			return BITOR;
+		case BITXOR_VALUE:
+			return BITXOR;
+		case DIV_VALUE:
+			return DIV;
+		case DIV_INT_VALUE:
+			return DIV_INT;
+		case EQ_VALUE:
+			return EQ;
+		case EXP_VALUE:
+			return EXP;
+		case GE_VALUE:
+			return GE;
+		case GT_VALUE:
+			return GT;
+		case LE_VALUE:
+			return LE;
+		case LOGIC_AND_VALUE:
+			return LOGIC_AND;
+		case LOGIC_OR_VALUE:
+			return LOGIC_OR;
+		case LT_VALUE:
+			return LT;
+		case MINUS_VALUE:
+			return MINUS;
+		case MOD_VALUE:
+			return MOD;
+		case NE_VALUE:
+			return NE;
+		case PLUS_VALUE:
+			return PLUS;
+		case SHIFT_LEFT_VALUE:
+			return SHIFT_LEFT;
+		case SHIFT_RIGHT_VALUE:
+			return SHIFT_RIGHT;
+		case TIMES_VALUE:
+			return TIMES;
 		}
 		return null;
 	}
@@ -787,7 +789,7 @@ public enum OpBinary implements Enumerator {
 	 * @generated
 	 */
 	public String getLiteral() {
-	  return literal;
+		return literal;
 	}
 
 	/**
@@ -795,7 +797,7 @@ public enum OpBinary implements Enumerator {
 	 * @generated
 	 */
 	public String getName() {
-	  return name;
+		return name;
 	}
 
 	/**
@@ -848,7 +850,7 @@ public enum OpBinary implements Enumerator {
 	 * @generated
 	 */
 	public int getValue() {
-	  return value;
+		return value;
 	}
 
 	/**

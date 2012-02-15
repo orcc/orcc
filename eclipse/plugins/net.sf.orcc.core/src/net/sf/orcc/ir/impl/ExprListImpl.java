@@ -45,7 +45,7 @@ public class ExprListImpl extends ExpressionImpl implements ExprList {
 	 * @ordered
 	 */
 	protected EList<Expression> value;
-	
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -61,8 +61,8 @@ public class ExprListImpl extends ExpressionImpl implements ExprList {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.EXPR_LIST__VALUE:
-				return getValue();
+		case IrPackage.EXPR_LIST__VALUE:
+			return getValue();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -73,10 +73,11 @@ public class ExprListImpl extends ExpressionImpl implements ExprList {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrPackage.EXPR_LIST__VALUE:
-				return ((InternalEList<?>)getValue()).basicRemove(otherEnd, msgs);
+		case IrPackage.EXPR_LIST__VALUE:
+			return ((InternalEList<?>) getValue()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -88,8 +89,8 @@ public class ExprListImpl extends ExpressionImpl implements ExprList {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.EXPR_LIST__VALUE:
-				return value != null && !value.isEmpty();
+		case IrPackage.EXPR_LIST__VALUE:
+			return value != null && !value.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -102,10 +103,10 @@ public class ExprListImpl extends ExpressionImpl implements ExprList {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.EXPR_LIST__VALUE:
-				getValue().clear();
-				getValue().addAll((Collection<? extends Expression>)newValue);
-				return;
+		case IrPackage.EXPR_LIST__VALUE:
+			getValue().clear();
+			getValue().addAll((Collection<? extends Expression>) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -126,9 +127,9 @@ public class ExprListImpl extends ExpressionImpl implements ExprList {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.EXPR_LIST__VALUE:
-				getValue().clear();
-				return;
+		case IrPackage.EXPR_LIST__VALUE:
+			getValue().clear();
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -162,7 +163,8 @@ public class ExprListImpl extends ExpressionImpl implements ExprList {
 	 */
 	public EList<Expression> getValue() {
 		if (value == null) {
-			value = new EObjectContainmentEList<Expression>(Expression.class, this, IrPackage.EXPR_LIST__VALUE);
+			value = new EObjectContainmentEList<Expression>(Expression.class,
+					this, IrPackage.EXPR_LIST__VALUE);
 		}
 		return value;
 	}
@@ -174,7 +176,8 @@ public class ExprListImpl extends ExpressionImpl implements ExprList {
 
 	@Override
 	public void set(ExprInt index, Expression value) {
-		((AbstractEList<Expression>) getValue()).setUnique(index.getIntValue(), value);
+		((AbstractEList<Expression>) getValue()).setUnique(index.getIntValue(),
+				value);
 	}
 
 	@Override

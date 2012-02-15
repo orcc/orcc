@@ -98,8 +98,12 @@ public class ExprBinaryImpl extends ExpressionImpl implements ExprBinary {
 		Expression oldE1 = e1;
 		e1 = newE1;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_BINARY__E1, oldE1, newE1);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.EXPR_BINARY__E1, oldE1, newE1);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -112,8 +116,12 @@ public class ExprBinaryImpl extends ExpressionImpl implements ExprBinary {
 		Expression oldE2 = e2;
 		e2 = newE2;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_BINARY__E2, oldE2, newE2);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.EXPR_BINARY__E2, oldE2, newE2);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -126,8 +134,13 @@ public class ExprBinaryImpl extends ExpressionImpl implements ExprBinary {
 		Type oldType = type;
 		type = newType;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_BINARY__TYPE, oldType, newType);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.EXPR_BINARY__TYPE, oldType,
+					newType);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -139,14 +152,14 @@ public class ExprBinaryImpl extends ExpressionImpl implements ExprBinary {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.EXPR_BINARY__E1:
-				return getE1();
-			case IrPackage.EXPR_BINARY__E2:
-				return getE2();
-			case IrPackage.EXPR_BINARY__OP:
-				return getOp();
-			case IrPackage.EXPR_BINARY__TYPE:
-				return getType();
+		case IrPackage.EXPR_BINARY__E1:
+			return getE1();
+		case IrPackage.EXPR_BINARY__E2:
+			return getE2();
+		case IrPackage.EXPR_BINARY__OP:
+			return getOp();
+		case IrPackage.EXPR_BINARY__TYPE:
+			return getType();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -159,12 +172,12 @@ public class ExprBinaryImpl extends ExpressionImpl implements ExprBinary {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrPackage.EXPR_BINARY__E1:
-				return basicSetE1(null, msgs);
-			case IrPackage.EXPR_BINARY__E2:
-				return basicSetE2(null, msgs);
-			case IrPackage.EXPR_BINARY__TYPE:
-				return basicSetType(null, msgs);
+		case IrPackage.EXPR_BINARY__E1:
+			return basicSetE1(null, msgs);
+		case IrPackage.EXPR_BINARY__E2:
+			return basicSetE2(null, msgs);
+		case IrPackage.EXPR_BINARY__TYPE:
+			return basicSetType(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -176,14 +189,14 @@ public class ExprBinaryImpl extends ExpressionImpl implements ExprBinary {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.EXPR_BINARY__E1:
-				return e1 != null;
-			case IrPackage.EXPR_BINARY__E2:
-				return e2 != null;
-			case IrPackage.EXPR_BINARY__OP:
-				return op != OP_EDEFAULT;
-			case IrPackage.EXPR_BINARY__TYPE:
-				return type != null;
+		case IrPackage.EXPR_BINARY__E1:
+			return e1 != null;
+		case IrPackage.EXPR_BINARY__E2:
+			return e2 != null;
+		case IrPackage.EXPR_BINARY__OP:
+			return op != OP_EDEFAULT;
+		case IrPackage.EXPR_BINARY__TYPE:
+			return type != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -195,18 +208,18 @@ public class ExprBinaryImpl extends ExpressionImpl implements ExprBinary {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.EXPR_BINARY__E1:
-				setE1((Expression)newValue);
-				return;
-			case IrPackage.EXPR_BINARY__E2:
-				setE2((Expression)newValue);
-				return;
-			case IrPackage.EXPR_BINARY__OP:
-				setOp((OpBinary)newValue);
-				return;
-			case IrPackage.EXPR_BINARY__TYPE:
-				setType((Type)newValue);
-				return;
+		case IrPackage.EXPR_BINARY__E1:
+			setE1((Expression) newValue);
+			return;
+		case IrPackage.EXPR_BINARY__E2:
+			setE2((Expression) newValue);
+			return;
+		case IrPackage.EXPR_BINARY__OP:
+			setOp((OpBinary) newValue);
+			return;
+		case IrPackage.EXPR_BINARY__TYPE:
+			setType((Type) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -227,18 +240,18 @@ public class ExprBinaryImpl extends ExpressionImpl implements ExprBinary {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.EXPR_BINARY__E1:
-				setE1((Expression)null);
-				return;
-			case IrPackage.EXPR_BINARY__E2:
-				setE2((Expression)null);
-				return;
-			case IrPackage.EXPR_BINARY__OP:
-				setOp(OP_EDEFAULT);
-				return;
-			case IrPackage.EXPR_BINARY__TYPE:
-				setType((Type)null);
-				return;
+		case IrPackage.EXPR_BINARY__E1:
+			setE1((Expression) null);
+			return;
+		case IrPackage.EXPR_BINARY__E2:
+			setE2((Expression) null);
+			return;
+		case IrPackage.EXPR_BINARY__OP:
+			setOp(OP_EDEFAULT);
+			return;
+		case IrPackage.EXPR_BINARY__TYPE:
+			setType((Type) null);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -288,14 +301,19 @@ public class ExprBinaryImpl extends ExpressionImpl implements ExprBinary {
 		if (newE1 != e1) {
 			NotificationChain msgs = null;
 			if (e1 != null)
-				msgs = ((InternalEObject)e1).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_BINARY__E1, null, msgs);
+				msgs = ((InternalEObject) e1).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_BINARY__E1,
+						null, msgs);
 			if (newE1 != null)
-				msgs = ((InternalEObject)newE1).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_BINARY__E1, null, msgs);
+				msgs = ((InternalEObject) newE1).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_BINARY__E1,
+						null, msgs);
 			msgs = basicSetE1(newE1, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_BINARY__E1, newE1, newE1));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.EXPR_BINARY__E1, newE1, newE1));
 	}
 
 	/**
@@ -306,14 +324,19 @@ public class ExprBinaryImpl extends ExpressionImpl implements ExprBinary {
 		if (newE2 != e2) {
 			NotificationChain msgs = null;
 			if (e2 != null)
-				msgs = ((InternalEObject)e2).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_BINARY__E2, null, msgs);
+				msgs = ((InternalEObject) e2).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_BINARY__E2,
+						null, msgs);
 			if (newE2 != null)
-				msgs = ((InternalEObject)newE2).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_BINARY__E2, null, msgs);
+				msgs = ((InternalEObject) newE2).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_BINARY__E2,
+						null, msgs);
 			msgs = basicSetE2(newE2, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_BINARY__E2, newE2, newE2));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.EXPR_BINARY__E2, newE2, newE2));
 	}
 
 	/**
@@ -324,7 +347,8 @@ public class ExprBinaryImpl extends ExpressionImpl implements ExprBinary {
 		OpBinary oldOp = op;
 		op = newOp == null ? OP_EDEFAULT : newOp;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_BINARY__OP, oldOp, op));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.EXPR_BINARY__OP, oldOp, op));
 	}
 
 	/**
@@ -335,14 +359,19 @@ public class ExprBinaryImpl extends ExpressionImpl implements ExprBinary {
 		if (newType != type) {
 			NotificationChain msgs = null;
 			if (type != null)
-				msgs = ((InternalEObject)type).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_BINARY__TYPE, null, msgs);
+				msgs = ((InternalEObject) type).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_BINARY__TYPE,
+						null, msgs);
 			if (newType != null)
-				msgs = ((InternalEObject)newType).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_BINARY__TYPE, null, msgs);
+				msgs = ((InternalEObject) newType).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_BINARY__TYPE,
+						null, msgs);
 			msgs = basicSetType(newType, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_BINARY__TYPE, newType, newType));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.EXPR_BINARY__TYPE, newType, newType));
 	}
 
 	/**
@@ -351,7 +380,8 @@ public class ExprBinaryImpl extends ExpressionImpl implements ExprBinary {
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (op: ");

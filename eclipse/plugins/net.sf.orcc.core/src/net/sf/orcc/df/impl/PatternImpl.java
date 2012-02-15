@@ -149,19 +149,25 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case DfPackage.PATTERN__NUM_TOKENS_MAP:
-				if (coreType) return getNumTokensMap();
-				else return getNumTokensMap().map();
-			case DfPackage.PATTERN__PORTS:
-				return getPorts();
-			case DfPackage.PATTERN__PORT_TO_VAR_MAP:
-				if (coreType) return getPortToVarMap();
-				else return getPortToVarMap().map();
-			case DfPackage.PATTERN__VARIABLES:
-				return getVariables();
-			case DfPackage.PATTERN__VAR_TO_PORT_MAP:
-				if (coreType) return getVarToPortMap();
-				else return getVarToPortMap().map();
+		case DfPackage.PATTERN__NUM_TOKENS_MAP:
+			if (coreType)
+				return getNumTokensMap();
+			else
+				return getNumTokensMap().map();
+		case DfPackage.PATTERN__PORTS:
+			return getPorts();
+		case DfPackage.PATTERN__PORT_TO_VAR_MAP:
+			if (coreType)
+				return getPortToVarMap();
+			else
+				return getPortToVarMap().map();
+		case DfPackage.PATTERN__VARIABLES:
+			return getVariables();
+		case DfPackage.PATTERN__VAR_TO_PORT_MAP:
+			if (coreType)
+				return getVarToPortMap();
+			else
+				return getVarToPortMap().map();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -174,14 +180,18 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case DfPackage.PATTERN__NUM_TOKENS_MAP:
-				return ((InternalEList<?>)getNumTokensMap()).basicRemove(otherEnd, msgs);
-			case DfPackage.PATTERN__PORT_TO_VAR_MAP:
-				return ((InternalEList<?>)getPortToVarMap()).basicRemove(otherEnd, msgs);
-			case DfPackage.PATTERN__VARIABLES:
-				return ((InternalEList<?>)getVariables()).basicRemove(otherEnd, msgs);
-			case DfPackage.PATTERN__VAR_TO_PORT_MAP:
-				return ((InternalEList<?>)getVarToPortMap()).basicRemove(otherEnd, msgs);
+		case DfPackage.PATTERN__NUM_TOKENS_MAP:
+			return ((InternalEList<?>) getNumTokensMap()).basicRemove(otherEnd,
+					msgs);
+		case DfPackage.PATTERN__PORT_TO_VAR_MAP:
+			return ((InternalEList<?>) getPortToVarMap()).basicRemove(otherEnd,
+					msgs);
+		case DfPackage.PATTERN__VARIABLES:
+			return ((InternalEList<?>) getVariables()).basicRemove(otherEnd,
+					msgs);
+		case DfPackage.PATTERN__VAR_TO_PORT_MAP:
+			return ((InternalEList<?>) getVarToPortMap()).basicRemove(otherEnd,
+					msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -193,16 +203,16 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case DfPackage.PATTERN__NUM_TOKENS_MAP:
-				return numTokensMap != null && !numTokensMap.isEmpty();
-			case DfPackage.PATTERN__PORTS:
-				return ports != null && !ports.isEmpty();
-			case DfPackage.PATTERN__PORT_TO_VAR_MAP:
-				return portToVarMap != null && !portToVarMap.isEmpty();
-			case DfPackage.PATTERN__VARIABLES:
-				return variables != null && !variables.isEmpty();
-			case DfPackage.PATTERN__VAR_TO_PORT_MAP:
-				return varToPortMap != null && !varToPortMap.isEmpty();
+		case DfPackage.PATTERN__NUM_TOKENS_MAP:
+			return numTokensMap != null && !numTokensMap.isEmpty();
+		case DfPackage.PATTERN__PORTS:
+			return ports != null && !ports.isEmpty();
+		case DfPackage.PATTERN__PORT_TO_VAR_MAP:
+			return portToVarMap != null && !portToVarMap.isEmpty();
+		case DfPackage.PATTERN__VARIABLES:
+			return variables != null && !variables.isEmpty();
+		case DfPackage.PATTERN__VAR_TO_PORT_MAP:
+			return varToPortMap != null && !varToPortMap.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -215,23 +225,23 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case DfPackage.PATTERN__NUM_TOKENS_MAP:
-				((EStructuralFeature.Setting)getNumTokensMap()).set(newValue);
-				return;
-			case DfPackage.PATTERN__PORTS:
-				getPorts().clear();
-				getPorts().addAll((Collection<? extends Port>)newValue);
-				return;
-			case DfPackage.PATTERN__PORT_TO_VAR_MAP:
-				((EStructuralFeature.Setting)getPortToVarMap()).set(newValue);
-				return;
-			case DfPackage.PATTERN__VARIABLES:
-				getVariables().clear();
-				getVariables().addAll((Collection<? extends Var>)newValue);
-				return;
-			case DfPackage.PATTERN__VAR_TO_PORT_MAP:
-				((EStructuralFeature.Setting)getVarToPortMap()).set(newValue);
-				return;
+		case DfPackage.PATTERN__NUM_TOKENS_MAP:
+			((EStructuralFeature.Setting) getNumTokensMap()).set(newValue);
+			return;
+		case DfPackage.PATTERN__PORTS:
+			getPorts().clear();
+			getPorts().addAll((Collection<? extends Port>) newValue);
+			return;
+		case DfPackage.PATTERN__PORT_TO_VAR_MAP:
+			((EStructuralFeature.Setting) getPortToVarMap()).set(newValue);
+			return;
+		case DfPackage.PATTERN__VARIABLES:
+			getVariables().clear();
+			getVariables().addAll((Collection<? extends Var>) newValue);
+			return;
+		case DfPackage.PATTERN__VAR_TO_PORT_MAP:
+			((EStructuralFeature.Setting) getVarToPortMap()).set(newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -252,21 +262,21 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case DfPackage.PATTERN__NUM_TOKENS_MAP:
-				getNumTokensMap().clear();
-				return;
-			case DfPackage.PATTERN__PORTS:
-				getPorts().clear();
-				return;
-			case DfPackage.PATTERN__PORT_TO_VAR_MAP:
-				getPortToVarMap().clear();
-				return;
-			case DfPackage.PATTERN__VARIABLES:
-				getVariables().clear();
-				return;
-			case DfPackage.PATTERN__VAR_TO_PORT_MAP:
-				getVarToPortMap().clear();
-				return;
+		case DfPackage.PATTERN__NUM_TOKENS_MAP:
+			getNumTokensMap().clear();
+			return;
+		case DfPackage.PATTERN__PORTS:
+			getPorts().clear();
+			return;
+		case DfPackage.PATTERN__PORT_TO_VAR_MAP:
+			getPortToVarMap().clear();
+			return;
+		case DfPackage.PATTERN__VARIABLES:
+			getVariables().clear();
+			return;
+		case DfPackage.PATTERN__VAR_TO_PORT_MAP:
+			getVarToPortMap().clear();
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -286,7 +296,10 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	 */
 	public EMap<Port, Integer> getNumTokensMap() {
 		if (numTokensMap == null) {
-			numTokensMap = new EcoreEMap<Port,Integer>(DfPackage.Literals.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY, PortToEIntegerObjectMapEntryImpl.class, this, DfPackage.PATTERN__NUM_TOKENS_MAP);
+			numTokensMap = new EcoreEMap<Port, Integer>(
+					DfPackage.Literals.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY,
+					PortToEIntegerObjectMapEntryImpl.class, this,
+					DfPackage.PATTERN__NUM_TOKENS_MAP);
 		}
 		return numTokensMap;
 	}
@@ -302,7 +315,8 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	 */
 	public EList<Port> getPorts() {
 		if (ports == null) {
-			ports = new EObjectResolvingEList<Port>(Port.class, this, DfPackage.PATTERN__PORTS);
+			ports = new EObjectResolvingEList<Port>(Port.class, this,
+					DfPackage.PATTERN__PORTS);
 		}
 		return ports;
 	}
@@ -313,7 +327,10 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	 */
 	public EMap<Port, Var> getPortToVarMap() {
 		if (portToVarMap == null) {
-			portToVarMap = new EcoreEMap<Port,Var>(DfPackage.Literals.PORT_TO_VAR_MAP_ENTRY, PortToVarMapEntryImpl.class, this, DfPackage.PATTERN__PORT_TO_VAR_MAP);
+			portToVarMap = new EcoreEMap<Port, Var>(
+					DfPackage.Literals.PORT_TO_VAR_MAP_ENTRY,
+					PortToVarMapEntryImpl.class, this,
+					DfPackage.PATTERN__PORT_TO_VAR_MAP);
 		}
 		return portToVarMap;
 	}
@@ -329,7 +346,8 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	 */
 	public EList<Var> getVariables() {
 		if (variables == null) {
-			variables = new EObjectContainmentEList<Var>(Var.class, this, DfPackage.PATTERN__VARIABLES);
+			variables = new EObjectContainmentEList<Var>(Var.class, this,
+					DfPackage.PATTERN__VARIABLES);
 		}
 		return variables;
 	}
@@ -340,7 +358,10 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	 */
 	public EMap<Var, Port> getVarToPortMap() {
 		if (varToPortMap == null) {
-			varToPortMap = new EcoreEMap<Var,Port>(DfPackage.Literals.VAR_TO_PORT_MAP_ENTRY, VarToPortMapEntryImpl.class, this, DfPackage.PATTERN__VAR_TO_PORT_MAP);
+			varToPortMap = new EcoreEMap<Var, Port>(
+					DfPackage.Literals.VAR_TO_PORT_MAP_ENTRY,
+					VarToPortMapEntryImpl.class, this,
+					DfPackage.PATTERN__VAR_TO_PORT_MAP);
 		}
 		return varToPortMap;
 	}

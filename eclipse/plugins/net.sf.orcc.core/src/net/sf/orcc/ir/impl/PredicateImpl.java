@@ -72,8 +72,8 @@ public class PredicateImpl extends EObjectImpl implements Predicate {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.PREDICATE__EXPRESSIONS:
-				return getExpressions();
+		case IrPackage.PREDICATE__EXPRESSIONS:
+			return getExpressions();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -85,8 +85,8 @@ public class PredicateImpl extends EObjectImpl implements Predicate {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.PREDICATE__EXPRESSIONS:
-				return expressions != null && !expressions.isEmpty();
+		case IrPackage.PREDICATE__EXPRESSIONS:
+			return expressions != null && !expressions.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -99,10 +99,11 @@ public class PredicateImpl extends EObjectImpl implements Predicate {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.PREDICATE__EXPRESSIONS:
-				getExpressions().clear();
-				getExpressions().addAll((Collection<? extends Expression>)newValue);
-				return;
+		case IrPackage.PREDICATE__EXPRESSIONS:
+			getExpressions().clear();
+			getExpressions()
+					.addAll((Collection<? extends Expression>) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -123,9 +124,9 @@ public class PredicateImpl extends EObjectImpl implements Predicate {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.PREDICATE__EXPRESSIONS:
-				getExpressions().clear();
-				return;
+		case IrPackage.PREDICATE__EXPRESSIONS:
+			getExpressions().clear();
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -136,7 +137,8 @@ public class PredicateImpl extends EObjectImpl implements Predicate {
 	 */
 	public EList<Expression> getExpressions() {
 		if (expressions == null) {
-			expressions = new EObjectContainmentEList<Expression>(Expression.class, this, IrPackage.PREDICATE__EXPRESSIONS);
+			expressions = new EObjectContainmentEList<Expression>(
+					Expression.class, this, IrPackage.PREDICATE__EXPRESSIONS);
 		}
 		return expressions;
 	}
@@ -149,8 +151,9 @@ public class PredicateImpl extends EObjectImpl implements Predicate {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrPackage.PREDICATE__EXPRESSIONS:
-				return ((InternalEList<?>)getExpressions()).basicRemove(otherEnd, msgs);
+		case IrPackage.PREDICATE__EXPRESSIONS:
+			return ((InternalEList<?>) getExpressions()).basicRemove(otherEnd,
+					msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}

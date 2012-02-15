@@ -197,5 +197,5 @@ public interface ExprInt extends Expression {
 	ExprInt subtract(ExprInt expr);
 
 	ExprInt xor(ExprInt expr);
-	
+
 }

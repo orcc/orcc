@@ -19,7 +19,8 @@ import org.eclipse.emf.ecore.EClass;
  *
  * @generated
  */
-public abstract class InstSpecificImpl extends InstructionImpl implements InstSpecific {
+public abstract class InstSpecificImpl extends InstructionImpl implements
+		InstSpecific {
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated

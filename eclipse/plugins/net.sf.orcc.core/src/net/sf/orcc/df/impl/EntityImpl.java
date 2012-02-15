@@ -77,12 +77,12 @@ public abstract class EntityImpl extends DfVertexImpl implements Entity {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case DfPackage.ENTITY__INPUTS:
-				return getInputs();
-			case DfPackage.ENTITY__OUTPUTS:
-				return getOutputs();
-			case DfPackage.ENTITY__PARAMETERS:
-				return getParameters();
+		case DfPackage.ENTITY__INPUTS:
+			return getInputs();
+		case DfPackage.ENTITY__OUTPUTS:
+			return getOutputs();
+		case DfPackage.ENTITY__PARAMETERS:
+			return getParameters();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -95,12 +95,14 @@ public abstract class EntityImpl extends DfVertexImpl implements Entity {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case DfPackage.ENTITY__INPUTS:
-				return ((InternalEList<?>)getInputs()).basicRemove(otherEnd, msgs);
-			case DfPackage.ENTITY__OUTPUTS:
-				return ((InternalEList<?>)getOutputs()).basicRemove(otherEnd, msgs);
-			case DfPackage.ENTITY__PARAMETERS:
-				return ((InternalEList<?>)getParameters()).basicRemove(otherEnd, msgs);
+		case DfPackage.ENTITY__INPUTS:
+			return ((InternalEList<?>) getInputs()).basicRemove(otherEnd, msgs);
+		case DfPackage.ENTITY__OUTPUTS:
+			return ((InternalEList<?>) getOutputs())
+					.basicRemove(otherEnd, msgs);
+		case DfPackage.ENTITY__PARAMETERS:
+			return ((InternalEList<?>) getParameters()).basicRemove(otherEnd,
+					msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -112,12 +114,12 @@ public abstract class EntityImpl extends DfVertexImpl implements Entity {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case DfPackage.ENTITY__INPUTS:
-				return inputs != null && !inputs.isEmpty();
-			case DfPackage.ENTITY__OUTPUTS:
-				return outputs != null && !outputs.isEmpty();
-			case DfPackage.ENTITY__PARAMETERS:
-				return parameters != null && !parameters.isEmpty();
+		case DfPackage.ENTITY__INPUTS:
+			return inputs != null && !inputs.isEmpty();
+		case DfPackage.ENTITY__OUTPUTS:
+			return outputs != null && !outputs.isEmpty();
+		case DfPackage.ENTITY__PARAMETERS:
+			return parameters != null && !parameters.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -130,18 +132,18 @@ public abstract class EntityImpl extends DfVertexImpl implements Entity {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case DfPackage.ENTITY__INPUTS:
-				getInputs().clear();
-				getInputs().addAll((Collection<? extends Port>)newValue);
-				return;
-			case DfPackage.ENTITY__OUTPUTS:
-				getOutputs().clear();
-				getOutputs().addAll((Collection<? extends Port>)newValue);
-				return;
-			case DfPackage.ENTITY__PARAMETERS:
-				getParameters().clear();
-				getParameters().addAll((Collection<? extends Var>)newValue);
-				return;
+		case DfPackage.ENTITY__INPUTS:
+			getInputs().clear();
+			getInputs().addAll((Collection<? extends Port>) newValue);
+			return;
+		case DfPackage.ENTITY__OUTPUTS:
+			getOutputs().clear();
+			getOutputs().addAll((Collection<? extends Port>) newValue);
+			return;
+		case DfPackage.ENTITY__PARAMETERS:
+			getParameters().clear();
+			getParameters().addAll((Collection<? extends Var>) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -162,15 +164,15 @@ public abstract class EntityImpl extends DfVertexImpl implements Entity {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case DfPackage.ENTITY__INPUTS:
-				getInputs().clear();
-				return;
-			case DfPackage.ENTITY__OUTPUTS:
-				getOutputs().clear();
-				return;
-			case DfPackage.ENTITY__PARAMETERS:
-				getParameters().clear();
-				return;
+		case DfPackage.ENTITY__INPUTS:
+			getInputs().clear();
+			return;
+		case DfPackage.ENTITY__OUTPUTS:
+			getOutputs().clear();
+			return;
+		case DfPackage.ENTITY__PARAMETERS:
+			getParameters().clear();
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -184,7 +186,6 @@ public abstract class EntityImpl extends DfVertexImpl implements Entity {
 		}
 		return null;
 	}
-
 
 	@Override
 	public Port getPort(String name) {
@@ -202,7 +203,8 @@ public abstract class EntityImpl extends DfVertexImpl implements Entity {
 	 */
 	public EList<Port> getInputs() {
 		if (inputs == null) {
-			inputs = new EObjectContainmentEList<Port>(Port.class, this, DfPackage.ENTITY__INPUTS);
+			inputs = new EObjectContainmentEList<Port>(Port.class, this,
+					DfPackage.ENTITY__INPUTS);
 		}
 		return inputs;
 	}
@@ -223,7 +225,8 @@ public abstract class EntityImpl extends DfVertexImpl implements Entity {
 	 */
 	public EList<Port> getOutputs() {
 		if (outputs == null) {
-			outputs = new EObjectContainmentEList<Port>(Port.class, this, DfPackage.ENTITY__OUTPUTS);
+			outputs = new EObjectContainmentEList<Port>(Port.class, this,
+					DfPackage.ENTITY__OUTPUTS);
 		}
 		return outputs;
 	}
@@ -244,7 +247,8 @@ public abstract class EntityImpl extends DfVertexImpl implements Entity {
 	 */
 	public EList<Var> getParameters() {
 		if (parameters == null) {
-			parameters = new EObjectContainmentEList<Var>(Var.class, this, DfPackage.ENTITY__PARAMETERS);
+			parameters = new EObjectContainmentEList<Var>(Var.class, this,
+					DfPackage.ENTITY__PARAMETERS);
 		}
 		return parameters;
 	}

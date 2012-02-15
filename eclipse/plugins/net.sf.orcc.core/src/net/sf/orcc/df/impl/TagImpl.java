@@ -61,7 +61,8 @@ public class TagImpl extends EObjectImpl implements Tag {
 	 */
 	public EList<String> getIdentifiers() {
 		if (identifiers == null) {
-			identifiers = new EDataTypeUniqueEList<String>(String.class, this, DfPackage.TAG__IDENTIFIERS);
+			identifiers = new EDataTypeUniqueEList<String>(String.class, this,
+					DfPackage.TAG__IDENTIFIERS);
 		}
 		return identifiers;
 	}
@@ -73,8 +74,8 @@ public class TagImpl extends EObjectImpl implements Tag {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case DfPackage.TAG__IDENTIFIERS:
-				return getIdentifiers();
+		case DfPackage.TAG__IDENTIFIERS:
+			return getIdentifiers();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -87,10 +88,10 @@ public class TagImpl extends EObjectImpl implements Tag {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case DfPackage.TAG__IDENTIFIERS:
-				getIdentifiers().clear();
-				getIdentifiers().addAll((Collection<? extends String>)newValue);
-				return;
+		case DfPackage.TAG__IDENTIFIERS:
+			getIdentifiers().clear();
+			getIdentifiers().addAll((Collection<? extends String>) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -102,9 +103,9 @@ public class TagImpl extends EObjectImpl implements Tag {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case DfPackage.TAG__IDENTIFIERS:
-				getIdentifiers().clear();
-				return;
+		case DfPackage.TAG__IDENTIFIERS:
+			getIdentifiers().clear();
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -116,8 +117,8 @@ public class TagImpl extends EObjectImpl implements Tag {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case DfPackage.TAG__IDENTIFIERS:
-				return identifiers != null && !identifiers.isEmpty();
+		case DfPackage.TAG__IDENTIFIERS:
+			return identifiers != null && !identifiers.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -129,7 +130,8 @@ public class TagImpl extends EObjectImpl implements Tag {
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (identifiers: ");

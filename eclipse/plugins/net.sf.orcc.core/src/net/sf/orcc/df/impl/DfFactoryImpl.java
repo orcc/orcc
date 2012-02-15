@@ -68,12 +68,12 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	 */
 	public static DfFactory init() {
 		try {
-			DfFactory theDfFactory = (DfFactory)EPackage.Registry.INSTANCE.getEFactory("http://orcc.sf.net/model/2011/Df"); 
+			DfFactory theDfFactory = (DfFactory) EPackage.Registry.INSTANCE
+					.getEFactory("http://orcc.sf.net/model/2011/Df");
 			if (theDfFactory != null) {
 				return theDfFactory;
 			}
-		}
-		catch (Exception exception) {
+		} catch (Exception exception) {
 			EcorePlugin.INSTANCE.log(exception);
 		}
 		return new DfFactoryImpl();
@@ -96,28 +96,49 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	@Override
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
-			case DfPackage.UNIT: return createUnit();
-			case DfPackage.PORT: return createPort();
-			case DfPackage.INSTANCE: return createInstance();
-			case DfPackage.ENTITY_SPECIFIC: return createEntitySpecific();
-			case DfPackage.ACTOR: return createActor();
-			case DfPackage.NETWORK: return createNetwork();
-			case DfPackage.BROADCAST: return createBroadcast();
-			case DfPackage.CONNECTION: return createConnection();
-			case DfPackage.WRAPPER_STRING: return createWrapperString();
-			case DfPackage.WRAPPER_XML: return createWrapperXml();
-			case DfPackage.ACTION: return createAction();
-			case DfPackage.FSM: return createFSM();
-			case DfPackage.PATTERN: return createPattern();
-			case DfPackage.STATE: return createState();
-			case DfPackage.TAG: return createTag();
-			case DfPackage.TRANSITION: return createTransition();
-			case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY: return (EObject)createPortToEIntegerObjectMapEntry();
-			case DfPackage.PORT_TO_VAR_MAP_ENTRY: return (EObject)createPortToVarMapEntry();
-			case DfPackage.VAR_TO_PORT_MAP_ENTRY: return (EObject)createVarToPortMapEntry();
-			case DfPackage.ARGUMENT: return createArgument();
-			default:
-				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
+		case DfPackage.UNIT:
+			return createUnit();
+		case DfPackage.PORT:
+			return createPort();
+		case DfPackage.INSTANCE:
+			return createInstance();
+		case DfPackage.ENTITY_SPECIFIC:
+			return createEntitySpecific();
+		case DfPackage.ACTOR:
+			return createActor();
+		case DfPackage.NETWORK:
+			return createNetwork();
+		case DfPackage.BROADCAST:
+			return createBroadcast();
+		case DfPackage.CONNECTION:
+			return createConnection();
+		case DfPackage.WRAPPER_STRING:
+			return createWrapperString();
+		case DfPackage.WRAPPER_XML:
+			return createWrapperXml();
+		case DfPackage.ACTION:
+			return createAction();
+		case DfPackage.FSM:
+			return createFSM();
+		case DfPackage.PATTERN:
+			return createPattern();
+		case DfPackage.STATE:
+			return createState();
+		case DfPackage.TAG:
+			return createTag();
+		case DfPackage.TRANSITION:
+			return createTransition();
+		case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY:
+			return (EObject) createPortToEIntegerObjectMapEntry();
+		case DfPackage.PORT_TO_VAR_MAP_ENTRY:
+			return (EObject) createPortToVarMapEntry();
+		case DfPackage.VAR_TO_PORT_MAP_ENTRY:
+			return (EObject) createVarToPortMapEntry();
+		case DfPackage.ARGUMENT:
+			return createArgument();
+		default:
+			throw new IllegalArgumentException("The class '" + eClass.getName()
+					+ "' is not a valid classifier");
 		}
 	}
 
@@ -464,7 +485,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	 * @generated
 	 */
 	public DfPackage getDfPackage() {
-		return (DfPackage)getEPackage();
+		return (DfPackage) getEPackage();
 	}
 
 } // DfFactoryImpl

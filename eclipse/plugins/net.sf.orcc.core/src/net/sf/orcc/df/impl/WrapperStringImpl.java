@@ -87,7 +87,8 @@ public class WrapperStringImpl extends EObjectImpl implements WrapperString {
 		String oldString = string;
 		string = newString;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.WRAPPER_STRING__STRING, oldString, string));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.WRAPPER_STRING__STRING, oldString, string));
 	}
 
 	/**
@@ -98,8 +99,8 @@ public class WrapperStringImpl extends EObjectImpl implements WrapperString {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case DfPackage.WRAPPER_STRING__STRING:
-				return getString();
+		case DfPackage.WRAPPER_STRING__STRING:
+			return getString();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -112,9 +113,9 @@ public class WrapperStringImpl extends EObjectImpl implements WrapperString {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case DfPackage.WRAPPER_STRING__STRING:
-				setString((String)newValue);
-				return;
+		case DfPackage.WRAPPER_STRING__STRING:
+			setString((String) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -127,9 +128,9 @@ public class WrapperStringImpl extends EObjectImpl implements WrapperString {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case DfPackage.WRAPPER_STRING__STRING:
-				setString(STRING_EDEFAULT);
-				return;
+		case DfPackage.WRAPPER_STRING__STRING:
+			setString(STRING_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -142,8 +143,9 @@ public class WrapperStringImpl extends EObjectImpl implements WrapperString {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case DfPackage.WRAPPER_STRING__STRING:
-				return STRING_EDEFAULT == null ? string != null : !STRING_EDEFAULT.equals(string);
+		case DfPackage.WRAPPER_STRING__STRING:
+			return STRING_EDEFAULT == null ? string != null : !STRING_EDEFAULT
+					.equals(string);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -155,7 +157,8 @@ public class WrapperStringImpl extends EObjectImpl implements WrapperString {
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (string: ");

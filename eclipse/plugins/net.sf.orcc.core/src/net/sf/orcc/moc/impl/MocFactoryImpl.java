@@ -48,12 +48,12 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 	 */
 	public static MocFactory init() {
 		try {
-			MocFactory theMocFactory = (MocFactory)EPackage.Registry.INSTANCE.getEFactory("http://orcc.sf.net/model/2011/MoC"); 
+			MocFactory theMocFactory = (MocFactory) EPackage.Registry.INSTANCE
+					.getEFactory("http://orcc.sf.net/model/2011/MoC");
 			if (theMocFactory != null) {
 				return theMocFactory;
 			}
-		}
-		catch (Exception exception) {
+		} catch (Exception exception) {
 			EcorePlugin.INSTANCE.log(exception);
 		}
 		return new MocFactoryImpl();
@@ -76,14 +76,21 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 	@Override
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
-			case MocPackage.CSDF_MO_C: return createCSDFMoC();
-			case MocPackage.DPN_MO_C: return createDPNMoC();
-			case MocPackage.KPN_MO_C: return createKPNMoC();
-			case MocPackage.QSDF_MO_C: return createQSDFMoC();
-			case MocPackage.SDF_MO_C: return createSDFMoC();
-			case MocPackage.INVOCATION: return createInvocation();
-			default:
-				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
+		case MocPackage.CSDF_MO_C:
+			return createCSDFMoC();
+		case MocPackage.DPN_MO_C:
+			return createDPNMoC();
+		case MocPackage.KPN_MO_C:
+			return createKPNMoC();
+		case MocPackage.QSDF_MO_C:
+			return createQSDFMoC();
+		case MocPackage.SDF_MO_C:
+			return createSDFMoC();
+		case MocPackage.INVOCATION:
+			return createInvocation();
+		default:
+			throw new IllegalArgumentException("The class '" + eClass.getName()
+					+ "' is not a valid classifier");
 		}
 	}
 
@@ -156,7 +163,7 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 	 * @generated
 	 */
 	public MocPackage getMocPackage() {
-		return (MocPackage)getEPackage();
+		return (MocPackage) getEPackage();
 	}
 
 } // MocFactoryImpl

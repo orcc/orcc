@@ -81,7 +81,7 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 			return true;
 		}
 		if (object instanceof EObject) {
-			return ((EObject)object).eClass().getEPackage() == modelPackage;
+			return ((EObject) object).eClass().getEPackage() == modelPackage;
 		}
 		return false;
 	}
@@ -92,113 +92,138 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected DfSwitch<Adapter> modelSwitch =
-		new DfSwitch<Adapter>() {
-			@Override
-			public Adapter caseDfVertex(DfVertex object) {
-				return createDfVertexAdapter();
-			}
-			@Override
-			public Adapter caseUnit(Unit object) {
-				return createUnitAdapter();
-			}
-			@Override
-			public Adapter casePort(Port object) {
-				return createPortAdapter();
-			}
-			@Override
-			public Adapter caseInstance(Instance object) {
-				return createInstanceAdapter();
-			}
-			@Override
-			public Adapter caseEntity(Entity object) {
-				return createEntityAdapter();
-			}
-			@Override
-			public Adapter caseEntitySpecific(EntitySpecific object) {
-				return createEntitySpecificAdapter();
-			}
-			@Override
-			public Adapter caseActor(Actor object) {
-				return createActorAdapter();
-			}
-			@Override
-			public Adapter caseNetwork(Network object) {
-				return createNetworkAdapter();
-			}
-			@Override
-			public Adapter caseBroadcast(Broadcast object) {
-				return createBroadcastAdapter();
-			}
-			@Override
-			public Adapter caseConnection(Connection object) {
-				return createConnectionAdapter();
-			}
-			@Override
-			public Adapter caseWrapperString(WrapperString object) {
-				return createWrapperStringAdapter();
-			}
-			@Override
-			public Adapter caseWrapperXml(WrapperXml object) {
-				return createWrapperXmlAdapter();
-			}
-			@Override
-			public Adapter caseAction(Action object) {
-				return createActionAdapter();
-			}
-			@Override
-			public Adapter caseFSM(FSM object) {
-				return createFSMAdapter();
-			}
-			@Override
-			public Adapter casePattern(Pattern object) {
-				return createPatternAdapter();
-			}
-			@Override
-			public Adapter caseState(State object) {
-				return createStateAdapter();
-			}
-			@Override
-			public Adapter caseTag(Tag object) {
-				return createTagAdapter();
-			}
-			@Override
-			public Adapter caseTransition(Transition object) {
-				return createTransitionAdapter();
-			}
-			@Override
-			public Adapter casePortToEIntegerObjectMapEntry(Map.Entry<Port, Integer> object) {
-				return createPortToEIntegerObjectMapEntryAdapter();
-			}
-			@Override
-			public Adapter casePortToVarMapEntry(Map.Entry<Port, Var> object) {
-				return createPortToVarMapEntryAdapter();
-			}
-			@Override
-			public Adapter caseVarToPortMapEntry(Map.Entry<Var, Port> object) {
-				return createVarToPortMapEntryAdapter();
-			}
-			@Override
-			public Adapter caseArgument(Argument object) {
-				return createArgumentAdapter();
-			}
-			@Override
-			public Adapter caseNameable(Nameable object) {
-				return createNameableAdapter();
-			}
-			@Override
-			public Adapter caseVertex(Vertex object) {
-				return createVertexAdapter();
-			}
-			@Override
-			public Adapter caseEdge(Edge object) {
-				return createEdgeAdapter();
-			}
-			@Override
-			public Adapter defaultCase(EObject object) {
-				return createEObjectAdapter();
-			}
-		};
+	protected DfSwitch<Adapter> modelSwitch = new DfSwitch<Adapter>() {
+		@Override
+		public Adapter caseDfVertex(DfVertex object) {
+			return createDfVertexAdapter();
+		}
+
+		@Override
+		public Adapter caseUnit(Unit object) {
+			return createUnitAdapter();
+		}
+
+		@Override
+		public Adapter casePort(Port object) {
+			return createPortAdapter();
+		}
+
+		@Override
+		public Adapter caseInstance(Instance object) {
+			return createInstanceAdapter();
+		}
+
+		@Override
+		public Adapter caseEntity(Entity object) {
+			return createEntityAdapter();
+		}
+
+		@Override
+		public Adapter caseEntitySpecific(EntitySpecific object) {
+			return createEntitySpecificAdapter();
+		}
+
+		@Override
+		public Adapter caseActor(Actor object) {
+			return createActorAdapter();
+		}
+
+		@Override
+		public Adapter caseNetwork(Network object) {
+			return createNetworkAdapter();
+		}
+
+		@Override
+		public Adapter caseBroadcast(Broadcast object) {
+			return createBroadcastAdapter();
+		}
+
+		@Override
+		public Adapter caseConnection(Connection object) {
+			return createConnectionAdapter();
+		}
+
+		@Override
+		public Adapter caseWrapperString(WrapperString object) {
+			return createWrapperStringAdapter();
+		}
+
+		@Override
+		public Adapter caseWrapperXml(WrapperXml object) {
+			return createWrapperXmlAdapter();
+		}
+
+		@Override
+		public Adapter caseAction(Action object) {
+			return createActionAdapter();
+		}
+
+		@Override
+		public Adapter caseFSM(FSM object) {
+			return createFSMAdapter();
+		}
+
+		@Override
+		public Adapter casePattern(Pattern object) {
+			return createPatternAdapter();
+		}
+
+		@Override
+		public Adapter caseState(State object) {
+			return createStateAdapter();
+		}
+
+		@Override
+		public Adapter caseTag(Tag object) {
+			return createTagAdapter();
+		}
+
+		@Override
+		public Adapter caseTransition(Transition object) {
+			return createTransitionAdapter();
+		}
+
+		@Override
+		public Adapter casePortToEIntegerObjectMapEntry(
+				Map.Entry<Port, Integer> object) {
+			return createPortToEIntegerObjectMapEntryAdapter();
+		}
+
+		@Override
+		public Adapter casePortToVarMapEntry(Map.Entry<Port, Var> object) {
+			return createPortToVarMapEntryAdapter();
+		}
+
+		@Override
+		public Adapter caseVarToPortMapEntry(Map.Entry<Var, Port> object) {
+			return createVarToPortMapEntryAdapter();
+		}
+
+		@Override
+		public Adapter caseArgument(Argument object) {
+			return createArgumentAdapter();
+		}
+
+		@Override
+		public Adapter caseNameable(Nameable object) {
+			return createNameableAdapter();
+		}
+
+		@Override
+		public Adapter caseVertex(Vertex object) {
+			return createVertexAdapter();
+		}
+
+		@Override
+		public Adapter caseEdge(Edge object) {
+			return createEdgeAdapter();
+		}
+
+		@Override
+		public Adapter defaultCase(EObject object) {
+			return createEObjectAdapter();
+		}
+	};
 
 	/**
 	 * Creates an adapter for the <code>target</code>.
@@ -210,9 +235,8 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	 */
 	@Override
 	public Adapter createAdapter(Notifier target) {
-		return modelSwitch.doSwitch((EObject)target);
+		return modelSwitch.doSwitch((EObject) target);
 	}
-
 
 	/**
 	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.DfVertex <em>Vertex</em>}'.

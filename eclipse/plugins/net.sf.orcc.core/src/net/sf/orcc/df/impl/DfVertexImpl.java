@@ -50,13 +50,12 @@ public abstract class DfVertexImpl extends VertexImpl implements DfVertex {
 	protected EClass eStaticClass() {
 		return DfPackage.Literals.DF_VERTEX;
 	}
-	
+
 	/**
 	 * holds template-specific data.
 	 */
 	private Object templateData;
 
-	
 	@Override
 	public Object getTemplateData() {
 		return templateData;
@@ -76,7 +75,7 @@ public abstract class DfVertexImpl extends VertexImpl implements DfVertex {
 	public boolean isPort() {
 		return false;
 	}
-	
+
 	@Override
 	public Map<Port, Connection> getIncomingPortMap() {
 		Map<Port, Connection> map = new HashMap<Port, Connection>();
@@ -88,7 +87,7 @@ public abstract class DfVertexImpl extends VertexImpl implements DfVertex {
 		}
 		return map;
 	}
-	
+
 	@Override
 	public Map<Port, List<Connection>> getOutgoingPortMap() {
 		Map<Port, List<Connection>> map = new HashMap<Port, List<Connection>>();
@@ -111,7 +110,7 @@ public abstract class DfVertexImpl extends VertexImpl implements DfVertex {
 	public void setTemplateData(Object templateData) {
 		this.templateData = templateData;
 	}
-	
+
 	@Override
 	public List<String> getHierarchicalId() {
 		List<String> ids = new ArrayList<String>();

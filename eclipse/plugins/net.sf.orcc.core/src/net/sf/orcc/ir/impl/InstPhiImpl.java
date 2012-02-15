@@ -48,7 +48,8 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	 * @generated
 	 * @ordered
 	 */
-	protected Var oldVariable;/**
+	protected Var oldVariable;
+	/**
 	 * The cached value of the '{@link #getTarget() <em>Target</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -94,13 +95,14 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.INST_PHI__OLD_VARIABLE:
-				if (resolve) return getOldVariable();
-				return basicGetOldVariable();
-			case IrPackage.INST_PHI__TARGET:
-				return getTarget();
-			case IrPackage.INST_PHI__VALUES:
-				return getValues();
+		case IrPackage.INST_PHI__OLD_VARIABLE:
+			if (resolve)
+				return getOldVariable();
+			return basicGetOldVariable();
+		case IrPackage.INST_PHI__TARGET:
+			return getTarget();
+		case IrPackage.INST_PHI__VALUES:
+			return getValues();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -111,12 +113,13 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrPackage.INST_PHI__TARGET:
-				return basicSetTarget(null, msgs);
-			case IrPackage.INST_PHI__VALUES:
-				return ((InternalEList<?>)getValues()).basicRemove(otherEnd, msgs);
+		case IrPackage.INST_PHI__TARGET:
+			return basicSetTarget(null, msgs);
+		case IrPackage.INST_PHI__VALUES:
+			return ((InternalEList<?>) getValues()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -129,12 +132,12 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.INST_PHI__OLD_VARIABLE:
-				return oldVariable != null;
-			case IrPackage.INST_PHI__TARGET:
-				return target != null;
-			case IrPackage.INST_PHI__VALUES:
-				return values != null && !values.isEmpty();
+		case IrPackage.INST_PHI__OLD_VARIABLE:
+			return oldVariable != null;
+		case IrPackage.INST_PHI__TARGET:
+			return target != null;
+		case IrPackage.INST_PHI__VALUES:
+			return values != null && !values.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -148,16 +151,16 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.INST_PHI__OLD_VARIABLE:
-				setOldVariable((Var)newValue);
-				return;
-			case IrPackage.INST_PHI__TARGET:
-				setTarget((Def)newValue);
-				return;
-			case IrPackage.INST_PHI__VALUES:
-				getValues().clear();
-				getValues().addAll((Collection<? extends Expression>)newValue);
-				return;
+		case IrPackage.INST_PHI__OLD_VARIABLE:
+			setOldVariable((Var) newValue);
+			return;
+		case IrPackage.INST_PHI__TARGET:
+			setTarget((Def) newValue);
+			return;
+		case IrPackage.INST_PHI__VALUES:
+			getValues().clear();
+			getValues().addAll((Collection<? extends Expression>) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -180,15 +183,15 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.INST_PHI__OLD_VARIABLE:
-				setOldVariable((Var)null);
-				return;
-			case IrPackage.INST_PHI__TARGET:
-				setTarget((Def)null);
-				return;
-			case IrPackage.INST_PHI__VALUES:
-				getValues().clear();
-				return;
+		case IrPackage.INST_PHI__OLD_VARIABLE:
+			setOldVariable((Var) null);
+			return;
+		case IrPackage.INST_PHI__TARGET:
+			setTarget((Def) null);
+			return;
+		case IrPackage.INST_PHI__VALUES:
+			getValues().clear();
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -200,11 +203,13 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	 */
 	public Var getOldVariable() {
 		if (oldVariable != null && oldVariable.eIsProxy()) {
-			InternalEObject oldOldVariable = (InternalEObject)oldVariable;
-			oldVariable = (Var)eResolveProxy(oldOldVariable);
+			InternalEObject oldOldVariable = (InternalEObject) oldVariable;
+			oldVariable = (Var) eResolveProxy(oldOldVariable);
 			if (oldVariable != oldOldVariable) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.INST_PHI__OLD_VARIABLE, oldOldVariable, oldVariable));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							IrPackage.INST_PHI__OLD_VARIABLE, oldOldVariable,
+							oldVariable));
 			}
 		}
 		return oldVariable;
@@ -224,12 +229,18 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetTarget(Def newTarget, NotificationChain msgs) {
+	public NotificationChain basicSetTarget(Def newTarget,
+			NotificationChain msgs) {
 		Def oldTarget = target;
 		target = newTarget;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.INST_PHI__TARGET, oldTarget, newTarget);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.INST_PHI__TARGET, oldTarget,
+					newTarget);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -241,7 +252,8 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	 */
 	public EList<Expression> getValues() {
 		if (values == null) {
-			values = new EObjectContainmentEList<Expression>(Expression.class, this, IrPackage.INST_PHI__VALUES);
+			values = new EObjectContainmentEList<Expression>(Expression.class,
+					this, IrPackage.INST_PHI__VALUES);
 		}
 		return values;
 	}
@@ -260,7 +272,9 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 		Var oldOldVariable = oldVariable;
 		oldVariable = newOldVariable;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_PHI__OLD_VARIABLE, oldOldVariable, oldVariable));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.INST_PHI__OLD_VARIABLE, oldOldVariable,
+					oldVariable));
 	}
 
 	/**
@@ -272,21 +286,27 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 		if (newTarget != target) {
 			NotificationChain msgs = null;
 			if (target != null)
-				msgs = ((InternalEObject)target).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.INST_PHI__TARGET, null, msgs);
+				msgs = ((InternalEObject) target).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.INST_PHI__TARGET,
+						null, msgs);
 			if (newTarget != null)
-				msgs = ((InternalEObject)newTarget).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.INST_PHI__TARGET, null, msgs);
+				msgs = ((InternalEObject) newTarget).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.INST_PHI__TARGET,
+						null, msgs);
 			msgs = basicSetTarget(newTarget, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_PHI__TARGET, newTarget, newTarget));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.INST_PHI__TARGET, newTarget, newTarget));
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(super.toString());
-		builder.append("Phi(").append(getTarget().getVariable().getIndexedName());
+		builder.append("Phi(").append(
+				getTarget().getVariable().getIndexedName());
 		for (Expression value : getValues()) {
 			builder.append(", ");
 			builder.append(new ExpressionPrinter().doSwitch(value));

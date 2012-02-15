@@ -227,8 +227,13 @@ public class VarImpl extends EObjectImpl implements Var {
 		Expression oldInitialValue = initialValue;
 		initialValue = newInitialValue;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.VAR__INITIAL_VALUE, oldInitialValue, newInitialValue);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.VAR__INITIAL_VALUE,
+					oldInitialValue, newInitialValue);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -241,8 +246,12 @@ public class VarImpl extends EObjectImpl implements Var {
 		Type oldType = type;
 		type = newType;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.VAR__TYPE, oldType, newType);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.VAR__TYPE, oldType, newType);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -254,28 +263,28 @@ public class VarImpl extends EObjectImpl implements Var {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.VAR__ANNOTATIONS:
-				return getAnnotations();
-			case IrPackage.VAR__ASSIGNABLE:
-				return isAssignable();
-			case IrPackage.VAR__DEFS:
-				return getDefs();
-			case IrPackage.VAR__GLOBAL:
-				return isGlobal();
-			case IrPackage.VAR__INDEX:
-				return getIndex();
-			case IrPackage.VAR__INITIAL_VALUE:
-				return getInitialValue();
-			case IrPackage.VAR__LINE_NUMBER:
-				return getLineNumber();
-			case IrPackage.VAR__NAME:
-				return getName();
-			case IrPackage.VAR__TYPE:
-				return getType();
-			case IrPackage.VAR__USES:
-				return getUses();
-			case IrPackage.VAR__VALUE:
-				return getValue();
+		case IrPackage.VAR__ANNOTATIONS:
+			return getAnnotations();
+		case IrPackage.VAR__ASSIGNABLE:
+			return isAssignable();
+		case IrPackage.VAR__DEFS:
+			return getDefs();
+		case IrPackage.VAR__GLOBAL:
+			return isGlobal();
+		case IrPackage.VAR__INDEX:
+			return getIndex();
+		case IrPackage.VAR__INITIAL_VALUE:
+			return getInitialValue();
+		case IrPackage.VAR__LINE_NUMBER:
+			return getLineNumber();
+		case IrPackage.VAR__NAME:
+			return getName();
+		case IrPackage.VAR__TYPE:
+			return getType();
+		case IrPackage.VAR__USES:
+			return getUses();
+		case IrPackage.VAR__VALUE:
+			return getValue();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -289,10 +298,12 @@ public class VarImpl extends EObjectImpl implements Var {
 	public NotificationChain eInverseAdd(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrPackage.VAR__DEFS:
-				return ((InternalEList<InternalEObject>)(InternalEList<?>)getDefs()).basicAdd(otherEnd, msgs);
-			case IrPackage.VAR__USES:
-				return ((InternalEList<InternalEObject>)(InternalEList<?>)getUses()).basicAdd(otherEnd, msgs);
+		case IrPackage.VAR__DEFS:
+			return ((InternalEList<InternalEObject>) (InternalEList<?>) getDefs())
+					.basicAdd(otherEnd, msgs);
+		case IrPackage.VAR__USES:
+			return ((InternalEList<InternalEObject>) (InternalEList<?>) getUses())
+					.basicAdd(otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -305,16 +316,17 @@ public class VarImpl extends EObjectImpl implements Var {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrPackage.VAR__ANNOTATIONS:
-				return ((InternalEList<?>)getAnnotations()).basicRemove(otherEnd, msgs);
-			case IrPackage.VAR__DEFS:
-				return ((InternalEList<?>)getDefs()).basicRemove(otherEnd, msgs);
-			case IrPackage.VAR__INITIAL_VALUE:
-				return basicSetInitialValue(null, msgs);
-			case IrPackage.VAR__TYPE:
-				return basicSetType(null, msgs);
-			case IrPackage.VAR__USES:
-				return ((InternalEList<?>)getUses()).basicRemove(otherEnd, msgs);
+		case IrPackage.VAR__ANNOTATIONS:
+			return ((InternalEList<?>) getAnnotations()).basicRemove(otherEnd,
+					msgs);
+		case IrPackage.VAR__DEFS:
+			return ((InternalEList<?>) getDefs()).basicRemove(otherEnd, msgs);
+		case IrPackage.VAR__INITIAL_VALUE:
+			return basicSetInitialValue(null, msgs);
+		case IrPackage.VAR__TYPE:
+			return basicSetType(null, msgs);
+		case IrPackage.VAR__USES:
+			return ((InternalEList<?>) getUses()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -326,28 +338,30 @@ public class VarImpl extends EObjectImpl implements Var {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.VAR__ANNOTATIONS:
-				return annotations != null && !annotations.isEmpty();
-			case IrPackage.VAR__ASSIGNABLE:
-				return assignable != ASSIGNABLE_EDEFAULT;
-			case IrPackage.VAR__DEFS:
-				return defs != null && !defs.isEmpty();
-			case IrPackage.VAR__GLOBAL:
-				return global != GLOBAL_EDEFAULT;
-			case IrPackage.VAR__INDEX:
-				return index != INDEX_EDEFAULT;
-			case IrPackage.VAR__INITIAL_VALUE:
-				return initialValue != null;
-			case IrPackage.VAR__LINE_NUMBER:
-				return lineNumber != LINE_NUMBER_EDEFAULT;
-			case IrPackage.VAR__NAME:
-				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
-			case IrPackage.VAR__TYPE:
-				return type != null;
-			case IrPackage.VAR__USES:
-				return uses != null && !uses.isEmpty();
-			case IrPackage.VAR__VALUE:
-				return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT.equals(value);
+		case IrPackage.VAR__ANNOTATIONS:
+			return annotations != null && !annotations.isEmpty();
+		case IrPackage.VAR__ASSIGNABLE:
+			return assignable != ASSIGNABLE_EDEFAULT;
+		case IrPackage.VAR__DEFS:
+			return defs != null && !defs.isEmpty();
+		case IrPackage.VAR__GLOBAL:
+			return global != GLOBAL_EDEFAULT;
+		case IrPackage.VAR__INDEX:
+			return index != INDEX_EDEFAULT;
+		case IrPackage.VAR__INITIAL_VALUE:
+			return initialValue != null;
+		case IrPackage.VAR__LINE_NUMBER:
+			return lineNumber != LINE_NUMBER_EDEFAULT;
+		case IrPackage.VAR__NAME:
+			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
+					.equals(name);
+		case IrPackage.VAR__TYPE:
+			return type != null;
+		case IrPackage.VAR__USES:
+			return uses != null && !uses.isEmpty();
+		case IrPackage.VAR__VALUE:
+			return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT
+					.equals(value);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -360,42 +374,43 @@ public class VarImpl extends EObjectImpl implements Var {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.VAR__ANNOTATIONS:
-				getAnnotations().clear();
-				getAnnotations().addAll((Collection<? extends Annotation>)newValue);
-				return;
-			case IrPackage.VAR__ASSIGNABLE:
-				setAssignable((Boolean)newValue);
-				return;
-			case IrPackage.VAR__DEFS:
-				getDefs().clear();
-				getDefs().addAll((Collection<? extends Def>)newValue);
-				return;
-			case IrPackage.VAR__GLOBAL:
-				setGlobal((Boolean)newValue);
-				return;
-			case IrPackage.VAR__INDEX:
-				setIndex((Integer)newValue);
-				return;
-			case IrPackage.VAR__INITIAL_VALUE:
-				setInitialValue((Expression)newValue);
-				return;
-			case IrPackage.VAR__LINE_NUMBER:
-				setLineNumber((Integer)newValue);
-				return;
-			case IrPackage.VAR__NAME:
-				setName((String)newValue);
-				return;
-			case IrPackage.VAR__TYPE:
-				setType((Type)newValue);
-				return;
-			case IrPackage.VAR__USES:
-				getUses().clear();
-				getUses().addAll((Collection<? extends Use>)newValue);
-				return;
-			case IrPackage.VAR__VALUE:
-				setValue(newValue);
-				return;
+		case IrPackage.VAR__ANNOTATIONS:
+			getAnnotations().clear();
+			getAnnotations()
+					.addAll((Collection<? extends Annotation>) newValue);
+			return;
+		case IrPackage.VAR__ASSIGNABLE:
+			setAssignable((Boolean) newValue);
+			return;
+		case IrPackage.VAR__DEFS:
+			getDefs().clear();
+			getDefs().addAll((Collection<? extends Def>) newValue);
+			return;
+		case IrPackage.VAR__GLOBAL:
+			setGlobal((Boolean) newValue);
+			return;
+		case IrPackage.VAR__INDEX:
+			setIndex((Integer) newValue);
+			return;
+		case IrPackage.VAR__INITIAL_VALUE:
+			setInitialValue((Expression) newValue);
+			return;
+		case IrPackage.VAR__LINE_NUMBER:
+			setLineNumber((Integer) newValue);
+			return;
+		case IrPackage.VAR__NAME:
+			setName((String) newValue);
+			return;
+		case IrPackage.VAR__TYPE:
+			setType((Type) newValue);
+			return;
+		case IrPackage.VAR__USES:
+			getUses().clear();
+			getUses().addAll((Collection<? extends Use>) newValue);
+			return;
+		case IrPackage.VAR__VALUE:
+			setValue(newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -419,7 +434,7 @@ public class VarImpl extends EObjectImpl implements Var {
 
 		return null;
 	}
-	
+
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -427,7 +442,8 @@ public class VarImpl extends EObjectImpl implements Var {
 	 */
 	public EList<Annotation> getAnnotations() {
 		if (annotations == null) {
-			annotations = new EObjectContainmentEList<Annotation>(Annotation.class, this, IrPackage.VAR__ANNOTATIONS);
+			annotations = new EObjectContainmentEList<Annotation>(
+					Annotation.class, this, IrPackage.VAR__ANNOTATIONS);
 		}
 		return annotations;
 	}
@@ -439,39 +455,39 @@ public class VarImpl extends EObjectImpl implements Var {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.VAR__ANNOTATIONS:
-				getAnnotations().clear();
-				return;
-			case IrPackage.VAR__ASSIGNABLE:
-				setAssignable(ASSIGNABLE_EDEFAULT);
-				return;
-			case IrPackage.VAR__DEFS:
-				getDefs().clear();
-				return;
-			case IrPackage.VAR__GLOBAL:
-				setGlobal(GLOBAL_EDEFAULT);
-				return;
-			case IrPackage.VAR__INDEX:
-				setIndex(INDEX_EDEFAULT);
-				return;
-			case IrPackage.VAR__INITIAL_VALUE:
-				setInitialValue((Expression)null);
-				return;
-			case IrPackage.VAR__LINE_NUMBER:
-				setLineNumber(LINE_NUMBER_EDEFAULT);
-				return;
-			case IrPackage.VAR__NAME:
-				setName(NAME_EDEFAULT);
-				return;
-			case IrPackage.VAR__TYPE:
-				setType((Type)null);
-				return;
-			case IrPackage.VAR__USES:
-				getUses().clear();
-				return;
-			case IrPackage.VAR__VALUE:
-				setValue(VALUE_EDEFAULT);
-				return;
+		case IrPackage.VAR__ANNOTATIONS:
+			getAnnotations().clear();
+			return;
+		case IrPackage.VAR__ASSIGNABLE:
+			setAssignable(ASSIGNABLE_EDEFAULT);
+			return;
+		case IrPackage.VAR__DEFS:
+			getDefs().clear();
+			return;
+		case IrPackage.VAR__GLOBAL:
+			setGlobal(GLOBAL_EDEFAULT);
+			return;
+		case IrPackage.VAR__INDEX:
+			setIndex(INDEX_EDEFAULT);
+			return;
+		case IrPackage.VAR__INITIAL_VALUE:
+			setInitialValue((Expression) null);
+			return;
+		case IrPackage.VAR__LINE_NUMBER:
+			setLineNumber(LINE_NUMBER_EDEFAULT);
+			return;
+		case IrPackage.VAR__NAME:
+			setName(NAME_EDEFAULT);
+			return;
+		case IrPackage.VAR__TYPE:
+			setType((Type) null);
+			return;
+		case IrPackage.VAR__USES:
+			getUses().clear();
+			return;
+		case IrPackage.VAR__VALUE:
+			setValue(VALUE_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -483,7 +499,8 @@ public class VarImpl extends EObjectImpl implements Var {
 	 */
 	public EList<Def> getDefs() {
 		if (defs == null) {
-			defs = new EObjectWithInverseResolvingEList<Def>(Def.class, this, IrPackage.VAR__DEFS, IrPackage.DEF__VARIABLE);
+			defs = new EObjectWithInverseResolvingEList<Def>(Def.class, this,
+					IrPackage.VAR__DEFS, IrPackage.DEF__VARIABLE);
 		}
 		return defs;
 	}
@@ -544,7 +561,8 @@ public class VarImpl extends EObjectImpl implements Var {
 	 */
 	public EList<Use> getUses() {
 		if (uses == null) {
-			uses = new EObjectWithInverseResolvingEList<Use>(Use.class, this, IrPackage.VAR__USES, IrPackage.USE__VARIABLE);
+			uses = new EObjectWithInverseResolvingEList<Use>(Use.class, this,
+					IrPackage.VAR__USES, IrPackage.USE__VARIABLE);
 		}
 		return uses;
 	}
@@ -601,7 +619,8 @@ public class VarImpl extends EObjectImpl implements Var {
 		boolean oldAssignable = assignable;
 		assignable = newAssignable;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.VAR__ASSIGNABLE, oldAssignable, assignable));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.VAR__ASSIGNABLE, oldAssignable, assignable));
 	}
 
 	/**
@@ -612,7 +631,8 @@ public class VarImpl extends EObjectImpl implements Var {
 		boolean oldGlobal = global;
 		global = newGlobal;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.VAR__GLOBAL, oldGlobal, global));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.VAR__GLOBAL, oldGlobal, global));
 	}
 
 	/**
@@ -623,7 +643,8 @@ public class VarImpl extends EObjectImpl implements Var {
 		int oldIndex = index;
 		index = newIndex;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.VAR__INDEX, oldIndex, index));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.VAR__INDEX, oldIndex, index));
 	}
 
 	/**
@@ -634,14 +655,20 @@ public class VarImpl extends EObjectImpl implements Var {
 		if (newInitialValue != initialValue) {
 			NotificationChain msgs = null;
 			if (initialValue != null)
-				msgs = ((InternalEObject)initialValue).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.VAR__INITIAL_VALUE, null, msgs);
+				msgs = ((InternalEObject) initialValue).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.VAR__INITIAL_VALUE,
+						null, msgs);
 			if (newInitialValue != null)
-				msgs = ((InternalEObject)newInitialValue).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.VAR__INITIAL_VALUE, null, msgs);
+				msgs = ((InternalEObject) newInitialValue).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.VAR__INITIAL_VALUE,
+						null, msgs);
 			msgs = basicSetInitialValue(newInitialValue, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.VAR__INITIAL_VALUE, newInitialValue, newInitialValue));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.VAR__INITIAL_VALUE, newInitialValue,
+					newInitialValue));
 	}
 
 	/**
@@ -653,7 +680,8 @@ public class VarImpl extends EObjectImpl implements Var {
 		int oldLineNumber = lineNumber;
 		lineNumber = newLineNumber;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.VAR__LINE_NUMBER, oldLineNumber, lineNumber));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.VAR__LINE_NUMBER, oldLineNumber, lineNumber));
 	}
 
 	/**
@@ -664,7 +692,8 @@ public class VarImpl extends EObjectImpl implements Var {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.VAR__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.VAR__NAME, oldName, name));
 	}
 
 	/**
@@ -675,14 +704,19 @@ public class VarImpl extends EObjectImpl implements Var {
 		if (newType != type) {
 			NotificationChain msgs = null;
 			if (type != null)
-				msgs = ((InternalEObject)type).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.VAR__TYPE, null, msgs);
+				msgs = ((InternalEObject) type).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.VAR__TYPE, null,
+						msgs);
 			if (newType != null)
-				msgs = ((InternalEObject)newType).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.VAR__TYPE, null, msgs);
+				msgs = ((InternalEObject) newType).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.VAR__TYPE, null,
+						msgs);
 			msgs = basicSetType(newType, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.VAR__TYPE, newType, newType));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.VAR__TYPE, newType, newType));
 	}
 
 	/**
@@ -694,12 +728,14 @@ public class VarImpl extends EObjectImpl implements Var {
 		Object oldValue = value;
 		value = newValue;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.VAR__VALUE, oldValue, value));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.VAR__VALUE, oldValue, value));
 	}
 
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer();
 		result.append(type);

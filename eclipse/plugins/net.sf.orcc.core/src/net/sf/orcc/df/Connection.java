@@ -81,9 +81,9 @@ public interface Connection extends Edge {
 	 * @model
 	 */
 	Port getSourcePort();
-	
+
 	DfVertex getSource();
-	
+
 	DfVertex getTarget();
 
 	/**

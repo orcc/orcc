@@ -78,177 +78,218 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected IrSwitch<Adapter> modelSwitch =
-		new IrSwitch<Adapter>() {
-			@Override
-			public Adapter caseProcedure(Procedure object) {
-				return createProcedureAdapter();
-			}
-			@Override
-			public Adapter caseParam(Param object) {
-				return createParamAdapter();
-			}
-			@Override
-			public Adapter caseNode(Node object) {
-				return createNodeAdapter();
-			}
-			@Override
-			public Adapter caseNodeBlock(NodeBlock object) {
-				return createNodeBlockAdapter();
-			}
-			@Override
-			public Adapter caseNodeIf(NodeIf object) {
-				return createNodeIfAdapter();
-			}
-			@Override
-			public Adapter caseNodeWhile(NodeWhile object) {
-				return createNodeWhileAdapter();
-			}
-			@Override
-			public Adapter caseInstruction(Instruction object) {
-				return createInstructionAdapter();
-			}
-			@Override
-			public Adapter caseInstAssign(InstAssign object) {
-				return createInstAssignAdapter();
-			}
-			@Override
-			public Adapter caseInstCall(InstCall object) {
-				return createInstCallAdapter();
-			}
-			@Override
-			public Adapter caseInstLoad(InstLoad object) {
-				return createInstLoadAdapter();
-			}
-			@Override
-			public Adapter caseInstPhi(InstPhi object) {
-				return createInstPhiAdapter();
-			}
-			@Override
-			public Adapter caseInstReturn(InstReturn object) {
-				return createInstReturnAdapter();
-			}
-			@Override
-			public Adapter caseInstSpecific(InstSpecific object) {
-				return createInstSpecificAdapter();
-			}
-			@Override
-			public Adapter caseInstStore(InstStore object) {
-				return createInstStoreAdapter();
-			}
-			@Override
-			public Adapter caseArg(Arg object) {
-				return createArgAdapter();
-			}
-			@Override
-			public Adapter caseArgByRef(ArgByRef object) {
-				return createArgByRefAdapter();
-			}
-			@Override
-			public Adapter caseArgByVal(ArgByVal object) {
-				return createArgByValAdapter();
-			}
-			@Override
-			public Adapter caseExpression(Expression object) {
-				return createExpressionAdapter();
-			}
-			@Override
-			public Adapter caseExprBinary(ExprBinary object) {
-				return createExprBinaryAdapter();
-			}
-			@Override
-			public Adapter caseExprBool(ExprBool object) {
-				return createExprBoolAdapter();
-			}
-			@Override
-			public Adapter caseExprFloat(ExprFloat object) {
-				return createExprFloatAdapter();
-			}
-			@Override
-			public Adapter caseExprInt(ExprInt object) {
-				return createExprIntAdapter();
-			}
-			@Override
-			public Adapter caseExprList(ExprList object) {
-				return createExprListAdapter();
-			}
-			@Override
-			public Adapter caseExprString(ExprString object) {
-				return createExprStringAdapter();
-			}
-			@Override
-			public Adapter caseExprUnary(ExprUnary object) {
-				return createExprUnaryAdapter();
-			}
-			@Override
-			public Adapter caseExprVar(ExprVar object) {
-				return createExprVarAdapter();
-			}
-			@Override
-			public Adapter caseType(Type object) {
-				return createTypeAdapter();
-			}
-			@Override
-			public Adapter caseTypeBool(TypeBool object) {
-				return createTypeBoolAdapter();
-			}
-			@Override
-			public Adapter caseTypeFloat(TypeFloat object) {
-				return createTypeFloatAdapter();
-			}
-			@Override
-			public Adapter caseTypeInt(TypeInt object) {
-				return createTypeIntAdapter();
-			}
-			@Override
-			public Adapter caseTypeList(TypeList object) {
-				return createTypeListAdapter();
-			}
-			@Override
-			public Adapter caseTypeString(TypeString object) {
-				return createTypeStringAdapter();
-			}
-			@Override
-			public Adapter caseTypeUint(TypeUint object) {
-				return createTypeUintAdapter();
-			}
-			@Override
-			public Adapter caseTypeVoid(TypeVoid object) {
-				return createTypeVoidAdapter();
-			}
-			@Override
-			public Adapter caseDef(Def object) {
-				return createDefAdapter();
-			}
-			@Override
-			public Adapter caseAnnotation(Annotation object) {
-				return createAnnotationAdapter();
-			}
-			@Override
-			public Adapter caseVar(Var object) {
-				return createVarAdapter();
-			}
-			@Override
-			public Adapter caseUse(Use object) {
-				return createUseAdapter();
-			}
-			@Override
-			public Adapter casePredicate(Predicate object) {
-				return createPredicateAdapter();
-			}
-			@Override
-			public Adapter caseEStringToEStringMapEntry(Map.Entry<String, String> object) {
-				return createEStringToEStringMapEntryAdapter();
-			}
-			@Override
-			public Adapter caseNodeSpecific(NodeSpecific object) {
-				return createNodeSpecificAdapter();
-			}
-			@Override
-			public Adapter defaultCase(EObject object) {
-				return createEObjectAdapter();
-			}
-		};
+	protected IrSwitch<Adapter> modelSwitch = new IrSwitch<Adapter>() {
+		@Override
+		public Adapter caseProcedure(Procedure object) {
+			return createProcedureAdapter();
+		}
+
+		@Override
+		public Adapter caseParam(Param object) {
+			return createParamAdapter();
+		}
+
+		@Override
+		public Adapter caseNode(Node object) {
+			return createNodeAdapter();
+		}
+
+		@Override
+		public Adapter caseNodeBlock(NodeBlock object) {
+			return createNodeBlockAdapter();
+		}
+
+		@Override
+		public Adapter caseNodeIf(NodeIf object) {
+			return createNodeIfAdapter();
+		}
+
+		@Override
+		public Adapter caseNodeWhile(NodeWhile object) {
+			return createNodeWhileAdapter();
+		}
+
+		@Override
+		public Adapter caseInstruction(Instruction object) {
+			return createInstructionAdapter();
+		}
+
+		@Override
+		public Adapter caseInstAssign(InstAssign object) {
+			return createInstAssignAdapter();
+		}
+
+		@Override
+		public Adapter caseInstCall(InstCall object) {
+			return createInstCallAdapter();
+		}
+
+		@Override
+		public Adapter caseInstLoad(InstLoad object) {
+			return createInstLoadAdapter();
+		}
+
+		@Override
+		public Adapter caseInstPhi(InstPhi object) {
+			return createInstPhiAdapter();
+		}
+
+		@Override
+		public Adapter caseInstReturn(InstReturn object) {
+			return createInstReturnAdapter();
+		}
+
+		@Override
+		public Adapter caseInstSpecific(InstSpecific object) {
+			return createInstSpecificAdapter();
+		}
+
+		@Override
+		public Adapter caseInstStore(InstStore object) {
+			return createInstStoreAdapter();
+		}
+
+		@Override
+		public Adapter caseArg(Arg object) {
+			return createArgAdapter();
+		}
+
+		@Override
+		public Adapter caseArgByRef(ArgByRef object) {
+			return createArgByRefAdapter();
+		}
+
+		@Override
+		public Adapter caseArgByVal(ArgByVal object) {
+			return createArgByValAdapter();
+		}
+
+		@Override
+		public Adapter caseExpression(Expression object) {
+			return createExpressionAdapter();
+		}
+
+		@Override
+		public Adapter caseExprBinary(ExprBinary object) {
+			return createExprBinaryAdapter();
+		}
+
+		@Override
+		public Adapter caseExprBool(ExprBool object) {
+			return createExprBoolAdapter();
+		}
+
+		@Override
+		public Adapter caseExprFloat(ExprFloat object) {
+			return createExprFloatAdapter();
+		}
+
+		@Override
+		public Adapter caseExprInt(ExprInt object) {
+			return createExprIntAdapter();
+		}
+
+		@Override
+		public Adapter caseExprList(ExprList object) {
+			return createExprListAdapter();
+		}
+
+		@Override
+		public Adapter caseExprString(ExprString object) {
+			return createExprStringAdapter();
+		}
+
+		@Override
+		public Adapter caseExprUnary(ExprUnary object) {
+			return createExprUnaryAdapter();
+		}
+
+		@Override
+		public Adapter caseExprVar(ExprVar object) {
+			return createExprVarAdapter();
+		}
+
+		@Override
+		public Adapter caseType(Type object) {
+			return createTypeAdapter();
+		}
+
+		@Override
+		public Adapter caseTypeBool(TypeBool object) {
+			return createTypeBoolAdapter();
+		}
+
+		@Override
+		public Adapter caseTypeFloat(TypeFloat object) {
+			return createTypeFloatAdapter();
+		}
+
+		@Override
+		public Adapter caseTypeInt(TypeInt object) {
+			return createTypeIntAdapter();
+		}
+
+		@Override
+		public Adapter caseTypeList(TypeList object) {
+			return createTypeListAdapter();
+		}
+
+		@Override
+		public Adapter caseTypeString(TypeString object) {
+			return createTypeStringAdapter();
+		}
+
+		@Override
+		public Adapter caseTypeUint(TypeUint object) {
+			return createTypeUintAdapter();
+		}
+
+		@Override
+		public Adapter caseTypeVoid(TypeVoid object) {
+			return createTypeVoidAdapter();
+		}
+
+		@Override
+		public Adapter caseDef(Def object) {
+			return createDefAdapter();
+		}
+
+		@Override
+		public Adapter caseAnnotation(Annotation object) {
+			return createAnnotationAdapter();
+		}
+
+		@Override
+		public Adapter caseVar(Var object) {
+			return createVarAdapter();
+		}
+
+		@Override
+		public Adapter caseUse(Use object) {
+			return createUseAdapter();
+		}
+
+		@Override
+		public Adapter casePredicate(Predicate object) {
+			return createPredicateAdapter();
+		}
+
+		@Override
+		public Adapter caseEStringToEStringMapEntry(
+				Map.Entry<String, String> object) {
+			return createEStringToEStringMapEntryAdapter();
+		}
+
+		@Override
+		public Adapter caseNodeSpecific(NodeSpecific object) {
+			return createNodeSpecificAdapter();
+		}
+
+		@Override
+		public Adapter defaultCase(EObject object) {
+			return createEObjectAdapter();
+		}
+	};
 
 	/**
 	 * Creates an instance of the adapter factory.
@@ -272,7 +313,7 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 */
 	@Override
 	public Adapter createAdapter(Notifier target) {
-		return modelSwitch.doSwitch((EObject)target);
+		return modelSwitch.doSwitch((EObject) target);
 	}
 
 	/**
@@ -875,7 +916,7 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 			return true;
 		}
 		if (object instanceof EObject) {
-			return ((EObject)object).eClass().getEPackage() == modelPackage;
+			return ((EObject) object).eClass().getEPackage() == modelPackage;
 		}
 		return false;
 	}

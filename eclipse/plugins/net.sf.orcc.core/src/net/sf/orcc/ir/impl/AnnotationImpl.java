@@ -102,7 +102,8 @@ public class AnnotationImpl extends EObjectImpl implements Annotation {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ANNOTATION__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.ANNOTATION__NAME, oldName, name));
 	}
 
 	/**
@@ -112,7 +113,10 @@ public class AnnotationImpl extends EObjectImpl implements Annotation {
 	 */
 	public EMap<String, String> getAttributes() {
 		if (attributes == null) {
-			attributes = new EcoreEMap<String,String>(IrPackage.Literals.ESTRING_TO_ESTRING_MAP_ENTRY, EStringToEStringMapEntryImpl.class, this, IrPackage.ANNOTATION__ATTRIBUTES);
+			attributes = new EcoreEMap<String, String>(
+					IrPackage.Literals.ESTRING_TO_ESTRING_MAP_ENTRY,
+					EStringToEStringMapEntryImpl.class, this,
+					IrPackage.ANNOTATION__ATTRIBUTES);
 		}
 		return attributes;
 	}
@@ -128,10 +132,12 @@ public class AnnotationImpl extends EObjectImpl implements Annotation {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrPackage.ANNOTATION__ATTRIBUTES:
-				return ((InternalEList<?>)getAttributes()).basicRemove(otherEnd, msgs);
+		case IrPackage.ANNOTATION__ATTRIBUTES:
+			return ((InternalEList<?>) getAttributes()).basicRemove(otherEnd,
+					msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -144,11 +150,13 @@ public class AnnotationImpl extends EObjectImpl implements Annotation {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.ANNOTATION__ATTRIBUTES:
-				if (coreType) return getAttributes();
-				else return getAttributes().map();
-			case IrPackage.ANNOTATION__NAME:
-				return getName();
+		case IrPackage.ANNOTATION__ATTRIBUTES:
+			if (coreType)
+				return getAttributes();
+			else
+				return getAttributes().map();
+		case IrPackage.ANNOTATION__NAME:
+			return getName();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -161,12 +169,12 @@ public class AnnotationImpl extends EObjectImpl implements Annotation {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.ANNOTATION__ATTRIBUTES:
-				((EStructuralFeature.Setting)getAttributes()).set(newValue);
-				return;
-			case IrPackage.ANNOTATION__NAME:
-				setName((String)newValue);
-				return;
+		case IrPackage.ANNOTATION__ATTRIBUTES:
+			((EStructuralFeature.Setting) getAttributes()).set(newValue);
+			return;
+		case IrPackage.ANNOTATION__NAME:
+			setName((String) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -179,12 +187,12 @@ public class AnnotationImpl extends EObjectImpl implements Annotation {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.ANNOTATION__ATTRIBUTES:
-				getAttributes().clear();
-				return;
-			case IrPackage.ANNOTATION__NAME:
-				setName(NAME_EDEFAULT);
-				return;
+		case IrPackage.ANNOTATION__ATTRIBUTES:
+			getAttributes().clear();
+			return;
+		case IrPackage.ANNOTATION__NAME:
+			setName(NAME_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -197,10 +205,11 @@ public class AnnotationImpl extends EObjectImpl implements Annotation {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.ANNOTATION__ATTRIBUTES:
-				return attributes != null && !attributes.isEmpty();
-			case IrPackage.ANNOTATION__NAME:
-				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
+		case IrPackage.ANNOTATION__ATTRIBUTES:
+			return attributes != null && !attributes.isEmpty();
+		case IrPackage.ANNOTATION__NAME:
+			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
+					.equals(name);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -212,7 +221,8 @@ public class AnnotationImpl extends EObjectImpl implements Annotation {
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (name: ");

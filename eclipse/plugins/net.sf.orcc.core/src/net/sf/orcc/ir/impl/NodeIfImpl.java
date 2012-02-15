@@ -112,8 +112,13 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 		Expression oldCondition = condition;
 		condition = newCondition;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.NODE_IF__CONDITION, oldCondition, newCondition);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.NODE_IF__CONDITION,
+					oldCondition, newCondition);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -127,8 +132,13 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 		NodeBlock oldJoinNode = joinNode;
 		joinNode = newJoinNode;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.NODE_IF__JOIN_NODE, oldJoinNode, newJoinNode);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.NODE_IF__JOIN_NODE,
+					oldJoinNode, newJoinNode);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -140,16 +150,16 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.NODE_IF__CONDITION:
-				return getCondition();
-			case IrPackage.NODE_IF__ELSE_NODES:
-				return getElseNodes();
-			case IrPackage.NODE_IF__JOIN_NODE:
-				return getJoinNode();
-			case IrPackage.NODE_IF__LINE_NUMBER:
-				return getLineNumber();
-			case IrPackage.NODE_IF__THEN_NODES:
-				return getThenNodes();
+		case IrPackage.NODE_IF__CONDITION:
+			return getCondition();
+		case IrPackage.NODE_IF__ELSE_NODES:
+			return getElseNodes();
+		case IrPackage.NODE_IF__JOIN_NODE:
+			return getJoinNode();
+		case IrPackage.NODE_IF__LINE_NUMBER:
+			return getLineNumber();
+		case IrPackage.NODE_IF__THEN_NODES:
+			return getThenNodes();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -162,14 +172,16 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrPackage.NODE_IF__CONDITION:
-				return basicSetCondition(null, msgs);
-			case IrPackage.NODE_IF__ELSE_NODES:
-				return ((InternalEList<?>)getElseNodes()).basicRemove(otherEnd, msgs);
-			case IrPackage.NODE_IF__JOIN_NODE:
-				return basicSetJoinNode(null, msgs);
-			case IrPackage.NODE_IF__THEN_NODES:
-				return ((InternalEList<?>)getThenNodes()).basicRemove(otherEnd, msgs);
+		case IrPackage.NODE_IF__CONDITION:
+			return basicSetCondition(null, msgs);
+		case IrPackage.NODE_IF__ELSE_NODES:
+			return ((InternalEList<?>) getElseNodes()).basicRemove(otherEnd,
+					msgs);
+		case IrPackage.NODE_IF__JOIN_NODE:
+			return basicSetJoinNode(null, msgs);
+		case IrPackage.NODE_IF__THEN_NODES:
+			return ((InternalEList<?>) getThenNodes()).basicRemove(otherEnd,
+					msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -181,16 +193,16 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.NODE_IF__CONDITION:
-				return condition != null;
-			case IrPackage.NODE_IF__ELSE_NODES:
-				return elseNodes != null && !elseNodes.isEmpty();
-			case IrPackage.NODE_IF__JOIN_NODE:
-				return joinNode != null;
-			case IrPackage.NODE_IF__LINE_NUMBER:
-				return lineNumber != LINE_NUMBER_EDEFAULT;
-			case IrPackage.NODE_IF__THEN_NODES:
-				return thenNodes != null && !thenNodes.isEmpty();
+		case IrPackage.NODE_IF__CONDITION:
+			return condition != null;
+		case IrPackage.NODE_IF__ELSE_NODES:
+			return elseNodes != null && !elseNodes.isEmpty();
+		case IrPackage.NODE_IF__JOIN_NODE:
+			return joinNode != null;
+		case IrPackage.NODE_IF__LINE_NUMBER:
+			return lineNumber != LINE_NUMBER_EDEFAULT;
+		case IrPackage.NODE_IF__THEN_NODES:
+			return thenNodes != null && !thenNodes.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -201,7 +213,8 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (lineNumber: ");
@@ -218,23 +231,23 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.NODE_IF__CONDITION:
-				setCondition((Expression)newValue);
-				return;
-			case IrPackage.NODE_IF__ELSE_NODES:
-				getElseNodes().clear();
-				getElseNodes().addAll((Collection<? extends Node>)newValue);
-				return;
-			case IrPackage.NODE_IF__JOIN_NODE:
-				setJoinNode((NodeBlock)newValue);
-				return;
-			case IrPackage.NODE_IF__LINE_NUMBER:
-				setLineNumber((Integer)newValue);
-				return;
-			case IrPackage.NODE_IF__THEN_NODES:
-				getThenNodes().clear();
-				getThenNodes().addAll((Collection<? extends Node>)newValue);
-				return;
+		case IrPackage.NODE_IF__CONDITION:
+			setCondition((Expression) newValue);
+			return;
+		case IrPackage.NODE_IF__ELSE_NODES:
+			getElseNodes().clear();
+			getElseNodes().addAll((Collection<? extends Node>) newValue);
+			return;
+		case IrPackage.NODE_IF__JOIN_NODE:
+			setJoinNode((NodeBlock) newValue);
+			return;
+		case IrPackage.NODE_IF__LINE_NUMBER:
+			setLineNumber((Integer) newValue);
+			return;
+		case IrPackage.NODE_IF__THEN_NODES:
+			getThenNodes().clear();
+			getThenNodes().addAll((Collection<? extends Node>) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -255,21 +268,21 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.NODE_IF__CONDITION:
-				setCondition((Expression)null);
-				return;
-			case IrPackage.NODE_IF__ELSE_NODES:
-				getElseNodes().clear();
-				return;
-			case IrPackage.NODE_IF__JOIN_NODE:
-				setJoinNode((NodeBlock)null);
-				return;
-			case IrPackage.NODE_IF__LINE_NUMBER:
-				setLineNumber(LINE_NUMBER_EDEFAULT);
-				return;
-			case IrPackage.NODE_IF__THEN_NODES:
-				getThenNodes().clear();
-				return;
+		case IrPackage.NODE_IF__CONDITION:
+			setCondition((Expression) null);
+			return;
+		case IrPackage.NODE_IF__ELSE_NODES:
+			getElseNodes().clear();
+			return;
+		case IrPackage.NODE_IF__JOIN_NODE:
+			setJoinNode((NodeBlock) null);
+			return;
+		case IrPackage.NODE_IF__LINE_NUMBER:
+			setLineNumber(LINE_NUMBER_EDEFAULT);
+			return;
+		case IrPackage.NODE_IF__THEN_NODES:
+			getThenNodes().clear();
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -288,7 +301,8 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 	 */
 	public EList<Node> getElseNodes() {
 		if (elseNodes == null) {
-			elseNodes = new EObjectContainmentEList<Node>(Node.class, this, IrPackage.NODE_IF__ELSE_NODES);
+			elseNodes = new EObjectContainmentEList<Node>(Node.class, this,
+					IrPackage.NODE_IF__ELSE_NODES);
 		}
 		return elseNodes;
 	}
@@ -307,7 +321,8 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 	 */
 	public EList<Node> getThenNodes() {
 		if (thenNodes == null) {
-			thenNodes = new EObjectContainmentEList<Node>(Node.class, this, IrPackage.NODE_IF__THEN_NODES);
+			thenNodes = new EObjectContainmentEList<Node>(Node.class, this,
+					IrPackage.NODE_IF__THEN_NODES);
 		}
 		return thenNodes;
 	}
@@ -341,14 +356,19 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 		if (newCondition != condition) {
 			NotificationChain msgs = null;
 			if (condition != null)
-				msgs = ((InternalEObject)condition).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.NODE_IF__CONDITION, null, msgs);
+				msgs = ((InternalEObject) condition).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.NODE_IF__CONDITION,
+						null, msgs);
 			if (newCondition != null)
-				msgs = ((InternalEObject)newCondition).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.NODE_IF__CONDITION, null, msgs);
+				msgs = ((InternalEObject) newCondition).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.NODE_IF__CONDITION,
+						null, msgs);
 			msgs = basicSetCondition(newCondition, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.NODE_IF__CONDITION, newCondition, newCondition));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.NODE_IF__CONDITION, newCondition, newCondition));
 	}
 
 	/**
@@ -367,7 +387,8 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 		int oldLineNumber = lineNumber;
 		lineNumber = newLineNumber;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.NODE_IF__LINE_NUMBER, oldLineNumber, lineNumber));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.NODE_IF__LINE_NUMBER, oldLineNumber, lineNumber));
 	}
 
 	/**
@@ -378,14 +399,19 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 		if (newJoinNode != joinNode) {
 			NotificationChain msgs = null;
 			if (joinNode != null)
-				msgs = ((InternalEObject)joinNode).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.NODE_IF__JOIN_NODE, null, msgs);
+				msgs = ((InternalEObject) joinNode).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.NODE_IF__JOIN_NODE,
+						null, msgs);
 			if (newJoinNode != null)
-				msgs = ((InternalEObject)newJoinNode).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.NODE_IF__JOIN_NODE, null, msgs);
+				msgs = ((InternalEObject) newJoinNode).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.NODE_IF__JOIN_NODE,
+						null, msgs);
 			msgs = basicSetJoinNode(newJoinNode, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.NODE_IF__JOIN_NODE, newJoinNode, newJoinNode));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.NODE_IF__JOIN_NODE, newJoinNode, newJoinNode));
 	}
 
 } // NodeIfImpl

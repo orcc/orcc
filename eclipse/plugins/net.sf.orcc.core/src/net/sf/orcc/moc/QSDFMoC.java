@@ -71,7 +71,7 @@ public interface QSDFMoC extends MoC {
 	 * @return a SDF MoC
 	 */
 	SDFMoC getSDFMoC(Action action);
-	
+
 	/**
 	 * Sets the SDF MoC that is associated with the configuration given by the
 	 * action.

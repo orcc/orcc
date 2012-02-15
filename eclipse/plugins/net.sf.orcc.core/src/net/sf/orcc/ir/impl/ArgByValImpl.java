@@ -54,12 +54,18 @@ public class ArgByValImpl extends ArgImpl implements ArgByVal {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetValue(Expression newValue, NotificationChain msgs) {
+	public NotificationChain basicSetValue(Expression newValue,
+			NotificationChain msgs) {
 		Expression oldValue = value;
 		value = newValue;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.ARG_BY_VAL__VALUE, oldValue, newValue);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.ARG_BY_VAL__VALUE, oldValue,
+					newValue);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -72,8 +78,8 @@ public class ArgByValImpl extends ArgImpl implements ArgByVal {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.ARG_BY_VAL__VALUE:
-				return getValue();
+		case IrPackage.ARG_BY_VAL__VALUE:
+			return getValue();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -84,10 +90,11 @@ public class ArgByValImpl extends ArgImpl implements ArgByVal {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrPackage.ARG_BY_VAL__VALUE:
-				return basicSetValue(null, msgs);
+		case IrPackage.ARG_BY_VAL__VALUE:
+			return basicSetValue(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -100,8 +107,8 @@ public class ArgByValImpl extends ArgImpl implements ArgByVal {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.ARG_BY_VAL__VALUE:
-				return value != null;
+		case IrPackage.ARG_BY_VAL__VALUE:
+			return value != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -114,9 +121,9 @@ public class ArgByValImpl extends ArgImpl implements ArgByVal {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.ARG_BY_VAL__VALUE:
-				setValue((Expression)newValue);
-				return;
+		case IrPackage.ARG_BY_VAL__VALUE:
+			setValue((Expression) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -139,9 +146,9 @@ public class ArgByValImpl extends ArgImpl implements ArgByVal {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.ARG_BY_VAL__VALUE:
-				setValue((Expression)null);
-				return;
+		case IrPackage.ARG_BY_VAL__VALUE:
+			setValue((Expression) null);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -174,14 +181,19 @@ public class ArgByValImpl extends ArgImpl implements ArgByVal {
 		if (newValue != value) {
 			NotificationChain msgs = null;
 			if (value != null)
-				msgs = ((InternalEObject)value).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ARG_BY_VAL__VALUE, null, msgs);
+				msgs = ((InternalEObject) value).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.ARG_BY_VAL__VALUE,
+						null, msgs);
 			if (newValue != null)
-				msgs = ((InternalEObject)newValue).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ARG_BY_VAL__VALUE, null, msgs);
+				msgs = ((InternalEObject) newValue).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.ARG_BY_VAL__VALUE,
+						null, msgs);
 			msgs = basicSetValue(newValue, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ARG_BY_VAL__VALUE, newValue, newValue));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.ARG_BY_VAL__VALUE, newValue, newValue));
 	}
 
 }

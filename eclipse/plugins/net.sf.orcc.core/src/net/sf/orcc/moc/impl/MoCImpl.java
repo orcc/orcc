@@ -41,7 +41,7 @@ public abstract class MoCImpl extends EObjectImpl implements MoC {
 	protected EClass eStaticClass() {
 		return MocPackage.Literals.MO_C;
 	}
-	
+
 	@Override
 	public boolean isCSDF() {
 		return false;

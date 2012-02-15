@@ -742,281 +742,352 @@ public class IrSwitch<T> extends Switch<T> {
 	@Override
 	protected T doSwitch(int classifierID, EObject theEObject) {
 		switch (classifierID) {
-			case IrPackage.PROCEDURE: {
-				Procedure procedure = (Procedure)theEObject;
-				T result = caseProcedure(procedure);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.PARAM: {
-				Param param = (Param)theEObject;
-				T result = caseParam(param);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.NODE: {
-				Node node = (Node)theEObject;
-				T result = caseNode(node);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.NODE_BLOCK: {
-				NodeBlock nodeBlock = (NodeBlock)theEObject;
-				T result = caseNodeBlock(nodeBlock);
-				if (result == null) result = caseNode(nodeBlock);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.NODE_IF: {
-				NodeIf nodeIf = (NodeIf)theEObject;
-				T result = caseNodeIf(nodeIf);
-				if (result == null) result = caseNode(nodeIf);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.NODE_WHILE: {
-				NodeWhile nodeWhile = (NodeWhile)theEObject;
-				T result = caseNodeWhile(nodeWhile);
-				if (result == null) result = caseNode(nodeWhile);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.INSTRUCTION: {
-				Instruction instruction = (Instruction)theEObject;
-				T result = caseInstruction(instruction);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.INST_ASSIGN: {
-				InstAssign instAssign = (InstAssign)theEObject;
-				T result = caseInstAssign(instAssign);
-				if (result == null) result = caseInstruction(instAssign);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.INST_CALL: {
-				InstCall instCall = (InstCall)theEObject;
-				T result = caseInstCall(instCall);
-				if (result == null) result = caseInstruction(instCall);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.INST_LOAD: {
-				InstLoad instLoad = (InstLoad)theEObject;
-				T result = caseInstLoad(instLoad);
-				if (result == null) result = caseInstruction(instLoad);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.INST_PHI: {
-				InstPhi instPhi = (InstPhi)theEObject;
-				T result = caseInstPhi(instPhi);
-				if (result == null) result = caseInstruction(instPhi);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.INST_RETURN: {
-				InstReturn instReturn = (InstReturn)theEObject;
-				T result = caseInstReturn(instReturn);
-				if (result == null) result = caseInstruction(instReturn);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.INST_SPECIFIC: {
-				InstSpecific instSpecific = (InstSpecific)theEObject;
-				T result = caseInstSpecific(instSpecific);
-				if (result == null) result = caseInstruction(instSpecific);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.INST_STORE: {
-				InstStore instStore = (InstStore)theEObject;
-				T result = caseInstStore(instStore);
-				if (result == null) result = caseInstruction(instStore);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.ARG: {
-				Arg arg = (Arg)theEObject;
-				T result = caseArg(arg);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.ARG_BY_REF: {
-				ArgByRef argByRef = (ArgByRef)theEObject;
-				T result = caseArgByRef(argByRef);
-				if (result == null) result = caseArg(argByRef);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.ARG_BY_VAL: {
-				ArgByVal argByVal = (ArgByVal)theEObject;
-				T result = caseArgByVal(argByVal);
-				if (result == null) result = caseArg(argByVal);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.EXPRESSION: {
-				Expression expression = (Expression)theEObject;
-				T result = caseExpression(expression);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.EXPR_BINARY: {
-				ExprBinary exprBinary = (ExprBinary)theEObject;
-				T result = caseExprBinary(exprBinary);
-				if (result == null) result = caseExpression(exprBinary);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.EXPR_BOOL: {
-				ExprBool exprBool = (ExprBool)theEObject;
-				T result = caseExprBool(exprBool);
-				if (result == null) result = caseExpression(exprBool);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.EXPR_FLOAT: {
-				ExprFloat exprFloat = (ExprFloat)theEObject;
-				T result = caseExprFloat(exprFloat);
-				if (result == null) result = caseExpression(exprFloat);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.EXPR_INT: {
-				ExprInt exprInt = (ExprInt)theEObject;
-				T result = caseExprInt(exprInt);
-				if (result == null) result = caseExpression(exprInt);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.EXPR_LIST: {
-				ExprList exprList = (ExprList)theEObject;
-				T result = caseExprList(exprList);
-				if (result == null) result = caseExpression(exprList);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.EXPR_STRING: {
-				ExprString exprString = (ExprString)theEObject;
-				T result = caseExprString(exprString);
-				if (result == null) result = caseExpression(exprString);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.EXPR_UNARY: {
-				ExprUnary exprUnary = (ExprUnary)theEObject;
-				T result = caseExprUnary(exprUnary);
-				if (result == null) result = caseExpression(exprUnary);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.EXPR_VAR: {
-				ExprVar exprVar = (ExprVar)theEObject;
-				T result = caseExprVar(exprVar);
-				if (result == null) result = caseExpression(exprVar);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.TYPE: {
-				Type type = (Type)theEObject;
-				T result = caseType(type);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.TYPE_BOOL: {
-				TypeBool typeBool = (TypeBool)theEObject;
-				T result = caseTypeBool(typeBool);
-				if (result == null) result = caseType(typeBool);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.TYPE_FLOAT: {
-				TypeFloat typeFloat = (TypeFloat)theEObject;
-				T result = caseTypeFloat(typeFloat);
-				if (result == null) result = caseType(typeFloat);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.TYPE_INT: {
-				TypeInt typeInt = (TypeInt)theEObject;
-				T result = caseTypeInt(typeInt);
-				if (result == null) result = caseType(typeInt);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.TYPE_LIST: {
-				TypeList typeList = (TypeList)theEObject;
-				T result = caseTypeList(typeList);
-				if (result == null) result = caseType(typeList);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.TYPE_STRING: {
-				TypeString typeString = (TypeString)theEObject;
-				T result = caseTypeString(typeString);
-				if (result == null) result = caseType(typeString);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.TYPE_UINT: {
-				TypeUint typeUint = (TypeUint)theEObject;
-				T result = caseTypeUint(typeUint);
-				if (result == null) result = caseType(typeUint);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.TYPE_VOID: {
-				TypeVoid typeVoid = (TypeVoid)theEObject;
-				T result = caseTypeVoid(typeVoid);
-				if (result == null) result = caseType(typeVoid);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.DEF: {
-				Def def = (Def)theEObject;
-				T result = caseDef(def);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.ANNOTATION: {
-				Annotation annotation = (Annotation)theEObject;
-				T result = caseAnnotation(annotation);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.VAR: {
-				Var var = (Var)theEObject;
-				T result = caseVar(var);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.USE: {
-				Use use = (Use)theEObject;
-				T result = caseUse(use);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.PREDICATE: {
-				Predicate predicate = (Predicate)theEObject;
-				T result = casePredicate(predicate);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY: {
-				@SuppressWarnings("unchecked") Map.Entry<String, String> eStringToEStringMapEntry = (Map.Entry<String, String>)theEObject;
-				T result = caseEStringToEStringMapEntry(eStringToEStringMapEntry);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.NODE_SPECIFIC: {
-				NodeSpecific nodeSpecific = (NodeSpecific)theEObject;
-				T result = caseNodeSpecific(nodeSpecific);
-				if (result == null) result = caseNode(nodeSpecific);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			default: return defaultCase(theEObject);
+		case IrPackage.PROCEDURE: {
+			Procedure procedure = (Procedure) theEObject;
+			T result = caseProcedure(procedure);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.PARAM: {
+			Param param = (Param) theEObject;
+			T result = caseParam(param);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.NODE: {
+			Node node = (Node) theEObject;
+			T result = caseNode(node);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.NODE_BLOCK: {
+			NodeBlock nodeBlock = (NodeBlock) theEObject;
+			T result = caseNodeBlock(nodeBlock);
+			if (result == null)
+				result = caseNode(nodeBlock);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.NODE_IF: {
+			NodeIf nodeIf = (NodeIf) theEObject;
+			T result = caseNodeIf(nodeIf);
+			if (result == null)
+				result = caseNode(nodeIf);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.NODE_WHILE: {
+			NodeWhile nodeWhile = (NodeWhile) theEObject;
+			T result = caseNodeWhile(nodeWhile);
+			if (result == null)
+				result = caseNode(nodeWhile);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.INSTRUCTION: {
+			Instruction instruction = (Instruction) theEObject;
+			T result = caseInstruction(instruction);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.INST_ASSIGN: {
+			InstAssign instAssign = (InstAssign) theEObject;
+			T result = caseInstAssign(instAssign);
+			if (result == null)
+				result = caseInstruction(instAssign);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.INST_CALL: {
+			InstCall instCall = (InstCall) theEObject;
+			T result = caseInstCall(instCall);
+			if (result == null)
+				result = caseInstruction(instCall);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.INST_LOAD: {
+			InstLoad instLoad = (InstLoad) theEObject;
+			T result = caseInstLoad(instLoad);
+			if (result == null)
+				result = caseInstruction(instLoad);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.INST_PHI: {
+			InstPhi instPhi = (InstPhi) theEObject;
+			T result = caseInstPhi(instPhi);
+			if (result == null)
+				result = caseInstruction(instPhi);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.INST_RETURN: {
+			InstReturn instReturn = (InstReturn) theEObject;
+			T result = caseInstReturn(instReturn);
+			if (result == null)
+				result = caseInstruction(instReturn);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.INST_SPECIFIC: {
+			InstSpecific instSpecific = (InstSpecific) theEObject;
+			T result = caseInstSpecific(instSpecific);
+			if (result == null)
+				result = caseInstruction(instSpecific);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.INST_STORE: {
+			InstStore instStore = (InstStore) theEObject;
+			T result = caseInstStore(instStore);
+			if (result == null)
+				result = caseInstruction(instStore);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.ARG: {
+			Arg arg = (Arg) theEObject;
+			T result = caseArg(arg);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.ARG_BY_REF: {
+			ArgByRef argByRef = (ArgByRef) theEObject;
+			T result = caseArgByRef(argByRef);
+			if (result == null)
+				result = caseArg(argByRef);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.ARG_BY_VAL: {
+			ArgByVal argByVal = (ArgByVal) theEObject;
+			T result = caseArgByVal(argByVal);
+			if (result == null)
+				result = caseArg(argByVal);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.EXPRESSION: {
+			Expression expression = (Expression) theEObject;
+			T result = caseExpression(expression);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.EXPR_BINARY: {
+			ExprBinary exprBinary = (ExprBinary) theEObject;
+			T result = caseExprBinary(exprBinary);
+			if (result == null)
+				result = caseExpression(exprBinary);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.EXPR_BOOL: {
+			ExprBool exprBool = (ExprBool) theEObject;
+			T result = caseExprBool(exprBool);
+			if (result == null)
+				result = caseExpression(exprBool);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.EXPR_FLOAT: {
+			ExprFloat exprFloat = (ExprFloat) theEObject;
+			T result = caseExprFloat(exprFloat);
+			if (result == null)
+				result = caseExpression(exprFloat);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.EXPR_INT: {
+			ExprInt exprInt = (ExprInt) theEObject;
+			T result = caseExprInt(exprInt);
+			if (result == null)
+				result = caseExpression(exprInt);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.EXPR_LIST: {
+			ExprList exprList = (ExprList) theEObject;
+			T result = caseExprList(exprList);
+			if (result == null)
+				result = caseExpression(exprList);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.EXPR_STRING: {
+			ExprString exprString = (ExprString) theEObject;
+			T result = caseExprString(exprString);
+			if (result == null)
+				result = caseExpression(exprString);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.EXPR_UNARY: {
+			ExprUnary exprUnary = (ExprUnary) theEObject;
+			T result = caseExprUnary(exprUnary);
+			if (result == null)
+				result = caseExpression(exprUnary);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.EXPR_VAR: {
+			ExprVar exprVar = (ExprVar) theEObject;
+			T result = caseExprVar(exprVar);
+			if (result == null)
+				result = caseExpression(exprVar);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.TYPE: {
+			Type type = (Type) theEObject;
+			T result = caseType(type);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.TYPE_BOOL: {
+			TypeBool typeBool = (TypeBool) theEObject;
+			T result = caseTypeBool(typeBool);
+			if (result == null)
+				result = caseType(typeBool);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.TYPE_FLOAT: {
+			TypeFloat typeFloat = (TypeFloat) theEObject;
+			T result = caseTypeFloat(typeFloat);
+			if (result == null)
+				result = caseType(typeFloat);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.TYPE_INT: {
+			TypeInt typeInt = (TypeInt) theEObject;
+			T result = caseTypeInt(typeInt);
+			if (result == null)
+				result = caseType(typeInt);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.TYPE_LIST: {
+			TypeList typeList = (TypeList) theEObject;
+			T result = caseTypeList(typeList);
+			if (result == null)
+				result = caseType(typeList);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.TYPE_STRING: {
+			TypeString typeString = (TypeString) theEObject;
+			T result = caseTypeString(typeString);
+			if (result == null)
+				result = caseType(typeString);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.TYPE_UINT: {
+			TypeUint typeUint = (TypeUint) theEObject;
+			T result = caseTypeUint(typeUint);
+			if (result == null)
+				result = caseType(typeUint);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.TYPE_VOID: {
+			TypeVoid typeVoid = (TypeVoid) theEObject;
+			T result = caseTypeVoid(typeVoid);
+			if (result == null)
+				result = caseType(typeVoid);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.DEF: {
+			Def def = (Def) theEObject;
+			T result = caseDef(def);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.ANNOTATION: {
+			Annotation annotation = (Annotation) theEObject;
+			T result = caseAnnotation(annotation);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.VAR: {
+			Var var = (Var) theEObject;
+			T result = caseVar(var);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.USE: {
+			Use use = (Use) theEObject;
+			T result = caseUse(use);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.PREDICATE: {
+			Predicate predicate = (Predicate) theEObject;
+			T result = casePredicate(predicate);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY: {
+			@SuppressWarnings("unchecked")
+			Map.Entry<String, String> eStringToEStringMapEntry = (Map.Entry<String, String>) theEObject;
+			T result = caseEStringToEStringMapEntry(eStringToEStringMapEntry);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.NODE_SPECIFIC: {
+			NodeSpecific nodeSpecific = (NodeSpecific) theEObject;
+			T result = caseNodeSpecific(nodeSpecific);
+			if (result == null)
+				result = caseNode(nodeSpecific);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		default:
+			return defaultCase(theEObject);
 		}
 	}
 

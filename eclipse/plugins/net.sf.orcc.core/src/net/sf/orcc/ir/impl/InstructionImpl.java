@@ -76,12 +76,18 @@ public abstract class InstructionImpl extends EObjectImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetPredicate(Predicate newPredicate, NotificationChain msgs) {
+	public NotificationChain basicSetPredicate(Predicate newPredicate,
+			NotificationChain msgs) {
 		Predicate oldPredicate = predicate;
 		predicate = newPredicate;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.INSTRUCTION__PREDICATE, oldPredicate, newPredicate);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.INSTRUCTION__PREDICATE,
+					oldPredicate, newPredicate);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -93,10 +99,10 @@ public abstract class InstructionImpl extends EObjectImpl implements
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.INSTRUCTION__LINE_NUMBER:
-				return getLineNumber();
-			case IrPackage.INSTRUCTION__PREDICATE:
-				return getPredicate();
+		case IrPackage.INSTRUCTION__LINE_NUMBER:
+			return getLineNumber();
+		case IrPackage.INSTRUCTION__PREDICATE:
+			return getPredicate();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -109,8 +115,8 @@ public abstract class InstructionImpl extends EObjectImpl implements
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrPackage.INSTRUCTION__PREDICATE:
-				return basicSetPredicate(null, msgs);
+		case IrPackage.INSTRUCTION__PREDICATE:
+			return basicSetPredicate(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -122,10 +128,10 @@ public abstract class InstructionImpl extends EObjectImpl implements
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.INSTRUCTION__LINE_NUMBER:
-				return lineNumber != LINE_NUMBER_EDEFAULT;
-			case IrPackage.INSTRUCTION__PREDICATE:
-				return predicate != null;
+		case IrPackage.INSTRUCTION__LINE_NUMBER:
+			return lineNumber != LINE_NUMBER_EDEFAULT;
+		case IrPackage.INSTRUCTION__PREDICATE:
+			return predicate != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -137,12 +143,12 @@ public abstract class InstructionImpl extends EObjectImpl implements
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.INSTRUCTION__LINE_NUMBER:
-				setLineNumber((Integer)newValue);
-				return;
-			case IrPackage.INSTRUCTION__PREDICATE:
-				setPredicate((Predicate)newValue);
-				return;
+		case IrPackage.INSTRUCTION__LINE_NUMBER:
+			setLineNumber((Integer) newValue);
+			return;
+		case IrPackage.INSTRUCTION__PREDICATE:
+			setPredicate((Predicate) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -163,12 +169,12 @@ public abstract class InstructionImpl extends EObjectImpl implements
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.INSTRUCTION__LINE_NUMBER:
-				setLineNumber(LINE_NUMBER_EDEFAULT);
-				return;
-			case IrPackage.INSTRUCTION__PREDICATE:
-				setPredicate((Predicate)null);
-				return;
+		case IrPackage.INSTRUCTION__LINE_NUMBER:
+			setLineNumber(LINE_NUMBER_EDEFAULT);
+			return;
+		case IrPackage.INSTRUCTION__PREDICATE:
+			setPredicate((Predicate) null);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -234,7 +240,9 @@ public abstract class InstructionImpl extends EObjectImpl implements
 		int oldLineNumber = lineNumber;
 		lineNumber = newLineNumber;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INSTRUCTION__LINE_NUMBER, oldLineNumber, lineNumber));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.INSTRUCTION__LINE_NUMBER, oldLineNumber,
+					lineNumber));
 	}
 
 	/**
@@ -245,14 +253,20 @@ public abstract class InstructionImpl extends EObjectImpl implements
 		if (newPredicate != predicate) {
 			NotificationChain msgs = null;
 			if (predicate != null)
-				msgs = ((InternalEObject)predicate).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.INSTRUCTION__PREDICATE, null, msgs);
+				msgs = ((InternalEObject) predicate).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE
+								- IrPackage.INSTRUCTION__PREDICATE, null, msgs);
 			if (newPredicate != null)
-				msgs = ((InternalEObject)newPredicate).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.INSTRUCTION__PREDICATE, null, msgs);
+				msgs = ((InternalEObject) newPredicate).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE
+								- IrPackage.INSTRUCTION__PREDICATE, null, msgs);
 			msgs = basicSetPredicate(newPredicate, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INSTRUCTION__PREDICATE, newPredicate, newPredicate));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.INSTRUCTION__PREDICATE, newPredicate,
+					newPredicate));
 	}
 
 	@Override

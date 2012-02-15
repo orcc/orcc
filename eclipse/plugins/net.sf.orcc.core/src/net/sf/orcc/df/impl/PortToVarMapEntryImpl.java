@@ -33,7 +33,8 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  *
  * @generated
  */
-public class PortToVarMapEntryImpl extends EObjectImpl implements BasicEMap.Entry<Port,Var> {
+public class PortToVarMapEntryImpl extends EObjectImpl implements
+		BasicEMap.Entry<Port, Var> {
 	/**
 	 * The cached value of the '{@link #getTypedKey() <em>Key</em>}' reference.
 	 * <!-- begin-user-doc -->
@@ -80,11 +81,12 @@ public class PortToVarMapEntryImpl extends EObjectImpl implements BasicEMap.Entr
 	 */
 	public Port getTypedKey() {
 		if (key != null && key.eIsProxy()) {
-			InternalEObject oldKey = (InternalEObject)key;
-			key = (Port)eResolveProxy(oldKey);
+			InternalEObject oldKey = (InternalEObject) key;
+			key = (Port) eResolveProxy(oldKey);
 			if (key != oldKey) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.PORT_TO_VAR_MAP_ENTRY__KEY, oldKey, key));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							DfPackage.PORT_TO_VAR_MAP_ENTRY__KEY, oldKey, key));
 			}
 		}
 		return key;
@@ -108,7 +110,8 @@ public class PortToVarMapEntryImpl extends EObjectImpl implements BasicEMap.Entr
 		Port oldKey = key;
 		key = newKey;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.PORT_TO_VAR_MAP_ENTRY__KEY, oldKey, key));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.PORT_TO_VAR_MAP_ENTRY__KEY, oldKey, key));
 	}
 
 	/**
@@ -118,11 +121,13 @@ public class PortToVarMapEntryImpl extends EObjectImpl implements BasicEMap.Entr
 	 */
 	public Var getTypedValue() {
 		if (value != null && value.eIsProxy()) {
-			InternalEObject oldValue = (InternalEObject)value;
-			value = (Var)eResolveProxy(oldValue);
+			InternalEObject oldValue = (InternalEObject) value;
+			value = (Var) eResolveProxy(oldValue);
 			if (value != oldValue) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.PORT_TO_VAR_MAP_ENTRY__VALUE, oldValue, value));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							DfPackage.PORT_TO_VAR_MAP_ENTRY__VALUE, oldValue,
+							value));
 			}
 		}
 		return value;
@@ -146,7 +151,8 @@ public class PortToVarMapEntryImpl extends EObjectImpl implements BasicEMap.Entr
 		Var oldValue = value;
 		value = newValue;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.PORT_TO_VAR_MAP_ENTRY__VALUE, oldValue, value));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.PORT_TO_VAR_MAP_ENTRY__VALUE, oldValue, value));
 	}
 
 	/**
@@ -157,12 +163,14 @@ public class PortToVarMapEntryImpl extends EObjectImpl implements BasicEMap.Entr
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case DfPackage.PORT_TO_VAR_MAP_ENTRY__KEY:
-				if (resolve) return getTypedKey();
-				return basicGetTypedKey();
-			case DfPackage.PORT_TO_VAR_MAP_ENTRY__VALUE:
-				if (resolve) return getTypedValue();
-				return basicGetTypedValue();
+		case DfPackage.PORT_TO_VAR_MAP_ENTRY__KEY:
+			if (resolve)
+				return getTypedKey();
+			return basicGetTypedKey();
+		case DfPackage.PORT_TO_VAR_MAP_ENTRY__VALUE:
+			if (resolve)
+				return getTypedValue();
+			return basicGetTypedValue();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -175,12 +183,12 @@ public class PortToVarMapEntryImpl extends EObjectImpl implements BasicEMap.Entr
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case DfPackage.PORT_TO_VAR_MAP_ENTRY__KEY:
-				setTypedKey((Port)newValue);
-				return;
-			case DfPackage.PORT_TO_VAR_MAP_ENTRY__VALUE:
-				setTypedValue((Var)newValue);
-				return;
+		case DfPackage.PORT_TO_VAR_MAP_ENTRY__KEY:
+			setTypedKey((Port) newValue);
+			return;
+		case DfPackage.PORT_TO_VAR_MAP_ENTRY__VALUE:
+			setTypedValue((Var) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -193,12 +201,12 @@ public class PortToVarMapEntryImpl extends EObjectImpl implements BasicEMap.Entr
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case DfPackage.PORT_TO_VAR_MAP_ENTRY__KEY:
-				setTypedKey((Port)null);
-				return;
-			case DfPackage.PORT_TO_VAR_MAP_ENTRY__VALUE:
-				setTypedValue((Var)null);
-				return;
+		case DfPackage.PORT_TO_VAR_MAP_ENTRY__KEY:
+			setTypedKey((Port) null);
+			return;
+		case DfPackage.PORT_TO_VAR_MAP_ENTRY__VALUE:
+			setTypedValue((Var) null);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -211,10 +219,10 @@ public class PortToVarMapEntryImpl extends EObjectImpl implements BasicEMap.Entr
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case DfPackage.PORT_TO_VAR_MAP_ENTRY__KEY:
-				return key != null;
-			case DfPackage.PORT_TO_VAR_MAP_ENTRY__VALUE:
-				return value != null;
+		case DfPackage.PORT_TO_VAR_MAP_ENTRY__KEY:
+			return key != null;
+		case DfPackage.PORT_TO_VAR_MAP_ENTRY__VALUE:
+			return value != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -294,7 +302,8 @@ public class PortToVarMapEntryImpl extends EObjectImpl implements BasicEMap.Entr
 	@SuppressWarnings("unchecked")
 	public EMap<Port, Var> getEMap() {
 		EObject container = eContainer();
-		return container == null ? null : (EMap<Port, Var>)container.eGet(eContainmentFeature());
+		return container == null ? null : (EMap<Port, Var>) container
+				.eGet(eContainmentFeature());
 	}
 
 } //PortToVarMapEntryImpl

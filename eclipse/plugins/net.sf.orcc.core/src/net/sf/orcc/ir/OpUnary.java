@@ -145,19 +145,16 @@ public enum OpUnary implements Enumerator {
 	 * 
 	 * @generated
 	 */
-	private static final OpUnary[] VALUES_ARRAY = new OpUnary[] {
-			BITNOT,
-			LOGIC_NOT,
-			MINUS,
-			NUM_ELTS,
-		};
+	private static final OpUnary[] VALUES_ARRAY = new OpUnary[] { BITNOT,
+			LOGIC_NOT, MINUS, NUM_ELTS, };
 
 	/**
 	 * A public read-only list of all the '<em><b>Op Unary</b></em>' enumerators.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static final List<OpUnary> VALUES = Collections.unmodifiableList(Arrays.asList(VALUES_ARRAY));
+	public static final List<OpUnary> VALUES = Collections
+			.unmodifiableList(Arrays.asList(VALUES_ARRAY));
 
 	static {
 		for (OpUnary op : OpUnary.values()) {
@@ -174,10 +171,14 @@ public enum OpUnary implements Enumerator {
 	 */
 	public static OpUnary get(int value) {
 		switch (value) {
-			case BITNOT_VALUE: return BITNOT;
-			case LOGIC_NOT_VALUE: return LOGIC_NOT;
-			case MINUS_VALUE: return MINUS;
-			case NUM_ELTS_VALUE: return NUM_ELTS;
+		case BITNOT_VALUE:
+			return BITNOT;
+		case LOGIC_NOT_VALUE:
+			return LOGIC_NOT;
+		case MINUS_VALUE:
+			return MINUS;
+		case NUM_ELTS_VALUE:
+			return NUM_ELTS;
 		}
 		return null;
 	}
@@ -265,7 +266,7 @@ public enum OpUnary implements Enumerator {
 	 * @generated
 	 */
 	public String getLiteral() {
-	  return literal;
+		return literal;
 	}
 
 	/**
@@ -273,7 +274,7 @@ public enum OpUnary implements Enumerator {
 	 * @generated
 	 */
 	public String getName() {
-	  return name;
+		return name;
 	}
 
 	/**
@@ -290,7 +291,7 @@ public enum OpUnary implements Enumerator {
 	 * @generated
 	 */
 	public int getValue() {
-	  return value;
+		return value;
 	}
 
 	/**

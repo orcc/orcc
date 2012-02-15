@@ -173,8 +173,13 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 		Type oldReturnType = returnType;
 		returnType = newReturnType;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.PROCEDURE__RETURN_TYPE, oldReturnType, newReturnType);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.PROCEDURE__RETURN_TYPE,
+					oldReturnType, newReturnType);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -186,20 +191,20 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.PROCEDURE__LINE_NUMBER:
-				return getLineNumber();
-			case IrPackage.PROCEDURE__LOCALS:
-				return getLocals();
-			case IrPackage.PROCEDURE__NAME:
-				return getName();
-			case IrPackage.PROCEDURE__NATIVE:
-				return isNative();
-			case IrPackage.PROCEDURE__NODES:
-				return getNodes();
-			case IrPackage.PROCEDURE__PARAMETERS:
-				return getParameters();
-			case IrPackage.PROCEDURE__RETURN_TYPE:
-				return getReturnType();
+		case IrPackage.PROCEDURE__LINE_NUMBER:
+			return getLineNumber();
+		case IrPackage.PROCEDURE__LOCALS:
+			return getLocals();
+		case IrPackage.PROCEDURE__NAME:
+			return getName();
+		case IrPackage.PROCEDURE__NATIVE:
+			return isNative();
+		case IrPackage.PROCEDURE__NODES:
+			return getNodes();
+		case IrPackage.PROCEDURE__PARAMETERS:
+			return getParameters();
+		case IrPackage.PROCEDURE__RETURN_TYPE:
+			return getReturnType();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -212,14 +217,15 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrPackage.PROCEDURE__LOCALS:
-				return ((InternalEList<?>)getLocals()).basicRemove(otherEnd, msgs);
-			case IrPackage.PROCEDURE__NODES:
-				return ((InternalEList<?>)getNodes()).basicRemove(otherEnd, msgs);
-			case IrPackage.PROCEDURE__PARAMETERS:
-				return ((InternalEList<?>)getParameters()).basicRemove(otherEnd, msgs);
-			case IrPackage.PROCEDURE__RETURN_TYPE:
-				return basicSetReturnType(null, msgs);
+		case IrPackage.PROCEDURE__LOCALS:
+			return ((InternalEList<?>) getLocals()).basicRemove(otherEnd, msgs);
+		case IrPackage.PROCEDURE__NODES:
+			return ((InternalEList<?>) getNodes()).basicRemove(otherEnd, msgs);
+		case IrPackage.PROCEDURE__PARAMETERS:
+			return ((InternalEList<?>) getParameters()).basicRemove(otherEnd,
+					msgs);
+		case IrPackage.PROCEDURE__RETURN_TYPE:
+			return basicSetReturnType(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -231,20 +237,21 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.PROCEDURE__LINE_NUMBER:
-				return lineNumber != LINE_NUMBER_EDEFAULT;
-			case IrPackage.PROCEDURE__LOCALS:
-				return locals != null && !locals.isEmpty();
-			case IrPackage.PROCEDURE__NAME:
-				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
-			case IrPackage.PROCEDURE__NATIVE:
-				return native_ != NATIVE_EDEFAULT;
-			case IrPackage.PROCEDURE__NODES:
-				return nodes != null && !nodes.isEmpty();
-			case IrPackage.PROCEDURE__PARAMETERS:
-				return parameters != null && !parameters.isEmpty();
-			case IrPackage.PROCEDURE__RETURN_TYPE:
-				return returnType != null;
+		case IrPackage.PROCEDURE__LINE_NUMBER:
+			return lineNumber != LINE_NUMBER_EDEFAULT;
+		case IrPackage.PROCEDURE__LOCALS:
+			return locals != null && !locals.isEmpty();
+		case IrPackage.PROCEDURE__NAME:
+			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
+					.equals(name);
+		case IrPackage.PROCEDURE__NATIVE:
+			return native_ != NATIVE_EDEFAULT;
+		case IrPackage.PROCEDURE__NODES:
+			return nodes != null && !nodes.isEmpty();
+		case IrPackage.PROCEDURE__PARAMETERS:
+			return parameters != null && !parameters.isEmpty();
+		case IrPackage.PROCEDURE__RETURN_TYPE:
+			return returnType != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -257,30 +264,30 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.PROCEDURE__LINE_NUMBER:
-				setLineNumber((Integer)newValue);
-				return;
-			case IrPackage.PROCEDURE__LOCALS:
-				getLocals().clear();
-				getLocals().addAll((Collection<? extends Var>)newValue);
-				return;
-			case IrPackage.PROCEDURE__NAME:
-				setName((String)newValue);
-				return;
-			case IrPackage.PROCEDURE__NATIVE:
-				setNative((Boolean)newValue);
-				return;
-			case IrPackage.PROCEDURE__NODES:
-				getNodes().clear();
-				getNodes().addAll((Collection<? extends Node>)newValue);
-				return;
-			case IrPackage.PROCEDURE__PARAMETERS:
-				getParameters().clear();
-				getParameters().addAll((Collection<? extends Param>)newValue);
-				return;
-			case IrPackage.PROCEDURE__RETURN_TYPE:
-				setReturnType((Type)newValue);
-				return;
+		case IrPackage.PROCEDURE__LINE_NUMBER:
+			setLineNumber((Integer) newValue);
+			return;
+		case IrPackage.PROCEDURE__LOCALS:
+			getLocals().clear();
+			getLocals().addAll((Collection<? extends Var>) newValue);
+			return;
+		case IrPackage.PROCEDURE__NAME:
+			setName((String) newValue);
+			return;
+		case IrPackage.PROCEDURE__NATIVE:
+			setNative((Boolean) newValue);
+			return;
+		case IrPackage.PROCEDURE__NODES:
+			getNodes().clear();
+			getNodes().addAll((Collection<? extends Node>) newValue);
+			return;
+		case IrPackage.PROCEDURE__PARAMETERS:
+			getParameters().clear();
+			getParameters().addAll((Collection<? extends Param>) newValue);
+			return;
+		case IrPackage.PROCEDURE__RETURN_TYPE:
+			setReturnType((Type) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -301,27 +308,27 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.PROCEDURE__LINE_NUMBER:
-				setLineNumber(LINE_NUMBER_EDEFAULT);
-				return;
-			case IrPackage.PROCEDURE__LOCALS:
-				getLocals().clear();
-				return;
-			case IrPackage.PROCEDURE__NAME:
-				setName(NAME_EDEFAULT);
-				return;
-			case IrPackage.PROCEDURE__NATIVE:
-				setNative(NATIVE_EDEFAULT);
-				return;
-			case IrPackage.PROCEDURE__NODES:
-				getNodes().clear();
-				return;
-			case IrPackage.PROCEDURE__PARAMETERS:
-				getParameters().clear();
-				return;
-			case IrPackage.PROCEDURE__RETURN_TYPE:
-				setReturnType((Type)null);
-				return;
+		case IrPackage.PROCEDURE__LINE_NUMBER:
+			setLineNumber(LINE_NUMBER_EDEFAULT);
+			return;
+		case IrPackage.PROCEDURE__LOCALS:
+			getLocals().clear();
+			return;
+		case IrPackage.PROCEDURE__NAME:
+			setName(NAME_EDEFAULT);
+			return;
+		case IrPackage.PROCEDURE__NATIVE:
+			setNative(NATIVE_EDEFAULT);
+			return;
+		case IrPackage.PROCEDURE__NODES:
+			getNodes().clear();
+			return;
+		case IrPackage.PROCEDURE__PARAMETERS:
+			getParameters().clear();
+			return;
+		case IrPackage.PROCEDURE__RETURN_TYPE:
+			setReturnType((Type) null);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -375,7 +382,8 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 */
 	public EList<Var> getLocals() {
 		if (locals == null) {
-			locals = new EObjectContainmentEList<Var>(Var.class, this, IrPackage.PROCEDURE__LOCALS);
+			locals = new EObjectContainmentEList<Var>(Var.class, this,
+					IrPackage.PROCEDURE__LOCALS);
 		}
 		return locals;
 	}
@@ -398,7 +406,8 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 */
 	public EList<Node> getNodes() {
 		if (nodes == null) {
-			nodes = new EObjectContainmentEList<Node>(Node.class, this, IrPackage.PROCEDURE__NODES);
+			nodes = new EObjectContainmentEList<Node>(Node.class, this,
+					IrPackage.PROCEDURE__NODES);
 		}
 		return nodes;
 	}
@@ -409,7 +418,8 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 */
 	public EList<Param> getParameters() {
 		if (parameters == null) {
-			parameters = new EObjectContainmentEList<Param>(Param.class, this, IrPackage.PROCEDURE__PARAMETERS);
+			parameters = new EObjectContainmentEList<Param>(Param.class, this,
+					IrPackage.PROCEDURE__PARAMETERS);
 		}
 		return parameters;
 	}
@@ -477,7 +487,8 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 		int oldLineNumber = lineNumber;
 		lineNumber = newLineNumber;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PROCEDURE__LINE_NUMBER, oldLineNumber, lineNumber));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.PROCEDURE__LINE_NUMBER, oldLineNumber, lineNumber));
 	}
 
 	/**
@@ -488,7 +499,8 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PROCEDURE__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.PROCEDURE__NAME, oldName, name));
 	}
 
 	/**
@@ -499,7 +511,8 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 		boolean oldNative = native_;
 		native_ = newNative;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PROCEDURE__NATIVE, oldNative, native_));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.PROCEDURE__NATIVE, oldNative, native_));
 	}
 
 	public void setResult(Expression result) {
@@ -514,14 +527,20 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 		if (newReturnType != returnType) {
 			NotificationChain msgs = null;
 			if (returnType != null)
-				msgs = ((InternalEObject)returnType).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.PROCEDURE__RETURN_TYPE, null, msgs);
+				msgs = ((InternalEObject) returnType).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE
+								- IrPackage.PROCEDURE__RETURN_TYPE, null, msgs);
 			if (newReturnType != null)
-				msgs = ((InternalEObject)newReturnType).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.PROCEDURE__RETURN_TYPE, null, msgs);
+				msgs = ((InternalEObject) newReturnType).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE
+								- IrPackage.PROCEDURE__RETURN_TYPE, null, msgs);
 			msgs = basicSetReturnType(newReturnType, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PROCEDURE__RETURN_TYPE, newReturnType, newReturnType));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.PROCEDURE__RETURN_TYPE, newReturnType,
+					newReturnType));
 	}
 
 	/**
@@ -530,7 +549,8 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (lineNumber: ");

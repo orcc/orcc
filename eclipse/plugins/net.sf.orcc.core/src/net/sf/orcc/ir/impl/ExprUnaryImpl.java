@@ -82,12 +82,18 @@ public class ExprUnaryImpl extends ExpressionImpl implements ExprUnary {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetExpr(Expression newExpr, NotificationChain msgs) {
+	public NotificationChain basicSetExpr(Expression newExpr,
+			NotificationChain msgs) {
 		Expression oldExpr = expr;
 		expr = newExpr;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_UNARY__EXPR, oldExpr, newExpr);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.EXPR_UNARY__EXPR, oldExpr,
+					newExpr);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -100,12 +106,12 @@ public class ExprUnaryImpl extends ExpressionImpl implements ExprUnary {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.EXPR_UNARY__EXPR:
-				return getExpr();
-			case IrPackage.EXPR_UNARY__OP:
-				return getOp();
-			case IrPackage.EXPR_UNARY__TYPE:
-				return getType();
+		case IrPackage.EXPR_UNARY__EXPR:
+			return getExpr();
+		case IrPackage.EXPR_UNARY__OP:
+			return getOp();
+		case IrPackage.EXPR_UNARY__TYPE:
+			return getType();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -116,12 +122,13 @@ public class ExprUnaryImpl extends ExpressionImpl implements ExprUnary {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrPackage.EXPR_UNARY__EXPR:
-				return basicSetExpr(null, msgs);
-			case IrPackage.EXPR_UNARY__TYPE:
-				return basicSetType(null, msgs);
+		case IrPackage.EXPR_UNARY__EXPR:
+			return basicSetExpr(null, msgs);
+		case IrPackage.EXPR_UNARY__TYPE:
+			return basicSetType(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -134,12 +141,12 @@ public class ExprUnaryImpl extends ExpressionImpl implements ExprUnary {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.EXPR_UNARY__EXPR:
-				return expr != null;
-			case IrPackage.EXPR_UNARY__OP:
-				return op != OP_EDEFAULT;
-			case IrPackage.EXPR_UNARY__TYPE:
-				return type != null;
+		case IrPackage.EXPR_UNARY__EXPR:
+			return expr != null;
+		case IrPackage.EXPR_UNARY__OP:
+			return op != OP_EDEFAULT;
+		case IrPackage.EXPR_UNARY__TYPE:
+			return type != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -152,15 +159,15 @@ public class ExprUnaryImpl extends ExpressionImpl implements ExprUnary {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.EXPR_UNARY__EXPR:
-				setExpr((Expression)newValue);
-				return;
-			case IrPackage.EXPR_UNARY__OP:
-				setOp((OpUnary)newValue);
-				return;
-			case IrPackage.EXPR_UNARY__TYPE:
-				setType((Type)newValue);
-				return;
+		case IrPackage.EXPR_UNARY__EXPR:
+			setExpr((Expression) newValue);
+			return;
+		case IrPackage.EXPR_UNARY__OP:
+			setOp((OpUnary) newValue);
+			return;
+		case IrPackage.EXPR_UNARY__TYPE:
+			setType((Type) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -183,15 +190,15 @@ public class ExprUnaryImpl extends ExpressionImpl implements ExprUnary {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.EXPR_UNARY__EXPR:
-				setExpr((Expression)null);
-				return;
-			case IrPackage.EXPR_UNARY__OP:
-				setOp(OP_EDEFAULT);
-				return;
-			case IrPackage.EXPR_UNARY__TYPE:
-				setType((Type)null);
-				return;
+		case IrPackage.EXPR_UNARY__EXPR:
+			setExpr((Expression) null);
+			return;
+		case IrPackage.EXPR_UNARY__OP:
+			setOp(OP_EDEFAULT);
+			return;
+		case IrPackage.EXPR_UNARY__TYPE:
+			setType((Type) null);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -228,8 +235,13 @@ public class ExprUnaryImpl extends ExpressionImpl implements ExprUnary {
 		Type oldType = type;
 		type = newType;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_UNARY__TYPE, oldType, newType);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.EXPR_UNARY__TYPE, oldType,
+					newType);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -248,14 +260,19 @@ public class ExprUnaryImpl extends ExpressionImpl implements ExprUnary {
 		if (newExpr != expr) {
 			NotificationChain msgs = null;
 			if (expr != null)
-				msgs = ((InternalEObject)expr).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_UNARY__EXPR, null, msgs);
+				msgs = ((InternalEObject) expr).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_UNARY__EXPR,
+						null, msgs);
 			if (newExpr != null)
-				msgs = ((InternalEObject)newExpr).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_UNARY__EXPR, null, msgs);
+				msgs = ((InternalEObject) newExpr).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_UNARY__EXPR,
+						null, msgs);
 			msgs = basicSetExpr(newExpr, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_UNARY__EXPR, newExpr, newExpr));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.EXPR_UNARY__EXPR, newExpr, newExpr));
 	}
 
 	/**
@@ -267,7 +284,8 @@ public class ExprUnaryImpl extends ExpressionImpl implements ExprUnary {
 		OpUnary oldOp = op;
 		op = newOp == null ? OP_EDEFAULT : newOp;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_UNARY__OP, oldOp, op));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.EXPR_UNARY__OP, oldOp, op));
 	}
 
 	@Override
@@ -282,7 +300,8 @@ public class ExprUnaryImpl extends ExpressionImpl implements ExprUnary {
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (op: ");

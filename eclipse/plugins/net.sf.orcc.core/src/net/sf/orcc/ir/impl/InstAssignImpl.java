@@ -67,8 +67,13 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 		Expression oldValue = value;
 		value = newValue;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.INST_ASSIGN__VALUE, oldValue, newValue);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.INST_ASSIGN__VALUE, oldValue,
+					newValue);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -80,10 +85,10 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.INST_ASSIGN__TARGET:
-				return getTarget();
-			case IrPackage.INST_ASSIGN__VALUE:
-				return getValue();
+		case IrPackage.INST_ASSIGN__TARGET:
+			return getTarget();
+		case IrPackage.INST_ASSIGN__VALUE:
+			return getValue();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -96,10 +101,10 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrPackage.INST_ASSIGN__TARGET:
-				return basicSetTarget(null, msgs);
-			case IrPackage.INST_ASSIGN__VALUE:
-				return basicSetValue(null, msgs);
+		case IrPackage.INST_ASSIGN__TARGET:
+			return basicSetTarget(null, msgs);
+		case IrPackage.INST_ASSIGN__VALUE:
+			return basicSetValue(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -111,10 +116,10 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.INST_ASSIGN__TARGET:
-				return target != null;
-			case IrPackage.INST_ASSIGN__VALUE:
-				return value != null;
+		case IrPackage.INST_ASSIGN__TARGET:
+			return target != null;
+		case IrPackage.INST_ASSIGN__VALUE:
+			return value != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -126,12 +131,12 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.INST_ASSIGN__TARGET:
-				setTarget((Def)newValue);
-				return;
-			case IrPackage.INST_ASSIGN__VALUE:
-				setValue((Expression)newValue);
-				return;
+		case IrPackage.INST_ASSIGN__TARGET:
+			setTarget((Def) newValue);
+			return;
+		case IrPackage.INST_ASSIGN__VALUE:
+			setValue((Expression) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -152,12 +157,12 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.INST_ASSIGN__TARGET:
-				setTarget((Def)null);
-				return;
-			case IrPackage.INST_ASSIGN__VALUE:
-				setValue((Expression)null);
-				return;
+		case IrPackage.INST_ASSIGN__TARGET:
+			setTarget((Def) null);
+			return;
+		case IrPackage.INST_ASSIGN__VALUE:
+			setValue((Expression) null);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -179,8 +184,13 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 		Def oldTarget = target;
 		target = newTarget;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.INST_ASSIGN__TARGET, oldTarget, newTarget);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.INST_ASSIGN__TARGET, oldTarget,
+					newTarget);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
 		return msgs;
 	}
@@ -206,14 +216,19 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 		if (newTarget != target) {
 			NotificationChain msgs = null;
 			if (target != null)
-				msgs = ((InternalEObject)target).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.INST_ASSIGN__TARGET, null, msgs);
+				msgs = ((InternalEObject) target).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.INST_ASSIGN__TARGET,
+						null, msgs);
 			if (newTarget != null)
-				msgs = ((InternalEObject)newTarget).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.INST_ASSIGN__TARGET, null, msgs);
+				msgs = ((InternalEObject) newTarget).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.INST_ASSIGN__TARGET,
+						null, msgs);
 			msgs = basicSetTarget(newTarget, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_ASSIGN__TARGET, newTarget, newTarget));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.INST_ASSIGN__TARGET, newTarget, newTarget));
 	}
 
 	/**
@@ -224,14 +239,19 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 		if (newValue != value) {
 			NotificationChain msgs = null;
 			if (value != null)
-				msgs = ((InternalEObject)value).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.INST_ASSIGN__VALUE, null, msgs);
+				msgs = ((InternalEObject) value).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.INST_ASSIGN__VALUE,
+						null, msgs);
 			if (newValue != null)
-				msgs = ((InternalEObject)newValue).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.INST_ASSIGN__VALUE, null, msgs);
+				msgs = ((InternalEObject) newValue).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.INST_ASSIGN__VALUE,
+						null, msgs);
 			msgs = basicSetValue(newValue, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_ASSIGN__VALUE, newValue, newValue));
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.INST_ASSIGN__VALUE, newValue, newValue));
 	}
 
 	@Override

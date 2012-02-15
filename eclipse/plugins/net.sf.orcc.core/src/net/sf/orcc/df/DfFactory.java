@@ -328,5 +328,4 @@ public interface DfFactory extends EFactory {
 	 */
 	DfPackage getDfPackage();
 
-
 } // DfFactory

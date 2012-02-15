@@ -33,7 +33,8 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  *
  * @generated
  */
-public class EStringToEStringMapEntryImpl extends EObjectImpl implements BasicEMap.Entry<String,String> {
+public class EStringToEStringMapEntryImpl extends EObjectImpl implements
+		BasicEMap.Entry<String, String> {
 	/**
 	 * The default value of the '{@link #getTypedKey() <em>Key</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -111,7 +112,8 @@ public class EStringToEStringMapEntryImpl extends EObjectImpl implements BasicEM
 		String oldKey = key;
 		key = newKey;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY__KEY, oldKey, key));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY__KEY, oldKey, key));
 	}
 
 	/**
@@ -132,7 +134,9 @@ public class EStringToEStringMapEntryImpl extends EObjectImpl implements BasicEM
 		String oldValue = value;
 		value = newValue;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY__VALUE, oldValue, value));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY__VALUE, oldValue,
+					value));
 	}
 
 	/**
@@ -143,10 +147,10 @@ public class EStringToEStringMapEntryImpl extends EObjectImpl implements BasicEM
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY__KEY:
-				return getTypedKey();
-			case IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY__VALUE:
-				return getTypedValue();
+		case IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY__KEY:
+			return getTypedKey();
+		case IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY__VALUE:
+			return getTypedValue();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -159,12 +163,12 @@ public class EStringToEStringMapEntryImpl extends EObjectImpl implements BasicEM
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY__KEY:
-				setTypedKey((String)newValue);
-				return;
-			case IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY__VALUE:
-				setTypedValue((String)newValue);
-				return;
+		case IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY__KEY:
+			setTypedKey((String) newValue);
+			return;
+		case IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY__VALUE:
+			setTypedValue((String) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -177,12 +181,12 @@ public class EStringToEStringMapEntryImpl extends EObjectImpl implements BasicEM
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY__KEY:
-				setTypedKey(KEY_EDEFAULT);
-				return;
-			case IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY__VALUE:
-				setTypedValue(VALUE_EDEFAULT);
-				return;
+		case IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY__KEY:
+			setTypedKey(KEY_EDEFAULT);
+			return;
+		case IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY__VALUE:
+			setTypedValue(VALUE_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -195,10 +199,12 @@ public class EStringToEStringMapEntryImpl extends EObjectImpl implements BasicEM
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY__KEY:
-				return KEY_EDEFAULT == null ? key != null : !KEY_EDEFAULT.equals(key);
-			case IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY__VALUE:
-				return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT.equals(value);
+		case IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY__KEY:
+			return KEY_EDEFAULT == null ? key != null : !KEY_EDEFAULT
+					.equals(key);
+		case IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY__VALUE:
+			return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT
+					.equals(value);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -210,7 +216,8 @@ public class EStringToEStringMapEntryImpl extends EObjectImpl implements BasicEM
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (key: ");
@@ -296,7 +303,8 @@ public class EStringToEStringMapEntryImpl extends EObjectImpl implements BasicEM
 	@SuppressWarnings("unchecked")
 	public EMap<String, String> getEMap() {
 		EObject container = eContainer();
-		return container == null ? null : (EMap<String, String>)container.eGet(eContainmentFeature());
+		return container == null ? null : (EMap<String, String>) container
+				.eGet(eContainmentFeature());
 	}
 
 } //EStringToEStringMapEntryImpl

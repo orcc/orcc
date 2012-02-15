@@ -87,7 +87,8 @@ public class WrapperXmlImpl extends EObjectImpl implements WrapperXml {
 		String oldXml = xml;
 		xml = newXml;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.WRAPPER_XML__XML, oldXml, xml));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.WRAPPER_XML__XML, oldXml, xml));
 	}
 
 	/**
@@ -98,8 +99,8 @@ public class WrapperXmlImpl extends EObjectImpl implements WrapperXml {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case DfPackage.WRAPPER_XML__XML:
-				return getXml();
+		case DfPackage.WRAPPER_XML__XML:
+			return getXml();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -112,9 +113,9 @@ public class WrapperXmlImpl extends EObjectImpl implements WrapperXml {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case DfPackage.WRAPPER_XML__XML:
-				setXml((String)newValue);
-				return;
+		case DfPackage.WRAPPER_XML__XML:
+			setXml((String) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -127,9 +128,9 @@ public class WrapperXmlImpl extends EObjectImpl implements WrapperXml {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case DfPackage.WRAPPER_XML__XML:
-				setXml(XML_EDEFAULT);
-				return;
+		case DfPackage.WRAPPER_XML__XML:
+			setXml(XML_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -142,8 +143,9 @@ public class WrapperXmlImpl extends EObjectImpl implements WrapperXml {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case DfPackage.WRAPPER_XML__XML:
-				return XML_EDEFAULT == null ? xml != null : !XML_EDEFAULT.equals(xml);
+		case DfPackage.WRAPPER_XML__XML:
+			return XML_EDEFAULT == null ? xml != null : !XML_EDEFAULT
+					.equals(xml);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -155,7 +157,8 @@ public class WrapperXmlImpl extends EObjectImpl implements WrapperXml {
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (xml: ");

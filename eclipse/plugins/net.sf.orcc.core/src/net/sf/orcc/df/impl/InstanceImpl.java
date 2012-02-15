@@ -119,7 +119,8 @@ public class InstanceImpl extends DfVertexImpl implements Instance {
 		Entity oldEntity = entity;
 		entity = newEntity;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.INSTANCE__ENTITY, oldEntity, entity));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.INSTANCE__ENTITY, oldEntity, entity));
 	}
 
 	/**
@@ -129,15 +130,16 @@ public class InstanceImpl extends DfVertexImpl implements Instance {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case DfPackage.INSTANCE__OUTPUTS:
-				return getOutputs();
-			case DfPackage.INSTANCE__INPUTS:
-				return getInputs();
-			case DfPackage.INSTANCE__ARGUMENTS:
-				return getArguments();
-			case DfPackage.INSTANCE__ENTITY:
-				if (resolve) return getEntity();
-				return basicGetEntity();
+		case DfPackage.INSTANCE__OUTPUTS:
+			return getOutputs();
+		case DfPackage.INSTANCE__INPUTS:
+			return getInputs();
+		case DfPackage.INSTANCE__ARGUMENTS:
+			return getArguments();
+		case DfPackage.INSTANCE__ENTITY:
+			if (resolve)
+				return getEntity();
+			return basicGetEntity();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -150,12 +152,14 @@ public class InstanceImpl extends DfVertexImpl implements Instance {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case DfPackage.INSTANCE__OUTPUTS:
-				return ((InternalEList<?>)getOutputs()).basicRemove(otherEnd, msgs);
-			case DfPackage.INSTANCE__INPUTS:
-				return ((InternalEList<?>)getInputs()).basicRemove(otherEnd, msgs);
-			case DfPackage.INSTANCE__ARGUMENTS:
-				return ((InternalEList<?>)getArguments()).basicRemove(otherEnd, msgs);
+		case DfPackage.INSTANCE__OUTPUTS:
+			return ((InternalEList<?>) getOutputs())
+					.basicRemove(otherEnd, msgs);
+		case DfPackage.INSTANCE__INPUTS:
+			return ((InternalEList<?>) getInputs()).basicRemove(otherEnd, msgs);
+		case DfPackage.INSTANCE__ARGUMENTS:
+			return ((InternalEList<?>) getArguments()).basicRemove(otherEnd,
+					msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -167,14 +171,14 @@ public class InstanceImpl extends DfVertexImpl implements Instance {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case DfPackage.INSTANCE__OUTPUTS:
-				return outputs != null && !outputs.isEmpty();
-			case DfPackage.INSTANCE__INPUTS:
-				return inputs != null && !inputs.isEmpty();
-			case DfPackage.INSTANCE__ARGUMENTS:
-				return arguments != null && !arguments.isEmpty();
-			case DfPackage.INSTANCE__ENTITY:
-				return entity != null;
+		case DfPackage.INSTANCE__OUTPUTS:
+			return outputs != null && !outputs.isEmpty();
+		case DfPackage.INSTANCE__INPUTS:
+			return inputs != null && !inputs.isEmpty();
+		case DfPackage.INSTANCE__ARGUMENTS:
+			return arguments != null && !arguments.isEmpty();
+		case DfPackage.INSTANCE__ENTITY:
+			return entity != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -187,21 +191,21 @@ public class InstanceImpl extends DfVertexImpl implements Instance {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case DfPackage.INSTANCE__OUTPUTS:
-				getOutputs().clear();
-				getOutputs().addAll((Collection<? extends Port>)newValue);
-				return;
-			case DfPackage.INSTANCE__INPUTS:
-				getInputs().clear();
-				getInputs().addAll((Collection<? extends Port>)newValue);
-				return;
-			case DfPackage.INSTANCE__ARGUMENTS:
-				getArguments().clear();
-				getArguments().addAll((Collection<? extends Argument>)newValue);
-				return;
-			case DfPackage.INSTANCE__ENTITY:
-				setEntity((Entity)newValue);
-				return;
+		case DfPackage.INSTANCE__OUTPUTS:
+			getOutputs().clear();
+			getOutputs().addAll((Collection<? extends Port>) newValue);
+			return;
+		case DfPackage.INSTANCE__INPUTS:
+			getInputs().clear();
+			getInputs().addAll((Collection<? extends Port>) newValue);
+			return;
+		case DfPackage.INSTANCE__ARGUMENTS:
+			getArguments().clear();
+			getArguments().addAll((Collection<? extends Argument>) newValue);
+			return;
+		case DfPackage.INSTANCE__ENTITY:
+			setEntity((Entity) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -222,7 +226,8 @@ public class InstanceImpl extends DfVertexImpl implements Instance {
 	 */
 	public EList<Port> getOutputs() {
 		if (outputs == null) {
-			outputs = new EObjectContainmentEList<Port>(Port.class, this, DfPackage.INSTANCE__OUTPUTS);
+			outputs = new EObjectContainmentEList<Port>(Port.class, this,
+					DfPackage.INSTANCE__OUTPUTS);
 		}
 		return outputs;
 	}
@@ -234,7 +239,8 @@ public class InstanceImpl extends DfVertexImpl implements Instance {
 	 */
 	public EList<Port> getInputs() {
 		if (inputs == null) {
-			inputs = new EObjectContainmentEList<Port>(Port.class, this, DfPackage.INSTANCE__INPUTS);
+			inputs = new EObjectContainmentEList<Port>(Port.class, this,
+					DfPackage.INSTANCE__INPUTS);
 		}
 		return inputs;
 	}
@@ -246,18 +252,18 @@ public class InstanceImpl extends DfVertexImpl implements Instance {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case DfPackage.INSTANCE__OUTPUTS:
-				getOutputs().clear();
-				return;
-			case DfPackage.INSTANCE__INPUTS:
-				getInputs().clear();
-				return;
-			case DfPackage.INSTANCE__ARGUMENTS:
-				getArguments().clear();
-				return;
-			case DfPackage.INSTANCE__ENTITY:
-				setEntity((Entity)null);
-				return;
+		case DfPackage.INSTANCE__OUTPUTS:
+			getOutputs().clear();
+			return;
+		case DfPackage.INSTANCE__INPUTS:
+			getInputs().clear();
+			return;
+		case DfPackage.INSTANCE__ARGUMENTS:
+			getArguments().clear();
+			return;
+		case DfPackage.INSTANCE__ENTITY:
+			setEntity((Entity) null);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -273,7 +279,8 @@ public class InstanceImpl extends DfVertexImpl implements Instance {
 	 */
 	public EList<Argument> getArguments() {
 		if (arguments == null) {
-			arguments = new EObjectContainmentEList<Argument>(Argument.class, this, DfPackage.INSTANCE__ARGUMENTS);
+			arguments = new EObjectContainmentEList<Argument>(Argument.class,
+					this, DfPackage.INSTANCE__ARGUMENTS);
 		}
 		return arguments;
 	}
@@ -289,11 +296,12 @@ public class InstanceImpl extends DfVertexImpl implements Instance {
 	 */
 	public Entity getEntity() {
 		if (entity != null && entity.eIsProxy()) {
-			InternalEObject oldEntity = (InternalEObject)entity;
-			entity = (Entity)eResolveProxy(oldEntity);
+			InternalEObject oldEntity = (InternalEObject) entity;
+			entity = (Entity) eResolveProxy(oldEntity);
 			if (entity != oldEntity) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.INSTANCE__ENTITY, oldEntity, entity));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							DfPackage.INSTANCE__ENTITY, oldEntity, entity));
 			}
 		}
 		return entity;

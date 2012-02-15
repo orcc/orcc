@@ -69,11 +69,12 @@ public class InvocationImpl extends EObjectImpl implements Invocation {
 	 */
 	public Action getAction() {
 		if (action != null && action.eIsProxy()) {
-			InternalEObject oldAction = (InternalEObject)action;
-			action = (Action)eResolveProxy(oldAction);
+			InternalEObject oldAction = (InternalEObject) action;
+			action = (Action) eResolveProxy(oldAction);
 			if (action != oldAction) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, MocPackage.INVOCATION__ACTION, oldAction, action));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							MocPackage.INVOCATION__ACTION, oldAction, action));
 			}
 		}
 		return action;
@@ -97,7 +98,8 @@ public class InvocationImpl extends EObjectImpl implements Invocation {
 		Action oldAction = action;
 		action = newAction;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, MocPackage.INVOCATION__ACTION, oldAction, action));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					MocPackage.INVOCATION__ACTION, oldAction, action));
 	}
 
 	/**
@@ -108,9 +110,10 @@ public class InvocationImpl extends EObjectImpl implements Invocation {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case MocPackage.INVOCATION__ACTION:
-				if (resolve) return getAction();
-				return basicGetAction();
+		case MocPackage.INVOCATION__ACTION:
+			if (resolve)
+				return getAction();
+			return basicGetAction();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -123,9 +126,9 @@ public class InvocationImpl extends EObjectImpl implements Invocation {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case MocPackage.INVOCATION__ACTION:
-				setAction((Action)newValue);
-				return;
+		case MocPackage.INVOCATION__ACTION:
+			setAction((Action) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -138,9 +141,9 @@ public class InvocationImpl extends EObjectImpl implements Invocation {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case MocPackage.INVOCATION__ACTION:
-				setAction((Action)null);
-				return;
+		case MocPackage.INVOCATION__ACTION:
+			setAction((Action) null);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -153,8 +156,8 @@ public class InvocationImpl extends EObjectImpl implements Invocation {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case MocPackage.INVOCATION__ACTION:
-				return action != null;
+		case MocPackage.INVOCATION__ACTION:
+			return action != null;
 		}
 		return super.eIsSet(featureID);
 	}
