@@ -30,7 +30,7 @@ use work.processor_{{id}}_tl_params.all;
 entity processor_{{id}} is
   generic
     (
-      device_family : string  := "Stratix III"
+      device_family : string
       );
   port
     (
@@ -153,17 +153,17 @@ begin
   bytemask_i2 <= wren_wire & wren_wire & wren_wire & wren_wire;
   bytemask_i  <= bytemask_i2 and bytemask_wire;
 
-  inst_irom_{{id}} : irom_source
+  inst_irom_{{id}} : irom_{{id}}
     port map (
       clka  => clk,
-      addra => imem_addr(4 downto 0),
+      addra => imem_addr({{irom_addr-1}} downto 0),
       douta => idata_wire);
 
-  inst_dram_{{id}} : dram_source
+  inst_dram_{{id}} : dram_{{id}}
     port map (
       clka  => clk,
       wea   => bytemask_i,
-      addra => dram_addr(8 downto 0),
+      addra => dram_addr({{dram_addr-1}} downto 0),
       dina  => dram_data_in_wire,
       douta => dram_data_out_wire);
 {{endif}}

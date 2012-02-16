@@ -1,4 +1,4 @@
-// Quartus project
+// ISE project
 
 xiseNetwork(network, options) ::= <<
 
@@ -37,11 +37,11 @@ xiseNetwork(network, options) ::= <<
       \<association xil_pn:name="BehavioralSimulation"/\>
       \<association xil_pn:name="Implementation"/\>
     \</file\>
-    \<file xil_pn:name="share/vhdl/cal_stream_in_v2.vhdl" xil_pn:type="FILE_VHDL"\>
+    \<file xil_pn:name="share/vhdl/cal_stream_in_8fifos.vhdl" xil_pn:type="FILE_VHDL"\>
       \<association xil_pn:name="BehavioralSimulation"/\>
       \<association xil_pn:name="Implementation"/\>
     \</file\>
-    \<file xil_pn:name="share/vhdl/cal_stream_out_v2.vhdl" xil_pn:type="FILE_VHDL"\>
+    \<file xil_pn:name="share/vhdl/cal_stream_out_8fifos.vhdl" xil_pn:type="FILE_VHDL"\>
       \<association xil_pn:name="BehavioralSimulation"/\>
       \<association xil_pn:name="Implementation"/\>
     \</file\>
@@ -176,4 +176,33 @@ xiseInstance(instance) ::= <<
   \<association xil_pn:name="Implementation"/\>
 \</file\>
 <endif>
+>>
+
+ucfNetwork(network, options) ::= <<
+NET "leds[0]" IOSTANDARD = LVCMOS18;
+NET "leds[0]" LOC = AE24;
+NET "leds[1]" IOSTANDARD = LVCMOS18;
+NET "leds[1]" LOC = AD24;
+NET "leds[2]" IOSTANDARD = LVCMOS18;
+NET "leds[2]" LOC = AD25;
+NET "leds[3]" IOSTANDARD = LVCMOS25;
+NET "leds[3]" LOC = G16;
+NET "leds[4]" IOSTANDARD = LVCMOS18;
+NET "leds[4]" LOC = AD26;
+NET "leds[5]" IOSTANDARD = LVCMOS25;
+NET "leds[5]" LOC = G15;
+NET "leds[6]" IOSTANDARD = LVCMOS25;
+NET "leds[6]" LOC = L18;
+NET "leds[7]" IOSTANDARD = LVCMOS25;
+NET "leds[7]" LOC = H18;
+
+NET "rst_n" TIG;
+NET "rst_n" IOSTANDARD = LVCMOS33;
+NET "rst_n" PULLUP;
+NET "rst_n" LOC = E9;
+
+NET "clk" TNM_NET = "sys_clk_pin";
+TIMESPEC TS_sys_clk_pin = PERIOD "sys_clk_pin" 100000 KHz;
+NET "clk" IOSTANDARD = LVCMOS33;
+NET "clk" LOC = AH15;
 >>

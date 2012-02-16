@@ -296,6 +296,8 @@ public class TTABackendImpl extends AbstractBackend {
 					"net/sf/orcc/backends/tta/ISE_Project.stg");
 			projectXisePrinter.print("top.xise", path, "xiseNetwork",
 					"network", network);
+			projectXisePrinter.print("top.ucf", path, "ucfNetwork",
+					"network", network);
 		}
 
 		// ModelSim
