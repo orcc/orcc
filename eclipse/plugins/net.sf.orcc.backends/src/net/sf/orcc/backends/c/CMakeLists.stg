@@ -1,14 +1,14 @@
-printActor(name, actor) ::= <<
-<if (!actor.native)
-><name>.c
+printActor(name, actor) ::= <%
+<if (!actor.native)>
+<name>.c
 <endif>
->>
+%>
 
-printInstance(instance) ::= <<
-<if (instance.actor)
-><printActor(instance.name, instance.actor)><
-endif>
->>
+printInstance(instance) ::= <%
+<if (instance.actor)>
+<printActor(instance.name, instance.actor)>
+<endif>
+%>
 
 printNetwork(network, options) ::= <<
 # Generated from <network.simpleName>
@@ -30,7 +30,7 @@ include_directories(${ORCC_INCLUDE_DIR} ${ROXML_INCLUDE_DIR})
 
 set(filenames
 	<network.simpleName>.c
-	<network.instances: printInstance()>
+	<network.instances: printInstance();separator="\n">
 )
 
 add_executable(<network.simpleName> ${filenames})
