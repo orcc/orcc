@@ -77,7 +77,8 @@ class Design:
             os.mkdir(cgPath)
             self.generateCgFiles(libPath, cgPath)
             retcode = subprocess.call(["coregen", "-intstyle", "xflow", "-b", os.path.join(cgPath, self._xoeFifoFile), "-p", os.path.join(cgPath, "cg_project.cgp")])
-            shutil.copy(os.path.join(cgPath, self._ngcFifoFile), "wrapper")
+            shutil.copy(os.path.join(cgPath, self._ngcFifoFile), os.path.join(srcPath, "wrapper"))
+            shutil.rmtree(cgPath, ignore_errors=True)
 
         for processor in self.processors:
             if not processor.isNative:

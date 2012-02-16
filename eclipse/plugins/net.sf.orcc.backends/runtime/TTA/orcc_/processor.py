@@ -139,6 +139,7 @@ class Processor:
             retcode = subprocess.call(["coregen", "-intstyle", "xflow", "-b", os.path.join(cgPath, self._xoeDataFile), "-p", "ipcore_dir_gen/cg_project.cgp"])
             shutil.copy(os.path.join(cgPath, self._ngcFile), vhdlPath)
             shutil.copy(os.path.join(cgPath, self._ngcDataFile), vhdlPath)
+            shutil.rmtree(cgPath, ignore_errors=True)
         
         # Copy files to build directory
         if targetAltera:
