@@ -16,27 +16,25 @@ printNetwork(network, options) ::= <<
 cmake_minimum_required (VERSION 2.6)
 project (<network.simpleName>)
 
-# Common packages required
-find_library(orcc_LIBRARY orcc)
-find_path(orcc_INCLUDE_DIR NAMES orcc_fifo.h orcc_types.h
-  PATH_SUFFIXES include/orcc)
-  
-find_library(roxml_LIBRARY roxml)
-find_path(roxml_INCLUDE_DIR NAMES roxml.h
-  PATH_SUFFIXES include/roxml)
-
+# SDL library inclusion
 find_package(SDL REQUIRED)
-find_package(Threads REQUIRED)
+include_directories(${SDL_INCLUDE_DIR})
 
-# Common include directories
-include_directories(${orcc_INCLUDE_DIR} ${roxml_INCLUDE_DIR} ${SDL_INCLUDE_DIR})
+# Runtime libraries inclusion
+set(LIBS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs)
+set(ORCC_INCLUDE_DIR ${LIBS_DIR}/orcc/include)
+set(ROXML_INCLUDE_DIR ${LIBS_DIR}/roxml/include)
+
+add_subdirectory(${LIBS_DIR})
+include_directories(${ORCC_INCLUDE_DIR} ${ROXML_INCLUDE_DIR})
 
 set(filenames
-<network.simpleName>.c
-<network.instances: printInstance()>)
+	<network.simpleName>.c
+	<network.instances: printInstance()>
+)
 
 add_executable(<network.simpleName> ${filenames})
 
-target_link_libraries(<network.simpleName> ${orcc_LIBRARY} ${roxml_LIBRARY} ${SDL_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(<network.simpleName> orcc roxml ${SDL_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
 
 >>

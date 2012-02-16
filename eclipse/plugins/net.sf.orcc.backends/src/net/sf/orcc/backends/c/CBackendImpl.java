@@ -272,6 +272,23 @@ public class CBackendImpl extends AbstractBackend {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.orcc.backends.AbstractBackend#exportRuntimeLibrary()
+	 */
+	@Override
+	public boolean exportRuntimeLibrary() throws OrccException {
+		String target = path + File.separator + "libs";
+		write("Export libraries sources into " + target + "... ");
+		if (copyFolderToFileSystem("/runtime/C", target)) {
+			write("OK" + "\n");
+		} else {
+			write("Error" + "\n");
+		}
+		return true;
+	}
+
 	private void printCMake(Network network) {
 		StandardPrinter networkPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/c/CMakeLists.stg");
