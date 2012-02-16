@@ -95,7 +95,15 @@ xiseNetwork(network, options) ::= <<
 
   \</files\>
 
-  \<properties/\>
+  \<properties\>
+    \<property xil_pn:name="Auto Implementation Top" xil_pn:value="false" xil_pn:valueState="non-default"/\>
+    \<property xil_pn:name="Implementation Top" xil_pn:value="Architecture|top|bdf_type" xil_pn:valueState="non-default"/\>
+    \<property xil_pn:name="Implementation Top File" xil_pn:value="top.vhd" xil_pn:valueState="non-default"/\>
+    \<property xil_pn:name="Implementation Top Instance Path" xil_pn:value="/top" xil_pn:valueState="non-default"/\>
+    \<property xil_pn:name="Device Family" xil_pn:value="Virtex5" xil_pn:valueState="non-default"/\>
+    \<property xil_pn:name="Device" xil_pn:value="xc5vsx50t" xil_pn:valueState="non-default"/\>
+    \<property xil_pn:name="Speed Grade" xil_pn:value="-1" xil_pn:valueState="non-default"/\>
+  \</properties\>
 
   \<bindings/\>
 
