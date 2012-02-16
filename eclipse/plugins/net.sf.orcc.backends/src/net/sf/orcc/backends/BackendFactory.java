@@ -102,6 +102,8 @@ public class BackendFactory extends PluginFactory {
 		if ((Boolean) options.get(COMPILE_XDF)) {
 			backend.compileXDF();
 		}
+		// Export libraries if needed by backend
+		backend.exportRuntimeLibrary();
 	}
 
 }

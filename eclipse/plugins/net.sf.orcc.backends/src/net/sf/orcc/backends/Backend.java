@@ -61,6 +61,15 @@ public interface Backend {
 	 *             if something goes wrong
 	 */
 	void compileXDF() throws OrccException;
+	
+	/**
+	 * Export runtime library used by source produced. Should be overridden by
+	 * back-ends that produce code source which need third party libraries at
+	 * runtime.
+	 * 
+	 * @return <code>true</code> if the libraries were correctly exported
+	 */
+	boolean exportRuntimeLibrary() throws OrccException;
 
 	/**
 	 * Sets the options of this back-end.

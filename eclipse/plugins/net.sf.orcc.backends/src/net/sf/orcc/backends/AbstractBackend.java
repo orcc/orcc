@@ -453,7 +453,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * 
 	 * @return <code>true</code> if the libraries were correctly exported
 	 */
-	protected boolean exportRuntimeLibrary() throws OrccException {
+	public boolean exportRuntimeLibrary() throws OrccException {
 		return false;
 	}
 
