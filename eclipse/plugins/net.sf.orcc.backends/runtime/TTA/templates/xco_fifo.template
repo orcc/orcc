@@ -29,7 +29,7 @@ SELECT Fifo_Generator family Xilinx,_Inc. 6.1
 # BEGIN Parameters
 CSET almost_empty_flag=false
 CSET almost_full_flag=false
-CSET component_name=fifo
+CSET component_name=fifo_br
 CSET data_count=false
 CSET data_count_width=9
 CSET disable_timing_violations=false
@@ -41,14 +41,14 @@ CSET enable_int_clk=false
 CSET enable_reset_synchronization=true
 CSET fifo_implementation=Common_Clock_Block_RAM
 CSET full_flags_reset_value=1
-CSET full_threshold_assert_value=255
-CSET full_threshold_negate_value=254
+CSET full_threshold_assert_value={{size-1}}
+CSET full_threshold_negate_value={{size-2}}
 CSET inject_dbit_error=false
 CSET inject_sbit_error=false
 CSET input_data_width=32
-CSET input_depth=256
+CSET input_depth={{size}}
 CSET output_data_width=32
-CSET output_depth=256
+CSET output_depth={{size}}
 CSET overflow_flag=false
 CSET overflow_sense=Active_High
 CSET performance_options=First_Word_Fall_Through

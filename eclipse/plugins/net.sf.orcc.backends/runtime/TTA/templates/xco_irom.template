@@ -55,8 +55,8 @@ CSET port_b_clock=0
 CSET port_b_enable_rate=0
 CSET port_b_write_rate=0
 CSET primitive=8kx2
-CSET read_width_a=86
-CSET read_width_b=86
+CSET read_width_a={{width}}
+CSET read_width_b={{width}}
 CSET register_porta_output_of_memory_core=false
 CSET register_porta_output_of_memory_primitives=false
 CSET register_portb_output_of_memory_core=false
@@ -73,9 +73,9 @@ CSET use_regcea_pin=false
 CSET use_regceb_pin=false
 CSET use_rsta_pin=false
 CSET use_rstb_pin=false
-CSET write_depth_a=62
-CSET write_width_a=86
-CSET write_width_b=86
+CSET write_depth_a={{depth}}
+CSET write_width_a={{width}}
+CSET write_width_b={{width}}
 # END Parameters
 GENERATE
 # CRC: 36bf9fd8

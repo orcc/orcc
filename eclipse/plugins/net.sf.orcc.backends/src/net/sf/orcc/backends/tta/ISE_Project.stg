@@ -73,12 +73,7 @@ xiseNetwork(network, options) ::= <<
       \<association xil_pn:name="BehavioralSimulation"/\>
       \<association xil_pn:name="Implementation"/\>
     \</file\>
-    \<file xil_pn:name="wrapper/xilinx_ram.vhd" xil_pn:type="FILE_VHDL"\>
-      \<association xil_pn:name="BehavioralSimulation"/\>
-      \<association xil_pn:name="Implementation"/\>
-    \</file\>
-    \<file xil_pn:name="wrapper/xilinx_rom.vhd" xil_pn:type="FILE_VHDL"\>
-      \<association xil_pn:name="BehavioralSimulation"/\>
+    \<file xil_pn:name="wrapper/fifo_br.ngc" xil_pn:type="FILE_NGC"\>
       \<association xil_pn:name="Implementation"/\>
     \</file\>
     \<file xil_pn:name="interface/counter.vhd" xil_pn:type="FILE_VHDL"\>
@@ -172,6 +167,12 @@ xiseInstance(instance) ::= <<
 \</file\>
 \<file xil_pn:name="<instance.id>/tta/gcu_ic/decoder.vhdl" xil_pn:type="FILE_VHDL"\>
   \<association xil_pn:name="BehavioralSimulation"/\>
+  \<association xil_pn:name="Implementation"/\>
+\</file\>
+\<file xil_pn:name="<instance.id>/tta/vhdl/irom_<instance.id>.ngc" xil_pn:type="FILE_NGC"\>
+  \<association xil_pn:name="Implementation"/\>
+\</file\>
+\<file xil_pn:name="<instance.id>/tta/vhdl/dram_<instance.id>.ngc" xil_pn:type="FILE_NGC"\>
   \<association xil_pn:name="Implementation"/\>
 \</file\>
 <endif>

@@ -43,6 +43,8 @@ class Design:
         self.name = name
         self.processors = processors
         self.targetAltera = targetAltera
+        self._xoeFifoFile = "fifo_br.xoe"
+        self._ngcFifoFile = "fifo_br.ngc"
 
 
     def compile(self, srcPath, libPath, args, debug):
@@ -69,8 +71,25 @@ class Design:
         shutil.rmtree(os.path.join(srcPath, "simulation"), ignore_errors=True)
         shutil.copytree(os.path.join(libPath, "simulation"), os.path.join(srcPath, "simulation"))
 
+        if not self.targetAltera: 
+            cgPath = os.path.join(srcPath, "ipcore_dir_gen")
+            shutil.rmtree(cgPath, ignore_errors=True)
+            os.mkdir(cgPath)
+            self.generateCgFiles(libPath, cgPath)
+            retcode = subprocess.call(["coregen", "-intstyle", "xflow", "-b", os.path.join(cgPath, self._xoeFifoFile), "-p", os.path.join(cgPath, "cg_project.cgp")])
+            shutil.copy(os.path.join(cgPath, self._ngcFifoFile), "wrapper")
+
         for processor in self.processors:
             if not processor.isNative:
                 print ">> Generate " + processor.id + "."
-                retcode = processor.generate(srcPath, libPath, args, debug)
+                retcode = processor.generate(srcPath, libPath, args, debug, self.targetAltera)
                 if retcode != 0: sys.exit(retcode)
+                
+    def generateCgFiles(self, libPath, genPath):
+        templatePath = os.path.join(libPath, "templates")
+        template = tempita.Template.from_filename(os.path.join(templatePath, "cg_project.template"), namespace={}, encoding=None)
+        result = template.substitute(path=genPath)
+        open(os.path.join(genPath, "cg_project.cgp"), "w").write(result)
+        template = tempita.Template.from_filename(os.path.join(templatePath, "xco_fifo.template"), namespace={}, encoding=None)
+        result = template.substitute(size=256)
+        open(os.path.join(genPath, self._xoeFifoFile), "w").write(result)

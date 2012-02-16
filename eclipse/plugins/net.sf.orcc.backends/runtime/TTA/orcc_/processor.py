@@ -68,8 +68,12 @@ class Processor:
         self._bemFile = self.id + ".bem"
         self._mifFile = self.id + ".mif"
         self._coeFile = self.id + ".coe"
+        self._xoeFile = "irom_" + self.id + ".xoe"
+        self._ngcFile = "irom_" + self.id + ".ngc"
         self._mifDataFile = self.id + "_data" + ".mif"
         self._coeDataFile = self.id + "_data" + ".coe"
+        self._xoeDataFile = "dram_" + self.id + ".xoe"
+        self._ngcDataFile = "dram_" + self.id + ".ngc"
         self._waveFile = "wave.do"
         # Useful names
         self._entity = "processor_" + self.id + "_tl"
@@ -88,11 +92,10 @@ class Processor:
         os.remove("stream_units.opb")
         return retcode
 
-    def generate(self, srcPath, libPath, args, debug):
+    def generate(self, srcPath, libPath, args, debug, targetAltera):
         instanceSrcPath = os.path.join(srcPath, self.id)
         ttaPath = os.path.join(instanceSrcPath, "tta")
         vhdlPath = os.path.join(ttaPath, "vhdl")
-        memoryPath = os.path.join(ttaPath, "memory")
         wrapperPath = os.path.join(srcPath, "wrapper")
         sharePath = os.path.join(srcPath, "share")
         os.chdir(instanceSrcPath)
@@ -112,7 +115,10 @@ class Processor:
         retcode = subprocess.call(["createbem", "-o", self._bemFile, self._adfFile])    
         if retcode == 0: retcode = subprocess.call(["generateprocessor"] + args + ["-o", ttaPath, "-b", self._bemFile, "--shared-files-dir", sharePath,
                                         "-l", "vhdl", "-e", self._entity, "-i", self._idfFile, self._adfFile])
-        if retcode == 0: retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", vhdlPath, "-f", "mif", "-o", "mif", self._adfFile])
+        if retcode == 0: 
+            retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", vhdlPath, "-f", "mif", "-o", "mif", self._adfFile])
+            if not targetAltera:
+                retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", vhdlPath, "-f", "coe", "-o", "coe", self._adfFile])
 
         # Generate processor files
         self.irom = self._readMif(self._mifFile)
@@ -121,11 +127,26 @@ class Processor:
             print "ROM: " + str(self.irom.depth) + "x" + str(self.irom.width) + "bits"
             print "RAM: " + str(self.dram.depth) + "x" + str(self.dram.width) + "bits"
             
-        self.generateProcessor(os.path.join(libPath, "templates", "processor.template"), os.path.join(vhdlPath, self._processorFile))
+        self.generateProcessor(libPath, os.path.join(vhdlPath, self._processorFile), targetAltera)
+        if not targetAltera: 
+            cgPath = os.path.join(instanceSrcPath, "ipcore_dir_gen")
+            shutil.rmtree(cgPath, ignore_errors=True)
+            os.mkdir(cgPath)
+            shutil.move(self._coeFile, cgPath)
+            shutil.move(self._coeDataFile, cgPath)
+            self.generateCgFiles(libPath, cgPath)
+            retcode = subprocess.call(["coregen", "-intstyle", "xflow", "-b", os.path.join(cgPath, self._xoeFile), "-p", "ipcore_dir_gen/cg_project.cgp"])
+            retcode = subprocess.call(["coregen", "-intstyle", "xflow", "-b", os.path.join(cgPath, self._xoeDataFile), "-p", "ipcore_dir_gen/cg_project.cgp"])
+            shutil.copy(os.path.join(cgPath, self._ngcFile), vhdlPath)
+            shutil.copy(os.path.join(cgPath, self._ngcDataFile), vhdlPath)
         
         # Copy files to build directory
-        shutil.move(self._mifFile, os.path.join(wrapperPath, self._mifFile))
-        shutil.move(self._mifDataFile, os.path.join(wrapperPath, self._mifDataFile))
+        if targetAltera:
+            shutil.move(self._mifFile, os.path.join(wrapperPath, self._mifFile))
+            shutil.move(self._mifDataFile, os.path.join(wrapperPath, self._mifDataFile))
+        else:
+            os.remove(self._mifFile)
+            os.remove(self._mifDataFile)
         shutil.move("imem_mau_pkg.vhdl", vhdlPath)
         
         # Manage simulation files
@@ -212,12 +233,24 @@ class Processor:
                 return True;
         return False        
 
-    def generateProcessor(self, templateFile, targetFile):
-        template = tempita.Template.from_filename(templateFile, namespace={}, encoding=None)
-        result = template.substitute(id=self.id, inputs=self.inputs, outputs=self.outputs,
+    def generateProcessor(self, libPath, targetFile, targetAltera):
+        template = tempita.Template.from_filename(os.path.join(libPath, "templates", "processor.template"), namespace={}, encoding=None)
+        result = template.substitute(id=self.id, targetAltera=targetAltera, inputs=self.inputs, outputs=self.outputs,
             irom_width=self.irom.getWidth(), irom_addr=self.irom.getAddr(), irom_depth=self.irom.getDepth(),
             dram_width=self.dram.getWidth(), dram_addr=self.dram.getAddr(), dram_depth=self.dram.getDepth())
         open(targetFile, "w").write(result)
+        
+    def generateCgFiles(self, libPath, genPath):
+        templatePath = os.path.join(libPath, "templates")
+        template = tempita.Template.from_filename(os.path.join(templatePath, "cg_project.template"), namespace={}, encoding=None)
+        result = template.substitute(path=genPath)
+        open(os.path.join(genPath, "cg_project.cgp"), "w").write(result)
+        template = tempita.Template.from_filename(os.path.join(templatePath, "xco_dram.template"), namespace={}, encoding=None)
+        result = template.substitute(path=genPath, id=self.id, width=self.dram.getWidth(), depth=self.dram.getDepth())
+        open(os.path.join(genPath, self._xoeDataFile), "w").write(result)
+        template = tempita.Template.from_filename(os.path.join(templatePath, "xco_irom.template"), namespace={}, encoding=None)
+        result = template.substitute(path=genPath, id=self.id, width=self.irom.getWidth(), depth=self.irom.getDepth())
+        open(os.path.join(genPath, self._xoeFile), "w").write(result)
 
     def diff(self, traceFile, genFile, port):
         f_trace = open(traceFile, 'r')

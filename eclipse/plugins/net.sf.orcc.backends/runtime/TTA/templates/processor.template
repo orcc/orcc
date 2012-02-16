@@ -61,6 +61,27 @@ end processor_{{id}};
 ------------------------------------------------------------------------------
 architecture bdf_type of processor_{{id}} is
 
+{{if not targetAltera}}
+  ---------------------------------------------------------------------------
+  -- Components declaration
+  ---------------------------------------------------------------------------
+  component dram_{{id}}
+    port (
+      clka  : in  std_logic;
+      wea   : in  std_logic_vector(3 downto 0);
+      addra : in  std_logic_vector(8 downto 0);
+      dina  : in  std_logic_vector(31 downto 0);
+      douta : out std_logic_vector(31 downto 0));
+  end component;
+
+  component irom_{{id}}
+    port (
+      clka  : in  std_logic;
+      addra : in  std_logic_vector(4 downto 0);
+      douta : out std_logic_vector(85 downto 0));
+  end component;
+  
+{{endif}}
   ---------------------------------------------------------------------------
   -- Signals declaration
   ---------------------------------------------------------------------------
@@ -72,6 +93,10 @@ architecture bdf_type of processor_{{id}} is
   signal dram_data_out_wire : std_logic_vector(fu_LSU_dataw-1 downto 0);
   signal wren_x_wire        : std_logic;
   signal idata_wire         : std_logic_vector(IMEMWIDTHINMAUS*IMEMMAUWIDTH-1 downto 0);
+{{if not targetAltera}}
+  signal bytemask_i         : std_logic_vector(fu_LSU_dataw/8-1 downto 0);
+  signal bytemask_i2        : std_logic_vector(fu_LSU_dataw/8-1 downto 0);
+{{endif}}
 {{for input in inputs}}
 {{if input.isNative}}
   signal s_{{input.name}} : std_logic_vector(31 downto 0) := (others => '0');
@@ -82,6 +107,7 @@ architecture bdf_type of processor_{{id}} is
   signal s_{{output.name}} : std_logic_vector(31 downto 0) := (others => '0');
 {{endif}}
 {{endfor}}
+
   ---------------------------------------------------------------------------
 
 begin
@@ -97,6 +123,10 @@ begin
 {{endif}}
 {{endfor}}
 
+  wren_wire <= not(wren_x_wire);
+
+{{if targetAltera}}
+
   inst_dram_{{id}} : entity work.dram
     generic map(size          => {{dram_depth}},
                 width         => {{dram_width}},
@@ -110,8 +140,6 @@ begin
              data    => dram_data_in_wire,
              q       => dram_data_out_wire);
 
-  wren_wire <= not(wren_x_wire);
-
   inst_irom_{{id}} : entity work.irom
     generic map(size          => {{irom_depth}},
                 width         => {{irom_width}},
@@ -121,6 +149,24 @@ begin
     port map(clock   => clk,
              address => imem_addr({{irom_addr-1}} downto 0),
              q       => idata_wire);
+{{else}}
+  bytemask_i2 <= wren_wire & wren_wire & wren_wire & wren_wire;
+  bytemask_i  <= bytemask_i2 and bytemask_wire;
+
+  inst_irom_{{id}} : irom_source
+    port map (
+      clka  => clk,
+      addra => imem_addr(4 downto 0),
+      douta => idata_wire);
+
+  inst_dram_{{id}} : dram_source
+    port map (
+      clka  => clk,
+      wea   => bytemask_i,
+      addra => dram_addr(8 downto 0),
+      dina  => dram_data_in_wire,
+      douta => dram_data_out_wire);
+{{endif}}
 
   processor_{{id}} : entity work.processor_{{id}}_tl
     port map(clk                        => clk,
