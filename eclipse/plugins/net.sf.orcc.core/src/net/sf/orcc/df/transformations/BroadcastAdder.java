@@ -61,7 +61,7 @@ public class BroadcastAdder extends DfSwitch<Void> {
 		this.network = network;
 		// make a copy of the existing vertex set because the set returned is
 		// modified when broadcasts are added
-		List<Vertex> vertexSet = network.getVertices();
+		List<Vertex> vertexSet = new ArrayList<Vertex>(network.getVertices());
 
 		for (Vertex vertex : vertexSet) {
 			if (vertex instanceof Entity) {
