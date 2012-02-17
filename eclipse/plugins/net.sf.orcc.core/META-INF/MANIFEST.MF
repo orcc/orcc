@@ -11,7 +11,7 @@ Require-Bundle: org.eclipse.core.expressions;bundle-version="3.4.0",
  org.eclipse.emf.ecore,
  org.eclipse.emf.ecore.xmi;bundle-version="2.5.0",
  org.eclipse.jdt.core,
- org.jgrapht;bundle-version="1.3.7",
+ org.jgrapht;bundle-version="0.8.2",
  net.sf.dftools.models;bundle-version="0.1.0",
  org.stringtemplate;bundle-version="4.0.5"
 Bundle-ActivationPolicy: lazy
