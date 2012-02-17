@@ -12,6 +12,7 @@ import net.sf.orcc.cache.Cache;
 import net.sf.orcc.cache.CacheFactory;
 import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cache.CachePackage;
+import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.moc.MocPackage;
 
@@ -59,6 +60,7 @@ public class CachePackageImpl extends EPackageImpl implements CachePackage {
 		// Initialize simple dependencies
 		IrPackage.eINSTANCE.eClass();
 		MocPackage.eINSTANCE.eClass();
+		DfPackage.eINSTANCE.eClass();
 
 		// Create package meta-data objects
 		theCachePackage.createPackageContents();
