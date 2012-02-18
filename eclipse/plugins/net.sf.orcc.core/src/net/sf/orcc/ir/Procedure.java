@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ir;
 
+import net.sf.orcc.cfg.Cfg;
+
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 
@@ -40,12 +42,13 @@ import org.eclipse.emf.ecore.EObject;
 public interface Procedure extends EObject {
 
 	/**
-	 * Returns the CFG of this procedure. The CFG must be set by calling
-	 * {@link #setGraph(CFG)}.
+	 * Returns the CFG of this procedure. Must be built and set first with
+	 * {@link #setCfg(Cfg)}.
 	 * 
 	 * @return the CFG of this procedure
+	 * @model
 	 */
-	CFG getCFG();
+	Cfg getCfg();
 
 	/**
 	 * Returns the first block in the list of nodes of the given procedure. A
@@ -68,6 +71,14 @@ public interface Procedure extends EObject {
 	NodeBlock getLast();
 
 	/**
+	 * Returns the line number on which this procedure starts.
+	 * 
+	 * @return the line number on which this procedure starts
+	 * @model
+	 */
+	public int getLineNumber();
+
+	/**
 	 * Returns the local variable of this procedure that has the given name.
 	 * 
 	 * @param name
@@ -84,14 +95,6 @@ public interface Procedure extends EObject {
 	 * @model containment="true"
 	 */
 	EList<Var> getLocals();
-
-	/**
-	 * Returns the line number on which this procedure starts.
-	 * 
-	 * @return the line number on which this procedure starts
-	 * @model
-	 */
-	public int getLineNumber();
 
 	/**
 	 * Returns the name of this procedure.
@@ -153,12 +156,12 @@ public interface Procedure extends EObject {
 	Var newTempLocalVariable(Type type, String hint);
 
 	/**
-	 * Set the CFG of this procedure.
+	 * Sets the CFG associated with this procedure.
 	 * 
-	 * @param the
-	 *            CFG of this procedure
+	 * @param cfg
+	 *            a CFG
 	 */
-	void setGraph(CFG graph);
+	void setCfg(Cfg cfg);
 
 	/**
 	 * Sets the line number on which this procedure starts.

@@ -10,6 +10,8 @@ import java.util.Map;
 
 import net.sf.dftools.graph.GraphPackage;
 import net.sf.dftools.util.UtilPackage;
+import net.sf.orcc.cfg.CfgPackage;
+import net.sf.orcc.cfg.impl.CfgPackageImpl;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.impl.DfPackageImpl;
 import net.sf.orcc.ir.Annotation;
@@ -424,6 +426,9 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		UtilPackage.eINSTANCE.eClass();
 
 		// Obtain or create and register interdependencies
+		CfgPackageImpl theCfgPackage = (CfgPackageImpl) (EPackage.Registry.INSTANCE
+				.getEPackage(CfgPackage.eNS_URI) instanceof CfgPackageImpl ? EPackage.Registry.INSTANCE
+				.getEPackage(CfgPackage.eNS_URI) : CfgPackage.eINSTANCE);
 		DfPackageImpl theDfPackage = (DfPackageImpl) (EPackage.Registry.INSTANCE
 				.getEPackage(DfPackage.eNS_URI) instanceof DfPackageImpl ? EPackage.Registry.INSTANCE
 				.getEPackage(DfPackage.eNS_URI) : DfPackage.eINSTANCE);
@@ -433,11 +438,13 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		// Create package meta-data objects
 		theIrPackage.createPackageContents();
+		theCfgPackage.createPackageContents();
 		theDfPackage.createPackageContents();
 		theMocPackage.createPackageContents();
 
 		// Initialize created meta-data
 		theIrPackage.initializePackageContents();
+		theCfgPackage.initializePackageContents();
 		theDfPackage.initializePackageContents();
 		theMocPackage.initializePackageContents();
 
@@ -818,6 +825,15 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 */
 	public EReference getProcedure_ReturnType() {
 		return (EReference) procedureEClass.getEStructuralFeatures().get(6);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getProcedure_Cfg() {
+		return (EReference) procedureEClass.getEStructuralFeatures().get(7);
 	}
 
 	/**
@@ -1550,6 +1566,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEReference(procedureEClass, PROCEDURE__NODES);
 		createEReference(procedureEClass, PROCEDURE__PARAMETERS);
 		createEReference(procedureEClass, PROCEDURE__RETURN_TYPE);
+		createEReference(procedureEClass, PROCEDURE__CFG);
 
 		paramEClass = createEClass(PARAM);
 		createEReference(paramEClass, PARAM__VARIABLE);
@@ -1733,12 +1750,17 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		// Obtain other dependent packages
 		EcorePackage theEcorePackage = (EcorePackage) EPackage.Registry.INSTANCE
 				.getEPackage(EcorePackage.eNS_URI);
+		CfgPackage theCfgPackage = (CfgPackage) EPackage.Registry.INSTANCE
+				.getEPackage(CfgPackage.eNS_URI);
+		GraphPackage theGraphPackage = (GraphPackage) EPackage.Registry.INSTANCE
+				.getEPackage(GraphPackage.eNS_URI);
 
 		// Create type parameters
 
 		// Set bounds for type parameters
 
 		// Add supertypes to classes
+		nodeEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		nodeBlockEClass.getESuperTypes().add(this.getNode());
 		nodeIfEClass.getESuperTypes().add(this.getNode());
 		nodeWhileEClass.getESuperTypes().add(this.getNode());
@@ -1798,6 +1820,10 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEReference(getProcedure_ReturnType(), this.getType(), null,
 				"returnType", null, 0, 1, Procedure.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getProcedure_Cfg(), theCfgPackage.getCfg(), null, "cfg",
+				null, 0, 1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(paramEClass, Param.class, "Param", !IS_ABSTRACT,

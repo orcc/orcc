@@ -10,13 +10,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.ir.CFG;
+import net.sf.orcc.cfg.Cfg;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
@@ -46,6 +46,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getNodes <em>Nodes</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getParameters <em>Parameters</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getReturnType <em>Return Type</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getCfg <em>Cfg</em>}</li>
  * </ul>
  * </p>
  *
@@ -61,8 +62,6 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 * @ordered
 	 */
 	protected static final int LINE_NUMBER_EDEFAULT = 0;
-
-	private CFG graph;
 
 	/**
 	 * The cached value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
@@ -153,6 +152,16 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	protected Type returnType;
 
 	/**
+	 * The cached value of the '{@link #getCfg() <em>Cfg</em>}' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getCfg()
+	 * @generated
+	 * @ordered
+	 */
+	protected Cfg cfg;
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 */
@@ -205,6 +214,10 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 			return getParameters();
 		case IrPackage.PROCEDURE__RETURN_TYPE:
 			return getReturnType();
+		case IrPackage.PROCEDURE__CFG:
+			if (resolve)
+				return getCfg();
+			return basicGetCfg();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -252,6 +265,8 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 			return parameters != null && !parameters.isEmpty();
 		case IrPackage.PROCEDURE__RETURN_TYPE:
 			return returnType != null;
+		case IrPackage.PROCEDURE__CFG:
+			return cfg != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -287,6 +302,9 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 			return;
 		case IrPackage.PROCEDURE__RETURN_TYPE:
 			setReturnType((Type) newValue);
+			return;
+		case IrPackage.PROCEDURE__CFG:
+			setCfg((Cfg) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -329,18 +347,11 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 		case IrPackage.PROCEDURE__RETURN_TYPE:
 			setReturnType((Type) null);
 			return;
+		case IrPackage.PROCEDURE__CFG:
+			setCfg((Cfg) null);
+			return;
 		}
 		super.eUnset(featureID);
-	}
-
-	/**
-	 * Returns the CFG of this procedure. The CFG must be set by calling
-	 * {@link #setGraph(CFG)}.
-	 * 
-	 * @return the CFG of this procedure
-	 */
-	public CFG getCFG() {
-		return graph;
 	}
 
 	/**
@@ -470,16 +481,6 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	}
 
 	/**
-	 * Set the CFG of this procedure.
-	 * 
-	 * @param the
-	 *            CFG of this procedure
-	 */
-	public void setGraph(CFG graph) {
-		this.graph = graph;
-	}
-
-	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -541,6 +542,46 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 			eNotify(new ENotificationImpl(this, Notification.SET,
 					IrPackage.PROCEDURE__RETURN_TYPE, newReturnType,
 					newReturnType));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Cfg getCfg() {
+		if (cfg != null && cfg.eIsProxy()) {
+			InternalEObject oldCfg = (InternalEObject) cfg;
+			cfg = (Cfg) eResolveProxy(oldCfg);
+			if (cfg != oldCfg) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							IrPackage.PROCEDURE__CFG, oldCfg, cfg));
+			}
+		}
+		return cfg;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Cfg basicGetCfg() {
+		return cfg;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setCfg(Cfg newCfg) {
+		Cfg oldCfg = cfg;
+		cfg = newCfg;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.PROCEDURE__CFG, oldCfg, cfg));
 	}
 
 	/**

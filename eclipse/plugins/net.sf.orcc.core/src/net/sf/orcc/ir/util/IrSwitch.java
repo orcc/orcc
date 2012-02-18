@@ -8,6 +8,8 @@ package net.sf.orcc.ir.util;
 
 import java.util.Map;
 
+import net.sf.dftools.graph.Vertex;
+import net.sf.dftools.util.Nameable;
 import net.sf.orcc.ir.Annotation;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
@@ -308,6 +310,36 @@ public class IrSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseNodeSpecific(NodeSpecific object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Nameable</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Nameable</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseNameable(Nameable object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Vertex</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Vertex</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseVertex(Vertex object) {
 		return null;
 	}
 
@@ -760,6 +792,10 @@ public class IrSwitch<T> extends Switch<T> {
 			Node node = (Node) theEObject;
 			T result = caseNode(node);
 			if (result == null)
+				result = caseVertex(node);
+			if (result == null)
+				result = caseNameable(node);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -768,6 +804,10 @@ public class IrSwitch<T> extends Switch<T> {
 			T result = caseNodeBlock(nodeBlock);
 			if (result == null)
 				result = caseNode(nodeBlock);
+			if (result == null)
+				result = caseVertex(nodeBlock);
+			if (result == null)
+				result = caseNameable(nodeBlock);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -778,6 +818,10 @@ public class IrSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseNode(nodeIf);
 			if (result == null)
+				result = caseVertex(nodeIf);
+			if (result == null)
+				result = caseNameable(nodeIf);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -786,6 +830,10 @@ public class IrSwitch<T> extends Switch<T> {
 			T result = caseNodeWhile(nodeWhile);
 			if (result == null)
 				result = caseNode(nodeWhile);
+			if (result == null)
+				result = caseVertex(nodeWhile);
+			if (result == null)
+				result = caseNameable(nodeWhile);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -1082,6 +1130,10 @@ public class IrSwitch<T> extends Switch<T> {
 			T result = caseNodeSpecific(nodeSpecific);
 			if (result == null)
 				result = caseNode(nodeSpecific);
+			if (result == null)
+				result = caseVertex(nodeSpecific);
+			if (result == null)
+				result = caseNameable(nodeSpecific);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;

@@ -10,6 +10,8 @@ import java.util.Map;
 
 import net.sf.dftools.graph.GraphPackage;
 import net.sf.dftools.util.UtilPackage;
+import net.sf.orcc.cfg.CfgPackage;
+import net.sf.orcc.cfg.impl.CfgPackageImpl;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
@@ -222,6 +224,9 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		UtilPackage.eINSTANCE.eClass();
 
 		// Obtain or create and register interdependencies
+		CfgPackageImpl theCfgPackage = (CfgPackageImpl) (EPackage.Registry.INSTANCE
+				.getEPackage(CfgPackage.eNS_URI) instanceof CfgPackageImpl ? EPackage.Registry.INSTANCE
+				.getEPackage(CfgPackage.eNS_URI) : CfgPackage.eINSTANCE);
 		IrPackageImpl theIrPackage = (IrPackageImpl) (EPackage.Registry.INSTANCE
 				.getEPackage(IrPackage.eNS_URI) instanceof IrPackageImpl ? EPackage.Registry.INSTANCE
 				.getEPackage(IrPackage.eNS_URI) : IrPackage.eINSTANCE);
@@ -231,11 +236,13 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 
 		// Create package meta-data objects
 		theDfPackage.createPackageContents();
+		theCfgPackage.createPackageContents();
 		theIrPackage.createPackageContents();
 		theMocPackage.createPackageContents();
 
 		// Initialize created meta-data
 		theDfPackage.initializePackageContents();
+		theCfgPackage.initializePackageContents();
 		theIrPackage.initializePackageContents();
 		theMocPackage.initializePackageContents();
 

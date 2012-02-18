@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2011, IETR/INSA of Rennes
+ * Copyright (c) 2012, Synflow
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,44 +26,16 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir;
+package net.sf.orcc.cfg;
 
-import net.sf.dftools.graph.Vertex;
+import net.sf.dftools.graph.Graph;
 
 /**
- * This class defines a node in the CFG.
+ * This interface defines a Control-Flow Graph.
  * 
  * @author Matthieu Wipliez
- * @model abstract="true"
+ * @model
  */
-public interface Node extends Vertex {
-
-	/**
-	 * Returns the procedure this node belongs to.
-	 * 
-	 * @return the procedure this node belongs to
-	 */
-	public Procedure getProcedure();
-
-	/**
-	 * Returns <code>true</code> if this node is a NodeBlock.
-	 * 
-	 * @return <code>true</code> if this node is a NodeBlock
-	 */
-	boolean isNodeBlock();
-
-	/**
-	 * Returns <code>true</code> if this node is an NodeIf.
-	 * 
-	 * @return <code>true</code> if this node is an NodeIf
-	 */
-	boolean isNodeIf();
-
-	/**
-	 * Returns <code>true</code> if this node is a NodeWhile.
-	 * 
-	 * @return <code>true</code> if this node is a NodeWhile
-	 */
-	boolean isNodeWhile();
+public interface Cfg extends Graph {
 
 }

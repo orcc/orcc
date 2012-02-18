@@ -1,5 +1,6 @@
-/*
- * Copyright (c) 2009-2011, IETR/INSA of Rennes
+/**
+ * <copyright>
+ * Copyright (c) 2009-2012, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -25,45 +26,44 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
+ * </copyright>
  */
-package net.sf.orcc.ir;
+package net.sf.orcc.cfg.impl;
 
-import net.sf.dftools.graph.Vertex;
+import net.sf.dftools.graph.impl.GraphImpl;
+
+import net.sf.orcc.cfg.Cfg;
+import net.sf.orcc.cfg.CfgPackage;
+
+import org.eclipse.emf.ecore.EClass;
 
 /**
- * This class defines a node in the CFG.
- * 
- * @author Matthieu Wipliez
- * @model abstract="true"
+ * <!-- begin-user-doc -->
+ * An implementation of the model object '<em><b>Cfg</b></em>'.
+ * <!-- end-user-doc -->
+ * <p>
+ * </p>
+ *
+ * @generated
  */
-public interface Node extends Vertex {
+public class CfgImpl extends GraphImpl implements Cfg {
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected CfgImpl() {
+		super();
+	}
 
 	/**
-	 * Returns the procedure this node belongs to.
-	 * 
-	 * @return the procedure this node belongs to
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
 	 */
-	public Procedure getProcedure();
+	@Override
+	protected EClass eStaticClass() {
+		return CfgPackage.Literals.CFG;
+	}
 
-	/**
-	 * Returns <code>true</code> if this node is a NodeBlock.
-	 * 
-	 * @return <code>true</code> if this node is a NodeBlock
-	 */
-	boolean isNodeBlock();
-
-	/**
-	 * Returns <code>true</code> if this node is an NodeIf.
-	 * 
-	 * @return <code>true</code> if this node is an NodeIf
-	 */
-	boolean isNodeIf();
-
-	/**
-	 * Returns <code>true</code> if this node is a NodeWhile.
-	 * 
-	 * @return <code>true</code> if this node is a NodeWhile
-	 */
-	boolean isNodeWhile();
-
-}
+} //CfgImpl
