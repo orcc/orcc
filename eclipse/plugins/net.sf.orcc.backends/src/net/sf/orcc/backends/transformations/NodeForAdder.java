@@ -94,7 +94,8 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 
 		Expression condition = nodeWhile.getCondition();
 		Node endNode = nodes.get(nodes.size() - 1);
-		Node previousNode = nodeWhile.getJoinNode().getPredecessors().get(0);
+		Node previousNode = (Node) nodeWhile.getJoinNode().getPredecessors()
+				.get(0);
 
 		List<Var> conditionVars = new VarGetter(condition).get();
 		List<Instruction> loopCnts = new ArrayList<Instruction>();
@@ -115,7 +116,7 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 		}
 
 		// No loop counter founds, no for node to create
-		if (loopCnts.isEmpty()&& initCnts.isEmpty()) {
+		if (loopCnts.isEmpty() && initCnts.isEmpty()) {
 			return null;
 		}
 
@@ -155,7 +156,7 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 
 		// Return in case of an empty node
 		EList<Instruction> instructions = lastBlockNode.getInstructions();
-		if (instructions.isEmpty()){
+		if (instructions.isEmpty()) {
 			return null;
 		}
 
@@ -164,9 +165,10 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 		for (Def def : defs) {
 			InstAssign instAssign = EcoreHelper.getContainerOfType(def,
 					InstAssign.class);
-			
-			Instruction lastInstruction = instructions.get(instructions.size()-1);
-			
+
+			Instruction lastInstruction = instructions
+					.get(instructions.size() - 1);
+
 			// Get last assignation
 			if (lastInstruction.equals(instAssign)) {
 				lastAssign = instAssign;
