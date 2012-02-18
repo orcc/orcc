@@ -37,7 +37,9 @@ import java.util.List;
 import java.util.Set;
 
 import net.sf.dftools.graph.Edge;
+import net.sf.dftools.graph.Graph;
 import net.sf.dftools.graph.Vertex;
+import net.sf.dftools.graph.visit.SccFinder;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
@@ -49,9 +51,6 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.moc.MoC;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.alg.StrongConnectivityInspector;
-import org.jgrapht.graph.DirectedMultigraph;
 
 /**
  * This class detects statically schedulable regions of the graph. A region
@@ -87,17 +86,9 @@ public class StaticRegionDetector {
 		int outIndex = 0;
 
 		network = EcoreUtil.copy(network);
-		DirectedGraph<Vertex, Connection> clusteredGraph = new DirectedMultigraph<Vertex, Connection>(
-				Connection.class);
 
-		for (Instance instance : network.getInstances()) {
-			clusteredGraph.addVertex(instance);
-		}
-
-		for (Connection connection : network.getConnections()) {
-			clusteredGraph.addEdge(connection.getSource(),
-					connection.getTarget(), connection);
-		}
+		// the clustered graph is just the network
+		Graph clusteredGraph = network;
 
 		Actor cluster = DfFactory.eINSTANCE.createActor();
 		cluster.setName("cluster");
@@ -106,7 +97,7 @@ public class StaticRegionDetector {
 				cluster);
 		Vertex clusterVertex = inst;
 
-		clusteredGraph.addVertex(clusterVertex);
+		clusteredGraph.getVertices().add(clusterVertex);
 
 		for (Connection edge : network.getConnections()) {
 			Vertex srcVertex = edge.getSource();
@@ -120,7 +111,7 @@ public class StaticRegionDetector {
 				Connection incoming = DfFactory.eINSTANCE.createConnection(
 						srcVertex, edge.getSourcePort(), clusterVertex,
 						tgtPort, edge.getAttributes());
-				clusteredGraph.addEdge(srcVertex, clusterVertex, incoming);
+				clusteredGraph.getEdges().add(incoming);
 			} else if (vertices.contains(srcVertex)
 					&& !vertices.contains(tgtVertex)) {
 				Port srcPort = DfFactory.eINSTANCE.createPort(edge
@@ -130,16 +121,14 @@ public class StaticRegionDetector {
 				Connection outgoing = DfFactory.eINSTANCE.createConnection(
 						clusterVertex, srcPort, tgtVertex,
 						edge.getTargetPort(), edge.getAttributes());
-				clusteredGraph.addEdge(clusterVertex, tgtVertex, outgoing);
+				clusteredGraph.getEdges().add(outgoing);
 			}
 		}
 
-		clusteredGraph.removeAllVertices(vertices);
+		clusteredGraph.getVertices().removeAll(vertices);
 
-		List<Set<Vertex>> sccs = new StrongConnectivityInspector<Vertex, Connection>(
-				clusteredGraph).stronglyConnectedSets();
-
-		for (Set<Vertex> scc : sccs) {
+		List<List<Vertex>> sccs = new SccFinder().doSwitch(clusteredGraph);
+		for (List<Vertex> scc : sccs) {
 			if (scc.size() > 1) {
 				if (scc.remove(clusterVertex)) {
 					for (Vertex v : scc) {

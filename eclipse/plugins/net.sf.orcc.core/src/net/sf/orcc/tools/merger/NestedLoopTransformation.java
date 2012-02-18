@@ -32,12 +32,11 @@ package net.sf.orcc.tools.merger;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.util.Rational;
-
-import org.jgrapht.DirectedGraph;
 
 /**
  * 
@@ -56,13 +55,7 @@ public class NestedLoopTransformation {
 
 	private int size;
 
-	private DirectedGraph<Vertex, Connection> graph;
-
 	Schedule schedule;
-
-	public NestedLoopTransformation(DirectedGraph<Vertex, Connection> graph) {
-		this.graph = graph;
-	}
 
 	private void computeMatrixChainOrder(Schedule schedule) {
 		List<Iterand> iterands = schedule.getIterands();
@@ -107,9 +100,9 @@ public class NestedLoopTransformation {
 					double cost = m[i][k] + m[k + 1][j];
 
 					for (Vertex vertex : left) {
-						for (Connection connection : graph
-								.outgoingEdgesOf(vertex)) {
-							if (right.contains(graph.getEdgeTarget(connection))) {
+						for (Edge edge : vertex.getOutgoing()) {
+							if (right.contains(edge.getTarget())) {
+								Connection connection = (Connection) edge;
 								cost += connection.getSourcePort()
 										.getNumTokensProduced() * q / gcd;
 							}

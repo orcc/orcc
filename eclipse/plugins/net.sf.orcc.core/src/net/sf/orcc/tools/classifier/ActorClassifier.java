@@ -430,13 +430,14 @@ public class ActorClassifier extends DfSwitch<Object> {
 	 */
 	private boolean isCycloStaticFsm(FSM fsm) {
 		State initialState = fsm.getInitialState();
-		BFS bfs = new BFS(initialState);
-		for (Vertex vertex : bfs.getVertices()) {
-			if (vertex == initialState) {
-				return true;
+		for (Vertex vertex : initialState.getSuccessors()) {
+			BFS bfs = new BFS(vertex);
+			if (!bfs.getVertices().contains(initialState)) {
+				// no path back to initial state: cannot be cyclo-static
+				return false;
 			}
 		}
-		return false;
+		return true;
 	}
 
 	/**
@@ -452,18 +453,14 @@ public class ActorClassifier extends DfSwitch<Object> {
 	private boolean isQuasiStaticFsm(FSM fsm) {
 		State initialState = fsm.getInitialState();
 		List<Edge> edges = initialState.getOutgoing();
-		loopEdge: for (Edge edge : edges) {
+		for (Edge edge : edges) {
 			State target = (State) edge.getTarget();
 
 			BFS bfs = new BFS(target);
-			for (Vertex vertex : bfs.getVertices()) {
-				if (vertex == initialState) {
-					continue loopEdge;
-				}
+			if (!bfs.getVertices().contains(initialState)) {
+				// if no vertex goes back to the initial state, return false
+				return false;
 			}
-
-			// if no vertex goes back to the initial state, return false
-			return false;
 		}
 
 		return true;
