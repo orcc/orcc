@@ -234,6 +234,8 @@ public class DfSwitch<T> extends Switch<T> {
 			FSM fsm = (FSM) theEObject;
 			T result = caseFSM(fsm);
 			if (result == null)
+				result = caseGraph(fsm);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}

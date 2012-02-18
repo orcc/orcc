@@ -39,6 +39,8 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.dftools.graph.Edge;
+import net.sf.dftools.graph.Vertex;
+import net.sf.dftools.graph.visit.BFS;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
@@ -59,9 +61,6 @@ import net.sf.orcc.moc.SDFMoC;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.alg.ConnectivityInspector;
-import org.jgrapht.traverse.DepthFirstIterator;
 
 /**
  * This class defines an actor classifier that uses symbolic execution to
@@ -430,11 +429,14 @@ public class ActorClassifier extends DfSwitch<Object> {
 	 * @return <code>true</code> if the given FSM has cyclo-static form
 	 */
 	private boolean isCycloStaticFsm(FSM fsm) {
-		DirectedGraph<State, Transition> graph = fsm.getGraph();
-		ConnectivityInspector<State, Transition> inspector;
-		inspector = new ConnectivityInspector<State, Transition>(graph);
-		State initial = fsm.getInitialState();
-		return inspector.pathExists(initial, initial);
+		State initialState = fsm.getInitialState();
+		BFS bfs = new BFS(initialState);
+		for (Vertex vertex : bfs.getVertices()) {
+			if (vertex == initialState) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -448,27 +450,20 @@ public class ActorClassifier extends DfSwitch<Object> {
 	 * @return <code>true</code> if the given FSM has quasi-static form
 	 */
 	private boolean isQuasiStaticFsm(FSM fsm) {
-		DirectedGraph<State, Transition> graph = fsm.getGraph();
 		State initialState = fsm.getInitialState();
-		Set<Transition> edges = graph.outgoingEdgesOf(initialState);
-		for (Transition edge : edges) {
-			State target = graph.getEdgeTarget(edge);
+		List<Edge> edges = initialState.getOutgoing();
+		loopEdge: for (Edge edge : edges) {
+			State target = (State) edge.getTarget();
 
-			DepthFirstIterator<State, Transition> it;
-			it = new DepthFirstIterator<State, Transition>(graph, target);
-
-			boolean cyclesBackToInitialState = false;
-			while (it.hasNext()) {
-				State state = it.next();
-				if (state.equals(initialState)) {
-					cyclesBackToInitialState = true;
-					break;
+			BFS bfs = new BFS(target);
+			for (Vertex vertex : bfs.getVertices()) {
+				if (vertex == initialState) {
+					continue loopEdge;
 				}
 			}
 
-			if (!cyclesBackToInitialState) {
-				return false;
-			}
+			// if no vertex goes back to the initial state, return false
+			return false;
 		}
 
 		return true;

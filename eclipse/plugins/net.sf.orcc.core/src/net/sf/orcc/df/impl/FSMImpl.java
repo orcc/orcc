@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sf.dftools.graph.Edge;
+import net.sf.dftools.graph.impl.GraphImpl;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.DfPackage;
@@ -25,11 +26,8 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.emf.ecore.impl.EObjectImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.graph.DirectedMultigraph;
 
 /**
  * <!-- begin-user-doc --> An implementation of the model object '
@@ -39,13 +37,12 @@ import org.jgrapht.graph.DirectedMultigraph;
  * <ul>
  *   <li>{@link net.sf.orcc.df.impl.FSMImpl#getInitialState <em>Initial State</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.FSMImpl#getStates <em>States</em>}</li>
- *   <li>{@link net.sf.orcc.df.impl.FSMImpl#getTransitions <em>Transitions</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public class FSMImpl extends EObjectImpl implements FSM {
+public class FSMImpl extends GraphImpl implements FSM {
 
 	/**
 	 * The cached value of the '{@link #getInitialState() <em>Initial State</em>}' reference.
@@ -65,14 +62,6 @@ public class FSMImpl extends EObjectImpl implements FSM {
 	 * @ordered
 	 */
 	protected EList<State> states;
-	/**
-	 * The cached value of the '{@link #getTransitions() <em>Transitions</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getTransitions()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Transition> transitions;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -111,8 +100,6 @@ public class FSMImpl extends EObjectImpl implements FSM {
 			return basicGetInitialState();
 		case DfPackage.FSM__STATES:
 			return getStates();
-		case DfPackage.FSM__TRANSITIONS:
-			return getTransitions();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -127,9 +114,6 @@ public class FSMImpl extends EObjectImpl implements FSM {
 		switch (featureID) {
 		case DfPackage.FSM__STATES:
 			return ((InternalEList<?>) getStates()).basicRemove(otherEnd, msgs);
-		case DfPackage.FSM__TRANSITIONS:
-			return ((InternalEList<?>) getTransitions()).basicRemove(otherEnd,
-					msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -145,8 +129,6 @@ public class FSMImpl extends EObjectImpl implements FSM {
 			return initialState != null;
 		case DfPackage.FSM__STATES:
 			return states != null && !states.isEmpty();
-		case DfPackage.FSM__TRANSITIONS:
-			return transitions != null && !transitions.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -165,11 +147,6 @@ public class FSMImpl extends EObjectImpl implements FSM {
 		case DfPackage.FSM__STATES:
 			getStates().clear();
 			getStates().addAll((Collection<? extends State>) newValue);
-			return;
-		case DfPackage.FSM__TRANSITIONS:
-			getTransitions().clear();
-			getTransitions()
-					.addAll((Collection<? extends Transition>) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -197,29 +174,8 @@ public class FSMImpl extends EObjectImpl implements FSM {
 		case DfPackage.FSM__STATES:
 			getStates().clear();
 			return;
-		case DfPackage.FSM__TRANSITIONS:
-			getTransitions().clear();
-			return;
 		}
 		super.eUnset(featureID);
-	}
-
-	@Override
-	public DirectedGraph<State, Transition> getGraph() {
-		DirectedGraph<State, Transition> graph = new DirectedMultigraph<State, Transition>(
-				Transition.class);
-		for (State source : getStates()) {
-			graph.addVertex(source);
-
-			for (Edge edge : source.getOutgoing()) {
-				Transition transition = (Transition) edge;
-				State target = (State) transition.getTarget();
-				graph.addVertex(target);
-				graph.addEdge(source, target, transition);
-			}
-		}
-
-		return graph;
 	}
 
 	/**
@@ -262,16 +218,10 @@ public class FSMImpl extends EObjectImpl implements FSM {
 		return actions;
 	}
 
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
+	@Override
+	@SuppressWarnings("unchecked")
 	public EList<Transition> getTransitions() {
-		if (transitions == null) {
-			transitions = new EObjectContainmentEList<Transition>(
-					Transition.class, this, DfPackage.FSM__TRANSITIONS);
-		}
-		return transitions;
+		return (EList<Transition>) (EList<?>) getEdges();
 	}
 
 	@Override

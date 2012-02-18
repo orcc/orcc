@@ -1076,13 +1076,31 @@ public interface DfPackage extends EPackage {
 	int ACTION_FEATURE_COUNT = 6;
 
 	/**
+	 * The feature id for the '<em><b>Edges</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FSM__EDGES = GraphPackage.GRAPH__EDGES;
+
+	/**
+	 * The feature id for the '<em><b>Vertices</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FSM__VERTICES = GraphPackage.GRAPH__VERTICES;
+
+	/**
 	 * The feature id for the '<em><b>Initial State</b></em>' reference. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int FSM__INITIAL_STATE = 0;
+	int FSM__INITIAL_STATE = GraphPackage.GRAPH_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>States</b></em>' containment reference list.
@@ -1090,15 +1108,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int FSM__STATES = 1;
-
-	/**
-	 * The feature id for the '<em><b>Transitions</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int FSM__TRANSITIONS = 2;
+	int FSM__STATES = GraphPackage.GRAPH_FEATURE_COUNT + 1;
 
 	/**
 	 * The number of structural features of the '<em>FSM</em>' class. <!--
@@ -1107,7 +1117,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int FSM_FEATURE_COUNT = 3;
+	int FSM_FEATURE_COUNT = GraphPackage.GRAPH_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Num Tokens Map</b></em>' map. <!--
@@ -1767,19 +1777,6 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getFSM_States();
-
-	/**
-	 * Returns the meta object for the containment reference list '
-	 * {@link net.sf.orcc.df.FSM#getTransitions <em>Transitions</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the containment reference list '
-	 *         <em>Transitions</em>'.
-	 * @see net.sf.orcc.df.FSM#getTransitions()
-	 * @see #getFSM()
-	 * @generated
-	 */
-	EReference getFSM_Transitions();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Pattern <em>Pattern</em>}'.
@@ -2502,14 +2499,6 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EReference FSM__STATES = eINSTANCE.getFSM_States();
-
-		/**
-		 * The meta object literal for the '<em><b>Transitions</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc --> <!--
-		 * end-user-doc -->
-		 * @generated
-		 */
-		EReference FSM__TRANSITIONS = eINSTANCE.getFSM_Transitions();
 
 		/**
 		 * The meta object literal for the '

@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import net.sf.dftools.graph.Edge;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.DfFactory;
@@ -54,7 +55,6 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.jgrapht.DirectedGraph;
 
 /**
  * This class defines a transformation that merges actions that have the same
@@ -77,6 +77,24 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 	 * Creates a new classifier
 	 */
 	public SDFActionsMerger() {
+	}
+
+	@Override
+	public Object caseActor(Actor actor) {
+		this.actor = actor;
+
+		FSM fsm = actor.getFsm();
+		if (fsm == null) {
+			List<Action> actions = actor.getActionsOutsideFsm();
+			List<Action> mergedActions = tryAndMerge(actions);
+			actions.clear();
+			actions.addAll(mergedActions);
+		} else {
+			for (State state : fsm.getStates()) {
+				examineState(fsm, state);
+			}
+		}
+		return null;
 	}
 
 	private NodeIf createActionCall(Expression expr, Procedure body,
@@ -145,24 +163,33 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 		return procedure;
 	}
 
-	private void examineState(DirectedGraph<State, Transition> graph,
-			State source) {
-		Iterator<Transition> it = graph.outgoingEdgesOf(source).iterator();
+	/**
+	 * If all outgoing transitions from the given source state are to the same
+	 * target state, and all associated actions can be merged into one, merges
+	 * them and updates the given FSM in-place.
+	 * 
+	 * @param fsm
+	 *            the FSM to which the state belongs
+	 * @param source
+	 *            a state
+	 */
+	private void examineState(FSM fsm, State source) {
+		Iterator<Edge> it = source.getOutgoing().iterator();
 		if (it.hasNext()) {
 			boolean mergeActions = true;
 			List<Action> actions = new ArrayList<Action>();
 
-			Transition edge = it.next();
-			State target = graph.getEdgeTarget(edge);
-			actions.add(edge.getAction());
+			Transition transition = (Transition) it.next();
+			State target = (State) transition.getTarget();
+			actions.add(transition.getAction());
 
 			while (it.hasNext()) {
-				edge = it.next();
-				if (target != graph.getEdgeTarget(edge)) {
+				transition = (Transition) it.next();
+				if (target != transition.getTarget()) {
 					mergeActions = false;
 					break;
 				}
-				actions.add(edge.getAction());
+				actions.add(transition.getAction());
 			}
 
 			if (mergeActions) {
@@ -171,28 +198,9 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 					System.out.println("in actor " + actor.getName()
 							+ ", state " + source + ", merging actions "
 							+ actions);
-					// TODO : this is a fix that may be bugged in case of
-					// transition
-					// than need a merged action in the list as a unique action
-					// Update graph with the new action
-					List<Transition> upEdges = new ArrayList<Transition>();
-					for (Transition checkEdge : graph.edgeSet()) {
-						if (actions.contains(checkEdge.getAction())) {
-							upEdges.add(checkEdge);
-						}
-					}
 
-					// Remove all transitions and create a new one
-					for (Transition upEdge : upEdges) {
-						State sourceState = graph.getEdgeSource(upEdge);
-						State targetState = graph.getEdgeTarget(upEdge);
-						graph.removeEdge(upEdge);
-
-						Transition newEdge = DfFactory.eINSTANCE
-								.createTransition(sourceState,
-										newActions.get(0), targetState);
-						graph.addEdge(sourceState, targetState, newEdge);
-					}
+					source.getOutgoing().clear();
+					fsm.addTransition(source, newActions.get(0), target);
 				}
 			}
 		}
@@ -312,51 +320,6 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 
 			return mergeActions(actions);
 		}
-	}
-
-	private FSM updateFSM(State initialState,
-			DirectedGraph<State, Transition> graph) {
-		FSM fsm = DfFactory.eINSTANCE.createFSM();
-
-		// Set states of the fsm
-		for (State state : graph.vertexSet()) {
-			fsm.getStates().add(state);
-		}
-
-		// Set initial state
-		fsm.setInitialState(initialState);
-
-		// Set transitions of the fsm
-		for (Transition edge : graph.edgeSet()) {
-			State source = graph.getEdgeSource(edge);
-			State target = graph.getEdgeTarget(edge);
-			Action action = edge.getAction();
-			fsm.addTransition(source, action, target);
-		}
-
-		return fsm;
-	}
-
-	@Override
-	public Object caseActor(Actor actor) {
-		this.actor = actor;
-
-		FSM fsm = actor.getFsm();
-		if (fsm == null) {
-			List<Action> actions = actor.getActionsOutsideFsm();
-			List<Action> mergedActions = tryAndMerge(actions);
-			actions.clear();
-			actions.addAll(mergedActions);
-		} else {
-			DirectedGraph<State, Transition> graph = fsm.getGraph();
-			for (State state : graph.vertexSet()) {
-				examineState(graph, state);
-			}
-
-			// Update the fsm
-			actor.setFsm(updateFSM(fsm.getInitialState(), graph));
-		}
-		return null;
 	}
 
 }

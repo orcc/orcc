@@ -30,9 +30,10 @@ package net.sf.orcc.df;
 
 import java.util.List;
 
+import net.sf.dftools.graph.Edge;
+import net.sf.dftools.graph.Graph;
+
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EObject;
-import org.jgrapht.DirectedGraph;
 
 /**
  * This class defines a Finite State Machine (FSM). A FSM is a directed
@@ -41,7 +42,7 @@ import org.jgrapht.DirectedGraph;
  * @author Matthieu Wipliez
  * @model
  */
-public interface FSM extends EObject {
+public interface FSM extends Graph {
 
 	/**
 	 * Adds a transition between two states with the given action.
@@ -55,14 +56,6 @@ public interface FSM extends EObject {
 	 * @return the transition created
 	 */
 	Transition addTransition(State source, Action action, State target);
-
-	/**
-	 * Creates and returns a graph representation of this FSM. Note that the
-	 * graph is built each time this method is called.
-	 * 
-	 * @return a graph representation of this FSM
-	 */
-	DirectedGraph<State, Transition> getGraph();
 
 	/**
 	 * Returns the initial state.
@@ -92,10 +85,11 @@ public interface FSM extends EObject {
 	List<Action> getTargetActions(State source);
 
 	/**
-	 * Returns a list of transitions.
+	 * Returns the list of this FSM's transitions. This returns the same as
+	 * {@link #getEdges()} but as a list of {@link Transition}s rather than as a
+	 * list of {@link Edge}s.
 	 * 
-	 * @return a list of transitions.
-	 * @model containment="true"
+	 * @return the list of this FSM's transitions
 	 */
 	EList<Transition> getTransitions();
 

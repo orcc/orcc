@@ -80,12 +80,10 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="tag" eType="#//Tag" containment="true"
         resolveProxies="false"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="FSM">
+  <eClassifiers xsi:type="ecore:EClass" name="FSM" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Graph">
     <eStructuralFeatures xsi:type="ecore:EReference" name="initialState" eType="#//State"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="states" upperBound="-1"
         eType="#//State" containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="transitions" upperBound="-1"
-        eType="#//Transition" containment="true" resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Pattern">
     <eStructuralFeatures xsi:type="ecore:EReference" name="numTokensMap" upperBound="-1"
