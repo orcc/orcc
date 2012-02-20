@@ -22,5 +22,6 @@ Export-Package: net.sf.orcc.backends,
  net.sf.orcc.backends.llvm.transformations,
  net.sf.orcc.backends.transformations,
  net.sf.orcc.backends.tta.transformations,
+ net.sf.orcc.backends.util,
  net.sf.orcc.backends.xlim,
  net.sf.orcc.backends.xlim.transformations
