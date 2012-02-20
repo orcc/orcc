@@ -175,7 +175,7 @@ public class ExpressionEvaluator extends IrSwitch<Object> {
 
 			Object[] innerIndexes = new Object[indexes.length + 1];
 			System.arraycopy(indexes, 0, innerIndexes, 0, indexes.length);
-			for (int i = 0; i < typeList.getSize(); i++) {
+			for (int i = 0; (i < list.size()) && (i < typeList.getSize()); i++) {
 				innerIndexes[indexes.length] = i;
 				computeInitValue(array, eltType, list.get(i), innerIndexes);
 			}
