@@ -444,8 +444,12 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 		try {
 			// initializes actors parameters from instance map
 			for (Argument argument : arguments) {
-				Object value = exprInterpreter.doSwitch(argument.getValue());
-				argument.getVariable().setValue(value);
+				Var parameter = actor.getParameter(argument.getVariable()
+						.getName());
+				if (parameter != null) {
+					parameter.setValue(exprInterpreter.doSwitch(argument
+							.getValue()));
+				}
 			}
 
 			// initializes state variables
