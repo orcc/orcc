@@ -168,8 +168,7 @@ public abstract class AbstractPrinter {
 	 *            the full path of the template
 	 */
 	public AbstractPrinter(String fullPath) {
-		group = OrccUtil.loadGroup(fullPath, 
-				AbstractPrinter.class.getClassLoader());
+		this(fullPath, AbstractPrinter.class.getClassLoader());
 	}
 
 	protected void printTemplate(ST template, String fileName) {
