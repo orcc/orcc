@@ -143,14 +143,15 @@ public abstract class AbstractPrinter {
 	private Class<? extends TypePrinter> typePrinterClass;
 
 	/**
-	 * Creates a new printer.
+	 * Creates a new printer bounds to the given ClassLoader.
 	 * 
 	 * @param fullPath
 	 *            the full path of the template
+	 * @param cl
+	 *            the associated ClassLoader
 	 */
-	public AbstractPrinter(String fullPath) {
-		group = OrccUtil.loadGroup(fullPath,
-				AbstractPrinter.class.getClassLoader());
+	public AbstractPrinter(String fullPath, ClassLoader cl) {
+		group = OrccUtil.loadGroup(fullPath, cl);
 		group.registerRenderer(Expression.class, new ExpressionRenderer());
 		group.registerRenderer(Type.class, new TypeRenderer());
 
@@ -158,6 +159,17 @@ public abstract class AbstractPrinter {
 		group.registerModelAdaptor(Instance.class, new InstanceModelAdaptor());
 		group.registerModelAdaptor(Connection.class,
 				new ConnectionModelAdaptor());
+	}
+	
+	/**
+	 * Creates a new printer.
+	 * 
+	 * @param fullPath
+	 *            the full path of the template
+	 */
+	public AbstractPrinter(String fullPath) {
+		group = OrccUtil.loadGroup(fullPath, 
+				AbstractPrinter.class.getClassLoader());
 	}
 
 	protected void printTemplate(ST template, String fileName) {

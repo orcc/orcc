@@ -38,6 +38,7 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.util.MultipleClassLoader;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.EObject;
@@ -101,6 +102,21 @@ public class StandardPrinter extends AbstractPrinter {
 			boolean printBroadcasts) {
 		this(templateName, keepUnchangedFiles);
 		this.printBroadcasts = printBroadcasts;
+	}
+
+	/**
+	 * Creates a new printer from a specific orcc plugins.
+	 * 
+	 * @param templateName
+	 *            the name of the template
+	 * @param plugins
+	 *            the plugins Class
+	 */
+	public StandardPrinter(String templateName, Class<?> plugins) {
+		super(templateName, new MultipleClassLoader(plugins,
+				AbstractPrinter.class));
+
+		options = new HashMap<String, Object>();
 	}
 
 	/**
@@ -186,6 +202,28 @@ public class StandardPrinter extends AbstractPrinter {
 	}
 
 	/**
+	 * Prints the given entity to a file whose name and path are given.
+	 * 
+	 * @param fileName
+	 *            name of the output file
+	 * @param path
+	 *            path of the output file
+	 * @param entity
+	 *            the entity to generate code for
+	 * @return always <code>false</code>
+	 */
+	public boolean print(String fileName, String path, Entity entity) {
+		String file = path + File.separator + fileName;
+
+		ST template = group.getInstanceOf("printEntity");
+		template.add("entity", entity);
+		template.add("options", options);
+		printTemplate(template, file);
+
+		return false;
+	}
+
+	/**
 	 * Prints the given instance to a file whose name and path are given.
 	 * 
 	 * @param fileName
@@ -216,28 +254,6 @@ public class StandardPrinter extends AbstractPrinter {
 			template.add("options", options);
 			printTemplate(template, file);
 		}
-		return false;
-	}
-
-	/**
-	 * Prints the given entity to a file whose name and path are given.
-	 * 
-	 * @param fileName
-	 *            name of the output file
-	 * @param path
-	 *            path of the output file
-	 * @param entity
-	 *            the entity to generate code for
-	 * @return always <code>false</code>
-	 */
-	public boolean print(String fileName, String path, Entity entity) {
-		String file = path + File.separator + fileName;
-
-		ST template = group.getInstanceOf("printEntity");
-		template.add("entity", entity);
-		template.add("options", options);
-		printTemplate(template, file);
-		
 		return false;
 	}
 
