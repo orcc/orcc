@@ -69,16 +69,16 @@ architecture bdf_type of processor_{{id}} is
     port (
       clka  : in  std_logic;
       wea   : in  std_logic_vector(3 downto 0);
-      addra : in  std_logic_vector(8 downto 0);
-      dina  : in  std_logic_vector(31 downto 0);
-      douta : out std_logic_vector(31 downto 0));
+      addra : in  std_logic_vector({{dram_addr-1}} downto 0);
+      dina  : in  std_logic_vector({{dram_width-1}} downto 0);
+      douta : out std_logic_vector({{dram_width-1}} downto 0));
   end component;
 
   component irom_{{id}}
     port (
       clka  : in  std_logic;
-      addra : in  std_logic_vector(4 downto 0);
-      douta : out std_logic_vector(85 downto 0));
+      addra : in  std_logic_vector({{irom_addr-1}} downto 0);
+      douta : out std_logic_vector({{irom_width-1}} downto 0));
   end component;
   
 {{endif}}
