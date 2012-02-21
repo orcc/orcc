@@ -13,9 +13,12 @@ Require-Bundle: net.sf.orcc.core;bundle-version="1.0.0",
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: IETR/INSA Rennes
-Export-Package: net.sf.orcc.runtime,
+Export-Package: ch.epfl.mpeg4.part2.impl,
+ net.sf.orcc.runtime,
  net.sf.orcc.runtime.impl,
  net.sf.orcc.simulators,
+ org.ietr.stdio.impl,
  std.io.impl,
+ std.lang.impl,
  std.video.impl
 Bundle-ClassPath: .
