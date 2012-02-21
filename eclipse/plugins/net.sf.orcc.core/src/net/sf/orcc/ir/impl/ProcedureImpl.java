@@ -152,7 +152,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	protected Type returnType;
 
 	/**
-	 * The cached value of the '{@link #getCfg() <em>Cfg</em>}' reference.
+	 * The cached value of the '{@link #getCfg() <em>Cfg</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see #getCfg()
@@ -215,9 +215,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 		case IrPackage.PROCEDURE__RETURN_TYPE:
 			return getReturnType();
 		case IrPackage.PROCEDURE__CFG:
-			if (resolve)
-				return getCfg();
-			return basicGetCfg();
+			return getCfg();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -239,6 +237,8 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 					msgs);
 		case IrPackage.PROCEDURE__RETURN_TYPE:
 			return basicSetReturnType(null, msgs);
+		case IrPackage.PROCEDURE__CFG:
+			return basicSetCfg(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -550,15 +550,6 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 * @generated
 	 */
 	public Cfg getCfg() {
-		if (cfg != null && cfg.eIsProxy()) {
-			InternalEObject oldCfg = (InternalEObject) cfg;
-			cfg = (Cfg) eResolveProxy(oldCfg);
-			if (cfg != oldCfg) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							IrPackage.PROCEDURE__CFG, oldCfg, cfg));
-			}
-		}
 		return cfg;
 	}
 
@@ -567,8 +558,18 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Cfg basicGetCfg() {
-		return cfg;
+	public NotificationChain basicSetCfg(Cfg newCfg, NotificationChain msgs) {
+		Cfg oldCfg = cfg;
+		cfg = newCfg;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.PROCEDURE__CFG, oldCfg, newCfg);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
+		}
+		return msgs;
 	}
 
 	/**
@@ -577,11 +578,22 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 * @generated
 	 */
 	public void setCfg(Cfg newCfg) {
-		Cfg oldCfg = cfg;
-		cfg = newCfg;
-		if (eNotificationRequired())
+		if (newCfg != cfg) {
+			NotificationChain msgs = null;
+			if (cfg != null)
+				msgs = ((InternalEObject) cfg).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.PROCEDURE__CFG,
+						null, msgs);
+			if (newCfg != null)
+				msgs = ((InternalEObject) newCfg).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.PROCEDURE__CFG,
+						null, msgs);
+			msgs = basicSetCfg(newCfg, msgs);
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.PROCEDURE__CFG, oldCfg, cfg));
+					IrPackage.PROCEDURE__CFG, newCfg, newCfg));
 	}
 
 	/**

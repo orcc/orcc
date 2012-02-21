@@ -13,7 +13,8 @@
         eType="#//Param" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="returnType" eType="#//Type"
         containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="cfg" eType="ecore:EClass Cfg.ecore#//Cfg"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="cfg" eType="ecore:EClass Cfg.ecore#//Cfg"
+        containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Param">
     <eStructuralFeatures xsi:type="ecore:EReference" name="variable" eType="#//Var"

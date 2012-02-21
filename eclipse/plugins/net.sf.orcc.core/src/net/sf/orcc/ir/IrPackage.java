@@ -768,7 +768,7 @@ public interface IrPackage extends EPackage {
 		EReference PROCEDURE__RETURN_TYPE = eINSTANCE.getProcedure_ReturnType();
 
 		/**
-		 * The meta object literal for the '<em><b>Cfg</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Cfg</b></em>' containment reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
@@ -1354,7 +1354,7 @@ public interface IrPackage extends EPackage {
 	int PROCEDURE__RETURN_TYPE = 6;
 
 	/**
-	 * The feature id for the '<em><b>Cfg</b></em>' reference.
+	 * The feature id for the '<em><b>Cfg</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -3759,10 +3759,10 @@ public interface IrPackage extends EPackage {
 	EReference getProcedure_ReturnType();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.Procedure#getCfg <em>Cfg</em>}'.
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Procedure#getCfg <em>Cfg</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Cfg</em>'.
+	 * @return the meta object for the containment reference '<em>Cfg</em>'.
 	 * @see net.sf.orcc.ir.Procedure#getCfg()
 	 * @see #getProcedure()
 	 * @generated

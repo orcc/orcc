@@ -1823,7 +1823,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getProcedure_Cfg(), theCfgPackage.getCfg(), null, "cfg",
 				null, 0, 1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
+				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(paramEClass, Param.class, "Param", !IS_ABSTRACT,

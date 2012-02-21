@@ -991,6 +991,15 @@ public interface DfPackage extends EPackage {
 	int CONNECTION__TARGET = GraphPackage.EDGE__TARGET;
 
 	/**
+	 * The feature id for the '<em><b>Back Edge</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CONNECTION__BACK_EDGE = GraphPackage.EDGE__BACK_EDGE;
+
+	/**
 	 * The feature id for the '<em><b>Source Port</b></em>' reference. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -1259,6 +1268,15 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int TRANSITION__TARGET = GraphPackage.EDGE__TARGET;
+
+	/**
+	 * The feature id for the '<em><b>Back Edge</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRANSITION__BACK_EDGE = GraphPackage.EDGE__BACK_EDGE;
 
 	/**
 	 * The feature id for the '<em><b>Action</b></em>' reference. <!--
