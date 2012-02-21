@@ -18,6 +18,9 @@ xiseNetwork(network, options) ::= <<
   \<version xil_pn:ise_version="12.1" xil_pn:schema_version="2"/\>
 
   \<files\>
+    \<file xil_pn:name="top.ucf" xil_pn:type="FILE_UCF"\>
+      \<association xil_pn:name="Implementation"/\>
+    \</file\>
 
     \<file xil_pn:name="top.vhd" xil_pn:type="FILE_VHDL"\>
       \<association xil_pn:name="BehavioralSimulation"/\>
