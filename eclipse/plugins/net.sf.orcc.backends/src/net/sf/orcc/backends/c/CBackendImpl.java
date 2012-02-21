@@ -70,31 +70,31 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
  */
 public class CBackendImpl extends AbstractBackend {
 
-	private boolean classify;
+	protected boolean classify;
 	/**
 	 * Backend options
 	 */
 
-	private boolean debug;
+	protected boolean debug;
 
-	private boolean enableTrace;
-	private Map<String, String> mapping;
-	private boolean merge;
+	protected boolean enableTrace;
+	protected Map<String, String> mapping;
+	protected boolean merge;
 
-	private boolean newScheduler;
-	private boolean normalize;
-	private StandardPrinter printer;
-	private boolean ringTopology;
+	protected boolean newScheduler;
+	protected boolean normalize;
+	protected StandardPrinter printer;
+	protected boolean ringTopology;
 
 	/**
 	 * Configuration mapping
 	 */
-	private Map<String, List<Instance>> targetToInstancesMap;
-	private int threadsNb;
+	protected Map<String, List<Instance>> targetToInstancesMap;
+	protected int threadsNb;
 
-	private boolean useGeneticAlgo;
+	protected boolean useGeneticAlgo;
 
-	private void computeOptions(Map<String, Object> options) {
+	protected void computeOptions(Map<String, Object> options) {
 		options.put("newScheduler", newScheduler);
 		options.put("ringTopology", ringTopology);
 		options.put("fifoSize", fifoSize);
@@ -195,7 +195,7 @@ public class CBackendImpl extends AbstractBackend {
 		actor.setTemplateData(data);
 	}
 
-	private Network doTransformNetwork(Network network) throws OrccException {
+	protected Network doTransformNetwork(Network network) throws OrccException {
 		CNetworkTemplateData data = new CNetworkTemplateData();
 		data.computeHierarchicalTemplateMaps(network);
 		network.setTemplateData(data);
@@ -289,7 +289,7 @@ public class CBackendImpl extends AbstractBackend {
 		return true;
 	}
 
-	private void printCMake(Network network) {
+	protected void printCMake(Network network) {
 		StandardPrinter networkPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/c/CMakeLists.stg");
 		networkPrinter.print("CMakeLists.txt", path, network);
@@ -300,7 +300,7 @@ public class CBackendImpl extends AbstractBackend {
 		return printer.print(instance.getName() + ".c", path, instance);
 	}
 
-	private void printMapping(Network network) {
+	protected void printMapping(Network network) {
 		StandardPrinter networkPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/c/Mapping.stg");
 		networkPrinter.getOptions().put("mapping", targetToInstancesMap);
