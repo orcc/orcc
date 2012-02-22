@@ -91,20 +91,20 @@ public interface ArchitecturePackage extends EPackage {
 	int DESIGN = 0;
 
 	/**
-	 * The feature id for the '<em><b>Vertices</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int DESIGN__VERTICES = GraphPackage.GRAPH__VERTICES;
-
-	/**
 	 * The feature id for the '<em><b>Edges</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int DESIGN__EDGES = GraphPackage.GRAPH__EDGES;
+
+	/**
+	 * The feature id for the '<em><b>Vertices</b></em>' reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DESIGN__VERTICES = GraphPackage.GRAPH__VERTICES;
 
 	/**
 	 * The number of structural features of the '<em>Design</em>' class. <!--
@@ -125,6 +125,14 @@ public interface ArchitecturePackage extends EPackage {
 	int HW_FIFO = 1;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int HW_FIFO__ATTRIBUTES = GraphPackage.EDGE__ATTRIBUTES;
+
+	/**
 	 * The feature id for the '<em><b>Source</b></em>' reference. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -143,12 +151,13 @@ public interface ArchitecturePackage extends EPackage {
 	int HW_FIFO__TARGET = GraphPackage.EDGE__TARGET;
 
 	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Back Edge</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int HW_FIFO__ATTRIBUTES = GraphPackage.EDGE__ATTRIBUTES;
+	int HW_FIFO__BACK_EDGE = GraphPackage.EDGE__BACK_EDGE;
 
 	/**
 	 * The number of structural features of the '<em>Hw Fifo</em>' class. <!--
@@ -169,22 +178,12 @@ public interface ArchitecturePackage extends EPackage {
 	int PROCESSOR = 2;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PROCESSOR__NAME = GraphPackage.VERTEX__NAME;
-
-	/**
-	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int PROCESSOR__OUTGOING = GraphPackage.VERTEX__OUTGOING;
+	int PROCESSOR__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Incoming</b></em>' reference list. <!--
@@ -196,12 +195,13 @@ public interface ArchitecturePackage extends EPackage {
 	int PROCESSOR__INCOMING = GraphPackage.VERTEX__INCOMING;
 
 	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int PROCESSOR__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
+	int PROCESSOR__OUTGOING = GraphPackage.VERTEX__OUTGOING;
 
 	/**
 	 * The feature id for the '<em><b>Gcu</b></em>' containment reference. <!--
@@ -278,13 +278,22 @@ public interface ArchitecturePackage extends EPackage {
 	int PROCESSOR__HARDWARE_DATABASE = GraphPackage.VERTEX_FEATURE_COUNT + 8;
 
 	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int PROCESSOR__NAME = GraphPackage.VERTEX_FEATURE_COUNT + 9;
+
+	/**
 	 * The number of structural features of the '<em>Processor</em>' class. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int PROCESSOR_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 9;
+	int PROCESSOR_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 10;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.BusImpl <em>Bus</em>}' class.
@@ -1512,6 +1521,17 @@ public interface ArchitecturePackage extends EPackage {
 	EReference getProcessor_HardwareDatabase();
 
 	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Processor#getName <em>Name</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Name</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Processor#getName()
+	 * @see #getProcessor()
+	 * @generated
+	 */
+	EAttribute getProcessor_Name();
+
+	/**
 	 * Returns the meta object for class '
 	 * {@link net.sf.orcc.backends.tta.architecture.Bus <em>Bus</em>}'. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
@@ -2538,6 +2558,14 @@ public interface ArchitecturePackage extends EPackage {
 		 */
 		EReference PROCESSOR__HARDWARE_DATABASE = eINSTANCE
 				.getProcessor_HardwareDatabase();
+
+		/**
+		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute PROCESSOR__NAME = eINSTANCE.getProcessor_Name();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.BusImpl <em>Bus</em>}' class.

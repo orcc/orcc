@@ -118,7 +118,7 @@ public abstract class AbstractPrinter {
 			if (attribute == null) {
 				return super.getProperty(interp, st, o, property, propertyName);
 			} else {
-				return attribute.getValue();
+				return attribute.getPojoValue();
 			}
 		}
 	}

@@ -49,7 +49,6 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -78,15 +77,15 @@ import com.google.common.collect.Iterables;
  */
 public class XdfImporter {
 
-	private Map<DfVertex, Vertex> vertexMap;
+	private Map<net.sf.dftools.graph.Vertex, Vertex> vertexMap;
 
 	private void addConnections(Graph graph, ObjectType type,
 			List<Connection> connections) {
 		for (Connection connection : connections) {
 			Port srcPort = connection.getSourcePort();
 			Port tgtPort = connection.getTargetPort();
-			DfVertex srcVertex = connection.getSource();
-			DfVertex tgtVertex = connection.getTarget();
+			net.sf.dftools.graph.Vertex srcVertex = connection.getSource();
+			net.sf.dftools.graph.Vertex tgtVertex = connection.getTarget();
 
 			Vertex source = vertexMap.get(srcVertex);
 			Vertex target = vertexMap.get(tgtVertex);
@@ -182,8 +181,8 @@ public class XdfImporter {
 		// attributes
 		Attribute partName = instance.getAttribute("partName");
 		if (partName != null) {
-			vertex.setValue("partName",
-					new ExpressionPrinter().doSwitch(partName.getValue()));
+			vertex.setValue("partName", new ExpressionPrinter()
+					.doSwitch(partName.getReferencedValue()));
 		}
 		Attribute skip = instance.getAttribute("skip");
 		if (skip != null) {
@@ -201,7 +200,7 @@ public class XdfImporter {
 	 * @return a graph
 	 */
 	public Graph transform(IFile file) {
-		vertexMap = new HashMap<DfVertex, Vertex>();
+		vertexMap = new HashMap<net.sf.dftools.graph.Vertex, Vertex>();
 
 		ResourceSet set = new ResourceSetImpl();
 		Network network = EcoreHelper.getEObject(set, file);

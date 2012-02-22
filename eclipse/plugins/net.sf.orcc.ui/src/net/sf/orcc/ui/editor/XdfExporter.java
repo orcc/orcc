@@ -78,7 +78,6 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -143,11 +142,11 @@ public class XdfExporter extends CalSwitch<Object> {
 
 	private Map<String, Var> varMap;
 
-	private Map<Vertex, DfVertex> vertexMap;
+	private Map<Vertex, net.sf.dftools.graph.Vertex> vertexMap;
 
 	private void addEdge(Network network, Edge edge) {
-		DfVertex source = vertexMap.get(edge.getSource());
-		DfVertex target = vertexMap.get(edge.getTarget());
+		net.sf.dftools.graph.Vertex source = vertexMap.get(edge.getSource());
+		net.sf.dftools.graph.Vertex target = vertexMap.get(edge.getTarget());
 
 		Port sourcePort = null;
 		if ("Instance".equals(edge.getSource().getType().getName())) {
@@ -167,14 +166,15 @@ public class XdfExporter extends CalSwitch<Object> {
 			}
 		}
 
-		if (source.isInstance() && sourcePort == null) {
+		if (source instanceof Instance && sourcePort == null) {
 			throw new OrccRuntimeException("the source port of a connection "
-					+ "from instance " + source.getName()
+					+ "from instance " + ((Instance) source).getName()
 					+ " must be specified");
 		}
-		if (target.isInstance() && targetPort == null) {
+		if (target instanceof Instance && targetPort == null) {
 			throw new OrccRuntimeException("the target port of a connection "
-					+ "to instance " + target.getName() + " must be specified");
+					+ "to instance " + ((Instance) target).getName()
+					+ " must be specified");
 		}
 
 		// buffer size
@@ -472,7 +472,7 @@ public class XdfExporter extends CalSwitch<Object> {
 
 		varMap = new HashMap<String, Var>();
 		portMap = new HashMap<Port, Vertex>();
-		vertexMap = new HashMap<Vertex, DfVertex>();
+		vertexMap = new HashMap<Vertex, net.sf.dftools.graph.Vertex>();
 
 		Network network = DfFactory.eINSTANCE.createNetwork();
 		network.setName((String) graph.getValue(PARAMETER_ID));

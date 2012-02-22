@@ -69,6 +69,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getProgram <em>Program</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getData <em>Data</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getHardwareDatabase <em>Hardware Database</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getName <em>Name</em>}</li>
  * </ul>
  * </p>
  *
@@ -164,6 +165,26 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 	 * @ordered
 	 */
 	protected EList<Implementation> hardwareDatabase;
+
+	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected String name = NAME_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -439,6 +460,28 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setName(String newName) {
+		String oldName = name;
+		name = newName;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.PROCESSOR__NAME, oldName, name));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
@@ -496,6 +539,8 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 			return getData();
 		case ArchitecturePackage.PROCESSOR__HARDWARE_DATABASE:
 			return getHardwareDatabase();
+		case ArchitecturePackage.PROCESSOR__NAME:
+			return getName();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -545,6 +590,9 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 			getHardwareDatabase().addAll(
 					(Collection<? extends Implementation>) newValue);
 			return;
+		case ArchitecturePackage.PROCESSOR__NAME:
+			setName((String) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -584,6 +632,9 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 		case ArchitecturePackage.PROCESSOR__HARDWARE_DATABASE:
 			getHardwareDatabase().clear();
 			return;
+		case ArchitecturePackage.PROCESSOR__NAME:
+			setName(NAME_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -614,8 +665,28 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 			return data != null;
 		case ArchitecturePackage.PROCESSOR__HARDWARE_DATABASE:
 			return hardwareDatabase != null && !hardwareDatabase.isEmpty();
+		case ArchitecturePackage.PROCESSOR__NAME:
+			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
+					.equals(name);
 		}
 		return super.eIsSet(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public String toString() {
+		if (eIsProxy())
+			return super.toString();
+
+		StringBuffer result = new StringBuffer(super.toString());
+		result.append(" (name: ");
+		result.append(name);
+		result.append(')');
+		return result.toString();
 	}
 
 } //ProcessorImpl

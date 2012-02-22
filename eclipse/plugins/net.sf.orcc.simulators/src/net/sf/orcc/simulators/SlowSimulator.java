@@ -42,11 +42,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -76,27 +76,27 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
  */
 public class SlowSimulator extends AbstractSimulator {
 
+	private boolean enableTraces;
+
 	protected List<SimulatorFifo> fifoList;
-
-	protected Map<Port, SimulatorFifo> inputFifos;
-
-	protected Map<Port, List<SimulatorFifo>> outputFifos;
 
 	private int fifoSize;
 
+	protected Map<Port, SimulatorFifo> inputFifos;
+
 	protected Map<Instance, ActorInterpreter> interpreters;
+
+	protected Map<Port, List<SimulatorFifo>> outputFifos;
 
 	protected IProject project;
 
 	private String stimulusFile;
 
+	private String traceFolder;
+
 	protected List<IFolder> vtlFolders;
 
 	protected String xdfFile;
-
-	private boolean enableTraces;
-
-	private String traceFolder;
 
 	protected void connectActors(Instance src, Port srcPort, Instance tgt,
 			Port tgtPort, int fifoSize) {
@@ -132,10 +132,10 @@ public class SlowSimulator extends AbstractSimulator {
 		// Loop over the connections and ask for the source and target actors
 		// connection through specified I/O ports.
 		for (Connection connection : network.getConnections()) {
-			DfVertex srcVertex = connection.getSource();
-			DfVertex tgtVertex = connection.getTarget();
+			Vertex srcVertex = connection.getSource();
+			Vertex tgtVertex = connection.getTarget();
 
-			if (srcVertex.isInstance() && tgtVertex.isInstance()) {
+			if (srcVertex instanceof Instance && tgtVertex instanceof Instance) {
 				// get FIFO size (user-defined nor default)
 				Integer connectionSize = connection.getSize();
 				int size = (connectionSize == null) ? fifoSize : connectionSize;
@@ -269,10 +269,10 @@ public class SlowSimulator extends AbstractSimulator {
 
 	protected void updateConnections(Network network) throws OrccException {
 		for (Connection connection : network.getConnections()) {
-			DfVertex srcVertex = connection.getSource();
-			DfVertex tgtVertex = connection.getTarget();
+			Vertex srcVertex = connection.getSource();
+			Vertex tgtVertex = connection.getTarget();
 
-			if (srcVertex.isInstance()) {
+			if (srcVertex instanceof Instance) {
 				Instance source = (Instance) srcVertex;
 				String srcPortName = connection.getSourcePort().getName();
 
@@ -285,7 +285,7 @@ public class SlowSimulator extends AbstractSimulator {
 				connection.setSourcePort(srcPort);
 			}
 
-			if (tgtVertex.isInstance()) {
+			if (tgtVertex instanceof Instance) {
 				Instance target = (Instance) tgtVertex;
 				String dstPortName = connection.getTargetPort().getName();
 

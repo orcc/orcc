@@ -51,6 +51,7 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getProgram <em>Program</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getData <em>Data</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getHardwareDatabase <em>Hardware Database</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getName <em>Name</em>}</li>
  * </ul>
  * </p>
  *
@@ -232,5 +233,31 @@ public interface Processor extends Vertex {
 	 * @generated
 	 */
 	EList<Implementation> getHardwareDatabase();
+
+	/**
+	 * Returns the value of the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Name</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Name</em>' attribute.
+	 * @see #setName(String)
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getProcessor_Name()
+	 * @model
+	 * @generated
+	 */
+	String getName();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Processor#getName <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Name</em>' attribute.
+	 * @see #getName()
+	 * @generated
+	 */
+	void setName(String value);
 
 } // Processor

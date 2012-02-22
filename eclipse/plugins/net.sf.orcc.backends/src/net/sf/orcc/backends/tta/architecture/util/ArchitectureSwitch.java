@@ -33,7 +33,7 @@ import java.util.Map;
 import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.Graph;
 import net.sf.dftools.graph.Vertex;
-import net.sf.dftools.util.Nameable;
+import net.sf.dftools.util.Attributable;
 import net.sf.orcc.backends.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.Bridge;
@@ -135,6 +135,8 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseEdge(hwFifo);
 			if (result == null)
+				result = caseAttributable(hwFifo);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -144,7 +146,7 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseVertex(processor);
 			if (result == null)
-				result = caseNameable(processor);
+				result = caseAttributable(processor);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -694,6 +696,21 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 	}
 
 	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Attributable</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Attributable</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseAttributable(Attributable object) {
+		return null;
+	}
+
+	/**
 	 * Returns the result of interpreting the object as an instance of '
 	 * <em>Edge</em>'. <!-- begin-user-doc --> This implementation returns null;
 	 * returning a non-null result will terminate the switch. <!-- end-user-doc
@@ -707,20 +724,6 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseEdge(Edge object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Nameable</em>'.
-	 * <!-- begin-user-doc --> This implementation returns
-	 * null; returning a non-null result will terminate the switch. <!--
-	 * end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Nameable</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseNameable(Nameable object) {
 		return null;
 	}
 

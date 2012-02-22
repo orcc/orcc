@@ -33,7 +33,7 @@ import java.util.Map;
 import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.Graph;
 import net.sf.dftools.graph.Vertex;
-import net.sf.dftools.util.Nameable;
+import net.sf.dftools.util.Attributable;
 import net.sf.orcc.backends.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.Bridge;
@@ -267,13 +267,13 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 		}
 
 		@Override
-		public Adapter caseEdge(Edge object) {
-			return createEdgeAdapter();
+		public Adapter caseAttributable(Attributable object) {
+			return createAttributableAdapter();
 		}
 
 		@Override
-		public Adapter caseNameable(Nameable object) {
-			return createNameableAdapter();
+		public Adapter caseEdge(Edge object) {
+			return createEdgeAdapter();
 		}
 
 		@Override
@@ -638,6 +638,20 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.dftools.util.Attributable <em>Attributable</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.dftools.util.Attributable
+	 * @generated
+	 */
+	public Adapter createAttributableAdapter() {
+		return null;
+	}
+
+	/**
 	 * Creates a new adapter for an object of class '{@link graph.Edge
 	 * <em>Edge</em>}'. <!-- begin-user-doc --> This default implementation
 	 * returns null so that we can easily ignore cases; it's useful to ignore a
@@ -649,21 +663,6 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createEdgeAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link graph.Nameable
-	 * <em>Nameable</em>}'. <!-- begin-user-doc --> This default implementation
-	 * returns null so that we can easily ignore cases; it's useful to ignore a
-	 * case when inheritance will catch all the cases anyway. <!-- end-user-doc
-	 * -->
-	 * 
-	 * @return the new adapter.
-	 * @see graph.Nameable
-	 * @generated
-	 */
-	public Adapter createNameableAdapter() {
 		return null;
 	}
 

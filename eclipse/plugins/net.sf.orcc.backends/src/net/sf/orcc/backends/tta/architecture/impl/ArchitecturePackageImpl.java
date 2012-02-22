@@ -72,6 +72,7 @@ import org.eclipse.emf.ecore.EEnum;
 import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
+import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.impl.EPackageImpl;
 
 /**
@@ -438,6 +439,15 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 */
 	public EReference getProcessor_HardwareDatabase() {
 		return (EReference) processorEClass.getEStructuralFeatures().get(8);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getProcessor_Name() {
+		return (EAttribute) processorEClass.getEStructuralFeatures().get(9);
 	}
 
 	/**
@@ -1221,6 +1231,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEReference(processorEClass, PROCESSOR__PROGRAM);
 		createEReference(processorEClass, PROCESSOR__DATA);
 		createEReference(processorEClass, PROCESSOR__HARDWARE_DATABASE);
+		createEAttribute(processorEClass, PROCESSOR__NAME);
 
 		busEClass = createEClass(BUS);
 		createEAttribute(busEClass, BUS__NAME);
@@ -1374,6 +1385,8 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		// Obtain other dependent packages
 		GraphPackage theGraphPackage = (GraphPackage) EPackage.Registry.INSTANCE
 				.getEPackage(GraphPackage.eNS_URI);
+		EcorePackage theEcorePackage = (EcorePackage) EPackage.Registry.INSTANCE
+				.getEPackage(EcorePackage.eNS_URI);
 
 		// Create type parameters
 
@@ -1441,6 +1454,10 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				-1, Processor.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getProcessor_Name(), theEcorePackage.getEString(),
+				"name", null, 0, 1, Processor.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
 
 		initEClass(busEClass, Bus.class, "Bus", !IS_ABSTRACT, !IS_INTERFACE,
 				IS_GENERATED_INSTANCE_CLASS);
