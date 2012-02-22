@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir;
 
+import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.Vertex;
 
 /**
@@ -37,6 +38,20 @@ import net.sf.dftools.graph.Vertex;
  * @model abstract="true"
  */
 public interface Node extends Vertex {
+
+	/**
+	 * Returns the first outgoing edge whose flag is false.
+	 * 
+	 * @return the first outgoing edge whose flag is false
+	 */
+	Edge getEdgeFalse();
+
+	/**
+	 * Returns the first outgoing edge whose flag is true.
+	 * 
+	 * @return the first outgoing edge whose flag is true
+	 */
+	Edge getEdgeTrue();
 
 	/**
 	 * Returns the procedure this node belongs to.

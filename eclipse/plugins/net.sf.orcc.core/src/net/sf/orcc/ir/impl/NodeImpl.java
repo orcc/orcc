@@ -6,7 +6,9 @@
  */
 package net.sf.orcc.ir.impl;
 
+import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.impl.VertexImpl;
+import net.sf.dftools.util.Attribute;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Procedure;
@@ -19,21 +21,55 @@ import org.eclipse.emf.ecore.EClass;
  * <em><b>CFG Node</b></em>'. <!-- end-user-doc -->
  * <p>
  * </p>
- *
+ * 
  * @generated
  */
 public abstract class NodeImpl extends VertexImpl implements Node {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected NodeImpl() {
 		super();
 	}
 
+	@Override
+	public Edge getEdgeFalse() {
+		for (Edge edge : getOutgoing()) {
+			Attribute attr = edge.getAttribute("flag");
+			if (attr == null) {
+				return edge;
+			}
+			Object value = attr.getRuntimeValue();
+			if (value == null) {
+				return edge;
+			}
+			if (value instanceof Boolean && !(Boolean) value) {
+				return edge;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public Edge getEdgeTrue() {
+		for (Edge edge : getOutgoing()) {
+			Attribute attr = edge.getAttribute("flag");
+			if (attr != null) {
+				Object value = attr.getRuntimeValue();
+				if (value instanceof Boolean && (Boolean) value) {
+					return edge;
+				}
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
