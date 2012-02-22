@@ -46,7 +46,7 @@ public interface Procedure extends EObject {
 	 * {@link #setCfg(Cfg)}.
 	 * 
 	 * @return the CFG of this procedure
-	 * @model
+	 * @model containment="true"
 	 */
 	Cfg getCfg();
 
