@@ -16,17 +16,25 @@ printNetwork(network, options) ::= <<
 cmake_minimum_required (VERSION 2.6)
 project (<network.simpleName>)
 
-# SDL library inclusion
-find_package(SDL REQUIRED)
-include_directories(${SDL_INCLUDE_DIR})
+# Libraries folder
+set(LIBS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs)
 
 # Runtime libraries inclusion
-set(LIBS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs)
 set(ORCC_INCLUDE_DIR ${LIBS_DIR}/orcc/include)
 set(ROXML_INCLUDE_DIR ${LIBS_DIR}/roxml/include)
 
+# Helps to find where SDL libraries are saved (win32 only)
+if(WIN32)
+	set(ENV{CMAKE_PREFIX_PATH} ${LIBS_DIR}/windows/SDL-*\;${LIBS_DIR}/windows/SDL_image-*)
+endif(WIN32)
+
+find_package(Threads REQUIRED)
+
 add_subdirectory(${LIBS_DIR})
 include_directories(${ORCC_INCLUDE_DIR} ${ROXML_INCLUDE_DIR})
+
+find_package(SDL REQUIRED)
+include_directories(${SDL_INCLUDE_DIR})
 
 set(filenames
 	<network.simpleName>.c
