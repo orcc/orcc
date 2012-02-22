@@ -53,6 +53,7 @@ import net.sf.orcc.moc.impl.MocPackageImpl;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
 
+import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.impl.EPackageImpl;
 
 /**
@@ -168,6 +169,24 @@ public class CfgPackageImpl extends EPackageImpl implements CfgPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getCfg_Entry() {
+		return (EReference) cfgEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getCfg_Exit() {
+		return (EReference) cfgEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public CfgFactory getCfgFactory() {
 		return (CfgFactory) getEFactoryInstance();
 	}
@@ -193,6 +212,8 @@ public class CfgPackageImpl extends EPackageImpl implements CfgPackage {
 
 		// Create classes and their features
 		cfgEClass = createEClass(CFG);
+		createEReference(cfgEClass, CFG__ENTRY);
+		createEReference(cfgEClass, CFG__EXIT);
 	}
 
 	/**
@@ -222,6 +243,8 @@ public class CfgPackageImpl extends EPackageImpl implements CfgPackage {
 		// Obtain other dependent packages
 		GraphPackage theGraphPackage = (GraphPackage) EPackage.Registry.INSTANCE
 				.getEPackage(GraphPackage.eNS_URI);
+		IrPackage theIrPackage = (IrPackage) EPackage.Registry.INSTANCE
+				.getEPackage(IrPackage.eNS_URI);
 
 		// Create type parameters
 
@@ -233,6 +256,14 @@ public class CfgPackageImpl extends EPackageImpl implements CfgPackage {
 		// Initialize classes and features; add operations and parameters
 		initEClass(cfgEClass, Cfg.class, "Cfg", !IS_ABSTRACT, !IS_INTERFACE,
 				IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getCfg_Entry(), theIrPackage.getNode(), null, "entry",
+				null, 0, 1, Cfg.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getCfg_Exit(), theIrPackage.getNode(), null, "exit",
+				null, 0, 1, Cfg.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Create resource
 		createResource(eNS_URI);

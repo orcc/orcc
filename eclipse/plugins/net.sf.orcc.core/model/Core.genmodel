@@ -7,7 +7,10 @@
   <foreignModel>@model</foreignModel>
   <genPackages prefix="Cfg" basePackage="net.sf.orcc" disposableProviderFactory="true"
       ecorePackage="Cfg.ecore#/">
-    <genClasses ecoreClass="Cfg.ecore#//Cfg"/>
+    <genClasses ecoreClass="Cfg.ecore#//Cfg">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Cfg.ecore#//Cfg/entry"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Cfg.ecore#//Cfg/exit"/>
+    </genClasses>
   </genPackages>
   <genPackages prefix="Df" basePackage="net.sf.orcc" disposableProviderFactory="true"
       ecorePackage="Df.ecore#/">

@@ -34,6 +34,7 @@ import net.sf.dftools.graph.GraphPackage;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.emf.ecore.EReference;
 
 /**
  * <!-- begin-user-doc -->
@@ -112,13 +113,31 @@ public interface CfgPackage extends EPackage {
 	int CFG__VERTICES = GraphPackage.GRAPH__VERTICES;
 
 	/**
+	 * The feature id for the '<em><b>Entry</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CFG__ENTRY = GraphPackage.GRAPH_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>Exit</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CFG__EXIT = GraphPackage.GRAPH_FEATURE_COUNT + 1;
+
+	/**
 	 * The number of structural features of the '<em>Cfg</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int CFG_FEATURE_COUNT = GraphPackage.GRAPH_FEATURE_COUNT + 0;
+	int CFG_FEATURE_COUNT = GraphPackage.GRAPH_FEATURE_COUNT + 2;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.cfg.Cfg <em>Cfg</em>}'.
@@ -129,6 +148,28 @@ public interface CfgPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getCfg();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.cfg.Cfg#getEntry <em>Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Entry</em>'.
+	 * @see net.sf.orcc.cfg.Cfg#getEntry()
+	 * @see #getCfg()
+	 * @generated
+	 */
+	EReference getCfg_Entry();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.cfg.Cfg#getExit <em>Exit</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Exit</em>'.
+	 * @see net.sf.orcc.cfg.Cfg#getExit()
+	 * @see #getCfg()
+	 * @generated
+	 */
+	EReference getCfg_Exit();
 
 	/**
 	 * Returns the factory that creates the instances of the model.
@@ -161,6 +202,20 @@ public interface CfgPackage extends EPackage {
 		 * @generated
 		 */
 		EClass CFG = eINSTANCE.getCfg();
+		/**
+		 * The meta object literal for the '<em><b>Entry</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference CFG__ENTRY = eINSTANCE.getCfg_Entry();
+		/**
+		 * The meta object literal for the '<em><b>Exit</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference CFG__EXIT = eINSTANCE.getCfg_Exit();
 
 	}
 

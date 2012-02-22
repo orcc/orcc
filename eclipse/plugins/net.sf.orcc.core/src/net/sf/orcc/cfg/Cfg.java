@@ -29,6 +29,7 @@
 package net.sf.orcc.cfg;
 
 import net.sf.dftools.graph.Graph;
+import net.sf.orcc.ir.Node;
 
 /**
  * This interface defines a Control-Flow Graph.
@@ -37,5 +38,37 @@ import net.sf.dftools.graph.Graph;
  * @model
  */
 public interface Cfg extends Graph {
+
+	/**
+	 * Returns the entry node of this CFG.
+	 * 
+	 * @return the entry node of this CFG
+	 * @model
+	 */
+	Node getEntry();
+
+	/**
+	 * Returns the exit node of this CFG.
+	 * 
+	 * @return the exit node of this CFG
+	 * @model
+	 */
+	Node getExit();
+
+	/**
+	 * Sets the entry node of this CFG.
+	 * 
+	 * @param node
+	 *            the new entry node
+	 */
+	void setEntry(Node node);
+
+	/**
+	 * Sets the exit node of this CFG.
+	 * 
+	 * @param node
+	 *            the new exit node
+	 */
+	void setExit(Node node);
 
 }
