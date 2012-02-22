@@ -1,7 +1,8 @@
-# The name of our project is "Orcc". CMakeLists files in this project can
-# refer to the root source directory of the project as ${orcc_SOURCE_DIR} and
-# to the root binary directory of the project as ${orcc_BINARY_DIR}.
-cmake_minimum_required (VERSION 2.8)
+# This project is used by source code produced with Orcc
+# c backend. It is designed to build both Roxml and Orcc
+# libraries and statically link them.
+
+cmake_minimum_required (VERSION 2.6)
 
 # Common packages required
 find_package(SDL REQUIRED)
