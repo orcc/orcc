@@ -1409,15 +1409,6 @@ public interface IrPackage extends EPackage {
 	int PARAM_FEATURE_COUNT = 2;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NODE__NAME = GraphPackage.VERTEX__NAME;
-
-	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1452,15 +1443,6 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int NODE_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 0;
-
-	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NODE_BLOCK__NAME = NODE__NAME;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -1504,15 +1486,6 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int NODE_BLOCK_FEATURE_COUNT = NODE_FEATURE_COUNT + 1;
-
-	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NODE_IF__NAME = NODE__NAME;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -1590,15 +1563,6 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int NODE_IF_FEATURE_COUNT = NODE_FEATURE_COUNT + 5;
-
-	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NODE_WHILE__NAME = NODE__NAME;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -2744,15 +2708,6 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	int NODE_SPECIFIC = 40;
-
-	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NODE_SPECIFIC__NAME = NODE__NAME;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.

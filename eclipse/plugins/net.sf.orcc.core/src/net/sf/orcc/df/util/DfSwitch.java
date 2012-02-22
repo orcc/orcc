@@ -11,6 +11,7 @@ import java.util.Map;
 import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.Graph;
 import net.sf.dftools.graph.Vertex;
+import net.sf.dftools.util.Attributable;
 import net.sf.dftools.util.Nameable;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
@@ -101,6 +102,8 @@ public class DfSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseNameable(dfVertex);
 			if (result == null)
+				result = caseAttributable(dfVertex);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -117,11 +120,9 @@ public class DfSwitch<T> extends Switch<T> {
 			Port port = (Port) theEObject;
 			T result = casePort(port);
 			if (result == null)
-				result = caseDfVertex(port);
-			if (result == null)
 				result = caseVertex(port);
 			if (result == null)
-				result = caseNameable(port);
+				result = caseAttributable(port);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -136,6 +137,8 @@ public class DfSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseNameable(instance);
 			if (result == null)
+				result = caseAttributable(instance);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -148,6 +151,8 @@ public class DfSwitch<T> extends Switch<T> {
 				result = caseVertex(entity);
 			if (result == null)
 				result = caseNameable(entity);
+			if (result == null)
+				result = caseAttributable(entity);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -164,6 +169,8 @@ public class DfSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseNameable(entitySpecific);
 			if (result == null)
+				result = caseAttributable(entitySpecific);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -178,6 +185,8 @@ public class DfSwitch<T> extends Switch<T> {
 				result = caseVertex(actor);
 			if (result == null)
 				result = caseNameable(actor);
+			if (result == null)
+				result = caseAttributable(actor);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -196,6 +205,8 @@ public class DfSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseNameable(network);
 			if (result == null)
+				result = caseAttributable(network);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -211,6 +222,8 @@ public class DfSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseNameable(broadcast);
 			if (result == null)
+				result = caseAttributable(broadcast);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -219,6 +232,8 @@ public class DfSwitch<T> extends Switch<T> {
 			T result = caseConnection(connection);
 			if (result == null)
 				result = caseEdge(connection);
+			if (result == null)
+				result = caseAttributable(connection);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -252,7 +267,7 @@ public class DfSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseVertex(state);
 			if (result == null)
-				result = caseNameable(state);
+				result = caseAttributable(state);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -269,6 +284,8 @@ public class DfSwitch<T> extends Switch<T> {
 			T result = caseTransition(transition);
 			if (result == null)
 				result = caseEdge(transition);
+			if (result == null)
+				result = caseAttributable(transition);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -591,6 +608,21 @@ public class DfSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseArgument(Argument object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Attributable</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Attributable</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseAttributable(Attributable object) {
 		return null;
 	}
 

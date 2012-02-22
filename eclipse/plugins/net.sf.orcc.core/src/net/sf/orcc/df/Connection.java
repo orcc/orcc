@@ -61,10 +61,6 @@ public interface Connection extends Edge {
 	 */
 	Port getSourcePort();
 
-	DfVertex getSource();
-
-	DfVertex getTarget();
-
 	/**
 	 * Returns this connection's target port (may be <code>null</code>).
 	 * 

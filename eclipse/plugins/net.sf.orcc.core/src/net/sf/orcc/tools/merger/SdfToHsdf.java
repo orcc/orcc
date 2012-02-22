@@ -11,7 +11,6 @@ import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
@@ -342,8 +341,8 @@ public class SdfToHsdf extends DfSwitch<Network> {
 
 		DfFactory factory = DfFactory.eINSTANCE;
 		for (Connection connection : connections) {
-			DfVertex src = connection.getSource();
-			if (src.isInstance()) {
+			Vertex src = connection.getSource();
+			if (src instanceof Instance) {
 				int rep = repetitions.get(src);
 				if (rep > 1) {
 					// add join node and repeated instances
@@ -353,8 +352,8 @@ public class SdfToHsdf extends DfSwitch<Network> {
 					network.getInstances().add(instJoin);
 
 					for (int i = 0; i < rep; i++) {
-						Instance srcCopy = network.getInstance(src.getName()
-								+ i);
+						Instance srcCopy = network.getInstance(((Instance) src)
+								.getName() + i);
 						if (srcCopy == null) {
 							srcCopy = EcoreUtil.copy((Instance) src);
 							srcCopy.setName(srcCopy.getName() + i);
@@ -374,8 +373,8 @@ public class SdfToHsdf extends DfSwitch<Network> {
 				}
 			}
 
-			DfVertex tgt = connection.getTarget();
-			if (tgt.isInstance()) {
+			Vertex tgt = connection.getTarget();
+			if (tgt instanceof Instance) {
 				int rep = repetitions.get(tgt);
 				if (rep > 1) {
 					Actor split = createSplit(connection);
@@ -384,8 +383,8 @@ public class SdfToHsdf extends DfSwitch<Network> {
 					network.getInstances().add(splitInst);
 
 					for (int i = 0; i < rep; i++) {
-						Instance tgtCopy = network.getInstance(tgt.getName()
-								+ i);
+						Instance tgtCopy = network.getInstance(((Instance) tgt)
+								.getName() + i);
 						if (tgtCopy == null) {
 							tgtCopy = EcoreUtil.copy((Instance) tgt);
 							tgtCopy.setName(tgtCopy.getName() + i);

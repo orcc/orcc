@@ -43,6 +43,7 @@ import net.sf.dftools.util.WrapperXml;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -333,8 +334,8 @@ public class XdfWriter {
 			attributeElt.setAttribute("name", attribute.getName());
 
 			String kind;
-			EObject value = attribute.getValue();
-			if (value instanceof WrapperString) {
+			EObject value = attribute.getReferencedValue();
+			if (attribute.getPojoValue() instanceof String) {
 				kind = XdfConstants.STRING;
 				String str = ((WrapperString) value).getString();
 				attributeElt.setAttribute("value", str);
@@ -413,9 +414,9 @@ public class XdfWriter {
 
 		if (port == null) {
 			vertexAttr = "";
-			portAttr = vertex.getName();
+			portAttr = ((Port) vertex).getName();
 		} else {
-			vertexAttr = vertex.getName();
+			vertexAttr = ((DfVertex) vertex).getName();
 			portAttr = port.getName();
 		}
 

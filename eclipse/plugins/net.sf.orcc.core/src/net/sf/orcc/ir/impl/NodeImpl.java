@@ -21,14 +21,13 @@ import org.eclipse.emf.ecore.EClass;
  * <em><b>CFG Node</b></em>'. <!-- end-user-doc -->
  * <p>
  * </p>
- * 
+ *
  * @generated
  */
 public abstract class NodeImpl extends VertexImpl implements Node {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	protected NodeImpl() {
@@ -42,7 +41,7 @@ public abstract class NodeImpl extends VertexImpl implements Node {
 			if (attr == null) {
 				return edge;
 			}
-			Object value = attr.getRuntimeValue();
+			Object value = attr.getPojoValue();
 			if (value == null) {
 				return edge;
 			}
@@ -58,7 +57,7 @@ public abstract class NodeImpl extends VertexImpl implements Node {
 		for (Edge edge : getOutgoing()) {
 			Attribute attr = edge.getAttribute("flag");
 			if (attr != null) {
-				Object value = attr.getRuntimeValue();
+				Object value = attr.getPojoValue();
 				if (value instanceof Boolean && (Boolean) value) {
 					return edge;
 				}
@@ -69,7 +68,6 @@ public abstract class NodeImpl extends VertexImpl implements Node {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override

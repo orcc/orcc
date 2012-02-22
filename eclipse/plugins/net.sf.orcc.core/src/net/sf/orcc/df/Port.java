@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.df;
 
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.ir.Type;
 
 /**
@@ -36,7 +37,15 @@ import net.sf.orcc.ir.Type;
  * @author Matthieu Wipliez
  * @model extends="Vertex"
  */
-public interface Port extends DfVertex {
+public interface Port extends Vertex {
+
+	/**
+	 * Returns the name of this port.
+	 * 
+	 * @return the name of this port
+	 * @model
+	 */
+	String getName();
 
 	/**
 	 * Returns the number of tokens consumed by this port.
@@ -101,6 +110,14 @@ public interface Port extends DfVertex {
 	 * Resets the number of tokens produced by this port.
 	 */
 	void resetTokenProduction();
+
+	/**
+	 * Sets the new name of this port.
+	 * 
+	 * @param name
+	 *            the new name of this port
+	 */
+	void setName(String name);
 
 	/**
 	 * Sets this port as native if <code>newNative</code> is <code>true</code>.

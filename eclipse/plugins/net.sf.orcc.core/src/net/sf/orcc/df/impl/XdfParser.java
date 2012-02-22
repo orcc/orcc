@@ -36,13 +36,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.dftools.graph.Vertex;
 import net.sf.dftools.util.Attribute;
 import net.sf.dftools.util.UtilFactory;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -543,8 +543,8 @@ public class XdfParser {
 	 *            the name of a port
 	 * @return a port, or <code>null</code> if no port should be returned
 	 */
-	private Port getPort(DfVertex vertex, String dir, String portName) {
-		if (vertex.isPort()) {
+	private Port getPort(Vertex vertex, String dir, String portName) {
+		if (vertex instanceof Port) {
 			return null;
 		} else {
 			URI uri = EcoreUtil.getURI(((Instance) vertex).getEntity());
@@ -568,7 +568,7 @@ public class XdfParser {
 	 *            the kind of port
 	 * @return a vertex that contains a port or an instance
 	 */
-	private DfVertex getVertex(String vertexName, String portName, String kind) {
+	private Vertex getVertex(String vertexName, String portName, String kind) {
 		if (vertexName.isEmpty()) {
 			Port port;
 			if ("Input".equals(kind)) {
@@ -692,9 +692,9 @@ public class XdfParser {
 		String dst = connection.getAttribute("dst");
 		String dst_port = connection.getAttribute("dst-port");
 
-		DfVertex source = getVertex(src, src_port, "Input");
+		Vertex source = getVertex(src, src_port, "Input");
 		Port srcPort = getPort(source, "outputs", src_port);
-		DfVertex target = getVertex(dst, dst_port, "Output");
+		Vertex target = getVertex(dst, dst_port, "Output");
 		Port dstPort = getPort(target, "inputs", dst_port);
 
 		Node child = connection.getFirstChild();

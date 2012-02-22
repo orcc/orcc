@@ -26,6 +26,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Port/numTokensProduced"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Port/type"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Port/native"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Port/name"/>
     </genClasses>
     <genClasses ecoreClass="Df.ecore#//Instance">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Instance/arguments"/>
@@ -80,7 +81,9 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Pattern/variables"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Pattern/varToPortMap"/>
     </genClasses>
-    <genClasses ecoreClass="Df.ecore#//State"/>
+    <genClasses ecoreClass="Df.ecore#//State">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//State/name"/>
+    </genClasses>
     <genClasses ecoreClass="Df.ecore#//Tag">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Tag/identifiers"/>
     </genClasses>

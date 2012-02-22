@@ -3,9 +3,9 @@ package net.sf.orcc.tools.merger;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -39,17 +39,17 @@ public class UniqueInstantiator extends DfSwitch<Void> {
 	}
 
 	private void updateConnection(Connection connection) {
-		DfVertex srcVertex = connection.getSource();
-		DfVertex tgtVertex = connection.getTarget();
+		Vertex srcVertex = connection.getSource();
+		Vertex tgtVertex = connection.getTarget();
 
-		if (srcVertex.isInstance()) {
+		if (srcVertex instanceof Instance) {
 			Instance source = (Instance) srcVertex;
 			String srcPortName = connection.getSourcePort().getName();
 			Port srcPort = source.getActor().getOutput(srcPortName);
 			connection.setSourcePort(srcPort);
 		}
 
-		if (tgtVertex.isInstance()) {
+		if (tgtVertex instanceof Instance) {
 			Instance target = (Instance) tgtVertex;
 			String dstPortName = connection.getTargetPort().getName();
 			Port dstPort = target.getActor().getInput(dstPortName);

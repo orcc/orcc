@@ -6,6 +6,7 @@
  */
 package net.sf.orcc.df.impl;
 
+import net.sf.dftools.graph.impl.VertexImpl;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.Type;
@@ -17,9 +18,8 @@ import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Port</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object '
+ * <em><b>Port</b></em>'. <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
@@ -27,16 +27,17 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  *   <li>{@link net.sf.orcc.df.impl.PortImpl#getNumTokensProduced <em>Num Tokens Produced</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.PortImpl#getType <em>Type</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.PortImpl#isNative <em>Native</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.PortImpl#getName <em>Name</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public class PortImpl extends DfVertexImpl implements Port {
+public class PortImpl extends VertexImpl implements Port {
 	/**
 	 * The default value of the '{@link #getNumTokensConsumed() <em>Num Tokens Consumed</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @see #getNumTokensConsumed()
 	 * @generated
 	 * @ordered
@@ -45,8 +46,8 @@ public class PortImpl extends DfVertexImpl implements Port {
 
 	/**
 	 * The cached value of the '{@link #getNumTokensConsumed() <em>Num Tokens Consumed</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @see #getNumTokensConsumed()
 	 * @generated
 	 * @ordered
@@ -55,8 +56,8 @@ public class PortImpl extends DfVertexImpl implements Port {
 
 	/**
 	 * The default value of the '{@link #getNumTokensProduced() <em>Num Tokens Produced</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @see #getNumTokensProduced()
 	 * @generated
 	 * @ordered
@@ -65,8 +66,8 @@ public class PortImpl extends DfVertexImpl implements Port {
 
 	/**
 	 * The cached value of the '{@link #getNumTokensProduced() <em>Num Tokens Produced</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @see #getNumTokensProduced()
 	 * @generated
 	 * @ordered
@@ -75,8 +76,7 @@ public class PortImpl extends DfVertexImpl implements Port {
 
 	/**
 	 * The cached value of the '{@link #getType() <em>Type</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getType()
 	 * @generated
 	 * @ordered
@@ -85,8 +85,7 @@ public class PortImpl extends DfVertexImpl implements Port {
 
 	/**
 	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #isNative()
 	 * @generated
 	 * @ordered
@@ -95,8 +94,7 @@ public class PortImpl extends DfVertexImpl implements Port {
 
 	/**
 	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #isNative()
 	 * @generated
 	 * @ordered
@@ -104,8 +102,25 @@ public class PortImpl extends DfVertexImpl implements Port {
 	protected boolean native_ = NATIVE_EDEFAULT;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected String name = NAME_EDEFAULT;
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected PortImpl() {
@@ -113,8 +128,7 @@ public class PortImpl extends DfVertexImpl implements Port {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public NotificationChain basicSetType(Type newType, NotificationChain msgs) {
@@ -132,8 +146,7 @@ public class PortImpl extends DfVertexImpl implements Port {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -147,13 +160,14 @@ public class PortImpl extends DfVertexImpl implements Port {
 			return getType();
 		case DfPackage.PORT__NATIVE:
 			return isNative();
+		case DfPackage.PORT__NAME:
+			return getName();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -167,8 +181,7 @@ public class PortImpl extends DfVertexImpl implements Port {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -182,13 +195,15 @@ public class PortImpl extends DfVertexImpl implements Port {
 			return type != null;
 		case DfPackage.PORT__NATIVE:
 			return native_ != NATIVE_EDEFAULT;
+		case DfPackage.PORT__NAME:
+			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
+					.equals(name);
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -206,13 +221,15 @@ public class PortImpl extends DfVertexImpl implements Port {
 		case DfPackage.PORT__NATIVE:
 			setNative((Boolean) newValue);
 			return;
+		case DfPackage.PORT__NAME:
+			setName((String) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -221,8 +238,7 @@ public class PortImpl extends DfVertexImpl implements Port {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -240,13 +256,15 @@ public class PortImpl extends DfVertexImpl implements Port {
 		case DfPackage.PORT__NATIVE:
 			setNative(NATIVE_EDEFAULT);
 			return;
+		case DfPackage.PORT__NAME:
+			setName(NAME_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public int getNumTokensConsumed() {
@@ -254,8 +272,7 @@ public class PortImpl extends DfVertexImpl implements Port {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public int getNumTokensProduced() {
@@ -263,8 +280,7 @@ public class PortImpl extends DfVertexImpl implements Port {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public Type getType() {
@@ -290,15 +306,18 @@ public class PortImpl extends DfVertexImpl implements Port {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public boolean isNative() {
 		return native_;
 	}
 
-	@Override
+	/**
+	 * Returns true. Only used in templates.
+	 * 
+	 * @return
+	 */
 	public boolean isPort() {
 		return true;
 	}
@@ -314,8 +333,7 @@ public class PortImpl extends DfVertexImpl implements Port {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setNative(boolean newNative) {
@@ -327,8 +345,27 @@ public class PortImpl extends DfVertexImpl implements Port {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setName(String newName) {
+		String oldName = name;
+		name = newName;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.PORT__NAME, oldName, name));
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setNumTokensConsumed(int newNumTokensConsumed) {
@@ -341,8 +378,7 @@ public class PortImpl extends DfVertexImpl implements Port {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setNumTokensProduced(int newNumTokensProduced) {
@@ -355,8 +391,7 @@ public class PortImpl extends DfVertexImpl implements Port {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setType(Type newType) {
@@ -379,8 +414,7 @@ public class PortImpl extends DfVertexImpl implements Port {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -395,8 +429,10 @@ public class PortImpl extends DfVertexImpl implements Port {
 		result.append(numTokensProduced);
 		result.append(", native: ");
 		result.append(native_);
+		result.append(", name: ");
+		result.append(name);
 		result.append(')');
 		return result.toString();
 	}
 
-} //PortImpl
+} // PortImpl

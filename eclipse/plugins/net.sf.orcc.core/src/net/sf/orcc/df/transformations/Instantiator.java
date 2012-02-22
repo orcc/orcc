@@ -31,6 +31,7 @@ package net.sf.orcc.df.transformations;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
@@ -138,8 +139,8 @@ public class Instantiator extends DfSwitch<Network> {
 
 		// copy connections
 		for (Connection connection : network.getConnections()) {
-			DfVertex source = getCopy(connection.getSource());
-			DfVertex target = getCopy(connection.getTarget());
+			Vertex source = getCopy(connection.getSource());
+			Vertex target = getCopy(connection.getTarget());
 
 			Port sourcePort = getPort(source, connection.getSourcePort());
 			Port targetPort = getPort(target, connection.getTargetPort());
@@ -153,9 +154,9 @@ public class Instantiator extends DfSwitch<Network> {
 		return networkCopy;
 	}
 
-	private DfVertex getCopy(DfVertex vertex) {
+	private Vertex getCopy(Vertex vertex) {
 		// assume vertex is port or instance of actor
-		DfVertex result = (DfVertex) copier.get(vertex);
+		Vertex result = (Vertex) copier.get(vertex);
 		if (result == null) {
 			// if not, get mapping from instance to entity
 			result = map.get((Instance) vertex);
@@ -163,8 +164,8 @@ public class Instantiator extends DfSwitch<Network> {
 		return result;
 	}
 
-	private Port getPort(DfVertex vertex, Port port) {
-		if (vertex.isEntity()) {
+	private Port getPort(Vertex vertex, Port port) {
+		if (vertex instanceof Entity) {
 			Entity entity = (Entity) vertex;
 			return entity.getPort(port.getName());
 		} else {

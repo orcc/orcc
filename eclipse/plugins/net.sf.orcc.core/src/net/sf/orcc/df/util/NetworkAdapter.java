@@ -33,8 +33,8 @@ import static net.sf.orcc.df.DfPackage.eINSTANCE;
 import java.util.List;
 
 import net.sf.dftools.graph.Graph;
+import net.sf.dftools.graph.Vertex;
 import net.sf.dftools.graph.util.GraphAdapter;
-import net.sf.orcc.df.DfVertex;
 
 import org.eclipse.emf.common.notify.Notification;
 
@@ -59,25 +59,25 @@ public class NetworkAdapter extends GraphAdapter {
 				|| feature == eINSTANCE.getNetwork_Instances()) {
 			switch (msg.getEventType()) {
 			case Notification.ADD: {
-				DfVertex vertex = (DfVertex) msg.getNewValue();
+				Vertex vertex = (Vertex) msg.getNewValue();
 				((Graph) target).getVertices().add(vertex);
 				return;
 			}
 
 			case Notification.ADD_MANY: {
-				List<DfVertex> vertices = (List<DfVertex>) msg.getNewValue();
+				List<Vertex> vertices = (List<Vertex>) msg.getNewValue();
 				((Graph) target).getVertices().addAll(vertices);
 				return;
 			}
 
 			case Notification.REMOVE_MANY: {
-				List<DfVertex> vertices = (List<DfVertex>) msg.getOldValue();
+				List<Vertex> vertices = (List<Vertex>) msg.getOldValue();
 				((Graph) target).getVertices().removeAll(vertices);
 				return;
 			}
 
 			case Notification.REMOVE: {
-				DfVertex vertex = (DfVertex) msg.getOldValue();
+				Vertex vertex = (Vertex) msg.getOldValue();
 				((Graph) target).getVertices().remove(vertex);
 				return;
 			}

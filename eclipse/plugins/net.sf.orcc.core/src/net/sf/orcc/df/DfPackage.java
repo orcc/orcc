@@ -68,15 +68,6 @@ public interface DfPackage extends EPackage {
 	int DF_VERTEX = 0;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int DF_VERTEX__NAME = GraphPackage.VERTEX__NAME;
-
-	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -103,13 +94,22 @@ public interface DfPackage extends EPackage {
 	int DF_VERTEX__OUTGOING = GraphPackage.VERTEX__OUTGOING;
 
 	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int DF_VERTEX__NAME = GraphPackage.VERTEX_FEATURE_COUNT + 0;
+
+	/**
 	 * The number of structural features of the '<em>Vertex</em>' class. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int DF_VERTEX_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 0;
+	int DF_VERTEX_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 1;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.EntityImpl <em>Entity</em>}' class.
@@ -333,21 +333,12 @@ public interface DfPackage extends EPackage {
 	int UNIT_FEATURE_COUNT = UtilPackage.NAMEABLE_FEATURE_COUNT + 4;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int PORT__NAME = DF_VERTEX__NAME;
-
-	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__ATTRIBUTES = DF_VERTEX__ATTRIBUTES;
+	int PORT__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Incoming</b></em>' reference list. <!--
@@ -356,7 +347,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__INCOMING = DF_VERTEX__INCOMING;
+	int PORT__INCOMING = GraphPackage.VERTEX__INCOMING;
 
 	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
@@ -365,7 +356,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__OUTGOING = DF_VERTEX__OUTGOING;
+	int PORT__OUTGOING = GraphPackage.VERTEX__OUTGOING;
 
 	/**
 	 * The feature id for the '<em><b>Num Tokens Consumed</b></em>' attribute.
@@ -373,7 +364,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__NUM_TOKENS_CONSUMED = DF_VERTEX_FEATURE_COUNT + 0;
+	int PORT__NUM_TOKENS_CONSUMED = GraphPackage.VERTEX_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Num Tokens Produced</b></em>' attribute.
@@ -381,7 +372,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__NUM_TOKENS_PRODUCED = DF_VERTEX_FEATURE_COUNT + 1;
+	int PORT__NUM_TOKENS_PRODUCED = GraphPackage.VERTEX_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Type</b></em>' containment reference. <!--
@@ -390,7 +381,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__TYPE = DF_VERTEX_FEATURE_COUNT + 2;
+	int PORT__TYPE = GraphPackage.VERTEX_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Native</b></em>' attribute. <!--
@@ -399,16 +390,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__NATIVE = DF_VERTEX_FEATURE_COUNT + 3;
-
-	/**
-	 * The number of structural features of the '<em>Port</em>' class. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int PORT_FEATURE_COUNT = DF_VERTEX_FEATURE_COUNT + 4;
+	int PORT__NATIVE = GraphPackage.VERTEX_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -417,7 +399,16 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INSTANCE__NAME = DF_VERTEX__NAME;
+	int PORT__NAME = GraphPackage.VERTEX_FEATURE_COUNT + 4;
+
+	/**
+	 * The number of structural features of the '<em>Port</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int PORT_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 5;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -446,6 +437,15 @@ public interface DfPackage extends EPackage {
 	int INSTANCE__OUTGOING = DF_VERTEX__OUTGOING;
 
 	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int INSTANCE__NAME = DF_VERTEX__NAME;
+
+	/**
 	 * The feature id for the '<em><b>Arguments</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -472,15 +472,6 @@ public interface DfPackage extends EPackage {
 	int INSTANCE_FEATURE_COUNT = DF_VERTEX_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int ENTITY__NAME = DF_VERTEX__NAME;
-
-	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -505,6 +496,15 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int ENTITY__OUTGOING = DF_VERTEX__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int ENTITY__NAME = DF_VERTEX__NAME;
 
 	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
@@ -549,15 +549,6 @@ public interface DfPackage extends EPackage {
 	int ENTITY_SPECIFIC = 5;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int ENTITY_SPECIFIC__NAME = ENTITY__NAME;
-
-	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -582,6 +573,15 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int ENTITY_SPECIFIC__OUTGOING = ENTITY__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int ENTITY_SPECIFIC__NAME = ENTITY__NAME;
 
 	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
@@ -616,15 +616,6 @@ public interface DfPackage extends EPackage {
 	int ENTITY_SPECIFIC_FEATURE_COUNT = ENTITY_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__NAME = ENTITY__NAME;
-
-	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -649,6 +640,15 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int ACTOR__OUTGOING = ENTITY__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__NAME = ENTITY__NAME;
 
 	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
@@ -769,15 +769,6 @@ public interface DfPackage extends EPackage {
 	int ACTOR_FEATURE_COUNT = ENTITY_FEATURE_COUNT + 10;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int NETWORK__NAME = ENTITY__NAME;
-
-	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -802,6 +793,15 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int NETWORK__OUTGOING = ENTITY__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int NETWORK__NAME = ENTITY__NAME;
 
 	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
@@ -897,15 +897,6 @@ public interface DfPackage extends EPackage {
 	int NETWORK_FEATURE_COUNT = ENTITY_FEATURE_COUNT + 7;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int BROADCAST__NAME = ENTITY__NAME;
-
-	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -930,6 +921,15 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int BROADCAST__OUTGOING = ENTITY__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int BROADCAST__NAME = ENTITY__NAME;
 
 	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
@@ -1182,15 +1182,6 @@ public interface DfPackage extends EPackage {
 	int PATTERN_FEATURE_COUNT = 5;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int STATE__NAME = GraphPackage.VERTEX__NAME;
-
-	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -1217,13 +1208,22 @@ public interface DfPackage extends EPackage {
 	int STATE__OUTGOING = GraphPackage.VERTEX__OUTGOING;
 
 	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int STATE__NAME = GraphPackage.VERTEX_FEATURE_COUNT + 0;
+
+	/**
 	 * The number of structural features of the '<em>State</em>' class. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int STATE_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 0;
+	int STATE_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Identifiers</b></em>' attribute list. <!--
@@ -1919,6 +1919,17 @@ public interface DfPackage extends EPackage {
 	EAttribute getPort_Native();
 
 	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.Port#getName <em>Name</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Name</em>'.
+	 * @see net.sf.orcc.df.Port#getName()
+	 * @see #getPort()
+	 * @generated
+	 */
+	EAttribute getPort_Name();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.State <em>State</em>}'.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>State</em>'.
@@ -1926,6 +1937,17 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getState();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.State#getName <em>Name</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Name</em>'.
+	 * @see net.sf.orcc.df.State#getName()
+	 * @see #getState()
+	 * @generated
+	 */
+	EAttribute getState_Name();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Tag <em>Tag</em>}'.
@@ -2608,6 +2630,14 @@ public interface DfPackage extends EPackage {
 		EAttribute PORT__NATIVE = eINSTANCE.getPort_Native();
 
 		/**
+		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute PORT__NAME = eINSTANCE.getPort_Name();
+
+		/**
 		 * The meta object literal for the '
 		 * {@link net.sf.orcc.df.impl.StateImpl <em>State</em>}' class. <!--
 		 * begin-user-doc --> <!-- end-user-doc -->
@@ -2617,6 +2647,14 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EClass STATE = eINSTANCE.getState();
+
+		/**
+		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute STATE__NAME = eINSTANCE.getState_Name();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.TagImpl <em>Tag</em>}' class.

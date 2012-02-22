@@ -13,7 +13,6 @@ import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
@@ -223,9 +222,9 @@ public class MergerHsdf extends DfSwitch<Actor> {
 
 		// Create buffers for connections inside the sub-graph
 		for (Connection connection : network.getConnections()) {
-			DfVertex src = connection.getSource();
-			DfVertex tgt = connection.getTarget();
-			if (src.isInstance() && tgt.isInstance()) {
+			Vertex src = connection.getSource();
+			Vertex tgt = connection.getTarget();
+			if (src instanceof Instance && tgt instanceof Instance) {
 				String name = "buffer_" + index++;
 				Port srcPort = connection.getSourcePort();
 				Port tgtPort = connection.getTargetPort();

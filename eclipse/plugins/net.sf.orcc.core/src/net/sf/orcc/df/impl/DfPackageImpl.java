@@ -623,11 +623,29 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getPort_Name() {
+		return (EAttribute) portEClass.getEStructuralFeatures().get(4);
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EClass getState() {
 		return stateEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getState_Name() {
+		return (EAttribute) stateEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -884,6 +902,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEAttribute(portEClass, PORT__NUM_TOKENS_PRODUCED);
 		createEReference(portEClass, PORT__TYPE);
 		createEAttribute(portEClass, PORT__NATIVE);
+		createEAttribute(portEClass, PORT__NAME);
 
 		instanceEClass = createEClass(INSTANCE);
 		createEReference(instanceEClass, INSTANCE__ARGUMENTS);
@@ -941,6 +960,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEReference(patternEClass, PATTERN__VAR_TO_PORT_MAP);
 
 		stateEClass = createEClass(STATE);
+		createEAttribute(stateEClass, STATE__NAME);
 
 		tagEClass = createEClass(TAG);
 		createEAttribute(tagEClass, TAG__IDENTIFIERS);
@@ -1008,8 +1028,9 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 
 		// Add supertypes to classes
 		dfVertexEClass.getESuperTypes().add(theGraphPackage.getVertex());
+		dfVertexEClass.getESuperTypes().add(theUtilPackage.getNameable());
 		unitEClass.getESuperTypes().add(theUtilPackage.getNameable());
-		portEClass.getESuperTypes().add(this.getDfVertex());
+		portEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		instanceEClass.getESuperTypes().add(this.getDfVertex());
 		entityEClass.getESuperTypes().add(this.getDfVertex());
 		entitySpecificEClass.getESuperTypes().add(this.getEntity());
@@ -1063,6 +1084,9 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
+		initEAttribute(getPort_Name(), ecorePackage.getEString(), "name", null,
+				0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(instanceEClass, Instance.class, "Instance", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -1241,6 +1265,10 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 
 		initEClass(stateEClass, State.class, "State", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getState_Name(), ecorePackage.getEString(), "name",
+				null, 0, 1, State.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
 
 		initEClass(tagEClass, Tag.class, "Tag", !IS_ABSTRACT, !IS_INTERFACE,
 				IS_GENERATED_INSTANCE_CLASS);

@@ -36,7 +36,6 @@ import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.moc.CSDFMoC;
@@ -54,7 +53,7 @@ public class RepetitionsAnalyzer {
 
 	private Network network;
 
-	private Map<DfVertex, Rational> rationals = new HashMap<DfVertex, Rational>();
+	private Map<Vertex, Rational> rationals = new HashMap<Vertex, Rational>();
 
 	private Map<Vertex, Integer> repetitions = new HashMap<Vertex, Integer>();
 
@@ -77,7 +76,7 @@ public class RepetitionsAnalyzer {
 			lcm = Rational.lcm(lcm, rat.getDenominator());
 		}
 
-		for (DfVertex vertex : rationals.keySet()) {
+		for (Vertex vertex : rationals.keySet()) {
 			Rational rat = rationals.get(vertex);
 			repetitions.put(vertex,
 					rat.getNumerator() * lcm / rat.getDenominator());
@@ -93,7 +92,7 @@ public class RepetitionsAnalyzer {
 	 * @param rate
 	 * 
 	 */
-	private void calculateRate(DfVertex vertex, Rational rate) {
+	private void calculateRate(Vertex vertex, Rational rate) {
 		Instance instance = (Instance) vertex;
 		if (!instance.getMoC().isCSDF()) {
 			throw new OrccRuntimeException("actor" + instance.getEntity()
@@ -106,8 +105,8 @@ public class RepetitionsAnalyzer {
 
 		for (Edge edge : vertex.getOutgoing()) {
 			Connection conn = (Connection) edge;
-			DfVertex tgt = conn.getTarget();
-			if (tgt.isInstance()) {
+			Vertex tgt = conn.getTarget();
+			if (tgt instanceof Instance) {
 				CSDFMoC tgtMoC = (CSDFMoC) ((Instance) tgt).getMoC();
 				if (!rationals.containsKey(tgt)) {
 					int prd = moc.getNumTokensProduced(conn.getSourcePort());
@@ -119,8 +118,8 @@ public class RepetitionsAnalyzer {
 
 		for (Edge edge : vertex.getIncoming()) {
 			Connection conn = (Connection) edge;
-			DfVertex src = conn.getSource();
-			if (src.isInstance()) {
+			Vertex src = conn.getSource();
+			if (src instanceof Instance) {
 				CSDFMoC srcMoC = (CSDFMoC) ((Instance) src).getMoC();
 				if (!rationals.containsKey(src)) {
 					int prd = srcMoC.getNumTokensProduced(conn.getSourcePort());
@@ -137,8 +136,8 @@ public class RepetitionsAnalyzer {
 	 */
 	private void checkConsistency() {
 		for (Connection connection : network.getConnections()) {
-			if (connection.getSource().isInstance()
-					&& connection.getTarget().isInstance()) {
+			if (connection.getSource() instanceof Instance
+					&& connection.getTarget() instanceof Instance) {
 				int srcRate = repetitions.get(connection.getSource());
 				int tgtRate = repetitions.get(connection.getTarget());
 

@@ -11,6 +11,7 @@ import java.util.Map;
 import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.Graph;
 import net.sf.dftools.graph.Vertex;
+import net.sf.dftools.util.Attributable;
 import net.sf.dftools.util.Nameable;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
@@ -194,13 +195,18 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 		}
 
 		@Override
-		public Adapter caseNameable(Nameable object) {
-			return createNameableAdapter();
+		public Adapter caseAttributable(Attributable object) {
+			return createAttributableAdapter();
 		}
 
 		@Override
 		public Adapter caseVertex(Vertex object) {
 			return createVertexAdapter();
+		}
+
+		@Override
+		public Adapter caseNameable(Nameable object) {
+			return createNameableAdapter();
 		}
 
 		@Override
@@ -494,6 +500,20 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createArgumentAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.dftools.util.Attributable <em>Attributable</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.dftools.util.Attributable
+	 * @generated
+	 */
+	public Adapter createAttributableAdapter() {
 		return null;
 	}
 

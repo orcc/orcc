@@ -37,4 +37,21 @@ import net.sf.dftools.graph.Vertex;
  * @model
  */
 public interface State extends Vertex {
+
+	/**
+	 * Returns the name of this state.
+	 * 
+	 * @return the name of this state
+	 * @model
+	 */
+	String getName();
+
+	/**
+	 * Sets the new name of this state.
+	 * 
+	 * @param name
+	 *            the new name of this state
+	 */
+	void setName(String name);
+
 }

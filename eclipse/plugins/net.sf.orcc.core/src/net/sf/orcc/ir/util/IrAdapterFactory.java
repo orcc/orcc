@@ -9,7 +9,7 @@ package net.sf.orcc.ir.util;
 import java.util.Map;
 
 import net.sf.dftools.graph.Vertex;
-import net.sf.dftools.util.Nameable;
+import net.sf.dftools.util.Attributable;
 import net.sf.orcc.ir.Annotation;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
@@ -288,8 +288,8 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 		}
 
 		@Override
-		public Adapter caseNameable(Nameable object) {
-			return createNameableAdapter();
+		public Adapter caseAttributable(Attributable object) {
+			return createAttributableAdapter();
 		}
 
 		@Override
@@ -537,16 +537,16 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.dftools.util.Nameable <em>Nameable</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.dftools.util.Attributable <em>Attributable</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.dftools.util.Nameable
+	 * @see net.sf.dftools.util.Attributable
 	 * @generated
 	 */
-	public Adapter createNameableAdapter() {
+	public Adapter createAttributableAdapter() {
 		return null;
 	}
 

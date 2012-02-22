@@ -9,6 +9,7 @@ package net.sf.orcc.df.impl;
 import net.sf.dftools.graph.impl.EdgeImpl;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.State;
 import net.sf.orcc.df.Transition;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -32,8 +33,7 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 
 	/**
 	 * The cached value of the '{@link #getAction() <em>Action</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getAction()
 	 * @generated
 	 * @ordered
@@ -100,8 +100,7 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public Action getAction() {
@@ -118,8 +117,7 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public Action basicGetAction() {
@@ -127,8 +125,7 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setAction(Action newAction) {
@@ -157,7 +154,7 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		if (getSource() != null) {
-			builder.append(getSource().getName());
+			builder.append(((State) getSource()).getName());
 		}
 		builder.append(" (");
 		if (getAction() != null) {
@@ -165,7 +162,7 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 		}
 		builder.append(") --> ");
 		if (getSource() != null) {
-			builder.append(getTarget().getName());
+			builder.append(((State) getTarget()).getName());
 		}
 		return builder.toString();
 	}

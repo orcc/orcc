@@ -74,7 +74,7 @@ public abstract class AbstractScheduler implements IScheduler {
 				DfVertex vertex = iterand.getVertex();
 				for (Edge edge : vertex.getIncoming()) {
 					Connection conn = (Connection) edge;
-					if (conn.getSource().isInstance()) {
+					if (conn.getSource() instanceof Instance) {
 						Connection connection = (Connection) edge;
 						int cns = connection.getTargetPort()
 								.getNumTokensConsumed();
@@ -84,7 +84,7 @@ public abstract class AbstractScheduler implements IScheduler {
 
 				for (Edge edge : vertex.getOutgoing()) {
 					Connection conn = (Connection) edge;
-					if (conn.getTarget().isInstance()) {
+					if (conn.getTarget() instanceof Instance) {
 						Connection connection = (Connection) edge;
 						int current = tokens.get(connection);
 						int max = maxTokens.get(connection);
@@ -126,8 +126,8 @@ public abstract class AbstractScheduler implements IScheduler {
 			tokens = new HashMap<Connection, Integer>();
 
 			for (Connection connection : network.getConnections()) {
-				if (connection.getSource().isInstance()
-						&& connection.getTarget().isInstance())
+				if (connection.getSource() instanceof Instance
+						&& connection.getTarget() instanceof Instance)
 					maxTokens.put(connection, 0);
 				tokens.put(connection, 0);
 			}

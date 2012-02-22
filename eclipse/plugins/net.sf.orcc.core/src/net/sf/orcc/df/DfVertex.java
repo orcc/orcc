@@ -10,18 +10,18 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.dftools.graph.Vertex;
+import net.sf.dftools.util.Nameable;
 
 /**
- * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>Vertex</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> A representation of the model object '
+ * <em><b>Vertex</b></em>'. <!-- end-user-doc -->
  *
  *
  * @see net.sf.orcc.df.DfPackage#getDfVertex()
  * @model abstract="true"
  * @generated
  */
-public interface DfVertex extends Vertex {
+public interface DfVertex extends Vertex, Nameable {
 
 	List<String> getHierarchicalId();
 
@@ -39,7 +39,6 @@ public interface DfVertex extends Vertex {
 
 	boolean isInstance();
 
-	boolean isPort();
-
 	void setTemplateData(Object templateData);
-} // DfVertex
+
+}
