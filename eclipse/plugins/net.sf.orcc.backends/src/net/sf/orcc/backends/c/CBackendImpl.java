@@ -279,14 +279,22 @@ public class CBackendImpl extends AbstractBackend {
 	 */
 	@Override
 	public boolean exportRuntimeLibrary() throws OrccException {
+		if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
+			File targetPath = new File(path).getParentFile();
+			copyFileToFilesystem("/runtime/run_cmake_with_VS_env.bat",
+					targetPath
+					+ File.separator + "run_cmake_with_VS_env.bat");
+		}
+
 		String target = path + File.separator + "libs";
 		write("Export libraries sources into " + target + "... ");
 		if (copyFolderToFileSystem("/runtime/C", target)) {
 			write("OK" + "\n");
+			return true;
 		} else {
 			write("Error" + "\n");
+			return false;
 		}
-		return true;
 	}
 
 	protected void printCMake(Network network) {
