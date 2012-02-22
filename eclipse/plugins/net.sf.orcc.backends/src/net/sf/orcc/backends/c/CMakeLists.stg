@@ -26,7 +26,7 @@ set(ROXML_INCLUDE_DIR ${LIBS_DIR}/roxml/include)
 # Helps to find where SDL libraries are saved (win32 only)
 if(WIN32)
 	set(ENV{CMAKE_PREFIX_PATH} ${LIBS_DIR}/windows/SDL-*\;${LIBS_DIR}/windows/SDL_image-*)
-endif(WIN32)
+endif()
 
 find_package(Threads REQUIRED)
 
@@ -44,5 +44,4 @@ set(filenames
 add_executable(<network.simpleName> ${filenames})
 
 target_link_libraries(<network.simpleName> orcc roxml ${SDL_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
-
 >>
