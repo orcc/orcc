@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2009-2011, IETR/INSA of Rennes
+ * Copyright (c) 2012, Synflow
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -334,23 +335,23 @@ public class XdfWriter {
 			String kind;
 			EObject value = attribute.getValue();
 			if (value instanceof WrapperString) {
-				kind = Attribute.STRING;
+				kind = XdfConstants.STRING;
 				String str = ((WrapperString) value).getString();
 				attributeElt.setAttribute("value", str);
 			} else if (value instanceof WrapperXml) {
 				// TODO custom
-				kind = Attribute.CUSTOM;
+				kind = XdfConstants.CUSTOM;
 			} else if (value instanceof Type) {
-				kind = Attribute.TYPE;
+				kind = XdfConstants.TYPE;
 				Type type = (Type) value;
 				attributeElt.appendChild(writeType(type));
 			} else if (value instanceof Expression) {
-				kind = Attribute.VALUE;
+				kind = XdfConstants.VALUE;
 				Expression expr = (Expression) value;
 				writeExpr(attributeElt, expr);
 			} else {
 				// default is flag
-				kind = Attribute.FLAG;
+				kind = XdfConstants.FLAG;
 			}
 
 			attributeElt.setAttribute("kind", kind);

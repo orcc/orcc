@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2011, IETR/INSA of Rennes
+ * Copyright (c) 2012, Synflow
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -44,7 +45,7 @@ import org.eclipse.emf.ecore.resource.impl.ResourceImpl;
  * This class defines a resource implementation for the Df model which is used
  * to serialize to/deserialize from XDF.
  * 
- * @author mwipliez
+ * @author Matthie Wipliez
  * 
  */
 public class XdfResourceImpl extends ResourceImpl {
@@ -54,6 +55,29 @@ public class XdfResourceImpl extends ResourceImpl {
 
 	public XdfResourceImpl(URI uri) {
 		super(uri);
+	}
+
+	@Override
+	protected void doLoad(InputStream inputStream, Map<?, ?> options)
+			throws IOException {
+		try {
+			Network network = new XdfParser(this).parseNetwork(inputStream);
+			getContents().add(network);
+		} catch (OrccRuntimeException e) {
+			e.printStackTrace();
+			throw new IOException(e);
+		}
+	}
+
+	@Override
+	protected void doSave(OutputStream outputStream, Map<?, ?> options)
+			throws IOException {
+		try {
+			Network network = (Network) getContents().get(0);
+			new XdfWriter().write(network, outputStream);
+		} catch (OrccRuntimeException e) {
+			throw new IOException(e);
+		}
 	}
 
 	@Override
@@ -79,29 +103,6 @@ public class XdfResourceImpl extends ResourceImpl {
 			return result;
 		}
 		return super.getEObject(uriFragment);
-	}
-
-	@Override
-	protected void doLoad(InputStream inputStream, Map<?, ?> options)
-			throws IOException {
-		try {
-			Network network = new XdfParser(this).parseNetwork(inputStream);
-			getContents().add(network);
-		} catch (OrccRuntimeException e) {
-			e.printStackTrace();
-			throw new IOException(e);
-		}
-	}
-
-	@Override
-	protected void doSave(OutputStream outputStream, Map<?, ?> options)
-			throws IOException {
-		try {
-			Network network = (Network) getContents().get(0);
-			new XdfWriter().write(network, outputStream);
-		} catch (OrccRuntimeException e) {
-			throw new IOException(e);
-		}
 	}
 
 }

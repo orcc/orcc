@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2009-2011, IETR/INSA of Rennes
+ * Copyright (c) 2012, Synflow
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -613,21 +614,21 @@ public class XdfParser {
 				UtilFactory factory = UtilFactory.eINSTANCE;
 
 				Attribute attr;
-				if (kind.equals(Attribute.CUSTOM)) {
+				if (kind.equals(XdfConstants.CUSTOM)) {
 					// TODO custom
 					attr = factory.createAttribute(attrName,
 							factory.createWrapperXml());
-				} else if (kind.equals(Attribute.FLAG)) {
+				} else if (kind.equals(XdfConstants.FLAG)) {
 					attr = factory.createAttribute(attrName, null);
-				} else if (kind.equals(Attribute.STRING)) {
+				} else if (kind.equals(XdfConstants.STRING)) {
 					String value = attribute.getAttribute("value");
 					attr = factory.createAttribute(attrName,
 							factory.createWrapperString(value));
-				} else if (kind.equals(Attribute.TYPE)) {
+				} else if (kind.equals(XdfConstants.TYPE)) {
 					Type type = typeParser.parseType(attribute.getFirstChild())
 							.getResult();
 					attr = factory.createAttribute(attrName, type);
-				} else if (kind.equals(Attribute.VALUE)) {
+				} else if (kind.equals(XdfConstants.VALUE)) {
 					Expression expr = exprParser
 							.parseExpr(node.getFirstChild());
 					attr = factory.createAttribute(attrName, expr);
