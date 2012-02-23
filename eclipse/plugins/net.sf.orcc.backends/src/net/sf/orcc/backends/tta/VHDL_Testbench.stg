@@ -52,6 +52,7 @@ architecture arch_tb_<instance.simpleName> of tb_<instance.simpleName> is
 begin
 
   <instance.simpleName>_inst : entity work.processor_<instance.simpleName>
+    generic map(device_family =\> "<options.("fpgaFamily")>")
     port map (
       clk =\> clk,
       <mapVertexSignals(instance)>
@@ -238,8 +239,8 @@ begin
         read(current_line, input_value);
         <sendData(input)>
         current_status_<input.name> := current_status_<input.name> - 1;
-        if current_status_<input.name> > 256 then
-          given_status_<input.name> := 256;
+        if current_status_<input.name> > <options.("fifoSize")> then
+          given_status_<input.name> := <options.("fifoSize")>;
         else
           given_status_<input.name> := current_status_<input.name>;
         end if;
@@ -279,7 +280,7 @@ Proc_in_<output.name> : process (rst_n, clk)
 begin
 
   if (rst_n = '0') then
-    s_<output.name>_status \<= std_logic_vector(to_unsigned(256, 32));
+    s_<output.name>_status \<= std_logic_vector(to_unsigned(<options.("fifoSize")>, 32));
     
   elsif clk'event and clk = '1' then
     if (not (endfile (trace_<output.name>)) and s_<output.name>_wrreq = '1') then

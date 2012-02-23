@@ -246,6 +246,9 @@ public class TTABackendImpl extends AbstractBackend {
 			StandardPrinter tbPrinter = new StandardPrinter(
 					"net/sf/orcc/backends/tta/VHDL_Testbench.stg", !debug,
 					false);
+			tbPrinter.getOptions().put("fifoSize", fifoSize);
+			tbPrinter.getOptions().put("targetAltera", targetAltera);
+			tbPrinter.getOptions().put("fpgaFamily", fpgaFamily);
 			StandardPrinter tclPrinter = new StandardPrinter(
 					"net/sf/orcc/backends/tta/ModelSim_Script.stg");
 			StandardPrinter wavePrinter = new StandardPrinter(
