@@ -59,12 +59,12 @@ static unsigned int nbByteRead = 0;
 
 void printSpeed(void) {
 	double executionTime;
-	int speed;
+	double speed;
 
 	executionTime = (double)(clock() - startTime)/CLOCKS_PER_SEC;
 	speed = nbByteRead / executionTime;
 	speed /= 1024;
-	printf("Speed : %d Kib/s\n",speed);
+	printf("Speed : %f Kib/s\n",speed);
 }
 
 // Called before any *_scheduler function.

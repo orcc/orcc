@@ -110,7 +110,7 @@ void compare_NBytes(unsigned char * inTable, unsigned short nbTokenToRead){
 	free(outTable);
 }
 
-int compare_NBytesNext(unsigned char * inTable, unsigned short nbTokenToRead, unsigned short display){
+void compare_NBytesNext(unsigned char * inTable, unsigned short nbTokenToRead, unsigned short display){
   unsigned char *outTable = (unsigned char *) malloc(nbTokenToRead);
   int n;
   int noEqual = 1;
