@@ -588,14 +588,16 @@ public class OrccUtil {
 	 */
 	public static STGroup loadGroup(String fullPath, ClassLoader cl) {
 		ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
-		Thread.currentThread().setContextClassLoader(cl);
+		try {
+			Thread.currentThread().setContextClassLoader(cl);
 
-		STGroup group = new STGroupFile(fullPath);
-		loadGroup(group);
-
-		Thread.currentThread().setContextClassLoader(oldCl);
-
-		return group;
+			STGroup group = new STGroupFile(fullPath);
+			loadGroup(group);
+			return group;
+		} finally {
+			// restore class loader even if there is an unexpected exception
+			Thread.currentThread().setContextClassLoader(oldCl);
+		}
 	}
 
 	/**
