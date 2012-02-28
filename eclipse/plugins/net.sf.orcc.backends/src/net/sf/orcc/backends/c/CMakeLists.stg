@@ -41,6 +41,8 @@ set(filenames
 	<network.instances: printInstance();separator="\n">
 )
 
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+
 add_executable(<network.simpleName> ${filenames})
 
 target_link_libraries(<network.simpleName> orcc roxml ${SDL_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
