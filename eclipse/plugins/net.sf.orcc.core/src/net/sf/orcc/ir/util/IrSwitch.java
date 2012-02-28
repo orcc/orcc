@@ -6,11 +6,8 @@
  */
 package net.sf.orcc.ir.util;
 
-import java.util.Map;
-
 import net.sf.dftools.graph.Vertex;
 import net.sf.dftools.util.Attributable;
-import net.sf.orcc.ir.Annotation;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
@@ -115,21 +112,6 @@ public class IrSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseDef(Def object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Annotation</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Annotation</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseAnnotation(Annotation object) {
 		return null;
 	}
 
@@ -280,21 +262,6 @@ public class IrSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T casePredicate(Predicate object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>EString To EString Map Entry</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>EString To EString Map Entry</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseEStringToEStringMapEntry(Map.Entry<String, String> object) {
 		return null;
 	}
 
@@ -1089,16 +1056,11 @@ public class IrSwitch<T> extends Switch<T> {
 				result = defaultCase(theEObject);
 			return result;
 		}
-		case IrPackage.ANNOTATION: {
-			Annotation annotation = (Annotation) theEObject;
-			T result = caseAnnotation(annotation);
-			if (result == null)
-				result = defaultCase(theEObject);
-			return result;
-		}
 		case IrPackage.VAR: {
 			Var var = (Var) theEObject;
 			T result = caseVar(var);
+			if (result == null)
+				result = caseAttributable(var);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -1113,14 +1075,6 @@ public class IrSwitch<T> extends Switch<T> {
 		case IrPackage.PREDICATE: {
 			Predicate predicate = (Predicate) theEObject;
 			T result = casePredicate(predicate);
-			if (result == null)
-				result = defaultCase(theEObject);
-			return result;
-		}
-		case IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY: {
-			@SuppressWarnings("unchecked")
-			Map.Entry<String, String> eStringToEStringMapEntry = (Map.Entry<String, String>) theEObject;
-			T result = caseEStringToEStringMapEntry(eStringToEStringMapEntry);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;

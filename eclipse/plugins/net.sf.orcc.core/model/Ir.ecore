@@ -163,14 +163,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="variable" eType="#//Var"
         eOpposite="#//Var/defs"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Annotation">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="attributes" upperBound="-1"
-        eType="#//EStringToEStringMapEntry" containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Var">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="annotations" upperBound="-1"
-        eType="#//Annotation" containment="true" resolveProxies="false"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Var" eSuperTypes="../../net.sf.dftools.models/model/Util.ecore#//Attributable">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="assignable" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="defs" upperBound="-1" eType="#//Def"
         eOpposite="#//Def/variable"/>
@@ -194,10 +187,6 @@
   <eClassifiers xsi:type="ecore:EClass" name="Predicate">
     <eStructuralFeatures xsi:type="ecore:EReference" name="expressions" upperBound="-1"
         eType="#//Expression" containment="true" resolveProxies="false"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="EStringToEStringMapEntry" instanceClassName="java.util.Map$Entry">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="NodeSpecific" abstract="true" eSuperTypes="#//Node"/>
   <eClassifiers xsi:type="ecore:EEnum" name="OpBinary">

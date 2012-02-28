@@ -10,9 +10,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import net.sf.orcc.ir.Annotation;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
@@ -208,36 +206,16 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 			return createTypeVoid();
 		case IrPackage.DEF:
 			return createDef();
-		case IrPackage.ANNOTATION:
-			return createAnnotation();
 		case IrPackage.VAR:
 			return createVar();
 		case IrPackage.USE:
 			return createUse();
 		case IrPackage.PREDICATE:
 			return createPredicate();
-		case IrPackage.ESTRING_TO_ESTRING_MAP_ENTRY:
-			return (EObject) createEStringToEStringMapEntry();
 		default:
 			throw new IllegalArgumentException("The class '" + eClass.getName()
 					+ "' is not a valid classifier");
 		}
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Annotation createAnnotation() {
-		AnnotationImpl annotation = new AnnotationImpl();
-		return annotation;
-	}
-
-	@Override
-	public Annotation createAnnotation(String name) {
-		AnnotationImpl annotation = new AnnotationImpl();
-		annotation.setName(name);
-		return annotation;
 	}
 
 	/**
@@ -293,15 +271,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		DefImpl def = new DefImpl();
 		def.setVariable(variable);
 		return def;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Map.Entry<String, String> createEStringToEStringMapEntry() {
-		EStringToEStringMapEntryImpl eStringToEStringMapEntry = new EStringToEStringMapEntryImpl();
-		return eStringToEStringMapEntry;
 	}
 
 	/**

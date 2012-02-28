@@ -50,9 +50,10 @@ import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
-import net.sf.orcc.ir.Annotation;
+import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstReturn;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
@@ -271,12 +272,20 @@ public class StructTransformer extends CalSwitch<EObject> {
 	private void transformAnnotations(Var variable,
 			List<AstAnnotation> annotations) {
 		for (AstAnnotation astAnnotation : annotations) {
-			Annotation annotation = eINSTANCE.createAnnotation(astAnnotation
-					.getName());
+			String name = astAnnotation.getName();
+
+			ExprList arguments = IrFactory.eINSTANCE.createExprList();
 			for (AnnotationArgument arg : astAnnotation.getArguments()) {
-				annotation.getAttributes().put(arg.getName(), arg.getValue());
+				ExprList pair = IrFactory.eINSTANCE.createExprList();
+				pair.getValue().add(eINSTANCE.createExprString(arg.getName()));
+				pair.getValue().add(eINSTANCE.createExprString(arg.getValue()));
+				arguments.getValue().add(pair);
 			}
-			variable.getAnnotations().add(annotation);
+
+			if (arguments.getValue().isEmpty()) {
+				arguments = null;
+			}
+			variable.setAttribute(name, arguments);
 		}
 	}
 

@@ -8,7 +8,7 @@ package net.sf.orcc.ir.impl;
 
 import java.util.Collection;
 
-import net.sf.orcc.ir.Annotation;
+import net.sf.dftools.util.impl.AttributableImpl;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrPackage;
@@ -22,8 +22,6 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.emf.ecore.impl.EObjectImpl;
-import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.EObjectWithInverseResolvingEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
@@ -33,7 +31,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getAnnotations <em>Annotations</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#isAssignable <em>Assignable</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getDefs <em>Defs</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#isGlobal <em>Global</em>}</li>
@@ -49,17 +46,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *
  * @generated
  */
-public class VarImpl extends EObjectImpl implements Var {
-	/**
-	 * The cached value of the '{@link #getAnnotations() <em>Annotations</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getAnnotations()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Annotation> annotations;
-
+public class VarImpl extends AttributableImpl implements Var {
 	/**
 	 * The default value of the '{@link #isAssignable() <em>Assignable</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -263,8 +250,6 @@ public class VarImpl extends EObjectImpl implements Var {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case IrPackage.VAR__ANNOTATIONS:
-			return getAnnotations();
 		case IrPackage.VAR__ASSIGNABLE:
 			return isAssignable();
 		case IrPackage.VAR__DEFS:
@@ -316,9 +301,6 @@ public class VarImpl extends EObjectImpl implements Var {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-		case IrPackage.VAR__ANNOTATIONS:
-			return ((InternalEList<?>) getAnnotations()).basicRemove(otherEnd,
-					msgs);
 		case IrPackage.VAR__DEFS:
 			return ((InternalEList<?>) getDefs()).basicRemove(otherEnd, msgs);
 		case IrPackage.VAR__INITIAL_VALUE:
@@ -338,8 +320,6 @@ public class VarImpl extends EObjectImpl implements Var {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case IrPackage.VAR__ANNOTATIONS:
-			return annotations != null && !annotations.isEmpty();
 		case IrPackage.VAR__ASSIGNABLE:
 			return assignable != ASSIGNABLE_EDEFAULT;
 		case IrPackage.VAR__DEFS:
@@ -374,11 +354,6 @@ public class VarImpl extends EObjectImpl implements Var {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case IrPackage.VAR__ANNOTATIONS:
-			getAnnotations().clear();
-			getAnnotations()
-					.addAll((Collection<? extends Annotation>) newValue);
-			return;
 		case IrPackage.VAR__ASSIGNABLE:
 			setAssignable((Boolean) newValue);
 			return;
@@ -424,30 +399,6 @@ public class VarImpl extends EObjectImpl implements Var {
 		return IrPackage.Literals.VAR;
 	}
 
-	@Override
-	public Annotation getAnnotation(String name) {
-		for (Annotation annotation : getAnnotations()) {
-			if (name.equals(annotation.getName())) {
-				return annotation;
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Annotation> getAnnotations() {
-		if (annotations == null) {
-			annotations = new EObjectContainmentEList<Annotation>(
-					Annotation.class, this, IrPackage.VAR__ANNOTATIONS);
-		}
-		return annotations;
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -455,9 +406,6 @@ public class VarImpl extends EObjectImpl implements Var {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case IrPackage.VAR__ANNOTATIONS:
-			getAnnotations().clear();
-			return;
 		case IrPackage.VAR__ASSIGNABLE:
 			setAssignable(ASSIGNABLE_EDEFAULT);
 			return;

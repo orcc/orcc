@@ -27,24 +27,6 @@ public interface IrFactory extends EFactory {
 	IrFactory eINSTANCE = net.sf.orcc.ir.impl.IrFactoryImpl.init();
 
 	/**
-	 * Returns a new object of class '<em>Annotation</em>'.
-	 * <!-- begin-user-doc
-	 * --> <!-- end-user-doc -->
-	 * @return a new object of class '<em>Annotation</em>'.
-	 * @generated
-	 */
-	Annotation createAnnotation();
-
-	/**
-	 * Creates a new annotation with the given name.
-	 * 
-	 * @param name
-	 *            name of the annotation
-	 * @return a new annotation with the given name
-	 */
-	Annotation createAnnotation(String name);
-
-	/**
 	 * Returns a new object of class '<em>Arg By Ref</em>'.
 	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->

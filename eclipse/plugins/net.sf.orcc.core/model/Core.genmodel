@@ -258,12 +258,7 @@
     <genClasses ecoreClass="Ir.ecore#//Def">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Def/variable"/>
     </genClasses>
-    <genClasses ecoreClass="Ir.ecore#//Annotation">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Annotation/attributes"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Annotation/name"/>
-    </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Var">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Var/annotations"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Var/assignable"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Var/defs"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Var/global"/>

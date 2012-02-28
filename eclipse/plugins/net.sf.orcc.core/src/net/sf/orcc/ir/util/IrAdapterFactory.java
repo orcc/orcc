@@ -6,11 +6,8 @@
  */
 package net.sf.orcc.ir.util;
 
-import java.util.Map;
-
 import net.sf.dftools.graph.Vertex;
 import net.sf.dftools.util.Attributable;
-import net.sf.orcc.ir.Annotation;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
@@ -257,11 +254,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 		}
 
 		@Override
-		public Adapter caseAnnotation(Annotation object) {
-			return createAnnotationAdapter();
-		}
-
-		@Override
 		public Adapter caseVar(Var object) {
 			return createVarAdapter();
 		}
@@ -274,12 +266,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 		@Override
 		public Adapter casePredicate(Predicate object) {
 			return createPredicateAdapter();
-		}
-
-		@Override
-		public Adapter caseEStringToEStringMapEntry(
-				Map.Entry<String, String> object) {
-			return createEStringToEStringMapEntryAdapter();
 		}
 
 		@Override
@@ -339,20 +325,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createDefAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Annotation <em>Annotation</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.Annotation
-	 * @generated
-	 */
-	public Adapter createAnnotationAdapter() {
 		return null;
 	}
 
@@ -505,20 +477,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createPredicateAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>EString To EString Map Entry</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see java.util.Map.Entry
-	 * @generated
-	 */
-	public Adapter createEStringToEStringMapEntryAdapter() {
 		return null;
 	}
 

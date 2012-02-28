@@ -28,9 +28,9 @@
  */
 package net.sf.orcc.ir;
 
-import java.lang.String;
+import net.sf.dftools.util.Attributable;
+
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EObject;
 
 /**
  * This interface represents a variable. A variable has a location, a type, a
@@ -41,25 +41,7 @@ import org.eclipse.emf.ecore.EObject;
  * @author Matthieu Wipliez
  * @model
  */
-public interface Var extends EObject {
-
-	/**
-	 * If it exists, returns the annotation with the given name, otherwise
-	 * returns <code>null</code>.
-	 * 
-	 * @param name
-	 *            name of an annotation
-	 * @return the annotation with the given name, or <code>null</code>
-	 */
-	Annotation getAnnotation(String name);
-
-	/**
-	 * Returns the annotations that may be associated with this variable.
-	 * 
-	 * @return the annotations that may be associated with this variable
-	 * @model containment="true"
-	 */
-	EList<Annotation> getAnnotations();
+public interface Var extends Attributable {
 
 	/**
 	 * Returns the definitions of this variable. A definition is an instruction
