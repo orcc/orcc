@@ -52,13 +52,13 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  */
 public class BuildCFG extends AbstractActorVisitor<Node> {
 
-	private Cfg cfg;
+	protected Cfg cfg;
 
-	private Node last;
+	protected Node last;
 
-	private boolean flag;
+	protected boolean flag;
 
-	private void addEdge(Node node) {
+	protected void addEdge(Node node) {
 		Edge edge = GraphFactory.eINSTANCE.createEdge(last, node);
 		if (flag) {
 			edge.setAttribute("flag", IrFactory.eINSTANCE.createExprBool(true));

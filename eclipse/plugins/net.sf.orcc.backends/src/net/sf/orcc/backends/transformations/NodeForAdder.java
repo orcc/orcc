@@ -33,6 +33,7 @@ import java.util.List;
 
 import net.sf.orcc.backends.ir.IrSpecificFactory;
 import net.sf.orcc.backends.ir.NodeFor;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
@@ -41,8 +42,10 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
+import net.sf.orcc.ir.NodeSpecific;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.transformations.BuildCFG;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.util.EcoreHelper;
 
@@ -58,6 +61,39 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class NodeForAdder extends AbstractActorVisitor<Object> {
 
+	private class ForNodeCfg extends BuildCFG {
+		public Node caseNodeFor(NodeFor node) {
+			Node join = node.getJoinNode();
+			cfg.getVertices().add(join);
+
+			if (last != null) {
+				addEdge(join);
+			}
+
+			cfg.getVertices().add(node);
+			addEdge(node);
+
+			last = join;
+			flag = true;
+			last = doSwitch(node.getNodes());
+
+			// reset flag (in case there are no nodes in "then" branch)
+			flag = false;
+			addEdge(join);
+			last = node;
+
+			return node;
+		}
+		
+		@Override
+		public Node caseNodeSpecific(NodeSpecific node) {
+			if (node.isNodeFor()){
+				caseNodeFor((NodeFor)node);
+			}
+			return null;
+		}
+	}
+	
 	private class VarGetter extends AbstractActorVisitor<Object> {
 
 		private List<Var> vars;
@@ -78,7 +114,21 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 		}
 
 	}
-
+	
+	@Override
+	public Object caseActor(Actor actor) {
+		// Build first CFG
+		new BuildCFG().doSwitch(actor);
+		
+		// Transform actor
+		super.caseActor(actor);
+		
+		// Rebuild CFG with for node
+		new ForNodeCfg().doSwitch(actor);
+		
+		return null;
+	}
+	
 	@Override
 	public Object caseNodeWhile(NodeWhile nodeWhile) {
 
@@ -127,20 +177,20 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 		nodeFor.setLineNumber(nodeWhile.getLineNumber());
 		nodeFor.setJoinNode(nodeWhile.getJoinNode());
 		nodeFor.getNodes().addAll(nodeWhile.getNodes());
-
+		
 		// Add loop counters and inits
 		nodeFor.getLoopCounter().addAll(loopCnts);
 		nodeFor.getInit().addAll(initCnts);
-
+		
 		// Replace node
 		EcoreUtil.replace(nodeWhile, nodeFor);
-
+		
 		return null;
 	}
-
+	
 	private Instruction getLastAssign(Var var, Node lastNode) {
 		EList<Def> defs = var.getDefs();
-
+				
 		// Check if one var defs is located in the last node
 		NodeBlock lastBlockNode = null;
 

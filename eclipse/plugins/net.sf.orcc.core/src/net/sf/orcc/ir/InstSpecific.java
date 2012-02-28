@@ -36,4 +36,33 @@ package net.sf.orcc.ir;
  */
 public interface InstSpecific extends Instruction {
 
+	/**
+	 * Return <code>true</code> if the instruction is a gep
+	 * 
+	 * @return <code>true</code> if the instruction is a gep
+	 */
+	public boolean isGep();
+	
+	/**
+	 * Return <code>true</code> if the instruction is an assign index
+	 * instruction
+	 * 
+	 * @return <code>true</code> if the instruction is an assign index
+	 *         instruction
+	 */
+	public boolean isInstAssignIndex();
+	
+	/**
+	 * Return <code>true</code> if the instruction is a cast
+	 * 
+	 * @return <code>true</code> if the instruction is a cast
+	 */
+	public boolean isInstCast();
+	
+	/**
+	 * Return <code>true</code> if the instruction is a ternary instruction
+	 * 
+	 * @return <code>true</code> if the instruction is a ternary instruction
+	 */
+	public boolean isInstTernary();
 }

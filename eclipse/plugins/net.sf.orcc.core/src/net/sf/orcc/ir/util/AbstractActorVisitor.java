@@ -57,6 +57,7 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
+import net.sf.orcc.ir.NodeSpecific;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
@@ -168,6 +169,11 @@ public abstract class AbstractActorVisitor<T> extends DfSwitch<T> {
 		@Override
 		public T caseNodeBlock(NodeBlock block) {
 			return AbstractActorVisitor.this.caseNodeBlock(block);
+		}
+		
+		@Override
+		public T caseNodeSpecific(NodeSpecific block) {
+			return AbstractActorVisitor.this.caseNodeSpecific(block);
 		}
 
 		@Override
@@ -358,6 +364,11 @@ public abstract class AbstractActorVisitor<T> extends DfSwitch<T> {
 	}
 
 	public T caseInstSpecific(InstSpecific inst) {
+		// default implementation does nothing
+		return null;
+	}
+	
+	public T caseNodeSpecific(NodeSpecific node) {
 		// default implementation does nothing
 		return null;
 	}

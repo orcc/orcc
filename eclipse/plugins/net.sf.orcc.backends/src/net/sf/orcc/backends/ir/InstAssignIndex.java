@@ -89,15 +89,6 @@ public interface InstAssignIndex extends InstSpecific {
 	Def getTarget();
 
 	/**
-	 * Return <code>true</code> if the instruction is an assign index
-	 * instruction
-	 * 
-	 * @return <code>true</code> if the instruction is an assign index
-	 *         instruction
-	 */
-	public boolean isInstAssignIndex();
-
-	/**
 	 * Sets the value of the '{@link net.sf.orcc.backends.ir.InstAssignIndex#getListType <em>List Type</em>}' containment reference.
 	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
