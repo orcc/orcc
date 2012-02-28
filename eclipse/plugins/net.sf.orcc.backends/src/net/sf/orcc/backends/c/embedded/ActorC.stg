@@ -10,6 +10,11 @@ printOutputPortEmbd(port,action)  ::= <<
 <port.type>[<action.outputPattern.numTokensMap.(port)>] <port.name>
 >>
 
+printProcedureDeclarationEmbd(procedure,action="") ::= <<
+<if(!procedure.native)> <procedure.returnType> <procedure.name>(<procedure.parameters: {param |
+<varDecl(param.variable)>}; separator=", ">); <endif>
+>>
+
 printActionEmbd(action)  ::= <<
 
 static void <action.body.name>(
@@ -34,13 +39,13 @@ printActor(actor, options) ::= <<
  from actor "<actor.name>"
 */
 
-////////////////////////////////////////////////////////////////////////////////
-// State variables of the actor
-<actor.stateVars: stateVar()>
+#include \<stdio.h\>
+#include \<stdlib.h\>
+#include "orcc_types.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Functions/procedures
-<actor.procs: printProcedureDeclaration()>
+<actor.procs: printProcedureDeclarationEmbd()>
 <actor.procs: printProcedure()>
 
 ////////////////////////////////////////////////////////////////////////////////

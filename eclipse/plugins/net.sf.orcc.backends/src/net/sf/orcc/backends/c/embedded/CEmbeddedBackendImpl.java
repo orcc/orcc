@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.c.embedded;
 
+import java.io.File;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -53,7 +54,28 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doInitializeOptions() {
+		// Set Algo, Code, Code/src and Code/IDL directory
+		File algoDir = new File(path + "/Algo");
+		File codeDir = new File(path + "/Code");
+		File srcDir = new File(path + "/Code/src");
+		File idlDir = new File(path + "/Code/IDL");
 
+		// If directories don't exist, create them
+		if (!algoDir.exists()) {
+			algoDir.mkdirs();
+		}
+		
+		if (!codeDir.exists()) {
+			codeDir.mkdirs();
+		}
+		
+		if (!srcDir.exists()) {
+			srcDir.mkdirs();
+		}
+		
+		if (!idlDir.exists()) {
+			idlDir.mkdirs();
+		}
 	}
 
 	@Override
@@ -94,7 +116,7 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 			SDFMoC moc = (SDFMoC) network.getAllActors().get(0).getMoC();
 			moc.toString();
 			write("Printing network...\n");
-			printer.print(network.getName() + ".graphml", path, network);
+			printer.print("./Algo/" + network.getName() + ".graphml", path, network);
 		} else {
 			write("The network is not SDF. Other models are not yet supported.");
 		}
@@ -106,11 +128,23 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 	 */
 	@Override
 	protected boolean printActor(Actor actor) throws OrccException {
-		StandardPrinter printer = new StandardPrinter(
-				"net/sf/orcc/backends/c/embedded/Actor.stg", false);
-		printer.setExpressionPrinter(new CExpressionPrinter());
-		printer.setTypePrinter(new CTypePrinter());
-		return printer.print(actor.getSimpleName() + ".c", path, actor);
+		boolean result = false;
+		
+		// print IDL
+		StandardPrinter printerIDL = new StandardPrinter(
+				"net/sf/orcc/backends/c/embedded/ActorIDL.stg", false);
+		printerIDL.setExpressionPrinter(new CExpressionPrinter());
+		printerIDL.setTypePrinter(new CTypePrinter());
+		result = printerIDL.print("./Code/IDL/" + actor.getSimpleName() + ".idl", path, actor);
+		
+		// Print C code
+		StandardPrinter printerC = new StandardPrinter(
+				"net/sf/orcc/backends/c/embedded/ActorC.stg", false);
+		printerC.setExpressionPrinter(new CExpressionPrinter());
+		printerC.setTypePrinter(new CTypePrinter());
+		result |= printerC.print("./Code/src/" + actor.getSimpleName() + ".c", path, actor);
+		
+		return result;
 	}
 
 	@Override

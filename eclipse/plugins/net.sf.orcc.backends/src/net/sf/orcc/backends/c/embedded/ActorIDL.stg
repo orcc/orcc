@@ -1,0 +1,35 @@
+// printing actor interfaces in an IDL file
+
+
+printActor(actor, options) ::= <<
+module <actor.simpleName> {
+
+	typedef long parameter; <! It might be a good idea to write net.sf.orcc.ir.util.IDLTypePrinter !>
+	
+<if (!actor.initializes.empty)>
+<printInterface(first(actor.initializes), actor, "init")>
+<endif>
+<if (!actor.actions.empty)>
+<printInterface(first(actor.actions), actor, "loop")>
+<endif><!
+ There is no end() action in CAL !>};
+>>
+
+printParameter(parameter) ::= <<
+	in parameter <parameter.name>
+>>
+
+printPort(port,direction) ::= <<
+	<direction> <port.type> <port.name>
+>>
+
+printInterface(action, actor, interface) ::= <<
+	interface <interface> {
+		void <action.name> (<actor.parameters:printParameter(); separator=", "><
+		if ((!actor.parameters.empty) && (!action.inputPattern.ports.empty))>, <endif><
+		action.inputPattern.ports:printPort("in"); separator=", "><
+		if (((!actor.parameters.empty)||(!action.inputPattern.ports.empty)) && (!action.outputPattern.ports.empty))>, <endif><
+		action.outputPattern.ports:printPort("out"); separator=", "> );
+	};
+	
+>>

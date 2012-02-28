@@ -2,30 +2,47 @@
 // printing a network in a graphml file
 // We consider that we have one action / actor and an SDF behavior
 
+printArgument(argument) ::= <<
+	\<data key="arguments"\>
+	\<argument name="<argument.variable.name>" value="<argument.value.value>"/\>
+	\</data\>
+>>
+
 printInstance(instance) ::= <<
 	\<node id="<instance.id>" kind="vertex"\>
 		\<data key="graph_desc"\>../Code/IDL/<instance.actor.simpleName>.idl\</data\>
 		\<data key="name"\><instance.actor.simpleName>\</data\>
+	<if (instance.arguments.empty)>
 		\<data key="arguments"/\>
-	\</node\>
-	
+	<else>
+	<instance.arguments:printArgument()>
+	<endif>
+	\</node\>	
 >>
 
 getProduction(actor,port) ::= <<
-	<actor.moC.outputPattern.numTokensMap.(port)>
+	<actor.moC.outputPattern.numTokens.(port)>
 >>
 
 getConsumption(actor,port) ::= <<
 	<actor.moC.inputPattern.numTokensMap.(port)>
 >>
 
-printConnection(connection, network) ::= <<
-	\<edge source="<network.sourceMap.(connection).instance.id>" sourceport="<connection.source.name>" target="<network.targetMap.(connection).instance.id>" targetport="<connection.target.name>"\>
-	    \<data key="edge_prod"\><getProduction(network.sourceMap.(connection).instance.actor,connection.source)>\</data\>
+printConnection(connection) ::= <<
+	\<edge source="<connection.source.name>" sourceport="<connection.sourcePort.name>" target="<connection.target.name>" targetport="<connection.targetPort.name>"\>
+	    \<data key="edge_prod"\><connection.source.actor.moC.outputPattern.numTokensMap.(connection.sourcePort)>\</data\>
 	    \<data key="edge_delay"\>0\</data\>
-	    \<data key="edge_cons"\><getConsumption(network.targetMap.(connection).instance.actor,connection.target)>\</data\>
-	    \<data key="data_type"\><connection.source.type>\</data\>
+	    \<data key="edge_cons"\><connection.target.actor.moC.inputPattern.numTokensMap.(connection.targetPort)>\</data\>
+	    \<data key="data_type"\><connection.sourcePort.type>\</data\>
 	\</edge\>
+>>
+
+printVariable(variable) ::= <<
+	\<variable name="<variable.name>" value="<variable.initialValue.value>"/\>
+>>
+
+printParameter(parameter) ::= <<
+	\<parameter name="<parameter.name>"/\>
 >>
 
 printNetwork(network, options) ::= <<
@@ -50,11 +67,27 @@ printNetwork(network, options) ::= <<
         \<desc\>org.sdf4j.model.sdf.types.SDFTextualEdgePropertyTypeFactory\</desc\>
     \</key\>
     \<graph edgedefault="directed"\>
-        \<data key="name"/\>
-        \<data key="parameters"/\>
+    <if (network.simpleName)>
+    	\<data key="name"\><network.simpleName>\</data\>
+    <else>
+        \<data key="name" /\>
+    <endif>
+    <if (network.parameters.empty)>
+    	\<data key="parameters"/\>
+    <else>
+    	\<data key="parameters"\>
+    	<network.parameters:printParameter()>
+    	\</data\>
+    <endif>
+	<if (network.variables.empty)>
         \<data key="variables"/\>
+    <else>
+    	\<data key="variables"\>
+    	<network.variables:printVariable()>
+    	\</data\>
+    <endif>
     <network.instances:printInstance()>
-    <network.connections:printConnection(network)>
+    <network.connections:printConnection()>
     \</graph\>
 \</graphml\>
 >>
