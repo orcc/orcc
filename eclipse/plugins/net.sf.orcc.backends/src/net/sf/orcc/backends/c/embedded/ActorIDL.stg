@@ -23,13 +23,21 @@ printPort(port,direction) ::= <<
 	<direction> <port.type> <port.name>
 >>
 
+printFunctionParameters(actor,action) ::= <%
+<actor.parameters:printParameter(); separator=", ">
+<if ( !actor.parameters.empty && !action.inputPattern.ports.empty)>, <endif>
+<action.inputPattern.ports:printPort("in"); separator=", ">
+<if (!actor.parameters.empty || !action.inputPattern.ports.empty)><
+	if(!action.outputPattern.ports.empty)>, 
+	<endif>
+<endif>
+<action.outputPattern.ports:printPort("out"); separator=", "> 
+
+%>
+
 printInterface(action, actor, interface) ::= <<
 	interface <interface> {
-		void <action.name> (<actor.parameters:printParameter(); separator=", "><
-		if ((!actor.parameters.empty) && (!action.inputPattern.ports.empty))>, <endif><
-		action.inputPattern.ports:printPort("in"); separator=", "><
-		if (((!actor.parameters.empty)||(!action.inputPattern.ports.empty)) && (!action.outputPattern.ports.empty))>, <endif><
-		action.outputPattern.ports:printPort("out"); separator=", "> );
+		void <action.name> (<printFunctionParameters(actor,action)>);
 	};
 	
 >>
