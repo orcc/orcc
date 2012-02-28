@@ -12,7 +12,8 @@ printOutputPortEmbd(port,action)  ::= <<
 
 printProcedureDeclarationEmbd(procedure,action="") ::= <<
 <if(!procedure.native)> <procedure.returnType> <procedure.name>(<procedure.parameters: {param |
-<varDecl(param.variable)>}; separator=", ">); <endif>
+<varDecl(param.variable)>}; separator=", ">);
+<endif>
 >>
 
 printActionEmbd(action)  ::= <<
