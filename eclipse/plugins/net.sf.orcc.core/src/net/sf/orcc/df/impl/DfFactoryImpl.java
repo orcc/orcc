@@ -31,6 +31,7 @@ import net.sf.orcc.df.Tag;
 import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.Unit;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
@@ -350,11 +351,16 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	}
 
 	@Override
-	public Port createPort(Type type, String name, boolean native_) {
+	public Port createPort(Type type, String name, boolean isNative) {
 		PortImpl port = new PortImpl();
 		port.setName(name);
-		port.setNative(native_);
 		port.setType(type);
+
+		// only set the attribute when the port is native
+		if (isNative) {
+			EObject value = IrFactory.eINSTANCE.createExprBool(isNative);
+			port.setAttribute("native", value);
+		}
 		return port;
 	}
 

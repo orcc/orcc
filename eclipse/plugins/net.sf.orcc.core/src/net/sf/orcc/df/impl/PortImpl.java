@@ -7,13 +7,16 @@
 package net.sf.orcc.df.impl;
 
 import net.sf.dftools.graph.impl.VertexImpl;
+import net.sf.dftools.util.Attribute;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.Type;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
@@ -26,7 +29,6 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  *   <li>{@link net.sf.orcc.df.impl.PortImpl#getNumTokensConsumed <em>Num Tokens Consumed</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.PortImpl#getNumTokensProduced <em>Num Tokens Produced</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.PortImpl#getType <em>Type</em>}</li>
- *   <li>{@link net.sf.orcc.df.impl.PortImpl#isNative <em>Native</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.PortImpl#getName <em>Name</em>}</li>
  * </ul>
  * </p>
@@ -82,24 +84,6 @@ public class PortImpl extends VertexImpl implements Port {
 	 * @ordered
 	 */
 	protected Type type;
-
-	/**
-	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isNative()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean NATIVE_EDEFAULT = false;
-
-	/**
-	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isNative()
-	 * @generated
-	 * @ordered
-	 */
-	protected boolean native_ = NATIVE_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
@@ -158,8 +142,6 @@ public class PortImpl extends VertexImpl implements Port {
 			return getNumTokensProduced();
 		case DfPackage.PORT__TYPE:
 			return getType();
-		case DfPackage.PORT__NATIVE:
-			return isNative();
 		case DfPackage.PORT__NAME:
 			return getName();
 		}
@@ -193,8 +175,6 @@ public class PortImpl extends VertexImpl implements Port {
 			return numTokensProduced != NUM_TOKENS_PRODUCED_EDEFAULT;
 		case DfPackage.PORT__TYPE:
 			return type != null;
-		case DfPackage.PORT__NATIVE:
-			return native_ != NATIVE_EDEFAULT;
 		case DfPackage.PORT__NAME:
 			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
 					.equals(name);
@@ -217,9 +197,6 @@ public class PortImpl extends VertexImpl implements Port {
 			return;
 		case DfPackage.PORT__TYPE:
 			setType((Type) newValue);
-			return;
-		case DfPackage.PORT__NATIVE:
-			setNative((Boolean) newValue);
 			return;
 		case DfPackage.PORT__NAME:
 			setName((String) newValue);
@@ -252,9 +229,6 @@ public class PortImpl extends VertexImpl implements Port {
 			return;
 		case DfPackage.PORT__TYPE:
 			setType((Type) null);
-			return;
-		case DfPackage.PORT__NATIVE:
-			setNative(NATIVE_EDEFAULT);
 			return;
 		case DfPackage.PORT__NAME:
 			setName(NAME_EDEFAULT);
@@ -305,12 +279,14 @@ public class PortImpl extends VertexImpl implements Port {
 		numTokensProduced += n;
 	}
 
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
+	@Override
 	public boolean isNative() {
-		return native_;
+		Attribute attribute = getAttribute("native");
+		if (attribute == null) {
+			return false;
+		}
+		EObject value = attribute.getContainedValue();
+		return value instanceof ExprBool && ((ExprBool) value).isValue();
 	}
 
 	/**
@@ -330,18 +306,6 @@ public class PortImpl extends VertexImpl implements Port {
 	@Override
 	public void resetTokenProduction() {
 		numTokensProduced = 0;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setNative(boolean newNative) {
-		boolean oldNative = native_;
-		native_ = newNative;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.PORT__NATIVE, oldNative, native_));
 	}
 
 	/**
@@ -427,8 +391,6 @@ public class PortImpl extends VertexImpl implements Port {
 		result.append(numTokensConsumed);
 		result.append(", numTokensProduced: ");
 		result.append(numTokensProduced);
-		result.append(", native: ");
-		result.append(native_);
 		result.append(", name: ");
 		result.append(name);
 		result.append(')');

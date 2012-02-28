@@ -384,22 +384,13 @@ public interface DfPackage extends EPackage {
 	int PORT__TYPE = GraphPackage.VERTEX_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>Native</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int PORT__NATIVE = GraphPackage.VERTEX_FEATURE_COUNT + 3;
-
-	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__NAME = GraphPackage.VERTEX_FEATURE_COUNT + 4;
+	int PORT__NAME = GraphPackage.VERTEX_FEATURE_COUNT + 3;
 
 	/**
 	 * The number of structural features of the '<em>Port</em>' class. <!--
@@ -408,7 +399,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 5;
+	int PORT_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -1907,18 +1898,6 @@ public interface DfPackage extends EPackage {
 	EReference getPort_Type();
 
 	/**
-	 * Returns the meta object for the attribute '
-	 * {@link net.sf.orcc.df.Port#isNative <em>Native</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the attribute '<em>Native</em>'.
-	 * @see net.sf.orcc.df.Port#isNative()
-	 * @see #getPort()
-	 * @generated
-	 */
-	EAttribute getPort_Native();
-
-	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.Port#getName <em>Name</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2621,13 +2600,6 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EReference PORT__TYPE = eINSTANCE.getPort_Type();
-
-		/**
-		 * The meta object literal for the '<em><b>Native</b></em>' attribute feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute PORT__NATIVE = eINSTANCE.getPort_Native();
 
 		/**
 		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.

@@ -97,7 +97,6 @@ public interface Port extends Vertex {
 	 * Returns <code>true</code> if this port is native.
 	 * 
 	 * @return <code>true</code> if this port is native
-	 * @model
 	 */
 	boolean isNative();
 
@@ -118,14 +117,6 @@ public interface Port extends Vertex {
 	 *            the new name of this port
 	 */
 	void setName(String name);
-
-	/**
-	 * Sets this port as native if <code>newNative</code> is <code>true</code>.
-	 * 
-	 * @param newNative
-	 *            <code>true</code> if this port is native
-	 */
-	void setNative(boolean newNative);
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.df.Port#getNumTokensConsumed <em>Num Tokens Consumed</em>}' attribute.

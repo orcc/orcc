@@ -615,20 +615,12 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getPort_Native() {
-		return (EAttribute) portEClass.getEStructuralFeatures().get(3);
-	}
-
-	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EAttribute getPort_Name() {
-		return (EAttribute) portEClass.getEStructuralFeatures().get(4);
+		return (EAttribute) portEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -901,7 +893,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEAttribute(portEClass, PORT__NUM_TOKENS_CONSUMED);
 		createEAttribute(portEClass, PORT__NUM_TOKENS_PRODUCED);
 		createEReference(portEClass, PORT__TYPE);
-		createEAttribute(portEClass, PORT__NATIVE);
 		createEAttribute(portEClass, PORT__NAME);
 
 		instanceEClass = createEClass(INSTANCE);
@@ -1080,10 +1071,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getPort_Native(), ecorePackage.getEBoolean(), "native",
-				null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
 		initEAttribute(getPort_Name(), ecorePackage.getEString(), "name", null,
 				0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
 				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
