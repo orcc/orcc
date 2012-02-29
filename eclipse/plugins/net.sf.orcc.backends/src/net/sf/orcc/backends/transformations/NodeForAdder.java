@@ -87,7 +87,7 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 		
 		@Override
 		public Node caseNodeSpecific(NodeSpecific node) {
-			if (node.isNodeFor()){
+			if (node instanceof NodeFor){
 				caseNodeFor((NodeFor)node);
 			}
 			return null;

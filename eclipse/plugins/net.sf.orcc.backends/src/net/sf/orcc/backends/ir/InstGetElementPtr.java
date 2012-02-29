@@ -100,6 +100,15 @@ public interface InstGetElementPtr extends InstSpecific {
 	 */
 	void setSource(Use value);
 
+	/**
+	 * Returns true if the current instruction is GEP (which is always true for
+	 * the current instruction). This method is only useable to detect this
+	 * specific instruction in template document.
+	 * 
+	 * @return true if current instruction is GEP
+	 */
+	public boolean isGep();
+
 	@Override
 	public boolean isLoad();
 

@@ -45,6 +45,13 @@ public interface InstCast extends InstSpecific {
 	Def getTarget();
 
 	/**
+	 * Return <code>true</code> if the instruction is a cast
+	 * 
+	 * @return <code>true</code> if the instruction is a cast
+	 */
+	public boolean isInstCast();
+
+	/**
 	 * Return <code>true</code> if the target type is different from the source
 	 * type.
 	 * 

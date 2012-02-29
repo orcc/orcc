@@ -163,4 +163,6 @@ public interface NodeFor extends NodeSpecific {
 	 */
 	EList<Instruction> getInit();
 
+	public boolean isNodeFor();
+
 } // NodeFor

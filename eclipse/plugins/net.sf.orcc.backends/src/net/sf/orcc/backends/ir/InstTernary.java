@@ -134,4 +134,11 @@ public interface InstTernary extends InstSpecific {
 	 */
 	void setTarget(Def value);
 
+	/**
+	 * Return <code>true</code> if the instruction is a ternary instruction
+	 * 
+	 * @return <code>true</code> if the instruction is a ternary instruction
+	 */
+	public boolean isInstTernary();
+
 } // InstTernary

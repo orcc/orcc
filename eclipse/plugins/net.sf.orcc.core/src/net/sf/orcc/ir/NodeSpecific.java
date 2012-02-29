@@ -14,10 +14,4 @@ package net.sf.orcc.ir;
  * @model abstract="true" extends="net.sf.orcc.ir.Node"
  */
 public interface NodeSpecific extends Node {
-	/**
-	 * Return <code>true</code> if the instruction is a NodeFor
-	 * 
-	 * @return <code>true</code> if the instruction is a NodeFor
-	 */
-	public boolean isNodeFor();
 }
