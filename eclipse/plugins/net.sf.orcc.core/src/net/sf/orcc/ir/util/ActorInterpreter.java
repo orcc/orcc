@@ -52,6 +52,9 @@ import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.Node;
+import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Param;
@@ -73,7 +76,14 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
  * @author Matthieu Wipliez
  * 
  */
-public class ActorInterpreter extends AbstractActorVisitor<Object> {
+public class ActorInterpreter extends IrSwitch<Object> {
+
+	protected Actor actor;
+
+	/**
+	 * Actor's constant parameters to be set at initialization time
+	 */
+	protected List<Argument> arguments;
 
 	/**
 	 * branch being visited
@@ -86,11 +96,6 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	 * Actor's FSM current state
 	 */
 	private State fsmState;
-
-	/**
-	 * Actor's constant parameters to be set at initialization time
-	 */
-	protected List<Argument> arguments;
 
 	/**
 	 * Creates a new interpreter with no actor and no parameters.
@@ -298,6 +303,16 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
+	public Object caseNodeBlock(NodeBlock block) {
+		Object result = null;
+		List<Instruction> instructions = block.getInstructions();
+		for (Instruction instruction : instructions) {
+			result = doSwitch(instruction);
+		}
+		return result;
+	}
+
+	@Override
 	public Object caseNodeIf(NodeIf node) {
 		// Interpret first expression ("if" condition)
 		Object condition = exprInterpreter.doSwitch(node.getCondition());
@@ -375,6 +390,18 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	}
 
 	/**
+	 * Visits the nodes of the given node list.
+	 * 
+	 * @param nodes
+	 *            a list of nodes that belong to a procedure
+	 */
+	protected void doSwitch(List<Node> nodes) {
+		for (Node node : nodes) {
+			doSwitch(node);
+		}
+	}
+
+	/**
 	 * Executes the given action. This implementation allocates input/output
 	 * pattern and executes the body. Should be overriden by implementations to
 	 * perform read/write from/to FIFOs.
@@ -389,6 +416,16 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 		allocatePattern(output);
 
 		doSwitch(action.getBody());
+	}
+
+	/**
+	 * Returns the value of the <code>actor</code> attribute. This may be
+	 * <code>null</code> if the visitor did not set it.
+	 * 
+	 * @return the value of the <code>actor</code> attribute
+	 */
+	final public Actor getActor() {
+		return actor;
 	}
 
 	/**
