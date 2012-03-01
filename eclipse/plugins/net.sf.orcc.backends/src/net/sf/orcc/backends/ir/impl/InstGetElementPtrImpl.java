@@ -10,23 +10,16 @@ import java.util.Collection;
 
 import net.sf.orcc.backends.ir.InstGetElementPtr;
 import net.sf.orcc.backends.ir.IrSpecificPackage;
-
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Use;
 
-import net.sf.orcc.ir.impl.InstSpecificImpl;
-
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
-
 import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
@@ -45,7 +38,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *
  * @generated
  */
-public class InstGetElementPtrImpl extends InstSpecificImpl implements
+public class InstGetElementPtrImpl extends IrInstSpecificImpl implements
 		InstGetElementPtr {
 	/**
 	 * The cached value of the '{@link #getIndexes() <em>Indexes</em>}' containment reference list.

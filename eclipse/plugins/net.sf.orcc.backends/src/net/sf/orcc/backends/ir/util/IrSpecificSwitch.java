@@ -6,10 +6,14 @@
  */
 package net.sf.orcc.backends.ir.util;
 
+import net.sf.dftools.graph.Vertex;
+import net.sf.dftools.util.Attributable;
 import net.sf.orcc.backends.ir.InstAssignIndex;
 import net.sf.orcc.backends.ir.InstCast;
 import net.sf.orcc.backends.ir.InstGetElementPtr;
 import net.sf.orcc.backends.ir.InstTernary;
+import net.sf.orcc.backends.ir.IrInstSpecific;
+import net.sf.orcc.backends.ir.IrNodeSpecific;
 import net.sf.orcc.backends.ir.IrSpecificPackage;
 import net.sf.orcc.backends.ir.NodeFor;
 import net.sf.orcc.ir.InstSpecific;
@@ -82,6 +86,8 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 			InstAssignIndex instAssignIndex = (InstAssignIndex) theEObject;
 			T result = caseInstAssignIndex(instAssignIndex);
 			if (result == null)
+				result = caseIrInstSpecific(instAssignIndex);
+			if (result == null)
 				result = caseInstSpecific(instAssignIndex);
 			if (result == null)
 				result = caseInstruction(instAssignIndex);
@@ -92,6 +98,8 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 		case IrSpecificPackage.INST_CAST: {
 			InstCast instCast = (InstCast) theEObject;
 			T result = caseInstCast(instCast);
+			if (result == null)
+				result = caseIrInstSpecific(instCast);
 			if (result == null)
 				result = caseInstSpecific(instCast);
 			if (result == null)
@@ -104,6 +112,8 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 			InstGetElementPtr instGetElementPtr = (InstGetElementPtr) theEObject;
 			T result = caseInstGetElementPtr(instGetElementPtr);
 			if (result == null)
+				result = caseIrInstSpecific(instGetElementPtr);
+			if (result == null)
 				result = caseInstSpecific(instGetElementPtr);
 			if (result == null)
 				result = caseInstruction(instGetElementPtr);
@@ -114,6 +124,8 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 		case IrSpecificPackage.INST_TERNARY: {
 			InstTernary instTernary = (InstTernary) theEObject;
 			T result = caseInstTernary(instTernary);
+			if (result == null)
+				result = caseIrInstSpecific(instTernary);
 			if (result == null)
 				result = caseInstSpecific(instTernary);
 			if (result == null)
@@ -126,9 +138,41 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 			NodeFor nodeFor = (NodeFor) theEObject;
 			T result = caseNodeFor(nodeFor);
 			if (result == null)
+				result = caseIrNodeSpecific(nodeFor);
+			if (result == null)
 				result = caseNodeSpecific(nodeFor);
 			if (result == null)
 				result = caseNode(nodeFor);
+			if (result == null)
+				result = caseVertex(nodeFor);
+			if (result == null)
+				result = caseAttributable(nodeFor);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrSpecificPackage.IR_INST_SPECIFIC: {
+			IrInstSpecific irInstSpecific = (IrInstSpecific) theEObject;
+			T result = caseIrInstSpecific(irInstSpecific);
+			if (result == null)
+				result = caseInstSpecific(irInstSpecific);
+			if (result == null)
+				result = caseInstruction(irInstSpecific);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrSpecificPackage.IR_NODE_SPECIFIC: {
+			IrNodeSpecific irNodeSpecific = (IrNodeSpecific) theEObject;
+			T result = caseIrNodeSpecific(irNodeSpecific);
+			if (result == null)
+				result = caseNodeSpecific(irNodeSpecific);
+			if (result == null)
+				result = caseNode(irNodeSpecific);
+			if (result == null)
+				result = caseVertex(irNodeSpecific);
+			if (result == null)
+				result = caseAttributable(irNodeSpecific);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -214,6 +258,36 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 	}
 
 	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Ir Inst Specific</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Ir Inst Specific</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseIrInstSpecific(IrInstSpecific object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Ir Node Specific</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Ir Node Specific</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseIrNodeSpecific(IrNodeSpecific object) {
+		return null;
+	}
+
+	/**
 	 * Returns the result of interpreting the object as an instance of '<em>Instruction</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
@@ -240,6 +314,36 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseInstSpecific(InstSpecific object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Attributable</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Attributable</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseAttributable(Attributable object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Vertex</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Vertex</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseVertex(Vertex object) {
 		return null;
 	}
 

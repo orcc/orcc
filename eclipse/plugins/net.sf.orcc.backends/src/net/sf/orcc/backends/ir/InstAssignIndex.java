@@ -10,7 +10,6 @@ import java.util.Map;
 
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Type;
 
 import org.eclipse.emf.common.util.EList;
@@ -32,7 +31,7 @@ import org.eclipse.emf.common.util.EList;
  * @model
  * @generated
  */
-public interface InstAssignIndex extends InstSpecific {
+public interface InstAssignIndex extends IrInstSpecific {
 	/**
 	 * Returns the map of index expression to index number computed on the fly.
 	 * 
@@ -87,15 +86,6 @@ public interface InstAssignIndex extends InstSpecific {
 	 * @generated
 	 */
 	Def getTarget();
-
-	/**
-	 * Return <code>true</code> if the instruction is an assign index
-	 * instruction
-	 * 
-	 * @return <code>true</code> if the instruction is an assign index
-	 *         instruction
-	 */
-	public boolean isInstAssignIndex();
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.backends.ir.InstAssignIndex#getListType <em>List Type</em>}' containment reference.

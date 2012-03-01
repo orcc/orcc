@@ -85,6 +85,24 @@ public interface IrSpecificFactory extends EFactory {
 	 */
 	NodeFor createNodeFor();
 
+	/**
+	 * Returns a new object of class '<em>Ir Inst Specific</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Ir Inst Specific</em>'.
+	 * @generated
+	 */
+	IrInstSpecific createIrInstSpecific();
+
+	/**
+	 * Returns a new object of class '<em>Ir Node Specific</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Ir Node Specific</em>'.
+	 * @generated
+	 */
+	IrNodeSpecific createIrNodeSpecific();
+
 	InstTernary createInstTernary(Var target, Expression condition,
 			Expression trueValue, Expression falseValue);
 

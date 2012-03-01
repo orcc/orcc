@@ -12,6 +12,8 @@ import net.sf.orcc.backends.ir.InstAssignIndex;
 import net.sf.orcc.backends.ir.InstCast;
 import net.sf.orcc.backends.ir.InstGetElementPtr;
 import net.sf.orcc.backends.ir.InstTernary;
+import net.sf.orcc.backends.ir.IrInstSpecific;
+import net.sf.orcc.backends.ir.IrNodeSpecific;
 import net.sf.orcc.backends.ir.IrSpecificFactory;
 import net.sf.orcc.backends.ir.IrSpecificPackage;
 import net.sf.orcc.backends.ir.NodeFor;
@@ -81,6 +83,10 @@ public class IrSpecificFactoryImpl extends EFactoryImpl implements
 			return createInstTernary();
 		case IrSpecificPackage.NODE_FOR:
 			return createNodeFor();
+		case IrSpecificPackage.IR_INST_SPECIFIC:
+			return createIrInstSpecific();
+		case IrSpecificPackage.IR_NODE_SPECIFIC:
+			return createIrNodeSpecific();
 		default:
 			throw new IllegalArgumentException("The class '" + eClass.getName()
 					+ "' is not a valid classifier");
@@ -163,6 +169,26 @@ public class IrSpecificFactoryImpl extends EFactoryImpl implements
 	public NodeFor createNodeFor() {
 		NodeForImpl nodeFor = new NodeForImpl();
 		return nodeFor;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public IrInstSpecific createIrInstSpecific() {
+		IrInstSpecificImpl irInstSpecific = new IrInstSpecificImpl();
+		return irInstSpecific;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public IrNodeSpecific createIrNodeSpecific() {
+		IrNodeSpecificImpl irNodeSpecific = new IrNodeSpecificImpl();
+		return irNodeSpecific;
 	}
 
 	@Override

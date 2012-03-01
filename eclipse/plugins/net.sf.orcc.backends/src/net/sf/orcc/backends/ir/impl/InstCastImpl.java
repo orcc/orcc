@@ -8,20 +8,15 @@ package net.sf.orcc.backends.ir.impl;
 
 import net.sf.orcc.backends.ir.InstCast;
 import net.sf.orcc.backends.ir.IrSpecificPackage;
-
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Use;
 
-import net.sf.orcc.ir.impl.InstSpecificImpl;
-
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
 /**
@@ -38,7 +33,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  *
  * @generated
  */
-public class InstCastImpl extends InstSpecificImpl implements InstCast {
+public class InstCastImpl extends IrInstSpecificImpl implements InstCast {
 	/**
 	 * The cached value of the '{@link #getTarget() <em>Target</em>}' containment reference.
 	 * <!-- begin-user-doc -->

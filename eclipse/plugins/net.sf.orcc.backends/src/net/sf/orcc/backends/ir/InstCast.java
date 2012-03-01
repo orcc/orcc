@@ -7,7 +7,6 @@
 package net.sf.orcc.backends.ir;
 
 import net.sf.orcc.ir.Def;
-import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Use;
 
 /**
@@ -27,7 +26,7 @@ import net.sf.orcc.ir.Use;
  * @model
  * @generated
  */
-public interface InstCast extends InstSpecific {
+public interface InstCast extends IrInstSpecific {
 	/**
 	 * Returns the value of the '<em><b>Target</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
@@ -43,13 +42,6 @@ public interface InstCast extends InstSpecific {
 	 * @generated
 	 */
 	Def getTarget();
-
-	/**
-	 * Return <code>true</code> if the instruction is a cast
-	 * 
-	 * @return <code>true</code> if the instruction is a cast
-	 */
-	public boolean isInstCast();
 
 	/**
 	 * Return <code>true</code> if the target type is different from the source

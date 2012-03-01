@@ -8,7 +8,6 @@ package net.sf.orcc.backends.ir;
 
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Use;
 
 import org.eclipse.emf.common.util.EList;
@@ -31,7 +30,7 @@ import org.eclipse.emf.common.util.EList;
  * @model
  * @generated
  */
-public interface InstGetElementPtr extends InstSpecific {
+public interface InstGetElementPtr extends IrInstSpecific {
 	/**
 	 * Returns the value of the '<em><b>Indexes</b></em>' containment reference list.
 	 * The list contents are of type {@link net.sf.orcc.ir.Expression}.
@@ -99,15 +98,6 @@ public interface InstGetElementPtr extends InstSpecific {
 	 * @generated
 	 */
 	void setSource(Use value);
-
-	/**
-	 * Returns true if the current instruction is GEP (which is always true for
-	 * the current instruction). This method is only useable to detect this
-	 * specific instruction in template document.
-	 * 
-	 * @return true if current instruction is GEP
-	 */
-	public boolean isGep();
 
 	@Override
 	public boolean isLoad();

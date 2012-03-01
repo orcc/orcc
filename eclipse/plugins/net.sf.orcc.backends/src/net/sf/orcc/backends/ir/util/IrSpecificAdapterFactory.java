@@ -6,10 +6,14 @@
  */
 package net.sf.orcc.backends.ir.util;
 
+import net.sf.dftools.graph.Vertex;
+import net.sf.dftools.util.Attributable;
 import net.sf.orcc.backends.ir.InstAssignIndex;
 import net.sf.orcc.backends.ir.InstCast;
 import net.sf.orcc.backends.ir.InstGetElementPtr;
 import net.sf.orcc.backends.ir.InstTernary;
+import net.sf.orcc.backends.ir.IrInstSpecific;
+import net.sf.orcc.backends.ir.IrNodeSpecific;
 import net.sf.orcc.backends.ir.IrSpecificPackage;
 import net.sf.orcc.backends.ir.NodeFor;
 import net.sf.orcc.ir.InstSpecific;
@@ -103,6 +107,16 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 		}
 
 		@Override
+		public Adapter caseIrInstSpecific(IrInstSpecific object) {
+			return createIrInstSpecificAdapter();
+		}
+
+		@Override
+		public Adapter caseIrNodeSpecific(IrNodeSpecific object) {
+			return createIrNodeSpecificAdapter();
+		}
+
+		@Override
 		public Adapter caseInstruction(Instruction object) {
 			return createInstructionAdapter();
 		}
@@ -110,6 +124,16 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 		@Override
 		public Adapter caseInstSpecific(InstSpecific object) {
 			return createInstSpecificAdapter();
+		}
+
+		@Override
+		public Adapter caseAttributable(Attributable object) {
+			return createAttributableAdapter();
+		}
+
+		@Override
+		public Adapter caseVertex(Vertex object) {
+			return createVertexAdapter();
 		}
 
 		@Override
@@ -212,6 +236,34 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.ir.IrInstSpecific <em>Ir Inst Specific</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.ir.IrInstSpecific
+	 * @generated
+	 */
+	public Adapter createIrInstSpecificAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.ir.IrNodeSpecific <em>Ir Node Specific</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.ir.IrNodeSpecific
+	 * @generated
+	 */
+	public Adapter createIrNodeSpecificAdapter() {
+		return null;
+	}
+
+	/**
 	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Instruction <em>Instruction</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
@@ -236,6 +288,34 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createInstSpecificAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.dftools.util.Attributable <em>Attributable</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.dftools.util.Attributable
+	 * @generated
+	 */
+	public Adapter createAttributableAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.dftools.graph.Vertex <em>Vertex</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.dftools.graph.Vertex
+	 * @generated
+	 */
+	public Adapter createVertexAdapter() {
 		return null;
 	}
 

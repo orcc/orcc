@@ -8,7 +8,6 @@ package net.sf.orcc.backends.ir;
 
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.InstSpecific;
 
 /**
  * <!-- begin-user-doc -->
@@ -29,7 +28,7 @@ import net.sf.orcc.ir.InstSpecific;
  * @model
  * @generated
  */
-public interface InstTernary extends InstSpecific {
+public interface InstTernary extends IrInstSpecific {
 	/**
 	 * Returns the value of the '<em><b>Condition Value</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
@@ -133,12 +132,5 @@ public interface InstTernary extends InstSpecific {
 	 * @generated
 	 */
 	void setTarget(Def value);
-
-	/**
-	 * Return <code>true</code> if the instruction is a ternary instruction
-	 * 
-	 * @return <code>true</code> if the instruction is a ternary instruction
-	 */
-	public boolean isInstTernary();
 
 } // InstTernary

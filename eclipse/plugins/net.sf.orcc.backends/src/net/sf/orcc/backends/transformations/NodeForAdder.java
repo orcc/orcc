@@ -31,6 +31,7 @@ package net.sf.orcc.backends.transformations;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.backends.ir.IrNodeSpecific;
 import net.sf.orcc.backends.ir.IrSpecificFactory;
 import net.sf.orcc.backends.ir.NodeFor;
 import net.sf.orcc.df.Actor;
@@ -84,16 +85,18 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 
 			return node;
 		}
-		
+
 		@Override
 		public Node caseNodeSpecific(NodeSpecific node) {
-			if (node instanceof NodeFor){
-				caseNodeFor((NodeFor)node);
+
+			if (((IrNodeSpecific) node).isNodeFor()) {
+				caseNodeFor((NodeFor) node);
 			}
+
 			return null;
 		}
 	}
-	
+
 	private class VarGetter extends AbstractActorVisitor<Object> {
 
 		private List<Var> vars;
@@ -114,21 +117,21 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 		}
 
 	}
-	
+
 	@Override
 	public Object caseActor(Actor actor) {
 		// Build first CFG
 		new BuildCFG().doSwitch(actor);
-		
+
 		// Transform actor
 		super.caseActor(actor);
-		
+
 		// Rebuild CFG with for node
 		new ForNodeCfg().doSwitch(actor);
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public Object caseNodeWhile(NodeWhile nodeWhile) {
 
@@ -177,20 +180,20 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 		nodeFor.setLineNumber(nodeWhile.getLineNumber());
 		nodeFor.setJoinNode(nodeWhile.getJoinNode());
 		nodeFor.getNodes().addAll(nodeWhile.getNodes());
-		
+
 		// Add loop counters and inits
 		nodeFor.getLoopCounter().addAll(loopCnts);
 		nodeFor.getInit().addAll(initCnts);
-		
+
 		// Replace node
 		EcoreUtil.replace(nodeWhile, nodeFor);
-		
+
 		return null;
 	}
-	
+
 	private Instruction getLastAssign(Var var, Node lastNode) {
 		EList<Def> defs = var.getDefs();
-				
+
 		// Check if one var defs is located in the last node
 		NodeBlock lastBlockNode = null;
 

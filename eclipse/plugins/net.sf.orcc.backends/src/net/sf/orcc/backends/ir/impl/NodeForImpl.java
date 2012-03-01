@@ -10,24 +10,17 @@ import java.util.Collection;
 
 import net.sf.orcc.backends.ir.IrSpecificPackage;
 import net.sf.orcc.backends.ir.NodeFor;
-
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 
-import net.sf.orcc.ir.impl.NodeSpecificImpl;
-
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
-
 import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
@@ -49,7 +42,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *
  * @generated
  */
-public class NodeForImpl extends NodeSpecificImpl implements NodeFor {
+public class NodeForImpl extends IrNodeSpecificImpl implements NodeFor {
 	/**
 	 * The cached value of the '{@link #getCondition() <em>Condition</em>}' containment reference.
 	 * <!-- begin-user-doc -->
