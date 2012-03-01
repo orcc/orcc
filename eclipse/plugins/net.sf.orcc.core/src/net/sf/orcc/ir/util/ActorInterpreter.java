@@ -425,7 +425,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 				clippedValue = clippedValue.subtract(twoPowSize);
 			}
 
-			if (!value.equals(clippedValue)) {
+			if (!clippedValue.equals(intVal)) {
 				System.err.println("Warning: signed overflow/underflow");
 			}
 		}
