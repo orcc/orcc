@@ -497,10 +497,10 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 		Type type = variable.getType();
 		Expression initConst = variable.getInitialValue();
 		if (initConst == null) {
-			if (type.isList()) {
-				// allocate empty array variable
-				variable.setValue(ValueUtil.createArray((TypeList) type));
-			}
+			Object value = type.isBool() ? false : type.isFloat() ? 0.0f : type
+					.isInt() || type.isUint() ? 0 : type.isList() ? ValueUtil
+					.createArray((TypeList) type) : type.isString() ? "" : null;
+			variable.setValue(value);
 		} else {
 			// evaluate initial constant value
 			if (type.isList()) {
