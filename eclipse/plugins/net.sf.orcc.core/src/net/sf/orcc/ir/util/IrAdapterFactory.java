@@ -6,11 +6,13 @@
  */
 package net.sf.orcc.ir.util;
 
+import net.sf.dftools.graph.Graph;
 import net.sf.dftools.graph.Vertex;
 import net.sf.dftools.util.Attributable;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
+import net.sf.orcc.ir.Cfg;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
@@ -274,6 +276,11 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 		}
 
 		@Override
+		public Adapter caseCfg(Cfg object) {
+			return createCfgAdapter();
+		}
+
+		@Override
 		public Adapter caseAttributable(Attributable object) {
 			return createAttributableAdapter();
 		}
@@ -281,6 +288,11 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 		@Override
 		public Adapter caseVertex(Vertex object) {
 			return createVertexAdapter();
+		}
+
+		@Override
+		public Adapter caseGraph(Graph object) {
+			return createGraphAdapter();
 		}
 
 		@Override
@@ -495,6 +507,20 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Cfg <em>Cfg</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.Cfg
+	 * @generated
+	 */
+	public Adapter createCfgAdapter() {
+		return null;
+	}
+
+	/**
 	 * Creates a new adapter for an object of class '{@link net.sf.dftools.util.Attributable <em>Attributable</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
@@ -519,6 +545,20 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createVertexAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.dftools.graph.Graph <em>Graph</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.dftools.graph.Graph
+	 * @generated
+	 */
+	public Adapter createGraphAdapter() {
 		return null;
 	}
 

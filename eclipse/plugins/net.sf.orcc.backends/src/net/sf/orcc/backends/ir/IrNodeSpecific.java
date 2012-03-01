@@ -35,8 +35,8 @@ import net.sf.orcc.ir.NodeSpecific;
 /**
  * <!-- begin-user-doc --> A representation of the model object '
  * <em><b>Ir Node Specific</b></em>'. <!-- end-user-doc -->
- * 
- * 
+ *
+ *
  * @see net.sf.orcc.backends.ir.IrSpecificPackage#getIrNodeSpecific()
  * @model
  * @generated

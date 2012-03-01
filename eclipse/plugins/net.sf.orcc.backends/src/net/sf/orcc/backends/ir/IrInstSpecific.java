@@ -51,26 +51,26 @@ public interface IrInstSpecific extends InstSpecific {
 	 *         instruction
 	 */
 	public boolean isInstAssignIndex();
-	
+
 	/**
 	 * Return <code>true</code> if the instruction is a cast
 	 * 
 	 * @return <code>true</code> if the instruction is a cast
 	 */
 	public boolean isInstCast();
-	
+
 	/**
 	 * Return <code>true</code> if the instruction is a getElementPointer
 	 * 
 	 * @return <code>true</code> if the instruction is a getElementPointer
 	 */
 	public boolean isGep();
-	
+
 	/**
 	 * Return <code>true</code> if the instruction is a ternary instruction
 	 * 
 	 * @return <code>true</code> if the instruction is a ternary instruction
 	 */
 	public boolean isInstTernary();
-	
+
 } // IrInstSpecific

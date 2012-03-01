@@ -511,6 +511,32 @@ public interface IrPackage extends EPackage {
 		EClass NODE_SPECIFIC = eINSTANCE.getNodeSpecific();
 
 		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.CfgImpl <em>Cfg</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.CfgImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getCfg()
+		 * @generated
+		 */
+		EClass CFG = eINSTANCE.getCfg();
+
+		/**
+		 * The meta object literal for the '<em><b>Entry</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference CFG__ENTRY = eINSTANCE.getCfg_Entry();
+
+		/**
+		 * The meta object literal for the '<em><b>Exit</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference CFG__EXIT = eINSTANCE.getCfg_Exit();
+
+		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.NodeImpl <em>Node</em>}' class.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.NodeImpl
@@ -1211,7 +1237,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpBinary()
 	 * @generated
 	 */
-	int OP_BINARY = 39;
+	int OP_BINARY = 40;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpUnary <em>Op Unary</em>}' enum.
@@ -1220,7 +1246,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpUnary()
 	 * @generated
 	 */
-	int OP_UNARY = 40;
+	int OP_UNARY = 41;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ProcedureImpl <em>Procedure</em>}' class.
@@ -2609,6 +2635,61 @@ public interface IrPackage extends EPackage {
 	int NODE_SPECIFIC_FEATURE_COUNT = NODE_FEATURE_COUNT + 0;
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.CfgImpl <em>Cfg</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.CfgImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getCfg()
+	 * @generated
+	 */
+	int CFG = 39;
+
+	/**
+	 * The feature id for the '<em><b>Edges</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CFG__EDGES = GraphPackage.GRAPH__EDGES;
+
+	/**
+	 * The feature id for the '<em><b>Vertices</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CFG__VERTICES = GraphPackage.GRAPH__VERTICES;
+
+	/**
+	 * The feature id for the '<em><b>Entry</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CFG__ENTRY = GraphPackage.GRAPH_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>Exit</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CFG__EXIT = GraphPackage.GRAPH_FEATURE_COUNT + 1;
+
+	/**
+	 * The number of structural features of the '<em>Cfg</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CFG_FEATURE_COUNT = GraphPackage.GRAPH_FEATURE_COUNT + 2;
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Def <em>Def</em>}'.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Def</em>'.
@@ -3112,6 +3193,38 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getNodeSpecific();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.Cfg <em>Cfg</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Cfg</em>'.
+	 * @see net.sf.orcc.ir.Cfg
+	 * @generated
+	 */
+	EClass getCfg();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.Cfg#getEntry <em>Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Entry</em>'.
+	 * @see net.sf.orcc.ir.Cfg#getEntry()
+	 * @see #getCfg()
+	 * @generated
+	 */
+	EReference getCfg_Entry();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.Cfg#getExit <em>Exit</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Exit</em>'.
+	 * @see net.sf.orcc.ir.Cfg#getExit()
+	 * @see #getCfg()
+	 * @generated
+	 */
+	EReference getCfg_Exit();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.InstSpecific <em>Inst Specific</em>}'.

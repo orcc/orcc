@@ -8,13 +8,12 @@ package net.sf.orcc.ir.impl;
 
 import net.sf.dftools.graph.GraphPackage;
 import net.sf.dftools.util.UtilPackage;
-import net.sf.orcc.cfg.CfgPackage;
-import net.sf.orcc.cfg.impl.CfgPackageImpl;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.impl.DfPackageImpl;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
+import net.sf.orcc.ir.Cfg;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
@@ -345,6 +344,13 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	private EClass cfgEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	private EEnum opBinaryEEnum = null;
 
 	/**
@@ -409,9 +415,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		UtilPackage.eINSTANCE.eClass();
 
 		// Obtain or create and register interdependencies
-		CfgPackageImpl theCfgPackage = (CfgPackageImpl) (EPackage.Registry.INSTANCE
-				.getEPackage(CfgPackage.eNS_URI) instanceof CfgPackageImpl ? EPackage.Registry.INSTANCE
-				.getEPackage(CfgPackage.eNS_URI) : CfgPackage.eINSTANCE);
 		DfPackageImpl theDfPackage = (DfPackageImpl) (EPackage.Registry.INSTANCE
 				.getEPackage(DfPackage.eNS_URI) instanceof DfPackageImpl ? EPackage.Registry.INSTANCE
 				.getEPackage(DfPackage.eNS_URI) : DfPackage.eINSTANCE);
@@ -421,13 +424,11 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		// Create package meta-data objects
 		theIrPackage.createPackageContents();
-		theCfgPackage.createPackageContents();
 		theDfPackage.createPackageContents();
 		theMocPackage.createPackageContents();
 
 		// Initialize created meta-data
 		theIrPackage.initializePackageContents();
-		theCfgPackage.initializePackageContents();
 		theDfPackage.initializePackageContents();
 		theMocPackage.initializePackageContents();
 
@@ -617,6 +618,33 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 */
 	public EClass getNodeSpecific() {
 		return nodeSpecificEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getCfg() {
+		return cfgEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getCfg_Entry() {
+		return (EReference) cfgEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getCfg_Exit() {
+		return (EReference) cfgEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -1625,6 +1653,10 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		nodeSpecificEClass = createEClass(NODE_SPECIFIC);
 
+		cfgEClass = createEClass(CFG);
+		createEReference(cfgEClass, CFG__ENTRY);
+		createEReference(cfgEClass, CFG__EXIT);
+
 		// Create enums
 		opBinaryEEnum = createEEnum(OP_BINARY);
 		opUnaryEEnum = createEEnum(OP_UNARY);
@@ -1657,8 +1689,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		// Obtain other dependent packages
 		EcorePackage theEcorePackage = (EcorePackage) EPackage.Registry.INSTANCE
 				.getEPackage(EcorePackage.eNS_URI);
-		CfgPackage theCfgPackage = (CfgPackage) EPackage.Registry.INSTANCE
-				.getEPackage(CfgPackage.eNS_URI);
 		GraphPackage theGraphPackage = (GraphPackage) EPackage.Registry.INSTANCE
 				.getEPackage(GraphPackage.eNS_URI);
 		UtilPackage theUtilPackage = (UtilPackage) EPackage.Registry.INSTANCE
@@ -1699,6 +1729,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		typeVoidEClass.getESuperTypes().add(this.getType());
 		varEClass.getESuperTypes().add(theUtilPackage.getAttributable());
 		nodeSpecificEClass.getESuperTypes().add(this.getNode());
+		cfgEClass.getESuperTypes().add(theGraphPackage.getGraph());
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(procedureEClass, Procedure.class, "Procedure", !IS_ABSTRACT,
@@ -1731,10 +1762,10 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 				"returnType", null, 0, 1, Procedure.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getProcedure_Cfg(), theCfgPackage.getCfg(), null, "cfg",
-				null, 0, 1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getProcedure_Cfg(), this.getCfg(), null, "cfg", null, 0,
+				1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
 
 		initEClass(paramEClass, Param.class, "Param", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -2100,6 +2131,17 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		initEClass(nodeSpecificEClass, NodeSpecific.class, "NodeSpecific",
 				IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+
+		initEClass(cfgEClass, Cfg.class, "Cfg", !IS_ABSTRACT, !IS_INTERFACE,
+				IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getCfg_Entry(), this.getNode(), null, "entry", null, 0,
+				1, Cfg.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				!IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
+		initEReference(getCfg_Exit(), this.getNode(), null, "exit", null, 0, 1,
+				Cfg.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				!IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
 
 		// Initialize enums and add enum literals
 		initEEnum(opBinaryEEnum, OpBinary.class, "OpBinary");

@@ -8,8 +8,6 @@ package net.sf.orcc.moc.impl;
 
 import net.sf.dftools.graph.GraphPackage;
 import net.sf.dftools.util.UtilPackage;
-import net.sf.orcc.cfg.CfgPackage;
-import net.sf.orcc.cfg.impl.CfgPackageImpl;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.impl.DfPackageImpl;
 import net.sf.orcc.ir.IrPackage;
@@ -132,9 +130,6 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 		UtilPackage.eINSTANCE.eClass();
 
 		// Obtain or create and register interdependencies
-		CfgPackageImpl theCfgPackage = (CfgPackageImpl) (EPackage.Registry.INSTANCE
-				.getEPackage(CfgPackage.eNS_URI) instanceof CfgPackageImpl ? EPackage.Registry.INSTANCE
-				.getEPackage(CfgPackage.eNS_URI) : CfgPackage.eINSTANCE);
 		DfPackageImpl theDfPackage = (DfPackageImpl) (EPackage.Registry.INSTANCE
 				.getEPackage(DfPackage.eNS_URI) instanceof DfPackageImpl ? EPackage.Registry.INSTANCE
 				.getEPackage(DfPackage.eNS_URI) : DfPackage.eINSTANCE);
@@ -144,13 +139,11 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 
 		// Create package meta-data objects
 		theMocPackage.createPackageContents();
-		theCfgPackage.createPackageContents();
 		theDfPackage.createPackageContents();
 		theIrPackage.createPackageContents();
 
 		// Initialize created meta-data
 		theMocPackage.initializePackageContents();
-		theCfgPackage.initializePackageContents();
 		theDfPackage.initializePackageContents();
 		theIrPackage.initializePackageContents();
 

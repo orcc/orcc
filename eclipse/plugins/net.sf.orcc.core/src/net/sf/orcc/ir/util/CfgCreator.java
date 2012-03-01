@@ -26,19 +26,18 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.cfg.util;
+package net.sf.orcc.ir.util;
 
 import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.GraphFactory;
-import net.sf.orcc.cfg.Cfg;
-import net.sf.orcc.cfg.CfgFactory;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.ir.Cfg;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Node;
 
@@ -57,7 +56,7 @@ public class CfgCreator extends DfSwitch<Void> {
 	private Node last;
 
 	public CfgCreator() {
-		cfg = CfgFactory.eINSTANCE.createCfg();
+		cfg = IrFactory.eINSTANCE.createCfg();
 		Node start = IrFactory.eINSTANCE.createNodeBlock();
 		cfg.getVertices().add(start);
 		cfg.setEntry(start);

@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.ir;
 
-import net.sf.orcc.cfg.Cfg;
-
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 

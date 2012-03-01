@@ -14,6 +14,7 @@ import java.util.List;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
+import net.sf.orcc.ir.Cfg;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
@@ -212,6 +213,8 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 			return createUse();
 		case IrPackage.PREDICATE:
 			return createPredicate();
+		case IrPackage.CFG:
+			return createCfg();
 		default:
 			throw new IllegalArgumentException("The class '" + eClass.getName()
 					+ "' is not a valid classifier");
@@ -790,6 +793,16 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public Predicate createPredicate() {
 		PredicateImpl predicate = new PredicateImpl();
 		return predicate;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Cfg createCfg() {
+		CfgImpl cfg = new CfgImpl();
+		return cfg;
 	}
 
 	/**

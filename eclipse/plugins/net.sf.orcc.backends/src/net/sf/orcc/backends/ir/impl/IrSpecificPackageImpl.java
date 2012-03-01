@@ -14,9 +14,7 @@ import net.sf.orcc.backends.ir.IrInstSpecific;
 import net.sf.orcc.backends.ir.IrNodeSpecific;
 import net.sf.orcc.backends.ir.IrSpecificFactory;
 import net.sf.orcc.backends.ir.IrSpecificPackage;
-
 import net.sf.orcc.backends.ir.NodeFor;
-import net.sf.orcc.cfg.CfgPackage;
 import net.sf.orcc.ir.IrPackage;
 
 import org.eclipse.emf.ecore.EAttribute;
@@ -24,7 +22,6 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EcorePackage;
-
 import org.eclipse.emf.ecore.impl.EPackageImpl;
 
 /**
@@ -136,7 +133,6 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 
 		// Initialize simple dependencies
 		IrPackage.eINSTANCE.eClass();
-		CfgPackage.eINSTANCE.eClass();
 
 		// Create package meta-data objects
 		theIrSpecificPackage.createPackageContents();

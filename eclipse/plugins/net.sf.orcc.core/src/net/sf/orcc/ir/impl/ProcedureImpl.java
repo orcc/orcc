@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.cfg.Cfg;
+import net.sf.orcc.ir.Cfg;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;

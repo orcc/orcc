@@ -13,8 +13,8 @@
         eType="#//Param" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="returnType" eType="#//Type"
         containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="cfg" eType="ecore:EClass Cfg.ecore#//Cfg"
-        containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="cfg" eType="#//Cfg" containment="true"
+        resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Param">
     <eStructuralFeatures xsi:type="ecore:EReference" name="variable" eType="#//Var"
@@ -189,6 +189,10 @@
         eType="#//Expression" containment="true" resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="NodeSpecific" abstract="true" eSuperTypes="#//Node"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Cfg" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Graph">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="entry" eType="#//Node"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="exit" eType="#//Node"/>
+  </eClassifiers>
   <eClassifiers xsi:type="ecore:EEnum" name="OpBinary">
     <eLiterals name="BITAND"/>
     <eLiterals name="BITOR" value="1"/>

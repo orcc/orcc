@@ -41,14 +41,13 @@ import org.eclipse.emf.ecore.EClass;
  * <em><b>Ir Node Specific</b></em>'. <!-- end-user-doc -->
  * <p>
  * </p>
- * 
+ *
  * @generated
  */
 public class IrNodeSpecificImpl extends NodeSpecificImpl implements
 		IrNodeSpecific {
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	protected IrNodeSpecificImpl() {
@@ -57,7 +56,6 @@ public class IrNodeSpecificImpl extends NodeSpecificImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override

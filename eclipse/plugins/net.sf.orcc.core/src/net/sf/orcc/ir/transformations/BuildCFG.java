@@ -33,8 +33,7 @@ import java.util.List;
 
 import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.GraphFactory;
-import net.sf.orcc.cfg.Cfg;
-import net.sf.orcc.cfg.CfgFactory;
+import net.sf.orcc.ir.Cfg;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
@@ -131,7 +130,7 @@ public class BuildCFG extends AbstractActorVisitor<Node> {
 	@Override
 	public Node caseProcedure(Procedure procedure) {
 		last = null;
-		cfg = CfgFactory.eINSTANCE.createCfg();
+		cfg = IrFactory.eINSTANCE.createCfg();
 		procedure.setCfg(cfg);
 		return super.caseProcedure(procedure);
 	}

@@ -6,11 +6,13 @@
  */
 package net.sf.orcc.ir.util;
 
+import net.sf.dftools.graph.Graph;
 import net.sf.dftools.graph.Vertex;
 import net.sf.dftools.util.Attributable;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
+import net.sf.orcc.ir.Cfg;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
@@ -281,6 +283,21 @@ public class IrSwitch<T> extends Switch<T> {
 	}
 
 	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Cfg</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Cfg</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseCfg(Cfg object) {
+		return null;
+	}
+
+	/**
 	 * Returns the result of interpreting the object as an instance of '<em>Attributable</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
@@ -307,6 +324,21 @@ public class IrSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseVertex(Vertex object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Graph</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Graph</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseGraph(Graph object) {
 		return null;
 	}
 
@@ -1088,6 +1120,15 @@ public class IrSwitch<T> extends Switch<T> {
 				result = caseVertex(nodeSpecific);
 			if (result == null)
 				result = caseAttributable(nodeSpecific);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.CFG: {
+			Cfg cfg = (Cfg) theEObject;
+			T result = caseCfg(cfg);
+			if (result == null)
+				result = caseGraph(cfg);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;

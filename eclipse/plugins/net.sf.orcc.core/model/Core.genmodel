@@ -5,13 +5,6 @@
     modelName="Core" rootImplementsInterface="" codeFormatting="true" importerID="org.eclipse.emf.importer.java"
     complianceLevel="6.0" copyrightFields="false" usedGenPackages="../../net.sf.dftools.models/model/Graph.genmodel#//graph ../../net.sf.dftools.models/model/Graph.genmodel#//util platform:/plugin/org.eclipse.emf.ecore/model/Ecore.genmodel#//ecore">
   <foreignModel>@model</foreignModel>
-  <genPackages prefix="Cfg" basePackage="net.sf.orcc" disposableProviderFactory="true"
-      ecorePackage="Cfg.ecore#/">
-    <genClasses ecoreClass="Cfg.ecore#//Cfg">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Cfg.ecore#//Cfg/entry"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Cfg.ecore#//Cfg/exit"/>
-    </genClasses>
-  </genPackages>
   <genPackages prefix="Df" basePackage="net.sf.orcc" disposableProviderFactory="true"
       ecorePackage="Df.ecore#/">
     <genClasses image="false" ecoreClass="Df.ecore#//DfVertex"/>
@@ -276,6 +269,10 @@
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Predicate/expressions"/>
     </genClasses>
     <genClasses image="false" ecoreClass="Ir.ecore#//NodeSpecific"/>
+    <genClasses ecoreClass="Ir.ecore#//Cfg">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Cfg/entry"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Cfg/exit"/>
+    </genClasses>
   </genPackages>
   <genPackages prefix="Moc" basePackage="net.sf.orcc" disposableProviderFactory="true"
       ecorePackage="MoC.ecore#/">

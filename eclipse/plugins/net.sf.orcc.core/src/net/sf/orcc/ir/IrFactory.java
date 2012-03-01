@@ -605,6 +605,15 @@ public interface IrFactory extends EFactory {
 	Predicate createPredicate();
 
 	/**
+	 * Returns a new object of class '<em>Cfg</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Cfg</em>'.
+	 * @generated
+	 */
+	Cfg createCfg();
+
+	/**
 	 * Returns a new object of class '<em>Procedure</em>'.
 	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->

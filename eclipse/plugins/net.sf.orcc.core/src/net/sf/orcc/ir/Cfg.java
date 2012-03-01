@@ -1,6 +1,5 @@
-/**
- * <copyright>
- * Copyright (c) 2009-2012, IETR/INSA of Rennes
+/*
+ * Copyright (c) 2012, Synflow
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,50 +25,49 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- * </copyright>
  */
-package net.sf.orcc.cfg;
+package net.sf.orcc.ir;
 
-import net.sf.dftools.graph.Edge;
-import net.sf.dftools.graph.Vertex;
-
-import org.eclipse.emf.ecore.EFactory;
+import net.sf.dftools.graph.Graph;
 
 /**
- * <!-- begin-user-doc -->
- * The <b>Factory</b> for the model.
- * It provides a create method for each non-abstract class of the model.
- * <!-- end-user-doc -->
- * @see net.sf.orcc.cfg.CfgPackage
- * @generated
+ * This interface defines a Control-Flow Graph.
+ * 
+ * @author Matthieu Wipliez
+ * @model
  */
-public interface CfgFactory extends EFactory {
-	/**
-	 * The singleton instance of the factory.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	CfgFactory eINSTANCE = net.sf.orcc.cfg.impl.CfgFactoryImpl.init();
+public interface Cfg extends Graph {
 
 	/**
-	 * Returns a new object of class '<em>Cfg</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Cfg</em>'.
-	 * @generated
+	 * Returns the entry node of this CFG.
+	 * 
+	 * @return the entry node of this CFG
+	 * @model
 	 */
-	Cfg createCfg();
-
-	Edge createEdge(Vertex source, Vertex target);
+	Node getEntry();
 
 	/**
-	 * Returns the package supported by this factory.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the package supported by this factory.
-	 * @generated
+	 * Returns the exit node of this CFG.
+	 * 
+	 * @return the exit node of this CFG
+	 * @model
 	 */
-	CfgPackage getCfgPackage();
+	Node getExit();
 
-} //CfgFactory
+	/**
+	 * Sets the entry node of this CFG.
+	 * 
+	 * @param node
+	 *            the new entry node
+	 */
+	void setEntry(Node node);
+
+	/**
+	 * Sets the exit node of this CFG.
+	 * 
+	 * @param node
+	 *            the new exit node
+	 */
+	void setExit(Node node);
+
+}
