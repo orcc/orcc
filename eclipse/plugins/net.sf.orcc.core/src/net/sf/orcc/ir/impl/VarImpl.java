@@ -546,7 +546,7 @@ public class VarImpl extends AttributableImpl implements Var {
 
 	@Override
 	public boolean isInitialized() {
-		return (initialValue != null || value != null);
+		return initialValue != null;
 	}
 
 	@Override
