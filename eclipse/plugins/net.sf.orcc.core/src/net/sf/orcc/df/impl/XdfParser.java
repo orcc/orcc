@@ -58,7 +58,6 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.Entry;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
 import net.sf.orcc.util.BinOpSeqParser;
 import net.sf.orcc.util.DomUtil;
@@ -85,6 +84,94 @@ import org.w3c.dom.Node;
  * 
  */
 public class XdfParser {
+	
+	/**
+	 * This class defines a type entry.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	private static class Entry {
+
+		/**
+		 * expression entry
+		 */
+		public static final int EXPR = 1;
+
+		/**
+		 * type entry
+		 */
+		public static final int TYPE = 2;
+
+		/**
+		 * the contents of this entry: expression or type.
+		 */
+		private Object content;
+
+		/**
+		 * the type of this entry
+		 */
+		private int type;
+
+		/**
+		 * Creates a new expression entry
+		 * 
+		 * @param expr
+		 *            an expression
+		 */
+		public Entry(Expression expr) {
+			this.content = expr;
+			this.type = EXPR;
+		}
+
+		/**
+		 * Creates a new type entry
+		 * 
+		 * @param type
+		 *            a type
+		 */
+		public Entry(Type type) {
+			this.content = type;
+			this.type = TYPE;
+		}
+
+		/**
+		 * Returns this entry's content as an expression
+		 * 
+		 * @return this entry's content as an expression
+		 */
+		public Expression getEntryAsExpr() {
+			if (getType() == EXPR) {
+				return (Expression) content;
+			} else {
+				throw new OrccRuntimeException(
+						"this entry does not contain an expression");
+			}
+		}
+
+		/**
+		 * Returns this entry's content as a type
+		 * 
+		 * @return this entry's content as a type
+		 */
+		public Type getEntryAsType() {
+			if (getType() == TYPE) {
+				return (Type) content;
+			} else {
+				throw new OrccRuntimeException("this entry does not contain a type");
+			}
+		}
+
+		/**
+		 * Returns the type of this entry.
+		 * 
+		 * @return the type of this entry
+		 */
+		public int getType() {
+			return type;
+		}
+
+	}
 
 	/**
 	 * This class defines a parser of XDF expressions.
