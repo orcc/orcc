@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.ir.util;
 
+import static java.math.BigInteger.ONE;
+
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 
@@ -178,15 +181,11 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	public Object caseInstAssign(InstAssign instr) {
 		try {
 			Var target = instr.getTarget().getVariable();
-			target.setValue(exprInterpreter.doSwitch(instr.getValue()));
+			Object value = exprInterpreter.doSwitch(instr.getValue());
+			value = clipValue(target.getType(), value);
+			target.setValue(value);
 		} catch (OrccRuntimeException e) {
-			String file;
-			if (actor == null) {
-				file = "";
-			} else {
-				file = actor.getFileName();
-			}
-
+			String file = actor.getFileName();
 			throw new OrccRuntimeException(file, instr.getLineNumber(), "", e);
 		}
 		return null;
@@ -281,6 +280,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 		Var target = instr.getTarget().getVariable();
 		Object value = exprInterpreter.doSwitch(instr.getValue());
 		if (instr.getIndexes().isEmpty()) {
+			value = clipValue(target.getType(), value);
 			target.setValue(value);
 		} else {
 			try {
@@ -292,6 +292,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 				}
 
 				Type type = ((TypeList) target.getType()).getInnermostType();
+				value = clipValue(type, value);
 				ValueUtil.set(type, array, value, indexes);
 			} catch (IndexOutOfBoundsException e) {
 				throw new OrccRuntimeException(
@@ -304,12 +305,14 @@ public class ActorInterpreter extends IrSwitch<Object> {
 
 	@Override
 	public Object caseNodeBlock(NodeBlock block) {
-		Object result = null;
 		List<Instruction> instructions = block.getInstructions();
 		for (Instruction instruction : instructions) {
-			result = doSwitch(instruction);
+			Object result = doSwitch(instruction);
+			if (result != null) {
+				return result;
+			}
 		}
-		return result;
+		return null;
 	}
 
 	@Override
@@ -374,7 +377,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 			}
 		}
 
-		return super.caseProcedure(procedure);
+		return doSwitch(procedure.getNodes());
 	}
 
 	/**
@@ -390,15 +393,60 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	}
 
 	/**
+	 * Returns a new value clipped to:
+	 * <ul>
+	 * <li>[-2**(n-1); 2**(n-1) - 1] if type is int(size=n)</li>
+	 * <li>[0; 2**n - 1] if type is uint(size=n)</li>
+	 * </ul>
+	 * Prints a warning in case of signed overflow/underflow.
+	 * 
+	 * @param type
+	 *            type of the target variable
+	 * @param value
+	 *            a value
+	 * @return the original value or a new value
+	 */
+	protected Object clipValue(Type type, Object value) {
+		BigInteger intVal = ValueUtil.getBigInteger(value);
+		if (intVal == null) {
+			// value is not an integer, ignore
+			return value;
+		}
+
+		// converts to unsigned n-bit number
+		int n = type.getSizeInBits();
+		BigInteger twoPowSize = ONE.shiftLeft(n);
+		BigInteger clippedValue = intVal.and(twoPowSize.subtract(ONE));
+
+		// check signed overflow/underflow
+		if (type.isInt()) {
+			// if MSB is set, subtract 2**n to make negative number
+			if (clippedValue.testBit(n - 1)) {
+				clippedValue = clippedValue.subtract(twoPowSize);
+			}
+
+			if (!value.equals(clippedValue)) {
+				System.err.println("Warning: signed overflow/underflow");
+			}
+		}
+
+		return clippedValue;
+	}
+
+	/**
 	 * Visits the nodes of the given node list.
 	 * 
 	 * @param nodes
 	 *            a list of nodes that belong to a procedure
 	 */
-	protected void doSwitch(List<Node> nodes) {
+	protected Object doSwitch(List<Node> nodes) {
 		for (Node node : nodes) {
-			doSwitch(node);
+			Object result = doSwitch(node);
+			if (result != null) {
+				return result;
+			}
 		}
+		return null;
 	}
 
 	/**
