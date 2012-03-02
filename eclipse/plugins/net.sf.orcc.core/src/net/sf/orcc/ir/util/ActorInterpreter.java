@@ -563,7 +563,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 			for (Action action : actor.getInitializes()) {
 				if (isSchedulable(action)) {
 					execute(action);
-					continue;
+					break;
 				}
 			}
 		} catch (OrccRuntimeException ex) {
