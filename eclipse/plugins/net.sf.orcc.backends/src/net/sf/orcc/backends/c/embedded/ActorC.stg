@@ -1,34 +1,156 @@
 import "net/sf/orcc/backends/c/Actor.stg"
 
+
 // printing an actor in a C file
 
-printInputPortEmbd(port,action)  ::= <<
-<port.type>[<action.inputPattern.numTokensMap.(port)>] <port.name>
+///////////////////////////////////////////////////////////////////////////////
+// Instructions
+///////////////////////////////////////////////////////////////////////////////
+printLoad(load) ::= <<
+
+<if (action.inputPattern.varToPortMap.(load.source.variable) || action.outputPattern.varToPortMap.(load.source.variable) || action.peekPattern.varToPortMap.(load.source.variable))
+><load.target.variable.indexedName> = <getPort(load.source.variable)>[<first(load.indexes)>];<
+else
+><load.target.variable.indexedName> = <load.source.variable.name><load.indexes : {index | [<index>]}>;<
+endif>
 >>
 
-printOutputPortEmbd(port,action)  ::= <<
-<port.type>[<action.outputPattern.numTokensMap.(port)>] <port.name>
+printStore(store) ::= <<
+
+<if(action.inputPattern.varToPortMap.(store.target.variable) || action.outputPattern.varToPortMap.(store.target.variable) || action.peekPattern.varToPortMap.(store.target.variable))
+><if(action.outputPattern.varToPortMap.(store.target.variable).native)
+>printf("<getPort(store.target.variable)> = %i\n", <store.value>);<
+else
+><getPort(store.target.variable)>[<first(store.indexes)>] = <store.value>;<
+endif
+><else
+><store.target.variable.name><store.indexes : {index | [<index>]}> = <store.value>;<
+endif>
 >>
 
-printProcedureDeclarationEmbd(procedure,action="") ::= <<
-<if(!procedure.native)> <procedure.returnType> <procedure.name>(<procedure.parameters: {param |
-<varDecl(param.variable)>}; separator=", ">);
+printCall(call,actor) ::= <%
+
+<if(call.print)>printf(<call.parameters: printFormat()><call.parameters: printPrintfParam()>);<
+else
+><if(call.target)><call.target.variable.indexedName> = <endif><call.procedure.name>(
+<actor.parameters:{param | <param.name>}; separator=", ">
+<if (!actor.parameters.empty && !call.parameters.empty)>, <endif>
+<call.parameters: printCallParam(); separator=", ">);<
+endif>
+%>
+
+///////////////////////////////////////////////////////////////////////////////
+// Procedure
+///////////////////////////////////////////////////////////////////////////////
+
+printProcedureDeclarationParameters(procedure,actor) ::= <%
+<actor.parameters:printParameter(); separator=", ">
+<if (!actor.parameters.empty)>
+	<if (!procedure.parameters.empty)>, <endif>
+<endif>
+<procedure.parameters: {param | <varDecl(param.variable)>}; separator=", ">
+%>
+
+printProcedureDeclarationEmbd(procedure,actor) ::= <<
+<if (!procedure.native)><procedure.returnType> <procedure.name>(<printProcedureDeclarationParameters(procedure,actor)>);
 <endif>
 >>
 
-printActionEmbd(action)  ::= <<
+printProcedureEmbd(procedure,actor,action="") ::= <<
+<if(!procedure.native)>
+<procedure.returnType> <procedure.name>(<printProcedureDeclarationParameters(procedure,actor)>){
+<if(procedure.locals)>
+	<procedure.locals: {local | <varDecl(local,";\n")>}>
+<endif>
+	<printNodes(procedure.nodes,actor)>
+}
 
-static void <action.body.name>(
-	<if (!action.inputPattern.ports.empty)>
-		<action.inputPattern.ports:printInputPortEmbd(action); separator=", "><
-		if (!action.outputPattern.ports.empty)>, <endif> // Inputs
-	<endif>
-	<if (!action.outputPattern.ports.empty)>
-		<action.outputPattern.ports: printOutputPortEmbd(action); separator=", "> // Outputs
-	<endif>
-)
+<endif>
+>>
+
+printParameter(parameter) ::= <%
+	<parameter.type> <if (parameter.port)>*<endif><parameter.name>
+%>
+
+///////////////////////////////////////////////////////////////////////////////
+// Nodes
+///////////////////////////////////////////////////////////////////////////////
+
+printInstructions(instructions,actor) ::= <<
+<instructions: {instr | <
+if (instr.assign)><printAssign(assign=instr)><
+elseif (instr.call)><printCall(call=instr,actor=actor)><
+elseif (instr.load)><printLoad(load=instr)><
+elseif (instr.return)><printReturn(return=instr)><
+elseif (instr.store)><printStore(store=instr)><
+endif>}>
+>>
+
+printNodes(nodes,actor) ::= <<
+<nodes: {node | <if (node.nodeBlock)><printBlockNode(node,actor)><
+elseif (node.nodeIf)><printIfNode(node,actor)><
+elseif (node.nodeWhile)><printWhileNode(node,actor)><
+elseif (node.nodeFor)><printForNode(node,actor)><
+endif>}>
+>>
+
+// block node
+printBlockNode(blockNode,actor) ::= <<
+<printInstructions(blockNode.instructions,actor)>
+>>
+
+// if node
+printIfNode(ifNode,actor) ::= <<
+
+if (<ifNode.condition>) {
+	<printNodes(ifNode.thenNodes,actor)>
+}<if(ifNode.elseNodes)> else {
+	<printNodes(ifNode.elseNodes,actor)>
+}<endif>
+<printBlockNode(ifNode.joinNode,actor)>
+>>
+
+// while node
+printWhileNode(whileNode,actor) ::= <<
+
+while (<whileNode.condition>) {
+	<printNodes(whileNode.nodes,actor)>
+}
+<printBlockNode(whileNode.joinNode,actor)>
+>>
+
+// for node
+printForNode(forNode,actor) ::= <<
+
+for(<forNode.init:{assign | <assign.target.variable.indexedName> = <assign.value>} ; separator=", "> ;<forNode.condition>; <forNode.loopCounter:{assign | <assign.target.variable.indexedName> = <assign.value>}; separator=", ">) {
+	<printNodes(forNode.nodes,actor)>
+}
+<printBlockNode(forNode.joinNode,actor)>
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Action
+///////////////////////////////////////////////////////////////////////////////
+
+printActionParameters(action,actor) ::= <%
+<actor.parameters:printParameter(); separator=", ">
+<if ( !actor.parameters.empty && !action.inputPattern.ports.empty)>, <endif>
+<action.inputPattern.ports: printParameter(); separator=", ">
+<if (!actor.parameters.empty || !action.inputPattern.ports.empty)><
+	if(!action.outputPattern.ports.empty)>, <endif>
+<endif>
+<action.outputPattern.ports: printParameter(); separator=", ">
+
+%>
+
+printActionEmbd(action,actor)  ::= <<
+
+void <action.body.name>(<printActionParameters(action,actor)>)
 {
-	
+<if(action.body.locals)>
+	<action.body.locals: {local | <varDecl(local,";\n")>}>
+<endif>	
+	<printNodes(action.body.nodes,actor)>
 }
 
 >>
@@ -46,11 +168,21 @@ printActor(actor, options) ::= <<
 
 ////////////////////////////////////////////////////////////////////////////////
 // Functions/procedures
-<actor.procs: printProcedureDeclarationEmbd()>
-<actor.procs: printProcedure()>
+<actor.procs: printProcedureDeclarationEmbd(actor)>
+<actor.procs: printProcedureEmbd(actor)>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Actions
-<actor.actions: printActionEmbd()>
+<actor.actions: {action | <printActionEmbd(action, actor)>}>
+
+////////////////////////////////////////////////////////////////////////////////
+// Initializes 
+<! Not functional yet : 
+ In SDF classification, the token production obtained for an actor with an
+ initialize action include the number of token produce by this initialize 
+ action. This is not correct as the token produced by the initialize action
+ are not produced during each execution of the actor, but only when the actor
+ is instanciated !> 
+<actor.initializes:{action | <printActionEmbd(action,actor)>}>
 
 >>
