@@ -53,7 +53,6 @@ import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.sexp.SExp;
 import net.sf.orcc.util.sexp.SExpList;
@@ -100,7 +99,7 @@ public class SmtSolver {
 					// remove "bv" from the symbol
 					String contents = bv.getContents().substring(2);
 					BigInteger value = new BigInteger(contents);
-					return ValueUtil.getIntValue(value);
+					return ((BigInteger) value).intValue();
 				}
 			}
 

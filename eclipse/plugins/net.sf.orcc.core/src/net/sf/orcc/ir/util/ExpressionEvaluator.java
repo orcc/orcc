@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir.util;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import net.sf.orcc.OrccRuntimeException;
@@ -89,12 +90,12 @@ public class ExpressionEvaluator extends IrSwitch<Object> {
 
 	@Override
 	public Object caseExprFloat(ExprFloat expr) {
-		return ValueUtil.getFloatValue(expr.getValue());
+		return expr.getValue();
 	}
 
 	@Override
 	public Object caseExprInt(ExprInt expr) {
-		return ValueUtil.getIntValue(expr.getValue());
+		return expr.getValue();
 	}
 
 	@Override
@@ -204,7 +205,7 @@ public class ExpressionEvaluator extends IrSwitch<Object> {
 	public int evaluateAsInteger(Expression expr) {
 		Object value = doSwitch(expr);
 		if (ValueUtil.isInt(value)) {
-			return ValueUtil.getIntValue(value);
+			return ((BigInteger) value).intValue();
 		}
 
 		// evaluated ok, but not as an integer

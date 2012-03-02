@@ -34,6 +34,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.math.BigInteger;
 
 import javax.swing.JFrame;
 
@@ -127,11 +128,13 @@ public class DisplayYUV {
 
 	public static void displayYUV_displayPicture(short[] pictureBufferY,
 			short[] pictureBufferU, short[] pictureBufferV,
-			Integer pictureWidth, Integer pictureHeight) {
+			BigInteger biPictureWidth, BigInteger biPictureHeight) {
+		int pictureWidth = biPictureWidth.intValue();
+		int pictureHeight = biPictureHeight.intValue();
 		if (pictureWidth != lastWidth || pictureHeight != lastHeight) {
 			setVideoSize(pictureWidth, pictureHeight);
 		}
-		
+
 		if (image == null) {
 			return;
 		}
@@ -171,8 +174,8 @@ public class DisplayYUV {
 	 * 
 	 * @return the flags of the display
 	 */
-	public static int displayYUV_getFlags() {
-		return DISPLAY_ENABLE | DISPLAY_READY;
+	public static BigInteger displayYUV_getFlags() {
+		return BigInteger.valueOf(DISPLAY_ENABLE | DISPLAY_READY);
 	}
 
 	/**

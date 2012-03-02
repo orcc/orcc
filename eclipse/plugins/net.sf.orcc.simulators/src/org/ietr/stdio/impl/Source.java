@@ -31,6 +31,7 @@ package org.ietr.stdio.impl;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.math.BigInteger;
 
 import net.sf.orcc.runtime.impl.GenericSource;
 
@@ -52,8 +53,8 @@ public class Source extends GenericSource {
 		// System.exit(status);
 	}
 
-	public static int source_getNbLoop() {
-		return nbLoops;
+	public static BigInteger source_getNbLoop() {
+		return BigInteger.valueOf(nbLoops);
 	}
 
 	public static void source_init() {
@@ -65,11 +66,13 @@ public class Source extends GenericSource {
 		}
 	}
 
-	public static void source_readNBytes(short outTable[], Integer nbTokenToRead) {
+	public static void source_readNBytes(short outTable[],
+			BigInteger nbTokenToRead) {
 		try {
 			byte[] b = new byte[outTable.length];
 			in.read(b);
-			for (int i = 0; i < nbTokenToRead; i++) {
+			int n = nbTokenToRead.intValue();
+			for (int i = 0; i < n; i++) {
 				outTable[i] = (short) (b[i] & 0xFF);
 			}
 		} catch (IOException e) {
@@ -88,12 +91,12 @@ public class Source extends GenericSource {
 		}
 	}
 
-	public static int source_sizeOfFile() {
+	public static BigInteger source_sizeOfFile() {
 		try {
 			if (in == null) {
-				return 0;
+				return BigInteger.ZERO;
 			}
-			return (int) in.length();
+			return BigInteger.valueOf(in.length());
 		} catch (IOException e) {
 			String msg = "I/O error when getting size of file \"" + fileName
 					+ "\"";

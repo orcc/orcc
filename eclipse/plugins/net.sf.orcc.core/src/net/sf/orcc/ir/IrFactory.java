@@ -6,6 +6,7 @@
  */
 package net.sf.orcc.ir;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -129,6 +130,8 @@ public interface IrFactory extends EFactory {
 	 * @generated
 	 */
 	ExprFloat createExprFloat();
+
+	ExprFloat createExprFloat(BigDecimal value);
 
 	ExprFloat createExprFloat(float value);
 

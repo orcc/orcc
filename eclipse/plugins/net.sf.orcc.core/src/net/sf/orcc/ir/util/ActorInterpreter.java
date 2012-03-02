@@ -30,6 +30,7 @@ package net.sf.orcc.ir.util;
 
 import static java.math.BigInteger.ONE;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
@@ -407,11 +408,10 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	 * @return the original value or a new value
 	 */
 	protected Object clipValue(Type type, Object value) {
-		BigInteger intVal = ValueUtil.getBigInteger(value);
-		if (intVal == null) {
-			// value is not an integer, ignore
+		if (!ValueUtil.isInt(value)) {
 			return value;
 		}
+		BigInteger intVal = (BigInteger) value;
 
 		// converts to unsigned n-bit number
 		int n = type.getSizeInBits();
@@ -582,9 +582,20 @@ public class ActorInterpreter extends IrSwitch<Object> {
 		Type type = variable.getType();
 		Expression initConst = variable.getInitialValue();
 		if (initConst == null) {
-			Object value = type.isBool() ? false : type.isFloat() ? 0.0f : type
-					.isInt() || type.isUint() ? 0 : type.isList() ? ValueUtil
-					.createArray((TypeList) type) : type.isString() ? "" : null;
+			Object value;
+			if (type.isBool()) {
+				value = false;
+			} else if (type.isFloat()) {
+				value = BigDecimal.ZERO;
+			} else if (type.isInt() || type.isUint()) {
+				value = BigInteger.ZERO;
+			} else if (type.isList()) {
+				value = ValueUtil.createArray((TypeList) type);
+			} else if (type.isString()) {
+				value = "";
+			} else {
+				value = null;
+			}
 			variable.setValue(value);
 		} else {
 			// evaluate initial constant value

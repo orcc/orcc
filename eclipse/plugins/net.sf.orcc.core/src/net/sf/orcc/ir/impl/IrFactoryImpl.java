@@ -261,6 +261,16 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Cfg createCfg() {
+		CfgImpl cfg = new CfgImpl();
+		return cfg;
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -318,6 +328,13 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 */
 	public ExprFloat createExprFloat() {
 		ExprFloatImpl exprFloat = new ExprFloatImpl();
+		return exprFloat;
+	}
+
+	@Override
+	public ExprFloat createExprFloat(BigDecimal value) {
+		ExprFloatImpl exprFloat = new ExprFloatImpl();
+		exprFloat.setValue(value);
 		return exprFloat;
 	}
 
@@ -793,16 +810,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public Predicate createPredicate() {
 		PredicateImpl predicate = new PredicateImpl();
 		return predicate;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Cfg createCfg() {
-		CfgImpl cfg = new CfgImpl();
-		return cfg;
 	}
 
 	/**

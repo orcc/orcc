@@ -33,12 +33,14 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprFloat;
 import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 
@@ -52,7 +54,7 @@ public class ValueUtil {
 
 	/**
 	 * Returns a new integer equal to the sum of the two operands, or
-	 * <code>null</code> if the two operands are not both integers.
+	 * <code>null</code> if the two operands are not both floats or integers.
 	 * 
 	 * @param val1
 	 *            an object
@@ -61,12 +63,12 @@ public class ValueUtil {
 	 * @return an integer value or <code>null</code>
 	 */
 	public static Object add(Object val1, Object val2) {
-		BigInteger bi1 = getBigInteger(val1);
-		BigInteger bi2 = getBigInteger(val2);
-		if (bi1 == null || bi2 == null) {
-			return null;
+		if (isFloat(val1) && isFloat(val2)) {
+			return ((BigDecimal) val1).add((BigDecimal) val2);
+		} else if (isInt(val1) && isInt(val2)) {
+			return ((BigInteger) val1).add((BigInteger) val2);
 		}
-		return getIntValue(bi1.add(bi2));
+		throw new OrccRuntimeException("type mismatch in add");
 	}
 
 	/**
@@ -80,16 +82,10 @@ public class ValueUtil {
 	 * @return an integer value or <code>null</code>
 	 */
 	public static Object and(Object val1, Object val2) {
-		BigInteger bi1 = getBigInteger(val1);
-		BigInteger bi2 = getBigInteger(val2);
-		if (bi1 == null || bi2 == null) {
-			return null;
+		if (isInt(val1) && isInt(val2)) {
+			return ((BigInteger) val1).and((BigInteger) val2);
 		}
-		return getIntValue(bi1.and(bi2));
-	}
-
-	public static boolean areInts(Object val1, Object val2) {
-		return isInt(val1) && isInt(val2);
+		throw new OrccRuntimeException("type mismatch in and");
 	}
 
 	/**
@@ -160,7 +156,7 @@ public class ValueUtil {
 
 	/**
 	 * Returns a new integer equal to the division of the two operands, or
-	 * <code>null</code> if the two operands are not both integers.
+	 * <code>null</code> if the two operands are not both floats or integers.
 	 * 
 	 * @param val1
 	 *            an object
@@ -169,22 +165,31 @@ public class ValueUtil {
 	 * @return an integer value or <code>null</code>
 	 */
 	public static Object divide(Object val1, Object val2) {
-		BigInteger bi1 = getBigInteger(val1);
-		BigInteger bi2 = getBigInteger(val2);
-		if (bi1 == null || bi2 == null) {
-			return null;
+		if (isFloat(val1) && isFloat(val2)) {
+			return ((BigDecimal) val1).divide((BigDecimal) val2);
+		} else if (isInt(val1) && isInt(val2)) {
+			return ((BigInteger) val1).divide((BigInteger) val2);
 		}
-		return getIntValue(bi1.divide(bi2));
+		throw new OrccRuntimeException("type mismatch in divide");
 	}
 
+	/**
+	 * If the two operands have the same type, returns a new boolean that is the
+	 * result of their comparison; if they do not have the same type, returns
+	 * <code>null</code>.
+	 * 
+	 * @param val1
+	 *            an object
+	 * @param val2
+	 *            an object
+	 * @return a boolean or <code>null</code> in case of type mismatch
+	 */
 	public static Object equals(Object val1, Object val2) {
-		if (isBool(val1) && isBool(val2)) {
-			return ((Boolean) val1).equals(val2);
-		} else if (isInt(val1) && isInt(val2)) {
-			return getBigInteger(val1).equals(getBigInteger(val2));
-		} else {
-			return null;
+		if (isBool(val1) && isBool(val2) || isFloat(val1) && isFloat(val2)
+				|| isInt(val1) && isInt(val2)) {
+			return val1.equals(val2);
 		}
+		throw new OrccRuntimeException("type mismatch in equals");
 	}
 
 	/**
@@ -199,12 +204,12 @@ public class ValueUtil {
 	 * @return a boolean value or <code>null</code>
 	 */
 	public static Object ge(Object val1, Object val2) {
-		BigInteger bi1 = getBigInteger(val1);
-		BigInteger bi2 = getBigInteger(val2);
-		if (bi1 == null || bi2 == null) {
-			return null;
+		if (isFloat(val1) && isFloat(val2)) {
+			return ((BigDecimal) val1).compareTo((BigDecimal) val2) >= 0;
+		} else if (isInt(val1) && isInt(val2)) {
+			return ((BigInteger) val1).compareTo((BigInteger) val2) >= 0;
 		}
-		return getBigInteger(val1).compareTo(getBigInteger(val2)) >= 0;
+		throw new OrccRuntimeException("type mismatch in ge");
 	}
 
 	/**
@@ -231,71 +236,44 @@ public class ValueUtil {
 		if (type.isBool()) {
 			return Array.getBoolean(array, index);
 		} else if (type.isFloat()) {
-			return Array.getFloat(array, index);
+			return BigDecimal.valueOf(Array.getFloat(array, index));
 		} else if (type.isInt()) {
 			int size = type.getSizeInBits();
 			if (size <= 8) {
-				// extend to int
-				return (int) Array.getByte(array, index);
+				return BigInteger.valueOf(Array.getByte(array, index));
 			} else if (size <= 16) {
-				// extend to int
-				return (int) Array.getShort(array, index);
+				return BigInteger.valueOf(Array.getShort(array, index));
 			} else if (size <= 32) {
-				return Array.getInt(array, index);
+				return BigInteger.valueOf(Array.getInt(array, index));
 			} else if (size <= 64) {
-				return Array.getLong(array, index);
+				return BigInteger.valueOf(Array.getLong(array, index));
+			} else {
+				return Array.get(array, index);
 			}
 		} else if (type.isUint()) {
 			int size = type.getSizeInBits();
 			if (size < 8) {
-				// extend to int
-				return (int) Array.getByte(array, index);
+				return BigInteger.valueOf(Array.getByte(array, index));
 			} else if (size < 16) {
-				// extend to int
-				return (int) Array.getShort(array, index);
+				return BigInteger.valueOf(Array.getShort(array, index));
 			} else if (size < 32) {
-				return Array.getInt(array, index);
+				return BigInteger.valueOf(Array.getInt(array, index));
 			} else if (size < 64) {
-				return Array.getLong(array, index);
+				return BigInteger.valueOf(Array.getLong(array, index));
+			} else {
+				return Array.get(array, index);
 			}
 		}
-
-		return Array.get(array, index);
-	}
-
-	public static BigInteger getBigInteger(Object value) {
-		if (value instanceof Integer) {
-			return BigInteger.valueOf(((Integer) value));
-		} else if (value instanceof Long) {
-			return BigInteger.valueOf(((Long) value));
-		} else if (value instanceof BigInteger) {
-			return (BigInteger) value;
-		} else if (value instanceof Byte) {
-			return BigInteger.valueOf((Byte) value);
-		} else if (value instanceof Short) {
-			return BigInteger.valueOf((Short) value);
-		} else {
-			return null;
-		}
-	}
-
-	public static byte getByteValue(Object value) {
-		if (value instanceof Integer) {
-			return ((Integer) value).byteValue();
-		} else if (value instanceof Long) {
-			return ((Long) value).byteValue();
-		} else if (value instanceof BigInteger) {
-			return ((BigInteger) value).byteValue();
-		} else {
-			return 0;
-		}
+		throw new OrccRuntimeException("unexpected type in set");
 	}
 
 	public static Expression getExpression(Object value) {
 		if (isBool(value)) {
 			return IrFactory.eINSTANCE.createExprBool((Boolean) value);
+		} else if (isFloat(value)) {
+			return IrFactory.eINSTANCE.createExprFloat((BigDecimal) value);
 		} else if (isInt(value)) {
-			return IrFactory.eINSTANCE.createExprInt(getBigInteger(value));
+			return IrFactory.eINSTANCE.createExprInt((BigInteger) value);
 		} else if (isString(value)) {
 			return IrFactory.eINSTANCE.createExprString((String) value);
 		} else if (isList(value)) {
@@ -305,85 +283,40 @@ public class ValueUtil {
 				list.getValue().add(getExpression(Array.get(value, i)));
 			}
 			return list;
-
 		} else {
 			return null;
 		}
 	}
 
-	public static Object getFloatValue(BigDecimal decimal) {
-		float f = decimal.floatValue();
-		if (!Float.isInfinite(f)) {
-			return f;
-		}
-
-		double d = decimal.doubleValue();
-		if (!Double.isInfinite(d)) {
-			return d;
-		}
-
-		return decimal;
-	}
-
-	public static Object getIntValue(BigInteger integer) {
-		long l = integer.longValue();
-		if (BigInteger.valueOf(l).equals(integer)) {
-			int i = (int) l;
-			if (i == l) {
-				return i;
-			}
-			return l;
-		}
-		return integer;
-	}
-
-	public static int getIntValue(Object value) {
+	private static int getIntValue(Object value) {
 		if (value instanceof Integer) {
-			return ((Integer) value).intValue();
-		} else if (value instanceof Long) {
-			return ((Long) value).intValue();
-		} else if (value instanceof BigInteger) {
+			return (Integer) value;
+		} else if (isInt(value)) {
 			return ((BigInteger) value).intValue();
-		} else if (value instanceof Byte) {
-			return ((Byte) value).intValue();
-		} else if (value instanceof Short) {
-			return ((Short) value).intValue();
-		} else {
-			return 0;
 		}
+		throw new OrccRuntimeException("type mismatch in getIntValue");
 	}
 
-	public static long getLongValue(Object value) {
-		if (value instanceof Integer) {
-			return ((Integer) value).longValue();
-		} else if (value instanceof Long) {
-			return ((Long) value).longValue();
-		} else if (value instanceof BigInteger) {
-			return ((BigInteger) value).longValue();
-		} else {
-			return 0;
-		}
-	}
-
-	public static short getShortValue(Object value) {
-		if (value instanceof Integer) {
-			return ((Integer) value).shortValue();
-		} else if (value instanceof Long) {
-			return ((Long) value).shortValue();
-		} else if (value instanceof BigInteger) {
-			return ((BigInteger) value).shortValue();
-		} else {
-			return 0;
-		}
-	}
-
+	/**
+	 * Returns the value of the given expression.
+	 * 
+	 * @param expr
+	 *            an expression
+	 * @return the value of the given expression
+	 */
 	public static Object getValue(Expression expr) {
 		if (expr != null) {
-			switch (expr.eClass().getClassifierID()) {
-			case IrPackage.EXPR_BOOL:
+			if (expr.isExprBool()) {
 				return ((ExprBool) expr).isValue();
-			case IrPackage.EXPR_INT:
-				return getIntValue(((ExprInt) expr).getValue());
+			} else if (expr.isExprFloat()) {
+				return ((ExprFloat) expr).getValue();
+			} else if (expr.isExprInt()) {
+				return ((ExprInt) expr).getValue();
+			} else if (expr.isExprString()) {
+				return ((ExprString) expr).getValue();
+			} else if (expr.isExprList()) {
+				throw new OrccRuntimeException(
+						"list type not supported yet in getValue");
 			}
 		}
 		return null;
@@ -401,12 +334,12 @@ public class ValueUtil {
 	 * @return a boolean value or <code>null</code>
 	 */
 	public static Object gt(Object val1, Object val2) {
-		BigInteger bi1 = getBigInteger(val1);
-		BigInteger bi2 = getBigInteger(val2);
-		if (bi1 == null || bi2 == null) {
-			return null;
+		if (isFloat(val1) && isFloat(val2)) {
+			return ((BigDecimal) val1).compareTo((BigDecimal) val2) > 0;
+		} else if (isInt(val1) && isInt(val2)) {
+			return ((BigInteger) val1).compareTo((BigInteger) val2) > 0;
 		}
-		return getBigInteger(val1).compareTo(getBigInteger(val2)) > 0;
+		throw new OrccRuntimeException("type mismatch in gt");
 	}
 
 	/**
@@ -417,7 +350,7 @@ public class ValueUtil {
 	 * @return <code>true</code> if value is a boolean
 	 */
 	public static boolean isBool(Object value) {
-		return (value instanceof Boolean);
+		return value instanceof Boolean;
 	}
 
 	/**
@@ -428,7 +361,7 @@ public class ValueUtil {
 	 * @return <code>true</code> if value is a float
 	 */
 	public static boolean isFloat(Object value) {
-		return (value instanceof Float || value instanceof Double || value instanceof BigDecimal);
+		return value instanceof BigDecimal;
 	}
 
 	/**
@@ -439,8 +372,7 @@ public class ValueUtil {
 	 * @return <code>true</code> if value is an integer
 	 */
 	public static boolean isInt(Object value) {
-		return (value instanceof Byte || value instanceof Short
-				|| value instanceof Integer || value instanceof Long || value instanceof BigInteger);
+		return value instanceof BigInteger;
 	}
 
 	/**
@@ -489,12 +421,12 @@ public class ValueUtil {
 	 * @return a boolean value or <code>null</code>
 	 */
 	public static Object le(Object val1, Object val2) {
-		BigInteger bi1 = getBigInteger(val1);
-		BigInteger bi2 = getBigInteger(val2);
-		if (bi1 == null || bi2 == null) {
-			return null;
+		if (isFloat(val1) && isFloat(val2)) {
+			return ((BigDecimal) val1).compareTo((BigDecimal) val2) <= 0;
+		} else if (isInt(val1) && isInt(val2)) {
+			return ((BigInteger) val1).compareTo((BigInteger) val2) <= 0;
 		}
-		return getBigInteger(val1).compareTo(getBigInteger(val2)) <= 0;
+		throw new OrccRuntimeException("type mismatch in le");
 	}
 
 	/**
@@ -510,25 +442,55 @@ public class ValueUtil {
 		return 0;
 	}
 
-	public static boolean logicAnd(Object val1, Object val2) {
+	/**
+	 * Returns a new boolean that is <code>true</code> if both val1 and val2 are
+	 * true, or <code>null</code> if the two operands are not both of the same
+	 * type.
+	 * 
+	 * @param val1
+	 *            an object
+	 * @param val2
+	 *            an object
+	 * @return a boolean value or <code>null</code>
+	 */
+	public static Object logicAnd(Object val1, Object val2) {
 		if (isBool(val1) && isBool(val2)) {
 			return ((Boolean) val1) && ((Boolean) val2);
 		}
-		return false;
+		throw new OrccRuntimeException("type mismatch in logicAnd");
 	}
 
-	public static boolean logicNot(Object value) {
+	/**
+	 * Returns a new boolean that is <code>!value</code> if value is a boolean,
+	 * or <code>null</code> otherwise
+	 * 
+	 * @param value
+	 *            an object
+	 * @return a boolean value or <code>null</code>
+	 */
+	public static Object logicNot(Object value) {
 		if (isBool(value)) {
 			return !((Boolean) value);
 		}
-		return false;
+		throw new OrccRuntimeException("type mismatch in logicNot");
 	}
 
-	public static boolean logicOr(Object val1, Object val2) {
+	/**
+	 * Returns a new boolean that is <code>true</code> if either val1 or val2 is
+	 * true, or <code>null</code> if the two operands are not both of the same
+	 * type.
+	 * 
+	 * @param val1
+	 *            an object
+	 * @param val2
+	 *            an object
+	 * @return a boolean value or <code>null</code>
+	 */
+	public static Object logicOr(Object val1, Object val2) {
 		if (isBool(val1) && isBool(val2)) {
 			return ((Boolean) val1) || ((Boolean) val2);
 		}
-		return false;
+		throw new OrccRuntimeException("type mismatch in logicOr");
 	}
 
 	/**
@@ -543,12 +505,12 @@ public class ValueUtil {
 	 * @return a boolean value or <code>null</code>
 	 */
 	public static Object lt(Object val1, Object val2) {
-		BigInteger bi1 = getBigInteger(val1);
-		BigInteger bi2 = getBigInteger(val2);
-		if (bi1 == null || bi2 == null) {
-			return null;
+		if (isFloat(val1) && isFloat(val2)) {
+			return ((BigDecimal) val1).compareTo((BigDecimal) val2) < 0;
+		} else if (isInt(val1) && isInt(val2)) {
+			return ((BigInteger) val1).compareTo((BigInteger) val2) < 0;
 		}
-		return getBigInteger(val1).compareTo(getBigInteger(val2)) < 0;
+		throw new OrccRuntimeException("type mismatch in lt");
 	}
 
 	/**
@@ -562,17 +524,15 @@ public class ValueUtil {
 	 * @return an integer value or <code>null</code>
 	 */
 	public static Object mod(Object val1, Object val2) {
-		BigInteger bi1 = getBigInteger(val1);
-		BigInteger bi2 = getBigInteger(val2);
-		if (bi1 == null || bi2 == null) {
-			return null;
+		if (isInt(val1) && isInt(val2)) {
+			return ((BigInteger) val1).mod((BigInteger) val2);
 		}
-		return getIntValue(bi1.mod(bi2));
+		throw new OrccRuntimeException("type mismatch in mod");
 	}
 
 	/**
 	 * Returns a new integer equal to the product of the two operands, or
-	 * <code>null</code> if the two operands are not both integers.
+	 * <code>null</code> if the two operands are not both floats or integers.
 	 * 
 	 * @param val1
 	 *            an object
@@ -581,48 +541,63 @@ public class ValueUtil {
 	 * @return an integer value or <code>null</code>
 	 */
 	public static Object multiply(Object val1, Object val2) {
-		BigInteger bi1 = getBigInteger(val1);
-		BigInteger bi2 = getBigInteger(val2);
-		if (bi1 == null || bi2 == null) {
-			return null;
+		if (isFloat(val1) && isFloat(val2)) {
+			return ((BigDecimal) val1).multiply((BigDecimal) val2);
+		} else if (isInt(val1) && isInt(val2)) {
+			return ((BigInteger) val1).multiply((BigInteger) val2);
 		}
-		return getIntValue(bi1.multiply(bi2));
+		throw new OrccRuntimeException("type mismatch in multiply");
 	}
 
 	/**
-	 * Returns <code>-value</code>.
+	 * Returns a new integer equal to <code>-value</code>, or <code>null</code>
+	 * if value is not a float or an integer.
 	 * 
 	 * @param value
-	 * @return <code>-value</code>.
+	 *            an object
+	 * @return a float or integer value or <code>null</code>
 	 */
 	public static Object negate(Object value) {
-		BigInteger bi = getBigInteger(value);
-		if (bi == null) {
-			return null;
+		if (isFloat(value)) {
+			return ((BigDecimal) value).negate();
+		} else if (isInt(value)) {
+			return ((BigInteger) value).negate();
 		}
-		return bi.negate();
+		throw new OrccRuntimeException("type mismatch in negate");
 	}
 
 	/**
-	 * Returns <code>~value</code>.
+	 * Returns a new integer equal to <code>~value</code>, or <code>null</code>
+	 * if value is not an integer.
 	 * 
 	 * @param value
-	 * @return <code>~value</code>.
+	 *            an object
+	 * @return an integer value or <code>null</code>
 	 */
 	public static Object not(Object value) {
-		BigInteger bi = getBigInteger(value);
-		if (bi == null) {
-			return null;
+		if (isInt(value)) {
+			return ((BigInteger) value).not();
 		}
-		return bi.not();
+		throw new OrccRuntimeException("type mismatch in not");
 	}
 
+	/**
+	 * If the two operands have the same type, returns a new boolean that is the
+	 * result of their comparison; if they do not have the same type, returns
+	 * <code>null</code>.
+	 * 
+	 * @param val1
+	 *            an object
+	 * @param val2
+	 *            an object
+	 * @return a boolean or <code>null</code> in case of type mismatch
+	 */
 	public static Object notEquals(Object val1, Object val2) {
 		Object result = equals(val1, val2);
 		if (isBool(result)) {
 			return !((Boolean) result);
 		}
-		return null;
+		throw new OrccRuntimeException("type mismatch in notEquals");
 	}
 
 	/**
@@ -636,21 +611,29 @@ public class ValueUtil {
 	 * @return an integer value or <code>null</code>
 	 */
 	public static Object or(Object val1, Object val2) {
-		BigInteger bi1 = getBigInteger(val1);
-		BigInteger bi2 = getBigInteger(val2);
-		if (bi1 == null || bi2 == null) {
-			return null;
+		if (isInt(val1) && isInt(val2)) {
+			return ((BigInteger) val1).or((BigInteger) val2);
 		}
-		return getIntValue(bi1.or(bi2));
+		throw new OrccRuntimeException("type mismatch in or");
 	}
 
+	/**
+	 * Returns a new integer equal to the first operand left shifted by the
+	 * right operand, or <code>null</code> if the two operands are not both
+	 * integers.
+	 * 
+	 * @param val1
+	 *            an object
+	 * @param val2
+	 *            an object
+	 * @return an integer value or <code>null</code>
+	 */
 	public static Object pow(Object val1, Object val2) {
-		BigInteger bi1 = getBigInteger(val1);
-		int i2 = getIntValue(val2);
-		if (bi1 == null) {
-			return null;
+		if (isInt(val1) && isInt(val2)) {
+			int exponent = ((BigInteger) val2).intValue();
+			return ((BigInteger) val1).pow(exponent);
 		}
-		return bi1.pow(i2);
+		throw new OrccRuntimeException("type mismatch in pow");
 	}
 
 	/**
@@ -678,39 +661,27 @@ public class ValueUtil {
 		}
 
 		int index = getIntValue(indexes[numIndexes - 1]);
-		if (type.isBool()) {
-			Array.setBoolean(array, index, (Boolean) value);
-		} else if (type.isFloat()) {
-			Array.setFloat(array, index, (Float) value);
-		} else if (type.isInt()) {
+		Object valueToSet;
+		if (type.isBool() && isBool(value)) {
+			valueToSet = value;
+		} else if (type.isFloat() && isFloat(value)) {
+			valueToSet = value;
+		} else if (type.isInt() && isInt(value)) {
+			BigInteger intVal = (BigInteger) value;
 			int size = type.getSizeInBits();
-			if (size <= 8) {
-				Array.setByte(array, index, getByteValue(value));
-			} else if (size <= 16) {
-				Array.setShort(array, index, getShortValue(value));
-			} else if (size <= 32) {
-				Array.setInt(array, index, getIntValue(value));
-			} else if (size <= 64) {
-				Array.setLong(array, index, getLongValue(value));
-			} else {
-				Array.set(array, index, value);
-			}
-		} else if (type.isUint()) {
+			valueToSet = size <= 8 ? intVal.byteValue() : size <= 16 ? intVal
+					.shortValue() : size <= 32 ? intVal.intValue()
+					: size <= 64 ? intVal.longValue() : value;
+		} else if (type.isUint() && isInt(value)) {
+			BigInteger intVal = (BigInteger) value;
 			int size = type.getSizeInBits();
-			if (size < 8) {
-				Array.setByte(array, index, getByteValue(value));
-			} else if (size < 16) {
-				Array.setShort(array, index, getShortValue(value));
-			} else if (size < 32) {
-				Array.setInt(array, index, getIntValue(value));
-			} else if (size < 64) {
-				Array.setLong(array, index, getLongValue(value));
-			} else {
-				Array.set(array, index, value);
-			}
+			valueToSet = size < 8 ? intVal.byteValue() : size < 16 ? intVal
+					.shortValue() : size < 32 ? intVal.intValue()
+					: size < 64 ? intVal.longValue() : value;
 		} else {
-			Array.set(array, index, value);
+			throw new OrccRuntimeException("unexpected type in set");
 		}
+		Array.set(array, index, valueToSet);
 	}
 
 	/**
@@ -725,12 +696,11 @@ public class ValueUtil {
 	 * @return an integer value or <code>null</code>
 	 */
 	public static Object shiftLeft(Object val1, Object val2) {
-		BigInteger bi1 = getBigInteger(val1);
-		int i2 = getIntValue(val2);
-		if (bi1 == null) {
-			return null;
+		if (isInt(val1) && isInt(val2)) {
+			int n = ((BigInteger) val2).intValue();
+			return ((BigInteger) val1).shiftLeft(n);
 		}
-		return getIntValue(getBigInteger(val1).shiftLeft(i2));
+		throw new OrccRuntimeException("type mismatch in shiftLeft");
 	}
 
 	/**
@@ -745,31 +715,30 @@ public class ValueUtil {
 	 * @return an integer value or <code>null</code>
 	 */
 	public static Object shiftRight(Object val1, Object val2) {
-		BigInteger bi1 = getBigInteger(val1);
-		int i2 = getIntValue(val2);
-		if (bi1 == null) {
-			return null;
+		if (isInt(val1) && isInt(val2)) {
+			int n = ((BigInteger) val2).intValue();
+			return ((BigInteger) val1).shiftRight(n);
 		}
-		return getIntValue(getBigInteger(val1).shiftRight(i2));
+		throw new OrccRuntimeException("type mismatch in shiftRight");
 	}
 
 	/**
 	 * Returns a new integer equal to the difference of the two operands, or
-	 * <code>null</code> if the two operands are not both integers.
+	 * <code>null</code> if the two operands are not both floats or integers.
 	 * 
 	 * @param val1
 	 *            an object
 	 * @param val2
 	 *            an object
-	 * @return an integer value or <code>null</code>
+	 * @return a float or integer value or <code>null</code>
 	 */
 	public static Object subtract(Object val1, Object val2) {
-		BigInteger bi1 = getBigInteger(val1);
-		BigInteger bi2 = getBigInteger(val2);
-		if (bi1 == null || bi2 == null) {
-			return null;
+		if (isFloat(val1) && isFloat(val2)) {
+			return ((BigDecimal) val1).subtract((BigDecimal) val2);
+		} else if (isInt(val1) && isInt(val2)) {
+			return ((BigInteger) val1).subtract((BigInteger) val2);
 		}
-		return getIntValue(bi1.subtract(bi2));
+		throw new OrccRuntimeException("type mismatch in subtract");
 	}
 
 	/**
@@ -783,12 +752,10 @@ public class ValueUtil {
 	 * @return an integer value or <code>null</code>
 	 */
 	public static Object xor(Object val1, Object val2) {
-		BigInteger bi1 = getBigInteger(val1);
-		BigInteger bi2 = getBigInteger(val2);
-		if (bi1 == null || bi2 == null) {
-			return null;
+		if (isInt(val1) && isInt(val2)) {
+			return ((BigInteger) val1).xor((BigInteger) val2);
 		}
-		return getIntValue(bi1.xor(bi2));
+		throw new OrccRuntimeException("type mismatch in xor");
 	}
 
 }

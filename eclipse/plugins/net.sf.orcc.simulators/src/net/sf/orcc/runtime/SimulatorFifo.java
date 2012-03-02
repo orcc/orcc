@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -240,27 +241,29 @@ public class SimulatorFifo {
 			writer.println((Boolean) value);
 		} else if (type.isFloat()) {
 			writer.println((Float) value);
-		} else if (type.isInt()) {
+		} else if (type.isInt() && ValueUtil.isInt(value)) {
+			BigInteger intVal = (BigInteger) value;
 			int size = type.getSizeInBits();
 			if (size <= 8) {
-				writer.println(ValueUtil.getByteValue(value));
+				writer.println(intVal.byteValue());
 			} else if (size <= 16) {
-				writer.println(ValueUtil.getShortValue(value));
+				writer.println(intVal.shortValue());
 			} else if (size <= 32) {
-				writer.println(ValueUtil.getIntValue(value));
+				writer.println(intVal.intValue());
 			} else if (size <= 64) {
-				writer.println(ValueUtil.getLongValue(value));
+				writer.println(intVal.longValue());
 			}
-		} else if (type.isUint()) {
+		} else if (type.isUint() && ValueUtil.isInt(value)) {
+			BigInteger intVal = (BigInteger) value;
 			int size = type.getSizeInBits();
 			if (size < 8) {
-				writer.println(ValueUtil.getByteValue(value));
+				writer.println(intVal.byteValue());
 			} else if (size < 16) {
-				writer.println(ValueUtil.getShortValue(value));
+				writer.println(intVal.shortValue());
 			} else if (size < 32) {
-				writer.println(ValueUtil.getIntValue(value));
+				writer.println(intVal.intValue());
 			} else if (size < 64) {
-				writer.println(ValueUtil.getLongValue(value));
+				writer.println(intVal.longValue());
 			}
 		}
 	}
