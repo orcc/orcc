@@ -132,9 +132,6 @@ public class ActorTransformer extends CalSwitch<Actor> {
 
 				i++;
 			}
-		} else if (tokens.size() == 1) {
-			Variable token = tokens.get(0);
-			Frontend.putMapping(token, portVariable);
 		} else {
 			// creates loop variable and initializes it
 			Var loopVar = procedure.newTempLocalVariable(
