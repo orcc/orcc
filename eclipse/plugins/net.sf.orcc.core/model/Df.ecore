@@ -66,7 +66,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="sourcePort" eType="#//Port"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="targetPort" eType="#//Port"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Action">
+  <eClassifiers xsi:type="ecore:EClass" name="Action" eSuperTypes="../../net.sf.dftools.models/model/Util.ecore#//Attributable">
     <eStructuralFeatures xsi:type="ecore:EReference" name="body" eType="ecore:EClass Ir.ecore#//Procedure"
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="inputPattern" eType="#//Pattern"

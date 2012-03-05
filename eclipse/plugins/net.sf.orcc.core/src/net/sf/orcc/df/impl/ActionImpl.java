@@ -6,6 +6,7 @@
  */
 package net.sf.orcc.df.impl;
 
+import net.sf.dftools.util.impl.AttributableImpl;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Pattern;
@@ -17,7 +18,6 @@ import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.emf.ecore.impl.EObjectImpl;
 
 /**
  * <!-- begin-user-doc --> An implementation of the model object '
@@ -36,7 +36,7 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  *
  * @generated
  */
-public class ActionImpl extends EObjectImpl implements Action {
+public class ActionImpl extends AttributableImpl implements Action {
 
 	/**
 	 * The cached value of the '{@link #getBody() <em>Body</em>}' containment reference.

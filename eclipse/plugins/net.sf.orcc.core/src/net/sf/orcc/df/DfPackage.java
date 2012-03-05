@@ -1017,13 +1017,22 @@ public interface DfPackage extends EPackage {
 	int CONNECTION_FEATURE_COUNT = GraphPackage.EDGE_FEATURE_COUNT + 2;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTION__ATTRIBUTES = UtilPackage.ATTRIBUTABLE__ATTRIBUTES;
+
+	/**
 	 * The feature id for the '<em><b>Body</b></em>' containment reference. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int ACTION__BODY = 0;
+	int ACTION__BODY = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Input Pattern</b></em>' containment reference.
@@ -1031,7 +1040,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTION__INPUT_PATTERN = 1;
+	int ACTION__INPUT_PATTERN = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Output Pattern</b></em>' containment reference.
@@ -1039,7 +1048,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTION__OUTPUT_PATTERN = 2;
+	int ACTION__OUTPUT_PATTERN = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Peek Pattern</b></em>' containment reference.
@@ -1047,7 +1056,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTION__PEEK_PATTERN = 3;
+	int ACTION__PEEK_PATTERN = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Scheduler</b></em>' containment reference.
@@ -1055,7 +1064,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTION__SCHEDULER = 4;
+	int ACTION__SCHEDULER = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>Tag</b></em>' containment reference. <!--
@@ -1064,7 +1073,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTION__TAG = 5;
+	int ACTION__TAG = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 5;
 
 	/**
 	 * The number of structural features of the '<em>Action</em>' class. <!--
@@ -1073,7 +1082,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTION_FEATURE_COUNT = 6;
+	int ACTION_FEATURE_COUNT = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 6;
 
 	/**
 	 * The feature id for the '<em><b>Edges</b></em>' containment reference list.

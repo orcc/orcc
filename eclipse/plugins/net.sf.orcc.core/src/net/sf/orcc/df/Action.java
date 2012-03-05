@@ -28,9 +28,8 @@
  */
 package net.sf.orcc.df;
 
+import net.sf.dftools.util.Attributable;
 import net.sf.orcc.ir.Procedure;
-
-import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines an action. An action has a location, a tag, an input and
@@ -42,7 +41,7 @@ import org.eclipse.emf.ecore.EObject;
  * @author Samuel Keller
  * @model
  */
-public interface Action extends EObject {
+public interface Action extends Attributable {
 
 	/**
 	 * Returns the procedure that holds the body of this action.
