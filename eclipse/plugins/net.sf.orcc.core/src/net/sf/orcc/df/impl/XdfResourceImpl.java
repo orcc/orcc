@@ -36,6 +36,8 @@ import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.util.XdfParser;
+import net.sf.orcc.df.util.XdfWriter;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;

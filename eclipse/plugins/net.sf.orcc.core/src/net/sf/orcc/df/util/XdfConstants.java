@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.df.impl;
+package net.sf.orcc.df.util;
 
 /**
  * This class defines constants used for XDF serialization.
