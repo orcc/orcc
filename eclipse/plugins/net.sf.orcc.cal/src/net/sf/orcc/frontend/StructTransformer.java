@@ -137,6 +137,9 @@ public class StructTransformer extends CalSwitch<EObject> {
 			procedure.setNative(true);
 		}
 
+		// Add annotations
+		transformAnnotations(procedure, astProcedure.getAnnotations());
+		
 		// add mapping now (in case this procedure is recursive)
 		Frontend.putMapping(astProcedure, procedure);
 
@@ -178,6 +181,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 			procedure.setNative(true);
 		}
 		
+		// Add annotations
 		transformAnnotations(procedure, function.getAnnotations());
 		
 		// add mapping now (in case this function is recursive)
