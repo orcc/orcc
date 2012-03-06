@@ -310,12 +310,13 @@ for(<forNode.init:{assign | <assign.target.variable.indexedName> = <assign.value
 ///////////////////////////////////////////////////////////////////////////////
 
 printProcedureDeclaration(procedure,action="") ::= <<
-<if(procedure.native)>extern<else>static<endif> <procedure.returnType> <procedure.name>(<procedure.parameters: {param |
+<printAttributes(procedure)><if(procedure.native)>extern<else>static<endif> <procedure.returnType> <procedure.name>(<procedure.parameters: {param |
 <varDecl(param.variable)>}; separator=", ">);
 
 >>
 
 printProcedure(procedure,action="") ::= <<
+<printAttributes(procedure)>
 <if(!procedure.native)>
 static <procedure.returnType> <procedure.name>(<
   procedure.parameters: {param | <varDecl(param.variable)>}; wrap, anchor, separator=", ">) {
@@ -750,5 +751,13 @@ finished:
 	<instance.actor.outputs: {port|<if(!port.native)>write_end_<port.name>();<endif>}; separator="\n">
 }
 <endif>
+
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Annotations
+///////////////////////////////////////////////////////////////////////////////
+
+printAttributes(attributeable) ::= <<
 
 >>
