@@ -80,6 +80,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.transformations.UselessCopyElimination;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrccUtil;
 
@@ -383,6 +384,9 @@ public class ActorTransformer extends CalSwitch<Actor> {
 
 		actor.getActions().addAll(actions.getAllActions());
 		actor.getInitializes().addAll(initializes.getAllActions());
+		
+		// remove useless list copies
+		new UselessCopyElimination().doSwitch(actor);
 
 		// serialize actor and cache
 		Frontend.instance.serialize(actor);
