@@ -382,6 +382,6 @@ VariableReference: variable=[Variable|QualifiedName];
 // annotations
 ///////////////////////////////////////////////////////////////////////////////
 
-AstAnnotation: '@' name=ID ('(' arguments += AnnotationArgument (',' arguments += AnnotationArgument)* ')')?;
+AstAnnotation: '@' name=ID (arguments += AnnotationArgument)?;
 
-AnnotationArgument: name=ID '=' value=STRING;
+AnnotationArgument: name=ID ('=' value=STRING)?;

@@ -1687,18 +1687,19 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		setNsURI(eNS_URI);
 
 		// Obtain other dependent packages
+		UtilPackage theUtilPackage = (UtilPackage) EPackage.Registry.INSTANCE
+				.getEPackage(UtilPackage.eNS_URI);
 		EcorePackage theEcorePackage = (EcorePackage) EPackage.Registry.INSTANCE
 				.getEPackage(EcorePackage.eNS_URI);
 		GraphPackage theGraphPackage = (GraphPackage) EPackage.Registry.INSTANCE
 				.getEPackage(GraphPackage.eNS_URI);
-		UtilPackage theUtilPackage = (UtilPackage) EPackage.Registry.INSTANCE
-				.getEPackage(UtilPackage.eNS_URI);
 
 		// Create type parameters
 
 		// Set bounds for type parameters
 
 		// Add supertypes to classes
+		procedureEClass.getESuperTypes().add(theUtilPackage.getAttributable());
 		nodeEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		nodeBlockEClass.getESuperTypes().add(this.getNode());
 		nodeIfEClass.getESuperTypes().add(this.getNode());

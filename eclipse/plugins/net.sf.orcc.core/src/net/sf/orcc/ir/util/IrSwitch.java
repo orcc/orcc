@@ -777,6 +777,8 @@ public class IrSwitch<T> extends Switch<T> {
 			Procedure procedure = (Procedure) theEObject;
 			T result = caseProcedure(procedure);
 			if (result == null)
+				result = caseAttributable(procedure);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}

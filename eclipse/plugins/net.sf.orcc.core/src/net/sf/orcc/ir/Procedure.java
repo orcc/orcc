@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.ir;
 
+import net.sf.dftools.util.Attributable;
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines a procedure.
@@ -37,7 +37,7 @@ import org.eclipse.emf.ecore.EObject;
  * @author Matthieu Wipliez
  * @model
  */
-public interface Procedure extends EObject {
+public interface Procedure extends Attributable {
 
 	/**
 	 * Returns the CFG of this procedure. Must be built and set first with

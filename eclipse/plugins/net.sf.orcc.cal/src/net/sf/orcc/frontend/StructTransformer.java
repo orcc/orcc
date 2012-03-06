@@ -32,6 +32,7 @@ import static net.sf.orcc.ir.IrFactory.eINSTANCE;
 
 import java.util.List;
 
+import net.sf.dftools.util.Attributable;
 import net.sf.orcc.cal.cal.AnnotationArgument;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstAnnotation;
@@ -171,12 +172,14 @@ public class StructTransformer extends CalSwitch<EObject> {
 
 		// create procedure
 		procedure = eINSTANCE.createProcedure(name, lineNumber, type);
-
+		
 		// set native flag
 		if (Util.hasAnnotation("native", function.getAnnotations())) {
 			procedure.setNative(true);
 		}
-
+		
+		transformAnnotations(procedure, function.getAnnotations());
+		
 		// add mapping now (in case this function is recursive)
 		Frontend.putMapping(function, procedure);
 
@@ -269,7 +272,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 	 * @param annotations
 	 *            a list of annotations
 	 */
-	private void transformAnnotations(Var variable,
+	private void transformAnnotations(Attributable attr,
 			List<AstAnnotation> annotations) {
 		for (AstAnnotation astAnnotation : annotations) {
 			String name = astAnnotation.getName();
@@ -285,7 +288,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 			if (arguments.getValue().isEmpty()) {
 				arguments = null;
 			}
-			variable.setAttribute(name, arguments);
+			attr.setAttribute(name, arguments);
 		}
 	}
 

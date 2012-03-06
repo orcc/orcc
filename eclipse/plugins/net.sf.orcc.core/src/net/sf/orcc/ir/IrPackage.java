@@ -1258,13 +1258,22 @@ public interface IrPackage extends EPackage {
 	int PROCEDURE = 0;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCEDURE__ATTRIBUTES = UtilPackage.ATTRIBUTABLE__ATTRIBUTES;
+
+	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PROCEDURE__LINE_NUMBER = 0;
+	int PROCEDURE__LINE_NUMBER = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Locals</b></em>' containment reference list.
@@ -1272,7 +1281,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PROCEDURE__LOCALS = 1;
+	int PROCEDURE__LOCALS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' reference. <!--
@@ -1281,7 +1290,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PROCEDURE__NAME = 2;
+	int PROCEDURE__NAME = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Native</b></em>' attribute. <!--
@@ -1290,7 +1299,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PROCEDURE__NATIVE = 3;
+	int PROCEDURE__NATIVE = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Nodes</b></em>' containment reference list.
@@ -1298,7 +1307,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PROCEDURE__NODES = 4;
+	int PROCEDURE__NODES = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
@@ -1306,7 +1315,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PROCEDURE__PARAMETERS = 5;
+	int PROCEDURE__PARAMETERS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 5;
 
 	/**
 	 * The feature id for the '<em><b>Return Type</b></em>' containment reference.
@@ -1314,7 +1323,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PROCEDURE__RETURN_TYPE = 6;
+	int PROCEDURE__RETURN_TYPE = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 6;
 
 	/**
 	 * The feature id for the '<em><b>Cfg</b></em>' containment reference.
@@ -1323,7 +1332,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PROCEDURE__CFG = 7;
+	int PROCEDURE__CFG = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 7;
 
 	/**
 	 * The number of structural features of the '<em>Procedure</em>' class. <!--
@@ -1332,7 +1341,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PROCEDURE_FEATURE_COUNT = 8;
+	int PROCEDURE_FEATURE_COUNT = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 8;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ParamImpl <em>Param</em>}' class.

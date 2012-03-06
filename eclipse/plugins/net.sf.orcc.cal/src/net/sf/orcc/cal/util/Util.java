@@ -32,6 +32,7 @@ import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
 
 import java.util.List;
 
+import net.sf.dftools.util.Attributable;
 import net.sf.orcc.cal.cal.AstAnnotation;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.Variable;
