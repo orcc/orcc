@@ -153,5 +153,4 @@ public interface Action extends Attributable {
 	 * @generated
 	 */
 	void setTag(Tag value);
-
 }
