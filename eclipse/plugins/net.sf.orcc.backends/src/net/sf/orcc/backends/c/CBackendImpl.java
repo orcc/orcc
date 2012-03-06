@@ -41,7 +41,6 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.c.transformations.CBroadcastAdder;
-import net.sf.orcc.backends.transformations.NodeForAdder;
 import net.sf.orcc.backends.transformations.TypeResizer;
 import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.backends.util.BackendUtil;
@@ -177,8 +176,7 @@ public class CBackendImpl extends AbstractBackend {
 
 		DfSwitch<?>[] transformations = { new UnitImporter(),
 				new TypeResizer(true, false, true, true),
-				new RenameTransformation(replacementMap),
-				new NodeForAdder()};
+				new RenameTransformation(replacementMap)};
 
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
