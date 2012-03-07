@@ -30,7 +30,6 @@ package net.sf.orcc.df.impl;
 
 import net.sf.dftools.graph.impl.EdgeImpl;
 import net.sf.dftools.util.Attribute;
-import net.sf.dftools.util.UtilFactory;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Port;
@@ -53,8 +52,9 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
 public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
-	 * The cached value of the '{@link #getSourcePort() <em>Source Port</em>}' reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getSourcePort() <em>Source Port</em>}'
+	 * reference. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getSourcePort()
 	 * @generated
 	 * @ordered
@@ -62,8 +62,9 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 	protected Port sourcePort;
 
 	/**
-	 * The cached value of the '{@link #getTargetPort() <em>Target Port</em>}' reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getTargetPort() <em>Target Port</em>}'
+	 * reference. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getTargetPort()
 	 * @generated
 	 * @ordered
@@ -72,6 +73,7 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected ConnectionImpl() {
@@ -80,6 +82,7 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Port basicGetSourcePort() {
@@ -88,6 +91,7 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Port basicGetTargetPort() {
@@ -96,6 +100,7 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -115,6 +120,7 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -130,6 +136,7 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -147,6 +154,7 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -156,6 +164,7 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -187,6 +196,7 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Port getSourcePort() {
@@ -205,6 +215,7 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Port getTargetPort() {
@@ -221,18 +232,9 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 		return targetPort;
 	}
 
-	@Override
-	public void setAttribute(String name, Expression value) {
-		getAttributes().add(UtilFactory.eINSTANCE.createAttribute(name, value));
-	}
-
-	@Override
-	public void setAttribute(String name, int value) {
-		getAttributes().add(UtilFactory.eINSTANCE.createAttribute(name, value));
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void setSourcePort(Port newSourcePort) {
@@ -246,6 +248,7 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void setTargetPort(Port newTargetPort) {

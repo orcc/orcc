@@ -182,7 +182,7 @@ public class XdfExporter extends CalSwitch<Object> {
 				sourcePort, target, targetPort);
 		Integer bufferSize = (Integer) edge.getValue("buffer size");
 		if (bufferSize != null) {
-			connection.setAttribute(Connection.BUFFER_SIZE, (int) bufferSize);
+			connection.setAttribute(Connection.BUFFER_SIZE, IrFactory.eINSTANCE.createExprInt(bufferSize));
 		}
 
 		network.getConnections().add(connection);

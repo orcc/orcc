@@ -29,7 +29,6 @@
 package net.sf.orcc.df;
 
 import net.sf.dftools.graph.Edge;
-import net.sf.orcc.ir.Expression;
 
 /**
  * This class represents a connection in a network. A connection can have a
@@ -68,26 +67,6 @@ public interface Connection extends Edge {
 	 * @model
 	 */
 	Port getTargetPort();
-
-	/**
-	 * Adds an attribute with the given name and value
-	 * 
-	 * @param name
-	 *            attribute name
-	 * @param value
-	 *            value
-	 */
-	void setAttribute(String name, Expression value);
-
-	/**
-	 * Adds an attribute with the given name and value
-	 * 
-	 * @param name
-	 *            attribute name
-	 * @param value
-	 *            value
-	 */
-	void setAttribute(String name, int value);
 
 	/**
 	 * Sets the source of this connection to the given port
