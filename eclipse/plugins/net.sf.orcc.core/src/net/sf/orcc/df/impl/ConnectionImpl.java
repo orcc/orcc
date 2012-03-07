@@ -184,8 +184,8 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 	public Integer getSize() {
 		Attribute attr = getAttribute(BUFFER_SIZE);
 		if (attr != null) {
-			if (attr.getReferencedValue() instanceof Expression) {
-				Expression expr = (Expression) attr.getReferencedValue();
+			if (attr.getContainedValue() instanceof Expression) {
+				Expression expr = (Expression) attr.getContainedValue();
 				return new ExpressionEvaluator().evaluateAsInteger(expr);
 			} else if (attr.getPojoValue() instanceof Integer) {
 				return (Integer) attr.getPojoValue();
