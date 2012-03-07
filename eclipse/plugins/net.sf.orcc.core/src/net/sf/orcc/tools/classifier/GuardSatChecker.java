@@ -134,11 +134,11 @@ public class GuardSatChecker {
 		 *            a term
 		 */
 		private void addLet(Var variable, String term) {
-			builder.append("(let (");
+			builder.append("(let ((");
 			builder.append(variable.getName());
 			builder.append(" ");
 			builder.append(term);
-			builder.append(") ");
+			builder.append(")) ");
 			numLets++;
 		}
 
@@ -280,14 +280,21 @@ public class GuardSatChecker {
 				}
 
 				Var variable = call.getTarget().getVariable();
-				String term = "(" + call.getProcedure().getName();
+
+				String args = new String();
 				for (Arg arg : call.getParameters()) {
 					if (arg.isByVal()) {
 						Expression expr = ((ArgByVal) arg).getValue();
-						term += " " + doSwitch(expr);
+						args += " " + doSwitch(expr);
 					}
 				}
-				term += ")";
+
+				String term = new String();
+				if (args.isEmpty()) {
+					term = call.getProcedure().getName();
+				} else {
+					term = "(" + call.getProcedure().getName() + args + ")";
+				}
 				addLet(variable, term);
 			}
 			return null;
@@ -504,7 +511,9 @@ public class GuardSatChecker {
 		@Override
 		public String caseTypeList(TypeList type) {
 			// (Array indexType valueType)
-			return "(Array (_ BitVec 32) " + doSwitch(type.getType()) + ")";
+			return "(Array (_ BitVec 32) "
+					+ (type.getType().isBool() ? "(_ BitVec 1)" : doSwitch(type
+							.getType())) + ")";
 		}
 
 		@Override
