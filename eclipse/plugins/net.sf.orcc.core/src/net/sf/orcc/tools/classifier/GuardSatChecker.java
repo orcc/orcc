@@ -511,9 +511,7 @@ public class GuardSatChecker {
 		@Override
 		public String caseTypeList(TypeList type) {
 			// (Array indexType valueType)
-			return "(Array (_ BitVec 32) "
-					+ (type.getType().isBool() ? "(_ BitVec 1)" : doSwitch(type
-							.getType())) + ")";
+			return "(Array (_ BitVec 32) " + doSwitch(type.getType()) + ")";
 		}
 
 		@Override
