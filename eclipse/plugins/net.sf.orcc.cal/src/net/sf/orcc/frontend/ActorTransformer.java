@@ -383,7 +383,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 
 		actor.getActions().addAll(actions.getAllActions());
 		actor.getInitializes().addAll(initializes.getAllActions());
-		
+
 		// remove useless list copies
 		// new UselessCopyElimination().doSwitch(actor);
 

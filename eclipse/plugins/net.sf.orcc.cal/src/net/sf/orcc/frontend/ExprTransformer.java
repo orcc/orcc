@@ -41,10 +41,10 @@ import net.sf.orcc.cal.cal.ExpressionBinary;
 import net.sf.orcc.cal.cal.ExpressionBoolean;
 import net.sf.orcc.cal.cal.ExpressionCall;
 import net.sf.orcc.cal.cal.ExpressionElsif;
+import net.sf.orcc.cal.cal.ExpressionFloat;
 import net.sf.orcc.cal.cal.ExpressionIf;
 import net.sf.orcc.cal.cal.ExpressionIndex;
 import net.sf.orcc.cal.cal.ExpressionInteger;
-import net.sf.orcc.cal.cal.ExpressionFloat;
 import net.sf.orcc.cal.cal.ExpressionList;
 import net.sf.orcc.cal.cal.ExpressionString;
 import net.sf.orcc.cal.cal.ExpressionUnary;
@@ -90,6 +90,7 @@ import org.eclipse.emf.ecore.EObject;
  * </p>
  * 
  * @author Matthieu Wipliez
+ * @author Hervé Yviquel
  */
 public class ExprTransformer extends CalSwitch<Expression> {
 
@@ -301,13 +302,22 @@ public class ExprTransformer extends CalSwitch<Expression> {
 	}
 
 	@Override
-	public Expression caseExpressionList(ExpressionList astExpression) {
+	public Expression caseExpressionList(ExpressionList expression) {
 		if (indexes == null) {
 			indexes = new ArrayList<Expression>();
 		}
 
-		List<AstExpression> expressions = astExpression.getExpressions();
-		List<Generator> generators = astExpression.getGenerators();
+		// Return new ExprVar only in case we need one
+		boolean needReturn = false;
+
+		if (target == null) {
+			target = procedure.newTempLocalVariable(Typer.getType(expression),
+					"tmp_list");
+			needReturn = true;
+		}
+
+		List<AstExpression> expressions = expression.getExpressions();
+		List<Generator> generators = expression.getGenerators();
 
 		if (generators.isEmpty()) {
 			transformListSimple(expressions);
@@ -315,7 +325,11 @@ public class ExprTransformer extends CalSwitch<Expression> {
 			transformListGenerators(expressions, generators);
 		}
 
-		return null;
+		if (needReturn) {
+			return eINSTANCE.createExprVar(target);
+		} else {
+			return null;
+		}
 	}
 
 	@Override
