@@ -92,7 +92,7 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	 */
 	private void configureAction(FormattingConfig c) {
 		AstActionElements access = f.getAstActionAccess();
-
+ 
 		c.setLinewrap().before(access.getTagAssignment_1_0());
 		c.setNoSpace().before(access.getColonKeyword_1_1());
 
@@ -104,7 +104,7 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 
 		// "guard" unindents and indents, configure comma rules
 		keywordAndCommas(c, access.getGuardKeyword_6_0(),
-				access.getCommaKeyword_6_2_0());
+				access.getCommaKeyword_6_2_0());	
 
 		// "var" unindents and indents, configure comma rules
 		keywordAndCommas(c, access.getVarKeyword_7_0(),

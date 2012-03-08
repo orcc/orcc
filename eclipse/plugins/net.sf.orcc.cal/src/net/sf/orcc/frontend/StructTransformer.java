@@ -32,10 +32,7 @@ import static net.sf.orcc.ir.IrFactory.eINSTANCE;
 
 import java.util.List;
 
-import net.sf.dftools.util.Attributable;
-import net.sf.orcc.cal.cal.AnnotationArgument;
 import net.sf.orcc.cal.cal.AstActor;
-import net.sf.orcc.cal.cal.AstAnnotation;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstProcedure;
@@ -51,10 +48,8 @@ import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
-import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstReturn;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
@@ -138,7 +133,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 		}
 
 		// Add annotations
-		transformAnnotations(procedure, astProcedure.getAnnotations());
+		Util.transformAnnotations(procedure, astProcedure.getAnnotations());
 		
 		// add mapping now (in case this procedure is recursive)
 		Frontend.putMapping(astProcedure, procedure);
@@ -182,7 +177,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 		}
 		
 		// Add annotations
-		transformAnnotations(procedure, function.getAnnotations());
+		Util.transformAnnotations(procedure, function.getAnnotations());
 		
 		// add mapping now (in case this function is recursive)
 		Frontend.putMapping(function, procedure);
@@ -235,7 +230,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 		// create state variable and put it in the map
 		Var var = eINSTANCE.createVar(lineNumber, type, name, assignable,
 				initialValue);
-		transformAnnotations(var, variable.getAnnotations());
+		Util.transformAnnotations(var, variable.getAnnotations());
 		Frontend.putMapping(variable, var);
 
 		return var;
@@ -266,34 +261,6 @@ public class StructTransformer extends CalSwitch<EObject> {
 
 		Frontend.putMapping(variable, local);
 		return local;
-	}
-
-	/**
-	 * Transforms the AST annotations to IR.
-	 * 
-	 * @param variable
-	 *            an annotated variable
-	 * @param annotations
-	 *            a list of annotations
-	 */
-	private void transformAnnotations(Attributable attr,
-			List<AstAnnotation> annotations) {
-		for (AstAnnotation astAnnotation : annotations) {
-			String name = astAnnotation.getName();
-
-			ExprList arguments = IrFactory.eINSTANCE.createExprList();
-			for (AnnotationArgument arg : astAnnotation.getArguments()) {
-				ExprList pair = IrFactory.eINSTANCE.createExprList();
-				pair.getValue().add(eINSTANCE.createExprString(arg.getName()));
-				pair.getValue().add(eINSTANCE.createExprString(arg.getValue()));
-				arguments.getValue().add(pair);
-			}
-
-			if (arguments.getValue().isEmpty()) {
-				arguments = null;
-			}
-			attr.setAttribute(name, arguments);
-		}
 	}
 
 	/**

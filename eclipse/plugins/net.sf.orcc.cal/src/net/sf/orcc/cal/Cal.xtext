@@ -29,7 +29,7 @@ QualifiedNameWithWildCard:
 ///////////////////////////////////////////////////////////////////////////////
 
 AstUnit: {AstUnit} ':'
-
+	
 	(functions += Function
 	| procedures += AstProcedure
 	| variables += ConstantVariable)*
@@ -164,7 +164,7 @@ LocalFsm:
 
 AstAction:
 	{AstAction}
-
+	
 	(tag=AstTag ':')?
 	'action'
 	(inputs += InputPattern (',' inputs += InputPattern)*)?
@@ -384,4 +384,4 @@ VariableReference: variable=[Variable|QualifiedName];
 
 AstAnnotation: '@' name=ID ('(' arguments += AnnotationArgument (',' arguments += AnnotationArgument)* ')')?;
 
-AnnotationArgument: name=ID '=' value=STRING;
+AnnotationArgument: name=ID ('=' value=STRING)?;

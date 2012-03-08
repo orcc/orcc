@@ -380,7 +380,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		AstEntity entity = (AstEntity) astActor.eContainer();
 		actor.setName(net.sf.orcc.cal.util.Util.getQualifiedName(entity));
 		actor.setNative(Util.hasAnnotation("native", entity.getAnnotations()));
-
+		Util.transformAnnotations(actor, entity.getAnnotations());
 		actor.getActions().addAll(actions.getAllActions());
 		actor.getInitializes().addAll(initializes.getAllActions());
 

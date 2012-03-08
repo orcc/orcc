@@ -32,9 +32,13 @@ import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
 
 import java.util.List;
 
+import net.sf.dftools.util.Attributable;
+import net.sf.orcc.cal.cal.AnnotationArgument;
 import net.sf.orcc.cal.cal.AstAnnotation;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.Variable;
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.IrFactory;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
@@ -121,6 +125,40 @@ public class Util {
 		} else {
 			return feature != eINSTANCE.getAstActor_Parameters()
 					&& feature != eINSTANCE.getAstUnit_Variables();
+		}
+	}
+
+	/**
+	 * Transforms the AST annotations to IR.
+	 * 
+	 * @param attr
+	 *            an attributable object
+	 * @param annotations
+	 *            a list of annotations
+	 */
+	public static void transformAnnotations(Attributable attr,
+			List<AstAnnotation> annotations) {
+		for (AstAnnotation astAnnotation : annotations) {
+			String name = astAnnotation.getName();
+
+			ExprList arguments = IrFactory.eINSTANCE.createExprList();
+			for (AnnotationArgument arg : astAnnotation.getArguments()) {
+				ExprList pair = IrFactory.eINSTANCE.createExprList();
+				pair.getValue().add(
+						IrFactory.eINSTANCE.createExprString(arg.getName()));
+				
+				// Add value if exist
+				if (arg.getValue() != null){
+					pair.getValue().add(
+							IrFactory.eINSTANCE.createExprString(arg.getValue()));
+				}
+				arguments.getValue().add(pair);
+			}
+
+			if (arguments.getValue().isEmpty()) {
+				arguments = null;
+			}
+			attr.setAttribute(name, arguments);
 		}
 	}
 

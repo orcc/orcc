@@ -661,6 +661,7 @@ printInstance(instance, options) ::= <<
 #include "orcc_scheduler.h"
 
 #define SIZE <options.("fifoSize")>
+<printAttributes(instance)>
 
 <if(options.newScheduler)>
 #define RING_TOPOLOGY <if(options.ringTopology)>1<else>0<endif>
