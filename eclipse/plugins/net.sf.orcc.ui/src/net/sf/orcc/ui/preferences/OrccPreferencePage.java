@@ -33,13 +33,10 @@ import static net.sf.orcc.preferences.PreferenceConstants.P_JADE_TOOLBOX;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_OPTIONS;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_TYPE;
-import static net.sf.orcc.preferences.PreferenceConstants.P_TTA_LIB;
-import static net.sf.orcc.preferences.PreferenceConstants.P_VHDL_LIB;
 import net.sf.orcc.OrccActivator;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -132,8 +129,6 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 
 		createJadeFieldEditors(parent);
 		createSolverFieldEditors(parent);
-		createVHDLFieldEditors(parent);
-		createTtaFieldEditors(parent);
 	}
 
 	/**
@@ -151,23 +146,6 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 
 		addField(new FileFieldEditor(P_JADE, "Path of Jade executable:", group));
 		addField(new FileFieldEditor(P_JADE_TOOLBOX, "Path of Jade toolbox:",
-				group));
-	}
-
-	/**
-	 * Creates field editors for the TTA backend preferences.
-	 * 
-	 * @param parent
-	 *            parent composite
-	 */
-	private void createTtaFieldEditors(Composite parent) {
-		Group group = new Group(parent, SWT.NONE);
-		group.setFont(getFont());
-		group.setLayout(new GridLayout(3, false));
-		group.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-		group.setText("TTA backend");
-
-		addField(new DirectoryFieldEditor(P_TTA_LIB, "Path of TTA library:",
 				group));
 	}
 
@@ -249,23 +227,6 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 		addField(fieldRadio);
 
 		createListeners();
-	}
-
-	/**
-	 * Creates field editors for the VHDL preferences.
-	 * 
-	 * @param parent
-	 *            parent composite
-	 */
-	private void createVHDLFieldEditors(Composite parent) {
-		Group group = new Group(parent, SWT.NONE);
-		group.setFont(getFont());
-		group.setLayout(new GridLayout(3, false));
-		group.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-		group.setText("VHDL");
-
-		addField(new DirectoryFieldEditor(P_VHDL_LIB, "Path of VHDL library:",
-				group));
 	}
 
 	@Override

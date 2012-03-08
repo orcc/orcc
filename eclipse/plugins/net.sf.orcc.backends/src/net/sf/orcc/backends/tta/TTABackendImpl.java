@@ -28,10 +28,8 @@
  */
 package net.sf.orcc.backends.tta;
 
-import static net.sf.orcc.OrccActivator.getDefault;
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
-import static net.sf.orcc.preferences.PreferenceConstants.P_TTA_LIB;
 
 import java.io.File;
 import java.io.IOException;
@@ -128,7 +126,6 @@ public class TTABackendImpl extends AbstractBackend {
 		debug = getAttribute(DEBUG_MODE, true);
 		finalize = getAttribute("net.sf.orcc.backends.tta.finalizeGeneration",
 				false);
-		libPath = getDefault().getPreference(P_TTA_LIB, "");
 		fpgaBrand = getAttribute("net.sf.orcc.backends.tta.fpgaBrand", "Altera");
 		fpgaFamily = getAttribute("net.sf.orcc.backends.tta.fpgaFamily",
 				"Stratix III");
@@ -136,6 +133,25 @@ public class TTABackendImpl extends AbstractBackend {
 		// Set default FIFO size to 256
 		fifoSize = getAttribute(FIFO_SIZE, 256);
 		fifoWidthu = (int) Math.ceil(Math.log(fifoSize) / Math.log(2));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.orcc.backends.AbstractBackend#exportRuntimeLibrary()
+	 */
+	@Override
+	public boolean exportRuntimeLibrary() throws OrccException {
+		libPath = path + File.separator + "libs";
+		write("Export library files into " + libPath + "... ");
+		if (copyFolderToFileSystem("/runtime/TTA", libPath)) {
+			write("OK" + "\n");
+			new File(libPath + File.separator + "generate").setExecutable(true);
+			return true;
+		} else {
+			write("Error" + "\n");
+			return false;
+		}
 	}
 
 	@Override
@@ -299,8 +315,8 @@ public class TTABackendImpl extends AbstractBackend {
 					"net/sf/orcc/backends/tta/ISE_Project.stg");
 			projectXisePrinter.print("top.xise", path, "xiseNetwork",
 					"network", network);
-			projectXisePrinter.print("top.ucf", path, "ucfNetwork",
-					"network", network);
+			projectXisePrinter.print("top.ucf", path, "ucfNetwork", "network",
+					network);
 		}
 
 		// ModelSim

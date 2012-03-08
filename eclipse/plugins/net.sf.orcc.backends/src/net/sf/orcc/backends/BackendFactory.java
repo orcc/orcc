@@ -94,6 +94,9 @@ public class BackendFactory extends PluginFactory {
 		backend.setProgressMonitor(monitor);
 		backend.setWriteListener(listener);
 		backend.setOptions(options);
+		
+		// Export libraries if needed by backend
+		backend.exportRuntimeLibrary();
 
 		// always compile VTL.
 		// an actor is only compiled if it needs to (based on modification date)
@@ -102,8 +105,6 @@ public class BackendFactory extends PluginFactory {
 		if ((Boolean) options.get(COMPILE_XDF)) {
 			backend.compileXDF();
 		}
-		// Export libraries if needed by backend
-		backend.exportRuntimeLibrary();
 	}
 
 }

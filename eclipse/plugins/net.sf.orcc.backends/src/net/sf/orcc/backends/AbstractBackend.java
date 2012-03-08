@@ -837,9 +837,9 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 			try {
 				setOptions(optionMap);
+				exportRuntimeLibrary();
 				compileVTL();
 				compileXDF();
-				exportRuntimeLibrary();
 				return IApplication.EXIT_OK;
 			} catch (Exception e) {
 				System.err.println("Could not run the back-end with \""
