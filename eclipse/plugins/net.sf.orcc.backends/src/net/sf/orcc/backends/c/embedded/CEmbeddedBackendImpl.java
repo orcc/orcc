@@ -31,8 +31,6 @@ package net.sf.orcc.backends.c.embedded;
 import java.io.File;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
-
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
@@ -44,6 +42,8 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.df.transformations.NetworkFlattener;
 import net.sf.orcc.moc.SDFMoC;
+
+import org.eclipse.core.resources.IFile;
 
 /**
  * C backend targetting embedded systems
@@ -64,15 +64,15 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 		if (!algoDir.exists()) {
 			algoDir.mkdirs();
 		}
-		
+
 		if (!codeDir.exists()) {
 			codeDir.mkdirs();
 		}
-		
+
 		if (!srcDir.exists()) {
 			srcDir.mkdirs();
 		}
-		
+
 		if (!idlDir.exists()) {
 			idlDir.mkdirs();
 		}
@@ -81,6 +81,11 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 
+	}
+
+	@Override
+	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
+		// do not generate an embedded C VTL
 	}
 
 	@Override
@@ -116,9 +121,10 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 			SDFMoC moc = (SDFMoC) network.getAllActors().get(0).getMoC();
 			moc.toString();
 			write("Printing network...\n");
-			printer.print("./Algo/" + network.getName() + ".graphml", path, network);
+			printer.print("./Algo/" + network.getName() + ".graphml", path,
+					network);
 		} else {
-			write("The network is not SDF. Other models are not yet supported.");
+			write("The network is not SDF. Other models are not yet supported.\n");
 		}
 	}
 
@@ -129,26 +135,23 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 	@Override
 	protected boolean printActor(Actor actor) throws OrccException {
 		boolean result = false;
-		
+
 		// print IDL
 		StandardPrinter printerIDL = new StandardPrinter(
 				"net/sf/orcc/backends/c/embedded/ActorIDL.stg", false);
 		printerIDL.setExpressionPrinter(new CExpressionPrinter());
 		printerIDL.setTypePrinter(new CTypePrinter());
-		result = printerIDL.print("./Code/IDL/" + actor.getSimpleName() + ".idl", path, actor);
-		
+		result = printerIDL.print("./Code/IDL/" + actor.getSimpleName()
+				+ ".idl", path, actor);
+
 		// Print C code
 		StandardPrinter printerC = new StandardPrinter(
 				"net/sf/orcc/backends/c/embedded/ActorC.stg", false);
 		printerC.setExpressionPrinter(new CExpressionPrinter());
 		printerC.setTypePrinter(new CTypePrinter());
-		result |= printerC.print("./Code/src/" + actor.getSimpleName() + ".c", path, actor);
-		
-		return result;
-	}
+		result |= printerC.print("./Code/src/" + actor.getSimpleName() + ".c",
+				path, actor);
 
-	@Override
-	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
-		// do not generate an embedded C VTL
+		return result;
 	}
 }
