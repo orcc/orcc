@@ -1120,7 +1120,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		tta.setName(name);
 		// Address spaces
 		tta.setData(createAddressSpace("data", 8, 0,
-				quantizeUp(ramSize / 8 + 256)));
+				quantizeUp(ramSize / 8 + 512)));
 		tta.setProgram(createAddressSpace("instructions", 8, 0, 60000));
 		// Buses
 		for (int i = 0; i < busNb; i++) {
