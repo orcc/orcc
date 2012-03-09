@@ -31,18 +31,10 @@ package net.sf.orcc.tools.statistics;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Network;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.TypeInt;
-import net.sf.orcc.ir.TypeList;
-import net.sf.orcc.ir.TypeString;
-import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Var;
 
 /**
@@ -53,25 +45,6 @@ import net.sf.orcc.ir.Var;
  * 
  */
 public class MemoryStats {
-
-	public class MemoryStatsElement {
-		private int globalMemorySize;
-
-		private int globalVariableNb;
-
-		public MemoryStatsElement() {
-			globalMemorySize = 0;
-			globalVariableNb = 0;
-		}
-
-		public int getGlobalMemorySize() {
-			return globalMemorySize;
-		}
-
-		public int getGlobalVariableNb() {
-			return globalVariableNb;
-		}
-	}
 
 	/**
 	 * Returns the memory size needed by the given actor in bits. This size
@@ -86,7 +59,7 @@ public class MemoryStats {
 		int neededMemorySize = 0;
 		// Compute memory size needed by state variable
 		for (Var var : actor.getStateVars()) {
-			neededMemorySize += getSize(var.getType());
+			neededMemorySize += var.getType().getSizeInBits();
 		}
 		// Compute memory size needed by the actions
 		Collection<Integer> actionsMemorySize = new ArrayList<Integer>();
@@ -112,55 +85,10 @@ public class MemoryStats {
 		// Compute memory size needed by local arrays
 		for (Var var : procedure.getLocals()) {
 			if (var.getType().isList()) {
-				neededMemorySize += getSize(var.getType());
+				neededMemorySize += var.getType().getSizeInBits();
 			}
 		}
 		return neededMemorySize;
-	}
-
-	private static int getSize(Type type) {
-		int size;
-		if (type.isBool()) {
-			size = 1;
-		} else if (type.isFloat()) {
-			size = 32;
-		} else if (type.isInt()) {
-			size = ((TypeInt) type).getSize();
-		} else if (type.isList()) {
-			size = getSize(((TypeList) type).getInnermostType());
-			for (int dim : type.getDimensions()) {
-				size *= dim;
-			}
-		} else if (type.isString()) {
-			size = ((TypeString) type).getSize();
-		} else if (type.isUint()) {
-			size = ((TypeUint) type).getSize();
-		} else {
-			size = 0;
-		}
-		return size;
-	}
-
-	private Map<Actor, MemoryStatsElement> memoryStatsMap;
-
-	private void computeMemorySize(Actor actor, MemoryStatsElement statsElement) {
-		for (Var var : actor.getStateVars()) {
-			statsElement.globalMemorySize += getSize(var.getType());
-		}
-	}
-
-	public void computeMemoryStats(Network network) {
-		memoryStatsMap = new HashMap<Actor, MemoryStats.MemoryStatsElement>();
-		for (Actor actor : network.getAllActors()) {
-			MemoryStatsElement statsElement = new MemoryStatsElement();
-			computeMemorySize(actor, statsElement);
-			memoryStatsMap.put(actor, statsElement);
-		}
-
-	}
-
-	public Map<Actor, MemoryStatsElement> getMemoryStatsMap() {
-		return memoryStatsMap;
 	}
 
 }
