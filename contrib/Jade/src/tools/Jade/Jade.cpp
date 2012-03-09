@@ -317,13 +317,13 @@ void startCmdLine(){
 	// Set input file
 	input_file = (char*)VidFile.c_str();
 
-	//Run network
-	engine->run(network);
-
 	// Print the given decoder if needed
 	if (OutputDir != ""){
 		engine->print(network, "module.txt");
 	}
+
+	//Run network
+	engine->run(network);
 
 
 	cout << "End of Jade:" << (clock () - timer) * 1000 / CLOCKS_PER_SEC;
