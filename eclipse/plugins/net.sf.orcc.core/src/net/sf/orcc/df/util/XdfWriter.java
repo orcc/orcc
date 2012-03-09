@@ -334,7 +334,7 @@ public class XdfWriter {
 			attributeElt.setAttribute("name", attribute.getName());
 
 			String kind;
-			EObject value = attribute.getReferencedValue();
+			EObject value = attribute.getContainedValue();
 			if (attribute.getPojoValue() instanceof String) {
 				kind = XdfConstants.STRING;
 				String str = ((WrapperString) value).getString();
