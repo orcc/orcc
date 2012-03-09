@@ -752,7 +752,7 @@ b<label(whileNode)>:
 label(node) ::= "b<actor.templateData.nodeToLabelMap.(node)>"
 
 printNextLabel(node)::=<<
-<if(first(node).whileNode)><label(first(node).joinNode)><else><label(first(node))><endif>
+<if(first(node).nodeWhile)><label(first(node).joinNode)><else><label(first(node))><endif>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -112,6 +112,8 @@ public class BuildCFG extends AbstractActorVisitor<Node> {
 			addEdge(join);
 		}
 
+		flag = true;
+		last = join;
 		cfg.getVertices().add(node);
 		addEdge(node);
 
