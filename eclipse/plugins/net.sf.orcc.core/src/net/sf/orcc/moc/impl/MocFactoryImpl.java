@@ -101,6 +101,7 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 		CSDFMoCImpl csdfMoC = new CSDFMoCImpl();
 		csdfMoC.setInputPattern(DfFactory.eINSTANCE.createPattern());
 		csdfMoC.setOutputPattern(DfFactory.eINSTANCE.createPattern());
+		csdfMoC.setDelayPattern(DfFactory.eINSTANCE.createPattern());
 		return csdfMoC;
 	}
 
@@ -154,6 +155,7 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 		SDFMoCImpl sdfMoC = new SDFMoCImpl();
 		sdfMoC.setInputPattern(DfFactory.eINSTANCE.createPattern());
 		sdfMoC.setOutputPattern(DfFactory.eINSTANCE.createPattern());
+		sdfMoC.setDelayPattern(DfFactory.eINSTANCE.createPattern());
 		sdfMoC.setNumberOfPhases(1);
 		return sdfMoC;
 	}

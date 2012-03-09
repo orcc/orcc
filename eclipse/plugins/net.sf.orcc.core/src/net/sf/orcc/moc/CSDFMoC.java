@@ -43,6 +43,14 @@ import org.eclipse.emf.common.util.EList;
 public interface CSDFMoC extends MoC {
 
 	/**
+	 * Returns the delay pattern of this CSDF MoC.
+	 * 
+	 * @return the delay pattern of this CSDF MoC
+	 * @model containment="true"
+	 */
+	Pattern getDelayPattern();
+
+	/**
 	 * Returns the input pattern of this CSDF MoC.
 	 * 
 	 * @return the input pattern of this CSDF MoC
@@ -91,6 +99,14 @@ public interface CSDFMoC extends MoC {
 	 * @model containment="true"
 	 */
 	Pattern getOutputPattern();
+
+	/**
+	 * Set the delay pattern of this CSDF MoC.
+	 * 
+	 * @param pattern
+	 *            the delay pattern of this CSDF MoC
+	 */
+	void setDelayPattern(Pattern value);
 
 	/**
 	 * Set the input pattern of this CSDF MoC.

@@ -205,6 +205,15 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getCSDFMoC_DelayPattern() {
+		return (EReference) csdfMoCEClass.getEStructuralFeatures().get(4);
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -288,6 +297,7 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 		createEAttribute(csdfMoCEClass, CSDF_MO_C__NUMBER_OF_PHASES);
 		createEReference(csdfMoCEClass, CSDF_MO_C__OUTPUT_PATTERN);
 		createEReference(csdfMoCEClass, CSDF_MO_C__INVOCATIONS);
+		createEReference(csdfMoCEClass, CSDF_MO_C__DELAY_PATTERN);
 
 		dpnMoCEClass = createEClass(DPN_MO_C);
 
@@ -360,6 +370,10 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 				IS_ORDERED);
 		initEReference(getCSDFMoC_Invocations(), this.getInvocation(), null,
 				"invocations", null, 0, -1, CSDFMoC.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getCSDFMoC_DelayPattern(), theDfPackage.getPattern(),
+				null, "delayPattern", null, 0, 1, CSDFMoC.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 

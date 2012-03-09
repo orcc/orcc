@@ -10,6 +10,8 @@
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="invocations" upperBound="-1"
         eType="#//Invocation" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="delayPattern" eType="ecore:EClass Df.ecore#//Pattern"
+        containment="true" resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="DPNMoC" eSuperTypes="#//MoC"/>
   <eClassifiers xsi:type="ecore:EClass" name="KPNMoC" eSuperTypes="#//MoC"/>

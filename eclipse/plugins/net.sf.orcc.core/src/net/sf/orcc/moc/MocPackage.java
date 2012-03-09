@@ -125,13 +125,22 @@ public interface MocPackage extends EPackage {
 	int CSDF_MO_C__INVOCATIONS = MO_C_FEATURE_COUNT + 3;
 
 	/**
+	 * The feature id for the '<em><b>Delay Pattern</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CSDF_MO_C__DELAY_PATTERN = MO_C_FEATURE_COUNT + 4;
+
+	/**
 	 * The number of structural features of the '<em>CSDF Mo C</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int CSDF_MO_C_FEATURE_COUNT = MO_C_FEATURE_COUNT + 4;
+	int CSDF_MO_C_FEATURE_COUNT = MO_C_FEATURE_COUNT + 5;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.moc.impl.DPNMoCImpl <em>DPN Mo C</em>}' class.
@@ -237,6 +246,15 @@ public interface MocPackage extends EPackage {
 	int SDF_MO_C__INVOCATIONS = CSDF_MO_C__INVOCATIONS;
 
 	/**
+	 * The feature id for the '<em><b>Delay Pattern</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SDF_MO_C__DELAY_PATTERN = CSDF_MO_C__DELAY_PATTERN;
+
+	/**
 	 * The number of structural features of the '<em>SDF Mo C</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -336,6 +354,17 @@ public interface MocPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getCSDFMoC_Invocations();
+
+	/**
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.moc.CSDFMoC#getDelayPattern <em>Delay Pattern</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>Delay Pattern</em>'.
+	 * @see net.sf.orcc.moc.CSDFMoC#getDelayPattern()
+	 * @see #getCSDFMoC()
+	 * @generated
+	 */
+	EReference getCSDFMoC_DelayPattern();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.moc.DPNMoC <em>DPN Mo C</em>}'.
@@ -469,6 +498,14 @@ public interface MocPackage extends EPackage {
 		 * @generated
 		 */
 		EReference CSDF_MO_C__INVOCATIONS = eINSTANCE.getCSDFMoC_Invocations();
+		/**
+		 * The meta object literal for the '<em><b>Delay Pattern</b></em>' containment reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference CSDF_MO_C__DELAY_PATTERN = eINSTANCE
+				.getCSDFMoC_DelayPattern();
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.moc.impl.DPNMoCImpl <em>DPN Mo C</em>}' class.
 		 * <!-- begin-user-doc -->
