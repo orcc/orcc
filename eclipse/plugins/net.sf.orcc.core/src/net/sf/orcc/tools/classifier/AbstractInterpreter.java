@@ -71,7 +71,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 
 	private boolean schedulableMode;
 
-	private Action scheduledAction;
+	private Action executedAction;
 
 	/**
 	 * Creates a new abstract interpreter.
@@ -91,6 +91,10 @@ public class AbstractInterpreter extends ActorInterpreter {
 		originalActions = new HashMap<Action, Action>();
 		for (Action action : originalActor.getActions()) {
 			originalActions.put((Action) copier.get(action), action);
+		}
+		// also save initialize action
+		for (Action action : originalActor.getInitializes()) {
+				originalActions.put((Action) copier.get(action), action);
 		}
 
 		setActor(copyOfActor);
@@ -172,7 +176,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 
 	@Override
 	public void execute(Action action) {
-		scheduledAction = action;
+		executedAction = action;
 		Pattern inputPattern = action.getInputPattern();
 		for (Port port : inputPattern.getPorts()) {
 			int numTokens = inputPattern.getNumTokens(port);
@@ -206,14 +210,14 @@ public class AbstractInterpreter extends ActorInterpreter {
 	}
 
 	/**
-	 * Returns the latest action that was scheduled by the latest call to
-	 * {@link #schedule()}.
+	 * Returns the latest action that was executed by the latest call to
+	 * {@link #execute()}.
 	 * 
-	 * @return the latest scheduled action
+	 * @return the latest executed action
 	 */
-	public Action getScheduledAction() {
+	public Action getExecutedAction() {
 		// return the action of the original actor
-		return originalActions.get(scheduledAction);
+		return originalActions.get(executedAction);
 	}
 
 	@Override

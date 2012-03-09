@@ -201,7 +201,7 @@ public class ActorClassifier extends DfSwitch<Object> {
 		State initialState = interpreter.getFsmState();
 		do {
 			interpreter.schedule();
-			Action latest = interpreter.getScheduledAction();
+			Action latest = interpreter.getExecutedAction();
 			Invocation invocation = eINSTANCE.createInvocation(latest);
 			csdfMoc.getInvocations().add(invocation);
 			nbPhases++;
@@ -238,7 +238,7 @@ public class ActorClassifier extends DfSwitch<Object> {
 		final int MAX_PHASES = 16384;
 		do {
 			interpreter.schedule();
-			Action latest = interpreter.getScheduledAction();
+			Action latest = interpreter.getExecutedAction();
 			Invocation invocation = eINSTANCE.createInvocation(latest);
 			sdfMoc.getInvocations().add(invocation);
 			nbPhases++;
@@ -326,8 +326,18 @@ public class ActorClassifier extends DfSwitch<Object> {
 		// schedule
 		SDFMoC sdfMoc = MocFactory.eINSTANCE.createSDFMoC();
 		AbstractInterpreter interpreter = new AbstractInterpreter(actor);
+		Action initializeAction = interpreter.getExecutedAction();
+		if (initializeAction != null) {
+			// If there was an initialize action, the tokens produced
+			// are delays in the sdf moc.
+			sdfMoc.getDelayPattern().updatePattern(
+					(initializeAction.getOutputPattern()));
+			// Reset output production
+			interpreter.getActor().resetTokenProduction();
+		}
+				
 		interpreter.schedule();
-		Action action = interpreter.getScheduledAction();
+		Action action = interpreter.getExecutedAction();
 		Invocation invocation = eINSTANCE.createInvocation(action);
 		sdfMoc.getInvocations().add(invocation);
 
