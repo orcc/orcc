@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.dftools.graph.Vertex;
+import net.sf.dftools.util.Attribute;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Actor;
@@ -82,11 +83,7 @@ public class SlowSimulator extends AbstractSimulator {
 
 	private int fifoSize;
 
-	protected Map<Port, SimulatorFifo> inputFifos;
-
 	protected Map<Instance, ActorInterpreter> interpreters;
-
-	protected Map<Port, List<SimulatorFifo>> outputFifos;
 
 	protected IProject project;
 
@@ -98,6 +95,7 @@ public class SlowSimulator extends AbstractSimulator {
 
 	protected String xdfFile;
 
+	@SuppressWarnings("unchecked")
 	protected void connectActors(Instance src, Port srcPort, Instance tgt,
 			Port tgtPort, int fifoSize) {
 		SimulatorFifo fifo = null;
@@ -110,12 +108,18 @@ public class SlowSimulator extends AbstractSimulator {
 			fifo = new SimulatorFifo(srcPort.getType(), fifoSize);
 		}
 
-		inputFifos.put(tgtPort, fifo);
+		tgtPort.setAttribute("fifo", fifo);
 
-		List<SimulatorFifo> fifos = outputFifos.get(srcPort);
+		Attribute attribute = srcPort.getAttribute("fifo");
+		List<SimulatorFifo> fifos;
+		if (attribute == null) {
+			fifos = null;
+		} else {
+			fifos = (List<SimulatorFifo>) attribute.getPojoValue();
+		}
 		if (fifos == null) {
 			fifos = new ArrayList<SimulatorFifo>();
-			outputFifos.put(srcPort, fifos);
+			srcPort.setAttribute("fifo", fifos);
 		}
 		fifos.add(fifo);
 	}
@@ -205,7 +209,6 @@ public class SlowSimulator extends AbstractSimulator {
 					clonedActor, instance.getArguments(), getWriteListener());
 
 			interpreters.put(instance, interpreter);
-			interpreter.setFifos(inputFifos, outputFifos);
 		}
 	}
 
@@ -236,8 +239,6 @@ public class SlowSimulator extends AbstractSimulator {
 	public void start(String mode) {
 		try {
 			interpreters = new HashMap<Instance, ActorInterpreter>();
-			inputFifos = new HashMap<Port, SimulatorFifo>();
-			outputFifos = new HashMap<Port, List<SimulatorFifo>>();
 
 			IFile file = OrccUtil.getFile(project, xdfFile, "xdf");
 			ResourceSet set = new ResourceSetImpl();
@@ -261,8 +262,6 @@ public class SlowSimulator extends AbstractSimulator {
 			throw new OrccRuntimeException(e.getMessage());
 		} finally {
 			// clean up to prevent memory leak
-			inputFifos = null;
-			outputFifos = null;
 			interpreters = null;
 		}
 	}

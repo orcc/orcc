@@ -30,7 +30,6 @@ package net.sf.orcc.simulators;
 
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Map;
 
 import net.sf.dftools.util.Nameable;
 import net.sf.orcc.OrccRuntimeException;
@@ -63,15 +62,7 @@ import net.sf.orcc.util.WriteListener;
  */
 public class ConnectedActorInterpreter extends ActorInterpreter {
 
-	/**
-	 * Communication fifos map : key = related I/O port name; value =
-	 * Fifo_int/boolean/String
-	 */
-	private Map<Port, SimulatorFifo> inputFifos;
-
 	private WriteListener listener;
-
-	private Map<Port, List<SimulatorFifo>> outputFifos;
 
 	public ConnectedActorInterpreter(Actor actor, List<Argument> arguments,
 			WriteListener listener) {
@@ -156,7 +147,9 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		if (outputPattern != null) {
 			for (Port port : outputPattern.getPorts()) {
 				Integer nbOfTokens = outputPattern.getNumTokens(port);
-				List<SimulatorFifo> fifos = outputFifos.get(port);
+				@SuppressWarnings("unchecked")
+				List<SimulatorFifo> fifos = (List<SimulatorFifo>) port
+						.getAttributes().get(0).getPojoValue();
 				for (SimulatorFifo fifo : fifos) {
 					hasRooms &= fifo.hasRoom(nbOfTokens);
 				}
@@ -179,7 +172,8 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 
 		for (Port port : inputPattern.getPorts()) {
 			int numTokens = inputPattern.getNumTokens(port);
-			SimulatorFifo fifo = inputFifos.get(port);
+			SimulatorFifo fifo = (SimulatorFifo) port.getAttributes().get(0)
+					.getPojoValue();
 
 			Var variable = inputPattern.getVariable(port);
 			Type type = ((TypeList) variable.getType()).getInnermostType();
@@ -195,7 +189,9 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 
 		for (Port port : outputPattern.getPorts()) {
 			int numTokens = outputPattern.getNumTokens(port);
-			List<SimulatorFifo> fifos = outputFifos.get(port);
+			@SuppressWarnings("unchecked")
+			List<SimulatorFifo> fifos = (List<SimulatorFifo>) port
+					.getAttributes().get(0).getPojoValue();
 
 			Var variable = outputPattern.getVariable(port);
 			Type type = ((TypeList) variable.getType()).getInnermostType();
@@ -220,7 +216,8 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		Pattern pattern = action.getInputPattern();
 		// check tokens
 		for (Port port : pattern.getPorts()) {
-			SimulatorFifo fifo = inputFifos.get(port);
+			SimulatorFifo fifo = (SimulatorFifo) port.getAttributes().get(0)
+					.getPojoValue();
 			boolean hasTok = fifo.hasTokens(pattern.getNumTokens(port));
 			if (!hasTok) {
 				return false;
@@ -231,7 +228,8 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		pattern = action.getPeekPattern();
 		for (Port port : pattern.getPorts()) {
 			int numTokens = pattern.getNumTokens(port);
-			SimulatorFifo fifo = inputFifos.get(port);
+			SimulatorFifo fifo = (SimulatorFifo) port.getAttributes().get(0)
+					.getPojoValue();
 
 			Var peeked = pattern.getVariable(port);
 			if (peeked != null) {
@@ -249,18 +247,6 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 
 		Object result = doSwitch(action.getScheduler());
 		return ValueUtil.isTrue(result);
-	}
-
-	/**
-	 * Set the communication FIFOs map for interpreter to be able to execute
-	 * read/write accesses.
-	 * 
-	 * @param outputFifos
-	 */
-	public void setFifos(Map<Port, SimulatorFifo> fifos,
-			Map<Port, List<SimulatorFifo>> outputFifos) {
-		this.inputFifos = fifos;
-		this.outputFifos = outputFifos;
 	}
 
 	@Override
