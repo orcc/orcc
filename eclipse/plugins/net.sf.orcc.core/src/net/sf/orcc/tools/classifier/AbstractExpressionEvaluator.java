@@ -32,7 +32,6 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
-import net.sf.orcc.ir.util.ExpressionPrinter;
 
 /**
  * This class defines a partial expression evaluator.
@@ -46,29 +45,33 @@ public class AbstractExpressionEvaluator extends ExpressionEvaluator {
 
 	@Override
 	public Object caseExprBinary(ExprBinary expr) {
-		Object val1 = doSwitch(expr.getE1());
-		Object val2 = doSwitch(expr.getE2());
-		Object result = interpretBinaryExpr(val1, expr.getOp(), val2);
+		try {
+			Object val1 = doSwitch(expr.getE1());
+			Object val2 = doSwitch(expr.getE2());
+			return interpretBinaryExpr(val1, expr.getOp(), val2);
+		} catch (OrccRuntimeException e) {
+			// if the expression could not be evaluated
+			if (schedulableMode) {
+				// if we are in schedulable mode, rethrow
+				throw e;
+			}
 
-		// only throws an exception if we are in schedulable mode and the result
-		// is null
-		if (schedulableMode && result == null) {
-			throw new OrccRuntimeException("Expression '"
-					+ new ExpressionPrinter().doSwitch(expr) + "' is null");
+			// otherwise ignore and returns null
+			return null;
 		}
-		return result;
 	}
 
 	@Override
 	public Object caseExprUnary(ExprUnary expr) {
-		Object value = doSwitch(expr.getExpr());
-		Object result = interpretUnaryExpr(expr.getOp(), value);
-
-		if (schedulableMode && value == null) {
-			throw new OrccRuntimeException("Expression '"
-					+ new ExpressionPrinter().doSwitch(expr) + "' is null");
+		try {
+			Object value = doSwitch(expr.getExpr());
+			return interpretUnaryExpr(expr.getOp(), value);
+		} catch (OrccRuntimeException e) {
+			if (schedulableMode) {
+				throw e;
+			}
+			return null;
 		}
-		return result;
 	}
 
 	/**
