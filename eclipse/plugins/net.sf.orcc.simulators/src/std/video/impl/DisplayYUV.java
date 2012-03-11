@@ -103,7 +103,7 @@ public class DisplayYUV {
 	 */
 	public static void compareYUV_comparePicture(short[] pictureBufferY,
 			short[] pictureBufferU, short[] pictureBufferV,
-			Integer pictureWidth, Integer pictureHeight) {
+			BigInteger pictureWidth, BigInteger pictureHeight) {
 
 	}
 
