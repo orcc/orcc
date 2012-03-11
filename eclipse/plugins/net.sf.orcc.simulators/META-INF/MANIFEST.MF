@@ -2,14 +2,14 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Orcc simulators plug-in
 Bundle-SymbolicName: net.sf.orcc.simulators;singleton:=true
-Bundle-Version: 1.0.0.v20120131
+Bundle-Version: 1.1.0.v20120313
 Bundle-Activator: net.sf.orcc.simulators.Activator
-Require-Bundle: net.sf.orcc.core;bundle-version="1.0.0",
+Require-Bundle: net.sf.orcc.core;bundle-version="1.1.0",
  org.eclipse.core.runtime,
  org.eclipse.core.resources;bundle-version="3.6.1",
  org.eclipse.emf.ecore,
  org.eclipse.jface.text;bundle-version="3.6.1",
- net.sf.dftools.models;bundle-version="0.1.0"
+ net.sf.dftools.models;bundle-version="0.2.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: IETR/INSA Rennes

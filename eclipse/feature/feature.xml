@@ -2,7 +2,7 @@
 <feature
       id="net.sf.orcc"
       label="Orcc"
-      version="1.0.0.v20120131"
+      version="1.1.0.v20120313"
       provider-name="IETR/INSA Rennes">
 
    <description url="http://orcc.sf.net/eclipse/updates/">
@@ -68,56 +68,70 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
          id="net.sf.orcc.core"
          download-size="0"
          install-size="0"
-         version="1.0.0.v20120131"
+         version="1.1.0.v20120313"
          unpack="false"/>
 
    <plugin
          id="net.sf.orcc.backends"
          download-size="0"
          install-size="0"
-         version="1.0.0.v20120131"
+         version="1.1.0.v20120313"
          unpack="false"/>
 
    <plugin
          id="net.sf.orcc.cal"
          download-size="0"
          install-size="0"
-         version="1.0.0.v20120131"
+         version="1.1.0.v20120313"
          unpack="false"/>
 
    <plugin
          id="net.sf.orcc.cal.ui"
          download-size="0"
          install-size="0"
-         version="1.0.0.v20120131"
+         version="1.1.0.v20120313"
          unpack="false"/>
 
    <plugin
          id="net.sf.orcc.simulators"
          download-size="0"
          install-size="0"
-         version="1.0.0.v20120131"
+         version="1.1.0.v20120313"
          unpack="false"/>
 
    <plugin
          id="net.sf.orcc.ui"
          download-size="0"
          install-size="0"
-         version="1.0.0.v20120131"
+         version="1.1.0.v20120313"
          unpack="false"/>
 
    <plugin
          id="net.sf.openforge.core"
          download-size="0"
          install-size="0"
-         version="1.0.11"
+         version="1.0.12"
          unpack="false"/>
 
    <plugin
          id="net.sf.orc2hdl"
          download-size="0"
          install-size="0"
-         version="1.0.0.v20120131"
+         version="1.1.0.v20120313"
+         unpack="false"/>
+
+   <plugin
+         id="net.sf.dftools.models"
+         download-size="0"
+         install-size="0"
+         version="0.2.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.stringtemplate"
+         download-size="0"
+         install-size="0"
+         version="4.0.5"
          unpack="false"/>
 
 </feature>

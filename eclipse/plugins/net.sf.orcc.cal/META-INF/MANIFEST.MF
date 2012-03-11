@@ -2,11 +2,11 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: RVC-CAL Xtext model plug-in
 Bundle-Vendor: IETR/INSA Rennes
-Bundle-Version: 1.0.0.v20120131
+Bundle-Version: 1.1.0.v20120313
 Bundle-SymbolicName: net.sf.orcc.cal; singleton:=true
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.xtext;bundle-version="2.0.0",
- net.sf.orcc.core;bundle-version="1.0.0",
+ net.sf.orcc.core;bundle-version="1.1.0",
  org.antlr.runtime;bundle-version="3.2.0",
  org.apache.commons.logging;resolution:=optional,
  org.eclipse.core.resources,
@@ -18,7 +18,7 @@ Require-Bundle: org.eclipse.xtext;bundle-version="2.0.0",
  org.eclipse.jdt.core,
  org.jgrapht;bundle-version="0.8.2",
  org.eclipse.xtext.util,
- net.sf.dftools.models;bundle-version="0.1.0"
+ net.sf.dftools.models;bundle-version="0.2.0"
 Import-Package: org.apache.log4j
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: net.sf.orcc.cache,
