@@ -149,7 +149,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 				Integer nbOfTokens = outputPattern.getNumTokens(port);
 				@SuppressWarnings("unchecked")
 				List<SimulatorFifo> fifos = (List<SimulatorFifo>) port
-						.getAttributes().get(0).getPojoValue();
+						.getAttribute(0).getPojoValue();
 				for (SimulatorFifo fifo : fifos) {
 					hasRooms &= fifo.hasRoom(nbOfTokens);
 				}
@@ -172,7 +172,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 
 		for (Port port : inputPattern.getPorts()) {
 			int numTokens = inputPattern.getNumTokens(port);
-			SimulatorFifo fifo = (SimulatorFifo) port.getAttributes().get(0)
+			SimulatorFifo fifo = (SimulatorFifo) port.getAttribute(0)
 					.getPojoValue();
 
 			Var variable = inputPattern.getVariable(port);
@@ -191,7 +191,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 			int numTokens = outputPattern.getNumTokens(port);
 			@SuppressWarnings("unchecked")
 			List<SimulatorFifo> fifos = (List<SimulatorFifo>) port
-					.getAttributes().get(0).getPojoValue();
+					.getAttribute(0).getPojoValue();
 
 			Var variable = outputPattern.getVariable(port);
 			Type type = ((TypeList) variable.getType()).getInnermostType();
@@ -216,7 +216,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		Pattern pattern = action.getInputPattern();
 		// check tokens
 		for (Port port : pattern.getPorts()) {
-			SimulatorFifo fifo = (SimulatorFifo) port.getAttributes().get(0)
+			SimulatorFifo fifo = (SimulatorFifo) port.getAttribute(0)
 					.getPojoValue();
 			boolean hasTok = fifo.hasTokens(pattern.getNumTokens(port));
 			if (!hasTok) {
@@ -228,7 +228,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		pattern = action.getPeekPattern();
 		for (Port port : pattern.getPorts()) {
 			int numTokens = pattern.getNumTokens(port);
-			SimulatorFifo fifo = (SimulatorFifo) port.getAttributes().get(0)
+			SimulatorFifo fifo = (SimulatorFifo) port.getAttribute(0)
 					.getPojoValue();
 
 			Var peeked = pattern.getVariable(port);
