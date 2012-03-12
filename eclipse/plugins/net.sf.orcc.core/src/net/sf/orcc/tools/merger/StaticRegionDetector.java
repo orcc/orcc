@@ -127,7 +127,7 @@ public class StaticRegionDetector {
 
 		clusteredGraph.getVertices().removeAll(vertices);
 
-		List<List<Vertex>> sccs = new SccFinder().doSwitch(clusteredGraph);
+		List<List<Vertex>> sccs = new SccFinder().visitGraph(clusteredGraph);
 		for (List<Vertex> scc : sccs) {
 			if (scc.size() > 1) {
 				if (scc.remove(clusterVertex)) {

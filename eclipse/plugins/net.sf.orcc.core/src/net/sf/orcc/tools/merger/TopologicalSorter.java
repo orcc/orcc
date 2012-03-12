@@ -40,6 +40,7 @@ import java.util.Set;
 
 import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.Vertex;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 
 /**
@@ -66,18 +67,20 @@ public class TopologicalSorter {
 		}
 
 		private void dfsVisit(Vertex vertex) {
-			defined.add(vertex);
-			currentTime++;
-			timeStamps.put(vertex, new TimeStamp(currentTime, 0));
+			if (vertex instanceof Instance) {
+				defined.add(vertex);
+				currentTime++;
+				timeStamps.put(vertex, new TimeStamp(currentTime, 0));
 
-			for (Edge edge : vertex.getOutgoing()) {
-				Vertex tgtVertex = edge.getTarget();
-				if (!defined.contains(tgtVertex)) {
-					dfsVisit(tgtVertex);
+				for (Edge edge : vertex.getOutgoing()) {
+					Vertex tgtVertex = edge.getTarget();
+					if (!defined.contains(tgtVertex)) {
+						dfsVisit(tgtVertex);
+					}
 				}
+				currentTime++;
+				timeStamps.get(vertex).setFinished(currentTime);
 			}
-			currentTime++;
-			timeStamps.get(vertex).setFinished(currentTime);
 		}
 
 		private Map<Vertex, TimeStamp> getTimestamps() {
