@@ -334,9 +334,10 @@ public class IrUtil {
 			e.printStackTrace();
 		}
 
-		URI uri = URI.createPlatformResourceURI(outputFolder.getFullPath()
-				.append(OrccUtil.getFile(entity)).addFileExtension("ir")
-				.toString(), true);
+		URI uri = URI.createPlatformResourceURI(
+				outputFolder.getFullPath()
+						.append(OrccUtil.getFile(entity.getName()))
+						.addFileExtension("ir").toString(), true);
 		return serializeActor(set, uri, entity);
 	}
 
@@ -352,7 +353,7 @@ public class IrUtil {
 	public static boolean serializeActor(ResourceSet set, String outputFolder,
 			Nameable entity) {
 		String pathName = outputFolder + File.separator
-				+ OrccUtil.getFile(entity) + ".ir";
+				+ OrccUtil.getFile(entity.getName()) + ".ir";
 		URI uri = URI.createFileURI(pathName);
 		return serializeActor(set, uri, entity);
 	}

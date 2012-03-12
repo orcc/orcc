@@ -37,7 +37,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sf.dftools.util.Nameable;
 import net.sf.orcc.df.Actor;
 
 import org.eclipse.core.resources.IContainer;
@@ -327,8 +326,8 @@ public class OrccUtil {
 	 *            an actor/unit
 	 * @return the file name that corresponds to the qualified name of the actor
 	 */
-	public static String getFile(Nameable entity) {
-		return entity.getName().replace('.', '/');
+	public static String getFile(String name) {
+		return name.replace('.', '/');
 	}
 
 	/**
