@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ir.util;
 
+import static java.math.BigInteger.ONE;
+
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -103,7 +105,7 @@ public class ValueUtil {
 			return Array.newInstance(Boolean.TYPE, dimensions);
 		} else if (type.isFloat()) {
 			return Array.newInstance(Float.TYPE, dimensions);
-		} else if (type.isInt()) {
+		} else if (type.isInt() || type.isUint()) {
 			int size = type.getSizeInBits();
 			if (size <= 8) {
 				return Array.newInstance(Byte.TYPE, dimensions);
@@ -112,19 +114,6 @@ public class ValueUtil {
 			} else if (size <= 32) {
 				return Array.newInstance(Integer.TYPE, dimensions);
 			} else if (size <= 64) {
-				return Array.newInstance(Long.TYPE, dimensions);
-			} else {
-				return Array.newInstance(BigInteger.class, dimensions);
-			}
-		} else if (type.isUint()) {
-			int size = type.getSizeInBits();
-			if (size < 8) {
-				return Array.newInstance(Byte.TYPE, dimensions);
-			} else if (size < 16) {
-				return Array.newInstance(Short.TYPE, dimensions);
-			} else if (size < 32) {
-				return Array.newInstance(Integer.TYPE, dimensions);
-			} else if (size < 64) {
 				return Array.newInstance(Long.TYPE, dimensions);
 			} else {
 				return Array.newInstance(BigInteger.class, dimensions);
@@ -239,30 +228,37 @@ public class ValueUtil {
 			return BigDecimal.valueOf(Array.getFloat(array, index));
 		} else if (type.isInt()) {
 			int size = type.getSizeInBits();
+			Object value = Array.get(array, index);
+			long longVal;
 			if (size <= 8) {
-				return BigInteger.valueOf(Array.getByte(array, index));
+				longVal = (Byte) value;
 			} else if (size <= 16) {
-				return BigInteger.valueOf(Array.getShort(array, index));
+				longVal = (Short) value;
 			} else if (size <= 32) {
-				return BigInteger.valueOf(Array.getInt(array, index));
+				longVal = (Integer) value;
 			} else if (size <= 64) {
-				return BigInteger.valueOf(Array.getLong(array, index));
+				longVal = (Long) value;
 			} else {
-				return Array.get(array, index);
+				return value;
 			}
+			return BigInteger.valueOf(longVal);
 		} else if (type.isUint()) {
 			int size = type.getSizeInBits();
-			if (size < 8) {
-				return BigInteger.valueOf(Array.getByte(array, index));
-			} else if (size < 16) {
-				return BigInteger.valueOf(Array.getShort(array, index));
-			} else if (size < 32) {
-				return BigInteger.valueOf(Array.getInt(array, index));
-			} else if (size < 64) {
-				return BigInteger.valueOf(Array.getLong(array, index));
+			Object value = Array.get(array, index);
+			long longVal;
+			if (size <= 8) {
+				longVal = ((Byte) value) & 0xFF;
+			} else if (size <= 16) {
+				longVal = ((Short) value) & 0xFFFF;
+			} else if (size <= 32) {
+				longVal = ((Integer) value) & 0xFFFFFFFFL;
+			} else if (size <= 64) {
+				BigInteger bigInt = BigInteger.valueOf((Long) value);
+				return bigInt.and(ONE.shiftLeft(64).subtract(ONE));
 			} else {
-				return Array.get(array, index);
+				return value;
 			}
+			return BigInteger.valueOf(longVal);
 		}
 		throw new OrccRuntimeException("unexpected type in set");
 	}
@@ -665,19 +661,22 @@ public class ValueUtil {
 		if (type.isBool() && isBool(value)) {
 			valueToSet = value;
 		} else if (type.isFloat() && isFloat(value)) {
-			valueToSet = value;
-		} else if (type.isInt() && isInt(value)) {
+			BigDecimal floatVal = (BigDecimal) value;
+			valueToSet = floatVal.floatValue();
+		} else if ((type.isInt() || type.isUint()) && isInt(value)) {
 			BigInteger intVal = (BigInteger) value;
 			int size = type.getSizeInBits();
-			valueToSet = size <= 8 ? intVal.byteValue() : size <= 16 ? intVal
-					.shortValue() : size <= 32 ? intVal.intValue()
-					: size <= 64 ? intVal.longValue() : value;
-		} else if (type.isUint() && isInt(value)) {
-			BigInteger intVal = (BigInteger) value;
-			int size = type.getSizeInBits();
-			valueToSet = size < 8 ? intVal.byteValue() : size < 16 ? intVal
-					.shortValue() : size < 32 ? intVal.intValue()
-					: size < 64 ? intVal.longValue() : value;
+			if (size <= 8) {
+				valueToSet = intVal.byteValue();
+			} else if (size <= 16) {
+				valueToSet = intVal.shortValue();
+			} else if (size <= 32) {
+				valueToSet = intVal.intValue();
+			} else if (size <= 64) {
+				valueToSet = intVal.longValue();
+			} else {
+				valueToSet = value;
+			}
 		} else {
 			throw new OrccRuntimeException("unexpected type in set");
 		}
