@@ -44,6 +44,15 @@ import org.eclipse.emf.common.util.EList;
 public interface Unit extends Nameable {
 
 	/**
+	 * Returns the constant with the given name.
+	 * 
+	 * @param name
+	 *            name of a constant
+	 * @return the constant with the given name
+	 */
+	Var getConstant(String name);
+
+	/**
 	 * Returns the constants contained in this unit.
 	 * 
 	 * @return the constants contained in this unit
@@ -73,6 +82,15 @@ public interface Unit extends Nameable {
 	 * @model
 	 */
 	int getLineNumber();
+
+	/**
+	 * Returns a procedure of this unit whose name matches the given name.
+	 * 
+	 * @param name
+	 *            the procedure name
+	 * @return a procedure whose name matches the given name
+	 */
+	Procedure getProcedure(String name);
 
 	/**
 	 * Returns the functions/procedures contained in this unit.

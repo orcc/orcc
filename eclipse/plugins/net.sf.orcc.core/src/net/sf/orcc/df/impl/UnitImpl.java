@@ -229,6 +229,16 @@ public class UnitImpl extends NameableImpl implements Unit {
 		super.eUnset(featureID);
 	}
 
+	@Override
+	public Var getConstant(String name) {
+		for (Var var : getConstants()) {
+			if (var.getName().equals(name)) {
+				return var;
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -267,6 +277,16 @@ public class UnitImpl extends NameableImpl implements Unit {
 	 */
 	public int getLineNumber() {
 		return lineNumber;
+	}
+
+	@Override
+	public Procedure getProcedure(String name) {
+		for (Procedure procedure : getProcedures()) {
+			if (procedure.getName().equals(name)) {
+				return procedure;
+			}
+		}
+		return null;
 	}
 
 	/**
