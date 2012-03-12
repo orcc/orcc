@@ -49,7 +49,7 @@ public class Source extends GenericSource {
 
 	private static int nbLoops = 1;
 
-	public static void source_exit(Integer status) {
+	public static void source_exit(BigInteger status) {
 		// System.exit(status);
 	}
 
@@ -66,15 +66,10 @@ public class Source extends GenericSource {
 		}
 	}
 
-	public static void source_readNBytes(short outTable[],
+	public static void source_readNBytes(byte outTable[],
 			BigInteger nbTokenToRead) {
 		try {
-			byte[] b = new byte[outTable.length];
-			in.read(b);
-			int n = nbTokenToRead.intValue();
-			for (int i = 0; i < n; i++) {
-				outTable[i] = (short) (b[i] & 0xFF);
-			}
+			in.read(outTable, 0, nbTokenToRead.intValue());
 		} catch (IOException e) {
 			String msg = "I/O error when reading file \"" + fileName + "\"";
 			throw new RuntimeException(msg, e);
