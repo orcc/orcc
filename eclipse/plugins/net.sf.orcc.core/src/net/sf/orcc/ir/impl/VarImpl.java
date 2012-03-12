@@ -701,8 +701,4 @@ public class VarImpl extends AttributableImpl implements Var {
 		return result.toString();
 	}
 
-	@Override
-	public boolean isVar() {
-		return true;
-	}
 }

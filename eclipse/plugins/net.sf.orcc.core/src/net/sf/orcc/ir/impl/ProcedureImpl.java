@@ -616,8 +616,4 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 		return result.toString();
 	}
 
-	@Override
-	public boolean isProc() {
-		return true;
-	}
 } // ProcedureImpl

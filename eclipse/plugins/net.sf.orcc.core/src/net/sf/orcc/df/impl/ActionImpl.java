@@ -567,8 +567,4 @@ public class ActionImpl extends AttributableImpl implements Action {
 		return getName();
 	}
 
-	@Override
-	public boolean isAction() {
-		return true;
-	}
 } // ActionImpl
