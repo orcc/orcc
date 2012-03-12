@@ -29,6 +29,7 @@
 package net.sf.orcc.ir.impl;
 
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Unit;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -65,24 +66,43 @@ public class IrResourceImpl extends XMIResourceImpl {
 		if (getContents().isEmpty()) {
 			return null;
 		}
-
-		if (uriFragment.startsWith("//@inputs.")
-				&& !Character.isDigit(uriFragment.charAt(10))) {
-			String name = uriFragment.substring(10);
-			Actor actor = (Actor) getContents().get(0);
-			return actor.getInput(name);
-		} else if (uriFragment.startsWith("//@outputs.")
-				&& !Character.isDigit(uriFragment.charAt(11))) {
-			String name = uriFragment.substring(11);
-			Actor actor = (Actor) getContents().get(0);
-			return actor.getOutput(name);
-		} else if (uriFragment.startsWith("//@parameters.")
-				&& !Character.isDigit(uriFragment.charAt(14))) {
-			String name = uriFragment.substring(14);
-			Actor actor = (Actor) getContents().get(0);
-			return actor.getParameter(name);
-		} else {
+		
+		if (uriFragment.length() == 0) {
 			return super.getEObject(uriFragment);
 		}
+
+		EObject root = getContents().get(0);
+		if (root instanceof Actor) {
+			Actor actor = (Actor) root;
+			int index = uriFragment.lastIndexOf('.') + 1;
+			if (!Character.isDigit(uriFragment.charAt(index))) {
+				String name = uriFragment.substring(index);
+				if (uriFragment.startsWith("//@inputs.")) {
+					return actor.getInput(name);
+				} else if (uriFragment.startsWith("//@outputs.")) {
+					return actor.getOutput(name);
+				} else if (uriFragment.startsWith("//@parameters.")) {
+					return actor.getParameter(name);
+				} else if (uriFragment.startsWith("//@procedures.")) {
+					return actor.getProcedure(name);
+				} else if (uriFragment.startsWith("//@stateVars.")) {
+					return actor.getStateVar(name);
+				}
+			}
+		} else if (root instanceof Unit) {
+			Unit unit = (Unit) root;
+			int index = uriFragment.lastIndexOf('.') + 1;
+			if (!Character.isDigit(uriFragment.charAt(index))) {
+				String name = uriFragment.substring(index);
+				if (uriFragment.startsWith("//@procedures.")) {
+					return unit.getProcedure(name);
+				} else if (uriFragment.startsWith("//@constants.")) {
+					return unit.getConstant(name);
+				}
+			}
+		}
+
+		return super.getEObject(uriFragment);
 	}
+
 }
