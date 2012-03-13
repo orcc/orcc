@@ -254,7 +254,7 @@ index_<port.name> += <numTokens>;
 ///////////////////////////////////////////////////////////////////////////////
 
 printInstructions(instructions) ::= <<
-<instructions: {instr | <
+<instructions: {instr | <printAttributes(instr)> <
 if (instr.assign)><printAssign(assign=instr)><
 elseif (instr.call)><printCall(call=instr)><
 elseif (instr.load)><printLoad(load=instr)><
@@ -264,7 +264,7 @@ endif>}>
 >>
 
 printNodes(nodes) ::= <<
-<nodes: {node | <if (node.nodeBlock)><printBlockNode(node)><
+<nodes: {node | <printAttributes(node)> <if (node.nodeBlock)><printBlockNode(node)><
 elseif (node.nodeIf)><printIfNode(node)><
 elseif (node.nodeWhile)><printWhileNode(node)><
 elseif (node.nodeFor)><printForNode(node)><
@@ -310,7 +310,7 @@ for(<forNode.init:{assign | <assign.target.variable.indexedName> = <assign.value
 ///////////////////////////////////////////////////////////////////////////////
 
 printProcedureDeclaration(procedure,action="") ::= <<
-<printAttributes(procedure)><if(procedure.native)>extern<else>static<endif> <procedure.returnType> <procedure.name>(<procedure.parameters: {param |
+<if(procedure.native)>extern<else>static<endif> <procedure.returnType> <procedure.name>(<procedure.parameters: {param |
 <varDecl(param.variable)>}; separator=", ">);
 
 >>
