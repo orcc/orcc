@@ -76,7 +76,7 @@ stateVar(var) ::= <<
 	<initVariable(type=var.type, value=var.value)>\</stateVar\>
 <else>
 <typeDefLocal(var)>
-\<stateVar name="<var.name>"sourceName="<var.name>"typeName="<
+\<stateVar name="<var.name>" sourceName="<var.name>" typeName="<
 if(var.type.list)><var.name>_typedef<else><var.type><endif>"<
 if(!var.type.list)><if(!var.type.float)> size="<if (var.type.bool)>1<else><var.type.size><endif>"<endif><endif>/\><endif>
 >>
