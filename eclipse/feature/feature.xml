@@ -59,7 +59,7 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
    </url>
 
    <requires>
-      <import plugin="org.jgrapht" version="1.3.7" match="greaterOrEqual"/>
+      <import plugin="org.jgrapht" version="0.8.2" match="greaterOrEqual"/>
       <import plugin="net.sf.graphiti.model" version="1.3.7" match="greaterOrEqual"/>
       <import plugin="net.sf.graphiti.ui" version="1.3.7" match="greaterOrEqual"/>
    </requires>
