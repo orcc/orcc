@@ -235,11 +235,10 @@ public class OrccUtil {
 	public static String getContents(InputStream in) throws IOException {
 		StringBuilder builder = new StringBuilder();
 		int n = in.available();
-		n = in.available();
 		while (n > 0) {
 			byte[] bytes = new byte[n];
-			in.read(bytes);
-			String str = new String(bytes);
+			n = in.read(bytes);
+			String str = new String(bytes, 0, n);
 			builder.append(str);
 			n = in.available();
 		}
