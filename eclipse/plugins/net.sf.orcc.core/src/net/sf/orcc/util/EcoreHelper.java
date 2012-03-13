@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2011, IETR/INSA of Rennes
+ * Copyright (c) 2012, Synflow SAS
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -40,6 +41,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -119,6 +121,22 @@ public class EcoreHelper {
 				.getFullPath().toString(), true), true);
 		T eObject = (T) resource.getContents().get(0);
 		return eObject;
+	}
+
+	/**
+	 * Finds the feature of the given object that has the given name, and
+	 * returns its value in the given object.
+	 * 
+	 * @param eObject
+	 *            an EObject
+	 * @param name
+	 *            name of a feature of the object's class
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getFeature(EObject eObject, String name) {
+		EClass eClass = eObject.eClass();
+		EStructuralFeature feature = eClass.getEStructuralFeature(name);
+		return (T) eObject.eGet(feature);
 	}
 
 	/**
@@ -220,6 +238,23 @@ public class EcoreHelper {
 			e.printStackTrace();
 			return false;
 		}
+	}
+
+	/**
+	 * Finds the feature of the given object that has the given name, and sets
+	 * its value in the given object to the given value.
+	 * 
+	 * @param eObject
+	 *            an EObject
+	 * @param name
+	 *            name of a feature of the object's class
+	 * @param value
+	 *            value that should be set
+	 */
+	public static void setFeature(EObject eObject, String name, Object value) {
+		EClass eClass = eObject.eClass();
+		EStructuralFeature feature = eClass.getEStructuralFeature(name);
+		eObject.eSet(feature, value);
 	}
 
 }
