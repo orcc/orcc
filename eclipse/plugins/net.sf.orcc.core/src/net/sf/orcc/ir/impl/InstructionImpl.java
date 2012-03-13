@@ -6,6 +6,7 @@
  */
 package net.sf.orcc.ir.impl;
 
+import net.sf.dftools.util.impl.AttributableImpl;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.NodeBlock;
@@ -16,7 +17,6 @@ import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.emf.ecore.impl.EObjectImpl;
 
 /**
  * <!-- begin-user-doc --> An implementation of the model object '
@@ -31,7 +31,7 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  *
  * @generated
  */
-public abstract class InstructionImpl extends EObjectImpl implements
+public abstract class InstructionImpl extends AttributableImpl implements
 		Instruction {
 
 	/**

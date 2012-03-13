@@ -1605,13 +1605,22 @@ public interface IrPackage extends EPackage {
 	int NODE_WHILE_FEATURE_COUNT = NODE_FEATURE_COUNT + 4;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INSTRUCTION__ATTRIBUTES = UtilPackage.ATTRIBUTABLE__ATTRIBUTES;
+
+	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INSTRUCTION__LINE_NUMBER = 0;
+	int INSTRUCTION__LINE_NUMBER = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
@@ -1620,7 +1629,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INSTRUCTION__PREDICATE = 1;
+	int INSTRUCTION__PREDICATE = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 1;
 
 	/**
 	 * The number of structural features of the '<em>Instruction</em>' class.
@@ -1628,7 +1637,16 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INSTRUCTION_FEATURE_COUNT = 2;
+	int INSTRUCTION_FEATURE_COUNT = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 2;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_ASSIGN__ATTRIBUTES = INSTRUCTION__ATTRIBUTES;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.PredicateImpl <em>Predicate</em>}' class.
@@ -1684,6 +1702,15 @@ public interface IrPackage extends EPackage {
 	int INST_ASSIGN_FEATURE_COUNT = INSTRUCTION_FEATURE_COUNT + 2;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_CALL__ATTRIBUTES = INSTRUCTION__ATTRIBUTES;
+
+	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1735,6 +1762,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int INST_CALL_FEATURE_COUNT = INSTRUCTION_FEATURE_COUNT + 3;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_LOAD__ATTRIBUTES = INSTRUCTION__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -1790,6 +1826,15 @@ public interface IrPackage extends EPackage {
 	int INST_LOAD_FEATURE_COUNT = INSTRUCTION_FEATURE_COUNT + 3;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_PHI__ATTRIBUTES = INSTRUCTION__ATTRIBUTES;
+
+	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1843,6 +1888,15 @@ public interface IrPackage extends EPackage {
 	int INST_PHI_FEATURE_COUNT = INSTRUCTION_FEATURE_COUNT + 3;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RETURN__ATTRIBUTES = INSTRUCTION__ATTRIBUTES;
+
+	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1877,6 +1931,15 @@ public interface IrPackage extends EPackage {
 	int INST_RETURN_FEATURE_COUNT = INSTRUCTION_FEATURE_COUNT + 1;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_SPECIFIC__ATTRIBUTES = INSTRUCTION__ATTRIBUTES;
+
+	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1901,6 +1964,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int INST_SPECIFIC_FEATURE_COUNT = INSTRUCTION_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_STORE__ATTRIBUTES = INSTRUCTION__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.

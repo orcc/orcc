@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ir;
 
-import org.eclipse.emf.ecore.EObject;
+import net.sf.dftools.util.Attributable;
 
 /**
  * This class defines an instruction.
@@ -36,7 +36,7 @@ import org.eclipse.emf.ecore.EObject;
  * @author Matthieu Wipliez
  * @model abstract="true"
  */
-public interface Instruction extends EObject {
+public interface Instruction extends Attributable {
 
 	/**
 	 * Returns the block that contains this instruction.

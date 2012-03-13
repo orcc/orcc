@@ -843,6 +843,8 @@ public class IrSwitch<T> extends Switch<T> {
 			Instruction instruction = (Instruction) theEObject;
 			T result = caseInstruction(instruction);
 			if (result == null)
+				result = caseAttributable(instruction);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -851,6 +853,8 @@ public class IrSwitch<T> extends Switch<T> {
 			T result = caseInstAssign(instAssign);
 			if (result == null)
 				result = caseInstruction(instAssign);
+			if (result == null)
+				result = caseAttributable(instAssign);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -861,6 +865,8 @@ public class IrSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseInstruction(instCall);
 			if (result == null)
+				result = caseAttributable(instCall);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -869,6 +875,8 @@ public class IrSwitch<T> extends Switch<T> {
 			T result = caseInstLoad(instLoad);
 			if (result == null)
 				result = caseInstruction(instLoad);
+			if (result == null)
+				result = caseAttributable(instLoad);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -879,6 +887,8 @@ public class IrSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseInstruction(instPhi);
 			if (result == null)
+				result = caseAttributable(instPhi);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -887,6 +897,8 @@ public class IrSwitch<T> extends Switch<T> {
 			T result = caseInstReturn(instReturn);
 			if (result == null)
 				result = caseInstruction(instReturn);
+			if (result == null)
+				result = caseAttributable(instReturn);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -897,6 +909,8 @@ public class IrSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseInstruction(instSpecific);
 			if (result == null)
+				result = caseAttributable(instSpecific);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -905,6 +919,8 @@ public class IrSwitch<T> extends Switch<T> {
 			T result = caseInstStore(instStore);
 			if (result == null)
 				result = caseInstruction(instStore);
+			if (result == null)
+				result = caseAttributable(instStore);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;

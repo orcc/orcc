@@ -1704,6 +1704,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		nodeBlockEClass.getESuperTypes().add(this.getNode());
 		nodeIfEClass.getESuperTypes().add(this.getNode());
 		nodeWhileEClass.getESuperTypes().add(this.getNode());
+		instructionEClass.getESuperTypes()
+				.add(theUtilPackage.getAttributable());
 		instAssignEClass.getESuperTypes().add(this.getInstruction());
 		instCallEClass.getESuperTypes().add(this.getInstruction());
 		instLoadEClass.getESuperTypes().add(this.getInstruction());
