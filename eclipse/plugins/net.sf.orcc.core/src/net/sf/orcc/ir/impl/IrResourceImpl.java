@@ -85,7 +85,7 @@ public class IrResourceImpl extends XMIResourceImpl {
 					return actor.getParameter(name);
 				} else if (uriFragment.startsWith("//@procedures.")) {
 					return actor.getProcedure(name);
-				} else if (uriFragment.startsWith("//@stateVars.")) {
+				} else if (uriFragment.startsWith("//@variables.")) {
 					return actor.getStateVar(name);
 				}
 			}
@@ -96,7 +96,7 @@ public class IrResourceImpl extends XMIResourceImpl {
 				String name = uriFragment.substring(index);
 				if (uriFragment.startsWith("//@procedures.")) {
 					return unit.getProcedure(name);
-				} else if (uriFragment.startsWith("//@constants.")) {
+				} else if (uriFragment.startsWith("//@variables.")) {
 					return unit.getConstant(name);
 				}
 			}
