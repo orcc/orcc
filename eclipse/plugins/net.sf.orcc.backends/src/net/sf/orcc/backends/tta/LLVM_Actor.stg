@@ -232,7 +232,7 @@ bb_<sourceState.name>_<transition.action.name>_check_outputs:
 	<printPortsStatus("OUT", actor.outputs, transition.action, sourceState)>
 	<checkOutputPattern(transition.action, transition.action.outputPattern, sourceState)>
 	
-	br i1 %has_valid_outputs_<sourceState.name>_<transition.action.name>_<length(transition.action.outputPattern.ports)>, label %bb_<sourceState.name>_<transition.action.name>_fire, label %bb_<sourceState.name>_<transition.action.name>_check_outputs<
+	br i1 %has_valid_outputs_<sourceState.name>_<transition.action.name>_<length(transition.action.outputPattern.ports)>, label %bb_<sourceState.name>_<transition.action.name>_fire, label %bb_scheduler_start<
 else
 >	;; Empty output pattern
 	
