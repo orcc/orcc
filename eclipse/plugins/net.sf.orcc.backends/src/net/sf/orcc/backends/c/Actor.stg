@@ -54,7 +54,7 @@ printString(constant) ::= <<
 // State variables
 ///////////////////////////////////////////////////////////////////////////////
 stateVar(variable) ::= <<
-<if(variable.initialized)>
+<printAttributes(variable)><if(variable.initialized)>
 <if(!variable.assignable)>
 <if(!variable.type.list)>
 #define <variable.name> <Constant(variable.initialValue)>
