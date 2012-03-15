@@ -28,10 +28,18 @@ getConsumption(actor,port) ::= <<
 	<actor.moC.inputPattern.numTokensMap.(port)>
 >>
 
+printDelays(connection) ::= <%
+	<if (connection.source.actor.moC.delayPattern.numTokensMap.(connection.sourcePort))>
+		<connection.source.actor.moC.delayPattern.numTokensMap.(connection.sourcePort)>
+	<else>
+		0
+	<endif>
+%>
+
 printConnection(connection) ::= <<
 	\<edge source="<connection.source.name>" sourceport="<connection.sourcePort.name>" target="<connection.target.name>" targetport="<connection.targetPort.name>"\>
 	    \<data key="edge_prod"\><connection.source.actor.moC.outputPattern.numTokensMap.(connection.sourcePort)>\</data\>
-	    \<data key="edge_delay"\><connection.source.actor.moC.delayPattern.numTokensMap.(connection.sourcePort)>\</data\>
+	    \<data key="edge_delay"\><printDelays(connection)>\</data\>
 	    \<data key="edge_cons"\><connection.target.actor.moC.inputPattern.numTokensMap.(connection.targetPort)>\</data\>
 	    \<data key="data_type"\><connection.sourcePort.type>\</data\>
 	\</edge\>
