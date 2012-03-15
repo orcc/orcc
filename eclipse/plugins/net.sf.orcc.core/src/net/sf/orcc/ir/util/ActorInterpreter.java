@@ -133,8 +133,10 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	final protected void allocatePattern(Pattern pattern) {
 		for (Port port : pattern.getPorts()) {
 			Var var = pattern.getVariable(port);
-			Object value = ValueUtil.createArray((TypeList) var.getType());
-			var.setValue(value);
+			if (var != null) {
+				Object value = ValueUtil.createArray((TypeList) var.getType());
+				var.setValue(value);
+			}
 		}
 	}
 
