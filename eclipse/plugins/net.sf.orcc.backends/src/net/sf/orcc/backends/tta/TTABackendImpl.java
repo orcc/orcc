@@ -113,12 +113,14 @@ public class TTABackendImpl extends AbstractBackend {
 		transformations.put("max", "max_");
 		transformations.put("select", "select_");
 		processorIntensiveActors = new ArrayList<String>();
-		// processorIntensiveActors.add("fi.oulu.ee.mvg.Mgnt_Address");
-		// processorIntensiveActors.add("com.xilinx.Add");
-		// processorIntensiveActors.add("org.mpeg4.part2.motion.Algo_Interpolation_halfpel");
+		// processorIntensiveActors.add("org.mpeg4.part2.motion.Algo_Add");
+		// processorIntensiveActors.add("com.ericsson.Algo_Interpolation_halfpel");
 		// processorIntensiveActors.add("org.sc29.wg11.mpeg4.part2.texture.Algo_IDCT2D_ISOIEC_23002_1");
+		// processorIntensiveActors.add("fi.oulu.ee.mvg.Framebuffer");
+		// processorIntensiveActors.add("com.xilinx.Mgnt_Merger");
+		// processorIntensiveActors.add("org.mpeg4.part2.texture.Algo_Inversequant");
+
 		// processorIntensiveActors.add("fi.oulu.ee.mvg.Algo_IAP");
-		processorIntensiveActors.add("fi.oulu.ee.mvg.Framebuffer");
 	}
 
 	@Override
@@ -230,7 +232,7 @@ public class TTABackendImpl extends AbstractBackend {
 		if (instance.isActor()
 				&& processorIntensiveActors.contains(instance.getActor()
 						.getName())) {
-			return 8;
+			return 6;
 		}
 		return 2;
 	}
@@ -239,7 +241,7 @@ public class TTABackendImpl extends AbstractBackend {
 		if (instance.isActor()
 				&& processorIntensiveActors.contains(instance.getActor()
 						.getName())) {
-			return 6;
+			return 4;
 		}
 		return 2;
 	}
@@ -324,6 +326,7 @@ public class TTABackendImpl extends AbstractBackend {
 				"net/sf/orcc/backends/tta/ModelSim_Script.stg");
 		StandardPrinter tbPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/tta/VHDL_Testbench.stg");
+		tbPrinter.getOptions().put("fifoSize", fifoSize);
 		StandardPrinter wavePrinter = new StandardPrinter(
 				"net/sf/orcc/backends/tta/ModelSim_Wave.stg");
 		wavePrinter.setExpressionPrinter(new LLVMExpressionPrinter());
@@ -338,9 +341,15 @@ public class TTABackendImpl extends AbstractBackend {
 
 		Processor tta = ArchitectureFactory.eINSTANCE.createProcessor(
 				instance.getSimpleName(), getBusNb(instance),
-				getRegNb(instance), getAluNb(instance), instance.getEntity()
-						.getInputs().size(), instance.getEntity().getOutputs()
-						.size(), ramSize);
+				getRegNb(instance), 12, 2, getAluNb(instance), 1, 1, 1,
+				instance.getEntity().getInputs().size(), instance.getEntity()
+						.getOutputs().size(), ramSize);
+
+		/*
+		 * Processor tta = ArchitectureFactory.eINSTANCE.createHugeProcessor(
+		 * instance.getSimpleName(), instance.getEntity().getInputs() .size(),
+		 * instance.getEntity().getOutputs().size(), ramSize);
+		 */
 
 		CustomPrinter adfPrinter = new CustomPrinter(
 				"net/sf/orcc/backends/tta/TCE_Processor_ADF.stg");

@@ -77,12 +77,14 @@ import org.eclipse.emf.ecore.plugin.EcorePlugin;
 /**
  * <!-- begin-user-doc --> An implementation of the model <b>Factory</b>. <!--
  * end-user-doc -->
+ * 
  * @generated
  */
 public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		ArchitectureFactory {
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @deprecated
 	 * @generated
 	 */
@@ -92,9 +94,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * Creates the default factory implementation.
-	 * <!-- begin-user-doc --> <!--
+	 * Creates the default factory implementation. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public static ArchitectureFactory init() {
@@ -111,9 +113,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * Creates an instance of the factory.
-	 * <!-- begin-user-doc --> <!--
+	 * Creates an instance of the factory. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ArchitectureFactoryImpl() {
@@ -122,6 +124,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String convertExtensionToString(EDataType eDataType,
@@ -131,6 +134,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String convertOpBinaryToString(EDataType eDataType,
@@ -140,6 +144,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String convertOpUnaryToString(EDataType eDataType,
@@ -149,6 +154,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String convertSocketTypeToString(EDataType eDataType,
@@ -158,6 +164,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -179,6 +186,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Design createDesign() {
@@ -188,6 +196,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public HwFifo createHwFifo() {
@@ -197,6 +206,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Processor createProcessor() {
@@ -206,6 +216,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -269,6 +280,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public AddressSpace createAddressSpace() {
@@ -332,8 +344,62 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return functionUnit;
 	}
 
+	public FunctionUnit createAlu2Unit(Processor tta, String name) {
+		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
+		functionUnit.setName(name);
+		// Sockets
+		EList<Segment> segments = getAllSegments(tta.getBuses());
+		Socket i1 = createInputSocket(name + "_i1", segments);
+		Socket i2 = createInputSocket(name + "_i2", segments);
+		Socket o1 = createOutputSocket(name + "_o1", segments);
+		Socket o2 = createOutputSocket(name + "_o2", segments);
+		// Port
+		Port in1t = createPort("in1t", 32, true, true);
+		Port in2 = createPort("in2", 32, false, false);
+		Port out1 = createPort("out1", 32, false, false);
+		Port out2 = createPort("out2", 32, false, false);
+		in1t.connect(i1);
+		in2.connect(i2);
+		out1.connect(o1);
+		out2.connect(o2);
+		functionUnit.getPorts().add(in1t);
+		functionUnit.getPorts().add(in2);
+		functionUnit.getPorts().add(out1);
+		functionUnit.getPorts().add(out2);
+		// Implementation
+		Implementation aluImpl = createImplementation("asic_130nm_1.5V.hdb",
+				375);
+		functionUnit.setImplementation(aluImpl);
+		tta.getHardwareDatabase().add(aluImpl);
+
+		// Operations (Shift operations use inverse binding)
+		String[] oneInputOps = { "abs", "sxhw", "sxqw", "neg" };
+		String[] twoInputOps = { "add", "and", "andn", "eq", "gt", "gtu", "lt",
+				"ltu", "ior", "sub", "xor" };
+		String[] twoInputOutputOps = { "addsub" };
+		String[] shiftOps = { "shl", "shr", "shru" };
+		for (String operation : oneInputOps) {
+			functionUnit.getOperations().add(
+					createOperationDefault(operation, in1t, out1));
+		}
+		for (String operation : twoInputOps) {
+			functionUnit.getOperations().add(
+					createOperationDefault(operation, in1t, in2, out1));
+		}
+		for (String operation : twoInputOutputOps) {
+			functionUnit.getOperations().add(
+					createOperationDefault(operation, in1t, in2, out1, out2));
+		}
+		for (String operation : shiftOps) {
+			functionUnit.getOperations().add(
+					createOperationDefault(operation, in2, in1t, out1));
+		}
+		return functionUnit;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Bridge createBridge() {
@@ -343,6 +409,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Bus createBus() {
@@ -368,6 +435,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprBinary createExprBinary() {
@@ -386,6 +454,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprFalse createExprFalse() {
@@ -395,6 +464,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprTrue createExprTrue() {
@@ -404,6 +474,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprUnary createExprUnary() {
@@ -425,6 +496,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Extension createExtensionFromString(EDataType eDataType,
@@ -439,6 +511,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -460,6 +533,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public FunctionUnit createFunctionUnit() {
@@ -519,6 +593,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public GlobalControlUnit createGlobalControlUnit() {
@@ -576,6 +651,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Implementation createImplementation() {
@@ -598,8 +674,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public FunctionUnit createLSU(Processor tta, Implementation implementation) {
-		FunctionUnit LSU = createFunctionUnit(tta, "LSU", implementation);
+	public FunctionUnit createLSU(String name, Processor tta,
+			Implementation implementation) {
+		FunctionUnit LSU = createFunctionUnit(tta, name, implementation);
 		// Operations
 		EList<Port> ports = LSU.getPorts();
 		String[] loadOperations = { "ldw", "ldq", "ldh", "ldqu", "ldhu" };
@@ -619,9 +696,20 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public FunctionUnit createMultiplier(Processor tta,
+	public FunctionUnit createMultiplier(String name, Processor tta,
 			Implementation implementation) {
-		FunctionUnit multiplier = createFunctionUnit(tta, "Mul", implementation);
+		FunctionUnit multiplier = createFunctionUnit(tta, name, implementation);
+		multiplier.getOperations().add(
+				createOperationMul("mul", multiplier.getPorts().get(0),
+						multiplier.getPorts().get(1), multiplier.getPorts()
+								.get(2)));
+		multiplier.setAddressSpace(tta.getData());
+		return multiplier;
+	}
+
+	public FunctionUnit createMultiplier2(String name, Processor tta,
+			Implementation implementation) {
+		FunctionUnit multiplier = createFunctionUnit(tta, name, implementation);
 		multiplier.getOperations().add(
 				createOperationMul("mul", multiplier.getPorts().get(0),
 						multiplier.getPorts().get(1), multiplier.getPorts()
@@ -632,6 +720,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public OpBinary createOpBinaryFromString(EDataType eDataType,
@@ -646,6 +735,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Operation createOperation() {
@@ -706,6 +796,17 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		operation.getPipeline().add(createReads(in1, 0, 1));
 		operation.getPipeline().add(createReads(in2, 0, 1));
 		operation.getPipeline().add(createWrites(out1, 0, 1));
+		return operation;
+	}
+
+	private Operation createOperationDefault(String name, Port in1, Port in2,
+			Port out1, Port out2) {
+		Operation operation = createOperation(name);
+		operation.setControl(false);
+		operation.getPipeline().add(createReads(in1, 0, 1));
+		operation.getPipeline().add(createReads(in2, 0, 1));
+		operation.getPipeline().add(createWrites(out1, 0, 1));
+		operation.getPipeline().add(createWrites(out2, 0, 1));
 		return operation;
 	}
 
@@ -821,6 +922,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public OpUnary createOpUnaryFromString(EDataType eDataType,
@@ -842,6 +944,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Port createPort() {
@@ -868,6 +971,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Map.Entry<Port, Integer> createPortToIndexMapEntry() {
@@ -877,6 +981,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Reads createReads() {
@@ -895,6 +1000,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public RegisterFile createRegisterFile() {
@@ -937,8 +1043,34 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return registerFile;
 	}
 
+	public RegisterFile createRegisterFileDefault2(Processor tta, String name,
+			int size, int width, Implementation implementation) {
+		RegisterFile registerFile = createRegisterFile(name, size, width, 2, 1,
+				implementation);
+
+		// Sockets
+		EList<Segment> segments = getAllSegments(tta.getBuses());
+		Socket i1 = createInputSocket(name + "_i1", segments);
+		Socket o1 = createOutputSocket(name + "_o1", segments);
+		Socket o2 = createOutputSocket(name + "_o2", segments);
+
+		// Ports
+		Port wr = createPort("wr");
+		wr.connect(o1);
+		Port wr2 = createPort("wr2");
+		wr2.connect(o2);
+		Port rd = createPort("rd");
+		rd.connect(i1);
+		registerFile.getPorts().add(wr);
+		registerFile.getPorts().add(rd);
+		registerFile.getPorts().add(wr2);
+
+		return registerFile;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Resource createResource() {
@@ -957,6 +1089,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Segment createSegment() {
@@ -973,6 +1106,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ShortImmediate createShortImmediate() {
@@ -990,6 +1124,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Socket createSocket() {
@@ -1009,6 +1144,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public SocketType createSocketTypeFromString(EDataType eDataType,
@@ -1081,6 +1217,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public TermBool createTermBool() {
@@ -1098,6 +1235,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public TermUnit createTermUnit() {
@@ -1114,8 +1252,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public Processor createProcessor(String name, int busNb, int registerNb,
-			int aluNb, int inputNb, int outputNb, int ramSize) {
+	public Processor createProcessor(String name, int busNb, int intRfNb,
+			int intRfSize, int boolRfSize, int aluNb, int lsuNb, int mulNb,
+			int logNb, int inputNb, int outputNb, int ramSize) {
 		Processor tta = createProcessor();
 		tta.setName(name);
 		// Address spaces
@@ -1132,12 +1271,12 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		// Register files
 		Implementation registerImpl = createImplementation(
 				"asic_130nm_1.5V.hdb", 96);
-		RegisterFile bool = createRegisterFileDefault(tta, "BOOL", 2, 1,
-				registerImpl);
+		RegisterFile bool = createRegisterFileDefault(tta, "BOOL", boolRfSize,
+				1, registerImpl);
 		tta.getRegisterFiles().add(bool);
-		for (int i = 0; i < registerNb; i++) {
-			RegisterFile rf = createRegisterFileDefault(tta, "RF_" + i, 12, 32,
-					registerImpl);
+		for (int i = 0; i < intRfNb; i++) {
+			RegisterFile rf = createRegisterFileDefault(tta, "RF_" + i,
+					intRfSize, 32, registerImpl);
 			tta.getRegisterFiles().add(rf);
 		}
 		tta.getHardwareDatabase().add(registerImpl);
@@ -1154,11 +1293,16 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		}
 		// * LSU
 		Implementation lsuImpl = createImplementation("stratixII.hdb", 2);
-		units.add(createLSU(tta, lsuImpl));
+		for (int i = 0; i < lsuNb; i++) {
+			String lsuName = lsuNb == 1 ? "LSU" : "LSU_" + i;
+			units.add(createLSU(lsuName, tta, lsuImpl));
+		}
 		tta.getHardwareDatabase().add(lsuImpl);
 		// * Mul
 		Implementation mulImpl = createImplementation("asic_130nm_1.5V.hdb", 88);
-		units.add(createMultiplier(tta, mulImpl));
+		for (int i = 0; i < mulNb; i++) {
+			units.add(createMultiplier("Mul_" + i, tta, mulImpl));
+		}
 		tta.getHardwareDatabase().add(mulImpl);
 		// * And-ior-xor
 		Implementation logicImpl = createImplementation("asic_130nm_1.5V.hdb",
@@ -1178,8 +1322,16 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return tta;
 	}
 
+	@Override
+	public Processor createHugeProcessor(String name, int inputNb,
+			int outputNb, int ramSize) {
+		return createProcessor(name, 32, 8, 32, 3, 12, 2, 8, 0, inputNb,
+				outputNb, ramSize);
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Writes createWrites() {
@@ -1206,6 +1358,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ArchitecturePackage getArchitecturePackage() {
