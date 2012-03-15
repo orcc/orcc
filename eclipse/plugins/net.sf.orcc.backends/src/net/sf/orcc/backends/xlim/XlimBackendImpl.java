@@ -185,7 +185,7 @@ public class XlimBackendImpl extends AbstractBackend {
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		// instantiate and flattens network
-		network = new Instantiator().doSwitch(network);
+		network = new Instantiator(fifoSize).doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
 
 		transformActors(network.getAllActors());

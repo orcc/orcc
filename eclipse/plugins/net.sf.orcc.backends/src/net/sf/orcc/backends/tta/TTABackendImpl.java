@@ -177,7 +177,7 @@ public class TTABackendImpl extends AbstractBackend {
 
 	private Network doTransformNetwork(Network network) throws OrccException {
 		write("Instantiating...\n");
-		network = new Instantiator().doSwitch(network);
+		network = new Instantiator(fifoSize).doSwitch(network);
 		write("Flattening...\n");
 		new NetworkFlattener().doSwitch(network);
 
@@ -287,7 +287,6 @@ public class TTABackendImpl extends AbstractBackend {
 		StandardPrinter networkPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/tta/VHDL_Network.stg");
 		networkPrinter.setExpressionPrinter(new LLVMExpressionPrinter());
-		networkPrinter.getOptions().put("fifoSize", fifoSize);
 		networkPrinter.getOptions().put("fifoWidthu", fifoWidthu);
 		networkPrinter.getOptions().put("targetAltera", targetAltera);
 		networkPrinter.getOptions().put("fpgaFamily", fpgaFamily);

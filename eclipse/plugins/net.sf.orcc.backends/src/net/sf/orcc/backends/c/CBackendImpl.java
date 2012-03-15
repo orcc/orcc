@@ -176,7 +176,7 @@ public class CBackendImpl extends AbstractBackend {
 
 		DfSwitch<?>[] transformations = { new UnitImporter(),
 				new TypeResizer(true, false, true, true),
-				new RenameTransformation(replacementMap)};
+				new RenameTransformation(replacementMap) };
 
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
@@ -199,7 +199,7 @@ public class CBackendImpl extends AbstractBackend {
 
 		// instantiate and flattens network
 		write("Instantiating...\n");
-		network = new Instantiator().doSwitch(network);
+		network = new Instantiator(fifoSize).doSwitch(network);
 		write("Flattening...\n");
 		new NetworkFlattener().doSwitch(network);
 
@@ -279,8 +279,7 @@ public class CBackendImpl extends AbstractBackend {
 		if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
 			File targetPath = new File(path).getParentFile();
 			copyFileToFilesystem("/runtime/run_cmake_with_VS_env.bat",
-					targetPath
-					+ File.separator + "run_cmake_with_VS_env.bat");
+					targetPath + File.separator + "run_cmake_with_VS_env.bat");
 		}
 
 		String target = path + File.separator + "libs";

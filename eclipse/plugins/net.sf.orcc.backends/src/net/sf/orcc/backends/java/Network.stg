@@ -57,7 +57,7 @@ actor_<instance.name>.initialize();
 ///////////////////////////////////////////////////////////////////////////////
 
 setupFifo(connection) ::= <<
-f = new Fifo\<<connection.targetPort.type>\>(<if (connection.size)><connection.size><else>SIZE<endif>);
+f = new Fifo\<<connection.targetPort.type>\>(<connection.size>);
 actor_<connection.source.name>.setFifo("<connection.sourcePort.name>", f);
 actor_<connection.target.name>.setFifo("<connection.targetPort.name>", f);
 >>
@@ -75,8 +75,6 @@ import net.sf.orcc.runtime.actors.*;
 import net.sf.orcc.runtime.source.GenericSource;
 
 public class <network.simpleName> implements IScheduler {
-
-	public static final int SIZE = <options.fifoSize>;
 	
 	// Actors
 	<network.instances: declareActor()>

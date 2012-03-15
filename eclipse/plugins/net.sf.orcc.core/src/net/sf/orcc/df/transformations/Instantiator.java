@@ -53,9 +53,12 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  * networks where the value of parameters have been appropriately replaced.
  * 
  * @author Matthieu Wipliez
+ * @author Hervé Yviquel
  * 
  */
 public class Instantiator extends DfSwitch<Network> {
+
+	static String BUFFER_SIZE = Connection.BUFFER_SIZE;
 
 	private Copier copier;
 
@@ -63,12 +66,22 @@ public class Instantiator extends DfSwitch<Network> {
 
 	private boolean skipActors;
 
+	private int defaultFifoSize;
+
 	/**
 	 * Creates a default instantiator, equivalent to
 	 * <code>Instantiator(true)</code>.
 	 */
 	public Instantiator() {
 		this(true);
+	}
+
+	/**
+	 * Creates a default instantiator, equivalent to
+	 * <code>Instantiator(true)</code>.
+	 */
+	public Instantiator(int defaultFifoSize) {
+		this(true, defaultFifoSize);
 	}
 
 	/**
@@ -81,7 +94,21 @@ public class Instantiator extends DfSwitch<Network> {
 	 *            instantiation process, <code>false</code> otherwise
 	 */
 	public Instantiator(boolean skipActors) {
+		this(skipActors, 0);
+	}
+
+	/**
+	 * Creates an instantiator that will replace instances of networks by
+	 * instantiated networks, and if <code>skipActors</code> is false, will also
+	 * replace instances of actors by instantiated actors.
+	 * 
+	 * @param skipActors
+	 *            <code>true</code> if actors should be skipped in the
+	 *            instantiation process, <code>false</code> otherwise
+	 */
+	public Instantiator(boolean skipActors, int defaultFifoSize) {
 		this.skipActors = skipActors;
+		this.defaultFifoSize = defaultFifoSize;
 		copier = new Copier();
 		map = new HashMap<Instance, DfVertex>();
 	}
@@ -148,6 +175,12 @@ public class Instantiator extends DfSwitch<Network> {
 			Connection copy = DfFactory.eINSTANCE.createConnection(source,
 					sourcePort, target, targetPort,
 					copier.copyAll(connection.getAttributes()));
+
+			if (connection.getAttribute(BUFFER_SIZE) == null
+					&& defaultFifoSize != 0) {
+				copy.setAttribute(BUFFER_SIZE, defaultFifoSize);
+			}
+
 			networkCopy.getConnections().add(copy);
 		}
 
