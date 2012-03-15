@@ -122,13 +122,27 @@ public class IrUtil {
 	/**
 	 * Returns a deep copy of the given objects, and updates def/use chains.
 	 * 
+	 * @param copier
+	 *            a copier
 	 * @param eObjects
 	 *            a list of objects
 	 * @return a deep copy of the given objects with def/use chains correctly
 	 *         updated
 	 */
 	public static <T extends EObject> Collection<T> copy(Collection<T> eObjects) {
-		Copier copier = new Copier();
+		return copy(new Copier(), eObjects);
+	}
+
+	/**
+	 * Returns a deep copy of the given objects, and updates def/use chains.
+	 * 
+	 * @param eObjects
+	 *            a list of objects
+	 * @return a deep copy of the given objects with def/use chains correctly
+	 *         updated
+	 */
+	public static <T extends EObject> Collection<T> copy(Copier copier,
+			Collection<T> eObjects) {
 		Collection<T> result = copier.copyAll(eObjects);
 		copier.copyReferences();
 
@@ -290,13 +304,8 @@ public class IrUtil {
 	 *            an EObject
 	 */
 	public static void removeDefs(EObject eObject) {
-		TreeIterator<EObject> it = eObject.eAllContents();
-		while (it.hasNext()) {
-			EObject descendant = it.next();
-			if (descendant instanceof Def) {
-				Def def = (Def) descendant;
-				def.setVariable(null);
-			}
+		for (Def def : EcoreHelper.getObjects(eObject, Def.class)) {
+			def.setVariable(null);
 		}
 	}
 
@@ -307,13 +316,8 @@ public class IrUtil {
 	 *            an EObject
 	 */
 	public static void removeUses(EObject eObject) {
-		TreeIterator<EObject> it = eObject.eAllContents();
-		while (it.hasNext()) {
-			EObject descendant = it.next();
-			if (descendant instanceof Use) {
-				Use use = (Use) descendant;
-				use.setVariable(null);
-			}
+		for (Use use : EcoreHelper.getObjects(eObject, Use.class)) {
+			use.setVariable(null);
 		}
 	}
 
