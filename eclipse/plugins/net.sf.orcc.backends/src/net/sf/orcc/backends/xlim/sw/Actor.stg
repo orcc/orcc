@@ -62,20 +62,39 @@ actorPorts() ::= <<
 // State Variables
 ///////////////////////////////////////////////////////////////////////////////
 
-initVariable(type, value) ::= <<
-<if(value.class.array)
->\<initValue typeName="List"\>
-	<value: {elt | <initVariable(type=type.type, value=elt)>}; separator="">\</initValue\>
-<else
->\<initValue <if(!type.float)>size="<if (type.bool)>1<else><type.size><endif>"<endif> typeName="<type>" value="<if (type.bool)><if (value)>1<else>0<endif><else><value><endif>"/\>
-<endif>
+initVariableExpr(type, expr) ::= <<
+<if(type.list)>
+\<initValue typeName="List"\>
+	<expr.value: {elt | <initVariableValue(type.type, elt)>}; separator="\n">
+\</initValue\><
+elseif(type.bool)
+>\<initValue size="1" typeName="<type>" value="<expr.value>"/\><
+else
+>\<initValue <if(!type.float)>size="<type.size>"<endif> typeName="<type>" value="<expr.value>"/\><endif>
+>>
+
+initVariableValue(type, value) ::= <<
+<if(type.list)>
+\<initValue typeName="List"\>
+	<value: {elt | <initVariableValue(type.type, elt)>}; separator="\n">
+\</initValue\><
+elseif(type.bool)
+>\<initValue size="1" typeName="<type>" value="<value>"/\><
+else
+>\<initValue <if(!type.float)>size="<type.size>"<endif> typeName="<type>" value="<value>"/\><endif>
 >>
 
 stateVar(var) ::= <<
-<if(var.initialized || var.value)>\<stateVar name="<var.name>" sourceName="<var.name>"\>
-	<initVariable(type=var.type, value=var.value)>\</stateVar\>
-<else>
-<typeDefLocal(var)>
+<if(var.initialized)
+>\<stateVar name="<var.name>" sourceName="<var.name>"\>
+	<initVariableExpr(var.type, var.initialValue)>
+\</stateVar\><
+elseif(var.value || var.type.bool)
+>\<stateVar name="<var.name>" sourceName="<var.name>"\>
+	<initVariableValue(var.type, var.value)>
+\</stateVar\><
+else><
+typeDefLocal(var)>
 \<stateVar name="<var.name>" sourceName="<var.name>" typeName="<
 if(var.type.list)><var.name>_typedef<else><var.type><endif>"<
 if(!var.type.list)><if(!var.type.float)> size="<if (var.type.bool)>1<else><var.type.size><endif>"<endif><endif>/\><endif>
@@ -83,7 +102,7 @@ if(!var.type.list)><if(!var.type.float)> size="<if (var.type.bool)>1<else><var.t
 
 stateVars() ::= <<
 \<!-- State Variables --\>
-<instance.actor.stateVars: stateVar()>
+<instance.actor.stateVars: stateVar(); separator="\n">
 >>
 
 
