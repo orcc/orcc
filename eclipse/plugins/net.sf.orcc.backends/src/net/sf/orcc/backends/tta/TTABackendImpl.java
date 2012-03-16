@@ -59,6 +59,7 @@ import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.tta.architecture.Processor;
 import net.sf.orcc.backends.tta.architecture.util.ArchitectureMemoryStats;
 import net.sf.orcc.backends.tta.transformations.BroadcastTypeResizer;
+import net.sf.orcc.backends.tta.transformations.SlowOperationDetector;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Entity;
@@ -159,7 +160,8 @@ public class TTABackendImpl extends AbstractBackend {
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		DfSwitch<?>[] transformations = { new UnitImporter(),
-				new SSATransformation(), new BoolToIntTransformation(),
+				new SlowOperationDetector(listener), new SSATransformation(),
+				new BoolToIntTransformation(),
 				new TypeResizer(true, true, false, true),
 				new StringTransformation(),
 				new RenameTransformation(this.transformations),
