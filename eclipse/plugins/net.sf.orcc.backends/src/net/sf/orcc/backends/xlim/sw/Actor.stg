@@ -62,13 +62,17 @@ actorPorts() ::= <<
 // State Variables
 ///////////////////////////////////////////////////////////////////////////////
 
+printBool(value) ::= <%
+<if(value)>1<else>0<endif>
+%>
+
 initVariableExpr(type, expr) ::= <<
 <if(type.list)>
 \<initValue typeName="List"\>
 	<expr.value: {elt | <initVariableValue(type.type, elt)>}; separator="\n">
 \</initValue\><
 elseif(type.bool)
->\<initValue size="1" typeName="<type>" value="<expr.value>"/\><
+>\<initValue size="1" typeName="<type>" value="<printBool(expr.value)>"/\><
 else
 >\<initValue <if(!type.float)>size="<type.size>"<endif> typeName="<type>" value="<expr.value>"/\><endif>
 >>
@@ -79,7 +83,7 @@ initVariableValue(type, value) ::= <<
 	<value: {elt | <initVariableValue(type.type, elt)>}; separator="\n">
 \</initValue\><
 elseif(type.bool)
->\<initValue size="1" typeName="<type>" value="<value>"/\><
+>\<initValue size="1" typeName="<type>" value="<printBool(value)>"/\><
 else
 >\<initValue <if(!type.float)>size="<type.size>"<endif> typeName="<type>" value="<value>"/\><endif>
 >>
