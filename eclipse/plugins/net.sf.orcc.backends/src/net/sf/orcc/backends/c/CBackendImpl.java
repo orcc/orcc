@@ -53,7 +53,6 @@ import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
-import net.sf.orcc.util.WriteListener;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.resource.ResourceSet;
@@ -212,12 +211,7 @@ public class CBackendImpl extends AbstractBackend {
 			}
 		}
 
-		new CBroadcastAdder(new WriteListener() {
-			@Override
-			public void writeText(String text) {
-				write(text);
-			}
-		}, fifoSize).doSwitch(network);
+		new CBroadcastAdder(listener, fifoSize).doSwitch(network);
 
 		return network;
 	}
