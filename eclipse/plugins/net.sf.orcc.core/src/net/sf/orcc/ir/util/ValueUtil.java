@@ -222,13 +222,14 @@ public class ValueUtil {
 		}
 
 		int index = getIntValue(indexes[numIndexes - 1]);
-		if (type.isBool()) {
-			return Array.getBoolean(array, index);
+		Object value = Array.get(array, index);
+		if (type.isBool() && isBool(value) || type.isString()
+				&& isString(value)) {
+			return value;
 		} else if (type.isFloat()) {
-			return BigDecimal.valueOf(Array.getFloat(array, index));
+			return BigDecimal.valueOf((Float) value);
 		} else if (type.isInt()) {
 			int size = type.getSizeInBits();
-			Object value = Array.get(array, index);
 			long longVal;
 			if (size <= 8) {
 				longVal = (Byte) value;
@@ -244,7 +245,6 @@ public class ValueUtil {
 			return BigInteger.valueOf(longVal);
 		} else if (type.isUint()) {
 			int size = type.getSizeInBits();
-			Object value = Array.get(array, index);
 			long longVal;
 			if (size <= 8) {
 				longVal = ((Byte) value) & 0xFF;
@@ -658,7 +658,8 @@ public class ValueUtil {
 
 		int index = getIntValue(indexes[numIndexes - 1]);
 		Object valueToSet;
-		if (type.isBool() && isBool(value)) {
+		if (type.isBool() && isBool(value) || type.isString()
+				&& isString(value)) {
 			valueToSet = value;
 		} else if (type.isFloat() && isFloat(value)) {
 			BigDecimal floatVal = (BigDecimal) value;
