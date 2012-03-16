@@ -94,5 +94,7 @@ public interface Backend {
 	 *            a write listener
 	 */
 	void setWriteListener(WriteListener listener);
+	
+	WriteListener getWriteListener();
 
 }

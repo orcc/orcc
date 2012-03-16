@@ -546,6 +546,11 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		return options;
 	}
 
+	@Override
+	public WriteListener getWriteListener() {
+		return listener;
+	}
+
 	/**
 	 * Returns true if this process has been canceled.
 	 * 
@@ -750,6 +755,11 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	@Override
+	public void setWriteListener(WriteListener listener) {
+		this.listener = listener;
+	}
+
+	@Override
 	public void setOptions(Map<String, Object> options) {
 		this.options = options;
 
@@ -790,11 +800,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	@Override
-	public void setWriteListener(WriteListener listener) {
-		this.listener = listener;
-	}
-
-	@Override
 	public Object start(IApplicationContext context) throws Exception {
 		Map<?, ?> map = context.getArguments();
 		String[] args = (String[]) map
@@ -812,6 +817,13 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		opt = new Option("o", "output", true, "output folder");
 		opt.setRequired(true);
 		options.addOption(opt);
+
+		setWriteListener(new WriteListener() {
+			@Override
+			public void writeText(String text) {
+				System.out.print(text);
+			}
+		});
 
 		// add optional options
 		options.addOption("c", "classify", false, "classify the given network");
@@ -882,11 +894,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 *            a string
 	 */
 	final public void write(String text) {
-		if (listener == null) {
-			System.out.print(text);
-		} else {
-			listener.writeText(text);
-		}
+		listener.writeText(text);
 	}
 
 }
