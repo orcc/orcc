@@ -34,6 +34,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.math.BigInteger;
 
 import javax.swing.JFrame;
 
@@ -100,9 +101,9 @@ public class Display {
 	 * @param pictureHeight
 	 *            height
 	 */
-	public static void compareYUV_comparePicture(short[] pictureBufferY,
-			short[] pictureBufferU, short[] pictureBufferV,
-			Integer pictureWidth, Integer pictureHeight) {
+	public static void compareYUV_comparePicture(byte[] pictureBufferY,
+			byte[] pictureBufferU, byte[] pictureBufferV,
+			BigInteger pictureWidth, BigInteger pictureHeight) {
 
 	}
 
@@ -125,21 +126,23 @@ public class Display {
 		return (r << 16) | (g << 8) | b;
 	}
 
-	public static void displayYUV_displayPicture(short[] pictureBufferY,
-			short[] pictureBufferU, short[] pictureBufferV,
-			Integer pictureWidth, Integer pictureHeight) {
+	public static void displayYUV_displayPicture(byte[] pictureBufferY,
+			byte[] pictureBufferU, byte[] pictureBufferV,
+			BigInteger width, BigInteger height) {
+		int pictureWidth = width.intValue();
+		int pictureHeight = height.intValue();
 		if (pictureWidth != lastWidth || pictureHeight != lastHeight) {
 			setVideoSize(pictureWidth, pictureHeight);
 		}
 
 		for (int i = 0; i < pictureWidth / 2; i++) {
 			for (int j = 0; j < pictureHeight / 2; j++) {
-				int u = pictureBufferU[i + j * pictureWidth / 2];
-				int v = pictureBufferV[i + j * pictureWidth / 2];
-				int y0 = pictureBufferY[i * 2 + j * 2 * pictureWidth];
-				int y1 = pictureBufferY[i * 2 + 1 + j * 2 * pictureWidth];
-				int y2 = pictureBufferY[i * 2 + (j * 2 + 1) * pictureWidth];
-				int y3 = pictureBufferY[i * 2 + 1 + (j * 2 + 1) * pictureWidth];
+				int u = pictureBufferU[i + j * pictureWidth / 2] & 0xFF;
+				int v = pictureBufferV[i + j * pictureWidth / 2] & 0xFF;
+				int y0 = pictureBufferY[i * 2 + j * 2 * pictureWidth] & 0xFF;
+				int y1 = pictureBufferY[i * 2 + 1 + j * 2 * pictureWidth] & 0xFF;
+				int y2 = pictureBufferY[i * 2 + (j * 2 + 1) * pictureWidth] & 0xFF;
+				int y3 = pictureBufferY[i * 2 + 1 + (j * 2 + 1) * pictureWidth] & 0xFF;
 
 				int rgb0 = convertYCbCrtoRGB(y0, u, v);
 				int rgb1 = convertYCbCrtoRGB(y1, u, v);
@@ -167,8 +170,8 @@ public class Display {
 	 * 
 	 * @return the flags of the display
 	 */
-	public static int displayYUV_getFlags() {
-		return DISPLAY_ENABLE | DISPLAY_READY;
+	public static BigInteger displayYUV_getFlags() {
+		return  BigInteger.valueOf(DISPLAY_ENABLE | DISPLAY_READY);
 	}
 
 	/**

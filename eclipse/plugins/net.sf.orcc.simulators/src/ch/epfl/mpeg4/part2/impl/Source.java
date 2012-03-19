@@ -31,9 +31,9 @@ package ch.epfl.mpeg4.part2.impl;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.math.BigInteger;
 
 import net.sf.orcc.runtime.impl.GenericSource;
-
 
 /**
  * This class defines native functions for the Source actor.
@@ -49,12 +49,12 @@ public class Source extends GenericSource {
 
 	private static int nbLoops = 1;
 
-	public static void source_exit(Integer status) {
+	public static void source_exit(BigInteger status) {
 		// System.exit(status);
 	}
 
-	public static int source_getNbLoop() {
-		return nbLoops;
+	public static BigInteger source_getNbLoop() {
+		return BigInteger.valueOf(nbLoops);
 	}
 
 	public static void source_init() {
@@ -66,13 +66,10 @@ public class Source extends GenericSource {
 		}
 	}
 
-	public static void source_readNBytes(short outTable[], Integer nbTokenToRead) {
+	public static void source_readNBytes(byte outTable[],
+			BigInteger nbTokenToRead) {
 		try {
-			byte[] b = new byte[outTable.length];
-			in.read(b);
-			for (int i = 0; i < nbTokenToRead; i++) {
-				outTable[i] = (short) (b[i] & 0xFF);
-			}
+			in.read(outTable, 0, nbTokenToRead.intValue());
 		} catch (IOException e) {
 			String msg = "I/O error when reading file \"" + fileName + "\"";
 			throw new RuntimeException(msg, e);
@@ -89,12 +86,12 @@ public class Source extends GenericSource {
 		}
 	}
 
-	public static int source_sizeOfFile() {
+	public static BigInteger source_sizeOfFile() {
 		try {
 			if (in == null) {
-				return 0;
+				return BigInteger.ZERO;
 			}
-			return (int) in.length();
+			return BigInteger.valueOf(in.length());
 		} catch (IOException e) {
 			String msg = "I/O error when getting size of file \"" + fileName
 					+ "\"";
