@@ -92,7 +92,7 @@ public class GlobalArrayInitializer extends AbstractActorVisitor<Object> {
 								.createArray((TypeList) type));
 					} else if (type.isBool()) {
 						variable.setValue(false);
-					} else if (type.isInt()) {
+					} else if (type.isInt() || type.isUint()) {
 						variable.setValue(0);
 					}
 				}
