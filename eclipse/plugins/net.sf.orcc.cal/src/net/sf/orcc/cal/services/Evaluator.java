@@ -53,14 +53,11 @@ import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprInt;
-import net.sf.orcc.ir.ExprFloat;
 import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
-import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
 import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.util.OrccUtil;
@@ -251,45 +248,11 @@ public class Evaluator extends CalSwitch<Expression> {
 	@Override
 	public Expression caseExpressionUnary(ExpressionUnary expression) {
 		OpUnary op = OpUnary.getOperator(expression.getUnaryOperator());
+		Expression expr = getValue(expression.getExpression());
+		Object value = ValueUtil.getValue(expr);
 
-		switch (op) {
-		case BITNOT: {
-			Expression value = getValue(expression.getExpression());
-			if (value != null && value.isExprInt()) {
-				ExprInt i = (ExprInt) value;
-				return i.not();
-			}
-			return null;
-		}
-		case LOGIC_NOT: {
-			Expression value = getValue(expression.getExpression());
-			if (value != null && value.isExprBool()) {
-				return ((ExprBool) value).not();
-			}
-			return null;
-		}
-		case MINUS: {
-			Expression value = getValue(expression.getExpression());
-			if (value != null && value.isExprInt()) {
-				ExprInt i = (ExprInt) value;
-				return i.negate();
-			}
-			if (value != null && value.isExprFloat()) {
-				ExprFloat i = (ExprFloat) value;
-				return i.negate();
-			}
-			return null;
-		}
-		case NUM_ELTS:
-			Type type = Typer.getType(expression.getExpression());
-			if (type != null && type.isList()) {
-				return IrFactory.eINSTANCE.createExprInt(((TypeList) type)
-						.getSize());
-			}
-			return null;
-		}
-
-		return null;
+		Object result = new ExpressionEvaluator().interpretUnaryExpr(op, value);
+		return ValueUtil.getExpression(result);
 	}
 
 	@Override
