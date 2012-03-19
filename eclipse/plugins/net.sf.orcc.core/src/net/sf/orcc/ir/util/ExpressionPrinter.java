@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
+ * Copyright (c) 2012, Synflow
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -96,7 +97,7 @@ public class ExpressionPrinter extends IrSwitch<String> {
 	@Override
 	public String caseExprList(ExprList expr) {
 		StringBuilder builder = new StringBuilder();
-		builder.append('[');
+		builder.append('{');
 
 		Iterator<Expression> it = expr.getValue().iterator();
 		if (it.hasNext()) {
@@ -107,7 +108,7 @@ public class ExpressionPrinter extends IrSwitch<String> {
 			}
 		}
 
-		return builder.append(']').toString();
+		return builder.append('}').toString();
 	}
 
 	@Override
