@@ -60,13 +60,13 @@ begin
   begin
     if (clk'event and clk = '1') then
       if ((wrreq = '1' and nb_tokens_i(widthu) = '0') and (rdreq = '1' and empty = '0')) then
-        nb_tokens_i(widthu-1 downto 0) <= nb_tokens_i(widthu-1 downto 0);
+        nb_tokens_i <= nb_tokens_i;
       else
         if (wrreq = '1' and nb_tokens_i(widthu) = '0') then
-          nb_tokens_i(widthu-1 downto 0) <= nb_tokens_i(widthu-1 downto 0) + 1;
+          nb_tokens_i <= nb_tokens_i + 1;
         end if;
         if (rdreq = '1' and empty = '0') then
-          nb_tokens_i(widthu-1 downto 0) <= nb_tokens_i(widthu-1 downto 0) - 1;
+          nb_tokens_i <= nb_tokens_i - 1;
         end if;
       end if;
     end if;
@@ -81,6 +81,5 @@ begin
       wr_en => wrreq,
       rd_en => rdreq,
       dout  => q,
-      full  => nb_tokens_i(widthu),
       empty => empty);
 end rtl_fifo;
