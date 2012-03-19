@@ -8,7 +8,6 @@ package net.sf.orcc.ir.impl;
 
 import java.math.BigInteger;
 
-import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
@@ -60,21 +59,6 @@ public class ExprIntImpl extends ExpressionImpl implements ExprInt {
 	public ExprIntImpl(BigInteger value) {
 		super();
 		setValue(value);
-	}
-
-	@Override
-	public ExprInt add(ExprInt expr) {
-		return new ExprIntImpl(getValue().add(expr.getValue()));
-	}
-
-	@Override
-	public ExprInt and(ExprInt expr) {
-		return new ExprIntImpl(getValue().and(expr.getValue()));
-	}
-
-	@Override
-	public ExprInt divide(ExprInt expr) {
-		return new ExprIntImpl(getValue().divide(expr.getValue()));
 	}
 
 	/**
@@ -142,11 +126,6 @@ public class ExprIntImpl extends ExpressionImpl implements ExprInt {
 	}
 
 	@Override
-	public ExprBool ge(ExprInt expr) {
-		return new ExprBoolImpl(value.compareTo(expr.getValue()) >= 0);
-	}
-
-	@Override
 	public int getIntValue() {
 		return value.intValue();
 	}
@@ -171,11 +150,6 @@ public class ExprIntImpl extends ExpressionImpl implements ExprInt {
 	}
 
 	@Override
-	public ExprBool gt(ExprInt expr) {
-		return new ExprBoolImpl(value.compareTo(expr.getValue()) > 0);
-	}
-
-	@Override
 	public boolean isExprInt() {
 		return true;
 	}
@@ -183,41 +157,6 @@ public class ExprIntImpl extends ExpressionImpl implements ExprInt {
 	@Override
 	public boolean isLong() {
 		return getIntValue() != getLongValue();
-	}
-
-	@Override
-	public ExprBool le(ExprInt expr) {
-		return new ExprBoolImpl(value.compareTo(expr.getValue()) <= 0);
-	}
-
-	@Override
-	public ExprBool lt(ExprInt expr) {
-		return new ExprBoolImpl(value.compareTo(expr.getValue()) < 0);
-	}
-
-	@Override
-	public ExprInt mod(ExprInt expr) {
-		return new ExprIntImpl(value.mod(expr.getValue()));
-	}
-
-	@Override
-	public ExprInt multiply(ExprInt expr) {
-		return new ExprIntImpl(value.multiply(expr.getValue()));
-	}
-
-	@Override
-	public ExprInt negate() {
-		return new ExprIntImpl(getValue().negate());
-	}
-
-	@Override
-	public ExprInt not() {
-		return new ExprIntImpl(getValue().not());
-	}
-
-	@Override
-	public ExprInt or(ExprInt expr) {
-		return new ExprIntImpl(getValue().or(expr.getValue()));
 	}
 
 	/**
@@ -230,22 +169,6 @@ public class ExprIntImpl extends ExpressionImpl implements ExprInt {
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
 					IrPackage.EXPR_INT__VALUE, oldValue, value));
-	}
-
-	@Override
-	public ExprInt shiftLeft(ExprInt expr) {
-		return new ExprIntImpl(getValue().shiftLeft(expr.getValue().intValue()));
-	}
-
-	@Override
-	public ExprInt shiftRight(ExprInt expr) {
-		return new ExprIntImpl(getValue()
-				.shiftRight(expr.getValue().intValue()));
-	}
-
-	@Override
-	public ExprInt subtract(ExprInt expr) {
-		return new ExprIntImpl(getValue().subtract(expr.getValue()));
 	}
 
 	/**

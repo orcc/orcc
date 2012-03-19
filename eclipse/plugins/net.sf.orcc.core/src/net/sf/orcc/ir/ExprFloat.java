@@ -40,27 +40,6 @@ import java.math.BigDecimal;
 public interface ExprFloat extends Expression {
 
 	/**
-	 * Adds the given float expression to this float expression.
-	 * 
-	 * @param expr
-	 *            a float expression
-	 * @return the sum of this float expression and the given float expression
-	 */
-	ExprFloat add(ExprFloat expr);
-
-	int compareTo(ExprFloat expr);
-
-	/**
-	 * Divides the given float expression to this float expression.
-	 * 
-	 * @param expr
-	 *            a float expression
-	 * @return the dividend of this float expression and the given float
-	 *         expression
-	 */
-	ExprFloat divide(ExprFloat expr);
-
-	/**
 	 * Returns the value of this integer expression.
 	 * 
 	 * @return the value of this integer expression
@@ -69,40 +48,11 @@ public interface ExprFloat extends Expression {
 	BigDecimal getValue();
 
 	/**
-	 * Multiplies this float expression by the given float expression.
-	 * 
-	 * @param expr
-	 *            a float expression
-	 * @return the product of this float expression and the given float
-	 *         expression
-	 */
-	ExprFloat multiply(ExprFloat expr);
-
-	/**
-	 * Negates this float expression.
-	 * 
-	 * @param expr
-	 *            a float expression
-	 * @return the negation of this float expression
-	 */
-	ExprFloat negate();
-
-	/**
 	 * Sets the value of this float expression.
 	 * 
 	 * @param value
 	 *            the value of this float expression
 	 */
 	void setValue(BigDecimal value);
-
-	/**
-	 * Subtracts the given float expression to this float expression.
-	 * 
-	 * @param expr
-	 *            a float expression
-	 * @return the difference of this float expression and the given float
-	 *         expression
-	 */
-	ExprFloat subtract(ExprFloat expr);
 
 }

@@ -139,11 +139,6 @@ public class ExprBoolImpl extends ExpressionImpl implements ExprBool {
 		return value;
 	}
 
-	@Override
-	public ExprBool not() {
-		return new ExprBoolImpl(!value);
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated

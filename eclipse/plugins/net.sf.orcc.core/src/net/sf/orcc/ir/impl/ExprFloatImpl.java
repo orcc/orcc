@@ -61,21 +61,6 @@ public class ExprFloatImpl extends ExpressionImpl implements ExprFloat {
 		setValue(value);
 	}
 
-	@Override
-	public ExprFloat add(ExprFloat expr) {
-		return new ExprFloatImpl(getValue().add(expr.getValue()));
-	}
-
-	@Override
-	public int compareTo(ExprFloat expr) {
-		return getValue().compareTo(expr.getValue());
-	}
-
-	@Override
-	public ExprFloat divide(ExprFloat expr) {
-		return new ExprFloatImpl(getValue().divide(expr.getValue()));
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -158,16 +143,6 @@ public class ExprFloatImpl extends ExpressionImpl implements ExprFloat {
 		return true;
 	}
 
-	@Override
-	public ExprFloat multiply(ExprFloat expr) {
-		return new ExprFloatImpl(getValue().multiply(expr.getValue()));
-	}
-
-	@Override
-	public ExprFloat negate() {
-		return new ExprFloatImpl(getValue().negate());
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -178,11 +153,6 @@ public class ExprFloatImpl extends ExpressionImpl implements ExprFloat {
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
 					IrPackage.EXPR_FLOAT__VALUE, oldValue, value));
-	}
-
-	@Override
-	public ExprFloat subtract(ExprFloat expr) {
-		return new ExprFloatImpl(getValue().subtract(expr.getValue()));
 	}
 
 	/**

@@ -46,13 +46,6 @@ public interface ExprBool extends Expression {
 	boolean isValue();
 
 	/**
-	 * Returns the inverse of this boolean expression.
-	 * 
-	 * @return the inverse of this boolean expression
-	 */
-	ExprBool not();
-
-	/**
 	 * Sets the value of this boolean expression.
 	 * 
 	 * @param value

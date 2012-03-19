@@ -40,46 +40,6 @@ import java.math.BigInteger;
 public interface ExprInt extends Expression {
 
 	/**
-	 * Adds the given integer expression to this integer expression.
-	 * 
-	 * @param expr
-	 *            an integer expression
-	 * @return the sum of this integer expression and the given integer
-	 *         expression
-	 */
-	ExprInt add(ExprInt expr);
-
-	/**
-	 * Bitands this integer expression and the given integer expression.
-	 * 
-	 * @param expr
-	 *            an integer expression
-	 * @return the bitand of this integer expression and the given integer
-	 *         expression
-	 */
-	ExprInt and(ExprInt expr);
-
-	/**
-	 * Divides this integer expression by the given integer expression.
-	 * 
-	 * @param expr
-	 *            a integer expression
-	 * @return the dividend of this integer expression and the given integer
-	 *         expression
-	 */
-	ExprInt divide(ExprInt expr);
-
-	/**
-	 * Compares the given integer expression to this integer expression.
-	 * 
-	 * @param expr
-	 *            a integer expression
-	 * @return <code>true</code> if this expression is greater than or equal to
-	 *         the given expression
-	 */
-	ExprBool ge(ExprInt expr);
-
-	/**
 	 * Returns the value of this integer expression truncated as an
 	 * <code>int</code> .
 	 * 
@@ -104,98 +64,12 @@ public interface ExprInt extends Expression {
 	BigInteger getValue();
 
 	/**
-	 * Compares the given integer expression to this integer expression.
-	 * 
-	 * @param expr
-	 *            a integer expression
-	 * @return <code>true</code> if this expression is greater than the given
-	 *         expression
-	 */
-	ExprBool gt(ExprInt expr);
-
-	/**
 	 * Returns true if this integer number needs the "long" storage type.
 	 * 
 	 * @return true if this integer number needs the "long" storage type
 	 */
 	boolean isLong();
 
-	/**
-	 * Compares the given integer expression to this integer expression.
-	 * 
-	 * @param expr
-	 *            a integer expression
-	 * @return <code>true</code> if this expression is less than or equal to the
-	 *         given expression
-	 */
-	ExprBool le(ExprInt expr);
-
-	/**
-	 * Compares the given integer expression to this integer expression.
-	 * 
-	 * @param expr
-	 *            a integer expression
-	 * @return <code>true</code> if this expression is less than the given
-	 *         expression
-	 */
-	ExprBool lt(ExprInt expr);
-
-	/**
-	 * Divides this integer expression by the given integer expression and
-	 * return the modulo.
-	 * 
-	 * @param expr
-	 *            a integer expression
-	 * @return the modulo of the division of this integer expression by the
-	 *         given integer expression
-	 */
-	ExprInt mod(ExprInt expr);
-
-	/**
-	 * Multiplies this integer expression by the given integer expression.
-	 * 
-	 * @param expr
-	 *            a integer expression
-	 * @return the product of this integer expression and the given integer
-	 *         expression
-	 */
-	ExprInt multiply(ExprInt expr);
-
-	/**
-	 * Negates this integer expression.
-	 * 
-	 * @param expr
-	 *            a integer expression
-	 * @return the negation of this integer expression
-	 */
-	ExprInt negate();
-
-	/**
-	 * Bitnots this integer expression.
-	 * 
-	 * @param expr
-	 *            a integer expression
-	 * @return the 1's complement of this integer expression
-	 */
-	ExprInt not();
-
-	/**
-	 * Bitors this integer expression.
-	 * 
-	 * @param expr
-	 *            a integer expression
-	 * @return the 1's complement of this integer expression
-	 */
-	ExprInt or(ExprInt expr);
-
 	void setValue(BigInteger value);
-
-	ExprInt shiftLeft(ExprInt expr);
-
-	ExprInt shiftRight(ExprInt expr);
-
-	ExprInt subtract(ExprInt expr);
-
-	ExprInt xor(ExprInt expr);
 
 }
