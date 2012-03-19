@@ -96,7 +96,6 @@ add wave -noupdate -divider fifo_<connection.id>:_<connection.source.id>_\>\>_<c
 add wave -noupdate -divider \<NULL\>
 add wave -noupdate -format Logic /tb_top/top_orcc/fifo_<connection.id>/clk
 add wave -noupdate -format Logic /tb_top/top_orcc/fifo_<connection.id>/rst_n
-add wave -noupdate -format Logic /tb_top/top_orcc/fifo_<connection.id>/clear
 add wave -noupdate -format Logic /tb_top/top_orcc/fifo_<connection.id>/wrreq
 add wave -noupdate -format Logic /tb_top/top_orcc/fifo_<connection.id>/rdreq
 add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/fifo_<connection.id>/data

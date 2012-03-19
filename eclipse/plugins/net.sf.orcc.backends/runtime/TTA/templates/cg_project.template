@@ -7,11 +7,11 @@
 
 SET designentry = VHDL
 SET BusFormat = BusFormatAngleBracketNotRipped
-SET devicefamily = virtex5
-SET device = xc5vsx50t
-SET package = ff1136
+SET devicefamily = virtex6
+SET device = xc6vlx240t
+SET package = ff1156
 SET speedgrade = -1
 SET FlowVendor = Foundation_ISE
-SET VerilogSim = True
+SET VerilogSim = False
 SET VHDLSim = True
 

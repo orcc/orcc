@@ -77,8 +77,6 @@ set_global_assignment -name VHDL_FILE <instance.id>/tta/gcu_ic/idecompressor.vhd
 set_global_assignment -name VHDL_FILE <instance.id>/tta/gcu_ic/ic.vhdl
 set_global_assignment -name VHDL_FILE <instance.id>/tta/gcu_ic/gcu_opcodes_pkg.vhdl
 set_global_assignment -name VHDL_FILE <instance.id>/tta/gcu_ic/decoder.vhdl
-set_global_assignment -name MIF_FILE <instance.id>/tta/memory/<instance.id>_data.mif
-set_global_assignment -name MIF_FILE <instance.id>/tta/memory/<instance.id>.mif
 <endif>
 >>
 

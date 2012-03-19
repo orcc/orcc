@@ -45,6 +45,7 @@ class Design:
         self.targetAltera = targetAltera
         self._xoeFifoFile = "fifo_br.xoe"
         self._ngcFifoFile = "fifo_br.ngc"
+        self._vhdFifoFile = "fifo_br.vhd"
 
 
     def compile(self, srcPath, libPath, args, debug):
@@ -78,7 +79,8 @@ class Design:
             self.generateCgFiles(libPath, cgPath)
             retcode = subprocess.call(["coregen", "-intstyle", "xflow", "-b", os.path.join(cgPath, self._xoeFifoFile), "-p", os.path.join(cgPath, "cg_project.cgp")])
             shutil.copy(os.path.join(cgPath, self._ngcFifoFile), os.path.join(srcPath, "wrapper"))
-            shutil.rmtree(cgPath, ignore_errors=True)
+            shutil.copy(os.path.join(cgPath, self._vhdFifoFile), os.path.join(srcPath, "wrapper"))
+            #shutil.rmtree(cgPath, ignore_errors=True)
 
         for processor in self.processors:
             if not processor.isNative:

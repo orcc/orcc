@@ -271,6 +271,7 @@ public class TTABackendImpl extends AbstractBackend {
 			tbPrinter.getOptions().put("fpgaFamily", fpgaFamily);
 			StandardPrinter tclPrinter = new StandardPrinter(
 					"net/sf/orcc/backends/tta/ModelSim_Script.stg");
+			tclPrinter.getOptions().put("targetAltera", targetAltera);
 			StandardPrinter wavePrinter = new StandardPrinter(
 					"net/sf/orcc/backends/tta/ModelSim_Wave.stg");
 			tbPrinter.print(instance.getSimpleName() + "_tb.vhd", simPath,
@@ -325,6 +326,7 @@ public class TTABackendImpl extends AbstractBackend {
 		// ModelSim
 		StandardPrinter tclPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/tta/ModelSim_Script.stg");
+		tclPrinter.getOptions().put("targetAltera", targetAltera);
 		StandardPrinter tbPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/tta/VHDL_Testbench.stg");
 		tbPrinter.getOptions().put("fifoSize", fifoSize);

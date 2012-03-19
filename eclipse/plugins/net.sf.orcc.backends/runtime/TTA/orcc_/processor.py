@@ -66,14 +66,14 @@ class Processor:
         self._tpefFile = self.id + ".tpef"
         self._asmFile = self.id + ".tceasm"
         self._bemFile = self.id + ".bem"
-        self._mifFile = self.id + ".mif"
-        self._coeFile = self.id + ".coe"
-        self._xoeFile = "irom_" + self.id + ".xoe"
-        self._ngcFile = "irom_" + self.id + ".ngc"
-        self._mifDataFile = self.id + "_data" + ".mif"
-        self._coeDataFile = self.id + "_data" + ".coe"
-        self._xoeDataFile = "dram_" + self.id + ".xoe"
-        self._ngcDataFile = "dram_" + self.id + ".ngc"
+        self._mifRomFile = "irom_" + self.id + ".mif"
+        self._vhdRomFile = "irom_" + self.id + ".vhd"
+        self._xoeRomFile = "irom_" + self.id + ".xoe"
+        self._ngcRomFile = "irom_" + self.id + ".ngc"
+        self._mifRamFile = "dram_" + self.id + ".mif"
+        self._vhdRamFile = "dram_" + self.id + ".vhd"
+        self._xoeRamFile = "dram_" + self.id + ".xoe"
+        self._ngcRamFile = "dram_" + self.id + ".ngc"
         self._waveFile = "wave.do"
         # Useful names
         self._entity = "processor_" + self.id + "_tl"
@@ -118,10 +118,10 @@ class Processor:
         if retcode == 0: 
             retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", vhdlPath, "-f", "mif", "-o", "mif", self._adfFile])
             if not targetAltera:
-                retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", vhdlPath, "-f", "coe", "-o", "coe", self._adfFile])
+                retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", vhdlPath, "-f", "coe", "-o", "coe", self._adfFile])                
 
         # Generate processor files
-        self.irom = self._readMif(self._mifFile)
+        self.irom = self._readMif(self.id + ".mif")
         self.dram = self._readAdf(self._adfFile)
         if debug: 
             print "ROM: " + str(self.irom.depth) + "x" + str(self.irom.width) + "bits"
@@ -132,22 +132,26 @@ class Processor:
             cgPath = os.path.join(instanceSrcPath, "ipcore_dir_gen")
             shutil.rmtree(cgPath, ignore_errors=True)
             os.mkdir(cgPath)
-            shutil.move(self._coeFile, cgPath)
-            shutil.move(self._coeDataFile, cgPath)
+            shutil.move(self.id + "_data" + ".coe", cgPath)
+            shutil.move(self.id + ".coe", cgPath)
             self.generateCgFiles(libPath, cgPath)
-            retcode = subprocess.call(["coregen", "-intstyle", "xflow", "-b", os.path.join(cgPath, self._xoeFile), "-p", "ipcore_dir_gen/cg_project.cgp"])
-            retcode = subprocess.call(["coregen", "-intstyle", "xflow", "-b", os.path.join(cgPath, self._xoeDataFile), "-p", "ipcore_dir_gen/cg_project.cgp"])
-            shutil.copy(os.path.join(cgPath, self._ngcFile), vhdlPath)
-            shutil.copy(os.path.join(cgPath, self._ngcDataFile), vhdlPath)
-            shutil.rmtree(cgPath, ignore_errors=True)
+            retcode = subprocess.call(["coregen", "-intstyle", "xflow", "-b", os.path.join(cgPath, self._xoeRomFile), "-p", "ipcore_dir_gen/cg_project.cgp"])
+            retcode = subprocess.call(["coregen", "-intstyle", "xflow", "-b", os.path.join(cgPath, self._xoeRamFile), "-p", "ipcore_dir_gen/cg_project.cgp"])
+            shutil.copy(os.path.join(cgPath, self._ngcRomFile), vhdlPath)
+            shutil.copy(os.path.join(cgPath, self._ngcRamFile), vhdlPath)
+            shutil.copy(os.path.join(cgPath, self._mifRomFile), vhdlPath)
+            shutil.copy(os.path.join(cgPath, self._mifRamFile), vhdlPath)
+            shutil.copy(os.path.join(cgPath, self._vhdRomFile), vhdlPath)
+            shutil.copy(os.path.join(cgPath, self._vhdRamFile), vhdlPath)
+            #shutil.rmtree(cgPath, ignore_errors=True)
         
         # Copy files to build directory
         if targetAltera:
-            shutil.move(self._mifFile, os.path.join(wrapperPath, self._mifFile))
-            shutil.move(self._mifDataFile, os.path.join(wrapperPath, self._mifDataFile))
+            shutil.move(self.id + ".mif", os.path.join(wrapperPath, self._mifRomFile))
+            shutil.move(self.id + "_data.mif", os.path.join(wrapperPath, self._mifRamFile))
         else:
-            os.remove(self._mifFile)
-            os.remove(self._mifDataFile)
+            os.remove(self.id + ".mif")
+            os.remove(self.id + "_data.mif")
         shutil.move("imem_mau_pkg.vhdl", vhdlPath)
         
         # Manage simulation files
@@ -248,10 +252,10 @@ class Processor:
         open(os.path.join(genPath, "cg_project.cgp"), "w").write(result)
         template = tempita.Template.from_filename(os.path.join(templatePath, "xco_dram.template"), namespace={}, encoding=None)
         result = template.substitute(path=genPath, id=self.id, width=self.dram.getWidth(), depth=self.dram.getDepth())
-        open(os.path.join(genPath, self._xoeDataFile), "w").write(result)
+        open(os.path.join(genPath, self._xoeRamFile), "w").write(result)
         template = tempita.Template.from_filename(os.path.join(templatePath, "xco_irom.template"), namespace={}, encoding=None)
         result = template.substitute(path=genPath, id=self.id, width=self.irom.getWidth(), depth=self.irom.getDepth())
-        open(os.path.join(genPath, self._xoeFile), "w").write(result)
+        open(os.path.join(genPath, self._xoeRomFile), "w").write(result)
 
     def diff(self, traceFile, genFile, port):
         f_trace = open(traceFile, 'r')

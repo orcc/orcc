@@ -16,7 +16,7 @@ vcom -93 -quiet -work work top.vhd
 vcom -93 -quiet -work work top_tb.vhd
 
 # Simulate
-vsim -novopt -L altera_mf work.tb_top -t ps -do "do wave.do;"
+vsim -novopt <if(options.targetAltera)>-L altera_mf <endif>work.tb_top -t ps -do "do wave.do;"
 
 >>
 
@@ -34,22 +34,26 @@ printInstance(instance, options) ::= <<
 vcom -93 -quiet -work work simulation/<instance.id>_tb.vhd
 
 # Simulate
-vsim -novopt -L altera_mf work.tb_<instance.id> -t ps -do "do simulation/wave.do;"
+vsim -novopt  <if(options.targetAltera)>-L altera_mf <endif>work.tb_<instance.id> -t ps -do "do simulation/wave.do;"
 >>
 
 initializeLibraries(callByNetwork) ::= <<
 # Remove old libraries
 vdel -all -lib work
-vdel -all -lib altera_mf
+<if(options.targetAltera)>vdel -all -lib altera_mf<endif>
 
 # Create Working library
 vlib work
 
+<if(options.targetAltera)>
 # Create and compile Altera library
 vlib altera_mf
 vmap altera_mf altera_mf
 vcom -quiet -opt=-clkOpt -work altera_mf -93 -explicit <if(!callByNetwork)>../<endif>simulation/altera_mf_components.vhd
 vcom -quiet -opt=-clkOpt -work altera_mf -93 -explicit <if(!callByNetwork)>../<endif>simulation/altera_mf.vhd
+<else>
+exec compxlib -s mti_se -l vhdl -arch virtex6 -lib unisim -lib xilinxcorelib &
+<endif>
 >>
 
 compileInstance(instance, callByNetwork) ::= <<
@@ -69,16 +73,30 @@ vcom -93 -quiet -work work <if(callByNetwork)><instance.id>/<endif>tta/gcu_ic/id
 vcom -93 -quiet -work work <if(callByNetwork)><instance.id>/<endif>tta/gcu_ic/ic.vhdl
 vcom -93 -quiet -work work <if(callByNetwork)><instance.id>/<endif>tta/gcu_ic/decoder.vhdl
 
-exec cp -f <if(!callByNetwork)>../<endif>wrapper/<instance.id>.mif . &
-exec cp -f <if(!callByNetwork)>../<endif>wrapper/<instance.id>_data.mif . &<
+<if(!options.targetAltera)>
+vcom -93 -quiet -work work <if(callByNetwork)><instance.id>/<endif>tta/vhdl/dram_<instance.id>.vhd
+vcom -93 -quiet -work work <if(callByNetwork)><instance.id>/<endif>tta/vhdl/irom_<instance.id>.vhd
+
+exec cp -f <if(callByNetwork)><instance.id>/<endif>tta/vhdl/dram_<instance.id>.mif . &
+exec cp -f <if(callByNetwork)><instance.id>/<endif>tta/vhdl/irom_<instance.id>.mif . &
+<else>
+exec cp -f <if(!callByNetwork)>../<endif>wrapper/ram_<instance.id>.mif . &
+exec cp -f <if(!callByNetwork)>../<endif>wrapper/rom_<instance.id>.mif . &
+<endif><
 endif>
 >>
 
 compileOtherComponents(callByNetwork) ::= <<
 # Compile other components
+<if(options.targetAltera)>
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/altera_fifo.vhd
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/altera_ram.vhd
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/altera_rom.vhd
+<else>
+vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/xilinx_fifo.vhd
+vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/fifo_br.vhd
+<endif>
+
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>simulation/sim_package.vhd
 >>
 

@@ -131,7 +131,7 @@ begin
     generic map(size          => {{dram_depth}},
                 width         => {{dram_width}},
                 widthu		  => {{dram_addr}},
-                init_file     => "{{id}}_data.mif",
+                init_file     => "dram_{{id}}.mif",
                 device_family => device_family)
     port map(clock   => clk,
              wren    => wren_wire,
@@ -144,7 +144,7 @@ begin
     generic map(size          => {{irom_depth}},
                 width         => {{irom_width}},
                 widthu		  => {{irom_addr}},
-                init_file     => "{{id}}.mif",
+                init_file     => "irom_{{id}}.mif",
                 device_family => device_family)
     port map(clock   => clk,
              address => imem_addr({{irom_addr-1}} downto 0),
