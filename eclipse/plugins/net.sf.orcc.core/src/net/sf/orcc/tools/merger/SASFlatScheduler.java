@@ -30,7 +30,8 @@
 package net.sf.orcc.tools.merger;
 
 import net.sf.dftools.graph.Vertex;
-import net.sf.orcc.df.DfVertex;
+import net.sf.dftools.graph.visit.TopologicalSorter;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 
 /**
@@ -52,15 +53,12 @@ public class SASFlatScheduler extends AbstractScheduler {
 
 		schedule.setIterationCount(1);
 
-		TopologicalSorter sort = new TopologicalSorter(network);
-
-		for (Vertex vertex : sort.topologicalSort()) {
-			DfVertex vert = (DfVertex) vertex;
-			if (vert.isInstance()) {
-				int rep = repetitions.get(vert);
+		for (Vertex vertex : new TopologicalSorter().visitGraph(network)) {
+			if (vertex instanceof Instance) {
+				int rep = repetitions.get(vertex);
 				Iterand iterand = null;
 				for (int i = 0; i < rep; i++) {
-					iterand = new Iterand(vert);
+					iterand = new Iterand(vertex);
 					schedule.add(iterand);
 				}
 			}

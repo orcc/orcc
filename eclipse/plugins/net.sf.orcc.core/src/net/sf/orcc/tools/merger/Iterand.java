@@ -29,7 +29,7 @@
 
 package net.sf.orcc.tools.merger;
 
-import net.sf.orcc.df.DfVertex;
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.df.Instance;
 
 /**
@@ -55,7 +55,7 @@ public class Iterand {
 		type = Type.SCHEDULE;
 	}
 
-	public Iterand(DfVertex vertex) {
+	public Iterand(Vertex vertex) {
 		contents = vertex;
 		type = Type.VERTEX;
 	}
@@ -64,8 +64,8 @@ public class Iterand {
 		return (Schedule) contents;
 	}
 
-	public DfVertex getVertex() {
-		return (DfVertex) contents;
+	public Vertex getVertex() {
+		return (Vertex) contents;
 	}
 
 	public boolean isSchedule() {

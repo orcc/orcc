@@ -35,7 +35,6 @@ import java.util.Map;
 import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.moc.CSDFMoC;
@@ -71,7 +70,7 @@ public abstract class AbstractScheduler implements IScheduler {
 	private void computeMemoryBound(Schedule schedule) {
 		for (Iterand iterand : schedule.getIterands()) {
 			if (iterand.isVertex()) {
-				DfVertex vertex = iterand.getVertex();
+				Vertex vertex = iterand.getVertex();
 				for (Edge edge : vertex.getIncoming()) {
 					Connection conn = (Connection) edge;
 					if (conn.getSource() instanceof Instance) {

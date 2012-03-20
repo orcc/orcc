@@ -40,6 +40,7 @@ import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.Graph;
 import net.sf.dftools.graph.Vertex;
 import net.sf.dftools.graph.visit.SccFinder;
+import net.sf.dftools.graph.visit.TopologicalSorter;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
@@ -195,8 +196,8 @@ public class StaticRegionDetector {
 		discovered = new HashSet<Vertex>();
 		finished = new HashSet<Vertex>();
 
-		List<Vertex> vertices = new TopologicalSorter(network)
-				.topologicalSort();
+		List<Vertex> vertices = new TopologicalSorter().visitGraph(network);
+		
 		for (Vertex vertex : vertices) {
 			DfVertex vert = (DfVertex) vertex;
 			if (vert.isInstance()) {
