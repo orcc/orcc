@@ -34,12 +34,9 @@ import java.util.List;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.ir.ExprVar;
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
-import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.TypeList;
@@ -48,7 +45,6 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.EcoreHelper;
 
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -86,29 +82,19 @@ public class UnaryListRemoval extends AbstractActorVisitor<Object> {
 					newTarget = load.getTarget().getVariable();
 
 					IrUtil.delete(load);
-				} else if (!oldTarget.getDefs().isEmpty()) {
-					// Second case: an output variable
-					InstStore store = EcoreHelper.getContainerOfType(oldTarget
-							.getDefs().get(0), InstStore.class);
-
-					Expression expr = store.getValue();
-					if (expr.isExprVar()) {
-						newTarget = ((ExprVar) expr).getUse().getVariable();
-						newTarget.setName("scalar_" + newTarget.getName());
-					} else {
-						newTarget = createScalarVariable(oldTarget, procedure);
-						InstAssign assign = IrFactory.eINSTANCE
-								.createInstAssign(newTarget, expr);
-						EList<Instruction> instructions = store.getBlock()
-								.getInstructions();
-						instructions.add(instructions.indexOf(store), assign);
-					}
-
-					IrUtil.delete(store);
 				} else {
-					// Third case: an input swallower
+					// Second case: an output variable or an input swallower
 					// i.e. an input variable which just consumes tokens
 					newTarget = createScalarVariable(oldTarget, procedure);
+					while (!oldTarget.getDefs().isEmpty()) {
+						InstStore store = EcoreHelper.getContainerOfType(
+								oldTarget.getDefs().get(0), InstStore.class);
+						InstAssign assign = IrFactory.eINSTANCE
+								.createInstAssign(newTarget, store.getValue());
+						EcoreUtil.replace(store, assign);
+						IrUtil.delete(store);
+					}
+
 				}
 				// Replace variable in pattern
 				pattern.setVariable(port, newTarget);
@@ -124,7 +110,6 @@ public class UnaryListRemoval extends AbstractActorVisitor<Object> {
 				((TypeList) listVar.getType()).getInnermostType(), "scalar_"
 						+ listVar.getName());
 		scalarVar.setAssignable(true);
-		scalarVar.setIndex(1);
 		return scalarVar;
 	}
 }
