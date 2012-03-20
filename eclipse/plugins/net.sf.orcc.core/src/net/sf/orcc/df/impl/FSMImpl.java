@@ -196,6 +196,21 @@ public class FSMImpl extends GraphImpl implements FSM {
 		return initialState;
 	}
 
+	@Override
+	public State getLastState() {
+		State last = null;
+		for (State state : getStates()) {
+			if (state.getOutgoing().isEmpty()) {
+				if (last != null) {
+					// "last" state already found, returns null
+					return null;
+				}
+				last = state;
+			}
+		}
+		return last;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated

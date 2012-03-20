@@ -66,6 +66,15 @@ public interface FSM extends Graph {
 	State getInitialState();
 
 	/**
+	 * Returns the last state of this FSM. The last state is the one state that
+	 * has no outgoing edges. If there are several such states, this method
+	 * returns <code>null</code>.
+	 * 
+	 * @return the last state of this FSM
+	 */
+	State getLastState();
+
+	/**
 	 * Returns the list of states sorted by alphabetical order.
 	 * 
 	 * @return the list of states sorted by alphabetical order
