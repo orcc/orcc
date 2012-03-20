@@ -191,7 +191,7 @@ public class LLVMTemplateData {
 			FSM fsm = actor.getFsm();
 			actionScheduler.put(fsm, id++);
 			actionScheduler.put(fsm.getStates(), id++);
-			actionScheduler.put(fsm.getTransitions(), id++);
+			actionScheduler.put(fsm.getTransitions().getClass(), id++);
 
 			for (State state : fsm.getStates()) {
 				actionScheduler.put(state, id++);

@@ -120,7 +120,7 @@ State_decl_MD(actor) ::= <<
 >>
 
 Transitions_decl_MD(actor) ::= <<
-!<actor.templateData.actionScheduler.(actor.fsm.transitions)>
+!<actor.templateData.actionScheduler.(actor.fsm.transitions.class)>
 >>
 
 Transition_decl_MD(actor, state) ::= <<
