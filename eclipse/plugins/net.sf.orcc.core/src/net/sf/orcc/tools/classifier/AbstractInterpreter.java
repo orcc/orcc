@@ -36,7 +36,9 @@ import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstPhi;
+import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Type;
@@ -63,6 +65,8 @@ public class AbstractInterpreter extends ActorInterpreter {
 
 	private Copier copier;
 
+	private Action executedAction;
+
 	private Map<Action, Action> originalActions;
 
 	private Actor originalActor;
@@ -70,8 +74,6 @@ public class AbstractInterpreter extends ActorInterpreter {
 	private Map<String, Boolean> portRead;
 
 	private boolean schedulableMode;
-
-	private Action executedAction;
 
 	/**
 	 * Creates a new abstract interpreter.
@@ -94,7 +96,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 		}
 		// also save initialize action
 		for (Action action : originalActor.getInitializes()) {
-				originalActions.put((Action) copier.get(action), action);
+			originalActions.put((Action) copier.get(action), action);
 		}
 
 		setActor(copyOfActor);
@@ -106,11 +108,35 @@ public class AbstractInterpreter extends ActorInterpreter {
 	}
 
 	@Override
+	public Object caseInstLoad(InstLoad instr) {
+		try {
+			return super.caseInstLoad(instr);
+		} catch (OrccRuntimeException e) {
+			if (schedulableMode) {
+				throw e;
+			}
+			return null;
+		}
+	}
+
+	@Override
 	public Object caseInstPhi(InstPhi phi) {
 		if (branch != -1) {
 			return super.caseInstPhi(phi);
 		}
 		return null;
+	}
+
+	@Override
+	public Object caseInstStore(InstStore instr) {
+		try {
+			return super.caseInstStore(instr);
+		} catch (OrccRuntimeException e) {
+			if (schedulableMode) {
+				throw e;
+			}
+			return null;
+		}
 	}
 
 	@Override
