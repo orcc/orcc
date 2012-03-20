@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2011, IETR/INSA of Rennes
+ * Copyright (c) 2012, Synflow
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,8 +29,6 @@
  */
 package net.sf.orcc.df.util;
 
-import static net.sf.orcc.df.DfPackage.eINSTANCE;
-
 import java.util.List;
 
 import net.sf.dftools.graph.Graph;
@@ -37,55 +36,73 @@ import net.sf.dftools.graph.Vertex;
 import net.sf.dftools.graph.util.GraphAdapter;
 
 import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.ecore.EReference;
 
 /**
- * This class defines an adapter for a network that automatically adds an
- * entity/instance/port to the vertices list when it is added to a containment
- * list, and automatically removes an entity/instance/port from the vertices
- * list when it is removed from its containment list.
+ * This class defines an adapter for a network that automatically adds a vertex
+ * to the vertices list when it is added to a containment list, and
+ * automatically removes a vertex from the vertices list when it is removed from
+ * its containment list. The list of containment features are specified when
+ * creating the adapter.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class NetworkAdapter extends GraphAdapter {
+public class GraphContainmentAdapter extends GraphAdapter {
+
+	private EReference[] references;
+
+	/**
+	 * Creates a new graph containment adapter.
+	 * 
+	 * @param references
+	 *            containment references
+	 */
+	public GraphContainmentAdapter(EReference... references) {
+		this.references = references;
+	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void notifyChanged(Notification msg) {
 		Object feature = msg.getFeature();
-		if (feature == eINSTANCE.getEntity_Inputs()
-				|| feature == eINSTANCE.getEntity_Outputs()
-				|| feature == eINSTANCE.getNetwork_Entities()
-				|| feature == eINSTANCE.getNetwork_Instances()) {
-			switch (msg.getEventType()) {
-			case Notification.ADD: {
-				Vertex vertex = (Vertex) msg.getNewValue();
-				((Graph) target).getVertices().add(vertex);
+		for (EReference reference : references) {
+			if (feature == reference) {
+				updateGraph(msg);
 				return;
-			}
-
-			case Notification.ADD_MANY: {
-				List<Vertex> vertices = (List<Vertex>) msg.getNewValue();
-				((Graph) target).getVertices().addAll(vertices);
-				return;
-			}
-
-			case Notification.REMOVE_MANY: {
-				List<Vertex> vertices = (List<Vertex>) msg.getOldValue();
-				((Graph) target).getVertices().removeAll(vertices);
-				return;
-			}
-
-			case Notification.REMOVE: {
-				Vertex vertex = (Vertex) msg.getOldValue();
-				((Graph) target).getVertices().remove(vertex);
-				return;
-			}
 			}
 		}
 
 		// delegates to super if not applicable here
 		super.notifyChanged(msg);
+	}
+
+	@SuppressWarnings("unchecked")
+	private void updateGraph(Notification msg) {
+		switch (msg.getEventType()) {
+		case Notification.ADD: {
+			Vertex vertex = (Vertex) msg.getNewValue();
+			((Graph) target).getVertices().add(vertex);
+			break;
+		}
+
+		case Notification.ADD_MANY: {
+			List<Vertex> vertices = (List<Vertex>) msg.getNewValue();
+			((Graph) target).getVertices().addAll(vertices);
+			break;
+		}
+
+		case Notification.REMOVE_MANY: {
+			List<Vertex> vertices = (List<Vertex>) msg.getOldValue();
+			((Graph) target).getVertices().removeAll(vertices);
+			break;
+		}
+
+		case Notification.REMOVE: {
+			Vertex vertex = (Vertex) msg.getOldValue();
+			((Graph) target).getVertices().remove(vertex);
+			break;
+		}
+		}
 	}
 
 }
