@@ -19,6 +19,7 @@ import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Transition;
+import net.sf.orcc.df.util.DfAdapterFactory;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -65,10 +66,12 @@ public class FSMImpl extends GraphImpl implements FSM {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 */
 	protected FSMImpl() {
 		super();
+
+		// add adapter
+		eAdapters().add(new DfAdapterFactory().createFSMAdapter());
 	}
 
 	@Override
