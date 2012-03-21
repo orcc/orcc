@@ -45,6 +45,22 @@ import org.eclipse.emf.common.util.EList;
 public interface FSM extends Graph {
 
 	/**
+	 * Adds the given state to the list of states of this FSM.
+	 * 
+	 * @param state
+	 *            a state
+	 */
+	void add(State state);
+
+	/**
+	 * Adds the given states to the list of states of this FSM.
+	 * 
+	 * @param states
+	 *            a list of states
+	 */
+	void addStates(List<State> states);
+
+	/**
 	 * Adds a transition between two states with the given action.
 	 * 
 	 * @param source
@@ -94,6 +110,33 @@ public interface FSM extends Graph {
 	EList<Transition> getTransitions();
 
 	/**
+	 * Removes the given state from the list of states, and removes all its
+	 * incoming and outgoing transitions.
+	 * 
+	 * @param state
+	 *            a state
+	 */
+	void remove(State state);
+
+	/**
+	 * Removes the given transition from the list of transitions and unlinks it
+	 * (set its source and target attributes to <code>null</code>).
+	 * 
+	 * @param transition
+	 *            a transition
+	 */
+	void remove(Transition transition);
+
+	/**
+	 * Removes all given states from the list of states, and unlinks them (clear
+	 * their incoming and outgoing attributes).
+	 * 
+	 * @param states
+	 *            a list of states
+	 */
+	void removeStates(List<State> states);
+
+	/**
 	 * Removes the transition from the given <code>source</code> state that is
 	 * associated with the given action.
 	 * 
@@ -103,6 +146,15 @@ public interface FSM extends Graph {
 	 *            action associated with the transition
 	 */
 	void removeTransition(State source, Action action);
+
+	/**
+	 * Removes all given transitions from the list of transitions, and unlinks
+	 * them (set their source and target attributes to <code>null</code>).
+	 * 
+	 * @param transitions
+	 *            a list of transitions
+	 */
+	void removeTransitions(List<Transition> transitions);
 
 	/**
 	 * Replaces the target of the transition from the <code>source</code> state

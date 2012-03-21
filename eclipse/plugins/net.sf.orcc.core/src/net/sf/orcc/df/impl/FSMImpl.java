@@ -72,6 +72,18 @@ public class FSMImpl extends GraphImpl implements FSM {
 	}
 
 	@Override
+	public void add(State state) {
+		getStates().add(state);
+		getVertices().add(state);
+	}
+
+	@Override
+	public void addStates(List<State> states) {
+		getStates().addAll(states);
+		getVertices().addAll(states);
+	}
+
+	@Override
 	public Transition addTransition(State source, Action action, State target) {
 		Transition transition = DfFactory.eINSTANCE.createTransition(source,
 				action, target);
@@ -225,6 +237,29 @@ public class FSMImpl extends GraphImpl implements FSM {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
+	public void remove(State state) {
+		removeTransitions((List<Transition>) (List<?>) state.getIncoming());
+		removeTransitions((List<Transition>) (List<?>) state.getOutgoing());
+		getVertices().remove(state);
+		getStates().remove(state);
+	}
+
+	@Override
+	public void remove(Transition transition) {
+		transition.setSource(null);
+		transition.setTarget(null);
+		getTransitions().remove(transition);
+	}
+
+	@Override
+	public void removeStates(List<State> states) {
+		for (State state : states) {
+			remove(state);
+		}
+	}
+
+	@Override
 	public void removeTransition(State source, Action action) {
 		Iterator<Edge> it = source.getOutgoing().iterator();
 		while (it.hasNext()) {
@@ -235,6 +270,15 @@ public class FSMImpl extends GraphImpl implements FSM {
 				return;
 			}
 		}
+	}
+
+	@Override
+	public void removeTransitions(List<Transition> transitions) {
+		for (Transition transition : transitions) {
+			transition.setSource(null);
+			transition.setTarget(null);
+		}
+		getTransitions().removeAll(transitions);
 	}
 
 	@Override
