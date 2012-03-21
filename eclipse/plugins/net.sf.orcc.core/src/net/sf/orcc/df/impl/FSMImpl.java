@@ -239,8 +239,11 @@ public class FSMImpl extends GraphImpl implements FSM {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void remove(State state) {
-		removeTransitions((List<Transition>) (List<?>) state.getIncoming());
-		removeTransitions((List<Transition>) (List<?>) state.getOutgoing());
+		List<?> incoming = new ArrayList<Edge>(state.getIncoming());
+		removeTransitions((List<Transition>) incoming);
+		List<?> outgoing = new ArrayList<Edge>(state.getOutgoing());
+		removeTransitions((List<Transition>) outgoing);
+
 		getVertices().remove(state);
 		getStates().remove(state);
 	}
