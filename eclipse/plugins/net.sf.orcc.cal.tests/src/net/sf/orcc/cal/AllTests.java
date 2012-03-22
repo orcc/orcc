@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.Assert;
-import net.sf.dftools.util.Nameable;
 import net.sf.orcc.OrccProjectNature;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.Variable;
@@ -29,6 +28,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jdt.core.JavaCore;
@@ -83,7 +83,7 @@ public class AllTests extends AbstractXtextTests {
 	 *            name of a .cal file that contains an entity
 	 */
 	private void assertExecution(String expected, String name) {
-		Nameable entity = generateCode(name);
+		EObject entity = generateCode(name);
 		Assert.assertNotNull("expected parsing, validation, and code "
 				+ "generation to be correct for " + name, entity);
 
@@ -105,7 +105,7 @@ public class AllTests extends AbstractXtextTests {
 	 * @return an IR entity if the file could be parsed, validated, and
 	 *         translated to IR, otherwise <code>null</code>
 	 */
-	private Nameable generateCode(String name) {
+	private EObject generateCode(String name) {
 		AstEntity entity = parseAndValidate(name);
 		if (entity == null) {
 			return null;

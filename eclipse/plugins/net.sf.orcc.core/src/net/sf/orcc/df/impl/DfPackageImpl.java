@@ -218,8 +218,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		isInited = true;
 
 		// Initialize simple dependencies
-		GraphPackage.eINSTANCE.eClass();
 		UtilPackage.eINSTANCE.eClass();
+		GraphPackage.eINSTANCE.eClass();
 
 		// Obtain or create and register interdependencies
 		IrPackageImpl theIrPackage = (IrPackageImpl) (EPackage.Registry.INSTANCE
@@ -253,6 +253,15 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 */
 	public EClass getDfVertex() {
 		return dfVertexEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getDfVertex_Name() {
+		return (EAttribute) dfVertexEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -848,6 +857,15 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getUnit_Name() {
+		return (EAttribute) unitEClass.getEStructuralFeatures().get(4);
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -875,12 +893,14 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 
 		// Create classes and their features
 		dfVertexEClass = createEClass(DF_VERTEX);
+		createEAttribute(dfVertexEClass, DF_VERTEX__NAME);
 
 		unitEClass = createEClass(UNIT);
 		createEReference(unitEClass, UNIT__CONSTANTS);
 		createEReference(unitEClass, UNIT__PROCEDURES);
 		createEAttribute(unitEClass, UNIT__FILE_NAME);
 		createEAttribute(unitEClass, UNIT__LINE_NUMBER);
+		createEAttribute(unitEClass, UNIT__NAME);
 
 		portEClass = createEClass(PORT);
 		createEAttribute(portEClass, PORT__NUM_TOKENS_CONSUMED);
@@ -997,12 +1017,12 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		// Obtain other dependent packages
 		GraphPackage theGraphPackage = (GraphPackage) EPackage.Registry.INSTANCE
 				.getEPackage(GraphPackage.eNS_URI);
-		UtilPackage theUtilPackage = (UtilPackage) EPackage.Registry.INSTANCE
-				.getEPackage(UtilPackage.eNS_URI);
 		IrPackage theIrPackage = (IrPackage) EPackage.Registry.INSTANCE
 				.getEPackage(IrPackage.eNS_URI);
 		MocPackage theMocPackage = (MocPackage) EPackage.Registry.INSTANCE
 				.getEPackage(MocPackage.eNS_URI);
+		UtilPackage theUtilPackage = (UtilPackage) EPackage.Registry.INSTANCE
+				.getEPackage(UtilPackage.eNS_URI);
 		EcorePackage theEcorePackage = (EcorePackage) EPackage.Registry.INSTANCE
 				.getEPackage(EcorePackage.eNS_URI);
 
@@ -1012,8 +1032,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 
 		// Add supertypes to classes
 		dfVertexEClass.getESuperTypes().add(theGraphPackage.getVertex());
-		dfVertexEClass.getESuperTypes().add(theUtilPackage.getNameable());
-		unitEClass.getESuperTypes().add(theUtilPackage.getNameable());
 		portEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		instanceEClass.getESuperTypes().add(this.getDfVertex());
 		entityEClass.getESuperTypes().add(this.getDfVertex());
@@ -1031,6 +1049,10 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		// Initialize classes and features; add operations and parameters
 		initEClass(dfVertexEClass, DfVertex.class, "DfVertex", IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getDfVertex_Name(), ecorePackage.getEString(), "name",
+				null, 0, 1, DfVertex.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
 
 		initEClass(unitEClass, Unit.class, "Unit", !IS_ABSTRACT, !IS_INTERFACE,
 				IS_GENERATED_INSTANCE_CLASS);
@@ -1050,6 +1072,9 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				"lineNumber", null, 0, 1, Unit.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
+		initEAttribute(getUnit_Name(), ecorePackage.getEString(), "name", null,
+				0, 1, Unit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(portEClass, Port.class, "Port", !IS_ABSTRACT, !IS_INTERFACE,
 				IS_GENERATED_INSTANCE_CLASS);

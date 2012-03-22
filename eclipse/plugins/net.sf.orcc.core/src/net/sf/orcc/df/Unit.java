@@ -28,20 +28,22 @@
  */
 package net.sf.orcc.df;
 
-import net.sf.dftools.util.Nameable;
+import java.util.List;
+
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines a unit.
  * 
  * @author Matthieu Wipliez
- * @model extends="Entity"
+ * @model
  */
-public interface Unit extends Nameable {
+public interface Unit extends EObject {
 
 	/**
 	 * Returns the constant with the given name.
@@ -84,6 +86,18 @@ public interface Unit extends Nameable {
 	int getLineNumber();
 
 	/**
+	 * Returns the qualified name of this unit.
+	 * 
+	 * @return the qualified name of this unit
+	 * @model
+	 */
+	String getName();
+
+	String getPackage();
+
+	List<String> getPackageAsList();
+
+	/**
 	 * Returns a procedure of this unit whose name matches the given name.
 	 * 
 	 * @param name
@@ -99,6 +113,8 @@ public interface Unit extends Nameable {
 	 * @model containment="true"
 	 */
 	EList<Procedure> getProcedures();
+
+	String getSimpleName();
 
 	/**
 	 * Returns an object with template-specific data.
@@ -122,6 +138,14 @@ public interface Unit extends Nameable {
 	 *            the line number on which this unit starts
 	 */
 	void setLineNumber(int newLineNumber);
+
+	/**
+	 * Sets the qualified name of this unit.
+	 * 
+	 * @param name
+	 *            the qualified name of this unit
+	 */
+	void setName(String name);
 
 	/**
 	 * Sets the template data associated with this vertex. Template data should

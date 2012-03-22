@@ -31,7 +31,6 @@ package net.sf.orcc.simulators;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import net.sf.dftools.util.Nameable;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
@@ -49,8 +48,11 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.ActorInterpreter;
 import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.runtime.SimulatorFifo;
+import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.WriteListener;
+
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines an actor that can be interpreted by calling
@@ -100,11 +102,15 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		try {
 			// get packageName and containerName for calling the correct native
 			// function
-			Nameable entity = (Nameable) procedure.eContainer();
-			String packageName = entity.getPackage() + ".impl";
-			String containerName = entity.getSimpleName();
+			EObject entity = procedure.eContainer();
+			String name = EcoreHelper.getFeature(entity, "name");
+			int index = name.lastIndexOf('.');
+			if (index != -1) {
+				name = name.substring(0, index) + ".impl"
+						+ name.substring(index);
+			}
 
-			Class<?> clasz = Class.forName(packageName + "." + containerName);
+			Class<?> clasz = Class.forName(name);
 			Method method = clasz
 					.getMethod(procedure.getName(), parameterTypes);
 			return method.invoke(null, args);

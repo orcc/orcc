@@ -12,7 +12,6 @@ import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.Graph;
 import net.sf.dftools.graph.Vertex;
 import net.sf.dftools.util.Attributable;
-import net.sf.dftools.util.Nameable;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
@@ -100,8 +99,6 @@ public class DfSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseVertex(dfVertex);
 			if (result == null)
-				result = caseNameable(dfVertex);
-			if (result == null)
 				result = caseAttributable(dfVertex);
 			if (result == null)
 				result = defaultCase(theEObject);
@@ -110,8 +107,6 @@ public class DfSwitch<T> extends Switch<T> {
 		case DfPackage.UNIT: {
 			Unit unit = (Unit) theEObject;
 			T result = caseUnit(unit);
-			if (result == null)
-				result = caseNameable(unit);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -135,8 +130,6 @@ public class DfSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseVertex(instance);
 			if (result == null)
-				result = caseNameable(instance);
-			if (result == null)
 				result = caseAttributable(instance);
 			if (result == null)
 				result = defaultCase(theEObject);
@@ -149,8 +142,6 @@ public class DfSwitch<T> extends Switch<T> {
 				result = caseDfVertex(entity);
 			if (result == null)
 				result = caseVertex(entity);
-			if (result == null)
-				result = caseNameable(entity);
 			if (result == null)
 				result = caseAttributable(entity);
 			if (result == null)
@@ -167,8 +158,6 @@ public class DfSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseVertex(entitySpecific);
 			if (result == null)
-				result = caseNameable(entitySpecific);
-			if (result == null)
 				result = caseAttributable(entitySpecific);
 			if (result == null)
 				result = defaultCase(theEObject);
@@ -183,8 +172,6 @@ public class DfSwitch<T> extends Switch<T> {
 				result = caseDfVertex(actor);
 			if (result == null)
 				result = caseVertex(actor);
-			if (result == null)
-				result = caseNameable(actor);
 			if (result == null)
 				result = caseAttributable(actor);
 			if (result == null)
@@ -203,8 +190,6 @@ public class DfSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseVertex(network);
 			if (result == null)
-				result = caseNameable(network);
-			if (result == null)
 				result = caseAttributable(network);
 			if (result == null)
 				result = defaultCase(theEObject);
@@ -219,8 +204,6 @@ public class DfSwitch<T> extends Switch<T> {
 				result = caseDfVertex(broadcast);
 			if (result == null)
 				result = caseVertex(broadcast);
-			if (result == null)
-				result = caseNameable(broadcast);
 			if (result == null)
 				result = caseAttributable(broadcast);
 			if (result == null)
@@ -685,21 +668,6 @@ public class DfSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseUnit(Unit object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Nameable</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Nameable</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseNameable(Nameable object) {
 		return null;
 	}
 

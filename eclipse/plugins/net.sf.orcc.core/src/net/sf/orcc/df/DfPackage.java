@@ -281,21 +281,12 @@ public interface DfPackage extends EPackage {
 	int UNIT = 1;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int UNIT__NAME = UtilPackage.NAMEABLE__NAME;
-
-	/**
 	 * The feature id for the '<em><b>Constants</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int UNIT__CONSTANTS = UtilPackage.NAMEABLE_FEATURE_COUNT + 0;
+	int UNIT__CONSTANTS = 0;
 
 	/**
 	 * The feature id for the '<em><b>Procedures</b></em>' containment reference list.
@@ -303,7 +294,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int UNIT__PROCEDURES = UtilPackage.NAMEABLE_FEATURE_COUNT + 1;
+	int UNIT__PROCEDURES = 1;
 
 	/**
 	 * The feature id for the '<em><b>File Name</b></em>' attribute. <!--
@@ -312,7 +303,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int UNIT__FILE_NAME = UtilPackage.NAMEABLE_FEATURE_COUNT + 2;
+	int UNIT__FILE_NAME = 2;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute. <!--
@@ -321,7 +312,16 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int UNIT__LINE_NUMBER = UtilPackage.NAMEABLE_FEATURE_COUNT + 3;
+	int UNIT__LINE_NUMBER = 3;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int UNIT__NAME = 4;
 
 	/**
 	 * The number of structural features of the '<em>Unit</em>' class. <!--
@@ -330,7 +330,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int UNIT_FEATURE_COUNT = UtilPackage.NAMEABLE_FEATURE_COUNT + 4;
+	int UNIT_FEATURE_COUNT = 5;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -1410,6 +1410,17 @@ public interface DfPackage extends EPackage {
 	EClass getDfVertex();
 
 	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.DfVertex#getName <em>Name</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Name</em>'.
+	 * @see net.sf.orcc.df.DfVertex#getName()
+	 * @see #getDfVertex()
+	 * @generated
+	 */
+	EAttribute getDfVertex_Name();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Network <em>Network</em>}'.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Network</em>'.
@@ -2225,6 +2236,17 @@ public interface DfPackage extends EPackage {
 	EAttribute getUnit_LineNumber();
 
 	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.Unit#getName <em>Name</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Name</em>'.
+	 * @see net.sf.orcc.df.Unit#getName()
+	 * @see #getUnit()
+	 * @generated
+	 */
+	EAttribute getUnit_Name();
+
+	/**
 	 * Returns the factory that creates the instances of the model. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -2256,6 +2278,14 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EClass DF_VERTEX = eINSTANCE.getDfVertex();
+
+		/**
+		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute DF_VERTEX__NAME = eINSTANCE.getDfVertex_Name();
 
 		/**
 		 * The meta object literal for the '
@@ -2854,6 +2884,14 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute UNIT__LINE_NUMBER = eINSTANCE.getUnit_LineNumber();
+
+		/**
+		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute UNIT__NAME = eINSTANCE.getUnit_Name();
 
 	}
 

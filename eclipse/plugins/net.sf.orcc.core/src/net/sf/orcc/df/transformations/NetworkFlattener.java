@@ -33,10 +33,10 @@ import java.util.List;
 
 import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.Vertex;
-import net.sf.dftools.util.Nameable;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Entity;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfSwitch;
@@ -152,11 +152,11 @@ public class NetworkFlattener extends DfSwitch<Void> {
 
 	private void moveEntitiesAndConnections(Network network, Network subNetwork) {
 		// Rename subNetwork entities
-		for (Nameable nameable : subNetwork.getEntities()) {
-			nameable.setName(subNetwork.getName() + "_" + nameable.getName());
+		for (Entity entity : subNetwork.getEntities()) {
+			entity.setName(subNetwork.getName() + "_" + entity.getName());
 		}
-		for (Nameable nameable : subNetwork.getInstances()) {
-			nameable.setName(subNetwork.getName() + "_" + nameable.getName());
+		for (Instance instance : subNetwork.getInstances()) {
+			instance.setName(subNetwork.getName() + "_" + instance.getName());
 		}
 
 		// move entities in this network

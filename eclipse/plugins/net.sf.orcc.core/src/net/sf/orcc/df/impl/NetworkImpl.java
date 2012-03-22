@@ -80,15 +80,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  */
 public class NetworkImpl extends EntityImpl implements Network {
 	/**
-	 * The default value of the '{@link #getFileName() <em>File Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getFileName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String FILE_NAME_EDEFAULT = null;
-
-	/**
 	 * The cached value of the '{@link #getEdges() <em>Edges</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getEdges()
@@ -98,31 +89,13 @@ public class NetworkImpl extends EntityImpl implements Network {
 	protected EList<Edge> edges;
 
 	/**
-	 * The cached value of the '{@link #getEntities() <em>Entities</em>}' containment reference list.
+	 * The cached value of the '{@link #getVertices() <em>Vertices</em>}' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getEntities()
+	 * @see #getVertices()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Entity> entities;
-
-	/**
-	 * The cached value of the '{@link #getFileName() <em>File Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getFileName()
-	 * @generated
-	 * @ordered
-	 */
-	protected String fileName = FILE_NAME_EDEFAULT;
-
-	/**
-	 * The cached value of the '{@link #getInstances() <em>Instances</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getInstances()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Instance> instances;
+	protected EList<Vertex> vertices;
 
 	/**
 	 * The cached value of the '{@link #getMoC() <em>Mo C</em>}' containment reference.
@@ -139,13 +112,40 @@ public class NetworkImpl extends EntityImpl implements Network {
 	protected EList<Var> variables;
 
 	/**
-	 * The cached value of the '{@link #getVertices() <em>Vertices</em>}' reference list.
+	 * The cached value of the '{@link #getInstances() <em>Instances</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getVertices()
+	 * @see #getInstances()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Vertex> vertices;
+	protected EList<Instance> instances;
+
+	/**
+	 * The default value of the '{@link #getFileName() <em>File Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getFileName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String FILE_NAME_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getFileName() <em>File Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getFileName()
+	 * @generated
+	 * @ordered
+	 */
+	protected String fileName = FILE_NAME_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getEntities() <em>Entities</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getEntities()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Entity> entities;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->

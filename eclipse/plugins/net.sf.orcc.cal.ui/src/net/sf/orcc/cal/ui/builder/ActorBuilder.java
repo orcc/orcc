@@ -33,7 +33,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.dftools.util.Nameable;
 import net.sf.orcc.OrccProjectNature;
 import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstEntity;
@@ -104,7 +103,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		}
 
 		// store result of build
-		List<Nameable> entities = new ArrayList<Nameable>();
+		List<EObject> entities = new ArrayList<EObject>();
 		Set<IResourceDescription> builtDescs = new HashSet<IResourceDescription>();
 
 		// build actors/units
@@ -115,7 +114,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 				IResourceDescription desc = delta.getNew();
 				monitor.subTask(desc.getURI().lastSegment());
 				builtDescs.add(desc);
-				Nameable entity = build(set, desc);
+				EObject entity = build(set, desc);
 				if (entity != null) {
 					entities.add(entity);
 				}
@@ -141,7 +140,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		monitor.done();
 	}
 
-	private Nameable build(ResourceSet set, IResourceDescription desc)
+	private EObject build(ResourceSet set, IResourceDescription desc)
 			throws CoreException {
 		// load resource and compile
 		Resource resource = set.getResource(desc.getURI(), true);
@@ -162,12 +161,13 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 
 	private void buildDependentEntities(IProgressMonitor monitor,
 			ResourceSet set, Set<IResourceDescription> builtDescs,
-			List<Nameable> entities) throws CoreException {
+			List<EObject> entities) throws CoreException {
 		IResourceDescriptions descs = provider.createResourceDescriptions();
 
 		Set<IResourceDescription> dependentDescs = new HashSet<IResourceDescription>();
-		for (Nameable entity : entities) {
-			String entityName = entity.getName().toLowerCase();
+		for (EObject entity : entities) {
+			String entityName = EcoreHelper.getFeature(entity, "name");
+			entityName = entityName.toLowerCase();
 			for (IResourceDescription desc : descs.getAllResourceDescriptions()) {
 				try {
 					for (QualifiedName name : desc.getImportedNames()) {

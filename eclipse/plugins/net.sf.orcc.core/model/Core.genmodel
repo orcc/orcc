@@ -3,16 +3,19 @@
     xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/net.sf.orcc.core/src" modelPluginID="net.sf.orcc.core"
     templateDirectory="/net.sf.dftools.models/templates" dynamicTemplates="true" redirection=""
     modelName="Core" rootImplementsInterface="" codeFormatting="true" importerID="org.eclipse.emf.importer.java"
-    complianceLevel="6.0" copyrightFields="false" usedGenPackages="../../net.sf.dftools.models/model/Graph.genmodel#//graph ../../net.sf.dftools.models/model/Graph.genmodel#//util platform:/plugin/org.eclipse.emf.ecore/model/Ecore.genmodel#//ecore">
+    complianceLevel="6.0" copyrightFields="false" usedGenPackages="../../net.sf.dftools.models/model/Graph.genmodel#//util platform:/plugin/org.eclipse.emf.ecore/model/Ecore.genmodel#//ecore ../../net.sf.dftools.models/model/Graph.genmodel#//graph">
   <foreignModel>@model</foreignModel>
   <genPackages prefix="Df" basePackage="net.sf.orcc" disposableProviderFactory="true"
       ecorePackage="Df.ecore#/">
-    <genClasses image="false" ecoreClass="Df.ecore#//DfVertex"/>
+    <genClasses image="false" ecoreClass="Df.ecore#//DfVertex">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//DfVertex/name"/>
+    </genClasses>
     <genClasses ecoreClass="Df.ecore#//Unit">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Unit/constants"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Unit/procedures"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Unit/fileName"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Unit/lineNumber"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Unit/name"/>
     </genClasses>
     <genClasses ecoreClass="Df.ecore#//Port">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Port/numTokensConsumed"/>
@@ -282,6 +285,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MoC.ecore#//CSDFMoC/numberOfPhases"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference MoC.ecore#//CSDFMoC/outputPattern"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MoC.ecore#//CSDFMoC/invocations"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MoC.ecore#//CSDFMoC/delayPattern"/>
     </genClasses>
     <genClasses ecoreClass="MoC.ecore#//DPNMoC"/>
     <genClasses ecoreClass="MoC.ecore#//KPNMoC"/>

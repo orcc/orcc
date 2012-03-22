@@ -13,18 +13,16 @@ import java.util.Map;
 
 import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.impl.VertexImpl;
-import net.sf.dftools.util.Nameable;
-import net.sf.dftools.util.UtilPackage;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.DfVertex;
-import org.eclipse.emf.common.notify.Notification;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Port;
 
+import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
 /**
  * <!-- begin-user-doc -->
@@ -71,42 +69,6 @@ public abstract class DfVertexImpl extends VertexImpl implements DfVertex {
 	 */
 	protected DfVertexImpl() {
 		super();
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public int eBaseStructuralFeatureID(int derivedFeatureID, Class<?> baseClass) {
-		if (baseClass == Nameable.class) {
-			switch (derivedFeatureID) {
-			case DfPackage.DF_VERTEX__NAME:
-				return UtilPackage.NAMEABLE__NAME;
-			default:
-				return -1;
-			}
-		}
-		return super.eBaseStructuralFeatureID(derivedFeatureID, baseClass);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public int eDerivedStructuralFeatureID(int baseFeatureID, Class<?> baseClass) {
-		if (baseClass == Nameable.class) {
-			switch (baseFeatureID) {
-			case UtilPackage.NAMEABLE__NAME:
-				return DfPackage.DF_VERTEX__NAME;
-			default:
-				return -1;
-			}
-		}
-		return super.eDerivedStructuralFeatureID(baseFeatureID, baseClass);
 	}
 
 	/**

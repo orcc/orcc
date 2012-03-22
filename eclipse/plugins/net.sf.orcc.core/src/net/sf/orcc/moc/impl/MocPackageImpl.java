@@ -126,8 +126,8 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 		isInited = true;
 
 		// Initialize simple dependencies
-		GraphPackage.eINSTANCE.eClass();
 		UtilPackage.eINSTANCE.eClass();
+		GraphPackage.eINSTANCE.eClass();
 
 		// Obtain or create and register interdependencies
 		DfPackageImpl theDfPackage = (DfPackageImpl) (EPackage.Registry.INSTANCE

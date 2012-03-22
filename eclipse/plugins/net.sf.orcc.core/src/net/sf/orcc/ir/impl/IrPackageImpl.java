@@ -411,8 +411,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		isInited = true;
 
 		// Initialize simple dependencies
-		GraphPackage.eINSTANCE.eClass();
 		UtilPackage.eINSTANCE.eClass();
+		GraphPackage.eINSTANCE.eClass();
 
 		// Obtain or create and register interdependencies
 		DfPackageImpl theDfPackage = (DfPackageImpl) (EPackage.Registry.INSTANCE

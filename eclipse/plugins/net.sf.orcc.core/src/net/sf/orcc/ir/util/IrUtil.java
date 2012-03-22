@@ -33,7 +33,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.dftools.util.Nameable;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
@@ -331,7 +330,7 @@ public class IrUtil {
 	 * @return <code>true</code> if the serialization succeeded
 	 */
 	public static boolean serializeActor(ResourceSet set, IFolder outputFolder,
-			Nameable entity) {
+			EObject entity) {
 		try {
 			OrccUtil.createFolder(outputFolder);
 		} catch (CoreException e) {
@@ -339,8 +338,10 @@ public class IrUtil {
 		}
 
 		URI uri = URI.createPlatformResourceURI(
-				outputFolder.getFullPath()
-						.append(OrccUtil.getFile(entity.getName()))
+				outputFolder
+						.getFullPath()
+						.append(OrccUtil.getFile((String) EcoreHelper
+								.getFeature(entity, "name")))
 						.addFileExtension("ir").toString(), true);
 		return serializeActor(set, uri, entity);
 	}
@@ -355,9 +356,11 @@ public class IrUtil {
 	 * @return <code>true</code> if the serialization succeeded
 	 */
 	public static boolean serializeActor(ResourceSet set, String outputFolder,
-			Nameable entity) {
-		String pathName = outputFolder + File.separator
-				+ OrccUtil.getFile(entity.getName()) + ".ir";
+			EObject entity) {
+		String pathName = outputFolder
+				+ File.separator
+				+ OrccUtil.getFile((String) EcoreHelper.getFeature(entity,
+						"name")) + ".ir";
 		URI uri = URI.createFileURI(pathName);
 		return serializeActor(set, uri, entity);
 	}
@@ -372,7 +375,7 @@ public class IrUtil {
 	 * @return <code>true</code> if the serialization succeeded
 	 */
 	private static boolean serializeActor(ResourceSet set, URI uri,
-			Nameable entity) {
+			EObject entity) {
 		// check that the factory is registered
 		// (only happens in command-line mode)
 		// ...

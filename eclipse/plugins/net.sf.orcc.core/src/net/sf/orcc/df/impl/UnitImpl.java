@@ -6,9 +6,10 @@
  */
 package net.sf.orcc.df.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
-import net.sf.dftools.util.impl.NameableImpl;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Unit;
 import net.sf.orcc.ir.Procedure;
@@ -24,6 +25,7 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
+import org.eclipse.emf.ecore.impl.EObjectImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
@@ -37,30 +39,13 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.df.impl.UnitImpl#getProcedures <em>Procedures</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.UnitImpl#getFileName <em>File Name</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.UnitImpl#getLineNumber <em>Line Number</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.UnitImpl#getName <em>Name</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public class UnitImpl extends NameableImpl implements Unit {
-	/**
-	 * The cached value of the '{@link #getConstants() <em>Constants</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getConstants()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Var> constants;
-
-	/**
-	 * The cached value of the '{@link #getProcedures() <em>Procedures</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getProcedures()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Procedure> procedures;
-
+public class UnitImpl extends EObjectImpl implements Unit {
 	/**
 	 * The default value of the '{@link #getFileName() <em>File Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -70,16 +55,6 @@ public class UnitImpl extends NameableImpl implements Unit {
 	 * @ordered
 	 */
 	protected static final String FILE_NAME_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getFileName() <em>File Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getFileName()
-	 * @generated
-	 * @ordered
-	 */
-	protected String fileName = FILE_NAME_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
@@ -92,6 +67,35 @@ public class UnitImpl extends NameableImpl implements Unit {
 	protected static final int LINE_NUMBER_EDEFAULT = 0;
 
 	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getConstants() <em>Constants</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getConstants()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Var> constants;
+
+	/**
+	 * The cached value of the '{@link #getFileName() <em>File Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getFileName()
+	 * @generated
+	 * @ordered
+	 */
+	protected String fileName = FILE_NAME_EDEFAULT;
+
+	/**
 	 * The cached value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -100,6 +104,25 @@ public class UnitImpl extends NameableImpl implements Unit {
 	 * @ordered
 	 */
 	protected int lineNumber = LINE_NUMBER_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected String name = NAME_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getProcedures() <em>Procedures</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getProcedures()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Procedure> procedures;
 
 	/**
 	 * holds template-specific data.
@@ -129,6 +152,8 @@ public class UnitImpl extends NameableImpl implements Unit {
 			return getFileName();
 		case DfPackage.UNIT__LINE_NUMBER:
 			return getLineNumber();
+		case DfPackage.UNIT__NAME:
+			return getName();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -167,6 +192,9 @@ public class UnitImpl extends NameableImpl implements Unit {
 					: !FILE_NAME_EDEFAULT.equals(fileName);
 		case DfPackage.UNIT__LINE_NUMBER:
 			return lineNumber != LINE_NUMBER_EDEFAULT;
+		case DfPackage.UNIT__NAME:
+			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
+					.equals(name);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -192,6 +220,9 @@ public class UnitImpl extends NameableImpl implements Unit {
 			return;
 		case DfPackage.UNIT__LINE_NUMBER:
 			setLineNumber((Integer) newValue);
+			return;
+		case DfPackage.UNIT__NAME:
+			setName((String) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -224,6 +255,9 @@ public class UnitImpl extends NameableImpl implements Unit {
 			return;
 		case DfPackage.UNIT__LINE_NUMBER:
 			setLineNumber(LINE_NUMBER_EDEFAULT);
+			return;
+		case DfPackage.UNIT__NAME:
+			setName(NAME_EDEFAULT);
 			return;
 		}
 		super.eUnset(featureID);
@@ -279,6 +313,49 @@ public class UnitImpl extends NameableImpl implements Unit {
 		return lineNumber;
 	}
 
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String getName() {
+		return name;
+	}@Override
+	public String getPackage() {
+		if (name == null) {
+			return null;
+		}
+		int index = name.lastIndexOf('.');
+		if (index == -1) {
+			return "";
+		} else {
+			return name.substring(0, index);
+		}
+	}
+
+	@Override
+	public List<String> getPackageAsList() {
+		String[] segments = name == null ? new String[0] : name.split("\\.");
+		List<String> list = new ArrayList<String>(segments.length - 1);
+		for (int i = 0; i < segments.length - 1; i++) {
+			list.add(segments[i]);
+		}
+		return list;
+	}
+
+	@Override
+	public String getSimpleName() {
+		if (name == null) {
+			return null;
+		}
+		int index = name.lastIndexOf('.');
+		if (index == -1) {
+			return name;
+		} else {
+			return name.substring(index + 1);
+		}
+	}
+
 	@Override
 	public Procedure getProcedure(String name) {
 		for (Procedure procedure : getProcedures()) {
@@ -332,6 +409,19 @@ public class UnitImpl extends NameableImpl implements Unit {
 					DfPackage.UNIT__LINE_NUMBER, oldLineNumber, lineNumber));
 	}
 
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setName(String newName) {
+		String oldName = name;
+		name = newName;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.UNIT__NAME, oldName, name));
+	}
+
 	@Override
 	public void setTemplateData(Object templateData) {
 		this.templateData = templateData;
@@ -352,6 +442,8 @@ public class UnitImpl extends NameableImpl implements Unit {
 		result.append(fileName);
 		result.append(", lineNumber: ");
 		result.append(lineNumber);
+		result.append(", name: ");
+		result.append(name);
 		result.append(')');
 		return result.toString();
 	}

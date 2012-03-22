@@ -10,18 +10,23 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.dftools.graph.Vertex;
-import net.sf.dftools.util.Nameable;
 
 /**
  * <!-- begin-user-doc --> A representation of the model object '
  * <em><b>Vertex</b></em>'. <!-- end-user-doc -->
  *
+ * <p>
+ * The following features are supported:
+ * <ul>
+ *   <li>{@link net.sf.orcc.df.DfVertex#getName <em>Name</em>}</li>
+ * </ul>
+ * </p>
  *
  * @see net.sf.orcc.df.DfPackage#getDfVertex()
  * @model abstract="true"
  * @generated
  */
-public interface DfVertex extends Vertex, Nameable {
+public interface DfVertex extends Vertex {
 
 	List<String> getHierarchicalId();
 
@@ -31,13 +36,35 @@ public interface DfVertex extends Vertex, Nameable {
 
 	Map<Port, Connection> getIncomingPortMap();
 
+	/**
+	 * Returns the qualified name of this vertex.
+	 * 
+	 * @return the qualified name of this vertex
+	 * @model
+	 */
+	String getName();
+
 	Map<Port, List<Connection>> getOutgoingPortMap();
+
+	String getPackage();
+
+	List<String> getPackageAsList();
+
+	String getSimpleName();
 
 	Object getTemplateData();
 
 	boolean isEntity();
 
 	boolean isInstance();
+
+	/**
+	 * Sets the qualified name of this vertex.
+	 * 
+	 * @param name
+	 *            the qualified name of this vertex
+	 */
+	void setName(String name);
 
 	void setTemplateData(Object templateData);
 
