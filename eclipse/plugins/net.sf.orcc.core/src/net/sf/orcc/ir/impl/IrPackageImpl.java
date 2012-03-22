@@ -14,6 +14,7 @@ import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.Cfg;
+import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
@@ -351,6 +352,13 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	private EClass cfgNodeEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	private EEnum opBinaryEEnum = null;
 
 	/**
@@ -652,6 +660,24 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EClass getCfgNode() {
+		return cfgNodeEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getCfgNode_Node() {
+		return (EReference) cfgNodeEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getNodeBlock() {
 		return nodeBlockEClass;
 	}
@@ -771,6 +797,15 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 */
 	public EClass getNode() {
 		return nodeEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getNode_CfgNode() {
+		return (EReference) nodeEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -1519,6 +1554,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEAttribute(paramEClass, PARAM__BY_REF);
 
 		nodeEClass = createEClass(NODE);
+		createEReference(nodeEClass, NODE__CFG_NODE);
 
 		nodeBlockEClass = createEClass(NODE_BLOCK);
 		createEReference(nodeBlockEClass, NODE_BLOCK__INSTRUCTIONS);
@@ -1657,6 +1693,9 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEReference(cfgEClass, CFG__ENTRY);
 		createEReference(cfgEClass, CFG__EXIT);
 
+		cfgNodeEClass = createEClass(CFG_NODE);
+		createEReference(cfgNodeEClass, CFG_NODE__NODE);
+
 		// Create enums
 		opBinaryEEnum = createEEnum(OP_BINARY);
 		opUnaryEEnum = createEEnum(OP_UNARY);
@@ -1700,7 +1739,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		// Add supertypes to classes
 		procedureEClass.getESuperTypes().add(theUtilPackage.getAttributable());
-		nodeEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		nodeBlockEClass.getESuperTypes().add(this.getNode());
 		nodeIfEClass.getESuperTypes().add(this.getNode());
 		nodeWhileEClass.getESuperTypes().add(this.getNode());
@@ -1733,6 +1771,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		varEClass.getESuperTypes().add(theUtilPackage.getAttributable());
 		nodeSpecificEClass.getESuperTypes().add(this.getNode());
 		cfgEClass.getESuperTypes().add(theGraphPackage.getGraph());
+		cfgNodeEClass.getESuperTypes().add(theGraphPackage.getVertex());
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(procedureEClass, Procedure.class, "Procedure", !IS_ABSTRACT,
@@ -1783,6 +1822,11 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		initEClass(nodeEClass, Node.class, "Node", IS_ABSTRACT, !IS_INTERFACE,
 				IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getNode_CfgNode(), this.getCfgNode(),
+				this.getCfgNode_Node(), "cfgNode", null, 0, 1, Node.class,
+				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE,
+				IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
 
 		initEClass(nodeBlockEClass, NodeBlock.class, "NodeBlock", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -2137,14 +2181,22 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		initEClass(cfgEClass, Cfg.class, "Cfg", !IS_ABSTRACT, !IS_INTERFACE,
 				IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getCfg_Entry(), this.getNode(), null, "entry", null, 0,
+		initEReference(getCfg_Entry(), this.getCfgNode(), null, "entry", null,
+				0, 1, Cfg.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				!IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
+		initEReference(getCfg_Exit(), this.getCfgNode(), null, "exit", null, 0,
 				1, Cfg.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
 				!IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
-		initEReference(getCfg_Exit(), this.getNode(), null, "exit", null, 0, 1,
-				Cfg.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
-				!IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
+
+		initEClass(cfgNodeEClass, CfgNode.class, "CfgNode", !IS_ABSTRACT,
+				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getCfgNode_Node(), this.getNode(),
+				this.getNode_CfgNode(), "node", null, 0, 1, CfgNode.class,
+				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE,
+				IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
 
 		// Initialize enums and add enum literals
 		initEEnum(opBinaryEEnum, OpBinary.class, "OpBinary");

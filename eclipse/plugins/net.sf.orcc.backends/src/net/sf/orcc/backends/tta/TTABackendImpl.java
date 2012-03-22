@@ -70,7 +70,7 @@ import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.df.transformations.NetworkFlattener;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.transformations.BlockCombine;
-import net.sf.orcc.ir.transformations.BuildCFG;
+import net.sf.orcc.ir.transformations.CfgBuilder;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.transformations.TacTransformation;
@@ -115,14 +115,15 @@ public class TTABackendImpl extends AbstractBackend {
 		transformations.put("max", "max_");
 		transformations.put("select", "select_");
 		processorIntensiveActors = new ArrayList<String>();
-		// processorIntensiveActors.add("org.mpeg4.part2.motion.Algo_Add");
-		// processorIntensiveActors.add("com.ericsson.Algo_Interpolation_halfpel");
-		// processorIntensiveActors.add("org.sc29.wg11.mpeg4.part2.texture.Algo_IDCT2D_ISOIEC_23002_1");
-		// processorIntensiveActors.add("fi.oulu.ee.mvg.Framebuffer");
-		// processorIntensiveActors.add("com.xilinx.Mgnt_Merger");
-		// processorIntensiveActors.add("org.mpeg4.part2.texture.Algo_Inversequant");
-
-		// processorIntensiveActors.add("fi.oulu.ee.mvg.Algo_IAP");
+		processorIntensiveActors.add("org.mpeg4.part2.motion.Algo_Add");
+		processorIntensiveActors.add("com.ericsson.Algo_Interpolation_halfpel");
+		processorIntensiveActors.add("org.sc29.wg11.mpeg4.part2.texture.Algo_IDCT2D_ISOIEC_23002_1");
+		processorIntensiveActors.add("fi.oulu.ee.mvg.Framebuffer");
+		processorIntensiveActors.add("com.xilinx.Mgnt_Merger");
+		processorIntensiveActors.add("org.mpeg4.part2.texture.Algo_Inversequant");
+		
+		processorIntensiveActors.add("fi.oulu.ee.mvg.Algo_IAP_multi");
+		processorIntensiveActors.add("org.mpeg4.part2.parser.Algo_Synp_MPEG_4");
 	}
 
 	@Override
@@ -169,7 +170,7 @@ public class TTABackendImpl extends AbstractBackend {
 				new TacTransformation(), new CopyPropagator(),
 				new ConstantPropagator(), new InstPhiTransformation(),
 				new GetElementPtrAdder(), new CastAdder(false),
-				new EmptyNodeRemover(), new BlockCombine(), new BuildCFG() };
+				new EmptyNodeRemover(), new BlockCombine(), new CfgBuilder() };
 
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);

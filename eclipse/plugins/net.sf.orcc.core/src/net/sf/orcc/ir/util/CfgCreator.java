@@ -38,6 +38,7 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.Cfg;
+import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Node;
 
@@ -49,15 +50,17 @@ import net.sf.orcc.ir.Node;
  */
 public class CfgCreator extends DfSwitch<Void> {
 
+	private IrFactory factory = IrFactory.eINSTANCE;
+
 	private Cfg cfg;
 
 	private FSM fsm;
 
-	private Node last;
+	private CfgNode last;
 
 	public CfgCreator() {
-		cfg = IrFactory.eINSTANCE.createCfg();
-		Node start = IrFactory.eINSTANCE.createNodeBlock();
+		cfg = factory.createCfg();
+		CfgNode start = factory.createCfgNode(factory.createNodeBlock());
 		cfg.getVertices().add(start);
 		cfg.setEntry(start);
 
@@ -73,24 +76,24 @@ public class CfgCreator extends DfSwitch<Void> {
 	 */
 	private void addActions(List<Action> actions) {
 		// initial step: start from the end
-		Node nodeLastElse = addNode(IrFactory.eINSTANCE.createNodeBlock());
-		Node nodeLastJoin = nodeLastElse;
+		CfgNode nodeLastElse = addNode(factory.createNodeBlock());
+		CfgNode nodeLastJoin = nodeLastElse;
 
 		// reverse iterate
 		ListIterator<Action> it = actions.listIterator(actions.size());
 		while (it.hasPrevious()) {
 			Action action = it.previous();
 
-			Node nodeIf = addNode(IrFactory.eINSTANCE.createNodeIf());
+			CfgNode nodeIf = addNode(factory.createNodeIf());
 			nodeIf.setAttribute("action", action);
 
-			Node nodeThen = addNode(IrFactory.eINSTANCE.createNodeBlock());
+			CfgNode nodeThen = addNode(factory.createNodeBlock());
 			nodeThen.setAttribute("action", action);
 
 			addEdge(nodeIf, nodeThen).setAttribute("flag", true);
 			addEdge(nodeIf, nodeLastElse);
 
-			Node nodeJoin = addNode(IrFactory.eINSTANCE.createNodeBlock());
+			CfgNode nodeJoin = addNode(factory.createNodeBlock());
 			addEdge(nodeThen, nodeJoin);
 			addEdge(nodeLastJoin, nodeJoin);
 
@@ -109,7 +112,7 @@ public class CfgCreator extends DfSwitch<Void> {
 	 * 
 	 * @return a newly-created edge
 	 */
-	private Edge addEdge(Node from, Node to) {
+	private Edge addEdge(CfgNode from, CfgNode to) {
 		Edge edge = GraphFactory.eINSTANCE.createEdge();
 		cfg.getEdges().add(edge);
 		edge.setSource(from);
@@ -133,9 +136,10 @@ public class CfgCreator extends DfSwitch<Void> {
 	 * 
 	 * @return a newly-created node
 	 */
-	private Node addNode(Node node) {
-		cfg.getVertices().add(node);
-		return node;
+	private CfgNode addNode(Node node) {
+		CfgNode cfgNode = factory.createCfgNode(node);
+		cfg.getVertices().add(cfgNode);
+		return cfgNode;
 	}
 
 	public Cfg getCfg() {

@@ -29,7 +29,8 @@
 package net.sf.orcc.ir;
 
 import net.sf.dftools.graph.Edge;
-import net.sf.dftools.graph.Vertex;
+
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines a node in the CFG.
@@ -37,7 +38,37 @@ import net.sf.dftools.graph.Vertex;
  * @author Matthieu Wipliez
  * @model abstract="true"
  */
-public interface Node extends Vertex {
+public interface Node extends EObject {
+
+	/**
+	 * Returns the value of the '<em><b>Cfg Node</b></em>' reference.
+	 * It is bidirectional and its opposite is '{@link net.sf.orcc.ir.CfgNode#getNode <em>Node</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Cfg Node</em>' reference isn't clear, there
+	 * really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Cfg Node</em>' reference.
+	 * @see #setCfgNode(CfgNode)
+	 * @see net.sf.orcc.ir.IrPackage#getNode_CfgNode()
+	 * @see net.sf.orcc.ir.CfgNode#getNode
+	 * @model opposite="node"
+	 * @generated
+	 */
+	CfgNode getCfgNode();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.ir.Node#getCfgNode
+	 * <em>Cfg Node</em>}' reference. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Cfg Node</em>' reference.
+	 * @see #getCfgNode()
+	 * @generated
+	 */
+	void setCfgNode(CfgNode value);
 
 	/**
 	 * Returns the first outgoing edge whose flag is false.

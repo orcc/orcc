@@ -30,53 +30,44 @@
  */
 package net.sf.orcc.ir.impl;
 
-import net.sf.dftools.graph.impl.GraphImpl;
-import net.sf.orcc.ir.Cfg;
+import net.sf.dftools.graph.impl.VertexImpl;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.IrPackage;
+import net.sf.orcc.ir.Node;
 
 import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
 /**
  * <!-- begin-user-doc --> An implementation of the model object '
- * <em><b>Cfg</b></em>'. <!-- end-user-doc -->
+ * <em><b>Cfg Node</b></em>'. <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.ir.impl.CfgImpl#getEntry <em>Entry</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.CfgImpl#getExit <em>Exit</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.CfgNodeImpl#getNode <em>Node</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public class CfgImpl extends GraphImpl implements Cfg {
+public class CfgNodeImpl extends VertexImpl implements CfgNode {
 	/**
-	 * The cached value of the '{@link #getEntry() <em>Entry</em>}' reference.
+	 * The cached value of the '{@link #getNode() <em>Node</em>}' reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getEntry()
+	 * @see #getNode()
 	 * @generated
 	 * @ordered
 	 */
-	protected CfgNode entry;
-
-	/**
-	 * The cached value of the '{@link #getExit() <em>Exit</em>}' reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getExit()
-	 * @generated
-	 * @ordered
-	 */
-	protected CfgNode exit;
+	protected Node node;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected CfgImpl() {
+	protected CfgNodeImpl() {
 		super();
 	}
 
@@ -86,81 +77,106 @@ public class CfgImpl extends GraphImpl implements Cfg {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return IrPackage.Literals.CFG;
+		return IrPackage.Literals.CFG_NODE;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public CfgNode getEntry() {
-		if (entry != null && entry.eIsProxy()) {
-			InternalEObject oldEntry = (InternalEObject) entry;
-			entry = (CfgNode) eResolveProxy(oldEntry);
-			if (entry != oldEntry) {
+	public Node getNode() {
+		if (node != null && node.eIsProxy()) {
+			InternalEObject oldNode = (InternalEObject) node;
+			node = (Node) eResolveProxy(oldNode);
+			if (node != oldNode) {
 				if (eNotificationRequired())
 					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							IrPackage.CFG__ENTRY, oldEntry, entry));
+							IrPackage.CFG_NODE__NODE, oldNode, node));
 			}
 		}
-		return entry;
+		return node;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public CfgNode basicGetEntry() {
-		return entry;
+	public Node basicGetNode() {
+		return node;
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setEntry(CfgNode newEntry) {
-		CfgNode oldEntry = entry;
-		entry = newEntry;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.CFG__ENTRY, oldEntry, entry));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public CfgNode getExit() {
-		if (exit != null && exit.eIsProxy()) {
-			InternalEObject oldExit = (InternalEObject) exit;
-			exit = (CfgNode) eResolveProxy(oldExit);
-			if (exit != oldExit) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							IrPackage.CFG__EXIT, oldExit, exit));
-			}
+	public NotificationChain basicSetNode(Node newNode, NotificationChain msgs) {
+		Node oldNode = node;
+		node = newNode;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.CFG_NODE__NODE, oldNode,
+					newNode);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
-		return exit;
+		return msgs;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public CfgNode basicGetExit() {
-		return exit;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setExit(CfgNode newExit) {
-		CfgNode oldExit = exit;
-		exit = newExit;
-		if (eNotificationRequired())
+	public void setNode(Node newNode) {
+		if (newNode != node) {
+			NotificationChain msgs = null;
+			if (node != null)
+				msgs = ((InternalEObject) node).eInverseRemove(this,
+						IrPackage.NODE__CFG_NODE, Node.class, msgs);
+			if (newNode != null)
+				msgs = ((InternalEObject) newNode).eInverseAdd(this,
+						IrPackage.NODE__CFG_NODE, Node.class, msgs);
+			msgs = basicSetNode(newNode, msgs);
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.CFG__EXIT, oldExit, exit));
+					IrPackage.CFG_NODE__NODE, newNode, newNode));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseAdd(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
+		switch (featureID) {
+		case IrPackage.CFG_NODE__NODE:
+			if (node != null)
+				msgs = ((InternalEObject) node).eInverseRemove(this,
+						IrPackage.NODE__CFG_NODE, Node.class, msgs);
+			return basicSetNode((Node) otherEnd, msgs);
+		}
+		return super.eInverseAdd(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
+		switch (featureID) {
+		case IrPackage.CFG_NODE__NODE:
+			return basicSetNode(null, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**
@@ -170,14 +186,10 @@ public class CfgImpl extends GraphImpl implements Cfg {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case IrPackage.CFG__ENTRY:
+		case IrPackage.CFG_NODE__NODE:
 			if (resolve)
-				return getEntry();
-			return basicGetEntry();
-		case IrPackage.CFG__EXIT:
-			if (resolve)
-				return getExit();
-			return basicGetExit();
+				return getNode();
+			return basicGetNode();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -189,11 +201,8 @@ public class CfgImpl extends GraphImpl implements Cfg {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case IrPackage.CFG__ENTRY:
-			setEntry((CfgNode) newValue);
-			return;
-		case IrPackage.CFG__EXIT:
-			setExit((CfgNode) newValue);
+		case IrPackage.CFG_NODE__NODE:
+			setNode((Node) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -206,11 +215,8 @@ public class CfgImpl extends GraphImpl implements Cfg {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case IrPackage.CFG__ENTRY:
-			setEntry((CfgNode) null);
-			return;
-		case IrPackage.CFG__EXIT:
-			setExit((CfgNode) null);
+		case IrPackage.CFG_NODE__NODE:
+			setNode((Node) null);
 			return;
 		}
 		super.eUnset(featureID);
@@ -223,12 +229,10 @@ public class CfgImpl extends GraphImpl implements Cfg {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case IrPackage.CFG__ENTRY:
-			return entry != null;
-		case IrPackage.CFG__EXIT:
-			return exit != null;
+		case IrPackage.CFG_NODE__NODE:
+			return node != null;
 		}
 		return super.eIsSet(featureID);
 	}
 
-} // CfgImpl
+} // CfgNodeImpl

@@ -1,5 +1,6 @@
-/*
- * Copyright (c) 2012, Synflow
+/**
+ * <copyright>
+ * Copyright (c) 2009-2012, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -25,51 +26,52 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
+ * </copyright>
  */
 package net.sf.orcc.ir;
 
-import net.sf.dftools.graph.Graph;
+import net.sf.dftools.graph.Vertex;
 
 /**
- * This interface defines a Control-Flow Graph.
- * 
- * @author Matthieu Wipliez
+ * <!-- begin-user-doc --> A representation of the model object '
+ * <em><b>Cfg Node</b></em>'. <!-- end-user-doc -->
+ *
+ * <p>
+ * The following features are supported:
+ * <ul>
+ *   <li>{@link net.sf.orcc.ir.CfgNode#getNode <em>Node</em>}</li>
+ * </ul>
+ * </p>
+ *
+ * @see net.sf.orcc.ir.IrPackage#getCfgNode()
  * @model
+ * @generated
  */
-public interface Cfg extends Graph {
-
+public interface CfgNode extends Vertex {
 	/**
-	 * Returns the entry node of this CFG.
+	 * Returns the value of the '<em><b>Node</b></em>' reference. <!--
+	 * begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Node</em>' reference isn't clear, there really
+	 * should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
 	 * 
-	 * @return the entry node of this CFG
+	 * @return the value of the '<em>Node</em>' reference.
+	 * @see #setNode(Node)
+	 * @see net.sf.orcc.ir.IrPackage#getCfgNode_Node()
 	 * @model
-	 */
-	CfgNode getEntry();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Cfg#getEntry <em>Entry</em>}' reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Entry</em>' reference.
-	 * @see #getEntry()
 	 * @generated
 	 */
-	void setEntry(CfgNode value);
+	Node getNode();
 
 	/**
-	 * Returns the exit node of this CFG.
-	 * 
-	 * @return the exit node of this CFG
-	 * @model
-	 */
-	CfgNode getExit();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Cfg#getExit <em>Exit</em>}' reference.
+	 * Sets the value of the '{@link net.sf.orcc.ir.CfgNode#getNode <em>Node</em>}' reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Exit</em>' reference.
-	 * @see #getExit()
+	 * @param value the new value of the '<em>Node</em>' reference.
+	 * @see #getNode()
 	 * @generated
 	 */
-	void setExit(CfgNode value);
+	void setNode(Node value);
 
-}
+} // CfgNode

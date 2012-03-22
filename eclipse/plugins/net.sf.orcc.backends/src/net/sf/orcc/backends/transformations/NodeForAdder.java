@@ -35,6 +35,7 @@ import net.sf.orcc.backends.ir.IrNodeSpecific;
 import net.sf.orcc.backends.ir.IrSpecificFactory;
 import net.sf.orcc.backends.ir.NodeFor;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
@@ -46,7 +47,7 @@ import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeSpecific;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.transformations.BuildCFG;
+import net.sf.orcc.ir.transformations.CfgBuilder;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.util.EcoreHelper;
 
@@ -62,17 +63,17 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class NodeForAdder extends AbstractActorVisitor<Object> {
 
-	private class ForNodeCfg extends BuildCFG {
-		public Node caseNodeFor(NodeFor node) {
-			Node join = node.getJoinNode();
+	private class ForNodeCfg extends CfgBuilder {
+		public CfgNode caseNodeFor(NodeFor node) {
+			CfgNode join = addNode(node.getJoinNode());
 			cfg.getVertices().add(join);
 
 			if (last != null) {
 				addEdge(join);
 			}
 
-			cfg.getVertices().add(node);
-			addEdge(node);
+			CfgNode cfgNode = addNode(node);
+			addEdge(cfgNode);
 
 			last = join;
 			flag = true;
@@ -81,16 +82,16 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 			// reset flag (in case there are no nodes in "then" branch)
 			flag = false;
 			addEdge(join);
-			last = node;
+			last = cfgNode;
 
-			return node;
+			return cfgNode;
 		}
 
 		@Override
-		public Node caseNodeSpecific(NodeSpecific node) {
+		public CfgNode caseNodeSpecific(NodeSpecific node) {
 
 			if (((IrNodeSpecific) node).isNodeFor()) {
-				caseNodeFor((NodeFor) node);
+				return caseNodeFor((NodeFor) node);
 			}
 
 			return null;
@@ -121,7 +122,7 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 	@Override
 	public Object caseActor(Actor actor) {
 		// Build first CFG
-		new BuildCFG().doSwitch(actor);
+		new CfgBuilder().doSwitch(actor);
 
 		// Transform actor
 		super.caseActor(actor);
@@ -147,8 +148,8 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 
 		Expression condition = nodeWhile.getCondition();
 		Node endNode = nodes.get(nodes.size() - 1);
-		Node previousNode = (Node) nodeWhile.getJoinNode().getPredecessors()
-				.get(0);
+		Node previousNode = (Node) nodeWhile.getJoinNode().getCfgNode()
+				.getPredecessors().get(0);
 
 		List<Var> conditionVars = new VarGetter(condition).get();
 		List<Instruction> loopCnts = new ArrayList<Instruction>();

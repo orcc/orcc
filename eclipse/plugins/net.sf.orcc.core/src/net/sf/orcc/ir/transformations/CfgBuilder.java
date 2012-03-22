@@ -29,12 +29,12 @@
  */
 package net.sf.orcc.ir.transformations;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.GraphFactory;
 import net.sf.orcc.ir.Cfg;
+import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
@@ -50,45 +50,57 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * @author Jerome Gorin
  * 
  */
-public class BuildCFG extends AbstractActorVisitor<Node> {
+public class CfgBuilder extends AbstractActorVisitor<CfgNode> {
+
+	private IrFactory factory = IrFactory.eINSTANCE;
 
 	protected Cfg cfg;
 
-	protected Node last;
+	protected CfgNode last;
 
 	protected boolean flag;
 
-	protected void addEdge(Node node) {
-		Edge edge = GraphFactory.eINSTANCE.createEdge(last, node);
+	protected void addEdge(CfgNode node) {
+		Edge edge = GraphFactory.eINSTANCE.createEdge(node, node);
 		if (flag) {
-			edge.setAttribute("flag", IrFactory.eINSTANCE.createExprBool(true));
+			edge.setAttribute("flag", factory.createExprBool(true));
 			// reset flag to false (so it is only set for this edge)
 			flag = false;
 		}
 		cfg.getEdges().add(edge);
 	}
 
-	@Override
-	public Node caseNodeBlock(NodeBlock node) {
-		cfg.getVertices().add(node);
-		if (last != null) {
-			addEdge(node);
-		}
-
-		return node;
+	/**
+	 * Creates a node and adds it to this CFG.
+	 * 
+	 * @return a newly-created node
+	 */
+	protected CfgNode addNode(Node node) {
+		CfgNode cfgNode = factory.createCfgNode(node);
+		cfg.getVertices().add(cfgNode);
+		return cfgNode;
 	}
 
 	@Override
-	public Node caseNodeIf(NodeIf node) {
-		cfg.getVertices().add(node);
+	public CfgNode caseNodeBlock(NodeBlock node) {
+		CfgNode cfgNode = addNode(node);
 		if (last != null) {
-			addEdge(node);
+			addEdge(cfgNode);
 		}
 
-		Node join = node.getJoinNode();
-		cfg.getVertices().add(join);
+		return cfgNode;
+	}
 
-		last = node;
+	@Override
+	public CfgNode caseNodeIf(NodeIf node) {
+		CfgNode cfgNode = addNode(node);
+		if (last != null) {
+			addEdge(cfgNode);
+		}
+
+		CfgNode join = addNode(node.getJoinNode());
+
+		last = cfgNode;
 		flag = true;
 		last = doSwitch(node.getThenNodes());
 
@@ -96,7 +108,7 @@ public class BuildCFG extends AbstractActorVisitor<Node> {
 		flag = false;
 		addEdge(join);
 
-		last = node;
+		last = cfgNode;
 		last = doSwitch(node.getElseNodes());
 		addEdge(join);
 		last = join;
@@ -105,9 +117,8 @@ public class BuildCFG extends AbstractActorVisitor<Node> {
 	}
 
 	@Override
-	public Node caseNodeWhile(NodeWhile node) {
-		Node join = node.getJoinNode();
-		cfg.getVertices().add(join);
+	public CfgNode caseNodeWhile(NodeWhile node) {
+		CfgNode join = addNode(node.getJoinNode());
 
 		if (last != null) {
 			addEdge(join);
@@ -115,8 +126,8 @@ public class BuildCFG extends AbstractActorVisitor<Node> {
 
 		flag = true;
 		last = join;
-		cfg.getVertices().add(node);
-		addEdge(node);
+		CfgNode cfgNode = addNode(node);
+		addEdge(cfgNode);
 
 		last = join;
 		flag = true;
@@ -125,15 +136,15 @@ public class BuildCFG extends AbstractActorVisitor<Node> {
 		// reset flag (in case there are no nodes in "then" branch)
 		flag = false;
 		addEdge(join);
-		last = node;
+		last = cfgNode;
 
-		return node;
+		return cfgNode;
 	}
 
 	@Override
-	public Node caseProcedure(Procedure procedure) {
+	public CfgNode caseProcedure(Procedure procedure) {
 		last = null;
-		cfg = IrFactory.eINSTANCE.createCfg();
+		cfg = factory.createCfg();
 		procedure.setCfg(cfg);
 		return super.caseProcedure(procedure);
 	}
@@ -145,8 +156,8 @@ public class BuildCFG extends AbstractActorVisitor<Node> {
 	 *            a list of nodes
 	 * @return the last node of the node list
 	 */
-	public Node doSwitch(List<Node> nodes) {
-		for (Node node : new ArrayList<Node>(nodes)) {
+	public CfgNode doSwitch(List<Node> nodes) {
+		for (Node node : nodes) {
 			last = doSwitch(node);
 		}
 

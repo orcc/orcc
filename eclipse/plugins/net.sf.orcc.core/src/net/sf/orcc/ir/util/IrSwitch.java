@@ -13,6 +13,7 @@ import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.Cfg;
+import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
@@ -294,6 +295,21 @@ public class IrSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseCfg(Cfg object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Cfg Node</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Cfg Node</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseCfgNode(CfgNode object) {
 		return null;
 	}
 
@@ -793,10 +809,6 @@ public class IrSwitch<T> extends Switch<T> {
 			Node node = (Node) theEObject;
 			T result = caseNode(node);
 			if (result == null)
-				result = caseVertex(node);
-			if (result == null)
-				result = caseAttributable(node);
-			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -805,10 +817,6 @@ public class IrSwitch<T> extends Switch<T> {
 			T result = caseNodeBlock(nodeBlock);
 			if (result == null)
 				result = caseNode(nodeBlock);
-			if (result == null)
-				result = caseVertex(nodeBlock);
-			if (result == null)
-				result = caseAttributable(nodeBlock);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -819,10 +827,6 @@ public class IrSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseNode(nodeIf);
 			if (result == null)
-				result = caseVertex(nodeIf);
-			if (result == null)
-				result = caseAttributable(nodeIf);
-			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -831,10 +835,6 @@ public class IrSwitch<T> extends Switch<T> {
 			T result = caseNodeWhile(nodeWhile);
 			if (result == null)
 				result = caseNode(nodeWhile);
-			if (result == null)
-				result = caseVertex(nodeWhile);
-			if (result == null)
-				result = caseAttributable(nodeWhile);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -1135,10 +1135,6 @@ public class IrSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseNode(nodeSpecific);
 			if (result == null)
-				result = caseVertex(nodeSpecific);
-			if (result == null)
-				result = caseAttributable(nodeSpecific);
-			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -1147,6 +1143,17 @@ public class IrSwitch<T> extends Switch<T> {
 			T result = caseCfg(cfg);
 			if (result == null)
 				result = caseGraph(cfg);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.CFG_NODE: {
+			CfgNode cfgNode = (CfgNode) theEObject;
+			T result = caseCfgNode(cfgNode);
+			if (result == null)
+				result = caseVertex(cfgNode);
+			if (result == null)
+				result = caseAttributable(cfgNode);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;

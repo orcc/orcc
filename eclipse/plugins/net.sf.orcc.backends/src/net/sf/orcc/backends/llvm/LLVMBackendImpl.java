@@ -64,7 +64,7 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.df.transformations.NetworkFlattener;
 import net.sf.orcc.ir.transformations.BlockCombine;
-import net.sf.orcc.ir.transformations.BuildCFG;
+import net.sf.orcc.ir.transformations.CfgBuilder;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
@@ -170,7 +170,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		new CastAdder(false).doSwitch(actor);
 		new EmptyNodeRemover().doSwitch(actor);
 		new BlockCombine().doSwitch(actor);
-		new BuildCFG().doSwitch(actor);
+		new CfgBuilder().doSwitch(actor);
 		new ListInitializer().doSwitch(actor);
 
 		// Organize metadata information for the current actor

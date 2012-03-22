@@ -68,7 +68,7 @@ import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.df.transformations.NetworkFlattener;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.transformations.BlockCombine;
-import net.sf.orcc.ir.transformations.BuildCFG;
+import net.sf.orcc.ir.transformations.CfgBuilder;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
 import net.sf.orcc.ir.transformations.SSATransformation;
@@ -160,7 +160,7 @@ public class XlimBackendImpl extends AbstractBackend {
 				new DeadGlobalElimination(), new DeadCodeElimination(),
 				new XlimDeadVariableRemoval(), new ListFlattener(),
 				new TacTransformation(), /* new CopyPropagator(), */
-				new BuildCFG(), new InstPhiTransformation(),
+				new CfgBuilder(), new InstPhiTransformation(),
 				new LiteralIntegersAdder(), new CastAdder(true),
 				new XlimVariableRenamer(), new EmptyNodeRemover(),
 				new BlockCombine() };

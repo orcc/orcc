@@ -13,6 +13,7 @@ import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.Cfg;
+import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
@@ -281,18 +282,23 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 		}
 
 		@Override
+		public Adapter caseCfgNode(CfgNode object) {
+			return createCfgNodeAdapter();
+		}
+
+		@Override
 		public Adapter caseAttributable(Attributable object) {
 			return createAttributableAdapter();
 		}
 
 		@Override
-		public Adapter caseVertex(Vertex object) {
-			return createVertexAdapter();
+		public Adapter caseGraph(Graph object) {
+			return createGraphAdapter();
 		}
 
 		@Override
-		public Adapter caseGraph(Graph object) {
-			return createGraphAdapter();
+		public Adapter caseVertex(Vertex object) {
+			return createVertexAdapter();
 		}
 
 		@Override
@@ -517,6 +523,20 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createCfgAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.CfgNode <em>Cfg Node</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.CfgNode
+	 * @generated
+	 */
+	public Adapter createCfgNodeAdapter() {
 		return null;
 	}
 

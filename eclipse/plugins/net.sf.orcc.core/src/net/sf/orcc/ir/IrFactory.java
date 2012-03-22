@@ -617,6 +617,17 @@ public interface IrFactory extends EFactory {
 	Cfg createCfg();
 
 	/**
+	 * Returns a new object of class '<em>Cfg Node</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Cfg Node</em>'.
+	 * @generated
+	 */
+	CfgNode createCfgNode();
+
+	CfgNode createCfgNode(Node node);
+
+	/**
 	 * Returns a new object of class '<em>Procedure</em>'.
 	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->

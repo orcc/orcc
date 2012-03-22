@@ -15,6 +15,7 @@ import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.Cfg;
+import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
@@ -33,6 +34,7 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
@@ -215,6 +217,8 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 			return createPredicate();
 		case IrPackage.CFG:
 			return createCfg();
+		case IrPackage.CFG_NODE:
+			return createCfgNode();
 		default:
 			throw new IllegalArgumentException("The class '" + eClass.getName()
 					+ "' is not a valid classifier");
@@ -268,6 +272,23 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public Cfg createCfg() {
 		CfgImpl cfg = new CfgImpl();
 		return cfg;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public CfgNode createCfgNode() {
+		CfgNodeImpl cfgNode = new CfgNodeImpl();
+		return cfgNode;
+	}
+
+	@Override
+	public CfgNode createCfgNode(Node node) {
+		CfgNode cfgNode = new CfgNodeImpl();
+		cfgNode.setNode(node);
+		return cfgNode;
 	}
 
 	/**

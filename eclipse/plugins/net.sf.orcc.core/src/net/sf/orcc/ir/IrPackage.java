@@ -537,6 +537,24 @@ public interface IrPackage extends EPackage {
 		EReference CFG__EXIT = eINSTANCE.getCfg_Exit();
 
 		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.CfgNodeImpl <em>Cfg Node</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.CfgNodeImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getCfgNode()
+		 * @generated
+		 */
+		EClass CFG_NODE = eINSTANCE.getCfgNode();
+
+		/**
+		 * The meta object literal for the '<em><b>Node</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference CFG_NODE__NODE = eINSTANCE.getCfgNode_Node();
+
+		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.NodeImpl <em>Node</em>}' class.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.NodeImpl
@@ -544,6 +562,14 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EClass NODE = eINSTANCE.getNode();
+
+		/**
+		 * The meta object literal for the '<em><b>Cfg Node</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference NODE__CFG_NODE = eINSTANCE.getNode_CfgNode();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.NodeBlockImpl <em>Node Block</em>}' class.
@@ -1237,7 +1263,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpBinary()
 	 * @generated
 	 */
-	int OP_BINARY = 40;
+	int OP_BINARY = 41;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpUnary <em>Op Unary</em>}' enum.
@@ -1246,7 +1272,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpUnary()
 	 * @generated
 	 */
-	int OP_UNARY = 41;
+	int OP_UNARY = 42;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ProcedureImpl <em>Procedure</em>}' class.
@@ -1381,31 +1407,13 @@ public interface IrPackage extends EPackage {
 	int PARAM_FEATURE_COUNT = 2;
 
 	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Cfg Node</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int NODE__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
-
-	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NODE__INCOMING = GraphPackage.VERTEX__INCOMING;
-
-	/**
-	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NODE__OUTGOING = GraphPackage.VERTEX__OUTGOING;
+	int NODE__CFG_NODE = 0;
 
 	/**
 	 * The number of structural features of the '<em>Node</em>' class. <!--
@@ -1414,34 +1422,16 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 0;
+	int NODE_FEATURE_COUNT = 1;
 
 	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Cfg Node</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_BLOCK__ATTRIBUTES = NODE__ATTRIBUTES;
-
-	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NODE_BLOCK__INCOMING = NODE__INCOMING;
-
-	/**
-	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NODE_BLOCK__OUTGOING = NODE__OUTGOING;
+	int NODE_BLOCK__CFG_NODE = NODE__CFG_NODE;
 
 	/**
 	 * The feature id for the '<em><b>Instructions</b></em>' containment reference list.
@@ -1460,31 +1450,13 @@ public interface IrPackage extends EPackage {
 	int NODE_BLOCK_FEATURE_COUNT = NODE_FEATURE_COUNT + 1;
 
 	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Cfg Node</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_IF__ATTRIBUTES = NODE__ATTRIBUTES;
-
-	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NODE_IF__INCOMING = NODE__INCOMING;
-
-	/**
-	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NODE_IF__OUTGOING = NODE__OUTGOING;
+	int NODE_IF__CFG_NODE = NODE__CFG_NODE;
 
 	/**
 	 * The feature id for the '<em><b>Condition</b></em>' containment reference.
@@ -1537,31 +1509,13 @@ public interface IrPackage extends EPackage {
 	int NODE_IF_FEATURE_COUNT = NODE_FEATURE_COUNT + 5;
 
 	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Cfg Node</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_WHILE__ATTRIBUTES = NODE__ATTRIBUTES;
-
-	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NODE_WHILE__INCOMING = NODE__INCOMING;
-
-	/**
-	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NODE_WHILE__OUTGOING = NODE__OUTGOING;
+	int NODE_WHILE__CFG_NODE = NODE__CFG_NODE;
 
 	/**
 	 * The feature id for the '<em><b>Condition</b></em>' containment reference.
@@ -2680,31 +2634,13 @@ public interface IrPackage extends EPackage {
 	int NODE_SPECIFIC = 38;
 
 	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Cfg Node</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_SPECIFIC__ATTRIBUTES = NODE__ATTRIBUTES;
-
-	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NODE_SPECIFIC__INCOMING = NODE__INCOMING;
-
-	/**
-	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NODE_SPECIFIC__OUTGOING = NODE__OUTGOING;
+	int NODE_SPECIFIC__CFG_NODE = NODE__CFG_NODE;
 
 	/**
 	 * The number of structural features of the '<em>Node Specific</em>' class.
@@ -2769,6 +2705,61 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int CFG_FEATURE_COUNT = GraphPackage.GRAPH_FEATURE_COUNT + 2;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.CfgNodeImpl <em>Cfg Node</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.CfgNodeImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getCfgNode()
+	 * @generated
+	 */
+	int CFG_NODE = 40;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CFG_NODE__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
+
+	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CFG_NODE__INCOMING = GraphPackage.VERTEX__INCOMING;
+
+	/**
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CFG_NODE__OUTGOING = GraphPackage.VERTEX__OUTGOING;
+
+	/**
+	 * The feature id for the '<em><b>Node</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CFG_NODE__NODE = GraphPackage.VERTEX_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Cfg Node</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CFG_NODE_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 1;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Def <em>Def</em>}'.
@@ -3308,6 +3299,27 @@ public interface IrPackage extends EPackage {
 	EReference getCfg_Exit();
 
 	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.CfgNode <em>Cfg Node</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Cfg Node</em>'.
+	 * @see net.sf.orcc.ir.CfgNode
+	 * @generated
+	 */
+	EClass getCfgNode();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.CfgNode#getNode <em>Node</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Node</em>'.
+	 * @see net.sf.orcc.ir.CfgNode#getNode()
+	 * @see #getCfgNode()
+	 * @generated
+	 */
+	EReference getCfgNode_Node();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.InstSpecific <em>Inst Specific</em>}'.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Inst Specific</em>'.
@@ -3442,6 +3454,17 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getNode();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.Node#getCfgNode <em>Cfg Node</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Cfg Node</em>'.
+	 * @see net.sf.orcc.ir.Node#getCfgNode()
+	 * @see #getNode()
+	 * @generated
+	 */
+	EReference getNode_CfgNode();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.NodeBlock <em>Node Block</em>}'.

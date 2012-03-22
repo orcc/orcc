@@ -73,6 +73,15 @@ public interface IrSpecificPackage extends EPackage {
 	int IR_INST_SPECIFIC = 5;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int IR_INST_SPECIFIC__ATTRIBUTES = IrPackage.INST_SPECIFIC__ATTRIBUTES;
+
+	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -108,6 +117,15 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 */
 	int INST_ASSIGN_INDEX = 0;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_ASSIGN_INDEX__ATTRIBUTES = IR_INST_SPECIFIC__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -174,6 +192,15 @@ public interface IrSpecificPackage extends EPackage {
 	int INST_CAST = 1;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_CAST__ATTRIBUTES = IR_INST_SPECIFIC__ATTRIBUTES;
+
+	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -227,6 +254,15 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 */
 	int INST_GET_ELEMENT_PTR = 2;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_GET_ELEMENT_PTR__ATTRIBUTES = IR_INST_SPECIFIC__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -291,6 +327,15 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 */
 	int INST_TERNARY = 3;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_TERNARY__ATTRIBUTES = IR_INST_SPECIFIC__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -366,31 +411,13 @@ public interface IrSpecificPackage extends EPackage {
 	int IR_NODE_SPECIFIC = 6;
 
 	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Cfg Node</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int IR_NODE_SPECIFIC__ATTRIBUTES = IrPackage.NODE_SPECIFIC__ATTRIBUTES;
-
-	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int IR_NODE_SPECIFIC__INCOMING = IrPackage.NODE_SPECIFIC__INCOMING;
-
-	/**
-	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int IR_NODE_SPECIFIC__OUTGOING = IrPackage.NODE_SPECIFIC__OUTGOING;
+	int IR_NODE_SPECIFIC__CFG_NODE = IrPackage.NODE_SPECIFIC__CFG_NODE;
 
 	/**
 	 * The number of structural features of the '<em>Ir Node Specific</em>' class.
@@ -412,31 +439,13 @@ public interface IrSpecificPackage extends EPackage {
 	int NODE_FOR = 4;
 
 	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Cfg Node</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_FOR__ATTRIBUTES = IR_NODE_SPECIFIC__ATTRIBUTES;
-
-	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NODE_FOR__INCOMING = IR_NODE_SPECIFIC__INCOMING;
-
-	/**
-	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NODE_FOR__OUTGOING = IR_NODE_SPECIFIC__OUTGOING;
+	int NODE_FOR__CFG_NODE = IR_NODE_SPECIFIC__CFG_NODE;
 
 	/**
 	 * The feature id for the '<em><b>Condition</b></em>' containment reference.
