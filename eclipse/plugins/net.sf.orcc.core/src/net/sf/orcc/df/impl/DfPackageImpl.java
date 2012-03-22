@@ -361,6 +361,15 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getInstance_Name() {
+		return (EAttribute) instanceEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -809,6 +818,15 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getEntity_Name() {
+		return (EAttribute) entityEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -911,11 +929,13 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		instanceEClass = createEClass(INSTANCE);
 		createEReference(instanceEClass, INSTANCE__ARGUMENTS);
 		createEReference(instanceEClass, INSTANCE__ENTITY);
+		createEAttribute(instanceEClass, INSTANCE__NAME);
 
 		entityEClass = createEClass(ENTITY);
 		createEReference(entityEClass, ENTITY__INPUTS);
 		createEReference(entityEClass, ENTITY__OUTPUTS);
 		createEReference(entityEClass, ENTITY__PARAMETERS);
+		createEAttribute(entityEClass, ENTITY__NAME);
 
 		entitySpecificEClass = createEClass(ENTITY_SPECIFIC);
 
@@ -1033,8 +1053,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		// Add supertypes to classes
 		dfVertexEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		portEClass.getESuperTypes().add(theGraphPackage.getVertex());
-		instanceEClass.getESuperTypes().add(this.getDfVertex());
-		entityEClass.getESuperTypes().add(this.getDfVertex());
+		instanceEClass.getESuperTypes().add(theGraphPackage.getVertex());
+		entityEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		entitySpecificEClass.getESuperTypes().add(this.getEntity());
 		actorEClass.getESuperTypes().add(this.getEntity());
 		networkEClass.getESuperTypes().add(this.getEntity());
@@ -1104,6 +1124,10 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				null, 0, 1, Instance.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getInstance_Name(), ecorePackage.getEString(), "name",
+				null, 0, 1, Instance.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
 
 		initEClass(entityEClass, Entity.class, "Entity", IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -1119,6 +1143,10 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				"parameters", null, 0, -1, Entity.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getEntity_Name(), ecorePackage.getEString(), "name",
+				null, 0, 1, Entity.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
 
 		initEClass(entitySpecificEClass, EntitySpecific.class,
 				"EntitySpecific", !IS_ABSTRACT, !IS_INTERFACE,

@@ -28,6 +28,10 @@
  */
 package net.sf.orcc.df;
 
+import java.util.List;
+import java.util.Map;
+
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.common.util.EList;
@@ -39,7 +43,15 @@ import org.eclipse.emf.common.util.EList;
  * @model abstract="true" extends="Vertex"
  * @generated
  */
-public interface Entity extends DfVertex {
+public interface Entity extends Vertex {
+
+	List<String> getHierarchicalId();
+
+	String getHierarchicalName();
+
+	List<Entity> getHierarchy();
+
+	Map<Port, Connection> getIncomingPortMap();
 
 	/**
 	 * Returns the input port whose name matches the given name.
@@ -59,6 +71,16 @@ public interface Entity extends DfVertex {
 	EList<Port> getInputs();
 
 	/**
+	 * Returns the qualified name of this vertex.
+	 * 
+	 * @return the qualified name of this vertex
+	 * @model
+	 */
+	String getName();
+
+	Map<Port, List<Connection>> getOutgoingPortMap();
+
+	/**
 	 * Returns the output port whose name matches the given name.
 	 * 
 	 * @param name
@@ -74,6 +96,8 @@ public interface Entity extends DfVertex {
 	 * @model containment="true"
 	 */
 	EList<Port> getOutputs();
+
+	String getPackage();
 
 	/**
 	 * Returns the parameter with the given name.
@@ -101,6 +125,10 @@ public interface Entity extends DfVertex {
 	 */
 	Port getPort(String name);
 
+	String getSimpleName();
+
+	Object getTemplateData();
+
 	/**
 	 * Returns <code>true</code> if this entity is an actor.
 	 * 
@@ -121,5 +149,15 @@ public interface Entity extends DfVertex {
 	 * @return <code>true</code> if this entity is a network
 	 */
 	boolean isNetwork();
+
+	/**
+	 * Sets the qualified name of this vertex.
+	 * 
+	 * @param name
+	 *            the qualified name of this vertex
+	 */
+	void setName(String name);
+
+	void setTemplateData(Object templateData);
 
 }

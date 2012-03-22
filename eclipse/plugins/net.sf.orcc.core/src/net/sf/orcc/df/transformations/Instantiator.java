@@ -35,7 +35,6 @@ import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -62,7 +61,7 @@ public class Instantiator extends DfSwitch<Network> {
 
 	private Copier copier;
 
-	private Map<Instance, DfVertex> map;
+	private Map<Instance, Vertex> map;
 
 	private boolean skipActors;
 
@@ -110,7 +109,7 @@ public class Instantiator extends DfSwitch<Network> {
 		this.skipActors = skipActors;
 		this.defaultFifoSize = defaultFifoSize;
 		copier = new Copier();
-		map = new HashMap<Instance, DfVertex>();
+		map = new HashMap<Instance, Vertex>();
 	}
 
 	@Override

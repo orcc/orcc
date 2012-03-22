@@ -44,6 +44,14 @@ public interface DfVertex extends Vertex {
 	 */
 	String getName();
 
+	/**
+	 * Sets the qualified name of this vertex.
+	 * 
+	 * @param name
+	 *            the qualified name of this vertex
+	 */
+	void setName(String name);
+
 	Map<Port, List<Connection>> getOutgoingPortMap();
 
 	String getPackage();
@@ -55,14 +63,6 @@ public interface DfVertex extends Vertex {
 	boolean isEntity();
 
 	boolean isInstance();
-
-	/**
-	 * Sets the qualified name of this vertex.
-	 * 
-	 * @param name
-	 *            the qualified name of this vertex
-	 */
-	void setName(String name);
 
 	void setTemplateData(Object templateData);
 

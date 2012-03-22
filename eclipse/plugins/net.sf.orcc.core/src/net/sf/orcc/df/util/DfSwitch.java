@@ -126,8 +126,6 @@ public class DfSwitch<T> extends Switch<T> {
 			Instance instance = (Instance) theEObject;
 			T result = caseInstance(instance);
 			if (result == null)
-				result = caseDfVertex(instance);
-			if (result == null)
 				result = caseVertex(instance);
 			if (result == null)
 				result = caseAttributable(instance);
@@ -138,8 +136,6 @@ public class DfSwitch<T> extends Switch<T> {
 		case DfPackage.ENTITY: {
 			Entity entity = (Entity) theEObject;
 			T result = caseEntity(entity);
-			if (result == null)
-				result = caseDfVertex(entity);
 			if (result == null)
 				result = caseVertex(entity);
 			if (result == null)
@@ -154,8 +150,6 @@ public class DfSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseEntity(entitySpecific);
 			if (result == null)
-				result = caseDfVertex(entitySpecific);
-			if (result == null)
 				result = caseVertex(entitySpecific);
 			if (result == null)
 				result = caseAttributable(entitySpecific);
@@ -168,8 +162,6 @@ public class DfSwitch<T> extends Switch<T> {
 			T result = caseActor(actor);
 			if (result == null)
 				result = caseEntity(actor);
-			if (result == null)
-				result = caseDfVertex(actor);
 			if (result == null)
 				result = caseVertex(actor);
 			if (result == null)
@@ -186,8 +178,6 @@ public class DfSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseGraph(network);
 			if (result == null)
-				result = caseDfVertex(network);
-			if (result == null)
 				result = caseVertex(network);
 			if (result == null)
 				result = caseAttributable(network);
@@ -200,8 +190,6 @@ public class DfSwitch<T> extends Switch<T> {
 			T result = caseBroadcast(broadcast);
 			if (result == null)
 				result = caseEntity(broadcast);
-			if (result == null)
-				result = caseDfVertex(broadcast);
 			if (result == null)
 				result = caseVertex(broadcast);
 			if (result == null)

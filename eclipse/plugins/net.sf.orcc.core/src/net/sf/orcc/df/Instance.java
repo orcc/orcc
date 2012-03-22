@@ -28,6 +28,10 @@
  */
 package net.sf.orcc.df;
 
+import java.util.List;
+import java.util.Map;
+
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.moc.MoC;
 
 import org.eclipse.emf.common.util.EList;
@@ -39,7 +43,7 @@ import org.eclipse.emf.common.util.EList;
  * @author Matthieu Wipliez
  * @model extends="Vertex"
  */
-public interface Instance extends DfVertex {
+public interface Instance extends Vertex {
 
 	/**
 	 * Returns the actor referenced by this instance.
@@ -72,6 +76,12 @@ public interface Instance extends DfVertex {
 	 */
 	Entity getEntity();
 
+	List<String> getHierarchicalId();
+
+	String getHierarchicalName();
+
+	List<Entity> getHierarchy();
+
 	/**
 	 * Returns the identifier of this instance. Delegates to {@link #getName()}.
 	 * 
@@ -79,6 +89,8 @@ public interface Instance extends DfVertex {
 	 */
 	@Deprecated
 	String getId();
+
+	Map<Port, Connection> getIncomingPortMap();
 
 	/**
 	 * Returns the classification class of this instance.
@@ -88,12 +100,26 @@ public interface Instance extends DfVertex {
 	MoC getMoC();
 
 	/**
+	 * Returns the qualified name of this vertex.
+	 * 
+	 * @return the qualified name of this vertex
+	 * @model
+	 */
+	String getName();
+
+	/**
 	 * Returns the network referenced by this instance.
 	 * 
 	 * @return the network referenced by this instance, or <code>null</code> if
 	 *         this instance does not reference a network
 	 */
 	Network getNetwork();
+
+	Map<Port, List<Connection>> getOutgoingPortMap();
+
+	String getPackage();
+
+	String getSimpleName();
 
 	/**
 	 * Returns <code>true</code> if this instance references an actor.
@@ -109,6 +135,8 @@ public interface Instance extends DfVertex {
 	 */
 	boolean isBroadcast();
 
+	boolean isInstance();
+
 	/**
 	 * Returns <code>true</code> if this instance references a network.
 	 * 
@@ -123,5 +151,13 @@ public interface Instance extends DfVertex {
 	 *            an entity
 	 */
 	void setEntity(Entity entity);
+
+	/**
+	 * Sets the qualified name of this vertex.
+	 * 
+	 * @param name
+	 *            the qualified name of this vertex
+	 */
+	void setName(String name);
 
 }

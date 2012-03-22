@@ -28,21 +28,30 @@
  */
 package net.sf.orcc.df.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import net.sf.dftools.graph.impl.VertexImpl;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import net.sf.dftools.graph.Edge;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Broadcast;
+import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.moc.MoC;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
@@ -55,11 +64,21 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * @author Matthieu Wipliez
  * @generated
  */
-public class InstanceImpl extends DfVertexImpl implements Instance {
+public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
-	 * The cached value of the '{@link #getArguments() <em>Arguments</em>}' containment reference list.
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getArguments() <em>Arguments</em>}'
+	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getArguments()
 	 * @ordered
 	 */
@@ -73,6 +92,15 @@ public class InstanceImpl extends DfVertexImpl implements Instance {
 	 * @ordered
 	 */
 	protected Entity entity;
+
+	/**
+	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected String name = NAME_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -94,18 +122,6 @@ public class InstanceImpl extends DfVertexImpl implements Instance {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setEntity(Entity newEntity) {
-		Entity oldEntity = entity;
-		entity = newEntity;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.INSTANCE__ENTITY, oldEntity, entity));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
@@ -115,6 +131,8 @@ public class InstanceImpl extends DfVertexImpl implements Instance {
 			if (resolve)
 				return getEntity();
 			return basicGetEntity();
+		case DfPackage.INSTANCE__NAME:
+			return getName();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -145,6 +163,9 @@ public class InstanceImpl extends DfVertexImpl implements Instance {
 			return arguments != null && !arguments.isEmpty();
 		case DfPackage.INSTANCE__ENTITY:
 			return entity != null;
+		case DfPackage.INSTANCE__NAME:
+			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
+					.equals(name);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -163,6 +184,9 @@ public class InstanceImpl extends DfVertexImpl implements Instance {
 			return;
 		case DfPackage.INSTANCE__ENTITY:
 			setEntity((Entity) newValue);
+			return;
+		case DfPackage.INSTANCE__NAME:
+			setName((String) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -189,6 +213,9 @@ public class InstanceImpl extends DfVertexImpl implements Instance {
 			return;
 		case DfPackage.INSTANCE__ENTITY:
 			setEntity((Entity) null);
+			return;
+		case DfPackage.INSTANCE__NAME:
+			setName(NAME_EDEFAULT);
 			return;
 		}
 		super.eUnset(featureID);
@@ -234,8 +261,52 @@ public class InstanceImpl extends DfVertexImpl implements Instance {
 	}
 
 	@Override
+	public List<String> getHierarchicalId() {
+		List<String> ids = new ArrayList<String>();
+		for (Entity entity : getHierarchy()) {
+			ids.add(entity.getName());
+		}
+		ids.add(getName());
+		return ids;
+	}
+
+	@Override
+	public String getHierarchicalName() {
+		StringBuilder builder = new StringBuilder();
+		for (Entity entity : getHierarchy()) {
+			builder.append(entity.getName());
+			builder.append('_');
+		}
+		builder.append(getName());
+		return builder.toString();
+	}
+
+	@Override
+	public List<Entity> getHierarchy() {
+		List<Entity> entities = new ArrayList<Entity>();
+		EObject obj = eContainer();
+		while (obj != null) {
+			entities.add(0, (Entity) obj);
+			obj = obj.eContainer();
+		}
+		return entities;
+	}
+
+	@Override
 	public String getId() {
 		return getName();
+	}
+
+	@Override
+	public Map<Port, Connection> getIncomingPortMap() {
+		Map<Port, Connection> map = new HashMap<Port, Connection>();
+		for (Edge edge : getIncoming()) {
+			if (edge instanceof Connection) {
+				Connection connection = (Connection) edge;
+				map.put(connection.getTargetPort(), connection);
+			}
+		}
+		return map;
 	}
 
 	@Override
@@ -249,9 +320,55 @@ public class InstanceImpl extends DfVertexImpl implements Instance {
 		}
 	}
 
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String getName() {
+		return name;
+	}
+
 	@Override
 	public Network getNetwork() {
 		return (Network) getEntity();
+	}
+
+	@Override
+	public Map<Port, List<Connection>> getOutgoingPortMap() {
+		Map<Port, List<Connection>> map = new HashMap<Port, List<Connection>>();
+		for (Edge edge : getOutgoing()) {
+			if (edge instanceof Connection) {
+				Connection connection = (Connection) edge;
+				Port source = connection.getSourcePort();
+				List<Connection> conns = map.get(source);
+				if (conns == null) {
+					conns = new ArrayList<Connection>(1);
+					map.put(source, conns);
+				}
+				conns.add(connection);
+			}
+		}
+		return map;
+	}
+
+	@Override
+	public String getPackage() {
+		int index = name.lastIndexOf('.');
+		if (index == -1) {
+			return "";
+		} else {
+			return name.substring(0, index);
+		}
+	}
+
+	@Override
+	public String getSimpleName() {
+		int index = name.lastIndexOf('.');
+		String simpleName = name;
+		if (index != -1) {
+			simpleName = name.substring(index + 1);
+		}
+		return simpleName;
 	}
 
 	@Override
@@ -272,6 +389,30 @@ public class InstanceImpl extends DfVertexImpl implements Instance {
 	@Override
 	public boolean isNetwork() {
 		return getEntity() != null && getEntity().isNetwork();
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setEntity(Entity newEntity) {
+		Entity oldEntity = entity;
+		entity = newEntity;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.INSTANCE__ENTITY, oldEntity, entity));
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setName(String newName) {
+		String oldName = name;
+		name = newName;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.INSTANCE__NAME, oldName, name));
 	}
 
 	@Override

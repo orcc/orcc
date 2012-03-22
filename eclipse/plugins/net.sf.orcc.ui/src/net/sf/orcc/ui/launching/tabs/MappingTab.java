@@ -41,6 +41,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
@@ -113,7 +114,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 		public Object[] getElements(Object inputElement) {
 			if (inputElement instanceof Network) {
 				Network network = (Network) inputElement;
-				EList<DfVertex> vertices = new BasicEList<DfVertex>();
+				EList<Vertex> vertices = new BasicEList<Vertex>();
 				vertices.addAll(network.getInstances());
 				vertices.addAll(network.getEntities());
 				return vertices.toArray();
@@ -176,13 +177,13 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 			return "";
 		}
 
-		private void setMapping(DfVertex vertex, String component) {
-			if (vertex.isInstance()) {
+		private void setMapping(Vertex vertex, String component) {
+			if (vertex instanceof Instance) {
 				Instance instance = (Instance) vertex;
 				mapping.put(instance.getHierarchicalName(), component);
-			} else if (vertex.isEntity()) {
+			} else if (vertex instanceof Entity) {
 				Network network = (Network) vertex;
-				mapping.put(vertex.getName(), component);
+				mapping.put(network.getName(), component);
 				for (Entity subEntity : network.getEntities()) {
 					setMapping(subEntity, component);
 				}
