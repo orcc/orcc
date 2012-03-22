@@ -135,8 +135,6 @@ public interface Instance extends Vertex {
 	 */
 	boolean isBroadcast();
 
-	boolean isInstance();
-
 	/**
 	 * Returns <code>true</code> if this instance references a network.
 	 * 

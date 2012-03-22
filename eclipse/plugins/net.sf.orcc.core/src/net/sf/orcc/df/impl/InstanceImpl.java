@@ -381,7 +381,6 @@ public class InstanceImpl extends VertexImpl implements Instance {
 		return getEntity() != null && getEntity().isBroadcast();
 	}
 
-	@Override
 	public boolean isInstance() {
 		return true;
 	}

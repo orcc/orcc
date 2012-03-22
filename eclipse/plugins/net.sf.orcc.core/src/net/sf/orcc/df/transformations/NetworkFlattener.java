@@ -151,11 +151,6 @@ public class NetworkFlattener extends DfSwitch<Void> {
 		for (Instance instance : subNetwork.getInstances()) {
 			instance.setName(subNetwork.getName() + "_" + instance.getName());
 		}
-		
-		//network.removeVertices(network.getInputs());
-		//network.getInputs().clear();
-		//network.removeVertices(network.getOutputs());
-		//network.getOutputs().clear();
 
 		// move entities/instances and vertices in this network
 		network.getEntities().addAll(subNetwork.getEntities());
@@ -167,8 +162,18 @@ public class NetworkFlattener extends DfSwitch<Void> {
 			}
 		}
 
+		// move connections between entities in this network
+		List<Connection> connections = new ArrayList<Connection>();
+		for (Connection connection : subNetwork.getConnections()) {
+			Vertex source = connection.getSource();
+			Vertex target = connection.getTarget();
+			if (!(source instanceof Port) && !(target instanceof Port)) {
+				connections.add(connection);
+			}
+		}
+
 		// move connections
-		network.getConnections().addAll(subNetwork.getConnections());
+		network.getConnections().addAll(connections);
 	}
 
 	/**
