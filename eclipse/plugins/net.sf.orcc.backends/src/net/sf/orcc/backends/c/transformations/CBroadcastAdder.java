@@ -34,7 +34,7 @@ import java.util.Map;
 
 import net.sf.dftools.graph.Edge;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.DfVertex;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.transformations.BroadcastAdder;
 import net.sf.orcc.util.WriteListener;
@@ -58,9 +58,9 @@ public class CBroadcastAdder extends BroadcastAdder {
 	}
 
 	@Override
-	public Void caseDfVertex(DfVertex vertex) {
-		List<Edge> edges = new ArrayList<Edge>(vertex.getOutgoing());
-		Map<Port, List<Connection>> outMap = vertex.getOutgoingPortMap();
+	public Void caseInstance(Instance instance) {
+		List<Edge> edges = new ArrayList<Edge>(instance.getOutgoing());
+		Map<Port, List<Connection>> outMap = instance.getOutgoingPortMap();
 		for (Edge edge : edges) {
 			Connection connection = (Connection) edge;
 			Port srcPort = connection.getSourcePort();
@@ -71,12 +71,13 @@ public class CBroadcastAdder extends BroadcastAdder {
 					int size = getSize(outList.get(0));
 					for (Connection connec : outList) {
 						if (size != getSize(connec)) {
-							createBroadcast(vertex.getName(), srcPort, outList);
+							createBroadcast(instance.getName(), srcPort,
+									outList);
 							writeListener
 									.writeText("Warning: Different-sized FIFOs connected to port '"
 											+ srcPort.getName()
 											+ "' from '"
-											+ vertex.getName()
+											+ instance.getName()
 											+ "'. A broadcast is created.\n");
 							return null;
 						}

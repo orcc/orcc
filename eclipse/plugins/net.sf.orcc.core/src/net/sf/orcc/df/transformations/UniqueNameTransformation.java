@@ -32,9 +32,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.dftools.graph.Vertex;
-import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.util.EcoreHelper;
 
 /**
  * This class defines a transformation that updates the name of all entities of
@@ -61,14 +61,14 @@ public class UniqueNameTransformation extends DfSwitch<Void> {
 	}
 
 	@Override
-	public Void caseDfVertex(DfVertex vertex) {
-		String id = vertex.getName();
+	public Void caseVertex(Vertex vertex) {
+		String id = EcoreHelper.getFeature(vertex, "name");
 		Integer num = identifiers.get(id);
 		if (num == null) {
 			identifiers.put(id, 0);
 		} else {
 			num++;
-			vertex.setName(id + "_" + num);
+			EcoreHelper.setFeature(vertex, "name", id + "_" + num);
 			identifiers.put(id, num);
 		}
 

@@ -59,66 +59,13 @@ public interface DfPackage extends EPackage {
 	DfPackage eINSTANCE = net.sf.orcc.df.impl.DfPackageImpl.init();
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.df.impl.DfVertexImpl <em>Vertex</em>}' class.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see net.sf.orcc.df.impl.DfVertexImpl
-	 * @see net.sf.orcc.df.impl.DfPackageImpl#getDfVertex()
-	 * @generated
-	 */
-	int DF_VERTEX = 0;
-
-	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int DF_VERTEX__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
-
-	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int DF_VERTEX__INCOMING = GraphPackage.VERTEX__INCOMING;
-
-	/**
-	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int DF_VERTEX__OUTGOING = GraphPackage.VERTEX__OUTGOING;
-
-	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int DF_VERTEX__NAME = GraphPackage.VERTEX_FEATURE_COUNT + 0;
-
-	/**
-	 * The number of structural features of the '<em>Vertex</em>' class. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int DF_VERTEX_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 1;
-
-	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.EntityImpl <em>Entity</em>}' class.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.df.impl.EntityImpl
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getEntity()
 	 * @generated
 	 */
-	int ENTITY = 4;
+	int ENTITY = 3;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.NetworkImpl <em>Network</em>}' class.
@@ -127,7 +74,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getNetwork()
 	 * @generated
 	 */
-	int NETWORK = 7;
+	int NETWORK = 6;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.ConnectionImpl
@@ -138,7 +85,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getConnection()
 	 * @generated
 	 */
-	int CONNECTION = 9;
+	int CONNECTION = 8;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.InstanceImpl <em>Instance</em>}' class.
@@ -147,7 +94,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getInstance()
 	 * @generated
 	 */
-	int INSTANCE = 3;
+	int INSTANCE = 2;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.BroadcastImpl <em>Broadcast</em>}' class.
@@ -156,7 +103,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getBroadcast()
 	 * @generated
 	 */
-	int BROADCAST = 8;
+	int BROADCAST = 7;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.ActionImpl <em>Action</em>}' class.
@@ -165,7 +112,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getAction()
 	 * @generated
 	 */
-	int ACTION = 10;
+	int ACTION = 9;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.ActorImpl <em>Actor</em>}' class.
@@ -174,7 +121,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getActor()
 	 * @generated
 	 */
-	int ACTOR = 6;
+	int ACTOR = 5;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.FSMImpl <em>FSM</em>}' class.
@@ -183,7 +130,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getFSM()
 	 * @generated
 	 */
-	int FSM = 11;
+	int FSM = 10;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.PatternImpl <em>Pattern</em>}' class.
@@ -192,7 +139,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getPattern()
 	 * @generated
 	 */
-	int PATTERN = 12;
+	int PATTERN = 11;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.PortImpl <em>Port</em>}' class.
@@ -201,7 +148,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getPort()
 	 * @generated
 	 */
-	int PORT = 2;
+	int PORT = 1;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.StateImpl <em>State</em>}' class.
@@ -210,7 +157,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getState()
 	 * @generated
 	 */
-	int STATE = 13;
+	int STATE = 12;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.TagImpl <em>Tag</em>}' class.
@@ -219,7 +166,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getTag()
 	 * @generated
 	 */
-	int TAG = 14;
+	int TAG = 13;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.TransitionImpl
@@ -230,7 +177,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getTransition()
 	 * @generated
 	 */
-	int TRANSITION = 15;
+	int TRANSITION = 14;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.PortToEIntegerObjectMapEntryImpl <em>Port To EInteger Object Map Entry</em>}' class.
@@ -240,7 +187,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getPortToEIntegerObjectMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = 16;
+	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = 15;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.PortToVarMapEntryImpl <em>Port To Var Map Entry</em>}' class.
@@ -250,7 +197,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getPortToVarMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_VAR_MAP_ENTRY = 17;
+	int PORT_TO_VAR_MAP_ENTRY = 16;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.VarToPortMapEntryImpl <em>Var To Port Map Entry</em>}' class.
@@ -260,7 +207,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getVarToPortMapEntry()
 	 * @generated
 	 */
-	int VAR_TO_PORT_MAP_ENTRY = 18;
+	int VAR_TO_PORT_MAP_ENTRY = 17;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.ArgumentImpl <em>Argument</em>}' class.
@@ -269,7 +216,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getArgument()
 	 * @generated
 	 */
-	int ARGUMENT = 19;
+	int ARGUMENT = 18;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.UnitImpl <em>Unit</em>}' class.
@@ -278,7 +225,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getUnit()
 	 * @generated
 	 */
-	int UNIT = 1;
+	int UNIT = 0;
 
 	/**
 	 * The feature id for the '<em><b>Constants</b></em>' containment reference list.
@@ -537,7 +484,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getEntitySpecific()
 	 * @generated
 	 */
-	int ENTITY_SPECIFIC = 5;
+	int ENTITY_SPECIFIC = 4;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -1399,26 +1346,6 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int ARGUMENT_FEATURE_COUNT = 2;
-
-	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.df.DfVertex <em>Vertex</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Vertex</em>'.
-	 * @see net.sf.orcc.df.DfVertex
-	 * @generated
-	 */
-	EClass getDfVertex();
-
-	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.DfVertex#getName <em>Name</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Name</em>'.
-	 * @see net.sf.orcc.df.DfVertex#getName()
-	 * @see #getDfVertex()
-	 * @generated
-	 */
-	EAttribute getDfVertex_Name();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Network <em>Network</em>}'.
@@ -2290,25 +2217,6 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 */
 	interface Literals {
-		/**
-		 * The meta object literal for the '
-		 * {@link net.sf.orcc.df.impl.DfVertexImpl <em>Vertex</em>}' class. <!--
-		 * begin-user-doc --> <!-- end-user-doc -->
-		 * 
-		 * @see net.sf.orcc.df.impl.DfVertexImpl
-		 * @see net.sf.orcc.df.impl.DfPackageImpl#getDfVertex()
-		 * @generated
-		 */
-		EClass DF_VERTEX = eINSTANCE.getDfVertex();
-
-		/**
-		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute DF_VERTEX__NAME = eINSTANCE.getDfVertex_Name();
-
 		/**
 		 * The meta object literal for the '
 		 * {@link net.sf.orcc.df.impl.NetworkImpl <em>Network</em>}' class. <!--

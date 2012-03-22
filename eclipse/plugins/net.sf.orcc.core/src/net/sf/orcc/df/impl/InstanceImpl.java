@@ -67,15 +67,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
 public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String NAME_EDEFAULT = null;
-
-	/**
 	 * The cached value of the '{@link #getArguments() <em>Arguments</em>}'
 	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -92,6 +83,15 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 * @ordered
 	 */
 	protected Entity entity;
+
+	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
 
 	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.

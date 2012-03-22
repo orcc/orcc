@@ -17,7 +17,6 @@ import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.EntitySpecific;
 import net.sf.orcc.df.Instance;
@@ -46,12 +45,6 @@ import org.eclipse.emf.ecore.impl.EPackageImpl;
  * @generated
  */
 public class DfPackageImpl extends EPackageImpl implements DfPackage {
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass dfVertexEClass = null;
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -245,23 +238,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		// Update the registry and return the package
 		EPackage.Registry.INSTANCE.put(DfPackage.eNS_URI, theDfPackage);
 		return theDfPackage;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getDfVertex() {
-		return dfVertexEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getDfVertex_Name() {
-		return (EAttribute) dfVertexEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -910,9 +886,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		isCreated = true;
 
 		// Create classes and their features
-		dfVertexEClass = createEClass(DF_VERTEX);
-		createEAttribute(dfVertexEClass, DF_VERTEX__NAME);
-
 		unitEClass = createEClass(UNIT);
 		createEReference(unitEClass, UNIT__CONSTANTS);
 		createEReference(unitEClass, UNIT__PROCEDURES);
@@ -1035,10 +1008,10 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		setNsURI(eNS_URI);
 
 		// Obtain other dependent packages
-		GraphPackage theGraphPackage = (GraphPackage) EPackage.Registry.INSTANCE
-				.getEPackage(GraphPackage.eNS_URI);
 		IrPackage theIrPackage = (IrPackage) EPackage.Registry.INSTANCE
 				.getEPackage(IrPackage.eNS_URI);
+		GraphPackage theGraphPackage = (GraphPackage) EPackage.Registry.INSTANCE
+				.getEPackage(GraphPackage.eNS_URI);
 		MocPackage theMocPackage = (MocPackage) EPackage.Registry.INSTANCE
 				.getEPackage(MocPackage.eNS_URI);
 		UtilPackage theUtilPackage = (UtilPackage) EPackage.Registry.INSTANCE
@@ -1051,7 +1024,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		// Set bounds for type parameters
 
 		// Add supertypes to classes
-		dfVertexEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		portEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		instanceEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		entityEClass.getESuperTypes().add(theGraphPackage.getVertex());
@@ -1067,13 +1039,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		transitionEClass.getESuperTypes().add(theGraphPackage.getEdge());
 
 		// Initialize classes and features; add operations and parameters
-		initEClass(dfVertexEClass, DfVertex.class, "DfVertex", IS_ABSTRACT,
-				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getDfVertex_Name(), ecorePackage.getEString(), "name",
-				null, 0, 1, DfVertex.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
-
 		initEClass(unitEClass, Unit.class, "Unit", !IS_ABSTRACT, !IS_INTERFACE,
 				IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getUnit_Constants(), theIrPackage.getVar(), null,

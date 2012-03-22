@@ -48,16 +48,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
 public abstract class EntityImpl extends VertexImpl implements Entity {
 
 	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String NAME_EDEFAULT = null;
-
-	/**
 	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getInputs()
@@ -65,11 +55,6 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 	 * @ordered
 	 */
 	protected EList<Port> inputs;
-
-	/**
-	 * @generated
-	 */
-	protected String name = NAME_EDEFAULT;
 
 	/**
 	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' containment reference list.
@@ -88,6 +73,21 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 	 * @ordered
 	 */
 	protected EList<Var> parameters;
+
+	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
+
+	/**
+	 * @generated
+	 */
+	protected String name = NAME_EDEFAULT;
 
 	private Object templateData;
 

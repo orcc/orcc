@@ -18,7 +18,6 @@ import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.EntitySpecific;
 import net.sf.orcc.df.FSM;
@@ -93,17 +92,6 @@ public class DfSwitch<T> extends Switch<T> {
 	@Override
 	protected T doSwitch(int classifierID, EObject theEObject) {
 		switch (classifierID) {
-		case DfPackage.DF_VERTEX: {
-			DfVertex dfVertex = (DfVertex) theEObject;
-			T result = caseDfVertex(dfVertex);
-			if (result == null)
-				result = caseVertex(dfVertex);
-			if (result == null)
-				result = caseAttributable(dfVertex);
-			if (result == null)
-				result = defaultCase(theEObject);
-			return result;
-		}
 		case DfPackage.UNIT: {
 			Unit unit = (Unit) theEObject;
 			T result = caseUnit(unit);
@@ -297,21 +285,6 @@ public class DfSwitch<T> extends Switch<T> {
 		default:
 			return defaultCase(theEObject);
 		}
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Vertex</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Vertex</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseDfVertex(DfVertex object) {
-		return null;
 	}
 
 	/**

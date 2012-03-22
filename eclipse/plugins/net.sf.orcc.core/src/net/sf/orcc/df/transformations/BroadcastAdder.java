@@ -37,8 +37,8 @@ import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Entity;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfSwitch;
@@ -57,6 +57,18 @@ public class BroadcastAdder extends DfSwitch<Void> {
 	private Network network;
 
 	@Override
+	public Void caseEntity(Entity entity) {
+		handle(entity.getName(), entity.getOutgoingPortMap());
+		return null;
+	}
+
+	@Override
+	public Void caseInstance(Instance instance) {
+		handle(instance.getName(), instance.getOutgoingPortMap());
+		return null;
+	}
+
+	@Override
 	public Void caseNetwork(Network network) {
 		this.network = network;
 		// make a copy of the existing vertex set because the set returned is
@@ -73,6 +85,15 @@ public class BroadcastAdder extends DfSwitch<Void> {
 			} else {
 				doSwitch(vertex);
 			}
+		}
+		return null;
+	}
+
+	@Override
+	public Void casePort(Port port) {
+		List<Edge> connections = new ArrayList<Edge>(port.getOutgoing());
+		if (connections.size() > 1) {
+			createBroadcast(network.getName(), port, connections);
 		}
 		return null;
 	}
@@ -103,25 +124,13 @@ public class BroadcastAdder extends DfSwitch<Void> {
 		}
 	}
 
-	@Override
-	public Void casePort(Port port) {
-		List<Edge> connections = new ArrayList<Edge>(port.getOutgoing());
-		if (connections.size() > 1) {
-			createBroadcast(network.getName(), port, connections);
-		}
-		return null;
-	}
-
-	@Override
-	public Void caseDfVertex(DfVertex vertex) {
-		Map<Port, List<Connection>> outMap = vertex.getOutgoingPortMap();
+	private void handle(String name, Map<Port, List<Connection>> outMap) {
 		for (Port srcPort : outMap.keySet()) {
 			List<Connection> outList = outMap.get(srcPort);
 			if (outList.size() > 1) {
-				createBroadcast(vertex.getName(), srcPort, outList);
+				createBroadcast(name, srcPort, outList);
 			}
 		}
-		return null;
 	}
 
 }

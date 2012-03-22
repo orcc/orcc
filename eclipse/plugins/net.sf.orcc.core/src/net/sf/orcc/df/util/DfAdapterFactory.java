@@ -18,7 +18,6 @@ import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.EntitySpecific;
 import net.sf.orcc.df.FSM;
@@ -92,11 +91,6 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	protected DfSwitch<Adapter> modelSwitch = new DfSwitch<Adapter>() {
-		@Override
-		public Adapter caseDfVertex(DfVertex object) {
-			return createDfVertexAdapter();
-		}
-
 		@Override
 		public Adapter caseUnit(Unit object) {
 			return createUnitAdapter();
@@ -230,20 +224,6 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	@Override
 	public Adapter createAdapter(Notifier target) {
 		return modelSwitch.doSwitch((EObject) target);
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.DfVertex <em>Vertex</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.df.DfVertex
-	 * @generated
-	 */
-	public Adapter createDfVertexAdapter() {
-		return null;
 	}
 
 	/**
