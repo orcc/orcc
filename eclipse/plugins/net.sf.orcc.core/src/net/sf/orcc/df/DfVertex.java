@@ -48,8 +48,6 @@ public interface DfVertex extends Vertex {
 
 	String getPackage();
 
-	List<String> getPackageAsList();
-
 	String getSimpleName();
 
 	Object getTemplateData();

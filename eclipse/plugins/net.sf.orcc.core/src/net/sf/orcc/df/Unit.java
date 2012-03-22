@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.df;
 
-import java.util.List;
-
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 
@@ -93,9 +91,12 @@ public interface Unit extends EObject {
 	 */
 	String getName();
 
+	/**
+	 * Returns the package of this unit.
+	 * 
+	 * @return the package of this unit
+	 */
 	String getPackage();
-
-	List<String> getPackageAsList();
 
 	/**
 	 * Returns a procedure of this unit whose name matches the given name.

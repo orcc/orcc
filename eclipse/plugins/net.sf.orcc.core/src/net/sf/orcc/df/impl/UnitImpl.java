@@ -6,9 +6,7 @@
  */
 package net.sf.orcc.df.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Unit;
@@ -320,11 +318,10 @@ public class UnitImpl extends EObjectImpl implements Unit {
 	 */
 	public String getName() {
 		return name;
-	}@Override
+	}
+
+	@Override
 	public String getPackage() {
-		if (name == null) {
-			return null;
-		}
 		int index = name.lastIndexOf('.');
 		if (index == -1) {
 			return "";
@@ -334,26 +331,13 @@ public class UnitImpl extends EObjectImpl implements Unit {
 	}
 
 	@Override
-	public List<String> getPackageAsList() {
-		String[] segments = name == null ? new String[0] : name.split("\\.");
-		List<String> list = new ArrayList<String>(segments.length - 1);
-		for (int i = 0; i < segments.length - 1; i++) {
-			list.add(segments[i]);
-		}
-		return list;
-	}
-
-	@Override
 	public String getSimpleName() {
-		if (name == null) {
-			return null;
-		}
 		int index = name.lastIndexOf('.');
-		if (index == -1) {
-			return name;
-		} else {
-			return name.substring(index + 1);
+		String simpleName = name;
+		if (index != -1) {
+			simpleName = name.substring(index + 1);
 		}
+		return simpleName;
 	}
 
 	@Override
