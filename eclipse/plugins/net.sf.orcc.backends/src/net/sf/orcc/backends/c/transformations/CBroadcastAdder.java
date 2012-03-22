@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.c.transformations;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -55,41 +54,32 @@ public class CBroadcastAdder extends BroadcastAdder {
 
 	@Override
 	public Void casePort(Port port) {
-		List<Edge> connections = new ArrayList<Edge>(port.getOutgoing());
-		if (connections.size() > 1) {
-			int size = ((Connection) connections.get(0)).getSize();
-			for (Edge edge : connections) {
-				if (size != ((Connection) edge).getSize()) {
-					createBroadcast(network.getName(), port, connections);
-					listener.writeText("Warning: Different-sized FIFOs connected to port '"
-							+ port.getName()
-							+ "' in '"
-							+ network.getName()
-							+ "'. A broadcast is created.\n");
-					return null;
-				}
-			}
-		}
+		createNeededBcast(port, port.getOutgoing());
 		return null;
 	}
-	
+
 	@Override
 	protected void handle(String name, Map<Port, List<Connection>> outMap) {
 		for (Port srcPort : outMap.keySet()) {
-			List<Connection> outList = outMap.get(srcPort);
-			if (outMap.size() > 1) {
-				int size = ((Connection) outList.get(0)).getSize();
-				for (Edge edge : outList) {
-					if (size != ((Connection) edge).getSize()) {
-						createBroadcast(network.getName(), srcPort, outList);
-						listener.writeText("Warning: Different-sized FIFOs connected to port '"
-								+ srcPort.getName()
-								+ "' in '"
-								+ network.getName()
-								+ "'. A broadcast is created.\n");
-					}
+			createNeededBcast(srcPort, outMap.get(srcPort));
+		}
+	}
+
+	private void createNeededBcast(Port srcPort, List<? extends Edge> edges) {
+		if (edges.size() > 1) {
+			int size = ((Connection) edges.get(0)).getSize();
+			for (Edge edge : edges) {
+				if (size != ((Connection) edge).getSize()) {
+					createBroadcast(network.getName(), srcPort, edges);
+					listener.writeText("Warning: Different-sized FIFOs connected to port '"
+							+ srcPort.getName()
+							+ "' in '"
+							+ network.getName()
+							+ "'. A broadcast is created.\n");
 				}
 			}
 		}
+
 	}
+
 }
