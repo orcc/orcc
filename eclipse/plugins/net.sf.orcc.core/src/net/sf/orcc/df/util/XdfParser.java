@@ -884,7 +884,7 @@ public class XdfParser {
 		parseAttributes(instance.getAttributes(), child);
 
 		// add instance
-		network.addInstance(instance);
+		network.add(instance);
 	}
 
 	/**

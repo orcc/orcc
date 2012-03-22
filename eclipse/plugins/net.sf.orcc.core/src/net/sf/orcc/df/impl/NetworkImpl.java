@@ -175,21 +175,19 @@ public class NetworkImpl extends EntityImpl implements Network {
 	}
 
 	@Override
-	public void addEntity(Entity entity) {
-		getVertices().add(entity);
-		getEntities().add(entity);
+	public void add(Vertex vertex) {
+		if (vertex instanceof Entity) {
+			getEntities().add((Entity) vertex);
+		} else if (vertex instanceof Instance) {
+			getInstances().add((Instance) vertex);
+		}
+		getVertices().add(vertex);
 	}
 
 	@Override
 	public void addInput(Port port) {
 		getVertices().add(port);
 		getInputs().add(port);
-	}
-
-	@Override
-	public void addInstance(Instance instance) {
-		getVertices().add(instance);
-		getInstances().add(instance);
 	}
 
 	@Override

@@ -50,15 +50,6 @@ import org.eclipse.emf.common.util.EList;
 public interface Network extends Entity, Graph {
 
 	/**
-	 * Adds the given entity to this network. The entity is added to the
-	 * vertices and the entities list.
-	 * 
-	 * @param entity
-	 *            an entity
-	 */
-	void addEntity(Entity entity);
-
-	/**
 	 * Adds the given port to this network. The port is added to the vertices
 	 * and the inputs list.
 	 * 
@@ -66,15 +57,6 @@ public interface Network extends Entity, Graph {
 	 *            a port
 	 */
 	void addInput(Port port);
-
-	/**
-	 * Adds the given instance to this network. The instance is added to the
-	 * vertices and the instances list.
-	 * 
-	 * @param instance
-	 *            an instance
-	 */
-	void addInstance(Instance instance);
 
 	/**
 	 * Adds the given port to this network. The port is added to the vertices

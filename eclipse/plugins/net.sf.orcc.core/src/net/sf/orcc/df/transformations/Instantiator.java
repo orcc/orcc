@@ -140,7 +140,7 @@ public class Instantiator extends DfSwitch<Network> {
 			Entity entity = instance.getEntity();
 			if (entity.isActor() && skipActors) {
 				Instance copy = (Instance) copier.copy(instance);
-				networkCopy.addInstance(copy);
+				networkCopy.add(copy);
 			} else {
 				if (entity.isNetwork()) {
 					entity = doSwitch(entity);
@@ -150,7 +150,7 @@ public class Instantiator extends DfSwitch<Network> {
 				map.put(instance, entity);
 
 				// add entity to the network's entities
-				networkCopy.addEntity(entity);
+				networkCopy.add(entity);
 
 				// set name, attributes, arguments
 				entity.setName(instance.getName());

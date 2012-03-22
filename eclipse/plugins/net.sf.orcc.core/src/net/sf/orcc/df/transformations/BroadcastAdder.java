@@ -104,7 +104,7 @@ public class BroadcastAdder extends DfSwitch<Void> {
 		Broadcast bcast = DfFactory.eINSTANCE.createBroadcast(outList.size(),
 				port.getType());
 		bcast.setName(id + "_" + port.getName());
-		network.addEntity(bcast);
+		network.add(bcast);
 
 		// Creates a connection between the vertex and the broadcast
 		Connection conn = (Connection) outList.get(0);
