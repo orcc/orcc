@@ -211,7 +211,7 @@ public class CBackendImpl extends AbstractBackend {
 			}
 		}
 
-		new CBroadcastAdder(getWriteListener(), fifoSize).doSwitch(network);
+		new CBroadcastAdder(getWriteListener()).doSwitch(network);
 
 		return network;
 	}

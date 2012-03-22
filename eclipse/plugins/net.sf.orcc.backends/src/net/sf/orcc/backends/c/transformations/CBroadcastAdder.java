@@ -34,7 +34,6 @@ import java.util.Map;
 
 import net.sf.dftools.graph.Edge;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.transformations.BroadcastAdder;
 import net.sf.orcc.util.WriteListener;
@@ -48,50 +47,49 @@ import net.sf.orcc.util.WriteListener;
  */
 public class CBroadcastAdder extends BroadcastAdder {
 
-	private int defaultFifoSize;
+	private WriteListener listener;
 
-	private WriteListener writeListener;
-
-	public CBroadcastAdder(WriteListener writeListener, int defaultFifoSize) {
-		this.writeListener = writeListener;
-		this.defaultFifoSize = defaultFifoSize;
+	public CBroadcastAdder(WriteListener listener) {
+		this.listener = listener;
 	}
 
 	@Override
-	public Void caseInstance(Instance instance) {
-		List<Edge> edges = new ArrayList<Edge>(instance.getOutgoing());
-		Map<Port, List<Connection>> outMap = instance.getOutgoingPortMap();
-		for (Edge edge : edges) {
-			Connection connection = (Connection) edge;
-			Port srcPort = connection.getSourcePort();
-			if (srcPort != null) {
-				List<Connection> outList = outMap.get(srcPort);
-				int numOutput = outList.size();
-				if (numOutput > 1) {
-					int size = getSize(outList.get(0));
-					for (Connection connec : outList) {
-						if (size != getSize(connec)) {
-							createBroadcast(instance.getName(), srcPort,
-									outList);
-							writeListener
-									.writeText("Warning: Different-sized FIFOs connected to port '"
-											+ srcPort.getName()
-											+ "' from '"
-											+ instance.getName()
-											+ "'. A broadcast is created.\n");
-							return null;
-						}
+	public Void casePort(Port port) {
+		List<Edge> connections = new ArrayList<Edge>(port.getOutgoing());
+		if (connections.size() > 1) {
+			int size = ((Connection) connections.get(0)).getSize();
+			for (Edge edge : connections) {
+				if (size != ((Connection) edge).getSize()) {
+					createBroadcast(network.getName(), port, connections);
+					listener.writeText("Warning: Different-sized FIFOs connected to port '"
+							+ port.getName()
+							+ "' in '"
+							+ network.getName()
+							+ "'. A broadcast is created.\n");
+					return null;
+				}
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	protected void handle(String name, Map<Port, List<Connection>> outMap) {
+		for (Port srcPort : outMap.keySet()) {
+			List<Connection> outList = outMap.get(srcPort);
+			if (outMap.size() > 1) {
+				int size = ((Connection) outList.get(0)).getSize();
+				for (Edge edge : outList) {
+					if (size != ((Connection) edge).getSize()) {
+						createBroadcast(network.getName(), srcPort, outList);
+						listener.writeText("Warning: Different-sized FIFOs connected to port '"
+								+ srcPort.getName()
+								+ "' in '"
+								+ network.getName()
+								+ "'. A broadcast is created.\n");
 					}
 				}
 			}
 		}
-
-		return null;
 	}
-
-	private int getSize(Connection connection) {
-		return connection.getSize() == null ? defaultFifoSize : connection
-				.getSize();
-	}
-
 }

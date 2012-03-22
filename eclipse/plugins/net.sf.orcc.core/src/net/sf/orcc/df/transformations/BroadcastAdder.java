@@ -54,7 +54,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class BroadcastAdder extends DfSwitch<Void> {
 
-	private Network network;
+	protected Network network;
 
 	@Override
 	public Void caseEntity(Entity entity) {
@@ -124,7 +124,7 @@ public class BroadcastAdder extends DfSwitch<Void> {
 		}
 	}
 
-	private void handle(String name, Map<Port, List<Connection>> outMap) {
+	protected void handle(String name, Map<Port, List<Connection>> outMap) {
 		for (Port srcPort : outMap.keySet()) {
 			List<Connection> outList = outMap.get(srcPort);
 			if (outList.size() > 1) {
