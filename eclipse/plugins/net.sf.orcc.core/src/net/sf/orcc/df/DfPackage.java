@@ -753,7 +753,7 @@ public interface DfPackage extends EPackage {
 	int NETWORK__VARIABLES = ENTITY_FEATURE_COUNT + 3;
 
 	/**
-	 * The feature id for the '<em><b>Instances</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Instances</b></em>' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
@@ -770,7 +770,7 @@ public interface DfPackage extends EPackage {
 	int NETWORK__FILE_NAME = ENTITY_FEATURE_COUNT + 5;
 
 	/**
-	 * The feature id for the '<em><b>Entities</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Entities</b></em>' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
@@ -2231,7 +2231,7 @@ public interface DfPackage extends EPackage {
 		EReference NETWORK__VARIABLES = eINSTANCE.getNetwork_Variables();
 
 		/**
-		 * The meta object literal for the '<em><b>Instances</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Instances</b></em>' reference list feature.
 		 * <!-- begin-user-doc --> <!--
 		 * end-user-doc -->
 		 * @generated
@@ -2246,7 +2246,7 @@ public interface DfPackage extends EPackage {
 		EAttribute NETWORK__FILE_NAME = eINSTANCE.getNetwork_FileName();
 
 		/**
-		 * The meta object literal for the '<em><b>Entities</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Entities</b></em>' reference list feature.
 		 * <!-- begin-user-doc --> <!--
 		 * end-user-doc -->
 		 * @generated

@@ -124,7 +124,7 @@ public interface Network extends Entity, Graph {
 	 * Returns the list of entities contained in this network.
 	 * 
 	 * @return the list of entities contained in this network
-	 * @model containment="true"
+	 * @model
 	 */
 	EList<Entity> getEntities();
 
@@ -144,19 +144,10 @@ public interface Network extends Entity, Graph {
 	String getFileName();
 
 	/**
-	 * Returns the value of the '<em><b>Inputs</b></em>' reference list. The
-	 * list contents are of type {@link net.sf.orcc.df.Port}. <!--
-	 * begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Inputs</em>' containment reference list isn't
-	 * clear, there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
+	 * Returns the inputs of this network.
 	 * 
-	 * @return the value of the '<em>Inputs</em>' reference list.
-	 * @see net.sf.orcc.df.DfPackage#getNetwork_Inputs()
-	 * @model resolveProxies="false"
-	 * @generated
+	 * @return the inputs of this network
+	 * @model
 	 */
 	EList<Port> getInputs();
 
@@ -166,7 +157,7 @@ public interface Network extends Entity, Graph {
 	 * Returns the list of instances referenced by the graph of this network.
 	 * 
 	 * @return a list of instances
-	 * @model containment="true"
+	 * @model
 	 */
 	EList<Instance> getInstances();
 
@@ -189,19 +180,10 @@ public interface Network extends Entity, Graph {
 	MoC getMoC();
 
 	/**
-	 * Returns the value of the '<em><b>Outputs</b></em>' reference list. The
-	 * list contents are of type {@link net.sf.orcc.df.Port}. <!--
-	 * begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Outputs</em>' containment reference list isn't
-	 * clear, there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
+	 * Returns the outputs of this network.
 	 * 
-	 * @return the value of the '<em>Outputs</em>' reference list.
-	 * @see net.sf.orcc.df.DfPackage#getNetwork_Outputs()
-	 * @model resolveProxies="false"
-	 * @generated
+	 * @return the outputs of this network
+	 * @model
 	 */
 	EList<Port> getOutputs();
 
