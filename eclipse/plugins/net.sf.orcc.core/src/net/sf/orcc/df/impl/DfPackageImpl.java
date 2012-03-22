@@ -289,6 +289,24 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getNetwork_Inputs() {
+		return (EReference) networkEClass.getEStructuralFeatures().get(5);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getNetwork_Outputs() {
+		return (EReference) networkEClass.getEStructuralFeatures().get(6);
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -351,6 +369,24 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 */
 	public EClass getBroadcast() {
 		return broadcastEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getBroadcast_Inputs() {
+		return (EReference) broadcastEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getBroadcast_Outputs() {
+		return (EReference) broadcastEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -495,6 +531,24 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 */
 	public EAttribute getActor_LineNumber() {
 		return (EAttribute) actorEClass.getEStructuralFeatures().get(9);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getActor_Inputs() {
+		return (EReference) actorEClass.getEStructuralFeatures().get(10);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getActor_Outputs() {
+		return (EReference) actorEClass.getEStructuralFeatures().get(11);
 	}
 
 	/**
@@ -773,24 +827,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getEntity_Inputs() {
-		return (EReference) entityEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getEntity_Outputs() {
-		return (EReference) entityEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EReference getEntity_Parameters() {
-		return (EReference) entityEClass.getEStructuralFeatures().get(2);
+		return (EReference) entityEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -799,7 +837,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EAttribute getEntity_Name() {
-		return (EAttribute) entityEClass.getEStructuralFeatures().get(3);
+		return (EAttribute) entityEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -905,8 +943,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEAttribute(instanceEClass, INSTANCE__NAME);
 
 		entityEClass = createEClass(ENTITY);
-		createEReference(entityEClass, ENTITY__INPUTS);
-		createEReference(entityEClass, ENTITY__OUTPUTS);
 		createEReference(entityEClass, ENTITY__PARAMETERS);
 		createEAttribute(entityEClass, ENTITY__NAME);
 
@@ -923,6 +959,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEAttribute(actorEClass, ACTOR__NATIVE);
 		createEAttribute(actorEClass, ACTOR__FILE_NAME);
 		createEAttribute(actorEClass, ACTOR__LINE_NUMBER);
+		createEReference(actorEClass, ACTOR__INPUTS);
+		createEReference(actorEClass, ACTOR__OUTPUTS);
 
 		networkEClass = createEClass(NETWORK);
 		createEReference(networkEClass, NETWORK__MO_C);
@@ -930,8 +968,12 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEReference(networkEClass, NETWORK__INSTANCES);
 		createEAttribute(networkEClass, NETWORK__FILE_NAME);
 		createEReference(networkEClass, NETWORK__ENTITIES);
+		createEReference(networkEClass, NETWORK__INPUTS);
+		createEReference(networkEClass, NETWORK__OUTPUTS);
 
 		broadcastEClass = createEClass(BROADCAST);
+		createEReference(broadcastEClass, BROADCAST__INPUTS);
+		createEReference(broadcastEClass, BROADCAST__OUTPUTS);
 
 		connectionEClass = createEClass(CONNECTION);
 		createEReference(connectionEClass, CONNECTION__SOURCE_PORT);
@@ -1096,14 +1138,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 
 		initEClass(entityEClass, Entity.class, "Entity", IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getEntity_Inputs(), this.getPort(), null, "inputs",
-				null, 0, -1, Entity.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getEntity_Outputs(), this.getPort(), null, "outputs",
-				null, 0, -1, Entity.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getEntity_Parameters(), theIrPackage.getVar(), null,
 				"parameters", null, 0, -1, Entity.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
@@ -1159,6 +1193,14 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				"lineNumber", null, 0, 1, Actor.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
+		initEReference(getActor_Inputs(), this.getPort(), null, "inputs", null,
+				0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
+		initEReference(getActor_Outputs(), this.getPort(), null, "outputs",
+				null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(networkEClass, Network.class, "Network", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -1182,9 +1224,25 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				"entities", null, 0, -1, Network.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getNetwork_Inputs(), this.getPort(), null, "inputs",
+				null, 0, -1, Network.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getNetwork_Outputs(), this.getPort(), null, "outputs",
+				null, 0, -1, Network.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(broadcastEClass, Broadcast.class, "Broadcast", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getBroadcast_Inputs(), this.getPort(), null, "inputs",
+				null, 0, -1, Broadcast.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getBroadcast_Outputs(), this.getPort(), null, "outputs",
+				null, 0, -1, Broadcast.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(connectionEClass, Connection.class, "Connection",
 				!IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);

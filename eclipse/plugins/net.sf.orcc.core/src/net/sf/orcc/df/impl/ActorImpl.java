@@ -50,6 +50,8 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.df.impl.ActorImpl#isNative <em>Native</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getFileName <em>File Name</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getLineNumber <em>Line Number</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getInputs <em>Inputs</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getOutputs <em>Outputs</em>}</li>
  * </ul>
  * </p>
  *
@@ -175,6 +177,26 @@ public class ActorImpl extends EntityImpl implements Actor {
 	protected int lineNumber = LINE_NUMBER_EDEFAULT;
 
 	/**
+	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getInputs()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Port> inputs;
+
+	/**
+	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getOutputs()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Port> outputs;
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 */
 	protected ActorImpl() {
@@ -248,6 +270,10 @@ public class ActorImpl extends EntityImpl implements Actor {
 			return getFileName();
 		case DfPackage.ACTOR__LINE_NUMBER:
 			return getLineNumber();
+		case DfPackage.ACTOR__INPUTS:
+			return getInputs();
+		case DfPackage.ACTOR__OUTPUTS:
+			return getOutputs();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -275,6 +301,11 @@ public class ActorImpl extends EntityImpl implements Actor {
 		case DfPackage.ACTOR__STATE_VARS:
 			return ((InternalEList<?>) getStateVars()).basicRemove(otherEnd,
 					msgs);
+		case DfPackage.ACTOR__INPUTS:
+			return ((InternalEList<?>) getInputs()).basicRemove(otherEnd, msgs);
+		case DfPackage.ACTOR__OUTPUTS:
+			return ((InternalEList<?>) getOutputs())
+					.basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -307,6 +338,10 @@ public class ActorImpl extends EntityImpl implements Actor {
 					: !FILE_NAME_EDEFAULT.equals(fileName);
 		case DfPackage.ACTOR__LINE_NUMBER:
 			return lineNumber != LINE_NUMBER_EDEFAULT;
+		case DfPackage.ACTOR__INPUTS:
+			return inputs != null && !inputs.isEmpty();
+		case DfPackage.ACTOR__OUTPUTS:
+			return outputs != null && !outputs.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -354,6 +389,14 @@ public class ActorImpl extends EntityImpl implements Actor {
 			return;
 		case DfPackage.ACTOR__LINE_NUMBER:
 			setLineNumber((Integer) newValue);
+			return;
+		case DfPackage.ACTOR__INPUTS:
+			getInputs().clear();
+			getInputs().addAll((Collection<? extends Port>) newValue);
+			return;
+		case DfPackage.ACTOR__OUTPUTS:
+			getOutputs().clear();
+			getOutputs().addAll((Collection<? extends Port>) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -404,6 +447,12 @@ public class ActorImpl extends EntityImpl implements Actor {
 			return;
 		case DfPackage.ACTOR__LINE_NUMBER:
 			setLineNumber(LINE_NUMBER_EDEFAULT);
+			return;
+		case DfPackage.ACTOR__INPUTS:
+			getInputs().clear();
+			return;
+		case DfPackage.ACTOR__OUTPUTS:
+			getOutputs().clear();
 			return;
 		}
 		super.eUnset(featureID);
@@ -625,6 +674,32 @@ public class ActorImpl extends EntityImpl implements Actor {
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
 					DfPackage.ACTOR__LINE_NUMBER, oldLineNumber, lineNumber));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Port> getInputs() {
+		if (inputs == null) {
+			inputs = new EObjectContainmentEList<Port>(Port.class, this,
+					DfPackage.ACTOR__INPUTS);
+		}
+		return inputs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Port> getOutputs() {
+		if (outputs == null) {
+			outputs = new EObjectContainmentEList<Port>(Port.class, this,
+					DfPackage.ACTOR__OUTPUTS);
+		}
+		return outputs;
 	}
 
 	/**

@@ -74,6 +74,7 @@ import net.sf.orcc.ir.transformations.BuildCFG;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.transformations.TacTransformation;
+import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -345,8 +346,9 @@ public class TTABackendImpl extends AbstractBackend {
 		Processor tta = ArchitectureFactory.eINSTANCE.createProcessor(
 				instance.getSimpleName(), getBusNb(instance),
 				getRegNb(instance), 12, 2, getAluNb(instance), 1, 1, 1,
-				instance.getEntity().getInputs().size(), instance.getEntity()
-						.getOutputs().size(), ramSize);
+				EcoreHelper.getList(instance.getEntity(), "inputs").size(),
+				EcoreHelper.getList(instance.getEntity(), "outputs").size(),
+				ramSize);
 
 		/*
 		 * Processor tta = ArchitectureFactory.eINSTANCE.createHugeProcessor(

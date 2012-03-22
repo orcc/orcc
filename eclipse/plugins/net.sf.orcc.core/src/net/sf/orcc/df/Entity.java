@@ -63,14 +63,6 @@ public interface Entity extends Vertex {
 	Port getInput(String name);
 
 	/**
-	 * Returns the list of this entity's input ports
-	 * 
-	 * @return the list of this entity's input ports
-	 * @model containment="true"
-	 */
-	EList<Port> getInputs();
-
-	/**
 	 * Returns the qualified name of this vertex.
 	 * 
 	 * @return the qualified name of this vertex
@@ -88,14 +80,6 @@ public interface Entity extends Vertex {
 	 * @return an output port whose name matches the given name
 	 */
 	Port getOutput(String name);
-
-	/**
-	 * Returns the list of this entity's output ports
-	 * 
-	 * @return the list of this entity's output ports
-	 * @model containment="true"
-	 */
-	EList<Port> getOutputs();
 
 	String getPackage();
 

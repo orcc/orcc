@@ -19,6 +19,7 @@ import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.util.EcoreHelper;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -36,8 +37,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getInputs <em>Inputs</em>}</li>
- *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getOutputs <em>Outputs</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getParameters <em>Parameters</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getName <em>Name</em>}</li>
  * </ul>
@@ -46,24 +45,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * @generated
  */
 public abstract class EntityImpl extends VertexImpl implements Entity {
-
-	/**
-	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getInputs()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Port> inputs;
-
-	/**
-	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getOutputs()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Port> outputs;
 
 	/**
 	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}' containment reference list.
@@ -106,10 +87,6 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case DfPackage.ENTITY__INPUTS:
-			return getInputs();
-		case DfPackage.ENTITY__OUTPUTS:
-			return getOutputs();
 		case DfPackage.ENTITY__PARAMETERS:
 			return getParameters();
 		case DfPackage.ENTITY__NAME:
@@ -126,11 +103,6 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-		case DfPackage.ENTITY__INPUTS:
-			return ((InternalEList<?>) getInputs()).basicRemove(otherEnd, msgs);
-		case DfPackage.ENTITY__OUTPUTS:
-			return ((InternalEList<?>) getOutputs())
-					.basicRemove(otherEnd, msgs);
 		case DfPackage.ENTITY__PARAMETERS:
 			return ((InternalEList<?>) getParameters()).basicRemove(otherEnd,
 					msgs);
@@ -145,10 +117,6 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case DfPackage.ENTITY__INPUTS:
-			return inputs != null && !inputs.isEmpty();
-		case DfPackage.ENTITY__OUTPUTS:
-			return outputs != null && !outputs.isEmpty();
 		case DfPackage.ENTITY__PARAMETERS:
 			return parameters != null && !parameters.isEmpty();
 		case DfPackage.ENTITY__NAME:
@@ -166,14 +134,6 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case DfPackage.ENTITY__INPUTS:
-			getInputs().clear();
-			getInputs().addAll((Collection<? extends Port>) newValue);
-			return;
-		case DfPackage.ENTITY__OUTPUTS:
-			getOutputs().clear();
-			getOutputs().addAll((Collection<? extends Port>) newValue);
-			return;
 		case DfPackage.ENTITY__PARAMETERS:
 			getParameters().clear();
 			getParameters().addAll((Collection<? extends Var>) newValue);
@@ -201,12 +161,6 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case DfPackage.ENTITY__INPUTS:
-			getInputs().clear();
-			return;
-		case DfPackage.ENTITY__OUTPUTS:
-			getOutputs().clear();
-			return;
 		case DfPackage.ENTITY__PARAMETERS:
 			getParameters().clear();
 			return;
@@ -263,24 +217,13 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 
 	@Override
 	public Port getInput(String name) {
-		for (Port port : getInputs()) {
+		List<Port> inputs = EcoreHelper.getList(this, "inputs");
+		for (Port port : inputs) {
 			if (port.getName().equals(name)) {
 				return port;
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Port> getInputs() {
-		if (inputs == null) {
-			inputs = new EObjectContainmentEList<Port>(Port.class, this,
-					DfPackage.ENTITY__INPUTS);
-		}
-		return inputs;
 	}
 
 	/**
@@ -310,24 +253,13 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 
 	@Override
 	public Port getOutput(String name) {
-		for (Port port : getOutputs()) {
+		List<Port> outputs = EcoreHelper.getList(this, "outputs");
+		for (Port port : outputs) {
 			if (port.getName().equals(name)) {
 				return port;
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Port> getOutputs() {
-		if (outputs == null) {
-			outputs = new EObjectContainmentEList<Port>(Port.class, this,
-					DfPackage.ENTITY__OUTPUTS);
-		}
-		return outputs;
 	}
 
 	@Override

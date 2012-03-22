@@ -436,28 +436,12 @@ public interface DfPackage extends EPackage {
 	int ENTITY__OUTGOING = GraphPackage.VERTEX__OUTGOING;
 
 	/**
-	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ENTITY__INPUTS = GraphPackage.VERTEX_FEATURE_COUNT + 0;
-
-	/**
-	 * The feature id for the '<em><b>Outputs</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ENTITY__OUTPUTS = GraphPackage.VERTEX_FEATURE_COUNT + 1;
-
-	/**
 	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ENTITY__PARAMETERS = GraphPackage.VERTEX_FEATURE_COUNT + 2;
+	int ENTITY__PARAMETERS = GraphPackage.VERTEX_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -466,7 +450,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ENTITY__NAME = GraphPackage.VERTEX_FEATURE_COUNT + 3;
+	int ENTITY__NAME = GraphPackage.VERTEX_FEATURE_COUNT + 1;
 
 	/**
 	 * The number of structural features of the '<em>Entity</em>' class. <!--
@@ -475,7 +459,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ENTITY_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 4;
+	int ENTITY_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 2;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.EntitySpecificImpl <em>Entity Specific</em>}' class.
@@ -511,22 +495,6 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int ENTITY_SPECIFIC__OUTGOING = ENTITY__OUTGOING;
-
-	/**
-	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ENTITY_SPECIFIC__INPUTS = ENTITY__INPUTS;
-
-	/**
-	 * The feature id for the '<em><b>Outputs</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ENTITY_SPECIFIC__OUTPUTS = ENTITY__OUTPUTS;
 
 	/**
 	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
@@ -578,22 +546,6 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int ACTOR__OUTGOING = ENTITY__OUTGOING;
-
-	/**
-	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__INPUTS = ENTITY__INPUTS;
-
-	/**
-	 * The feature id for the '<em><b>Outputs</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__OUTPUTS = ENTITY__OUTPUTS;
 
 	/**
 	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
@@ -698,13 +650,29 @@ public interface DfPackage extends EPackage {
 	int ACTOR__LINE_NUMBER = ENTITY_FEATURE_COUNT + 9;
 
 	/**
+	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__INPUTS = ENTITY_FEATURE_COUNT + 10;
+
+	/**
+	 * The feature id for the '<em><b>Outputs</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__OUTPUTS = ENTITY_FEATURE_COUNT + 11;
+
+	/**
 	 * The number of structural features of the '<em>Actor</em>' class. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR_FEATURE_COUNT = ENTITY_FEATURE_COUNT + 10;
+	int ACTOR_FEATURE_COUNT = ENTITY_FEATURE_COUNT + 12;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -731,22 +699,6 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int NETWORK__OUTGOING = ENTITY__OUTGOING;
-
-	/**
-	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NETWORK__INPUTS = ENTITY__INPUTS;
-
-	/**
-	 * The feature id for the '<em><b>Outputs</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NETWORK__OUTPUTS = ENTITY__OUTPUTS;
 
 	/**
 	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
@@ -826,13 +778,29 @@ public interface DfPackage extends EPackage {
 	int NETWORK__ENTITIES = ENTITY_FEATURE_COUNT + 6;
 
 	/**
+	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NETWORK__INPUTS = ENTITY_FEATURE_COUNT + 7;
+
+	/**
+	 * The feature id for the '<em><b>Outputs</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NETWORK__OUTPUTS = ENTITY_FEATURE_COUNT + 8;
+
+	/**
 	 * The number of structural features of the '<em>Network</em>' class. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK_FEATURE_COUNT = ENTITY_FEATURE_COUNT + 7;
+	int NETWORK_FEATURE_COUNT = ENTITY_FEATURE_COUNT + 9;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -861,22 +829,6 @@ public interface DfPackage extends EPackage {
 	int BROADCAST__OUTGOING = ENTITY__OUTGOING;
 
 	/**
-	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int BROADCAST__INPUTS = ENTITY__INPUTS;
-
-	/**
-	 * The feature id for the '<em><b>Outputs</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int BROADCAST__OUTPUTS = ENTITY__OUTPUTS;
-
-	/**
 	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -894,13 +846,29 @@ public interface DfPackage extends EPackage {
 	int BROADCAST__NAME = ENTITY__NAME;
 
 	/**
+	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int BROADCAST__INPUTS = ENTITY_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>Outputs</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int BROADCAST__OUTPUTS = ENTITY_FEATURE_COUNT + 1;
+
+	/**
 	 * The number of structural features of the '<em>Broadcast</em>' class. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int BROADCAST_FEATURE_COUNT = ENTITY_FEATURE_COUNT + 0;
+	int BROADCAST_FEATURE_COUNT = ENTITY_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -1419,6 +1387,28 @@ public interface DfPackage extends EPackage {
 	EReference getNetwork_Entities();
 
 	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.df.Network#getInputs <em>Inputs</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Inputs</em>'.
+	 * @see net.sf.orcc.df.Network#getInputs()
+	 * @see #getNetwork()
+	 * @generated
+	 */
+	EReference getNetwork_Inputs();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.df.Network#getOutputs <em>Outputs</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Outputs</em>'.
+	 * @see net.sf.orcc.df.Network#getOutputs()
+	 * @see #getNetwork()
+	 * @generated
+	 */
+	EReference getNetwork_Outputs();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Connection <em>Connection</em>}'.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Connection</em>'.
@@ -1500,6 +1490,28 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getBroadcast();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.df.Broadcast#getInputs <em>Inputs</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Inputs</em>'.
+	 * @see net.sf.orcc.df.Broadcast#getInputs()
+	 * @see #getBroadcast()
+	 * @generated
+	 */
+	EReference getBroadcast_Inputs();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.df.Broadcast#getOutputs <em>Outputs</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Outputs</em>'.
+	 * @see net.sf.orcc.df.Broadcast#getOutputs()
+	 * @see #getBroadcast()
+	 * @generated
+	 */
+	EReference getBroadcast_Outputs();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Action <em>Action</em>}'.
@@ -1710,6 +1722,28 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getActor_LineNumber();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.df.Actor#getInputs <em>Inputs</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Inputs</em>'.
+	 * @see net.sf.orcc.df.Actor#getInputs()
+	 * @see #getActor()
+	 * @generated
+	 */
+	EReference getActor_Inputs();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.df.Actor#getOutputs <em>Outputs</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Outputs</em>'.
+	 * @see net.sf.orcc.df.Actor#getOutputs()
+	 * @see #getActor()
+	 * @generated
+	 */
+	EReference getActor_Outputs();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.FSM <em>FSM</em>}'.
@@ -2068,32 +2102,6 @@ public interface DfPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the containment reference list '
-	 * {@link net.sf.orcc.df.Entity#getInputs <em>Inputs</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the containment reference list '
-	 *         <em>Inputs</em>'.
-	 * @see net.sf.orcc.df.Entity#getInputs()
-	 * @see #getEntity()
-	 * @generated
-	 */
-	EReference getEntity_Inputs();
-
-	/**
-	 * Returns the meta object for the containment reference list '
-	 * {@link net.sf.orcc.df.Entity#getOutputs <em>Outputs</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the containment reference list '
-	 *         <em>Outputs</em>'.
-	 * @see net.sf.orcc.df.Entity#getOutputs()
-	 * @see #getEntity()
-	 * @generated
-	 */
-	EReference getEntity_Outputs();
-
-	/**
-	 * Returns the meta object for the containment reference list '
 	 * {@link net.sf.orcc.df.Entity#getParameters <em>Parameters</em>}'. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -2267,6 +2275,22 @@ public interface DfPackage extends EPackage {
 		EReference NETWORK__ENTITIES = eINSTANCE.getNetwork_Entities();
 
 		/**
+		 * The meta object literal for the '<em><b>Inputs</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference NETWORK__INPUTS = eINSTANCE.getNetwork_Inputs();
+
+		/**
+		 * The meta object literal for the '<em><b>Outputs</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference NETWORK__OUTPUTS = eINSTANCE.getNetwork_Outputs();
+
+		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.ConnectionImpl <em>Connection</em>}' class.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.df.impl.ConnectionImpl
@@ -2331,6 +2355,22 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EClass BROADCAST = eINSTANCE.getBroadcast();
+
+		/**
+		 * The meta object literal for the '<em><b>Inputs</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference BROADCAST__INPUTS = eINSTANCE.getBroadcast_Inputs();
+
+		/**
+		 * The meta object literal for the '<em><b>Outputs</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference BROADCAST__OUTPUTS = eINSTANCE.getBroadcast_Outputs();
 
 		/**
 		 * The meta object literal for the '
@@ -2472,6 +2512,22 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute ACTOR__LINE_NUMBER = eINSTANCE.getActor_LineNumber();
+
+		/**
+		 * The meta object literal for the '<em><b>Inputs</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference ACTOR__INPUTS = eINSTANCE.getActor_Inputs();
+
+		/**
+		 * The meta object literal for the '<em><b>Outputs</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference ACTOR__OUTPUTS = eINSTANCE.getActor_Outputs();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.FSMImpl <em>FSM</em>}' class.
@@ -2751,20 +2807,6 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EClass ENTITY = eINSTANCE.getEntity();
-
-		/**
-		 * The meta object literal for the '<em><b>Inputs</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference ENTITY__INPUTS = eINSTANCE.getEntity_Inputs();
-
-		/**
-		 * The meta object literal for the '<em><b>Outputs</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference ENTITY__OUTPUTS = eINSTANCE.getEntity_Outputs();
 
 		/**
 		 * The meta object literal for the '<em><b>Parameters</b></em>' containment reference list feature.

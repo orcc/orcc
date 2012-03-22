@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.df;
 
+import org.eclipse.emf.common.util.EList;
+
 /**
  * This class defines a broadcast as a particular entity.
  * 
@@ -36,6 +38,38 @@ package net.sf.orcc.df;
  * @model extends="Entity"
  */
 public interface Broadcast extends Entity {
+
+	/**
+	 * Returns the value of the '<em><b>Inputs</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.df.Port}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Inputs</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Inputs</em>' containment reference list.
+	 * @see net.sf.orcc.df.DfPackage#getBroadcast_Inputs()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Port> getInputs();
+
+	/**
+	 * Returns the value of the '<em><b>Outputs</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.df.Port}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Outputs</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Outputs</em>' containment reference list.
+	 * @see net.sf.orcc.df.DfPackage#getBroadcast_Outputs()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Port> getOutputs();
 
 	Port getInput();
 

@@ -207,6 +207,38 @@ public interface Actor extends Entity {
 	void setLineNumber(int newLineNumber);
 
 	/**
+	 * Returns the value of the '<em><b>Inputs</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.df.Port}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Inputs</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Inputs</em>' containment reference list.
+	 * @see net.sf.orcc.df.DfPackage#getActor_Inputs()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Port> getInputs();
+
+	/**
+	 * Returns the value of the '<em><b>Outputs</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.df.Port}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Outputs</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Outputs</em>' containment reference list.
+	 * @see net.sf.orcc.df.DfPackage#getActor_Outputs()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Port> getOutputs();
+
+	/**
 	 * Sets the MoC of this actor.
 	 * 
 	 * @param moc

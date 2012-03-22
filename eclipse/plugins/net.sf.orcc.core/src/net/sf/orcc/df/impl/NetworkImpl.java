@@ -148,6 +148,26 @@ public class NetworkImpl extends EntityImpl implements Network {
 	protected EList<Entity> entities;
 
 	/**
+	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getInputs()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Port> inputs;
+
+	/**
+	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getOutputs()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Port> outputs;
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 */
 	protected NetworkImpl() {
@@ -277,6 +297,10 @@ public class NetworkImpl extends EntityImpl implements Network {
 			return getFileName();
 		case DfPackage.NETWORK__ENTITIES:
 			return getEntities();
+		case DfPackage.NETWORK__INPUTS:
+			return getInputs();
+		case DfPackage.NETWORK__OUTPUTS:
+			return getOutputs();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -302,6 +326,11 @@ public class NetworkImpl extends EntityImpl implements Network {
 		case DfPackage.NETWORK__ENTITIES:
 			return ((InternalEList<?>) getEntities()).basicRemove(otherEnd,
 					msgs);
+		case DfPackage.NETWORK__INPUTS:
+			return ((InternalEList<?>) getInputs()).basicRemove(otherEnd, msgs);
+		case DfPackage.NETWORK__OUTPUTS:
+			return ((InternalEList<?>) getOutputs())
+					.basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -328,6 +357,10 @@ public class NetworkImpl extends EntityImpl implements Network {
 					: !FILE_NAME_EDEFAULT.equals(fileName);
 		case DfPackage.NETWORK__ENTITIES:
 			return entities != null && !entities.isEmpty();
+		case DfPackage.NETWORK__INPUTS:
+			return inputs != null && !inputs.isEmpty();
+		case DfPackage.NETWORK__OUTPUTS:
+			return outputs != null && !outputs.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -365,6 +398,14 @@ public class NetworkImpl extends EntityImpl implements Network {
 		case DfPackage.NETWORK__ENTITIES:
 			getEntities().clear();
 			getEntities().addAll((Collection<? extends Entity>) newValue);
+			return;
+		case DfPackage.NETWORK__INPUTS:
+			getInputs().clear();
+			getInputs().addAll((Collection<? extends Port>) newValue);
+			return;
+		case DfPackage.NETWORK__OUTPUTS:
+			getOutputs().clear();
+			getOutputs().addAll((Collection<? extends Port>) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -406,6 +447,12 @@ public class NetworkImpl extends EntityImpl implements Network {
 			return;
 		case DfPackage.NETWORK__ENTITIES:
 			getEntities().clear();
+			return;
+		case DfPackage.NETWORK__INPUTS:
+			getInputs().clear();
+			return;
+		case DfPackage.NETWORK__OUTPUTS:
+			getOutputs().clear();
 			return;
 		}
 		super.eUnset(featureID);
@@ -502,6 +549,32 @@ public class NetworkImpl extends EntityImpl implements Network {
 					DfPackage.NETWORK__ENTITIES);
 		}
 		return entities;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Port> getInputs() {
+		if (inputs == null) {
+			inputs = new EObjectContainmentEList<Port>(Port.class, this,
+					DfPackage.NETWORK__INPUTS);
+		}
+		return inputs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Port> getOutputs() {
+		if (outputs == null) {
+			outputs = new EObjectContainmentEList<Port>(Port.class, this,
+					DfPackage.NETWORK__OUTPUTS);
+		}
+		return outputs;
 	}
 
 	@Override

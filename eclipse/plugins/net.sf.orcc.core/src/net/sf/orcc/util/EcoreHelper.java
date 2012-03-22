@@ -140,6 +140,22 @@ public class EcoreHelper {
 	}
 
 	/**
+	 * Finds the feature of the given object that has the given name, and
+	 * returns its value as a list.
+	 * 
+	 * @param eObject
+	 *            an EObject
+	 * @param name
+	 *            name of a feature of the object's class
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> List<T> getList(EObject eObject, String name) {
+		EClass eClass = eObject.eClass();
+		EStructuralFeature feature = eClass.getEStructuralFeature(name);
+		return (List<T>) eObject.eGet(feature);
+	}
+
+	/**
 	 * Returns the IFile associated with the given resource.
 	 * 
 	 * @param resource

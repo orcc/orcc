@@ -111,6 +111,38 @@ public interface Network extends Entity, Graph {
 	EList<Entity> getEntities();
 
 	/**
+	 * Returns the value of the '<em><b>Inputs</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.df.Port}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Inputs</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Inputs</em>' containment reference list.
+	 * @see net.sf.orcc.df.DfPackage#getNetwork_Inputs()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Port> getInputs();
+
+	/**
+	 * Returns the value of the '<em><b>Outputs</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.df.Port}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Outputs</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Outputs</em>' containment reference list.
+	 * @see net.sf.orcc.df.DfPackage#getNetwork_Outputs()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Port> getOutputs();
+
+	/**
 	 * Returns the file this network is defined in.
 	 * 
 	 * @return the file this network is defined in
