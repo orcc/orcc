@@ -2735,7 +2735,7 @@ public interface IrPackage extends EPackage {
 	int CFG__EDGES = GraphPackage.GRAPH__EDGES;
 
 	/**
-	 * The feature id for the '<em><b>Vertices</b></em>' reference list.
+	 * The feature id for the '<em><b>Vertices</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated

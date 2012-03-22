@@ -727,7 +727,7 @@ public interface DfPackage extends EPackage {
 	int NETWORK__EDGES = ENTITY_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Vertices</b></em>' reference list.
+	 * The feature id for the '<em><b>Vertices</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -753,7 +753,7 @@ public interface DfPackage extends EPackage {
 	int NETWORK__VARIABLES = ENTITY_FEATURE_COUNT + 3;
 
 	/**
-	 * The feature id for the '<em><b>Instances</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Instances</b></em>' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
@@ -770,7 +770,7 @@ public interface DfPackage extends EPackage {
 	int NETWORK__FILE_NAME = ENTITY_FEATURE_COUNT + 5;
 
 	/**
-	 * The feature id for the '<em><b>Entities</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Entities</b></em>' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
@@ -778,7 +778,7 @@ public interface DfPackage extends EPackage {
 	int NETWORK__ENTITIES = ENTITY_FEATURE_COUNT + 6;
 
 	/**
-	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Inputs</b></em>' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
@@ -786,7 +786,7 @@ public interface DfPackage extends EPackage {
 	int NETWORK__INPUTS = ENTITY_FEATURE_COUNT + 7;
 
 	/**
-	 * The feature id for the '<em><b>Outputs</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Outputs</b></em>' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
@@ -1009,7 +1009,7 @@ public interface DfPackage extends EPackage {
 	int FSM__EDGES = GraphPackage.GRAPH__EDGES;
 
 	/**
-	 * The feature id for the '<em><b>Vertices</b></em>' reference list.
+	 * The feature id for the '<em><b>Vertices</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -1387,10 +1387,10 @@ public interface DfPackage extends EPackage {
 	EReference getNetwork_Entities();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.df.Network#getInputs <em>Inputs</em>}'.
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.df.Network#getInputs <em>Inputs</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Inputs</em>'.
+	 * @return the meta object for the reference list '<em>Inputs</em>'.
 	 * @see net.sf.orcc.df.Network#getInputs()
 	 * @see #getNetwork()
 	 * @generated
@@ -1398,10 +1398,10 @@ public interface DfPackage extends EPackage {
 	EReference getNetwork_Inputs();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.df.Network#getOutputs <em>Outputs</em>}'.
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.df.Network#getOutputs <em>Outputs</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Outputs</em>'.
+	 * @return the meta object for the reference list '<em>Outputs</em>'.
 	 * @see net.sf.orcc.df.Network#getOutputs()
 	 * @see #getNetwork()
 	 * @generated
@@ -2252,7 +2252,7 @@ public interface DfPackage extends EPackage {
 		EReference NETWORK__VARIABLES = eINSTANCE.getNetwork_Variables();
 
 		/**
-		 * The meta object literal for the '<em><b>Instances</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Instances</b></em>' reference list feature.
 		 * <!-- begin-user-doc --> <!--
 		 * end-user-doc -->
 		 * @generated
@@ -2267,7 +2267,7 @@ public interface DfPackage extends EPackage {
 		EAttribute NETWORK__FILE_NAME = eINSTANCE.getNetwork_FileName();
 
 		/**
-		 * The meta object literal for the '<em><b>Entities</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Entities</b></em>' reference list feature.
 		 * <!-- begin-user-doc --> <!--
 		 * end-user-doc -->
 		 * @generated
@@ -2275,7 +2275,7 @@ public interface DfPackage extends EPackage {
 		EReference NETWORK__ENTITIES = eINSTANCE.getNetwork_Entities();
 
 		/**
-		 * The meta object literal for the '<em><b>Inputs</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Inputs</b></em>' reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
@@ -2283,7 +2283,7 @@ public interface DfPackage extends EPackage {
 		EReference NETWORK__INPUTS = eINSTANCE.getNetwork_Inputs();
 
 		/**
-		 * The meta object literal for the '<em><b>Outputs</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Outputs</b></em>' reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated

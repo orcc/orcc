@@ -58,14 +58,14 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="variables" upperBound="-1"
         eType="ecore:EClass Ir.ecore#//Var" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="instances" upperBound="-1"
-        eType="#//Instance" containment="true" resolveProxies="false"/>
+        eType="#//Instance" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="fileName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="entities" upperBound="-1"
-        eType="#//Entity" containment="true" resolveProxies="false"/>
+        eType="#//Entity" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="inputs" upperBound="-1"
-        eType="#//Port" containment="true" resolveProxies="false"/>
+        eType="#//Port" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="outputs" upperBound="-1"
-        eType="#//Port" containment="true" resolveProxies="false"/>
+        eType="#//Port" resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Broadcast" eSuperTypes="#//Entity">
     <eStructuralFeatures xsi:type="ecore:EReference" name="inputs" upperBound="-1"

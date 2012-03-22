@@ -121,9 +121,15 @@ public class Instantiator extends DfSwitch<Network> {
 		networkCopy.setName(network.getName());
 		networkCopy.setMoC((MoC) copier.copy(network.getMoC()));
 
-		// copy ports, parameters, variables
-		networkCopy.getInputs().addAll(copier.copyAll(network.getInputs()));
-		networkCopy.getOutputs().addAll(copier.copyAll(network.getOutputs()));
+		// copy ports
+		for (Port port : network.getInputs()) {
+			networkCopy.addInput((Port) copier.copy(port));
+		}
+		for (Port port : network.getOutputs()) {
+			networkCopy.addOutput((Port) copier.copy(port));
+		}
+
+		// copy parameters, variables
 		networkCopy.getParameters().addAll(
 				copier.copyAll(network.getParameters()));
 		networkCopy.getVariables().addAll(
@@ -134,7 +140,7 @@ public class Instantiator extends DfSwitch<Network> {
 			Entity entity = instance.getEntity();
 			if (entity.isActor() && skipActors) {
 				Instance copy = (Instance) copier.copy(instance);
-				networkCopy.getInstances().add(copy);
+				networkCopy.addInstance(copy);
 			} else {
 				if (entity.isNetwork()) {
 					entity = doSwitch(entity);
@@ -144,7 +150,7 @@ public class Instantiator extends DfSwitch<Network> {
 				map.put(instance, entity);
 
 				// add entity to the network's entities
-				networkCopy.getEntities().add(entity);
+				networkCopy.addEntity(entity);
 
 				// set name, attributes, arguments
 				entity.setName(instance.getName());

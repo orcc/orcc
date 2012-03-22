@@ -884,7 +884,7 @@ public class XdfParser {
 		parseAttributes(instance.getAttributes(), child);
 
 		// add instance
-		network.getInstances().add(instance);
+		network.addInstance(instance);
 	}
 
 	/**
@@ -973,9 +973,9 @@ public class XdfParser {
 		// adds the port to inputs or outputs depending on its kind
 		String kind = eltPort.getAttribute("kind");
 		if (kind.equals("Input")) {
-			network.getInputs().add(port);
+			network.addInput(port);
 		} else if (kind.equals("Output")) {
-			network.getOutputs().add(port);
+			network.addOutput(port);
 		} else {
 			throw new OrccRuntimeException("Port \"" + name
 					+ "\", invalid kind: \"" + kind + "\"");

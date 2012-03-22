@@ -47,7 +47,6 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.EcoreHelper;
 
-import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -73,10 +72,6 @@ public class NetworkFlattener extends DfSwitch<Void> {
 				// flatten this sub-network
 				new NetworkFlattener().doSwitch(subNetwork);
 
-				// remove adapter of subNetwork
-				// so that connections are not automatically updated
-				Adapter adapter = subNetwork.eAdapters().remove(0);
-
 				moveEntitiesAndConnections(network, subNetwork);
 				propagateVariables(subNetwork.getParameters());
 				propagateVariables(subNetwork.getVariables());
@@ -85,12 +80,10 @@ public class NetworkFlattener extends DfSwitch<Void> {
 				linkIncomingConnections(network, subNetwork);
 
 				// remove entity from network
-				network.getEntities().remove(entity);
+				network.remove(entity);
 
-				// restore adapter, remove connections to clean up
-				// incoming/outgoing of instances
-				subNetwork.eAdapters().add(adapter);
-				subNetwork.getConnections().clear();
+				// remove connections to clean up incoming/outgoing of instances
+				subNetwork.removeEdges(subNetwork.getConnections());
 			}
 		}
 
@@ -158,22 +151,24 @@ public class NetworkFlattener extends DfSwitch<Void> {
 		for (Instance instance : subNetwork.getInstances()) {
 			instance.setName(subNetwork.getName() + "_" + instance.getName());
 		}
+		
+		//network.removeVertices(network.getInputs());
+		//network.getInputs().clear();
+		//network.removeVertices(network.getOutputs());
+		//network.getOutputs().clear();
 
-		// move entities in this network
+		// move entities/instances and vertices in this network
 		network.getEntities().addAll(subNetwork.getEntities());
 		network.getInstances().addAll(subNetwork.getInstances());
-
-		// move connections between entities in this network
-		List<Connection> connections = new ArrayList<Connection>();
-		for (Connection connection : subNetwork.getConnections()) {
-			Vertex source = connection.getSource();
-			Vertex target = connection.getTarget();
-			if (!(source instanceof Port) && !(target instanceof Port)) {
-				connections.add(connection);
+		List<Vertex> vertices = new ArrayList<Vertex>(subNetwork.getVertices());
+		for (Vertex vertex : vertices) {
+			if (!(vertex instanceof Port)) {
+				network.getVertices().add(vertex);
 			}
 		}
 
-		network.getConnections().addAll(connections);
+		// move connections
+		network.getConnections().addAll(subNetwork.getConnections());
 	}
 
 	/**

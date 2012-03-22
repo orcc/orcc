@@ -40,22 +40,21 @@ import org.eclipse.emf.ecore.EObject;
  * <!-- begin-user-doc --> The <b>Adapter Factory</b> for the model. It provides
  * an adapter <code>createXXX</code> method for each class of the model. <!--
  * end-user-doc -->
- * 
  * @see net.sf.orcc.df.DfPackage
  * @generated
  */
 public class DfAdapterFactory extends AdapterFactoryImpl {
 	/**
-	 * The cached model package. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached model package.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected static DfPackage modelPackage;
 
 	/**
-	 * Creates an instance of the adapter factory. <!-- begin-user-doc --> <!--
+	 * Creates an instance of the adapter factory.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public DfAdapterFactory() {
@@ -69,7 +68,6 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	 * <!-- begin-user-doc --> This implementation returns <code>true</code> if
 	 * the object is either the model's package or is an instance object of the
 	 * model. <!-- end-user-doc -->
-	 * 
 	 * @return whether this factory is applicable for the type of the object.
 	 * @generated
 	 */
@@ -214,11 +212,10 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	};
 
 	/**
-	 * Creates an adapter for the <code>target</code>. <!-- begin-user-doc -->
+	 * Creates an adapter for the <code>target</code>.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * 
-	 * @param target
-	 *            the object to adapt.
+	 * @param target the object to adapt.
 	 * @return the adapter for the <code>target</code>.
 	 * @generated
 	 */
@@ -228,14 +225,10 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new network adapter.
-	 * 
-	 * @return the new adapter.
+	 * @generated
 	 */
 	public Adapter createNetworkAdapter() {
-		return new GraphContainmentAdapter(
-				DfPackage.eINSTANCE.getNetwork_Entities(),
-				DfPackage.eINSTANCE.getNetwork_Instances());
+		return null;
 	}
 
 	/**
@@ -254,12 +247,11 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.df.Instance <em>Instance</em>}'. <!-- begin-user-doc
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Instance <em>Instance</em>}'.
+	 * <!-- begin-user-doc
 	 * --> This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.df.Instance
 	 * @generated
@@ -269,12 +261,11 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.df.Broadcast <em>Broadcast</em>}'. <!-- begin-user-doc
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Broadcast <em>Broadcast</em>}'.
+	 * <!-- begin-user-doc
 	 * --> This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.df.Broadcast
 	 * @generated
@@ -284,12 +275,11 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.dftools.graph.Vertex <em>Vertex</em>}'. <!-- begin-user-doc
+	 * Creates a new adapter for an object of class '{@link net.sf.dftools.graph.Vertex <em>Vertex</em>}'.
+	 * <!-- begin-user-doc
 	 * --> This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.dftools.graph.Vertex
 	 * @generated
@@ -299,12 +289,11 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.dftools.graph.Graph <em>Graph</em>}'. <!-- begin-user-doc
+	 * Creates a new adapter for an object of class '{@link net.sf.dftools.graph.Graph <em>Graph</em>}'.
+	 * <!-- begin-user-doc
 	 * --> This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.dftools.graph.Graph
 	 * @generated
@@ -314,12 +303,11 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.df.Action <em>Action</em>}'. <!-- begin-user-doc -->
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Action <em>Action</em>}'.
+	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.df.Action
 	 * @generated
@@ -329,12 +317,11 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.df.Actor <em>Actor</em>}'. <!-- begin-user-doc -->
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Actor <em>Actor</em>}'.
+	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.df.Actor
 	 * @generated
@@ -344,21 +331,18 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new FSM adapter.
-	 * 
-	 * @return the new adapter.
+	 * @generated
 	 */
 	public Adapter createFSMAdapter() {
-		return new GraphContainmentAdapter(DfPackage.eINSTANCE.getFSM_States());
+		return null;
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.df.Pattern <em>Pattern</em>}'. <!-- begin-user-doc -->
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Pattern <em>Pattern</em>}'.
+	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.df.Pattern
 	 * @generated
@@ -383,12 +367,11 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.df.State <em>State</em>}'. <!-- begin-user-doc -->
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.State <em>State</em>}'.
+	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.df.State
 	 * @generated
@@ -428,12 +411,11 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry
-	 * <em>Port To EInteger Object Map Entry</em>}'. <!-- begin-user-doc -->
+	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Port To EInteger Object Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see java.util.Map.Entry
 	 * @generated
@@ -443,12 +425,11 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry
-	 * <em>Port To Var Map Entry</em>}'. <!-- begin-user-doc --> This default
+	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Port To Var Map Entry</em>}'.
+	 * <!-- begin-user-doc --> This default
 	 * implementation returns null so that we can easily ignore cases; it's
 	 * useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see java.util.Map.Entry
 	 * @generated
@@ -458,12 +439,11 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry
-	 * <em>Var To Port Map Entry</em>}'. <!-- begin-user-doc --> This default
+	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Var To Port Map Entry</em>}'.
+	 * <!-- begin-user-doc --> This default
 	 * implementation returns null so that we can easily ignore cases; it's
 	 * useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see java.util.Map.Entry
 	 * @generated
@@ -473,12 +453,11 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.df.Argument <em>Argument</em>}'. <!-- begin-user-doc
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Argument <em>Argument</em>}'.
+	 * <!-- begin-user-doc
 	 * --> This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.df.Argument
 	 * @generated
@@ -503,12 +482,11 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.dftools.graph.Edge <em>Edge</em>}'. <!-- begin-user-doc -->
+	 * Creates a new adapter for an object of class '{@link net.sf.dftools.graph.Edge <em>Edge</em>}'.
+	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.dftools.graph.Edge
 	 * @generated
@@ -518,12 +496,11 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.df.Entity <em>Entity</em>}'. <!-- begin-user-doc -->
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Entity <em>Entity</em>}'.
+	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.df.Entity
 	 * @generated
@@ -563,9 +540,9 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for the default case. <!-- begin-user-doc --> This
+	 * Creates a new adapter for the default case.
+	 * <!-- begin-user-doc --> This
 	 * default implementation returns null. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @generated
 	 */

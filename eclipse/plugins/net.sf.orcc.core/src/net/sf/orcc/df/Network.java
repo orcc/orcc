@@ -50,6 +50,42 @@ import org.eclipse.emf.common.util.EList;
 public interface Network extends Entity, Graph {
 
 	/**
+	 * Adds the given entity to this network. The entity is added to the
+	 * vertices and the entities list.
+	 * 
+	 * @param entity
+	 *            an entity
+	 */
+	void addEntity(Entity entity);
+
+	/**
+	 * Adds the given port to this network. The port is added to the vertices
+	 * and the inputs list.
+	 * 
+	 * @param port
+	 *            a port
+	 */
+	void addInput(Port port);
+
+	/**
+	 * Adds the given instance to this network. The instance is added to the
+	 * vertices and the instances list.
+	 * 
+	 * @param instance
+	 *            an instance
+	 */
+	void addInstance(Instance instance);
+
+	/**
+	 * Adds the given port to this network. The port is added to the vertices
+	 * and the outputs list.
+	 * 
+	 * @param port
+	 *            a port
+	 */
+	void addOutput(Port port);
+
+	/**
 	 * Classifies this network.
 	 * 
 	 * @throws OrccException
@@ -111,38 +147,6 @@ public interface Network extends Entity, Graph {
 	EList<Entity> getEntities();
 
 	/**
-	 * Returns the value of the '<em><b>Inputs</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.df.Port}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Inputs</em>' containment reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Inputs</em>' containment reference list.
-	 * @see net.sf.orcc.df.DfPackage#getNetwork_Inputs()
-	 * @model containment="true"
-	 * @generated
-	 */
-	EList<Port> getInputs();
-
-	/**
-	 * Returns the value of the '<em><b>Outputs</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.df.Port}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Outputs</em>' containment reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Outputs</em>' containment reference list.
-	 * @see net.sf.orcc.df.DfPackage#getNetwork_Outputs()
-	 * @model containment="true"
-	 * @generated
-	 */
-	EList<Port> getOutputs();
-
-	/**
 	 * Returns the file this network is defined in.
 	 * 
 	 * @return the file this network is defined in
@@ -156,6 +160,23 @@ public interface Network extends Entity, Graph {
 	 * @model
 	 */
 	String getFileName();
+
+	/**
+	 * Returns the value of the '<em><b>Inputs</b></em>' reference list. The
+	 * list contents are of type {@link net.sf.orcc.df.Port}. <!--
+	 * begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Inputs</em>' containment reference list isn't
+	 * clear, there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * 
+	 * @return the value of the '<em>Inputs</em>' reference list.
+	 * @see net.sf.orcc.df.DfPackage#getNetwork_Inputs()
+	 * @model resolveProxies="false"
+	 * @generated
+	 */
+	EList<Port> getInputs();
 
 	Instance getInstance(String id);
 
@@ -184,6 +205,23 @@ public interface Network extends Entity, Graph {
 	 * @model containment="true"
 	 */
 	MoC getMoC();
+
+	/**
+	 * Returns the value of the '<em><b>Outputs</b></em>' reference list. The
+	 * list contents are of type {@link net.sf.orcc.df.Port}. <!--
+	 * begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Outputs</em>' containment reference list isn't
+	 * clear, there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * 
+	 * @return the value of the '<em>Outputs</em>' reference list.
+	 * @see net.sf.orcc.df.DfPackage#getNetwork_Outputs()
+	 * @model resolveProxies="false"
+	 * @generated
+	 */
+	EList<Port> getOutputs();
 
 	/**
 	 * Returns the variable with the given name.
@@ -220,6 +258,15 @@ public interface Network extends Entity, Graph {
 	 *             if something goes wrong
 	 */
 	void normalizeActors() throws OrccException;
+
+	/**
+	 * Removes the given entity from the list of entities, and then removes it
+	 * from this graph.
+	 * 
+	 * @param entity
+	 *            a entity
+	 */
+	void remove(Entity entity);
 
 	/**
 	 * Sets the name of the file in which this entity is defined.
