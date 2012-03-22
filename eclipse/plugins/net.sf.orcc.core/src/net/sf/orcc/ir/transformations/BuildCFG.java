@@ -29,6 +29,7 @@
  */
 package net.sf.orcc.ir.transformations;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.dftools.graph.Edge;
@@ -145,7 +146,7 @@ public class BuildCFG extends AbstractActorVisitor<Node> {
 	 * @return the last node of the node list
 	 */
 	public Node doSwitch(List<Node> nodes) {
-		for (Node node : nodes) {
+		for (Node node : new ArrayList<Node>(nodes)) {
 			last = doSwitch(node);
 		}
 
