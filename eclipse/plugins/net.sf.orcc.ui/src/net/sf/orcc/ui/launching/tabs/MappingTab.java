@@ -42,7 +42,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.sf.dftools.graph.Vertex;
-import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -195,8 +194,8 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 
 		@Override
 		protected void setValue(Object element, Object value) {
-			if (element instanceof DfVertex) {
-				DfVertex vertex = (DfVertex) element;
+			if (element instanceof Vertex) {
+				Vertex vertex = (Vertex) element;
 				String component = (String) value;
 				if (component == null || component.contains(",")
 						|| component.isEmpty()) {
@@ -227,8 +226,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 		@Override
 		public String getColumnText(Object element, int columnIndex) {
 			if (columnIndex == 0) {
-				DfVertex vertex = (DfVertex) element;
-				return vertex.getName();
+				return EcoreHelper.getFeature((Vertex) element, "name");
 			} else {
 				if (element instanceof Instance) {
 					Instance instance = (Instance) element;

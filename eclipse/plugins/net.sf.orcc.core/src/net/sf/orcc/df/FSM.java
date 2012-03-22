@@ -45,22 +45,6 @@ import org.eclipse.emf.common.util.EList;
 public interface FSM extends Graph {
 
 	/**
-	 * Adds the given state to the list of states of this FSM.
-	 * 
-	 * @param state
-	 *            a state
-	 */
-	void add(State state);
-
-	/**
-	 * Adds the given states to the list of states of this FSM.
-	 * 
-	 * @param states
-	 *            a list of states
-	 */
-	void addStates(List<State> states);
-
-	/**
 	 * Adds a transition between two states with the given action.
 	 * 
 	 * @param source
@@ -82,10 +66,11 @@ public interface FSM extends Graph {
 	State getInitialState();
 
 	/**
-	 * Returns the list of states sorted by alphabetical order.
+	 * Returns the list of this FSM's transitions. This returns the same as
+	 * {@link #getVertices()} but as a list of {@link State}s rather than as a
+	 * list of {@link Vertex}s.
 	 * 
-	 * @return the list of states sorted by alphabetical order
-	 * @model containment="true"
+	 * @return the list of states
 	 */
 	EList<State> getStates();
 

@@ -58,10 +58,10 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="variables" upperBound="-1"
         eType="ecore:EClass Ir.ecore#//Var" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="instances" upperBound="-1"
-        eType="#//Instance" resolveProxies="false"/>
+        eType="#//Instance" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="fileName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="entities" upperBound="-1"
-        eType="#//Entity" resolveProxies="false"/>
+        eType="#//Entity" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="inputs" upperBound="-1"
         eType="#//Port" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="outputs" upperBound="-1"
@@ -93,8 +93,6 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="FSM" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Graph">
     <eStructuralFeatures xsi:type="ecore:EReference" name="initialState" eType="#//State"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="states" upperBound="-1"
-        eType="#//State" containment="true" resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Pattern">
     <eStructuralFeatures xsi:type="ecore:EReference" name="numTokensMap" upperBound="-1"

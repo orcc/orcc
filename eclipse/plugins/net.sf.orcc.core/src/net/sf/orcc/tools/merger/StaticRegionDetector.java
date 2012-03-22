@@ -45,7 +45,6 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -199,13 +198,12 @@ public class StaticRegionDetector {
 		List<Vertex> vertices = new TopologicalSorter().visitGraph(network);
 		
 		for (Vertex vertex : vertices) {
-			DfVertex vert = (DfVertex) vertex;
-			if (vert.isInstance()) {
-				MoC clasz = ((Instance) vert).getMoC();
-				if (!discovered.contains(vert) && clasz.isCSDF()) {
+			if (vertex instanceof Instance) {
+				MoC clasz = ((Instance) vertex).getMoC();
+				if (!discovered.contains(vertex) && clasz.isCSDF()) {
 					List<Vertex> set = new LinkedList<Vertex>();
 					staticRegionList.add(set);
-					staticRegionAnalysis(vert, set);
+					staticRegionAnalysis(vertex, set);
 				}
 			}
 		}

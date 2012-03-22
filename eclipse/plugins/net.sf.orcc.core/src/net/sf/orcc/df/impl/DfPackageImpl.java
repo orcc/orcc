@@ -571,14 +571,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getFSM_States() {
-		return (EReference) fsmEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EClass getPattern() {
 		return patternEClass;
 	}
@@ -989,7 +981,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 
 		fsmEClass = createEClass(FSM);
 		createEReference(fsmEClass, FSM__INITIAL_STATE);
-		createEReference(fsmEClass, FSM__STATES);
 
 		patternEClass = createEClass(PATTERN);
 		createEReference(patternEClass, PATTERN__NUM_TOKENS_MAP);
@@ -1214,18 +1205,16 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNetwork_Instances(), this.getInstance(), null,
 				"instances", null, 0, -1, Network.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE,
-				!IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
+				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getNetwork_FileName(), ecorePackage.getEString(),
 				"fileName", null, 0, 1, Network.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
 		initEReference(getNetwork_Entities(), this.getEntity(), null,
 				"entities", null, 0, -1, Network.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE,
-				!IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
+				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNetwork_Inputs(), this.getPort(), null, "inputs",
 				null, 0, -1, Network.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_COMPOSITE, !IS_RESOLVE_PROXIES,
@@ -1291,10 +1280,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE,
 				IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
-		initEReference(getFSM_States(), this.getState(), null, "states", null,
-				0, -1, net.sf.orcc.df.FSM.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(patternEClass, Pattern.class, "Pattern", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);

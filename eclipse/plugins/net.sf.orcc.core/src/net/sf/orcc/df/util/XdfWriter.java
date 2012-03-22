@@ -43,7 +43,6 @@ import net.sf.dftools.util.WrapperXml;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.DfVertex;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -66,6 +65,7 @@ import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.util.DomUtil;
+import net.sf.orcc.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.ECollections;
 import org.eclipse.emf.common.util.EList;
@@ -416,7 +416,7 @@ public class XdfWriter {
 			vertexAttr = "";
 			portAttr = ((Port) vertex).getName();
 		} else {
-			vertexAttr = ((DfVertex) vertex).getName();
+			vertexAttr = EcoreHelper.getFeature(vertex, "name");
 			portAttr = port.getName();
 		}
 

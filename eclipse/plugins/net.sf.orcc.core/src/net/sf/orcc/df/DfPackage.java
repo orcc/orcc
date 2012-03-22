@@ -753,7 +753,7 @@ public interface DfPackage extends EPackage {
 	int NETWORK__VARIABLES = ENTITY_FEATURE_COUNT + 3;
 
 	/**
-	 * The feature id for the '<em><b>Instances</b></em>' reference list.
+	 * The feature id for the '<em><b>Instances</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
@@ -770,7 +770,7 @@ public interface DfPackage extends EPackage {
 	int NETWORK__FILE_NAME = ENTITY_FEATURE_COUNT + 5;
 
 	/**
-	 * The feature id for the '<em><b>Entities</b></em>' reference list.
+	 * The feature id for the '<em><b>Entities</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
@@ -1027,21 +1027,13 @@ public interface DfPackage extends EPackage {
 	int FSM__INITIAL_STATE = GraphPackage.GRAPH_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>States</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int FSM__STATES = GraphPackage.GRAPH_FEATURE_COUNT + 1;
-
-	/**
 	 * The number of structural features of the '<em>FSM</em>' class. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int FSM_FEATURE_COUNT = GraphPackage.GRAPH_FEATURE_COUNT + 2;
+	int FSM_FEATURE_COUNT = GraphPackage.GRAPH_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Num Tokens Map</b></em>' map. <!--
@@ -1767,19 +1759,6 @@ public interface DfPackage extends EPackage {
 	EReference getFSM_InitialState();
 
 	/**
-	 * Returns the meta object for the containment reference list '
-	 * {@link net.sf.orcc.df.FSM#getStates <em>States</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the containment reference list '
-	 *         <em>States</em>'.
-	 * @see net.sf.orcc.df.FSM#getStates()
-	 * @see #getFSM()
-	 * @generated
-	 */
-	EReference getFSM_States();
-
-	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Pattern <em>Pattern</em>}'.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Pattern</em>'.
@@ -2252,7 +2231,7 @@ public interface DfPackage extends EPackage {
 		EReference NETWORK__VARIABLES = eINSTANCE.getNetwork_Variables();
 
 		/**
-		 * The meta object literal for the '<em><b>Instances</b></em>' reference list feature.
+		 * The meta object literal for the '<em><b>Instances</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc --> <!--
 		 * end-user-doc -->
 		 * @generated
@@ -2267,7 +2246,7 @@ public interface DfPackage extends EPackage {
 		EAttribute NETWORK__FILE_NAME = eINSTANCE.getNetwork_FileName();
 
 		/**
-		 * The meta object literal for the '<em><b>Entities</b></em>' reference list feature.
+		 * The meta object literal for the '<em><b>Entities</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc --> <!--
 		 * end-user-doc -->
 		 * @generated
@@ -2544,13 +2523,6 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EReference FSM__INITIAL_STATE = eINSTANCE.getFSM_InitialState();
-
-		/**
-		 * The meta object literal for the '<em><b>States</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference FSM__STATES = eINSTANCE.getFSM_States();
 
 		/**
 		 * The meta object literal for the '

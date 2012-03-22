@@ -7,9 +7,6 @@
   <foreignModel>@model</foreignModel>
   <genPackages prefix="Df" basePackage="net.sf.orcc" disposableProviderFactory="true"
       ecorePackage="Df.ecore#/">
-    <genClasses image="false" ecoreClass="Df.ecore#//DfVertex">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//DfVertex/name"/>
-    </genClasses>
     <genClasses ecoreClass="Df.ecore#//Unit">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Unit/constants"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Unit/procedures"/>
@@ -29,8 +26,6 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Instance/name"/>
     </genClasses>
     <genClasses image="false" ecoreClass="Df.ecore#//Entity">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Entity/inputs"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Entity/outputs"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Entity/parameters"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Entity/name"/>
     </genClasses>
@@ -46,6 +41,8 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Actor/native"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Actor/fileName"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Actor/lineNumber"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Actor/inputs"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Actor/outputs"/>
     </genClasses>
     <genClasses ecoreClass="Df.ecore#//Network">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Network/moC"/>
@@ -53,8 +50,13 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Network/instances"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Network/fileName"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Network/entities"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Network/inputs"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Network/outputs"/>
     </genClasses>
-    <genClasses ecoreClass="Df.ecore#//Broadcast"/>
+    <genClasses ecoreClass="Df.ecore#//Broadcast">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Broadcast/inputs"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Broadcast/outputs"/>
+    </genClasses>
     <genClasses ecoreClass="Df.ecore#//Connection">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Connection/sourcePort"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//Connection/targetPort"/>
@@ -69,7 +71,6 @@
     </genClasses>
     <genClasses ecoreClass="Df.ecore#//FSM">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Df.ecore#//FSM/initialState"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//FSM/states"/>
     </genClasses>
     <genClasses ecoreClass="Df.ecore#//Pattern">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Pattern/numTokensMap"/>
