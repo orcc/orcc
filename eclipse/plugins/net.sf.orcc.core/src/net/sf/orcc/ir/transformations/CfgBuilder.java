@@ -32,7 +32,6 @@ package net.sf.orcc.ir.transformations;
 import java.util.List;
 
 import net.sf.dftools.graph.Edge;
-import net.sf.dftools.graph.GraphFactory;
 import net.sf.orcc.ir.Cfg;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.IrFactory;
@@ -61,13 +60,12 @@ public class CfgBuilder extends AbstractActorVisitor<CfgNode> {
 	protected boolean flag;
 
 	protected void addEdge(CfgNode node) {
-		Edge edge = GraphFactory.eINSTANCE.createEdge(last, node);
+		Edge edge = cfg.add(last, node);
 		if (flag) {
 			edge.setAttribute("flag", factory.createExprBool(true));
 			// reset flag to false (so it is only set for this edge)
 			flag = false;
 		}
-		cfg.getEdges().add(edge);
 	}
 
 	/**

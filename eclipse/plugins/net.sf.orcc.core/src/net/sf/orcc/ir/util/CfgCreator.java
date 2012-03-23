@@ -31,8 +31,6 @@ package net.sf.orcc.ir.util;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.dftools.graph.Edge;
-import net.sf.dftools.graph.GraphFactory;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.FSM;
@@ -61,7 +59,7 @@ public class CfgCreator extends DfSwitch<Void> {
 	public CfgCreator() {
 		cfg = factory.createCfg();
 		CfgNode start = factory.createCfgNode(factory.createNodeBlock());
-		cfg.getVertices().add(start);
+		cfg.add(start);
 		cfg.setEntry(start);
 
 		last = start;
@@ -90,12 +88,12 @@ public class CfgCreator extends DfSwitch<Void> {
 			CfgNode nodeThen = addNode(factory.createNodeBlock());
 			nodeThen.setAttribute("action", action);
 
-			addEdge(nodeIf, nodeThen).setAttribute("flag", true);
-			addEdge(nodeIf, nodeLastElse);
+			cfg.add(nodeIf, nodeThen).setAttribute("flag", true);
+			cfg.add(nodeIf, nodeLastElse);
 
 			CfgNode nodeJoin = addNode(factory.createNodeBlock());
-			addEdge(nodeThen, nodeJoin);
-			addEdge(nodeLastJoin, nodeJoin);
+			cfg.add(nodeThen, nodeJoin);
+			cfg.add(nodeLastJoin, nodeJoin);
 
 			// update last else and join
 			nodeLastElse = nodeIf;
@@ -103,21 +101,8 @@ public class CfgCreator extends DfSwitch<Void> {
 		}
 
 		// final step: link to the incoming node, and update last
-		addEdge(last, nodeLastElse);
+		cfg.add(last, nodeLastElse);
 		last = nodeLastJoin;
-	}
-
-	/**
-	 * Creates an edge and adds it to this CFG.
-	 * 
-	 * @return a newly-created edge
-	 */
-	private Edge addEdge(CfgNode from, CfgNode to) {
-		Edge edge = GraphFactory.eINSTANCE.createEdge();
-		cfg.getEdges().add(edge);
-		edge.setSource(from);
-		edge.setTarget(to);
-		return edge;
 	}
 
 	@Override

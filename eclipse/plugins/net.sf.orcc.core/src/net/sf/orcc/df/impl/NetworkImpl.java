@@ -175,6 +175,11 @@ public class NetworkImpl extends EntityImpl implements Network {
 	}
 
 	@Override
+	public Edge add(Vertex source, Vertex target) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public void add(Vertex vertex) {
 		if (vertex instanceof Entity) {
 			getEntities().add((Entity) vertex);
