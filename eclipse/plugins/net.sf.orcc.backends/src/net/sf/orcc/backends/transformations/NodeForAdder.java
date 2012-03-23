@@ -148,8 +148,10 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 
 		Expression condition = nodeWhile.getCondition();
 		Node endNode = nodes.get(nodes.size() - 1);
-		Node previousNode = (Node) nodeWhile.getJoinNode().getCfgNode()
+		
+		CfgNode previousCFGNode = (CfgNode) nodeWhile.getJoinNode().getCfgNode()
 				.getPredecessors().get(0);
+		Node previousNode = previousCFGNode.getNode();
 
 		List<Var> conditionVars = new VarGetter(condition).get();
 		List<Instruction> loopCnts = new ArrayList<Instruction>();
