@@ -670,7 +670,7 @@ printPhiAssignment(phi) ::= <<
 >>
 
 printPhiPairs(phi) ::= <<
-<printPhiExpr(first(phi.values), phi.target.variable.type, first(phi.block.cfgNode.predecessors))>, <printPhiExpr(first(rest(phi.values)), phi.target.variable.type, first(rest(phi.block.cfgNode.predecessors)))>
+<printPhiExpr(first(phi.values), phi.target.variable.type, first(phi.block.cfgNode.predecessors).node)>, <printPhiExpr(first(rest(phi.values)), phi.target.variable.type, first(rest(phi.block.cfgNode.predecessors)).node)>
 >>
 
 printPhiExpr(expr, type, node) ::= <<
@@ -723,13 +723,13 @@ printBlockNode(blockNode) ::= <<
 b<label(blockNode)>:
 	<printInstructions(blockNode.instructions)>
 	<if(blockNode.cfgNode.successors)>
-	br label %b<printNextLabel(blockNode.cfgNode.successors)>
+	br label %b<printNextLabel(first(blockNode.cfgNode.successors).node)>
 	<endif>
 >>
 
 printIfNode(ifNode) ::= <<
 b<label(ifNode)>:
-	br i1 <Expr(ifNode.condition)>, label %b<printNextLabel(ifNode.thenNodes)>, label %b<printNextLabel(ifNode.elseNodes)>
+	br i1 <Expr(ifNode.condition)>, label %b<printNextLabel(first(ifNode.thenNodes))>, label %b<printNextLabel(first(ifNode.elseNodes))>
 
 <printNodes(ifNode.thenNodes, removeReturn)>
 
@@ -746,13 +746,13 @@ b<label(whileNode.joinNode)>:
 <printNodes(whileNode.nodes, removeReturn)>
 
 b<label(whileNode)>:
-	br label %b<printNextLabel(whileNode.cfgNode.successors)>
+	br label %b<printNextLabel(first(whileNode.cfgNode.successors).node)>
 >>
 
 label(node) ::= "b<actor.templateData.nodeToLabelMap.(node)>"
 
 printNextLabel(node)::=<<
-<if(first(node).node.nodeWhile)><label(first(node).node.joinNode)><else><label(first(node).node)><endif>
+<if(node.nodeWhile)><label(node.joinNode)><else><label(node)><endif>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////

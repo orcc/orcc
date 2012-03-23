@@ -61,7 +61,7 @@ public class CfgBuilder extends AbstractActorVisitor<CfgNode> {
 	protected boolean flag;
 
 	protected void addEdge(CfgNode node) {
-		Edge edge = GraphFactory.eINSTANCE.createEdge(node, node);
+		Edge edge = GraphFactory.eINSTANCE.createEdge(last, node);
 		if (flag) {
 			edge.setAttribute("flag", factory.createExprBool(true));
 			// reset flag to false (so it is only set for this edge)
@@ -77,7 +77,7 @@ public class CfgBuilder extends AbstractActorVisitor<CfgNode> {
 	 */
 	protected CfgNode addNode(Node node) {
 		CfgNode cfgNode = factory.createCfgNode(node);
-		cfg.getVertices().add(cfgNode);
+		cfg.add(cfgNode);
 		return cfgNode;
 	}
 
