@@ -58,13 +58,13 @@ public class BroadcastAdder extends DfSwitch<Void> {
 
 	@Override
 	public Void caseEntity(Entity entity) {
-		handle(entity.getName(), entity.getOutgoingPortMap());
+		handle(entity.getSimpleName(), entity.getOutgoingPortMap());
 		return null;
 	}
 
 	@Override
 	public Void caseInstance(Instance instance) {
-		handle(instance.getName(), instance.getOutgoingPortMap());
+		handle(instance.getSimpleName(), instance.getOutgoingPortMap());
 		return null;
 	}
 
@@ -93,7 +93,7 @@ public class BroadcastAdder extends DfSwitch<Void> {
 	public Void casePort(Port port) {
 		List<Edge> connections = new ArrayList<Edge>(port.getOutgoing());
 		if (connections.size() > 1) {
-			createBroadcast(network.getName(), port, connections);
+			createBroadcast(network.getSimpleName(), port, connections);
 		}
 		return null;
 	}
