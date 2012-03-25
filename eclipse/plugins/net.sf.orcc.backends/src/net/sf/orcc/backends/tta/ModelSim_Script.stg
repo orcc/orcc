@@ -80,8 +80,8 @@ vcom -93 -quiet -work work <if(callByNetwork)><instance.id>/<endif>tta/vhdl/irom
 exec cp -f <if(callByNetwork)><instance.id>/<endif>tta/vhdl/dram_<instance.id>.mif . &
 exec cp -f <if(callByNetwork)><instance.id>/<endif>tta/vhdl/irom_<instance.id>.mif . &
 <else>
-exec cp -f <if(!callByNetwork)>../<endif>wrapper/ram_<instance.id>.mif . &
-exec cp -f <if(!callByNetwork)>../<endif>wrapper/rom_<instance.id>.mif . &
+exec cp -f <if(!callByNetwork)>../<endif>wrapper/dram_<instance.id>.mif . &
+exec cp -f <if(!callByNetwork)>../<endif>wrapper/irom_<instance.id>.mif . &
 <endif><
 endif>
 >>
@@ -98,6 +98,7 @@ vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/fifo_br.vhd
 <endif>
 
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>simulation/sim_package.vhd
+vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/broadcast.vhd
 >>
 
 compileInterfaceComponents(callByNetwork) ::= <<

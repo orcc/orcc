@@ -38,7 +38,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.dftools.graph.Edge;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.CustomPrinter;
@@ -58,11 +57,8 @@ import net.sf.orcc.backends.transformations.ssa.CopyPropagator;
 import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.tta.architecture.Processor;
 import net.sf.orcc.backends.tta.architecture.util.ArchitectureMemoryStats;
-import net.sf.orcc.backends.tta.transformations.BroadcastTypeResizer;
 import net.sf.orcc.backends.tta.transformations.SlowOperationDetector;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transformations.BroadcastAdder;
@@ -78,7 +74,6 @@ import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.emf.common.util.BasicEList;
 
 /**
  * TTA back-end.
@@ -115,15 +110,15 @@ public class TTABackendImpl extends AbstractBackend {
 		transformations.put("max", "max_");
 		transformations.put("select", "select_");
 		processorIntensiveActors = new ArrayList<String>();
-		processorIntensiveActors.add("org.mpeg4.part2.motion.Algo_Add");
-		processorIntensiveActors.add("com.ericsson.Algo_Interpolation_halfpel");
-		processorIntensiveActors.add("org.sc29.wg11.mpeg4.part2.texture.Algo_IDCT2D_ISOIEC_23002_1");
-		processorIntensiveActors.add("fi.oulu.ee.mvg.Framebuffer");
-		processorIntensiveActors.add("com.xilinx.Mgnt_Merger");
-		processorIntensiveActors.add("org.mpeg4.part2.texture.Algo_Inversequant");
+		//processorIntensiveActors.add("org.mpeg4.part2.motion.Algo_Add");
+		//processorIntensiveActors.add("com.ericsson.Algo_Interpolation_halfpel");
+		//processorIntensiveActors.add("org.sc29.wg11.mpeg4.part2.texture.Algo_IDCT2D_ISOIEC_23002_1");
+		//processorIntensiveActors.add("fi.oulu.ee.mvg.Framebuffer");
+		//processorIntensiveActors.add("com.xilinx.Mgnt_Merger");
+		//processorIntensiveActors.add("org.mpeg4.part2.texture.Algo_Inversequant");
 		
-		processorIntensiveActors.add("fi.oulu.ee.mvg.Algo_IAP_multi");
-		processorIntensiveActors.add("org.mpeg4.part2.parser.Algo_Synp_MPEG_4");
+		//processorIntensiveActors.add("fi.oulu.ee.mvg.Algo_IAP_multi");
+		//processorIntensiveActors.add("org.mpeg4.part2.parser.Algo_Synp_MPEG_4");
 	}
 
 	@Override
@@ -186,19 +181,6 @@ public class TTABackendImpl extends AbstractBackend {
 		new NetworkFlattener().doSwitch(network);
 
 		new BroadcastAdder().doSwitch(network);
-		new BroadcastTypeResizer().doSwitch(network);
-
-		for (Entity entity : network.getEntities()) {
-			Instance instance = DfFactory.eINSTANCE.createInstance(
-					entity.getSimpleName(), entity);
-			network.getInstances().add(instance);
-			for (Edge edge : new BasicEList<Edge>(entity.getIncoming())) {
-				edge.setTarget(instance);
-			}
-			for (Edge edge : new BasicEList<Edge>(entity.getOutgoing())) {
-				edge.setSource(instance);
-			}
-		}
 
 		return network;
 	}
@@ -253,7 +235,7 @@ public class TTABackendImpl extends AbstractBackend {
 	@Override
 	protected boolean printInstance(Instance instance) throws OrccException {
 		StandardPrinter printer = new StandardPrinter(
-				"net/sf/orcc/backends/tta/LLVM_Actor.stg", !debug, true);
+				"net/sf/orcc/backends/tta/LLVM_Actor.stg", !debug, false);
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
 

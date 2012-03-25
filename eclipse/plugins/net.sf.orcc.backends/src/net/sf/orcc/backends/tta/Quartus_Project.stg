@@ -30,6 +30,7 @@ set_global_assignment -name VHDL_FILE share/vhdl/add_and_eq_gt_gtu_ior_shl_shr_s
 set_global_assignment -name VHDL_FILE wrapper/altera_fifo.vhd
 set_global_assignment -name VHDL_FILE wrapper/altera_ram.vhd
 set_global_assignment -name VHDL_FILE wrapper/altera_rom.vhd
+set_global_assignment -name VHDL_FILE wrapper/broadcast.vhd
 set_global_assignment -name VHDL_FILE interface/counter.vhd
 set_global_assignment -name VHDL_FILE interface/fps_eval.vhd
 set_global_assignment -name VHDL_FILE interface/segment_display_conv.vhd
