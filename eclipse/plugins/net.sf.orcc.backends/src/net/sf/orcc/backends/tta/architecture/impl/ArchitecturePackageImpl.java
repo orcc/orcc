@@ -31,7 +31,6 @@ package net.sf.orcc.backends.tta.architecture.impl;
 import java.util.Map;
 
 import net.sf.dftools.graph.GraphPackage;
-import net.sf.dftools.util.UtilPackage;
 import net.sf.orcc.backends.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
@@ -47,6 +46,7 @@ import net.sf.orcc.backends.tta.architecture.Extension;
 import net.sf.orcc.backends.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
 import net.sf.orcc.backends.tta.architecture.Guard;
+import net.sf.orcc.backends.tta.architecture.HwBroadcast;
 import net.sf.orcc.backends.tta.architecture.HwFifo;
 import net.sf.orcc.backends.tta.architecture.Implementation;
 import net.sf.orcc.backends.tta.architecture.OpBinary;
@@ -65,6 +65,9 @@ import net.sf.orcc.backends.tta.architecture.Term;
 import net.sf.orcc.backends.tta.architecture.TermBool;
 import net.sf.orcc.backends.tta.architecture.TermUnit;
 import net.sf.orcc.backends.tta.architecture.Writes;
+import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.ir.IrPackage;
+import net.sf.orcc.moc.MocPackage;
 
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
@@ -93,6 +96,13 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	private EClass hwFifoEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass hwBroadcastEClass = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -327,8 +337,9 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		isInited = true;
 
 		// Initialize simple dependencies
-		GraphPackage.eINSTANCE.eClass();
-		UtilPackage.eINSTANCE.eClass();
+		DfPackage.eINSTANCE.eClass();
+		IrPackage.eINSTANCE.eClass();
+		MocPackage.eINSTANCE.eClass();
 
 		// Create package meta-data objects
 		theArchitecturePackage.createPackageContents();
@@ -362,6 +373,15 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getHwBroadcast() {
+		return hwBroadcastEClass;
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -374,14 +394,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	public EReference getProcessor_Gcu() {
-		return (EReference) processorEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getProcessor_Buses() {
 		return (EReference) processorEClass.getEStructuralFeatures().get(1);
 	}
 
@@ -389,7 +401,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getProcessor_Bridges() {
+	public EReference getProcessor_Buses() {
 		return (EReference) processorEClass.getEStructuralFeatures().get(2);
 	}
 
@@ -397,7 +409,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getProcessor_Sockets() {
+	public EReference getProcessor_Bridges() {
 		return (EReference) processorEClass.getEStructuralFeatures().get(3);
 	}
 
@@ -405,7 +417,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getProcessor_FunctionUnits() {
+	public EReference getProcessor_Sockets() {
 		return (EReference) processorEClass.getEStructuralFeatures().get(4);
 	}
 
@@ -413,7 +425,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getProcessor_RegisterFiles() {
+	public EReference getProcessor_FunctionUnits() {
 		return (EReference) processorEClass.getEStructuralFeatures().get(5);
 	}
 
@@ -421,7 +433,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getProcessor_Program() {
+	public EReference getProcessor_RegisterFiles() {
 		return (EReference) processorEClass.getEStructuralFeatures().get(6);
 	}
 
@@ -429,7 +441,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getProcessor_Data() {
+	public EReference getProcessor_Program() {
 		return (EReference) processorEClass.getEStructuralFeatures().get(7);
 	}
 
@@ -437,8 +449,25 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getProcessor_HardwareDatabase() {
+	public EReference getProcessor_Data() {
 		return (EReference) processorEClass.getEStructuralFeatures().get(8);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getProcessor_HardwareDatabase() {
+		return (EReference) processorEClass.getEStructuralFeatures().get(9);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getProcessor_MappedActors() {
+		return (EReference) processorEClass.getEStructuralFeatures().get(10);
 	}
 
 	/**
@@ -447,7 +476,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	public EAttribute getProcessor_Name() {
-		return (EAttribute) processorEClass.getEStructuralFeatures().get(9);
+		return (EAttribute) processorEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -1221,7 +1250,10 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 		hwFifoEClass = createEClass(HW_FIFO);
 
+		hwBroadcastEClass = createEClass(HW_BROADCAST);
+
 		processorEClass = createEClass(PROCESSOR);
+		createEAttribute(processorEClass, PROCESSOR__NAME);
 		createEReference(processorEClass, PROCESSOR__GCU);
 		createEReference(processorEClass, PROCESSOR__BUSES);
 		createEReference(processorEClass, PROCESSOR__BRIDGES);
@@ -1231,7 +1263,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEReference(processorEClass, PROCESSOR__PROGRAM);
 		createEReference(processorEClass, PROCESSOR__DATA);
 		createEReference(processorEClass, PROCESSOR__HARDWARE_DATABASE);
-		createEAttribute(processorEClass, PROCESSOR__NAME);
+		createEReference(processorEClass, PROCESSOR__MAPPED_ACTORS);
 
 		busEClass = createEClass(BUS);
 		createEAttribute(busEClass, BUS__NAME);
@@ -1387,6 +1419,8 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				.getEPackage(GraphPackage.eNS_URI);
 		EcorePackage theEcorePackage = (EcorePackage) EPackage.Registry.INSTANCE
 				.getEPackage(EcorePackage.eNS_URI);
+		DfPackage theDfPackage = (DfPackage) EPackage.Registry.INSTANCE
+				.getEPackage(DfPackage.eNS_URI);
 
 		// Create type parameters
 
@@ -1395,6 +1429,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		// Add supertypes to classes
 		designEClass.getESuperTypes().add(theGraphPackage.getGraph());
 		hwFifoEClass.getESuperTypes().add(theGraphPackage.getEdge());
+		hwBroadcastEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		processorEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		readsEClass.getESuperTypes().add(this.getElement());
 		writesEClass.getESuperTypes().add(this.getElement());
@@ -1413,8 +1448,15 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		initEClass(hwFifoEClass, HwFifo.class, "HwFifo", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
+		initEClass(hwBroadcastEClass, HwBroadcast.class, "HwBroadcast",
+				!IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+
 		initEClass(processorEClass, Processor.class, "Processor", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getProcessor_Name(), theEcorePackage.getEString(),
+				"name", null, 0, 1, Processor.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
 		initEReference(getProcessor_Gcu(), this.getGlobalControlUnit(), null,
 				"gcu", null, 0, 1, Processor.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
@@ -1454,10 +1496,11 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				-1, Processor.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getProcessor_Name(), theEcorePackage.getEString(),
-				"name", null, 0, 1, Processor.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
+		initEReference(getProcessor_MappedActors(), theDfPackage.getInstance(),
+				null, "mappedActors", null, 0, 1, Processor.class,
+				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE,
+				IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
 
 		initEClass(busEClass, Bus.class, "Bus", !IS_ABSTRACT, !IS_INTERFACE,
 				IS_GENERATED_INSTANCE_CLASS);

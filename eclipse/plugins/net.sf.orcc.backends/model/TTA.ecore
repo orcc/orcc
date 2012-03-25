@@ -4,7 +4,9 @@
     nsPrefix="net.sf.orcc.backends.tta.architecture">
   <eClassifiers xsi:type="ecore:EClass" name="Design" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Graph"/>
   <eClassifiers xsi:type="ecore:EClass" name="HwFifo" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Edge"/>
+  <eClassifiers xsi:type="ecore:EClass" name="HwBroadcast" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Vertex"/>
   <eClassifiers xsi:type="ecore:EClass" name="Processor" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Vertex">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="gcu" eType="#//GlobalControlUnit"
         containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="buses" upperBound="-1"
@@ -23,7 +25,7 @@
         containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="hardwareDatabase" upperBound="-1"
         eType="#//Implementation" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="mappedActors" eType="ecore:EClass ../../net.sf.orcc.core/model/Df.ecore#//Instance"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Bus">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>

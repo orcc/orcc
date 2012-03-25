@@ -47,6 +47,7 @@ import net.sf.orcc.backends.tta.architecture.ExprUnary;
 import net.sf.orcc.backends.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
 import net.sf.orcc.backends.tta.architecture.Guard;
+import net.sf.orcc.backends.tta.architecture.HwBroadcast;
 import net.sf.orcc.backends.tta.architecture.HwFifo;
 import net.sf.orcc.backends.tta.architecture.Implementation;
 import net.sf.orcc.backends.tta.architecture.Operation;
@@ -136,6 +137,17 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 				result = caseEdge(hwFifo);
 			if (result == null)
 				result = caseAttributable(hwFifo);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.HW_BROADCAST: {
+			HwBroadcast hwBroadcast = (HwBroadcast) theEObject;
+			T result = caseHwBroadcast(hwBroadcast);
+			if (result == null)
+				result = caseVertex(hwBroadcast);
+			if (result == null)
+				result = caseAttributable(hwBroadcast);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -375,6 +387,21 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseHwFifo(HwFifo object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Hw Broadcast</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Hw Broadcast</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseHwBroadcast(HwBroadcast object) {
 		return null;
 	}
 

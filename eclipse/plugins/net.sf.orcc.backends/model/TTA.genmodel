@@ -3,8 +3,9 @@
     xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/net.sf.orcc.backends/src" modelPluginID="net.sf.orcc.backends"
     templateDirectory="/net.sf.dftools.models/templates" dynamicTemplates="true" modelName="TTA"
     codeFormatting="true" importerID="org.eclipse.emf.importer.ecore" complianceLevel="6.0"
-    copyrightFields="false" usedGenPackages="../../net.sf.dftools.models/model/Graph.genmodel#//graph">
+    copyrightFields="false" usedGenPackages="../../net.sf.orcc.core/model/Core.genmodel#//df ../../net.sf.orcc.core/model/Core.genmodel#//ir ../../net.sf.orcc.core/model/Core.genmodel#//moc platform:/plugin/org.eclipse.emf.ecore/model/Ecore.genmodel#//ecore ../../net.sf.dftools.models/model/Graph.genmodel#//graph ../../net.sf.dftools.models/model/Graph.genmodel#//util">
   <foreignModel>TTA.ecore</foreignModel>
+  <foreignModel>../../net.sf.orcc.core/model/Ir.ecore</foreignModel>
   <genPackages prefix="Architecture" basePackage="net.sf.orcc.backends.tta" disposableProviderFactory="true"
       ecorePackage="TTA.ecore#/">
     <genEnums typeSafeEnumCompatible="false" ecoreEnum="TTA.ecore#//SocketType">
@@ -25,7 +26,9 @@
     </genEnums>
     <genClasses ecoreClass="TTA.ecore#//Design"/>
     <genClasses ecoreClass="TTA.ecore#//HwFifo"/>
+    <genClasses ecoreClass="TTA.ecore#//HwBroadcast"/>
     <genClasses ecoreClass="TTA.ecore#//Processor">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//Processor/name"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//Processor/gcu"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//Processor/buses"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//Processor/bridges"/>
@@ -35,6 +38,7 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//Processor/program"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//Processor/data"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//Processor/hardwareDatabase"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//Processor/mappedActors"/>
     </genClasses>
     <genClasses ecoreClass="TTA.ecore#//Bus">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//Bus/name"/>

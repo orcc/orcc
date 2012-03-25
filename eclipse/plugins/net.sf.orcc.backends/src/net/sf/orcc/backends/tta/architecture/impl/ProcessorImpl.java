@@ -44,6 +44,7 @@ import net.sf.orcc.backends.tta.architecture.Processor;
 import net.sf.orcc.backends.tta.architecture.RegisterFile;
 import net.sf.orcc.backends.tta.architecture.Socket;
 
+import net.sf.orcc.df.Instance;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
@@ -60,6 +61,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getGcu <em>Gcu</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getBuses <em>Buses</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getBridges <em>Bridges</em>}</li>
@@ -69,13 +71,33 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getProgram <em>Program</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getData <em>Data</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getHardwareDatabase <em>Hardware Database</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getMappedActors <em>Mapped Actors</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
 public class ProcessorImpl extends VertexImpl implements Processor {
+	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected String name = NAME_EDEFAULT;
+
 	/**
 	 * The cached value of the '{@link #getGcu() <em>Gcu</em>}' containment reference.
 	 * <!-- begin-user-doc -->
@@ -167,24 +189,14 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 	protected EList<Implementation> hardwareDatabase;
 
 	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * The cached value of the '{@link #getMappedActors() <em>Mapped Actors</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getName()
+	 * @see #getMappedActors()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final String NAME_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected String name = NAME_EDEFAULT;
+	protected Instance mappedActors;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -460,6 +472,48 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public Instance getMappedActors() {
+		if (mappedActors != null && mappedActors.eIsProxy()) {
+			InternalEObject oldMappedActors = (InternalEObject) mappedActors;
+			mappedActors = (Instance) eResolveProxy(oldMappedActors);
+			if (mappedActors != oldMappedActors) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							ArchitecturePackage.PROCESSOR__MAPPED_ACTORS,
+							oldMappedActors, mappedActors));
+			}
+		}
+		return mappedActors;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Instance basicGetMappedActors() {
+		return mappedActors;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setMappedActors(Instance newMappedActors) {
+		Instance oldMappedActors = mappedActors;
+		mappedActors = newMappedActors;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.PROCESSOR__MAPPED_ACTORS,
+					oldMappedActors, mappedActors));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public String getName() {
 		return name;
 	}
@@ -521,6 +575,8 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
+		case ArchitecturePackage.PROCESSOR__NAME:
+			return getName();
 		case ArchitecturePackage.PROCESSOR__GCU:
 			return getGcu();
 		case ArchitecturePackage.PROCESSOR__BUSES:
@@ -539,8 +595,10 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 			return getData();
 		case ArchitecturePackage.PROCESSOR__HARDWARE_DATABASE:
 			return getHardwareDatabase();
-		case ArchitecturePackage.PROCESSOR__NAME:
-			return getName();
+		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
+			if (resolve)
+				return getMappedActors();
+			return basicGetMappedActors();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -554,6 +612,9 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
+		case ArchitecturePackage.PROCESSOR__NAME:
+			setName((String) newValue);
+			return;
 		case ArchitecturePackage.PROCESSOR__GCU:
 			setGcu((GlobalControlUnit) newValue);
 			return;
@@ -590,8 +651,8 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 			getHardwareDatabase().addAll(
 					(Collection<? extends Implementation>) newValue);
 			return;
-		case ArchitecturePackage.PROCESSOR__NAME:
-			setName((String) newValue);
+		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
+			setMappedActors((Instance) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -605,6 +666,9 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
+		case ArchitecturePackage.PROCESSOR__NAME:
+			setName(NAME_EDEFAULT);
+			return;
 		case ArchitecturePackage.PROCESSOR__GCU:
 			setGcu((GlobalControlUnit) null);
 			return;
@@ -632,8 +696,8 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 		case ArchitecturePackage.PROCESSOR__HARDWARE_DATABASE:
 			getHardwareDatabase().clear();
 			return;
-		case ArchitecturePackage.PROCESSOR__NAME:
-			setName(NAME_EDEFAULT);
+		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
+			setMappedActors((Instance) null);
 			return;
 		}
 		super.eUnset(featureID);
@@ -647,6 +711,9 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
+		case ArchitecturePackage.PROCESSOR__NAME:
+			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
+					.equals(name);
 		case ArchitecturePackage.PROCESSOR__GCU:
 			return gcu != null;
 		case ArchitecturePackage.PROCESSOR__BUSES:
@@ -665,9 +732,8 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 			return data != null;
 		case ArchitecturePackage.PROCESSOR__HARDWARE_DATABASE:
 			return hardwareDatabase != null && !hardwareDatabase.isEmpty();
-		case ArchitecturePackage.PROCESSOR__NAME:
-			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
-					.equals(name);
+		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
+			return mappedActors != null;
 		}
 		return super.eIsSet(featureID);
 	}

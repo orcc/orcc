@@ -47,6 +47,7 @@ import net.sf.orcc.backends.tta.architecture.ExprUnary;
 import net.sf.orcc.backends.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
 import net.sf.orcc.backends.tta.architecture.Guard;
+import net.sf.orcc.backends.tta.architecture.HwBroadcast;
 import net.sf.orcc.backends.tta.architecture.HwFifo;
 import net.sf.orcc.backends.tta.architecture.Implementation;
 import net.sf.orcc.backends.tta.architecture.Operation;
@@ -129,6 +130,11 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 		@Override
 		public Adapter caseHwFifo(HwFifo object) {
 			return createHwFifoAdapter();
+		}
+
+		@Override
+		public Adapter caseHwBroadcast(HwBroadcast object) {
+			return createHwBroadcastAdapter();
 		}
 
 		@Override
@@ -323,6 +329,20 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createHwFifoAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.HwBroadcast <em>Hw Broadcast</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.tta.architecture.HwBroadcast
+	 * @generated
+	 */
+	public Adapter createHwBroadcastAdapter() {
 		return null;
 	}
 

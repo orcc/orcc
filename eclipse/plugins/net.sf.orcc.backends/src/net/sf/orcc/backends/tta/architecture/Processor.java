@@ -32,6 +32,7 @@ package net.sf.orcc.backends.tta.architecture;
 
 import net.sf.dftools.graph.Vertex;
 
+import net.sf.orcc.df.Instance;
 import org.eclipse.emf.common.util.EList;
 
 /**
@@ -42,6 +43,7 @@ import org.eclipse.emf.common.util.EList;
  * <p>
  * The following features are supported:
  * <ul>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getGcu <em>Gcu</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getBuses <em>Buses</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getBridges <em>Bridges</em>}</li>
@@ -51,7 +53,7 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getProgram <em>Program</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getData <em>Data</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getHardwareDatabase <em>Hardware Database</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getMappedActors <em>Mapped Actors</em>}</li>
  * </ul>
  * </p>
  *
@@ -233,6 +235,32 @@ public interface Processor extends Vertex {
 	 * @generated
 	 */
 	EList<Implementation> getHardwareDatabase();
+
+	/**
+	 * Returns the value of the '<em><b>Mapped Actors</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Mapped Actors</em>' reference isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Mapped Actors</em>' reference.
+	 * @see #setMappedActors(Instance)
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getProcessor_MappedActors()
+	 * @model
+	 * @generated
+	 */
+	Instance getMappedActors();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Processor#getMappedActors <em>Mapped Actors</em>}' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Mapped Actors</em>' reference.
+	 * @see #getMappedActors()
+	 * @generated
+	 */
+	void setMappedActors(Instance value);
 
 	/**
 	 * Returns the value of the '<em><b>Name</b></em>' attribute.
