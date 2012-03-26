@@ -12,17 +12,27 @@ typeDefLocal(local) ::= <<
 // Input and output pattern
 patternPortPinAvail(dir, port)::= <<
 \<!--  <dir>putPattern --\>
+<if(port.native)>
+\<operation kind="$literal_Integer" value="1"\>
+	\<port dir="out" size="1" source="<dir>putPattern_<instance.id>_<action.name>_<port.name>" typeName="bool"/\>
+\</operation\>
+<else>
 \<operation kind="noop"\>
 	\<port dir="in" source="<port.name>_pinStatus"/\>
 	\<port dir="out" size="1" source="<dir>putPattern_<instance.id>_<action.name>_<port.name>" typeName="bool"/\>
 \</operation\>
+<endif>
 >>
 
 
 declarePinAvailableVariable(port) ::= <<
+<if(!port.native)>
 \<operation kind="pinStatus" portName="<port.name>"\>
   \<port dir="out" source="<port.name>_pinStatus" typeName="bool"/\>
 \</operation\>
+<else>
+\<!-- No need for pinStatus for native ports --\>
+<endif>
 >>
 
 // For the switch structure of Openforge BE

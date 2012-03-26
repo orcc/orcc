@@ -38,11 +38,11 @@ UnaryOp ::= [
 
 actorPort(port, dir) ::= <<
 <if (port.type.bool)
->\<actor-port dir="<dir>" name="<port.name>" size="1" typeName="<port.type>"/\><
+>\<actor<if(port.native)>-native<endif>-port dir="<dir>" name="<port.name>" size="1" typeName="<port.type>"/\><
 elseif (port.type.float)
->\<actor-port dir="<dir>" name="<port.name>" typeName="<port.type>"/\><
+>\<actor<if(port.native)>-native<endif>-port dir="<dir>" name="<port.name>" typeName="<port.type>"/\><
 else
->\<actor-port dir="<dir>" name="<port.name>" size="<port.type.size>" typeName="<port.type>"/\><
+>\<actor<if(port.native)>-native<endif>-port dir="<dir>" name="<port.name>" size="<port.type.size>" typeName="<port.type>"/\><
 endif>
 >>
 
