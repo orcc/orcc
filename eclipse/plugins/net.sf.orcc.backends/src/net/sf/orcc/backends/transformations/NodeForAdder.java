@@ -31,6 +31,7 @@ package net.sf.orcc.backends.transformations;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.dftools.util.Attribute;
 import net.sf.orcc.backends.ir.IrNodeSpecific;
 import net.sf.orcc.backends.ir.IrSpecificFactory;
 import net.sf.orcc.backends.ir.NodeFor;
@@ -188,6 +189,11 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 		nodeFor.getLoopCounter().addAll(loopCnts);
 		nodeFor.getInit().addAll(initCnts);
 
+		// Set annotations to the for node
+		for (Attribute attribute : nodeWhile.getAttributes()){
+			nodeFor.setAttribute(attribute.getName(), attribute.getValue());
+		}
+		
 		// Replace node
 		EcoreUtil.replace(nodeWhile, nodeFor);
 
