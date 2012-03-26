@@ -267,9 +267,9 @@ public class ExpressionEvaluator extends IrSwitch<Object> {
 			return ValueUtil.shiftRight(val1, val2);
 		case TIMES:
 			return ValueUtil.multiply(val1, val2);
+		default:
+			return null;
 		}
-
-		return null;
 	}
 
 	/**
@@ -292,9 +292,9 @@ public class ExpressionEvaluator extends IrSwitch<Object> {
 			return ValueUtil.negate(value);
 		case NUM_ELTS:
 			return ValueUtil.length(value);
+		default:
+			return null;
 		}
-
-		return null;
 	}
 
 	public void setType(TypeList typeList) {

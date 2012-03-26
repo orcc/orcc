@@ -576,9 +576,10 @@ public class Typer extends CalSwitch<Type> {
 		case LOGIC_AND:
 		case LOGIC_OR:
 			return IrFactory.eINSTANCE.createTypeBool();
-		}
 
-		return null;
+		default:
+			return null;
+		}
 	}
 
 }

@@ -564,6 +564,9 @@ public class TypeValidator extends AbstractCalJavaValidator {
 						index);
 			}
 			break;
+
+		default:
+			break;
 		}
 	}
 
