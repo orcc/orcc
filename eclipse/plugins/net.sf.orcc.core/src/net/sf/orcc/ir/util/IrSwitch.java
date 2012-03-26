@@ -809,6 +809,8 @@ public class IrSwitch<T> extends Switch<T> {
 			Node node = (Node) theEObject;
 			T result = caseNode(node);
 			if (result == null)
+				result = caseAttributable(node);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -817,6 +819,8 @@ public class IrSwitch<T> extends Switch<T> {
 			T result = caseNodeBlock(nodeBlock);
 			if (result == null)
 				result = caseNode(nodeBlock);
+			if (result == null)
+				result = caseAttributable(nodeBlock);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -827,6 +831,8 @@ public class IrSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseNode(nodeIf);
 			if (result == null)
+				result = caseAttributable(nodeIf);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -835,6 +841,8 @@ public class IrSwitch<T> extends Switch<T> {
 			T result = caseNodeWhile(nodeWhile);
 			if (result == null)
 				result = caseNode(nodeWhile);
+			if (result == null)
+				result = caseAttributable(nodeWhile);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -1134,6 +1142,8 @@ public class IrSwitch<T> extends Switch<T> {
 			T result = caseNodeSpecific(nodeSpecific);
 			if (result == null)
 				result = caseNode(nodeSpecific);
+			if (result == null)
+				result = caseAttributable(nodeSpecific);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;

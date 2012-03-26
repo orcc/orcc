@@ -1407,13 +1407,22 @@ public interface IrPackage extends EPackage {
 	int PARAM_FEATURE_COUNT = 2;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NODE__ATTRIBUTES = UtilPackage.ATTRIBUTABLE__ATTRIBUTES;
+
+	/**
 	 * The feature id for the '<em><b>Cfg Node</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int NODE__CFG_NODE = 0;
+	int NODE__CFG_NODE = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 0;
 
 	/**
 	 * The number of structural features of the '<em>Node</em>' class. <!--
@@ -1422,7 +1431,16 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_FEATURE_COUNT = 1;
+	int NODE_FEATURE_COUNT = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 1;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NODE_BLOCK__ATTRIBUTES = NODE__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Cfg Node</b></em>' reference.
@@ -1448,6 +1466,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int NODE_BLOCK_FEATURE_COUNT = NODE_FEATURE_COUNT + 1;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NODE_IF__ATTRIBUTES = NODE__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Cfg Node</b></em>' reference.
@@ -1507,6 +1534,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int NODE_IF_FEATURE_COUNT = NODE_FEATURE_COUNT + 5;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NODE_WHILE__ATTRIBUTES = NODE__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Cfg Node</b></em>' reference.
@@ -2632,6 +2668,15 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	int NODE_SPECIFIC = 38;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NODE_SPECIFIC__ATTRIBUTES = NODE__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Cfg Node</b></em>' reference.

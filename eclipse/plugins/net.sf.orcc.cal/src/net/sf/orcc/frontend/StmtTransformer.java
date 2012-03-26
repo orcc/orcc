@@ -181,7 +181,9 @@ public class StmtTransformer extends CalSwitch<EObject> {
 		InstCall call = eINSTANCE.createInstCall(lineNumber, null, calledProc,
 				parameters);
 		IrUtil.getLast(nodes).add(call);
-
+		
+		//Add annotations
+		Util.transformAnnotations(call, stmtCall.getAnnotations());
 		return null;
 	}
 
@@ -224,6 +226,9 @@ public class StmtTransformer extends CalSwitch<EObject> {
 						loopVar.getType()));
 		block.add(assign);
 
+		//Add annotations
+		Util.transformAnnotations(nodeWhile, foreach.getAnnotations());
+		
 		return null;
 	}
 
@@ -242,6 +247,9 @@ public class StmtTransformer extends CalSwitch<EObject> {
 
 		nodes.add(node);
 
+		//Add annotations
+		Util.transformAnnotations(node, stmtIf.getAnnotations());
+		
 		// transforms "then" statements
 		new StmtTransformer(procedure, node.getThenNodes()).doSwitch(stmtIf
 				.getThen());
@@ -297,6 +305,9 @@ public class StmtTransformer extends CalSwitch<EObject> {
 		nodes.addAll(tempNodes);
 		nodes.add(nodeWhile);
 
+		//Add annotations
+		Util.transformAnnotations(nodeWhile, stmtWhile.getAnnotations());
+		
 		return null;
 	}
 

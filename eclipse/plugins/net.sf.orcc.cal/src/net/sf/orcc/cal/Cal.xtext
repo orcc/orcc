@@ -165,6 +165,7 @@ LocalFsm:
 AstAction:
 	{AstAction}
 	
+	(annotations += AstAnnotation)*
 	(tag=AstTag ':')?
 	'action'
 	(inputs += InputPattern (',' inputs += InputPattern)*)?
@@ -184,6 +185,7 @@ AstAction:
 Initialize returns AstAction:
 	{AstAction}
 
+	(annotations += AstAnnotation)*
 	(tag=AstTag ':')?
 	'initialize'
 	'==>'
@@ -211,20 +213,24 @@ OutputPattern: port=[AstPort] ':' '[' values+=AstExpression (',' values+=AstExpr
 ///////////////////////////////////////////////////////////////////////////////
 
 StatementAssign:
+	(annotations += AstAnnotation)*
 	target=VariableReference 
 		('[' indexes += AstExpression ']')* ':=' value=AstExpression ';'; 
 
 StatementCall:
+	(annotations += AstAnnotation)*
 	procedure=[AstProcedure|QualifiedName]
 	'(' (parameters += AstExpression (',' parameters += AstExpression)*)? ')' ';';
 
 StatementForeach:
+	(annotations += AstAnnotation)*
 	'foreach' variable=VariableDeclaration 'in' lower=AstExpression '..' higher=AstExpression
 	'do'
 		(statements += Statement)*
 	'end';
 
 StatementIf:
+	(annotations += AstAnnotation)*
 	'if' condition = AstExpression 'then'
 		(then += Statement)*
 	(elsifs += StatementElsif)*
@@ -236,6 +242,7 @@ StatementElsif:
 		(then += Statement)*;
 
 StatementWhile:
+	(annotations += AstAnnotation)*
 	'while' condition=AstExpression 'do'
 		(statements += Statement)*
 	'end';

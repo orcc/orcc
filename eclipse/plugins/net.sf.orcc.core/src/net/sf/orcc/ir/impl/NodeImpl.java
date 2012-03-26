@@ -6,6 +6,7 @@
  */
 package net.sf.orcc.ir.impl;
 
+import net.sf.dftools.util.impl.AttributableImpl;
 import net.sf.dftools.graph.Edge;
 import net.sf.dftools.util.Attribute;
 import net.sf.orcc.ir.CfgNode;
@@ -19,7 +20,6 @@ import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.emf.ecore.impl.EObjectImpl;
 
 /**
  * <!-- begin-user-doc --> An implementation of the model object '
@@ -33,7 +33,7 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  *
  * @generated
  */
-public abstract class NodeImpl extends EObjectImpl implements Node {
+public abstract class NodeImpl extends AttributableImpl implements Node {
 
 	/**
 	 * The cached value of the '{@link #getCfgNode() <em>Cfg Node</em>}' reference.

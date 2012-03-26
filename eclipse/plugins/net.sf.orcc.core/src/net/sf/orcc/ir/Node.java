@@ -28,9 +28,8 @@
  */
 package net.sf.orcc.ir;
 
+import net.sf.dftools.util.Attributable;
 import net.sf.dftools.graph.Edge;
-
-import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines a node in the CFG.
@@ -38,7 +37,7 @@ import org.eclipse.emf.ecore.EObject;
  * @author Matthieu Wipliez
  * @model abstract="true"
  */
-public interface Node extends EObject {
+public interface Node extends Attributable {
 
 	/**
 	 * Returns the value of the '<em><b>Cfg Node</b></em>' reference.

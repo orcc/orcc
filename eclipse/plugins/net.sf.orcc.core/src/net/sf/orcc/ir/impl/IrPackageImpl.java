@@ -1739,6 +1739,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		// Add supertypes to classes
 		procedureEClass.getESuperTypes().add(theUtilPackage.getAttributable());
+		nodeEClass.getESuperTypes().add(theUtilPackage.getAttributable());
 		nodeBlockEClass.getESuperTypes().add(this.getNode());
 		nodeIfEClass.getESuperTypes().add(this.getNode());
 		nodeWhileEClass.getESuperTypes().add(this.getNode());

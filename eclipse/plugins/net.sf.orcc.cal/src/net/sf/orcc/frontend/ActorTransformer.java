@@ -479,6 +479,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		// creates IR action and add it to action list
 		Action action = DfFactory.eINSTANCE.createAction(tag, inputPattern,
 				outputPattern, peekPattern, scheduler, body);
+		Util.transformAnnotations(action, astAction.getAnnotations());
 		actionList.add(action);
 	}
 
