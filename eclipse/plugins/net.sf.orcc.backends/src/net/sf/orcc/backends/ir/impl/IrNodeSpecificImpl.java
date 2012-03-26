@@ -65,7 +65,7 @@ public class IrNodeSpecificImpl extends NodeSpecificImpl implements
 
 	@Override
 	public boolean isNodeFor() {
-		return false;
+		return true;
 	}
 
 } // IrNodeSpecificImpl

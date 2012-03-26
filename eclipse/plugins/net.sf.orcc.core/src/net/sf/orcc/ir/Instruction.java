@@ -105,6 +105,13 @@ public interface Instruction extends Attributable {
 	boolean isStore();
 
 	/**
+	 * Return <code>true</code> if the instruction is a backend specific instruction
+	 * 
+	 * @return <code>true</code> if the instruction is a backend specific instruction
+	 */
+	boolean isInstSpecific();
+	
+	/**
 	 * Sets the line number of this instruction.
 	 * 
 	 * @param newLineNumber

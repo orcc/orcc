@@ -90,8 +90,7 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 
 		@Override
 		public CfgNode caseNodeSpecific(NodeSpecific node) {
-
-			if (((IrNodeSpecific) node).isNodeFor()) {
+			if (((IrNodeSpecific)node).isNodeFor()) {
 				return caseNodeFor((NodeFor) node);
 			}
 
@@ -196,7 +195,7 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 		
 		// Replace node
 		EcoreUtil.replace(nodeWhile, nodeFor);
-
+		
 		return null;
 	}
 

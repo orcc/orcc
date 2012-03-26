@@ -37,5 +37,10 @@ public abstract class InstSpecificImpl extends InstructionImpl implements
 	protected EClass eStaticClass() {
 		return IrPackage.Literals.INST_SPECIFIC;
 	}
+	
+	@Override
+	public boolean isInstSpecific() {
+		return true;
+	}
 
 } // InstSpecificImpl

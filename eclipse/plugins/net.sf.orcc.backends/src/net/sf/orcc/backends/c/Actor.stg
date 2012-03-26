@@ -131,6 +131,16 @@ initializeFifoId(port) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 // Instructions
 ///////////////////////////////////////////////////////////////////////////////
+printInstructions(instructions) ::= <<
+<instructions: {instr | <printAttributes(instr)> <
+if (instr.assign)><printAssign(assign=instr)><
+elseif (instr.call)><printCall(call=instr)><
+elseif (instr.load)><printLoad(load=instr)><
+elseif (instr.return)><printReturn(return=instr)><
+elseif (instr.store)><printStore(store=instr)><
+elseif (instr.instSpecific)><printInstSpecific(instr)><
+endif>}>
+>>
 
 printAssign(assign) ::= <<
 
@@ -249,25 +259,18 @@ printWriteEnd(port, numTokens) ::= <<
 index_<port.name> += <numTokens>;
 >>
 
+// specific instruction
+printInstSpecific(instSpecific) ::= <<>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Nodes
 ///////////////////////////////////////////////////////////////////////////////
-
-printInstructions(instructions) ::= <<
-<instructions: {instr | <printAttributes(instr)> <
-if (instr.assign)><printAssign(assign=instr)><
-elseif (instr.call)><printCall(call=instr)><
-elseif (instr.load)><printLoad(load=instr)><
-elseif (instr.return)><printReturn(return=instr)><
-elseif (instr.store)><printStore(store=instr)><
-endif>}>
->>
 
 printNodes(nodes) ::= <<
 <nodes: {node | <printAttributes(node)> <if (node.nodeBlock)><printBlockNode(node)><
 elseif (node.nodeIf)><printIfNode(node)><
 elseif (node.nodeWhile)><printWhileNode(node)><
-elseif (node.nodeFor)><printForNode(node)><
+elseif (node.nodeSpecific)><printNodeSpecific(node)><
 endif>}>
 >>
 
@@ -296,14 +299,8 @@ while (<whileNode.condition>) {
 <printBlockNode(whileNode.joinNode)>
 >>
 
-// for node
-printForNode(forNode) ::= <<
-
-for(<forNode.init:{assign | <assign.target.variable.indexedName> = <assign.value>} ; separator=", "> ;<forNode.condition>; <forNode.loopCounter:{assign | <assign.target.variable.indexedName> = <assign.value>}; separator=", ">) {
-	<printNodes(forNode.nodes)>
-}
-<printBlockNode(forNode.joinNode)>
->>
+// specific node
+printNodeSpecific(nodeSpecific) ::= <<>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Procedure

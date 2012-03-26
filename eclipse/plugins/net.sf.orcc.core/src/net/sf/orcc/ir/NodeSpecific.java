@@ -14,4 +14,11 @@ package net.sf.orcc.ir;
  * @model abstract="true" extends="net.sf.orcc.ir.Node"
  */
 public interface NodeSpecific extends Node {
+	
+	/**
+	 * Returns <code>true</code> if the instruction is a backend specific node.
+	 * 
+	 * @return <code>true</code> if the instruction is a backend specific node
+	 */
+	public boolean isNodeSpecific();
 }

@@ -161,5 +161,7 @@ public interface NodeFor extends IrNodeSpecific {
 	 * @generated
 	 */
 	EList<Instruction> getInit();
+	
+	public boolean isNodeFor();
 
 } // NodeFor

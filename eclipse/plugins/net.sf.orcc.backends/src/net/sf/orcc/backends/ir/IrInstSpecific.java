@@ -51,6 +51,7 @@ public interface IrInstSpecific extends InstSpecific {
 	 *         instruction
 	 */
 	public boolean isInstAssignIndex();
+	
 
 	/**
 	 * Return <code>true</code> if the instruction is a cast
