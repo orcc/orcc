@@ -34,6 +34,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.math.BigInteger;
 
 import javax.swing.JFrame;
 
@@ -171,8 +172,8 @@ public class DisplayYUVWithCrop {
 	 * 
 	 * @return the flags of the display
 	 */
-	public static int displayYUV_getFlags() {
-		return DISPLAY_ENABLE | DISPLAY_READY;
+	public static BigInteger displayYUV_getFlags() {
+		return BigInteger.valueOf(DISPLAY_ENABLE | DISPLAY_READY);
 	}
 
 	/**
