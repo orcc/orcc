@@ -29,39 +29,20 @@
 
 package net.sf.orcc.runtime.impl;
 
-public class GenericSource {
+public interface Intf {
 
-	protected static String inputStimulus = "";
+	public boolean exists();
 
-	/**
-	 * Sets the file name used by this Source class.
-	 * 
-	 * @param inputStimulus
-	 *            name of a file to read
-	 */
+	public boolean isInputShutdown();
 
-	public static String getInputStimulus() {
-		return inputStimulus;
-	}
+	public Byte readByte();
 
-	public static void setInputStimulus(String fileName) {
-		GenericSource.inputStimulus = fileName;
-	}
-	
-	public void close(){
-		
-	}
-	
-	public boolean isSystemIO(){
-		return false;
-	}
+	public boolean isOutputShutdown();
 
-	public boolean isIntfNet() {
-		return false;
-	}
+	public void writeByte(Byte b);
 
-	public boolean isIntfChannel() {
-		return false;
-	}
+	public void setOption(String name, String value);
+
+	public String getOption(String name);
 
 }

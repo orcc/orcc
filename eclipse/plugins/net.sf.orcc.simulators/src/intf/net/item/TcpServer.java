@@ -27,41 +27,64 @@
  * SUCH DAMAGE.
  */
 
-package net.sf.orcc.runtime.impl;
+package intf.net.item;
 
-public class GenericSource {
+import intf.net.item.thread.TcpServerThread;
 
-	protected static String inputStimulus = "";
 
-	/**
-	 * Sets the file name used by this Source class.
-	 * 
-	 * @param inputStimulus
-	 *            name of a file to read
-	 */
+public class TcpServer extends Tcp {
 
-	public static String getInputStimulus() {
-		return inputStimulus;
+	private TcpServerThread serverThread;
+
+	public TcpServer(Integer parseInt) {
+		serverThread = new TcpServerThread(1234);
+		serverThread.start();
 	}
 
-	public static void setInputStimulus(String fileName) {
-		GenericSource.inputStimulus = fileName;
-	}
-	
-	public void close(){
-		
-	}
-	
-	public boolean isSystemIO(){
-		return false;
-	}
-
-	public boolean isIntfNet() {
-		return false;
+	@Override
+	public void close() {
+		try {
+			serverThread.kill();
+			serverThread.join();
+			serverThread = null;
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
-	public boolean isIntfChannel() {
-		return false;
+	@Override
+	public boolean exists() {
+		return serverThread.isConnected();
+	}
+
+	@Override
+	public boolean isInputShutdown() {
+		return serverThread.isInputShutdown();
+	}
+
+	@Override
+	public boolean isOutputShutdown() {
+		return serverThread.isOutputShutdown();
+	}
+
+	@Override
+	public void writeByte(Byte b) {
+		serverThread.writeByte(b);
+	}
+
+	@Override
+	public Byte readByte() {
+		return serverThread.readByte();
+	}
+
+	@Override
+	public void setOption(String name, String value) {
+		serverThread.setOption(name, value);
+	}
+
+	@Override
+	public String getOption(String name) {
+		return serverThread.getOption(name);
 	}
 
 }

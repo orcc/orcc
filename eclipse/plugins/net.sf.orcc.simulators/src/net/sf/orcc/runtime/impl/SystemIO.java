@@ -27,45 +27,49 @@
  * SUCH DAMAGE.
  */
 
-package std.lang.impl;
+package net.sf.orcc.runtime.impl;
 
-/**
- * This class defines native functions for the Chain unit.
- * 
- * @author Thavot Richard
- * 
- */
-public class Chain {
+import java.io.File;
 
-	public static void split(String string, String regex,
-			String dividedString[]) {
-		String[] ds = string.split(regex);
-		for (int i = 0; i < ds.length; i++) {
-			dividedString[i] = ds[i];
-		}
+import system.io.item.AccessFile;
+
+public class SystemIO extends GenericSource {
+
+	protected File file;
+
+	public SystemIO() {
 	}
 
-	public static String concat(String dividedString[], String separator) {
-		StringBuffer result = new StringBuffer();
-		if (dividedString.length > 0) {
-			result.append(dividedString[0]);
-			for (int i = 1; i < dividedString.length; i++) {
-				if (dividedString[i] != null) {
-					result.append(separator);
-					result.append(dividedString[i]);
-				}
-			}
+	public SystemIO(String path) {
+		if (path.isEmpty())
+			path = super.getInputStimulus();
+		if (!path.contains(File.separator)) {
+			String dir = null;
+			if (super.getInputStimulus().contains("."))
+				dir = new File(super.getInputStimulus()).getParent();
+			else
+				dir = super.getInputStimulus();
+			path = dir + File.separator + path;
 		}
-		return result.toString();
+		file = new File(path);
 	}
 
-	public static String replace(String string, String regex, String replacement) {
-		StringBuffer result = new StringBuffer(string);
-		int k;
-		while ((k = result.indexOf(regex)) > 0) {
-			result.replace(k, k + regex.length(), replacement);
-		}
-		return result.toString();
+	@Override
+	public boolean isSystemIO() {
+		return true;
+	}
+
+	@Override
+	public void close() {
+		file = null;
+	}
+
+	public boolean isAccessFile() {
+		return false;
+	}
+
+	public static AccessFile toAccessFile(SystemIO io) {
+		return (AccessFile) io;
 	}
 
 }

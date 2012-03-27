@@ -43,7 +43,7 @@ import net.sf.orcc.runtime.impl.GenericSource;
  */
 public class Source extends GenericSource {
 
-	// private static String fileName;
+	// private static String inputStimulus;
 
 	private static RandomAccessFile in;
 
@@ -59,9 +59,9 @@ public class Source extends GenericSource {
 
 	public static void source_init() {
 		try {
-			in = new RandomAccessFile(fileName, "r");
+			in = new RandomAccessFile(inputStimulus, "r");
 		} catch (FileNotFoundException e) {
-			String msg = "file not found: \"" + fileName + "\"";
+			String msg = "file not found: \"" + inputStimulus + "\"";
 			throw new RuntimeException(msg, e);
 		}
 	}
@@ -71,7 +71,7 @@ public class Source extends GenericSource {
 		try {
 			in.read(outTable, 0, nbTokenToRead.intValue());
 		} catch (IOException e) {
-			String msg = "I/O error when reading file \"" + fileName + "\"";
+			String msg = "I/O error when reading file \"" + inputStimulus + "\"";
 			throw new RuntimeException(msg, e);
 		}
 	}
@@ -81,7 +81,7 @@ public class Source extends GenericSource {
 			// and for Damien, no there are no rewind on RandomAccessFile :)
 			in.seek(0L);
 		} catch (IOException e) {
-			String msg = "I/O error when rewinding file \"" + fileName + "\"";
+			String msg = "I/O error when rewinding file \"" + inputStimulus + "\"";
 			throw new RuntimeException(msg, e);
 		}
 	}
@@ -93,7 +93,7 @@ public class Source extends GenericSource {
 			}
 			return BigInteger.valueOf(in.length());
 		} catch (IOException e) {
-			String msg = "I/O error when getting size of file \"" + fileName
+			String msg = "I/O error when getting size of file \"" + inputStimulus
 					+ "\"";
 			throw new RuntimeException(msg, e);
 		}

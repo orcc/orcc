@@ -95,7 +95,7 @@ public class ReadImage extends GenericSource {
 
 	public static void readImage_initialize() {
 		try {
-			image = ImageIO.read(new File(fileName));
+			image = ImageIO.read(new File(inputStimulus));
 		} catch (IOException e) {
 			String msg = "image error";
 			throw new RuntimeException(msg, e);

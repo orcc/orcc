@@ -27,41 +27,59 @@
  * SUCH DAMAGE.
  */
 
-package net.sf.orcc.runtime.impl;
+package intf.channel.item;
 
-public class GenericSource {
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
-	protected static String inputStimulus = "";
+import net.sf.orcc.runtime.impl.IntfChannel;
 
-	/**
-	 * Sets the file name used by this Source class.
-	 * 
-	 * @param inputStimulus
-	 *            name of a file to read
-	 */
+public class FileOutputChannel extends IntfChannel {
 
-	public static String getInputStimulus() {
-		return inputStimulus;
+	private FileOutputStream fileOutputStream;
+
+	public FileOutputChannel(String path) {
+		super(path);
+		try {
+			fileOutputStream = new FileOutputStream(file, false);
+			channel = fileOutputStream.getChannel();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 
-	public static void setInputStimulus(String fileName) {
-		GenericSource.inputStimulus = fileName;
-	}
-	
-	public void close(){
-		
-	}
-	
-	public boolean isSystemIO(){
-		return false;
+	@Override
+	public boolean isOutputShutdown() {
+		return !channel.isOpen();
 	}
 
-	public boolean isIntfNet() {
-		return false;
+	@Override
+	public void writeByte(Byte b) {
+		try {
+			buffer.put(b);
+			if (!buffer.hasRemaining()) {
+				buffer.flip();
+				channel.write(buffer);
+				buffer.clear();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
-	public boolean isIntfChannel() {
-		return false;
+	@Override
+	public void close() {
+		try {
+			if (buffer.remaining() != 0) {
+				buffer.flip();
+				channel.write(buffer);
+			}
+			super.close();
+			fileOutputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

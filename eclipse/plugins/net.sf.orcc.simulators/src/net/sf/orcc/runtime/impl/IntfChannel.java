@@ -29,39 +29,76 @@
 
 package net.sf.orcc.runtime.impl;
 
-public class GenericSource {
+import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 
-	protected static String inputStimulus = "";
+public class IntfChannel extends GenericSource implements Intf {
 
-	/**
-	 * Sets the file name used by this Source class.
-	 * 
-	 * @param inputStimulus
-	 *            name of a file to read
-	 */
+	protected File file;
+	protected FileChannel channel;
+	protected ByteBuffer buffer = ByteBuffer.allocate(4096);
 
-	public static String getInputStimulus() {
-		return inputStimulus;
+	public IntfChannel() {
 	}
 
-	public static void setInputStimulus(String fileName) {
-		GenericSource.inputStimulus = fileName;
-	}
-	
-	public void close(){
-		
-	}
-	
-	public boolean isSystemIO(){
-		return false;
-	}
-
-	public boolean isIntfNet() {
-		return false;
+	public IntfChannel(String path) {
+		if (path.isEmpty())
+			path = super.getInputStimulus();
+		if (!path.contains(File.separator)) {
+			String dir = null;
+			if (super.getInputStimulus().contains("."))
+				dir = new File(super.getInputStimulus()).getParent();
+			else
+				dir = super.getInputStimulus();
+			path = dir + File.separator + path;
+		}
+		file = new File(path);
 	}
 
+	@Override
 	public boolean isIntfChannel() {
+		return true;
+	}
+
+	public boolean exists() {
 		return false;
+	}
+
+	public boolean isInputShutdown() {
+		return true;
+	}
+
+	public boolean isOutputShutdown() {
+		return true;
+	}
+
+	public void writeByte(Byte b) {
+
+	}
+
+	public Byte readByte() {
+		return 0;
+	}
+
+	public void setOption(String name, String value) {
+
+	}
+
+	public String getOption(String name) {
+		return "";
+	}
+
+	@Override
+	public void close() {
+		if (channel != null)
+			try {
+				channel.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		buffer.clear();
 	}
 
 }

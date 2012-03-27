@@ -28,14 +28,14 @@
  */
 package net.sf.orcc.simulators;
 
-import java.io.File;
-import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
-import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.runtime.RuntimeFactory;
+import net.sf.orcc.runtime.impl.GenericSource;
+import net.sf.orcc.runtime.impl.IntfChannel;
+import net.sf.orcc.runtime.impl.IntfNet;
+import net.sf.orcc.runtime.impl.SystemIO;
 
 /**
  * This class handle handle descriptors used by the native functions.
@@ -45,56 +45,77 @@ import net.sf.orcc.OrccRuntimeException;
  */
 public class SimulatorDescriptor {
 
-	private static Map<Integer, File> fileDescs = new HashMap<Integer, File>();
-	private static Map<Integer, Method> shutters = new HashMap<Integer, Method>();
+	private static Map<Integer, GenericSource> descsMap = new HashMap<Integer, GenericSource>();
 
-	public static Integer create(String fileName, Method shutter) {
-		File f = new File(fileName);
-		Integer desc = f.hashCode();
-		fileDescs.put(desc, f);
-		shutters.put(desc, shutter);
+	public static Integer create(IntfNet net) {
+		int desc = net.hashCode();
+		descsMap.put(desc, net);
 		return desc;
 	}
 
-	public static File get(Integer descriptor) {
-		return fileDescs.get(descriptor);
+	public static Integer create(IntfChannel channel) {
+		int desc = channel.hashCode();
+		descsMap.put(desc, channel);
+		return desc;
+	}
+
+	public static Integer create(SystemIO io) {
+		int desc = io.hashCode();
+		descsMap.put(desc, io);
+		return desc;
+	}
+
+	public static GenericSource get(Integer descriptor) {
+		if (descsMap.containsKey(descriptor))
+			return descsMap.get(descriptor);
+		return null;
+	}
+
+	public static IntfNet getIntfNet(Integer descriptor) {
+		if (descsMap.containsKey(descriptor)) {
+			GenericSource g = descsMap.get(descriptor);
+			if (g.isIntfNet())
+				return (IntfNet) g;
+		}
+		return RuntimeFactory.createIntfNet();
+	}
+
+	public static IntfChannel getIntfChannel(Integer descriptor) {
+		if (descsMap.containsKey(descriptor)) {
+			GenericSource g = descsMap.get(descriptor);
+			if (g.isIntfChannel())
+				return (IntfChannel) g;
+		}
+		return RuntimeFactory.createIntfChannel();
+	}
+
+	public static SystemIO getSystemIO(Integer descriptor) {
+		if (descsMap.containsKey(descriptor)) {
+			GenericSource g = descsMap.get(descriptor);
+			if (g.isSystemIO())
+				return (SystemIO) g;
+		}
+		return RuntimeFactory.createSystemIO();
 	}
 
 	public static boolean contains(Integer descriptor) {
-		return fileDescs.containsKey(descriptor);
+		return descsMap.containsKey(descriptor);
 	}
 
 	public static void finalize(Integer descriptor) {
-		fileDescs.remove(descriptor);
+		if (descsMap.containsKey(descriptor)) {
+			descsMap.remove(descriptor).close();
+		}
 	}
 
 	/**
 	 * Kill all simulation descriptors by closing them correctly.
 	 */
 	public static void killDescriptors() {
-
-		Set<Integer> descs = new HashSet<Integer>(fileDescs.keySet());
-		for (Integer desc : descs) {
-			Method shutter = shutters.get(desc);
-			if (shutter != null) {
-				Object args[] = new Object[1];
-				args[0] = desc;
-				try {
-					shutter.invoke(null, args);
-				} catch (Exception e) {
-					throw new OrccRuntimeException(
-							"exception during the killing "
-									+ "of the descriptors by calling to "
-									+ shutter.getName(), e);
-				}
-			}
+		for (GenericSource g : descsMap.values()) {
+			g.close();
 		}
-		
-		if (!fileDescs.isEmpty()) {
-			fileDescs.clear();
-			throw new OrccRuntimeException("A descriptor may be still alive");
-		}
-
-		shutters.clear();
+		descsMap.clear();
 	}
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2011, IETR/INSA of Rennes
+ * Copyright (c) 2011, EPFL
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the IETR/INSA of Rennes nor the names of its
+ *   * Neither the name of the EPFL nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -26,76 +26,109 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package ch.epfl.mpeg4.part2.impl;
+
+package system.io.item;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.math.BigInteger;
 
-import net.sf.orcc.runtime.impl.GenericSource;
+import net.sf.orcc.runtime.impl.SystemIO;
 
 /**
- * This class defines native functions for the Source actor.
+ * This class defines native functions for the File unit.
  * 
- * @author Matthieu Wipliez
+ * This class uses the SimulatorDecriptor class to handle descriptors.
+ * 
+ * @author Thavot Richard
  * 
  */
-public class Source extends GenericSource {
+public class AccessFile extends SystemIO {
 
-	// private static String fileName;
+	private RandomAccessFile randomAccessFile;
 
-	private static RandomAccessFile in;
-
-	private static int nbLoops = 1;
-
-	public static void source_exit(BigInteger status) {
-		// System.exit(status);
-	}
-
-	public static BigInteger source_getNbLoop() {
-		return BigInteger.valueOf(nbLoops);
-	}
-
-	public static void source_init() {
+	public AccessFile(String path) {
+		super(path);
 		try {
-			in = new RandomAccessFile(inputStimulus, "r");
+			randomAccessFile = new RandomAccessFile(file, "rw");
 		} catch (FileNotFoundException e) {
-			String msg = "file not found: \"" + inputStimulus + "\"";
-			throw new RuntimeException(msg, e);
+			e.printStackTrace();
+		}
+	}
+	
+	
+
+	@Override
+	public void close() {
+		try {
+			randomAccessFile.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		super.close();
+	}
+
+	@Override
+	public boolean isAccessFile() {
+		return true;
+	}
+
+	public Byte readByte() {
+		try {
+			return randomAccessFile.readByte();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+	public Integer sizeOfFile() {
+		try {
+			return (int) randomAccessFile.length();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+	public void seek(Integer pos) {
+		try {
+			randomAccessFile.seek(pos);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
-	public static void source_readNBytes(byte outTable[],
-			BigInteger nbTokenToRead) {
+	public Integer filePointer() {
 		try {
-			in.read(outTable, 0, nbTokenToRead.intValue());
+			return (int) randomAccessFile.getFilePointer();
 		} catch (IOException e) {
-			String msg = "I/O error when reading file \"" + inputStimulus + "\"";
-			throw new RuntimeException(msg, e);
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+	public void readByte(byte[] buf, Integer count) {
+		try {
+			randomAccessFile.read(buf, 0, count);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
-	public static void source_rewind() {
+	public void writeByte(byte[] buf, Integer count) {
 		try {
-			// and for Damien, no there are no rewind on RandomAccessFile :)
-			in.seek(0L);
+			randomAccessFile.write(buf, 0, count);
 		} catch (IOException e) {
-			String msg = "I/O error when rewinding file \"" + inputStimulus + "\"";
-			throw new RuntimeException(msg, e);
+			e.printStackTrace();
 		}
 	}
 
-	public static BigInteger source_sizeOfFile() {
+	public void writeByte(Byte v) {
 		try {
-			if (in == null) {
-				return BigInteger.ZERO;
-			}
-			return BigInteger.valueOf(in.length());
+			randomAccessFile.writeByte(v);
 		} catch (IOException e) {
-			String msg = "I/O error when getting size of file \"" + inputStimulus
-					+ "\"";
-			throw new RuntimeException(msg, e);
+			e.printStackTrace();
 		}
 	}
 

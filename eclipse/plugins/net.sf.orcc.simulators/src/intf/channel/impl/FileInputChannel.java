@@ -27,41 +27,60 @@
  * SUCH DAMAGE.
  */
 
-package net.sf.orcc.runtime.impl;
+package intf.channel.impl;
 
-public class GenericSource {
+import java.math.BigInteger;
 
-	protected static String inputStimulus = "";
+import net.sf.orcc.runtime.RuntimeFactory;
+import net.sf.orcc.simulators.SimulatorDescriptor;
 
-	/**
-	 * Sets the file name used by this Source class.
-	 * 
-	 * @param inputStimulus
-	 *            name of a file to read
-	 */
+/**
+ * This class defines native functions for the File unit.
+ * 
+ * This class uses the SimulatorDecriptor class to handle descriptors.
+ * 
+ * @author Thavot Richard
+ * 
+ */
+public class FileInputChannel {
 
-	public static String getInputStimulus() {
-		return inputStimulus;
+	public static Integer open(String path, String mode) {
+		return SimulatorDescriptor.create(RuntimeFactory
+				.createFileInputChannel(path, mode));
 	}
 
-	public static void setInputStimulus(String fileName) {
-		GenericSource.inputStimulus = fileName;
+	public static void setOption(Integer desc, String name, String value) {
+		SimulatorDescriptor.getIntfChannel(desc).setOption(name, value);
+	}
+
+	public static String getOption(Integer desc, String name) {
+		return SimulatorDescriptor.getIntfChannel(desc).getOption(name);
+	}
+
+	public static boolean exists(Integer desc) {
+		return SimulatorDescriptor.getIntfChannel(desc).exists();
+	}
+
+	public static void close(Integer desc) {
+		SimulatorDescriptor.finalize(desc);
+	}
+
+	public static boolean isInputShutdown(Integer desc) {
+		return SimulatorDescriptor.getIntfChannel(desc).isInputShutdown();
+	}
+
+	public static boolean isOutputShutdown(Integer desc) {
+		return SimulatorDescriptor.getIntfChannel(desc).isOutputShutdown();
 	}
 	
-	public void close(){
-		
+	public static void writeByte(Integer desc, BigInteger b) {
+		SimulatorDescriptor.getIntfChannel(desc).writeByte(b.byteValue());
 	}
 	
-	public boolean isSystemIO(){
-		return false;
-	}
-
-	public boolean isIntfNet() {
-		return false;
-	}
-
-	public boolean isIntfChannel() {
-		return false;
+	public static BigInteger readByte(Integer desc) {
+		byte[] b = new byte[1];
+		b[0] = SimulatorDescriptor.getIntfChannel(desc).readByte();
+		return new BigInteger(b);
 	}
 
 }

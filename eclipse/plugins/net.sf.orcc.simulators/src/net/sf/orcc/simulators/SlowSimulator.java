@@ -159,7 +159,7 @@ public class SlowSimulator extends AbstractSimulator {
 	}
 
 	protected void initializeNetwork(Network network) {
-		GenericSource.setFileName(stimulusFile);
+		GenericSource.setInputStimulus(stimulusFile);
 
 		for (Instance instance : network.getInstances()) {
 			ActorInterpreter interpreter = interpreters.get(instance);
@@ -221,6 +221,10 @@ public class SlowSimulator extends AbstractSimulator {
 				ActorInterpreter interpreter = interpreters.get(instance);
 
 				while (interpreter.schedule()) {
+					// check for cancelation
+					if (isCanceled()) {
+						return;
+					}
 					nbFiring++;
 				}
 
@@ -238,6 +242,7 @@ public class SlowSimulator extends AbstractSimulator {
 	@Override
 	public void start(String mode) {
 		try {
+			SimulatorDescriptor.killDescriptors();
 			interpreters = new HashMap<Instance, ActorInterpreter>();
 
 			IFile file = OrccUtil.getFile(project, xdfFile, "xdf");

@@ -26,24 +26,11 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package std.io.impl;
 
-/**
- * This class defines native functions for the Console unit.
- * 
- * This class uses the System.out functions. 
- * 
- * @author Thavot Richard
- * 
- */
-public class Console {
+package intf.net.item;
 
-	public static void print(String x) {
-		System.out.print(x);
-	}
-	
-	public static void println(String x) {
-		System.out.println(x);
-	}
+import net.sf.orcc.runtime.impl.IntfNet;
+
+public class Tcp extends IntfNet {
 
 }

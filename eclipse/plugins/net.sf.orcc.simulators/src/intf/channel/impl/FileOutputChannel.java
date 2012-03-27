@@ -26,58 +26,61 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package std.lang.impl;
+
+package intf.channel.impl;
 
 import java.math.BigInteger;
 
-public class Integer {
+import net.sf.orcc.runtime.RuntimeFactory;
+import net.sf.orcc.simulators.SimulatorDescriptor;
 
-	/*
-	 * Returns a String representing the specified integer.
-	 */
-	public static String toString(java.lang.Integer i) {
-		return i.toString();
+/**
+ * This class defines native functions for the File unit.
+ * 
+ * This class uses the SimulatorDecriptor class to handle descriptors.
+ * 
+ * @author Thavot Richard
+ * 
+ */
+public class FileOutputChannel {
+
+	public static Integer open(String path, String mode) {
+		return SimulatorDescriptor.create(RuntimeFactory
+				.createFileOutputChannel(path, mode));
 	}
 
-	/*
-	 * Returns a string representation of the integer argument as an unsigned
-	 * integer in base 16.
-	 */
-	public static String toHexString(java.lang.Integer i) {
-		return java.lang.Integer.toHexString(i);
+	public static void setOption(Integer desc, String name, String value) {
+		SimulatorDescriptor.getIntfChannel(desc).setOption(name, value);
 	}
 
-	public static String toHexString(BigInteger i) {
-		return toHexString(i.intValue());
+	public static String getOption(Integer desc, String name) {
+		return SimulatorDescriptor.getIntfChannel(desc).getOption(name);
+	}
+
+	public static boolean exists(Integer desc) {
+		return SimulatorDescriptor.getIntfChannel(desc).exists();
+	}
+
+	public static void close(Integer desc) {
+		SimulatorDescriptor.finalize(desc);
+	}
+
+	public static boolean isInputShutdown(Integer desc) {
+		return SimulatorDescriptor.getIntfChannel(desc).isInputShutdown();
+	}
+
+	public static boolean isOutputShutdown(Integer desc) {
+		return SimulatorDescriptor.getIntfChannel(desc).isOutputShutdown();
 	}
 	
-	public static String toHexString(Long i) {
-		return toHexString(i.intValue());
+	public static void writeByte(Integer desc, BigInteger b) {
+		SimulatorDescriptor.getIntfChannel(desc).writeByte(b.byteValue());
 	}
-
-	/*
-	 * Returns a string representation of the integer argument as an unsigned
-	 * integer in base 8.
-	 */
-	public static String toOctalString(java.lang.Integer i) {
-		return java.lang.Integer.toOctalString(i);
-	}
-
-	/*
-	 * Returns a string representation of the integer argument as an unsigned
-	 * integer in base 2.
-	 */
-	public static String toBinaryString(java.lang.Integer i) {
-		return java.lang.Integer.toBinaryString(i);
-	}
-
-	/*
-	 * Parses the string argument as a signed integer in the radix specified by
-	 * the second argument.
-	 */
-
-	public static int toBinaryString(String s, java.lang.Integer radix) {
-		return java.lang.Integer.parseInt(s, radix);
+	
+	public static BigInteger readByte(Integer desc) {
+		byte[] b = new byte[1];
+		b[0] = SimulatorDescriptor.getIntfChannel(desc).readByte();
+		return new BigInteger(b);
 	}
 
 }

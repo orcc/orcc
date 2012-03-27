@@ -18,7 +18,5 @@ Export-Package: ch.epfl.mpeg4.part2.impl,
  net.sf.orcc.runtime.impl,
  net.sf.orcc.simulators,
  org.ietr.stdio.impl,
- std.io.impl,
- std.lang.impl,
  std.video.impl
 Bundle-ClassPath: .

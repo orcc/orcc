@@ -26,27 +26,42 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package std.io.impl;
 
-import net.sf.orcc.simulators.SimulatorDescriptor;
+package net.sf.orcc.runtime.impl;
 
-public class File {
 
-	public static String getName(Integer desc) {
-		if (SimulatorDescriptor.contains(desc)) {
-			return SimulatorDescriptor.get(desc).getName();
-		}
-		return "";
+public class IntfNet extends GenericSource implements Intf {
+
+	@Override
+	public boolean isIntfNet() {
+		return true;
 	}
 
-	public static String separator() {
-		return java.io.File.separator;
+	public boolean exists() {
+		return false;
 	}
 
-	public static String getParent(Integer desc) {
-		if (SimulatorDescriptor.contains(desc)) {
-			return SimulatorDescriptor.get(desc).getParent();
-		}
+	public boolean isInputShutdown() {
+		return true;
+	}
+
+	public boolean isOutputShutdown() {
+		return true;
+	}
+
+	public void writeByte(Byte b) {
+
+	}
+
+	public Byte readByte() {
+		return 0;
+	}
+
+	public void setOption(String name, String value) {
+
+	}
+
+	public String getOption(String name) {
 		return "";
 	}
 

@@ -27,41 +27,52 @@
  * SUCH DAMAGE.
  */
 
-package net.sf.orcc.runtime.impl;
+package intf.net.impl;
 
-public class GenericSource {
+import java.math.BigInteger;
 
-	protected static String inputStimulus = "";
+import net.sf.orcc.runtime.RuntimeFactory;
+import net.sf.orcc.simulators.SimulatorDescriptor;
 
-	/**
-	 * Sets the file name used by this Source class.
-	 * 
-	 * @param inputStimulus
-	 *            name of a file to read
-	 */
+public class Tcp {
 
-	public static String getInputStimulus() {
-		return inputStimulus;
+	public static Integer open(String address, String port) {
+		return SimulatorDescriptor.create(RuntimeFactory.createTcp(address,
+				port));
 	}
 
-	public static void setInputStimulus(String fileName) {
-		GenericSource.inputStimulus = fileName;
+	public static void setOption(Integer desc, String name, String value) {
+		SimulatorDescriptor.getIntfNet(desc).setOption(name, value);
+	}
+
+	public static String getOption(Integer desc, String name) {
+		return SimulatorDescriptor.getIntfNet(desc).getOption(name);
+	}
+
+	public static boolean exists(Integer desc) {
+		return SimulatorDescriptor.getIntfNet(desc).exists();
+	}
+
+	public static void close(Integer desc) {
+		SimulatorDescriptor.finalize(desc);
+	}
+
+	public static boolean isInputShutdown(Integer desc) {
+		return SimulatorDescriptor.getIntfNet(desc).isInputShutdown();
+	}
+
+	public static boolean isOutputShutdown(Integer desc) {
+		return SimulatorDescriptor.getIntfNet(desc).isOutputShutdown();
 	}
 	
-	public void close(){
-		
-	}
-	
-	public boolean isSystemIO(){
-		return false;
+	public static void writeByte(Integer desc, BigInteger b) {
+		SimulatorDescriptor.getIntfNet(desc).writeByte(b.byteValue());
 	}
 
-	public boolean isIntfNet() {
-		return false;
-	}
-
-	public boolean isIntfChannel() {
-		return false;
+	public static BigInteger readByte(Integer desc) {
+		byte[] b = new byte[1];
+		b[0] = SimulatorDescriptor.getIntfNet(desc).readByte();
+		return new BigInteger(b);
 	}
 
 }
