@@ -66,7 +66,7 @@ public class StaticRegionDetector {
 	private Set<Vertex> discovered = new HashSet<Vertex>();
 	private Set<Vertex> finished = new HashSet<Vertex>();
 
-	private Set<Set<Vertex>> staticRegionSet;
+	private Set<List<Instance>> staticRegionSet;
 
 	private Network network;
 
@@ -149,17 +149,19 @@ public class StaticRegionDetector {
 	 * @throws OrccException
 	 * 
 	 */
-	private void staticRegionAnalysis(Vertex vertex, List<Vertex> vertices) {
-		LinkedList<Vertex> stack = new LinkedList<Vertex>(Arrays.asList(vertex));
+	private void staticRegionAnalysis(Instance instance,
+			List<Instance> instances) {
+		LinkedList<Vertex> stack = new LinkedList<Vertex>(
+				Arrays.asList(instance));
 
 		while (!stack.isEmpty()) {
-			Vertex v = stack.pop();
+			Instance v = (Instance) stack.pop();
 			MoC moc = ((Instance) v).getMoC();
 			if (moc.isCSDF()) {
 				if (!discovered.contains(v)) {
 					discovered.add(v);
-					if (vertices != null) {
-						vertices.add(v);
+					if (instances != null) {
+						instances.add(v);
 					}
 					stack.push(v);
 					finished.add(v);
@@ -167,9 +169,9 @@ public class StaticRegionDetector {
 						Vertex tgtVertex = edge.getTarget();
 						moc = ((Instance) tgtVertex).getMoC();
 						if (!discovered.contains(tgtVertex) && moc.isCSDF()) {
-							if (vertices != null) {
+							if (instances != null) {
 								List<Vertex> l = new LinkedList<Vertex>(
-										vertices);
+										instances);
 								l.add(tgtVertex);
 								if (!introduceCycle(l)) {
 									stack.push(tgtVertex);
@@ -188,29 +190,30 @@ public class StaticRegionDetector {
 	 * 
 	 * 
 	 */
-	public Set<Set<Vertex>> staticRegionSets() {
-		staticRegionSet = new HashSet<Set<Vertex>>();
-		List<List<Vertex>> staticRegionList = new ArrayList<List<Vertex>>();
+	public Set<List<Instance>> staticRegionSets() {
+		staticRegionSet = new HashSet<List<Instance>>();
+		List<List<Instance>> staticRegionList = new ArrayList<List<Instance>>();
 
 		discovered = new HashSet<Vertex>();
 		finished = new HashSet<Vertex>();
 
 		List<Vertex> vertices = new TopologicalSorter().visitGraph(network);
-		
+
 		for (Vertex vertex : vertices) {
 			if (vertex instanceof Instance) {
-				MoC clasz = ((Instance) vertex).getMoC();
-				if (!discovered.contains(vertex) && clasz.isCSDF()) {
-					List<Vertex> set = new LinkedList<Vertex>();
-					staticRegionList.add(set);
-					staticRegionAnalysis(vertex, set);
+				Instance instance = (Instance) vertex;
+				MoC moc = instance.getMoC();
+				if (!discovered.contains(instance) && moc.isCSDF()) {
+					List<Instance> list = new LinkedList<Instance>();
+					staticRegionList.add(list);
+					staticRegionAnalysis(instance, list);
 				}
 			}
 		}
 
-		for (List<Vertex> list1 : staticRegionList) {
+		for (List<Instance> list1 : staticRegionList) {
 			if (list1.size() > 1) {
-				Set<Vertex> set1 = new HashSet<Vertex>(list1);
+				List<Instance> set1 = new ArrayList<Instance>(list1);
 				staticRegionSet.add(set1);
 			}
 		}
