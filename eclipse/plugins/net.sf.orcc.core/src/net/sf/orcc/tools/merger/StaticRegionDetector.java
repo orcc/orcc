@@ -63,6 +63,8 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class StaticRegionDetector {
 
+	private static int index;
+
 	private Set<Vertex> discovered = new HashSet<Vertex>();
 	private Set<Vertex> finished = new HashSet<Vertex>();
 
@@ -81,7 +83,6 @@ public class StaticRegionDetector {
 	 * @return
 	 */
 	private boolean introduceCycle(List<Vertex> vertices) {
-		boolean ret = false;
 		int inIndex = 0;
 		int outIndex = 0;
 
@@ -90,51 +91,66 @@ public class StaticRegionDetector {
 		// the clustered graph is just the network
 		Graph clusteredGraph = network;
 
-		Actor cluster = DfFactory.eINSTANCE.createActor();
-		cluster.setName("cluster");
+		Actor actor = DfFactory.eINSTANCE.createActor();
+		actor.setName("cluster" + index++);
 
-		Instance inst = DfFactory.eINSTANCE.createInstance(cluster.getName(),
-				cluster);
-		Vertex clusterVertex = inst;
+		Instance cluster = DfFactory.eINSTANCE.createInstance(actor.getName(),
+				actor);
 
-		clusteredGraph.getVertices().add(clusterVertex);
+		clusteredGraph.add(cluster);
+
+		List<Vertex> verticesCopy = new ArrayList<Vertex>();
+		List<Edge> edges = new ArrayList<Edge>();
+
+		for (Vertex vertex : vertices) {
+			for (Vertex other : clusteredGraph.getVertices()) {
+				if (((Instance) vertex).getName().equals(
+						((Instance) other).getName())) {
+					verticesCopy.add(other);
+				}
+			}
+		}
 
 		for (Connection edge : network.getConnections()) {
 			Vertex srcVertex = edge.getSource();
 			Vertex tgtVertex = edge.getTarget();
 
-			if (!vertices.contains(srcVertex) && vertices.contains(tgtVertex)) {
+			if (!verticesCopy.contains(srcVertex)
+					&& verticesCopy.contains(tgtVertex)) {
 				Port tgtPort = DfFactory.eINSTANCE.createPort(edge
 						.getTargetPort());
 				tgtPort.setName("input_" + outIndex++);
-				cluster.getInputs().add(tgtPort);
+				actor.getInputs().add(tgtPort);
 				Connection incoming = DfFactory.eINSTANCE.createConnection(
-						srcVertex, edge.getSourcePort(), clusterVertex,
-						tgtPort, edge.getAttributes());
-				clusteredGraph.getEdges().add(incoming);
-			} else if (vertices.contains(srcVertex)
-					&& !vertices.contains(tgtVertex)) {
+						srcVertex, edge.getSourcePort(), cluster, tgtPort,
+						edge.getAttributes());
+				edges.add(incoming);
+			} else if (verticesCopy.contains(srcVertex)
+					&& !verticesCopy.contains(tgtVertex)) {
 				Port srcPort = DfFactory.eINSTANCE.createPort(edge
 						.getSourcePort());
 				srcPort.setName("output_" + inIndex++);
-				cluster.getOutputs().add(srcPort);
+				actor.getOutputs().add(srcPort);
 				Connection outgoing = DfFactory.eINSTANCE.createConnection(
-						clusterVertex, srcPort, tgtVertex,
-						edge.getTargetPort(), edge.getAttributes());
-				clusteredGraph.getEdges().add(outgoing);
+						cluster, srcPort, tgtVertex, edge.getTargetPort(),
+						edge.getAttributes());
+				edges.add(outgoing);
 			}
 		}
 
-		clusteredGraph.getVertices().removeAll(vertices);
+		clusteredGraph.getEdges().addAll(edges);
+		clusteredGraph.removeVertices(verticesCopy);
 
 		List<List<Vertex>> sccs = new SccFinder().visitGraph(clusteredGraph);
+
+		boolean ret = false;
 		for (List<Vertex> scc : sccs) {
 			if (scc.size() > 1) {
-				if (scc.remove(clusterVertex)) {
+				if (scc.remove(cluster)) {
+					// only cycles inside the cluster are allowed
 					for (Vertex v : scc) {
-						MoC clasz = ((Instance) v).getMoC();
-						if (!clasz.isCSDF()) {
-							ret = true;
+						if (!verticesCopy.contains(v)) {
+							return true;
 						}
 					}
 				}
