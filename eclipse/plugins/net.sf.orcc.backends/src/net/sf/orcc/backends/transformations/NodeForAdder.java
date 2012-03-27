@@ -188,9 +188,10 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 		nodeFor.getLoopCounter().addAll(loopCnts);
 		nodeFor.getInit().addAll(initCnts);
 
-		// Set annotations to the for node
+		// Copy attributes
 		for (Attribute attribute : nodeWhile.getAttributes()){
-			nodeFor.setAttribute(attribute.getName(), attribute.getValue());
+			//TODO : copye attribute
+			nodeFor.setAttribute(attribute.getName(), null);
 		}
 		
 		// Replace node
