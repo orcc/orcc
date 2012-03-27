@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.simulators;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,65 +48,59 @@ public class SimulatorDescriptor {
 
 	private static Map<Integer, GenericSource> descsMap = new HashMap<Integer, GenericSource>();
 
-	public static Integer create(IntfNet net) {
-		int desc = net.hashCode();
+	public static BigInteger create(IntfNet net) {
+		Integer desc = net.hashCode();
 		descsMap.put(desc, net);
-		return desc;
+		return new BigInteger(desc.toString());
 	}
 
-	public static Integer create(IntfChannel channel) {
-		int desc = channel.hashCode();
+	public static BigInteger create(IntfChannel channel) {
+		Integer desc = channel.hashCode();
 		descsMap.put(desc, channel);
-		return desc;
+		return new BigInteger(desc.toString());
 	}
 
-	public static Integer create(SystemIO io) {
-		int desc = io.hashCode();
+	public static BigInteger create(SystemIO io) {
+		Integer desc = io.hashCode();
 		descsMap.put(desc, io);
-		return desc;
+		return new BigInteger(desc.toString());
 	}
 
-	public static GenericSource get(Integer descriptor) {
-		if (descsMap.containsKey(descriptor))
-			return descsMap.get(descriptor);
+	public static GenericSource get(BigInteger descriptor) {
+		if (descsMap.containsKey(descriptor.intValue()))
+			return descsMap.get(descriptor.intValue());
 		return null;
 	}
 
-	public static IntfNet getIntfNet(Integer descriptor) {
-		if (descsMap.containsKey(descriptor)) {
-			GenericSource g = descsMap.get(descriptor);
+	public static IntfNet getIntfNet(BigInteger descriptor) {
+		if (descsMap.containsKey(descriptor.intValue())) {
+			GenericSource g = descsMap.get(descriptor.intValue());
 			if (g.isIntfNet())
 				return (IntfNet) g;
 		}
 		return RuntimeFactory.createIntfNet();
 	}
 
-	public static IntfChannel getIntfChannel(Integer descriptor) {
-		if (descsMap.containsKey(descriptor)) {
-			GenericSource g = descsMap.get(descriptor);
+	public static IntfChannel getIntfChannel(BigInteger descriptor) {
+		if (descsMap.containsKey(descriptor.intValue())) {
+			GenericSource g = descsMap.get(descriptor.intValue());
 			if (g.isIntfChannel())
 				return (IntfChannel) g;
 		}
 		return RuntimeFactory.createIntfChannel();
 	}
 
-	public static SystemIO getSystemIO(Integer descriptor) {
-		if (descsMap.containsKey(descriptor)) {
-			GenericSource g = descsMap.get(descriptor);
+	public static SystemIO getSystemIO(BigInteger descriptor) {
+		if (descsMap.containsKey(descriptor.intValue())) {
+			GenericSource g = descsMap.get(descriptor.intValue());
 			if (g.isSystemIO())
 				return (SystemIO) g;
 		}
 		return RuntimeFactory.createSystemIO();
 	}
 
-	public static boolean contains(Integer descriptor) {
-		return descsMap.containsKey(descriptor);
-	}
-
-	public static void finalize(Integer descriptor) {
-		if (descsMap.containsKey(descriptor)) {
-			descsMap.remove(descriptor).close();
-		}
+	public static boolean contains(BigInteger descriptor) {
+		return descsMap.containsKey(descriptor.intValue());
 	}
 
 	/**
@@ -116,6 +111,12 @@ public class SimulatorDescriptor {
 			g.close();
 		}
 		descsMap.clear();
+	}
+
+	public static void finalize(BigInteger descriptor) {
+		if (descsMap.containsKey(descriptor.intValue())) {
+			descsMap.remove(descriptor.intValue()).close();
+		}
 	}
 
 }

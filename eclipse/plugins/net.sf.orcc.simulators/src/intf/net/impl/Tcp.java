@@ -36,42 +36,41 @@ import net.sf.orcc.simulators.SimulatorDescriptor;
 
 public class Tcp {
 
-	public static Integer open(String address, String port) {
+	public static BigInteger open(String address, String port) {
 		return SimulatorDescriptor.create(RuntimeFactory.createTcp(address,
 				port));
 	}
 
-	public static void setOption(Integer desc, String name, String value) {
+	public static void setOption(BigInteger desc, String name, String value) {
 		SimulatorDescriptor.getIntfNet(desc).setOption(name, value);
 	}
 
-	public static String getOption(Integer desc, String name) {
+	public static String getOption(BigInteger desc, String name) {
 		return SimulatorDescriptor.getIntfNet(desc).getOption(name);
 	}
 
-	public static boolean exists(Integer desc) {
+	public static boolean exists(BigInteger desc) {
 		return SimulatorDescriptor.getIntfNet(desc).exists();
 	}
 
-	public static void close(Integer desc) {
+	public static void close(BigInteger desc) {
 		SimulatorDescriptor.finalize(desc);
 	}
 
-	public static boolean isInputShutdown(Integer desc) {
+	public static boolean isInputShutdown(BigInteger desc) {
 		return SimulatorDescriptor.getIntfNet(desc).isInputShutdown();
 	}
 
-	public static boolean isOutputShutdown(Integer desc) {
+	public static boolean isOutputShutdown(BigInteger desc) {
 		return SimulatorDescriptor.getIntfNet(desc).isOutputShutdown();
 	}
-	
-	public static void writeByte(Integer desc, BigInteger b) {
+
+	public static void writeByte(BigInteger desc, BigInteger b) {
 		SimulatorDescriptor.getIntfNet(desc).writeByte(b.byteValue());
 	}
 
-	public static BigInteger readByte(Integer desc) {
-		byte[] b = new byte[1];
-		b[0] = SimulatorDescriptor.getIntfNet(desc).readByte();
+	public static BigInteger readByte(BigInteger desc) {
+		byte[] b = new byte[] { SimulatorDescriptor.getIntfNet(desc).readByte() };
 		return new BigInteger(b);
 	}
 

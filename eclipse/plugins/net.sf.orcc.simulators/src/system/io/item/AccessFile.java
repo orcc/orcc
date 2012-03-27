@@ -82,13 +82,13 @@ public class AccessFile extends SystemIO {
 		return 0;
 	}
 
-	public Integer sizeOfFile() {
+	public Long sizeOfFile() {
 		try {
-			return (int) randomAccessFile.length();
+			return randomAccessFile.length();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return 0;
+		return new Long(0L);
 	}
 
 	public void seek(Integer pos) {

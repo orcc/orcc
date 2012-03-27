@@ -29,6 +29,8 @@
 
 package system.io.impl;
 
+import java.math.BigInteger;
+
 import net.sf.orcc.runtime.RuntimeFactory;
 import net.sf.orcc.runtime.impl.SystemIO;
 import net.sf.orcc.simulators.SimulatorDescriptor;
@@ -43,66 +45,68 @@ import net.sf.orcc.simulators.SimulatorDescriptor;
  */
 public class AccessFile {
 
-	public static Integer openFile(String fileName) {
+	public static BigInteger openFile(String fileName) {
 		return SimulatorDescriptor.create(RuntimeFactory
 				.createAccessFile(fileName));
 	}
 
-	public static Integer closeFile(Integer desc) {
+	public static BigInteger closeFile(BigInteger desc) {
 		SimulatorDescriptor.finalize(desc);
-		return 0;
+		return new BigInteger("0");
 	}
 
-	public static Integer readByte(Integer desc) {
+	public static BigInteger readByte(BigInteger desc) {
 		SystemIO io = SimulatorDescriptor.getSystemIO(desc);
 		if (io.isAccessFile()) {
-			SystemIO.toAccessFile(io).readByte();
+			new BigInteger(SystemIO.toAccessFile(io).readByte().toString());
 		}
-		return 0;
+		return new BigInteger("0");
 	}
 
-	public static void readBytes(Integer desc, byte buf[], Integer count) {
+	public static void readBytes(BigInteger desc, byte buf[], BigInteger count) {
 		SystemIO io = SimulatorDescriptor.getSystemIO(desc);
 		if (io.isAccessFile()) {
-			SystemIO.toAccessFile(io).readByte(buf,count);
+			SystemIO.toAccessFile(io).readByte(buf, count.intValue());
 		}
 	}
 
-	public static void writeByte(Integer desc, Integer v) {
+	public static void writeByte(BigInteger desc, BigInteger v) {
 		SystemIO io = SimulatorDescriptor.getSystemIO(desc);
 		if (io.isAccessFile()) {
 			SystemIO.toAccessFile(io).writeByte(v.byteValue());
 		}
 	}
 
-	public static void writeBytes(Integer desc, byte buf[], Integer count) {
+	public static void writeBytes(BigInteger desc, byte buf[], BigInteger count) {
 		SystemIO io = SimulatorDescriptor.getSystemIO(desc);
 		if (io.isAccessFile()) {
-			SystemIO.toAccessFile(io).writeByte(buf,count);
+			SystemIO.toAccessFile(io).writeByte(buf, count.intValue());
 		}
 	}
 
-	public static Integer sizeOfFile(Integer desc) {
+	public static BigInteger sizeOfFile(BigInteger desc) {
 		SystemIO io = SimulatorDescriptor.getSystemIO(desc);
 		if (io.isAccessFile()) {
-			return SystemIO.toAccessFile(io).sizeOfFile();
+			return new BigInteger(SystemIO.toAccessFile(io).sizeOfFile()
+					.toString());
 		}
-		return 0;
+		return new BigInteger("0");
 	}
 
-	public static void seek(Integer desc, Integer pos) {
+	public static void seek(BigInteger desc, BigInteger pos) {
 		SystemIO io = SimulatorDescriptor.getSystemIO(desc);
 		if (io.isAccessFile()) {
-			SystemIO.toAccessFile(io).seek(pos);
+			SystemIO.toAccessFile(io).seek(pos.intValue());
 		}
 	}
 
-	public static Integer filePointer(Integer desc) {
+	public static BigInteger filePointer(BigInteger desc) {
 		SystemIO io = SimulatorDescriptor.getSystemIO(desc);
 		if (io.isAccessFile()) {
-			return SystemIO.toAccessFile(io).filePointer();
+			return new BigInteger(SystemIO.toAccessFile(io).filePointer()
+					.toString());
 		}
-		return 0;
+		return new BigInteger("0");
 	}
 
 }
