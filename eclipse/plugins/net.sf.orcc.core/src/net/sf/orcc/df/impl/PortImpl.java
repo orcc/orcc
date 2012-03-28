@@ -10,13 +10,11 @@ import net.sf.dftools.graph.impl.VertexImpl;
 import net.sf.dftools.util.Attribute;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.Type;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
@@ -282,11 +280,7 @@ public class PortImpl extends VertexImpl implements Port {
 	@Override
 	public boolean isNative() {
 		Attribute attribute = getAttribute("native");
-		if (attribute == null) {
-			return false;
-		}
-		EObject value = attribute.getContainedValue();
-		return value instanceof ExprBool && ((ExprBool) value).isValue();
+		return attribute != null;
 	}
 
 	/**
