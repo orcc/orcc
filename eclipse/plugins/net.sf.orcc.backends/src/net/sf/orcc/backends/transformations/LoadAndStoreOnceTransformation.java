@@ -43,6 +43,7 @@ import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByVal;
+import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
@@ -75,32 +76,64 @@ public class LoadAndStoreOnceTransformation extends
 
 	/**
 	 * Locks a variable whether all accesses are not static. e.g x=0, x[10] are
-	 * static but not x[i]
+	 * static but not x[i] or is call by a procedure
 	 * 
 	 * @author Thavot Richard
 	 * 
 	 */
 	private class GlobalsLocked extends AbstractActorVisitor<Object> {
 
-		Map<Var, Boolean> globalsLockedMap = new HashMap<Var, Boolean>();
+		// Map<Var, Boolean> globalsLockedMap = new HashMap<Var, Boolean>();
+		Set<Var> globalsLockedSet = new HashSet<Var>();
 
 		public GlobalsLocked(Procedure procedure) {
+			this.procedure = procedure;
 			super.doSwitch(procedure);
 		}
 
 		@Override
 		public Object caseInstLoad(InstLoad load) {
 			Var loadedVar = load.getSource().getVariable();
-			EList<Expression> indexes = load.getIndexes();
-			tryLockingVar(loadedVar, indexes);
+			if (loadedVar.isGlobal()) {
+				if (procedure.eContainer() instanceof Action) {
+					EList<Expression> indexes = load.getIndexes();
+					if (LoadAndStoreOnceTransformation.isStaticIndexes(indexes)) {
+						if (indexes == null & loadedVar.getType().isList()) {
+							globalsLockedSet.add(loadedVar);
+						} else if (indexes.isEmpty()
+								& loadedVar.getType().isList()) {
+							globalsLockedSet.add(loadedVar);
+						}
+					} else {
+						globalsLockedSet.add(loadedVar);
+					}
+				} else {
+					globalsLockedSet.add(loadedVar);
+				}
+			}
 			return null;
 		}
 
 		@Override
 		public Object caseInstStore(InstStore store) {
 			Var storedVar = store.getTarget().getVariable();
-			EList<Expression> indexes = store.getIndexes();
-			tryLockingVar(storedVar, indexes);
+			if (storedVar.isGlobal()) {
+				if (procedure.eContainer() instanceof Action) {
+					EList<Expression> indexes = store.getIndexes();
+					if (LoadAndStoreOnceTransformation.isStaticIndexes(indexes)) {
+						if (indexes == null & storedVar.getType().isList()) {
+							globalsLockedSet.add(storedVar);
+						} else if (indexes.isEmpty()
+								& storedVar.getType().isList()) {
+							globalsLockedSet.add(storedVar);
+						}
+					} else {
+						globalsLockedSet.add(storedVar);
+					}
+				} else {
+					globalsLockedSet.add(storedVar);
+				}
+			}
 			return null;
 		}
 
@@ -110,44 +143,24 @@ public class LoadAndStoreOnceTransformation extends
 				if (arg.isByVal()) {
 					ArgByVal argByVal = (ArgByVal) arg;
 					if (argByVal.getValue().isExprVar()) {
-						Var value = ((ExprVar) argByVal.getValue()).getUse()
+						Var var = ((ExprVar) argByVal.getValue()).getUse()
 								.getVariable();
-						tryLockingVar(value, null);
+						if (var.isGlobal())
+							globalsLockedSet.add(var);
 					}
 				}
 			}
 			return null;
 		}
 
-		private void tryLockingVar(Var var, EList<Expression> indexes) {
-			if (var.isGlobal()) {
-				if (LoadAndStoreOnceTransformation.isStaticIndexes(indexes)) {
-					if (indexes == null & var.getType().isList()) {
-						globalsLockedMap.put(var, true);
-					} else if (indexes.isEmpty() & var.getType().isList()) {
-						globalsLockedMap.put(var, true);
-					} else if (!globalsLockedMap.containsKey(var)) {
-						globalsLockedMap.put(var, false);
-					}
-				} else {
-					globalsLockedMap.put(var, true);
-				}
-			}
-		}
-
 		public Set<Var> getGlobalsLockedSet() {
-			Set<Var> globalsLockedSet = new HashSet<Var>();
-			for (Entry<Var, Boolean> entry : globalsLockedMap.entrySet()) {
-				if (entry.getValue())
-					globalsLockedSet.add(entry.getKey());
-			}
 			return globalsLockedSet;
 		}
 
 	}
 
-	private Map<Procedure, Map<String, Var>> procsKeyToLoadedVarsMap;
-	private Map<Procedure, Map<String, Collection<Expression>>> procsKeyToLoadedIndexesMap;
+	private Map<Procedure, List<Var>> procedureToLoadedVarsMap;
+	private List<Var> loadedVarsList;
 
 	private Map<Var, Var> localToLocalsMap;
 
@@ -160,20 +173,18 @@ public class LoadAndStoreOnceTransformation extends
 	private Map<String, NodeBlock> keyToLastStoredMap;
 
 	public LoadAndStoreOnceTransformation() {
-		this.procsKeyToLoadedVarsMap = new HashMap<Procedure, Map<String, Var>>();
-		this.procsKeyToLoadedIndexesMap = new HashMap<Procedure, Map<String, Collection<Expression>>>();
+		this.procedureToLoadedVarsMap = new HashMap<Procedure, List<Var>>();
 	}
 
 	private LoadAndStoreOnceTransformation(
-			Map<Procedure, Map<String, Var>> procsToLoadedVarsMap,
-			Map<Procedure, Map<String, Collection<Expression>>> procsKeyToLoadedIndexesMap) {
-		this.procsKeyToLoadedVarsMap = procsToLoadedVarsMap;
-		this.procsKeyToLoadedIndexesMap = procsKeyToLoadedIndexesMap;
+			Map<Procedure, List<Var>> procedureToLoadedVarsMap) {
+		this.procedureToLoadedVarsMap = procedureToLoadedVarsMap;
 	}
 
 	@Override
 	public Object caseActor(Actor actor) {
 
+		this.actor = actor;
 		super.caseActor(actor);
 
 		return null;
@@ -181,6 +192,10 @@ public class LoadAndStoreOnceTransformation extends
 
 	@Override
 	public Object caseProcedure(Procedure procedure) {
+
+		if (procedure.getName().equals("iteration")) {
+			System.out.println("Break");
+		}
 
 		// if a variable is locked then no transformation is applied
 		globalsLockedSet = new GlobalsLocked(procedure).getGlobalsLockedSet();
@@ -193,6 +208,10 @@ public class LoadAndStoreOnceTransformation extends
 		keyToFirstLoadMap = new HashMap<String, NodeBlock>();
 		keyToLastStoredMap = new HashMap<String, NodeBlock>();
 
+		// procedureToLoadedVarsMap.put(procedure, new ArrayList<Var>());
+		loadedVarsList = new ArrayList<Var>();
+
+		this.procedure = procedure;
 		super.caseProcedure(procedure);
 
 		if (procedure.eContainer() instanceof Action) {
@@ -208,22 +227,41 @@ public class LoadAndStoreOnceTransformation extends
 	@Override
 	public Object caseInstLoad(InstLoad load) {
 		Var loadedVar = load.getSource().getVariable();
-		if (loadedVar.isGlobal() & !globalsLockedSet.contains(loadedVar)) {
-			Var localVar = load.getTarget().getVariable();
+		if (loadedVar.isGlobal()) {
 			EList<Expression> indexes = load.getIndexes();
-			if (isStaticIndexes(indexes)) {
-				String key = getKey(loadedVar, indexes);
-				if (!keyToGlobalsMap.containsKey(key)) {
-					keyToGlobalsMap.put(key, loadedVar);
-					keyToLocalsMap.put(key, localVar);
-					keyToFirstLoadMap.put(key, load.getBlock());
-					if (!indexes.isEmpty())
-						keyToIndexesMap.put(key, indexes);
+			if (procedure.eContainer() instanceof Action) {
+				if (!globalsLockedSet.contains(loadedVar)) {
+					if (isStaticIndexes(indexes)) {
+						Var localVar = load.getTarget().getVariable();
+						String key = getKey(loadedVar, indexes);
+						if (!keyToGlobalsMap.containsKey(key)) {
+							keyToGlobalsMap.put(key, loadedVar);
+							keyToLocalsMap.put(key, localVar);
+							keyToFirstLoadMap.put(key, load.getBlock());
+							if (!indexes.isEmpty())
+								keyToIndexesMap.put(key, indexes);
+						} else {
+							localToLocalsMap.put(localVar,
+									keyToLocalsMap.get(key));
+						}
+						IrUtil.delete(load);
+						indexInst--;
+					}
 				} else {
-					localToLocalsMap.put(localVar, keyToLocalsMap.get(key));
+					if (indexes.isEmpty()) {
+						indexes.add(IrFactory.eINSTANCE.createExprInt(0));
+					}
 				}
-				IrUtil.delete(load);
-				indexInst--;
+			} else {
+				if (!loadedVarsList.contains(loadedVar)) {
+					loadedVarsList.add(loadedVar);
+					if (!loadedVar.getType().isList()) {
+						setGlobalAsList(loadedVar);
+					}
+				}
+				if (indexes.isEmpty()) {
+					indexes.add(IrFactory.eINSTANCE.createExprInt(0));
+				}
 			}
 		}
 		return null;
@@ -235,29 +273,46 @@ public class LoadAndStoreOnceTransformation extends
 		super.doSwitch(store.getValue());
 		//
 		Var storedVar = store.getTarget().getVariable();
-		if (storedVar.isGlobal() & !globalsLockedSet.contains(storedVar)) {
+		if (storedVar.isGlobal()) {
 			EList<Expression> indexes = store.getIndexes();
-			if (isStaticIndexes(indexes)) {
-				String key = getKey(storedVar, indexes);
-				Var localVar = keyToLocalsMap.get(key);
-				if (localVar == null) {
-					Type type = storedVar.getType();
-					if (!indexes.isEmpty()) {
-						type = ((TypeList) type).getInnermostType();
+			if (procedure.eContainer() instanceof Action) {
+				if (!globalsLockedSet.contains(storedVar)) {
+					if (isStaticIndexes(indexes)) {
+						String key = getKey(storedVar, indexes);
+						Var localVar = keyToLocalsMap.get(key);
+						if (localVar == null) {
+							Type type = storedVar.getType();
+							if (!indexes.isEmpty()) {
+								type = ((TypeList) type).getInnermostType();
+							}
+							localVar = procedure.newTempLocalVariable(type,
+									"local_" + storedVar.getName());
+							keyToGlobalsMap.put(key, storedVar);
+							keyToIndexesMap.put(key, indexes);
+							keyToLocalsMap.put(key, localVar);
+						}
+						NodeBlock block = store.getBlock();
+						keyToLastStoredMap.put(key, block);
+						InstAssign assign = eINSTANCE.createInstAssign(
+								localVar, store.getValue());
+						IrUtil.delete(store);
+						block.getInstructions().add(indexInst, assign);
 					}
-					localVar = procedure.newTempLocalVariable(type, "local_"
-							+ storedVar.getName());
-					keyToGlobalsMap.put(key, storedVar);
-					keyToIndexesMap.put(key, indexes);
-					keyToLocalsMap.put(key, localVar);
+				} else {
+					if (indexes.isEmpty()) {
+						indexes.add(IrFactory.eINSTANCE.createExprInt(0));
+					}
 				}
-				NodeBlock block = store.getBlock();
-				keyToLastStoredMap.put(key, block);
-				InstAssign assign = eINSTANCE.createInstAssign(localVar,
-						store.getValue());
-				IrUtil.delete(store);
-				block.getInstructions().add(indexInst, assign);
-
+			} else {
+				if (!loadedVarsList.contains(storedVar)) {
+					loadedVarsList.add(storedVar);
+					if (!storedVar.getType().isList()) {
+						setGlobalAsList(storedVar);
+					}
+				}
+				if (indexes.isEmpty()) {
+					indexes.add(IrFactory.eINSTANCE.createExprInt(0));
+				}
 			}
 		}
 		return null;
@@ -265,62 +320,21 @@ public class LoadAndStoreOnceTransformation extends
 
 	@Override
 	public Object caseInstCall(InstCall call) {
-		for (Arg arg : call.getParameters()) {
-			if (arg.isByVal()) {
-				ArgByVal argByVal = (ArgByVal) arg;
-				// Replace if a reference already exists to a global var
-				super.doSwitch(argByVal.getValue());
-			}
-		}
-		// retrieve loaded variables
 		Procedure calledProc = call.getProcedure();
-		Map<String, Var> loadedVars = procsKeyToLoadedVarsMap.get(calledProc);
+		List<Var> loadedVars = procedureToLoadedVarsMap.get(calledProc);
 		if (loadedVars == null) {
 			// transform procedure
-			new LoadAndStoreOnceTransformation(procsKeyToLoadedVarsMap,
-					procsKeyToLoadedIndexesMap).doSwitch(calledProc);
-			loadedVars = procsKeyToLoadedVarsMap.get(calledProc);
+			new LoadAndStoreOnceTransformation(procedureToLoadedVarsMap)
+					.doSwitch(calledProc);
+			loadedVars = procedureToLoadedVarsMap.get(calledProc);
 		}
-		Map<String, Collection<Expression>> loadedIndexes = procsKeyToLoadedIndexesMap
-				.get(calledProc);
-		// add additional parameters
 		int i = 0;
-		for (Entry<String, Var> entry : loadedVars.entrySet()) {
-			String key = entry.getKey();
-			Var var = entry.getValue();
-			Collection<Expression> indexes = loadedIndexes.get(key);
-			Var localVar = null;
-			if (keyToLocalsMap.containsKey(key)) {
-				localVar = keyToLocalsMap.get(key);
-			} else {
-				Type type = var.getType();
-				keyToGlobalsMap.put(key, var);
-				if(indexes == null){
-					if(type.isList()){
-						localVar = var;
-					}else{
-						localVar = procedure.newTempLocalVariable(type,
-								"local_" + var.getName());
-						keyToLocalsMap.put(key, localVar);
-						keyToFirstLoadMap.put(key, call.getBlock());
-					}
-				}else if(indexes.isEmpty()){
-					localVar = procedure.newTempLocalVariable(type,
-							"local_" + var.getName());
-					keyToLocalsMap.put(key, localVar);
-					keyToFirstLoadMap.put(key, call.getBlock());
-				}else{
-					type = ((TypeList) type).getInnermostType();
-					localVar = procedure.newTempLocalVariable(type,
-							"local_" + var.getName());
-					keyToLocalsMap.put(key, localVar);
-					keyToIndexesMap.put(key, indexes);
-					keyToFirstLoadMap.put(key, call.getBlock());
-				}
+		for (Var var : loadedVars) {
+			if (!loadedVarsList.contains(var)) {
+				loadedVarsList.add(var);
 			}
-			keyToLastStoredMap.put(key, call.getBlock());
 			call.getParameters().add(i++,
-					IrFactory.eINSTANCE.createArgByVal(localVar));
+					IrFactory.eINSTANCE.createArgByVal(var));
 		}
 
 		return null;
@@ -400,26 +414,15 @@ public class LoadAndStoreOnceTransformation extends
 	 *            a procedure
 	 */
 	private void addParameters(Procedure procedure) {
-		int i = 0;
-		Map<String, Var> loadedVars = new HashMap<String, Var>();
-		Map<String, Collection<Expression>> loadedIndexes = new HashMap<String, Collection<Expression>>();
-		for (Entry<String, Var> entry : keyToGlobalsMap.entrySet()) {
-			String key = entry.getKey();
-			procedure.getParameters().add(i++,
-					IrFactory.eINSTANCE.createParam(keyToLocalsMap.get(key)));
-			loadedVars.put(key, entry.getValue());
-			Collection<Expression> indexes = keyToIndexesMap.get(key);
-			if (indexes != null)
-				loadedIndexes.put(key, indexes);
+		if (!procedureToLoadedVarsMap.containsKey(procedure)) {
+			int i = 0;
+			List<Var> loadedVars = loadedVarsList;
+			for (Var var : loadedVars) {
+				procedure.getParameters().add(i++,
+						IrFactory.eINSTANCE.createParam(IrUtil.copy(var)));
+			}
+			procedureToLoadedVarsMap.put(procedure, loadedVars);
 		}
-		for (Var var : globalsLockedSet) {
-			String key = getKey(var, null);
-			procedure.getParameters().add(i++,
-					IrFactory.eINSTANCE.createParam(var));
-			loadedVars.put(key, var);
-		}
-		procsKeyToLoadedVarsMap.put(procedure, loadedVars);
-		procsKeyToLoadedIndexesMap.put(procedure, loadedIndexes);
 	}
 
 	/**
@@ -452,6 +455,19 @@ public class LoadAndStoreOnceTransformation extends
 			}
 		}
 		return s;
+	}
+
+	/**
+	 * 
+	 * @param var
+	 */
+	private void setGlobalAsList(Var var) {
+		var.setType(IrFactory.eINSTANCE.createTypeList(1, var.getType()));
+		if (var.getInitialValue() != null) {
+			ExprList initValue = IrFactory.eINSTANCE.createExprList();
+			initValue.getValue().add(var.getInitialValue());
+			var.setInitialValue(initValue);
+		}
 	}
 
 }
