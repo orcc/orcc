@@ -52,7 +52,10 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.NodeIf;
+import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
@@ -61,6 +64,7 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.ExpressionPrinter;
 import net.sf.orcc.ir.util.IrUtil;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.emf.common.util.EList;
 
 /**
@@ -320,6 +324,13 @@ public class LoadAndStoreOnceTransformation extends
 
 	@Override
 	public Object caseInstCall(InstCall call) {
+		for (Arg arg : call.getParameters()) {
+			if (arg.isByVal()) {
+				ArgByVal argByVal = (ArgByVal) arg;
+				// Replace if a reference already exists to a global var
+				super.doSwitch(argByVal.getValue());
+			}
+		}
 		Procedure calledProc = call.getProcedure();
 		List<Var> loadedVars = procedureToLoadedVarsMap.get(calledProc);
 		if (loadedVars == null) {
@@ -337,6 +348,20 @@ public class LoadAndStoreOnceTransformation extends
 					IrFactory.eINSTANCE.createArgByVal(var));
 		}
 
+		return null;
+	}
+
+	@Override
+	public Object caseNodeIf(NodeIf nodeif) {
+		super.doSwitch(nodeif.getCondition());
+		super.caseNodeIf(nodeif);
+		return null;
+	}
+
+	@Override
+	public Object caseNodeWhile(NodeWhile nodeWhile) {
+		super.doSwitch(nodeWhile.getCondition());
+		super.caseNodeWhile(nodeWhile);
 		return null;
 	}
 
@@ -373,7 +398,11 @@ public class LoadAndStoreOnceTransformation extends
 				if (indexes != null) {
 					load.getIndexes().addAll(IrUtil.copy(indexes));
 				}
-				keyToFirstLoadMap.get(key).getInstructions().add(0, load);
+				NodeBlock block = keyToFirstLoadMap.get(key);
+				//if (block.eContainer() instanceof NodeIf) {
+					block = procedure.getFirst();
+				//}
+				block.getInstructions().add(0, load);
 			}
 		}
 	}
