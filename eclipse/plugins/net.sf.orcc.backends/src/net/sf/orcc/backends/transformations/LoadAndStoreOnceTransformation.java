@@ -52,7 +52,6 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
@@ -64,7 +63,6 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.ExpressionPrinter;
 import net.sf.orcc.ir.util.IrUtil;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.emf.common.util.EList;
 
 /**
@@ -391,19 +389,15 @@ public class LoadAndStoreOnceTransformation extends
 	private void addLoads(Procedure procedure) {
 		for (Entry<String, Var> entry : keyToGlobalsMap.entrySet()) {
 			String key = entry.getKey();
-			if (keyToFirstLoadMap.containsKey(key)) {
-				InstLoad load = IrFactory.eINSTANCE.createInstLoad(
-						keyToLocalsMap.get(key), entry.getValue());
-				Collection<Expression> indexes = keyToIndexesMap.get(key);
-				if (indexes != null) {
-					load.getIndexes().addAll(IrUtil.copy(indexes));
-				}
-				NodeBlock block = keyToFirstLoadMap.get(key);
-				//if (block.eContainer() instanceof NodeIf) {
-					block = procedure.getFirst();
-				//}
-				block.getInstructions().add(0, load);
+			InstLoad load = IrFactory.eINSTANCE.createInstLoad(
+					keyToLocalsMap.get(key), entry.getValue());
+			Collection<Expression> indexes = keyToIndexesMap.get(key);
+			if (indexes != null) {
+				load.getIndexes().addAll(IrUtil.copy(indexes));
 			}
+			NodeBlock block = keyToFirstLoadMap.get(key);
+			block = procedure.getFirst();
+			block.getInstructions().add(0, load);
 		}
 	}
 
@@ -423,14 +417,10 @@ public class LoadAndStoreOnceTransformation extends
 				if (indexes != null) {
 					store.getIndexes().addAll(IrUtil.copy(indexes));
 				}
-				EList<Instruction> block = keyToLastStoredMap.get(key)
+				EList<Instruction> block = procedure.getLast()
 						.getInstructions();
 				int lastInstIndex = block.size() - 1;
-				if (block.get(lastInstIndex).isReturn()) {
-					block.add(lastInstIndex, store);
-				} else {
-					block.add(store);
-				}
+				block.add(lastInstIndex, store);
 			}
 		}
 	}
