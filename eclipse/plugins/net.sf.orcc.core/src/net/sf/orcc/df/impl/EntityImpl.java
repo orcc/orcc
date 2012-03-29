@@ -14,12 +14,12 @@ import java.util.Map;
 
 import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.impl.VertexImpl;
+import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.util.EcoreHelper;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;

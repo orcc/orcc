@@ -28,12 +28,12 @@
  */
 package net.sf.orcc.backends.tta.transformations;
 
+import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.WriteListener;
 
 /**

@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.CustomPrinter;
@@ -70,7 +71,6 @@ import net.sf.orcc.ir.transformations.CfgBuilder;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.transformations.TacTransformation;
-import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;

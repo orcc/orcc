@@ -44,6 +44,7 @@ import java.util.Map;
 
 import net.sf.dftools.graph.Vertex;
 import net.sf.dftools.util.Attribute;
+import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Actor;
@@ -57,7 +58,6 @@ import net.sf.orcc.ir.util.ActorInterpreter;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.runtime.SimulatorFifo;
 import net.sf.orcc.runtime.impl.GenericSource;
-import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;

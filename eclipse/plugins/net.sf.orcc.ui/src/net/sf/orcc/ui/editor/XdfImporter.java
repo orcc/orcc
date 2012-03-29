@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.dftools.util.Attribute;
+import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.graphiti.io.LayoutReader;
 import net.sf.graphiti.model.Configuration;
 import net.sf.graphiti.model.Edge;
@@ -57,7 +58,6 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.ExpressionPrinter;
-import net.sf.orcc.util.EcoreHelper;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;

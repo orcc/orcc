@@ -31,6 +31,7 @@ package net.sf.orcc.ir.transformations;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.InstAssign;
@@ -46,7 +47,6 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
-import net.sf.orcc.util.EcoreHelper;
 
 /**
  * This class defines a very simple Dead Var Elimination.

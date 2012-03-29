@@ -31,6 +31,7 @@ package net.sf.orcc.ir.transformations;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.Expression;
@@ -45,7 +46,6 @@ import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
-import net.sf.orcc.util.EcoreHelper;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 

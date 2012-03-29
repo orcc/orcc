@@ -31,6 +31,7 @@ package net.sf.orcc.ir.transformations;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprVar;
@@ -44,7 +45,6 @@ import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.util.EcoreHelper;
 
 /**
  * This class defines a very simple Dead Code Elimination.

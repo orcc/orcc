@@ -7,13 +7,13 @@
 package net.sf.orcc.ir.impl;
 
 import net.sf.dftools.util.impl.AttributableImpl;
+import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.dftools.graph.Edge;
 import net.sf.dftools.util.Attribute;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.util.EcoreHelper;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;

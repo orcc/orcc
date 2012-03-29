@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -46,7 +47,6 @@ import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.impl.IrResourceFactoryImpl;
-import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFolder;

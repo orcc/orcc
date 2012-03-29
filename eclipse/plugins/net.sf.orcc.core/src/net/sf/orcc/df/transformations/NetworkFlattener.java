@@ -33,6 +33,7 @@ import java.util.List;
 
 import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.Vertex;
+import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Entity;
@@ -45,7 +46,6 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrUtil;
-import net.sf.orcc.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;

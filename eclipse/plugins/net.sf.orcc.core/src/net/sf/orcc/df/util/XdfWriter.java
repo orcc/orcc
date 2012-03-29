@@ -40,6 +40,7 @@ import net.sf.dftools.graph.Vertex;
 import net.sf.dftools.util.Attribute;
 import net.sf.dftools.util.WrapperString;
 import net.sf.dftools.util.WrapperXml;
+import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
@@ -65,7 +66,6 @@ import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.util.DomUtil;
-import net.sf.orcc.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.ECollections;
 import org.eclipse.emf.common.util.EList;

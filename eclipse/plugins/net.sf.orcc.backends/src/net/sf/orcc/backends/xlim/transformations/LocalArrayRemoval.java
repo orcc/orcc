@@ -30,6 +30,7 @@ package net.sf.orcc.backends.xlim.transformations;
 
 import java.util.ArrayList;
 
+import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.IrFactory;
@@ -38,7 +39,6 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
-import net.sf.orcc.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.EList;
 

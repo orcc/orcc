@@ -33,12 +33,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.OrccProjectNature;
 import net.sf.orcc.cache.CacheManager;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.frontend.Frontend;
-import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;

@@ -30,6 +30,7 @@ package net.sf.orcc.backends.xlim.transformations;
 
 import java.util.List;
 
+import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -51,7 +52,6 @@ import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
-import net.sf.orcc.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;

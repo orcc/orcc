@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.dftools.util.Attribute;
+import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.backends.ir.IrNodeSpecific;
 import net.sf.orcc.backends.ir.IrSpecificFactory;
 import net.sf.orcc.backends.ir.NodeFor;
@@ -50,7 +51,6 @@ import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.transformations.CfgBuilder;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
