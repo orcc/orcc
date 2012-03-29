@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.cal.CalStandaloneSetup;
@@ -80,14 +79,14 @@ import org.eclipse.xtext.validation.Issue;
  */
 public class FrontendCli implements IApplication {
 
-	private Vector<IProject> orderedProjects;
+	private List<IProject> orderedProjects;
 	private List<IProject> unorderedProjects;
 	private ResourceSet emfResourceSet;
 	private IWorkspace workspace;
 	private boolean isAutoBuildActivated;
 
 	public FrontendCli() {
-		orderedProjects = new Vector<IProject>();
+		orderedProjects = new ArrayList<IProject>();
 		unorderedProjects = new ArrayList<IProject>();
 		workspace = ResourcesPlugin.getWorkspace();
 		isAutoBuildActivated = false;
