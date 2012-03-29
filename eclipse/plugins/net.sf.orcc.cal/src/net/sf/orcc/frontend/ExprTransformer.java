@@ -50,11 +50,13 @@ import net.sf.orcc.cal.cal.ExpressionString;
 import net.sf.orcc.cal.cal.ExpressionUnary;
 import net.sf.orcc.cal.cal.ExpressionVariable;
 import net.sf.orcc.cal.cal.Generator;
+import net.sf.orcc.cal.cal.StatementCall;
 import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.cal.util.Util;
+import net.sf.orcc.df.Action;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
@@ -361,6 +363,17 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		Expression value;
 		if (var.getType().isList()) {
 			if (target == null) {
+				if (expression.eContainer() instanceof StatementCall
+						&& procedure.eContainer() instanceof Action) {
+					if (((Action) procedure.eContainer()).getInputPattern()
+							.contains(var)) {
+						// Need to copy the list before using it in a procedure
+						target = procedure.newTempLocalVariable(var.getType(),
+								"local_" + var.getName());
+						copyList(var);
+						return eINSTANCE.createExprVar(target);
+					}
+				}
 				return eINSTANCE.createExprVar(var);
 			} else {
 				return copyList(var);

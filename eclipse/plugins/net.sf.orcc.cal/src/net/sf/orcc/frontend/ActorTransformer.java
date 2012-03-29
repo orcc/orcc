@@ -132,6 +132,9 @@ public class ActorTransformer extends CalSwitch<Actor> {
 
 				i++;
 			}
+		} else if (tokens.size() == 1) {
+			Variable token = tokens.get(0);
+			Frontend.putMapping(token, portVariable);
 		} else {
 			// creates loop variable and initializes it
 			Var loopVar = procedure.newTempLocalVariable(
@@ -384,9 +387,6 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		actor.getActions().addAll(actions.getAllActions());
 		actor.getInitializes().addAll(initializes.getAllActions());
 
-		// remove useless list copies
-		// new UselessCopyElimination().doSwitch(actor);
-
 		// serialize actor and cache
 		Frontend.instance.serialize(actor);
 
@@ -471,15 +471,17 @@ public class ActorTransformer extends CalSwitch<Actor> {
 						eINSTANCE.createTypeBool());
 		Procedure body = eINSTANCE.createProcedure(name, lineNumber,
 				eINSTANCE.createTypeVoid());
+		
+		// creates IR action 
+		Action action = DfFactory.eINSTANCE.createAction(tag, inputPattern,
+				outputPattern, peekPattern, scheduler, body);
 
 		// transforms action body and scheduler
 		transformActionBody(astAction, body, inputPattern, outputPattern);
 		transformActionScheduler(astAction, scheduler, peekPattern);
-
-		// creates IR action and add it to action list
-		Action action = DfFactory.eINSTANCE.createAction(tag, inputPattern,
-				outputPattern, peekPattern, scheduler, body);
 		Util.transformAnnotations(action, astAction.getAnnotations());
+		
+		// add it to action list
 		actionList.add(action);
 	}
 
