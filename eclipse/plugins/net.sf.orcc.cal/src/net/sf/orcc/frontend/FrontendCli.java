@@ -66,9 +66,9 @@ import org.eclipse.xtext.validation.IResourceValidator;
 import org.eclipse.xtext.validation.Issue;
 
 /**
- * This class defines an RVC-CAL command live version of the front-end. It
- * should be used with the folowing command-line, when all plugins are in
- * eclipse plugin folder :
+ * This class defines an RVC-CAL command line version of the frontend. It should
+ * be used with the folowing command-line, when all plugins are loaded by
+ * eclipse :
  * 
  * <pre>
  * eclipse -application net.sf.orcc.cal.cli -data &lt;workspacePath&gt; &lt;projectName&gt;
@@ -94,7 +94,7 @@ public class FrontendCli implements IApplication {
 
 		CalStandaloneSetup.doSetup();
 
-		// Create a resource set to hold the resources.
+		// Get the resource set used by Frontend
 		emfResourceSet = Frontend.instance.getResourceSet();
 		// Register the package to ensure it is available during loading.
 		emfResourceSet.getPackageRegistry().put(CalPackage.eNS_URI,
