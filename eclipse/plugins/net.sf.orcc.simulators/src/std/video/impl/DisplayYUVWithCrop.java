@@ -141,12 +141,12 @@ public class DisplayYUVWithCrop {
 
 		for (int i = 0; i < pictureWidth / 2; i++) {
 			for (int j = 0; j < pictureHeight / 2; j++) {
-				int u = pictureBufferU[i + j * pictureWidth / 2];
-				int v = pictureBufferV[i + j * pictureWidth / 2];
-				int y0 = pictureBufferY[i * 2 + j * 2 * pictureWidth];
-				int y1 = pictureBufferY[i * 2 + 1 + j * 2 * pictureWidth];
-				int y2 = pictureBufferY[i * 2 + (j * 2 + 1) * pictureWidth];
-				int y3 = pictureBufferY[i * 2 + 1 + (j * 2 + 1) * pictureWidth];
+				int u = pictureBufferU[i + j * pictureWidth / 2] & 0xFF;
+				int v = pictureBufferV[i + j * pictureWidth / 2] & 0xFF;
+				int y0 = pictureBufferY[i * 2 + j * 2 * pictureWidth] & 0xFF;
+				int y1 = pictureBufferY[i * 2 + 1 + j * 2 * pictureWidth] & 0xFF;
+				int y2 = pictureBufferY[i * 2 + (j * 2 + 1) * pictureWidth] & 0xFF;
+				int y3 = pictureBufferY[i * 2 + 1 + (j * 2 + 1) * pictureWidth] & 0xFF;
 
 				int rgb0 = convertYCbCrtoRGB(y0, u, v);
 				int rgb1 = convertYCbCrtoRGB(y1, u, v);
