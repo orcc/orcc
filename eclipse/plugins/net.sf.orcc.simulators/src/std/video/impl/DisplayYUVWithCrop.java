@@ -101,9 +101,9 @@ public class DisplayYUVWithCrop {
 	 * @param pictureHeight
 	 *            height
 	 */
-	public static void compareYUV_comparePicture(short[] pictureBufferY,
-			short[] pictureBufferU, short[] pictureBufferV,
-			Integer pictureWidth, Integer pictureHeight) {
+	public static void compareYUV_comparePicture(byte[] pictureBufferY,
+			byte[] pictureBufferU, byte[] pictureBufferV,
+			BigInteger pictureWidth, BigInteger pictureHeight) {
 
 	}
 
@@ -126,13 +126,15 @@ public class DisplayYUVWithCrop {
 		return (r << 16) | (g << 8) | b;
 	}
 
-	public static void displayYUV_displayPicture(short[] pictureBufferY,
-			short[] pictureBufferU, short[] pictureBufferV,
-			Integer pictureWidth, Integer pictureHeight) {
+	public static void displayYUV_displayPicture(byte[] pictureBufferY,
+			byte[] pictureBufferU, byte[] pictureBufferV,
+			BigInteger biPictureWidth, BigInteger biPictureHeight) {
+		int pictureWidth = biPictureWidth.intValue();
+		int pictureHeight = biPictureHeight.intValue();
 		if (pictureWidth != lastWidth || pictureHeight != lastHeight) {
 			setVideoSize(pictureWidth, pictureHeight);
 		}
-		
+
 		if (image == null) {
 			return;
 		}
