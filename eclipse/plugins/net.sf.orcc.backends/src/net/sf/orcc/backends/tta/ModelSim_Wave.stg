@@ -59,13 +59,8 @@ add wave -noupdate -divider \<NULL\>
 add wave -noupdate -format Logic /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<instance.id><endif>/<instance.id>_inst/clk
 add wave -noupdate -format Logic /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<instance.id><endif>/<instance.id>_inst/rst_n
 
-<if(instance.actor)>
 <instance.actor.inputs: { input | <addInstanceInput(input, i0, choosePrefix)> }; separator="\n">
-<instance.actor.outputs: { output | <addInstanceOutput(output, i0, choosePrefix)> }; separator="\n">
-<elseif(instance.broadcast)>
-<instance.broadcast.inputs: { input | <addInstanceInput(input, i0, choosePrefix)> }; separator="\n">
-<instance.broadcast.outputs: { output | <addInstanceOutput(output, i0, choosePrefix)> }; separator="\n">
-<endif><
+<instance.actor.outputs: { output | <addInstanceOutput(output, i0, choosePrefix)> }; separator="\n"><
 endif>
 >>
 

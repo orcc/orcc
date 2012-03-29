@@ -338,64 +338,6 @@ callInitialize(initialize) ::= <<
 call <initialize.body.returnType> @<initialize.body.name> ()
 >>
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Broadcast
-///////////////////////////////////////////////////////////////////////////////
-
-printBcastOutputConditions(lastPort, currentPort, restPorts) ::= <<
-<if(restPorts)>%available_<currentPort.name> = icmp sge i32 %status_<currentPort.name>, 1
-%has_valid_<currentPort.name> = and i1 %has_valid_<lastPort.name>, %available_<currentPort.name>
-<printBcastOutputConditions(currentPort, first(restPorts), rest(restPorts))><
-else
->%available_<currentPort.name> = icmp sge i32 %status_<currentPort.name>, 1
-%can_copy_next_token = and i1 %has_valid_<lastPort.name>, %available_<currentPort.name><
-endif>
->>
-
-printBcastCondition(broadcast) ::= <<
-%has_valid_input = icmp sge i32 %status_input, 1
-%available_output_0 = icmp sge i32 %status_<first(broadcast.outputs).name>, 1
-%has_valid_output_0 = and i1 %has_valid_input, %available_output_0
-<printBcastOutputConditions(first(broadcast.outputs), first(rest(broadcast.outputs)), rest(rest(broadcast.outputs)))>
->>
-
-printBroadcast(broadcast) ::= <<
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Broadcast file
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Input FIFO
-<broadcast.inputs: { input | <printReadFunction(input, i0, true)> }; separator="\n\n">
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Output FIFOs
-<broadcast.outputs: { output | <printWriteFunction(output, i0, true)> }; separator="\n\n">
-
-
-define void @main() noreturn nounwind noinline {
-entry:
-	%token = alloca [1 x <broadcast.input.type>]
-	%token_ptr = bitcast [1 x <broadcast.input.type>]* %token to <broadcast.input.type>*
-
-	br label %bb_broadcast_start
-
-bb_broadcast_start:
-	<printPortsStatus("IN", broadcast.inputs)>
-	<printPortsStatus("OUT", broadcast.outputs)>
-	<printBcastCondition(broadcast)>
-	
-	br i1 %can_copy_next_token, label %bb_broadcast_copy, label %bb_broadcast_start
-	
-bb_broadcast_copy:
-	call void @_read_<broadcast.input.name>(<broadcast.input.type>* %token_ptr, i32 1)
-	<broadcast.outputs: { port | call void @_write_<port.name>(<port.type>* %token_ptr, i32 1) }; separator="\n">
-	
-	br label %bb_broadcast_start
-}
-
->>
-
 actorParameter(var, expr) ::= <<
 @<var.name> = global <var.type> <Constant(expr, var.type)>
 >>
@@ -473,9 +415,5 @@ endif>
 >>
 
 printInstance(instance, options) ::= <<
-<if(instance.actor)><
-printActor(instance.actor, options)
-><elseif(instance.broadcast)><
-printBroadcast(instance.broadcast)
-><endif>
+<if(instance.actor)><printActor(instance.actor, options)><endif>
 >>
