@@ -31,6 +31,7 @@ package std.io.impl;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -114,6 +115,17 @@ public class AccessFile extends GenericSource {
 		}
 	}
 
+	public static void writeByte(BigInteger desc, BigInteger v) {
+		if (SimulatorDescriptor.contains(desc.intValue())) {
+			try {
+				randomAccessFiles.get(desc.intValue()).writeByte(v.intValue());
+			} catch (IOException e) {
+				String msg = "I/O error : writeByte function";
+				throw new RuntimeException(msg, e);
+			}
+		}
+	}
+	
 	public static void writeBytes(Integer desc, int buf[], Integer count) {
 		if (SimulatorDescriptor.contains(desc)) {
 			RandomAccessFile raf = randomAccessFiles.get(desc);
@@ -128,6 +140,20 @@ public class AccessFile extends GenericSource {
 		}
 	}
 
+	public static void writeBytes(BigInteger desc, int buf[], BigInteger count) {
+		if (SimulatorDescriptor.contains(desc.intValue())) {
+			RandomAccessFile raf = randomAccessFiles.get(desc.intValue());
+			try {
+				for (int i = 0; i < count.intValue(); i++) {
+					raf.writeByte(buf[i]);
+				}
+			} catch (IOException e) {
+				String msg = "I/O error : readNBytes function";
+				throw new RuntimeException(msg, e);
+			}
+		}
+	}
+	
 	public static Integer sizeOfFile(Integer desc) {
 		if (SimulatorDescriptor.contains(desc)) {
 			try {

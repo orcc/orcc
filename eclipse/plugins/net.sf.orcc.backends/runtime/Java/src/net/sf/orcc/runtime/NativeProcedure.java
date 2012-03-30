@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.runtime;
 
+import java.math.BigInteger;
+
 import net.sf.orcc.runtime.source.Source;
 import std.io.impl.AccessFile;
 import std.io.impl.AccessImage;
@@ -108,6 +110,14 @@ public class NativeProcedure {
 
 	/**
 	 * @param desc
+	 * @param v
+	 */
+	public static void writeByte(BigInteger desc, BigInteger v) {
+		AccessFile.writeByte(desc, v);
+	}
+
+	/**
+	 * @param desc
 	 * @param buffer
 	 * @param count
 	 */
@@ -115,6 +125,15 @@ public class NativeProcedure {
 		AccessFile.writeBytes(desc, buffer, count);
 	}
 
+	/**
+	 * @param desc
+	 * @param buffer
+	 * @param count
+	 */
+	public static void writeBytes(BigInteger desc, int[] buffer, BigInteger count) {
+		AccessFile.writeBytes(desc, buffer, count);
+	}
+	
 	/**
 	 * @param desc
 	 * @return
