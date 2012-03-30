@@ -324,6 +324,7 @@ public class FrontendCli implements IApplication {
 	@Override
 	public Object start(IApplicationContext context) {
 		Map<?, ?> map = context.getArguments();
+
 		String[] args = (String[]) map
 				.get(IApplicationContext.APPLICATION_ARGS);
 
@@ -353,14 +354,14 @@ public class FrontendCli implements IApplication {
 			restoreAutoBuild();
 
 		} catch (OrccException oe) {
-			System.out.println(oe.getMessage());
+			System.err.println(oe.getMessage());
 		} catch (CoreException ce) {
-			System.out.println(ce.getMessage());
+			System.err.println(ce.getMessage());
 		} finally {
 			try {
 			restoreAutoBuild();
 			} catch (CoreException e) {
-				System.out.println(e.getMessage());
+				System.err.println(e.getMessage());
 			}
 		}
 
