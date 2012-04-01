@@ -29,6 +29,8 @@
  */
 package net.sf.orcc.df.util;
 
+import static org.w3c.dom.Node.ELEMENT_NODE;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -84,7 +86,7 @@ import org.w3c.dom.Node;
  * 
  */
 public class XdfParser {
-	
+
 	/**
 	 * This class defines a type entry.
 	 * 
@@ -158,7 +160,8 @@ public class XdfParser {
 			if (getType() == TYPE) {
 				return (Type) content;
 			} else {
-				throw new OrccRuntimeException("this entry does not contain a type");
+				throw new OrccRuntimeException(
+						"this entry does not contain a type");
 			}
 		}
 
@@ -702,15 +705,23 @@ public class XdfParser {
 
 				Attribute attr;
 				if (kind.equals(XdfConstants.CUSTOM)) {
-					// TODO custom
-					attr = factory.createAttribute(attrName,
-							factory.createWrapperXml());
+					// find the first element child
+					Node child = node.getFirstChild();
+					while (child != null && child.getNodeType() != ELEMENT_NODE) {
+						child = child.getNextSibling();
+					}
+					if (child == null) {
+						continue;
+					}
+
+					// serialize it to a String
+					String value = DomUtil.writeToString(child);
+					attr = factory.createAttribute(attrName, value);
 				} else if (kind.equals(XdfConstants.FLAG)) {
 					attr = factory.createAttribute(attrName, null);
 				} else if (kind.equals(XdfConstants.STRING)) {
 					String value = attribute.getAttribute("value");
-					attr = factory.createAttribute(attrName,
-							factory.createWrapperString(value));
+					attr = factory.createAttribute(attrName, value);
 				} else if (kind.equals(XdfConstants.TYPE)) {
 					Type type = typeParser.parseType(attribute.getFirstChild())
 							.getResult();
@@ -954,21 +965,27 @@ public class XdfParser {
 			throw new OrccRuntimeException("Port has an empty name");
 		}
 
-		boolean native_ = false;
+		Node child = cont.getNode();
+
+		// creates a port and parses its attributes
+		Port port = DfFactory.eINSTANCE.createPort(type, name);
+		parseAttributes(port.getAttributes(), child);
+
+		// DEPRECATED USE OF NOTE ELEMENT
 		Node node = cont.getNode();
 		while (node != null) {
 			if (node.getNodeName().equals("Note")) {
 				Element note = (Element) node;
 				if ("native".equals(note.getAttribute("kind"))) {
-					native_ = true;
+					System.err
+							.println("Deprecated Note kind=\"native\" found.");
+					port.setAttribute("native", (Object) null);
 					break;
 				}
 			}
 			node = node.getNextSibling();
 		}
-
-		// creates a port
-		Port port = DfFactory.eINSTANCE.createPort(type, name, native_);
+		// DEPRECATED USE OF NOTE ELEMENT
 
 		// adds the port to inputs or outputs depending on its kind
 		String kind = eltPort.getAttribute("kind");

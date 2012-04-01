@@ -38,8 +38,6 @@ import java.util.List;
 
 import net.sf.dftools.graph.Vertex;
 import net.sf.dftools.util.Attribute;
-import net.sf.dftools.util.WrapperString;
-import net.sf.dftools.util.WrapperXml;
 import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Argument;
@@ -69,9 +67,9 @@ import net.sf.orcc.util.DomUtil;
 
 import org.eclipse.emf.common.util.ECollections;
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * This class defines an XDF network writer.
@@ -334,14 +332,23 @@ public class XdfWriter {
 			attributeElt.setAttribute("name", attribute.getName());
 
 			String kind;
-			EObject value = attribute.getContainedValue();
-			if (attribute.getPojoValue() instanceof String) {
-				kind = XdfConstants.STRING;
-				String str = ((WrapperString) value).getString();
-				attributeElt.setAttribute("value", str);
-			} else if (value instanceof WrapperXml) {
-				// TODO custom
-				kind = XdfConstants.CUSTOM;
+			Object value = attribute.getValue();
+			if (value instanceof String) {
+				String str = (String) value;
+				if (str.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")) {
+					// that is somewhat arbitrary, but a String is only
+					// considered XML content if it starts with that prologue
+					// (which written by default by DomUtil.writeToString)
+					Document document = DomUtil.parseDocument(str);
+					Element docElt = document.getDocumentElement();
+					kind = XdfConstants.CUSTOM;
+
+					Node imported = this.document.importNode(docElt, true);
+					attributeElt.appendChild(imported);
+				} else {
+					kind = XdfConstants.STRING;
+					attributeElt.setAttribute("value", (String) value);
+				}
 			} else if (value instanceof Type) {
 				kind = XdfConstants.TYPE;
 				Type type = (Type) value;
@@ -552,11 +559,8 @@ public class XdfWriter {
 			portElt.setAttribute("name", port.getName());
 			portElt.appendChild(writeType(port.getType()));
 
-			if (port.isNative()) {
-				Element note = document.createElement("Note");
-				note.setAttribute("kind", "native");
-				portElt.appendChild(note);
-			}
+			// attributes
+			writeAttributes(portElt, port.getAttributes());
 		}
 	}
 

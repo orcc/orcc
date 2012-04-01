@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2012, Synflow
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,6 +29,8 @@
  */
 package net.sf.orcc.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -96,6 +99,20 @@ public class DomUtil {
 	}
 
 	/**
+	 * Parses the given String as XML and returns the corresponding DOM
+	 * document. The String is converted to an input stream so that encoding is
+	 * taken into account (otherwise if we pass a String to an LSInput DOM will
+	 * ignore the encoding and assume UTF-16).
+	 * 
+	 * @param str
+	 *            a String
+	 * @return a DOM document
+	 */
+	public static Document parseDocument(String str) {
+		return parseDocument(new ByteArrayInputStream(str.getBytes()));
+	}
+
+	/**
 	 * Parses the given input stream as XML and returns the corresponding DOM
 	 * document.
 	 * 
@@ -122,34 +139,28 @@ public class DomUtil {
 	}
 
 	/**
-	 * Writes the given document to the given output stream.
+	 * Returns a string representation of the given node. Like
+	 * {@link #parseDocument(String)}, we use an intermediary byte array output
+	 * stream so we can specify the encoding.
 	 * 
-	 * @param os
-	 *            an output stream
-	 * @param document
-	 *            a DOM document created by
-	 *            {@link #writeDocument(OutputStream, Document)}
+	 * @param node
+	 *            a DOM node
 	 */
 	public static String writeToString(Node node) {
-		getImplementation();
-		DOMImplementationLS implLS = (DOMImplementationLS) impl;
-
-		// serialize the document, close the stream
-		LSSerializer serializer = implLS.createLSSerializer();
-		serializer.getDomConfig().setParameter("format-pretty-print", true);
-		return serializer.writeToString(node);
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		writeDocument(os, node);
+		return os.toString();
 	}
 
 	/**
-	 * Writes the given document to the given output stream.
+	 * Writes the given node to the given output stream.
 	 * 
 	 * @param os
 	 *            an output stream
-	 * @param document
-	 *            a DOM document created by
-	 *            {@link #writeDocument(OutputStream, Document)}
+	 * @param node
+	 *            a DOM node
 	 */
-	public static void writeDocument(OutputStream os, Document document) {
+	public static void writeDocument(OutputStream os, Node node) {
 		getImplementation();
 		DOMImplementationLS implLS = (DOMImplementationLS) impl;
 
@@ -160,7 +171,7 @@ public class DomUtil {
 		// serialize the document, close the stream
 		LSSerializer serializer = implLS.createLSSerializer();
 		serializer.getDomConfig().setParameter("format-pretty-print", true);
-		serializer.write(document, output);
+		serializer.write(node, output);
 	}
 
 }
