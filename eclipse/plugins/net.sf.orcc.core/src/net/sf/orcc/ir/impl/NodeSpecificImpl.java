@@ -39,9 +39,9 @@ public abstract class NodeSpecificImpl extends NodeImpl implements NodeSpecific 
 	protected EClass eStaticClass() {
 		return IrPackage.Literals.NODE_SPECIFIC;
 	}
-	
+
 	@Override
-	public boolean isNodeSpecific(){
+	public boolean isNodeSpecific() {
 		return true;
 	}
 

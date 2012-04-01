@@ -110,7 +110,7 @@ public interface Instruction extends Attributable {
 	 * @return <code>true</code> if the instruction is a backend specific instruction
 	 */
 	boolean isInstSpecific();
-	
+
 	/**
 	 * Sets the line number of this instruction.
 	 * 

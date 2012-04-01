@@ -1041,14 +1041,14 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		setNsURI(eNS_URI);
 
 		// Obtain other dependent packages
+		UtilPackage theUtilPackage = (UtilPackage) EPackage.Registry.INSTANCE
+				.getEPackage(UtilPackage.eNS_URI);
 		IrPackage theIrPackage = (IrPackage) EPackage.Registry.INSTANCE
 				.getEPackage(IrPackage.eNS_URI);
 		GraphPackage theGraphPackage = (GraphPackage) EPackage.Registry.INSTANCE
 				.getEPackage(GraphPackage.eNS_URI);
 		MocPackage theMocPackage = (MocPackage) EPackage.Registry.INSTANCE
 				.getEPackage(MocPackage.eNS_URI);
-		UtilPackage theUtilPackage = (UtilPackage) EPackage.Registry.INSTANCE
-				.getEPackage(UtilPackage.eNS_URI);
 		EcorePackage theEcorePackage = (EcorePackage) EPackage.Registry.INSTANCE
 				.getEPackage(EcorePackage.eNS_URI);
 
@@ -1057,6 +1057,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		// Set bounds for type parameters
 
 		// Add supertypes to classes
+		unitEClass.getESuperTypes().add(theUtilPackage.getAttributable());
 		portEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		instanceEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		entityEClass.getESuperTypes().add(theGraphPackage.getVertex());

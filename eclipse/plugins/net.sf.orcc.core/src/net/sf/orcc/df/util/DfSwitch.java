@@ -96,6 +96,8 @@ public class DfSwitch<T> extends Switch<T> {
 			Unit unit = (Unit) theEObject;
 			T result = caseUnit(unit);
 			if (result == null)
+				result = caseAttributable(unit);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}

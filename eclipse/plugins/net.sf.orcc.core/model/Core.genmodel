@@ -149,7 +149,9 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Param/variable"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Param/byRef"/>
     </genClasses>
-    <genClasses image="false" ecoreClass="Ir.ecore#//Node"/>
+    <genClasses image="false" ecoreClass="Ir.ecore#//Node">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Node/cfgNode"/>
+    </genClasses>
     <genClasses ecoreClass="Ir.ecore#//NodeBlock">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//NodeBlock/instructions"/>
     </genClasses>
@@ -278,6 +280,9 @@
     <genClasses ecoreClass="Ir.ecore#//Cfg">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Cfg/entry"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Cfg/exit"/>
+    </genClasses>
+    <genClasses ecoreClass="Ir.ecore#//CfgNode">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//CfgNode/node"/>
     </genClasses>
   </genPackages>
   <genPackages prefix="Moc" basePackage="net.sf.orcc" disposableProviderFactory="true"

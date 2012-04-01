@@ -28,12 +28,12 @@
  */
 package net.sf.orcc.df;
 
+import net.sf.dftools.util.Attributable;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines a unit.
@@ -41,7 +41,7 @@ import org.eclipse.emf.ecore.EObject;
  * @author Matthieu Wipliez
  * @model
  */
-public interface Unit extends EObject {
+public interface Unit extends Attributable {
 
 	/**
 	 * Returns the constant with the given name.

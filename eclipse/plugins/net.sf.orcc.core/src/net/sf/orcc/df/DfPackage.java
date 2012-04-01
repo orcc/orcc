@@ -228,12 +228,21 @@ public interface DfPackage extends EPackage {
 	int UNIT = 0;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int UNIT__ATTRIBUTES = UtilPackage.ATTRIBUTABLE__ATTRIBUTES;
+
+	/**
 	 * The feature id for the '<em><b>Constants</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int UNIT__CONSTANTS = 0;
+	int UNIT__CONSTANTS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Procedures</b></em>' containment reference list.
@@ -241,7 +250,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int UNIT__PROCEDURES = 1;
+	int UNIT__PROCEDURES = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>File Name</b></em>' attribute. <!--
@@ -250,7 +259,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int UNIT__FILE_NAME = 2;
+	int UNIT__FILE_NAME = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute. <!--
@@ -259,7 +268,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int UNIT__LINE_NUMBER = 3;
+	int UNIT__LINE_NUMBER = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -268,7 +277,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int UNIT__NAME = 4;
+	int UNIT__NAME = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 4;
 
 	/**
 	 * The number of structural features of the '<em>Unit</em>' class. <!--
@@ -277,7 +286,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int UNIT_FEATURE_COUNT = 5;
+	int UNIT_FEATURE_COUNT = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 5;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
