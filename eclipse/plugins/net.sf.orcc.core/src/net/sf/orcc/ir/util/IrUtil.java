@@ -34,9 +34,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.dftools.util.util.EcoreHelper;
-import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.Network;
-import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
@@ -54,7 +51,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -289,25 +285,6 @@ public class IrUtil {
 		}
 
 		return block;
-	}
-
-	/**
-	 * Returns <code>true</code> if the given port is an input port of its
-	 * container. This method works for actor, broadcast and network containers.
-	 * 
-	 * @param port
-	 *            a port
-	 * @return <code>true</code> if the given port is an input port
-	 */
-	public static boolean isInput(Port port) {
-		EObject cter = port.eContainer();
-		if (cter instanceof Network) {
-			Network network = (Network) cter;
-			return network.getInputs().contains(port);
-		}
-		EStructuralFeature feature = port.eContainingFeature();
-		return feature == DfPackage.eINSTANCE.getActor_Inputs()
-				|| feature == DfPackage.eINSTANCE.getBroadcast_Inputs();
 	}
 
 	private static boolean isWhileJoinNode(Node node) {

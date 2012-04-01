@@ -30,12 +30,12 @@ package net.sf.orcc.df.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import net.sf.dftools.graph.impl.VertexImpl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import net.sf.dftools.graph.Edge;
+import net.sf.dftools.graph.impl.VertexImpl;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Broadcast;
@@ -45,6 +45,7 @@ import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.moc.MoC;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -353,22 +354,12 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	@Override
 	public String getPackage() {
-		int index = name.lastIndexOf('.');
-		if (index == -1) {
-			return "";
-		} else {
-			return name.substring(0, index);
-		}
+		return DfUtil.getPackage(name);
 	}
 
 	@Override
 	public String getSimpleName() {
-		int index = name.lastIndexOf('.');
-		String simpleName = name;
-		if (index != -1) {
-			simpleName = name.substring(index + 1);
-		}
-		return simpleName;
+		return DfUtil.getSimpleName(name);
 	}
 
 	@Override

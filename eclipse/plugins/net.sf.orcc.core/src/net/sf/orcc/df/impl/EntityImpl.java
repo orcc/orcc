@@ -19,6 +19,7 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -264,12 +265,7 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 
 	@Override
 	public String getPackage() {
-		int index = name.lastIndexOf('.');
-		if (index == -1) {
-			return "";
-		} else {
-			return name.substring(0, index);
-		}
+		return DfUtil.getPackage(name);
 	}
 
 	@Override
@@ -306,12 +302,7 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 
 	@Override
 	public String getSimpleName() {
-		int index = name.lastIndexOf('.');
-		String simpleName = name;
-		if (index != -1) {
-			simpleName = name.substring(index + 1);
-		}
-		return simpleName;
+		return DfUtil.getSimpleName(name);
 	}
 
 	@Override
