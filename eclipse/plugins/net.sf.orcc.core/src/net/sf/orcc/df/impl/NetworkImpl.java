@@ -175,11 +175,6 @@ public class NetworkImpl extends EntityImpl implements Network {
 	}
 
 	@Override
-	public Edge add(Vertex source, Vertex target) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public void add(Vertex vertex) {
 		if (vertex instanceof Entity) {
 			getEntities().add((Entity) vertex);
@@ -187,6 +182,11 @@ public class NetworkImpl extends EntityImpl implements Network {
 			getInstances().add((Instance) vertex);
 		}
 		getVertices().add(vertex);
+	}
+
+	@Override
+	public Edge add(Vertex source, Vertex target) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -567,36 +567,6 @@ public class NetworkImpl extends EntityImpl implements Network {
 	}
 
 	@Override
-	public Vertex getEntry() {
-		Vertex first = null;
-		for (Vertex vertex : getVertices()) {
-			if (vertex.getIncoming().isEmpty()) {
-				if (first != null) {
-					// first vertex already found, returns null
-					return null;
-				}
-				first = vertex;
-			}
-		}
-		return first;
-	}
-
-	@Override
-	public Vertex getExit() {
-		Vertex last = null;
-		for (Vertex vertex : getVertices()) {
-			if (vertex.getOutgoing().isEmpty()) {
-				if (last != null) {
-					// last vertex already found, returns null
-					return null;
-				}
-				last = vertex;
-			}
-		}
-		return last;
-	}
-
-	@Override
 	public IFile getFile() {
 		String fileName = getFileName();
 		if (fileName == null) {
@@ -612,6 +582,21 @@ public class NetworkImpl extends EntityImpl implements Network {
 	 */
 	public String getFileName() {
 		return fileName;
+	}
+
+	@Override
+	public Vertex getFirst() {
+		Vertex first = null;
+		for (Vertex vertex : getVertices()) {
+			if (vertex.getIncoming().isEmpty()) {
+				if (first != null) {
+					// first vertex already found, returns null
+					return null;
+				}
+				first = vertex;
+			}
+		}
+		return first;
 	}
 
 	/**
@@ -670,6 +655,21 @@ public class NetworkImpl extends EntityImpl implements Network {
 		}
 
 		return instances;
+	}
+
+	@Override
+	public Vertex getLast() {
+		Vertex last = null;
+		for (Vertex vertex : getVertices()) {
+			if (vertex.getOutgoing().isEmpty()) {
+				if (last != null) {
+					// last vertex already found, returns null
+					return null;
+				}
+				last = vertex;
+			}
+		}
+		return last;
 	}
 
 	/**
