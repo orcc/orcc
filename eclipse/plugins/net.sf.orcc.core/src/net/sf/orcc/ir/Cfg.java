@@ -29,6 +29,9 @@
 package net.sf.orcc.ir;
 
 import net.sf.dftools.graph.Graph;
+import net.sf.dftools.graph.Vertex;
+
+import org.eclipse.emf.common.util.EList;
 
 /**
  * This interface defines a Control-Flow Graph.
@@ -47,15 +50,6 @@ public interface Cfg extends Graph {
 	CfgNode getEntry();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Cfg#getEntry <em>Entry</em>}' reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Entry</em>' reference.
-	 * @see #getEntry()
-	 * @generated
-	 */
-	void setEntry(CfgNode value);
-
-	/**
 	 * Returns the exit node of this CFG.
 	 * 
 	 * @return the exit node of this CFG
@@ -64,12 +58,28 @@ public interface Cfg extends Graph {
 	CfgNode getExit();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Cfg#getExit <em>Exit</em>}' reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Exit</em>' reference.
-	 * @see #getExit()
-	 * @generated
+	 * Returns the list of this CFG's nodes. This returns the same as
+	 * {@link #getVertices()} but as a list of {@link CfgNode}s rather than as a
+	 * list of {@link Vertex}s.
+	 * 
+	 * @return the list of nodes
 	 */
-	void setExit(CfgNode value);
+	EList<CfgNode> getNodes();
+
+	/**
+	 * Sets the entry node of this CFG.
+	 * 
+	 * @param entry
+	 *            the new entry node
+	 */
+	void setEntry(CfgNode entry);
+
+	/**
+	 * Sets the exit node of this CFG.
+	 * 
+	 * @param exit
+	 *            the new exit node
+	 */
+	void setExit(CfgNode exit);
 
 }
