@@ -30,10 +30,14 @@ package net.sf.orcc.ir.cfg;
 
 import static net.sf.orcc.ir.IrFactory.eINSTANCE;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.dftools.graph.Edge;
+import net.sf.dftools.graph.GraphPackage;
+import net.sf.dftools.graph.util.Dota;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.FSM;
@@ -42,6 +46,9 @@ import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.Cfg;
 import net.sf.orcc.ir.CfgNode;
+
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EReference;
 
 /**
  * This class defines a CFG creator from an FSM.
@@ -56,8 +63,26 @@ public class CfgCreator extends DfSwitch<Void> {
 	public CfgCreator() {
 		cfg = eINSTANCE.createCfg();
 		CfgNode start = eINSTANCE.createCfgNode();
+		start.setAttribute("name", "entry");
 		cfg.add(start);
 		cfg.setEntry(start);
+	}
+
+	/**
+	 * Adds a new node to the CFG. If name is not <code>null</code>, this method
+	 * sets a "name" attribute to the given name.
+	 * 
+	 * @param name
+	 *            name that identifies this node(may be <code>null</code>)
+	 * @return a new node
+	 */
+	private CfgNode addNode(String name) {
+		CfgNode node = eINSTANCE.createCfgNode();
+		if (name != null) {
+			node.setAttribute("name", name);
+		}
+		cfg.add(node);
+		return node;
 	}
 
 	@Override
@@ -69,17 +94,14 @@ public class CfgCreator extends DfSwitch<Void> {
 			convertFsmToCfg(fsm);
 		}
 
+		System.out.println(new Dota().printDot(cfg));
+
 		normalizeConditionals();
+		System.out.println(new Dota().printDot(cfg));
+
+		new DominatorComputer().computeDominanceInformation(cfg);
 
 		return null;
-	}
-
-	/**
-	 * Transforms multiple conditioned branches to a series of binary branches.
-	 */
-	private void normalizeConditionals() {
-		List<CfgNode> nodes = cfg.getNodes();
-		nodes.toString();
 	}
 
 	/**
@@ -89,15 +111,15 @@ public class CfgCreator extends DfSwitch<Void> {
 	 *            a list of actions
 	 */
 	private void convertActionsToCfg(List<Action> actions) {
-		CfgNode idle = eINSTANCE.createCfgNode();
-		cfg.add(cfg.getFirst(), idle);
-		cfg.add(idle, idle);
+		CfgNode loopHeader = addNode("loop");
+		cfg.add(cfg.getEntry(), loopHeader);
 
 		for (Action action : actions) {
-			CfgNode bbNode = eINSTANCE.createCfgNode();
+			CfgNode bbNode = addNode(action.getName());
 			bbNode.setAttribute("action", action);
-			cfg.add(idle, bbNode);
-			cfg.add(bbNode, idle);
+
+			cfg.add(loopHeader, bbNode);
+			cfg.add(bbNode, loopHeader);
 		}
 	}
 
@@ -115,10 +137,13 @@ public class CfgCreator extends DfSwitch<Void> {
 		for (Transition transition : fsm.getTransitions()) {
 			CfgNode srcNode = getCfgNode(stateMap, transition.getSource());
 			CfgNode tgtNode = getCfgNode(stateMap, transition.getTarget());
-			CfgNode bbNode = eINSTANCE.createCfgNode();
+
+			Action action = transition.getAction();
+			CfgNode bbNode = addNode(action.getName());
+			bbNode.setAttribute("action", action);
+
 			cfg.add(srcNode, bbNode);
 			cfg.add(bbNode, tgtNode);
-			bbNode.setAttribute("action", transition.getAction());
 		}
 	}
 
@@ -145,9 +170,39 @@ public class CfgCreator extends DfSwitch<Void> {
 		CfgNode node = stateMap.get(state);
 		if (node == null) {
 			node = eINSTANCE.createCfgNode();
+			cfg.add(node);
 			stateMap.put(state, node);
 		}
 		return node;
+	}
+
+	/**
+	 * Transforms multiple conditioned branches to a series of binary branches.
+	 */
+	private void normalizeConditionals() {
+		List<CfgNode> nodes = new ArrayList<CfgNode>(cfg.getNodes());
+		for (CfgNode node : nodes) {
+			normalizeEdges(node, GraphPackage.Literals.VERTEX__INCOMING);
+			normalizeEdges(node, GraphPackage.Literals.VERTEX__OUTGOING);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private void normalizeEdges(CfgNode node, EReference reference) {
+		EList<Edge> list = (EList<Edge>) node.eGet(reference);
+		if (list.size() > 2) {
+			// multiple conditionals
+			CfgNode newNode = eINSTANCE.createCfgNode();
+			cfg.add(newNode);
+
+			List<Edge> subList = list.subList(1, list.size());
+			((EList<Edge>) newNode.eGet(reference)).addAll(subList);
+			if (reference == GraphPackage.Literals.VERTEX__INCOMING) {
+				cfg.add(newNode, node);
+			} else {
+				cfg.add(node, newNode);
+			}
+		}
 	}
 
 }
