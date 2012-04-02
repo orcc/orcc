@@ -116,6 +116,16 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 		return action;
 	}
 
+	@Override
+	public State getSource() {
+		return (State) super.getSource();
+	}
+
+	@Override
+	public State getTarget() {
+		return (State) super.getTarget();
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -154,7 +164,7 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		if (getSource() != null) {
-			builder.append(((State) getSource()).getName());
+			builder.append(getSource().getName());
 		}
 		builder.append(" (");
 		if (getAction() != null) {
@@ -162,7 +172,7 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 		}
 		builder.append(") --> ");
 		if (getSource() != null) {
-			builder.append(((State) getTarget()).getName());
+			builder.append(getTarget().getName());
 		}
 		return builder.toString();
 	}

@@ -46,6 +46,12 @@ public interface Transition extends Edge {
 	 */
 	Action getAction();
 
+	@Override
+	State getSource();
+
+	@Override
+	State getTarget();
+
 	/**
 	 * Sets the action that is the target of this transition.
 	 * 
