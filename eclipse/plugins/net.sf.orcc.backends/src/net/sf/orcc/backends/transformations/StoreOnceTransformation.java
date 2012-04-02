@@ -325,6 +325,9 @@ public class StoreOnceTransformation extends AbstractActorVisitor<Object> {
 		Var loadedVar = load.getSource().getVariable();
 		if (loadedVar.isGlobal()) {
 			EList<Expression> indexes = load.getIndexes();
+			for(Expression e: indexes){
+				super.doSwitch(e);
+			}
 			if (procedure.eContainer() instanceof Action) {
 				if (!globalsLockedSet.contains(loadedVar)) {
 					if (isStaticIndexes(indexes)) {
@@ -370,6 +373,9 @@ public class StoreOnceTransformation extends AbstractActorVisitor<Object> {
 		Var storedVar = store.getTarget().getVariable();
 		if (storedVar.isGlobal()) {
 			EList<Expression> indexes = store.getIndexes();
+			for(Expression e: indexes){
+				super.doSwitch(e);
+			}
 			if (procedure.eContainer() instanceof Action) {
 				if (!globalsLockedSet.contains(storedVar)) {
 					if (isStaticIndexes(indexes)) {
@@ -431,10 +437,6 @@ public class StoreOnceTransformation extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseProcedure(Procedure procedure) {
-
-		if (procedure.getName().equals("iteration")) {
-			System.out.println("Break");
-		}
 
 		// if a variable is locked then no transformation is applied
 		globalsLockedSet = new GlobalsLocked(procedure).getGlobalsLockedSet();
