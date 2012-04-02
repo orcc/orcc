@@ -56,7 +56,7 @@ extern char	*optarg;
 extern int getopt(int nargc, char * const *nargv, const char *ostr);
 
 //Nb Loops
-unsigned int nbLoops = 0; // 0: infinite loop.
+unsigned int nbLoops = -1; // -1: infinite loop.
 
 // input file
 char *input_file;
