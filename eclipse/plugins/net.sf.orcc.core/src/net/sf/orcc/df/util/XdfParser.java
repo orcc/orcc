@@ -61,7 +61,6 @@ import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
-import net.sf.orcc.util.BinOpSeqParser;
 import net.sf.orcc.util.DomUtil;
 import net.sf.orcc.util.OrccUtil;
 

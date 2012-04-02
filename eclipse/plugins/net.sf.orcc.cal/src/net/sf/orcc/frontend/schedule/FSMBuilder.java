@@ -48,8 +48,6 @@ import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Tag;
 import net.sf.orcc.frontend.Frontend;
-import net.sf.orcc.util.ActionList;
-import net.sf.orcc.util.UniqueEdge;
 
 import org.eclipse.emf.common.util.ECollections;
 import org.jgrapht.DirectedGraph;

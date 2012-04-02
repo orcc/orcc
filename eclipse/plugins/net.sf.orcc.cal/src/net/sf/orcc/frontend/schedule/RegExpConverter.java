@@ -44,7 +44,6 @@ import net.sf.orcc.df.Action;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Tag;
-import net.sf.orcc.util.ActionList;
 
 import org.jgrapht.ext.DOTExporter;
 import org.jgrapht.ext.StringEdgeNameProvider;

@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.util;
+package net.sf.orcc.frontend.schedule;
 
 import java.util.ArrayList;
 import java.util.HashMap;

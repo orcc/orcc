@@ -39,7 +39,6 @@ import net.sf.orcc.cal.cal.Priority;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Tag;
-import net.sf.orcc.util.ActionList;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.ext.DOTExporter;
