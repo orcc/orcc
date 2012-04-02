@@ -128,9 +128,6 @@ public class MultiMap<K, V> extends AbstractMap<K, Collection<V>> {
 
 	@Override
 	public Collection<V> put(K key, Collection<V> value) {
-		if (!(value instanceof Collection)) {
-			throw new IllegalArgumentException(value.getClass().toString());
-		}
 		Collection<V> original = get(key);
 		map.put(key, value);
 		return original;

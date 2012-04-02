@@ -102,7 +102,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 			int cns = scheduler.getRepetitions().get(tgt)
 					* moc.getNumTokensConsumed(connection.getTargetPort());
 			Port portCopy = (Port) copier.get(port);
-			sdfMoC.getInputPattern().setNumTokens((Port) portCopy, cns);
+			sdfMoC.getInputPattern().setNumTokens(portCopy, cns);
 			portsMap.put(portCopy, connection.getTargetPort());
 		}
 
@@ -113,7 +113,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 			int prd = scheduler.getRepetitions().get(src)
 					* moc.getNumTokensProduced(connection.getSourcePort());
 			Port portCopy = (Port) copier.get(port);
-			sdfMoC.getOutputPattern().setNumTokens((Port) portCopy, prd);
+			sdfMoC.getOutputPattern().setNumTokens(portCopy, prd);
 			portsMap.put(portCopy, connection.getSourcePort());
 		}
 	}

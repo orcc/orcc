@@ -139,7 +139,7 @@ public class ValueUtil {
 			dimensions[i] = listDimensions.get(i);
 		}
 
-		Type eltType = ((TypeList) type).getInnermostType();
+		Type eltType = type.getInnermostType();
 		return createArray(eltType, dimensions);
 	}
 

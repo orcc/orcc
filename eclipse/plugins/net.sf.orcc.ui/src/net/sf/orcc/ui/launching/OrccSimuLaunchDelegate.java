@@ -29,9 +29,6 @@
 package net.sf.orcc.ui.launching;
 
 import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
-
-import java.util.Map;
-
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.simulators.SimulatorFactory;
 
@@ -71,12 +68,12 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 			try {
 				SimulatorFactory factory = SimulatorFactory.getInstance();
 				factory.runSimulator(monitor, process, mode,
-						(Map<String, Object>) configuration.getAttributes());
+						configuration.getAttributes());
 			} catch (Exception e) {
 				// clear actor pool because it might not have been done if
 				// we got an error too soon
 				monitor.setCanceled(true);
-				
+
 				e.printStackTrace();
 
 				Throwable throwable = e;

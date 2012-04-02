@@ -29,9 +29,6 @@
 package net.sf.orcc.ui.launching;
 
 import static net.sf.orcc.OrccLaunchConstants.BACKEND;
-
-import java.util.Map;
-
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.backends.BackendFactory;
 
@@ -68,7 +65,7 @@ public class OrccRunLaunchDelegate implements ILaunchConfigurationDelegate {
 			try {
 				BackendFactory factory = BackendFactory.getInstance();
 				factory.runBackend(process.getProgressMonitor(), process,
-						(Map<String, Object>) configuration.getAttributes());
+						configuration.getAttributes());
 			} catch (Exception e) {
 				// clear actor pool because it might not have been done if we
 				// got an error too soon

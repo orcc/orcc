@@ -238,9 +238,9 @@ public class SimulatorFifo {
 			return;
 
 		if (type.isBool()) {
-			writer.println((Boolean) value);
+			writer.println(value);
 		} else if (type.isFloat()) {
-			writer.println((Float) value);
+			writer.println(value);
 		} else if (type.isInt() && ValueUtil.isInt(value)) {
 			BigInteger intVal = (BigInteger) value;
 			int size = type.getSizeInBits();

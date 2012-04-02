@@ -75,7 +75,7 @@ public class DeadCodeElimination extends AbstractActorVisitor<Object> {
 
 				Var target = phi.getTarget().getVariable();
 				ExprVar sourceExpr = (ExprVar) phi.getValues().get(index);
-				Var source = (Var) sourceExpr.getUse().getVariable();
+				Var source = sourceExpr.getUse().getVariable();
 
 				// translate the phi to an assign
 				ExprVar expr = IrFactory.eINSTANCE.createExprVar(source);

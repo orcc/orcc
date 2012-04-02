@@ -197,7 +197,7 @@ public class Instantiator extends DfSwitch<Network> {
 		Vertex result = (Vertex) copier.get(vertex);
 		if (result == null) {
 			// if not, get mapping from instance to entity
-			result = map.get((Instance) vertex);
+			result = map.get(vertex);
 		}
 		return result;
 	}

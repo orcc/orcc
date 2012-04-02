@@ -55,7 +55,7 @@ public class CacheManagerImpl extends EObjectImpl implements CacheManager {
 	public Cache getCache(Resource resource) {
 		Cache cache = cacheMap.get(resource);
 		if (cache == null) {
-			cache = (Cache) CacheFactory.eINSTANCE.createCache();
+			cache = CacheFactory.eINSTANCE.createCache();
 			cacheMap.put(resource, cache);
 		}
 

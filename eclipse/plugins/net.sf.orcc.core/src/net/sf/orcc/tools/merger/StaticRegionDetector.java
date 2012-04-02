@@ -172,7 +172,7 @@ public class StaticRegionDetector {
 
 		while (!stack.isEmpty()) {
 			Instance v = (Instance) stack.pop();
-			MoC moc = ((Instance) v).getMoC();
+			MoC moc = v.getMoC();
 			if (moc.isCSDF()) {
 				if (!discovered.contains(v)) {
 					discovered.add(v);

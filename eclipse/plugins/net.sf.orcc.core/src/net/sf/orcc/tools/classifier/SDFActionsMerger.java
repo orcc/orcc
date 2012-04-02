@@ -180,7 +180,7 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 			List<Action> actions = new ArrayList<Action>();
 
 			Transition transition = (Transition) it.next();
-			State target = (State) transition.getTarget();
+			State target = transition.getTarget();
 			actions.add(transition.getAction());
 
 			while (it.hasNext()) {

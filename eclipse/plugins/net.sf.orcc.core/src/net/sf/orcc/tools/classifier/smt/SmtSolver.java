@@ -99,7 +99,7 @@ public class SmtSolver {
 					// remove "bv" from the symbol
 					String contents = bv.getContents().substring(2);
 					BigInteger value = new BigInteger(contents);
-					return ((BigInteger) value).intValue();
+					return value.intValue();
 				}
 			}
 

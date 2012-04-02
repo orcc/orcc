@@ -51,8 +51,7 @@ public class VariableRenamer extends AbstractActorVisitor<Object> {
 	public Object caseProcedure(Procedure procedure) {
 		String procName = procedure.getName();
 		for (Var var : procedure.getLocals()) {
-			Var local = (Var) var;
-			var.setName(procName + "_" + local.getName());
+			var.setName(procName + "_" + var.getName());
 		}
 		return null;
 	}

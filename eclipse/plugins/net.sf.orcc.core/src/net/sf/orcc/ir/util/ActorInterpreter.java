@@ -511,7 +511,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 				if (isSchedulable(action)) {
 					// Update FSM state
 					if (checkOutputPattern(action.getOutputPattern())) {
-						fsmState = (State) transition.getTarget();
+						fsmState = transition.getTarget();
 						return action;
 					}
 					return null;

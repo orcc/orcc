@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, Åbo Akademi University
+ * Copyright (c) 2011, ï¿½bo Akademi University
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the Åbo Akademi University nor the names of its
+ *   * Neither the name of the ï¿½bo Akademi University nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -100,14 +100,14 @@ public class PromelaTokenAnalyzer extends AbstractActorVisitor<Object>{
 		for (Port port : inMap.keySet()) {
 			Connection connection = inMap.get(port);
 			if (connection.getSize() == null || port.getNumTokensConsumed() > connection.getSize()) {
-				inMap.get(port).setAttribute(Connection.BUFFER_SIZE, (int)port.getNumTokensConsumed());
+				inMap.get(port).setAttribute(Connection.BUFFER_SIZE, port.getNumTokensConsumed());
 			}
 		}
 		Map<Port,List<Connection>> outMap = instance.getOutgoingPortMap();
 		for (Port port : outMap.keySet()) {
 			for (Connection connection : outMap.get(port)) {
 				if (connection.getSize() == null || port.getNumTokensProduced() > connection.getSize()) {
-					connection.setAttribute(Connection.BUFFER_SIZE, (int)port.getNumTokensProduced());
+					connection.setAttribute(Connection.BUFFER_SIZE, port.getNumTokensProduced());
 				}
 			}
 		}

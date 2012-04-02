@@ -889,8 +889,8 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				// with an FSM: visits all transitions
 
 				for (Transition transition : fsm.getTransitions()) {
-					State source = (State) transition.getSource();
-					State target = (State) transition.getTarget();
+					State source = transition.getSource();
+					State target = transition.getTarget();
 					Action action = transition.getAction();
 					visitTransition(source, target, action);
 				}
