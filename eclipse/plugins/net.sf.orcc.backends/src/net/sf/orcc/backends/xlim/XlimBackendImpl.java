@@ -155,7 +155,7 @@ public class XlimBackendImpl extends AbstractBackend {
 
 		DfSwitch<?>[] transformations = { new UnitImporter(),
 				new SSATransformation(), new GlobalArrayInitializer(useHw),
-				new InstTernaryAdder(), new Inliner(true, true),
+				new Inliner(true, true), new InstTernaryAdder(),
 				new UnaryListRemoval(), new CustomPeekAdder(),
 				new DeadGlobalElimination(), new DeadCodeElimination(),
 				new XlimDeadVariableRemoval(), new ListFlattener(),
