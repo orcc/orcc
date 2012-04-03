@@ -91,7 +91,7 @@ else
 stateVar(var) ::= <<
 <if(var.initialized)
 >\<stateVar name="<var.name>" sourceName="<var.name>"\>
-	<initVariableExpr(var.type, var.initialValue)>
+	<initVariableExpr(var.type, var)>
 \</stateVar\><
 elseif(var.value || var.type.bool)
 >\<stateVar name="<var.name>" sourceName="<var.name>"\>
