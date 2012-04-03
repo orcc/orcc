@@ -33,6 +33,7 @@ import java.util.List;
 import net.sf.dftools.graph.Vertex;
 import net.sf.dftools.graph.visit.Ordering;
 import net.sf.orcc.ir.Cfg;
+import net.sf.orcc.ir.CfgNode;
 
 /**
  * This class computes the dominance information of a CFG using the algorithm
@@ -52,7 +53,7 @@ public class DominatorComputer {
 	 * @param cfg
 	 *            a CFG
 	 */
-	public void computeDominanceInformation(Cfg cfg) {
+	public int[] computeDominanceInformation(Cfg cfg) {
 		// compute reverse post-order
 		Ordering rpo = new ReversePostOrdering(cfg);
 		List<Vertex> vertices = rpo.getVertices();
@@ -75,9 +76,12 @@ public class DominatorComputer {
 				int newIdom = 0;
 				Vertex processed = null;
 				Vertex vertex = vertices.get(i);
-				List<Vertex> preds = vertex.getPredecessors();
-				for (Vertex pred : preds) {
-					int p = getId(pred);
+
+				@SuppressWarnings("unchecked")
+				List<CfgNode> preds = (List<CfgNode>) (List<?>) vertex
+						.getPredecessors();
+				for (CfgNode pred : preds) {
+					int p = pred.getNumber();
 					if (doms[p] != 0) {
 						// pred has already been processed, set newIdom
 						processed = pred;
@@ -87,9 +91,9 @@ public class DominatorComputer {
 				}
 
 				// for all predecessors different from processed
-				for (Vertex pred : preds) {
+				for (CfgNode pred : preds) {
 					if (pred != processed) {
-						int p = getId(pred);
+						int p = pred.getNumber();
 						if (doms[p] != 0) {
 							// i.e., if doms[p] already calculated
 							newIdom = intersect(p, newIdom);
@@ -106,8 +110,7 @@ public class DominatorComputer {
 			}
 		}
 
-		// end of dominator computer
-		System.out.println();
+		return doms;
 	}
 
 	private int intersect(int b1, int b2) {
@@ -122,10 +125,6 @@ public class DominatorComputer {
 			}
 		}
 		return finger1;
-	}
-
-	private int getId(Vertex vertex) {
-		return (Integer) vertex.getAttribute(0).getValue();
 	}
 
 }

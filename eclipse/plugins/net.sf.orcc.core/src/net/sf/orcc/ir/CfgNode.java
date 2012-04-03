@@ -33,45 +33,44 @@ package net.sf.orcc.ir;
 import net.sf.dftools.graph.Vertex;
 
 /**
- * <!-- begin-user-doc --> A representation of the model object '
- * <em><b>Cfg Node</b></em>'. <!-- end-user-doc -->
- *
- * <p>
- * The following features are supported:
- * <ul>
- *   <li>{@link net.sf.orcc.ir.CfgNode#getNode <em>Node</em>}</li>
- * </ul>
- * </p>
- *
- * @see net.sf.orcc.ir.IrPackage#getCfgNode()
+ * This class defines a node of a CFG graph. In addition to a vertex, a CFG node
+ * can be associated to a Node of a procedure (NodeBlock, NodeIf, NodeWhile). It
+ * also has a post-order number, useful for computing dominators.
+ * 
  * @model
- * @generated
  */
 public interface CfgNode extends Vertex {
+
 	/**
-	 * Returns the value of the '<em><b>Node</b></em>' reference. <!--
-	 * begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Node</em>' reference isn't clear, there really
-	 * should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
+	 * Returns the Node associated with this CFG node.
 	 * 
-	 * @return the value of the '<em>Node</em>' reference.
-	 * @see #setNode(Node)
-	 * @see net.sf.orcc.ir.IrPackage#getCfgNode_Node()
+	 * @return the Node associated with this CFG node
 	 * @model
-	 * @generated
 	 */
 	Node getNode();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.CfgNode#getNode <em>Node</em>}' reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Node</em>' reference.
-	 * @see #getNode()
-	 * @generated
+	 * Returns the post-order number of this CFG node.
+	 * 
+	 * @return the post-order number of this CFG node
+	 * @model transient="true"
 	 */
-	void setNode(Node value);
+	int getNumber();
 
-} // CfgNode
+	/**
+	 * Sets the Node associated with this CFG node.
+	 * 
+	 * @param node
+	 *            the Node to associate with this CFG node
+	 */
+	void setNode(Node node);
+
+	/**
+	 * Sets the post-order number of this CFG node.
+	 * 
+	 * @param number
+	 *            the post-order number of this CFG node
+	 */
+	void setNumber(int number);
+
+}

@@ -48,6 +48,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * The following features are implemented:
  * <ul>
  *   <li>{@link net.sf.orcc.ir.impl.CfgNodeImpl#getNode <em>Node</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.CfgNodeImpl#getNumber <em>Number</em>}</li>
  * </ul>
  * </p>
  *
@@ -64,37 +65,30 @@ public class CfgNodeImpl extends VertexImpl implements CfgNode {
 	protected Node node;
 
 	/**
+	 * The default value of the '{@link #getNumber() <em>Number</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getNumber()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final int NUMBER_EDEFAULT = 0;
+	/**
+	 * The cached value of the '{@link #getNumber() <em>Number</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getNumber()
+	 * @generated
+	 * @ordered
+	 */
+	protected int number = NUMBER_EDEFAULT;
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected CfgNodeImpl() {
 		super();
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	protected EClass eStaticClass() {
-		return IrPackage.Literals.CFG_NODE;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Node getNode() {
-		if (node != null && node.eIsProxy()) {
-			InternalEObject oldNode = (InternalEObject) node;
-			node = (Node) eResolveProxy(oldNode);
-			if (node != oldNode) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							IrPackage.CFG_NODE__NODE, oldNode, node));
-			}
-		}
-		return node;
 	}
 
 	/**
@@ -129,21 +123,17 @@ public class CfgNodeImpl extends VertexImpl implements CfgNode {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setNode(Node newNode) {
-		if (newNode != node) {
-			NotificationChain msgs = null;
-			if (node != null)
-				msgs = ((InternalEObject) node).eInverseRemove(this,
-						IrPackage.NODE__CFG_NODE, Node.class, msgs);
-			if (newNode != null)
-				msgs = ((InternalEObject) newNode).eInverseAdd(this,
-						IrPackage.NODE__CFG_NODE, Node.class, msgs);
-			msgs = basicSetNode(newNode, msgs);
-			if (msgs != null)
-				msgs.dispatch();
-		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.CFG_NODE__NODE, newNode, newNode));
+	@Override
+	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+		switch (featureID) {
+		case IrPackage.CFG_NODE__NODE:
+			if (resolve)
+				return getNode();
+			return basicGetNode();
+		case IrPackage.CFG_NODE__NUMBER:
+			return getNumber();
+		}
+		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
@@ -184,14 +174,14 @@ public class CfgNodeImpl extends VertexImpl implements CfgNode {
 	 * @generated
 	 */
 	@Override
-	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 		case IrPackage.CFG_NODE__NODE:
-			if (resolve)
-				return getNode();
-			return basicGetNode();
+			return node != null;
+		case IrPackage.CFG_NODE__NUMBER:
+			return number != NUMBER_EDEFAULT;
 		}
-		return super.eGet(featureID, resolve, coreType);
+		return super.eIsSet(featureID);
 	}
 
 	/**
@@ -204,8 +194,20 @@ public class CfgNodeImpl extends VertexImpl implements CfgNode {
 		case IrPackage.CFG_NODE__NODE:
 			setNode((Node) newValue);
 			return;
+		case IrPackage.CFG_NODE__NUMBER:
+			setNumber((Integer) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	protected EClass eStaticClass() {
+		return IrPackage.Literals.CFG_NODE;
 	}
 
 	/**
@@ -218,6 +220,9 @@ public class CfgNodeImpl extends VertexImpl implements CfgNode {
 		case IrPackage.CFG_NODE__NODE:
 			setNode((Node) null);
 			return;
+		case IrPackage.CFG_NODE__NUMBER:
+			setNumber(NUMBER_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -226,13 +231,77 @@ public class CfgNodeImpl extends VertexImpl implements CfgNode {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-		case IrPackage.CFG_NODE__NODE:
-			return node != null;
+	public Node getNode() {
+		if (node != null && node.eIsProxy()) {
+			InternalEObject oldNode = (InternalEObject) node;
+			node = (Node) eResolveProxy(oldNode);
+			if (node != oldNode) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							IrPackage.CFG_NODE__NODE, oldNode, node));
+			}
 		}
-		return super.eIsSet(featureID);
+		return node;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public int getNumber() {
+		return number;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setNode(Node newNode) {
+		if (newNode != node) {
+			NotificationChain msgs = null;
+			if (node != null)
+				msgs = ((InternalEObject) node).eInverseRemove(this,
+						IrPackage.NODE__CFG_NODE, Node.class, msgs);
+			if (newNode != null)
+				msgs = ((InternalEObject) newNode).eInverseAdd(this,
+						IrPackage.NODE__CFG_NODE, Node.class, msgs);
+			msgs = basicSetNode(newNode, msgs);
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.CFG_NODE__NODE, newNode, newNode));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setNumber(int newNumber) {
+		int oldNumber = number;
+		number = newNumber;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.CFG_NODE__NUMBER, oldNumber, number));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public String toString() {
+		if (eIsProxy())
+			return super.toString();
+
+		StringBuffer result = new StringBuffer(super.toString());
+		result.append(" (number: ");
+		result.append(number);
+		result.append(')');
+		return result.toString();
 	}
 
 } // CfgNodeImpl

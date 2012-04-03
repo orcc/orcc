@@ -32,6 +32,7 @@ import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.Vertex;
 import net.sf.dftools.graph.visit.Ordering;
 import net.sf.orcc.ir.Cfg;
+import net.sf.orcc.ir.CfgNode;
 
 /**
  * This class computes the reverse post-ordering of a CFG. It also labels the
@@ -51,35 +52,37 @@ public class ReversePostOrdering extends Ordering {
 	 *            a cfg
 	 */
 	public ReversePostOrdering(Cfg cfg) {
+		super(cfg.getVertices().size());
+
+		// starts post-order numbering at 1
 		num = 1;
-		visitVertex(cfg.getEntry());
+
+		// starts from the CFG's entry
+		visitNode(cfg.getEntry());
 	}
 
 	/**
 	 * Builds the search starting from the given vertex.
 	 * 
-	 * @param v
-	 *            a vertex
+	 * @param n
+	 *            a CFG node
 	 */
-	public void visitVertex(Vertex v) {
-		visited.add(v);
+	public void visitNode(CfgNode n) {
+		visited.add(n);
 
-		for (Edge edge : v.getOutgoing()) {
+		for (Edge edge : n.getOutgoing()) {
 			Vertex w = edge.getTarget();
-			if (visited.contains(w)) {
-				// edge goes to a node already visited
-				edge.setBackEdge(true);
-			} else {
-				edge.setBackEdge(false);
-				visitVertex(w);
+			if (!visited.contains(w)) {
+				// edge goes to a node not yet visited
+				visitNode((CfgNode) w);
 			}
 		}
 
 		// add to the beginning (to reverse the post-order)
-		vertices.add(0, v);
+		vertices.add(0, n);
 
-		// value of "order" is the post-order numbering
-		v.setAttribute("order", num);
+		// set the post-order numbering
+		n.setNumber(num);
 		num++;
 	}
 

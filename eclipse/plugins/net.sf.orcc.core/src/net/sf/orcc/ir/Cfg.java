@@ -67,6 +67,20 @@ public interface Cfg extends Graph {
 	EList<CfgNode> getNodes();
 
 	/**
+	 * Returns <code>true</code> if the given <code>m</code> node
+	 * <i>immediately</i> dominates the given <code>n</code> node. If the
+	 * dominance information has not been computed yet, it is computed now.
+	 * 
+	 * @param m
+	 *            a CFG node
+	 * @param n
+	 *            a CFG node
+	 * @return <code>true</code> if <code>m</code> immediately dominates
+	 *         <code>n</code>
+	 */
+	boolean immediatelyDominates(CfgNode m, CfgNode n);
+
+	/**
 	 * Sets the entry node of this CFG.
 	 * 
 	 * @param entry

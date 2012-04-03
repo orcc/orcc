@@ -283,6 +283,7 @@
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//CfgNode">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//CfgNode/node"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//CfgNode/number"/>
     </genClasses>
   </genPackages>
   <genPackages prefix="Moc" basePackage="net.sf.orcc" disposableProviderFactory="true"

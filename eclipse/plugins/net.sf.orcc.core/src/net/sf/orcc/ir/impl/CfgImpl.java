@@ -31,9 +31,11 @@
 package net.sf.orcc.ir.impl;
 
 import net.sf.dftools.graph.impl.GraphImpl;
+import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.ir.Cfg;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.IrPackage;
+import net.sf.orcc.ir.cfg.DominatorComputer;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.util.EList;
@@ -55,6 +57,11 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * @generated
  */
 public class CfgImpl extends GraphImpl implements Cfg {
+
+	private int[] doms;
+
+	private int edgesModCount;
+
 	/**
 	 * The cached value of the '{@link #getEntry() <em>Entry</em>}' reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -95,6 +102,13 @@ public class CfgImpl extends GraphImpl implements Cfg {
 	 */
 	public CfgNode basicGetExit() {
 		return exit;
+	}
+
+	/**
+	 * Computes the dominance information of this CFG.
+	 */
+	private void computeDominance() {
+		doms = new DominatorComputer().computeDominanceInformation(this);
 	}
 
 	/**
@@ -212,6 +226,18 @@ public class CfgImpl extends GraphImpl implements Cfg {
 	@SuppressWarnings("unchecked")
 	public EList<CfgNode> getNodes() {
 		return (EList<CfgNode>) (EList<?>) getVertices();
+	}
+
+	@Override
+	public boolean immediatelyDominates(CfgNode m, CfgNode n) {
+		// only computes dominance when necessary
+		int modCount = EcoreHelper.getModCount(getEdges());
+		if (doms == null || modCount != edgesModCount) {
+			edgesModCount = modCount;
+			computeDominance();
+		}
+
+		return m.getNumber() == doms[n.getNumber()];
 	}
 
 	/**
