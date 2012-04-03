@@ -43,6 +43,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
@@ -229,6 +230,22 @@ public class Inliner extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
+	public Object caseNodeIf(NodeIf nodeif) {
+		// Replace the local variable name by visiting caseExprVar
+		super.doSwitch(nodeif.getCondition());
+		super.caseNodeIf(nodeif);
+		return null;
+	}
+
+	@Override
+	public Object caseNodeWhile(NodeWhile nodeWhile) {
+		// Replace the local variable name by visiting caseExprVar
+		super.doSwitch(nodeWhile.getCondition());
+		super.caseNodeWhile(nodeWhile);
+		return null;
+	}
+	
+	@Override
 	public Object caseInstAssign(InstAssign assign) {
 		// Replace the local variable name by visiting caseExprVar
 		super.doSwitch(assign.getValue());
@@ -277,22 +294,20 @@ public class Inliner extends AbstractActorVisitor<Object> {
 		this.instReturn = instReturn;
 		return null;
 	}
-
+	
 	@Override
-	public Object caseNodeIf(NodeIf nodeif) {
+	public Object caseInstPhi(InstPhi instPhi) {
 		// Replace the local variable name by visiting caseExprVar
-		super.doSwitch(nodeif.getCondition());
-		super.caseNodeIf(nodeif);
+		Var var = instPhi.getTarget().getVariable();
+		if (localToLocalsMap.containsKey(var)) {
+			instPhi.getTarget().setVariable(localToLocalsMap.get(var));
+		}
+		for(Expression e : instPhi.getValues()){
+			super.doSwitch(e);
+		}
 		return null;
 	}
 
-	@Override
-	public Object caseNodeWhile(NodeWhile nodeWhile) {
-		// Replace the local variable name by visiting caseExprVar
-		super.doSwitch(nodeWhile.getCondition());
-		super.caseNodeWhile(nodeWhile);
-		return null;
-	}
 
 	/**
 	 * Replace the local variable name if a reference already exists to a global

@@ -49,6 +49,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
@@ -288,6 +289,14 @@ public class StoreOnceTransformation extends AbstractActorVisitor<Object> {
 	public Object caseInstAssign(InstAssign assign) {
 		// Replace the local variable name by visiting caseExprVar
 		super.doSwitch(assign.getValue());
+		return null;
+	}
+	
+	@Override
+	public Object caseInstPhi(InstPhi instPhi) {
+		for(Expression e : instPhi.getValues()){
+			super.doSwitch(e);
+		}
 		return null;
 	}
 
