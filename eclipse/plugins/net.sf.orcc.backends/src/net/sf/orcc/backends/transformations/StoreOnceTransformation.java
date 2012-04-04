@@ -49,13 +49,10 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
-import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
@@ -73,7 +70,7 @@ import org.eclipse.emf.common.util.EList;
  * 
  * @author Matthieu Wipliez
  * @author Thavot Richard
- * @version 1.0
+ * @version 1.1
  * 
  */
 public class StoreOnceTransformation extends AbstractActorVisitor<Object> {
@@ -178,6 +175,7 @@ public class StoreOnceTransformation extends AbstractActorVisitor<Object> {
 		}
 		return s;
 	}
+
 	private Set<Var> globalsLockedSet;
 
 	private Map<String, Var> keyToGlobalsMap;
@@ -192,11 +190,13 @@ public class StoreOnceTransformation extends AbstractActorVisitor<Object> {
 	private Map<Procedure, List<Var>> procedureToLoadedVarsMap;
 
 	public StoreOnceTransformation() {
+		super(true);
 		this.procedureToLoadedVarsMap = new HashMap<Procedure, List<Var>>();
 	}
 
 	private StoreOnceTransformation(
 			Map<Procedure, List<Var>> procedureToLoadedVarsMap) {
+		super(true);
 		this.procedureToLoadedVarsMap = procedureToLoadedVarsMap;
 	}
 
@@ -265,38 +265,13 @@ public class StoreOnceTransformation extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseActor(Actor actor) {
-
 		this.actor = actor;
+
+		if (!actor.getParameters().isEmpty())
+			new ParameterImporter().doSwitch(actor);
+
 		super.caseActor(actor);
 
-		return null;
-	}
-
-	/**
-	 * Replace the local variable name if a reference already exists to a global
-	 * variable
-	 */
-	@Override
-	public Object caseExprVar(ExprVar exprVar) {
-		Var var = exprVar.getUse().getVariable();
-		if (localToLocalsMap.containsKey(var)) {
-			exprVar.getUse().setVariable(localToLocalsMap.get(var));
-		}
-		return null;
-	}
-
-	@Override
-	public Object caseInstAssign(InstAssign assign) {
-		// Replace the local variable name by visiting caseExprVar
-		super.doSwitch(assign.getValue());
-		return null;
-	}
-	
-	@Override
-	public Object caseInstPhi(InstPhi instPhi) {
-		for(Expression e : instPhi.getValues()){
-			super.doSwitch(e);
-		}
 		return null;
 	}
 
@@ -334,7 +309,7 @@ public class StoreOnceTransformation extends AbstractActorVisitor<Object> {
 		Var loadedVar = load.getSource().getVariable();
 		if (loadedVar.isGlobal()) {
 			EList<Expression> indexes = load.getIndexes();
-			for(Expression e: indexes){
+			for (Expression e : indexes) {
 				super.doSwitch(e);
 			}
 			if (procedure.eContainer() instanceof Action) {
@@ -382,7 +357,7 @@ public class StoreOnceTransformation extends AbstractActorVisitor<Object> {
 		Var storedVar = store.getTarget().getVariable();
 		if (storedVar.isGlobal()) {
 			EList<Expression> indexes = store.getIndexes();
-			for(Expression e: indexes){
+			for (Expression e : indexes) {
 				super.doSwitch(e);
 			}
 			if (procedure.eContainer() instanceof Action) {
@@ -429,22 +404,6 @@ public class StoreOnceTransformation extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseNodeIf(NodeIf nodeif) {
-		// Replace the local variable name by visiting caseExprVar
-		super.doSwitch(nodeif.getCondition());
-		super.caseNodeIf(nodeif);
-		return null;
-	}
-
-	@Override
-	public Object caseNodeWhile(NodeWhile nodeWhile) {
-		// Replace the local variable name by visiting caseExprVar
-		super.doSwitch(nodeWhile.getCondition());
-		super.caseNodeWhile(nodeWhile);
-		return null;
-	}
-
-	@Override
 	public Object caseProcedure(Procedure procedure) {
 
 		// if a variable is locked then no transformation is applied
@@ -469,6 +428,19 @@ public class StoreOnceTransformation extends AbstractActorVisitor<Object> {
 			addParameters(procedure);
 		}
 
+		return null;
+	}
+
+	/**
+	 * Replace the local variable name if a reference already exists to a global
+	 * variable
+	 */
+	@Override
+	public Object caseExprVar(ExprVar exprVar) {
+		Var var = exprVar.getUse().getVariable();
+		if (localToLocalsMap.containsKey(var)) {
+			exprVar.getUse().setVariable(localToLocalsMap.get(var));
+		}
 		return null;
 	}
 

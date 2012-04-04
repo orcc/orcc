@@ -68,6 +68,8 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Matthieu Wipliez
  * @author Thavot Richard
  * 
+ * @version 1.1
+ * 
  */
 public class Inliner extends AbstractActorVisitor<Object> {
 
@@ -109,6 +111,7 @@ public class Inliner extends AbstractActorVisitor<Object> {
 	private InstReturn instReturn;
 
 	public Inliner(boolean inlineProcedure, boolean inlineFunction) {
+		super(true);
 		callGetter = new CallGetter(inlineProcedure, inlineFunction);
 	}
 
@@ -118,6 +121,7 @@ public class Inliner extends AbstractActorVisitor<Object> {
 	 * @param call
 	 */
 	public Inliner(InstCall call) {
+		super(true);
 		this.instCallList = new ArrayList<InstCall>();
 		this.instCallList.add(call);
 	}
@@ -128,14 +132,20 @@ public class Inliner extends AbstractActorVisitor<Object> {
 	 * @param calls
 	 */
 	public Inliner(List<InstCall> calls) {
+		super(true);
 		this.instCallList = new ArrayList<InstCall>();
 	}
 
 	public Object caseActor(Actor actor) {
+		//Removes parameters
+		if (!actor.getParameters().isEmpty())
+			new ParameterImporter().doSwitch(actor);
+		//Get calls 
 		if (callGetter != null) {
 			callGetter.doSwitch(actor);
 			this.instCallList = callGetter.getCalls();
 		}
+		//Inline calls
 		for (InstCall call : instCallList) {
 			if (!call.getProcedure().isNative()) {
 				this.currentCall = call;
@@ -227,22 +237,6 @@ public class Inliner extends AbstractActorVisitor<Object> {
 		nodes.addAll(indexNode + 1, inlined);
 		// 8.
 		IrUtil.delete(currentCall);
-	}
-
-	@Override
-	public Object caseNodeIf(NodeIf nodeif) {
-		// Replace the local variable name by visiting caseExprVar
-		super.doSwitch(nodeif.getCondition());
-		super.caseNodeIf(nodeif);
-		return null;
-	}
-
-	@Override
-	public Object caseNodeWhile(NodeWhile nodeWhile) {
-		// Replace the local variable name by visiting caseExprVar
-		super.doSwitch(nodeWhile.getCondition());
-		super.caseNodeWhile(nodeWhile);
-		return null;
 	}
 	
 	@Override
