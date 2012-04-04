@@ -162,25 +162,26 @@ public class FrontendCli implements IApplication {
 	 * @param container
 	 *            instance of IProject or IFolder to search in
 	 * @return list of *.cal files from container
-	 * @throws InterruptedException
+	 * @throws OrccException
 	 */
-	private List<IFile> getCalFiles(IContainer container) {
+	private List<IFile> getCalFiles(IContainer container) throws OrccException {
 		List<IFile> actors = new ArrayList<IFile>();
 	
 		IResource[] members = null;
 		try {
 			members = container.members();
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
-	
-		for (IResource resource : members) {
-			if (resource.getType() == IResource.FOLDER) {
-				actors.addAll(getCalFiles((IFolder) resource));
-			} else if (resource.getType() == IResource.FILE
-					&& resource.getFileExtension().equals("cal")) {
-				actors.add((IFile) resource);
+
+			for (IResource resource : members) {
+				if (resource.getType() == IResource.FOLDER) {
+					actors.addAll(getCalFiles((IFolder) resource));
+				} else if (resource.getType() == IResource.FILE
+						&& resource.getFileExtension().equals("cal")) {
+					actors.add((IFile) resource);
+				}
 			}
+		} catch (CoreException e) {
+			throw new OrccException("Unable to get members of IContainer "
+					+ container.getName());
 		}
 	
 		return actors;
@@ -242,11 +243,9 @@ public class FrontendCli implements IApplication {
 	 * 
 	 * @param p
 	 *            project to compile
-	 * @throws CoreException
 	 * @throws OrccException
 	 */
-	private void writeProjectIR(IProject p) throws
-			CoreException, OrccException {
+	private void writeProjectIR(IProject p) throws OrccException {
 
 		Frontend.instance.setOutputFolder(OrccUtil.getOutputFolder(p));
 
