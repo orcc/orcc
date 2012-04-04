@@ -37,7 +37,6 @@ import java.util.Map;
 
 import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.GraphPackage;
-import net.sf.dftools.graph.util.Dota;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.FSM;
@@ -94,12 +93,8 @@ public class CfgCreator extends DfSwitch<Void> {
 			convertFsmToCfg(fsm);
 		}
 
-		System.out.println(new Dota().printDot(cfg));
-
+		// transform n-branches conditionals to two-branches conditionals
 		normalizeConditionals();
-		System.out.println(new Dota().printDot(cfg));
-
-		new DominatorComputer().computeDominanceInformation(cfg);
 
 		return null;
 	}

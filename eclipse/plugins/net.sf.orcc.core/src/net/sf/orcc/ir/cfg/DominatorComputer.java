@@ -30,6 +30,7 @@ package net.sf.orcc.ir.cfg;
 
 import java.util.List;
 
+import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.Vertex;
 import net.sf.dftools.graph.visit.Ordering;
 import net.sf.orcc.ir.Cfg;
@@ -75,12 +76,11 @@ public class DominatorComputer {
 				// find the first processed predecessor and set newIdom
 				int newIdom = 0;
 				Vertex processed = null;
-				Vertex vertex = vertices.get(i);
+				CfgNode vertex = (CfgNode) vertices.get(i);
 
-				@SuppressWarnings("unchecked")
-				List<CfgNode> preds = (List<CfgNode>) (List<?>) vertex
-						.getPredecessors();
-				for (CfgNode pred : preds) {
+				List<Edge> edges = vertex.getIncoming();
+				for (Edge edge : edges) {
+					CfgNode pred = (CfgNode) edge.getSource();
 					int p = pred.getNumber();
 					if (doms[p] != 0) {
 						// pred has already been processed, set newIdom
@@ -91,7 +91,8 @@ public class DominatorComputer {
 				}
 
 				// for all predecessors different from processed
-				for (CfgNode pred : preds) {
+				for (Edge edge : edges) {
+					CfgNode pred = (CfgNode) edge.getSource();
 					if (pred != processed) {
 						int p = pred.getNumber();
 						if (doms[p] != 0) {
@@ -102,7 +103,7 @@ public class DominatorComputer {
 				}
 
 				// b is the post-order number of vertex
-				int b = n - i;
+				int b = vertex.getNumber();
 				if (doms[b] != newIdom) {
 					doms[b] = newIdom;
 					changed = true;

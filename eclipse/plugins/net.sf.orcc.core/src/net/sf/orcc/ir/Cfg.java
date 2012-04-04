@@ -81,6 +81,16 @@ public interface Cfg extends Graph {
 	boolean immediatelyDominates(CfgNode m, CfgNode n);
 
 	/**
+	 * Returns <code>true</code> if the given node is a loop-starting node,
+	 * which is a node that has two incoming edges, of which one is a back edge.
+	 * 
+	 * @param node
+	 *            a node of this CFG
+	 * @return <code>true</code> if the node is a loop-starting node
+	 */
+	boolean isLoop(CfgNode node);
+
+	/**
 	 * Sets the entry node of this CFG.
 	 * 
 	 * @param entry

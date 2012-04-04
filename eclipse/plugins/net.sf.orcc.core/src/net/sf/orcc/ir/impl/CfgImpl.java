@@ -30,6 +30,9 @@
  */
 package net.sf.orcc.ir.impl;
 
+import java.util.List;
+
+import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.impl.GraphImpl;
 import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.ir.Cfg;
@@ -238,6 +241,20 @@ public class CfgImpl extends GraphImpl implements Cfg {
 		}
 
 		return m.getNumber() == doms[n.getNumber()];
+	}
+
+	@Override
+	public boolean isLoop(CfgNode node) {
+		List<Edge> edges = node.getIncoming();
+		if (edges.size() == 2) {
+			for (Edge edge : edges) {
+				CfgNode predNode = (CfgNode) edge.getSource();
+				if (immediatelyDominates(predNode, node)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/**

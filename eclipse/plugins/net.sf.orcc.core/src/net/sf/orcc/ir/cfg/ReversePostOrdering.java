@@ -28,9 +28,10 @@
  */
 package net.sf.orcc.ir.cfg;
 
-import net.sf.dftools.graph.Edge;
+import java.util.Collections;
+
 import net.sf.dftools.graph.Vertex;
-import net.sf.dftools.graph.visit.Ordering;
+import net.sf.dftools.graph.visit.DFS;
 import net.sf.orcc.ir.Cfg;
 import net.sf.orcc.ir.CfgNode;
 
@@ -41,7 +42,7 @@ import net.sf.orcc.ir.CfgNode;
  * @author Matthieu Wipliez
  * 
  */
-public class ReversePostOrdering extends Ordering {
+public class ReversePostOrdering extends DFS {
 
 	private int num;
 
@@ -58,31 +59,18 @@ public class ReversePostOrdering extends Ordering {
 		num = 1;
 
 		// starts from the CFG's entry
-		visitNode(cfg.getEntry());
+		visitPost(cfg.getEntry());
+
+		// reverse the list of vertices
+		Collections.reverse(vertices);
 	}
 
-	/**
-	 * Builds the search starting from the given vertex.
-	 * 
-	 * @param n
-	 *            a CFG node
-	 */
-	public void visitNode(CfgNode n) {
-		visited.add(n);
-
-		for (Edge edge : n.getOutgoing()) {
-			Vertex w = edge.getTarget();
-			if (!visited.contains(w)) {
-				// edge goes to a node not yet visited
-				visitNode((CfgNode) w);
-			}
-		}
-
-		// add to the beginning (to reverse the post-order)
-		vertices.add(0, n);
+	@Override
+	public void visitPost(Vertex vertex) {
+		super.visitPost(vertex);
 
 		// set the post-order numbering
-		n.setNumber(num);
+		((CfgNode) vertex).setNumber(num);
 		num++;
 	}
 
