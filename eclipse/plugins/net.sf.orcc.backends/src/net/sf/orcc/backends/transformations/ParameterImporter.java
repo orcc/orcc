@@ -37,11 +37,10 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.IrUtil;
 
 /**
- * This class defines a transformation that replaces actor parameters by a global variables.
- * actor.
+ * This class defines a transformation that replaces actor parameters by a
+ * global variables. actor.
  * 
  * @author Thavot Richard
  * @version 1.0
@@ -64,16 +63,12 @@ public class ParameterImporter extends AbstractActorVisitor<Object> {
 		for (Var parameter : actor.getParameters()) {
 			Var paramVar = newGlobalVariable(parameter.getType(), "param_"
 					+ parameter.getName());
-			if (parameter.getInitialValue() != null) {
-				paramVar.setInitialValue(IrUtil.copy(parameter
-						.getInitialValue()));
-			}
+			paramVar.setInitialValue(IrFactory.eINSTANCE
+					.createExprVar(parameter));
 			paramToGlobalVarMap.put(parameter, paramVar);
 		}
 
 		super.caseActor(actor);
-
-		actor.getParameters().clear();
 
 		return null;
 	}
