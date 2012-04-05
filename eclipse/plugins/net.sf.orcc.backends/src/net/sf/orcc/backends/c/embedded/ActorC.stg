@@ -32,7 +32,8 @@ printCall(call,actor) ::= <%
 
 <if(call.print)>printf(<call.parameters: printFormat()><call.parameters: printPrintfParam()>);<
 else
-><if(call.target)><call.target.variable.indexedName> = <endif><call.procedure.name>(
+><if(call.target)><call.target.variable.indexedName> = <endif>
+<if(!call.procedure.native)><actor.simpleName>_<endif><call.procedure.name>(
 <actor.parameters:{param | <param.name>}; separator=", ">
 <if (!actor.parameters.empty && !call.parameters.empty)>, <endif>
 <call.parameters: printCallParam(); separator=", ">);<
@@ -151,8 +152,7 @@ printStateVar(stateVar) ::= <%
 %>
 
 printActionEmbd(action,actor)  ::= <<
-
-void <action.body.name>(<printActionParameters(action,actor)>)
+void <actor.simpleName>_<action.body.name>(<printActionParameters(action,actor)>)
 {
 <if(action.body.locals)>
 	<action.body.locals: {local | <varDecl(local,";\n")>}>

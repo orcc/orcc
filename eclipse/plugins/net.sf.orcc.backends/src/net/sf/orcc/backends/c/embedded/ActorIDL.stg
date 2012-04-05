@@ -28,10 +28,10 @@ printFunctionParameters(actor,action) ::= <%
 %>
 
 printInterface(action, actor, interface) ::= <<
-	interface <interface> {
-		void <action.name> (<printFunctionParameters(actor,action)>);
+interface <interface> {
+		void <actor.simpleName>_<action.name> (<printFunctionParameters(actor,action)>);
 	};
-	
+
 >>
 
 printActor(actor, options) ::= <<
