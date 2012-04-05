@@ -151,15 +151,6 @@ public interface ArchitecturePackage extends EPackage {
 	int HW_FIFO__TARGET = GraphPackage.EDGE__TARGET;
 
 	/**
-	 * The feature id for the '<em><b>Back Edge</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int HW_FIFO__BACK_EDGE = GraphPackage.EDGE__BACK_EDGE;
-
-	/**
 	 * The number of structural features of the '<em>Hw Fifo</em>' class. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -195,6 +186,15 @@ public interface ArchitecturePackage extends EPackage {
 	 * @ordered
 	 */
 	int HW_BROADCAST__INCOMING = GraphPackage.VERTEX__INCOMING;
+
+	/**
+	 * The feature id for the '<em><b>Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int HW_BROADCAST__NUMBER = GraphPackage.VERTEX__NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
@@ -239,6 +239,15 @@ public interface ArchitecturePackage extends EPackage {
 	 * @ordered
 	 */
 	int PROCESSOR__INCOMING = GraphPackage.VERTEX__INCOMING;
+
+	/**
+	 * The feature id for the '<em><b>Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCESSOR__NUMBER = GraphPackage.VERTEX__NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
