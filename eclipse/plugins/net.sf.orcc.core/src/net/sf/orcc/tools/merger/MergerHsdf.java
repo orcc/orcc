@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.dftools.graph.Vertex;
-import net.sf.dftools.graph.visit.TopologicalSorter;
+import net.sf.dftools.graph.visit.ReversePostOrder;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
@@ -429,7 +429,7 @@ public class MergerHsdf extends DfSwitch<Actor> {
 	 * @param procedure
 	 */
 	private void createStaticSchedule(Procedure procedure) {
-		for (Vertex vertex : new TopologicalSorter(network, network.getInputs())) {
+		for (Vertex vertex : new ReversePostOrder(network, network.getInputs())) {
 			Instance instance = (Instance) vertex;
 			CSDFMoC moc = (CSDFMoC) instance.getMoC();
 			NodeBlock block = procedure.getLast();

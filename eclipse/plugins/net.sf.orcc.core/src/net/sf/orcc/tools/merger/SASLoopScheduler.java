@@ -30,7 +30,7 @@
 package net.sf.orcc.tools.merger;
 
 import net.sf.dftools.graph.Vertex;
-import net.sf.dftools.graph.visit.TopologicalSorter;
+import net.sf.dftools.graph.visit.ReversePostOrder;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 
@@ -53,7 +53,7 @@ public class SASLoopScheduler extends AbstractScheduler {
 
 		schedule.setIterationCount(1);
 
-		for (Vertex vertex : new TopologicalSorter(network, network.getInputs())) {
+		for (Vertex vertex : new ReversePostOrder(network, network.getInputs())) {
 			if (vertex instanceof Instance) {
 				int rep = repetitions.get(vertex);
 				Iterand iterand = null;
