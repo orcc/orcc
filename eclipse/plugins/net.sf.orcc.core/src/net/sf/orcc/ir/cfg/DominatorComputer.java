@@ -33,8 +33,8 @@ import java.util.List;
 import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.Vertex;
 import net.sf.dftools.graph.visit.Ordering;
+import net.sf.dftools.graph.visit.ReversePostOrder;
 import net.sf.orcc.ir.Cfg;
-import net.sf.orcc.ir.CfgNode;
 
 /**
  * This class computes the dominance information of a CFG using the algorithm
@@ -56,7 +56,7 @@ public class DominatorComputer {
 	 */
 	public int[] computeDominanceInformation(Cfg cfg) {
 		// compute reverse post-order
-		Ordering rpo = new ReversePostOrdering(cfg);
+		Ordering rpo = new ReversePostOrder(cfg, cfg.getEntry());
 		List<Vertex> vertices = rpo.getVertices();
 
 		// initialize doms
@@ -76,11 +76,11 @@ public class DominatorComputer {
 				// find the first processed predecessor and set newIdom
 				int newIdom = 0;
 				Vertex processed = null;
-				CfgNode vertex = (CfgNode) vertices.get(i);
+				Vertex vertex = vertices.get(i);
 
 				List<Edge> edges = vertex.getIncoming();
 				for (Edge edge : edges) {
-					CfgNode pred = (CfgNode) edge.getSource();
+					Vertex pred = edge.getSource();
 					int p = pred.getNumber();
 					if (doms[p] != 0) {
 						// pred has already been processed, set newIdom
@@ -92,7 +92,7 @@ public class DominatorComputer {
 
 				// for all predecessors different from processed
 				for (Edge edge : edges) {
-					CfgNode pred = (CfgNode) edge.getSource();
+					Vertex pred = edge.getSource();
 					if (pred != processed) {
 						int p = pred.getNumber();
 						if (doms[p] != 0) {
