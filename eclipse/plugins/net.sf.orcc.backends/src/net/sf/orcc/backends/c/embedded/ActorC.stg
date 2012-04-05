@@ -140,7 +140,14 @@ printActionParameters(action,actor) ::= <%
 	if(!action.outputPattern.ports.empty)>, <endif>
 <endif>
 <action.outputPattern.ports: printParameter(); separator=", ">
+<if (!actor.parameters.empty || !action.inputPattern.ports.empty || !action.outputPattern.ports.empty)><
+	if(!actor.stateVars.empty)>, <endif>
+<endif>
+<actor.stateVars: printStateVar(); separator=", ">
+%>
 
+printStateVar(stateVar) ::= <%
+	<stateVar.type> *<stateVar.name>_i, <stateVar.type> *<stateVar.name>_o
 %>
 
 printActionEmbd(action,actor)  ::= <<
@@ -149,9 +156,27 @@ void <action.body.name>(<printActionParameters(action,actor)>)
 {
 <if(action.body.locals)>
 	<action.body.locals: {local | <varDecl(local,";\n")>}>
-<endif>	
+<endif><if(!actor.stateVars.empty)>
+	// Initialize output stateVars and work on them
+	<actor.stateVars : declOutStateVar()>
+	
+<endif>
 	<printNodes(action.body.nodes,actor)>
+<if(!actor.stateVars.empty)>
+
+	// Write state Var to output buf
+	<actor.stateVars : writeStateVar()>
+<endif>
 }
+
+>>
+
+declOutStateVar(stateVar) ::= <<
+<stateVar.type> <stateVar.name> = *<stateVar.name>_i;
+>>
+
+writeStateVar(stateVar) ::= <<
+ *<stateVar.name>_o = <stateVar.name>;
 
 >>
 

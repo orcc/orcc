@@ -9,6 +9,10 @@ printPort(port,direction) ::= <<
 	<direction> <port.type> <port.name>
 >>
 
+printStateVar(stateVar) ::= <<
+	in <stateVar.type> <stateVar.name>_i, out <stateVar.type> <stateVar.name>_o  
+>>
+
 printFunctionParameters(actor,action) ::= <%
 <actor.parameters:printParameter(); separator=", ">
 <if ( !actor.parameters.empty && !action.inputPattern.ports.empty)>, <endif>
@@ -17,7 +21,10 @@ printFunctionParameters(actor,action) ::= <%
 	if(!action.outputPattern.ports.empty)>, <endif>
 <endif>
 <action.outputPattern.ports: {port | <printPort(port,"out")>}; separator=", "> 
-
+<if (!actor.parameters.empty || !action.inputPattern.ports.empty || !action.outputPattern.ports.empty)><
+	if(!actor.stateVars.empty)>, <endif>
+<endif>
+<actor.stateVars : {stateVar | <printStateVar(stateVar)>};separator=", ">
 %>
 
 printInterface(action, actor, interface) ::= <<

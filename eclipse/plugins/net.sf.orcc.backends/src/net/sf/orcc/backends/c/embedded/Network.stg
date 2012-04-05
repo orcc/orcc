@@ -8,6 +8,16 @@ printArgument(argument) ::= <<
 	\</data\>
 >>
 
+printStateVar(instance,stateVar) ::= <<
+\<edge source="<instance.id>" sourceport="<stateVar.name>_o" target="<instance.id>" targetport="<stateVar.name>_i"\>
+    \<data key="edge_prod"\>1\</data\>
+    \<data key="edge_delay"\>1\</data\>
+    \<data key="edge_cons"\>1\</data\>
+    \<data key="data_type"\><stateVar.type>\</data\>
+\</edge\>
+
+>>
+
 printInstance(instance) ::= <<
 	\<node id="<instance.id>" kind="vertex"\>
 		\<data key="graph_desc"\>../Code/IDL/<instance.actor.simpleName>.idl\</data\>
@@ -17,8 +27,10 @@ printInstance(instance) ::= <<
 	<else>
 	<instance.arguments:printArgument()>
 	<endif>
-	\</node\>	
+	\</node\>
+	<instance.actor.stateVars:{stateVar | <printStateVar(instance,stateVar)>}>	
 >>
+// <<actor.actions: {action | <printActionEmbd(action, actor)>}>
 
 getProduction(actor,port) ::= <<
 	<actor.moC.outputPattern.numTokens.(port)>
