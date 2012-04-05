@@ -429,7 +429,7 @@ public class MergerHsdf extends DfSwitch<Actor> {
 	 * @param procedure
 	 */
 	private void createStaticSchedule(Procedure procedure) {
-		for (Vertex vertex : new TopologicalSorter().visitGraph(network)) {
+		for (Vertex vertex : new TopologicalSorter(network, network.getInputs())) {
 			Instance instance = (Instance) vertex;
 			CSDFMoC moc = (CSDFMoC) instance.getMoC();
 			NodeBlock block = procedure.getLast();

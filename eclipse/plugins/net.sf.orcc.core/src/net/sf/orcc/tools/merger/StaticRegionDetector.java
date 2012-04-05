@@ -213,9 +213,7 @@ public class StaticRegionDetector {
 		discovered = new HashSet<Vertex>();
 		finished = new HashSet<Vertex>();
 
-		List<Vertex> vertices = new TopologicalSorter().visitGraph(network);
-
-		for (Vertex vertex : vertices) {
+		for (Vertex vertex : new TopologicalSorter(network, network.getInputs())) {
 			if (vertex instanceof Instance) {
 				Instance instance = (Instance) vertex;
 				MoC moc = instance.getMoC();

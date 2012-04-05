@@ -53,7 +53,7 @@ public class SASFlatScheduler extends AbstractScheduler {
 
 		schedule.setIterationCount(1);
 
-		for (Vertex vertex : new TopologicalSorter().visitGraph(network)) {
+		for (Vertex vertex : new TopologicalSorter(network, network.getInputs())) {
 			if (vertex instanceof Instance) {
 				int rep = repetitions.get(vertex);
 				Iterand iterand = null;

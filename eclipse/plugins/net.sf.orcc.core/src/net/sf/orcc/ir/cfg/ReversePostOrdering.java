@@ -30,10 +30,8 @@ package net.sf.orcc.ir.cfg;
 
 import java.util.Collections;
 
-import net.sf.dftools.graph.Vertex;
 import net.sf.dftools.graph.visit.DFS;
 import net.sf.orcc.ir.Cfg;
-import net.sf.orcc.ir.CfgNode;
 
 /**
  * This class computes the reverse post-ordering of a CFG. It also labels the
@@ -44,8 +42,6 @@ import net.sf.orcc.ir.CfgNode;
  */
 public class ReversePostOrdering extends DFS {
 
-	private int num;
-
 	/**
 	 * Creates the reverse post-ordering of the given CFG.
 	 * 
@@ -55,23 +51,11 @@ public class ReversePostOrdering extends DFS {
 	public ReversePostOrdering(Cfg cfg) {
 		super(cfg.getVertices().size());
 
-		// starts post-order numbering at 1
-		num = 1;
-
 		// starts from the CFG's entry
 		visitPost(cfg.getEntry());
 
 		// reverse the list of vertices
 		Collections.reverse(vertices);
-	}
-
-	@Override
-	public void visitPost(Vertex vertex) {
-		super.visitPost(vertex);
-
-		// set the post-order numbering
-		((CfgNode) vertex).setNumber(num);
-		num++;
 	}
 
 }
