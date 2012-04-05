@@ -678,15 +678,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getCfgNode_Number() {
-		return (EAttribute) cfgNodeEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EClass getNodeBlock() {
 		return nodeBlockEClass;
 	}
@@ -1704,7 +1695,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		cfgNodeEClass = createEClass(CFG_NODE);
 		createEReference(cfgNodeEClass, CFG_NODE__NODE);
-		createEAttribute(cfgNodeEClass, CFG_NODE__NUMBER);
 
 		// Create enums
 		opBinaryEEnum = createEEnum(OP_BINARY);
@@ -2207,10 +2197,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 				this.getNode_CfgNode(), "node", null, 0, 1, CfgNode.class,
 				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE,
 				IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
-		initEAttribute(getCfgNode_Number(), ecorePackage.getEInt(), "number",
-				null, 0, 1, CfgNode.class, IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
 
 		// Initialize enums and add enum literals

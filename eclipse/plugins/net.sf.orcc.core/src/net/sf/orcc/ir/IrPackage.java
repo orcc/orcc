@@ -555,14 +555,6 @@ public interface IrPackage extends EPackage {
 		EReference CFG_NODE__NODE = eINSTANCE.getCfgNode_Node();
 
 		/**
-		 * The meta object literal for the '<em><b>Number</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute CFG_NODE__NUMBER = eINSTANCE.getCfgNode_Number();
-
-		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.NodeImpl <em>Node</em>}' class.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.NodeImpl
@@ -2788,6 +2780,15 @@ public interface IrPackage extends EPackage {
 	int CFG_NODE__INCOMING = GraphPackage.VERTEX__INCOMING;
 
 	/**
+	 * The feature id for the '<em><b>Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CFG_NODE__NUMBER = GraphPackage.VERTEX__NUMBER;
+
+	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2806,22 +2807,13 @@ public interface IrPackage extends EPackage {
 	int CFG_NODE__NODE = GraphPackage.VERTEX_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Number</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int CFG_NODE__NUMBER = GraphPackage.VERTEX_FEATURE_COUNT + 1;
-
-	/**
 	 * The number of structural features of the '<em>Cfg Node</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int CFG_NODE_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 2;
+	int CFG_NODE_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 1;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Def <em>Def</em>}'.
@@ -3380,17 +3372,6 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getCfgNode_Node();
-
-	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.CfgNode#getNumber <em>Number</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Number</em>'.
-	 * @see net.sf.orcc.ir.CfgNode#getNumber()
-	 * @see #getCfgNode()
-	 * @generated
-	 */
-	EAttribute getCfgNode_Number();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.InstSpecific <em>Inst Specific</em>}'.

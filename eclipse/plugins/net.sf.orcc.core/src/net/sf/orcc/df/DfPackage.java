@@ -306,6 +306,15 @@ public interface DfPackage extends EPackage {
 	int PORT__INCOMING = GraphPackage.VERTEX__INCOMING;
 
 	/**
+	 * The feature id for the '<em><b>Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT__NUMBER = GraphPackage.VERTEX__NUMBER;
+
+	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -375,6 +384,15 @@ public interface DfPackage extends EPackage {
 	int INSTANCE__INCOMING = GraphPackage.VERTEX__INCOMING;
 
 	/**
+	 * The feature id for the '<em><b>Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INSTANCE__NUMBER = GraphPackage.VERTEX__NUMBER;
+
+	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -434,6 +452,15 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int ENTITY__INCOMING = GraphPackage.VERTEX__INCOMING;
+
+	/**
+	 * The feature id for the '<em><b>Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ENTITY__NUMBER = GraphPackage.VERTEX__NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
@@ -497,6 +524,15 @@ public interface DfPackage extends EPackage {
 	int ENTITY_SPECIFIC__INCOMING = ENTITY__INCOMING;
 
 	/**
+	 * The feature id for the '<em><b>Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ENTITY_SPECIFIC__NUMBER = ENTITY__NUMBER;
+
+	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -546,6 +582,15 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int ACTOR__INCOMING = ENTITY__INCOMING;
+
+	/**
+	 * The feature id for the '<em><b>Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__NUMBER = ENTITY__NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
@@ -701,6 +746,15 @@ public interface DfPackage extends EPackage {
 	int NETWORK__INCOMING = ENTITY__INCOMING;
 
 	/**
+	 * The feature id for the '<em><b>Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NETWORK__NUMBER = ENTITY__NUMBER;
+
+	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -827,6 +881,15 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int BROADCAST__INCOMING = ENTITY__INCOMING;
+
+	/**
+	 * The feature id for the '<em><b>Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int BROADCAST__NUMBER = ENTITY__NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
@@ -1113,6 +1176,15 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int STATE__INCOMING = GraphPackage.VERTEX__INCOMING;
+
+	/**
+	 * The feature id for the '<em><b>Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int STATE__NUMBER = GraphPackage.VERTEX__NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--

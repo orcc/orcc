@@ -34,8 +34,7 @@ import net.sf.dftools.graph.Vertex;
 
 /**
  * This class defines a node of a CFG graph. In addition to a vertex, a CFG node
- * can be associated to a Node of a procedure (NodeBlock, NodeIf, NodeWhile). It
- * also has a post-order number, useful for computing dominators.
+ * can be associated to a Node of a procedure (NodeBlock, NodeIf, NodeWhile).
  * 
  * @model
  */
@@ -50,27 +49,11 @@ public interface CfgNode extends Vertex {
 	Node getNode();
 
 	/**
-	 * Returns the post-order number of this CFG node.
-	 * 
-	 * @return the post-order number of this CFG node
-	 * @model transient="true"
-	 */
-	int getNumber();
-
-	/**
 	 * Sets the Node associated with this CFG node.
 	 * 
 	 * @param node
 	 *            the Node to associate with this CFG node
 	 */
 	void setNode(Node node);
-
-	/**
-	 * Sets the post-order number of this CFG node.
-	 * 
-	 * @param number
-	 *            the post-order number of this CFG node
-	 */
-	void setNumber(int number);
 
 }
