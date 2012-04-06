@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes and EFPL
+ * Copyright (c) 2009, EPFL
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the IETR/INSA of Rennes and EPFL nor the names of its
+ *   * Neither the name of the EPFL nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -26,7 +26,6 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-
 package net.sf.orcc.ir.transformations;
 
 import java.util.ArrayList;
@@ -43,31 +42,32 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
- * This class removes all unused procedures/functions
  * 
- * @author Matthieu Wipliez
+ * Removes the unused procedures
+ * 
  * @author Richard Thavot
  *
  */
 public class DeadProcedureElimination extends AbstractActorVisitor<Object> {
 
 	private Map<Procedure, List<InstCall>> procToCalledInstsMap;
-	private Map<Procedure, List<InstCall>> procToUsedInstsMap;
+
+	private Set<Procedure> removeProcSet;
 
 	public DeadProcedureElimination() {
 		procToCalledInstsMap = new HashMap<Procedure, List<InstCall>>();
-		procToUsedInstsMap = new HashMap<Procedure, List<InstCall>>();
 	}
 
 	private DeadProcedureElimination(
-			Map<Procedure, List<InstCall>> procToCalledInstsMap,
-			Map<Procedure, List<InstCall>> procToUsedInstsMap) {
+			Map<Procedure, List<InstCall>> procToCalledInstsMap) {
 		this.procToCalledInstsMap = procToCalledInstsMap;
-		this.procToUsedInstsMap = procToUsedInstsMap;
 	}
 
 	@Override
 	public Object caseActor(Actor actor) {
+
+		// 0. Load actor
+		this.actor = actor;
 
 		// 1. Visit all InstCall define inside actions
 		for (Action initialize : actor.getInitializes()) {
@@ -77,14 +77,14 @@ public class DeadProcedureElimination extends AbstractActorVisitor<Object> {
 			super.doSwitch(action);
 		}
 
-		// 2 Remove uncalled procedure
-		Set<Procedure> removeProcSet = new HashSet<Procedure>();
+		// 2.1 Remove uncalled procedure
+		removeProcSet = new HashSet<Procedure>();
 		for (Procedure procedure : actor.getProcs()) {
 			if (!procedure.isNative()) {
 				List<InstCall> instCalls = procToCalledInstsMap.get(procedure);
 				if (instCalls == null) {
 					removeProcSet.add(procedure);
-				} 
+				}
 			}
 		}
 		actor.getProcs().removeAll(removeProcSet);
@@ -94,19 +94,18 @@ public class DeadProcedureElimination extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseProcedure(Procedure procedure) {
-		procToUsedInstsMap.put(procedure, new ArrayList<InstCall>());
 		this.procedure = procedure;
 		return doSwitch(procedure.getNodes());
 	}
 
 	@Override
 	public Object caseInstCall(InstCall call) {
-		procToUsedInstsMap.get(procedure).add(call);
+		//
 		Procedure calledProc = call.getProcedure();
 		List<InstCall> instCalls = procToCalledInstsMap.get(calledProc);
 		if (instCalls == null) {
-			new DeadProcedureElimination(procToCalledInstsMap,
-					procToUsedInstsMap).doSwitch(calledProc);
+			new DeadProcedureElimination(procToCalledInstsMap)
+					.doSwitch(calledProc);
 			instCalls = new ArrayList<InstCall>();
 			procToCalledInstsMap.put(calledProc, instCalls);
 		}
