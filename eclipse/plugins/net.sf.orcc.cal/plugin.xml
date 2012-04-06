@@ -22,9 +22,15 @@
         </run>
      </application>
   </extension>
-
-
-
-
-
-</plugin>
+  <extension
+        id="workspaceSetup"
+        point="org.eclipse.core.runtime.applications">
+     <application
+           cardinality="singleton-global"
+           thread="main"
+           visible="true">
+        <run
+              class="net.sf.orcc.cal.util.WorkspaceCreator">
+        </run>
+     </application>
+  </extension></plugin>
