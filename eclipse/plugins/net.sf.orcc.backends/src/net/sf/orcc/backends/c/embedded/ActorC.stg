@@ -30,14 +30,31 @@ endif>
 
 printCall(call,actor) ::= <%
 
-<if(call.print)>printf(<call.parameters: printFormat()><call.parameters: printPrintfParam()>);<
-else
-><if(call.target)><call.target.variable.indexedName> = <endif>
-<if(!call.procedure.native)><actor.simpleName>_<endif><call.procedure.name>(
+<if(call.print)>
+printf(<call.parameters: printFormat()><call.parameters: printPrintfParam()>);
+<else>
+<if(call.target)>
+<call.target.variable.indexedName> = 
+<endif>
+<if(!call.procedure.native)>
+<actor.simpleName>_
+<endif>
+<call.procedure.name>(
+<if (!call.procedure.native)><! Do not print parameters in call if native procedure !>
 <actor.parameters:{param | <param.name>}; separator=", ">
-<if (!actor.parameters.empty && !call.parameters.empty)>, <endif>
-<call.parameters: printCallParam(); separator=", ">);<
-endif>
+	<if (!actor.parameters.empty && !call.parameters.empty)>, <endif>
+<endif>
+<call.parameters: printCallParam(); separator=", ">
+<if (!actor.stateVars.empty && !call.procedure.native)>
+	<if (!actor.parameters.empty || !call.parameters.empty)>, <endif>
+	<actor.stateVars : printCallStateVarParam(); separator=", ">
+<endif>
+);
+<endif>
+%>
+
+printCallStateVarParam(stateVar) ::= <%
+&<stateVar.name>
 %>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -50,27 +67,44 @@ printProcedureDeclarationParameters(procedure,actor) ::= <%
 	<if (!procedure.parameters.empty)>, <endif>
 <endif>
 <procedure.parameters: {param | <varDecl(param.variable)>}; separator=", ">
+<if (!actor.stateVars.empty)>
+	<if (!actor.parameters.empty || !procedure.parameters.empty)>, <endif>
+	<actor.stateVars : printStateVarProcedure()>
+<endif>
 %>
 
 printProcedureDeclarationEmbd(procedure,actor) ::= <<
-<if (!procedure.native)><procedure.returnType> <procedure.name>(<printProcedureDeclarationParameters(procedure,actor)>);
+<if (!procedure.native)><procedure.returnType> <actor.simpleName>_<procedure.name>(<printProcedureDeclarationParameters(procedure,actor)>);
 <endif>
 >>
 
 printProcedureEmbd(procedure,actor,action="") ::= <<
 <if(!procedure.native)>
-<procedure.returnType> <procedure.name>(<printProcedureDeclarationParameters(procedure,actor)>){
+<procedure.returnType> <actor.simpleName>_<procedure.name>(<printProcedureDeclarationParameters(procedure,actor)>){
 <if(procedure.locals)>
-	<procedure.locals: {local | <varDecl(local,";\n")>}>
+	<procedure.locals: {local | <varDecl(local,";\n")>}>< 
+endif><if(!actor.stateVars.empty)>	<actor.stateVars : declProcedureStateVar(procedure)>
 <endif>
 	<printNodes(procedure.nodes,actor)>
 }
 
 <endif>
 >>
-
+ 
 printParameter(parameter) ::= <%
 	<parameter.type> <if (parameter.port)>*<endif><parameter.name>
+%>
+
+printStateVarProcedure(stateVar) ::= <%
+	<stateVar.type> *<stateVar.name>_o
+%> 
+
+declProcedureStateVar(stateVar,procedure) ::= <%  
+	<stateVar.type> <stateVar.name> = *<stateVar.name>_o;
+%>
+
+writeStateVarProcedure(stateVar) ::= <%
+	 *<stateVar.name>_o = <stateVar.name>; 
 %>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -82,7 +116,7 @@ printInstructions(instructions,actor) ::= <<
 if (instr.assign)><printAssign(assign=instr)><
 elseif (instr.call)><printCall(call=instr,actor=actor)><
 elseif (instr.load)><printLoad(load=instr)><
-elseif (instr.return)><printReturn(return=instr)><
+elseif (instr.return)><printReturn(return=instr, actor=actor)><
 elseif (instr.store)><printStore(store=instr)><
 endif>}>
 >>
@@ -129,6 +163,16 @@ for(<forNode.init:{assign | <assign.target.variable.indexedName> = <assign.value
 <printBlockNode(forNode.joinNode,actor)>
 >>
 
+printReturn(return,actor) ::= <<
+<if (!actor.stateVars.empty)>
+// Write state Var to output buf
+<actor.stateVars : writeStateVar()> 
+<endif>
+<if(return.value)>
+return <return.value>;<
+endif>
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Action
 ///////////////////////////////////////////////////////////////////////////////
@@ -162,11 +206,6 @@ void <actor.simpleName>_<action.body.name>(<printActionParameters(action,actor)>
 	
 <endif>
 	<printNodes(action.body.nodes,actor)>
-<if(!actor.stateVars.empty)>
-
-	// Write state Var to output buf
-	<actor.stateVars : writeStateVar()>
-<endif>
 }
 
 >>
