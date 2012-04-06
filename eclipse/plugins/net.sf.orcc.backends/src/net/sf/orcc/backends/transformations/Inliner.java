@@ -34,10 +34,12 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.dftools.util.util.EcoreHelper;
+import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
+import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
@@ -73,12 +75,12 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class Inliner extends AbstractActorVisitor<Object> {
 
-	private class CallGetter extends AbstractActorVisitor<Object> {
+	private class CallGetter extends AbstractActorVisitor<List<InstCall>> {
 
 		private boolean inlineFunction;
 		private boolean inlineProcedure;
 
-		private List<InstCall> instCallList = new ArrayList<InstCall>();
+		private List<InstCall> instCallList;
 
 		public CallGetter(boolean inlineProcedure, boolean inlineFunction) {
 			this.inlineProcedure = inlineProcedure;
@@ -86,25 +88,40 @@ public class Inliner extends AbstractActorVisitor<Object> {
 		}
 
 		@Override
-		public Object caseInstCall(InstCall call) {
+		public List<InstCall> caseActor(Actor actor) {
+
+			instCallList = new ArrayList<InstCall>();
+
+			for (Action action : actor.getActions()) {
+				doSwitch(action);
+			}
+
+			for (Action initialize : actor.getInitializes()) {
+				doSwitch(initialize);
+			}
+
+			return instCallList;
+		}
+
+		@Override
+		public List<InstCall> caseInstCall(InstCall call) {
 			// Function case
 			Procedure procedure = call.getProcedure();
 			Type returnType = procedure.getReturnType();
 
 			if (returnType.isVoid() && inlineProcedure || !returnType.isVoid()
 					&& inlineFunction) {
-				instCallList.add(call);
+				if (!call.getProcedure().isNative())
+					instCallList.add(call);
 			}
 			return null;
 		}
 
-		public List<InstCall> getCalls() {
-			return instCallList;
-		}
 	}
 
 	private CallGetter callGetter;
-	private List<InstCall> instCallList;
+
+	private List<InstCall> instCallList = new ArrayList<InstCall>();
 
 	private InstCall currentCall;
 	private Map<Var, Var> localToLocalsMap;
@@ -122,7 +139,6 @@ public class Inliner extends AbstractActorVisitor<Object> {
 	 */
 	public Inliner(InstCall call) {
 		super(true);
-		this.instCallList = new ArrayList<InstCall>();
 		this.instCallList.add(call);
 	}
 
@@ -133,26 +149,38 @@ public class Inliner extends AbstractActorVisitor<Object> {
 	 */
 	public Inliner(List<InstCall> calls) {
 		super(true);
-		this.instCallList = new ArrayList<InstCall>();
+		this.instCallList.addAll(calls);
 	}
 
 	public Object caseActor(Actor actor) {
-		//Removes parameters
-		if (!actor.getParameters().isEmpty())
-			new ParameterImporter().doSwitch(actor);
-		//Get calls 
+		this.actor = actor;
 		if (callGetter != null) {
-			callGetter.doSwitch(actor);
-			this.instCallList = callGetter.getCalls();
+			caseFullInliner();
+		} else {
+			casePartialInliner();
 		}
-		//Inline calls
+		return null;
+	}
+
+	private void caseFullInliner() {
+
+		do {
+			casePartialInliner();
+			instCallList = callGetter.doSwitch(actor);
+		} while (!instCallList.isEmpty());
+	}
+
+	private void casePartialInliner() {
 		for (InstCall call : instCallList) {
 			if (!call.getProcedure().isNative()) {
+				if (call.getProcedure().getName()
+						.equals("computeBoundaryFiltStrength")) {
+					call.getProcedure();
+				}
 				this.currentCall = call;
 				inlineProcedure();
 			}
 		}
-		return null;
 	}
 
 	/**
@@ -170,7 +198,7 @@ public class Inliner extends AbstractActorVisitor<Object> {
 			Var newVar = callerProc.newTempLocalVariable(var.getType(),
 					"inlined_" + var.getName());
 			newVar.setIndex(var.getIndex());
-			newVar.setLineNumber(var.getLineNumber());
+			// newVar.setLineNumber(var.getLineNumber());
 			newVar.setAssignable(var.isAssignable());
 			localToLocalsMap.put(var, newVar);
 		}
@@ -238,7 +266,7 @@ public class Inliner extends AbstractActorVisitor<Object> {
 		// 8.
 		IrUtil.delete(currentCall);
 	}
-	
+
 	@Override
 	public Object caseInstAssign(InstAssign assign) {
 		// Replace the local variable name by visiting caseExprVar
@@ -261,7 +289,7 @@ public class Inliner extends AbstractActorVisitor<Object> {
 		if (localToLocalsMap.containsKey(var)) {
 			load.getSource().setVariable(localToLocalsMap.get(var));
 		}
-		for(Expression e : load.getIndexes()){
+		for (Expression e : load.getIndexes()) {
 			super.doSwitch(e);
 		}
 		return null;
@@ -275,7 +303,7 @@ public class Inliner extends AbstractActorVisitor<Object> {
 		if (localToLocalsMap.containsKey(var)) {
 			store.getTarget().setVariable(localToLocalsMap.get(var));
 		}
-		for(Expression e : store.getIndexes()){
+		for (Expression e : store.getIndexes()) {
 			super.doSwitch(e);
 		}
 		return null;
@@ -288,7 +316,7 @@ public class Inliner extends AbstractActorVisitor<Object> {
 		this.instReturn = instReturn;
 		return null;
 	}
-	
+
 	@Override
 	public Object caseInstPhi(InstPhi instPhi) {
 		// Replace the local variable name by visiting caseExprVar
@@ -296,12 +324,26 @@ public class Inliner extends AbstractActorVisitor<Object> {
 		if (localToLocalsMap.containsKey(var)) {
 			instPhi.getTarget().setVariable(localToLocalsMap.get(var));
 		}
-		for(Expression e : instPhi.getValues()){
+		for (Expression e : instPhi.getValues()) {
 			super.doSwitch(e);
 		}
 		return null;
 	}
 
+	@Override
+	public List<InstCall> caseInstCall(InstCall call) {
+		Def def = call.getTarget();
+		if (def != null) {
+			Var var = def.getVariable();
+			if (localToLocalsMap.containsKey(var)) {
+				call.getTarget().setVariable(localToLocalsMap.get(var));
+			}
+		}
+		for (Arg arg : call.getParameters()) {
+			doSwitch(arg);
+		}
+		return null;
+	}
 
 	/**
 	 * Replace the local variable name if a reference already exists to a global
