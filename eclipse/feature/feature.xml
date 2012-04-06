@@ -2,7 +2,7 @@
 <feature
       id="net.sf.orcc"
       label="Orcc"
-      version="1.1.0.v20120313"
+      version="1.1.0.qualifier"
       provider-name="IETR/INSA Rennes">
 
    <description url="http://orcc.sf.net/eclipse/updates/">
@@ -59,51 +59,49 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
    </url>
 
    <requires>
-      <import plugin="org.jgrapht" version="0.8.2" match="greaterOrEqual"/>
-      <import plugin="net.sf.graphiti.model" version="1.3.7" match="greaterOrEqual"/>
-      <import plugin="net.sf.graphiti.ui" version="1.3.7" match="greaterOrEqual"/>
+      <import feature="net.sf.graphiti" version="1.3.9.v20120313"/>
    </requires>
 
    <plugin
          id="net.sf.orcc.core"
          download-size="0"
          install-size="0"
-         version="1.1.0.v20120313"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="net.sf.orcc.backends"
          download-size="0"
          install-size="0"
-         version="1.1.0.v20120313"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="net.sf.orcc.cal"
          download-size="0"
          install-size="0"
-         version="1.1.0.v20120313"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="net.sf.orcc.cal.ui"
          download-size="0"
          install-size="0"
-         version="1.1.0.v20120313"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="net.sf.orcc.simulators"
          download-size="0"
          install-size="0"
-         version="1.1.0.v20120313"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="net.sf.orcc.ui"
          download-size="0"
          install-size="0"
-         version="1.1.0.v20120313"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
@@ -117,7 +115,7 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
          id="net.sf.orc2hdl"
          download-size="0"
          install-size="0"
-         version="1.1.0.v20120313"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
