@@ -172,9 +172,11 @@ public class FrontendCli implements IApplication {
 			members = container.members();
 
 			for (IResource resource : members) {
+
 				if (resource.getType() == IResource.FOLDER) {
 					actors.addAll(getCalFiles((IFolder) resource));
 				} else if (resource.getType() == IResource.FILE
+						&& resource.getFileExtension() != null
 						&& resource.getFileExtension().equals("cal")) {
 					actors.add((IFile) resource);
 				}
@@ -331,7 +333,7 @@ public class FrontendCli implements IApplication {
 		if (args.length == 1) {
 			projectName = args[0];
 		} else {
-			System.err.println("Please pass the project name in argument");
+			System.err.println("Please pass the project name in argument.");
 			return IApplication.EXIT_RELAUNCH;
 		}
 
