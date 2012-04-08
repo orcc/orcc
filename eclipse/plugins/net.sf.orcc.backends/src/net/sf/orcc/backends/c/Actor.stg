@@ -26,7 +26,12 @@ elseif (constant.exprInt)><printInt(constant)><
 elseif (constant.exprFloat)><printFloat(constant)><
 elseif (constant.exprList)><printList(constant)><
 elseif (constant.exprString)><printString(constant)><
+elseif (constant.exprVar)><printVar(constant)><
 endif>
+>>
+
+printVar(var) ::= <<
+<var.use.variable.name>
 >>
 
 printBool(constant) ::= <<
