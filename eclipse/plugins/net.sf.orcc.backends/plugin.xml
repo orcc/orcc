@@ -75,10 +75,7 @@
                id="net.sf.orcc.backends.tta.finalizeGeneration">
          </option>
          <option
-               id="net.sf.orcc.backends.tta.fpgaBrand">
-         </option>
-         <option
-               id="net.sf.orcc.backends.tta.fpgaFamily">
+               id="net.sf.orcc.backends.tta.fpga">
          </option>
       </backend>
       <backend
@@ -270,25 +267,21 @@
             <checkBox></checkBox>
          </option>
          <option
-               defaultValue="Altera"
-               description="Name of the manufacturer of your FPGA device"
-               id="net.sf.orcc.backends.tta.fpgaBrand"
-               name="FPGA manufacturer">
+               defaultValue="Stratix III (EP3SL150F1152C2)"
+               description="Name of your FPGA device"
+               id="net.sf.orcc.backends.tta.fpga"
+               name="FPGA board">
             <comboBox>
                <comboBoxItem
-                  id="Altera">
+                  id="Stratix III (EP3SL150F1152C2)">
                </comboBoxItem>
                <comboBoxItem
-                  id="Xilinx">
+                  id="Virtex6 (xc6vlx240t)">
+               </comboBoxItem>
+               <comboBoxItem
+                  id="Others">
                </comboBoxItem>
             </comboBox>
-         </option>
-         <option
-               defaultValue="Stratix III"
-               description="Name of the family of your FPGA device"
-               id="net.sf.orcc.backends.tta.fpgaFamily"
-               name="FPGA family">
-               <textBox></textBox>
          </option>
    </extension>
    <extension

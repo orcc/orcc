@@ -165,8 +165,8 @@ assignFifo(connection) ::= <<
 <if(!connection.sourcePort.native && !connection.targetPort.native && !connection.source.port && !connection.target.port)>
 fifo_<connection.id> : entity work.fifo
   generic map(size          =\> <connection.size>,
-              widthu        =\> <options.("fifoWidthu")>,
-              device_family =\> "<options.("fpgaFamily")>")
+              widthu        =\> <options.fifoWidthu>,
+              device_family =\> "<options.fpga.family>")
   port map(clk          =\> clk,
            rdreq        =\> fifo_<connection.id>_rdreq,
            data         =\> fifo_<connection.id>_data(31 downto 0),
@@ -184,7 +184,7 @@ assignInstance(instance) ::= <<
 <if(instance.actor.native)
 >  generic map(<assignGenerics(instance)>)  
 <else
->  generic map(device_family =\> "<options.("fpgaFamily")>")
+>  generic map(device_family =\> "<options.fpga.family>")
 <endif>
   port map(clk          =\> clk,
   	       <assignPort(instance)>

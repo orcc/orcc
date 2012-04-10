@@ -37,6 +37,6 @@ processors = [
 ]
 
 ## Network initialization
-design = Design("<network.simpleName>", processors, <if(options.targetAltera)>True<else>False<endif>)
+design = Design("<network.simpleName>", processors, <if(options.fpga.altera)>True<else>False<endif>)
 		
 >>

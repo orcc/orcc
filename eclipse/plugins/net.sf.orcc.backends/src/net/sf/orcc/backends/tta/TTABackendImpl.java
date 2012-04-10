@@ -59,6 +59,7 @@ import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.tta.architecture.Processor;
 import net.sf.orcc.backends.tta.architecture.util.ArchitectureMemoryStats;
 import net.sf.orcc.backends.tta.transformations.SlowOperationDetector;
+import net.sf.orcc.backends.util.FPGA;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -88,9 +89,7 @@ public class TTABackendImpl extends AbstractBackend {
 	 */
 	private boolean debug;
 	private boolean finalize;
-	private String fpgaBrand;
-	private String fpgaFamily;
-	private boolean targetAltera;
+	private FPGA fpga;
 	private String libPath;
 	private int fifoWidthu;
 
@@ -110,15 +109,15 @@ public class TTABackendImpl extends AbstractBackend {
 		transformations.put("max", "max_");
 		transformations.put("select", "select_");
 		processorIntensiveActors = new ArrayList<String>();
-		//processorIntensiveActors.add("org.mpeg4.part2.motion.Algo_Add");
-		//processorIntensiveActors.add("com.ericsson.Algo_Interpolation_halfpel");
-		//processorIntensiveActors.add("org.sc29.wg11.mpeg4.part2.texture.Algo_IDCT2D_ISOIEC_23002_1");
-		//processorIntensiveActors.add("fi.oulu.ee.mvg.Framebuffer");
-		//processorIntensiveActors.add("com.xilinx.Mgnt_Merger");
-		//processorIntensiveActors.add("org.mpeg4.part2.texture.Algo_Inversequant");
-		
-		//processorIntensiveActors.add("fi.oulu.ee.mvg.Algo_IAP_multi");
-		//processorIntensiveActors.add("org.mpeg4.part2.parser.Algo_Synp_MPEG_4");
+		// processorIntensiveActors.add("org.mpeg4.part2.motion.Algo_Add");
+		// processorIntensiveActors.add("com.ericsson.Algo_Interpolation_halfpel");
+		// processorIntensiveActors.add("org.sc29.wg11.mpeg4.part2.texture.Algo_IDCT2D_ISOIEC_23002_1");
+		// processorIntensiveActors.add("fi.oulu.ee.mvg.Framebuffer");
+		// processorIntensiveActors.add("com.xilinx.Mgnt_Merger");
+		// processorIntensiveActors.add("org.mpeg4.part2.texture.Algo_Inversequant");
+
+		// processorIntensiveActors.add("fi.oulu.ee.mvg.Algo_IAP_multi");
+		// processorIntensiveActors.add("org.mpeg4.part2.parser.Algo_Synp_MPEG_4");
 	}
 
 	@Override
@@ -126,10 +125,8 @@ public class TTABackendImpl extends AbstractBackend {
 		debug = getAttribute(DEBUG_MODE, true);
 		finalize = getAttribute("net.sf.orcc.backends.tta.finalizeGeneration",
 				false);
-		fpgaBrand = getAttribute("net.sf.orcc.backends.tta.fpgaBrand", "Altera");
-		fpgaFamily = getAttribute("net.sf.orcc.backends.tta.fpgaFamily",
-				"Stratix III");
-		targetAltera = fpgaBrand.equals("Altera");
+		fpga = FPGA.builder(getAttribute("net.sf.orcc.backends.tta.fpga",
+				"Stratix III (EP3SL150F1152C2)"));
 		// Set default FIFO size to 256
 		fifoSize = getAttribute(FIFO_SIZE, 256);
 		fifoWidthu = (int) Math.ceil(Math.log(fifoSize) / Math.log(2));
@@ -251,11 +248,10 @@ public class TTABackendImpl extends AbstractBackend {
 					"net/sf/orcc/backends/tta/VHDL_Testbench.stg", !debug,
 					false);
 			tbPrinter.getOptions().put("fifoSize", fifoSize);
-			tbPrinter.getOptions().put("targetAltera", targetAltera);
-			tbPrinter.getOptions().put("fpgaFamily", fpgaFamily);
+			tbPrinter.getOptions().put("fpga", fpga);
 			StandardPrinter tclPrinter = new StandardPrinter(
 					"net/sf/orcc/backends/tta/ModelSim_Script.stg");
-			tclPrinter.getOptions().put("targetAltera", targetAltera);
+			tclPrinter.getOptions().put("fpga", fpga);
 			StandardPrinter wavePrinter = new StandardPrinter(
 					"net/sf/orcc/backends/tta/ModelSim_Wave.stg");
 			tbPrinter.print(instance.getSimpleName() + "_tb.vhd", simPath,
@@ -275,19 +271,18 @@ public class TTABackendImpl extends AbstractBackend {
 				"net/sf/orcc/backends/tta/VHDL_Network.stg");
 		networkPrinter.setExpressionPrinter(new LLVMExpressionPrinter());
 		networkPrinter.getOptions().put("fifoWidthu", fifoWidthu);
-		networkPrinter.getOptions().put("targetAltera", targetAltera);
-		networkPrinter.getOptions().put("fpgaFamily", fpgaFamily);
+		networkPrinter.getOptions().put("fpga", fpga);
 		networkPrinter.print("top.vhd", path, network);
 
 		// Python package
 		String pythonPath = OrccUtil.createFolder(path, "informations_");
 		StandardPrinter pythonPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/tta/Python_Network.stg");
-		pythonPrinter.getOptions().put("targetAltera", targetAltera);
+		pythonPrinter.getOptions().put("fpga", fpga);
 		pythonPrinter.print("informations.py", pythonPath, network);
 		OrccUtil.createFile(pythonPath, "__init__.py");
 
-		if (targetAltera) {
+		if (fpga.isAltera()) {
 			// Quartus
 			CustomPrinter projectQsfPrinter = new CustomPrinter(
 					"net/sf/orcc/backends/tta/Quartus_Project.stg");
@@ -297,7 +292,7 @@ public class TTABackendImpl extends AbstractBackend {
 					network);
 			projectQpfPrinter.print("top.qpf", path, "qpfNetwork", "network",
 					network);
-		} else {
+		} else if (fpga.isXilinx()) {
 			// ISE
 			CustomPrinter projectXisePrinter = new CustomPrinter(
 					"net/sf/orcc/backends/tta/ISE_Project.stg");
@@ -310,7 +305,7 @@ public class TTABackendImpl extends AbstractBackend {
 		// ModelSim
 		StandardPrinter tclPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/tta/ModelSim_Script.stg");
-		tclPrinter.getOptions().put("targetAltera", targetAltera);
+		tclPrinter.getOptions().put("fpga", fpga);
 		StandardPrinter tbPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/tta/VHDL_Testbench.stg");
 		tbPrinter.getOptions().put("fifoSize", fifoSize);
