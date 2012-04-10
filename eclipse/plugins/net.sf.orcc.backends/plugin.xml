@@ -149,7 +149,7 @@
                defaultValue="false"
                description="Uses an experimental genetic algorithm to search efficient mappings of the actors on the processor cores"
                id="net.sf.orcc.backends.geneticAlgorithm"
-               name="Search efficient mappings (Only on linux)">
+               name="[BROKEN] Search efficient mappings (Only on linux)">
             <checkBox>
             	<option
 	               		defaultValue="1"
