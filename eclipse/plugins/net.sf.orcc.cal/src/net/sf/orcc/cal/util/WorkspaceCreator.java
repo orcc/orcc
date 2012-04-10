@@ -122,6 +122,9 @@ public class WorkspaceCreator implements IApplication {
 						if (!project.exists()) {
 							project.create(description, progressMonitor);
 							project.open(progressMonitor);
+
+							System.out.println("Project " + project.getName()
+									+ " registered.");
 						}
 					}
 				}
