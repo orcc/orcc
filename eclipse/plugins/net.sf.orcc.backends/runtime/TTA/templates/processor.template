@@ -179,38 +179,34 @@ begin
              fu_LSU_dmem_addr           => dram_addr,
              fu_LSU_dmem_wr_en_x(0)     => wren_x_wire,
              fu_LSU_dmem_bytemask       => bytemask_wire,
-{{for input in inputs}}
 {{for i in range(8)}}
-{{if i == input.index}}
+{{if i < len(inputs)}}
 {{if input.isNative}}
-             fu_STREAM_IN_{{input.index}}_ext_data{{i}}    => s_{{input.name}},
-             fu_STREAM_IN_{{input.index}}_ext_status{{i}}  => (0=>'1', others => '0'),
+             fu_STREAM_IN_ext_data{{i}}    => s_{{input.name}},
+             fu_STREAM_IN_ext_status{{i}}  => (0=>'1', others => '0'),
 {{else}}
-             fu_STREAM_IN_{{input.index}}_ext_data{{i}}    => data_{{i}}_in,
-             fu_STREAM_IN_{{input.index}}_ext_status{{i}}  => status_{{i}}_in,
-             fu_STREAM_IN_{{input.index}}_ext_ack{{i}}(0)  => ack_{{i}}_in,
+             fu_STREAM_IN_ext_data{{i}}    => data_{{i}}_in,
+             fu_STREAM_IN_ext_status{{i}}  => status_{{i}}_in,
+             fu_STREAM_IN_ext_ack{{i}}(0)  => ack_{{i}}_in,
 {{endif}}
 {{else}}
-             fu_STREAM_IN_{{input.index}}_ext_data{{i}}    => (others => '0'),
-             fu_STREAM_IN_{{input.index}}_ext_status{{i}}  => (others => '0'),
+             fu_STREAM_IN_ext_data{{i}}    => (others => '0'),
+             fu_STREAM_IN_ext_status{{i}}  => (others => '0'),
 {{endif}}
 {{endfor}}
-{{endfor}}
-{{for output in outputs}}
 {{for i in range(8)}}
-{{if i == output.index}}
+{{if i < len(outputs)}}
 {{if output.isNative}}
-             fu_STREAM_OUT_{{output.index}}_ext_data{{i}}   => s_{{output.name}},
-             fu_STREAM_OUT_{{output.index}}_ext_status{{i}} => (0=>'1', others => '0'),
+             fu_STREAM_OUT_ext_data{{i}}   => s_{{output.name}},
+             fu_STREAM_OUT_ext_status{{i}} => (0=>'1', others => '0'),
 {{else}}
-             fu_STREAM_OUT_{{output.index}}_ext_data{{i}}   => data_{{i}}_out,
-             fu_STREAM_OUT_{{output.index}}_ext_status{{i}} => status_{{i}}_out,
-             fu_STREAM_OUT_{{output.index}}_ext_dv{{i}}(0)  => dv_{{i}}_out,
+             fu_STREAM_OUT_ext_data{{i}}   => data_{{i}}_out,
+             fu_STREAM_OUT_ext_status{{i}} => status_{{i}}_out,
+             fu_STREAM_OUT_ext_dv{{i}}(0)  => dv_{{i}}_out,
 {{endif}}
 {{else}}
-             fu_STREAM_OUT_{{output.index}}_ext_status{{i}} => (others => '0'),
+             fu_STREAM_OUT_ext_status{{i}} => (others => '0'),
 {{endif}}
-{{endfor}}
 {{endfor}}
              rstx                       => rst_n);
 end bdf_type;

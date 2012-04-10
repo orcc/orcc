@@ -38,7 +38,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.CustomPrinter;
@@ -84,9 +83,6 @@ import org.eclipse.core.resources.IFile;
  */
 public class TTABackendImpl extends AbstractBackend {
 
-	/**
-	 * Backend options
-	 */
 	private boolean debug;
 	private boolean finalize;
 	private FPGA fpga;
@@ -95,6 +91,8 @@ public class TTABackendImpl extends AbstractBackend {
 
 	private final Map<String, String> transformations;
 	private final List<String> processorIntensiveActors;
+
+	private ArchitectureFactory factory = ArchitectureFactory.eINSTANCE;
 
 	/**
 	 * Creates a new instance of the TTA back-end. Initializes the
@@ -130,6 +128,7 @@ public class TTABackendImpl extends AbstractBackend {
 		// Set default FIFO size to 256
 		fifoSize = getAttribute(FIFO_SIZE, 256);
 		fifoWidthu = (int) Math.ceil(Math.log(fifoSize) / Math.log(2));
+
 	}
 
 	/*
@@ -321,17 +320,13 @@ public class TTABackendImpl extends AbstractBackend {
 		int ramSize = instance.isActor() ? ArchitectureMemoryStats
 				.computeNeededMemorySize(instance.getActor()) : 1;
 
-		Processor tta = ArchitectureFactory.eINSTANCE.createProcessor(
-				instance.getSimpleName(), getBusNb(instance),
-				getRegNb(instance), 12, 2, getAluNb(instance), 1, 1, 1,
-				EcoreHelper.getList(instance.getEntity(), "inputs").size(),
-				EcoreHelper.getList(instance.getEntity(), "outputs").size(),
-				ramSize);
+		Processor tta = factory.createProcessor(instance.getSimpleName(),
+				getBusNb(instance), getRegNb(instance), 12, 2,
+				getAluNb(instance), 1, 1, 1, ramSize);
 
 		/*
-		 * Processor tta = ArchitectureFactory.eINSTANCE.createHugeProcessor(
-		 * instance.getSimpleName(), instance.getEntity().getInputs() .size(),
-		 * instance.getEntity().getOutputs().size(), ramSize);
+		 * Processor tta = factory.createHugeProcessor(instance.getSimpleName(),
+		 * ramSize);
 		 */
 
 		CustomPrinter adfPrinter = new CustomPrinter(

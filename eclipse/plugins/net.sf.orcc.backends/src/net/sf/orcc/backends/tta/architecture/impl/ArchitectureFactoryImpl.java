@@ -1197,9 +1197,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public FunctionUnit createStreamInput(Processor tta, int index) {
+	public FunctionUnit createStreamInput(Processor tta) {
 		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
-		String name = "STREAM_IN_" + index;
+		String name = "STREAM_IN";
 		functionUnit.setName(name);
 		// Sockets
 		EList<Segment> segments = getAllSegments(tta.getBuses());
@@ -1224,9 +1224,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public FunctionUnit createStreamOutput(Processor tta, int index) {
+	public FunctionUnit createStreamOutput(Processor tta) {
 		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
-		String name = "STREAM_OUT_" + index;
+		String name = "STREAM_OUT";
 		functionUnit.setName(name);
 		// Sockets
 		EList<Segment> segments = getAllSegments(tta.getBuses());
@@ -1293,7 +1293,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	@Override
 	public Processor createProcessor(String name, int busNb, int intRfNb,
 			int intRfSize, int boolRfSize, int aluNb, int lsuNb, int mulNb,
-			int logNb, int inputNb, int outputNb, int ramSize) {
+			int logNb, int ramSize) {
 		Processor tta = createProcessor();
 		tta.setName(name);
 		// Address spaces
@@ -1351,21 +1351,15 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 				logicImpl));
 		tta.getHardwareDatabase().add(logicImpl);
 		// * Stream-units
-		for (int i = 0; i < inputNb; i++) {
-			tta.getFunctionUnits().add(createStreamInput(tta, i));
-		}
-		for (int i = 0; i < outputNb; i++) {
-			tta.getFunctionUnits().add(createStreamOutput(tta, i));
-		}
+		tta.getFunctionUnits().add(createStreamInput(tta));
+		tta.getFunctionUnits().add(createStreamOutput(tta));
 
 		return tta;
 	}
 
 	@Override
-	public Processor createHugeProcessor(String name, int inputNb,
-			int outputNb, int ramSize) {
-		return createProcessor(name, 32, 8, 32, 3, 12, 2, 8, 0, inputNb,
-				outputNb, ramSize);
+	public Processor createHugeProcessor(String name, int ramSize) {
+		return createProcessor(name, 32, 8, 32, 3, 12, 2, 8, 0, ramSize);
 	}
 
 	/**
