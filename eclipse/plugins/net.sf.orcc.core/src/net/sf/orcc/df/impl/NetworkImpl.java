@@ -79,49 +79,9 @@ import org.eclipse.emf.ecore.util.InternalEList;
  */
 public class NetworkImpl extends EntityImpl implements Network {
 	/**
-	 * The cached value of the '{@link #getEdges() <em>Edges</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getEdges()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Edge> edges;
-
-	/**
-	 * The cached value of the '{@link #getVertices() <em>Vertices</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getVertices()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Vertex> vertices;
-
-	/**
-	 * The cached value of the '{@link #getMoC() <em>Mo C</em>}' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getMoC()
-	 * @generated
-	 * @ordered
-	 */
-	protected MoC moC;
-
-	/**
-	 * @generated
-	 */
-	protected EList<Var> variables;
-
-	/**
-	 * The cached value of the '{@link #getInstances() <em>Instances</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getInstances()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Instance> instances;
-
-	/**
-	 * The default value of the '{@link #getFileName() <em>File Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The default value of the '{@link #getFileName() <em>File Name</em>}'
+	 * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getFileName()
 	 * @generated
 	 * @ordered
@@ -129,17 +89,19 @@ public class NetworkImpl extends EntityImpl implements Network {
 	protected static final String FILE_NAME_EDEFAULT = null;
 
 	/**
-	 * The cached value of the '{@link #getFileName() <em>File Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getFileName()
+	 * The cached value of the '{@link #getEdges() <em>Edges</em>}' containment
+	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getEdges()
 	 * @generated
 	 * @ordered
 	 */
-	protected String fileName = FILE_NAME_EDEFAULT;
+	protected EList<Edge> edges;
 
 	/**
-	 * The cached value of the '{@link #getEntities() <em>Entities</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getEntities() <em>Entities</em>}'
+	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getEntities()
 	 * @generated
 	 * @ordered
@@ -147,9 +109,19 @@ public class NetworkImpl extends EntityImpl implements Network {
 	protected EList<Entity> entities;
 
 	/**
-	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The cached value of the '{@link #getFileName() <em>File Name</em>}'
+	 * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getFileName()
+	 * @generated
+	 * @ordered
+	 */
+	protected String fileName = FILE_NAME_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' reference
+	 * list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getInputs()
 	 * @generated
 	 * @ordered
@@ -157,9 +129,29 @@ public class NetworkImpl extends EntityImpl implements Network {
 	protected EList<Port> inputs;
 
 	/**
-	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The cached value of the '{@link #getInstances() <em>Instances</em>}'
+	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getInstances()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Instance> instances;
+
+	/**
+	 * The cached value of the '{@link #getMoC() <em>Mo C</em>}' containment
+	 * reference. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getMoC()
+	 * @generated
+	 * @ordered
+	 */
+	protected MoC moC;
+
+	/**
+	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}'
+	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getOutputs()
 	 * @generated
 	 * @ordered
@@ -167,11 +159,32 @@ public class NetworkImpl extends EntityImpl implements Network {
 	protected EList<Port> outputs;
 
 	/**
+	 * @generated
+	 */
+	protected EList<Var> variables;
+
+	/**
+	 * The cached value of the '{@link #getVertices() <em>Vertices</em>}'
+	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getVertices()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Vertex> vertices;
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected NetworkImpl() {
 		super();
+	}
+
+	@Override
+	public void add(Edge edge) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -203,6 +216,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public NotificationChain basicSetMoC(MoC newMoC, NotificationChain msgs) {
@@ -263,6 +277,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -282,6 +297,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -301,6 +317,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -330,6 +347,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -352,6 +370,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -382,6 +401,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -428,6 +448,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -437,6 +458,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -544,6 +566,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Edge> getEdges() {
@@ -556,6 +579,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Entity> getEntities() {
@@ -578,6 +602,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String getFileName() {
@@ -600,8 +625,8 @@ public class NetworkImpl extends EntityImpl implements Network {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Port> getInputs() {
@@ -624,6 +649,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Instance> getInstances() {
@@ -683,8 +709,8 @@ public class NetworkImpl extends EntityImpl implements Network {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Port> getOutputs() {
@@ -721,6 +747,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Vertex> getVertices() {
@@ -803,6 +830,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void setFileName(String newFileName) {
