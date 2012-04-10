@@ -147,7 +147,7 @@ public class WorkspaceCreator implements IApplication {
 			try {
 				disableAutoBuild();
 
-				File searchPath = new File(args[0]);
+				File searchPath = new File(args[0]).getAbsoluteFile();
 				searchForProjects(searchPath);
 
 				return IApplication.EXIT_OK;
@@ -165,7 +165,7 @@ public class WorkspaceCreator implements IApplication {
 			}
 		} else {
 			System.err
-					.println("Please add the path to find projects to add in workspace");
+					.println("Please add the path to a directory containing .project files.");
 		}
 
 		return IApplication.EXIT_RELAUNCH;
