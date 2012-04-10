@@ -93,7 +93,7 @@ TRIGGER
 	limit = (int)sqrt((double)fifo_size);
 	if(test_limit <= limit)
 		RUNTIME_ERROR("Stream out of data.")
-	tokens_remaining = tokens_remaining > 256 ? 256 : tokens_remaining;
+	tokens_remaining = tokens_remaining > 512 ? 512 : tokens_remaining;
 		
     IO(2) = tokens_remaining;
 END_TRIGGER;
@@ -191,7 +191,7 @@ END_OPERATION_WITH_STATE(CAL_STREAM_OUT_WRITE)
 OPERATION_WITH_STATE(CAL_STREAM_OUT_STATUS, OUTPUT_STREAM)
 
 TRIGGER
-    IO(2) = 256;
+    IO(2) = 512;
 END_TRIGGER;
 
 END_OPERATION_WITH_STATE(CAL_STREAM_OUT_STATUS)
