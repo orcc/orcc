@@ -116,58 +116,14 @@ public interface ArchitecturePackage extends EPackage {
 	int DESIGN_FEATURE_COUNT = GraphPackage.GRAPH_FEATURE_COUNT + 0;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.HwFifoImpl <em>Hw Fifo</em>}' class.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see net.sf.orcc.backends.tta.architecture.impl.HwFifoImpl
-	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getHwFifo()
-	 * @generated
-	 */
-	int HW_FIFO = 1;
-
-	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int HW_FIFO__ATTRIBUTES = GraphPackage.EDGE__ATTRIBUTES;
-
-	/**
-	 * The feature id for the '<em><b>Source</b></em>' reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int HW_FIFO__SOURCE = GraphPackage.EDGE__SOURCE;
-
-	/**
-	 * The feature id for the '<em><b>Target</b></em>' reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int HW_FIFO__TARGET = GraphPackage.EDGE__TARGET;
-
-	/**
-	 * The number of structural features of the '<em>Hw Fifo</em>' class. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int HW_FIFO_FEATURE_COUNT = GraphPackage.EDGE_FEATURE_COUNT + 0;
-
-	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.HwBroadcastImpl <em>Hw Broadcast</em>}' class.
+	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.FifoImpl <em>Fifo</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.backends.tta.architecture.impl.HwBroadcastImpl
-	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getHwBroadcast()
+	 * @see net.sf.orcc.backends.tta.architecture.impl.FifoImpl
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getFifo()
 	 * @generated
 	 */
-	int HW_BROADCAST = 2;
+	int FIFO = 1;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -176,7 +132,99 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int HW_BROADCAST__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
+	int FIFO__ATTRIBUTES = GraphPackage.EDGE__ATTRIBUTES;
+
+	/**
+	 * The feature id for the '<em><b>Source</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FIFO__SOURCE = GraphPackage.EDGE__SOURCE;
+
+	/**
+	 * The feature id for the '<em><b>Target</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FIFO__TARGET = GraphPackage.EDGE__TARGET;
+
+	/**
+	 * The number of structural features of the '<em>Fifo</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FIFO_FEATURE_COUNT = GraphPackage.EDGE_FEATURE_COUNT + 0;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.SignalImpl <em>Signal</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.tta.architecture.impl.SignalImpl
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getSignal()
+	 * @generated
+	 */
+	int SIGNAL = 2;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SIGNAL__ATTRIBUTES = GraphPackage.EDGE__ATTRIBUTES;
+
+	/**
+	 * The feature id for the '<em><b>Source</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SIGNAL__SOURCE = GraphPackage.EDGE__SOURCE;
+
+	/**
+	 * The feature id for the '<em><b>Target</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SIGNAL__TARGET = GraphPackage.EDGE__TARGET;
+
+	/**
+	 * The number of structural features of the '<em>Signal</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SIGNAL_FEATURE_COUNT = GraphPackage.EDGE_FEATURE_COUNT + 0;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ComponentImpl <em>Component</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ComponentImpl
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getComponent()
+	 * @generated
+	 */
+	int COMPONENT = 3;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMPONENT__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
@@ -185,7 +233,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int HW_BROADCAST__INCOMING = GraphPackage.VERTEX__INCOMING;
+	int COMPONENT__INCOMING = GraphPackage.VERTEX__INCOMING;
 
 	/**
 	 * The feature id for the '<em><b>Number</b></em>' attribute.
@@ -194,7 +242,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int HW_BROADCAST__NUMBER = GraphPackage.VERTEX__NUMBER;
+	int COMPONENT__NUMBER = GraphPackage.VERTEX__NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
@@ -203,16 +251,71 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int HW_BROADCAST__OUTGOING = GraphPackage.VERTEX__OUTGOING;
+	int COMPONENT__OUTGOING = GraphPackage.VERTEX__OUTGOING;
 
 	/**
-	 * The number of structural features of the '<em>Hw Broadcast</em>' class.
+	 * The number of structural features of the '<em>Component</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int HW_BROADCAST_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 0;
+	int COMPONENT_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 0;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.BroadcastImpl <em>Broadcast</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.tta.architecture.impl.BroadcastImpl
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getBroadcast()
+	 * @generated
+	 */
+	int BROADCAST = 4;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int BROADCAST__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
+
+	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int BROADCAST__INCOMING = GraphPackage.VERTEX__INCOMING;
+
+	/**
+	 * The feature id for the '<em><b>Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int BROADCAST__NUMBER = GraphPackage.VERTEX__NUMBER;
+
+	/**
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int BROADCAST__OUTGOING = GraphPackage.VERTEX__OUTGOING;
+
+	/**
+	 * The number of structural features of the '<em>Broadcast</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int BROADCAST_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 0;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl <em>Processor</em>}' class.
@@ -221,7 +324,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getProcessor()
 	 * @generated
 	 */
-	int PROCESSOR = 3;
+	int PROCESSOR = 5;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -342,7 +445,7 @@ public interface ArchitecturePackage extends EPackage {
 	int PROCESSOR__HARDWARE_DATABASE = GraphPackage.VERTEX_FEATURE_COUNT + 9;
 
 	/**
-	 * The feature id for the '<em><b>Mapped Actors</b></em>' reference.
+	 * The feature id for the '<em><b>Mapped Actors</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -366,7 +469,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getBus()
 	 * @generated
 	 */
-	int BUS = 4;
+	int BUS = 6;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -426,7 +529,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getBridge()
 	 * @generated
 	 */
-	int BRIDGE = 5;
+	int BRIDGE = 7;
 
 	/**
 	 * The feature id for the '<em><b>Input Bus</b></em>' reference. <!--
@@ -462,7 +565,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getSegment()
 	 * @generated
 	 */
-	int SEGMENT = 6;
+	int SEGMENT = 8;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -490,7 +593,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getGlobalControlUnit()
 	 * @generated
 	 */
-	int GLOBAL_CONTROL_UNIT = 7;
+	int GLOBAL_CONTROL_UNIT = 9;
 
 	/**
 	 * The feature id for the '<em><b>Ports</b></em>' containment reference list.
@@ -561,7 +664,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getFunctionUnit()
 	 * @generated
 	 */
-	int FUNCTION_UNIT = 8;
+	int FUNCTION_UNIT = 10;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -624,7 +727,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getRegisterFile()
 	 * @generated
 	 */
-	int REGISTER_FILE = 9;
+	int REGISTER_FILE = 11;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -703,7 +806,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getPort()
 	 * @generated
 	 */
-	int PORT = 10;
+	int PORT = 12;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -775,7 +878,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getSocket()
 	 * @generated
 	 */
-	int SOCKET = 11;
+	int SOCKET = 13;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -819,7 +922,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getOperation()
 	 * @generated
 	 */
-	int OPERATION = 12;
+	int OPERATION = 14;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -867,7 +970,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getAddressSpace()
 	 * @generated
 	 */
-	int ADDRESS_SPACE = 13;
+	int ADDRESS_SPACE = 15;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -920,7 +1023,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getGuard()
 	 * @generated
 	 */
-	int GUARD = 19;
+	int GUARD = 21;
 
 	/**
 	 * The meta object id for the '
@@ -932,7 +1035,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprUnary()
 	 * @generated
 	 */
-	int EXPR_UNARY = 20;
+	int EXPR_UNARY = 22;
 
 	/**
 	 * The meta object id for the '
@@ -944,7 +1047,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprBinary()
 	 * @generated
 	 */
-	int EXPR_BINARY = 21;
+	int EXPR_BINARY = 23;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ExprTrueImpl <em>Expr True</em>}' class.
@@ -953,7 +1056,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprTrue()
 	 * @generated
 	 */
-	int EXPR_TRUE = 22;
+	int EXPR_TRUE = 24;
 
 	/**
 	 * The meta object id for the '
@@ -965,7 +1068,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprFalse()
 	 * @generated
 	 */
-	int EXPR_FALSE = 23;
+	int EXPR_FALSE = 25;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.Term <em>Term</em>}' class.
@@ -974,7 +1077,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTerm()
 	 * @generated
 	 */
-	int TERM = 24;
+	int TERM = 26;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.TermBoolImpl <em>Term Bool</em>}' class.
@@ -983,7 +1086,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTermBool()
 	 * @generated
 	 */
-	int TERM_BOOL = 25;
+	int TERM_BOOL = 27;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.TermUnitImpl <em>Term Unit</em>}' class.
@@ -992,7 +1095,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTermUnit()
 	 * @generated
 	 */
-	int TERM_UNIT = 26;
+	int TERM_UNIT = 28;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.Element <em>Element</em>}' class.
@@ -1001,7 +1104,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getElement()
 	 * @generated
 	 */
-	int ELEMENT = 14;
+	int ELEMENT = 16;
 
 	/**
 	 * The feature id for the '<em><b>Start Cycle</b></em>' attribute. <!--
@@ -1037,7 +1140,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getReads()
 	 * @generated
 	 */
-	int READS = 15;
+	int READS = 17;
 
 	/**
 	 * The feature id for the '<em><b>Start Cycle</b></em>' attribute. <!--
@@ -1082,7 +1185,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getWrites()
 	 * @generated
 	 */
-	int WRITES = 16;
+	int WRITES = 18;
 
 	/**
 	 * The feature id for the '<em><b>Start Cycle</b></em>' attribute. <!--
@@ -1127,7 +1230,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getResource()
 	 * @generated
 	 */
-	int RESOURCE = 17;
+	int RESOURCE = 19;
 
 	/**
 	 * The feature id for the '<em><b>Start Cycle</b></em>' attribute. <!--
@@ -1173,7 +1276,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getPortToIndexMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_INDEX_MAP_ENTRY = 28;
+	int PORT_TO_INDEX_MAP_ENTRY = 30;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ShortImmediateImpl <em>Short Immediate</em>}' class.
@@ -1183,7 +1286,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getShortImmediate()
 	 * @generated
 	 */
-	int SHORT_IMMEDIATE = 18;
+	int SHORT_IMMEDIATE = 20;
 
 	/**
 	 * The feature id for the '<em><b>Extension</b></em>' attribute. <!--
@@ -1369,7 +1472,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getImplementation()
 	 * @generated
 	 */
-	int IMPLEMENTATION = 27;
+	int IMPLEMENTATION = 29;
 
 	/**
 	 * The feature id for the '<em><b>Hdb File</b></em>' attribute. <!--
@@ -1434,7 +1537,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getSocketType()
 	 * @generated
 	 */
-	int SOCKET_TYPE = 29;
+	int SOCKET_TYPE = 31;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.Extension <em>Extension</em>}' enum.
@@ -1443,7 +1546,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExtension()
 	 * @generated
 	 */
-	int EXTENSION = 30;
+	int EXTENSION = 32;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.OpUnary <em>Op Unary</em>}' enum.
@@ -1452,7 +1555,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getOpUnary()
 	 * @generated
 	 */
-	int OP_UNARY = 31;
+	int OP_UNARY = 33;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.OpBinary <em>Op Binary</em>}' enum.
@@ -1461,7 +1564,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getOpBinary()
 	 * @generated
 	 */
-	int OP_BINARY = 32;
+	int OP_BINARY = 34;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Design <em>Design</em>}'.
@@ -1473,23 +1576,44 @@ public interface ArchitecturePackage extends EPackage {
 	EClass getDesign();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.HwFifo <em>Hw Fifo</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Hw Fifo</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.HwFifo
-	 * @generated
-	 */
-	EClass getHwFifo();
-
-	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.HwBroadcast <em>Hw Broadcast</em>}'.
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Fifo <em>Fifo</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Hw Broadcast</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.HwBroadcast
+	 * @return the meta object for class '<em>Fifo</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Fifo
 	 * @generated
 	 */
-	EClass getHwBroadcast();
+	EClass getFifo();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Signal <em>Signal</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Signal</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Signal
+	 * @generated
+	 */
+	EClass getSignal();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Component <em>Component</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Component</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Component
+	 * @generated
+	 */
+	EClass getComponent();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Broadcast <em>Broadcast</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Broadcast</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Broadcast
+	 * @generated
+	 */
+	EClass getBroadcast();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Processor <em>Processor</em>}'.
@@ -1595,10 +1719,10 @@ public interface ArchitecturePackage extends EPackage {
 	EReference getProcessor_HardwareDatabase();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.Processor#getMappedActors <em>Mapped Actors</em>}'.
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.backends.tta.architecture.Processor#getMappedActors <em>Mapped Actors</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Mapped Actors</em>'.
+	 * @return the meta object for the reference list '<em>Mapped Actors</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.Processor#getMappedActors()
 	 * @see #getProcessor()
 	 * @generated
@@ -2552,26 +2676,44 @@ public interface ArchitecturePackage extends EPackage {
 		EClass DESIGN = eINSTANCE.getDesign();
 
 		/**
-		 * The meta object literal for the '
-		 * {@link net.sf.orcc.backends.tta.architecture.impl.HwFifoImpl
-		 * <em>Hw Fifo</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
-		 * -->
-		 * 
-		 * @see net.sf.orcc.backends.tta.architecture.impl.HwFifoImpl
-		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getHwFifo()
-		 * @generated
-		 */
-		EClass HW_FIFO = eINSTANCE.getHwFifo();
-
-		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.HwBroadcastImpl <em>Hw Broadcast</em>}' class.
+		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.FifoImpl <em>Fifo</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.backends.tta.architecture.impl.HwBroadcastImpl
-		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getHwBroadcast()
+		 * @see net.sf.orcc.backends.tta.architecture.impl.FifoImpl
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getFifo()
 		 * @generated
 		 */
-		EClass HW_BROADCAST = eINSTANCE.getHwBroadcast();
+		EClass FIFO = eINSTANCE.getFifo();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.SignalImpl <em>Signal</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.backends.tta.architecture.impl.SignalImpl
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getSignal()
+		 * @generated
+		 */
+		EClass SIGNAL = eINSTANCE.getSignal();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.ComponentImpl <em>Component</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ComponentImpl
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getComponent()
+		 * @generated
+		 */
+		EClass COMPONENT = eINSTANCE.getComponent();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.BroadcastImpl <em>Broadcast</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.backends.tta.architecture.impl.BroadcastImpl
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getBroadcast()
+		 * @generated
+		 */
+		EClass BROADCAST = eINSTANCE.getBroadcast();
 
 		/**
 		 * The meta object literal for the '
@@ -2655,7 +2797,7 @@ public interface ArchitecturePackage extends EPackage {
 				.getProcessor_HardwareDatabase();
 
 		/**
-		 * The meta object literal for the '<em><b>Mapped Actors</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Mapped Actors</b></em>' reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated

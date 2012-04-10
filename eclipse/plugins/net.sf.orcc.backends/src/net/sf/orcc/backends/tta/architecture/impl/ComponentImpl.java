@@ -33,26 +33,26 @@ package net.sf.orcc.backends.tta.architecture.impl;
 import net.sf.dftools.graph.impl.VertexImpl;
 
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
-import net.sf.orcc.backends.tta.architecture.HwBroadcast;
+import net.sf.orcc.backends.tta.architecture.Component;
 
 import org.eclipse.emf.ecore.EClass;
 
 /**
  * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Hw Broadcast</b></em>'.
+ * An implementation of the model object '<em><b>Component</b></em>'.
  * <!-- end-user-doc -->
  * <p>
  * </p>
  *
  * @generated
  */
-public class HwBroadcastImpl extends VertexImpl implements HwBroadcast {
+public class ComponentImpl extends VertexImpl implements Component {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected HwBroadcastImpl() {
+	protected ComponentImpl() {
 		super();
 	}
 
@@ -63,7 +63,7 @@ public class HwBroadcastImpl extends VertexImpl implements HwBroadcast {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return ArchitecturePackage.Literals.HW_BROADCAST;
+		return ArchitecturePackage.Literals.COMPONENT;
 	}
 
-} //HwBroadcastImpl
+} //ComponentImpl

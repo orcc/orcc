@@ -35,7 +35,9 @@ import net.sf.orcc.backends.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.Bridge;
+import net.sf.orcc.backends.tta.architecture.Broadcast;
 import net.sf.orcc.backends.tta.architecture.Bus;
+import net.sf.orcc.backends.tta.architecture.Component;
 import net.sf.orcc.backends.tta.architecture.Design;
 import net.sf.orcc.backends.tta.architecture.Element;
 import net.sf.orcc.backends.tta.architecture.ExprBinary;
@@ -43,11 +45,10 @@ import net.sf.orcc.backends.tta.architecture.ExprFalse;
 import net.sf.orcc.backends.tta.architecture.ExprTrue;
 import net.sf.orcc.backends.tta.architecture.ExprUnary;
 import net.sf.orcc.backends.tta.architecture.Extension;
+import net.sf.orcc.backends.tta.architecture.Fifo;
 import net.sf.orcc.backends.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
-import net.sf.orcc.backends.tta.architecture.HwBroadcast;
 import net.sf.orcc.backends.tta.architecture.Guard;
-import net.sf.orcc.backends.tta.architecture.HwFifo;
 import net.sf.orcc.backends.tta.architecture.Implementation;
 import net.sf.orcc.backends.tta.architecture.OpBinary;
 import net.sf.orcc.backends.tta.architecture.OpUnary;
@@ -59,6 +60,7 @@ import net.sf.orcc.backends.tta.architecture.RegisterFile;
 import net.sf.orcc.backends.tta.architecture.Resource;
 import net.sf.orcc.backends.tta.architecture.Segment;
 import net.sf.orcc.backends.tta.architecture.ShortImmediate;
+import net.sf.orcc.backends.tta.architecture.Signal;
 import net.sf.orcc.backends.tta.architecture.Socket;
 import net.sf.orcc.backends.tta.architecture.SocketType;
 import net.sf.orcc.backends.tta.architecture.Term;
@@ -78,12 +80,14 @@ import org.eclipse.emf.ecore.plugin.EcorePlugin;
 /**
  * <!-- begin-user-doc --> An implementation of the model <b>Factory</b>. <!--
  * end-user-doc -->
+ * 
  * @generated
  */
 public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		ArchitectureFactory {
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @deprecated
 	 * @generated
 	 */
@@ -93,9 +97,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * Creates the default factory implementation.
-	 * <!-- begin-user-doc --> <!--
+	 * Creates the default factory implementation. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public static ArchitectureFactory init() {
@@ -112,9 +116,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * Creates an instance of the factory.
-	 * <!-- begin-user-doc --> <!--
+	 * Creates an instance of the factory. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ArchitectureFactoryImpl() {
@@ -123,6 +127,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String convertExtensionToString(EDataType eDataType,
@@ -132,6 +137,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String convertOpBinaryToString(EDataType eDataType,
@@ -141,6 +147,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String convertOpUnaryToString(EDataType eDataType,
@@ -150,6 +157,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String convertSocketTypeToString(EDataType eDataType,
@@ -159,6 +167,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -180,6 +189,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Design createDesign() {
@@ -189,25 +199,47 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
-	public HwFifo createHwFifo() {
-		HwFifoImpl hwFifo = new HwFifoImpl();
-		return hwFifo;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public HwBroadcast createHwBroadcast() {
-		HwBroadcastImpl hwBroadcast = new HwBroadcastImpl();
-		return hwBroadcast;
+	public Fifo createFifo() {
+		FifoImpl fifo = new FifoImpl();
+		return fifo;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public Signal createSignal() {
+		SignalImpl signal = new SignalImpl();
+		return signal;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public Component createComponent() {
+		ComponentImpl component = new ComponentImpl();
+		return component;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public Broadcast createBroadcast() {
+		BroadcastImpl broadcast = new BroadcastImpl();
+		return broadcast;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Processor createProcessor() {
@@ -217,6 +249,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -224,10 +257,14 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		switch (eClass.getClassifierID()) {
 		case ArchitecturePackage.DESIGN:
 			return createDesign();
-		case ArchitecturePackage.HW_FIFO:
-			return createHwFifo();
-		case ArchitecturePackage.HW_BROADCAST:
-			return createHwBroadcast();
+		case ArchitecturePackage.FIFO:
+			return createFifo();
+		case ArchitecturePackage.SIGNAL:
+			return createSignal();
+		case ArchitecturePackage.COMPONENT:
+			return createComponent();
+		case ArchitecturePackage.BROADCAST:
+			return createBroadcast();
 		case ArchitecturePackage.PROCESSOR:
 			return createProcessor();
 		case ArchitecturePackage.BUS:
@@ -282,6 +319,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public AddressSpace createAddressSpace() {
@@ -400,6 +438,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Bridge createBridge() {
@@ -409,6 +448,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Bus createBus() {
@@ -434,6 +474,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprBinary createExprBinary() {
@@ -452,6 +493,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprFalse createExprFalse() {
@@ -461,6 +503,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprTrue createExprTrue() {
@@ -470,6 +513,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprUnary createExprUnary() {
@@ -491,6 +535,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Extension createExtensionFromString(EDataType eDataType,
@@ -505,6 +550,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -526,6 +572,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public FunctionUnit createFunctionUnit() {
@@ -585,6 +632,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public GlobalControlUnit createGlobalControlUnit() {
@@ -642,6 +690,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Implementation createImplementation() {
@@ -710,6 +759,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public OpBinary createOpBinaryFromString(EDataType eDataType,
@@ -724,6 +774,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Operation createOperation() {
@@ -910,6 +961,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public OpUnary createOpUnaryFromString(EDataType eDataType,
@@ -931,6 +983,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Port createPort() {
@@ -957,6 +1010,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Map.Entry<Port, Integer> createPortToIndexMapEntry() {
@@ -966,6 +1020,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Reads createReads() {
@@ -984,6 +1039,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public RegisterFile createRegisterFile() {
@@ -1053,6 +1109,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Resource createResource() {
@@ -1071,6 +1128,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Segment createSegment() {
@@ -1087,6 +1145,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ShortImmediate createShortImmediate() {
@@ -1104,6 +1163,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Socket createSocket() {
@@ -1123,6 +1183,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public SocketType createSocketTypeFromString(EDataType eDataType,
@@ -1195,6 +1256,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public TermBool createTermBool() {
@@ -1212,6 +1274,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public TermUnit createTermUnit() {
@@ -1307,6 +1370,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Writes createWrites() {
@@ -1333,6 +1397,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ArchitecturePackage getArchitecturePackage() {

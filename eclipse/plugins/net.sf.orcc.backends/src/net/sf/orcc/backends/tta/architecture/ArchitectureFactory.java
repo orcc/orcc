@@ -63,22 +63,40 @@ public interface ArchitectureFactory extends EFactory {
 	Design createDesign();
 
 	/**
-	 * Returns a new object of class '<em>Hw Fifo</em>'.
+	 * Returns a new object of class '<em>Fifo</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Hw Fifo</em>'.
+	 * @return a new object of class '<em>Fifo</em>'.
 	 * @generated
 	 */
-	HwFifo createHwFifo();
+	Fifo createFifo();
 
 	/**
-	 * Returns a new object of class '<em>Hw Broadcast</em>'.
+	 * Returns a new object of class '<em>Signal</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Hw Broadcast</em>'.
+	 * @return a new object of class '<em>Signal</em>'.
 	 * @generated
 	 */
-	HwBroadcast createHwBroadcast();
+	Signal createSignal();
+
+	/**
+	 * Returns a new object of class '<em>Component</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Component</em>'.
+	 * @generated
+	 */
+	Component createComponent();
+
+	/**
+	 * Returns a new object of class '<em>Broadcast</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Broadcast</em>'.
+	 * @generated
+	 */
+	Broadcast createBroadcast();
 
 	/**
 	 * Returns a new object of class '<em>Processor</em>'.

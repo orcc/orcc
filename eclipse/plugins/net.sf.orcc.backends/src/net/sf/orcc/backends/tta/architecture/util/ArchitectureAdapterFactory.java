@@ -37,18 +37,19 @@ import net.sf.dftools.util.Attributable;
 import net.sf.orcc.backends.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.Bridge;
+import net.sf.orcc.backends.tta.architecture.Broadcast;
 import net.sf.orcc.backends.tta.architecture.Bus;
+import net.sf.orcc.backends.tta.architecture.Component;
 import net.sf.orcc.backends.tta.architecture.Design;
 import net.sf.orcc.backends.tta.architecture.Element;
 import net.sf.orcc.backends.tta.architecture.ExprBinary;
 import net.sf.orcc.backends.tta.architecture.ExprFalse;
 import net.sf.orcc.backends.tta.architecture.ExprTrue;
 import net.sf.orcc.backends.tta.architecture.ExprUnary;
+import net.sf.orcc.backends.tta.architecture.Fifo;
 import net.sf.orcc.backends.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
 import net.sf.orcc.backends.tta.architecture.Guard;
-import net.sf.orcc.backends.tta.architecture.HwBroadcast;
-import net.sf.orcc.backends.tta.architecture.HwFifo;
 import net.sf.orcc.backends.tta.architecture.Implementation;
 import net.sf.orcc.backends.tta.architecture.Operation;
 import net.sf.orcc.backends.tta.architecture.Port;
@@ -58,6 +59,7 @@ import net.sf.orcc.backends.tta.architecture.RegisterFile;
 import net.sf.orcc.backends.tta.architecture.Resource;
 import net.sf.orcc.backends.tta.architecture.Segment;
 import net.sf.orcc.backends.tta.architecture.ShortImmediate;
+import net.sf.orcc.backends.tta.architecture.Signal;
 import net.sf.orcc.backends.tta.architecture.Socket;
 import net.sf.orcc.backends.tta.architecture.Term;
 import net.sf.orcc.backends.tta.architecture.TermBool;
@@ -128,13 +130,23 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 		}
 
 		@Override
-		public Adapter caseHwFifo(HwFifo object) {
-			return createHwFifoAdapter();
+		public Adapter caseFifo(Fifo object) {
+			return createFifoAdapter();
 		}
 
 		@Override
-		public Adapter caseHwBroadcast(HwBroadcast object) {
-			return createHwBroadcastAdapter();
+		public Adapter caseSignal(Signal object) {
+			return createSignalAdapter();
+		}
+
+		@Override
+		public Adapter caseComponent(Component object) {
+			return createComponentAdapter();
+		}
+
+		@Override
+		public Adapter caseBroadcast(Broadcast object) {
+			return createBroadcastAdapter();
 		}
 
 		@Override
@@ -320,29 +332,58 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.HwFifo <em>Hw Fifo</em>}'.
-	 * <!-- begin-user-doc --> This default implementation returns null so that
-	 * we can easily ignore cases; it's useful to ignore a case when inheritance
-	 * will catch all the cases anyway. <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.backends.tta.architecture.HwFifo
-	 * @generated
-	 */
-	public Adapter createHwFifoAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.HwBroadcast <em>Hw Broadcast</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.Fifo <em>Fifo</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.orcc.backends.tta.architecture.HwBroadcast
+	 * @see net.sf.orcc.backends.tta.architecture.Fifo
 	 * @generated
 	 */
-	public Adapter createHwBroadcastAdapter() {
+	public Adapter createFifoAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.Signal <em>Signal</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.tta.architecture.Signal
+	 * @generated
+	 */
+	public Adapter createSignalAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.Component <em>Component</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.tta.architecture.Component
+	 * @generated
+	 */
+	public Adapter createComponentAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.Broadcast <em>Broadcast</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.tta.architecture.Broadcast
+	 * @generated
+	 */
+	public Adapter createBroadcastAdapter() {
 		return null;
 	}
 

@@ -37,18 +37,19 @@ import net.sf.dftools.util.Attributable;
 import net.sf.orcc.backends.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.Bridge;
+import net.sf.orcc.backends.tta.architecture.Broadcast;
 import net.sf.orcc.backends.tta.architecture.Bus;
+import net.sf.orcc.backends.tta.architecture.Component;
 import net.sf.orcc.backends.tta.architecture.Design;
 import net.sf.orcc.backends.tta.architecture.Element;
 import net.sf.orcc.backends.tta.architecture.ExprBinary;
 import net.sf.orcc.backends.tta.architecture.ExprFalse;
 import net.sf.orcc.backends.tta.architecture.ExprTrue;
 import net.sf.orcc.backends.tta.architecture.ExprUnary;
+import net.sf.orcc.backends.tta.architecture.Fifo;
 import net.sf.orcc.backends.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
 import net.sf.orcc.backends.tta.architecture.Guard;
-import net.sf.orcc.backends.tta.architecture.HwBroadcast;
-import net.sf.orcc.backends.tta.architecture.HwFifo;
 import net.sf.orcc.backends.tta.architecture.Implementation;
 import net.sf.orcc.backends.tta.architecture.Operation;
 import net.sf.orcc.backends.tta.architecture.Port;
@@ -58,6 +59,7 @@ import net.sf.orcc.backends.tta.architecture.RegisterFile;
 import net.sf.orcc.backends.tta.architecture.Resource;
 import net.sf.orcc.backends.tta.architecture.Segment;
 import net.sf.orcc.backends.tta.architecture.ShortImmediate;
+import net.sf.orcc.backends.tta.architecture.Signal;
 import net.sf.orcc.backends.tta.architecture.Socket;
 import net.sf.orcc.backends.tta.architecture.Term;
 import net.sf.orcc.backends.tta.architecture.TermBool;
@@ -130,24 +132,46 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 				result = defaultCase(theEObject);
 			return result;
 		}
-		case ArchitecturePackage.HW_FIFO: {
-			HwFifo hwFifo = (HwFifo) theEObject;
-			T result = caseHwFifo(hwFifo);
+		case ArchitecturePackage.FIFO: {
+			Fifo fifo = (Fifo) theEObject;
+			T result = caseFifo(fifo);
 			if (result == null)
-				result = caseEdge(hwFifo);
+				result = caseEdge(fifo);
 			if (result == null)
-				result = caseAttributable(hwFifo);
+				result = caseAttributable(fifo);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
-		case ArchitecturePackage.HW_BROADCAST: {
-			HwBroadcast hwBroadcast = (HwBroadcast) theEObject;
-			T result = caseHwBroadcast(hwBroadcast);
+		case ArchitecturePackage.SIGNAL: {
+			Signal signal = (Signal) theEObject;
+			T result = caseSignal(signal);
 			if (result == null)
-				result = caseVertex(hwBroadcast);
+				result = caseEdge(signal);
 			if (result == null)
-				result = caseAttributable(hwBroadcast);
+				result = caseAttributable(signal);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.COMPONENT: {
+			Component component = (Component) theEObject;
+			T result = caseComponent(component);
+			if (result == null)
+				result = caseVertex(component);
+			if (result == null)
+				result = caseAttributable(component);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.BROADCAST: {
+			Broadcast broadcast = (Broadcast) theEObject;
+			T result = caseBroadcast(broadcast);
+			if (result == null)
+				result = caseVertex(broadcast);
+			if (result == null)
+				result = caseAttributable(broadcast);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -377,31 +401,62 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Hw Fifo</em>'.
-	 * <!-- begin-user-doc --> This implementation returns
-	 * null; returning a non-null result will terminate the switch. <!--
-	 * end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Hw Fifo</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseHwFifo(HwFifo object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Hw Broadcast</em>'.
+	 * Returns the result of interpreting the object as an instance of '<em>Fifo</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
 	 * returning a non-null result will terminate the switch.
 	 * <!-- end-user-doc -->
 	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Hw Broadcast</em>'.
+	 * @return the result of interpreting the object as an instance of '<em>Fifo</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseHwBroadcast(HwBroadcast object) {
+	public T caseFifo(Fifo object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Signal</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Signal</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseSignal(Signal object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Component</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Component</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseComponent(Component object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Broadcast</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Broadcast</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseBroadcast(Broadcast object) {
 		return null;
 	}
 

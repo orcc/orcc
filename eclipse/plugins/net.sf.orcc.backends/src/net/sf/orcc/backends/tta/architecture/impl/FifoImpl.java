@@ -31,35 +31,39 @@
 package net.sf.orcc.backends.tta.architecture.impl;
 
 import net.sf.dftools.graph.impl.EdgeImpl;
+
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
-import net.sf.orcc.backends.tta.architecture.HwFifo;
+import net.sf.orcc.backends.tta.architecture.Fifo;
 
 import org.eclipse.emf.ecore.EClass;
 
 /**
- * <!-- begin-user-doc --> An implementation of the model object '
- * <em><b>Hw Fifo</b></em>'. <!-- end-user-doc -->
+ * <!-- begin-user-doc -->
+ * An implementation of the model object '<em><b>Fifo</b></em>'.
+ * <!-- end-user-doc -->
  * <p>
  * </p>
  *
  * @generated
  */
-public class HwFifoImpl extends EdgeImpl implements HwFifo {
+public class FifoImpl extends EdgeImpl implements Fifo {
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected HwFifoImpl() {
+	protected FifoImpl() {
 		super();
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return ArchitecturePackage.Literals.HW_FIFO;
+		return ArchitecturePackage.Literals.FIFO;
 	}
 
-} // HwFifoImpl
+} //FifoImpl

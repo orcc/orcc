@@ -52,6 +52,7 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
+import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
@@ -189,14 +190,14 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 	protected EList<Implementation> hardwareDatabase;
 
 	/**
-	 * The cached value of the '{@link #getMappedActors() <em>Mapped Actors</em>}' reference.
+	 * The cached value of the '{@link #getMappedActors() <em>Mapped Actors</em>}' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see #getMappedActors()
 	 * @generated
 	 * @ordered
 	 */
-	protected Instance mappedActors;
+	protected EList<Instance> mappedActors;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -472,41 +473,12 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Instance getMappedActors() {
-		if (mappedActors != null && mappedActors.eIsProxy()) {
-			InternalEObject oldMappedActors = (InternalEObject) mappedActors;
-			mappedActors = (Instance) eResolveProxy(oldMappedActors);
-			if (mappedActors != oldMappedActors) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							ArchitecturePackage.PROCESSOR__MAPPED_ACTORS,
-							oldMappedActors, mappedActors));
-			}
+	public EList<Instance> getMappedActors() {
+		if (mappedActors == null) {
+			mappedActors = new EObjectResolvingEList<Instance>(Instance.class,
+					this, ArchitecturePackage.PROCESSOR__MAPPED_ACTORS);
 		}
 		return mappedActors;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Instance basicGetMappedActors() {
-		return mappedActors;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setMappedActors(Instance newMappedActors) {
-		Instance oldMappedActors = mappedActors;
-		mappedActors = newMappedActors;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					ArchitecturePackage.PROCESSOR__MAPPED_ACTORS,
-					oldMappedActors, mappedActors));
 	}
 
 	/**
@@ -596,9 +568,7 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 		case ArchitecturePackage.PROCESSOR__HARDWARE_DATABASE:
 			return getHardwareDatabase();
 		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
-			if (resolve)
-				return getMappedActors();
-			return basicGetMappedActors();
+			return getMappedActors();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -652,7 +622,8 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 					(Collection<? extends Implementation>) newValue);
 			return;
 		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
-			setMappedActors((Instance) newValue);
+			getMappedActors().clear();
+			getMappedActors().addAll((Collection<? extends Instance>) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -697,7 +668,7 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 			getHardwareDatabase().clear();
 			return;
 		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
-			setMappedActors((Instance) null);
+			getMappedActors().clear();
 			return;
 		}
 		super.eUnset(featureID);
@@ -733,7 +704,7 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 		case ArchitecturePackage.PROCESSOR__HARDWARE_DATABASE:
 			return hardwareDatabase != null && !hardwareDatabase.isEmpty();
 		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
-			return mappedActors != null;
+			return mappedActors != null && !mappedActors.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

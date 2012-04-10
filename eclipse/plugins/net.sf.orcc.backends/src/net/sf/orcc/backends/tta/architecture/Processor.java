@@ -237,30 +237,20 @@ public interface Processor extends Vertex {
 	EList<Implementation> getHardwareDatabase();
 
 	/**
-	 * Returns the value of the '<em><b>Mapped Actors</b></em>' reference.
+	 * Returns the value of the '<em><b>Mapped Actors</b></em>' reference list.
+	 * The list contents are of type {@link net.sf.orcc.df.Instance}.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Mapped Actors</em>' reference isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Mapped Actors</em>' reference.
-	 * @see #setMappedActors(Instance)
+	 * @return the value of the '<em>Mapped Actors</em>' reference list.
 	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getProcessor_MappedActors()
 	 * @model
 	 * @generated
 	 */
-	Instance getMappedActors();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Processor#getMappedActors <em>Mapped Actors</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Mapped Actors</em>' reference.
-	 * @see #getMappedActors()
-	 * @generated
-	 */
-	void setMappedActors(Instance value);
+	EList<Instance> getMappedActors();
 
 	/**
 	 * Returns the value of the '<em><b>Name</b></em>' attribute.
