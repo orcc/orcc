@@ -29,6 +29,9 @@
 package net.sf.orcc.cal.util;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
@@ -46,6 +49,9 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
 
 /**
  * This application take a folder path in argument and create a valid Eclipse
@@ -92,6 +98,32 @@ public class WorkspaceCreator implements IApplication {
 	}
 
 	/**
+	 * Scan the list of IJavaProject rax Classpath, extract projects from this
+	 * list and add them to the IProject referencedProjects list.
+	 * 
+	 * @throws CoreException
+	 */
+	private void registerReferencedProjects(IJavaProject jp, IProject p)
+			throws CoreException {
+
+		List<IProject> referencedProjects = new ArrayList<IProject>();
+
+		IClasspathEntry[] classpathEntries = jp.getRawClasspath();
+		for (IClasspathEntry cpe : classpathEntries) {
+			if (cpe.getEntryKind() == IClasspathEntry.CPE_PROJECT) {
+				IProject referencedProject = (IProject) workspace.getRoot()
+						.getProject(cpe.getPath().toString());
+
+				referencedProjects.add(referencedProject);
+			}
+		}
+
+		IProjectDescription desc = p.getDescription();
+		desc.setReferencedProjects(referencedProjects.toArray(new IProject[0]));
+		p.setDescription(desc, progressMonitor);
+	}
+
+	/**
 	 * Open searchFolder and try to find .project files inside it. Then, try to
 	 * create an eclipse projects and add it to the current workspace.
 	 * 
@@ -101,7 +133,7 @@ public class WorkspaceCreator implements IApplication {
 	 */
 	private void searchForProjects(File searchFolder) throws CoreException,
 			OrccException {
-		
+
 		if (!searchFolder.isDirectory()) {
 			throw new OrccException("Bad path to search project : "
 					+ searchFolder.getPath());
@@ -114,17 +146,21 @@ public class WorkspaceCreator implements IApplication {
 						IProjectDescription.DESCRIPTION_FILE_NAME)) {
 					IPath projectFile = new Path(child.getAbsolutePath());
 
-					IProjectDescription description = ResourcesPlugin
-							.getWorkspace().loadProjectDescription(projectFile);
+					IProjectDescription description = workspace
+							.loadProjectDescription(projectFile);
+
 					if (description.hasNature(nature)) {
 						IProject project = workspace.getRoot().getProject(
 								description.getName());
+
 						if (!project.exists()) {
 							project.create(description, progressMonitor);
 							project.open(progressMonitor);
 
-							System.out.println("Project " + project.getName()
-									+ " registered.");
+							IJavaProject jp = JavaCore.create(project);
+							registerReferencedProjects(jp, project);
+							
+							System.out.println(project.getName());
 						}
 					}
 				}
@@ -132,8 +168,11 @@ public class WorkspaceCreator implements IApplication {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.IApplicationContext)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.
+	 * IApplicationContext)
 	 */
 	@Override
 	public Object start(IApplicationContext context) {
@@ -147,7 +186,10 @@ public class WorkspaceCreator implements IApplication {
 			try {
 				disableAutoBuild();
 
-				File searchPath = new File(args[0]).getAbsoluteFile();
+				File searchPath = new File(args[0]).getCanonicalFile();
+				System.out.println("Register projects from "
+						+ searchPath.getAbsolutePath() + " to workspace "
+						+ workspace.getRoot().getLocation());
 				searchForProjects(searchPath);
 
 				return IApplication.EXIT_OK;
@@ -155,6 +197,8 @@ public class WorkspaceCreator implements IApplication {
 			} catch (CoreException e) {
 				System.err.println(e.getMessage());
 			} catch (OrccException e) {
+				System.err.println(e.getMessage());
+			} catch (IOException e) {
 				System.err.println(e.getMessage());
 			} finally {
 				try {
@@ -171,7 +215,9 @@ public class WorkspaceCreator implements IApplication {
 		return IApplication.EXIT_RELAUNCH;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.equinox.app.IApplication#stop()
 	 */
 	@Override
