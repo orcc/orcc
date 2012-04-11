@@ -3,8 +3,6 @@ package net.sf.orcc.runtime;
 import intf.channel.item.FileInputChannel;
 import intf.channel.item.FileOutputChannel;
 import intf.net.item.Tcp;
-import intf.net.item.TcpClient;
-import intf.net.item.TcpServer;
 import net.sf.orcc.runtime.impl.IntfChannel;
 import net.sf.orcc.runtime.impl.IntfNet;
 import net.sf.orcc.runtime.impl.SystemIO;
@@ -16,12 +14,8 @@ public class RuntimeFactory {
 		return new IntfNet();
 	}
 
-	public static Tcp createTcp(String address, String port) {
-		if (address.isEmpty()) {
-			return new TcpServer(Integer.parseInt(port));
-		} else {
-			return new TcpClient(address, Integer.parseInt(port));
-		}
+	public static Tcp createTcp(String hostName, String port) {
+		return new Tcp(hostName, Integer.parseInt(port));
 	}
 
 	public static FileInputChannel createFileInputChannel(String path,

@@ -29,8 +29,150 @@
 
 package intf.net.item;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
+
 import net.sf.orcc.runtime.impl.IntfNet;
 
 public class Tcp extends IntfNet {
+
+	private int SIZE = 1024;
+
+	private boolean isServer;
+	private String hostName;
+	private int port;
+
+	private ServerSocketChannel server = null;
+	private SocketChannel socket = null;
+
+	private ByteBuffer inputBuffer = ByteBuffer.allocateDirect(SIZE);
+	private ByteBuffer outputBuffer = ByteBuffer.allocateDirect(SIZE);
+
+	public Tcp(String hostName, int port) {
+		inputBuffer.flip();
+		outputBuffer.clear();
+		setConfig(hostName, port);
+		try {
+			if (isServer)
+				createServer();
+			else
+				createClient();
+		} catch (IOException e) {
+			this.close();
+			e.printStackTrace();
+		}
+	}
+
+	private void setConfig(String hostName, int port) {
+		this.hostName = hostName;
+		this.port = port;
+		this.isServer = hostName.isEmpty();
+	}
+
+	private void createServer() throws IOException {
+		server = ServerSocketChannel.open();
+		server.configureBlocking(false);
+		server.socket().bind(new InetSocketAddress(port));
+	}
+
+	private void createClient() throws IOException {
+		socket = SocketChannel.open();
+		socket.configureBlocking(false);
+		socket.connect(new InetSocketAddress(hostName, port));
+		socket.finishConnect();
+	}
+
+	@Override
+	public boolean exists() {
+		try {
+			if (isServer) {
+				if (socket == null) {
+					socket = server.accept();
+				}
+				return true;
+			} else {
+				if (socket != null) {
+					if (socket.isConnectionPending())
+						socket.finishConnect();
+					return socket.isConnected();
+				}
+				return false;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	@Override
+	public void close() {
+		try {
+			if (socket != null)
+				socket.close();
+			if (isServer) {
+				if (server != null) {
+					server.socket().close();
+					server.close();
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		server = null;
+		socket = null;
+	}
+
+	@Override
+	public boolean isInputShutdown() {
+		int size = inputBuffer.limit() - inputBuffer.position();
+		if (socket != null) {
+			if (socket.isConnected() && (size == 0)) {
+				int numBytesRead = 0;
+				try {
+					socket.configureBlocking(false);
+					inputBuffer.clear();
+					numBytesRead = socket.read(inputBuffer);
+					inputBuffer.flip();
+				} catch (IOException e) {
+					e.printStackTrace();
+					return super.isInputShutdown();
+				}
+				if (numBytesRead > 0) {
+					size = inputBuffer.limit();
+				}
+			}
+		}
+		return size == 0;
+	}
+
+	@Override
+	public boolean isOutputShutdown() {
+		if (socket != null) {
+			if (socket.isConnected())
+				return false;
+		}
+		return true;
+	}
+
+	@Override
+	public Byte readByte() {
+		return inputBuffer.get();
+	}
+
+	@Override
+	public void writeByte(Byte b) {
+		outputBuffer.put(b);
+		outputBuffer.flip();
+		try {
+			socket.write(outputBuffer);
+			if (outputBuffer.position() == outputBuffer.limit())
+				outputBuffer.clear();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 }
