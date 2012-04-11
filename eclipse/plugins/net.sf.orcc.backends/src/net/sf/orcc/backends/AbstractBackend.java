@@ -857,6 +857,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				System.err.println("Could not run the back-end with \""
 						+ networkName + "\"");
 				e.printStackTrace();
+				return IApplication.EXIT_RELAUNCH;
 			}
 		} catch (ParseException exp) {
 			HelpFormatter formatter = new HelpFormatter();
