@@ -154,11 +154,11 @@ public class WorkspaceCreator implements IApplication {
 								description.getName());
 
 						if (!project.exists()) {
-							IJavaProject jp = JavaCore.create(project);
-							registerReferencedProjects(jp, project);
-
 							project.create(description, progressMonitor);
 							project.open(progressMonitor);
+
+							IJavaProject jp = JavaCore.create(project);
+							registerReferencedProjects(jp, project);
 							
 							System.out.println(project.getName());
 						}
@@ -191,6 +191,8 @@ public class WorkspaceCreator implements IApplication {
 						+ searchPath.getAbsolutePath() + " to workspace "
 						+ workspace.getRoot().getLocation());
 				searchForProjects(searchPath);
+
+				workspace.save(true, progressMonitor);
 
 				return IApplication.EXIT_OK;
 
