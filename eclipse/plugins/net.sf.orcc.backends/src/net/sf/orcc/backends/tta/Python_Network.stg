@@ -3,40 +3,32 @@ printPort(port, index) ::= <<
 Port("<port.name>", <index>, <if(port.native)>True<else>False<endif>, <port.type.sizeInBits>)
 >>
 
-initPorts(name, inputs, outputs) ::= <<
-<name>_inputs = [<inputs: { port | <printPort(port, i0)> }; separator=", ">]
-<name>_outputs = [<outputs: { port | <printPort(port, i0)> }; separator=", ">]
+initProcessorPort(processor) ::= <<
+<processor.name>_inputs = [<processor.inputs: { port | <printPort(port, i0)> }; separator=", ">]
+<processor.name>_outputs = [<processor.outputs: { port | <printPort(port, i0)> }; separator=", ">]
 >>
 
-initInstancePort(instance) ::= <<
-<if(instance.actor)
-><initPorts(instance.simpleName, instance.actor.inputs, instance.actor.outputs)><
-elseif(instance.broadcast)
-><initPorts(instance.simpleName, instance.broadcast.inputs, instance.broadcast.outputs)><
-endif>
+initProcessor(processor) ::= <<
+Processor("<processor.name>", <processor.name>_inputs, <processor.name>_outputs)
 >>
 
-initInstance(vertex) ::= <<
-Processor("<vertex.simpleName>", <vertex.simpleName>_inputs, <vertex.simpleName>_outputs, <if(vertex.actor.native)>True<else>False<endif>, <if(vertex.broadcast)>True<else>False<endif>)
->>
-
-printNetwork(network, options) ::= <<
+printDesign(design, options) ::= <<
 # -*- coding: utf-8 -*-
 #
-# Generated from <network.name> using Open-RVC CAL Compiler
+# Generated from <design.name> using Open-RVC CAL Compiler
 #
 
 from orcc_ import *
 
 ## Ports initialization
-<network.instances: initInstancePort(); separator="\n">
+<design.processors: initProcessorPort(); separator="\n">
 
 ## Instances initialization
 processors = [
-	<network.instances: initInstance(); separator=",\n">
+	<design.processors: initProcessor(); separator=",\n">
 ]
 
 ## Network initialization
-design = Design("<network.simpleName>", processors, <if(options.fpga.altera)>True<else>False<endif>)
+design = Design("<design.name>", processors, <if(options.fpga.altera)>True<else>False<endif>)
 		
 >>

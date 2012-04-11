@@ -251,7 +251,7 @@ public class TTABackendImpl extends AbstractBackend {
 			CustomPrinter projectQpfPrinter = new CustomPrinter(
 					"net/sf/orcc/backends/tta/Quartus_Project.stg");
 			projectQsfPrinter.print("top.qsf", path, design);
-			projectQpfPrinter.print("top.qpf", path, "qpfNetwork");
+			projectQpfPrinter.print("top.qpf", path, "printQpf");
 		} else if (fpga.isXilinx()) {
 			// ISE
 			ArchitecturePrinter projectXisePrinter = new ArchitecturePrinter(
