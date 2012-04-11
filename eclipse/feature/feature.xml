@@ -108,7 +108,7 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
          id="net.sf.openforge.core"
          download-size="0"
          install-size="0"
-         version="1.0.12"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
