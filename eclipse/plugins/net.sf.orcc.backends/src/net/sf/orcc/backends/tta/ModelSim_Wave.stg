@@ -1,5 +1,5 @@
 
-printNetwork(network, options) ::= <<
+printDesign(design, options) ::= <<
 
 onerror {resume}
 quietly WaveActivateNextPane {} 0
@@ -8,20 +8,20 @@ add wave -noupdate -divider Top
 add wave -noupdate -divider \<NULL\>
 add wave -noupdate -format Logic /tb_top/clk
 add wave -noupdate -format Logic /tb_top/rst_n
-<network.inputs: addNetworkInputPort(); separator="\n">
-<network.outputs: addNetworkOutputPort(); separator="\n">
+<design.inputs: addNetworkInputPort(); separator="\n">
+<design.outputs: addNetworkOutputPort(); separator="\n">
 
-<network.instances: { instance | <addInstanceSignals(instance, true)> }; separator="\n\n">
-<network.connections: addConnectionSignals(); separator="\n\n">
+<design.processors: { processor | <printProcessorWave(processor, true)> }; separator="\n\n">
+<design.fifos: printFifoWave(); separator="\n\n">
 
 <printOptions()>
 >>
 
-printInstance(instance, options) ::= <<
+printProcessor(processor, options) ::= <<
 onerror {resume}
 quietly WaveActivateNextPane {} 0
 
-<addInstanceSignals(instance, false)>
+<printProcessorWave(processor, false)>
 
 <printOptions()>
 >>
@@ -50,55 +50,51 @@ addNetworkNativePort(port) ::= <<
 add wave -noupdate -format Literal /tb_top/<port.name>_native
 >>
 
-addInstanceSignals(instance, choosePrefix) ::= <<
-<if(!instance.actor.native)
->add wave -noupdate -divider \<NULL\>
-add wave -noupdate -divider <instance.id>
+printProcessorWave(processor, choosePrefix) ::= <<
+add wave -noupdate -divider \<NULL\>
+add wave -noupdate -divider <processor.name>
 add wave -noupdate -divider \<NULL\>
 
-add wave -noupdate -format Logic /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<instance.id><endif>/<instance.id>_inst/clk
-add wave -noupdate -format Logic /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<instance.id><endif>/<instance.id>_inst/rst_n
+add wave -noupdate -format Logic /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<processor.name><endif>/<processor.name>_inst/clk
+add wave -noupdate -format Logic /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<processor.name><endif>/<processor.name>_inst/rst_n
 
-<instance.actor.inputs: { input | <addInstanceInput(input, i0, choosePrefix)> }; separator="\n">
-<instance.actor.outputs: { output | <addInstanceOutput(output, i0, choosePrefix)> }; separator="\n"><
-endif>
+<processor.inputs: { input | <printProcessorInputWave(input, i0, choosePrefix)> }; separator="\n">
+<processor.outputs: { output | <printProcessorOutputWave(output, i0, choosePrefix)> }; separator="\n">
 >>
 
-addInstanceInput(input, index, choosePrefix) ::= <<
-<if(!input.native)
->add wave -noupdate -format Literal -radix decimal /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<instance.id><endif>/<instance.id>_inst/data_<index>_in
-add wave -noupdate -format Literal -radix decimal /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<instance.id><endif>//<instance.id>_inst/status_<index>_in
-add wave -noupdate -format Logic /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<instance.id><endif>/<instance.id>_inst/ack_<index>_in<
+printProcessorInputWave(edge, index, choosePrefix) ::= <<
+<if(!edge.fifo)
+>add wave -noupdate -format Literal -radix decimal /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<processor.name><endif>/<processor.name>_inst/data_<index>_in
+add wave -noupdate -format Literal -radix decimal /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<processor.name><endif>//<processor.name>_inst/status_<index>_in
+add wave -noupdate -format Logic /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<processor.name><endif>/<processor.name>_inst/ack_<index>_in<
 else
->add wave -noupdate -format Literal /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<instance.id><endif>/<instance.id>_inst/s_<input.name><
+>add wave -noupdate -format Literal /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<processor.name><endif>/<processor.name>_inst/s_<edge.name><
 endif>
 >>
 
-addInstanceOutput(output, index, choosePrefix) ::= <<
-<if(!output.native)
->add wave -noupdate -format Literal -radix decimal /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<instance.id><endif>/<instance.id>_inst/data_<index>_out
-add wave -noupdate -format Literal -radix decimal /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<instance.id><endif>/<instance.id>_inst/status_<index>_out
-add wave -noupdate -format Logic /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<instance.id><endif>/<instance.id>_inst/dv_<index>_out<
+printProcessorOutputWave(edge, index, choosePrefix) ::= <<
+<if(!edge.fifo)
+>add wave -noupdate -format Literal -radix decimal /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<processor.name><endif>/<processor.name>_inst/data_<index>_out
+add wave -noupdate -format Literal -radix decimal /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<processor.name><endif>/<processor.name>_inst/status_<index>_out
+add wave -noupdate -format Logic /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<processor.name><endif>/<processor.name>_inst/dv_<index>_out<
 else
->add wave -noupdate -format Literal /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<instance.id><endif>/<instance.id>_inst/s_<output.name><
+>add wave -noupdate -format Literal /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<processor.name><endif>/<processor.name>_inst/s_<output.name><
 endif>
 >>
 
-addConnectionSignals(connection) ::= <<
-<if(!connection.sourcePort.native && !connection.targetPort.native && !connection.source.port && !connection.target.port)
->add wave -noupdate -divider \<NULL\>
-add wave -noupdate -divider fifo_<connection.id>:_<connection.source.id>_\>\>_<connection.target.id>
+printFifoWave(fifo) ::= <<
 add wave -noupdate -divider \<NULL\>
-add wave -noupdate -format Logic /tb_top/top_orcc/fifo_<connection.id>/clk
-add wave -noupdate -format Logic /tb_top/top_orcc/fifo_<connection.id>/rst_n
-add wave -noupdate -format Logic /tb_top/top_orcc/fifo_<connection.id>/wrreq
-add wave -noupdate -format Logic /tb_top/top_orcc/fifo_<connection.id>/rdreq
-add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/fifo_<connection.id>/data
-add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/fifo_<connection.id>/q
-add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/fifo_<connection.id>/nb_freerooms
-add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/fifo_<connection.id>/nb_tokens
-add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/fifo_<connection.id>/nb_tokens_i<
-endif>
+add wave -noupdate -divider fifo_<fifo.name>:_<fifo.source.name>_\>\>_<fifo.target.name>
+add wave -noupdate -divider \<NULL\>
+add wave -noupdate -format Logic /tb_top/top_orcc/fifo_<fifo.name>/clk
+add wave -noupdate -format Logic /tb_top/top_orcc/fifo_<fifo.name>/rst_n
+add wave -noupdate -format Logic /tb_top/top_orcc/fifo_<fifo.name>/wrreq
+add wave -noupdate -format Logic /tb_top/top_orcc/fifo_<fifo.name>/rdreq
+add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/fifo_<fifo.name>/data
+add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/fifo_<fifo.name>/q
+add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/fifo_<fifo.name>/nb_freerooms
+add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/fifo_<fifo.name>/nb_tokens
+add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/fifo_<fifo.name>/nb_tokens_i
 >>
 
 printOptions() ::= <<

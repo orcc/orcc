@@ -31,15 +31,136 @@
 package net.sf.orcc.backends.tta.architecture;
 
 import net.sf.dftools.graph.Graph;
+import org.eclipse.emf.common.util.EList;
 
 /**
  * <!-- begin-user-doc --> A representation of the model object '
  * <em><b>Design</b></em>'. <!-- end-user-doc -->
  *
+ * <p>
+ * The following features are supported:
+ * <ul>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Design#getComponents <em>Components</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Design#getProcessors <em>Processors</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Design#getFifos <em>Fifos</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Design#getSignals <em>Signals</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Design#getPorts <em>Ports</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Design#getConfiguration <em>Configuration</em>}</li>
+ * </ul>
+ * </p>
  *
  * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getDesign()
  * @model
  * @generated
  */
 public interface Design extends Graph {
+
+	/**
+	 * Returns the value of the '<em><b>Components</b></em>' reference list.
+	 * The list contents are of type {@link net.sf.orcc.backends.tta.architecture.Component}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Components</em>' reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Components</em>' reference list.
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getDesign_Components()
+	 * @model
+	 * @generated
+	 */
+	EList<Component> getComponents();
+
+	/**
+	 * Returns the value of the '<em><b>Processors</b></em>' reference list.
+	 * The list contents are of type {@link net.sf.orcc.backends.tta.architecture.Processor}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Processors</em>' reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Processors</em>' reference list.
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getDesign_Processors()
+	 * @model
+	 * @generated
+	 */
+	EList<Processor> getProcessors();
+
+	/**
+	 * Returns the value of the '<em><b>Fifos</b></em>' reference list.
+	 * The list contents are of type {@link net.sf.orcc.backends.tta.architecture.Fifo}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Fifos</em>' reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Fifos</em>' reference list.
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getDesign_Fifos()
+	 * @model
+	 * @generated
+	 */
+	EList<Fifo> getFifos();
+
+	/**
+	 * Returns the value of the '<em><b>Signals</b></em>' reference list.
+	 * The list contents are of type {@link net.sf.orcc.backends.tta.architecture.Signal}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Signals</em>' reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Signals</em>' reference list.
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getDesign_Signals()
+	 * @model
+	 * @generated
+	 */
+	EList<Signal> getSignals();
+
+	/**
+	 * Returns the value of the '<em><b>Ports</b></em>' reference list.
+	 * The list contents are of type {@link net.sf.orcc.backends.tta.architecture.ExternalPort}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Ports</em>' reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Ports</em>' reference list.
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getDesign_Ports()
+	 * @model
+	 * @generated
+	 */
+	EList<ExternalPort> getPorts();
+
+	/**
+	 * Returns the value of the '<em><b>Configuration</b></em>' attribute.
+	 * The literals are from the enumeration {@link net.sf.orcc.backends.tta.architecture.DesignConfiguration}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Configuration</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Configuration</em>' attribute.
+	 * @see net.sf.orcc.backends.tta.architecture.DesignConfiguration
+	 * @see #setConfiguration(DesignConfiguration)
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getDesign_Configuration()
+	 * @model
+	 * @generated
+	 */
+	DesignConfiguration getConfiguration();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Design#getConfiguration <em>Configuration</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Configuration</em>' attribute.
+	 * @see net.sf.orcc.backends.tta.architecture.DesignConfiguration
+	 * @see #getConfiguration()
+	 * @generated
+	 */
+	void setConfiguration(DesignConfiguration value);
 } // Design

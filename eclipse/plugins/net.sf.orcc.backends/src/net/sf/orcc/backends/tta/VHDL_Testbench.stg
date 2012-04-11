@@ -2,8 +2,8 @@
 // Testbench
 ///////////////////////////////////////////////////////////////////////////////
 
-printNetwork(network, options) ::= <<
-<printHeader(network)>
+printDesign(design, options) ::= <<
+<printHeader(design)>
 
 entity tb_top is
 
@@ -15,7 +15,7 @@ architecture arch_tb_top of tb_top is
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
   --------------------------------------------------------------------------- 
-  <declareVertexSigAndConst(network)>
+  <declareVertexSigAndConst(design)>
   ---------------------------------------------------------------------------
 
 begin
@@ -23,46 +23,46 @@ begin
   top_orcc : entity work.top
     port map (
       clk =\> clk,
-      <mapVertexSignals(network)>
+      <mapVertexSignals(design)>
       rst_n =\> rst_n);
       
   <printInitProcess()>
     
-  <printFifoProcess(network)>
+  <printFifoProcess(design)>
 
 end architecture arch_tb_top;
 >>
 
-printInstance(instance, options) ::= <<
-<printHeader(instance)>
+printProcessor(processor, options) ::= <<
+<printHeader(processor)>
 
-entity tb_<instance.simpleName> is
+entity tb_<processor.name> is
 
-end tb_<instance.simpleName>;
+end tb_<processor.name>;
 
 
-architecture arch_tb_<instance.simpleName> of tb_<instance.simpleName> is 
+architecture arch_tb_<processor.name> of tb_<processor.name> is 
 
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
   --------------------------------------------------------------------------- 
-  <declareVertexSigAndConst(instance)>
+  <declareVertexSigAndConst(processor)>
   ---------------------------------------------------------------------------
 
 begin
 
-  <instance.simpleName>_inst : entity work.processor_<instance.simpleName>
+  <processor.name>_inst : entity work.processor_<processor.name>
     generic map(device_family =\> "<options.fpga.family>")
     port map (
       clk =\> clk,
-      <mapVertexSignals(instance)>
+      <mapVertexSignals(processor)>
       rst_n =\> rst_n);
             
   <printInitProcess()>
     
-  <printFifoProcess(instance)>
+  <printFifoProcess(processor)>
 
-end architecture arch_tb_<instance.simpleName>;
+end architecture arch_tb_<processor.name>;
 >>
 
 

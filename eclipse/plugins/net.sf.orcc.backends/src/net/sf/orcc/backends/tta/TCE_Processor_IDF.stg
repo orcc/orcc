@@ -1,5 +1,5 @@
 
-printTTA(tta, options) ::= <<
+printProcessor(processor, options) ::= <<
 \<?xml version="1.0" encoding="UTF-8" standalone="no" ?\>
 \<adf-implementation\>
 	
@@ -9,9 +9,9 @@ printTTA(tta, options) ::= <<
 		\<hdb-file\>asic_130nm_1.5V.hdb\</hdb-file\>
 	\</ic-decoder-plugin\>
 	
-	<tta.functionUnits: printFunctionUnit(); separator="\n\n">
+	<processor.functionUnits: printFunctionUnit(); separator="\n\n">
 	
-	<tta.registerFiles: printRegisterFile(); separator="\n\n">
+	<processor.registerFiles: printRegisterFile(); separator="\n\n">
 	
 \</adf-implementation\>
 >>

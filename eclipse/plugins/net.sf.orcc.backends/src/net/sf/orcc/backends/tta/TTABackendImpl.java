@@ -54,9 +54,11 @@ import net.sf.orcc.backends.transformations.TypeResizer;
 import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.backends.transformations.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transformations.ssa.CopyPropagator;
-import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
+import net.sf.orcc.backends.tta.architecture.Design;
+import net.sf.orcc.backends.tta.architecture.DesignConfiguration;
 import net.sf.orcc.backends.tta.architecture.Processor;
-import net.sf.orcc.backends.tta.architecture.util.ArchitectureMemoryStats;
+import net.sf.orcc.backends.tta.architecture.util.ArchitectureBuilder;
+import net.sf.orcc.backends.tta.architecture.util.ArchitecturePrinter;
 import net.sf.orcc.backends.tta.transformations.SlowOperationDetector;
 import net.sf.orcc.backends.util.FPGA;
 import net.sf.orcc.df.Actor;
@@ -89,10 +91,13 @@ public class TTABackendImpl extends AbstractBackend {
 	private String libPath;
 	private int fifoWidthu;
 
+	private DesignConfiguration conf;
+	private Design design;
+
 	private final Map<String, String> transformations;
 	private final List<String> processorIntensiveActors;
 
-	private ArchitectureFactory factory = ArchitectureFactory.eINSTANCE;
+	String instancePath;
 
 	/**
 	 * Creates a new instance of the TTA back-end. Initializes the
@@ -128,6 +133,9 @@ public class TTABackendImpl extends AbstractBackend {
 		// Set default FIFO size to 256
 		fifoSize = getAttribute(FIFO_SIZE, 256);
 		fifoWidthu = (int) Math.ceil(Math.log(fifoSize) / Math.log(2));
+
+		conf = DesignConfiguration.getByName(getAttribute(
+				"net.sf.orcc.backends.tta.configuration", "Standard"));
 
 	}
 
@@ -190,42 +198,18 @@ public class TTABackendImpl extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network = doTransformNetwork(network);
 
+		instancePath = OrccUtil.createFolder(path, "instances");
 		transformActors(network.getAllActors());
 		printInstances(network);
 
 		network.computeTemplateMaps();
-		printNetwork(network);
+
+		design = new ArchitectureBuilder().caseNetwork(network);
+		printDesign(design);
 
 		if (finalize) {
 			runPythonScript();
 		}
-	}
-
-	private int getAluNb(Instance instance) {
-		if (instance.isActor()
-				&& processorIntensiveActors.contains(instance.getActor()
-						.getName())) {
-			return 4;
-		}
-		return 1;
-	}
-
-	private int getBusNb(Instance instance) {
-		if (instance.isActor()
-				&& processorIntensiveActors.contains(instance.getActor()
-						.getName())) {
-			return 6;
-		}
-		return 2;
-	}
-
-	private int getRegNb(Instance instance) {
-		if (instance.isActor()
-				&& processorIntensiveActors.contains(instance.getActor()
-						.getName())) {
-			return 4;
-		}
-		return 2;
 	}
 
 	@Override
@@ -235,109 +219,91 @@ public class TTABackendImpl extends AbstractBackend {
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
 
-		String instancePath = null;
-		if (!(instance.isActor() && instance.getActor().isNative())) {
-			instancePath = OrccUtil
-					.createFolder(path, instance.getSimpleName());
-			printProcessor(instance, instancePath);
-
-			// ModelSim
-			String simPath = OrccUtil.createFolder(instancePath, "simulation");
-			StandardPrinter tbPrinter = new StandardPrinter(
-					"net/sf/orcc/backends/tta/VHDL_Testbench.stg", !debug,
-					false);
-			tbPrinter.getOptions().put("fifoSize", fifoSize);
-			tbPrinter.getOptions().put("fpga", fpga);
-			StandardPrinter tclPrinter = new StandardPrinter(
-					"net/sf/orcc/backends/tta/ModelSim_Script.stg");
-			tclPrinter.getOptions().put("fpga", fpga);
-			StandardPrinter wavePrinter = new StandardPrinter(
-					"net/sf/orcc/backends/tta/ModelSim_Wave.stg");
-			tbPrinter.print(instance.getSimpleName() + "_tb.vhd", simPath,
-					instance);
-			tclPrinter.print(instance.getSimpleName() + ".tcl", instancePath,
-					instance);
-			wavePrinter.print("wave.do", simPath, instance);
-		}
-
 		return printer.print(instance.getSimpleName() + ".ll", instancePath,
 				instance);
 	}
 
-	private void printNetwork(Network network) {
+	private void printDesign(Design design) {
+		for (Processor processor : design.getProcessors()) {
+			printProcessor(processor);
+		}
+
 		// VHDL Network of TTA processors
-		StandardPrinter networkPrinter = new StandardPrinter(
+		ArchitecturePrinter vhdlPrinter = new ArchitecturePrinter(
 				"net/sf/orcc/backends/tta/VHDL_Network.stg");
-		networkPrinter.setExpressionPrinter(new LLVMExpressionPrinter());
-		networkPrinter.getOptions().put("fifoWidthu", fifoWidthu);
-		networkPrinter.getOptions().put("fpga", fpga);
-		networkPrinter.print("top.vhd", path, network);
+		vhdlPrinter.setExpressionPrinter(new LLVMExpressionPrinter());
+		vhdlPrinter.getOptions().put("fifoWidthu", fifoWidthu);
+		vhdlPrinter.getOptions().put("fpga", fpga);
+		vhdlPrinter.print("top.vhd", path, design);
 
 		// Python package
 		String pythonPath = OrccUtil.createFolder(path, "informations_");
-		StandardPrinter pythonPrinter = new StandardPrinter(
+		ArchitecturePrinter pythonPrinter = new ArchitecturePrinter(
 				"net/sf/orcc/backends/tta/Python_Network.stg");
 		pythonPrinter.getOptions().put("fpga", fpga);
-		pythonPrinter.print("informations.py", pythonPath, network);
+		pythonPrinter.print("informations.py", pythonPath, design);
 		OrccUtil.createFile(pythonPath, "__init__.py");
 
 		if (fpga.isAltera()) {
 			// Quartus
-			CustomPrinter projectQsfPrinter = new CustomPrinter(
+			ArchitecturePrinter projectQsfPrinter = new ArchitecturePrinter(
 					"net/sf/orcc/backends/tta/Quartus_Project.stg");
 			CustomPrinter projectQpfPrinter = new CustomPrinter(
 					"net/sf/orcc/backends/tta/Quartus_Project.stg");
-			projectQsfPrinter.print("top.qsf", path, "qsfNetwork", "network",
-					network);
-			projectQpfPrinter.print("top.qpf", path, "qpfNetwork", "network",
-					network);
+			projectQsfPrinter.print("top.qsf", path, design);
+			projectQpfPrinter.print("top.qpf", path, "qpfNetwork");
 		} else if (fpga.isXilinx()) {
 			// ISE
-			CustomPrinter projectXisePrinter = new CustomPrinter(
+			ArchitecturePrinter projectXisePrinter = new ArchitecturePrinter(
 					"net/sf/orcc/backends/tta/ISE_Project.stg");
-			projectXisePrinter.print("top.xise", path, "xiseNetwork",
-					"network", network);
-			projectXisePrinter.print("top.ucf", path, "ucfNetwork", "network",
-					network);
+			projectXisePrinter.print("top.xise", path, design);
+			projectXisePrinter.print("top.ucf", path, design);
 		}
 
 		// ModelSim
-		StandardPrinter tclPrinter = new StandardPrinter(
+		ArchitecturePrinter tclPrinter = new ArchitecturePrinter(
 				"net/sf/orcc/backends/tta/ModelSim_Script.stg");
 		tclPrinter.getOptions().put("fpga", fpga);
-		StandardPrinter tbPrinter = new StandardPrinter(
+		ArchitecturePrinter tbPrinter = new ArchitecturePrinter(
 				"net/sf/orcc/backends/tta/VHDL_Testbench.stg");
 		tbPrinter.getOptions().put("fifoSize", fifoSize);
-		StandardPrinter wavePrinter = new StandardPrinter(
+		ArchitecturePrinter wavePrinter = new ArchitecturePrinter(
 				"net/sf/orcc/backends/tta/ModelSim_Wave.stg");
 		wavePrinter.setExpressionPrinter(new LLVMExpressionPrinter());
-		tclPrinter.print("top.tcl", path, network);
-		tbPrinter.print("top_tb.vhd", path, network);
-		wavePrinter.print("wave.do", path, network);
+		tclPrinter.print("top.tcl", path, design);
+		tbPrinter.print("top_tb.vhd", path, design);
+		wavePrinter.print("wave.do", path, design);
 	}
 
-	private void printProcessor(Instance instance, String instancePath) {
-		int ramSize = instance.isActor() ? ArchitectureMemoryStats
-				.computeNeededMemorySize(instance.getActor()) : 1;
+	private void printProcessor(Processor tta) {
+		String processorPath = OrccUtil.createFolder(path, tta.getName());
 
-		Processor tta = factory.createProcessor(instance.getSimpleName(),
-				getBusNb(instance), getRegNb(instance), 12, 2,
-				getAluNb(instance), 1, 1, 1, ramSize);
-
-		/*
-		 * Processor tta = factory.createHugeProcessor(instance.getSimpleName(),
-		 * ramSize);
-		 */
-
-		CustomPrinter adfPrinter = new CustomPrinter(
+		// Print high-level description
+		ArchitecturePrinter adfPrinter = new ArchitecturePrinter(
 				"net/sf/orcc/backends/tta/TCE_Processor_ADF.stg");
-		CustomPrinter idfPrinter = new CustomPrinter(
+		ArchitecturePrinter idfPrinter = new ArchitecturePrinter(
 				"net/sf/orcc/backends/tta/TCE_Processor_IDF.stg");
 
-		adfPrinter.print("processor_" + instance.getSimpleName() + ".adf",
-				instancePath, "printTTA", "tta", tta);
-		idfPrinter.print("processor_" + instance.getSimpleName() + ".idf",
-				instancePath, "printTTA", "tta", tta);
+		adfPrinter.print(tta.getName() + ".adf", processorPath, tta);
+		idfPrinter.print(tta.getName() + ".idf", processorPath, tta);
+
+		// Print ModelSim testbench and wave
+		String simPath = OrccUtil.createFolder(processorPath, "simulation");
+		ArchitecturePrinter tbPrinter = new ArchitecturePrinter(
+				"net/sf/orcc/backends/tta/VHDL_Testbench.stg");
+		tbPrinter.getOptions().put("fifoSize", fifoSize);
+		tbPrinter.getOptions().put("fpga", fpga);
+		ArchitecturePrinter tclPrinter = new ArchitecturePrinter(
+				"net/sf/orcc/backends/tta/ModelSim_Script.stg");
+		tclPrinter.getOptions().put("fpga", fpga);
+		ArchitecturePrinter wavePrinter = new ArchitecturePrinter(
+				"net/sf/orcc/backends/tta/ModelSim_Wave.stg");
+
+		tbPrinter.print(tta.getName() + "_tb.vhd", simPath, tta);
+		wavePrinter.print("wave.do", simPath, tta);
+		tclPrinter.print(tta.getName() + ".tcl", processorPath, tta);
+
+		// TODO: Print assembly code of actor-scheduler
 	}
 
 	private void runPythonScript() throws OrccException {

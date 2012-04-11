@@ -1,6 +1,6 @@
 // ISE project
 
-xiseNetwork(network, options) ::= <<
+printDesign(design, options) ::= <<
 
 \<?xml version="1.0" encoding="UTF-8" standalone="no" ?\>
 \<project xmlns="http://www.xilinx.com/XMLSchema" xmlns:xil_pn="http://www.xilinx.com/XMLSchema"\>
@@ -27,7 +27,7 @@ xiseNetwork(network, options) ::= <<
       \<association xil_pn:name="Implementation"/\>
     \</file\>
 
-    <network.instances: xiseInstance(); separator="\n">
+    <design.processor: printProcessor(); separator="\n">
 
     \<!--                   --\>
     \<!-- Shared components.--\>
@@ -130,71 +130,69 @@ xiseNetwork(network, options) ::= <<
 
 >>
 
-xiseInstance(instance) ::= <<
-<if(!instance.actor.native)
->\<!-- Instance <instance.id>.--\>
-\<file xil_pn:name="<instance.id>/tta/vhdl/processor_<instance.id>_tl_params_pkg.vhdl" xil_pn:type="FILE_VHDL"\>
+printProcessor(processor) ::= <<
+>\<!-- Processor <processor.name> --\>
+\<file xil_pn:name="<processor.name>/tta/vhdl/<processor.name>_tl_params_pkg.vhdl" xil_pn:type="FILE_VHDL"\>
   \<association xil_pn:name="BehavioralSimulation"/\>
   \<association xil_pn:name="Implementation"/\>
 \</file\>
-\<file xil_pn:name="<instance.id>/tta/vhdl/processor_<instance.id>_tl.vhdl" xil_pn:type="FILE_VHDL"\>
+\<file xil_pn:name="<processor.name>/tta/vhdl/<processor.name>_tl.vhdl" xil_pn:type="FILE_VHDL"\>
   \<association xil_pn:name="BehavioralSimulation"/\>
   \<association xil_pn:name="Implementation"/\>
 \</file\>
-\<file xil_pn:name="<instance.id>/tta/vhdl/globals_pkg.vhdl" xil_pn:type="FILE_VHDL"\>
+\<file xil_pn:name="<processor.name>/tta/vhdl/globals_pkg.vhdl" xil_pn:type="FILE_VHDL"\>
   \<association xil_pn:name="BehavioralSimulation"/\>
   \<association xil_pn:name="Implementation"/\>
 \</file\>
-\<file xil_pn:name="<instance.id>/tta/vhdl/processor_<instance.id>.vhd" xil_pn:type="FILE_VHDL"\>
+\<file xil_pn:name="<processor.name>/tta/vhdl/<processor.name>.vhd" xil_pn:type="FILE_VHDL"\>
   \<association xil_pn:name="BehavioralSimulation"/\>
   \<association xil_pn:name="Implementation"/\>
 \</file\>
-\<file xil_pn:name="<instance.id>/tta/vhdl/imem_mau_pkg.vhdl" xil_pn:type="FILE_VHDL"\>
+\<file xil_pn:name="<processor.name>/tta/vhdl/imem_mau_pkg.vhdl" xil_pn:type="FILE_VHDL"\>
   \<association xil_pn:name="BehavioralSimulation"/\>
   \<association xil_pn:name="Implementation"/\>
 \</file\>
-\<file xil_pn:name="<instance.id>/tta/gcu_ic/output_socket_2_1.vhdl" xil_pn:type="FILE_VHDL"\>
+\<file xil_pn:name="<processor.name>/tta/gcu_ic/output_socket_2_1.vhdl" xil_pn:type="FILE_VHDL"\>
   \<association xil_pn:name="BehavioralSimulation"/\>
   \<association xil_pn:name="Implementation"/\>
 \</file\>
-\<file xil_pn:name="<instance.id>/tta/gcu_ic/output_socket_1_1.vhdl" xil_pn:type="FILE_VHDL"\>
+\<file xil_pn:name="<processor.name>/tta/gcu_ic/output_socket_1_1.vhdl" xil_pn:type="FILE_VHDL"\>
   \<association xil_pn:name="BehavioralSimulation"/\>
   \<association xil_pn:name="Implementation"/\>
 \</file\>
-\<file xil_pn:name="<instance.id>/tta/gcu_ic/input_socket_2.vhdl" xil_pn:type="FILE_VHDL"\>
+\<file xil_pn:name="<processor.name>/tta/gcu_ic/input_socket_2.vhdl" xil_pn:type="FILE_VHDL"\>
   \<association xil_pn:name="BehavioralSimulation"/\>
   \<association xil_pn:name="Implementation"/\>
 \</file\>
-\<file xil_pn:name="<instance.id>/tta/gcu_ic/ifetch.vhdl" xil_pn:type="FILE_VHDL"\>
+\<file xil_pn:name="<processor.name>/tta/gcu_ic/ifetch.vhdl" xil_pn:type="FILE_VHDL"\>
   \<association xil_pn:name="BehavioralSimulation"/\>
   \<association xil_pn:name="Implementation"/\>
 \</file\>
-\<file xil_pn:name="<instance.id>/tta/gcu_ic/idecompressor.vhdl" xil_pn:type="FILE_VHDL"\>
+\<file xil_pn:name="<processor.name>/tta/gcu_ic/idecompressor.vhdl" xil_pn:type="FILE_VHDL"\>
   \<association xil_pn:name="BehavioralSimulation"/\>
   \<association xil_pn:name="Implementation"/\>
 \</file\>
-\<file xil_pn:name="<instance.id>/tta/gcu_ic/ic.vhdl" xil_pn:type="FILE_VHDL"\>
+\<file xil_pn:name="<processor.name>/tta/gcu_ic/ic.vhdl" xil_pn:type="FILE_VHDL"\>
   \<association xil_pn:name="BehavioralSimulation"/\>
   \<association xil_pn:name="Implementation"/\>
 \</file\>
-\<file xil_pn:name="<instance.id>/tta/gcu_ic/gcu_opcodes_pkg.vhdl" xil_pn:type="FILE_VHDL"\>
+\<file xil_pn:name="<processor.name>/tta/gcu_ic/gcu_opcodes_pkg.vhdl" xil_pn:type="FILE_VHDL"\>
   \<association xil_pn:name="BehavioralSimulation"/\>
   \<association xil_pn:name="Implementation"/\>
 \</file\>
-\<file xil_pn:name="<instance.id>/tta/gcu_ic/decoder.vhdl" xil_pn:type="FILE_VHDL"\>
+\<file xil_pn:name="<processor.name>/tta/gcu_ic/decoder.vhdl" xil_pn:type="FILE_VHDL"\>
   \<association xil_pn:name="BehavioralSimulation"/\>
   \<association xil_pn:name="Implementation"/\>
 \</file\>
-\<file xil_pn:name="<instance.id>/tta/vhdl/irom_<instance.id>.ngc" xil_pn:type="FILE_NGC"\>
+\<file xil_pn:name="<processor.name>/tta/vhdl/irom_<processor.name>.ngc" xil_pn:type="FILE_NGC"\>
   \<association xil_pn:name="Implementation"/\>
 \</file\>
-\<file xil_pn:name="<instance.id>/tta/vhdl/dram_<instance.id>.ngc" xil_pn:type="FILE_NGC"\>
+\<file xil_pn:name="<processor.name>/tta/vhdl/dram_<processor.name>.ngc" xil_pn:type="FILE_NGC"\>
   \<association xil_pn:name="Implementation"/\>
 \</file\>
-<endif>
 >>
 
-ucfNetwork(network, options) ::= <<
+printUcf() ::= <<
 NET "leds[0]" IOSTANDARD = LVCMOS18;
 NET "leds[0]" LOC = AE24;
 NET "leds[1]" IOSTANDARD = LVCMOS18;

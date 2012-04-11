@@ -37,7 +37,6 @@ import net.sf.dftools.util.Attributable;
 import net.sf.orcc.backends.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.Bridge;
-import net.sf.orcc.backends.tta.architecture.Broadcast;
 import net.sf.orcc.backends.tta.architecture.Bus;
 import net.sf.orcc.backends.tta.architecture.Component;
 import net.sf.orcc.backends.tta.architecture.Design;
@@ -46,6 +45,7 @@ import net.sf.orcc.backends.tta.architecture.ExprBinary;
 import net.sf.orcc.backends.tta.architecture.ExprFalse;
 import net.sf.orcc.backends.tta.architecture.ExprTrue;
 import net.sf.orcc.backends.tta.architecture.ExprUnary;
+import net.sf.orcc.backends.tta.architecture.ExternalPort;
 import net.sf.orcc.backends.tta.architecture.Fifo;
 import net.sf.orcc.backends.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
@@ -165,13 +165,13 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 				result = defaultCase(theEObject);
 			return result;
 		}
-		case ArchitecturePackage.BROADCAST: {
-			Broadcast broadcast = (Broadcast) theEObject;
-			T result = caseBroadcast(broadcast);
+		case ArchitecturePackage.EXTERNAL_PORT: {
+			ExternalPort externalPort = (ExternalPort) theEObject;
+			T result = caseExternalPort(externalPort);
 			if (result == null)
-				result = caseVertex(broadcast);
+				result = caseVertex(externalPort);
 			if (result == null)
-				result = caseAttributable(broadcast);
+				result = caseAttributable(externalPort);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -446,17 +446,17 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Broadcast</em>'.
+	 * Returns the result of interpreting the object as an instance of '<em>External Port</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
 	 * returning a non-null result will terminate the switch.
 	 * <!-- end-user-doc -->
 	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Broadcast</em>'.
+	 * @return the result of interpreting the object as an instance of '<em>External Port</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseBroadcast(Broadcast object) {
+	public T caseExternalPort(ExternalPort object) {
 		return null;
 	}
 

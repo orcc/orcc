@@ -28,19 +28,42 @@
  * SUCH DAMAGE.
  * </copyright>
  */
-package net.sf.orcc.backends.tta.architecture;
+package net.sf.orcc.backends.tta.architecture.impl;
 
-import net.sf.dftools.graph.Vertex;
+import net.sf.dftools.graph.impl.VertexImpl;
+
+import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
+import net.sf.orcc.backends.tta.architecture.ExternalPort;
+
+import org.eclipse.emf.ecore.EClass;
 
 /**
  * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>Broadcast</b></em>'.
+ * An implementation of the model object '<em><b>External Port</b></em>'.
  * <!-- end-user-doc -->
+ * <p>
+ * </p>
  *
- *
- * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getBroadcast()
- * @model
  * @generated
  */
-public interface Broadcast extends Vertex {
-} // Broadcast
+public class ExternalPortImpl extends VertexImpl implements ExternalPort {
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected ExternalPortImpl() {
+		super();
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	protected EClass eStaticClass() {
+		return ArchitecturePackage.Literals.EXTERNAL_PORT;
+	}
+
+} //ExternalPortImpl

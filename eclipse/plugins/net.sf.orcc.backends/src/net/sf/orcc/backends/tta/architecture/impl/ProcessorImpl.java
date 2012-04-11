@@ -41,6 +41,7 @@ import net.sf.orcc.backends.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
 import net.sf.orcc.backends.tta.architecture.Implementation;
 import net.sf.orcc.backends.tta.architecture.Processor;
+import net.sf.orcc.backends.tta.architecture.ProcessorConfiguration;
 import net.sf.orcc.backends.tta.architecture.RegisterFile;
 import net.sf.orcc.backends.tta.architecture.Socket;
 
@@ -73,6 +74,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getData <em>Data</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getHardwareDatabase <em>Hardware Database</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getMappedActors <em>Mapped Actors</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getConfiguration <em>Configuration</em>}</li>
  * </ul>
  * </p>
  *
@@ -198,6 +200,26 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 	 * @ordered
 	 */
 	protected EList<Instance> mappedActors;
+
+	/**
+	 * The default value of the '{@link #getConfiguration() <em>Configuration</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getConfiguration()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final ProcessorConfiguration CONFIGURATION_EDEFAULT = ProcessorConfiguration.STANDARD;
+
+	/**
+	 * The cached value of the '{@link #getConfiguration() <em>Configuration</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getConfiguration()
+	 * @generated
+	 * @ordered
+	 */
+	protected ProcessorConfiguration configuration = CONFIGURATION_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -486,6 +508,30 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public ProcessorConfiguration getConfiguration() {
+		return configuration;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setConfiguration(ProcessorConfiguration newConfiguration) {
+		ProcessorConfiguration oldConfiguration = configuration;
+		configuration = newConfiguration == null ? CONFIGURATION_EDEFAULT
+				: newConfiguration;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.PROCESSOR__CONFIGURATION,
+					oldConfiguration, configuration));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public String getName() {
 		return name;
 	}
@@ -569,6 +615,8 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 			return getHardwareDatabase();
 		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
 			return getMappedActors();
+		case ArchitecturePackage.PROCESSOR__CONFIGURATION:
+			return getConfiguration();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -625,6 +673,9 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 			getMappedActors().clear();
 			getMappedActors().addAll((Collection<? extends Instance>) newValue);
 			return;
+		case ArchitecturePackage.PROCESSOR__CONFIGURATION:
+			setConfiguration((ProcessorConfiguration) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -670,6 +721,9 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
 			getMappedActors().clear();
 			return;
+		case ArchitecturePackage.PROCESSOR__CONFIGURATION:
+			setConfiguration(CONFIGURATION_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -705,6 +759,8 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 			return hardwareDatabase != null && !hardwareDatabase.isEmpty();
 		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
 			return mappedActors != null && !mappedActors.isEmpty();
+		case ArchitecturePackage.PROCESSOR__CONFIGURATION:
+			return configuration != CONFIGURATION_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -722,6 +778,8 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (name: ");
 		result.append(name);
+		result.append(", configuration: ");
+		result.append(configuration);
 		result.append(')');
 		return result.toString();
 	}

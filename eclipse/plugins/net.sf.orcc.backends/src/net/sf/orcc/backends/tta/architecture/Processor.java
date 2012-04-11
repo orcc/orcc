@@ -54,6 +54,7 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getData <em>Data</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getHardwareDatabase <em>Hardware Database</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getMappedActors <em>Mapped Actors</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getConfiguration <em>Configuration</em>}</li>
  * </ul>
  * </p>
  *
@@ -251,6 +252,35 @@ public interface Processor extends Vertex {
 	 * @generated
 	 */
 	EList<Instance> getMappedActors();
+
+	/**
+	 * Returns the value of the '<em><b>Configuration</b></em>' attribute.
+	 * The literals are from the enumeration {@link net.sf.orcc.backends.tta.architecture.ProcessorConfiguration}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Configuration</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Configuration</em>' attribute.
+	 * @see net.sf.orcc.backends.tta.architecture.ProcessorConfiguration
+	 * @see #setConfiguration(ProcessorConfiguration)
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getProcessor_Configuration()
+	 * @model
+	 * @generated
+	 */
+	ProcessorConfiguration getConfiguration();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Processor#getConfiguration <em>Configuration</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Configuration</em>' attribute.
+	 * @see net.sf.orcc.backends.tta.architecture.ProcessorConfiguration
+	 * @see #getConfiguration()
+	 * @generated
+	 */
+	void setConfiguration(ProcessorConfiguration value);
 
 	/**
 	 * Returns the value of the '<em><b>Name</b></em>' attribute.

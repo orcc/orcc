@@ -1,11 +1,11 @@
 
 
-printNetwork(network, options) ::= <<
+printDesign(design, options) ::= <<
 -------------------------------------------------------------------------------
--- Title      : Network: <network.name>
+-- Title      : Network: <design.name>
 -- Project    : 
 -------------------------------------------------------------------------------
--- File       : <network.name>.vhd
+-- File       : <design.name>.vhd
 -- Author     : Orcc - TTA
 -- Company    : 
 -- Created    : 
@@ -31,7 +31,7 @@ entity top is
   port
     (
       clk          : in  std_logic;
-      <declarePorts(network)>
+      <declarePorts(design)>
       rst_n        : in  std_logic
       );
 end top;
@@ -42,8 +42,8 @@ architecture bdf_type of top is
   ---------------------------------------------------------------------------
   -- Signals declaration
   ---------------------------------------------------------------------------  
-  <network.connections: declareFifoSignals(); separator="\n\n">
-  <network.entities: declareBroadcastSignals(); separator="\n\n">
+  <design.connections: declareFifoSignals(); separator="\n\n">
+  <design.broadcasts: declareBroadcastSignals(); separator="\n\n">
   ---------------------------------------------------------------------------
   
 begin
@@ -51,20 +51,20 @@ begin
   ---------------------------------------------------------------------------
   -- Ports instantiation 
   ---------------------------------------------------------------------------
-  <network.inputs: { input | <assignNetworkInputPort(input, i0)> }>
-  <network.outputs: { output | <assignNetworkOutputPort(output, i0)> }>
+  <design.inputs: { input | <assignNetworkInputPort(input, i0)> }>
+  <design.outputs: { output | <assignNetworkOutputPort(output, i0)> }>
   ---------------------------------------------------------------------------
   -- FIFOs instantiation 
   --------------------------------------------------------------------------- 
-  <network.connections: assignFifo()>
+  <design.connections: assignFifo()>
   ---------------------------------------------------------------------------
   -- Actors instantiation 
   ---------------------------------------------------------------------------
-  <network.instances: assignInstance(); separator="\n\n">
+  <design.instances: assignInstance(); separator="\n\n">
 ---------------------------------------------------------------------------
   -- Broadcast instantiation 
   ---------------------------------------------------------------------------
-  <network.entities: assignBroadcast(); separator="\n\n">
+  <design.entities: assignBroadcast(); separator="\n\n">
   ---------------------------------------------------------------------------  
 
 
@@ -76,9 +76,9 @@ end bdf_type;
 // Network ports
 ///////////////////////////////////////////////////////////////////////////////
 
-declarePorts(network) ::= <<
-<if(network.inputs)><network.inputs: {input|<declareInput(input, "in", i0)>}; separator="\n"><endif>
-<if(network.outputs)><network.outputs: {output|<declareOutput(output, "out", i0)>}; separator="\n"><endif>
+declarePorts(design) ::= <<
+<if(design.inputs)><design.inputs: {input|<declareInput(input, "in", i0)>}; separator="\n"><endif>
+<if(design.outputs)><design.outputs: {output|<declareOutput(output, "out", i0)>}; separator="\n"><endif>
 >>
 
 declareInput(port, dir, index) ::= <<

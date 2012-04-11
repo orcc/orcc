@@ -37,7 +37,6 @@ import net.sf.dftools.util.Attributable;
 import net.sf.orcc.backends.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.Bridge;
-import net.sf.orcc.backends.tta.architecture.Broadcast;
 import net.sf.orcc.backends.tta.architecture.Bus;
 import net.sf.orcc.backends.tta.architecture.Component;
 import net.sf.orcc.backends.tta.architecture.Design;
@@ -46,6 +45,7 @@ import net.sf.orcc.backends.tta.architecture.ExprBinary;
 import net.sf.orcc.backends.tta.architecture.ExprFalse;
 import net.sf.orcc.backends.tta.architecture.ExprTrue;
 import net.sf.orcc.backends.tta.architecture.ExprUnary;
+import net.sf.orcc.backends.tta.architecture.ExternalPort;
 import net.sf.orcc.backends.tta.architecture.Fifo;
 import net.sf.orcc.backends.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
@@ -145,8 +145,8 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 		}
 
 		@Override
-		public Adapter caseBroadcast(Broadcast object) {
-			return createBroadcastAdapter();
+		public Adapter caseExternalPort(ExternalPort object) {
+			return createExternalPortAdapter();
 		}
 
 		@Override
@@ -374,16 +374,16 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.Broadcast <em>Broadcast</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.ExternalPort <em>External Port</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.orcc.backends.tta.architecture.Broadcast
+	 * @see net.sf.orcc.backends.tta.architecture.ExternalPort
 	 * @generated
 	 */
-	public Adapter createBroadcastAdapter() {
+	public Adapter createExternalPortAdapter() {
 		return null;
 	}
 

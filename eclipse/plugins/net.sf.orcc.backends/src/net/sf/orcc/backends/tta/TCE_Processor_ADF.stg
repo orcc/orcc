@@ -1,20 +1,20 @@
 
-printTTA(tta) ::= <<
+printProcessor(processor, options) ::= <<
 \<?xml version="1.0" encoding="UTF-8" standalone="no" ?\>
 \<adf version="1.7"\>
-	<tta.buses: printBus(); separator="\n\n">
+	<processor.buses: printBus(); separator="\n\n">
 	
-	<tta.sockets: printSocket(); separator="\n\n">
+	<processor.sockets: printSocket(); separator="\n\n">
 	
-	<tta.functionUnits: printFunctionUnit(); separator="\n\n">
+	<processor.functionUnits: printFunctionUnit(); separator="\n\n">
 	
-	<tta.registerFiles: printRegisterFile(); separator="\n\n">
+	<processor.registerFiles: printRegisterFile(); separator="\n\n">
 	
-	<if(tta.data)><printAddressSpace(tta.data)><endif>
+	<if(processor.data)><printAddressSpace(processor.data)><endif>
 	
-	<if(tta.program)><printAddressSpace(tta.program)><endif>
+	<if(processor.program)><printAddressSpace(processor.program)><endif>
 	
-	<if(tta.gcu)><printGlobalControlUnit(tta.gcu)><endif>
+	<if(processor.gcu)><printGlobalControlUnit(processor.gcu)><endif>
 \</adf\>
 >>
 

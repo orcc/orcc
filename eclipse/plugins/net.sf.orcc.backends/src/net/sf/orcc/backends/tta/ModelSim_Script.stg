@@ -1,15 +1,15 @@
 
 
-printNetwork(network, options) ::= <<
-<initializeLibraries(true)>
+printDesign(design, options) ::= <<
+<initializeLibraries()>
 
-<compileOtherComponents(true)>
+<compileOtherComponents()>
 
-<compileInterfaceComponents(true)>
+<compileInterfaceComponents()>
 
-<compileSharedComponent(true)>
+<compileSharedComponent()>
 
-<network.instances: { instance | <compileInstance(instance, true)> }; separator="\n">
+<design.processors: compileProcessor(); separator="\n">
 
 # Network
 vcom -93 -quiet -work work top.vhd
@@ -20,7 +20,7 @@ vsim -novopt <if(options.fpga.altera)>-L altera_mf <endif>work.tb_top -t ps -do 
 
 >>
 
-printInstance(instance, options) ::= <<
+printProcessor(processor, options) ::= <<
 <initializeLibraries(false)>
 
 <compileOtherComponents(false)>
@@ -29,15 +29,15 @@ printInstance(instance, options) ::= <<
 
 <compileSharedComponent(false)>
 
-<compileInstance(instance, false)>
+<compileProcessor(processor, false)>
 
-vcom -93 -quiet -work work simulation/<instance.id>_tb.vhd
+vcom -93 -quiet -work work simulation/<processor.name>_tb.vhd
 
 # Simulate
-vsim -novopt  <if(options.fpga.altera)>-L altera_mf <endif>work.tb_<instance.id> -t ps -do "do simulation/wave.do;"
+vsim -novopt  <if(options.fpga.altera)>-L altera_mf <endif>work.tb_<processor.name> -t ps -do "do simulation/wave.do;"
 >>
 
-initializeLibraries(callByNetwork) ::= <<
+initializeLibraries(callByNetwork=true) ::= <<
 # Remove old libraries
 vdel -all -lib work
 <if(options.fpga.altera)>vdel -all -lib altera_mf<endif>
@@ -56,37 +56,35 @@ exec compxlib -s mti_se -l vhdl -arch virtex6 -lib unisim -lib xilinxcorelib &
 <endif>
 >>
 
-compileInstance(instance, callByNetwork) ::= <<
-<if(!instance.actor.native)
-># Compile Instance <instance.id>
-vcom -93 -quiet -work work <if(callByNetwork)><instance.id>/<endif>tta/vhdl/imem_mau_pkg.vhdl
-vcom -93 -quiet -work work <if(callByNetwork)><instance.id>/<endif>tta/vhdl/globals_pkg.vhdl
-vcom -93 -quiet -work work <if(callByNetwork)><instance.id>/<endif>tta/vhdl/processor_<instance.id>_tl_params_pkg.vhdl
-vcom -93 -quiet -work work <if(callByNetwork)><instance.id>/<endif>tta/vhdl/processor_<instance.id>_tl.vhdl
-vcom -93 -quiet -work work <if(callByNetwork)><instance.id>/<endif>tta/vhdl/processor_<instance.id>.vhd
-vcom -93 -quiet -work work <if(callByNetwork)><instance.id>/<endif>tta/gcu_ic/gcu_opcodes_pkg.vhdl
-vcom -93 -quiet -work work <if(callByNetwork)><instance.id>/<endif>tta/gcu_ic/output_socket_2_1.vhdl
-vcom -93 -quiet -work work <if(callByNetwork)><instance.id>/<endif>tta/gcu_ic/output_socket_1_1.vhdl
-vcom -93 -quiet -work work <if(callByNetwork)><instance.id>/<endif>tta/gcu_ic/input_socket_2.vhdl
-vcom -93 -quiet -work work <if(callByNetwork)><instance.id>/<endif>tta/gcu_ic/ifetch.vhdl
-vcom -93 -quiet -work work <if(callByNetwork)><instance.id>/<endif>tta/gcu_ic/idecompressor.vhdl
-vcom -93 -quiet -work work <if(callByNetwork)><instance.id>/<endif>tta/gcu_ic/ic.vhdl
-vcom -93 -quiet -work work <if(callByNetwork)><instance.id>/<endif>tta/gcu_ic/decoder.vhdl
+compileProcessor(processor, callByNetwork=true) ::= <<
+# Compile processor <processor.name>
+vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/vhdl/imem_mau_pkg.vhdl
+vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/vhdl/globals_pkg.vhdl
+vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/vhdl/processor_<processor.name>_tl_params_pkg.vhdl
+vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/vhdl/processor_<processor.name>_tl.vhdl
+vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/vhdl/processor_<processor.name>.vhd
+vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/gcu_opcodes_pkg.vhdl
+vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/output_socket_2_1.vhdl
+vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/output_socket_1_1.vhdl
+vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/input_socket_2.vhdl
+vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/ifetch.vhdl
+vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/idecompressor.vhdl
+vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/ic.vhdl
+vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/decoder.vhdl
 
 <if(options.fpga.xilinx)>
-vcom -93 -quiet -work work <if(callByNetwork)><instance.id>/<endif>tta/vhdl/dram_<instance.id>.vhd
-vcom -93 -quiet -work work <if(callByNetwork)><instance.id>/<endif>tta/vhdl/irom_<instance.id>.vhd
+vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/vhdl/dram_<processor.name>.vhd
+vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/vhdl/irom_<processor.name>.vhd
 
-exec cp -f <if(callByNetwork)><instance.id>/<endif>tta/vhdl/dram_<instance.id>.mif . &
-exec cp -f <if(callByNetwork)><instance.id>/<endif>tta/vhdl/irom_<instance.id>.mif . &
+exec cp -f <if(callByNetwork)><processor.name>/<endif>tta/vhdl/dram_<processor.name>.mif . &
+exec cp -f <if(callByNetwork)><processor.name>/<endif>tta/vhdl/irom_<processor.name>.mif . &
 <else>
-exec cp -f <if(!callByNetwork)>../<endif>wrapper/dram_<instance.id>.mif . &
-exec cp -f <if(!callByNetwork)>../<endif>wrapper/irom_<instance.id>.mif . &
-<endif><
-endif>
+exec cp -f <if(!callByNetwork)>../<endif>wrapper/dram_<processor.name>.mif . &
+exec cp -f <if(!callByNetwork)>../<endif>wrapper/irom_<processor.name>.mif . &
+<endif>
 >>
 
-compileOtherComponents(callByNetwork) ::= <<
+compileOtherComponents(callByNetwork=true) ::= <<
 # Compile other components
 <if(options.fpga.altera)>
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/altera_fifo.vhd
@@ -101,7 +99,7 @@ vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>simulation/sim_package.
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/broadcast.vhd
 >>
 
-compileInterfaceComponents(callByNetwork) ::= <<
+compileInterfaceComponents(callByNetwork=true) ::= <<
 # Compile interface components
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>interface/counter.vhd
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>interface/segment_display_conv.vhd
@@ -109,7 +107,7 @@ vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>interface/segment_displ
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>interface/fps_eval.vhd
 >>
 
-compileSharedComponent(callByNetwork) ::= <<
+compileSharedComponent(callByNetwork=true) ::= <<
 # Compile Shared components
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>share/vhdl/util_pkg.vhdl
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>share/vhdl/tce_util_pkg.vhdl

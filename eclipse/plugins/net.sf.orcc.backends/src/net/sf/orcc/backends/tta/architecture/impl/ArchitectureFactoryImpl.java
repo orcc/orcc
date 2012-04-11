@@ -35,16 +35,17 @@ import net.sf.orcc.backends.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.Bridge;
-import net.sf.orcc.backends.tta.architecture.Broadcast;
 import net.sf.orcc.backends.tta.architecture.Bus;
 import net.sf.orcc.backends.tta.architecture.Component;
 import net.sf.orcc.backends.tta.architecture.Design;
+import net.sf.orcc.backends.tta.architecture.DesignConfiguration;
 import net.sf.orcc.backends.tta.architecture.Element;
 import net.sf.orcc.backends.tta.architecture.ExprBinary;
 import net.sf.orcc.backends.tta.architecture.ExprFalse;
 import net.sf.orcc.backends.tta.architecture.ExprTrue;
 import net.sf.orcc.backends.tta.architecture.ExprUnary;
 import net.sf.orcc.backends.tta.architecture.Extension;
+import net.sf.orcc.backends.tta.architecture.ExternalPort;
 import net.sf.orcc.backends.tta.architecture.Fifo;
 import net.sf.orcc.backends.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
@@ -55,6 +56,7 @@ import net.sf.orcc.backends.tta.architecture.OpUnary;
 import net.sf.orcc.backends.tta.architecture.Operation;
 import net.sf.orcc.backends.tta.architecture.Port;
 import net.sf.orcc.backends.tta.architecture.Processor;
+import net.sf.orcc.backends.tta.architecture.ProcessorConfiguration;
 import net.sf.orcc.backends.tta.architecture.Reads;
 import net.sf.orcc.backends.tta.architecture.RegisterFile;
 import net.sf.orcc.backends.tta.architecture.Resource;
@@ -173,6 +175,11 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	@Override
 	public String convertToString(EDataType eDataType, Object instanceValue) {
 		switch (eDataType.getClassifierID()) {
+		case ArchitecturePackage.DESIGN_CONFIGURATION:
+			return convertDesignConfigurationToString(eDataType, instanceValue);
+		case ArchitecturePackage.PROCESSOR_CONFIGURATION:
+			return convertProcessorConfigurationToString(eDataType,
+					instanceValue);
 		case ArchitecturePackage.SOCKET_TYPE:
 			return convertSocketTypeToString(eDataType, instanceValue);
 		case ArchitecturePackage.EXTENSION:
@@ -232,9 +239,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	 * 
 	 * @generated
 	 */
-	public Broadcast createBroadcast() {
-		BroadcastImpl broadcast = new BroadcastImpl();
-		return broadcast;
+	public ExternalPort createExternalPort() {
+		ExternalPortImpl externalPort = new ExternalPortImpl();
+		return externalPort;
 	}
 
 	/**
@@ -263,8 +270,8 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 			return createSignal();
 		case ArchitecturePackage.COMPONENT:
 			return createComponent();
-		case ArchitecturePackage.BROADCAST:
-			return createBroadcast();
+		case ArchitecturePackage.EXTERNAL_PORT:
+			return createExternalPort();
 		case ArchitecturePackage.PROCESSOR:
 			return createProcessor();
 		case ArchitecturePackage.BUS:
@@ -556,6 +563,11 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	@Override
 	public Object createFromString(EDataType eDataType, String initialValue) {
 		switch (eDataType.getClassifierID()) {
+		case ArchitecturePackage.DESIGN_CONFIGURATION:
+			return createDesignConfigurationFromString(eDataType, initialValue);
+		case ArchitecturePackage.PROCESSOR_CONFIGURATION:
+			return createProcessorConfigurationFromString(eDataType,
+					initialValue);
 		case ArchitecturePackage.SOCKET_TYPE:
 			return createSocketTypeFromString(eDataType, initialValue);
 		case ArchitecturePackage.EXTENSION:
@@ -1023,6 +1035,57 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	 * 
 	 * @generated
 	 */
+	public DesignConfiguration createDesignConfigurationFromString(
+			EDataType eDataType, String initialValue) {
+		DesignConfiguration result = DesignConfiguration.get(initialValue);
+		if (result == null)
+			throw new IllegalArgumentException("The value '" + initialValue
+					+ "' is not a valid enumerator of '" + eDataType.getName()
+					+ "'");
+		return result;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public String convertDesignConfigurationToString(EDataType eDataType,
+			Object instanceValue) {
+		return instanceValue == null ? null : instanceValue.toString();
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public ProcessorConfiguration createProcessorConfigurationFromString(
+			EDataType eDataType, String initialValue) {
+		ProcessorConfiguration result = ProcessorConfiguration
+				.get(initialValue);
+		if (result == null)
+			throw new IllegalArgumentException("The value '" + initialValue
+					+ "' is not a valid enumerator of '" + eDataType.getName()
+					+ "'");
+		return result;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public String convertProcessorConfigurationToString(EDataType eDataType,
+			Object instanceValue) {
+		return instanceValue == null ? null : instanceValue.toString();
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
 	public Reads createReads() {
 		ReadsImpl reads = new ReadsImpl();
 		return reads;
@@ -1291,9 +1354,8 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public Processor createProcessor(String name, int busNb, int intRfNb,
-			int intRfSize, int boolRfSize, int aluNb, int lsuNb, int mulNb,
-			int logNb, int ramSize) {
+	public Processor createProcessor(String name, ProcessorConfiguration conf,
+			int ramSize) {
 		Processor tta = createProcessor();
 		tta.setName(name);
 		// Address spaces
@@ -1301,7 +1363,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 				quantizeUp(ramSize / 8 + 512)));
 		tta.setProgram(createAddressSpace("instructions", 8, 0, 60000));
 		// Buses
-		for (int i = 0; i < busNb; i++) {
+		for (int i = 0; i < conf.getBusNb(); i++) {
 			Bus bus = createBusDefault(i, 32);
 			tta.getBuses().add(bus);
 		}
@@ -1310,12 +1372,12 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		// Register files
 		Implementation registerImpl = createImplementation(
 				"asic_130nm_1.5V.hdb", 96);
-		RegisterFile bool = createRegisterFileDefault(tta, "BOOL", boolRfSize,
-				1, registerImpl);
+		RegisterFile bool = createRegisterFileDefault(tta, "BOOL",
+				conf.getBoolRfSize(), 1, registerImpl);
 		tta.getRegisterFiles().add(bool);
-		for (int i = 0; i < intRfNb; i++) {
+		for (int i = 0; i < conf.getIntRfNb(); i++) {
 			RegisterFile rf = createRegisterFileDefault(tta, "RF_" + i,
-					intRfSize, 32, registerImpl);
+					conf.getIntRfSize(), 32, registerImpl);
 			tta.getRegisterFiles().add(rf);
 		}
 		tta.getHardwareDatabase().add(registerImpl);
@@ -1326,20 +1388,20 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		// Functional units
 		EList<FunctionUnit> units = tta.getFunctionUnits();
 		// * ALU
-		for (int i = 0; i < aluNb; i++) {
+		for (int i = 0; i < conf.getAluNb(); i++) {
 			FunctionUnit alu = createAluUnit(tta, "ALU_" + i);
 			units.add(alu);
 		}
 		// * LSU
 		Implementation lsuImpl = createImplementation("stratixII.hdb", 2);
-		for (int i = 0; i < lsuNb; i++) {
-			String lsuName = lsuNb == 1 ? "LSU" : "LSU_" + i;
+		for (int i = 0; i < conf.getLsuNb(); i++) {
+			String lsuName = conf.getLsuNb() == 1 ? "LSU" : "LSU_" + i;
 			units.add(createLSU(lsuName, tta, lsuImpl));
 		}
 		tta.getHardwareDatabase().add(lsuImpl);
 		// * Mul
 		Implementation mulImpl = createImplementation("asic_130nm_1.5V.hdb", 88);
-		for (int i = 0; i < mulNb; i++) {
+		for (int i = 0; i < conf.getMulNb(); i++) {
 			units.add(createMultiplier("Mul_" + i, tta, mulImpl));
 		}
 		tta.getHardwareDatabase().add(mulImpl);
@@ -1355,11 +1417,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		tta.getFunctionUnits().add(createStreamOutput(tta));
 
 		return tta;
-	}
-
-	@Override
-	public Processor createHugeProcessor(String name, int ramSize) {
-		return createProcessor(name, 32, 8, 32, 3, 12, 2, 8, 0, ramSize);
 	}
 
 	/**
