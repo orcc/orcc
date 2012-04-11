@@ -154,11 +154,11 @@ public class WorkspaceCreator implements IApplication {
 								description.getName());
 
 						if (!project.exists()) {
-							project.create(description, progressMonitor);
-							project.open(progressMonitor);
-
 							IJavaProject jp = JavaCore.create(project);
 							registerReferencedProjects(jp, project);
+
+							project.create(description, progressMonitor);
+							project.open(progressMonitor);
 							
 							System.out.println(project.getName());
 						}
