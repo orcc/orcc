@@ -30,10 +30,10 @@ package net.sf.orcc.ir.transformations;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
-import net.sf.orcc.df.Action;
+import org.eclipse.emf.common.util.EList;
+
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -41,8 +41,6 @@ import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-
-import org.eclipse.emf.common.util.EList;
 
 /**
  * This class defines a transformation that transforms variable and procedure
@@ -117,13 +115,6 @@ public class RenameTransformation extends AbstractActorVisitor<Object> {
 		return null;
 	}
 
-	@Override
-	public Object caseAction(Action action) {
-		checkVariables(action.getInputPattern().getVarToPortMap().keySet());
-		checkVariables(action.getOutputPattern().getVarToPortMap().keySet());
-		return null;
-	}
-
 	private void checkPorts(EList<Port> inputs) {
 		for (Port port : inputs) {
 			checkport(port);
@@ -155,12 +146,6 @@ public class RenameTransformation extends AbstractActorVisitor<Object> {
 	}
 
 	private void checkVariables(List<Var> variables) {
-		for (Var var : variables) {
-			checkVariable(var);
-		}
-	}
-
-	private void checkVariables(Set<Var> variables) {
 		for (Var var : variables) {
 			checkVariable(var);
 		}
