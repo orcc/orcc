@@ -1187,22 +1187,13 @@ public interface DfPackage extends EPackage {
 	int STATE__OUTGOING = GraphPackage.VERTEX__OUTGOING;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int STATE__NAME = GraphPackage.VERTEX_FEATURE_COUNT + 0;
-
-	/**
 	 * The number of structural features of the '<em>State</em>' class. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int STATE_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 1;
+	int STATE_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Identifiers</b></em>' attribute list. <!--
@@ -1952,17 +1943,6 @@ public interface DfPackage extends EPackage {
 	EClass getState();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.State#getName <em>Name</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Name</em>'.
-	 * @see net.sf.orcc.df.State#getName()
-	 * @see #getState()
-	 * @generated
-	 */
-	EAttribute getState_Name();
-
-	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Tag <em>Tag</em>}'.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Tag</em>'.
@@ -2687,14 +2667,6 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EClass STATE = eINSTANCE.getState();
-
-		/**
-		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute STATE__NAME = eINSTANCE.getState_Name();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.TagImpl <em>Tag</em>}' class.

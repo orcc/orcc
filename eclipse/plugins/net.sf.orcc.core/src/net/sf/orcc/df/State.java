@@ -42,7 +42,6 @@ public interface State extends Vertex {
 	 * Returns the name of this state.
 	 * 
 	 * @return the name of this state
-	 * @model
 	 */
 	String getName();
 

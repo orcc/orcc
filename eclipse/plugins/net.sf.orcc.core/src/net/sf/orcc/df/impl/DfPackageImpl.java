@@ -665,15 +665,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getState_Name() {
-		return (EAttribute) stateEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -990,7 +981,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEReference(patternEClass, PATTERN__VAR_TO_PORT_MAP);
 
 		stateEClass = createEClass(STATE);
-		createEAttribute(stateEClass, STATE__NAME);
 
 		tagEClass = createEClass(TAG);
 		createEAttribute(tagEClass, TAG__IDENTIFIERS);
@@ -1310,10 +1300,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 
 		initEClass(stateEClass, State.class, "State", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getState_Name(), ecorePackage.getEString(), "name",
-				null, 0, 1, State.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
 
 		initEClass(tagEClass, Tag.class, "Tag", !IS_ABSTRACT, !IS_INTERFACE,
 				IS_GENERATED_INSTANCE_CLASS);
