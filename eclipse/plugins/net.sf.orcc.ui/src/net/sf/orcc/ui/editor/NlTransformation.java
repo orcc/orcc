@@ -41,7 +41,7 @@ import net.sf.graphiti.model.Graph;
 import net.sf.graphiti.model.ObjectType;
 import net.sf.graphiti.model.Vertex;
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.util.OrccUtil;
+import net.sf.orcc.backends.AbstractPrinter;
 
 import org.eclipse.core.resources.IFile;
 import org.stringtemplate.v4.Interpreter;
@@ -68,7 +68,7 @@ public class NlTransformation implements ITransformation {
 	@Override
 	public void transform(Graph graph, OutputStream out) {
 		// reload group
-		group = OrccUtil.loadGroup("net/sf/orcc/ui/editor/NL.stg",
+		group = AbstractPrinter.loadGroup("net/sf/orcc/ui/editor/NL.stg",
 				NlTransformation.class.getClassLoader());
 
 		// register model adaptor for AbstractObject

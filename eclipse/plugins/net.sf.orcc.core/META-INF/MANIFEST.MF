@@ -9,8 +9,7 @@ Require-Bundle: org.eclipse.core.expressions;bundle-version="3.4.0",
  org.eclipse.core.runtime;bundle-version="3.7.0",
  org.eclipse.emf.ecore.xmi;bundle-version="2.7.0",
  org.eclipse.jdt.core;bundle-version="3.7.0",
- net.sf.dftools.models;bundle-version="0.2.0",
- org.stringtemplate;bundle-version="4.0.5"
+ net.sf.dftools.models;bundle-version="0.2.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .

@@ -38,7 +38,6 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.util.MultipleClassLoader;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.EObject;
