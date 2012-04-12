@@ -32,6 +32,7 @@ import java.util.Collection;
 
 import net.sf.orcc.backends.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
+import net.sf.orcc.backends.tta.architecture.FuPort;
 import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
 import net.sf.orcc.backends.tta.architecture.Operation;
 import net.sf.orcc.backends.tta.architecture.Port;
@@ -72,7 +73,7 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Port> ports;
+	protected EList<FuPort> ports;
 
 	/**
 	 * The cached value of the '{@link #getReturnAddress() <em>Return Address</em>}' containment reference.
@@ -82,7 +83,7 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected Port returnAddress;
+	protected FuPort returnAddress;
 
 	/**
 	 * The cached value of the '{@link #getAddressSpace() <em>Address Space</em>}' reference.
@@ -162,9 +163,9 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Port> getPorts() {
+	public EList<FuPort> getPorts() {
 		if (ports == null) {
-			ports = new EObjectContainmentEList<Port>(Port.class, this,
+			ports = new EObjectContainmentEList<FuPort>(FuPort.class, this,
 					ArchitecturePackage.GLOBAL_CONTROL_UNIT__PORTS);
 		}
 		return ports;
@@ -174,7 +175,7 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Port getReturnAddress() {
+	public FuPort getReturnAddress() {
 		return returnAddress;
 	}
 
@@ -183,9 +184,9 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetReturnAddress(Port newReturnAddress,
+	public NotificationChain basicSetReturnAddress(FuPort newReturnAddress,
 			NotificationChain msgs) {
-		Port oldReturnAddress = returnAddress;
+		FuPort oldReturnAddress = returnAddress;
 		returnAddress = newReturnAddress;
 		if (eNotificationRequired()) {
 			ENotificationImpl notification = new ENotificationImpl(this,
@@ -201,10 +202,11 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setReturnAddress(Port newReturnAddress) {
+	public void setReturnAddress(FuPort newReturnAddress) {
 		if (newReturnAddress != returnAddress) {
 			NotificationChain msgs = null;
 			if (returnAddress != null)
@@ -380,10 +382,10 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 		switch (featureID) {
 		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__PORTS:
 			getPorts().clear();
-			getPorts().addAll((Collection<? extends Port>) newValue);
+			getPorts().addAll((Collection<? extends FuPort>) newValue);
 			return;
 		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS:
-			setReturnAddress((Port) newValue);
+			setReturnAddress((FuPort) newValue);
 			return;
 		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__ADDRESS_SPACE:
 			setAddressSpace((AddressSpace) newValue);
@@ -413,7 +415,7 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 			getPorts().clear();
 			return;
 		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS:
-			setReturnAddress((Port) null);
+			setReturnAddress((FuPort) null);
 			return;
 		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__ADDRESS_SPACE:
 			setAddressSpace((AddressSpace) null);

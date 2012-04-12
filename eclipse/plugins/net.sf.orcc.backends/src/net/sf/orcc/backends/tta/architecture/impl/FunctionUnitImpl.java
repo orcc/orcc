@@ -32,6 +32,7 @@ import java.util.Collection;
 
 import net.sf.orcc.backends.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
+import net.sf.orcc.backends.tta.architecture.FuPort;
 import net.sf.orcc.backends.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.tta.architecture.Implementation;
 import net.sf.orcc.backends.tta.architecture.Operation;
@@ -107,7 +108,7 @@ public class FunctionUnitImpl extends EObjectImpl implements FunctionUnit {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Port> ports;
+	protected EList<FuPort> ports;
 
 	/**
 	 * The cached value of the '{@link #getAddressSpace() <em>Address Space</em>}' reference.
@@ -189,9 +190,9 @@ public class FunctionUnitImpl extends EObjectImpl implements FunctionUnit {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Port> getPorts() {
+	public EList<FuPort> getPorts() {
 		if (ports == null) {
-			ports = new EObjectContainmentEList<Port>(Port.class, this,
+			ports = new EObjectContainmentEList<FuPort>(FuPort.class, this,
 					ArchitecturePackage.FUNCTION_UNIT__PORTS);
 		}
 		return ports;
@@ -343,7 +344,7 @@ public class FunctionUnitImpl extends EObjectImpl implements FunctionUnit {
 			return;
 		case ArchitecturePackage.FUNCTION_UNIT__PORTS:
 			getPorts().clear();
-			getPorts().addAll((Collection<? extends Port>) newValue);
+			getPorts().addAll((Collection<? extends FuPort>) newValue);
 			return;
 		case ArchitecturePackage.FUNCTION_UNIT__ADDRESS_SPACE:
 			setAddressSpace((AddressSpace) newValue);

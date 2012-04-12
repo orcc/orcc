@@ -31,21 +31,17 @@ package net.sf.orcc.backends.tta.architecture.impl;
 import java.util.Collection;
 
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
+import net.sf.orcc.backends.tta.architecture.FuPort;
 import net.sf.orcc.backends.tta.architecture.Implementation;
-import net.sf.orcc.backends.tta.architecture.Port;
 import net.sf.orcc.backends.tta.architecture.RegisterFile;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
-
 import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
-
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
@@ -177,7 +173,7 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Port> ports;
+	protected EList<FuPort> ports;
 
 	/**
 	 * The cached value of the '{@link #getImplementation() <em>Implementation</em>}' reference.
@@ -325,9 +321,9 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Port> getPorts() {
+	public EList<FuPort> getPorts() {
 		if (ports == null) {
-			ports = new EObjectContainmentEList<Port>(Port.class, this,
+			ports = new EObjectContainmentEList<FuPort>(FuPort.class, this,
 					ArchitecturePackage.REGISTER_FILE__PORTS);
 		}
 		return ports;
@@ -444,7 +440,7 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 			return;
 		case ArchitecturePackage.REGISTER_FILE__PORTS:
 			getPorts().clear();
-			getPorts().addAll((Collection<? extends Port>) newValue);
+			getPorts().addAll((Collection<? extends FuPort>) newValue);
 			return;
 		case ArchitecturePackage.REGISTER_FILE__IMPLEMENTATION:
 			setImplementation((Implementation) newValue);

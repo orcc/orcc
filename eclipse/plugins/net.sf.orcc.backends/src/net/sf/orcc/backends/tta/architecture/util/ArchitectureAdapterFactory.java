@@ -45,8 +45,7 @@ import net.sf.orcc.backends.tta.architecture.ExprBinary;
 import net.sf.orcc.backends.tta.architecture.ExprFalse;
 import net.sf.orcc.backends.tta.architecture.ExprTrue;
 import net.sf.orcc.backends.tta.architecture.ExprUnary;
-import net.sf.orcc.backends.tta.architecture.ExternalPort;
-import net.sf.orcc.backends.tta.architecture.Fifo;
+import net.sf.orcc.backends.tta.architecture.FuPort;
 import net.sf.orcc.backends.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
 import net.sf.orcc.backends.tta.architecture.Guard;
@@ -130,11 +129,6 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 		}
 
 		@Override
-		public Adapter caseFifo(Fifo object) {
-			return createFifoAdapter();
-		}
-
-		@Override
 		public Adapter caseSignal(Signal object) {
 			return createSignalAdapter();
 		}
@@ -145,8 +139,8 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 		}
 
 		@Override
-		public Adapter caseExternalPort(ExternalPort object) {
-			return createExternalPortAdapter();
+		public Adapter casePort(Port object) {
+			return createPortAdapter();
 		}
 
 		@Override
@@ -185,8 +179,8 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 		}
 
 		@Override
-		public Adapter casePort(Port object) {
-			return createPortAdapter();
+		public Adapter caseFuPort(FuPort object) {
+			return createFuPortAdapter();
 		}
 
 		@Override
@@ -275,7 +269,7 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 		}
 
 		@Override
-		public Adapter casePortToIndexMapEntry(Map.Entry<Port, Integer> object) {
+		public Adapter casePortToIndexMapEntry(Map.Entry<FuPort, Integer> object) {
 			return createPortToIndexMapEntryAdapter();
 		}
 
@@ -332,20 +326,6 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.Fifo <em>Fifo</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.backends.tta.architecture.Fifo
-	 * @generated
-	 */
-	public Adapter createFifoAdapter() {
-		return null;
-	}
-
-	/**
 	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.Signal <em>Signal</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
@@ -370,20 +350,6 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createComponentAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.ExternalPort <em>External Port</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.backends.tta.architecture.ExternalPort
-	 * @generated
-	 */
-	public Adapter createExternalPortAdapter() {
 		return null;
 	}
 
@@ -483,6 +449,20 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createRegisterFileAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.FuPort <em>Fu Port</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.tta.architecture.FuPort
+	 * @generated
+	 */
+	public Adapter createFuPortAdapter() {
 		return null;
 	}
 

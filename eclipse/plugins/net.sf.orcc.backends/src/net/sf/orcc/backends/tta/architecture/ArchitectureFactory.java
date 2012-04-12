@@ -54,60 +54,6 @@ public interface ArchitectureFactory extends EFactory {
 			.init();
 
 	/**
-	 * Returns a new object of class '<em>Design</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Design</em>'.
-	 * @generated
-	 */
-	Design createDesign();
-
-	/**
-	 * Returns a new object of class '<em>Fifo</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Fifo</em>'.
-	 * @generated
-	 */
-	Fifo createFifo();
-
-	/**
-	 * Returns a new object of class '<em>Signal</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Signal</em>'.
-	 * @generated
-	 */
-	Signal createSignal();
-
-	/**
-	 * Returns a new object of class '<em>Component</em>'.
-	 * <!-- begin-user-doc
-	 * --> <!-- end-user-doc -->
-	 * @return a new object of class '<em>Component</em>'.
-	 * @generated
-	 */
-	Component createComponent();
-
-	/**
-	 * Returns a new object of class '<em>External Port</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>External Port</em>'.
-	 * @generated
-	 */
-	ExternalPort createExternalPort();
-
-	/**
-	 * Returns a new object of class '<em>Processor</em>'.
-	 * <!-- begin-user-doc
-	 * --> <!-- end-user-doc -->
-	 * @return a new object of class '<em>Processor</em>'.
-	 * @generated
-	 */
-	Processor createProcessor();
-
-	/**
 	 * Returns a new object of class '<em>Address Space</em>'. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -184,6 +130,26 @@ public interface ArchitectureFactory extends EFactory {
 	 *         initialized with the given arguments
 	 */
 	Bus createBusDefault(int index, int width);
+
+	/**
+	 * Returns a new object of class '<em>Component</em>'.
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
+	 * @return a new object of class '<em>Component</em>'.
+	 * @generated
+	 */
+	Component createComponent();
+
+	Component createComponent(String name, String entityName);
+
+	/**
+	 * Returns a new object of class '<em>Design</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Design</em>'.
+	 * @generated
+	 */
+	Design createDesign();
 
 	/**
 	 * Returns a new object of class '<em>Expr Binary</em>'.
@@ -284,6 +250,40 @@ public interface ArchitectureFactory extends EFactory {
 	FunctionUnit createFunctionUnit(Processor tta, String name,
 			String[] operations1, String[] operations2,
 			Implementation implementation);
+
+	/**
+	 * Returns a new object of class '<em>Fu Port</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Fu Port</em>'.
+	 * @generated
+	 */
+	FuPort createFuPort();
+
+	/**
+	 * Return a new Port with the given name
+	 * 
+	 * @param name
+	 *            the name of the port
+	 * @return a named port
+	 */
+	FuPort createFuPort(String name);
+
+	/**
+	 * Return a new Port with the given parameters
+	 * 
+	 * @param name
+	 *            the name of the port
+	 * @param width
+	 *            the width of the port
+	 * @param isOpcodeSelector
+	 *            whether the port selects the opcode
+	 * @param isTrigger
+	 *            whether the port is a trigger one
+	 * @return a Port with the given parameters
+	 */
+	FuPort createFuPort(String name, int width, boolean isOpcodeSelector,
+			boolean isTrigger);
 
 	/**
 	 * Returns a new object of class '<em>Global Control Unit</em>'. <!--
@@ -392,7 +392,7 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the port read by this operation
 	 * @return a control Operation
 	 */
-	Operation createOperationCtrl(String name, Port port);
+	Operation createOperationCtrl(String name, FuPort port);
 
 	/**
 	 * Return a new output socket with the given parameters
@@ -414,30 +414,31 @@ public interface ArchitectureFactory extends EFactory {
 	 */
 	Port createPort();
 
-	/**
-	 * Return a new Port with the given name
-	 * 
-	 * @param name
-	 *            the name of the port
-	 * @return a named port
-	 */
 	Port createPort(String name);
 
 	/**
-	 * Return a new Port with the given parameters
+	 * Returns a new object of class '<em>Processor</em>'.
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
+	 * @return a new object of class '<em>Processor</em>'.
+	 * @generated
+	 */
+	Processor createProcessor();
+
+	/**
+	 * Returns a simple TTA processor corresponding to default TTA processor
+	 * include in the TCE tools
 	 * 
 	 * @param name
-	 *            the name of the port
-	 * @param width
-	 *            the width of the port
-	 * @param isOpcodeSelector
-	 *            whether the port selects the opcode
-	 * @param isTrigger
-	 *            whether the port is a trigger one
-	 * @return a Port with the given parameters
+	 *            the name of the TTA
+	 * @param conf
+	 *            the configuration of the processor
+	 * @param ramSize
+	 *            the size of the ram
+	 * @return a simple TTA
 	 */
-	Port createPort(String name, int width, boolean isOpcodeSelector,
-			boolean isTrigger);
+	public Processor createProcessor(String name, String entityName,
+			ProcessorConfiguration conf, int ramSize);
 
 	/**
 	 * Returns a new object of class '<em>Reads</em>'.
@@ -459,7 +460,7 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the duration of the read
 	 * @return a Reads with the given parameters
 	 */
-	Reads createReads(Port port, int startCycle, int cycle);
+	Reads createReads(FuPort port, int startCycle, int cycle);
 
 	/**
 	 * Returns a new object of class '<em>Register File</em>'. <!--
@@ -569,6 +570,18 @@ public interface ArchitectureFactory extends EFactory {
 	ShortImmediate createShortImmediate(int width, Extension extension);
 
 	/**
+	 * Returns a new object of class '<em>Signal</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Signal</em>'.
+	 * @generated
+	 */
+	Signal createSignal();
+
+	Signal createSignal(String name, Component source, Component target,
+			Port sourcePort, Port targetPort);
+
+	/**
 	 * Returns a new object of class '<em>Socket</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -646,22 +659,7 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the referenced port
 	 * @return A TermUnit initialized with the given parameters
 	 */
-	TermUnit createTermUnit(FunctionUnit unit, Port port);
-
-	/**
-	 * Returns a simple TTA processor corresponding to default TTA processor
-	 * include in the TCE tools
-	 * 
-	 * @param name
-	 *            the name of the TTA
-	 * @param conf
-	 *            the configuration of the processor
-	 * @param ramSize
-	 *            the size of the ram
-	 * @return a simple TTA
-	 */
-	public Processor createProcessor(String name, ProcessorConfiguration conf,
-			int ramSize);
+	TermUnit createTermUnit(FunctionUnit unit, FuPort port);
 
 	/**
 	 * Returns a new object of class '<em>Writes</em>'.
@@ -683,7 +681,7 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the duration of the write
 	 * @return a Writes with the given parameters
 	 */
-	Writes createWrites(Port port, int startCycle, int cycle);
+	Writes createWrites(FuPort port, int startCycle, int cycle);
 
 	/**
 	 * Returns the package supported by this factory.

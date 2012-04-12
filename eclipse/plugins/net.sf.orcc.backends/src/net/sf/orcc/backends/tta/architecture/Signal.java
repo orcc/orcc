@@ -40,7 +40,9 @@ import net.sf.dftools.graph.Edge;
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.Signal#getSize <em>Size</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Signal#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Signal#getSourcePort <em>Source Port</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Signal#getTargetPort <em>Target Port</em>}</li>
  * </ul>
  * </p>
  *
@@ -51,28 +53,80 @@ import net.sf.dftools.graph.Edge;
 public interface Signal extends Edge {
 
 	/**
-	 * Returns the value of the '<em><b>Size</b></em>' attribute.
+	 * Returns the value of the '<em><b>Name</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Size</em>' attribute isn't clear,
+	 * If the meaning of the '<em>Name</em>' attribute isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Size</em>' attribute.
-	 * @see #setSize(int)
-	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getSignal_Size()
+	 * @return the value of the '<em>Name</em>' attribute.
+	 * @see #setName(String)
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getSignal_Name()
 	 * @model
 	 * @generated
 	 */
-	int getSize();
+	String getName();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Signal#getSize <em>Size</em>}' attribute.
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Signal#getName <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Size</em>' attribute.
-	 * @see #getSize()
+	 * @param value the new value of the '<em>Name</em>' attribute.
+	 * @see #getName()
 	 * @generated
 	 */
-	void setSize(int value);
+	void setName(String value);
+
+	/**
+	 * Returns the value of the '<em><b>Source Port</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Source Port</em>' reference isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Source Port</em>' reference.
+	 * @see #setSourcePort(Port)
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getSignal_SourcePort()
+	 * @model
+	 * @generated
+	 */
+	Port getSourcePort();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Signal#getSourcePort <em>Source Port</em>}' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Source Port</em>' reference.
+	 * @see #getSourcePort()
+	 * @generated
+	 */
+	void setSourcePort(Port value);
+
+	/**
+	 * Returns the value of the '<em><b>Target Port</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Target Port</em>' reference isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Target Port</em>' reference.
+	 * @see #setTargetPort(Port)
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getSignal_TargetPort()
+	 * @model
+	 * @generated
+	 */
+	Port getTargetPort();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Signal#getTargetPort <em>Target Port</em>}' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Target Port</em>' reference.
+	 * @see #getTargetPort()
+	 * @generated
+	 */
+	void setTargetPort(Port value);
 } // Signal

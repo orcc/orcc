@@ -54,6 +54,7 @@ import net.sf.orcc.backends.transformations.TypeResizer;
 import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.backends.transformations.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transformations.ssa.CopyPropagator;
+import net.sf.orcc.backends.tta.architecture.Component;
 import net.sf.orcc.backends.tta.architecture.Design;
 import net.sf.orcc.backends.tta.architecture.DesignConfiguration;
 import net.sf.orcc.backends.tta.architecture.Processor;
@@ -89,7 +90,6 @@ public class TTABackendImpl extends AbstractBackend {
 	private boolean finalize;
 	private FPGA fpga;
 	private String libPath;
-	private int fifoWidthu;
 
 	private DesignConfiguration conf;
 	private Design design;
@@ -121,7 +121,6 @@ public class TTABackendImpl extends AbstractBackend {
 				"Stratix III (EP3SL150F1152C2)"));
 		// Set default FIFO size to 256
 		fifoSize = getAttribute(FIFO_SIZE, 256);
-		fifoWidthu = (int) Math.ceil(Math.log(fifoSize) / Math.log(2));
 
 		conf = DesignConfiguration.getByName(getAttribute(
 				"net.sf.orcc.backends.tta.configuration", "Standard"));
@@ -213,15 +212,17 @@ public class TTABackendImpl extends AbstractBackend {
 	}
 
 	private void printDesign(Design design) {
-		for (Processor processor : design.getProcessors()) {
-			printProcessor(processor);
+		for (Component component : design.getComponents()) {
+			if (component.isProcessor()) {
+				Processor processor = (Processor) component;
+				printProcessor(processor);
+			}
 		}
 
 		// VHDL Network of TTA processors
 		ArchitecturePrinter vhdlPrinter = new ArchitecturePrinter(
 				"net/sf/orcc/backends/tta/VHDL_Network.stg");
 		vhdlPrinter.setExpressionPrinter(new LLVMExpressionPrinter());
-		vhdlPrinter.getOptions().put("fifoWidthu", fifoWidthu);
 		vhdlPrinter.getOptions().put("fpga", fpga);
 		vhdlPrinter.print("top.vhd", path, design);
 

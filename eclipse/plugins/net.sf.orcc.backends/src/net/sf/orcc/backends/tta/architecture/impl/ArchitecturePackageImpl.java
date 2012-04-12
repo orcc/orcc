@@ -45,8 +45,7 @@ import net.sf.orcc.backends.tta.architecture.ExprFalse;
 import net.sf.orcc.backends.tta.architecture.ExprTrue;
 import net.sf.orcc.backends.tta.architecture.ExprUnary;
 import net.sf.orcc.backends.tta.architecture.Extension;
-import net.sf.orcc.backends.tta.architecture.ExternalPort;
-import net.sf.orcc.backends.tta.architecture.Fifo;
+import net.sf.orcc.backends.tta.architecture.FuPort;
 import net.sf.orcc.backends.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
 import net.sf.orcc.backends.tta.architecture.Guard;
@@ -99,12 +98,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass fifoEClass = null;
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	private EClass signalEClass = null;
 
 	/**
@@ -112,13 +105,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	private EClass componentEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass externalPortEClass = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -161,6 +147,13 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	private EClass registerFileEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass fuPortEClass = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -426,7 +419,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getDesign_Fifos() {
+	public EReference getDesign_Broadcasts() {
 		return (EReference) designEClass.getEStructuralFeatures().get(3);
 	}
 
@@ -435,7 +428,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getDesign_Signals() {
+	public EReference getDesign_Fifos() {
 		return (EReference) designEClass.getEStructuralFeatures().get(4);
 	}
 
@@ -444,7 +437,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getDesign_Ports() {
+	public EReference getDesign_Signals() {
 		return (EReference) designEClass.getEStructuralFeatures().get(5);
 	}
 
@@ -453,16 +446,8 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getDesign_Configuration() {
-		return (EAttribute) designEClass.getEStructuralFeatures().get(6);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getFifo() {
-		return fifoEClass;
+	public EReference getDesign_Inputs() {
+		return (EReference) designEClass.getEStructuralFeatures().get(6);
 	}
 
 	/**
@@ -470,8 +455,17 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getFifo_Size() {
-		return (EAttribute) fifoEClass.getEStructuralFeatures().get(0);
+	public EReference getDesign_Outputs() {
+		return (EReference) designEClass.getEStructuralFeatures().get(7);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getDesign_Configuration() {
+		return (EAttribute) designEClass.getEStructuralFeatures().get(8);
 	}
 
 	/**
@@ -487,8 +481,26 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getSignal_Size() {
+	public EAttribute getSignal_Name() {
 		return (EAttribute) signalEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getSignal_SourcePort() {
+		return (EReference) signalEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getSignal_TargetPort() {
+		return (EReference) signalEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -522,8 +534,17 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getExternalPort() {
-		return externalPortEClass;
+	public EReference getComponent_Inputs() {
+		return (EReference) componentEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getComponent_Outputs() {
+		return (EReference) componentEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -539,7 +560,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	public EReference getProcessor_Gcu() {
-		return (EReference) processorEClass.getEStructuralFeatures().get(1);
+		return (EReference) processorEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -547,7 +568,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	public EReference getProcessor_Buses() {
-		return (EReference) processorEClass.getEStructuralFeatures().get(2);
+		return (EReference) processorEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -555,7 +576,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	public EReference getProcessor_Bridges() {
-		return (EReference) processorEClass.getEStructuralFeatures().get(3);
+		return (EReference) processorEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -563,7 +584,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	public EReference getProcessor_Sockets() {
-		return (EReference) processorEClass.getEStructuralFeatures().get(4);
+		return (EReference) processorEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -571,7 +592,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	public EReference getProcessor_FunctionUnits() {
-		return (EReference) processorEClass.getEStructuralFeatures().get(5);
+		return (EReference) processorEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -579,7 +600,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	public EReference getProcessor_RegisterFiles() {
-		return (EReference) processorEClass.getEStructuralFeatures().get(6);
+		return (EReference) processorEClass.getEStructuralFeatures().get(5);
 	}
 
 	/**
@@ -587,7 +608,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	public EReference getProcessor_Program() {
-		return (EReference) processorEClass.getEStructuralFeatures().get(7);
+		return (EReference) processorEClass.getEStructuralFeatures().get(6);
 	}
 
 	/**
@@ -595,7 +616,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	public EReference getProcessor_Data() {
-		return (EReference) processorEClass.getEStructuralFeatures().get(8);
+		return (EReference) processorEClass.getEStructuralFeatures().get(7);
 	}
 
 	/**
@@ -603,7 +624,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	public EReference getProcessor_HardwareDatabase() {
-		return (EReference) processorEClass.getEStructuralFeatures().get(9);
+		return (EReference) processorEClass.getEStructuralFeatures().get(8);
 	}
 
 	/**
@@ -611,7 +632,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	public EReference getProcessor_MappedActors() {
-		return (EReference) processorEClass.getEStructuralFeatures().get(10);
+		return (EReference) processorEClass.getEStructuralFeatures().get(9);
 	}
 
 	/**
@@ -620,15 +641,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	public EAttribute getProcessor_Configuration() {
-		return (EAttribute) processorEClass.getEStructuralFeatures().get(11);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getProcessor_Name() {
-		return (EAttribute) processorEClass.getEStructuralFeatures().get(0);
+		return (EAttribute) processorEClass.getEStructuralFeatures().get(10);
 	}
 
 	/**
@@ -894,6 +907,69 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getFuPort() {
+		return fuPortEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getFuPort_Name() {
+		return (EAttribute) fuPortEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getFuPort_InputSocket() {
+		return (EReference) fuPortEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getFuPort_OutputSocket() {
+		return (EReference) fuPortEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getFuPort_Width() {
+		return (EAttribute) fuPortEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getFuPort_Trigger() {
+		return (EAttribute) fuPortEClass.getEStructuralFeatures().get(4);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getFuPort_OpcodeSelector() {
+		return (EAttribute) fuPortEClass.getEStructuralFeatures().get(5);
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -902,51 +978,12 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EAttribute getPort_Name() {
 		return (EAttribute) portEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getPort_InputSocket() {
-		return (EReference) portEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getPort_OutputSocket() {
-		return (EReference) portEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getPort_Width() {
-		return (EAttribute) portEClass.getEStructuralFeatures().get(3);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getPort_Trigger() {
-		return (EAttribute) portEClass.getEStructuralFeatures().get(4);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getPort_OpcodeSelector() {
-		return (EAttribute) portEClass.getEStructuralFeatures().get(5);
 	}
 
 	/**
@@ -1420,25 +1457,28 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEAttribute(designEClass, DESIGN__NAME);
 		createEReference(designEClass, DESIGN__COMPONENTS);
 		createEReference(designEClass, DESIGN__PROCESSORS);
+		createEReference(designEClass, DESIGN__BROADCASTS);
 		createEReference(designEClass, DESIGN__FIFOS);
 		createEReference(designEClass, DESIGN__SIGNALS);
-		createEReference(designEClass, DESIGN__PORTS);
+		createEReference(designEClass, DESIGN__INPUTS);
+		createEReference(designEClass, DESIGN__OUTPUTS);
 		createEAttribute(designEClass, DESIGN__CONFIGURATION);
 
-		fifoEClass = createEClass(FIFO);
-		createEAttribute(fifoEClass, FIFO__SIZE);
-
 		signalEClass = createEClass(SIGNAL);
-		createEAttribute(signalEClass, SIGNAL__SIZE);
+		createEAttribute(signalEClass, SIGNAL__NAME);
+		createEReference(signalEClass, SIGNAL__SOURCE_PORT);
+		createEReference(signalEClass, SIGNAL__TARGET_PORT);
 
 		componentEClass = createEClass(COMPONENT);
 		createEAttribute(componentEClass, COMPONENT__NAME);
 		createEAttribute(componentEClass, COMPONENT__ENTITY_NAME);
+		createEReference(componentEClass, COMPONENT__INPUTS);
+		createEReference(componentEClass, COMPONENT__OUTPUTS);
 
-		externalPortEClass = createEClass(EXTERNAL_PORT);
+		portEClass = createEClass(PORT);
+		createEAttribute(portEClass, PORT__NAME);
 
 		processorEClass = createEClass(PROCESSOR);
-		createEAttribute(processorEClass, PROCESSOR__NAME);
 		createEReference(processorEClass, PROCESSOR__GCU);
 		createEReference(processorEClass, PROCESSOR__BUSES);
 		createEReference(processorEClass, PROCESSOR__BRIDGES);
@@ -1494,13 +1534,13 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEReference(registerFileEClass, REGISTER_FILE__PORTS);
 		createEReference(registerFileEClass, REGISTER_FILE__IMPLEMENTATION);
 
-		portEClass = createEClass(PORT);
-		createEAttribute(portEClass, PORT__NAME);
-		createEReference(portEClass, PORT__INPUT_SOCKET);
-		createEReference(portEClass, PORT__OUTPUT_SOCKET);
-		createEAttribute(portEClass, PORT__WIDTH);
-		createEAttribute(portEClass, PORT__TRIGGER);
-		createEAttribute(portEClass, PORT__OPCODE_SELECTOR);
+		fuPortEClass = createEClass(FU_PORT);
+		createEAttribute(fuPortEClass, FU_PORT__NAME);
+		createEReference(fuPortEClass, FU_PORT__INPUT_SOCKET);
+		createEReference(fuPortEClass, FU_PORT__OUTPUT_SOCKET);
+		createEAttribute(fuPortEClass, FU_PORT__WIDTH);
+		createEAttribute(fuPortEClass, FU_PORT__TRIGGER);
+		createEAttribute(fuPortEClass, FU_PORT__OPCODE_SELECTOR);
 
 		socketEClass = createEClass(SOCKET);
 		createEAttribute(socketEClass, SOCKET__NAME);
@@ -1616,11 +1656,10 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 		// Add supertypes to classes
 		designEClass.getESuperTypes().add(theGraphPackage.getGraph());
-		fifoEClass.getESuperTypes().add(theGraphPackage.getEdge());
 		signalEClass.getESuperTypes().add(theGraphPackage.getEdge());
 		componentEClass.getESuperTypes().add(theGraphPackage.getVertex());
-		externalPortEClass.getESuperTypes().add(theGraphPackage.getVertex());
-		processorEClass.getESuperTypes().add(theGraphPackage.getVertex());
+		portEClass.getESuperTypes().add(theGraphPackage.getVertex());
+		processorEClass.getESuperTypes().add(this.getComponent());
 		readsEClass.getESuperTypes().add(this.getElement());
 		writesEClass.getESuperTypes().add(this.getElement());
 		resourceEClass.getESuperTypes().add(this.getElement());
@@ -1646,35 +1685,45 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				"processors", null, 0, -1, Design.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getDesign_Fifos(), this.getFifo(), null, "fifos", null,
-				0, -1, Design.class, !IS_TRANSIENT, !IS_VOLATILE,
+		initEReference(getDesign_Broadcasts(), this.getComponent(), null,
+				"broadcasts", null, 0, -1, Design.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getDesign_Fifos(), this.getComponent(), null, "fifos",
+				null, 0, -1, Design.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getDesign_Signals(), this.getSignal(), null, "signals",
 				null, 0, -1, Design.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getDesign_Ports(), this.getExternalPort(), null,
-				"ports", null, 0, -1, Design.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
+		initEReference(getDesign_Inputs(), this.getPort(), null, "inputs",
+				null, 0, -1, Design.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getDesign_Outputs(), this.getPort(), null, "outputs",
+				null, 0, -1, Design.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getDesign_Configuration(),
 				this.getDesignConfiguration(), "configuration", null, 0, 1,
 				Design.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
 				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(fifoEClass, Fifo.class, "Fifo", !IS_ABSTRACT, !IS_INTERFACE,
-				IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getFifo_Size(), theEcorePackage.getEInt(), "size", null,
-				0, 1, Fifo.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
-				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
 		initEClass(signalEClass, Signal.class, "Signal", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getSignal_Size(), theEcorePackage.getEInt(), "size",
+		initEAttribute(getSignal_Name(), theEcorePackage.getEString(), "name",
 				null, 0, 1, Signal.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
+		initEReference(getSignal_SourcePort(), this.getPort(), null,
+				"sourcePort", null, 0, 1, Signal.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getSignal_TargetPort(), this.getPort(), null,
+				"targetPort", null, 0, 1, Signal.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(componentEClass, Component.class, "Component", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -1686,16 +1735,24 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				"entityName", null, 0, 1, Component.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
+		initEReference(getComponent_Inputs(), this.getPort(), null, "inputs",
+				null, 0, -1, Component.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getComponent_Outputs(), this.getPort(), null, "outputs",
+				null, 0, -1, Component.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(externalPortEClass, ExternalPort.class, "ExternalPort",
-				!IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEClass(portEClass, Port.class, "Port", !IS_ABSTRACT, !IS_INTERFACE,
+				IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getPort_Name(), theEcorePackage.getEString(), "name",
+				null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
 
 		initEClass(processorEClass, Processor.class, "Processor", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getProcessor_Name(), theEcorePackage.getEString(),
-				"name", null, 0, 1, Processor.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
 		initEReference(getProcessor_Gcu(), this.getGlobalControlUnit(), null,
 				"gcu", null, 0, 1, Processor.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
@@ -1790,11 +1847,11 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		initEClass(globalControlUnitEClass, GlobalControlUnit.class,
 				"GlobalControlUnit", !IS_ABSTRACT, !IS_INTERFACE,
 				IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getGlobalControlUnit_Ports(), this.getPort(), null,
+		initEReference(getGlobalControlUnit_Ports(), this.getFuPort(), null,
 				"ports", null, 0, -1, GlobalControlUnit.class, IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getGlobalControlUnit_ReturnAddress(), this.getPort(),
+		initEReference(getGlobalControlUnit_ReturnAddress(), this.getFuPort(),
 				null, "returnAddress", null, 0, 1, GlobalControlUnit.class,
 				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE,
 				!IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
@@ -1830,9 +1887,9 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				"operations", null, 0, -1, FunctionUnit.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getFunctionUnit_Ports(), this.getPort(), null, "ports",
-				null, 0, -1, FunctionUnit.class, IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+		initEReference(getFunctionUnit_Ports(), this.getFuPort(), null,
+				"ports", null, 0, -1, FunctionUnit.class, IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getFunctionUnit_AddressSpace(), this.getAddressSpace(),
 				null, "addressSpace", null, 0, 1, FunctionUnit.class,
@@ -1867,9 +1924,9 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				"maxWrites", null, 0, 1, RegisterFile.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
-		initEReference(getRegisterFile_Ports(), this.getPort(), null, "ports",
-				null, 0, -1, RegisterFile.class, IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+		initEReference(getRegisterFile_Ports(), this.getFuPort(), null,
+				"ports", null, 0, -1, RegisterFile.class, IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getRegisterFile_Implementation(),
 				this.getImplementation(), null, "implementation", null, 0, 1,
@@ -1877,32 +1934,34 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				!IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
 
-		initEClass(portEClass, Port.class, "Port", !IS_ABSTRACT, !IS_INTERFACE,
-				IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getPort_Name(), ecorePackage.getEString(), "name", null,
-				0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
-				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getPort_InputSocket(), this.getSocket(), null,
-				"inputSocket", null, 0, 1, Port.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
-				IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getPort_OutputSocket(), this.getSocket(), null,
-				"outputSocket", null, 0, 1, Port.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
-				IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getPort_Width(), ecorePackage.getEInt(), "width", null,
-				0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
-				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getPort_Trigger(), ecorePackage.getEBoolean(),
-				"trigger", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE,
+		initEClass(fuPortEClass, FuPort.class, "FuPort", !IS_ABSTRACT,
+				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getFuPort_Name(), ecorePackage.getEString(), "name",
+				null, 0, 1, FuPort.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
-		initEAttribute(getPort_OpcodeSelector(), ecorePackage.getEBoolean(),
-				"opcodeSelector", null, 0, 1, Port.class, !IS_TRANSIENT,
+		initEReference(getFuPort_InputSocket(), this.getSocket(), null,
+				"inputSocket", null, 0, 1, FuPort.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
+				IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getFuPort_OutputSocket(), this.getSocket(), null,
+				"outputSocket", null, 0, 1, FuPort.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
+				IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getFuPort_Width(), ecorePackage.getEInt(), "width",
+				null, 0, 1, FuPort.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
+		initEAttribute(getFuPort_Trigger(), ecorePackage.getEBoolean(),
+				"trigger", null, 0, 1, FuPort.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
+		initEAttribute(getFuPort_OpcodeSelector(), ecorePackage.getEBoolean(),
+				"opcodeSelector", null, 0, 1, FuPort.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
 
-		EOperation op = addEOperation(portEClass, null, "connect", 0, 1,
+		EOperation op = addEOperation(fuPortEClass, null, "connect", 0, 1,
 				IS_UNIQUE, IS_ORDERED);
 		addEParameter(op, this.getSocket(), "socket", 0, 1, IS_UNIQUE,
 				IS_ORDERED);
@@ -1942,7 +2001,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
 
-		addEOperation(operationEClass, this.getPort(), "getPorts", 0, -1,
+		addEOperation(operationEClass, this.getFuPort(), "getPorts", 0, -1,
 				IS_UNIQUE, IS_ORDERED);
 
 		addEOperation(operationEClass, this.getPortToIndexMapEntry(),
@@ -1989,15 +2048,15 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 		initEClass(readsEClass, Reads.class, "Reads", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getReads_Port(), this.getPort(), null, "port", null, 0,
-				1, Reads.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+		initEReference(getReads_Port(), this.getFuPort(), null, "port", null,
+				0, 1, Reads.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
 				!IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
 
 		initEClass(writesEClass, Writes.class, "Writes", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getWrites_Port(), this.getPort(), null, "port", null, 0,
-				1, Writes.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+		initEReference(getWrites_Port(), this.getFuPort(), null, "port", null,
+				0, 1, Writes.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
 				!IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
 
@@ -2106,8 +2165,8 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE,
 				IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
-		initEReference(getTermUnit_Port(), this.getPort(), null, "port", null,
-				0, 1, TermUnit.class, !IS_TRANSIENT, !IS_VOLATILE,
+		initEReference(getTermUnit_Port(), this.getFuPort(), null, "port",
+				null, 0, 1, TermUnit.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
@@ -2126,7 +2185,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		initEClass(portToIndexMapEntryEClass, Map.Entry.class,
 				"PortToIndexMapEntry", !IS_ABSTRACT, !IS_INTERFACE,
 				!IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getPortToIndexMapEntry_Key(), this.getPort(), null,
+		initEReference(getPortToIndexMapEntry_Key(), this.getFuPort(), null,
 				"key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

@@ -30,24 +30,35 @@
  */
 package net.sf.orcc.backends.tta.architecture.impl;
 
-import net.sf.dftools.graph.impl.VertexImpl;
+import java.util.Collection;
+import java.util.Map;
 
+import net.sf.dftools.graph.impl.VertexImpl;
+import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.Component;
+import net.sf.orcc.backends.tta.architecture.Port;
+import net.sf.orcc.backends.tta.architecture.Signal;
 
 import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.notify.NotificationChain;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
+import org.eclipse.emf.ecore.util.EObjectContainmentEList;
+import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Component</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object '
+ * <em><b>Component</b></em>'. <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ComponentImpl#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ComponentImpl#getEntityName <em>Entity Name</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ComponentImpl#getInputs <em>Inputs</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ComponentImpl#getOutputs <em>Outputs</em>}</li>
  * </ul>
  * </p>
  *
@@ -56,8 +67,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
 public class ComponentImpl extends VertexImpl implements Component {
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -65,8 +75,7 @@ public class ComponentImpl extends VertexImpl implements Component {
 	protected static final String NAME_EDEFAULT = null;
 	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -90,10 +99,25 @@ public class ComponentImpl extends VertexImpl implements Component {
 	 * @ordered
 	 */
 	protected String entityName = ENTITY_NAME_EDEFAULT;
+	/**
+	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getInputs()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Port> inputs;
+	/**
+	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getOutputs()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Port> outputs;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected ComponentImpl() {
@@ -101,8 +125,7 @@ public class ComponentImpl extends VertexImpl implements Component {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -111,8 +134,7 @@ public class ComponentImpl extends VertexImpl implements Component {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public String getName() {
@@ -120,8 +142,7 @@ public class ComponentImpl extends VertexImpl implements Component {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setName(String newName) {
@@ -156,8 +177,48 @@ public class ComponentImpl extends VertexImpl implements Component {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Port> getInputs() {
+		if (inputs == null) {
+			inputs = new EObjectContainmentEList<Port>(Port.class, this,
+					ArchitecturePackage.COMPONENT__INPUTS);
+		}
+		return inputs;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Port> getOutputs() {
+		if (outputs == null) {
+			outputs = new EObjectContainmentEList<Port>(Port.class, this,
+					ArchitecturePackage.COMPONENT__OUTPUTS);
+		}
+		return outputs;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
+		switch (featureID) {
+		case ArchitecturePackage.COMPONENT__INPUTS:
+			return ((InternalEList<?>) getInputs()).basicRemove(otherEnd, msgs);
+		case ArchitecturePackage.COMPONENT__OUTPUTS:
+			return ((InternalEList<?>) getOutputs())
+					.basicRemove(otherEnd, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -167,15 +228,19 @@ public class ComponentImpl extends VertexImpl implements Component {
 			return getName();
 		case ArchitecturePackage.COMPONENT__ENTITY_NAME:
 			return getEntityName();
+		case ArchitecturePackage.COMPONENT__INPUTS:
+			return getInputs();
+		case ArchitecturePackage.COMPONENT__OUTPUTS:
+			return getOutputs();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
@@ -185,13 +250,20 @@ public class ComponentImpl extends VertexImpl implements Component {
 		case ArchitecturePackage.COMPONENT__ENTITY_NAME:
 			setEntityName((String) newValue);
 			return;
+		case ArchitecturePackage.COMPONENT__INPUTS:
+			getInputs().clear();
+			getInputs().addAll((Collection<? extends Port>) newValue);
+			return;
+		case ArchitecturePackage.COMPONENT__OUTPUTS:
+			getOutputs().clear();
+			getOutputs().addAll((Collection<? extends Port>) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -203,13 +275,18 @@ public class ComponentImpl extends VertexImpl implements Component {
 		case ArchitecturePackage.COMPONENT__ENTITY_NAME:
 			setEntityName(ENTITY_NAME_EDEFAULT);
 			return;
+		case ArchitecturePackage.COMPONENT__INPUTS:
+			getInputs().clear();
+			return;
+		case ArchitecturePackage.COMPONENT__OUTPUTS:
+			getOutputs().clear();
+			return;
 		}
 		super.eUnset(featureID);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -221,13 +298,16 @@ public class ComponentImpl extends VertexImpl implements Component {
 		case ArchitecturePackage.COMPONENT__ENTITY_NAME:
 			return ENTITY_NAME_EDEFAULT == null ? entityName != null
 					: !ENTITY_NAME_EDEFAULT.equals(entityName);
+		case ArchitecturePackage.COMPONENT__INPUTS:
+			return inputs != null && !inputs.isEmpty();
+		case ArchitecturePackage.COMPONENT__OUTPUTS:
+			return outputs != null && !outputs.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -244,4 +324,35 @@ public class ComponentImpl extends VertexImpl implements Component {
 		return result.toString();
 	}
 
-} //ComponentImpl
+	@Override
+	public Map<Port, Signal> getIncomingPortMap() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<Port, Signal> getOutgoingPortMap() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Port createInput(String name) {
+		Port port = ArchitectureFactory.eINSTANCE.createPort(name);
+		getInputs().add(port);
+		return port;
+	}
+
+	@Override
+	public Port createOutput(String name) {
+		Port port = ArchitectureFactory.eINSTANCE.createPort(name);
+		getInputs().add(port);
+		return port;
+	}
+
+	@Override
+	public boolean isProcessor() {
+		return false;
+	}
+
+} // ComponentImpl

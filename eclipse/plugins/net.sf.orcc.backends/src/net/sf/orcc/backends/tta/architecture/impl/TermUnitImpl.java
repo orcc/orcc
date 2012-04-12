@@ -29,15 +29,13 @@
 package net.sf.orcc.backends.tta.architecture.impl;
 
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
+import net.sf.orcc.backends.tta.architecture.FuPort;
 import net.sf.orcc.backends.tta.architecture.FunctionUnit;
-import net.sf.orcc.backends.tta.architecture.Port;
 import net.sf.orcc.backends.tta.architecture.TermUnit;
 
 import org.eclipse.emf.common.notify.Notification;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 
@@ -74,7 +72,7 @@ public class TermUnitImpl extends EObjectImpl implements TermUnit {
 	 * @generated
 	 * @ordered
 	 */
-	protected Port port;
+	protected FuPort port;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -142,10 +140,10 @@ public class TermUnitImpl extends EObjectImpl implements TermUnit {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Port getPort() {
+	public FuPort getPort() {
 		if (port != null && port.eIsProxy()) {
 			InternalEObject oldPort = (InternalEObject) port;
-			port = (Port) eResolveProxy(oldPort);
+			port = (FuPort) eResolveProxy(oldPort);
 			if (port != oldPort) {
 				if (eNotificationRequired())
 					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
@@ -160,7 +158,7 @@ public class TermUnitImpl extends EObjectImpl implements TermUnit {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Port basicGetPort() {
+	public FuPort basicGetPort() {
 		return port;
 	}
 
@@ -169,8 +167,8 @@ public class TermUnitImpl extends EObjectImpl implements TermUnit {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setPort(Port newPort) {
-		Port oldPort = port;
+	public void setPort(FuPort newPort) {
+		FuPort oldPort = port;
 		port = newPort;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
@@ -225,7 +223,7 @@ public class TermUnitImpl extends EObjectImpl implements TermUnit {
 			setFunctionUnit((FunctionUnit) newValue);
 			return;
 		case ArchitecturePackage.TERM_UNIT__PORT:
-			setPort((Port) newValue);
+			setPort((FuPort) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -243,7 +241,7 @@ public class TermUnitImpl extends EObjectImpl implements TermUnit {
 			setFunctionUnit((FunctionUnit) null);
 			return;
 		case ArchitecturePackage.TERM_UNIT__PORT:
-			setPort((Port) null);
+			setPort((FuPort) null);
 			return;
 		}
 		super.eUnset(featureID);

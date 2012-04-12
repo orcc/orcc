@@ -39,8 +39,7 @@ import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.Component;
 import net.sf.orcc.backends.tta.architecture.Design;
 import net.sf.orcc.backends.tta.architecture.DesignConfiguration;
-import net.sf.orcc.backends.tta.architecture.ExternalPort;
-import net.sf.orcc.backends.tta.architecture.Fifo;
+import net.sf.orcc.backends.tta.architecture.Port;
 import net.sf.orcc.backends.tta.architecture.Processor;
 import net.sf.orcc.backends.tta.architecture.Signal;
 
@@ -59,9 +58,11 @@ import org.eclipse.emf.ecore.util.EObjectResolvingEList;
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getComponents <em>Components</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getProcessors <em>Processors</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getBroadcasts <em>Broadcasts</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getFifos <em>Fifos</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getSignals <em>Signals</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getPorts <em>Ports</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getInputs <em>Inputs</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getOutputs <em>Outputs</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getConfiguration <em>Configuration</em>}</li>
  * </ul>
  * </p>
@@ -71,8 +72,7 @@ import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 public class DesignImpl extends GraphImpl implements Design {
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -80,8 +80,7 @@ public class DesignImpl extends GraphImpl implements Design {
 	protected static final String NAME_EDEFAULT = null;
 	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -97,20 +96,31 @@ public class DesignImpl extends GraphImpl implements Design {
 	protected EList<Component> components;
 	/**
 	 * The cached value of the '{@link #getProcessors() <em>Processors</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @see #getProcessors()
 	 * @generated
 	 * @ordered
 	 */
 	protected EList<Processor> processors;
 	/**
+	 * The cached value of the '{@link #getBroadcasts() <em>Broadcasts</em>}' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getBroadcasts()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Component> broadcasts;
+	/**
 	 * The cached value of the '{@link #getFifos() <em>Fifos</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @see #getFifos()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Fifo> fifos;
+	protected EList<Component> fifos;
 	/**
 	 * The cached value of the '{@link #getSignals() <em>Signals</em>}' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -120,13 +130,21 @@ public class DesignImpl extends GraphImpl implements Design {
 	 */
 	protected EList<Signal> signals;
 	/**
-	 * The cached value of the '{@link #getPorts() <em>Ports</em>}' reference list.
+	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getPorts()
+	 * @see #getInputs()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<ExternalPort> ports;
+	protected EList<Port> inputs;
+	/**
+	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getOutputs()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Port> outputs;
 	/**
 	 * The default value of the '{@link #getConfiguration() <em>Configuration</em>}' attribute.
 	 * <!-- begin-user-doc --> <!--
@@ -156,24 +174,8 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	@Override
 	public void add(Edge edge) {
-		if (edge instanceof Component) {
-			getFifos().add((Fifo) edge);
-		} else if (edge instanceof Processor) {
-			getSignals().add((Signal) edge);
-		}
+		getSignals().add((Signal) edge);
 		getEdges().add(edge);
-	}
-
-	@Override
-	public void add(Vertex vertex) {
-		if (vertex instanceof Component) {
-			getComponents().add((Component) vertex);
-		} else if (vertex instanceof Processor) {
-			getProcessors().add((Processor) vertex);
-		} else if (vertex instanceof ExternalPort) {
-			getPorts().add((ExternalPort) vertex);
-		}
-		getVertices().add(vertex);
 	}
 
 	@Override
@@ -194,16 +196,32 @@ public class DesignImpl extends GraphImpl implements Design {
 			return getComponents();
 		case ArchitecturePackage.DESIGN__PROCESSORS:
 			return getProcessors();
+		case ArchitecturePackage.DESIGN__BROADCASTS:
+			return getBroadcasts();
 		case ArchitecturePackage.DESIGN__FIFOS:
 			return getFifos();
 		case ArchitecturePackage.DESIGN__SIGNALS:
 			return getSignals();
-		case ArchitecturePackage.DESIGN__PORTS:
-			return getPorts();
+		case ArchitecturePackage.DESIGN__INPUTS:
+			return getInputs();
+		case ArchitecturePackage.DESIGN__OUTPUTS:
+			return getOutputs();
 		case ArchitecturePackage.DESIGN__CONFIGURATION:
 			return getConfiguration();
 		}
 		return super.eGet(featureID, resolve, coreType);
+	}
+
+	@Override
+	public void addInput(Port port) {
+		getVertices().add(port);
+		getInputs().add(port);
+	}
+
+	@Override
+	public void addOutput(Port port) {
+		getVertices().add(port);
+		getOutputs().add(port);
 	}
 
 	/**
@@ -220,12 +238,16 @@ public class DesignImpl extends GraphImpl implements Design {
 			return components != null && !components.isEmpty();
 		case ArchitecturePackage.DESIGN__PROCESSORS:
 			return processors != null && !processors.isEmpty();
+		case ArchitecturePackage.DESIGN__BROADCASTS:
+			return broadcasts != null && !broadcasts.isEmpty();
 		case ArchitecturePackage.DESIGN__FIFOS:
 			return fifos != null && !fifos.isEmpty();
 		case ArchitecturePackage.DESIGN__SIGNALS:
 			return signals != null && !signals.isEmpty();
-		case ArchitecturePackage.DESIGN__PORTS:
-			return ports != null && !ports.isEmpty();
+		case ArchitecturePackage.DESIGN__INPUTS:
+			return inputs != null && !inputs.isEmpty();
+		case ArchitecturePackage.DESIGN__OUTPUTS:
+			return outputs != null && !outputs.isEmpty();
 		case ArchitecturePackage.DESIGN__CONFIGURATION:
 			return configuration != CONFIGURATION_EDEFAULT;
 		}
@@ -251,17 +273,25 @@ public class DesignImpl extends GraphImpl implements Design {
 			getProcessors().clear();
 			getProcessors().addAll((Collection<? extends Processor>) newValue);
 			return;
+		case ArchitecturePackage.DESIGN__BROADCASTS:
+			getBroadcasts().clear();
+			getBroadcasts().addAll((Collection<? extends Component>) newValue);
+			return;
 		case ArchitecturePackage.DESIGN__FIFOS:
 			getFifos().clear();
-			getFifos().addAll((Collection<? extends Fifo>) newValue);
+			getFifos().addAll((Collection<? extends Component>) newValue);
 			return;
 		case ArchitecturePackage.DESIGN__SIGNALS:
 			getSignals().clear();
 			getSignals().addAll((Collection<? extends Signal>) newValue);
 			return;
-		case ArchitecturePackage.DESIGN__PORTS:
-			getPorts().clear();
-			getPorts().addAll((Collection<? extends ExternalPort>) newValue);
+		case ArchitecturePackage.DESIGN__INPUTS:
+			getInputs().clear();
+			getInputs().addAll((Collection<? extends Port>) newValue);
+			return;
+		case ArchitecturePackage.DESIGN__OUTPUTS:
+			getOutputs().clear();
+			getOutputs().addAll((Collection<? extends Port>) newValue);
 			return;
 		case ArchitecturePackage.DESIGN__CONFIGURATION:
 			setConfiguration((DesignConfiguration) newValue);
@@ -280,8 +310,7 @@ public class DesignImpl extends GraphImpl implements Design {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public String getName() {
@@ -289,8 +318,7 @@ public class DesignImpl extends GraphImpl implements Design {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setName(String newName) {
@@ -317,14 +345,20 @@ public class DesignImpl extends GraphImpl implements Design {
 		case ArchitecturePackage.DESIGN__PROCESSORS:
 			getProcessors().clear();
 			return;
+		case ArchitecturePackage.DESIGN__BROADCASTS:
+			getBroadcasts().clear();
+			return;
 		case ArchitecturePackage.DESIGN__FIFOS:
 			getFifos().clear();
 			return;
 		case ArchitecturePackage.DESIGN__SIGNALS:
 			getSignals().clear();
 			return;
-		case ArchitecturePackage.DESIGN__PORTS:
-			getPorts().clear();
+		case ArchitecturePackage.DESIGN__INPUTS:
+			getInputs().clear();
+			return;
+		case ArchitecturePackage.DESIGN__OUTPUTS:
+			getOutputs().clear();
 			return;
 		case ArchitecturePackage.DESIGN__CONFIGURATION:
 			setConfiguration(CONFIGURATION_EDEFAULT);
@@ -346,20 +380,39 @@ public class DesignImpl extends GraphImpl implements Design {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public DesignConfiguration getConfiguration() {
-		return configuration;
+	public EList<Processor> getProcessors() {
+		if (processors == null) {
+			processors = new EObjectResolvingEList<Processor>(Processor.class,
+					this, ArchitecturePackage.DESIGN__PROCESSORS);
+		}
+		return processors;
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Fifo> getFifos() {
+	public EList<Component> getBroadcasts() {
+		if (broadcasts == null) {
+			broadcasts = new EObjectResolvingEList<Component>(Component.class,
+					this, ArchitecturePackage.DESIGN__BROADCASTS);
+		}
+		return broadcasts;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Component> getFifos() {
 		if (fifos == null) {
-			fifos = new EObjectResolvingEList<Fifo>(Fifo.class, this,
+			fifos = new EObjectResolvingEList<Component>(Component.class, this,
 					ArchitecturePackage.DESIGN__FIFOS);
 		}
 		return fifos;
@@ -369,24 +422,8 @@ public class DesignImpl extends GraphImpl implements Design {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<ExternalPort> getPorts() {
-		if (ports == null) {
-			ports = new EObjectResolvingEList<ExternalPort>(ExternalPort.class,
-					this, ArchitecturePackage.DESIGN__PORTS);
-		}
-		return ports;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Processor> getProcessors() {
-		if (processors == null) {
-			processors = new EObjectResolvingEList<Processor>(Processor.class,
-					this, ArchitecturePackage.DESIGN__PROCESSORS);
-		}
-		return processors;
+	public DesignConfiguration getConfiguration() {
+		return configuration;
 	}
 
 	/**
@@ -399,6 +436,30 @@ public class DesignImpl extends GraphImpl implements Design {
 					ArchitecturePackage.DESIGN__SIGNALS);
 		}
 		return signals;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Port> getInputs() {
+		if (inputs == null) {
+			inputs = new EObjectResolvingEList<Port>(Port.class, this,
+					ArchitecturePackage.DESIGN__INPUTS);
+		}
+		return inputs;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Port> getOutputs() {
+		if (outputs == null) {
+			outputs = new EObjectResolvingEList<Port>(Port.class, this,
+					ArchitecturePackage.DESIGN__OUTPUTS);
+		}
+		return outputs;
 	}
 
 	/**

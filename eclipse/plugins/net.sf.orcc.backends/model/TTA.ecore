@@ -8,27 +8,35 @@
         eType="#//Component"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="processors" upperBound="-1"
         eType="#//Processor"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="broadcasts" upperBound="-1"
+        eType="#//Component"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="fifos" upperBound="-1"
-        eType="#//Fifo"/>
+        eType="#//Component"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="signals" upperBound="-1"
         eType="#//Signal"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="ports" upperBound="-1"
-        eType="#//ExternalPort"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="inputs" upperBound="-1"
+        eType="#//Port"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="outputs" upperBound="-1"
+        eType="#//Port"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="configuration" eType="#//DesignConfiguration"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Fifo" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Edge">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="size" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EInt"/>
-  </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Signal" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Edge">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="size" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sourcePort" eType="#//Port"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="targetPort" eType="#//Port"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Component" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Vertex">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="entityName" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="inputs" upperBound="-1"
+        eType="#//Port" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="outputs" upperBound="-1"
+        eType="#//Port" containment="true"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="ExternalPort" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Vertex"/>
-  <eClassifiers xsi:type="ecore:EClass" name="Processor" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Vertex">
+  <eClassifiers xsi:type="ecore:EClass" name="Port" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Vertex">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Processor" eSuperTypes="#//Component">
     <eStructuralFeatures xsi:type="ecore:EReference" name="gcu" eType="#//GlobalControlUnit"
         containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="buses" upperBound="-1"
@@ -80,8 +88,8 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="GlobalControlUnit">
     <eStructuralFeatures xsi:type="ecore:EReference" name="ports" upperBound="-1"
-        eType="#//Port" transient="true" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="returnAddress" eType="#//Port"
+        eType="#//FuPort" transient="true" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="returnAddress" eType="#//FuPort"
         containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="addressSpace" eType="#//AddressSpace"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="operations" upperBound="-1"
@@ -94,7 +102,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="operations" upperBound="-1"
         eType="#//Operation" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="ports" upperBound="-1"
-        eType="#//Port" transient="true" containment="true"/>
+        eType="#//FuPort" transient="true" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="addressSpace" eType="#//AddressSpace"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="implementation" eType="#//Implementation"/>
   </eClassifiers>
@@ -105,10 +113,10 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="maxReads" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="maxWrites" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="ports" upperBound="-1"
-        eType="#//Port" transient="true" containment="true"/>
+        eType="#//FuPort" transient="true" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="implementation" eType="#//Implementation"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Port">
+  <eClassifiers xsi:type="ecore:EClass" name="FuPort">
     <eOperations name="connect">
       <eParameters name="socket" eType="#//Socket"/>
     </eOperations>
@@ -130,7 +138,7 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" eType="#//SocketType"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Operation">
-    <eOperations name="getPorts" upperBound="-1" eType="#//Port"/>
+    <eOperations name="getPorts" upperBound="-1" eType="#//FuPort"/>
     <eOperations name="getPortToIndexMap" upperBound="-1" eType="#//PortToIndexMapEntry"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="pipeline" upperBound="-1"
@@ -152,10 +160,10 @@
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Reads" eSuperTypes="#//Element">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="port" eType="#//Port"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="port" eType="#//FuPort"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Writes" eSuperTypes="#//Element">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="port" eType="#//Port"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="port" eType="#//FuPort"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Resource" eSuperTypes="#//Element">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -197,7 +205,7 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="TermUnit" eSuperTypes="#//Term">
     <eStructuralFeatures xsi:type="ecore:EReference" name="functionUnit" eType="#//FunctionUnit"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="port" eType="#//Port"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="port" eType="#//FuPort"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Implementation">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="hdbFile" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -220,7 +228,7 @@
     <eLiterals name="or" value="1"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="PortToIndexMapEntry" instanceClassName="java.util.Map$Entry">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="key" eType="#//Port"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="key" eType="#//FuPort"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EIntegerObject"/>
   </eClassifiers>
 </ecore:EPackage>

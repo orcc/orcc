@@ -54,12 +54,12 @@ public interface Writes extends Element {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Port</em>' reference.
-	 * @see #setPort(Port)
+	 * @see #setPort(FuPort)
 	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getWrites_Port()
 	 * @model
 	 * @generated
 	 */
-	Port getPort();
+	FuPort getPort();
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Writes#getPort <em>Port</em>}' reference.
@@ -69,6 +69,6 @@ public interface Writes extends Element {
 	 * @see #getPort()
 	 * @generated
 	 */
-	void setPort(Port value);
+	void setPort(FuPort value);
 
 } // Writes

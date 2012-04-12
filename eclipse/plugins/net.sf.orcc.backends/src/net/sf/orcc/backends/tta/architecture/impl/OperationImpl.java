@@ -32,8 +32,8 @@ import java.util.Collection;
 
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.Element;
+import net.sf.orcc.backends.tta.architecture.FuPort;
 import net.sf.orcc.backends.tta.architecture.Operation;
-import net.sf.orcc.backends.tta.architecture.Port;
 import net.sf.orcc.backends.tta.architecture.Reads;
 import net.sf.orcc.backends.tta.architecture.Writes;
 
@@ -159,10 +159,10 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 */
-	public EMap<Port, Integer> getPortToIndexMap() {
-		EMap<Port, Integer> portToIndexMap = new BasicEMap<Port, Integer>(1);
+	public EMap<FuPort, Integer> getPortToIndexMap() {
+		EMap<FuPort, Integer> portToIndexMap = new BasicEMap<FuPort, Integer>(1);
 		int i = 1;
-		for (Port port : getPorts()) {
+		for (FuPort port : getPorts()) {
 			portToIndexMap.put(port, i++);
 		}
 		return portToIndexMap;
@@ -191,8 +191,8 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 */
-	public EList<Port> getPorts() {
-		EList<Port> ports = new BasicEList<Port>();
+	public EList<FuPort> getPorts() {
+		EList<FuPort> ports = new BasicEList<FuPort>();
 		for (Element element : getPipeline()) {
 			if (element.isReads()) {
 				ports.add(((Reads) element).getPort());

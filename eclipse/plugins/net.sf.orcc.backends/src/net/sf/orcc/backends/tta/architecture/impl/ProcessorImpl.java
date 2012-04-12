@@ -32,7 +32,6 @@ package net.sf.orcc.backends.tta.architecture.impl;
 
 import java.util.Collection;
 
-import net.sf.dftools.graph.impl.VertexImpl;
 import net.sf.orcc.backends.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.Bridge;
@@ -44,8 +43,8 @@ import net.sf.orcc.backends.tta.architecture.Processor;
 import net.sf.orcc.backends.tta.architecture.ProcessorConfiguration;
 import net.sf.orcc.backends.tta.architecture.RegisterFile;
 import net.sf.orcc.backends.tta.architecture.Socket;
-
 import net.sf.orcc.df.Instance;
+
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
@@ -63,7 +62,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getGcu <em>Gcu</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getBuses <em>Buses</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getBridges <em>Bridges</em>}</li>
@@ -80,27 +78,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *
  * @generated
  */
-public class ProcessorImpl extends VertexImpl implements Processor {
-	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String NAME_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected String name = NAME_EDEFAULT;
-
+public class ProcessorImpl extends ComponentImpl implements Processor {
 	/**
 	 * The cached value of the '{@link #getGcu() <em>Gcu</em>}' containment reference.
 	 * <!-- begin-user-doc -->
@@ -120,6 +98,11 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 	 * @ordered
 	 */
 	protected EList<Bus> buses;
+
+	@Override
+	public boolean isProcessor() {
+		return true;
+	}
 
 	/**
 	 * The cached value of the '{@link #getBridges() <em>Bridges</em>}' containment reference list.
@@ -532,28 +515,6 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setName(String newName) {
-		String oldName = name;
-		name = newName;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					ArchitecturePackage.PROCESSOR__NAME, oldName, name));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
@@ -593,8 +554,6 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case ArchitecturePackage.PROCESSOR__NAME:
-			return getName();
 		case ArchitecturePackage.PROCESSOR__GCU:
 			return getGcu();
 		case ArchitecturePackage.PROCESSOR__BUSES:
@@ -630,9 +589,6 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case ArchitecturePackage.PROCESSOR__NAME:
-			setName((String) newValue);
-			return;
 		case ArchitecturePackage.PROCESSOR__GCU:
 			setGcu((GlobalControlUnit) newValue);
 			return;
@@ -688,9 +644,6 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case ArchitecturePackage.PROCESSOR__NAME:
-			setName(NAME_EDEFAULT);
-			return;
 		case ArchitecturePackage.PROCESSOR__GCU:
 			setGcu((GlobalControlUnit) null);
 			return;
@@ -736,9 +689,6 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case ArchitecturePackage.PROCESSOR__NAME:
-			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
-					.equals(name);
 		case ArchitecturePackage.PROCESSOR__GCU:
 			return gcu != null;
 		case ArchitecturePackage.PROCESSOR__BUSES:
@@ -776,9 +726,7 @@ public class ProcessorImpl extends VertexImpl implements Processor {
 			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (name: ");
-		result.append(name);
-		result.append(", configuration: ");
+		result.append(" (configuration: ");
 		result.append(configuration);
 		result.append(')');
 		return result.toString();

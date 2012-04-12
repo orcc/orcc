@@ -81,12 +81,12 @@ public interface TermUnit extends Term {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Port</em>' reference.
-	 * @see #setPort(Port)
+	 * @see #setPort(FuPort)
 	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getTermUnit_Port()
 	 * @model
 	 * @generated
 	 */
-	Port getPort();
+	FuPort getPort();
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.TermUnit#getPort <em>Port</em>}' reference.
@@ -96,6 +96,6 @@ public interface TermUnit extends Term {
 	 * @see #getPort()
 	 * @generated
 	 */
-	void setPort(Port value);
+	void setPort(FuPort value);
 
 } // TermUnit

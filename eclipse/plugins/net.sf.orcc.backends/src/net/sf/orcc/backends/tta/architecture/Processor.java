@@ -30,9 +30,8 @@
  */
 package net.sf.orcc.backends.tta.architecture;
 
-import net.sf.dftools.graph.Vertex;
-
 import net.sf.orcc.df.Instance;
+
 import org.eclipse.emf.common.util.EList;
 
 /**
@@ -43,7 +42,6 @@ import org.eclipse.emf.common.util.EList;
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getGcu <em>Gcu</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getBuses <em>Buses</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getBridges <em>Bridges</em>}</li>
@@ -62,7 +60,7 @@ import org.eclipse.emf.common.util.EList;
  * @model
  * @generated
  */
-public interface Processor extends Vertex {
+public interface Processor extends Component {
 	/**
 	 * Returns the value of the '<em><b>Gcu</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
@@ -281,31 +279,5 @@ public interface Processor extends Vertex {
 	 * @generated
 	 */
 	void setConfiguration(ProcessorConfiguration value);
-
-	/**
-	 * Returns the value of the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Name</em>' attribute isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Name</em>' attribute.
-	 * @see #setName(String)
-	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getProcessor_Name()
-	 * @model
-	 * @generated
-	 */
-	String getName();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Processor#getName <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Name</em>' attribute.
-	 * @see #getName()
-	 * @generated
-	 */
-	void setName(String value);
 
 } // Processor

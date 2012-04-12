@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.tta.architecture;
 
-import org.eclipse.emf.ecore.EObject;
+import net.sf.dftools.graph.Vertex;
 
 /**
  * <!-- begin-user-doc -->
@@ -39,11 +39,6 @@ import org.eclipse.emf.ecore.EObject;
  * The following features are supported:
  * <ul>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Port#getName <em>Name</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.Port#getInputSocket <em>Input Socket</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.Port#getOutputSocket <em>Output Socket</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.Port#getWidth <em>Width</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.Port#isTrigger <em>Trigger</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.Port#isOpcodeSelector <em>Opcode Selector</em>}</li>
  * </ul>
  * </p>
  *
@@ -51,7 +46,8 @@ import org.eclipse.emf.ecore.EObject;
  * @model
  * @generated
  */
-public interface Port extends EObject {
+public interface Port extends Vertex {
+
 	/**
 	 * Returns the value of the '<em><b>Name</b></em>' attribute.
 	 * <!-- begin-user-doc -->
@@ -77,197 +73,5 @@ public interface Port extends EObject {
 	 * @generated
 	 */
 	void setName(String value);
-
-	/**
-	 * Returns the value of the '<em><b>Input Socket</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Input Socket</em>' reference isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Input Socket</em>' reference.
-	 * @see #isSetInputSocket()
-	 * @see #unsetInputSocket()
-	 * @see #setInputSocket(Socket)
-	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getPort_InputSocket()
-	 * @model unsettable="true"
-	 * @generated
-	 */
-	Socket getInputSocket();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Port#getInputSocket <em>Input Socket</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Input Socket</em>' reference.
-	 * @see #isSetInputSocket()
-	 * @see #unsetInputSocket()
-	 * @see #getInputSocket()
-	 * @generated
-	 */
-	void setInputSocket(Socket value);
-
-	/**
-	 * Unsets the value of the '{@link net.sf.orcc.backends.tta.architecture.Port#getInputSocket <em>Input Socket</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #isSetInputSocket()
-	 * @see #getInputSocket()
-	 * @see #setInputSocket(Socket)
-	 * @generated
-	 */
-	void unsetInputSocket();
-
-	/**
-	 * Returns whether the value of the '{@link net.sf.orcc.backends.tta.architecture.Port#getInputSocket <em>Input Socket</em>}' reference is set.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return whether the value of the '<em>Input Socket</em>' reference is set.
-	 * @see #unsetInputSocket()
-	 * @see #getInputSocket()
-	 * @see #setInputSocket(Socket)
-	 * @generated
-	 */
-	boolean isSetInputSocket();
-
-	/**
-	 * Returns the value of the '<em><b>Output Socket</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Output Socket</em>' reference isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Output Socket</em>' reference.
-	 * @see #isSetOutputSocket()
-	 * @see #unsetOutputSocket()
-	 * @see #setOutputSocket(Socket)
-	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getPort_OutputSocket()
-	 * @model unsettable="true"
-	 * @generated
-	 */
-	Socket getOutputSocket();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Port#getOutputSocket <em>Output Socket</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Output Socket</em>' reference.
-	 * @see #isSetOutputSocket()
-	 * @see #unsetOutputSocket()
-	 * @see #getOutputSocket()
-	 * @generated
-	 */
-	void setOutputSocket(Socket value);
-
-	/**
-	 * Unsets the value of the '{@link net.sf.orcc.backends.tta.architecture.Port#getOutputSocket <em>Output Socket</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #isSetOutputSocket()
-	 * @see #getOutputSocket()
-	 * @see #setOutputSocket(Socket)
-	 * @generated
-	 */
-	void unsetOutputSocket();
-
-	/**
-	 * Returns whether the value of the '{@link net.sf.orcc.backends.tta.architecture.Port#getOutputSocket <em>Output Socket</em>}' reference is set.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return whether the value of the '<em>Output Socket</em>' reference is set.
-	 * @see #unsetOutputSocket()
-	 * @see #getOutputSocket()
-	 * @see #setOutputSocket(Socket)
-	 * @generated
-	 */
-	boolean isSetOutputSocket();
-
-	/**
-	 * Returns the value of the '<em><b>Width</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Width</em>' attribute isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Width</em>' attribute.
-	 * @see #setWidth(int)
-	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getPort_Width()
-	 * @model
-	 * @generated
-	 */
-	int getWidth();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Port#getWidth <em>Width</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Width</em>' attribute.
-	 * @see #getWidth()
-	 * @generated
-	 */
-	void setWidth(int value);
-
-	/**
-	 * Returns the value of the '<em><b>Trigger</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Trigger</em>' attribute isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Trigger</em>' attribute.
-	 * @see #setTrigger(boolean)
-	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getPort_Trigger()
-	 * @model
-	 * @generated
-	 */
-	boolean isTrigger();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Port#isTrigger <em>Trigger</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Trigger</em>' attribute.
-	 * @see #isTrigger()
-	 * @generated
-	 */
-	void setTrigger(boolean value);
-
-	/**
-	 * Returns the value of the '<em><b>Opcode Selector</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Opcode Selector</em>' attribute isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Opcode Selector</em>' attribute.
-	 * @see #setOpcodeSelector(boolean)
-	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getPort_OpcodeSelector()
-	 * @model
-	 * @generated
-	 */
-	boolean isOpcodeSelector();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Port#isOpcodeSelector <em>Opcode Selector</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Opcode Selector</em>' attribute.
-	 * @see #isOpcodeSelector()
-	 * @generated
-	 */
-	void setOpcodeSelector(boolean value);
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @model
-	 * @generated
-	 */
-	void connect(Socket socket);
 
 } // Port

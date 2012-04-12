@@ -45,8 +45,7 @@ import net.sf.orcc.backends.tta.architecture.ExprFalse;
 import net.sf.orcc.backends.tta.architecture.ExprTrue;
 import net.sf.orcc.backends.tta.architecture.ExprUnary;
 import net.sf.orcc.backends.tta.architecture.Extension;
-import net.sf.orcc.backends.tta.architecture.ExternalPort;
-import net.sf.orcc.backends.tta.architecture.Fifo;
+import net.sf.orcc.backends.tta.architecture.FuPort;
 import net.sf.orcc.backends.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
 import net.sf.orcc.backends.tta.architecture.Guard;
@@ -129,6 +128,15 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	public String convertDesignConfigurationToString(EDataType eDataType,
+			Object instanceValue) {
+		return instanceValue == null ? null : instanceValue.toString();
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
 	public String convertExtensionToString(EDataType eDataType,
 			Object instanceValue) {
 		return instanceValue == null ? null : instanceValue.toString();
@@ -148,6 +156,15 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	 * @generated
 	 */
 	public String convertOpUnaryToString(EDataType eDataType,
+			Object instanceValue) {
+		return instanceValue == null ? null : instanceValue.toString();
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String convertProcessorConfigurationToString(EDataType eDataType,
 			Object instanceValue) {
 		return instanceValue == null ? null : instanceValue.toString();
 	}
@@ -191,73 +208,17 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Design createDesign() {
-		DesignImpl design = new DesignImpl();
-		return design;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Fifo createFifo() {
-		FifoImpl fifo = new FifoImpl();
-		return fifo;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Signal createSignal() {
-		SignalImpl signal = new SignalImpl();
-		return signal;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Component createComponent() {
-		ComponentImpl component = new ComponentImpl();
-		return component;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public ExternalPort createExternalPort() {
-		ExternalPortImpl externalPort = new ExternalPortImpl();
-		return externalPort;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Processor createProcessor() {
-		ProcessorImpl processor = new ProcessorImpl();
-		return processor;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	@Override
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
 		case ArchitecturePackage.DESIGN:
 			return createDesign();
-		case ArchitecturePackage.FIFO:
-			return createFifo();
 		case ArchitecturePackage.SIGNAL:
 			return createSignal();
 		case ArchitecturePackage.COMPONENT:
 			return createComponent();
-		case ArchitecturePackage.EXTERNAL_PORT:
-			return createExternalPort();
+		case ArchitecturePackage.PORT:
+			return createPort();
 		case ArchitecturePackage.PROCESSOR:
 			return createProcessor();
 		case ArchitecturePackage.BUS:
@@ -272,8 +233,8 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 			return createFunctionUnit();
 		case ArchitecturePackage.REGISTER_FILE:
 			return createRegisterFile();
-		case ArchitecturePackage.PORT:
-			return createPort();
+		case ArchitecturePackage.FU_PORT:
+			return createFuPort();
 		case ArchitecturePackage.SOCKET:
 			return createSocket();
 		case ArchitecturePackage.OPERATION:
@@ -330,51 +291,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return addressSpace;
 	}
 
-	@Override
-	public FunctionUnit createAluUnit(Processor tta, String name) {
-		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
-		functionUnit.setName(name);
-		// Sockets
-		EList<Segment> segments = getAllSegments(tta.getBuses());
-		Socket i1 = createInputSocket(name + "_i1", segments);
-		Socket i2 = createInputSocket(name + "_i2", segments);
-		Socket o1 = createOutputSocket(name + "_o1", segments);
-		// Port
-		Port in1t = createPort("in1t", 32, true, true);
-		Port in2 = createPort("in2", 32, false, false);
-		Port out1 = createPort("out1", 32, false, false);
-		in1t.connect(i1);
-		in2.connect(i2);
-		out1.connect(o1);
-		functionUnit.getPorts().add(in1t);
-		functionUnit.getPorts().add(in2);
-		functionUnit.getPorts().add(out1);
-		// Implementation
-		Implementation aluImpl = createImplementation("asic_130nm_1.5V.hdb",
-				375);
-		functionUnit.setImplementation(aluImpl);
-		tta.getHardwareDatabase().add(aluImpl);
-
-		// Operations (Shift operations use inverse binding)
-		String[] oneInputOps = { "sxqw", "sxhw" };
-		String[] twoInputOps = { "add", "and", "eq", "gt", "gtu", "ior", "sub",
-				"xor" };
-		String[] shiftOps = { "shl", "shr", "shru" };
-		for (String operation : oneInputOps) {
-			functionUnit.getOperations().add(
-					createOperationDefault(operation, in1t, out1));
-		}
-		for (String operation : twoInputOps) {
-			functionUnit.getOperations().add(
-					createOperationDefault(operation, in1t, in2, out1));
-		}
-		for (String operation : shiftOps) {
-			functionUnit.getOperations().add(
-					createOperationDefault(operation, in2, in1t, out1));
-		}
-		return functionUnit;
-	}
-
 	public FunctionUnit createAlu2Unit(Processor tta, String name) {
 		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
 		functionUnit.setName(name);
@@ -385,10 +301,10 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		Socket o1 = createOutputSocket(name + "_o1", segments);
 		Socket o2 = createOutputSocket(name + "_o2", segments);
 		// Port
-		Port in1t = createPort("in1t", 32, true, true);
-		Port in2 = createPort("in2", 32, false, false);
-		Port out1 = createPort("out1", 32, false, false);
-		Port out2 = createPort("out2", 32, false, false);
+		FuPort in1t = createFuPort("in1t", 32, true, true);
+		FuPort in2 = createFuPort("in2", 32, false, false);
+		FuPort out1 = createFuPort("out1", 32, false, false);
+		FuPort out2 = createFuPort("out2", 32, false, false);
 		in1t.connect(i1);
 		in2.connect(i2);
 		out1.connect(o1);
@@ -420,6 +336,51 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		for (String operation : twoInputOutputOps) {
 			functionUnit.getOperations().add(
 					createOperationDefault(operation, in1t, in2, out1, out2));
+		}
+		for (String operation : shiftOps) {
+			functionUnit.getOperations().add(
+					createOperationDefault(operation, in2, in1t, out1));
+		}
+		return functionUnit;
+	}
+
+	@Override
+	public FunctionUnit createAluUnit(Processor tta, String name) {
+		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
+		functionUnit.setName(name);
+		// Sockets
+		EList<Segment> segments = getAllSegments(tta.getBuses());
+		Socket i1 = createInputSocket(name + "_i1", segments);
+		Socket i2 = createInputSocket(name + "_i2", segments);
+		Socket o1 = createOutputSocket(name + "_o1", segments);
+		// Port
+		FuPort in1t = createFuPort("in1t", 32, true, true);
+		FuPort in2 = createFuPort("in2", 32, false, false);
+		FuPort out1 = createFuPort("out1", 32, false, false);
+		in1t.connect(i1);
+		in2.connect(i2);
+		out1.connect(o1);
+		functionUnit.getPorts().add(in1t);
+		functionUnit.getPorts().add(in2);
+		functionUnit.getPorts().add(out1);
+		// Implementation
+		Implementation aluImpl = createImplementation("asic_130nm_1.5V.hdb",
+				375);
+		functionUnit.setImplementation(aluImpl);
+		tta.getHardwareDatabase().add(aluImpl);
+
+		// Operations (Shift operations use inverse binding)
+		String[] oneInputOps = { "sxqw", "sxhw" };
+		String[] twoInputOps = { "add", "and", "eq", "gt", "gtu", "ior", "sub",
+				"xor" };
+		String[] shiftOps = { "shl", "shr", "shru" };
+		for (String operation : oneInputOps) {
+			functionUnit.getOperations().add(
+					createOperationDefault(operation, in1t, out1));
+		}
+		for (String operation : twoInputOps) {
+			functionUnit.getOperations().add(
+					createOperationDefault(operation, in1t, in2, out1));
 		}
 		for (String operation : shiftOps) {
 			functionUnit.getOperations().add(
@@ -460,6 +421,46 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		bus.getSegments().add(createSegment("segment0"));
 		bus.setShortImmediate(createShortImmediate(width, Extension.ZERO));
 		return bus;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Component createComponent() {
+		ComponentImpl component = new ComponentImpl();
+		return component;
+	}
+
+	@Override
+	public Component createComponent(String name, String entityName) {
+		ComponentImpl component = new ComponentImpl();
+		component.setName(name);
+		component.setEntityName(entityName);
+		return component;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Design createDesign() {
+		DesignImpl design = new DesignImpl();
+		return design;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public DesignConfiguration createDesignConfigurationFromString(
+			EDataType eDataType, String initialValue) {
+		DesignConfiguration result = DesignConfiguration.get(initialValue);
+		if (result == null)
+			throw new IllegalArgumentException("The value '" + initialValue
+					+ "' is not a valid enumerator of '" + eDataType.getName()
+					+ "'");
+		return result;
 	}
 
 	/**
@@ -579,9 +580,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		Socket i2 = createInputSocket(name + "_i2", segments);
 		Socket o1 = createOutputSocket(name + "_o1", segments);
 		// Port
-		Port in1t = createPort("in1t", 32, true, true);
-		Port in2 = createPort("in2", 32, false, false);
-		Port out1 = createPort("out1", 32, false, false);
+		FuPort in1t = createFuPort("in1t", 32, true, true);
+		FuPort in2 = createFuPort("in2", 32, false, false);
+		FuPort out1 = createFuPort("out1", 32, false, false);
 		in1t.connect(i1);
 		in2.connect(i2);
 		out1.connect(o1);
@@ -599,7 +600,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 			Implementation implementation) {
 		FunctionUnit functionUnit = createFunctionUnit(tta, name,
 				implementation);
-		EList<Port> ports = functionUnit.getPorts();
+		EList<FuPort> ports = functionUnit.getPorts();
 		// Operations
 		if (operations1 != null) {
 			for (String operation : operations1) {
@@ -616,6 +617,32 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 			}
 		}
 		return functionUnit;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public FuPort createFuPort() {
+		FuPortImpl fuPort = new FuPortImpl();
+		return fuPort;
+	}
+
+	@Override
+	public FuPort createFuPort(String name) {
+		FuPortImpl port = new FuPortImpl();
+		port.setName(name);
+		return port;
+	}
+
+	@Override
+	public FuPort createFuPort(String name, int width,
+			boolean isOpcodeSelector, boolean isTrigger) {
+		FuPort port = createFuPort(name);
+		port.setWidth(width);
+		port.setOpcodeSelector(isOpcodeSelector);
+		port.setTrigger(isTrigger);
+		return port;
 	}
 
 	/**
@@ -648,9 +675,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		Socket gcu_o1 = createOutputSocket("gcu_o1", segments);
 
 		// Ports
-		Port pc = createPort("pc", 32, true, true);
+		FuPort pc = createFuPort("pc", 32, true, true);
 		pc.connect(gcu_i1);
-		Port ra = createPort("ra", 32, false, false);
+		FuPort ra = createFuPort("ra", 32, false, false);
 		ra.connect(gcu_i2);
 		ra.connect(gcu_o1);
 
@@ -703,7 +730,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 			Implementation implementation) {
 		FunctionUnit LSU = createFunctionUnit(tta, name, implementation);
 		// Operations
-		EList<Port> ports = LSU.getPorts();
+		EList<FuPort> ports = LSU.getPorts();
 		String[] loadOperations = { "ldw", "ldq", "ldh", "ldqu", "ldhu" };
 		for (String loadOperation : loadOperations) {
 			LSU.getOperations().add(
@@ -774,7 +801,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public Operation createOperationCtrl(String name, Port port) {
+	public Operation createOperationCtrl(String name, FuPort port) {
 		Operation operation = new OperationImpl();
 		operation.setName(name);
 		operation.setControl(true);
@@ -783,8 +810,38 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return operation;
 	}
 
-	private Operation createOperationDefault(String name, Port port1,
-			int startCycle1, int cycle1, boolean isReads1, Port port2,
+	private Operation createOperationDefault(String name, FuPort in1,
+			FuPort out1) {
+		Operation operation = createOperation(name);
+		operation.setControl(false);
+		operation.getPipeline().add(createReads(in1, 0, 1));
+		operation.getPipeline().add(createWrites(out1, 0, 1));
+		return operation;
+	}
+
+	private Operation createOperationDefault(String name, FuPort in1,
+			FuPort in2, FuPort out1) {
+		Operation operation = createOperation(name);
+		operation.setControl(false);
+		operation.getPipeline().add(createReads(in1, 0, 1));
+		operation.getPipeline().add(createReads(in2, 0, 1));
+		operation.getPipeline().add(createWrites(out1, 0, 1));
+		return operation;
+	}
+
+	private Operation createOperationDefault(String name, FuPort in1,
+			FuPort in2, FuPort out1, FuPort out2) {
+		Operation operation = createOperation(name);
+		operation.setControl(false);
+		operation.getPipeline().add(createReads(in1, 0, 1));
+		operation.getPipeline().add(createReads(in2, 0, 1));
+		operation.getPipeline().add(createWrites(out1, 0, 1));
+		operation.getPipeline().add(createWrites(out2, 0, 1));
+		return operation;
+	}
+
+	private Operation createOperationDefault(String name, FuPort port1,
+			int startCycle1, int cycle1, boolean isReads1, FuPort port2,
 			int startCycle2, int cycle2, boolean isReads2) {
 		Operation operation = createOperation(name);
 		operation.setControl(false);
@@ -804,37 +861,8 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return operation;
 	}
 
-	private Operation createOperationDefault(String name, Port in1, Port out1) {
-		Operation operation = createOperation(name);
-		operation.setControl(false);
-		operation.getPipeline().add(createReads(in1, 0, 1));
-		operation.getPipeline().add(createWrites(out1, 0, 1));
-		return operation;
-	}
-
-	private Operation createOperationDefault(String name, Port in1, Port in2,
-			Port out1) {
-		Operation operation = createOperation(name);
-		operation.setControl(false);
-		operation.getPipeline().add(createReads(in1, 0, 1));
-		operation.getPipeline().add(createReads(in2, 0, 1));
-		operation.getPipeline().add(createWrites(out1, 0, 1));
-		return operation;
-	}
-
-	private Operation createOperationDefault(String name, Port in1, Port in2,
-			Port out1, Port out2) {
-		Operation operation = createOperation(name);
-		operation.setControl(false);
-		operation.getPipeline().add(createReads(in1, 0, 1));
-		operation.getPipeline().add(createReads(in2, 0, 1));
-		operation.getPipeline().add(createWrites(out1, 0, 1));
-		operation.getPipeline().add(createWrites(out2, 0, 1));
-		return operation;
-	}
-
 	@SuppressWarnings("unused")
-	private Operation createOperationIn(Port in, Port out) {
+	private Operation createOperationIn(FuPort in, FuPort out) {
 		Operation operation = createOperation("cal_stream_in_read");
 		operation.setControl(false);
 		operation.getPipeline().add(createResource("res0", 0, 3));
@@ -843,17 +871,8 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return operation;
 	}
 
-	private Operation createOperationInV2(Port in1, Port out) {
-		Operation operation = createOperation("cal_stream_in_read");
-		operation.setControl(false);
-		operation.getPipeline().add(createResource("res0", 0, 2));
-		operation.getPipeline().add(createReads(in1, 0, 1));
-		operation.getPipeline().add(createWrites(out, 0, 1));
-		return operation;
-	}
-
 	@SuppressWarnings("unused")
-	private Operation createOperationInPeek(Port in, Port out) {
+	private Operation createOperationInPeek(FuPort in, FuPort out) {
 		Operation operation = createOperation("cal_stream_in_peek");
 		operation.setControl(false);
 		operation.getPipeline().add(createResource("res0", 0, 3));
@@ -862,7 +881,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return operation;
 	}
 
-	private Operation createOperationInPeekV2(Port in1, Port out) {
+	private Operation createOperationInPeekV2(FuPort in1, FuPort out) {
 		Operation operation = createOperation("cal_stream_in_peek");
 		operation.setControl(false);
 		operation.getPipeline().add(createResource("res0", 0, 2));
@@ -872,7 +891,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@SuppressWarnings("unused")
-	private Operation createOperationInStatus(Port in, Port out) {
+	private Operation createOperationInStatus(FuPort in, FuPort out) {
 		Operation operation = createOperation("cal_stream_in_status");
 		operation.setControl(false);
 		operation.getPipeline().add(createReads(in, 0, 1));
@@ -880,7 +899,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return operation;
 	}
 
-	private Operation createOperationInStatusV2(Port in1, Port out) {
+	private Operation createOperationInStatusV2(FuPort in1, FuPort out) {
 		Operation operation = createOperation("cal_stream_in_status");
 		operation.setControl(false);
 		operation.getPipeline().add(createResource("res0", 0, 2));
@@ -889,12 +908,21 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return operation;
 	}
 
-	private Operation createOperationLoad(String name, Port in, Port out) {
+	private Operation createOperationInV2(FuPort in1, FuPort out) {
+		Operation operation = createOperation("cal_stream_in_read");
+		operation.setControl(false);
+		operation.getPipeline().add(createResource("res0", 0, 2));
+		operation.getPipeline().add(createReads(in1, 0, 1));
+		operation.getPipeline().add(createWrites(out, 0, 1));
+		return operation;
+	}
+
+	private Operation createOperationLoad(String name, FuPort in, FuPort out) {
 		return createOperationDefault(name, in, 0, 1, true, out, 2, 1, false);
 	}
 
-	private Operation createOperationMul(String name, Port in1, Port in2,
-			Port out) {
+	private Operation createOperationMul(String name, FuPort in1, FuPort in2,
+			FuPort out) {
 		Operation operation = createOperation(name);
 		operation.setControl(false);
 		operation.getPipeline().add(createReads(in1, 0, 1));
@@ -904,7 +932,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@SuppressWarnings("unused")
-	private Operation createOperationOut(Port in, Port out) {
+	private Operation createOperationOut(FuPort in, FuPort out) {
 		Operation operation = createOperation("cal_stream_out_write");
 		operation.setControl(false);
 		operation.getPipeline().add(createResource("res0", 0, 3));
@@ -912,17 +940,8 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return operation;
 	}
 
-	private Operation createOperationOutV2(Port in1, Port in2) {
-		Operation operation = createOperation("cal_stream_out_write");
-		operation.setControl(false);
-		operation.getPipeline().add(createResource("res0", 0, 2));
-		operation.getPipeline().add(createReads(in1, 0, 1));
-		operation.getPipeline().add(createReads(in2, 0, 1));
-		return operation;
-	}
-
 	@SuppressWarnings("unused")
-	private Operation createOperationOutStatus(Port in, Port out) {
+	private Operation createOperationOutStatus(FuPort in, FuPort out) {
 		Operation operation = createOperation("cal_stream_out_status");
 		operation.setControl(false);
 		operation.getPipeline().add(createReads(in, 0, 1));
@@ -930,7 +949,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return operation;
 	}
 
-	private Operation createOperationOutStatusV2(Port in1, Port out) {
+	private Operation createOperationOutStatusV2(FuPort in1, FuPort out) {
 		Operation operation = createOperation("cal_stream_out_status");
 		operation.setControl(false);
 		operation.getPipeline().add(createResource("res0", 0, 2));
@@ -939,7 +958,16 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return operation;
 	}
 
-	private Operation createOperationStore(String name, Port in1, Port in2) {
+	private Operation createOperationOutV2(FuPort in1, FuPort in2) {
+		Operation operation = createOperation("cal_stream_out_write");
+		operation.setControl(false);
+		operation.getPipeline().add(createResource("res0", 0, 2));
+		operation.getPipeline().add(createReads(in1, 0, 1));
+		operation.getPipeline().add(createReads(in2, 0, 1));
+		return operation;
+	}
+
+	private Operation createOperationStore(String name, FuPort in1, FuPort in2) {
 		return createOperationDefault(name, in1, 0, 1, true, in2, 0, 1, true);
 	}
 
@@ -973,20 +1001,14 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return port;
 	}
 
-	@Override
 	public Port createPort(String name) {
 		PortImpl port = new PortImpl();
 		port.setName(name);
 		return port;
 	}
 
-	@Override
-	public Port createPort(String name, int width, boolean isOpcodeSelector,
-			boolean isTrigger) {
-		Port port = createPort(name);
-		port.setWidth(width);
-		port.setOpcodeSelector(isOpcodeSelector);
-		port.setTrigger(isTrigger);
+	public Port createPort(String name, Component component) {
+		PortImpl port = new PortImpl();
 		return port;
 	}
 
@@ -994,7 +1016,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Map.Entry<Port, Integer> createPortToIndexMapEntry() {
+	public Map.Entry<FuPort, Integer> createPortToIndexMapEntry() {
 		PortToIndexMapEntryImpl portToIndexMapEntry = new PortToIndexMapEntryImpl();
 		return portToIndexMapEntry;
 	}
@@ -1003,23 +1025,77 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public DesignConfiguration createDesignConfigurationFromString(
-			EDataType eDataType, String initialValue) {
-		DesignConfiguration result = DesignConfiguration.get(initialValue);
-		if (result == null)
-			throw new IllegalArgumentException("The value '" + initialValue
-					+ "' is not a valid enumerator of '" + eDataType.getName()
-					+ "'");
-		return result;
+	public Processor createProcessor() {
+		ProcessorImpl processor = new ProcessorImpl();
+		return processor;
 	}
 
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public String convertDesignConfigurationToString(EDataType eDataType,
-			Object instanceValue) {
-		return instanceValue == null ? null : instanceValue.toString();
+	@Override
+	public Processor createProcessor(String name, String entityName,
+			ProcessorConfiguration conf, int ramSize) {
+		Processor processor = createProcessor();
+		processor.setName(name);
+		processor.setEntityName(entityName);
+
+		// Address spaces
+		processor.setData(createAddressSpace("data", 8, 0,
+				quantizeUp(ramSize / 8 + 512)));
+		processor.setProgram(createAddressSpace("instructions", 8, 0, 60000));
+		// Buses
+		for (int i = 0; i < conf.getBusNb(); i++) {
+			Bus bus = createBusDefault(i, 32);
+			processor.getBuses().add(bus);
+		}
+		// Global Control Unit
+		processor.setGcu(createGlobalControlUnitDefault(processor));
+		// Register files
+		Implementation registerImpl = createImplementation(
+				"asic_130nm_1.5V.hdb", 96);
+		RegisterFile bool = createRegisterFileDefault(processor, "BOOL",
+				conf.getBoolRfSize(), 1, registerImpl);
+		processor.getRegisterFiles().add(bool);
+		for (int i = 0; i < conf.getIntRfNb(); i++) {
+			RegisterFile rf = createRegisterFileDefault(processor, "RF_" + i,
+					conf.getIntRfSize(), 32, registerImpl);
+			processor.getRegisterFiles().add(rf);
+		}
+		processor.getHardwareDatabase().add(registerImpl);
+		// Guards
+		for (Bus bus : processor.getBuses()) {
+			bus.getGuards().addAll(createGuardsDefault(bool));
+		}
+		// Functional units
+		EList<FunctionUnit> units = processor.getFunctionUnits();
+		// * ALU
+		for (int i = 0; i < conf.getAluNb(); i++) {
+			FunctionUnit alu = createAluUnit(processor, "ALU_" + i);
+			units.add(alu);
+		}
+		// * LSU
+		Implementation lsuImpl = createImplementation("stratixII.hdb", 2);
+		for (int i = 0; i < conf.getLsuNb(); i++) {
+			String lsuName = conf.getLsuNb() == 1 ? "LSU" : "LSU_" + i;
+			units.add(createLSU(lsuName, processor, lsuImpl));
+		}
+		processor.getHardwareDatabase().add(lsuImpl);
+		// * Mul
+		Implementation mulImpl = createImplementation("asic_130nm_1.5V.hdb", 88);
+		for (int i = 0; i < conf.getMulNb(); i++) {
+			units.add(createMultiplier("Mul_" + i, processor, mulImpl));
+		}
+		processor.getHardwareDatabase().add(mulImpl);
+		// * And-ior-xor
+		Implementation logicImpl = createImplementation("asic_130nm_1.5V.hdb",
+				22);
+		String[] aixOperations2 = { "and", "ior", "xor" };
+		units.add(createFunctionUnit(processor, "And_ior_xor", null,
+				aixOperations2, logicImpl));
+		processor.getHardwareDatabase().add(logicImpl);
+		// * Stream-units
+		processor.getFunctionUnits().add(createStreamInput(processor));
+		processor.getFunctionUnits().add(createStreamOutput(processor));
+
+		return processor;
 	}
 
 	/**
@@ -1041,22 +1117,13 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public String convertProcessorConfigurationToString(EDataType eDataType,
-			Object instanceValue) {
-		return instanceValue == null ? null : instanceValue.toString();
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	public Reads createReads() {
 		ReadsImpl reads = new ReadsImpl();
 		return reads;
 	}
 
 	@Override
-	public Reads createReads(Port port, int startCycle, int cycle) {
+	public Reads createReads(FuPort port, int startCycle, int cycle) {
 		ReadsImpl reads = new ReadsImpl();
 		reads.setPort(port);
 		reads.setStartCycle(startCycle);
@@ -1098,9 +1165,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		Socket o1 = createOutputSocket(name + "_o1", segments);
 
 		// Ports
-		Port wr = createPort("wr");
+		FuPort wr = createFuPort("wr");
 		wr.connect(o1);
-		Port rd = createPort("rd");
+		FuPort rd = createFuPort("rd");
 		rd.connect(i1);
 		registerFile.getPorts().add(wr);
 		registerFile.getPorts().add(rd);
@@ -1120,11 +1187,11 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		Socket o2 = createOutputSocket(name + "_o2", segments);
 
 		// Ports
-		Port wr = createPort("wr");
+		FuPort wr = createFuPort("wr");
 		wr.connect(o1);
-		Port wr2 = createPort("wr2");
+		FuPort wr2 = createFuPort("wr2");
 		wr2.connect(o2);
-		Port rd = createPort("rd");
+		FuPort rd = createFuPort("rd");
 		rd.connect(i1);
 		registerFile.getPorts().add(wr);
 		registerFile.getPorts().add(rd);
@@ -1188,6 +1255,26 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	public Signal createSignal() {
+		SignalImpl signal = new SignalImpl();
+		return signal;
+	}
+
+	public Signal createSignal(String name, Component source, Component target,
+			Port sourcePort, Port targetPort) {
+		SignalImpl signal = new SignalImpl();
+		signal.setName(name);
+		signal.setSourcePort(sourcePort);
+		signal.setTargetPort(targetPort);
+		signal.setSource(source);
+		signal.setTarget(target);
+		return signal;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
 	public Socket createSocket() {
 		SocketImpl socket = new SocketImpl();
 		return socket;
@@ -1227,8 +1314,8 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		Socket i1 = createInputSocket(name + "_i1", segments);
 		Socket o1 = createOutputSocket(name + "_o1", segments);
 		// Port
-		Port in1t = createPort("in1t", 32, true, true);
-		Port out1 = createPort("out1", 32, false, false);
+		FuPort in1t = createFuPort("in1t", 32, true, true);
+		FuPort out1 = createFuPort("out1", 32, false, false);
 		in1t.connect(i1);
 		out1.connect(o1);
 		functionUnit.getPorts().add(in1t);
@@ -1255,9 +1342,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		Socket i2 = createInputSocket(name + "_i2", segments);
 		Socket o1 = createOutputSocket(name + "_o1", segments);
 		// Port
-		Port in1t = createPort("in1t", 32, true, true);
-		Port in2 = createPort("in2", 32, false, false);
-		Port out1 = createPort("out1", 32, false, false);
+		FuPort in1t = createFuPort("in1t", 32, true, true);
+		FuPort in2 = createFuPort("in2", 32, false, false);
+		FuPort out1 = createFuPort("out1", 32, false, false);
 		in1t.connect(i1);
 		in2.connect(i2);
 		out1.connect(o1);
@@ -1302,77 +1389,11 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public TermUnit createTermUnit(FunctionUnit unit, Port port) {
+	public TermUnit createTermUnit(FunctionUnit unit, FuPort port) {
 		TermUnitImpl termUnit = new TermUnitImpl();
 		termUnit.setFunctionUnit(unit);
 		termUnit.setPort(port);
 		return termUnit;
-	}
-
-	@Override
-	public Processor createProcessor(String name, ProcessorConfiguration conf,
-			int ramSize) {
-		Processor tta = createProcessor();
-		tta.setName(name);
-		// Address spaces
-		tta.setData(createAddressSpace("data", 8, 0,
-				quantizeUp(ramSize / 8 + 512)));
-		tta.setProgram(createAddressSpace("instructions", 8, 0, 60000));
-		// Buses
-		for (int i = 0; i < conf.getBusNb(); i++) {
-			Bus bus = createBusDefault(i, 32);
-			tta.getBuses().add(bus);
-		}
-		// Global Control Unit
-		tta.setGcu(createGlobalControlUnitDefault(tta));
-		// Register files
-		Implementation registerImpl = createImplementation(
-				"asic_130nm_1.5V.hdb", 96);
-		RegisterFile bool = createRegisterFileDefault(tta, "BOOL",
-				conf.getBoolRfSize(), 1, registerImpl);
-		tta.getRegisterFiles().add(bool);
-		for (int i = 0; i < conf.getIntRfNb(); i++) {
-			RegisterFile rf = createRegisterFileDefault(tta, "RF_" + i,
-					conf.getIntRfSize(), 32, registerImpl);
-			tta.getRegisterFiles().add(rf);
-		}
-		tta.getHardwareDatabase().add(registerImpl);
-		// Guards
-		for (Bus bus : tta.getBuses()) {
-			bus.getGuards().addAll(createGuardsDefault(bool));
-		}
-		// Functional units
-		EList<FunctionUnit> units = tta.getFunctionUnits();
-		// * ALU
-		for (int i = 0; i < conf.getAluNb(); i++) {
-			FunctionUnit alu = createAluUnit(tta, "ALU_" + i);
-			units.add(alu);
-		}
-		// * LSU
-		Implementation lsuImpl = createImplementation("stratixII.hdb", 2);
-		for (int i = 0; i < conf.getLsuNb(); i++) {
-			String lsuName = conf.getLsuNb() == 1 ? "LSU" : "LSU_" + i;
-			units.add(createLSU(lsuName, tta, lsuImpl));
-		}
-		tta.getHardwareDatabase().add(lsuImpl);
-		// * Mul
-		Implementation mulImpl = createImplementation("asic_130nm_1.5V.hdb", 88);
-		for (int i = 0; i < conf.getMulNb(); i++) {
-			units.add(createMultiplier("Mul_" + i, tta, mulImpl));
-		}
-		tta.getHardwareDatabase().add(mulImpl);
-		// * And-ior-xor
-		Implementation logicImpl = createImplementation("asic_130nm_1.5V.hdb",
-				22);
-		String[] aixOperations2 = { "and", "ior", "xor" };
-		units.add(createFunctionUnit(tta, "And_ior_xor", null, aixOperations2,
-				logicImpl));
-		tta.getHardwareDatabase().add(logicImpl);
-		// * Stream-units
-		tta.getFunctionUnits().add(createStreamInput(tta));
-		tta.getFunctionUnits().add(createStreamOutput(tta));
-
-		return tta;
 	}
 
 	/**
@@ -1385,7 +1406,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public Writes createWrites(Port port, int startCycle, int cycle) {
+	public Writes createWrites(FuPort port, int startCycle, int cycle) {
 		WritesImpl writes = new WritesImpl();
 		writes.setPort(port);
 		writes.setStartCycle(startCycle);

@@ -101,10 +101,10 @@ public interface Operation extends EObject {
 	 * really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @model kind="operation" mapType="net.sf.orcc.backends.tta.architecture.PortToIndexMapEntry<net.sf.orcc.backends.tta.architecture.Port, org.eclipse.emf.ecore.EIntegerObject>"
+	 * @model kind="operation" mapType="net.sf.orcc.backends.tta.architecture.PortToIndexMapEntry<net.sf.orcc.backends.tta.architecture.FuPort, org.eclipse.emf.ecore.EIntegerObject>"
 	 * @generated
 	 */
-	EMap<Port, Integer> getPortToIndexMap();
+	EMap<FuPort, Integer> getPortToIndexMap();
 
 	/**
 	 * Returns the value of the '<em><b>Control</b></em>' attribute. <!--
@@ -141,6 +141,6 @@ public interface Operation extends EObject {
 	 * @model kind="operation"
 	 * @generated
 	 */
-	EList<Port> getPorts();
+	EList<FuPort> getPorts();
 
 } // Operation

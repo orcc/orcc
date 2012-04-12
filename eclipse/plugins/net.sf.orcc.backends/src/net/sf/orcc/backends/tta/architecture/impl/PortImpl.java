@@ -28,15 +28,13 @@
  */
 package net.sf.orcc.backends.tta.architecture.impl;
 
+import net.sf.dftools.graph.impl.VertexImpl;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.Port;
-import net.sf.orcc.backends.tta.architecture.Socket;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.emf.ecore.impl.EObjectImpl;
 
 /**
  * <!-- begin-user-doc --> An implementation of the model object '
@@ -45,127 +43,30 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * The following features are implemented:
  * <ul>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.PortImpl#getName <em>Name</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.PortImpl#getInputSocket <em>Input Socket</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.PortImpl#getOutputSocket <em>Output Socket</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.PortImpl#getWidth <em>Width</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.PortImpl#isTrigger <em>Trigger</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.PortImpl#isOpcodeSelector <em>Opcode Selector</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public class PortImpl extends EObjectImpl implements Port {
+public class PortImpl extends VertexImpl implements Port {
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @see #getName()
 	 * @generated
 	 * @ordered
 	 */
 	protected static final String NAME_EDEFAULT = null;
-
 	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @see #getName()
 	 * @generated
 	 * @ordered
 	 */
 	protected String name = NAME_EDEFAULT;
-
-	/**
-	 * The cached value of the '{@link #getInputSocket() <em>Input Socket</em>}' reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getInputSocket()
-	 * @generated
-	 * @ordered
-	 */
-	protected Socket inputSocket;
-
-	/**
-	 * This is true if the Input Socket reference has been set. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	protected boolean inputSocketESet;
-
-	/**
-	 * The cached value of the '{@link #getOutputSocket() <em>Output Socket</em>}' reference.
-	 * <!-- begin-user-doc --> <!--
-	 * end-user-doc -->
-	 * @see #getOutputSocket()
-	 * @generated
-	 * @ordered
-	 */
-	protected Socket outputSocket;
-
-	/**
-	 * This is true if the Output Socket reference has been set. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	protected boolean outputSocketESet;
-
-	/**
-	 * The default value of the '{@link #getWidth() <em>Width</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getWidth()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final int WIDTH_EDEFAULT = 0;
-
-	/**
-	 * The cached value of the '{@link #getWidth() <em>Width</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getWidth()
-	 * @generated
-	 * @ordered
-	 */
-	protected int width = WIDTH_EDEFAULT;
-
-	/**
-	 * The default value of the '{@link #isTrigger() <em>Trigger</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isTrigger()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean TRIGGER_EDEFAULT = false;
-
-	/**
-	 * The cached value of the '{@link #isTrigger() <em>Trigger</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isTrigger()
-	 * @generated
-	 * @ordered
-	 */
-	protected boolean trigger = TRIGGER_EDEFAULT;
-
-	/**
-	 * The default value of the '{@link #isOpcodeSelector() <em>Opcode Selector</em>}' attribute.
-	 * <!-- begin-user-doc --> <!--
-	 * end-user-doc -->
-	 * @see #isOpcodeSelector()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean OPCODE_SELECTOR_EDEFAULT = false;
-
-	/**
-	 * The cached value of the '{@link #isOpcodeSelector() <em>Opcode Selector</em>}' attribute.
-	 * <!-- begin-user-doc --> <!--
-	 * end-user-doc -->
-	 * @see #isOpcodeSelector()
-	 * @generated
-	 * @ordered
-	 */
-	protected boolean opcodeSelector = OPCODE_SELECTOR_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -185,7 +86,8 @@ public class PortImpl extends EObjectImpl implements Port {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	public String getName() {
@@ -193,7 +95,8 @@ public class PortImpl extends EObjectImpl implements Port {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setName(String newName) {
@@ -205,207 +108,8 @@ public class PortImpl extends EObjectImpl implements Port {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Socket getInputSocket() {
-		if (inputSocket != null && inputSocket.eIsProxy()) {
-			InternalEObject oldInputSocket = (InternalEObject) inputSocket;
-			inputSocket = (Socket) eResolveProxy(oldInputSocket);
-			if (inputSocket != oldInputSocket) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							ArchitecturePackage.PORT__INPUT_SOCKET,
-							oldInputSocket, inputSocket));
-			}
-		}
-		return inputSocket;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Socket basicGetInputSocket() {
-		return inputSocket;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setInputSocket(Socket newInputSocket) {
-		Socket oldInputSocket = inputSocket;
-		inputSocket = newInputSocket;
-		boolean oldInputSocketESet = inputSocketESet;
-		inputSocketESet = true;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					ArchitecturePackage.PORT__INPUT_SOCKET, oldInputSocket,
-					inputSocket, !oldInputSocketESet));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void unsetInputSocket() {
-		Socket oldInputSocket = inputSocket;
-		boolean oldInputSocketESet = inputSocketESet;
-		inputSocket = null;
-		inputSocketESet = false;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET,
-					ArchitecturePackage.PORT__INPUT_SOCKET, oldInputSocket,
-					null, oldInputSocketESet));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public boolean isSetInputSocket() {
-		return inputSocketESet;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Socket getOutputSocket() {
-		if (outputSocket != null && outputSocket.eIsProxy()) {
-			InternalEObject oldOutputSocket = (InternalEObject) outputSocket;
-			outputSocket = (Socket) eResolveProxy(oldOutputSocket);
-			if (outputSocket != oldOutputSocket) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							ArchitecturePackage.PORT__OUTPUT_SOCKET,
-							oldOutputSocket, outputSocket));
-			}
-		}
-		return outputSocket;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Socket basicGetOutputSocket() {
-		return outputSocket;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setOutputSocket(Socket newOutputSocket) {
-		Socket oldOutputSocket = outputSocket;
-		outputSocket = newOutputSocket;
-		boolean oldOutputSocketESet = outputSocketESet;
-		outputSocketESet = true;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					ArchitecturePackage.PORT__OUTPUT_SOCKET, oldOutputSocket,
-					outputSocket, !oldOutputSocketESet));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void unsetOutputSocket() {
-		Socket oldOutputSocket = outputSocket;
-		boolean oldOutputSocketESet = outputSocketESet;
-		outputSocket = null;
-		outputSocketESet = false;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET,
-					ArchitecturePackage.PORT__OUTPUT_SOCKET, oldOutputSocket,
-					null, oldOutputSocketESet));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public boolean isSetOutputSocket() {
-		return outputSocketESet;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public int getWidth() {
-		return width;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setWidth(int newWidth) {
-		int oldWidth = width;
-		width = newWidth;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					ArchitecturePackage.PORT__WIDTH, oldWidth, width));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public boolean isTrigger() {
-		return trigger;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setTrigger(boolean newTrigger) {
-		boolean oldTrigger = trigger;
-		trigger = newTrigger;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					ArchitecturePackage.PORT__TRIGGER, oldTrigger, trigger));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public boolean isOpcodeSelector() {
-		return opcodeSelector;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setOpcodeSelector(boolean newOpcodeSelector) {
-		boolean oldOpcodeSelector = opcodeSelector;
-		opcodeSelector = newOpcodeSelector;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					ArchitecturePackage.PORT__OPCODE_SELECTOR,
-					oldOpcodeSelector, opcodeSelector));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 */
-	public void connect(Socket socket) {
-		if (socket.isInput()) {
-			inputSocket = socket;
-		} else {
-			outputSocket = socket;
-		}
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -413,26 +117,13 @@ public class PortImpl extends EObjectImpl implements Port {
 		switch (featureID) {
 		case ArchitecturePackage.PORT__NAME:
 			return getName();
-		case ArchitecturePackage.PORT__INPUT_SOCKET:
-			if (resolve)
-				return getInputSocket();
-			return basicGetInputSocket();
-		case ArchitecturePackage.PORT__OUTPUT_SOCKET:
-			if (resolve)
-				return getOutputSocket();
-			return basicGetOutputSocket();
-		case ArchitecturePackage.PORT__WIDTH:
-			return getWidth();
-		case ArchitecturePackage.PORT__TRIGGER:
-			return isTrigger();
-		case ArchitecturePackage.PORT__OPCODE_SELECTOR:
-			return isOpcodeSelector();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -441,27 +132,13 @@ public class PortImpl extends EObjectImpl implements Port {
 		case ArchitecturePackage.PORT__NAME:
 			setName((String) newValue);
 			return;
-		case ArchitecturePackage.PORT__INPUT_SOCKET:
-			setInputSocket((Socket) newValue);
-			return;
-		case ArchitecturePackage.PORT__OUTPUT_SOCKET:
-			setOutputSocket((Socket) newValue);
-			return;
-		case ArchitecturePackage.PORT__WIDTH:
-			setWidth((Integer) newValue);
-			return;
-		case ArchitecturePackage.PORT__TRIGGER:
-			setTrigger((Boolean) newValue);
-			return;
-		case ArchitecturePackage.PORT__OPCODE_SELECTOR:
-			setOpcodeSelector((Boolean) newValue);
-			return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -470,27 +147,13 @@ public class PortImpl extends EObjectImpl implements Port {
 		case ArchitecturePackage.PORT__NAME:
 			setName(NAME_EDEFAULT);
 			return;
-		case ArchitecturePackage.PORT__INPUT_SOCKET:
-			unsetInputSocket();
-			return;
-		case ArchitecturePackage.PORT__OUTPUT_SOCKET:
-			unsetOutputSocket();
-			return;
-		case ArchitecturePackage.PORT__WIDTH:
-			setWidth(WIDTH_EDEFAULT);
-			return;
-		case ArchitecturePackage.PORT__TRIGGER:
-			setTrigger(TRIGGER_EDEFAULT);
-			return;
-		case ArchitecturePackage.PORT__OPCODE_SELECTOR:
-			setOpcodeSelector(OPCODE_SELECTOR_EDEFAULT);
-			return;
 		}
 		super.eUnset(featureID);
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -499,22 +162,13 @@ public class PortImpl extends EObjectImpl implements Port {
 		case ArchitecturePackage.PORT__NAME:
 			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
 					.equals(name);
-		case ArchitecturePackage.PORT__INPUT_SOCKET:
-			return isSetInputSocket();
-		case ArchitecturePackage.PORT__OUTPUT_SOCKET:
-			return isSetOutputSocket();
-		case ArchitecturePackage.PORT__WIDTH:
-			return width != WIDTH_EDEFAULT;
-		case ArchitecturePackage.PORT__TRIGGER:
-			return trigger != TRIGGER_EDEFAULT;
-		case ArchitecturePackage.PORT__OPCODE_SELECTOR:
-			return opcodeSelector != OPCODE_SELECTOR_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -525,12 +179,6 @@ public class PortImpl extends EObjectImpl implements Port {
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (name: ");
 		result.append(name);
-		result.append(", width: ");
-		result.append(width);
-		result.append(", trigger: ");
-		result.append(trigger);
-		result.append(", opcodeSelector: ");
-		result.append(opcodeSelector);
 		result.append(')');
 		return result.toString();
 	}

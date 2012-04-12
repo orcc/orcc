@@ -45,8 +45,7 @@ import net.sf.orcc.backends.tta.architecture.ExprBinary;
 import net.sf.orcc.backends.tta.architecture.ExprFalse;
 import net.sf.orcc.backends.tta.architecture.ExprTrue;
 import net.sf.orcc.backends.tta.architecture.ExprUnary;
-import net.sf.orcc.backends.tta.architecture.ExternalPort;
-import net.sf.orcc.backends.tta.architecture.Fifo;
+import net.sf.orcc.backends.tta.architecture.FuPort;
 import net.sf.orcc.backends.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
 import net.sf.orcc.backends.tta.architecture.Guard;
@@ -132,17 +131,6 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 				result = defaultCase(theEObject);
 			return result;
 		}
-		case ArchitecturePackage.FIFO: {
-			Fifo fifo = (Fifo) theEObject;
-			T result = caseFifo(fifo);
-			if (result == null)
-				result = caseEdge(fifo);
-			if (result == null)
-				result = caseAttributable(fifo);
-			if (result == null)
-				result = defaultCase(theEObject);
-			return result;
-		}
 		case ArchitecturePackage.SIGNAL: {
 			Signal signal = (Signal) theEObject;
 			T result = caseSignal(signal);
@@ -165,13 +153,13 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 				result = defaultCase(theEObject);
 			return result;
 		}
-		case ArchitecturePackage.EXTERNAL_PORT: {
-			ExternalPort externalPort = (ExternalPort) theEObject;
-			T result = caseExternalPort(externalPort);
+		case ArchitecturePackage.PORT: {
+			Port port = (Port) theEObject;
+			T result = casePort(port);
 			if (result == null)
-				result = caseVertex(externalPort);
+				result = caseVertex(port);
 			if (result == null)
-				result = caseAttributable(externalPort);
+				result = caseAttributable(port);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -179,6 +167,8 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 		case ArchitecturePackage.PROCESSOR: {
 			Processor processor = (Processor) theEObject;
 			T result = caseProcessor(processor);
+			if (result == null)
+				result = caseComponent(processor);
 			if (result == null)
 				result = caseVertex(processor);
 			if (result == null)
@@ -229,9 +219,9 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 				result = defaultCase(theEObject);
 			return result;
 		}
-		case ArchitecturePackage.PORT: {
-			Port port = (Port) theEObject;
-			T result = casePort(port);
+		case ArchitecturePackage.FU_PORT: {
+			FuPort fuPort = (FuPort) theEObject;
+			T result = caseFuPort(fuPort);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -375,7 +365,7 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 		}
 		case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY: {
 			@SuppressWarnings("unchecked")
-			Map.Entry<Port, Integer> portToIndexMapEntry = (Map.Entry<Port, Integer>) theEObject;
+			Map.Entry<FuPort, Integer> portToIndexMapEntry = (Map.Entry<FuPort, Integer>) theEObject;
 			T result = casePortToIndexMapEntry(portToIndexMapEntry);
 			if (result == null)
 				result = defaultCase(theEObject);
@@ -397,21 +387,6 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseDesign(Design object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Fifo</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Fifo</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseFifo(Fifo object) {
 		return null;
 	}
 
@@ -442,21 +417,6 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseComponent(Component object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>External Port</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>External Port</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseExternalPort(ExternalPort object) {
 		return null;
 	}
 
@@ -558,6 +518,21 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseRegisterFile(RegisterFile object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Fu Port</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Fu Port</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseFuPort(FuPort object) {
 		return null;
 	}
 
@@ -759,7 +734,7 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T casePortToIndexMapEntry(Map.Entry<Port, Integer> object) {
+	public T casePortToIndexMapEntry(Map.Entry<FuPort, Integer> object) {
 		return null;
 	}
 

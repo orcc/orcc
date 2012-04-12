@@ -187,7 +187,7 @@ public interface RegisterFile extends EObject {
 
 	/**
 	 * Returns the value of the '<em><b>Ports</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.backends.tta.architecture.Port}.
+	 * The list contents are of type {@link net.sf.orcc.backends.tta.architecture.FuPort}.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Ports</em>' containment reference list isn't clear,
@@ -199,7 +199,7 @@ public interface RegisterFile extends EObject {
 	 * @model containment="true" transient="true"
 	 * @generated
 	 */
-	EList<Port> getPorts();
+	EList<FuPort> getPorts();
 
 	/**
 	 * Returns the value of the '<em><b>Implementation</b></em>' reference.
