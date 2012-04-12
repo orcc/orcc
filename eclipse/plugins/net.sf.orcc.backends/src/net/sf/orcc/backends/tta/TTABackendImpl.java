@@ -95,7 +95,6 @@ public class TTABackendImpl extends AbstractBackend {
 	private Design design;
 
 	private final Map<String, String> transformations;
-	private final List<String> processorIntensiveActors;
 
 	String instancePath;
 
@@ -111,16 +110,6 @@ public class TTABackendImpl extends AbstractBackend {
 		transformations.put("min", "min_");
 		transformations.put("max", "max_");
 		transformations.put("select", "select_");
-		processorIntensiveActors = new ArrayList<String>();
-		// processorIntensiveActors.add("org.mpeg4.part2.motion.Algo_Add");
-		// processorIntensiveActors.add("com.ericsson.Algo_Interpolation_halfpel");
-		// processorIntensiveActors.add("org.sc29.wg11.mpeg4.part2.texture.Algo_IDCT2D_ISOIEC_23002_1");
-		// processorIntensiveActors.add("fi.oulu.ee.mvg.Framebuffer");
-		// processorIntensiveActors.add("com.xilinx.Mgnt_Merger");
-		// processorIntensiveActors.add("org.mpeg4.part2.texture.Algo_Inversequant");
-
-		// processorIntensiveActors.add("fi.oulu.ee.mvg.Algo_IAP_multi");
-		// processorIntensiveActors.add("org.mpeg4.part2.parser.Algo_Synp_MPEG_4");
 	}
 
 	@Override
