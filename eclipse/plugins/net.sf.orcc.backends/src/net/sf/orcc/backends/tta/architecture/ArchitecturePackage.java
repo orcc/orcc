@@ -107,13 +107,22 @@ public interface ArchitecturePackage extends EPackage {
 	int DESIGN__VERTICES = GraphPackage.GRAPH__VERTICES;
 
 	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DESIGN__NAME = GraphPackage.GRAPH_FEATURE_COUNT + 0;
+
+	/**
 	 * The feature id for the '<em><b>Components</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int DESIGN__COMPONENTS = GraphPackage.GRAPH_FEATURE_COUNT + 0;
+	int DESIGN__COMPONENTS = GraphPackage.GRAPH_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Processors</b></em>' reference list.
@@ -122,7 +131,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int DESIGN__PROCESSORS = GraphPackage.GRAPH_FEATURE_COUNT + 1;
+	int DESIGN__PROCESSORS = GraphPackage.GRAPH_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Fifos</b></em>' reference list.
@@ -131,7 +140,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int DESIGN__FIFOS = GraphPackage.GRAPH_FEATURE_COUNT + 2;
+	int DESIGN__FIFOS = GraphPackage.GRAPH_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Signals</b></em>' reference list.
@@ -140,7 +149,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int DESIGN__SIGNALS = GraphPackage.GRAPH_FEATURE_COUNT + 3;
+	int DESIGN__SIGNALS = GraphPackage.GRAPH_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>Ports</b></em>' reference list.
@@ -149,7 +158,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int DESIGN__PORTS = GraphPackage.GRAPH_FEATURE_COUNT + 4;
+	int DESIGN__PORTS = GraphPackage.GRAPH_FEATURE_COUNT + 5;
 
 	/**
 	 * The feature id for the '<em><b>Configuration</b></em>' attribute.
@@ -158,7 +167,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int DESIGN__CONFIGURATION = GraphPackage.GRAPH_FEATURE_COUNT + 5;
+	int DESIGN__CONFIGURATION = GraphPackage.GRAPH_FEATURE_COUNT + 6;
 
 	/**
 	 * The number of structural features of the '<em>Design</em>' class. <!--
@@ -167,7 +176,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int DESIGN_FEATURE_COUNT = GraphPackage.GRAPH_FEATURE_COUNT + 6;
+	int DESIGN_FEATURE_COUNT = GraphPackage.GRAPH_FEATURE_COUNT + 7;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.FifoImpl <em>Fifo</em>}' class.
@@ -207,13 +216,22 @@ public interface ArchitecturePackage extends EPackage {
 	int FIFO__TARGET = GraphPackage.EDGE__TARGET;
 
 	/**
+	 * The feature id for the '<em><b>Size</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FIFO__SIZE = GraphPackage.EDGE_FEATURE_COUNT + 0;
+
+	/**
 	 * The number of structural features of the '<em>Fifo</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int FIFO_FEATURE_COUNT = GraphPackage.EDGE_FEATURE_COUNT + 0;
+	int FIFO_FEATURE_COUNT = GraphPackage.EDGE_FEATURE_COUNT + 1;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.SignalImpl <em>Signal</em>}' class.
@@ -253,13 +271,22 @@ public interface ArchitecturePackage extends EPackage {
 	int SIGNAL__TARGET = GraphPackage.EDGE__TARGET;
 
 	/**
+	 * The feature id for the '<em><b>Size</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SIGNAL__SIZE = GraphPackage.EDGE_FEATURE_COUNT + 0;
+
+	/**
 	 * The number of structural features of the '<em>Signal</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int SIGNAL_FEATURE_COUNT = GraphPackage.EDGE_FEATURE_COUNT + 0;
+	int SIGNAL_FEATURE_COUNT = GraphPackage.EDGE_FEATURE_COUNT + 1;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ComponentImpl <em>Component</em>}' class.
@@ -308,13 +335,31 @@ public interface ArchitecturePackage extends EPackage {
 	int COMPONENT__OUTGOING = GraphPackage.VERTEX__OUTGOING;
 
 	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMPONENT__NAME = GraphPackage.VERTEX_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>Entity Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMPONENT__ENTITY_NAME = GraphPackage.VERTEX_FEATURE_COUNT + 1;
+
+	/**
 	 * The number of structural features of the '<em>Component</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int COMPONENT_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 0;
+	int COMPONENT_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 2;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ExternalPortImpl <em>External Port</em>}' class.
@@ -1659,6 +1704,17 @@ public interface ArchitecturePackage extends EPackage {
 	EClass getDesign();
 
 	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Design#getName <em>Name</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Name</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Design#getName()
+	 * @see #getDesign()
+	 * @generated
+	 */
+	EAttribute getDesign_Name();
+
+	/**
 	 * Returns the meta object for the reference list '{@link net.sf.orcc.backends.tta.architecture.Design#getComponents <em>Components</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1735,6 +1791,17 @@ public interface ArchitecturePackage extends EPackage {
 	EClass getFifo();
 
 	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Fifo#getSize <em>Size</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Size</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Fifo#getSize()
+	 * @see #getFifo()
+	 * @generated
+	 */
+	EAttribute getFifo_Size();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Signal <em>Signal</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1745,6 +1812,17 @@ public interface ArchitecturePackage extends EPackage {
 	EClass getSignal();
 
 	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Signal#getSize <em>Size</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Size</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Signal#getSize()
+	 * @see #getSignal()
+	 * @generated
+	 */
+	EAttribute getSignal_Size();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Component <em>Component</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1753,6 +1831,28 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 */
 	EClass getComponent();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Component#getName <em>Name</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Name</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Component#getName()
+	 * @see #getComponent()
+	 * @generated
+	 */
+	EAttribute getComponent_Name();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Component#getEntityName <em>Entity Name</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Entity Name</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Component#getEntityName()
+	 * @see #getComponent()
+	 * @generated
+	 */
+	EAttribute getComponent_EntityName();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.ExternalPort <em>External Port</em>}'.
@@ -2856,6 +2956,14 @@ public interface ArchitecturePackage extends EPackage {
 		EClass DESIGN = eINSTANCE.getDesign();
 
 		/**
+		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute DESIGN__NAME = eINSTANCE.getDesign_Name();
+
+		/**
 		 * The meta object literal for the '<em><b>Components</b></em>' reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -2914,6 +3022,14 @@ public interface ArchitecturePackage extends EPackage {
 		EClass FIFO = eINSTANCE.getFifo();
 
 		/**
+		 * The meta object literal for the '<em><b>Size</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute FIFO__SIZE = eINSTANCE.getFifo_Size();
+
+		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.SignalImpl <em>Signal</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -2924,6 +3040,14 @@ public interface ArchitecturePackage extends EPackage {
 		EClass SIGNAL = eINSTANCE.getSignal();
 
 		/**
+		 * The meta object literal for the '<em><b>Size</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute SIGNAL__SIZE = eINSTANCE.getSignal_Size();
+
+		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.ComponentImpl <em>Component</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -2932,6 +3056,22 @@ public interface ArchitecturePackage extends EPackage {
 		 * @generated
 		 */
 		EClass COMPONENT = eINSTANCE.getComponent();
+
+		/**
+		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute COMPONENT__NAME = eINSTANCE.getComponent_Name();
+
+		/**
+		 * The meta object literal for the '<em><b>Entity Name</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute COMPONENT__ENTITY_NAME = eINSTANCE.getComponent_EntityName();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.ExternalPortImpl <em>External Port</em>}' class.

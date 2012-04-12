@@ -56,96 +56,98 @@ import org.eclipse.emf.ecore.util.EObjectResolvingEList;
  * <p>
  * The following features are implemented:
  * <ul>
- * <li>
- * {@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getComponents
- * <em>Components</em>}</li>
- * <li>
- * {@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getProcessors
- * <em>Processors</em>}</li>
- * <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getFifos
- * <em>Fifos</em>}</li>
- * <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getSignals
- * <em>Signals</em>}</li>
- * <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getPorts
- * <em>Ports</em>}</li>
- * <li>
- * {@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getConfiguration
- * <em>Configuration</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getComponents <em>Components</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getProcessors <em>Processors</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getFifos <em>Fifos</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getSignals <em>Signals</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getPorts <em>Ports</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getConfiguration <em>Configuration</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class DesignImpl extends GraphImpl implements Design {
 	/**
-	 * The default value of the '{@link #getConfiguration()
-	 * <em>Configuration</em>}' attribute. <!-- begin-user-doc --> <!--
-	 * end-user-doc -->
-	 * 
-	 * @see #getConfiguration()
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final DesignConfiguration CONFIGURATION_EDEFAULT = DesignConfiguration.DIRECT_MAPPING;
+	protected static final String NAME_EDEFAULT = null;
 	/**
-	 * The cached value of the '{@link #getComponents() <em>Components</em>}'
-	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected String name = NAME_EDEFAULT;
+	/**
+	 * The cached value of the '{@link #getComponents() <em>Components</em>}' reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getComponents()
 	 * @generated
 	 * @ordered
 	 */
 	protected EList<Component> components;
 	/**
-	 * The cached value of the '{@link #getConfiguration()
-	 * <em>Configuration</em>}' attribute. <!-- begin-user-doc --> <!--
-	 * end-user-doc -->
-	 * 
-	 * @see #getConfiguration()
-	 * @generated
-	 * @ordered
-	 */
-	protected DesignConfiguration configuration = CONFIGURATION_EDEFAULT;
-	/**
-	 * The cached value of the '{@link #getFifos() <em>Fifos</em>}' reference
-	 * list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @see #getFifos()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Fifo> fifos;
-	/**
-	 * The cached value of the '{@link #getPorts() <em>Ports</em>}' reference
-	 * list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @see #getPorts()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<ExternalPort> ports;
-	/**
-	 * The cached value of the '{@link #getProcessors() <em>Processors</em>}'
-	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getProcessors() <em>Processors</em>}' reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getProcessors()
 	 * @generated
 	 * @ordered
 	 */
 	protected EList<Processor> processors;
 	/**
-	 * The cached value of the '{@link #getSignals() <em>Signals</em>}'
-	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getFifos() <em>Fifos</em>}' reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getFifos()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Fifo> fifos;
+	/**
+	 * The cached value of the '{@link #getSignals() <em>Signals</em>}' reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getSignals()
 	 * @generated
 	 * @ordered
 	 */
 	protected EList<Signal> signals;
+	/**
+	 * The cached value of the '{@link #getPorts() <em>Ports</em>}' reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getPorts()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<ExternalPort> ports;
+	/**
+	 * The default value of the '{@link #getConfiguration() <em>Configuration</em>}' attribute.
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
+	 * @see #getConfiguration()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final DesignConfiguration CONFIGURATION_EDEFAULT = DesignConfiguration.DIRECT_MAPPING;
+	/**
+	 * The cached value of the '{@link #getConfiguration() <em>Configuration</em>}' attribute.
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
+	 * @see #getConfiguration()
+	 * @generated
+	 * @ordered
+	 */
+	protected DesignConfiguration configuration = CONFIGURATION_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	protected DesignImpl() {
@@ -181,12 +183,13 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
+		case ArchitecturePackage.DESIGN__NAME:
+			return getName();
 		case ArchitecturePackage.DESIGN__COMPONENTS:
 			return getComponents();
 		case ArchitecturePackage.DESIGN__PROCESSORS:
@@ -205,12 +208,14 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
+		case ArchitecturePackage.DESIGN__NAME:
+			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
+					.equals(name);
 		case ArchitecturePackage.DESIGN__COMPONENTS:
 			return components != null && !components.isEmpty();
 		case ArchitecturePackage.DESIGN__PROCESSORS:
@@ -229,13 +234,15 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
+		case ArchitecturePackage.DESIGN__NAME:
+			setName((String) newValue);
+			return;
 		case ArchitecturePackage.DESIGN__COMPONENTS:
 			getComponents().clear();
 			getComponents().addAll((Collection<? extends Component>) newValue);
@@ -265,7 +272,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -274,13 +280,37 @@ public class DesignImpl extends GraphImpl implements Design {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setName(String newName) {
+		String oldName = name;
+		name = newName;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.DESIGN__NAME, oldName, name));
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
+		case ArchitecturePackage.DESIGN__NAME:
+			setName(NAME_EDEFAULT);
+			return;
 		case ArchitecturePackage.DESIGN__COMPONENTS:
 			getComponents().clear();
 			return;
@@ -305,7 +335,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<Component> getComponents() {
@@ -318,7 +347,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public DesignConfiguration getConfiguration() {
@@ -327,7 +355,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<Fifo> getFifos() {
@@ -340,7 +367,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<ExternalPort> getPorts() {
@@ -353,7 +379,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<Processor> getProcessors() {
@@ -366,7 +391,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<Signal> getSignals() {
@@ -379,7 +403,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public void setConfiguration(DesignConfiguration newConfiguration) {
@@ -394,7 +417,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -403,7 +425,9 @@ public class DesignImpl extends GraphImpl implements Design {
 			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (configuration: ");
+		result.append(" (name: ");
+		result.append(name);
+		result.append(", configuration: ");
 		result.append(configuration);
 		result.append(')');
 		return result.toString();

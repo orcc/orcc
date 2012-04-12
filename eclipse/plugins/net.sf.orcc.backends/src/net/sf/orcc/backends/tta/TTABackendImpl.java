@@ -193,7 +193,7 @@ public class TTABackendImpl extends AbstractBackend {
 
 		network.computeTemplateMaps();
 
-		design = new ArchitectureBuilder().caseNetwork(network);
+		design = new ArchitectureBuilder(conf).caseNetwork(network);
 		printDesign(design);
 
 		if (finalize) {

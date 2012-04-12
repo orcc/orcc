@@ -399,8 +399,8 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getDesign_Components() {
-		return (EReference) designEClass.getEStructuralFeatures().get(0);
+	public EAttribute getDesign_Name() {
+		return (EAttribute) designEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -408,7 +408,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getDesign_Processors() {
+	public EReference getDesign_Components() {
 		return (EReference) designEClass.getEStructuralFeatures().get(1);
 	}
 
@@ -417,7 +417,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getDesign_Fifos() {
+	public EReference getDesign_Processors() {
 		return (EReference) designEClass.getEStructuralFeatures().get(2);
 	}
 
@@ -426,7 +426,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getDesign_Signals() {
+	public EReference getDesign_Fifos() {
 		return (EReference) designEClass.getEStructuralFeatures().get(3);
 	}
 
@@ -435,7 +435,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getDesign_Ports() {
+	public EReference getDesign_Signals() {
 		return (EReference) designEClass.getEStructuralFeatures().get(4);
 	}
 
@@ -444,8 +444,17 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getDesign_Ports() {
+		return (EReference) designEClass.getEStructuralFeatures().get(5);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EAttribute getDesign_Configuration() {
-		return (EAttribute) designEClass.getEStructuralFeatures().get(5);
+		return (EAttribute) designEClass.getEStructuralFeatures().get(6);
 	}
 
 	/**
@@ -457,6 +466,15 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getFifo_Size() {
+		return (EAttribute) fifoEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -465,11 +483,38 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getSignal_Size() {
+		return (EAttribute) signalEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EClass getComponent() {
 		return componentEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getComponent_Name() {
+		return (EAttribute) componentEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getComponent_EntityName() {
+		return (EAttribute) componentEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -1372,6 +1417,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 		// Create classes and their features
 		designEClass = createEClass(DESIGN);
+		createEAttribute(designEClass, DESIGN__NAME);
 		createEReference(designEClass, DESIGN__COMPONENTS);
 		createEReference(designEClass, DESIGN__PROCESSORS);
 		createEReference(designEClass, DESIGN__FIFOS);
@@ -1380,10 +1426,14 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEAttribute(designEClass, DESIGN__CONFIGURATION);
 
 		fifoEClass = createEClass(FIFO);
+		createEAttribute(fifoEClass, FIFO__SIZE);
 
 		signalEClass = createEClass(SIGNAL);
+		createEAttribute(signalEClass, SIGNAL__SIZE);
 
 		componentEClass = createEClass(COMPONENT);
+		createEAttribute(componentEClass, COMPONENT__NAME);
+		createEAttribute(componentEClass, COMPONENT__ENTITY_NAME);
 
 		externalPortEClass = createEClass(EXTERNAL_PORT);
 
@@ -1584,6 +1634,10 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		// Initialize classes and features; add operations and parameters
 		initEClass(designEClass, Design.class, "Design", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getDesign_Name(), theEcorePackage.getEString(), "name",
+				null, 0, 1, Design.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
 		initEReference(getDesign_Components(), this.getComponent(), null,
 				"components", null, 0, -1, Design.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
@@ -1611,12 +1665,27 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 		initEClass(fifoEClass, Fifo.class, "Fifo", !IS_ABSTRACT, !IS_INTERFACE,
 				IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getFifo_Size(), theEcorePackage.getEInt(), "size", null,
+				0, 1, Fifo.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(signalEClass, Signal.class, "Signal", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getSignal_Size(), theEcorePackage.getEInt(), "size",
+				null, 0, 1, Signal.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
 
 		initEClass(componentEClass, Component.class, "Component", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getComponent_Name(), theEcorePackage.getEString(),
+				"name", null, 0, 1, Component.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
+		initEAttribute(getComponent_EntityName(), theEcorePackage.getEString(),
+				"entityName", null, 0, 1, Component.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
 
 		initEClass(externalPortEClass, ExternalPort.class, "ExternalPort",
 				!IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);

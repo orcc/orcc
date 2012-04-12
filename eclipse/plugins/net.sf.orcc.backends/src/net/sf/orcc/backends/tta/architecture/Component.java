@@ -37,10 +37,69 @@ import net.sf.dftools.graph.Vertex;
  * A representation of the model object '<em><b>Component</b></em>'.
  * <!-- end-user-doc -->
  *
+ * <p>
+ * The following features are supported:
+ * <ul>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Component#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Component#getEntityName <em>Entity Name</em>}</li>
+ * </ul>
+ * </p>
  *
  * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getComponent()
  * @model
  * @generated
  */
 public interface Component extends Vertex {
+
+	/**
+	 * Returns the value of the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Name</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Name</em>' attribute.
+	 * @see #setName(String)
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getComponent_Name()
+	 * @model
+	 * @generated
+	 */
+	String getName();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Component#getName <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Name</em>' attribute.
+	 * @see #getName()
+	 * @generated
+	 */
+	void setName(String value);
+
+	/**
+	 * Returns the value of the '<em><b>Entity Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Entity Name</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Entity Name</em>' attribute.
+	 * @see #setEntityName(String)
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getComponent_EntityName()
+	 * @model
+	 * @generated
+	 */
+	String getEntityName();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Component#getEntityName <em>Entity Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Entity Name</em>' attribute.
+	 * @see #getEntityName()
+	 * @generated
+	 */
+	void setEntityName(String value);
 } // Component

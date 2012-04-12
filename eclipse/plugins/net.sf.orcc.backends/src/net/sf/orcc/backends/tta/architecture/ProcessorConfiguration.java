@@ -40,16 +40,15 @@ import org.eclipse.emf.common.util.Enumerator;
  * <!-- begin-user-doc --> A representation of the literals of the enumeration '
  * <em><b>Processor Configuration</b></em>', and utility methods for working
  * with them. <!-- end-user-doc -->
- * 
  * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getProcessorConfiguration()
  * @model
  * @generated
  */
 public enum ProcessorConfiguration implements Enumerator {
 	/**
-	 * The '<em><b>Standard</b></em>' literal object. <!-- begin-user-doc -->
+	 * The '<em><b>Standard</b></em>' literal object.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * 
 	 * @see #STANDARD_VALUE
 	 * @generated
 	 * @ordered
@@ -57,9 +56,9 @@ public enum ProcessorConfiguration implements Enumerator {
 	STANDARD(0, "Standard", "Standard"),
 
 	/**
-	 * The '<em><b>Custom</b></em>' literal object. <!-- begin-user-doc --> <!--
+	 * The '<em><b>Custom</b></em>' literal object.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
 	 * @see #CUSTOM_VALUE
 	 * @generated
 	 * @ordered
@@ -67,9 +66,9 @@ public enum ProcessorConfiguration implements Enumerator {
 	CUSTOM(1, "Custom", "Custom"),
 
 	/**
-	 * The '<em><b>Huge</b></em>' literal object. <!-- begin-user-doc --> <!--
+	 * The '<em><b>Huge</b></em>' literal object.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
 	 * @see #HUGE_VALUE
 	 * @generated
 	 * @ordered
@@ -77,13 +76,13 @@ public enum ProcessorConfiguration implements Enumerator {
 	HUGE(2, "Huge", "Huge");
 
 	/**
-	 * The '<em><b>Standard</b></em>' literal value. <!-- begin-user-doc -->
+	 * The '<em><b>Standard</b></em>' literal value.
+	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of '<em><b>Standard</b></em>' literal object isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
 	 * @see #STANDARD
 	 * @model name="Standard"
 	 * @generated
@@ -92,13 +91,13 @@ public enum ProcessorConfiguration implements Enumerator {
 	public static final int STANDARD_VALUE = 0;
 
 	/**
-	 * The '<em><b>Custom</b></em>' literal value. <!-- begin-user-doc -->
+	 * The '<em><b>Custom</b></em>' literal value.
+	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of '<em><b>Custom</b></em>' literal object isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
 	 * @see #CUSTOM
 	 * @model name="Custom"
 	 * @generated
@@ -107,13 +106,13 @@ public enum ProcessorConfiguration implements Enumerator {
 	public static final int CUSTOM_VALUE = 1;
 
 	/**
-	 * The '<em><b>Huge</b></em>' literal value. <!-- begin-user-doc -->
+	 * The '<em><b>Huge</b></em>' literal value.
+	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of '<em><b>Huge</b></em>' literal object isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
 	 * @see #HUGE
 	 * @model name="Huge"
 	 * @generated
@@ -122,28 +121,25 @@ public enum ProcessorConfiguration implements Enumerator {
 	public static final int HUGE_VALUE = 2;
 
 	/**
-	 * An array of all the '<em><b>Processor Configuration</b></em>'
-	 * enumerators. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * An array of all the '<em><b>Processor Configuration</b></em>' enumerators.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	private static final ProcessorConfiguration[] VALUES_ARRAY = new ProcessorConfiguration[] {
 			STANDARD, CUSTOM, HUGE, };
 
 	/**
-	 * A public read-only list of all the '
-	 * <em><b>Processor Configuration</b></em>' enumerators. <!-- begin-user-doc
+	 * A public read-only list of all the '<em><b>Processor Configuration</b></em>' enumerators.
+	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public static final List<ProcessorConfiguration> VALUES = Collections
 			.unmodifiableList(Arrays.asList(VALUES_ARRAY));
 
 	/**
-	 * Returns the '<em><b>Processor Configuration</b></em>' literal with the
-	 * specified literal value. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * Returns the '<em><b>Processor Configuration</b></em>' literal with the specified literal value.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public static ProcessorConfiguration get(String literal) {
@@ -157,9 +153,8 @@ public enum ProcessorConfiguration implements Enumerator {
 	}
 
 	/**
-	 * Returns the '<em><b>Processor Configuration</b></em>' literal with the
-	 * specified name. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * Returns the '<em><b>Processor Configuration</b></em>' literal with the specified name.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public static ProcessorConfiguration getByName(String name) {
@@ -173,9 +168,8 @@ public enum ProcessorConfiguration implements Enumerator {
 	}
 
 	/**
-	 * Returns the '<em><b>Processor Configuration</b></em>' literal with the
-	 * specified integer value. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * Returns the '<em><b>Processor Configuration</b></em>' literal with the specified integer value.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public static ProcessorConfiguration get(int value) {
@@ -192,29 +186,26 @@ public enum ProcessorConfiguration implements Enumerator {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	private final int value;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	private final String name;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	private final String literal;
 
 	/**
-	 * Only this class can construct instances. <!-- begin-user-doc --> <!--
+	 * Only this class can construct instances.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	private ProcessorConfiguration(int value, String name, String literal) {
@@ -225,7 +216,6 @@ public enum ProcessorConfiguration implements Enumerator {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public int getValue() {
@@ -234,7 +224,6 @@ public enum ProcessorConfiguration implements Enumerator {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public String getName() {
@@ -243,7 +232,6 @@ public enum ProcessorConfiguration implements Enumerator {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public String getLiteral() {
@@ -251,9 +239,8 @@ public enum ProcessorConfiguration implements Enumerator {
 	}
 
 	/**
-	 * Returns the literal value of the enumerator, which is its string
-	 * representation. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * Returns the literal value of the enumerator, which is its string representation.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override

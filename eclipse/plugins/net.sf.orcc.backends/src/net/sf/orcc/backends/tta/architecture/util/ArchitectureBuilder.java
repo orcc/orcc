@@ -8,6 +8,7 @@ import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.tta.architecture.Component;
 import net.sf.orcc.backends.tta.architecture.Design;
+import net.sf.orcc.backends.tta.architecture.DesignConfiguration;
 import net.sf.orcc.backends.tta.architecture.ProcessorConfiguration;
 import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.df.Broadcast;
@@ -20,20 +21,21 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 
 	private ArchitectureFactory factory = ArchitectureFactory.eINSTANCE;
 	private Design design;
+	private DesignConfiguration conf;
 
 	private Map<Vertex, Vertex> vertexMap;
 	private Map<Edge, Edge> edgeMap;
 
 	private Mapping mapping;
 
-	public ArchitectureBuilder() {
+	public ArchitectureBuilder(DesignConfiguration conf) {
 		design = factory.createDesign();
 		vertexMap = new HashMap<Vertex, Vertex>();
 		edgeMap = new HashMap<Edge, Edge>();
 	}
 
-	public ArchitectureBuilder(Mapping mapping) {
-		this();
+	public ArchitectureBuilder(DesignConfiguration conf, Mapping mapping) {
+		this.conf = conf;
 		this.mapping = mapping;
 	}
 
@@ -43,7 +45,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 			// One-to-one mapping
 			for (Instance instance : network.getInstances()) {
 				Vertex vertex;
-				if (!instance.getActor().isNative()) {
+				if (instance.getActor().isNative()) {
 					vertex = factory.createComponent();
 				} else {
 					int memorySize = ArchitectureMemoryStats
