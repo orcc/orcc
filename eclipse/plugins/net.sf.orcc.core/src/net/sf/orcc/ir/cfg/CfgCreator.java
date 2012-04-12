@@ -30,13 +30,13 @@ package net.sf.orcc.ir.cfg;
 
 import static net.sf.orcc.ir.IrFactory.eINSTANCE;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.GraphPackage;
+import net.sf.dftools.graph.util.Dota;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.FSM;
@@ -185,10 +185,14 @@ public class CfgCreator extends DfSwitch<Void> {
 	 * Transforms multiple conditioned branches to a series of binary branches.
 	 */
 	private void normalizeConditionals() {
-		List<CfgNode> nodes = new ArrayList<CfgNode>(cfg.getNodes());
-		for (CfgNode node : nodes) {
-			normalizeEdges(node, GraphPackage.Literals.VERTEX__INCOMING);
+		List<CfgNode> nodes = cfg.getNodes();
+
+		// visits all nodes (including newly-created ones)
+		// using nodes.size() instead of a constant is intended
+		for (int i = 0; i < nodes.size(); i++) {
+			CfgNode node = nodes.get(i);
 			normalizeEdges(node, GraphPackage.Literals.VERTEX__OUTGOING);
+			normalizeEdges(node, GraphPackage.Literals.VERTEX__INCOMING);
 		}
 	}
 
@@ -207,6 +211,8 @@ public class CfgCreator extends DfSwitch<Void> {
 			} else {
 				cfg.add(node, newNode);
 			}
+
+			System.out.println(new Dota().printDot(cfg));
 		}
 	}
 
