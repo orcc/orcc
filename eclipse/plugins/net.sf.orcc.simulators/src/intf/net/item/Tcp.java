@@ -95,8 +95,9 @@ public class Tcp extends IntfNet {
 				return true;
 			} else {
 				if (socket != null) {
-					if (socket.isConnectionPending())
-						socket.finishConnect();
+					if (socket.isConnectionPending()){
+						while(!socket.finishConnect());
+					}
 					return socket.isConnected();
 				}
 				return false;
