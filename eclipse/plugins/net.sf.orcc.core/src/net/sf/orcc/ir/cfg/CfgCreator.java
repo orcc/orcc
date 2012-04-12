@@ -108,13 +108,23 @@ public class CfgCreator extends DfSwitch<Void> {
 	private void convertActionsToCfg(List<Action> actions) {
 		CfgNode loopHeader = addNode("loop");
 		cfg.add(cfg.getEntry(), loopHeader);
+		CfgNode first, last;
+		if (actions.size() >= 2) {
+			first = addNode("if");
+			cfg.add(loopHeader, first);
+			last = addNode("join");
+			cfg.add(last, loopHeader);
+		} else {
+			first = loopHeader;
+			last = loopHeader;
+		}
 
 		for (Action action : actions) {
 			CfgNode bbNode = addNode(action.getName());
 			bbNode.setAttribute("action", action);
 
-			cfg.add(loopHeader, bbNode);
-			cfg.add(bbNode, loopHeader);
+			cfg.add(first, bbNode);
+			cfg.add(bbNode, last);
 		}
 	}
 
