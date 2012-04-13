@@ -58,7 +58,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 				.getTarget().getLabel() : connection.getTargetPort().getName();
 
 		if (source != null && target != null) {
-			String name = "fifo_" + connection.getAttribute("id");
+			String name = "fifo_" + connection.getAttribute("id").getValue();
 			Component fifo = factory.createComponent(name, "fifo");
 
 			int size = connection.getSize();
@@ -190,7 +190,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		} else {
 			int memorySize = computeNeededMemorySize(instance);
 			String name = instance.getSimpleName();
-			Processor processor = factory.createProcessor(name + "inst",
+			Processor processor = factory.createProcessor(name + "_inst",
 					"processor_" + name, ProcessorConfiguration.STANDARD,
 					memorySize);
 			design.getProcessors().add(processor);

@@ -31,14 +31,17 @@
 package net.sf.orcc.backends.tta.architecture.impl;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.impl.VertexImpl;
 import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.Component;
 import net.sf.orcc.backends.tta.architecture.Port;
 import net.sf.orcc.backends.tta.architecture.Signal;
+import net.sf.orcc.df.Connection;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -310,14 +313,26 @@ public class ComponentImpl extends VertexImpl implements Component {
 
 	@Override
 	public Map<Port, Signal> getIncomingPortMap() {
-		// TODO Auto-generated method stub
-		return null;
+		Map<Port, Signal> map = new HashMap<Port, Signal>();
+		for (Edge edge : getIncoming()) {
+			if (edge instanceof Signal) {
+				Signal signal = (Signal) edge;
+				map.put(signal.getTargetPort(), signal);
+			}
+		}
+		return map;
 	}
 
 	@Override
 	public Map<Port, Signal> getOutgoingPortMap() {
-		// TODO Auto-generated method stub
-		return null;
+		Map<Port, Signal> map = new HashMap<Port, Signal>();
+		for (Edge edge : getOutgoing()) {
+			if (edge instanceof Connection) {
+				Signal signal = (Signal) edge;
+				map.put(signal.getSourcePort(), signal);
+			}
+		}
+		return map;
 	}
 
 	@Override
