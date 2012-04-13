@@ -59,7 +59,7 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
    </url>
 
    <requires>
-      <import feature="net.sf.graphiti" version="1.3.9.v20120313"/>
+      <import feature="net.sf.graphiti" version="0.0.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
