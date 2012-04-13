@@ -119,28 +119,28 @@ assignPort(port, signal) ::= <<
 assignComponent(component) ::= <<
 <component.name> : entity work.<component.entityName>
   generic map()
-  port map(clk          =\> clk,
+  port map(clk =\> clk,
   	       <component.inputs: { input | <assignPort(input, component.incomingPortMap.(input))> }; separator="\n">
            <component.outputs: { output | <assignPort(output, component.outgoingPortMap.(output))> }; separator="\n">
-           rst_n        =\> rst_n);
+           rst_n =\> rst_n);
 >>
 
 assignFifo(fifo) ::= <<
 <fifo.name> : entity work.<fifo.entityName>
   generic map(device_family =\> "<options.fpga.family>")
-  port map(clk          =\> clk,
-  	       <fifo.inputs: { input | <assignPort(input, fifo.incomingPortMap.(input))> }; separator="\n">
+  port map(clk =\> clk,
+           <fifo.inputs: { input | <assignPort(input, fifo.incomingPortMap.(input))> }; separator="\n">
            <fifo.outputs: { output | <assignPort(output, fifo.outgoingPortMap.(output))> }; separator="\n">
-           rst_n        =\> rst_n);
+           rst_n =\> rst_n);
 >>
 
 assignProcessor(processor) ::= <<
 <processor.name> : entity work.<processor.entityName>
   generic map(device_family =\> "<options.fpga.family>")
-  port map(clk          =\> clk,
+  port map(clk =\> clk,
            <processor.inputs: { input | <assignPort(input, processor.incomingPortMap.(input))> }; separator="\n">
            <processor.outputs: { output | <assignPort(output, processor.outgoingPortMap.(output))> }; separator="\n">
-           rst_n        =\> rst_n);
+           rst_n =\> rst_n);
 >>
 
 assignBroadcast(broadcast) ::= <<

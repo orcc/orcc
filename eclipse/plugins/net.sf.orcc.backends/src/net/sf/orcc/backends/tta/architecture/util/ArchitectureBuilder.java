@@ -58,8 +58,8 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 				.getTarget().getLabel() : connection.getTargetPort().getName();
 
 		if (source != null && target != null) {
-			String name = "fifo_" + connection.getAttribute("id").getValue();
-			Component fifo = factory.createComponent(name, "fifo");
+			String id = connection.getAttribute("id").getValue().toString();
+			Component fifo = factory.createComponent("fifo_" + id, "fifo");
 
 			int size = connection.getSize();
 			fifo.setAttribute("size", size);
@@ -70,10 +70,10 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 			// Ports
 			Port fifo_rdreq = fifo.createInput("rdreq");
 			Port fifo_data = fifo.createInput("data");
-			Port fifo_nb_tokens = fifo.createOutput("nb_tokens");
+			Port fifo_nb_tokens = fifo.createOutput("tokens");
 			Port fifo_wreq = fifo.createInput("wreq");
-			Port fifo_q = fifo.createOutput("q");
-			Port fifo_nb_freerooms = fifo.createOutput("nb_freerooms");
+			Port fifo_q = fifo.createOutput("queue");
+			Port fifo_nb_freerooms = fifo.createOutput("rooms");
 
 			Port tgt_data = target.createInput("in_" + tgtCalPort + "_data");
 			Port tgt_nb_tokens = target.createInput("in_" + tgtCalPort
@@ -85,19 +85,18 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 			Port src_ack = source.createOutput("out_" + srcCalPort + "_ack");
 
 			// Signals
-			Signal s_data = factory.createSignal(name + "_data", source, fifo,
+			Signal s_data = factory.createSignal("s_data_" + id, source, fifo,
 					src_data, fifo_data);
-			Signal s_wrreq = factory.createSignal(name + "_wrreq", source,
+			Signal s_wrreq = factory.createSignal("s_wrreq_" + id, source,
 					fifo, src_ack, fifo_wreq);
-			Signal s_nb_freerooms = factory.createSignal(
-					name + "_nb_freerooms", fifo, source, fifo_nb_freerooms,
-					src_nb_freerooms);
-			Signal s_q = factory.createSignal(name + "_q", fifo, target,
+			Signal s_nb_freerooms = factory.createSignal("s_rooms_" + id, fifo,
+					source, fifo_nb_freerooms, src_nb_freerooms);
+			Signal s_q = factory.createSignal("s_queue_" + id, fifo, target,
 					fifo_q, tgt_data);
-			Signal s_rdreq = factory.createSignal(name + "_rdreq", target,
+			Signal s_rdreq = factory.createSignal("s_rdreq_" + id, target,
 					fifo, tgt_ack, fifo_rdreq);
-			Signal s_nb_tokens = factory.createSignal(name + "_nb_tokens",
-					fifo, target, fifo_nb_tokens, tgt_nb_tokens);
+			Signal s_nb_tokens = factory.createSignal("s_tokens_" + id, fifo,
+					target, fifo_nb_tokens, tgt_nb_tokens);
 
 			design.add(s_data);
 			design.add(s_wrreq);

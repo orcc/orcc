@@ -41,7 +41,6 @@ import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.Component;
 import net.sf.orcc.backends.tta.architecture.Port;
 import net.sf.orcc.backends.tta.architecture.Signal;
-import net.sf.orcc.df.Connection;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -327,7 +326,7 @@ public class ComponentImpl extends VertexImpl implements Component {
 	public Map<Port, Signal> getOutgoingPortMap() {
 		Map<Port, Signal> map = new HashMap<Port, Signal>();
 		for (Edge edge : getOutgoing()) {
-			if (edge instanceof Connection) {
+			if (edge instanceof Signal) {
 				Signal signal = (Signal) edge;
 				map.put(signal.getSourcePort(), signal);
 			}
@@ -345,7 +344,7 @@ public class ComponentImpl extends VertexImpl implements Component {
 	@Override
 	public Port createOutput(String name) {
 		Port port = ArchitectureFactory.eINSTANCE.createPort(name);
-		getInputs().add(port);
+		getOutputs().add(port);
 		return port;
 	}
 
