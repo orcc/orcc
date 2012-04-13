@@ -63,6 +63,9 @@ import net.sf.orcc.backends.tta.architecture.Socket;
 import net.sf.orcc.backends.tta.architecture.Term;
 import net.sf.orcc.backends.tta.architecture.TermBool;
 import net.sf.orcc.backends.tta.architecture.TermUnit;
+import net.sf.orcc.backends.tta.architecture.Type;
+import net.sf.orcc.backends.tta.architecture.TypeLogic;
+import net.sf.orcc.backends.tta.architecture.TypeVector;
 import net.sf.orcc.backends.tta.architecture.Writes;
 
 import org.eclipse.emf.common.notify.Adapter;
@@ -146,6 +149,21 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 		@Override
 		public Adapter caseProcessor(Processor object) {
 			return createProcessorAdapter();
+		}
+
+		@Override
+		public Adapter caseType(Type object) {
+			return createTypeAdapter();
+		}
+
+		@Override
+		public Adapter caseTypeVector(TypeVector object) {
+			return createTypeVectorAdapter();
+		}
+
+		@Override
+		public Adapter caseTypeLogic(TypeLogic object) {
+			return createTypeLogicAdapter();
 		}
 
 		@Override
@@ -366,6 +384,48 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createProcessorAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.Type <em>Type</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.tta.architecture.Type
+	 * @generated
+	 */
+	public Adapter createTypeAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.TypeVector <em>Type Vector</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.tta.architecture.TypeVector
+	 * @generated
+	 */
+	public Adapter createTypeVectorAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.TypeLogic <em>Type Logic</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.tta.architecture.TypeLogic
+	 * @generated
+	 */
+	public Adapter createTypeLogicAdapter() {
 		return null;
 	}
 

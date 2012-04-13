@@ -67,6 +67,9 @@ import net.sf.orcc.backends.tta.architecture.SocketType;
 import net.sf.orcc.backends.tta.architecture.Term;
 import net.sf.orcc.backends.tta.architecture.TermBool;
 import net.sf.orcc.backends.tta.architecture.TermUnit;
+import net.sf.orcc.backends.tta.architecture.Type;
+import net.sf.orcc.backends.tta.architecture.TypeLogic;
+import net.sf.orcc.backends.tta.architecture.TypeVector;
 import net.sf.orcc.backends.tta.architecture.Writes;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.ir.IrPackage;
@@ -111,6 +114,27 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	private EClass processorEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass typeEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass typeVectorEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass typeLogicEClass = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -490,7 +514,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getSignal_SourcePort() {
+	public EReference getSignal_Type() {
 		return (EReference) signalEClass.getEStructuralFeatures().get(1);
 	}
 
@@ -499,8 +523,17 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getSignal_TargetPort() {
+	public EReference getSignal_SourcePort() {
 		return (EReference) signalEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getSignal_TargetPort() {
+		return (EReference) signalEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -642,6 +675,42 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 */
 	public EAttribute getProcessor_Configuration() {
 		return (EAttribute) processorEClass.getEStructuralFeatures().get(10);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getType() {
+		return typeEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getType_Size() {
+		return (EAttribute) typeEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getTypeVector() {
+		return typeVectorEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getTypeLogic() {
+		return typeLogicEClass;
 	}
 
 	/**
@@ -984,6 +1053,15 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 */
 	public EAttribute getPort_Name() {
 		return (EAttribute) portEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getPort_Type() {
+		return (EReference) portEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -1466,6 +1544,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 		signalEClass = createEClass(SIGNAL);
 		createEAttribute(signalEClass, SIGNAL__NAME);
+		createEReference(signalEClass, SIGNAL__TYPE);
 		createEReference(signalEClass, SIGNAL__SOURCE_PORT);
 		createEReference(signalEClass, SIGNAL__TARGET_PORT);
 
@@ -1477,6 +1556,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 		portEClass = createEClass(PORT);
 		createEAttribute(portEClass, PORT__NAME);
+		createEReference(portEClass, PORT__TYPE);
 
 		processorEClass = createEClass(PROCESSOR);
 		createEReference(processorEClass, PROCESSOR__GCU);
@@ -1490,6 +1570,13 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEReference(processorEClass, PROCESSOR__HARDWARE_DATABASE);
 		createEReference(processorEClass, PROCESSOR__MAPPED_ACTORS);
 		createEAttribute(processorEClass, PROCESSOR__CONFIGURATION);
+
+		typeEClass = createEClass(TYPE);
+		createEAttribute(typeEClass, TYPE__SIZE);
+
+		typeVectorEClass = createEClass(TYPE_VECTOR);
+
+		typeLogicEClass = createEClass(TYPE_LOGIC);
 
 		busEClass = createEClass(BUS);
 		createEAttribute(busEClass, BUS__NAME);
@@ -1660,6 +1747,8 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		componentEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		portEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		processorEClass.getESuperTypes().add(this.getComponent());
+		typeVectorEClass.getESuperTypes().add(this.getType());
+		typeLogicEClass.getESuperTypes().add(this.getType());
 		readsEClass.getESuperTypes().add(this.getElement());
 		writesEClass.getESuperTypes().add(this.getElement());
 		resourceEClass.getESuperTypes().add(this.getElement());
@@ -1716,6 +1805,10 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				null, 0, 1, Signal.class, IS_TRANSIENT, IS_VOLATILE,
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED,
 				IS_ORDERED);
+		initEReference(getSignal_Type(), this.getType(), null, "type", null, 0,
+				1, Signal.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
 		initEReference(getSignal_SourcePort(), this.getPort(), null,
 				"sourcePort", null, 0, 1, Signal.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
@@ -1750,6 +1843,10 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				null, 0, 1, Port.class, IS_TRANSIENT, IS_VOLATILE,
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED,
 				IS_ORDERED);
+		initEReference(getPort_Type(), this.getType(), null, "type", null, 0,
+				1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
 
 		initEClass(processorEClass, Processor.class, "Processor", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -1801,6 +1898,18 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				this.getProcessorConfiguration(), "configuration", null, 0, 1,
 				Processor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
 				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(typeEClass, Type.class, "Type", IS_ABSTRACT, IS_INTERFACE,
+				IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getType_Size(), theEcorePackage.getEInt(), "size", null,
+				0, 1, Type.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(typeVectorEClass, TypeVector.class, "TypeVector",
+				!IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+
+		initEClass(typeLogicEClass, TypeLogic.class, "TypeLogic", !IS_ABSTRACT,
+				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(busEClass, Bus.class, "Bus", !IS_ABSTRACT, !IS_INTERFACE,
 				IS_GENERATED_INSTANCE_CLASS);

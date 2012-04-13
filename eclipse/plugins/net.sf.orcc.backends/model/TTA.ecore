@@ -23,6 +23,7 @@
   <eClassifiers xsi:type="ecore:EClass" name="Signal" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Edge">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"
         volatile="true" transient="true" derived="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//Type" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="sourcePort" eType="#//Port"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="targetPort" eType="#//Port"/>
   </eClassifiers>
@@ -38,6 +39,7 @@
   <eClassifiers xsi:type="ecore:EClass" name="Port" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Vertex">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"
         volatile="true" transient="true" derived="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//Type" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Processor" eSuperTypes="#//Component">
     <eStructuralFeatures xsi:type="ecore:EReference" name="gcu" eType="#//GlobalControlUnit"
@@ -62,6 +64,11 @@
         eType="ecore:EClass ../../net.sf.orcc.core/model/Df.ecore#//Instance"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="configuration" eType="#//ProcessorConfiguration"/>
   </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Type" abstract="true" interface="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="size" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TypeVector" eSuperTypes="#//Type"/>
+  <eClassifiers xsi:type="ecore:EClass" name="TypeLogic" eSuperTypes="#//Type"/>
   <eClassifiers xsi:type="ecore:EEnum" name="DesignConfiguration">
     <eLiterals name="DirectMapping"/>
     <eLiterals name="Hade" value="1"/>

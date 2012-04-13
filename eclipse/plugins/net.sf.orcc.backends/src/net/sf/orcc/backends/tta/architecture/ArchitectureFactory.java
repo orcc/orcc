@@ -413,8 +413,12 @@ public interface ArchitectureFactory extends EFactory {
 	 * @generated
 	 */
 	Port createPort();
+	
+	Port createPortVec32(String name);
+	
+	Port createPortLogic(String name);
 
-	Port createPort(String name);
+	Port createPort(String name, Type type);
 
 	/**
 	 * Returns a new object of class '<em>Processor</em>'.
@@ -424,6 +428,26 @@ public interface ArchitectureFactory extends EFactory {
 	 * @generated
 	 */
 	Processor createProcessor();
+
+	/**
+	 * Returns a new object of class '<em>Type Vector</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Type Vector</em>'.
+	 * @generated
+	 */
+	TypeVector createTypeVector();
+	
+	TypeVector createTypeVector(int size);
+
+	/**
+	 * Returns a new object of class '<em>Type Logic</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Type Logic</em>'.
+	 * @generated
+	 */
+	TypeLogic createTypeLogic();
 
 	/**
 	 * Returns a simple TTA processor corresponding to default TTA processor

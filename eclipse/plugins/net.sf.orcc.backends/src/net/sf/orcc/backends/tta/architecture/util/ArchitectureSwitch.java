@@ -63,6 +63,9 @@ import net.sf.orcc.backends.tta.architecture.Socket;
 import net.sf.orcc.backends.tta.architecture.Term;
 import net.sf.orcc.backends.tta.architecture.TermBool;
 import net.sf.orcc.backends.tta.architecture.TermUnit;
+import net.sf.orcc.backends.tta.architecture.Type;
+import net.sf.orcc.backends.tta.architecture.TypeLogic;
+import net.sf.orcc.backends.tta.architecture.TypeVector;
 import net.sf.orcc.backends.tta.architecture.Writes;
 
 import org.eclipse.emf.ecore.EObject;
@@ -173,6 +176,31 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 				result = caseVertex(processor);
 			if (result == null)
 				result = caseAttributable(processor);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.TYPE: {
+			Type type = (Type) theEObject;
+			T result = caseType(type);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.TYPE_VECTOR: {
+			TypeVector typeVector = (TypeVector) theEObject;
+			T result = caseTypeVector(typeVector);
+			if (result == null)
+				result = caseType(typeVector);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.TYPE_LOGIC: {
+			TypeLogic typeLogic = (TypeLogic) theEObject;
+			T result = caseTypeLogic(typeLogic);
+			if (result == null)
+				result = caseType(typeLogic);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -431,6 +459,51 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseProcessor(Processor object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Type</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Type</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseType(Type object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Type Vector</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Type Vector</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseTypeVector(TypeVector object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Type Logic</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Type Logic</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseTypeLogic(TypeLogic object) {
 		return null;
 	}
 

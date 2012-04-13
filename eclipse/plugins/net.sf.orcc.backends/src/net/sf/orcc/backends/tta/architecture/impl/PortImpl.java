@@ -32,7 +32,12 @@ import net.sf.dftools.graph.impl.VertexImpl;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.Port;
 
+import net.sf.orcc.backends.tta.architecture.Type;
+import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.InternalEObject;
+import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
 /**
  * <!-- begin-user-doc --> An implementation of the model object '
@@ -40,18 +45,17 @@ import org.eclipse.emf.ecore.EClass;
  * <p>
  * The following features are implemented:
  * <ul>
- * <li>{@link net.sf.orcc.backends.tta.architecture.impl.PortImpl#getName <em>
- * Name</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.PortImpl#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.PortImpl#getType <em>Type</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class PortImpl extends VertexImpl implements Port {
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -59,8 +63,17 @@ public class PortImpl extends VertexImpl implements Port {
 	protected static final String NAME_EDEFAULT = null;
 
 	/**
+	 * The cached value of the '{@link #getType() <em>Type</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getType()
+	 * @generated
+	 * @ordered
+	 */
+	protected Type type;
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	protected PortImpl() {
@@ -69,7 +82,6 @@ public class PortImpl extends VertexImpl implements Port {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -92,8 +104,75 @@ public class PortImpl extends VertexImpl implements Port {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Type getType() {
+		return type;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetType(Type newType, NotificationChain msgs) {
+		Type oldType = type;
+		type = newType;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, ArchitecturePackage.PORT__TYPE, oldType,
+					newType);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setType(Type newType) {
+		if (newType != type) {
+			NotificationChain msgs = null;
+			if (type != null)
+				msgs = ((InternalEObject) type)
+						.eInverseRemove(this, EOPPOSITE_FEATURE_BASE
+								- ArchitecturePackage.PORT__TYPE, null, msgs);
+			if (newType != null)
+				msgs = ((InternalEObject) newType)
+						.eInverseAdd(this, EOPPOSITE_FEATURE_BASE
+								- ArchitecturePackage.PORT__TYPE, null, msgs);
+			msgs = basicSetType(newType, msgs);
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.PORT__TYPE, newType, newType));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
+		switch (featureID) {
+		case ArchitecturePackage.PORT__TYPE:
+			return basicSetType(null, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -101,13 +180,14 @@ public class PortImpl extends VertexImpl implements Port {
 		switch (featureID) {
 		case ArchitecturePackage.PORT__NAME:
 			return getName();
+		case ArchitecturePackage.PORT__TYPE:
+			return getType();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -116,13 +196,15 @@ public class PortImpl extends VertexImpl implements Port {
 		case ArchitecturePackage.PORT__NAME:
 			setName((String) newValue);
 			return;
+		case ArchitecturePackage.PORT__TYPE:
+			setType((Type) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -131,13 +213,15 @@ public class PortImpl extends VertexImpl implements Port {
 		case ArchitecturePackage.PORT__NAME:
 			setName(NAME_EDEFAULT);
 			return;
+		case ArchitecturePackage.PORT__TYPE:
+			setType((Type) null);
+			return;
 		}
 		super.eUnset(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -146,6 +230,8 @@ public class PortImpl extends VertexImpl implements Port {
 		case ArchitecturePackage.PORT__NAME:
 			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT
 					.equals(getName());
+		case ArchitecturePackage.PORT__TYPE:
+			return type != null;
 		}
 		return super.eIsSet(featureID);
 	}

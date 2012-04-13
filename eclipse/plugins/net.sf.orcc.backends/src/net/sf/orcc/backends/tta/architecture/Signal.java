@@ -41,6 +41,7 @@ import net.sf.dftools.graph.Edge;
  * The following features are supported:
  * <ul>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Signal#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Signal#getType <em>Type</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Signal#getSourcePort <em>Source Port</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Signal#getTargetPort <em>Target Port</em>}</li>
  * </ul>
@@ -77,6 +78,32 @@ public interface Signal extends Edge {
 	 * @generated
 	 */
 	void setName(String value);
+
+	/**
+	 * Returns the value of the '<em><b>Type</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Type</em>' containment reference isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Type</em>' containment reference.
+	 * @see #setType(Type)
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getSignal_Type()
+	 * @model containment="true"
+	 * @generated
+	 */
+	Type getType();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Signal#getType <em>Type</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Type</em>' containment reference.
+	 * @see #getType()
+	 * @generated
+	 */
+	void setType(Type value);
 
 	/**
 	 * Returns the value of the '<em><b>Source Port</b></em>' reference.

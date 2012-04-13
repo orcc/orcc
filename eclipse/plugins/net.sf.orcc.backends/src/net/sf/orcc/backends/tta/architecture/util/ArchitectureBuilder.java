@@ -58,57 +58,71 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		String tgtCalPort = connection.getTargetPort() == null ? connection
 				.getTarget().getLabel() : connection.getTargetPort().getName();
 
-		if (source != null && target != null) {
-			String id = connection.getAttribute("id").getValue().toString();
-			Component fifo = factory.createComponent("fifo_" + id, "fifo");
+		String id = connection.getAttribute("id").getValue().toString();
+		Component fifo = factory.createComponent("fifo_" + id, "fifo");
 
-			int size = connection.getSize();
-			fifo.setAttribute("size", size);
-			fifo.setAttribute("width", 32);
-			fifo.setAttribute("widthu",
-					(int) Math.ceil(Math.log(size) / Math.log(2)));
+		// Generics
+		int size = connection.getSize();
+		fifo.setAttribute("size", size);
+		fifo.setAttribute("width", 32);
+		fifo.setAttribute("widthu",
+				(int) Math.ceil(Math.log(size) / Math.log(2)));
 
-			// Ports
-			Port fifo_rdreq = fifo.createInput("rdreq");
-			Port fifo_data = fifo.createInput("data");
-			Port fifo_nb_tokens = fifo.createOutput("tokens");
-			Port fifo_wreq = fifo.createInput("wreq");
-			Port fifo_q = fifo.createOutput("queue");
-			Port fifo_nb_freerooms = fifo.createOutput("rooms");
+		// FIFO ports
+		Port fifo_rdreq = factory.createPortLogic("rdreq");
+		fifo.addInput(fifo_rdreq);
+		Port fifo_data = factory.createPortVec32("data");
+		fifo.addInput(fifo_data);
+		Port fifo_tokens = factory.createPortVec32("tokens");
+		fifo.addOutput(fifo_tokens);
+		Port fifo_wreq = factory.createPortLogic("wreq");
+		fifo.addInput(fifo_wreq);
+		Port fifo_queue = factory.createPortVec32("queue");
+		fifo.addOutput(fifo_queue);
+		Port fifo_rooms = factory.createPortVec32("rooms");
+		fifo.addOutput(fifo_rooms);
 
-			Port tgt_data = target.createInput("in_" + tgtCalPort + "_data");
-			Port tgt_nb_tokens = target.createInput("in_" + tgtCalPort
-					+ "_nb_tokens");
-			Port tgt_ack = target.createOutput("in_" + tgtCalPort + "_ack");
-			Port src_data = source.createOutput("out_" + srcCalPort + "_data");
-			Port src_nb_freerooms = source.createInput("out_" + srcCalPort
-					+ "_nb_freerooms");
-			Port src_ack = source.createOutput("out_" + srcCalPort + "_ack");
+		// Target ports
+		Port tgt_data = factory.createPortVec32("in_" + tgtCalPort + "_data");
+		target.addInput(tgt_data);
+		Port tgt_tokens = factory.createPortVec32("in_" + tgtCalPort
+				+ "_tokens");
+		target.addInput(tgt_tokens);
+		Port tgt_ack = factory.createPortLogic("in_" + tgtCalPort + "_ack");
+		target.addOutput(tgt_ack);
 
-			// Signals
-			Signal s_data = factory.createSignal("s_data_" + id, source, fifo,
-					src_data, fifo_data);
-			Signal s_wrreq = factory.createSignal("s_wrreq_" + id, source,
-					fifo, src_ack, fifo_wreq);
-			Signal s_nb_freerooms = factory.createSignal("s_rooms_" + id, fifo,
-					source, fifo_nb_freerooms, src_nb_freerooms);
-			Signal s_q = factory.createSignal("s_queue_" + id, fifo, target,
-					fifo_q, tgt_data);
-			Signal s_rdreq = factory.createSignal("s_rdreq_" + id, target,
-					fifo, tgt_ack, fifo_rdreq);
-			Signal s_nb_tokens = factory.createSignal("s_tokens_" + id, fifo,
-					target, fifo_nb_tokens, tgt_nb_tokens);
+		// Source ports
+		Port src_data = factory.createPortVec32("out_" + srcCalPort + "_data");
+		source.addOutput(src_data);
+		Port src_rooms = factory
+				.createPortVec32("out_" + srcCalPort + "_rooms");
+		source.addOutput(src_rooms);
+		Port src_ack = factory.createPortLogic("out_" + srcCalPort + "_ack");
+		source.addOutput(src_ack);
 
-			design.add(s_data);
-			design.add(s_wrreq);
-			design.add(s_nb_freerooms);
-			design.add(s_q);
-			design.add(s_rdreq);
-			design.add(s_nb_tokens);
+		// Signals
+		Signal s_data = factory.createSignal("s_data_" + id, source, fifo,
+				src_data, fifo_data);
+		Signal s_wrreq = factory.createSignal("s_wrreq_" + id, source, fifo,
+				src_ack, fifo_wreq);
+		Signal s_rooms = factory.createSignal("s_rooms_" + id, fifo, source,
+				fifo_rooms, src_rooms);
+		Signal s_q = factory.createSignal("s_queue_" + id, fifo, target,
+				fifo_queue, tgt_data);
+		Signal s_rdreq = factory.createSignal("s_rdreq_" + id, target, fifo,
+				tgt_ack, fifo_rdreq);
+		Signal s_tokens = factory.createSignal("s_tokens_" + id, fifo, target,
+				fifo_tokens, tgt_tokens);
 
-			design.add(fifo);
-			design.getFifos().add(fifo);
-		}
+		design.add(s_data);
+		design.add(s_wrreq);
+		design.add(s_rooms);
+		design.add(s_q);
+		design.add(s_rdreq);
+		design.add(s_tokens);
+
+		design.add(fifo);
+		design.getFifos().add(fifo);
 	}
 
 	private void addSignal(Connection connection) {
@@ -123,22 +137,30 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		if (source == null) {
 			sourcePort = portMap.get(connection.getSource());
 		} else if (source.isProcessor()) {
-			sourcePort = source.createOutput("out_" + srcCalPort + "_data");
-			source.createInput("out_" + srcCalPort + "_nb_freerooms");
-			source.createOutput("out_" + srcCalPort + "_ack");
+			sourcePort = factory.createPortVec32("out_" + srcCalPort + "_data");
+			source.addOutput(sourcePort);
+			source.addInput(factory.createPortVec32("out_" + srcCalPort
+					+ "_rooms"));
+			source.addOutput(factory.createPortLogic("out_" + srcCalPort
+					+ "_ack"));
 		} else {
-			sourcePort = source.createOutput(srcCalPort);
+			sourcePort = factory.createPortVec32(srcCalPort);
+			source.addOutput(sourcePort);
 		}
 
 		Port targetPort;
 		if (target == null) {
 			targetPort = portMap.get(connection.getSource());
 		} else if (target.isProcessor()) {
-			targetPort = target.createInput("in_" + tgtCalPort + "_data");
-			target.createInput("in_" + tgtCalPort + "_nb_tokens");
-			target.createOutput("in_" + tgtCalPort + "_ack");
+			targetPort = factory.createPortVec32("in_" + tgtCalPort + "_data");
+			target.addInput(targetPort);
+			target.addInput(factory.createPortVec32("in_" + tgtCalPort
+					+ "_tokens"));
+			target.addOutput(factory.createPortLogic("in_" + tgtCalPort
+					+ "_ack"));
 		} else {
-			targetPort = target.createInput(tgtCalPort);
+			targetPort = factory.createPortVec32(tgtCalPort);
+			target.addInput(targetPort);
 		}
 
 		Signal signal = factory.createSignal(
@@ -165,7 +187,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 			addSignal(connection);
 		} else if (connection.getSourcePort() == null) {
 
-		} else if (connection.getTarget() == null) {
+		} else if (connection.getTargetPort() == null) {
 
 		} else {
 			addFifo(connection);
@@ -211,7 +233,8 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 
 	@Override
 	public Design casePort(net.sf.orcc.df.Port port) {
-		Port newPort = factory.createPort(port.getName());
+		Port newPort = factory.createPort(port.getName(),
+				factory.createTypeVector(port.getType().getSizeInBits()));
 		if (port.getIncoming().isEmpty()) {
 			design.addInput(newPort);
 		} else {
