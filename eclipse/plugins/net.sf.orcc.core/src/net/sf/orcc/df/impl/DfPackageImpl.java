@@ -1100,8 +1100,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getPort_Name(), ecorePackage.getEString(), "name", null,
-				0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
-				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+				0, 1, Port.class, !IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE,
+				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
 		initEClass(instanceEClass, Instance.class, "Instance", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -1114,8 +1114,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getInstance_Name(), ecorePackage.getEString(), "name",
-				null, 0, 1, Instance.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
+				null, 0, 1, Instance.class, IS_TRANSIENT, IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED,
 				IS_ORDERED);
 
 		initEClass(entityEClass, Entity.class, "Entity", IS_ABSTRACT,
@@ -1125,8 +1125,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getEntity_Name(), ecorePackage.getEString(), "name",
-				null, 0, 1, Entity.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
+				null, 0, 1, Entity.class, IS_TRANSIENT, IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED,
 				IS_ORDERED);
 
 		initEClass(entitySpecificEClass, EntitySpecific.class,

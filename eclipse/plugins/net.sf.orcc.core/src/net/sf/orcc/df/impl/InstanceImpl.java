@@ -79,6 +79,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	/**
 	 * The cached value of the '{@link #getEntity() <em>Entity</em>}' reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getEntity()
 	 * @generated
 	 * @ordered
@@ -88,6 +89,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -95,16 +97,8 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	protected static final String NAME_EDEFAULT = null;
 
 	/**
-	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected String name = NAME_EDEFAULT;
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected InstanceImpl() {
@@ -113,6 +107,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Entity basicGetEntity() {
@@ -121,6 +116,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -140,6 +136,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -155,6 +152,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -165,14 +163,15 @@ public class InstanceImpl extends VertexImpl implements Instance {
 		case DfPackage.INSTANCE__ENTITY:
 			return entity != null;
 		case DfPackage.INSTANCE__NAME:
-			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
-					.equals(name);
+			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT
+					.equals(getName());
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -195,6 +194,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -204,6 +204,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -229,6 +230,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Argument> getArguments() {
@@ -246,6 +248,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Entity getEntity() {
@@ -323,10 +326,9 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
 	 */
 	public String getName() {
-		return name;
+		return getLabel();
 	}
 
 	@Override
@@ -354,12 +356,12 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	@Override
 	public String getPackage() {
-		return DfUtil.getPackage(name);
+		return DfUtil.getPackage(getName());
 	}
 
 	@Override
 	public String getSimpleName() {
-		return DfUtil.getSimpleName(name);
+		return DfUtil.getSimpleName(getSimpleName());
 	}
 
 	@Override
@@ -383,6 +385,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void setEntity(Entity newEntity) {
@@ -395,14 +398,10 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
+	 * 
 	 */
 	public void setName(String newName) {
-		String oldName = name;
-		name = newName;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.INSTANCE__NAME, oldName, name));
+		setLabel(newName);
 	}
 
 	@Override

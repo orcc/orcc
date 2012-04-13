@@ -22,13 +22,11 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.ir.Var;
 
-import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
-import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
@@ -38,18 +36,19 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getParameters <em>Parameters</em>}</li>
- *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getName <em>Name</em>}</li>
+ * <li>{@link net.sf.orcc.df.impl.EntityImpl#getParameters <em>Parameters</em>}</li>
+ * <li>{@link net.sf.orcc.df.impl.EntityImpl#getName <em>Name</em>}</li>
  * </ul>
  * </p>
- *
+ * 
  * @generated
  */
 public abstract class EntityImpl extends VertexImpl implements Entity {
 
 	/**
-	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}'
+	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getParameters()
 	 * @generated
 	 * @ordered
@@ -58,23 +57,19 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getName()
 	 * @generated
 	 * @ordered
 	 */
 	protected static final String NAME_EDEFAULT = null;
 
-	/**
-	 * @generated
-	 */
-	protected String name = NAME_EDEFAULT;
-
 	private Object templateData;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected EntityImpl() {
@@ -83,6 +78,7 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -98,6 +94,7 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -113,6 +110,7 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -121,14 +119,15 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 		case DfPackage.ENTITY__PARAMETERS:
 			return parameters != null && !parameters.isEmpty();
 		case DfPackage.ENTITY__NAME:
-			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
-					.equals(name);
+			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT
+					.equals(getName());
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -148,6 +147,7 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -157,6 +157,7 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -227,11 +228,8 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 		return null;
 	}
 
-	/**
-	 * @generated
-	 */
 	public String getName() {
-		return name;
+		return getLabel();
 	}
 
 	@Override
@@ -265,7 +263,7 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 
 	@Override
 	public String getPackage() {
-		return DfUtil.getPackage(name);
+		return DfUtil.getPackage(getName());
 	}
 
 	@Override
@@ -280,6 +278,7 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Var> getParameters() {
@@ -302,7 +301,7 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 
 	@Override
 	public String getSimpleName() {
-		return DfUtil.getSimpleName(name);
+		return DfUtil.getSimpleName(getName());
 	}
 
 	@Override
@@ -333,33 +332,12 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 	 * @generated
 	 */
 	public void setName(String newName) {
-		String oldName = name;
-		name = newName;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.ENTITY__NAME, oldName, name));
+		setLabel(newName);
 	}
 
 	@Override
 	public void setTemplateData(Object templateData) {
 		this.templateData = templateData;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public String toString() {
-		if (eIsProxy())
-			return super.toString();
-
-		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (name: ");
-		result.append(name);
-		result.append(')');
-		return result.toString();
 	}
 
 } // EntityImpl

@@ -93,15 +93,6 @@ public class PortImpl extends VertexImpl implements Port {
 	protected static final String NAME_EDEFAULT = null;
 
 	/**
-	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected String name = NAME_EDEFAULT;
-
-	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -174,8 +165,8 @@ public class PortImpl extends VertexImpl implements Port {
 		case DfPackage.PORT__TYPE:
 			return type != null;
 		case DfPackage.PORT__NAME:
-			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
-					.equals(name);
+			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT
+					.equals(getName());
 		}
 		return super.eIsSet(featureID);
 	}
@@ -307,7 +298,9 @@ public class PortImpl extends VertexImpl implements Port {
 	 * @generated
 	 */
 	public String getName() {
-		return name;
+		// TODO: implement this method to return the 'Name' attribute
+		// Ensure that you remove @generated or mark it @generated NOT
+		throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -315,11 +308,9 @@ public class PortImpl extends VertexImpl implements Port {
 	 * @generated
 	 */
 	public void setName(String newName) {
-		String oldName = name;
-		name = newName;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.PORT__NAME, oldName, name));
+		// TODO: implement this method to set the 'Name' attribute
+		// Ensure that you remove @generated or mark it @generated NOT
+		throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -385,8 +376,6 @@ public class PortImpl extends VertexImpl implements Port {
 		result.append(numTokensConsumed);
 		result.append(", numTokensProduced: ");
 		result.append(numTokensProduced);
-		result.append(", name: ");
-		result.append(name);
 		result.append(')');
 		return result.toString();
 	}

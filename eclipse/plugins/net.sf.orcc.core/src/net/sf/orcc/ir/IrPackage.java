@@ -2771,6 +2771,15 @@ public interface IrPackage extends EPackage {
 	int CFG_NODE__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
 
 	/**
+	 * The feature id for the '<em><b>Label</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CFG_NODE__LABEL = GraphPackage.VERTEX__LABEL;
+
+	/**
 	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
