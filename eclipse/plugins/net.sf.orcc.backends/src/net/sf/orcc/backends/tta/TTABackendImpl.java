@@ -54,7 +54,6 @@ import net.sf.orcc.backends.transformations.TypeResizer;
 import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.backends.transformations.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transformations.ssa.CopyPropagator;
-import net.sf.orcc.backends.tta.architecture.Component;
 import net.sf.orcc.backends.tta.architecture.Design;
 import net.sf.orcc.backends.tta.architecture.DesignConfiguration;
 import net.sf.orcc.backends.tta.architecture.Processor;
@@ -212,11 +211,8 @@ public class TTABackendImpl extends AbstractBackend {
 	}
 
 	private void printDesign(Design design) {
-		for (Component component : design.getComponents()) {
-			if (component.isProcessor()) {
-				Processor processor = (Processor) component;
-				printProcessor(processor);
-			}
+		for (Processor processor : design.getProcessors()) {
+			printProcessor(processor);
 		}
 
 		// VHDL Network of TTA processors

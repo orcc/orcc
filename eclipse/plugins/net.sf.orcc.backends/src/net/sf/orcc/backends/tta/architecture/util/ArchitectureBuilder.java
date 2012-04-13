@@ -27,11 +27,12 @@ import net.sf.orcc.ir.Var;
 
 public class ArchitectureBuilder extends DfSwitch<Design> {
 
-	@SuppressWarnings("unused")
-	private DesignConfiguration conf;
-	private Design design;
 	private ArchitectureFactory factory = ArchitectureFactory.eINSTANCE;
 
+	private Design design;
+
+	@SuppressWarnings("unused")
+	private DesignConfiguration conf;
 	@SuppressWarnings("unused")
 	private Mapping mapping;
 
@@ -151,6 +152,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	public Design caseBroadcast(Broadcast broadcast) {
 		Component component = factory.createComponent(
 				broadcast.getSimpleName(), "broadcast");
+		component.setAttribute("outputs_number", broadcast.getOutputs().size());
 		design.getBroadcasts().add(component);
 		design.add(component);
 		componentMap.put(broadcast, component);
@@ -158,21 +160,13 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	}
 
 	@Override
-	public Design casePort(net.sf.orcc.df.Port port) {
-		Port newPort = factory.createPort(port.getName());
-		if (port.getIncoming().isEmpty()) {
-			design.addInput(newPort);
-		} else {
-			design.addOutput(newPort);
-		}
-		portMap.put(port, newPort);
-		return null;
-	}
-
-	@Override
 	public Design caseConnection(Connection connection) {
 		if (connection.hasAttribute("native")) {
 			addSignal(connection);
+		} else if (connection.getSourcePort() == null) {
+
+		} else if (connection.getTarget() == null) {
+
 		} else {
 			addFifo(connection);
 		}
@@ -184,6 +178,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		if (instance.getActor().isNative()) {
 			Component component = factory.createComponent(instance.getName(),
 					instance.getActor().getSimpleName());
+			design.getComponents().add(component);
 			design.add(component);
 			componentMap.put(instance, component);
 		} else {
@@ -212,6 +207,18 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 			doSwitch(connection);
 		}
 		return design;
+	}
+
+	@Override
+	public Design casePort(net.sf.orcc.df.Port port) {
+		Port newPort = factory.createPort(port.getName());
+		if (port.getIncoming().isEmpty()) {
+			design.addInput(newPort);
+		} else {
+			design.addOutput(newPort);
+		}
+		portMap.put(port, newPort);
+		return null;
 	}
 
 	private int computeNeededMemorySize(Action action) {
