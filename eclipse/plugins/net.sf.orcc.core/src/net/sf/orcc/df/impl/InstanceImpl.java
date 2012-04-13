@@ -361,7 +361,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	@Override
 	public String getSimpleName() {
-		return DfUtil.getSimpleName(getSimpleName());
+		return DfUtil.getSimpleName(getName());
 	}
 
 	@Override
