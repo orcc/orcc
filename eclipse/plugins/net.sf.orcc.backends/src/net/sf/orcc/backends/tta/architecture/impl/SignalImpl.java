@@ -31,7 +31,6 @@
 package net.sf.orcc.backends.tta.architecture.impl;
 
 import net.sf.dftools.graph.impl.EdgeImpl;
-
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.Port;
 import net.sf.orcc.backends.tta.architecture.Signal;
@@ -42,52 +41,47 @@ import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Signal</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object '
+ * <em><b>Signal</b></em>'. <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.SignalImpl#getName <em>Name</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.SignalImpl#getSourcePort <em>Source Port</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.SignalImpl#getTargetPort <em>Target Port</em>}</li>
+ * <li>{@link net.sf.orcc.backends.tta.architecture.impl.SignalImpl#getName <em>
+ * Name</em>}</li>
+ * <li>
+ * {@link net.sf.orcc.backends.tta.architecture.impl.SignalImpl#getSourcePort
+ * <em>Source Port</em>}</li>
+ * <li>
+ * {@link net.sf.orcc.backends.tta.architecture.impl.SignalImpl#getTargetPort
+ * <em>Target Port</em>}</li>
  * </ul>
  * </p>
- *
+ * 
  * @generated
  */
 public class SignalImpl extends EdgeImpl implements Signal {
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getName()
 	 * @generated
 	 * @ordered
 	 */
 	protected static final String NAME_EDEFAULT = null;
 	/**
-	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected String name = NAME_EDEFAULT;
-	/**
-	 * The cached value of the '{@link #getSourcePort() <em>Source Port</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The cached value of the '{@link #getSourcePort() <em>Source Port</em>}'
+	 * reference. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getSourcePort()
 	 * @generated
 	 * @ordered
 	 */
 	protected Port sourcePort;
 	/**
-	 * The cached value of the '{@link #getTargetPort() <em>Target Port</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The cached value of the '{@link #getTargetPort() <em>Target Port</em>}'
+	 * reference. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getTargetPort()
 	 * @generated
 	 * @ordered
@@ -95,8 +89,8 @@ public class SignalImpl extends EdgeImpl implements Signal {
 	protected Port targetPort;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected SignalImpl() {
@@ -104,8 +98,8 @@ public class SignalImpl extends EdgeImpl implements Signal {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -114,30 +108,22 @@ public class SignalImpl extends EdgeImpl implements Signal {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 */
 	public String getName() {
-		return name;
+		return getLabel();
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 */
 	public void setName(String newName) {
-		String oldName = name;
-		name = newName;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					ArchitecturePackage.SIGNAL__NAME, oldName, name));
+		setLabel(newName);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Port getSourcePort() {
@@ -155,8 +141,8 @@ public class SignalImpl extends EdgeImpl implements Signal {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Port basicGetSourcePort() {
@@ -164,8 +150,8 @@ public class SignalImpl extends EdgeImpl implements Signal {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void setSourcePort(Port newSourcePort) {
@@ -178,8 +164,8 @@ public class SignalImpl extends EdgeImpl implements Signal {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Port getTargetPort() {
@@ -197,8 +183,8 @@ public class SignalImpl extends EdgeImpl implements Signal {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Port basicGetTargetPort() {
@@ -206,8 +192,8 @@ public class SignalImpl extends EdgeImpl implements Signal {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void setTargetPort(Port newTargetPort) {
@@ -220,8 +206,8 @@ public class SignalImpl extends EdgeImpl implements Signal {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -242,8 +228,8 @@ public class SignalImpl extends EdgeImpl implements Signal {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -263,8 +249,8 @@ public class SignalImpl extends EdgeImpl implements Signal {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -284,16 +270,16 @@ public class SignalImpl extends EdgeImpl implements Signal {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 		case ArchitecturePackage.SIGNAL__NAME:
-			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
-					.equals(name);
+			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT
+					.equals(getName());
 		case ArchitecturePackage.SIGNAL__SOURCE_PORT:
 			return sourcePort != null;
 		case ArchitecturePackage.SIGNAL__TARGET_PORT:
@@ -302,21 +288,4 @@ public class SignalImpl extends EdgeImpl implements Signal {
 		return super.eIsSet(featureID);
 	}
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public String toString() {
-		if (eIsProxy())
-			return super.toString();
-
-		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (name: ");
-		result.append(name);
-		result.append(')');
-		return result.toString();
-	}
-
-} //SignalImpl
+} // SignalImpl

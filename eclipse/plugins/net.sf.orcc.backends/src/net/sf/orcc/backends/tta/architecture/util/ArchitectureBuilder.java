@@ -17,6 +17,7 @@ import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.util.DfSwitch;
@@ -26,13 +27,15 @@ import net.sf.orcc.ir.Var;
 
 public class ArchitectureBuilder extends DfSwitch<Design> {
 
-	private ArchitectureFactory factory = ArchitectureFactory.eINSTANCE;
-	private Design design;
+	@SuppressWarnings("unused")
 	private DesignConfiguration conf;
+	private Design design;
+	private ArchitectureFactory factory = ArchitectureFactory.eINSTANCE;
+
+	@SuppressWarnings("unused")
+	private Mapping mapping;
 
 	private Map<Vertex, Component> vertexMap;
-
-	private Mapping mapping;
 
 	public ArchitectureBuilder(DesignConfiguration conf) {
 		design = factory.createDesign();
@@ -44,57 +47,13 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		this.mapping = mapping;
 	}
 
-	public Design caseNetwork(Network network) {
-		design = factory.createDesign();
-		if (mapping == null) {
-			// One-to-one mapping
-			for (Instance instance : network.getInstances()) {
-				if (instance.getActor().isNative()) {
-					Component component = factory.createComponent(instance
-							.getName(), instance.getActor().getSimpleName());
-					design.add(component);
-					vertexMap.put(instance, component);
-				} else {
-					int memorySize = computeNeededMemorySize(instance);
-					String name = instance.getSimpleName();
-					Processor processor = factory.createProcessor(
-							name + "inst", "processor_" + name,
-							ProcessorConfiguration.STANDARD, memorySize);
-					design.getProcessors().add(processor);
-					design.add(processor);
-					vertexMap.put(instance, processor);
-				}
-			}
-		} else {
-			// TODO: Map several actors on the same processor
-		}
-		super.caseNetwork(network);
-		return design;
-	}
-
-	public Design caseBroadcast(Broadcast broadcast) {
-		Component component = factory.createComponent(
-				broadcast.getSimpleName(), "broadcast");
-		design.getBroadcasts().add(component);
-		design.add(component);
-		vertexMap.put(broadcast, component);
-		return null;
-	}
-
-	public Design caseConnection(Connection connection) {
-		if (connection.hasAttribute("native")) {
-			addSignal(connection);
-		} else {
-			addFifo(connection);
-		}
-		return null;
-	}
-
 	private void addFifo(Connection connection) {
 		Component source = vertexMap.get(connection.getSource());
 		Component target = vertexMap.get(connection.getTarget());
-		String srcCalPort = connection.getSourcePort().getName();
-		String tgtCalPort = connection.getTargetPort().getName();
+		String srcCalPort = connection.getSourcePort() == null ? connection
+				.getSource().getLabel() : connection.getSourcePort().getName();
+		String tgtCalPort = connection.getTargetPort() == null ? connection
+				.getTarget().getLabel() : connection.getTargetPort().getName();
 
 		String name = "fifo_" + connection.getAttribute("id");
 		Component fifo = factory.createComponent(name, "fifo");
@@ -150,8 +109,10 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	private void addSignal(Connection connection) {
 		Component source = vertexMap.get(connection.getSource());
 		Component target = vertexMap.get(connection.getTarget());
-		String srcCalPort = connection.getSourcePort().getName();
-		String tgtCalPort = connection.getTargetPort().getName();
+		String srcCalPort = connection.getSourcePort() == null ? connection
+				.getSource().getLabel() : connection.getSourcePort().getName();
+		String tgtCalPort = connection.getTargetPort() == null ? connection
+				.getTarget().getLabel() : connection.getTargetPort().getName();
 
 		Port sourcePort;
 		if (source.isProcessor()) {
@@ -178,6 +139,74 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		design.add(signal);
 	}
 
+	@Override
+	public Design caseBroadcast(Broadcast broadcast) {
+		Component component = factory.createComponent(
+				broadcast.getSimpleName(), "broadcast");
+		design.getBroadcasts().add(component);
+		design.add(component);
+		vertexMap.put(broadcast, component);
+		return null;
+	}
+
+	@Override
+	public Design caseConnection(Connection connection) {
+		if (connection.hasAttribute("native")) {
+			addSignal(connection);
+		} else {
+			addFifo(connection);
+		}
+		return null;
+	}
+
+	@Override
+	public Design caseInstance(Instance instance) {
+		if (instance.getActor().isNative()) {
+			Component component = factory.createComponent(instance.getName(),
+					instance.getActor().getSimpleName());
+			design.add(component);
+			vertexMap.put(instance, component);
+		} else {
+			int memorySize = computeNeededMemorySize(instance);
+			String name = instance.getSimpleName();
+			Processor processor = factory.createProcessor(name + "inst",
+					"processor_" + name, ProcessorConfiguration.STANDARD,
+					memorySize);
+			design.getProcessors().add(processor);
+			design.add(processor);
+			vertexMap.put(instance, processor);
+		}
+		return null;
+	}
+
+	@Override
+	public Design caseNetwork(Network network) {
+		design = factory.createDesign();
+		for (Entity entity : network.getEntities()) {
+			doSwitch(entity);
+		}
+		for (Instance instance : network.getInstances()) {
+			doSwitch(instance);
+		}
+		for (Connection connection : network.getConnections()) {
+			doSwitch(connection);
+		}
+		return design;
+	}
+
+	private int computeNeededMemorySize(Action action) {
+		int neededMemorySize = 0;
+		neededMemorySize += computeNeededMemorySize(action.getBody()
+				.getLocals());
+		neededMemorySize += computeNeededMemorySize(action.getInputPattern()
+				.getVariables());
+		neededMemorySize += computeNeededMemorySize(action.getScheduler()
+				.getLocals());
+		neededMemorySize += computeNeededMemorySize(action.getPeekPattern()
+				.getVariables());
+		return neededMemorySize;
+	}
+
 	/**
 	 * Returns the memory size needed by the given actor in bits. This size
 	 * corresponds to the sum of state variable size (only assignable variables
@@ -200,19 +229,6 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		for (Action action : instance.getActor().getActions()) {
 			neededMemorySize += computeNeededMemorySize(action) * 1.3;
 		}
-		return neededMemorySize;
-	}
-
-	private int computeNeededMemorySize(Action action) {
-		int neededMemorySize = 0;
-		neededMemorySize += computeNeededMemorySize(action.getBody()
-				.getLocals());
-		neededMemorySize += computeNeededMemorySize(action.getInputPattern()
-				.getVariables());
-		neededMemorySize += computeNeededMemorySize(action.getScheduler()
-				.getLocals());
-		neededMemorySize += computeNeededMemorySize(action.getPeekPattern()
-				.getVariables());
 		return neededMemorySize;
 	}
 

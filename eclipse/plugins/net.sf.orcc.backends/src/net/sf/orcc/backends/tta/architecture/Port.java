@@ -59,7 +59,7 @@ public interface Port extends Vertex {
 	 * @return the value of the '<em>Name</em>' attribute.
 	 * @see #setName(String)
 	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getPort_Name()
-	 * @model
+	 * @model transient="true" volatile="true" derived="true"
 	 * @generated
 	 */
 	String getName();

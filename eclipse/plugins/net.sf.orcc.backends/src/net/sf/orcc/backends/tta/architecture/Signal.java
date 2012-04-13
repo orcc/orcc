@@ -63,7 +63,7 @@ public interface Signal extends Edge {
 	 * @return the value of the '<em>Name</em>' attribute.
 	 * @see #setName(String)
 	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getSignal_Name()
-	 * @model
+	 * @model transient="true" volatile="true" derived="true"
 	 * @generated
 	 */
 	String getName();

@@ -35,7 +35,6 @@ import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.FuPort;
 import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
 import net.sf.orcc.backends.tta.architecture.Operation;
-import net.sf.orcc.backends.tta.architecture.Port;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;

@@ -216,6 +216,15 @@ public interface ArchitecturePackage extends EPackage {
 	int SIGNAL__ATTRIBUTES = GraphPackage.EDGE__ATTRIBUTES;
 
 	/**
+	 * The feature id for the '<em><b>Label</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SIGNAL__LABEL = GraphPackage.EDGE__LABEL;
+
+	/**
 	 * The feature id for the '<em><b>Source</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -287,6 +296,15 @@ public interface ArchitecturePackage extends EPackage {
 	 * @ordered
 	 */
 	int COMPONENT__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
+
+	/**
+	 * The feature id for the '<em><b>Label</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMPONENT__LABEL = GraphPackage.VERTEX__LABEL;
 
 	/**
 	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
@@ -459,6 +477,15 @@ public interface ArchitecturePackage extends EPackage {
 	int PORT__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
 
 	/**
+	 * The feature id for the '<em><b>Label</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT__LABEL = GraphPackage.VERTEX__LABEL;
+
+	/**
 	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -510,6 +537,15 @@ public interface ArchitecturePackage extends EPackage {
 	 * @ordered
 	 */
 	int PROCESSOR__ATTRIBUTES = COMPONENT__ATTRIBUTES;
+
+	/**
+	 * The feature id for the '<em><b>Label</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCESSOR__LABEL = COMPONENT__LABEL;
 
 	/**
 	 * The feature id for the '<em><b>Incoming</b></em>' reference list. <!--

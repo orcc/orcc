@@ -1713,8 +1713,8 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		initEClass(signalEClass, Signal.class, "Signal", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getSignal_Name(), theEcorePackage.getEString(), "name",
-				null, 0, 1, Signal.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
+				null, 0, 1, Signal.class, IS_TRANSIENT, IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED,
 				IS_ORDERED);
 		initEReference(getSignal_SourcePort(), this.getPort(), null,
 				"sourcePort", null, 0, 1, Signal.class, !IS_TRANSIENT,
@@ -1728,9 +1728,9 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		initEClass(componentEClass, Component.class, "Component", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getComponent_Name(), theEcorePackage.getEString(),
-				"name", null, 0, 1, Component.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
+				"name", null, 0, 1, Component.class, IS_TRANSIENT, IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED,
+				IS_ORDERED);
 		initEAttribute(getComponent_EntityName(), theEcorePackage.getEString(),
 				"entityName", null, 0, 1, Component.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
@@ -1747,8 +1747,8 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		initEClass(portEClass, Port.class, "Port", !IS_ABSTRACT, !IS_INTERFACE,
 				IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getPort_Name(), theEcorePackage.getEString(), "name",
-				null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
+				null, 0, 1, Port.class, IS_TRANSIENT, IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED,
 				IS_ORDERED);
 
 		initEClass(processorEClass, Processor.class, "Processor", !IS_ABSTRACT,
