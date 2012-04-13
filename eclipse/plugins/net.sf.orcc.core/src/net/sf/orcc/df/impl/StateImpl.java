@@ -41,12 +41,12 @@ public class StateImpl extends VertexImpl implements State {
 
 	@Override
 	public String getName() {
-		return (String) getAttribute("name").getValue();
+		return getLabel();
 	}
 
 	@Override
 	public void setName(String name) {
-		setAttribute("name", name);
+		setLabel(name);
 	}
 
 } // StateImpl

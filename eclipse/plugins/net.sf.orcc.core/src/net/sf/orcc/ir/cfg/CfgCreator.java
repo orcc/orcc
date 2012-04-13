@@ -76,9 +76,7 @@ public class CfgCreator extends DfSwitch<Void> {
 	 */
 	private CfgNode addNode(String name) {
 		CfgNode node = eINSTANCE.createCfgNode();
-		if (name != null) {
-			node.setAttribute("name", name);
-		}
+		node.setLabel(name);
 		cfg.add(node);
 		return node;
 	}
@@ -136,17 +134,45 @@ public class CfgCreator extends DfSwitch<Void> {
 	 */
 	private void convertFsmToCfg(FSM fsm) {
 		Map<State, CfgNode> stateMap = new HashMap<State, CfgNode>();
-		cfg.add(cfg.getFirst(), getCfgNode(stateMap, fsm.getInitialState()));
+		State init = fsm.getInitialState();
+		cfg.add(cfg.getFirst(), getCfgNode(stateMap, init));
+		
+		// by convention the initial state is visited once
+		init.setAttribute("count", 1);
 
 		for (Transition transition : fsm.getTransitions()) {
-			CfgNode srcNode = getCfgNode(stateMap, transition.getSource());
-			CfgNode tgtNode = getCfgNode(stateMap, transition.getTarget());
+			State source = transition.getSource();
+			CfgNode srcNode = getCfgNode(stateMap, source);
+			
+			// if the source node is a fork
+			// i.e. more than one outgoing edge *and* not a loop
+			Integer n = source.getValue("count");
+			if (srcNode.getOutgoing().size() > 0 && n != null && n == 1) {
+				CfgNode newNode = eINSTANCE.createCfgNode();
+				cfg.add(newNode);
+				newNode.getOutgoing().addAll(srcNode.getOutgoing());
+				cfg.add(srcNode, newNode);
+				srcNode = newNode;
+			}
 
+			// update target's count
+			State target = transition.getTarget();
+			n = target.getValue("count");
+			if (n == null) {
+				n = 1;
+			} else {
+				n++;
+			}
+			target.setAttribute("count", n);
+
+			// create new node for action
 			Action action = transition.getAction();
 			CfgNode bbNode = addNode(action.getName());
 			bbNode.setAttribute("action", action);
 
+			// add edges
 			cfg.add(srcNode, bbNode);
+			CfgNode tgtNode = getCfgNode(stateMap, target);
 			cfg.add(bbNode, tgtNode);
 		}
 	}
@@ -174,6 +200,7 @@ public class CfgCreator extends DfSwitch<Void> {
 		CfgNode node = stateMap.get(state);
 		if (node == null) {
 			node = eINSTANCE.createCfgNode();
+			node.setLabel(state.getName());
 			cfg.add(node);
 			stateMap.put(state, node);
 		}
