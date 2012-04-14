@@ -67,6 +67,7 @@ public interface Instruction extends Attributable {
 	 * 
 	 * @return <code>true</code> if the instruction is an Assign
 	 */
+	@Deprecated
 	boolean isAssign();
 
 	/**
@@ -74,6 +75,7 @@ public interface Instruction extends Attributable {
 	 * 
 	 * @return <code>true</code> if the instruction is a Call
 	 */
+	@Deprecated
 	boolean isCall();
 
 	/**
@@ -81,6 +83,7 @@ public interface Instruction extends Attributable {
 	 * 
 	 * @return <code>true</code> if the instruction is a Load
 	 */
+	@Deprecated
 	boolean isLoad();
 
 	/**
@@ -88,6 +91,7 @@ public interface Instruction extends Attributable {
 	 * 
 	 * @return <code>true</code> if the instruction is a Phi
 	 */
+	@Deprecated
 	boolean isPhi();
 
 	/**
@@ -95,8 +99,51 @@ public interface Instruction extends Attributable {
 	 * 
 	 * @return <code>true</code> if the instruction is a Return
 	 */
+	@Deprecated
 	boolean isReturn();
 
+	/**
+	 * Returns <code>true</code> if the instruction is an Assign.
+	 * 
+	 * @return <code>true</code> if the instruction is an Assign
+	 */
+	boolean isInstAssign();
+
+	/**
+	 * Returns <code>true</code> if the instruction is a Call.
+	 * 
+	 * @return <code>true</code> if the instruction is a Call
+	 */
+	boolean isInstCall();
+
+	/**
+	 * Returns <code>true</code> if the instruction is a Load.
+	 * 
+	 * @return <code>true</code> if the instruction is a Load
+	 */
+	boolean isInstLoad();
+
+	/**
+	 * Returns <code>true</code> if the instruction is a Phi.
+	 * 
+	 * @return <code>true</code> if the instruction is a Phi
+	 */
+	boolean isInstPhi();
+
+	/**
+	 * Returns <code>true</code> if the instruction is a Return.
+	 * 
+	 * @return <code>true</code> if the instruction is a Return
+	 */
+	boolean isInstReturn();
+
+	/**
+	 * Returns <code>true</code> if the instruction is a Store.
+	 * 
+	 * @return <code>true</code> if the instruction is a Store
+	 */
+	boolean isInstStore();
+	
 	/**
 	 * Returns <code>true</code> if the instruction is a Store.
 	 * 

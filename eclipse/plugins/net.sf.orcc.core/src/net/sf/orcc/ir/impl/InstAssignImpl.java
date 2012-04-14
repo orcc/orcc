@@ -62,6 +62,26 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	public NotificationChain basicSetTarget(Def newTarget,
+			NotificationChain msgs) {
+		Def oldTarget = target;
+		target = newTarget;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.INST_ASSIGN__TARGET, oldTarget,
+					newTarget);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
 	public NotificationChain basicSetValue(Expression newValue,
 			NotificationChain msgs) {
 		Expression oldValue = value;
@@ -179,32 +199,17 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetTarget(Def newTarget,
-			NotificationChain msgs) {
-		Def oldTarget = target;
-		target = newTarget;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.INST_ASSIGN__TARGET, oldTarget,
-					newTarget);
-			if (msgs == null)
-				msgs = notification;
-			else
-				msgs.add(notification);
-		}
-		return msgs;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	public Expression getValue() {
 		return value;
 	}
 
 	@Override
 	public boolean isAssign() {
+		return true;
+	}
+
+	@Override
+	public boolean isInstAssign() {
 		return true;
 	}
 

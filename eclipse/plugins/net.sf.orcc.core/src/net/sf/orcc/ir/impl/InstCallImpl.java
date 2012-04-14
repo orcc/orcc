@@ -88,6 +88,26 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	public NotificationChain basicSetTarget(Def newTarget,
+			NotificationChain msgs) {
+		Def oldTarget = target;
+		target = newTarget;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.INST_CALL__TARGET, oldTarget,
+					newTarget);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
@@ -226,26 +246,6 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 		return target;
 	}
 
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NotificationChain basicSetTarget(Def newTarget,
-			NotificationChain msgs) {
-		Def oldTarget = target;
-		target = newTarget;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.INST_CALL__TARGET, oldTarget,
-					newTarget);
-			if (msgs == null)
-				msgs = notification;
-			else
-				msgs.add(notification);
-		}
-		return msgs;
-	}
-
 	@Override
 	public boolean hasResult() {
 		return (getTarget() != null);
@@ -253,6 +253,11 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 
 	@Override
 	public boolean isCall() {
+		return true;
+	}
+
+	@Override
+	public boolean isInstCall() {
 		return true;
 	}
 
@@ -295,7 +300,7 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 			eNotify(new ENotificationImpl(this, Notification.SET,
 					IrPackage.INST_CALL__TARGET, newTarget, newTarget));
 	}
-
+	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

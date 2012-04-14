@@ -92,6 +92,27 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public NotificationChain basicSetTarget(Def newTarget,
+			NotificationChain msgs) {
+		Def oldTarget = target;
+		target = newTarget;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.INST_PHI__TARGET, oldTarget,
+					newTarget);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
@@ -229,33 +250,17 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetTarget(Def newTarget,
-			NotificationChain msgs) {
-		Def oldTarget = target;
-		target = newTarget;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.INST_PHI__TARGET, oldTarget,
-					newTarget);
-			if (msgs == null)
-				msgs = notification;
-			else
-				msgs.add(notification);
-		}
-		return msgs;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EList<Expression> getValues() {
 		if (values == null) {
 			values = new EObjectContainmentEList<Expression>(Expression.class,
 					this, IrPackage.INST_PHI__VALUES);
 		}
 		return values;
+	}
+
+	@Override
+	public boolean isInstPhi() {
+		return true;
 	}
 
 	@Override

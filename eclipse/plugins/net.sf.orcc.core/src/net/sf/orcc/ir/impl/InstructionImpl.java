@@ -230,6 +230,36 @@ public abstract class InstructionImpl extends AttributableImpl implements
 	public boolean isStore() {
 		return false;
 	}
+	
+	@Override
+	public boolean isInstAssign() {
+		return false;
+	}
+
+	@Override
+	public boolean isInstCall() {
+		return false;
+	}
+
+	@Override
+	public boolean isInstLoad() {
+		return false;
+	}
+
+	@Override
+	public boolean isInstPhi() {
+		return false;
+	}
+
+	@Override
+	public boolean isInstReturn() {
+		return false;
+	}
+
+	@Override
+	public boolean isInstStore() {
+		return false;
+	}
 
 	@Override
 	public boolean isInstSpecific() {

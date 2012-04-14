@@ -78,6 +78,46 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	public NotificationChain basicSetSource(Use newSource,
+			NotificationChain msgs) {
+		Use oldSource = source;
+		source = newSource;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.INST_LOAD__SOURCE, oldSource,
+					newSource);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetTarget(Def newTarget,
+			NotificationChain msgs) {
+		Def oldTarget = target;
+		target = newTarget;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.INST_LOAD__TARGET, oldTarget,
+					newTarget);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
@@ -202,48 +242,38 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetSource(Use newSource,
-			NotificationChain msgs) {
-		Use oldSource = source;
-		source = newSource;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.INST_LOAD__SOURCE, oldSource,
-					newSource);
-			if (msgs == null)
-				msgs = notification;
-			else
-				msgs.add(notification);
-		}
-		return msgs;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	public Def getTarget() {
 		return target;
 	}
 
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NotificationChain basicSetTarget(Def newTarget,
-			NotificationChain msgs) {
-		Def oldTarget = target;
-		target = newTarget;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.INST_LOAD__TARGET, oldTarget,
-					newTarget);
-			if (msgs == null)
-				msgs = notification;
-			else
-				msgs.add(notification);
-		}
-		return msgs;
+	@Override
+	public boolean isInstAssign() {
+		return false;
+	}
+
+	@Override
+	public boolean isInstCall() {
+		return false;
+	}
+
+	@Override
+	public boolean isInstLoad() {
+		return true;
+	}
+
+	@Override
+	public boolean isInstPhi() {
+		return false;
+	}
+
+	@Override
+	public boolean isInstReturn() {
+		return false;
+	}
+
+	@Override
+	public boolean isInstStore() {
+		return false;
 	}
 
 	@Override

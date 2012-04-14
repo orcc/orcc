@@ -29,18 +29,19 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.ir.impl.InstStoreImpl#getIndexes <em>Indexes</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.InstStoreImpl#getTarget <em>Target</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.InstStoreImpl#getValue <em>Value</em>}</li>
+ * <li>{@link net.sf.orcc.ir.impl.InstStoreImpl#getIndexes <em>Indexes</em>}</li>
+ * <li>{@link net.sf.orcc.ir.impl.InstStoreImpl#getTarget <em>Target</em>}</li>
+ * <li>{@link net.sf.orcc.ir.impl.InstStoreImpl#getValue <em>Value</em>}</li>
  * </ul>
  * </p>
- *
+ * 
  * @generated
  */
 public class InstStoreImpl extends InstructionImpl implements InstStore {
 	/**
-	 * The cached value of the '{@link #getIndexes() <em>Indexes</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getIndexes() <em>Indexes</em>}'
+	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getIndexes()
 	 * @generated
 	 * @ordered
@@ -48,8 +49,9 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	protected EList<Expression> indexes;
 
 	/**
-	 * The cached value of the '{@link #getTarget() <em>Target</em>}' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getTarget() <em>Target</em>}'
+	 * containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getTarget()
 	 * @generated
 	 * @ordered
@@ -57,8 +59,9 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	protected Def target;
 
 	/**
-	 * The cached value of the '{@link #getValue() <em>Value</em>}' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getValue() <em>Value</em>}' containment
+	 * reference. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getValue()
 	 * @generated
 	 * @ordered
@@ -67,6 +70,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected InstStoreImpl() {
@@ -75,6 +79,28 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public NotificationChain basicSetTarget(Def newTarget,
+			NotificationChain msgs) {
+		Def oldTarget = target;
+		target = newTarget;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.INST_STORE__TARGET, oldTarget,
+					newTarget);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public NotificationChain basicSetValue(Expression newValue,
@@ -95,6 +121,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -112,6 +139,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -131,6 +159,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -148,6 +177,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -170,6 +200,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -179,6 +210,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -199,6 +231,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Expression> getIndexes() {
@@ -211,6 +244,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Def getTarget() {
@@ -219,30 +253,16 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NotificationChain basicSetTarget(Def newTarget,
-			NotificationChain msgs) {
-		Def oldTarget = target;
-		target = newTarget;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.INST_STORE__TARGET, oldTarget,
-					newTarget);
-			if (msgs == null)
-				msgs = notification;
-			else
-				msgs.add(notification);
-		}
-		return msgs;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Expression getValue() {
 		return value;
+	}
+
+	@Override
+	public boolean isInstStore() {
+		return true;
 	}
 
 	@Override
@@ -252,6 +272,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void setTarget(Def newTarget) {
@@ -275,6 +296,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void setValue(Expression newValue) {
