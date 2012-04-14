@@ -39,7 +39,7 @@ import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
-import net.sf.orcc.ir.Node;
+import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
@@ -108,7 +108,7 @@ public class LLVMTemplateData {
 	/**
 	 * Label of all nodes
 	 */
-	private Map<Node, Integer> nodeToLabelMap;
+	private Map<Block, Integer> nodeToLabelMap;
 
 	private Map<EMap<Port, Integer>, Integer> numTokenPattern;
 
@@ -141,7 +141,7 @@ public class LLVMTemplateData {
 
 	public LLVMTemplateData(Actor actor) {
 		
-		nodeToLabelMap = new HashMap<Node, Integer>();
+		nodeToLabelMap = new HashMap<Block, Integer>();
 		castedListReferences = new HashMap<Var, Var>();
 
 		// Initialize metadata maps
@@ -300,8 +300,8 @@ public class LLVMTemplateData {
 				TreeIterator<EObject> it2 = proc.eAllContents();
 				while (it2.hasNext()) {
 					EObject object2 = it2.next();
-					if (object2 instanceof Node) {
-						Node node = (Node) object2;
+					if (object2 instanceof Block) {
+						Block node = (Block) object2;
 						nodeToLabelMap.put(node, label);
 						label++;
 					}
@@ -423,7 +423,7 @@ public class LLVMTemplateData {
 		return names;
 	}
 
-	public Map<Node, Integer> getNodeToLabelMap() {
+	public Map<Block, Integer> getNodeToLabelMap() {
 		return nodeToLabelMap;
 	}
 

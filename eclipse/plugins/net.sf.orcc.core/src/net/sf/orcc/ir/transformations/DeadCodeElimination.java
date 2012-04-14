@@ -40,9 +40,9 @@ import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeIf;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 
@@ -54,9 +54,9 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  */
 public class DeadCodeElimination extends AbstractActorVisitor<Object> {
 
-	private void addNodes(List<Node> nodes, NodeBlock join, int index) {
+	private void addNodes(List<Block> nodes, BlockBasic join, int index) {
 		indexNode--;
-		List<Node> parentNodes = EcoreHelper.getContainingList(join);
+		List<Block> parentNodes = EcoreHelper.getContainingList(join);
 		parentNodes.remove(indexNode);
 
 		int size = nodes.size();
@@ -66,7 +66,7 @@ public class DeadCodeElimination extends AbstractActorVisitor<Object> {
 		replacePhis(join, index);
 	}
 
-	private void replacePhis(NodeBlock joinNode, int index) {
+	private void replacePhis(BlockBasic joinNode, int index) {
 		ListIterator<Instruction> it = joinNode.listIterator();
 		while (it.hasNext()) {
 			Instruction instruction = it.next();
@@ -104,7 +104,7 @@ public class DeadCodeElimination extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseNodeIf(NodeIf node) {
+	public Object caseNodeIf(BlockIf node) {
 		Expression condition = node.getCondition();
 		if (condition.isExprBool()) {
 			if (((ExprBool) condition).isValue()) {

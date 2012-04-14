@@ -35,10 +35,10 @@ import net.sf.dftools.graph.Edge;
 import net.sf.orcc.ir.Cfg;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 
@@ -73,14 +73,14 @@ public class CfgBuilder extends AbstractActorVisitor<CfgNode> {
 	 * 
 	 * @return a newly-created node
 	 */
-	protected CfgNode addNode(Node node) {
+	protected CfgNode addNode(Block node) {
 		CfgNode cfgNode = factory.createCfgNode(node);
 		cfg.add(cfgNode);
 		return cfgNode;
 	}
 
 	@Override
-	public CfgNode caseNodeBlock(NodeBlock node) {
+	public CfgNode caseNodeBlock(BlockBasic node) {
 		CfgNode cfgNode = addNode(node);
 		if (last != null) {
 			addEdge(cfgNode);
@@ -90,7 +90,7 @@ public class CfgBuilder extends AbstractActorVisitor<CfgNode> {
 	}
 
 	@Override
-	public CfgNode caseNodeIf(NodeIf node) {
+	public CfgNode caseNodeIf(BlockIf node) {
 		CfgNode cfgNode = addNode(node);
 		if (last != null) {
 			addEdge(cfgNode);
@@ -115,7 +115,7 @@ public class CfgBuilder extends AbstractActorVisitor<CfgNode> {
 	}
 
 	@Override
-	public CfgNode caseNodeWhile(NodeWhile node) {
+	public CfgNode caseNodeWhile(BlockWhile node) {
 		CfgNode join = addNode(node.getJoinNode());
 
 		if (last != null) {
@@ -154,8 +154,8 @@ public class CfgBuilder extends AbstractActorVisitor<CfgNode> {
 	 *            a list of nodes
 	 * @return the last node of the node list
 	 */
-	public CfgNode doSwitch(List<Node> nodes) {
-		for (Node node : nodes) {
+	public CfgNode doSwitch(List<Block> nodes) {
+		for (Block node : nodes) {
 			last = doSwitch(node);
 		}
 

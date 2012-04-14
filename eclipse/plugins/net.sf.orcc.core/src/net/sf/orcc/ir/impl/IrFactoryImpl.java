@@ -34,10 +34,10 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Param;
@@ -155,12 +155,12 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 			return createProcedure();
 		case IrPackage.PARAM:
 			return createParam();
-		case IrPackage.NODE_BLOCK:
-			return createNodeBlock();
-		case IrPackage.NODE_IF:
-			return createNodeIf();
-		case IrPackage.NODE_WHILE:
-			return createNodeWhile();
+		case IrPackage.BLOCK_BASIC:
+			return createBlockBasic();
+		case IrPackage.BLOCK_IF:
+			return createBlockIf();
+		case IrPackage.BLOCK_WHILE:
+			return createBlockWhile();
 		case IrPackage.INST_ASSIGN:
 			return createInstAssign();
 		case IrPackage.INST_CALL:
@@ -285,7 +285,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public CfgNode createCfgNode(Node node) {
+	public CfgNode createCfgNode(Block node) {
 		CfgNode cfgNode = new CfgNodeImpl();
 		cfgNode.setNode(node);
 		return cfgNode;
@@ -758,27 +758,27 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NodeBlock createNodeBlock() {
-		NodeBlockImpl nodeBlock = new NodeBlockImpl();
-		return nodeBlock;
+	public BlockBasic createBlockBasic() {
+		BlockBasicImpl blockBasic = new BlockBasicImpl();
+		return blockBasic;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NodeIf createNodeIf() {
-		NodeIfImpl nodeIf = new NodeIfImpl();
-		return nodeIf;
+	public BlockIf createBlockIf() {
+		BlockIfImpl blockIf = new BlockIfImpl();
+		return blockIf;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NodeWhile createNodeWhile() {
-		NodeWhileImpl nodeWhile = new NodeWhileImpl();
-		return nodeWhile;
+	public BlockWhile createBlockWhile() {
+		BlockWhileImpl blockWhile = new BlockWhileImpl();
+		return blockWhile;
 	}
 
 	/**

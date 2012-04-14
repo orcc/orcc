@@ -7,7 +7,7 @@
 package net.sf.orcc.ir.impl;
 
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.NodeSpecific;
+import net.sf.orcc.ir.BlockSpecific;
 
 import org.eclipse.emf.ecore.EClass;
 
@@ -20,13 +20,14 @@ import org.eclipse.emf.ecore.EClass;
  *
  * @generated
  */
-public abstract class NodeSpecificImpl extends NodeImpl implements NodeSpecific {
+public abstract class BlockSpecificImpl extends BlockImpl implements
+		BlockSpecific {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected NodeSpecificImpl() {
+	protected BlockSpecificImpl() {
 		super();
 	}
 
@@ -37,7 +38,7 @@ public abstract class NodeSpecificImpl extends NodeImpl implements NodeSpecific 
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return IrPackage.Literals.NODE_SPECIFIC;
+		return IrPackage.Literals.BLOCK_SPECIFIC;
 	}
 
 	@Override

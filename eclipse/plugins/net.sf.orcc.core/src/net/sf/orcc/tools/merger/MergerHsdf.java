@@ -26,9 +26,9 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -258,7 +258,7 @@ public class MergerHsdf extends DfSwitch<Actor> {
 							factory.createTypeVoid());
 
 					Procedure body = action.getBody();
-					List<Node> nodes = body.getNodes();
+					List<Block> nodes = body.getNodes();
 					proc.getLocals().addAll(body.getLocals());
 					proc.getNodes().addAll(nodes);
 					IrUtil.getLast(nodes).add(factory.createInstReturn());
@@ -323,7 +323,7 @@ public class MergerHsdf extends DfSwitch<Actor> {
 			Var target) {
 		IrFactory factory = IrFactory.eINSTANCE;
 
-		List<Node> nodes = procedure.getNodes();
+		List<Block> nodes = procedure.getNodes();
 
 		int size = ((TypeList) source.getType()).getSize();
 
@@ -337,20 +337,20 @@ public class MergerHsdf extends DfSwitch<Actor> {
 			indexes.add(factory.createExprInt(0));
 			InstStore store = factory.createInstStore(0, target, indexes,
 					factory.createExprVar(tmpVar));
-			NodeBlock node = IrUtil.getLast(nodes);
+			BlockBasic node = IrUtil.getLast(nodes);
 			node.add(load);
 			node.add(store);
 		} else {
 			Var loop = procedure.getLocal("idx_0");
-			NodeBlock block = IrUtil.getLast(nodes);
+			BlockBasic block = IrUtil.getLast(nodes);
 			block.add(factory.createInstAssign(loop, factory.createExprInt(0)));
 
 			Expression condition = factory.createExprBinary(
 					factory.createExprVar(loop), OpBinary.LT,
 					factory.createExprInt(size), factory.createTypeBool());
 
-			NodeWhile nodeWhile = factory.createNodeWhile();
-			nodeWhile.setJoinNode(factory.createNodeBlock());
+			BlockWhile nodeWhile = factory.createBlockWhile();
+			nodeWhile.setJoinNode(factory.createBlockBasic());
 			nodeWhile.setCondition(condition);
 			nodes.add(nodeWhile);
 
@@ -362,7 +362,7 @@ public class MergerHsdf extends DfSwitch<Actor> {
 			indexes.add(factory.createExprVar(loop));
 			InstStore store = factory.createInstStore(0, target, indexes,
 					factory.createExprVar(tmpVar));
-			NodeBlock childBlock = IrUtil.getLast(nodeWhile.getNodes());
+			BlockBasic childBlock = IrUtil.getLast(nodeWhile.getNodes());
 			childBlock.add(load);
 			childBlock.add(store);
 
@@ -400,7 +400,7 @@ public class MergerHsdf extends DfSwitch<Actor> {
 	 * @param block
 	 *            block to which return is to be added
 	 */
-	private void createInputCondition(NodeBlock block) {
+	private void createInputCondition(BlockBasic block) {
 		final IrFactory factory = IrFactory.eINSTANCE;
 		InstReturn returnInstr = factory.createInstReturn(factory
 				.createExprBool(true));
@@ -417,7 +417,7 @@ public class MergerHsdf extends DfSwitch<Actor> {
 		Procedure procedure = IrFactory.eINSTANCE.createProcedure(
 				SCHEDULER_NAME, 0, IrFactory.eINSTANCE.createTypeBool());
 
-		NodeBlock block = factory.createNodeBlock();
+		BlockBasic block = factory.createBlockBasic();
 		procedure.getNodes().add(block);
 		createInputCondition(block);
 		return procedure;
@@ -432,7 +432,7 @@ public class MergerHsdf extends DfSwitch<Actor> {
 		for (Vertex vertex : new ReversePostOrder(network, network.getInputs())) {
 			Instance instance = (Instance) vertex;
 			CSDFMoC moc = (CSDFMoC) instance.getMoC();
-			NodeBlock block = procedure.getLast();
+			BlockBasic block = procedure.getLast();
 			for (Invocation invocation : moc.getInvocations()) {
 				Action action = invocation.getAction();
 				Procedure proc = superActor.getProcedure(instance.getName()

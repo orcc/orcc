@@ -15,8 +15,8 @@ import net.sf.orcc.ir.Cfg;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -129,7 +129,7 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Node> nodes;
+	protected EList<Block> nodes;
 
 	/**
 	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}' containment reference list.
@@ -294,7 +294,7 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 			return;
 		case IrPackage.PROCEDURE__NODES:
 			getNodes().clear();
-			getNodes().addAll((Collection<? extends Node>) newValue);
+			getNodes().addAll((Collection<? extends Block>) newValue);
 			return;
 		case IrPackage.PROCEDURE__PARAMETERS:
 			getParameters().clear();
@@ -360,7 +360,7 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	 * 
 	 * @return the first block in the list of nodes of this procedure
 	 */
-	public NodeBlock getFirst() {
+	public BlockBasic getFirst() {
 		return IrUtil.getFirst(getNodes());
 	}
 
@@ -370,7 +370,7 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	 * 
 	 * @return the last block in the list of nodes of this procedure
 	 */
-	public NodeBlock getLast() {
+	public BlockBasic getLast() {
 		return IrUtil.getLast(getNodes());
 	}
 
@@ -415,9 +415,9 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Node> getNodes() {
+	public EList<Block> getNodes() {
 		if (nodes == null) {
-			nodes = new EObjectContainmentEList<Node>(Node.class, this,
+			nodes = new EObjectContainmentEList<Block>(Block.class, this,
 					IrPackage.PROCEDURE__NODES);
 		}
 		return nodes;

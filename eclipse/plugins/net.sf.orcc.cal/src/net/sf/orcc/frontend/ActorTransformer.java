@@ -72,9 +72,9 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -143,7 +143,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 					eINSTANCE.createExprInt(0));
 			procedure.getLast().add(assign);
 
-			NodeBlock block = eINSTANCE.createNodeBlock();
+			BlockBasic block = eINSTANCE.createBlockBasic();
 
 			int i = 0;
 			int numTokens = tokens.size();
@@ -186,11 +186,11 @@ public class ActorTransformer extends CalSwitch<Actor> {
 					.createExprBinary(eINSTANCE.createExprVar(loopVar),
 							OpBinary.LT, eINSTANCE.createExprInt(repeat),
 							eINSTANCE.createTypeBool());
-			List<Node> nodes = new ArrayList<Node>(1);
+			List<Block> nodes = new ArrayList<Block>(1);
 			nodes.add(block);
 
-			NodeWhile nodeWhile = eINSTANCE.createNodeWhile();
-			nodeWhile.setJoinNode(eINSTANCE.createNodeBlock());
+			BlockWhile nodeWhile = eINSTANCE.createBlockWhile();
+			nodeWhile.setJoinNode(eINSTANCE.createBlockBasic());
 			nodeWhile.setCondition(condition);
 			nodeWhile.getNodes().addAll(nodes);
 
@@ -235,7 +235,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 					eINSTANCE.createExprInt(0));
 			procedure.getLast().add(assign);
 
-			NodeBlock block = eINSTANCE.createNodeBlock();
+			BlockBasic block = eINSTANCE.createBlockBasic();
 
 			int i = 0;
 			int numTokens = values.size();
@@ -283,8 +283,8 @@ public class ActorTransformer extends CalSwitch<Actor> {
 							OpBinary.LT, eINSTANCE.createExprInt(repeat),
 							eINSTANCE.createTypeBool());
 
-			NodeWhile nodeWhile = eINSTANCE.createNodeWhile();
-			nodeWhile.setJoinNode(eINSTANCE.createNodeBlock());
+			BlockWhile nodeWhile = eINSTANCE.createBlockWhile();
+			nodeWhile.setJoinNode(eINSTANCE.createBlockBasic());
 			nodeWhile.setCondition(condition);
 			nodeWhile.getNodes().add(block);
 

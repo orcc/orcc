@@ -31,68 +31,84 @@ package net.sf.orcc.ir;
 import org.eclipse.emf.common.util.EList;
 
 /**
- * This class defines a While node. A while node is a node with a value used in
- * its condition.
+ * This class defines an If node. An if node is a node with a value used in its
+ * condition.
  * 
  * @author Matthieu Wipliez
  * @model extends="net.sf.orcc.ir.Node"
  * 
  */
-public interface NodeWhile extends Node {
+public interface BlockIf extends Block {
 
 	/**
-	 * Returns the condition of this node While.
+	 * Returns the condition of this node If.
 	 * 
-	 * @return the condition of this node While
+	 * @return the condition of this node If
 	 * @model containment="true"
 	 */
 	Expression getCondition();
 
 	/**
-	 * Returns the join node of this NodeWhile.
+	 * Returns <code>true</code> if it is necessary to generate an "else" branch
+	 * in the code.
 	 * 
-	 * @return the join node of this NodeWhile.
-	 * @model containment="true"
+	 * @return <code>true</code> if it is necessary to generate an "else" branch
 	 */
-	NodeBlock getJoinNode();
+	boolean isElseRequired();
 
 	/**
-	 * Returns the line number on which this "while" starts.
+	 * Returns the nodes in the "else" branch of this NodeIf.
 	 * 
-	 * @return the line number on which this "while" starts
+	 * @return the nodes in the "else" branch of this NodeIf
+	 * @model containment="true"
+	 */
+	EList<Block> getElseNodes();
+
+	/**
+	 * Returns the join node of this NodeIf.
+	 * 
+	 * @return the join node of this NodeIf.
+	 * @model containment="true"
+	 */
+	BlockBasic getJoinNode();
+
+	/**
+	 * Returns the line number on which this "if" starts.
+	 * 
+	 * @return the line number on which this "if" starts
 	 * @model
 	 */
 	public int getLineNumber();
 
 	/**
-	 * Returns the nodes of this NodeWhile.
+	 * Returns the nodes in the "then" branch of this NodeIf.
 	 * 
-	 * @return the nodes of this NodeWhile
+	 * @return the nodes in the "then" branch of this NodeIf
 	 * @model containment="true"
 	 */
-	EList<Node> getNodes();
+	EList<Block> getThenNodes();
 
 	/**
-	 * Sets the condition of this node While.
+	 * Sets the condition of this node If.
 	 * 
 	 * @param condition
-	 *            the condition of this node While
+	 *            the condition of this node If
 	 */
 	void setCondition(Expression condition);
 
 	/**
-	 * Sets the join node of this NodeWhile.
+	 * Sets the join node of this NodeIf.
 	 * 
 	 * @param joinNode
-	 *            the join node of this NodeWhile
+	 *            the join node of this NodeIf
 	 */
-	void setJoinNode(NodeBlock joinNode);
+	void setJoinNode(BlockBasic joinNode);
 
 	/**
-	 * Sets the line number on which this "while" starts.
+	 * Sets the line number on which this "if" starts.
 	 * 
 	 * @param newLineNumber
-	 *            the line number on which this "while" starts
+	 *            the line number on which this "if" starts
 	 */
 	public void setLineNumber(int newLineNumber);
 

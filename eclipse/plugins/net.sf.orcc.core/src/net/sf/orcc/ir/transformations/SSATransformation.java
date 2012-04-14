@@ -44,10 +44,10 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
@@ -79,12 +79,12 @@ public class SSATransformation extends AbstractActorVisitor<Object> {
 	/**
 	 * join node (if any)
 	 */
-	private NodeBlock join;
+	private BlockBasic join;
 
 	/**
 	 * contains the current while node being treated (if any)
 	 */
-	private NodeWhile loop;
+	private BlockWhile loop;
 
 	/**
 	 * maps a variable name to a local variable (used when replacing uses)
@@ -105,7 +105,7 @@ public class SSATransformation extends AbstractActorVisitor<Object> {
 	 * @param innerJoin
 	 *            a NodeBlock that contains phi assignments
 	 */
-	private void commitPhi(NodeBlock innerJoin) {
+	private void commitPhi(BlockBasic innerJoin) {
 		for (Instruction instruction : innerJoin.getInstructions()) {
 			InstPhi phi = (InstPhi) instruction;
 			Var oldVar = phi.getOldVariable();
@@ -157,7 +157,7 @@ public class SSATransformation extends AbstractActorVisitor<Object> {
 			if (loop != null) {
 				List<Use> uses = new ArrayList<Use>(oldVar.getUses());
 				for (Use use : uses) {
-					Node node = EcoreHelper.getContainerOfType(use, Node.class);
+					Block node = EcoreHelper.getContainerOfType(use, Block.class);
 
 					// only changes uses that are in the loop
 					if (node != join && EcoreUtil.isAncestor(loop, node)) {
@@ -289,10 +289,10 @@ public class SSATransformation extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseNodeIf(NodeIf nodeIf) {
+	public Object caseNodeIf(BlockIf nodeIf) {
 		int outerBranch = branch;
-		NodeBlock outerJoin = join;
-		NodeWhile outerLoop = loop;
+		BlockBasic outerJoin = join;
+		BlockWhile outerLoop = loop;
 
 		replaceUses(nodeIf.getCondition());
 
@@ -309,7 +309,7 @@ public class SSATransformation extends AbstractActorVisitor<Object> {
 		doSwitch(nodeIf.getElseNodes());
 
 		// commit phi
-		NodeBlock innerJoin = join;
+		BlockBasic innerJoin = join;
 		branch = outerBranch;
 		join = outerJoin;
 		loop = outerLoop;
@@ -348,10 +348,10 @@ public class SSATransformation extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseNodeWhile(NodeWhile nodeWhile) {
+	public Object caseNodeWhile(BlockWhile nodeWhile) {
 		int outerBranch = branch;
-		NodeBlock outerJoin = join;
-		NodeWhile outerLoop = loop;
+		BlockBasic outerJoin = join;
+		BlockWhile outerLoop = loop;
 
 		replaceUses(nodeWhile.getCondition());
 
@@ -362,7 +362,7 @@ public class SSATransformation extends AbstractActorVisitor<Object> {
 		doSwitch(nodeWhile.getNodes());
 
 		// commit phi
-		NodeBlock innerJoin = join;
+		BlockBasic innerJoin = join;
 		branch = outerBranch;
 		join = outerJoin;
 		loop = outerLoop;

@@ -33,7 +33,7 @@ package net.sf.orcc.ir.impl;
 import net.sf.dftools.graph.impl.VertexImpl;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Node;
+import net.sf.orcc.ir.Block;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -61,7 +61,7 @@ public class CfgNodeImpl extends VertexImpl implements CfgNode {
 	 * @generated
 	 * @ordered
 	 */
-	protected Node node;
+	protected Block node;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -75,7 +75,7 @@ public class CfgNodeImpl extends VertexImpl implements CfgNode {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Node basicGetNode() {
+	public Block basicGetNode() {
 		return node;
 	}
 
@@ -84,8 +84,8 @@ public class CfgNodeImpl extends VertexImpl implements CfgNode {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetNode(Node newNode, NotificationChain msgs) {
-		Node oldNode = node;
+	public NotificationChain basicSetNode(Block newNode, NotificationChain msgs) {
+		Block oldNode = node;
 		node = newNode;
 		if (eNotificationRequired()) {
 			ENotificationImpl notification = new ENotificationImpl(this,
@@ -126,8 +126,8 @@ public class CfgNodeImpl extends VertexImpl implements CfgNode {
 		case IrPackage.CFG_NODE__NODE:
 			if (node != null)
 				msgs = ((InternalEObject) node).eInverseRemove(this,
-						IrPackage.NODE__CFG_NODE, Node.class, msgs);
-			return basicSetNode((Node) otherEnd, msgs);
+						IrPackage.BLOCK__CFG_NODE, Block.class, msgs);
+			return basicSetNode((Block) otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -168,7 +168,7 @@ public class CfgNodeImpl extends VertexImpl implements CfgNode {
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case IrPackage.CFG_NODE__NODE:
-			setNode((Node) newValue);
+			setNode((Block) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -191,7 +191,7 @@ public class CfgNodeImpl extends VertexImpl implements CfgNode {
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case IrPackage.CFG_NODE__NODE:
-			setNode((Node) null);
+			setNode((Block) null);
 			return;
 		}
 		super.eUnset(featureID);
@@ -201,10 +201,10 @@ public class CfgNodeImpl extends VertexImpl implements CfgNode {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Node getNode() {
+	public Block getNode() {
 		if (node != null && node.eIsProxy()) {
 			InternalEObject oldNode = (InternalEObject) node;
-			node = (Node) eResolveProxy(oldNode);
+			node = (Block) eResolveProxy(oldNode);
 			if (node != oldNode) {
 				if (eNotificationRequired())
 					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
@@ -218,15 +218,15 @@ public class CfgNodeImpl extends VertexImpl implements CfgNode {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setNode(Node newNode) {
+	public void setNode(Block newNode) {
 		if (newNode != node) {
 			NotificationChain msgs = null;
 			if (node != null)
 				msgs = ((InternalEObject) node).eInverseRemove(this,
-						IrPackage.NODE__CFG_NODE, Node.class, msgs);
+						IrPackage.BLOCK__CFG_NODE, Block.class, msgs);
 			if (newNode != null)
 				msgs = ((InternalEObject) newNode).eInverseAdd(this,
-						IrPackage.NODE__CFG_NODE, Node.class, msgs);
+						IrPackage.BLOCK__CFG_NODE, Block.class, msgs);
 			msgs = basicSetNode(newNode, msgs);
 			if (msgs != null)
 				msgs.dispatch();

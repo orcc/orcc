@@ -34,7 +34,7 @@ import java.util.List;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Node;
+import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 
@@ -77,7 +77,7 @@ public class AstIrUtil {
 	 * @return a list of IR expressions
 	 */
 	public static List<Expression> transformExpressions(Procedure procedure,
-			List<Node> nodes, List<AstExpression> expressions) {
+			List<Block> nodes, List<AstExpression> expressions) {
 		int length = expressions.size();
 		List<Expression> irExpressions = new ArrayList<Expression>(length);
 		for (AstExpression expression : expressions) {

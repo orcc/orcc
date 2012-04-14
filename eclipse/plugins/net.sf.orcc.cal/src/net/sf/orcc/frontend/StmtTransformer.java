@@ -50,10 +50,10 @@ import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
@@ -119,7 +119,7 @@ public class StmtTransformer extends CalSwitch<EObject> {
 
 	}
 
-	private List<Node> nodes;
+	private List<Block> nodes;
 
 	private Procedure print;
 
@@ -132,7 +132,7 @@ public class StmtTransformer extends CalSwitch<EObject> {
 	 * @param procedure
 	 *            a procedure
 	 */
-	public StmtTransformer(Procedure procedure, List<Node> nodes) {
+	public StmtTransformer(Procedure procedure, List<Block> nodes) {
 		this.procedure = procedure;
 		this.nodes = nodes;
 	}
@@ -207,8 +207,8 @@ public class StmtTransformer extends CalSwitch<EObject> {
 				eINSTANCE.createTypeBool());
 
 		// create while
-		NodeWhile nodeWhile = eINSTANCE.createNodeWhile();
-		nodeWhile.setJoinNode(eINSTANCE.createNodeBlock());
+		BlockWhile nodeWhile = eINSTANCE.createBlockWhile();
+		nodeWhile.setJoinNode(eINSTANCE.createBlockBasic());
 		nodeWhile.setLineNumber(lineNumber);
 		nodeWhile.setCondition(condition);
 
@@ -219,7 +219,7 @@ public class StmtTransformer extends CalSwitch<EObject> {
 				.getStatements());
 
 		// add increment
-		NodeBlock block = IrUtil.getLast(nodeWhile.getNodes());
+		BlockBasic block = IrUtil.getLast(nodeWhile.getNodes());
 		InstAssign assign = eINSTANCE.createInstAssign(lineNumber, loopVar,
 				eINSTANCE.createExprBinary(eINSTANCE.createExprVar(loopVar),
 						OpBinary.PLUS, eINSTANCE.createExprInt(1),
@@ -240,8 +240,8 @@ public class StmtTransformer extends CalSwitch<EObject> {
 				.doSwitch(stmtIf.getCondition());
 
 		// creates if and adds it to procedure
-		NodeIf node = eINSTANCE.createNodeIf();
-		node.setJoinNode(eINSTANCE.createNodeBlock());
+		BlockIf node = eINSTANCE.createBlockIf();
+		node.setJoinNode(eINSTANCE.createBlockBasic());
 		node.setLineNumber(lineNumber);
 		node.setCondition(condition);
 
@@ -261,8 +261,8 @@ public class StmtTransformer extends CalSwitch<EObject> {
 
 			// creates inner if
 			lineNumber = Util.getLocation(elsif);
-			NodeIf innerIf = eINSTANCE.createNodeIf();
-			innerIf.setJoinNode(eINSTANCE.createNodeBlock());
+			BlockIf innerIf = eINSTANCE.createBlockIf();
+			innerIf.setJoinNode(eINSTANCE.createBlockBasic());
 			innerIf.setLineNumber(lineNumber);
 			innerIf.setCondition(condition);
 			new StmtTransformer(procedure, innerIf.getThenNodes())
@@ -285,13 +285,13 @@ public class StmtTransformer extends CalSwitch<EObject> {
 		int lineNumber = Util.getLocation(stmtWhile);
 
 		// to track the instructions created when condition was transformed
-		List<Node> tempNodes = new ArrayList<Node>();
+		List<Block> tempNodes = new ArrayList<Block>();
 		ExprTransformer transformer = new ExprTransformer(procedure, tempNodes);
 		Expression condition = transformer.doSwitch(stmtWhile.getCondition());
 
 		// create the while
-		NodeWhile nodeWhile = eINSTANCE.createNodeWhile();
-		nodeWhile.setJoinNode(eINSTANCE.createNodeBlock());
+		BlockWhile nodeWhile = eINSTANCE.createBlockWhile();
+		nodeWhile.setJoinNode(eINSTANCE.createBlockBasic());
 		nodeWhile.setLineNumber(lineNumber);
 		nodeWhile.setCondition(condition);
 

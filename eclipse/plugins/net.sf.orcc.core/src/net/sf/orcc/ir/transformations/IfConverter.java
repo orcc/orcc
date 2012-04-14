@@ -34,9 +34,9 @@ import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
@@ -55,10 +55,10 @@ public class IfConverter extends AbstractActorVisitor<Object> {
 
 	private Predicate currentPredicate;
 
-	private NodeBlock targetBlock;
+	private BlockBasic targetBlock;
 
 	@Override
-	public Object caseNodeBlock(NodeBlock block) {
+	public Object caseNodeBlock(BlockBasic block) {
 		List<Instruction> instructions = block.getInstructions();
 		// annotate with predicate
 		for (Instruction instruction : instructions) {
@@ -76,7 +76,7 @@ public class IfConverter extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseNodeIf(NodeIf nodeIf) {
+	public Object caseNodeIf(BlockIf nodeIf) {
 		Predicate previousPredicate = currentPredicate;
 
 		// predicate for "then" branch
@@ -107,21 +107,21 @@ public class IfConverter extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseNodeWhile(NodeWhile nodeWhile) {
+	public Object caseNodeWhile(BlockWhile nodeWhile) {
 		throw new OrccRuntimeException("unsupported NodeWhile");
 	}
 
 	@Override
 	public Object caseProcedure(Procedure procedure) {
 		// do not perform if-conversion if procedure contains whiles
-		if (EcoreHelper.getObjects(procedure, NodeWhile.class).iterator()
+		if (EcoreHelper.getObjects(procedure, BlockWhile.class).iterator()
 				.hasNext()) {
 			return null;
 		}
 
 		// now we can safely perform if-conversion
 		currentPredicate = IrFactory.eINSTANCE.createPredicate();
-		targetBlock = IrFactory.eINSTANCE.createNodeBlock();
+		targetBlock = IrFactory.eINSTANCE.createBlockBasic();
 
 		super.caseProcedure(procedure);
 		procedure.getNodes().add(targetBlock);

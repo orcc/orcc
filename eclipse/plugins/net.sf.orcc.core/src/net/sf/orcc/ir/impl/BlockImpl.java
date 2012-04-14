@@ -12,7 +12,7 @@ import net.sf.dftools.graph.Edge;
 import net.sf.dftools.util.Attribute;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Node;
+import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.Procedure;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -27,13 +27,13 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.ir.impl.NodeImpl#getCfgNode <em>Cfg Node</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.BlockImpl#getCfgNode <em>Cfg Node</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public abstract class NodeImpl extends AttributableImpl implements Node {
+public abstract class BlockImpl extends AttributableImpl implements Block {
 
 	/**
 	 * The cached value of the '{@link #getCfgNode() <em>Cfg Node</em>}' reference.
@@ -48,7 +48,7 @@ public abstract class NodeImpl extends AttributableImpl implements Node {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected NodeImpl() {
+	protected BlockImpl() {
 		super();
 	}
 
@@ -90,7 +90,7 @@ public abstract class NodeImpl extends AttributableImpl implements Node {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return IrPackage.Literals.NODE;
+		return IrPackage.Literals.BLOCK;
 	}
 
 	/**
@@ -104,7 +104,7 @@ public abstract class NodeImpl extends AttributableImpl implements Node {
 			if (cfgNode != oldCfgNode) {
 				if (eNotificationRequired())
 					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							IrPackage.NODE__CFG_NODE, oldCfgNode, cfgNode));
+							IrPackage.BLOCK__CFG_NODE, oldCfgNode, cfgNode));
 			}
 		}
 		return cfgNode;
@@ -128,7 +128,7 @@ public abstract class NodeImpl extends AttributableImpl implements Node {
 		cfgNode = newCfgNode;
 		if (eNotificationRequired()) {
 			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.NODE__CFG_NODE, oldCfgNode,
+					Notification.SET, IrPackage.BLOCK__CFG_NODE, oldCfgNode,
 					newCfgNode);
 			if (msgs == null)
 				msgs = notification;
@@ -156,7 +156,7 @@ public abstract class NodeImpl extends AttributableImpl implements Node {
 				msgs.dispatch();
 		} else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.NODE__CFG_NODE, newCfgNode, newCfgNode));
+					IrPackage.BLOCK__CFG_NODE, newCfgNode, newCfgNode));
 	}
 
 	/**
@@ -167,7 +167,7 @@ public abstract class NodeImpl extends AttributableImpl implements Node {
 	public NotificationChain eInverseAdd(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-		case IrPackage.NODE__CFG_NODE:
+		case IrPackage.BLOCK__CFG_NODE:
 			if (cfgNode != null)
 				msgs = ((InternalEObject) cfgNode).eInverseRemove(this,
 						IrPackage.CFG_NODE__NODE, CfgNode.class, msgs);
@@ -184,7 +184,7 @@ public abstract class NodeImpl extends AttributableImpl implements Node {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-		case IrPackage.NODE__CFG_NODE:
+		case IrPackage.BLOCK__CFG_NODE:
 			return basicSetCfgNode(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
@@ -197,7 +197,7 @@ public abstract class NodeImpl extends AttributableImpl implements Node {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case IrPackage.NODE__CFG_NODE:
+		case IrPackage.BLOCK__CFG_NODE:
 			if (resolve)
 				return getCfgNode();
 			return basicGetCfgNode();
@@ -212,7 +212,7 @@ public abstract class NodeImpl extends AttributableImpl implements Node {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case IrPackage.NODE__CFG_NODE:
+		case IrPackage.BLOCK__CFG_NODE:
 			setCfgNode((CfgNode) newValue);
 			return;
 		}
@@ -226,7 +226,7 @@ public abstract class NodeImpl extends AttributableImpl implements Node {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case IrPackage.NODE__CFG_NODE:
+		case IrPackage.BLOCK__CFG_NODE:
 			setCfgNode((CfgNode) null);
 			return;
 		}
@@ -240,7 +240,7 @@ public abstract class NodeImpl extends AttributableImpl implements Node {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case IrPackage.NODE__CFG_NODE:
+		case IrPackage.BLOCK__CFG_NODE:
 			return cfgNode != null;
 		}
 		return super.eIsSet(featureID);

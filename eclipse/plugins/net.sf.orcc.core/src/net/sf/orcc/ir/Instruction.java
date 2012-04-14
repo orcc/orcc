@@ -43,7 +43,7 @@ public interface Instruction extends Attributable {
 	 * 
 	 * @return the block that contains this instruction
 	 */
-	NodeBlock getBlock();
+	BlockBasic getBlock();
 
 	/**
 	 * Returns the line number of this instruction.

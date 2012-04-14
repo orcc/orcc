@@ -554,31 +554,31 @@ public interface IrFactory extends EFactory {
 	InstStore createInstStore(Var target, Var index, Var source);
 
 	/**
-	 * Returns a new object of class '<em>Node Block</em>'.
+	 * Returns a new object of class '<em>Block Basic</em>'.
 	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * @return a new object of class '<em>Node Block</em>'.
+	 * @return a new object of class '<em>Block Basic</em>'.
 	 * @generated
 	 */
-	NodeBlock createNodeBlock();
+	BlockBasic createBlockBasic();
 
 	/**
-	 * Returns a new object of class '<em>Node If</em>'.
+	 * Returns a new object of class '<em>Block If</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Node If</em>'.
+	 * @return a new object of class '<em>Block If</em>'.
 	 * @generated
 	 */
-	NodeIf createNodeIf();
+	BlockIf createBlockIf();
 
 	/**
-	 * Returns a new object of class '<em>Node While</em>'.
+	 * Returns a new object of class '<em>Block While</em>'.
 	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * @return a new object of class '<em>Node While</em>'.
+	 * @return a new object of class '<em>Block While</em>'.
 	 * @generated
 	 */
-	NodeWhile createNodeWhile();
+	BlockWhile createBlockWhile();
 
 	/**
 	 * Returns a new object of class '<em>Param</em>'.
@@ -625,7 +625,7 @@ public interface IrFactory extends EFactory {
 	 */
 	CfgNode createCfgNode();
 
-	CfgNode createCfgNode(Node node);
+	CfgNode createCfgNode(Block node);
 
 	/**
 	 * Returns a new object of class '<em>Procedure</em>'.

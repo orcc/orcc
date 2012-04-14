@@ -29,8 +29,8 @@
 package net.sf.orcc.backends.transformations;
 
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
@@ -42,22 +42,22 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
 public class EmptyNodeRemover extends AbstractActorVisitor<Object> {
 
 	@Override
-	public Object caseNodeIf(NodeIf nodeIf) {
+	public Object caseNodeIf(BlockIf nodeIf) {
 		if (nodeIf.getThenNodes().isEmpty()) {
-			nodeIf.getThenNodes().add(IrFactory.eINSTANCE.createNodeBlock());
+			nodeIf.getThenNodes().add(IrFactory.eINSTANCE.createBlockBasic());
 		}
 		
 		if (nodeIf.getElseNodes().isEmpty()) {
-			nodeIf.getElseNodes().add(IrFactory.eINSTANCE.createNodeBlock());
+			nodeIf.getElseNodes().add(IrFactory.eINSTANCE.createBlockBasic());
 		}
 		super.caseNodeIf(nodeIf);
 		return null;
 	}
 	
 	@Override
-	public Object caseNodeWhile(NodeWhile nodeWhile) {
+	public Object caseNodeWhile(BlockWhile nodeWhile) {
 		if (nodeWhile.getNodes().isEmpty()) {
-			nodeWhile.getNodes().add(IrFactory.eINSTANCE.createNodeBlock());
+			nodeWhile.getNodes().add(IrFactory.eINSTANCE.createBlockBasic());
 		}
 		
 		super.caseNodeWhile(nodeWhile);

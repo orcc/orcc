@@ -9,7 +9,7 @@ package net.sf.orcc.ir.impl;
 import net.sf.dftools.util.impl.AttributableImpl;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.Predicate;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -180,8 +180,8 @@ public abstract class InstructionImpl extends AttributableImpl implements
 	}
 
 	@Override
-	public NodeBlock getBlock() {
-		return (NodeBlock) eContainer();
+	public BlockBasic getBlock() {
+		return (BlockBasic) eContainer();
 	}
 
 	/**

@@ -53,10 +53,10 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Type;
@@ -300,7 +300,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 				}
 			}
 			// Add cast instructions just before call
-			NodeBlock debugBlock = call.getBlock();
+			BlockBasic debugBlock = call.getBlock();
 			for (Instruction instr : castInstrToAdd) {
 				debugBlock.add(indexInst++, instr);
 			}
@@ -345,32 +345,32 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 		Type oldParentType = parentType;
 		parentType = phi.getTarget().getVariable().getType();
 		EList<Expression> values = phi.getValues();
-		Node containingNode = (Node) phi.eContainer().eContainer();
+		Block containingNode = (Block) phi.eContainer().eContainer();
 		Expression value0 = phi.getValues().get(0);
 		Expression value1 = phi.getValues().get(1);
-		if (containingNode.isNodeIf()) {
-			NodeIf nodeIf = (NodeIf) containingNode;
+		if (containingNode.isBlockIf()) {
+			BlockIf nodeIf = (BlockIf) containingNode;
 			if (value0.isExprVar()) {
-				NodeBlock block0 = IrFactory.eINSTANCE.createNodeBlock();
+				BlockBasic block0 = IrFactory.eINSTANCE.createBlockBasic();
 				nodeIf.getThenNodes().add(block0);
 				values.set(0, castExpression(value0, block0, 0));
 			}
 			if (value1.isExprVar()) {
-				NodeBlock block1 = IrFactory.eINSTANCE.createNodeBlock();
+				BlockBasic block1 = IrFactory.eINSTANCE.createBlockBasic();
 				nodeIf.getElseNodes().add(block1);
 				values.set(1, castExpression(value1, block1, 0));
 			}
 		} else {
-			NodeWhile nodeWhile = (NodeWhile) containingNode;
+			BlockWhile nodeWhile = (BlockWhile) containingNode;
 			if (value0.isExprVar()) {
-				NodeBlock block = IrFactory.eINSTANCE.createNodeBlock();
+				BlockBasic block = IrFactory.eINSTANCE.createBlockBasic();
 				EcoreHelper.getContainingList(containingNode).add(indexNode,
 						block);
 				indexNode++;
 				values.set(0, castExpression(value0, block, 0));
 			}
 			if (value1.isExprVar()) {
-				NodeBlock block = IrFactory.eINSTANCE.createNodeBlock();
+				BlockBasic block = IrFactory.eINSTANCE.createBlockBasic();
 				nodeWhile.getNodes().add(block);
 				values.set(1, castExpression(value1, block, 0));
 			}
@@ -409,7 +409,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 	}
 
 	@Override
-	public Expression caseNodeIf(NodeIf nodeIf) {
+	public Expression caseNodeIf(BlockIf nodeIf) {
 		Type oldParentType = parentType;
 		parentType = IrFactory.eINSTANCE.createTypeBool();
 		nodeIf.setCondition(doSwitch(nodeIf.getCondition()));
@@ -421,7 +421,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 	}
 
 	@Override
-	public Expression caseNodeWhile(NodeWhile nodeWhile) {
+	public Expression caseNodeWhile(BlockWhile nodeWhile) {
 		Type oldParentType = parentType;
 		parentType = IrFactory.eINSTANCE.createTypeBool();
 		nodeWhile.setCondition(doSwitch(nodeWhile.getCondition()));
@@ -460,7 +460,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 		return expr;
 	}
 
-	private Expression castExpression(Expression expr, NodeBlock node, int index) {
+	private Expression castExpression(Expression expr, BlockBasic node, int index) {
 		if (needCast(expr.getType(), parentType)) {
 			Var oldVar;
 			if (expr.isExprVar()) {

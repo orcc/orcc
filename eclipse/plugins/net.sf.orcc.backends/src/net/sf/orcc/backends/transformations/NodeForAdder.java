@@ -33,21 +33,21 @@ import java.util.List;
 
 import net.sf.dftools.util.Attribute;
 import net.sf.dftools.util.util.EcoreHelper;
+import net.sf.orcc.backends.ir.BlockFor;
 import net.sf.orcc.backends.ir.IrNodeSpecific;
 import net.sf.orcc.backends.ir.IrSpecificFactory;
-import net.sf.orcc.backends.ir.NodeFor;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockSpecific;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.NodeSpecific;
-import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.transformations.CfgBuilder;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
@@ -65,7 +65,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 public class NodeForAdder extends AbstractActorVisitor<Object> {
 
 	private class ForNodeCfg extends CfgBuilder {
-		public CfgNode caseNodeFor(NodeFor node) {
+		public CfgNode caseNodeFor(BlockFor node) {
 			CfgNode join = addNode(node.getJoinNode());
 			cfg.getVertices().add(join);
 
@@ -89,9 +89,9 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 		}
 
 		@Override
-		public CfgNode caseNodeSpecific(NodeSpecific node) {
-			if (((IrNodeSpecific)node).isNodeFor()) {
-				return caseNodeFor((NodeFor) node);
+		public CfgNode caseNodeSpecific(BlockSpecific node) {
+			if (((IrNodeSpecific) node).isNodeFor()) {
+				return caseNodeFor((BlockFor) node);
 			}
 
 			return null;
@@ -134,12 +134,12 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseNodeWhile(NodeWhile nodeWhile) {
+	public Object caseNodeWhile(BlockWhile nodeWhile) {
 
 		super.caseNodeWhile(nodeWhile);
 
 		// Get properties of the while node
-		EList<Node> nodes = nodeWhile.getNodes();
+		EList<Block> nodes = nodeWhile.getNodes();
 
 		if (nodes.isEmpty()) {
 			// Don't treat empty nodes
@@ -147,11 +147,11 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 		}
 
 		Expression condition = nodeWhile.getCondition();
-		Node endNode = nodes.get(nodes.size() - 1);
-		
-		CfgNode previousCFGNode = (CfgNode) nodeWhile.getJoinNode().getCfgNode()
-				.getPredecessors().get(0);
-		Node previousNode = previousCFGNode.getNode();
+		Block endNode = nodes.get(nodes.size() - 1);
+
+		CfgNode previousCFGNode = (CfgNode) nodeWhile.getJoinNode()
+				.getCfgNode().getPredecessors().get(0);
+		Block previousNode = previousCFGNode.getNode();
 
 		List<Var> conditionVars = new VarGetter(condition).get();
 		List<Instruction> loopCnts = new ArrayList<Instruction>();
@@ -177,7 +177,7 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 		}
 
 		// Create node for
-		NodeFor nodeFor = IrSpecificFactory.eINSTANCE.createNodeFor();
+		BlockFor nodeFor = IrSpecificFactory.eINSTANCE.createBlockFor();
 
 		nodeFor.setCondition(nodeWhile.getCondition());
 		nodeFor.setLineNumber(nodeWhile.getLineNumber());
@@ -189,31 +189,31 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 		nodeFor.getInit().addAll(initCnts);
 
 		// Copy attributes
-		for (Attribute attribute : nodeWhile.getAttributes()){
-			//TODO : copye attribute
+		for (Attribute attribute : nodeWhile.getAttributes()) {
+			// TODO: copy attribute
 			nodeFor.setAttribute(attribute.getName(), null);
 		}
-		
+
 		// Replace node
 		EcoreUtil.replace(nodeWhile, nodeFor);
-		
+
 		return null;
 	}
 
-	private Instruction getLastAssign(Var var, Node lastNode) {
+	private Instruction getLastAssign(Var var, Block lastNode) {
 		EList<Def> defs = var.getDefs();
 
 		// Check if one var defs is located in the last node
-		NodeBlock lastBlockNode = null;
+		BlockBasic lastBlockNode = null;
 
-		if (lastNode.isNodeIf()) {
-			lastBlockNode = ((NodeIf) lastNode).getJoinNode();
-		} else if (lastNode.isNodeWhile()) {
-			lastBlockNode = ((NodeWhile) lastNode).getJoinNode();
-		} else if (lastNode.isNodeBlock()) {
-			lastBlockNode = (NodeBlock) lastNode;
+		if (lastNode.isBlockIf()) {
+			lastBlockNode = ((BlockIf) lastNode).getJoinNode();
+		} else if (lastNode.isBlockWhile()) {
+			lastBlockNode = ((BlockWhile) lastNode).getJoinNode();
+		} else if (lastNode.isBlockBasic()) {
+			lastBlockNode = (BlockBasic) lastNode;
 		} else {
-			lastBlockNode = ((NodeFor) lastNode).getJoinNode();
+			lastBlockNode = ((BlockFor) lastNode).getJoinNode();
 		}
 
 		// Return in case of an empty node

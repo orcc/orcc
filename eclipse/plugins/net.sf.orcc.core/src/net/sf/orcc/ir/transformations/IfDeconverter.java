@@ -37,10 +37,10 @@ import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
@@ -59,13 +59,13 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 
 	private Predicate currentPredicate;
 
-	private List<NodeIf> nodeIfList;
+	private List<BlockIf> nodeIfList;
 
 	@Override
-	public Object caseNodeBlock(NodeBlock block) {
+	public Object caseNodeBlock(BlockBasic block) {
 		Procedure procedure = EcoreHelper.getContainerOfType(block,
 				Procedure.class);
-		NodeBlock targetBlock = null;
+		BlockBasic targetBlock = null;
 
 		List<Instruction> instructions = block.getInstructions();
 		while (!instructions.isEmpty()) {
@@ -101,25 +101,25 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseNodeWhile(NodeWhile nodeWhile) {
+	public Object caseNodeWhile(BlockWhile nodeWhile) {
 		throw new OrccRuntimeException("unsupported NodeWhile");
 	}
 
 	@Override
 	public Object caseProcedure(Procedure procedure) {
 		// do not perform if-deconversion if procedure contains whiles
-		if (EcoreHelper.getObjects(procedure, NodeWhile.class).iterator()
+		if (EcoreHelper.getObjects(procedure, BlockWhile.class).iterator()
 				.hasNext()) {
 			return null;
 		}
 
-		nodeIfList = new ArrayList<NodeIf>();
+		nodeIfList = new ArrayList<BlockIf>();
 
 		// initialized to "null" so that the first empty predicate will create
 		// an unconditional block
 		currentPredicate = null;
 
-		List<Node> nodes = procedure.getNodes();
+		List<Block> nodes = procedure.getNodes();
 		if (!nodes.isEmpty()) {
 			doSwitch(nodes.get(0));
 		}
@@ -137,9 +137,9 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 	 * @return the list of nodes that matches the given condition, or
 	 *         <code>null</code>
 	 */
-	private List<Node> findNodes(List<Node> parentNodes, Expression condition) {
-		for (NodeIf nodeIf : nodeIfList) {
-			List<Node> nodes = EcoreHelper.getContainingList(nodeIf);
+	private List<Block> findNodes(List<Block> parentNodes, Expression condition) {
+		for (BlockIf nodeIf : nodeIfList) {
+			List<Block> nodes = EcoreHelper.getContainingList(nodeIf);
 			if (EcoreUtil.equals(condition, nodeIf.getCondition())
 					&& parentNodes == nodes) {
 				return nodeIf.getThenNodes();
@@ -168,26 +168,26 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 	 * @param predicate
 	 *            a predicate
 	 */
-	private NodeBlock updateTargetBlock(Procedure procedure, Predicate predicate) {
+	private BlockBasic updateTargetBlock(Procedure procedure, Predicate predicate) {
 		currentPredicate = IrFactory.eINSTANCE.createPredicate();
-		List<Node> parentNodes = procedure.getNodes();
+		List<Block> parentNodes = procedure.getNodes();
 
 		if (predicate.isEmpty()) {
 			// unconditioned predicate => forgets all ifs
 			nodeIfList.clear();
 
 			// creates a new block
-			NodeBlock block = IrFactory.eINSTANCE.createNodeBlock();
+			BlockBasic block = IrFactory.eINSTANCE.createBlockBasic();
 			procedure.getNodes().add(block);
 			return block;
 		} else {
 			for (Expression condition : predicate.getExpressions()) {
-				List<Node> nodes = findNodes(parentNodes, condition);
+				List<Block> nodes = findNodes(parentNodes, condition);
 				if (nodes == null) {
 					// create a new if
-					NodeIf nodeIf = IrFactory.eINSTANCE.createNodeIf();
+					BlockIf nodeIf = IrFactory.eINSTANCE.createBlockIf();
 					nodeIf.setCondition(IrUtil.copy(condition));
-					nodeIf.setJoinNode(IrFactory.eINSTANCE.createNodeBlock());
+					nodeIf.setJoinNode(IrFactory.eINSTANCE.createBlockBasic());
 					nodeIfList.add(nodeIf);
 					parentNodes.add(nodeIf);
 

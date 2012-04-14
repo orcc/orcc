@@ -46,7 +46,7 @@ public interface CfgNode extends Vertex {
 	 * @return the Node associated with this CFG node
 	 * @model
 	 */
-	Node getNode();
+	Block getNode();
 
 	/**
 	 * Sets the Node associated with this CFG node.
@@ -54,6 +54,6 @@ public interface CfgNode extends Vertex {
 	 * @param node
 	 *            the Node to associate with this CFG node
 	 */
-	void setNode(Node node);
+	void setNode(Block node);
 
 }

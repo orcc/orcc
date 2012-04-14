@@ -57,10 +57,10 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -307,7 +307,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	}
 
 	@Override
-	public Object caseNodeBlock(NodeBlock block) {
+	public Object caseBlockBasic(BlockBasic block) {
 		List<Instruction> instructions = block.getInstructions();
 		for (Instruction instruction : instructions) {
 			Object result = doSwitch(instruction);
@@ -319,7 +319,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	}
 
 	@Override
-	public Object caseNodeIf(NodeIf node) {
+	public Object caseBlockIf(BlockIf node) {
 		// Interpret first expression ("if" condition)
 		Object condition = exprInterpreter.doSwitch(node.getCondition());
 
@@ -346,7 +346,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	}
 
 	@Override
-	public Object caseNodeWhile(NodeWhile node) {
+	public Object caseBlockWhile(BlockWhile node) {
 		int oldBranch = branch;
 		branch = 0;
 		doSwitch(node.getJoinNode());
@@ -441,8 +441,8 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	 * @param nodes
 	 *            a list of nodes that belong to a procedure
 	 */
-	protected Object doSwitch(List<Node> nodes) {
-		for (Node node : nodes) {
+	protected Object doSwitch(List<Block> nodes) {
+		for (Block node : nodes) {
 			Object result = doSwitch(node);
 			if (result != null) {
 				return result;

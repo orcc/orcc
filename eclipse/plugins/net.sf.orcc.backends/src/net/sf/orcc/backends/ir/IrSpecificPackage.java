@@ -355,14 +355,14 @@ public interface IrSpecificPackage extends EPackage {
 	int INST_TERNARY_FEATURE_COUNT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 4;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.ir.impl.NodeForImpl <em>Node For</em>}' class.
+	 * The meta object id for the '{@link net.sf.orcc.backends.ir.impl.BlockForImpl <em>Block For</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.backends.ir.impl.NodeForImpl
-	 * @see net.sf.orcc.backends.ir.impl.IrSpecificPackageImpl#getNodeFor()
+	 * @see net.sf.orcc.backends.ir.impl.BlockForImpl
+	 * @see net.sf.orcc.backends.ir.impl.IrSpecificPackageImpl#getBlockFor()
 	 * @generated
 	 */
-	int NODE_FOR = 4;
+	int BLOCK_FOR = 4;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -371,7 +371,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_FOR__ATTRIBUTES = IrPackage.NODE_SPECIFIC__ATTRIBUTES;
+	int BLOCK_FOR__ATTRIBUTES = IrPackage.BLOCK_SPECIFIC__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Cfg Node</b></em>' reference.
@@ -380,7 +380,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_FOR__CFG_NODE = IrPackage.NODE_SPECIFIC__CFG_NODE;
+	int BLOCK_FOR__CFG_NODE = IrPackage.BLOCK_SPECIFIC__CFG_NODE;
 
 	/**
 	 * The feature id for the '<em><b>Condition</b></em>' containment reference.
@@ -389,7 +389,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_FOR__CONDITION = IrPackage.NODE_SPECIFIC_FEATURE_COUNT + 0;
+	int BLOCK_FOR__CONDITION = IrPackage.BLOCK_SPECIFIC_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Join Node</b></em>' containment reference.
@@ -398,7 +398,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_FOR__JOIN_NODE = IrPackage.NODE_SPECIFIC_FEATURE_COUNT + 1;
+	int BLOCK_FOR__JOIN_NODE = IrPackage.BLOCK_SPECIFIC_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -407,7 +407,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_FOR__LINE_NUMBER = IrPackage.NODE_SPECIFIC_FEATURE_COUNT + 2;
+	int BLOCK_FOR__LINE_NUMBER = IrPackage.BLOCK_SPECIFIC_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Nodes</b></em>' containment reference list.
@@ -416,7 +416,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_FOR__NODES = IrPackage.NODE_SPECIFIC_FEATURE_COUNT + 3;
+	int BLOCK_FOR__NODES = IrPackage.BLOCK_SPECIFIC_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Loop Counter</b></em>' containment reference list.
@@ -425,7 +425,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_FOR__LOOP_COUNTER = IrPackage.NODE_SPECIFIC_FEATURE_COUNT + 4;
+	int BLOCK_FOR__LOOP_COUNTER = IrPackage.BLOCK_SPECIFIC_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>Init</b></em>' containment reference list.
@@ -434,16 +434,16 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_FOR__INIT = IrPackage.NODE_SPECIFIC_FEATURE_COUNT + 5;
+	int BLOCK_FOR__INIT = IrPackage.BLOCK_SPECIFIC_FEATURE_COUNT + 5;
 
 	/**
-	 * The number of structural features of the '<em>Node For</em>' class.
+	 * The number of structural features of the '<em>Block For</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_FOR_FEATURE_COUNT = IrPackage.NODE_SPECIFIC_FEATURE_COUNT + 6;
+	int BLOCK_FOR_FEATURE_COUNT = IrPackage.BLOCK_SPECIFIC_FEATURE_COUNT + 6;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.ir.InstAssignIndex <em>Inst Assign Index</em>}'.
@@ -618,80 +618,80 @@ public interface IrSpecificPackage extends EPackage {
 	EReference getInstTernary_Target();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.backends.ir.NodeFor <em>Node For</em>}'.
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.ir.BlockFor <em>Block For</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Node For</em>'.
-	 * @see net.sf.orcc.backends.ir.NodeFor
+	 * @return the meta object for class '<em>Block For</em>'.
+	 * @see net.sf.orcc.backends.ir.BlockFor
 	 * @generated
 	 */
-	EClass getNodeFor();
+	EClass getBlockFor();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.ir.NodeFor#getCondition <em>Condition</em>}'.
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.ir.BlockFor#getCondition <em>Condition</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the containment reference '<em>Condition</em>'.
-	 * @see net.sf.orcc.backends.ir.NodeFor#getCondition()
-	 * @see #getNodeFor()
+	 * @see net.sf.orcc.backends.ir.BlockFor#getCondition()
+	 * @see #getBlockFor()
 	 * @generated
 	 */
-	EReference getNodeFor_Condition();
+	EReference getBlockFor_Condition();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.ir.NodeFor#getJoinNode <em>Join Node</em>}'.
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.ir.BlockFor#getJoinNode <em>Join Node</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the containment reference '<em>Join Node</em>'.
-	 * @see net.sf.orcc.backends.ir.NodeFor#getJoinNode()
-	 * @see #getNodeFor()
+	 * @see net.sf.orcc.backends.ir.BlockFor#getJoinNode()
+	 * @see #getBlockFor()
 	 * @generated
 	 */
-	EReference getNodeFor_JoinNode();
+	EReference getBlockFor_JoinNode();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.ir.NodeFor#getLineNumber <em>Line Number</em>}'.
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.ir.BlockFor#getLineNumber <em>Line Number</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Line Number</em>'.
-	 * @see net.sf.orcc.backends.ir.NodeFor#getLineNumber()
-	 * @see #getNodeFor()
+	 * @see net.sf.orcc.backends.ir.BlockFor#getLineNumber()
+	 * @see #getBlockFor()
 	 * @generated
 	 */
-	EAttribute getNodeFor_LineNumber();
+	EAttribute getBlockFor_LineNumber();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.ir.NodeFor#getNodes <em>Nodes</em>}'.
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.ir.BlockFor#getNodes <em>Nodes</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the containment reference list '<em>Nodes</em>'.
-	 * @see net.sf.orcc.backends.ir.NodeFor#getNodes()
-	 * @see #getNodeFor()
+	 * @see net.sf.orcc.backends.ir.BlockFor#getNodes()
+	 * @see #getBlockFor()
 	 * @generated
 	 */
-	EReference getNodeFor_Nodes();
+	EReference getBlockFor_Nodes();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.ir.NodeFor#getLoopCounter <em>Loop Counter</em>}'.
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.ir.BlockFor#getLoopCounter <em>Loop Counter</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the containment reference list '<em>Loop Counter</em>'.
-	 * @see net.sf.orcc.backends.ir.NodeFor#getLoopCounter()
-	 * @see #getNodeFor()
+	 * @see net.sf.orcc.backends.ir.BlockFor#getLoopCounter()
+	 * @see #getBlockFor()
 	 * @generated
 	 */
-	EReference getNodeFor_LoopCounter();
+	EReference getBlockFor_LoopCounter();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.ir.NodeFor#getInit <em>Init</em>}'.
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.ir.BlockFor#getInit <em>Init</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the containment reference list '<em>Init</em>'.
-	 * @see net.sf.orcc.backends.ir.NodeFor#getInit()
-	 * @see #getNodeFor()
+	 * @see net.sf.orcc.backends.ir.BlockFor#getInit()
+	 * @see #getBlockFor()
 	 * @generated
 	 */
-	EReference getNodeFor_Init();
+	EReference getBlockFor_Init();
 
 	/**
 	 * Returns the factory that creates the instances of the model.
@@ -861,14 +861,14 @@ public interface IrSpecificPackage extends EPackage {
 		EReference INST_TERNARY__TARGET = eINSTANCE.getInstTernary_Target();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.ir.impl.NodeForImpl <em>Node For</em>}' class.
+		 * The meta object literal for the '{@link net.sf.orcc.backends.ir.impl.BlockForImpl <em>Block For</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.backends.ir.impl.NodeForImpl
-		 * @see net.sf.orcc.backends.ir.impl.IrSpecificPackageImpl#getNodeFor()
+		 * @see net.sf.orcc.backends.ir.impl.BlockForImpl
+		 * @see net.sf.orcc.backends.ir.impl.IrSpecificPackageImpl#getBlockFor()
 		 * @generated
 		 */
-		EClass NODE_FOR = eINSTANCE.getNodeFor();
+		EClass BLOCK_FOR = eINSTANCE.getBlockFor();
 
 		/**
 		 * The meta object literal for the '<em><b>Condition</b></em>' containment reference feature.
@@ -876,7 +876,7 @@ public interface IrSpecificPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference NODE_FOR__CONDITION = eINSTANCE.getNodeFor_Condition();
+		EReference BLOCK_FOR__CONDITION = eINSTANCE.getBlockFor_Condition();
 
 		/**
 		 * The meta object literal for the '<em><b>Join Node</b></em>' containment reference feature.
@@ -884,7 +884,7 @@ public interface IrSpecificPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference NODE_FOR__JOIN_NODE = eINSTANCE.getNodeFor_JoinNode();
+		EReference BLOCK_FOR__JOIN_NODE = eINSTANCE.getBlockFor_JoinNode();
 
 		/**
 		 * The meta object literal for the '<em><b>Line Number</b></em>' attribute feature.
@@ -892,7 +892,7 @@ public interface IrSpecificPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute NODE_FOR__LINE_NUMBER = eINSTANCE.getNodeFor_LineNumber();
+		EAttribute BLOCK_FOR__LINE_NUMBER = eINSTANCE.getBlockFor_LineNumber();
 
 		/**
 		 * The meta object literal for the '<em><b>Nodes</b></em>' containment reference list feature.
@@ -900,7 +900,7 @@ public interface IrSpecificPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference NODE_FOR__NODES = eINSTANCE.getNodeFor_Nodes();
+		EReference BLOCK_FOR__NODES = eINSTANCE.getBlockFor_Nodes();
 
 		/**
 		 * The meta object literal for the '<em><b>Loop Counter</b></em>' containment reference list feature.
@@ -908,7 +908,8 @@ public interface IrSpecificPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference NODE_FOR__LOOP_COUNTER = eINSTANCE.getNodeFor_LoopCounter();
+		EReference BLOCK_FOR__LOOP_COUNTER = eINSTANCE
+				.getBlockFor_LoopCounter();
 
 		/**
 		 * The meta object literal for the '<em><b>Init</b></em>' containment reference list feature.
@@ -916,7 +917,7 @@ public interface IrSpecificPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference NODE_FOR__INIT = eINSTANCE.getNodeFor_Init();
+		EReference BLOCK_FOR__INIT = eINSTANCE.getBlockFor_Init();
 
 	}
 

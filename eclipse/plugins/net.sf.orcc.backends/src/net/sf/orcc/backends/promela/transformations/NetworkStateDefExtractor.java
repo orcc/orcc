@@ -47,8 +47,8 @@ import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstStore;
-import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 
@@ -234,7 +234,7 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseNodeIf(NodeIf nodeIf) {
+	public Object caseNodeIf(BlockIf nodeIf) {
 		conditionVars.push(new HashSet<Var>());
 		inCondition = true;
 		doSwitch(nodeIf.getCondition());
@@ -247,7 +247,7 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseNodeWhile(NodeWhile nodeWhile) {
+	public Object caseNodeWhile(BlockWhile nodeWhile) {
 		conditionVars.push(new HashSet<Var>());
 		inCondition = true;
 		doSwitch(nodeWhile.getCondition());

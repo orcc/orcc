@@ -8,7 +8,7 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="native" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="nodes" upperBound="-1"
-        eType="#//Node" containment="true" resolveProxies="false"/>
+        eType="#//Block" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="parameters" upperBound="-1"
         eType="#//Param" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="returnType" eType="#//Type"
@@ -21,34 +21,35 @@
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="byRef" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Node" abstract="true" eSuperTypes="../../net.sf.dftools.models/model/Util.ecore#//Attributable">
+  <eClassifiers xsi:type="ecore:EClass" name="Block" abstract="true" eSuperTypes="../../net.sf.dftools.models/model/Util.ecore#//Attributable">
     <eStructuralFeatures xsi:type="ecore:EReference" name="cfgNode" eType="#//CfgNode"
         eOpposite="#//CfgNode/node"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="NodeBlock" eSuperTypes="#//Node">
+  <eClassifiers xsi:type="ecore:EClass" name="BlockBasic" eSuperTypes="#//Block">
     <eStructuralFeatures xsi:type="ecore:EReference" name="instructions" upperBound="-1"
         eType="#//Instruction" containment="true" resolveProxies="false"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="NodeIf" eSuperTypes="#//Node">
+  <eClassifiers xsi:type="ecore:EClass" name="BlockIf" eSuperTypes="#//Block">
     <eStructuralFeatures xsi:type="ecore:EReference" name="condition" eType="#//Expression"
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="elseNodes" upperBound="-1"
-        eType="#//Node" containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="joinNode" eType="#//NodeBlock"
+        eType="#//Block" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="joinNode" eType="#//BlockBasic"
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="lineNumber" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="thenNodes" upperBound="-1"
-        eType="#//Node" containment="true" resolveProxies="false"/>
+        eType="#//Block" containment="true" resolveProxies="false"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="NodeWhile" eSuperTypes="#//Node">
+  <eClassifiers xsi:type="ecore:EClass" name="BlockWhile" eSuperTypes="#//Block">
     <eStructuralFeatures xsi:type="ecore:EReference" name="condition" eType="#//Expression"
         containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="joinNode" eType="#//NodeBlock"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="joinNode" eType="#//BlockBasic"
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="lineNumber" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="nodes" upperBound="-1"
-        eType="#//Node" containment="true" resolveProxies="false"/>
+        eType="#//Block" containment="true" resolveProxies="false"/>
   </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BlockSpecific" abstract="true" eSuperTypes="#//Block"/>
   <eClassifiers xsi:type="ecore:EClass" name="Instruction" abstract="true" eSuperTypes="../../net.sf.dftools.models/model/Util.ecore#//Attributable">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="lineNumber" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="predicate" eType="#//Predicate"
@@ -191,13 +192,13 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="expressions" upperBound="-1"
         eType="#//Expression" containment="true" resolveProxies="false"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="NodeSpecific" abstract="true" eSuperTypes="#//Node"/>
   <eClassifiers xsi:type="ecore:EClass" name="Cfg" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Graph">
     <eStructuralFeatures xsi:type="ecore:EReference" name="entry" eType="#//CfgNode"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="exit" eType="#//CfgNode"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="CfgNode" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Vertex">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="node" eType="#//Node" eOpposite="#//Node/cfgNode"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="node" eType="#//Block"
+        eOpposite="#//Block/cfgNode"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EEnum" name="OpBinary">
     <eLiterals name="BITAND"/>

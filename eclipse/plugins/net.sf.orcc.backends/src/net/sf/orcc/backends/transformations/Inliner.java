@@ -49,10 +49,10 @@ import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -204,7 +204,7 @@ public class Inliner extends AbstractActorVisitor<Object> {
 		}
 		// 3.2
 		int i = 0;
-		NodeBlock assignBlock = IrFactory.eINSTANCE.createNodeBlock();
+		BlockBasic assignBlock = IrFactory.eINSTANCE.createBlockBasic();
 		for (Arg arg : currentCall.getParameters()) {
 			Param param = calledProc.getParameters().get(i);
 			if (arg.isByRef()) {
@@ -242,8 +242,8 @@ public class Inliner extends AbstractActorVisitor<Object> {
 			EcoreUtil.replace(instReturn, instAssign);
 		}
 		// 6. Cut the block containing call instruction in two parts
-		NodeBlock beginningBlock = currentCall.getBlock();
-		NodeBlock followingBlock = IrFactory.eINSTANCE.createNodeBlock();
+		BlockBasic beginningBlock = currentCall.getBlock();
+		BlockBasic followingBlock = IrFactory.eINSTANCE.createBlockBasic();
 		indexInst = 0;
 		while (indexInst < beginningBlock.getInstructions().size()) {
 			if (beginningBlock.getInstructions().get(indexInst)
@@ -255,9 +255,9 @@ public class Inliner extends AbstractActorVisitor<Object> {
 			followingBlock.add(beginningBlock.getInstructions().get(indexInst));
 		}
 		// 7. Add all inlined blocks
-		List<Node> nodes = findNode(callerProc.getNodes(), beginningBlock);
+		List<Block> nodes = findNode(callerProc.getNodes(), beginningBlock);
 		indexNode = nodes.indexOf(beginningBlock);
-		List<Node> inlined = calledProc.getNodes();
+		List<Block> inlined = calledProc.getNodes();
 		if (!assignBlock.getInstructions().isEmpty()) {
 			inlined.add(0, assignBlock);
 		}
@@ -365,18 +365,18 @@ public class Inliner extends AbstractActorVisitor<Object> {
 	 * @param nodeToFind
 	 * @return
 	 */
-	public List<Node> findNode(List<Node> locationNodes, Node nodeToFind) {
+	public List<Block> findNode(List<Block> locationNodes, Block nodeToFind) {
 		if (locationNodes.contains(nodeToFind)) {
 			return locationNodes;
 		} else {
-			List<Node> n = null;
-			for (Node node : locationNodes) {
-				if (node.isNodeIf()) {
-					n = findNode(((NodeIf) node).getElseNodes(), nodeToFind);
+			List<Block> n = null;
+			for (Block node : locationNodes) {
+				if (node.isBlockIf()) {
+					n = findNode(((BlockIf) node).getElseNodes(), nodeToFind);
 					if (n == null)
-						n = findNode(((NodeIf) node).getThenNodes(), nodeToFind);
-				} else if (node.isNodeWhile()) {
-					n = findNode(((NodeWhile) node).getNodes(), nodeToFind);
+						n = findNode(((BlockIf) node).getThenNodes(), nodeToFind);
+				} else if (node.isBlockWhile()) {
+					n = findNode(((BlockWhile) node).getNodes(), nodeToFind);
 				}
 				if (n != null)
 					return n;

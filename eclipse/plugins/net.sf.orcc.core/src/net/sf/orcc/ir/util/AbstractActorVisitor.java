@@ -54,11 +54,11 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.NodeSpecific;
-import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockSpecific;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 
@@ -167,22 +167,22 @@ public abstract class AbstractActorVisitor<T> extends DfSwitch<T> {
 		}
 
 		@Override
-		public T caseNodeBlock(NodeBlock block) {
+		public T caseBlockBasic(BlockBasic block) {
 			return AbstractActorVisitor.this.caseNodeBlock(block);
 		}
 		
 		@Override
-		public T caseNodeSpecific(NodeSpecific block) {
+		public T caseBlockSpecific(BlockSpecific block) {
 			return AbstractActorVisitor.this.caseNodeSpecific(block);
 		}
 
 		@Override
-		public T caseNodeIf(NodeIf nodeIf) {
+		public T caseBlockIf(BlockIf nodeIf) {
 			return AbstractActorVisitor.this.caseNodeIf(nodeIf);
 		}
 
 		@Override
-		public T caseNodeWhile(NodeWhile nodeWhile) {
+		public T caseBlockWhile(BlockWhile nodeWhile) {
 			return AbstractActorVisitor.this.caseNodeWhile(nodeWhile);
 		}
 
@@ -368,7 +368,7 @@ public abstract class AbstractActorVisitor<T> extends DfSwitch<T> {
 		return null;
 	}
 	
-	public T caseNodeSpecific(NodeSpecific node) {
+	public T caseNodeSpecific(BlockSpecific node) {
 		// default implementation does nothing
 		return null;
 	}
@@ -384,7 +384,7 @@ public abstract class AbstractActorVisitor<T> extends DfSwitch<T> {
 		return null;
 	}
 
-	public T caseNodeBlock(NodeBlock block) {
+	public T caseNodeBlock(BlockBasic block) {
 		int oldIndexInst = indexInst;
 		List<Instruction> instructions = block.getInstructions();
 		T result = null;
@@ -398,7 +398,7 @@ public abstract class AbstractActorVisitor<T> extends DfSwitch<T> {
 		return result;
 	}
 
-	public T caseNodeIf(NodeIf nodeIf) {
+	public T caseNodeIf(BlockIf nodeIf) {
 		if (visitFull) {
 			doSwitch(nodeIf.getCondition());
 		}
@@ -409,7 +409,7 @@ public abstract class AbstractActorVisitor<T> extends DfSwitch<T> {
 		return null;
 	}
 
-	public T caseNodeWhile(NodeWhile nodeWhile) {
+	public T caseNodeWhile(BlockWhile nodeWhile) {
 		if (visitFull) {
 			doSwitch(nodeWhile.getCondition());
 		}
@@ -456,11 +456,11 @@ public abstract class AbstractActorVisitor<T> extends DfSwitch<T> {
 	 * @param nodes
 	 *            a list of nodes that belong to a procedure
 	 */
-	public T doSwitch(List<Node> nodes) {
+	public T doSwitch(List<Block> nodes) {
 		int oldIndexNode = indexNode;
 		T result = null;
 		for (indexNode = 0; indexNode < nodes.size() && result == null; indexNode++) {
-			Node node = nodes.get(indexNode);
+			Block node = nodes.get(indexNode);
 			result = irSwitch.doSwitch(node);
 		}
 

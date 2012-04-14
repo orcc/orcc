@@ -35,11 +35,11 @@ import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.NodeSpecific;
-import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockSpecific;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Param;
@@ -142,34 +142,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass nodeBlockEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass nodeIfEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass nodeWhileEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass nodeEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	private EClass procedureEClass = null;
 
 	/**
@@ -178,6 +150,41 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	private EClass paramEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass blockEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass blockBasicEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass blockIfEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass blockWhileEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass blockSpecificEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -332,13 +339,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	private EClass predicateEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass nodeSpecificEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -624,15 +624,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getNodeSpecific() {
-		return nodeSpecificEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EClass getCfg() {
 		return cfgEClass;
 	}
@@ -671,141 +662,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 */
 	public EReference getCfgNode_Node() {
 		return (EReference) cfgNodeEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getNodeBlock() {
-		return nodeBlockEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getNodeBlock_Instructions() {
-		return (EReference) nodeBlockEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getNodeIf() {
-		return nodeIfEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getNodeIf_ElseNodes() {
-		return (EReference) nodeIfEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getNodeIf_JoinNode() {
-		return (EReference) nodeIfEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getNodeIf_ThenNodes() {
-		return (EReference) nodeIfEClass.getEStructuralFeatures().get(4);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getNodeIf_Condition() {
-		return (EReference) nodeIfEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getNodeIf_LineNumber() {
-		return (EAttribute) nodeIfEClass.getEStructuralFeatures().get(3);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getNodeWhile() {
-		return nodeWhileEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getNodeWhile_JoinNode() {
-		return (EReference) nodeWhileEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getNodeWhile_Nodes() {
-		return (EReference) nodeWhileEClass.getEStructuralFeatures().get(3);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getNodeWhile_Condition() {
-		return (EReference) nodeWhileEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getNodeWhile_LineNumber() {
-		return (EAttribute) nodeWhileEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getNode() {
-		return nodeEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getNode_CfgNode() {
-		return (EReference) nodeEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -878,6 +734,150 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 */
 	public EAttribute getParam_ByRef() {
 		return (EAttribute) paramEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getBlock() {
+		return blockEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getBlock_CfgNode() {
+		return (EReference) blockEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getBlockBasic() {
+		return blockBasicEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getBlockBasic_Instructions() {
+		return (EReference) blockBasicEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getBlockIf() {
+		return blockIfEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getBlockIf_Condition() {
+		return (EReference) blockIfEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getBlockIf_ElseNodes() {
+		return (EReference) blockIfEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getBlockIf_JoinNode() {
+		return (EReference) blockIfEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getBlockIf_LineNumber() {
+		return (EAttribute) blockIfEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getBlockIf_ThenNodes() {
+		return (EReference) blockIfEClass.getEStructuralFeatures().get(4);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getBlockWhile() {
+		return blockWhileEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getBlockWhile_Condition() {
+		return (EReference) blockWhileEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getBlockWhile_JoinNode() {
+		return (EReference) blockWhileEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getBlockWhile_LineNumber() {
+		return (EAttribute) blockWhileEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getBlockWhile_Nodes() {
+		return (EReference) blockWhileEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getBlockSpecific() {
+		return blockSpecificEClass;
 	}
 
 	/**
@@ -1553,24 +1553,26 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEReference(paramEClass, PARAM__VARIABLE);
 		createEAttribute(paramEClass, PARAM__BY_REF);
 
-		nodeEClass = createEClass(NODE);
-		createEReference(nodeEClass, NODE__CFG_NODE);
+		blockEClass = createEClass(BLOCK);
+		createEReference(blockEClass, BLOCK__CFG_NODE);
 
-		nodeBlockEClass = createEClass(NODE_BLOCK);
-		createEReference(nodeBlockEClass, NODE_BLOCK__INSTRUCTIONS);
+		blockBasicEClass = createEClass(BLOCK_BASIC);
+		createEReference(blockBasicEClass, BLOCK_BASIC__INSTRUCTIONS);
 
-		nodeIfEClass = createEClass(NODE_IF);
-		createEReference(nodeIfEClass, NODE_IF__CONDITION);
-		createEReference(nodeIfEClass, NODE_IF__ELSE_NODES);
-		createEReference(nodeIfEClass, NODE_IF__JOIN_NODE);
-		createEAttribute(nodeIfEClass, NODE_IF__LINE_NUMBER);
-		createEReference(nodeIfEClass, NODE_IF__THEN_NODES);
+		blockIfEClass = createEClass(BLOCK_IF);
+		createEReference(blockIfEClass, BLOCK_IF__CONDITION);
+		createEReference(blockIfEClass, BLOCK_IF__ELSE_NODES);
+		createEReference(blockIfEClass, BLOCK_IF__JOIN_NODE);
+		createEAttribute(blockIfEClass, BLOCK_IF__LINE_NUMBER);
+		createEReference(blockIfEClass, BLOCK_IF__THEN_NODES);
 
-		nodeWhileEClass = createEClass(NODE_WHILE);
-		createEReference(nodeWhileEClass, NODE_WHILE__CONDITION);
-		createEReference(nodeWhileEClass, NODE_WHILE__JOIN_NODE);
-		createEAttribute(nodeWhileEClass, NODE_WHILE__LINE_NUMBER);
-		createEReference(nodeWhileEClass, NODE_WHILE__NODES);
+		blockWhileEClass = createEClass(BLOCK_WHILE);
+		createEReference(blockWhileEClass, BLOCK_WHILE__CONDITION);
+		createEReference(blockWhileEClass, BLOCK_WHILE__JOIN_NODE);
+		createEAttribute(blockWhileEClass, BLOCK_WHILE__LINE_NUMBER);
+		createEReference(blockWhileEClass, BLOCK_WHILE__NODES);
+
+		blockSpecificEClass = createEClass(BLOCK_SPECIFIC);
 
 		instructionEClass = createEClass(INSTRUCTION);
 		createEAttribute(instructionEClass, INSTRUCTION__LINE_NUMBER);
@@ -1687,8 +1689,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		predicateEClass = createEClass(PREDICATE);
 		createEReference(predicateEClass, PREDICATE__EXPRESSIONS);
 
-		nodeSpecificEClass = createEClass(NODE_SPECIFIC);
-
 		cfgEClass = createEClass(CFG);
 		createEReference(cfgEClass, CFG__ENTRY);
 		createEReference(cfgEClass, CFG__EXIT);
@@ -1739,10 +1739,11 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		// Add supertypes to classes
 		procedureEClass.getESuperTypes().add(theUtilPackage.getAttributable());
-		nodeEClass.getESuperTypes().add(theUtilPackage.getAttributable());
-		nodeBlockEClass.getESuperTypes().add(this.getNode());
-		nodeIfEClass.getESuperTypes().add(this.getNode());
-		nodeWhileEClass.getESuperTypes().add(this.getNode());
+		blockEClass.getESuperTypes().add(theUtilPackage.getAttributable());
+		blockBasicEClass.getESuperTypes().add(this.getBlock());
+		blockIfEClass.getESuperTypes().add(this.getBlock());
+		blockWhileEClass.getESuperTypes().add(this.getBlock());
+		blockSpecificEClass.getESuperTypes().add(this.getBlock());
 		instructionEClass.getESuperTypes()
 				.add(theUtilPackage.getAttributable());
 		instAssignEClass.getESuperTypes().add(this.getInstruction());
@@ -1770,7 +1771,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		typeUintEClass.getESuperTypes().add(this.getType());
 		typeVoidEClass.getESuperTypes().add(this.getType());
 		varEClass.getESuperTypes().add(theUtilPackage.getAttributable());
-		nodeSpecificEClass.getESuperTypes().add(this.getNode());
 		cfgEClass.getESuperTypes().add(theGraphPackage.getGraph());
 		cfgNodeEClass.getESuperTypes().add(theGraphPackage.getVertex());
 
@@ -1793,7 +1793,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 				"native", null, 0, 1, Procedure.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
-		initEReference(getProcedure_Nodes(), this.getNode(), null, "nodes",
+		initEReference(getProcedure_Nodes(), this.getBlock(), null, "nodes",
 				null, 0, -1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -1821,63 +1821,66 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
 
-		initEClass(nodeEClass, Node.class, "Node", IS_ABSTRACT, !IS_INTERFACE,
-				IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getNode_CfgNode(), this.getCfgNode(),
-				this.getCfgNode_Node(), "cfgNode", null, 0, 1, Node.class,
+		initEClass(blockEClass, Block.class, "Block", IS_ABSTRACT,
+				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getBlock_CfgNode(), this.getCfgNode(),
+				this.getCfgNode_Node(), "cfgNode", null, 0, 1, Block.class,
 				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE,
 				IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
 
-		initEClass(nodeBlockEClass, NodeBlock.class, "NodeBlock", !IS_ABSTRACT,
-				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getNodeBlock_Instructions(), this.getInstruction(),
-				null, "instructions", null, 0, -1, NodeBlock.class,
+		initEClass(blockBasicEClass, BlockBasic.class, "BlockBasic",
+				!IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getBlockBasic_Instructions(), this.getInstruction(),
+				null, "instructions", null, 0, -1, BlockBasic.class,
 				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE,
 				!IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
 
-		initEClass(nodeIfEClass, NodeIf.class, "NodeIf", !IS_ABSTRACT,
+		initEClass(blockIfEClass, BlockIf.class, "BlockIf", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getNodeIf_Condition(), this.getExpression(), null,
-				"condition", null, 0, 1, NodeIf.class, !IS_TRANSIENT,
+		initEReference(getBlockIf_Condition(), this.getExpression(), null,
+				"condition", null, 0, 1, BlockIf.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getNodeIf_ElseNodes(), this.getNode(), null,
-				"elseNodes", null, 0, -1, NodeIf.class, !IS_TRANSIENT,
+		initEReference(getBlockIf_ElseNodes(), this.getBlock(), null,
+				"elseNodes", null, 0, -1, BlockIf.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getNodeIf_JoinNode(), this.getNodeBlock(), null,
-				"joinNode", null, 0, 1, NodeIf.class, !IS_TRANSIENT,
+		initEReference(getBlockIf_JoinNode(), this.getBlockBasic(), null,
+				"joinNode", null, 0, 1, BlockIf.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getNodeIf_LineNumber(), ecorePackage.getEInt(),
-				"lineNumber", null, 0, 1, NodeIf.class, !IS_TRANSIENT,
+		initEAttribute(getBlockIf_LineNumber(), ecorePackage.getEInt(),
+				"lineNumber", null, 0, 1, BlockIf.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
-		initEReference(getNodeIf_ThenNodes(), this.getNode(), null,
-				"thenNodes", null, 0, -1, NodeIf.class, !IS_TRANSIENT,
+		initEReference(getBlockIf_ThenNodes(), this.getBlock(), null,
+				"thenNodes", null, 0, -1, BlockIf.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(nodeWhileEClass, NodeWhile.class, "NodeWhile", !IS_ABSTRACT,
-				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getNodeWhile_Condition(), this.getExpression(), null,
-				"condition", null, 0, 1, NodeWhile.class, !IS_TRANSIENT,
+		initEClass(blockWhileEClass, BlockWhile.class, "BlockWhile",
+				!IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getBlockWhile_Condition(), this.getExpression(), null,
+				"condition", null, 0, 1, BlockWhile.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getNodeWhile_JoinNode(), this.getNodeBlock(), null,
-				"joinNode", null, 0, 1, NodeWhile.class, !IS_TRANSIENT,
+		initEReference(getBlockWhile_JoinNode(), this.getBlockBasic(), null,
+				"joinNode", null, 0, 1, BlockWhile.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getNodeWhile_LineNumber(), ecorePackage.getEInt(),
-				"lineNumber", null, 0, 1, NodeWhile.class, !IS_TRANSIENT,
+		initEAttribute(getBlockWhile_LineNumber(), ecorePackage.getEInt(),
+				"lineNumber", null, 0, 1, BlockWhile.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
-		initEReference(getNodeWhile_Nodes(), this.getNode(), null, "nodes",
-				null, 0, -1, NodeWhile.class, !IS_TRANSIENT, !IS_VOLATILE,
+		initEReference(getBlockWhile_Nodes(), this.getBlock(), null, "nodes",
+				null, 0, -1, BlockWhile.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(blockSpecificEClass, BlockSpecific.class, "BlockSpecific",
+				IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(instructionEClass, Instruction.class, "Instruction",
 				IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -2177,9 +2180,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(nodeSpecificEClass, NodeSpecific.class, "NodeSpecific",
-				IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-
 		initEClass(cfgEClass, Cfg.class, "Cfg", !IS_ABSTRACT, !IS_INTERFACE,
 				IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getCfg_Entry(), this.getCfgNode(), null, "entry", null,
@@ -2193,8 +2193,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		initEClass(cfgNodeEClass, CfgNode.class, "CfgNode", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getCfgNode_Node(), this.getNode(),
-				this.getNode_CfgNode(), "node", null, 0, 1, CfgNode.class,
+		initEReference(getCfgNode_Node(), this.getBlock(),
+				this.getBlock_CfgNode(), "node", null, 0, 1, CfgNode.class,
 				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE,
 				IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);

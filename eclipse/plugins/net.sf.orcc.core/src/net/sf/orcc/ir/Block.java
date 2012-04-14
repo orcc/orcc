@@ -32,12 +32,12 @@ import net.sf.dftools.util.Attributable;
 import net.sf.dftools.graph.Edge;
 
 /**
- * This class defines a node in the CFG.
+ * This class defines a block.
  * 
  * @author Matthieu Wipliez
  * @model abstract="true"
  */
-public interface Node extends Attributable {
+public interface Block extends Attributable {
 
 	/**
 	 * Returns the value of the '<em><b>Cfg Node</b></em>' reference.
@@ -50,7 +50,7 @@ public interface Node extends Attributable {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Cfg Node</em>' reference.
 	 * @see #setCfgNode(CfgNode)
-	 * @see net.sf.orcc.ir.IrPackage#getNode_CfgNode()
+	 * @see net.sf.orcc.ir.IrPackage#getBlock_CfgNode()
 	 * @see net.sf.orcc.ir.CfgNode#getNode
 	 * @model opposite="node"
 	 * @generated
@@ -58,7 +58,7 @@ public interface Node extends Attributable {
 	CfgNode getCfgNode();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Node#getCfgNode
+	 * Sets the value of the '{@link net.sf.orcc.ir.Block#getCfgNode
 	 * <em>Cfg Node</em>}' reference. <!-- begin-user-doc --> <!-- end-user-doc
 	 * -->
 	 * 
@@ -95,6 +95,7 @@ public interface Node extends Attributable {
 	 * 
 	 * @return <code>true</code> if this node is a NodeBlock
 	 */
+	@Deprecated
 	boolean isNodeBlock();
 
 	/**
@@ -102,6 +103,7 @@ public interface Node extends Attributable {
 	 * 
 	 * @return <code>true</code> if this node is an NodeIf
 	 */
+	@Deprecated
 	boolean isNodeIf();
 
 	/**
@@ -109,6 +111,28 @@ public interface Node extends Attributable {
 	 * 
 	 * @return <code>true</code> if this node is a NodeWhile
 	 */
+	@Deprecated
 	boolean isNodeWhile();
+	
+	/**
+	 * Returns <code>true</code> if this node is a BlockBasic.
+	 * 
+	 * @return <code>true</code> if this node is a BlockBasic
+	 */
+	boolean isBlockBasic();
+
+	/**
+	 * Returns <code>true</code> if this node is an BlockIf.
+	 * 
+	 * @return <code>true</code> if this node is an BlockIf
+	 */
+	boolean isBlockIf();
+
+	/**
+	 * Returns <code>true</code> if this node is a BlockWhile.
+	 * 
+	 * @return <code>true</code> if this node is a BlockWhile
+	 */
+	boolean isBlockWhile();
 
 }

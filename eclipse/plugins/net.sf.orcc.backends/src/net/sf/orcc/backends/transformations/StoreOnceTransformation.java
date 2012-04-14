@@ -50,7 +50,7 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
@@ -410,7 +410,7 @@ public class StoreOnceTransformation extends AbstractActorVisitor<Object> {
 					keyToIndexesMap.put(key, indexes);
 					keyToLocalsMap.put(key, localVar);
 				}
-				NodeBlock block = store.getBlock();
+				BlockBasic block = store.getBlock();
 				keyToStoreSet.add(key);
 				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
 						localVar, store.getValue());
@@ -450,7 +450,7 @@ public class StoreOnceTransformation extends AbstractActorVisitor<Object> {
 			if (indexes != null) {
 				load.getIndexes().addAll(IrUtil.copy(indexes));
 			}
-			NodeBlock block = procedure.getFirst();
+			BlockBasic block = procedure.getFirst();
 			block.getInstructions().add(0, load);
 		}
 	}

@@ -26,20 +26,17 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * <p>
  * The following features are implemented:
  * <ul>
- * <li>{@link net.sf.orcc.backends.ir.impl.InstCastImpl#getTarget <em>Target
- * </em>}</li>
- * <li>{@link net.sf.orcc.backends.ir.impl.InstCastImpl#getSource <em>Source
- * </em>}</li>
+ *   <li>{@link net.sf.orcc.backends.ir.impl.InstCastImpl#getTarget <em>Target</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.ir.impl.InstCastImpl#getSource <em>Source</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class InstCastImpl extends InstSpecificImpl implements InstCast {
 	/**
-	 * The cached value of the '{@link #getTarget() <em>Target</em>}'
-	 * containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getTarget() <em>Target</em>}' containment reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getTarget()
 	 * @generated
 	 * @ordered
@@ -47,9 +44,8 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 	protected Def target;
 
 	/**
-	 * The cached value of the '{@link #getSource() <em>Source</em>}'
-	 * containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getSource() <em>Source</em>}' containment reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getSource()
 	 * @generated
 	 * @ordered
@@ -58,7 +54,6 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	protected InstCastImpl() {
@@ -67,7 +62,6 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -77,7 +71,6 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Def getTarget() {
@@ -86,7 +79,6 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public NotificationChain basicSetTarget(Def newTarget,
@@ -107,7 +99,6 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public void setTarget(Def newTarget) {
@@ -133,7 +124,6 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Use getSource() {
@@ -142,7 +132,6 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public NotificationChain basicSetSource(Use newSource,
@@ -243,7 +232,6 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public void setSource(Use newSource) {
@@ -269,7 +257,6 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -286,7 +273,6 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -302,7 +288,6 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -320,7 +305,6 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -338,7 +322,6 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override

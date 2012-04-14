@@ -51,7 +51,7 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -358,7 +358,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 *            position of the buffer in inputBuffers list
 	 */
 	private void consumeToken(Procedure body, int position, Port port) {
-		NodeBlock bodyNode = body.getFirst();
+		BlockBasic bodyNode = body.getFirst();
 		Var index = body.newTempLocalVariable(factory.createTypeInt(32),
 				"index" + port.getName());
 		index.setIndex(1);
@@ -384,7 +384,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		// Scheduler building
 		Procedure scheduler = factory.createProcedure("isSchedulable_" + name,
 				0, factory.createTypeBool());
-		NodeBlock blockScheduler = factory.createNodeBlock();
+		BlockBasic blockScheduler = factory.createBlockBasic();
 		Var result = scheduler.newTempLocalVariable(factory.createTypeBool(),
 				"actionResult");
 		result.setIndex(1);
@@ -396,7 +396,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		// Body building ;-)
 		Procedure body = factory.createProcedure(name, 0,
 				factory.createTypeVoid());
-		NodeBlock blockBody = factory.createNodeBlock();
+		BlockBasic blockBody = factory.createBlockBasic();
 		blockBody.add(factory.createInstReturn());
 		body.getNodes().add(blockBody);
 
@@ -459,7 +459,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		// Body building ;-)
 		Procedure body = factory.createProcedure(name, 0,
 				factory.createTypeVoid());
-		NodeBlock blockBody = factory.createNodeBlock();
+		BlockBasic blockBody = factory.createBlockBasic();
 		blockBody.add(factory.createInstStore(counter, 0));
 		blockBody.add(factory.createInstReturn());
 		body.getNodes().add(blockBody);
@@ -478,7 +478,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		Var localCounter = factory.createVar(0, counter.getType(),
 				"localCounter", true, 1);
 		scheduler.getLocals().add(localCounter);
-		NodeBlock blockScheduler = factory.createNodeBlock();
+		BlockBasic blockScheduler = factory.createBlockBasic();
 		blockScheduler.add(0, factory.createInstLoad(localCounter, counter));
 
 		Expression guardValue = factory.createExprInt(numTokens);
@@ -605,7 +605,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 */
 	private void defineUntaggedBody(Var readCounter, Var storeList,
 			Procedure body, Var localINPUT, Port port, int bufferSize) {
-		NodeBlock bodyNode = body.getFirst();
+		BlockBasic bodyNode = body.getFirst();
 
 		EList<Var> locals = body.getLocals();
 		Var input = factory.createVar(0, port.getType(), port.getName()
@@ -650,7 +650,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 */
 	private void defineWriteBody(Var writeCounter, Var writeList,
 			Procedure body, Var OUTPUT) {
-		NodeBlock bodyNode = body.getFirst();
+		BlockBasic bodyNode = body.getFirst();
 		EList<Var> locals = body.getLocals();
 		Var counter1 = factory.createVar(0, writeCounter.getType(),
 				port.getName() + "_Local_writeCounter", true, outputIndex);
@@ -686,7 +686,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 			Var readIndex, OpBinary op, Expression reference, Port port) {
 		int index = 0;
 		Procedure scheduler = action.getScheduler();
-		NodeBlock bodyNode = scheduler.getLast();
+		BlockBasic bodyNode = scheduler.getLast();
 		EList<Var> locals = scheduler.getLocals();
 
 		Var localRead = factory.createVar(0, factory.createTypeInt(32),
@@ -744,7 +744,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 */
 	private void modifyDoneAction(Var counter, int portIndex, String portName) {
 
-		NodeBlock blkNode = done.getBody().getFirst();
+		BlockBasic blkNode = done.getBody().getFirst();
 		blkNode.add(factory.createInstStore(counter, 0));
 
 		blkNode = done.getScheduler().getFirst();
@@ -1032,7 +1032,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 					}
 
 					Procedure body = action.getBody();
-					NodeBlock bodyNode = body.getFirst();
+					BlockBasic bodyNode = body.getFirst();
 					Var index = body.newTempLocalVariable(
 							factory.createTypeInt(32), "writeIndex");
 					index.setIndex(1);
@@ -1046,7 +1046,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 							factory.createExprVar(index), OpBinary.PLUS,
 							factory.createExprInt(numTokens),
 							factory.createTypeInt(32));
-					NodeBlock lastNode = body.getLast();
+					BlockBasic lastNode = body.getLast();
 					lastNode.add(factory
 							.createInstStore(untagWriteIndex, value));
 
@@ -1223,7 +1223,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 					Var numTokenToSend = factory.createVar(0,
 							factory.createTypeInt(32), "numTokensToSend", true,
 							0);
-					NodeBlock untaggedBlkNode = untaggedWrite.getBody()
+					BlockBasic untaggedBlkNode = untaggedWrite.getBody()
 							.getLast();
 					untaggedBlkNode.add(factory.createInstLoad(numTokenToSend,
 							tokensToSend));
@@ -1236,7 +1236,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 					// add untagged action in high priority
 					actor.getActionsOutsideFsm().add(0, untaggedWrite);
 					// add write condition to untagged action
-					NodeBlock blkNode = action.getBody().getLast();
+					BlockBasic blkNode = action.getBody().getLast();
 					blkNode.add(factory
 							.createInstStore(tokensToSend, numTokens));
 				}
@@ -1324,7 +1324,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 *            number of tokens read from the buffer
 	 */
 	private void updateUntagIndex(Action action, Var writeIndex, int numTokens) {
-		NodeBlock blkNode = action.getBody().getLast();
+		BlockBasic blkNode = action.getBody().getLast();
 		Var localWriteIndex = action.getBody().newTempLocalVariable(
 				factory.createTypeInt(32), "localWriteIndex");
 		blkNode.add(factory.createInstLoad(localWriteIndex, writeIndex));

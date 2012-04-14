@@ -63,9 +63,9 @@ import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Procedure;
@@ -98,7 +98,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 
 	private List<Expression> indexes;
 
-	private List<Node> nodes;
+	private List<Block> nodes;
 
 	private Procedure procedure;
 
@@ -117,7 +117,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 	 *            appended. In general, this is a subset of the procedure's node
 	 *            list.
 	 */
-	public ExprTransformer(Procedure procedure, List<Node> nodes) {
+	public ExprTransformer(Procedure procedure, List<Block> nodes) {
 		this(procedure, nodes, null);
 	}
 
@@ -135,7 +135,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 	 * @param target
 	 *            the variable to which the expression should be assigned
 	 */
-	public ExprTransformer(Procedure procedure, List<Node> nodes, Var target) {
+	public ExprTransformer(Procedure procedure, List<Block> nodes, Var target) {
 		this(procedure, nodes, target, null);
 	}
 
@@ -156,7 +156,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 	 *            a list of expression to use when creating assignments (Store
 	 *            instructions) to the target
 	 */
-	public ExprTransformer(Procedure procedure, List<Node> nodes, Var target,
+	public ExprTransformer(Procedure procedure, List<Block> nodes, Var target,
 			List<Expression> indexes) {
 		this.procedure = procedure;
 		this.nodes = nodes;
@@ -217,8 +217,8 @@ public class ExprTransformer extends CalSwitch<Expression> {
 				.doSwitch(expression.getCondition());
 
 		// transforms "then" statements and "else" statements
-		NodeIf node = eINSTANCE.createNodeIf();
-		node.setJoinNode(eINSTANCE.createNodeBlock());
+		BlockIf node = eINSTANCE.createBlockIf();
+		node.setJoinNode(eINSTANCE.createBlockBasic());
 		node.setLineNumber(lineNumber);
 		node.setCondition(condition);
 
@@ -243,8 +243,8 @@ public class ExprTransformer extends CalSwitch<Expression> {
 
 			// creates inner if
 			lineNumber = Util.getLocation(elsif);
-			NodeIf innerIf = eINSTANCE.createNodeIf();
-			innerIf.setJoinNode(eINSTANCE.createNodeBlock());
+			BlockIf innerIf = eINSTANCE.createBlockIf();
+			innerIf.setJoinNode(eINSTANCE.createBlockBasic());
 			innerIf.setLineNumber(lineNumber);
 			innerIf.setCondition(condition);
 			new ExprTransformer(procedure, innerIf.getThenNodes(), ifTarget,
@@ -408,8 +408,8 @@ public class ExprTransformer extends CalSwitch<Expression> {
 	 */
 	private Expression copyList(Var var) {
 		TypeList typeList = (TypeList) target.getType();
-		List<Node> nodes = this.nodes;
-		List<NodeWhile> whiles = new ArrayList<NodeWhile>();
+		List<Block> nodes = this.nodes;
+		List<BlockWhile> whiles = new ArrayList<BlockWhile>();
 		List<Var> loopVars = new ArrayList<Var>();
 		List<Expression> indexes = new ArrayList<Expression>();
 		for (int size : typeList.getDimensions()) {
@@ -429,8 +429,8 @@ public class ExprTransformer extends CalSwitch<Expression> {
 					eINSTANCE.createExprVar(loopVar), OpBinary.LT,
 					eINSTANCE.createExprInt(size), eINSTANCE.createTypeBool());
 
-			NodeWhile nodeWhile = eINSTANCE.createNodeWhile();
-			nodeWhile.setJoinNode(eINSTANCE.createNodeBlock());
+			BlockWhile nodeWhile = eINSTANCE.createBlockWhile();
+			nodeWhile.setJoinNode(eINSTANCE.createBlockBasic());
 			nodeWhile.setCondition(condition);
 			whiles.add(nodeWhile);
 
@@ -577,8 +577,8 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		indexes.add(index);
 
 		// build the loops
-		List<Node> nodes = this.nodes;
-		List<NodeWhile> whiles = new ArrayList<NodeWhile>();
+		List<Block> nodes = this.nodes;
+		List<BlockWhile> whiles = new ArrayList<BlockWhile>();
 		for (Generator generator : generators) {
 			// assigns the loop variable its initial value
 			Var loopVar = Frontend.getMapping(generator.getVariable());
@@ -593,8 +593,8 @@ public class ExprTransformer extends CalSwitch<Expression> {
 					eINSTANCE.createTypeBool());
 
 			// create while
-			NodeWhile nodeWhile = eINSTANCE.createNodeWhile();
-			nodeWhile.setJoinNode(eINSTANCE.createNodeBlock());
+			BlockWhile nodeWhile = eINSTANCE.createBlockWhile();
+			nodeWhile.setJoinNode(eINSTANCE.createBlockBasic());
 			nodeWhile.setCondition(condition);
 			whiles.add(nodeWhile);
 

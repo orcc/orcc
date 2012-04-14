@@ -28,85 +28,72 @@
  */
 package net.sf.orcc.ir;
 
-import java.util.Iterator;
-import java.util.ListIterator;
-
 import org.eclipse.emf.common.util.EList;
 
 /**
- * This class defines a Block node. A block node is a node that contains
- * instructions.
+ * This class defines a While node. A while node is a node with a value used in
+ * its condition.
  * 
  * @author Matthieu Wipliez
  * @model extends="net.sf.orcc.ir.Node"
  * 
  */
-public interface NodeBlock extends Node {
+public interface BlockWhile extends Block {
 
 	/**
-	 * Appends the specified instruction to the end of this block.
+	 * Returns the condition of this node While.
 	 * 
-	 * @param instruction
-	 *            an instruction
-	 */
-	void add(Instruction instruction);
-
-	/**
-	 * Appends the specified instruction to this block at the specified index.
-	 * 
-	 * @param index
-	 *            the index
-	 * @param instruction
-	 *            an instruction
-	 */
-	void add(int index, Instruction instruction);
-
-	/**
-	 * Returns the instructions of this block node.
-	 * 
-	 * @return the instructions of this block node
+	 * @return the condition of this node While
 	 * @model containment="true"
 	 */
-	EList<Instruction> getInstructions();
+	Expression getCondition();
 
 	/**
-	 * Returns the index of the given instruction in the list of instructions of
-	 * this block.
+	 * Returns the join node of this NodeWhile.
 	 * 
-	 * @param instruction
-	 *            an instruction
-	 * @return the index of the given instruction in the list of instructions of
-	 *         this block
+	 * @return the join node of this NodeWhile.
+	 * @model containment="true"
 	 */
-	int indexOf(Instruction instruction);
-
-	Iterator<Instruction> iterator();
+	BlockBasic getJoinNode();
 
 	/**
-	 * Returns a list iterator over the elements in this list (in proper
-	 * sequence) that is positioned after the last instruction.
+	 * Returns the line number on which this "while" starts.
 	 * 
-	 * @return a list iterator over the elements in this list (in proper
-	 *         sequence)
+	 * @return the line number on which this "while" starts
+	 * @model
 	 */
-	ListIterator<Instruction> lastListIterator();
+	public int getLineNumber();
 
 	/**
-	 * Returns a list iterator over the elements in this list (in proper
-	 * sequence).
+	 * Returns the nodes of this NodeWhile.
 	 * 
-	 * @return a list iterator over the elements in this list (in proper
-	 *         sequence)
+	 * @return the nodes of this NodeWhile
+	 * @model containment="true"
 	 */
-	ListIterator<Instruction> listIterator();
+	EList<Block> getNodes();
 
 	/**
-	 * Returns a list iterator over the elements in this list already positioned
-	 * at index (in proper sequence).
+	 * Sets the condition of this node While.
 	 * 
-	 * @return a list iterator over the elements in this list already positioned
-	 *         at index (in proper sequence)
+	 * @param condition
+	 *            the condition of this node While
 	 */
-	ListIterator<Instruction> listIterator(int index);
+	void setCondition(Expression condition);
+
+	/**
+	 * Sets the join node of this NodeWhile.
+	 * 
+	 * @param joinNode
+	 *            the join node of this NodeWhile
+	 */
+	void setJoinNode(BlockBasic joinNode);
+
+	/**
+	 * Sets the line number on which this "while" starts.
+	 * 
+	 * @param newLineNumber
+	 *            the line number on which this "while" starts
+	 */
+	public void setLineNumber(int newLineNumber);
 
 }

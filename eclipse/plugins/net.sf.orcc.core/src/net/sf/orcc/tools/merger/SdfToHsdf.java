@@ -21,8 +21,8 @@ import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
@@ -69,11 +69,11 @@ public class SdfToHsdf extends DfSwitch<Network> {
 		Expression condition = factory.createExprBinary(
 				factory.createExprVar(loop), OpBinary.LT,
 				factory.createExprInt(cns), factory.createTypeBool());
-		NodeWhile nodeWhile = factory.createNodeWhile();
-		nodeWhile.setJoinNode(factory.createNodeBlock());
+		BlockWhile nodeWhile = factory.createBlockWhile();
+		nodeWhile.setJoinNode(factory.createBlockBasic());
 		nodeWhile.setCondition(condition);
 		body.getNodes().add(nodeWhile);
-		NodeBlock whileBlock = IrUtil.getLast(nodeWhile.getNodes());
+		BlockBasic whileBlock = IrUtil.getLast(nodeWhile.getNodes());
 
 		int ind = 0;
 		for (Port input : actor.getInputs()) {
@@ -237,11 +237,11 @@ public class SdfToHsdf extends DfSwitch<Network> {
 		Expression condition = factory.createExprBinary(
 				factory.createExprVar(loop), OpBinary.LT,
 				factory.createExprInt(prd), factory.createTypeBool());
-		NodeWhile nodeWhile = factory.createNodeWhile();
-		nodeWhile.setJoinNode(factory.createNodeBlock());
+		BlockWhile nodeWhile = factory.createBlockWhile();
+		nodeWhile.setJoinNode(factory.createBlockBasic());
 		nodeWhile.setCondition(condition);
 		body.getNodes().add(nodeWhile);
-		NodeBlock whileBlock = IrUtil.getLast(nodeWhile.getNodes());
+		BlockBasic whileBlock = IrUtil.getLast(nodeWhile.getNodes());
 
 		int ind = 0;
 		for (Port output : actor.getOutputs()) {

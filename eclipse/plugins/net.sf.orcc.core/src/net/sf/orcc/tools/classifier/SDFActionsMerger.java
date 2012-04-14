@@ -43,9 +43,9 @@ import net.sf.orcc.df.Transition;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeIf;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
@@ -97,17 +97,17 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 		return null;
 	}
 
-	private NodeIf createActionCall(Expression expr, Procedure body,
+	private BlockIf createActionCall(Expression expr, Procedure body,
 			Pattern inputPattern, Pattern outputPattern) {
-		NodeIf nodeIf = IrFactoryImpl.eINSTANCE.createNodeIf();
-		nodeIf.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
+		BlockIf nodeIf = IrFactoryImpl.eINSTANCE.createBlockIf();
+		nodeIf.setJoinNode(IrFactoryImpl.eINSTANCE.createBlockBasic());
 		nodeIf.setCondition(expr);
 
 		List<Expression> callExprs = setProcedureParameters(body, inputPattern,
 				outputPattern);
 		actor.getProcs().add(body);
-		List<Node> thenNodes = nodeIf.getThenNodes();
-		NodeBlock node = IrFactoryImpl.eINSTANCE.createNodeBlock();
+		List<Block> thenNodes = nodeIf.getThenNodes();
+		BlockBasic node = IrFactoryImpl.eINSTANCE.createBlockBasic();
 
 		node.add(IrFactory.eINSTANCE.createInstCall(0, null, body, callExprs));
 
@@ -116,7 +116,7 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 		return nodeIf;
 	}
 
-	private Expression createActionCondition(NodeBlock node,
+	private Expression createActionCondition(BlockBasic node,
 			Procedure scheduler, Pattern inputPattern, Pattern outputPattern) {
 
 		List<Expression> callExprs = setProcedureParameters(scheduler,
@@ -148,12 +148,12 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 		// create "then" nodes
 		InstAssign thenAssign = IrFactory.eINSTANCE.createInstAssign(result,
 				IrFactory.eINSTANCE.createExprBool(true));
-		NodeBlock nodeBlock = IrFactoryImpl.eINSTANCE.createNodeBlock();
+		BlockBasic nodeBlock = IrFactoryImpl.eINSTANCE.createBlockBasic();
 		nodeBlock.add(thenAssign);
 		procedure.getNodes().add(nodeBlock);
 
 		// add the return
-		NodeBlock block = procedure.getLast();
+		BlockBasic block = procedure.getLast();
 		block.add(IrFactory.eINSTANCE.createInstReturn((IrFactory.eINSTANCE
 				.createExprVar(result))));
 
@@ -247,22 +247,22 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 				IrFactory.eINSTANCE.createTypeVoid());
 
 		// Launch action
-		List<Node> elseNodes = target.getNodes();
+		List<Block> elseNodes = target.getNodes();
 
 		for (Action action : actions) {
 			Pattern input = action.getInputPattern();
 			Pattern output = action.getOutputPattern();
 
-			NodeBlock thenBlock = IrUtil.getFirst(elseNodes);
+			BlockBasic thenBlock = IrUtil.getFirst(elseNodes);
 			Expression callExpr = createActionCondition(thenBlock,
 					action.getScheduler(), input, output);
-			NodeIf nodeIf = createActionCall(callExpr, action.getBody(), input,
+			BlockIf nodeIf = createActionCall(callExpr, action.getBody(), input,
 					output);
 			elseNodes.add(nodeIf);
 			elseNodes = nodeIf.getElseNodes();
 		}
 
-		NodeBlock lastBlock = target.getLast();
+		BlockBasic lastBlock = target.getLast();
 		lastBlock.add(IrFactory.eINSTANCE.createInstReturn());
 
 		return target;

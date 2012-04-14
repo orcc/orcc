@@ -36,7 +36,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
@@ -55,7 +55,7 @@ import org.eclipse.emf.common.util.EList;
 public class GetElementPtrAdder extends AbstractActorVisitor<Object> {
 
 	private Var addGEP(Var array, Type type, List<Expression> indexes,
-			NodeBlock currentNode) {
+			BlockBasic currentNode) {
 		// Make a new localVariable that will contains the elt to access
 		Var eltVar = procedure.newTempLocalVariable(IrUtil.copy(type),
 				array.getName() + "_" + "elt");

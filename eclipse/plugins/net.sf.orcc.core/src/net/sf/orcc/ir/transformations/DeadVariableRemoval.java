@@ -41,7 +41,7 @@ import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
@@ -116,7 +116,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseNodeBlock(NodeBlock block) {
+	public Object caseNodeBlock(BlockBasic block) {
 		// adds all instructions to the list
 		instructionsToVisit.addAll(block.getInstructions());
 		return null;

@@ -50,7 +50,7 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstReturn;
-import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -96,7 +96,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 	 *            do not have a return value
 	 */
 	public void addReturn(Procedure procedure, Expression value) {
-		NodeBlock block = procedure.getLast();
+		BlockBasic block = procedure.getLast();
 		InstReturn returnInstr = eINSTANCE.createInstReturn(value);
 		block.add(returnInstr);
 	}

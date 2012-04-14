@@ -42,10 +42,10 @@ import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Procedure;
 
 import org.eclipse.emf.ecore.EObject;
@@ -173,7 +173,7 @@ public abstract class AbstractIrVisitor<T> extends IrSwitch<T> {
 	}
 
 	@Override
-	public T caseNodeBlock(NodeBlock block) {
+	public T caseBlockBasic(BlockBasic block) {
 		int oldIndexInst = indexInst;
 		List<Instruction> instructions = block.getInstructions();
 		T result = null;
@@ -188,7 +188,7 @@ public abstract class AbstractIrVisitor<T> extends IrSwitch<T> {
 	}
 
 	@Override
-	public T caseNodeIf(NodeIf nodeIf) {
+	public T caseBlockIf(BlockIf nodeIf) {
 		if (visitFull) {
 			doSwitch(nodeIf.getCondition());
 		}
@@ -200,7 +200,7 @@ public abstract class AbstractIrVisitor<T> extends IrSwitch<T> {
 	}
 
 	@Override
-	public T caseNodeWhile(NodeWhile nodeWhile) {
+	public T caseBlockWhile(BlockWhile nodeWhile) {
 		if (visitFull) {
 			doSwitch(nodeWhile.getCondition());
 		}
@@ -230,11 +230,11 @@ public abstract class AbstractIrVisitor<T> extends IrSwitch<T> {
 	 * @param nodes
 	 *            a list of nodes that belong to a procedure
 	 */
-	public T doSwitch(List<Node> nodes) {
+	public T doSwitch(List<Block> nodes) {
 		int oldIndexNode = indexNode;
 		T result = null;
 		for (indexNode = 0; indexNode < nodes.size() && result == null; indexNode++) {
-			Node node = nodes.get(indexNode);
+			Block node = nodes.get(indexNode);
 			result = doSwitch(node);
 		}
 

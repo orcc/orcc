@@ -12,7 +12,7 @@ import net.sf.orcc.backends.ir.InstGetElementPtr;
 import net.sf.orcc.backends.ir.InstTernary;
 import net.sf.orcc.backends.ir.IrSpecificFactory;
 import net.sf.orcc.backends.ir.IrSpecificPackage;
-import net.sf.orcc.backends.ir.NodeFor;
+import net.sf.orcc.backends.ir.BlockFor;
 import net.sf.orcc.ir.IrPackage;
 
 import org.eclipse.emf.ecore.EAttribute;
@@ -63,7 +63,7 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass nodeForEClass = null;
+	private EClass blockForEClass = null;
 
 	/**
 	 * Creates an instance of the model <b>Package</b>, registered with
@@ -288,8 +288,8 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getNodeFor() {
-		return nodeForEClass;
+	public EClass getBlockFor() {
+		return blockForEClass;
 	}
 
 	/**
@@ -297,8 +297,8 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getNodeFor_Condition() {
-		return (EReference) nodeForEClass.getEStructuralFeatures().get(0);
+	public EReference getBlockFor_Condition() {
+		return (EReference) blockForEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -306,8 +306,8 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getNodeFor_JoinNode() {
-		return (EReference) nodeForEClass.getEStructuralFeatures().get(1);
+	public EReference getBlockFor_JoinNode() {
+		return (EReference) blockForEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -315,8 +315,8 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getNodeFor_LineNumber() {
-		return (EAttribute) nodeForEClass.getEStructuralFeatures().get(2);
+	public EAttribute getBlockFor_LineNumber() {
+		return (EAttribute) blockForEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -324,8 +324,8 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getNodeFor_Nodes() {
-		return (EReference) nodeForEClass.getEStructuralFeatures().get(3);
+	public EReference getBlockFor_Nodes() {
+		return (EReference) blockForEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -333,8 +333,8 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getNodeFor_LoopCounter() {
-		return (EReference) nodeForEClass.getEStructuralFeatures().get(4);
+	public EReference getBlockFor_LoopCounter() {
+		return (EReference) blockForEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -342,8 +342,8 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getNodeFor_Init() {
-		return (EReference) nodeForEClass.getEStructuralFeatures().get(5);
+	public EReference getBlockFor_Init() {
+		return (EReference) blockForEClass.getEStructuralFeatures().get(5);
 	}
 
 	/**
@@ -395,13 +395,13 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 		createEReference(instTernaryEClass, INST_TERNARY__FALSE_VALUE);
 		createEReference(instTernaryEClass, INST_TERNARY__TARGET);
 
-		nodeForEClass = createEClass(NODE_FOR);
-		createEReference(nodeForEClass, NODE_FOR__CONDITION);
-		createEReference(nodeForEClass, NODE_FOR__JOIN_NODE);
-		createEAttribute(nodeForEClass, NODE_FOR__LINE_NUMBER);
-		createEReference(nodeForEClass, NODE_FOR__NODES);
-		createEReference(nodeForEClass, NODE_FOR__LOOP_COUNTER);
-		createEReference(nodeForEClass, NODE_FOR__INIT);
+		blockForEClass = createEClass(BLOCK_FOR);
+		createEReference(blockForEClass, BLOCK_FOR__CONDITION);
+		createEReference(blockForEClass, BLOCK_FOR__JOIN_NODE);
+		createEAttribute(blockForEClass, BLOCK_FOR__LINE_NUMBER);
+		createEReference(blockForEClass, BLOCK_FOR__NODES);
+		createEReference(blockForEClass, BLOCK_FOR__LOOP_COUNTER);
+		createEReference(blockForEClass, BLOCK_FOR__INIT);
 	}
 
 	/**
@@ -445,7 +445,7 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 		instGetElementPtrEClass.getESuperTypes().add(
 				theIrPackage.getInstSpecific());
 		instTernaryEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
-		nodeForEClass.getESuperTypes().add(theIrPackage.getNodeSpecific());
+		blockForEClass.getESuperTypes().add(theIrPackage.getBlockSpecific());
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(instAssignIndexEClass, InstAssignIndex.class,
@@ -519,30 +519,31 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(nodeForEClass, NodeFor.class, "NodeFor", !IS_ABSTRACT,
+		initEClass(blockForEClass, BlockFor.class, "BlockFor", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getNodeFor_Condition(), theIrPackage.getExpression(),
-				null, "condition", null, 0, 1, NodeFor.class, !IS_TRANSIENT,
+		initEReference(getBlockFor_Condition(), theIrPackage.getExpression(),
+				null, "condition", null, 0, 1, BlockFor.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getNodeFor_JoinNode(), theIrPackage.getNodeBlock(),
-				null, "joinNode", null, 0, 1, NodeFor.class, !IS_TRANSIENT,
+		initEReference(getBlockFor_JoinNode(), theIrPackage.getBlockBasic(),
+				null, "joinNode", null, 0, 1, BlockFor.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getNodeFor_LineNumber(), theEcorePackage.getEInt(),
-				"lineNumber", "0", 0, 1, NodeFor.class, !IS_TRANSIENT,
+		initEAttribute(getBlockFor_LineNumber(), theEcorePackage.getEInt(),
+				"lineNumber", "0", 0, 1, BlockFor.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
-		initEReference(getNodeFor_Nodes(), theIrPackage.getNode(), null,
-				"nodes", null, 0, -1, NodeFor.class, !IS_TRANSIENT,
+		initEReference(getBlockFor_Nodes(), theIrPackage.getBlock(), null,
+				"nodes", null, 0, -1, BlockFor.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getNodeFor_LoopCounter(), theIrPackage.getInstruction(),
-				null, "loopCounter", null, 0, -1, NodeFor.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getNodeFor_Init(), theIrPackage.getInstruction(), null,
-				"init", null, 0, -1, NodeFor.class, !IS_TRANSIENT,
+		initEReference(getBlockFor_LoopCounter(),
+				theIrPackage.getInstruction(), null, "loopCounter", null, 0,
+				-1, BlockFor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
+		initEReference(getBlockFor_Init(), theIrPackage.getInstruction(), null,
+				"init", null, 0, -1, BlockFor.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 

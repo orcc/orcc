@@ -33,11 +33,11 @@ import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.NodeSpecific;
-import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockSpecific;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
@@ -269,17 +269,17 @@ public class IrSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Node Specific</em>'.
+	 * Returns the result of interpreting the object as an instance of '<em>Block Specific</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
 	 * returning a non-null result will terminate the switch.
 	 * <!-- end-user-doc -->
 	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Node Specific</em>'.
+	 * @return the result of interpreting the object as an instance of '<em>Block Specific</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseNodeSpecific(NodeSpecific object) {
+	public T caseBlockSpecific(BlockSpecific object) {
 		return null;
 	}
 
@@ -524,62 +524,62 @@ public class IrSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Node</em>'.
+	 * Returns the result of interpreting the object as an instance of '<em>Block</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
 	 * returning a non-null result will terminate the switch.
 	 * <!-- end-user-doc -->
 	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Node</em>'.
+	 * @return the result of interpreting the object as an instance of '<em>Block</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseNode(Node object) {
+	public T caseBlock(Block object) {
 		return null;
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Node Block</em>'.
+	 * Returns the result of interpreting the object as an instance of '<em>Block Basic</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
 	 * returning a non-null result will terminate the switch.
 	 * <!-- end-user-doc -->
 	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Node Block</em>'.
+	 * @return the result of interpreting the object as an instance of '<em>Block Basic</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseNodeBlock(NodeBlock object) {
+	public T caseBlockBasic(BlockBasic object) {
 		return null;
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Node If</em>'.
+	 * Returns the result of interpreting the object as an instance of '<em>Block If</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
 	 * returning a non-null result will terminate the switch.
 	 * <!-- end-user-doc -->
 	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Node If</em>'.
+	 * @return the result of interpreting the object as an instance of '<em>Block If</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseNodeIf(NodeIf object) {
+	public T caseBlockIf(BlockIf object) {
 		return null;
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Node While</em>'.
+	 * Returns the result of interpreting the object as an instance of '<em>Block While</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
 	 * returning a non-null result will terminate the switch.
 	 * <!-- end-user-doc -->
 	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Node While</em>'.
+	 * @return the result of interpreting the object as an instance of '<em>Block While</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseNodeWhile(NodeWhile object) {
+	public T caseBlockWhile(BlockWhile object) {
 		return null;
 	}
 
@@ -805,44 +805,55 @@ public class IrSwitch<T> extends Switch<T> {
 				result = defaultCase(theEObject);
 			return result;
 		}
-		case IrPackage.NODE: {
-			Node node = (Node) theEObject;
-			T result = caseNode(node);
+		case IrPackage.BLOCK: {
+			Block block = (Block) theEObject;
+			T result = caseBlock(block);
 			if (result == null)
-				result = caseAttributable(node);
-			if (result == null)
-				result = defaultCase(theEObject);
-			return result;
-		}
-		case IrPackage.NODE_BLOCK: {
-			NodeBlock nodeBlock = (NodeBlock) theEObject;
-			T result = caseNodeBlock(nodeBlock);
-			if (result == null)
-				result = caseNode(nodeBlock);
-			if (result == null)
-				result = caseAttributable(nodeBlock);
+				result = caseAttributable(block);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
-		case IrPackage.NODE_IF: {
-			NodeIf nodeIf = (NodeIf) theEObject;
-			T result = caseNodeIf(nodeIf);
+		case IrPackage.BLOCK_BASIC: {
+			BlockBasic blockBasic = (BlockBasic) theEObject;
+			T result = caseBlockBasic(blockBasic);
 			if (result == null)
-				result = caseNode(nodeIf);
+				result = caseBlock(blockBasic);
 			if (result == null)
-				result = caseAttributable(nodeIf);
+				result = caseAttributable(blockBasic);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
-		case IrPackage.NODE_WHILE: {
-			NodeWhile nodeWhile = (NodeWhile) theEObject;
-			T result = caseNodeWhile(nodeWhile);
+		case IrPackage.BLOCK_IF: {
+			BlockIf blockIf = (BlockIf) theEObject;
+			T result = caseBlockIf(blockIf);
 			if (result == null)
-				result = caseNode(nodeWhile);
+				result = caseBlock(blockIf);
 			if (result == null)
-				result = caseAttributable(nodeWhile);
+				result = caseAttributable(blockIf);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.BLOCK_WHILE: {
+			BlockWhile blockWhile = (BlockWhile) theEObject;
+			T result = caseBlockWhile(blockWhile);
+			if (result == null)
+				result = caseBlock(blockWhile);
+			if (result == null)
+				result = caseAttributable(blockWhile);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case IrPackage.BLOCK_SPECIFIC: {
+			BlockSpecific blockSpecific = (BlockSpecific) theEObject;
+			T result = caseBlockSpecific(blockSpecific);
+			if (result == null)
+				result = caseBlock(blockSpecific);
+			if (result == null)
+				result = caseAttributable(blockSpecific);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -1133,17 +1144,6 @@ public class IrSwitch<T> extends Switch<T> {
 		case IrPackage.PREDICATE: {
 			Predicate predicate = (Predicate) theEObject;
 			T result = casePredicate(predicate);
-			if (result == null)
-				result = defaultCase(theEObject);
-			return result;
-		}
-		case IrPackage.NODE_SPECIFIC: {
-			NodeSpecific nodeSpecific = (NodeSpecific) theEObject;
-			T result = caseNodeSpecific(nodeSpecific);
-			if (result == null)
-				result = caseNode(nodeSpecific);
-			if (result == null)
-				result = caseAttributable(nodeSpecific);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;

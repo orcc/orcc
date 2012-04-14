@@ -39,8 +39,8 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstStore;
-import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
@@ -140,7 +140,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 	}
 
 	@Override
-	public Object caseNodeIf(NodeIf node) {
+	public Object caseBlockIf(BlockIf node) {
 		// Interpret first expression ("if" condition)
 		Object condition = exprInterpreter.doSwitch(node.getCondition());
 
@@ -169,7 +169,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 	}
 
 	@Override
-	public Object caseNodeWhile(NodeWhile node) {
+	public Object caseBlockWhile(BlockWhile node) {
 		int oldBranch = branch;
 		branch = 0;
 		doSwitch(node.getJoinNode());

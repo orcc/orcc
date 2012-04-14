@@ -14,7 +14,7 @@ import net.sf.orcc.backends.ir.InstGetElementPtr;
 import net.sf.orcc.backends.ir.InstTernary;
 import net.sf.orcc.backends.ir.IrSpecificFactory;
 import net.sf.orcc.backends.ir.IrSpecificPackage;
-import net.sf.orcc.backends.ir.NodeFor;
+import net.sf.orcc.backends.ir.BlockFor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
@@ -79,8 +79,8 @@ public class IrSpecificFactoryImpl extends EFactoryImpl implements
 			return createInstGetElementPtr();
 		case IrSpecificPackage.INST_TERNARY:
 			return createInstTernary();
-		case IrSpecificPackage.NODE_FOR:
-			return createNodeFor();
+		case IrSpecificPackage.BLOCK_FOR:
+			return createBlockFor();
 		default:
 			throw new IllegalArgumentException("The class '" + eClass.getName()
 					+ "' is not a valid classifier");
@@ -160,9 +160,9 @@ public class IrSpecificFactoryImpl extends EFactoryImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NodeFor createNodeFor() {
-		NodeForImpl nodeFor = new NodeForImpl();
-		return nodeFor;
+	public BlockFor createBlockFor() {
+		BlockForImpl blockFor = new BlockForImpl();
+		return blockFor;
 	}
 
 	@Override

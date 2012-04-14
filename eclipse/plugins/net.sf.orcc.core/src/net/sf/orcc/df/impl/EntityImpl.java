@@ -36,19 +36,18 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- * <li>{@link net.sf.orcc.df.impl.EntityImpl#getParameters <em>Parameters</em>}</li>
- * <li>{@link net.sf.orcc.df.impl.EntityImpl#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getParameters <em>Parameters</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getName <em>Name</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public abstract class EntityImpl extends VertexImpl implements Entity {
 
 	/**
-	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}'
-	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getParameters()
 	 * @generated
 	 * @ordered
@@ -58,7 +57,6 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -69,7 +67,6 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	protected EntityImpl() {
@@ -78,7 +75,6 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -94,7 +90,6 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -110,7 +105,6 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -127,7 +121,6 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -147,7 +140,6 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -157,7 +149,6 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -278,7 +269,6 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<Var> getParameters() {
@@ -328,9 +318,7 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 		return false;
 	}
 
-	/**
-	 * @generated
-	 */
+	@Override
 	public void setName(String newName) {
 		setLabel(newName);
 	}

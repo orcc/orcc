@@ -13,7 +13,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
@@ -25,7 +25,7 @@ public class ChangeFifoArrayAccess extends AbstractActorVisitor<Object> {
 
 	private Map<Var, Integer> loads;
 	private Map<Var, Integer> stores;
-	private NodeBlock currentBlock;
+	private BlockBasic currentBlock;
 
 	private Actor superActor;
 

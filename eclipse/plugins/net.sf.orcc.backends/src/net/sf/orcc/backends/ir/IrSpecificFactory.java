@@ -77,13 +77,13 @@ public interface IrSpecificFactory extends EFactory {
 	InstTernary createInstTernary();
 
 	/**
-	 * Returns a new object of class '<em>Node For</em>'.
+	 * Returns a new object of class '<em>Block For</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Node For</em>'.
+	 * @return a new object of class '<em>Block For</em>'.
 	 * @generated
 	 */
-	NodeFor createNodeFor();
+	BlockFor createBlockFor();
 
 	InstTernary createInstTernary(Var target, Expression condition,
 			Expression trueValue, Expression falseValue);

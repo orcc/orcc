@@ -12,7 +12,7 @@ import java.util.ListIterator;
 
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.BlockBasic;
 
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
@@ -27,13 +27,13 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.ir.impl.NodeBlockImpl#getInstructions <em>Instructions</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.BlockBasicImpl#getInstructions <em>Instructions</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public class NodeBlockImpl extends NodeImpl implements NodeBlock {
+public class BlockBasicImpl extends BlockImpl implements BlockBasic {
 	/**
 	 * The cached value of the '{@link #getInstructions() <em>Instructions</em>}
 	 * ' containment reference list. <!-- begin-user-doc --> <!-- end-user-doc
@@ -49,7 +49,7 @@ public class NodeBlockImpl extends NodeImpl implements NodeBlock {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected NodeBlockImpl() {
+	protected BlockBasicImpl() {
 		super();
 	}
 
@@ -70,7 +70,7 @@ public class NodeBlockImpl extends NodeImpl implements NodeBlock {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case IrPackage.NODE_BLOCK__INSTRUCTIONS:
+		case IrPackage.BLOCK_BASIC__INSTRUCTIONS:
 			return getInstructions();
 		}
 		return super.eGet(featureID, resolve, coreType);
@@ -84,7 +84,7 @@ public class NodeBlockImpl extends NodeImpl implements NodeBlock {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-		case IrPackage.NODE_BLOCK__INSTRUCTIONS:
+		case IrPackage.BLOCK_BASIC__INSTRUCTIONS:
 			return ((InternalEList<?>) getInstructions()).basicRemove(otherEnd,
 					msgs);
 		}
@@ -98,7 +98,7 @@ public class NodeBlockImpl extends NodeImpl implements NodeBlock {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case IrPackage.NODE_BLOCK__INSTRUCTIONS:
+		case IrPackage.BLOCK_BASIC__INSTRUCTIONS:
 			return instructions != null && !instructions.isEmpty();
 		}
 		return super.eIsSet(featureID);
@@ -112,7 +112,7 @@ public class NodeBlockImpl extends NodeImpl implements NodeBlock {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case IrPackage.NODE_BLOCK__INSTRUCTIONS:
+		case IrPackage.BLOCK_BASIC__INSTRUCTIONS:
 			getInstructions().clear();
 			getInstructions().addAll(
 					(Collection<? extends Instruction>) newValue);
@@ -127,7 +127,7 @@ public class NodeBlockImpl extends NodeImpl implements NodeBlock {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return IrPackage.Literals.NODE_BLOCK;
+		return IrPackage.Literals.BLOCK_BASIC;
 	}
 
 	/**
@@ -137,7 +137,7 @@ public class NodeBlockImpl extends NodeImpl implements NodeBlock {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case IrPackage.NODE_BLOCK__INSTRUCTIONS:
+		case IrPackage.BLOCK_BASIC__INSTRUCTIONS:
 			getInstructions().clear();
 			return;
 		}
@@ -151,7 +151,8 @@ public class NodeBlockImpl extends NodeImpl implements NodeBlock {
 	public EList<Instruction> getInstructions() {
 		if (instructions == null) {
 			instructions = new EObjectContainmentEList<Instruction>(
-					Instruction.class, this, IrPackage.NODE_BLOCK__INSTRUCTIONS);
+					Instruction.class, this,
+					IrPackage.BLOCK_BASIC__INSTRUCTIONS);
 		}
 		return instructions;
 	}
@@ -195,6 +196,21 @@ public class NodeBlockImpl extends NodeImpl implements NodeBlock {
 		}
 
 		return sb.toString();
+	}
+
+	@Override
+	public boolean isBlockBasic() {
+		return true;
+	}
+
+	@Override
+	public boolean isBlockIf() {
+		return false;
+	}
+
+	@Override
+	public boolean isBlockWhile() {
+		return false;
 	}
 
 } // NodeBlockImpl

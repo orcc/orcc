@@ -39,7 +39,7 @@ import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
@@ -60,7 +60,7 @@ public class ListFlattener extends AbstractActorVisitor<Object> {
 	/**
 	 * Prints the indexes of an NDim array.
 	 */
-	private void printAssignment(NodeBlock currentBlock,
+	private void printAssignment(BlockBasic currentBlock,
 			List<Expression> indexes, Type listType) {
 		List<Expression> listIndex = new ArrayList<Expression>(indexes.size());
 
@@ -98,7 +98,7 @@ public class ListFlattener extends AbstractActorVisitor<Object> {
 
 		if (!indexes.isEmpty()) {
 			printAssignment(
-					EcoreHelper.getContainerOfType(load, NodeBlock.class),
+					EcoreHelper.getContainerOfType(load, BlockBasic.class),
 					indexes,
 					IrUtil.copy(load.getSource().getVariable().getType()));
 		}
@@ -112,7 +112,7 @@ public class ListFlattener extends AbstractActorVisitor<Object> {
 
 		if (!indexes.isEmpty()) {
 			printAssignment(
-					EcoreHelper.getContainerOfType(store, NodeBlock.class),
+					EcoreHelper.getContainerOfType(store, BlockBasic.class),
 					indexes,
 					IrUtil.copy(store.getTarget().getVariable().getType()));
 		}

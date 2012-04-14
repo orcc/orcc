@@ -30,9 +30,9 @@ package net.sf.orcc.ir.transformations;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 
@@ -45,10 +45,10 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  */
 public class BlockCombine extends AbstractActorVisitor<Object> {
 
-	private NodeBlock previous;
+	private BlockBasic previous;
 
 	@Override
-	public Object caseNodeBlock(NodeBlock block) {
+	public Object caseNodeBlock(BlockBasic block) {
 		if (previous == null) {
 			previous = block;
 		} else {
@@ -65,7 +65,7 @@ public class BlockCombine extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseNodeIf(NodeIf node) {
+	public Object caseNodeIf(BlockIf node) {
 		// so that previous blocks are not linked to then branch
 		previous = null;
 		doSwitch(node.getThenNodes());
@@ -92,7 +92,7 @@ public class BlockCombine extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseNodeWhile(NodeWhile node) {
+	public Object caseNodeWhile(BlockWhile node) {
 		// previous blocks are not linked to the body of the while
 		previous = null;
 		doSwitch(node.getNodes());

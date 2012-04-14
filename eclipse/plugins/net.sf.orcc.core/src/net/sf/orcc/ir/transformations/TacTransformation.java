@@ -48,8 +48,8 @@ import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
@@ -239,7 +239,7 @@ public class TacTransformation extends AbstractActorVisitor<Expression> {
 	}
 
 	@Override
-	public Expression caseNodeIf(NodeIf nodeIf) {
+	public Expression caseNodeIf(BlockIf nodeIf) {
 		complexityLevel++;
 		nodeIf.setCondition(doSwitch(nodeIf.getCondition()));
 		complexityLevel--;
@@ -250,7 +250,7 @@ public class TacTransformation extends AbstractActorVisitor<Expression> {
 	}
 
 	@Override
-	public Expression caseNodeWhile(NodeWhile nodeWhile) {
+	public Expression caseNodeWhile(BlockWhile nodeWhile) {
 		complexityLevel++;
 		nodeWhile.setCondition(doSwitch(nodeWhile.getCondition()));
 		complexityLevel--;

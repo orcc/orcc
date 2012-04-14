@@ -13,7 +13,7 @@ package net.sf.orcc.ir;
  * @author Jérôme Gorin
  * @model abstract="true" extends="net.sf.orcc.ir.Node"
  */
-public interface NodeSpecific extends Node {
+public interface BlockSpecific extends Block {
 
 	/**
 	 * Returns <code>true</code> if the instruction is a backend specific node.

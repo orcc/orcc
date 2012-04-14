@@ -39,9 +39,9 @@ import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeIf;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
@@ -151,7 +151,7 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 				"remainder");
 
 		// Create procedural code
-		EList<Node> nodes = divProc.getNodes();
+		EList<Block> nodes = divProc.getNodes();
 		nodes.add(createInitBlock(result, flipResult, denom, numer, mask,
 				remainder));
 		nodes.add(createNodeIf(varNum, flipResult));
@@ -165,7 +165,7 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 		nodes.add(createResultNodeIf(flipResult, result));
 
 		// Create return instruction
-		NodeBlock blockReturn = factory.createNodeBlock();
+		BlockBasic blockReturn = factory.createBlockBasic();
 		InstReturn instReturn = factory.createInstReturn(factory
 				.createExprVar(result));
 		blockReturn.add(instReturn);
@@ -175,9 +175,9 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 		return divProc;
 	}
 
-	private NodeBlock createAssignmentBlock(Var varDenum, Var remainder,
+	private BlockBasic createAssignmentBlock(Var varDenum, Var remainder,
 			Var varNum, Var denom, Var mask, Var i) {
-		NodeBlock block = factory.createNodeBlock();
+		BlockBasic block = factory.createBlockBasic();
 		Expression blk11And = factory.createExprBinary(
 				factory.createExprVar(varDenum), OpBinary.BITAND,
 				factory.createExprInt(0x0000FFFF), factory.createTypeInt());
@@ -198,9 +198,9 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 	 *            to be initialized to zero
 	 * @return node block with initialization assigns
 	 */
-	private NodeBlock createInitBlock(Var result, Var flipResult, Var denom,
+	private BlockBasic createInitBlock(Var result, Var flipResult, Var denom,
 			Var numer, Var mask, Var remainder) {
-		NodeBlock initBlock = factory.createNodeBlock();
+		BlockBasic initBlock = factory.createBlockBasic();
 		initBlock.add(factory.createInstAssign(result, 0));
 		initBlock.add(factory.createInstAssign(flipResult, 0));
 		initBlock.add(factory.createInstAssign(denom, 0));
@@ -219,14 +219,14 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 	 *            (see definition)
 	 * @return if node
 	 */
-	private NodeIf createNodeIf(Var var, Var flip) {
-		NodeIf nodeIf = factory.createNodeIf();
-		NodeBlock blockIf_1 = factory.createNodeBlock();
+	private BlockIf createNodeIf(Var var, Var flip) {
+		BlockIf nodeIf = factory.createBlockIf();
+		BlockBasic blockIf_1 = factory.createBlockBasic();
 		Expression conditionIf_1 = factory.createExprBinary(
 				factory.createExprVar(var), OpBinary.LT,
 				factory.createExprInt(0), factory.createTypeBool());
 		nodeIf.setCondition(conditionIf_1);
-		NodeBlock join = factory.createNodeBlock();
+		BlockBasic join = factory.createBlockBasic();
 		nodeIf.setJoinNode(join);
 		Expression oppNomerator = factory.createExprBinary(
 				factory.createExprInt(0), OpBinary.MINUS,
@@ -239,7 +239,7 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 		InstAssign assign11 = factory.createInstAssign(flip, xorFlip);
 		blockIf_1.add(assign11);
 		nodeIf.getThenNodes().add(blockIf_1);
-		NodeBlock blockIf_2 = factory.createNodeBlock();
+		BlockBasic blockIf_2 = factory.createBlockBasic();
 		InstAssign assign20 = factory.createInstAssign(var, var);
 		blockIf_2.add(assign20);
 		InstAssign assign21 = factory.createInstAssign(flip, flip);
@@ -260,18 +260,18 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 	 * @param i
 	 * @return if Node
 	 */
-	private NodeIf createNodeIfRepeatBlock(Var numer, Var denom, Var result,
+	private BlockIf createNodeIfRepeatBlock(Var numer, Var denom, Var result,
 			Var mask, Var remainder, Var varDenum, int k) {
-		NodeIf nodeIf = factory.createNodeIf();
+		BlockIf nodeIf = factory.createBlockIf();
 		Expression condition = factory.createExprBinary(
 				factory.createExprVar(numer), OpBinary.GE,
 				factory.createExprVar(denom), factory.createTypeBool());
 		nodeIf.setCondition(condition);
 
-		NodeBlock join = factory.createNodeBlock();
+		BlockBasic join = factory.createBlockBasic();
 		nodeIf.setJoinNode(join);
 
-		NodeBlock nodeBlk = factory.createNodeBlock();
+		BlockBasic nodeBlk = factory.createBlockBasic();
 
 		Expression orExpr = factory.createExprBinary(
 				factory.createExprVar(result), OpBinary.BITOR,
@@ -309,11 +309,11 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 	 * @param varDenum
 	 * @return
 	 */
-	private void createRepeatBlock(EList<Node> nodes, int k, Var numer,
+	private void createRepeatBlock(EList<Block> nodes, int k, Var numer,
 			Var remainder, Var denom, Var result, Var mask, Var varDenum) {
 
-		NodeBlock nodeBlk_0 = factory.createNodeBlock();
-		NodeBlock nodeBlk_1 = factory.createNodeBlock();
+		BlockBasic nodeBlk_0 = factory.createBlockBasic();
+		BlockBasic nodeBlk_1 = factory.createBlockBasic();
 
 		Expression andExpr = factory.createExprBinary(
 				factory.createExprVar(remainder), OpBinary.BITAND,
@@ -329,7 +329,7 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 		nodeBlk_0.add(assignBlk_0);
 		nodes.add(nodeBlk_0);
 
-		NodeIf nodeIf = createNodeIfRepeatBlock(numer, denom, result, mask,
+		BlockIf nodeIf = createNodeIfRepeatBlock(numer, denom, result, mask,
 				remainder, varDenum, k);
 		nodes.add(nodeIf);
 
@@ -354,14 +354,14 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 	 *            (see definition)
 	 * @return If node (see definition)
 	 */
-	private NodeIf createResultNodeIf(Var flipResult, Var result) {
-		NodeIf nodeIf = factory.createNodeIf();
-		NodeBlock blockIf_1 = factory.createNodeBlock();
+	private BlockIf createResultNodeIf(Var flipResult, Var result) {
+		BlockIf nodeIf = factory.createBlockIf();
+		BlockBasic blockIf_1 = factory.createBlockBasic();
 		Expression conditionIf = factory.createExprBinary(
 				factory.createExprVar(flipResult), OpBinary.NE,
 				factory.createExprInt(0), factory.createTypeBool());
 		nodeIf.setCondition(conditionIf);
-		NodeBlock join = factory.createNodeBlock();
+		BlockBasic join = factory.createBlockBasic();
 		nodeIf.setJoinNode(join);
 		Expression oppflip = factory.createExprBinary(factory.createExprInt(0),
 				OpBinary.MINUS, factory.createExprVar(result),

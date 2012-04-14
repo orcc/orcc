@@ -30,7 +30,7 @@
  */
 package net.sf.orcc.backends.ir;
 
-import net.sf.orcc.ir.NodeSpecific;
+import net.sf.orcc.ir.BlockSpecific;
 
 /**
  * <!-- begin-user-doc --> A representation of the model object '
@@ -41,7 +41,7 @@ import net.sf.orcc.ir.NodeSpecific;
  * @model
  * @generated
  */
-public interface IrNodeSpecific extends NodeSpecific {
+public interface IrNodeSpecific extends BlockSpecific {
 	/**
 	 * Returns <code>true</code> if the instruction is a NodeFor.
 	 * 

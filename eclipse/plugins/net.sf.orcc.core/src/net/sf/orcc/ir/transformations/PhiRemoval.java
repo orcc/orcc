@@ -38,10 +38,10 @@ import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
@@ -70,7 +70,7 @@ public class PhiRemoval extends AbstractActorVisitor<Object> {
 
 	private int phiIndex;
 
-	private NodeBlock targetBlock;
+	private BlockBasic targetBlock;
 
 	@Override
 	public Object caseInstPhi(InstPhi phi) {
@@ -101,8 +101,8 @@ public class PhiRemoval extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseNodeIf(NodeIf node) {
-		NodeBlock join = node.getJoinNode();
+	public Object caseNodeIf(BlockIf node) {
+		BlockBasic join = node.getJoinNode();
 		targetBlock = IrUtil.getLast(node.getThenNodes());
 		phiIndex = 0;
 		caseNodeBlock(join);
@@ -118,23 +118,23 @@ public class PhiRemoval extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseNodeWhile(NodeWhile node) {
-		List<Node> nodes = EcoreHelper.getContainingList(node);
+	public Object caseNodeWhile(BlockWhile node) {
+		List<Block> nodes = EcoreHelper.getContainingList(node);
 		// the node before the while.
 		if (indexNode > 0) {
-			Node previousNode = nodes.get(indexNode - 1);
-			if (previousNode.isNodeBlock()) {
-				targetBlock = (NodeBlock) previousNode;
+			Block previousNode = nodes.get(indexNode - 1);
+			if (previousNode.isBlockBasic()) {
+				targetBlock = (BlockBasic) previousNode;
 			} else {
-				targetBlock = IrFactory.eINSTANCE.createNodeBlock();
+				targetBlock = IrFactory.eINSTANCE.createBlockBasic();
 				nodes.add(indexNode, targetBlock);
 			}
 		} else {
-			targetBlock = IrFactory.eINSTANCE.createNodeBlock();
+			targetBlock = IrFactory.eINSTANCE.createBlockBasic();
 			nodes.add(indexNode, targetBlock);
 		}
 
-		NodeBlock join = node.getJoinNode();
+		BlockBasic join = node.getJoinNode();
 		phiIndex = 0;
 		caseNodeBlock(join);
 

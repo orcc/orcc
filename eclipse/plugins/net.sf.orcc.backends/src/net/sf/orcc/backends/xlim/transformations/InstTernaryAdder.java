@@ -40,9 +40,9 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
@@ -64,7 +64,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 public class InstTernaryAdder extends AbstractActorVisitor<Object> {
 
 	private Var condVar;
-	private NodeBlock newBlockNode;
+	private BlockBasic newBlockNode;
 
 	@Override
 	public Object caseActor(Actor actor) {
@@ -123,7 +123,7 @@ public class InstTernaryAdder extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseNodeIf(NodeIf nodeIf) {
+	public Object caseNodeIf(BlockIf nodeIf) {
 		Var oldCondVar = condVar;
 
 		Expression condExpr = nodeIf.getCondition();
@@ -146,7 +146,7 @@ public class InstTernaryAdder extends AbstractActorVisitor<Object> {
 	@Override
 	public Object caseProcedure(Procedure procedure) {
 		if (!procedure.getReturnType().isVoid() && isTernarisable(procedure)) {
-			newBlockNode = IrFactoryImpl.eINSTANCE.createNodeBlock();
+			newBlockNode = IrFactoryImpl.eINSTANCE.createBlockBasic();
 			super.caseProcedure(procedure);
 			IrUtil.delete(procedure.getNodes());
 			procedure.getNodes().add(newBlockNode);
@@ -166,7 +166,7 @@ public class InstTernaryAdder extends AbstractActorVisitor<Object> {
 				.getNodes());
 		while (it.hasNext()) {
 			EObject object = it.next();
-			if (object instanceof NodeWhile) {
+			if (object instanceof BlockWhile) {
 				return false;
 			}
 		}

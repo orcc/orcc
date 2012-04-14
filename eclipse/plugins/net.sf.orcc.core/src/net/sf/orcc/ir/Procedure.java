@@ -56,7 +56,7 @@ public interface Procedure extends Attributable {
 	 *            a procedure
 	 * @return a block
 	 */
-	NodeBlock getFirst();
+	BlockBasic getFirst();
 
 	/**
 	 * Returns the last block in the list of nodes of the given procedure. A new
@@ -66,7 +66,7 @@ public interface Procedure extends Attributable {
 	 *            a procedure
 	 * @return a block
 	 */
-	NodeBlock getLast();
+	BlockBasic getLast();
 
 	/**
 	 * Returns the line number on which this procedure starts.
@@ -108,7 +108,7 @@ public interface Procedure extends Attributable {
 	 * @return the list of nodes of this procedure
 	 * @model containment="true"
 	 */
-	EList<Node> getNodes();
+	EList<Block> getNodes();
 
 	/**
 	 * Returns the parameters of this procedure.

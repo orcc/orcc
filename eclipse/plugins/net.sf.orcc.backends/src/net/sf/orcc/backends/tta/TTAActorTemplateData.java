@@ -36,7 +36,7 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
-import net.sf.orcc.ir.Node;
+import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 
@@ -57,7 +57,7 @@ public class TTAActorTemplateData {
 	/**
 	 * Label of all nodes
 	 */
-	private Map<Node, Integer> nodeToLabelMap;
+	private Map<Block, Integer> nodeToLabelMap;
 
 	private Map<Pattern, Map<Port, Integer>> portToIndexByPatternMap;
 
@@ -68,7 +68,7 @@ public class TTAActorTemplateData {
 	private Map<State, Integer> stateToLabelMap;
 
 	public TTAActorTemplateData(Actor actor) {
-		nodeToLabelMap = new HashMap<Node, Integer>();
+		nodeToLabelMap = new HashMap<Block, Integer>();
 		castedListReferences = new HashMap<Var, Var>();
 		stateToLabelMap = new HashMap<State, Integer>();
 		portToIndexByPatternMap = new HashMap<Pattern, Map<Port, Integer>>();
@@ -103,8 +103,8 @@ public class TTAActorTemplateData {
 				TreeIterator<EObject> it2 = proc.eAllContents();
 				while (it2.hasNext()) {
 					EObject object2 = it2.next();
-					if (object2 instanceof Node) {
-						Node node = (Node) object2;
+					if (object2 instanceof Block) {
+						Block node = (Block) object2;
 						nodeToLabelMap.put(node, label);
 						label++;
 					}
@@ -167,7 +167,7 @@ public class TTAActorTemplateData {
 		return castedListReferences;
 	}
 
-	public Map<Node, Integer> getNodeToLabelMap() {
+	public Map<Block, Integer> getNodeToLabelMap() {
 		return nodeToLabelMap;
 	}
 

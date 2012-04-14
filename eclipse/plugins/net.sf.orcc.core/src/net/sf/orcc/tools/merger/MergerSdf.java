@@ -24,9 +24,9 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -206,7 +206,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 							factory.createTypeVoid());
 
 					Procedure body = action.getBody();
-					List<Node> nodes = body.getNodes();
+					List<Block> nodes = body.getNodes();
 					proc.getLocals().addAll(body.getLocals());
 					proc.getNodes().addAll(nodes);
 					IrUtil.getLast(nodes).add(factory.createInstReturn());
@@ -271,7 +271,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 			Var target) {
 		IrFactory factory = IrFactory.eINSTANCE;
 
-		List<Node> nodes = procedure.getNodes();
+		List<Block> nodes = procedure.getNodes();
 
 		int size = ((TypeList) source.getType()).getSize();
 
@@ -285,20 +285,20 @@ public class MergerSdf extends DfSwitch<Actor> {
 			indexes.add(factory.createExprInt(0));
 			InstStore store = factory.createInstStore(0, target, indexes,
 					factory.createExprVar(tmpVar));
-			NodeBlock node = IrUtil.getLast(nodes);
+			BlockBasic node = IrUtil.getLast(nodes);
 			node.add(load);
 			node.add(store);
 		} else {
 			Var loop = procedure.getLocal("idx_0");
-			NodeBlock block = IrUtil.getLast(nodes);
+			BlockBasic block = IrUtil.getLast(nodes);
 			block.add(factory.createInstAssign(loop, factory.createExprInt(0)));
 
 			Expression condition = factory.createExprBinary(
 					factory.createExprVar(loop), OpBinary.LT,
 					factory.createExprInt(size), factory.createTypeBool());
 
-			NodeWhile nodeWhile = factory.createNodeWhile();
-			nodeWhile.setJoinNode(factory.createNodeBlock());
+			BlockWhile nodeWhile = factory.createBlockWhile();
+			nodeWhile.setJoinNode(factory.createBlockBasic());
 			nodeWhile.setCondition(condition);
 			nodes.add(nodeWhile);
 
@@ -310,7 +310,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 			indexes.add(factory.createExprVar(loop));
 			InstStore store = factory.createInstStore(0, target, indexes,
 					factory.createExprVar(tmpVar));
-			NodeBlock childBlock = IrUtil.getLast(nodeWhile.getNodes());
+			BlockBasic childBlock = IrUtil.getLast(nodeWhile.getNodes());
 			childBlock.add(load);
 			childBlock.add(store);
 
@@ -348,7 +348,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 	 * @param block
 	 *            block to which return is to be added
 	 */
-	private void createInputCondition(NodeBlock block) {
+	private void createInputCondition(BlockBasic block) {
 		final IrFactory factory = IrFactory.eINSTANCE;
 		InstReturn returnInstr = factory.createInstReturn(factory
 				.createExprBool(true));
@@ -365,7 +365,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 		Procedure procedure = IrFactory.eINSTANCE.createProcedure(
 				SCHEDULER_NAME, 0, IrFactory.eINSTANCE.createTypeBool());
 
-		NodeBlock block = factory.createNodeBlock();
+		BlockBasic block = factory.createBlockBasic();
 		procedure.getNodes().add(block);
 		createInputCondition(block);
 		return procedure;
@@ -379,13 +379,13 @@ public class MergerSdf extends DfSwitch<Actor> {
 	 * @param nodes
 	 */
 	private void createStaticSchedule(Procedure procedure, Schedule schedule,
-			List<Node> nodes) {
+			List<Block> nodes) {
 		IrFactory factory = IrFactory.eINSTANCE;
 		for (Iterand iterand : schedule.getIterands()) {
 			if (iterand.isVertex()) {
 				Instance instance = (Instance) iterand.getVertex();
 				CSDFMoC moc = (CSDFMoC) instance.getMoC();
-				NodeBlock block = IrUtil.getLast(nodes);
+				BlockBasic block = IrUtil.getLast(nodes);
 				for (Invocation invocation : moc.getInvocations()) {
 					Action action = invocation.getAction();
 					Procedure proc = superActor.getProcedure(instance.getName()
@@ -400,7 +400,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 				Var loopVar = procedure.getLocal("idx_" + depth);
 
 				// init counter
-				NodeBlock block = IrUtil.getLast(nodes);
+				BlockBasic block = IrUtil.getLast(nodes);
 				block.add(factory.createInstAssign(loopVar,
 						factory.createExprInt(0)));
 
@@ -410,8 +410,8 @@ public class MergerSdf extends DfSwitch<Actor> {
 						factory.createExprInt(sched.getIterationCount()),
 						factory.createTypeBool());
 
-				NodeWhile nodeWhile = factory.createNodeWhile();
-				nodeWhile.setJoinNode(factory.createNodeBlock());
+				BlockWhile nodeWhile = factory.createBlockWhile();
+				nodeWhile.setJoinNode(factory.createBlockBasic());
 				nodeWhile.setCondition(condition);
 				nodes.add(nodeWhile);
 
@@ -471,7 +471,7 @@ public class MergerSdf extends DfSwitch<Actor> {
 			Var read = superActor.getStateVar(var.getName() + "_r");
 			Var write = superActor.getStateVar(var.getName() + "_w");
 
-			NodeBlock block = procedure.getLast();
+			BlockBasic block = procedure.getLast();
 			if (read != null) {
 				block.add(factory.createInstStore(read,
 						factory.createExprInt(0)));

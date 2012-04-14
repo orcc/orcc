@@ -45,9 +45,9 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -78,7 +78,7 @@ public class StaticActorNormalizer {
 
 		private List<Var> indexes;
 
-		private List<Node> nodes;
+		private List<Block> nodes;
 
 		public MyPatternVisitor(Procedure procedure) {
 			nodes = procedure.getNodes();
@@ -100,17 +100,17 @@ public class StaticActorNormalizer {
 			Var loopVar = indexes.get(depth - 1);
 
 			// init var
-			NodeBlock block = IrUtil.getLast(nodes);
+			BlockBasic block = IrUtil.getLast(nodes);
 			InstAssign assign = factory.createInstAssign(loopVar,
 					factory.createExprInt(0));
 			block.add(assign);
 
 			// create while
-			List<Node> oldNodes = nodes;
-			nodes = new ArrayList<Node>();
+			List<Block> oldNodes = nodes;
+			nodes = new ArrayList<Block>();
 
-			NodeWhile nodeWhile = factory.createNodeWhile();
-			nodeWhile.setJoinNode(factory.createNodeBlock());
+			BlockWhile nodeWhile = factory.createBlockWhile();
+			nodeWhile.setJoinNode(factory.createBlockBasic());
 			nodeWhile.getNodes().addAll(nodes);
 
 			oldNodes.add(nodeWhile);
@@ -147,7 +147,7 @@ public class StaticActorNormalizer {
 
 		@Override
 		public void visit(SimplePattern pattern) {
-			NodeBlock block = IrUtil.getLast(nodes);
+			BlockBasic block = IrUtil.getLast(nodes);
 			Action action = pattern.getAction();
 
 			// Call the action corresponding to the pattern
@@ -216,7 +216,7 @@ public class StaticActorNormalizer {
 	private void addStateVariables(Procedure procedure, Pattern pattern) {
 		final IrFactory factory = IrFactory.eINSTANCE;
 
-		NodeBlock block = procedure.getLast();
+		BlockBasic block = procedure.getLast();
 		for (Port port : pattern.getPorts()) {
 			int numTokens = pattern.getNumTokens(port);
 
@@ -260,10 +260,10 @@ public class StaticActorNormalizer {
 			Procedure scheduler = action.getScheduler();
 			scheduler.getLocals().clear();
 
-			List<Node> nodes = scheduler.getNodes();
+			List<Block> nodes = scheduler.getNodes();
 			nodes.clear();
 
-			NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
+			BlockBasic block = IrFactoryImpl.eINSTANCE.createBlockBasic();
 			nodes.add(block);
 			block.add(IrFactory.eINSTANCE.createInstReturn(IrFactory.eINSTANCE
 					.createExprBool(true)));
@@ -327,7 +327,7 @@ public class StaticActorNormalizer {
 	 * @param block
 	 *            block to which return is to be added
 	 */
-	private void createInputCondition(NodeBlock block) {
+	private void createInputCondition(BlockBasic block) {
 		final IrFactory factory = IrFactory.eINSTANCE;
 
 		Expression value;
@@ -378,7 +378,7 @@ public class StaticActorNormalizer {
 
 		variables = procedure.getLocals();
 
-		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
+		BlockBasic block = IrFactoryImpl.eINSTANCE.createBlockBasic();
 		procedure.getNodes().add(block);
 
 		createInputCondition(block);

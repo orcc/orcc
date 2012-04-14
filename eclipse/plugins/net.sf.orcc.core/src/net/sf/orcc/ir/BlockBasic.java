@@ -28,88 +28,85 @@
  */
 package net.sf.orcc.ir;
 
+import java.util.Iterator;
+import java.util.ListIterator;
+
 import org.eclipse.emf.common.util.EList;
 
 /**
- * This class defines an If node. An if node is a node with a value used in its
- * condition.
+ * This class defines a Block node. A block node is a node that contains
+ * instructions.
  * 
  * @author Matthieu Wipliez
  * @model extends="net.sf.orcc.ir.Node"
  * 
  */
-public interface NodeIf extends Node {
+public interface BlockBasic extends Block {
 
 	/**
-	 * Returns the condition of this node If.
+	 * Appends the specified instruction to the end of this block.
 	 * 
-	 * @return the condition of this node If
+	 * @param instruction
+	 *            an instruction
+	 */
+	void add(Instruction instruction);
+
+	/**
+	 * Appends the specified instruction to this block at the specified index.
+	 * 
+	 * @param index
+	 *            the index
+	 * @param instruction
+	 *            an instruction
+	 */
+	void add(int index, Instruction instruction);
+
+	/**
+	 * Returns the instructions of this block node.
+	 * 
+	 * @return the instructions of this block node
 	 * @model containment="true"
 	 */
-	Expression getCondition();
+	EList<Instruction> getInstructions();
 
 	/**
-	 * Returns <code>true</code> if it is necessary to generate an "else" branch
-	 * in the code.
+	 * Returns the index of the given instruction in the list of instructions of
+	 * this block.
 	 * 
-	 * @return <code>true</code> if it is necessary to generate an "else" branch
+	 * @param instruction
+	 *            an instruction
+	 * @return the index of the given instruction in the list of instructions of
+	 *         this block
 	 */
-	boolean isElseRequired();
+	int indexOf(Instruction instruction);
+
+	Iterator<Instruction> iterator();
 
 	/**
-	 * Returns the nodes in the "else" branch of this NodeIf.
+	 * Returns a list iterator over the elements in this list (in proper
+	 * sequence) that is positioned after the last instruction.
 	 * 
-	 * @return the nodes in the "else" branch of this NodeIf
-	 * @model containment="true"
+	 * @return a list iterator over the elements in this list (in proper
+	 *         sequence)
 	 */
-	EList<Node> getElseNodes();
+	ListIterator<Instruction> lastListIterator();
 
 	/**
-	 * Returns the join node of this NodeIf.
+	 * Returns a list iterator over the elements in this list (in proper
+	 * sequence).
 	 * 
-	 * @return the join node of this NodeIf.
-	 * @model containment="true"
+	 * @return a list iterator over the elements in this list (in proper
+	 *         sequence)
 	 */
-	NodeBlock getJoinNode();
+	ListIterator<Instruction> listIterator();
 
 	/**
-	 * Returns the line number on which this "if" starts.
+	 * Returns a list iterator over the elements in this list already positioned
+	 * at index (in proper sequence).
 	 * 
-	 * @return the line number on which this "if" starts
-	 * @model
+	 * @return a list iterator over the elements in this list already positioned
+	 *         at index (in proper sequence)
 	 */
-	public int getLineNumber();
-
-	/**
-	 * Returns the nodes in the "then" branch of this NodeIf.
-	 * 
-	 * @return the nodes in the "then" branch of this NodeIf
-	 * @model containment="true"
-	 */
-	EList<Node> getThenNodes();
-
-	/**
-	 * Sets the condition of this node If.
-	 * 
-	 * @param condition
-	 *            the condition of this node If
-	 */
-	void setCondition(Expression condition);
-
-	/**
-	 * Sets the join node of this NodeIf.
-	 * 
-	 * @param joinNode
-	 *            the join node of this NodeIf
-	 */
-	void setJoinNode(NodeBlock joinNode);
-
-	/**
-	 * Sets the line number on which this "if" starts.
-	 * 
-	 * @param newLineNumber
-	 *            the line number on which this "if" starts
-	 */
-	public void setLineNumber(int newLineNumber);
+	ListIterator<Instruction> listIterator(int index);
 
 }

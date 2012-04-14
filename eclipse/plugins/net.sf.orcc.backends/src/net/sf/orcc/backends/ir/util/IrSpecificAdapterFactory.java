@@ -12,11 +12,11 @@ import net.sf.orcc.backends.ir.InstCast;
 import net.sf.orcc.backends.ir.InstGetElementPtr;
 import net.sf.orcc.backends.ir.InstTernary;
 import net.sf.orcc.backends.ir.IrSpecificPackage;
-import net.sf.orcc.backends.ir.NodeFor;
+import net.sf.orcc.backends.ir.BlockFor;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeSpecific;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockSpecific;
 
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notifier;
@@ -97,8 +97,8 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 		}
 
 		@Override
-		public Adapter caseNodeFor(NodeFor object) {
-			return createNodeForAdapter();
+		public Adapter caseBlockFor(BlockFor object) {
+			return createBlockForAdapter();
 		}
 
 		@Override
@@ -117,13 +117,13 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 		}
 
 		@Override
-		public Adapter caseNode(Node object) {
-			return createNodeAdapter();
+		public Adapter caseBlock(Block object) {
+			return createBlockAdapter();
 		}
 
 		@Override
-		public Adapter caseNodeSpecific(NodeSpecific object) {
-			return createNodeSpecificAdapter();
+		public Adapter caseBlockSpecific(BlockSpecific object) {
+			return createBlockSpecificAdapter();
 		}
 
 		@Override
@@ -204,17 +204,16 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.backends.ir.NodeFor <em>Node For</em>}'. <!--
-	 * begin-user-doc --> This default implementation returns null so that we
-	 * can easily ignore cases; it's useful to ignore a case when inheritance
-	 * will catch all the cases anyway. <!-- end-user-doc -->
-	 * 
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.ir.BlockFor <em>Block For</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.orcc.backends.ir.NodeFor
+	 * @see net.sf.orcc.backends.ir.BlockFor
 	 * @generated
 	 */
-	public Adapter createNodeForAdapter() {
+	public Adapter createBlockForAdapter() {
 		return null;
 	}
 
@@ -249,6 +248,34 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Block <em>Block</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.Block
+	 * @generated
+	 */
+	public Adapter createBlockAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.BlockSpecific <em>Block Specific</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.BlockSpecific
+	 * @generated
+	 */
+	public Adapter createBlockSpecificAdapter() {
+		return null;
+	}
+
+	/**
 	 * Creates a new adapter for an object of class '
 	 * {@link net.sf.dftools.util.Attributable <em>Attributable</em>}'. <!--
 	 * begin-user-doc --> This default implementation returns null so that we
@@ -260,36 +287,6 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createAttributableAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Node
-	 * <em>Node</em>}'. <!-- begin-user-doc --> This default implementation
-	 * returns null so that we can easily ignore cases; it's useful to ignore a
-	 * case when inheritance will catch all the cases anyway. <!-- end-user-doc
-	 * -->
-	 * 
-	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.Node
-	 * @generated
-	 */
-	public Adapter createNodeAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.ir.NodeSpecific <em>Node Specific</em>}'. <!--
-	 * begin-user-doc --> This default implementation returns null so that we
-	 * can easily ignore cases; it's useful to ignore a case when inheritance
-	 * will catch all the cases anyway. <!-- end-user-doc -->
-	 * 
-	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.NodeSpecific
-	 * @generated
-	 */
-	public Adapter createNodeSpecificAdapter() {
 		return null;
 	}
 
