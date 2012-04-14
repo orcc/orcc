@@ -33,6 +33,9 @@ import java.util.ListIterator;
 
 import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
@@ -40,9 +43,6 @@ import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Block;
-import net.sf.orcc.ir.BlockBasic;
-import net.sf.orcc.ir.BlockIf;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 
@@ -70,7 +70,7 @@ public class DeadCodeElimination extends AbstractActorVisitor<Object> {
 		ListIterator<Instruction> it = joinNode.listIterator();
 		while (it.hasNext()) {
 			Instruction instruction = it.next();
-			if (instruction.isPhi()) {
+			if (instruction.isInstPhi()) {
 				InstPhi phi = (InstPhi) instruction;
 
 				Var target = phi.getTarget().getVariable();
@@ -99,7 +99,7 @@ public class DeadCodeElimination extends AbstractActorVisitor<Object> {
 
 		// combines adjacent blocks that may have been created
 		new BlockCombine().doSwitch(actor);
-		
+
 		return null;
 	}
 
@@ -113,7 +113,7 @@ public class DeadCodeElimination extends AbstractActorVisitor<Object> {
 				addNodes(node.getElseNodes(), node.getJoinNode(), 1);
 			}
 		}
-		
+
 		return null;
 	}
 

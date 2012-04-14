@@ -86,7 +86,7 @@ public class IrUtil {
 		Block containingNode = EcoreHelper.getContainerOfType(expression,
 				Block.class);
 		if (containingInst != null) {
-			if (containingInst.isPhi() && isWhileJoinNode(containingNode)) {
+			if (containingInst.isInstPhi() && isWhileJoinNode(containingNode)) {
 				BlockWhile nodeWhile = EcoreHelper.getContainerOfType(
 						containingNode, BlockWhile.class);
 				addToPreviousNodeBlock(nodeWhile, instruction);

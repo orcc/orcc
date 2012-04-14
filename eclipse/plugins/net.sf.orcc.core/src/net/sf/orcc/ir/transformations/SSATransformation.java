@@ -34,6 +34,10 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.dftools.util.util.EcoreHelper;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
@@ -44,10 +48,6 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Block;
-import net.sf.orcc.ir.BlockBasic;
-import net.sf.orcc.ir.BlockIf;
-import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
@@ -135,7 +135,7 @@ public class SSATransformation extends AbstractActorVisitor<Object> {
 		String name = oldVar.getName();
 		InstPhi phi = null;
 		for (Instruction instruction : join.getInstructions()) {
-			if (instruction.isPhi()) {
+			if (instruction.isInstPhi()) {
 				InstPhi tempPhi = (InstPhi) instruction;
 				if (tempPhi.getTarget().getVariable().getName().equals(name)) {
 					phi = tempPhi;
@@ -157,7 +157,8 @@ public class SSATransformation extends AbstractActorVisitor<Object> {
 			if (loop != null) {
 				List<Use> uses = new ArrayList<Use>(oldVar.getUses());
 				for (Use use : uses) {
-					Block node = EcoreHelper.getContainerOfType(use, Block.class);
+					Block node = EcoreHelper.getContainerOfType(use,
+							Block.class);
 
 					// only changes uses that are in the loop
 					if (node != join && EcoreUtil.isAncestor(loop, node)) {
