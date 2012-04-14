@@ -63,52 +63,6 @@ public interface IrSpecificPackage extends EPackage {
 			.init();
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.ir.impl.IrInstSpecificImpl <em>Ir Inst Specific</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.backends.ir.impl.IrInstSpecificImpl
-	 * @see net.sf.orcc.backends.ir.impl.IrSpecificPackageImpl#getIrInstSpecific()
-	 * @generated
-	 */
-	int IR_INST_SPECIFIC = 5;
-
-	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int IR_INST_SPECIFIC__ATTRIBUTES = IrPackage.INST_SPECIFIC__ATTRIBUTES;
-
-	/**
-	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int IR_INST_SPECIFIC__LINE_NUMBER = IrPackage.INST_SPECIFIC__LINE_NUMBER;
-
-	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int IR_INST_SPECIFIC__PREDICATE = IrPackage.INST_SPECIFIC__PREDICATE;
-
-	/**
-	 * The number of structural features of the '<em>Ir Inst Specific</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int IR_INST_SPECIFIC_FEATURE_COUNT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 0;
-
-	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.ir.impl.InstAssignIndexImpl <em>Inst Assign Index</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -125,7 +79,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_ASSIGN_INDEX__ATTRIBUTES = IR_INST_SPECIFIC__ATTRIBUTES;
+	int INST_ASSIGN_INDEX__ATTRIBUTES = IrPackage.INST_SPECIFIC__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -134,7 +88,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_ASSIGN_INDEX__LINE_NUMBER = IR_INST_SPECIFIC__LINE_NUMBER;
+	int INST_ASSIGN_INDEX__LINE_NUMBER = IrPackage.INST_SPECIFIC__LINE_NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
@@ -143,7 +97,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_ASSIGN_INDEX__PREDICATE = IR_INST_SPECIFIC__PREDICATE;
+	int INST_ASSIGN_INDEX__PREDICATE = IrPackage.INST_SPECIFIC__PREDICATE;
 
 	/**
 	 * The feature id for the '<em><b>Indexes</b></em>' containment reference list.
@@ -152,7 +106,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_ASSIGN_INDEX__INDEXES = IR_INST_SPECIFIC_FEATURE_COUNT + 0;
+	int INST_ASSIGN_INDEX__INDEXES = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Target</b></em>' containment reference.
@@ -161,7 +115,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_ASSIGN_INDEX__TARGET = IR_INST_SPECIFIC_FEATURE_COUNT + 1;
+	int INST_ASSIGN_INDEX__TARGET = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>List Type</b></em>' containment reference.
@@ -170,7 +124,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_ASSIGN_INDEX__LIST_TYPE = IR_INST_SPECIFIC_FEATURE_COUNT + 2;
+	int INST_ASSIGN_INDEX__LIST_TYPE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 2;
 
 	/**
 	 * The number of structural features of the '<em>Inst Assign Index</em>' class.
@@ -179,7 +133,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_ASSIGN_INDEX_FEATURE_COUNT = IR_INST_SPECIFIC_FEATURE_COUNT + 3;
+	int INST_ASSIGN_INDEX_FEATURE_COUNT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 3;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.ir.impl.InstCastImpl <em>Inst Cast</em>}' class.
@@ -198,7 +152,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_CAST__ATTRIBUTES = IR_INST_SPECIFIC__ATTRIBUTES;
+	int INST_CAST__ATTRIBUTES = IrPackage.INST_SPECIFIC__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -207,7 +161,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_CAST__LINE_NUMBER = IR_INST_SPECIFIC__LINE_NUMBER;
+	int INST_CAST__LINE_NUMBER = IrPackage.INST_SPECIFIC__LINE_NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
@@ -216,7 +170,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_CAST__PREDICATE = IR_INST_SPECIFIC__PREDICATE;
+	int INST_CAST__PREDICATE = IrPackage.INST_SPECIFIC__PREDICATE;
 
 	/**
 	 * The feature id for the '<em><b>Target</b></em>' containment reference.
@@ -225,7 +179,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_CAST__TARGET = IR_INST_SPECIFIC_FEATURE_COUNT + 0;
+	int INST_CAST__TARGET = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Source</b></em>' containment reference.
@@ -234,7 +188,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_CAST__SOURCE = IR_INST_SPECIFIC_FEATURE_COUNT + 1;
+	int INST_CAST__SOURCE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 1;
 
 	/**
 	 * The number of structural features of the '<em>Inst Cast</em>' class.
@@ -243,7 +197,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_CAST_FEATURE_COUNT = IR_INST_SPECIFIC_FEATURE_COUNT + 2;
+	int INST_CAST_FEATURE_COUNT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 2;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.ir.impl.InstGetElementPtrImpl <em>Inst Get Element Ptr</em>}' class.
@@ -262,7 +216,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_GET_ELEMENT_PTR__ATTRIBUTES = IR_INST_SPECIFIC__ATTRIBUTES;
+	int INST_GET_ELEMENT_PTR__ATTRIBUTES = IrPackage.INST_SPECIFIC__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -271,7 +225,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_GET_ELEMENT_PTR__LINE_NUMBER = IR_INST_SPECIFIC__LINE_NUMBER;
+	int INST_GET_ELEMENT_PTR__LINE_NUMBER = IrPackage.INST_SPECIFIC__LINE_NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
@@ -280,7 +234,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_GET_ELEMENT_PTR__PREDICATE = IR_INST_SPECIFIC__PREDICATE;
+	int INST_GET_ELEMENT_PTR__PREDICATE = IrPackage.INST_SPECIFIC__PREDICATE;
 
 	/**
 	 * The feature id for the '<em><b>Indexes</b></em>' containment reference list.
@@ -289,7 +243,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_GET_ELEMENT_PTR__INDEXES = IR_INST_SPECIFIC_FEATURE_COUNT + 0;
+	int INST_GET_ELEMENT_PTR__INDEXES = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Target</b></em>' containment reference.
@@ -298,7 +252,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_GET_ELEMENT_PTR__TARGET = IR_INST_SPECIFIC_FEATURE_COUNT + 1;
+	int INST_GET_ELEMENT_PTR__TARGET = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Source</b></em>' containment reference.
@@ -307,7 +261,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_GET_ELEMENT_PTR__SOURCE = IR_INST_SPECIFIC_FEATURE_COUNT + 2;
+	int INST_GET_ELEMENT_PTR__SOURCE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 2;
 
 	/**
 	 * The number of structural features of the '<em>Inst Get Element Ptr</em>' class.
@@ -316,7 +270,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_GET_ELEMENT_PTR_FEATURE_COUNT = IR_INST_SPECIFIC_FEATURE_COUNT + 3;
+	int INST_GET_ELEMENT_PTR_FEATURE_COUNT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 3;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.ir.impl.InstTernaryImpl <em>Inst Ternary</em>}' class.
@@ -335,7 +289,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_TERNARY__ATTRIBUTES = IR_INST_SPECIFIC__ATTRIBUTES;
+	int INST_TERNARY__ATTRIBUTES = IrPackage.INST_SPECIFIC__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -344,7 +298,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_TERNARY__LINE_NUMBER = IR_INST_SPECIFIC__LINE_NUMBER;
+	int INST_TERNARY__LINE_NUMBER = IrPackage.INST_SPECIFIC__LINE_NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
@@ -353,7 +307,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_TERNARY__PREDICATE = IR_INST_SPECIFIC__PREDICATE;
+	int INST_TERNARY__PREDICATE = IrPackage.INST_SPECIFIC__PREDICATE;
 
 	/**
 	 * The feature id for the '<em><b>Condition Value</b></em>' containment reference.
@@ -362,7 +316,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_TERNARY__CONDITION_VALUE = IR_INST_SPECIFIC_FEATURE_COUNT + 0;
+	int INST_TERNARY__CONDITION_VALUE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>True Value</b></em>' containment reference.
@@ -371,7 +325,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_TERNARY__TRUE_VALUE = IR_INST_SPECIFIC_FEATURE_COUNT + 1;
+	int INST_TERNARY__TRUE_VALUE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>False Value</b></em>' containment reference.
@@ -380,7 +334,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_TERNARY__FALSE_VALUE = IR_INST_SPECIFIC_FEATURE_COUNT + 2;
+	int INST_TERNARY__FALSE_VALUE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Target</b></em>' containment reference.
@@ -389,7 +343,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_TERNARY__TARGET = IR_INST_SPECIFIC_FEATURE_COUNT + 3;
+	int INST_TERNARY__TARGET = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 3;
 
 	/**
 	 * The number of structural features of the '<em>Inst Ternary</em>' class.
@@ -398,35 +352,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INST_TERNARY_FEATURE_COUNT = IR_INST_SPECIFIC_FEATURE_COUNT + 4;
-
-	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.ir.impl.IrNodeSpecificImpl <em>Ir Node Specific</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.backends.ir.impl.IrNodeSpecificImpl
-	 * @see net.sf.orcc.backends.ir.impl.IrSpecificPackageImpl#getIrNodeSpecific()
-	 * @generated
-	 */
-	int IR_NODE_SPECIFIC = 6;
-
-	/**
-	 * The feature id for the '<em><b>Cfg Node</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int IR_NODE_SPECIFIC__CFG_NODE = IrPackage.NODE_SPECIFIC__CFG_NODE;
-
-	/**
-	 * The number of structural features of the '<em>Ir Node Specific</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int IR_NODE_SPECIFIC_FEATURE_COUNT = IrPackage.NODE_SPECIFIC_FEATURE_COUNT + 0;
+	int INST_TERNARY_FEATURE_COUNT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 4;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.ir.impl.NodeForImpl <em>Node For</em>}' class.
@@ -439,13 +365,22 @@ public interface IrSpecificPackage extends EPackage {
 	int NODE_FOR = 4;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NODE_FOR__ATTRIBUTES = IrPackage.NODE_SPECIFIC__ATTRIBUTES;
+
+	/**
 	 * The feature id for the '<em><b>Cfg Node</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_FOR__CFG_NODE = IR_NODE_SPECIFIC__CFG_NODE;
+	int NODE_FOR__CFG_NODE = IrPackage.NODE_SPECIFIC__CFG_NODE;
 
 	/**
 	 * The feature id for the '<em><b>Condition</b></em>' containment reference.
@@ -454,7 +389,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_FOR__CONDITION = IR_NODE_SPECIFIC_FEATURE_COUNT + 0;
+	int NODE_FOR__CONDITION = IrPackage.NODE_SPECIFIC_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Join Node</b></em>' containment reference.
@@ -463,7 +398,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_FOR__JOIN_NODE = IR_NODE_SPECIFIC_FEATURE_COUNT + 1;
+	int NODE_FOR__JOIN_NODE = IrPackage.NODE_SPECIFIC_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -472,7 +407,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_FOR__LINE_NUMBER = IR_NODE_SPECIFIC_FEATURE_COUNT + 2;
+	int NODE_FOR__LINE_NUMBER = IrPackage.NODE_SPECIFIC_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Nodes</b></em>' containment reference list.
@@ -481,7 +416,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_FOR__NODES = IR_NODE_SPECIFIC_FEATURE_COUNT + 3;
+	int NODE_FOR__NODES = IrPackage.NODE_SPECIFIC_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Loop Counter</b></em>' containment reference list.
@@ -490,7 +425,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_FOR__LOOP_COUNTER = IR_NODE_SPECIFIC_FEATURE_COUNT + 4;
+	int NODE_FOR__LOOP_COUNTER = IrPackage.NODE_SPECIFIC_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>Init</b></em>' containment reference list.
@@ -499,7 +434,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_FOR__INIT = IR_NODE_SPECIFIC_FEATURE_COUNT + 5;
+	int NODE_FOR__INIT = IrPackage.NODE_SPECIFIC_FEATURE_COUNT + 5;
 
 	/**
 	 * The number of structural features of the '<em>Node For</em>' class.
@@ -508,7 +443,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_FOR_FEATURE_COUNT = IR_NODE_SPECIFIC_FEATURE_COUNT + 6;
+	int NODE_FOR_FEATURE_COUNT = IrPackage.NODE_SPECIFIC_FEATURE_COUNT + 6;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.ir.InstAssignIndex <em>Inst Assign Index</em>}'.
@@ -759,26 +694,6 @@ public interface IrSpecificPackage extends EPackage {
 	EReference getNodeFor_Init();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.backends.ir.IrInstSpecific <em>Ir Inst Specific</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Ir Inst Specific</em>'.
-	 * @see net.sf.orcc.backends.ir.IrInstSpecific
-	 * @generated
-	 */
-	EClass getIrInstSpecific();
-
-	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.backends.ir.IrNodeSpecific <em>Ir Node Specific</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Ir Node Specific</em>'.
-	 * @see net.sf.orcc.backends.ir.IrNodeSpecific
-	 * @generated
-	 */
-	EClass getIrNodeSpecific();
-
-	/**
 	 * Returns the factory that creates the instances of the model.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1002,26 +917,6 @@ public interface IrSpecificPackage extends EPackage {
 		 * @generated
 		 */
 		EReference NODE_FOR__INIT = eINSTANCE.getNodeFor_Init();
-
-		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.ir.impl.IrInstSpecificImpl <em>Ir Inst Specific</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.backends.ir.impl.IrInstSpecificImpl
-		 * @see net.sf.orcc.backends.ir.impl.IrSpecificPackageImpl#getIrInstSpecific()
-		 * @generated
-		 */
-		EClass IR_INST_SPECIFIC = eINSTANCE.getIrInstSpecific();
-
-		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.ir.impl.IrNodeSpecificImpl <em>Ir Node Specific</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.backends.ir.impl.IrNodeSpecificImpl
-		 * @see net.sf.orcc.backends.ir.impl.IrSpecificPackageImpl#getIrNodeSpecific()
-		 * @generated
-		 */
-		EClass IR_NODE_SPECIFIC = eINSTANCE.getIrNodeSpecific();
 
 	}
 

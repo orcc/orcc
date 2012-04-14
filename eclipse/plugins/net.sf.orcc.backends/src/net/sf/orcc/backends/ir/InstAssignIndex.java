@@ -10,6 +10,7 @@ import java.util.Map;
 
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Type;
 
 import org.eclipse.emf.common.util.EList;
@@ -31,7 +32,7 @@ import org.eclipse.emf.common.util.EList;
  * @model
  * @generated
  */
-public interface InstAssignIndex extends IrInstSpecific {
+public interface InstAssignIndex extends InstSpecific {
 	/**
 	 * Returns the map of index expression to index number computed on the fly.
 	 * 

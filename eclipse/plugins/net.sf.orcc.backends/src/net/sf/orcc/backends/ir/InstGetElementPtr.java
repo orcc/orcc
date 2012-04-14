@@ -8,6 +8,7 @@ package net.sf.orcc.backends.ir;
 
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Use;
 
 import org.eclipse.emf.common.util.EList;
@@ -30,7 +31,7 @@ import org.eclipse.emf.common.util.EList;
  * @model
  * @generated
  */
-public interface InstGetElementPtr extends IrInstSpecific {
+public interface InstGetElementPtr extends InstSpecific {
 	/**
 	 * Returns the value of the '<em><b>Indexes</b></em>' containment reference list.
 	 * The list contents are of type {@link net.sf.orcc.ir.Expression}.

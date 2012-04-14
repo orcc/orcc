@@ -14,6 +14,7 @@ import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Use;
 
+import net.sf.orcc.ir.impl.InstSpecificImpl;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
@@ -38,7 +39,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *
  * @generated
  */
-public class InstGetElementPtrImpl extends IrInstSpecificImpl implements
+public class InstGetElementPtrImpl extends InstSpecificImpl implements
 		InstGetElementPtr {
 	/**
 	 * The cached value of the '{@link #getIndexes() <em>Indexes</em>}' containment reference list.
@@ -326,7 +327,6 @@ public class InstGetElementPtrImpl extends IrInstSpecificImpl implements
 		return super.eIsSet(featureID);
 	}
 
-	@Override
 	public boolean isGep() {
 		return true;
 	}

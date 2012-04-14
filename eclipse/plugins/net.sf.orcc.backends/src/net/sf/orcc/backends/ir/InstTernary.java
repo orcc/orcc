@@ -8,6 +8,7 @@ package net.sf.orcc.backends.ir;
 
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.InstSpecific;
 
 /**
  * <!-- begin-user-doc -->
@@ -28,7 +29,7 @@ import net.sf.orcc.ir.Expression;
  * @model
  * @generated
  */
-public interface InstTernary extends IrInstSpecific {
+public interface InstTernary extends InstSpecific {
 	/**
 	 * Returns the value of the '<em><b>Condition Value</b></em>' containment reference.
 	 * <!-- begin-user-doc -->

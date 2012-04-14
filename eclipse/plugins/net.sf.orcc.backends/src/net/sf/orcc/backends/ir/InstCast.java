@@ -7,6 +7,7 @@
 package net.sf.orcc.backends.ir;
 
 import net.sf.orcc.ir.Def;
+import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Use;
 
 /**
@@ -26,7 +27,7 @@ import net.sf.orcc.ir.Use;
  * @model
  * @generated
  */
-public interface InstCast extends IrInstSpecific {
+public interface InstCast extends InstSpecific {
 	/**
 	 * Returns the value of the '<em><b>Target</b></em>' containment reference.
 	 * <!-- begin-user-doc -->

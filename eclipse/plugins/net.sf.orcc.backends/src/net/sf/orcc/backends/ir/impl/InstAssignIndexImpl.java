@@ -15,6 +15,7 @@ import net.sf.orcc.backends.ir.IrSpecificPackage;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.impl.InstSpecificImpl;
 import net.sf.orcc.ir.util.ExpressionPrinter;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -40,7 +41,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *
  * @generated
  */
-public class InstAssignIndexImpl extends IrInstSpecificImpl implements
+public class InstAssignIndexImpl extends InstSpecificImpl implements
 		InstAssignIndex {
 	/**
 	 * The cached value of the '{@link #getIndexes() <em>Indexes</em>}' containment reference list.
@@ -263,7 +264,6 @@ public class InstAssignIndexImpl extends IrInstSpecificImpl implements
 		return target;
 	}
 
-	@Override
 	public boolean isInstAssignIndex() {
 		return true;
 	}

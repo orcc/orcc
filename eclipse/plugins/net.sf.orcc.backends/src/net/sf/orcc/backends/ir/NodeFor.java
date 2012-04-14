@@ -11,6 +11,7 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 
+import net.sf.orcc.ir.NodeSpecific;
 import org.eclipse.emf.common.util.EList;
 
 /**
@@ -34,7 +35,7 @@ import org.eclipse.emf.common.util.EList;
  * @model
  * @generated
  */
-public interface NodeFor extends IrNodeSpecific {
+public interface NodeFor extends NodeSpecific {
 	/**
 	 * Returns the value of the '<em><b>Condition</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
@@ -161,7 +162,7 @@ public interface NodeFor extends IrNodeSpecific {
 	 * @generated
 	 */
 	EList<Instruction> getInit();
-	
+
 	public boolean isNodeFor();
 
 } // NodeFor

@@ -11,6 +11,7 @@ import net.sf.orcc.backends.ir.IrSpecificPackage;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
 
+import net.sf.orcc.ir.impl.InstSpecificImpl;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.ecore.EClass;
@@ -33,7 +34,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  *
  * @generated
  */
-public class InstTernaryImpl extends IrInstSpecificImpl implements InstTernary {
+public class InstTernaryImpl extends InstSpecificImpl implements InstTernary {
 	/**
 	 * The cached value of the '{@link #getConditionValue() <em>Condition Value</em>}' containment reference.
 	 * <!-- begin-user-doc -->
@@ -417,7 +418,6 @@ public class InstTernaryImpl extends IrInstSpecificImpl implements InstTernary {
 		super.eUnset(featureID);
 	}
 
-	@Override
 	public boolean isInstTernary() {
 		return true;
 	}

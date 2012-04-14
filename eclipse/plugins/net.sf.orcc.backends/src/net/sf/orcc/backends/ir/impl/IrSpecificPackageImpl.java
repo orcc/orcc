@@ -10,8 +10,6 @@ import net.sf.orcc.backends.ir.InstAssignIndex;
 import net.sf.orcc.backends.ir.InstCast;
 import net.sf.orcc.backends.ir.InstGetElementPtr;
 import net.sf.orcc.backends.ir.InstTernary;
-import net.sf.orcc.backends.ir.IrInstSpecific;
-import net.sf.orcc.backends.ir.IrNodeSpecific;
 import net.sf.orcc.backends.ir.IrSpecificFactory;
 import net.sf.orcc.backends.ir.IrSpecificPackage;
 import net.sf.orcc.backends.ir.NodeFor;
@@ -66,20 +64,6 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	private EClass nodeForEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass irInstSpecificEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass irNodeSpecificEClass = null;
 
 	/**
 	 * Creates an instance of the model <b>Package</b>, registered with
@@ -367,24 +351,6 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getIrInstSpecific() {
-		return irInstSpecificEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getIrNodeSpecific() {
-		return irNodeSpecificEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public IrSpecificFactory getIrSpecificFactory() {
 		return (IrSpecificFactory) getEFactoryInstance();
 	}
@@ -436,10 +402,6 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 		createEReference(nodeForEClass, NODE_FOR__NODES);
 		createEReference(nodeForEClass, NODE_FOR__LOOP_COUNTER);
 		createEReference(nodeForEClass, NODE_FOR__INIT);
-
-		irInstSpecificEClass = createEClass(IR_INST_SPECIFIC);
-
-		irNodeSpecificEClass = createEClass(IR_NODE_SPECIFIC);
 	}
 
 	/**
@@ -477,15 +439,13 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 		// Set bounds for type parameters
 
 		// Add supertypes to classes
-		instAssignIndexEClass.getESuperTypes().add(this.getIrInstSpecific());
-		instCastEClass.getESuperTypes().add(this.getIrInstSpecific());
-		instGetElementPtrEClass.getESuperTypes().add(this.getIrInstSpecific());
-		instTernaryEClass.getESuperTypes().add(this.getIrInstSpecific());
-		nodeForEClass.getESuperTypes().add(this.getIrNodeSpecific());
-		irInstSpecificEClass.getESuperTypes().add(
+		instAssignIndexEClass.getESuperTypes().add(
 				theIrPackage.getInstSpecific());
-		irNodeSpecificEClass.getESuperTypes().add(
-				theIrPackage.getNodeSpecific());
+		instCastEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
+		instGetElementPtrEClass.getESuperTypes().add(
+				theIrPackage.getInstSpecific());
+		instTernaryEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
+		nodeForEClass.getESuperTypes().add(theIrPackage.getNodeSpecific());
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(instAssignIndexEClass, InstAssignIndex.class,
@@ -585,14 +545,6 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 				"init", null, 0, -1, NodeFor.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-		initEClass(irInstSpecificEClass, IrInstSpecific.class,
-				"IrInstSpecific", !IS_ABSTRACT, !IS_INTERFACE,
-				IS_GENERATED_INSTANCE_CLASS);
-
-		initEClass(irNodeSpecificEClass, IrNodeSpecific.class,
-				"IrNodeSpecific", !IS_ABSTRACT, !IS_INTERFACE,
-				IS_GENERATED_INSTANCE_CLASS);
 
 		// Create resource
 		createResource(eNS_URI);

@@ -15,6 +15,7 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 
+import net.sf.orcc.ir.impl.NodeSpecificImpl;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
@@ -42,7 +43,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *
  * @generated
  */
-public class NodeForImpl extends IrNodeSpecificImpl implements NodeFor {
+public class NodeForImpl extends NodeSpecificImpl implements NodeFor {
 	/**
 	 * The cached value of the '{@link #getCondition() <em>Condition</em>}' containment reference.
 	 * <!-- begin-user-doc -->

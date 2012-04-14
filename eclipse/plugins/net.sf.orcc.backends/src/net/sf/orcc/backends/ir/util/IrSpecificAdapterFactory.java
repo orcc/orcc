@@ -11,8 +11,6 @@ import net.sf.orcc.backends.ir.InstAssignIndex;
 import net.sf.orcc.backends.ir.InstCast;
 import net.sf.orcc.backends.ir.InstGetElementPtr;
 import net.sf.orcc.backends.ir.InstTernary;
-import net.sf.orcc.backends.ir.IrInstSpecific;
-import net.sf.orcc.backends.ir.IrNodeSpecific;
 import net.sf.orcc.backends.ir.IrSpecificPackage;
 import net.sf.orcc.backends.ir.NodeFor;
 import net.sf.orcc.ir.InstSpecific;
@@ -29,22 +27,21 @@ import org.eclipse.emf.ecore.EObject;
  * <!-- begin-user-doc --> The <b>Adapter Factory</b> for the model. It provides
  * an adapter <code>createXXX</code> method for each class of the model. <!--
  * end-user-doc -->
- * 
  * @see net.sf.orcc.backends.ir.IrSpecificPackage
  * @generated
  */
 public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 	/**
-	 * The cached model package. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached model package.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected static IrSpecificPackage modelPackage;
 
 	/**
-	 * Creates an instance of the adapter factory. <!-- begin-user-doc --> <!--
+	 * Creates an instance of the adapter factory.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public IrSpecificAdapterFactory() {
@@ -58,7 +55,6 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 	 * <!-- begin-user-doc --> This implementation returns <code>true</code> if
 	 * the object is either the model's package or is an instance object of the
 	 * model. <!-- end-user-doc -->
-	 * 
 	 * @return whether this factory is applicable for the type of the object.
 	 * @generated
 	 */
@@ -106,16 +102,6 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 		}
 
 		@Override
-		public Adapter caseIrInstSpecific(IrInstSpecific object) {
-			return createIrInstSpecificAdapter();
-		}
-
-		@Override
-		public Adapter caseIrNodeSpecific(IrNodeSpecific object) {
-			return createIrNodeSpecificAdapter();
-		}
-
-		@Override
 		public Adapter caseAttributable(Attributable object) {
 			return createAttributableAdapter();
 		}
@@ -147,11 +133,10 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 	};
 
 	/**
-	 * Creates an adapter for the <code>target</code>. <!-- begin-user-doc -->
+	 * Creates an adapter for the <code>target</code>.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * 
-	 * @param target
-	 *            the object to adapt.
+	 * @param target the object to adapt.
 	 * @return the adapter for the <code>target</code>.
 	 * @generated
 	 */
@@ -161,13 +146,11 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.backends.ir.InstAssignIndex
-	 * <em>Inst Assign Index</em>}'. <!-- begin-user-doc --> This default
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.ir.InstAssignIndex <em>Inst Assign Index</em>}'.
+	 * <!-- begin-user-doc --> This default
 	 * implementation returns null so that we can easily ignore cases; it's
 	 * useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.backends.ir.InstAssignIndex
 	 * @generated
@@ -192,13 +175,11 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.backends.ir.InstGetElementPtr
-	 * <em>Inst Get Element Ptr</em>}'. <!-- begin-user-doc --> This default
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.ir.InstGetElementPtr <em>Inst Get Element Ptr</em>}'.
+	 * <!-- begin-user-doc --> This default
 	 * implementation returns null so that we can easily ignore cases; it's
 	 * useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.backends.ir.InstGetElementPtr
 	 * @generated
@@ -234,36 +215,6 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createNodeForAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.backends.ir.IrInstSpecific <em>Ir Inst Specific</em>}
-	 * '. <!-- begin-user-doc --> This default implementation returns null so
-	 * that we can easily ignore cases; it's useful to ignore a case when
-	 * inheritance will catch all the cases anyway. <!-- end-user-doc -->
-	 * 
-	 * @return the new adapter.
-	 * @see net.sf.orcc.backends.ir.IrInstSpecific
-	 * @generated
-	 */
-	public Adapter createIrInstSpecificAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.backends.ir.IrNodeSpecific <em>Ir Node Specific</em>}
-	 * '. <!-- begin-user-doc --> This default implementation returns null so
-	 * that we can easily ignore cases; it's useful to ignore a case when
-	 * inheritance will catch all the cases anyway. <!-- end-user-doc -->
-	 * 
-	 * @return the new adapter.
-	 * @see net.sf.orcc.backends.ir.IrNodeSpecific
-	 * @generated
-	 */
-	public Adapter createIrNodeSpecificAdapter() {
 		return null;
 	}
 
@@ -343,9 +294,9 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for the default case. <!-- begin-user-doc --> This
+	 * Creates a new adapter for the default case.
+	 * <!-- begin-user-doc --> This
 	 * default implementation returns null. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @generated
 	 */
