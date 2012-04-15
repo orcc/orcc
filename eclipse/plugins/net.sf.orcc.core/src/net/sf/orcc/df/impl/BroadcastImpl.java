@@ -36,6 +36,7 @@ import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.util.DfUtil;
 
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
@@ -239,6 +240,11 @@ public class BroadcastImpl extends VertexImpl implements Broadcast {
 					DfPackage.BROADCAST__OUTPUTS);
 		}
 		return outputs;
+	}
+
+	@Override
+	public String getSimpleName() {
+		return DfUtil.getSimpleName(getName());
 	}
 
 	public boolean isBroadcast() {

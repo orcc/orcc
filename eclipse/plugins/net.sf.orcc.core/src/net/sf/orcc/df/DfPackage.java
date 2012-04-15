@@ -719,12 +719,21 @@ public interface DfPackage extends EPackage {
 	int NETWORK__PARAMETERS = GraphPackage.GRAPH_FEATURE_COUNT + 7;
 
 	/**
+	 * The feature id for the '<em><b>Template Data</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NETWORK__TEMPLATE_DATA = GraphPackage.GRAPH_FEATURE_COUNT + 8;
+
+	/**
 	 * The feature id for the '<em><b>Variables</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__VARIABLES = GraphPackage.GRAPH_FEATURE_COUNT + 8;
+	int NETWORK__VARIABLES = GraphPackage.GRAPH_FEATURE_COUNT + 9;
 
 	/**
 	 * The number of structural features of the '<em>Network</em>' class. <!--
@@ -733,7 +742,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK_FEATURE_COUNT = GraphPackage.GRAPH_FEATURE_COUNT + 9;
+	int NETWORK_FEATURE_COUNT = GraphPackage.GRAPH_FEATURE_COUNT + 10;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -1418,6 +1427,17 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getNetwork_Parameters();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.Network#getTemplateData <em>Template Data</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Template Data</em>'.
+	 * @see net.sf.orcc.df.Network#getTemplateData()
+	 * @see #getNetwork()
+	 * @generated
+	 */
+	EAttribute getNetwork_TemplateData();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Connection <em>Connection</em>}'.
@@ -2294,6 +2314,14 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EReference NETWORK__PARAMETERS = eINSTANCE.getNetwork_Parameters();
+
+		/**
+		 * The meta object literal for the '<em><b>Template Data</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute NETWORK__TEMPLATE_DATA = eINSTANCE.getNetwork_TemplateData();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.ConnectionImpl <em>Connection</em>}' class.

@@ -256,7 +256,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getNetwork_Variables() {
-		return (EReference) networkEClass.getEStructuralFeatures().get(8);
+		return (EReference) networkEClass.getEStructuralFeatures().get(9);
 	}
 
 	/**
@@ -308,6 +308,15 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 */
 	public EReference getNetwork_Parameters() {
 		return (EReference) networkEClass.getEStructuralFeatures().get(7);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getNetwork_TemplateData() {
+		return (EAttribute) networkEClass.getEStructuralFeatures().get(8);
 	}
 
 	/**
@@ -958,6 +967,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEAttribute(networkEClass, NETWORK__NAME);
 		createEReference(networkEClass, NETWORK__OUTPUTS);
 		createEReference(networkEClass, NETWORK__PARAMETERS);
+		createEAttribute(networkEClass, NETWORK__TEMPLATE_DATA);
 		createEReference(networkEClass, NETWORK__VARIABLES);
 
 		broadcastEClass = createEClass(BROADCAST);
@@ -1219,6 +1229,10 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				"parameters", null, 0, -1, Network.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getNetwork_TemplateData(),
+				theEcorePackage.getEJavaObject(), "templateData", null, 0, 1,
+				Network.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNetwork_Variables(), theIrPackage.getVar(), null,
 				"variables", null, 0, -1, Network.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,

@@ -99,6 +99,8 @@ public interface Broadcast extends Vertex {
 	 */
 	EList<Port> getOutputs();
 
+	String getSimpleName();
+
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.df.Broadcast#getName <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc -->

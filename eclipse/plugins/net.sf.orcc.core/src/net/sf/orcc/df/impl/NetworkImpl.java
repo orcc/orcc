@@ -162,6 +162,26 @@ public class NetworkImpl extends GraphImpl implements Network {
 	protected EList<Var> parameters;
 
 	/**
+	 * The default value of the '{@link #getTemplateData() <em>Template Data</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getTemplateData()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final Object TEMPLATE_DATA_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getTemplateData() <em>Template Data</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getTemplateData()
+	 * @generated
+	 * @ordered
+	 */
+	protected Object templateData = TEMPLATE_DATA_EDEFAULT;
+
+	/**
 	 * @generated
 	 */
 	protected EList<Var> variables;
@@ -279,6 +299,8 @@ public class NetworkImpl extends GraphImpl implements Network {
 			return getOutputs();
 		case DfPackage.NETWORK__PARAMETERS:
 			return getParameters();
+		case DfPackage.NETWORK__TEMPLATE_DATA:
+			return getTemplateData();
 		case DfPackage.NETWORK__VARIABLES:
 			return getVariables();
 		}
@@ -330,6 +352,9 @@ public class NetworkImpl extends GraphImpl implements Network {
 			return outputs != null && !outputs.isEmpty();
 		case DfPackage.NETWORK__PARAMETERS:
 			return parameters != null && !parameters.isEmpty();
+		case DfPackage.NETWORK__TEMPLATE_DATA:
+			return TEMPLATE_DATA_EDEFAULT == null ? templateData != null
+					: !TEMPLATE_DATA_EDEFAULT.equals(templateData);
 		case DfPackage.NETWORK__VARIABLES:
 			return variables != null && !variables.isEmpty();
 		}
@@ -372,6 +397,9 @@ public class NetworkImpl extends GraphImpl implements Network {
 		case DfPackage.NETWORK__PARAMETERS:
 			getParameters().clear();
 			getParameters().addAll((Collection<? extends Var>) newValue);
+			return;
+		case DfPackage.NETWORK__TEMPLATE_DATA:
+			setTemplateData(newValue);
 			return;
 		case DfPackage.NETWORK__VARIABLES:
 			getVariables().clear();
@@ -420,6 +448,9 @@ public class NetworkImpl extends GraphImpl implements Network {
 			return;
 		case DfPackage.NETWORK__PARAMETERS:
 			getParameters().clear();
+			return;
+		case DfPackage.NETWORK__TEMPLATE_DATA:
+			setTemplateData(TEMPLATE_DATA_EDEFAULT);
 			return;
 		case DfPackage.NETWORK__VARIABLES:
 			getVariables().clear();
@@ -652,6 +683,11 @@ public class NetworkImpl extends GraphImpl implements Network {
 	}
 
 	@Override
+	public String getPackage() {
+		return DfUtil.getPackage(getName());
+	}
+
+	@Override
 	public Var getParameter(String name) {
 		for (Var var : getParameters()) {
 			if (var.getName().equals(name)) {
@@ -676,6 +712,15 @@ public class NetworkImpl extends GraphImpl implements Network {
 	@Override
 	public String getSimpleName() {
 		return DfUtil.getSimpleName(getName());
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Object getTemplateData() {
+		return templateData;
 	}
 
 	@Override
@@ -784,6 +829,20 @@ public class NetworkImpl extends GraphImpl implements Network {
 	@Override
 	public void setName(String newName) {
 		setLabel(newName);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setTemplateData(Object newTemplateData) {
+		Object oldTemplateData = templateData;
+		templateData = newTemplateData;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.NETWORK__TEMPLATE_DATA, oldTemplateData,
+					templateData));
 	}
 
 	@Override
