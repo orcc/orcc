@@ -43,7 +43,6 @@ import java.util.TreeSet;
 
 import net.sf.dftools.graph.Vertex;
 import net.sf.dftools.util.util.EcoreHelper;
-import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transformations.Instantiator;
@@ -180,10 +179,10 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 			if (vertex instanceof Instance) {
 				Instance instance = (Instance) vertex;
 				mapping.put(instance.getHierarchicalName(), component);
-			} else if (vertex instanceof Entity) {
+			} else if (vertex instanceof Network) {
 				Network network = (Network) vertex;
 				mapping.put(network.getName(), component);
-				for (Entity subEntity : network.getEntities()) {
+				for (Vertex subEntity : network.getEntities()) {
 					setMapping(subEntity, component);
 				}
 				for (Instance subInstance : network.getInstances()) {
@@ -258,7 +257,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 					components.add(component);
 				}
 			}
-			for (Entity entity : network.getEntities()) {
+			for (Vertex entity : network.getEntities()) {
 				Network subNetwork = (Network) entity;
 				getComponents(components, subNetwork);
 			}
