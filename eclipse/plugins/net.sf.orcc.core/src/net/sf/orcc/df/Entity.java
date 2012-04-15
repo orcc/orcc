@@ -58,8 +58,6 @@ public interface Entity extends Vertex {
 
 	String getHierarchicalName();
 
-	List<Entity> getHierarchy();
-
 	Map<Port, Connection> getIncomingPortMap();
 
 	/**

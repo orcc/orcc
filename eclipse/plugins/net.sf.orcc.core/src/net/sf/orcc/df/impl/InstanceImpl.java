@@ -35,13 +35,13 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.dftools.graph.Edge;
+import net.sf.dftools.graph.Graph;
 import net.sf.dftools.graph.impl.VertexImpl;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -268,8 +268,8 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	@Override
 	public List<String> getHierarchicalId() {
 		List<String> ids = new ArrayList<String>();
-		for (Entity entity : getHierarchy()) {
-			ids.add(entity.getName());
+		for (Graph graph : getHierarchy()) {
+			ids.add(graph.getLabel());
 		}
 		ids.add(getName());
 		return ids;
@@ -278,23 +278,12 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	@Override
 	public String getHierarchicalName() {
 		StringBuilder builder = new StringBuilder();
-		for (Entity entity : getHierarchy()) {
-			builder.append(entity.getName());
+		for (Graph graph : getHierarchy()) {
+			builder.append(graph.getLabel());
 			builder.append('_');
 		}
 		builder.append(getName());
 		return builder.toString();
-	}
-
-	@Override
-	public List<Entity> getHierarchy() {
-		List<Entity> entities = new ArrayList<Entity>();
-		EObject obj = eContainer();
-		while (obj != null) {
-			entities.add(0, (Entity) obj);
-			obj = obj.eContainer();
-		}
-		return entities;
 	}
 
 	@Override

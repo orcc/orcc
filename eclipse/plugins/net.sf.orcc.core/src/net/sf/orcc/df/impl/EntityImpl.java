@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.dftools.graph.Edge;
+import net.sf.dftools.graph.Graph;
 import net.sf.dftools.graph.impl.VertexImpl;
 import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.df.Connection;
@@ -25,7 +26,6 @@ import net.sf.orcc.ir.Var;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
@@ -167,8 +167,8 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 	@Override
 	public List<String> getHierarchicalId() {
 		List<String> ids = new ArrayList<String>();
-		for (Entity entity : getHierarchy()) {
-			ids.add(entity.getName());
+		for (Graph graph : getHierarchy()) {
+			ids.add(graph.getLabel());
 		}
 		ids.add(getName());
 		return ids;
@@ -177,23 +177,12 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 	@Override
 	public String getHierarchicalName() {
 		StringBuilder builder = new StringBuilder();
-		for (Entity entity : getHierarchy()) {
-			builder.append(entity.getName());
+		for (Graph graph : getHierarchy()) {
+			builder.append(graph.getLabel());
 			builder.append('_');
 		}
 		builder.append(getName());
 		return builder.toString();
-	}
-
-	@Override
-	public List<Entity> getHierarchy() {
-		List<Entity> entities = new ArrayList<Entity>();
-		EObject obj = eContainer();
-		while (obj != null) {
-			entities.add(0, (Entity) obj);
-			obj = obj.eContainer();
-		}
-		return entities;
 	}
 
 	@Override

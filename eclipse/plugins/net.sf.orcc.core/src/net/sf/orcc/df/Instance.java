@@ -108,8 +108,6 @@ public interface Instance extends Vertex {
 
 	String getHierarchicalName();
 
-	List<Entity> getHierarchy();
-
 	/**
 	 * Returns the identifier of this instance. Delegates to {@link #getName()}.
 	 * 
