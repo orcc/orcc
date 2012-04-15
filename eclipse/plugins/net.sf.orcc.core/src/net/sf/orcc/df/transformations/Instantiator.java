@@ -95,6 +95,7 @@ public class Instantiator extends DfSwitch<Network> {
 				doSwitch(subNetwork);
 
 				// replace connections of instance
+				network.add(subNetwork);
 				connect(copier, instance, subNetwork);
 
 				// remove instance
