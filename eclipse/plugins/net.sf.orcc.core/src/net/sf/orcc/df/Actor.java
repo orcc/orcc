@@ -36,31 +36,55 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.EList;
 
 /**
- * This class defines an actor. An actor has parameters, input and output ports,
- * state variables, procedures, actions and an action scheduler. The action
- * scheduler has information about the FSM if the actor has one, and the order
- * in which actions should be scheduled.
- * 
- * @author Matthieu Wipliez
- * @model extends="Entity"
+ * <!-- begin-user-doc --> This class defines an actor. An actor has parameters,
+ * input and output ports, state variables, procedures, actions and an FSM.<!--
+ * end-user-doc -->
+ *
+ * <p>
+ * The following features are supported:
+ * <ul>
+ *   <li>{@link net.sf.orcc.df.Actor#getActions <em>Actions</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Actor#getActionsOutsideFsm <em>Actions Outside Fsm</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Actor#getFileName <em>File Name</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Actor#getFsm <em>Fsm</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Actor#getInitializes <em>Initializes</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Actor#getInputs <em>Inputs</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Actor#getLineNumber <em>Line Number</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Actor#getMoC <em>Mo C</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Actor#isNative <em>Native</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Actor#getOutputs <em>Outputs</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Actor#getProcs <em>Procs</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Actor#getStateVars <em>State Vars</em>}</li>
+ * </ul>
+ * </p>
+ *
+ * @see net.sf.orcc.df.DfPackage#getActor()
+ * @model
+ * @generated
  */
 public interface Actor extends Entity {
 
 	/**
-	 * Returns all the actions of this actor.
-	 * 
-	 * @return all the actions of this actor
+	 * Returns the value of the '<em><b>Actions</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.df.Action}.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Actions</em>' containment reference list.
+	 * @see net.sf.orcc.df.DfPackage#getActor_Actions()
 	 * @model containment="true"
+	 * @generated
 	 */
 	EList<Action> getActions();
 
 	/**
-	 * Returns the actions that are outside of an FSM. If this actor has no FSM,
-	 * all actions of the actor are returned. The actions are sorted by
-	 * decreasing priority.
-	 * 
-	 * @return the actions that are outside of an FSM
+	 * Returns the value of the '<em><b>Actions Outside Fsm</b></em>' reference list.
+	 * The list contents are of type {@link net.sf.orcc.df.Action}.
+	 * <!-- begin-user-doc -->Returns the actions that are outside of an FSM. If
+	 * this actor has no FSM, all actions of the actor are returned. The actions
+	 * are sorted by decreasing priority.<!-- end-user-doc -->
+	 * @return the value of the '<em>Actions Outside Fsm</em>' reference list.
+	 * @see net.sf.orcc.df.DfPackage#getActor_ActionsOutsideFsm()
 	 * @model
+	 * @generated
 	 */
 	EList<Action> getActionsOutsideFsm();
 
@@ -72,45 +96,94 @@ public interface Actor extends Entity {
 	IFile getFile();
 
 	/**
-	 * Returns the name of the file this actor is defined in.
-	 * 
-	 * @return the name of the file this actor is defined in
+	 * Returns the value of the '<em><b>File Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->Returns the name of the file this actor is defined
+	 * in.<!-- end-user-doc -->
+	 * @return the value of the '<em>File Name</em>' attribute.
+	 * @see #setFileName(String)
+	 * @see net.sf.orcc.df.DfPackage#getActor_FileName()
 	 * @model
+	 * @generated
 	 */
 	String getFileName();
 
 	/**
-	 * Returns the FSM of this actor, or <code>null</code> if it does not have
-	 * one.
-	 * 
-	 * @return the FSM of this actor
+	 * Returns the value of the '<em><b>Fsm</b></em>' containment reference.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Fsm</em>' containment reference.
+	 * @see #setFsm(FSM)
+	 * @see net.sf.orcc.df.DfPackage#getActor_Fsm()
 	 * @model containment="true"
+	 * @generated
 	 */
 	FSM getFsm();
 
 	/**
-	 * Returns the list of initialize actions.
-	 * 
-	 * @return the list of initialize actions
+	 * Returns the value of the '<em><b>Initializes</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.df.Action}.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Initializes</em>' containment reference list.
+	 * @see net.sf.orcc.df.DfPackage#getActor_Initializes()
 	 * @model containment="true"
+	 * @generated
 	 */
 	EList<Action> getInitializes();
 
 	/**
-	 * Returns the line number on which this actor starts.
+	 * Returns the value of the '<em><b>Inputs</b></em>' containment reference
+	 * list. The list contents are of type {@link net.sf.orcc.df.Port}. <!--
+	 * begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Inputs</em>' containment reference list isn't
+	 * clear, there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
 	 * 
-	 * @return the line number on which this actor starts
+	 * @return the value of the '<em>Inputs</em>' containment reference list.
+	 * @see net.sf.orcc.df.DfPackage#getActor_Inputs()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Port> getInputs();
+
+	/**
+	 * Returns the value of the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Line Number</em>' attribute.
+	 * @see #setLineNumber(int)
+	 * @see net.sf.orcc.df.DfPackage#getActor_LineNumber()
 	 * @model
+	 * @generated
 	 */
 	int getLineNumber();
 
 	/**
-	 * Returns the MoC of this actor.
-	 * 
-	 * @return an MoC
+	 * Returns the value of the '<em><b>Mo C</b></em>' containment reference.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Mo C</em>' containment reference.
+	 * @see #setMoC(MoC)
+	 * @see net.sf.orcc.df.DfPackage#getActor_MoC()
 	 * @model containment="true"
+	 * @generated
 	 */
 	MoC getMoC();
+
+	/**
+	 * Returns the value of the '<em><b>Outputs</b></em>' containment reference
+	 * list. The list contents are of type {@link net.sf.orcc.df.Port}. <!--
+	 * begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Outputs</em>' containment reference list isn't
+	 * clear, there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * 
+	 * @return the value of the '<em>Outputs</em>' containment reference list.
+	 * @see net.sf.orcc.df.DfPackage#getActor_Outputs()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Port> getOutputs();
 
 	/**
 	 * Returns a procedure of this actor whose name matches the given name.
@@ -122,10 +195,13 @@ public interface Actor extends Entity {
 	Procedure getProcedure(String name);
 
 	/**
-	 * Returns the list of functions and procedures defined in this actor.
-	 * 
-	 * @return the list of functions and procedures defined in this actor
+	 * Returns the value of the '<em><b>Procs</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.ir.Procedure}.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Procs</em>' containment reference list.
+	 * @see net.sf.orcc.df.DfPackage#getActor_Procs()
 	 * @model containment="true"
+	 * @generated
 	 */
 	EList<Procedure> getProcs();
 
@@ -139,10 +215,13 @@ public interface Actor extends Entity {
 	Var getStateVar(String name);
 
 	/**
-	 * Returns the ordered map of state variables.
-	 * 
-	 * @return the ordered map of state variables
+	 * Returns the value of the '<em><b>State Vars</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.ir.Var}.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>State Vars</em>' containment reference list.
+	 * @see net.sf.orcc.df.DfPackage#getActor_StateVars()
 	 * @model containment="true"
+	 * @generated
 	 */
 	EList<Var> getStateVars();
 
@@ -183,68 +262,40 @@ public interface Actor extends Entity {
 	void resetTokenProduction();
 
 	/**
-	 * Sets the name of the file in which this unit is defined.
-	 * 
-	 * @param fileName
-	 *            name of the file in which this unit is defined
-	 */
-	void setFileName(String fileName);
-
-	/**
-	 * Sets the FSM of this actor to the given FSM.
-	 * 
-	 * @param fsm
-	 *            an FSM
-	 */
-	void setFsm(FSM fsm);
-
-	/**
-	 * Sets the line number on which this unit starts.
-	 * 
-	 * @param newLineNumber
-	 *            the line number on which this unit starts
-	 */
-	void setLineNumber(int newLineNumber);
-
-	/**
-	 * Returns the value of the '<em><b>Inputs</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.df.Port}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Inputs</em>' containment reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Inputs</em>' containment reference list.
-	 * @see net.sf.orcc.df.DfPackage#getActor_Inputs()
-	 * @model containment="true"
+	 * Sets the value of the '{@link net.sf.orcc.df.Actor#getFileName <em>File Name</em>}' attribute.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @param value the new value of the '<em>File Name</em>' attribute.
+	 * @see #getFileName()
 	 * @generated
 	 */
-	EList<Port> getInputs();
+	void setFileName(String value);
 
 	/**
-	 * Returns the value of the '<em><b>Outputs</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.df.Port}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Outputs</em>' containment reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Outputs</em>' containment reference list.
-	 * @see net.sf.orcc.df.DfPackage#getActor_Outputs()
-	 * @model containment="true"
+	 * Sets the value of the '{@link net.sf.orcc.df.Actor#getFsm <em>Fsm</em>}' containment reference.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @param value the new value of the '<em>Fsm</em>' containment reference.
+	 * @see #getFsm()
 	 * @generated
 	 */
-	EList<Port> getOutputs();
+	void setFsm(FSM value);
 
 	/**
-	 * Sets the MoC of this actor.
-	 * 
-	 * @param moc
-	 *            an MoC
+	 * Sets the value of the '{@link net.sf.orcc.df.Actor#getLineNumber <em>Line Number</em>}' attribute.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @param value the new value of the '<em>Line Number</em>' attribute.
+	 * @see #getLineNumber()
+	 * @generated
 	 */
-	void setMoC(MoC moc);
+	void setLineNumber(int value);
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.df.Actor#getMoC <em>Mo C</em>}' containment reference.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @param value the new value of the '<em>Mo C</em>' containment reference.
+	 * @see #getMoC()
+	 * @generated
+	 */
+	void setMoC(MoC value);
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.df.Actor#isNative

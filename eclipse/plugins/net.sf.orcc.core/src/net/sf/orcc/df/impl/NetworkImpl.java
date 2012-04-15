@@ -97,27 +97,13 @@ public class NetworkImpl extends EntityImpl implements Network {
 	protected EList<Vertex> vertices;
 
 	/**
-	 * The cached value of the '{@link #getMoC() <em>Mo C</em>}' containment reference.
+	 * The cached value of the '{@link #getEntities() <em>Entities</em>}' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getMoC()
+	 * @see #getEntities()
 	 * @generated
 	 * @ordered
 	 */
-	protected MoC moC;
-
-	/**
-	 * @generated
-	 */
-	protected EList<Var> variables;
-
-	/**
-	 * The cached value of the '{@link #getInstances() <em>Instances</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getInstances()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Instance> instances;
+	protected EList<Entity> entities;
 
 	/**
 	 * The default value of the '{@link #getFileName() <em>File Name</em>}' attribute.
@@ -138,15 +124,6 @@ public class NetworkImpl extends EntityImpl implements Network {
 	protected String fileName = FILE_NAME_EDEFAULT;
 
 	/**
-	 * The cached value of the '{@link #getEntities() <em>Entities</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getEntities()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Entity> entities;
-
-	/**
 	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getInputs()
@@ -156,6 +133,24 @@ public class NetworkImpl extends EntityImpl implements Network {
 	protected EList<Port> inputs;
 
 	/**
+	 * The cached value of the '{@link #getInstances() <em>Instances</em>}' reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getInstances()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Instance> instances;
+
+	/**
+	 * The cached value of the '{@link #getMoC() <em>Mo C</em>}' containment reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getMoC()
+	 * @generated
+	 * @ordered
+	 */
+	protected MoC moC;
+
+	/**
 	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getOutputs()
@@ -163,6 +158,11 @@ public class NetworkImpl extends EntityImpl implements Network {
 	 * @ordered
 	 */
 	protected EList<Port> outputs;
+
+	/**
+	 * @generated
+	 */
+	protected EList<Var> variables;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -313,20 +313,20 @@ public class NetworkImpl extends EntityImpl implements Network {
 			return getEdges();
 		case DfPackage.NETWORK__VERTICES:
 			return getVertices();
-		case DfPackage.NETWORK__MO_C:
-			return getMoC();
-		case DfPackage.NETWORK__VARIABLES:
-			return getVariables();
-		case DfPackage.NETWORK__INSTANCES:
-			return getInstances();
-		case DfPackage.NETWORK__FILE_NAME:
-			return getFileName();
 		case DfPackage.NETWORK__ENTITIES:
 			return getEntities();
+		case DfPackage.NETWORK__FILE_NAME:
+			return getFileName();
 		case DfPackage.NETWORK__INPUTS:
 			return getInputs();
+		case DfPackage.NETWORK__INSTANCES:
+			return getInstances();
+		case DfPackage.NETWORK__MO_C:
+			return getMoC();
 		case DfPackage.NETWORK__OUTPUTS:
 			return getOutputs();
+		case DfPackage.NETWORK__VARIABLES:
+			return getVariables();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -364,21 +364,21 @@ public class NetworkImpl extends EntityImpl implements Network {
 			return edges != null && !edges.isEmpty();
 		case DfPackage.NETWORK__VERTICES:
 			return vertices != null && !vertices.isEmpty();
-		case DfPackage.NETWORK__MO_C:
-			return moC != null;
-		case DfPackage.NETWORK__VARIABLES:
-			return variables != null && !variables.isEmpty();
-		case DfPackage.NETWORK__INSTANCES:
-			return instances != null && !instances.isEmpty();
+		case DfPackage.NETWORK__ENTITIES:
+			return entities != null && !entities.isEmpty();
 		case DfPackage.NETWORK__FILE_NAME:
 			return FILE_NAME_EDEFAULT == null ? fileName != null
 					: !FILE_NAME_EDEFAULT.equals(fileName);
-		case DfPackage.NETWORK__ENTITIES:
-			return entities != null && !entities.isEmpty();
 		case DfPackage.NETWORK__INPUTS:
 			return inputs != null && !inputs.isEmpty();
+		case DfPackage.NETWORK__INSTANCES:
+			return instances != null && !instances.isEmpty();
+		case DfPackage.NETWORK__MO_C:
+			return moC != null;
 		case DfPackage.NETWORK__OUTPUTS:
 			return outputs != null && !outputs.isEmpty();
+		case DfPackage.NETWORK__VARIABLES:
+			return variables != null && !variables.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -399,31 +399,31 @@ public class NetworkImpl extends EntityImpl implements Network {
 			getVertices().clear();
 			getVertices().addAll((Collection<? extends Vertex>) newValue);
 			return;
-		case DfPackage.NETWORK__MO_C:
-			setMoC((MoC) newValue);
-			return;
-		case DfPackage.NETWORK__VARIABLES:
-			getVariables().clear();
-			getVariables().addAll((Collection<? extends Var>) newValue);
-			return;
-		case DfPackage.NETWORK__INSTANCES:
-			getInstances().clear();
-			getInstances().addAll((Collection<? extends Instance>) newValue);
-			return;
-		case DfPackage.NETWORK__FILE_NAME:
-			setFileName((String) newValue);
-			return;
 		case DfPackage.NETWORK__ENTITIES:
 			getEntities().clear();
 			getEntities().addAll((Collection<? extends Entity>) newValue);
+			return;
+		case DfPackage.NETWORK__FILE_NAME:
+			setFileName((String) newValue);
 			return;
 		case DfPackage.NETWORK__INPUTS:
 			getInputs().clear();
 			getInputs().addAll((Collection<? extends Port>) newValue);
 			return;
+		case DfPackage.NETWORK__INSTANCES:
+			getInstances().clear();
+			getInstances().addAll((Collection<? extends Instance>) newValue);
+			return;
+		case DfPackage.NETWORK__MO_C:
+			setMoC((MoC) newValue);
+			return;
 		case DfPackage.NETWORK__OUTPUTS:
 			getOutputs().clear();
 			getOutputs().addAll((Collection<? extends Port>) newValue);
+			return;
+		case DfPackage.NETWORK__VARIABLES:
+			getVariables().clear();
+			getVariables().addAll((Collection<? extends Var>) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -451,26 +451,26 @@ public class NetworkImpl extends EntityImpl implements Network {
 		case DfPackage.NETWORK__VERTICES:
 			getVertices().clear();
 			return;
-		case DfPackage.NETWORK__MO_C:
-			setMoC((MoC) null);
-			return;
-		case DfPackage.NETWORK__VARIABLES:
-			getVariables().clear();
-			return;
-		case DfPackage.NETWORK__INSTANCES:
-			getInstances().clear();
+		case DfPackage.NETWORK__ENTITIES:
+			getEntities().clear();
 			return;
 		case DfPackage.NETWORK__FILE_NAME:
 			setFileName(FILE_NAME_EDEFAULT);
 			return;
-		case DfPackage.NETWORK__ENTITIES:
-			getEntities().clear();
-			return;
 		case DfPackage.NETWORK__INPUTS:
 			getInputs().clear();
 			return;
+		case DfPackage.NETWORK__INSTANCES:
+			getInstances().clear();
+			return;
+		case DfPackage.NETWORK__MO_C:
+			setMoC((MoC) null);
+			return;
 		case DfPackage.NETWORK__OUTPUTS:
 			getOutputs().clear();
+			return;
+		case DfPackage.NETWORK__VARIABLES:
+			getVariables().clear();
 			return;
 		}
 		super.eUnset(featureID);

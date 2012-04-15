@@ -245,21 +245,13 @@ public interface DfPackage extends EPackage {
 	int UNIT__CONSTANTS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Procedures</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int UNIT__PROCEDURES = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 1;
-
-	/**
 	 * The feature id for the '<em><b>File Name</b></em>' attribute. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int UNIT__FILE_NAME = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 2;
+	int UNIT__FILE_NAME = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute. <!--
@@ -268,7 +260,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int UNIT__LINE_NUMBER = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 3;
+	int UNIT__LINE_NUMBER = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -277,7 +269,15 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int UNIT__NAME = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 4;
+	int UNIT__NAME = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 3;
+
+	/**
+	 * The feature id for the '<em><b>Procedures</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int UNIT__PROCEDURES = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 4;
 
 	/**
 	 * The number of structural features of the '<em>Unit</em>' class. <!--
@@ -333,12 +333,21 @@ public interface DfPackage extends EPackage {
 	int PORT__OUTGOING = GraphPackage.VERTEX__OUTGOING;
 
 	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int PORT__NAME = GraphPackage.VERTEX_FEATURE_COUNT + 0;
+
+	/**
 	 * The feature id for the '<em><b>Num Tokens Consumed</b></em>' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__NUM_TOKENS_CONSUMED = GraphPackage.VERTEX_FEATURE_COUNT + 0;
+	int PORT__NUM_TOKENS_CONSUMED = GraphPackage.VERTEX_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Num Tokens Produced</b></em>' attribute.
@@ -346,7 +355,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__NUM_TOKENS_PRODUCED = GraphPackage.VERTEX_FEATURE_COUNT + 1;
+	int PORT__NUM_TOKENS_PRODUCED = GraphPackage.VERTEX_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Type</b></em>' containment reference. <!--
@@ -355,16 +364,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__TYPE = GraphPackage.VERTEX_FEATURE_COUNT + 2;
-
-	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int PORT__NAME = GraphPackage.VERTEX_FEATURE_COUNT + 3;
+	int PORT__TYPE = GraphPackage.VERTEX_FEATURE_COUNT + 3;
 
 	/**
 	 * The number of structural features of the '<em>Port</em>' class. <!--
@@ -499,21 +499,21 @@ public interface DfPackage extends EPackage {
 	int ENTITY__OUTGOING = GraphPackage.VERTEX__OUTGOING;
 
 	/**
-	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ENTITY__PARAMETERS = GraphPackage.VERTEX_FEATURE_COUNT + 0;
-
-	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int ENTITY__NAME = GraphPackage.VERTEX_FEATURE_COUNT + 1;
+	int ENTITY__NAME = GraphPackage.VERTEX_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ENTITY__PARAMETERS = GraphPackage.VERTEX_FEATURE_COUNT + 1;
 
 	/**
 	 * The number of structural features of the '<em>Entity</em>' class. <!--
@@ -578,14 +578,6 @@ public interface DfPackage extends EPackage {
 	int ENTITY_SPECIFIC__OUTGOING = ENTITY__OUTGOING;
 
 	/**
-	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ENTITY_SPECIFIC__PARAMETERS = ENTITY__PARAMETERS;
-
-	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -593,6 +585,14 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int ENTITY_SPECIFIC__NAME = ENTITY__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ENTITY_SPECIFIC__PARAMETERS = ENTITY__PARAMETERS;
 
 	/**
 	 * The number of structural features of the '<em>Entity Specific</em>' class.
@@ -647,14 +647,6 @@ public interface DfPackage extends EPackage {
 	int ACTOR__OUTGOING = ENTITY__OUTGOING;
 
 	/**
-	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__PARAMETERS = ENTITY__PARAMETERS;
-
-	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -662,6 +654,14 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int ACTOR__NAME = ENTITY__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__PARAMETERS = ENTITY__PARAMETERS;
 
 	/**
 	 * The feature id for the '<em><b>Actions</b></em>' containment reference list.
@@ -680,13 +680,22 @@ public interface DfPackage extends EPackage {
 	int ACTOR__ACTIONS_OUTSIDE_FSM = ENTITY_FEATURE_COUNT + 1;
 
 	/**
+	 * The feature id for the '<em><b>File Name</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__FILE_NAME = ENTITY_FEATURE_COUNT + 2;
+
+	/**
 	 * The feature id for the '<em><b>Fsm</b></em>' containment reference. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__FSM = ENTITY_FEATURE_COUNT + 2;
+	int ACTOR__FSM = ENTITY_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Initializes</b></em>' containment reference list.
@@ -694,50 +703,15 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__INITIALIZES = ENTITY_FEATURE_COUNT + 3;
+	int ACTOR__INITIALIZES = ENTITY_FEATURE_COUNT + 4;
 
 	/**
-	 * The feature id for the '<em><b>Mo C</b></em>' containment reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__MO_C = ENTITY_FEATURE_COUNT + 4;
-
-	/**
-	 * The feature id for the '<em><b>Procs</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__PROCS = ENTITY_FEATURE_COUNT + 5;
-
-	/**
-	 * The feature id for the '<em><b>State Vars</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__STATE_VARS = ENTITY_FEATURE_COUNT + 6;
-
-	/**
-	 * The feature id for the '<em><b>Native</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__NATIVE = ENTITY_FEATURE_COUNT + 7;
-
-	/**
-	 * The feature id for the '<em><b>File Name</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__FILE_NAME = ENTITY_FEATURE_COUNT + 8;
+	int ACTOR__INPUTS = ENTITY_FEATURE_COUNT + 5;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute. <!--
@@ -746,15 +720,25 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__LINE_NUMBER = ENTITY_FEATURE_COUNT + 9;
+	int ACTOR__LINE_NUMBER = ENTITY_FEATURE_COUNT + 6;
 
 	/**
-	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Mo C</b></em>' containment reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__INPUTS = ENTITY_FEATURE_COUNT + 10;
+	int ACTOR__MO_C = ENTITY_FEATURE_COUNT + 7;
+
+	/**
+	 * The feature id for the '<em><b>Native</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__NATIVE = ENTITY_FEATURE_COUNT + 8;
 
 	/**
 	 * The feature id for the '<em><b>Outputs</b></em>' containment reference list.
@@ -762,7 +746,23 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__OUTPUTS = ENTITY_FEATURE_COUNT + 11;
+	int ACTOR__OUTPUTS = ENTITY_FEATURE_COUNT + 9;
+
+	/**
+	 * The feature id for the '<em><b>Procs</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__PROCS = ENTITY_FEATURE_COUNT + 10;
+
+	/**
+	 * The feature id for the '<em><b>State Vars</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__STATE_VARS = ENTITY_FEATURE_COUNT + 11;
 
 	/**
 	 * The number of structural features of the '<em>Actor</em>' class. <!--
@@ -818,14 +818,6 @@ public interface DfPackage extends EPackage {
 	int NETWORK__OUTGOING = ENTITY__OUTGOING;
 
 	/**
-	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NETWORK__PARAMETERS = ENTITY__PARAMETERS;
-
-	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -833,6 +825,14 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int NETWORK__NAME = ENTITY__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NETWORK__PARAMETERS = ENTITY__PARAMETERS;
 
 	/**
 	 * The feature id for the '<em><b>Edges</b></em>' containment reference list.
@@ -853,29 +853,12 @@ public interface DfPackage extends EPackage {
 	int NETWORK__VERTICES = ENTITY_FEATURE_COUNT + 1;
 
 	/**
-	 * The feature id for the '<em><b>Mo C</b></em>' containment reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int NETWORK__MO_C = ENTITY_FEATURE_COUNT + 2;
-
-	/**
-	 * The feature id for the '<em><b>Variables</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Entities</b></em>' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__VARIABLES = ENTITY_FEATURE_COUNT + 3;
-
-	/**
-	 * The feature id for the '<em><b>Instances</b></em>' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NETWORK__INSTANCES = ENTITY_FEATURE_COUNT + 4;
+	int NETWORK__ENTITIES = ENTITY_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>File Name</b></em>' attribute. <!--
@@ -884,15 +867,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__FILE_NAME = ENTITY_FEATURE_COUNT + 5;
-
-	/**
-	 * The feature id for the '<em><b>Entities</b></em>' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NETWORK__ENTITIES = ENTITY_FEATURE_COUNT + 6;
+	int NETWORK__FILE_NAME = ENTITY_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' reference list.
@@ -900,7 +875,24 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__INPUTS = ENTITY_FEATURE_COUNT + 7;
+	int NETWORK__INPUTS = ENTITY_FEATURE_COUNT + 4;
+
+	/**
+	 * The feature id for the '<em><b>Instances</b></em>' reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NETWORK__INSTANCES = ENTITY_FEATURE_COUNT + 5;
+
+	/**
+	 * The feature id for the '<em><b>Mo C</b></em>' containment reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int NETWORK__MO_C = ENTITY_FEATURE_COUNT + 6;
 
 	/**
 	 * The feature id for the '<em><b>Outputs</b></em>' reference list.
@@ -908,7 +900,15 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NETWORK__OUTPUTS = ENTITY_FEATURE_COUNT + 8;
+	int NETWORK__OUTPUTS = ENTITY_FEATURE_COUNT + 7;
+
+	/**
+	 * The feature id for the '<em><b>Variables</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NETWORK__VARIABLES = ENTITY_FEATURE_COUNT + 8;
 
 	/**
 	 * The number of structural features of the '<em>Network</em>' class. <!--
@@ -964,14 +964,6 @@ public interface DfPackage extends EPackage {
 	int BROADCAST__OUTGOING = ENTITY__OUTGOING;
 
 	/**
-	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int BROADCAST__PARAMETERS = ENTITY__PARAMETERS;
-
-	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -979,6 +971,14 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int BROADCAST__NAME = ENTITY__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int BROADCAST__PARAMETERS = ENTITY__PARAMETERS;
 
 	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.

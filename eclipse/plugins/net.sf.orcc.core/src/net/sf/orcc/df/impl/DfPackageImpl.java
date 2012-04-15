@@ -253,7 +253,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getNetwork_MoC() {
-		return (EReference) networkEClass.getEStructuralFeatures().get(0);
+		return (EReference) networkEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -261,7 +261,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getNetwork_Variables() {
-		return (EReference) networkEClass.getEStructuralFeatures().get(1);
+		return (EReference) networkEClass.getEStructuralFeatures().get(6);
 	}
 
 	/**
@@ -269,7 +269,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getNetwork_Instances() {
-		return (EReference) networkEClass.getEStructuralFeatures().get(2);
+		return (EReference) networkEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -277,7 +277,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EAttribute getNetwork_FileName() {
-		return (EAttribute) networkEClass.getEStructuralFeatures().get(3);
+		return (EAttribute) networkEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -285,7 +285,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getNetwork_Entities() {
-		return (EReference) networkEClass.getEStructuralFeatures().get(4);
+		return (EReference) networkEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -294,7 +294,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getNetwork_Inputs() {
-		return (EReference) networkEClass.getEStructuralFeatures().get(5);
+		return (EReference) networkEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -303,7 +303,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getNetwork_Outputs() {
-		return (EReference) networkEClass.getEStructuralFeatures().get(6);
+		return (EReference) networkEClass.getEStructuralFeatures().get(5);
 	}
 
 	/**
@@ -474,14 +474,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getActor_Fsm() {
-		return (EReference) actorEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getActor_Initializes() {
 		return (EReference) actorEClass.getEStructuralFeatures().get(3);
 	}
 
@@ -489,7 +481,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getActor_MoC() {
+	public EReference getActor_Initializes() {
 		return (EReference) actorEClass.getEStructuralFeatures().get(4);
 	}
 
@@ -497,8 +489,16 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getActor_MoC() {
+		return (EReference) actorEClass.getEStructuralFeatures().get(7);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EReference getActor_Procs() {
-		return (EReference) actorEClass.getEStructuralFeatures().get(5);
+		return (EReference) actorEClass.getEStructuralFeatures().get(10);
 	}
 
 	/**
@@ -506,7 +506,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getActor_StateVars() {
-		return (EReference) actorEClass.getEStructuralFeatures().get(6);
+		return (EReference) actorEClass.getEStructuralFeatures().get(11);
 	}
 
 	/**
@@ -514,14 +514,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EAttribute getActor_Native() {
-		return (EAttribute) actorEClass.getEStructuralFeatures().get(7);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getActor_FileName() {
 		return (EAttribute) actorEClass.getEStructuralFeatures().get(8);
 	}
 
@@ -529,8 +521,16 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EAttribute getActor_FileName() {
+		return (EAttribute) actorEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EAttribute getActor_LineNumber() {
-		return (EAttribute) actorEClass.getEStructuralFeatures().get(9);
+		return (EAttribute) actorEClass.getEStructuralFeatures().get(6);
 	}
 
 	/**
@@ -539,7 +539,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getActor_Inputs() {
-		return (EReference) actorEClass.getEStructuralFeatures().get(10);
+		return (EReference) actorEClass.getEStructuralFeatures().get(5);
 	}
 
 	/**
@@ -548,7 +548,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getActor_Outputs() {
-		return (EReference) actorEClass.getEStructuralFeatures().get(11);
+		return (EReference) actorEClass.getEStructuralFeatures().get(9);
 	}
 
 	/**
@@ -628,14 +628,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EAttribute getPort_NumTokensConsumed() {
-		return (EAttribute) portEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getPort_NumTokensProduced() {
 		return (EAttribute) portEClass.getEStructuralFeatures().get(1);
 	}
 
@@ -643,8 +635,16 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EAttribute getPort_NumTokensProduced() {
+		return (EAttribute) portEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EReference getPort_Type() {
-		return (EReference) portEClass.getEStructuralFeatures().get(2);
+		return (EReference) portEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -653,7 +653,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EAttribute getPort_Name() {
-		return (EAttribute) portEClass.getEStructuralFeatures().get(3);
+		return (EAttribute) portEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -811,7 +811,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getEntity_Parameters() {
-		return (EReference) entityEClass.getEStructuralFeatures().get(0);
+		return (EReference) entityEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -820,7 +820,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EAttribute getEntity_Name() {
-		return (EAttribute) entityEClass.getEStructuralFeatures().get(1);
+		return (EAttribute) entityEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -852,7 +852,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getUnit_Procedures() {
-		return (EReference) unitEClass.getEStructuralFeatures().get(1);
+		return (EReference) unitEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -860,7 +860,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EAttribute getUnit_FileName() {
-		return (EAttribute) unitEClass.getEStructuralFeatures().get(2);
+		return (EAttribute) unitEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -868,7 +868,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EAttribute getUnit_LineNumber() {
-		return (EAttribute) unitEClass.getEStructuralFeatures().get(3);
+		return (EAttribute) unitEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -877,7 +877,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EAttribute getUnit_Name() {
-		return (EAttribute) unitEClass.getEStructuralFeatures().get(4);
+		return (EAttribute) unitEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -909,16 +909,16 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		// Create classes and their features
 		unitEClass = createEClass(UNIT);
 		createEReference(unitEClass, UNIT__CONSTANTS);
-		createEReference(unitEClass, UNIT__PROCEDURES);
 		createEAttribute(unitEClass, UNIT__FILE_NAME);
 		createEAttribute(unitEClass, UNIT__LINE_NUMBER);
 		createEAttribute(unitEClass, UNIT__NAME);
+		createEReference(unitEClass, UNIT__PROCEDURES);
 
 		portEClass = createEClass(PORT);
+		createEAttribute(portEClass, PORT__NAME);
 		createEAttribute(portEClass, PORT__NUM_TOKENS_CONSUMED);
 		createEAttribute(portEClass, PORT__NUM_TOKENS_PRODUCED);
 		createEReference(portEClass, PORT__TYPE);
-		createEAttribute(portEClass, PORT__NAME);
 
 		instanceEClass = createEClass(INSTANCE);
 		createEReference(instanceEClass, INSTANCE__ARGUMENTS);
@@ -926,33 +926,33 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEAttribute(instanceEClass, INSTANCE__NAME);
 
 		entityEClass = createEClass(ENTITY);
-		createEReference(entityEClass, ENTITY__PARAMETERS);
 		createEAttribute(entityEClass, ENTITY__NAME);
+		createEReference(entityEClass, ENTITY__PARAMETERS);
 
 		entitySpecificEClass = createEClass(ENTITY_SPECIFIC);
 
 		actorEClass = createEClass(ACTOR);
 		createEReference(actorEClass, ACTOR__ACTIONS);
 		createEReference(actorEClass, ACTOR__ACTIONS_OUTSIDE_FSM);
+		createEAttribute(actorEClass, ACTOR__FILE_NAME);
 		createEReference(actorEClass, ACTOR__FSM);
 		createEReference(actorEClass, ACTOR__INITIALIZES);
+		createEReference(actorEClass, ACTOR__INPUTS);
+		createEAttribute(actorEClass, ACTOR__LINE_NUMBER);
 		createEReference(actorEClass, ACTOR__MO_C);
+		createEAttribute(actorEClass, ACTOR__NATIVE);
+		createEReference(actorEClass, ACTOR__OUTPUTS);
 		createEReference(actorEClass, ACTOR__PROCS);
 		createEReference(actorEClass, ACTOR__STATE_VARS);
-		createEAttribute(actorEClass, ACTOR__NATIVE);
-		createEAttribute(actorEClass, ACTOR__FILE_NAME);
-		createEAttribute(actorEClass, ACTOR__LINE_NUMBER);
-		createEReference(actorEClass, ACTOR__INPUTS);
-		createEReference(actorEClass, ACTOR__OUTPUTS);
 
 		networkEClass = createEClass(NETWORK);
-		createEReference(networkEClass, NETWORK__MO_C);
-		createEReference(networkEClass, NETWORK__VARIABLES);
-		createEReference(networkEClass, NETWORK__INSTANCES);
-		createEAttribute(networkEClass, NETWORK__FILE_NAME);
 		createEReference(networkEClass, NETWORK__ENTITIES);
+		createEAttribute(networkEClass, NETWORK__FILE_NAME);
 		createEReference(networkEClass, NETWORK__INPUTS);
+		createEReference(networkEClass, NETWORK__INSTANCES);
+		createEReference(networkEClass, NETWORK__MO_C);
 		createEReference(networkEClass, NETWORK__OUTPUTS);
+		createEReference(networkEClass, NETWORK__VARIABLES);
 
 		broadcastEClass = createEClass(BROADCAST);
 		createEReference(broadcastEClass, BROADCAST__INPUTS);
@@ -1069,10 +1069,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				"constants", null, 0, -1, Unit.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getUnit_Procedures(), theIrPackage.getProcedure(), null,
-				"procedures", null, 0, -1, Unit.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getUnit_FileName(), ecorePackage.getEString(),
 				"fileName", null, 0, 1, Unit.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
@@ -1084,9 +1080,16 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		initEAttribute(getUnit_Name(), ecorePackage.getEString(), "name", null,
 				0, 1, Unit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
 				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getUnit_Procedures(), theIrPackage.getProcedure(), null,
+				"procedures", null, 0, -1, Unit.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(portEClass, Port.class, "Port", !IS_ABSTRACT, !IS_INTERFACE,
 				IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getPort_Name(), ecorePackage.getEString(), "name", null,
+				0, 1, Port.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE,
+				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEAttribute(getPort_NumTokensConsumed(), ecorePackage.getEInt(),
 				"numTokensConsumed", null, 0, 1, Port.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
@@ -1099,9 +1102,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getPort_Name(), ecorePackage.getEString(), "name", null,
-				0, 1, Port.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE,
-				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
 		initEClass(instanceEClass, Instance.class, "Instance", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -1120,14 +1120,14 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 
 		initEClass(entityEClass, Entity.class, "Entity", IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getEntity_Parameters(), theIrPackage.getVar(), null,
-				"parameters", null, 0, -1, Entity.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getEntity_Name(), ecorePackage.getEString(), "name",
 				null, 0, 1, Entity.class, IS_TRANSIENT, IS_VOLATILE,
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED,
 				IS_ORDERED);
+		initEReference(getEntity_Parameters(), theIrPackage.getVar(), null,
+				"parameters", null, 0, -1, Entity.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(entitySpecificEClass, EntitySpecific.class,
 				"EntitySpecific", !IS_ABSTRACT, !IS_INTERFACE,
@@ -1143,6 +1143,10 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				"actionsOutsideFsm", null, 0, -1, Actor.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getActor_FileName(), ecorePackage.getEString(),
+				"fileName", null, 0, 1, Actor.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
 		initEReference(getActor_Fsm(), this.getFSM(), null, "fsm", null, 0, 1,
 				Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
 				IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
@@ -1151,8 +1155,24 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				"initializes", null, 0, -1, Actor.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getActor_Inputs(), this.getPort(), null, "inputs", null,
+				0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
+		initEAttribute(getActor_LineNumber(), ecorePackage.getEInt(),
+				"lineNumber", null, 0, 1, Actor.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
 		initEReference(getActor_MoC(), theMocPackage.getMoC(), null, "moC",
 				null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getActor_Native(), ecorePackage.getEBoolean(), "native",
+				null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
+		initEReference(getActor_Outputs(), this.getPort(), null, "outputs",
+				null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getActor_Procs(), theIrPackage.getProcedure(), null,
@@ -1163,56 +1183,36 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				"stateVars", null, 0, -1, Actor.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getActor_Native(), ecorePackage.getEBoolean(), "native",
-				null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
-		initEAttribute(getActor_FileName(), ecorePackage.getEString(),
-				"fileName", null, 0, 1, Actor.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
-		initEAttribute(getActor_LineNumber(), ecorePackage.getEInt(),
-				"lineNumber", null, 0, 1, Actor.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
-		initEReference(getActor_Inputs(), this.getPort(), null, "inputs", null,
-				0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
-				IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
-		initEReference(getActor_Outputs(), this.getPort(), null, "outputs",
-				null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(networkEClass, Network.class, "Network", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getNetwork_MoC(), theMocPackage.getMoC(), null, "moC",
-				null, 0, 1, Network.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getNetwork_Variables(), theIrPackage.getVar(), null,
-				"variables", null, 0, -1, Network.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getNetwork_Instances(), this.getInstance(), null,
-				"instances", null, 0, -1, Network.class, !IS_TRANSIENT,
+		initEReference(getNetwork_Entities(), this.getEntity(), null,
+				"entities", null, 0, -1, Network.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getNetwork_FileName(), ecorePackage.getEString(),
 				"fileName", null, 0, 1, Network.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
-		initEReference(getNetwork_Entities(), this.getEntity(), null,
-				"entities", null, 0, -1, Network.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNetwork_Inputs(), this.getPort(), null, "inputs",
 				null, 0, -1, Network.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getNetwork_Instances(), this.getInstance(), null,
+				"instances", null, 0, -1, Network.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getNetwork_MoC(), theMocPackage.getMoC(), null, "moC",
+				null, 0, 1, Network.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNetwork_Outputs(), this.getPort(), null, "outputs",
 				null, 0, -1, Network.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getNetwork_Variables(), theIrPackage.getVar(), null,
+				"variables", null, 0, -1, Network.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(broadcastEClass, Broadcast.class, "Broadcast", !IS_ABSTRACT,

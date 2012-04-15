@@ -24,16 +24,25 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * <p>
  * The following features are implemented:
  * <ul>
+ *   <li>{@link net.sf.orcc.df.impl.PortImpl#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.PortImpl#getNumTokensConsumed <em>Num Tokens Consumed</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.PortImpl#getNumTokensProduced <em>Num Tokens Produced</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.PortImpl#getType <em>Type</em>}</li>
- *   <li>{@link net.sf.orcc.df.impl.PortImpl#getName <em>Name</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
 public class PortImpl extends VertexImpl implements Port {
+	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
+
 	/**
 	 * The default value of the '{@link #getNumTokensConsumed() <em>Num Tokens Consumed</em>}' attribute.
 	 * <!-- begin-user-doc --> <!--
@@ -84,15 +93,6 @@ public class PortImpl extends VertexImpl implements Port {
 	protected Type type;
 
 	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String NAME_EDEFAULT = null;
-
-	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -125,14 +125,14 @@ public class PortImpl extends VertexImpl implements Port {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
+		case DfPackage.PORT__NAME:
+			return getName();
 		case DfPackage.PORT__NUM_TOKENS_CONSUMED:
 			return getNumTokensConsumed();
 		case DfPackage.PORT__NUM_TOKENS_PRODUCED:
 			return getNumTokensProduced();
 		case DfPackage.PORT__TYPE:
 			return getType();
-		case DfPackage.PORT__NAME:
-			return getName();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -158,15 +158,15 @@ public class PortImpl extends VertexImpl implements Port {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
+		case DfPackage.PORT__NAME:
+			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT
+					.equals(getName());
 		case DfPackage.PORT__NUM_TOKENS_CONSUMED:
 			return numTokensConsumed != NUM_TOKENS_CONSUMED_EDEFAULT;
 		case DfPackage.PORT__NUM_TOKENS_PRODUCED:
 			return numTokensProduced != NUM_TOKENS_PRODUCED_EDEFAULT;
 		case DfPackage.PORT__TYPE:
 			return type != null;
-		case DfPackage.PORT__NAME:
-			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT
-					.equals(getName());
 		}
 		return super.eIsSet(featureID);
 	}
@@ -178,6 +178,9 @@ public class PortImpl extends VertexImpl implements Port {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
+		case DfPackage.PORT__NAME:
+			setName((String) newValue);
+			return;
 		case DfPackage.PORT__NUM_TOKENS_CONSUMED:
 			setNumTokensConsumed((Integer) newValue);
 			return;
@@ -186,9 +189,6 @@ public class PortImpl extends VertexImpl implements Port {
 			return;
 		case DfPackage.PORT__TYPE:
 			setType((Type) newValue);
-			return;
-		case DfPackage.PORT__NAME:
-			setName((String) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -210,6 +210,9 @@ public class PortImpl extends VertexImpl implements Port {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
+		case DfPackage.PORT__NAME:
+			setName(NAME_EDEFAULT);
+			return;
 		case DfPackage.PORT__NUM_TOKENS_CONSUMED:
 			setNumTokensConsumed(NUM_TOKENS_CONSUMED_EDEFAULT);
 			return;
@@ -218,9 +221,6 @@ public class PortImpl extends VertexImpl implements Port {
 			return;
 		case DfPackage.PORT__TYPE:
 			setType((Type) null);
-			return;
-		case DfPackage.PORT__NAME:
-			setName(NAME_EDEFAULT);
 			return;
 		}
 		super.eUnset(featureID);

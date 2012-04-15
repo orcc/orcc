@@ -34,10 +34,10 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * The following features are implemented:
  * <ul>
  *   <li>{@link net.sf.orcc.df.impl.UnitImpl#getConstants <em>Constants</em>}</li>
- *   <li>{@link net.sf.orcc.df.impl.UnitImpl#getProcedures <em>Procedures</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.UnitImpl#getFileName <em>File Name</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.UnitImpl#getLineNumber <em>Line Number</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.UnitImpl#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.UnitImpl#getProcedures <em>Procedures</em>}</li>
  * </ul>
  * </p>
  *
@@ -52,15 +52,6 @@ public class UnitImpl extends AttributableImpl implements Unit {
 	 * @ordered
 	 */
 	protected EList<Var> constants;
-
-	/**
-	 * The cached value of the '{@link #getProcedures() <em>Procedures</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getProcedures()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Procedure> procedures;
 
 	/**
 	 * The default value of the '{@link #getFileName() <em>File Name</em>}' attribute.
@@ -123,6 +114,15 @@ public class UnitImpl extends AttributableImpl implements Unit {
 	protected String name = NAME_EDEFAULT;
 
 	/**
+	 * The cached value of the '{@link #getProcedures() <em>Procedures</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getProcedures()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Procedure> procedures;
+
+	/**
 	 * holds template-specific data.
 	 */
 	private Object templateData;
@@ -144,14 +144,14 @@ public class UnitImpl extends AttributableImpl implements Unit {
 		switch (featureID) {
 		case DfPackage.UNIT__CONSTANTS:
 			return getConstants();
-		case DfPackage.UNIT__PROCEDURES:
-			return getProcedures();
 		case DfPackage.UNIT__FILE_NAME:
 			return getFileName();
 		case DfPackage.UNIT__LINE_NUMBER:
 			return getLineNumber();
 		case DfPackage.UNIT__NAME:
 			return getName();
+		case DfPackage.UNIT__PROCEDURES:
+			return getProcedures();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -183,8 +183,6 @@ public class UnitImpl extends AttributableImpl implements Unit {
 		switch (featureID) {
 		case DfPackage.UNIT__CONSTANTS:
 			return constants != null && !constants.isEmpty();
-		case DfPackage.UNIT__PROCEDURES:
-			return procedures != null && !procedures.isEmpty();
 		case DfPackage.UNIT__FILE_NAME:
 			return FILE_NAME_EDEFAULT == null ? fileName != null
 					: !FILE_NAME_EDEFAULT.equals(fileName);
@@ -193,6 +191,8 @@ public class UnitImpl extends AttributableImpl implements Unit {
 		case DfPackage.UNIT__NAME:
 			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
 					.equals(name);
+		case DfPackage.UNIT__PROCEDURES:
+			return procedures != null && !procedures.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -209,10 +209,6 @@ public class UnitImpl extends AttributableImpl implements Unit {
 			getConstants().clear();
 			getConstants().addAll((Collection<? extends Var>) newValue);
 			return;
-		case DfPackage.UNIT__PROCEDURES:
-			getProcedures().clear();
-			getProcedures().addAll((Collection<? extends Procedure>) newValue);
-			return;
 		case DfPackage.UNIT__FILE_NAME:
 			setFileName((String) newValue);
 			return;
@@ -221,6 +217,10 @@ public class UnitImpl extends AttributableImpl implements Unit {
 			return;
 		case DfPackage.UNIT__NAME:
 			setName((String) newValue);
+			return;
+		case DfPackage.UNIT__PROCEDURES:
+			getProcedures().clear();
+			getProcedures().addAll((Collection<? extends Procedure>) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -245,9 +245,6 @@ public class UnitImpl extends AttributableImpl implements Unit {
 		case DfPackage.UNIT__CONSTANTS:
 			getConstants().clear();
 			return;
-		case DfPackage.UNIT__PROCEDURES:
-			getProcedures().clear();
-			return;
 		case DfPackage.UNIT__FILE_NAME:
 			setFileName(FILE_NAME_EDEFAULT);
 			return;
@@ -256,6 +253,9 @@ public class UnitImpl extends AttributableImpl implements Unit {
 			return;
 		case DfPackage.UNIT__NAME:
 			setName(NAME_EDEFAULT);
+			return;
+		case DfPackage.UNIT__PROCEDURES:
+			getProcedures().clear();
 			return;
 		}
 		super.eUnset(featureID);

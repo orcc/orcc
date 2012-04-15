@@ -40,12 +40,25 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.EList;
 
 /**
- * This class defines a hierarchical XDF network. It extends both entity and
- * graph.
- * 
- * @author Matthieu Wipliez
- * @author Herve Yviquel
- * @model extends="Entity"
+ * <!-- begin-user-doc -->This class defines a hierarchical XDF network. It
+ * extends both entity and graph.<!-- end-user-doc -->
+ *
+ * <p>
+ * The following features are supported:
+ * <ul>
+ *   <li>{@link net.sf.orcc.df.Network#getEntities <em>Entities</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Network#getFileName <em>File Name</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Network#getInputs <em>Inputs</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Network#getInstances <em>Instances</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Network#getMoC <em>Mo C</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Network#getOutputs <em>Outputs</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Network#getVariables <em>Variables</em>}</li>
+ * </ul>
+ * </p>
+ *
+ * @see net.sf.orcc.df.DfPackage#getNetwork()
+ * @model
+ * @generated
  */
 public interface Network extends Entity, Graph {
 
@@ -121,10 +134,13 @@ public interface Network extends Entity, Graph {
 	EList<Connection> getConnections();
 
 	/**
-	 * Returns the list of entities contained in this network.
-	 * 
-	 * @return the list of entities contained in this network
+	 * Returns the value of the '<em><b>Entities</b></em>' reference list.
+	 * The list contents are of type {@link net.sf.orcc.df.Entity}.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Entities</em>' reference list.
+	 * @see net.sf.orcc.df.DfPackage#getNetwork_Entities()
 	 * @model
+	 * @generated
 	 */
 	EList<Entity> getEntities();
 
@@ -136,28 +152,37 @@ public interface Network extends Entity, Graph {
 	IFile getFile();
 
 	/**
-	 * Returns the name of the file this network is defined in.
-	 * 
-	 * @return the name of the file this network is defined in
+	 * Returns the value of the '<em><b>File Name</b></em>' attribute.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>File Name</em>' attribute.
+	 * @see #setFileName(String)
+	 * @see net.sf.orcc.df.DfPackage#getNetwork_FileName()
 	 * @model
+	 * @generated
 	 */
 	String getFileName();
 
 	/**
-	 * Returns the inputs of this network.
-	 * 
-	 * @return the inputs of this network
+	 * Returns the value of the '<em><b>Inputs</b></em>' reference list.
+	 * The list contents are of type {@link net.sf.orcc.df.Port}.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Inputs</em>' reference list.
+	 * @see net.sf.orcc.df.DfPackage#getNetwork_Inputs()
 	 * @model
+	 * @generated
 	 */
 	EList<Port> getInputs();
 
 	Instance getInstance(String id);
 
 	/**
-	 * Returns the list of instances referenced by the graph of this network.
-	 * 
-	 * @return a list of instances
+	 * Returns the value of the '<em><b>Instances</b></em>' reference list.
+	 * The list contents are of type {@link net.sf.orcc.df.Instance}.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Instances</em>' reference list.
+	 * @see net.sf.orcc.df.DfPackage#getNetwork_Instances()
 	 * @model
+	 * @generated
 	 */
 	EList<Instance> getInstances();
 
@@ -172,18 +197,24 @@ public interface Network extends Entity, Graph {
 	List<Instance> getInstancesOf(Actor actor);
 
 	/**
-	 * Returns the MoC of the network.
-	 * 
-	 * @return the network MoC.
+	 * Returns the value of the '<em><b>Mo C</b></em>' containment reference.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Mo C</em>' containment reference.
+	 * @see #setMoC(MoC)
+	 * @see net.sf.orcc.df.DfPackage#getNetwork_MoC()
 	 * @model containment="true"
+	 * @generated
 	 */
 	MoC getMoC();
 
 	/**
-	 * Returns the outputs of this network.
-	 * 
-	 * @return the outputs of this network
+	 * Returns the value of the '<em><b>Outputs</b></em>' reference list.
+	 * The list contents are of type {@link net.sf.orcc.df.Port}.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Outputs</em>' reference list.
+	 * @see net.sf.orcc.df.DfPackage#getNetwork_Outputs()
 	 * @model
+	 * @generated
 	 */
 	EList<Port> getOutputs();
 
@@ -197,10 +228,13 @@ public interface Network extends Entity, Graph {
 	Var getVariable(String name);
 
 	/**
-	 * Returns the list of this network's variables
-	 * 
-	 * @return the list of this network's variables
+	 * Returns the value of the '<em><b>Variables</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.ir.Var}.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Variables</em>' containment reference list.
+	 * @see net.sf.orcc.df.DfPackage#getNetwork_Variables()
 	 * @model containment="true"
+	 * @generated
 	 */
 	EList<Var> getVariables();
 
@@ -233,19 +267,21 @@ public interface Network extends Entity, Graph {
 	void remove(Entity entity);
 
 	/**
-	 * Sets the name of the file in which this entity is defined.
-	 * 
-	 * @param fileName
-	 *            name of the file in which this entity is defined
+	 * Sets the value of the '{@link net.sf.orcc.df.Network#getFileName <em>File Name</em>}' attribute.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @param value the new value of the '<em>File Name</em>' attribute.
+	 * @see #getFileName()
+	 * @generated
 	 */
-	void setFileName(String fileName);
+	void setFileName(String value);
 
 	/**
-	 * Sets the MoC of this network.
-	 * 
-	 * @param moc
-	 *            the new MoC of this network
+	 * Sets the value of the '{@link net.sf.orcc.df.Network#getMoC <em>Mo C</em>}' containment reference.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @param value the new value of the '<em>Mo C</em>' containment reference.
+	 * @see #getMoC()
+	 * @generated
 	 */
-	void setMoC(MoC moc);
+	void setMoC(MoC value);
 
 }

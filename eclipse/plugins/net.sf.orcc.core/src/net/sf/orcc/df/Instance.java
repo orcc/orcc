@@ -37,11 +37,21 @@ import net.sf.orcc.moc.MoC;
 import org.eclipse.emf.common.util.EList;
 
 /**
- * This class defines an instance. An instance has an id, a class, parameters
- * and attributes. The class of the instance points to an actor or a network.
- * 
- * @author Matthieu Wipliez
- * @model extends="Vertex"
+ * <!-- begin-user-doc -->This class defines an instance. An instance has an id, a class, parameters
+ * and attributes. The class of the instance points to an actor or a network.<!-- end-user-doc -->
+ *
+ * <p>
+ * The following features are supported:
+ * <ul>
+ *   <li>{@link net.sf.orcc.df.Instance#getArguments <em>Arguments</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Instance#getEntity <em>Entity</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Instance#getName <em>Name</em>}</li>
+ * </ul>
+ * </p>
+ *
+ * @see net.sf.orcc.df.DfPackage#getInstance()
+ * @model
+ * @generated
  */
 public interface Instance extends Vertex {
 
@@ -54,12 +64,15 @@ public interface Instance extends Vertex {
 	Actor getActor();
 
 	/**
-	 * Returns the list of argument of this instance.
-	 * 
-	 * @return the list of argument of this instance
+	 * Returns the value of the '<em><b>Arguments</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.df.Argument}.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Arguments</em>' containment reference list.
+	 * @see net.sf.orcc.df.DfPackage#getInstance_Arguments()
 	 * @model containment="true"
+	 * @generated
 	 */
-	public EList<Argument> getArguments();
+	EList<Argument> getArguments();
 
 	/**
 	 * Returns the broadcast referenced by this instance.
@@ -70,9 +83,13 @@ public interface Instance extends Vertex {
 	Broadcast getBroadcast();
 
 	/**
-	 * Returns the instantiable object referenced by this instance.
-	 * 
+	 * Returns the value of the '<em><b>Entity</b></em>' reference.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Entity</em>' reference.
+	 * @see #setEntity(Entity)
+	 * @see net.sf.orcc.df.DfPackage#getInstance_Entity()
 	 * @model
+	 * @generated
 	 */
 	Entity getEntity();
 
@@ -100,10 +117,13 @@ public interface Instance extends Vertex {
 	MoC getMoC();
 
 	/**
-	 * Returns the qualified name of this vertex.
-	 * 
-	 * @return the qualified name of this vertex
-	 * @model derived="true" transient="true" volatile="true"
+	 * Returns the value of the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Name</em>' attribute.
+	 * @see #setName(String)
+	 * @see net.sf.orcc.df.DfPackage#getInstance_Name()
+	 * @model transient="true" volatile="true" derived="true"
+	 * @generated
 	 */
 	String getName();
 
@@ -143,19 +163,21 @@ public interface Instance extends Vertex {
 	boolean isNetwork();
 
 	/**
-	 * Sets the entity referenced by this instance.
-	 * 
-	 * @param entity
-	 *            an entity
+	 * Sets the value of the '{@link net.sf.orcc.df.Instance#getEntity <em>Entity</em>}' reference.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @param value the new value of the '<em>Entity</em>' reference.
+	 * @see #getEntity()
+	 * @generated
 	 */
-	void setEntity(Entity entity);
+	void setEntity(Entity value);
 
 	/**
-	 * Sets the qualified name of this vertex.
-	 * 
-	 * @param name
-	 *            the qualified name of this vertex
+	 * Sets the value of the '{@link net.sf.orcc.df.Instance#getName <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @param value the new value of the '<em>Name</em>' attribute.
+	 * @see #getName()
+	 * @generated
 	 */
-	void setName(String name);
+	void setName(String value);
 
 }

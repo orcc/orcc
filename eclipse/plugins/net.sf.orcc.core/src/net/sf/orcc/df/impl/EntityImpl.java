@@ -36,23 +36,14 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getParameters <em>Parameters</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.EntityImpl#getParameters <em>Parameters</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
 public abstract class EntityImpl extends VertexImpl implements Entity {
-
-	/**
-	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getParameters()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Var> parameters;
 
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
@@ -62,6 +53,15 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 	 * @ordered
 	 */
 	protected static final String NAME_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getParameters()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Var> parameters;
 
 	private Object templateData;
 
@@ -80,10 +80,10 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case DfPackage.ENTITY__PARAMETERS:
-			return getParameters();
 		case DfPackage.ENTITY__NAME:
 			return getName();
+		case DfPackage.ENTITY__PARAMETERS:
+			return getParameters();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -110,11 +110,11 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case DfPackage.ENTITY__PARAMETERS:
-			return parameters != null && !parameters.isEmpty();
 		case DfPackage.ENTITY__NAME:
 			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT
 					.equals(getName());
+		case DfPackage.ENTITY__PARAMETERS:
+			return parameters != null && !parameters.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -127,12 +127,12 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
+		case DfPackage.ENTITY__NAME:
+			setName((String) newValue);
+			return;
 		case DfPackage.ENTITY__PARAMETERS:
 			getParameters().clear();
 			getParameters().addAll((Collection<? extends Var>) newValue);
-			return;
-		case DfPackage.ENTITY__NAME:
-			setName((String) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -154,11 +154,11 @@ public abstract class EntityImpl extends VertexImpl implements Entity {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case DfPackage.ENTITY__PARAMETERS:
-			getParameters().clear();
-			return;
 		case DfPackage.ENTITY__NAME:
 			setName(NAME_EDEFAULT);
+			return;
+		case DfPackage.ENTITY__PARAMETERS:
+			getParameters().clear();
 			return;
 		}
 		super.eUnset(featureID);

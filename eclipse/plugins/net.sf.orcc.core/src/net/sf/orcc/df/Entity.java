@@ -37,10 +37,19 @@ import net.sf.orcc.ir.Var;
 import org.eclipse.emf.common.util.EList;
 
 /**
- * This interface defines an entity that can be instantiated by an Instance, or
- * contained in a Network.
- * 
- * @model abstract="true" extends="Vertex"
+ * <!-- begin-user-doc -->This interface defines an entity that can be instantiated by an Instance, or
+ * contained in a Network.<!-- end-user-doc -->
+ *
+ * <p>
+ * The following features are supported:
+ * <ul>
+ *   <li>{@link net.sf.orcc.df.Entity#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Entity#getParameters <em>Parameters</em>}</li>
+ * </ul>
+ * </p>
+ *
+ * @see net.sf.orcc.df.DfPackage#getEntity()
+ * @model abstract="true"
  * @generated
  */
 public interface Entity extends Vertex {
@@ -93,10 +102,13 @@ public interface Entity extends Vertex {
 	Var getParameter(String name);
 
 	/**
-	 * Returns the list of this entity's parameters
-	 * 
-	 * @return the list of this entity's parameters
+	 * Returns the value of the '<em><b>Parameters</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.ir.Var}.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Parameters</em>' containment reference list.
+	 * @see net.sf.orcc.df.DfPackage#getEntity_Parameters()
 	 * @model containment="true"
+	 * @generated
 	 */
 	EList<Var> getParameters();
 

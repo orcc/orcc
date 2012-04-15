@@ -48,10 +48,13 @@ public interface Port extends Vertex {
 	String getName();
 
 	/**
-	 * Returns the number of tokens consumed by this port.
-	 * 
-	 * @return the number of tokens consumed by this port
+	 * Returns the value of the '<em><b>Num Tokens Consumed</b></em>' attribute.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Num Tokens Consumed</em>' attribute.
+	 * @see #setNumTokensConsumed(int)
+	 * @see net.sf.orcc.df.DfPackage#getPort_NumTokensConsumed()
 	 * @model
+	 * @generated
 	 */
 	int getNumTokensConsumed();
 
