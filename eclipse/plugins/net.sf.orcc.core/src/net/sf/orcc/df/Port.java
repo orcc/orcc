@@ -32,18 +32,32 @@ import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.ir.Type;
 
 /**
- * This class defines a port. A port has a location, a type, a name.
- * 
- * @author Matthieu Wipliez
- * @model extends="Vertex"
+ * <!-- begin-user-doc -->This class defines a port. A port has a location, a type, a name.<!-- end-user-doc -->
+ *
+ * <p>
+ * The following features are supported:
+ * <ul>
+ *   <li>{@link net.sf.orcc.df.Port#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Port#getNumTokensConsumed <em>Num Tokens Consumed</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Port#getNumTokensProduced <em>Num Tokens Produced</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Port#getType <em>Type</em>}</li>
+ * </ul>
+ * </p>
+ *
+ * @see net.sf.orcc.df.DfPackage#getPort()
+ * @model
+ * @generated
  */
 public interface Port extends Vertex {
 
 	/**
-	 * Returns the name of this port.
-	 * 
-	 * @return the name of this port
-	 * @model derived="true" transient="true" volatile="true"
+	 * Returns the value of the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Name</em>' attribute.
+	 * @see #setName(String)
+	 * @see net.sf.orcc.df.DfPackage#getPort_Name()
+	 * @model transient="true" volatile="true" derived="true"
+	 * @generated
 	 */
 	String getName();
 
@@ -59,18 +73,24 @@ public interface Port extends Vertex {
 	int getNumTokensConsumed();
 
 	/**
-	 * Returns the number of tokens produced by this port.
-	 * 
-	 * @return the number of tokens produced by this port
+	 * Returns the value of the '<em><b>Num Tokens Produced</b></em>' attribute.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Num Tokens Produced</em>' attribute.
+	 * @see #setNumTokensProduced(int)
+	 * @see net.sf.orcc.df.DfPackage#getPort_NumTokensProduced()
 	 * @model
+	 * @generated
 	 */
 	int getNumTokensProduced();
 
 	/**
-	 * Returns the type of this port.
-	 * 
-	 * @return the type of this port
+	 * Returns the value of the '<em><b>Type</b></em>' containment reference.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Type</em>' containment reference.
+	 * @see #setType(Type)
+	 * @see net.sf.orcc.df.DfPackage#getPort_Type()
 	 * @model containment="true"
+	 * @generated
 	 */
 	Type getType();
 
@@ -114,12 +134,13 @@ public interface Port extends Vertex {
 	void resetTokenProduction();
 
 	/**
-	 * Sets the new name of this port.
-	 * 
-	 * @param name
-	 *            the new name of this port
+	 * Sets the value of the '{@link net.sf.orcc.df.Port#getName <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @param value the new value of the '<em>Name</em>' attribute.
+	 * @see #getName()
+	 * @generated
 	 */
-	void setName(String name);
+	void setName(String value);
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.df.Port#getNumTokensConsumed <em>Num Tokens Consumed</em>}' attribute.
@@ -142,11 +163,12 @@ public interface Port extends Vertex {
 	void setNumTokensProduced(int value);
 
 	/**
-	 * Sets the type of this port.
-	 * 
-	 * @param type
-	 *            the new type of this port
+	 * Sets the value of the '{@link net.sf.orcc.df.Port#getType <em>Type</em>}' containment reference.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @param value the new value of the '<em>Type</em>' containment reference.
+	 * @see #getType()
+	 * @generated
 	 */
-	void setType(Type type);
+	void setType(Type value);
 
 }
