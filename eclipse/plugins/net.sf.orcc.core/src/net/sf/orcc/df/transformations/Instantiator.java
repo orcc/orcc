@@ -29,10 +29,7 @@
 package net.sf.orcc.df.transformations;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import net.sf.dftools.graph.Edge;
 import net.sf.orcc.df.Actor;
@@ -81,10 +78,7 @@ public class Instantiator extends DfSwitch<Network> {
 
 	@Override
 	public Network caseNetwork(Network network) {
-		Copier copier = new Copier();
-
 		// copy instances to entities/instances
-		Map<Instance, Network> instMap = new HashMap<Instance, Network>();
 		List<Instance> instances = new ArrayList<Instance>(
 				network.getInstances());
 		for (Instance instance : instances) {
@@ -93,38 +87,19 @@ public class Instantiator extends DfSwitch<Network> {
 
 			} else if (entity instanceof Network) {
 				// copy sub network
+				Copier copier = new Copier();
 				Network subNetwork = (Network) copier.copy(entity);
 				copier.copyReferences();
-				
+
 				// instantiate sub network
 				doSwitch(subNetwork);
 
-				instMap.put(instance, subNetwork);
+				// replace connections of instance
+				connect(copier, instance, subNetwork);
+
+				// remove instance
+				network.remove(instance);
 			}
-		}
-
-		for (Entry<Instance, Network> entry : instMap.entrySet()) {
-			Instance instance = entry.getKey();
-			Network instantiatedNetwork = entry.getValue();
-			network.add(instantiatedNetwork);
-
-			List<Edge> incoming = new ArrayList<Edge>(instance.getIncoming());
-			for (Edge edge : incoming) {
-				edge.setTarget(instantiatedNetwork);
-				Connection connection = (Connection) edge;
-				connection.setTargetPort((Port) copier.get(connection
-						.getTargetPort()));
-			}
-
-			List<Edge> outgoing = new ArrayList<Edge>(instance.getOutgoing());
-			for (Edge edge : outgoing) {
-				edge.setSource(instantiatedNetwork);
-				Connection connection = (Connection) edge;
-				connection.setSourcePort((Port) copier.get(connection
-						.getSourcePort()));
-			}
-
-			network.remove(instance);
 		}
 
 		// update FIFO size
@@ -136,6 +111,25 @@ public class Instantiator extends DfSwitch<Network> {
 		}
 
 		return network;
+	}
+
+	private void connect(Copier copier, Instance instance,
+			Network instantiatedNetwork) {
+		List<Edge> incoming = new ArrayList<Edge>(instance.getIncoming());
+		for (Edge edge : incoming) {
+			edge.setTarget(instantiatedNetwork);
+			Connection connection = (Connection) edge;
+			connection.setTargetPort((Port) copier.get(connection
+					.getTargetPort()));
+		}
+
+		List<Edge> outgoing = new ArrayList<Edge>(instance.getOutgoing());
+		for (Edge edge : outgoing) {
+			edge.setSource(instantiatedNetwork);
+			Connection connection = (Connection) edge;
+			connection.setSourcePort((Port) copier.get(connection
+					.getSourcePort()));
+		}
 	}
 
 }
