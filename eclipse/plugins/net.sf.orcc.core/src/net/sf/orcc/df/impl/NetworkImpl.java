@@ -32,24 +32,25 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import net.sf.dftools.graph.Edge;
-import net.sf.dftools.graph.Graph;
-import net.sf.dftools.graph.GraphPackage;
 import net.sf.dftools.graph.Vertex;
+import net.sf.dftools.graph.impl.GraphImpl;
+import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.transformations.NetworkClassifier;
+import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.tools.merger.ActorMerger;
@@ -63,6 +64,7 @@ import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
@@ -77,37 +79,11 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * @author Herve Yviquel
  * @generated
  */
-public class NetworkImpl extends EntityImpl implements Network {
+public class NetworkImpl extends GraphImpl implements Network {
 	/**
-	 * The cached value of the '{@link #getEdges() <em>Edges</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getEdges()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Edge> edges;
-
-	/**
-	 * The cached value of the '{@link #getVertices() <em>Vertices</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getVertices()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Vertex> vertices;
-
-	/**
-	 * The cached value of the '{@link #getEntities() <em>Entities</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getEntities()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Entity> entities;
-
-	/**
-	 * The default value of the '{@link #getFileName() <em>File Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The default value of the '{@link #getFileName() <em>File Name</em>}'
+	 * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getFileName()
 	 * @generated
 	 * @ordered
@@ -115,8 +91,29 @@ public class NetworkImpl extends EntityImpl implements Network {
 	protected static final String FILE_NAME_EDEFAULT = null;
 
 	/**
-	 * The cached value of the '{@link #getFileName() <em>File Name</em>}' attribute.
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getEntities() <em>Entities</em>}'
+	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getEntities()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Vertex> entities;
+
+	/**
+	 * The cached value of the '{@link #getFileName() <em>File Name</em>}'
+	 * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getFileName()
 	 * @generated
 	 * @ordered
@@ -124,8 +121,9 @@ public class NetworkImpl extends EntityImpl implements Network {
 	protected String fileName = FILE_NAME_EDEFAULT;
 
 	/**
-	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' reference
+	 * list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getInputs()
 	 * @generated
 	 * @ordered
@@ -133,8 +131,9 @@ public class NetworkImpl extends EntityImpl implements Network {
 	protected EList<Port> inputs;
 
 	/**
-	 * The cached value of the '{@link #getInstances() <em>Instances</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getInstances() <em>Instances</em>}'
+	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getInstances()
 	 * @generated
 	 * @ordered
@@ -142,8 +141,9 @@ public class NetworkImpl extends EntityImpl implements Network {
 	protected EList<Instance> instances;
 
 	/**
-	 * The cached value of the '{@link #getMoC() <em>Mo C</em>}' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getMoC() <em>Mo C</em>}' containment
+	 * reference. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getMoC()
 	 * @generated
 	 * @ordered
@@ -151,13 +151,24 @@ public class NetworkImpl extends EntityImpl implements Network {
 	protected MoC moC;
 
 	/**
-	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}'
+	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getOutputs()
 	 * @generated
 	 * @ordered
 	 */
 	protected EList<Port> outputs;
+
+	/**
+	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}'
+	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getParameters()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Var> parameters;
 
 	/**
 	 * @generated
@@ -166,6 +177,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected NetworkImpl() {
@@ -173,23 +185,13 @@ public class NetworkImpl extends EntityImpl implements Network {
 	}
 
 	@Override
-	public void add(Edge edge) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public void add(Vertex vertex) {
-		if (vertex instanceof Entity) {
-			getEntities().add((Entity) vertex);
-		} else if (vertex instanceof Instance) {
+		if (vertex instanceof Instance) {
 			getInstances().add((Instance) vertex);
+		} else if (!(vertex instanceof Port)) {
+			getEntities().add(vertex);
 		}
 		getVertices().add(vertex);
-	}
-
-	@Override
-	public Edge add(Vertex source, Vertex target) {
-		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -206,6 +208,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public NotificationChain basicSetMoC(MoC newMoC, NotificationChain msgs) {
@@ -266,53 +269,12 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public int eBaseStructuralFeatureID(int derivedFeatureID, Class<?> baseClass) {
-		if (baseClass == Graph.class) {
-			switch (derivedFeatureID) {
-			case DfPackage.NETWORK__EDGES:
-				return GraphPackage.GRAPH__EDGES;
-			case DfPackage.NETWORK__VERTICES:
-				return GraphPackage.GRAPH__VERTICES;
-			default:
-				return -1;
-			}
-		}
-		return super.eBaseStructuralFeatureID(derivedFeatureID, baseClass);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public int eDerivedStructuralFeatureID(int baseFeatureID, Class<?> baseClass) {
-		if (baseClass == Graph.class) {
-			switch (baseFeatureID) {
-			case GraphPackage.GRAPH__EDGES:
-				return DfPackage.NETWORK__EDGES;
-			case GraphPackage.GRAPH__VERTICES:
-				return DfPackage.NETWORK__VERTICES;
-			default:
-				return -1;
-			}
-		}
-		return super.eDerivedStructuralFeatureID(baseFeatureID, baseClass);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case DfPackage.NETWORK__EDGES:
-			return getEdges();
-		case DfPackage.NETWORK__VERTICES:
-			return getVertices();
 		case DfPackage.NETWORK__ENTITIES:
 			return getEntities();
 		case DfPackage.NETWORK__FILE_NAME:
@@ -323,8 +285,12 @@ public class NetworkImpl extends EntityImpl implements Network {
 			return getInstances();
 		case DfPackage.NETWORK__MO_C:
 			return getMoC();
+		case DfPackage.NETWORK__NAME:
+			return getName();
 		case DfPackage.NETWORK__OUTPUTS:
 			return getOutputs();
+		case DfPackage.NETWORK__PARAMETERS:
+			return getParameters();
 		case DfPackage.NETWORK__VARIABLES:
 			return getVariables();
 		}
@@ -333,19 +299,18 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-		case DfPackage.NETWORK__EDGES:
-			return ((InternalEList<?>) getEdges()).basicRemove(otherEnd, msgs);
-		case DfPackage.NETWORK__VERTICES:
-			return ((InternalEList<?>) getVertices()).basicRemove(otherEnd,
-					msgs);
 		case DfPackage.NETWORK__MO_C:
 			return basicSetMoC(null, msgs);
+		case DfPackage.NETWORK__PARAMETERS:
+			return ((InternalEList<?>) getParameters()).basicRemove(otherEnd,
+					msgs);
 		case DfPackage.NETWORK__VARIABLES:
 			return ((InternalEList<?>) getVariables()).basicRemove(otherEnd,
 					msgs);
@@ -355,15 +320,12 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case DfPackage.NETWORK__EDGES:
-			return edges != null && !edges.isEmpty();
-		case DfPackage.NETWORK__VERTICES:
-			return vertices != null && !vertices.isEmpty();
 		case DfPackage.NETWORK__ENTITIES:
 			return entities != null && !entities.isEmpty();
 		case DfPackage.NETWORK__FILE_NAME:
@@ -375,8 +337,13 @@ public class NetworkImpl extends EntityImpl implements Network {
 			return instances != null && !instances.isEmpty();
 		case DfPackage.NETWORK__MO_C:
 			return moC != null;
+		case DfPackage.NETWORK__NAME:
+			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT
+					.equals(getName());
 		case DfPackage.NETWORK__OUTPUTS:
 			return outputs != null && !outputs.isEmpty();
+		case DfPackage.NETWORK__PARAMETERS:
+			return parameters != null && !parameters.isEmpty();
 		case DfPackage.NETWORK__VARIABLES:
 			return variables != null && !variables.isEmpty();
 		}
@@ -385,23 +352,16 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case DfPackage.NETWORK__EDGES:
-			getEdges().clear();
-			getEdges().addAll((Collection<? extends Edge>) newValue);
-			return;
-		case DfPackage.NETWORK__VERTICES:
-			getVertices().clear();
-			getVertices().addAll((Collection<? extends Vertex>) newValue);
-			return;
 		case DfPackage.NETWORK__ENTITIES:
 			getEntities().clear();
-			getEntities().addAll((Collection<? extends Entity>) newValue);
+			getEntities().addAll((Collection<? extends Vertex>) newValue);
 			return;
 		case DfPackage.NETWORK__FILE_NAME:
 			setFileName((String) newValue);
@@ -417,9 +377,16 @@ public class NetworkImpl extends EntityImpl implements Network {
 		case DfPackage.NETWORK__MO_C:
 			setMoC((MoC) newValue);
 			return;
+		case DfPackage.NETWORK__NAME:
+			setName((String) newValue);
+			return;
 		case DfPackage.NETWORK__OUTPUTS:
 			getOutputs().clear();
 			getOutputs().addAll((Collection<? extends Port>) newValue);
+			return;
+		case DfPackage.NETWORK__PARAMETERS:
+			getParameters().clear();
+			getParameters().addAll((Collection<? extends Var>) newValue);
 			return;
 		case DfPackage.NETWORK__VARIABLES:
 			getVariables().clear();
@@ -431,6 +398,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -440,17 +408,12 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case DfPackage.NETWORK__EDGES:
-			getEdges().clear();
-			return;
-		case DfPackage.NETWORK__VERTICES:
-			getVertices().clear();
-			return;
 		case DfPackage.NETWORK__ENTITIES:
 			getEntities().clear();
 			return;
@@ -466,8 +429,14 @@ public class NetworkImpl extends EntityImpl implements Network {
 		case DfPackage.NETWORK__MO_C:
 			setMoC((MoC) null);
 			return;
+		case DfPackage.NETWORK__NAME:
+			setName(NAME_EDEFAULT);
+			return;
 		case DfPackage.NETWORK__OUTPUTS:
 			getOutputs().clear();
+			return;
+		case DfPackage.NETWORK__PARAMETERS:
+			getParameters().clear();
 			return;
 		case DfPackage.NETWORK__VARIABLES:
 			getVariables().clear();
@@ -491,10 +460,10 @@ public class NetworkImpl extends EntityImpl implements Network {
 	 */
 	public List<Actor> getAllActors() {
 		Set<Actor> actors = new HashSet<Actor>();
-		for (Entity entity : getAllEntities()) {
-			if (entity.isActor()) {
+		for (EObject entity : getAllEntities()) {
+			if (entity instanceof Actor) {
 				actors.add((Actor) entity);
-			} else if (entity.isNetwork()) {
+			} else if (entity instanceof Network) {
 				actors.addAll(((Network) entity).getAllActors());
 			}
 		}
@@ -517,10 +486,10 @@ public class NetworkImpl extends EntityImpl implements Network {
 	 * 
 	 * @return an iterable of Entity
 	 */
-	private List<Entity> getAllEntities() {
-		List<Entity> entities = new ArrayList<Entity>(getEntities());
+	private List<EObject> getAllEntities() {
+		List<EObject> entities = new ArrayList<EObject>(getEntities());
 		for (Instance instance : getInstances()) {
-			entities.add((Entity) instance.getEntity());
+			entities.add(instance.getEntity());
 		}
 		return entities;
 	}
@@ -528,8 +497,8 @@ public class NetworkImpl extends EntityImpl implements Network {
 	@Override
 	public List<Network> getAllNetworks() {
 		Set<Network> networks = new HashSet<Network>();
-		for (Entity entity : getAllEntities()) {
-			if (entity.isNetwork()) {
+		for (EObject entity : getAllEntities()) {
+			if (entity instanceof Network) {
 				Network network = (Network) entity;
 				networks.add(network);
 				networks.addAll(network.getAllNetworks());
@@ -547,23 +516,12 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
-	public EList<Edge> getEdges() {
-		if (edges == null) {
-			edges = new EObjectContainmentEList<Edge>(Edge.class, this,
-					DfPackage.NETWORK__EDGES);
-		}
-		return edges;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Entity> getEntities() {
+	public EList<Vertex> getEntities() {
 		if (entities == null) {
-			entities = new EObjectResolvingEList<Entity>(Entity.class, this,
+			entities = new EObjectResolvingEList<Vertex>(Vertex.class, this,
 					DfPackage.NETWORK__ENTITIES);
 		}
 		return entities;
@@ -581,6 +539,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String getFileName() {
@@ -588,22 +547,19 @@ public class NetworkImpl extends EntityImpl implements Network {
 	}
 
 	@Override
-	public Vertex getFirst() {
-		Vertex first = null;
-		for (Vertex vertex : getVertices()) {
-			if (vertex.getIncoming().isEmpty()) {
-				if (first != null) {
-					// first vertex already found, returns null
-					return null;
-				}
-				first = vertex;
+	public Port getInput(String name) {
+		List<Port> inputs = EcoreHelper.getList(this, "inputs");
+		for (Port port : inputs) {
+			if (port.getName().equals(name)) {
+				return port;
 			}
 		}
-		return first;
+		return null;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Port> getInputs() {
@@ -626,6 +582,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Instance> getInstances() {
@@ -659,21 +616,6 @@ public class NetworkImpl extends EntityImpl implements Network {
 		return instances;
 	}
 
-	@Override
-	public Vertex getLast() {
-		Vertex last = null;
-		for (Vertex vertex : getVertices()) {
-			if (vertex.getOutgoing().isEmpty()) {
-				if (last != null) {
-					// last vertex already found, returns null
-					return null;
-				}
-				last = vertex;
-			}
-		}
-		return last;
-	}
-
 	/**
 	 * Returns the MoC of the network.
 	 * 
@@ -684,8 +626,43 @@ public class NetworkImpl extends EntityImpl implements Network {
 		return moC;
 	}
 
+	@Override
+	public String getName() {
+		return getLabel();
+	}
+
+	@Override
+	public Map<Port, List<Connection>> getOutgoingPortMap() {
+		Map<Port, List<Connection>> map = new HashMap<Port, List<Connection>>();
+		for (Edge edge : getOutgoing()) {
+			if (edge instanceof Connection) {
+				Connection connection = (Connection) edge;
+				Port source = connection.getSourcePort();
+				List<Connection> conns = map.get(source);
+				if (conns == null) {
+					conns = new ArrayList<Connection>(1);
+					map.put(source, conns);
+				}
+				conns.add(connection);
+			}
+		}
+		return map;
+	}
+
+	@Override
+	public Port getOutput(String name) {
+		List<Port> outputs = EcoreHelper.getList(this, "outputs");
+		for (Port port : outputs) {
+			if (port.getName().equals(name)) {
+				return port;
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Port> getOutputs() {
@@ -694,6 +671,34 @@ public class NetworkImpl extends EntityImpl implements Network {
 					DfPackage.NETWORK__OUTPUTS);
 		}
 		return outputs;
+	}
+
+	@Override
+	public Var getParameter(String name) {
+		for (Var var : getParameters()) {
+			if (var.getName().equals(name)) {
+				return var;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public EList<Var> getParameters() {
+		if (parameters == null) {
+			parameters = new EObjectContainmentEList<Var>(Var.class, this,
+					DfPackage.NETWORK__PARAMETERS);
+		}
+		return parameters;
+	}
+
+	@Override
+	public String getSimpleName() {
+		return DfUtil.getSimpleName(getName());
 	}
 
 	@Override
@@ -720,19 +725,6 @@ public class NetworkImpl extends EntityImpl implements Network {
 		return variables;
 	}
 
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Vertex> getVertices() {
-		if (vertices == null) {
-			vertices = new EObjectContainmentEList<Vertex>(Vertex.class, this,
-					DfPackage.NETWORK__VERTICES);
-		}
-		return vertices;
-	}
-
-	@Override
 	public boolean isNetwork() {
 		return true;
 	}
@@ -763,47 +755,20 @@ public class NetworkImpl extends EntityImpl implements Network {
 	}
 
 	@Override
-	public void remove(Edge edge) {
-		edge.setSource(null);
-		edge.setTarget(null);
-
-		getEdges().remove(edge);
+	public void remove(Instance instance) {
+		getInstances().remove(instance);
+		remove(instance);
 	}
 
 	@Override
-	public void remove(Entity entity) {
+	public void removeEntity(Vertex entity) {
 		getEntities().remove(entity);
-		remove((Vertex) entity);
-	}
-
-	@Override
-	public void remove(Vertex vertex) {
-		removeEdges(new ArrayList<Edge>(vertex.getIncoming()));
-		removeEdges(new ArrayList<Edge>(vertex.getOutgoing()));
-
-		getVertices().remove(vertex);
-	}
-
-	@Override
-	public void removeEdges(List<? extends Edge> edges) {
-		for (Edge transition : edges) {
-			transition.setSource(null);
-			transition.setTarget(null);
-		}
-		getEdges().removeAll(edges);
-	}
-
-	@Override
-	public void removeVertices(List<? extends Vertex> vertices) {
-		for (Vertex vertex : vertices) {
-			removeEdges(new ArrayList<Edge>(vertex.getIncoming()));
-			removeEdges(new ArrayList<Edge>(vertex.getOutgoing()));
-		}
-		getVertices().removeAll(vertices);
+		remove(entity);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void setFileName(String newFileName) {
@@ -838,6 +803,11 @@ public class NetworkImpl extends EntityImpl implements Network {
 		} else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
 					DfPackage.NETWORK__MO_C, newMoC, newMoC));
+	}
+
+	@Override
+	public void setName(String newName) {
+		setLabel(newName);
 	}
 
 	@Override

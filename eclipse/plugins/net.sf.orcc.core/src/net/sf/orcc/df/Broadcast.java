@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.df;
 
+import net.sf.dftools.graph.Vertex;
 import org.eclipse.emf.common.util.EList;
 
 /**
@@ -37,7 +38,9 @@ import org.eclipse.emf.common.util.EList;
  * @author Herve Yviquel
  * @model extends="Entity"
  */
-public interface Broadcast extends Entity {
+public interface Broadcast extends Vertex {
+
+	Port getInput();
 
 	/**
 	 * Returns the value of the '<em><b>Inputs</b></em>' containment reference list.
@@ -56,6 +59,31 @@ public interface Broadcast extends Entity {
 	EList<Port> getInputs();
 
 	/**
+	 * Returns the value of the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Name</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Name</em>' attribute.
+	 * @see #setName(String)
+	 * @see net.sf.orcc.df.DfPackage#getBroadcast_Name()
+	 * @model transient="true" volatile="true" derived="true"
+	 * @generated
+	 */
+	String getName();
+
+	/**
+	 * Returns the output port whose name matches the given name.
+	 * 
+	 * @param name
+	 *            the port name
+	 * @return an output port whose name matches the given name
+	 */
+	Port getOutput(String name);
+
+	/**
 	 * Returns the value of the '<em><b>Outputs</b></em>' containment reference list.
 	 * The list contents are of type {@link net.sf.orcc.df.Port}.
 	 * <!-- begin-user-doc -->
@@ -71,6 +99,14 @@ public interface Broadcast extends Entity {
 	 */
 	EList<Port> getOutputs();
 
-	Port getInput();
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.df.Broadcast#getName <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Name</em>' attribute.
+	 * @see #getName()
+	 * @generated
+	 */
+	void setName(String value);
 
 }

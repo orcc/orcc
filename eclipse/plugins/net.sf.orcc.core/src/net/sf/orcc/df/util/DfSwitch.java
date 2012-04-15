@@ -18,8 +18,6 @@ import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.Entity;
-import net.sf.orcc.df.EntitySpecific;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -123,30 +121,6 @@ public class DfSwitch<T> extends Switch<T> {
 				result = defaultCase(theEObject);
 			return result;
 		}
-		case DfPackage.ENTITY: {
-			Entity entity = (Entity) theEObject;
-			T result = caseEntity(entity);
-			if (result == null)
-				result = caseVertex(entity);
-			if (result == null)
-				result = caseAttributable(entity);
-			if (result == null)
-				result = defaultCase(theEObject);
-			return result;
-		}
-		case DfPackage.ENTITY_SPECIFIC: {
-			EntitySpecific entitySpecific = (EntitySpecific) theEObject;
-			T result = caseEntitySpecific(entitySpecific);
-			if (result == null)
-				result = caseEntity(entitySpecific);
-			if (result == null)
-				result = caseVertex(entitySpecific);
-			if (result == null)
-				result = caseAttributable(entitySpecific);
-			if (result == null)
-				result = defaultCase(theEObject);
-			return result;
-		}
 		case DfPackage.ACTOR: {
 			Actor actor = (Actor) theEObject;
 			T result = caseActor(actor);
@@ -160,8 +134,6 @@ public class DfSwitch<T> extends Switch<T> {
 			Network network = (Network) theEObject;
 			T result = caseNetwork(network);
 			if (result == null)
-				result = caseEntity(network);
-			if (result == null)
 				result = caseGraph(network);
 			if (result == null)
 				result = caseVertex(network);
@@ -174,8 +146,6 @@ public class DfSwitch<T> extends Switch<T> {
 		case DfPackage.BROADCAST: {
 			Broadcast broadcast = (Broadcast) theEObject;
 			T result = caseBroadcast(broadcast);
-			if (result == null)
-				result = caseEntity(broadcast);
 			if (result == null)
 				result = caseVertex(broadcast);
 			if (result == null)
@@ -586,36 +556,6 @@ public class DfSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseEdge(Edge object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Entity</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Entity</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseEntity(Entity object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Entity Specific</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Entity Specific</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseEntitySpecific(EntitySpecific object) {
 		return null;
 	}
 

@@ -17,8 +17,6 @@ import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.Entity;
-import net.sf.orcc.df.EntitySpecific;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
@@ -144,18 +142,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass entityEClass = null;
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass entitySpecificEClass = null;
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	private EClass unitEClass = null;
 
 	/**
@@ -257,11 +243,20 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getNetwork_Name() {
+		return (EAttribute) networkEClass.getEStructuralFeatures().get(5);
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getNetwork_Variables() {
-		return (EReference) networkEClass.getEStructuralFeatures().get(6);
+		return (EReference) networkEClass.getEStructuralFeatures().get(8);
 	}
 
 	/**
@@ -303,7 +298,16 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getNetwork_Outputs() {
-		return (EReference) networkEClass.getEStructuralFeatures().get(5);
+		return (EReference) networkEClass.getEStructuralFeatures().get(6);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getNetwork_Parameters() {
+		return (EReference) networkEClass.getEStructuralFeatures().get(7);
 	}
 
 	/**
@@ -385,8 +389,17 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EAttribute getBroadcast_Name() {
+		return (EAttribute) broadcastEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EReference getBroadcast_Outputs() {
-		return (EReference) broadcastEClass.getEStructuralFeatures().get(1);
+		return (EReference) broadcastEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -829,39 +842,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getEntity() {
-		return entityEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getEntity_Parameters() {
-		return (EReference) entityEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getEntity_Name() {
-		return (EAttribute) entityEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getEntitySpecific() {
-		return entitySpecificEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EClass getUnit() {
 		return unitEClass;
 	}
@@ -952,12 +932,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEReference(instanceEClass, INSTANCE__ENTITY);
 		createEAttribute(instanceEClass, INSTANCE__NAME);
 
-		entityEClass = createEClass(ENTITY);
-		createEAttribute(entityEClass, ENTITY__NAME);
-		createEReference(entityEClass, ENTITY__PARAMETERS);
-
-		entitySpecificEClass = createEClass(ENTITY_SPECIFIC);
-
 		actorEClass = createEClass(ACTOR);
 		createEReference(actorEClass, ACTOR__ACTIONS);
 		createEReference(actorEClass, ACTOR__ACTIONS_OUTSIDE_FSM);
@@ -981,11 +955,14 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEReference(networkEClass, NETWORK__INPUTS);
 		createEReference(networkEClass, NETWORK__INSTANCES);
 		createEReference(networkEClass, NETWORK__MO_C);
+		createEAttribute(networkEClass, NETWORK__NAME);
 		createEReference(networkEClass, NETWORK__OUTPUTS);
+		createEReference(networkEClass, NETWORK__PARAMETERS);
 		createEReference(networkEClass, NETWORK__VARIABLES);
 
 		broadcastEClass = createEClass(BROADCAST);
 		createEReference(broadcastEClass, BROADCAST__INPUTS);
+		createEAttribute(broadcastEClass, BROADCAST__NAME);
 		createEReference(broadcastEClass, BROADCAST__OUTPUTS);
 
 		connectionEClass = createEClass(CONNECTION);
@@ -1080,12 +1057,9 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		unitEClass.getESuperTypes().add(theUtilPackage.getAttributable());
 		portEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		instanceEClass.getESuperTypes().add(theGraphPackage.getVertex());
-		entityEClass.getESuperTypes().add(theGraphPackage.getVertex());
-		entitySpecificEClass.getESuperTypes().add(this.getEntity());
 		actorEClass.getESuperTypes().add(theUtilPackage.getAttributable());
-		networkEClass.getESuperTypes().add(this.getEntity());
 		networkEClass.getESuperTypes().add(theGraphPackage.getGraph());
-		broadcastEClass.getESuperTypes().add(this.getEntity());
+		broadcastEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		connectionEClass.getESuperTypes().add(theGraphPackage.getEdge());
 		actionEClass.getESuperTypes().add(theUtilPackage.getAttributable());
 		fsmEClass.getESuperTypes().add(theGraphPackage.getGraph());
@@ -1147,21 +1121,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				null, 0, 1, Instance.class, IS_TRANSIENT, IS_VOLATILE,
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED,
 				IS_ORDERED);
-
-		initEClass(entityEClass, Entity.class, "Entity", IS_ABSTRACT,
-				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getEntity_Name(), ecorePackage.getEString(), "name",
-				null, 0, 1, Entity.class, IS_TRANSIENT, IS_VOLATILE,
-				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED,
-				IS_ORDERED);
-		initEReference(getEntity_Parameters(), theIrPackage.getVar(), null,
-				"parameters", null, 0, -1, Entity.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-		initEClass(entitySpecificEClass, EntitySpecific.class,
-				"EntitySpecific", !IS_ABSTRACT, !IS_INTERFACE,
-				IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(actorEClass, Actor.class, "Actor", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -1228,8 +1187,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 
 		initEClass(networkEClass, Network.class, "Network", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getNetwork_Entities(), this.getEntity(), null,
-				"entities", null, 0, -1, Network.class, !IS_TRANSIENT,
+		initEReference(getNetwork_Entities(), theGraphPackage.getVertex(),
+				null, "entities", null, 0, -1, Network.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getNetwork_FileName(), ecorePackage.getEString(),
@@ -1248,9 +1207,17 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				null, 0, 1, Network.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getNetwork_Name(), ecorePackage.getEString(), "name",
+				null, 0, 1, Network.class, IS_TRANSIENT, IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED,
+				IS_ORDERED);
 		initEReference(getNetwork_Outputs(), this.getPort(), null, "outputs",
 				null, 0, -1, Network.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getNetwork_Parameters(), theIrPackage.getVar(), null,
+				"parameters", null, 0, -1, Network.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNetwork_Variables(), theIrPackage.getVar(), null,
 				"variables", null, 0, -1, Network.class, !IS_TRANSIENT,
@@ -1263,6 +1230,10 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				null, 0, -1, Broadcast.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getBroadcast_Name(), ecorePackage.getEString(), "name",
+				null, 0, 1, Broadcast.class, IS_TRANSIENT, IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED,
+				IS_ORDERED);
 		initEReference(getBroadcast_Outputs(), this.getPort(), null, "outputs",
 				null, 0, -1, Broadcast.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,

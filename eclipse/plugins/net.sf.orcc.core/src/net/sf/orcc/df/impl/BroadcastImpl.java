@@ -29,6 +29,10 @@
 package net.sf.orcc.df.impl;
 
 import java.util.Collection;
+import java.util.List;
+
+import net.sf.dftools.graph.impl.VertexImpl;
+import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Port;
@@ -43,8 +47,17 @@ import org.eclipse.emf.ecore.util.InternalEList;
 /**
  * @generated
  */
-public class BroadcastImpl extends EntityImpl implements Broadcast {
+public class BroadcastImpl extends VertexImpl implements Broadcast {
 
+	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
 	/**
 	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
@@ -73,38 +86,21 @@ public class BroadcastImpl extends EntityImpl implements Broadcast {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
-	protected EClass eStaticClass() {
-		return DfPackage.Literals.BROADCAST;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Port> getInputs() {
-		if (inputs == null) {
-			inputs = new EObjectContainmentEList<Port>(Port.class, this,
-					DfPackage.BROADCAST__INPUTS);
+	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+		switch (featureID) {
+		case DfPackage.BROADCAST__INPUTS:
+			return getInputs();
+		case DfPackage.BROADCAST__NAME:
+			return getName();
+		case DfPackage.BROADCAST__OUTPUTS:
+			return getOutputs();
 		}
-		return inputs;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Port> getOutputs() {
-		if (outputs == null) {
-			outputs = new EObjectContainmentEList<Port>(Port.class, this,
-					DfPackage.BROADCAST__OUTPUTS);
-		}
-		return outputs;
+		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
@@ -131,14 +127,17 @@ public class BroadcastImpl extends EntityImpl implements Broadcast {
 	 * @generated
 	 */
 	@Override
-	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 		case DfPackage.BROADCAST__INPUTS:
-			return getInputs();
+			return inputs != null && !inputs.isEmpty();
+		case DfPackage.BROADCAST__NAME:
+			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT
+					.equals(getName());
 		case DfPackage.BROADCAST__OUTPUTS:
-			return getOutputs();
+			return outputs != null && !outputs.isEmpty();
 		}
-		return super.eGet(featureID, resolve, coreType);
+		return super.eIsSet(featureID);
 	}
 
 	/**
@@ -154,12 +153,24 @@ public class BroadcastImpl extends EntityImpl implements Broadcast {
 			getInputs().clear();
 			getInputs().addAll((Collection<? extends Port>) newValue);
 			return;
+		case DfPackage.BROADCAST__NAME:
+			setName((String) newValue);
+			return;
 		case DfPackage.BROADCAST__OUTPUTS:
 			getOutputs().clear();
 			getOutputs().addAll((Collection<? extends Port>) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	protected EClass eStaticClass() {
+		return DfPackage.Literals.BROADCAST;
 	}
 
 	/**
@@ -173,6 +184,9 @@ public class BroadcastImpl extends EntityImpl implements Broadcast {
 		case DfPackage.BROADCAST__INPUTS:
 			getInputs().clear();
 			return;
+		case DfPackage.BROADCAST__NAME:
+			setName(NAME_EDEFAULT);
+			return;
 		case DfPackage.BROADCAST__OUTPUTS:
 			getOutputs().clear();
 			return;
@@ -180,30 +194,60 @@ public class BroadcastImpl extends EntityImpl implements Broadcast {
 		super.eUnset(featureID);
 	}
 
+	@Override
+	public Port getInput() {
+		return getInputs().get(0);
+	}
+
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-		case DfPackage.BROADCAST__INPUTS:
-			return inputs != null && !inputs.isEmpty();
-		case DfPackage.BROADCAST__OUTPUTS:
-			return outputs != null && !outputs.isEmpty();
+	public EList<Port> getInputs() {
+		if (inputs == null) {
+			inputs = new EObjectContainmentEList<Port>(Port.class, this,
+					DfPackage.BROADCAST__INPUTS);
 		}
-		return super.eIsSet(featureID);
+		return inputs;
 	}
 
 	@Override
+	public String getName() {
+		return getLabel();
+	}
+
+	@Override
+	public Port getOutput(String name) {
+		List<Port> outputs = EcoreHelper.getList(this, "outputs");
+		for (Port port : outputs) {
+			if (port.getName().equals(name)) {
+				return port;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Port> getOutputs() {
+		if (outputs == null) {
+			outputs = new EObjectContainmentEList<Port>(Port.class, this,
+					DfPackage.BROADCAST__OUTPUTS);
+		}
+		return outputs;
+	}
+
 	public boolean isBroadcast() {
 		return true;
 	}
 
 	@Override
-	public Port getInput() {
-		return getInputs().get(0);
+	public void setName(String newName) {
+		setLabel(newName);
 	}
 
 }

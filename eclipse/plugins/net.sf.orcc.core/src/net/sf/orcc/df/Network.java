@@ -29,9 +29,11 @@
 package net.sf.orcc.df;
 
 import java.util.List;
+import java.util.Map;
 
 import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.Graph;
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
@@ -42,25 +44,27 @@ import org.eclipse.emf.common.util.EList;
 /**
  * <!-- begin-user-doc -->This class defines a hierarchical XDF network. It
  * extends both entity and graph.<!-- end-user-doc -->
- *
+ * 
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link net.sf.orcc.df.Network#getEntities <em>Entities</em>}</li>
- *   <li>{@link net.sf.orcc.df.Network#getFileName <em>File Name</em>}</li>
- *   <li>{@link net.sf.orcc.df.Network#getInputs <em>Inputs</em>}</li>
- *   <li>{@link net.sf.orcc.df.Network#getInstances <em>Instances</em>}</li>
- *   <li>{@link net.sf.orcc.df.Network#getMoC <em>Mo C</em>}</li>
- *   <li>{@link net.sf.orcc.df.Network#getOutputs <em>Outputs</em>}</li>
- *   <li>{@link net.sf.orcc.df.Network#getVariables <em>Variables</em>}</li>
+ * <li>{@link net.sf.orcc.df.Network#getEntities <em>Entities</em>}</li>
+ * <li>{@link net.sf.orcc.df.Network#getFileName <em>File Name</em>}</li>
+ * <li>{@link net.sf.orcc.df.Network#getInputs <em>Inputs</em>}</li>
+ * <li>{@link net.sf.orcc.df.Network#getInstances <em>Instances</em>}</li>
+ * <li>{@link net.sf.orcc.df.Network#getMoC <em>Mo C</em>}</li>
+ * <li>{@link net.sf.orcc.df.Network#getName <em>Name</em>}</li>
+ * <li>{@link net.sf.orcc.df.Network#getOutputs <em>Outputs</em>}</li>
+ * <li>{@link net.sf.orcc.df.Network#getParameters <em>Parameters</em>}</li>
+ * <li>{@link net.sf.orcc.df.Network#getVariables <em>Variables</em>}</li>
  * </ul>
  * </p>
- *
+ * 
  * @see net.sf.orcc.df.DfPackage#getNetwork()
  * @model
  * @generated
  */
-public interface Network extends Entity, Graph {
+public interface Network extends Graph {
 
 	/**
 	 * Adds the given port to this network. The port is added to the vertices
@@ -134,15 +138,16 @@ public interface Network extends Entity, Graph {
 	EList<Connection> getConnections();
 
 	/**
-	 * Returns the value of the '<em><b>Entities</b></em>' reference list.
-	 * The list contents are of type {@link net.sf.orcc.df.Entity}.
-	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * Returns the value of the '<em><b>Entities</b></em>' reference list. The
+	 * list contents are of type {@link net.sf.dftools.graph.Vertex}. <!--
+	 * begin-user-doc --><!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Entities</em>' reference list.
 	 * @see net.sf.orcc.df.DfPackage#getNetwork_Entities()
 	 * @model
 	 * @generated
 	 */
-	EList<Entity> getEntities();
+	EList<Vertex> getEntities();
 
 	/**
 	 * Returns the file this network is defined in.
@@ -152,8 +157,9 @@ public interface Network extends Entity, Graph {
 	IFile getFile();
 
 	/**
-	 * Returns the value of the '<em><b>File Name</b></em>' attribute.
-	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * Returns the value of the '<em><b>File Name</b></em>' attribute. <!--
+	 * begin-user-doc --><!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>File Name</em>' attribute.
 	 * @see #setFileName(String)
 	 * @see net.sf.orcc.df.DfPackage#getNetwork_FileName()
@@ -163,9 +169,19 @@ public interface Network extends Entity, Graph {
 	String getFileName();
 
 	/**
-	 * Returns the value of the '<em><b>Inputs</b></em>' reference list.
-	 * The list contents are of type {@link net.sf.orcc.df.Port}.
-	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * Returns the input port whose name matches the given name.
+	 * 
+	 * @param name
+	 *            the port name
+	 * @return an input port whose name matches the given name
+	 */
+	Port getInput(String name);
+
+	/**
+	 * Returns the value of the '<em><b>Inputs</b></em>' reference list. The
+	 * list contents are of type {@link net.sf.orcc.df.Port}. <!--
+	 * begin-user-doc --><!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Inputs</em>' reference list.
 	 * @see net.sf.orcc.df.DfPackage#getNetwork_Inputs()
 	 * @model
@@ -176,9 +192,10 @@ public interface Network extends Entity, Graph {
 	Instance getInstance(String id);
 
 	/**
-	 * Returns the value of the '<em><b>Instances</b></em>' reference list.
-	 * The list contents are of type {@link net.sf.orcc.df.Instance}.
-	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * Returns the value of the '<em><b>Instances</b></em>' reference list. The
+	 * list contents are of type {@link net.sf.orcc.df.Instance}. <!--
+	 * begin-user-doc --><!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Instances</em>' reference list.
 	 * @see net.sf.orcc.df.DfPackage#getNetwork_Instances()
 	 * @model
@@ -199,6 +216,7 @@ public interface Network extends Entity, Graph {
 	/**
 	 * Returns the value of the '<em><b>Mo C</b></em>' containment reference.
 	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Mo C</em>' containment reference.
 	 * @see #setMoC(MoC)
 	 * @see net.sf.orcc.df.DfPackage#getNetwork_MoC()
@@ -208,15 +226,73 @@ public interface Network extends Entity, Graph {
 	MoC getMoC();
 
 	/**
-	 * Returns the value of the '<em><b>Outputs</b></em>' reference list.
-	 * The list contents are of type {@link net.sf.orcc.df.Port}.
-	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * Returns the value of the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Name</em>' attribute isn't clear, there really
+	 * should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * 
+	 * @return the value of the '<em>Name</em>' attribute.
+	 * @see #setName(String)
+	 * @see net.sf.orcc.df.DfPackage#getNetwork_Name()
+	 * @model transient="true" volatile="true" derived="true"
+	 * @generated
+	 */
+	String getName();
+
+	Map<Port, List<Connection>> getOutgoingPortMap();
+
+	/**
+	 * Returns the output port whose name matches the given name.
+	 * 
+	 * @param name
+	 *            the port name
+	 * @return an output port whose name matches the given name
+	 */
+	Port getOutput(String name);
+
+	/**
+	 * Returns the value of the '<em><b>Outputs</b></em>' reference list. The
+	 * list contents are of type {@link net.sf.orcc.df.Port}. <!--
+	 * begin-user-doc --><!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Outputs</em>' reference list.
 	 * @see net.sf.orcc.df.DfPackage#getNetwork_Outputs()
 	 * @model
 	 * @generated
 	 */
 	EList<Port> getOutputs();
+
+	/**
+	 * Returns the parameter with the given name.
+	 * 
+	 * @param name
+	 *            name of a parameter
+	 * @return the parameter with the given name
+	 */
+	Var getParameter(String name);
+
+	/**
+	 * Returns the value of the '<em><b>Parameters</b></em>' containment
+	 * reference list. The list contents are of type {@link net.sf.orcc.ir.Var}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Parameters</em>' containment reference list
+	 * isn't clear, there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * 
+	 * @return the value of the '<em>Parameters</em>' containment reference
+	 *         list.
+	 * @see net.sf.orcc.df.DfPackage#getNetwork_Parameters()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Var> getParameters();
+
+	String getSimpleName();
 
 	/**
 	 * Returns the variable with the given name.
@@ -228,9 +304,10 @@ public interface Network extends Entity, Graph {
 	Var getVariable(String name);
 
 	/**
-	 * Returns the value of the '<em><b>Variables</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.ir.Var}.
+	 * Returns the value of the '<em><b>Variables</b></em>' containment
+	 * reference list. The list contents are of type {@link net.sf.orcc.ir.Var}.
 	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Variables</em>' containment reference list.
 	 * @see net.sf.orcc.df.DfPackage#getNetwork_Variables()
 	 * @model containment="true"
@@ -258,30 +335,56 @@ public interface Network extends Entity, Graph {
 	void normalizeActors() throws OrccException;
 
 	/**
+	 * Removes the given instance from the list of instances, and then removes
+	 * it from this graph.
+	 * 
+	 * @param instance
+	 *            an instance
+	 */
+	void remove(Instance instance);
+
+	/**
 	 * Removes the given entity from the list of entities, and then removes it
 	 * from this graph.
 	 * 
 	 * @param entity
-	 *            a entity
+	 *            an entity
 	 */
-	void remove(Entity entity);
+	void removeEntity(Vertex entity);
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.df.Network#getFileName <em>File Name</em>}' attribute.
-	 * <!-- begin-user-doc --><!-- end-user-doc -->
-	 * @param value the new value of the '<em>File Name</em>' attribute.
+	 * Sets the value of the '{@link net.sf.orcc.df.Network#getFileName
+	 * <em>File Name</em>}' attribute. <!-- begin-user-doc --><!-- end-user-doc
+	 * -->
+	 * 
+	 * @param value
+	 *            the new value of the '<em>File Name</em>' attribute.
 	 * @see #getFileName()
 	 * @generated
 	 */
 	void setFileName(String value);
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.df.Network#getMoC <em>Mo C</em>}' containment reference.
-	 * <!-- begin-user-doc --><!-- end-user-doc -->
-	 * @param value the new value of the '<em>Mo C</em>' containment reference.
+	 * Sets the value of the '{@link net.sf.orcc.df.Network#getMoC
+	 * <em>Mo C</em>}' containment reference. <!-- begin-user-doc --><!--
+	 * end-user-doc -->
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Mo C</em>' containment reference.
 	 * @see #getMoC()
 	 * @generated
 	 */
 	void setMoC(MoC value);
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.df.Network#getName
+	 * <em>Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Name</em>' attribute.
+	 * @see #getName()
+	 * @generated
+	 */
+	void setName(String value);
 
 }

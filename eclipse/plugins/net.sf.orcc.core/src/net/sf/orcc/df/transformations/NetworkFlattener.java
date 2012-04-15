@@ -36,7 +36,6 @@ import net.sf.dftools.graph.Vertex;
 import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -64,9 +63,9 @@ public class NetworkFlattener extends DfSwitch<Void> {
 
 	@Override
 	public Void caseNetwork(Network network) {
-		List<Entity> entities = new ArrayList<Entity>(network.getEntities());
-		for (Entity entity : entities) {
-			if (entity.isNetwork()) {
+		List<Vertex> entities = new ArrayList<Vertex>(network.getEntities());
+		for (Vertex entity : entities) {
+			if (entity instanceof Network) {
 				Network subNetwork = (Network) entity;
 
 				// flatten this sub-network
@@ -80,7 +79,7 @@ public class NetworkFlattener extends DfSwitch<Void> {
 				linkIncomingConnections(network, subNetwork);
 
 				// remove entity from network
-				network.remove(entity);
+				network.removeEntity(entity);
 
 				// remove connections to clean up incoming/outgoing of instances
 				subNetwork.removeEdges(subNetwork.getConnections());
@@ -145,8 +144,8 @@ public class NetworkFlattener extends DfSwitch<Void> {
 
 	private void moveEntitiesAndConnections(Network network, Network subNetwork) {
 		// Rename subNetwork entities
-		for (Entity entity : subNetwork.getEntities()) {
-			entity.setName(subNetwork.getName() + "_" + entity.getName());
+		for (Vertex entity : subNetwork.getEntities()) {
+			entity.setLabel(subNetwork.getName() + "_" + entity.getLabel());
 		}
 		for (Instance instance : subNetwork.getInstances()) {
 			instance.setName(subNetwork.getName() + "_" + instance.getName());

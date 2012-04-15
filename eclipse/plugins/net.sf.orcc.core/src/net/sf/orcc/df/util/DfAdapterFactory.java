@@ -18,8 +18,6 @@ import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.Entity;
-import net.sf.orcc.df.EntitySpecific;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -102,16 +100,6 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 		@Override
 		public Adapter caseInstance(Instance object) {
 			return createInstanceAdapter();
-		}
-
-		@Override
-		public Adapter caseEntity(Entity object) {
-			return createEntityAdapter();
-		}
-
-		@Override
-		public Adapter caseEntitySpecific(EntitySpecific object) {
-			return createEntitySpecificAdapter();
 		}
 
 		@Override
@@ -492,35 +480,6 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createEdgeAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.df.Entity <em>Entity</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore
-	 * cases; it's useful to ignore a case when inheritance will catch all the
-	 * cases anyway. <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.df.Entity
-	 * @generated
-	 */
-	public Adapter createEntityAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.df.EntitySpecific <em>Entity Specific</em>}'. <!--
-	 * begin-user-doc --> This default implementation returns null so that we
-	 * can easily ignore cases; it's useful to ignore a case when inheritance
-	 * will catch all the cases anyway. <!-- end-user-doc -->
-	 * 
-	 * @return the new adapter.
-	 * @see net.sf.orcc.df.EntitySpecific
-	 * @generated
-	 */
-	public Adapter createEntitySpecificAdapter() {
 		return null;
 	}
 

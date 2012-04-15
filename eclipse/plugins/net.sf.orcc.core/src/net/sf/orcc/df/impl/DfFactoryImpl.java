@@ -19,7 +19,6 @@ import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.EntitySpecific;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -99,8 +98,6 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 			return createPort();
 		case DfPackage.INSTANCE:
 			return createInstance();
-		case DfPackage.ENTITY_SPECIFIC:
-			return createEntitySpecific();
 		case DfPackage.ACTOR:
 			return createActor();
 		case DfPackage.NETWORK:
@@ -282,15 +279,6 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	public Instance createInstance() {
 		InstanceImpl instance = new InstanceImpl();
 		return instance;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EntitySpecific createEntitySpecific() {
-		EntitySpecificImpl entitySpecific = new EntitySpecificImpl();
-		return entitySpecific;
 	}
 
 	@Override

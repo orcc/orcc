@@ -67,52 +67,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  */
 public class ActorImpl extends AttributableImpl implements Actor {
 	/**
-	 * The default value of the '{@link #getFileName() <em>File Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getFileName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String FILE_NAME_EDEFAULT = null;
-
-	/**
-	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getLineNumber()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final int LINE_NUMBER_EDEFAULT = 0;
-	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String NAME_EDEFAULT = null;
-
-	/**
-	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isNative()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean NATIVE_EDEFAULT = false;
-
-	/**
-	 * The default value of the '{@link #getTemplateData() <em>Template Data</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getTemplateData()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final Object TEMPLATE_DATA_EDEFAULT = null;
-
-	/**
 	 * The cached value of the '{@link #getActions() <em>Actions</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getActions()
@@ -130,6 +84,15 @@ public class ActorImpl extends AttributableImpl implements Actor {
 	 * @ordered
 	 */
 	protected EList<Action> actionsOutsideFsm;
+
+	/**
+	 * The default value of the '{@link #getFileName() <em>File Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getFileName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String FILE_NAME_EDEFAULT = null;
 
 	/**
 	 * The cached value of the '{@link #getFileName() <em>File Name</em>}' attribute.
@@ -169,6 +132,15 @@ public class ActorImpl extends AttributableImpl implements Actor {
 	protected EList<Port> inputs;
 
 	/**
+	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getLineNumber()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final int LINE_NUMBER_EDEFAULT = 0;
+
+	/**
 	 * The cached value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getLineNumber()
@@ -189,14 +161,13 @@ public class ActorImpl extends AttributableImpl implements Actor {
 	protected MoC moC;
 
 	/**
-	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getName()
+	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #isNative()
 	 * @generated
 	 * @ordered
 	 */
-	protected String name = NAME_EDEFAULT;
+	protected static final boolean NATIVE_EDEFAULT = false;
 
 	/**
 	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
@@ -206,6 +177,26 @@ public class ActorImpl extends AttributableImpl implements Actor {
 	 * @ordered
 	 */
 	protected boolean native_ = NATIVE_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected String name = NAME_EDEFAULT;
 
 	/**
 	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' containment reference list.
@@ -244,6 +235,16 @@ public class ActorImpl extends AttributableImpl implements Actor {
 	 * @ordered
 	 */
 	protected EList<Var> stateVars;
+
+	/**
+	 * The default value of the '{@link #getTemplateData() <em>Template Data</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getTemplateData()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final Object TEMPLATE_DATA_EDEFAULT = null;
 
 	/**
 	 * The cached value of the '{@link #getTemplateData() <em>Template Data</em>}' attribute.

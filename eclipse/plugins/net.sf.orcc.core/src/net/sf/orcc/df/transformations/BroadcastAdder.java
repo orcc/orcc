@@ -37,7 +37,6 @@ import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -57,12 +56,6 @@ public class BroadcastAdder extends DfSwitch<Void> {
 	protected Network network;
 
 	@Override
-	public Void caseEntity(Entity entity) {
-		handle(entity.getSimpleName(), entity.getOutgoingPortMap());
-		return null;
-	}
-
-	@Override
 	public Void caseInstance(Instance instance) {
 		handle(instance.getSimpleName(), instance.getOutgoingPortMap());
 		return null;
@@ -76,16 +69,15 @@ public class BroadcastAdder extends DfSwitch<Void> {
 		List<Vertex> vertexSet = new ArrayList<Vertex>(network.getVertices());
 
 		for (Vertex vertex : vertexSet) {
-			if (vertex instanceof Entity) {
-				Entity entity = (Entity) vertex;
-				if (entity.isNetwork()) {
-					new BroadcastAdder().doSwitch(entity);
-				}
-				caseVertex(vertex);
+			if (vertex instanceof Network) {
+				new BroadcastAdder().doSwitch(vertex);
 			} else {
 				doSwitch(vertex);
 			}
 		}
+
+		handle(network.getSimpleName(), network.getOutgoingPortMap());
+
 		return null;
 	}
 
