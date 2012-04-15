@@ -31,22 +31,88 @@ package net.sf.orcc.ir;
 import org.eclipse.emf.common.util.EList;
 
 /**
- * This class defines an If block. An if block is a block with a value used in its
- * condition.
+ * <!-- begin-user-doc --> This class defines an If block. An if block is a
+ * block with a value used in its condition.
  * 
- * @author Matthieu Wipliez
+ * @author Matthieu Wipliez<!-- end-user-doc -->
+ *
+ * <p>
+ * The following features are supported:
+ * <ul>
+ *   <li>{@link net.sf.orcc.ir.BlockIf#getCondition <em>Condition</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.BlockIf#getElseNodes <em>Else Nodes</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.BlockIf#getJoinNode <em>Join Node</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.BlockIf#getLineNumber <em>Line Number</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.BlockIf#getThenNodes <em>Then Nodes</em>}</li>
+ * </ul>
+ * </p>
+ *
+ * @see net.sf.orcc.ir.IrPackage#getBlockIf()
  * @model
- * 
+ * @generated
  */
 public interface BlockIf extends Block {
 
 	/**
-	 * Returns the condition of this node If.
-	 * 
-	 * @return the condition of this node If
+	 * Returns the value of the '<em><b>Condition</b></em>' containment reference.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Condition</em>' containment reference.
+	 * @see #setCondition(Expression)
+	 * @see net.sf.orcc.ir.IrPackage#getBlockIf_Condition()
 	 * @model containment="true"
+	 * @generated
 	 */
 	Expression getCondition();
+
+	/**
+	 * Returns the value of the '<em><b>Else Nodes</b></em>' containment
+	 * reference list. The list contents are of type
+	 * {@link net.sf.orcc.ir.Block}. <!-- begin-user-doc --><!-- end-user-doc
+	 * -->
+	 * 
+	 * @return the value of the '<em>Else Nodes</em>' containment reference
+	 *         list.
+	 * @see net.sf.orcc.ir.IrPackage#getBlockIf_ElseNodes()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Block> getElseNodes();
+
+	/**
+	 * Returns the value of the '<em><b>Join Node</b></em>' containment reference.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Join Node</em>' containment reference.
+	 * @see #setJoinNode(BlockBasic)
+	 * @see net.sf.orcc.ir.IrPackage#getBlockIf_JoinNode()
+	 * @model containment="true"
+	 * @generated
+	 */
+	BlockBasic getJoinNode();
+
+	/**
+	 * Returns the value of the '<em><b>Line Number</b></em>' attribute. <!--
+	 * begin-user-doc --> Returns the line number on which this "if" starts.<!--
+	 * end-user-doc -->
+	 * 
+	 * @return the value of the '<em>Line Number</em>' attribute.
+	 * @see #setLineNumber(int)
+	 * @see net.sf.orcc.ir.IrPackage#getBlockIf_LineNumber()
+	 * @model
+	 * @generated
+	 */
+	int getLineNumber();
+
+	/**
+	 * Returns the value of the '<em><b>Then Nodes</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.ir.Block}.
+	 * <!-- begin-user-doc --> Returns the nodes
+	 * in the "then" branch.<!-- end-user-doc -->
+	 * @return the value of the '<em>Then Nodes</em>' containment reference list.
+	 * @see net.sf.orcc.ir.IrPackage#getBlockIf_ThenNodes()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Block> getThenNodes();
 
 	/**
 	 * Returns <code>true</code> if it is necessary to generate an "else" branch
@@ -57,59 +123,23 @@ public interface BlockIf extends Block {
 	boolean isElseRequired();
 
 	/**
-	 * Returns the nodes in the "else" branch of this NodeIf.
-	 * 
-	 * @return the nodes in the "else" branch of this NodeIf
-	 * @model containment="true"
+	 * @generated
 	 */
-	EList<Block> getElseNodes();
+	void setCondition(Expression value);
 
 	/**
-	 * Returns the join node of this NodeIf.
-	 * 
-	 * @return the join node of this NodeIf.
-	 * @model containment="true"
+	 * @generated
 	 */
-	BlockBasic getJoinNode();
+	void setJoinNode(BlockBasic value);
 
 	/**
-	 * Returns the line number on which this "if" starts.
-	 * 
-	 * @return the line number on which this "if" starts
-	 * @model
+	 * Sets the value of the '{@link net.sf.orcc.ir.BlockIf#getLineNumber <em>Line Number</em>}' attribute.
+	 * <!-- begin-user-doc -->Sets the line
+	 * number on which this "if" starts. <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Line Number</em>' attribute.
+	 * @see #getLineNumber()
+	 * @generated
 	 */
-	public int getLineNumber();
-
-	/**
-	 * Returns the nodes in the "then" branch of this NodeIf.
-	 * 
-	 * @return the nodes in the "then" branch of this NodeIf
-	 * @model containment="true"
-	 */
-	EList<Block> getThenNodes();
-
-	/**
-	 * Sets the condition of this node If.
-	 * 
-	 * @param condition
-	 *            the condition of this node If
-	 */
-	void setCondition(Expression condition);
-
-	/**
-	 * Sets the join node of this NodeIf.
-	 * 
-	 * @param joinNode
-	 *            the join node of this NodeIf
-	 */
-	void setJoinNode(BlockBasic joinNode);
-
-	/**
-	 * Sets the line number on which this "if" starts.
-	 * 
-	 * @param newLineNumber
-	 *            the line number on which this "if" starts
-	 */
-	public void setLineNumber(int newLineNumber);
+	void setLineNumber(int value);
 
 }

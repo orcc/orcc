@@ -31,11 +31,12 @@ package net.sf.orcc.ir;
 import org.eclipse.emf.ecore.EObject;
 
 /**
- * This class defines an argument of a Call instruction.
- * 
- * @author Matthieu Wipliez
- * 
+ * <!-- begin-user-doc --> This class defines an argument of a Call instruction.<!-- end-user-doc --> 
+ *
+ *
+ * @see net.sf.orcc.ir.IrPackage#getArg()
  * @model abstract="true"
+ * @generated
  */
 public interface Arg extends EObject {
 

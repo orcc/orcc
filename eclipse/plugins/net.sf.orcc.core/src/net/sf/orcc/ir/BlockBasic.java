@@ -34,11 +34,19 @@ import java.util.ListIterator;
 import org.eclipse.emf.common.util.EList;
 
 /**
- * This class defines a basic block. A basic block only contains instructions.
- * 
- * @author Matthieu Wipliez
+ * <!-- begin-user-doc --> This class defines a basic block. A basic block only
+ * contains instructions.<!-- end-user-doc -->
+ *
+ * <p>
+ * The following features are supported:
+ * <ul>
+ *   <li>{@link net.sf.orcc.ir.BlockBasic#getInstructions <em>Instructions</em>}</li>
+ * </ul>
+ * </p>
+ *
+ * @see net.sf.orcc.ir.IrPackage#getBlockBasic()
  * @model
- * 
+ * @generated
  */
 public interface BlockBasic extends Block {
 
@@ -61,10 +69,13 @@ public interface BlockBasic extends Block {
 	void add(int index, Instruction instruction);
 
 	/**
-	 * Returns the instructions of this block node.
-	 * 
-	 * @return the instructions of this block node
+	 * Returns the value of the '<em><b>Instructions</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.ir.Instruction}.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @return the value of the '<em>Instructions</em>' containment reference list.
+	 * @see net.sf.orcc.ir.IrPackage#getBlockBasic_Instructions()
 	 * @model containment="true"
+	 * @generated
 	 */
 	EList<Instruction> getInstructions();
 

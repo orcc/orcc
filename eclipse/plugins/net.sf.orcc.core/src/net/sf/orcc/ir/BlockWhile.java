@@ -31,69 +31,97 @@ package net.sf.orcc.ir;
 import org.eclipse.emf.common.util.EList;
 
 /**
- * This class defines a While block. A while block is a block with a value used
- * in its condition.
- * 
- * @author Matthieu Wipliez
+ * <!-- begin-user-doc -->This class defines a While block. A while block is a
+ * block with a value used in its condition.<!-- end-user-doc -->
+ *
+ * <p>
+ * The following features are supported:
+ * <ul>
+ *   <li>{@link net.sf.orcc.ir.BlockWhile#getCondition <em>Condition</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.BlockWhile#getJoinNode <em>Join Node</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.BlockWhile#getLineNumber <em>Line Number</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.BlockWhile#getNodes <em>Nodes</em>}</li>
+ * </ul>
+ * </p>
+ *
+ * @see net.sf.orcc.ir.IrPackage#getBlockWhile()
  * @model
- * 
+ * @generated
  */
 public interface BlockWhile extends Block {
 
 	/**
-	 * Returns the condition of this node While.
-	 * 
-	 * @return the condition of this node While
+	 * Returns the value of the '<em><b>Condition</b></em>' containment reference.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Condition</em>' containment reference.
+	 * @see #setCondition(Expression)
+	 * @see net.sf.orcc.ir.IrPackage#getBlockWhile_Condition()
 	 * @model containment="true"
+	 * @generated
 	 */
 	Expression getCondition();
 
 	/**
-	 * Returns the join node of this NodeWhile.
-	 * 
-	 * @return the join node of this NodeWhile.
+	 * Returns the value of the '<em><b>Join Node</b></em>' containment reference.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Join Node</em>' containment reference.
+	 * @see #setJoinNode(BlockBasic)
+	 * @see net.sf.orcc.ir.IrPackage#getBlockWhile_JoinNode()
 	 * @model containment="true"
+	 * @generated
 	 */
 	BlockBasic getJoinNode();
 
 	/**
-	 * Returns the line number on which this "while" starts.
+	 * Returns the value of the '<em><b>Line Number</b></em>' attribute. <!--
+	 * begin-user-doc -->Returns the line number on which this "while" starts.
 	 * 
-	 * @return the line number on which this "while" starts
+	 * @return the line number on which this "while" starts<!-- end-user-doc -->
+	 * @return the value of the '<em>Line Number</em>' attribute.
+	 * @see #setLineNumber(int)
+	 * @see net.sf.orcc.ir.IrPackage#getBlockWhile_LineNumber()
 	 * @model
+	 * @generated
 	 */
-	public int getLineNumber();
+	int getLineNumber();
 
 	/**
-	 * Returns the nodes of this NodeWhile.
-	 * 
-	 * @return the nodes of this NodeWhile
+	 * Returns the value of the '<em><b>Nodes</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.ir.Block}.
+	 * <!-- begin-user-doc -->Returns the nodes of this NodeWhile.<!-- end-user-doc -->
+	 * @return the value of the '<em>Nodes</em>' containment reference list.
+	 * @see net.sf.orcc.ir.IrPackage#getBlockWhile_Nodes()
 	 * @model containment="true"
+	 * @generated
 	 */
 	EList<Block> getNodes();
 
 	/**
-	 * Sets the condition of this node While.
-	 * 
-	 * @param condition
-	 *            the condition of this node While
+	 * Sets the value of the '{@link net.sf.orcc.ir.BlockWhile#getCondition <em>Condition</em>}' containment reference.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @param value the new value of the '<em>Condition</em>' containment reference.
+	 * @see #getCondition()
+	 * @generated
 	 */
-	void setCondition(Expression condition);
+	void setCondition(Expression value);
 
 	/**
-	 * Sets the join node of this NodeWhile.
-	 * 
-	 * @param joinNode
-	 *            the join node of this NodeWhile
+	 * Sets the value of the '{@link net.sf.orcc.ir.BlockWhile#getJoinNode <em>Join Node</em>}' containment reference.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @param value the new value of the '<em>Join Node</em>' containment reference.
+	 * @see #getJoinNode()
+	 * @generated
 	 */
-	void setJoinNode(BlockBasic joinNode);
+	void setJoinNode(BlockBasic value);
 
 	/**
-	 * Sets the line number on which this "while" starts.
-	 * 
-	 * @param newLineNumber
-	 *            the line number on which this "while" starts
+	 * Sets the value of the '{@link net.sf.orcc.ir.BlockWhile#getLineNumber <em>Line Number</em>}' attribute.
+	 * <!-- begin-user-doc -->Sets the line number on which this "while" starts.
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Line Number</em>' attribute.
+	 * @see #getLineNumber()
+	 * @generated
 	 */
-	public void setLineNumber(int newLineNumber);
+	void setLineNumber(int value);
 
 }

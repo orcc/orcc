@@ -7,10 +7,15 @@
 package net.sf.orcc.ir;
 
 /**
- * This interface defines a block that is specific to a given back-end.
+ * <!-- begin-user-doc -->This interface defines a block that is specific to a
+ * given back-end.
  * 
- * @author Jérôme Gorin
+ * @author Jerome Gorin<!-- end-user-doc -->
+ *
+ *
+ * @see net.sf.orcc.ir.IrPackage#getBlockSpecific()
  * @model abstract="true"
+ * @generated
  */
 public interface BlockSpecific extends Block {
 

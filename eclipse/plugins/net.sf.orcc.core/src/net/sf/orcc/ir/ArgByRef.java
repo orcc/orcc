@@ -31,38 +31,62 @@ package net.sf.orcc.ir;
 import org.eclipse.emf.common.util.EList;
 
 /**
- * This class defines an argument passed by reference.
- * 
- * @author Matthieu Wipliez
- * 
- * @model extends="Arg"
+ * <!-- begin-user-doc --> This class defines an argument passed by reference.<!-- end-user-doc -->
+ *
+ * <p>
+ * The following features are supported:
+ * <ul>
+ *   <li>{@link net.sf.orcc.ir.ArgByRef#getIndexes <em>Indexes</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.ArgByRef#getUse <em>Use</em>}</li>
+ * </ul>
+ * </p>
+ *
+ * @see net.sf.orcc.ir.IrPackage#getArgByRef()
+ * @model
+ * @generated
  */
 public interface ArgByRef extends Arg {
 
 	/**
-	 * Returns the (possibly empty) list of indexes of this argument by
-	 * reference.
+	 * Returns the value of the '<em><b>Indexes</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.ir.Expression}.
+	 * <!-- begin-user-doc --> Returns the (possibly empty) list of indexes of
+	 * this argument by reference.
 	 * 
 	 * @return the (possibly empty) list of indexes of this argument by
-	 *         reference
+	 *         reference<!-- end-user-doc -->
+	 * @return the value of the '<em>Indexes</em>' containment reference list.
+	 * @see net.sf.orcc.ir.IrPackage#getArgByRef_Indexes()
 	 * @model containment="true"
+	 * @generated
 	 */
 	EList<Expression> getIndexes();
 
 	/**
-	 * Returns the use associated with this argument by reference.
+	 * Returns the value of the '<em><b>Use</b></em>' containment reference.
+	 * <!-- begin-user-doc --> Returns the use associated with this argument by
+	 * reference.
 	 * 
-	 * @return the use associated with this argument by reference
+	 * @return the use associated with this argument by reference<!--
+	 *         end-user-doc -->
+	 * @return the value of the '<em>Use</em>' containment reference.
+	 * @see #setUse(Use)
+	 * @see net.sf.orcc.ir.IrPackage#getArgByRef_Use()
 	 * @model containment="true"
+	 * @generated
 	 */
 	Use getUse();
 
 	/**
-	 * Sets the use referenced with this argument.
+	 * Sets the value of the '{@link net.sf.orcc.ir.ArgByRef#getUse <em>Use</em>}' containment reference.
+	 * <!-- begin-user-doc --> Sets the use referenced with this argument.
 	 * 
 	 * @param variable
-	 *            the use referenced with this argument
+	 *            the use referenced with this argument<!-- end-user-doc -->
+	 * @param value the new value of the '<em>Use</em>' containment reference.
+	 * @see #getUse()
+	 * @generated
 	 */
-	void setUse(Use use);
+	void setUse(Use value);
 
 }

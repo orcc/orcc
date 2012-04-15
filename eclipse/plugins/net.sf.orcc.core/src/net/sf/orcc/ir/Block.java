@@ -32,16 +32,30 @@ import net.sf.dftools.util.Attributable;
 import net.sf.dftools.graph.Edge;
 
 /**
- * This class defines a block.
- * 
- * @author Matthieu Wipliez
+ * <!-- begin-user-doc --> This class defines a block.<!-- end-user-doc -->
+ *
+ * <p>
+ * The following features are supported:
+ * <ul>
+ *   <li>{@link net.sf.orcc.ir.Block#getCfgNode <em>Cfg Node</em>}</li>
+ * </ul>
+ * </p>
+ *
+ * @see net.sf.orcc.ir.IrPackage#getBlock()
  * @model abstract="true"
+ * @generated
  */
 public interface Block extends Attributable {
 
 	/**
-	 * Returns the CFG node associated with this block.
-	 * 
+	 * Returns the value of the '<em><b>Cfg Node</b></em>' reference.
+	 * It is bidirectional and its opposite is '{@link net.sf.orcc.ir.CfgNode#getNode <em>Node</em>}'.
+	 * <!-- begin-user-doc --> Returns the CFG node associated with this block.
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Cfg Node</em>' reference.
+	 * @see #setCfgNode(CfgNode)
+	 * @see net.sf.orcc.ir.IrPackage#getBlock_CfgNode()
+	 * @see net.sf.orcc.ir.CfgNode#getNode
 	 * @model opposite="node"
 	 * @generated
 	 */

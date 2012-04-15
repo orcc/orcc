@@ -29,27 +29,38 @@
 package net.sf.orcc.ir;
 
 /**
- * This class defines an argument passed by value.
- * 
- * @author Matthieu Wipliez
- * 
- * @model extends="Arg"
+ * <!-- begin-user-doc --> This class defines an argument passed by value.<!-- end-user-doc -->
+ *
+ * <p>
+ * The following features are supported:
+ * <ul>
+ *   <li>{@link net.sf.orcc.ir.ArgByVal#getValue <em>Value</em>}</li>
+ * </ul>
+ * </p>
+ *
+ * @see net.sf.orcc.ir.IrPackage#getArgByVal()
+ * @model
+ * @generated
  */
 public interface ArgByVal extends Arg {
 
 	/**
-	 * Returns the value given to this argument.
-	 * 
-	 * @return the value given to this argument
+	 * Returns the value of the '<em><b>Value</b></em>' containment reference.
+	 * <!-- begin-user-doc --> Returns the value given to this argument.<!-- end-user-doc -->
+	 * @return the value of the '<em>Value</em>' containment reference.
+	 * @see #setValue(Expression)
+	 * @see net.sf.orcc.ir.IrPackage#getArgByVal_Value()
 	 * @model containment="true"
+	 * @generated
 	 */
 	Expression getValue();
 
 	/**
-	 * Sets the value given to this argument.
-	 * 
-	 * @param value
-	 *            the value given to this argument
+	 * Sets the value of the '{@link net.sf.orcc.ir.ArgByVal#getValue <em>Value</em>}' containment reference.
+	 * <!-- begin-user-doc --> Sets the value given to this argument.<!-- end-user-doc -->
+	 * @param value the new value of the '<em>Value</em>' containment reference.
+	 * @see #getValue()
+	 * @generated
 	 */
 	void setValue(Expression value);
 

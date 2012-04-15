@@ -34,26 +34,42 @@ import net.sf.dftools.graph.Vertex;
 import org.eclipse.emf.common.util.EList;
 
 /**
- * This interface defines a Control-Flow Graph.
- * 
- * @author Matthieu Wipliez
+ * <!-- begin-user-doc -->This interface defines a Control-Flow Graph.<!--
+ * end-user-doc -->
+ *
+ * <p>
+ * The following features are supported:
+ * <ul>
+ *   <li>{@link net.sf.orcc.ir.Cfg#getEntry <em>Entry</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.Cfg#getExit <em>Exit</em>}</li>
+ * </ul>
+ * </p>
+ *
+ * @see net.sf.orcc.ir.IrPackage#getCfg()
  * @model
+ * @generated
  */
 public interface Cfg extends Graph {
 
 	/**
-	 * Returns the entry node of this CFG.
-	 * 
-	 * @return the entry node of this CFG
+	 * Returns the value of the '<em><b>Entry</b></em>' reference.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Entry</em>' reference.
+	 * @see #setEntry(CfgNode)
+	 * @see net.sf.orcc.ir.IrPackage#getCfg_Entry()
 	 * @model
+	 * @generated
 	 */
 	CfgNode getEntry();
 
 	/**
-	 * Returns the exit node of this CFG.
-	 * 
-	 * @return the exit node of this CFG
+	 * Returns the value of the '<em><b>Exit</b></em>' reference.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Exit</em>' reference.
+	 * @see #setExit(CfgNode)
+	 * @see net.sf.orcc.ir.IrPackage#getCfg_Exit()
 	 * @model
+	 * @generated
 	 */
 	CfgNode getExit();
 
@@ -91,19 +107,21 @@ public interface Cfg extends Graph {
 	boolean isLoop(CfgNode node);
 
 	/**
-	 * Sets the entry node of this CFG.
-	 * 
-	 * @param entry
-	 *            the new entry node
+	 * Sets the value of the '{@link net.sf.orcc.ir.Cfg#getEntry <em>Entry</em>}' reference.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @param value the new value of the '<em>Entry</em>' reference.
+	 * @see #getEntry()
+	 * @generated
 	 */
-	void setEntry(CfgNode entry);
+	void setEntry(CfgNode value);
 
 	/**
-	 * Sets the exit node of this CFG.
-	 * 
-	 * @param exit
-	 *            the new exit node
+	 * Sets the value of the '{@link net.sf.orcc.ir.Cfg#getExit <em>Exit</em>}' reference.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @param value the new value of the '<em>Exit</em>' reference.
+	 * @see #getExit()
+	 * @generated
 	 */
-	void setExit(CfgNode exit);
+	void setExit(CfgNode value);
 
 }

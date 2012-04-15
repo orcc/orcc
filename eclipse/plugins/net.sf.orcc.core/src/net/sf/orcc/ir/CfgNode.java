@@ -33,27 +33,42 @@ package net.sf.orcc.ir;
 import net.sf.dftools.graph.Vertex;
 
 /**
- * This class defines a node of a CFG graph. In addition to a vertex, a CFG node
- * can be associated to a Node of a procedure (NodeBlock, NodeIf, NodeWhile).
- * 
+ * <!-- begin-user-doc -->This class defines a node of a CFG graph. In addition
+ * to a vertex, a CFG node can be associated to a Block of a procedure.<!-- end-user-doc -->
+ *
+ * <p>
+ * The following features are supported:
+ * <ul>
+ *   <li>{@link net.sf.orcc.ir.CfgNode#getNode <em>Node</em>}</li>
+ * </ul>
+ * </p>
+ *
+ * @see net.sf.orcc.ir.IrPackage#getCfgNode()
  * @model
+ * @generated
  */
 public interface CfgNode extends Vertex {
 
 	/**
-	 * Returns the Node associated with this CFG node.
-	 * 
-	 * @return the Node associated with this CFG node
-	 * @model
+	 * Returns the value of the '<em><b>Node</b></em>' reference.
+	 * It is bidirectional and its opposite is '{@link net.sf.orcc.ir.Block#getCfgNode <em>Cfg Node</em>}'.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @return the value of the '<em>Node</em>' reference.
+	 * @see #setNode(Block)
+	 * @see net.sf.orcc.ir.IrPackage#getCfgNode_Node()
+	 * @see net.sf.orcc.ir.Block#getCfgNode
+	 * @model opposite="cfgNode"
+	 * @generated
 	 */
 	Block getNode();
 
 	/**
-	 * Sets the Node associated with this CFG node.
-	 * 
-	 * @param node
-	 *            the Node to associate with this CFG node
+	 * Sets the value of the '{@link net.sf.orcc.ir.CfgNode#getNode <em>Node</em>}' reference.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @param value the new value of the '<em>Node</em>' reference.
+	 * @see #getNode()
+	 * @generated
 	 */
-	void setNode(Block node);
+	void setNode(Block value);
 
 }
