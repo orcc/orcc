@@ -110,7 +110,7 @@ public class NetworkFlattener extends DfSwitch<Void> {
 						edge.getSource(), connection.getSourcePort(),
 						outgoingEdge.getTarget(),
 						outgoingConnection.getTargetPort(),
-						connection.getAttributes());
+						EcoreUtil.copyAll(connection.getAttributes()));
 				network.getConnections().add(incoming);
 			}
 		}
@@ -136,7 +136,8 @@ public class NetworkFlattener extends DfSwitch<Void> {
 				Connection incoming = DfFactory.eINSTANCE.createConnection(
 						incomingEdge.getSource(),
 						incomingConnection.getSourcePort(), edge.getTarget(),
-						connection.getTargetPort(), connection.getAttributes());
+						connection.getTargetPort(),
+						EcoreUtil.copyAll(connection.getAttributes()));
 				network.getConnections().add(incoming);
 			}
 		}

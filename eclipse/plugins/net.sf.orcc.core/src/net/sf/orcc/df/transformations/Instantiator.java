@@ -28,7 +28,9 @@
  */
 package net.sf.orcc.df.transformations;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -56,10 +58,6 @@ public class Instantiator extends DfSwitch<Network> {
 
 	static String BUFFER_SIZE = Connection.BUFFER_SIZE;
 
-	private Copier copier;
-
-	private Map<Instance, Network> map;
-
 	private int defaultFifoSize;
 
 	/**
@@ -79,57 +77,65 @@ public class Instantiator extends DfSwitch<Network> {
 	 */
 	public Instantiator(int defaultFifoSize) {
 		this.defaultFifoSize = defaultFifoSize;
-		copier = new Copier();
-		map = new HashMap<Instance, Network>();
 	}
 
 	@Override
 	public Network caseNetwork(Network network) {
-		Network networkCopy = (Network) copier.copy(network);
+		Copier copier = new Copier();
 
 		// copy instances to entities/instances
 		Map<Instance, Network> instMap = new HashMap<Instance, Network>();
-		for (Instance instance : network.getInstances()) {
+		List<Instance> instances = new ArrayList<Instance>(
+				network.getInstances());
+		for (Instance instance : instances) {
 			EObject entity = instance.getEntity();
 			if (entity instanceof Actor) {
 
 			} else if (entity instanceof Network) {
-				Network subNetwork = (Network) entity;
-				map.put(instance, doSwitch(subNetwork));
+				// copy sub network
+				Network subNetwork = (Network) copier.copy(entity);
+				copier.copyReferences();
+				
+				// instantiate sub network
+				doSwitch(subNetwork);
+
+				instMap.put(instance, subNetwork);
 			}
 		}
 
 		for (Entry<Instance, Network> entry : instMap.entrySet()) {
 			Instance instance = entry.getKey();
 			Network instantiatedNetwork = entry.getValue();
-			networkCopy.add(instantiatedNetwork);
+			network.add(instantiatedNetwork);
 
-			for (Edge edge : instance.getIncoming()) {
+			List<Edge> incoming = new ArrayList<Edge>(instance.getIncoming());
+			for (Edge edge : incoming) {
 				edge.setTarget(instantiatedNetwork);
 				Connection connection = (Connection) edge;
 				connection.setTargetPort((Port) copier.get(connection
 						.getTargetPort()));
 			}
 
-			for (Edge edge : instance.getOutgoing()) {
+			List<Edge> outgoing = new ArrayList<Edge>(instance.getOutgoing());
+			for (Edge edge : outgoing) {
 				edge.setSource(instantiatedNetwork);
 				Connection connection = (Connection) edge;
 				connection.setSourcePort((Port) copier.get(connection
 						.getSourcePort()));
 			}
 
-			networkCopy.remove(instance);
+			network.remove(instance);
 		}
 
 		// update FIFO size
-		for (Connection connection : networkCopy.getConnections()) {
+		for (Connection connection : network.getConnections()) {
 			if (connection.getAttribute(BUFFER_SIZE) == null
 					&& defaultFifoSize != 0) {
 				connection.setAttribute(BUFFER_SIZE, defaultFifoSize);
 			}
 		}
 
-		return networkCopy;
+		return network;
 	}
 
 }
