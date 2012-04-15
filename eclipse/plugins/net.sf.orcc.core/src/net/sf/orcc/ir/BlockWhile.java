@@ -31,11 +31,11 @@ package net.sf.orcc.ir;
 import org.eclipse.emf.common.util.EList;
 
 /**
- * This class defines a While node. A while node is a node with a value used in
- * its condition.
+ * This class defines a While block. A while block is a block with a value used
+ * in its condition.
  * 
  * @author Matthieu Wipliez
- * @model extends="net.sf.orcc.ir.Node"
+ * @model
  * 
  */
 public interface BlockWhile extends Block {

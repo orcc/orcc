@@ -214,6 +214,10 @@ public class DfSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseGraph(fsm);
 			if (result == null)
+				result = caseVertex(fsm);
+			if (result == null)
+				result = caseAttributable(fsm);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}

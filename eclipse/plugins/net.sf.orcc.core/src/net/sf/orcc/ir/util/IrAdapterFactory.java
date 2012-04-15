@@ -292,13 +292,13 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 		}
 
 		@Override
-		public Adapter caseGraph(Graph object) {
-			return createGraphAdapter();
+		public Adapter caseVertex(Vertex object) {
+			return createVertexAdapter();
 		}
 
 		@Override
-		public Adapter caseVertex(Vertex object) {
-			return createVertexAdapter();
+		public Adapter caseGraph(Graph object) {
+			return createGraphAdapter();
 		}
 
 		@Override

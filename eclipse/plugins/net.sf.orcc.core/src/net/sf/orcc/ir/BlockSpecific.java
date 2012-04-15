@@ -7,11 +7,10 @@
 package net.sf.orcc.ir;
 
 /**
- * This interface defines a node that is specific to a given back-end
- *
- *
+ * This interface defines a block that is specific to a given back-end.
+ * 
  * @author Jérôme Gorin
- * @model abstract="true" extends="net.sf.orcc.ir.Node"
+ * @model abstract="true"
  */
 public interface BlockSpecific extends Block {
 
@@ -21,4 +20,5 @@ public interface BlockSpecific extends Block {
 	 * @return <code>true</code> if the instruction is a backend specific node
 	 */
 	public boolean isNodeSpecific();
+
 }

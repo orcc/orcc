@@ -32,7 +32,7 @@ package net.sf.orcc.ir;
  * This interface defines an instruction that is specific to a given back-end.
  * 
  * @author Matthieu Wipliez
- * @model abstract="true" extends="net.sf.orcc.ir.Instruction"
+ * @model abstract="true"
  */
 public interface InstSpecific extends Instruction {
 

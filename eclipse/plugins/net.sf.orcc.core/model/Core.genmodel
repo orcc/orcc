@@ -79,9 +79,7 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Pattern/variables"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Df.ecore#//Pattern/varToPortMap"/>
     </genClasses>
-    <genClasses ecoreClass="Df.ecore#//State">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//State/name"/>
-    </genClasses>
+    <genClasses ecoreClass="Df.ecore#//State"/>
     <genClasses ecoreClass="Df.ecore#//Tag">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Df.ecore#//Tag/identifiers"/>
     </genClasses>
@@ -149,25 +147,26 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Param/variable"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Param/byRef"/>
     </genClasses>
-    <genClasses image="false" ecoreClass="Ir.ecore#//Node">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Node/cfgNode"/>
+    <genClasses image="false" ecoreClass="Ir.ecore#//Block">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Block/cfgNode"/>
     </genClasses>
-    <genClasses ecoreClass="Ir.ecore#//NodeBlock">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//NodeBlock/instructions"/>
+    <genClasses ecoreClass="Ir.ecore#//BlockBasic">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//BlockBasic/instructions"/>
     </genClasses>
-    <genClasses ecoreClass="Ir.ecore#//NodeIf">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//NodeIf/condition"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//NodeIf/elseNodes"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//NodeIf/joinNode"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//NodeIf/lineNumber"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//NodeIf/thenNodes"/>
+    <genClasses ecoreClass="Ir.ecore#//BlockIf">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//BlockIf/condition"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//BlockIf/elseNodes"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//BlockIf/joinNode"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//BlockIf/lineNumber"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//BlockIf/thenNodes"/>
     </genClasses>
-    <genClasses ecoreClass="Ir.ecore#//NodeWhile">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//NodeWhile/condition"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//NodeWhile/joinNode"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//NodeWhile/lineNumber"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//NodeWhile/nodes"/>
+    <genClasses ecoreClass="Ir.ecore#//BlockWhile">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//BlockWhile/condition"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//BlockWhile/joinNode"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//BlockWhile/lineNumber"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//BlockWhile/nodes"/>
     </genClasses>
+    <genClasses image="false" ecoreClass="Ir.ecore#//BlockSpecific"/>
     <genClasses image="false" ecoreClass="Ir.ecore#//Instruction">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Instruction/lineNumber"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Instruction/predicate"/>
@@ -276,7 +275,6 @@
     <genClasses ecoreClass="Ir.ecore#//Predicate">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Predicate/expressions"/>
     </genClasses>
-    <genClasses image="false" ecoreClass="Ir.ecore#//NodeSpecific"/>
     <genClasses ecoreClass="Ir.ecore#//Cfg">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Cfg/entry"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Cfg/exit"/>

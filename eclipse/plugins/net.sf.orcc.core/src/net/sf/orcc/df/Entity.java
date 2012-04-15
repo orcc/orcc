@@ -66,7 +66,7 @@ public interface Entity extends Vertex {
 	 * Returns the qualified name of this vertex.
 	 * 
 	 * @return the qualified name of this vertex
-	 * @model
+	 * @model derived="true" transient="true" volatile="true"
 	 */
 	String getName();
 

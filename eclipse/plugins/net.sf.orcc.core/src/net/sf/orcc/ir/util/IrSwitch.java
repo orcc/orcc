@@ -1154,6 +1154,10 @@ public class IrSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseGraph(cfg);
 			if (result == null)
+				result = caseVertex(cfg);
+			if (result == null)
+				result = caseAttributable(cfg);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}

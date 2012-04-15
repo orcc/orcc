@@ -43,7 +43,7 @@ public interface Port extends Vertex {
 	 * Returns the name of this port.
 	 * 
 	 * @return the name of this port
-	 * @model
+	 * @model derived="true" transient="true" volatile="true"
 	 */
 	String getName();
 

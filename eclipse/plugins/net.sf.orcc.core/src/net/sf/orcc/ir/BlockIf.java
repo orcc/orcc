@@ -31,11 +31,11 @@ package net.sf.orcc.ir;
 import org.eclipse.emf.common.util.EList;
 
 /**
- * This class defines an If node. An if node is a node with a value used in its
+ * This class defines an If block. An if block is a block with a value used in its
  * condition.
  * 
  * @author Matthieu Wipliez
- * @model extends="net.sf.orcc.ir.Node"
+ * @model
  * 
  */
 public interface BlockIf extends Block {

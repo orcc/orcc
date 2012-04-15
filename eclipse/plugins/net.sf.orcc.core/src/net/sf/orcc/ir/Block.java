@@ -40,34 +40,12 @@ import net.sf.dftools.graph.Edge;
 public interface Block extends Attributable {
 
 	/**
-	 * Returns the value of the '<em><b>Cfg Node</b></em>' reference.
-	 * It is bidirectional and its opposite is '{@link net.sf.orcc.ir.CfgNode#getNode <em>Node</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Cfg Node</em>' reference isn't clear, there
-	 * really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Cfg Node</em>' reference.
-	 * @see #setCfgNode(CfgNode)
-	 * @see net.sf.orcc.ir.IrPackage#getBlock_CfgNode()
-	 * @see net.sf.orcc.ir.CfgNode#getNode
+	 * Returns the CFG node associated with this block.
+	 * 
 	 * @model opposite="node"
 	 * @generated
 	 */
 	CfgNode getCfgNode();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Block#getCfgNode
-	 * <em>Cfg Node</em>}' reference. <!-- begin-user-doc --> <!-- end-user-doc
-	 * -->
-	 * 
-	 * @param value
-	 *            the new value of the '<em>Cfg Node</em>' reference.
-	 * @see #getCfgNode()
-	 * @generated
-	 */
-	void setCfgNode(CfgNode value);
 
 	/**
 	 * Returns the first outgoing edge whose flag is false.
@@ -89,6 +67,27 @@ public interface Block extends Attributable {
 	 * @return the procedure this node belongs to
 	 */
 	public Procedure getProcedure();
+
+	/**
+	 * Returns <code>true</code> if this node is a BlockBasic.
+	 * 
+	 * @return <code>true</code> if this node is a BlockBasic
+	 */
+	boolean isBlockBasic();
+
+	/**
+	 * Returns <code>true</code> if this node is an BlockIf.
+	 * 
+	 * @return <code>true</code> if this node is an BlockIf
+	 */
+	boolean isBlockIf();
+
+	/**
+	 * Returns <code>true</code> if this node is a BlockWhile.
+	 * 
+	 * @return <code>true</code> if this node is a BlockWhile
+	 */
+	boolean isBlockWhile();
 
 	/**
 	 * Returns <code>true</code> if this node is a NodeBlock.
@@ -113,26 +112,17 @@ public interface Block extends Attributable {
 	 */
 	@Deprecated
 	boolean isNodeWhile();
-	
-	/**
-	 * Returns <code>true</code> if this node is a BlockBasic.
-	 * 
-	 * @return <code>true</code> if this node is a BlockBasic
-	 */
-	boolean isBlockBasic();
 
 	/**
-	 * Returns <code>true</code> if this node is an BlockIf.
+	 * Sets the value of the '{@link net.sf.orcc.ir.Block#getCfgNode
+	 * <em>Cfg Node</em>}' reference. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
 	 * 
-	 * @return <code>true</code> if this node is an BlockIf
+	 * @param value
+	 *            the new value of the '<em>Cfg Node</em>' reference.
+	 * @see #getCfgNode()
+	 * @generated
 	 */
-	boolean isBlockIf();
-
-	/**
-	 * Returns <code>true</code> if this node is a BlockWhile.
-	 * 
-	 * @return <code>true</code> if this node is a BlockWhile
-	 */
-	boolean isBlockWhile();
+	void setCfgNode(CfgNode value);
 
 }

@@ -34,11 +34,10 @@ import java.util.ListIterator;
 import org.eclipse.emf.common.util.EList;
 
 /**
- * This class defines a Block node. A block node is a node that contains
- * instructions.
+ * This class defines a basic block. A basic block only contains instructions.
  * 
  * @author Matthieu Wipliez
- * @model extends="net.sf.orcc.ir.Node"
+ * @model
  * 
  */
 public interface BlockBasic extends Block {

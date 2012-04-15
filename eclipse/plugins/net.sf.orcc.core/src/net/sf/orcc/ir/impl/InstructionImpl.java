@@ -230,7 +230,7 @@ public abstract class InstructionImpl extends AttributableImpl implements
 	public boolean isStore() {
 		return false;
 	}
-	
+
 	@Override
 	public boolean isInstAssign() {
 		return false;

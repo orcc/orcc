@@ -300,7 +300,7 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 			eNotify(new ENotificationImpl(this, Notification.SET,
 					IrPackage.INST_CALL__TARGET, newTarget, newTarget));
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
