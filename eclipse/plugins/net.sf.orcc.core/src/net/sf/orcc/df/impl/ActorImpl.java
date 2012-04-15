@@ -67,6 +67,52 @@ import org.eclipse.emf.ecore.util.InternalEList;
  */
 public class ActorImpl extends AttributableImpl implements Actor {
 	/**
+	 * The default value of the '{@link #getFileName() <em>File Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getFileName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String FILE_NAME_EDEFAULT = null;
+
+	/**
+	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getLineNumber()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final int LINE_NUMBER_EDEFAULT = 0;
+	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
+
+	/**
+	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #isNative()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean NATIVE_EDEFAULT = false;
+
+	/**
+	 * The default value of the '{@link #getTemplateData() <em>Template Data</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getTemplateData()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final Object TEMPLATE_DATA_EDEFAULT = null;
+
+	/**
 	 * The cached value of the '{@link #getActions() <em>Actions</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getActions()
@@ -84,16 +130,6 @@ public class ActorImpl extends AttributableImpl implements Actor {
 	 * @ordered
 	 */
 	protected EList<Action> actionsOutsideFsm;
-	private Map<String, Var> mapStateVars;
-
-	/**
-	 * The default value of the '{@link #getFileName() <em>File Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getFileName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String FILE_NAME_EDEFAULT = null;
 
 	/**
 	 * The cached value of the '{@link #getFileName() <em>File Name</em>}' attribute.
@@ -133,15 +169,6 @@ public class ActorImpl extends AttributableImpl implements Actor {
 	protected EList<Port> inputs;
 
 	/**
-	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getLineNumber()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final int LINE_NUMBER_EDEFAULT = 0;
-
-	/**
 	 * The cached value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getLineNumber()
@@ -149,6 +176,8 @@ public class ActorImpl extends AttributableImpl implements Actor {
 	 * @ordered
 	 */
 	protected int lineNumber = LINE_NUMBER_EDEFAULT;
+
+	private Map<String, Var> mapStateVars;
 
 	/**
 	 * The cached value of the '{@link #getMoC() <em>Mo C</em>}' containment reference.
@@ -160,13 +189,14 @@ public class ActorImpl extends AttributableImpl implements Actor {
 	protected MoC moC;
 
 	/**
-	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isNative()
+	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final boolean NATIVE_EDEFAULT = false;
+	protected String name = NAME_EDEFAULT;
 
 	/**
 	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
@@ -176,16 +206,6 @@ public class ActorImpl extends AttributableImpl implements Actor {
 	 * @ordered
 	 */
 	protected boolean native_ = NATIVE_EDEFAULT;
-
-	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String NAME_EDEFAULT = null;
 
 	/**
 	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' containment reference list.
@@ -224,16 +244,6 @@ public class ActorImpl extends AttributableImpl implements Actor {
 	 * @ordered
 	 */
 	protected EList<Var> stateVars;
-
-	/**
-	 * The default value of the '{@link #getTemplateData() <em>Template Data</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getTemplateData()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final Object TEMPLATE_DATA_EDEFAULT = null;
 
 	/**
 	 * The cached value of the '{@link #getTemplateData() <em>Template Data</em>}' attribute.
@@ -395,8 +405,8 @@ public class ActorImpl extends AttributableImpl implements Actor {
 		case DfPackage.ACTOR__NATIVE:
 			return native_ != NATIVE_EDEFAULT;
 		case DfPackage.ACTOR__NAME:
-			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT
-					.equals(getName());
+			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
+					.equals(name);
 		case DfPackage.ACTOR__OUTPUTS:
 			return outputs != null && !outputs.isEmpty();
 		case DfPackage.ACTOR__PARAMETERS:
@@ -610,6 +620,30 @@ public class ActorImpl extends AttributableImpl implements Actor {
 		return initializes;
 	}
 
+	@Override
+	public Port getInput(String name) {
+		List<Port> inputs = EcoreHelper.getList(this, "inputs");
+		for (Port port : inputs) {
+			if (port.getName().equals(name)) {
+				return port;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Port> getInputs() {
+		if (inputs == null) {
+			inputs = new EObjectContainmentEList<Port>(Port.class, this,
+					DfPackage.ACTOR__INPUTS);
+		}
+		return inputs;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -626,6 +660,67 @@ public class ActorImpl extends AttributableImpl implements Actor {
 	@Override
 	public MoC getMoC() {
 		return moC;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public Port getOutput(String name) {
+		List<Port> outputs = EcoreHelper.getList(this, "outputs");
+		for (Port port : outputs) {
+			if (port.getName().equals(name)) {
+				return port;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Port> getOutputs() {
+		if (outputs == null) {
+			outputs = new EObjectContainmentEList<Port>(Port.class, this,
+					DfPackage.ACTOR__OUTPUTS);
+		}
+		return outputs;
+	}
+
+	@Override
+	public String getPackage() {
+		return DfUtil.getPackage(getName());
+	}
+
+	@Override
+	public Var getParameter(String name) {
+		for (Var var : getParameters()) {
+			if (var.getName().equals(name)) {
+				return var;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Var> getParameters() {
+		if (parameters == null) {
+			parameters = new EObjectContainmentEList<Var>(Var.class, this,
+					DfPackage.ACTOR__PARAMETERS);
+		}
+		return parameters;
 	}
 
 	@Override
@@ -695,20 +790,6 @@ public class ActorImpl extends AttributableImpl implements Actor {
 	 */
 	public Object getTemplateData() {
 		return templateData;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setTemplateData(Object newTemplateData) {
-		Object oldTemplateData = templateData;
-		templateData = newTemplateData;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.ACTOR__TEMPLATE_DATA, oldTemplateData,
-					templateData));
 	}
 
 	@Override
@@ -794,82 +875,6 @@ public class ActorImpl extends AttributableImpl implements Actor {
 					DfPackage.ACTOR__LINE_NUMBER, oldLineNumber, lineNumber));
 	}
 
-	@Override
-	public Port getInput(String name) {
-		List<Port> inputs = EcoreHelper.getList(this, "inputs");
-		for (Port port : inputs) {
-			if (port.getName().equals(name)) {
-				return port;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Port> getInputs() {
-		if (inputs == null) {
-			inputs = new EObjectContainmentEList<Port>(Port.class, this,
-					DfPackage.ACTOR__INPUTS);
-		}
-		return inputs;
-	}
-
-	@Override
-	public Port getOutput(String name) {
-		List<Port> outputs = EcoreHelper.getList(this, "outputs");
-		for (Port port : outputs) {
-			if (port.getName().equals(name)) {
-				return port;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Port> getOutputs() {
-		if (outputs == null) {
-			outputs = new EObjectContainmentEList<Port>(Port.class, this,
-					DfPackage.ACTOR__OUTPUTS);
-		}
-		return outputs;
-	}
-
-	@Override
-	public Var getParameter(String name) {
-		for (Var var : getParameters()) {
-			if (var.getName().equals(name)) {
-				return var;
-			}
-		}
-		return null;
-	}
-
-	@Override
-	public String getPackage() {
-		return DfUtil.getPackage(getName());
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Var> getParameters() {
-		if (parameters == null) {
-			parameters = new EObjectContainmentEList<Var>(Var.class, this,
-					DfPackage.ACTOR__PARAMETERS);
-		}
-		return parameters;
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -895,6 +900,19 @@ public class ActorImpl extends AttributableImpl implements Actor {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setName(String newName) {
+		String oldName = name;
+		name = newName;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.ACTOR__NAME, oldName, name));
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -912,21 +930,13 @@ public class ActorImpl extends AttributableImpl implements Actor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public String getName() {
-		// TODO: implement this method to return the 'Name' attribute
-		// Ensure that you remove @generated or mark it @generated NOT
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setName(String newName) {
-		// TODO: implement this method to set the 'Name' attribute
-		// Ensure that you remove @generated or mark it @generated NOT
-		throw new UnsupportedOperationException();
+	public void setTemplateData(Object newTemplateData) {
+		Object oldTemplateData = templateData;
+		templateData = newTemplateData;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.ACTOR__TEMPLATE_DATA, oldTemplateData,
+					templateData));
 	}
 
 	/**
@@ -945,6 +955,8 @@ public class ActorImpl extends AttributableImpl implements Actor {
 		result.append(lineNumber);
 		result.append(", native: ");
 		result.append(native_);
+		result.append(", name: ");
+		result.append(name);
 		result.append(", templateData: ");
 		result.append(templateData);
 		result.append(')');

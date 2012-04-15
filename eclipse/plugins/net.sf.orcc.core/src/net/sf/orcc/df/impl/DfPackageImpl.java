@@ -1202,8 +1202,8 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
 		initEAttribute(getActor_Name(), ecorePackage.getEString(), "name",
-				null, 0, 1, Actor.class, IS_TRANSIENT, IS_VOLATILE,
-				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED,
+				null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
 		initEReference(getActor_Outputs(), this.getPort(), null, "outputs",
 				null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE,

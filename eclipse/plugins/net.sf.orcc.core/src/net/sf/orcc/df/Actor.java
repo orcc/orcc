@@ -182,6 +182,22 @@ public interface Actor extends Attributable {
 	MoC getMoC();
 
 	/**
+	 * Returns the value of the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Name</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Name</em>' attribute.
+	 * @see #setName(String)
+	 * @see net.sf.orcc.df.DfPackage#getActor_Name()
+	 * @model
+	 * @generated
+	 */
+	String getName();
+
+	/**
 	 * Returns the output port whose name matches the given name.
 	 * 
 	 * @param name
@@ -302,16 +318,6 @@ public interface Actor extends Attributable {
 	Object getTemplateData();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.df.Actor#getTemplateData <em>Template Data</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Template Data</em>' attribute.
-	 * @see #getTemplateData()
-	 * @generated
-	 */
-	void setTemplateData(Object value);
-
-	/**
 	 * Returns true if this actor has an FSM.
 	 * 
 	 * @return true if this actor has an FSM
@@ -384,6 +390,16 @@ public interface Actor extends Attributable {
 	void setMoC(MoC value);
 
 	/**
+	 * Sets the value of the '{@link net.sf.orcc.df.Actor#getName <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Name</em>' attribute.
+	 * @see #getName()
+	 * @generated
+	 */
+	void setName(String value);
+
+	/**
 	 * Sets the value of the '{@link net.sf.orcc.df.Actor#isNative
 	 * <em>Native</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc
 	 * -->
@@ -396,29 +412,13 @@ public interface Actor extends Attributable {
 	void setNative(boolean value);
 
 	/**
-	 * Returns the value of the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Name</em>' attribute isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Name</em>' attribute.
-	 * @see #setName(String)
-	 * @see net.sf.orcc.df.DfPackage#getActor_Name()
-	 * @model transient="true" volatile="true" derived="true"
-	 * @generated
-	 */
-	String getName();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.df.Actor#getName <em>Name</em>}' attribute.
+	 * Sets the value of the '{@link net.sf.orcc.df.Actor#getTemplateData <em>Template Data</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Name</em>' attribute.
-	 * @see #getName()
+	 * @param value the new value of the '<em>Template Data</em>' attribute.
+	 * @see #getTemplateData()
 	 * @generated
 	 */
-	void setName(String value);
+	void setTemplateData(Object value);
 
 }
