@@ -35,7 +35,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 
@@ -211,7 +210,7 @@ public class StandardPrinter extends AbstractPrinter {
 	 *            the entity to generate code for
 	 * @return always <code>false</code>
 	 */
-	public boolean print(String fileName, String path, Entity entity) {
+	public boolean print(String fileName, String path, EObject entity) {
 		String file = path + File.separator + fileName;
 
 		ST template = group.getInstanceOf("printEntity");

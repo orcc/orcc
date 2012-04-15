@@ -55,10 +55,10 @@ import java.util.concurrent.Future;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import net.sf.dftools.graph.Vertex;
 import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.util.OrccUtil;
@@ -308,37 +308,39 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				inputPath = inputPath.substring(9, inputPath.indexOf('!'));
 
 				JarFile jar = new JarFile(inputPath);
-
-				Enumeration<JarEntry> jarEntries = jar.entries();
-				if (jarEntries == null) {
-					write("Unable to list content from " + jar.getName()
-							+ " file.\n");
-					return false;
-				}
-
-				// "source" value without starting '/' char
-				String sourceMinusSlash = source.substring(1);
-
-				JarEntry elt;
-				while (jarEntries.hasMoreElements()) {
-
-					elt = jarEntries.nextElement();
-
-					// Only deal with sub-files of 'source' path
-					if (elt.isDirectory()
-							|| !elt.getName().startsWith(sourceMinusSlash)) {
-						continue;
+				try {
+					Enumeration<JarEntry> jarEntries = jar.entries();
+					if (jarEntries == null) {
+						write("Unable to list content from " + jar.getName()
+								+ " file.\n");
+						return false;
 					}
 
-					String newInPath = "/" + elt.getName();
-					String newOutPath = outputDir
-							+ File.separator
-							+ elt.getName()
-									.substring(sourceMinusSlash.length());
-					result &= copyFileToFilesystem(newInPath, newOutPath);
-				}
-				return result;
+					// "source" value without starting '/' char
+					String sourceMinusSlash = source.substring(1);
 
+					JarEntry elt;
+					while (jarEntries.hasMoreElements()) {
+
+						elt = jarEntries.nextElement();
+
+						// Only deal with sub-files of 'source' path
+						if (elt.isDirectory()
+								|| !elt.getName().startsWith(sourceMinusSlash)) {
+							continue;
+						}
+
+						String newInPath = "/" + elt.getName();
+						String newOutPath = outputDir
+								+ File.separator
+								+ elt.getName().substring(
+										sourceMinusSlash.length());
+						result &= copyFileToFilesystem(newInPath, newOutPath);
+					}
+					return result;
+				} finally {
+					jar.close();
+				}
 			} else {
 				// Backend running from filesystem
 				File[] listDir = new File(inputPath.substring(5)).listFiles();
@@ -664,7 +666,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		// creates a list of tasks: each task will print an actor when called
 		List<Callable<Boolean>> tasks = new ArrayList<Callable<Boolean>>();
-		for (final Entity entity : network.getEntities()) {
+		for (final Vertex entity : network.getEntities()) {
 			tasks.add(new Callable<Boolean>() {
 
 				@Override
@@ -700,7 +702,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 *            the entity
 	 * @return <code>true</code> if the actor was cached
 	 */
-	protected boolean printEntity(Entity entity) throws OrccException {
+	protected boolean printEntity(Vertex entity) throws OrccException {
 		return false;
 	}
 

@@ -17,7 +17,6 @@ import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.util.DfSwitch;
@@ -219,7 +218,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	@Override
 	public Design caseNetwork(Network network) {
 		design = factory.createDesign();
-		for (Entity entity : network.getEntities()) {
+		for (Vertex entity : network.getEntities()) {
 			doSwitch(entity);
 		}
 		for (Instance instance : network.getInstances()) {

@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.dftools.graph.Vertex;
-import net.sf.orcc.df.Entity;
+import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 
@@ -65,8 +65,8 @@ public class Mapping {
 			map(instance.getHierarchicalName(), instance);
 		}
 		if (mapBroadcast) {
-			for (Entity entity : network.getEntities()) {
-				if (entity.isBroadcast()) {
+			for (Vertex entity : network.getEntities()) {
+				if (entity instanceof Broadcast) {
 					// Broadcasts are mapped with their source
 					String srcName = ((Instance) entity.getPredecessors()
 							.get(0)).getHierarchicalName();
