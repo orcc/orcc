@@ -33,11 +33,14 @@ import java.util.List;
 
 import net.sf.dftools.graph.Edge;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
@@ -86,20 +89,7 @@ public class Instantiator extends DfSwitch<Network> {
 			if (entity instanceof Actor) {
 
 			} else if (entity instanceof Network) {
-				// copy sub network
-				Copier copier = new Copier();
-				Network subNetwork = (Network) copier.copy(entity);
-				copier.copyReferences();
-
-				// instantiate sub network
-				doSwitch(subNetwork);
-
-				// replace connections of instance
-				network.add(subNetwork);
-				connect(copier, instance, subNetwork);
-
-				// remove instance
-				network.remove(instance);
+				instantiate(network, instance, entity);
 			}
 		}
 
@@ -130,6 +120,33 @@ public class Instantiator extends DfSwitch<Network> {
 			Connection connection = (Connection) edge;
 			connection.setSourcePort((Port) copier.get(connection
 					.getSourcePort()));
+		}
+	}
+
+	private void instantiate(Network network, Instance instance, EObject entity) {
+		// copy sub network
+		Copier copier = new Copier();
+		Network subNetwork = (Network) copier.copy(entity);
+		copier.copyReferences();
+
+		// instantiate sub network
+		doSwitch(subNetwork);
+
+		// rename sub network
+		subNetwork.setName(instance.getName());
+
+		// replace connections of instance
+		network.add(subNetwork);
+		connect(copier, instance, subNetwork);
+
+		// remove instance
+		network.remove(instance);
+
+		// assigns arguments' values to network's variables
+		for (Argument argument : instance.getArguments()) {
+			Var var = (Var) copier.get(argument.getVariable());
+			Expression value = argument.getValue();
+			var.setInitialValue(value);
 		}
 	}
 
