@@ -779,7 +779,7 @@ public class NetworkImpl extends GraphImpl implements Network {
 	@Override
 	public void remove(Instance instance) {
 		getInstances().remove(instance);
-		remove(instance);
+		remove((Vertex) instance);
 	}
 
 	@Override
