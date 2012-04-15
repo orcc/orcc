@@ -44,7 +44,7 @@ import javax.swing.JFrame;
  * @author Matthieu Wipliez
  * 
  */
-public class DisplayYUV {
+public class Display {
 
 	private static BufferStrategy buffer;
 
