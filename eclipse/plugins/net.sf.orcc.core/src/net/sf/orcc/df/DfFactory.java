@@ -17,6 +17,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.ecore.EFactory;
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * <!-- begin-user-doc --> The <b>Factory</b> for the model. It provides a
@@ -212,7 +213,7 @@ public interface DfFactory extends EFactory {
 	 */
 	EntitySpecific createEntitySpecific();
 
-	Instance createInstance(String id, Entity entity);
+	Instance createInstance(String id, EObject entity);
 
 	/**
 	 * Returns a new object of class '<em>Network</em>'.

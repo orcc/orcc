@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.df;
 
+import net.sf.dftools.util.Attributable;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
@@ -52,9 +53,12 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link net.sf.orcc.df.Actor#getLineNumber <em>Line Number</em>}</li>
  *   <li>{@link net.sf.orcc.df.Actor#getMoC <em>Mo C</em>}</li>
  *   <li>{@link net.sf.orcc.df.Actor#isNative <em>Native</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Actor#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.df.Actor#getOutputs <em>Outputs</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Actor#getParameters <em>Parameters</em>}</li>
  *   <li>{@link net.sf.orcc.df.Actor#getProcs <em>Procs</em>}</li>
  *   <li>{@link net.sf.orcc.df.Actor#getStateVars <em>State Vars</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Actor#getTemplateData <em>Template Data</em>}</li>
  * </ul>
  * </p>
  *
@@ -62,7 +66,7 @@ import org.eclipse.emf.common.util.EList;
  * @model
  * @generated
  */
-public interface Actor extends Entity {
+public interface Actor extends Attributable {
 
 	/**
 	 * Returns the value of the '<em><b>Actions</b></em>' containment reference list.
@@ -130,6 +134,15 @@ public interface Actor extends Entity {
 	EList<Action> getInitializes();
 
 	/**
+	 * Returns the input port whose name matches the given name.
+	 * 
+	 * @param name
+	 *            the port name
+	 * @return an input port whose name matches the given name
+	 */
+	Port getInput(String name);
+
+	/**
 	 * Returns the value of the '<em><b>Inputs</b></em>' containment reference
 	 * list. The list contents are of type {@link net.sf.orcc.df.Port}. <!--
 	 * begin-user-doc -->
@@ -169,6 +182,15 @@ public interface Actor extends Entity {
 	MoC getMoC();
 
 	/**
+	 * Returns the output port whose name matches the given name.
+	 * 
+	 * @param name
+	 *            the port name
+	 * @return an output port whose name matches the given name
+	 */
+	Port getOutput(String name);
+
+	/**
 	 * Returns the value of the '<em><b>Outputs</b></em>' containment reference
 	 * list. The list contents are of type {@link net.sf.orcc.df.Port}. <!--
 	 * begin-user-doc -->
@@ -184,6 +206,42 @@ public interface Actor extends Entity {
 	 * @generated
 	 */
 	EList<Port> getOutputs();
+
+	String getPackage();
+
+	/**
+	 * Returns the parameter with the given name.
+	 * 
+	 * @param name
+	 *            name of a parameter
+	 * @return the parameter with the given name
+	 */
+	Var getParameter(String name);
+
+	/**
+	 * Returns the value of the '<em><b>Parameters</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.ir.Var}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Parameters</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Parameters</em>' containment reference list.
+	 * @see net.sf.orcc.df.DfPackage#getActor_Parameters()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Var> getParameters();
+
+	/**
+	 * Returns the port whose name matches the given name.
+	 * 
+	 * @param name
+	 *            the port name
+	 * @return a port whose name matches the given name
+	 */
+	Port getPort(String name);
 
 	/**
 	 * Returns a procedure of this actor whose name matches the given name.
@@ -205,6 +263,8 @@ public interface Actor extends Entity {
 	 */
 	EList<Procedure> getProcs();
 
+	String getSimpleName();
+
 	/**
 	 * Returns the state variable with the given name.
 	 * 
@@ -224,6 +284,32 @@ public interface Actor extends Entity {
 	 * @generated
 	 */
 	EList<Var> getStateVars();
+
+	/**
+	 * Returns the value of the '<em><b>Template Data</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Template Data</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Template Data</em>' attribute.
+	 * @see #setTemplateData(Object)
+	 * @see net.sf.orcc.df.DfPackage#getActor_TemplateData()
+	 * @model
+	 * @generated
+	 */
+	Object getTemplateData();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.df.Actor#getTemplateData <em>Template Data</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Template Data</em>' attribute.
+	 * @see #getTemplateData()
+	 * @generated
+	 */
+	void setTemplateData(Object value);
 
 	/**
 	 * Returns true if this actor has an FSM.
@@ -308,5 +394,31 @@ public interface Actor extends Entity {
 	 * @generated
 	 */
 	void setNative(boolean value);
+
+	/**
+	 * Returns the value of the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Name</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Name</em>' attribute.
+	 * @see #setName(String)
+	 * @see net.sf.orcc.df.DfPackage#getActor_Name()
+	 * @model transient="true" volatile="true" derived="true"
+	 * @generated
+	 */
+	String getName();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.df.Actor#getName <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Name</em>' attribute.
+	 * @see #getName()
+	 * @generated
+	 */
+	void setName(String value);
 
 }

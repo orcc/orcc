@@ -45,7 +45,6 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -71,6 +70,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -859,7 +859,7 @@ public class XdfParser {
 					+ "must have a valid \"Class\" child.");
 		}
 
-		Entity proxy = null;
+		EObject proxy = null;
 		IProject project = file.getProject();
 		IFile file = OrccUtil.getFile(project, clasz, "ir");
 		if (file == null || !file.exists()) {

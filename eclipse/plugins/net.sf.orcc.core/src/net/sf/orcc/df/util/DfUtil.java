@@ -33,7 +33,6 @@ import java.util.List;
 import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -56,7 +55,7 @@ public class DfUtil {
 	 *            an entity
 	 * @return the list of input ports of the given entity
 	 */
-	public static List<Port> getInputs(Entity entity) {
+	public static List<Port> getInputs(EObject entity) {
 		if (entity instanceof Actor) {
 			return ((Actor) entity).getInputs();
 		} else if (entity instanceof Network) {
@@ -86,7 +85,7 @@ public class DfUtil {
 	 *            an entity
 	 * @return the list of output ports of the given entity
 	 */
-	public static List<Port> getOutputs(Entity entity) {
+	public static List<Port> getOutputs(EObject entity) {
 		if (entity instanceof Actor) {
 			return ((Actor) entity).getOutputs();
 		} else if (entity instanceof Network) {

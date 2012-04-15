@@ -608,60 +608,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__ATTRIBUTES = ENTITY__ATTRIBUTES;
-
-	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference list. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__INCOMING = ENTITY__INCOMING;
-
-	/**
-	 * The feature id for the '<em><b>Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__LABEL = ENTITY__LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Number</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__NUMBER = ENTITY__NUMBER;
-
-	/**
-	 * The feature id for the '<em><b>Outgoing</b></em>' reference list. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__OUTGOING = ENTITY__OUTGOING;
-
-	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__NAME = ENTITY__NAME;
-
-	/**
-	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__PARAMETERS = ENTITY__PARAMETERS;
+	int ACTOR__ATTRIBUTES = UtilPackage.ATTRIBUTABLE__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Actions</b></em>' containment reference list.
@@ -669,7 +616,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__ACTIONS = ENTITY_FEATURE_COUNT + 0;
+	int ACTOR__ACTIONS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Actions Outside Fsm</b></em>' reference list.
@@ -677,7 +624,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__ACTIONS_OUTSIDE_FSM = ENTITY_FEATURE_COUNT + 1;
+	int ACTOR__ACTIONS_OUTSIDE_FSM = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>File Name</b></em>' attribute. <!--
@@ -686,7 +633,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__FILE_NAME = ENTITY_FEATURE_COUNT + 2;
+	int ACTOR__FILE_NAME = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Fsm</b></em>' containment reference. <!--
@@ -695,7 +642,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__FSM = ENTITY_FEATURE_COUNT + 3;
+	int ACTOR__FSM = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Initializes</b></em>' containment reference list.
@@ -703,7 +650,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__INITIALIZES = ENTITY_FEATURE_COUNT + 4;
+	int ACTOR__INITIALIZES = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
@@ -711,7 +658,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__INPUTS = ENTITY_FEATURE_COUNT + 5;
+	int ACTOR__INPUTS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 5;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute. <!--
@@ -720,7 +667,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__LINE_NUMBER = ENTITY_FEATURE_COUNT + 6;
+	int ACTOR__LINE_NUMBER = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 6;
 
 	/**
 	 * The feature id for the '<em><b>Mo C</b></em>' containment reference. <!--
@@ -729,7 +676,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__MO_C = ENTITY_FEATURE_COUNT + 7;
+	int ACTOR__MO_C = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 7;
 
 	/**
 	 * The feature id for the '<em><b>Native</b></em>' attribute. <!--
@@ -738,7 +685,16 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__NATIVE = ENTITY_FEATURE_COUNT + 8;
+	int ACTOR__NATIVE = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 8;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__NAME = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 9;
 
 	/**
 	 * The feature id for the '<em><b>Outputs</b></em>' containment reference list.
@@ -746,7 +702,15 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__OUTPUTS = ENTITY_FEATURE_COUNT + 9;
+	int ACTOR__OUTPUTS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 10;
+
+	/**
+	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__PARAMETERS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 11;
 
 	/**
 	 * The feature id for the '<em><b>Procs</b></em>' containment reference list.
@@ -754,7 +718,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__PROCS = ENTITY_FEATURE_COUNT + 10;
+	int ACTOR__PROCS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 12;
 
 	/**
 	 * The feature id for the '<em><b>State Vars</b></em>' containment reference list.
@@ -762,7 +726,16 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__STATE_VARS = ENTITY_FEATURE_COUNT + 11;
+	int ACTOR__STATE_VARS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 13;
+
+	/**
+	 * The feature id for the '<em><b>Template Data</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__TEMPLATE_DATA = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 14;
 
 	/**
 	 * The number of structural features of the '<em>Actor</em>' class. <!--
@@ -771,7 +744,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR_FEATURE_COUNT = ENTITY_FEATURE_COUNT + 12;
+	int ACTOR_FEATURE_COUNT = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 15;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -1869,6 +1842,17 @@ public interface DfPackage extends EPackage {
 	EReference getActor_StateVars();
 
 	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.Actor#getTemplateData <em>Template Data</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Template Data</em>'.
+	 * @see net.sf.orcc.df.Actor#getTemplateData()
+	 * @see #getActor()
+	 * @generated
+	 */
+	EAttribute getActor_TemplateData();
+
+	/**
 	 * Returns the meta object for the attribute '
 	 * {@link net.sf.orcc.df.Actor#isNative <em>Native</em>}'. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
@@ -1879,6 +1863,17 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getActor_Native();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.Actor#getName <em>Name</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Name</em>'.
+	 * @see net.sf.orcc.df.Actor#getName()
+	 * @see #getActor()
+	 * @generated
+	 */
+	EAttribute getActor_Name();
 
 	/**
 	 * Returns the meta object for the attribute '
@@ -1925,6 +1920,17 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getActor_Outputs();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.df.Actor#getParameters <em>Parameters</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Parameters</em>'.
+	 * @see net.sf.orcc.df.Actor#getParameters()
+	 * @see #getActor()
+	 * @generated
+	 */
+	EReference getActor_Parameters();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.FSM <em>FSM</em>}'.
@@ -2650,11 +2656,27 @@ public interface DfPackage extends EPackage {
 		EReference ACTOR__STATE_VARS = eINSTANCE.getActor_StateVars();
 
 		/**
+		 * The meta object literal for the '<em><b>Template Data</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute ACTOR__TEMPLATE_DATA = eINSTANCE.getActor_TemplateData();
+
+		/**
 		 * The meta object literal for the '<em><b>Native</b></em>' attribute feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute ACTOR__NATIVE = eINSTANCE.getActor_Native();
+
+		/**
+		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute ACTOR__NAME = eINSTANCE.getActor_Name();
 
 		/**
 		 * The meta object literal for the '<em><b>File Name</b></em>' attribute feature.
@@ -2685,6 +2707,14 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EReference ACTOR__OUTPUTS = eINSTANCE.getActor_Outputs();
+
+		/**
+		 * The meta object literal for the '<em><b>Parameters</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference ACTOR__PARAMETERS = eINSTANCE.getActor_Parameters();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.FSMImpl <em>FSM</em>}' class.

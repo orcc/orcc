@@ -520,7 +520,7 @@ public class NetworkImpl extends EntityImpl implements Network {
 	private List<Entity> getAllEntities() {
 		List<Entity> entities = new ArrayList<Entity>(getEntities());
 		for (Instance instance : getInstances()) {
-			entities.add(instance.getEntity());
+			entities.add((Entity) instance.getEntity());
 		}
 		return entities;
 	}

@@ -35,6 +35,7 @@ import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.moc.MoC;
 
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * <!-- begin-user-doc -->This class defines an instance. An instance has an id, a class, parameters
@@ -86,12 +87,22 @@ public interface Instance extends Vertex {
 	 * Returns the value of the '<em><b>Entity</b></em>' reference.
 	 * <!-- begin-user-doc --><!-- end-user-doc -->
 	 * @return the value of the '<em>Entity</em>' reference.
-	 * @see #setEntity(Entity)
+	 * @see #setEntity(EObject)
 	 * @see net.sf.orcc.df.DfPackage#getInstance_Entity()
 	 * @model
 	 * @generated
 	 */
-	Entity getEntity();
+	EObject getEntity();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.df.Instance#getEntity <em>Entity</em>}' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Entity</em>' reference.
+	 * @see #getEntity()
+	 * @generated
+	 */
+	void setEntity(EObject value);
 
 	List<String> getHierarchicalId();
 
@@ -161,15 +172,6 @@ public interface Instance extends Vertex {
 	 * @return <code>true</code> if this instance references a network
 	 */
 	boolean isNetwork();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.df.Instance#getEntity <em>Entity</em>}' reference.
-	 * <!-- begin-user-doc --><!-- end-user-doc -->
-	 * @param value the new value of the '<em>Entity</em>' reference.
-	 * @see #getEntity()
-	 * @generated
-	 */
-	void setEntity(Entity value);
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.df.Instance#getName <em>Name</em>}' attribute.

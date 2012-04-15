@@ -83,7 +83,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 * @generated
 	 * @ordered
 	 */
-	protected Entity entity;
+	protected EObject entity;
 
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
@@ -106,8 +106,21 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Entity basicGetEntity() {
+	public EObject basicGetEntity() {
 		return entity;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setEntity(EObject newEntity) {
+		EObject oldEntity = entity;
+		entity = newEntity;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.INSTANCE__ENTITY, oldEntity, entity));
 	}
 
 	/**
@@ -175,7 +188,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 			getArguments().addAll((Collection<? extends Argument>) newValue);
 			return;
 		case DfPackage.INSTANCE__ENTITY:
-			setEntity((Entity) newValue);
+			setEntity((EObject) newValue);
 			return;
 		case DfPackage.INSTANCE__NAME:
 			setName((String) newValue);
@@ -204,7 +217,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 			getArguments().clear();
 			return;
 		case DfPackage.INSTANCE__ENTITY:
-			setEntity((Entity) null);
+			setEntity((EObject) null);
 			return;
 		case DfPackage.INSTANCE__NAME:
 			setName(NAME_EDEFAULT);
@@ -239,10 +252,10 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Entity getEntity() {
+	public EObject getEntity() {
 		if (entity != null && entity.eIsProxy()) {
 			InternalEObject oldEntity = (InternalEObject) entity;
-			entity = (Entity) eResolveProxy(oldEntity);
+			entity = eResolveProxy(oldEntity);
 			if (entity != oldEntity) {
 				if (eNotificationRequired())
 					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
@@ -354,12 +367,12 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	@Override
 	public boolean isActor() {
-		return getEntity() != null && getEntity().isActor();
+		return getEntity() instanceof Actor;
 	}
 
 	@Override
 	public boolean isBroadcast() {
-		return getEntity() != null && getEntity().isBroadcast();
+		return getEntity() instanceof Broadcast;
 	}
 
 	public boolean isInstance() {
@@ -368,19 +381,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 
 	@Override
 	public boolean isNetwork() {
-		return getEntity() != null && getEntity().isNetwork();
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setEntity(Entity newEntity) {
-		Entity oldEntity = entity;
-		entity = newEntity;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.INSTANCE__ENTITY, oldEntity, entity));
+		return getEntity() instanceof Network;
 	}
 
 	/**

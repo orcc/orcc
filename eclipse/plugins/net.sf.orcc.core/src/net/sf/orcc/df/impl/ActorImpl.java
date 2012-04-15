@@ -7,7 +7,11 @@
 package net.sf.orcc.df.impl;
 
 import java.util.Collection;
+import net.sf.dftools.util.impl.AttributableImpl;
+import net.sf.dftools.util.util.EcoreHelper;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.df.Action;
@@ -15,6 +19,7 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.MapAdapter;
@@ -49,15 +54,18 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getLineNumber <em>Line Number</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getMoC <em>Mo C</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.ActorImpl#isNative <em>Native</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getOutputs <em>Outputs</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getParameters <em>Parameters</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getProcs <em>Procs</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getStateVars <em>State Vars</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.ActorImpl#getTemplateData <em>Template Data</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public class ActorImpl extends EntityImpl implements Actor {
+public class ActorImpl extends AttributableImpl implements Actor {
 	/**
 	 * The cached value of the '{@link #getActions() <em>Actions</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -170,6 +178,16 @@ public class ActorImpl extends EntityImpl implements Actor {
 	protected boolean native_ = NATIVE_EDEFAULT;
 
 	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
+
+	/**
 	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -178,6 +196,16 @@ public class ActorImpl extends EntityImpl implements Actor {
 	 * @ordered
 	 */
 	protected EList<Port> outputs;
+
+	/**
+	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getParameters()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Var> parameters;
 
 	/**
 	 * The cached value of the '{@link #getProcs() <em>Procs</em>}' containment reference list.
@@ -196,6 +224,26 @@ public class ActorImpl extends EntityImpl implements Actor {
 	 * @ordered
 	 */
 	protected EList<Var> stateVars;
+
+	/**
+	 * The default value of the '{@link #getTemplateData() <em>Template Data</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getTemplateData()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final Object TEMPLATE_DATA_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getTemplateData() <em>Template Data</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getTemplateData()
+	 * @generated
+	 * @ordered
+	 */
+	protected Object templateData = TEMPLATE_DATA_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -269,12 +317,18 @@ public class ActorImpl extends EntityImpl implements Actor {
 			return getMoC();
 		case DfPackage.ACTOR__NATIVE:
 			return isNative();
+		case DfPackage.ACTOR__NAME:
+			return getName();
 		case DfPackage.ACTOR__OUTPUTS:
 			return getOutputs();
+		case DfPackage.ACTOR__PARAMETERS:
+			return getParameters();
 		case DfPackage.ACTOR__PROCS:
 			return getProcs();
 		case DfPackage.ACTOR__STATE_VARS:
 			return getStateVars();
+		case DfPackage.ACTOR__TEMPLATE_DATA:
+			return getTemplateData();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -302,6 +356,9 @@ public class ActorImpl extends EntityImpl implements Actor {
 		case DfPackage.ACTOR__OUTPUTS:
 			return ((InternalEList<?>) getOutputs())
 					.basicRemove(otherEnd, msgs);
+		case DfPackage.ACTOR__PARAMETERS:
+			return ((InternalEList<?>) getParameters()).basicRemove(otherEnd,
+					msgs);
 		case DfPackage.ACTOR__PROCS:
 			return ((InternalEList<?>) getProcs()).basicRemove(otherEnd, msgs);
 		case DfPackage.ACTOR__STATE_VARS:
@@ -337,12 +394,20 @@ public class ActorImpl extends EntityImpl implements Actor {
 			return moC != null;
 		case DfPackage.ACTOR__NATIVE:
 			return native_ != NATIVE_EDEFAULT;
+		case DfPackage.ACTOR__NAME:
+			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT
+					.equals(getName());
 		case DfPackage.ACTOR__OUTPUTS:
 			return outputs != null && !outputs.isEmpty();
+		case DfPackage.ACTOR__PARAMETERS:
+			return parameters != null && !parameters.isEmpty();
 		case DfPackage.ACTOR__PROCS:
 			return procs != null && !procs.isEmpty();
 		case DfPackage.ACTOR__STATE_VARS:
 			return stateVars != null && !stateVars.isEmpty();
+		case DfPackage.ACTOR__TEMPLATE_DATA:
+			return TEMPLATE_DATA_EDEFAULT == null ? templateData != null
+					: !TEMPLATE_DATA_EDEFAULT.equals(templateData);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -387,9 +452,16 @@ public class ActorImpl extends EntityImpl implements Actor {
 		case DfPackage.ACTOR__NATIVE:
 			setNative((Boolean) newValue);
 			return;
+		case DfPackage.ACTOR__NAME:
+			setName((String) newValue);
+			return;
 		case DfPackage.ACTOR__OUTPUTS:
 			getOutputs().clear();
 			getOutputs().addAll((Collection<? extends Port>) newValue);
+			return;
+		case DfPackage.ACTOR__PARAMETERS:
+			getParameters().clear();
+			getParameters().addAll((Collection<? extends Var>) newValue);
 			return;
 		case DfPackage.ACTOR__PROCS:
 			getProcs().clear();
@@ -398,6 +470,9 @@ public class ActorImpl extends EntityImpl implements Actor {
 		case DfPackage.ACTOR__STATE_VARS:
 			getStateVars().clear();
 			getStateVars().addAll((Collection<? extends Var>) newValue);
+			return;
+		case DfPackage.ACTOR__TEMPLATE_DATA:
+			setTemplateData(newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -446,14 +521,23 @@ public class ActorImpl extends EntityImpl implements Actor {
 		case DfPackage.ACTOR__NATIVE:
 			setNative(NATIVE_EDEFAULT);
 			return;
+		case DfPackage.ACTOR__NAME:
+			setName(NAME_EDEFAULT);
+			return;
 		case DfPackage.ACTOR__OUTPUTS:
 			getOutputs().clear();
+			return;
+		case DfPackage.ACTOR__PARAMETERS:
+			getParameters().clear();
 			return;
 		case DfPackage.ACTOR__PROCS:
 			getProcs().clear();
 			return;
 		case DfPackage.ACTOR__STATE_VARS:
 			getStateVars().clear();
+			return;
+		case DfPackage.ACTOR__TEMPLATE_DATA:
+			setTemplateData(TEMPLATE_DATA_EDEFAULT);
 			return;
 		}
 		super.eUnset(featureID);
@@ -545,6 +629,16 @@ public class ActorImpl extends EntityImpl implements Actor {
 	}
 
 	@Override
+	public Port getPort(String name) {
+		Port port = getInput(name);
+		if (port != null) {
+			return port;
+		}
+
+		return getOutput(name);
+	}
+
+	@Override
 	public Procedure getProcedure(String name) {
 		for (Procedure procedure : getProcs()) {
 			if (procedure.getName().equals(name)) {
@@ -565,6 +659,11 @@ public class ActorImpl extends EntityImpl implements Actor {
 					this, DfPackage.ACTOR__PROCS);
 		}
 		return procs;
+	}
+
+	@Override
+	public String getSimpleName() {
+		return DfUtil.getSimpleName(getName());
 	}
 
 	@Override
@@ -589,6 +688,29 @@ public class ActorImpl extends EntityImpl implements Actor {
 		return stateVars;
 	}
 
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Object getTemplateData() {
+		return templateData;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setTemplateData(Object newTemplateData) {
+		Object oldTemplateData = templateData;
+		templateData = newTemplateData;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					DfPackage.ACTOR__TEMPLATE_DATA, oldTemplateData,
+					templateData));
+	}
+
 	@Override
 	public boolean hasFsm() {
 		return fsm != null;
@@ -597,11 +719,6 @@ public class ActorImpl extends EntityImpl implements Actor {
 	@Override
 	public boolean hasMoC() {
 		return moC != null;
-	}
-
-	@Override
-	public boolean isActor() {
-		return true;
 	}
 
 	/**
@@ -677,6 +794,17 @@ public class ActorImpl extends EntityImpl implements Actor {
 					DfPackage.ACTOR__LINE_NUMBER, oldLineNumber, lineNumber));
 	}
 
+	@Override
+	public Port getInput(String name) {
+		List<Port> inputs = EcoreHelper.getList(this, "inputs");
+		for (Port port : inputs) {
+			if (port.getName().equals(name)) {
+				return port;
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -690,6 +818,17 @@ public class ActorImpl extends EntityImpl implements Actor {
 		return inputs;
 	}
 
+	@Override
+	public Port getOutput(String name) {
+		List<Port> outputs = EcoreHelper.getList(this, "outputs");
+		for (Port port : outputs) {
+			if (port.getName().equals(name)) {
+				return port;
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -701,6 +840,34 @@ public class ActorImpl extends EntityImpl implements Actor {
 					DfPackage.ACTOR__OUTPUTS);
 		}
 		return outputs;
+	}
+
+	@Override
+	public Var getParameter(String name) {
+		for (Var var : getParameters()) {
+			if (var.getName().equals(name)) {
+				return var;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public String getPackage() {
+		return DfUtil.getPackage(getName());
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Var> getParameters() {
+		if (parameters == null) {
+			parameters = new EObjectContainmentEList<Var>(Var.class, this,
+					DfPackage.ACTOR__PARAMETERS);
+		}
+		return parameters;
 	}
 
 	/**
@@ -741,6 +908,28 @@ public class ActorImpl extends EntityImpl implements Actor {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String getName() {
+		// TODO: implement this method to return the 'Name' attribute
+		// Ensure that you remove @generated or mark it @generated NOT
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setName(String newName) {
+		// TODO: implement this method to set the 'Name' attribute
+		// Ensure that you remove @generated or mark it @generated NOT
+		throw new UnsupportedOperationException();
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -756,6 +945,8 @@ public class ActorImpl extends EntityImpl implements Actor {
 		result.append(lineNumber);
 		result.append(", native: ");
 		result.append(native_);
+		result.append(", templateData: ");
+		result.append(templateData);
 		result.append(')');
 		return result.toString();
 	}

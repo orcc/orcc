@@ -47,10 +47,8 @@ import net.sf.graphiti.model.Graph;
 import net.sf.graphiti.model.ObjectType;
 import net.sf.graphiti.model.Vertex;
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -63,6 +61,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 
@@ -163,11 +162,10 @@ public class XdfImporter {
 	private Vertex getVertex(Instance instance, ObjectType type) {
 		Vertex vertex = new Vertex(type);
 		vertex.setValue(PARAMETER_ID, instance.getName());
-		Entity inst = instance.getEntity();
-		if (inst instanceof Actor) {
-			vertex.setValue(PARAMETER_REFINEMENT, ((Actor) inst).getName());
-		} else if (inst instanceof Network) {
-			vertex.setValue(PARAMETER_REFINEMENT, ((Network) inst).getName());
+		EObject entity = instance.getEntity();
+		String name = EcoreHelper.getFeature(entity, "name");
+		if (name != null) {
+			vertex.setValue(PARAMETER_REFINEMENT, name);
 		}
 
 		// parameters

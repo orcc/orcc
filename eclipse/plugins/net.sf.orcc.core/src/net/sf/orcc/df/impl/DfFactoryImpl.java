@@ -19,7 +19,6 @@ import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.DfPackage;
-import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.EntitySpecific;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Instance;
@@ -295,7 +294,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	}
 
 	@Override
-	public Instance createInstance(String id, Entity entity) {
+	public Instance createInstance(String id, EObject entity) {
 		InstanceImpl instance = new InstanceImpl();
 		instance.setName(id);
 		instance.setEntity(entity);

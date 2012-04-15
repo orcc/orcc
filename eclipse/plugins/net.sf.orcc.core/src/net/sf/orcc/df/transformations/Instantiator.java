@@ -137,7 +137,7 @@ public class Instantiator extends DfSwitch<Network> {
 
 		// copy instances to entities/instances
 		for (Instance instance : network.getInstances()) {
-			Entity entity = instance.getEntity();
+			Entity entity = (Entity) instance.getEntity();
 			if (entity.isActor() && skipActors) {
 				Instance copy = (Instance) copier.copy(instance);
 				networkCopy.add(copy);

@@ -42,7 +42,6 @@ import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -67,6 +66,7 @@ import net.sf.orcc.util.DomUtil;
 
 import org.eclipse.emf.common.util.ECollections;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -518,10 +518,11 @@ public class XdfWriter {
 		instanceElt.setAttribute("id", instance.getName());
 
 		// class
-		Entity entity = instance.getEntity();
+		EObject entity = instance.getEntity();
 		if (entity != null) {
 			Element classElt = document.createElement("Class");
-			classElt.setAttribute("name", entity.getName());
+			String name = EcoreHelper.getFeature(entity, "name");
+			classElt.setAttribute("name", name);
 			instanceElt.appendChild(classElt);
 		}
 

@@ -498,7 +498,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getActor_Procs() {
-		return (EReference) actorEClass.getEStructuralFeatures().get(10);
+		return (EReference) actorEClass.getEStructuralFeatures().get(12);
 	}
 
 	/**
@@ -506,7 +506,16 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getActor_StateVars() {
-		return (EReference) actorEClass.getEStructuralFeatures().get(11);
+		return (EReference) actorEClass.getEStructuralFeatures().get(13);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getActor_TemplateData() {
+		return (EAttribute) actorEClass.getEStructuralFeatures().get(14);
 	}
 
 	/**
@@ -515,6 +524,15 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 */
 	public EAttribute getActor_Native() {
 		return (EAttribute) actorEClass.getEStructuralFeatures().get(8);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getActor_Name() {
+		return (EAttribute) actorEClass.getEStructuralFeatures().get(9);
 	}
 
 	/**
@@ -548,7 +566,16 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getActor_Outputs() {
-		return (EReference) actorEClass.getEStructuralFeatures().get(9);
+		return (EReference) actorEClass.getEStructuralFeatures().get(10);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getActor_Parameters() {
+		return (EReference) actorEClass.getEStructuralFeatures().get(11);
 	}
 
 	/**
@@ -941,9 +968,12 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEAttribute(actorEClass, ACTOR__LINE_NUMBER);
 		createEReference(actorEClass, ACTOR__MO_C);
 		createEAttribute(actorEClass, ACTOR__NATIVE);
+		createEAttribute(actorEClass, ACTOR__NAME);
 		createEReference(actorEClass, ACTOR__OUTPUTS);
+		createEReference(actorEClass, ACTOR__PARAMETERS);
 		createEReference(actorEClass, ACTOR__PROCS);
 		createEReference(actorEClass, ACTOR__STATE_VARS);
+		createEAttribute(actorEClass, ACTOR__TEMPLATE_DATA);
 
 		networkEClass = createEClass(NETWORK);
 		createEReference(networkEClass, NETWORK__ENTITIES);
@@ -1037,10 +1067,10 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				.getEPackage(IrPackage.eNS_URI);
 		GraphPackage theGraphPackage = (GraphPackage) EPackage.Registry.INSTANCE
 				.getEPackage(GraphPackage.eNS_URI);
-		MocPackage theMocPackage = (MocPackage) EPackage.Registry.INSTANCE
-				.getEPackage(MocPackage.eNS_URI);
 		EcorePackage theEcorePackage = (EcorePackage) EPackage.Registry.INSTANCE
 				.getEPackage(EcorePackage.eNS_URI);
+		MocPackage theMocPackage = (MocPackage) EPackage.Registry.INSTANCE
+				.getEPackage(MocPackage.eNS_URI);
 
 		// Create type parameters
 
@@ -1052,7 +1082,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		instanceEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		entityEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		entitySpecificEClass.getESuperTypes().add(this.getEntity());
-		actorEClass.getESuperTypes().add(this.getEntity());
+		actorEClass.getESuperTypes().add(theUtilPackage.getAttributable());
 		networkEClass.getESuperTypes().add(this.getEntity());
 		networkEClass.getESuperTypes().add(theGraphPackage.getGraph());
 		broadcastEClass.getESuperTypes().add(this.getEntity());
@@ -1109,9 +1139,9 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				"arguments", null, 0, -1, Instance.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getInstance_Entity(), this.getEntity(), null, "entity",
-				null, 0, 1, Instance.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
+		initEReference(getInstance_Entity(), theEcorePackage.getEObject(),
+				null, "entity", null, 0, 1, Instance.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getInstance_Name(), ecorePackage.getEString(), "name",
 				null, 0, 1, Instance.class, IS_TRANSIENT, IS_VOLATILE,
@@ -1171,9 +1201,17 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
+		initEAttribute(getActor_Name(), ecorePackage.getEString(), "name",
+				null, 0, 1, Actor.class, IS_TRANSIENT, IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED,
+				IS_ORDERED);
 		initEReference(getActor_Outputs(), this.getPort(), null, "outputs",
 				null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getActor_Parameters(), theIrPackage.getVar(), null,
+				"parameters", null, 0, -1, Actor.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getActor_Procs(), theIrPackage.getProcedure(), null,
 				"procs", null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE,
@@ -1183,6 +1221,10 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				"stateVars", null, 0, -1, Actor.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getActor_TemplateData(),
+				theEcorePackage.getEJavaObject(), "templateData", null, 0, 1,
+				Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(networkEClass, Network.class, "Network", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
