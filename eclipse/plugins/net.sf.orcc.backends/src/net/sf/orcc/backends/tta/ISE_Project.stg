@@ -152,7 +152,7 @@ printProcessor(processor) ::= <<
   \<association xil_pn:name="BehavioralSimulation"/\>
   \<association xil_pn:name="Implementation"/\>
 \</file\>
-\<file xil_pn:name="<processor.name>/tta/gcu_ic/output_socket_2_1.vhdl" xil_pn:type="FILE_VHDL"\>
+\<file xil_pn:name="<processor.name>/tta/gcu_ic/output_socket_<processor.buses.size>_1.vhdl" xil_pn:type="FILE_VHDL"\>
   \<association xil_pn:name="BehavioralSimulation"/\>
   \<association xil_pn:name="Implementation"/\>
 \</file\>
@@ -160,7 +160,7 @@ printProcessor(processor) ::= <<
   \<association xil_pn:name="BehavioralSimulation"/\>
   \<association xil_pn:name="Implementation"/\>
 \</file\>
-\<file xil_pn:name="<processor.name>/tta/gcu_ic/input_socket_2.vhdl" xil_pn:type="FILE_VHDL"\>
+\<file xil_pn:name="<processor.name>/tta/gcu_ic/input_socket_<processor.buses.size>.vhdl" xil_pn:type="FILE_VHDL"\>
   \<association xil_pn:name="BehavioralSimulation"/\>
   \<association xil_pn:name="Implementation"/\>
 \</file\>

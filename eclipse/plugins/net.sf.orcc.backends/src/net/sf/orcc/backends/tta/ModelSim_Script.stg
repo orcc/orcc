@@ -64,9 +64,9 @@ vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/vhdl/p
 vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/vhdl/processor_<processor.name>_tl.vhdl
 vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/vhdl/processor_<processor.name>.vhd
 vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/gcu_opcodes_pkg.vhdl
-vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/output_socket_2_1.vhdl
+vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/output_socket_<processor.buses.size>_1.vhdl
 vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/output_socket_1_1.vhdl
-vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/input_socket_2.vhdl
+vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/input_socket_<processor.buses.size>.vhdl
 vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/ifetch.vhdl
 vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/idecompressor.vhdl
 vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/ic.vhdl

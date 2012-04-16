@@ -69,9 +69,9 @@ set_global_assignment -name VHDL_FILE <processor.name>/tta/vhdl/<processor.name>
 set_global_assignment -name VHDL_FILE <processor.name>/tta/vhdl/globals_pkg.vhdl
 set_global_assignment -name VHDL_FILE <processor.name>/tta/vhdl/<processor.name>.vhd
 set_global_assignment -name VHDL_FILE <processor.name>/tta/vhdl/imem_mau_pkg.vhdl
-set_global_assignment -name VHDL_FILE <processor.name>/tta/gcu_ic/output_socket_2_1.vhdl
+set_global_assignment -name VHDL_FILE <processor.name>/tta/gcu_ic/output_socket_<processor.buses.size>_1.vhdl
 set_global_assignment -name VHDL_FILE <processor.name>/tta/gcu_ic/output_socket_1_1.vhdl
-set_global_assignment -name VHDL_FILE <processor.name>/tta/gcu_ic/input_socket_2.vhdl
+set_global_assignment -name VHDL_FILE <processor.name>/tta/gcu_ic/input_socket_<processor.buses.size>.vhdl
 set_global_assignment -name VHDL_FILE <processor.name>/tta/gcu_ic/ifetch.vhdl
 set_global_assignment -name VHDL_FILE <processor.name>/tta/gcu_ic/idecompressor.vhdl
 set_global_assignment -name VHDL_FILE <processor.name>/tta/gcu_ic/ic.vhdl
