@@ -38,8 +38,8 @@ import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.impl.VertexImpl;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.Component;
+import net.sf.orcc.backends.tta.architecture.Link;
 import net.sf.orcc.backends.tta.architecture.Port;
-import net.sf.orcc.backends.tta.architecture.Signal;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -330,24 +330,24 @@ public class ComponentImpl extends VertexImpl implements Component {
 	}
 
 	@Override
-	public Map<Port, Signal> getIncomingPortMap() {
-		Map<Port, Signal> map = new HashMap<Port, Signal>();
+	public Map<Port, Link> getIncomingPortMap() {
+		Map<Port, Link> map = new HashMap<Port, Link>();
 		for (Edge edge : getIncoming()) {
-			if (edge instanceof Signal) {
-				Signal signal = (Signal) edge;
-				map.put(signal.getTargetPort(), signal);
+			if (edge instanceof Link) {
+				Link link = (Link) edge;
+				map.put(link.getTargetPort(), link);
 			}
 		}
 		return map;
 	}
 
 	@Override
-	public Map<Port, Signal> getOutgoingPortMap() {
-		Map<Port, Signal> map = new HashMap<Port, Signal>();
+	public Map<Port, Link> getOutgoingPortMap() {
+		Map<Port, Link> map = new HashMap<Port, Link>();
 		for (Edge edge : getOutgoing()) {
-			if (edge instanceof Signal) {
-				Signal signal = (Signal) edge;
-				map.put(signal.getSourcePort(), signal);
+			if (edge instanceof Link) {
+				Link link = (Link) edge;
+				map.put(link.getSourcePort(), link);
 			}
 		}
 		return map;

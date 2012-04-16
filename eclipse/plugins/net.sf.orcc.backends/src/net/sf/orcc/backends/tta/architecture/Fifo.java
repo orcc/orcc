@@ -30,15 +30,17 @@
  */
 package net.sf.orcc.backends.tta.architecture;
 
+
 /**
  * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>Type Logic</b></em>'.
+ * A representation of the model object '<em><b>Fifo</b></em>'.
  * <!-- end-user-doc -->
  *
  *
- * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getTypeLogic()
+ * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getFifo()
  * @model
  * @generated
  */
-public interface TypeLogic extends Type {
-} // TypeLogic
+public interface Fifo extends Link {
+
+} // Fifo

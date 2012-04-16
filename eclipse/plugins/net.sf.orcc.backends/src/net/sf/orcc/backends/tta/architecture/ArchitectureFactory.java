@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.backends.tta.architecture;
 
+import net.sf.dftools.graph.Vertex;
+
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EFactory;
 
@@ -413,12 +415,6 @@ public interface ArchitectureFactory extends EFactory {
 	 * @generated
 	 */
 	Port createPort();
-	
-	Port createPortVec32(String name);
-	
-	Port createPortLogic(String name);
-
-	Port createPort(String name, Type type);
 
 	/**
 	 * Returns a new object of class '<em>Processor</em>'.
@@ -428,26 +424,6 @@ public interface ArchitectureFactory extends EFactory {
 	 * @generated
 	 */
 	Processor createProcessor();
-
-	/**
-	 * Returns a new object of class '<em>Type Vector</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Type Vector</em>'.
-	 * @generated
-	 */
-	TypeVector createTypeVector();
-	
-	TypeVector createTypeVector(int size);
-
-	/**
-	 * Returns a new object of class '<em>Type Logic</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Type Logic</em>'.
-	 * @generated
-	 */
-	TypeLogic createTypeLogic();
 
 	/**
 	 * Returns a simple TTA processor corresponding to default TTA processor
@@ -602,8 +578,20 @@ public interface ArchitectureFactory extends EFactory {
 	 */
 	Signal createSignal();
 
-	Signal createSignal(String name, Component source, Component target,
+	/**
+	 * Returns a new object of class '<em>Fifo</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Fifo</em>'.
+	 * @generated
+	 */
+	Fifo createFifo();
+
+	Fifo createFifo(String name, Vertex source, Vertex target,
 			Port sourcePort, Port targetPort);
+
+	Signal createSignal(String name, int size, Vertex source,
+			Vertex target, Port sourcePort, Port targetPort);
 
 	/**
 	 * Returns a new object of class '<em>Socket</em>'.

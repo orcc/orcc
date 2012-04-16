@@ -30,6 +30,7 @@ package net.sf.orcc.backends.tta.architecture.impl;
 
 import java.util.Map;
 
+import net.sf.dftools.graph.Vertex;
 import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.backends.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
@@ -45,6 +46,7 @@ import net.sf.orcc.backends.tta.architecture.ExprFalse;
 import net.sf.orcc.backends.tta.architecture.ExprTrue;
 import net.sf.orcc.backends.tta.architecture.ExprUnary;
 import net.sf.orcc.backends.tta.architecture.Extension;
+import net.sf.orcc.backends.tta.architecture.Fifo;
 import net.sf.orcc.backends.tta.architecture.FuPort;
 import net.sf.orcc.backends.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
@@ -67,9 +69,6 @@ import net.sf.orcc.backends.tta.architecture.SocketType;
 import net.sf.orcc.backends.tta.architecture.Term;
 import net.sf.orcc.backends.tta.architecture.TermBool;
 import net.sf.orcc.backends.tta.architecture.TermUnit;
-import net.sf.orcc.backends.tta.architecture.Type;
-import net.sf.orcc.backends.tta.architecture.TypeLogic;
-import net.sf.orcc.backends.tta.architecture.TypeVector;
 import net.sf.orcc.backends.tta.architecture.Writes;
 
 import org.eclipse.emf.common.util.BasicEList;
@@ -84,14 +83,12 @@ import org.eclipse.emf.ecore.plugin.EcorePlugin;
 /**
  * <!-- begin-user-doc --> An implementation of the model <b>Factory</b>. <!--
  * end-user-doc -->
- * 
  * @generated
  */
 public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		ArchitectureFactory {
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @deprecated
 	 * @generated
 	 */
@@ -101,9 +98,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * Creates the default factory implementation. <!-- begin-user-doc --> <!--
+	 * Creates the default factory implementation.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public static ArchitectureFactory init() {
@@ -120,9 +117,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * Creates an instance of the factory. <!-- begin-user-doc --> <!--
+	 * Creates an instance of the factory.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public ArchitectureFactoryImpl() {
@@ -131,7 +128,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public String convertDesignConfigurationToString(EDataType eDataType,
@@ -141,7 +137,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public String convertExtensionToString(EDataType eDataType,
@@ -151,7 +146,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public String convertOpBinaryToString(EDataType eDataType,
@@ -161,7 +155,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public String convertOpUnaryToString(EDataType eDataType,
@@ -171,7 +164,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public String convertProcessorConfigurationToString(EDataType eDataType,
@@ -181,7 +173,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public String convertSocketTypeToString(EDataType eDataType,
@@ -191,7 +182,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -218,7 +208,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -228,16 +217,14 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 			return createDesign();
 		case ArchitecturePackage.SIGNAL:
 			return createSignal();
+		case ArchitecturePackage.FIFO:
+			return createFifo();
 		case ArchitecturePackage.COMPONENT:
 			return createComponent();
 		case ArchitecturePackage.PORT:
 			return createPort();
 		case ArchitecturePackage.PROCESSOR:
 			return createProcessor();
-		case ArchitecturePackage.TYPE_VECTOR:
-			return createTypeVector();
-		case ArchitecturePackage.TYPE_LOGIC:
-			return createTypeLogic();
 		case ArchitecturePackage.BUS:
 			return createBus();
 		case ArchitecturePackage.BRIDGE:
@@ -290,7 +277,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public AddressSpace createAddressSpace() {
@@ -409,7 +395,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Bridge createBridge() {
@@ -419,7 +404,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Bus createBus() {
@@ -445,7 +429,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Component createComponent() {
@@ -463,7 +446,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Design createDesign() {
@@ -473,7 +455,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public DesignConfiguration createDesignConfigurationFromString(
@@ -488,7 +469,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public ExprBinary createExprBinary() {
@@ -507,7 +487,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public ExprFalse createExprFalse() {
@@ -517,7 +496,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public ExprTrue createExprTrue() {
@@ -527,7 +505,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public ExprUnary createExprUnary() {
@@ -549,7 +526,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Extension createExtensionFromString(EDataType eDataType,
@@ -564,7 +540,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -591,7 +566,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public FunctionUnit createFunctionUnit() {
@@ -651,7 +625,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public FuPort createFuPort() {
@@ -678,7 +651,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public GlobalControlUnit createGlobalControlUnit() {
@@ -736,7 +708,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Implementation createImplementation() {
@@ -805,7 +776,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public OpBinary createOpBinaryFromString(EDataType eDataType,
@@ -820,7 +790,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Operation createOperation() {
@@ -1008,7 +977,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public OpUnary createOpUnaryFromString(EDataType eDataType,
@@ -1030,7 +998,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Port createPort() {
@@ -1038,16 +1005,8 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return port;
 	}
 
-	public Port createPort(String name, Type type) {
-		PortImpl port = new PortImpl();
-		port.setName(name);
-		port.setType(type);
-		return port;
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Map.Entry<FuPort, Integer> createPortToIndexMapEntry() {
@@ -1057,32 +1016,11 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Processor createProcessor() {
 		ProcessorImpl processor = new ProcessorImpl();
 		return processor;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 */
-	public TypeVector createTypeVector() {
-		TypeVectorImpl typeVector = new TypeVectorImpl();
-		return typeVector;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 */
-	public TypeLogic createTypeLogic() {
-		TypeLogicImpl typeLogic = new TypeLogicImpl();
-		return typeLogic;
 	}
 
 	@Override
@@ -1155,7 +1093,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public ProcessorConfiguration createProcessorConfigurationFromString(
@@ -1171,7 +1108,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Reads createReads() {
@@ -1190,7 +1126,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public RegisterFile createRegisterFile() {
@@ -1260,7 +1195,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Resource createResource() {
@@ -1279,7 +1213,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Segment createSegment() {
@@ -1296,7 +1229,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public ShortImmediate createShortImmediate() {
@@ -1314,7 +1246,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Signal createSignal() {
@@ -1322,10 +1253,21 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return signal;
 	}
 
-	public Signal createSignal(String name, Component source, Component target,
-			Port sourcePort, Port targetPort) {
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Fifo createFifo() {
+		FifoImpl fifo = new FifoImpl();
+		return fifo;
+	}
+
+	public Signal createSignal(String label, int size, Vertex source,
+			Vertex target, Port sourcePort, Port targetPort) {
 		SignalImpl signal = new SignalImpl();
-		signal.setName(name);
+		signal.setLabel(label);
+		signal.setSize(size);
 		signal.setSourcePort(sourcePort);
 		signal.setTargetPort(targetPort);
 		signal.setSource(source);
@@ -1335,7 +1277,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Socket createSocket() {
@@ -1355,7 +1296,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public SocketType createSocketTypeFromString(EDataType eDataType,
@@ -1428,7 +1368,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public TermBool createTermBool() {
@@ -1446,7 +1385,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public TermUnit createTermUnit() {
@@ -1464,7 +1402,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Writes createWrites() {
@@ -1491,7 +1428,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public ArchitecturePackage getArchitecturePackage() {
@@ -1511,20 +1447,15 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public TypeVector createTypeVector(int size) {
-		TypeVector type = new TypeVectorImpl();
-		type.setSize(size);
-		return type;
-	}
-
-	@Override
-	public Port createPortVec32(String name) {
-		return createPort(name, createTypeVector(32));
-	}
-
-	@Override
-	public Port createPortLogic(String name) {
-		return createPort(name, createTypeLogic());
+	public Fifo createFifo(String label, Vertex source, Vertex target,
+			Port sourcePort, Port targetPort) {
+		Fifo fifo = new FifoImpl();
+		fifo.setLabel(label);
+		fifo.setSource(source);
+		fifo.setTarget(target);
+		fifo.setSourcePort(sourcePort);
+		fifo.setTargetPort(targetPort);
+		return fifo;
 	}
 
 } // ArchitectureFactoryImpl

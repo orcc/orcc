@@ -45,11 +45,13 @@ import net.sf.orcc.backends.tta.architecture.ExprBinary;
 import net.sf.orcc.backends.tta.architecture.ExprFalse;
 import net.sf.orcc.backends.tta.architecture.ExprTrue;
 import net.sf.orcc.backends.tta.architecture.ExprUnary;
+import net.sf.orcc.backends.tta.architecture.Fifo;
 import net.sf.orcc.backends.tta.architecture.FuPort;
 import net.sf.orcc.backends.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
 import net.sf.orcc.backends.tta.architecture.Guard;
 import net.sf.orcc.backends.tta.architecture.Implementation;
+import net.sf.orcc.backends.tta.architecture.Link;
 import net.sf.orcc.backends.tta.architecture.Operation;
 import net.sf.orcc.backends.tta.architecture.Port;
 import net.sf.orcc.backends.tta.architecture.Processor;
@@ -63,9 +65,6 @@ import net.sf.orcc.backends.tta.architecture.Socket;
 import net.sf.orcc.backends.tta.architecture.Term;
 import net.sf.orcc.backends.tta.architecture.TermBool;
 import net.sf.orcc.backends.tta.architecture.TermUnit;
-import net.sf.orcc.backends.tta.architecture.Type;
-import net.sf.orcc.backends.tta.architecture.TypeLogic;
-import net.sf.orcc.backends.tta.architecture.TypeVector;
 import net.sf.orcc.backends.tta.architecture.Writes;
 
 import org.eclipse.emf.ecore.EObject;
@@ -131,6 +130,21 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 			if (result == null)
 				result = caseGraph(design);
 			if (result == null)
+				result = caseVertex(design);
+			if (result == null)
+				result = caseAttributable(design);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.LINK: {
+			Link link = (Link) theEObject;
+			T result = caseLink(link);
+			if (result == null)
+				result = caseEdge(link);
+			if (result == null)
+				result = caseAttributable(link);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}
@@ -138,9 +152,24 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 			Signal signal = (Signal) theEObject;
 			T result = caseSignal(signal);
 			if (result == null)
+				result = caseLink(signal);
+			if (result == null)
 				result = caseEdge(signal);
 			if (result == null)
 				result = caseAttributable(signal);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.FIFO: {
+			Fifo fifo = (Fifo) theEObject;
+			T result = caseFifo(fifo);
+			if (result == null)
+				result = caseLink(fifo);
+			if (result == null)
+				result = caseEdge(fifo);
+			if (result == null)
+				result = caseAttributable(fifo);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -176,31 +205,6 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 				result = caseVertex(processor);
 			if (result == null)
 				result = caseAttributable(processor);
-			if (result == null)
-				result = defaultCase(theEObject);
-			return result;
-		}
-		case ArchitecturePackage.TYPE: {
-			Type type = (Type) theEObject;
-			T result = caseType(type);
-			if (result == null)
-				result = defaultCase(theEObject);
-			return result;
-		}
-		case ArchitecturePackage.TYPE_VECTOR: {
-			TypeVector typeVector = (TypeVector) theEObject;
-			T result = caseTypeVector(typeVector);
-			if (result == null)
-				result = caseType(typeVector);
-			if (result == null)
-				result = defaultCase(theEObject);
-			return result;
-		}
-		case ArchitecturePackage.TYPE_LOGIC: {
-			TypeLogic typeLogic = (TypeLogic) theEObject;
-			T result = caseTypeLogic(typeLogic);
-			if (result == null)
-				result = caseType(typeLogic);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -419,6 +423,21 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 	}
 
 	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Link</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Link</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseLink(Link object) {
+		return null;
+	}
+
+	/**
 	 * Returns the result of interpreting the object as an instance of '<em>Signal</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
@@ -430,6 +449,21 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseSignal(Signal object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Fifo</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Fifo</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseFifo(Fifo object) {
 		return null;
 	}
 
@@ -459,51 +493,6 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseProcessor(Processor object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Type</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Type</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseType(Type object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Type Vector</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Type Vector</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseTypeVector(TypeVector object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Type Logic</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Type Logic</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseTypeLogic(TypeLogic object) {
 		return null;
 	}
 

@@ -28,51 +28,42 @@
  * SUCH DAMAGE.
  * </copyright>
  */
-package net.sf.orcc.backends.tta.architecture;
+package net.sf.orcc.backends.tta.architecture.impl;
 
-import org.eclipse.emf.ecore.EObject;
+import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
+import net.sf.orcc.backends.tta.architecture.Fifo;
+
+import org.eclipse.emf.ecore.EClass;
 
 /**
- * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>Type</b></em>'.
- * <!-- end-user-doc -->
- *
+ * <!-- begin-user-doc --> An implementation of the model object '
+ * <em><b>Fifo</b></em>'. <!-- end-user-doc -->
  * <p>
- * The following features are supported:
- * <ul>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.Type#getSize <em>Size</em>}</li>
- * </ul>
  * </p>
  *
- * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getType()
- * @model interface="true" abstract="true"
  * @generated
  */
-public interface Type extends EObject {
+public class FifoImpl extends LinkImpl implements Fifo {
 	/**
-	 * Returns the value of the '<em><b>Size</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Size</em>' attribute isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Size</em>' attribute.
-	 * @see #setSize(int)
-	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getType_Size()
-	 * @model
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	int getSize();
+	protected FifoImpl() {
+		super();
+	}
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Type#getSize <em>Size</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Size</em>' attribute.
-	 * @see #getSize()
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	void setSize(int value);
+	@Override
+	protected EClass eStaticClass() {
+		return ArchitecturePackage.Literals.FIFO;
+	}
 
-} // Type
+	@Override
+	public boolean isFifo() {
+		return true;
+	}
+
+} // FifoImpl

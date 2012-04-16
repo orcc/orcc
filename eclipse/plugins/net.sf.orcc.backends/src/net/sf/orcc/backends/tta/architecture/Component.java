@@ -39,21 +39,17 @@ import org.eclipse.emf.common.util.EList;
 /**
  * <!-- begin-user-doc --> A representation of the model object '
  * <em><b>Component</b></em>'. <!-- end-user-doc -->
- * 
+ *
  * <p>
  * The following features are supported:
  * <ul>
- * <li>{@link net.sf.orcc.backends.tta.architecture.Component#getName <em>Name
- * </em>}</li>
- * <li>{@link net.sf.orcc.backends.tta.architecture.Component#getEntityName <em>
- * Entity Name</em>}</li>
- * <li>{@link net.sf.orcc.backends.tta.architecture.Component#getInputs <em>
- * Inputs</em>}</li>
- * <li>{@link net.sf.orcc.backends.tta.architecture.Component#getOutputs <em>
- * Outputs</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Component#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Component#getEntityName <em>Entity Name</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Component#getInputs <em>Inputs</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Component#getOutputs <em>Outputs</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getComponent()
  * @model
  * @generated
@@ -77,7 +73,7 @@ public interface Component extends Vertex {
 	 */
 	String getName();
 
-	Map<Port, Signal> getIncomingPortMap();
+	Map<Port, Link> getIncomingPortMap();
 
 	void addInput(Port port);
 
@@ -85,15 +81,12 @@ public interface Component extends Vertex {
 
 	boolean isProcessor();
 
-	Map<Port, Signal> getOutgoingPortMap();
+	Map<Port, Link> getOutgoingPortMap();
 
 	/**
-	 * Sets the value of the '
-	 * {@link net.sf.orcc.backends.tta.architecture.Component#getName
-	 * <em>Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @param value
-	 *            the new value of the '<em>Name</em>' attribute.
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Component#getName <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Name</em>' attribute.
 	 * @see #getName()
 	 * @generated
 	 */
@@ -117,29 +110,25 @@ public interface Component extends Vertex {
 	String getEntityName();
 
 	/**
-	 * Sets the value of the '
-	 * {@link net.sf.orcc.backends.tta.architecture.Component#getEntityName
-	 * <em>Entity Name</em>}' attribute. <!-- begin-user-doc --> <!--
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Component#getEntityName <em>Entity Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
-	 * @param value
-	 *            the new value of the '<em>Entity Name</em>' attribute.
+	 * @param value the new value of the '<em>Entity Name</em>' attribute.
 	 * @see #getEntityName()
 	 * @generated
 	 */
 	void setEntityName(String value);
 
 	/**
-	 * Returns the value of the '<em><b>Inputs</b></em>' containment reference
-	 * list. The list contents are of type
-	 * {@link net.sf.orcc.backends.tta.architecture.Port}. <!-- begin-user-doc
+	 * Returns the value of the '<em><b>Inputs</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.backends.tta.architecture.Port}.
+	 * <!-- begin-user-doc
 	 * -->
 	 * <p>
 	 * If the meaning of the '<em>Inputs</em>' containment reference list isn't
 	 * clear, there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the value of the '<em>Inputs</em>' containment reference list.
 	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getComponent_Inputs()
 	 * @model containment="true"
@@ -148,16 +137,15 @@ public interface Component extends Vertex {
 	EList<Port> getInputs();
 
 	/**
-	 * Returns the value of the '<em><b>Outputs</b></em>' containment reference
-	 * list. The list contents are of type
-	 * {@link net.sf.orcc.backends.tta.architecture.Port}. <!-- begin-user-doc
+	 * Returns the value of the '<em><b>Outputs</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.backends.tta.architecture.Port}.
+	 * <!-- begin-user-doc
 	 * -->
 	 * <p>
 	 * If the meaning of the '<em>Outputs</em>' containment reference list isn't
 	 * clear, there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the value of the '<em>Outputs</em>' containment reference list.
 	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getComponent_Outputs()
 	 * @model containment="true"

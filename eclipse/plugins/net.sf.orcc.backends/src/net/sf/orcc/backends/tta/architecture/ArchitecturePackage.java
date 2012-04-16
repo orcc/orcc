@@ -91,6 +91,51 @@ public interface ArchitecturePackage extends EPackage {
 	int DESIGN = 0;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DESIGN__ATTRIBUTES = GraphPackage.GRAPH__ATTRIBUTES;
+
+	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DESIGN__INCOMING = GraphPackage.GRAPH__INCOMING;
+
+	/**
+	 * The feature id for the '<em><b>Label</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DESIGN__LABEL = GraphPackage.GRAPH__LABEL;
+
+	/**
+	 * The feature id for the '<em><b>Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DESIGN__NUMBER = GraphPackage.GRAPH__NUMBER;
+
+	/**
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DESIGN__OUTGOING = GraphPackage.GRAPH__OUTGOING;
+
+	/**
 	 * The feature id for the '<em><b>Edges</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -197,14 +242,14 @@ public interface ArchitecturePackage extends EPackage {
 	int DESIGN_FEATURE_COUNT = GraphPackage.GRAPH_FEATURE_COUNT + 9;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.SignalImpl <em>Signal</em>}' class.
+	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.LinkImpl <em>Link</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.backends.tta.architecture.impl.SignalImpl
-	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getSignal()
+	 * @see net.sf.orcc.backends.tta.architecture.impl.LinkImpl
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getLink()
 	 * @generated
 	 */
-	int SIGNAL = 1;
+	int LINK = 1;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -213,7 +258,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int SIGNAL__ATTRIBUTES = GraphPackage.EDGE__ATTRIBUTES;
+	int LINK__ATTRIBUTES = GraphPackage.EDGE__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
@@ -222,7 +267,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int SIGNAL__LABEL = GraphPackage.EDGE__LABEL;
+	int LINK__LABEL = GraphPackage.EDGE__LABEL;
 
 	/**
 	 * The feature id for the '<em><b>Source</b></em>' reference.
@@ -231,7 +276,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int SIGNAL__SOURCE = GraphPackage.EDGE__SOURCE;
+	int LINK__SOURCE = GraphPackage.EDGE__SOURCE;
 
 	/**
 	 * The feature id for the '<em><b>Target</b></em>' reference.
@@ -240,25 +285,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int SIGNAL__TARGET = GraphPackage.EDGE__TARGET;
-
-	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int SIGNAL__NAME = GraphPackage.EDGE_FEATURE_COUNT + 0;
-
-	/**
-	 * The feature id for the '<em><b>Type</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int SIGNAL__TYPE = GraphPackage.EDGE_FEATURE_COUNT + 1;
+	int LINK__TARGET = GraphPackage.EDGE__TARGET;
 
 	/**
 	 * The feature id for the '<em><b>Source Port</b></em>' reference.
@@ -267,7 +294,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int SIGNAL__SOURCE_PORT = GraphPackage.EDGE_FEATURE_COUNT + 2;
+	int LINK__SOURCE_PORT = GraphPackage.EDGE_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Target Port</b></em>' reference.
@@ -276,7 +303,89 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int SIGNAL__TARGET_PORT = GraphPackage.EDGE_FEATURE_COUNT + 3;
+	int LINK__TARGET_PORT = GraphPackage.EDGE_FEATURE_COUNT + 1;
+
+	/**
+	 * The number of structural features of the '<em>Link</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int LINK_FEATURE_COUNT = GraphPackage.EDGE_FEATURE_COUNT + 2;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.SignalImpl <em>Signal</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.tta.architecture.impl.SignalImpl
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getSignal()
+	 * @generated
+	 */
+	int SIGNAL = 2;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SIGNAL__ATTRIBUTES = LINK__ATTRIBUTES;
+
+	/**
+	 * The feature id for the '<em><b>Label</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SIGNAL__LABEL = LINK__LABEL;
+
+	/**
+	 * The feature id for the '<em><b>Source</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SIGNAL__SOURCE = LINK__SOURCE;
+
+	/**
+	 * The feature id for the '<em><b>Target</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SIGNAL__TARGET = LINK__TARGET;
+
+	/**
+	 * The feature id for the '<em><b>Source Port</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SIGNAL__SOURCE_PORT = LINK__SOURCE_PORT;
+
+	/**
+	 * The feature id for the '<em><b>Target Port</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SIGNAL__TARGET_PORT = LINK__TARGET_PORT;
+
+	/**
+	 * The feature id for the '<em><b>Size</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SIGNAL__SIZE = LINK_FEATURE_COUNT + 0;
 
 	/**
 	 * The number of structural features of the '<em>Signal</em>' class.
@@ -285,7 +394,80 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int SIGNAL_FEATURE_COUNT = GraphPackage.EDGE_FEATURE_COUNT + 4;
+	int SIGNAL_FEATURE_COUNT = LINK_FEATURE_COUNT + 1;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.FifoImpl <em>Fifo</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.tta.architecture.impl.FifoImpl
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getFifo()
+	 * @generated
+	 */
+	int FIFO = 3;
+
+	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FIFO__ATTRIBUTES = LINK__ATTRIBUTES;
+
+	/**
+	 * The feature id for the '<em><b>Label</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FIFO__LABEL = LINK__LABEL;
+
+	/**
+	 * The feature id for the '<em><b>Source</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FIFO__SOURCE = LINK__SOURCE;
+
+	/**
+	 * The feature id for the '<em><b>Target</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FIFO__TARGET = LINK__TARGET;
+
+	/**
+	 * The feature id for the '<em><b>Source Port</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FIFO__SOURCE_PORT = LINK__SOURCE_PORT;
+
+	/**
+	 * The feature id for the '<em><b>Target Port</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FIFO__TARGET_PORT = LINK__TARGET_PORT;
+
+	/**
+	 * The number of structural features of the '<em>Fifo</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FIFO_FEATURE_COUNT = LINK_FEATURE_COUNT + 0;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ComponentImpl <em>Component</em>}' class.
@@ -295,7 +477,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getComponent()
 	 * @generated
 	 */
-	int COMPONENT = 2;
+	int COMPONENT = 4;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -307,15 +489,6 @@ public interface ArchitecturePackage extends EPackage {
 	int COMPONENT__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
 
 	/**
-	 * The feature id for the '<em><b>Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int COMPONENT__LABEL = GraphPackage.VERTEX__LABEL;
-
-	/**
 	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -323,6 +496,15 @@ public interface ArchitecturePackage extends EPackage {
 	 * @ordered
 	 */
 	int COMPONENT__INCOMING = GraphPackage.VERTEX__INCOMING;
+
+	/**
+	 * The feature id for the '<em><b>Label</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMPONENT__LABEL = GraphPackage.VERTEX__LABEL;
 
 	/**
 	 * The feature id for the '<em><b>Number</b></em>' attribute.
@@ -394,7 +576,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getProcessor()
 	 * @generated
 	 */
-	int PROCESSOR = 4;
+	int PROCESSOR = 6;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.BusImpl <em>Bus</em>}' class.
@@ -403,7 +585,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getBus()
 	 * @generated
 	 */
-	int BUS = 8;
+	int BUS = 7;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.BridgeImpl <em>Bridge</em>}' class.
@@ -412,7 +594,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getBridge()
 	 * @generated
 	 */
-	int BRIDGE = 9;
+	int BRIDGE = 8;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.SegmentImpl <em>Segment</em>}' class.
@@ -421,7 +603,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getSegment()
 	 * @generated
 	 */
-	int SEGMENT = 10;
+	int SEGMENT = 9;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.GlobalControlUnitImpl <em>Global Control Unit</em>}' class.
@@ -431,7 +613,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getGlobalControlUnit()
 	 * @generated
 	 */
-	int GLOBAL_CONTROL_UNIT = 11;
+	int GLOBAL_CONTROL_UNIT = 10;
 
 	/**
 	 * The meta object id for the '
@@ -443,7 +625,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getFunctionUnit()
 	 * @generated
 	 */
-	int FUNCTION_UNIT = 12;
+	int FUNCTION_UNIT = 11;
 
 	/**
 	 * The meta object id for the '
@@ -455,7 +637,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getRegisterFile()
 	 * @generated
 	 */
-	int REGISTER_FILE = 13;
+	int REGISTER_FILE = 12;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.FuPortImpl <em>Fu Port</em>}' class.
@@ -465,7 +647,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getFuPort()
 	 * @generated
 	 */
-	int FU_PORT = 14;
+	int FU_PORT = 13;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.PortImpl <em>Port</em>}' class.
@@ -474,7 +656,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getPort()
 	 * @generated
 	 */
-	int PORT = 3;
+	int PORT = 5;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -486,15 +668,6 @@ public interface ArchitecturePackage extends EPackage {
 	int PORT__ATTRIBUTES = GraphPackage.VERTEX__ATTRIBUTES;
 
 	/**
-	 * The feature id for the '<em><b>Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PORT__LABEL = GraphPackage.VERTEX__LABEL;
-
-	/**
 	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -502,6 +675,15 @@ public interface ArchitecturePackage extends EPackage {
 	 * @ordered
 	 */
 	int PORT__INCOMING = GraphPackage.VERTEX__INCOMING;
+
+	/**
+	 * The feature id for the '<em><b>Label</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT__LABEL = GraphPackage.VERTEX__LABEL;
 
 	/**
 	 * The feature id for the '<em><b>Number</b></em>' attribute.
@@ -522,31 +704,13 @@ public interface ArchitecturePackage extends EPackage {
 	int PORT__OUTGOING = GraphPackage.VERTEX__OUTGOING;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PORT__NAME = GraphPackage.VERTEX_FEATURE_COUNT + 0;
-
-	/**
-	 * The feature id for the '<em><b>Type</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PORT__TYPE = GraphPackage.VERTEX_FEATURE_COUNT + 1;
-
-	/**
 	 * The number of structural features of the '<em>Port</em>' class. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int PORT_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 2;
+	int PORT_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -557,15 +721,6 @@ public interface ArchitecturePackage extends EPackage {
 	int PROCESSOR__ATTRIBUTES = COMPONENT__ATTRIBUTES;
 
 	/**
-	 * The feature id for the '<em><b>Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PROCESSOR__LABEL = COMPONENT__LABEL;
-
-	/**
 	 * The feature id for the '<em><b>Incoming</b></em>' reference list. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -573,6 +728,15 @@ public interface ArchitecturePackage extends EPackage {
 	 * @ordered
 	 */
 	int PROCESSOR__INCOMING = COMPONENT__INCOMING;
+
+	/**
+	 * The feature id for the '<em><b>Label</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCESSOR__LABEL = COMPONENT__LABEL;
 
 	/**
 	 * The feature id for the '<em><b>Number</b></em>' attribute.
@@ -728,90 +892,6 @@ public interface ArchitecturePackage extends EPackage {
 	 * @ordered
 	 */
 	int PROCESSOR_FEATURE_COUNT = COMPONENT_FEATURE_COUNT + 11;
-
-	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.Type <em>Type</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.backends.tta.architecture.Type
-	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getType()
-	 * @generated
-	 */
-	int TYPE = 5;
-
-	/**
-	 * The feature id for the '<em><b>Size</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int TYPE__SIZE = 0;
-
-	/**
-	 * The number of structural features of the '<em>Type</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int TYPE_FEATURE_COUNT = 1;
-
-	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.TypeVectorImpl <em>Type Vector</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.backends.tta.architecture.impl.TypeVectorImpl
-	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTypeVector()
-	 * @generated
-	 */
-	int TYPE_VECTOR = 6;
-
-	/**
-	 * The feature id for the '<em><b>Size</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int TYPE_VECTOR__SIZE = TYPE__SIZE;
-
-	/**
-	 * The number of structural features of the '<em>Type Vector</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int TYPE_VECTOR_FEATURE_COUNT = TYPE_FEATURE_COUNT + 0;
-
-	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.TypeLogicImpl <em>Type Logic</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.backends.tta.architecture.impl.TypeLogicImpl
-	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTypeLogic()
-	 * @generated
-	 */
-	int TYPE_LOGIC = 7;
-
-	/**
-	 * The feature id for the '<em><b>Size</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int TYPE_LOGIC__SIZE = TYPE__SIZE;
-
-	/**
-	 * The number of structural features of the '<em>Type Logic</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int TYPE_LOGIC_FEATURE_COUNT = TYPE_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -1159,7 +1239,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getSocket()
 	 * @generated
 	 */
-	int SOCKET = 15;
+	int SOCKET = 14;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -1203,7 +1283,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getOperation()
 	 * @generated
 	 */
-	int OPERATION = 16;
+	int OPERATION = 15;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -1251,7 +1331,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getAddressSpace()
 	 * @generated
 	 */
-	int ADDRESS_SPACE = 17;
+	int ADDRESS_SPACE = 16;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -1304,7 +1384,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getGuard()
 	 * @generated
 	 */
-	int GUARD = 23;
+	int GUARD = 22;
 
 	/**
 	 * The meta object id for the '
@@ -1316,7 +1396,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprUnary()
 	 * @generated
 	 */
-	int EXPR_UNARY = 24;
+	int EXPR_UNARY = 23;
 
 	/**
 	 * The meta object id for the '
@@ -1328,7 +1408,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprBinary()
 	 * @generated
 	 */
-	int EXPR_BINARY = 25;
+	int EXPR_BINARY = 24;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ExprTrueImpl <em>Expr True</em>}' class.
@@ -1337,7 +1417,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprTrue()
 	 * @generated
 	 */
-	int EXPR_TRUE = 26;
+	int EXPR_TRUE = 25;
 
 	/**
 	 * The meta object id for the '
@@ -1349,7 +1429,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprFalse()
 	 * @generated
 	 */
-	int EXPR_FALSE = 27;
+	int EXPR_FALSE = 26;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.Term <em>Term</em>}' class.
@@ -1358,7 +1438,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTerm()
 	 * @generated
 	 */
-	int TERM = 28;
+	int TERM = 27;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.TermBoolImpl <em>Term Bool</em>}' class.
@@ -1367,7 +1447,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTermBool()
 	 * @generated
 	 */
-	int TERM_BOOL = 29;
+	int TERM_BOOL = 28;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.TermUnitImpl <em>Term Unit</em>}' class.
@@ -1376,7 +1456,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTermUnit()
 	 * @generated
 	 */
-	int TERM_UNIT = 30;
+	int TERM_UNIT = 29;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.Element <em>Element</em>}' class.
@@ -1385,7 +1465,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getElement()
 	 * @generated
 	 */
-	int ELEMENT = 18;
+	int ELEMENT = 17;
 
 	/**
 	 * The feature id for the '<em><b>Start Cycle</b></em>' attribute. <!--
@@ -1421,7 +1501,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getReads()
 	 * @generated
 	 */
-	int READS = 19;
+	int READS = 18;
 
 	/**
 	 * The feature id for the '<em><b>Start Cycle</b></em>' attribute. <!--
@@ -1466,7 +1546,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getWrites()
 	 * @generated
 	 */
-	int WRITES = 20;
+	int WRITES = 19;
 
 	/**
 	 * The feature id for the '<em><b>Start Cycle</b></em>' attribute. <!--
@@ -1511,7 +1591,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getResource()
 	 * @generated
 	 */
-	int RESOURCE = 21;
+	int RESOURCE = 20;
 
 	/**
 	 * The feature id for the '<em><b>Start Cycle</b></em>' attribute. <!--
@@ -1557,7 +1637,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getPortToIndexMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_INDEX_MAP_ENTRY = 32;
+	int PORT_TO_INDEX_MAP_ENTRY = 31;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ShortImmediateImpl <em>Short Immediate</em>}' class.
@@ -1567,7 +1647,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getShortImmediate()
 	 * @generated
 	 */
-	int SHORT_IMMEDIATE = 22;
+	int SHORT_IMMEDIATE = 21;
 
 	/**
 	 * The feature id for the '<em><b>Extension</b></em>' attribute. <!--
@@ -1753,7 +1833,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getImplementation()
 	 * @generated
 	 */
-	int IMPLEMENTATION = 31;
+	int IMPLEMENTATION = 30;
 
 	/**
 	 * The feature id for the '<em><b>Hdb File</b></em>' attribute. <!--
@@ -1816,7 +1896,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getDesignConfiguration()
 	 * @generated
 	 */
-	int DESIGN_CONFIGURATION = 33;
+	int DESIGN_CONFIGURATION = 32;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.ProcessorConfiguration <em>Processor Configuration</em>}' enum.
@@ -1826,7 +1906,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getProcessorConfiguration()
 	 * @generated
 	 */
-	int PROCESSOR_CONFIGURATION = 34;
+	int PROCESSOR_CONFIGURATION = 33;
 
 	/**
 	 * The meta object id for the '
@@ -1838,7 +1918,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getSocketType()
 	 * @generated
 	 */
-	int SOCKET_TYPE = 35;
+	int SOCKET_TYPE = 34;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.Extension <em>Extension</em>}' enum.
@@ -1847,7 +1927,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExtension()
 	 * @generated
 	 */
-	int EXTENSION = 36;
+	int EXTENSION = 35;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.OpUnary <em>Op Unary</em>}' enum.
@@ -1856,7 +1936,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getOpUnary()
 	 * @generated
 	 */
-	int OP_UNARY = 37;
+	int OP_UNARY = 36;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.OpBinary <em>Op Binary</em>}' enum.
@@ -1865,7 +1945,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getOpBinary()
 	 * @generated
 	 */
-	int OP_BINARY = 38;
+	int OP_BINARY = 37;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Design <em>Design</em>}'.
@@ -1976,6 +2056,38 @@ public interface ArchitecturePackage extends EPackage {
 	EAttribute getDesign_Configuration();
 
 	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Link <em>Link</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Link</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Link
+	 * @generated
+	 */
+	EClass getLink();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.Link#getSourcePort <em>Source Port</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Source Port</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Link#getSourcePort()
+	 * @see #getLink()
+	 * @generated
+	 */
+	EReference getLink_SourcePort();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.Link#getTargetPort <em>Target Port</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Target Port</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Link#getTargetPort()
+	 * @see #getLink()
+	 * @generated
+	 */
+	EReference getLink_TargetPort();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Signal <em>Signal</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1986,48 +2098,25 @@ public interface ArchitecturePackage extends EPackage {
 	EClass getSignal();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Signal#getName <em>Name</em>}'.
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Signal#getSize <em>Size</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Name</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.Signal#getName()
+	 * @return the meta object for the attribute '<em>Size</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Signal#getSize()
 	 * @see #getSignal()
 	 * @generated
 	 */
-	EAttribute getSignal_Name();
+	EAttribute getSignal_Size();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.tta.architecture.Signal#getType <em>Type</em>}'.
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Fifo <em>Fifo</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Type</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.Signal#getType()
-	 * @see #getSignal()
+	 * @return the meta object for class '<em>Fifo</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Fifo
 	 * @generated
 	 */
-	EReference getSignal_Type();
-
-	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.Signal#getSourcePort <em>Source Port</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Source Port</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.Signal#getSourcePort()
-	 * @see #getSignal()
-	 * @generated
-	 */
-	EReference getSignal_SourcePort();
-
-	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.Signal#getTargetPort <em>Target Port</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Target Port</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.Signal#getTargetPort()
-	 * @see #getSignal()
-	 * @generated
-	 */
-	EReference getSignal_TargetPort();
+	EClass getFifo();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Component <em>Component</em>}'.
@@ -2207,47 +2296,6 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getProcessor_Configuration();
-
-	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Type <em>Type</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Type</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.Type
-	 * @generated
-	 */
-	EClass getType();
-
-	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Type#getSize <em>Size</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Size</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.Type#getSize()
-	 * @see #getType()
-	 * @generated
-	 */
-	EAttribute getType_Size();
-
-	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.TypeVector <em>Type Vector</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Type Vector</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.TypeVector
-	 * @generated
-	 */
-	EClass getTypeVector();
-
-	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.TypeLogic <em>Type Logic</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Type Logic</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.TypeLogic
-	 * @generated
-	 */
-	EClass getTypeLogic();
 
 	/**
 	 * Returns the meta object for class '
@@ -2654,28 +2702,6 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 */
 	EClass getPort();
-
-	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Port#getName <em>Name</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Name</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.Port#getName()
-	 * @see #getPort()
-	 * @generated
-	 */
-	EAttribute getPort_Name();
-
-	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.tta.architecture.Port#getType <em>Type</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Type</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.Port#getType()
-	 * @see #getPort()
-	 * @generated
-	 */
-	EReference getPort_Type();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Socket <em>Socket</em>}'.
@@ -3315,6 +3341,32 @@ public interface ArchitecturePackage extends EPackage {
 		EAttribute DESIGN__CONFIGURATION = eINSTANCE.getDesign_Configuration();
 
 		/**
+		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.LinkImpl <em>Link</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.backends.tta.architecture.impl.LinkImpl
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getLink()
+		 * @generated
+		 */
+		EClass LINK = eINSTANCE.getLink();
+
+		/**
+		 * The meta object literal for the '<em><b>Source Port</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference LINK__SOURCE_PORT = eINSTANCE.getLink_SourcePort();
+
+		/**
+		 * The meta object literal for the '<em><b>Target Port</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference LINK__TARGET_PORT = eINSTANCE.getLink_TargetPort();
+
+		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.SignalImpl <em>Signal</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -3325,36 +3377,22 @@ public interface ArchitecturePackage extends EPackage {
 		EClass SIGNAL = eINSTANCE.getSignal();
 
 		/**
-		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Size</b></em>' attribute feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute SIGNAL__NAME = eINSTANCE.getSignal_Name();
+		EAttribute SIGNAL__SIZE = eINSTANCE.getSignal_Size();
 
 		/**
-		 * The meta object literal for the '<em><b>Type</b></em>' containment reference feature.
+		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.FifoImpl <em>Fifo</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.backends.tta.architecture.impl.FifoImpl
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getFifo()
 		 * @generated
 		 */
-		EReference SIGNAL__TYPE = eINSTANCE.getSignal_Type();
-
-		/**
-		 * The meta object literal for the '<em><b>Source Port</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference SIGNAL__SOURCE_PORT = eINSTANCE.getSignal_SourcePort();
-
-		/**
-		 * The meta object literal for the '<em><b>Target Port</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference SIGNAL__TARGET_PORT = eINSTANCE.getSignal_TargetPort();
+		EClass FIFO = eINSTANCE.getFifo();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.ComponentImpl <em>Component</em>}' class.
@@ -3496,44 +3534,6 @@ public interface ArchitecturePackage extends EPackage {
 		 */
 		EAttribute PROCESSOR__CONFIGURATION = eINSTANCE
 				.getProcessor_Configuration();
-
-		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.Type <em>Type</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.backends.tta.architecture.Type
-		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getType()
-		 * @generated
-		 */
-		EClass TYPE = eINSTANCE.getType();
-
-		/**
-		 * The meta object literal for the '<em><b>Size</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute TYPE__SIZE = eINSTANCE.getType_Size();
-
-		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.TypeVectorImpl <em>Type Vector</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.backends.tta.architecture.impl.TypeVectorImpl
-		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTypeVector()
-		 * @generated
-		 */
-		EClass TYPE_VECTOR = eINSTANCE.getTypeVector();
-
-		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.TypeLogicImpl <em>Type Logic</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.backends.tta.architecture.impl.TypeLogicImpl
-		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTypeLogic()
-		 * @generated
-		 */
-		EClass TYPE_LOGIC = eINSTANCE.getTypeLogic();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.BusImpl <em>Bus</em>}' class.
@@ -3864,22 +3864,6 @@ public interface ArchitecturePackage extends EPackage {
 		 * @generated
 		 */
 		EClass PORT = eINSTANCE.getPort();
-
-		/**
-		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute PORT__NAME = eINSTANCE.getPort_Name();
-
-		/**
-		 * The meta object literal for the '<em><b>Type</b></em>' containment reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference PORT__TYPE = eINSTANCE.getPort_Type();
 
 		/**
 		 * The meta object literal for the '

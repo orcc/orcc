@@ -9,12 +9,14 @@ import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.tta.architecture.Component;
 import net.sf.orcc.backends.tta.architecture.Design;
 import net.sf.orcc.backends.tta.architecture.DesignConfiguration;
+import net.sf.orcc.backends.tta.architecture.Fifo;
 import net.sf.orcc.backends.tta.architecture.Port;
 import net.sf.orcc.backends.tta.architecture.Processor;
 import net.sf.orcc.backends.tta.architecture.ProcessorConfiguration;
 import net.sf.orcc.backends.tta.architecture.Signal;
 import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
@@ -23,6 +25,9 @@ import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
+
+import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.EList;
 
 public class ArchitectureBuilder extends DfSwitch<Design> {
 
@@ -36,12 +41,12 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	private Mapping mapping;
 
 	private Map<Vertex, Component> componentMap;
-	private Map<Vertex, Port> portMap;
+	private Map<net.sf.orcc.df.Port, Port> portMap;
 
 	public ArchitectureBuilder(DesignConfiguration conf) {
 		design = factory.createDesign();
 		componentMap = new HashMap<Vertex, Component>();
-		portMap = new HashMap<Vertex, Port>();
+		portMap = new HashMap<net.sf.orcc.df.Port, Port>();
 	}
 
 	public ArchitectureBuilder(DesignConfiguration conf, Mapping mapping) {
@@ -52,13 +57,12 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	private void addFifo(Connection connection) {
 		Component source = componentMap.get(connection.getSource());
 		Component target = componentMap.get(connection.getTarget());
-		String srcCalPort = connection.getSourcePort() == null ? connection
-				.getSource().getLabel() : connection.getSourcePort().getName();
-		String tgtCalPort = connection.getTargetPort() == null ? connection
-				.getTarget().getLabel() : connection.getTargetPort().getName();
+		Port sourcePort = portMap.get(connection.getSourcePort());
+		Port targetPort = portMap.get(connection.getTargetPort());
 
 		String id = connection.getAttribute("id").getValue().toString();
-		Component fifo = factory.createComponent("fifo_" + id, "fifo");
+		Fifo fifo = factory.createFifo(id, source, target, sourcePort,
+				targetPort);
 
 		// Generics
 		int size = connection.getSize();
@@ -67,104 +71,44 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		fifo.setAttribute("widthu",
 				(int) Math.ceil(Math.log(size) / Math.log(2)));
 
-		// FIFO ports
-		Port fifo_rdreq = factory.createPortLogic("rdreq");
-		fifo.addInput(fifo_rdreq);
-		Port fifo_data = factory.createPortVec32("data");
-		fifo.addInput(fifo_data);
-		Port fifo_tokens = factory.createPortVec32("tokens");
-		fifo.addOutput(fifo_tokens);
-		Port fifo_wreq = factory.createPortLogic("wreq");
-		fifo.addInput(fifo_wreq);
-		Port fifo_queue = factory.createPortVec32("queue");
-		fifo.addOutput(fifo_queue);
-		Port fifo_rooms = factory.createPortVec32("rooms");
-		fifo.addOutput(fifo_rooms);
-
-		// Target ports
-		Port tgt_data = factory.createPortVec32("in_" + tgtCalPort + "_data");
-		target.addInput(tgt_data);
-		Port tgt_tokens = factory.createPortVec32("in_" + tgtCalPort
-				+ "_tokens");
-		target.addInput(tgt_tokens);
-		Port tgt_ack = factory.createPortLogic("in_" + tgtCalPort + "_ack");
-		target.addOutput(tgt_ack);
-
-		// Source ports
-		Port src_data = factory.createPortVec32("out_" + srcCalPort + "_data");
-		source.addOutput(src_data);
-		Port src_rooms = factory
-				.createPortVec32("out_" + srcCalPort + "_rooms");
-		source.addOutput(src_rooms);
-		Port src_ack = factory.createPortLogic("out_" + srcCalPort + "_ack");
-		source.addOutput(src_ack);
-
-		// Signals
-		Signal s_data = factory.createSignal("s_data_" + id, source, fifo,
-				src_data, fifo_data);
-		Signal s_wrreq = factory.createSignal("s_wrreq_" + id, source, fifo,
-				src_ack, fifo_wreq);
-		Signal s_rooms = factory.createSignal("s_rooms_" + id, fifo, source,
-				fifo_rooms, src_rooms);
-		Signal s_q = factory.createSignal("s_queue_" + id, fifo, target,
-				fifo_queue, tgt_data);
-		Signal s_rdreq = factory.createSignal("s_rdreq_" + id, target, fifo,
-				tgt_ack, fifo_rdreq);
-		Signal s_tokens = factory.createSignal("s_tokens_" + id, fifo, target,
-				fifo_tokens, tgt_tokens);
-
-		design.add(s_data);
-		design.add(s_wrreq);
-		design.add(s_rooms);
-		design.add(s_q);
-		design.add(s_rdreq);
-		design.add(s_tokens);
-
 		design.add(fifo);
 		design.getFifos().add(fifo);
 	}
 
+	private EList<Port> createPorts(EList<net.sf.orcc.df.Port> calPorts) {
+		EList<Port> ports = new BasicEList<Port>();
+		for (net.sf.orcc.df.Port calPort : calPorts) {
+			Port port = factory.createPort();
+			port.setLabel(calPort.getName());
+			ports.add(port);
+			portMap.put(calPort, port);
+		}
+		return ports;
+	}
+
 	private void addSignal(Connection connection) {
-		Component source = componentMap.get(connection.getSource());
-		Component target = componentMap.get(connection.getTarget());
-		String srcCalPort = connection.getSourcePort() == null ? connection
-				.getSource().getLabel() : connection.getSourcePort().getName();
-		String tgtCalPort = connection.getTargetPort() == null ? connection
-				.getTarget().getLabel() : connection.getTargetPort().getName();
+		Vertex source = componentMap.get(connection.getSource());
+		Vertex target = componentMap.get(connection.getTarget());
+		Port sourcePort = portMap.get(connection.getSourcePort());
+		Port targetPort = portMap.get(connection.getTargetPort());
+		int size;
 
-		Port sourcePort;
 		if (source == null) {
-			sourcePort = portMap.get(connection.getSource());
-		} else if (source.isProcessor()) {
-			sourcePort = factory.createPortVec32("out_" + srcCalPort + "_data");
-			source.addOutput(sourcePort);
-			source.addInput(factory.createPortVec32("out_" + srcCalPort
-					+ "_rooms"));
-			source.addOutput(factory.createPortLogic("out_" + srcCalPort
-					+ "_ack"));
+			net.sf.orcc.df.Port calPort = (net.sf.orcc.df.Port) connection
+					.getSource();
+			source = portMap.get(calPort);
+			size = calPort.getType().getSizeInBits();
 		} else {
-			sourcePort = factory.createPortVec32(srcCalPort);
-			source.addOutput(sourcePort);
+			size = connection.getSourcePort().getType().getSizeInBits();
 		}
 
-		Port targetPort;
 		if (target == null) {
-			targetPort = portMap.get(connection.getSource());
-		} else if (target.isProcessor()) {
-			targetPort = factory.createPortVec32("in_" + tgtCalPort + "_data");
-			target.addInput(targetPort);
-			target.addInput(factory.createPortVec32("in_" + tgtCalPort
-					+ "_tokens"));
-			target.addOutput(factory.createPortLogic("in_" + tgtCalPort
-					+ "_ack"));
-		} else {
-			targetPort = factory.createPortVec32(tgtCalPort);
-			target.addInput(targetPort);
+			target = portMap.get((net.sf.orcc.df.Port) connection.getTarget());
 		}
 
-		Signal signal = factory.createSignal(
-				"s_" + connection.getAttribute("id"), source, target,
-				sourcePort, targetPort);
+		Signal signal = factory.createSignal(connection.getAttribute("id")
+				.getValue().toString(), size, source, target, sourcePort,
+				targetPort);
 
 		design.add(signal);
 	}
@@ -172,8 +116,10 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	@Override
 	public Design caseBroadcast(Broadcast broadcast) {
 		Component component = factory.createComponent(
-				broadcast.getSimpleName(), "broadcast");
-		component.setAttribute("outputs_number", broadcast.getOutputs().size());
+				broadcast.getSimpleName(), "broadcast_"
+						+ broadcast.getOutputs().size());
+		component.getInputs().addAll(createPorts(broadcast.getInputs()));
+		component.getOutputs().addAll(createPorts(broadcast.getOutputs()));
 		design.getBroadcasts().add(component);
 		design.add(component);
 		componentMap.put(broadcast, component);
@@ -182,12 +128,13 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 
 	@Override
 	public Design caseConnection(Connection connection) {
-		if (connection.hasAttribute("native")) {
+		net.sf.orcc.df.Port sourcePort = connection.getSourcePort() == null ? (net.sf.orcc.df.Port) connection
+				.getSource() : connection.getSourcePort();
+		net.sf.orcc.df.Port targetPort = connection.getTargetPort() == null ? (net.sf.orcc.df.Port) connection
+				.getTarget() : connection.getTargetPort();
+
+		if (sourcePort.isNative() || targetPort.isNative()) {
 			addSignal(connection);
-		} else if (connection.getSourcePort() == null) {
-
-		} else if (connection.getTargetPort() == null) {
-
 		} else {
 			addFifo(connection);
 		}
@@ -196,9 +143,11 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 
 	@Override
 	public Design caseInstance(Instance instance) {
-		if (instance.getActor().isNative()) {
-			Component component = factory.createComponent(instance.getName(),
-					instance.getActor().getSimpleName());
+		Actor actor = instance.getActor();
+		Component component;
+		if (actor.isNative()) {
+			component = factory.createComponent(instance.getName(), instance
+					.getActor().getSimpleName());
 			design.getComponents().add(component);
 			design.add(component);
 			componentMap.put(instance, component);
@@ -208,39 +157,34 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 			Processor processor = factory.createProcessor(name + "_inst",
 					"processor_" + name, ProcessorConfiguration.STANDARD,
 					memorySize);
+			component = processor;
 			design.getProcessors().add(processor);
 			design.add(processor);
 			componentMap.put(instance, processor);
 		}
+		component.getInputs().addAll(createPorts(actor.getInputs()));
+		component.getOutputs().addAll(createPorts(actor.getOutputs()));
 		return null;
 	}
 
 	@Override
 	public Design caseNetwork(Network network) {
 		design = factory.createDesign();
+		design.getInputs().addAll(createPorts(network.getInputs()));
+		design.getOutputs().addAll(createPorts(network.getOutputs()));
 		for (Vertex entity : network.getEntities()) {
 			doSwitch(entity);
 		}
 		for (Instance instance : network.getInstances()) {
 			doSwitch(instance);
 		}
+		for (net.sf.orcc.df.Port port : network.getInputs()) {
+			doSwitch(port);
+		}
 		for (Connection connection : network.getConnections()) {
 			doSwitch(connection);
 		}
 		return design;
-	}
-
-	@Override
-	public Design casePort(net.sf.orcc.df.Port port) {
-		Port newPort = factory.createPort(port.getName(),
-				factory.createTypeVector(port.getType().getSizeInBits()));
-		if (port.getIncoming().isEmpty()) {
-			design.addInput(newPort);
-		} else {
-			design.addOutput(newPort);
-		}
-		portMap.put(port, newPort);
-		return null;
 	}
 
 	private int computeNeededMemorySize(Action action) {

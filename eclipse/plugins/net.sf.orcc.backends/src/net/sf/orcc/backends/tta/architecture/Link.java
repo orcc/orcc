@@ -30,48 +30,80 @@
  */
 package net.sf.orcc.backends.tta.architecture;
 
+import net.sf.dftools.graph.Edge;
 
 /**
- * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>Signal</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> A representation of the model object '
+ * <em><b>Link</b></em>'. <!-- end-user-doc -->
  *
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.Signal#getSize <em>Size</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Link#getSourcePort <em>Source Port</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Link#getTargetPort <em>Target Port</em>}</li>
  * </ul>
  * </p>
  *
- * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getSignal()
- * @model
+ * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getLink()
+ * @model abstract="true"
  * @generated
  */
-public interface Signal extends Link {
+public interface Link extends Edge {
 
 	/**
-	 * Returns the value of the '<em><b>Size</b></em>' attribute.
+	 * Returns the value of the '<em><b>Source Port</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Size</em>' attribute isn't clear,
+	 * If the meaning of the '<em>Source Port</em>' reference isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Size</em>' attribute.
-	 * @see #setSize(int)
-	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getSignal_Size()
+	 * @return the value of the '<em>Source Port</em>' reference.
+	 * @see #setSourcePort(Port)
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getLink_SourcePort()
 	 * @model
 	 * @generated
 	 */
-	int getSize();
+	Port getSourcePort();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Signal#getSize <em>Size</em>}' attribute.
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Link#getSourcePort <em>Source Port</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Size</em>' attribute.
-	 * @see #getSize()
+	 * @param value the new value of the '<em>Source Port</em>' reference.
+	 * @see #getSourcePort()
 	 * @generated
 	 */
-	void setSize(int value);
-} // Signal
+	void setSourcePort(Port value);
+
+	/**
+	 * Returns the value of the '<em><b>Target Port</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Target Port</em>' reference isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Target Port</em>' reference.
+	 * @see #setTargetPort(Port)
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getLink_TargetPort()
+	 * @model
+	 * @generated
+	 */
+	Port getTargetPort();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Link#getTargetPort <em>Target Port</em>}' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Target Port</em>' reference.
+	 * @see #getTargetPort()
+	 * @generated
+	 */
+	void setTargetPort(Port value);
+
+	boolean isFifo();
+
+	boolean isSignal();
+
+} // Link

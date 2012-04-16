@@ -39,6 +39,7 @@ import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.Component;
 import net.sf.orcc.backends.tta.architecture.Design;
 import net.sf.orcc.backends.tta.architecture.DesignConfiguration;
+import net.sf.orcc.backends.tta.architecture.Fifo;
 import net.sf.orcc.backends.tta.architecture.Port;
 import net.sf.orcc.backends.tta.architecture.Processor;
 import net.sf.orcc.backends.tta.architecture.Signal;
@@ -96,8 +97,7 @@ public class DesignImpl extends GraphImpl implements Design {
 	protected EList<Component> components;
 	/**
 	 * The cached value of the '{@link #getProcessors() <em>Processors</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getProcessors()
 	 * @generated
 	 * @ordered
@@ -105,8 +105,7 @@ public class DesignImpl extends GraphImpl implements Design {
 	protected EList<Processor> processors;
 	/**
 	 * The cached value of the '{@link #getBroadcasts() <em>Broadcasts</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getBroadcasts()
 	 * @generated
 	 * @ordered
@@ -114,13 +113,12 @@ public class DesignImpl extends GraphImpl implements Design {
 	protected EList<Component> broadcasts;
 	/**
 	 * The cached value of the '{@link #getFifos() <em>Fifos</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getFifos()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Component> fifos;
+	protected EList<Fifo> fifos;
 	/**
 	 * The cached value of the '{@link #getSignals() <em>Signals</em>}' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -174,7 +172,11 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	@Override
 	public void add(Edge edge) {
-		getSignals().add((Signal) edge);
+		if (edge instanceof Signal) {
+			getSignals().add((Signal) edge);
+		} else if (edge instanceof Fifo) {
+			getFifos().add((Fifo) edge);
+		}
 		getEdges().add(edge);
 	}
 
@@ -279,7 +281,7 @@ public class DesignImpl extends GraphImpl implements Design {
 			return;
 		case ArchitecturePackage.DESIGN__FIFOS:
 			getFifos().clear();
-			getFifos().addAll((Collection<? extends Component>) newValue);
+			getFifos().addAll((Collection<? extends Fifo>) newValue);
 			return;
 		case ArchitecturePackage.DESIGN__SIGNALS:
 			getSignals().clear();
@@ -380,8 +382,7 @@ public class DesignImpl extends GraphImpl implements Design {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EList<Processor> getProcessors() {
@@ -393,8 +394,7 @@ public class DesignImpl extends GraphImpl implements Design {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EList<Component> getBroadcasts() {
@@ -406,13 +406,12 @@ public class DesignImpl extends GraphImpl implements Design {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Component> getFifos() {
+	public EList<Fifo> getFifos() {
 		if (fifos == null) {
-			fifos = new EObjectResolvingEList<Component>(Component.class, this,
+			fifos = new EObjectResolvingEList<Fifo>(Fifo.class, this,
 					ArchitecturePackage.DESIGN__FIFOS);
 		}
 		return fifos;

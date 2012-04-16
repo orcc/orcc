@@ -138,7 +138,7 @@ public interface Design extends Graph {
 
 	/**
 	 * Returns the value of the '<em><b>Fifos</b></em>' reference list.
-	 * The list contents are of type {@link net.sf.orcc.backends.tta.architecture.Component}.
+	 * The list contents are of type {@link net.sf.orcc.backends.tta.architecture.Fifo}.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Fifos</em>' reference list isn't clear,
@@ -150,7 +150,7 @@ public interface Design extends Graph {
 	 * @model
 	 * @generated
 	 */
-	EList<Component> getFifos();
+	EList<Fifo> getFifos();
 
 	/**
 	 * Returns the value of the '<em><b>Signals</b></em>' reference list.

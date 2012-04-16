@@ -30,9 +30,9 @@ use work.broadcast_type.all;
 entity top is
   port
     (
-      clk          : in  std_logic;
+      clk : in  std_logic;
       <declarePorts(design)>
-      rst_n        : in  std_logic
+      rst_n : in  std_logic
       );
 end top;
 
@@ -43,6 +43,7 @@ architecture bdf_type of top is
   -- Signals declaration
   ---------------------------------------------------------------------------  
   <design.signals: declareSignal(); separator="\n">
+  <design.fifos: declareFifoSignal(); separator="\n">
   ---------------------------------------------------------------------------
   
 begin
@@ -50,8 +51,8 @@ begin
   ---------------------------------------------------------------------------
   -- Ports instantiation 
   ---------------------------------------------------------------------------
-  <design.inputs: { input | <assignNetworkPort(input, false)> }; separator="\n">
-  <design.outputs: { output | <assignNetworkPort(output, false)> }; separator="\n">
+  <design.inputs: { input | <assignNetworkPort(input, first(input.outgoing))> }; separator="\n">
+  <design.outputs: { output | <assignNetworkPort(output, first(output.incoming))> }; separator="\n">
   ---------------------------------------------------------------------------
   -- FIFOs instantiation 
   --------------------------------------------------------------------------- 
@@ -85,11 +86,11 @@ declarePorts(component) ::= <<
 >>
 
 declareInput(port) ::= <<
-<port.name> : in std_logic_vector(<port.size> downto 0);
+<port.label> : in std_logic_vector(<port.size> downto 0);
 >>
 
 declareOutput(port) ::= <<
-<port.name> : out std_logic_vector(<port.size> downto 0);
+<port.label> : out std_logic_vector(<port.size> downto 0);
 >>
 
 
@@ -104,20 +105,45 @@ signal <broadcast.name>_dv_outputs     : std_logic_vector(<length(broadcast.outp
 >>
 
 declareSignal(signal) ::= <<
-signal <signal.name> : std_logic_vector(31 downto 0);
+signal s_<signal.label> : std_logic_vector(<signal.size>-1 downto 0);
 >>
+
+declareFifoSignal(fifo) ::= <<
+signal fifo_<fifo.label>_data         : std_logic_vector(31 downto 0);
+signal fifo_<fifo.label>_q            : std_logic_vector(31 downto 0);
+signal fifo_<fifo.label>_rdreq        : std_logic;
+signal fifo_<fifo.label>_wrreq        : std_logic;
+signal fifo_<fifo.label>_nb_tokens    : std_logic_vector(31 downto 0);
+signal fifo_<fifo.label>_nb_freerooms : std_logic_vector(31 downto 0);
+>> 
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Instantiation
 ///////////////////////////////////////////////////////////////////////////////
 
-assignNetworkPort(port, signal) ::= <<
-<port.name> \<= <signal.name>;
+assignNetworkPort(port, link) ::= <<
+<port.label> \<= s_<link.label>;
 >>
 
-assignPort(port, signal) ::= <<
-<port.name> =\> <signal.name>
+assignInputPort(port, link, index) ::= <<
+<if(link.signal)
+><port.name>  =\> s_<link.label>,<
+elseif(link.fifo)
+>data_<index>_in   =\> fifo_<link.label>_queue,
+status_<index>_in =\> fifo_<link.label>_tokens,
+ack_<index>_in    =\> fifo_<link.label>_rdreq,<
+endif>
+>>
+
+assignOutputPort(port, link, index) ::= <<
+<if(link.signal)
+><port.name>  =\> s_<link.label>,<
+elseif(link.fifo)
+>data_<index>_in   =\> fifo_<link.label>_queue,
+status_<index>_in =\> fifo_<link.label>_tokens,
+ack_<index>_in    =\> fifo_<link.label>_rdreq,<
+endif>
 >>
 
 assignGeneric(attribute) ::= <<
@@ -127,34 +153,38 @@ assignGeneric(attribute) ::= <<
 assignComponent(component) ::= <<
 <component.name> : entity work.<component.entityName>
   port map(clk =\> clk,
-           <component.inputs: { input |<assignPort(input, component.incomingPortMap.(input))>}; separator=",\n">
-           <component.outputs: { output |<assignPort(output, component.outgoingPortMap.(output))>}; separator=",\n">
+           <component.inputs: { input |<assignInputPort(input, component.incomingPortMap.(input), i0)>}; separator="\n">
+           <component.outputs: { output |<assignOutputPort(output, component.outgoingPortMap.(output), i0)>}; separator="\n">
            rst_n =\> rst_n);
 >>
 
 assignFifo(fifo) ::= <<
-<fifo.name> : entity work.<fifo.entityName>
+fifo_<fifo.label> : entity work.fifo
   generic map(device_family =\> "<options.fpga.family>"
               <fifo.attributes: assignGeneric(); separator=",\n">)
   port map(clk =\> clk,
-           <fifo.inputs: { input |<assignPort(input, fifo.incomingPortMap.(input))>}; separator=",\n">
-           <fifo.outputs: { output |<assignPort(output, fifo.outgoingPortMap.(output))>}; separator=",\n">
-           rst_n =\> rst_n);
+           rdreq  => fifo_<fifo.label>_rdreq,
+           data   => fifo_<fifo.label>_data,
+           queue  => fifo_<fifo.label>_queue,
+           tokens => fifo_<fifo.label>_tokens,
+           rooms  => fifo_<fifo.label>_rooms,
+           wrreq  => fifo_<fifo.label>_wrreq,
+           rst_n  =\> rst_n);
 >>
 
 assignProcessor(processor) ::= <<
 <processor.name> : entity work.<processor.entityName>
   generic map(device_family =\> "<options.fpga.family>")
   port map(clk =\> clk,
-           <processor.inputs: { input |<assignPort(input, processor.incomingPortMap.(input))>}; separator=",\n">
-           <processor.outputs: { output |<assignPort(output, processor.outgoingPortMap.(output))>}; separator=",\n">
+           <processor.inputs: { input |<assignInputPort(input, processor.incomingPortMap.(input), i0)>}; separator="\n">
+           <processor.outputs: { output |<assignOutputPort(output, processor.outgoingPortMap.(output), i0)>}; separator="\n">
            rst_n =\> rst_n);
 >>
 
 assignBroadcast(broadcast) ::= <<
 <broadcast.name> : entity work.<broadcast.entityName>
   port map(clk          =\> clk,
-           <broadcast.inputs: { input |<assignPort(input, broadcast.incomingPortMap.(input))>}; separator=",\n">
-           <broadcast.outputs: { output |<assignPort(output, broadcast.outgoingPortMap.(output))>}; separator=",\n">
+           <broadcast.inputs: { input |<assignInputPort(input, broadcast.incomingPortMap.(input), i0)>}; separator="\n">
+           <broadcast.outputs: { output |<assignOutputPort(output, broadcast.outgoingPortMap.(output), i0)>}; separator="\n">
            rst_n        =\> rst_n);
 >>
