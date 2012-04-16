@@ -20,14 +20,14 @@ entity fifo is
       );
   port
     (
-      wrreq        : in  std_logic;
-      rst_n        : in  std_logic;
-      clk          : in  std_logic;
-      rdreq        : in  std_logic;
-      data         : in  std_logic_vector(width-1 downto 0);
-      q            : out std_logic_vector(width-1 downto 0);
-      nb_freerooms : out std_logic_vector(31 downto 0);
-      nb_tokens    : out std_logic_vector(31 downto 0)
+      wrreq  : in  std_logic;
+      rst_n  : in  std_logic;
+      clk    : in  std_logic;
+      rdreq  : in  std_logic;
+      data   : in  std_logic_vector(width-1 downto 0);
+      queue  : out std_logic_vector(width-1 downto 0);
+      rooms  : out std_logic_vector(31 downto 0);
+      tokens : out std_logic_vector(31 downto 0)
       );
 end fifo;
 
@@ -46,27 +46,27 @@ architecture rtl_fifo of fifo is
       empty : out std_logic);
   end component;
 
-  signal nb_tokens_i : std_logic_vector(31 downto 0) := (others => '0');
-  signal rst         : std_logic;
-  signal empty       : std_logic;
+  signal tokens_i : std_logic_vector(31 downto 0) := (others => '0');
+  signal rst      : std_logic;
+  signal empty    : std_logic;
 
 begin
 
-  rst          <= not(rst_n);
-  nb_tokens    <= nb_tokens_i;
-  nb_freerooms <= std_logic_vector(to_unsigned(size - to_integer(unsigned(nb_tokens_i)), 32));
+  rst    <= not(rst_n);
+  tokens <= tokens_i;
+  rooms  <= std_logic_vector(to_unsigned(size - to_integer(unsigned(tokens_i)), 32));
 
   token_count : process(clk)
   begin
     if (clk'event and clk = '1') then
-      if ((wrreq = '1' and nb_tokens_i(widthu) = '0') and (rdreq = '1' and empty = '0')) then
-        nb_tokens_i <= nb_tokens_i;
+      if ((wrreq = '1' and tokens_i(widthu) = '0') and (rdreq = '1' and empty = '0')) then
+        tokens_i <= tokens_i;
       else
-        if (wrreq = '1' and nb_tokens_i(widthu) = '0') then
-          nb_tokens_i <= nb_tokens_i + 1;
+        if (wrreq = '1' and tokens_i(widthu) = '0') then
+          tokens_i <= tokens_i + 1;
         end if;
         if (rdreq = '1' and empty = '0') then
-          nb_tokens_i <= nb_tokens_i - 1;
+          tokens_i <= tokens_i - 1;
         end if;
       end if;
     end if;
@@ -80,6 +80,6 @@ begin
       din   => data,
       wr_en => wrreq,
       rd_en => rdreq,
-      dout  => q,
+      dout  => queue,
       empty => empty);
 end rtl_fifo;

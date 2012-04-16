@@ -15,28 +15,28 @@ entity fifo is
       );
   port
     (
-      wrreq        : in  std_logic;
-      rst_n        : in  std_logic;
-      clk          : in  std_logic;
-      rdreq        : in  std_logic;
-      data         : in  std_logic_vector(width-1 downto 0);
-      q            : out std_logic_vector(width-1 downto 0);
-      nb_freerooms : out std_logic_vector(31 downto 0);
-      nb_tokens    : out std_logic_vector(31 downto 0)
+      wrreq  : in  std_logic;
+      rst_n  : in  std_logic;
+      clk    : in  std_logic;
+      rdreq  : in  std_logic;
+      data   : in  std_logic_vector(width-1 downto 0);
+      queue  : out std_logic_vector(width-1 downto 0);
+      rooms  : out std_logic_vector(31 downto 0);
+      tokens : out std_logic_vector(31 downto 0)
       );
 end fifo;
 
 
 architecture rtl_fifo of fifo is
 
-  signal nb_tokens_i : std_logic_vector(31 downto 0) := (others => '0');
-  signal clear       : std_logic;
+  signal tokens_i : std_logic_vector(31 downto 0) := (others => '0');
+  signal clear    : std_logic;
 
 begin
 
-  clear        <= not(rst_n);
-  nb_tokens    <= nb_tokens_i;
-  nb_freerooms <= std_logic_vector(to_unsigned(size - to_integer(unsigned(nb_tokens_i)), 32));
+  clear  <= not(rst_n);
+  tokens <= tokens_i;
+  rooms  <= std_logic_vector(to_unsigned(size - to_integer(unsigned(tokens_i)), 32));
 
   fifo_component : altera_mf_components.scfifo
     generic map (
@@ -57,9 +57,9 @@ begin
       rdreq => rdreq,
       sclr  => clear,
       wrreq => wrreq,
-      usedw => nb_tokens_i(widthu-1 downto 0),
-      q     => q,
-      full  => nb_tokens_i(widthu)
+      usedw => tokens_i(widthu-1 downto 0),
+      q     => queue,
+      full  => tokens_i(widthu)
       );
 
 end rtl_fifo;
