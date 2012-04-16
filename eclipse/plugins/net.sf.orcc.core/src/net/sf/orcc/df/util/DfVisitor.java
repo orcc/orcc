@@ -38,13 +38,13 @@ import net.sf.orcc.ir.util.AbstractIrVisitor;
 import org.eclipse.emf.ecore.EObject;
 
 /**
- * This abstract class implements a no-op visitor on an actor. This class should
- * be extended by classes that implement actor visitors and transformations.
+ * This class implements a no-op visitor on an actor. This class should be
+ * extended by classes that implement actor visitors and transformations.
  * 
  * @author Matthieu Wipliez
  * @since 1.2
  */
-public abstract class AbstractDfVisitor<T> extends DfSwitch<T> {
+public class DfVisitor<T> extends DfSwitch<T> {
 
 	protected Actor actor;
 
@@ -60,7 +60,7 @@ public abstract class AbstractDfVisitor<T> extends DfSwitch<T> {
 	 * instructions of all procedures (including the ones referenced by
 	 * actions).
 	 */
-	public AbstractDfVisitor(AbstractIrVisitor<T> irVisitor) {
+	public DfVisitor(AbstractIrVisitor<T> irVisitor) {
 		this.irVisitor = irVisitor;
 	}
 
