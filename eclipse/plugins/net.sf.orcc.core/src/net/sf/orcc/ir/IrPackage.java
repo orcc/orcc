@@ -597,11 +597,12 @@ public interface IrPackage extends EPackage {
 		EAttribute PROCEDURE__NATIVE = eINSTANCE.getProcedure_Native();
 
 		/**
-		 * The meta object literal for the '<em><b>Nodes</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * The meta object literal for the '<em><b>Blocks</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PROCEDURE__NODES = eINSTANCE.getProcedure_Nodes();
+		EReference PROCEDURE__BLOCKS = eINSTANCE.getProcedure_Blocks();
 
 		/**
 		 * The meta object literal for the '<em><b>Parameters</b></em>' containment reference list feature.
@@ -1292,12 +1293,13 @@ public interface IrPackage extends EPackage {
 	int PROCEDURE__NATIVE = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 3;
 
 	/**
-	 * The feature id for the '<em><b>Nodes</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Blocks</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PROCEDURE__NODES = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 4;
+	int PROCEDURE__BLOCKS = UtilPackage.ATTRIBUTABLE_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
@@ -3623,17 +3625,15 @@ public interface IrPackage extends EPackage {
 	EAttribute getProcedure_Native();
 
 	/**
-	 * Returns the meta object for the containment reference list '
-	 * {@link net.sf.orcc.ir.Procedure#getNodes <em>Nodes</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the containment reference list '
-	 *         <em>Nodes</em>'.
-	 * @see net.sf.orcc.ir.Procedure#getNodes()
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.Procedure#getBlocks <em>Blocks</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Blocks</em>'.
+	 * @see net.sf.orcc.ir.Procedure#getBlocks()
 	 * @see #getProcedure()
 	 * @generated
 	 */
-	EReference getProcedure_Nodes();
+	EReference getProcedure_Blocks();
 
 	/**
 	 * Returns the meta object for the containment reference list '

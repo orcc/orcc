@@ -687,15 +687,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getProcedure_Nodes() {
-		return (EReference) procedureEClass.getEStructuralFeatures().get(4);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EReference getProcedure_ReturnType() {
 		return (EReference) procedureEClass.getEStructuralFeatures().get(6);
 	}
@@ -887,6 +878,15 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 */
 	public EAttribute getProcedure_Native() {
 		return (EAttribute) procedureEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getProcedure_Blocks() {
+		return (EReference) procedureEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -1544,7 +1544,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEReference(procedureEClass, PROCEDURE__LOCALS);
 		createEAttribute(procedureEClass, PROCEDURE__NAME);
 		createEAttribute(procedureEClass, PROCEDURE__NATIVE);
-		createEReference(procedureEClass, PROCEDURE__NODES);
+		createEReference(procedureEClass, PROCEDURE__BLOCKS);
 		createEReference(procedureEClass, PROCEDURE__PARAMETERS);
 		createEReference(procedureEClass, PROCEDURE__RETURN_TYPE);
 		createEReference(procedureEClass, PROCEDURE__CFG);
@@ -1793,7 +1793,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 				"native", null, 0, 1, Procedure.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
-		initEReference(getProcedure_Nodes(), this.getBlock(), null, "nodes",
+		initEReference(getProcedure_Blocks(), this.getBlock(), null, "blocks",
 				null, 0, -1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

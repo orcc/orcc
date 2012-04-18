@@ -43,7 +43,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getLocals <em>Locals</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#isNative <em>Native</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getNodes <em>Nodes</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getBlocks <em>Blocks</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getParameters <em>Parameters</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getReturnType <em>Return Type</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getCfg <em>Cfg</em>}</li>
@@ -123,13 +123,14 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	protected boolean native_ = NATIVE_EDEFAULT;
 
 	/**
-	 * The cached value of the '{@link #getNodes() <em>Nodes</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getNodes()
+	 * The cached value of the '{@link #getBlocks() <em>Blocks</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getBlocks()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Block> nodes;
+	protected EList<Block> blocks;
 
 	/**
 	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}' containment reference list.
@@ -174,6 +175,25 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetCfg(Cfg newCfg, NotificationChain msgs) {
+		Cfg oldCfg = cfg;
+		cfg = newCfg;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, IrPackage.PROCEDURE__CFG, oldCfg, newCfg);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -208,8 +228,8 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 			return getName();
 		case IrPackage.PROCEDURE__NATIVE:
 			return isNative();
-		case IrPackage.PROCEDURE__NODES:
-			return getNodes();
+		case IrPackage.PROCEDURE__BLOCKS:
+			return getBlocks();
 		case IrPackage.PROCEDURE__PARAMETERS:
 			return getParameters();
 		case IrPackage.PROCEDURE__RETURN_TYPE:
@@ -230,8 +250,8 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 		switch (featureID) {
 		case IrPackage.PROCEDURE__LOCALS:
 			return ((InternalEList<?>) getLocals()).basicRemove(otherEnd, msgs);
-		case IrPackage.PROCEDURE__NODES:
-			return ((InternalEList<?>) getNodes()).basicRemove(otherEnd, msgs);
+		case IrPackage.PROCEDURE__BLOCKS:
+			return ((InternalEList<?>) getBlocks()).basicRemove(otherEnd, msgs);
 		case IrPackage.PROCEDURE__PARAMETERS:
 			return ((InternalEList<?>) getParameters()).basicRemove(otherEnd,
 					msgs);
@@ -259,8 +279,8 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 					.equals(name);
 		case IrPackage.PROCEDURE__NATIVE:
 			return native_ != NATIVE_EDEFAULT;
-		case IrPackage.PROCEDURE__NODES:
-			return nodes != null && !nodes.isEmpty();
+		case IrPackage.PROCEDURE__BLOCKS:
+			return blocks != null && !blocks.isEmpty();
 		case IrPackage.PROCEDURE__PARAMETERS:
 			return parameters != null && !parameters.isEmpty();
 		case IrPackage.PROCEDURE__RETURN_TYPE:
@@ -292,9 +312,9 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 		case IrPackage.PROCEDURE__NATIVE:
 			setNative((Boolean) newValue);
 			return;
-		case IrPackage.PROCEDURE__NODES:
-			getNodes().clear();
-			getNodes().addAll((Collection<? extends Block>) newValue);
+		case IrPackage.PROCEDURE__BLOCKS:
+			getBlocks().clear();
+			getBlocks().addAll((Collection<? extends Block>) newValue);
 			return;
 		case IrPackage.PROCEDURE__PARAMETERS:
 			getParameters().clear();
@@ -338,8 +358,8 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 		case IrPackage.PROCEDURE__NATIVE:
 			setNative(NATIVE_EDEFAULT);
 			return;
-		case IrPackage.PROCEDURE__NODES:
-			getNodes().clear();
+		case IrPackage.PROCEDURE__BLOCKS:
+			getBlocks().clear();
 			return;
 		case IrPackage.PROCEDURE__PARAMETERS:
 			getParameters().clear();
@@ -352,6 +372,28 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 			return;
 		}
 		super.eUnset(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Block> getBlocks() {
+		if (blocks == null) {
+			blocks = new EObjectContainmentEList<Block>(Block.class, this,
+					IrPackage.PROCEDURE__BLOCKS);
+		}
+		return blocks;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Cfg getCfg() {
+		return cfg;
 	}
 
 	/**
@@ -411,16 +453,9 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 		return name;
 	}
 
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
+	@Override
 	public EList<Block> getNodes() {
-		if (nodes == null) {
-			nodes = new EObjectContainmentEList<Block>(Block.class, this,
-					IrPackage.PROCEDURE__NODES);
-		}
-		return nodes;
+		return getBlocks();
 	}
 
 	/**
@@ -478,6 +513,30 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 		variable = IrFactory.eINSTANCE.createVar(0, type, name, true, 0);
 		getLocals().add(variable);
 		return variable;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setCfg(Cfg newCfg) {
+		if (newCfg != cfg) {
+			NotificationChain msgs = null;
+			if (cfg != null)
+				msgs = ((InternalEObject) cfg).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.PROCEDURE__CFG,
+						null, msgs);
+			if (newCfg != null)
+				msgs = ((InternalEObject) newCfg).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.PROCEDURE__CFG,
+						null, msgs);
+			msgs = basicSetCfg(newCfg, msgs);
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.PROCEDURE__CFG, newCfg, newCfg));
 	}
 
 	/**
@@ -542,58 +601,6 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 			eNotify(new ENotificationImpl(this, Notification.SET,
 					IrPackage.PROCEDURE__RETURN_TYPE, newReturnType,
 					newReturnType));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Cfg getCfg() {
-		return cfg;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NotificationChain basicSetCfg(Cfg newCfg, NotificationChain msgs) {
-		Cfg oldCfg = cfg;
-		cfg = newCfg;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.PROCEDURE__CFG, oldCfg, newCfg);
-			if (msgs == null)
-				msgs = notification;
-			else
-				msgs.add(notification);
-		}
-		return msgs;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setCfg(Cfg newCfg) {
-		if (newCfg != cfg) {
-			NotificationChain msgs = null;
-			if (cfg != null)
-				msgs = ((InternalEObject) cfg).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.PROCEDURE__CFG,
-						null, msgs);
-			if (newCfg != null)
-				msgs = ((InternalEObject) newCfg).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.PROCEDURE__CFG,
-						null, msgs);
-			msgs = basicSetCfg(newCfg, msgs);
-			if (msgs != null)
-				msgs.dispatch();
-		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.PROCEDURE__CFG, newCfg, newCfg));
 	}
 
 	/**
