@@ -32,6 +32,8 @@ import java.util.List;
 
 import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -48,8 +50,6 @@ import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.BlockIf;
-import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
@@ -243,9 +243,9 @@ public class TacTransformation extends AbstractActorVisitor<Expression> {
 		complexityLevel++;
 		nodeIf.setCondition(doSwitch(nodeIf.getCondition()));
 		complexityLevel--;
-		doSwitch(nodeIf.getThenNodes());
-		doSwitch(nodeIf.getElseNodes());
-		doSwitch(nodeIf.getJoinNode());
+		doSwitch(nodeIf.getThenBlocks());
+		doSwitch(nodeIf.getElseBlocks());
+		doSwitch(nodeIf.getJoinBlock());
 		return null;
 	}
 
@@ -254,8 +254,8 @@ public class TacTransformation extends AbstractActorVisitor<Expression> {
 		complexityLevel++;
 		nodeWhile.setCondition(doSwitch(nodeWhile.getCondition()));
 		complexityLevel--;
-		doSwitch(nodeWhile.getNodes());
-		doSwitch(nodeWhile.getJoinNode());
+		doSwitch(nodeWhile.getBlocks());
+		doSwitch(nodeWhile.getJoinBlock());
 		return null;
 	}
 

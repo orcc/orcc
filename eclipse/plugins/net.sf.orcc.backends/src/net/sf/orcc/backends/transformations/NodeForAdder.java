@@ -139,7 +139,7 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 		super.caseNodeWhile(nodeWhile);
 
 		// Get properties of the while node
-		EList<Block> nodes = nodeWhile.getNodes();
+		EList<Block> nodes = nodeWhile.getBlocks();
 
 		if (nodes.isEmpty()) {
 			// Don't treat empty nodes
@@ -149,7 +149,7 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 		Expression condition = nodeWhile.getCondition();
 		Block endNode = nodes.get(nodes.size() - 1);
 
-		CfgNode previousCFGNode = (CfgNode) nodeWhile.getJoinNode()
+		CfgNode previousCFGNode = (CfgNode) nodeWhile.getJoinBlock()
 				.getCfgNode().getPredecessors().get(0);
 		Block previousNode = previousCFGNode.getNode();
 
@@ -181,8 +181,8 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 
 		nodeFor.setCondition(nodeWhile.getCondition());
 		nodeFor.setLineNumber(nodeWhile.getLineNumber());
-		nodeFor.setJoinNode(nodeWhile.getJoinNode());
-		nodeFor.getNodes().addAll(nodeWhile.getNodes());
+		nodeFor.setJoinNode(nodeWhile.getJoinBlock());
+		nodeFor.getNodes().addAll(nodeWhile.getBlocks());
 
 		// Add loop counters and inits
 		nodeFor.getLoopCounter().addAll(loopCnts);
@@ -207,9 +207,9 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 		BlockBasic lastBlockNode = null;
 
 		if (lastNode.isBlockIf()) {
-			lastBlockNode = ((BlockIf) lastNode).getJoinNode();
+			lastBlockNode = ((BlockIf) lastNode).getJoinBlock();
 		} else if (lastNode.isBlockWhile()) {
-			lastBlockNode = ((BlockWhile) lastNode).getJoinNode();
+			lastBlockNode = ((BlockWhile) lastNode).getJoinBlock();
 		} else if (lastNode.isBlockBasic()) {
 			lastBlockNode = (BlockBasic) lastNode;
 		} else {

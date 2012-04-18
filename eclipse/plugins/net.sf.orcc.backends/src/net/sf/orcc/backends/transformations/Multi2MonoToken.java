@@ -391,14 +391,14 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		blockScheduler.add(factory.createInstAssign(result, condition));
 		blockScheduler.add(factory.createInstReturn(factory
 				.createExprVar(result)));
-		scheduler.getNodes().add(blockScheduler);
+		scheduler.getBlocks().add(blockScheduler);
 
 		// Body building ;-)
 		Procedure body = factory.createProcedure(name, 0,
 				factory.createTypeVoid());
 		BlockBasic blockBody = factory.createBlockBasic();
 		blockBody.add(factory.createInstReturn());
-		body.getNodes().add(blockBody);
+		body.getBlocks().add(blockBody);
 
 		Action action = DfFactory.eINSTANCE.createAction(tag,
 				DfFactory.eINSTANCE.createPattern(),
@@ -462,7 +462,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		BlockBasic blockBody = factory.createBlockBasic();
 		blockBody.add(factory.createInstStore(counter, 0));
 		blockBody.add(factory.createInstReturn());
-		body.getNodes().add(blockBody);
+		body.getBlocks().add(blockBody);
 
 		// Scheduler building
 		Procedure scheduler = factory.createProcedure("isSchedulable_" + name,
@@ -490,7 +490,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				factory.createExprVar(temp)));
 		blockScheduler.add(factory.createInstReturn(factory
 				.createExprVar(result)));
-		scheduler.getNodes().add(blockScheduler);
+		scheduler.getBlocks().add(blockScheduler);
 
 		Action action = DfFactory.eINSTANCE.createAction(tag,
 				DfFactory.eINSTANCE.createPattern(),

@@ -46,7 +46,7 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * Removes the unused procedures
  * 
  * @author Richard Thavot
- *
+ * 
  */
 public class DeadProcedureElimination extends AbstractActorVisitor<Object> {
 
@@ -95,7 +95,7 @@ public class DeadProcedureElimination extends AbstractActorVisitor<Object> {
 	@Override
 	public Object caseProcedure(Procedure procedure) {
 		this.procedure = procedure;
-		return doSwitch(procedure.getNodes());
+		return doSwitch(procedure.getBlocks());
 	}
 
 	@Override

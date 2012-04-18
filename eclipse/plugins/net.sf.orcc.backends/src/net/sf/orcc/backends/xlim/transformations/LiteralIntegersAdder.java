@@ -31,6 +31,8 @@ package net.sf.orcc.backends.xlim.transformations;
 import java.util.List;
 
 import net.sf.dftools.util.util.EcoreHelper;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -47,8 +49,6 @@ import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.BlockIf;
-import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
@@ -172,17 +172,17 @@ public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 	@Override
 	public Expression caseNodeIf(BlockIf nodeIf) {
 		nodeIf.setCondition(doSwitch(nodeIf.getCondition()));
-		doSwitch(nodeIf.getThenNodes());
-		doSwitch(nodeIf.getElseNodes());
-		doSwitch(nodeIf.getJoinNode());
+		doSwitch(nodeIf.getThenBlocks());
+		doSwitch(nodeIf.getElseBlocks());
+		doSwitch(nodeIf.getJoinBlock());
 		return null;
 	}
 
 	@Override
 	public Expression caseNodeWhile(BlockWhile nodeWhile) {
 		nodeWhile.setCondition(doSwitch(nodeWhile.getCondition()));
-		doSwitch(nodeWhile.getNodes());
-		doSwitch(nodeWhile.getJoinNode());
+		doSwitch(nodeWhile.getBlocks());
+		doSwitch(nodeWhile.getJoinBlock());
 		return null;
 	}
 

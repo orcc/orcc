@@ -37,6 +37,11 @@ import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockSpecific;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -54,11 +59,6 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.Block;
-import net.sf.orcc.ir.BlockBasic;
-import net.sf.orcc.ir.BlockIf;
-import net.sf.orcc.ir.BlockSpecific;
-import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 
@@ -170,7 +170,7 @@ public abstract class AbstractActorVisitor<T> extends DfSwitch<T> {
 		public T caseBlockBasic(BlockBasic block) {
 			return AbstractActorVisitor.this.caseNodeBlock(block);
 		}
-		
+
 		@Override
 		public T caseBlockSpecific(BlockSpecific block) {
 			return AbstractActorVisitor.this.caseNodeSpecific(block);
@@ -367,7 +367,7 @@ public abstract class AbstractActorVisitor<T> extends DfSwitch<T> {
 		// default implementation does nothing
 		return null;
 	}
-	
+
 	public T caseNodeSpecific(BlockSpecific node) {
 		// default implementation does nothing
 		return null;
@@ -403,9 +403,9 @@ public abstract class AbstractActorVisitor<T> extends DfSwitch<T> {
 			doSwitch(nodeIf.getCondition());
 		}
 
-		doSwitch(nodeIf.getThenNodes());
-		doSwitch(nodeIf.getElseNodes());
-		doSwitch(nodeIf.getJoinNode());
+		doSwitch(nodeIf.getThenBlocks());
+		doSwitch(nodeIf.getElseBlocks());
+		doSwitch(nodeIf.getJoinBlock());
 		return null;
 	}
 
@@ -414,8 +414,8 @@ public abstract class AbstractActorVisitor<T> extends DfSwitch<T> {
 			doSwitch(nodeWhile.getCondition());
 		}
 
-		doSwitch(nodeWhile.getNodes());
-		doSwitch(nodeWhile.getJoinNode());
+		doSwitch(nodeWhile.getBlocks());
+		doSwitch(nodeWhile.getJoinBlock());
 		return null;
 	}
 
@@ -426,7 +426,7 @@ public abstract class AbstractActorVisitor<T> extends DfSwitch<T> {
 
 	public T caseProcedure(Procedure procedure) {
 		this.procedure = procedure;
-		return doSwitch(procedure.getNodes());
+		return doSwitch(procedure.getBlocks());
 	}
 
 	public T caseVar(Var var) {

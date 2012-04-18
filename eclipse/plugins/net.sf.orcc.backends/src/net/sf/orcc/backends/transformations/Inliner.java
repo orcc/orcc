@@ -255,9 +255,9 @@ public class Inliner extends AbstractActorVisitor<Object> {
 			followingBlock.add(beginningBlock.getInstructions().get(indexInst));
 		}
 		// 7. Add all inlined blocks
-		List<Block> nodes = findNode(callerProc.getNodes(), beginningBlock);
+		List<Block> nodes = findNode(callerProc.getBlocks(), beginningBlock);
 		indexNode = nodes.indexOf(beginningBlock);
-		List<Block> inlined = calledProc.getNodes();
+		List<Block> inlined = calledProc.getBlocks();
 		if (!assignBlock.getInstructions().isEmpty()) {
 			inlined.add(0, assignBlock);
 		}
@@ -372,11 +372,11 @@ public class Inliner extends AbstractActorVisitor<Object> {
 			List<Block> n = null;
 			for (Block node : locationNodes) {
 				if (node.isBlockIf()) {
-					n = findNode(((BlockIf) node).getElseNodes(), nodeToFind);
+					n = findNode(((BlockIf) node).getElseBlocks(), nodeToFind);
 					if (n == null)
-						n = findNode(((BlockIf) node).getThenNodes(), nodeToFind);
+						n = findNode(((BlockIf) node).getThenBlocks(), nodeToFind);
 				} else if (node.isBlockWhile()) {
-					n = findNode(((BlockWhile) node).getNodes(), nodeToFind);
+					n = findNode(((BlockWhile) node).getBlocks(), nodeToFind);
 				}
 				if (n != null)
 					return n;

@@ -297,17 +297,17 @@ public class SSATransformation extends AbstractActorVisitor<Object> {
 
 		replaceUses(nodeIf.getCondition());
 
-		join = nodeIf.getJoinNode();
+		join = nodeIf.getJoinBlock();
 		loop = null;
 
 		branch = 1;
-		doSwitch(nodeIf.getThenNodes());
+		doSwitch(nodeIf.getThenBlocks());
 
 		// restore variables used in phi assignments
 		restoreVariables();
 
 		branch = 2;
-		doSwitch(nodeIf.getElseNodes());
+		doSwitch(nodeIf.getElseBlocks());
 
 		// commit phi
 		BlockBasic innerJoin = join;
@@ -357,10 +357,10 @@ public class SSATransformation extends AbstractActorVisitor<Object> {
 		replaceUses(nodeWhile.getCondition());
 
 		branch = 2;
-		join = nodeWhile.getJoinNode();
+		join = nodeWhile.getJoinBlock();
 		loop = nodeWhile;
 
-		doSwitch(nodeWhile.getNodes());
+		doSwitch(nodeWhile.getBlocks());
 
 		// commit phi
 		BlockBasic innerJoin = join;

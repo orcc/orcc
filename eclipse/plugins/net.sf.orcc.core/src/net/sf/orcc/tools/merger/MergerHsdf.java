@@ -19,6 +19,9 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
@@ -26,9 +29,6 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Block;
-import net.sf.orcc.ir.BlockBasic;
-import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -258,9 +258,9 @@ public class MergerHsdf extends DfSwitch<Actor> {
 							factory.createTypeVoid());
 
 					Procedure body = action.getBody();
-					List<Block> nodes = body.getNodes();
+					List<Block> nodes = body.getBlocks();
 					proc.getLocals().addAll(body.getLocals());
-					proc.getNodes().addAll(nodes);
+					proc.getBlocks().addAll(nodes);
 					IrUtil.getLast(nodes).add(factory.createInstReturn());
 					superActor.getProcs().add(proc);
 					new ChangeFifoArrayAccess(action.getInputPattern(),
@@ -323,7 +323,7 @@ public class MergerHsdf extends DfSwitch<Actor> {
 			Var target) {
 		IrFactory factory = IrFactory.eINSTANCE;
 
-		List<Block> nodes = procedure.getNodes();
+		List<Block> nodes = procedure.getBlocks();
 
 		int size = ((TypeList) source.getType()).getSize();
 
@@ -418,7 +418,7 @@ public class MergerHsdf extends DfSwitch<Actor> {
 				SCHEDULER_NAME, 0, IrFactory.eINSTANCE.createTypeBool());
 
 		BlockBasic block = factory.createBlockBasic();
-		procedure.getNodes().add(block);
+		procedure.getBlocks().add(block);
 		createInputCondition(block);
 		return procedure;
 	}

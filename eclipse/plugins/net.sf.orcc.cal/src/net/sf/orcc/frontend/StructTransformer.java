@@ -48,9 +48,9 @@ import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
+import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstReturn;
-import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -134,7 +134,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 
 		// Add annotations
 		Util.transformAnnotations(procedure, astProcedure.getAnnotations());
-		
+
 		// add mapping now (in case this procedure is recursive)
 		Frontend.putMapping(astProcedure, procedure);
 
@@ -170,15 +170,15 @@ public class StructTransformer extends CalSwitch<EObject> {
 
 		// create procedure
 		procedure = eINSTANCE.createProcedure(name, lineNumber, type);
-		
+
 		// set native flag
 		if (Util.hasAnnotation("native", function.getAnnotations())) {
 			procedure.setNative(true);
 		}
-		
+
 		// Add annotations
 		Util.transformAnnotations(procedure, function.getAnnotations());
-		
+
 		// add mapping now (in case this function is recursive)
 		Frontend.putMapping(function, procedure);
 
@@ -190,7 +190,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 			value = null;
 		} else {
 			ExprTransformer transformer = new ExprTransformer(procedure,
-					procedure.getNodes());
+					procedure.getBlocks());
 			value = transformer.doSwitch(function.getExpression());
 		}
 
@@ -255,7 +255,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 
 		AstExpression value = variable.getValue();
 		if (value != null) {
-			new ExprTransformer(procedure, procedure.getNodes(), local)
+			new ExprTransformer(procedure, procedure.getBlocks(), local)
 					.doSwitch(value);
 		}
 
@@ -300,7 +300,7 @@ public class StructTransformer extends CalSwitch<EObject> {
 	 *            a list of AST statements
 	 */
 	public void transformStatements(List<Statement> statements) {
-		new StmtTransformer(procedure, procedure.getNodes())
+		new StmtTransformer(procedure, procedure.getBlocks())
 				.doSwitch(statements);
 	}
 

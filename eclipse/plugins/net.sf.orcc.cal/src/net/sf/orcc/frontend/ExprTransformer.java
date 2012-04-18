@@ -57,15 +57,15 @@ import net.sf.orcc.cal.services.Evaluator;
 import net.sf.orcc.cal.services.Typer;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.df.Action;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.Block;
-import net.sf.orcc.ir.BlockIf;
-import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Procedure;
@@ -218,7 +218,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 
 		// transforms "then" statements and "else" statements
 		BlockIf node = eINSTANCE.createBlockIf();
-		node.setJoinNode(eINSTANCE.createBlockBasic());
+		node.setJoinBlock(eINSTANCE.createBlockBasic());
 		node.setLineNumber(lineNumber);
 		node.setCondition(condition);
 
@@ -233,29 +233,29 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		}
 
 		// transforms "then" expression
-		new ExprTransformer(procedure, node.getThenNodes(), ifTarget, indexes)
+		new ExprTransformer(procedure, node.getThenBlocks(), ifTarget, indexes)
 				.doSwitch(expression.getThen());
 
 		// add elsif expressions
 		for (ExpressionElsif elsif : expression.getElsifs()) {
-			condition = new ExprTransformer(procedure, node.getElseNodes())
+			condition = new ExprTransformer(procedure, node.getElseBlocks())
 					.doSwitch(elsif.getCondition());
 
 			// creates inner if
 			lineNumber = Util.getLocation(elsif);
 			BlockIf innerIf = eINSTANCE.createBlockIf();
-			innerIf.setJoinNode(eINSTANCE.createBlockBasic());
+			innerIf.setJoinBlock(eINSTANCE.createBlockBasic());
 			innerIf.setLineNumber(lineNumber);
 			innerIf.setCondition(condition);
-			new ExprTransformer(procedure, innerIf.getThenNodes(), ifTarget,
+			new ExprTransformer(procedure, innerIf.getThenBlocks(), ifTarget,
 					indexes).doSwitch(elsif.getThen());
 
 			// adds elsif to node's else nodes, and assign elsif to node
-			node.getElseNodes().add(innerIf);
+			node.getElseBlocks().add(innerIf);
 			node = innerIf;
 		}
 
-		new ExprTransformer(procedure, node.getElseNodes(), ifTarget, indexes)
+		new ExprTransformer(procedure, node.getElseBlocks(), ifTarget, indexes)
 				.doSwitch(expression.getElse());
 
 		// return expr
@@ -430,13 +430,13 @@ public class ExprTransformer extends CalSwitch<Expression> {
 					eINSTANCE.createExprInt(size), eINSTANCE.createTypeBool());
 
 			BlockWhile nodeWhile = eINSTANCE.createBlockWhile();
-			nodeWhile.setJoinNode(eINSTANCE.createBlockBasic());
+			nodeWhile.setJoinBlock(eINSTANCE.createBlockBasic());
 			nodeWhile.setCondition(condition);
 			whiles.add(nodeWhile);
 
 			nodes.add(nodeWhile);
 
-			nodes = nodeWhile.getNodes();
+			nodes = nodeWhile.getBlocks();
 		}
 
 		// load
@@ -459,7 +459,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		int size = typeList.getDimensions().size();
 		for (int i = 0; i < size; i++) {
 			Var loopVar = loopVars.get(i);
-			IrUtil.getLast(whiles.get(i).getNodes()).add(
+			IrUtil.getLast(whiles.get(i).getBlocks()).add(
 					eINSTANCE.createInstAssign(loopVar, eINSTANCE
 							.createExprBinary(eINSTANCE.createExprVar(loopVar),
 									OpBinary.PLUS, eINSTANCE.createExprInt(1),
@@ -594,13 +594,13 @@ public class ExprTransformer extends CalSwitch<Expression> {
 
 			// create while
 			BlockWhile nodeWhile = eINSTANCE.createBlockWhile();
-			nodeWhile.setJoinNode(eINSTANCE.createBlockBasic());
+			nodeWhile.setJoinBlock(eINSTANCE.createBlockBasic());
 			nodeWhile.setCondition(condition);
 			whiles.add(nodeWhile);
 
 			nodes.add(nodeWhile);
 
-			nodes = nodeWhile.getNodes();
+			nodes = nodeWhile.getBlocks();
 		}
 
 		// translates the expression (add to the innermost nodes)
@@ -615,7 +615,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		for (Generator generator : generators) {
 			int lineNumber = Util.getLocation(generator);
 			Var loopVar = Frontend.getMapping(generator.getVariable());
-			IrUtil.getLast(whiles.get(i).getNodes()).add(
+			IrUtil.getLast(whiles.get(i).getBlocks()).add(
 					eINSTANCE.createInstAssign(lineNumber, loopVar, eINSTANCE
 							.createExprBinary(eINSTANCE.createExprVar(loopVar),
 									OpBinary.PLUS, eINSTANCE.createExprInt(1),

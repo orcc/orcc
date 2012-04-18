@@ -135,9 +135,9 @@ public class InstTernaryAdder extends AbstractActorVisitor<Object> {
 				condExpr);
 		newBlockNode.add(assignCond);
 
-		doSwitch(nodeIf.getThenNodes());
-		doSwitch(nodeIf.getElseNodes());
-		doSwitch(nodeIf.getJoinNode());
+		doSwitch(nodeIf.getThenBlocks());
+		doSwitch(nodeIf.getElseBlocks());
+		doSwitch(nodeIf.getJoinBlock());
 		condVar = oldCondVar;
 
 		return null;
@@ -148,8 +148,8 @@ public class InstTernaryAdder extends AbstractActorVisitor<Object> {
 		if (!procedure.getReturnType().isVoid() && isTernarisable(procedure)) {
 			newBlockNode = IrFactoryImpl.eINSTANCE.createBlockBasic();
 			super.caseProcedure(procedure);
-			IrUtil.delete(procedure.getNodes());
-			procedure.getNodes().add(newBlockNode);
+			IrUtil.delete(procedure.getBlocks());
+			procedure.getBlocks().add(newBlockNode);
 		}
 		return null;
 	}
@@ -163,7 +163,7 @@ public class InstTernaryAdder extends AbstractActorVisitor<Object> {
 	 */
 	private boolean isTernarisable(Procedure procedure) {
 		TreeIterator<EObject> it = EcoreUtil.getAllContents(procedure
-				.getNodes());
+				.getBlocks());
 		while (it.hasNext()) {
 			EObject object = it.next();
 			if (object instanceof BlockWhile) {

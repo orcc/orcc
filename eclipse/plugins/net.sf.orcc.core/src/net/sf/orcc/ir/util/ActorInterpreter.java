@@ -47,6 +47,10 @@ import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.Unit;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByVal;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
@@ -57,10 +61,6 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.Block;
-import net.sf.orcc.ir.BlockBasic;
-import net.sf.orcc.ir.BlockIf;
-import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -328,14 +328,14 @@ public class ActorInterpreter extends IrSwitch<Object> {
 		if (ValueUtil.isBool(condition)) {
 			int oldBranch = branch;
 			if (ValueUtil.isTrue(condition)) {
-				doSwitch(node.getThenNodes());
+				doSwitch(node.getThenBlocks());
 				branch = 0;
 			} else {
-				doSwitch(node.getElseNodes());
+				doSwitch(node.getElseBlocks());
 				branch = 1;
 			}
 
-			ret = doSwitch(node.getJoinNode());
+			ret = doSwitch(node.getJoinBlock());
 			branch = oldBranch;
 		} else {
 			throw new OrccRuntimeException("Condition "
@@ -349,7 +349,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 	public Object caseBlockWhile(BlockWhile node) {
 		int oldBranch = branch;
 		branch = 0;
-		doSwitch(node.getJoinNode());
+		doSwitch(node.getJoinBlock());
 
 		// Interpret first expression ("while" condition)
 		Object condition = exprInterpreter.doSwitch(node.getCondition());
@@ -357,8 +357,8 @@ public class ActorInterpreter extends IrSwitch<Object> {
 		// while (condition is true) do
 		branch = 1;
 		while (ValueUtil.isTrue(condition)) {
-			doSwitch(node.getNodes());
-			doSwitch(node.getJoinNode());
+			doSwitch(node.getBlocks());
+			doSwitch(node.getJoinBlock());
 
 			// Interpret next value of "while" condition
 			condition = exprInterpreter.doSwitch(node.getCondition());
@@ -380,7 +380,7 @@ public class ActorInterpreter extends IrSwitch<Object> {
 			}
 		}
 
-		return doSwitch(procedure.getNodes());
+		return doSwitch(procedure.getBlocks());
 	}
 
 	/**

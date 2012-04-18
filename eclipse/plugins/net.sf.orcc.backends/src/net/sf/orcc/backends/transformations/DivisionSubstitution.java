@@ -151,7 +151,7 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 				"remainder");
 
 		// Create procedural code
-		EList<Block> nodes = divProc.getNodes();
+		EList<Block> nodes = divProc.getBlocks();
 		nodes.add(createInitBlock(result, flipResult, denom, numer, mask,
 				remainder));
 		nodes.add(createNodeIf(varNum, flipResult));
@@ -170,7 +170,7 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 				.createExprVar(result));
 		blockReturn.add(instReturn);
 		divProc.setReturnType(factory.createTypeInt(16));
-		divProc.getNodes().add(blockReturn);
+		divProc.getBlocks().add(blockReturn);
 
 		return divProc;
 	}
@@ -227,7 +227,7 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 				factory.createExprInt(0), factory.createTypeBool());
 		nodeIf.setCondition(conditionIf_1);
 		BlockBasic join = factory.createBlockBasic();
-		nodeIf.setJoinNode(join);
+		nodeIf.setJoinBlock(join);
 		Expression oppNomerator = factory.createExprBinary(
 				factory.createExprInt(0), OpBinary.MINUS,
 				factory.createExprVar(var), factory.createTypeInt());
@@ -238,13 +238,13 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 				factory.createExprInt(1), factory.createTypeInt());
 		InstAssign assign11 = factory.createInstAssign(flip, xorFlip);
 		blockIf_1.add(assign11);
-		nodeIf.getThenNodes().add(blockIf_1);
+		nodeIf.getThenBlocks().add(blockIf_1);
 		BlockBasic blockIf_2 = factory.createBlockBasic();
 		InstAssign assign20 = factory.createInstAssign(var, var);
 		blockIf_2.add(assign20);
 		InstAssign assign21 = factory.createInstAssign(flip, flip);
 		blockIf_2.add(assign21);
-		nodeIf.getElseNodes().add(blockIf_2);
+		nodeIf.getElseBlocks().add(blockIf_2);
 		return nodeIf;
 	}
 
@@ -269,7 +269,7 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 		nodeIf.setCondition(condition);
 
 		BlockBasic join = factory.createBlockBasic();
-		nodeIf.setJoinNode(join);
+		nodeIf.setJoinBlock(join);
 
 		BlockBasic nodeBlk = factory.createBlockBasic();
 
@@ -292,7 +292,7 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 				RemainderMinus);
 		nodeBlk.add(assignBlk_1);
 
-		nodeIf.getThenNodes().add(nodeBlk);
+		nodeIf.getThenBlocks().add(nodeBlk);
 
 		return nodeIf;
 	}
@@ -362,13 +362,13 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 				factory.createExprInt(0), factory.createTypeBool());
 		nodeIf.setCondition(conditionIf);
 		BlockBasic join = factory.createBlockBasic();
-		nodeIf.setJoinNode(join);
+		nodeIf.setJoinBlock(join);
 		Expression oppflip = factory.createExprBinary(factory.createExprInt(0),
 				OpBinary.MINUS, factory.createExprVar(result),
 				factory.createTypeInt());
 		InstAssign assign10 = factory.createInstAssign(result, oppflip);
 		blockIf_1.add(assign10);
-		nodeIf.getThenNodes().add(blockIf_1);
+		nodeIf.getThenBlocks().add(blockIf_1);
 		return nodeIf;
 	}
 }

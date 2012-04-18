@@ -40,12 +40,12 @@ import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Transition;
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.InstAssign;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
@@ -100,13 +100,13 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 	private BlockIf createActionCall(Expression expr, Procedure body,
 			Pattern inputPattern, Pattern outputPattern) {
 		BlockIf nodeIf = IrFactoryImpl.eINSTANCE.createBlockIf();
-		nodeIf.setJoinNode(IrFactoryImpl.eINSTANCE.createBlockBasic());
+		nodeIf.setJoinBlock(IrFactoryImpl.eINSTANCE.createBlockBasic());
 		nodeIf.setCondition(expr);
 
 		List<Expression> callExprs = setProcedureParameters(body, inputPattern,
 				outputPattern);
 		actor.getProcs().add(body);
-		List<Block> thenNodes = nodeIf.getThenNodes();
+		List<Block> thenNodes = nodeIf.getThenBlocks();
 		BlockBasic node = IrFactoryImpl.eINSTANCE.createBlockBasic();
 
 		node.add(IrFactory.eINSTANCE.createInstCall(0, null, body, callExprs));
@@ -150,7 +150,7 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 				IrFactory.eINSTANCE.createExprBool(true));
 		BlockBasic nodeBlock = IrFactoryImpl.eINSTANCE.createBlockBasic();
 		nodeBlock.add(thenAssign);
-		procedure.getNodes().add(nodeBlock);
+		procedure.getBlocks().add(nodeBlock);
 
 		// add the return
 		BlockBasic block = procedure.getLast();
@@ -247,7 +247,7 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 				IrFactory.eINSTANCE.createTypeVoid());
 
 		// Launch action
-		List<Block> elseNodes = target.getNodes();
+		List<Block> elseNodes = target.getBlocks();
 
 		for (Action action : actions) {
 			Pattern input = action.getInputPattern();
@@ -256,10 +256,10 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 			BlockBasic thenBlock = IrUtil.getFirst(elseNodes);
 			Expression callExpr = createActionCondition(thenBlock,
 					action.getScheduler(), input, output);
-			BlockIf nodeIf = createActionCall(callExpr, action.getBody(), input,
-					output);
+			BlockIf nodeIf = createActionCall(callExpr, action.getBody(),
+					input, output);
 			elseNodes.add(nodeIf);
-			elseNodes = nodeIf.getElseNodes();
+			elseNodes = nodeIf.getElseBlocks();
 		}
 
 		BlockBasic lastBlock = target.getLast();

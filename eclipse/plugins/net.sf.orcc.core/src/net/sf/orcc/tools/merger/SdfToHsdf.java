@@ -72,7 +72,7 @@ public class SdfToHsdf extends DfSwitch<Network> {
 		BlockWhile nodeWhile = factory.createBlockWhile();
 		nodeWhile.setJoinBlock(factory.createBlockBasic());
 		nodeWhile.setCondition(condition);
-		body.getNodes().add(nodeWhile);
+		body.getBlocks().add(nodeWhile);
 		BlockBasic whileBlock = IrUtil.getLast(nodeWhile.getBlocks());
 
 		int ind = 0;
@@ -240,7 +240,7 @@ public class SdfToHsdf extends DfSwitch<Network> {
 		BlockWhile nodeWhile = factory.createBlockWhile();
 		nodeWhile.setJoinBlock(factory.createBlockBasic());
 		nodeWhile.setCondition(condition);
-		body.getNodes().add(nodeWhile);
+		body.getBlocks().add(nodeWhile);
 		BlockBasic whileBlock = IrUtil.getLast(nodeWhile.getBlocks());
 
 		int ind = 0;

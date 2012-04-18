@@ -102,7 +102,7 @@ public class IrUtil {
 			// The given expression is contained in the condition of If/While
 			if (containingNode.isBlockWhile()) {
 				BlockBasic joinNode = ((BlockWhile) containingNode)
-						.getJoinNode();
+						.getJoinBlock();
 				joinNode.add(instruction);
 			} else {
 				addToPreviousNodeBlock(containingNode, instruction);
@@ -292,7 +292,7 @@ public class IrUtil {
 		if (node.isBlockBasic()) {
 			BlockWhile nodeWhile = EcoreHelper.getContainerOfType(node,
 					BlockWhile.class);
-			return (nodeWhile != null && nodeWhile.getJoinNode() == node);
+			return (nodeWhile != null && nodeWhile.getJoinBlock() == node);
 		}
 		return false;
 	}

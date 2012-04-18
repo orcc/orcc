@@ -36,11 +36,11 @@ import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstStore;
-import net.sf.orcc.ir.BlockIf;
-import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
@@ -147,10 +147,10 @@ public class AbstractInterpreter extends ActorInterpreter {
 		int oldBranch = branch;
 		if (ValueUtil.isBool(condition)) {
 			if (ValueUtil.isTrue(condition)) {
-				doSwitch(node.getThenNodes());
+				doSwitch(node.getThenBlocks());
 				branch = 0;
 			} else {
-				doSwitch(node.getElseNodes());
+				doSwitch(node.getElseBlocks());
 				branch = 1;
 			}
 
@@ -163,7 +163,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 			branch = -1;
 		}
 
-		doSwitch(node.getJoinNode());
+		doSwitch(node.getJoinBlock());
 		branch = oldBranch;
 		return null;
 	}
@@ -172,7 +172,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 	public Object caseBlockWhile(BlockWhile node) {
 		int oldBranch = branch;
 		branch = 0;
-		doSwitch(node.getJoinNode());
+		doSwitch(node.getJoinBlock());
 
 		// Interpret first expression ("while" condition)
 		Object condition = exprInterpreter.doSwitch(node.getCondition());
@@ -180,8 +180,8 @@ public class AbstractInterpreter extends ActorInterpreter {
 		if (ValueUtil.isBool(condition)) {
 			branch = 1;
 			while (ValueUtil.isTrue(condition)) {
-				doSwitch(node.getNodes());
-				doSwitch(node.getJoinNode());
+				doSwitch(node.getBlocks());
+				doSwitch(node.getJoinBlock());
 
 				// Interpret next value of "while" condition
 				condition = exprInterpreter.doSwitch(node.getCondition());

@@ -43,12 +43,12 @@ public class EmptyNodeRemover extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseNodeIf(BlockIf nodeIf) {
-		if (nodeIf.getThenNodes().isEmpty()) {
-			nodeIf.getThenNodes().add(IrFactory.eINSTANCE.createBlockBasic());
+		if (nodeIf.getThenBlocks().isEmpty()) {
+			nodeIf.getThenBlocks().add(IrFactory.eINSTANCE.createBlockBasic());
 		}
 		
-		if (nodeIf.getElseNodes().isEmpty()) {
-			nodeIf.getElseNodes().add(IrFactory.eINSTANCE.createBlockBasic());
+		if (nodeIf.getElseBlocks().isEmpty()) {
+			nodeIf.getElseBlocks().add(IrFactory.eINSTANCE.createBlockBasic());
 		}
 		super.caseNodeIf(nodeIf);
 		return null;
@@ -56,8 +56,8 @@ public class EmptyNodeRemover extends AbstractActorVisitor<Object> {
 	
 	@Override
 	public Object caseNodeWhile(BlockWhile nodeWhile) {
-		if (nodeWhile.getNodes().isEmpty()) {
-			nodeWhile.getNodes().add(IrFactory.eINSTANCE.createBlockBasic());
+		if (nodeWhile.getBlocks().isEmpty()) {
+			nodeWhile.getBlocks().add(IrFactory.eINSTANCE.createBlockBasic());
 		}
 		
 		super.caseNodeWhile(nodeWhile);

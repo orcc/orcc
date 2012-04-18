@@ -83,7 +83,7 @@ public class IfConverter extends AbstractActorVisitor<Object> {
 		currentPredicate = IrUtil.copy(previousPredicate);
 		currentPredicate.getExpressions().add(
 				IrUtil.copy(nodeIf.getCondition()));
-		doSwitch(nodeIf.getThenNodes());
+		doSwitch(nodeIf.getThenBlocks());
 		IrUtil.delete(currentPredicate);
 
 		// predicate for "else" branch
@@ -92,12 +92,12 @@ public class IfConverter extends AbstractActorVisitor<Object> {
 				IrFactory.eINSTANCE.createExprUnary(OpUnary.LOGIC_NOT,
 						IrUtil.copy(nodeIf.getCondition()),
 						IrFactory.eINSTANCE.createTypeBool()));
-		doSwitch(nodeIf.getElseNodes());
+		doSwitch(nodeIf.getElseBlocks());
 		IrUtil.delete(currentPredicate);
 
 		// restore predicate for "join" node
 		currentPredicate = previousPredicate;
-		doSwitch(nodeIf.getJoinNode());
+		doSwitch(nodeIf.getJoinBlock());
 
 		// deletes condition and node
 		IrUtil.delete(nodeIf.getCondition());
@@ -124,7 +124,7 @@ public class IfConverter extends AbstractActorVisitor<Object> {
 		targetBlock = IrFactory.eINSTANCE.createBlockBasic();
 
 		super.caseProcedure(procedure);
-		procedure.getNodes().add(targetBlock);
+		procedure.getBlocks().add(targetBlock);
 		return null;
 	}
 

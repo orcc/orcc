@@ -32,6 +32,10 @@ import java.util.List;
 
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByVal;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.Expression;
@@ -42,10 +46,6 @@ import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.Block;
-import net.sf.orcc.ir.BlockBasic;
-import net.sf.orcc.ir.BlockIf;
-import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Procedure;
 
 import org.eclipse.emf.ecore.EObject;
@@ -193,9 +193,9 @@ public abstract class AbstractIrVisitor<T> extends IrSwitch<T> {
 			doSwitch(nodeIf.getCondition());
 		}
 
-		doSwitch(nodeIf.getThenNodes());
-		doSwitch(nodeIf.getElseNodes());
-		doSwitch(nodeIf.getJoinNode());
+		doSwitch(nodeIf.getThenBlocks());
+		doSwitch(nodeIf.getElseBlocks());
+		doSwitch(nodeIf.getJoinBlock());
 		return null;
 	}
 
@@ -205,15 +205,15 @@ public abstract class AbstractIrVisitor<T> extends IrSwitch<T> {
 			doSwitch(nodeWhile.getCondition());
 		}
 
-		doSwitch(nodeWhile.getNodes());
-		doSwitch(nodeWhile.getJoinNode());
+		doSwitch(nodeWhile.getBlocks());
+		doSwitch(nodeWhile.getJoinBlock());
 		return null;
 	}
 
 	@Override
 	public T caseProcedure(Procedure procedure) {
 		this.procedure = procedure;
-		return doSwitch(procedure.getNodes());
+		return doSwitch(procedure.getBlocks());
 	}
 
 	@Override

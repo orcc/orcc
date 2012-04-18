@@ -47,13 +47,13 @@ import net.sf.orcc.cal.cal.StatementWhile;
 import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.util.Util;
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.InstAssign;
-import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockIf;
 import net.sf.orcc.ir.BlockWhile;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
@@ -181,8 +181,8 @@ public class StmtTransformer extends CalSwitch<EObject> {
 		InstCall call = eINSTANCE.createInstCall(lineNumber, null, calledProc,
 				parameters);
 		IrUtil.getLast(nodes).add(call);
-		
-		//Add annotations
+
+		// Add annotations
 		Util.transformAnnotations(call, stmtCall.getAnnotations());
 		return null;
 	}
@@ -208,27 +208,27 @@ public class StmtTransformer extends CalSwitch<EObject> {
 
 		// create while
 		BlockWhile nodeWhile = eINSTANCE.createBlockWhile();
-		nodeWhile.setJoinNode(eINSTANCE.createBlockBasic());
+		nodeWhile.setJoinBlock(eINSTANCE.createBlockBasic());
 		nodeWhile.setLineNumber(lineNumber);
 		nodeWhile.setCondition(condition);
 
 		nodes.add(nodeWhile);
 
 		// body
-		new StmtTransformer(procedure, nodeWhile.getNodes()).doSwitch(foreach
+		new StmtTransformer(procedure, nodeWhile.getBlocks()).doSwitch(foreach
 				.getStatements());
 
 		// add increment
-		BlockBasic block = IrUtil.getLast(nodeWhile.getNodes());
+		BlockBasic block = IrUtil.getLast(nodeWhile.getBlocks());
 		InstAssign assign = eINSTANCE.createInstAssign(lineNumber, loopVar,
 				eINSTANCE.createExprBinary(eINSTANCE.createExprVar(loopVar),
 						OpBinary.PLUS, eINSTANCE.createExprInt(1),
 						loopVar.getType()));
 		block.add(assign);
 
-		//Add annotations
+		// Add annotations
 		Util.transformAnnotations(nodeWhile, foreach.getAnnotations());
-		
+
 		return null;
 	}
 
@@ -241,40 +241,40 @@ public class StmtTransformer extends CalSwitch<EObject> {
 
 		// creates if and adds it to procedure
 		BlockIf node = eINSTANCE.createBlockIf();
-		node.setJoinNode(eINSTANCE.createBlockBasic());
+		node.setJoinBlock(eINSTANCE.createBlockBasic());
 		node.setLineNumber(lineNumber);
 		node.setCondition(condition);
 
 		nodes.add(node);
 
-		//Add annotations
+		// Add annotations
 		Util.transformAnnotations(node, stmtIf.getAnnotations());
-		
+
 		// transforms "then" statements
-		new StmtTransformer(procedure, node.getThenNodes()).doSwitch(stmtIf
+		new StmtTransformer(procedure, node.getThenBlocks()).doSwitch(stmtIf
 				.getThen());
 
 		// add elsif statements
 		for (StatementElsif elsif : stmtIf.getElsifs()) {
-			condition = new ExprTransformer(procedure, node.getElseNodes())
+			condition = new ExprTransformer(procedure, node.getElseBlocks())
 					.doSwitch(elsif.getCondition());
 
 			// creates inner if
 			lineNumber = Util.getLocation(elsif);
 			BlockIf innerIf = eINSTANCE.createBlockIf();
-			innerIf.setJoinNode(eINSTANCE.createBlockBasic());
+			innerIf.setJoinBlock(eINSTANCE.createBlockBasic());
 			innerIf.setLineNumber(lineNumber);
 			innerIf.setCondition(condition);
-			new StmtTransformer(procedure, innerIf.getThenNodes())
+			new StmtTransformer(procedure, innerIf.getThenBlocks())
 					.doSwitch(elsif.getThen());
 
 			// adds elsif to node's else nodes, and assign elsif to node
-			node.getElseNodes().add(innerIf);
+			node.getElseBlocks().add(innerIf);
 			node = innerIf;
 		}
 
 		// add else nodes to current if
-		new StmtTransformer(procedure, node.getElseNodes()).doSwitch(stmtIf
+		new StmtTransformer(procedure, node.getElseBlocks()).doSwitch(stmtIf
 				.getElse());
 
 		return null;
@@ -291,23 +291,23 @@ public class StmtTransformer extends CalSwitch<EObject> {
 
 		// create the while
 		BlockWhile nodeWhile = eINSTANCE.createBlockWhile();
-		nodeWhile.setJoinNode(eINSTANCE.createBlockBasic());
+		nodeWhile.setJoinBlock(eINSTANCE.createBlockBasic());
 		nodeWhile.setLineNumber(lineNumber);
 		nodeWhile.setCondition(condition);
 
 		// the body
-		new StmtTransformer(procedure, nodeWhile.getNodes()).doSwitch(stmtWhile
-				.getStatements());
+		new StmtTransformer(procedure, nodeWhile.getBlocks())
+				.doSwitch(stmtWhile.getStatements());
 
 		// copy instructions
-		nodeWhile.getNodes().addAll(IrUtil.copy(tempNodes));
+		nodeWhile.getBlocks().addAll(IrUtil.copy(tempNodes));
 
 		nodes.addAll(tempNodes);
 		nodes.add(nodeWhile);
 
-		//Add annotations
+		// Add annotations
 		Util.transformAnnotations(nodeWhile, stmtWhile.getAnnotations());
-		
+
 		return null;
 	}
 

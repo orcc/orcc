@@ -33,14 +33,14 @@ import java.util.List;
 
 import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.ir.ExprUnary;
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockIf;
 import net.sf.orcc.ir.BlockWhile;
+import net.sf.orcc.ir.ExprUnary;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
@@ -119,7 +119,7 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 		// an unconditional block
 		currentPredicate = null;
 
-		List<Block> nodes = procedure.getNodes();
+		List<Block> nodes = procedure.getBlocks();
 		if (!nodes.isEmpty()) {
 			doSwitch(nodes.get(0));
 		}
@@ -142,7 +142,7 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 			List<Block> nodes = EcoreHelper.getContainingList(nodeIf);
 			if (EcoreUtil.equals(condition, nodeIf.getCondition())
 					&& parentNodes == nodes) {
-				return nodeIf.getThenNodes();
+				return nodeIf.getThenBlocks();
 			} else {
 				if (condition.isExprUnary()) {
 					ExprUnary unary = (ExprUnary) condition;
@@ -151,7 +151,7 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 					if (unary.getOp() == OpUnary.LOGIC_NOT
 							&& EcoreUtil.equals(expr, nodeIf.getCondition())
 							&& parentNodes == nodes) {
-						return nodeIf.getElseNodes();
+						return nodeIf.getElseBlocks();
 					}
 				}
 			}
@@ -168,9 +168,10 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 	 * @param predicate
 	 *            a predicate
 	 */
-	private BlockBasic updateTargetBlock(Procedure procedure, Predicate predicate) {
+	private BlockBasic updateTargetBlock(Procedure procedure,
+			Predicate predicate) {
 		currentPredicate = IrFactory.eINSTANCE.createPredicate();
-		List<Block> parentNodes = procedure.getNodes();
+		List<Block> parentNodes = procedure.getBlocks();
 
 		if (predicate.isEmpty()) {
 			// unconditioned predicate => forgets all ifs
@@ -178,7 +179,7 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 
 			// creates a new block
 			BlockBasic block = IrFactory.eINSTANCE.createBlockBasic();
-			procedure.getNodes().add(block);
+			procedure.getBlocks().add(block);
 			return block;
 		} else {
 			for (Expression condition : predicate.getExpressions()) {
@@ -187,12 +188,12 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 					// create a new if
 					BlockIf nodeIf = IrFactory.eINSTANCE.createBlockIf();
 					nodeIf.setCondition(IrUtil.copy(condition));
-					nodeIf.setJoinNode(IrFactory.eINSTANCE.createBlockBasic());
+					nodeIf.setJoinBlock(IrFactory.eINSTANCE.createBlockBasic());
 					nodeIfList.add(nodeIf);
 					parentNodes.add(nodeIf);
 
 					// use the nodes of the "then" branch
-					parentNodes = nodeIf.getThenNodes();
+					parentNodes = nodeIf.getThenBlocks();
 				} else {
 					parentNodes = nodes;
 				}

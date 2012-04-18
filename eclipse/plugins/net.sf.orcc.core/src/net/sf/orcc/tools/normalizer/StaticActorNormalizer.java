@@ -38,6 +38,9 @@ import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Tag;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
@@ -45,9 +48,6 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Block;
-import net.sf.orcc.ir.BlockBasic;
-import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -81,7 +81,7 @@ public class StaticActorNormalizer {
 		private List<Block> nodes;
 
 		public MyPatternVisitor(Procedure procedure) {
-			nodes = procedure.getNodes();
+			nodes = procedure.getBlocks();
 			indexes = new ArrayList<Var>();
 		}
 
@@ -110,8 +110,8 @@ public class StaticActorNormalizer {
 			nodes = new ArrayList<Block>();
 
 			BlockWhile nodeWhile = factory.createBlockWhile();
-			nodeWhile.setJoinNode(factory.createBlockBasic());
-			nodeWhile.getNodes().addAll(nodes);
+			nodeWhile.setJoinBlock(factory.createBlockBasic());
+			nodeWhile.getBlocks().addAll(nodes);
 
 			oldNodes.add(nodeWhile);
 
@@ -260,7 +260,7 @@ public class StaticActorNormalizer {
 			Procedure scheduler = action.getScheduler();
 			scheduler.getLocals().clear();
 
-			List<Block> nodes = scheduler.getNodes();
+			List<Block> nodes = scheduler.getBlocks();
 			nodes.clear();
 
 			BlockBasic block = IrFactoryImpl.eINSTANCE.createBlockBasic();
@@ -379,7 +379,7 @@ public class StaticActorNormalizer {
 		variables = procedure.getLocals();
 
 		BlockBasic block = IrFactoryImpl.eINSTANCE.createBlockBasic();
-		procedure.getNodes().add(block);
+		procedure.getBlocks().add(block);
 
 		createInputCondition(block);
 

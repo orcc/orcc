@@ -239,10 +239,10 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 		inCondition = true;
 		doSwitch(nodeIf.getCondition());
 		inCondition = false;
-		doSwitch(nodeIf.getThenNodes());
-		doSwitch(nodeIf.getElseNodes());
+		doSwitch(nodeIf.getThenBlocks());
+		doSwitch(nodeIf.getElseBlocks());
 		conditionVars.pop();
-		doSwitch(nodeIf.getJoinNode());
+		doSwitch(nodeIf.getJoinBlock());
 		return null;
 	}
 
@@ -252,9 +252,9 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 		inCondition = true;
 		doSwitch(nodeWhile.getCondition());
 		inCondition = false;
-		doSwitch(nodeWhile.getNodes());
+		doSwitch(nodeWhile.getBlocks());
 		conditionVars.pop();
-		doSwitch(nodeWhile.getJoinNode());
+		doSwitch(nodeWhile.getJoinBlock());
 		return null;
 	}
 

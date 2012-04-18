@@ -32,13 +32,13 @@ package net.sf.orcc.ir.transformations;
 import java.util.List;
 
 import net.sf.dftools.graph.Edge;
-import net.sf.orcc.ir.Cfg;
-import net.sf.orcc.ir.CfgNode;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockIf;
 import net.sf.orcc.ir.BlockWhile;
+import net.sf.orcc.ir.Cfg;
+import net.sf.orcc.ir.CfgNode;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 
@@ -96,18 +96,18 @@ public class CfgBuilder extends AbstractActorVisitor<CfgNode> {
 			addEdge(cfgNode);
 		}
 
-		CfgNode join = addNode(node.getJoinNode());
+		CfgNode join = addNode(node.getJoinBlock());
 
 		last = cfgNode;
 		flag = true;
-		last = doSwitch(node.getThenNodes());
+		last = doSwitch(node.getThenBlocks());
 
 		// reset flag (in case there are no nodes in "then" branch)
 		flag = false;
 		addEdge(join);
 
 		last = cfgNode;
-		last = doSwitch(node.getElseNodes());
+		last = doSwitch(node.getElseBlocks());
 		addEdge(join);
 		last = join;
 
@@ -116,7 +116,7 @@ public class CfgBuilder extends AbstractActorVisitor<CfgNode> {
 
 	@Override
 	public CfgNode caseNodeWhile(BlockWhile node) {
-		CfgNode join = addNode(node.getJoinNode());
+		CfgNode join = addNode(node.getJoinBlock());
 
 		if (last != null) {
 			addEdge(join);
@@ -129,7 +129,7 @@ public class CfgBuilder extends AbstractActorVisitor<CfgNode> {
 
 		last = join;
 		flag = true;
-		last = doSwitch(node.getNodes());
+		last = doSwitch(node.getBlocks());
 
 		// reset flag (in case there are no nodes in "then" branch)
 		flag = false;

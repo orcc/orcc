@@ -190,11 +190,11 @@ public class ActorTransformer extends CalSwitch<Actor> {
 			nodes.add(block);
 
 			BlockWhile nodeWhile = eINSTANCE.createBlockWhile();
-			nodeWhile.setJoinNode(eINSTANCE.createBlockBasic());
+			nodeWhile.setJoinBlock(eINSTANCE.createBlockBasic());
 			nodeWhile.setCondition(condition);
-			nodeWhile.getNodes().addAll(nodes);
+			nodeWhile.getBlocks().addAll(nodes);
 
-			procedure.getNodes().add(nodeWhile);
+			procedure.getBlocks().add(nodeWhile);
 		}
 	}
 
@@ -219,13 +219,13 @@ public class ActorTransformer extends CalSwitch<Actor> {
 				List<Expression> indexes = new ArrayList<Expression>(1);
 				indexes.add(eINSTANCE.createExprInt(i));
 
-				new ExprTransformer(procedure, procedure.getNodes(),
+				new ExprTransformer(procedure, procedure.getBlocks(),
 						portVariable, indexes).doSwitch(value);
 				i++;
 			}
 		} else if (values.size() == 1) {
 			AstExpression value = values.get(0);
-			new ExprTransformer(procedure, procedure.getNodes(), portVariable)
+			new ExprTransformer(procedure, procedure.getBlocks(), portVariable)
 					.doSwitch(value);
 		} else {
 			// creates loop variable and initializes it
@@ -249,7 +249,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 				// so they are necessarily variables
 				Var tmpVar = procedure.newTempLocalVariable(type, "token");
 				Expression expression = new ExprTransformer(procedure,
-						procedure.getNodes(), tmpVar).doSwitch(value);
+						procedure.getBlocks(), tmpVar).doSwitch(value);
 				Use use = ((ExprVar) expression).getUse();
 
 				InstLoad load = eINSTANCE.createInstLoad(tmpVar,
@@ -284,11 +284,11 @@ public class ActorTransformer extends CalSwitch<Actor> {
 							eINSTANCE.createTypeBool());
 
 			BlockWhile nodeWhile = eINSTANCE.createBlockWhile();
-			nodeWhile.setJoinNode(eINSTANCE.createBlockBasic());
+			nodeWhile.setJoinBlock(eINSTANCE.createBlockBasic());
 			nodeWhile.setCondition(condition);
-			nodeWhile.getNodes().add(block);
+			nodeWhile.getBlocks().add(block);
 
-			procedure.getNodes().add(nodeWhile);
+			procedure.getBlocks().add(nodeWhile);
 		}
 	}
 
@@ -572,7 +572,7 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	private Expression transformGuards(StructTransformer transformer,
 			Procedure procedure, List<AstExpression> guards) {
 		List<Expression> expressions = AstIrUtil.transformExpressions(
-				procedure, procedure.getNodes(), guards);
+				procedure, procedure.getBlocks(), guards);
 		Iterator<Expression> it = expressions.iterator();
 		Expression value = it.next();
 		while (it.hasNext()) {

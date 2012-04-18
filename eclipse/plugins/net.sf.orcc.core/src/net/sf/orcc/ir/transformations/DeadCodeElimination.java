@@ -108,9 +108,9 @@ public class DeadCodeElimination extends AbstractActorVisitor<Object> {
 		Expression condition = node.getCondition();
 		if (condition.isExprBool()) {
 			if (((ExprBool) condition).isValue()) {
-				addNodes(node.getThenNodes(), node.getJoinNode(), 0);
+				addNodes(node.getThenBlocks(), node.getJoinBlock(), 0);
 			} else {
-				addNodes(node.getElseNodes(), node.getJoinNode(), 1);
+				addNodes(node.getElseBlocks(), node.getJoinBlock(), 1);
 			}
 		}
 

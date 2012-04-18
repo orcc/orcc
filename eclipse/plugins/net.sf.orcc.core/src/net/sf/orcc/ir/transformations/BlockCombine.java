@@ -28,13 +28,13 @@
  */
 package net.sf.orcc.ir.transformations;
 
-import org.eclipse.emf.ecore.util.EcoreUtil;
-
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockIf;
 import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
+
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class defines an actor transformation that combines blocks of
@@ -68,16 +68,16 @@ public class BlockCombine extends AbstractActorVisitor<Object> {
 	public Object caseNodeIf(BlockIf node) {
 		// so that previous blocks are not linked to then branch
 		previous = null;
-		doSwitch(node.getThenNodes());
+		doSwitch(node.getThenBlocks());
 
 		// so that previous blocks are not linked to else branch
 		previous = null;
-		doSwitch(node.getElseNodes());
+		doSwitch(node.getElseBlocks());
 
 		// so that neither then nor else branch are linked to this join
 		// as a matter of fact, this also ensures correctness in nested ifs
 		previous = null;
-		doSwitch(node.getJoinNode());
+		doSwitch(node.getJoinBlock());
 
 		// we do not set previous to null again, because join may be combined
 		// with next blocks (actually it needs to be).
@@ -95,7 +95,7 @@ public class BlockCombine extends AbstractActorVisitor<Object> {
 	public Object caseNodeWhile(BlockWhile node) {
 		// previous blocks are not linked to the body of the while
 		previous = null;
-		doSwitch(node.getNodes());
+		doSwitch(node.getBlocks());
 
 		// no previous block to be linked to
 		previous = null;

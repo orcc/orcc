@@ -352,12 +352,12 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 			BlockIf nodeIf = (BlockIf) containingNode;
 			if (value0.isExprVar()) {
 				BlockBasic block0 = IrFactory.eINSTANCE.createBlockBasic();
-				nodeIf.getThenNodes().add(block0);
+				nodeIf.getThenBlocks().add(block0);
 				values.set(0, castExpression(value0, block0, 0));
 			}
 			if (value1.isExprVar()) {
 				BlockBasic block1 = IrFactory.eINSTANCE.createBlockBasic();
-				nodeIf.getElseNodes().add(block1);
+				nodeIf.getElseBlocks().add(block1);
 				values.set(1, castExpression(value1, block1, 0));
 			}
 		} else {
@@ -371,7 +371,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 			}
 			if (value1.isExprVar()) {
 				BlockBasic block = IrFactory.eINSTANCE.createBlockBasic();
-				nodeWhile.getNodes().add(block);
+				nodeWhile.getBlocks().add(block);
 				values.set(1, castExpression(value1, block, 0));
 			}
 		}
@@ -413,9 +413,9 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 		Type oldParentType = parentType;
 		parentType = IrFactory.eINSTANCE.createTypeBool();
 		nodeIf.setCondition(doSwitch(nodeIf.getCondition()));
-		doSwitch(nodeIf.getThenNodes());
-		doSwitch(nodeIf.getElseNodes());
-		doSwitch(nodeIf.getJoinNode());
+		doSwitch(nodeIf.getThenBlocks());
+		doSwitch(nodeIf.getElseBlocks());
+		doSwitch(nodeIf.getJoinBlock());
 		parentType = oldParentType;
 		return null;
 	}
@@ -425,8 +425,8 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 		Type oldParentType = parentType;
 		parentType = IrFactory.eINSTANCE.createTypeBool();
 		nodeWhile.setCondition(doSwitch(nodeWhile.getCondition()));
-		doSwitch(nodeWhile.getNodes());
-		doSwitch(nodeWhile.getJoinNode());
+		doSwitch(nodeWhile.getBlocks());
+		doSwitch(nodeWhile.getJoinBlock());
 		parentType = oldParentType;
 		return null;
 	}
