@@ -40,10 +40,10 @@ import org.eclipse.emf.common.util.EList;
  * The following features are supported:
  * <ul>
  *   <li>{@link net.sf.orcc.ir.BlockIf#getCondition <em>Condition</em>}</li>
- *   <li>{@link net.sf.orcc.ir.BlockIf#getElseNodes <em>Else Nodes</em>}</li>
- *   <li>{@link net.sf.orcc.ir.BlockIf#getJoinNode <em>Join Node</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.BlockIf#getElseBlocks <em>Else Blocks</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.BlockIf#getJoinBlock <em>Join Block</em>}</li>
  *   <li>{@link net.sf.orcc.ir.BlockIf#getLineNumber <em>Line Number</em>}</li>
- *   <li>{@link net.sf.orcc.ir.BlockIf#getThenNodes <em>Then Nodes</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.BlockIf#getThenBlocks <em>Then Blocks</em>}</li>
  * </ul>
  * </p>
  *
@@ -64,29 +64,10 @@ public interface BlockIf extends Block {
 	 */
 	Expression getCondition();
 
-	/**
-	 * Returns the value of the '<em><b>Else Nodes</b></em>' containment
-	 * reference list. The list contents are of type
-	 * {@link net.sf.orcc.ir.Block}. <!-- begin-user-doc --><!-- end-user-doc
-	 * -->
-	 * 
-	 * @return the value of the '<em>Else Nodes</em>' containment reference
-	 *         list.
-	 * @see net.sf.orcc.ir.IrPackage#getBlockIf_ElseNodes()
-	 * @model containment="true"
-	 * @generated
-	 */
+	@Deprecated
 	EList<Block> getElseNodes();
 
-	/**
-	 * Returns the value of the '<em><b>Join Node</b></em>' containment reference.
-	 * <!-- begin-user-doc --><!-- end-user-doc -->
-	 * @return the value of the '<em>Join Node</em>' containment reference.
-	 * @see #setJoinNode(BlockBasic)
-	 * @see net.sf.orcc.ir.IrPackage#getBlockIf_JoinNode()
-	 * @model containment="true"
-	 * @generated
-	 */
+	@Deprecated
 	BlockBasic getJoinNode();
 
 	/**
@@ -102,16 +83,7 @@ public interface BlockIf extends Block {
 	 */
 	int getLineNumber();
 
-	/**
-	 * Returns the value of the '<em><b>Then Nodes</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.ir.Block}.
-	 * <!-- begin-user-doc --> Returns the nodes
-	 * in the "then" branch.<!-- end-user-doc -->
-	 * @return the value of the '<em>Then Nodes</em>' containment reference list.
-	 * @see net.sf.orcc.ir.IrPackage#getBlockIf_ThenNodes()
-	 * @model containment="true"
-	 * @generated
-	 */
+	@Deprecated
 	EList<Block> getThenNodes();
 
 	/**
@@ -128,8 +100,48 @@ public interface BlockIf extends Block {
 	void setCondition(Expression value);
 
 	/**
+	 * Returns the value of the '<em><b>Else Blocks</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.ir.Block}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Else Blocks</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Else Blocks</em>' containment reference list.
+	 * @see net.sf.orcc.ir.IrPackage#getBlockIf_ElseBlocks()
+	 * @model containment="true"
 	 * @generated
 	 */
+	EList<Block> getElseBlocks();
+
+	/**
+	 * Returns the value of the '<em><b>Join Block</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Join Block</em>' containment reference isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Join Block</em>' containment reference.
+	 * @see #setJoinBlock(BlockBasic)
+	 * @see net.sf.orcc.ir.IrPackage#getBlockIf_JoinBlock()
+	 * @model containment="true"
+	 * @generated
+	 */
+	BlockBasic getJoinBlock();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.ir.BlockIf#getJoinBlock <em>Join Block</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Join Block</em>' containment reference.
+	 * @see #getJoinBlock()
+	 * @generated
+	 */
+	void setJoinBlock(BlockBasic value);
+
+	@Deprecated
 	void setJoinNode(BlockBasic value);
 
 	/**
@@ -141,5 +153,21 @@ public interface BlockIf extends Block {
 	 * @generated
 	 */
 	void setLineNumber(int value);
+
+	/**
+	 * Returns the value of the '<em><b>Then Blocks</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.ir.Block}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Then Blocks</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Then Blocks</em>' containment reference list.
+	 * @see net.sf.orcc.ir.IrPackage#getBlockIf_ThenBlocks()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Block> getThenBlocks();
 
 }

@@ -38,9 +38,9 @@ import org.eclipse.emf.common.util.EList;
  * The following features are supported:
  * <ul>
  *   <li>{@link net.sf.orcc.ir.BlockWhile#getCondition <em>Condition</em>}</li>
- *   <li>{@link net.sf.orcc.ir.BlockWhile#getJoinNode <em>Join Node</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.BlockWhile#getJoinBlock <em>Join Block</em>}</li>
  *   <li>{@link net.sf.orcc.ir.BlockWhile#getLineNumber <em>Line Number</em>}</li>
- *   <li>{@link net.sf.orcc.ir.BlockWhile#getNodes <em>Nodes</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.BlockWhile#getBlocks <em>Blocks</em>}</li>
  * </ul>
  * </p>
  *
@@ -61,15 +61,7 @@ public interface BlockWhile extends Block {
 	 */
 	Expression getCondition();
 
-	/**
-	 * Returns the value of the '<em><b>Join Node</b></em>' containment reference.
-	 * <!-- begin-user-doc --><!-- end-user-doc -->
-	 * @return the value of the '<em>Join Node</em>' containment reference.
-	 * @see #setJoinNode(BlockBasic)
-	 * @see net.sf.orcc.ir.IrPackage#getBlockWhile_JoinNode()
-	 * @model containment="true"
-	 * @generated
-	 */
+	@Deprecated
 	BlockBasic getJoinNode();
 
 	/**
@@ -85,15 +77,7 @@ public interface BlockWhile extends Block {
 	 */
 	int getLineNumber();
 
-	/**
-	 * Returns the value of the '<em><b>Nodes</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.ir.Block}.
-	 * <!-- begin-user-doc -->Returns the nodes of this NodeWhile.<!-- end-user-doc -->
-	 * @return the value of the '<em>Nodes</em>' containment reference list.
-	 * @see net.sf.orcc.ir.IrPackage#getBlockWhile_Nodes()
-	 * @model containment="true"
-	 * @generated
-	 */
+	@Deprecated
 	EList<Block> getNodes();
 
 	/**
@@ -106,12 +90,32 @@ public interface BlockWhile extends Block {
 	void setCondition(Expression value);
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.BlockWhile#getJoinNode <em>Join Node</em>}' containment reference.
-	 * <!-- begin-user-doc --><!-- end-user-doc -->
-	 * @param value the new value of the '<em>Join Node</em>' containment reference.
-	 * @see #getJoinNode()
+	 * Returns the value of the '<em><b>Join Block</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Join Block</em>' containment reference isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Join Block</em>' containment reference.
+	 * @see #setJoinBlock(BlockBasic)
+	 * @see net.sf.orcc.ir.IrPackage#getBlockWhile_JoinBlock()
+	 * @model containment="true"
 	 * @generated
 	 */
+	BlockBasic getJoinBlock();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.ir.BlockWhile#getJoinBlock <em>Join Block</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Join Block</em>' containment reference.
+	 * @see #getJoinBlock()
+	 * @generated
+	 */
+	void setJoinBlock(BlockBasic value);
+
+	@Deprecated
 	void setJoinNode(BlockBasic value);
 
 	/**
@@ -123,5 +127,21 @@ public interface BlockWhile extends Block {
 	 * @generated
 	 */
 	void setLineNumber(int value);
+
+	/**
+	 * Returns the value of the '<em><b>Blocks</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.ir.Block}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Blocks</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Blocks</em>' containment reference list.
+	 * @see net.sf.orcc.ir.IrPackage#getBlockWhile_Blocks()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Block> getBlocks();
 
 }

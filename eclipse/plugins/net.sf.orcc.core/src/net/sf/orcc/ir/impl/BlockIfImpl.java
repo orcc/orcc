@@ -9,11 +9,11 @@ package net.sf.orcc.ir.impl;
 import java.util.Collection;
 import java.util.List;
 
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.IrPackage;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -31,10 +31,10 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * The following features are implemented:
  * <ul>
  *   <li>{@link net.sf.orcc.ir.impl.BlockIfImpl#getCondition <em>Condition</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.BlockIfImpl#getElseNodes <em>Else Nodes</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.BlockIfImpl#getJoinNode <em>Join Node</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.BlockIfImpl#getElseBlocks <em>Else Blocks</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.BlockIfImpl#getJoinBlock <em>Join Block</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.BlockIfImpl#getLineNumber <em>Line Number</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.BlockIfImpl#getThenNodes <em>Then Nodes</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.BlockIfImpl#getThenBlocks <em>Then Blocks</em>}</li>
  * </ul>
  * </p>
  *
@@ -51,22 +51,22 @@ public class BlockIfImpl extends BlockImpl implements BlockIf {
 	protected Expression condition;
 
 	/**
-	 * The cached value of the '{@link #getElseNodes() <em>Else Nodes</em>}' containment reference list.
+	 * The cached value of the '{@link #getElseBlocks() <em>Else Blocks</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getElseNodes()
+	 * @see #getElseBlocks()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Block> elseNodes;
+	protected EList<Block> elseBlocks;
 
 	/**
-	 * The cached value of the '{@link #getJoinNode() <em>Join Node</em>}' containment reference.
+	 * The cached value of the '{@link #getJoinBlock() <em>Join Block</em>}' containment reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getJoinNode()
+	 * @see #getJoinBlock()
 	 * @generated
 	 * @ordered
 	 */
-	protected BlockBasic joinNode;
+	protected BlockBasic joinBlock;
 
 	/**
 	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
@@ -87,13 +87,13 @@ public class BlockIfImpl extends BlockImpl implements BlockIf {
 	protected int lineNumber = LINE_NUMBER_EDEFAULT;
 
 	/**
-	 * The cached value of the '{@link #getThenNodes() <em>Then Nodes</em>}' containment reference list.
+	 * The cached value of the '{@link #getThenBlocks() <em>Then Blocks</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getThenNodes()
+	 * @see #getThenBlocks()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Block> thenNodes;
+	protected EList<Block> thenBlocks;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -127,14 +127,14 @@ public class BlockIfImpl extends BlockImpl implements BlockIf {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetJoinNode(BlockBasic newJoinNode,
+	public NotificationChain basicSetJoinBlock(BlockBasic newJoinBlock,
 			NotificationChain msgs) {
-		BlockBasic oldJoinNode = joinNode;
-		joinNode = newJoinNode;
+		BlockBasic oldJoinBlock = joinBlock;
+		joinBlock = newJoinBlock;
 		if (eNotificationRequired()) {
 			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.BLOCK_IF__JOIN_NODE,
-					oldJoinNode, newJoinNode);
+					Notification.SET, IrPackage.BLOCK_IF__JOIN_BLOCK,
+					oldJoinBlock, newJoinBlock);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -152,14 +152,14 @@ public class BlockIfImpl extends BlockImpl implements BlockIf {
 		switch (featureID) {
 		case IrPackage.BLOCK_IF__CONDITION:
 			return getCondition();
-		case IrPackage.BLOCK_IF__ELSE_NODES:
-			return getElseNodes();
-		case IrPackage.BLOCK_IF__JOIN_NODE:
-			return getJoinNode();
+		case IrPackage.BLOCK_IF__ELSE_BLOCKS:
+			return getElseBlocks();
+		case IrPackage.BLOCK_IF__JOIN_BLOCK:
+			return getJoinBlock();
 		case IrPackage.BLOCK_IF__LINE_NUMBER:
 			return getLineNumber();
-		case IrPackage.BLOCK_IF__THEN_NODES:
-			return getThenNodes();
+		case IrPackage.BLOCK_IF__THEN_BLOCKS:
+			return getThenBlocks();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -174,13 +174,13 @@ public class BlockIfImpl extends BlockImpl implements BlockIf {
 		switch (featureID) {
 		case IrPackage.BLOCK_IF__CONDITION:
 			return basicSetCondition(null, msgs);
-		case IrPackage.BLOCK_IF__ELSE_NODES:
-			return ((InternalEList<?>) getElseNodes()).basicRemove(otherEnd,
+		case IrPackage.BLOCK_IF__ELSE_BLOCKS:
+			return ((InternalEList<?>) getElseBlocks()).basicRemove(otherEnd,
 					msgs);
-		case IrPackage.BLOCK_IF__JOIN_NODE:
-			return basicSetJoinNode(null, msgs);
-		case IrPackage.BLOCK_IF__THEN_NODES:
-			return ((InternalEList<?>) getThenNodes()).basicRemove(otherEnd,
+		case IrPackage.BLOCK_IF__JOIN_BLOCK:
+			return basicSetJoinBlock(null, msgs);
+		case IrPackage.BLOCK_IF__THEN_BLOCKS:
+			return ((InternalEList<?>) getThenBlocks()).basicRemove(otherEnd,
 					msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
@@ -195,32 +195,16 @@ public class BlockIfImpl extends BlockImpl implements BlockIf {
 		switch (featureID) {
 		case IrPackage.BLOCK_IF__CONDITION:
 			return condition != null;
-		case IrPackage.BLOCK_IF__ELSE_NODES:
-			return elseNodes != null && !elseNodes.isEmpty();
-		case IrPackage.BLOCK_IF__JOIN_NODE:
-			return joinNode != null;
+		case IrPackage.BLOCK_IF__ELSE_BLOCKS:
+			return elseBlocks != null && !elseBlocks.isEmpty();
+		case IrPackage.BLOCK_IF__JOIN_BLOCK:
+			return joinBlock != null;
 		case IrPackage.BLOCK_IF__LINE_NUMBER:
 			return lineNumber != LINE_NUMBER_EDEFAULT;
-		case IrPackage.BLOCK_IF__THEN_NODES:
-			return thenNodes != null && !thenNodes.isEmpty();
+		case IrPackage.BLOCK_IF__THEN_BLOCKS:
+			return thenBlocks != null && !thenBlocks.isEmpty();
 		}
 		return super.eIsSet(featureID);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public String toString() {
-		if (eIsProxy())
-			return super.toString();
-
-		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (lineNumber: ");
-		result.append(lineNumber);
-		result.append(')');
-		return result.toString();
 	}
 
 	/**
@@ -234,19 +218,19 @@ public class BlockIfImpl extends BlockImpl implements BlockIf {
 		case IrPackage.BLOCK_IF__CONDITION:
 			setCondition((Expression) newValue);
 			return;
-		case IrPackage.BLOCK_IF__ELSE_NODES:
-			getElseNodes().clear();
-			getElseNodes().addAll((Collection<? extends Block>) newValue);
+		case IrPackage.BLOCK_IF__ELSE_BLOCKS:
+			getElseBlocks().clear();
+			getElseBlocks().addAll((Collection<? extends Block>) newValue);
 			return;
-		case IrPackage.BLOCK_IF__JOIN_NODE:
-			setJoinNode((BlockBasic) newValue);
+		case IrPackage.BLOCK_IF__JOIN_BLOCK:
+			setJoinBlock((BlockBasic) newValue);
 			return;
 		case IrPackage.BLOCK_IF__LINE_NUMBER:
 			setLineNumber((Integer) newValue);
 			return;
-		case IrPackage.BLOCK_IF__THEN_NODES:
-			getThenNodes().clear();
-			getThenNodes().addAll((Collection<? extends Block>) newValue);
+		case IrPackage.BLOCK_IF__THEN_BLOCKS:
+			getThenBlocks().clear();
+			getThenBlocks().addAll((Collection<? extends Block>) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -271,17 +255,17 @@ public class BlockIfImpl extends BlockImpl implements BlockIf {
 		case IrPackage.BLOCK_IF__CONDITION:
 			setCondition((Expression) null);
 			return;
-		case IrPackage.BLOCK_IF__ELSE_NODES:
-			getElseNodes().clear();
+		case IrPackage.BLOCK_IF__ELSE_BLOCKS:
+			getElseBlocks().clear();
 			return;
-		case IrPackage.BLOCK_IF__JOIN_NODE:
-			setJoinNode((BlockBasic) null);
+		case IrPackage.BLOCK_IF__JOIN_BLOCK:
+			setJoinBlock((BlockBasic) null);
 			return;
 		case IrPackage.BLOCK_IF__LINE_NUMBER:
 			setLineNumber(LINE_NUMBER_EDEFAULT);
 			return;
-		case IrPackage.BLOCK_IF__THEN_NODES:
-			getThenNodes().clear();
+		case IrPackage.BLOCK_IF__THEN_BLOCKS:
+			getThenBlocks().clear();
 			return;
 		}
 		super.eUnset(featureID);
@@ -299,32 +283,70 @@ public class BlockIfImpl extends BlockImpl implements BlockIf {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EList<Block> getElseBlocks() {
+		if (elseBlocks == null) {
+			elseBlocks = new EObjectContainmentEList<Block>(Block.class, this,
+					IrPackage.BLOCK_IF__ELSE_BLOCKS);
+		}
+		return elseBlocks;
+	}
+
+	@Override
 	public EList<Block> getElseNodes() {
-		if (elseNodes == null) {
-			elseNodes = new EObjectContainmentEList<Block>(Block.class, this,
-					IrPackage.BLOCK_IF__ELSE_NODES);
-		}
-		return elseNodes;
+		return getElseBlocks();
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	public BlockBasic getJoinBlock() {
+		return joinBlock;
+	}
+
+	@Override
 	public BlockBasic getJoinNode() {
-		return joinNode;
+		return getJoinBlock();
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Block> getThenNodes() {
-		if (thenNodes == null) {
-			thenNodes = new EObjectContainmentEList<Block>(Block.class, this,
-					IrPackage.BLOCK_IF__THEN_NODES);
+	public int getLineNumber() {
+		return lineNumber;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Block> getThenBlocks() {
+		if (thenBlocks == null) {
+			thenBlocks = new EObjectContainmentEList<Block>(Block.class, this,
+					IrPackage.BLOCK_IF__THEN_BLOCKS);
 		}
-		return thenNodes;
+		return thenBlocks;
+	}
+
+	@Override
+	public EList<Block> getThenNodes() {
+		return getThenBlocks();
+	}
+
+	@Override
+	public boolean isBlockBasic() {
+		return false;
+	}
+
+	@Override
+	public boolean isBlockIf() {
+		return true;
+	}
+
+	@Override
+	public boolean isBlockWhile() {
+		return false;
 	}
 
 	@Override
@@ -375,8 +397,28 @@ public class BlockIfImpl extends BlockImpl implements BlockIf {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public int getLineNumber() {
-		return lineNumber;
+	public void setJoinBlock(BlockBasic newJoinBlock) {
+		if (newJoinBlock != joinBlock) {
+			NotificationChain msgs = null;
+			if (joinBlock != null)
+				msgs = ((InternalEObject) joinBlock)
+						.eInverseRemove(this, EOPPOSITE_FEATURE_BASE
+								- IrPackage.BLOCK_IF__JOIN_BLOCK, null, msgs);
+			if (newJoinBlock != null)
+				msgs = ((InternalEObject) newJoinBlock)
+						.eInverseAdd(this, EOPPOSITE_FEATURE_BASE
+								- IrPackage.BLOCK_IF__JOIN_BLOCK, null, msgs);
+			msgs = basicSetJoinBlock(newJoinBlock, msgs);
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.BLOCK_IF__JOIN_BLOCK, newJoinBlock, newJoinBlock));
+	}
+
+	@Override
+	public void setJoinNode(BlockBasic value) {
+		setJoinBlock(value);
 	}
 
 	/**
@@ -395,38 +437,16 @@ public class BlockIfImpl extends BlockImpl implements BlockIf {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setJoinNode(BlockBasic newJoinNode) {
-		if (newJoinNode != joinNode) {
-			NotificationChain msgs = null;
-			if (joinNode != null)
-				msgs = ((InternalEObject) joinNode).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.BLOCK_IF__JOIN_NODE,
-						null, msgs);
-			if (newJoinNode != null)
-				msgs = ((InternalEObject) newJoinNode).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.BLOCK_IF__JOIN_NODE,
-						null, msgs);
-			msgs = basicSetJoinNode(newJoinNode, msgs);
-			if (msgs != null)
-				msgs.dispatch();
-		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.BLOCK_IF__JOIN_NODE, newJoinNode, newJoinNode));
-	}
-
 	@Override
-	public boolean isBlockBasic() {
-		return false;
-	}
+	public String toString() {
+		if (eIsProxy())
+			return super.toString();
 
-	@Override
-	public boolean isBlockIf() {
-		return true;
-	}
-
-	@Override
-	public boolean isBlockWhile() {
-		return false;
+		StringBuffer result = new StringBuffer(super.toString());
+		result.append(" (lineNumber: ");
+		result.append(lineNumber);
+		result.append(')');
+		return result.toString();
 	}
 
 } // NodeIfImpl

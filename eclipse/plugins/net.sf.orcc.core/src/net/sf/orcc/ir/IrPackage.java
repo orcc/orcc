@@ -717,20 +717,20 @@ public interface IrPackage extends EPackage {
 		EReference BLOCK_IF__CONDITION = eINSTANCE.getBlockIf_Condition();
 
 		/**
-		 * The meta object literal for the '<em><b>Else Nodes</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Else Blocks</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference BLOCK_IF__ELSE_NODES = eINSTANCE.getBlockIf_ElseNodes();
+		EReference BLOCK_IF__ELSE_BLOCKS = eINSTANCE.getBlockIf_ElseBlocks();
 
 		/**
-		 * The meta object literal for the '<em><b>Join Node</b></em>' containment reference feature.
+		 * The meta object literal for the '<em><b>Join Block</b></em>' containment reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference BLOCK_IF__JOIN_NODE = eINSTANCE.getBlockIf_JoinNode();
+		EReference BLOCK_IF__JOIN_BLOCK = eINSTANCE.getBlockIf_JoinBlock();
 
 		/**
 		 * The meta object literal for the '<em><b>Line Number</b></em>' attribute feature.
@@ -741,12 +741,12 @@ public interface IrPackage extends EPackage {
 		EAttribute BLOCK_IF__LINE_NUMBER = eINSTANCE.getBlockIf_LineNumber();
 
 		/**
-		 * The meta object literal for the '<em><b>Then Nodes</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Then Blocks</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference BLOCK_IF__THEN_NODES = eINSTANCE.getBlockIf_ThenNodes();
+		EReference BLOCK_IF__THEN_BLOCKS = eINSTANCE.getBlockIf_ThenBlocks();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.BlockWhileImpl <em>Block While</em>}' class.
@@ -767,12 +767,13 @@ public interface IrPackage extends EPackage {
 		EReference BLOCK_WHILE__CONDITION = eINSTANCE.getBlockWhile_Condition();
 
 		/**
-		 * The meta object literal for the '<em><b>Join Node</b></em>' containment reference feature.
+		 * The meta object literal for the '<em><b>Join Block</b></em>' containment reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference BLOCK_WHILE__JOIN_NODE = eINSTANCE.getBlockWhile_JoinNode();
+		EReference BLOCK_WHILE__JOIN_BLOCK = eINSTANCE
+				.getBlockWhile_JoinBlock();
 
 		/**
 		 * The meta object literal for the '<em><b>Line Number</b></em>' attribute feature.
@@ -784,12 +785,12 @@ public interface IrPackage extends EPackage {
 				.getBlockWhile_LineNumber();
 
 		/**
-		 * The meta object literal for the '<em><b>Nodes</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Blocks</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference BLOCK_WHILE__NODES = eINSTANCE.getBlockWhile_Nodes();
+		EReference BLOCK_WHILE__BLOCKS = eINSTANCE.getBlockWhile_Blocks();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.BlockSpecificImpl <em>Block Specific</em>}' class.
@@ -1490,22 +1491,22 @@ public interface IrPackage extends EPackage {
 	int BLOCK_IF__CONDITION = BLOCK_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Else Nodes</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Else Blocks</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int BLOCK_IF__ELSE_NODES = BLOCK_FEATURE_COUNT + 1;
+	int BLOCK_IF__ELSE_BLOCKS = BLOCK_FEATURE_COUNT + 1;
 
 	/**
-	 * The feature id for the '<em><b>Join Node</b></em>' containment reference.
+	 * The feature id for the '<em><b>Join Block</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int BLOCK_IF__JOIN_NODE = BLOCK_FEATURE_COUNT + 2;
+	int BLOCK_IF__JOIN_BLOCK = BLOCK_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -1517,13 +1518,13 @@ public interface IrPackage extends EPackage {
 	int BLOCK_IF__LINE_NUMBER = BLOCK_FEATURE_COUNT + 3;
 
 	/**
-	 * The feature id for the '<em><b>Then Nodes</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Then Blocks</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int BLOCK_IF__THEN_NODES = BLOCK_FEATURE_COUNT + 4;
+	int BLOCK_IF__THEN_BLOCKS = BLOCK_FEATURE_COUNT + 4;
 
 	/**
 	 * The number of structural features of the '<em>Block If</em>' class.
@@ -1572,13 +1573,13 @@ public interface IrPackage extends EPackage {
 	int BLOCK_WHILE__CONDITION = BLOCK_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Join Node</b></em>' containment reference.
+	 * The feature id for the '<em><b>Join Block</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int BLOCK_WHILE__JOIN_NODE = BLOCK_FEATURE_COUNT + 1;
+	int BLOCK_WHILE__JOIN_BLOCK = BLOCK_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -1590,13 +1591,13 @@ public interface IrPackage extends EPackage {
 	int BLOCK_WHILE__LINE_NUMBER = BLOCK_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>Nodes</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Blocks</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int BLOCK_WHILE__NODES = BLOCK_FEATURE_COUNT + 3;
+	int BLOCK_WHILE__BLOCKS = BLOCK_FEATURE_COUNT + 3;
 
 	/**
 	 * The number of structural features of the '<em>Block While</em>' class.
@@ -3775,26 +3776,26 @@ public interface IrPackage extends EPackage {
 	EReference getBlockIf_Condition();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.BlockIf#getElseNodes <em>Else Nodes</em>}'.
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.BlockIf#getElseBlocks <em>Else Blocks</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Else Nodes</em>'.
-	 * @see net.sf.orcc.ir.BlockIf#getElseNodes()
+	 * @return the meta object for the containment reference list '<em>Else Blocks</em>'.
+	 * @see net.sf.orcc.ir.BlockIf#getElseBlocks()
 	 * @see #getBlockIf()
 	 * @generated
 	 */
-	EReference getBlockIf_ElseNodes();
+	EReference getBlockIf_ElseBlocks();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.BlockIf#getJoinNode <em>Join Node</em>}'.
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.BlockIf#getJoinBlock <em>Join Block</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Join Node</em>'.
-	 * @see net.sf.orcc.ir.BlockIf#getJoinNode()
+	 * @return the meta object for the containment reference '<em>Join Block</em>'.
+	 * @see net.sf.orcc.ir.BlockIf#getJoinBlock()
 	 * @see #getBlockIf()
 	 * @generated
 	 */
-	EReference getBlockIf_JoinNode();
+	EReference getBlockIf_JoinBlock();
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.BlockIf#getLineNumber <em>Line Number</em>}'.
@@ -3808,15 +3809,15 @@ public interface IrPackage extends EPackage {
 	EAttribute getBlockIf_LineNumber();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.BlockIf#getThenNodes <em>Then Nodes</em>}'.
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.BlockIf#getThenBlocks <em>Then Blocks</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Then Nodes</em>'.
-	 * @see net.sf.orcc.ir.BlockIf#getThenNodes()
+	 * @return the meta object for the containment reference list '<em>Then Blocks</em>'.
+	 * @see net.sf.orcc.ir.BlockIf#getThenBlocks()
 	 * @see #getBlockIf()
 	 * @generated
 	 */
-	EReference getBlockIf_ThenNodes();
+	EReference getBlockIf_ThenBlocks();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.BlockWhile <em>Block While</em>}'.
@@ -3840,15 +3841,15 @@ public interface IrPackage extends EPackage {
 	EReference getBlockWhile_Condition();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.BlockWhile#getJoinNode <em>Join Node</em>}'.
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.BlockWhile#getJoinBlock <em>Join Block</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Join Node</em>'.
-	 * @see net.sf.orcc.ir.BlockWhile#getJoinNode()
+	 * @return the meta object for the containment reference '<em>Join Block</em>'.
+	 * @see net.sf.orcc.ir.BlockWhile#getJoinBlock()
 	 * @see #getBlockWhile()
 	 * @generated
 	 */
-	EReference getBlockWhile_JoinNode();
+	EReference getBlockWhile_JoinBlock();
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.BlockWhile#getLineNumber <em>Line Number</em>}'.
@@ -3862,15 +3863,15 @@ public interface IrPackage extends EPackage {
 	EAttribute getBlockWhile_LineNumber();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.BlockWhile#getNodes <em>Nodes</em>}'.
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.BlockWhile#getBlocks <em>Blocks</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Nodes</em>'.
-	 * @see net.sf.orcc.ir.BlockWhile#getNodes()
+	 * @return the meta object for the containment reference list '<em>Blocks</em>'.
+	 * @see net.sf.orcc.ir.BlockWhile#getBlocks()
 	 * @see #getBlockWhile()
 	 * @generated
 	 */
-	EReference getBlockWhile_Nodes();
+	EReference getBlockWhile_Blocks();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.BlockSpecific <em>Block Specific</em>}'.

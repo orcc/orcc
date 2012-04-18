@@ -32,21 +32,21 @@
   <eClassifiers xsi:type="ecore:EClass" name="BlockIf" eSuperTypes="#//Block">
     <eStructuralFeatures xsi:type="ecore:EReference" name="condition" eType="#//Expression"
         containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="elseNodes" upperBound="-1"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="elseBlocks" upperBound="-1"
         eType="#//Block" containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="joinNode" eType="#//BlockBasic"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="joinBlock" eType="#//BlockBasic"
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="lineNumber" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="thenNodes" upperBound="-1"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="thenBlocks" upperBound="-1"
         eType="#//Block" containment="true" resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="BlockWhile" eSuperTypes="#//Block">
     <eStructuralFeatures xsi:type="ecore:EReference" name="condition" eType="#//Expression"
         containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="joinNode" eType="#//BlockBasic"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="joinBlock" eType="#//BlockBasic"
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="lineNumber" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="nodes" upperBound="-1"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="blocks" upperBound="-1"
         eType="#//Block" containment="true" resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="BlockSpecific" abstract="true" eSuperTypes="#//Block"/>

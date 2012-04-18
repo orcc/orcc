@@ -795,7 +795,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getBlockIf_ElseNodes() {
+	public EReference getBlockIf_ElseBlocks() {
 		return (EReference) blockIfEClass.getEStructuralFeatures().get(1);
 	}
 
@@ -804,7 +804,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getBlockIf_JoinNode() {
+	public EReference getBlockIf_JoinBlock() {
 		return (EReference) blockIfEClass.getEStructuralFeatures().get(2);
 	}
 
@@ -822,7 +822,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getBlockIf_ThenNodes() {
+	public EReference getBlockIf_ThenBlocks() {
 		return (EReference) blockIfEClass.getEStructuralFeatures().get(4);
 	}
 
@@ -849,7 +849,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getBlockWhile_JoinNode() {
+	public EReference getBlockWhile_JoinBlock() {
 		return (EReference) blockWhileEClass.getEStructuralFeatures().get(1);
 	}
 
@@ -867,7 +867,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getBlockWhile_Nodes() {
+	public EReference getBlockWhile_Blocks() {
 		return (EReference) blockWhileEClass.getEStructuralFeatures().get(3);
 	}
 
@@ -1561,16 +1561,16 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		blockIfEClass = createEClass(BLOCK_IF);
 		createEReference(blockIfEClass, BLOCK_IF__CONDITION);
-		createEReference(blockIfEClass, BLOCK_IF__ELSE_NODES);
-		createEReference(blockIfEClass, BLOCK_IF__JOIN_NODE);
+		createEReference(blockIfEClass, BLOCK_IF__ELSE_BLOCKS);
+		createEReference(blockIfEClass, BLOCK_IF__JOIN_BLOCK);
 		createEAttribute(blockIfEClass, BLOCK_IF__LINE_NUMBER);
-		createEReference(blockIfEClass, BLOCK_IF__THEN_NODES);
+		createEReference(blockIfEClass, BLOCK_IF__THEN_BLOCKS);
 
 		blockWhileEClass = createEClass(BLOCK_WHILE);
 		createEReference(blockWhileEClass, BLOCK_WHILE__CONDITION);
-		createEReference(blockWhileEClass, BLOCK_WHILE__JOIN_NODE);
+		createEReference(blockWhileEClass, BLOCK_WHILE__JOIN_BLOCK);
 		createEAttribute(blockWhileEClass, BLOCK_WHILE__LINE_NUMBER);
-		createEReference(blockWhileEClass, BLOCK_WHILE__NODES);
+		createEReference(blockWhileEClass, BLOCK_WHILE__BLOCKS);
 
 		blockSpecificEClass = createEClass(BLOCK_SPECIFIC);
 
@@ -1843,20 +1843,20 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 				"condition", null, 0, 1, BlockIf.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getBlockIf_ElseNodes(), this.getBlock(), null,
-				"elseNodes", null, 0, -1, BlockIf.class, !IS_TRANSIENT,
+		initEReference(getBlockIf_ElseBlocks(), this.getBlock(), null,
+				"elseBlocks", null, 0, -1, BlockIf.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getBlockIf_JoinNode(), this.getBlockBasic(), null,
-				"joinNode", null, 0, 1, BlockIf.class, !IS_TRANSIENT,
+		initEReference(getBlockIf_JoinBlock(), this.getBlockBasic(), null,
+				"joinBlock", null, 0, 1, BlockIf.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getBlockIf_LineNumber(), ecorePackage.getEInt(),
 				"lineNumber", null, 0, 1, BlockIf.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
-		initEReference(getBlockIf_ThenNodes(), this.getBlock(), null,
-				"thenNodes", null, 0, -1, BlockIf.class, !IS_TRANSIENT,
+		initEReference(getBlockIf_ThenBlocks(), this.getBlock(), null,
+				"thenBlocks", null, 0, -1, BlockIf.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
@@ -1866,15 +1866,15 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 				"condition", null, 0, 1, BlockWhile.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getBlockWhile_JoinNode(), this.getBlockBasic(), null,
-				"joinNode", null, 0, 1, BlockWhile.class, !IS_TRANSIENT,
+		initEReference(getBlockWhile_JoinBlock(), this.getBlockBasic(), null,
+				"joinBlock", null, 0, 1, BlockWhile.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getBlockWhile_LineNumber(), ecorePackage.getEInt(),
 				"lineNumber", null, 0, 1, BlockWhile.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
-		initEReference(getBlockWhile_Nodes(), this.getBlock(), null, "nodes",
+		initEReference(getBlockWhile_Blocks(), this.getBlock(), null, "blocks",
 				null, 0, -1, BlockWhile.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
