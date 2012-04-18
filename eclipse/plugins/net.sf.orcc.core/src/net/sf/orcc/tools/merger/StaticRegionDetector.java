@@ -63,8 +63,6 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class StaticRegionDetector {
 
-	private static int index;
-
 	private Set<Vertex> discovered = new HashSet<Vertex>();
 	private Set<Vertex> finished = new HashSet<Vertex>();
 
@@ -83,16 +81,13 @@ public class StaticRegionDetector {
 	 * @return
 	 */
 	private boolean introduceCycle(List<Vertex> vertices) {
-		int inIndex = 0;
-		int outIndex = 0;
-
 		network = EcoreUtil.copy(network);
 
 		// the clustered graph is just the network
 		Graph clusteredGraph = network;
 
 		Actor actor = DfFactory.eINSTANCE.createActor();
-		actor.setName("cluster" + index++);
+		actor.setName("cluster");
 
 		Instance cluster = DfFactory.eINSTANCE.createInstance(actor.getName(),
 				actor);
@@ -117,9 +112,7 @@ public class StaticRegionDetector {
 
 			if (!verticesCopy.contains(srcVertex)
 					&& verticesCopy.contains(tgtVertex)) {
-				Port tgtPort = DfFactory.eINSTANCE.createPort(edge
-						.getTargetPort());
-				tgtPort.setName("input_" + outIndex++);
+				Port tgtPort = DfFactory.eINSTANCE.createPort();
 				actor.getInputs().add(tgtPort);
 				Connection incoming = DfFactory.eINSTANCE.createConnection(
 						srcVertex, edge.getSourcePort(), cluster, tgtPort,
@@ -127,9 +120,7 @@ public class StaticRegionDetector {
 				edges.add(incoming);
 			} else if (verticesCopy.contains(srcVertex)
 					&& !verticesCopy.contains(tgtVertex)) {
-				Port srcPort = DfFactory.eINSTANCE.createPort(edge
-						.getSourcePort());
-				srcPort.setName("output_" + inIndex++);
+				Port srcPort = DfFactory.eINSTANCE.createPort();
 				actor.getOutputs().add(srcPort);
 				Connection outgoing = DfFactory.eINSTANCE.createConnection(
 						cluster, srcPort, tgtVertex, edge.getTargetPort(),
@@ -143,20 +134,19 @@ public class StaticRegionDetector {
 
 		List<List<Vertex>> sccs = new SccFinder().visitGraph(clusteredGraph);
 
-		boolean ret = false;
 		for (List<Vertex> scc : sccs) {
 			if (scc.size() > 1) {
 				if (scc.remove(cluster)) {
-					// only cycles inside the cluster are allowed
 					for (Vertex v : scc) {
-						if (!verticesCopy.contains(v)) {
+						MoC moc = ((Instance) v).getMoC();
+						if (moc != null && !moc.isCSDF()) {
 							return true;
 						}
 					}
 				}
 			}
 		}
-		return ret;
+		return false;
 	}
 
 	/**

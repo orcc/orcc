@@ -65,15 +65,12 @@ public class ChangeFifoArrayAccess extends AbstractActorVisitor<Object> {
 		Use use = load.getSource();
 		Var var = use.getVariable();
 		Port port = inputPattern.getVarToPortMap().get(var);
-
-		if (var.isLocal() && port != null) {
+		if (port != null) {
 			var = buffersMap.get(port);
 			int cns = inputPattern.getNumTokens(port);
 			loads.put(var, cns);
 			use.setVariable(var);
-
 			List<Expression> indexes = load.getIndexes();
-
 			Expression e1 = factory.createExprVar(factory.createUse(superActor
 					.getStateVar(var.getName() + "_r")));
 			Expression e2 = IrUtil.copy(indexes.get(0));
@@ -92,20 +89,35 @@ public class ChangeFifoArrayAccess extends AbstractActorVisitor<Object> {
 		Def def = store.getTarget();
 		Var var = def.getVariable();
 		Port port = outputPattern.getVarToPortMap().get(var);
-		if (var.isLocal() && port != null) {
+		if (port != null) {
 			var = buffersMap.get(port);
 			int prd = outputPattern.getNumTokens(port);
 			stores.put(var, prd);
 			def.setVariable(var);
-
 			Expression e1 = factory.createExprVar(factory.createUse(superActor
 					.getStateVar(var.getName() + "_w")));
 			Expression e2 = IrUtil.copy(store.getIndexes().get(0));
 			Expression bop = factory.createExprBinary(e1, OpBinary.PLUS, e2,
 					e1.getType());
 			store.getIndexes().set(0, bop);
+			return null;
 		}
-
+		
+		port = inputPattern.getVarToPortMap().get(var);
+		if (port != null) {
+			var = buffersMap.get(port);
+			int cns = inputPattern.getNumTokens(port);
+			stores.put(var, cns);
+			def.setVariable(var);
+			Expression e1 = factory.createExprVar(factory.createUse(superActor
+					.getStateVar(var.getName() + "_r")));
+			Expression e2 = IrUtil.copy(store.getIndexes().get(0));
+			Expression bop = factory.createExprBinary(e1, OpBinary.PLUS, e2,
+					e1.getType());
+			store.getIndexes().set(0, bop);
+			return null;
+		}
+		
 		return null;
 	}
 

@@ -41,6 +41,7 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
@@ -108,7 +109,7 @@ public class ActorMerger extends DfSwitch<Void> {
 				// add connection is the parent network
 				newConnections.add(DfFactory.eINSTANCE.createConnection(
 						srcVertex, connection.getSourcePort(), subNetworkInst,
-						input));
+						input, IrUtil.copy(connection.getAttributes())));
 				oldConnections.add(connection);
 			} else if (vertices.contains(srcVertex)
 					&& !vertices.contains(tgtVertex)) {
@@ -124,13 +125,13 @@ public class ActorMerger extends DfSwitch<Void> {
 				// add connection is the parent network
 				newConnections.add(DfFactory.eINSTANCE.createConnection(
 						subNetworkInst, output, tgtVertex,
-						connection.getTargetPort()));
+						connection.getTargetPort(),
+						IrUtil.copy(connection.getAttributes())));
 				oldConnections.add(connection);
 			}
 		}
 
 		network.getConnections().addAll(newConnections);
-		network.removeEdges(oldConnections);
 		network.add(subNetworkInst);
 
 		network.removeVertices(vertices);

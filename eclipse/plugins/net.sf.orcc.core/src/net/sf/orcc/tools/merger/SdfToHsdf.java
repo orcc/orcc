@@ -70,10 +70,10 @@ public class SdfToHsdf extends DfSwitch<Network> {
 				factory.createExprVar(loop), OpBinary.LT,
 				factory.createExprInt(cns), factory.createTypeBool());
 		BlockWhile nodeWhile = factory.createBlockWhile();
-		nodeWhile.setJoinNode(factory.createBlockBasic());
+		nodeWhile.setJoinBlock(factory.createBlockBasic());
 		nodeWhile.setCondition(condition);
 		body.getNodes().add(nodeWhile);
-		BlockBasic whileBlock = IrUtil.getLast(nodeWhile.getNodes());
+		BlockBasic whileBlock = IrUtil.getLast(nodeWhile.getBlocks());
 
 		int ind = 0;
 		for (Port input : actor.getInputs()) {
@@ -238,10 +238,10 @@ public class SdfToHsdf extends DfSwitch<Network> {
 				factory.createExprVar(loop), OpBinary.LT,
 				factory.createExprInt(prd), factory.createTypeBool());
 		BlockWhile nodeWhile = factory.createBlockWhile();
-		nodeWhile.setJoinNode(factory.createBlockBasic());
+		nodeWhile.setJoinBlock(factory.createBlockBasic());
 		nodeWhile.setCondition(condition);
 		body.getNodes().add(nodeWhile);
-		BlockBasic whileBlock = IrUtil.getLast(nodeWhile.getNodes());
+		BlockBasic whileBlock = IrUtil.getLast(nodeWhile.getBlocks());
 
 		int ind = 0;
 		for (Port output : actor.getOutputs()) {

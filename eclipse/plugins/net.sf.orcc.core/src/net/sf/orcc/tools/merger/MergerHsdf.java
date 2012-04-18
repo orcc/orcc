@@ -350,7 +350,7 @@ public class MergerHsdf extends DfSwitch<Actor> {
 					factory.createExprInt(size), factory.createTypeBool());
 
 			BlockWhile nodeWhile = factory.createBlockWhile();
-			nodeWhile.setJoinNode(factory.createBlockBasic());
+			nodeWhile.setJoinBlock(factory.createBlockBasic());
 			nodeWhile.setCondition(condition);
 			nodes.add(nodeWhile);
 
@@ -362,7 +362,7 @@ public class MergerHsdf extends DfSwitch<Actor> {
 			indexes.add(factory.createExprVar(loop));
 			InstStore store = factory.createInstStore(0, target, indexes,
 					factory.createExprVar(tmpVar));
-			BlockBasic childBlock = IrUtil.getLast(nodeWhile.getNodes());
+			BlockBasic childBlock = IrUtil.getLast(nodeWhile.getBlocks());
 			childBlock.add(load);
 			childBlock.add(store);
 
