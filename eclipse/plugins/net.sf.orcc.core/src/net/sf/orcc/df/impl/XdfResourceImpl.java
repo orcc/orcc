@@ -35,9 +35,14 @@ import java.io.OutputStream;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Port;
+import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.df.util.XdfParser;
 import net.sf.orcc.df.util.XdfWriter;
+import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -88,23 +93,59 @@ public class XdfResourceImpl extends ResourceImpl {
 			return null;
 		}
 
-		EObject top = getContents().get(0);
-		EObject result = null;
-		if (uriFragment.startsWith("//@inputs.")) {
-			String name = uriFragment.substring(10);
-			result = ((Network) top).getInput(name);
-		} else if (uriFragment.startsWith("//@outputs.")) {
-			String name = uriFragment.substring(11);
-			result = ((Network) top).getOutput(name);
-		} else if (uriFragment.startsWith("//@parameters.")) {
-			String name = uriFragment.substring(14);
-			result = ((Network) top).getParameter(name);
+		if (uriFragment.length() == 0) {
+			return super.getEObject(uriFragment);
 		}
 
-		if (result != null) {
-			return result;
+		EObject root = getContents().get(0);
+		if (root instanceof Network) {
+			Network network = (Network) root;
+			int index = uriFragment.lastIndexOf('.') + 1;
+			if (!Character.isDigit(uriFragment.charAt(index))) {
+				String name = uriFragment.substring(index);
+				if (uriFragment.startsWith("//@inputs.")) {
+					return network.getInput(name);
+				} else if (uriFragment.startsWith("//@outputs.")) {
+					return network.getOutput(name);
+				} else if (uriFragment.startsWith("//@instances.")) {
+					return network.getInstance(name);
+				} else if (uriFragment.startsWith("//@parameters.")) {
+					return network.getParameter(name);
+				} else if (uriFragment.startsWith("//@variables.")) {
+					return network.getVariable(name);
+				}
+			}
 		}
+
 		return super.getEObject(uriFragment);
+	}
+
+	@Override
+	public String getURIFragment(EObject eObject) {
+		if (eObject instanceof Network) {
+			// only one network per XdfResource
+			return "/";
+		} else if (eObject instanceof Instance) {
+			Instance instance = (Instance) eObject;
+			return "//@instances." + instance.getName();
+		} else if (eObject instanceof Port) {
+			Port port = (Port) eObject;
+			if (DfUtil.isInput(port)) {
+				return "//@inputs." + port.getName();
+			} else {
+				return "//@outputs." + port.getName();
+			}
+		} else if (eObject instanceof Var) {
+			Var var = (Var) eObject;
+			if (var.eContainingFeature() == DfPackage.Literals.NETWORK__PARAMETERS) {
+				return "//@parameters." + var.getName();
+			} else {
+				return "//@variables." + var.getName();
+			}
+		}
+
+		// for connection and other objects
+		return super.getURIFragment(eObject);
 	}
 
 }
