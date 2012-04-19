@@ -59,7 +59,7 @@ import net.sf.orcc.backends.tta.architecture.DesignConfiguration;
 import net.sf.orcc.backends.tta.architecture.Processor;
 import net.sf.orcc.backends.tta.architecture.util.ArchitectureBuilder;
 import net.sf.orcc.backends.tta.architecture.util.ArchitecturePrinter;
-import net.sf.orcc.backends.tta.transformations.SlowOperationDetector;
+import net.sf.orcc.backends.tta.transformations.ComplexHwOpDetector;
 import net.sf.orcc.backends.util.FPGA;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
@@ -148,7 +148,7 @@ public class TTABackendImpl extends AbstractBackend {
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		DfSwitch<?>[] transformations = { new UnitImporter(),
-				new SlowOperationDetector(getWriteListener()),
+				new ComplexHwOpDetector(getWriteListener()),
 				new SSATransformation(), new BoolToIntTransformation(),
 				new TypeResizer(true, true, false, true),
 				new StringTransformation(),
