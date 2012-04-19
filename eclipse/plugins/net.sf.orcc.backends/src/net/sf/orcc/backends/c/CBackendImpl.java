@@ -57,6 +57,7 @@ import net.sf.orcc.tools.normalizer.ActorNormalizer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * C back-end.
@@ -224,6 +225,11 @@ public class CBackendImpl extends AbstractBackend {
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network = doTransformNetwork(network);
+
+		if (debug) {
+			// Serialization of the actors will break proxy link
+			EcoreUtil.resolveAll(network);
+		}
 		transformActors(network.getAllActors());
 
 		network.computeTemplateMaps();
