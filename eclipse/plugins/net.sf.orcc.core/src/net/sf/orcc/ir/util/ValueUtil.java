@@ -383,6 +383,23 @@ public class ValueUtil {
 	}
 
 	/**
+	 * Determine if an expression is evaluate as a pow two number.
+	 * 
+	 * @param expr
+	 *            an expression
+	 * @return true if the expression is evaluate as a pow two number
+	 */
+	public static boolean isPowTwo(Expression expr) {
+		int n;
+		try {
+			n = new ExpressionEvaluator().evaluateAsInteger(expr);
+		} catch (Exception e) {
+			return false;
+		}
+		return ((n != 0) && (n & (n - 1)) == 0);
+	}
+
+	/**
 	 * Returns <code>true</code> if value is a String.
 	 * 
 	 * @param value
