@@ -579,14 +579,15 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				OpBinary.LT, guardValue, factory.createTypeBool());
 		Action newWriteAction = createAction(expression, writeName);
 
-		Var OUTPUT = factory.createVar(0, port.getType(), port.getName()
+		Var OUTPUT = factory.createVar(0, factory.createTypeList(1, port.getType()), port.getName()
 				+ "_OUTPUT", true, 0);
 		defineWriteBody(writeCounter, writeList, newWriteAction.getBody(),
 				OUTPUT);
 		// add output pattern
 		Pattern pattern = newWriteAction.getOutputPattern();
-		pattern.setNumTokens(port, 1);
 		pattern.setVariable(port, OUTPUT);
+		pattern.setNumTokens(port, 1);
+		
 		return newWriteAction;
 	}
 
@@ -1084,6 +1085,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 
 				for (Entry<Port, Integer> entry : action.getOutputPattern()
 						.getNumTokensMap().entrySet()) {
+					
 					numTokens = entry.getValue();
 					outputIndex = outputIndex + 100;
 					port = entry.getKey();
@@ -1094,6 +1096,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 					String listName = action.getName() + "NewWriteList"
 							+ outputIndex;
 					Var tab = createTab(listName, entryType, numTokens);
+					
 					write = createWriteAction(action.getName(), counter, tab);
 					write.getOutputPattern().setNumTokens(port, 1);
 
@@ -1116,6 +1119,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 					} else {
 						modifyDoneAction(counter, outputIndex, port.getName());
 					}
+					
 				}
 				// remove outputPattern from transition action
 				action.getOutputPattern().clear();
