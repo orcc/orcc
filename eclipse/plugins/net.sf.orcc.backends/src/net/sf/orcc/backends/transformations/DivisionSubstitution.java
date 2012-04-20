@@ -34,6 +34,7 @@ import java.util.List;
 
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
@@ -79,10 +80,26 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseExprBinary(ExprBinary expr) {
+		boolean toShift = false;
+		int pow = 0;
 		if (expr.getOp() == OpBinary.DIV) {
-			if (divProc == null) {
-				divProc = createDivProc();
+			
+			// check the second operand if pow2 toshift =1 else 0
+			if (expr.getE2().isExprInt()) {
+				ExprInt scndOperand = (ExprInt) expr.getE2();
+				int x = scndOperand.getIntValue();
+				pow = closestPow_2(x);
+				if (pow == x){
+					toShift =true;
+				}else{
+					toShift = false;
+				}
 			}
+			
+			if (toShift == false) {
+				if (divProc == null) {
+					divProc = createDivProc();
+				}
 
 			// what ever the expression type of division operands they are
 			// put in local variables VarNum and varDenum the result of
@@ -109,8 +126,24 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 			IrUtil.addInstBeforeExpr(expr, call);
 
 			EcoreUtil.replace(expr, factory.createExprVar(varResult));
+			} 
 		}
+		toShift = false;
 		return null;
+	}
+	
+	/**
+	 * this method returns the closest power of 2 of x --> optimal buffer size
+	 * 
+	 * @param x
+	 * @return closest power of 2 of x
+	 */
+	private int closestPow_2(int x) {
+		int p = 1;
+		while (p < x) {
+			p = p * 2;
+		}
+		return p;
 	}
 
 	/**
