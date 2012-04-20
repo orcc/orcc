@@ -2,12 +2,12 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Orcc back-ends plug-in
 Bundle-SymbolicName: net.sf.orcc.backends;singleton:=true
-Bundle-Version: 1.1.0.qualifier
+Bundle-Version: 1.1.1.qualifier
 Bundle-Vendor: IETR/INSA Rennes
 Require-Bundle: org.apache.commons.cli;bundle-version="1.2.0",
  org.eclipse.core.runtime;bundle-version="3.7.0",
  org.eclipse.core.resources;bundle-version="3.7.0",
- net.sf.orcc.core;bundle-version="1.1.0",
+ net.sf.orcc.core;bundle-version="1.1.1",
  net.sf.dftools.models;bundle-version="0.2.0",
  org.stringtemplate;bundle-version="4.0.5"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
