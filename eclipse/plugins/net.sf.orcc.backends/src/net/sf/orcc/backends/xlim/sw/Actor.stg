@@ -799,12 +799,15 @@ schedulerFSM(actions, fsm) ::= <<
 // Parameters of the Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-parameters(parameters) ::= <<
-<parameters.keys: { k | 
-\<stateVar name="<k>" sourceName="<k>"\>
-	\<initValue size="<if(parameters.(k).type.bool)>1<else><parameters.(k).type.size><endif>" typeName="<parameters.(k).type>" value="<parameters.(k)>"/\>
+parameters(arguments) ::= <<
+<if(arguments)>\<!-- Instance parameters --\><endif>
+<arguments: {argument|<printInstanceParameter(argument.variable.name, argument.value)>}>
+>>
+
+printInstanceParameter(name, value) ::= <<
+\<stateVar name="<name>" sourceName="<name>"\>
+	\<initValue size="<if(value.type.bool)>1<else><value.type.size><endif>" typeName="<value.type>" value="<value>"/\>
 \</stateVar\>
-}>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -820,7 +823,7 @@ printDesign(instance) ::= <<
 \<!-- Source file is "<instance.actor.file>" --\>
 \<design name="<instance.id>"\>
 	<actorPorts()>
-	<parameters(instance.parameters)>
+	<parameters(instance.arguments)>
 	<stateVars()>
 	<instance.actor.actions: typeDef()>
 	<instance.actor.actions: action(); separator="\n\n">
