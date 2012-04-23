@@ -219,6 +219,7 @@ public class TTABackendImpl extends AbstractBackend {
 			// Quartus
 			ArchitecturePrinter projectQsfPrinter = new ArchitecturePrinter(
 					"net/sf/orcc/backends/tta/Quartus_Project.stg");
+			projectQsfPrinter.getOptions().put("fpga", fpga);
 			CustomPrinter projectQpfPrinter = new CustomPrinter(
 					"net/sf/orcc/backends/tta/Quartus_Project.stg");
 			projectQsfPrinter.print("top.qsf", path, design);
@@ -227,6 +228,7 @@ public class TTABackendImpl extends AbstractBackend {
 			// ISE
 			ArchitecturePrinter projectXisePrinter = new ArchitecturePrinter(
 					"net/sf/orcc/backends/tta/ISE_Project.stg");
+			projectXisePrinter.getOptions().put("fpga", fpga);
 			projectXisePrinter.print("top.xise", path, design);
 			projectXisePrinter.print("top.ucf", path, design);
 		}
