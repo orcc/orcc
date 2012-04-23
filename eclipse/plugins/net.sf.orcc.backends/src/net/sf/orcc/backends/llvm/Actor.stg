@@ -564,10 +564,6 @@ indexes(indexes) ::= <<
 <indexes: { index | <if(index.type)><index.type><else>i32<endif> <Expr(index)> }; separator=", ">
 >>
 
-indexesName(indexes) ::= <<
-<indexes: {index |<index>}; separator="_">
->>
-
 printParameters(arguments, parameters) ::= <<
 <arguments, parameters: { arg, param | <printParameter(arg.variable.type, param)>}; separator=", ">
 >>
