@@ -33,7 +33,7 @@ import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.common.util.EList;
@@ -45,10 +45,10 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Herve Yviquel
  * 
  */
-public class ConstantPropagator extends AbstractActorVisitor<Object> {
+public class ConstantPropagator extends AbstractIrVisitor<Void> {
 
 	@Override
-	public Object caseInstAssign(InstAssign assign) {
+	public Void caseInstAssign(InstAssign assign) {
 		Expression value = assign.getValue();
 		if (value.isExprBool() || value.isExprFloat() || value.isExprInt()
 				|| value.isExprString()) {

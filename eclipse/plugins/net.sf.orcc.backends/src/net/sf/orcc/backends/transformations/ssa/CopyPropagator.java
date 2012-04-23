@@ -33,7 +33,7 @@ import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.common.util.EList;
@@ -48,12 +48,12 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Herve Yviquel
  * 
  */
-public class CopyPropagator extends AbstractActorVisitor<Object> {
+public class CopyPropagator extends AbstractIrVisitor<Void> {
 
 	protected boolean changed;
 
 	@Override
-	public Object caseProcedure(Procedure procedure) {
+	public Void caseProcedure(Procedure procedure) {
 		do {
 			changed = false;
 			super.caseProcedure(procedure);
@@ -62,7 +62,7 @@ public class CopyPropagator extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseInstAssign(InstAssign assign) {
+	public Void caseInstAssign(InstAssign assign) {
 		if (assign.getValue().isExprVar()) {
 			Var source = ((ExprVar) assign.getValue()).getUse().getVariable();
 			Var target = assign.getTarget().getVariable();

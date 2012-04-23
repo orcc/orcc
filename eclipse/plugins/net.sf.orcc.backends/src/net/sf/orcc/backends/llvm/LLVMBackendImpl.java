@@ -63,6 +63,7 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.df.transformations.NetworkFlattener;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.transformations.BlockCombine;
 import net.sf.orcc.ir.transformations.CfgBuilder;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
@@ -163,8 +164,8 @@ public class LLVMBackendImpl extends AbstractBackend {
 		new StringTransformation().doSwitch(actor);
 		new RenameTransformation(this.transformations).doSwitch(actor);
 		new TacTransformation().doSwitch(actor);
-		new CopyPropagator().doSwitch(actor);
-		new ConstantPropagator().doSwitch(actor);
+		new DfVisitor<Void>(new CopyPropagator()).doSwitch(actor);
+		new DfVisitor<Void>(new ConstantPropagator()).doSwitch(actor);
 		new InstPhiTransformation().doSwitch(actor);
 		new GetElementPtrAdder().doSwitch(actor);
 		new CastAdder(false).doSwitch(actor);
