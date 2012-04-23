@@ -54,42 +54,34 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- * <li>{@link net.sf.orcc.backends.tta.architecture.impl.ComponentImpl#getName
- * <em>Name</em>}</li>
- * <li>
- * {@link net.sf.orcc.backends.tta.architecture.impl.ComponentImpl#getInputs
- * <em>Inputs</em>}</li>
- * <li>
- * {@link net.sf.orcc.backends.tta.architecture.impl.ComponentImpl#getOutputs
- * <em>Outputs</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ComponentImpl#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ComponentImpl#getInputs <em>Inputs</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ComponentImpl#getOutputs <em>Outputs</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class ComponentImpl extends VertexImpl implements Component {
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @see #getName()
 	 * @generated
 	 * @ordered
 	 */
 	protected static final String NAME_EDEFAULT = null;
 	/**
-	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}'
-	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getInputs()
 	 * @generated
 	 * @ordered
 	 */
 	protected EList<Port> inputs;
 	/**
-	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}'
-	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getOutputs()
 	 * @generated
 	 * @ordered
@@ -98,7 +90,6 @@ public class ComponentImpl extends VertexImpl implements Component {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	protected ComponentImpl() {
@@ -107,7 +98,6 @@ public class ComponentImpl extends VertexImpl implements Component {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -131,7 +121,6 @@ public class ComponentImpl extends VertexImpl implements Component {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<Port> getInputs() {
@@ -144,7 +133,6 @@ public class ComponentImpl extends VertexImpl implements Component {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<Port> getOutputs() {
@@ -157,7 +145,6 @@ public class ComponentImpl extends VertexImpl implements Component {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -175,7 +162,6 @@ public class ComponentImpl extends VertexImpl implements Component {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -193,7 +179,6 @@ public class ComponentImpl extends VertexImpl implements Component {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -217,7 +202,6 @@ public class ComponentImpl extends VertexImpl implements Component {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -238,7 +222,6 @@ public class ComponentImpl extends VertexImpl implements Component {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override

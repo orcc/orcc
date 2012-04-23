@@ -52,6 +52,7 @@ import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
 import net.sf.orcc.backends.tta.architecture.Guard;
 import net.sf.orcc.backends.tta.architecture.Implementation;
 import net.sf.orcc.backends.tta.architecture.Link;
+import net.sf.orcc.backends.tta.architecture.Memory;
 import net.sf.orcc.backends.tta.architecture.Operation;
 import net.sf.orcc.backends.tta.architecture.Port;
 import net.sf.orcc.backends.tta.architecture.Processor;
@@ -148,6 +149,11 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 		@Override
 		public Adapter caseComponent(Component object) {
 			return createComponentAdapter();
+		}
+
+		@Override
+		public Adapter caseMemory(Memory object) {
+			return createMemoryAdapter();
 		}
 
 		@Override
@@ -390,6 +396,20 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createComponentAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.Memory <em>Memory</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.tta.architecture.Memory
+	 * @generated
+	 */
+	public Adapter createMemoryAdapter() {
 		return null;
 	}
 

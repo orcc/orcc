@@ -40,15 +40,20 @@ import net.sf.orcc.backends.tta.architecture.Component;
 import net.sf.orcc.backends.tta.architecture.Design;
 import net.sf.orcc.backends.tta.architecture.DesignConfiguration;
 import net.sf.orcc.backends.tta.architecture.Fifo;
+import net.sf.orcc.backends.tta.architecture.Memory;
 import net.sf.orcc.backends.tta.architecture.Port;
 import net.sf.orcc.backends.tta.architecture.Processor;
 import net.sf.orcc.backends.tta.architecture.Signal;
 
 import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
+import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.EObjectResolvingEList;
+import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
  * <!-- begin-user-doc --> An implementation of the model object '
@@ -61,6 +66,7 @@ import org.eclipse.emf.ecore.util.EObjectResolvingEList;
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getProcessors <em>Processors</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getBroadcasts <em>Broadcasts</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getFifos <em>Fifos</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getMemories <em>Memories</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getSignals <em>Signals</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getInputs <em>Inputs</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.DesignImpl#getOutputs <em>Outputs</em>}</li>
@@ -119,6 +125,15 @@ public class DesignImpl extends GraphImpl implements Design {
 	 * @ordered
 	 */
 	protected EList<Fifo> fifos;
+	/**
+	 * The cached value of the '{@link #getMemories() <em>Memories</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getMemories()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Memory> memories;
 	/**
 	 * The cached value of the '{@link #getSignals() <em>Signals</em>}' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -202,6 +217,8 @@ public class DesignImpl extends GraphImpl implements Design {
 			return getBroadcasts();
 		case ArchitecturePackage.DESIGN__FIFOS:
 			return getFifos();
+		case ArchitecturePackage.DESIGN__MEMORIES:
+			return getMemories();
 		case ArchitecturePackage.DESIGN__SIGNALS:
 			return getSignals();
 		case ArchitecturePackage.DESIGN__INPUTS:
@@ -244,6 +261,8 @@ public class DesignImpl extends GraphImpl implements Design {
 			return broadcasts != null && !broadcasts.isEmpty();
 		case ArchitecturePackage.DESIGN__FIFOS:
 			return fifos != null && !fifos.isEmpty();
+		case ArchitecturePackage.DESIGN__MEMORIES:
+			return memories != null && !memories.isEmpty();
 		case ArchitecturePackage.DESIGN__SIGNALS:
 			return signals != null && !signals.isEmpty();
 		case ArchitecturePackage.DESIGN__INPUTS:
@@ -282,6 +301,10 @@ public class DesignImpl extends GraphImpl implements Design {
 		case ArchitecturePackage.DESIGN__FIFOS:
 			getFifos().clear();
 			getFifos().addAll((Collection<? extends Fifo>) newValue);
+			return;
+		case ArchitecturePackage.DESIGN__MEMORIES:
+			getMemories().clear();
+			getMemories().addAll((Collection<? extends Memory>) newValue);
 			return;
 		case ArchitecturePackage.DESIGN__SIGNALS:
 			getSignals().clear();
@@ -353,6 +376,9 @@ public class DesignImpl extends GraphImpl implements Design {
 		case ArchitecturePackage.DESIGN__FIFOS:
 			getFifos().clear();
 			return;
+		case ArchitecturePackage.DESIGN__MEMORIES:
+			getMemories().clear();
+			return;
 		case ArchitecturePackage.DESIGN__SIGNALS:
 			getSignals().clear();
 			return;
@@ -418,6 +444,19 @@ public class DesignImpl extends GraphImpl implements Design {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Memory> getMemories() {
+		if (memories == null) {
+			memories = new EObjectContainmentEList<Memory>(Memory.class, this,
+					ArchitecturePackage.DESIGN__MEMORIES);
+		}
+		return memories;
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -473,6 +512,22 @@ public class DesignImpl extends GraphImpl implements Design {
 			eNotify(new ENotificationImpl(this, Notification.SET,
 					ArchitecturePackage.DESIGN__CONFIGURATION,
 					oldConfiguration, configuration));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
+		switch (featureID) {
+		case ArchitecturePackage.DESIGN__MEMORIES:
+			return ((InternalEList<?>) getMemories()).basicRemove(otherEnd,
+					msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**

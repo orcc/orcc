@@ -45,6 +45,7 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Design#getProcessors <em>Processors</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Design#getBroadcasts <em>Broadcasts</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Design#getFifos <em>Fifos</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Design#getMemories <em>Memories</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Design#getSignals <em>Signals</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Design#getInputs <em>Inputs</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Design#getOutputs <em>Outputs</em>}</li>
@@ -151,6 +152,22 @@ public interface Design extends Graph {
 	 * @generated
 	 */
 	EList<Fifo> getFifos();
+
+	/**
+	 * Returns the value of the '<em><b>Memories</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.backends.tta.architecture.Memory}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Memories</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Memories</em>' containment reference list.
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getDesign_Memories()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Memory> getMemories();
 
 	/**
 	 * Returns the value of the '<em><b>Signals</b></em>' reference list.

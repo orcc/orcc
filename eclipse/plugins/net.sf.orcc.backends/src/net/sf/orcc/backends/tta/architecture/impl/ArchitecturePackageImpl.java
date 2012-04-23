@@ -52,6 +52,7 @@ import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
 import net.sf.orcc.backends.tta.architecture.Guard;
 import net.sf.orcc.backends.tta.architecture.Implementation;
 import net.sf.orcc.backends.tta.architecture.Link;
+import net.sf.orcc.backends.tta.architecture.Memory;
 import net.sf.orcc.backends.tta.architecture.OpBinary;
 import net.sf.orcc.backends.tta.architecture.OpUnary;
 import net.sf.orcc.backends.tta.architecture.Operation;
@@ -120,6 +121,13 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	private EClass componentEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass memoryEClass = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -440,10 +448,11 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getDesign_Signals() {
+	public EReference getDesign_Memories() {
 		return (EReference) designEClass.getEStructuralFeatures().get(5);
 	}
 
@@ -451,7 +460,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getDesign_Inputs() {
+	public EReference getDesign_Signals() {
 		return (EReference) designEClass.getEStructuralFeatures().get(6);
 	}
 
@@ -459,7 +468,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getDesign_Outputs() {
+	public EReference getDesign_Inputs() {
 		return (EReference) designEClass.getEStructuralFeatures().get(7);
 	}
 
@@ -467,8 +476,16 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getDesign_Outputs() {
+		return (EReference) designEClass.getEStructuralFeatures().get(8);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EAttribute getDesign_Configuration() {
-		return (EAttribute) designEClass.getEStructuralFeatures().get(8);
+		return (EAttribute) designEClass.getEStructuralFeatures().get(9);
 	}
 
 	/**
@@ -549,6 +566,42 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 */
 	public EReference getComponent_Outputs() {
 		return (EReference) componentEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getMemory() {
+		return memoryEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getMemory_Size() {
+		return (EAttribute) memoryEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getMemory_Width() {
+		return (EAttribute) memoryEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getMemory_MappedConnections() {
+		return (EReference) memoryEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -1445,6 +1498,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEReference(designEClass, DESIGN__PROCESSORS);
 		createEReference(designEClass, DESIGN__BROADCASTS);
 		createEReference(designEClass, DESIGN__FIFOS);
+		createEReference(designEClass, DESIGN__MEMORIES);
 		createEReference(designEClass, DESIGN__SIGNALS);
 		createEReference(designEClass, DESIGN__INPUTS);
 		createEReference(designEClass, DESIGN__OUTPUTS);
@@ -1463,6 +1517,11 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEAttribute(componentEClass, COMPONENT__NAME);
 		createEReference(componentEClass, COMPONENT__INPUTS);
 		createEReference(componentEClass, COMPONENT__OUTPUTS);
+
+		memoryEClass = createEClass(MEMORY);
+		createEAttribute(memoryEClass, MEMORY__SIZE);
+		createEAttribute(memoryEClass, MEMORY__WIDTH);
+		createEReference(memoryEClass, MEMORY__MAPPED_CONNECTIONS);
 
 		portEClass = createEClass(PORT);
 
@@ -1648,6 +1707,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		signalEClass.getESuperTypes().add(this.getLink());
 		fifoEClass.getESuperTypes().add(this.getLink());
 		componentEClass.getESuperTypes().add(theGraphPackage.getVertex());
+		memoryEClass.getESuperTypes().add(this.getLink());
 		portEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		processorEClass.getESuperTypes().add(this.getComponent());
 		readsEClass.getESuperTypes().add(this.getElement());
@@ -1682,6 +1742,10 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		initEReference(getDesign_Fifos(), this.getFifo(), null, "fifos", null,
 				0, -1, Design.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getDesign_Memories(), this.getMemory(), null,
+				"memories", null, 0, -1, Design.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getDesign_Signals(), this.getSignal(), null, "signals",
 				null, 0, -1, Design.class, !IS_TRANSIENT, !IS_VOLATILE,
@@ -1734,6 +1798,22 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		initEReference(getComponent_Outputs(), this.getPort(), null, "outputs",
 				null, 0, -1, Component.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(memoryEClass, Memory.class, "Memory", !IS_ABSTRACT,
+				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getMemory_Size(), theEcorePackage.getEInt(), "size",
+				null, 0, 1, Memory.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
+		initEAttribute(getMemory_Width(), theEcorePackage.getEInt(), "width",
+				null, 0, 1, Memory.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
+		initEReference(getMemory_MappedConnections(),
+				theDfPackage.getConnection(), null, "mappedConnections", null,
+				0, -1, Memory.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(portEClass, Port.class, "Port", !IS_ABSTRACT, !IS_INTERFACE,

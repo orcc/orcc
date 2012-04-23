@@ -52,6 +52,7 @@ import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
 import net.sf.orcc.backends.tta.architecture.Guard;
 import net.sf.orcc.backends.tta.architecture.Implementation;
 import net.sf.orcc.backends.tta.architecture.Link;
+import net.sf.orcc.backends.tta.architecture.Memory;
 import net.sf.orcc.backends.tta.architecture.Operation;
 import net.sf.orcc.backends.tta.architecture.Port;
 import net.sf.orcc.backends.tta.architecture.Processor;
@@ -181,6 +182,19 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 				result = caseVertex(component);
 			if (result == null)
 				result = caseAttributable(component);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.MEMORY: {
+			Memory memory = (Memory) theEObject;
+			T result = caseMemory(memory);
+			if (result == null)
+				result = caseLink(memory);
+			if (result == null)
+				result = caseEdge(memory);
+			if (result == null)
+				result = caseAttributable(memory);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -479,6 +493,21 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseComponent(Component object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Memory</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Memory</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseMemory(Memory object) {
 		return null;
 	}
 

@@ -40,13 +40,12 @@ import org.eclipse.emf.ecore.EClass;
  * <em><b>Port</b></em>'. <!-- end-user-doc -->
  * <p>
  * </p>
- * 
+ *
  * @generated
  */
 public class PortImpl extends VertexImpl implements Port {
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	protected PortImpl() {
@@ -55,7 +54,6 @@ public class PortImpl extends VertexImpl implements Port {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
