@@ -38,7 +38,7 @@ import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 
 /**
@@ -49,10 +49,10 @@ import net.sf.orcc.ir.util.IrUtil;
  * @author Herve Yviquel
  * 
  */
-public class InstPhiTransformation extends AbstractActorVisitor<Object> {
+public class InstPhiTransformation extends AbstractIrVisitor<Void> {
 
 	@Override
-	public Object caseInstPhi(InstPhi phi) {
+	public Void caseInstPhi(InstPhi phi) {
 		List<Expression> values = phi.getValues();
 		Var target = phi.getTarget().getVariable();
 		List<Param> parameters = procedure.getParameters();
@@ -63,7 +63,8 @@ public class InstPhiTransformation extends AbstractActorVisitor<Object> {
 				Var source = ((ExprVar) value).getUse().getVariable();
 
 				// Local variable must not be a parameter of the procedure
-				if (source.getIndex() == 0 && !parameters.contains(source.eContainer())) {
+				if (source.getIndex() == 0
+						&& !parameters.contains(source.eContainer())) {
 					Expression expr;
 					if (target.getType().isBool()) {
 						expr = IrFactory.eINSTANCE.createExprBool(false);
@@ -80,7 +81,7 @@ public class InstPhiTransformation extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseInstSpecific(InstSpecific instSpecific) {
+	public Void caseInstSpecific(InstSpecific instSpecific) {
 		if (instSpecific instanceof InstTernary) {
 			InstTernary ternaryOperation = (InstTernary) instSpecific;
 			ternaryOperation.setConditionValue(clean(ternaryOperation

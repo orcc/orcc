@@ -34,15 +34,15 @@ import java.util.List;
 import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.backends.ir.InstAssignIndex;
 import net.sf.orcc.backends.ir.IrSpecificFactory;
+import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 
 /**
@@ -55,7 +55,7 @@ import net.sf.orcc.ir.util.IrUtil;
  * @author Herve Yviquel
  * 
  */
-public class ListFlattener extends AbstractActorVisitor<Object> {
+public class ListFlattener extends AbstractIrVisitor<Void> {
 
 	/**
 	 * Prints the indexes of an NDim array.
@@ -93,7 +93,7 @@ public class ListFlattener extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseInstLoad(InstLoad load) {
+	public Void caseInstLoad(InstLoad load) {
 		List<Expression> indexes = load.getIndexes();
 
 		if (!indexes.isEmpty()) {
@@ -107,7 +107,7 @@ public class ListFlattener extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseInstStore(InstStore store) {
+	public Void caseInstStore(InstStore store) {
 		List<Expression> indexes = store.getIndexes();
 
 		if (!indexes.isEmpty()) {

@@ -35,6 +35,7 @@ import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
@@ -42,7 +43,6 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -54,18 +54,10 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Herve Yviquel
  * 
  */
-public class UnaryListRemoval extends AbstractActorVisitor<Object> {
+public class UnaryListRemoval extends DfVisitor<Void> {
 
 	@Override
-	public Object caseAction(Action action) {
-		doSwitch(action.getInputPattern());
-		doSwitch(action.getOutputPattern());
-
-		return null;
-	}
-
-	@Override
-	public Object casePattern(Pattern pattern) {
+	public Void casePattern(Pattern pattern) {
 		List<Port> ports = new ArrayList<Port>(pattern.getPorts());
 		for (Port port : ports) {
 			if (pattern.getNumTokens(port) == 1) {

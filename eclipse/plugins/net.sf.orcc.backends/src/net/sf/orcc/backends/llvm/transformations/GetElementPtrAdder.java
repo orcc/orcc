@@ -32,15 +32,15 @@ import java.util.List;
 
 import net.sf.orcc.backends.ir.InstGetElementPtr;
 import net.sf.orcc.backends.ir.IrSpecificFactory;
+import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.common.util.EList;
@@ -52,7 +52,7 @@ import org.eclipse.emf.common.util.EList;
  * @author Herve Yviquel
  * 
  */
-public class GetElementPtrAdder extends AbstractActorVisitor<Object> {
+public class GetElementPtrAdder extends AbstractIrVisitor<Void> {
 
 	private Var addGEP(Var array, Type type, List<Expression> indexes,
 			BlockBasic currentNode) {
@@ -68,15 +68,15 @@ public class GetElementPtrAdder extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseInstLoad(InstLoad load) {
+	public Void caseInstLoad(InstLoad load) {
 		Var source = load.getSource().getVariable();
 		EList<Expression> indexes = load.getIndexes();
 
 		if (!indexes.isEmpty()) {
 			TypeList typeList = (TypeList) source.getType();
-			
-			Var newSource = addGEP(source, typeList.getInnermostType(), indexes,
-					load.getBlock());
+
+			Var newSource = addGEP(source, typeList.getInnermostType(),
+					indexes, load.getBlock());
 
 			load.setSource(IrFactory.eINSTANCE.createUse(newSource));
 		}
@@ -84,15 +84,15 @@ public class GetElementPtrAdder extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseInstStore(InstStore store) {
+	public Void caseInstStore(InstStore store) {
 		Var target = store.getTarget().getVariable();
 		EList<Expression> indexes = store.getIndexes();
 
 		if (!indexes.isEmpty()) {
 			TypeList typeList = (TypeList) target.getType();
 
-			Var newTarget = addGEP(target, typeList.getInnermostType(), indexes,
-					store.getBlock());
+			Var newTarget = addGEP(target, typeList.getInnermostType(),
+					indexes, store.getBlock());
 
 			store.setTarget(IrFactory.eINSTANCE.createDef(newTarget));
 		}

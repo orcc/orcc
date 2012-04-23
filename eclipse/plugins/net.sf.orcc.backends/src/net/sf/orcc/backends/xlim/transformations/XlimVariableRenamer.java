@@ -36,6 +36,7 @@ import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.Var;
 
 /**
@@ -45,32 +46,32 @@ import net.sf.orcc.ir.Var;
  * @author Herve Yviquel
  * 
  */
-public class XlimVariableRenamer extends VariableRenamer {
+public class XlimVariableRenamer extends DfVisitor<Void> {
 
 	private Action action;
 
+	public XlimVariableRenamer() {
+		this.irVisitor = new VariableRenamer();
+	}
+
 	@Override
-	public Object casePattern(Pattern pattern) {
+	public Void casePattern(Pattern pattern) {
 		for (Var var : pattern.getVariables()) {
 			if (!action.getBody().getLocals().contains(var)) {
 				var.setName(action.getName() + "_" + var.getName());
 			}
 		}
-		return super.casePattern(pattern);
-	}
-
-	@Override
-	public Object caseAction(Action action) {
-		this.action = action;
-		doSwitch(action.getInputPattern());
-		doSwitch(action.getOutputPattern());
-		doSwitch(action.getScheduler());
-		doSwitch(action.getBody());
 		return null;
 	}
 
 	@Override
-	public Object caseActor(Actor actor) {
+	public Void caseAction(Action action) {
+		this.action = action;
+		return super.caseAction(action);
+	}
+
+	@Override
+	public Void caseActor(Actor actor) {
 		XlimActorTemplateData data = (XlimActorTemplateData) actor
 				.getTemplateData();
 		for (Action action : data.getCustomPeekedMapPerAction().keySet()) {

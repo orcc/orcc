@@ -47,7 +47,7 @@ import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
 import net.sf.orcc.backends.llvm.transformations.GetElementPtrAdder;
 import net.sf.orcc.backends.llvm.transformations.StringTransformation;
 import net.sf.orcc.backends.transformations.CastAdder;
-import net.sf.orcc.backends.transformations.EmptyNodeRemover;
+import net.sf.orcc.backends.transformations.EmptyBlockRemover;
 import net.sf.orcc.backends.transformations.InstPhiTransformation;
 import net.sf.orcc.backends.transformations.TypeResizer;
 import net.sf.orcc.backends.transformations.UnitImporter;
@@ -67,6 +67,7 @@ import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.df.transformations.NetworkFlattener;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.transformations.BlockCombine;
 import net.sf.orcc.ir.transformations.CfgBuilder;
 import net.sf.orcc.ir.transformations.RenameTransformation;
@@ -156,8 +157,10 @@ public class TTABackendImpl extends AbstractBackend {
 				new TacTransformation(),
 				new DfVisitor<Void>(new CopyPropagator()),
 				new DfVisitor<Void>(new ConstantPropagator()),
-				new InstPhiTransformation(), new GetElementPtrAdder(),
-				new CastAdder(false), new EmptyNodeRemover(),
+				new DfVisitor<Void>(new InstPhiTransformation()),
+				new DfVisitor<Void>(new GetElementPtrAdder()),
+				new DfVisitor<Expression>(new CastAdder(false)),
+				new DfVisitor<Void>(new EmptyBlockRemover()),
 				new BlockCombine(), new CfgBuilder() };
 
 		for (DfSwitch<?> transformation : transformations) {

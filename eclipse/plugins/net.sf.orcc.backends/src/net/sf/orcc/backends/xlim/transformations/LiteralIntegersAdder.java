@@ -50,7 +50,7 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.common.util.BasicEList;
@@ -67,7 +67,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Herve Yviquel
  * 
  */
-public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
+public class LiteralIntegersAdder extends AbstractIrVisitor<Expression> {
 
 	@Override
 	public Expression caseExprBinary(ExprBinary expr) {
@@ -170,7 +170,7 @@ public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 	}
 
 	@Override
-	public Expression caseNodeIf(BlockIf nodeIf) {
+	public Expression caseBlockIf(BlockIf nodeIf) {
 		nodeIf.setCondition(doSwitch(nodeIf.getCondition()));
 		doSwitch(nodeIf.getThenBlocks());
 		doSwitch(nodeIf.getElseBlocks());
@@ -179,7 +179,7 @@ public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 	}
 
 	@Override
-	public Expression caseNodeWhile(BlockWhile nodeWhile) {
+	public Expression caseBlockWhile(BlockWhile nodeWhile) {
 		nodeWhile.setCondition(doSwitch(nodeWhile.getCondition()));
 		doSwitch(nodeWhile.getBlocks());
 		doSwitch(nodeWhile.getJoinBlock());

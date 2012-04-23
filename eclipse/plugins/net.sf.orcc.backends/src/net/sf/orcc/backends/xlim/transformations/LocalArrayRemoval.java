@@ -37,7 +37,7 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.common.util.EList;
@@ -48,16 +48,17 @@ import org.eclipse.emf.common.util.EList;
  * @author Herve Yviquel
  * 
  */
-public class LocalArrayRemoval extends AbstractActorVisitor<Object> {
+public class LocalArrayRemoval extends AbstractIrVisitor<Void> {
 
 	@Override
-	public Object caseProcedure(Procedure procedure) {
+	public Void caseProcedure(Procedure procedure) {
 		Actor actor = EcoreHelper.getContainerOfType(procedure, Actor.class);
 		EList<Var> stateVars = actor.getStateVars();
 		for (Var var : new ArrayList<Var>(procedure.getLocals())) {
 			if (var.getType().isList()) {
 				Var newVar = IrFactory.eINSTANCE.createVar(var.getType(),
-						var.getName()+"_"+procedure.getName(), true, var.getIndex());
+						var.getName() + "_" + procedure.getName(), true,
+						var.getIndex());
 				newVar.setInitialValue(var.getInitialValue());
 				newVar.setGlobal(true);
 
@@ -66,10 +67,10 @@ public class LocalArrayRemoval extends AbstractActorVisitor<Object> {
 					uses.get(0).setVariable(newVar);
 				}
 				EList<Def> defs = var.getDefs();
-				while (!defs.isEmpty()){
+				while (!defs.isEmpty()) {
 					defs.get(0).setVariable(newVar);
 				}
-				
+
 				IrUtil.delete(var);
 				stateVars.add(newVar);
 			}

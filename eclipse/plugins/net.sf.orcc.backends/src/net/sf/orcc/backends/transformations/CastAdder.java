@@ -36,6 +36,10 @@ import net.sf.orcc.backends.ir.InstCast;
 import net.sf.orcc.backends.ir.IrSpecificFactory;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByVal;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -53,10 +57,6 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Block;
-import net.sf.orcc.ir.BlockBasic;
-import net.sf.orcc.ir.BlockIf;
-import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Type;
@@ -64,7 +64,7 @@ import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.common.util.BasicEList;
@@ -80,7 +80,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Matthieu Wipliez
  * 
  */
-public class CastAdder extends AbstractActorVisitor<Expression> {
+public class CastAdder extends AbstractIrVisitor<Expression> {
 
 	private boolean castToUnsigned;
 	private Type parentType;
@@ -94,6 +94,29 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 	 */
 	public CastAdder(boolean castToUnsigned) {
 		this.castToUnsigned = castToUnsigned;
+	}
+
+	@Override
+	public Expression caseBlockIf(BlockIf nodeIf) {
+		Type oldParentType = parentType;
+		parentType = IrFactory.eINSTANCE.createTypeBool();
+		nodeIf.setCondition(doSwitch(nodeIf.getCondition()));
+		doSwitch(nodeIf.getThenBlocks());
+		doSwitch(nodeIf.getElseBlocks());
+		doSwitch(nodeIf.getJoinBlock());
+		parentType = oldParentType;
+		return null;
+	}
+
+	@Override
+	public Expression caseBlockWhile(BlockWhile nodeWhile) {
+		Type oldParentType = parentType;
+		parentType = IrFactory.eINSTANCE.createTypeBool();
+		nodeWhile.setCondition(doSwitch(nodeWhile.getCondition()));
+		doSwitch(nodeWhile.getBlocks());
+		doSwitch(nodeWhile.getJoinBlock());
+		parentType = oldParentType;
+		return null;
 	}
 
 	@Override
@@ -221,8 +244,8 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 
 					target.setType(IrUtil.copy(returnType));
 
-					InstCast cast = IrSpecificFactory.eINSTANCE
-							.createInstCast(target, castedTarget);
+					InstCast cast = IrSpecificFactory.eINSTANCE.createInstCast(
+							target, castedTarget);
 
 					call.getBlock().add(indexInst + 1, cast);
 				}
@@ -332,8 +355,8 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 
 			target.setType(uncastedType);
 
-			InstCast cast = IrSpecificFactory.eINSTANCE.createInstCast(
-					target, castedTarget);
+			InstCast cast = IrSpecificFactory.eINSTANCE.createInstCast(target,
+					castedTarget);
 
 			load.getBlock().add(indexInst + 1, cast);
 		}
@@ -408,29 +431,6 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 		return null;
 	}
 
-	@Override
-	public Expression caseNodeIf(BlockIf nodeIf) {
-		Type oldParentType = parentType;
-		parentType = IrFactory.eINSTANCE.createTypeBool();
-		nodeIf.setCondition(doSwitch(nodeIf.getCondition()));
-		doSwitch(nodeIf.getThenBlocks());
-		doSwitch(nodeIf.getElseBlocks());
-		doSwitch(nodeIf.getJoinBlock());
-		parentType = oldParentType;
-		return null;
-	}
-
-	@Override
-	public Expression caseNodeWhile(BlockWhile nodeWhile) {
-		Type oldParentType = parentType;
-		parentType = IrFactory.eINSTANCE.createTypeBool();
-		nodeWhile.setCondition(doSwitch(nodeWhile.getCondition()));
-		doSwitch(nodeWhile.getBlocks());
-		doSwitch(nodeWhile.getJoinBlock());
-		parentType = oldParentType;
-		return null;
-	}
-
 	private Expression castExpression(Expression expr) {
 		if (needCast(expr.getType(), parentType)) {
 			Var oldVar;
@@ -448,8 +448,8 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 			Var newVar = procedure.newTempLocalVariable(
 					EcoreUtil.copy(parentType),
 					"castedExpr_" + procedure.getName());
-			InstCast cast = IrSpecificFactory.eINSTANCE.createInstCast(
-					oldVar, newVar);
+			InstCast cast = IrSpecificFactory.eINSTANCE.createInstCast(oldVar,
+					newVar);
 			if (IrUtil.addInstBeforeExpr(expr, cast)) {
 				indexInst++;
 			}
@@ -460,7 +460,8 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 		return expr;
 	}
 
-	private Expression castExpression(Expression expr, BlockBasic node, int index) {
+	private Expression castExpression(Expression expr, BlockBasic node,
+			int index) {
 		if (needCast(expr.getType(), parentType)) {
 			Var oldVar;
 			if (expr.isExprVar()) {
@@ -478,8 +479,8 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 			Var newVar = procedure.newTempLocalVariable(
 					EcoreUtil.copy(parentType),
 					"castedExpr_" + procedure.getName());
-			InstCast cast = IrSpecificFactory.eINSTANCE.createInstCast(
-					oldVar, newVar);
+			InstCast cast = IrSpecificFactory.eINSTANCE.createInstCast(oldVar,
+					newVar);
 			node.add(index, cast);
 			return IrFactory.eINSTANCE.createExprVar(newVar);
 		}

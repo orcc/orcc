@@ -30,7 +30,7 @@ package net.sf.orcc.backends.transformations;
 
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 
 /**
  * This class defines an actor transformation that renames all variables inside
@@ -45,10 +45,10 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * @author Matthieu Wipliez
  * 
  */
-public class VariableRenamer extends AbstractActorVisitor<Object> {
+public class VariableRenamer extends AbstractIrVisitor<Void> {
 
 	@Override
-	public Object caseProcedure(Procedure procedure) {
+	public Void caseProcedure(Procedure procedure) {
 		String procName = procedure.getName();
 		for (Var var : procedure.getLocals()) {
 			var.setName(procName + "_" + var.getName());
