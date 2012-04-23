@@ -50,10 +50,10 @@ class Design:
 
     def compile(self, srcPath, libPath, args, debug):
         for processor in self.processors:
-            if not processor.isNative and not processor.isBroadcast:
-                print ">> Compile code of " + processor.id + "."
-                retcode = processor.compile(srcPath, libPath, args, debug)
-                if retcode != 0: sys.exit(retcode)
+            print ">> Compile code of " + processor.id + "."
+            retcode = processor.compile(srcPath, libPath, args, debug)
+            if retcode != 0: 
+                sys.exit(retcode)
 
 
     def simulate(self, srcPath, libPath, tracePath):
@@ -84,10 +84,10 @@ class Design:
             #shutil.rmtree(cgPath, ignore_errors=True)
 
         for processor in self.processors:
-            if not processor.isNative and not processor.isBroadcast:
-                print ">> Generate " + processor.id + "."
-                retcode = processor.generate(srcPath, libPath, args, debug, self.targetAltera)
-                if retcode != 0: sys.exit(retcode)
+            print ">> Generate " + processor.id + "."
+            retcode = processor.generate(srcPath, libPath, args, debug, self.targetAltera)
+            if retcode != 0: 
+                sys.exit(retcode)
                 
     def generateCgFiles(self, libPath, genPath):
         templatePath = os.path.join(libPath, "templates")

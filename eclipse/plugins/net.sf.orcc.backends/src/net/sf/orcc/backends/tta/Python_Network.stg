@@ -1,6 +1,6 @@
 
 printPort(port, index) ::= <<
-Port("<port.name>", <index>, <if(port.native)>True<else>False<endif>, <port.type.sizeInBits>)
+Port(<index>, <if(port.native)>True, <port.size><else>False<endif>)
 >>
 
 initProcessorPort(processor) ::= <<

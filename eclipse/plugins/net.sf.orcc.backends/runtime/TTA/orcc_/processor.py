@@ -43,11 +43,9 @@ import tempita
 
 class Processor:
 
-    def __init__(self, name, inputs, outputs, isNative, isBroadcast):
+    def __init__(self, name, inputs, outputs):
         # General
         self.id = name
-        self.isNative = isNative
-        self.isBroadcast = isBroadcast
         # Ports
         self.inputs = inputs
         self.outputs = outputs
@@ -155,8 +153,7 @@ class Processor:
         shutil.move("imem_mau_pkg.vhdl", vhdlPath)
         
         # Manage simulation files
-        if not (self.isNative or self.isBroadcast):
-            os.chmod(os.path.join(instanceSrcPath, self._tclFile), stat.S_IRWXU)        
+        os.chmod(os.path.join(instanceSrcPath, self._tclFile), stat.S_IRWXU)        
 
         # Clean working directory
         os.remove("stream_units.hdb")
@@ -169,7 +166,7 @@ class Processor:
 
 
     def simulate(self, srcPath, libPath, tracePath):
-        if not (self.isNative or self.isBroadcast) and self.inputs and not self._hasNativePort() :
+        if self.inputs and not self._hasNativePort() :
             instancePath = os.path.join(srcPath, self.id)
             os.chdir(instancePath)
             
