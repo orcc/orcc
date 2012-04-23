@@ -104,7 +104,7 @@ architecture bdf_type of {{id}} is
 {{endfor}}
 {{for output in outputs}}
 {{if output.isNative}}
-  signal s_{{output.name}} : std_logic_vector(31 downto 0) := (others => '0');
+  signal s_{{output.name}} : std_logic_vector(31 downto 0);
 {{endif}}
 {{endfor}}
 
@@ -114,7 +114,7 @@ begin
 
 {{for input in inputs}}
 {{if input.isNative}}
-  {{input.name}} <= s_{{input.name}}({{output.size - 1}} downto 0);
+  s_{{input.name}}({{output.size - 1}} downto 0) <= {{input.name}};
 {{endif}}
 {{endfor}}
 {{for output in outputs}}
@@ -182,7 +182,7 @@ begin
 {{for i in range(8)}}
 {{if i < len(inputs)}}
 {{if input.isNative}}
-             fu_STREAM_IN_ext_data{{i}}    => s_{{input.name}},
+             fu_STREAM_IN_ext_data{{i}}    => s_{{inputs[i].name}},
              fu_STREAM_IN_ext_status{{i}}  => (0=>'1', others => '0'),
 {{else}}
              fu_STREAM_IN_ext_data{{i}}    => data_{{i}}_in,
@@ -197,7 +197,7 @@ begin
 {{for i in range(8)}}
 {{if i < len(outputs)}}
 {{if output.isNative}}
-             fu_STREAM_OUT_ext_data{{i}}   => s_{{output.name}},
+             fu_STREAM_OUT_ext_data{{i}}   => s_{{outputs[i].name}},
              fu_STREAM_OUT_ext_status{{i}} => (0=>'1', others => '0'),
 {{else}}
              fu_STREAM_OUT_ext_data{{i}}   => data_{{i}}_out,
