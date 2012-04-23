@@ -125,7 +125,7 @@ declareSignalsInput(port) ::= <<
 signal s_<port.name>_status : std_logic_vector(31 downto 0);
 signal s_<port.name>_rdreq  : std_logic;<
 else
->signal <port.name>_native : std_logic_vector(<port.type.size>-1 downto 0);<
+>signal <port.name>_native : std_logic_vector(<port.size>-1 downto 0);<
 endif>
 >>
 
@@ -135,7 +135,7 @@ declareSignalsOutput(port) ::= <<
 signal s_<port.name>_status : std_logic_vector(31 downto 0);
 signal s_<port.name>_wrreq  : std_logic;<
 else
->signal <port.name>_native : std_logic_vector(<port.type.size>-1 downto 0);<
+>signal <port.name>_native : std_logic_vector(<port.size>-1 downto 0);<
 endif>
 >>
 
@@ -146,13 +146,8 @@ endif>
 >>
 
 mapVertexSignals(vertex) ::= <<
-<if(vertex.actor)
-><if(vertex.actor.inputs)><vertex.actor.inputs: { input | <mapSignalInput(input, i0)> }; separator="\n"><endif>
-<if(vertex.actor.outputs)><vertex.actor.outputs: { output | <mapSignalOutput(output, i0)> }; separator="\n"><endif><
-else
-><if(vertex.inputs)><vertex.inputs: { input | <mapSignalInput(input, i0)> }; separator="\n"><endif>
-<if(vertex.outputs)><vertex.outputs: { output | <mapSignalOutput(output, i0)> }; separator="\n"><endif><
-endif>
+<if(vertex.inputs)><vertex.inputs: { input | <mapSignalInput(input, i0)> }; separator="\n"><endif>
+<if(vertex.outputs)><vertex.outputs: { output | <mapSignalOutput(output, i0)> }; separator="\n"><endif>
 >>
 
 mapSignalInput(port, index) ::= <<

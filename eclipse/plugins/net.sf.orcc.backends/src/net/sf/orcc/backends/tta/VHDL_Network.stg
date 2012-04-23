@@ -86,11 +86,11 @@ declarePorts(component) ::= <<
 >>
 
 declareInput(port) ::= <<
-<port.label> : in std_logic_vector(<port.size> downto 0);
+<port.label> : in std_logic_vector(<port.size>-1 downto 0);
 >>
 
 declareOutput(port) ::= <<
-<port.label> : out std_logic_vector(<port.size> downto 0);
+<port.label> : out std_logic_vector(<port.size>-1 downto 0);
 >>
 
 
@@ -110,11 +110,11 @@ signal s_<signal.label> : std_logic_vector(<signal.size>-1 downto 0);
 
 declareFifoSignal(fifo) ::= <<
 signal fifo_<fifo.label>_data         : std_logic_vector(31 downto 0);
-signal fifo_<fifo.label>_q            : std_logic_vector(31 downto 0);
+signal fifo_<fifo.label>_queue        : std_logic_vector(31 downto 0);
 signal fifo_<fifo.label>_rdreq        : std_logic;
 signal fifo_<fifo.label>_wrreq        : std_logic;
-signal fifo_<fifo.label>_nb_tokens    : std_logic_vector(31 downto 0);
-signal fifo_<fifo.label>_nb_freerooms : std_logic_vector(31 downto 0);
+signal fifo_<fifo.label>_tokens       : std_logic_vector(31 downto 0);
+signal fifo_<fifo.label>_rooms        : std_logic_vector(31 downto 0);
 >> 
 
 
@@ -128,11 +128,11 @@ assignNetworkPort(port, link) ::= <<
 
 assignInputPort(port, link, index) ::= <<
 <if(link.signal)
-><port.name>  =\> s_<link.label>,<
+><port.name> =\> s_<link.label>,<
 elseif(link.fifo)
->data_<index>_in   =\> fifo_<link.label>_queue,
-status_<index>_in =\> fifo_<link.label>_tokens,
-ack_<index>_in    =\> fifo_<link.label>_rdreq,<
+>data_<index>_in    =\> fifo_<link.label>_queue,
+status_<index>_in  =\> fifo_<link.label>_tokens,
+ack_<index>_in     =\> fifo_<link.label>_rdreq,<
 endif>
 >>
 
@@ -140,9 +140,9 @@ assignOutputPort(port, link, index) ::= <<
 <if(link.signal)
 ><port.name>  =\> s_<link.label>,<
 elseif(link.fifo)
->data_<index>_in   =\> fifo_<link.label>_queue,
-status_<index>_in =\> fifo_<link.label>_tokens,
-ack_<index>_in    =\> fifo_<link.label>_rdreq,<
+>data_<index>_out   =\> fifo_<link.label>_data,
+status_<index>_out =\> fifo_<link.label>_rooms,
+dv_<index>_out     =\> fifo_<link.label>_wrreq,<
 endif>
 >>
 
@@ -151,8 +151,9 @@ assignGeneric(attribute) ::= <<
 >>
 
 assignComponent(component) ::= <<
-<component.name> : entity work.<component.entityName>
-  port map(clk =\> clk,
+<component.name>_inst : entity work.<component.name>
+  <if(component.attributes)>generic map(<component.attributes: assignGeneric(); separator=",\n">)<endif>
+  port map(clk   =\> clk,
            <component.inputs: { input |<assignInputPort(input, component.incomingPortMap.(input), i0)>}; separator="\n">
            <component.outputs: { output |<assignOutputPort(output, component.outgoingPortMap.(output), i0)>}; separator="\n">
            rst_n =\> rst_n);
@@ -160,7 +161,7 @@ assignComponent(component) ::= <<
 
 assignFifo(fifo) ::= <<
 fifo_<fifo.label> : entity work.fifo
-  generic map(device_family =\> "<options.fpga.family>"
+  generic map(device_family =\> "<options.fpga.family>",
               <fifo.attributes: assignGeneric(); separator=",\n">)
   port map(clk =\> clk,
            rdreq  => fifo_<fifo.label>_rdreq,
@@ -173,18 +174,18 @@ fifo_<fifo.label> : entity work.fifo
 >>
 
 assignProcessor(processor) ::= <<
-<processor.name> : entity work.<processor.entityName>
+<processor.name>_inst : entity work.<processor.name>
   generic map(device_family =\> "<options.fpga.family>")
-  port map(clk =\> clk,
+  port map(clk   =\> clk,
            <processor.inputs: { input |<assignInputPort(input, processor.incomingPortMap.(input), i0)>}; separator="\n">
            <processor.outputs: { output |<assignOutputPort(output, processor.outgoingPortMap.(output), i0)>}; separator="\n">
            rst_n =\> rst_n);
 >>
 
 assignBroadcast(broadcast) ::= <<
-<broadcast.name> : entity work.<broadcast.entityName>
-  port map(clk          =\> clk,
+<broadcast.name> : entity work.broadcast_<length(broadcast.outputs)>
+  port map(clk   =\> clk,
            <broadcast.inputs: { input |<assignInputPort(input, broadcast.incomingPortMap.(input), i0)>}; separator="\n">
            <broadcast.outputs: { output |<assignOutputPort(output, broadcast.outgoingPortMap.(output), i0)>}; separator="\n">
-           rst_n        =\> rst_n);
+           rst_n =\> rst_n);
 >>

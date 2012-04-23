@@ -41,5 +41,9 @@ import net.sf.dftools.graph.Vertex;
  * @generated
  */
 public interface Port extends Vertex {
+	
+	boolean isNative();
+	
+	int getSize();
 
 } // Port

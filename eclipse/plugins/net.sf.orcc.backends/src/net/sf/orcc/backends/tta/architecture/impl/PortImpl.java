@@ -29,6 +29,7 @@
 package net.sf.orcc.backends.tta.architecture.impl;
 
 import net.sf.dftools.graph.impl.VertexImpl;
+import net.sf.dftools.util.Attribute;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.Port;
 
@@ -39,12 +40,13 @@ import org.eclipse.emf.ecore.EClass;
  * <em><b>Port</b></em>'. <!-- end-user-doc -->
  * <p>
  * </p>
- *
+ * 
  * @generated
  */
 public class PortImpl extends VertexImpl implements Port {
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected PortImpl() {
@@ -53,6 +55,7 @@ public class PortImpl extends VertexImpl implements Port {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -72,6 +75,18 @@ public class PortImpl extends VertexImpl implements Port {
 	 */
 	public void setName(String newName) {
 		setLabel(newName);
+	}
+
+	@Override
+	public boolean isNative() {
+		Attribute attribute = getAttribute("native");
+		return attribute != null;
+	}
+
+	@Override
+	public int getSize() {
+		Attribute attribute = getAttribute("size");
+		return (Integer) attribute.getValue();
 	}
 
 } // PortImpl

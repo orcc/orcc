@@ -2,7 +2,7 @@
 -- Title      : Instance: {{id}}
 -- Project    : 
 -------------------------------------------------------------------------------
--- File       : processor_{{id}}.vhd
+-- File       : {{id}}.vhd
 -- Author     : Orcc - TTA
 -- Company    : 
 -- Created    : 
@@ -21,13 +21,13 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 library work;
-use work.processor_{{id}}_tl_globals.all;
-use work.processor_{{id}}_tl_imem_mau.all;
-use work.processor_{{id}}_tl_params.all;
+use work.{{id}}_tl_globals.all;
+use work.{{id}}_tl_imem_mau.all;
+use work.{{id}}_tl_params.all;
 
 
 ------------------------------------------------------------------------------
-entity processor_{{id}} is
+entity {{id}} is
   generic
     (
       device_family : string
@@ -55,11 +55,11 @@ entity processor_{{id}} is
 {{endfor}}
       rst_n          : in  std_logic
       );
-end processor_{{id}};
+end {{id}};
 
 
 ------------------------------------------------------------------------------
-architecture bdf_type of processor_{{id}} is
+architecture bdf_type of {{id}} is
 
 {{if not targetAltera}}
   ---------------------------------------------------------------------------
@@ -168,7 +168,7 @@ begin
       douta => dram_data_out_wire);
 {{endif}}
 
-  processor_{{id}} : entity work.processor_{{id}}_tl
+  inst_{{id}}_tl : entity work.{{id}}_tl
     port map(clk                        => clk,
              busy                       => '0',
              imem_addr                  => imem_addr,

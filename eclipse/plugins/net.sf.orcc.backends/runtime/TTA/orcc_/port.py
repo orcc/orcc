@@ -32,7 +32,7 @@
 
 class Port:
 
-    def __init__(self, name, index, isNative=None, size=None):
+    def __init__(self, name, index, isNative=False, size=0):
         self.name = name
         self.index = index
         self.isNative = isNative

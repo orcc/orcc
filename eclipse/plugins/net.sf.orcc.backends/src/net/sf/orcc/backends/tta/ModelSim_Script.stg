@@ -60,13 +60,13 @@ compileProcessor(processor, callByNetwork=true) ::= <<
 # Compile processor <processor.name>
 vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/vhdl/imem_mau_pkg.vhdl
 vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/vhdl/globals_pkg.vhdl
-vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/vhdl/processor_<processor.name>_tl_params_pkg.vhdl
-vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/vhdl/processor_<processor.name>_tl.vhdl
-vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/vhdl/processor_<processor.name>.vhd
+vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/vhdl/<processor.name>_tl_params_pkg.vhdl
+vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/vhdl/<processor.name>_tl.vhdl
+vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/vhdl/<processor.name>.vhd
 vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/gcu_opcodes_pkg.vhdl
-vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/output_socket_<processor.buses.size>_1.vhdl
+vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/output_socket_<length(processor.buses)>_1.vhdl
 vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/output_socket_1_1.vhdl
-vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/input_socket_<processor.buses.size>.vhdl
+vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/input_socket_<length(processor.buses)>.vhdl
 vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/ifetch.vhdl
 vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/idecompressor.vhdl
 vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/ic.vhdl
@@ -97,6 +97,8 @@ vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/fifo_br.vhd
 
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>simulation/sim_package.vhd
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/broadcast.vhd
+vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/broadcast_2.vhd
+vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/broadcast_6.vhd
 >>
 
 compileInterfaceComponents(callByNetwork=true) ::= <<

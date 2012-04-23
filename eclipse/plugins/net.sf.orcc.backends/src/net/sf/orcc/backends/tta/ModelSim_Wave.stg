@@ -84,17 +84,16 @@ endif>
 
 printFifoWave(fifo) ::= <<
 add wave -noupdate -divider \<NULL\>
-add wave -noupdate -divider fifo_<fifo.name>:_<fifo.source.name>_\>\>_<fifo.target.name>
+add wave -noupdate -divider fifo_<fifo.label>:_<fifo.source.name>_\>\>_<fifo.target.name>
 add wave -noupdate -divider \<NULL\>
-add wave -noupdate -format Logic /tb_top/top_orcc/fifo_<fifo.name>/clk
-add wave -noupdate -format Logic /tb_top/top_orcc/fifo_<fifo.name>/rst_n
-add wave -noupdate -format Logic /tb_top/top_orcc/fifo_<fifo.name>/wrreq
-add wave -noupdate -format Logic /tb_top/top_orcc/fifo_<fifo.name>/rdreq
-add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/fifo_<fifo.name>/data
-add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/fifo_<fifo.name>/q
-add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/fifo_<fifo.name>/nb_freerooms
-add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/fifo_<fifo.name>/nb_tokens
-add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/fifo_<fifo.name>/nb_tokens_i
+add wave -noupdate -format Logic /tb_top/top_orcc/fifo_<fifo.label>/clk
+add wave -noupdate -format Logic /tb_top/top_orcc/fifo_<fifo.label>/rst_n
+add wave -noupdate -format Logic /tb_top/top_orcc/fifo_<fifo.label>/wrreq
+add wave -noupdate -format Logic /tb_top/top_orcc/fifo_<fifo.label>/rdreq
+add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/fifo_<fifo.label>/data
+add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/fifo_<fifo.label>/queue
+add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/fifo_<fifo.label>/rooms
+add wave -noupdate -format Literal -radix decimal /tb_top/top_orcc/fifo_<fifo.label>/tokens
 >>
 
 printOptions() ::= <<

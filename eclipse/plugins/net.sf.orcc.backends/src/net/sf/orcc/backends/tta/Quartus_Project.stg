@@ -31,6 +31,8 @@ set_global_assignment -name VHDL_FILE wrapper/altera_fifo.vhd
 set_global_assignment -name VHDL_FILE wrapper/altera_ram.vhd
 set_global_assignment -name VHDL_FILE wrapper/altera_rom.vhd
 set_global_assignment -name VHDL_FILE wrapper/broadcast.vhd
+set_global_assignment -name VHDL_FILE wrapper/broadcast_2.vhd
+set_global_assignment -name VHDL_FILE wrapper/broadcast_6.vhd
 set_global_assignment -name VHDL_FILE interface/counter.vhd
 set_global_assignment -name VHDL_FILE interface/fps_eval.vhd
 set_global_assignment -name VHDL_FILE interface/segment_display_conv.vhd
@@ -69,9 +71,9 @@ set_global_assignment -name VHDL_FILE <processor.name>/tta/vhdl/<processor.name>
 set_global_assignment -name VHDL_FILE <processor.name>/tta/vhdl/globals_pkg.vhdl
 set_global_assignment -name VHDL_FILE <processor.name>/tta/vhdl/<processor.name>.vhd
 set_global_assignment -name VHDL_FILE <processor.name>/tta/vhdl/imem_mau_pkg.vhdl
-set_global_assignment -name VHDL_FILE <processor.name>/tta/gcu_ic/output_socket_<processor.buses.size>_1.vhdl
+set_global_assignment -name VHDL_FILE <processor.name>/tta/gcu_ic/output_socket_<length(processor.buses)>_1.vhdl
 set_global_assignment -name VHDL_FILE <processor.name>/tta/gcu_ic/output_socket_1_1.vhdl
-set_global_assignment -name VHDL_FILE <processor.name>/tta/gcu_ic/input_socket_<processor.buses.size>.vhdl
+set_global_assignment -name VHDL_FILE <processor.name>/tta/gcu_ic/input_socket_<length(processor.buses)>.vhdl
 set_global_assignment -name VHDL_FILE <processor.name>/tta/gcu_ic/ifetch.vhdl
 set_global_assignment -name VHDL_FILE <processor.name>/tta/gcu_ic/idecompressor.vhdl
 set_global_assignment -name VHDL_FILE <processor.name>/tta/gcu_ic/ic.vhdl

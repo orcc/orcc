@@ -17,6 +17,7 @@ import net.sf.orcc.backends.tta.architecture.Signal;
 import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
@@ -28,6 +29,7 @@ import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 public class ArchitectureBuilder extends DfSwitch<Design> {
 
@@ -80,6 +82,8 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		for (net.sf.orcc.df.Port calPort : calPorts) {
 			Port port = factory.createPort();
 			port.setLabel(calPort.getName());
+			port.getAttributes().addAll(
+					EcoreUtil.copyAll(calPort.getAttributes()));
 			ports.add(port);
 			portMap.put(calPort, port);
 		}
@@ -98,12 +102,17 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 					.getSource();
 			source = portMap.get(calPort);
 			size = calPort.getType().getSizeInBits();
+			source.setAttribute("size", size);
 		} else {
 			size = connection.getSourcePort().getType().getSizeInBits();
+			sourcePort.setAttribute("size", size);
 		}
 
 		if (target == null) {
 			target = portMap.get((net.sf.orcc.df.Port) connection.getTarget());
+			target.setAttribute("size", size);
+		} else {
+			targetPort.setAttribute("size", size);
 		}
 
 		Signal signal = factory.createSignal(connection.getAttribute("id")
@@ -149,6 +158,10 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 					.getSimpleName());
 			design.getComponents().add(component);
 			design.add(component);
+			for (Argument arg : instance.getArguments()) {
+				component.setAttribute(arg.getVariable().getName(),
+						arg.getValue());
+			}
 			componentMap.put(instance, component);
 		} else {
 			int memorySize = computeNeededMemorySize(instance);
