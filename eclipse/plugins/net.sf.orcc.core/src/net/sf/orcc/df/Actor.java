@@ -312,7 +312,7 @@ public interface Actor extends Attributable {
 	 * @return the value of the '<em>Template Data</em>' attribute.
 	 * @see #setTemplateData(Object)
 	 * @see net.sf.orcc.df.DfPackage#getActor_TemplateData()
-	 * @model
+	 * @model transient="true"
 	 * @generated
 	 */
 	Object getTemplateData();
