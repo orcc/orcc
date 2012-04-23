@@ -35,10 +35,11 @@ import java.util.Set;
 
 import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.OpBinary;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.util.WriteListener;
 
@@ -50,37 +51,40 @@ import net.sf.orcc.util.WriteListener;
  * @author Herve Yviquel
  * 
  */
-public class ComplexHwOpDetector extends AbstractActorVisitor<Object> {
+public class ComplexHwOpDetector extends DfVisitor<Void> {
 
-	private WriteListener writeListener;
+	private class Detector extends AbstractIrVisitor<Void> {
+		@Override
+		public Void caseExprBinary(ExprBinary expr) {
+			OpBinary op = expr.getOp();
+			// The operation will be transform in a simple shift.
+			if (op == OpBinary.TIMES && !ValueUtil.isPowTwo(expr.getE1())
+					&& !ValueUtil.isPowTwo(expr.getE2())) {
+				detectedOps.add(op);
+				operationsLines.add(EcoreHelper.getContainerOfType(expr,
+						Instruction.class).getLineNumber());
+			} else if ((op == OpBinary.MOD || op == OpBinary.DIV)
+					&& !ValueUtil.isPowTwo(expr.getE2())) {
+				detectedOps.add(op);
+				operationsLines.add(EcoreHelper.getContainerOfType(expr,
+						Instruction.class).getLineNumber());
+			}
+			return null;
+		}
+	}
+
 	private Set<OpBinary> detectedOps;
 	private List<Integer> operationsLines;
 
+	private WriteListener writeListener;
+
 	public ComplexHwOpDetector(WriteListener writeListener) {
-		super(true);
+		this.irVisitor = new Detector();
 		this.writeListener = writeListener;
-	}
+	};
 
 	@Override
-	public Object caseExprBinary(ExprBinary expr) {
-		OpBinary op = expr.getOp();
-		// The operation will be transform in a simple shift.
-		if (op == OpBinary.TIMES && !ValueUtil.isPowTwo(expr.getE1())
-				&& !ValueUtil.isPowTwo(expr.getE2())) {
-			detectedOps.add(op);
-			operationsLines.add(EcoreHelper.getContainerOfType(expr,
-					Instruction.class).getLineNumber());
-		} else if ((op == OpBinary.MOD || op == OpBinary.DIV)
-				&& !ValueUtil.isPowTwo(expr.getE2())) {
-			detectedOps.add(op);
-			operationsLines.add(EcoreHelper.getContainerOfType(expr,
-					Instruction.class).getLineNumber());
-		}
-		return null;
-	}
-
-	@Override
-	public Object caseActor(Actor actor) {
+	public Void caseActor(Actor actor) {
 		detectedOps = new HashSet<OpBinary>();
 		operationsLines = new ArrayList<Integer>();
 

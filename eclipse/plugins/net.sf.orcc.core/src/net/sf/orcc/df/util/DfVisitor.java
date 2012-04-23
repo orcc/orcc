@@ -54,6 +54,9 @@ public class DfVisitor<T> extends DfSwitch<T> {
 	 * current procedure being visited
 	 */
 	protected Procedure procedure;
+	
+	public DfVisitor() {
+	}
 
 	/**
 	 * Creates a new abstract actor visitor that visits all nodes and

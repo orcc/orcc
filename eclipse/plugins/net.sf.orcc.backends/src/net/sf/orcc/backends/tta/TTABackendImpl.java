@@ -148,7 +148,8 @@ public class TTABackendImpl extends AbstractBackend {
 	protected void doTransformActor(Actor actor) throws OrccException {
 		DfSwitch<?>[] transformations = { new UnitImporter(),
 				new ComplexHwOpDetector(getWriteListener()),
-				new SSATransformation(), new BoolToIntTransformation(),
+				new DfVisitor<Void>(new SSATransformation()),
+				new BoolToIntTransformation(),
 				new TypeResizer(true, true, false, true),
 				new StringTransformation(),
 				new RenameTransformation(this.transformations),

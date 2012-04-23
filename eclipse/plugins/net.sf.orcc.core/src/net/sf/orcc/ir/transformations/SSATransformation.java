@@ -51,7 +51,7 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.ecore.EObject;
@@ -63,7 +63,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Matthieu Wipliez
  * 
  */
-public class SSATransformation extends AbstractActorVisitor<Object> {
+public class SSATransformation extends AbstractIrVisitor<Void> {
 
 	/**
 	 * ith branch (or 0 if we are not in a branch)
@@ -276,21 +276,21 @@ public class SSATransformation extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseInstAssign(InstAssign assign) {
+	public Void caseInstAssign(InstAssign assign) {
 		replaceUses(assign.getValue());
 		replaceDef(assign.getTarget());
 		return null;
 	}
 
 	@Override
-	public Object caseInstCall(InstCall call) {
+	public Void caseInstCall(InstCall call) {
 		replaceUses(call.getParameters());
 		replaceDef(call.getTarget());
 		return null;
 	}
 
 	@Override
-	public Object caseNodeIf(BlockIf nodeIf) {
+	public Void caseBlockIf(BlockIf nodeIf) {
 		int outerBranch = branch;
 		BlockBasic outerJoin = join;
 		BlockWhile outerLoop = loop;
@@ -319,21 +319,21 @@ public class SSATransformation extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseInstLoad(InstLoad load) {
+	public Void caseInstLoad(InstLoad load) {
 		replaceUses(load.getIndexes());
 		replaceDef(load.getTarget());
 		return null;
 	}
 
 	@Override
-	public Object caseProcedure(Procedure procedure) {
+	public Void caseProcedure(Procedure procedure) {
 		definitions.clear();
 		uses.clear();
 		return super.caseProcedure(procedure);
 	}
 
 	@Override
-	public Object caseInstReturn(InstReturn returnInstr) {
+	public Void caseInstReturn(InstReturn returnInstr) {
 		Expression value = returnInstr.getValue();
 		if (value != null) {
 			replaceUses(value);
@@ -342,14 +342,14 @@ public class SSATransformation extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseInstStore(InstStore store) {
+	public Void caseInstStore(InstStore store) {
 		replaceUses(store.getIndexes());
 		replaceUses(store.getValue());
 		return null;
 	}
 
 	@Override
-	public Object caseNodeWhile(BlockWhile nodeWhile) {
+	public Void caseBlockWhile(BlockWhile nodeWhile) {
 		int outerBranch = branch;
 		BlockBasic outerJoin = join;
 		BlockWhile outerLoop = loop;

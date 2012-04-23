@@ -67,6 +67,7 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.df.transformations.NetworkFlattener;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.transformations.BlockCombine;
 import net.sf.orcc.ir.transformations.CfgBuilder;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
@@ -154,16 +155,15 @@ public class XlimBackendImpl extends AbstractBackend {
 		}
 
 		DfSwitch<?>[] transformations = { new UnitImporter(),
-				new SSATransformation(), new GlobalArrayInitializer(useHw),
-				new Inliner(true, true), new InstTernaryAdder(),
-				new UnaryListRemoval(), new CustomPeekAdder(),
-				new DeadGlobalElimination(), new DeadCodeElimination(),
-				new XlimDeadVariableRemoval(), new ListFlattener(),
-				new TacTransformation(), /* new CopyPropagator(), */
-				new CfgBuilder(), new InstPhiTransformation(),
-				new LiteralIntegersAdder(), new CastAdder(true),
-				new XlimVariableRenamer(), new EmptyNodeRemover(),
-				new BlockCombine() };
+				new DfVisitor<Void>(new SSATransformation()),
+				new GlobalArrayInitializer(useHw), new Inliner(true, true),
+				new InstTernaryAdder(), new UnaryListRemoval(),
+				new CustomPeekAdder(), new DeadGlobalElimination(),
+				new DeadCodeElimination(), new XlimDeadVariableRemoval(),
+				new ListFlattener(), new TacTransformation(), new CfgBuilder(),
+				new InstPhiTransformation(), new LiteralIntegersAdder(),
+				new CastAdder(true), new XlimVariableRenamer(),
+				new EmptyNodeRemover(), new BlockCombine() };
 
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
