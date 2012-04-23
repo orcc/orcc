@@ -534,22 +534,13 @@ public interface ArchitecturePackage extends EPackage {
 	int COMPONENT__NAME = GraphPackage.VERTEX_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Entity Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int COMPONENT__ENTITY_NAME = GraphPackage.VERTEX_FEATURE_COUNT + 1;
-
-	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int COMPONENT__INPUTS = GraphPackage.VERTEX_FEATURE_COUNT + 2;
+	int COMPONENT__INPUTS = GraphPackage.VERTEX_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Outputs</b></em>' containment reference list.
@@ -558,7 +549,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int COMPONENT__OUTPUTS = GraphPackage.VERTEX_FEATURE_COUNT + 3;
+	int COMPONENT__OUTPUTS = GraphPackage.VERTEX_FEATURE_COUNT + 2;
 
 	/**
 	 * The number of structural features of the '<em>Component</em>' class.
@@ -567,7 +558,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int COMPONENT_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 4;
+	int COMPONENT_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 3;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl <em>Processor</em>}' class.
@@ -766,15 +757,6 @@ public interface ArchitecturePackage extends EPackage {
 	int PROCESSOR__NAME = COMPONENT__NAME;
 
 	/**
-	 * The feature id for the '<em><b>Entity Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PROCESSOR__ENTITY_NAME = COMPONENT__ENTITY_NAME;
-
-	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -867,13 +849,13 @@ public interface ArchitecturePackage extends EPackage {
 	int PROCESSOR__HARDWARE_DATABASE = COMPONENT_FEATURE_COUNT + 8;
 
 	/**
-	 * The feature id for the '<em><b>Mapped Actors</b></em>' reference list.
+	 * The feature id for the '<em><b>Mapped Instances</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PROCESSOR__MAPPED_ACTORS = COMPONENT_FEATURE_COUNT + 9;
+	int PROCESSOR__MAPPED_INSTANCES = COMPONENT_FEATURE_COUNT + 9;
 
 	/**
 	 * The feature id for the '<em><b>Configuration</b></em>' attribute.
@@ -2140,17 +2122,6 @@ public interface ArchitecturePackage extends EPackage {
 	EAttribute getComponent_Name();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Component#getEntityName <em>Entity Name</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Entity Name</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.Component#getEntityName()
-	 * @see #getComponent()
-	 * @generated
-	 */
-	EAttribute getComponent_EntityName();
-
-	/**
 	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.tta.architecture.Component#getInputs <em>Inputs</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2276,15 +2247,15 @@ public interface ArchitecturePackage extends EPackage {
 	EReference getProcessor_HardwareDatabase();
 
 	/**
-	 * Returns the meta object for the reference list '{@link net.sf.orcc.backends.tta.architecture.Processor#getMappedActors <em>Mapped Actors</em>}'.
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.backends.tta.architecture.Processor#getMappedInstances <em>Mapped Instances</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference list '<em>Mapped Actors</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.Processor#getMappedActors()
+	 * @return the meta object for the reference list '<em>Mapped Instances</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Processor#getMappedInstances()
 	 * @see #getProcessor()
 	 * @generated
 	 */
-	EReference getProcessor_MappedActors();
+	EReference getProcessor_MappedInstances();
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Processor#getConfiguration <em>Configuration</em>}'.
@@ -3413,14 +3384,6 @@ public interface ArchitecturePackage extends EPackage {
 		EAttribute COMPONENT__NAME = eINSTANCE.getComponent_Name();
 
 		/**
-		 * The meta object literal for the '<em><b>Entity Name</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute COMPONENT__ENTITY_NAME = eINSTANCE.getComponent_EntityName();
-
-		/**
 		 * The meta object literal for the '<em><b>Inputs</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -3518,13 +3481,13 @@ public interface ArchitecturePackage extends EPackage {
 				.getProcessor_HardwareDatabase();
 
 		/**
-		 * The meta object literal for the '<em><b>Mapped Actors</b></em>' reference list feature.
+		 * The meta object literal for the '<em><b>Mapped Instances</b></em>' reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PROCESSOR__MAPPED_ACTORS = eINSTANCE
-				.getProcessor_MappedActors();
+		EReference PROCESSOR__MAPPED_INSTANCES = eINSTANCE
+				.getProcessor_MappedInstances();
 
 		/**
 		 * The meta object literal for the '<em><b>Configuration</b></em>' attribute feature.

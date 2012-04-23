@@ -53,11 +53,11 @@ class Processor:
         self.irom = None
         self.dram = None
         # Useful filenames
-        self._processorFile = "processor_" + self.id + ".vhd"
+        self._processorFile = self.id + ".vhd"
         self._tbFile = self.id + "_tb.vhd"
         self._tclFile = self.id + ".tcl"
-        self._adfFile = "processor_" + self.id + ".adf"
-        self._idfFile = "processor_" + self.id + ".idf"
+        self._adfFile = self.id + ".adf"
+        self._idfFile = self.id + ".idf"
         self._llFile = self.id + ".ll"
         self._bcFile = self.id + ".bc"
         self._llOptFile = self.id + "_opt.ll"
@@ -74,14 +74,16 @@ class Processor:
         self._ngcRamFile = "dram_" + self.id + ".ngc"
         self._waveFile = "wave.do"
         # Useful names
-        self._entity = "processor_" + self.id + "_tl"
+        self._entity = self.id + "_tl"
 
 
     def compile(self, srcPath, libPath, args, debug):
-        instancePath = os.path.join(srcPath, self.id)
-        os.chdir(instancePath)
-        shutil.copy(os.path.join(libPath, "stream", "opset", "stream_units.opb"), instancePath)
-        shutil.copy(os.path.join(libPath, "stream", "opset", "stream_units.opp"), instancePath)
+        processorPath = os.path.join(srcPath, self.id)
+        instancesPath = os.path.join(srcPath, "instances")
+        os.chdir(processorPath)
+        shutil.copy(os.path.join(libPath, "stream", "opset", "stream_units.opb"), processorPath)
+        shutil.copy(os.path.join(libPath, "stream", "opset", "stream_units.opp"), processorPath)
+        
         retcode = subprocess.call(["tcecc"] + args + ["-o", self._tpefFile, "-a", self._adfFile, self._llFile])
         if retcode == 0 and debug: retcode = subprocess.call(["tcecc", "-O3", "-o", self._bcFile, self._llFile, "--emit-llvm"])
         if retcode == 0 and debug: retcode = subprocess.call(["llvm-dis", "-o", self._llOptFile, self._bcFile])

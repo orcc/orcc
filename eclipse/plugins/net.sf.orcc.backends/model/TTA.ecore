@@ -31,7 +31,6 @@
   <eClassifiers xsi:type="ecore:EClass" name="Component" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Vertex">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"
         volatile="true" transient="true" derived="true"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="entityName" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="inputs" upperBound="-1"
         eType="#//Port" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="outputs" upperBound="-1"
@@ -57,7 +56,7 @@
         containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="hardwareDatabase" upperBound="-1"
         eType="#//Implementation" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="mappedActors" upperBound="-1"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="mappedInstances" upperBound="-1"
         eType="ecore:EClass ../../net.sf.orcc.core/model/Df.ecore#//Instance"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="configuration" eType="#//ProcessorConfiguration"/>
   </eClassifiers>

@@ -44,7 +44,6 @@ import org.eclipse.emf.common.util.EList;
  * The following features are supported:
  * <ul>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Component#getName <em>Name</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.Component#getEntityName <em>Entity Name</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Component#getInputs <em>Inputs</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Component#getOutputs <em>Outputs</em>}</li>
  * </ul>
@@ -91,33 +90,6 @@ public interface Component extends Vertex {
 	 * @generated
 	 */
 	void setName(String value);
-
-	/**
-	 * Returns the value of the '<em><b>Entity Name</b></em>' attribute. <!--
-	 * begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Entity Name</em>' attribute isn't clear, there
-	 * really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * 
-	 * @return the value of the '<em>Entity Name</em>' attribute.
-	 * @see #setEntityName(String)
-	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getComponent_EntityName()
-	 * @model
-	 * @generated
-	 */
-	String getEntityName();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Component#getEntityName <em>Entity Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!--
-	 * end-user-doc -->
-	 * @param value the new value of the '<em>Entity Name</em>' attribute.
-	 * @see #getEntityName()
-	 * @generated
-	 */
-	void setEntityName(String value);
 
 	/**
 	 * Returns the value of the '<em><b>Inputs</b></em>' containment reference list.

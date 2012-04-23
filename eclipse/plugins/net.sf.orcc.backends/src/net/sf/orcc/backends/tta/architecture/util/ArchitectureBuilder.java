@@ -115,9 +115,8 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 
 	@Override
 	public Design caseBroadcast(Broadcast broadcast) {
-		Component component = factory.createComponent(
-				broadcast.getSimpleName(), "broadcast_"
-						+ broadcast.getOutputs().size());
+		Component component = factory
+				.createComponent(broadcast.getSimpleName());
 		component.getInputs().addAll(createPorts(broadcast.getInputs()));
 		component.getOutputs().addAll(createPorts(broadcast.getOutputs()));
 		design.getBroadcasts().add(component);
@@ -146,18 +145,18 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		Actor actor = instance.getActor();
 		Component component;
 		if (actor.isNative()) {
-			component = factory.createComponent(instance.getName(), instance
-					.getActor().getSimpleName());
+			component = factory.createComponent(instance.getActor()
+					.getSimpleName());
 			design.getComponents().add(component);
 			design.add(component);
 			componentMap.put(instance, component);
 		} else {
 			int memorySize = computeNeededMemorySize(instance);
-			String name = instance.getSimpleName();
-			Processor processor = factory.createProcessor(name + "_inst",
-					"processor_" + name, ProcessorConfiguration.STANDARD,
-					memorySize);
+			Processor processor = factory.createProcessor("processor_"
+					+ instance.getSimpleName(),
+					ProcessorConfiguration.STANDARD, memorySize);
 			component = processor;
+			processor.getMappedInstances().add(instance);
 			design.getProcessors().add(processor);
 			design.add(processor);
 			componentMap.put(instance, processor);

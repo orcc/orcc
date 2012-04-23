@@ -41,12 +41,10 @@ import net.sf.orcc.backends.tta.architecture.Component;
 import net.sf.orcc.backends.tta.architecture.Link;
 import net.sf.orcc.backends.tta.architecture.Port;
 
-import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
@@ -58,9 +56,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <ul>
  * <li>{@link net.sf.orcc.backends.tta.architecture.impl.ComponentImpl#getName
  * <em>Name</em>}</li>
- * <li>
- * {@link net.sf.orcc.backends.tta.architecture.impl.ComponentImpl#getEntityName
- * <em>Entity Name</em>}</li>
  * <li>
  * {@link net.sf.orcc.backends.tta.architecture.impl.ComponentImpl#getInputs
  * <em>Inputs</em>}</li>
@@ -82,24 +77,6 @@ public class ComponentImpl extends VertexImpl implements Component {
 	 * @ordered
 	 */
 	protected static final String NAME_EDEFAULT = null;
-	/**
-	 * The default value of the '{@link #getEntityName() <em>Entity Name</em>}'
-	 * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @see #getEntityName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String ENTITY_NAME_EDEFAULT = null;
-	/**
-	 * The cached value of the '{@link #getEntityName() <em>Entity Name</em>}'
-	 * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @see #getEntityName()
-	 * @generated
-	 * @ordered
-	 */
-	protected String entityName = ENTITY_NAME_EDEFAULT;
 	/**
 	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}'
 	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -157,29 +134,6 @@ public class ComponentImpl extends VertexImpl implements Component {
 	 * 
 	 * @generated
 	 */
-	public String getEntityName() {
-		return entityName;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 */
-	public void setEntityName(String newEntityName) {
-		String oldEntityName = entityName;
-		entityName = newEntityName;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					ArchitecturePackage.COMPONENT__ENTITY_NAME, oldEntityName,
-					entityName));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 */
 	public EList<Port> getInputs() {
 		if (inputs == null) {
 			inputs = new EObjectContainmentEList<Port>(Port.class, this,
@@ -229,8 +183,6 @@ public class ComponentImpl extends VertexImpl implements Component {
 		switch (featureID) {
 		case ArchitecturePackage.COMPONENT__NAME:
 			return getName();
-		case ArchitecturePackage.COMPONENT__ENTITY_NAME:
-			return getEntityName();
 		case ArchitecturePackage.COMPONENT__INPUTS:
 			return getInputs();
 		case ArchitecturePackage.COMPONENT__OUTPUTS:
@@ -250,9 +202,6 @@ public class ComponentImpl extends VertexImpl implements Component {
 		switch (featureID) {
 		case ArchitecturePackage.COMPONENT__NAME:
 			setName((String) newValue);
-			return;
-		case ArchitecturePackage.COMPONENT__ENTITY_NAME:
-			setEntityName((String) newValue);
 			return;
 		case ArchitecturePackage.COMPONENT__INPUTS:
 			getInputs().clear();
@@ -277,9 +226,6 @@ public class ComponentImpl extends VertexImpl implements Component {
 		case ArchitecturePackage.COMPONENT__NAME:
 			setName(NAME_EDEFAULT);
 			return;
-		case ArchitecturePackage.COMPONENT__ENTITY_NAME:
-			setEntityName(ENTITY_NAME_EDEFAULT);
-			return;
 		case ArchitecturePackage.COMPONENT__INPUTS:
 			getInputs().clear();
 			return;
@@ -301,32 +247,12 @@ public class ComponentImpl extends VertexImpl implements Component {
 		case ArchitecturePackage.COMPONENT__NAME:
 			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT
 					.equals(getName());
-		case ArchitecturePackage.COMPONENT__ENTITY_NAME:
-			return ENTITY_NAME_EDEFAULT == null ? entityName != null
-					: !ENTITY_NAME_EDEFAULT.equals(entityName);
 		case ArchitecturePackage.COMPONENT__INPUTS:
 			return inputs != null && !inputs.isEmpty();
 		case ArchitecturePackage.COMPONENT__OUTPUTS:
 			return outputs != null && !outputs.isEmpty();
 		}
 		return super.eIsSet(featureID);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 */
-	@Override
-	public String toString() {
-		if (eIsProxy())
-			return super.toString();
-
-		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (entityName: ");
-		result.append(entityName);
-		result.append(')');
-		return result.toString();
 	}
 
 	@Override

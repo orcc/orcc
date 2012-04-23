@@ -41,7 +41,6 @@ import java.util.Map;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.CustomPrinter;
-import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.llvm.LLVMExpressionPrinter;
 import net.sf.orcc.backends.llvm.LLVMTypePrinter;
 import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
@@ -62,7 +61,6 @@ import net.sf.orcc.backends.tta.architecture.util.ArchitecturePrinter;
 import net.sf.orcc.backends.tta.transformations.ComplexHwOpDetector;
 import net.sf.orcc.backends.util.FPGA;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transformations.BroadcastAdder;
 import net.sf.orcc.df.transformations.Instantiator;
@@ -185,9 +183,7 @@ public class TTABackendImpl extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network = doTransformNetwork(network);
 
-		instancePath = OrccUtil.createFolder(path, "instances");
 		transformActors(network.getAllActors());
-		printInstances(network);
 
 		network.computeTemplateMaps();
 
@@ -197,17 +193,6 @@ public class TTABackendImpl extends AbstractBackend {
 		if (finalize) {
 			runPythonScript();
 		}
-	}
-
-	@Override
-	protected boolean printInstance(Instance instance) throws OrccException {
-		StandardPrinter printer = new StandardPrinter(
-				"net/sf/orcc/backends/tta/LLVM_Actor.stg", !debug, false);
-		printer.setExpressionPrinter(new LLVMExpressionPrinter());
-		printer.setTypePrinter(new LLVMTypePrinter());
-
-		return printer.print(instance.getSimpleName() + ".ll", instancePath,
-				instance);
 	}
 
 	private void printDesign(Design design) {
@@ -289,7 +274,12 @@ public class TTABackendImpl extends AbstractBackend {
 		wavePrinter.print("wave.do", simPath, tta);
 		tclPrinter.print(tta.getName() + ".tcl", processorPath, tta);
 
-		// TODO: Print assembly code of actor-scheduler
+		// Print assembly code of actor-scheduler
+		ArchitecturePrinter schedulerPrinter = new ArchitecturePrinter(
+				"net/sf/orcc/backends/tta/LLVM_Actor.stg");
+		schedulerPrinter.setExpressionPrinter(new LLVMExpressionPrinter());
+		schedulerPrinter.setTypePrinter(new LLVMTypePrinter());
+		schedulerPrinter.print(tta.getName() + ".ll", processorPath, tta);
 	}
 
 	private void runPythonScript() throws OrccException {

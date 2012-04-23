@@ -71,7 +71,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getProgram <em>Program</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getData <em>Data</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getHardwareDatabase <em>Hardware Database</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getMappedActors <em>Mapped Actors</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getMappedInstances <em>Mapped Instances</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ProcessorImpl#getConfiguration <em>Configuration</em>}</li>
  * </ul>
  * </p>
@@ -175,14 +175,14 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	protected EList<Implementation> hardwareDatabase;
 
 	/**
-	 * The cached value of the '{@link #getMappedActors() <em>Mapped Actors</em>}' reference list.
+	 * The cached value of the '{@link #getMappedInstances() <em>Mapped Instances</em>}' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getMappedActors()
+	 * @see #getMappedInstances()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Instance> mappedActors;
+	protected EList<Instance> mappedInstances;
 
 	/**
 	 * The default value of the '{@link #getConfiguration() <em>Configuration</em>}' attribute.
@@ -478,12 +478,13 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Instance> getMappedActors() {
-		if (mappedActors == null) {
-			mappedActors = new EObjectResolvingEList<Instance>(Instance.class,
-					this, ArchitecturePackage.PROCESSOR__MAPPED_ACTORS);
+	public EList<Instance> getMappedInstances() {
+		if (mappedInstances == null) {
+			mappedInstances = new EObjectResolvingEList<Instance>(
+					Instance.class, this,
+					ArchitecturePackage.PROCESSOR__MAPPED_INSTANCES);
 		}
-		return mappedActors;
+		return mappedInstances;
 	}
 
 	/**
@@ -572,8 +573,8 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 			return getData();
 		case ArchitecturePackage.PROCESSOR__HARDWARE_DATABASE:
 			return getHardwareDatabase();
-		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
-			return getMappedActors();
+		case ArchitecturePackage.PROCESSOR__MAPPED_INSTANCES:
+			return getMappedInstances();
 		case ArchitecturePackage.PROCESSOR__CONFIGURATION:
 			return getConfiguration();
 		}
@@ -625,9 +626,10 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 			getHardwareDatabase().addAll(
 					(Collection<? extends Implementation>) newValue);
 			return;
-		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
-			getMappedActors().clear();
-			getMappedActors().addAll((Collection<? extends Instance>) newValue);
+		case ArchitecturePackage.PROCESSOR__MAPPED_INSTANCES:
+			getMappedInstances().clear();
+			getMappedInstances().addAll(
+					(Collection<? extends Instance>) newValue);
 			return;
 		case ArchitecturePackage.PROCESSOR__CONFIGURATION:
 			setConfiguration((ProcessorConfiguration) newValue);
@@ -671,8 +673,8 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 		case ArchitecturePackage.PROCESSOR__HARDWARE_DATABASE:
 			getHardwareDatabase().clear();
 			return;
-		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
-			getMappedActors().clear();
+		case ArchitecturePackage.PROCESSOR__MAPPED_INSTANCES:
+			getMappedInstances().clear();
 			return;
 		case ArchitecturePackage.PROCESSOR__CONFIGURATION:
 			setConfiguration(CONFIGURATION_EDEFAULT);
@@ -707,8 +709,8 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 			return data != null;
 		case ArchitecturePackage.PROCESSOR__HARDWARE_DATABASE:
 			return hardwareDatabase != null && !hardwareDatabase.isEmpty();
-		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
-			return mappedActors != null && !mappedActors.isEmpty();
+		case ArchitecturePackage.PROCESSOR__MAPPED_INSTANCES:
+			return mappedInstances != null && !mappedInstances.isEmpty();
 		case ArchitecturePackage.PROCESSOR__CONFIGURATION:
 			return configuration != CONFIGURATION_EDEFAULT;
 		}

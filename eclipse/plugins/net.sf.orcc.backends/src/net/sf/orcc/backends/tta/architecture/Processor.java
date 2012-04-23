@@ -51,7 +51,7 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getProgram <em>Program</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getData <em>Data</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getHardwareDatabase <em>Hardware Database</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getMappedActors <em>Mapped Actors</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getMappedInstances <em>Mapped Instances</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Processor#getConfiguration <em>Configuration</em>}</li>
  * </ul>
  * </p>
@@ -236,20 +236,20 @@ public interface Processor extends Component {
 	EList<Implementation> getHardwareDatabase();
 
 	/**
-	 * Returns the value of the '<em><b>Mapped Actors</b></em>' reference list.
+	 * Returns the value of the '<em><b>Mapped Instances</b></em>' reference list.
 	 * The list contents are of type {@link net.sf.orcc.df.Instance}.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Mapped Actors</em>' reference isn't clear,
+	 * If the meaning of the '<em>Mapped Instances</em>' reference list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Mapped Actors</em>' reference list.
-	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getProcessor_MappedActors()
+	 * @return the value of the '<em>Mapped Instances</em>' reference list.
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getProcessor_MappedInstances()
 	 * @model
 	 * @generated
 	 */
-	EList<Instance> getMappedActors();
+	EList<Instance> getMappedInstances();
 
 	/**
 	 * Returns the value of the '<em><b>Configuration</b></em>' attribute.

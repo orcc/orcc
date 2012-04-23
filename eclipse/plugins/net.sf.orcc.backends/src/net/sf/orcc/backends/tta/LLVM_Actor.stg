@@ -346,9 +346,9 @@ actorParameter(var, expr) ::= <<
 // Instance
 ///////////////////////////////////////////////////////////////////////////////
 
-printActor(actor, options) ::= <<
+printActor(actor) ::= <<
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Source file is "<instance.actor.file>"
+; "<instance.actor.file>"
 
 <if(instance.actor.parameters)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -398,7 +398,7 @@ printActor(actor, options) ::= <<
 @_FSM_state = global i32 <actor.templateData.stateToLabelMap.(actor.fsm.initialState)>
 <endif>
 
-define void @main() noreturn nounwind noinline {
+define external void @<instance.name>_scheduler() noreturn nounwind {
 entry:
 	<actor.initializes: callInitialize(); separator="\n">
 
@@ -414,6 +414,22 @@ endif>
 }
 >>
 
-printInstance(instance, options) ::= <<
-<if(instance.actor)><printActor(instance.actor, options)><endif>
+printInstance(instance) ::= <<
+<if(instance.actor)><printActor(instance.actor)><endif>
+>>
+
+callScheduler(instance) ::= <<
+call void @<instance.name>_scheduler()
+>>
+
+printProcessor(processor, options) ::= <<
+<processor.mappedInstances: printInstance(); separator="\n\n">
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Actor-scheduler
+define void @main() noinline noreturn nounwind {
+entry:
+	<processor.mappedInstances: callScheduler(); separator="\n">
+	ret void
+}
 >>
