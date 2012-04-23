@@ -72,6 +72,7 @@ import org.eclipse.emf.ecore.EObject;
  * @author Matthieu Wipliez
  * 
  */
+@Deprecated
 public abstract class AbstractActorVisitor<T> extends DfSwitch<T> {
 
 	protected class IrSwitchDelegate extends IrSwitch<T> {
