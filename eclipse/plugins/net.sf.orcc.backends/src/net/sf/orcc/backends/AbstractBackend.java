@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends;
 
+import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
@@ -829,6 +830,9 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		// add optional options
 		options.addOption("c", "classify", false, "classify the given network");
+		options.addOption("t", "transfo_add", false,
+				"execute additional transformations before generate code");
+		options.addOption("d", "debug", false, "enable debug mode");
 
 		try {
 			// parse the command line arguments
@@ -845,8 +849,17 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			optionMap.put(PROJECT, projectName);
 			optionMap.put(XDF_FILE, networkName);
 			optionMap.put(OUTPUT_FOLDER, outputFolder);
+
 			if (line.hasOption('c')) {
 				optionMap.put("net.sf.orcc.backends.classify", true);
+			}
+
+			if (line.hasOption('t')) {
+				optionMap.put("net.sf.orcc.backends.additionalTransfos", true);
+			}
+
+			if (line.hasOption('d')) {
+				optionMap.put(DEBUG_MODE, true);
 			}
 
 			try {
@@ -864,11 +877,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		} catch (ParseException exp) {
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp(getClass().getSimpleName() + " [options] "
-					+ "-p project -o \"output folder\" "
-					+ "qualified.name.of.network", options);
+									+ "-p <project> -o <output.folder> <network.qualified.name>",
+							options);
+			return IApplication.EXIT_RELAUNCH;
 		}
-
-		return IApplication.EXIT_OK;
 	}
 
 	@Override
