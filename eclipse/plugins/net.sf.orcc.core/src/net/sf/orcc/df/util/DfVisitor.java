@@ -49,11 +49,6 @@ public class DfVisitor<T> extends DfSwitch<T> {
 	protected Actor actor;
 
 	protected AbstractIrVisitor<T> irVisitor;
-
-	/**
-	 * current procedure being visited
-	 */
-	protected Procedure procedure;
 	
 	public DfVisitor() {
 	}
@@ -118,6 +113,7 @@ public class DfVisitor<T> extends DfSwitch<T> {
 
 	@Override
 	public final T doSwitch(EObject eObject) {
+		// allow null objects
 		if (eObject == null) {
 			return null;
 		}
