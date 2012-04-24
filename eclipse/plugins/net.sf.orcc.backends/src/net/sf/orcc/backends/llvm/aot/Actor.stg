@@ -3,7 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 variableDeclaration(variable) ::= <<
-<if(variable.type.list && !actor.templateData.castedListReferences.(variable))>
+<if(variable.type.list && !instance.templateData.castedListReferences.(variable))>
 %<variable.indexedName> = alloca <variable.type>
 <endif>
 >>
@@ -14,16 +14,12 @@ variableDeclaration(variable) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 fifoVar(port, var) ::= <<
-%<var.name>_ptr = load <port.type>** <fifoVarName(port)>
-%<var.name> = bitcast <port.type>* %<var.name>_ptr to <var.type>*
 >>
 
 fifoVarName(port) ::= <<
-@<port.name>_ptr
 >>
 
 fifo(port) ::= <<
-<fifoVarName(port)> = global <port.type>* null
 >>
 
 
@@ -129,17 +125,8 @@ initializeStateVar(variable) ::= <<
 <if(variable.initialValue)><Constant(variable.initialValue, variable.type)><else>zeroinitializer, align 32<endif>
 >>
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Instructions
-///////////////////////////////////////////////////////////////////////////////
-
-PrintInstr(parameters) ::= <<
-call i32 (i8*, ...)* @printf(<parameters:{param | <printParameter(param.value.type, param)>}; separator=", ">)
->>
-
-///////////////////////////////////////////////////////////////////////////////
-// ORCC IR Instructions
 ///////////////////////////////////////////////////////////////////////////////
 
 printInstructions(instructions) ::= <<
@@ -160,7 +147,7 @@ endif>
 
 printCall(call) ::= <<
 <if(call.print)
-><PrintInstr(call.parameters)><
+>call i32 (i8*, ...)* @printf(<call.parameters:{param | <printParameter(param.value.type, param)>}; separator=", ">)<
 else
 ><if(call.target)
 >%<call.target.variable.indexedName> = <
@@ -265,7 +252,7 @@ b<label(whileNode)>:
 	br label %b<printNextLabel(first(whileNode.cfgNode.successors).node)>
 >>
 
-label(node) ::= "b<actor.templateData.nodeToLabelMap.(node)>"
+label(block) ::= "b<block.cfgNode.number>"
 
 printNextLabel(node)::=<<
 <if(node.nodeWhile)><label(node.joinNode)><else><label(node)><endif>
@@ -326,50 +313,50 @@ actorParameter(parameter) ::= <<
 @<parameter.name> = global <parameter.type> undef
 >>
 
-printActor(actor, options) ::= <<
+printInstance(instance, options) ::= <<
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Generated from "<actor.name>"
+; Generated from "<instance.actor.name>"
 declare i32 @printf(i8* noalias , ...) nounwind 
 
-<if(actor.inputs)>
+<if(instance.actor.inputs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Input FIFOs
-<actor.inputs: fifo(); separator="\n">
+<instance.actor.inputs: fifo(); separator="\n">
 <endif>
 
-<if(actor.outputs)>
+<if(instance.actor.outputs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Output FIFOs
-<actor.outputs: fifo(); separator="\n">
+<instance.actor.outputs: fifo(); separator="\n">
 <endif>
 
-<if(actor.parameters)>
+<if(instance.actor.parameters)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Parameter values of the instance
-<actor.parameters: actorParameter(); separator="\n">
+<instance.actor.parameters: actorParameter(); separator="\n">
 <endif>
 
-<if(actor.stateVars)>
+<if(instance.actor.stateVars)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; State variables of the actor
-<actor.stateVars: stateVar(); separator="\n">
+<instance.actor.stateVars: stateVar(); separator="\n">
 <endif>
 
-<if(actor.procs)>
+<if(instance.actor.procs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Functions/procedures
-<actor.procs: {proc | <procedure(proc)>}>
+<instance.actor.procs: procedure()>
 <endif>
 
-<if(actor.initializes)>
+<if(instance.actor.initializes)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Initializes
-<actor.initializes: printAction(); separator="\n\n">
+<instance.actor.initializes: printAction(); separator="\n\n">
 <endif>
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Actions
-<actor.actions: printAction(); separator="\n\n">
+<instance.actor.actions: printAction(); separator="\n\n">
 
 >>

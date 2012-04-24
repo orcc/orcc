@@ -49,6 +49,7 @@ import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.llvm.aot.LLVMExpressionPrinter;
 import net.sf.orcc.backends.llvm.aot.LLVMTemplateData;
 import net.sf.orcc.backends.llvm.aot.LLVMTypePrinter;
+import net.sf.orcc.backends.llvm.transformations.BlockNumbering;
 import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
 import net.sf.orcc.backends.llvm.transformations.GetElementPtrAdder;
 import net.sf.orcc.backends.llvm.transformations.ListInitializer;
@@ -66,7 +67,9 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.df.transformations.NetworkFlattener;
+import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
+import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.transformations.BlockCombine;
 import net.sf.orcc.ir.transformations.CfgBuilder;
@@ -81,10 +84,6 @@ import net.sf.orcc.tools.normalizer.ActorNormalizer;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 
 /**
  * LLVM back-end.
@@ -155,28 +154,33 @@ public class JadeBackendImpl extends AbstractBackend {
 		}
 
 		new UnitImporter().doSwitch(actor);
-		new SSATransformation().doSwitch(actor);
+		new DfVisitor<Void>(new SSATransformation()).doSwitch(actor);
 		new DeadGlobalElimination().doSwitch(actor);
 
 		if (!byteexact) {
 			new TypeResizer(true, false, false, true).doSwitch(actor);
 		}
 
-		new DeadCodeElimination().doSwitch(actor);
-		new DeadVariableRemoval().doSwitch(actor);
-		new BoolToIntTransformation().doSwitch(actor);
-		new StringTransformation().doSwitch(actor);
-		new RenameTransformation(this.transformations).doSwitch(actor);
-		new TacTransformation().doSwitch(actor);
-		new DfVisitor<Void>(new CopyPropagator()).doSwitch(actor);
-		new DfVisitor<Void>(new ConstantPropagator()).doSwitch(actor);
-		new InstPhiTransformation().doSwitch(actor);
-		new DfVisitor<Void>(new GetElementPtrAdder()).doSwitch(actor);
-		new DfVisitor<Expression>(new CastAdder(false)).doSwitch(actor);
-		new EmptyBlockRemover().doSwitch(actor);
-		new BlockCombine().doSwitch(actor);
-		new CfgBuilder().doSwitch(actor);
-		new ListInitializer().doSwitch(actor);
+		DfSwitch<?>[] transformations = {
+				new DfVisitor<Void>(new DeadCodeElimination()),
+				new DfVisitor<Void>(new DeadVariableRemoval()),
+				new BoolToIntTransformation(), new StringTransformation(),
+				new RenameTransformation(this.transformations),
+				new DfVisitor<Expression>(new TacTransformation()),
+				new DfVisitor<Void>(new CopyPropagator()),
+				new DfVisitor<Void>(new ConstantPropagator()),
+				new DfVisitor<Void>(new InstPhiTransformation()),
+				new DfVisitor<Void>(new GetElementPtrAdder()),
+				new DfVisitor<Expression>(new CastAdder(false)),
+				new DfVisitor<Void>(new EmptyBlockRemover()),
+				new DfVisitor<Void>(new BlockCombine()),
+				new DfVisitor<CfgNode>(new CfgBuilder()),
+				new DfVisitor<Void>(new ListInitializer()),
+				new DfVisitor<Void>(new BlockNumbering()) };
+
+		for (DfSwitch<?> transformation : transformations) {
+			transformation.doSwitch(actor);
+		}
 
 		// Organize metadata information for the current actor
 		actor.setTemplateData(new LLVMTemplateData(actor));
@@ -186,8 +190,8 @@ public class JadeBackendImpl extends AbstractBackend {
 	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
 		List<Actor> actors = parseActors(files);
 
-		printer = new StandardPrinter("net/sf/orcc/backends/llvm/Actor.stg",
-				!debug);
+		printer = new StandardPrinter(
+				"net/sf/orcc/backends/llvm/jit/Actor.stg", !debug);
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
 
@@ -242,7 +246,7 @@ public class JadeBackendImpl extends AbstractBackend {
 
 	private void printMapping(Network network) {
 		StandardPrinter networkPrinter = new StandardPrinter(
-				"net/sf/orcc/backends/llvm/Mapping.stg");
+				"net/sf/orcc/backends/llvm/jit/Mapping.stg");
 		networkPrinter.getOptions().put("mapping", targetToInstancesMap);
 		networkPrinter.print(network.getName() + ".xcf", path, network);
 	}

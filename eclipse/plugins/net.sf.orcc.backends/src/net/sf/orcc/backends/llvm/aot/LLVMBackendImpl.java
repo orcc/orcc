@@ -36,6 +36,7 @@ import java.util.Map;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
+import net.sf.orcc.backends.llvm.transformations.BlockNumbering;
 import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
 import net.sf.orcc.backends.llvm.transformations.GetElementPtrAdder;
 import net.sf.orcc.backends.llvm.transformations.ListInitializer;
@@ -50,7 +51,9 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.df.transformations.NetworkFlattener;
+import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
+import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.transformations.BlockCombine;
 import net.sf.orcc.ir.transformations.CfgBuilder;
@@ -96,24 +99,29 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		new UnitImporter().doSwitch(actor);
-		new SSATransformation().doSwitch(actor);
-		new DeadGlobalElimination().doSwitch(actor);
-		new DeadCodeElimination().doSwitch(actor);
-		new DeadVariableRemoval().doSwitch(actor);
-		new BoolToIntTransformation().doSwitch(actor);
-		new StringTransformation().doSwitch(actor);
-		new RenameTransformation(this.transformations).doSwitch(actor);
-		new TacTransformation().doSwitch(actor);
-		new DfVisitor<Void>(new CopyPropagator()).doSwitch(actor);
-		new DfVisitor<Void>(new ConstantPropagator()).doSwitch(actor);
-		new InstPhiTransformation().doSwitch(actor);
-		new DfVisitor<Void>(new GetElementPtrAdder()).doSwitch(actor);
-		new DfVisitor<Expression>(new CastAdder(false)).doSwitch(actor);
-		new EmptyBlockRemover().doSwitch(actor);
-		new BlockCombine().doSwitch(actor);
-		new CfgBuilder().doSwitch(actor);
-		new ListInitializer().doSwitch(actor);
+
+		DfSwitch<?>[] transformations = { new UnitImporter(),
+				new DfVisitor<Void>(new SSATransformation()),
+				new DeadGlobalElimination(),
+				new DfVisitor<Void>(new DeadCodeElimination()),
+				new DfVisitor<Void>(new DeadVariableRemoval()),
+				new BoolToIntTransformation(), new StringTransformation(),
+				new RenameTransformation(this.transformations),
+				new DfVisitor<Expression>(new TacTransformation()),
+				new DfVisitor<Void>(new CopyPropagator()),
+				new DfVisitor<Void>(new ConstantPropagator()),
+				new DfVisitor<Void>(new InstPhiTransformation()),
+				new DfVisitor<Void>(new GetElementPtrAdder()),
+				new DfVisitor<Expression>(new CastAdder(false)),
+				new DfVisitor<Void>(new EmptyBlockRemover()),
+				new DfVisitor<Void>(new BlockCombine()),
+				new DfVisitor<CfgNode>(new CfgBuilder()),
+				new DfVisitor<Void>(new ListInitializer()),
+				new DfVisitor<Void>(new BlockNumbering()) };
+
+		for (DfSwitch<?> transformation : transformations) {
+			transformation.doSwitch(actor);
+		}
 
 		// Organize metadata information for the current actor
 		actor.setTemplateData(new LLVMTemplateData(actor));

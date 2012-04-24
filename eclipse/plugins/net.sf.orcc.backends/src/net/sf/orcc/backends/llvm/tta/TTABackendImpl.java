@@ -43,6 +43,7 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.CustomPrinter;
 import net.sf.orcc.backends.llvm.aot.LLVMExpressionPrinter;
 import net.sf.orcc.backends.llvm.aot.LLVMTypePrinter;
+import net.sf.orcc.backends.llvm.transformations.BlockNumbering;
 import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
 import net.sf.orcc.backends.llvm.transformations.GetElementPtrAdder;
 import net.sf.orcc.backends.llvm.transformations.StringTransformation;
@@ -163,7 +164,8 @@ public class TTABackendImpl extends AbstractBackend {
 				new DfVisitor<Expression>(new CastAdder(false)),
 				new DfVisitor<Void>(new EmptyBlockRemover()),
 				new DfVisitor<Void>(new BlockCombine()),
-				new DfVisitor<CfgNode>(new CfgBuilder()) };
+				new DfVisitor<CfgNode>(new CfgBuilder()),
+				new DfVisitor<Void>(new BlockNumbering()) };
 
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
@@ -211,7 +213,7 @@ public class TTABackendImpl extends AbstractBackend {
 
 		// VHDL Network of TTA processors
 		ArchitecturePrinter vhdlPrinter = new ArchitecturePrinter(
-				"net/sf/orcc/backends/tta/VHDL_Network.stg");
+				"net/sf/orcc/backends/llvm/tta/VHDL_Network.stg");
 		vhdlPrinter.setExpressionPrinter(new LLVMExpressionPrinter());
 		vhdlPrinter.getOptions().put("fpga", fpga);
 		vhdlPrinter.print("top.vhd", path, design);
@@ -219,7 +221,7 @@ public class TTABackendImpl extends AbstractBackend {
 		// Python package
 		String pythonPath = OrccUtil.createFolder(path, "informations_");
 		ArchitecturePrinter pythonPrinter = new ArchitecturePrinter(
-				"net/sf/orcc/backends/tta/Python_Network.stg");
+				"net/sf/orcc/backends/llvm/tta/Python_Network.stg");
 		pythonPrinter.getOptions().put("fpga", fpga);
 		pythonPrinter.print("informations.py", pythonPath, design);
 		OrccUtil.createFile(pythonPath, "__init__.py");
@@ -227,16 +229,16 @@ public class TTABackendImpl extends AbstractBackend {
 		if (fpga.isAltera()) {
 			// Quartus
 			ArchitecturePrinter projectQsfPrinter = new ArchitecturePrinter(
-					"net/sf/orcc/backends/tta/Quartus_Project.stg");
+					"net/sf/orcc/backends/llvm/tta/Quartus_Project.stg");
 			projectQsfPrinter.getOptions().put("fpga", fpga);
 			CustomPrinter projectQpfPrinter = new CustomPrinter(
-					"net/sf/orcc/backends/tta/Quartus_Project.stg");
+					"net/sf/orcc/backends/llvm/tta/Quartus_Project.stg");
 			projectQsfPrinter.print("top.qsf", path, design);
 			projectQpfPrinter.print("top.qpf", path, "printQpf");
 		} else if (fpga.isXilinx()) {
 			// ISE
 			ArchitecturePrinter projectXisePrinter = new ArchitecturePrinter(
-					"net/sf/orcc/backends/tta/ISE_Project.stg");
+					"net/sf/orcc/backends/llvm/tta/ISE_Project.stg");
 			projectXisePrinter.getOptions().put("fpga", fpga);
 			projectXisePrinter.print("top.xise", path, design);
 			projectXisePrinter.print("top.ucf", path, design);
@@ -244,13 +246,13 @@ public class TTABackendImpl extends AbstractBackend {
 
 		// ModelSim
 		ArchitecturePrinter tclPrinter = new ArchitecturePrinter(
-				"net/sf/orcc/backends/tta/ModelSim_Script.stg");
+				"net/sf/orcc/backends/llvm/tta/ModelSim_Script.stg");
 		tclPrinter.getOptions().put("fpga", fpga);
 		ArchitecturePrinter tbPrinter = new ArchitecturePrinter(
-				"net/sf/orcc/backends/tta/VHDL_Testbench.stg");
+				"net/sf/orcc/backends/llvm/tta/VHDL_Testbench.stg");
 		tbPrinter.getOptions().put("fifoSize", fifoSize);
 		ArchitecturePrinter wavePrinter = new ArchitecturePrinter(
-				"net/sf/orcc/backends/tta/ModelSim_Wave.stg");
+				"net/sf/orcc/backends/llvm/tta/ModelSim_Wave.stg");
 		wavePrinter.setExpressionPrinter(new LLVMExpressionPrinter());
 		tclPrinter.print("top.tcl", path, design);
 		tbPrinter.print("top_tb.vhd", path, design);
@@ -262,9 +264,9 @@ public class TTABackendImpl extends AbstractBackend {
 
 		// Print high-level description
 		ArchitecturePrinter adfPrinter = new ArchitecturePrinter(
-				"net/sf/orcc/backends/tta/TCE_Processor_ADF.stg");
+				"net/sf/orcc/backends/llvm/tta/TCE_Processor_ADF.stg");
 		ArchitecturePrinter idfPrinter = new ArchitecturePrinter(
-				"net/sf/orcc/backends/tta/TCE_Processor_IDF.stg");
+				"net/sf/orcc/backends/llvm/tta/TCE_Processor_IDF.stg");
 
 		adfPrinter.print(tta.getName() + ".adf", processorPath, tta);
 		idfPrinter.print(tta.getName() + ".idf", processorPath, tta);
@@ -272,14 +274,14 @@ public class TTABackendImpl extends AbstractBackend {
 		// Print ModelSim testbench and wave
 		String simPath = OrccUtil.createFolder(processorPath, "simulation");
 		ArchitecturePrinter tbPrinter = new ArchitecturePrinter(
-				"net/sf/orcc/backends/tta/VHDL_Testbench.stg");
+				"net/sf/orcc/backends/llvm/tta/VHDL_Testbench.stg");
 		tbPrinter.getOptions().put("fifoSize", fifoSize);
 		tbPrinter.getOptions().put("fpga", fpga);
 		ArchitecturePrinter tclPrinter = new ArchitecturePrinter(
-				"net/sf/orcc/backends/tta/ModelSim_Script.stg");
+				"net/sf/orcc/backends/llvm/tta/ModelSim_Script.stg");
 		tclPrinter.getOptions().put("fpga", fpga);
 		ArchitecturePrinter wavePrinter = new ArchitecturePrinter(
-				"net/sf/orcc/backends/tta/ModelSim_Wave.stg");
+				"net/sf/orcc/backends/llvm/tta/ModelSim_Wave.stg");
 
 		tbPrinter.print(tta.getName() + "_tb.vhd", simPath, tta);
 		wavePrinter.print("wave.do", simPath, tta);
@@ -287,7 +289,7 @@ public class TTABackendImpl extends AbstractBackend {
 
 		// Print assembly code of actor-scheduler
 		ArchitecturePrinter schedulerPrinter = new ArchitecturePrinter(
-				"net/sf/orcc/backends/tta/LLVM_Actor.stg");
+				"net/sf/orcc/backends/llvm/tta/LLVM_Actor.stg");
 		schedulerPrinter.setExpressionPrinter(new LLVMExpressionPrinter());
 		schedulerPrinter.setTypePrinter(new LLVMTypePrinter());
 		schedulerPrinter.print(tta.getName() + ".ll", processorPath, tta);
