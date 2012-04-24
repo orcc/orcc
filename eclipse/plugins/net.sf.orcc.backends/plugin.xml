@@ -34,8 +34,8 @@
          </option>
       </backend>
       <backend
-            class="net.sf.orcc.backends.llvm.LLVMBackendImpl"
-            name="LLVM">
+            class="net.sf.orcc.backends.llvm.jit.JadeBackendImpl"
+            name="Jade">
          <option
                id="net.sf.orcc.backends.llvmMode">
          </option>
@@ -53,6 +53,13 @@
          </option>
       </backend>
       <backend
+            class="net.sf.orcc.backends.llvm.aot.LLVMBackendImpl"
+            name="LLVM">
+         <option
+               id="net.sf.orcc.plugins.compileXDF">
+         </option>
+      </backend>
+      <backend
             class="net.sf.orcc.backends.xlim.XlimBackendImpl"
             name="XLIM">
          <option
@@ -66,7 +73,7 @@
          </option>
       </backend>
       <backend
-            class="net.sf.orcc.backends.tta.TTABackendImpl"
+            class="net.sf.orcc.backends.llvm.tta.TTABackendImpl"
             name="TTA">
          <option
                id="net.sf.orcc.plugins.compileXDF">
@@ -328,7 +335,7 @@
             thread="main"
             visible="true">
          <run
-               class="net.sf.orcc.backends.tta.TTABackendImpl">
+               class="net.sf.orcc.backends.llvm.tta.TTABackendImpl">
          </run>
       </application>
    </extension>
@@ -340,7 +347,7 @@
             thread="main"
             visible="true">
          <run
-               class="net.sf.orcc.backends.llvm.LLVMBackendImpl">
+               class="net.sf.orcc.backends.llvm.aot.LLVMBackendImpl">
          </run>
       </application>
    </extension>

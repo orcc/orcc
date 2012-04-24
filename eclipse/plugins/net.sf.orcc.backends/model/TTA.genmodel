@@ -6,8 +6,17 @@
     copyrightFields="false" usedGenPackages="../../net.sf.orcc.core/model/Core.genmodel#//df ../../net.sf.orcc.core/model/Core.genmodel#//ir ../../net.sf.orcc.core/model/Core.genmodel#//moc platform:/plugin/org.eclipse.emf.ecore/model/Ecore.genmodel#//ecore ../../net.sf.dftools.models/model/Graph.genmodel#//graph ../../net.sf.dftools.models/model/Graph.genmodel#//util">
   <foreignModel>TTA.ecore</foreignModel>
   <foreignModel>../../net.sf.orcc.core/model/Ir.ecore</foreignModel>
-  <genPackages prefix="Architecture" basePackage="net.sf.orcc.backends.tta" disposableProviderFactory="true"
+  <genPackages prefix="Architecture" basePackage="net.sf.orcc.backends.llvm.tta" disposableProviderFactory="true"
       ecorePackage="TTA.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="TTA.ecore#//DesignConfiguration">
+      <genEnumLiterals ecoreEnumLiteral="TTA.ecore#//DesignConfiguration/DirectMapping"/>
+      <genEnumLiterals ecoreEnumLiteral="TTA.ecore#//DesignConfiguration/Hade"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="TTA.ecore#//ProcessorConfiguration">
+      <genEnumLiterals ecoreEnumLiteral="TTA.ecore#//ProcessorConfiguration/Standard"/>
+      <genEnumLiterals ecoreEnumLiteral="TTA.ecore#//ProcessorConfiguration/Custom"/>
+      <genEnumLiterals ecoreEnumLiteral="TTA.ecore#//ProcessorConfiguration/Huge"/>
+    </genEnums>
     <genEnums typeSafeEnumCompatible="false" ecoreEnum="TTA.ecore#//SocketType">
       <genEnumLiterals ecoreEnumLiteral="TTA.ecore#//SocketType/input"/>
       <genEnumLiterals ecoreEnumLiteral="TTA.ecore#//SocketType/output"/>
@@ -24,11 +33,38 @@
       <genEnumLiterals ecoreEnumLiteral="TTA.ecore#//OpBinary/and"/>
       <genEnumLiterals ecoreEnumLiteral="TTA.ecore#//OpBinary/or"/>
     </genEnums>
-    <genClasses ecoreClass="TTA.ecore#//Design"/>
-    <genClasses ecoreClass="TTA.ecore#//HwFifo"/>
-    <genClasses ecoreClass="TTA.ecore#//HwBroadcast"/>
+    <genClasses ecoreClass="TTA.ecore#//Design">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//Design/name"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//Design/components"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//Design/processors"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//Design/broadcasts"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//Design/fifos"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//Design/memories"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//Design/signals"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//Design/inputs"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//Design/outputs"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//Design/configuration"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="TTA.ecore#//Link">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//Link/sourcePort"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//Link/targetPort"/>
+    </genClasses>
+    <genClasses ecoreClass="TTA.ecore#//Signal">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//Signal/size"/>
+    </genClasses>
+    <genClasses ecoreClass="TTA.ecore#//Fifo"/>
+    <genClasses ecoreClass="TTA.ecore#//Component">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//Component/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//Component/inputs"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//Component/outputs"/>
+    </genClasses>
+    <genClasses ecoreClass="TTA.ecore#//Memory">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//Memory/size"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//Memory/width"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//Memory/mappedConnections"/>
+    </genClasses>
+    <genClasses ecoreClass="TTA.ecore#//Port"/>
     <genClasses ecoreClass="TTA.ecore#//Processor">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//Processor/name"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//Processor/gcu"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//Processor/buses"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//Processor/bridges"/>
@@ -38,7 +74,8 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//Processor/program"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//Processor/data"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//Processor/hardwareDatabase"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//Processor/mappedActors"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//Processor/mappedInstances"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//Processor/configuration"/>
     </genClasses>
     <genClasses ecoreClass="TTA.ecore#//Bus">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//Bus/name"/>
@@ -79,15 +116,15 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//RegisterFile/ports"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//RegisterFile/implementation"/>
     </genClasses>
-    <genClasses ecoreClass="TTA.ecore#//Port">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//Port/name"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//Port/inputSocket"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//Port/outputSocket"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//Port/width"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//Port/trigger"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//Port/opcodeSelector"/>
-      <genOperations ecoreOperation="TTA.ecore#//Port/connect">
-        <genParameters ecoreParameter="TTA.ecore#//Port/connect/socket"/>
+    <genClasses ecoreClass="TTA.ecore#//FuPort">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//FuPort/name"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//FuPort/inputSocket"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//FuPort/outputSocket"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//FuPort/width"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//FuPort/trigger"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//FuPort/opcodeSelector"/>
+      <genOperations ecoreOperation="TTA.ecore#//FuPort/connect">
+        <genParameters ecoreParameter="TTA.ecore#//FuPort/connect/socket"/>
       </genOperations>
     </genClasses>
     <genClasses ecoreClass="TTA.ecore#//Socket">
