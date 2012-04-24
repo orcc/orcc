@@ -178,7 +178,7 @@ endif>
 bb_<action.name>_check_outputs:
 <if(!action.outputPattern.empty)
 >	;; Output pattern
-	<printPortsStatus("OUT", actor.outputs, action)>
+	<printPortsStatus("OUT", instance.actor.outputs, action)>
 	<checkOutputPattern(action, action.outputPattern)>
 	
 	br i1 %has_valid_outputs_<action.name>_<length(action.outputPattern.ports)>, label %bb_<action.name>_fire, label %bb_<action.name>_check_outputs<
@@ -229,7 +229,7 @@ endif>
 bb_<sourceState.name>_<transition.action.name>_check_outputs:
 <if(!transition.action.outputPattern.empty)
 >	;; Output pattern
-	<printPortsStatus("OUT", actor.outputs, transition.action, sourceState)>
+	<printPortsStatus("OUT", instance.actor.outputs, transition.action, sourceState)>
 	<checkOutputPattern(transition.action, transition.action.outputPattern, sourceState)>
 	
 	br i1 %has_valid_outputs_<sourceState.name>_<transition.action.name>_<length(transition.action.outputPattern.ports)>, label %bb_<sourceState.name>_<transition.action.name>_fire, label %bb_scheduler_start<
@@ -346,7 +346,7 @@ actorParameter(var, expr) ::= <<
 // Instance
 ///////////////////////////////////////////////////////////////////////////////
 
-printActor(actor) ::= <<
+printInstance(instance) ::= <<
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; "<instance.actor.file>"
 
@@ -356,66 +356,62 @@ printActor(actor) ::= <<
 <instance.arguments: { argument | <actorParameter(argument.variable, argument.value)> }; separator="\n">
 <endif>
 
-<if(actor.stateVars)>
+<if(instance.actor.stateVars)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; State variables of the actor
-<actor.stateVars: stateVar(); separator="\n">
+<instance.actor.stateVars: stateVar(); separator="\n">
 <endif>
 
-<if(actor.inputs)>
+<if(instance.actor.inputs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Input FIFOs
-<actor.inputs: { input | <printReadFunction(input, i0, actor.templateData.portToNeedCastMap.(input))> }; separator="\n\n">
+<instance.actor.inputs: { input | <printReadFunction(input, i0, instance.actor.templateData.portToNeedCastMap.(input))> }; separator="\n\n">
 
-<actor.inputs: { input | <printPeekFunction(input, i0, actor.templateData.portToNeedCastMap.(input))> }; separator="\n\n">
+<instance.actor.inputs: { input | <printPeekFunction(input, i0, instance.actor.templateData.portToNeedCastMap.(input))> }; separator="\n\n">
 <endif>
 
-<if(actor.outputs)>
+<if(instance.actor.outputs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Output FIFOs
-<actor.outputs: { output | <printWriteFunction(output, i0, actor.templateData.portToNeedCastMap.(output))> }; separator="\n\n">
+<instance.actor.outputs: { output | <printWriteFunction(output, i0, instance.actor.templateData.portToNeedCastMap.(output))> }; separator="\n\n">
 <endif>
 
-<if(actor.procs)>
+<if(instance.actor.procs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Functions/procedures
-<actor.procs: {proc | <procedure(procedure = proc)>}>
+<instance.actor.procs: {proc | <procedure(procedure = proc)>}>
 <endif>
 
-<if(actor.initializes)>
+<if(instance.actor.initializes)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Initializes
-<actor.initializes: printAction(); separator="\n\n">
+<instance.actor.initializes: printAction(); separator="\n\n">
 <endif>
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Actions
-<actor.actions: printAction(); separator="\n\n">
+<instance.actor.actions: printAction(); separator="\n\n">
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Action-scheduler
-<if(actor.fsm)>
-@_FSM_state = global i32 <actor.templateData.stateToLabelMap.(actor.fsm.initialState)>
+<if(instance.actor.fsm)>
+@_FSM_state = global i32 <instance.actor.templateData.stateToLabelMap.(instance.actor.fsm.initialState)>
 <endif>
 
 define external void @<instance.name>_scheduler() noreturn nounwind {
 entry:
-	<actor.initializes: callInitialize(); separator="\n">
+	<instance.actor.initializes: callInitialize(); separator="\n">
 
 	br label %bb_scheduler_start
 
 	bb_scheduler_start:
-	<printPortsStatus("IN", actor.inputs)>
-<if(actor.fsm)
-><schedulerWithFSM(actor.actionsOutsideFsm, actor.fsm)><
+	<printPortsStatus("IN", instance.actor.inputs)>
+<if(instance.actor.fsm)
+><schedulerWithFSM(instance.actor.actionsOutsideFsm, instance.actor.fsm)><
 else
-><schedulerWithoutFSM(actor.actionsOutsideFsm)><
+><schedulerWithoutFSM(instance.actor.actionsOutsideFsm)><
 endif>
 }
->>
-
-printInstance(instance) ::= <<
-<if(instance.actor)><printActor(instance.actor)><endif>
 >>
 
 callScheduler(instance) ::= <<
