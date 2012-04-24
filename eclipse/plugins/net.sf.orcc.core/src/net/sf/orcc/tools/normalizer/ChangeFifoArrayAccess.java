@@ -31,6 +31,7 @@ package net.sf.orcc.tools.normalizer;
 import java.util.List;
 
 import net.sf.orcc.df.Pattern;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.Expression;
@@ -40,7 +41,7 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 
 /**
  * This class defines a transform that changes the load/store on FIFO arrays so
@@ -50,41 +51,50 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * @author Jerome Gorin
  * 
  */
-public class ChangeFifoArrayAccess extends AbstractActorVisitor<Object> {
+public class ChangeFifoArrayAccess extends DfVisitor<Object> {
 
-	private void updateIndex(Var var, List<Expression> indexes) {
-		if (indexes.size() < 2) {
-			Var varCount = actor.getStateVar(var.getName() + "_count");
-			ExprBinary expr = IrFactory.eINSTANCE.createExprBinary(
-					IrFactory.eINSTANCE.createExprVar(varCount), OpBinary.PLUS,
-					indexes.get(0), IrFactory.eINSTANCE.createTypeInt(32));
+	private class IrVisitor extends AbstractIrVisitor<Object> {
 
-			indexes.set(0, expr);
-		} else {
-			System.err.println("TODO index");
+		@Override
+		public Object caseInstLoad(InstLoad load) {
+			Use use = load.getSource();
+			Var var = use.getVariable();
+			if (var.isLocal() && var.eContainer() instanceof Pattern) {
+				use.setVariable(actor.getStateVar(var.getName()));
+				updateIndex(var, load.getIndexes());
+			}
+			return null;
 		}
+
+		@Override
+		public Object caseInstStore(InstStore store) {
+			Def def = store.getTarget();
+			Var var = def.getVariable();
+			if (var.isLocal() && var.eContainer() instanceof Pattern) {
+				def.setVariable(actor.getStateVar(var.getName()));
+				updateIndex(var, store.getIndexes());
+			}
+			return null;
+		}
+
+		private void updateIndex(Var var, List<Expression> indexes) {
+			if (indexes.size() < 2) {
+				Var varCount = actor.getStateVar(var.getName() + "_count");
+				ExprBinary expr = IrFactory.eINSTANCE.createExprBinary(
+						IrFactory.eINSTANCE.createExprVar(varCount),
+						OpBinary.PLUS, indexes.get(0),
+						IrFactory.eINSTANCE.createTypeInt(32));
+
+				indexes.set(0, expr);
+			} else {
+				System.err.println("TODO index");
+			}
+		}
+
 	}
 
-	@Override
-	public Object caseInstLoad(InstLoad load) {
-		Use use = load.getSource();
-		Var var = use.getVariable();
-		if (var.isLocal() && var.eContainer() instanceof Pattern) {
-			use.setVariable(actor.getStateVar(var.getName()));
-			updateIndex(var, load.getIndexes());
-		}
-		return null;
-	}
-
-	@Override
-	public Object caseInstStore(InstStore store) {
-		Def def = store.getTarget();
-		Var var = def.getVariable();
-		if (var.isLocal() && var.eContainer() instanceof Pattern) {
-			def.setVariable(actor.getStateVar(var.getName()));
-			updateIndex(var, store.getIndexes());
-		}
-		return null;
+	public ChangeFifoArrayAccess() {
+		irVisitor = new IrVisitor();
 	}
 
 }

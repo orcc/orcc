@@ -19,6 +19,7 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockWhile;
@@ -35,7 +36,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.Invocation;
@@ -47,22 +48,58 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 
 public class MergerHsdf extends DfSwitch<Actor> {
 
-	private class ChangeFifoArrayAccess extends AbstractActorVisitor<Object> {
+	private class ChangeFifoArrayAccess extends DfVisitor<Object> {
+
+		private class IrVisitor extends AbstractIrVisitor<Object> {
+
+			@Override
+			public Object caseInstLoad(InstLoad load) {
+				Use use = load.getSource();
+				Var var = use.getVariable();
+				Port port = inputPattern.getVarToPortMap().get(var);
+
+				if (var.isLocal() && port != null) {
+					var = buffersMap.get(port);
+					int cns = inputPattern.getNumTokens(port);
+					loads.put(var, cns);
+					use.setVariable(var);
+				}
+
+				return null;
+			}
+
+			@Override
+			public Object caseInstStore(InstStore store) {
+				Def def = store.getTarget();
+				Var var = def.getVariable();
+				Port port = outputPattern.getVarToPortMap().get(var);
+				if (var.isLocal() && port != null) {
+					var = buffersMap.get(port);
+					int prd = outputPattern.getNumTokens(port);
+					stores.put(var, prd);
+					def.setVariable(var);
+				}
+				return null;
+			}
+
+		};
+
+		private Map<Port, Var> buffersMap;
+		private Pattern inputPattern;
 
 		private Map<Var, Integer> loads;
-		private Map<Var, Integer> stores;
-
-		private Pattern inputPattern;
 
 		private Pattern outputPattern;
 
-		private Map<Port, Var> buffersMap;
+		private Map<Var, Integer> stores;
 
 		public ChangeFifoArrayAccess(Pattern inputPattern,
 				Pattern outputPattern, Map<Port, Var> buffersMap) {
 			this.inputPattern = inputPattern;
 			this.outputPattern = outputPattern;
 			this.buffersMap = buffersMap;
+
+			irVisitor = new IrVisitor();
 		}
 
 		@Override
@@ -76,55 +113,25 @@ public class MergerHsdf extends DfSwitch<Actor> {
 			return null;
 		}
 
-		@Override
-		public Object caseInstLoad(InstLoad load) {
-			Use use = load.getSource();
-			Var var = use.getVariable();
-			Port port = inputPattern.getVarToPortMap().get(var);
-
-			if (var.isLocal() && port != null) {
-				var = buffersMap.get(port);
-				int cns = inputPattern.getNumTokens(port);
-				loads.put(var, cns);
-				use.setVariable(var);
-			}
-
-			return null;
-		}
-
-		@Override
-		public Object caseInstStore(InstStore store) {
-			Def def = store.getTarget();
-			Var var = def.getVariable();
-			Port port = outputPattern.getVarToPortMap().get(var);
-			if (var.isLocal() && port != null) {
-				var = buffersMap.get(port);
-				int prd = outputPattern.getNumTokens(port);
-				stores.put(var, prd);
-				def.setVariable(var);
-			}
-			return null;
-		}
-
 	}
-
-	private static int index;
 
 	private static final String ACTION_NAME = "static_schedule";
 
+	private static int index;
+
 	private static final String SCHEDULER_NAME = "isSchedulable_" + ACTION_NAME;
 
-	private Actor superActor;
+	private Map<Port, Var> buffersMap = new HashMap<Port, Var>();
 
-	private AbstractScheduler scheduler;
+	private Map<Port, Var> inputToVarMap = new HashMap<Port, Var>();
 
 	private Network network;
 
 	private Map<Port, Port> portsMap = new HashMap<Port, Port>();
 
-	private Map<Port, Var> inputToVarMap = new HashMap<Port, Var>();
+	private AbstractScheduler scheduler;
 
-	private Map<Port, Var> buffersMap = new HashMap<Port, Var>();
+	private Actor superActor;
 
 	public MergerHsdf(AbstractScheduler scheduler) {
 		this.scheduler = scheduler;
@@ -137,36 +144,35 @@ public class MergerHsdf extends DfSwitch<Actor> {
 		superActor.getStateVars().add(var);
 	}
 
-	/**
-	 * Creates input and output ports of the merged actor.
-	 * 
-	 */
-	private void createPorts() {
-		Copier copier = new Copier();
-		SDFMoC sdfMoC = MocFactory.eINSTANCE.createSDFMoC();
-		superActor.setMoC(sdfMoC);
-		superActor.getInputs().addAll(copier.copyAll(network.getInputs()));
-		superActor.getOutputs().addAll(copier.copyAll(network.getOutputs()));
-		copier.copyReferences();
+	@Override
+	public Actor caseNetwork(Network network) {
+		this.network = network;
+		superActor = DfFactory.eINSTANCE.createActor();
+		String name = "cluster" + index;
+		superActor.setName(name);
 
-		for (Port port : network.getInputs()) {
-			Connection connection = (Connection) port.getOutgoing().get(0);
-			Vertex tgt = connection.getTarget();
-			CSDFMoC moc = (CSDFMoC) ((Instance) tgt).getMoC();
-			int cns = moc.getNumTokensConsumed(connection.getTargetPort());
-			Port portCopy = (Port) copier.get(port);
-			sdfMoC.getInputPattern().setNumTokens(portCopy, cns);
-			portsMap.put(portCopy, connection.getTargetPort());
-		}
+		new SdfToHsdf(scheduler.getRepetitions()).doSwitch(network);
 
-		for (Port port : network.getOutputs()) {
-			Connection connection = (Connection) port.getIncoming().get(0);
-			Vertex src = connection.getSource();
-			CSDFMoC moc = (CSDFMoC) ((Instance) src).getMoC();
-			int prd = moc.getNumTokensProduced(connection.getSourcePort());
-			Port portCopy = (Port) copier.get(port);
-			sdfMoC.getOutputPattern().setNumTokens(portCopy, prd);
-			portsMap.put(portCopy, connection.getSourcePort());
+		new UniqueInstantiator().doSwitch(network);
+
+		createPorts();
+		copyStateVariables();
+		copyProcedures();
+		createStateVariables();
+		createProcedures();
+		createStaticAction();
+
+		return superActor;
+	}
+
+	private void copyProcedures() {
+		for (Instance instance : network.getInstances()) {
+			String id = instance.getName();
+			Actor actor = instance.getActor();
+			for (Procedure proc : new ArrayList<Procedure>(actor.getProcs())) {
+				proc.setName(id + "_" + proc.getName());
+				superActor.getProcs().add(proc);
+			}
 		}
 	}
 
@@ -182,134 +188,40 @@ public class MergerHsdf extends DfSwitch<Actor> {
 		}
 	}
 
-	private void copyProcedures() {
-		for (Instance instance : network.getInstances()) {
-			String id = instance.getName();
-			Actor actor = instance.getActor();
-			for (Procedure proc : new ArrayList<Procedure>(actor.getProcs())) {
-				proc.setName(id + "_" + proc.getName());
-				superActor.getProcs().add(proc);
-			}
-		}
-	}
-
 	/**
-	 * Create global list variables to replace the FIFOs.
 	 * 
+	 * @param ip
+	 * @param op
+	 * @return
 	 */
-	private void createStateVariables() {
-		buffersMap = new HashMap<Port, Var>();
-		inputToVarMap = new HashMap<Port, Var>();
-		SDFMoC sdfMoc = (SDFMoC) superActor.getMoC();
-
-		int index = 0;
-		// Create buffers for inputs
-		for (Port port : superActor.getInputs()) {
-			String name = "buffer_" + index++;
-			int numTokens = sdfMoc.getNumTokensConsumed(port);
-			addBuffer(name, numTokens, port.getType());
-			inputToVarMap.put(port, superActor.getStateVar(name));
-			buffersMap.put(portsMap.get(port), superActor.getStateVar(name));
-		}
-
-		// Create buffers for outputs
-		for (Port port : superActor.getOutputs()) {
-			String name = "buffer_" + index++;
-			int numTokens = sdfMoc.getNumTokensProduced(port);
-			addBuffer(name, numTokens, port.getType());
-			inputToVarMap.put(port, superActor.getStateVar(name));
-			buffersMap.put(portsMap.get(port), superActor.getStateVar(name));
-		}
-
-		// Create buffers for connections inside the sub-graph
-		for (Connection connection : network.getConnections()) {
-			Vertex src = connection.getSource();
-			Vertex tgt = connection.getTarget();
-			if (src instanceof Instance && tgt instanceof Instance) {
-				String name = "buffer_" + index++;
-				Port srcPort = connection.getSourcePort();
-				Port tgtPort = connection.getTargetPort();
-				int prd = ((CSDFMoC) ((Instance) src).getMoC())
-						.getNumTokensProduced(srcPort);
-				addBuffer(name, prd, srcPort.getType());
-				buffersMap.put(srcPort, superActor.getStateVar(name));
-				buffersMap.put(tgtPort, superActor.getStateVar(name));
-			}
-		}
-	}
-
-	/**
-	 * Turns actions of CSDF actors into procedures
-	 * 
-	 */
-	private void createProcedures() {
+	private Procedure createBody(Pattern ip, Pattern op) {
 		IrFactory factory = IrFactory.eINSTANCE;
-		for (Instance instance : network.getInstances()) {
-			CSDFMoC moc = (CSDFMoC) instance.getMoC();
-			Iterator<Invocation> it = moc.getInvocations().iterator();
 
-			Set<Action> alreadyExists = new HashSet<Action>();
-			while (it.hasNext()) {
-				Action action = it.next().getAction();
-				if (!alreadyExists.contains(action)) {
-					alreadyExists.add(action);
-					String name = instance.getName() + "_" + action.getName();
-					Procedure proc = factory.createProcedure(name, 0,
-							factory.createTypeVoid());
+		Procedure procedure = factory.createProcedure(ACTION_NAME, 0,
+				IrFactory.eINSTANCE.createTypeVoid());
 
-					Procedure body = action.getBody();
-					List<Block> nodes = body.getBlocks();
-					proc.getLocals().addAll(body.getLocals());
-					proc.getBlocks().addAll(nodes);
-					IrUtil.getLast(nodes).add(factory.createInstReturn());
-					superActor.getProcs().add(proc);
-					new ChangeFifoArrayAccess(action.getInputPattern(),
-							action.getOutputPattern(), buffersMap)
-							.doSwitch(superActor);
-
-				}
-			}
+		// Add temp vars to load/store data from ports to buffers
+		for (Port port : ip.getPorts()) {
+			Type type = port.getType();
+			String name = port.getName();
+			Var tmp = factory.createVar(0, type, "tmp_" + name, false, true);
+			procedure.getLocals().add(tmp);
 		}
-	}
 
-	/**
-	 * Creates the input pattern of the static action.
-	 * 
-	 * @return ip
-	 */
-	private Pattern createInputPattern() {
-		Pattern ip = DfFactory.eINSTANCE.createPattern();
-		SDFMoC moc = (SDFMoC) superActor.getMoC();
-		for (Port port : superActor.getInputs()) {
-			int numTokens = moc.getNumTokensConsumed(port);
-			Type type = IrFactory.eINSTANCE.createTypeList(numTokens,
-					EcoreUtil.copy(port.getType()));
-			Var var = IrFactory.eINSTANCE.createVar(0, type, port.getName(),
-					false, true);
-			ip.setNumTokens(port, numTokens);
-			ip.setVariable(port, var);
+		for (Port port : op.getPorts()) {
+			Type type = port.getType();
+			String name = port.getName();
+			Var tmp = factory.createVar(0, type, "tmp_" + name, false, true);
+			procedure.getLocals().add(tmp);
 		}
-		return ip;
-	}
 
-	/**
-	 * Creates the output pattern of the static action.
-	 * 
-	 * @return op
-	 */
-	private Pattern createOutputPattern() {
-		IrFactory factory = IrFactory.eINSTANCE;
-		Pattern op = DfFactory.eINSTANCE.createPattern();
-		SDFMoC moc = (SDFMoC) superActor.getMoC();
-		for (Port port : superActor.getOutputs()) {
-			int numTokens = moc.getNumTokensProduced(port);
-			Type type = factory.createTypeList(numTokens,
-					EcoreUtil.copy(port.getType()));
-			Var var = factory.createVar(0, type, port.getName(), false, true);
-			op.setNumTokens(port, numTokens);
-			op.setVariable(port, var);
-		}
-		return op;
+		createCopiesFromInputs(procedure, ip);
+
+		createStaticSchedule(procedure);
+
+		createCopiesToOutputs(procedure, op);
+
+		return procedure;
 	}
 
 	/**
@@ -408,6 +320,113 @@ public class MergerHsdf extends DfSwitch<Actor> {
 	}
 
 	/**
+	 * Creates the input pattern of the static action.
+	 * 
+	 * @return ip
+	 */
+	private Pattern createInputPattern() {
+		Pattern ip = DfFactory.eINSTANCE.createPattern();
+		SDFMoC moc = (SDFMoC) superActor.getMoC();
+		for (Port port : superActor.getInputs()) {
+			int numTokens = moc.getNumTokensConsumed(port);
+			Type type = IrFactory.eINSTANCE.createTypeList(numTokens,
+					EcoreUtil.copy(port.getType()));
+			Var var = IrFactory.eINSTANCE.createVar(0, type, port.getName(),
+					false, true);
+			ip.setNumTokens(port, numTokens);
+			ip.setVariable(port, var);
+		}
+		return ip;
+	}
+
+	/**
+	 * Creates the output pattern of the static action.
+	 * 
+	 * @return op
+	 */
+	private Pattern createOutputPattern() {
+		IrFactory factory = IrFactory.eINSTANCE;
+		Pattern op = DfFactory.eINSTANCE.createPattern();
+		SDFMoC moc = (SDFMoC) superActor.getMoC();
+		for (Port port : superActor.getOutputs()) {
+			int numTokens = moc.getNumTokensProduced(port);
+			Type type = factory.createTypeList(numTokens,
+					EcoreUtil.copy(port.getType()));
+			Var var = factory.createVar(0, type, port.getName(), false, true);
+			op.setNumTokens(port, numTokens);
+			op.setVariable(port, var);
+		}
+		return op;
+	}
+
+	/**
+	 * Creates input and output ports of the merged actor.
+	 * 
+	 */
+	private void createPorts() {
+		Copier copier = new Copier();
+		SDFMoC sdfMoC = MocFactory.eINSTANCE.createSDFMoC();
+		superActor.setMoC(sdfMoC);
+		superActor.getInputs().addAll(copier.copyAll(network.getInputs()));
+		superActor.getOutputs().addAll(copier.copyAll(network.getOutputs()));
+		copier.copyReferences();
+
+		for (Port port : network.getInputs()) {
+			Connection connection = (Connection) port.getOutgoing().get(0);
+			Vertex tgt = connection.getTarget();
+			CSDFMoC moc = (CSDFMoC) ((Instance) tgt).getMoC();
+			int cns = moc.getNumTokensConsumed(connection.getTargetPort());
+			Port portCopy = (Port) copier.get(port);
+			sdfMoC.getInputPattern().setNumTokens(portCopy, cns);
+			portsMap.put(portCopy, connection.getTargetPort());
+		}
+
+		for (Port port : network.getOutputs()) {
+			Connection connection = (Connection) port.getIncoming().get(0);
+			Vertex src = connection.getSource();
+			CSDFMoC moc = (CSDFMoC) ((Instance) src).getMoC();
+			int prd = moc.getNumTokensProduced(connection.getSourcePort());
+			Port portCopy = (Port) copier.get(port);
+			sdfMoC.getOutputPattern().setNumTokens(portCopy, prd);
+			portsMap.put(portCopy, connection.getSourcePort());
+		}
+	}
+
+	/**
+	 * Turns actions of CSDF actors into procedures
+	 * 
+	 */
+	private void createProcedures() {
+		IrFactory factory = IrFactory.eINSTANCE;
+		for (Instance instance : network.getInstances()) {
+			CSDFMoC moc = (CSDFMoC) instance.getMoC();
+			Iterator<Invocation> it = moc.getInvocations().iterator();
+
+			Set<Action> alreadyExists = new HashSet<Action>();
+			while (it.hasNext()) {
+				Action action = it.next().getAction();
+				if (!alreadyExists.contains(action)) {
+					alreadyExists.add(action);
+					String name = instance.getName() + "_" + action.getName();
+					Procedure proc = factory.createProcedure(name, 0,
+							factory.createTypeVoid());
+
+					Procedure body = action.getBody();
+					List<Block> nodes = body.getBlocks();
+					proc.getLocals().addAll(body.getLocals());
+					proc.getBlocks().addAll(nodes);
+					IrUtil.getLast(nodes).add(factory.createInstReturn());
+					superActor.getProcs().add(proc);
+					new ChangeFifoArrayAccess(action.getInputPattern(),
+							action.getOutputPattern(), buffersMap)
+							.doSwitch(superActor);
+
+				}
+			}
+		}
+	}
+
+	/**
 	 * Creates the scheduler of the static action.
 	 * 
 	 * @return the scheduler of the static action
@@ -424,59 +443,48 @@ public class MergerHsdf extends DfSwitch<Actor> {
 	}
 
 	/**
-	 * Create the static schedule of the action
+	 * Create global list variables to replace the FIFOs.
 	 * 
-	 * @param procedure
 	 */
-	private void createStaticSchedule(Procedure procedure) {
-		for (Vertex vertex : new ReversePostOrder(network, network.getInputs())) {
-			Instance instance = (Instance) vertex;
-			CSDFMoC moc = (CSDFMoC) instance.getMoC();
-			BlockBasic block = procedure.getLast();
-			for (Invocation invocation : moc.getInvocations()) {
-				Action action = invocation.getAction();
-				Procedure proc = superActor.getProcedure(instance.getName()
-						+ "_" + action.getName());
-				block.add(IrFactory.eINSTANCE.createInstCall(0, null, proc,
-						new ArrayList<Expression>()));
+	private void createStateVariables() {
+		buffersMap = new HashMap<Port, Var>();
+		inputToVarMap = new HashMap<Port, Var>();
+		SDFMoC sdfMoc = (SDFMoC) superActor.getMoC();
+
+		int index = 0;
+		// Create buffers for inputs
+		for (Port port : superActor.getInputs()) {
+			String name = "buffer_" + index++;
+			int numTokens = sdfMoc.getNumTokensConsumed(port);
+			addBuffer(name, numTokens, port.getType());
+			inputToVarMap.put(port, superActor.getStateVar(name));
+			buffersMap.put(portsMap.get(port), superActor.getStateVar(name));
+		}
+
+		// Create buffers for outputs
+		for (Port port : superActor.getOutputs()) {
+			String name = "buffer_" + index++;
+			int numTokens = sdfMoc.getNumTokensProduced(port);
+			addBuffer(name, numTokens, port.getType());
+			inputToVarMap.put(port, superActor.getStateVar(name));
+			buffersMap.put(portsMap.get(port), superActor.getStateVar(name));
+		}
+
+		// Create buffers for connections inside the sub-graph
+		for (Connection connection : network.getConnections()) {
+			Vertex src = connection.getSource();
+			Vertex tgt = connection.getTarget();
+			if (src instanceof Instance && tgt instanceof Instance) {
+				String name = "buffer_" + index++;
+				Port srcPort = connection.getSourcePort();
+				Port tgtPort = connection.getTargetPort();
+				int prd = ((CSDFMoC) ((Instance) src).getMoC())
+						.getNumTokensProduced(srcPort);
+				addBuffer(name, prd, srcPort.getType());
+				buffersMap.put(srcPort, superActor.getStateVar(name));
+				buffersMap.put(tgtPort, superActor.getStateVar(name));
 			}
 		}
-	}
-
-	/**
-	 * 
-	 * @param ip
-	 * @param op
-	 * @return
-	 */
-	private Procedure createBody(Pattern ip, Pattern op) {
-		IrFactory factory = IrFactory.eINSTANCE;
-
-		Procedure procedure = factory.createProcedure(ACTION_NAME, 0,
-				IrFactory.eINSTANCE.createTypeVoid());
-
-		// Add temp vars to load/store data from ports to buffers
-		for (Port port : ip.getPorts()) {
-			Type type = port.getType();
-			String name = port.getName();
-			Var tmp = factory.createVar(0, type, "tmp_" + name, false, true);
-			procedure.getLocals().add(tmp);
-		}
-
-		for (Port port : op.getPorts()) {
-			Type type = port.getType();
-			String name = port.getName();
-			Var tmp = factory.createVar(0, type, "tmp_" + name, false, true);
-			procedure.getLocals().add(tmp);
-		}
-
-		createCopiesFromInputs(procedure, ip);
-
-		createStaticSchedule(procedure);
-
-		createCopiesToOutputs(procedure, op);
-
-		return procedure;
 	}
 
 	/**
@@ -497,24 +505,23 @@ public class MergerHsdf extends DfSwitch<Actor> {
 		superActor.getActionsOutsideFsm().add(action);
 	}
 
-	@Override
-	public Actor caseNetwork(Network network) {
-		this.network = network;
-		superActor = DfFactory.eINSTANCE.createActor();
-		String name = "cluster" + index;
-		superActor.setName(name);
-
-		new SdfToHsdf(scheduler.getRepetitions()).doSwitch(network);
-
-		new UniqueInstantiator().doSwitch(network);
-
-		createPorts();
-		copyStateVariables();
-		copyProcedures();
-		createStateVariables();
-		createProcedures();
-		createStaticAction();
-
-		return superActor;
+	/**
+	 * Create the static schedule of the action
+	 * 
+	 * @param procedure
+	 */
+	private void createStaticSchedule(Procedure procedure) {
+		for (Vertex vertex : new ReversePostOrder(network, network.getInputs())) {
+			Instance instance = (Instance) vertex;
+			CSDFMoC moc = (CSDFMoC) instance.getMoC();
+			BlockBasic block = procedure.getLast();
+			for (Invocation invocation : moc.getInvocations()) {
+				Action action = invocation.getAction();
+				Procedure proc = superActor.getProcedure(instance.getName()
+						+ "_" + action.getName());
+				block.add(IrFactory.eINSTANCE.createInstCall(0, null, proc,
+						new ArrayList<Expression>()));
+			}
+		}
 	}
 }
