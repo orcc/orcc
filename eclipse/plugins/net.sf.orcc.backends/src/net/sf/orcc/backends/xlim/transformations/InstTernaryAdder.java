@@ -30,7 +30,10 @@ package net.sf.orcc.backends.xlim.transformations;
 
 import net.sf.orcc.backends.ir.InstTernary;
 import net.sf.orcc.backends.ir.IrSpecificFactory;
-import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Action;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
@@ -40,13 +43,10 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.BlockBasic;
-import net.sf.orcc.ir.BlockIf;
-import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.common.util.TreeIterator;
@@ -55,97 +55,89 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * 
- * This class defines a transformation that replace ifNode in function by our
- * ternary operation.
+ * This class defines a transformation that replace block 'if' in function by
+ * our ternary instruction when it is possible.
  * 
  * @author Herve Yviquel
  * 
  */
-public class InstTernaryAdder extends AbstractActorVisitor<Object> {
+public class InstTernaryAdder extends AbstractIrVisitor<Void> {
 
 	private Var condVar;
 	private BlockBasic newBlockNode;
 
 	@Override
-	public Object caseActor(Actor actor) {
-		for (Procedure procedure : actor.getProcs()) {
-			doSwitch(procedure);
-		}
-		return null;
-	}
-
-	@Override
-	public Object caseInstAssign(InstAssign assign) {
-		newBlockNode.add(IrUtil.copy(assign));
-		return null;
-	}
-
-	@Override
-	public Object caseInstCall(InstCall call) {
-		newBlockNode.add(IrUtil.copy(call));
-		return null;
-	}
-
-	@Override
-	public Object caseInstLoad(InstLoad load) {
-		newBlockNode.add(IrUtil.copy(load));
-		return null;
-	}
-
-	@Override
-	public Object caseInstPhi(InstPhi phi) {
-		InstTernary ternaryOp = IrSpecificFactory.eINSTANCE
-				.createInstTernary(phi.getTarget().getVariable(),
-						IrFactory.eINSTANCE.createExprVar(condVar),
-						IrUtil.copy(phi.getValues().get(0)),
-						IrUtil.copy(phi.getValues().get(1)));
-
-		newBlockNode.add(ternaryOp);
-		return null;
-	}
-
-	@Override
-	public Object caseInstReturn(InstReturn returnInstr) {
-		newBlockNode.add(IrUtil.copy(returnInstr));
-		return null;
-	}
-
-	@Override
-	public Object caseInstSpecific(InstSpecific inst) {
-		newBlockNode.add(IrUtil.copy(inst));
-		return null;
-	}
-
-	@Override
-	public Object caseInstStore(InstStore store) {
-		newBlockNode.add(IrUtil.copy(store));
-		return null;
-	}
-
-	@Override
-	public Object caseNodeIf(BlockIf nodeIf) {
+	public Void caseBlockIf(BlockIf blockIf) {
 		Var oldCondVar = condVar;
 
-		Expression condExpr = nodeIf.getCondition();
+		Expression condExpr = blockIf.getCondition();
 		condVar = procedure.newTempLocalVariable(
 				IrFactory.eINSTANCE.createTypeBool(),
-				"ifCondition_" + nodeIf.getLineNumber());
+				"ifCondition_" + blockIf.getLineNumber());
 		condVar.setIndex(1);
 		InstAssign assignCond = IrFactory.eINSTANCE.createInstAssign(condVar,
 				condExpr);
 		newBlockNode.add(assignCond);
 
-		doSwitch(nodeIf.getThenBlocks());
-		doSwitch(nodeIf.getElseBlocks());
-		doSwitch(nodeIf.getJoinBlock());
+		doSwitch(blockIf.getThenBlocks());
+		doSwitch(blockIf.getElseBlocks());
+		doSwitch(blockIf.getJoinBlock());
 		condVar = oldCondVar;
 
 		return null;
 	}
 
 	@Override
-	public Object caseProcedure(Procedure procedure) {
-		if (!procedure.getReturnType().isVoid() && isTernarisable(procedure)) {
+	public Void caseInstAssign(InstAssign assign) {
+		newBlockNode.add(IrUtil.copy(assign));
+		return null;
+	}
+
+	@Override
+	public Void caseInstCall(InstCall call) {
+		newBlockNode.add(IrUtil.copy(call));
+		return null;
+	}
+
+	@Override
+	public Void caseInstLoad(InstLoad load) {
+		newBlockNode.add(IrUtil.copy(load));
+		return null;
+	}
+
+	@Override
+	public Void caseInstPhi(InstPhi phi) {
+		InstTernary ternaryOp = IrSpecificFactory.eINSTANCE.createInstTernary(
+				phi.getTarget().getVariable(),
+				IrFactory.eINSTANCE.createExprVar(condVar),
+				IrUtil.copy(phi.getValues().get(0)),
+				IrUtil.copy(phi.getValues().get(1)));
+
+		newBlockNode.add(ternaryOp);
+		return null;
+	}
+
+	@Override
+	public Void caseInstReturn(InstReturn returnInstr) {
+		newBlockNode.add(IrUtil.copy(returnInstr));
+		return null;
+	}
+
+	@Override
+	public Void caseInstSpecific(InstSpecific inst) {
+		newBlockNode.add(IrUtil.copy(inst));
+		return null;
+	}
+
+	@Override
+	public Void caseInstStore(InstStore store) {
+		newBlockNode.add(IrUtil.copy(store));
+		return null;
+	}
+
+	@Override
+	public Void caseProcedure(Procedure procedure) {
+		if (isTernarisable(procedure)) {
 			newBlockNode = IrFactoryImpl.eINSTANCE.createBlockBasic();
 			super.caseProcedure(procedure);
 			IrUtil.delete(procedure.getBlocks());
@@ -162,6 +154,12 @@ public class InstTernaryAdder extends AbstractActorVisitor<Object> {
 	 * @return true if this procedure can be transformed to ternary instructions
 	 */
 	private boolean isTernarisable(Procedure procedure) {
+		// The procedure has to be a function
+		if (procedure.eContainer() instanceof Action
+				|| procedure.getReturnType().isVoid()) {
+			return false;
+		}
+		// The procedure cannot contain any loops
 		TreeIterator<EObject> it = EcoreUtil.getAllContents(procedure
 				.getBlocks());
 		while (it.hasNext()) {

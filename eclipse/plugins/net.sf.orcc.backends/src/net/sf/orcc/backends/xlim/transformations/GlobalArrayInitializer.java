@@ -34,11 +34,11 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.ActorInterpreter;
 import net.sf.orcc.ir.util.ValueUtil;
 
@@ -51,7 +51,7 @@ import net.sf.orcc.ir.util.ValueUtil;
  * @author Matthieu Wipliez
  * 
  */
-public class GlobalArrayInitializer extends AbstractActorVisitor<Object> {
+public class GlobalArrayInitializer extends DfVisitor<Void> {
 
 	private class XlimActorInitializer extends ActorInterpreter {
 		private boolean initToZero;
@@ -113,7 +113,7 @@ public class GlobalArrayInitializer extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseActor(Actor actor) {
+	public Void caseActor(Actor actor) {
 		new XlimActorInitializer(actor, initToZero).initialize();
 		return null;
 	}

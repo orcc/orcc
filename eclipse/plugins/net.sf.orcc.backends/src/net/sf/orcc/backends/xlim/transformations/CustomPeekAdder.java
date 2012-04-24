@@ -40,12 +40,12 @@ import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -58,12 +58,12 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Herve Yviquel
  * 
  */
-public class CustomPeekAdder extends AbstractActorVisitor<Object> {
+public class CustomPeekAdder extends DfVisitor<Void> {
 
 	private Map<Port, Map<Integer, Var>> customPeekedMap;
 
 	@Override
-	public Object caseAction(Action action) {
+	public Void caseAction(Action action) {
 		customPeekedMap = new HashMap<Port, Map<Integer, Var>>();
 		doSwitch(action.getPeekPattern());
 		((XlimActorTemplateData) EcoreHelper.getContainerOfType(action,
@@ -73,7 +73,7 @@ public class CustomPeekAdder extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object casePattern(Pattern pattern) {
+	public Void casePattern(Pattern pattern) {
 		for (Port port : pattern.getPorts()) {
 			Map<Integer, Var> indexToVariableMap = new HashMap<Integer, Var>();
 			Var oldTarget = pattern.getVariable(port);
