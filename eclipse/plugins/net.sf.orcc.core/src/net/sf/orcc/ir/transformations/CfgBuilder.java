@@ -40,7 +40,7 @@ import net.sf.orcc.ir.Cfg;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 
 /**
  * This class defines a transformation to build the CFG of procedures.
@@ -49,15 +49,15 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * @author Jerome Gorin
  * 
  */
-public class CfgBuilder extends AbstractActorVisitor<CfgNode> {
-
-	private IrFactory factory = IrFactory.eINSTANCE;
+public class CfgBuilder extends AbstractIrVisitor<CfgNode> {
 
 	protected Cfg cfg;
 
-	protected CfgNode last;
+	private IrFactory factory = IrFactory.eINSTANCE;
 
 	protected boolean flag;
+
+	protected CfgNode last;
 
 	protected void addEdge(CfgNode node) {
 		Edge edge = cfg.add(last, node);
@@ -80,7 +80,7 @@ public class CfgBuilder extends AbstractActorVisitor<CfgNode> {
 	}
 
 	@Override
-	public CfgNode caseNodeBlock(BlockBasic node) {
+	public CfgNode caseBlockBasic(BlockBasic node) {
 		CfgNode cfgNode = addNode(node);
 		if (last != null) {
 			addEdge(cfgNode);
@@ -90,7 +90,7 @@ public class CfgBuilder extends AbstractActorVisitor<CfgNode> {
 	}
 
 	@Override
-	public CfgNode caseNodeIf(BlockIf node) {
+	public CfgNode caseBlockIf(BlockIf node) {
 		CfgNode cfgNode = addNode(node);
 		if (last != null) {
 			addEdge(cfgNode);
@@ -115,7 +115,7 @@ public class CfgBuilder extends AbstractActorVisitor<CfgNode> {
 	}
 
 	@Override
-	public CfgNode caseNodeWhile(BlockWhile node) {
+	public CfgNode caseBlockWhile(BlockWhile node) {
 		CfgNode join = addNode(node.getJoinBlock());
 
 		if (last != null) {

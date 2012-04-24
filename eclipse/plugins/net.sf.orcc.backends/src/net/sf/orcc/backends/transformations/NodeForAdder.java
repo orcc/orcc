@@ -65,6 +65,15 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 public class NodeForAdder extends AbstractActorVisitor<Object> {
 
 	private class ForNodeCfg extends CfgBuilder {
+		@Override
+		public CfgNode caseBlockSpecific(BlockSpecific node) {
+			if (((IrNodeSpecific) node).isNodeFor()) {
+				return caseNodeFor((BlockFor) node);
+			}
+
+			return null;
+		}
+
 		public CfgNode caseNodeFor(BlockFor node) {
 			CfgNode join = addNode(node.getJoinNode());
 			cfg.getVertices().add(join);
@@ -86,15 +95,6 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 			last = cfgNode;
 
 			return cfgNode;
-		}
-
-		@Override
-		public CfgNode caseNodeSpecific(BlockSpecific node) {
-			if (((IrNodeSpecific) node).isNodeFor()) {
-				return caseNodeFor((BlockFor) node);
-			}
-
-			return null;
 		}
 	}
 

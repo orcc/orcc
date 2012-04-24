@@ -37,9 +37,10 @@ import java.util.Set;
 
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 
 /**
  * 
@@ -48,18 +49,45 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * @author Richard Thavot
  * 
  */
-public class DeadProcedureElimination extends AbstractActorVisitor<Object> {
+public class DeadProcedureElimination extends DfVisitor<Object> {
+
+	private class IrVisitor extends AbstractIrVisitor<Object> {
+
+		@Override
+		public Object caseInstCall(InstCall call) {
+			Procedure calledProc = call.getProcedure();
+			List<InstCall> instCalls = procToCalledInstsMap.get(calledProc);
+			if (instCalls == null) {
+				new DeadProcedureElimination(procToCalledInstsMap)
+						.doSwitch(calledProc);
+				instCalls = new ArrayList<InstCall>();
+				procToCalledInstsMap.put(calledProc, instCalls);
+			}
+			instCalls.add(call);
+
+			return null;
+		}
+
+		@Override
+		public Object caseProcedure(Procedure procedure) {
+			this.procedure = procedure;
+			return doSwitch(procedure.getBlocks());
+		}
+
+	}
 
 	private Map<Procedure, List<InstCall>> procToCalledInstsMap;
 
 	private Set<Procedure> removeProcSet;
 
 	public DeadProcedureElimination() {
+		irVisitor = new IrVisitor();
 		procToCalledInstsMap = new HashMap<Procedure, List<InstCall>>();
 	}
 
 	private DeadProcedureElimination(
 			Map<Procedure, List<InstCall>> procToCalledInstsMap) {
+		irVisitor = new IrVisitor();
 		this.procToCalledInstsMap = procToCalledInstsMap;
 	}
 
@@ -88,28 +116,6 @@ public class DeadProcedureElimination extends AbstractActorVisitor<Object> {
 			}
 		}
 		actor.getProcs().removeAll(removeProcSet);
-
-		return null;
-	}
-
-	@Override
-	public Object caseProcedure(Procedure procedure) {
-		this.procedure = procedure;
-		return doSwitch(procedure.getBlocks());
-	}
-
-	@Override
-	public Object caseInstCall(InstCall call) {
-		//
-		Procedure calledProc = call.getProcedure();
-		List<InstCall> instCalls = procToCalledInstsMap.get(calledProc);
-		if (instCalls == null) {
-			new DeadProcedureElimination(procToCalledInstsMap)
-					.doSwitch(calledProc);
-			instCalls = new ArrayList<InstCall>();
-			procToCalledInstsMap.put(calledProc, instCalls);
-		}
-		instCalls.add(call);
 
 		return null;
 	}

@@ -33,6 +33,7 @@ import java.util.List;
 
 import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
@@ -41,11 +42,10 @@ import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 
 /**
@@ -54,13 +54,20 @@ import net.sf.orcc.ir.util.IrUtil;
  * @author Matthieu Wipliez
  * 
  */
-public class DeadVariableRemoval extends AbstractActorVisitor<Object> {
+public class DeadVariableRemoval extends AbstractIrVisitor<Object> {
 
 	protected boolean changed;
 
 	private List<Instruction> instructionsToVisit;
 
 	private List<Var> unusedLocals;
+
+	@Override
+	public Object caseBlockBasic(BlockBasic block) {
+		// adds all instructions to the list
+		instructionsToVisit.addAll(block.getInstructions());
+		return null;
+	}
 
 	@Override
 	public Object caseInstAssign(InstAssign assign) {
@@ -112,13 +119,6 @@ public class DeadVariableRemoval extends AbstractActorVisitor<Object> {
 
 			handleInstruction(target, store);
 		}
-		return null;
-	}
-
-	@Override
-	public Object caseNodeBlock(BlockBasic block) {
-		// adds all instructions to the list
-		instructionsToVisit.addAll(block.getInstructions());
 		return null;
 	}
 

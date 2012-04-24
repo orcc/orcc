@@ -44,7 +44,7 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -55,14 +55,14 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Matthieu Wipliez
  * 
  */
-public class IfDeconverter extends AbstractActorVisitor<Object> {
+public class IfDeconverter extends AbstractIrVisitor<Object> {
 
 	private Predicate currentPredicate;
 
 	private List<BlockIf> nodeIfList;
 
 	@Override
-	public Object caseNodeBlock(BlockBasic block) {
+	public Object caseBlockBasic(BlockBasic block) {
 		Procedure procedure = EcoreHelper.getContainerOfType(block,
 				Procedure.class);
 		BlockBasic targetBlock = null;
@@ -101,7 +101,7 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseNodeWhile(BlockWhile nodeWhile) {
+	public Object caseBlockWhile(BlockWhile nodeWhile) {
 		throw new OrccRuntimeException("unsupported NodeWhile");
 	}
 

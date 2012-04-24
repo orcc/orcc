@@ -32,7 +32,7 @@ import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockIf;
 import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -43,12 +43,12 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Matthieu Wipliez
  * 
  */
-public class BlockCombine extends AbstractActorVisitor<Object> {
+public class BlockCombine extends AbstractIrVisitor<Object> {
 
 	private BlockBasic previous;
 
 	@Override
-	public Object caseNodeBlock(BlockBasic block) {
+	public Object caseBlockBasic(BlockBasic block) {
 		if (previous == null) {
 			previous = block;
 		} else {
@@ -65,7 +65,7 @@ public class BlockCombine extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseNodeIf(BlockIf node) {
+	public Object caseBlockIf(BlockIf node) {
 		// so that previous blocks are not linked to then branch
 		previous = null;
 		doSwitch(node.getThenBlocks());
@@ -86,13 +86,7 @@ public class BlockCombine extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseProcedure(Procedure procedure) {
-		previous = null;
-		return super.caseProcedure(procedure);
-	}
-
-	@Override
-	public Object caseNodeWhile(BlockWhile node) {
+	public Object caseBlockWhile(BlockWhile node) {
 		// previous blocks are not linked to the body of the while
 		previous = null;
 		doSwitch(node.getBlocks());
@@ -101,6 +95,12 @@ public class BlockCombine extends AbstractActorVisitor<Object> {
 		previous = null;
 
 		return null;
+	}
+
+	@Override
+	public Object caseProcedure(Procedure procedure) {
+		previous = null;
+		return super.caseProcedure(procedure);
 	}
 
 }

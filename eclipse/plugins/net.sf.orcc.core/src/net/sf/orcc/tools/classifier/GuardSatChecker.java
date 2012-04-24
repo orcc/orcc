@@ -40,6 +40,7 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Unit;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.ExprBinary;
@@ -63,7 +64,7 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrSwitch;
 import net.sf.orcc.ir.util.TypePrinter;
 import net.sf.orcc.tools.classifier.smt.SmtScript;
@@ -91,7 +92,7 @@ public class GuardSatChecker {
 	 * @author Matthieu Wipliez
 	 * 
 	 */
-	private static class SmtTranslator extends AbstractActorVisitor<Object> {
+	private static class SmtIrTranslator extends AbstractIrVisitor<Object> {
 
 		private StringBuilder builder;
 
@@ -108,7 +109,7 @@ public class GuardSatChecker {
 		 * Creates a new constraint expression visitor.
 		 * 
 		 */
-		public SmtTranslator() {
+		public SmtIrTranslator() {
 			script = new SmtScript();
 			procs = new ArrayList<Procedure>();
 		}
@@ -140,30 +141,6 @@ public class GuardSatChecker {
 			builder.append(term);
 			builder.append(")) ");
 			numLets++;
-		}
-
-		@Override
-		public Object caseAction(Action action) {
-			Pattern pattern = action.getPeekPattern();
-			for (Port port : pattern.getPorts()) {
-				Var variable = pattern.getVariable(port);
-				declareVar(variable);
-				int numTokens = pattern.getNumTokens(port);
-				String command = getUniqueName(variable);
-				for (int i = 0; i < numTokens; i++) {
-					String select = "(select " + port.getName() + " "
-							+ getStringOfInt(i) + ")";
-					command = "(store " + command + " " + getStringOfInt(i)
-							+ " " + select + ")";
-				}
-				command = "(assert (= " + getUniqueName(variable) + " "
-						+ command + "))";
-				script.addCommand(command);
-			}
-
-			caseProcedure(action.getScheduler());
-
-			return null;
 		}
 
 		@Override
@@ -340,16 +317,6 @@ public class GuardSatChecker {
 		}
 
 		@Override
-		public Object casePort(Port port) {
-			String name = port.getName();
-			Type portType = IrFactory.eINSTANCE.createTypeList(0,
-					port.getType());
-			String type = new TypeSwitchBitVec().doSwitch(portType);
-			script.addCommand("(declare-fun " + name + " () " + type + ")");
-			return null;
-		}
-
-		@Override
 		public Object caseProcedure(Procedure procedure) {
 			// add procedure to list of procedures
 			procs.add(procedure);
@@ -427,15 +394,6 @@ public class GuardSatChecker {
 		}
 
 		/**
-		 * Returns the script created by this translator.
-		 * 
-		 * @return the script created by this translator
-		 */
-		public SmtScript getScript() {
-			return script;
-		}
-
-		/**
 		 * Returns the 32-bit BitVec representation of the given BigInteger.
 		 * 
 		 * @param integer
@@ -478,6 +436,69 @@ public class GuardSatChecker {
 				return ((Procedure) cter).getName() + "_" + name;
 			}
 			return name;
+		}
+
+	}
+
+	/**
+	 * This class defines a visitor that examines expressions that depend on a
+	 * value peeked from the configuration port.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	private static class SmtTranslator extends DfVisitor<Object> {
+
+		private SmtIrTranslator irTranslator;
+
+		public SmtTranslator() {
+			irTranslator = new SmtIrTranslator();
+			irVisitor = irTranslator;
+		}
+
+		@Override
+		public Object caseAction(Action action) {
+			Pattern pattern = action.getPeekPattern();
+			for (Port port : pattern.getPorts()) {
+				Var variable = pattern.getVariable(port);
+				irTranslator.declareVar(variable);
+				int numTokens = pattern.getNumTokens(port);
+				String command = irTranslator.getUniqueName(variable);
+				for (int i = 0; i < numTokens; i++) {
+					String select = "(select " + port.getName() + " "
+							+ irTranslator.getStringOfInt(i) + ")";
+					command = "(store " + command + " "
+							+ irTranslator.getStringOfInt(i) + " " + select
+							+ ")";
+				}
+				command = "(assert (= " + irTranslator.getUniqueName(variable)
+						+ " " + command + "))";
+				irTranslator.script.addCommand(command);
+			}
+
+			irTranslator.doSwitch(action.getScheduler());
+
+			return null;
+		}
+
+		@Override
+		public Object casePort(Port port) {
+			String name = port.getName();
+			Type portType = IrFactory.eINSTANCE.createTypeList(0,
+					port.getType());
+			String type = new TypeSwitchBitVec().doSwitch(portType);
+			irTranslator.script.addCommand("(declare-fun " + name + " () "
+					+ type + ")");
+			return null;
+		}
+
+		/**
+		 * Returns the script created by this translator.
+		 * 
+		 * @return the script created by this translator
+		 */
+		public SmtScript getScript() {
+			return irTranslator.script;
 		}
 
 	}

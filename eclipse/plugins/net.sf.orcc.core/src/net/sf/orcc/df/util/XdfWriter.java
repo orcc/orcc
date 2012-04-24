@@ -61,7 +61,7 @@ import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.IrSwitch;
 import net.sf.orcc.util.DomUtil;
 
 import org.eclipse.emf.common.util.ECollections;
@@ -87,7 +87,7 @@ public class XdfWriter {
 	 * @author Matthieu Wipliez
 	 * 
 	 */
-	private class BinOpSeqWriter extends AbstractActorVisitor<Expression> {
+	private class BinOpSeqWriter extends IrSwitch<Expression> {
 
 		private Element parentElt;
 

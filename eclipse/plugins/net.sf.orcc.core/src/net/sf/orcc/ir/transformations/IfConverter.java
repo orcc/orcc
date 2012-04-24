@@ -32,15 +32,15 @@ import java.util.List;
 
 import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockIf;
 import net.sf.orcc.ir.BlockWhile;
+import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -51,14 +51,14 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Matthieu Wipliez
  * 
  */
-public class IfConverter extends AbstractActorVisitor<Object> {
+public class IfConverter extends AbstractIrVisitor<Object> {
 
 	private Predicate currentPredicate;
 
 	private BlockBasic targetBlock;
 
 	@Override
-	public Object caseNodeBlock(BlockBasic block) {
+	public Object caseBlockBasic(BlockBasic block) {
 		List<Instruction> instructions = block.getInstructions();
 		// annotate with predicate
 		for (Instruction instruction : instructions) {
@@ -76,7 +76,7 @@ public class IfConverter extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseNodeIf(BlockIf nodeIf) {
+	public Object caseBlockIf(BlockIf nodeIf) {
 		Predicate previousPredicate = currentPredicate;
 
 		// predicate for "then" branch
@@ -107,7 +107,7 @@ public class IfConverter extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseNodeWhile(BlockWhile nodeWhile) {
+	public Object caseBlockWhile(BlockWhile nodeWhile) {
 		throw new OrccRuntimeException("unsupported NodeWhile");
 	}
 

@@ -37,10 +37,10 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.c.CExpressionPrinter;
-import net.sf.orcc.backends.promela.transformations.PromelaTokenAnalyzer;
 import net.sf.orcc.backends.promela.transformations.GuardsExtractor;
 import net.sf.orcc.backends.promela.transformations.NetworkStateDefExtractor;
 import net.sf.orcc.backends.promela.transformations.PromelaDeadGlobalElimination;
+import net.sf.orcc.backends.promela.transformations.PromelaTokenAnalyzer;
 import net.sf.orcc.backends.transformations.Inliner;
 import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.df.Action;
@@ -51,6 +51,7 @@ import net.sf.orcc.df.transformations.BroadcastAdder;
 import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.df.transformations.NetworkFlattener;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
@@ -107,28 +108,28 @@ public class PromelaBackendImpl extends AbstractBackend {
 				// new ListFlattener(), //Promela does not support multi
 				// dimensional arrays
 				new RenameTransformation(this.transformations),
-				new PhiRemoval(),
-				};
+				new PhiRemoval(), };
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 		}
 	}
-		
-	private void transformInstance(Instance instance) throws OrccException{
+
+	private void transformInstance(Instance instance) throws OrccException {
 		DfSwitch<?>[] transformations = {
 				new PromelaDeadGlobalElimination(
 						netStateDef.getVarsUsedInScheduling(),
 						netStateDef.getPortsUsedInScheduling()),
 				new GuardsExtractor(guards, priority, loadPeeks),
-				new DeadCodeElimination(), new DeadVariableRemoval()
-				};
+				new DfVisitor<Object>(new DeadCodeElimination()),
+				new DfVisitor<Object>(new DeadVariableRemoval()) };
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(instance.getActor());
 		}
 		new PromelaTokenAnalyzer(netStateDef).doSwitch(instance);
 	}
-	
-	private void transformInstances(List<Instance> instances) throws OrccException {
+
+	private void transformInstances(List<Instance> instances)
+			throws OrccException {
 		write("Transforming instances...\n");
 		for (Instance instance : instances) {
 			transformInstance(instance);
@@ -145,7 +146,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 		// instantiate and flattens network
 		network = new Instantiator().doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
-		
+
 		instancePrinter = new StandardPrinter(
 				"net/sf/orcc/backends/promela/Actor.stg");
 		instancePrinter.setExpressionPrinter(new CExpressionPrinter());
@@ -157,7 +158,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 
 		List<Actor> actors = network.getAllActors();
 		transformActors(actors);
-		
+
 		netStateDef = new NetworkStateDefExtractor();
 		netStateDef.doSwitch(network);
 
@@ -167,7 +168,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 		new BroadcastAdder().doSwitch(network);
 
 		network.computeTemplateMaps();
-		
+
 		printNetwork(network);
 	}
 

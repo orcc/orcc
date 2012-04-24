@@ -67,6 +67,7 @@ import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.df.transformations.NetworkFlattener;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
+import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.transformations.BlockCombine;
 import net.sf.orcc.ir.transformations.CfgBuilder;
@@ -161,7 +162,8 @@ public class TTABackendImpl extends AbstractBackend {
 				new DfVisitor<Void>(new GetElementPtrAdder()),
 				new DfVisitor<Expression>(new CastAdder(false)),
 				new DfVisitor<Void>(new EmptyBlockRemover()),
-				new BlockCombine(), new CfgBuilder() };
+				new DfVisitor<Object>(new BlockCombine()),
+				new DfVisitor<CfgNode>(new CfgBuilder()) };
 
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);

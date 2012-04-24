@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.dftools.util.util.EcoreHelper;
-import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockIf;
@@ -44,7 +43,7 @@ import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 
 /**
  * This class defines a very simple Dead Code Elimination.
@@ -52,7 +51,7 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * @author Matthieu Wipliez
  * 
  */
-public class DeadCodeElimination extends AbstractActorVisitor<Object> {
+public class DeadCodeElimination extends AbstractIrVisitor<Object> {
 
 	private void addNodes(List<Block> nodes, BlockBasic join, int index) {
 		indexNode--;
@@ -64,6 +63,20 @@ public class DeadCodeElimination extends AbstractActorVisitor<Object> {
 
 		parentNodes.add(indexNode + size, join);
 		replacePhis(join, index);
+	}
+
+	@Override
+	public Object caseBlockIf(BlockIf node) {
+		Expression condition = node.getCondition();
+		if (condition.isExprBool()) {
+			if (((ExprBool) condition).isValue()) {
+				addNodes(node.getThenBlocks(), node.getJoinBlock(), 0);
+			} else {
+				addNodes(node.getElseBlocks(), node.getJoinBlock(), 1);
+			}
+		}
+
+		return null;
 	}
 
 	private void replacePhis(BlockBasic joinNode, int index) {
@@ -90,31 +103,6 @@ public class DeadCodeElimination extends AbstractActorVisitor<Object> {
 				procedure.getLocals().remove(local);
 			}
 		}
-	}
-
-	@Override
-	public Object caseActor(Actor actor) {
-		// remove dead ifs and whiles
-		super.caseActor(actor);
-
-		// combines adjacent blocks that may have been created
-		new BlockCombine().doSwitch(actor);
-
-		return null;
-	}
-
-	@Override
-	public Object caseNodeIf(BlockIf node) {
-		Expression condition = node.getCondition();
-		if (condition.isExprBool()) {
-			if (((ExprBool) condition).isValue()) {
-				addNodes(node.getThenBlocks(), node.getJoinBlock(), 0);
-			} else {
-				addNodes(node.getElseBlocks(), node.getJoinBlock(), 1);
-			}
-		}
-
-		return null;
 	}
 
 }
