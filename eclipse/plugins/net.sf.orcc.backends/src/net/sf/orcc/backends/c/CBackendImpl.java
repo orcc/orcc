@@ -41,6 +41,10 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.c.transformations.CBroadcastAdder;
+import net.sf.orcc.backends.transformations.Inliner;
+import net.sf.orcc.backends.transformations.Multi2MonoToken;
+import net.sf.orcc.backends.transformations.ParameterImporter;
+import net.sf.orcc.backends.transformations.StoreOnceTransformation;
 import net.sf.orcc.backends.transformations.TypeResizer;
 import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.backends.util.BackendUtil;
@@ -174,15 +178,25 @@ public class CBackendImpl extends AbstractBackend {
 			new ActorNormalizer().doSwitch(actor);
 		}
 
-		DfSwitch<?>[] transformations = { new UnitImporter(),
-				new TypeResizer(true, false, true, true),
-				new RenameTransformation(replacementMap) };
+		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
+		transformations.add(new UnitImporter());
+		transformations.add(new TypeResizer(true, false, true, true));
+		transformations.add(new RenameTransformation(replacementMap));
+
+		// If "-t" option is passed to command line, apply additional
+		// transformations
+		if (getAttribute("net.sf.orcc.backends.additionalTransfos", false)) {
+			transformations.add(new Multi2MonoToken());
+			transformations.add(new ParameterImporter());
+			transformations.add(new Inliner(true, true));
+			transformations.add(new StoreOnceTransformation());
+		}
 
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 			ResourceSet set = new ResourceSetImpl();
 			if (debug && !IrUtil.serializeActor(set, path, actor)) {
-				System.out.println("oops " + transformation + " "
+				System.err.println("oops " + transformation + " "
 						+ actor.getName());
 			}
 		}
