@@ -22,6 +22,14 @@ fifoVarName(port) ::= <<
 fifo(port) ::= <<
 >>
 
+printStatus(dir, port, index, action, state) ::= <<
+%status_<port.name><if(action)>_<action.name><endif><if(state)>_<state.name><endif> = tail call i32 asm sideeffect "STREAM_<dir>.CAL_STREAM_<dir>_STATUS", "=r,ir"(i32 <index>) nounwind
+>>
+
+printPortsStatus(dir, ports, action=false, state=false) ::= <<
+<ports: { port | <printStatus(dir, port, i0, action, state)> }; separator="\n">
+>>
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constants
@@ -280,6 +288,179 @@ entry:
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Scheduler
+///////////////////////////////////////////////////////////////////////////////
+
+checkOutputPorts(action, port, restPorts, portToIndexMap, state, lastPort=false) ::= <<
+<if(!lastPort)>
+%has_valid_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = icmp sge i32 %status_<port.name>_<action.name><if(state)>_<state.name><endif>, <pattern.numTokensMap.(port)>
+<else>
+%available_output_<if(state)><state.name>_<endif><action.name>_<port.name> = icmp sge i32 %status_<port.name>_<action.name><if(state)>_<state.name><endif>, <pattern.numTokensMap.(port)>
+%has_valid_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = and i1 %has_valid_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(lastPort)>, %available_output_<if(state)><state.name>_<endif><action.name>_<port.name><
+endif><
+if(restPorts)>
+<checkOutputPorts(action, first(restPorts), rest(restPorts), portToIndexMap, state, port)><
+endif>
+>>
+
+checkOutputPattern(action, pattern, state=false) ::= <<
+<checkOutputPorts(action, first(pattern.ports), rest(pattern.ports), instance.actor.templateData.portToIndexByPatternMap.(pattern), state)>
+>>
+
+checkInputPorts(action, port, restPorts, portToIndexMap, state, lastPort=false) ::= <<
+<if(!lastPort)>
+%has_valid_inputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = icmp sge i32 %status_<port.name>, <pattern.numTokensMap.(port)>
+<else>
+%available_input_<if(state)><state.name>_<endif><action.name>_<port.name> = icmp sge i32 %status_<port.name>, <pattern.numTokensMap.(port)>
+%has_valid_inputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = and i1 %has_valid_inputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(lastPort)>, %available_input_<if(state)><state.name>_<endif><action.name>_<port.name><
+endif><
+if(restPorts)>
+<checkInputPorts(action, first(restPorts), rest(restPorts), portToIndexMap, state, port)><
+endif>
+>>
+
+checkInputPattern(action, pattern, state=false) ::= <<
+<checkInputPorts(action, first(pattern.ports), rest(pattern.ports), instance.actor.templateData.portToIndexByPatternMap.(pattern), state)>
+>>
+
+actionTest(action) ::= <<
+	; ACTION <action.name>
+<if(!action.inputPattern.empty)
+>	;; Input pattern
+	<checkInputPattern(action, action.inputPattern)>
+	%is_schedulable_<action.name> = call i1 @<action.scheduler.name> ()
+	%is_fireable_<action.name> = and i1 %is_schedulable_<action.name>, %has_valid_inputs_<action.name>_<length(action.inputPattern.ports)>
+	
+	br i1 %is_fireable_<action.name>, label %bb_<action.name>_check_outputs, label %bb_<action.name>_unschedulable<
+else
+>	;; Empty input pattern
+	%is_fireable_<action.name> = call i1 @<action.scheduler.name> ()
+	
+	br i1 %is_fireable_<action.name>, label %bb_<action.name>_check_outputs, label %bb_<action.name>_unschedulable<
+endif>
+
+
+bb_<action.name>_check_outputs:
+<if(!action.outputPattern.empty)
+>	;; Output pattern
+	<printPortsStatus("OUT", instance.actor.outputs, action)>
+	<checkOutputPattern(action, action.outputPattern)>
+	
+	br i1 %has_valid_outputs_<action.name>_<length(action.outputPattern.ports)>, label %bb_<action.name>_fire, label %bb_<action.name>_check_outputs<
+else
+>	;; Empty output pattern
+	
+	br label %bb_<action.name>_fire<
+endif>
+
+
+bb_<action.name>_fire:
+	call void @<action.body.name> ()
+
+	br label %bb_scheduler_start
+
+bb_<action.name>_unschedulable:
+>>
+
+printActions(actions) ::= <<
+	; ------- Actions outside the FSM --------
+<actions: actionTest(); separator="\n">
+	; ---- End of actions outside the FSM ----
+>>
+
+schedulerWithoutFSM(actions) ::= <<
+<printActions(actions)>
+
+	br label %bb_scheduler_start
+>>
+
+actionTestState(sourceState, transition, restTransitionsList) ::= <<
+	; ACTION <transition.action.name>
+<if(!transition.action.inputPattern.empty)
+>	;; Input pattern
+	<checkInputPattern(transition.action, transition.action.inputPattern, sourceState)>
+	%is_schedulable_<sourceState.name>_<transition.action.name> = call i1 @<transition.action.scheduler.name> ()
+	%is_fireable_<sourceState.name>_<transition.action.name> = and i1 %is_schedulable_<sourceState.name>_<transition.action.name>, %has_valid_inputs_<sourceState.name>_<transition.action.name>_<length(transition.action.inputPattern.ports)>
+	
+	br i1 %is_fireable_<sourceState.name>_<transition.action.name>, label %bb_<sourceState.name>_<transition.action.name>_check_outputs, label %bb_<sourceState.name>_<transition.action.name>_unschedulable<
+else
+>	;; Empty input pattern
+	%is_fireable_<sourceState.name>_<transition.action.name> = call i1 @<transition.action.scheduler.name> ()
+	
+	br i1 %is_fireable_<sourceState.name>_<transition.action.name>, label %bb_<sourceState.name>_<transition.action.name>_check_outputs, label %bb_<sourceState.name>_<transition.action.name>_unschedulable<
+endif>
+
+
+bb_<sourceState.name>_<transition.action.name>_check_outputs:
+<if(!transition.action.outputPattern.empty)
+>	;; Output pattern
+	<printPortsStatus("OUT", instance.actor.outputs, transition.action, sourceState)>
+	<checkOutputPattern(transition.action, transition.action.outputPattern, sourceState)>
+	
+	br i1 %has_valid_outputs_<sourceState.name>_<transition.action.name>_<length(transition.action.outputPattern.ports)>, label %bb_<sourceState.name>_<transition.action.name>_fire, label %bb_scheduler_start<
+else
+>	;; Empty output pattern
+	
+	br label %bb_<sourceState.name>_<transition.action.name>_fire<
+endif>
+
+
+bb_<sourceState.name>_<transition.action.name>_fire:
+	call void @<transition.action.body.name> ()
+	store i32 <instance.actor.templateData.stateToLabelMap.(transition.target)>, i32* @_FSM_state
+	
+	br label %bb_scheduler_start
+
+bb_<sourceState.name>_<transition.action.name>_unschedulable:
+
+<if(restTransitionsList)>
+<actionTestState(sourceState, first(restTransitionsList), rest(restTransitionsList))><
+else
+>	br label %bb_scheduler_start
+<endif>
+>>
+
+schedulingStates(sourceState, transitionsList) ::= <<
+<actionTestState(sourceState, first(transitionsList), rest(transitionsList))>
+>>
+
+printTransition(state) ::= <<
+; STATE <state.name>
+bb_s_<state.name>:
+<schedulingStates(state, state.outgoing)>
+>>
+
+printFsmState(state) ::= <<
+i32 <instance.actor.templateData.stateToLabelMap.(state)>, label %bb_s_<state.name>
+>>
+
+printFsmSwitch(fsm) ::= <<
+%local_FSM_state = load i32* @_FSM_state
+switch i32 %local_FSM_state, label %default [
+					<fsm.states: printFsmState(); separator="\n"> ]
+>>
+
+schedulerWithFSM(actions, fsm) ::= <<
+<if(actions)>
+<printActions(actions)>
+	br label %bb_fsm_start
+
+bb_fsm_start:
+<endif>
+
+	<printFsmSwitch(fsm)>
+	
+	br label %bb_scheduler_start
+
+default:
+	; TODO: print error
+	br label %bb_scheduler_start
+
+<fsm.states: printTransition(); separator="\n">
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Action
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -304,9 +485,13 @@ entry:
 }
 >>
 
+callInitialize(initialize) ::= <<
+call <initialize.body.returnType> @<initialize.body.name> ()
+>>
+
 
 ///////////////////////////////////////////////////////////////////////////////
-// Actor
+// Instance
 ///////////////////////////////////////////////////////////////////////////////
 
 actorParameter(parameter) ::= <<
@@ -359,4 +544,24 @@ declare i32 @printf(i8* noalias , ...) nounwind
 ; Actions
 <instance.actor.actions: printAction(); separator="\n\n">
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Action-scheduler
+<if(instance.actor.fsm)>
+@_FSM_state = global i32 <instance.actor.templateData.stateToLabelMap.(instance.actor.fsm.initialState)>
+<endif>
+
+define external void @<instance.name>_scheduler() noreturn nounwind {
+entry:
+	<instance.actor.initializes: callInitialize(); separator="\n">
+
+	br label %bb_scheduler_start
+
+	bb_scheduler_start:
+	<printPortsStatus("IN", instance.actor.inputs)>
+<if(instance.actor.fsm)
+><schedulerWithFSM(instance.actor.actionsOutsideFsm, instance.actor.fsm)><
+else
+><schedulerWithoutFSM(instance.actor.actionsOutsideFsm)><
+endif>
+}
 >>
