@@ -684,11 +684,7 @@ endif>
 >>
 
 printStore(store) ::= <<
-<if(store.value.exprInt || store.value.exprBool)
->store <store.target.variable.type> <store.value>, <store.target.variable.type>* <Var(store.target.variable)><
-else
->store <store.value.type> <Expr(store.value)>, <store.target.variable.type>* <Var(store.target.variable)><
-endif>
+store <store.target.variable.type> <Expr(store.value)>, <store.target.variable.type>* <Var(store.target.variable)>
 >>
 
 printLoad(load) ::= <<
