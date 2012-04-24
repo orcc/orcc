@@ -49,7 +49,7 @@ public class DfVisitor<T> extends DfSwitch<T> {
 	protected Actor actor;
 
 	protected AbstractIrVisitor<T> irVisitor;
-	
+
 	public DfVisitor() {
 	}
 
@@ -105,8 +105,10 @@ public class DfVisitor<T> extends DfSwitch<T> {
 
 	@Override
 	public T defaultCase(EObject eObject) {
-		if (irVisitor.isSwitchFor(eObject.eClass().getEPackage())) {
-			return irVisitor.doSwitch(eObject);
+		if (irVisitor != null) {
+			if (irVisitor.isSwitchFor(eObject.eClass().getEPackage())) {
+				return irVisitor.doSwitch(eObject);
+			}
 		}
 		return null;
 	}
