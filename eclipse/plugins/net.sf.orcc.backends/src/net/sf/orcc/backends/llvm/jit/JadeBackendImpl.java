@@ -84,6 +84,10 @@ import net.sf.orcc.tools.normalizer.ActorNormalizer;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 
 /**
  * LLVM back-end.
@@ -217,7 +221,34 @@ public class JadeBackendImpl extends AbstractBackend {
 		// print network
 		write("Printing network...\n");
 		String pathName = path + "/" + network.getSimpleName() + ".xdf";
+		URI uri = URI.createFileURI(pathName);
+		
+		ResourceSet set = new ResourceSetImpl();
+		Resource resource = set.createResource(uri);
+		resource.getContents().add(network);
+		try {
+			resource.save(null);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
+		for (String component : mapping.values()) {
+			if (!component.isEmpty()) {
+				targetToInstancesMap = new HashMap<String, List<Instance>>();
+				List<Instance> unmappedInstances = new ArrayList<Instance>();
+				BackendUtil.computeMapping(network, mapping,
+						targetToInstancesMap, unmappedInstances);
+				for (Instance instance : unmappedInstances) {
+					write("Warning: The instance '" + instance.getName()
+							+ "' is not mapped.\n");
+				}
+				break;
+			}
+		}
+
+		if (targetToInstancesMap != null) {
+			printMapping(network);
+		}
 	}
 
 	private void finalizeActors(List<Actor> actors) throws OrccException {
