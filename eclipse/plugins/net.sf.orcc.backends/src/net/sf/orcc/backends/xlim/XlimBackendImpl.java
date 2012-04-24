@@ -161,8 +161,8 @@ public class XlimBackendImpl extends AbstractBackend {
 				new GlobalArrayInitializer(useHw), new Inliner(true, true),
 				new InstTernaryAdder(), new UnaryListRemoval(),
 				new CustomPeekAdder(), new DeadGlobalElimination(),
-				new DfVisitor<Object>(new DeadCodeElimination()),
-				new DfVisitor<Object>(new XlimDeadVariableRemoval()),
+				new DfVisitor<Void>(new DeadCodeElimination()),
+				new DfVisitor<Void>(new XlimDeadVariableRemoval()),
 				new DfVisitor<Void>(new ListFlattener()),
 				new DfVisitor<Expression>(new TacTransformation()),
 				new DfVisitor<CfgNode>(new CfgBuilder()),
@@ -171,7 +171,7 @@ public class XlimBackendImpl extends AbstractBackend {
 				new DfVisitor<Expression>(new CastAdder(true)),
 				new XlimVariableRenamer(),
 				new DfVisitor<Void>(new EmptyBlockRemover()),
-				new DfVisitor<Object>(new BlockCombine()), };
+				new DfVisitor<Void>(new BlockCombine()), };
 
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);

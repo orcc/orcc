@@ -51,7 +51,7 @@ import net.sf.orcc.ir.util.AbstractIrVisitor;
  * @author Matthieu Wipliez
  * 
  */
-public class DeadCodeElimination extends AbstractIrVisitor<Object> {
+public class DeadCodeElimination extends AbstractIrVisitor<Void> {
 
 	private void addNodes(List<Block> nodes, BlockBasic join, int index) {
 		indexNode--;
@@ -66,7 +66,7 @@ public class DeadCodeElimination extends AbstractIrVisitor<Object> {
 	}
 
 	@Override
-	public Object caseBlockIf(BlockIf node) {
+	public Void caseBlockIf(BlockIf node) {
 		Expression condition = node.getCondition();
 		if (condition.isExprBool()) {
 			if (((ExprBool) condition).isValue()) {

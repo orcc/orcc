@@ -43,7 +43,7 @@ import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 public class XlimDeadVariableRemoval extends DeadVariableRemoval {
 
 	@Override
-	public Object caseInstSpecific(InstSpecific specific) {
+	public Void caseInstSpecific(InstSpecific specific) {
 		if (specific instanceof InstTernary) {
 			InstTernary ternaryOperation = (InstTernary) specific;
 

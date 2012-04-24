@@ -43,12 +43,12 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Matthieu Wipliez
  * 
  */
-public class BlockCombine extends AbstractIrVisitor<Object> {
+public class BlockCombine extends AbstractIrVisitor<Void> {
 
 	private BlockBasic previous;
 
 	@Override
-	public Object caseBlockBasic(BlockBasic block) {
+	public Void caseBlockBasic(BlockBasic block) {
 		if (previous == null) {
 			previous = block;
 		} else {
@@ -65,7 +65,7 @@ public class BlockCombine extends AbstractIrVisitor<Object> {
 	}
 
 	@Override
-	public Object caseBlockIf(BlockIf node) {
+	public Void caseBlockIf(BlockIf node) {
 		// so that previous blocks are not linked to then branch
 		previous = null;
 		doSwitch(node.getThenBlocks());
@@ -86,7 +86,7 @@ public class BlockCombine extends AbstractIrVisitor<Object> {
 	}
 
 	@Override
-	public Object caseBlockWhile(BlockWhile node) {
+	public Void caseBlockWhile(BlockWhile node) {
 		// previous blocks are not linked to the body of the while
 		previous = null;
 		doSwitch(node.getBlocks());
@@ -98,7 +98,7 @@ public class BlockCombine extends AbstractIrVisitor<Object> {
 	}
 
 	@Override
-	public Object caseProcedure(Procedure procedure) {
+	public Void caseProcedure(Procedure procedure) {
 		previous = null;
 		return super.caseProcedure(procedure);
 	}

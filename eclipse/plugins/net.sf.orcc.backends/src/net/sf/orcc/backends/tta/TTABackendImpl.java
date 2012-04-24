@@ -162,7 +162,7 @@ public class TTABackendImpl extends AbstractBackend {
 				new DfVisitor<Void>(new GetElementPtrAdder()),
 				new DfVisitor<Expression>(new CastAdder(false)),
 				new DfVisitor<Void>(new EmptyBlockRemover()),
-				new DfVisitor<Object>(new BlockCombine()),
+				new DfVisitor<Void>(new BlockCombine()),
 				new DfVisitor<CfgNode>(new CfgBuilder()) };
 
 		for (DfSwitch<?> transformation : transformations) {

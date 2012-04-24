@@ -54,7 +54,7 @@ import net.sf.orcc.ir.util.IrUtil;
  * @author Matthieu Wipliez
  * 
  */
-public class DeadVariableRemoval extends AbstractIrVisitor<Object> {
+public class DeadVariableRemoval extends AbstractIrVisitor<Void> {
 
 	protected boolean changed;
 
@@ -63,14 +63,14 @@ public class DeadVariableRemoval extends AbstractIrVisitor<Object> {
 	private List<Var> unusedLocals;
 
 	@Override
-	public Object caseBlockBasic(BlockBasic block) {
+	public Void caseBlockBasic(BlockBasic block) {
 		// adds all instructions to the list
 		instructionsToVisit.addAll(block.getInstructions());
 		return null;
 	}
 
 	@Override
-	public Object caseInstAssign(InstAssign assign) {
+	public Void caseInstAssign(InstAssign assign) {
 		Var target = assign.getTarget().getVariable();
 		if (target != null && !target.isUsed()) {
 			handleInstruction(target, assign);
@@ -79,7 +79,7 @@ public class DeadVariableRemoval extends AbstractIrVisitor<Object> {
 	}
 
 	@Override
-	public Object caseInstCall(InstCall call) {
+	public Void caseInstCall(InstCall call) {
 		if (call.hasResult()) {
 			Var target = call.getTarget().getVariable();
 			if (target != null && !target.isUsed()) {
@@ -90,7 +90,7 @@ public class DeadVariableRemoval extends AbstractIrVisitor<Object> {
 	}
 
 	@Override
-	public Object caseInstLoad(InstLoad load) {
+	public Void caseInstLoad(InstLoad load) {
 		Var target = load.getTarget().getVariable();
 		if (target != null && !target.isUsed()) {
 			handleInstruction(target, load);
@@ -99,7 +99,7 @@ public class DeadVariableRemoval extends AbstractIrVisitor<Object> {
 	}
 
 	@Override
-	public Object caseInstPhi(InstPhi phi) {
+	public Void caseInstPhi(InstPhi phi) {
 		Var target = phi.getTarget().getVariable();
 		if (target != null && !target.isUsed()) {
 			handleInstruction(target, phi);
@@ -108,7 +108,7 @@ public class DeadVariableRemoval extends AbstractIrVisitor<Object> {
 	}
 
 	@Override
-	public Object caseInstStore(InstStore store) {
+	public Void caseInstStore(InstStore store) {
 		Var target = store.getTarget().getVariable();
 		if (target != null && !target.isUsed()) {
 			// do not remove stores to variables that are parameters
@@ -123,7 +123,7 @@ public class DeadVariableRemoval extends AbstractIrVisitor<Object> {
 	}
 
 	@Override
-	public Object caseProcedure(Procedure procedure) {
+	public Void caseProcedure(Procedure procedure) {
 		unusedLocals = new ArrayList<Var>();
 		instructionsToVisit = new ArrayList<Instruction>();
 

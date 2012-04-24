@@ -120,8 +120,8 @@ public class PromelaBackendImpl extends AbstractBackend {
 						netStateDef.getVarsUsedInScheduling(),
 						netStateDef.getPortsUsedInScheduling()),
 				new GuardsExtractor(guards, priority, loadPeeks),
-				new DfVisitor<Object>(new DeadCodeElimination()),
-				new DfVisitor<Object>(new DeadVariableRemoval()) };
+				new DfVisitor<Void>(new DeadCodeElimination()),
+				new DfVisitor<Void>(new DeadVariableRemoval()) };
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(instance.getActor());
 		}
