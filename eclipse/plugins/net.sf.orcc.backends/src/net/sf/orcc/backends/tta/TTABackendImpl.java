@@ -155,7 +155,7 @@ public class TTABackendImpl extends AbstractBackend {
 				new TypeResizer(true, true, false, true),
 				new StringTransformation(),
 				new RenameTransformation(this.transformations),
-				new TacTransformation(),
+				new DfVisitor<Expression>(new TacTransformation()),
 				new DfVisitor<Void>(new CopyPropagator()),
 				new DfVisitor<Void>(new ConstantPropagator()),
 				new DfVisitor<Void>(new InstPhiTransformation()),

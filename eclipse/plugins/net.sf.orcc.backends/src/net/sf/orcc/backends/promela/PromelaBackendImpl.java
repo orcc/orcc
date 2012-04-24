@@ -108,7 +108,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 				// new ListFlattener(), //Promela does not support multi
 				// dimensional arrays
 				new RenameTransformation(this.transformations),
-				new PhiRemoval(), };
+				new DfVisitor<Object>(new PhiRemoval()) };
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 		}

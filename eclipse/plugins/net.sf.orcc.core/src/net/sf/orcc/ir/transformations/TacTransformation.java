@@ -52,7 +52,7 @@ import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.common.util.BasicEList;
@@ -67,11 +67,32 @@ import org.eclipse.emf.common.util.EList;
  * @author Herve Yviquel
  * 
  */
-public class TacTransformation extends AbstractActorVisitor<Expression> {
+public class TacTransformation extends AbstractIrVisitor<Expression> {
 
 	private static IrFactory factory = IrFactory.eINSTANCE;
 
 	private int complexityLevel = 0;
+
+	@Override
+	public Expression caseBlockIf(BlockIf nodeIf) {
+		complexityLevel++;
+		nodeIf.setCondition(doSwitch(nodeIf.getCondition()));
+		complexityLevel--;
+		doSwitch(nodeIf.getThenBlocks());
+		doSwitch(nodeIf.getElseBlocks());
+		doSwitch(nodeIf.getJoinBlock());
+		return null;
+	}
+
+	@Override
+	public Expression caseBlockWhile(BlockWhile nodeWhile) {
+		complexityLevel++;
+		nodeWhile.setCondition(doSwitch(nodeWhile.getCondition()));
+		complexityLevel--;
+		doSwitch(nodeWhile.getBlocks());
+		doSwitch(nodeWhile.getJoinBlock());
+		return null;
+	}
 
 	@Override
 	public Expression caseExprBinary(ExprBinary expr) {
@@ -235,27 +256,6 @@ public class TacTransformation extends AbstractActorVisitor<Expression> {
 
 		store.setValue(doSwitch(store.getValue()));
 		complexityLevel--;
-		return null;
-	}
-
-	@Override
-	public Expression caseNodeIf(BlockIf nodeIf) {
-		complexityLevel++;
-		nodeIf.setCondition(doSwitch(nodeIf.getCondition()));
-		complexityLevel--;
-		doSwitch(nodeIf.getThenBlocks());
-		doSwitch(nodeIf.getElseBlocks());
-		doSwitch(nodeIf.getJoinBlock());
-		return null;
-	}
-
-	@Override
-	public Expression caseNodeWhile(BlockWhile nodeWhile) {
-		complexityLevel++;
-		nodeWhile.setCondition(doSwitch(nodeWhile.getCondition()));
-		complexityLevel--;
-		doSwitch(nodeWhile.getBlocks());
-		doSwitch(nodeWhile.getJoinBlock());
 		return null;
 	}
 

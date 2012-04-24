@@ -32,19 +32,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.dftools.util.util.EcoreHelper;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Block;
-import net.sf.orcc.ir.BlockBasic;
-import net.sf.orcc.ir.BlockIf;
-import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 
 /**
@@ -53,9 +53,9 @@ import net.sf.orcc.ir.util.IrUtil;
  * @author Matthieu Wipliez
  * 
  */
-public class PhiRemoval extends AbstractActorVisitor<Object> {
+public class PhiRemoval extends AbstractIrVisitor<Object> {
 
-	private class PhiRemover extends AbstractActorVisitor<Object> {
+	private class PhiRemover extends AbstractIrVisitor<Object> {
 
 		@Override
 		public Object caseInstPhi(InstPhi phi) {
@@ -101,16 +101,16 @@ public class PhiRemoval extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseNodeIf(BlockIf node) {
+	public Object caseBlockIf(BlockIf node) {
 		BlockBasic join = node.getJoinBlock();
 		targetBlock = IrUtil.getLast(node.getThenBlocks());
 		phiIndex = 0;
-		caseNodeBlock(join);
+		caseBlockBasic(join);
 
 		targetBlock = IrUtil.getLast(node.getElseBlocks());
 		phiIndex = 1;
-		caseNodeBlock(join);
-		new PhiRemover().caseNodeBlock(join);
+		caseBlockBasic(join);
+		new PhiRemover().caseBlockBasic(join);
 
 		doSwitch(node.getThenBlocks());
 		doSwitch(node.getElseBlocks());
@@ -118,7 +118,7 @@ public class PhiRemoval extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseNodeWhile(BlockWhile node) {
+	public Object caseBlockWhile(BlockWhile node) {
 		List<Block> nodes = EcoreHelper.getContainingList(node);
 		// the node before the while.
 		if (indexNode > 0) {
@@ -136,13 +136,13 @@ public class PhiRemoval extends AbstractActorVisitor<Object> {
 
 		BlockBasic join = node.getJoinBlock();
 		phiIndex = 0;
-		caseNodeBlock(join);
+		caseBlockBasic(join);
 
 		// last node of the while
 		targetBlock = IrUtil.getLast(node.getBlocks());
 		phiIndex = 1;
-		caseNodeBlock(join);
-		new PhiRemover().caseNodeBlock(join);
+		caseBlockBasic(join);
+		new PhiRemover().caseBlockBasic(join);
 		doSwitch(node.getBlocks());
 		return null;
 	}

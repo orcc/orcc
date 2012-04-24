@@ -164,7 +164,7 @@ public class XlimBackendImpl extends AbstractBackend {
 				new DfVisitor<Object>(new DeadCodeElimination()),
 				new DfVisitor<Object>(new XlimDeadVariableRemoval()),
 				new DfVisitor<Void>(new ListFlattener()),
-				new TacTransformation(),
+				new DfVisitor<Expression>(new TacTransformation()),
 				new DfVisitor<CfgNode>(new CfgBuilder()),
 				new DfVisitor<Void>(new InstPhiTransformation()),
 				new DfVisitor<Expression>(new LiteralIntegersAdder()),

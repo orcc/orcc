@@ -32,15 +32,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.eclipse.emf.common.util.EList;
-
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
+
+import org.eclipse.emf.common.util.EList;
 
 /**
  * This class defines a transformation that transforms variable and procedure
@@ -50,7 +51,26 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * @author Matthieu Wipliez
  * 
  */
-public class RenameTransformation extends AbstractActorVisitor<Object> {
+public class RenameTransformation extends DfVisitor<Object> {
+
+	private class IrVisitor extends AbstractIrVisitor<Object> {
+
+		@Override
+		public Object caseProcedure(Procedure procedure) {
+			String name = procedure.getName();
+			if (transformations != null && transformations.containsKey(name)) {
+				procedure.setName(transformations.get(name));
+			} else if (pattern != null) {
+				procedure
+						.setName(pattern.matcher(name).replaceAll(replacement));
+			}
+
+			checkParameters(procedure.getParameters());
+			checkVariables(procedure.getLocals());
+			return null;
+		}
+
+	}
 
 	private final Pattern pattern;
 
@@ -68,6 +88,8 @@ public class RenameTransformation extends AbstractActorVisitor<Object> {
 		this.transformations = transformations;
 		pattern = null;
 		replacement = null;
+
+		irVisitor = new IrVisitor();
 	}
 
 	/**
@@ -83,6 +105,8 @@ public class RenameTransformation extends AbstractActorVisitor<Object> {
 		transformations = null;
 		this.pattern = pattern;
 		this.replacement = replacement;
+
+		irVisitor = new IrVisitor();
 	}
 
 	@Override
@@ -99,20 +123,6 @@ public class RenameTransformation extends AbstractActorVisitor<Object> {
 		checkPorts(network.getOutputs());
 
 		return super.caseNetwork(network);
-	}
-
-	@Override
-	public Object caseProcedure(Procedure procedure) {
-		String name = procedure.getName();
-		if (transformations != null && transformations.containsKey(name)) {
-			procedure.setName(transformations.get(name));
-		} else if (pattern != null) {
-			procedure.setName(pattern.matcher(name).replaceAll(replacement));
-		}
-
-		checkParameters(procedure.getParameters());
-		checkVariables(procedure.getLocals());
-		return null;
 	}
 
 	private void checkPorts(EList<Port> inputs) {
