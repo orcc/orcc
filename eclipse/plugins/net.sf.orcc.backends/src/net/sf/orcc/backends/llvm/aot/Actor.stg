@@ -22,14 +22,6 @@ fifoVarName(port) ::= <<
 fifo(port) ::= <<
 >>
 
-printStatus(dir, port, index, action, state) ::= <<
-%status_<port.name><if(action)>_<action.name><endif><if(state)>_<state.name><endif> = tail call i32 asm sideeffect "STREAM_<dir>.CAL_STREAM_<dir>_STATUS", "=r,ir"(i32 <index>) nounwind
->>
-
-printPortsStatus(dir, ports, action=false, state=false) ::= <<
-<ports: { port | <printStatus(dir, port, i0, action, state)> }; separator="\n">
->>
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constants
@@ -288,6 +280,104 @@ entry:
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// FIFO managment
+///////////////////////////////////////////////////////////////////////////////
+
+printInputId(port) ::= <<
+<instance.incomingPortMap.(port).label>
+>>
+
+printInputSize(port) ::= <<
+<instance.incomingPortMap.(port).size>
+>>
+
+printInputPort(port) ::= <<
+@fifo_<printInputId(port)>_content = external global [<printInputSize(port)> x i32]
+@fifo_<printInputId(port)>_rdIndex = external global i32
+@fifo_<printInputId(port)>_wrIndex = external global i32
+
+@SIZE_<port.name> == constant i32 <printInputSize(port)>
+@index_<port.name> = internal global i32 0
+@numTokens_<port.name> = internal global i32 0
+>>
+
+printOutputId(port) ::= <<
+<instance.incomingPortMap.(port).label>
+>>
+
+printOutputSize(port) ::= <<
+<instance.incomingPortMap.(port).size>
+>>
+
+printOutputPort(port) ::= <<
+@fifo_<printOutputId(port)>_content = external global [<printOutputSize(port)> x i32]
+@fifo_<printOutputId(port)>_rdIndex = external global i32
+@fifo_<printOutputId(port)>_wrIndex = external global i32
+
+@SIZE_<port.name> == constant i32 <printOutputSize(port)>
+@index_<port.name> = internal global i32 0
+@numFree_<port.name> = internal global i32 0
+>>
+
+getPortName(port) ::= <<
+<instance.name>_<port.name>
+>>
+
+printReadTokensFunction(port) ::= <<
+define internal void @read_<port.name>() {
+<if(instance.incomingPortMap.(port))>
+	%rdIndex = load i32 @fifo_<printInputId(port)>_rdIndex
+	store i32 %rdIndex, i32 @index_<port.name>
+	%wrIndex = load i32 @fifo_<printInputId(port)>_wrIndex
+	%numTokens = sub i32 wrIndex, i32 rdIndex
+	store i32 %numTokens, i32 @numTokens_<port.name>
+<else>
+	;; Input port <getPortName(port)> not connected
+<endif>
+}
+
+define internal void @read_end_<port.name>() {
+<if(instance.incomingPortMap.(port))>
+	%rdIndex = load i32 @index_<port.name>
+	store i32 %rdIndex, i32 @fifo_<printInputId(port)>_rdIndex
+<else>
+	;; Input port <getPortName(port)> not connected<
+endif>
+}
+>>
+
+printWriteTokensFunction(port) ::= <<
+define internal void @write_<port.name>() {
+	%wrIndex = load i32 @fifo_<printOutputId(port)>_wrIndex
+	store i32 %wrIndex, i32 @index_<port.name>
+	%rdIndex = load i32 @fifo_<printOutputId(port)>_rdIndex
+	%numFree = sub i32 rdIndex, i32 wrIndex
+	store i32 %numFree, i32 @numFree_<port.name>
+}
+
+define internal void @write_end_<port.name>() {
+	%wrIndex = load i32 @index_<port.name>
+	store i32 %wrIndex, i32 @fifo_<printOutputId(port)>_wrIndex
+}
+>>
+
+printTokensFunctions() ::= <<
+<instance.actor.inputs: printReadTokensFunction()>
+<instance.actor.outputs: {port|<if(!port.native)><printWriteTokensFunction(port)><endif>}>
+>>
+
+printCallStartTokenFunctions() ::= <<
+<instance.actor.inputs: {port|call void @read_<port.name>()}; separator="\n">
+<instance.actor.outputs: {port|<if(!port.native)>call void @write_<port.name>()<endif>}; separator="\n">
+>>
+
+printCallEndTokenFunctions() ::= <<
+<instance.actor.inputs: {port|call void @read_end_<port.name>()}; separator="\n">
+<instance.actor.outputs: {port|<if(!port.native)>call void @write_end_<port.name>()<endif>}; separator="\n">
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Scheduler
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -323,7 +413,7 @@ checkInputPattern(action, pattern, state=false) ::= <<
 <checkInputPorts(action, first(pattern.ports), rest(pattern.ports), instance.actor.templateData.portToIndexByPatternMap.(pattern), state)>
 >>
 
-actionTest(action) ::= <<
+actionTest(action, restActions) ::= <<
 	; ACTION <action.name>
 <if(!action.inputPattern.empty)
 >	;; Input pattern
@@ -343,10 +433,9 @@ endif>
 bb_<action.name>_check_outputs:
 <if(!action.outputPattern.empty)
 >	;; Output pattern
-	<printPortsStatus("OUT", instance.actor.outputs, action)>
 	<checkOutputPattern(action, action.outputPattern)>
 	
-	br i1 %has_valid_outputs_<action.name>_<length(action.outputPattern.ports)>, label %bb_<action.name>_fire, label %bb_<action.name>_check_outputs<
+	br i1 %has_valid_outputs_<action.name>_<length(action.outputPattern.ports)>, label %bb_<action.name>_fire, label %bb_finished<
 else
 >	;; Empty output pattern
 	
@@ -360,18 +449,15 @@ bb_<action.name>_fire:
 	br label %bb_scheduler_start
 
 bb_<action.name>_unschedulable:
+<if(restActions)>
+<actionTest(first(restActions), rest(restActions))>
+<else>
+	br label %bb_finished
+<endif>
 >>
 
-printActions(actions) ::= <<
-	; ------- Actions outside the FSM --------
-<actions: actionTest(); separator="\n">
-	; ---- End of actions outside the FSM ----
->>
-
-schedulerWithoutFSM(actions) ::= <<
-<printActions(actions)>
-
-	br label %bb_scheduler_start
+printActionLoop(actions) ::= <<
+<actionTest(first(actions), rest(actions))>
 >>
 
 actionTestState(sourceState, transition, restTransitionsList) ::= <<
@@ -394,10 +480,9 @@ endif>
 bb_<sourceState.name>_<transition.action.name>_check_outputs:
 <if(!transition.action.outputPattern.empty)
 >	;; Output pattern
-	<printPortsStatus("OUT", instance.actor.outputs, transition.action, sourceState)>
 	<checkOutputPattern(transition.action, transition.action.outputPattern, sourceState)>
 	
-	br i1 %has_valid_outputs_<sourceState.name>_<transition.action.name>_<length(transition.action.outputPattern.ports)>, label %bb_<sourceState.name>_<transition.action.name>_fire, label %bb_scheduler_start<
+	br i1 %has_valid_outputs_<sourceState.name>_<transition.action.name>_<length(transition.action.outputPattern.ports)>, label %bb_<sourceState.name>_<transition.action.name>_fire, label %bb_<sourceState.name>_finished<
 else
 >	;; Empty output pattern
 	
@@ -407,16 +492,19 @@ endif>
 
 bb_<sourceState.name>_<transition.action.name>_fire:
 	call void @<transition.action.body.name> ()
-	store i32 <instance.actor.templateData.stateToLabelMap.(transition.target)>, i32* @_FSM_state
 	
-	br label %bb_scheduler_start
+	br label %bb_s_<transition.target.name>
 
 bb_<sourceState.name>_<transition.action.name>_unschedulable:
 
 <if(restTransitionsList)>
 <actionTestState(sourceState, first(restTransitionsList), rest(restTransitionsList))><
 else
->	br label %bb_scheduler_start
+>	br label %bb_<sourceState.name>_finished
+
+bb_<sourceState.name>_finished:
+	store i32 <instance.actor.templateData.stateToLabelMap.(sourceState)>, i32* @_FSM_state
+	br label %bb_finished
 <endif>
 >>
 
@@ -427,6 +515,9 @@ schedulingStates(sourceState, transitionsList) ::= <<
 printTransition(state) ::= <<
 ; STATE <state.name>
 bb_s_<state.name>:
+	<if (actions)>
+	call void @<instance.name>_outside_FSM_scheduler()
+	<endif>
 <schedulingStates(state, state.outgoing)>
 >>
 
@@ -441,15 +532,25 @@ switch i32 %local_FSM_state, label %default [
 >>
 
 schedulerWithFSM(actions, fsm) ::= <<
-<if(actions)>
-<printActions(actions)>
-	br label %bb_fsm_start
+@_FSM_state = global i32 <instance.actor.templateData.stateToLabelMap.(fsm.initialState)>
 
-bb_fsm_start:
+<if(actions)>
+define void @<instance.name>_outside_FSM_scheduler() noreturn nounwind {
+bb_scheduler_start:
+	;; no read/write here!
+<printActionLoop(actions)>
+
+bb_finished:
+	;; no read_end/write_end here!
+	ret void
+}
 <endif>
 
+
+define void @<instance.name>_scheduler() noreturn nounwind {
+bb_scheduler_start:
+	<printCallStartTokenFunctions()>
 	<printFsmSwitch(fsm)>
-	
 	br label %bb_scheduler_start
 
 default:
@@ -457,6 +558,22 @@ default:
 	br label %bb_scheduler_start
 
 <fsm.states: printTransition(); separator="\n">
+
+bb_finished:
+	<printCallEndTokenFunctions()>
+	ret void
+}
+>>
+
+schedulerWithoutFSM(actions) ::= <<
+define void @<instance.name>_scheduler() noreturn nounwind {
+bb_scheduler_start:
+	<printCallStartTokenFunctions()>
+<printActionLoop(instance.actor.actionsOutsideFsm)>
+bb_finished:
+	<printCallEndTokenFunctions()>
+	ret void
+}
 >>
 
 
@@ -508,12 +625,14 @@ declare i32 @printf(i8* noalias , ...) nounwind
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Input FIFOs
 <instance.actor.inputs: fifo(); separator="\n">
+<instance.actor.inputs: { port | <if(!port.native)><printInputPort(port)><endif> }>
 <endif>
 
 <if(instance.actor.outputs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Output FIFOs
 <instance.actor.outputs: fifo(); separator="\n">
+<instance.actor.outputs: { port | <if(!port.native)><printOutputPort(port)><endif> }>
 <endif>
 
 <if(instance.actor.parameters)>
@@ -545,23 +664,16 @@ declare i32 @printf(i8* noalias , ...) nounwind
 <instance.actor.actions: printAction(); separator="\n\n">
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Token functions
+<printTokensFunctions()>
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Action-scheduler
 <if(instance.actor.fsm)>
-@_FSM_state = global i32 <instance.actor.templateData.stateToLabelMap.(instance.actor.fsm.initialState)>
+<schedulerWithFSM(instance.actor.actionsOutsideFsm, instance.actor.fsm)>
+<else>
+<schedulerWithoutFSM(instance.actor.actionsOutsideFsm)>
 <endif>
-
-define external void @<instance.name>_scheduler() noreturn nounwind {
-entry:
-	<instance.actor.initializes: callInitialize(); separator="\n">
-
-	br label %bb_scheduler_start
-
-	bb_scheduler_start:
-	<printPortsStatus("IN", instance.actor.inputs)>
-<if(instance.actor.fsm)
-><schedulerWithFSM(instance.actor.actionsOutsideFsm, instance.actor.fsm)><
-else
-><schedulerWithoutFSM(instance.actor.actionsOutsideFsm)><
-endif>
-}
 >>
+
+
