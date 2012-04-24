@@ -320,7 +320,7 @@ public class CBackendImpl extends AbstractBackend {
 
 	protected void printMapping(Network network) {
 		StandardPrinter networkPrinter = new StandardPrinter(
-				"net/sf/orcc/backends/c/Mapping.stg");
+				"net/sf/orcc/backends/util/Mapping.stg");
 		networkPrinter.getOptions().put("mapping", targetToInstancesMap);
 		networkPrinter.print(network.getName() + ".xcf", path, network);
 	}

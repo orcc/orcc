@@ -277,7 +277,7 @@ public class JadeBackendImpl extends AbstractBackend {
 
 	private void printMapping(Network network) {
 		StandardPrinter networkPrinter = new StandardPrinter(
-				"net/sf/orcc/backends/llvm/jit/Mapping.stg");
+				"net/sf/orcc/backends/util/Mapping.stg");
 		networkPrinter.getOptions().put("mapping", targetToInstancesMap);
 		networkPrinter.print(network.getName() + ".xcf", path, network);
 	}
