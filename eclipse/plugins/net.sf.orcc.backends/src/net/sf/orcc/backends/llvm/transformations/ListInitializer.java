@@ -35,7 +35,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 
 /**
  * Check coherence between a list size and its number of initial values.
@@ -43,10 +43,10 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * @author Jerome Gorin
  * 
  */
-public class ListInitializer extends AbstractActorVisitor<Object> {
+public class ListInitializer extends AbstractIrVisitor<Void> {
 
 	@Override
-	public Object caseVar(Var var) {
+	public Void caseVar(Var var) {
 		if (var.getType().isList() && var.isInitialized()) {
 			TypeList type = (TypeList) var.getType();
 			Expression init = var.getInitialValue();

@@ -31,10 +31,10 @@ package net.sf.orcc.backends.llvm.transformations;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 import org.eclipse.emf.common.util.EList;
 
@@ -44,7 +44,7 @@ import org.eclipse.emf.common.util.EList;
  * @author Jerome Gorin
  * @author Herve Yviquel
  */
-public class BoolToIntTransformation extends AbstractActorVisitor<Object> {
+public class BoolToIntTransformation extends DfVisitor<Void> {
 
 	private void changeType(Var var) {
 		TypeList listType = (TypeList) var.getType();
@@ -54,7 +54,7 @@ public class BoolToIntTransformation extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object casePattern(Pattern pattern) {
+	public Void casePattern(Pattern pattern) {
 		for (Var var : pattern.getVariables()) {
 			changeType(var);
 		}
@@ -62,7 +62,7 @@ public class BoolToIntTransformation extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseActor(Actor actor) {
+	public Void caseActor(Actor actor) {
 		visitPort(actor.getInputs());
 		visitPort(actor.getOutputs());
 		return super.caseActor(actor);
