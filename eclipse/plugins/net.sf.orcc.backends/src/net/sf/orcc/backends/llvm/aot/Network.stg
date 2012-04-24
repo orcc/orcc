@@ -1,3 +1,17 @@
 printNetwork (network, options) ::= << 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Actor-scheduler - Round-robin
 
+define void @main() noinline noreturn nounwind {
+entry:
+	<network.instances: callScheduler(); separator="\n">
+	br %entry
+
+end:
+	ret void
+}
+>>
+
+callScheduler(instance) ::= <<
+call void @<instance.name>_scheduler()
 >>
