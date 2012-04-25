@@ -34,7 +34,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
 
+import net.sf.dftools.graph.Edge;
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -87,32 +90,103 @@ public class XdfResourceImpl extends ResourceImpl {
 		}
 	}
 
+	/**
+	 * Returns the connection of the given network that corresponds to the given
+	 * fragment.
+	 * 
+	 * @param network
+	 *            network
+	 * @param fragment
+	 *            a fragment of the form
+	 *            "//@connections:source.port-target.port"
+	 * @return a connection, or <code>null</code>
+	 */
+	private Connection getConnection(Network network, String fragment) {
+		Vertex source, target;
+		String sourcePort = null, targetPort = null;
+
+		String arg = fragment.substring(12);
+		int dot = arg.indexOf('.');
+		int dash = arg.indexOf('-');
+		if (dash < dot) {
+			// first vertex is a port
+			source = network.getInput(arg.substring(0, dash));
+		} else {
+			// first vertex is an instance
+			source = network.getInstance(arg.substring(0, dot));
+			sourcePort = arg.substring(dot + 1, dash);
+		}
+
+		dash++;
+		dot = arg.indexOf('.', dash);
+		if (dot == -1) {
+			// second vertex is a port
+			target = network.getOutput(arg.substring(dash));
+		} else {
+			// second vertex is an instance
+			target = network.getInstance(arg.substring(dash, dot));
+			targetPort = arg.substring(dot + 1);
+		}
+
+		for (Edge edge : source.getOutgoing()) {
+			Connection connection = (Connection) edge;
+			if (connection.getTarget() != target) {
+				continue;
+			}
+
+			// if source port is not null, check connection's source port
+			if (sourcePort != null) {
+				Port port = connection.getSourcePort();
+				if (port == null || !sourcePort.equals(port.getName())) {
+					continue;
+				}
+			}
+
+			// if target port is not null, check connection's target port
+			if (targetPort != null) {
+				Port port = connection.getTargetPort();
+				if (port == null || !targetPort.equals(port.getName())) {
+					continue;
+				}
+			}
+
+			return connection;
+		}
+
+		return null;
+	}
+
 	@Override
 	public EObject getEObject(String uriFragment) {
 		if (getContents().isEmpty()) {
 			return null;
 		}
 
-		if (uriFragment.length() == 0) {
+		if (uriFragment.length() < 4 || !uriFragment.startsWith("//@")) {
 			return super.getEObject(uriFragment);
 		}
 
+		String fragment = uriFragment.substring(3);
 		EObject root = getContents().get(0);
 		if (root instanceof Network) {
 			Network network = (Network) root;
-			int index = uriFragment.lastIndexOf('.') + 1;
-			if (!Character.isDigit(uriFragment.charAt(index))) {
-				String name = uriFragment.substring(index);
-				if (uriFragment.startsWith("//@inputs.")) {
-					return network.getInput(name);
-				} else if (uriFragment.startsWith("//@outputs.")) {
-					return network.getOutput(name);
-				} else if (uriFragment.startsWith("//@instances.")) {
-					return network.getInstance(name);
-				} else if (uriFragment.startsWith("//@parameters.")) {
-					return network.getParameter(name);
-				} else if (uriFragment.startsWith("//@variables.")) {
-					return network.getVariable(name);
+			if (fragment.startsWith("connections:")) {
+				return getConnection(network, fragment);
+			} else {
+				int index = fragment.lastIndexOf('.') + 1;
+				if (!Character.isDigit(fragment.charAt(index))) {
+					String name = fragment.substring(index);
+					if (fragment.startsWith("inputs.")) {
+						return network.getInput(name);
+					} else if (fragment.startsWith("outputs.")) {
+						return network.getOutput(name);
+					} else if (fragment.startsWith("instances.")) {
+						return network.getInstance(name);
+					} else if (fragment.startsWith("parameters.")) {
+						return network.getParameter(name);
+					} else if (fragment.startsWith("variables.")) {
+						return network.getVariable(name);
+					}
 				}
 			}
 		}
@@ -142,9 +216,29 @@ public class XdfResourceImpl extends ResourceImpl {
 			} else {
 				return "//@variables." + var.getName();
 			}
+		} else if (eObject instanceof Connection) {
+			Connection connection = (Connection) eObject;
+			StringBuilder builder = new StringBuilder("//@connections:");
+
+			builder.append(connection.getSource().getLabel());
+			Port sourcePort = connection.getSourcePort();
+			if (sourcePort != null) {
+				builder.append('.');
+				builder.append(sourcePort.getName());
+			}
+			builder.append('-');
+
+			builder.append(connection.getTarget().getLabel());
+			Port targetPort = connection.getTargetPort();
+			if (targetPort != null) {
+				builder.append('.');
+				builder.append(targetPort.getName());
+			}
+
+			return builder.toString();
 		}
 
-		// for connection and other objects
+		// for other objects (types, expressions...)
 		return super.getURIFragment(eObject);
 	}
 
