@@ -10,20 +10,6 @@ variableDeclaration(variable) ::= <<
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// FIFO declaration
-///////////////////////////////////////////////////////////////////////////////
-
-fifoVar(port, var) ::= <<
->>
-
-fifoVarName(port) ::= <<
->>
-
-fifo(port) ::= <<
->>
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Constants
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -585,7 +571,6 @@ printAction(action) ::= <<
 define <action.scheduler.returnType> @<action.scheduler.name>(<action.scheduler.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
 entry:
 	<action.scheduler.locals: variableDeclaration()>
-	<action.peekPattern.ports: { port | <fifoVar(port, action.inputPattern.portToVarMap.(port))>}; separator="\n">
 	br label %b<label(first(action.scheduler.nodes))>
 	
 <printNodes(action.scheduler.nodes)>
@@ -594,8 +579,6 @@ entry:
 define void @<action.body.name>(<action.body.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
 entry:
 	<action.body.locals: variableDeclaration()>
-	<action.inputPattern.ports: { port | <fifoVar(port, action.inputPattern.portToVarMap.(port))>}; separator="\n">
-	<action.outputPattern.ports: { port | <fifoVar(port, action.outputPattern.portToVarMap.(port))>}; separator="\n">
 	br label %b<label(first(action.body.nodes))>
 
 <printNodes(action.body.nodes)>
@@ -624,14 +607,12 @@ declare i32 @printf(i8* noalias , ...) nounwind
 <if(instance.actor.inputs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Input FIFOs
-<instance.actor.inputs: fifo(); separator="\n">
 <instance.actor.inputs: { port | <if(!port.native)><printInputPort(port)><endif> }>
 <endif>
 
 <if(instance.actor.outputs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Output FIFOs
-<instance.actor.outputs: fifo(); separator="\n">
 <instance.actor.outputs: { port | <if(!port.native)><printOutputPort(port)><endif> }>
 <endif>
 
