@@ -5,7 +5,7 @@ printNetwork (network, options) ::= <<
 define void @main() noinline noreturn nounwind {
 entry:
 	<network.instances: callScheduler(); separator="\n">
-	br %entry
+	br label %entry
 
 end:
 	ret void
