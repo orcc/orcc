@@ -57,6 +57,14 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 public class UnaryListRemoval extends DfVisitor<Void> {
 
 	@Override
+	public Void caseAction(Action action) {
+		doSwitch(action.getInputPattern());
+		doSwitch(action.getOutputPattern());
+
+		return null;
+	}
+
+	@Override
 	public Void casePattern(Pattern pattern) {
 		List<Port> ports = new ArrayList<Port>(pattern.getPorts());
 		for (Port port : ports) {
