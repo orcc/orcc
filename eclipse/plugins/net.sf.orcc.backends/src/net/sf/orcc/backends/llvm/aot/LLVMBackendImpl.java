@@ -48,6 +48,7 @@ import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.backends.transformations.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transformations.ssa.CopyPropagator;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.df.transformations.NetworkFlattener;
@@ -63,7 +64,6 @@ import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.transformations.TacTransformation;
-import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
 
@@ -75,8 +75,8 @@ import org.eclipse.core.resources.IFile;
  */
 public class LLVMBackendImpl extends AbstractBackend {
 
-	private final Map<String, String> transformations;
 	private StandardPrinter printer;
+	private final Map<String, String> transformations;
 
 	/**
 	 * Creates a new instance of the LLVM back-end. Initializes the
@@ -94,9 +94,29 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 	@Override
 	public void doInitializeOptions() {
+		printer = new StandardPrinter("net/sf/orcc/backends/llvm/aot/Actor.stg");
+		printer.setExpressionPrinter(new LLVMExpressionPrinter());
+		printer.setTypePrinter(new LLVMTypePrinter());
+		printer.getOptions().put("fifoSize", fifoSize);
 
+		// Set build and src directory
+		File srcDir = new File(path + "/src");
+		File buildDir = new File(path + "/build");
+
+		// If directories don't exist, create them
+		if (!srcDir.exists()) {
+			srcDir.mkdirs();
+		}
+
+		// If directories don't exist, create them
+		if (!buildDir.exists()) {
+			buildDir.mkdirs();
+		}
+
+		// Set src directory as path
+		path = srcDir.getAbsolutePath();
 	}
-
+	
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 
@@ -127,11 +147,6 @@ public class LLVMBackendImpl extends AbstractBackend {
 		actor.setTemplateData(new LLVMTemplateData(actor));
 	}
 
-	@Override
-	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
-		// do not generate a VTL
-	}
-
 	protected Network doTransformNetwork(Network network) throws OrccException {
 		// instantiate and flattens network
 		write("Instantiating...\n");
@@ -140,6 +155,11 @@ public class LLVMBackendImpl extends AbstractBackend {
 		new NetworkFlattener().doSwitch(network);
 
 		return network;
+	}
+
+	@Override
+	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
+		// do not generate a VTL
 	}
 
 	@Override
@@ -162,13 +182,33 @@ public class LLVMBackendImpl extends AbstractBackend {
 		printer.print(network.getSimpleName() + ".ll", path, network);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.orcc.backends.AbstractBackend#exportRuntimeLibrary()
+	 */
 	@Override
-	protected boolean printActor(Actor actor) {
-		// Create folder if necessary
-		String folder = path + File.separator + OrccUtil.getFolder(actor);
-		new File(folder).mkdirs();
+	public boolean exportRuntimeLibrary() throws OrccException {
+		if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
+			File targetPath = new File(path).getParentFile();
+			copyFileToFilesystem("/runtime/run_cmake_with_VS_env.bat",
+					targetPath + File.separator + "run_cmake_with_VS_env.bat");
+		}
 
-		return printer.print(actor.getSimpleName(), folder, actor);
+		String target = path + File.separator + "libs";
+		write("Export libraries sources into " + target + "... ");
+		if (copyFolderToFileSystem("/runtime/C", target)) {
+			write("OK" + "\n");
+			return true;
+		} else {
+			write("Error" + "\n");
+			return false;
+		}
+	}
+
+	@Override
+	protected boolean printInstance(Instance instance) {
+		return printer.print(instance.getSimpleName() + ".ll", path, instance);
 	}
 
 }
