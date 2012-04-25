@@ -284,7 +284,7 @@ entry:
 ///////////////////////////////////////////////////////////////////////////////
 
 printInputId(port) ::= <<
-<instance.incomingPortMap.(port).label>
+<instance.incomingPortMap.(port).fifoId>
 >>
 
 printInputSize(port) ::= <<
@@ -296,17 +296,17 @@ printInputPort(port) ::= <<
 @fifo_<printInputId(port)>_rdIndex = external global i32
 @fifo_<printInputId(port)>_wrIndex = external global i32
 
-@SIZE_<port.name> == constant i32 <printInputSize(port)>
+@SIZE_<port.name> = constant i32 <printInputSize(port)>
 @index_<port.name> = internal global i32 0
 @numTokens_<port.name> = internal global i32 0
 >>
 
 printOutputId(port) ::= <<
-<instance.incomingPortMap.(port).label>
+<first(instance.outgoingPortMap.(port)).fifoId>
 >>
 
 printOutputSize(port) ::= <<
-<instance.incomingPortMap.(port).size>
+<first(instance.outgoingPortMap.(port)).size>
 >>
 
 printOutputPort(port) ::= <<
@@ -314,7 +314,7 @@ printOutputPort(port) ::= <<
 @fifo_<printOutputId(port)>_rdIndex = external global i32
 @fifo_<printOutputId(port)>_wrIndex = external global i32
 
-@SIZE_<port.name> == constant i32 <printOutputSize(port)>
+@SIZE_<port.name> = constant i32 <printOutputSize(port)>
 @index_<port.name> = internal global i32 0
 @numFree_<port.name> = internal global i32 0
 >>

@@ -153,6 +153,8 @@ public class LLVMBackendImpl extends AbstractBackend {
 		network = new Instantiator(fifoSize).doSwitch(network);
 		write("Flattening...\n");
 		new NetworkFlattener().doSwitch(network);
+		
+		network.computeTemplateMaps();
 
 		return network;
 	}
