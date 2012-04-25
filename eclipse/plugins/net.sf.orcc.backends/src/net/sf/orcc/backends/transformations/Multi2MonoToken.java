@@ -46,6 +46,7 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Tag;
 import net.sf.orcc.df.Transition;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstReturn;
@@ -56,7 +57,7 @@ import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.common.util.EList;
@@ -68,7 +69,7 @@ import org.eclipse.emf.common.util.EList;
  * @author Khaled Jerbi
  * 
  */
-public class Multi2MonoToken extends AbstractActorVisitor<Object> {
+public class Multi2MonoToken extends DfVisitor<Void> {
 
 	/**
 	 * This class defines a visitor that substitutes the peek from the port to
@@ -78,7 +79,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 * @author Khaled Jerbi
 	 * 
 	 */
-	private class ModifyActionScheduler extends AbstractActorVisitor<Object> {
+	private class ModifyActionScheduler extends AbstractIrVisitor<Object> {
 		private Var buffer;
 		private int bufferSize;
 		private Port currentPort;
@@ -135,7 +136,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 * @author Khaled Jerbi
 	 * 
 	 */
-	private class ModifyProcessActionStore extends AbstractActorVisitor<Object> {
+	private class ModifyProcessActionStore extends AbstractIrVisitor<Object> {
 		private int bufferSize;
 		private Var tab;
 		private Var writeIndex;
@@ -179,7 +180,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 * @author Khaled JERBI
 	 * 
 	 */
-	private class ModifyProcessActionWrite extends AbstractActorVisitor<Object> {
+	private class ModifyProcessActionWrite extends AbstractIrVisitor<Object> {
 
 		private Var tab;
 
@@ -311,7 +312,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseActor(Actor actor) {
+	public Void caseActor(Actor actor) {
 		this.actor = actor;
 		inputIndex = 0;
 		outputIndex = 0;
@@ -949,7 +950,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				}
 			}
 		}
-		optimalSize = closestPow_2(size + 1);
+		optimalSize = closestPow_2(size);
 		return optimalSize;
 	}
 
