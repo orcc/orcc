@@ -37,6 +37,7 @@ import net.sf.orcc.backends.ir.BlockFor;
 import net.sf.orcc.backends.ir.IrNodeSpecific;
 import net.sf.orcc.backends.ir.IrSpecificFactory;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockIf;
@@ -50,7 +51,7 @@ import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.transformations.CfgBuilder;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -62,19 +63,23 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * 
  * @author Jerome Gorin
  */
-public class NodeForAdder extends AbstractActorVisitor<Object> {
+public class NodeForAdder extends DfVisitor<Object> {
+
+	public NodeForAdder() {
+		irVisitor = new Builder();
+	}
 
 	private class ForNodeCfg extends CfgBuilder {
 		@Override
 		public CfgNode caseBlockSpecific(BlockSpecific node) {
 			if (((IrNodeSpecific) node).isNodeFor()) {
-				return caseNodeFor((BlockFor) node);
+				return caseBlockFor((BlockFor) node);
 			}
 
 			return null;
 		}
 
-		public CfgNode caseNodeFor(BlockFor node) {
+		public CfgNode caseBlockFor(BlockFor node) {
 			CfgNode join = addNode(node.getJoinNode());
 			cfg.getVertices().add(join);
 
@@ -98,7 +103,7 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 		}
 	}
 
-	private class VarGetter extends AbstractActorVisitor<Object> {
+	private class VarGetter extends AbstractIrVisitor<Object> {
 
 		private List<Var> vars;
 
@@ -133,120 +138,121 @@ public class NodeForAdder extends AbstractActorVisitor<Object> {
 		return null;
 	}
 
-	@Override
-	public Object caseNodeWhile(BlockWhile nodeWhile) {
+	private class Builder extends AbstractIrVisitor<Object> {
+		@Override
+		public Object caseBlockWhile(BlockWhile nodeWhile) {
+			super.caseBlockWhile(nodeWhile);
 
-		super.caseNodeWhile(nodeWhile);
+			// Get properties of the while node
+			EList<Block> nodes = nodeWhile.getBlocks();
 
-		// Get properties of the while node
-		EList<Block> nodes = nodeWhile.getBlocks();
+			if (nodes.isEmpty()) {
+				// Don't treat empty nodes
+				return null;
+			}
 
-		if (nodes.isEmpty()) {
-			// Don't treat empty nodes
+			Expression condition = nodeWhile.getCondition();
+			Block endNode = nodes.get(nodes.size() - 1);
+
+			CfgNode previousCFGNode = (CfgNode) nodeWhile.getJoinBlock()
+					.getCfgNode().getPredecessors().get(0);
+			Block previousNode = previousCFGNode.getNode();
+
+			List<Var> conditionVars = new VarGetter(condition).get();
+			List<Instruction> loopCnts = new ArrayList<Instruction>();
+			List<Instruction> initCnts = new ArrayList<Instruction>();
+
+			for (Var conditionVar : conditionVars) {
+				// Get assignements on the variables contained in the condition
+				Instruction loopCnt = getLastAssign(conditionVar, endNode);
+				Instruction initCnt = getLastAssign(conditionVar, previousNode);
+
+				if (loopCnt != null) {
+					loopCnts.add(loopCnt);
+				}
+
+				if (initCnt != null) {
+					initCnts.add(initCnt);
+				}
+			}
+
+			// No loop counter founds, no for node to create
+			if (loopCnts.isEmpty() && initCnts.isEmpty()) {
+				return null;
+			}
+
+			// Create node for
+			BlockFor nodeFor = IrSpecificFactory.eINSTANCE.createBlockFor();
+
+			nodeFor.setCondition(nodeWhile.getCondition());
+			nodeFor.setLineNumber(nodeWhile.getLineNumber());
+			nodeFor.setJoinNode(nodeWhile.getJoinBlock());
+			nodeFor.getNodes().addAll(nodeWhile.getBlocks());
+
+			// Add loop counters and inits
+			nodeFor.getLoopCounter().addAll(loopCnts);
+			nodeFor.getInit().addAll(initCnts);
+
+			// Copy attributes
+			for (Attribute attribute : nodeWhile.getAttributes()) {
+				// TODO: copy attribute
+				nodeFor.setAttribute(attribute.getName(), null);
+			}
+
+			// Replace node
+			EcoreUtil.replace(nodeWhile, nodeFor);
+
 			return null;
 		}
 
-		Expression condition = nodeWhile.getCondition();
-		Block endNode = nodes.get(nodes.size() - 1);
+		private Instruction getLastAssign(Var var, Block lastNode) {
+			EList<Def> defs = var.getDefs();
 
-		CfgNode previousCFGNode = (CfgNode) nodeWhile.getJoinBlock()
-				.getCfgNode().getPredecessors().get(0);
-		Block previousNode = previousCFGNode.getNode();
+			// Check if one var defs is located in the last node
+			BlockBasic lastBlockNode = null;
 
-		List<Var> conditionVars = new VarGetter(condition).get();
-		List<Instruction> loopCnts = new ArrayList<Instruction>();
-		List<Instruction> initCnts = new ArrayList<Instruction>();
-
-		for (Var conditionVar : conditionVars) {
-			// Get assignements on the variables contained in the condition
-			Instruction loopCnt = getLastAssign(conditionVar, endNode);
-			Instruction initCnt = getLastAssign(conditionVar, previousNode);
-
-			if (loopCnt != null) {
-				loopCnts.add(loopCnt);
+			if (lastNode.isBlockIf()) {
+				lastBlockNode = ((BlockIf) lastNode).getJoinBlock();
+			} else if (lastNode.isBlockWhile()) {
+				lastBlockNode = ((BlockWhile) lastNode).getJoinBlock();
+			} else if (lastNode.isBlockBasic()) {
+				lastBlockNode = (BlockBasic) lastNode;
+			} else {
+				lastBlockNode = ((BlockFor) lastNode).getJoinNode();
 			}
 
-			if (initCnt != null) {
-				initCnts.add(initCnt);
+			// Return in case of an empty node
+			EList<Instruction> instructions = lastBlockNode.getInstructions();
+			if (instructions.isEmpty()) {
+				return null;
 			}
+
+			// Look for the last assignation
+			InstAssign lastAssign = null;
+			for (Def def : defs) {
+				InstAssign instAssign = EcoreHelper.getContainerOfType(def,
+						InstAssign.class);
+
+				Instruction lastInstruction = instructions.get(instructions
+						.size() - 1);
+
+				// Get last assignation
+				if (lastInstruction.equals(instAssign)) {
+					lastAssign = instAssign;
+					break;
+				}
+			}
+
+			if (lastAssign == null) {
+				// No assignation found
+				return null;
+			}
+
+			// Remove assign instructions and return the corresponding
+			// instruction
+			EcoreUtil.remove(lastAssign);
+
+			return lastAssign;
 		}
-
-		// No loop counter founds, no for node to create
-		if (loopCnts.isEmpty() && initCnts.isEmpty()) {
-			return null;
-		}
-
-		// Create node for
-		BlockFor nodeFor = IrSpecificFactory.eINSTANCE.createBlockFor();
-
-		nodeFor.setCondition(nodeWhile.getCondition());
-		nodeFor.setLineNumber(nodeWhile.getLineNumber());
-		nodeFor.setJoinNode(nodeWhile.getJoinBlock());
-		nodeFor.getNodes().addAll(nodeWhile.getBlocks());
-
-		// Add loop counters and inits
-		nodeFor.getLoopCounter().addAll(loopCnts);
-		nodeFor.getInit().addAll(initCnts);
-
-		// Copy attributes
-		for (Attribute attribute : nodeWhile.getAttributes()) {
-			// TODO: copy attribute
-			nodeFor.setAttribute(attribute.getName(), null);
-		}
-
-		// Replace node
-		EcoreUtil.replace(nodeWhile, nodeFor);
-
-		return null;
 	}
-
-	private Instruction getLastAssign(Var var, Block lastNode) {
-		EList<Def> defs = var.getDefs();
-
-		// Check if one var defs is located in the last node
-		BlockBasic lastBlockNode = null;
-
-		if (lastNode.isBlockIf()) {
-			lastBlockNode = ((BlockIf) lastNode).getJoinBlock();
-		} else if (lastNode.isBlockWhile()) {
-			lastBlockNode = ((BlockWhile) lastNode).getJoinBlock();
-		} else if (lastNode.isBlockBasic()) {
-			lastBlockNode = (BlockBasic) lastNode;
-		} else {
-			lastBlockNode = ((BlockFor) lastNode).getJoinNode();
-		}
-
-		// Return in case of an empty node
-		EList<Instruction> instructions = lastBlockNode.getInstructions();
-		if (instructions.isEmpty()) {
-			return null;
-		}
-
-		// Look for the last assignation
-		InstAssign lastAssign = null;
-		for (Def def : defs) {
-			InstAssign instAssign = EcoreHelper.getContainerOfType(def,
-					InstAssign.class);
-
-			Instruction lastInstruction = instructions
-					.get(instructions.size() - 1);
-
-			// Get last assignation
-			if (lastInstruction.equals(instAssign)) {
-				lastAssign = instAssign;
-				break;
-			}
-		}
-
-		if (lastAssign == null) {
-			// No assignation found
-			return null;
-		}
-
-		// Remove assign instructions and return the corresponding instruction
-		EcoreUtil.remove(lastAssign);
-
-		return lastAssign;
-	}
-
 }
