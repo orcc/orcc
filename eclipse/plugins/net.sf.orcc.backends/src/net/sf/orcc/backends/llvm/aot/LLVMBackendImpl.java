@@ -180,6 +180,11 @@ public class LLVMBackendImpl extends AbstractBackend {
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
 		printer.print(network.getSimpleName() + ".ll", path, network);
+		
+		// print network
+		StandardPrinter networkPrinter = new StandardPrinter(
+				"net/sf/orcc/backends/llvm/aot/CMakeLists.stg");
+		networkPrinter.print("CMakeLists.txt", path, network);
 	}
 
 	/*

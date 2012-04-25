@@ -1,21 +1,17 @@
-printActor(name, actor) ::= <%
-<if (!actor.native)>
-<name>.c
-<endif>
-%>
-
-printInstance(instance) ::= <%
-<if (instance.actor)>
-<printActor(instance.name, instance.actor)>
-<endif>
-%>
-
 printNetwork(network, options) ::= <<
 # Generated from <network.simpleName>
 
 cmake_minimum_required (VERSION 2.6)
 project (<network.simpleName>)
 
+<includeLibraries()>
+
+<createExecutable(network)>
+
+<link(network)>
+>>
+
+includeLibraries() ::= <<
 # Libraries folder
 set(LIBS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs)
 
@@ -36,6 +32,9 @@ include_directories(${ORCC_INCLUDE_DIR} ${ROXML_INCLUDE_DIR})
 find_package(SDL REQUIRED)
 include_directories(${SDL_INCLUDE_DIR})
 
+>>
+
+createExecutable(network) ::= <<
 set(filenames
 	<network.simpleName>.c
 	<network.instances: printInstance();separator="\n">
@@ -44,6 +43,16 @@ set(filenames
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
 add_executable(<network.simpleName> ${filenames})
+>>
 
+link(network) ::= <<
 target_link_libraries(<network.simpleName> orcc roxml ${SDL_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
 >>
+
+printInstance(instance) ::= <%
+<if(!instance.actor.native)>
+<instance.name>.c
+<endif>
+%>
+
+
