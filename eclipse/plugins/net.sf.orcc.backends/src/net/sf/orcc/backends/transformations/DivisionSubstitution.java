@@ -65,12 +65,12 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 public class DivisionSubstitution extends DfVisitor<Void> {
 	private IrFactory factory = IrFactory.eINSTANCE;
 	private Procedure divProc;
-	private boolean flag = false;
+
 	
 	private class Substitutor extends AbstractIrVisitor<Object> {
 		
 		
-		public Substitutor(Boolean flag) {
+		public Substitutor() {
 			super(true);
 		}
 
@@ -94,7 +94,6 @@ public class DivisionSubstitution extends DfVisitor<Void> {
 				if (toShift == false) {
 					if (divProc == null) {
 						divProc = createDivProc();
-						flag = true;
 					}
 
 					// what ever the expression type of division operands they
@@ -395,18 +394,18 @@ public class DivisionSubstitution extends DfVisitor<Void> {
 	@Override
 	public Void caseActor(Actor actor) {
 		this.actor = actor;
-		checkDiv(flag);
+		checkDiv();
 		
-		if (flag = true) {
+		if (divProc != null) {
 			actor.getProcs().add(0, divProc);
 		}
 		return null;
 	}
 
-	public void checkDiv(Boolean flag) {
+	public void checkDiv() {
 		List<Action> actions = new ArrayList<Action>(actor.getActions());
 		for (Action verifAction : actions) {
-			Substitutor substitutor = new Substitutor(flag);
+			Substitutor substitutor = new Substitutor();
 			substitutor.doSwitch(verifAction.getBody());
 		}
 	}
