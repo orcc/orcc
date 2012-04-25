@@ -149,9 +149,8 @@ public class Inliner extends AbstractIrVisitor<Void> {
 		@Override
 		public Void caseInstReturn(InstReturn inst) {
 			// Replace the local variable name by visiting caseExprVar
-			super.doSwitch(instReturn.getValue());
 			instReturn = inst;
-			return null;
+			return super.doSwitch(inst.getValue());
 		}
 
 		@Override
@@ -171,7 +170,7 @@ public class Inliner extends AbstractIrVisitor<Void> {
 
 	private boolean inlineFunction;
 	private boolean inlineProcedure;
-	
+
 	private InstReturn instReturn;
 
 	private Map<Var, Var> localToLocalsMap;
