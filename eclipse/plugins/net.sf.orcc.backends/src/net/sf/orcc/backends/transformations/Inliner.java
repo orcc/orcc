@@ -28,17 +28,18 @@
  */
 package net.sf.orcc.backends.transformations;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import net.sf.dftools.util.util.EcoreHelper;
-import net.sf.orcc.df.Action;
-import net.sf.orcc.df.Actor;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
@@ -49,15 +50,11 @@ import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Block;
-import net.sf.orcc.ir.BlockBasic;
-import net.sf.orcc.ir.BlockIf;
-import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -73,120 +70,162 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @version 1.1
  * 
  */
-public class Inliner extends AbstractActorVisitor<Object> {
+public class Inliner extends AbstractIrVisitor<Void> {
+	private class ExpressionUpdater extends AbstractIrVisitor<Void> {
 
-	private class CallGetter extends AbstractActorVisitor<List<InstCall>> {
-
-		private boolean inlineFunction;
-		private boolean inlineProcedure;
-
-		private List<InstCall> instCallList;
-
-		public CallGetter(boolean inlineProcedure, boolean inlineFunction) {
-			this.inlineProcedure = inlineProcedure;
-			this.inlineFunction = inlineFunction;
+		public ExpressionUpdater() {
+			super(true);
 		}
 
+		/**
+		 * Replace the local variable name if a reference already exists to a
+		 * global variable
+		 */
 		@Override
-		public List<InstCall> caseActor(Actor actor) {
-
-			instCallList = new ArrayList<InstCall>();
-
-			for (Action action : actor.getActions()) {
-				doSwitch(action);
-			}
-
-			for (Action initialize : actor.getInitializes()) {
-				doSwitch(initialize);
-			}
-
-			return instCallList;
-		}
-
-		@Override
-		public List<InstCall> caseInstCall(InstCall call) {
-			// Function case
-			Procedure procedure = call.getProcedure();
-			Type returnType = procedure.getReturnType();
-
-			if (returnType.isVoid() && inlineProcedure || !returnType.isVoid()
-					&& inlineFunction) {
-				if (!call.getProcedure().isNative())
-					instCallList.add(call);
+		public Void caseExprVar(ExprVar exprVar) {
+			Var var = exprVar.getUse().getVariable();
+			if (localToLocalsMap.containsKey(var)) {
+				exprVar.getUse().setVariable(localToLocalsMap.get(var));
 			}
 			return null;
 		}
 
+		@Override
+		public Void caseInstAssign(InstAssign assign) {
+			// Replace the local variable name by visiting caseExprVar
+			super.doSwitch(assign.getValue());
+			Var var = assign.getTarget().getVariable();
+			if (localToLocalsMap.containsKey(var)) {
+				assign.getTarget().setVariable(localToLocalsMap.get(var));
+			}
+			return null;
+		}
+
+		@Override
+		public Void caseInstCall(InstCall call) {
+			Def def = call.getTarget();
+			if (def != null) {
+				Var var = def.getVariable();
+				if (localToLocalsMap.containsKey(var)) {
+					call.getTarget().setVariable(localToLocalsMap.get(var));
+				}
+			}
+			for (Arg arg : call.getParameters()) {
+				doSwitch(arg);
+			}
+			return null;
+		}
+
+		@Override
+		public Void caseInstLoad(InstLoad load) {
+			// Replace the local variable name by visiting caseExprVar
+			Var var = load.getTarget().getVariable();
+			if (localToLocalsMap.containsKey(var)) {
+				load.getTarget().setVariable(localToLocalsMap.get(var));
+			}
+			var = load.getSource().getVariable();
+			if (localToLocalsMap.containsKey(var)) {
+				load.getSource().setVariable(localToLocalsMap.get(var));
+			}
+			for (Expression e : load.getIndexes()) {
+				super.doSwitch(e);
+			}
+			return null;
+		}
+
+		@Override
+		public Void caseInstPhi(InstPhi instPhi) {
+			// Replace the local variable name by visiting caseExprVar
+			Var var = instPhi.getTarget().getVariable();
+			if (localToLocalsMap.containsKey(var)) {
+				instPhi.getTarget().setVariable(localToLocalsMap.get(var));
+			}
+			for (Expression e : instPhi.getValues()) {
+				super.doSwitch(e);
+			}
+			return null;
+		}
+
+		@Override
+		public Void caseInstReturn(InstReturn inst) {
+			// Replace the local variable name by visiting caseExprVar
+			super.doSwitch(instReturn.getValue());
+			instReturn = inst;
+			return null;
+		}
+
+		@Override
+		public Void caseInstStore(InstStore store) {
+			// Replace the local variable name by visiting caseExprVar
+			super.doSwitch(store.getValue());
+			Var var = store.getTarget().getVariable();
+			if (localToLocalsMap.containsKey(var)) {
+				store.getTarget().setVariable(localToLocalsMap.get(var));
+			}
+			for (Expression e : store.getIndexes()) {
+				super.doSwitch(e);
+			}
+			return null;
+		}
 	}
 
-	private CallGetter callGetter;
-
-	private List<InstCall> instCallList = new ArrayList<InstCall>();
-
-	private InstCall currentCall;
-	private Map<Var, Var> localToLocalsMap;
+	private boolean inlineFunction;
+	private boolean inlineProcedure;
+	
 	private InstReturn instReturn;
 
+	private Map<Var, Var> localToLocalsMap;
+	private ExpressionUpdater updater;
+
 	public Inliner(boolean inlineProcedure, boolean inlineFunction) {
-		super(true);
-		callGetter = new CallGetter(inlineProcedure, inlineFunction);
+		this.inlineProcedure = inlineProcedure;
+		this.inlineFunction = inlineFunction;
+		this.updater = new ExpressionUpdater();
 	}
 
-	/**
-	 * Inline the procedure/function
-	 * 
-	 * @param call
-	 */
-	public Inliner(InstCall call) {
-		super(true);
-		this.instCallList.add(call);
-	}
-
-	/**
-	 * Inline the procedure(s)/function(s)
-	 * 
-	 * @param calls
-	 */
-	public Inliner(List<InstCall> calls) {
-		super(true);
-		this.instCallList.addAll(calls);
-	}
-
-	public Object caseActor(Actor actor) {
-		this.actor = actor;
-		if (callGetter != null) {
-			caseFullInliner();
-		} else {
-			casePartialInliner();
+	@Override
+	public Void caseInstCall(InstCall call) {
+		Type returnType = call.getProcedure().getReturnType();
+		if (returnType.isVoid() && inlineProcedure || !returnType.isVoid()
+				&& inlineFunction) {
+			if (!call.getProcedure().isNative())
+				inlineProcedure(call);
 		}
 		return null;
 	}
 
-	private void caseFullInliner() {
-
-		do {
-			casePartialInliner();
-			instCallList = callGetter.doSwitch(actor);
-		} while (!instCallList.isEmpty());
-	}
-
-	private void casePartialInliner() {
-		for (InstCall call : instCallList) {
-			if (!call.getProcedure().isNative()) {
-				if (call.getProcedure().getName()
-						.equals("computeBoundaryFiltStrength")) {
-					call.getProcedure();
+	/**
+	 * Find the given node into the given nodes location.
+	 * 
+	 * @param locationNodes
+	 * @param nodeToFind
+	 * @return
+	 */
+	public List<Block> findNode(List<Block> locationNodes, Block nodeToFind) {
+		if (locationNodes.contains(nodeToFind)) {
+			return locationNodes;
+		} else {
+			List<Block> n = null;
+			for (Block node : locationNodes) {
+				if (node.isBlockIf()) {
+					n = findNode(((BlockIf) node).getElseBlocks(), nodeToFind);
+					if (n == null)
+						n = findNode(((BlockIf) node).getThenBlocks(),
+								nodeToFind);
+				} else if (node.isBlockWhile()) {
+					n = findNode(((BlockWhile) node).getBlocks(), nodeToFind);
 				}
-				this.currentCall = call;
-				inlineProcedure();
+				if (n != null)
+					return n;
 			}
 		}
+		return null;
 	}
 
 	/**
 	 * Inline the currentCall;
 	 */
-	private void inlineProcedure() {
+	private void inlineProcedure(InstCall currentCall) {
 		// 1. Clone procedure
 		Procedure calledProc = IrUtil.copy(currentCall.getProcedure());
 		// 2. Get current procedure
@@ -230,7 +269,7 @@ public class Inliner extends AbstractActorVisitor<Object> {
 			i++;
 		}
 		// 4. Rename local variable
-		super.doSwitch(calledProc);
+		updater.doSwitch(calledProc);
 		// 5. Transform return
 		if ((currentCall.getTarget() == null)
 				| calledProc.getReturnType().isVoid()) {
@@ -265,124 +304,6 @@ public class Inliner extends AbstractActorVisitor<Object> {
 		nodes.addAll(indexNode + 1, inlined);
 		// 8.
 		IrUtil.delete(currentCall);
-	}
-
-	@Override
-	public Object caseInstAssign(InstAssign assign) {
-		// Replace the local variable name by visiting caseExprVar
-		super.doSwitch(assign.getValue());
-		Var var = assign.getTarget().getVariable();
-		if (localToLocalsMap.containsKey(var)) {
-			assign.getTarget().setVariable(localToLocalsMap.get(var));
-		}
-		return null;
-	}
-
-	@Override
-	public Object caseInstLoad(InstLoad load) {
-		// Replace the local variable name by visiting caseExprVar
-		Var var = load.getTarget().getVariable();
-		if (localToLocalsMap.containsKey(var)) {
-			load.getTarget().setVariable(localToLocalsMap.get(var));
-		}
-		var = load.getSource().getVariable();
-		if (localToLocalsMap.containsKey(var)) {
-			load.getSource().setVariable(localToLocalsMap.get(var));
-		}
-		for (Expression e : load.getIndexes()) {
-			super.doSwitch(e);
-		}
-		return null;
-	}
-
-	@Override
-	public Object caseInstStore(InstStore store) {
-		// Replace the local variable name by visiting caseExprVar
-		super.doSwitch(store.getValue());
-		Var var = store.getTarget().getVariable();
-		if (localToLocalsMap.containsKey(var)) {
-			store.getTarget().setVariable(localToLocalsMap.get(var));
-		}
-		for (Expression e : store.getIndexes()) {
-			super.doSwitch(e);
-		}
-		return null;
-	}
-
-	@Override
-	public Object caseInstReturn(InstReturn instReturn) {
-		// Replace the local variable name by visiting caseExprVar
-		super.doSwitch(instReturn.getValue());
-		this.instReturn = instReturn;
-		return null;
-	}
-
-	@Override
-	public Object caseInstPhi(InstPhi instPhi) {
-		// Replace the local variable name by visiting caseExprVar
-		Var var = instPhi.getTarget().getVariable();
-		if (localToLocalsMap.containsKey(var)) {
-			instPhi.getTarget().setVariable(localToLocalsMap.get(var));
-		}
-		for (Expression e : instPhi.getValues()) {
-			super.doSwitch(e);
-		}
-		return null;
-	}
-
-	@Override
-	public List<InstCall> caseInstCall(InstCall call) {
-		Def def = call.getTarget();
-		if (def != null) {
-			Var var = def.getVariable();
-			if (localToLocalsMap.containsKey(var)) {
-				call.getTarget().setVariable(localToLocalsMap.get(var));
-			}
-		}
-		for (Arg arg : call.getParameters()) {
-			doSwitch(arg);
-		}
-		return null;
-	}
-
-	/**
-	 * Replace the local variable name if a reference already exists to a global
-	 * variable
-	 */
-	@Override
-	public Object caseExprVar(ExprVar exprVar) {
-		Var var = exprVar.getUse().getVariable();
-		if (localToLocalsMap.containsKey(var)) {
-			exprVar.getUse().setVariable(localToLocalsMap.get(var));
-		}
-		return null;
-	}
-
-	/**
-	 * Find the given node into the given nodes location.
-	 * 
-	 * @param locationNodes
-	 * @param nodeToFind
-	 * @return
-	 */
-	public List<Block> findNode(List<Block> locationNodes, Block nodeToFind) {
-		if (locationNodes.contains(nodeToFind)) {
-			return locationNodes;
-		} else {
-			List<Block> n = null;
-			for (Block node : locationNodes) {
-				if (node.isBlockIf()) {
-					n = findNode(((BlockIf) node).getElseBlocks(), nodeToFind);
-					if (n == null)
-						n = findNode(((BlockIf) node).getThenBlocks(), nodeToFind);
-				} else if (node.isBlockWhile()) {
-					n = findNode(((BlockWhile) node).getBlocks(), nodeToFind);
-				}
-				if (n != null)
-					return n;
-			}
-		}
-		return null;
 	}
 
 }

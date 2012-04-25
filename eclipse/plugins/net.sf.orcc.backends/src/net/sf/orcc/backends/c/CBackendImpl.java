@@ -54,6 +54,7 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.df.transformations.NetworkFlattener;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
@@ -188,7 +189,7 @@ public class CBackendImpl extends AbstractBackend {
 		if (getAttribute("net.sf.orcc.backends.additionalTransfos", false)) {
 			transformations.add(new Multi2MonoToken());
 			transformations.add(new ParameterImporter());
-			transformations.add(new Inliner(true, true));
+			transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
 			transformations.add(new StoreOnceTransformation());
 		}
 

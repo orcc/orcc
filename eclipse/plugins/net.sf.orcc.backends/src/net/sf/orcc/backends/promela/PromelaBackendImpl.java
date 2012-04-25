@@ -104,7 +104,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 	protected void doTransformActor(Actor actor) throws OrccException {
 		DfSwitch<?>[] transformations = {
 				new UnitImporter(),
-				new Inliner(true, true),
+				new DfVisitor<Void>(new Inliner(true, true)),
 				// new ListFlattener(), //Promela does not support multi
 				// dimensional arrays
 				new RenameTransformation(this.transformations),
