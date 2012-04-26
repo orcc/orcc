@@ -27,7 +27,7 @@ printDesign(design, options) ::= <<
       \<association xil_pn:name="Implementation"/\>
     \</file\>
 
-    <design.processor: printProcessor(); separator="\n">
+    <design.processors: printProcessor(); separator="\n">
 
     \<!--                   --\>
     \<!-- Shared components.--\>
