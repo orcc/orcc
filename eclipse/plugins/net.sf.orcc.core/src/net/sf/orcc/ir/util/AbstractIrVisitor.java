@@ -99,6 +99,34 @@ public abstract class AbstractIrVisitor<T> extends IrSwitch<T> {
 	}
 
 	@Override
+	public T caseBlockBasic(BlockBasic block) {
+		return visitInstructions(block.getInstructions());
+	}
+
+	@Override
+	public T caseBlockIf(BlockIf nodeIf) {
+		if (visitFull) {
+			doSwitch(nodeIf.getCondition());
+		}
+
+		doSwitch(nodeIf.getThenBlocks());
+		doSwitch(nodeIf.getElseBlocks());
+		doSwitch(nodeIf.getJoinBlock());
+		return null;
+	}
+
+	@Override
+	public T caseBlockWhile(BlockWhile nodeWhile) {
+		if (visitFull) {
+			doSwitch(nodeWhile.getCondition());
+		}
+
+		doSwitch(nodeWhile.getBlocks());
+		doSwitch(nodeWhile.getJoinBlock());
+		return null;
+	}
+
+	@Override
 	public T caseExprBinary(ExprBinary expr) {
 		doSwitch(expr.getE1());
 		doSwitch(expr.getE2());
@@ -173,44 +201,6 @@ public abstract class AbstractIrVisitor<T> extends IrSwitch<T> {
 	}
 
 	@Override
-	public T caseBlockBasic(BlockBasic block) {
-		int oldIndexInst = indexInst;
-		List<Instruction> instructions = block.getInstructions();
-		T result = null;
-		for (indexInst = 0; indexInst < instructions.size() && result == null; indexInst++) {
-			Instruction inst = instructions.get(indexInst);
-			result = doSwitch(inst);
-		}
-
-		// restore old index
-		indexInst = oldIndexInst;
-		return result;
-	}
-
-	@Override
-	public T caseBlockIf(BlockIf nodeIf) {
-		if (visitFull) {
-			doSwitch(nodeIf.getCondition());
-		}
-
-		doSwitch(nodeIf.getThenBlocks());
-		doSwitch(nodeIf.getElseBlocks());
-		doSwitch(nodeIf.getJoinBlock());
-		return null;
-	}
-
-	@Override
-	public T caseBlockWhile(BlockWhile nodeWhile) {
-		if (visitFull) {
-			doSwitch(nodeWhile.getCondition());
-		}
-
-		doSwitch(nodeWhile.getBlocks());
-		doSwitch(nodeWhile.getJoinBlock());
-		return null;
-	}
-
-	@Override
 	public T caseProcedure(Procedure procedure) {
 		this.procedure = procedure;
 		return doSwitch(procedure.getBlocks());
@@ -225,16 +215,32 @@ public abstract class AbstractIrVisitor<T> extends IrSwitch<T> {
 	}
 
 	/**
-	 * Visits the nodes of the given node list.
+	 * Visits each block of the given block list.
 	 * 
-	 * @param nodes
-	 *            a list of nodes that belong to a procedure
+	 * @param blocks
+	 *            a list of blocks that belong to a procedure
 	 */
-	public T doSwitch(List<Block> nodes) {
+	public T doSwitch(List<Block> blocks) {
+		return visitBlocks(blocks);
+	}
+
+	@Override
+	public boolean isSwitchFor(EPackage ePackage) {
+		// just so we can use it in DfVisitor
+		return super.isSwitchFor(ePackage);
+	}
+
+	/**
+	 * Visits each block of the given block list.
+	 * 
+	 * @param blocks
+	 *            a list of blocks that belong to a procedure
+	 */
+	public T visitBlocks(List<Block> blocks) {
 		int oldIndexNode = indexNode;
 		T result = null;
-		for (indexNode = 0; indexNode < nodes.size() && result == null; indexNode++) {
-			Block node = nodes.get(indexNode);
+		for (indexNode = 0; indexNode < blocks.size() && result == null; indexNode++) {
+			Block node = blocks.get(indexNode);
 			result = doSwitch(node);
 		}
 
@@ -242,10 +248,24 @@ public abstract class AbstractIrVisitor<T> extends IrSwitch<T> {
 		return result;
 	}
 
-	@Override
-	public boolean isSwitchFor(EPackage ePackage) {
-		// just so we can use it in DfVisitor
-		return super.isSwitchFor(ePackage);
+	/**
+	 * Visits the given list of instructions.
+	 * 
+	 * @param instructions
+	 *            a list of instructions
+	 * @return a result
+	 */
+	public T visitInstructions(List<Instruction> instructions) {
+		int oldIndexInst = indexInst;
+		T result = null;
+		for (indexInst = 0; indexInst < instructions.size() && result == null; indexInst++) {
+			Instruction inst = instructions.get(indexInst);
+			result = doSwitch(inst);
+		}
+
+		// restore old index
+		indexInst = oldIndexInst;
+		return result;
 	}
 
 }
