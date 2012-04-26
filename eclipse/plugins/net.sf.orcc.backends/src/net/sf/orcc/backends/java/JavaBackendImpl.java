@@ -59,9 +59,9 @@ import org.eclipse.core.resources.IFile;
  */
 public class JavaBackendImpl extends AbstractBackend {
 
-	private final Map<String, String> transformations;
-
 	private boolean debug;
+
+	private final Map<String, String> transformations;
 
 	public JavaBackendImpl() {
 		transformations = new HashMap<String, String>();
@@ -123,6 +123,24 @@ public class JavaBackendImpl extends AbstractBackend {
 		write("Printing network...\n");
 		printNetwork(network);
 		write("Done\n");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.orcc.backends.AbstractBackend#exportRuntimeLibrary()
+	 */
+	@Override
+	public boolean exportRuntimeLibrary() throws OrccException {
+		String target = path + File.separator + "libs";
+		write("Export libraries sources into " + target + "... ");
+		if (copyFolderToFileSystem("/runtime/Java", target)) {
+			write("OK" + "\n");
+			return true;
+		} else {
+			write("Error" + "\n");
+			return false;
+		}
 	}
 
 	@Override
