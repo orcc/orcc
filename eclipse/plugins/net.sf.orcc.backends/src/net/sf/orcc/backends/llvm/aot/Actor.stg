@@ -223,11 +223,11 @@ endif>
 
 getPortId(variable) ::= <<
 <if(action.inputPattern.varToPortMap.(variable))
-><instance.incomingPortMap.(action.inputPattern.varToPortMap.(variable)).fifoId><
+><instance.incomingPortMap.(action.inputPattern.varToPortMap.(variable)).id><
 elseif (action.outputPattern.varToPortMap.(variable))
-><first(instance.outgoingPortMap.(action.outputPattern.varToPortMap.(variable))).fifoId><
+><first(instance.outgoingPortMap.(action.outputPattern.varToPortMap.(variable))).id><
 else
-><instance.incomingPortMap.(action.peekPattern.varToPortMap.(variable)).fifoId><
+><instance.incomingPortMap.(action.peekPattern.varToPortMap.(variable)).id><
 endif>
 >>
 
@@ -308,7 +308,7 @@ entry:
 ///////////////////////////////////////////////////////////////////////////////
 
 printInputId(port) ::= <<
-<instance.incomingPortMap.(port).fifoId>
+<instance.incomingPortMap.(port).id>
 >>
 
 printInputSize(port) ::= <<
@@ -326,7 +326,7 @@ printInputPort(port) ::= <<
 >>
 
 printOutputId(port) ::= <<
-<first(instance.outgoingPortMap.(port)).fifoId>
+<first(instance.outgoingPortMap.(port)).id>
 >>
 
 printOutputSize(port) ::= <<
