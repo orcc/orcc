@@ -1,21 +1,29 @@
 printNetwork (network, options) ::= << 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Declare and initialize FIFO variables 
+
 <network.connections: declareFifo(); separator="\n\n">
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Declare the scheduling function of each actor
+
+<network.instances: declareActorScheduler(); separator="\n">
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Actor-scheduler - Round-robin
 
 define void @main() noinline noreturn nounwind {
 entry:
-	<network.instances: callScheduler(); separator="\n">
+	<network.instances: callActorScheduler(); separator="\n">
 	br label %entry
-
-end:
-	ret void
 }
+
 >>
 
-callScheduler(instance) ::= <<
+callActorScheduler(instance) ::= <<
 call void @<instance.name>_scheduler()
 >>
 
@@ -23,4 +31,8 @@ declareFifo(connection) ::= <<
 @fifo_<connection.id>_content = global [<connection.size> x <connection.sourcePort.type>] zeroinitializer, align 32
 @fifo_<connection.id>_rdIndex = global i32 zeroinitializer, align 32
 @fifo_<connection.id>_wrIndex = global i32 zeroinitializer, align 32
+>>
+
+declareActorScheduler(instance) ::= <<
+declare void @<instance.name>_scheduler()
 >>
