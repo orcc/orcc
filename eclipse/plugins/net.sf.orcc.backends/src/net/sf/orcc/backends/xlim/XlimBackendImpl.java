@@ -51,6 +51,8 @@ import net.sf.orcc.backends.transformations.Multi2MonoToken;
 import net.sf.orcc.backends.transformations.StoreOnceTransformation;
 import net.sf.orcc.backends.transformations.TypeResizer;
 import net.sf.orcc.backends.transformations.UnitImporter;
+import net.sf.orcc.backends.transformations.ssa.ConstantPropagator;
+import net.sf.orcc.backends.transformations.ssa.CopyPropagator;
 import net.sf.orcc.backends.xlim.transformations.CustomPeekAdder;
 import net.sf.orcc.backends.xlim.transformations.GlobalArrayInitializer;
 import net.sf.orcc.backends.xlim.transformations.InstTernaryAdder;
@@ -58,7 +60,6 @@ import net.sf.orcc.backends.xlim.transformations.ListFlattener;
 import net.sf.orcc.backends.xlim.transformations.LiteralIntegersAdder;
 import net.sf.orcc.backends.xlim.transformations.LocalArrayRemoval;
 import net.sf.orcc.backends.xlim.transformations.UnaryListRemoval;
-import net.sf.orcc.backends.xlim.transformations.XlimDeadVariableRemoval;
 import net.sf.orcc.backends.xlim.transformations.XlimVariableRenamer;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.DfFactory;
@@ -74,6 +75,7 @@ import net.sf.orcc.ir.transformations.BlockCombine;
 import net.sf.orcc.ir.transformations.CfgBuilder;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
+import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.transformations.TacTransformation;
 import net.sf.orcc.ir.util.IrUtil;
@@ -157,23 +159,24 @@ public class XlimBackendImpl extends AbstractBackend {
 		}
 
 		DfSwitch<?>[] transformations = { new UnitImporter(),
-				new DfVisitor<Void>(new SSATransformation()),
-				new GlobalArrayInitializer(useHw),
 				new DfVisitor<Void>(new Inliner(true, true)),
-				new DfVisitor<Void>(new InstTernaryAdder()),
-				new UnaryListRemoval(), new CustomPeekAdder(),
+				new DfVisitor<Void>(new SSATransformation()),
 				new DeadGlobalElimination(),
 				new DfVisitor<Void>(new DeadCodeElimination()),
-				new DfVisitor<Void>(new XlimDeadVariableRemoval()),
+				new DfVisitor<Void>(new DeadVariableRemoval()),
+				new UnaryListRemoval(), new GlobalArrayInitializer(useHw),
+				new DfVisitor<Void>(new InstTernaryAdder()),
+				new CustomPeekAdder(),
 				new DfVisitor<Void>(new ListFlattener()),
 				new DfVisitor<Expression>(new TacTransformation()),
-				new DfVisitor<CfgNode>(new CfgBuilder()),
 				new DfVisitor<Void>(new InstPhiTransformation()),
+				new DfVisitor<Void>(new EmptyBlockRemover()),
+				new DfVisitor<Void>(new BlockCombine()),
+				new DfVisitor<CfgNode>(new CfgBuilder()),
+
 				new DfVisitor<Expression>(new LiteralIntegersAdder()),
 				new DfVisitor<Expression>(new CastAdder(true)),
-				new XlimVariableRenamer(),
-				new DfVisitor<Void>(new EmptyBlockRemover()),
-				new DfVisitor<Void>(new BlockCombine()), };
+				new XlimVariableRenamer() };
 
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
