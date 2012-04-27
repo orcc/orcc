@@ -1,5 +1,6 @@
 package net.sf.orcc.backends.llvm.tta.architecture.util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,10 +46,20 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	private Map<Vertex, Component> componentMap;
 	private Map<net.sf.orcc.df.Port, Port> portMap;
 
+	private List<String> optimizedActors;
+
 	public ArchitectureBuilder(DesignConfiguration conf) {
 		design = factory.createDesign();
 		componentMap = new HashMap<Vertex, Component>();
 		portMap = new HashMap<net.sf.orcc.df.Port, Port>();
+
+		optimizedActors = new ArrayList<String>();
+		optimizedActors.add("decoder_texture_IQ");
+		optimizedActors.add("Merger");
+		optimizedActors.add("decoder_motion_interpolation");
+		optimizedActors.add("decoder_motion_add");
+		optimizedActors.add("decoder_texture_idct2d");
+		optimizedActors.add("decoder_motion_framebuf");
 	}
 
 	public ArchitectureBuilder(DesignConfiguration conf, Mapping mapping) {
@@ -165,9 +176,14 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 			componentMap.put(instance, component);
 		} else {
 			int memorySize = computeNeededMemorySize(instance);
+
+			//ProcessorConfiguration conf = optimizedActors.contains(instance
+			//		.getName()) ? ProcessorConfiguration.CUSTOM
+			//		: ProcessorConfiguration.STANDARD;
+
+			ProcessorConfiguration conf = ProcessorConfiguration.STANDARD;
 			Processor processor = factory.createProcessor("processor_"
-					+ instance.getSimpleName(),
-					ProcessorConfiguration.STANDARD, memorySize);
+					+ instance.getName(), conf, memorySize);
 			component = processor;
 			processor.getMappedInstances().add(instance);
 			design.getProcessors().add(processor);
