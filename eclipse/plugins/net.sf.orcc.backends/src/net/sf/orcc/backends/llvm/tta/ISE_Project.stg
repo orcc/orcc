@@ -139,7 +139,7 @@ printDesign(design, options) ::= <<
 >>
 
 printProcessor(processor) ::= <<
->\<!-- Processor <processor.name> --\>
+\<!-- Processor <processor.name> --\>
 \<file xil_pn:name="<processor.name>/tta/vhdl/<processor.name>_tl_params_pkg.vhdl" xil_pn:type="FILE_VHDL"\>
   \<association xil_pn:name="BehavioralSimulation"/\>
   \<association xil_pn:name="Implementation"/\>
