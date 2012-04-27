@@ -36,13 +36,12 @@ import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfVisitor;
-import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.TypeList;
-import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrUtil;
 
@@ -70,33 +69,47 @@ public class UnaryListRemoval extends DfVisitor<Void> {
 		List<Port> ports = new ArrayList<Port>(pattern.getPorts());
 		for (Port port : ports) {
 			if (pattern.getNumTokens(port) == 1) {
-				Var var = pattern.getVariable(port);
+				Var oldTarget = pattern.getVariable(port);
+				Var newTarget;
 
-				// Transform in scalar variable
-				var.setType(((TypeList) var.getType()).getInnermostType());
+				Procedure procedure = EcoreHelper.getContainerOfType(pattern,
+						Action.class).getBody();
 
-				// Transform load in assignment
-				for (Use use : new ArrayList<Use>(var.getUses())) {
-					InstLoad load = EcoreHelper.getContainerOfType(use,
-							InstLoad.class);
-					InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
-							load.getTarget().getVariable(), load.getSource()
-									.getVariable());
-					EcoreUtil.replace(load, assign);
+				if (!oldTarget.getUses().isEmpty()) {
+					// First case: an input variable
+					InstLoad load = EcoreHelper.getContainerOfType(oldTarget
+							.getUses().get(0), InstLoad.class);
+					newTarget = load.getTarget().getVariable();
+
 					IrUtil.delete(load);
-				}
+				} else {
+					// Second case: an output variable or an input swallower
+					// i.e. an input variable which just consumes tokens
+					newTarget = createScalarVariable(oldTarget, procedure);
+					while (!oldTarget.getDefs().isEmpty()) {
+						InstStore store = EcoreHelper.getContainerOfType(
+								oldTarget.getDefs().get(0), InstStore.class);
+						InstAssign assign = IrFactory.eINSTANCE
+								.createInstAssign(newTarget, store.getValue());
+						EcoreUtil.replace(store, assign);
+						IrUtil.delete(store);
+					}
 
-				// Transform store in assignment
-				for (Def def : new ArrayList<Def>(var.getDefs())) {
-					InstStore store = EcoreHelper.getContainerOfType(def,
-							InstStore.class);
-					InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
-							store.getTarget().getVariable(), store.getValue());
-					EcoreUtil.replace(store, assign);
-					IrUtil.delete(store);
 				}
+				// Replace variable in pattern
+				pattern.setVariable(port, newTarget);
+				// Remove useless variable
+				EcoreUtil.remove(oldTarget);
 			}
 		}
 		return null;
+	}
+
+	private Var createScalarVariable(Var listVar, Procedure procedure) {
+		Var scalarVar = procedure.newTempLocalVariable(
+				((TypeList) listVar.getType()).getInnermostType(), "scalar_"
+						+ listVar.getName());
+		scalarVar.setAssignable(true);
+		return scalarVar;
 	}
 }
