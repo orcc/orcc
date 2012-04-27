@@ -31,14 +31,10 @@ package net.sf.orcc.backends.llvm.tta;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.backends.ir.InstCast;
+import net.sf.orcc.backends.llvm.aot.LLVMTemplateData;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.State;
-import net.sf.orcc.ir.Block;
-import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
@@ -50,67 +46,21 @@ import org.eclipse.emf.ecore.EObject;
  * @author Herve Yviquel
  * 
  */
-public class TTAActorTemplateData {
-
-	private Map<Var, Var> castedListReferences;
-
-	/**
-	 * Label of all nodes
-	 */
-	private Map<Block, Integer> nodeToLabelMap;
+public class TTAActorTemplateData extends LLVMTemplateData {
 
 	private Map<Pattern, Map<Port, Integer>> portToIndexByPatternMap;
 
 	private Map<Port, Integer> portToIndexMap;
-	
+
 	private Map<Port, Boolean> portToNeedCastMap;
 
-	private Map<State, Integer> stateToLabelMap;
-
 	public TTAActorTemplateData(Actor actor) {
-		nodeToLabelMap = new HashMap<Block, Integer>();
-		castedListReferences = new HashMap<Var, Var>();
-		stateToLabelMap = new HashMap<State, Integer>();
+		super(actor);
 		portToIndexByPatternMap = new HashMap<Pattern, Map<Port, Integer>>();
 		portToIndexMap = new HashMap<Port, Integer>();
 		portToNeedCastMap = new HashMap<Port, Boolean>();
 
 		computeTemplateMaps(actor);
-	}
-
-	private void computeCastedListReferences(Actor actor) {
-		TreeIterator<EObject> it = actor.eAllContents();
-		while (it.hasNext()) {
-			EObject object = it.next();
-			if (object instanceof Var) {
-				Var var = (Var) object;
-				if (var.getType().isList()
-						&& !var.getDefs().isEmpty()
-						&& (var.getDefs().get(0).eContainer() instanceof InstCast)) {
-					castedListReferences.put(var, var);
-				}
-			}
-		}
-	}
-
-	private void computeNodeToLabelMap(Actor actor) {
-		TreeIterator<EObject> it = actor.eAllContents();
-		while (it.hasNext()) {
-			EObject object = it.next();
-			if (object instanceof Procedure) {
-				Procedure proc = (Procedure) object;
-				int label = 1;
-				TreeIterator<EObject> it2 = proc.eAllContents();
-				while (it2.hasNext()) {
-					EObject object2 = it2.next();
-					if (object2 instanceof Block) {
-						Block node = (Block) object2;
-						nodeToLabelMap.put(node, label);
-						label++;
-					}
-				}
-			}
-		}
 	}
 
 	private void computePortToIndexByPatternMap(Actor actor) {
@@ -138,37 +88,20 @@ public class TTAActorTemplateData {
 	}
 
 	private void computePortToNeedCastMap(Actor actor) {
-		for (Port input: actor.getInputs()) {
+		for (Port input : actor.getInputs()) {
 			portToNeedCastMap.put(input, input.getType().getSizeInBits() < 32);
 		}
-		for (Port output: actor.getOutputs()) {
-			portToNeedCastMap.put(output, output.getType().getSizeInBits() < 32);
-		}
-	}
-	
-	private void computeStateToLabelMap(Actor actor) {
-		if (actor.hasFsm()) {
-			for (int i = 0; i < actor.getFsm().getStates().size(); i++) {
-				stateToLabelMap.put(actor.getFsm().getStates().get(i), i);
-			}
+		for (Port output : actor.getOutputs()) {
+			portToNeedCastMap
+					.put(output, output.getType().getSizeInBits() < 32);
 		}
 	}
 
 	public void computeTemplateMaps(Actor actor) {
-		computeNodeToLabelMap(actor);
-		computeCastedListReferences(actor);
-		computeStateToLabelMap(actor);
+		super.computeTemplateMaps(actor);
 		computePortToIndexByPatternMap(actor);
 		computePortToIndexMap(actor);
 		computePortToNeedCastMap(actor);
-	}
-
-	public Map<Var, Var> getCastedListReferences() {
-		return castedListReferences;
-	}
-
-	public Map<Block, Integer> getNodeToLabelMap() {
-		return nodeToLabelMap;
 	}
 
 	public Map<Pattern, Map<Port, Integer>> getPortToIndexByPatternMap() {
@@ -181,10 +114,6 @@ public class TTAActorTemplateData {
 
 	public Map<Port, Boolean> getPortToNeedCastMap() {
 		return portToNeedCastMap;
-	}
-
-	public Map<State, Integer> getStateToLabelMap() {
-		return stateToLabelMap;
 	}
 
 }

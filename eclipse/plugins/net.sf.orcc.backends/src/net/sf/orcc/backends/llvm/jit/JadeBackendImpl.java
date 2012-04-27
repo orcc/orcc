@@ -47,7 +47,6 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.llvm.aot.LLVMExpressionPrinter;
-import net.sf.orcc.backends.llvm.aot.LLVMTemplateData;
 import net.sf.orcc.backends.llvm.aot.LLVMTypePrinter;
 import net.sf.orcc.backends.llvm.transformations.BlockNumbering;
 import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
@@ -187,7 +186,7 @@ public class JadeBackendImpl extends AbstractBackend {
 		}
 
 		// Organize metadata information for the current actor
-		actor.setTemplateData(new LLVMTemplateData(actor));
+		actor.setTemplateData(new JadeTemplateData(actor));
 	}
 
 	@Override
@@ -222,7 +221,7 @@ public class JadeBackendImpl extends AbstractBackend {
 		write("Printing network...\n");
 		String pathName = path + "/" + network.getSimpleName() + ".xdf";
 		URI uri = URI.createFileURI(pathName);
-		
+
 		ResourceSet set = new ResourceSetImpl();
 		Resource resource = set.createResource(uri);
 		resource.getContents().add(network);
