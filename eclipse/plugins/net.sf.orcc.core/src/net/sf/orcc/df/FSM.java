@@ -30,7 +30,6 @@ package net.sf.orcc.df;
 
 import java.util.List;
 
-import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.Graph;
 
 import org.eclipse.emf.common.util.EList;
@@ -88,7 +87,7 @@ public interface FSM extends Graph {
 	/**
 	 * Returns the list of this FSM's transitions. This returns the same as
 	 * {@link #getEdges()} but as a list of {@link Transition}s rather than as a
-	 * list of {@link Edge}s.
+	 * list of edges.
 	 * 
 	 * @return the list of this FSM's transitions
 	 */

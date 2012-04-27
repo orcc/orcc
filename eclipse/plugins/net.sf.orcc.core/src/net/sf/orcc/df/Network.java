@@ -31,7 +31,6 @@ package net.sf.orcc.df;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.Graph;
 import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.OrccException;
@@ -132,7 +131,7 @@ public interface Network extends Graph {
 	/**
 	 * Returns the list of this graph's connections. This returns the same as
 	 * {@link #getEdges()} but as a list of {@link Connection}s rather than as a
-	 * list of {@link Edge}s.
+	 * list of edges.
 	 * 
 	 * @return the list of this graph's connections
 	 */

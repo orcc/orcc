@@ -41,7 +41,6 @@ import net.sf.dftools.graph.Graph;
 import net.sf.dftools.graph.Vertex;
 import net.sf.dftools.graph.visit.SccFinder;
 import net.sf.dftools.graph.visit.ReversePostOrder;
-import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
@@ -151,8 +150,6 @@ public class StaticRegionDetector {
 
 	/**
 	 * DFS
-	 * 
-	 * @throws OrccException
 	 * 
 	 */
 	private void staticRegionAnalysis(Instance instance,

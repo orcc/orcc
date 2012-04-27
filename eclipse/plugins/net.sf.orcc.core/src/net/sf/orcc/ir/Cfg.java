@@ -29,7 +29,6 @@
 package net.sf.orcc.ir;
 
 import net.sf.dftools.graph.Graph;
-import net.sf.dftools.graph.Vertex;
 
 import org.eclipse.emf.common.util.EList;
 
@@ -76,7 +75,7 @@ public interface Cfg extends Graph {
 	/**
 	 * Returns the list of this CFG's nodes. This returns the same as
 	 * {@link #getVertices()} but as a list of {@link CfgNode}s rather than as a
-	 * list of {@link Vertex}s.
+	 * list of vertices.
 	 * 
 	 * @return the list of nodes
 	 */
