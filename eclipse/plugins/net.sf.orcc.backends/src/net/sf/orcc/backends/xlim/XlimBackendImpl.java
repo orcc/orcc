@@ -51,8 +51,6 @@ import net.sf.orcc.backends.transformations.Multi2MonoToken;
 import net.sf.orcc.backends.transformations.StoreOnceTransformation;
 import net.sf.orcc.backends.transformations.TypeResizer;
 import net.sf.orcc.backends.transformations.UnitImporter;
-import net.sf.orcc.backends.transformations.ssa.ConstantPropagator;
-import net.sf.orcc.backends.transformations.ssa.CopyPropagator;
 import net.sf.orcc.backends.xlim.transformations.CustomPeekAdder;
 import net.sf.orcc.backends.xlim.transformations.GlobalArrayInitializer;
 import net.sf.orcc.backends.xlim.transformations.InstTernaryAdder;
