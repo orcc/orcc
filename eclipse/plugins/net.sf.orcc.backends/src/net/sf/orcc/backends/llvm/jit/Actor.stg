@@ -572,7 +572,7 @@ declare i32 @printf(i8* noalias , ...) nounwind
 <if(actor.procs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Functions/procedures
-<actor.procs: {proc | <procedure(proc)>}>
+<actor.procs: {proc | <printProcedure(proc)>}>
 <endif>
 
 <if(actor.initializes)>

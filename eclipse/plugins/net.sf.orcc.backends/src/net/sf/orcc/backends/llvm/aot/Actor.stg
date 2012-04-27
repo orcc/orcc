@@ -189,9 +189,47 @@ printLoad(load) ::= <<
 >>
 
 printGEP(gep) ::= <<
-<Var(gep.target.variable)> = getelementptr <gep.source.variable.type>* <Var(gep.source.variable)>, i32 0, <indexes(gep.indexes)>
+<if(action.inputPattern.varToPortMap.(gep.source.variable) || action.outputPattern.varToPortMap.(gep.source.variable) || action.peekPattern.varToPortMap.(gep.source.variable))
+>
+%local_index_<getPort(gep.source.variable)> = load i32* @index_<getPort(gep.source.variable)>
+%local_size_<getPort(gep.source.variable)> = load i32* @SIZE_<getPort(gep.source.variable)>
+%tmp_index_<getPort(gep.source.variable)> = add i32 %local_index_<getPort(gep.source.variable)>, <first(gep.indexes)>
+%final_index_<getPort(gep.source.variable)> = urem i32 %tmp_index_<getPort(gep.source.variable)>, %local_size_<getPort(gep.source.variable)>
+<Var(gep.target.variable)> = getelementptr <getPortType(gep.source.variable)>* @fifo_<getPortId(gep.source.variable)>_content, i32 0, i32 %final_index_<getPort(gep.source.variable)><
+else
+><Var(gep.target.variable)> = getelementptr <gep.source.variable.type>* <Var(gep.source.variable)>, i32 0, <indexes(gep.indexes)><
+endif>
 >>
 
+getPortType(variable) ::= <<
+<if(action.inputPattern.varToPortMap.(variable))
+>[<instance.incomingPortMap.(action.inputPattern.varToPortMap.(variable)).size> x <action.inputPattern.varToPortMap.(variable).type>]<
+elseif (action.outputPattern.varToPortMap.(variable))
+>[<first(instance.outgoingPortMap.(action.outputPattern.varToPortMap.(variable))).size> x <action.outputPattern.varToPortMap.(variable).type>]<
+else
+>[<instance.incomingPortMap.(action.peekPattern.varToPortMap.(variable)).size> x <action.peekPattern.varToPortMap.(variable).type>]<
+endif>
+>>
+
+getPort(variable) ::= <<
+<if(action.inputPattern.varToPortMap.(variable))
+><action.inputPattern.varToPortMap.(variable).name><
+elseif (action.outputPattern.varToPortMap.(variable))
+><action.outputPattern.varToPortMap.(variable).name><
+else
+><action.peekPattern.varToPortMap.(variable).name><
+endif>
+>>
+
+getPortId(variable) ::= <<
+<if(action.inputPattern.varToPortMap.(variable))
+><instance.incomingPortMap.(action.inputPattern.varToPortMap.(variable)).fifoId><
+elseif (action.outputPattern.varToPortMap.(variable))
+><first(instance.outgoingPortMap.(action.outputPattern.varToPortMap.(variable))).fifoId><
+else
+><instance.incomingPortMap.(action.peekPattern.varToPortMap.(variable)).fifoId><
+endif>
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Nodes
@@ -248,7 +286,7 @@ printNextLabel(node)::=<<
 // Procedure
 ///////////////////////////////////////////////////////////////////////////////
 
-procedure(procedure) ::= <<
+printProcedure(procedure, action="") ::= <<
 <if(procedure.native)>
 declare <procedure.returnType> @<procedure.name>(<procedure.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind
 <else>
@@ -278,7 +316,7 @@ printInputSize(port) ::= <<
 >>
 
 printInputPort(port) ::= <<
-@fifo_<printInputId(port)>_content = external global [<printInputSize(port)> x i32]
+@fifo_<printInputId(port)>_content = external global [<printInputSize(port)> x <port.type>]
 @fifo_<printInputId(port)>_rdIndex = external global i32
 @fifo_<printInputId(port)>_wrIndex = external global i32
 
@@ -296,7 +334,7 @@ printOutputSize(port) ::= <<
 >>
 
 printOutputPort(port) ::= <<
-@fifo_<printOutputId(port)>_content = external global [<printOutputSize(port)> x i32]
+@fifo_<printOutputId(port)>_content = external global [<printOutputSize(port)> x <port.type>]
 @fifo_<printOutputId(port)>_rdIndex = external global i32
 @fifo_<printOutputId(port)>_wrIndex = external global i32
 
@@ -312,38 +350,42 @@ getPortName(port) ::= <<
 printReadTokensFunction(port) ::= <<
 define internal void @read_<port.name>() {
 <if(instance.incomingPortMap.(port))>
-	%rdIndex = load i32 @fifo_<printInputId(port)>_rdIndex
-	store i32 %rdIndex, i32 @index_<port.name>
-	%wrIndex = load i32 @fifo_<printInputId(port)>_wrIndex
-	%numTokens = sub i32 wrIndex, i32 rdIndex
-	store i32 %numTokens, i32 @numTokens_<port.name>
+	%rdIndex = load i32* @fifo_<printInputId(port)>_rdIndex
+	store i32 %rdIndex, i32* @index_<port.name>
+	%wrIndex = load i32* @fifo_<printInputId(port)>_wrIndex
+	%numTokens = sub i32 %wrIndex, %rdIndex
+	store i32 %numTokens, i32* @numTokens_<port.name>
 <else>
 	;; Input port <getPortName(port)> not connected
 <endif>
+	ret void
 }
 
 define internal void @read_end_<port.name>() {
 <if(instance.incomingPortMap.(port))>
-	%rdIndex = load i32 @index_<port.name>
-	store i32 %rdIndex, i32 @fifo_<printInputId(port)>_rdIndex
+	%rdIndex = load i32* @index_<port.name>
+	store i32 %rdIndex, i32* @fifo_<printInputId(port)>_rdIndex
 <else>
 	;; Input port <getPortName(port)> not connected<
 endif>
+	ret void
 }
 >>
 
 printWriteTokensFunction(port) ::= <<
 define internal void @write_<port.name>() {
-	%wrIndex = load i32 @fifo_<printOutputId(port)>_wrIndex
-	store i32 %wrIndex, i32 @index_<port.name>
-	%rdIndex = load i32 @fifo_<printOutputId(port)>_rdIndex
-	%numFree = sub i32 rdIndex, i32 wrIndex
-	store i32 %numFree, i32 @numFree_<port.name>
+	%wrIndex = load i32* @fifo_<printOutputId(port)>_wrIndex
+	store i32 %wrIndex, i32* @index_<port.name>
+	%rdIndex = load i32* @fifo_<printOutputId(port)>_rdIndex
+	%numFree = sub i32 %rdIndex, %wrIndex
+	store i32 %numFree, i32* @numFree_<port.name>
+	ret void
 }
 
 define internal void @write_end_<port.name>() {
-	%wrIndex = load i32 @index_<port.name>
-	store i32 %wrIndex, i32 @fifo_<printOutputId(port)>_wrIndex
+	%wrIndex = load i32* @index_<port.name>
+	store i32 %wrIndex, i32* @fifo_<printOutputId(port)>_wrIndex
+	ret void
 }
 >>
 
@@ -568,21 +610,9 @@ bb_finished:
 ///////////////////////////////////////////////////////////////////////////////
 
 printAction(action) ::= <<
-define <action.scheduler.returnType> @<action.scheduler.name>(<action.scheduler.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
-entry:
-	<action.scheduler.locals: variableDeclaration()>
-	br label %b<label(first(action.scheduler.nodes))>
-	
-<printNodes(action.scheduler.nodes)>
-}
+<printProcedure(action.scheduler, action)>
 
-define void @<action.body.name>(<action.body.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
-entry:
-	<action.body.locals: variableDeclaration()>
-	br label %b<label(first(action.body.nodes))>
-
-<printNodes(action.body.nodes)>
-}
+<printProcedure(action.body, action)>
 >>
 
 callInitialize(initialize) ::= <<
@@ -607,13 +637,13 @@ declare i32 @printf(i8* noalias , ...) nounwind
 <if(instance.actor.inputs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Input FIFOs
-<instance.actor.inputs: { port | <if(!port.native)><printInputPort(port)><endif> }>
+<instance.actor.inputs: { port | <if(!port.native)><printInputPort(port)><endif> }; separator="\n\n">
 <endif>
 
 <if(instance.actor.outputs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Output FIFOs
-<instance.actor.outputs: { port | <if(!port.native)><printOutputPort(port)><endif> }>
+<instance.actor.outputs: { port | <if(!port.native)><printOutputPort(port)><endif> }; separator="\n\n">
 <endif>
 
 <if(instance.actor.parameters)>
@@ -631,7 +661,7 @@ declare i32 @printf(i8* noalias , ...) nounwind
 <if(instance.actor.procs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Functions/procedures
-<instance.actor.procs: procedure()>
+<instance.actor.procs: printProcedure()>
 <endif>
 
 <if(instance.actor.initializes)>

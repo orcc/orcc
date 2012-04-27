@@ -379,7 +379,7 @@ printInstance(instance) ::= <<
 <if(instance.actor.procs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Functions/procedures
-<instance.actor.procs: {proc | <procedure(procedure = proc)>}>
+<instance.actor.procs: printProcedure()>}>
 <endif>
 
 <if(instance.actor.initializes)>
