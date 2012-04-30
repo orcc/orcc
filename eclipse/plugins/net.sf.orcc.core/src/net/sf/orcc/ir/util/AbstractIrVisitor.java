@@ -249,6 +249,24 @@ public abstract class AbstractIrVisitor<T> extends IrSwitch<T> {
 	}
 
 	/**
+	 * Visits each block of the given block list in the reverse order.
+	 * 
+	 * @param blocks
+	 *            a list of blocks that belong to a procedure
+	 */
+	public T visitBlocksReverse(List<Block> blocks) {
+		int oldIndexNode = indexNode;
+		T result = null;
+		for (indexNode = blocks.size() - 1; indexNode >= 0 && result == null; indexNode--) {
+			Block node = blocks.get(indexNode);
+			result = doSwitch(node);
+		}
+
+		indexNode = oldIndexNode;
+		return result;
+	}
+
+	/**
 	 * Visits the given list of instructions.
 	 * 
 	 * @param instructions
@@ -259,6 +277,27 @@ public abstract class AbstractIrVisitor<T> extends IrSwitch<T> {
 		int oldIndexInst = indexInst;
 		T result = null;
 		for (indexInst = 0; indexInst < instructions.size() && result == null; indexInst++) {
+			Instruction inst = instructions.get(indexInst);
+			result = doSwitch(inst);
+		}
+
+		// restore old index
+		indexInst = oldIndexInst;
+		return result;
+	}
+
+	/**
+	 * Visits the given list of instructions in the reverse order.
+	 * 
+	 * @param instructions
+	 *            a list of instructions
+	 * @return a result
+	 */
+	public T visitInstructionsReverse(List<Instruction> instructions) {
+		int oldIndexInst = indexInst;
+		T result = null;
+		for (indexInst = instructions.size() - 1; indexInst >= 0
+				&& result == null; indexInst--) {
 			Instruction inst = instructions.get(indexInst);
 			result = doSwitch(inst);
 		}
