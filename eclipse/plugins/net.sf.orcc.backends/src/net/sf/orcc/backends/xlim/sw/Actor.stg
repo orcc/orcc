@@ -625,7 +625,7 @@ schedulingTest(actions) ::= <<
 >>
 
 scheduler(actions) ::= <<
-\<module autostart="true" kind="action-scheduler" name="<instance.id>_scheduler" sourcename="<instance.id>_scheduler"\>
+\<module autostart="true" kind="action-scheduler" name="scheduler" sourcename="scheduler"\>
 	\<module kind="loop"\>
 		\<module decision="var_<instance.id>_loop" kind="test"\>
 			\<operation kind="$literal_Integer" value="1"\>
@@ -757,7 +757,7 @@ schedulerFSM(actions, fsm) ::= <<
 \<stateVar name="currentState"\>
 	\<initValue size="32" typeName="int" value="<instance.actor.templateData.stateToIndexMap.(fsm.initialState)>"/\>
 \</stateVar\>
-\<module autostart="true" kind="action-scheduler" name="<instance.id>_scheduler" sourcename="<instance.id>_scheduler"\>
+\<module autostart="true" kind="action-scheduler" name="scheduler" sourcename="scheduler"\>
 	\<operation kind="$literal_Integer" value="1"\>
 		\<port dir="out" size="1" source="var_<instance.id>_sched" typeName="bool"/\>
 	\</operation\>
