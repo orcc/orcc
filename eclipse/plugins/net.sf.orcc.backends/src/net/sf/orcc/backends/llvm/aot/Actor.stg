@@ -192,7 +192,10 @@ printGEP(gep) ::= <<
 <if(action.inputPattern.varToPortMap.(gep.source.variable) || action.outputPattern.varToPortMap.(gep.source.variable) || action.peekPattern.varToPortMap.(gep.source.variable))
 >%tmp_index_<gep.target.variable.name> = add i32 %local_index_<getPort(gep.source.variable)>, <Expr(first(gep.indexes))>
 %final_index_<gep.target.variable.name>  = urem i32 %tmp_index_<gep.target.variable.name> , %local_size_<getPort(gep.source.variable)>
-<Var(gep.target.variable)> = getelementptr <getPortType(gep.source.variable)>* @fifo_<getPortId(gep.source.variable)>_content, i32 0, i32 %final_index_<gep.target.variable.name> <
+<Var(gep.target.variable)> = getelementptr <getPortType(gep.source.variable)>* @fifo_<getPortId(gep.source.variable)>_content, i32 0, i32 %final_index_<gep.target.variable.name>
+%new_index_<gep.target.variable.name> = add i32 %local_index_<getPort(gep.source.variable)>, 1
+
+<
 else
 ><Var(gep.target.variable)> = getelementptr <gep.source.variable.type>* <Var(gep.source.variable)>, i32 0, <indexes(gep.indexes)><
 endif>
@@ -600,8 +603,11 @@ bb_finished:
 
 schedulerWithoutFSM(actions) ::= <<
 define void @<instance.name>_scheduler() noreturn nounwind {
-bb_scheduler_start:
+entry:
 	<printCallStartTokenFunctions()>
+	br label %bb_scheduler_start
+	
+bb_scheduler_start:
 <printActionLoop(instance.actor.actionsOutsideFsm)>
 bb_finished:
 	<printCallEndTokenFunctions()>
@@ -617,6 +623,11 @@ bb_finished:
 fifoVar(port, var) ::= <<
 %local_index_<port.name> = load i32* @index_<port.name>
 %local_size_<port.name> = load i32* @SIZE_<port.name>
+>>
+
+printFifoEnd(port, numTokens) ::= <<
+%new_index_<port.name> = add i32 %local_index_<port.name>, <numTokens>
+store i32 %new_index_<port.name>, i32* @index_<port.name>
 >>
 
 printAction(action) ::= <<
@@ -636,7 +647,10 @@ entry:
 	<action.outputPattern.ports: { port | <fifoVar(port, action.outputPattern.portToVarMap.(port))>}; separator="\n">
 	br label %b<label(first(action.body.nodes))>
 
-<printNodes(action.body.nodes)>
+<printNodes(action.body.nodes, false)>
+	<action.inputPattern.ports: { port | <printFifoEnd(port, action.inputPattern.numTokensMap.(port))>}; separator="\n">
+	<action.outputPattern.ports: { port | <printFifoEnd(port, action.outputPattern.numTokensMap.(port))>}; separator="\n"> 
+	ret void
 }
 >>
 
