@@ -19,8 +19,11 @@ target triple = "x86_64-unknown-linux-gnu"
 
 define void @main() noinline noreturn nounwind {
 entry:
+	br label %loop
+
+loop:
 	<network.instances: callActorScheduler(); separator="\n">
-	br label %entry
+	br label %loop
 }
 
 >>
