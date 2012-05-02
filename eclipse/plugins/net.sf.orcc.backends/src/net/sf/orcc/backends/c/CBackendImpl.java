@@ -44,7 +44,6 @@ import net.sf.orcc.backends.c.transformations.CBroadcastAdder;
 import net.sf.orcc.backends.transformations.Inliner;
 import net.sf.orcc.backends.transformations.Multi2MonoToken;
 import net.sf.orcc.backends.transformations.ParameterImporter;
-import net.sf.orcc.backends.transformations.StoreOnceTransformation;
 import net.sf.orcc.backends.transformations.TypeResizer;
 import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.backends.util.BackendUtil;
@@ -190,7 +189,7 @@ public class CBackendImpl extends AbstractBackend {
 			transformations.add(new Multi2MonoToken());
 			transformations.add(new ParameterImporter());
 			transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
-			transformations.add(new StoreOnceTransformation());
+			// transformations.add(new StoreOnceTransformation());
 		}
 
 		for (DfSwitch<?> transformation : transformations) {
