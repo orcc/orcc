@@ -100,7 +100,7 @@ endif>
 ///////////////////////////////////////////////////////////////////////////////
 
 stateVar(variable) ::= <<
-@<variable.name> = <printStateVarNature(variable)> <variable.type> <initializeStateVar(variable)>
+@<variable.name> = internal <printStateVarNature(variable)> <variable.type> <initializeStateVar(variable)>
 >>
 
 printStateVarNature(variable) ::= <<
@@ -317,7 +317,7 @@ printInputPort(port) ::= <<
 @fifo_<printInputId(port)>_rdIndex = external global i32
 @fifo_<printInputId(port)>_wrIndex = external global i32
 
-@SIZE_<port.name> = constant i32 <printInputSize(port)>
+@SIZE_<port.name> = internal constant i32 <printInputSize(port)>
 @index_<port.name> = internal global i32 0
 @numTokens_<port.name> = internal global i32 0
 >>
@@ -335,7 +335,7 @@ printOutputPort(port) ::= <<
 @fifo_<printOutputId(port)>_rdIndex = external global i32
 @fifo_<printOutputId(port)>_wrIndex = external global i32
 
-@SIZE_<port.name> = constant i32 <printOutputSize(port)>
+@SIZE_<port.name> = internal constant i32 <printOutputSize(port)>
 @index_<port.name> = internal global i32 0
 @numFree_<port.name> = internal global i32 0
 >>
