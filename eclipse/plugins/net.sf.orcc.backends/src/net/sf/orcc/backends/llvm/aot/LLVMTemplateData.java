@@ -33,6 +33,8 @@ import java.util.Map;
 
 import net.sf.orcc.backends.ir.InstCast;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Pattern;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
 import net.sf.orcc.ir.Var;
 
@@ -51,9 +53,12 @@ public class LLVMTemplateData {
 
 	private Map<Var, Var> castedListReferences;
 
+	private Map<Pattern, Map<Port, Integer>> portToIndexByPatternMap;
+
 	private Map<State, Integer> stateToLabelMap;
 
 	public LLVMTemplateData(Actor actor) {
+		portToIndexByPatternMap = new HashMap<Pattern, Map<Port, Integer>>();
 
 		castedListReferences = new HashMap<Var, Var>();
 
@@ -77,6 +82,21 @@ public class LLVMTemplateData {
 		}
 	}
 
+	private void computePortToIndexByPatternMap(Actor actor) {
+		TreeIterator<EObject> it = actor.eAllContents();
+		while (it.hasNext()) {
+			EObject object = it.next();
+			if (object instanceof Pattern) {
+				Pattern pattern = (Pattern) object;
+				Map<Port, Integer> portToIndexMap = new HashMap<Port, Integer>();
+				for (int i = 0; i < pattern.getPorts().size(); i++) {
+					portToIndexMap.put(pattern.getPorts().get(i), i + 1);
+				}
+				portToIndexByPatternMap.put(pattern, portToIndexMap);
+			}
+		}
+	}
+
 	private void computeStateToLabelMap(Actor actor) {
 		if (actor.hasFsm()) {
 			for (int i = 0; i < actor.getFsm().getStates().size(); i++) {
@@ -88,10 +108,15 @@ public class LLVMTemplateData {
 	protected void computeTemplateMaps(Actor actor) {
 		computeCastedListReferences(actor);
 		computeStateToLabelMap(actor);
+		computePortToIndexByPatternMap(actor);
 	}
 
 	public Map<Var, Var> getCastedListReferences() {
 		return castedListReferences;
+	}
+
+	public Map<Pattern, Map<Port, Integer>> getPortToIndexByPatternMap() {
+		return portToIndexByPatternMap;
 	}
 
 	public Map<State, Integer> getStateToLabelMap() {
