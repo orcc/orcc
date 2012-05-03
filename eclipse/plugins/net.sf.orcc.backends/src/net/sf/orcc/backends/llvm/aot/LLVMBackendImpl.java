@@ -124,7 +124,6 @@ public class LLVMBackendImpl extends AbstractBackend {
 	protected void doTransformActor(Actor actor) throws OrccException {
 
 		DfSwitch<?>[] transformations = { new UnitImporter(),
-				new TypeResizer(true, false, false),
 				new DfVisitor<Void>(new SSATransformation()),
 				new DeadGlobalElimination(),
 				new DfVisitor<Void>(new DeadCodeElimination()),
@@ -156,8 +155,8 @@ public class LLVMBackendImpl extends AbstractBackend {
 		network = new Instantiator(fifoSize).doSwitch(network);
 		write("Flattening...\n");
 		new NetworkFlattener().doSwitch(network);
-
 		new BroadcastAdder().doSwitch(network);
+		new TypeResizer(true, true, false).doSwitch(network);
 
 		network.computeTemplateMaps();
 
