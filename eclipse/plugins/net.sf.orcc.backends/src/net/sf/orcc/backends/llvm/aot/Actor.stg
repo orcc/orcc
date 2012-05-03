@@ -195,7 +195,8 @@ printLoad(load) ::= <<
 
 printGEP(gep) ::= <<
 <if(action.inputPattern.varToPortMap.(gep.source.variable) || action.outputPattern.varToPortMap.(gep.source.variable) || action.peekPattern.varToPortMap.(gep.source.variable))
->%tmp_index_<gep.target.variable.name> = add i32 %local_index_<getPort(gep.source.variable)>, <Expr(first(gep.indexes))>
+><if(instance.actor.templateData.castedIndexes.(first(gep.indexes)))>%cast_index_<gep.target.variable.name> = zext <first(gep.indexes).type> <Expr(first(gep.indexes))> to i32<endif>
+%tmp_index_<gep.target.variable.name> = add i32 %local_index_<getPort(gep.source.variable)>, <if(instance.actor.templateData.castedIndexes.(first(gep.indexes)))>%cast_index_<gep.target.variable.name><else><Expr(first(gep.indexes))><endif>
 %final_index_<gep.target.variable.name>  = urem i32 %tmp_index_<gep.target.variable.name> , %local_size_<getPort(gep.source.variable)>
 <Var(gep.target.variable)> = getelementptr <getPortType(gep.source.variable)>* @fifo_<getPortId(gep.source.variable)>_content, i32 0, i32 %final_index_<gep.target.variable.name><
 else
