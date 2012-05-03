@@ -103,6 +103,8 @@ public class BroadcastAdder extends DfSwitch<Void> {
 		Connection incoming = DfFactory.eINSTANCE.createConnection(
 				conn.getSource(), conn.getSourcePort(), bcast,
 				bcast.getInput(), EcoreUtil.copyAll(conn.getAttributes()));
+		incoming.getAttributes()
+				.addAll(EcoreUtil.copyAll(conn.getAttributes()));
 		network.getConnections().add(incoming);
 
 		// Change the source of the other connections
