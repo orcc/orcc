@@ -43,23 +43,23 @@ import org.eclipse.emf.common.util.EList;
 /**
  * <!-- begin-user-doc -->This class defines a hierarchical XDF network. It
  * extends both entity and graph.<!-- end-user-doc -->
- *
+ * 
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link net.sf.orcc.df.Network#getEntities <em>Entities</em>}</li>
- *   <li>{@link net.sf.orcc.df.Network#getFileName <em>File Name</em>}</li>
- *   <li>{@link net.sf.orcc.df.Network#getInputs <em>Inputs</em>}</li>
- *   <li>{@link net.sf.orcc.df.Network#getInstances <em>Instances</em>}</li>
- *   <li>{@link net.sf.orcc.df.Network#getMoC <em>Mo C</em>}</li>
- *   <li>{@link net.sf.orcc.df.Network#getName <em>Name</em>}</li>
- *   <li>{@link net.sf.orcc.df.Network#getOutputs <em>Outputs</em>}</li>
- *   <li>{@link net.sf.orcc.df.Network#getParameters <em>Parameters</em>}</li>
- *   <li>{@link net.sf.orcc.df.Network#getTemplateData <em>Template Data</em>}</li>
- *   <li>{@link net.sf.orcc.df.Network#getVariables <em>Variables</em>}</li>
+ * <li>{@link net.sf.orcc.df.Network#getEntities <em>Entities</em>}</li>
+ * <li>{@link net.sf.orcc.df.Network#getFileName <em>File Name</em>}</li>
+ * <li>{@link net.sf.orcc.df.Network#getInputs <em>Inputs</em>}</li>
+ * <li>{@link net.sf.orcc.df.Network#getInstances <em>Instances</em>}</li>
+ * <li>{@link net.sf.orcc.df.Network#getMoC <em>Mo C</em>}</li>
+ * <li>{@link net.sf.orcc.df.Network#getName <em>Name</em>}</li>
+ * <li>{@link net.sf.orcc.df.Network#getOutputs <em>Outputs</em>}</li>
+ * <li>{@link net.sf.orcc.df.Network#getParameters <em>Parameters</em>}</li>
+ * <li>{@link net.sf.orcc.df.Network#getTemplateData <em>Template Data</em>}</li>
+ * <li>{@link net.sf.orcc.df.Network#getVariables <em>Variables</em>}</li>
  * </ul>
  * </p>
- *
+ * 
  * @see net.sf.orcc.df.DfPackage#getNetwork()
  * @model
  * @generated
@@ -168,6 +168,8 @@ public interface Network extends Graph {
 	 */
 	String getFileName();
 
+	Map<Port, Connection> getIncomingPortMap();
+
 	/**
 	 * Returns the input port whose name matches the given name.
 	 * 
@@ -216,6 +218,7 @@ public interface Network extends Graph {
 	/**
 	 * Returns the value of the '<em><b>Mo C</b></em>' containment reference.
 	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Mo C</em>' containment reference.
 	 * @see #setMoC(MoC)
 	 * @see net.sf.orcc.df.DfPackage#getNetwork_MoC()
@@ -276,15 +279,17 @@ public interface Network extends Graph {
 	Var getParameter(String name);
 
 	/**
-	 * Returns the value of the '<em><b>Parameters</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.ir.Var}.
+	 * Returns the value of the '<em><b>Parameters</b></em>' containment
+	 * reference list. The list contents are of type {@link net.sf.orcc.ir.Var}.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Parameters</em>' containment reference list
 	 * isn't clear, there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Parameters</em>' containment reference list.
+	 * 
+	 * @return the value of the '<em>Parameters</em>' containment reference
+	 *         list.
 	 * @see net.sf.orcc.df.DfPackage#getNetwork_Parameters()
 	 * @model containment="true"
 	 * @generated
@@ -294,13 +299,14 @@ public interface Network extends Graph {
 	String getSimpleName();
 
 	/**
-	 * Returns the value of the '<em><b>Template Data</b></em>' attribute.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Template Data</b></em>' attribute. <!--
+	 * begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Template Data</em>' attribute isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Template Data</em>' attribute.
 	 * @see #setTemplateData(Object)
 	 * @see net.sf.orcc.df.DfPackage#getNetwork_TemplateData()
@@ -319,9 +325,10 @@ public interface Network extends Graph {
 	Var getVariable(String name);
 
 	/**
-	 * Returns the value of the '<em><b>Variables</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.ir.Var}.
+	 * Returns the value of the '<em><b>Variables</b></em>' containment
+	 * reference list. The list contents are of type {@link net.sf.orcc.ir.Var}.
 	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Variables</em>' containment reference list.
 	 * @see net.sf.orcc.df.DfPackage#getNetwork_Variables()
 	 * @model containment="true"
@@ -379,29 +386,35 @@ public interface Network extends Graph {
 	void setFileName(String value);
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.df.Network#getMoC <em>Mo C</em>}' containment reference.
-	 * <!-- begin-user-doc --><!--
+	 * Sets the value of the '{@link net.sf.orcc.df.Network#getMoC
+	 * <em>Mo C</em>}' containment reference. <!-- begin-user-doc --><!--
 	 * end-user-doc -->
-	 * @param value the new value of the '<em>Mo C</em>' containment reference.
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Mo C</em>' containment reference.
 	 * @see #getMoC()
 	 * @generated
 	 */
 	void setMoC(MoC value);
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.df.Network#getName <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Name</em>' attribute.
+	 * Sets the value of the '{@link net.sf.orcc.df.Network#getName
+	 * <em>Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Name</em>' attribute.
 	 * @see #getName()
 	 * @generated
 	 */
 	void setName(String value);
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.df.Network#getTemplateData <em>Template Data</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Template Data</em>' attribute.
+	 * Sets the value of the '{@link net.sf.orcc.df.Network#getTemplateData
+	 * <em>Template Data</em>}' attribute. <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Template Data</em>' attribute.
 	 * @see #getTemplateData()
 	 * @generated
 	 */

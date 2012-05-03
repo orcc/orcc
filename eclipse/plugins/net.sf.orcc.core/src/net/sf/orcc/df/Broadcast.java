@@ -28,7 +28,11 @@
  */
 package net.sf.orcc.df;
 
+import java.util.List;
+import java.util.Map;
+
 import net.sf.dftools.graph.Vertex;
+
 import org.eclipse.emf.common.util.EList;
 
 /**
@@ -40,17 +44,20 @@ import org.eclipse.emf.common.util.EList;
  */
 public interface Broadcast extends Vertex {
 
+	Map<Port, Connection> getIncomingPortMap();
+
 	Port getInput();
 
 	/**
-	 * Returns the value of the '<em><b>Inputs</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.df.Port}.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Inputs</b></em>' containment reference
+	 * list. The list contents are of type {@link net.sf.orcc.df.Port}. <!--
+	 * begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Inputs</em>' containment reference list isn't clear,
-	 * there really should be more of a description here...
+	 * If the meaning of the '<em>Inputs</em>' containment reference list isn't
+	 * clear, there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Inputs</em>' containment reference list.
 	 * @see net.sf.orcc.df.DfPackage#getBroadcast_Inputs()
 	 * @model containment="true"
@@ -59,13 +66,14 @@ public interface Broadcast extends Vertex {
 	EList<Port> getInputs();
 
 	/**
-	 * Returns the value of the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Name</em>' attribute isn't clear,
-	 * there really should be more of a description here...
+	 * If the meaning of the '<em>Name</em>' attribute isn't clear, there really
+	 * should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Name</em>' attribute.
 	 * @see #setName(String)
 	 * @see net.sf.orcc.df.DfPackage#getBroadcast_Name()
@@ -73,6 +81,8 @@ public interface Broadcast extends Vertex {
 	 * @generated
 	 */
 	String getName();
+
+	Map<Port, List<Connection>> getOutgoingPortMap();
 
 	/**
 	 * Returns the output port whose name matches the given name.
@@ -84,14 +94,15 @@ public interface Broadcast extends Vertex {
 	Port getOutput(String name);
 
 	/**
-	 * Returns the value of the '<em><b>Outputs</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.df.Port}.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Outputs</b></em>' containment reference
+	 * list. The list contents are of type {@link net.sf.orcc.df.Port}. <!--
+	 * begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Outputs</em>' containment reference list isn't clear,
-	 * there really should be more of a description here...
+	 * If the meaning of the '<em>Outputs</em>' containment reference list isn't
+	 * clear, there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Outputs</em>' containment reference list.
 	 * @see net.sf.orcc.df.DfPackage#getBroadcast_Outputs()
 	 * @model containment="true"
@@ -102,10 +113,11 @@ public interface Broadcast extends Vertex {
 	String getSimpleName();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.df.Broadcast#getName <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Name</em>' attribute.
+	 * Sets the value of the '{@link net.sf.orcc.df.Broadcast#getName
+	 * <em>Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Name</em>' attribute.
 	 * @see #getName()
 	 * @generated
 	 */

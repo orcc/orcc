@@ -28,12 +28,17 @@
  */
 package net.sf.orcc.df.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.impl.VertexImpl;
 import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.df.Broadcast;
+import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfUtil;
@@ -51,15 +56,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
 public class BroadcastImpl extends VertexImpl implements Broadcast {
 
 	/**
-	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getInputs()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Port> inputs;
-	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -68,6 +64,15 @@ public class BroadcastImpl extends VertexImpl implements Broadcast {
 	 * @ordered
 	 */
 	protected static final String NAME_EDEFAULT = null;
+	/**
+	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getInputs()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Port> inputs;
 	/**
 	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
@@ -196,10 +201,22 @@ public class BroadcastImpl extends VertexImpl implements Broadcast {
 	}
 
 	@Override
+	public Map<Port, Connection> getIncomingPortMap() {
+		Map<Port, Connection> map = new HashMap<Port, Connection>();
+		for (Edge edge : getIncoming()) {
+			if (edge instanceof Connection) {
+				Connection connection = (Connection) edge;
+				map.put(connection.getTargetPort(), connection);
+			}
+		}
+		return map;
+	}
+	
+	@Override
 	public Port getInput() {
 		return getInputs().get(0);
 	}
-
+	
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -216,6 +233,24 @@ public class BroadcastImpl extends VertexImpl implements Broadcast {
 	@Override
 	public String getName() {
 		return getLabel();
+	}
+
+	@Override
+	public Map<Port, List<Connection>> getOutgoingPortMap() {
+		Map<Port, List<Connection>> map = new HashMap<Port, List<Connection>>();
+		for (Edge edge : getOutgoing()) {
+			if (edge instanceof Connection) {
+				Connection connection = (Connection) edge;
+				Port source = connection.getSourcePort();
+				List<Connection> conns = map.get(source);
+				if (conns == null) {
+					conns = new ArrayList<Connection>(1);
+					map.put(source, conns);
+				}
+				conns.add(connection);
+			}
+		}
+		return map;
 	}
 
 	@Override

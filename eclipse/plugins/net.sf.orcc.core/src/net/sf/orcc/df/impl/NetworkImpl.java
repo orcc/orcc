@@ -81,15 +81,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  */
 public class NetworkImpl extends GraphImpl implements Network {
 	/**
-	 * The cached value of the '{@link #getEntities() <em>Entities</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getEntities()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Vertex> entities;
-
-	/**
 	 * The default value of the '{@link #getFileName() <em>File Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getFileName()
@@ -97,6 +88,34 @@ public class NetworkImpl extends GraphImpl implements Network {
 	 * @ordered
 	 */
 	protected static final String FILE_NAME_EDEFAULT = null;
+
+	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
+
+	/**
+	 * The default value of the '{@link #getTemplateData() <em>Template Data</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getTemplateData()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final Object TEMPLATE_DATA_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getEntities() <em>Entities</em>}' reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getEntities()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Vertex> entities;
 
 	/**
 	 * The cached value of the '{@link #getFileName() <em>File Name</em>}' attribute.
@@ -135,15 +154,6 @@ public class NetworkImpl extends GraphImpl implements Network {
 	protected MoC moC;
 
 	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String NAME_EDEFAULT = null;
-
-	/**
 	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getOutputs()
@@ -160,16 +170,6 @@ public class NetworkImpl extends GraphImpl implements Network {
 	 * @ordered
 	 */
 	protected EList<Var> parameters;
-
-	/**
-	 * The default value of the '{@link #getTemplateData() <em>Template Data</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getTemplateData()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final Object TEMPLATE_DATA_EDEFAULT = null;
 
 	/**
 	 * The cached value of the '{@link #getTemplateData() <em>Template Data</em>}' attribute.
@@ -559,6 +559,18 @@ public class NetworkImpl extends GraphImpl implements Network {
 	}
 
 	@Override
+	public Map<Port, Connection> getIncomingPortMap() {
+		Map<Port, Connection> map = new HashMap<Port, Connection>();
+		for (Edge edge : getIncoming()) {
+			if (edge instanceof Connection) {
+				Connection connection = (Connection) edge;
+				map.put(connection.getTargetPort(), connection);
+			}
+		}
+		return map;
+	}
+
+	@Override
 	public Port getInput(String name) {
 		List<Port> inputs = EcoreHelper.getList(this, "inputs");
 		for (Port port : inputs) {
@@ -640,7 +652,7 @@ public class NetworkImpl extends GraphImpl implements Network {
 	public String getName() {
 		return getLabel();
 	}
-
+	
 	@Override
 	public Map<Port, List<Connection>> getOutgoingPortMap() {
 		Map<Port, List<Connection>> map = new HashMap<Port, List<Connection>>();
