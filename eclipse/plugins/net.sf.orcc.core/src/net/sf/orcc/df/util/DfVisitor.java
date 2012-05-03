@@ -28,9 +28,15 @@
  */
 package net.sf.orcc.df.util;
 
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Broadcast;
+import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
@@ -42,6 +48,7 @@ import org.eclipse.emf.ecore.EObject;
  * extended by classes that implement actor visitors and transformations.
  * 
  * @author Matthieu Wipliez
+ * @author Herve Yviquel
  * @since 1.2
  */
 public class DfVisitor<T> extends DfSwitch<T> {
@@ -75,6 +82,12 @@ public class DfVisitor<T> extends DfSwitch<T> {
 
 	@Override
 	public T caseActor(Actor actor) {
+		for (Port port : actor.getInputs()) {
+			doSwitch(port);
+		}
+		for (Port port : actor.getOutputs()) {
+			doSwitch(port);
+		}
 		for (Var parameter : actor.getParameters()) {
 			doSwitch(parameter);
 		}
@@ -99,7 +112,58 @@ public class DfVisitor<T> extends DfSwitch<T> {
 	}
 
 	@Override
+	public T caseBroadcast(Broadcast broadcast) {
+		for (Port port : broadcast.getInputs()) {
+			doSwitch(port);
+		}
+		for (Port port : broadcast.getOutputs()) {
+			doSwitch(port);
+		}
+		return null;
+	}
+
+	@Override
+	public T caseConnection(Connection connection) {
+		return null;
+	}
+
+	@Override
+	public T caseInstance(Instance instance) {
+		if (instance.isActor()) {
+			doSwitch(instance.getActor());
+		} else {
+			doSwitch(instance.getEntity());
+		}
+		return null;
+	}
+
+	@Override
+	public T caseNetwork(Network network) {
+		for (Port port : network.getInputs()) {
+			doSwitch(port);
+		}
+		for (Port port : network.getOutputs()) {
+			doSwitch(port);
+		}
+		for (Instance instance : network.getInstances()) {
+			doSwitch(instance);
+		}
+		for (Vertex entity : network.getEntities()) {
+			doSwitch(entity);
+		}
+		for (Connection connection : network.getConnections()) {
+			doSwitch(connection);
+		}
+		return null;
+	}
+
+	@Override
 	public T casePattern(Pattern pattern) {
+		return null;
+	}
+
+	@Override
+	public T casePort(Port port) {
 		return null;
 	}
 
