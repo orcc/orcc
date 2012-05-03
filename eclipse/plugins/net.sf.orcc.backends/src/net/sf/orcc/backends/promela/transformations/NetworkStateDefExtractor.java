@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, �bo Akademi University
+ * Copyright (c) 2011, Abo Akademi University
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the �bo Akademi University nor the names of its
+ *   * Neither the name of the Abo Akademi University nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -41,16 +41,17 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.util.DfVisitor;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstStore;
-import net.sf.orcc.ir.BlockIf;
-import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 
 /**
  * This class extracts the variables/ports needed to schedule a network. The
@@ -60,7 +61,86 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * @author Johan Ersfolk
  * 
  */
-public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
+public class NetworkStateDefExtractor extends DfVisitor<Void> {
+
+	private class InnerIrVisitor extends AbstractIrVisitor<Void> {
+		public InnerIrVisitor() {
+			super(true);
+		}
+
+		@Override
+		public Void caseBlockIf(BlockIf nodeIf) {
+			conditionVars.push(new HashSet<Var>());
+			inCondition = true;
+			doSwitch(nodeIf.getCondition());
+			inCondition = false;
+			doSwitch(nodeIf.getThenBlocks());
+			doSwitch(nodeIf.getElseBlocks());
+			conditionVars.pop();
+			doSwitch(nodeIf.getJoinBlock());
+			return null;
+		}
+
+		@Override
+		public Void caseBlockWhile(BlockWhile nodeWhile) {
+			conditionVars.push(new HashSet<Var>());
+			inCondition = true;
+			doSwitch(nodeWhile.getCondition());
+			inCondition = false;
+			doSwitch(nodeWhile.getBlocks());
+			conditionVars.pop();
+			doSwitch(nodeWhile.getJoinBlock());
+			return null;
+		}
+
+		@Override
+		public Void caseExprVar(ExprVar var) {
+			if (inCondition) {
+				conditionVars.peek().add(var.getUse().getVariable());
+			} else {
+				addVariableDep(currentTargetVar, var.getUse().getVariable());
+			}
+			return null;
+		}
+
+		@Override
+		public Void caseInstAssign(InstAssign assign) {
+			addTargetVar(assign.getTarget().getVariable());
+			return super.caseInstAssign(assign);
+		}
+
+		@Override
+		public Void caseInstCall(InstCall call) {
+			if (call.hasResult()) {
+				addTargetVar(call.getTarget().getVariable());
+			}
+			return super.caseInstCall(call);
+		}
+
+		@Override
+		public Void caseInstLoad(InstLoad load) {
+			addVariableDep(load.getTarget().getVariable(), load.getSource()
+					.getVariable());
+			if (inScheduler) {
+				// this might not be needed as 'casePattern' should do the same
+				varsUsedInScheduling.add(load.getSource().getVariable());
+			}
+			return null;
+		}
+
+		@Override
+		public Void caseInstPhi(InstPhi phi) {
+			addTargetVar(phi.getTarget().getVariable());
+			return super.caseInstPhi(phi);
+		}
+
+		@Override
+		public Void caseInstStore(InstStore store) {
+			addTargetVar(store.getTarget().getVariable());
+			doSwitch(store.getValue());
+			return null;
+		}
+	}
 
 	private Stack<Set<Var>> conditionVars = new Stack<Set<Var>>();
 
@@ -76,9 +156,9 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 
 	private Set<Port> outputPortsUsedInScheduling = new HashSet<Port>();
 
-	private Map<Port, Set<Port>> outputPortToInputPortMap = new HashMap<Port, Set<Port>>();
-
 	private Map<Port, Set<Var>> outputPortToDepVariablesMap = new HashMap<Port, Set<Var>>();
+
+	private Map<Port, Set<Port>> outputPortToInputPortMap = new HashMap<Port, Set<Port>>();
 
 	private Set<Port> portsUsedInScheduling = new HashSet<Port>();
 
@@ -91,23 +171,13 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 	private Set<Var> visited = new HashSet<Var>();
 
 	public NetworkStateDefExtractor() {
-		super(true);
+		this.irVisitor = new InnerIrVisitor();
 	}
 
 	/*
-	 * Adds the "target" 'depends on' "source" to the relation. 
-	 * 
-	 */
-	private void addVariableDep(Var target, Var source) {
-		if (!variableDependency.containsKey(target)) {
-			variableDependency.put(target, new HashSet<Var>());
-		}
-		variableDependency.get(target).add(source);
-	}
-	
-	/* Also adds "target" 'depends on' condition, this is used if the variable in set
-	 * within a loop or if-statement as the value of the target variable the
-	 * also depends on the condition.
+	 * Also adds "target" 'depends on' condition, this is used if the variable
+	 * in set within a loop or if-statement as the value of the target variable
+	 * the also depends on the condition.
 	 */
 	private void addTargetVar(Var target) {
 		currentTargetVar = target;
@@ -117,6 +187,16 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 		for (Set<Var> s : conditionVars) {
 			variableDependency.get(target).addAll(s);
 		}
+	}
+
+	/*
+	 * Adds the "target" 'depends on' "source" to the relation.
+	 */
+	private void addVariableDep(Var target, Var source) {
+		if (!variableDependency.containsKey(target)) {
+			variableDependency.put(target, new HashSet<Var>());
+		}
+		variableDependency.get(target).add(source);
 	}
 
 	void analyzeVarDeps() {
@@ -131,7 +211,7 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseAction(Action action) {
+	public Void caseAction(Action action) {
 		// solve the port dependency, procedures and functions should also be
 		// handled
 		doSwitch(action.getBody());
@@ -143,7 +223,7 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseActor(Actor actor) {
+	public Void caseActor(Actor actor) {
 		for (Action action : actor.getActions()) {
 			doSwitch(action);
 		}
@@ -173,57 +253,6 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseExprVar(ExprVar var) {
-		if (inCondition) {
-			conditionVars.peek().add(var.getUse().getVariable());
-		} else {
-			addVariableDep(currentTargetVar, var.getUse().getVariable());
-		}
-		return null;
-	}
-
-	@Override
-	public Object caseInstAssign(InstAssign assign) {
-		addTargetVar(assign.getTarget().getVariable());
-		super.caseInstAssign(assign);
-		return null;
-	}
-
-	@Override
-	public Object caseInstCall(InstCall call) {
-		if (call.hasResult()) {
-			addTargetVar(call.getTarget().getVariable());
-		}
-		super.caseInstCall(call);
-		return null;
-	}
-
-	@Override
-	public Object caseInstLoad(InstLoad load) {
-		addVariableDep(load.getTarget().getVariable(), load.getSource()
-				.getVariable());
-		if (inScheduler) {
-			// this might not be needed as 'casePattern' should do the same
-			varsUsedInScheduling.add(load.getSource().getVariable());
-		}
-		return null;
-	}
-
-	@Override
-	public Object caseInstPhi(InstPhi phi) {
-		addTargetVar(phi.getTarget().getVariable());
-		super.caseInstPhi(phi);
-		return null;
-	}
-
-	@Override
-	public Object caseInstStore(InstStore store) {
-		addTargetVar(store.getTarget().getVariable());
-		doSwitch(store.getValue());
-		return null;
-	}
-
-	@Override
 	public Void caseNetwork(Network network) {
 		for (Actor actor : network.getAllActors()) {
 			doSwitch(actor);
@@ -234,32 +263,7 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseNodeIf(BlockIf nodeIf) {
-		conditionVars.push(new HashSet<Var>());
-		inCondition = true;
-		doSwitch(nodeIf.getCondition());
-		inCondition = false;
-		doSwitch(nodeIf.getThenBlocks());
-		doSwitch(nodeIf.getElseBlocks());
-		conditionVars.pop();
-		doSwitch(nodeIf.getJoinBlock());
-		return null;
-	}
-
-	@Override
-	public Object caseNodeWhile(BlockWhile nodeWhile) {
-		conditionVars.push(new HashSet<Var>());
-		inCondition = true;
-		doSwitch(nodeWhile.getCondition());
-		inCondition = false;
-		doSwitch(nodeWhile.getBlocks());
-		conditionVars.pop();
-		doSwitch(nodeWhile.getJoinBlock());
-		return null;
-	}
-
-	@Override
-	public Object casePattern(Pattern pattern) {
+	public Void casePattern(Pattern pattern) {
 		// Only Peek patterns will end up here
 		inputPortsUsedInScheduling.addAll(pattern.getPorts());
 		varsUsedInScheduling.addAll(pattern.getVariables());
@@ -273,11 +277,15 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 		return portsUsedInScheduling;
 	}
 
-	/**
-	 * @return the varsUsedInScheduling
-	 */
-	public Set<Var> getVarsUsedInScheduling() {
-		return varsUsedInScheduling;
+	public void getTransitiveClosure(Var variable, Set<Var> transitiveClosure) {
+		if (variableDependency.containsKey(variable)) {
+			for (Var v : variableDependency.get(variable)) {
+				if (!transitiveClosure.contains(v)) {
+					transitiveClosure.add(v);
+					getTransitiveClosure(v, transitiveClosure);
+				}
+			}
+		}
 	}
 
 	/**
@@ -285,6 +293,13 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 	 */
 	public Map<Var, Set<Var>> getVariableDependency() {
 		return variableDependency;
+	}
+
+	/**
+	 * @return the varsUsedInScheduling
+	 */
+	public Set<Var> getVarsUsedInScheduling() {
+		return varsUsedInScheduling;
 	}
 
 	/*
@@ -329,18 +344,8 @@ public class NetworkStateDefExtractor extends AbstractActorVisitor<Object> {
 	private void identifySchedulingVars() {
 		for (Port port : outputPortsUsedInScheduling) {
 			if (outputPortToDepVariablesMap.containsKey(port)) {
-				varsUsedInScheduling.addAll(outputPortToDepVariablesMap.get(port));
-			}
-		}
-	}
-
-	public void getTransitiveClosure(Var variable, Set<Var> transitiveClosure) {
-		if (variableDependency.containsKey(variable)) {
-			for (Var v : variableDependency.get(variable)) {
-				if (!transitiveClosure.contains(v)) {
-					transitiveClosure.add(v);
-					getTransitiveClosure(v, transitiveClosure);
-				}
+				varsUsedInScheduling.addAll(outputPortToDepVariablesMap
+						.get(port));
 			}
 		}
 	}

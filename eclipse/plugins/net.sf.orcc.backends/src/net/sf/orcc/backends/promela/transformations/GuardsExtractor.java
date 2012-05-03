@@ -38,13 +38,14 @@ import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Transition;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 
 import org.eclipse.emf.ecore.EObject;
 
@@ -53,7 +54,24 @@ import org.eclipse.emf.ecore.EObject;
  * @author Ghislain Roquier
  * 
  */
-public class GuardsExtractor extends AbstractActorVisitor<Object> {
+public class GuardsExtractor extends DfVisitor<Void> {
+
+	private class InnerIrVisitor extends AbstractIrVisitor<Void> {
+		@Override
+		public Void caseInstAssign(InstAssign assign) {
+			// we should also consider other cases but this is enough for now
+			if (!assign.getValue().isExprBool()) {
+				guardList.add(assign.getValue());
+			}
+			return null;
+		}
+
+		@Override
+		public Void caseInstLoad(InstLoad load) {
+			loadList.add(load);
+			return null;
+		}
+	}
 
 	private Action currAction;
 
@@ -77,10 +95,11 @@ public class GuardsExtractor extends AbstractActorVisitor<Object> {
 		this.guards = guards;
 		this.priority = priority;
 		this.loadPeeks = loadPeeks;
+		this.irVisitor = new InnerIrVisitor();
 	}
 
 	@Override
-	public Object caseActor(Actor actor) {
+	public Void caseActor(Actor actor) {
 		for (Action action : actor.getActions()) {
 			currAction = action;
 			guardList = new ArrayList<Expression>();
@@ -123,21 +142,6 @@ public class GuardsExtractor extends AbstractActorVisitor<Object> {
 			}
 		}
 
-		return null;
-	}
-
-	@Override
-	public Object caseInstAssign(InstAssign assign) {
-		// we should also consider other cases but this is enough for now
-		if (!assign.getValue().isExprBool()) {
-			guardList.add(assign.getValue());
-		}
-		return null;
-	}
-
-	@Override
-	public Object caseInstLoad(InstLoad load) {
-		loadList.add(load);
 		return null;
 	}
 

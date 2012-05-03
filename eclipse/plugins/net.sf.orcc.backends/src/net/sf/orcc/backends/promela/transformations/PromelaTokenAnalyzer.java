@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, �bo Akademi University
+ * Copyright (c) 2011, Abo Akademi University
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the �bo Akademi University nor the names of its
+ *   * Neither the name of the Abo Akademi University nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -29,60 +29,60 @@
 
 package net.sf.orcc.backends.promela.transformations;
 
-//import java.util.HashMap;
-//import java.util.HashSet;
-//import java.util.Set;
 import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
-//import net.sf.orcc.df.Edge;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.df.util.DfVisitor;
 
 /**
- * This class generates information about the data/control tokens needed for the promela model.
- * The current version only sets the max number of tokens each port consumes/produces.
- *  
+ * This class generates information about the data/control tokens needed for the
+ * promela model. The current version only sets the max number of tokens each
+ * port consumes/produces.
+ * 
  * @author Johan Ersfolk
  * 
  */
 
-public class PromelaTokenAnalyzer extends AbstractActorVisitor<Object>{
-	
-	//private Set<Port> schedulingPorts;
-	
-	//private NetworkStateDefExtractor netStateDef;
-	
-	//private Map<Var, Action> localVarToAction = new HashMap<Var, Action>();
-	
+public class PromelaTokenAnalyzer extends DfVisitor<Void> {
+
+	// private Set<Port> schedulingPorts;
+
+	// private NetworkStateDefExtractor netStateDef;
+
+	// private Map<Var, Action> localVarToAction = new HashMap<Var, Action>();
+
 	@Override
-	public Object caseAction(Action action) {
-		//for(Var var : action.getBody().getLocals()) {
-		//	if (netStateDef.getVarsUsedInScheduling().contains(var)) {
-		//		Set<Var> tc = new HashSet<Var>();
-		//		netStateDef.getTransitiveClosure(var, tc);
-		//		//System.out.println(var+ " -> " + tc);
-		//		System.out.println("Action "+action.getName()+" contains var "+ var.getName());
-		//		localVarToAction.put(var, action);
-		//	}
-		//}
+	public Void caseAction(Action action) {
+		// for(Var var : action.getBody().getLocals()) {
+		// if (netStateDef.getVarsUsedInScheduling().contains(var)) {
+		// Set<Var> tc = new HashSet<Var>();
+		// netStateDef.getTransitiveClosure(var, tc);
+		// //System.out.println(var+ " -> " + tc);
+		// System.out.println("Action "+action.getName()+" contains var "+
+		// var.getName());
+		// localVarToAction.put(var, action);
+		// }
+		// }
 		Pattern pattern = action.getOutputPattern();
 		for (Port port : pattern.getPorts()) {
-			//if (schedulingPorts.contains(port)) {
-			//	System.out.println("Action "+action.getName()+" contributes to the output "+port.getName());
-			//}
-			int numTokens = pattern.getVariable(port).getType().getDimensions().get(0);
+			// if (schedulingPorts.contains(port)) {
+			// System.out.println("Action "+action.getName()+" contributes to the output "+port.getName());
+			// }
+			int numTokens = pattern.getVariable(port).getType().getDimensions()
+					.get(0);
 			if (numTokens > port.getNumTokensProduced()) {
 				port.setNumTokensProduced(numTokens);
 			}
 		}
 		pattern = action.getInputPattern();
 		for (Port port : pattern.getPorts()) {
-			int num_tokens = pattern.getVariable(port).getType().getDimensions().get(0);
+			int num_tokens = pattern.getVariable(port).getType()
+					.getDimensions().get(0);
 			if (num_tokens > port.getNumTokensConsumed()) {
 				port.setNumTokensConsumed(num_tokens);
 			}
@@ -91,34 +91,37 @@ public class PromelaTokenAnalyzer extends AbstractActorVisitor<Object>{
 	}
 
 	@Override
-	public Object caseInstance(Instance instance) {
+	public Void caseInstance(Instance instance) {
 		for (Action action : instance.getActor().getActions()) {
 			doSwitch(action);
 		}
 		// Set the FIFO sizes according to the token consumtion/production
-		Map<Port,Connection> inMap = instance.getIncomingPortMap();
+		Map<Port, Connection> inMap = instance.getIncomingPortMap();
 		for (Port port : inMap.keySet()) {
 			Connection connection = inMap.get(port);
-			if (connection.getSize() == null || port.getNumTokensConsumed() > connection.getSize()) {
-				inMap.get(port).setAttribute(Connection.BUFFER_SIZE, port.getNumTokensConsumed());
+			if (connection.getSize() == null
+					|| port.getNumTokensConsumed() > connection.getSize()) {
+				inMap.get(port).setAttribute(Connection.BUFFER_SIZE,
+						port.getNumTokensConsumed());
 			}
 		}
-		Map<Port,List<Connection>> outMap = instance.getOutgoingPortMap();
+		Map<Port, List<Connection>> outMap = instance.getOutgoingPortMap();
 		for (Port port : outMap.keySet()) {
 			for (Connection connection : outMap.get(port)) {
-				if (connection.getSize() == null || port.getNumTokensProduced() > connection.getSize()) {
-					connection.setAttribute(Connection.BUFFER_SIZE, port.getNumTokensProduced());
+				if (connection.getSize() == null
+						|| port.getNumTokensProduced() > connection.getSize()) {
+					connection.setAttribute(Connection.BUFFER_SIZE,
+							port.getNumTokensProduced());
 				}
 			}
 		}
 		return null;
 	}
 
-	
 	public PromelaTokenAnalyzer(NetworkStateDefExtractor netStateDef) {
 		super();
-		//this.netStateDef = netStateDef;
-		//this.schedulingPorts = netStateDef.getPortsUsedInScheduling();
+		// this.netStateDef = netStateDef;
+		// this.schedulingPorts = netStateDef.getPortsUsedInScheduling();
 	}
-	
+
 }
