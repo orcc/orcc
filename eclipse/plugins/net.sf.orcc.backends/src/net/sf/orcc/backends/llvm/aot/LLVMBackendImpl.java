@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
@@ -50,6 +51,7 @@ import net.sf.orcc.backends.transformations.ssa.CopyPropagator;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.transformations.BroadcastAdder;
 import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.df.transformations.NetworkFlattener;
 import net.sf.orcc.df.util.DfSwitch;
@@ -116,7 +118,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		// Set src directory as path
 		path = srcDir.getAbsolutePath();
 	}
-	
+
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 
@@ -143,7 +145,6 @@ public class LLVMBackendImpl extends AbstractBackend {
 			transformation.doSwitch(actor);
 		}
 
-		// Organize metadata information for the current actor
 		actor.setTemplateData(new LLVMTemplateData(actor));
 	}
 
@@ -154,6 +155,8 @@ public class LLVMBackendImpl extends AbstractBackend {
 		write("Flattening...\n");
 		new NetworkFlattener().doSwitch(network);
 		
+		new BroadcastAdder().doSwitch(network);
+
 		network.computeTemplateMaps();
 
 		return network;
@@ -172,8 +175,9 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 		network.computeTemplateMaps();
 
-		// print instances
+		// print instances and entities
 		printInstances(network);
+		printEntities(network);
 
 		// print network
 		write("Printing network...\n");
@@ -182,8 +186,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
 		printer.print(network.getSimpleName() + ".ll", path, network);
-		
-		// print network
+
 		StandardPrinter networkPrinter = new StandardPrinter(
 				"net/sf/orcc/backends/llvm/aot/CMakeLists.stg");
 		networkPrinter.print("CMakeLists.txt", path, network);
@@ -216,6 +219,11 @@ public class LLVMBackendImpl extends AbstractBackend {
 	@Override
 	protected boolean printInstance(Instance instance) {
 		return printer.print(instance.getSimpleName() + ".ll", path, instance);
+	}
+
+	@Override
+	protected boolean printEntity(Vertex vertex) {
+		return printer.print(vertex.getLabel() + ".ll", path, vertex);
 	}
 
 }
