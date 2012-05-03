@@ -293,7 +293,7 @@ printProcedure(procedure, action="") ::= <<
 <if(procedure.native)>
 declare <procedure.returnType> @<procedure.name>(<procedure.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind
 <else>
-define <procedure.returnType> @<procedure.name>(<procedure.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
+define internal <procedure.returnType> @<procedure.name>(<procedure.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
 entry:
 <if(procedure.locals)>
 	<procedure.locals: variableDeclaration()>
@@ -546,7 +546,7 @@ switch i32 %local_FSM_state, label %default [
 >>
 
 schedulerWithFSM(actions, fsm) ::= <<
-@_FSM_state = global i32 <instance.actor.templateData.stateToLabelMap.(fsm.initialState)>
+@_FSM_state = internal global i32 <instance.actor.templateData.stateToLabelMap.(fsm.initialState)>
 
 <if(actions)>
 define void @<instance.name>_outside_FSM_scheduler() noreturn nounwind {
@@ -615,7 +615,7 @@ store i32 %new_index_<port.name>, i32* @index_<port.name>
 >>
 
 printAction(action) ::= <<
-define i1 @<action.scheduler.name>() nounwind {
+define internal i1 @<action.scheduler.name>() nounwind {
 entry:
 	<action.scheduler.locals: variableDeclaration()>
 	<action.peekPattern.ports: { port | <fifoVar(port, action.inputPattern.portToVarMap.(port))>}; separator="\n">
@@ -624,7 +624,7 @@ entry:
 <printNodes(action.scheduler.nodes)>
 }
 
-define void @<action.body.name>() nounwind {
+define internal void @<action.body.name>() nounwind {
 entry:
 	<action.body.locals: variableDeclaration()>
 	<action.inputPattern.ports: { port | <fifoVar(port, action.inputPattern.portToVarMap.(port))>}; separator="\n">
