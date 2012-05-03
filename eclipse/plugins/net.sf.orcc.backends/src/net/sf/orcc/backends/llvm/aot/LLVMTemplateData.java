@@ -44,7 +44,7 @@ import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
 
 /**
- * This class computes a map for inserting metadata information into LLVM
+ * This class computes several map to get specific information into LLVM
  * template.
  * 
  * @author Jerome GORIN
@@ -127,18 +127,30 @@ public class LLVMTemplateData {
 		computeCastedIndex(actor);
 	}
 
+	/**
+	 * @return a map composed of the indexes which have to be casted
+	 */
 	public Map<Expression, Expression> getCastedIndexes() {
 		return castedIndexes;
 	}
 
+	/**
+	 * @return a map composed of list variables which have to be casted
+	 */
 	public Map<Var, Var> getCastedListReferences() {
 		return castedListReferences;
 	}
 
+	/**
+	 * @return a map of ports to their integer indexes in each pattern
+	 */
 	public Map<Pattern, Map<Port, Integer>> getPortToIndexByPatternMap() {
 		return portToIndexByPatternMap;
 	}
 
+	/**
+	 * @return a map of FSM states to their integer indexes
+	 */
 	public Map<State, Integer> getStateToLabelMap() {
 		return stateToLabelMap;
 	}
