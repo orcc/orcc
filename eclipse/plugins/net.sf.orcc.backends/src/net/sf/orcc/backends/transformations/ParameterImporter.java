@@ -32,32 +32,49 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 
 /**
  * This class defines a transformation that replaces actor parameters by a
  * global variables. actor.
  * 
  * @author Thavot Richard
- * @version 1.0
+ * @version 1.1
  */
-public class ParameterImporter extends AbstractActorVisitor<Object> {
+public class ParameterImporter extends DfVisitor<Void> {
 
 	private Map<Var, Var> paramToGlobalVarMap;
 
 	public ParameterImporter() {
-		paramToGlobalVarMap = new HashMap<Var, Var>();
+		this.irVisitor = new InnerIrVisitor();
+		this.paramToGlobalVarMap = new HashMap<Var, Var>();
+	}
+
+	private class InnerIrVisitor extends AbstractIrVisitor<Void> {
+		/**
+		 * Overwrite each load source that calls an actor parameter
+		 */
+		@Override
+		public Void caseInstLoad(InstLoad load) {
+			Var loadedVar = load.getSource().getVariable();
+			if (paramToGlobalVarMap.containsKey(loadedVar)) {
+				load.getSource()
+						.setVariable(paramToGlobalVarMap.get(loadedVar));
+			}
+			return null;
+		}
 	}
 
 	/**
 	 * Visit an actor for replacing actor parameters by a global variables.
 	 */
 	@Override
-	public Object caseActor(Actor actor) {
+	public Void caseActor(Actor actor) {
 		this.actor = actor;
 
 		for (Var parameter : actor.getParameters()) {
@@ -67,22 +84,7 @@ public class ParameterImporter extends AbstractActorVisitor<Object> {
 					.createExprVar(parameter));
 			paramToGlobalVarMap.put(parameter, paramVar);
 		}
-
-		super.caseActor(actor);
-
-		return null;
-	}
-
-	/**
-	 * Overwrite each load source that calls an actor parameter
-	 */
-	@Override
-	public Object caseInstLoad(InstLoad load) {
-		Var loadedVar = load.getSource().getVariable();
-		if (paramToGlobalVarMap.containsKey(loadedVar)) {
-			load.getSource().setVariable(paramToGlobalVarMap.get(loadedVar));
-		}
-		return null;
+		return super.caseActor(actor);
 	}
 
 	/**
