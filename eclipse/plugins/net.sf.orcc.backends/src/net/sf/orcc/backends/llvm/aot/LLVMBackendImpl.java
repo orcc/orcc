@@ -122,8 +122,15 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
+		// do not transform actor
+	}
 
-		DfSwitch<?>[] transformations = { new UnitImporter(),
+	protected Network doTransformNetwork(Network network) throws OrccException {
+		network = new Instantiator(fifoSize).doSwitch(network);
+
+		DfSwitch<?>[] transformations = { new NetworkFlattener(),
+				new BroadcastAdder(), new TypeResizer(true, true, false),
+				new UnitImporter(),
 				new DfVisitor<Void>(new SSATransformation()),
 				new DeadGlobalElimination(),
 				new DfVisitor<Void>(new DeadCodeElimination()),
@@ -143,22 +150,14 @@ public class LLVMBackendImpl extends AbstractBackend {
 				new DfVisitor<Void>(new BlockNumbering()) };
 
 		for (DfSwitch<?> transformation : transformations) {
-			transformation.doSwitch(actor);
+			transformation.doSwitch(network);
 		}
 
-		actor.setTemplateData(new LLVMTemplateData(actor));
-	}
-
-	protected Network doTransformNetwork(Network network) throws OrccException {
-		// instantiate and flattens network
-		write("Instantiating...\n");
-		network = new Instantiator(fifoSize).doSwitch(network);
-		write("Flattening...\n");
-		new NetworkFlattener().doSwitch(network);
-		new BroadcastAdder().doSwitch(network);
-		new TypeResizer(true, true, false).doSwitch(network);
-
 		network.computeTemplateMaps();
+
+		for (Actor actor : network.getAllActors()) {
+			actor.setTemplateData(new LLVMTemplateData(actor));
+		}
 
 		return network;
 	}
@@ -171,10 +170,6 @@ public class LLVMBackendImpl extends AbstractBackend {
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network = doTransformNetwork(network);
-
-		transformActors(network.getAllActors());
-
-		network.computeTemplateMaps();
 
 		// print instances and entities
 		printInstances(network);
