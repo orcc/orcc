@@ -33,6 +33,7 @@ import java.util.List;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.Param;
@@ -42,7 +43,7 @@ import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractIrVisitor;
 
 /**
  * This class defines a transformation that changes size of variable to fit
@@ -52,27 +53,52 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * @author Herve Yviquel
  * 
  */
-public class TypeResizer extends AbstractActorVisitor<Object> {
+public class TypeResizer extends DfVisitor<Void> {
 
-	private boolean castToPow2bits;
-	private boolean castTo32bits;
+	private class InnerTypeResizer extends AbstractIrVisitor<Void> {
+		public InnerTypeResizer() {
+			super(true);
+		}
+
+		@Override
+		public Void caseExprBinary(ExprBinary expr) {
+			checkType(expr.getType());
+			return super.caseExprBinary(expr);
+		}
+
+		@Override
+		public Void caseExprUnary(ExprUnary expr) {
+			checkType(expr.getType());
+			return super.caseExprUnary(expr);
+		}
+
+		@Override
+		public Void caseProcedure(Procedure procedure) {
+			checkParameters(procedure.getParameters());
+			checkVariables(procedure.getLocals());
+			checkType(procedure.getReturnType());
+			return super.caseProcedure(procedure);
+		}
+	}
 	private boolean castNativePort;
 	private boolean castPort;
+	private boolean castTo32bits;
+	private boolean castToPow2bits;
 
 	public TypeResizer(boolean castToPow2bits, boolean castTo32bits,
 			boolean castNativePort, boolean castPort) {
-		super(true);
 		this.castToPow2bits = castToPow2bits;
 		this.castTo32bits = castTo32bits;
 		this.castNativePort = castNativePort;
 		this.castPort = castPort;
+		this.irVisitor = new InnerTypeResizer();
 	}
 
 	@Override
-	public Object caseActor(Actor actor) {
+	public Void caseActor(Actor actor) {
 		checkVariables(actor.getParameters());
 		checkVariables(actor.getStateVars());
-		
+
 		if (castPort) {
 			checkPorts(actor.getInputs());
 			checkPorts(actor.getOutputs());
@@ -82,29 +108,9 @@ public class TypeResizer extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseExprBinary(ExprBinary expr) {
-		checkType(expr.getType());
-		return super.caseExprBinary(expr);
-	}
-
-	@Override
-	public Object caseExprUnary(ExprUnary expr) {
-		checkType(expr.getType());
-		return super.caseExprUnary(expr);
-	}
-
-	@Override
-	public Object casePattern(Pattern pattern) {
+	public Void casePattern(Pattern pattern) {
 		checkVariables(pattern.getVariables());
 		return null;
-	}
-
-	@Override
-	public Object caseProcedure(Procedure procedure) {
-		checkParameters(procedure.getParameters());
-		checkVariables(procedure.getLocals());
-		checkType(procedure.getReturnType());
-		return super.caseProcedure(procedure);
 	}
 
 	private void checkParameters(List<Param> parameters) {
