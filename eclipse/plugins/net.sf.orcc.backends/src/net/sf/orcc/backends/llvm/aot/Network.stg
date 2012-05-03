@@ -11,8 +11,8 @@ target triple = "x86_64-unknown-linux-gnu"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Declare the scheduling function of each actor
 
-<network.instances: declareActorScheduler(); separator="\n">
-
+<network.instances: declareScheduler(); separator="\n">
+<network.entities: declareScheduler(); separator="\n">
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; The main function - A simple round-robin scheduler
@@ -22,14 +22,15 @@ entry:
 	br label %loop
 
 loop:
-	<network.instances: callActorScheduler(); separator="\n">
+	<network.instances: callScheduler(); separator="\n">
+	<network.entities: callScheduler(); separator="\n">
 	br label %loop
 }
 
 >>
 
-callActorScheduler(instance) ::= <<
-call void @<instance.name>_scheduler()
+callScheduler(vertex) ::= <<
+call void @<vertex.name>_scheduler()
 >>
 
 declareFifo(connection) ::= <<
@@ -38,6 +39,6 @@ declareFifo(connection) ::= <<
 @fifo_<connection.id>_wrIndex = global i32 zeroinitializer, align 32
 >>
 
-declareActorScheduler(instance) ::= <<
-declare void @<instance.name>_scheduler()
+declareScheduler(vertex) ::= <<
+declare void @<vertex.name>_scheduler()
 >>
