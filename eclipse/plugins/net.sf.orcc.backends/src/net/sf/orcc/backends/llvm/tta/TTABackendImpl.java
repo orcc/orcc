@@ -152,9 +152,7 @@ public class TTABackendImpl extends AbstractBackend {
 		DfSwitch<?>[] transformations = { new UnitImporter(),
 				new ComplexHwOpDetector(getWriteListener()),
 				new DfVisitor<Void>(new SSATransformation()),
-				new BoolToIntTransformation(),
-				new TypeResizer(true, true, false),
-				new StringTransformation(),
+				new BoolToIntTransformation(), new StringTransformation(),
 				new RenameTransformation(this.transformations),
 				new DfVisitor<Expression>(new TacTransformation()),
 				new DfVisitor<Void>(new CopyPropagator()),
@@ -179,8 +177,8 @@ public class TTABackendImpl extends AbstractBackend {
 		network = new Instantiator(fifoSize).doSwitch(network);
 		write("Flattening...\n");
 		new NetworkFlattener().doSwitch(network);
-
 		new BroadcastAdder().doSwitch(network);
+		new TypeResizer(true, true, false).doSwitch(network);
 
 		return network;
 	}
