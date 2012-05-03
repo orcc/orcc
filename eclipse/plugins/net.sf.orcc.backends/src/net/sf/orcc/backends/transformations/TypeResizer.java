@@ -80,17 +80,17 @@ public class TypeResizer extends DfVisitor<Void> {
 			return super.caseProcedure(procedure);
 		}
 	}
+
 	private boolean castNativePort;
 	private boolean castPort;
 	private boolean castTo32bits;
 	private boolean castToPow2bits;
 
 	public TypeResizer(boolean castToPow2bits, boolean castTo32bits,
-			boolean castNativePort, boolean castPort) {
+			boolean castNativePort) {
 		this.castToPow2bits = castToPow2bits;
 		this.castTo32bits = castTo32bits;
 		this.castNativePort = castNativePort;
-		this.castPort = castPort;
 		this.irVisitor = new InnerTypeResizer();
 	}
 
@@ -99,10 +99,8 @@ public class TypeResizer extends DfVisitor<Void> {
 		checkVariables(actor.getParameters());
 		checkVariables(actor.getStateVars());
 
-		if (castPort) {
-			checkPorts(actor.getInputs());
-			checkPorts(actor.getOutputs());
-		}
+		checkPorts(actor.getInputs());
+		checkPorts(actor.getOutputs());
 
 		return super.caseActor(actor);
 	}

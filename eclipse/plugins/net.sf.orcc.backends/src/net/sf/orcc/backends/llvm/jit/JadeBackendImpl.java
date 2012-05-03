@@ -161,7 +161,7 @@ public class JadeBackendImpl extends AbstractBackend {
 		new DeadGlobalElimination().doSwitch(actor);
 
 		if (!byteexact) {
-			new TypeResizer(true, false, false, true).doSwitch(actor);
+			new TypeResizer(true, false, false).doSwitch(actor);
 		}
 
 		DfSwitch<?>[] transformations = {

@@ -45,6 +45,7 @@ import net.sf.orcc.backends.llvm.transformations.StringTransformation;
 import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.backends.transformations.EmptyBlockRemover;
 import net.sf.orcc.backends.transformations.InstPhiTransformation;
+import net.sf.orcc.backends.transformations.TypeResizer;
 import net.sf.orcc.backends.transformations.UnitImporter;
 import net.sf.orcc.backends.transformations.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transformations.ssa.CopyPropagator;
@@ -123,6 +124,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 	protected void doTransformActor(Actor actor) throws OrccException {
 
 		DfSwitch<?>[] transformations = { new UnitImporter(),
+				new TypeResizer(true, false, false),
 				new DfVisitor<Void>(new SSATransformation()),
 				new DeadGlobalElimination(),
 				new DfVisitor<Void>(new DeadCodeElimination()),
@@ -154,7 +156,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		network = new Instantiator(fifoSize).doSwitch(network);
 		write("Flattening...\n");
 		new NetworkFlattener().doSwitch(network);
-		
+
 		new BroadcastAdder().doSwitch(network);
 
 		network.computeTemplateMaps();

@@ -153,7 +153,7 @@ public class TTABackendImpl extends AbstractBackend {
 				new ComplexHwOpDetector(getWriteListener()),
 				new DfVisitor<Void>(new SSATransformation()),
 				new BoolToIntTransformation(),
-				new TypeResizer(true, true, false, true),
+				new TypeResizer(true, true, false),
 				new StringTransformation(),
 				new RenameTransformation(this.transformations),
 				new DfVisitor<Expression>(new TacTransformation()),
