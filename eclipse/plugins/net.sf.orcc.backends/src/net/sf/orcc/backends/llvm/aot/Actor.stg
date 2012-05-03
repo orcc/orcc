@@ -1,3 +1,8 @@
+printArchitecture() ::= <<
+target datalayout = "e-p:64:64:64-i1:8:8-i8:8:8-i16:16:16-i32:32:32-i64:64:64-f32:32:32-f64:64:64-v64:64:64-v128:128:128-a0:0:64-s0:64:64-f80:128:128-n8:16:32:64-S128"
+target triple = "x86_64-unknown-linux-gnu"
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Local variables
 ///////////////////////////////////////////////////////////////////////////////
@@ -646,8 +651,7 @@ actorParameter(parameter) ::= <<
 >>
 
 printInstance(instance, options) ::= <<
-target datalayout = "e-p:64:64:64-i1:8:8-i8:8:8-i16:16:16-i32:32:32-i64:64:64-f32:32:32-f64:64:64-v64:64:64-v128:128:128-a0:0:64-s0:64:64-f80:128:128-n8:16:32:64-S128"
-target triple = "x86_64-unknown-linux-gnu"
+<printArchitecture()>
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Generated from "<instance.actor.name>"
@@ -708,6 +712,7 @@ declare i32 @printf(i8* noalias , ...) nounwind
 ///////////////////////////////////////////////////////////////////////////////
 
 printEntity(entity, options) ::= <<
+<printArchitecture()>
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Broadcast
@@ -736,7 +741,7 @@ bb_scheduler_start:
 bb_copy:
 	%size_<first(entity.inputs).name> = load i32* @SIZE_<first(entity.inputs).name>
 	%final_index_<first(entity.inputs).name>  = urem i32 %index_<first(entity.inputs).name> , %size_<first(entity.inputs).name>
-	%ptr_<first(entity.inputs).name> = getelementptr <first(entity.inputs).type>* @fifo_<entity.incomingPortMap.(first(entity.inputs)).id>_content, i32 0, i32 %final_index_<first(entity.inputs).name>
+	%ptr_<first(entity.inputs).name> = getelementptr [<entity.incomingPortMap.(first(entity.inputs)).size> x <first(entity.inputs).type>]* @fifo_<entity.incomingPortMap.(first(entity.inputs)).id>_content, i32 0, i32 %final_index_<first(entity.inputs).name>
 	%value = load <first(entity.inputs).type>* %ptr_<first(entity.inputs).name>
 	%new_index_<first(entity.inputs).name> = add i32 %index_<first(entity.inputs).name>, 1
 	store i32 %new_index_<first(entity.inputs).name>, i32* @index_<first(entity.inputs).name>
@@ -767,10 +772,9 @@ endif>
 >>
 
 copyBcastOutputs(port) ::= <<
-%size_<port.name> = load i32* @SIZE_<port.name>
 %final_index_<port.name>  = urem i32 %index_<port.name> , %size_<port.name>
-%ptr_<port.name> = getelementptr <port.type>* @fifo_<entity.outgoingPortMap.(port).id>_content, i32 0, i32 %final_index_<port.name>
-%value = load <port.type>* %ptr_<port.name>
+%ptr_<port.name> = getelementptr [<first(entity.outgoingPortMap.(port)).size> x <port.type>]* @fifo_<first(entity.outgoingPortMap.(port)).id>_content, i32 0, i32 %final_index_<port.name>
+store <port.type> %value, <port.type>* %ptr_<port.name>
 %new_index_<port.name> = add i32 %index_<port.name>, 1
 store i32 %new_index_<port.name>, i32* @index_<port.name>
 >>
