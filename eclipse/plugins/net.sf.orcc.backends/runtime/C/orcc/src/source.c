@@ -57,6 +57,9 @@ static int genetic = 0;
 static clock_t startTime;
 static unsigned int nbByteRead = 0;
 
+// count number of times file were read
+unsigned int loopsCount;
+
 void printSpeed(void) {
 	double executionTime;
 	double speed;
@@ -93,11 +96,12 @@ void source_init() {
 		atexit(printSpeed);
 	}
 	startTime = clock();
+	loopsCount = nbLoops;
 }
 
 unsigned int source_getNbLoop(void)
 {
-		return nbLoops;
+	return nbLoops;
 }
 
 void source_exit(int exitCode)
@@ -173,4 +177,12 @@ void source_readNBytes(unsigned char *outTable, unsigned short nbTokenToRead){
 		exit(-4);
 	}
 	nbByteRead += nbTokenToRead * 8;
+}
+
+void source_decrementNbLoops(){
+	--loopsCount;
+}
+
+int source_isMaxLoopsReached(){
+	return nbLoops != DEFAULT_INFINITE_LOOP && loopsCount <= 0;
 }

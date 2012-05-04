@@ -48,15 +48,11 @@
 	#endif
 #endif
 
-#define DISPLAY_DISABLE 0
-#define DISPLAY_READY 1
-#define DISPLAY_ENABLE 2
-
 extern char	*optarg;
 extern int getopt(int nargc, char * const *nargv, const char *ostr);
 
 //Nb Loops
-unsigned int nbLoops = -1; // -1: infinite loop.
+unsigned int nbLoops = DEFAULT_INFINITE_LOOP; // -1: infinite loop.
 
 // input file
 char *input_file;
