@@ -105,7 +105,7 @@ public class ValueUtil {
 			return Array.newInstance(Boolean.TYPE, dimensions);
 		} else if (type.isFloat()) {
 			return Array.newInstance(Float.TYPE, dimensions);
-		} else if (type.isInt() || type.isUint()) {
+		} else if (type.isInt()) {
 			int size = type.getSizeInBits();
 			if (size <= 8) {
 				return Array.newInstance(Byte.TYPE, dimensions);
@@ -114,6 +114,19 @@ public class ValueUtil {
 			} else if (size <= 32) {
 				return Array.newInstance(Integer.TYPE, dimensions);
 			} else if (size <= 64) {
+				return Array.newInstance(Long.TYPE, dimensions);
+			} else {
+				return Array.newInstance(BigInteger.class, dimensions);
+			}
+		} else if (type.isUint()) {
+			int size = type.getSizeInBits();
+			if (size < 8) {
+				return Array.newInstance(Byte.TYPE, dimensions);
+			} else if (size < 16) {
+				return Array.newInstance(Short.TYPE, dimensions);
+			} else if (size < 32) {
+				return Array.newInstance(Integer.TYPE, dimensions);
+			} else if (size < 64) {
 				return Array.newInstance(Long.TYPE, dimensions);
 			} else {
 				return Array.newInstance(BigInteger.class, dimensions);
@@ -681,7 +694,7 @@ public class ValueUtil {
 		} else if (type.isFloat() && isFloat(value)) {
 			BigDecimal floatVal = (BigDecimal) value;
 			valueToSet = floatVal.floatValue();
-		} else if ((type.isInt() || type.isUint()) && isInt(value)) {
+		} else if (type.isInt()) {
 			BigInteger intVal = (BigInteger) value;
 			int size = type.getSizeInBits();
 			if (size <= 8) {
@@ -691,6 +704,20 @@ public class ValueUtil {
 			} else if (size <= 32) {
 				valueToSet = intVal.intValue();
 			} else if (size <= 64) {
+				valueToSet = intVal.longValue();
+			} else {
+				valueToSet = value;
+			}
+		} else if (type.isUint() && isInt(value)) {
+			BigInteger intVal = (BigInteger) value;
+			int size = type.getSizeInBits();
+			if (size < 8) {
+				valueToSet = intVal.byteValue();
+			} else if (size < 16) {
+				valueToSet = intVal.shortValue();
+			} else if (size < 32) {
+				valueToSet = intVal.intValue();
+			} else if (size < 64) {
 				valueToSet = intVal.longValue();
 			} else {
 				valueToSet = value;
