@@ -121,6 +121,9 @@ printPeekCalls(peekPattern) ::= <<
 <peekPattern.ports: { port | <printPeekCall(port, peekPattern.portToVarMap.(port), peekPattern.numTokensMap.(port))> }; separator="\n">
 >>
 
+printGEP(gep) ::= <<
+<Var(gep.target.variable)> = getelementptr <gep.source.variable.type>* <Var(gep.source.variable)>, i32 0, <indexes(gep.indexes)>
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler
