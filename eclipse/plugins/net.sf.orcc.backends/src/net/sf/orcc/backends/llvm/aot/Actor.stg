@@ -8,7 +8,7 @@ target triple = "x86_64-unknown-linux-gnu"
 ///////////////////////////////////////////////////////////////////////////////
 
 variableDeclaration(variable) ::= <<
-<if(variable.type.list && !instance.templateData.castedListReferences.(variable))>
+<if(variable.type.list && !instance.actor.templateData.castedListReferences.(variable))>
 %<variable.indexedName> = alloca <variable.type>
 <endif>
 >>
