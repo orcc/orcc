@@ -19,28 +19,40 @@ project (<network.simpleName>)
 useClang() ::= <<
 # LLVM compiler
 set(CMAKE_C_COMPILER "clang")
-set(CMAKE_AR         "llvm-ar")
-set(CMAKE_LINKER     "llvm-ld")
-set(CMAKE_NM         "llvm-nm")
-set(CMAKE_OBJDUMP    "llvm-objdump")
-set(CMAKE_RANLIB     "llvm-ranlib")
 >>
 
 createExecutable(network) ::= <<
 set(filenames
-	<network.simpleName>.ll
-	<network.instances: printInstance();separator="\n">
+	<network.simpleName>.o
+	<network.instances: sourceFile();separator="\n">
+	<network.entities: sourceFile();separator="\n">
 )
 
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+macro (compileAssemblyFile name) 
+	add_custom_command(
+		OUTPUT ${CMAKE_SOURCE_DIR}/${name}.o
+		DEPENDS ${CMAKE_SOURCE_DIR}/${name}.ll
+		COMMAND ${CMAKE_C_COMPILER} -c ${CMAKE_SOURCE_DIR}/${name}.ll
+	)
+endmacro(compileAssemblyFile)
+
+compileAssemblyFile(<network.simpleName>)
+<network.instances: compileAssemblyFile();separator="\n">
+<network.entities: compileAssemblyFile();separator="\n">
 
 add_executable(<network.simpleName> ${filenames})
 
-set_target_properties(Top_MVG PROPERTIES LINKER_LANGUAGE C)
+set_target_properties(<network.simpleName> PROPERTIES LINKER_LANGUAGE C)
 >>
 
-printInstance(instance) ::= <%
+sourceFile(instance) ::= <%
 <if(!instance.actor.native)>
-<instance.name>.ll
+${CMAKE_SOURCE_DIR}/<instance.name>.o
 <endif>
 %>
+
+compileAssemblyFile(vertex) ::= <<
+<if(!vertex.actor.native)
+>compileAssemblyFile(<vertex.name>)<
+endif>
+>>
