@@ -39,7 +39,7 @@ printBool(constant) ::= <<
 >>
 
 printInt(number) ::= <<
-<number><if (number.long)>L<endif>
+<number>
 >>
 
 printFloat(number) ::= <<
