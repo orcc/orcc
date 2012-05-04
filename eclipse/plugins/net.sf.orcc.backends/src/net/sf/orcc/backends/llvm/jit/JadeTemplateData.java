@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.dftools.graph.Edge;
+import net.sf.orcc.backends.TemplateData;
 import net.sf.orcc.backends.llvm.aot.LLVMTemplateData;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
@@ -128,8 +129,8 @@ public class JadeTemplateData extends LLVMTemplateData {
 	 */
 	private Map<Var, Integer> vars;
 
-	public JadeTemplateData(Actor actor) {
-		super(actor);
+	public JadeTemplateData() {
+		super();
 
 		// Initialize metadata maps
 		ports = new HashMap<Port, Integer>();
@@ -147,8 +148,12 @@ public class JadeTemplateData extends LLVMTemplateData {
 		mocs = new HashMap<Object, Integer>();
 		exprs = new HashMap<String, Integer>();
 		id = 0;
+	}
 
-		computeTemplateMaps(actor);
+	@Override
+	public TemplateData compute(Actor actor) {
+		computeMetadataMaps(actor);
+		return super.compute(actor);
 	}
 
 	private void computeAction(Action action) {
@@ -294,12 +299,6 @@ public class JadeTemplateData extends LLVMTemplateData {
 		if (var.isInitialized()) {
 			exprs.put(var.getName(), id++);
 		}
-	}
-
-	@Override
-	public void computeTemplateMaps(Actor actor) {
-		super.computeTemplateMaps(actor);
-		computeMetadataMaps(actor);
 	}
 
 	private void computeVar(Var var) {

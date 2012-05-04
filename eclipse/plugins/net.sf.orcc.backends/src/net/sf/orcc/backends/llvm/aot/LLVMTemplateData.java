@@ -31,6 +31,7 @@ package net.sf.orcc.backends.llvm.aot;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.orcc.backends.TemplateData;
 import net.sf.orcc.backends.ir.InstCast;
 import net.sf.orcc.backends.ir.InstGetElementPtr;
 import net.sf.orcc.df.Actor;
@@ -51,20 +52,18 @@ import org.eclipse.emf.ecore.EObject;
  * @author Herve Yviquel
  * 
  */
-public class LLVMTemplateData {
+public class LLVMTemplateData implements TemplateData {
 
 	private Map<Expression, Expression> castedIndexes;
 	private Map<Var, Var> castedListReferences;
 	private Map<Pattern, Map<Port, Integer>> portToIndexByPatternMap;
 	private Map<State, Integer> stateToLabelMap;
 
-	public LLVMTemplateData(Actor actor) {
+	public LLVMTemplateData() {
 		portToIndexByPatternMap = new HashMap<Pattern, Map<Port, Integer>>();
 		castedListReferences = new HashMap<Var, Var>();
 		stateToLabelMap = new HashMap<State, Integer>();
 		castedIndexes = new HashMap<Expression, Expression>();
-
-		computeTemplateMaps(actor);
 	}
 
 	private void computeCastedIndex(Actor actor) {
@@ -120,11 +119,13 @@ public class LLVMTemplateData {
 		}
 	}
 
-	protected void computeTemplateMaps(Actor actor) {
+	@Override
+	public TemplateData compute(Actor actor) {
 		computeCastedListReferences(actor);
 		computeStateToLabelMap(actor);
 		computePortToIndexByPatternMap(actor);
 		computeCastedIndex(actor);
+		return this;
 	}
 
 	/**

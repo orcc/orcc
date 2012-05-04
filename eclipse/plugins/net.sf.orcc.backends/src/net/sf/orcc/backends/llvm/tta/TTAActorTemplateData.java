@@ -31,6 +31,7 @@ package net.sf.orcc.backends.llvm.tta;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.orcc.backends.TemplateData;
 import net.sf.orcc.backends.llvm.aot.LLVMTemplateData;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Port;
@@ -49,12 +50,9 @@ public class TTAActorTemplateData extends LLVMTemplateData {
 	private Map<Port, Boolean> portToNeedCastMap;
 
 	public TTAActorTemplateData(Actor actor) {
-		super(actor);
-
+		super();
 		portToIndexMap = new HashMap<Port, Integer>();
 		portToNeedCastMap = new HashMap<Port, Boolean>();
-
-		computeTemplateMaps(actor);
 	}
 
 	private void computePortToIndexMap(Actor actor) {
@@ -76,10 +74,11 @@ public class TTAActorTemplateData extends LLVMTemplateData {
 		}
 	}
 
-	public void computeTemplateMaps(Actor actor) {
-		super.computeTemplateMaps(actor);
+	@Override
+	public TemplateData compute(Actor actor) {
 		computePortToIndexMap(actor);
 		computePortToNeedCastMap(actor);
+		return super.compute(actor);
 	}
 
 	public Map<Port, Integer> getPortToIndexMap() {

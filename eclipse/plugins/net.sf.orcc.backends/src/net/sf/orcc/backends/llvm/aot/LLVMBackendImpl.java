@@ -156,7 +156,8 @@ public class LLVMBackendImpl extends AbstractBackend {
 		network.computeTemplateMaps();
 
 		for (Actor actor : network.getAllActors()) {
-			actor.setTemplateData(new LLVMTemplateData(actor));
+			actor.setTemplateData(new LLVMTemplateData()
+					.compute(actor));
 		}
 
 		return network;

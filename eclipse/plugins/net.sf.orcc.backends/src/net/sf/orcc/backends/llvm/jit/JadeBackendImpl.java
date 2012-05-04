@@ -186,7 +186,7 @@ public class JadeBackendImpl extends AbstractBackend {
 		}
 
 		// Organize metadata information for the current actor
-		actor.setTemplateData(new JadeTemplateData(actor));
+		actor.setTemplateData(new JadeTemplateData().compute(actor));
 	}
 
 	@Override
