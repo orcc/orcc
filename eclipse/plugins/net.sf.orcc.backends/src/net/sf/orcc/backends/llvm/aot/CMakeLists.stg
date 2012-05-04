@@ -23,16 +23,16 @@ set(CMAKE_C_COMPILER "clang")
 
 createExecutable(network) ::= <<
 set(filenames
-	<network.simpleName>.o
+	${CMAKE_BINARY_DIR}/<network.simpleName>.o
 	<network.instances: sourceFile();separator="\n">
 	<network.entities: sourceFile();separator="\n">
 )
 
 macro (compileAssemblyFile name) 
 	add_custom_command(
-		OUTPUT ${CMAKE_SOURCE_DIR}/${name}.o
+		OUTPUT ${CMAKE_BINARY_DIR}/${name}.o
 		DEPENDS ${CMAKE_SOURCE_DIR}/${name}.ll
-		COMMAND ${CMAKE_C_COMPILER} -c ${CMAKE_SOURCE_DIR}/${name}.ll
+		COMMAND ${CMAKE_C_COMPILER} -c ${CMAKE_SOURCE_DIR}/${name}.ll -o ${CMAKE_BINARY_DIR}/${name}.o
 	)
 endmacro(compileAssemblyFile)
 
@@ -47,7 +47,7 @@ set_target_properties(<network.simpleName> PROPERTIES LINKER_LANGUAGE C)
 
 sourceFile(instance) ::= <%
 <if(!instance.actor.native)>
-${CMAKE_SOURCE_DIR}/<instance.name>.o
+${CMAKE_BINARY_DIR}/<instance.name>.o
 <endif>
 %>
 
