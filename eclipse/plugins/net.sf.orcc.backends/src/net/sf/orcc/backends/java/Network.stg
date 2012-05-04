@@ -8,11 +8,11 @@ private Broadcast\<<entity.input.type>\> actor_<entity.name>;
 <endif>
 >>
 
-createBroadcast(entity) ::= <<
+createBroadcast(entity) ::= <%
 <if (entity.broadcast)>
-actor_<entity.name> = new Broadcast\<<entity.input.type>\>(<length(entity.outputs)>);
+actor_<entity.name> = new Broadcast\<<entity.input.type>>(<length(entity.outputs)>);
 <endif>
->>
+%>
 
 declareActor(instance) ::= <<
 <if (instance.actor)>
@@ -25,13 +25,7 @@ args(arguments) ::= <<
 >>
 
 constructActor(instance) ::= <<
-<if (instance.actor)>
-<if (instance.actor.native)>
-actor_<instance.name> = new <instance.actor.hierarchicalName>(<args(instance.arguments)>);
-<else>
-actor_<instance.name> = new <instance.actor.hierarchicalName>(<args(instance.arguments)>);
-<endif>
-<endif>
+actor_<instance.name> = new <instance.actor.name>(<args(instance.arguments)>);
 >>
 
 scheduleActor(vertex) ::= <<
@@ -84,9 +78,9 @@ public class <network.simpleName> implements IScheduler {
 	@SuppressWarnings("unchecked")
 	public void initialize() {
 		// Instantiate actors
-		<network.instances: constructActor()>
+		<network.instances: constructActor(); separator="\n">
 		// Instantiate broadcast
-		<network.entities: createBroadcast()>
+		<network.entities: createBroadcast(); separator="\n">
 		@SuppressWarnings("rawtypes")
 		Fifo f;
 		<network.connections: setupFifo(); separator="\n">
