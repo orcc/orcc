@@ -42,16 +42,11 @@ import java.io.RandomAccessFile;
 public class Source extends GenericSource {
 
 	private static RandomAccessFile in;
-
-	private static int nbLoops = 1;
-
-	public static void source_exit(Integer status) {
-		// System.exit(status);
-	}
-
-	public static int source_getNbLoop() {
-		return nbLoops;
-	}
+	
+	private static final int INFINITE_LOOPS = -1;
+	
+	private static int nbLoops = INFINITE_LOOPS;
+	private static int loopsCount;
 
 	public static void source_init() {
 		try {
@@ -96,6 +91,22 @@ public class Source extends GenericSource {
 					+ "\"";
 			throw new RuntimeException(msg, e);
 		}
+	}
+
+	public static void source_decrementNbLoops() {
+		--loopsCount;
+	}
+
+	public static int source_getNbLoop() {
+		return nbLoops;
+	}
+
+	public static boolean source_isMaxLoopsReached() {
+		return nbLoops != INFINITE_LOOPS && loopsCount <= 0;
+	}
+
+	public static void source_exit(Integer status) {
+		System.exit(status);
 	}
 
 }

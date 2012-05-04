@@ -283,6 +283,20 @@ public class NativeProcedure {
 	}
 
 	/**
+	 * @return
+	 */
+	public static boolean source_isMaxLoopsReached() {
+		return Source.source_isMaxLoopsReached();
+	}
+
+	/**
+	 * @return
+	 */
+	public static void source_decrementNbLoops() {
+		Source.source_decrementNbLoops();
+	}
+
+	/**
 	 * 
 	 */
 	public static void source_rewind() {
