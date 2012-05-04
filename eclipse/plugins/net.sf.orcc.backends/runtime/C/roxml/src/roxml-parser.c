@@ -30,7 +30,7 @@ void print_help(void)
 	fprintf (stderr, "LGPL command line XML parser\n<blunderer@blunderer.org>\n") ;
 }
 
-void print_usage(const char *progname)
+void print_usage_roxml(const char *progname)
 {
 	fprintf (stderr, "\nusage: %s [-q|-h] <filename> [/]<node1>/<node2>/<node3>/.../<nodeN>\n", progname);
 	fprintf (stderr, "-q|--quiet activate quiet mode\n-h|--help display this message\n");
@@ -73,11 +73,11 @@ int main(int argc, char ** argv)
 				break ;
 			case 'h':
 				print_help();
-				print_usage(argv[0]);
+				print_usage_roxml(argv[0]);
 				return EXIT_FAILURE;
 				break;
 			default:
-				print_usage(argv[0]);
+				print_usage_roxml(argv[0]);
 				return EXIT_FAILURE;
 				break;
 		}
@@ -85,7 +85,7 @@ int main(int argc, char ** argv)
 
 	if(argc < optind + 2) {
 		fprintf(stderr,"wrong syntax\n");
-		print_usage(argv[0]);
+		print_usage_roxml(argv[0]);
 		return -1;
 	}
 
