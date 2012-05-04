@@ -259,13 +259,13 @@ public class ValueUtil {
 		} else if (type.isUint()) {
 			int size = type.getSizeInBits();
 			long longVal;
-			if (size <= 8) {
+			if (size < 8) {
 				longVal = ((Byte) value) & 0xFF;
-			} else if (size <= 16) {
+			} else if (size < 16) {
 				longVal = ((Short) value) & 0xFFFF;
-			} else if (size <= 32) {
+			} else if (size < 32) {
 				longVal = ((Integer) value) & 0xFFFFFFFFL;
-			} else if (size <= 64) {
+			} else if (size < 64) {
 				BigInteger bigInt = BigInteger.valueOf((Long) value);
 				return bigInt.and(ONE.shiftLeft(64).subtract(ONE));
 			} else {
