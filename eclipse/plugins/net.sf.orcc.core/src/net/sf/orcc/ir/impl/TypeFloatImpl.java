@@ -166,7 +166,7 @@ public class TypeFloatImpl extends TypeImpl implements TypeFloat {
 
 	@Override
 	public int getSizeInBits() {
-		return 32;
+		return size;
 	}
 
 	@Override

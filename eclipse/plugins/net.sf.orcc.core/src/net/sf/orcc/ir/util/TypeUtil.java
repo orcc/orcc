@@ -37,6 +37,7 @@ import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeFloat;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
@@ -109,7 +110,8 @@ public class TypeUtil {
 		if (t1.isBool() && t2.isBool()) {
 			return IrFactory.eINSTANCE.createTypeBool();
 		} else if (t1.isFloat() && t2.isFloat()) {
-			return IrFactory.eINSTANCE.createTypeFloat();
+			return IrFactory.eINSTANCE.createTypeFloat(Math.max(
+					((TypeFloat) t1).getSize(), ((TypeFloat) t2).getSize()));
 		} else if (t1.isString() && t2.isString()) {
 			return IrFactory.eINSTANCE.createTypeString();
 		} else if (t1.isInt() && t2.isInt()) {
@@ -221,12 +223,14 @@ public class TypeUtil {
 			return false;
 		}
 
-		if (src.isBool() && dst.isBool() || src.isFloat() && dst.isFloat()
-				|| src.isString() && dst.isString()
+		if (src.isFloat() && dst.isFloat()) {
+			return dst.getSizeInBits() >= src.getSizeInBits();
+		}
+
+		if (src.isBool() && dst.isBool() || src.isString() && dst.isString()
 				|| (src.isInt() || src.isUint())
 				&& (dst.isInt() || dst.isUint())
-				|| (src.isInt() || src.isUint())
-				&& dst.isFloat()) {
+				|| (src.isInt() || src.isUint()) && dst.isFloat()) {
 			return true;
 		}
 

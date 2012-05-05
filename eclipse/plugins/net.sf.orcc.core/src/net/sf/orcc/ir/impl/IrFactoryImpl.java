@@ -902,7 +902,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 */
 	public TypeFloat createTypeFloat() {
 		TypeFloatImpl typeFloat = new TypeFloatImpl();
-		typeFloat.setSize(32);
 		return typeFloat;
 	}
 

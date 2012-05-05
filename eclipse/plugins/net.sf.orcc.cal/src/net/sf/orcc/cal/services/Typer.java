@@ -314,7 +314,7 @@ public class Typer extends CalSwitch<Type> {
 
 	@Override
 	public Type caseExpressionFloat(ExpressionFloat expression) {
-		return IrFactory.eINSTANCE.createTypeFloat();
+		return IrFactory.eINSTANCE.createTypeFloat(32);
 	}
 
 	@Override
@@ -535,16 +535,22 @@ public class Typer extends CalSwitch<Type> {
 			return createType(t1, t2, Lub.instance);
 
 		case TIMES:
-			if (((t1.isInt() || t1.isUint()) && t2.isFloat())
-					|| ((t2.isInt() || t2.isUint()) && t1.isFloat())) {
-				return IrFactory.eINSTANCE.createTypeFloat();
+			if ((t1.isInt() || t1.isUint()) && t2.isFloat()) {
+				return IrFactory.eINSTANCE.createTypeFloat(t2.getSizeInBits());
+			} else if ((t2.isInt() || t2.isUint()) && t1.isFloat()) {
+				return IrFactory.eINSTANCE.createTypeFloat(t1.getSizeInBits());
+			} else if (t1.isFloat() && t2.isFloat()){
+				return createType(t1, t2, Lub.instance);
 			}
 			return createType(t1, t2, LubSum.instance);
 
 		case MINUS:
-			if (((t1.isInt() || t1.isUint()) && t2.isFloat())
-					|| ((t2.isInt() || t2.isUint()) && t1.isFloat())) {
-				return IrFactory.eINSTANCE.createTypeFloat();
+			if ((t1.isInt() || t1.isUint()) && t2.isFloat()) {
+				return IrFactory.eINSTANCE.createTypeFloat(t2.getSizeInBits());
+			} else if ((t2.isInt() || t2.isUint()) && t1.isFloat()) {
+				return IrFactory.eINSTANCE.createTypeFloat(t1.getSizeInBits());
+			} else if (t1.isFloat() && t2.isFloat()){
+				return createType(t1, t2, Lub.instance);
 			}
 			return createType(t1, t2, SignedLub.instance);
 
@@ -552,18 +558,24 @@ public class Typer extends CalSwitch<Type> {
 			if (t1.isString() && !t2.isList() || t2.isString() && !t1.isList()) {
 				return IrFactory.eINSTANCE.createTypeString();
 			}
-			if (((t1.isInt() || t1.isUint()) && t2.isFloat())
-					|| ((t2.isInt() || t2.isUint()) && t1.isFloat())) {
-				return IrFactory.eINSTANCE.createTypeFloat();
+			
+			if ((t1.isInt() || t1.isUint()) && t2.isFloat()) {
+				return IrFactory.eINSTANCE.createTypeFloat(t2.getSizeInBits());
+			} else if ((t2.isInt() || t2.isUint()) && t1.isFloat()) {
+				return IrFactory.eINSTANCE.createTypeFloat(t1.getSizeInBits());
+			} else if (t1.isFloat() && t2.isFloat()){
+				return createType(t1, t2, Lub.instance);
 			}
-
 			return createType(t1, t2, LubPlus1.instance);
 
 		case DIV:
 		case DIV_INT:
-			if (((t1.isInt() || t1.isUint()) && t2.isFloat())
-					|| ((t2.isInt() || t2.isUint()) && t1.isFloat())) {
-				return IrFactory.eINSTANCE.createTypeFloat();
+			if ((t1.isInt() || t1.isUint()) && t2.isFloat()) {
+				return IrFactory.eINSTANCE.createTypeFloat(t2.getSizeInBits());
+			} else if ((t2.isInt() || t2.isUint()) && t1.isFloat()) {
+				return IrFactory.eINSTANCE.createTypeFloat(t1.getSizeInBits());
+			} else if (t1.isFloat() && t2.isFloat()){
+				return createType(t1, t2, Lub.instance);
 			}
 		case SHIFT_RIGHT:
 			return EcoreUtil.copy(t1);
