@@ -355,11 +355,15 @@ ExpressionString: value=STRING;
 // types
 ///////////////////////////////////////////////////////////////////////////////
 
-AstType: AstTypeBool | AstTypeFloat | AstTypeInt | AstTypeList | AstTypeString | AstTypeUint;
+AstType: AstTypeBool | AstTypeFloat | AstTypeHalf | AstTypeDouble | AstTypeInt | AstTypeList | AstTypeString | AstTypeUint;
 
 AstTypeBool: {AstTypeBool} 'bool';
 
 AstTypeFloat: {AstTypeFloat} 'float';
+
+AstTypeHalf: {AstTypeFloat} 'half';
+
+AstTypeDouble: {AstTypeFloat} 'double';
 
 AstTypeInt: {AstTypeInt} 'int' ('(' 'size' '=' size = AstExpression ')')?;
 
