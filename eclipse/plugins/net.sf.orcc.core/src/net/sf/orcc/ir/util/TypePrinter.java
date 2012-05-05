@@ -51,6 +51,11 @@ public class TypePrinter extends IrSwitch<String> {
 
 	@Override
 	public String caseTypeFloat(TypeFloat type) {
+		if (type.isHalf()) {
+			return "half";
+		} else if (type.isDouble()) {
+			return "double";
+		}
 		return "float";
 	}
 

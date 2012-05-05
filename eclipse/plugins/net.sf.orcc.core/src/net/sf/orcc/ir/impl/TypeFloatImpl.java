@@ -70,42 +70,6 @@ public class TypeFloatImpl extends TypeImpl implements TypeFloat {
 		super();
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		return (obj instanceof TypeFloat);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	protected EClass eStaticClass() {
-		return IrPackage.Literals.TYPE_FLOAT;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public int getSize() {
-		return size;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setSize(int newSize) {
-		int oldSize = size;
-		size = newSize;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.TYPE_FLOAT__SIZE, oldSize, size));
-	}
-
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -126,6 +90,25 @@ public class TypeFloatImpl extends TypeImpl implements TypeFloat {
 	 * @generated
 	 */
 	@Override
+	public boolean eIsSet(int featureID) {
+		switch (featureID) {
+		case IrPackage.TYPE_FLOAT__SIZE:
+			return size != SIZE_EDEFAULT;
+		}
+		return super.eIsSet(featureID);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return (obj instanceof TypeFloat);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case IrPackage.TYPE_FLOAT__SIZE:
@@ -133,6 +116,15 @@ public class TypeFloatImpl extends TypeImpl implements TypeFloat {
 			return;
 		}
 		super.eSet(featureID, newValue);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	protected EClass eStaticClass() {
+		return IrPackage.Literals.TYPE_FLOAT;
 	}
 
 	/**
@@ -155,13 +147,8 @@ public class TypeFloatImpl extends TypeImpl implements TypeFloat {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-		case IrPackage.TYPE_FLOAT__SIZE:
-			return size != SIZE_EDEFAULT;
-		}
-		return super.eIsSet(featureID);
+	public int getSize() {
+		return size;
 	}
 
 	@Override
@@ -170,8 +157,31 @@ public class TypeFloatImpl extends TypeImpl implements TypeFloat {
 	}
 
 	@Override
+	public boolean isDouble() {
+		return getSize() == 64;
+	}
+
+	@Override
 	public boolean isFloat() {
 		return true;
+	}
+
+	@Override
+	public boolean isHalf() {
+		return getSize() == 16;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setSize(int newSize) {
+		int oldSize = size;
+		size = newSize;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.TYPE_FLOAT__SIZE, oldSize, size));
 	}
 
 	@Override

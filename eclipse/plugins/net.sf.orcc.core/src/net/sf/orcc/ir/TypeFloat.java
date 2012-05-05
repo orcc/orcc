@@ -37,6 +37,8 @@ package net.sf.orcc.ir;
  */
 public interface TypeFloat extends Type {
 
+	public static final String NAME = "float";
+
 	/**
 	 * Returns the value of the '<em><b>Size</b></em>' attribute.
 	 * <!-- begin-user-doc -->
@@ -52,6 +54,10 @@ public interface TypeFloat extends Type {
 	 * @generated
 	 */
 	int getSize();
+	
+	boolean isDouble();
+	
+	boolean isHalf();
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.ir.TypeFloat#getSize <em>Size</em>}' attribute.
@@ -62,7 +68,5 @@ public interface TypeFloat extends Type {
 	 * @generated
 	 */
 	void setSize(int value);
-
-	public static final String NAME = "float";
 
 }
