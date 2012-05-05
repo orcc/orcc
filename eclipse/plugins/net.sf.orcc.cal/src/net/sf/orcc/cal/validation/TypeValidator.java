@@ -64,6 +64,7 @@ import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.util.TypePrinter;
 import net.sf.orcc.ir.util.TypeUtil;
 
 import org.eclipse.emf.ecore.EObject;
@@ -82,6 +83,12 @@ import org.eclipse.xtext.validation.CheckType;
  */
 public class TypeValidator extends AbstractCalJavaValidator {
 
+	private TypePrinter printer;
+
+	public TypeValidator() {
+		printer = new TypePrinter();
+	}
+
 	private void checkActionGuards(AstAction action) {
 		List<AstExpression> guards = action.getGuards();
 		int index = 0;
@@ -89,8 +96,9 @@ public class TypeValidator extends AbstractCalJavaValidator {
 			Type type = Typer.getType(guard);
 			if (!TypeUtil.isConvertibleTo(type,
 					IrFactory.eINSTANCE.createTypeBool())) {
-				error("Type mismatch: cannot convert from " + type + " to bool",
-						action, eINSTANCE.getAstAction_Guards(), index);
+				error("Type mismatch: cannot convert from " + print(type)
+						+ " to bool", action, eINSTANCE.getAstAction_Guards(),
+						index);
 			}
 			index++;
 		}
@@ -114,9 +122,9 @@ public class TypeValidator extends AbstractCalJavaValidator {
 				for (AstExpression value : values) {
 					Type type = Typer.getType(value);
 					if (!TypeUtil.isConvertibleTo(type, portType)) {
-						error("this expression must be of type " + portType,
-								pattern, eINSTANCE.getOutputPattern_Values(),
-								index);
+						error("this expression must be of type "
+								+ print(portType), pattern,
+								eINSTANCE.getOutputPattern_Values(), index);
 					}
 					index++;
 				}
@@ -137,8 +145,8 @@ public class TypeValidator extends AbstractCalJavaValidator {
 							}
 						}
 
-						error("Type mismatch: expected " + portType + "["
-								+ repeat + "]", pattern,
+						error("Type mismatch: expected " + print(portType)
+								+ "[" + repeat + "]", pattern,
 								eINSTANCE.getOutputPattern_Values(), index);
 						index++;
 					}
@@ -184,8 +192,8 @@ public class TypeValidator extends AbstractCalJavaValidator {
 
 			// check types
 			if (!TypeUtil.isConvertibleTo(actualType, formalType)) {
-				error("Type mismatch: cannot convert from " + actualType
-						+ " to " + formalType, call,
+				error("Type mismatch: cannot convert from " + print(actualType)
+						+ " to " + print(formalType), call,
 						eINSTANCE.getExpressionCall_Parameters(), index);
 			}
 			index++;
@@ -205,7 +213,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 	public void checkExpressionIf(ExpressionIf expression) {
 		Type type = Typer.getType(expression.getCondition());
 		if (type == null || !type.isBool()) {
-			error("Cannot convert " + type + " to bool", expression,
+			error("Cannot convert " + print(type) + " to bool", expression,
 					eINSTANCE.getExpressionIf_Condition(), -1);
 		}
 
@@ -216,8 +224,8 @@ public class TypeValidator extends AbstractCalJavaValidator {
 			Type typeElsif = Typer.getType(elsif);
 			type = TypeUtil.getLub(type, typeElsif);
 			if (type == null) {
-				error("Type mismatch: cannot convert " + typeElsif + " to "
-						+ typeThen, expression,
+				error("Type mismatch: cannot convert " + print(typeElsif)
+						+ " to " + print(typeThen), expression,
 						eINSTANCE.getExpressionIf_Elsifs(), index);
 			}
 			index++;
@@ -226,8 +234,9 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		Type typeElse = Typer.getType(expression.getElse());
 		type = TypeUtil.getLub(type, typeElse);
 		if (type == null) {
-			error("Type mismatch: cannot convert " + typeElse + " to " + type,
-					expression, eINSTANCE.getExpressionIf_Else(), -1);
+			error("Type mismatch: cannot convert " + print(typeElse) + " to "
+					+ print(type), expression,
+					eINSTANCE.getExpressionIf_Else(), -1);
 		}
 	}
 
@@ -248,7 +257,7 @@ public class TypeValidator extends AbstractCalJavaValidator {
 							eINSTANCE.getExpressionIndex_Indexes(), errorIdx);
 				}
 			} else {
-				error("Cannot convert " + type + " to List", expression,
+				error("Cannot convert " + print(type) + " to List", expression,
 						eINSTANCE.getExpressionIndex_Source(), -1);
 			}
 			errorIdx++;
@@ -266,26 +275,28 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		switch (op) {
 		case BITNOT:
 			if (!(type.isInt() || type.isUint())) {
-				error("Cannot convert " + type + " to int/uint", expression,
-						eINSTANCE.getExpressionUnary_Expression(), -1);
+				error("Cannot convert " + print(type) + " to int/uint",
+						expression, eINSTANCE.getExpressionUnary_Expression(),
+						-1);
 			}
 			break;
 		case LOGIC_NOT:
 			if (!type.isBool()) {
-				error("Cannot convert " + type + " to boolean", expression,
-						eINSTANCE.getExpressionUnary_Expression(), -1);
+				error("Cannot convert " + print(type) + " to boolean",
+						expression, eINSTANCE.getExpressionUnary_Expression(),
+						-1);
 			}
 			break;
 		case MINUS:
 			if (!type.isUint() && !type.isInt() && !type.isFloat()) {
-				error("Cannot convert " + type + " to int or float",
+				error("Cannot convert " + print(type) + " to int or float",
 						expression, eINSTANCE.getExpressionUnary_Expression(),
 						-1);
 			}
 			break;
 		case NUM_ELTS:
 			if (!type.isList()) {
-				error("Cannot convert " + type + " to List", expression,
+				error("Cannot convert " + print(type) + " to List", expression,
 						eINSTANCE.getExpressionUnary_Expression(), -1);
 			}
 			break;
@@ -306,8 +317,8 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		Type returnType = Typer.getType(function);
 		Type expressionType = Typer.getType(function.getExpression());
 		if (!TypeUtil.isConvertibleTo(expressionType, returnType)) {
-			error("Type mismatch: cannot convert from " + expressionType
-					+ " to " + returnType, function,
+			error("Type mismatch: cannot convert from " + print(expressionType)
+					+ " to " + print(returnType), function,
 					eINSTANCE.getFunction_Expression(), -1);
 		}
 	}
@@ -339,8 +350,8 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		if (value != null) {
 			Type type = Typer.getType(value);
 			if (!TypeUtil.isConvertibleTo(type, targetType)) {
-				error("Type mismatch: cannot convert from " + type + " to "
-						+ targetType, assign,
+				error("Type mismatch: cannot convert from " + print(type)
+						+ " to " + print(targetType), assign,
 						eINSTANCE.getStatementAssign_Value(), -1);
 			}
 		}
@@ -381,8 +392,8 @@ public class TypeValidator extends AbstractCalJavaValidator {
 
 			// check types
 			if (!TypeUtil.isConvertibleTo(actualType, formalType)) {
-				error("Type mismatch: cannot convert from " + actualType
-						+ " to " + formalType, call,
+				error("Type mismatch: cannot convert from " + print(actualType)
+						+ " to " + print(formalType), call,
 						eINSTANCE.getStatementCall_Parameters(), index);
 			}
 			index++;
@@ -394,8 +405,9 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		Type type = Typer.getType(elsIf.getCondition());
 		if (!TypeUtil.isConvertibleTo(type,
 				IrFactory.eINSTANCE.createTypeBool())) {
-			error("Type mismatch: cannot convert from " + type + " to bool",
-					elsIf, eINSTANCE.getStatementElsif_Condition(), -1);
+			error("Type mismatch: cannot convert from " + print(type)
+					+ " to bool", elsIf,
+					eINSTANCE.getStatementElsif_Condition(), -1);
 		}
 	}
 
@@ -404,8 +416,9 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		Type type = Typer.getType(stmtIf.getCondition());
 		if (!TypeUtil.isConvertibleTo(type,
 				IrFactory.eINSTANCE.createTypeBool())) {
-			error("Type mismatch: cannot convert from " + type + " to bool",
-					stmtIf, eINSTANCE.getStatementIf_Condition(), -1);
+			error("Type mismatch: cannot convert from " + print(type)
+					+ " to bool", stmtIf, eINSTANCE.getStatementIf_Condition(),
+					-1);
 		}
 	}
 
@@ -414,8 +427,9 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		Type type = Typer.getType(stmtWhile.getCondition());
 		if (!TypeUtil.isConvertibleTo(type,
 				IrFactory.eINSTANCE.createTypeBool())) {
-			error("Type mismatch: cannot convert from " + type + " to bool",
-					stmtWhile, eINSTANCE.getStatementWhile_Condition(), -1);
+			error("Type mismatch: cannot convert from " + print(type)
+					+ " to bool", stmtWhile,
+					eINSTANCE.getStatementWhile_Condition(), -1);
 		}
 	}
 
@@ -443,57 +457,57 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		switch (op) {
 		case BITAND:
 			if (!t1.isInt() && !t1.isUint()) {
-				error("Cannot convert " + t1 + " to int/uint", source, feature,
-						index);
+				error("Cannot convert " + print(t1) + " to int/uint", source,
+						feature, index);
 			}
 			if (!t2.isInt() && !t2.isUint()) {
-				error("Cannot convert " + t2 + " to int/uint", source, feature,
-						index);
+				error("Cannot convert " + print(t2) + " to int/uint", source,
+						feature, index);
 			}
 			break;
 
 		case BITOR:
 		case BITXOR:
 			if (!t1.isInt() && !t1.isUint()) {
-				error("Cannot convert " + t1 + " to int/uint", source, feature,
-						index);
+				error("Cannot convert " + print(t1) + " to int/uint", source,
+						feature, index);
 			}
 			if (!t2.isInt() && !t2.isUint()) {
-				error("Cannot convert " + t2 + " to int/uint", source, feature,
-						index);
+				error("Cannot convert " + print(t2) + " to int/uint", source,
+						feature, index);
 			}
 			break;
 
 		case TIMES:
 			if (!t1.isInt() && !t1.isUint() && !t1.isFloat()) {
-				error("Cannot convert " + t1 + " to int/uint/float", source,
-						feature, index);
+				error("Cannot convert " + print(t1) + " to int/uint/float",
+						source, feature, index);
 			}
 			if (!t2.isInt() && !t2.isUint() && !t2.isFloat()) {
-				error("Cannot convert " + t2 + " to int/uint/float", source,
-						feature, index);
+				error("Cannot convert " + print(t2) + " to int/uint/float",
+						source, feature, index);
 			}
 			break;
 
 		case MINUS:
 			if (!t1.isInt() && !t1.isUint() && !t1.isFloat()) {
-				error("Cannot convert " + t1 + " to int/uint/float", source,
-						feature, index);
+				error("Cannot convert " + print(t1) + " to int/uint/float",
+						source, feature, index);
 			}
 			if (!t2.isInt() && !t2.isUint() && !t2.isFloat()) {
-				error("Cannot convert " + t2 + " to int/uint/float", source,
-						feature, index);
+				error("Cannot convert " + print(t2) + " to int/uint/float",
+						source, feature, index);
 			}
 			break;
 
 		case PLUS:
 			if (t1.isString() && t2.isList()) {
-				error("Cannot convert " + t2 + " to String", source, feature,
-						index);
+				error("Cannot convert " + print(t2) + " to String", source,
+						feature, index);
 			}
 			if (t2.isString() && t1.isList()) {
-				error("Cannot convert " + t1 + " to String", source, feature,
-						index);
+				error("Cannot convert " + print(t1) + " to String", source,
+						feature, index);
 			}
 			if (t1.isBool() && !t2.isString() || !t1.isString() && t2.isBool()) {
 				error("Addition is not defined for booleans", source, feature,
@@ -505,34 +519,34 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		case DIV_INT:
 		case SHIFT_RIGHT:
 			if (!t1.isInt() && !t1.isUint() && !t1.isFloat()) {
-				error("Cannot convert " + t1 + " to int/uint/float", source,
-						feature, index);
+				error("Cannot convert " + print(t1) + " to int/uint/float",
+						source, feature, index);
 			}
 			if (!t2.isInt() && !t2.isUint() && !t2.isFloat()) {
-				error("Cannot convert " + t2 + " to int/uint/float", source,
-						feature, index);
+				error("Cannot convert " + print(t2) + " to int/uint/float",
+						source, feature, index);
 			}
 			break;
 
 		case MOD:
 			if (!t1.isInt() && !t1.isUint()) {
-				error("Cannot convert " + t1 + " to int/uint", source, feature,
-						index);
+				error("Cannot convert " + print(t1) + " to int/uint", source,
+						feature, index);
 			}
 			if (!t2.isInt() && !t2.isUint()) {
-				error("Cannot convert " + t2 + " to int/uint", source, feature,
-						index);
+				error("Cannot convert " + print(t2) + " to int/uint", source,
+						feature, index);
 			}
 			break;
 
 		case SHIFT_LEFT:
 			if (!t1.isInt() && !t1.isUint()) {
-				error("Cannot convert " + t1 + " to int/uint", source, feature,
-						index);
+				error("Cannot convert " + print(t1) + " to int/uint", source,
+						feature, index);
 			}
 			if (!t2.isInt() && !t2.isUint()) {
-				error("Cannot convert " + t2 + " to int/uint", source, feature,
-						index);
+				error("Cannot convert " + print(t2) + " to int/uint", source,
+						feature, index);
 			}
 			break;
 
@@ -544,8 +558,8 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		case NE:
 			Type type = TypeUtil.getLub(t1, t2);
 			if (type == null) {
-				error("Incompatible operand types " + t1 + " and " + t2,
-						source, feature, index);
+				error("Incompatible operand types " + print(t1) + " and "
+						+ print(t2), source, feature, index);
 			}
 			break;
 
@@ -556,12 +570,12 @@ public class TypeValidator extends AbstractCalJavaValidator {
 		case LOGIC_AND:
 		case LOGIC_OR:
 			if (!t1.isBool()) {
-				error("Cannot convert " + t1 + " to bool", source, feature,
-						index);
+				error("Cannot convert " + print(t1) + " to bool", source,
+						feature, index);
 			}
 			if (!t2.isBool()) {
-				error("Cannot convert " + t2 + " to bool", source, feature,
-						index);
+				error("Cannot convert " + print(t2) + " to bool", source,
+						feature, index);
 			}
 			break;
 
@@ -617,11 +631,15 @@ public class TypeValidator extends AbstractCalJavaValidator {
 			Type targetType = Typer.getType(variable);
 			Type type = Typer.getType(value);
 			if (!TypeUtil.isConvertibleTo(type, targetType)) {
-				error("Type mismatch: cannot convert from " + type + " to "
-						+ targetType, variable, eINSTANCE.getVariable_Value(),
-						-1);
+				error("Type mismatch: cannot convert from " + print(type)
+						+ " to " + print(targetType), variable,
+						eINSTANCE.getVariable_Value(), -1);
 			}
 		}
+	}
+
+	private String print(Type type) {
+		return printer.doSwitch(type);
 	}
 
 }
