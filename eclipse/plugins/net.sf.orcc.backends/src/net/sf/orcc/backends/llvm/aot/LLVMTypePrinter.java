@@ -29,6 +29,7 @@
 package net.sf.orcc.backends.llvm.aot;
 
 import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeFloat;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
@@ -51,6 +52,16 @@ public class LLVMTypePrinter extends TypePrinter {
 	}
 
 	@Override
+	public String caseTypeFloat(TypeFloat type) {
+		if (type.getSize() == 16) {
+			return "half";
+		} else if (type.getSize() == 64) {
+			return "double";
+		}
+		return "float";
+	}
+
+	@Override
 	public String caseTypeInt(TypeInt type) {
 		return "i" + type.getSize();
 	}
@@ -62,9 +73,9 @@ public class LLVMTypePrinter extends TypePrinter {
 
 	@Override
 	public String caseTypeString(TypeString type) {
-		if (type.getSize() == 0 ){
+		if (type.getSize() == 0) {
 			return "i8";
-		}else{
+		} else {
 			return "[" + type.getSize() + " x i8]";
 		}
 	}

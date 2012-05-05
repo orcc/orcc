@@ -31,6 +31,7 @@ package net.sf.orcc.backends.java;
 import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeFloat;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
@@ -54,6 +55,14 @@ public class JavaTypePrinter extends TypePrinter {
 		} else {
 			return "Boolean";
 		}
+	}
+
+	@Override
+	public String caseTypeFloat(TypeFloat type) {
+		if (type.getSize() == 64) {
+			return "double";
+		}
+		return "float";
 	}
 
 	@Override

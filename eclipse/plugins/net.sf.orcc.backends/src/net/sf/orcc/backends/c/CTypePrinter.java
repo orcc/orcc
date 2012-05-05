@@ -29,6 +29,7 @@
 package net.sf.orcc.backends.c;
 
 import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeFloat;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
@@ -47,6 +48,14 @@ public class CTypePrinter extends TypePrinter {
 	public String caseTypeBool(TypeBool type) {
 		// boolean is a C int.
 		return "i32";
+	}
+
+	@Override
+	public String caseTypeFloat(TypeFloat type) {
+		if (type.getSize() == 64) {
+			return "double";
+		}
+		return "float";
 	}
 
 	@Override
