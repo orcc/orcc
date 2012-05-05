@@ -55,7 +55,9 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstType;
 import net.sf.orcc.cal.cal.AstTypeBool;
+import net.sf.orcc.cal.cal.AstTypeDouble;
 import net.sf.orcc.cal.cal.AstTypeFloat;
+import net.sf.orcc.cal.cal.AstTypeHalf;
 import net.sf.orcc.cal.cal.AstTypeInt;
 import net.sf.orcc.cal.cal.AstTypeList;
 import net.sf.orcc.cal.cal.AstTypeString;
@@ -302,8 +304,18 @@ public class XdfExporter extends CalSwitch<Object> {
 	}
 
 	@Override
+	public Type caseAstTypeDouble(AstTypeDouble type) {
+		return IrFactory.eINSTANCE.createTypeFloat(64);
+	}
+	
+	@Override
 	public Type caseAstTypeFloat(AstTypeFloat type) {
-		return IrFactory.eINSTANCE.createTypeFloat();
+		return IrFactory.eINSTANCE.createTypeFloat(32);
+	}
+	
+	@Override
+	public Type caseAstTypeHalf(AstTypeHalf type) {
+		return IrFactory.eINSTANCE.createTypeFloat(16);
 	}
 
 	@Override
