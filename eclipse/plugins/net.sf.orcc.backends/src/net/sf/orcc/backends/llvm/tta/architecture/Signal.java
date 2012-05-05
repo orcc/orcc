@@ -30,6 +30,7 @@
  */
 package net.sf.orcc.backends.llvm.tta.architecture;
 
+
 /**
  * <!-- begin-user-doc -->
  * A representation of the model object '<em><b>Signal</b></em>'.

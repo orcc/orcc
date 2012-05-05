@@ -8,12 +8,8 @@
         eType="#//Component"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="processors" upperBound="-1"
         eType="#//Processor"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="broadcasts" upperBound="-1"
-        eType="#//Component"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="fifos" upperBound="-1"
-        eType="#//Fifo"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="memories" upperBound="-1"
-        eType="#//Memory" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="buffers" upperBound="-1"
+        eType="#//Buffer" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="signals" upperBound="-1"
         eType="#//Signal"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="inputs" upperBound="-1"
@@ -29,7 +25,6 @@
   <eClassifiers xsi:type="ecore:EClass" name="Signal" eSuperTypes="#//Link">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="size" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EInt"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Fifo" eSuperTypes="#//Link"/>
   <eClassifiers xsi:type="ecore:EClass" name="Component" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Vertex">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"
         volatile="true" transient="true" derived="true"/>
@@ -38,7 +33,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="outputs" upperBound="-1"
         eType="#//Port" containment="true"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Memory" eSuperTypes="#//Link">
+  <eClassifiers xsi:type="ecore:EClass" name="Buffer" eSuperTypes="#//Link">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="size" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="width" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="mappedConnections" upperBound="-1"
@@ -64,8 +59,8 @@
         containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="hardwareDatabase" upperBound="-1"
         eType="#//Implementation" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="mappedInstances" upperBound="-1"
-        eType="ecore:EClass ../../net.sf.orcc.core/model/Df.ecore#//Instance"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="mappedActors" upperBound="-1"
+        eType="ecore:EClass ../../net.sf.dftools.models/model/Graph.ecore#//Vertex"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="configuration" eType="#//ProcessorConfiguration"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EEnum" name="DesignConfiguration">

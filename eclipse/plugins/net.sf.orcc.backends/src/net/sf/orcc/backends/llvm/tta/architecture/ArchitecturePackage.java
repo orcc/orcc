@@ -179,31 +179,13 @@ public interface ArchitecturePackage extends EPackage {
 	int DESIGN__PROCESSORS = GraphPackage.GRAPH_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>Broadcasts</b></em>' reference list.
+	 * The feature id for the '<em><b>Buffers</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int DESIGN__BROADCASTS = GraphPackage.GRAPH_FEATURE_COUNT + 3;
-
-	/**
-	 * The feature id for the '<em><b>Fifos</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int DESIGN__FIFOS = GraphPackage.GRAPH_FEATURE_COUNT + 4;
-
-	/**
-	 * The feature id for the '<em><b>Memories</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int DESIGN__MEMORIES = GraphPackage.GRAPH_FEATURE_COUNT + 5;
+	int DESIGN__BUFFERS = GraphPackage.GRAPH_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Signals</b></em>' reference list.
@@ -212,7 +194,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int DESIGN__SIGNALS = GraphPackage.GRAPH_FEATURE_COUNT + 6;
+	int DESIGN__SIGNALS = GraphPackage.GRAPH_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' reference list.
@@ -221,7 +203,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int DESIGN__INPUTS = GraphPackage.GRAPH_FEATURE_COUNT + 7;
+	int DESIGN__INPUTS = GraphPackage.GRAPH_FEATURE_COUNT + 5;
 
 	/**
 	 * The feature id for the '<em><b>Outputs</b></em>' reference list.
@@ -230,7 +212,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int DESIGN__OUTPUTS = GraphPackage.GRAPH_FEATURE_COUNT + 8;
+	int DESIGN__OUTPUTS = GraphPackage.GRAPH_FEATURE_COUNT + 6;
 
 	/**
 	 * The feature id for the '<em><b>Configuration</b></em>' attribute.
@@ -239,7 +221,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int DESIGN__CONFIGURATION = GraphPackage.GRAPH_FEATURE_COUNT + 9;
+	int DESIGN__CONFIGURATION = GraphPackage.GRAPH_FEATURE_COUNT + 7;
 
 	/**
 	 * The number of structural features of the '<em>Design</em>' class. <!--
@@ -248,7 +230,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int DESIGN_FEATURE_COUNT = GraphPackage.GRAPH_FEATURE_COUNT + 10;
+	int DESIGN_FEATURE_COUNT = GraphPackage.GRAPH_FEATURE_COUNT + 8;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.LinkImpl <em>Link</em>}' class.
@@ -406,79 +388,6 @@ public interface ArchitecturePackage extends EPackage {
 	int SIGNAL_FEATURE_COUNT = LINK_FEATURE_COUNT + 1;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.FifoImpl <em>Fifo</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.FifoImpl
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getFifo()
-	 * @generated
-	 */
-	int FIFO = 3;
-
-	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int FIFO__ATTRIBUTES = LINK__ATTRIBUTES;
-
-	/**
-	 * The feature id for the '<em><b>Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int FIFO__LABEL = LINK__LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Source</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int FIFO__SOURCE = LINK__SOURCE;
-
-	/**
-	 * The feature id for the '<em><b>Target</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int FIFO__TARGET = LINK__TARGET;
-
-	/**
-	 * The feature id for the '<em><b>Source Port</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int FIFO__SOURCE_PORT = LINK__SOURCE_PORT;
-
-	/**
-	 * The feature id for the '<em><b>Target Port</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int FIFO__TARGET_PORT = LINK__TARGET_PORT;
-
-	/**
-	 * The number of structural features of the '<em>Fifo</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int FIFO_FEATURE_COUNT = LINK_FEATURE_COUNT + 0;
-
-	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.ComponentImpl <em>Component</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -486,7 +395,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getComponent()
 	 * @generated
 	 */
-	int COMPONENT = 4;
+	int COMPONENT = 3;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -570,14 +479,14 @@ public interface ArchitecturePackage extends EPackage {
 	int COMPONENT_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 3;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.MemoryImpl <em>Memory</em>}' class.
+	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.BufferImpl <em>Buffer</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.MemoryImpl
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getMemory()
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.BufferImpl
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getBuffer()
 	 * @generated
 	 */
-	int MEMORY = 5;
+	int BUFFER = 4;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -586,7 +495,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int MEMORY__ATTRIBUTES = LINK__ATTRIBUTES;
+	int BUFFER__ATTRIBUTES = LINK__ATTRIBUTES;
 
 	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
@@ -595,7 +504,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int MEMORY__LABEL = LINK__LABEL;
+	int BUFFER__LABEL = LINK__LABEL;
 
 	/**
 	 * The feature id for the '<em><b>Source</b></em>' reference.
@@ -604,7 +513,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int MEMORY__SOURCE = LINK__SOURCE;
+	int BUFFER__SOURCE = LINK__SOURCE;
 
 	/**
 	 * The feature id for the '<em><b>Target</b></em>' reference.
@@ -613,7 +522,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int MEMORY__TARGET = LINK__TARGET;
+	int BUFFER__TARGET = LINK__TARGET;
 
 	/**
 	 * The feature id for the '<em><b>Source Port</b></em>' reference.
@@ -622,7 +531,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int MEMORY__SOURCE_PORT = LINK__SOURCE_PORT;
+	int BUFFER__SOURCE_PORT = LINK__SOURCE_PORT;
 
 	/**
 	 * The feature id for the '<em><b>Target Port</b></em>' reference.
@@ -631,7 +540,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int MEMORY__TARGET_PORT = LINK__TARGET_PORT;
+	int BUFFER__TARGET_PORT = LINK__TARGET_PORT;
 
 	/**
 	 * The feature id for the '<em><b>Size</b></em>' attribute.
@@ -640,7 +549,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int MEMORY__SIZE = LINK_FEATURE_COUNT + 0;
+	int BUFFER__SIZE = LINK_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Width</b></em>' attribute.
@@ -649,7 +558,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int MEMORY__WIDTH = LINK_FEATURE_COUNT + 1;
+	int BUFFER__WIDTH = LINK_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Mapped Connections</b></em>' reference list.
@@ -658,16 +567,16 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int MEMORY__MAPPED_CONNECTIONS = LINK_FEATURE_COUNT + 2;
+	int BUFFER__MAPPED_CONNECTIONS = LINK_FEATURE_COUNT + 2;
 
 	/**
-	 * The number of structural features of the '<em>Memory</em>' class.
+	 * The number of structural features of the '<em>Buffer</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int MEMORY_FEATURE_COUNT = LINK_FEATURE_COUNT + 3;
+	int BUFFER_FEATURE_COUNT = LINK_FEATURE_COUNT + 3;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.ProcessorImpl <em>Processor</em>}' class.
@@ -676,7 +585,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getProcessor()
 	 * @generated
 	 */
-	int PROCESSOR = 7;
+	int PROCESSOR = 6;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.BusImpl <em>Bus</em>}' class.
@@ -685,7 +594,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getBus()
 	 * @generated
 	 */
-	int BUS = 8;
+	int BUS = 7;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.BridgeImpl <em>Bridge</em>}' class.
@@ -694,7 +603,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getBridge()
 	 * @generated
 	 */
-	int BRIDGE = 9;
+	int BRIDGE = 8;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.SegmentImpl <em>Segment</em>}' class.
@@ -703,7 +612,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getSegment()
 	 * @generated
 	 */
-	int SEGMENT = 10;
+	int SEGMENT = 9;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.GlobalControlUnitImpl <em>Global Control Unit</em>}' class.
@@ -713,7 +622,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getGlobalControlUnit()
 	 * @generated
 	 */
-	int GLOBAL_CONTROL_UNIT = 11;
+	int GLOBAL_CONTROL_UNIT = 10;
 
 	/**
 	 * The meta object id for the '
@@ -725,7 +634,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getFunctionUnit()
 	 * @generated
 	 */
-	int FUNCTION_UNIT = 12;
+	int FUNCTION_UNIT = 11;
 
 	/**
 	 * The meta object id for the '
@@ -737,7 +646,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getRegisterFile()
 	 * @generated
 	 */
-	int REGISTER_FILE = 13;
+	int REGISTER_FILE = 12;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.FuPortImpl <em>Fu Port</em>}' class.
@@ -747,7 +656,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getFuPort()
 	 * @generated
 	 */
-	int FU_PORT = 14;
+	int FU_PORT = 13;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.PortImpl <em>Port</em>}' class.
@@ -756,7 +665,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getPort()
 	 * @generated
 	 */
-	int PORT = 6;
+	int PORT = 5;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -958,13 +867,13 @@ public interface ArchitecturePackage extends EPackage {
 	int PROCESSOR__HARDWARE_DATABASE = COMPONENT_FEATURE_COUNT + 8;
 
 	/**
-	 * The feature id for the '<em><b>Mapped Instances</b></em>' reference list.
+	 * The feature id for the '<em><b>Mapped Actors</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PROCESSOR__MAPPED_INSTANCES = COMPONENT_FEATURE_COUNT + 9;
+	int PROCESSOR__MAPPED_ACTORS = COMPONENT_FEATURE_COUNT + 9;
 
 	/**
 	 * The feature id for the '<em><b>Configuration</b></em>' attribute.
@@ -1330,7 +1239,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getSocket()
 	 * @generated
 	 */
-	int SOCKET = 15;
+	int SOCKET = 14;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -1374,7 +1283,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getOperation()
 	 * @generated
 	 */
-	int OPERATION = 16;
+	int OPERATION = 15;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -1422,7 +1331,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getAddressSpace()
 	 * @generated
 	 */
-	int ADDRESS_SPACE = 17;
+	int ADDRESS_SPACE = 16;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -1475,7 +1384,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getGuard()
 	 * @generated
 	 */
-	int GUARD = 23;
+	int GUARD = 22;
 
 	/**
 	 * The meta object id for the '
@@ -1487,7 +1396,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getExprUnary()
 	 * @generated
 	 */
-	int EXPR_UNARY = 24;
+	int EXPR_UNARY = 23;
 
 	/**
 	 * The meta object id for the '
@@ -1499,7 +1408,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getExprBinary()
 	 * @generated
 	 */
-	int EXPR_BINARY = 25;
+	int EXPR_BINARY = 24;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.ExprTrueImpl <em>Expr True</em>}' class.
@@ -1508,7 +1417,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getExprTrue()
 	 * @generated
 	 */
-	int EXPR_TRUE = 26;
+	int EXPR_TRUE = 25;
 
 	/**
 	 * The meta object id for the '
@@ -1520,7 +1429,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getExprFalse()
 	 * @generated
 	 */
-	int EXPR_FALSE = 27;
+	int EXPR_FALSE = 26;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.Term <em>Term</em>}' class.
@@ -1529,7 +1438,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getTerm()
 	 * @generated
 	 */
-	int TERM = 28;
+	int TERM = 27;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.TermBoolImpl <em>Term Bool</em>}' class.
@@ -1538,7 +1447,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getTermBool()
 	 * @generated
 	 */
-	int TERM_BOOL = 29;
+	int TERM_BOOL = 28;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.TermUnitImpl <em>Term Unit</em>}' class.
@@ -1547,7 +1456,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getTermUnit()
 	 * @generated
 	 */
-	int TERM_UNIT = 30;
+	int TERM_UNIT = 29;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.Element <em>Element</em>}' class.
@@ -1556,7 +1465,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getElement()
 	 * @generated
 	 */
-	int ELEMENT = 18;
+	int ELEMENT = 17;
 
 	/**
 	 * The feature id for the '<em><b>Start Cycle</b></em>' attribute. <!--
@@ -1592,7 +1501,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getReads()
 	 * @generated
 	 */
-	int READS = 19;
+	int READS = 18;
 
 	/**
 	 * The feature id for the '<em><b>Start Cycle</b></em>' attribute. <!--
@@ -1637,7 +1546,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getWrites()
 	 * @generated
 	 */
-	int WRITES = 20;
+	int WRITES = 19;
 
 	/**
 	 * The feature id for the '<em><b>Start Cycle</b></em>' attribute. <!--
@@ -1682,7 +1591,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getResource()
 	 * @generated
 	 */
-	int RESOURCE = 21;
+	int RESOURCE = 20;
 
 	/**
 	 * The feature id for the '<em><b>Start Cycle</b></em>' attribute. <!--
@@ -1728,7 +1637,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getPortToIndexMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_INDEX_MAP_ENTRY = 32;
+	int PORT_TO_INDEX_MAP_ENTRY = 31;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.ShortImmediateImpl <em>Short Immediate</em>}' class.
@@ -1738,7 +1647,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getShortImmediate()
 	 * @generated
 	 */
-	int SHORT_IMMEDIATE = 22;
+	int SHORT_IMMEDIATE = 21;
 
 	/**
 	 * The feature id for the '<em><b>Extension</b></em>' attribute. <!--
@@ -1924,7 +1833,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getImplementation()
 	 * @generated
 	 */
-	int IMPLEMENTATION = 31;
+	int IMPLEMENTATION = 30;
 
 	/**
 	 * The feature id for the '<em><b>Hdb File</b></em>' attribute. <!--
@@ -1987,7 +1896,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getDesignConfiguration()
 	 * @generated
 	 */
-	int DESIGN_CONFIGURATION = 33;
+	int DESIGN_CONFIGURATION = 32;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.ProcessorConfiguration <em>Processor Configuration</em>}' enum.
@@ -1997,7 +1906,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getProcessorConfiguration()
 	 * @generated
 	 */
-	int PROCESSOR_CONFIGURATION = 34;
+	int PROCESSOR_CONFIGURATION = 33;
 
 	/**
 	 * The meta object id for the '
@@ -2009,7 +1918,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getSocketType()
 	 * @generated
 	 */
-	int SOCKET_TYPE = 35;
+	int SOCKET_TYPE = 34;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.Extension <em>Extension</em>}' enum.
@@ -2018,7 +1927,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getExtension()
 	 * @generated
 	 */
-	int EXTENSION = 36;
+	int EXTENSION = 35;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.OpUnary <em>Op Unary</em>}' enum.
@@ -2027,7 +1936,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getOpUnary()
 	 * @generated
 	 */
-	int OP_UNARY = 37;
+	int OP_UNARY = 36;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.OpBinary <em>Op Binary</em>}' enum.
@@ -2036,7 +1945,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getOpBinary()
 	 * @generated
 	 */
-	int OP_BINARY = 38;
+	int OP_BINARY = 37;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.llvm.tta.architecture.Design <em>Design</em>}'.
@@ -2081,37 +1990,15 @@ public interface ArchitecturePackage extends EPackage {
 	EReference getDesign_Processors();
 
 	/**
-	 * Returns the meta object for the reference list '{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getBroadcasts <em>Broadcasts</em>}'.
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getBuffers <em>Buffers</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference list '<em>Broadcasts</em>'.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.Design#getBroadcasts()
+	 * @return the meta object for the containment reference list '<em>Buffers</em>'.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.Design#getBuffers()
 	 * @see #getDesign()
 	 * @generated
 	 */
-	EReference getDesign_Broadcasts();
-
-	/**
-	 * Returns the meta object for the reference list '{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getFifos <em>Fifos</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference list '<em>Fifos</em>'.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.Design#getFifos()
-	 * @see #getDesign()
-	 * @generated
-	 */
-	EReference getDesign_Fifos();
-
-	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getMemories <em>Memories</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Memories</em>'.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.Design#getMemories()
-	 * @see #getDesign()
-	 * @generated
-	 */
-	EReference getDesign_Memories();
+	EReference getDesign_Buffers();
 
 	/**
 	 * Returns the meta object for the reference list '{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getSignals <em>Signals</em>}'.
@@ -2211,16 +2098,6 @@ public interface ArchitecturePackage extends EPackage {
 	EAttribute getSignal_Size();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.backends.llvm.tta.architecture.Fifo <em>Fifo</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Fifo</em>'.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.Fifo
-	 * @generated
-	 */
-	EClass getFifo();
-
-	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.llvm.tta.architecture.Component <em>Component</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2264,47 +2141,47 @@ public interface ArchitecturePackage extends EPackage {
 	EReference getComponent_Outputs();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.backends.llvm.tta.architecture.Memory <em>Memory</em>}'.
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.llvm.tta.architecture.Buffer <em>Buffer</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Memory</em>'.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.Memory
+	 * @return the meta object for class '<em>Buffer</em>'.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.Buffer
 	 * @generated
 	 */
-	EClass getMemory();
+	EClass getBuffer();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.llvm.tta.architecture.Memory#getSize <em>Size</em>}'.
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.llvm.tta.architecture.Buffer#getSize <em>Size</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Size</em>'.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.Memory#getSize()
-	 * @see #getMemory()
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.Buffer#getSize()
+	 * @see #getBuffer()
 	 * @generated
 	 */
-	EAttribute getMemory_Size();
+	EAttribute getBuffer_Size();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.llvm.tta.architecture.Memory#getWidth <em>Width</em>}'.
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.llvm.tta.architecture.Buffer#getWidth <em>Width</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Width</em>'.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.Memory#getWidth()
-	 * @see #getMemory()
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.Buffer#getWidth()
+	 * @see #getBuffer()
 	 * @generated
 	 */
-	EAttribute getMemory_Width();
+	EAttribute getBuffer_Width();
 
 	/**
-	 * Returns the meta object for the reference list '{@link net.sf.orcc.backends.llvm.tta.architecture.Memory#getMappedConnections <em>Mapped Connections</em>}'.
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.backends.llvm.tta.architecture.Buffer#getMappedConnections <em>Mapped Connections</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the reference list '<em>Mapped Connections</em>'.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.Memory#getMappedConnections()
-	 * @see #getMemory()
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.Buffer#getMappedConnections()
+	 * @see #getBuffer()
 	 * @generated
 	 */
-	EReference getMemory_MappedConnections();
+	EReference getBuffer_MappedConnections();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor <em>Processor</em>}'.
@@ -2410,15 +2287,15 @@ public interface ArchitecturePackage extends EPackage {
 	EReference getProcessor_HardwareDatabase();
 
 	/**
-	 * Returns the meta object for the reference list '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getMappedInstances <em>Mapped Instances</em>}'.
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getMappedActors <em>Mapped Actors</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference list '<em>Mapped Instances</em>'.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.Processor#getMappedInstances()
+	 * @return the meta object for the reference list '<em>Mapped Actors</em>'.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.Processor#getMappedActors()
 	 * @see #getProcessor()
 	 * @generated
 	 */
-	EReference getProcessor_MappedInstances();
+	EReference getProcessor_MappedActors();
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getConfiguration <em>Configuration</em>}'.
@@ -3427,28 +3304,12 @@ public interface ArchitecturePackage extends EPackage {
 		EReference DESIGN__PROCESSORS = eINSTANCE.getDesign_Processors();
 
 		/**
-		 * The meta object literal for the '<em><b>Broadcasts</b></em>' reference list feature.
+		 * The meta object literal for the '<em><b>Buffers</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference DESIGN__BROADCASTS = eINSTANCE.getDesign_Broadcasts();
-
-		/**
-		 * The meta object literal for the '<em><b>Fifos</b></em>' reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference DESIGN__FIFOS = eINSTANCE.getDesign_Fifos();
-
-		/**
-		 * The meta object literal for the '<em><b>Memories</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference DESIGN__MEMORIES = eINSTANCE.getDesign_Memories();
+		EReference DESIGN__BUFFERS = eINSTANCE.getDesign_Buffers();
 
 		/**
 		 * The meta object literal for the '<em><b>Signals</b></em>' reference list feature.
@@ -3527,16 +3388,6 @@ public interface ArchitecturePackage extends EPackage {
 		EAttribute SIGNAL__SIZE = eINSTANCE.getSignal_Size();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.FifoImpl <em>Fifo</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.FifoImpl
-		 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getFifo()
-		 * @generated
-		 */
-		EClass FIFO = eINSTANCE.getFifo();
-
-		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.ComponentImpl <em>Component</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -3571,14 +3422,14 @@ public interface ArchitecturePackage extends EPackage {
 		EReference COMPONENT__OUTPUTS = eINSTANCE.getComponent_Outputs();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.MemoryImpl <em>Memory</em>}' class.
+		 * The meta object literal for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.BufferImpl <em>Buffer</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.MemoryImpl
-		 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getMemory()
+		 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.BufferImpl
+		 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getBuffer()
 		 * @generated
 		 */
-		EClass MEMORY = eINSTANCE.getMemory();
+		EClass BUFFER = eINSTANCE.getBuffer();
 
 		/**
 		 * The meta object literal for the '<em><b>Size</b></em>' attribute feature.
@@ -3586,7 +3437,7 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute MEMORY__SIZE = eINSTANCE.getMemory_Size();
+		EAttribute BUFFER__SIZE = eINSTANCE.getBuffer_Size();
 
 		/**
 		 * The meta object literal for the '<em><b>Width</b></em>' attribute feature.
@@ -3594,7 +3445,7 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute MEMORY__WIDTH = eINSTANCE.getMemory_Width();
+		EAttribute BUFFER__WIDTH = eINSTANCE.getBuffer_Width();
 
 		/**
 		 * The meta object literal for the '<em><b>Mapped Connections</b></em>' reference list feature.
@@ -3602,8 +3453,8 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference MEMORY__MAPPED_CONNECTIONS = eINSTANCE
-				.getMemory_MappedConnections();
+		EReference BUFFER__MAPPED_CONNECTIONS = eINSTANCE
+				.getBuffer_MappedConnections();
 
 		/**
 		 * The meta object literal for the '
@@ -3687,13 +3538,13 @@ public interface ArchitecturePackage extends EPackage {
 				.getProcessor_HardwareDatabase();
 
 		/**
-		 * The meta object literal for the '<em><b>Mapped Instances</b></em>' reference list feature.
+		 * The meta object literal for the '<em><b>Mapped Actors</b></em>' reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PROCESSOR__MAPPED_INSTANCES = eINSTANCE
-				.getProcessor_MappedInstances();
+		EReference PROCESSOR__MAPPED_ACTORS = eINSTANCE
+				.getProcessor_MappedActors();
 
 		/**
 		 * The meta object literal for the '<em><b>Configuration</b></em>' attribute feature.

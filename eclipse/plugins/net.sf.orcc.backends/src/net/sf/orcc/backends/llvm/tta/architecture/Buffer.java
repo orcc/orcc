@@ -36,23 +36,23 @@ import org.eclipse.emf.common.util.EList;
 
 /**
  * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>Memory</b></em>'.
+ * A representation of the model object '<em><b>Buffer</b></em>'.
  * <!-- end-user-doc -->
  *
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Memory#getSize <em>Size</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Memory#getWidth <em>Width</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Memory#getMappedConnections <em>Mapped Connections</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Buffer#getSize <em>Size</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Buffer#getWidth <em>Width</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Buffer#getMappedConnections <em>Mapped Connections</em>}</li>
  * </ul>
  * </p>
  *
- * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getMemory()
+ * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getBuffer()
  * @model
  * @generated
  */
-public interface Memory extends Link {
+public interface Buffer extends Link {
 	/**
 	 * Returns the value of the '<em><b>Size</b></em>' attribute.
 	 * <!-- begin-user-doc -->
@@ -63,14 +63,14 @@ public interface Memory extends Link {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Size</em>' attribute.
 	 * @see #setSize(int)
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getMemory_Size()
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getBuffer_Size()
 	 * @model
 	 * @generated
 	 */
 	int getSize();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Memory#getSize <em>Size</em>}' attribute.
+	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Buffer#getSize <em>Size</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Size</em>' attribute.
@@ -89,14 +89,14 @@ public interface Memory extends Link {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Width</em>' attribute.
 	 * @see #setWidth(int)
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getMemory_Width()
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getBuffer_Width()
 	 * @model
 	 * @generated
 	 */
 	int getWidth();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Memory#getWidth <em>Width</em>}' attribute.
+	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Buffer#getWidth <em>Width</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Width</em>' attribute.
@@ -115,10 +115,10 @@ public interface Memory extends Link {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mapped Connections</em>' reference list.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getMemory_MappedConnections()
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getBuffer_MappedConnections()
 	 * @model
 	 * @generated
 	 */
 	EList<Connection> getMappedConnections();
 
-} // Memory
+} // Buffer

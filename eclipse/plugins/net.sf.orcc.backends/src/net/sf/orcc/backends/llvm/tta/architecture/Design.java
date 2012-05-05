@@ -43,9 +43,7 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getComponents <em>Components</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getProcessors <em>Processors</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getBroadcasts <em>Broadcasts</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getFifos <em>Fifos</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getMemories <em>Memories</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getBuffers <em>Buffers</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getSignals <em>Signals</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getInputs <em>Inputs</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getOutputs <em>Outputs</em>}</li>
@@ -122,52 +120,20 @@ public interface Design extends Graph {
 	EList<Processor> getProcessors();
 
 	/**
-	 * Returns the value of the '<em><b>Broadcasts</b></em>' reference list.
-	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.Component}.
+	 * Returns the value of the '<em><b>Buffers</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.Buffer}.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Broadcasts</em>' reference list isn't clear,
+	 * If the meaning of the '<em>Buffers</em>' containment reference list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Broadcasts</em>' reference list.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getDesign_Broadcasts()
-	 * @model
-	 * @generated
-	 */
-	EList<Component> getBroadcasts();
-
-	/**
-	 * Returns the value of the '<em><b>Fifos</b></em>' reference list.
-	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.Fifo}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Fifos</em>' reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Fifos</em>' reference list.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getDesign_Fifos()
-	 * @model
-	 * @generated
-	 */
-	EList<Fifo> getFifos();
-
-	/**
-	 * Returns the value of the '<em><b>Memories</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.Memory}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Memories</em>' containment reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Memories</em>' containment reference list.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getDesign_Memories()
+	 * @return the value of the '<em>Buffers</em>' containment reference list.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getDesign_Buffers()
 	 * @model containment="true"
 	 * @generated
 	 */
-	EList<Memory> getMemories();
+	EList<Buffer> getBuffers();
 
 	/**
 	 * Returns the value of the '<em><b>Signals</b></em>' reference list.

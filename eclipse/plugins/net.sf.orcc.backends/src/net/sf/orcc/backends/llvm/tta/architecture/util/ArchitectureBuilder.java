@@ -7,10 +7,10 @@ import java.util.Map;
 
 import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitectureFactory;
+import net.sf.orcc.backends.llvm.tta.architecture.Buffer;
 import net.sf.orcc.backends.llvm.tta.architecture.Component;
 import net.sf.orcc.backends.llvm.tta.architecture.Design;
 import net.sf.orcc.backends.llvm.tta.architecture.DesignConfiguration;
-import net.sf.orcc.backends.llvm.tta.architecture.Fifo;
 import net.sf.orcc.backends.llvm.tta.architecture.Port;
 import net.sf.orcc.backends.llvm.tta.architecture.Processor;
 import net.sf.orcc.backends.llvm.tta.architecture.ProcessorConfiguration;
@@ -45,6 +45,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 
 	private Map<Vertex, Component> componentMap;
 	private Map<net.sf.orcc.df.Port, Port> portMap;
+	private Map<Component, Map<Component, Buffer>> bufferMap;
 
 	private List<String> optimizedActors;
 
@@ -52,6 +53,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		design = factory.createDesign();
 		componentMap = new HashMap<Vertex, Component>();
 		portMap = new HashMap<net.sf.orcc.df.Port, Port>();
+		bufferMap = new HashMap<Component, Map<Component, Buffer>>();
 
 		optimizedActors = new ArrayList<String>();
 		optimizedActors.add("decoder_texture_IQ");
@@ -67,25 +69,30 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		this.mapping = mapping;
 	}
 
-	private void addFifo(Connection connection) {
+	private void addToBuffer(Connection connection) {
 		Component source = componentMap.get(connection.getSource());
 		Component target = componentMap.get(connection.getTarget());
 		Port sourcePort = portMap.get(connection.getSourcePort());
 		Port targetPort = portMap.get(connection.getTargetPort());
 
-		String id = connection.getAttribute("id").getValue().toString();
-		Fifo fifo = factory.createFifo(id, source, target, sourcePort,
-				targetPort);
+		Map<Component, Buffer> tgtToBufferMap;
+		if (bufferMap.containsKey(source)) {
+			tgtToBufferMap = bufferMap.get(source);
+		} else {
+			tgtToBufferMap = new HashMap<Component, Buffer>();
+			bufferMap.put(source, tgtToBufferMap);
+		}
 
-		// Generics
-		int size = connection.getSize();
-		fifo.setAttribute("size", size);
-		fifo.setAttribute("width", 32);
-		fifo.setAttribute("widthu",
-				(int) Math.ceil(Math.log(size) / Math.log(2)));
-
-		design.add(fifo);
-		design.getFifos().add(fifo);
+		Buffer buffer;
+		if (tgtToBufferMap.containsKey(target)) {
+			buffer = tgtToBufferMap.get(target);
+		} else {
+			buffer = factory.createBuffer(source, target, sourcePort,
+					targetPort);
+			tgtToBufferMap.put(target, buffer);
+			design.add(buffer);
+		}
+		buffer.getMappedConnections().add(connection);
 	}
 
 	private EList<Port> createPorts(EList<net.sf.orcc.df.Port> calPorts) {
@@ -135,13 +142,14 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 
 	@Override
 	public Design caseBroadcast(Broadcast broadcast) {
-		Component component = factory
-				.createComponent(broadcast.getSimpleName());
-		component.getInputs().addAll(createPorts(broadcast.getInputs()));
-		component.getOutputs().addAll(createPorts(broadcast.getOutputs()));
-		design.getBroadcasts().add(component);
-		design.add(component);
-		componentMap.put(broadcast, component);
+		ProcessorConfiguration conf = ProcessorConfiguration.STANDARD;
+		Processor processor = factory.createProcessor(
+				"processor_" + broadcast.getName(), conf, 512);
+		processor.getMappedActors().add(broadcast);
+		processor.getInputs().addAll(createPorts(broadcast.getInputs()));
+		processor.getOutputs().addAll(createPorts(broadcast.getOutputs()));
+		design.add(processor);
+		componentMap.put(broadcast, processor);
 		return null;
 	}
 
@@ -155,7 +163,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		if (sourcePort.isNative() || targetPort.isNative()) {
 			addSignal(connection);
 		} else {
-			addFifo(connection);
+			addToBuffer(connection);
 		}
 		return null;
 	}
@@ -177,15 +185,15 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		} else {
 			int memorySize = computeNeededMemorySize(instance);
 
-			//ProcessorConfiguration conf = optimizedActors.contains(instance
-			//		.getName()) ? ProcessorConfiguration.CUSTOM
-			//		: ProcessorConfiguration.STANDARD;
+			// ProcessorConfiguration conf = optimizedActors.contains(instance
+			// .getName()) ? ProcessorConfiguration.CUSTOM
+			// : ProcessorConfiguration.STANDARD;
 
 			ProcessorConfiguration conf = ProcessorConfiguration.STANDARD;
 			Processor processor = factory.createProcessor("processor_"
 					+ instance.getName(), conf, memorySize);
 			component = processor;
-			processor.getMappedInstances().add(instance);
+			processor.getMappedActors().add(instance);
 			design.getProcessors().add(processor);
 			design.add(processor);
 			componentMap.put(instance, processor);

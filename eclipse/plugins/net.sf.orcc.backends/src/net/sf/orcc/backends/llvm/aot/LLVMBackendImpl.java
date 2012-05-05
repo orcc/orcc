@@ -78,8 +78,8 @@ import org.eclipse.core.resources.IFile;
  */
 public class LLVMBackendImpl extends AbstractBackend {
 
-	private StandardPrinter printer;
-	private final Map<String, String> transformations;
+	protected StandardPrinter printer;
+	protected final Map<String, String> transformations;
 
 	/**
 	 * Creates a new instance of the LLVM back-end. Initializes the
@@ -97,11 +97,6 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 	@Override
 	public void doInitializeOptions() {
-		printer = new StandardPrinter("net/sf/orcc/backends/llvm/aot/Actor.stg");
-		printer.setExpressionPrinter(new LLVMExpressionPrinter());
-		printer.setTypePrinter(new LLVMTypePrinter());
-		printer.getOptions().put("fifoSize", fifoSize);
-
 		// Set build and src directory
 		File srcDir = new File(path + "/src");
 		File buildDir = new File(path + "/build");
@@ -173,6 +168,10 @@ public class LLVMBackendImpl extends AbstractBackend {
 		network = doTransformNetwork(network);
 
 		// print instances and entities
+		printer = new StandardPrinter("net/sf/orcc/backends/llvm/aot/Actor.stg");
+		printer.setExpressionPrinter(new LLVMExpressionPrinter());
+		printer.setTypePrinter(new LLVMTypePrinter());
+		printer.getOptions().put("fifoSize", fifoSize);
 		printInstances(network);
 		printEntities(network);
 

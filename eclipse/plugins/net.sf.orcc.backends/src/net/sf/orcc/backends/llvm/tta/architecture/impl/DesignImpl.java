@@ -36,11 +36,10 @@ import net.sf.dftools.graph.Edge;
 import net.sf.dftools.graph.Vertex;
 import net.sf.dftools.graph.impl.GraphImpl;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
+import net.sf.orcc.backends.llvm.tta.architecture.Buffer;
 import net.sf.orcc.backends.llvm.tta.architecture.Component;
 import net.sf.orcc.backends.llvm.tta.architecture.Design;
 import net.sf.orcc.backends.llvm.tta.architecture.DesignConfiguration;
-import net.sf.orcc.backends.llvm.tta.architecture.Fifo;
-import net.sf.orcc.backends.llvm.tta.architecture.Memory;
 import net.sf.orcc.backends.llvm.tta.architecture.Port;
 import net.sf.orcc.backends.llvm.tta.architecture.Processor;
 import net.sf.orcc.backends.llvm.tta.architecture.Signal;
@@ -61,25 +60,40 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getName <em>Name</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getComponents <em>Components</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getProcessors <em>Processors</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getBroadcasts <em>Broadcasts</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getFifos <em>Fifos</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getMemories <em>Memories</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getSignals <em>Signals</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getInputs <em>Inputs</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getOutputs <em>Outputs</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getConfiguration <em>Configuration</em>}</li>
+ * <li>
+ * {@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getName
+ * <em>Name</em>}</li>
+ * <li>
+ * {@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getComponents
+ * <em>Components</em>}</li>
+ * <li>
+ * {@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getProcessors
+ * <em>Processors</em>}</li>
+ * <li>
+ * {@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getBuffers
+ * <em>Buffers</em>}</li>
+ * <li>
+ * {@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getSignals
+ * <em>Signals</em>}</li>
+ * <li>
+ * {@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getInputs
+ * <em>Inputs</em>}</li>
+ * <li>
+ * {@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getOutputs
+ * <em>Outputs</em>}</li>
+ * <li>
+ * {@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getConfiguration
+ * <em>Configuration</em>}</li>
  * </ul>
  * </p>
- *
+ * 
  * @generated
  */
 public class DesignImpl extends GraphImpl implements Design {
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -88,89 +102,81 @@ public class DesignImpl extends GraphImpl implements Design {
 	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getName()
 	 * @generated
 	 * @ordered
 	 */
 	protected String name = NAME_EDEFAULT;
 	/**
-	 * The cached value of the '{@link #getComponents() <em>Components</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getComponents() <em>Components</em>}'
+	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getComponents()
 	 * @generated
 	 * @ordered
 	 */
 	protected EList<Component> components;
 	/**
-	 * The cached value of the '{@link #getProcessors() <em>Processors</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getProcessors() <em>Processors</em>}'
+	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getProcessors()
 	 * @generated
 	 * @ordered
 	 */
 	protected EList<Processor> processors;
 	/**
-	 * The cached value of the '{@link #getBroadcasts() <em>Broadcasts</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getBroadcasts()
+	 * The cached value of the '{@link #getBuffers() <em>Buffers</em>}'
+	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getBuffers()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Component> broadcasts;
+	protected EList<Buffer> buffers;
 	/**
-	 * The cached value of the '{@link #getFifos() <em>Fifos</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getFifos()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Fifo> fifos;
-	/**
-	 * The cached value of the '{@link #getMemories() <em>Memories</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getMemories()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Memory> memories;
-	/**
-	 * The cached value of the '{@link #getSignals() <em>Signals</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getSignals() <em>Signals</em>}'
+	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getSignals()
 	 * @generated
 	 * @ordered
 	 */
 	protected EList<Signal> signals;
 	/**
-	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' reference
+	 * list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getInputs()
 	 * @generated
 	 * @ordered
 	 */
 	protected EList<Port> inputs;
 	/**
-	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}'
+	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getOutputs()
 	 * @generated
 	 * @ordered
 	 */
 	protected EList<Port> outputs;
 	/**
-	 * The default value of the '{@link #getConfiguration() <em>Configuration</em>}' attribute.
-	 * <!-- begin-user-doc --> <!--
+	 * The default value of the '{@link #getConfiguration()
+	 * <em>Configuration</em>}' attribute. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
+	 * 
 	 * @see #getConfiguration()
 	 * @generated
 	 * @ordered
 	 */
 	protected static final DesignConfiguration CONFIGURATION_EDEFAULT = DesignConfiguration.DIRECT_MAPPING;
 	/**
-	 * The cached value of the '{@link #getConfiguration() <em>Configuration</em>}' attribute.
-	 * <!-- begin-user-doc --> <!--
+	 * The cached value of the '{@link #getConfiguration()
+	 * <em>Configuration</em>}' attribute. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
+	 * 
 	 * @see #getConfiguration()
 	 * @generated
 	 * @ordered
@@ -179,6 +185,7 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected DesignImpl() {
@@ -189,8 +196,8 @@ public class DesignImpl extends GraphImpl implements Design {
 	public void add(Edge edge) {
 		if (edge instanceof Signal) {
 			getSignals().add((Signal) edge);
-		} else if (edge instanceof Fifo) {
-			getFifos().add((Fifo) edge);
+		} else if (edge instanceof Buffer) {
+			getBuffers().add((Buffer) edge);
 		}
 		getEdges().add(edge);
 	}
@@ -202,6 +209,7 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -213,12 +221,8 @@ public class DesignImpl extends GraphImpl implements Design {
 			return getComponents();
 		case ArchitecturePackage.DESIGN__PROCESSORS:
 			return getProcessors();
-		case ArchitecturePackage.DESIGN__BROADCASTS:
-			return getBroadcasts();
-		case ArchitecturePackage.DESIGN__FIFOS:
-			return getFifos();
-		case ArchitecturePackage.DESIGN__MEMORIES:
-			return getMemories();
+		case ArchitecturePackage.DESIGN__BUFFERS:
+			return getBuffers();
 		case ArchitecturePackage.DESIGN__SIGNALS:
 			return getSignals();
 		case ArchitecturePackage.DESIGN__INPUTS:
@@ -245,6 +249,7 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -257,12 +262,8 @@ public class DesignImpl extends GraphImpl implements Design {
 			return components != null && !components.isEmpty();
 		case ArchitecturePackage.DESIGN__PROCESSORS:
 			return processors != null && !processors.isEmpty();
-		case ArchitecturePackage.DESIGN__BROADCASTS:
-			return broadcasts != null && !broadcasts.isEmpty();
-		case ArchitecturePackage.DESIGN__FIFOS:
-			return fifos != null && !fifos.isEmpty();
-		case ArchitecturePackage.DESIGN__MEMORIES:
-			return memories != null && !memories.isEmpty();
+		case ArchitecturePackage.DESIGN__BUFFERS:
+			return buffers != null && !buffers.isEmpty();
 		case ArchitecturePackage.DESIGN__SIGNALS:
 			return signals != null && !signals.isEmpty();
 		case ArchitecturePackage.DESIGN__INPUTS:
@@ -277,6 +278,7 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -294,17 +296,9 @@ public class DesignImpl extends GraphImpl implements Design {
 			getProcessors().clear();
 			getProcessors().addAll((Collection<? extends Processor>) newValue);
 			return;
-		case ArchitecturePackage.DESIGN__BROADCASTS:
-			getBroadcasts().clear();
-			getBroadcasts().addAll((Collection<? extends Component>) newValue);
-			return;
-		case ArchitecturePackage.DESIGN__FIFOS:
-			getFifos().clear();
-			getFifos().addAll((Collection<? extends Fifo>) newValue);
-			return;
-		case ArchitecturePackage.DESIGN__MEMORIES:
-			getMemories().clear();
-			getMemories().addAll((Collection<? extends Memory>) newValue);
+		case ArchitecturePackage.DESIGN__BUFFERS:
+			getBuffers().clear();
+			getBuffers().addAll((Collection<? extends Buffer>) newValue);
 			return;
 		case ArchitecturePackage.DESIGN__SIGNALS:
 			getSignals().clear();
@@ -327,6 +321,7 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -336,6 +331,7 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String getName() {
@@ -344,6 +340,7 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void setName(String newName) {
@@ -356,6 +353,7 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -370,14 +368,8 @@ public class DesignImpl extends GraphImpl implements Design {
 		case ArchitecturePackage.DESIGN__PROCESSORS:
 			getProcessors().clear();
 			return;
-		case ArchitecturePackage.DESIGN__BROADCASTS:
-			getBroadcasts().clear();
-			return;
-		case ArchitecturePackage.DESIGN__FIFOS:
-			getFifos().clear();
-			return;
-		case ArchitecturePackage.DESIGN__MEMORIES:
-			getMemories().clear();
+		case ArchitecturePackage.DESIGN__BUFFERS:
+			getBuffers().clear();
 			return;
 		case ArchitecturePackage.DESIGN__SIGNALS:
 			getSignals().clear();
@@ -397,6 +389,7 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Component> getComponents() {
@@ -409,6 +402,7 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Processor> getProcessors() {
@@ -421,43 +415,20 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
-	public EList<Component> getBroadcasts() {
-		if (broadcasts == null) {
-			broadcasts = new EObjectResolvingEList<Component>(Component.class,
-					this, ArchitecturePackage.DESIGN__BROADCASTS);
+	public EList<Buffer> getBuffers() {
+		if (buffers == null) {
+			buffers = new EObjectContainmentEList<Buffer>(Buffer.class, this,
+					ArchitecturePackage.DESIGN__BUFFERS);
 		}
-		return broadcasts;
+		return buffers;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Fifo> getFifos() {
-		if (fifos == null) {
-			fifos = new EObjectResolvingEList<Fifo>(Fifo.class, this,
-					ArchitecturePackage.DESIGN__FIFOS);
-		}
-		return fifos;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Memory> getMemories() {
-		if (memories == null) {
-			memories = new EObjectContainmentEList<Memory>(Memory.class, this,
-					ArchitecturePackage.DESIGN__MEMORIES);
-		}
-		return memories;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public DesignConfiguration getConfiguration() {
@@ -466,6 +437,7 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Signal> getSignals() {
@@ -478,6 +450,7 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Port> getInputs() {
@@ -490,6 +463,7 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Port> getOutputs() {
@@ -502,6 +476,7 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void setConfiguration(DesignConfiguration newConfiguration) {
@@ -515,23 +490,24 @@ public class DesignImpl extends GraphImpl implements Design {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-		case ArchitecturePackage.DESIGN__MEMORIES:
-			return ((InternalEList<?>) getMemories()).basicRemove(otherEnd,
-					msgs);
+		case ArchitecturePackage.DESIGN__BUFFERS:
+			return ((InternalEList<?>) getBuffers())
+					.basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override

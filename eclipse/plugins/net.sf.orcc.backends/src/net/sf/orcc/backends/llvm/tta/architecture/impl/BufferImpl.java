@@ -33,36 +33,31 @@ package net.sf.orcc.backends.llvm.tta.architecture.impl;
 import java.util.Collection;
 
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
-import net.sf.orcc.backends.llvm.tta.architecture.Memory;
-
+import net.sf.orcc.backends.llvm.tta.architecture.Buffer;
 import net.sf.orcc.df.Connection;
 
 import org.eclipse.emf.common.notify.Notification;
-
 import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EClass;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-
 import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 
 /**
  * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Memory</b></em>'.
+ * An implementation of the model object '<em><b>Buffer</b></em>'.
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.MemoryImpl#getSize <em>Size</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.MemoryImpl#getWidth <em>Width</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.MemoryImpl#getMappedConnections <em>Mapped Connections</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.BufferImpl#getSize <em>Size</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.BufferImpl#getWidth <em>Width</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.BufferImpl#getMappedConnections <em>Mapped Connections</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public class MemoryImpl extends LinkImpl implements Memory {
+public class BufferImpl extends LinkImpl implements Buffer {
 	/**
 	 * The default value of the '{@link #getSize() <em>Size</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -118,7 +113,7 @@ public class MemoryImpl extends LinkImpl implements Memory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected MemoryImpl() {
+	protected BufferImpl() {
 		super();
 	}
 
@@ -129,7 +124,7 @@ public class MemoryImpl extends LinkImpl implements Memory {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return ArchitecturePackage.Literals.MEMORY;
+		return ArchitecturePackage.Literals.BUFFER;
 	}
 
 	/**
@@ -151,7 +146,7 @@ public class MemoryImpl extends LinkImpl implements Memory {
 		size = newSize;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
-					ArchitecturePackage.MEMORY__SIZE, oldSize, size));
+					ArchitecturePackage.BUFFER__SIZE, oldSize, size));
 	}
 
 	/**
@@ -173,7 +168,7 @@ public class MemoryImpl extends LinkImpl implements Memory {
 		width = newWidth;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
-					ArchitecturePackage.MEMORY__WIDTH, oldWidth, width));
+					ArchitecturePackage.BUFFER__WIDTH, oldWidth, width));
 	}
 
 	/**
@@ -185,7 +180,7 @@ public class MemoryImpl extends LinkImpl implements Memory {
 		if (mappedConnections == null) {
 			mappedConnections = new EObjectResolvingEList<Connection>(
 					Connection.class, this,
-					ArchitecturePackage.MEMORY__MAPPED_CONNECTIONS);
+					ArchitecturePackage.BUFFER__MAPPED_CONNECTIONS);
 		}
 		return mappedConnections;
 	}
@@ -198,11 +193,11 @@ public class MemoryImpl extends LinkImpl implements Memory {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case ArchitecturePackage.MEMORY__SIZE:
+		case ArchitecturePackage.BUFFER__SIZE:
 			return getSize();
-		case ArchitecturePackage.MEMORY__WIDTH:
+		case ArchitecturePackage.BUFFER__WIDTH:
 			return getWidth();
-		case ArchitecturePackage.MEMORY__MAPPED_CONNECTIONS:
+		case ArchitecturePackage.BUFFER__MAPPED_CONNECTIONS:
 			return getMappedConnections();
 		}
 		return super.eGet(featureID, resolve, coreType);
@@ -217,13 +212,13 @@ public class MemoryImpl extends LinkImpl implements Memory {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case ArchitecturePackage.MEMORY__SIZE:
+		case ArchitecturePackage.BUFFER__SIZE:
 			setSize((Integer) newValue);
 			return;
-		case ArchitecturePackage.MEMORY__WIDTH:
+		case ArchitecturePackage.BUFFER__WIDTH:
 			setWidth((Integer) newValue);
 			return;
-		case ArchitecturePackage.MEMORY__MAPPED_CONNECTIONS:
+		case ArchitecturePackage.BUFFER__MAPPED_CONNECTIONS:
 			getMappedConnections().clear();
 			getMappedConnections().addAll(
 					(Collection<? extends Connection>) newValue);
@@ -240,13 +235,13 @@ public class MemoryImpl extends LinkImpl implements Memory {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case ArchitecturePackage.MEMORY__SIZE:
+		case ArchitecturePackage.BUFFER__SIZE:
 			setSize(SIZE_EDEFAULT);
 			return;
-		case ArchitecturePackage.MEMORY__WIDTH:
+		case ArchitecturePackage.BUFFER__WIDTH:
 			setWidth(WIDTH_EDEFAULT);
 			return;
-		case ArchitecturePackage.MEMORY__MAPPED_CONNECTIONS:
+		case ArchitecturePackage.BUFFER__MAPPED_CONNECTIONS:
 			getMappedConnections().clear();
 			return;
 		}
@@ -261,11 +256,11 @@ public class MemoryImpl extends LinkImpl implements Memory {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case ArchitecturePackage.MEMORY__SIZE:
+		case ArchitecturePackage.BUFFER__SIZE:
 			return size != SIZE_EDEFAULT;
-		case ArchitecturePackage.MEMORY__WIDTH:
+		case ArchitecturePackage.BUFFER__WIDTH:
 			return width != WIDTH_EDEFAULT;
-		case ArchitecturePackage.MEMORY__MAPPED_CONNECTIONS:
+		case ArchitecturePackage.BUFFER__MAPPED_CONNECTIONS:
 			return mappedConnections != null && !mappedConnections.isEmpty();
 		}
 		return super.eIsSet(featureID);
@@ -290,4 +285,4 @@ public class MemoryImpl extends LinkImpl implements Memory {
 		return result.toString();
 	}
 
-} //MemoryImpl
+} //BufferImpl

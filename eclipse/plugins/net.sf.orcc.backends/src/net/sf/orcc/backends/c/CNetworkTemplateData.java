@@ -52,6 +52,18 @@ public class CNetworkTemplateData {
 
 	private int numberOfGroups;
 
+	public void computeHierarchicalTemplateMaps(Network network) {
+		instanceToGroupIdMap = new HashMap<Instance, Integer>();
+		numberOfGroups = 0;
+		Instance instance = DfFactory.eINSTANCE.createInstance("network",
+				network);
+		recursiveGroupsComputation(instance, 2);
+	}
+
+	public Map<String, Integer> getInstanceNameToGroupIdMap() {
+		return instanceNameToGroupIdMap;
+	}
+
 	private List<Instance> getInstancesRecursively(Network network) {
 		List<Instance> instances = new ArrayList<Instance>();
 		for (Instance instance : network.getInstances()) {
@@ -63,18 +75,6 @@ public class CNetworkTemplateData {
 			}
 		}
 		return instances;
-	}
-
-	public void computeHierarchicalTemplateMaps(Network network) {
-		instanceToGroupIdMap = new HashMap<Instance, Integer>();
-		numberOfGroups = 0;
-		Instance instance = DfFactory.eINSTANCE.createInstance("network",
-				network);
-		recursiveGroupsComputation(instance, 2);
-	}
-
-	public Map<String, Integer> getInstanceNameToGroupIdMap() {
-		return instanceNameToGroupIdMap;
 	}
 
 	public Map<Instance, Integer> getInstanceToGroupIdMap() {

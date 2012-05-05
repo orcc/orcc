@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.llvm.tta.architecture.impl;
 
+
 import java.util.Map;
 
 import net.sf.dftools.graph.GraphPackage;
@@ -35,6 +36,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.llvm.tta.architecture.Bridge;
+import net.sf.orcc.backends.llvm.tta.architecture.Buffer;
 import net.sf.orcc.backends.llvm.tta.architecture.Bus;
 import net.sf.orcc.backends.llvm.tta.architecture.Component;
 import net.sf.orcc.backends.llvm.tta.architecture.Design;
@@ -45,14 +47,12 @@ import net.sf.orcc.backends.llvm.tta.architecture.ExprFalse;
 import net.sf.orcc.backends.llvm.tta.architecture.ExprTrue;
 import net.sf.orcc.backends.llvm.tta.architecture.ExprUnary;
 import net.sf.orcc.backends.llvm.tta.architecture.Extension;
-import net.sf.orcc.backends.llvm.tta.architecture.Fifo;
 import net.sf.orcc.backends.llvm.tta.architecture.FuPort;
 import net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.llvm.tta.architecture.GlobalControlUnit;
 import net.sf.orcc.backends.llvm.tta.architecture.Guard;
 import net.sf.orcc.backends.llvm.tta.architecture.Implementation;
 import net.sf.orcc.backends.llvm.tta.architecture.Link;
-import net.sf.orcc.backends.llvm.tta.architecture.Memory;
 import net.sf.orcc.backends.llvm.tta.architecture.OpBinary;
 import net.sf.orcc.backends.llvm.tta.architecture.OpUnary;
 import net.sf.orcc.backends.llvm.tta.architecture.Operation;
@@ -98,7 +98,8 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	private EClass designEClass = null;
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	private EClass linkEClass = null;
@@ -108,12 +109,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	private EClass signalEClass = null;
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass fifoEClass = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->s
@@ -127,7 +122,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass memoryEClass = null;
+	private EClass bufferEClass = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -432,10 +427,11 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getDesign_Broadcasts() {
+	public EReference getDesign_Buffers() {
 		return (EReference) designEClass.getEStructuralFeatures().get(3);
 	}
 
@@ -443,25 +439,8 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getDesign_Fifos() {
-		return (EReference) designEClass.getEStructuralFeatures().get(4);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getDesign_Memories() {
-		return (EReference) designEClass.getEStructuralFeatures().get(5);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EReference getDesign_Signals() {
-		return (EReference) designEClass.getEStructuralFeatures().get(6);
+		return (EReference) designEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -469,7 +448,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	public EReference getDesign_Inputs() {
-		return (EReference) designEClass.getEStructuralFeatures().get(7);
+		return (EReference) designEClass.getEStructuralFeatures().get(5);
 	}
 
 	/**
@@ -477,7 +456,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	public EReference getDesign_Outputs() {
-		return (EReference) designEClass.getEStructuralFeatures().get(8);
+		return (EReference) designEClass.getEStructuralFeatures().get(6);
 	}
 
 	/**
@@ -485,11 +464,12 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	public EAttribute getDesign_Configuration() {
-		return (EAttribute) designEClass.getEStructuralFeatures().get(9);
+		return (EAttribute) designEClass.getEStructuralFeatures().get(7);
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EClass getLink() {
@@ -497,7 +477,8 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getLink_SourcePort() {
@@ -505,7 +486,8 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getLink_TargetPort() {
@@ -526,14 +508,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 */
 	public EAttribute getSignal_Size() {
 		return (EAttribute) signalEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getFifo() {
-		return fifoEClass;
 	}
 
 	/**
@@ -573,8 +547,8 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getMemory() {
-		return memoryEClass;
+	public EClass getBuffer() {
+		return bufferEClass;
 	}
 
 	/**
@@ -582,8 +556,8 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getMemory_Size() {
-		return (EAttribute) memoryEClass.getEStructuralFeatures().get(0);
+	public EAttribute getBuffer_Size() {
+		return (EAttribute) bufferEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -591,8 +565,8 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getMemory_Width() {
-		return (EAttribute) memoryEClass.getEStructuralFeatures().get(1);
+	public EAttribute getBuffer_Width() {
+		return (EAttribute) bufferEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -600,8 +574,8 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getMemory_MappedConnections() {
-		return (EReference) memoryEClass.getEStructuralFeatures().get(2);
+	public EReference getBuffer_MappedConnections() {
+		return (EReference) bufferEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -689,7 +663,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getProcessor_MappedInstances() {
+	public EReference getProcessor_MappedActors() {
 		return (EReference) processorEClass.getEStructuralFeatures().get(9);
 	}
 
@@ -1496,9 +1470,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEAttribute(designEClass, DESIGN__NAME);
 		createEReference(designEClass, DESIGN__COMPONENTS);
 		createEReference(designEClass, DESIGN__PROCESSORS);
-		createEReference(designEClass, DESIGN__BROADCASTS);
-		createEReference(designEClass, DESIGN__FIFOS);
-		createEReference(designEClass, DESIGN__MEMORIES);
+		createEReference(designEClass, DESIGN__BUFFERS);
 		createEReference(designEClass, DESIGN__SIGNALS);
 		createEReference(designEClass, DESIGN__INPUTS);
 		createEReference(designEClass, DESIGN__OUTPUTS);
@@ -1511,17 +1483,15 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		signalEClass = createEClass(SIGNAL);
 		createEAttribute(signalEClass, SIGNAL__SIZE);
 
-		fifoEClass = createEClass(FIFO);
-
 		componentEClass = createEClass(COMPONENT);
 		createEAttribute(componentEClass, COMPONENT__NAME);
 		createEReference(componentEClass, COMPONENT__INPUTS);
 		createEReference(componentEClass, COMPONENT__OUTPUTS);
 
-		memoryEClass = createEClass(MEMORY);
-		createEAttribute(memoryEClass, MEMORY__SIZE);
-		createEAttribute(memoryEClass, MEMORY__WIDTH);
-		createEReference(memoryEClass, MEMORY__MAPPED_CONNECTIONS);
+		bufferEClass = createEClass(BUFFER);
+		createEAttribute(bufferEClass, BUFFER__SIZE);
+		createEAttribute(bufferEClass, BUFFER__WIDTH);
+		createEReference(bufferEClass, BUFFER__MAPPED_CONNECTIONS);
 
 		portEClass = createEClass(PORT);
 
@@ -1535,7 +1505,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEReference(processorEClass, PROCESSOR__PROGRAM);
 		createEReference(processorEClass, PROCESSOR__DATA);
 		createEReference(processorEClass, PROCESSOR__HARDWARE_DATABASE);
-		createEReference(processorEClass, PROCESSOR__MAPPED_INSTANCES);
+		createEReference(processorEClass, PROCESSOR__MAPPED_ACTORS);
 		createEAttribute(processorEClass, PROCESSOR__CONFIGURATION);
 
 		busEClass = createEClass(BUS);
@@ -1705,9 +1675,8 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		designEClass.getESuperTypes().add(theGraphPackage.getGraph());
 		linkEClass.getESuperTypes().add(theGraphPackage.getEdge());
 		signalEClass.getESuperTypes().add(this.getLink());
-		fifoEClass.getESuperTypes().add(this.getLink());
 		componentEClass.getESuperTypes().add(theGraphPackage.getVertex());
-		memoryEClass.getESuperTypes().add(this.getLink());
+		bufferEClass.getESuperTypes().add(this.getLink());
 		portEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		processorEClass.getESuperTypes().add(this.getComponent());
 		readsEClass.getESuperTypes().add(this.getElement());
@@ -1735,17 +1704,9 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				"processors", null, 0, -1, Design.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getDesign_Broadcasts(), this.getComponent(), null,
-				"broadcasts", null, 0, -1, Design.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getDesign_Fifos(), this.getFifo(), null, "fifos", null,
-				0, -1, Design.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getDesign_Memories(), this.getMemory(), null,
-				"memories", null, 0, -1, Design.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+		initEReference(getDesign_Buffers(), this.getBuffer(), null, "buffers",
+				null, 0, -1, Design.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getDesign_Signals(), this.getSignal(), null, "signals",
 				null, 0, -1, Design.class, !IS_TRANSIENT, !IS_VOLATILE,
@@ -1782,9 +1743,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
 
-		initEClass(fifoEClass, Fifo.class, "Fifo", !IS_ABSTRACT, !IS_INTERFACE,
-				IS_GENERATED_INSTANCE_CLASS);
-
 		initEClass(componentEClass, Component.class, "Component", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getComponent_Name(), theEcorePackage.getEString(),
@@ -1800,19 +1758,19 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(memoryEClass, Memory.class, "Memory", !IS_ABSTRACT,
+		initEClass(bufferEClass, Buffer.class, "Buffer", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getMemory_Size(), theEcorePackage.getEInt(), "size",
-				null, 0, 1, Memory.class, !IS_TRANSIENT, !IS_VOLATILE,
+		initEAttribute(getBuffer_Size(), theEcorePackage.getEInt(), "size",
+				null, 0, 1, Buffer.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
-		initEAttribute(getMemory_Width(), theEcorePackage.getEInt(), "width",
-				null, 0, 1, Memory.class, !IS_TRANSIENT, !IS_VOLATILE,
+		initEAttribute(getBuffer_Width(), theEcorePackage.getEInt(), "width",
+				null, 0, 1, Buffer.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
-		initEReference(getMemory_MappedConnections(),
+		initEReference(getBuffer_MappedConnections(),
 				theDfPackage.getConnection(), null, "mappedConnections", null,
-				0, -1, Memory.class, !IS_TRANSIENT, !IS_VOLATILE,
+				0, -1, Buffer.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
@@ -1860,11 +1818,11 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				-1, Processor.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getProcessor_MappedInstances(),
-				theDfPackage.getInstance(), null, "mappedInstances", null, 0,
-				-1, Processor.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getProcessor_MappedActors(),
+				theGraphPackage.getVertex(), null, "mappedActors", null, 0, -1,
+				Processor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				!IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
 		initEAttribute(getProcessor_Configuration(),
 				this.getProcessorConfiguration(), "configuration", null, 0, 1,
 				Processor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,

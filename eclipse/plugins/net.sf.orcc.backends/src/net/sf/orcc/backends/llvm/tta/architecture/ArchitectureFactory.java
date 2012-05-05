@@ -47,9 +47,9 @@ import org.eclipse.emf.ecore.EFactory;
  */
 public interface ArchitectureFactory extends EFactory {
 	/**
-	 * The singleton instance of the factory.
-	 * <!-- begin-user-doc --> <!--
+	 * The singleton instance of the factory. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	ArchitectureFactory eINSTANCE = net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitectureFactoryImpl
@@ -92,18 +92,43 @@ public interface ArchitectureFactory extends EFactory {
 	FunctionUnit createAluUnit(Processor tta, String name);
 
 	/**
-	 * Returns a new object of class '<em>Bridge</em>'.
-	 * <!-- begin-user-doc -->
+	 * Returns a new object of class '<em>Bridge</em>'. <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return a new object of class '<em>Bridge</em>'.
 	 * @generated
 	 */
 	Bridge createBridge();
 
 	/**
-	 * Returns a new object of class '<em>Bus</em>'.
-	 * <!-- begin-user-doc -->
+	 * Returns a new object of class '<em>Buffer</em>'. <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
+	 * @return a new object of class '<em>Buffer</em>'.
+	 * @generated
+	 */
+	Buffer createBuffer();
+
+	/**
+	 * Returns a new object of class '<em>Buffer</em>'.
+	 * 
+	 * @param source
+	 *            the source vertex of this buffer
+	 * @param target
+	 *            the target vertex of this buffer
+	 * @param sourcePort
+	 *            the source port of this buffer
+	 * @param targetPort
+	 *            the target port of this buffer
+	 * @return a new buffer
+	 */
+	Buffer createBuffer(Vertex source, Vertex target, Port sourcePort,
+			Port targetPort);
+
+	/**
+	 * Returns a new object of class '<em>Bus</em>'. <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * 
 	 * @return a new object of class '<em>Bus</em>'.
 	 * @generated
 	 */
@@ -134,38 +159,36 @@ public interface ArchitectureFactory extends EFactory {
 	Bus createBusDefault(int index, int width);
 
 	/**
-	 * Returns a new object of class '<em>Component</em>'.
-	 * <!-- begin-user-doc
+	 * Returns a new object of class '<em>Component</em>'. <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
+	 * 
 	 * @return a new object of class '<em>Component</em>'.
 	 * @generated
 	 */
 	Component createComponent();
 
 	/**
-	 * Returns a new object of class '<em>Memory</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Memory</em>'.
-	 * @generated
+	 * Returns a new object of class '<em>Component</em>'.
+	 * 
+	 * @param name
+	 *            the name of the new component
+	 * @return a new object of class '<em>Component</em>'.
 	 */
-	Memory createMemory();
-
 	Component createComponent(String name);
 
 	/**
-	 * Returns a new object of class '<em>Design</em>'.
-	 * <!-- begin-user-doc -->
+	 * Returns a new object of class '<em>Design</em>'. <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return a new object of class '<em>Design</em>'.
 	 * @generated
 	 */
 	Design createDesign();
 
 	/**
-	 * Returns a new object of class '<em>Expr Binary</em>'.
-	 * <!-- begin-user-doc
+	 * Returns a new object of class '<em>Expr Binary</em>'. <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
+	 * 
 	 * @return a new object of class '<em>Expr Binary</em>'.
 	 * @generated
 	 */
@@ -185,27 +208,27 @@ public interface ArchitectureFactory extends EFactory {
 	ExprBinary createExprBinary(OpBinary op, ExprUnary e1, ExprUnary e2);
 
 	/**
-	 * Returns a new object of class '<em>Expr False</em>'.
-	 * <!-- begin-user-doc
+	 * Returns a new object of class '<em>Expr False</em>'. <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
+	 * 
 	 * @return a new object of class '<em>Expr False</em>'.
 	 * @generated
 	 */
 	ExprFalse createExprFalse();
 
 	/**
-	 * Returns a new object of class '<em>Expr True</em>'.
-	 * <!-- begin-user-doc
+	 * Returns a new object of class '<em>Expr True</em>'. <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
+	 * 
 	 * @return a new object of class '<em>Expr True</em>'.
 	 * @generated
 	 */
 	ExprTrue createExprTrue();
 
 	/**
-	 * Returns a new object of class '<em>Expr Unary</em>'.
-	 * <!-- begin-user-doc
+	 * Returns a new object of class '<em>Expr Unary</em>'. <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
+	 * 
 	 * @return a new object of class '<em>Expr Unary</em>'.
 	 * @generated
 	 */
@@ -263,9 +286,9 @@ public interface ArchitectureFactory extends EFactory {
 			Implementation implementation);
 
 	/**
-	 * Returns a new object of class '<em>Fu Port</em>'.
-	 * <!-- begin-user-doc -->
+	 * Returns a new object of class '<em>Fu Port</em>'. <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return a new object of class '<em>Fu Port</em>'.
 	 * @generated
 	 */
@@ -377,9 +400,9 @@ public interface ArchitectureFactory extends EFactory {
 			Implementation implementation);
 
 	/**
-	 * Returns a new object of class '<em>Operation</em>'.
-	 * <!-- begin-user-doc
+	 * Returns a new object of class '<em>Operation</em>'. <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
+	 * 
 	 * @return a new object of class '<em>Operation</em>'.
 	 * @generated
 	 */
@@ -417,18 +440,18 @@ public interface ArchitectureFactory extends EFactory {
 	Socket createOutputSocket(String name, EList<Segment> segments);
 
 	/**
-	 * Returns a new object of class '<em>Port</em>'.
-	 * <!-- begin-user-doc -->
+	 * Returns a new object of class '<em>Port</em>'. <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return a new object of class '<em>Port</em>'.
 	 * @generated
 	 */
 	Port createPort();
 
 	/**
-	 * Returns a new object of class '<em>Processor</em>'.
-	 * <!-- begin-user-doc
+	 * Returns a new object of class '<em>Processor</em>'. <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
+	 * 
 	 * @return a new object of class '<em>Processor</em>'.
 	 * @generated
 	 */
@@ -450,9 +473,9 @@ public interface ArchitectureFactory extends EFactory {
 			int ramSize);
 
 	/**
-	 * Returns a new object of class '<em>Reads</em>'.
-	 * <!-- begin-user-doc -->
+	 * Returns a new object of class '<em>Reads</em>'. <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return a new object of class '<em>Reads</em>'.
 	 * @generated
 	 */
@@ -516,9 +539,9 @@ public interface ArchitectureFactory extends EFactory {
 			int size, int width, Implementation implementation);
 
 	/**
-	 * Returns a new object of class '<em>Resource</em>'.
-	 * <!-- begin-user-doc
+	 * Returns a new object of class '<em>Resource</em>'. <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
+	 * 
 	 * @return a new object of class '<em>Resource</em>'.
 	 * @generated
 	 */
@@ -538,9 +561,9 @@ public interface ArchitectureFactory extends EFactory {
 	Resource createResource(String name, int startCycle, int cycles);
 
 	/**
-	 * Returns a new object of class '<em>Segment</em>'.
-	 * <!-- begin-user-doc -->
+	 * Returns a new object of class '<em>Segment</em>'. <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return a new object of class '<em>Segment</em>'.
 	 * @generated
 	 */
@@ -579,33 +602,38 @@ public interface ArchitectureFactory extends EFactory {
 	ShortImmediate createShortImmediate(int width, Extension extension);
 
 	/**
-	 * Returns a new object of class '<em>Signal</em>'.
-	 * <!-- begin-user-doc -->
+	 * Returns a new object of class '<em>Signal</em>'. <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return a new object of class '<em>Signal</em>'.
 	 * @generated
 	 */
 	Signal createSignal();
 
 	/**
-	 * Returns a new object of class '<em>Fifo</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Fifo</em>'.
-	 * @generated
+	 * Returns a new object of class '<em>Signal</em>'.
+	 * 
+	 * @param name
+	 *            the name of the signal
+	 * @param size
+	 *            the width of the signal
+	 * @param source
+	 *            the source vertex of this signal
+	 * @param target
+	 *            the target vertex of this signal
+	 * @param sourcePort
+	 *            the source port of this signal
+	 * @param targetPort
+	 *            the target port of this signal
+	 * @return a new signal
 	 */
-	Fifo createFifo();
-
-	Fifo createFifo(String name, Vertex source, Vertex target, Port sourcePort,
-			Port targetPort);
-
 	Signal createSignal(String name, int size, Vertex source, Vertex target,
 			Port sourcePort, Port targetPort);
 
 	/**
-	 * Returns a new object of class '<em>Socket</em>'.
-	 * <!-- begin-user-doc -->
+	 * Returns a new object of class '<em>Socket</em>'. <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return a new object of class '<em>Socket</em>'.
 	 * @generated
 	 */
@@ -641,9 +669,9 @@ public interface ArchitectureFactory extends EFactory {
 	FunctionUnit createStreamOutput(Processor tta);
 
 	/**
-	 * Returns a new object of class '<em>Term Bool</em>'.
-	 * <!-- begin-user-doc
+	 * Returns a new object of class '<em>Term Bool</em>'. <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
+	 * 
 	 * @return a new object of class '<em>Term Bool</em>'.
 	 * @generated
 	 */
@@ -662,9 +690,9 @@ public interface ArchitectureFactory extends EFactory {
 	TermBool createTermBool(RegisterFile register, int index);
 
 	/**
-	 * Returns a new object of class '<em>Term Unit</em>'.
-	 * <!-- begin-user-doc
+	 * Returns a new object of class '<em>Term Unit</em>'. <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
+	 * 
 	 * @return a new object of class '<em>Term Unit</em>'.
 	 * @generated
 	 */
@@ -683,9 +711,9 @@ public interface ArchitectureFactory extends EFactory {
 	TermUnit createTermUnit(FunctionUnit unit, FuPort port);
 
 	/**
-	 * Returns a new object of class '<em>Writes</em>'.
-	 * <!-- begin-user-doc -->
+	 * Returns a new object of class '<em>Writes</em>'. <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return a new object of class '<em>Writes</em>'.
 	 * @generated
 	 */
@@ -705,9 +733,9 @@ public interface ArchitectureFactory extends EFactory {
 	Writes createWrites(FuPort port, int startCycle, int cycle);
 
 	/**
-	 * Returns the package supported by this factory.
-	 * <!-- begin-user-doc -->
+	 * Returns the package supported by this factory. <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the package supported by this factory.
 	 * @generated
 	 */

@@ -30,7 +30,7 @@
  */
 package net.sf.orcc.backends.llvm.tta.architecture;
 
-import net.sf.orcc.df.Instance;
+import net.sf.dftools.graph.Vertex;
 
 import org.eclipse.emf.common.util.EList;
 
@@ -51,7 +51,7 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getProgram <em>Program</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getData <em>Data</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getHardwareDatabase <em>Hardware Database</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getMappedInstances <em>Mapped Instances</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getMappedActors <em>Mapped Actors</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getConfiguration <em>Configuration</em>}</li>
  * </ul>
  * </p>
@@ -236,20 +236,20 @@ public interface Processor extends Component {
 	EList<Implementation> getHardwareDatabase();
 
 	/**
-	 * Returns the value of the '<em><b>Mapped Instances</b></em>' reference list.
-	 * The list contents are of type {@link net.sf.orcc.df.Instance}.
+	 * Returns the value of the '<em><b>Mapped Actors</b></em>' reference list.
+	 * The list contents are of type {@link net.sf.dftools.graph.Vertex}.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Mapped Instances</em>' reference list isn't clear,
+	 * If the meaning of the '<em>Mapped Actors</em>' reference list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Mapped Instances</em>' reference list.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_MappedInstances()
+	 * @return the value of the '<em>Mapped Actors</em>' reference list.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_MappedActors()
 	 * @model
 	 * @generated
 	 */
-	EList<Instance> getMappedInstances();
+	EList<Vertex> getMappedActors();
 
 	/**
 	 * Returns the value of the '<em><b>Configuration</b></em>' attribute.

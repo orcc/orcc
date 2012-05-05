@@ -49,7 +49,7 @@ public class TTAActorTemplateData extends LLVMTemplateData {
 
 	private Map<Port, Boolean> portToNeedCastMap;
 
-	public TTAActorTemplateData(Actor actor) {
+	public TTAActorTemplateData() {
 		super();
 		portToIndexMap = new HashMap<Port, Integer>();
 		portToNeedCastMap = new HashMap<Port, Boolean>();

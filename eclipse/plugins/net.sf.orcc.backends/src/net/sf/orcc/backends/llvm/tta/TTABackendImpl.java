@@ -34,13 +34,12 @@ import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.CustomPrinter;
+import net.sf.orcc.backends.StandardPrinter;
+import net.sf.orcc.backends.llvm.aot.LLVMBackendImpl;
 import net.sf.orcc.backends.llvm.aot.LLVMExpressionPrinter;
 import net.sf.orcc.backends.llvm.aot.LLVMTypePrinter;
 import net.sf.orcc.backends.llvm.transformations.BlockNumbering;
@@ -77,15 +76,13 @@ import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.transformations.TacTransformation;
 import net.sf.orcc.util.OrccUtil;
 
-import org.eclipse.core.resources.IFile;
-
 /**
  * TTA back-end.
  * 
  * @author Herve Yviquel
  * 
  */
-public class TTABackendImpl extends AbstractBackend {
+public class TTABackendImpl extends LLVMBackendImpl {
 
 	private boolean debug;
 	private boolean finalize;
@@ -95,23 +92,7 @@ public class TTABackendImpl extends AbstractBackend {
 	private DesignConfiguration conf;
 	private Design design;
 
-	private final Map<String, String> transformations;
-
 	String instancePath;
-
-	/**
-	 * Creates a new instance of the TTA back-end. Initializes the
-	 * transformation hash map.
-	 */
-	public TTABackendImpl() {
-		transformations = new HashMap<String, String>();
-		transformations.put("abs", "abs_");
-		transformations.put("getw", "getw_");
-		transformations.put("index", "index_");
-		transformations.put("min", "min_");
-		transformations.put("max", "max_");
-		transformations.put("select", "select_");
-	}
 
 	@Override
 	public void doInitializeOptions() {
@@ -149,7 +130,17 @@ public class TTABackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		DfSwitch<?>[] transformations = { new UnitImporter(),
+		// do not transform actors
+	}
+
+	@Override
+	protected Network doTransformNetwork(Network network) throws OrccException {
+		write("Transform the network...\n");
+		network = new Instantiator(fifoSize).doSwitch(network);
+
+		DfSwitch<?>[] transformations = { new NetworkFlattener(),
+				new BroadcastAdder(), new TypeResizer(true, true, false),
+				new UnitImporter(),
 				new ComplexHwOpDetector(getWriteListener()),
 				new DfVisitor<Void>(new SSATransformation()),
 				new BoolToIntTransformation(), new StringTransformation(),
@@ -166,36 +157,33 @@ public class TTABackendImpl extends AbstractBackend {
 				new DfVisitor<Void>(new BlockNumbering()) };
 
 		for (DfSwitch<?> transformation : transformations) {
-			transformation.doSwitch(actor);
+			transformation.doSwitch(network);
 		}
 
-		actor.setTemplateData(new TTAActorTemplateData(actor));
-	}
+		network.computeTemplateMaps();
 
-	private Network doTransformNetwork(Network network) throws OrccException {
-		write("Instantiating...\n");
-		network = new Instantiator(fifoSize).doSwitch(network);
-		write("Flattening...\n");
-		new NetworkFlattener().doSwitch(network);
-		new BroadcastAdder().doSwitch(network);
-		new TypeResizer(true, true, false).doSwitch(network);
+		for (Actor actor : network.getAllActors()) {
+			actor.setTemplateData(new TTAActorTemplateData().compute(actor));
+		}
 
 		return network;
-	}
-
-	@Override
-	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
-		// do not generate a VTL
 	}
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network = doTransformNetwork(network);
 
-		transformActors(network.getAllActors());
+		// print instances and entities
+		String oldPath = path;
+		path = OrccUtil.createFolder(path, "actors");
+		printer = new StandardPrinter("net/sf/orcc/backends/llvm/aot/Actor.stg");
+		printer.setExpressionPrinter(new LLVMExpressionPrinter());
+		printer.setTypePrinter(new LLVMTypePrinter());
+		printInstances(network);
+		printEntities(network);
 
-		network.computeTemplateMaps();
-
+		// build and print the design
+		path = oldPath;
 		design = new ArchitectureBuilder(conf).caseNetwork(network);
 		printDesign(design);
 
@@ -287,7 +275,7 @@ public class TTABackendImpl extends AbstractBackend {
 
 		// Print assembly code of actor-scheduler
 		ArchitecturePrinter schedulerPrinter = new ArchitecturePrinter(
-				"net/sf/orcc/backends/llvm/tta/LLVM_Actor.stg");
+				"net/sf/orcc/backends/llvm/tta/LLVM_Processor.stg");
 		schedulerPrinter.setExpressionPrinter(new LLVMExpressionPrinter());
 		schedulerPrinter.setTypePrinter(new LLVMTypePrinter());
 		schedulerPrinter.print(tta.getName() + ".ll", processorPath, tta);
