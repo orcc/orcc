@@ -361,9 +361,9 @@ AstTypeBool: {AstTypeBool} 'bool';
 
 AstTypeFloat: {AstTypeFloat} 'float';
 
-AstTypeHalf: {AstTypeFloat} 'half';
+AstTypeHalf: {AstTypeHalf} 'half';
 
-AstTypeDouble: {AstTypeFloat} 'double';
+AstTypeDouble: {AstTypeDouble} 'double';
 
 AstTypeInt: {AstTypeInt} 'int' ('(' 'size' '=' size = AstExpression ')')?;
 
