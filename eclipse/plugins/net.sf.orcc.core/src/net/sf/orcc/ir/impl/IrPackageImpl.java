@@ -489,6 +489,15 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EAttribute getTypeFloat_Size() {
+		return (EAttribute) typeFloatEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getTypeInt() {
 		return typeIntEClass;
 	}
@@ -1652,6 +1661,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		typeBoolEClass = createEClass(TYPE_BOOL);
 
 		typeFloatEClass = createEClass(TYPE_FLOAT);
+		createEAttribute(typeFloatEClass, TYPE_FLOAT__SIZE);
 
 		typeIntEClass = createEClass(TYPE_INT);
 		createEAttribute(typeIntEClass, TYPE_INT__SIZE);
@@ -2081,6 +2091,10 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		initEClass(typeFloatEClass, TypeFloat.class, "TypeFloat", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getTypeFloat_Size(), ecorePackage.getEInt(), "size",
+				null, 0, 1, TypeFloat.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
 
 		initEClass(typeIntEClass, TypeInt.class, "TypeInt", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);

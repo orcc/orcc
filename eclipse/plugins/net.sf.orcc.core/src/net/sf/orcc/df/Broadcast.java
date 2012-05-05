@@ -113,11 +113,9 @@ public interface Broadcast extends Vertex {
 	String getSimpleName();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.df.Broadcast#getName
-	 * <em>Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @param value
-	 *            the new value of the '<em>Name</em>' attribute.
+	 * Sets the value of the '{@link net.sf.orcc.df.Broadcast#getName <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Name</em>' attribute.
 	 * @see #getName()
 	 * @generated
 	 */

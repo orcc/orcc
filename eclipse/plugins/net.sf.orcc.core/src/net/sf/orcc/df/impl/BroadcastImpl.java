@@ -56,15 +56,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
 public class BroadcastImpl extends VertexImpl implements Broadcast {
 
 	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String NAME_EDEFAULT = null;
-	/**
 	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -73,6 +64,15 @@ public class BroadcastImpl extends VertexImpl implements Broadcast {
 	 * @ordered
 	 */
 	protected EList<Port> inputs;
+	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
 	/**
 	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
@@ -211,12 +211,12 @@ public class BroadcastImpl extends VertexImpl implements Broadcast {
 		}
 		return map;
 	}
-	
+
 	@Override
 	public Port getInput() {
 		return getInputs().get(0);
 	}
-	
+
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

@@ -14,6 +14,10 @@ import java.util.List;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
+import net.sf.orcc.ir.Block;
+import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.BlockIf;
+import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Cfg;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Def;
@@ -34,10 +38,6 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Block;
-import net.sf.orcc.ir.BlockBasic;
-import net.sf.orcc.ir.BlockIf;
-import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Param;
@@ -66,12 +66,14 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 /**
  * <!-- begin-user-doc --> An implementation of the model <b>Factory</b>. <!--
  * end-user-doc -->
+ * 
  * @generated
  */
 public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @deprecated
 	 * @generated
 	 */
@@ -81,9 +83,9 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
-	 * Creates the default factory implementation.
-	 * <!-- begin-user-doc --> <!--
+	 * Creates the default factory implementation. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public static IrFactory init() {
@@ -100,9 +102,9 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
-	 * Creates an instance of the factory.
-	 * <!-- begin-user-doc --> <!--
+	 * Creates an instance of the factory. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public IrFactoryImpl() {
@@ -111,6 +113,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String convertOpBinaryToString(EDataType eDataType,
@@ -120,6 +123,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String convertOpUnaryToString(EDataType eDataType,
@@ -129,6 +133,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -146,6 +151,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -227,6 +233,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ArgByRef createArgByRef() {
@@ -236,6 +243,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ArgByVal createArgByVal() {
@@ -265,8 +273,8 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Cfg createCfg() {
@@ -275,8 +283,8 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public CfgNode createCfgNode() {
@@ -293,6 +301,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Def createDef() {
@@ -309,6 +318,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprBinary createExprBinary() {
@@ -329,6 +339,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprBool createExprBool() {
@@ -345,6 +356,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprFloat createExprFloat() {
@@ -368,6 +380,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprInt createExprInt() {
@@ -398,6 +411,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprList createExprList() {
@@ -422,6 +436,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprString createExprString() {
@@ -438,6 +453,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprUnary createExprUnary() {
@@ -457,6 +473,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprVar createExprVar() {
@@ -480,6 +497,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -497,6 +515,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public InstAssign createInstAssign() {
@@ -536,6 +555,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public InstCall createInstCall() {
@@ -567,6 +587,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public InstLoad createInstLoad() {
@@ -610,6 +631,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public InstPhi createInstPhi() {
@@ -641,6 +663,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public InstReturn createInstReturn() {
@@ -665,6 +688,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public InstStore createInstStore() {
@@ -756,6 +780,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public BlockBasic createBlockBasic() {
@@ -765,6 +790,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public BlockIf createBlockIf() {
@@ -774,6 +800,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public BlockWhile createBlockWhile() {
@@ -783,6 +810,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public OpBinary createOpBinaryFromString(EDataType eDataType,
@@ -797,6 +825,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public OpUnary createOpUnaryFromString(EDataType eDataType,
@@ -811,6 +840,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Param createParam() {
@@ -827,6 +857,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Predicate createPredicate() {
@@ -836,6 +867,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Procedure createProcedure() {
@@ -857,6 +889,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public TypeBool createTypeBool() {
@@ -866,10 +899,16 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
 	 */
 	public TypeFloat createTypeFloat() {
 		TypeFloatImpl typeFloat = new TypeFloatImpl();
+		typeFloat.setSize(32);
+		return typeFloat;
+	}
+
+	public TypeFloat createTypeFloat(int size) {
+		TypeFloatImpl typeFloat = new TypeFloatImpl();
+		typeFloat.setSize(size);
 		return typeFloat;
 	}
 
@@ -901,6 +940,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public TypeList createTypeList() {
@@ -926,6 +966,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public TypeString createTypeString() {
@@ -951,6 +992,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public TypeVoid createTypeVoid() {
@@ -960,6 +1002,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Use createUse() {
@@ -976,6 +1019,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Var createVar() {
@@ -1038,6 +1082,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public IrPackage getIrPackage() {

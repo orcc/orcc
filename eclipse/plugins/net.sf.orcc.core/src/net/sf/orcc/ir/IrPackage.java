@@ -831,6 +831,14 @@ public interface IrPackage extends EPackage {
 		EClass TYPE_FLOAT = eINSTANCE.getTypeFloat();
 
 		/**
+		 * The meta object literal for the '<em><b>Size</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute TYPE_FLOAT__SIZE = eINSTANCE.getTypeFloat_Size();
+
+		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TypeIntImpl <em>Type Int</em>}' class.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.TypeIntImpl
@@ -2392,12 +2400,21 @@ public interface IrPackage extends EPackage {
 	int TYPE_FLOAT = 29;
 
 	/**
+	 * The feature id for the '<em><b>Size</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TYPE_FLOAT__SIZE = TYPE_FEATURE_COUNT + 0;
+
+	/**
 	 * The number of structural features of the '<em>Type Float</em>' class.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TYPE_FLOAT_FEATURE_COUNT = TYPE_FEATURE_COUNT + 0;
+	int TYPE_FLOAT_FEATURE_COUNT = TYPE_FEATURE_COUNT + 1;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TypeIntImpl <em>Type Int</em>}' class.
@@ -3909,6 +3926,17 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getTypeFloat();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.TypeFloat#getSize <em>Size</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Size</em>'.
+	 * @see net.sf.orcc.ir.TypeFloat#getSize()
+	 * @see #getTypeFloat()
+	 * @generated
+	 */
+	EAttribute getTypeFloat_Size();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.TypeInt <em>Type Int</em>}'.
