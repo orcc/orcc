@@ -42,6 +42,8 @@ import net.sf.orcc.ir.util.TypePrinter;
  * This class defines a Java type printer.
  * 
  * @author Matthieu Wipliez
+ * @author Antoine Lorence
+ * @author Herve Yyviquel
  * 
  */
 public class JavaTypePrinter extends TypePrinter {
@@ -59,10 +61,17 @@ public class JavaTypePrinter extends TypePrinter {
 
 	@Override
 	public String caseTypeFloat(TypeFloat type) {
-		if (type.getSize() == 64) {
-			return "double";
+		if (EcoreHelper.getContainerOfType(type, Port.class) == null) {
+			if (type.getSize() == 64) {
+				return "double";
+			}
+			return "float";
+		} else {
+			if (type.getSize() == 64) {
+				return "Double";
+			}
+			return "Float";
 		}
-		return "float";
 	}
 
 	@Override
