@@ -105,7 +105,7 @@ public class ValueUtil {
 			return Array.newInstance(Boolean.TYPE, dimensions);
 		} else if (type.isFloat()) {
 			return Array.newInstance(Float.TYPE, dimensions);
-		} else if (type.isInt()) {
+		} else if (type.isInt() || type.isUint()) {
 			int size = type.getSizeInBits();
 			if (size <= 8) {
 				return Array.newInstance(Byte.TYPE, dimensions);
@@ -114,19 +114,6 @@ public class ValueUtil {
 			} else if (size <= 32) {
 				return Array.newInstance(Integer.TYPE, dimensions);
 			} else if (size <= 64) {
-				return Array.newInstance(Long.TYPE, dimensions);
-			} else {
-				return Array.newInstance(BigInteger.class, dimensions);
-			}
-		} else if (type.isUint()) {
-			int size = type.getSizeInBits();
-			if (size < 8) {
-				return Array.newInstance(Byte.TYPE, dimensions);
-			} else if (size < 16) {
-				return Array.newInstance(Short.TYPE, dimensions);
-			} else if (size < 32) {
-				return Array.newInstance(Integer.TYPE, dimensions);
-			} else if (size < 64) {
 				return Array.newInstance(Long.TYPE, dimensions);
 			} else {
 				return Array.newInstance(BigInteger.class, dimensions);
@@ -259,13 +246,13 @@ public class ValueUtil {
 		} else if (type.isUint()) {
 			int size = type.getSizeInBits();
 			long longVal;
-			if (size < 8) {
+			if (size <= 8) {
 				longVal = ((Byte) value) & 0xFF;
-			} else if (size < 16) {
+			} else if (size <= 16) {
 				longVal = ((Short) value) & 0xFFFF;
-			} else if (size < 32) {
+			} else if (size <= 32) {
 				longVal = ((Integer) value) & 0xFFFFFFFFL;
-			} else if (size < 64) {
+			} else if (size <= 64) {
 				BigInteger bigInt = BigInteger.valueOf((Long) value);
 				return bigInt.and(ONE.shiftLeft(64).subtract(ONE));
 			} else {
@@ -694,7 +681,7 @@ public class ValueUtil {
 		} else if (type.isFloat() && isFloat(value)) {
 			BigDecimal floatVal = (BigDecimal) value;
 			valueToSet = floatVal.floatValue();
-		} else if (type.isInt()) {
+		} else if ((type.isInt() || type.isUint()) && isInt(value)) {
 			BigInteger intVal = (BigInteger) value;
 			int size = type.getSizeInBits();
 			if (size <= 8) {
@@ -704,20 +691,6 @@ public class ValueUtil {
 			} else if (size <= 32) {
 				valueToSet = intVal.intValue();
 			} else if (size <= 64) {
-				valueToSet = intVal.longValue();
-			} else {
-				valueToSet = value;
-			}
-		} else if (type.isUint() && isInt(value)) {
-			BigInteger intVal = (BigInteger) value;
-			int size = type.getSizeInBits();
-			if (size < 8) {
-				valueToSet = intVal.byteValue();
-			} else if (size < 16) {
-				valueToSet = intVal.shortValue();
-			} else if (size < 32) {
-				valueToSet = intVal.intValue();
-			} else if (size < 64) {
 				valueToSet = intVal.longValue();
 			} else {
 				valueToSet = value;
