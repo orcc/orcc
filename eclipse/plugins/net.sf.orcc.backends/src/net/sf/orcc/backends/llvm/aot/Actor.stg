@@ -642,6 +642,19 @@ callInitialize(initialize) ::= <<
 call <initialize.body.returnType> @<initialize.body.name> ()
 >>
 
+initializeFunction() ::= <<
+define void @<instance.name>_initialize() noreturn nounwind {
+	<printCallStartTokenFunctions()>
+	br label %bb_scheduler_start
+	
+bb_scheduler_start:
+<printActionLoop(instance.actor.initializes)>
+bb_finished:
+	<printCallEndTokenFunctions()>
+	ret void
+}
+>>
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Instance
@@ -692,6 +705,8 @@ declare i32 @printf(i8* noalias , ...) nounwind
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Initializes
 <instance.actor.initializes: printAction(); separator="\n\n">
+
+<initializeFunction()>
 <endif>
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

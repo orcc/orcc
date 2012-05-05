@@ -13,12 +13,14 @@ target triple = "x86_64-unknown-linux-gnu"
 
 <network.instances: declareScheduler(); separator="\n">
 <network.entities: declareScheduler(); separator="\n">
+<network.instances: declareInitialize(); separator="\n">
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; The main function - A simple round-robin scheduler
 
 define void @main() noinline noreturn nounwind {
 entry:
+	<network.instances: callInitialize(); separator="\n">
 	br label %loop
 
 loop:
@@ -33,6 +35,12 @@ callScheduler(vertex) ::= <<
 call void @<vertex.name>_scheduler()
 >>
 
+callInitialize(instance) ::= <%
+<if(instance.actor.initializes)>
+call void @<instance.name>_initialize()
+<endif>
+%>
+
 declareFifo(connection) ::= <<
 @fifo_<connection.id>_content = global [<connection.size> x <connection.sourcePort.type>] zeroinitializer, align 32
 @fifo_<connection.id>_rdIndex = global i32 zeroinitializer, align 32
@@ -42,3 +50,9 @@ declareFifo(connection) ::= <<
 declareScheduler(vertex) ::= <<
 declare void @<vertex.name>_scheduler()
 >>
+
+declareInitialize(instance) ::= <%
+<if(instance.actor.initializes)>
+declare void @<instance.name>_initialize()
+<endif>
+%>
