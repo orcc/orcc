@@ -36,7 +36,9 @@ import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstType;
 import net.sf.orcc.cal.cal.AstTypeBool;
+import net.sf.orcc.cal.cal.AstTypeDouble;
 import net.sf.orcc.cal.cal.AstTypeFloat;
+import net.sf.orcc.cal.cal.AstTypeHalf;
 import net.sf.orcc.cal.cal.AstTypeInt;
 import net.sf.orcc.cal.cal.AstTypeList;
 import net.sf.orcc.cal.cal.AstTypeString;
@@ -214,7 +216,17 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 	}
 
 	@Override
+	public Boolean caseAstTypeDouble(AstTypeDouble type) {
+		return false;
+	}
+
+	@Override
 	public Boolean caseAstTypeFloat(AstTypeFloat type) {
+		return false;
+	}
+
+	@Override
+	public Boolean caseAstTypeHalf(AstTypeHalf type) {
 		return false;
 	}
 

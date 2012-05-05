@@ -35,7 +35,9 @@ import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstTypeBool;
+import net.sf.orcc.cal.cal.AstTypeDouble;
 import net.sf.orcc.cal.cal.AstTypeFloat;
+import net.sf.orcc.cal.cal.AstTypeHalf;
 import net.sf.orcc.cal.cal.AstTypeInt;
 import net.sf.orcc.cal.cal.AstTypeList;
 import net.sf.orcc.cal.cal.AstTypeString;
@@ -182,7 +184,17 @@ public class VoidSwitch extends CalSwitch<Void> {
 	}
 
 	@Override
+	public Void caseAstTypeDouble(AstTypeDouble type) {
+		return null;
+	}
+
+	@Override
 	public Void caseAstTypeFloat(AstTypeFloat type) {
+		return null;
+	}
+
+	@Override
+	public Void caseAstTypeHalf(AstTypeHalf type) {
 		return null;
 	}
 
