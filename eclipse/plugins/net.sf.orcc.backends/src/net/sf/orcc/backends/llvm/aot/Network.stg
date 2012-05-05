@@ -5,6 +5,8 @@ target triple = "x86_64-unknown-linux-gnu"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Declare and initialize FIFO variables 
 
+declare void @init_orcc(i32 %argc, i8** %argv)
+
 <network.connections: declareFifo(); separator="\n\n">
 
 
@@ -18,8 +20,9 @@ target triple = "x86_64-unknown-linux-gnu"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; The main function - A simple round-robin scheduler
 
-define void @main() noinline noreturn nounwind {
+define void @main(i32 %argc, i8** %argv) noinline noreturn nounwind {
 entry:
+	call void @init_orcc(i32 %argc, i8** %argv);
 	<network.instances: callInitialize(); separator="\n">
 	br label %loop
 
