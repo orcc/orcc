@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.sf.dftools.util.util.EcoreHelper;
-import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.Instruction;
@@ -54,6 +54,10 @@ import net.sf.orcc.util.WriteListener;
 public class ComplexHwOpDetector extends DfVisitor<Void> {
 
 	private class Detector extends AbstractIrVisitor<Void> {
+		public Detector() {
+			super(true);
+		}
+
 		@Override
 		public Void caseExprBinary(ExprBinary expr) {
 			OpBinary op = expr.getOp();
@@ -84,15 +88,15 @@ public class ComplexHwOpDetector extends DfVisitor<Void> {
 	};
 
 	@Override
-	public Void caseActor(Actor actor) {
+	public Void caseInstance(Instance instance) {
 		detectedOps = new HashSet<OpBinary>();
 		operationsLines = new ArrayList<Integer>();
 
-		super.caseActor(actor);
+		super.caseInstance(instance);
 
 		if (!detectedOps.isEmpty()) {
 			writeListener.writeText("Warning: " + detectedOps.toString()
-					+ " operation(s) detected in " + actor.getName()
+					+ " operation(s) detected in " + instance.getName()
 					+ " at line(s) " + operationsLines.toString() + ".\n");
 		}
 		return null;
