@@ -54,7 +54,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  * @author Hervé Yviquel
  * 
  */
-public class Instantiator extends DfSwitch<Network> {
+public class Instantiator extends DfSwitch<Void> {
 
 	static String BUFFER_SIZE = Connection.BUFFER_SIZE;
 
@@ -80,7 +80,7 @@ public class Instantiator extends DfSwitch<Network> {
 	}
 
 	@Override
-	public Network caseNetwork(Network network) {
+	public Void caseNetwork(Network network) {
 		// copy instances to entities/instances
 		List<Instance> instances = new ArrayList<Instance>(
 				network.getInstances());
@@ -100,8 +100,7 @@ public class Instantiator extends DfSwitch<Network> {
 				connection.setAttribute(BUFFER_SIZE, defaultFifoSize);
 			}
 		}
-
-		return network;
+		return null;
 	}
 
 	private void connect(Copier copier, Instance instance,

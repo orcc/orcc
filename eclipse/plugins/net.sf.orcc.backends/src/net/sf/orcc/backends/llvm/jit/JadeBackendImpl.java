@@ -214,7 +214,7 @@ public class JadeBackendImpl extends AbstractBackend {
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		// instantiate and flattens network
-		network = new Instantiator().doSwitch(network);
+		new Instantiator().doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
 
 		// print network

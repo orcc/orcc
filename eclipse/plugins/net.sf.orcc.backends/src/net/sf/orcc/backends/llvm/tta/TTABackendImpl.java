@@ -51,7 +51,6 @@ import net.sf.orcc.backends.llvm.tta.architecture.DesignConfiguration;
 import net.sf.orcc.backends.llvm.tta.architecture.Processor;
 import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureBuilder;
 import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitecturePrinter;
-import net.sf.orcc.backends.llvm.tta.transformations.ComplexHwOpDetector;
 import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.backends.transformations.EmptyBlockRemover;
 import net.sf.orcc.backends.transformations.InstPhiTransformation;
@@ -136,12 +135,10 @@ public class TTABackendImpl extends LLVMBackendImpl {
 	@Override
 	protected Network doTransformNetwork(Network network) throws OrccException {
 		write("Transform the network...\n");
-		network = new Instantiator(fifoSize).doSwitch(network);
 
-		DfSwitch<?>[] transformations = { new NetworkFlattener(),
-				new BroadcastAdder(), new TypeResizer(true, true, false),
-				new UnitImporter(),
-				new ComplexHwOpDetector(getWriteListener()),
+		DfSwitch<?>[] transformations = { new Instantiator(fifoSize),
+				new NetworkFlattener(), new BroadcastAdder(),
+				new TypeResizer(true, true, false), new UnitImporter(),
 				new DfVisitor<Void>(new SSATransformation()),
 				new BoolToIntTransformation(), new StringTransformation(),
 				new RenameTransformation(this.transformations),

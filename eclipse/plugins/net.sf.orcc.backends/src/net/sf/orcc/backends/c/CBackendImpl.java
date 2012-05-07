@@ -213,7 +213,7 @@ public class CBackendImpl extends AbstractBackend {
 
 		// instantiate and flattens network
 		write("Instantiating...\n");
-		network = new Instantiator(fifoSize).doSwitch(network);
+		new Instantiator(fifoSize).doSwitch(network);
 		write("Flattening...\n");
 		new NetworkFlattener().doSwitch(network);
 

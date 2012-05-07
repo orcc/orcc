@@ -121,11 +121,9 @@ public class LLVMBackendImpl extends AbstractBackend {
 	}
 
 	protected Network doTransformNetwork(Network network) throws OrccException {
-		network = new Instantiator(fifoSize).doSwitch(network);
-
-		DfSwitch<?>[] transformations = { new NetworkFlattener(),
-				new BroadcastAdder(), new TypeResizer(true, true, false),
-				new UnitImporter(),
+		DfSwitch<?>[] transformations = { new Instantiator(fifoSize),
+				new NetworkFlattener(), new BroadcastAdder(),
+				new TypeResizer(true, true, false), new UnitImporter(),
 				new DfVisitor<Void>(new SSATransformation()),
 				new DeadGlobalElimination(),
 				new DfVisitor<Void>(new DeadCodeElimination()),
@@ -151,8 +149,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		network.computeTemplateMaps();
 
 		for (Actor actor : network.getAllActors()) {
-			actor.setTemplateData(new LLVMTemplateData()
-					.compute(actor));
+			actor.setTemplateData(new LLVMTemplateData().compute(actor));
 		}
 
 		return network;

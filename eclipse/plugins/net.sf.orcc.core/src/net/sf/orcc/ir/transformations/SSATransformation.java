@@ -329,6 +329,7 @@ public class SSATransformation extends AbstractIrVisitor<Void> {
 	public Void caseProcedure(Procedure procedure) {
 		definitions.clear();
 		uses.clear();
+		branch = 0;
 		return super.caseProcedure(procedure);
 	}
 

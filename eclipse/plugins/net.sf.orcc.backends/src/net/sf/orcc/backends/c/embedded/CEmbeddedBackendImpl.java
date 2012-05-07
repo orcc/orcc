@@ -108,7 +108,7 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 		network.setTemplateData(data);
 
 		// instantiate and flattens network
-		network = new Instantiator(fifoSize).doSwitch(network);
+		new Instantiator(fifoSize).doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
 
 		// The classification gives production and consumption information from

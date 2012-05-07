@@ -381,7 +381,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 		if (xdfFile != null) {
 			ResourceSet set = new ResourceSetImpl();
 			network = EcoreHelper.getEObject(set, xdfFile);
-			network = new Instantiator().doSwitch(network);
+			new Instantiator().doSwitch(network);
 
 			Set<String> instances = new HashSet<String>();
 			for (Instance instance : network.getInstances()) {

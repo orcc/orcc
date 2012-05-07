@@ -250,7 +250,7 @@ public class SlowSimulator extends AbstractSimulator {
 			Network network = EcoreHelper.getEObject(set, file);
 
 			// instantiate and flattens network
-			network = new Instantiator().doSwitch(network);
+			new Instantiator().doSwitch(network);
 			new NetworkFlattener().doSwitch(network);
 
 			// Parse XDF file, do some transformations and return the
