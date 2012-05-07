@@ -81,7 +81,7 @@ static int compareYUV_compareComponent(const int x_size, const int y_size,
 								12, 13, 10, 11, 14, 15};
 							const unsigned int blkIdx = inverse4x4Tab[blkIdxX +
 								4*blkIdxY];
-							printf("\nerror %3d instead of %3d at position : mb=(%d;%d) , loc_in_mb=(%d;%d) , blk: %d",
+							fprintf(stderr, "\nerror %3d instead of %3d at position : mb=(%d;%d) , loc_in_mb=(%d;%d) , blk: %d",
 								test_img_uchar[Idx_pix] , true_img_uchar
 								[Idx_pix], blk_x, blk_y, pix_x, pix_y, blkIdx);
 						}
@@ -92,7 +92,7 @@ static int compareYUV_compareComponent(const int x_size, const int y_size,
 	}
 
 	if (error != 0) {
-		printf("\n%d error(s) in %c Component !!!!!!!!!!!!!\n", error, Component_Type);
+		fprintf(stderr, "\n%d error(s) in %c Component !!!!!!!!!!!!!\n", error, Component_Type);
 	}
 	return error;
 }
@@ -109,7 +109,7 @@ void compareYUV_init()
 	useCompare = 1;
 	ptrFile = fopen(yuv_file, "rb");
 	if (ptrFile == NULL) {
-		printf("Cannot open yuv_file concatenated input file '%s' for reading\n", yuv_file);
+		fprintf(stderr, "Cannot open yuv_file concatenated input file '%s' for reading\n", yuv_file);
 		exit(-1);
 	}
 

@@ -58,6 +58,12 @@ void wait_for_key();
 // print usage
 void print_usage();
 
+#define DISPLAY_DISABLE 0
+#define DISPLAY_READY 1
+#define DISPLAY_ENABLE 2
+
+#define DEFAULT_INFINITE_LOOP -1
+
 // specific to Microsoft Visual Studio
 // disable warnings about fopen
 #define _CRT_SECURE_NO_WARNINGS

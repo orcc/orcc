@@ -31,25 +31,53 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 
+// from APR
+/* Ignore Microsoft's interpretation of secure development
+ * and the POSIX string handling API
+ */
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+#ifndef _CRT_SECURE_NO_DEPRECATE
+#define _CRT_SECURE_NO_DEPRECATE
+#endif
+#pragma warning(disable: 4996)
+#endif
 
-int openFile(char* filename) {
+long openFile(char* filename) {
 	FILE* fd = NULL;
-	fd = fopen(filename,"wb");
+	fd = fopen(filename,"r+b");
 	if(fd == NULL) {
 		fprintf(stderr, "Error during opening of %s\n", filename);
 		exit(-2);
 	}
-	return (int)fd;
+	return (long)fd;
 }
 
-void writeByte(int desc, char value ) {
+void writeByte(long desc, char value ) {
 	FILE* fd = (FILE*) desc;
 
 	fwrite(&value, 1, 1, fd);
 }
 
-int closeFile(int desc) {
+int closeFile(long desc) {
 	FILE* fd = (FILE*) desc;
 	return fclose(fd);
+}
+
+int sizeOfFile(long desc){
+	FILE* fd = (FILE*) desc;
+	struct stat st; 
+	fstat(fileno(fd), &st); 
+	return st.st_size;
+}
+
+unsigned char readByte(long desc){
+	FILE* fd = (FILE*) desc;
+	unsigned char buf[1];
+	int n = fread(&buf, 1, 1,fd);
+	if (n < 1) {
+		fprintf(stderr,"Problem when reading input file.\n");
+	}
+	return buf[0];
 }

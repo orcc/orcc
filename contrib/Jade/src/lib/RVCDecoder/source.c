@@ -53,6 +53,8 @@ static int nbTokenSend;
 extern int nalState;
 
 int* stopVar;
+// count number of times file were read
+unsigned int loopsCount;
 
 void printSpeed(void) {
 }
@@ -111,6 +113,13 @@ void source_readNBytes(unsigned char *outTable, unsigned short nbTokenToRead){
 	}
 }
 
+void source_decrementNbLoops(){
+	--loopsCount;
+}
+
+int source_isMaxLoopsReached(){
+	return nbLoops != DEFAULT_INFINITE_LOOP && loopsCount <= 0;
+}
 
 void source_prepare(unsigned char* nal, int nal_length){
 	data = nal;

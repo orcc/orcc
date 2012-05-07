@@ -58,15 +58,17 @@ static clock_t startTime;
 static unsigned int nbByteRead = 0;
 
 int* stopVar;
+// count number of times file were read
+unsigned int loopsCount;
 
 void printSpeed(void) {
 	double executionTime;
-	int speed;
+	double speed;
 
 	executionTime = (double)(clock() - startTime)/CLOCKS_PER_SEC;
 	speed = nbByteRead / executionTime;
 	speed /= 1024;
-	printf("Speed : %ld Kib/s\n",speed);
+	printf("Speed : %f Kib/s\n",speed);
 }
 
 // Called before any *_scheduler function.
@@ -95,11 +97,12 @@ void source_init() {
 		atexit(printSpeed);
 	}
 	startTime = clock();
+	loopsCount = nbLoops;
 }
 
 unsigned int source_getNbLoop(void)
 {
-		return nbLoops;
+	return nbLoops;
 }
 
 void source_exit(int exitCode)
@@ -177,3 +180,13 @@ void source_readNBytes(unsigned char *outTable, unsigned int nbTokenToRead){
 	}
 	nbByteRead += nbTokenToRead * 8;
 }
+
+void source_decrementNbLoops(){
+	--loopsCount;
+}
+
+int source_isMaxLoopsReached(){
+	return nbLoops != DEFAULT_INFINITE_LOOP && loopsCount <= 0;
+}
+
+

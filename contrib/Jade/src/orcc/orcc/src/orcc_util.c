@@ -48,15 +48,11 @@
 	#endif
 #endif
 
-#define DISPLAY_DISABLE 0
-#define DISPLAY_READY 1
-#define DISPLAY_ENABLE 2
-
 extern char	*optarg;
 extern int getopt(int nargc, char * const *nargv, const char *ostr);
 
 //Nb Loops
-unsigned int nbLoops = 1;
+unsigned int nbLoops = DEFAULT_INFINITE_LOOP; // -1: infinite loop.
 
 // input file
 char *input_file;
@@ -145,9 +141,6 @@ void init_orcc(int argc, char *argv[]) {
 			break;
 		case 'l':
 			nbLoops = strtoul(optarg, NULL, 10);
-			if(nbLoops == 0) {
-				nbLoops = 1;
-			}
 			break;
 		case 'm':
 			mapping_file = strdup(optarg);

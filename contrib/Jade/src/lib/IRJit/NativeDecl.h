@@ -69,6 +69,8 @@ extern "C"{
 	extern unsigned int source_getNbLoop(void);
 	extern void source_exit(int exitCode);
 	extern unsigned int source_readByte();
+	extern void source_isMaxLoopsReached();
+	extern void source_decrementNbLoops();
 
 	//Extern functions for writer
 	extern void Writer_init();
@@ -104,7 +106,9 @@ std::map<std::string, void*> createNativeMap()
 	native["source_getNbLoop"] = (void*)source_getNbLoop;
 	native["source_exit"] = (void*)source_exit;
 	native["source_readByte"] = (void*)source_readByte;
-	
+	native["source_isMaxLoopsReached"] = (void*)source_isMaxLoopsReached;
+	native["source_decrementNbLoops"] = (void*)source_decrementNbLoops;
+
 	native["Writer_init"] = (void*)Writer_init;
 	native["Writer_write"] = (void*)Writer_write;
 	native["Writer_close"] = (void*)Writer_close;

@@ -80,7 +80,7 @@ static void displayYUV_setSize(int width, int height) {
 
 void displayYUV_displayPicture(unsigned char *pictureBufferY,
 		unsigned char *pictureBufferU, unsigned char *pictureBufferV,
-		unsigned short   pictureWidth, unsigned short pictureHeight) {
+		unsigned int   pictureWidth, unsigned int pictureHeight) {
 	static unsigned int lastWidth = 0;
 	static unsigned int lastHeight = 0;
 	SDL_Event event;
@@ -194,7 +194,7 @@ char clip255(int value) {
 void  convertYUV444_to_RGB(unsigned char *pictureBufferY,
 	unsigned char *pictureBufferU, unsigned char *pictureBufferV,
 	unsigned int   pictureWidth, unsigned int pictureHeight) {
-	int h, w, tmp;
+	unsigned int h, w;
 	int red, green, blue;
 	int pixel, idx_pixel;
 	SDL_PixelFormat *format = m_image->format;
