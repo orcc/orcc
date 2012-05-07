@@ -168,7 +168,7 @@ unsigned int source_readByte(){
 }
 
 
-void source_readNBytes(unsigned char *outTable, unsigned short nbTokenToRead){
+void source_readNBytes(unsigned char *outTable, unsigned int nbTokenToRead){
 	int n = fread(outTable, 1, nbTokenToRead, file);
 
 	if(n < nbTokenToRead) {
