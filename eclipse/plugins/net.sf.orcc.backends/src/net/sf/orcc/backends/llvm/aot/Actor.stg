@@ -1,5 +1,5 @@
 printArchitecture() ::= <<
-target triple = "x86_64"
+target triple = "x86_64-apple-darwin11.3.0"
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -426,7 +426,7 @@ checkInputPattern(action, pattern, state=false) ::= <<
 <checkInputPorts(action, first(pattern.ports), rest(pattern.ports), instance.actor.templateData.portToIndexByPatternMap.(pattern), state)>
 >>
 
-actionTest(action, restActions) ::= <<
+actionTest(action, restActions,outsideFSM) ::= <<
 	; ACTION <action.name>
 <if(!action.inputPattern.empty)
 >	;; Input pattern
@@ -459,18 +459,26 @@ endif>
 bb_<action.name>_fire:
 	call void @<action.body.name> ()
 
+<if(outsideFSM)>
+	br label %bb_outside_scheduler_start
+<else>
 	br label %bb_scheduler_start
+<endif>
 
 bb_<action.name>_unschedulable:
 <if(restActions)>
-<actionTest(first(restActions), rest(restActions))>
+<actionTest(first(restActions), rest(restActions),outsideFSM)>
 <else>
-	br label %bb_finished
+	<if(outsideFSM)>
+		br label %bb_outside_finished
+	<else>
+		br label %bb_finished
+	<endif>
 <endif>
 >>
 
-printActionLoop(actions) ::= <<
-<actionTest(first(actions), rest(actions))>
+printActionLoop(actions, outsideFSM) ::= <<
+<actionTest(first(actions), rest(actions), outsideFSM)>
 >>
 
 actionTestState(sourceState, transition, restTransitionsList) ::= <<
@@ -548,15 +556,15 @@ schedulerWithFSM(actions, fsm) ::= <<
 @_FSM_state = internal global i32 <instance.actor.templateData.stateToLabelMap.(fsm.initialState)>
 
 <if(actions)>
-define void @<instance.name>_outside_FSM_scheduler() noreturn nounwind {
+define void @<instance.name>_outside_FSM_scheduler() nounwind {
 entry:
-	br label %bb_scheduler_start
+	br label %bb_outside_scheduler_start
 	
-bb_scheduler_start:
+bb_outside_scheduler_start:
 	;; no read/write here!
-<printActionLoop(actions)>
+<printActionLoop(actions=actions, outsideFSM=true)>
 
-bb_finished:
+bb_outside_finished:
 	;; no read_end/write_end here!
 	ret void
 }
@@ -591,7 +599,7 @@ entry:
 	br label %bb_scheduler_start
 	
 bb_scheduler_start:
-<printActionLoop(instance.actor.actionsOutsideFsm)>
+<printActionLoop(actions=instance.actor.actionsOutsideFsm, outsideFSM=false)>
 bb_finished:
 	<printCallEndTokenFunctions()>
 	ret void
