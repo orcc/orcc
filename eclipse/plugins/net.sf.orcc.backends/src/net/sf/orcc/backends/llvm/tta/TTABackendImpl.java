@@ -51,6 +51,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.DesignConfiguration;
 import net.sf.orcc.backends.llvm.tta.architecture.Processor;
 import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureBuilder;
 import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitecturePrinter;
+import net.sf.orcc.backends.llvm.tta.transformations.ComplexHwOpDetector;
 import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.backends.transformations.EmptyBlockRemover;
 import net.sf.orcc.backends.transformations.InstPhiTransformation;
@@ -151,7 +152,8 @@ public class TTABackendImpl extends LLVMBackendImpl {
 				new DfVisitor<Void>(new EmptyBlockRemover()),
 				new DfVisitor<Void>(new BlockCombine()),
 				new DfVisitor<CfgNode>(new CfgBuilder()),
-				new DfVisitor<Void>(new BlockNumbering()) };
+				new DfVisitor<Void>(new BlockNumbering()),
+				new ComplexHwOpDetector(getWriteListener()) };
 
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(network);
