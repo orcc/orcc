@@ -1,9 +1,9 @@
 package net.sf.orcc.backends;
 
-import net.sf.orcc.df.Actor;
+import org.eclipse.emf.ecore.EObject;
 
 public interface TemplateData {
 
-	TemplateData compute(Actor actor);
+	TemplateData compute(EObject object);
 
 }

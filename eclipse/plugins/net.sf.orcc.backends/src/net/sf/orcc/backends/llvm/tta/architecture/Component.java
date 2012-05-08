@@ -55,6 +55,30 @@ import org.eclipse.emf.common.util.EList;
  */
 public interface Component extends Vertex {
 
+	void addInput(Port port);
+
+	void addOutput(Port port);
+
+	Map<Port, Link> getIncomingPortMap();
+
+	/**
+	 * Returns the value of the '<em><b>Inputs</b></em>' containment reference
+	 * list. The list contents are of type
+	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Port}. <!--
+	 * begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Inputs</em>' containment reference list isn't
+	 * clear, there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * 
+	 * @return the value of the '<em>Inputs</em>' containment reference list.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getComponent_Inputs()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Port> getInputs();
+
 	/**
 	 * Returns the value of the '<em><b>Name</b></em>' attribute. <!--
 	 * begin-user-doc -->
@@ -72,15 +96,27 @@ public interface Component extends Vertex {
 	 */
 	String getName();
 
-	Map<Port, Link> getIncomingPortMap();
+	Map<Port, Link> getOutgoingPortMap();
 
-	void addInput(Port port);
-
-	void addOutput(Port port);
+	/**
+	 * Returns the value of the '<em><b>Outputs</b></em>' containment reference
+	 * list. The list contents are of type
+	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Port}. <!--
+	 * begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Outputs</em>' containment reference list isn't
+	 * clear, there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * 
+	 * @return the value of the '<em>Outputs</em>' containment reference list.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getComponent_Outputs()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Port> getOutputs();
 
 	boolean isProcessor();
-
-	Map<Port, Link> getOutgoingPortMap();
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Component#getName <em>Name</em>}' attribute.
@@ -91,37 +127,4 @@ public interface Component extends Vertex {
 	 */
 	void setName(String value);
 
-	/**
-	 * Returns the value of the '<em><b>Inputs</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.Port}.
-	 * <!-- begin-user-doc
-	 * -->
-	 * <p>
-	 * If the meaning of the '<em>Inputs</em>' containment reference list isn't
-	 * clear, there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Inputs</em>' containment reference list.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getComponent_Inputs()
-	 * @model containment="true"
-	 * @generated
-	 */
-	EList<Port> getInputs();
-
-	/**
-	 * Returns the value of the '<em><b>Outputs</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.Port}.
-	 * <!-- begin-user-doc
-	 * -->
-	 * <p>
-	 * If the meaning of the '<em>Outputs</em>' containment reference list isn't
-	 * clear, there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Outputs</em>' containment reference list.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getComponent_Outputs()
-	 * @model containment="true"
-	 * @generated
-	 */
-	EList<Port> getOutputs();
 } // Component

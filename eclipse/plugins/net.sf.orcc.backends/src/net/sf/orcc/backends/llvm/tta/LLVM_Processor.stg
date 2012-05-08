@@ -31,7 +31,11 @@ declareBuffer(buffer) ::= <<
 >>
 
 declareFifo(connection) ::= <<
-@fifo_<connection.id>_content = addrspace(<buffer.id>) global [<connection.size> x <connection.sourcePort.type>] zeroinitializer, align 32
-@fifo_<connection.id>_rdIndex = addrspace(<buffer.id>) global i32 zeroinitializer, align 32
-@fifo_<connection.id>_wrIndex = addrspace(<buffer.id>) global i32 zeroinitializer, align 32
+@fifo_<connection.id>_content = addrspace(<getAddressSpace(processor, buffer)>) global [<connection.size> x <connection.sourcePort.type>] zeroinitializer, align 32
+@fifo_<connection.id>_rdIndex = addrspace(<getAddressSpace(processor, buffer)>) global i32 zeroinitializer, align 32
+@fifo_<connection.id>_wrIndex = addrspace(<getAddressSpace(processor, buffer)>) global i32 zeroinitializer, align 32
+>>
+
+getAddressSpace(processor, buffer) ::= <<
+<processor.templateData.bufferToIdMap.(buffer)>
 >>

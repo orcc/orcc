@@ -49,6 +49,7 @@ import net.sf.orcc.moc.QSDFMoC;
 import net.sf.orcc.moc.SDFMoC;
 
 import org.eclipse.emf.common.util.EMap;
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class computes a map for inserting metadata information into LLVM
@@ -151,7 +152,8 @@ public class JadeTemplateData extends LLVMTemplateData {
 	}
 
 	@Override
-	public TemplateData compute(Actor actor) {
+	public TemplateData compute(EObject object) {
+		Actor actor = (Actor) object;
 		computeMetadataMaps(actor);
 		return super.compute(actor);
 	}

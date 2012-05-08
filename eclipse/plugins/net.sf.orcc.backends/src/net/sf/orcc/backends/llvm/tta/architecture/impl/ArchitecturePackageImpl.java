@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.llvm.tta.architecture.impl;
 
-
 import java.util.Map;
 
 import net.sf.dftools.graph.GraphPackage;

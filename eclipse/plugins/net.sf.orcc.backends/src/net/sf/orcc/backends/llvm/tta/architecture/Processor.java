@@ -31,13 +31,13 @@
 package net.sf.orcc.backends.llvm.tta.architecture;
 
 import net.sf.dftools.graph.Vertex;
+import net.sf.orcc.backends.TemplateData;
 
 import org.eclipse.emf.common.util.EList;
 
 /**
- * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>Processor</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> A representation of the model object '
+ * <em><b>Processor</b></em>'. <!-- end-user-doc -->
  *
  * <p>
  * The following features are supported:
@@ -62,56 +62,16 @@ import org.eclipse.emf.common.util.EList;
  */
 public interface Processor extends Component {
 	/**
-	 * Returns the value of the '<em><b>Gcu</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Bridges</b></em>' containment reference
+	 * list. The list contents are of type
+	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Bridge}. <!--
+	 * begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Gcu</em>' containment reference isn't clear,
-	 * there really should be more of a description here...
+	 * If the meaning of the '<em>Bridges</em>' containment reference list isn't
+	 * clear, there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Gcu</em>' containment reference.
-	 * @see #setGcu(GlobalControlUnit)
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_Gcu()
-	 * @model containment="true"
-	 * @generated
-	 */
-	GlobalControlUnit getGcu();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getGcu <em>Gcu</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Gcu</em>' containment reference.
-	 * @see #getGcu()
-	 * @generated
-	 */
-	void setGcu(GlobalControlUnit value);
-
-	/**
-	 * Returns the value of the '<em><b>Buses</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.Bus}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Buses</em>' containment reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Buses</em>' containment reference list.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_Buses()
-	 * @model containment="true"
-	 * @generated
-	 */
-	EList<Bus> getBuses();
-
-	/**
-	 * Returns the value of the '<em><b>Bridges</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.Bridge}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Bridges</em>' containment reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Bridges</em>' containment reference list.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_Bridges()
 	 * @model containment="true"
@@ -120,136 +80,22 @@ public interface Processor extends Component {
 	EList<Bridge> getBridges();
 
 	/**
-	 * Returns the value of the '<em><b>Sockets</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.Socket}.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Buses</b></em>' containment reference
+	 * list. The list contents are of type
+	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Bus}. <!--
+	 * begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Sockets</em>' containment reference list isn't clear,
-	 * there really should be more of a description here...
+	 * If the meaning of the '<em>Buses</em>' containment reference list isn't
+	 * clear, there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Sockets</em>' containment reference list.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_Sockets()
+	 * 
+	 * @return the value of the '<em>Buses</em>' containment reference list.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_Buses()
 	 * @model containment="true"
 	 * @generated
 	 */
-	EList<Socket> getSockets();
-
-	/**
-	 * Returns the value of the '<em><b>Function Units</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Function Units</em>' containment reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Function Units</em>' containment reference list.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_FunctionUnits()
-	 * @model containment="true"
-	 * @generated
-	 */
-	EList<FunctionUnit> getFunctionUnits();
-
-	/**
-	 * Returns the value of the '<em><b>Register Files</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.RegisterFile}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Register Files</em>' containment reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Register Files</em>' containment reference list.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_RegisterFiles()
-	 * @model containment="true"
-	 * @generated
-	 */
-	EList<RegisterFile> getRegisterFiles();
-
-	/**
-	 * Returns the value of the '<em><b>Program</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Program</em>' containment reference isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Program</em>' containment reference.
-	 * @see #setProgram(AddressSpace)
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_Program()
-	 * @model containment="true"
-	 * @generated
-	 */
-	AddressSpace getProgram();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getProgram <em>Program</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Program</em>' containment reference.
-	 * @see #getProgram()
-	 * @generated
-	 */
-	void setProgram(AddressSpace value);
-
-	/**
-	 * Returns the value of the '<em><b>Data</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Data</em>' containment reference isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Data</em>' containment reference.
-	 * @see #setData(AddressSpace)
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_Data()
-	 * @model containment="true"
-	 * @generated
-	 */
-	AddressSpace getData();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getData <em>Data</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Data</em>' containment reference.
-	 * @see #getData()
-	 * @generated
-	 */
-	void setData(AddressSpace value);
-
-	/**
-	 * Returns the value of the '<em><b>Hardware Database</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.Implementation}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Hardware Database</em>' containment reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Hardware Database</em>' containment reference list.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_HardwareDatabase()
-	 * @model containment="true"
-	 * @generated
-	 */
-	EList<Implementation> getHardwareDatabase();
-
-	/**
-	 * Returns the value of the '<em><b>Mapped Actors</b></em>' reference list.
-	 * The list contents are of type {@link net.sf.dftools.graph.Vertex}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Mapped Actors</em>' reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Mapped Actors</em>' reference list.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_MappedActors()
-	 * @model
-	 * @generated
-	 */
-	EList<Vertex> getMappedActors();
+	EList<Bus> getBuses();
 
 	/**
 	 * Returns the value of the '<em><b>Configuration</b></em>' attribute.
@@ -270,14 +116,188 @@ public interface Processor extends Component {
 	ProcessorConfiguration getConfiguration();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getConfiguration <em>Configuration</em>}' attribute.
+	 * Returns the value of the '<em><b>Data</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Data</em>' containment reference isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
 	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Data</em>' containment reference.
+	 * @see #setData(AddressSpace)
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_Data()
+	 * @model containment="true"
+	 * @generated
+	 */
+	AddressSpace getData();
+
+	/**
+	 * Returns the value of the '<em><b>Function Units</b></em>' containment
+	 * reference list. The list contents are of type
+	 * {@link net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit}. <!--
+	 * begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Function Units</em>' containment reference
+	 * list isn't clear, there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * 
+	 * @return the value of the '<em>Function Units</em>' containment reference
+	 *         list.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_FunctionUnits()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<FunctionUnit> getFunctionUnits();
+
+	/**
+	 * Returns the value of the '<em><b>Gcu</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Gcu</em>' containment reference isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Gcu</em>' containment reference.
+	 * @see #setGcu(GlobalControlUnit)
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_Gcu()
+	 * @model containment="true"
+	 * @generated
+	 */
+	GlobalControlUnit getGcu();
+
+	/**
+	 * Returns the value of the '<em><b>Hardware Database</b></em>' containment
+	 * reference list. The list contents are of type
+	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Implementation}. <!--
+	 * begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Hardware Database</em>' containment reference
+	 * list isn't clear, there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * 
+	 * @return the value of the '<em>Hardware Database</em>' containment
+	 *         reference list.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_HardwareDatabase()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Implementation> getHardwareDatabase();
+
+	/**
+	 * Returns the value of the '<em><b>Mapped Actors</b></em>' reference list.
+	 * The list contents are of type {@link net.sf.dftools.graph.Vertex}. <!--
+	 * begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Mapped Actors</em>' reference list isn't
+	 * clear, there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * 
+	 * @return the value of the '<em>Mapped Actors</em>' reference list.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_MappedActors()
+	 * @model
+	 * @generated
+	 */
+	EList<Vertex> getMappedActors();
+
+	/**
+	 * Returns the value of the '<em><b>Program</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Program</em>' containment reference isn't
+	 * clear, there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Program</em>' containment reference.
+	 * @see #setProgram(AddressSpace)
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_Program()
+	 * @model containment="true"
+	 * @generated
+	 */
+	AddressSpace getProgram();
+
+	/**
+	 * Returns the value of the '<em><b>Register Files</b></em>' containment
+	 * reference list. The list contents are of type
+	 * {@link net.sf.orcc.backends.llvm.tta.architecture.RegisterFile}. <!--
+	 * begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Register Files</em>' containment reference
+	 * list isn't clear, there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * 
+	 * @return the value of the '<em>Register Files</em>' containment reference
+	 *         list.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_RegisterFiles()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<RegisterFile> getRegisterFiles();
+
+	/**
+	 * Returns the value of the '<em><b>Sockets</b></em>' containment reference
+	 * list. The list contents are of type
+	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Socket}. <!--
+	 * begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Sockets</em>' containment reference list isn't
+	 * clear, there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * 
+	 * @return the value of the '<em>Sockets</em>' containment reference list.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_Sockets()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Socket> getSockets();
+
+	TemplateData getTemplateData();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getConfiguration <em>Configuration</em>}' attribute.
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @param value the new value of the '<em>Configuration</em>' attribute.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ProcessorConfiguration
 	 * @see #getConfiguration()
 	 * @generated
 	 */
 	void setConfiguration(ProcessorConfiguration value);
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getData <em>Data</em>}' containment reference.
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
+	 * @param value the new value of the '<em>Data</em>' containment reference.
+	 * @see #getData()
+	 * @generated
+	 */
+	void setData(AddressSpace value);
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getGcu <em>Gcu</em>}' containment reference.
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
+	 * @param value the new value of the '<em>Gcu</em>' containment reference.
+	 * @see #getGcu()
+	 * @generated
+	 */
+	void setGcu(GlobalControlUnit value);
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getProgram <em>Program</em>}' containment reference.
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
+	 * @param value the new value of the '<em>Program</em>' containment reference.
+	 * @see #getProgram()
+	 * @generated
+	 */
+	void setProgram(AddressSpace value);
+
+	void setTemplateData(TemplateData templateData);
 
 } // Processor

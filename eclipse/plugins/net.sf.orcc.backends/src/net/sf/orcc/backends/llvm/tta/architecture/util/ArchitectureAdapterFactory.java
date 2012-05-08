@@ -76,22 +76,21 @@ import org.eclipse.emf.ecore.EObject;
  * <!-- begin-user-doc --> The <b>Adapter Factory</b> for the model. It provides
  * an adapter <code>createXXX</code> method for each class of the model. <!--
  * end-user-doc -->
- * 
  * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage
  * @generated
  */
 public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	/**
-	 * The cached model package. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached model package.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected static ArchitecturePackage modelPackage;
 
 	/**
-	 * Creates an instance of the adapter factory. <!-- begin-user-doc --> <!--
+	 * Creates an instance of the adapter factory.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public ArchitectureAdapterFactory() {
@@ -105,7 +104,6 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	 * <!-- begin-user-doc --> This implementation returns <code>true</code> if
 	 * the object is either the model's package or is an instance object of the
 	 * model. <!-- end-user-doc -->
-	 * 
 	 * @return whether this factory is applicable for the type of the object.
 	 * @generated
 	 */
@@ -314,11 +312,10 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	};
 
 	/**
-	 * Creates an adapter for the <code>target</code>. <!-- begin-user-doc -->
+	 * Creates an adapter for the <code>target</code>.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * 
-	 * @param target
-	 *            the object to adapt.
+	 * @param target the object to adapt.
 	 * @return the adapter for the <code>target</code>.
 	 * @generated
 	 */
@@ -328,12 +325,10 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Design <em>Design</em>}
-	 * '. <!-- begin-user-doc --> This default implementation returns null so
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.llvm.tta.architecture.Design <em>Design</em>}'.
+	 * <!-- begin-user-doc --> This default implementation returns null so
 	 * that we can easily ignore cases; it's useful to ignore a case when
 	 * inheritance will catch all the cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.Design
 	 * @generated
@@ -343,12 +338,10 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Link <em>Link</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.llvm.tta.architecture.Link <em>Link</em>}'.
 	 * <!-- begin-user-doc --> This default implementation returns null so that
 	 * we can easily ignore cases; it's useful to ignore a case when inheritance
 	 * will catch all the cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.Link
 	 * @generated
@@ -358,12 +351,10 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Signal <em>Signal</em>}
-	 * '. <!-- begin-user-doc --> This default implementation returns null so
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.llvm.tta.architecture.Signal <em>Signal</em>}'.
+	 * <!-- begin-user-doc --> This default implementation returns null so
 	 * that we can easily ignore cases; it's useful to ignore a case when
 	 * inheritance will catch all the cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.Signal
 	 * @generated
@@ -389,12 +380,10 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Buffer <em>Buffer</em>}
-	 * '. <!-- begin-user-doc --> This default implementation returns null so
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.llvm.tta.architecture.Buffer <em>Buffer</em>}'.
+	 * <!-- begin-user-doc --> This default implementation returns null so
 	 * that we can easily ignore cases; it's useful to ignore a case when
 	 * inheritance will catch all the cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.Buffer
 	 * @generated
@@ -420,12 +409,10 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Bus <em>Bus</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.llvm.tta.architecture.Bus <em>Bus</em>}'.
 	 * <!-- begin-user-doc --> This default implementation returns null so that
 	 * we can easily ignore cases; it's useful to ignore a case when inheritance
 	 * will catch all the cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.Bus
 	 * @generated
@@ -435,12 +422,10 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Bridge <em>Bridge</em>}
-	 * '. <!-- begin-user-doc --> This default implementation returns null so
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.llvm.tta.architecture.Bridge <em>Bridge</em>}'.
+	 * <!-- begin-user-doc --> This default implementation returns null so
 	 * that we can easily ignore cases; it's useful to ignore a case when
 	 * inheritance will catch all the cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.Bridge
 	 * @generated
@@ -466,13 +451,11 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.GlobalControlUnit
-	 * <em>Global Control Unit</em>}'. <!-- begin-user-doc --> This default
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.llvm.tta.architecture.GlobalControlUnit <em>Global Control Unit</em>}'.
+	 * <!-- begin-user-doc --> This default
 	 * implementation returns null so that we can easily ignore cases; it's
 	 * useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.GlobalControlUnit
 	 * @generated
@@ -482,13 +465,11 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit
-	 * <em>Function Unit</em>}'. <!-- begin-user-doc --> This default
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit <em>Function Unit</em>}'.
+	 * <!-- begin-user-doc --> This default
 	 * implementation returns null so that we can easily ignore cases; it's
 	 * useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit
 	 * @generated
@@ -498,13 +479,11 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.RegisterFile
-	 * <em>Register File</em>}'. <!-- begin-user-doc --> This default
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.llvm.tta.architecture.RegisterFile <em>Register File</em>}'.
+	 * <!-- begin-user-doc --> This default
 	 * implementation returns null so that we can easily ignore cases; it's
 	 * useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.RegisterFile
 	 * @generated
@@ -530,12 +509,10 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Port <em>Port</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.llvm.tta.architecture.Port <em>Port</em>}'.
 	 * <!-- begin-user-doc --> This default implementation returns null so that
 	 * we can easily ignore cases; it's useful to ignore a case when inheritance
 	 * will catch all the cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.Port
 	 * @generated
@@ -545,12 +522,10 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Socket <em>Socket</em>}
-	 * '. <!-- begin-user-doc --> This default implementation returns null so
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.llvm.tta.architecture.Socket <em>Socket</em>}'.
+	 * <!-- begin-user-doc --> This default implementation returns null so
 	 * that we can easily ignore cases; it's useful to ignore a case when
 	 * inheritance will catch all the cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.Socket
 	 * @generated
@@ -576,13 +551,11 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.AddressSpace
-	 * <em>Address Space</em>}'. <!-- begin-user-doc --> This default
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.llvm.tta.architecture.AddressSpace <em>Address Space</em>}'.
+	 * <!-- begin-user-doc --> This default
 	 * implementation returns null so that we can easily ignore cases; it's
 	 * useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.AddressSpace
 	 * @generated
@@ -592,12 +565,10 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Guard <em>Guard</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.llvm.tta.architecture.Guard <em>Guard</em>}'.
 	 * <!-- begin-user-doc --> This default implementation returns null so that
 	 * we can easily ignore cases; it's useful to ignore a case when inheritance
 	 * will catch all the cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.Guard
 	 * @generated
@@ -607,13 +578,11 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.ExprUnary
-	 * <em>Expr Unary</em>}'. <!-- begin-user-doc --> This default
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.llvm.tta.architecture.ExprUnary <em>Expr Unary</em>}'.
+	 * <!-- begin-user-doc --> This default
 	 * implementation returns null so that we can easily ignore cases; it's
 	 * useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ExprUnary
 	 * @generated
@@ -623,13 +592,11 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.ExprBinary
-	 * <em>Expr Binary</em>}'. <!-- begin-user-doc --> This default
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.llvm.tta.architecture.ExprBinary <em>Expr Binary</em>}'.
+	 * <!-- begin-user-doc --> This default
 	 * implementation returns null so that we can easily ignore cases; it's
 	 * useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ExprBinary
 	 * @generated
@@ -655,13 +622,11 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.ExprFalse
-	 * <em>Expr False</em>}'. <!-- begin-user-doc --> This default
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.llvm.tta.architecture.ExprFalse <em>Expr False</em>}'.
+	 * <!-- begin-user-doc --> This default
 	 * implementation returns null so that we can easily ignore cases; it's
 	 * useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ExprFalse
 	 * @generated
@@ -671,12 +636,10 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Term <em>Term</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.llvm.tta.architecture.Term <em>Term</em>}'.
 	 * <!-- begin-user-doc --> This default implementation returns null so that
 	 * we can easily ignore cases; it's useful to ignore a case when inheritance
 	 * will catch all the cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.Term
 	 * @generated
@@ -718,13 +681,11 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Implementation
-	 * <em>Implementation</em>}'. <!-- begin-user-doc --> This default
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.llvm.tta.architecture.Implementation <em>Implementation</em>}'.
+	 * <!-- begin-user-doc --> This default
 	 * implementation returns null so that we can easily ignore cases; it's
 	 * useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.Implementation
 	 * @generated
@@ -734,12 +695,11 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry
-	 * <em>Port To Index Map Entry</em>}'. <!-- begin-user-doc --> This default
+	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Port To Index Map Entry</em>}'.
+	 * <!-- begin-user-doc --> This default
 	 * implementation returns null so that we can easily ignore cases; it's
 	 * useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see java.util.Map.Entry
 	 * @generated
@@ -764,12 +724,11 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.dftools.graph.Edge <em>Edge</em>}'. <!-- begin-user-doc -->
+	 * Creates a new adapter for an object of class '{@link net.sf.dftools.graph.Edge <em>Edge</em>}'.
+	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.dftools.graph.Edge
 	 * @generated
@@ -825,12 +784,10 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Reads <em>Reads</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.llvm.tta.architecture.Reads <em>Reads</em>}'.
 	 * <!-- begin-user-doc --> This default implementation returns null so that
 	 * we can easily ignore cases; it's useful to ignore a case when inheritance
 	 * will catch all the cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.Reads
 	 * @generated
@@ -840,12 +797,10 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Writes <em>Writes</em>}
-	 * '. <!-- begin-user-doc --> This default implementation returns null so
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.llvm.tta.architecture.Writes <em>Writes</em>}'.
+	 * <!-- begin-user-doc --> This default implementation returns null so
 	 * that we can easily ignore cases; it's useful to ignore a case when
 	 * inheritance will catch all the cases anyway. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.Writes
 	 * @generated
@@ -871,13 +826,11 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.ShortImmediate
-	 * <em>Short Immediate</em>}'. <!-- begin-user-doc --> This default
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.llvm.tta.architecture.ShortImmediate <em>Short Immediate</em>}'.
+	 * <!-- begin-user-doc --> This default
 	 * implementation returns null so that we can easily ignore cases; it's
 	 * useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ShortImmediate
 	 * @generated
@@ -887,9 +840,9 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for the default case. <!-- begin-user-doc --> This
+	 * Creates a new adapter for the default case.
+	 * <!-- begin-user-doc --> This
 	 * default implementation returns null. <!-- end-user-doc -->
-	 * 
 	 * @return the new adapter.
 	 * @generated
 	 */

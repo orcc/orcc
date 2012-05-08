@@ -31,6 +31,8 @@ package net.sf.orcc.backends.llvm.tta;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.emf.ecore.EObject;
+
 import net.sf.orcc.backends.TemplateData;
 import net.sf.orcc.backends.llvm.aot.LLVMTemplateData;
 import net.sf.orcc.df.Actor;
@@ -75,7 +77,8 @@ public class TTAActorTemplateData extends LLVMTemplateData {
 	}
 
 	@Override
-	public TemplateData compute(Actor actor) {
+	public TemplateData compute(EObject object) {
+		Actor actor = (Actor) object;
 		computePortToIndexMap(actor);
 		computePortToNeedCastMap(actor);
 		return super.compute(actor);

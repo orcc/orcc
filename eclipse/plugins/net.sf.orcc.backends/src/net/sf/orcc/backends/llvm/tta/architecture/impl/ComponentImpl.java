@@ -96,51 +96,31 @@ public class ComponentImpl extends VertexImpl implements Component {
 		super();
 	}
 
+	@Override
+	public void addInput(Port port) {
+		getInputs().add(port);
+	}
+
+	@Override
+	public void addOutput(Port port) {
+		getOutputs().add(port);
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
-	protected EClass eStaticClass() {
-		return ArchitecturePackage.Literals.COMPONENT;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 */
-	public String getName() {
-		return getLabel();
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 */
-	public void setName(String newName) {
-		setLabel(newName);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Port> getInputs() {
-		if (inputs == null) {
-			inputs = new EObjectContainmentEList<Port>(Port.class, this,
-					ArchitecturePackage.COMPONENT__INPUTS);
+	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+		switch (featureID) {
+		case ArchitecturePackage.COMPONENT__NAME:
+			return getName();
+		case ArchitecturePackage.COMPONENT__INPUTS:
+			return getInputs();
+		case ArchitecturePackage.COMPONENT__OUTPUTS:
+			return getOutputs();
 		}
-		return inputs;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Port> getOutputs() {
-		if (outputs == null) {
-			outputs = new EObjectContainmentEList<Port>(Port.class, this,
-					ArchitecturePackage.COMPONENT__OUTPUTS);
-		}
-		return outputs;
+		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
@@ -165,16 +145,17 @@ public class ComponentImpl extends VertexImpl implements Component {
 	 * @generated
 	 */
 	@Override
-	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 		case ArchitecturePackage.COMPONENT__NAME:
-			return getName();
+			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT
+					.equals(getName());
 		case ArchitecturePackage.COMPONENT__INPUTS:
-			return getInputs();
+			return inputs != null && !inputs.isEmpty();
 		case ArchitecturePackage.COMPONENT__OUTPUTS:
-			return getOutputs();
+			return outputs != null && !outputs.isEmpty();
 		}
-		return super.eGet(featureID, resolve, coreType);
+		return super.eIsSet(featureID);
 	}
 
 	/**
@@ -205,6 +186,15 @@ public class ComponentImpl extends VertexImpl implements Component {
 	 * @generated
 	 */
 	@Override
+	protected EClass eStaticClass() {
+		return ArchitecturePackage.Literals.COMPONENT;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case ArchitecturePackage.COMPONENT__NAME:
@@ -220,24 +210,6 @@ public class ComponentImpl extends VertexImpl implements Component {
 		super.eUnset(featureID);
 	}
 
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-		case ArchitecturePackage.COMPONENT__NAME:
-			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT
-					.equals(getName());
-		case ArchitecturePackage.COMPONENT__INPUTS:
-			return inputs != null && !inputs.isEmpty();
-		case ArchitecturePackage.COMPONENT__OUTPUTS:
-			return outputs != null && !outputs.isEmpty();
-		}
-		return super.eIsSet(featureID);
-	}
-
 	@Override
 	public Map<Port, Link> getIncomingPortMap() {
 		Map<Port, Link> map = new HashMap<Port, Link>();
@@ -248,6 +220,25 @@ public class ComponentImpl extends VertexImpl implements Component {
 			}
 		}
 		return map;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Port> getInputs() {
+		if (inputs == null) {
+			inputs = new EObjectContainmentEList<Port>(Port.class, this,
+					ArchitecturePackage.COMPONENT__INPUTS);
+		}
+		return inputs;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 */
+	public String getName() {
+		return getLabel();
 	}
 
 	@Override
@@ -262,19 +253,28 @@ public class ComponentImpl extends VertexImpl implements Component {
 		return map;
 	}
 
-	@Override
-	public void addInput(Port port) {
-		getInputs().add(port);
-	}
-
-	@Override
-	public void addOutput(Port port) {
-		getOutputs().add(port);
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Port> getOutputs() {
+		if (outputs == null) {
+			outputs = new EObjectContainmentEList<Port>(Port.class, this,
+					ArchitecturePackage.COMPONENT__OUTPUTS);
+		}
+		return outputs;
 	}
 
 	@Override
 	public boolean isProcessor() {
 		return false;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 */
+	public void setName(String newName) {
+		setLabel(newName);
 	}
 
 } // ComponentImpl

@@ -182,6 +182,13 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		// build and print the design
 		path = oldPath;
 		design = new ArchitectureBuilder(conf).caseNetwork(network);
+
+		for (Processor processor : design.getProcessors()) {
+			processor.setTemplateData(new TTAProcessorTemplateData()
+					.compute(processor));
+			printProcessor(processor);
+		}
+
 		printDesign(design);
 
 		if (finalize) {
@@ -190,9 +197,6 @@ public class TTABackendImpl extends LLVMBackendImpl {
 	}
 
 	private void printDesign(Design design) {
-		for (Processor processor : design.getProcessors()) {
-			printProcessor(processor);
-		}
 
 		// VHDL Network of TTA processors
 		ArchitecturePrinter vhdlPrinter = new ArchitecturePrinter(

@@ -33,6 +33,7 @@ package net.sf.orcc.backends.llvm.tta.architecture.impl;
 import java.util.Collection;
 
 import net.sf.dftools.graph.Vertex;
+import net.sf.orcc.backends.TemplateData;
 import net.sf.orcc.backends.llvm.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.llvm.tta.architecture.Bridge;
@@ -98,11 +99,6 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	 * @ordered
 	 */
 	protected EList<Bus> buses;
-
-	@Override
-	public boolean isProcessor() {
-		return true;
-	}
 
 	/**
 	 * The cached value of the '{@link #getBridges() <em>Bridges</em>}' containment reference list.
@@ -204,212 +200,14 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	 */
 	protected ProcessorConfiguration configuration = CONFIGURATION_EDEFAULT;
 
+	protected TemplateData templateData;
+
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected ProcessorImpl() {
 		super();
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	protected EClass eStaticClass() {
-		return ArchitecturePackage.Literals.PROCESSOR;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public GlobalControlUnit getGcu() {
-		return gcu;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NotificationChain basicSetGcu(GlobalControlUnit newGcu,
-			NotificationChain msgs) {
-		GlobalControlUnit oldGcu = gcu;
-		gcu = newGcu;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, ArchitecturePackage.PROCESSOR__GCU,
-					oldGcu, newGcu);
-			if (msgs == null)
-				msgs = notification;
-			else
-				msgs.add(notification);
-		}
-		return msgs;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setGcu(GlobalControlUnit newGcu) {
-		if (newGcu != gcu) {
-			NotificationChain msgs = null;
-			if (gcu != null)
-				msgs = ((InternalEObject) gcu).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE
-								- ArchitecturePackage.PROCESSOR__GCU, null,
-						msgs);
-			if (newGcu != null)
-				msgs = ((InternalEObject) newGcu).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE
-								- ArchitecturePackage.PROCESSOR__GCU, null,
-						msgs);
-			msgs = basicSetGcu(newGcu, msgs);
-			if (msgs != null)
-				msgs.dispatch();
-		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					ArchitecturePackage.PROCESSOR__GCU, newGcu, newGcu));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Bus> getBuses() {
-		if (buses == null) {
-			buses = new EObjectContainmentEList<Bus>(Bus.class, this,
-					ArchitecturePackage.PROCESSOR__BUSES);
-		}
-		return buses;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Bridge> getBridges() {
-		if (bridges == null) {
-			bridges = new EObjectContainmentEList<Bridge>(Bridge.class, this,
-					ArchitecturePackage.PROCESSOR__BRIDGES);
-		}
-		return bridges;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Socket> getSockets() {
-		if (sockets == null) {
-			sockets = new EObjectContainmentEList<Socket>(Socket.class, this,
-					ArchitecturePackage.PROCESSOR__SOCKETS);
-		}
-		return sockets;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<FunctionUnit> getFunctionUnits() {
-		if (functionUnits == null) {
-			functionUnits = new EObjectContainmentEList<FunctionUnit>(
-					FunctionUnit.class, this,
-					ArchitecturePackage.PROCESSOR__FUNCTION_UNITS);
-		}
-		return functionUnits;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<RegisterFile> getRegisterFiles() {
-		if (registerFiles == null) {
-			registerFiles = new EObjectContainmentEList<RegisterFile>(
-					RegisterFile.class, this,
-					ArchitecturePackage.PROCESSOR__REGISTER_FILES);
-		}
-		return registerFiles;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public AddressSpace getProgram() {
-		return program;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NotificationChain basicSetProgram(AddressSpace newProgram,
-			NotificationChain msgs) {
-		AddressSpace oldProgram = program;
-		program = newProgram;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, ArchitecturePackage.PROCESSOR__PROGRAM,
-					oldProgram, newProgram);
-			if (msgs == null)
-				msgs = notification;
-			else
-				msgs.add(notification);
-		}
-		return msgs;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setProgram(AddressSpace newProgram) {
-		if (newProgram != program) {
-			NotificationChain msgs = null;
-			if (program != null)
-				msgs = ((InternalEObject) program).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE
-								- ArchitecturePackage.PROCESSOR__PROGRAM, null,
-						msgs);
-			if (newProgram != null)
-				msgs = ((InternalEObject) newProgram).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE
-								- ArchitecturePackage.PROCESSOR__PROGRAM, null,
-						msgs);
-			msgs = basicSetProgram(newProgram, msgs);
-			if (msgs != null)
-				msgs.dispatch();
-		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					ArchitecturePackage.PROCESSOR__PROGRAM, newProgram,
-					newProgram));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public AddressSpace getData() {
-		return data;
 	}
 
 	/**
@@ -438,39 +236,20 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setData(AddressSpace newData) {
-		if (newData != data) {
-			NotificationChain msgs = null;
-			if (data != null)
-				msgs = ((InternalEObject) data).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE
-								- ArchitecturePackage.PROCESSOR__DATA, null,
-						msgs);
-			if (newData != null)
-				msgs = ((InternalEObject) newData).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE
-								- ArchitecturePackage.PROCESSOR__DATA, null,
-						msgs);
-			msgs = basicSetData(newData, msgs);
-			if (msgs != null)
-				msgs.dispatch();
-		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					ArchitecturePackage.PROCESSOR__DATA, newData, newData));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Implementation> getHardwareDatabase() {
-		if (hardwareDatabase == null) {
-			hardwareDatabase = new EObjectContainmentEList<Implementation>(
-					Implementation.class, this,
-					ArchitecturePackage.PROCESSOR__HARDWARE_DATABASE);
+	public NotificationChain basicSetGcu(GlobalControlUnit newGcu,
+			NotificationChain msgs) {
+		GlobalControlUnit oldGcu = gcu;
+		gcu = newGcu;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, ArchitecturePackage.PROCESSOR__GCU,
+					oldGcu, newGcu);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
-		return hardwareDatabase;
+		return msgs;
 	}
 
 	/**
@@ -478,12 +257,20 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Vertex> getMappedActors() {
-		if (mappedActors == null) {
-			mappedActors = new EObjectResolvingEList<Vertex>(Vertex.class,
-					this, ArchitecturePackage.PROCESSOR__MAPPED_ACTORS);
+	public NotificationChain basicSetProgram(AddressSpace newProgram,
+			NotificationChain msgs) {
+		AddressSpace oldProgram = program;
+		program = newProgram;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, ArchitecturePackage.PROCESSOR__PROGRAM,
+					oldProgram, newProgram);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
 		}
-		return mappedActors;
+		return msgs;
 	}
 
 	/**
@@ -491,23 +278,33 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public ProcessorConfiguration getConfiguration() {
-		return configuration;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setConfiguration(ProcessorConfiguration newConfiguration) {
-		ProcessorConfiguration oldConfiguration = configuration;
-		configuration = newConfiguration == null ? CONFIGURATION_EDEFAULT
-				: newConfiguration;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					ArchitecturePackage.PROCESSOR__CONFIGURATION,
-					oldConfiguration, configuration));
+	@Override
+	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+		switch (featureID) {
+		case ArchitecturePackage.PROCESSOR__GCU:
+			return getGcu();
+		case ArchitecturePackage.PROCESSOR__BUSES:
+			return getBuses();
+		case ArchitecturePackage.PROCESSOR__BRIDGES:
+			return getBridges();
+		case ArchitecturePackage.PROCESSOR__SOCKETS:
+			return getSockets();
+		case ArchitecturePackage.PROCESSOR__FUNCTION_UNITS:
+			return getFunctionUnits();
+		case ArchitecturePackage.PROCESSOR__REGISTER_FILES:
+			return getRegisterFiles();
+		case ArchitecturePackage.PROCESSOR__PROGRAM:
+			return getProgram();
+		case ArchitecturePackage.PROCESSOR__DATA:
+			return getData();
+		case ArchitecturePackage.PROCESSOR__HARDWARE_DATABASE:
+			return getHardwareDatabase();
+		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
+			return getMappedActors();
+		case ArchitecturePackage.PROCESSOR__CONFIGURATION:
+			return getConfiguration();
+		}
+		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
@@ -552,32 +349,32 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	 * @generated
 	 */
 	@Override
-	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 		case ArchitecturePackage.PROCESSOR__GCU:
-			return getGcu();
+			return gcu != null;
 		case ArchitecturePackage.PROCESSOR__BUSES:
-			return getBuses();
+			return buses != null && !buses.isEmpty();
 		case ArchitecturePackage.PROCESSOR__BRIDGES:
-			return getBridges();
+			return bridges != null && !bridges.isEmpty();
 		case ArchitecturePackage.PROCESSOR__SOCKETS:
-			return getSockets();
+			return sockets != null && !sockets.isEmpty();
 		case ArchitecturePackage.PROCESSOR__FUNCTION_UNITS:
-			return getFunctionUnits();
+			return functionUnits != null && !functionUnits.isEmpty();
 		case ArchitecturePackage.PROCESSOR__REGISTER_FILES:
-			return getRegisterFiles();
+			return registerFiles != null && !registerFiles.isEmpty();
 		case ArchitecturePackage.PROCESSOR__PROGRAM:
-			return getProgram();
+			return program != null;
 		case ArchitecturePackage.PROCESSOR__DATA:
-			return getData();
+			return data != null;
 		case ArchitecturePackage.PROCESSOR__HARDWARE_DATABASE:
-			return getHardwareDatabase();
+			return hardwareDatabase != null && !hardwareDatabase.isEmpty();
 		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
-			return getMappedActors();
+			return mappedActors != null && !mappedActors.isEmpty();
 		case ArchitecturePackage.PROCESSOR__CONFIGURATION:
-			return getConfiguration();
+			return configuration != CONFIGURATION_EDEFAULT;
 		}
-		return super.eGet(featureID, resolve, coreType);
+		return super.eIsSet(featureID);
 	}
 
 	/**
@@ -642,6 +439,16 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	 * @generated
 	 */
 	@Override
+	protected EClass eStaticClass() {
+		return ArchitecturePackage.Literals.PROCESSOR;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case ArchitecturePackage.PROCESSOR__GCU:
@@ -686,33 +493,238 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-		case ArchitecturePackage.PROCESSOR__GCU:
-			return gcu != null;
-		case ArchitecturePackage.PROCESSOR__BUSES:
-			return buses != null && !buses.isEmpty();
-		case ArchitecturePackage.PROCESSOR__BRIDGES:
-			return bridges != null && !bridges.isEmpty();
-		case ArchitecturePackage.PROCESSOR__SOCKETS:
-			return sockets != null && !sockets.isEmpty();
-		case ArchitecturePackage.PROCESSOR__FUNCTION_UNITS:
-			return functionUnits != null && !functionUnits.isEmpty();
-		case ArchitecturePackage.PROCESSOR__REGISTER_FILES:
-			return registerFiles != null && !registerFiles.isEmpty();
-		case ArchitecturePackage.PROCESSOR__PROGRAM:
-			return program != null;
-		case ArchitecturePackage.PROCESSOR__DATA:
-			return data != null;
-		case ArchitecturePackage.PROCESSOR__HARDWARE_DATABASE:
-			return hardwareDatabase != null && !hardwareDatabase.isEmpty();
-		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
-			return mappedActors != null && !mappedActors.isEmpty();
-		case ArchitecturePackage.PROCESSOR__CONFIGURATION:
-			return configuration != CONFIGURATION_EDEFAULT;
+	public EList<Bridge> getBridges() {
+		if (bridges == null) {
+			bridges = new EObjectContainmentEList<Bridge>(Bridge.class, this,
+					ArchitecturePackage.PROCESSOR__BRIDGES);
 		}
-		return super.eIsSet(featureID);
+		return bridges;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Bus> getBuses() {
+		if (buses == null) {
+			buses = new EObjectContainmentEList<Bus>(Bus.class, this,
+					ArchitecturePackage.PROCESSOR__BUSES);
+		}
+		return buses;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public ProcessorConfiguration getConfiguration() {
+		return configuration;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public AddressSpace getData() {
+		return data;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<FunctionUnit> getFunctionUnits() {
+		if (functionUnits == null) {
+			functionUnits = new EObjectContainmentEList<FunctionUnit>(
+					FunctionUnit.class, this,
+					ArchitecturePackage.PROCESSOR__FUNCTION_UNITS);
+		}
+		return functionUnits;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public GlobalControlUnit getGcu() {
+		return gcu;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Implementation> getHardwareDatabase() {
+		if (hardwareDatabase == null) {
+			hardwareDatabase = new EObjectContainmentEList<Implementation>(
+					Implementation.class, this,
+					ArchitecturePackage.PROCESSOR__HARDWARE_DATABASE);
+		}
+		return hardwareDatabase;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Vertex> getMappedActors() {
+		if (mappedActors == null) {
+			mappedActors = new EObjectResolvingEList<Vertex>(Vertex.class,
+					this, ArchitecturePackage.PROCESSOR__MAPPED_ACTORS);
+		}
+		return mappedActors;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public AddressSpace getProgram() {
+		return program;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<RegisterFile> getRegisterFiles() {
+		if (registerFiles == null) {
+			registerFiles = new EObjectContainmentEList<RegisterFile>(
+					RegisterFile.class, this,
+					ArchitecturePackage.PROCESSOR__REGISTER_FILES);
+		}
+		return registerFiles;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Socket> getSockets() {
+		if (sockets == null) {
+			sockets = new EObjectContainmentEList<Socket>(Socket.class, this,
+					ArchitecturePackage.PROCESSOR__SOCKETS);
+		}
+		return sockets;
+	}
+
+	@Override
+	public TemplateData getTemplateData() {
+		return templateData;
+	}
+
+	@Override
+	public boolean isProcessor() {
+		return true;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setConfiguration(ProcessorConfiguration newConfiguration) {
+		ProcessorConfiguration oldConfiguration = configuration;
+		configuration = newConfiguration == null ? CONFIGURATION_EDEFAULT
+				: newConfiguration;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.PROCESSOR__CONFIGURATION,
+					oldConfiguration, configuration));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setData(AddressSpace newData) {
+		if (newData != data) {
+			NotificationChain msgs = null;
+			if (data != null)
+				msgs = ((InternalEObject) data).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE
+								- ArchitecturePackage.PROCESSOR__DATA, null,
+						msgs);
+			if (newData != null)
+				msgs = ((InternalEObject) newData).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE
+								- ArchitecturePackage.PROCESSOR__DATA, null,
+						msgs);
+			msgs = basicSetData(newData, msgs);
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.PROCESSOR__DATA, newData, newData));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setGcu(GlobalControlUnit newGcu) {
+		if (newGcu != gcu) {
+			NotificationChain msgs = null;
+			if (gcu != null)
+				msgs = ((InternalEObject) gcu).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE
+								- ArchitecturePackage.PROCESSOR__GCU, null,
+						msgs);
+			if (newGcu != null)
+				msgs = ((InternalEObject) newGcu).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE
+								- ArchitecturePackage.PROCESSOR__GCU, null,
+						msgs);
+			msgs = basicSetGcu(newGcu, msgs);
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.PROCESSOR__GCU, newGcu, newGcu));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setProgram(AddressSpace newProgram) {
+		if (newProgram != program) {
+			NotificationChain msgs = null;
+			if (program != null)
+				msgs = ((InternalEObject) program).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE
+								- ArchitecturePackage.PROCESSOR__PROGRAM, null,
+						msgs);
+			if (newProgram != null)
+				msgs = ((InternalEObject) newProgram).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE
+								- ArchitecturePackage.PROCESSOR__PROGRAM, null,
+						msgs);
+			msgs = basicSetProgram(newProgram, msgs);
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.PROCESSOR__PROGRAM, newProgram,
+					newProgram));
+	}
+
+	@Override
+	public void setTemplateData(TemplateData templateData) {
+		this.templateData = templateData;
 	}
 
 	/**

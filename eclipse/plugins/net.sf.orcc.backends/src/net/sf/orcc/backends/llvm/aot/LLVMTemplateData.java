@@ -120,7 +120,8 @@ public class LLVMTemplateData implements TemplateData {
 	}
 
 	@Override
-	public TemplateData compute(Actor actor) {
+	public TemplateData compute(EObject object) {
+		Actor actor = (Actor) object;
 		computeCastedListReferences(actor);
 		computeStateToLabelMap(actor);
 		computePortToIndexByPatternMap(actor);
