@@ -5,8 +5,9 @@ printProcessor(processor, options) ::= <<
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Declare and initialize FIFO variables 
 
-<processor.incoming: declareBuffer(); separator="\n\n">
-<processor.outgoing: declareBuffer(); separator="\n\n">
+<processor.incoming: { buffer |<declareBuffer(buffer, buffer.targetPort.addressSpace.id)>}; separator="\n\n">
+
+<processor.outgoing: { buffer |<declareBuffer(buffer, buffer.sourcePort.addressSpace.id)>}; separator="\n\n">
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Declare the scheduling function of each actor
@@ -26,14 +27,14 @@ loop:
 }
 >>
 
-declareBuffer(buffer) ::= <<
-<buffer.mappedConnections: declareFifo(); separator="\n\n">
+declareBuffer(buffer, id) ::= <<
+<buffer.mappedConnections: declareFifo(id); separator="\n\n">
 >>
 
-declareFifo(connection) ::= <<
-@fifo_<connection.id>_content = addrspace(<getAddressSpace(processor, buffer)>) global [<connection.size> x <connection.sourcePort.type>] zeroinitializer, align 32
-@fifo_<connection.id>_rdIndex = addrspace(<getAddressSpace(processor, buffer)>) global i32 zeroinitializer, align 32
-@fifo_<connection.id>_wrIndex = addrspace(<getAddressSpace(processor, buffer)>) global i32 zeroinitializer, align 32
+declareFifo(connection, id) ::= <<
+@fifo_<connection.id>_content = addrspace(<id>) global [<connection.size> x <connection.sourcePort.type>] zeroinitializer, align 32
+@fifo_<connection.id>_rdIndex = addrspace(<id>) global i32 zeroinitializer, align 32
+@fifo_<connection.id>_wrIndex = addrspace(<id>) global i32 zeroinitializer, align 32
 >>
 
 getAddressSpace(processor, buffer) ::= <<
