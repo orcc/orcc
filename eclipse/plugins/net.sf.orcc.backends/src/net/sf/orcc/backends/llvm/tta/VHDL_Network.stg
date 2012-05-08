@@ -43,7 +43,7 @@ architecture bdf_type of top is
   -- Signals declaration
   ---------------------------------------------------------------------------  
   <design.signals: declareSignal(); separator="\n">
-  <design.fifos: declareFifoSignal(); separator="\n">
+  <design.buffers: declareBufferSignals(); separator="\n">
   ---------------------------------------------------------------------------
   
 begin
@@ -54,9 +54,9 @@ begin
   <design.inputs: { input | <assignNetworkPort(input, first(input.outgoing))> }; separator="\n">
   <design.outputs: { output | <assignNetworkPort(output, first(output.incoming))> }; separator="\n">
   ---------------------------------------------------------------------------
-  -- FIFOs instantiation 
+  -- Buffers instantiation 
   --------------------------------------------------------------------------- 
-  <design.fifos: assignFifo(); separator="\n\n">
+  <design.buffers: assignBuffer(); separator="\n\n">
   ---------------------------------------------------------------------------
   -- Processors instantiation 
   ---------------------------------------------------------------------------
@@ -65,10 +65,6 @@ begin
   -- Components instantiation 
   ---------------------------------------------------------------------------
   <design.components: assignComponent(); separator="\n\n">
-  ---------------------------------------------------------------------------  
-  -- Broadcasts instantiation 
-  ---------------------------------------------------------------------------
-  <design.broadcasts: assignBroadcast(); separator="\n\n">
   ---------------------------------------------------------------------------  
 
 
@@ -98,23 +94,20 @@ declareOutput(port) ::= <<
 // Signals
 ///////////////////////////////////////////////////////////////////////////////
 
-declareBroadcastSignals(broadcast) ::= <<
-signal <broadcast.name>_data_outputs   : array_logic_v32(<length(broadcast.outputs)>-1 downto 0);
-signal <broadcast.name>_status_outputs : array_logic_v32(<length(broadcast.outputs)>-1 downto 0);
-signal <broadcast.name>_dv_outputs     : std_logic_vector(<length(broadcast.outputs)>-1 downto 0);
->>
-
 declareSignal(signal) ::= <<
 signal s_<signal.label> : std_logic_vector(<signal.size>-1 downto 0);
 >>
 
-declareFifoSignal(fifo) ::= <<
-signal fifo_<fifo.label>_data         : std_logic_vector(31 downto 0);
-signal fifo_<fifo.label>_queue        : std_logic_vector(31 downto 0);
-signal fifo_<fifo.label>_rdreq        : std_logic;
-signal fifo_<fifo.label>_wrreq        : std_logic;
-signal fifo_<fifo.label>_tokens       : std_logic_vector(31 downto 0);
-signal fifo_<fifo.label>_rooms        : std_logic_vector(31 downto 0);
+declareBufferSignals(buffer) ::= <<
+signal buf_<buffer.label>_wren_p1    : std_logic;
+signal buf_<buffer.label>_address_p1 : std_logic_vector(xx downto 0);
+signal buf_<buffer.label>_byteen_p2  : std_logic_vector(xx downto 0);
+signal buf_<buffer.label>_data_p1    : std_logic_vector(31 downto 0);
+signal buf_<buffer.label>_queue_p1   : std_logic_vector(31 downto 0);
+signal buf_<buffer.label>_wren_p2    : std_logic;
+signal buf_<buffer.label>_address_p2 : std_logic_vector(xx downto 0);
+signal buf_<buffer.label>_data_p2    : std_logic_vector(31 downto 0);
+signal buf_<buffer.label>_queue_p2   : std_logic_vector(31 downto 0);
 >> 
 
 
@@ -159,18 +152,24 @@ assignComponent(component) ::= <<
            rst_n =\> rst_n);
 >>
 
-assignFifo(fifo) ::= <<
-fifo_<fifo.label> : entity work.fifo
-  generic map(device_family =\> "<options.fpga.family>",
-              <fifo.attributes: assignGeneric(); separator=",\n">)
-  port map(clk =\> clk,
-           rdreq  => fifo_<fifo.label>_rdreq,
-           data   => fifo_<fifo.label>_data,
-           queue  => fifo_<fifo.label>_queue,
-           tokens => fifo_<fifo.label>_tokens,
-           rooms  => fifo_<fifo.label>_rooms,
-           wrreq  => fifo_<fifo.label>_wrreq,
-           rst_n  =\> rst_n);
+assignBuffer(buffer) ::= <<
+buffer_<buffer.label> : entity work.inferredRAM_2p
+  generic map(depth  =\> <buffer.depth>,
+              byte_width  =\> <buffer.byte_width>,
+              addr_width =\> <buffer.addr_width>,
+              bytes      =\> <buffer.bytes>)
+  port map(clk        =\> clk,
+           wren_p1    =\> buf_<buffer.label>_wren_p1,
+           address_p1 =\> buf_<buffer.label>_address_p1,
+           byteen_p1  =\> buf_<buffer.label>_byteen_p1,
+           data_p1    =\> buf_<buffer.label>_data_p1,
+           q_p1       =\> buf_<buffer.label>_queue_p1,
+           wren_p2    =\> buf_<buffer.label>_wren_p2,
+           address_p2 =\> buf_<buffer.label>_address_p2,
+           byteen_p2  =\> buf_<buffer.label>_byteen_p2,
+           data_p2    =\> buf_<buffer.label>_data_p2,
+           q_p2       =\> buf_<buffer.label>_queue_p2,
+           rst_n      =\> rst_n);
 >>
 
 assignProcessor(processor) ::= <<
@@ -179,13 +178,5 @@ assignProcessor(processor) ::= <<
   port map(clk   =\> clk,
            <processor.inputs: { input |<assignInputPort(input, processor.incomingPortMap.(input), i0)>}; separator="\n">
            <processor.outputs: { output |<assignOutputPort(output, processor.outgoingPortMap.(output), i0)>}; separator="\n">
-           rst_n =\> rst_n);
->>
-
-assignBroadcast(broadcast) ::= <<
-<broadcast.name> : entity work.broadcast_<length(broadcast.outputs)>
-  port map(clk   =\> clk,
-           <broadcast.inputs: { input |<assignInputPort(input, broadcast.incomingPortMap.(input), i0)>}; separator="\n">
-           <broadcast.outputs: { output |<assignOutputPort(output, broadcast.outgoingPortMap.(output), i0)>}; separator="\n">
            rst_n =\> rst_n);
 >>

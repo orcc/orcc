@@ -179,7 +179,7 @@ public interface ArchitecturePackage extends EPackage {
 	int DESIGN__PROCESSORS = GraphPackage.GRAPH_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>Buffers</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Buffers</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -2082,10 +2082,10 @@ public interface ArchitecturePackage extends EPackage {
 	EReference getDesign_Processors();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getBuffers <em>Buffers</em>}'.
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getBuffers <em>Buffers</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Buffers</em>'.
+	 * @return the meta object for the reference list '<em>Buffers</em>'.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.Design#getBuffers()
 	 * @see #getDesign()
 	 * @generated
@@ -3440,7 +3440,7 @@ public interface ArchitecturePackage extends EPackage {
 		EReference DESIGN__PROCESSORS = eINSTANCE.getDesign_Processors();
 
 		/**
-		 * The meta object literal for the '<em><b>Buffers</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Buffers</b></em>' reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated

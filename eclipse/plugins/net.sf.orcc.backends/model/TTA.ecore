@@ -9,7 +9,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="processors" upperBound="-1"
         eType="#//Processor"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="buffers" upperBound="-1"
-        eType="#//Buffer" containment="true"/>
+        eType="#//Buffer"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="signals" upperBound="-1"
         eType="#//Signal"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="inputs" upperBound="-1"

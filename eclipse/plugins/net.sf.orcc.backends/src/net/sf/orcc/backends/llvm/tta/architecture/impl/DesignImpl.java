@@ -53,7 +53,6 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 import org.eclipse.emf.ecore.util.EcoreEMap;
 import org.eclipse.emf.ecore.util.InternalEList;
@@ -112,7 +111,7 @@ public class DesignImpl extends GraphImpl implements Design {
 	 */
 	protected EList<Processor> processors;
 	/**
-	 * The cached value of the '{@link #getBuffers() <em>Buffers</em>}' containment reference list.
+	 * The cached value of the '{@link #getBuffers() <em>Buffers</em>}' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getBuffers()
 	 * @generated
@@ -410,7 +409,7 @@ public class DesignImpl extends GraphImpl implements Design {
 	 */
 	public EList<Buffer> getBuffers() {
 		if (buffers == null) {
-			buffers = new EObjectContainmentEList<Buffer>(Buffer.class, this,
+			buffers = new EObjectResolvingEList<Buffer>(Buffer.class, this,
 					ArchitecturePackage.DESIGN__BUFFERS);
 		}
 		return buffers;
@@ -497,9 +496,6 @@ public class DesignImpl extends GraphImpl implements Design {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-		case ArchitecturePackage.DESIGN__BUFFERS:
-			return ((InternalEList<?>) getBuffers())
-					.basicRemove(otherEnd, msgs);
 		case ArchitecturePackage.DESIGN__HARDWARE_DATABASE:
 			return ((InternalEList<?>) getHardwareDatabase()).basicRemove(
 					otherEnd, msgs);

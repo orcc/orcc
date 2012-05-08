@@ -1760,7 +1760,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getDesign_Buffers(), this.getBuffer(), null, "buffers",
 				null, 0, -1, Design.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getDesign_Signals(), this.getSignal(), null, "signals",
 				null, 0, -1, Design.class, !IS_TRANSIENT, !IS_VOLATILE,

@@ -50,6 +50,8 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	private List<String> optimizedActors;
 
 	private Map<net.sf.orcc.df.Port, Port> portMap;
+	
+	private int bufferId = 0;
 
 	public ArchitectureBuilder(DesignConfiguration conf) {
 		design = factory.createDesign();
@@ -82,7 +84,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	}
 
 	private Buffer createBuffer(Vertex source, Vertex target) {
-		Buffer buffer = factory.createBuffer(source, target);
+		Buffer buffer = factory.createBuffer(bufferId++, source, target);
 		Port sourcePort = addBuffer((Processor) source, buffer);
 		Port targetPort = addBuffer((Processor) target, buffer);
 		buffer.setSourcePort(sourcePort);

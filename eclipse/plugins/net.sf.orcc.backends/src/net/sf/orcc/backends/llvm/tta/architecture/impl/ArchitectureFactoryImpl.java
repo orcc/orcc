@@ -429,19 +429,11 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public Buffer createBuffer(Vertex source, Vertex target) {
+	public Buffer createBuffer(int id, Vertex source, Vertex target) {
 		BufferImpl buffer = new BufferImpl();
+		buffer.setLabel("" + id);
 		buffer.setSource(source);
 		buffer.setTarget(target);
-		return buffer;
-	}
-
-	@Override
-	public Buffer createBuffer(Vertex source, Vertex target, Port sourcePort,
-			Port targetPort) {
-		Buffer buffer = createBuffer(source, target);
-		buffer.setSourcePort(sourcePort);
-		buffer.setTargetPort(targetPort);
 		return buffer;
 	}
 

@@ -134,25 +134,9 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the source vertex of this buffer
 	 * @param target
 	 *            the target vertex of this buffer
-	 * @param sourcePort
-	 *            the source port of this buffer
-	 * @param targetPort
-	 *            the target port of this buffer
 	 * @return a new buffer
 	 */
-	Buffer createBuffer(Vertex source, Vertex target, Port sourcePort,
-			Port targetPort);
-
-	/**
-	 * Returns a new object of class '<em>Buffer</em>'.
-	 * 
-	 * @param source
-	 *            the source vertex of this buffer
-	 * @param target
-	 *            the target vertex of this buffer
-	 * @return a new buffer
-	 */
-	Buffer createBuffer(Vertex source, Vertex target);
+	Buffer createBuffer(int id, Vertex source, Vertex target);
 
 	/**
 	 * Returns a new object of class '<em>Bus</em>'.

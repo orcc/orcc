@@ -122,7 +122,7 @@ public interface Design extends Graph {
 	EList<Processor> getProcessors();
 
 	/**
-	 * Returns the value of the '<em><b>Buffers</b></em>' containment reference list.
+	 * Returns the value of the '<em><b>Buffers</b></em>' reference list.
 	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.Buffer}.
 	 * <!-- begin-user-doc -->
 	 * <p>
@@ -130,9 +130,9 @@ public interface Design extends Graph {
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Buffers</em>' containment reference list.
+	 * @return the value of the '<em>Buffers</em>' reference list.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getDesign_Buffers()
-	 * @model containment="true"
+	 * @model
 	 * @generated
 	 */
 	EList<Buffer> getBuffers();
