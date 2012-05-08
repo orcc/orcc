@@ -40,6 +40,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Buffer;
 import net.sf.orcc.backends.llvm.tta.architecture.Component;
 import net.sf.orcc.backends.llvm.tta.architecture.Design;
 import net.sf.orcc.backends.llvm.tta.architecture.DesignConfiguration;
+import net.sf.orcc.backends.llvm.tta.architecture.Implementation;
 import net.sf.orcc.backends.llvm.tta.architecture.Port;
 import net.sf.orcc.backends.llvm.tta.architecture.Processor;
 import net.sf.orcc.backends.llvm.tta.architecture.Signal;
@@ -47,11 +48,14 @@ import net.sf.orcc.backends.llvm.tta.architecture.Signal;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.EObjectResolvingEList;
+import org.eclipse.emf.ecore.util.EcoreEMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
@@ -67,6 +71,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getSignals <em>Signals</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getInputs <em>Inputs</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getOutputs <em>Outputs</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getHardwareDatabase <em>Hardware Database</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getConfiguration <em>Configuration</em>}</li>
  * </ul>
  * </p>
@@ -139,6 +144,15 @@ public class DesignImpl extends GraphImpl implements Design {
 	 */
 	protected EList<Port> outputs;
 	/**
+	 * The cached value of the '{@link #getHardwareDatabase() <em>Hardware Database</em>}' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getHardwareDatabase()
+	 * @generated
+	 * @ordered
+	 */
+	protected EMap<String, Implementation> hardwareDatabase;
+	/**
 	 * The default value of the '{@link #getConfiguration() <em>Configuration</em>}' attribute.
 	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
@@ -201,6 +215,11 @@ public class DesignImpl extends GraphImpl implements Design {
 			return getInputs();
 		case ArchitecturePackage.DESIGN__OUTPUTS:
 			return getOutputs();
+		case ArchitecturePackage.DESIGN__HARDWARE_DATABASE:
+			if (coreType)
+				return getHardwareDatabase();
+			else
+				return getHardwareDatabase().map();
 		case ArchitecturePackage.DESIGN__CONFIGURATION:
 			return getConfiguration();
 		}
@@ -241,6 +260,8 @@ public class DesignImpl extends GraphImpl implements Design {
 			return inputs != null && !inputs.isEmpty();
 		case ArchitecturePackage.DESIGN__OUTPUTS:
 			return outputs != null && !outputs.isEmpty();
+		case ArchitecturePackage.DESIGN__HARDWARE_DATABASE:
+			return hardwareDatabase != null && !hardwareDatabase.isEmpty();
 		case ArchitecturePackage.DESIGN__CONFIGURATION:
 			return configuration != CONFIGURATION_EDEFAULT;
 		}
@@ -281,6 +302,9 @@ public class DesignImpl extends GraphImpl implements Design {
 		case ArchitecturePackage.DESIGN__OUTPUTS:
 			getOutputs().clear();
 			getOutputs().addAll((Collection<? extends Port>) newValue);
+			return;
+		case ArchitecturePackage.DESIGN__HARDWARE_DATABASE:
+			((EStructuralFeature.Setting) getHardwareDatabase()).set(newValue);
 			return;
 		case ArchitecturePackage.DESIGN__CONFIGURATION:
 			setConfiguration((DesignConfiguration) newValue);
@@ -345,6 +369,9 @@ public class DesignImpl extends GraphImpl implements Design {
 			return;
 		case ArchitecturePackage.DESIGN__OUTPUTS:
 			getOutputs().clear();
+			return;
+		case ArchitecturePackage.DESIGN__HARDWARE_DATABASE:
+			getHardwareDatabase().clear();
 			return;
 		case ArchitecturePackage.DESIGN__CONFIGURATION:
 			setConfiguration(CONFIGURATION_EDEFAULT);
@@ -434,6 +461,21 @@ public class DesignImpl extends GraphImpl implements Design {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EMap<String, Implementation> getHardwareDatabase() {
+		if (hardwareDatabase == null) {
+			hardwareDatabase = new EcoreEMap<String, Implementation>(
+					ArchitecturePackage.Literals.TYPE_TO_IMPL_MAP_ENTRY,
+					TypeToImplMapEntryImpl.class, this,
+					ArchitecturePackage.DESIGN__HARDWARE_DATABASE);
+		}
+		return hardwareDatabase;
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -458,6 +500,9 @@ public class DesignImpl extends GraphImpl implements Design {
 		case ArchitecturePackage.DESIGN__BUFFERS:
 			return ((InternalEList<?>) getBuffers())
 					.basicRemove(otherEnd, msgs);
+		case ArchitecturePackage.DESIGN__HARDWARE_DATABASE:
+			return ((InternalEList<?>) getHardwareDatabase()).basicRemove(
+					otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}

@@ -250,6 +250,13 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	private EClass implementationEClass = null;
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass typeToImplMapEntryEClass = null;
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -459,11 +466,20 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getDesign_HardwareDatabase() {
+		return (EReference) designEClass.getEStructuralFeatures().get(7);
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EAttribute getDesign_Configuration() {
-		return (EAttribute) designEClass.getEStructuralFeatures().get(7);
+		return (EAttribute) designEClass.getEStructuralFeatures().get(8);
 	}
 
 	/**
@@ -650,20 +666,12 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getProcessor_HardwareDatabase() {
-		return (EReference) processorEClass.getEStructuralFeatures().get(8);
-	}
-
-	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getProcessor_MappedActors() {
-		return (EReference) processorEClass.getEStructuralFeatures().get(9);
+		return (EReference) processorEClass.getEStructuralFeatures().get(8);
 	}
 
 	/**
@@ -671,7 +679,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	public EAttribute getProcessor_Configuration() {
-		return (EAttribute) processorEClass.getEStructuralFeatures().get(10);
+		return (EAttribute) processorEClass.getEStructuralFeatures().get(9);
 	}
 
 	/**
@@ -865,11 +873,12 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getFunctionUnit_Implementation() {
-		return (EReference) functionUnitEClass.getEStructuralFeatures().get(4);
+	public EAttribute getFunctionUnit_Implementation() {
+		return (EAttribute) functionUnitEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -929,11 +938,12 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getRegisterFile_Implementation() {
-		return (EReference) registerFileEClass.getEStructuralFeatures().get(6);
+	public EAttribute getRegisterFile_Implementation() {
+		return (EAttribute) registerFileEClass.getEStructuralFeatures().get(6);
 	}
 
 	/**
@@ -1276,6 +1286,35 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getTypeToImplMapEntry() {
+		return typeToImplMapEntryEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getTypeToImplMapEntry_Key() {
+		return (EAttribute) typeToImplMapEntryEClass.getEStructuralFeatures()
+				.get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getTypeToImplMapEntry_Value() {
+		return (EReference) typeToImplMapEntryEClass.getEStructuralFeatures()
+				.get(1);
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -1482,6 +1521,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEReference(designEClass, DESIGN__SIGNALS);
 		createEReference(designEClass, DESIGN__INPUTS);
 		createEReference(designEClass, DESIGN__OUTPUTS);
+		createEReference(designEClass, DESIGN__HARDWARE_DATABASE);
 		createEAttribute(designEClass, DESIGN__CONFIGURATION);
 
 		linkEClass = createEClass(LINK);
@@ -1512,7 +1552,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEReference(processorEClass, PROCESSOR__REGISTER_FILES);
 		createEReference(processorEClass, PROCESSOR__PROGRAM);
 		createEReference(processorEClass, PROCESSOR__DATA);
-		createEReference(processorEClass, PROCESSOR__HARDWARE_DATABASE);
 		createEReference(processorEClass, PROCESSOR__MAPPED_ACTORS);
 		createEAttribute(processorEClass, PROCESSOR__CONFIGURATION);
 
@@ -1548,7 +1587,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEReference(functionUnitEClass, FUNCTION_UNIT__OPERATIONS);
 		createEReference(functionUnitEClass, FUNCTION_UNIT__PORTS);
 		createEReference(functionUnitEClass, FUNCTION_UNIT__ADDRESS_SPACE);
-		createEReference(functionUnitEClass, FUNCTION_UNIT__IMPLEMENTATION);
+		createEAttribute(functionUnitEClass, FUNCTION_UNIT__IMPLEMENTATION);
 
 		registerFileEClass = createEClass(REGISTER_FILE);
 		createEAttribute(registerFileEClass, REGISTER_FILE__NAME);
@@ -1557,7 +1596,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEAttribute(registerFileEClass, REGISTER_FILE__MAX_READS);
 		createEAttribute(registerFileEClass, REGISTER_FILE__MAX_WRITES);
 		createEReference(registerFileEClass, REGISTER_FILE__PORTS);
-		createEReference(registerFileEClass, REGISTER_FILE__IMPLEMENTATION);
+		createEAttribute(registerFileEClass, REGISTER_FILE__IMPLEMENTATION);
 
 		fuPortEClass = createEClass(FU_PORT);
 		createEAttribute(fuPortEClass, FU_PORT__NAME);
@@ -1629,6 +1668,11 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		implementationEClass = createEClass(IMPLEMENTATION);
 		createEAttribute(implementationEClass, IMPLEMENTATION__HDB_FILE);
 		createEAttribute(implementationEClass, IMPLEMENTATION__ID);
+
+		typeToImplMapEntryEClass = createEClass(TYPE_TO_IMPL_MAP_ENTRY);
+		createEAttribute(typeToImplMapEntryEClass, TYPE_TO_IMPL_MAP_ENTRY__KEY);
+		createEReference(typeToImplMapEntryEClass,
+				TYPE_TO_IMPL_MAP_ENTRY__VALUE);
 
 		portToIndexMapEntryEClass = createEClass(PORT_TO_INDEX_MAP_ENTRY);
 		createEReference(portToIndexMapEntryEClass,
@@ -1730,6 +1774,11 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				null, 0, -1, Design.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getDesign_HardwareDatabase(),
+				this.getTypeToImplMapEntry(), null, "hardwareDatabase", null,
+				0, -1, Design.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getDesign_Configuration(),
 				this.getDesignConfiguration(), "configuration", null, 0, 1,
 				Design.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
@@ -1822,11 +1871,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		initEReference(getProcessor_Data(), this.getAddressSpace(), null,
 				"data", null, 0, -1, Processor.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getProcessor_HardwareDatabase(),
-				this.getImplementation(), null, "hardwareDatabase", null, 0,
-				-1, Processor.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getProcessor_MappedActors(),
 				theGraphPackage.getVertex(), null, "mappedActors", null, 0, -1,
@@ -1932,11 +1976,10 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE,
 				IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
-		initEReference(getFunctionUnit_Implementation(),
-				this.getImplementation(), null, "implementation", null, 0, 1,
+		initEAttribute(getFunctionUnit_Implementation(),
+				theEcorePackage.getEString(), "implementation", null, 0, 1,
 				FunctionUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
-				!IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
+				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(registerFileEClass, RegisterFile.class, "RegisterFile",
 				!IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -1964,11 +2007,10 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				"ports", null, 0, -1, RegisterFile.class, IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getRegisterFile_Implementation(),
-				this.getImplementation(), null, "implementation", null, 0, 1,
+		initEAttribute(getRegisterFile_Implementation(),
+				theEcorePackage.getEString(), "implementation", null, 0, 1,
 				RegisterFile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
-				!IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
+				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(fuPortEClass, FuPort.class, "FuPort", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -2221,6 +2263,18 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				null, 0, 1, Implementation.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
+
+		initEClass(typeToImplMapEntryEClass, Map.Entry.class,
+				"TypeToImplMapEntry", !IS_ABSTRACT, !IS_INTERFACE,
+				!IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getTypeToImplMapEntry_Key(),
+				theEcorePackage.getEString(), "key", null, 0, 1,
+				Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getTypeToImplMapEntry_Value(), this.getImplementation(),
+				null, "value", null, 0, 1, Map.Entry.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(portToIndexMapEntryEClass, Map.Entry.class,
 				"PortToIndexMapEntry", !IS_ABSTRACT, !IS_INTERFACE,

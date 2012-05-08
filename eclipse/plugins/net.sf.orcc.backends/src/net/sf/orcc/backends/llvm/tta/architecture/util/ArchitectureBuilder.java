@@ -13,7 +13,6 @@ import net.sf.orcc.backends.llvm.tta.architecture.Component;
 import net.sf.orcc.backends.llvm.tta.architecture.Design;
 import net.sf.orcc.backends.llvm.tta.architecture.DesignConfiguration;
 import net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit;
-import net.sf.orcc.backends.llvm.tta.architecture.Implementation;
 import net.sf.orcc.backends.llvm.tta.architecture.Port;
 import net.sf.orcc.backends.llvm.tta.architecture.Processor;
 import net.sf.orcc.backends.llvm.tta.architecture.ProcessorConfiguration;
@@ -74,13 +73,9 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 
 	private FunctionUnit addBuffer(Processor processor, Buffer buffer) {
 		int i = processor.getData().size();
-		Implementation lsuImpl = factory.createImplementation("stratixII.hdb",
-				2);
-		processor.getHardwareDatabase().add(lsuImpl);
 		AddressSpace buf = factory.createAddressSpace("buf_" + i, i, 8, 0,
 				buffer.getSize());
-		FunctionUnit lsu = factory.createLSU("LSU_buf_" + i, processor, buf,
-				lsuImpl);
+		FunctionUnit lsu = factory.createLSU("LSU_buf_" + i, processor, buf);
 		processor.getData().add(buf);
 		processor.getFunctionUnits().add(lsu);
 		return lsu;

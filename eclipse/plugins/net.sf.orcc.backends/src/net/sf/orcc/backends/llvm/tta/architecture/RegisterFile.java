@@ -202,29 +202,29 @@ public interface RegisterFile extends EObject {
 	EList<FuPort> getPorts();
 
 	/**
-	 * Returns the value of the '<em><b>Implementation</b></em>' reference.
+	 * Returns the value of the '<em><b>Implementation</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Implementation</em>' reference isn't clear,
+	 * If the meaning of the '<em>Implementation</em>' attribute isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Implementation</em>' reference.
-	 * @see #setImplementation(Implementation)
+	 * @return the value of the '<em>Implementation</em>' attribute.
+	 * @see #setImplementation(String)
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getRegisterFile_Implementation()
 	 * @model
 	 * @generated
 	 */
-	Implementation getImplementation();
+	String getImplementation();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.RegisterFile#getImplementation <em>Implementation</em>}' reference.
+	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.RegisterFile#getImplementation <em>Implementation</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Implementation</em>' reference.
+	 * @param value the new value of the '<em>Implementation</em>' attribute.
 	 * @see #getImplementation()
 	 * @generated
 	 */
-	void setImplementation(Implementation value);
+	void setImplementation(String value);
 
 } // RegisterFile

@@ -281,6 +281,12 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 		}
 
 		@Override
+		public Adapter caseTypeToImplMapEntry(
+				Map.Entry<String, Implementation> object) {
+			return createTypeToImplMapEntryAdapter();
+		}
+
+		@Override
 		public Adapter casePortToIndexMapEntry(Map.Entry<FuPort, Integer> object) {
 			return createPortToIndexMapEntryAdapter();
 		}
@@ -691,6 +697,20 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createImplementationAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Type To Impl Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see java.util.Map.Entry
+	 * @generated
+	 */
+	public Adapter createTypeToImplMapEntryAdapter() {
 		return null;
 	}
 

@@ -401,6 +401,14 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 				result = defaultCase(theEObject);
 			return result;
 		}
+		case ArchitecturePackage.TYPE_TO_IMPL_MAP_ENTRY: {
+			@SuppressWarnings("unchecked")
+			Map.Entry<String, Implementation> typeToImplMapEntry = (Map.Entry<String, Implementation>) theEObject;
+			T result = caseTypeToImplMapEntry(typeToImplMapEntry);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
 		case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY: {
 			@SuppressWarnings("unchecked")
 			Map.Entry<FuPort, Integer> portToIndexMapEntry = (Map.Entry<FuPort, Integer>) theEObject;
@@ -787,6 +795,21 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseImplementation(Implementation object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Type To Impl Map Entry</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Type To Impl Map Entry</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseTypeToImplMapEntry(Map.Entry<String, Implementation> object) {
 		return null;
 	}
 

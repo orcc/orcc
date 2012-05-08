@@ -215,13 +215,22 @@ public interface ArchitecturePackage extends EPackage {
 	int DESIGN__OUTPUTS = GraphPackage.GRAPH_FEATURE_COUNT + 6;
 
 	/**
+	 * The feature id for the '<em><b>Hardware Database</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DESIGN__HARDWARE_DATABASE = GraphPackage.GRAPH_FEATURE_COUNT + 7;
+
+	/**
 	 * The feature id for the '<em><b>Configuration</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int DESIGN__CONFIGURATION = GraphPackage.GRAPH_FEATURE_COUNT + 7;
+	int DESIGN__CONFIGURATION = GraphPackage.GRAPH_FEATURE_COUNT + 8;
 
 	/**
 	 * The number of structural features of the '<em>Design</em>' class. <!--
@@ -230,7 +239,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int DESIGN_FEATURE_COUNT = GraphPackage.GRAPH_FEATURE_COUNT + 8;
+	int DESIGN_FEATURE_COUNT = GraphPackage.GRAPH_FEATURE_COUNT + 9;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.LinkImpl <em>Link</em>}' class.
@@ -859,21 +868,13 @@ public interface ArchitecturePackage extends EPackage {
 	int PROCESSOR__DATA = COMPONENT_FEATURE_COUNT + 7;
 
 	/**
-	 * The feature id for the '<em><b>Hardware Database</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PROCESSOR__HARDWARE_DATABASE = COMPONENT_FEATURE_COUNT + 8;
-
-	/**
 	 * The feature id for the '<em><b>Mapped Actors</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PROCESSOR__MAPPED_ACTORS = COMPONENT_FEATURE_COUNT + 9;
+	int PROCESSOR__MAPPED_ACTORS = COMPONENT_FEATURE_COUNT + 8;
 
 	/**
 	 * The feature id for the '<em><b>Configuration</b></em>' attribute.
@@ -882,7 +883,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PROCESSOR__CONFIGURATION = COMPONENT_FEATURE_COUNT + 10;
+	int PROCESSOR__CONFIGURATION = COMPONENT_FEATURE_COUNT + 9;
 
 	/**
 	 * The number of structural features of the '<em>Processor</em>' class. <!--
@@ -891,7 +892,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PROCESSOR_FEATURE_COUNT = COMPONENT_FEATURE_COUNT + 11;
+	int PROCESSOR_FEATURE_COUNT = COMPONENT_FEATURE_COUNT + 10;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -1128,9 +1129,9 @@ public interface ArchitecturePackage extends EPackage {
 	int FUNCTION_UNIT__ADDRESS_SPACE = PORT_FEATURE_COUNT + 3;
 
 	/**
-	 * The feature id for the '<em><b>Implementation</b></em>' reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The feature id for the '<em><b>Implementation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -1198,9 +1199,9 @@ public interface ArchitecturePackage extends EPackage {
 	int REGISTER_FILE__PORTS = 5;
 
 	/**
-	 * The feature id for the '<em><b>Implementation</b></em>' reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The feature id for the '<em><b>Implementation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -1691,7 +1692,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getPortToIndexMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_INDEX_MAP_ENTRY = 31;
+	int PORT_TO_INDEX_MAP_ENTRY = 32;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.ShortImmediateImpl <em>Short Immediate</em>}' class.
@@ -1916,6 +1917,43 @@ public interface ArchitecturePackage extends EPackage {
 	int IMPLEMENTATION_FEATURE_COUNT = 2;
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.TypeToImplMapEntryImpl <em>Type To Impl Map Entry</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.TypeToImplMapEntryImpl
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getTypeToImplMapEntry()
+	 * @generated
+	 */
+	int TYPE_TO_IMPL_MAP_ENTRY = 31;
+
+	/**
+	 * The feature id for the '<em><b>Key</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TYPE_TO_IMPL_MAP_ENTRY__KEY = 0;
+
+	/**
+	 * The feature id for the '<em><b>Value</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TYPE_TO_IMPL_MAP_ENTRY__VALUE = 1;
+
+	/**
+	 * The number of structural features of the '<em>Type To Impl Map Entry</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TYPE_TO_IMPL_MAP_ENTRY_FEATURE_COUNT = 2;
+
+	/**
 	 * The feature id for the '<em><b>Key</b></em>' reference. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -1950,7 +1988,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getDesignConfiguration()
 	 * @generated
 	 */
-	int DESIGN_CONFIGURATION = 32;
+	int DESIGN_CONFIGURATION = 33;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.ProcessorConfiguration <em>Processor Configuration</em>}' enum.
@@ -1960,7 +1998,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getProcessorConfiguration()
 	 * @generated
 	 */
-	int PROCESSOR_CONFIGURATION = 33;
+	int PROCESSOR_CONFIGURATION = 34;
 
 	/**
 	 * The meta object id for the '
@@ -1972,7 +2010,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getSocketType()
 	 * @generated
 	 */
-	int SOCKET_TYPE = 34;
+	int SOCKET_TYPE = 35;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.Extension <em>Extension</em>}' enum.
@@ -1981,7 +2019,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getExtension()
 	 * @generated
 	 */
-	int EXTENSION = 35;
+	int EXTENSION = 36;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.OpUnary <em>Op Unary</em>}' enum.
@@ -1990,7 +2028,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getOpUnary()
 	 * @generated
 	 */
-	int OP_UNARY = 36;
+	int OP_UNARY = 37;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.OpBinary <em>Op Binary</em>}' enum.
@@ -1999,7 +2037,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getOpBinary()
 	 * @generated
 	 */
-	int OP_BINARY = 37;
+	int OP_BINARY = 38;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.llvm.tta.architecture.Design <em>Design</em>}'.
@@ -2086,6 +2124,17 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 */
 	EReference getDesign_Outputs();
+
+	/**
+	 * Returns the meta object for the map '{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getHardwareDatabase <em>Hardware Database</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the map '<em>Hardware Database</em>'.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.Design#getHardwareDatabase()
+	 * @see #getDesign()
+	 * @generated
+	 */
+	EReference getDesign_HardwareDatabase();
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getConfiguration <em>Configuration</em>}'.
@@ -2325,20 +2374,6 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 */
 	EReference getProcessor_Data();
-
-	/**
-	 * Returns the meta object for the containment reference list '
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getHardwareDatabase
-	 * <em>Hardware Database</em>}'. <!-- begin-user-doc --> <!-- end-user-doc
-	 * -->
-	 * 
-	 * @return the meta object for the containment reference list '
-	 *         <em>Hardware Database</em>'.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.Processor#getHardwareDatabase()
-	 * @see #getProcessor()
-	 * @generated
-	 */
-	EReference getProcessor_HardwareDatabase();
 
 	/**
 	 * Returns the meta object for the reference list '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getMappedActors <em>Mapped Actors</em>}'.
@@ -2593,14 +2628,15 @@ public interface ArchitecturePackage extends EPackage {
 	EReference getFunctionUnit_AddressSpace();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit#getImplementation <em>Implementation</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Implementation</em>'.
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit#getImplementation <em>Implementation</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Implementation</em>'.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit#getImplementation()
 	 * @see #getFunctionUnit()
 	 * @generated
 	 */
-	EReference getFunctionUnit_Implementation();
+	EAttribute getFunctionUnit_Implementation();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.llvm.tta.architecture.RegisterFile <em>Register File</em>}'.
@@ -2672,14 +2708,15 @@ public interface ArchitecturePackage extends EPackage {
 	EReference getRegisterFile_Ports();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.llvm.tta.architecture.RegisterFile#getImplementation <em>Implementation</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Implementation</em>'.
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.llvm.tta.architecture.RegisterFile#getImplementation <em>Implementation</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Implementation</em>'.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.RegisterFile#getImplementation()
 	 * @see #getRegisterFile()
 	 * @generated
 	 */
-	EReference getRegisterFile_Implementation();
+	EAttribute getRegisterFile_Implementation();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.llvm.tta.architecture.FuPort <em>Fu Port</em>}'.
@@ -3106,6 +3143,40 @@ public interface ArchitecturePackage extends EPackage {
 	EAttribute getImplementation_Id();
 
 	/**
+	 * Returns the meta object for class '{@link java.util.Map.Entry <em>Type To Impl Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Type To Impl Map Entry</em>'.
+	 * @see java.util.Map.Entry
+	 * @model keyDataType="org.eclipse.emf.ecore.EString"
+	 *        valueType="net.sf.orcc.backends.llvm.tta.architecture.Implementation"
+	 * @generated
+	 */
+	EClass getTypeToImplMapEntry();
+
+	/**
+	 * Returns the meta object for the attribute '{@link java.util.Map.Entry <em>Key</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Key</em>'.
+	 * @see java.util.Map.Entry
+	 * @see #getTypeToImplMapEntry()
+	 * @generated
+	 */
+	EAttribute getTypeToImplMapEntry_Key();
+
+	/**
+	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Value</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Value</em>'.
+	 * @see java.util.Map.Entry
+	 * @see #getTypeToImplMapEntry()
+	 * @generated
+	 */
+	EReference getTypeToImplMapEntry_Value();
+
+	/**
 	 * Returns the meta object for class '{@link java.util.Map.Entry <em>Port To Index Map Entry</em>}'.
 	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
@@ -3401,6 +3472,15 @@ public interface ArchitecturePackage extends EPackage {
 		EReference DESIGN__OUTPUTS = eINSTANCE.getDesign_Outputs();
 
 		/**
+		 * The meta object literal for the '<em><b>Hardware Database</b></em>' map feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference DESIGN__HARDWARE_DATABASE = eINSTANCE
+				.getDesign_HardwareDatabase();
+
+		/**
 		 * The meta object literal for the '<em><b>Configuration</b></em>' attribute feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -3592,15 +3672,6 @@ public interface ArchitecturePackage extends EPackage {
 		 * @generated
 		 */
 		EReference PROCESSOR__DATA = eINSTANCE.getProcessor_Data();
-
-		/**
-		 * The meta object literal for the '<em><b>Hardware Database</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc --> <!--
-		 * end-user-doc -->
-		 * @generated
-		 */
-		EReference PROCESSOR__HARDWARE_DATABASE = eINSTANCE
-				.getProcessor_HardwareDatabase();
 
 		/**
 		 * The meta object literal for the '<em><b>Mapped Actors</b></em>' reference list feature.
@@ -3813,11 +3884,12 @@ public interface ArchitecturePackage extends EPackage {
 				.getFunctionUnit_AddressSpace();
 
 		/**
-		 * The meta object literal for the '<em><b>Implementation</b></em>' reference feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * The meta object literal for the '<em><b>Implementation</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference FUNCTION_UNIT__IMPLEMENTATION = eINSTANCE
+		EAttribute FUNCTION_UNIT__IMPLEMENTATION = eINSTANCE
 				.getFunctionUnit_Implementation();
 
 		/**
@@ -3875,11 +3947,12 @@ public interface ArchitecturePackage extends EPackage {
 		EReference REGISTER_FILE__PORTS = eINSTANCE.getRegisterFile_Ports();
 
 		/**
-		 * The meta object literal for the '<em><b>Implementation</b></em>' reference feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * The meta object literal for the '<em><b>Implementation</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference REGISTER_FILE__IMPLEMENTATION = eINSTANCE
+		EAttribute REGISTER_FILE__IMPLEMENTATION = eINSTANCE
 				.getRegisterFile_Implementation();
 
 		/**
@@ -4237,6 +4310,34 @@ public interface ArchitecturePackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute IMPLEMENTATION__ID = eINSTANCE.getImplementation_Id();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.TypeToImplMapEntryImpl <em>Type To Impl Map Entry</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.TypeToImplMapEntryImpl
+		 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getTypeToImplMapEntry()
+		 * @generated
+		 */
+		EClass TYPE_TO_IMPL_MAP_ENTRY = eINSTANCE.getTypeToImplMapEntry();
+
+		/**
+		 * The meta object literal for the '<em><b>Key</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute TYPE_TO_IMPL_MAP_ENTRY__KEY = eINSTANCE
+				.getTypeToImplMapEntry_Key();
+
+		/**
+		 * The meta object literal for the '<em><b>Value</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference TYPE_TO_IMPL_MAP_ENTRY__VALUE = eINSTANCE
+				.getTypeToImplMapEntry_Value();
 
 		/**
 		 * The meta object literal for the '

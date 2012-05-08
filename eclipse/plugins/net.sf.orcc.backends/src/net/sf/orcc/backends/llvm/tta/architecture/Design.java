@@ -32,6 +32,7 @@ package net.sf.orcc.backends.llvm.tta.architecture;
 
 import net.sf.dftools.graph.Graph;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.EMap;
 
 /**
  * <!-- begin-user-doc --> A representation of the model object '
@@ -47,6 +48,7 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getSignals <em>Signals</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getInputs <em>Inputs</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getOutputs <em>Outputs</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getHardwareDatabase <em>Hardware Database</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getConfiguration <em>Configuration</em>}</li>
  * </ul>
  * </p>
@@ -182,6 +184,23 @@ public interface Design extends Graph {
 	 * @generated
 	 */
 	EList<Port> getOutputs();
+
+	/**
+	 * Returns the value of the '<em><b>Hardware Database</b></em>' map.
+	 * The key is of type {@link java.lang.String},
+	 * and the value is of type {@link net.sf.orcc.backends.llvm.tta.architecture.Implementation},
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Hardware Database</em>' map isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Hardware Database</em>' map.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getDesign_HardwareDatabase()
+	 * @model mapType="net.sf.orcc.backends.llvm.tta.architecture.TypeToImplMapEntry<org.eclipse.emf.ecore.EString, net.sf.orcc.backends.llvm.tta.architecture.Implementation>"
+	 * @generated
+	 */
+	EMap<String, Implementation> getHardwareDatabase();
 
 	/**
 	 * Returns the value of the '<em><b>Configuration</b></em>' attribute.

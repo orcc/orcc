@@ -34,7 +34,6 @@ import net.sf.orcc.backends.llvm.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.llvm.tta.architecture.FuPort;
 import net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit;
-import net.sf.orcc.backends.llvm.tta.architecture.Implementation;
 import net.sf.orcc.backends.llvm.tta.architecture.Operation;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -47,9 +46,8 @@ import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Function Unit</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object '
+ * <em><b>Function Unit</b></em>'. <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
@@ -66,8 +64,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
 public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -76,8 +73,7 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 
 	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -86,8 +82,7 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 
 	/**
 	 * The cached value of the '{@link #getOperations() <em>Operations</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getOperations()
 	 * @generated
 	 * @ordered
@@ -96,8 +91,7 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 
 	/**
 	 * The cached value of the '{@link #getPorts() <em>Ports</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getPorts()
 	 * @generated
 	 * @ordered
@@ -106,8 +100,8 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 
 	/**
 	 * The cached value of the '{@link #getAddressSpace() <em>Address Space</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @see #getAddressSpace()
 	 * @generated
 	 * @ordered
@@ -115,18 +109,27 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 	protected AddressSpace addressSpace;
 
 	/**
-	 * The cached value of the '{@link #getImplementation() <em>Implementation</em>}' reference.
+	 * The default value of the '{@link #getImplementation() <em>Implementation</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see #getImplementation()
 	 * @generated
 	 * @ordered
 	 */
-	protected Implementation implementation;
+	protected static final String IMPLEMENTATION_EDEFAULT = null;
 
 	/**
+	 * The cached value of the '{@link #getImplementation() <em>Implementation</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * @see #getImplementation()
+	 * @generated
+	 * @ordered
+	 */
+	protected String implementation = IMPLEMENTATION_EDEFAULT;
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected FunctionUnitImpl() {
@@ -134,8 +137,7 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -144,8 +146,7 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public String getName() {
@@ -153,8 +154,7 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setName(String newName) {
@@ -166,8 +166,7 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EList<Operation> getOperations() {
@@ -180,8 +179,7 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EList<FuPort> getPorts() {
@@ -193,8 +191,7 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public AddressSpace getAddressSpace() {
@@ -212,8 +209,7 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public AddressSpace basicGetAddressSpace() {
@@ -221,8 +217,7 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setAddressSpace(AddressSpace newAddressSpace) {
@@ -239,36 +234,16 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Implementation getImplementation() {
-		if (implementation != null && implementation.eIsProxy()) {
-			InternalEObject oldImplementation = (InternalEObject) implementation;
-			implementation = (Implementation) eResolveProxy(oldImplementation);
-			if (implementation != oldImplementation) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							ArchitecturePackage.FUNCTION_UNIT__IMPLEMENTATION,
-							oldImplementation, implementation));
-			}
-		}
+	public String getImplementation() {
 		return implementation;
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Implementation basicGetImplementation() {
-		return implementation;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setImplementation(Implementation newImplementation) {
-		Implementation oldImplementation = implementation;
+	public void setImplementation(String newImplementation) {
+		String oldImplementation = implementation;
 		implementation = newImplementation;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
@@ -277,8 +252,7 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -295,8 +269,7 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -313,16 +286,13 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 				return getAddressSpace();
 			return basicGetAddressSpace();
 		case ArchitecturePackage.FUNCTION_UNIT__IMPLEMENTATION:
-			if (resolve)
-				return getImplementation();
-			return basicGetImplementation();
+			return getImplementation();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -344,15 +314,14 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 			setAddressSpace((AddressSpace) newValue);
 			return;
 		case ArchitecturePackage.FUNCTION_UNIT__IMPLEMENTATION:
-			setImplementation((Implementation) newValue);
+			setImplementation((String) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -371,15 +340,14 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 			setAddressSpace((AddressSpace) null);
 			return;
 		case ArchitecturePackage.FUNCTION_UNIT__IMPLEMENTATION:
-			setImplementation((Implementation) null);
+			setImplementation(IMPLEMENTATION_EDEFAULT);
 			return;
 		}
 		super.eUnset(featureID);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -395,14 +363,14 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 		case ArchitecturePackage.FUNCTION_UNIT__ADDRESS_SPACE:
 			return addressSpace != null;
 		case ArchitecturePackage.FUNCTION_UNIT__IMPLEMENTATION:
-			return implementation != null;
+			return IMPLEMENTATION_EDEFAULT == null ? implementation != null
+					: !IMPLEMENTATION_EDEFAULT.equals(implementation);
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -413,8 +381,10 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (name: ");
 		result.append(name);
+		result.append(", implementation: ");
+		result.append(implementation);
 		result.append(')');
 		return result.toString();
 	}
 
-} //FunctionUnitImpl
+} // FunctionUnitImpl

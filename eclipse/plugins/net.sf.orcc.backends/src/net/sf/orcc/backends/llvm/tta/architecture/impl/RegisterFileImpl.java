@@ -32,7 +32,6 @@ import java.util.Collection;
 
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.llvm.tta.architecture.FuPort;
-import net.sf.orcc.backends.llvm.tta.architecture.Implementation;
 import net.sf.orcc.backends.llvm.tta.architecture.RegisterFile;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -46,9 +45,8 @@ import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Register File</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object '
+ * <em><b>Register File</b></em>'. <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
@@ -67,8 +65,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
 public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -77,8 +74,7 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 
 	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -87,8 +83,7 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 
 	/**
 	 * The default value of the '{@link #getSize() <em>Size</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getSize()
 	 * @generated
 	 * @ordered
@@ -97,8 +92,7 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 
 	/**
 	 * The cached value of the '{@link #getSize() <em>Size</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getSize()
 	 * @generated
 	 * @ordered
@@ -107,8 +101,7 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 
 	/**
 	 * The default value of the '{@link #getWidth() <em>Width</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getWidth()
 	 * @generated
 	 * @ordered
@@ -117,8 +110,7 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 
 	/**
 	 * The cached value of the '{@link #getWidth() <em>Width</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getWidth()
 	 * @generated
 	 * @ordered
@@ -127,8 +119,7 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 
 	/**
 	 * The default value of the '{@link #getMaxReads() <em>Max Reads</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getMaxReads()
 	 * @generated
 	 * @ordered
@@ -137,8 +128,7 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 
 	/**
 	 * The cached value of the '{@link #getMaxReads() <em>Max Reads</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getMaxReads()
 	 * @generated
 	 * @ordered
@@ -147,8 +137,7 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 
 	/**
 	 * The default value of the '{@link #getMaxWrites() <em>Max Writes</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getMaxWrites()
 	 * @generated
 	 * @ordered
@@ -157,8 +146,7 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 
 	/**
 	 * The cached value of the '{@link #getMaxWrites() <em>Max Writes</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getMaxWrites()
 	 * @generated
 	 * @ordered
@@ -167,8 +155,7 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 
 	/**
 	 * The cached value of the '{@link #getPorts() <em>Ports</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getPorts()
 	 * @generated
 	 * @ordered
@@ -176,18 +163,27 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	protected EList<FuPort> ports;
 
 	/**
-	 * The cached value of the '{@link #getImplementation() <em>Implementation</em>}' reference.
+	 * The default value of the '{@link #getImplementation() <em>Implementation</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see #getImplementation()
 	 * @generated
 	 * @ordered
 	 */
-	protected Implementation implementation;
+	protected static final String IMPLEMENTATION_EDEFAULT = null;
 
 	/**
+	 * The cached value of the '{@link #getImplementation() <em>Implementation</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * @see #getImplementation()
+	 * @generated
+	 * @ordered
+	 */
+	protected String implementation = IMPLEMENTATION_EDEFAULT;
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected RegisterFileImpl() {
@@ -195,8 +191,7 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -205,8 +200,7 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public String getName() {
@@ -214,8 +208,7 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setName(String newName) {
@@ -227,8 +220,7 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public int getSize() {
@@ -236,8 +228,7 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setSize(int newSize) {
@@ -249,8 +240,7 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public int getWidth() {
@@ -258,8 +248,7 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setWidth(int newWidth) {
@@ -271,8 +260,7 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public int getMaxReads() {
@@ -280,8 +268,7 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setMaxReads(int newMaxReads) {
@@ -294,8 +281,7 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public int getMaxWrites() {
@@ -303,8 +289,7 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setMaxWrites(int newMaxWrites) {
@@ -317,8 +302,7 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EList<FuPort> getPorts() {
@@ -334,36 +318,16 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Implementation getImplementation() {
-		if (implementation != null && implementation.eIsProxy()) {
-			InternalEObject oldImplementation = (InternalEObject) implementation;
-			implementation = (Implementation) eResolveProxy(oldImplementation);
-			if (implementation != oldImplementation) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							ArchitecturePackage.REGISTER_FILE__IMPLEMENTATION,
-							oldImplementation, implementation));
-			}
-		}
+	public String getImplementation() {
 		return implementation;
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Implementation basicGetImplementation() {
-		return implementation;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setImplementation(Implementation newImplementation) {
-		Implementation oldImplementation = implementation;
+	public void setImplementation(String newImplementation) {
+		String oldImplementation = implementation;
 		implementation = newImplementation;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
@@ -372,8 +336,7 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -387,8 +350,7 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -407,16 +369,13 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 		case ArchitecturePackage.REGISTER_FILE__PORTS:
 			return getPorts();
 		case ArchitecturePackage.REGISTER_FILE__IMPLEMENTATION:
-			if (resolve)
-				return getImplementation();
-			return basicGetImplementation();
+			return getImplementation();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -443,15 +402,14 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 			getPorts().addAll((Collection<? extends FuPort>) newValue);
 			return;
 		case ArchitecturePackage.REGISTER_FILE__IMPLEMENTATION:
-			setImplementation((Implementation) newValue);
+			setImplementation((String) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -476,15 +434,14 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 			getPorts().clear();
 			return;
 		case ArchitecturePackage.REGISTER_FILE__IMPLEMENTATION:
-			setImplementation((Implementation) null);
+			setImplementation(IMPLEMENTATION_EDEFAULT);
 			return;
 		}
 		super.eUnset(featureID);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -504,14 +461,14 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 		case ArchitecturePackage.REGISTER_FILE__PORTS:
 			return ports != null && !ports.isEmpty();
 		case ArchitecturePackage.REGISTER_FILE__IMPLEMENTATION:
-			return implementation != null;
+			return IMPLEMENTATION_EDEFAULT == null ? implementation != null
+					: !IMPLEMENTATION_EDEFAULT.equals(implementation);
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -530,8 +487,10 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 		result.append(maxReads);
 		result.append(", maxWrites: ");
 		result.append(maxWrites);
+		result.append(", implementation: ");
+		result.append(implementation);
 		result.append(')');
 		return result.toString();
 	}
 
-} //RegisterFileImpl
+} // RegisterFileImpl

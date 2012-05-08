@@ -40,7 +40,6 @@ import net.sf.orcc.backends.llvm.tta.architecture.Bridge;
 import net.sf.orcc.backends.llvm.tta.architecture.Bus;
 import net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.llvm.tta.architecture.GlobalControlUnit;
-import net.sf.orcc.backends.llvm.tta.architecture.Implementation;
 import net.sf.orcc.backends.llvm.tta.architecture.Processor;
 import net.sf.orcc.backends.llvm.tta.architecture.ProcessorConfiguration;
 import net.sf.orcc.backends.llvm.tta.architecture.RegisterFile;
@@ -57,9 +56,8 @@ import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Processor</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object '
+ * <em><b>Processor</b></em>'. <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
@@ -71,7 +69,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.ProcessorImpl#getRegisterFiles <em>Register Files</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.ProcessorImpl#getProgram <em>Program</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.ProcessorImpl#getData <em>Data</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.ProcessorImpl#getHardwareDatabase <em>Hardware Database</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.ProcessorImpl#getMappedActors <em>Mapped Actors</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.ProcessorImpl#getConfiguration <em>Configuration</em>}</li>
  * </ul>
@@ -82,8 +79,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
 public class ProcessorImpl extends ComponentImpl implements Processor {
 	/**
 	 * The cached value of the '{@link #getGcu() <em>Gcu</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getGcu()
 	 * @generated
 	 * @ordered
@@ -92,8 +88,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 
 	/**
 	 * The cached value of the '{@link #getBuses() <em>Buses</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getBuses()
 	 * @generated
 	 * @ordered
@@ -102,8 +97,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 
 	/**
 	 * The cached value of the '{@link #getBridges() <em>Bridges</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getBridges()
 	 * @generated
 	 * @ordered
@@ -112,8 +106,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 
 	/**
 	 * The cached value of the '{@link #getSockets() <em>Sockets</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getSockets()
 	 * @generated
 	 * @ordered
@@ -122,8 +115,8 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 
 	/**
 	 * The cached value of the '{@link #getFunctionUnits() <em>Function Units</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
 	 * @see #getFunctionUnits()
 	 * @generated
 	 * @ordered
@@ -132,8 +125,8 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 
 	/**
 	 * The cached value of the '{@link #getRegisterFiles() <em>Register Files</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
 	 * @see #getRegisterFiles()
 	 * @generated
 	 * @ordered
@@ -142,8 +135,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 
 	/**
 	 * The cached value of the '{@link #getProgram() <em>Program</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getProgram()
 	 * @generated
 	 * @ordered
@@ -152,8 +144,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 
 	/**
 	 * The cached value of the '{@link #getData() <em>Data</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getData()
 	 * @generated
 	 * @ordered
@@ -161,19 +152,9 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	protected EList<AddressSpace> data;
 
 	/**
-	 * The cached value of the '{@link #getHardwareDatabase() <em>Hardware Database</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getHardwareDatabase()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Implementation> hardwareDatabase;
-
-	/**
 	 * The cached value of the '{@link #getMappedActors() <em>Mapped Actors</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @see #getMappedActors()
 	 * @generated
 	 * @ordered
@@ -182,8 +163,8 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 
 	/**
 	 * The default value of the '{@link #getConfiguration() <em>Configuration</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @see #getConfiguration()
 	 * @generated
 	 * @ordered
@@ -192,8 +173,8 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 
 	/**
 	 * The cached value of the '{@link #getConfiguration() <em>Configuration</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @see #getConfiguration()
 	 * @generated
 	 * @ordered
@@ -211,8 +192,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public NotificationChain basicSetGcu(GlobalControlUnit newGcu,
@@ -232,8 +212,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public NotificationChain basicSetProgram(AddressSpace newProgram,
@@ -253,8 +232,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -276,8 +254,6 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 			return getProgram();
 		case ArchitecturePackage.PROCESSOR__DATA:
 			return getData();
-		case ArchitecturePackage.PROCESSOR__HARDWARE_DATABASE:
-			return getHardwareDatabase();
 		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
 			return getMappedActors();
 		case ArchitecturePackage.PROCESSOR__CONFIGURATION:
@@ -287,8 +263,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -315,16 +290,12 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 			return basicSetProgram(null, msgs);
 		case ArchitecturePackage.PROCESSOR__DATA:
 			return ((InternalEList<?>) getData()).basicRemove(otherEnd, msgs);
-		case ArchitecturePackage.PROCESSOR__HARDWARE_DATABASE:
-			return ((InternalEList<?>) getHardwareDatabase()).basicRemove(
-					otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -346,8 +317,6 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 			return program != null;
 		case ArchitecturePackage.PROCESSOR__DATA:
 			return data != null && !data.isEmpty();
-		case ArchitecturePackage.PROCESSOR__HARDWARE_DATABASE:
-			return hardwareDatabase != null && !hardwareDatabase.isEmpty();
 		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
 			return mappedActors != null && !mappedActors.isEmpty();
 		case ArchitecturePackage.PROCESSOR__CONFIGURATION:
@@ -357,8 +326,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -397,11 +365,6 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 			getData().clear();
 			getData().addAll((Collection<? extends AddressSpace>) newValue);
 			return;
-		case ArchitecturePackage.PROCESSOR__HARDWARE_DATABASE:
-			getHardwareDatabase().clear();
-			getHardwareDatabase().addAll(
-					(Collection<? extends Implementation>) newValue);
-			return;
 		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
 			getMappedActors().clear();
 			getMappedActors().addAll((Collection<? extends Vertex>) newValue);
@@ -414,8 +377,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -424,8 +386,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -455,9 +416,6 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 		case ArchitecturePackage.PROCESSOR__DATA:
 			getData().clear();
 			return;
-		case ArchitecturePackage.PROCESSOR__HARDWARE_DATABASE:
-			getHardwareDatabase().clear();
-			return;
 		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
 			getMappedActors().clear();
 			return;
@@ -469,8 +427,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EList<Bridge> getBridges() {
@@ -482,8 +439,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EList<Bus> getBuses() {
@@ -495,8 +451,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public ProcessorConfiguration getConfiguration() {
@@ -504,8 +459,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EList<AddressSpace> getData() {
@@ -518,8 +472,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EList<FunctionUnit> getFunctionUnits() {
@@ -532,8 +485,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public GlobalControlUnit getGcu() {
@@ -541,22 +493,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Implementation> getHardwareDatabase() {
-		if (hardwareDatabase == null) {
-			hardwareDatabase = new EObjectContainmentEList<Implementation>(
-					Implementation.class, this,
-					ArchitecturePackage.PROCESSOR__HARDWARE_DATABASE);
-		}
-		return hardwareDatabase;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EList<Vertex> getMappedActors() {
@@ -568,8 +505,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public AddressSpace getProgram() {
@@ -577,8 +513,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EList<RegisterFile> getRegisterFiles() {
@@ -591,8 +526,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EList<Socket> getSockets() {
@@ -614,8 +548,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setConfiguration(ProcessorConfiguration newConfiguration) {
@@ -629,8 +562,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setGcu(GlobalControlUnit newGcu) {
@@ -655,8 +587,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setProgram(AddressSpace newProgram) {
@@ -687,8 +618,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -703,4 +633,4 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 		return result.toString();
 	}
 
-} //ProcessorImpl
+} // ProcessorImpl

@@ -50,7 +50,6 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getRegisterFiles <em>Register Files</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getProgram <em>Program</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getData <em>Data</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getHardwareDatabase <em>Hardware Database</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getMappedActors <em>Mapped Actors</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getConfiguration <em>Configuration</em>}</li>
  * </ul>
@@ -165,25 +164,6 @@ public interface Processor extends Component {
 	 * @generated
 	 */
 	GlobalControlUnit getGcu();
-
-	/**
-	 * Returns the value of the '<em><b>Hardware Database</b></em>' containment
-	 * reference list. The list contents are of type
-	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Implementation}. <!--
-	 * begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Hardware Database</em>' containment reference
-	 * list isn't clear, there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * 
-	 * @return the value of the '<em>Hardware Database</em>' containment
-	 *         reference list.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_HardwareDatabase()
-	 * @model containment="true"
-	 * @generated
-	 */
-	EList<Implementation> getHardwareDatabase();
 
 	/**
 	 * Returns the value of the '<em><b>Mapped Actors</b></em>' reference list.

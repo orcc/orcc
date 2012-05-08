@@ -16,6 +16,8 @@
         eType="#//Port"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="outputs" upperBound="-1"
         eType="#//Port"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="hardwareDatabase" upperBound="-1"
+        eType="#//TypeToImplMapEntry" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="configuration" eType="#//DesignConfiguration"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Link" abstract="true" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Edge">
@@ -57,8 +59,6 @@
         containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="data" upperBound="-1" eType="#//AddressSpace"
         containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="hardwareDatabase" upperBound="-1"
-        eType="#//Implementation" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="mappedActors" upperBound="-1"
         eType="ecore:EClass ../../net.sf.dftools.models/model/Graph.ecore#//Vertex"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="configuration" eType="#//ProcessorConfiguration"/>
@@ -108,7 +108,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="ports" upperBound="-1"
         eType="#//FuPort" transient="true" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="addressSpace" eType="#//AddressSpace"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="implementation" eType="#//Implementation"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="implementation" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="RegisterFile">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -118,7 +118,7 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="maxWrites" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="ports" upperBound="-1"
         eType="#//FuPort" transient="true" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="implementation" eType="#//Implementation"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="implementation" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="FuPort">
     <eOperations name="connect">
@@ -231,6 +231,10 @@
   <eClassifiers xsi:type="ecore:EEnum" name="OpBinary">
     <eLiterals name="and"/>
     <eLiterals name="or" value="1"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TypeToImplMapEntry" instanceClassName="java.util.Map$Entry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="#//Implementation"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="PortToIndexMapEntry" instanceClassName="java.util.Map$Entry">
     <eStructuralFeatures xsi:type="ecore:EReference" name="key" eType="#//FuPort"/>
