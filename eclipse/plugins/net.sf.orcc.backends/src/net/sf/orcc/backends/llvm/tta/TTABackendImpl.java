@@ -254,6 +254,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 				"net/sf/orcc/backends/llvm/tta/TCE_Processor_ADF.stg");
 		ArchitecturePrinter idfPrinter = new ArchitecturePrinter(
 				"net/sf/orcc/backends/llvm/tta/TCE_Processor_IDF.stg");
+		idfPrinter.getOptions().put("hwDb", design.getHardwareDatabase());
 
 		adfPrinter.print(tta.getName() + ".adf", processorPath, tta);
 		idfPrinter.print(tta.getName() + ".idf", processorPath, tta);

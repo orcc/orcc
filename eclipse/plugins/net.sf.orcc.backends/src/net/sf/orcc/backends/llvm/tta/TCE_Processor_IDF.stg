@@ -18,14 +18,14 @@ printProcessor(processor, options) ::= <<
 
 printFunctionUnit(functionUnit) ::= <<
 \<fu name="<functionUnit.name>"\>
-	\<hdb-file\><functionUnit.implementation.hdbFile>\</hdb-file\>
-	\<fu-id\><functionUnit.implementation.id>\</fu-id\>
+	\<hdb-file\><options.hwDb.(functionUnit.implementation).hdbFile>\</hdb-file\>
+	\<fu-id\><options.hwDb.(functionUnit.implementation).id>\</fu-id\>
 \</fu\>
 >>
 
 printRegisterFile(registerFile) ::= <<
 \<rf name="<registerFile.name>"\>
-	\<hdb-file\><registerFile.implementation.hdbFile>\</hdb-file\>
-    \<rf-id\><registerFile.implementation.id>\</rf-id\>
+	\<hdb-file\><options.hwDb.(registerFile.implementation).hdbFile>\</hdb-file\>
+    \<rf-id\><options.hwDb.(registerFile.implementation).id>\</rf-id\>
 \</rf\>
 >>
