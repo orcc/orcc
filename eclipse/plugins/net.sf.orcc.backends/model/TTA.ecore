@@ -55,7 +55,7 @@
         eType="#//RegisterFile" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="program" eType="#//AddressSpace"
         containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="data" eType="#//AddressSpace"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="data" upperBound="-1" eType="#//AddressSpace"
         containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="hardwareDatabase" upperBound="-1"
         eType="#//Implementation" containment="true"/>
@@ -101,7 +101,7 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="delaySlots" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="guardLatency" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="FunctionUnit">
+  <eClassifiers xsi:type="ecore:EClass" name="FunctionUnit" eSuperTypes="#//Port">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="operations" upperBound="-1"
         eType="#//Operation" containment="true"/>
@@ -154,6 +154,7 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="minAddress" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="maxAddress" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="width" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EInt"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Element" abstract="true" interface="true">
     <eOperations name="isReads" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>

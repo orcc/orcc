@@ -241,6 +241,12 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 			FunctionUnit functionUnit = (FunctionUnit) theEObject;
 			T result = caseFunctionUnit(functionUnit);
 			if (result == null)
+				result = casePort(functionUnit);
+			if (result == null)
+				result = caseVertex(functionUnit);
+			if (result == null)
+				result = caseAttributable(functionUnit);
+			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
 		}

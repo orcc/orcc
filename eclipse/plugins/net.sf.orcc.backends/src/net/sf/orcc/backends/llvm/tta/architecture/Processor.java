@@ -116,20 +116,20 @@ public interface Processor extends Component {
 	ProcessorConfiguration getConfiguration();
 
 	/**
-	 * Returns the value of the '<em><b>Data</b></em>' containment reference.
+	 * Returns the value of the '<em><b>Data</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.AddressSpace}.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Data</em>' containment reference isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Data</em>' containment reference.
-	 * @see #setData(AddressSpace)
+	 * @return the value of the '<em>Data</em>' containment reference list.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_Data()
 	 * @model containment="true"
 	 * @generated
 	 */
-	AddressSpace getData();
+	EList<AddressSpace> getData();
 
 	/**
 	 * Returns the value of the '<em><b>Function Units</b></em>' containment
@@ -267,16 +267,6 @@ public interface Processor extends Component {
 	 * @generated
 	 */
 	void setConfiguration(ProcessorConfiguration value);
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getData <em>Data</em>}' containment reference.
-	 * <!-- begin-user-doc --> <!--
-	 * end-user-doc -->
-	 * @param value the new value of the '<em>Data</em>' containment reference.
-	 * @see #getData()
-	 * @generated
-	 */
-	void setData(AddressSpace value);
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getGcu <em>Gcu</em>}' containment reference.

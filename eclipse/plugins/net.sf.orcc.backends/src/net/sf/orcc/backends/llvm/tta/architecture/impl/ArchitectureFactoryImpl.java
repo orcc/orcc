@@ -295,6 +295,15 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return addressSpace;
 	}
 
+	@Override
+	public AddressSpace createAddressSpace(String name, int id, int width,
+			int minAddress, int maxAddress) {
+		AddressSpace addressSpace = createAddressSpace(name, width, minAddress,
+				maxAddress);
+		addressSpace.setId(id);
+		return addressSpace;
+	}
+
 	public FunctionUnit createAlu2Unit(Processor tta, String name) {
 		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
 		functionUnit.setName(name);
@@ -406,6 +415,32 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	public Buffer createBuffer() {
+		BufferImpl buffer = new BufferImpl();
+		return buffer;
+	}
+	
+	@Override
+	public Buffer createBuffer(Vertex source, Vertex target) {
+		BufferImpl buffer = new BufferImpl();
+		buffer.setSource(source);
+		buffer.setTarget(target);
+		return buffer;
+	}
+
+	@Override
+	public Buffer createBuffer(Vertex source, Vertex target, Port sourcePort,
+			Port targetPort) {
+		Buffer buffer = createBuffer(source, target);
+		buffer.setSourcePort(sourcePort);
+		buffer.setTargetPort(targetPort);
+		return buffer;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
 	public Bus createBus() {
 		BusImpl bus = new BusImpl();
 		return bus;
@@ -434,15 +469,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	public Component createComponent() {
 		ComponentImpl component = new ComponentImpl();
 		return component;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Buffer createBuffer() {
-		BufferImpl buffer = new BufferImpl();
-		return buffer;
 	}
 
 	@Override
@@ -723,6 +749,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return implementation;
 	}
 
+	@Override
 	public Implementation createImplementation(String hdbFile, int id) {
 		ImplementationImpl implementation = new ImplementationImpl();
 		implementation.setHdbFile(hdbFile);
@@ -739,7 +766,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	@Override
 	public FunctionUnit createLSU(String name, Processor tta,
-			Implementation implementation) {
+			AddressSpace addressSpace, Implementation implementation) {
 		FunctionUnit LSU = createFunctionUnit(tta, name, implementation);
 		// Operations
 		EList<FuPort> ports = LSU.getPorts();
@@ -755,7 +782,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 					createOperationStore(storeOperation, ports.get(0),
 							ports.get(1)));
 		}
-		LSU.setAddressSpace(tta.getData());
+		LSU.setAddressSpace(addressSpace);
 		return LSU;
 	}
 
@@ -767,7 +794,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 				createOperationMul("mul", multiplier.getPorts().get(0),
 						multiplier.getPorts().get(1), multiplier.getPorts()
 								.get(2)));
-		multiplier.setAddressSpace(tta.getData());
 		return multiplier;
 	}
 
@@ -778,7 +804,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 				createOperationMul("mul", multiplier.getPorts().get(0),
 						multiplier.getPorts().get(1), multiplier.getPorts()
 								.get(2)));
-		multiplier.setAddressSpace(tta.getData());
 		return multiplier;
 	}
 
@@ -1038,9 +1063,10 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		processor.setName(name);
 
 		// Address spaces
-		processor.setData(createAddressSpace("data", 8, 0,
-				quantizeUp(ramSize / 8 + 512)));
+		AddressSpace data = createAddressSpace("data", 0, 8, 0,
+				quantizeUp(ramSize / 8 + 512));
 		processor.setProgram(createAddressSpace("instructions", 8, 0, 60000));
+		processor.getData().add(data);
 		// Buses
 		for (int i = 0; i < conf.getBusNb(); i++) {
 			Bus bus = createBusDefault(i, 32);
@@ -1075,7 +1101,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		Implementation lsuImpl = createImplementation("stratixII.hdb", 2);
 		for (int i = 0; i < conf.getLsuNb(); i++) {
 			String lsuName = conf.getLsuNb() == 1 ? "LSU" : "LSU_" + i;
-			units.add(createLSU(lsuName, processor, lsuImpl));
+			units.add(createLSU(lsuName, processor, data, lsuImpl));
 		}
 		processor.getHardwareDatabase().add(lsuImpl);
 		// * Mul
@@ -1271,16 +1297,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		signal.setSource(source);
 		signal.setTarget(target);
 		return signal;
-	}
-
-	public Buffer createBuffer(Vertex source, Vertex target, Port sourcePort,
-			Port targetPort) {
-		BufferImpl buffer = new BufferImpl();
-		buffer.setSourcePort(sourcePort);
-		buffer.setTargetPort(targetPort);
-		buffer.setSource(source);
-		buffer.setTarget(target);
-		return buffer;
 	}
 
 	/**

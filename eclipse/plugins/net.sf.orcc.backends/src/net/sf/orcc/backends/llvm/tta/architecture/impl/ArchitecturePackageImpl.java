@@ -1105,6 +1105,15 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getAddressSpace_Id() {
+		return (EAttribute) addressSpaceEClass.getEStructuralFeatures().get(4);
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -1573,6 +1582,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEAttribute(addressSpaceEClass, ADDRESS_SPACE__MIN_ADDRESS);
 		createEAttribute(addressSpaceEClass, ADDRESS_SPACE__MAX_ADDRESS);
 		createEAttribute(addressSpaceEClass, ADDRESS_SPACE__WIDTH);
+		createEAttribute(addressSpaceEClass, ADDRESS_SPACE__ID);
 
 		elementEClass = createEClass(ELEMENT);
 		createEAttribute(elementEClass, ELEMENT__START_CYCLE);
@@ -1678,6 +1688,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		bufferEClass.getESuperTypes().add(this.getLink());
 		portEClass.getESuperTypes().add(theGraphPackage.getVertex());
 		processorEClass.getESuperTypes().add(this.getComponent());
+		functionUnitEClass.getESuperTypes().add(this.getPort());
 		readsEClass.getESuperTypes().add(this.getElement());
 		writesEClass.getESuperTypes().add(this.getElement());
 		resourceEClass.getESuperTypes().add(this.getElement());
@@ -1809,7 +1820,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getProcessor_Data(), this.getAddressSpace(), null,
-				"data", null, 0, 1, Processor.class, !IS_TRANSIENT,
+				"data", null, 0, -1, Processor.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getProcessor_HardwareDatabase(),
@@ -2050,6 +2061,10 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				"width", null, 0, 1, AddressSpace.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
+		initEAttribute(getAddressSpace_Id(), theEcorePackage.getEInt(), "id",
+				null, 0, 1, AddressSpace.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
 
 		initEClass(elementEClass, Element.class, "Element", IS_ABSTRACT,
 				IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);

@@ -1049,13 +1049,58 @@ public interface ArchitecturePackage extends EPackage {
 	int GLOBAL_CONTROL_UNIT_FEATURE_COUNT = 6;
 
 	/**
+	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FUNCTION_UNIT__ATTRIBUTES = PORT__ATTRIBUTES;
+
+	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FUNCTION_UNIT__INCOMING = PORT__INCOMING;
+
+	/**
+	 * The feature id for the '<em><b>Label</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FUNCTION_UNIT__LABEL = PORT__LABEL;
+
+	/**
+	 * The feature id for the '<em><b>Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FUNCTION_UNIT__NUMBER = PORT__NUMBER;
+
+	/**
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FUNCTION_UNIT__OUTGOING = PORT__OUTGOING;
+
+	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int FUNCTION_UNIT__NAME = 0;
+	int FUNCTION_UNIT__NAME = PORT_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Operations</b></em>' containment reference list.
@@ -1063,7 +1108,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int FUNCTION_UNIT__OPERATIONS = 1;
+	int FUNCTION_UNIT__OPERATIONS = PORT_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Ports</b></em>' containment reference list.
@@ -1071,7 +1116,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int FUNCTION_UNIT__PORTS = 2;
+	int FUNCTION_UNIT__PORTS = PORT_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Address Space</b></em>' reference. <!--
@@ -1080,7 +1125,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int FUNCTION_UNIT__ADDRESS_SPACE = 3;
+	int FUNCTION_UNIT__ADDRESS_SPACE = PORT_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Implementation</b></em>' reference. <!--
@@ -1089,7 +1134,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int FUNCTION_UNIT__IMPLEMENTATION = 4;
+	int FUNCTION_UNIT__IMPLEMENTATION = PORT_FEATURE_COUNT + 4;
 
 	/**
 	 * The number of structural features of the '<em>Function Unit</em>' class.
@@ -1097,7 +1142,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int FUNCTION_UNIT_FEATURE_COUNT = 5;
+	int FUNCTION_UNIT_FEATURE_COUNT = PORT_FEATURE_COUNT + 5;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -1370,12 +1415,21 @@ public interface ArchitecturePackage extends EPackage {
 	int ADDRESS_SPACE__WIDTH = 3;
 
 	/**
+	 * The feature id for the '<em><b>Id</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ADDRESS_SPACE__ID = 4;
+
+	/**
 	 * The number of structural features of the '<em>Address Space</em>' class.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ADDRESS_SPACE_FEATURE_COUNT = 4;
+	int ADDRESS_SPACE_FEATURE_COUNT = 5;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.Guard <em>Guard</em>}' class.
@@ -2263,9 +2317,9 @@ public interface ArchitecturePackage extends EPackage {
 	EReference getProcessor_Program();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getData <em>Data</em>}'.
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getData <em>Data</em>}'.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Data</em>'.
+	 * @return the meta object for the containment reference list '<em>Data</em>'.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.Processor#getData()
 	 * @see #getProcessor()
 	 * @generated
@@ -2844,6 +2898,17 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getAddressSpace_Width();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.llvm.tta.architecture.AddressSpace#getId <em>Id</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Id</em>'.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.AddressSpace#getId()
+	 * @see #getAddressSpace()
+	 * @generated
+	 */
+	EAttribute getAddressSpace_Id();
 
 	/**
 	 * Returns the meta object for class '
@@ -3522,7 +3587,7 @@ public interface ArchitecturePackage extends EPackage {
 		EReference PROCESSOR__PROGRAM = eINSTANCE.getProcessor_Program();
 
 		/**
-		 * The meta object literal for the '<em><b>Data</b></em>' containment reference feature.
+		 * The meta object literal for the '<em><b>Data</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
@@ -3991,6 +4056,14 @@ public interface ArchitecturePackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute ADDRESS_SPACE__WIDTH = eINSTANCE.getAddressSpace_Width();
+
+		/**
+		 * The meta object literal for the '<em><b>Id</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute ADDRESS_SPACE__ID = eINSTANCE.getAddressSpace_Id();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.llvm.tta.architecture.Guard <em>Guard</em>}' class.

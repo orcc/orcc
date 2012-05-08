@@ -151,14 +151,14 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	protected AddressSpace program;
 
 	/**
-	 * The cached value of the '{@link #getData() <em>Data</em>}' containment reference.
+	 * The cached value of the '{@link #getData() <em>Data</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see #getData()
 	 * @generated
 	 * @ordered
 	 */
-	protected AddressSpace data;
+	protected EList<AddressSpace> data;
 
 	/**
 	 * The cached value of the '{@link #getHardwareDatabase() <em>Hardware Database</em>}' containment reference list.
@@ -208,27 +208,6 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	 */
 	protected ProcessorImpl() {
 		super();
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NotificationChain basicSetData(AddressSpace newData,
-			NotificationChain msgs) {
-		AddressSpace oldData = data;
-		data = newData;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, ArchitecturePackage.PROCESSOR__DATA,
-					oldData, newData);
-			if (msgs == null)
-				msgs = notification;
-			else
-				msgs.add(notification);
-		}
-		return msgs;
 	}
 
 	/**
@@ -335,7 +314,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 		case ArchitecturePackage.PROCESSOR__PROGRAM:
 			return basicSetProgram(null, msgs);
 		case ArchitecturePackage.PROCESSOR__DATA:
-			return basicSetData(null, msgs);
+			return ((InternalEList<?>) getData()).basicRemove(otherEnd, msgs);
 		case ArchitecturePackage.PROCESSOR__HARDWARE_DATABASE:
 			return ((InternalEList<?>) getHardwareDatabase()).basicRemove(
 					otherEnd, msgs);
@@ -366,7 +345,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 		case ArchitecturePackage.PROCESSOR__PROGRAM:
 			return program != null;
 		case ArchitecturePackage.PROCESSOR__DATA:
-			return data != null;
+			return data != null && !data.isEmpty();
 		case ArchitecturePackage.PROCESSOR__HARDWARE_DATABASE:
 			return hardwareDatabase != null && !hardwareDatabase.isEmpty();
 		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
@@ -415,7 +394,8 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 			setProgram((AddressSpace) newValue);
 			return;
 		case ArchitecturePackage.PROCESSOR__DATA:
-			setData((AddressSpace) newValue);
+			getData().clear();
+			getData().addAll((Collection<? extends AddressSpace>) newValue);
 			return;
 		case ArchitecturePackage.PROCESSOR__HARDWARE_DATABASE:
 			getHardwareDatabase().clear();
@@ -473,7 +453,7 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 			setProgram((AddressSpace) null);
 			return;
 		case ArchitecturePackage.PROCESSOR__DATA:
-			setData((AddressSpace) null);
+			getData().clear();
 			return;
 		case ArchitecturePackage.PROCESSOR__HARDWARE_DATABASE:
 			getHardwareDatabase().clear();
@@ -528,7 +508,12 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public AddressSpace getData() {
+	public EList<AddressSpace> getData() {
+		if (data == null) {
+			data = new EObjectContainmentEList<AddressSpace>(
+					AddressSpace.class, this,
+					ArchitecturePackage.PROCESSOR__DATA);
+		}
 		return data;
 	}
 
@@ -641,32 +626,6 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 			eNotify(new ENotificationImpl(this, Notification.SET,
 					ArchitecturePackage.PROCESSOR__CONFIGURATION,
 					oldConfiguration, configuration));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setData(AddressSpace newData) {
-		if (newData != data) {
-			NotificationChain msgs = null;
-			if (data != null)
-				msgs = ((InternalEObject) data).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE
-								- ArchitecturePackage.PROCESSOR__DATA, null,
-						msgs);
-			if (newData != null)
-				msgs = ((InternalEObject) newData).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE
-								- ArchitecturePackage.PROCESSOR__DATA, null,
-						msgs);
-			msgs = basicSetData(newData, msgs);
-			if (msgs != null)
-				msgs.dispatch();
-		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					ArchitecturePackage.PROCESSOR__DATA, newData, newData));
 	}
 
 	/**

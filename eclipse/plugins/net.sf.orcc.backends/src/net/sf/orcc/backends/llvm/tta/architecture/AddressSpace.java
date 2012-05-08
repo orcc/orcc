@@ -42,6 +42,7 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.AddressSpace#getMinAddress <em>Min Address</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.AddressSpace#getMaxAddress <em>Max Address</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.AddressSpace#getWidth <em>Width</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.AddressSpace#getId <em>Id</em>}</li>
  * </ul>
  * </p>
  *
@@ -101,6 +102,32 @@ public interface AddressSpace extends EObject {
 	 * @generated
 	 */
 	void setWidth(int value);
+
+	/**
+	 * Returns the value of the '<em><b>Id</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Id</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Id</em>' attribute.
+	 * @see #setId(int)
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getAddressSpace_Id()
+	 * @model
+	 * @generated
+	 */
+	int getId();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.AddressSpace#getId <em>Id</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Id</em>' attribute.
+	 * @see #getId()
+	 * @generated
+	 */
+	void setId(int value);
 
 	/**
 	 * Returns the value of the '<em><b>Min Address</b></em>' attribute.

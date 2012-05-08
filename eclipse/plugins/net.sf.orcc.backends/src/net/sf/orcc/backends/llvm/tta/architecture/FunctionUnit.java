@@ -30,8 +30,6 @@ package net.sf.orcc.backends.llvm.tta.architecture;
 
 import org.eclipse.emf.common.util.EList;
 
-import org.eclipse.emf.ecore.EObject;
-
 /**
  * <!-- begin-user-doc -->
  * A representation of the model object '<em><b>Function Unit</b></em>'.
@@ -52,7 +50,7 @@ import org.eclipse.emf.ecore.EObject;
  * @model
  * @generated
  */
-public interface FunctionUnit extends EObject {
+public interface FunctionUnit extends Port {
 	/**
 	 * Returns the value of the '<em><b>Name</b></em>' attribute.
 	 * <!-- begin-user-doc -->
