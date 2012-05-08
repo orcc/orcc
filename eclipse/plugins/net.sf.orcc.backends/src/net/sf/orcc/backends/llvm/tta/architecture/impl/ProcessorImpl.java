@@ -538,11 +538,6 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	}
 
 	@Override
-	public TemplateData getTemplateData() {
-		return templateData;
-	}
-
-	@Override
 	public boolean isProcessor() {
 		return true;
 	}
@@ -610,11 +605,6 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 			eNotify(new ENotificationImpl(this, Notification.SET,
 					ArchitecturePackage.PROCESSOR__PROGRAM, newProgram,
 					newProgram));
-	}
-
-	@Override
-	public void setTemplateData(TemplateData templateData) {
-		this.templateData = templateData;
 	}
 
 	/**

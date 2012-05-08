@@ -184,8 +184,6 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		design = new ArchitectureBuilder(conf).caseNetwork(network);
 
 		for (Processor processor : design.getProcessors()) {
-			processor.setTemplateData(new TTAProcessorTemplateData()
-					.compute(processor));
 			printProcessor(processor);
 		}
 

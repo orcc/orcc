@@ -31,7 +31,6 @@
 package net.sf.orcc.backends.llvm.tta.architecture;
 
 import net.sf.dftools.graph.Vertex;
-import net.sf.orcc.backends.TemplateData;
 
 import org.eclipse.emf.common.util.EList;
 
@@ -235,8 +234,6 @@ public interface Processor extends Component {
 	 */
 	EList<Socket> getSockets();
 
-	TemplateData getTemplateData();
-
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getConfiguration <em>Configuration</em>}' attribute.
 	 * <!-- begin-user-doc --> <!--
@@ -267,7 +264,5 @@ public interface Processor extends Component {
 	 * @generated
 	 */
 	void setProgram(AddressSpace value);
-
-	void setTemplateData(TemplateData templateData);
 
 } // Processor
