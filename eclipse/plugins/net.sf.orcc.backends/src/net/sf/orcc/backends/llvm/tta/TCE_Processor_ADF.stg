@@ -10,9 +10,9 @@ printProcessor(processor, options) ::= <<
 	
 	<processor.registerFiles: printRegisterFile(); separator="\n\n">
 	
-	<if(processor.data)><printAddressSpace(processor.data)><endif>
+	<if(processor.data)><processor.data: printAddressSpace(true); separator="\n\n"><endif>
 	
-	<if(processor.program)><printAddressSpace(processor.program)><endif>
+	<if(processor.program)><printAddressSpace(processor.program, false)><endif>
 	
 	<if(processor.gcu)><printGlobalControlUnit(processor.gcu)><endif>
 \</adf\>
@@ -147,11 +147,12 @@ connectSocket(socket) ::= <<
 <if(socket)>\<connects-to\><socket.name>\</connects-to\><endif>
 >>
 
-printAddressSpace(addressSpace) ::= <<
+printAddressSpace(addressSpace, printId) ::= <<
 \<address-space name="<addressSpace.name>"\>
 	\<width\><addressSpace.width>\</width\>
 	\<min-address\><addressSpace.minAddress>\</min-address\>
 	\<max-address\><addressSpace.maxAddress>\</max-address\>
+	<if(printId)>\<numerical-id\><addressSpace.id>\</numerical-id\><endif>
 \</address-space\>
 >>
 
