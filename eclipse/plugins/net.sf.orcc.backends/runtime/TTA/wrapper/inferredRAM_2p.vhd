@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@live.fr)
 -- Company    : INSA - Rennes
 -- Created    : 
--- Last update: 2011-09-13
+-- Last update: 2012-05-08
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -39,7 +39,8 @@
 -------------------------------------------------------------------------------
 -- Revisions  :
 -- Date        Version  Author       Description
--- 2011-02-21  1.0      Nicolas      Created
+-- 2011-02-21  1.0      nsiret       Created
+-- 2012-05-08  1.1      hyviquel     Updated for TTA backend
 -------------------------------------------------------------------------------
 
 library ieee;
@@ -47,25 +48,25 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 library work;
-use work.synflow_package.all;
 -------------------------------------------------------------------------------
 
 
 entity inferredRAM_2p is
   generic (
-    depth : integer := 32;
-    width : integer := 16;
-    initVal: integer := 0);
+    depth   : integer;
+    width   : integer;
+    widtha  : integer;
+    initVal : integer := 0);
   port (
     clk        : in  std_logic;
     --
     wren_p1    : in  std_logic;
-    address_p1 : in  std_logic_vector(bit_width(depth - 1) -1 downto 0);
+    address_p1 : in  std_logic_vector(widtha -1 downto 0);
     data_p1    : in  std_logic_vector(width -1 downto 0);
     q_p1       : out std_logic_vector(width -1 downto 0);
     --
     wren_p2    : in  std_logic;
-    address_p2 : in  std_logic_vector(bit_width(depth - 1) -1 downto 0);
+    address_p2 : in  std_logic_vector(widtha -1 downto 0);
     data_p2    : in  std_logic_vector(width -1 downto 0);
     q_p2       : out std_logic_vector(width -1 downto 0));
 end inferredRAM_2p;
@@ -87,8 +88,8 @@ architecture arch_inferredRAM_2p of inferredRAM_2p is
   -- Internal signal declarations
   -----------------------------------------------------------------------------
   shared variable ram : ram_type := (others => std_logic_vector(to_signed(initVal, width)));
-  signal iaddress_p1 : integer range DEPTH - 1 downto 0;
-  signal iaddress_p2 : integer range DEPTH - 1 downto 0;
+  signal iaddress_p1  : integer range DEPTH - 1 downto 0;
+  signal iaddress_p2  : integer range DEPTH - 1 downto 0;
   --
   -----------------------------------------------------------------------------
   
