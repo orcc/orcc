@@ -458,6 +458,10 @@ public interface ArchitectureFactory extends EFactory {
 	 * @generated
 	 */
 	Port createPort();
+	
+	Port createPort(String name);
+	
+	Port createPort(net.sf.orcc.df.Port port);
 
 	/**
 	 * Returns a new object of class '<em>Processor</em>'.
@@ -668,7 +672,7 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the containing tta processor
 	 * @return a new input signal
 	 */
-	FunctionUnit createSignalUnit(Processor tta);
+	FunctionUnit createOutputSignalUnit(Processor tta, String signalName);
 
 	/**
 	 * Returns a new object of class '<em>Term Bool</em>'.

@@ -973,6 +973,23 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return port;
 	}
 
+	@Override
+	public Port createPort(String name) {
+		PortImpl port = new PortImpl();
+		port.setName(name);
+		port.setAttribute("native", null);
+		return port;
+	}
+
+	@Override
+	public Port createPort(net.sf.orcc.df.Port oldPort) {
+		PortImpl port = new PortImpl();
+		port.setName(oldPort.getName());
+		port.setAttribute("native", null);
+		port.setAttribute("size", oldPort.getType().getSizeInBits());
+		return port;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -1216,10 +1233,10 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public Signal createSignal(String label, int size, Vertex source,
+	public Signal createSignal(String name, int size, Vertex source,
 			Vertex target, Port sourcePort, Port targetPort) {
 		SignalImpl signal = new SignalImpl();
-		signal.setLabel(label);
+		signal.setLabel(name);
 		signal.setSize(size);
 		signal.setSourcePort(sourcePort);
 		signal.setTargetPort(targetPort);
@@ -1264,23 +1281,23 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public FunctionUnit createSignalUnit(Processor tta) {
+	public FunctionUnit createOutputSignalUnit(Processor tta, String signalName) {
 		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
-		String name = "Signal_unit";
+		String name = "SIG_OUT_" + signalName;
 		functionUnit.setName(name);
 		// Sockets
 		EList<Segment> segments = getAllSegments(tta.getBuses());
 		Socket i1 = createInputSocket(name + "_i1", segments);
-		Socket o1 = createOutputSocket(name + "_o1", segments);
 		// Port
 		FuPort in1t = createFuPort("in1t", 32, true, true);
-		FuPort out1 = createFuPort("out1", 32, false, false);
 		in1t.connect(i1);
-		out1.connect(o1);
 		functionUnit.getPorts().add(in1t);
-		functionUnit.getPorts().add(out1);
-		// TODO: Add operation read/write.
-		functionUnit.setImplementation("SIG_UNIT");
+		// Operation
+		Operation write = createOperation("LEDS");
+		write.setControl(false);
+		write.getPipeline().add(createReads(in1t, 0, 1));
+		functionUnit.getOperations().add(write);
+		functionUnit.setImplementation("SIG_OUT");
 		return functionUnit;
 	}
 

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.dftools.graph.Vertex;
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.llvm.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.llvm.tta.architecture.Buffer;
@@ -30,10 +31,6 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 
-import org.eclipse.emf.common.util.BasicEList;
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.util.EcoreUtil;
-
 public class ArchitectureBuilder extends DfSwitch<Design> {
 
 	private Map<Component, Map<Component, Buffer>> bufferMap;
@@ -49,14 +46,11 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	private Mapping mapping;
 	private List<String> optimizedActors;
 
-	private Map<net.sf.orcc.df.Port, Port> portMap;
-	
 	private int bufferId = 0;
 
 	public ArchitectureBuilder(DesignConfiguration conf) {
 		design = factory.createDesign();
 		componentMap = new HashMap<Vertex, Component>();
-		portMap = new HashMap<net.sf.orcc.df.Port, Port>();
 		bufferMap = new HashMap<Component, Map<Component, Buffer>>();
 
 		optimizedActors = new ArrayList<String>();
@@ -96,31 +90,48 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	private void addSignal(Connection connection) {
 		Vertex source = componentMap.get(connection.getSource());
 		Vertex target = componentMap.get(connection.getTarget());
-		Port sourcePort = portMap.get(connection.getSourcePort());
-		Port targetPort = portMap.get(connection.getTargetPort());
+		Port sourcePort = null;
+		Port targetPort = null;
 		int size;
 
 		if (source == null) {
-			net.sf.orcc.df.Port calPort = (net.sf.orcc.df.Port) connection
-					.getSource();
-			source = portMap.get(calPort);
-			size = calPort.getType().getSizeInBits();
-			source.setAttribute("size", size);
+			Port port = factory.createPort((net.sf.orcc.df.Port) connection
+					.getSource());
+			design.addInput(port);
+			source = port;
 		} else {
-			size = connection.getSourcePort().getType().getSizeInBits();
-			sourcePort.setAttribute("size", size);
+			if (source instanceof Processor) {
+				Processor processor = (Processor) source;
+				FunctionUnit fu = factory.createOutputSignalUnit(processor,
+						connection.getSourcePort().getName());
+				processor.getFunctionUnits().add(fu);
+				sourcePort = fu;
+			} else {
+				Component component = (Component) source;
+				sourcePort = factory.createPort(connection.getSourcePort());
+				component.addInput(sourcePort);
+			}
 		}
 
 		if (target == null) {
-			target = portMap.get((net.sf.orcc.df.Port) connection.getTarget());
-			target.setAttribute("size", size);
+			Port port = factory.createPort((net.sf.orcc.df.Port) connection
+					.getTarget());
+			design.addOutput(port);
+			size = port.getSize();
+			target = port;
 		} else {
-			targetPort.setAttribute("size", size);
+			if (target instanceof Processor) {
+				throw new OrccRuntimeException("Unsupported input signal.");
+			} else {
+				Component component = (Component) target;
+				targetPort = factory.createPort(connection.getTargetPort());
+				component.addInput(targetPort);
+				size = targetPort.getSize();
+			}
 		}
 
 		Signal signal = factory.createSignal(connection.getAttribute("id")
-				.getValue().toString(), size, source, target, sourcePort,
-				targetPort);
+				.getValue().toString(), size, source, target, sourcePort, targetPort);
 
 		design.add(signal);
 	}
@@ -175,13 +186,10 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		if (actor.isNative()) {
 			component = factory.createComponent(instance.getActor()
 					.getSimpleName());
-			design.getComponents().add(component);
-			design.add(component);
 			for (Argument arg : instance.getArguments()) {
 				component.setAttribute(arg.getVariable().getName(),
 						arg.getValue());
 			}
-			componentMap.put(instance, component);
 		} else {
 			int memorySize = computeNeededMemorySize(instance);
 
@@ -194,20 +202,15 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 					+ instance.getName(), conf, memorySize);
 			component = processor;
 			processor.getMappedActors().add(instance);
-			design.getProcessors().add(processor);
-			design.add(processor);
-			componentMap.put(instance, processor);
 		}
-		component.getInputs().addAll(createPorts(actor.getInputs()));
-		component.getOutputs().addAll(createPorts(actor.getOutputs()));
+		design.add(component);
+		componentMap.put(instance, component);
 		return null;
 	}
 
 	@Override
 	public Design caseNetwork(Network network) {
 		design = factory.createDesign();
-		design.getInputs().addAll(createPorts(network.getInputs()));
-		design.getOutputs().addAll(createPorts(network.getOutputs()));
 		for (Vertex entity : network.getEntities()) {
 			doSwitch(entity);
 		}
@@ -276,19 +279,6 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		}
 
 		return neededMemorySize;
-	}
-
-	private EList<Port> createPorts(EList<net.sf.orcc.df.Port> calPorts) {
-		EList<Port> ports = new BasicEList<Port>();
-		for (net.sf.orcc.df.Port calPort : calPorts) {
-			Port port = factory.createPort();
-			port.setLabel(calPort.getName());
-			port.getAttributes().addAll(
-					EcoreUtil.copyAll(calPort.getAttributes()));
-			ports.add(port);
-			portMap.put(calPort, port);
-		}
-		return ports;
 	}
 
 	private int getSize(Type type) {
