@@ -7,7 +7,7 @@ printNativeRead(port, var) ::= <<
 printNativeWrite(port, var) ::= <<
 %tmp_<var.name>_elt = getelementptr [1 x <port.type>]* %top_frame, i32 0, i1 0 
 %tmp_<var.name> = load <port.type>* %top_frame_elt
-tail call void asm sideeffect "SIGNAL_<port.name>.LEDS", "ir,ir"(<port.type> %tmp_<var.name>) nounwind
+tail call void asm sideeffect "SIG_OUT_<port.name>.LEDS", "ir,ir"(<port.type> %tmp_<var.name>) nounwind
 >>
 
 printAction(action) ::= <<
