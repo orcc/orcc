@@ -193,45 +193,24 @@ printLoad(load) ::= <<
 >>
 
 printGEP(gep) ::= <<
-<if(action.inputPattern.varToPortMap.(gep.source.variable) || action.outputPattern.varToPortMap.(gep.source.variable) || action.peekPattern.varToPortMap.(gep.source.variable))
-><if(instance.actor.templateData.castedIndexes.(first(gep.indexes)))>%cast_index_<gep.target.variable.name> = zext <first(gep.indexes).type> <Expr(first(gep.indexes))> to i32<endif>
-%tmp_index_<gep.target.variable.name> = add i32 %local_index_<getPort(gep.source.variable)>, <if(instance.actor.templateData.castedIndexes.(first(gep.indexes)))>%cast_index_<gep.target.variable.name><else><Expr(first(gep.indexes))><endif>
-%final_index_<gep.target.variable.name>  = urem i32 %tmp_index_<gep.target.variable.name> , %local_size_<getPort(gep.source.variable)>
-<Var(gep.target.variable)> = getelementptr <getPortType(gep.source.variable)>* @fifo_<getPortId(gep.source.variable)>_content, i32 0, i32 %final_index_<gep.target.variable.name><
+<if(action.inputPattern.varToPortMap.(gep.source.variable) && !action.inputPattern.varToPortMap.(gep.source.variable).native)
+><printPortAccess(instance.incomingPortMap.(action.inputPattern.varToPortMap.(gep.source.variable)), action.inputPattern.varToPortMap.(gep.source.variable), gep)><
+elseif(action.outputPattern.varToPortMap.(gep.source.variable) && !action.outputPattern.varToPortMap.(gep.source.variable).native)
+><printPortAccess(first(instance.outgoingPortMap.(action.outputPattern.varToPortMap.(gep.source.variable))), action.outputPattern.varToPortMap.(gep.source.variable), gep)><
+elseif(action.peekPattern.varToPortMap.(gep.source.variable))
+><printPortAccess(instance.incomingPortMap.(action.peekPattern.varToPortMap.(gep.source.variable)), action.peekPattern.varToPortMap.(gep.source.variable), gep)><
 else
 ><Var(gep.target.variable)> = getelementptr <gep.source.variable.type>* <Var(gep.source.variable)>, i32 0, <indexes(gep.indexes)><
 endif>
 >>
 
-getPortType(variable) ::= <<
-<if(action.inputPattern.varToPortMap.(variable))
->[<instance.incomingPortMap.(action.inputPattern.varToPortMap.(variable)).size> x <action.inputPattern.varToPortMap.(variable).type>]<
-elseif (action.outputPattern.varToPortMap.(variable))
->[<first(instance.outgoingPortMap.(action.outputPattern.varToPortMap.(variable))).size> x <action.outputPattern.varToPortMap.(variable).type>]<
-else
->[<instance.incomingPortMap.(action.peekPattern.varToPortMap.(variable)).size> x <action.peekPattern.varToPortMap.(variable).type>]<
-endif>
+printPortAccess(fifo, port, gep) ::= <<
+<if(instance.actor.templateData.castedIndexes.(first(gep.indexes)))>%cast_index_<gep.target.variable.name> = zext <first(gep.indexes).type> <Expr(first(gep.indexes))> to i32<endif>
+%tmp_index_<gep.target.variable.name> = add i32 %local_index_<port.name>, <if(instance.actor.templateData.castedIndexes.(first(gep.indexes)))>%cast_index_<gep.target.variable.name><else><Expr(first(gep.indexes))><endif>
+%final_index_<gep.target.variable.name>  = urem i32 %tmp_index_<gep.target.variable.name> , %local_size_<port.name>
+<Var(gep.target.variable)> = getelementptr [<fifo.size> x <port.type>]* @fifo_<fifo.id>_content, i32 0, i32 %final_index_<gep.target.variable.name>
 >>
 
-getPort(variable) ::= <<
-<if(action.inputPattern.varToPortMap.(variable))
-><action.inputPattern.varToPortMap.(variable).name><
-elseif (action.outputPattern.varToPortMap.(variable))
-><action.outputPattern.varToPortMap.(variable).name><
-else
-><action.peekPattern.varToPortMap.(variable).name><
-endif>
->>
-
-getPortId(variable) ::= <<
-<if(action.inputPattern.varToPortMap.(variable))
-><instance.incomingPortMap.(action.inputPattern.varToPortMap.(variable)).id><
-elseif (action.outputPattern.varToPortMap.(variable))
-><first(instance.outgoingPortMap.(action.outputPattern.varToPortMap.(variable))).id><
-else
-><instance.incomingPortMap.(action.peekPattern.varToPortMap.(variable)).id><
-endif>
->>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Nodes
