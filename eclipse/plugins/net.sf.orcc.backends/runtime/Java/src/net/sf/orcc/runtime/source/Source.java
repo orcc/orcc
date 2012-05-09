@@ -55,6 +55,7 @@ public class Source extends GenericSource {
 			String msg = "file not found: \"" + fileName + "\"";
 			throw new RuntimeException(msg, e);
 		}
+		loopsCount = nbLoops;
 	}
 
 	public static void source_readNBytes(int outTable[], Integer nbTokenToRead) {
