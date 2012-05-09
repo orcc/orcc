@@ -101,11 +101,12 @@ signal s_<signal.label> : std_logic_vector(<signal.size>-1 downto 0);
 declareBufferSignals(buffer) ::= <<
 signal buf_<buffer.label>_wren_p1    : std_logic;
 signal buf_<buffer.label>_address_p1 : std_logic_vector(xx downto 0);
-signal buf_<buffer.label>_byteen_p2  : std_logic_vector(xx downto 0);
+signal buf_<buffer.label>_byteen_p1  : std_logic_vector(xx downto 0);
 signal buf_<buffer.label>_data_p1    : std_logic_vector(31 downto 0);
 signal buf_<buffer.label>_queue_p1   : std_logic_vector(31 downto 0);
 signal buf_<buffer.label>_wren_p2    : std_logic;
 signal buf_<buffer.label>_address_p2 : std_logic_vector(xx downto 0);
+signal buf_<buffer.label>_byteen_p2  : std_logic_vector(xx downto 0);
 signal buf_<buffer.label>_data_p2    : std_logic_vector(31 downto 0);
 signal buf_<buffer.label>_queue_p2   : std_logic_vector(31 downto 0);
 >> 
@@ -119,23 +120,27 @@ assignNetworkPort(port, link) ::= <<
 <port.label> \<= s_<link.label>;
 >>
 
-assignInputPort(port, link, index) ::= <<
+assignInputPort(port, link) ::= <<
 <if(link.signal)
 ><port.name> =\> s_<link.label>,<
-elseif(link.fifo)
->data_<index>_in    =\> fifo_<link.label>_queue,
-status_<index>_in  =\> fifo_<link.label>_tokens,
-ack_<index>_in     =\> fifo_<link.label>_rdreq,<
+else
+>fu_LSU_buf_<port.addressSpace.id>_dmem_data_in    => buf_<link.label>_data_p2,
+fu_LSU_buf_<port.addressSpace.id>_dmem_data_out   => buf_<link.label>_queue_p2,
+fu_LSU_buf_<port.addressSpace.id>_dmem_addr       => buf_<link.label>_address_p2,
+fu_LSU_buf_<port.addressSpace.id>_dmem_wr_en_x(0) => buf_<link.label>_wren_p2,
+fu_LSU_buf_<port.addressSpace.id>_dmem_bytemask   => buf_<link.label>_byteen_p2,<
 endif>
 >>
 
-assignOutputPort(port, link, index) ::= <<
+assignOutputPort(port, link) ::= <<
 <if(link.signal)
-><port.name>  =\> s_<link.label>,<
-elseif(link.fifo)
->data_<index>_out   =\> fifo_<link.label>_data,
-status_<index>_out =\> fifo_<link.label>_rooms,
-dv_<index>_out     =\> fifo_<link.label>_wrreq,<
+><port.name> =\> s_<link.label>,<
+else
+>fu_LSU_buf_<port.addressSpace.id>_dmem_data_in    => buf_<link.label>_data_p1,
+fu_LSU_buf_<port.addressSpace.id>_dmem_data_out   => buf_<link.label>_queue_p1,
+fu_LSU_buf_<port.addressSpace.id>_dmem_addr       => buf_<link.label>_address_p1,
+fu_LSU_buf_<port.addressSpace.id>_dmem_wr_en_x(0) => buf_<link.label>_wren_p1,
+fu_LSU_buf_<port.addressSpace.id>_dmem_bytemask   => buf_<link.label>_byteen_p1,<
 endif>
 >>
 
@@ -146,9 +151,9 @@ assignGeneric(attribute) ::= <<
 assignComponent(component) ::= <<
 <component.name>_inst : entity work.<component.name>
   <if(component.attributes)>generic map(<component.attributes: assignGeneric(); separator=",\n">)<endif>
-  port map(clk   =\> clk,
-           <component.inputs: { input |<assignInputPort(input, component.incomingPortMap.(input), i0)>}; separator="\n">
-           <component.outputs: { output |<assignOutputPort(output, component.outgoingPortMap.(output), i0)>}; separator="\n">
+  port map(clk =\> clk,
+           <component.inputs: { input |<assignInputPort(input, component.incomingPortMap.(input))>}; separator="\n">
+           <component.outputs: { output |<assignOutputPort(output, component.outgoingPortMap.(output))>}; separator="\n">
            rst_n =\> rst_n);
 >>
 
@@ -175,8 +180,8 @@ buffer_<buffer.label> : entity work.inferredRAM_2p
 assignProcessor(processor) ::= <<
 <processor.name>_inst : entity work.<processor.name>
   generic map(device_family =\> "<options.fpga.family>")
-  port map(clk   =\> clk,
-           <processor.inputs: { input |<assignInputPort(input, processor.incomingPortMap.(input), i0)>}; separator="\n">
-           <processor.outputs: { output |<assignOutputPort(output, processor.outgoingPortMap.(output), i0)>}; separator="\n">
-           rst_n =\> rst_n);
+  port map(clk                          =\> clk,
+           <processor.incoming: { edge |<assignInputPort(edge.targetPort, edge)>}; separator="\n">
+           <processor.outgoing: { edge |<assignOutputPort(edge.sourcePort, edge)>}; separator="\n">
+           rst_n                        =\> rst_n);
 >>
