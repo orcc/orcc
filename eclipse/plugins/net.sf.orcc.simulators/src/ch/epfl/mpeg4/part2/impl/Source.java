@@ -47,14 +47,25 @@ public class Source extends GenericSource {
 
 	private static RandomAccessFile in;
 
-	private static int nbLoops = 1;
+	private static final int INFINITE_LOOPS = -1;
+
+	private static int nbLoops = INFINITE_LOOPS;
+	private static int loopsCount;
 
 	public static void source_exit(BigInteger status) {
-		// System.exit(status);
+		System.exit(status.intValue());
 	}
 
 	public static BigInteger source_getNbLoop() {
 		return BigInteger.valueOf(nbLoops);
+	}
+
+	public static Boolean source_isMaxLoopsReached() {
+		return nbLoops != INFINITE_LOOPS && loopsCount <= 0;
+	}
+
+	public static void source_decrementNbLoops() {
+		--loopsCount;
 	}
 
 	public static void source_init() {
@@ -64,6 +75,7 @@ public class Source extends GenericSource {
 			String msg = "file not found: \"" + inputStimulus + "\"";
 			throw new RuntimeException(msg, e);
 		}
+		loopsCount = nbLoops;
 	}
 
 	public static void source_readNBytes(byte outTable[],
