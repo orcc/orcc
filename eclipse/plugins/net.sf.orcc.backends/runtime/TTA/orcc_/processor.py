@@ -43,7 +43,7 @@ import tempita
 
 class Processor:
 
-    def __init__(self, name, inputs, outputs):
+    def __init__(self, name, actors, inputs, outputs):
         # General
         self.id = name
         # Ports
@@ -52,6 +52,8 @@ class Processor:
         # Memories
         self.irom = None
         self.dram = None
+        # Actors
+        self.actors = actors
         # Useful filenames
         self._processorFile = self.id + ".vhd"
         self._tbFile = self.id + "_tb.vhd"
@@ -79,17 +81,17 @@ class Processor:
 
     def compile(self, srcPath, libPath, args, debug):
         processorPath = os.path.join(srcPath, self.id)
-        instancesPath = os.path.join(srcPath, "instances")
+        actorsPath = os.path.join(srcPath, "actors")
         os.chdir(processorPath)
-        shutil.copy(os.path.join(libPath, "stream", "opset", "stream_units.opb"), processorPath)
-        shutil.copy(os.path.join(libPath, "stream", "opset", "stream_units.opp"), processorPath)
         
-        retcode = subprocess.call(["tcecc"] + args + ["-o", self._tpefFile, "-a", self._adfFile, self._llFile])
+        sourceFiles = [self._llFile]
+        for actor in self.actors:
+            sourceFiles.append(os.path.join(actorsPath, actor + ".ll"))
+        
+        retcode = subprocess.call(["tcecc"] + args + ["-o", self._tpefFile, "-a", self._adfFile] + sourceFiles)
         if retcode == 0 and debug: retcode = subprocess.call(["tcecc", "-O3", "-o", self._bcFile, self._llFile, "--emit-llvm"])
         if retcode == 0 and debug: retcode = subprocess.call(["llvm-dis", "-o", self._llOptFile, self._bcFile])
         if retcode == 0 and debug: retcode = subprocess.call(["tcedisasm", "-n", "-o", self._asmFile, self._adfFile, self._tpefFile])
-        os.remove("stream_units.opp")
-        os.remove("stream_units.opb")
         return retcode
 
     def generate(self, srcPath, libPath, args, debug, targetAltera):

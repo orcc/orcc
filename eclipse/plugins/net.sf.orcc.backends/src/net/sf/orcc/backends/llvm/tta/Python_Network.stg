@@ -1,15 +1,19 @@
 
 printPort(port, index) ::= <<
-Port("<port.name>", <index>, <if(port.native)>True, <port.size><endif>)
+Port("<port.name>", <index><if(port.native)>, True, <port.size><endif>)
 >>
 
 initProcessorPort(processor) ::= <<
-<processor.name>_inputs = [<processor.inputs: { port | <printPort(port, i0)> }; separator=", ">]
-<processor.name>_outputs = [<processor.outputs: { port | <printPort(port, i0)> }; separator=", ">]
+<processor.name>_inputs = [<processor.incoming: { edge | <printPort(edge.targetPort, i0)> }; separator=", ">]
+<processor.name>_outputs = [<processor.outgoing: { edge | <printPort(edge.sourcePort, i0)> }; separator=", ">]
+>>
+
+initMappedActors(processor) ::= <<
+<processor.name>_instances = [<processor.mappedActors: { instance |"<instance.name>"}; separator=", ">]
 >>
 
 initProcessor(processor) ::= <<
-Processor("<processor.name>", <processor.name>_inputs, <processor.name>_outputs)
+Processor("<processor.name>", <processor.name>_instances, <processor.name>_inputs, <processor.name>_outputs)
 >>
 
 printDesign(design, options) ::= <<
@@ -23,7 +27,10 @@ from orcc_ import *
 ## Ports initialization
 <design.processors: initProcessorPort(); separator="\n">
 
-## Instances initialization
+## Actors initialization
+<design.processors: initMappedActors(); separator="\n">
+
+## Processors initialization
 processors = [
 	<design.processors: initProcessor(); separator=",\n">
 ]
