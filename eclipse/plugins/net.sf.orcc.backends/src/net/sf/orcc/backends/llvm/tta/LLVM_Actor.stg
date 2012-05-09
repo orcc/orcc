@@ -1,5 +1,8 @@
 import "net/sf/orcc/backends/llvm/aot/Actor.stg"
 
+printArchitecture() ::= <<
+>>
+
 printNativeRead(port, var) ::= <<
 ;; TODO
 >>
