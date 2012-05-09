@@ -109,7 +109,7 @@ void print_and_exit(const char *msg) {
 	exit(1);
 }
 
-static const char *usage = "%s: -i <file> [-o <file>] [-w <file>] [-l <number of loop iterations>...\n";
+static const char *usage = "%s: -i <file> [-o <file>] [-w <file>] [-l <number of loop iterations>]\n";
 static char *program;
 
 void print_usage() {
@@ -119,7 +119,9 @@ void print_usage() {
 ///////////////////////////////////////////////////////////////////////////////
 // initializes APR and parses options
 void init_orcc(int argc, char *argv[]) {
-	const char *ostr = "g:i:l:m:n:o:w:";
+	// every command line option must be followed by ':' if it takes an
+	// argument, and '::' if this argument is optional
+	const char *ostr = "g:i:l:m:no:w:";
 	int c;
 
 	program = argv[0];
