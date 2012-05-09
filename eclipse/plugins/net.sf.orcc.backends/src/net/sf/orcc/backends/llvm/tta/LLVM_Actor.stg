@@ -1,1 +1,37 @@
 import "net/sf/orcc/backends/llvm/aot/Actor.stg"
+
+printNativeRead(port, var) ::= <<
+;; TODO
+>>
+
+printNativeWrite(port, var) ::= <<
+%tmp_<var.name>_elt = getelementptr [1 x <port.type>]* %top_frame, i32 0, i1 0 
+%tmp_<var.name> = load <port.type>* %top_frame_elt
+tail call void asm sideeffect "SIGNAL_<port.name>.LEDS", "ir,ir"(<port.type> %tmp_<var.name>) nounwind
+>>
+
+printAction(action) ::= <<
+define internal i1 @<action.scheduler.name>() nounwind {
+entry:
+	<action.scheduler.locals: variableDeclaration()>
+	<action.peekPattern.ports: { port | <if(!port.native)><fifoVar(port, action.inputPattern.portToVarMap.(port))><endif>}; separator="\n">
+	br label %b<label(first(action.scheduler.nodes))>
+	
+<printNodes(action.scheduler.nodes)>
+}
+
+define internal void @<action.body.name>() nounwind {
+entry:
+	<action.body.locals: variableDeclaration()>
+	<action.inputPattern.ports: { port | <if(!port.native)><fifoVar(port, action.inputPattern.portToVarMap.(port))><endif>}; separator="\n">
+	<action.outputPattern.ports: { port | <if(!port.native)><fifoVar(port, action.outputPattern.portToVarMap.(port))><endif>}; separator="\n">
+	<action.inputPattern.ports: { port | <if(port.native)><printNativeRead(port, action.inputPattern.portToVarMap.(port))><endif>}; separator="\n">
+	br label %b<label(first(action.body.nodes))>
+
+<printNodes(action.body.nodes, false)>
+	<action.inputPattern.ports: { port | <if(!port.native)><printFifoEnd(port, action.inputPattern.numTokensMap.(port))><endif>}; separator="\n">
+	<action.outputPattern.ports: { port | <if(!port.native)><printFifoEnd(port, action.outputPattern.numTokensMap.(port))><endif>}; separator="\n">
+	<action.outputPattern.ports: { port | <if(port.native)><printNativeWrite(port, action.outputPattern.portToVarMap.(port))><endif>}; separator="\n">
+	ret void
+}
+>>

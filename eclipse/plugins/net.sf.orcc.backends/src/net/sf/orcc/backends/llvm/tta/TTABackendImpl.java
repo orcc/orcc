@@ -175,7 +175,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		// print instances and entities
 		String oldPath = path;
 		path = OrccUtil.createFolder(path, "actors");
-		printer = new StandardPrinter("net/sf/orcc/backends/llvm/aot/Actor.stg");
+		printer = new StandardPrinter("net/sf/orcc/backends/llvm/tta/LLVM_Actor.stg");
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
 		printInstances(network);

@@ -604,7 +604,7 @@ printAction(action) ::= <<
 define internal i1 @<action.scheduler.name>() nounwind {
 entry:
 	<action.scheduler.locals: variableDeclaration()>
-	<action.peekPattern.ports: { port | <fifoVar(port, action.inputPattern.portToVarMap.(port))>}; separator="\n">
+	<action.peekPattern.ports: { port | <if(!port.native)><fifoVar(port, action.inputPattern.portToVarMap.(port))><endif>}; separator="\n">
 	br label %b<label(first(action.scheduler.nodes))>
 	
 <printNodes(action.scheduler.nodes)>
@@ -613,13 +613,13 @@ entry:
 define internal void @<action.body.name>() nounwind {
 entry:
 	<action.body.locals: variableDeclaration()>
-	<action.inputPattern.ports: { port | <fifoVar(port, action.inputPattern.portToVarMap.(port))>}; separator="\n">
-	<action.outputPattern.ports: { port | <fifoVar(port, action.outputPattern.portToVarMap.(port))>}; separator="\n">
+	<action.inputPattern.ports: { port | <if(!port.native)><fifoVar(port, action.inputPattern.portToVarMap.(port))><endif>}; separator="\n">
+	<action.outputPattern.ports: { port | <if(!port.native)><fifoVar(port, action.outputPattern.portToVarMap.(port))><endif>}; separator="\n">
 	br label %b<label(first(action.body.nodes))>
 
 <printNodes(action.body.nodes, false)>
-	<action.inputPattern.ports: { port | <printFifoEnd(port, action.inputPattern.numTokensMap.(port))>}; separator="\n">
-	<action.outputPattern.ports: { port | <printFifoEnd(port, action.outputPattern.numTokensMap.(port))>}; separator="\n"> 
+	<action.inputPattern.ports: { port | <if(!port.native)><printFifoEnd(port, action.inputPattern.numTokensMap.(port))><endif>}; separator="\n">
+	<action.outputPattern.ports: { port | <if(!port.native)><printFifoEnd(port, action.outputPattern.numTokensMap.(port))><endif>}; separator="\n"> 
 	ret void
 }
 >>
