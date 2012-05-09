@@ -109,7 +109,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 			} else {
 				Component component = (Component) source;
 				sourcePort = factory.createPort(connection.getSourcePort());
-				component.addInput(sourcePort);
+				component.addOutput(sourcePort);
 			}
 		}
 

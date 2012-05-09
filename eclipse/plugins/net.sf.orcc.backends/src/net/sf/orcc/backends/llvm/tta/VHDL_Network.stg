@@ -100,13 +100,13 @@ signal s_<signal.label> : std_logic_vector(<signal.size>-1 downto 0);
 
 declareBufferSignals(buffer) ::= <<
 signal buf_<buffer.label>_wren_p1    : std_logic;
-signal buf_<buffer.label>_address_p1 : std_logic_vector(xx downto 0);
-signal buf_<buffer.label>_byteen_p1  : std_logic_vector(xx downto 0);
+signal buf_<buffer.label>_address_p1 : std_logic_vector(<buffer.addrWidth>-1 downto 0);
+signal buf_<buffer.label>_byteen_p1  : std_logic_vector(3 downto 0);
 signal buf_<buffer.label>_data_p1    : std_logic_vector(31 downto 0);
 signal buf_<buffer.label>_queue_p1   : std_logic_vector(31 downto 0);
 signal buf_<buffer.label>_wren_p2    : std_logic;
-signal buf_<buffer.label>_address_p2 : std_logic_vector(xx downto 0);
-signal buf_<buffer.label>_byteen_p2  : std_logic_vector(xx downto 0);
+signal buf_<buffer.label>_address_p2 : std_logic_vector(<buffer.addrWidth>-1 downto 0);
+signal buf_<buffer.label>_byteen_p2  : std_logic_vector(3 downto 0);
 signal buf_<buffer.label>_data_p2    : std_logic_vector(31 downto 0);
 signal buf_<buffer.label>_queue_p2   : std_logic_vector(31 downto 0);
 >> 
