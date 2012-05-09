@@ -34,6 +34,7 @@ import java.util.Collection;
 
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.llvm.tta.architecture.Buffer;
+import net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.df.Connection;
 
@@ -322,9 +323,15 @@ public class BufferImpl extends LinkImpl implements Buffer {
 		int bits = 0;
 		for (Connection connection : mappedConnections) {
 			bits += connection.getSize()
-					* connection.getSourcePort().getType().getSizeInBits();
+					* connection.getSourcePort().getType().getSizeInBits() + 2
+					* 32;
 		}
 		depth = bits / 32;
+		int maxAdress = bits / 8;
+		FunctionUnit srcLSU = (FunctionUnit) getSourcePort();
+		FunctionUnit tgtLSU = (FunctionUnit) getTargetPort();
+		srcLSU.getAddressSpace().setMaxAddress(maxAdress);
+		tgtLSU.getAddressSpace().setMaxAddress(maxAdress);
 	}
 
 } // BufferImpl
