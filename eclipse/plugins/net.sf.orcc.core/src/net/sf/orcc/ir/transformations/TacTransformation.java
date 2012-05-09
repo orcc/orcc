@@ -166,9 +166,10 @@ public class TacTransformation extends AbstractIrVisitor<Expression> {
 					IrUtil.copy(expr.getType()));
 			break;
 		case BITNOT:
+			Integer val = (int) (Math.pow(2, expr.getType().getSizeInBits()) - 1);
+			ExprInt allBitAtOne = factory.createExprInt(val);
 			newExpr = factory.createExprBinary(IrUtil.copy(expr.getExpr()),
-					OpBinary.BITXOR, IrUtil.copy(expr.getExpr()),
-					IrUtil.copy(expr.getType()));
+					OpBinary.BITXOR, allBitAtOne, IrUtil.copy(expr.getType()));
 			break;
 		default:
 			throw new OrccRuntimeException("unsupported operator");
