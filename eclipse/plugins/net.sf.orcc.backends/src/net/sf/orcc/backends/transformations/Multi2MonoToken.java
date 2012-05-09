@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.dftools.util.util.EcoreHelper;
+import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.DfFactory;
@@ -47,12 +48,12 @@ import net.sf.orcc.df.State;
 import net.sf.orcc.df.Tag;
 import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.util.DfVisitor;
+import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -336,20 +337,6 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 	}
 
 	/**
-	 * this method returns the closest power of 2 of x --> optimal buffer size
-	 * 
-	 * @param x
-	 * @return closest power of 2 of x
-	 */
-	private int closestPow_2(int x) {
-		int p = 1;
-		while (p < x) {
-			p = p * 2;
-		}
-		return p;
-	}
-
-	/**
 	 * This method adds instructions for an action to read from a specific
 	 * buffer at a specific index
 	 * 
@@ -580,15 +567,16 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 				OpBinary.LT, guardValue, factory.createTypeBool());
 		Action newWriteAction = createAction(expression, writeName);
 
-		Var OUTPUT = factory.createVar(0, factory.createTypeList(1, port.getType()), port.getName()
-				+ "_OUTPUT", true, 0);
+		Var OUTPUT = factory.createVar(0,
+				factory.createTypeList(1, port.getType()), port.getName()
+						+ "_OUTPUT", true, 0);
 		defineWriteBody(writeCounter, writeList, newWriteAction.getBody(),
 				OUTPUT);
 		// add output pattern
 		Pattern pattern = newWriteAction.getOutputPattern();
 		pattern.setVariable(port, OUTPUT);
 		pattern.setNumTokens(port, 1);
-		
+
 		return newWriteAction;
 	}
 
@@ -950,7 +938,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 				}
 			}
 		}
-		optimalSize = closestPow_2(size);
+		optimalSize = BackendUtil.closestPow_2(size);
 		return optimalSize;
 	}
 
@@ -1086,7 +1074,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 
 				for (Entry<Port, Integer> entry : action.getOutputPattern()
 						.getNumTokensMap().entrySet()) {
-					
+
 					numTokens = entry.getValue();
 					outputIndex = outputIndex + 100;
 					port = entry.getKey();
@@ -1097,7 +1085,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 					String listName = action.getName() + "NewWriteList"
 							+ outputIndex;
 					Var tab = createTab(listName, entryType, numTokens);
-					
+
 					write = createWriteAction(action.getName(), counter, tab);
 					write.getOutputPattern().setNumTokens(port, 1);
 
@@ -1120,7 +1108,7 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 					} else {
 						modifyDoneAction(counter, outputIndex, port.getName());
 					}
-					
+
 				}
 				// remove outputPattern from transition action
 				action.getOutputPattern().clear();
@@ -1265,7 +1253,8 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 			int verifNumTokens = verifEntry.getValue();
 			if (verifNumTokens > 1) {
 				repeatInput = true;
-				Transition transition = DfFactory.eINSTANCE.createTransition(source, oldAction, target);
+				Transition transition = DfFactory.eINSTANCE.createTransition(
+						source, oldAction, target);
 				transitionsList.add(transition);
 				visitedRenameIndex++;
 				break;
@@ -1298,7 +1287,8 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 							+ "_NewWrite";
 					int writeIndex = actionPosition(actions, writeName);
 					Action write = actions.get(writeIndex);
-					Transition writeTransition = DfFactory.eINSTANCE.createTransition(writeState, write, writeState);
+					Transition writeTransition = DfFactory.eINSTANCE
+							.createTransition(writeState, write, writeState);
 					transitionsList.add(writeTransition);
 
 					// create a new write done action once
@@ -1306,7 +1296,8 @@ public class Multi2MonoToken extends DfVisitor<Void> {
 						String doneName = action.getName() + "newWriteDone";
 						int doneIndex = actionPosition(actions, doneName);
 						Action done = actions.get(doneIndex);
-						Transition doneTransition = DfFactory.eINSTANCE.createTransition(writeState, done, target);
+						Transition doneTransition = DfFactory.eINSTANCE
+								.createTransition(writeState, done, target);
 						transitionsList.add(doneTransition);
 					}
 

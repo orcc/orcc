@@ -36,8 +36,11 @@
         eType="#//Port" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Buffer" eSuperTypes="#//Link">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="size" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EInt"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="width" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="depth" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="wordWidth" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EInt"
+        defaultValueLiteral="32"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="addrWidth" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EInt"
+        changeable="false" volatile="true" transient="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="mappedConnections" upperBound="-1"
         eType="ecore:EClass ../../net.sf.orcc.core/model/Df.ecore#//Connection"/>
   </eClassifiers>

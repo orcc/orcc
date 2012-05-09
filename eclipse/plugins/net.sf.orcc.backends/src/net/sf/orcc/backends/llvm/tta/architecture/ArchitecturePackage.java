@@ -552,22 +552,31 @@ public interface ArchitecturePackage extends EPackage {
 	int BUFFER__TARGET_PORT = LINK__TARGET_PORT;
 
 	/**
-	 * The feature id for the '<em><b>Size</b></em>' attribute.
+	 * The feature id for the '<em><b>Depth</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int BUFFER__SIZE = LINK_FEATURE_COUNT + 0;
+	int BUFFER__DEPTH = LINK_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Width</b></em>' attribute.
+	 * The feature id for the '<em><b>Word Width</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int BUFFER__WIDTH = LINK_FEATURE_COUNT + 1;
+	int BUFFER__WORD_WIDTH = LINK_FEATURE_COUNT + 1;
+
+	/**
+	 * The feature id for the '<em><b>Addr Width</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int BUFFER__ADDR_WIDTH = LINK_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Mapped Connections</b></em>' reference list.
@@ -576,7 +585,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int BUFFER__MAPPED_CONNECTIONS = LINK_FEATURE_COUNT + 2;
+	int BUFFER__MAPPED_CONNECTIONS = LINK_FEATURE_COUNT + 3;
 
 	/**
 	 * The number of structural features of the '<em>Buffer</em>' class.
@@ -585,7 +594,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int BUFFER_FEATURE_COUNT = LINK_FEATURE_COUNT + 3;
+	int BUFFER_FEATURE_COUNT = LINK_FEATURE_COUNT + 4;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.ProcessorImpl <em>Processor</em>}' class.
@@ -2254,26 +2263,37 @@ public interface ArchitecturePackage extends EPackage {
 	EClass getBuffer();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.llvm.tta.architecture.Buffer#getSize <em>Size</em>}'.
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.llvm.tta.architecture.Buffer#getDepth <em>Depth</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Size</em>'.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.Buffer#getSize()
+	 * @return the meta object for the attribute '<em>Depth</em>'.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.Buffer#getDepth()
 	 * @see #getBuffer()
 	 * @generated
 	 */
-	EAttribute getBuffer_Size();
+	EAttribute getBuffer_Depth();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.llvm.tta.architecture.Buffer#getWidth <em>Width</em>}'.
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.llvm.tta.architecture.Buffer#getWordWidth <em>Word Width</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Width</em>'.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.Buffer#getWidth()
+	 * @return the meta object for the attribute '<em>Word Width</em>'.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.Buffer#getWordWidth()
 	 * @see #getBuffer()
 	 * @generated
 	 */
-	EAttribute getBuffer_Width();
+	EAttribute getBuffer_WordWidth();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.llvm.tta.architecture.Buffer#getAddrWidth <em>Addr Width</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Addr Width</em>'.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.Buffer#getAddrWidth()
+	 * @see #getBuffer()
+	 * @generated
+	 */
+	EAttribute getBuffer_AddrWidth();
 
 	/**
 	 * Returns the meta object for the reference list '{@link net.sf.orcc.backends.llvm.tta.architecture.Buffer#getMappedConnections <em>Mapped Connections</em>}'.
@@ -3577,20 +3597,28 @@ public interface ArchitecturePackage extends EPackage {
 		EClass BUFFER = eINSTANCE.getBuffer();
 
 		/**
-		 * The meta object literal for the '<em><b>Size</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Depth</b></em>' attribute feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute BUFFER__SIZE = eINSTANCE.getBuffer_Size();
+		EAttribute BUFFER__DEPTH = eINSTANCE.getBuffer_Depth();
 
 		/**
-		 * The meta object literal for the '<em><b>Width</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Word Width</b></em>' attribute feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute BUFFER__WIDTH = eINSTANCE.getBuffer_Width();
+		EAttribute BUFFER__WORD_WIDTH = eINSTANCE.getBuffer_WordWidth();
+
+		/**
+		 * The meta object literal for the '<em><b>Addr Width</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute BUFFER__ADDR_WIDTH = eINSTANCE.getBuffer_AddrWidth();
 
 		/**
 		 * The meta object literal for the '<em><b>Mapped Connections</b></em>' reference list feature.

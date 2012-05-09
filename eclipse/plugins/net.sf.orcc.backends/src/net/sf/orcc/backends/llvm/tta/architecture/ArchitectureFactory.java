@@ -458,9 +458,9 @@ public interface ArchitectureFactory extends EFactory {
 	 * @generated
 	 */
 	Port createPort();
-	
+
 	Port createPort(String name);
-	
+
 	Port createPort(net.sf.orcc.df.Port port);
 
 	/**

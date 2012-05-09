@@ -571,7 +571,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getBuffer_Size() {
+	public EAttribute getBuffer_Depth() {
 		return (EAttribute) bufferEClass.getEStructuralFeatures().get(0);
 	}
 
@@ -580,7 +580,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getBuffer_Width() {
+	public EAttribute getBuffer_WordWidth() {
 		return (EAttribute) bufferEClass.getEStructuralFeatures().get(1);
 	}
 
@@ -589,8 +589,17 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EAttribute getBuffer_AddrWidth() {
+		return (EAttribute) bufferEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EReference getBuffer_MappedConnections() {
-		return (EReference) bufferEClass.getEStructuralFeatures().get(2);
+		return (EReference) bufferEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -1537,8 +1546,9 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEReference(componentEClass, COMPONENT__OUTPUTS);
 
 		bufferEClass = createEClass(BUFFER);
-		createEAttribute(bufferEClass, BUFFER__SIZE);
-		createEAttribute(bufferEClass, BUFFER__WIDTH);
+		createEAttribute(bufferEClass, BUFFER__DEPTH);
+		createEAttribute(bufferEClass, BUFFER__WORD_WIDTH);
+		createEAttribute(bufferEClass, BUFFER__ADDR_WIDTH);
 		createEReference(bufferEClass, BUFFER__MAPPED_CONNECTIONS);
 
 		portEClass = createEClass(PORT);
@@ -1819,14 +1829,18 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 		initEClass(bufferEClass, Buffer.class, "Buffer", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getBuffer_Size(), theEcorePackage.getEInt(), "size",
+		initEAttribute(getBuffer_Depth(), theEcorePackage.getEInt(), "depth",
 				null, 0, 1, Buffer.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
-		initEAttribute(getBuffer_Width(), theEcorePackage.getEInt(), "width",
-				null, 0, 1, Buffer.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
+		initEAttribute(getBuffer_WordWidth(), theEcorePackage.getEInt(),
+				"wordWidth", "32", 0, 1, Buffer.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
+		initEAttribute(getBuffer_AddrWidth(), theEcorePackage.getEInt(),
+				"addrWidth", null, 0, 1, Buffer.class, IS_TRANSIENT,
+				IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
 		initEReference(getBuffer_MappedConnections(),
 				theDfPackage.getConnection(), null, "mappedConnections", null,
 				0, -1, Buffer.class, !IS_TRANSIENT, !IS_VOLATILE,

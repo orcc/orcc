@@ -70,7 +70,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	private FunctionUnit addBuffer(Processor processor, Buffer buffer) {
 		int i = processor.getData().size();
 		AddressSpace buf = factory.createAddressSpace("buf_" + i, i, 8, 0,
-				buffer.getSize());
+				buffer.getDepth() * 4);
 		FunctionUnit lsu = factory.createLSU("LSU_buf_" + i, processor, buf);
 		processor.getData().add(buf);
 		processor.getFunctionUnits().add(lsu);
@@ -131,7 +131,8 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		}
 
 		Signal signal = factory.createSignal(connection.getAttribute("id")
-				.getValue().toString(), size, source, target, sourcePort, targetPort);
+				.getValue().toString(), size, source, target, sourcePort,
+				targetPort);
 
 		design.add(signal);
 	}
@@ -219,6 +220,9 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		}
 		for (Connection connection : network.getConnections()) {
 			doSwitch(connection);
+		}
+		for (Buffer buffer : design.getBuffers()) {
+			buffer.update();
 		}
 		return design;
 	}

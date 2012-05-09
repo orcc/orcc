@@ -34,6 +34,7 @@ import java.util.Collection;
 
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.llvm.tta.architecture.Buffer;
+import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.df.Connection;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -43,65 +44,84 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Buffer</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object '
+ * <em><b>Buffer</b></em>'. <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.BufferImpl#getSize <em>Size</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.BufferImpl#getWidth <em>Width</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.BufferImpl#getMappedConnections <em>Mapped Connections</em>}</li>
+ * <li>
+ * {@link net.sf.orcc.backends.llvm.tta.architecture.impl.BufferImpl#getDepth
+ * <em>Depth</em>}</li>
+ * <li>
+ * {@link net.sf.orcc.backends.llvm.tta.architecture.impl.BufferImpl#getWordWidth
+ * <em>Word Width</em>}</li>
+ * <li>
+ * {@link net.sf.orcc.backends.llvm.tta.architecture.impl.BufferImpl#getAddrWidth
+ * <em>Addr Width</em>}</li>
+ * <li>
+ * {@link net.sf.orcc.backends.llvm.tta.architecture.impl.BufferImpl#getMappedConnections
+ * <em>Mapped Connections</em>}</li>
  * </ul>
  * </p>
- *
+ * 
  * @generated
  */
 public class BufferImpl extends LinkImpl implements Buffer {
 	/**
-	 * The default value of the '{@link #getSize() <em>Size</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getSize()
+	 * The default value of the '{@link #getDepth() <em>Depth</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getDepth()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final int SIZE_EDEFAULT = 0;
+	protected static final int DEPTH_EDEFAULT = 0;
 
 	/**
-	 * The cached value of the '{@link #getSize() <em>Size</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getSize()
+	 * The cached value of the '{@link #getDepth() <em>Depth</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getDepth()
 	 * @generated
 	 * @ordered
 	 */
-	protected int size = SIZE_EDEFAULT;
+	protected int depth = DEPTH_EDEFAULT;
 
 	/**
-	 * The default value of the '{@link #getWidth() <em>Width</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getWidth()
+	 * The default value of the '{@link #getWordWidth() <em>Word Width</em>}'
+	 * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getWordWidth()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final int WIDTH_EDEFAULT = 0;
+	protected static final int WORD_WIDTH_EDEFAULT = 32;
 
 	/**
-	 * The cached value of the '{@link #getWidth() <em>Width</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getWidth()
+	 * The cached value of the '{@link #getWordWidth() <em>Word Width</em>}'
+	 * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getWordWidth()
 	 * @generated
 	 * @ordered
 	 */
-	protected int width = WIDTH_EDEFAULT;
+	protected int wordWidth = WORD_WIDTH_EDEFAULT;
 
 	/**
-	 * The cached value of the '{@link #getMappedConnections() <em>Mapped Connections</em>}' reference list.
-	 * <!-- begin-user-doc -->
+	 * The default value of the '{@link #getAddrWidth() <em>Addr Width</em>}'
+	 * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getAddrWidth()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final int ADDR_WIDTH_EDEFAULT = 0;
+
+	/**
+	 * The cached value of the '{@link #getMappedConnections()
+	 * <em>Mapped Connections</em>}' reference list. <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @see #getMappedConnections()
 	 * @generated
 	 * @ordered
@@ -109,8 +129,8 @@ public class BufferImpl extends LinkImpl implements Buffer {
 	protected EList<Connection> mappedConnections;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected BufferImpl() {
@@ -118,8 +138,8 @@ public class BufferImpl extends LinkImpl implements Buffer {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -128,52 +148,60 @@ public class BufferImpl extends LinkImpl implements Buffer {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
-	public int getSize() {
-		return size;
+	public int getDepth() {
+		return depth;
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
-	public void setSize(int newSize) {
-		int oldSize = size;
-		size = newSize;
+	public void setDepth(int newDepth) {
+		int oldDepth = depth;
+		depth = newDepth;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
-					ArchitecturePackage.BUFFER__SIZE, oldSize, size));
+					ArchitecturePackage.BUFFER__DEPTH, oldDepth, depth));
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
-	public int getWidth() {
-		return width;
+	public int getWordWidth() {
+		return wordWidth;
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
-	public void setWidth(int newWidth) {
-		int oldWidth = width;
-		width = newWidth;
+	public void setWordWidth(int newWordWidth) {
+		int oldWordWidth = wordWidth;
+		wordWidth = newWordWidth;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
-					ArchitecturePackage.BUFFER__WIDTH, oldWidth, width));
+					ArchitecturePackage.BUFFER__WORD_WIDTH, oldWordWidth,
+					wordWidth));
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 */
+	public int getAddrWidth() {
+		return BackendUtil.closestPow_2(Math.log(getDepth()) / Math.log(2));
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Connection> getMappedConnections() {
@@ -186,17 +214,19 @@ public class BufferImpl extends LinkImpl implements Buffer {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case ArchitecturePackage.BUFFER__SIZE:
-			return getSize();
-		case ArchitecturePackage.BUFFER__WIDTH:
-			return getWidth();
+		case ArchitecturePackage.BUFFER__DEPTH:
+			return getDepth();
+		case ArchitecturePackage.BUFFER__WORD_WIDTH:
+			return getWordWidth();
+		case ArchitecturePackage.BUFFER__ADDR_WIDTH:
+			return getAddrWidth();
 		case ArchitecturePackage.BUFFER__MAPPED_CONNECTIONS:
 			return getMappedConnections();
 		}
@@ -204,19 +234,19 @@ public class BufferImpl extends LinkImpl implements Buffer {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case ArchitecturePackage.BUFFER__SIZE:
-			setSize((Integer) newValue);
+		case ArchitecturePackage.BUFFER__DEPTH:
+			setDepth((Integer) newValue);
 			return;
-		case ArchitecturePackage.BUFFER__WIDTH:
-			setWidth((Integer) newValue);
+		case ArchitecturePackage.BUFFER__WORD_WIDTH:
+			setWordWidth((Integer) newValue);
 			return;
 		case ArchitecturePackage.BUFFER__MAPPED_CONNECTIONS:
 			getMappedConnections().clear();
@@ -228,18 +258,18 @@ public class BufferImpl extends LinkImpl implements Buffer {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case ArchitecturePackage.BUFFER__SIZE:
-			setSize(SIZE_EDEFAULT);
+		case ArchitecturePackage.BUFFER__DEPTH:
+			setDepth(DEPTH_EDEFAULT);
 			return;
-		case ArchitecturePackage.BUFFER__WIDTH:
-			setWidth(WIDTH_EDEFAULT);
+		case ArchitecturePackage.BUFFER__WORD_WIDTH:
+			setWordWidth(WORD_WIDTH_EDEFAULT);
 			return;
 		case ArchitecturePackage.BUFFER__MAPPED_CONNECTIONS:
 			getMappedConnections().clear();
@@ -249,17 +279,19 @@ public class BufferImpl extends LinkImpl implements Buffer {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case ArchitecturePackage.BUFFER__SIZE:
-			return size != SIZE_EDEFAULT;
-		case ArchitecturePackage.BUFFER__WIDTH:
-			return width != WIDTH_EDEFAULT;
+		case ArchitecturePackage.BUFFER__DEPTH:
+			return depth != DEPTH_EDEFAULT;
+		case ArchitecturePackage.BUFFER__WORD_WIDTH:
+			return wordWidth != WORD_WIDTH_EDEFAULT;
+		case ArchitecturePackage.BUFFER__ADDR_WIDTH:
+			return getAddrWidth() != ADDR_WIDTH_EDEFAULT;
 		case ArchitecturePackage.BUFFER__MAPPED_CONNECTIONS:
 			return mappedConnections != null && !mappedConnections.isEmpty();
 		}
@@ -267,8 +299,8 @@ public class BufferImpl extends LinkImpl implements Buffer {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -277,12 +309,22 @@ public class BufferImpl extends LinkImpl implements Buffer {
 			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (size: ");
-		result.append(size);
-		result.append(", width: ");
-		result.append(width);
+		result.append(" (depth: ");
+		result.append(depth);
+		result.append(", wordWidth: ");
+		result.append(wordWidth);
 		result.append(')');
 		return result.toString();
 	}
 
-} //BufferImpl
+	@Override
+	public void update() {
+		int bits = 0;
+		for (Connection connection : mappedConnections) {
+			bits += connection.getSize()
+					* connection.getSourcePort().getType().getSizeInBits();
+		}
+		depth = bits / 32;
+	}
+
+} // BufferImpl

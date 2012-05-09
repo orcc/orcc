@@ -64,43 +64,24 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- * <li>
- * {@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getName
- * <em>Name</em>}</li>
- * <li>
- * {@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getComponents
- * <em>Components</em>}</li>
- * <li>
- * {@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getProcessors
- * <em>Processors</em>}</li>
- * <li>
- * {@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getBuffers
- * <em>Buffers</em>}</li>
- * <li>
- * {@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getSignals
- * <em>Signals</em>}</li>
- * <li>
- * {@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getInputs
- * <em>Inputs</em>}</li>
- * <li>
- * {@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getOutputs
- * <em>Outputs</em>}</li>
- * <li>
- * {@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getHardwareDatabase
- * <em>Hardware Database</em>}</li>
- * <li>
- * {@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getConfiguration
- * <em>Configuration</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getComponents <em>Components</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getProcessors <em>Processors</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getBuffers <em>Buffers</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getSignals <em>Signals</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getInputs <em>Inputs</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getOutputs <em>Outputs</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getHardwareDatabase <em>Hardware Database</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getConfiguration <em>Configuration</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class DesignImpl extends GraphImpl implements Design {
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -109,91 +90,81 @@ public class DesignImpl extends GraphImpl implements Design {
 	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @see #getName()
 	 * @generated
 	 * @ordered
 	 */
 	protected String name = NAME_EDEFAULT;
 	/**
-	 * The cached value of the '{@link #getComponents() <em>Components</em>}'
-	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getComponents() <em>Components</em>}' reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getComponents()
 	 * @generated
 	 * @ordered
 	 */
 	protected EList<Component> components;
 	/**
-	 * The cached value of the '{@link #getProcessors() <em>Processors</em>}'
-	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getProcessors() <em>Processors</em>}' reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getProcessors()
 	 * @generated
 	 * @ordered
 	 */
 	protected EList<Processor> processors;
 	/**
-	 * The cached value of the '{@link #getBuffers() <em>Buffers</em>}'
-	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getBuffers() <em>Buffers</em>}' reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getBuffers()
 	 * @generated
 	 * @ordered
 	 */
 	protected EList<Buffer> buffers;
 	/**
-	 * The cached value of the '{@link #getSignals() <em>Signals</em>}'
-	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getSignals() <em>Signals</em>}' reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getSignals()
 	 * @generated
 	 * @ordered
 	 */
 	protected EList<Signal> signals;
 	/**
-	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' reference
-	 * list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getInputs()
 	 * @generated
 	 * @ordered
 	 */
 	protected EList<Port> inputs;
 	/**
-	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}'
-	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getOutputs()
 	 * @generated
 	 * @ordered
 	 */
 	protected EList<Port> outputs;
 	/**
-	 * The cached value of the '{@link #getHardwareDatabase()
-	 * <em>Hardware Database</em>}' map. <!-- begin-user-doc --> <!--
+	 * The cached value of the '{@link #getHardwareDatabase() <em>Hardware Database</em>}' map.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
 	 * @see #getHardwareDatabase()
 	 * @generated
 	 * @ordered
 	 */
 	protected EMap<String, Implementation> hardwareDatabase;
 	/**
-	 * The default value of the '{@link #getConfiguration()
-	 * <em>Configuration</em>}' attribute. <!-- begin-user-doc --> <!--
+	 * The default value of the '{@link #getConfiguration() <em>Configuration</em>}' attribute.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
 	 * @see #getConfiguration()
 	 * @generated
 	 * @ordered
 	 */
 	protected static final DesignConfiguration CONFIGURATION_EDEFAULT = DesignConfiguration.DIRECT_MAPPING;
 	/**
-	 * The cached value of the '{@link #getConfiguration()
-	 * <em>Configuration</em>}' attribute. <!-- begin-user-doc --> <!--
+	 * The cached value of the '{@link #getConfiguration() <em>Configuration</em>}' attribute.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
 	 * @see #getConfiguration()
 	 * @generated
 	 * @ordered
@@ -202,7 +173,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	protected DesignImpl() {
@@ -238,7 +208,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -283,7 +252,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -314,7 +282,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -360,7 +327,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -370,7 +336,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public String getName() {
@@ -379,7 +344,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public void setName(String newName) {
@@ -392,7 +356,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -431,7 +394,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<Component> getComponents() {
@@ -444,7 +406,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<Processor> getProcessors() {
@@ -457,7 +418,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<Buffer> getBuffers() {
@@ -470,7 +430,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public DesignConfiguration getConfiguration() {
@@ -479,7 +438,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<Signal> getSignals() {
@@ -492,7 +450,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<Port> getInputs() {
@@ -505,7 +462,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<Port> getOutputs() {
@@ -518,7 +474,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EMap<String, Implementation> getHardwareDatabase() {
@@ -533,7 +488,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public void setConfiguration(DesignConfiguration newConfiguration) {
@@ -548,7 +502,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -564,7 +517,6 @@ public class DesignImpl extends GraphImpl implements Design {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override

@@ -159,10 +159,10 @@ assignComponent(component) ::= <<
 
 assignBuffer(buffer) ::= <<
 buffer_<buffer.label> : entity work.inferredRAM_2p
-  generic map(depth  =\> <buffer.depth>,
-              byte_width  =\> <buffer.byte_width>,
-              addr_width =\> <buffer.addr_width>,
-              bytes      =\> <buffer.bytes>)
+  generic map(depth      =\> <buffer.depth>,
+              byte_width =\> 8,
+              addr_width =\> <buffer.addrWidth>,
+              bytes      =\> 4)
   port map(clk        =\> clk,
            wren_p1    =\> buf_<buffer.label>_wren_p1,
            address_p1 =\> buf_<buffer.label>_address_p1,

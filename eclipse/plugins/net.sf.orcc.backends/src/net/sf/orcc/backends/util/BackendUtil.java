@@ -46,8 +46,8 @@ public class BackendUtil {
 		}
 	}
 
-	public static void startExec(final AbstractBackend executingBackend, String[] cmd)
-			throws IOException {
+	public static void startExec(final AbstractBackend executingBackend,
+			String[] cmd) throws IOException {
 		Runtime run = Runtime.getRuntime();
 		final Process process = run.exec(cmd);
 
@@ -61,7 +61,8 @@ public class BackendUtil {
 					try {
 						String line = reader.readLine();
 						if (line != null) {
-							executingBackend.write("Generation error :" + line + "\n");
+							executingBackend.write("Generation error :" + line
+									+ "\n");
 						}
 					} finally {
 						reader.close();
@@ -77,6 +78,20 @@ public class BackendUtil {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * this method returns the closest power of 2 of x --> optimal buffer size
+	 * 
+	 * @param x
+	 * @return closest power of 2 of x
+	 */
+	public static int closestPow_2(double x) {
+		int p = 1;
+		while (p < x) {
+			p = p * 2;
+		}
+		return p;
 	}
 
 }
