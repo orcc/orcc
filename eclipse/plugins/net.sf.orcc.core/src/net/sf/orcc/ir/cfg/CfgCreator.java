@@ -30,6 +30,7 @@ package net.sf.orcc.ir.cfg;
 
 import static net.sf.orcc.ir.IrFactory.eINSTANCE;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,7 @@ import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.GraphPackage;
+import net.sf.orcc.graph.util.Dota;
 import net.sf.orcc.ir.Cfg;
 import net.sf.orcc.ir.CfgNode;
 
@@ -93,6 +95,8 @@ public class CfgCreator extends DfSwitch<Void> {
 		// transform n-branches conditionals to two-branches conditionals
 		normalizeConditionals();
 
+		// System.out.println(new Dota().printDot(cfg));
+
 		return null;
 	}
 
@@ -135,46 +139,63 @@ public class CfgCreator extends DfSwitch<Void> {
 	private void convertFsmToCfg(FSM fsm) {
 		Map<State, CfgNode> stateMap = new HashMap<State, CfgNode>();
 		State init = fsm.getInitialState();
-		cfg.add(cfg.getFirst(), getCfgNode(stateMap, init));
-		
-		// by convention the initial state is visited once
-		init.setAttribute("count", 1);
+		CfgNode first = getCfgNode(stateMap, init);
+		cfg.add(cfg.getEntry(), first);
 
 		for (Transition transition : fsm.getTransitions()) {
-			State source = transition.getSource();
-			CfgNode srcNode = getCfgNode(stateMap, source);
-			
-			// if the source node is a fork
-			// i.e. more than one outgoing edge *and* not a loop
-			Integer n = source.getValue("count");
-			if (srcNode.getOutgoing().size() > 0 && n != null && n == 1) {
-				CfgNode newNode = eINSTANCE.createCfgNode();
-				cfg.add(newNode);
-				newNode.getOutgoing().addAll(srcNode.getOutgoing());
-				cfg.add(srcNode, newNode);
-				srcNode = newNode;
-			}
-
-			// update target's count
-			State target = transition.getTarget();
-			n = target.getValue("count");
-			if (n == null) {
-				n = 1;
-			} else {
-				n++;
-			}
-			target.setAttribute("count", n);
-
 			// create new node for action
 			Action action = transition.getAction();
 			CfgNode bbNode = addNode(action.getName());
 			bbNode.setAttribute("action", action);
 
 			// add edges
+			State source = transition.getSource();
+			CfgNode srcNode = getCfgNode(stateMap, source);
 			cfg.add(srcNode, bbNode);
+
+			State target = transition.getTarget();
 			CfgNode tgtNode = getCfgNode(stateMap, target);
 			cfg.add(bbNode, tgtNode);
 		}
+
+		// add exit node
+		CfgNode exit = addNode("exit");
+		cfg.add(first, exit);
+		cfg.setExit(exit);
+
+		// create additional fork nodes so that normalization works as expected
+		// visits all nodes (excluding newly-created ones)
+		List<CfgNode> nodes = cfg.getNodes();
+
+		cfg.computeDominance();
+
+		// using a constant is intended
+		int n = nodes.size();
+		for (int i = 0; i < n; i++) {
+			CfgNode node = nodes.get(i);
+
+			List<Edge> edges;
+			if (cfg.isLoop(node)) {
+				edges = new ArrayList<Edge>();
+				for (Edge edge : node.getOutgoing()) {
+					if (!cfg.immediatelyPostDominates(edge.getTarget(), node)) {
+						edges.add(edge);
+					}
+				}
+			} else {
+				edges = node.getOutgoing();
+			}
+
+			if (edges.size() > 1) {
+				CfgNode newNode = eINSTANCE.createCfgNode();
+				cfg.add(newNode);
+				newNode.getOutgoing().addAll(node.getOutgoing());
+				cfg.add(node, newNode);
+				node = newNode;
+			}
+		}
+
+		System.out.println(new Dota().printDot(cfg));
 	}
 
 	/**

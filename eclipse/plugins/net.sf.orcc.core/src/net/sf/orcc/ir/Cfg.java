@@ -29,21 +29,22 @@
 package net.sf.orcc.ir;
 
 import net.sf.orcc.graph.Graph;
+import net.sf.orcc.graph.Vertex;
 
 import org.eclipse.emf.common.util.EList;
 
 /**
  * <!-- begin-user-doc -->This interface defines a Control-Flow Graph.<!--
  * end-user-doc -->
- *
+ * 
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link net.sf.orcc.ir.Cfg#getEntry <em>Entry</em>}</li>
- *   <li>{@link net.sf.orcc.ir.Cfg#getExit <em>Exit</em>}</li>
+ * <li>{@link net.sf.orcc.ir.Cfg#getEntry <em>Entry</em>}</li>
+ * <li>{@link net.sf.orcc.ir.Cfg#getExit <em>Exit</em>}</li>
  * </ul>
  * </p>
- *
+ * 
  * @see net.sf.orcc.ir.IrPackage#getCfg()
  * @model
  * @generated
@@ -51,8 +52,14 @@ import org.eclipse.emf.common.util.EList;
 public interface Cfg extends Graph {
 
 	/**
-	 * Returns the value of the '<em><b>Entry</b></em>' reference.
-	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * Computes the dominance and post-dominance information
+	 */
+	void computeDominance();
+
+	/**
+	 * Returns the value of the '<em><b>Entry</b></em>' reference. <!--
+	 * begin-user-doc --><!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Entry</em>' reference.
 	 * @see #setEntry(CfgNode)
 	 * @see net.sf.orcc.ir.IrPackage#getCfg_Entry()
@@ -62,8 +69,9 @@ public interface Cfg extends Graph {
 	CfgNode getEntry();
 
 	/**
-	 * Returns the value of the '<em><b>Exit</b></em>' reference.
-	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * Returns the value of the '<em><b>Exit</b></em>' reference. <!--
+	 * begin-user-doc --><!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Exit</em>' reference.
 	 * @see #setExit(CfgNode)
 	 * @see net.sf.orcc.ir.IrPackage#getCfg_Exit()
@@ -93,7 +101,21 @@ public interface Cfg extends Graph {
 	 * @return <code>true</code> if <code>m</code> immediately dominates
 	 *         <code>n</code>
 	 */
-	boolean immediatelyDominates(CfgNode m, CfgNode n);
+	boolean immediatelyDominates(Vertex m, Vertex n);
+
+	/**
+	 * Returns <code>true</code> if the given <code>m</code> node
+	 * <i>immediately</i> post-dominates the given <code>n</code> node. If the
+	 * post-dominance information has not been computed yet, it is computed now.
+	 * 
+	 * @param m
+	 *            a CFG node
+	 * @param n
+	 *            a CFG node
+	 * @return <code>true</code> if <code>m</code> immediately post-dominates
+	 *         <code>n</code>
+	 */
+	boolean immediatelyPostDominates(Vertex m, Vertex n);
 
 	/**
 	 * Returns <code>true</code> if the given node is a loop-starting node,
@@ -103,21 +125,25 @@ public interface Cfg extends Graph {
 	 *            a node of this CFG
 	 * @return <code>true</code> if the node is a loop-starting node
 	 */
-	boolean isLoop(CfgNode node);
+	boolean isLoop(Vertex node);
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Cfg#getEntry <em>Entry</em>}' reference.
-	 * <!-- begin-user-doc --><!-- end-user-doc -->
-	 * @param value the new value of the '<em>Entry</em>' reference.
+	 * Sets the value of the '{@link net.sf.orcc.ir.Cfg#getEntry <em>Entry</em>}
+	 * ' reference. <!-- begin-user-doc --><!-- end-user-doc -->
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Entry</em>' reference.
 	 * @see #getEntry()
 	 * @generated
 	 */
 	void setEntry(CfgNode value);
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Cfg#getExit <em>Exit</em>}' reference.
-	 * <!-- begin-user-doc --><!-- end-user-doc -->
-	 * @param value the new value of the '<em>Exit</em>' reference.
+	 * Sets the value of the '{@link net.sf.orcc.ir.Cfg#getExit <em>Exit</em>}'
+	 * reference. <!-- begin-user-doc --><!-- end-user-doc -->
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Exit</em>' reference.
 	 * @see #getExit()
 	 * @generated
 	 */

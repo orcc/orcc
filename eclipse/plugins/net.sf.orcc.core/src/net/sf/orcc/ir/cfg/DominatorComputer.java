@@ -28,13 +28,18 @@
  */
 package net.sf.orcc.ir.cfg;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.graph.Edge;
+import net.sf.orcc.graph.GraphPackage;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.graph.visit.Ordering;
 import net.sf.orcc.graph.visit.ReversePostOrder;
 import net.sf.orcc.ir.Cfg;
+
+import org.eclipse.emf.ecore.EReference;
 
 /**
  * This class computes the dominance information of a CFG using the algorithm
@@ -46,28 +51,78 @@ import net.sf.orcc.ir.Cfg;
  */
 public class DominatorComputer {
 
-	private int[] doms;
+	private final EReference refEdges;
+
+	private final EReference refVertex;
+
+	private final List<Vertex> vertices;
 
 	/**
-	 * Computes the dominance information of the given CFG.
 	 * 
 	 * @param cfg
-	 *            a CFG
+	 *            control flow graph
+	 * @param isPost
+	 *            <code>true</code> if computing post-dominance information,
+	 *            <code>false</code> otherwise
 	 */
-	public int[] computeDominanceInformation(Cfg cfg) {
-		// compute reverse post-order
-		Ordering rpo = new ReversePostOrder(cfg, cfg.getEntry());
-		List<Vertex> vertices = rpo.getVertices();
+	public DominatorComputer(Cfg cfg, boolean isPost) {
+		if (isPost) {
+			refEdges = GraphPackage.Literals.VERTEX__OUTGOING;
+			refVertex = GraphPackage.Literals.EDGE__TARGET;
+		} else {
+			refEdges = GraphPackage.Literals.VERTEX__INCOMING;
+			refVertex = GraphPackage.Literals.EDGE__SOURCE;
+		}
 
+		// opposite of source/target is outgoing/incoming
+		// opposite of incoming/outgoing is target/source
+		Ordering rpo = new ReversePostOrder(cfg, refVertex.getEOpposite(),
+				refEdges.getEOpposite(), null);
+		this.vertices = rpo.getVertices();
+	}
+
+	/**
+	 * Computes the dominance information.
+	 */
+	public Map<Vertex, Vertex> computeDominance() {
 		// initialize doms
 		// 0 is considered as "Undefined"
 		// so we start from 1 (hence the "n + 1" allocation)
 		int n = vertices.size();
-		doms = new int[n + 1];
+		int[] doms = new int[n + 1];
 
 		// n is the start node by definition of the post-order numbering
 		doms[n] = n;
 
+		// update dominance information
+		updateDom(doms, n);
+
+		// return the immediate dominator map
+		Map<Vertex, Vertex> map = new HashMap<Vertex, Vertex>(doms.length);
+		for (int i = 1; i < n; i++) {
+			// b is the post-order number of vertex
+			Vertex vertex = vertices.get(i);
+			int b = vertex.getNumber();
+			map.put(vertex, vertices.get(n - doms[b]));
+		}
+		return map;
+	}
+
+	private int intersect(int[] doms, int b1, int b2) {
+		int finger1 = b1;
+		int finger2 = b2;
+		while (finger1 != finger2) {
+			while (finger1 < finger2) {
+				finger1 = doms[finger1];
+			}
+			while (finger2 < finger1) {
+				finger2 = doms[finger2];
+			}
+		}
+		return finger1;
+	}
+
+	private void updateDom(int[] doms, int n) {
 		boolean changed = true;
 		while (changed) {
 			changed = false;
@@ -78,9 +133,10 @@ public class DominatorComputer {
 				Vertex processed = null;
 				Vertex vertex = vertices.get(i);
 
-				List<Edge> edges = vertex.getIncoming();
+				@SuppressWarnings("unchecked")
+				List<Edge> edges = (List<Edge>) vertex.eGet(refEdges);
 				for (Edge edge : edges) {
-					Vertex pred = edge.getSource();
+					Vertex pred = (Vertex) edge.eGet(refVertex);
 					int p = pred.getNumber();
 					if (doms[p] != 0) {
 						// pred has already been processed, set newIdom
@@ -92,12 +148,12 @@ public class DominatorComputer {
 
 				// for all predecessors different from processed
 				for (Edge edge : edges) {
-					Vertex pred = edge.getSource();
+					Vertex pred = (Vertex) edge.eGet(refVertex);
 					if (pred != processed) {
 						int p = pred.getNumber();
 						if (doms[p] != 0) {
 							// i.e., if doms[p] already calculated
-							newIdom = intersect(p, newIdom);
+							newIdom = intersect(doms, p, newIdom);
 						}
 					}
 				}
@@ -110,22 +166,6 @@ public class DominatorComputer {
 				}
 			}
 		}
-
-		return doms;
-	}
-
-	private int intersect(int b1, int b2) {
-		int finger1 = b1;
-		int finger2 = b2;
-		while (finger1 != finger2) {
-			while (finger1 < finger2) {
-				finger1 = doms[finger1];
-			}
-			while (finger2 < finger1) {
-				finger2 = doms[finger2];
-			}
-		}
-		return finger1;
 	}
 
 }

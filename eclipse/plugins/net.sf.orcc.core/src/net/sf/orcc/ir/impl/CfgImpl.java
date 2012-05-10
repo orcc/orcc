@@ -31,14 +31,15 @@
 package net.sf.orcc.ir.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.graph.Edge;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.graph.impl.GraphImpl;
 import net.sf.orcc.ir.Cfg;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.cfg.DominatorComputer;
-import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.util.EList;
@@ -61,9 +62,9 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  */
 public class CfgImpl extends GraphImpl implements Cfg {
 
-	private int[] doms;
+	private Map<Vertex, Vertex> doms;
 
-	private int edgesModCount;
+	private Map<Vertex, Vertex> idoms;
 
 	/**
 	 * The cached value of the '{@link #getEntry() <em>Entry</em>}' reference.
@@ -107,11 +108,13 @@ public class CfgImpl extends GraphImpl implements Cfg {
 		return exit;
 	}
 
-	/**
-	 * Computes the dominance information of this CFG.
-	 */
-	private void computeDominance() {
-		doms = new DominatorComputer().computeDominanceInformation(this);
+	@Override
+	public void computeDominance() {
+		idoms = new DominatorComputer(this, true).computeDominance();
+
+		// compute dominators last so we get the usual post-order numbering
+		// easier to debug
+		doms = new DominatorComputer(this, false).computeDominance();
 	}
 
 	/**
@@ -232,24 +235,29 @@ public class CfgImpl extends GraphImpl implements Cfg {
 	}
 
 	@Override
-	public boolean immediatelyDominates(CfgNode m, CfgNode n) {
-		// only computes dominance when necessary
-		int modCount = EcoreHelper.getModCount(getEdges());
-		if (doms == null || modCount != edgesModCount) {
-			edgesModCount = modCount;
-			computeDominance();
+	public boolean immediatelyDominates(Vertex m, Vertex n) {
+		if (doms == null) {
+			throw new IllegalStateException("computeDominance must be called first");
 		}
 
-		return m.getNumber() == doms[n.getNumber()];
+		return m == doms.get(n);
 	}
 
 	@Override
-	public boolean isLoop(CfgNode node) {
+	public boolean immediatelyPostDominates(Vertex m, Vertex n) {
+		if (idoms == null) {
+			throw new IllegalStateException("computeDominance must be called first");
+		}
+
+		return m == idoms.get(n);
+	}
+
+	@Override
+	public boolean isLoop(Vertex node) {
 		List<Edge> edges = node.getIncoming();
 		if (edges.size() == 2) {
 			for (Edge edge : edges) {
-				CfgNode predNode = (CfgNode) edge.getSource();
-				if (immediatelyDominates(predNode, node)) {
+				if (immediatelyDominates(edge.getSource(), node)) {
 					return true;
 				}
 			}
