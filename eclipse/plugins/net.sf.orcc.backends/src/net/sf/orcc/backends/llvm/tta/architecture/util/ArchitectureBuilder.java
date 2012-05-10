@@ -69,20 +69,58 @@ import net.sf.orcc.ir.Var;
  */
 public class ArchitectureBuilder extends DfSwitch<Design> {
 
+	/**
+	 * This class define an architecture visitor used to update needed
+	 * information after the projection of a dataflow application onto a network
+	 * of processors. For example, it computes the size of each memory according
+	 * to the mapping.
+	 * 
+	 * @author Herve Yviquel
+	 * 
+	 */
+	private class ProjectionFinalizer extends ArchitectureSwitch<Void> {
+
+		@Override
+		public Void caseBuffer(Buffer buffer) {
+			int bits = 0;
+			for (Connection connection : buffer.getMappedConnections()) {
+				bits += connection.getSize()
+						* connection.getSourcePort().getType().getSizeInBits()
+						+ 2 * 32;
+			}
+			buffer.setDepth(bits / 32);
+			int maxAdress = bits / 8;
+			FunctionUnit srcLSU = (FunctionUnit) buffer.getSourcePort();
+			FunctionUnit tgtLSU = (FunctionUnit) buffer.getTargetPort();
+			srcLSU.getAddressSpace().setMaxAddress(maxAdress);
+			tgtLSU.getAddressSpace().setMaxAddress(maxAdress);
+			return null;
+		}
+
+		@Override
+		public Void caseDesign(Design design) {
+			for (Buffer buffer : design.getBuffers()) {
+				doSwitch(buffer);
+			}
+			return null;
+		}
+
+	}
+
+	private int bufferId = 0;
+
 	private Map<Component, Map<Component, Buffer>> bufferMap;
 
 	private Map<Vertex, Component> componentMap;
-
 	@SuppressWarnings("unused")
 	private DesignConfiguration conf;
-	private Design design;
 
+	private Design design;
 	private ArchitectureFactory factory = ArchitectureFactory.eINSTANCE;
 	@SuppressWarnings("unused")
 	private Mapping mapping;
-	private List<String> optimizedActors;
 
-	private int bufferId = 0;
+	private List<String> optimizedActors;
 
 	public ArchitectureBuilder(DesignConfiguration conf) {
 		design = factory.createDesign();
@@ -113,16 +151,6 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		return lsu;
 	}
 
-	private Buffer createBuffer(Vertex source, Vertex target) {
-		Buffer buffer = factory.createBuffer(bufferId++, source, target);
-		Port sourcePort = addBuffer((Processor) source, buffer);
-		Port targetPort = addBuffer((Processor) target, buffer);
-		buffer.setSourcePort(sourcePort);
-		buffer.setTargetPort(targetPort);
-		design.add(buffer);
-		return buffer;
-	}
-
 	/**
 	 * Add a simple signal to the design. The signal is the translation of
 	 * native connection. External ports and functional units are automatically
@@ -139,6 +167,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		int size;
 
 		if (source == null) {
+			// The signal comes from an external port
 			Port port = factory.createPort((net.sf.orcc.df.Port) connection
 					.getSource());
 			design.addInput(port);
@@ -158,6 +187,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		}
 
 		if (target == null) {
+			// The signal targets an external port
 			Port port = factory.createPort((net.sf.orcc.df.Port) connection
 					.getTarget());
 			design.addOutput(port);
@@ -181,46 +211,6 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		design.add(signal);
 	}
 
-	/**
-	 * Map a connection on a circular buffer. If the actors source and target of
-	 * the connection are mapped on different processors, then the connection is
-	 * mapped to their interconnected memory and this memory is created in case
-	 * it doesn't yet exist. If both actors are mapped to the same processor,
-	 * then the connection is mapped to its internal RAM.
-	 * 
-	 * @param connection
-	 *            the connection to map on a buffer
-	 */
-	private void mapToBuffer(Connection connection) {
-		// TODO: when both actors are mapped to the same processor
-		Component source = componentMap.get(connection.getSource());
-		Component target = componentMap.get(connection.getTarget());
-
-		Map<Component, Buffer> tgtToBufferMap;
-		if (bufferMap.containsKey(source)) {
-			tgtToBufferMap = bufferMap.get(source);
-		} else {
-			tgtToBufferMap = new HashMap<Component, Buffer>();
-			bufferMap.put(source, tgtToBufferMap);
-		}
-
-		Buffer buffer;
-		if (tgtToBufferMap.containsKey(target)) {
-			buffer = tgtToBufferMap.get(target);
-		} else {
-			buffer = createBuffer(source, target);
-			tgtToBufferMap.put(target, buffer);
-		}
-		buffer.getMappedConnections().add(connection);
-
-		FunctionUnit srcLSU = (FunctionUnit) buffer.getSourcePort();
-		connection.getSourcePort().setAttribute("id",
-				srcLSU.getAddressSpace().getId());
-		FunctionUnit tgtLSU = (FunctionUnit) buffer.getTargetPort();
-		connection.getTargetPort().setAttribute("id",
-				tgtLSU.getAddressSpace().getId());
-	}
-
 	@Override
 	public Design caseBroadcast(Broadcast broadcast) {
 		ProcessorConfiguration conf = ProcessorConfiguration.STANDARD;
@@ -235,8 +225,10 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	@Override
 	public Design caseConnection(Connection connection) {
 		if (isNative(connection)) {
+			// Native connection are hardware signals
 			addSignal(connection);
 		} else {
+			// FIFO connection are mapped to a memory
 			mapToBuffer(connection);
 		}
 		return null;
@@ -276,6 +268,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	@Override
 	public Design caseNetwork(Network network) {
 		design = factory.createDesign();
+
 		for (Vertex entity : network.getEntities()) {
 			doSwitch(entity);
 		}
@@ -285,9 +278,8 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		for (Connection connection : network.getConnections()) {
 			doSwitch(connection);
 		}
-		for (Buffer buffer : design.getBuffers()) {
-			buffer.update();
-		}
+		new ProjectionFinalizer().doSwitch(design);
+
 		return design;
 	}
 
@@ -349,6 +341,16 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		return neededMemorySize;
 	}
 
+	private Buffer createBuffer(Vertex source, Vertex target) {
+		Buffer buffer = factory.createBuffer(bufferId++, source, target);
+		Port sourcePort = addBuffer((Processor) source, buffer);
+		Port targetPort = addBuffer((Processor) target, buffer);
+		buffer.setSourcePort(sourcePort);
+		buffer.setTargetPort(targetPort);
+		design.add(buffer);
+		return buffer;
+	}
+
 	private int getSize(Type type) {
 		int size;
 		if (type.isList()) {
@@ -370,5 +372,45 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 
 		return (source != null && source.isNative())
 				|| (target != null && target.isNative());
+	}
+
+	/**
+	 * Map a connection on a circular buffer. If the actors source and target of
+	 * the connection are mapped on different processors, then the connection is
+	 * mapped to their interconnected memory and this memory is created in case
+	 * it doesn't yet exist. If both actors are mapped to the same processor,
+	 * then the connection is mapped to its internal RAM.
+	 * 
+	 * @param connection
+	 *            the connection to map on a buffer
+	 */
+	private void mapToBuffer(Connection connection) {
+		// TODO: when both actors are mapped to the same processor
+		Component source = componentMap.get(connection.getSource());
+		Component target = componentMap.get(connection.getTarget());
+
+		Map<Component, Buffer> tgtToBufferMap;
+		if (bufferMap.containsKey(source)) {
+			tgtToBufferMap = bufferMap.get(source);
+		} else {
+			tgtToBufferMap = new HashMap<Component, Buffer>();
+			bufferMap.put(source, tgtToBufferMap);
+		}
+
+		Buffer buffer;
+		if (tgtToBufferMap.containsKey(target)) {
+			buffer = tgtToBufferMap.get(target);
+		} else {
+			buffer = createBuffer(source, target);
+			tgtToBufferMap.put(target, buffer);
+		}
+		buffer.getMappedConnections().add(connection);
+
+		FunctionUnit srcLSU = (FunctionUnit) buffer.getSourcePort();
+		connection.getSourcePort().setAttribute("id",
+				srcLSU.getAddressSpace().getId());
+		FunctionUnit tgtLSU = (FunctionUnit) buffer.getTargetPort();
+		connection.getTargetPort().setAttribute("id",
+				tgtLSU.getAddressSpace().getId());
 	}
 }
