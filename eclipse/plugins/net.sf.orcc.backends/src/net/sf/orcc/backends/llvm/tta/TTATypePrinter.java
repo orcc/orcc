@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2012, IRISA
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the IETR/INSA of Rennes nor the names of its
+ *   * Neither the name of the IRISA nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -41,9 +41,9 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.util.util.EcoreHelper;
 
 /**
- * This class defines a LLVM type printer.
+ * This class defines a TTA type printer.
  * 
- * @author Jerome GORIN
+ * @author Herve Yviquel
  * 
  */
 public class TTATypePrinter extends LLVMTypePrinter {
