@@ -157,6 +157,13 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 			tgtToBufferMap.put(target, buffer);
 		}
 		buffer.getMappedConnections().add(connection);
+
+		FunctionUnit srcLSU = (FunctionUnit) buffer.getSourcePort();
+		connection.getSourcePort().setAttribute("id",
+				srcLSU.getAddressSpace().getId());
+		FunctionUnit tgtLSU = (FunctionUnit) buffer.getTargetPort();
+		connection.getTargetPort().setAttribute("id",
+				tgtLSU.getAddressSpace().getId());
 	}
 
 	@Override
@@ -193,10 +200,6 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 			}
 		} else {
 			int memorySize = computeNeededMemorySize(instance);
-
-			// ProcessorConfiguration conf = optimizedActors.contains(instance
-			// .getName()) ? ProcessorConfiguration.CUSTOM
-			// : ProcessorConfiguration.STANDARD;
 
 			ProcessorConfiguration conf = ProcessorConfiguration.STANDARD;
 			Processor processor = factory.createProcessor("processor_"
