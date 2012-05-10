@@ -255,7 +255,7 @@ public class CfgImpl extends GraphImpl implements Cfg {
 	@Override
 	public boolean isLoop(Vertex node) {
 		List<Edge> edges = node.getIncoming();
-		if (edges.size() == 2) {
+		if (edges.size() >= 2) {
 			for (Edge edge : edges) {
 				if (immediatelyDominates(edge.getSource(), node)) {
 					return true;

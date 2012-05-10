@@ -43,7 +43,6 @@ import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.GraphPackage;
-import net.sf.orcc.graph.util.Dota;
 import net.sf.orcc.ir.Cfg;
 import net.sf.orcc.ir.CfgNode;
 
@@ -94,8 +93,6 @@ public class CfgCreator extends DfSwitch<Void> {
 
 		// transform n-branches conditionals to two-branches conditionals
 		normalizeConditionals();
-
-		// System.out.println(new Dota().printDot(cfg));
 
 		return null;
 	}
@@ -158,24 +155,31 @@ public class CfgCreator extends DfSwitch<Void> {
 			cfg.add(bbNode, tgtNode);
 		}
 
-		// add exit node
-		CfgNode exit = addNode("exit");
-		cfg.add(first, exit);
+		// set exit node (add it if necessary)
+		// a CFG *MUST* have an exit for dominators to be properly computed
+		CfgNode exit;
+		State last = (State) fsm.getLast();
+		if (last == null) {
+			exit = addNode("exit");
+			cfg.add(first, exit);
+		} else {
+			exit = getCfgNode(stateMap, last);
+		}
 		cfg.setExit(exit);
+
+		// we need dominance information
+		cfg.computeDominance();
 
 		// create additional fork nodes so that normalization works as expected
 		// visits all nodes (excluding newly-created ones)
 		List<CfgNode> nodes = cfg.getNodes();
-
-		cfg.computeDominance();
-
-		// using a constant is intended
 		int n = nodes.size();
 		for (int i = 0; i < n; i++) {
 			CfgNode node = nodes.get(i);
 
 			List<Edge> edges;
 			if (cfg.isLoop(node)) {
+				// only add edges that are inside the loop
 				edges = new ArrayList<Edge>();
 				for (Edge edge : node.getOutgoing()) {
 					if (!cfg.immediatelyPostDominates(edge.getTarget(), node)) {
@@ -189,13 +193,13 @@ public class CfgCreator extends DfSwitch<Void> {
 			if (edges.size() > 1) {
 				CfgNode newNode = eINSTANCE.createCfgNode();
 				cfg.add(newNode);
-				newNode.getOutgoing().addAll(node.getOutgoing());
-				cfg.add(node, newNode);
+				newNode.getOutgoing().addAll(edges);
+				Edge newEdge = cfg.add(node, newNode);
+				// by convention first edge of a loop node is inside the loop
+				node.getOutgoing().move(0, newEdge);
 				node = newNode;
 			}
 		}
-
-		System.out.println(new Dota().printDot(cfg));
 	}
 
 	/**
