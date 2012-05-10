@@ -172,23 +172,24 @@ public class TTABackendImpl extends LLVMBackendImpl {
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network = doTransformNetwork(network);
 
+		// build the design
+		design = new ArchitectureBuilder(conf).caseNetwork(network);
+
 		// print instances and entities
 		String oldPath = path;
 		path = OrccUtil.createFolder(path, "actors");
-		printer = new StandardPrinter("net/sf/orcc/backends/llvm/tta/LLVM_Actor.stg");
+		printer = new StandardPrinter(
+				"net/sf/orcc/backends/llvm/tta/LLVM_Actor.stg");
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
 		printInstances(network);
 		printEntities(network);
-
-		// build and print the design
 		path = oldPath;
-		design = new ArchitectureBuilder(conf).caseNetwork(network);
 
+		// print the design
 		for (Processor processor : design.getProcessors()) {
 			printProcessor(processor);
 		}
-
 		printDesign(design);
 
 		if (finalize) {
