@@ -31,7 +31,6 @@ package net.sf.orcc.backends.llvm.jit;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.dftools.graph.Edge;
 import net.sf.orcc.backends.TemplateData;
 import net.sf.orcc.backends.llvm.aot.LLVMTemplateData;
 import net.sf.orcc.df.Action;
@@ -40,6 +39,7 @@ import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
+import net.sf.orcc.graph.Edge;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;

@@ -30,10 +30,6 @@ package net.sf.orcc.backends.llvm.tta.architecture.util;
 
 import java.util.Map;
 
-import net.sf.dftools.graph.Edge;
-import net.sf.dftools.graph.Graph;
-import net.sf.dftools.graph.Vertex;
-import net.sf.dftools.util.Attributable;
 import net.sf.orcc.backends.llvm.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.llvm.tta.architecture.Bridge;
@@ -66,6 +62,10 @@ import net.sf.orcc.backends.llvm.tta.architecture.Term;
 import net.sf.orcc.backends.llvm.tta.architecture.TermBool;
 import net.sf.orcc.backends.llvm.tta.architecture.TermUnit;
 import net.sf.orcc.backends.llvm.tta.architecture.Writes;
+import net.sf.orcc.graph.Edge;
+import net.sf.orcc.graph.Graph;
+import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.util.Attributable;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;

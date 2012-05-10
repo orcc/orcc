@@ -32,13 +32,13 @@ import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
 
 import java.util.List;
 
-import net.sf.dftools.util.Attributable;
 import net.sf.orcc.cal.cal.AnnotationArgument;
 import net.sf.orcc.cal.cal.AstAnnotation;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.util.Attributable;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;

@@ -8,10 +8,6 @@ package net.sf.orcc.df.util;
 
 import java.util.Map;
 
-import net.sf.dftools.graph.Edge;
-import net.sf.dftools.graph.Graph;
-import net.sf.dftools.graph.Vertex;
-import net.sf.dftools.util.Attributable;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
@@ -27,7 +23,11 @@ import net.sf.orcc.df.State;
 import net.sf.orcc.df.Tag;
 import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.Unit;
+import net.sf.orcc.graph.Edge;
+import net.sf.orcc.graph.Graph;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.util.Attributable;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;

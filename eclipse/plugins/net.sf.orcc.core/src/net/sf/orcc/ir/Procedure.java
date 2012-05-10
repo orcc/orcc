@@ -28,7 +28,8 @@
  */
 package net.sf.orcc.ir;
 
-import net.sf.dftools.util.Attributable;
+import net.sf.orcc.util.Attributable;
+
 import org.eclipse.emf.common.util.EList;
 
 /**

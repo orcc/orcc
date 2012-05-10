@@ -8,11 +8,11 @@ package net.sf.orcc.df.impl;
 
 import java.util.Collection;
 
-import net.sf.dftools.util.impl.AttributableImpl;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Unit;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.util.impl.AttributableImpl;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;

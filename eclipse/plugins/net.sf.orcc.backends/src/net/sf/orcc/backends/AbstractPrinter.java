@@ -33,7 +33,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
 
-import net.sf.dftools.util.Attribute;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
@@ -41,6 +40,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.util.ExpressionPrinter;
 import net.sf.orcc.ir.util.TypePrinter;
+import net.sf.orcc.util.Attribute;
 
 import org.eclipse.emf.common.util.EMap;
 import org.stringtemplate.v4.AttributeRenderer;

@@ -31,8 +31,6 @@ package net.sf.orcc.backends.transformations;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.dftools.util.Attribute;
-import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.backends.ir.BlockFor;
 import net.sf.orcc.backends.ir.IrNodeSpecific;
 import net.sf.orcc.backends.ir.IrSpecificFactory;
@@ -52,6 +50,8 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.transformations.CfgBuilder;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
+import net.sf.orcc.util.Attribute;
+import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;

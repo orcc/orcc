@@ -31,9 +31,9 @@ package net.sf.orcc.df;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.dftools.graph.Graph;
-import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.OrccException;
+import net.sf.orcc.graph.Graph;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
 
@@ -139,7 +139,7 @@ public interface Network extends Graph {
 
 	/**
 	 * Returns the value of the '<em><b>Entities</b></em>' reference list. The
-	 * list contents are of type {@link net.sf.dftools.graph.Vertex}. <!--
+	 * list contents are of type {@link net.sf.orcc.graph.Vertex}. <!--
 	 * begin-user-doc --><!-- end-user-doc -->
 	 * 
 	 * @return the value of the '<em>Entities</em>' reference list.

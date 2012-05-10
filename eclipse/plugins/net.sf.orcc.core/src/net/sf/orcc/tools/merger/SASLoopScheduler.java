@@ -29,10 +29,10 @@
 
 package net.sf.orcc.tools.merger;
 
-import net.sf.dftools.graph.Vertex;
-import net.sf.dftools.graph.visit.ReversePostOrder;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.graph.visit.ReversePostOrder;
 
 /**
  * This class computes a single appearance schedule (SAS) with 1-level nested

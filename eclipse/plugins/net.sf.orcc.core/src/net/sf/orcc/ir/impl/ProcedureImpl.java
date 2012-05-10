@@ -7,7 +7,6 @@
 package net.sf.orcc.ir.impl;
 
 import java.util.Collection;
-import net.sf.dftools.util.impl.AttributableImpl;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,6 +22,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.ir.util.MapAdapter;
+import net.sf.orcc.util.impl.AttributableImpl;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;

@@ -3,13 +3,13 @@ package net.sf.orcc.tools.merger;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.util.IrUtil;
 
 public class UniqueInstantiator extends DfSwitch<Void> {

@@ -30,8 +30,6 @@ package net.sf.orcc.backends.llvm.tta.architecture.impl;
 
 import java.util.Map;
 
-import net.sf.dftools.graph.Vertex;
-import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.backends.llvm.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
@@ -70,6 +68,8 @@ import net.sf.orcc.backends.llvm.tta.architecture.Term;
 import net.sf.orcc.backends.llvm.tta.architecture.TermBool;
 import net.sf.orcc.backends.llvm.tta.architecture.TermUnit;
 import net.sf.orcc.backends.llvm.tta.architecture.Writes;
+import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;

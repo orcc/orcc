@@ -30,10 +30,6 @@ package net.sf.orcc.backends.llvm.tta.architecture.util;
 
 import java.util.Map;
 
-import net.sf.dftools.graph.Edge;
-import net.sf.dftools.graph.Graph;
-import net.sf.dftools.graph.Vertex;
-import net.sf.dftools.util.Attributable;
 import net.sf.orcc.backends.llvm.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.llvm.tta.architecture.Bridge;
@@ -66,6 +62,10 @@ import net.sf.orcc.backends.llvm.tta.architecture.Term;
 import net.sf.orcc.backends.llvm.tta.architecture.TermBool;
 import net.sf.orcc.backends.llvm.tta.architecture.TermUnit;
 import net.sf.orcc.backends.llvm.tta.architecture.Writes;
+import net.sf.orcc.graph.Edge;
+import net.sf.orcc.graph.Graph;
+import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.util.Attributable;
 
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notifier;
@@ -744,13 +744,13 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.dftools.graph.Edge <em>Edge</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.graph.Edge <em>Edge</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.dftools.graph.Edge
+	 * @see net.sf.orcc.graph.Edge
 	 * @generated
 	 */
 	public Adapter createEdgeAdapter() {
@@ -759,13 +759,13 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 
 	/**
 	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.dftools.util.Attributable <em>Attributable</em>}'. <!--
+	 * {@link net.sf.orcc.util.Attributable <em>Attributable</em>}'. <!--
 	 * begin-user-doc --> This default implementation returns null so that we
 	 * can easily ignore cases; it's useful to ignore a case when inheritance
 	 * will catch all the cases anyway. <!-- end-user-doc -->
 	 * 
 	 * @return the new adapter.
-	 * @see net.sf.dftools.util.Attributable
+	 * @see net.sf.orcc.util.Attributable
 	 * @generated
 	 */
 	public Adapter createAttributableAdapter() {

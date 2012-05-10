@@ -34,14 +34,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.dftools.graph.Edge;
-import net.sf.dftools.graph.impl.VertexImpl;
-import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfUtil;
+import net.sf.orcc.graph.Edge;
+import net.sf.orcc.graph.impl.VertexImpl;
+import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;

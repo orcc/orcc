@@ -10,14 +10,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sf.dftools.graph.Edge;
-import net.sf.dftools.graph.impl.GraphImpl;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Transition;
+import net.sf.orcc.graph.Edge;
+import net.sf.orcc.graph.impl.GraphImpl;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.util.EList;

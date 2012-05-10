@@ -6,9 +6,9 @@
  */
 package net.sf.orcc.df;
 
-import net.sf.dftools.graph.GraphPackage;
+import net.sf.orcc.graph.GraphPackage;
+import net.sf.orcc.util.UtilPackage;
 
-import net.sf.dftools.util.UtilPackage;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;

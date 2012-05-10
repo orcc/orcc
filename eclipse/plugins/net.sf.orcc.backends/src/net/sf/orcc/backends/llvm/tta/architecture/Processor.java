@@ -30,7 +30,7 @@
  */
 package net.sf.orcc.backends.llvm.tta.architecture;
 
-import net.sf.dftools.graph.Vertex;
+import net.sf.orcc.graph.Vertex;
 
 import org.eclipse.emf.common.util.EList;
 
@@ -166,7 +166,7 @@ public interface Processor extends Component {
 
 	/**
 	 * Returns the value of the '<em><b>Mapped Actors</b></em>' reference list.
-	 * The list contents are of type {@link net.sf.dftools.graph.Vertex}. <!--
+	 * The list contents are of type {@link net.sf.orcc.graph.Vertex}. <!--
 	 * begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Mapped Actors</em>' reference list isn't

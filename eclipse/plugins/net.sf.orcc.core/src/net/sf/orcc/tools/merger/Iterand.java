@@ -29,8 +29,8 @@
 
 package net.sf.orcc.tools.merger;
 
-import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.df.Instance;
+import net.sf.orcc.graph.Vertex;
 
 /**
  * This class defines an element of the body of a schedule. An iterand can be

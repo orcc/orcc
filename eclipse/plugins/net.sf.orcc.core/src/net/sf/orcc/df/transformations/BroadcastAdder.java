@@ -32,8 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.dftools.graph.Edge;
-import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
@@ -41,6 +39,8 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.graph.Edge;
+import net.sf.orcc.graph.Vertex;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 

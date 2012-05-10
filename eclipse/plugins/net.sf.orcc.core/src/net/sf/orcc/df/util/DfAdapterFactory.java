@@ -8,10 +8,6 @@ package net.sf.orcc.df.util;
 
 import java.util.Map;
 
-import net.sf.dftools.graph.Edge;
-import net.sf.dftools.graph.Graph;
-import net.sf.dftools.graph.Vertex;
-import net.sf.dftools.util.Attributable;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
@@ -27,7 +23,11 @@ import net.sf.orcc.df.State;
 import net.sf.orcc.df.Tag;
 import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.Unit;
+import net.sf.orcc.graph.Edge;
+import net.sf.orcc.graph.Graph;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.util.Attributable;
 
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notifier;
@@ -263,13 +263,13 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.dftools.graph.Vertex <em>Vertex</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.graph.Vertex <em>Vertex</em>}'.
 	 * <!-- begin-user-doc
 	 * --> This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.dftools.graph.Vertex
+	 * @see net.sf.orcc.graph.Vertex
 	 * @generated
 	 */
 	public Adapter createVertexAdapter() {
@@ -277,13 +277,13 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.dftools.graph.Graph <em>Graph</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.graph.Graph <em>Graph</em>}'.
 	 * <!-- begin-user-doc
 	 * --> This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.dftools.graph.Graph
+	 * @see net.sf.orcc.graph.Graph
 	 * @generated
 	 */
 	public Adapter createGraphAdapter() {
@@ -456,13 +456,13 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 
 	/**
 	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.dftools.util.Attributable <em>Attributable</em>}'. <!--
+	 * {@link net.sf.orcc.util.Attributable <em>Attributable</em>}'. <!--
 	 * begin-user-doc --> This default implementation returns null so that we
 	 * can easily ignore cases; it's useful to ignore a case when inheritance
 	 * will catch all the cases anyway. <!-- end-user-doc -->
 	 * 
 	 * @return the new adapter.
-	 * @see net.sf.dftools.util.Attributable
+	 * @see net.sf.orcc.util.Attributable
 	 * @generated
 	 */
 	public Adapter createAttributableAdapter() {
@@ -470,13 +470,13 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.dftools.graph.Edge <em>Edge</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.graph.Edge <em>Edge</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore
 	 * cases; it's useful to ignore a case when inheritance will catch all the
 	 * cases anyway. <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.dftools.graph.Edge
+	 * @see net.sf.orcc.graph.Edge
 	 * @generated
 	 */
 	public Adapter createEdgeAdapter() {

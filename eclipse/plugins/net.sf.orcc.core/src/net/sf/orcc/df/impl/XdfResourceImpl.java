@@ -34,8 +34,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
 
-import net.sf.dftools.graph.Edge;
-import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
@@ -45,6 +43,8 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.df.util.XdfParser;
 import net.sf.orcc.df.util.XdfWriter;
+import net.sf.orcc.graph.Edge;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.common.util.URI;

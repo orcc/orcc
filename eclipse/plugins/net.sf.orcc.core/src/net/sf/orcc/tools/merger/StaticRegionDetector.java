@@ -36,17 +36,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.dftools.graph.Edge;
-import net.sf.dftools.graph.Graph;
-import net.sf.dftools.graph.Vertex;
-import net.sf.dftools.graph.visit.SccFinder;
-import net.sf.dftools.graph.visit.ReversePostOrder;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.graph.Edge;
+import net.sf.orcc.graph.Graph;
+import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.graph.visit.ReversePostOrder;
+import net.sf.orcc.graph.visit.SccFinder;
 import net.sf.orcc.moc.MoC;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;

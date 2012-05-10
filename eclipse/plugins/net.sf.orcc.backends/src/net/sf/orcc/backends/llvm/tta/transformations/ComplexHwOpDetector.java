@@ -33,7 +33,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.ExprBinary;
@@ -42,6 +41,7 @@ import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.util.WriteListener;
+import net.sf.orcc.util.util.EcoreHelper;
 
 /**
  * 

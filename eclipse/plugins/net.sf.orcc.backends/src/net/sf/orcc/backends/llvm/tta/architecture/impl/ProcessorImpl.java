@@ -32,7 +32,6 @@ package net.sf.orcc.backends.llvm.tta.architecture.impl;
 
 import java.util.Collection;
 
-import net.sf.dftools.graph.Vertex;
 import net.sf.orcc.backends.TemplateData;
 import net.sf.orcc.backends.llvm.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
@@ -44,6 +43,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Processor;
 import net.sf.orcc.backends.llvm.tta.architecture.ProcessorConfiguration;
 import net.sf.orcc.backends.llvm.tta.architecture.RegisterFile;
 import net.sf.orcc.backends.llvm.tta.architecture.Socket;
+import net.sf.orcc.graph.Vertex;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;

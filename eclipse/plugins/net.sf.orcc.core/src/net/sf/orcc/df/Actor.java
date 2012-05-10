@@ -28,10 +28,10 @@
  */
 package net.sf.orcc.df;
 
-import net.sf.dftools.util.Attributable;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
+import net.sf.orcc.util.Attributable;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.EList;

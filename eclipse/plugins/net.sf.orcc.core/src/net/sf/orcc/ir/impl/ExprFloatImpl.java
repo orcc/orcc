@@ -23,17 +23,16 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * <p>
  * The following features are implemented:
  * <ul>
- * <li>{@link net.sf.orcc.ir.impl.ExprFloatImpl#getValue <em>Value</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ExprFloatImpl#getValue <em>Value</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class ExprFloatImpl extends ExpressionImpl implements ExprFloat {
 	/**
 	 * The default value of the '{@link #getValue() <em>Value</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @see #getValue()
 	 * @generated
 	 * @ordered
@@ -43,7 +42,6 @@ public class ExprFloatImpl extends ExpressionImpl implements ExprFloat {
 	/**
 	 * The cached value of the '{@link #getValue() <em>Value</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @see #getValue()
 	 * @generated
 	 * @ordered
@@ -52,7 +50,6 @@ public class ExprFloatImpl extends ExpressionImpl implements ExprFloat {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	protected ExprFloatImpl() {
@@ -66,7 +63,6 @@ public class ExprFloatImpl extends ExpressionImpl implements ExprFloat {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -80,7 +76,6 @@ public class ExprFloatImpl extends ExpressionImpl implements ExprFloat {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -95,7 +90,6 @@ public class ExprFloatImpl extends ExpressionImpl implements ExprFloat {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -110,7 +104,6 @@ public class ExprFloatImpl extends ExpressionImpl implements ExprFloat {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -120,7 +113,6 @@ public class ExprFloatImpl extends ExpressionImpl implements ExprFloat {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -147,7 +139,6 @@ public class ExprFloatImpl extends ExpressionImpl implements ExprFloat {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public BigDecimal getValue() {
@@ -161,7 +152,6 @@ public class ExprFloatImpl extends ExpressionImpl implements ExprFloat {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public void setValue(BigDecimal newValue) {
@@ -174,7 +164,6 @@ public class ExprFloatImpl extends ExpressionImpl implements ExprFloat {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override

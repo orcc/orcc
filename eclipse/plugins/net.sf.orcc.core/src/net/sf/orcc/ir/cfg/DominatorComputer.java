@@ -30,10 +30,10 @@ package net.sf.orcc.ir.cfg;
 
 import java.util.List;
 
-import net.sf.dftools.graph.Edge;
-import net.sf.dftools.graph.Vertex;
-import net.sf.dftools.graph.visit.Ordering;
-import net.sf.dftools.graph.visit.ReversePostOrder;
+import net.sf.orcc.graph.Edge;
+import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.graph.visit.Ordering;
+import net.sf.orcc.graph.visit.ReversePostOrder;
 import net.sf.orcc.ir.Cfg;
 
 /**

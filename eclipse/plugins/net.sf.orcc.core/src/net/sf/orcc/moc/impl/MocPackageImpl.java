@@ -6,10 +6,9 @@
  */
 package net.sf.orcc.moc.impl;
 
-import net.sf.dftools.graph.GraphPackage;
-import net.sf.dftools.util.UtilPackage;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.impl.DfPackageImpl;
+import net.sf.orcc.graph.GraphPackage;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.impl.IrPackageImpl;
 import net.sf.orcc.moc.CSDFMoC;
@@ -21,6 +20,7 @@ import net.sf.orcc.moc.MocFactory;
 import net.sf.orcc.moc.MocPackage;
 import net.sf.orcc.moc.QSDFMoC;
 import net.sf.orcc.moc.SDFMoC;
+import net.sf.orcc.util.UtilPackage;
 
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;

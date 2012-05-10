@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
     xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/net.sf.orcc.backends/src" modelPluginID="net.sf.orcc.backends"
-    templateDirectory="/net.sf.dftools.models/templates" dynamicTemplates="true" modelName="IrSpecific"
+    templateDirectory="/net.sf.orcc.models/templates" dynamicTemplates="true" modelName="IrSpecific"
     codeFormatting="true" importerID="org.eclipse.emf.importer.ecore" complianceLevel="6.0"
     copyrightFields="false" usedGenPackages="../../net.sf.orcc.core/model/Core.genmodel#//ir platform:/plugin/org.eclipse.emf.ecore/model/Ecore.genmodel#//ecore">
   <foreignModel>IrSpecific.ecore</foreignModel>

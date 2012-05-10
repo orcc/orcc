@@ -6,11 +6,11 @@
  */
 package net.sf.orcc.ir.impl;
 
-import net.sf.dftools.util.impl.AttributableImpl;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.Predicate;
+import net.sf.orcc.util.impl.AttributableImpl;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;

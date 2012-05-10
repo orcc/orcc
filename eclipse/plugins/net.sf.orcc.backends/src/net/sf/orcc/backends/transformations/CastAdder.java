@@ -31,7 +31,6 @@ package net.sf.orcc.backends.transformations;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.backends.ir.InstCast;
 import net.sf.orcc.backends.ir.IrSpecificFactory;
 import net.sf.orcc.ir.Arg;
@@ -66,6 +65,7 @@ import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;

@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.df;
 
-import net.sf.dftools.util.Attributable;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.util.Attributable;
 
 /**
  * This class defines an action. An action has a location, a tag, an input and

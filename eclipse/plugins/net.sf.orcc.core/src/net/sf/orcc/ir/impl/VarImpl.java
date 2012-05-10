@@ -8,13 +8,13 @@ package net.sf.orcc.ir.impl;
 
 import java.util.Collection;
 
-import net.sf.dftools.util.impl.AttributableImpl;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.util.impl.AttributableImpl;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;

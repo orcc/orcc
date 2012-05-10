@@ -6,9 +6,9 @@
  */
 package net.sf.orcc.df.impl;
 
-import net.sf.dftools.graph.impl.VertexImpl;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.State;
+import net.sf.orcc.graph.impl.VertexImpl;
 
 import org.eclipse.emf.ecore.EClass;
 

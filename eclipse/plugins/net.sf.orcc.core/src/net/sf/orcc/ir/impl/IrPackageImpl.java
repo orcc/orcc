@@ -6,10 +6,9 @@
  */
 package net.sf.orcc.ir.impl;
 
-import net.sf.dftools.graph.GraphPackage;
-import net.sf.dftools.util.UtilPackage;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.impl.DfPackageImpl;
+import net.sf.orcc.graph.GraphPackage;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByRef;
 import net.sf.orcc.ir.ArgByVal;
@@ -57,6 +56,7 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MocPackage;
 import net.sf.orcc.moc.impl.MocPackageImpl;
+import net.sf.orcc.util.UtilPackage;
 
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;

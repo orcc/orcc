@@ -31,7 +31,6 @@ package net.sf.orcc.simulators;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
@@ -51,6 +50,7 @@ import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.runtime.SimulatorFifo;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.WriteListener;
+import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.ecore.EObject;
 

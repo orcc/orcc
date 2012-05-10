@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.llvm.tta.architecture;
 
-import net.sf.dftools.graph.GraphPackage;
+import net.sf.orcc.graph.GraphPackage;
 
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;

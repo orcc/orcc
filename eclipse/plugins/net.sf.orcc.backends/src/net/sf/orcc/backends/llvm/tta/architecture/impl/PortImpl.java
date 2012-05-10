@@ -28,10 +28,10 @@
  */
 package net.sf.orcc.backends.llvm.tta.architecture.impl;
 
-import net.sf.dftools.graph.impl.VertexImpl;
-import net.sf.dftools.util.Attribute;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.llvm.tta.architecture.Port;
+import net.sf.orcc.graph.impl.VertexImpl;
+import net.sf.orcc.util.Attribute;
 
 import org.eclipse.emf.ecore.EClass;
 

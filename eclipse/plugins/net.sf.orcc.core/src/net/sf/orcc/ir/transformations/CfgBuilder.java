@@ -31,7 +31,7 @@ package net.sf.orcc.ir.transformations;
 
 import java.util.List;
 
-import net.sf.dftools.graph.Edge;
+import net.sf.orcc.graph.Edge;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockIf;

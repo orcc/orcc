@@ -6,7 +6,6 @@
  */
 package net.sf.orcc.backends.ir.util;
 
-import net.sf.dftools.util.Attributable;
 import net.sf.orcc.backends.ir.InstAssignIndex;
 import net.sf.orcc.backends.ir.InstCast;
 import net.sf.orcc.backends.ir.InstGetElementPtr;
@@ -17,6 +16,7 @@ import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockSpecific;
+import net.sf.orcc.util.Attributable;
 
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notifier;
@@ -277,13 +277,13 @@ public class IrSpecificAdapterFactory extends AdapterFactoryImpl {
 
 	/**
 	 * Creates a new adapter for an object of class '
-	 * {@link net.sf.dftools.util.Attributable <em>Attributable</em>}'. <!--
+	 * {@link net.sf.orcc.util.Attributable <em>Attributable</em>}'. <!--
 	 * begin-user-doc --> This default implementation returns null so that we
 	 * can easily ignore cases; it's useful to ignore a case when inheritance
 	 * will catch all the cases anyway. <!-- end-user-doc -->
 	 * 
 	 * @return the new adapter.
-	 * @see net.sf.dftools.util.Attributable
+	 * @see net.sf.orcc.util.Attributable
 	 * @generated
 	 */
 	public Adapter createAttributableAdapter() {

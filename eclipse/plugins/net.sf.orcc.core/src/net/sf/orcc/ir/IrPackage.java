@@ -6,8 +6,9 @@
  */
 package net.sf.orcc.ir;
 
-import net.sf.dftools.graph.GraphPackage;
-import net.sf.dftools.util.UtilPackage;
+import net.sf.orcc.graph.GraphPackage;
+import net.sf.orcc.util.UtilPackage;
+
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EEnum;

@@ -31,7 +31,7 @@ package net.sf.orcc.df;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.dftools.graph.Vertex;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.moc.MoC;
 
 import org.eclipse.emf.common.util.EList;

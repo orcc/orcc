@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ir;
 
-import net.sf.dftools.util.Attributable;
+import net.sf.orcc.util.Attributable;
 
 /**
  * This class defines an instruction.

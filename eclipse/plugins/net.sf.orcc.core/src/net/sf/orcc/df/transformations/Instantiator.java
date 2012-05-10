@@ -31,7 +31,6 @@ package net.sf.orcc.df.transformations;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.dftools.graph.Edge;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
@@ -39,6 +38,7 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.graph.Edge;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Var;
 

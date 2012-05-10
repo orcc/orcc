@@ -32,7 +32,7 @@ package net.sf.orcc.backends.llvm.tta.architecture;
 
 import java.util.Map;
 
-import net.sf.dftools.graph.Vertex;
+import net.sf.orcc.graph.Vertex;
 
 import org.eclipse.emf.common.util.EList;
 

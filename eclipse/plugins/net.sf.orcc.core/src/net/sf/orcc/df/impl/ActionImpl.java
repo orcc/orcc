@@ -6,12 +6,12 @@
  */
 package net.sf.orcc.df.impl;
 
-import net.sf.dftools.util.impl.AttributableImpl;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Tag;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.util.impl.AttributableImpl;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;

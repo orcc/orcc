@@ -31,10 +31,10 @@ package net.sf.orcc.df.transformations;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.dftools.graph.Vertex;
-import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.util.util.EcoreHelper;
 
 /**
  * This class defines a transformation that updates the name of all entities of

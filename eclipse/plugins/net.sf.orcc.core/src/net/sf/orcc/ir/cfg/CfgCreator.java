@@ -34,14 +34,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.dftools.graph.Edge;
-import net.sf.dftools.graph.GraphPackage;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.graph.Edge;
+import net.sf.orcc.graph.GraphPackage;
 import net.sf.orcc.ir.Cfg;
 import net.sf.orcc.ir.CfgNode;
 

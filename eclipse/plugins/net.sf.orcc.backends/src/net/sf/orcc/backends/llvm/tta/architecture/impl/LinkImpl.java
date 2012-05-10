@@ -30,11 +30,11 @@
  */
 package net.sf.orcc.backends.llvm.tta.architecture.impl;
 
-import net.sf.dftools.graph.impl.EdgeImpl;
 
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.llvm.tta.architecture.Link;
 import net.sf.orcc.backends.llvm.tta.architecture.Port;
+import net.sf.orcc.graph.impl.EdgeImpl;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EClass;

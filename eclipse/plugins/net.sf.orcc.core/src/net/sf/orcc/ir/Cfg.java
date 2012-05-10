@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ir;
 
-import net.sf.dftools.graph.Graph;
+import net.sf.orcc.graph.Graph;
 
 import org.eclipse.emf.common.util.EList;
 

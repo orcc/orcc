@@ -6,11 +6,11 @@
  */
 package net.sf.orcc.df.impl;
 
-import net.sf.dftools.graph.impl.EdgeImpl;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Transition;
+import net.sf.orcc.graph.impl.EdgeImpl;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EClass;

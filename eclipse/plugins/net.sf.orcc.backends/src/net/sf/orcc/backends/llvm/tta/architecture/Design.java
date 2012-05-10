@@ -30,7 +30,8 @@
  */
 package net.sf.orcc.backends.llvm.tta.architecture;
 
-import net.sf.dftools.graph.Graph;
+import net.sf.orcc.graph.Graph;
+
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.EMap;
 

@@ -38,10 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.dftools.graph.Edge;
-import net.sf.dftools.graph.Vertex;
-import net.sf.dftools.graph.impl.GraphImpl;
-import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
@@ -51,10 +47,14 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.transformations.NetworkClassifier;
 import net.sf.orcc.df.util.DfUtil;
+import net.sf.orcc.graph.Edge;
+import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.graph.impl.GraphImpl;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.tools.merger.ActorMerger;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
+import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;

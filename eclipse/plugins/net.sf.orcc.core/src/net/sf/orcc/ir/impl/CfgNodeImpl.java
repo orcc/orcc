@@ -30,7 +30,7 @@
  */
 package net.sf.orcc.ir.impl;
 
-import net.sf.dftools.graph.impl.VertexImpl;
+import net.sf.orcc.graph.impl.VertexImpl;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Block;

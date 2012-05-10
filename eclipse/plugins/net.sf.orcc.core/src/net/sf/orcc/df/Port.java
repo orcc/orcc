@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.df;
 
-import net.sf.dftools.graph.Vertex;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Type;
 
 /**

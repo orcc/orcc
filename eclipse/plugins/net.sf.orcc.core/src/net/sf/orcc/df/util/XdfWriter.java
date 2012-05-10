@@ -36,15 +36,13 @@ import java.io.OutputStream;
 import java.util.Comparator;
 import java.util.List;
 
-import net.sf.dftools.graph.Vertex;
-import net.sf.dftools.util.Attribute;
-import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -62,7 +60,9 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrSwitch;
+import net.sf.orcc.util.Attribute;
 import net.sf.orcc.util.DomUtil;
+import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.ECollections;
 import org.eclipse.emf.common.util.EList;

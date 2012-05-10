@@ -42,9 +42,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.dftools.graph.Vertex;
-import net.sf.dftools.util.Attribute;
-import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Actor;
@@ -54,11 +51,14 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.transformations.Instantiator;
 import net.sf.orcc.df.transformations.NetworkFlattener;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.util.ActorInterpreter;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.runtime.SimulatorFifo;
 import net.sf.orcc.runtime.impl.GenericSource;
+import net.sf.orcc.util.Attribute;
 import net.sf.orcc.util.OrccUtil;
+import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;

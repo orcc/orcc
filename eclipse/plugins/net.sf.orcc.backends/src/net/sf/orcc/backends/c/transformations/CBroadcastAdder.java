@@ -31,10 +31,10 @@ package net.sf.orcc.backends.c.transformations;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.dftools.graph.Edge;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.transformations.BroadcastAdder;
+import net.sf.orcc.graph.Edge;
 import net.sf.orcc.util.WriteListener;
 
 /**

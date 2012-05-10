@@ -38,8 +38,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.dftools.util.Attribute;
-import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.graphiti.io.LayoutReader;
 import net.sf.graphiti.model.Configuration;
 import net.sf.graphiti.model.Edge;
@@ -56,6 +54,8 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.ExpressionPrinter;
+import net.sf.orcc.util.Attribute;
+import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -76,15 +76,15 @@ import com.google.common.collect.Iterables;
  */
 public class XdfImporter {
 
-	private Map<net.sf.dftools.graph.Vertex, Vertex> vertexMap;
+	private Map<net.sf.orcc.graph.Vertex, Vertex> vertexMap;
 
 	private void addConnections(Graph graph, ObjectType type,
 			List<Connection> connections) {
 		for (Connection connection : connections) {
 			Port srcPort = connection.getSourcePort();
 			Port tgtPort = connection.getTargetPort();
-			net.sf.dftools.graph.Vertex srcVertex = connection.getSource();
-			net.sf.dftools.graph.Vertex tgtVertex = connection.getTarget();
+			net.sf.orcc.graph.Vertex srcVertex = connection.getSource();
+			net.sf.orcc.graph.Vertex tgtVertex = connection.getTarget();
 
 			Vertex source = vertexMap.get(srcVertex);
 			Vertex target = vertexMap.get(tgtVertex);
@@ -198,7 +198,7 @@ public class XdfImporter {
 	 * @return a graph
 	 */
 	public Graph transform(IFile file) {
-		vertexMap = new HashMap<net.sf.dftools.graph.Vertex, Vertex>();
+		vertexMap = new HashMap<net.sf.orcc.graph.Vertex, Vertex>();
 
 		ResourceSet set = new ResourceSetImpl();
 		Network network = EcoreHelper.getEObject(set, file);

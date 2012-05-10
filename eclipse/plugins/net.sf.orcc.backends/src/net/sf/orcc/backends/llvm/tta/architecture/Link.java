@@ -30,7 +30,7 @@
  */
 package net.sf.orcc.backends.llvm.tta.architecture;
 
-import net.sf.dftools.graph.Edge;
+import net.sf.orcc.graph.Edge;
 
 /**
  * <!-- begin-user-doc --> A representation of the model object '

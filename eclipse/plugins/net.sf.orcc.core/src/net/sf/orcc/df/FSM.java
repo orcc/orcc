@@ -30,7 +30,7 @@ package net.sf.orcc.df;
 
 import java.util.List;
 
-import net.sf.dftools.graph.Graph;
+import net.sf.orcc.graph.Graph;
 
 import org.eclipse.emf.common.util.EList;
 

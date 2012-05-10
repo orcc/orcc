@@ -35,7 +35,6 @@ import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.dftools.graph.Edge;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
@@ -45,6 +44,7 @@ import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Transition;
 import net.sf.orcc.df.Unit;
+import net.sf.orcc.graph.Edge;
 import net.sf.orcc.ir.Arg;
 import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.Block;

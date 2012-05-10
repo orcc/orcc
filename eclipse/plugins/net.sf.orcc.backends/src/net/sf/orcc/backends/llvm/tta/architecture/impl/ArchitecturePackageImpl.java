@@ -30,7 +30,6 @@ package net.sf.orcc.backends.llvm.tta.architecture.impl;
 
 import java.util.Map;
 
-import net.sf.dftools.graph.GraphPackage;
 import net.sf.orcc.backends.llvm.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
@@ -71,6 +70,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.TermBool;
 import net.sf.orcc.backends.llvm.tta.architecture.TermUnit;
 import net.sf.orcc.backends.llvm.tta.architecture.Writes;
 import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.graph.GraphPackage;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.moc.MocPackage;
 

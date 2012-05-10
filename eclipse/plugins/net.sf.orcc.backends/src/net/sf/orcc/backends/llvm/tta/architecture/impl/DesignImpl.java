@@ -32,9 +32,6 @@ package net.sf.orcc.backends.llvm.tta.architecture.impl;
 
 import java.util.Collection;
 
-import net.sf.dftools.graph.Edge;
-import net.sf.dftools.graph.Vertex;
-import net.sf.dftools.graph.impl.GraphImpl;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.llvm.tta.architecture.Buffer;
@@ -45,6 +42,9 @@ import net.sf.orcc.backends.llvm.tta.architecture.Implementation;
 import net.sf.orcc.backends.llvm.tta.architecture.Port;
 import net.sf.orcc.backends.llvm.tta.architecture.Processor;
 import net.sf.orcc.backends.llvm.tta.architecture.Signal;
+import net.sf.orcc.graph.Edge;
+import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.graph.impl.GraphImpl;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;

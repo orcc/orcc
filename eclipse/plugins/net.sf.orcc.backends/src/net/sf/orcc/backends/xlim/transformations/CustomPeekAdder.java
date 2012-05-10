@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.xlim.XlimActorTemplateData;
 import net.sf.orcc.df.Action;
@@ -47,6 +46,7 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 

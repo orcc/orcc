@@ -41,13 +41,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.sf.dftools.graph.Vertex;
-import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transformations.Instantiator;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ui.OrccUiActivator;
 import net.sf.orcc.util.OrccUtil;
+import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;

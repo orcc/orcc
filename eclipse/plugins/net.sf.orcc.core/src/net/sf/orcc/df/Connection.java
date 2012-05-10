@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.df;
 
-import net.sf.dftools.graph.Edge;
+import net.sf.orcc.graph.Edge;
 
 /**
  * This class represents a connection in a network. A connection can have a

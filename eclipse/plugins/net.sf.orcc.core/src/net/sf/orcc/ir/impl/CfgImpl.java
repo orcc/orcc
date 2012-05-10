@@ -32,13 +32,13 @@ package net.sf.orcc.ir.impl;
 
 import java.util.List;
 
-import net.sf.dftools.graph.Edge;
-import net.sf.dftools.graph.impl.GraphImpl;
-import net.sf.dftools.util.util.EcoreHelper;
+import net.sf.orcc.graph.Edge;
+import net.sf.orcc.graph.impl.GraphImpl;
 import net.sf.orcc.ir.Cfg;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.cfg.DominatorComputer;
+import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.util.EList;

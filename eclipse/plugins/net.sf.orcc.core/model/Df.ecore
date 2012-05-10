@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="df" nsURI="http://orcc.sf.net/model/2011/Df" nsPrefix="net.sf.orcc.df">
-  <eClassifiers xsi:type="ecore:EClass" name="Unit" eSuperTypes="../../net.sf.dftools.models/model/Util.ecore#//Attributable">
+  <eClassifiers xsi:type="ecore:EClass" name="Unit" eSuperTypes="../../net.sf.orcc.models/model/Util.ecore#//Attributable">
     <eStructuralFeatures xsi:type="ecore:EReference" name="constants" upperBound="-1"
         eType="ecore:EClass Ir.ecore#//Var" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="fileName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -10,7 +10,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="procedures" upperBound="-1"
         eType="ecore:EClass Ir.ecore#//Procedure" containment="true" resolveProxies="false"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Port" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Vertex">
+  <eClassifiers xsi:type="ecore:EClass" name="Port" eSuperTypes="../../net.sf.orcc.models/model/Graph.ecore#//Vertex">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
         volatile="true" transient="true" derived="true"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="numTokensConsumed" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
@@ -18,14 +18,14 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="ecore:EClass Ir.ecore#//Type"
         containment="true" resolveProxies="false"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Instance" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Vertex">
+  <eClassifiers xsi:type="ecore:EClass" name="Instance" eSuperTypes="../../net.sf.orcc.models/model/Graph.ecore#//Vertex">
     <eStructuralFeatures xsi:type="ecore:EReference" name="arguments" upperBound="-1"
         eType="#//Argument" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="entity" eType="ecore:EClass platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EObject"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
         volatile="true" transient="true" derived="true"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Actor" eSuperTypes="../../net.sf.dftools.models/model/Util.ecore#//Attributable">
+  <eClassifiers xsi:type="ecore:EClass" name="Actor" eSuperTypes="../../net.sf.orcc.models/model/Util.ecore#//Attributable">
     <eStructuralFeatures xsi:type="ecore:EReference" name="actions" upperBound="-1"
         eType="#//Action" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="actionsOutsideFsm" upperBound="-1"
@@ -53,9 +53,9 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="templateData" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"
         transient="true"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Network" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Graph">
+  <eClassifiers xsi:type="ecore:EClass" name="Network" eSuperTypes="../../net.sf.orcc.models/model/Graph.ecore#//Graph">
     <eStructuralFeatures xsi:type="ecore:EReference" name="entities" upperBound="-1"
-        eType="ecore:EClass ../../net.sf.dftools.models/model/Graph.ecore#//Vertex"/>
+        eType="ecore:EClass ../../net.sf.orcc.models/model/Graph.ecore#//Vertex"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="fileName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="inputs" upperBound="-1"
         eType="#//Port"/>
@@ -73,7 +73,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="variables" upperBound="-1"
         eType="ecore:EClass Ir.ecore#//Var" containment="true" resolveProxies="false"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Broadcast" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Vertex">
+  <eClassifiers xsi:type="ecore:EClass" name="Broadcast" eSuperTypes="../../net.sf.orcc.models/model/Graph.ecore#//Vertex">
     <eStructuralFeatures xsi:type="ecore:EReference" name="inputs" upperBound="-1"
         eType="#//Port" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
@@ -81,11 +81,11 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="outputs" upperBound="-1"
         eType="#//Port" containment="true" resolveProxies="false"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Connection" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Edge">
+  <eClassifiers xsi:type="ecore:EClass" name="Connection" eSuperTypes="../../net.sf.orcc.models/model/Graph.ecore#//Edge">
     <eStructuralFeatures xsi:type="ecore:EReference" name="sourcePort" eType="#//Port"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="targetPort" eType="#//Port"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Action" eSuperTypes="../../net.sf.dftools.models/model/Util.ecore#//Attributable">
+  <eClassifiers xsi:type="ecore:EClass" name="Action" eSuperTypes="../../net.sf.orcc.models/model/Util.ecore#//Attributable">
     <eStructuralFeatures xsi:type="ecore:EReference" name="body" eType="ecore:EClass Ir.ecore#//Procedure"
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="inputPattern" eType="#//Pattern"
@@ -99,7 +99,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="tag" eType="#//Tag" containment="true"
         resolveProxies="false"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="FSM" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Graph">
+  <eClassifiers xsi:type="ecore:EClass" name="FSM" eSuperTypes="../../net.sf.orcc.models/model/Graph.ecore#//Graph">
     <eStructuralFeatures xsi:type="ecore:EReference" name="initialState" eType="#//State"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Pattern">
@@ -114,12 +114,12 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="varToPortMap" upperBound="-1"
         eType="#//VarToPortMapEntry" containment="true" resolveProxies="false"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="State" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Vertex"/>
+  <eClassifiers xsi:type="ecore:EClass" name="State" eSuperTypes="../../net.sf.orcc.models/model/Graph.ecore#//Vertex"/>
   <eClassifiers xsi:type="ecore:EClass" name="Tag">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="identifiers" upperBound="-1"
         eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Transition" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Edge">
+  <eClassifiers xsi:type="ecore:EClass" name="Transition" eSuperTypes="../../net.sf.orcc.models/model/Graph.ecore#//Edge">
     <eStructuralFeatures xsi:type="ecore:EReference" name="action" eType="#//Action"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="PortToEIntegerObjectMapEntry" instanceClassName="java.util.Map$Entry">

@@ -33,7 +33,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockWhile;
@@ -45,6 +44,7 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.impl.IrResourceFactoryImpl;
 import net.sf.orcc.util.OrccUtil;
+import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;

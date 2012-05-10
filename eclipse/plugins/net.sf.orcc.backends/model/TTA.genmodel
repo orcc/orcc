@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
     xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/net.sf.orcc.backends/src" modelPluginID="net.sf.orcc.backends"
-    templateDirectory="/net.sf.dftools.models/templates" dynamicTemplates="true" modelName="TTA"
+    templateDirectory="/net.sf.orcc.models/templates" dynamicTemplates="true" modelName="TTA"
     codeFormatting="true" importerID="org.eclipse.emf.importer.ecore" complianceLevel="6.0"
-    copyrightFields="false" usedGenPackages="../../net.sf.orcc.core/model/Core.genmodel#//df ../../net.sf.orcc.core/model/Core.genmodel#//ir ../../net.sf.orcc.core/model/Core.genmodel#//moc platform:/plugin/org.eclipse.emf.ecore/model/Ecore.genmodel#//ecore ../../net.sf.dftools.models/model/Graph.genmodel#//graph ../../net.sf.dftools.models/model/Graph.genmodel#//util">
+    copyrightFields="false" usedGenPackages="../../net.sf.orcc.core/model/Core.genmodel#//df ../../net.sf.orcc.core/model/Core.genmodel#//ir ../../net.sf.orcc.core/model/Core.genmodel#//moc platform:/plugin/org.eclipse.emf.ecore/model/Ecore.genmodel#//ecore ../../net.sf.orcc.models/model/Graph.genmodel#//graph ../../net.sf.orcc.models/model/Graph.genmodel#//util">
   <foreignModel>TTA.ecore</foreignModel>
   <foreignModel>../../net.sf.orcc.core/model/Ir.ecore</foreignModel>
   <genPackages prefix="Architecture" basePackage="net.sf.orcc.backends.llvm.tta" disposableProviderFactory="true"

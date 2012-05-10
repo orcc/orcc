@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.llvm.tta.architecture;
 
-import net.sf.dftools.graph.Vertex;
+import net.sf.orcc.graph.Vertex;
 
 /**
  * <!-- begin-user-doc -->

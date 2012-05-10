@@ -56,14 +56,14 @@ import java.util.concurrent.Future;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import net.sf.dftools.graph.Vertex;
-import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.WriteListener;
+import net.sf.orcc.util.util.EcoreHelper;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;

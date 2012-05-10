@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.java;
 
-import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.ir.TypeBool;
 import net.sf.orcc.ir.TypeFloat;
@@ -37,6 +36,7 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.util.TypePrinter;
+import net.sf.orcc.util.util.EcoreHelper;
 
 /**
  * This class defines a Java type printer.

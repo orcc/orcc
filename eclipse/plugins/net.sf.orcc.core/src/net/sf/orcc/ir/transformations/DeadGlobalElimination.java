@@ -31,7 +31,6 @@ package net.sf.orcc.ir.transformations;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.Def;
@@ -39,6 +38,7 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.util.EcoreHelper;
 
 /**
  * This class defines a very simple Dead Global Elimination.

@@ -119,7 +119,7 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
          unpack="false"/>
 
    <plugin
-         id="net.sf.dftools.models"
+         id="net.sf.orcc.models"
          download-size="0"
          install-size="0"
          version="0.0.0"

@@ -6,7 +6,6 @@
  */
 package net.sf.orcc.backends.ir.util;
 
-import net.sf.dftools.util.Attributable;
 import net.sf.orcc.backends.ir.InstAssignIndex;
 import net.sf.orcc.backends.ir.InstCast;
 import net.sf.orcc.backends.ir.InstGetElementPtr;
@@ -17,6 +16,7 @@ import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockSpecific;
+import net.sf.orcc.util.Attributable;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;

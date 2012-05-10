@@ -34,12 +34,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.dftools.graph.Edge;
-import net.sf.dftools.graph.impl.VertexImpl;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.llvm.tta.architecture.Component;
 import net.sf.orcc.backends.llvm.tta.architecture.Link;
 import net.sf.orcc.backends.llvm.tta.architecture.Port;
+import net.sf.orcc.graph.Edge;
+import net.sf.orcc.graph.impl.VertexImpl;
 
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;

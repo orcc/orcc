@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="ir" nsURI="http://orcc.sf.net/model/2011/Ir" nsPrefix="net.sf.orcc.ir">
-  <eClassifiers xsi:type="ecore:EClass" name="Procedure" eSuperTypes="../../net.sf.dftools.models/model/Util.ecore#//Attributable">
+  <eClassifiers xsi:type="ecore:EClass" name="Procedure" eSuperTypes="../../net.sf.orcc.models/model/Util.ecore#//Attributable">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="lineNumber" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="locals" upperBound="-1"
         eType="#//Var" containment="true" resolveProxies="false"/>
@@ -21,7 +21,7 @@
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="byRef" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Block" abstract="true" eSuperTypes="../../net.sf.dftools.models/model/Util.ecore#//Attributable">
+  <eClassifiers xsi:type="ecore:EClass" name="Block" abstract="true" eSuperTypes="../../net.sf.orcc.models/model/Util.ecore#//Attributable">
     <eStructuralFeatures xsi:type="ecore:EReference" name="cfgNode" eType="#//CfgNode"
         eOpposite="#//CfgNode/node"/>
   </eClassifiers>
@@ -50,7 +50,7 @@
         eType="#//Block" containment="true" resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="BlockSpecific" abstract="true" eSuperTypes="#//Block"/>
-  <eClassifiers xsi:type="ecore:EClass" name="Instruction" abstract="true" eSuperTypes="../../net.sf.dftools.models/model/Util.ecore#//Attributable">
+  <eClassifiers xsi:type="ecore:EClass" name="Instruction" abstract="true" eSuperTypes="../../net.sf.orcc.models/model/Util.ecore#//Attributable">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="lineNumber" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="predicate" eType="#//Predicate"
         containment="true" resolveProxies="false"/>
@@ -169,7 +169,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="variable" eType="#//Var"
         eOpposite="#//Var/defs"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Var" eSuperTypes="../../net.sf.dftools.models/model/Util.ecore#//Attributable">
+  <eClassifiers xsi:type="ecore:EClass" name="Var" eSuperTypes="../../net.sf.orcc.models/model/Util.ecore#//Attributable">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="assignable" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="defs" upperBound="-1" eType="#//Def"
         eOpposite="#//Def/variable"/>
@@ -194,11 +194,11 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="expressions" upperBound="-1"
         eType="#//Expression" containment="true" resolveProxies="false"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Cfg" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Graph">
+  <eClassifiers xsi:type="ecore:EClass" name="Cfg" eSuperTypes="../../net.sf.orcc.models/model/Graph.ecore#//Graph">
     <eStructuralFeatures xsi:type="ecore:EReference" name="entry" eType="#//CfgNode"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="exit" eType="#//CfgNode"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="CfgNode" eSuperTypes="../../net.sf.dftools.models/model/Graph.ecore#//Vertex">
+  <eClassifiers xsi:type="ecore:EClass" name="CfgNode" eSuperTypes="../../net.sf.orcc.models/model/Graph.ecore#//Vertex">
     <eStructuralFeatures xsi:type="ecore:EReference" name="node" eType="#//Block"
         eOpposite="#//Block/cfgNode"/>
   </eClassifiers>

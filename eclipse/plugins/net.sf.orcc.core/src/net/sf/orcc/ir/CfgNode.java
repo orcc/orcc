@@ -30,7 +30,7 @@
  */
 package net.sf.orcc.ir;
 
-import net.sf.dftools.graph.Vertex;
+import net.sf.orcc.graph.Vertex;
 
 /**
  * <!-- begin-user-doc -->This class defines a node of a CFG graph. In addition

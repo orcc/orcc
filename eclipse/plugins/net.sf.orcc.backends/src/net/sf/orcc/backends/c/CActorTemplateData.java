@@ -33,7 +33,6 @@ import static net.sf.orcc.df.DfFactory.eINSTANCE;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.dftools.graph.Edge;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.FSM;
@@ -41,6 +40,7 @@ import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Transition;
+import net.sf.orcc.graph.Edge;
 
 import org.eclipse.emf.common.util.EList;
 

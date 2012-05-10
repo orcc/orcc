@@ -36,7 +36,6 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.sf.dftools.util.util.EcoreHelper;
 import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
@@ -60,6 +59,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.EList;
 

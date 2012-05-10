@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.ir;
 
-import net.sf.dftools.util.Attributable;
-import net.sf.dftools.graph.Edge;
+import net.sf.orcc.graph.Edge;
+import net.sf.orcc.util.Attributable;
 
 /**
  * <!-- begin-user-doc --> This class defines a block.<!-- end-user-doc -->

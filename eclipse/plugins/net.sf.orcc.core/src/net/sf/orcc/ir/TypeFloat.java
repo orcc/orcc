@@ -54,9 +54,9 @@ public interface TypeFloat extends Type {
 	 * @generated
 	 */
 	int getSize();
-	
+
 	boolean isDouble();
-	
+
 	boolean isHalf();
 
 	/**

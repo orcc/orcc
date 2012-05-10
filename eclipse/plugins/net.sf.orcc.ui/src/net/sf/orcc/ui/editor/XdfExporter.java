@@ -44,8 +44,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.sf.dftools.util.Attribute;
-import net.sf.dftools.util.UtilFactory;
 import net.sf.graphiti.io.LayoutWriter;
 import net.sf.graphiti.model.Edge;
 import net.sf.graphiti.model.Graph;
@@ -90,7 +88,9 @@ import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
+import net.sf.orcc.util.Attribute;
 import net.sf.orcc.util.OrccUtil;
+import net.sf.orcc.util.UtilFactory;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -144,11 +144,11 @@ public class XdfExporter extends CalSwitch<Object> {
 
 	private Map<String, Var> varMap;
 
-	private Map<Vertex, net.sf.dftools.graph.Vertex> vertexMap;
+	private Map<Vertex, net.sf.orcc.graph.Vertex> vertexMap;
 
 	private void addEdge(Network network, Edge edge) {
-		net.sf.dftools.graph.Vertex source = vertexMap.get(edge.getSource());
-		net.sf.dftools.graph.Vertex target = vertexMap.get(edge.getTarget());
+		net.sf.orcc.graph.Vertex source = vertexMap.get(edge.getSource());
+		net.sf.orcc.graph.Vertex target = vertexMap.get(edge.getTarget());
 
 		Port sourcePort = null;
 		if ("Instance".equals(edge.getSource().getType().getName())) {
@@ -484,7 +484,7 @@ public class XdfExporter extends CalSwitch<Object> {
 
 		varMap = new HashMap<String, Var>();
 		portMap = new HashMap<Port, Vertex>();
-		vertexMap = new HashMap<Vertex, net.sf.dftools.graph.Vertex>();
+		vertexMap = new HashMap<Vertex, net.sf.orcc.graph.Vertex>();
 
 		Network network = DfFactory.eINSTANCE.createNetwork();
 		network.setName((String) graph.getValue(PARAMETER_ID));

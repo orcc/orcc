@@ -28,13 +28,13 @@
  */
 package net.sf.orcc.df.impl;
 
-import net.sf.dftools.graph.impl.EdgeImpl;
-import net.sf.dftools.util.Attribute;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.graph.impl.EdgeImpl;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
+import net.sf.orcc.util.Attribute;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EClass;
