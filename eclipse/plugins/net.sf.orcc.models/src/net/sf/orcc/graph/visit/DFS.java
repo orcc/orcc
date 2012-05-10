@@ -31,7 +31,10 @@ package net.sf.orcc.graph.visit;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.eclipse.emf.ecore.EReference;
+
 import net.sf.orcc.graph.Edge;
+import net.sf.orcc.graph.GraphPackage;
 import net.sf.orcc.graph.Vertex;
 
 /**
@@ -47,6 +50,10 @@ public class DFS extends Ordering {
 	 */
 	private int num = 1;
 
+	private final EReference refEdges;
+
+	private final EReference refVertex;
+
 	/**
 	 * Creates a new DFS. This constructor only delegates to
 	 * <code>super(n)</code> and does not perform any visit.
@@ -54,8 +61,10 @@ public class DFS extends Ordering {
 	 * @param n
 	 *            the expected number of vertices
 	 */
-	protected DFS(int n) {
+	protected DFS(EReference refEdges, EReference refVertex, int n) {
 		super(n);
+		this.refEdges = refEdges;
+		this.refVertex = refVertex;
 	}
 
 	/**
@@ -84,6 +93,8 @@ public class DFS extends Ordering {
 	 */
 	public DFS(Vertex vertex, boolean order) {
 		super(vertex.getGraph().getVertices().size());
+		refEdges = GraphPackage.Literals.VERTEX__OUTGOING;
+		refVertex = GraphPackage.Literals.EDGE__TARGET;
 		if (order) {
 			visitPost(vertex);
 		} else {
@@ -115,10 +126,11 @@ public class DFS extends Ordering {
 	public final void visitPost(Vertex v) {
 		visited.add(v);
 
-		List<Edge> edges = v.getOutgoing();
+		@SuppressWarnings("unchecked")
+		List<Edge> edges = (List<Edge>) v.eGet(refEdges);
 		ListIterator<Edge> it = edges.listIterator(edges.size());
 		while (it.hasPrevious()) {
-			Vertex w = it.previous().getTarget();
+			Vertex w = (Vertex) it.previous().eGet(refVertex);
 			if (!visited.contains(w)) {
 				visitPost(w);
 			}
@@ -137,8 +149,10 @@ public class DFS extends Ordering {
 		visited.add(v);
 		visit(v);
 
-		for (Edge edge : v.getOutgoing()) {
-			Vertex w = edge.getTarget();
+		@SuppressWarnings("unchecked")
+		List<Edge> edges = (List<Edge>) v.eGet(refEdges);
+		for (Edge edge : edges) {
+			Vertex w = (Vertex) edge.eGet(refVertex);
 			if (!visited.contains(w)) {
 				visitPre(w);
 			}

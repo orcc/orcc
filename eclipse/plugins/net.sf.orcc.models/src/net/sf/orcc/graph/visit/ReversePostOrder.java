@@ -33,7 +33,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.emf.ecore.EReference;
+
+import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Graph;
+import net.sf.orcc.graph.GraphPackage;
 import net.sf.orcc.graph.Vertex;
 
 /**
@@ -47,34 +51,59 @@ public class ReversePostOrder extends DFS {
 	/**
 	 * Creates the reverse post-ordering of the given graph, starting from the
 	 * given entries. If <code>entries</code> is <code>null</code> or empty,
-	 * this method visits the graph to find entry vertices. If no entry vertex
-	 * is found, the first vertex of the graph is used.
+	 * this method visits the graph to find roots. If no entry vertex is found,
+	 * the first vertex of the graph is used.
 	 * 
 	 * @param graph
 	 *            a graph
 	 * @param entries
 	 *            a list of vertex
 	 */
-	@SuppressWarnings("unchecked")
 	public ReversePostOrder(Graph graph, List<? extends Vertex> entries) {
-		super(graph.getVertices().size());
+		this(graph, GraphPackage.Literals.VERTEX__OUTGOING,
+				GraphPackage.Literals.EDGE__TARGET, entries);
+	}
 
-		if (entries == null || entries.isEmpty()) {
-			entries = new ArrayList<Vertex>();
+	/**
+	 * Creates the reverse post-ordering of the given graph, starting from the
+	 * given roots. If <code>roots</code> is <code>null</code> or empty, this
+	 * method visits the graph to find roots. If no entry vertex is found, the
+	 * first vertex of the graph is used.
+	 * 
+	 * @param graph
+	 *            a graph
+	 * @param refEdges
+	 *            the EReference that returns either the incoming or outgoing
+	 *            edges of a vertex
+	 * @param refVertex
+	 *            the EReference that returns either the source or target of an
+	 *            edge
+	 * @param roots
+	 *            a list of vertex
+	 */
+	@SuppressWarnings("unchecked")
+	public ReversePostOrder(Graph graph, EReference refEdges,
+			EReference refVertex, List<? extends Vertex> roots) {
+		super(refEdges, refVertex, graph.getVertices().size());
+
+		if (roots == null || roots.isEmpty()) {
+			roots = new ArrayList<Vertex>();
+			EReference opposite = refVertex.getEOpposite();
 			for (Vertex vertex : graph.getVertices()) {
-				if (vertex.getIncoming().isEmpty()) {
-					((List<Vertex>) entries).add(vertex);
+				List<Edge> edges = (List<Edge>) vertex.eGet(opposite);
+				if (edges.isEmpty()) {
+					((List<Vertex>) roots).add(vertex);
 				}
 			}
 		}
 
-		if (entries.isEmpty()) {
+		if (roots.isEmpty()) {
 			// no entry point in the graph, take the first vertex
 			if (!graph.getVertices().isEmpty()) {
 				visitPost(graph.getVertices().get(0));
 			}
 		} else {
-			for (Vertex vertex : entries) {
+			for (Vertex vertex : roots) {
 				visitPost(vertex);
 			}
 		}
