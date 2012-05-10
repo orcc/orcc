@@ -166,8 +166,8 @@ public class TacTransformation extends AbstractIrVisitor<Expression> {
 					IrUtil.copy(expr.getType()));
 			break;
 		case BITNOT:
-			Integer val = (int) (Math.pow(2, expr.getType().getSizeInBits()) - 1);
-			ExprInt allBitAtOne = factory.createExprInt(val);
+			// Create an expression with all bits at '1'
+			ExprInt allBitAtOne = factory.createExprInt(-1);
 			newExpr = factory.createExprBinary(IrUtil.copy(expr.getExpr()),
 					OpBinary.BITXOR, allBitAtOne, IrUtil.copy(expr.getType()));
 			break;
