@@ -34,8 +34,8 @@ import java.io.IOException;
 import java.util.Locale;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.df.Connection;
-import net.sf.orcc.df.Instance;
+import net.sf.orcc.graph.Edge;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.util.ExpressionPrinter;
@@ -64,6 +64,77 @@ import org.stringtemplate.v4.misc.STNoSuchPropertyException;
  * 
  */
 public abstract class AbstractPrinter {
+
+	protected static class EdgeModelAdaptor extends ObjectModelAdaptor {
+
+		@Override
+		public Object getProperty(Interpreter interp, ST st, Object o,
+				Object property, String propertyName)
+				throws STNoSuchPropertyException {
+			String name = String.valueOf(property);
+			Attribute attribute = ((Edge) o).getAttribute(name);
+			if (attribute == null) {
+				return super.getProperty(interp, st, o, property, propertyName);
+			} else {
+				return attribute.getValue();
+			}
+		}
+
+	}
+
+	protected static class EMapModelAdaptor extends MapModelAdaptor {
+
+		@Override
+		public Object getProperty(Interpreter interp, ST st, Object o,
+				Object property, String propertyName)
+				throws STNoSuchPropertyException {
+			return super.getProperty(interp, st, ((EMap<?, ?>) o).map(),
+					property, propertyName);
+		}
+
+	}
+
+	protected class ExpressionRenderer implements AttributeRenderer {
+
+		@Override
+		public String toString(Object o, String formatString, Locale locale) {
+			try {
+				return exprPrinterClass.newInstance().doSwitch((Expression) o);
+			} catch (Exception e) {
+				return "(no expression printed)";
+			}
+		}
+
+	}
+
+	protected class TypeRenderer implements AttributeRenderer {
+
+		@Override
+		public String toString(Object o, String formatString, Locale locale) {
+			try {
+				return typePrinterClass.newInstance().doSwitch((Type) o);
+			} catch (Exception e) {
+				return "(no type printed)";
+			}
+		}
+
+	}
+
+	protected static class VertexModelAdaptor extends ObjectModelAdaptor {
+
+		@Override
+		public Object getProperty(Interpreter interp, ST st, Object o,
+				Object property, String propertyName)
+				throws STNoSuchPropertyException {
+			String name = String.valueOf(property);
+			Attribute attribute = ((Vertex) o).getAttribute(name);
+			if (attribute == null) {
+				return super.getProperty(interp, st, o, property, propertyName);
+			} else {
+				return attribute.getValue();
+			}
+		}
+	}
 
 	/**
 	 * Loads the given group and recursively loads the groups it imports.
@@ -99,82 +170,21 @@ public abstract class AbstractPrinter {
 		}
 	}
 
-	protected static class ConnectionModelAdaptor extends ObjectModelAdaptor {
-
-		@Override
-		public Object getProperty(Interpreter interp, ST st, Object o,
-				Object property, String propertyName)
-				throws STNoSuchPropertyException {
-			String name = String.valueOf(property);
-			Attribute attribute = ((Connection) o).getAttribute(name);
-			if (attribute == null) {
-				return super.getProperty(interp, st, o, property, propertyName);
-			} else {
-				return attribute.getValue();
-			}
-		}
-
-	}
-
-	protected static class EMapModelAdaptor extends MapModelAdaptor {
-
-		@Override
-		public Object getProperty(Interpreter interp, ST st, Object o,
-				Object property, String propertyName)
-				throws STNoSuchPropertyException {
-			return super.getProperty(interp, st, ((EMap<?, ?>) o).map(),
-					property, propertyName);
-		}
-
-	}
-
-	protected class ExpressionRenderer implements AttributeRenderer {
-
-		@Override
-		public String toString(Object o, String formatString, Locale locale) {
-			try {
-				return exprPrinterClass.newInstance().doSwitch((Expression) o);
-			} catch (Exception e) {
-				return "(no expression printed)";
-			}
-		}
-
-	}
-
-	protected static class InstanceModelAdaptor extends ObjectModelAdaptor {
-
-		@Override
-		public Object getProperty(Interpreter interp, ST st, Object o,
-				Object property, String propertyName)
-				throws STNoSuchPropertyException {
-			String name = String.valueOf(property);
-			Attribute attribute = ((Instance) o).getAttribute(name);
-			if (attribute == null) {
-				return super.getProperty(interp, st, o, property, propertyName);
-			} else {
-				return attribute.getPojoValue();
-			}
-		}
-	}
-
-	protected class TypeRenderer implements AttributeRenderer {
-
-		@Override
-		public String toString(Object o, String formatString, Locale locale) {
-			try {
-				return typePrinterClass.newInstance().doSwitch((Type) o);
-			} catch (Exception e) {
-				return "(no type printed)";
-			}
-		}
-
-	}
-
 	private Class<? extends ExpressionPrinter> exprPrinterClass;
 
 	protected STGroup group;
 
 	private Class<? extends TypePrinter> typePrinterClass;
+
+	/**
+	 * Creates a new printer.
+	 * 
+	 * @param fullPath
+	 *            the full path of the template
+	 */
+	public AbstractPrinter(String fullPath) {
+		this(fullPath, AbstractPrinter.class.getClassLoader());
+	}
 
 	/**
 	 * Creates a new printer bounds to the given ClassLoader.
@@ -190,19 +200,8 @@ public abstract class AbstractPrinter {
 		group.registerRenderer(Type.class, new TypeRenderer());
 
 		group.registerModelAdaptor(EMap.class, new EMapModelAdaptor());
-		group.registerModelAdaptor(Instance.class, new InstanceModelAdaptor());
-		group.registerModelAdaptor(Connection.class,
-				new ConnectionModelAdaptor());
-	}
-
-	/**
-	 * Creates a new printer.
-	 * 
-	 * @param fullPath
-	 *            the full path of the template
-	 */
-	public AbstractPrinter(String fullPath) {
-		this(fullPath, AbstractPrinter.class.getClassLoader());
+		group.registerModelAdaptor(Vertex.class, new VertexModelAdaptor());
+		group.registerModelAdaptor(Edge.class, new EdgeModelAdaptor());
 	}
 
 	protected void printTemplate(ST template, String fileName) {
