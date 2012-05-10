@@ -35,33 +35,38 @@ import net.sf.orcc.df.Connection;
 import org.eclipse.emf.common.util.EList;
 
 /**
- * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>Buffer</b></em>'.
- * <!-- end-user-doc -->
- *
+ * <!-- begin-user-doc --> A representation of the model object '
+ * <em><b>Buffer</b></em>'. <!-- end-user-doc -->
+ * 
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Buffer#getDepth <em>Depth</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Buffer#getWordWidth <em>Word Width</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Buffer#getAddrWidth <em>Addr Width</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Buffer#getMappedConnections <em>Mapped Connections</em>}</li>
+ * <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Buffer#getDepth <em>
+ * Depth</em>}</li>
+ * <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Buffer#getWordWidth
+ * <em>Word Width</em>}</li>
+ * <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Buffer#getAddrWidth
+ * <em>Addr Width</em>}</li>
+ * <li>
+ * {@link net.sf.orcc.backends.llvm.tta.architecture.Buffer#getMappedConnections
+ * <em>Mapped Connections</em>}</li>
  * </ul>
  * </p>
- *
+ * 
  * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getBuffer()
  * @model
  * @generated
  */
 public interface Buffer extends Link {
 	/**
-	 * Returns the value of the '<em><b>Depth</b></em>' attribute.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Depth</b></em>' attribute. <!--
+	 * begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Depth</em>' attribute isn't clear,
-	 * there really should be more of a description here...
+	 * If the meaning of the '<em>Depth</em>' attribute isn't clear, there
+	 * really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Depth</em>' attribute.
 	 * @see #setDepth(int)
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getBuffer_Depth()
@@ -71,24 +76,26 @@ public interface Buffer extends Link {
 	int getDepth();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Buffer#getDepth <em>Depth</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Depth</em>' attribute.
+	 * Sets the value of the '
+	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Buffer#getDepth
+	 * <em>Depth</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Depth</em>' attribute.
 	 * @see #getDepth()
 	 * @generated
 	 */
 	void setDepth(int value);
 
 	/**
-	 * Returns the value of the '<em><b>Word Width</b></em>' attribute.
-	 * The default value is <code>"32"</code>.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Word Width</b></em>' attribute. The
+	 * default value is <code>"32"</code>. <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Word Width</em>' attribute isn't clear,
-	 * there really should be more of a description here...
+	 * If the meaning of the '<em>Word Width</em>' attribute isn't clear, there
+	 * really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Word Width</em>' attribute.
 	 * @see #setWordWidth(int)
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getBuffer_WordWidth()
@@ -98,23 +105,27 @@ public interface Buffer extends Link {
 	int getWordWidth();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Buffer#getWordWidth <em>Word Width</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Word Width</em>' attribute.
+	 * Sets the value of the '
+	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Buffer#getWordWidth
+	 * <em>Word Width</em>}' attribute. <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Word Width</em>' attribute.
 	 * @see #getWordWidth()
 	 * @generated
 	 */
 	void setWordWidth(int value);
 
 	/**
-	 * Returns the value of the '<em><b>Addr Width</b></em>' attribute.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Addr Width</b></em>' attribute. <!--
+	 * begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Addr Width</em>' attribute isn't clear,
-	 * there really should be more of a description here...
+	 * If the meaning of the '<em>Addr Width</em>' attribute isn't clear, there
+	 * really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Addr Width</em>' attribute.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getBuffer_AddrWidth()
 	 * @model transient="true" changeable="false" volatile="true"
@@ -122,17 +133,16 @@ public interface Buffer extends Link {
 	 */
 	int getAddrWidth();
 
-	void update();
-
 	/**
-	 * Returns the value of the '<em><b>Mapped Connections</b></em>' reference list.
-	 * The list contents are of type {@link net.sf.orcc.df.Connection}.
+	 * Returns the value of the '<em><b>Mapped Connections</b></em>' reference
+	 * list. The list contents are of type {@link net.sf.orcc.df.Connection}.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Mapped Connections</em>' reference list isn't clear,
-	 * there really should be more of a description here...
+	 * If the meaning of the '<em>Mapped Connections</em>' reference list isn't
+	 * clear, there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Mapped Connections</em>' reference list.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getBuffer_MappedConnections()
 	 * @model
