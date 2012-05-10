@@ -185,7 +185,7 @@ endif>
 >>
 
 printStore(store) ::= <<
-store <store.target.variable.type> <Expr(store.value)>, <store.target.variable.type>* <Var(store.target.variable)>
+store <store.value.type> <Expr(store.value)>, <store.target.variable.type>* <Var(store.target.variable)>
 >>
 
 printLoad(load) ::= <<
@@ -288,32 +288,38 @@ entry:
 // FIFO managment
 ///////////////////////////////////////////////////////////////////////////////
 
-printInput(port, connection) ::= <<
+printExternalFifo(connection, port) ::= <<
 @fifo_<connection.id>_content = external global [<connection.size> x <port.type>]
 @fifo_<connection.id>_rdIndex = external global i32
 @fifo_<connection.id>_wrIndex = external global i32
+>>
 
-@SIZE_<port.name> = internal constant i32 <connection.size>
+printInput(port, connection) ::= <<
+<if(!port.native)
+>@SIZE_<port.name> = internal constant i32 <connection.size>
 @index_<port.name> = internal global i32 0
 @numTokens_<port.name> = internal global i32 0
 
-<printReadTokensFunction(port, connection)>
+<printReadTokensFunction(port, connection)><
+endif>
 >>
 
 printOutput(port, connection) ::= <<
-@fifo_<connection.id>_content = external global [<connection.size> x <port.type>]
-@fifo_<connection.id>_rdIndex = external global i32
-@fifo_<connection.id>_wrIndex = external global i32
-
-@SIZE_<port.name> = internal constant i32 <connection.size>
+<if(!port.native)
+>@SIZE_<port.name> = internal constant i32 <connection.size>
 @index_<port.name> = internal global i32 0
 @numFree_<port.name> = internal global i32 0
 
-<printWriteTokensFunction(port, connection)>
+<printWriteTokensFunction(port, connection)><
+endif>
 >>
 
 printReadTokensFunction(port, connection) ::= <<
 define internal void @read_<port.name>() {
+entry:
+	br label %read
+
+read:
 	%rdIndex = load i32* @fifo_<connection.id>_rdIndex
 	store i32 %rdIndex, i32* @index_<port.name>
 	%wrIndex = load i32* @fifo_<connection.id>_wrIndex
@@ -324,6 +330,10 @@ define internal void @read_<port.name>() {
 }
 
 define internal void @read_end_<port.name>() {
+entry:
+	br label %read_end
+
+read_end:
 	%rdIndex = load i32* @index_<port.name>
 	store i32 %rdIndex, i32* @fifo_<connection.id>_rdIndex
 	ret void
@@ -332,6 +342,10 @@ define internal void @read_end_<port.name>() {
 
 printWriteTokensFunction(port, connection) ::= <<
 define internal void @write_<port.name>() {
+entry:
+	br label %write
+
+write:
 	%wrIndex = load i32* @fifo_<connection.id>_wrIndex
 	store i32 %wrIndex, i32* @index_<port.name>
 	%rdIndex = load i32* @fifo_<connection.id>_rdIndex
@@ -344,6 +358,10 @@ define internal void @write_<port.name>() {
 }
 
 define internal void @write_end_<port.name>() {
+entry:
+	br label %write_end
+
+write_end:
 	%wrIndex = load i32* @index_<port.name>
 	store i32 %wrIndex, i32* @fifo_<connection.id>_wrIndex
 	ret void
@@ -654,16 +672,24 @@ printInstance(instance, options) ::= <<
 ; Generated from "<instance.actor.name>"
 declare i32 @printf(i8* noalias , ...) nounwind 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Connected FIFOs
+
+<instance.incoming: { connection |<printExternalFifo(connection, connection.targetPort)>}; separator="\n\n">
+
+<instance.outgoing: { connection |<printExternalFifo(connection, connection.sourcePort)>}; separator="\n\n">
+
 <if(instance.actor.inputs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Input FIFOs
-<instance.actor.inputs: { port | <if(!port.native)><printInput(port, instance.incomingPortMap.(port))><endif> }; separator="\n\n">
+; Input ports
+
+<instance.actor.inputs: { port |<printInput(port, instance.incomingPortMap.(port))>}; separator="\n\n">
 <endif>
 
 <if(instance.actor.outputs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Output FIFOs
-<instance.actor.outputs: { port | <if(!port.native)><printOutput(port, first(instance.outgoingPortMap.(port)))><endif> }; separator="\n\n">
+; Output ports
+<instance.actor.outputs: { port |<printOutput(port, first(instance.outgoingPortMap.(port)))>}; separator="\n\n">
 <endif>
 
 <if(instance.actor.parameters)>
@@ -720,15 +746,25 @@ printEntity(entity, options) ::= <<
 ; Broadcast
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Input FIFO
+; Connected FIFOs
+
+<entity.incoming: { connection |<printExternalFifo(connection, connection.targetPort)>}; separator="\n\n">
+
+<entity.outgoing: { connection |<printExternalFifo(connection, connection.sourcePort)>}; separator="\n\n">
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Input port
 <entity.inputs: { port |<printInput(port, entity.incomingPortMap.(port))>}; separator="\n\n">
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Output FIFOs
+; Output ports
 <entity.outputs: { port |<printOutput(port, first(entity.outgoingPortMap.(port)))>}; separator="\n\n">
 
 define void @<entity.name>_scheduler() noreturn nounwind {
 entry:
+	br label %bb_fifo_init
+	
+bb_fifo_init:
 	<entity.inputs: {port|call void @read_<port.name>()}; separator="\n">
 	<entity.outputs: {port|call void @write_<port.name>()}; separator="\n">
 	br label %bb_scheduler_start
@@ -741,14 +777,7 @@ bb_scheduler_start:
 	<checkBcastOutputs(first(entity.outputs), rest(entity.outputs), first(entity.inputs))>
 	
 bb_copy:
-	%size_<first(entity.inputs).name> = load i32* @SIZE_<first(entity.inputs).name>
-	%final_index_<first(entity.inputs).name>  = urem i32 %index_<first(entity.inputs).name> , %size_<first(entity.inputs).name>
-	%ptr_<first(entity.inputs).name> = getelementptr [<entity.incomingPortMap.(first(entity.inputs)).size> x <first(entity.inputs).type>]* @fifo_<entity.incomingPortMap.(first(entity.inputs)).id>_content, i32 0, i32 %final_index_<first(entity.inputs).name>
-	%value = load <first(entity.inputs).type>* %ptr_<first(entity.inputs).name>
-	%new_index_<first(entity.inputs).name> = add i32 %index_<first(entity.inputs).name>, 1
-	store i32 %new_index_<first(entity.inputs).name>, i32* @index_<first(entity.inputs).name>
-	<entity.outputs: copyBcastOutputs(); separator="\n">
-	br label %bb_scheduler_start
+	<printBcastCopy()>
 
 bb_finished:
 	<entity.inputs: {port|call void @read_end_<port.name>()}; separator="\n">
@@ -756,6 +785,17 @@ bb_finished:
 	ret void
 }
 
+>>
+
+printBcastCopy() ::= <<
+%size_<first(entity.inputs).name> = load i32* @SIZE_<first(entity.inputs).name>
+%final_index_<first(entity.inputs).name>  = urem i32 %index_<first(entity.inputs).name> , %size_<first(entity.inputs).name>
+%ptr_<first(entity.inputs).name> = getelementptr [<entity.incomingPortMap.(first(entity.inputs)).size> x <first(entity.inputs).type>]* @fifo_<entity.incomingPortMap.(first(entity.inputs)).id>_content, i32 0, i32 %final_index_<first(entity.inputs).name>
+%value = load <first(entity.inputs).type>* %ptr_<first(entity.inputs).name>
+%new_index_<first(entity.inputs).name> = add i32 %index_<first(entity.inputs).name>, 1
+store i32 %new_index_<first(entity.inputs).name>, i32* @index_<first(entity.inputs).name>
+<entity.outputs: copyBcastOutputs(); separator="\n">
+br label %bb_scheduler_start
 >>
 
 checkBcastOutputs(port, restPorts, lastPort) ::= <<
