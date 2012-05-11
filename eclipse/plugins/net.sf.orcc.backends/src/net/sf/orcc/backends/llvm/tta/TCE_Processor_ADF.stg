@@ -12,9 +12,11 @@ printProcessor(processor, options) ::= <<
 	
 	<printAddressSpace(processor.ROM, false)>
 	
-	<processor.localRAMs: printAddressSpace(true); separator="\n\n">
+	<processor.localRAMs: { ram |<printAddressSpace(ram, i0)>}; separator="\n\n">
 	
-	<processor.sharedMemories: printAddressSpace(true); separator="\n\n">
+	<processor.incoming: { ram |<printAddressSpace(ram, ram.targetPort.id)>}; separator="\n\n">
+	
+	<processor.outgoing: { ram |<printAddressSpace(ram, ram.sourcePort.id)>}; separator="\n\n">
 	
 	<if(processor.gcu)><printGlobalControlUnit(processor.gcu)><endif>
 \</adf\>
