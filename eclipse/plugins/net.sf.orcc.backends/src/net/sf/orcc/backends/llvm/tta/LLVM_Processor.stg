@@ -17,7 +17,7 @@ printProcessor(processor, options) ::= <<
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; The main function - A simple round-robin scheduler
 
-define i32 @main() noinline noreturn nounwind {
+define i32 @main() noreturn nounwind {
 entry:
 	br label %loop
 
