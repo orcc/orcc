@@ -194,7 +194,6 @@ store <store.target.variable.type.innermostType> <Expr(store.value)>, <store.tar
 <else>
 store <store.target.variable.type> <Expr(store.value)>, <store.target.variable.type>* <Var(store.target.variable)>
 <endif>
-
 >>
 
 printLoad(load) ::= <<
