@@ -1,5 +1,5 @@
 printArchitecture() ::= <<
-target triple = "x86_64-apple-darwin11.3.0"
+target triple = "x86_64"
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -125,7 +125,6 @@ printInstructions(instructions) ::= <<
 
 printInstruction(inst) ::= <<
 <if(inst.assign)><printAssign(inst)><
-elseif(inst.gep)><printGEP(inst)><
 elseif(inst.phi)><printPhiAssignment(inst)><
 elseif(inst.call)><printCall(inst)><
 elseif(inst.load)><printLoad(inst)><
@@ -185,30 +184,43 @@ endif>
 >>
 
 printStore(store) ::= <<
-store <store.value.type> <Expr(store.value)>, <store.target.variable.type>* <Var(store.target.variable)>
+<if(store.target.variable.type.list)>
+<if(action.outputPattern.varToPortMap.(store.target.variable) && !action.outputPattern.varToPortMap.(store.target.variable).native)>
+<printPortAccess(first(instance.outgoingPortMap.(action.outputPattern.varToPortMap.(store.target.variable))), action.outputPattern.varToPortMap.(store.target.variable), store.target.variable, store.indexes, store)>
+<else>
+<varName(store.target.variable, store)> = getelementptr <store.target.variable.type>* <Var(store.target.variable)>, i32 0<if(store.indexes)>, <indexes(store.indexes)><endif>
+<endif>
+store <store.target.variable.type.innermostType> <Expr(store.value)>, <store.target.variable.type.innermostType>* <varName(store.target.variable, store)>
+<else>
+store <store.target.variable.type> <Expr(store.value)>, <store.target.variable.type>* <Var(store.target.variable)>
+<endif>
+
 >>
 
 printLoad(load) ::= <<
+<if(load.source.variable.type.list)>
+<if(action.inputPattern.varToPortMap.(load.source.variable) && !action.inputPattern.varToPortMap.(load.source.variable).native)>
+<printPortAccess(instance.incomingPortMap.(action.inputPattern.varToPortMap.(load.source.variable)), action.inputPattern.varToPortMap.(load.source.variable), load.source.variable, load.indexes, load)>
+<elseif(action.peekPattern.varToPortMap.(load.source.variable))>
+<printPortAccess(instance.incomingPortMap.(action.peekPattern.varToPortMap.(load.source.variable)), action.peekPattern.varToPortMap.(load.source.variable), load.source.variable, load.indexes, load)>
+<else>
+<varName(load.source.variable, load)> = getelementptr <load.source.variable.type>* <Var(load.source.variable)>, i32 0, <indexes(load.indexes)>
+<endif>
+<Var(load.target.variable)> = load <load.source.variable.type.innermostType>* <varName(load.source.variable, load)>
+<else>
 <Var(load.target.variable)> = load <load.source.variable.type>* <Var(load.source.variable)>
+<endif>
 >>
 
-printGEP(gep) ::= <<
-<if(action.inputPattern.varToPortMap.(gep.source.variable) && !action.inputPattern.varToPortMap.(gep.source.variable).native)
-><printPortAccess(instance.incomingPortMap.(action.inputPattern.varToPortMap.(gep.source.variable)), action.inputPattern.varToPortMap.(gep.source.variable), gep)><
-elseif(action.outputPattern.varToPortMap.(gep.source.variable) && !action.outputPattern.varToPortMap.(gep.source.variable).native)
-><printPortAccess(first(instance.outgoingPortMap.(action.outputPattern.varToPortMap.(gep.source.variable))), action.outputPattern.varToPortMap.(gep.source.variable), gep)><
-elseif(action.peekPattern.varToPortMap.(gep.source.variable))
-><printPortAccess(instance.incomingPortMap.(action.peekPattern.varToPortMap.(gep.source.variable)), action.peekPattern.varToPortMap.(gep.source.variable), gep)><
-else
-><Var(gep.target.variable)> = getelementptr <gep.source.variable.type>* <Var(gep.source.variable)>, i32 0, <indexes(gep.indexes)><
-endif>
+printPortAccess(fifo, port, var, indexes, instruction) ::= <<
+<if(instance.actor.templateData.castedIndexes.(first(indexes)))>%cast_index_<var.name>_<procedure.accessMap.(instruction)> = zext <first(indexes).type> <Expr(first(indexes))> to i32<endif>
+%tmp_index_<var.name>_<procedure.accessMap.(instruction)> = add i32 %local_index_<port.name>, <if(instance.actor.templateData.castedIndexes.(first(indexes)))>%cast_index_<var.name>_<procedure.accessMap.(instruction)><else><Expr(first(indexes))><endif>
+%final_index_<var.name>_<procedure.accessMap.(instruction)> = urem i32 %tmp_index_<var.name>_<procedure.accessMap.(instruction)>, %local_size_<port.name>
+<varName(var, instruction)> = getelementptr [<fifo.size> x <port.type>]* @fifo_<fifo.id>_content, i32 0, i32 %final_index_<var.name>_<procedure.accessMap.(instruction)>
 >>
 
-printPortAccess(fifo, port, gep) ::= <<
-<if(instance.actor.templateData.castedIndexes.(first(gep.indexes)))>%cast_index_<gep.target.variable.name> = zext <first(gep.indexes).type> <Expr(first(gep.indexes))> to i32<endif>
-%tmp_index_<gep.target.variable.name> = add i32 %local_index_<port.name>, <if(instance.actor.templateData.castedIndexes.(first(gep.indexes)))>%cast_index_<gep.target.variable.name><else><Expr(first(gep.indexes))><endif>
-%final_index_<gep.target.variable.name>  = urem i32 %tmp_index_<gep.target.variable.name> , %local_size_<port.name>
-<Var(gep.target.variable)> = getelementptr [<fifo.size> x <port.type>]* @fifo_<fifo.id>_content, i32 0, i32 %final_index_<gep.target.variable.name>
+varName(var, instruction) ::= <<
+%<var.name>_elt_<procedure.accessMap.(instruction)>
 >>
 
 
@@ -618,28 +630,36 @@ printFifoEnd(port, numTokens) ::= <<
 store i32 %new_index_<port.name>, i32* @index_<port.name>
 >>
 
-printAction(action) ::= <<
-define internal i1 @<action.scheduler.name>() nounwind {
+printActionSchedulable(procedure) ::= <<
+define internal i1 @<procedure.name>() nounwind {
 entry:
-	<action.scheduler.locals: variableDeclaration()>
+	<procedure.locals: variableDeclaration()>
 	<action.peekPattern.ports: { port | <if(!port.native)><fifoVar(port, action.inputPattern.portToVarMap.(port))><endif>}; separator="\n">
-	br label %b<label(first(action.scheduler.nodes))>
+	br label %b<label(first(procedure.nodes))>
 	
-<printNodes(action.scheduler.nodes)>
+<printNodes(procedure.nodes)>
 }
+>>
 
-define internal void @<action.body.name>() nounwind {
+printActionBody(procedure) ::= <<
+define internal void @<procedure.name>() nounwind {
 entry:
-	<action.body.locals: variableDeclaration()>
+	<procedure.locals: variableDeclaration()>
 	<action.inputPattern.ports: { port | <if(!port.native)><fifoVar(port, action.inputPattern.portToVarMap.(port))><endif>}; separator="\n">
 	<action.outputPattern.ports: { port | <if(!port.native)><fifoVar(port, action.outputPattern.portToVarMap.(port))><endif>}; separator="\n">
-	br label %b<label(first(action.body.nodes))>
+	br label %b<label(first(procedure.nodes))>
 
-<printNodes(action.body.nodes, false)>
+<printNodes(procedure.nodes, false)>
 	<action.inputPattern.ports: { port | <if(!port.native)><printFifoEnd(port, action.inputPattern.numTokensMap.(port))><endif>}; separator="\n">
 	<action.outputPattern.ports: { port | <if(!port.native)><printFifoEnd(port, action.outputPattern.numTokensMap.(port))><endif>}; separator="\n"> 
 	ret void
 }
+>>
+
+printAction(action) ::= <<
+<printActionSchedulable(action.scheduler)>
+
+<printActionBody(action.body)>
 >>
 
 callInitialize(initialize) ::= <<

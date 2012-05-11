@@ -42,10 +42,9 @@ import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.llvm.aot.LLVMBackendImpl;
 import net.sf.orcc.backends.llvm.aot.LLVMExpressionPrinter;
 import net.sf.orcc.backends.llvm.aot.LLVMTypePrinter;
-import net.sf.orcc.backends.llvm.transformations.BlockNumbering;
 import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
-import net.sf.orcc.backends.llvm.transformations.GetElementPtrAdder;
 import net.sf.orcc.backends.llvm.transformations.StringTransformation;
+import net.sf.orcc.backends.llvm.transformations.TemplateInfoComputing;
 import net.sf.orcc.backends.llvm.tta.architecture.Design;
 import net.sf.orcc.backends.llvm.tta.architecture.DesignConfiguration;
 import net.sf.orcc.backends.llvm.tta.architecture.Processor;
@@ -147,12 +146,11 @@ public class TTABackendImpl extends LLVMBackendImpl {
 				new DfVisitor<Void>(new CopyPropagator()),
 				new DfVisitor<Void>(new ConstantPropagator()),
 				new DfVisitor<Void>(new InstPhiTransformation()),
-				new DfVisitor<Void>(new GetElementPtrAdder()),
 				new DfVisitor<Expression>(new CastAdder(false)),
 				new DfVisitor<Void>(new EmptyBlockRemover()),
 				new DfVisitor<Void>(new BlockCombine()),
 				new DfVisitor<CfgNode>(new CfgBuilder()),
-				new DfVisitor<Void>(new BlockNumbering()),
+				new DfVisitor<Void>(new TemplateInfoComputing()),
 				new ComplexHwOpDetector(getWriteListener()) };
 
 		for (DfSwitch<?> transformation : transformations) {

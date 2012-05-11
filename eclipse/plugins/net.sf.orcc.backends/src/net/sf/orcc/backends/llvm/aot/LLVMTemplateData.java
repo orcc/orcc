@@ -33,12 +33,13 @@ import java.util.Map;
 
 import net.sf.orcc.backends.TemplateData;
 import net.sf.orcc.backends.ir.InstCast;
-import net.sf.orcc.backends.ir.InstGetElementPtr;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.common.util.TreeIterator;
@@ -70,12 +71,19 @@ public class LLVMTemplateData implements TemplateData {
 		TreeIterator<EObject> it = actor.eAllContents();
 		while (it.hasNext()) {
 			EObject object = it.next();
-			if (object instanceof InstGetElementPtr) {
-				InstGetElementPtr gep = (InstGetElementPtr) object;
-				if (!gep.getIndexes().isEmpty()
-						&& gep.getIndexes().get(0).getType().getSizeInBits() != 32) {
-					castedIndexes.put(gep.getIndexes().get(0), gep.getIndexes()
-							.get(0));
+			if (object instanceof InstLoad) {
+				InstLoad load = (InstLoad) object;
+				if (!load.getIndexes().isEmpty()
+						&& load.getIndexes().get(0).getType().getSizeInBits() != 32) {
+					castedIndexes.put(load.getIndexes().get(0), load
+							.getIndexes().get(0));
+				}
+			} else if (object instanceof InstStore) {
+				InstStore store = (InstStore) object;
+				if (!store.getIndexes().isEmpty()
+						&& store.getIndexes().get(0).getType().getSizeInBits() != 32) {
+					castedIndexes.put(store.getIndexes().get(0), store
+							.getIndexes().get(0));
 				}
 			}
 		}

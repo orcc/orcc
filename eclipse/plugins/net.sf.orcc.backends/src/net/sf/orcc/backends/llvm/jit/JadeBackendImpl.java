@@ -48,11 +48,10 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.llvm.aot.LLVMExpressionPrinter;
 import net.sf.orcc.backends.llvm.aot.LLVMTypePrinter;
-import net.sf.orcc.backends.llvm.transformations.BlockNumbering;
 import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
-import net.sf.orcc.backends.llvm.transformations.GetElementPtrAdder;
 import net.sf.orcc.backends.llvm.transformations.ListInitializer;
 import net.sf.orcc.backends.llvm.transformations.StringTransformation;
+import net.sf.orcc.backends.llvm.transformations.TemplateInfoComputing;
 import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.backends.transformations.EmptyBlockRemover;
 import net.sf.orcc.backends.transformations.InstPhiTransformation;
@@ -173,13 +172,12 @@ public class JadeBackendImpl extends AbstractBackend {
 				new DfVisitor<Void>(new CopyPropagator()),
 				new DfVisitor<Void>(new ConstantPropagator()),
 				new DfVisitor<Void>(new InstPhiTransformation()),
-				new DfVisitor<Void>(new GetElementPtrAdder()),
 				new DfVisitor<Expression>(new CastAdder(false)),
 				new DfVisitor<Void>(new EmptyBlockRemover()),
 				new DfVisitor<Void>(new BlockCombine()),
 				new DfVisitor<CfgNode>(new CfgBuilder()),
 				new DfVisitor<Void>(new ListInitializer()),
-				new DfVisitor<Void>(new BlockNumbering()) };
+				new DfVisitor<Void>(new TemplateInfoComputing()) };
 
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
