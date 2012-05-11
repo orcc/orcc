@@ -45,7 +45,7 @@ import org.eclipse.emf.common.util.EMap;
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getComponents <em>Components</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getProcessors <em>Processors</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getBuffers <em>Buffers</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getSharedMemories <em>Shared Memories</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getSignals <em>Signals</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getInputs <em>Inputs</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getOutputs <em>Outputs</em>}</li>
@@ -123,20 +123,20 @@ public interface Design extends Graph {
 	EList<Processor> getProcessors();
 
 	/**
-	 * Returns the value of the '<em><b>Buffers</b></em>' reference list.
-	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.Buffer}.
+	 * Returns the value of the '<em><b>Shared Memories</b></em>' reference list.
+	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.Memory}.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Buffers</em>' containment reference list isn't clear,
+	 * If the meaning of the '<em>Shared Memories</em>' reference list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Buffers</em>' reference list.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getDesign_Buffers()
+	 * @return the value of the '<em>Shared Memories</em>' reference list.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getDesign_SharedMemories()
 	 * @model
 	 * @generated
 	 */
-	EList<Buffer> getBuffers();
+	EList<Memory> getSharedMemories();
 
 	/**
 	 * Returns the value of the '<em><b>Signals</b></em>' reference list.

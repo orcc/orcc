@@ -43,6 +43,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * <p>
  * The following features are implemented:
  * <ul>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.SignalImpl#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.SignalImpl#getSize <em>Size</em>}</li>
  * </ul>
  * </p>
@@ -50,6 +51,15 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * @generated
  */
 public class SignalImpl extends LinkImpl implements Signal {
+	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
 	/**
 	 * The default value of the '{@link #getSize() <em>Size</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -130,6 +140,8 @@ public class SignalImpl extends LinkImpl implements Signal {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
+		case ArchitecturePackage.SIGNAL__NAME:
+			return getName();
 		case ArchitecturePackage.SIGNAL__SIZE:
 			return getSize();
 		}
@@ -143,6 +155,9 @@ public class SignalImpl extends LinkImpl implements Signal {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
+		case ArchitecturePackage.SIGNAL__NAME:
+			setName((String) newValue);
+			return;
 		case ArchitecturePackage.SIGNAL__SIZE:
 			setSize((Integer) newValue);
 			return;
@@ -157,6 +172,9 @@ public class SignalImpl extends LinkImpl implements Signal {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
+		case ArchitecturePackage.SIGNAL__NAME:
+			setName(NAME_EDEFAULT);
+			return;
 		case ArchitecturePackage.SIGNAL__SIZE:
 			setSize(SIZE_EDEFAULT);
 			return;
@@ -171,6 +189,9 @@ public class SignalImpl extends LinkImpl implements Signal {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
+		case ArchitecturePackage.SIGNAL__NAME:
+			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT
+					.equals(getName());
 		case ArchitecturePackage.SIGNAL__SIZE:
 			return size != SIZE_EDEFAULT;
 		}

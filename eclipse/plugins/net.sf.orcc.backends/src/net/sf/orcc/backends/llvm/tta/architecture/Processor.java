@@ -47,8 +47,9 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getSockets <em>Sockets</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getFunctionUnits <em>Function Units</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getRegisterFiles <em>Register Files</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getProgram <em>Program</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getData <em>Data</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getROM <em>ROM</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getLocalRAMs <em>Local RA Ms</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getSharedRAMs <em>Shared RA Ms</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getMappedActors <em>Mapped Actors</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getConfiguration <em>Configuration</em>}</li>
  * </ul>
@@ -114,22 +115,6 @@ public interface Processor extends Component {
 	ProcessorConfiguration getConfiguration();
 
 	/**
-	 * Returns the value of the '<em><b>Data</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.AddressSpace}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Data</em>' containment reference isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Data</em>' containment reference list.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_Data()
-	 * @model containment="true"
-	 * @generated
-	 */
-	EList<AddressSpace> getData();
-
-	/**
 	 * Returns the value of the '<em><b>Function Units</b></em>' containment
 	 * reference list. The list contents are of type
 	 * {@link net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit}. <!--
@@ -182,22 +167,6 @@ public interface Processor extends Component {
 	EList<Vertex> getMappedActors();
 
 	/**
-	 * Returns the value of the '<em><b>Program</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Program</em>' containment reference isn't
-	 * clear, there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Program</em>' containment reference.
-	 * @see #setProgram(AddressSpace)
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_Program()
-	 * @model containment="true"
-	 * @generated
-	 */
-	AddressSpace getProgram();
-
-	/**
 	 * Returns the value of the '<em><b>Register Files</b></em>' containment
 	 * reference list. The list contents are of type
 	 * {@link net.sf.orcc.backends.llvm.tta.architecture.RegisterFile}. <!--
@@ -215,6 +184,64 @@ public interface Processor extends Component {
 	 * @generated
 	 */
 	EList<RegisterFile> getRegisterFiles();
+
+	/**
+	 * Returns the value of the '<em><b>ROM</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>ROM</em>' containment reference isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>ROM</em>' containment reference.
+	 * @see #setROM(Memory)
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_ROM()
+	 * @model containment="true"
+	 * @generated
+	 */
+	Memory getROM();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getROM <em>ROM</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>ROM</em>' containment reference.
+	 * @see #getROM()
+	 * @generated
+	 */
+	void setROM(Memory value);
+
+	/**
+	 * Returns the value of the '<em><b>Local RA Ms</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.Memory}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Local RA Ms</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Local RA Ms</em>' containment reference list.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_LocalRAMs()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Memory> getLocalRAMs();
+
+	/**
+	 * Returns the value of the '<em><b>Shared RA Ms</b></em>' reference list.
+	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.Memory}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Shared RA Ms</em>' reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Shared RA Ms</em>' reference list.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_SharedRAMs()
+	 * @model transient="true" changeable="false" volatile="true" derived="true"
+	 * @generated
+	 */
+	EList<Memory> getSharedRAMs();
 
 	/**
 	 * Returns the value of the '<em><b>Sockets</b></em>' containment reference
@@ -246,6 +273,14 @@ public interface Processor extends Component {
 	void setConfiguration(ProcessorConfiguration value);
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @model
+	 * @generated
+	 */
+	FunctionUnit connect(Memory sharedMemory);
+
+	/**
 	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getGcu <em>Gcu</em>}' containment reference.
 	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
@@ -254,15 +289,5 @@ public interface Processor extends Component {
 	 * @generated
 	 */
 	void setGcu(GlobalControlUnit value);
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getProgram <em>Program</em>}' containment reference.
-	 * <!-- begin-user-doc --> <!--
-	 * end-user-doc -->
-	 * @param value the new value of the '<em>Program</em>' containment reference.
-	 * @see #getProgram()
-	 * @generated
-	 */
-	void setProgram(AddressSpace value);
 
 } // Processor

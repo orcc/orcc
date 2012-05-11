@@ -30,11 +30,9 @@ package net.sf.orcc.backends.llvm.tta.architecture.impl;
 
 import java.util.Map;
 
-import net.sf.orcc.backends.llvm.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.llvm.tta.architecture.Bridge;
-import net.sf.orcc.backends.llvm.tta.architecture.Buffer;
 import net.sf.orcc.backends.llvm.tta.architecture.Bus;
 import net.sf.orcc.backends.llvm.tta.architecture.Component;
 import net.sf.orcc.backends.llvm.tta.architecture.Design;
@@ -50,6 +48,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.llvm.tta.architecture.GlobalControlUnit;
 import net.sf.orcc.backends.llvm.tta.architecture.Guard;
 import net.sf.orcc.backends.llvm.tta.architecture.Implementation;
+import net.sf.orcc.backends.llvm.tta.architecture.Memory;
 import net.sf.orcc.backends.llvm.tta.architecture.OpBinary;
 import net.sf.orcc.backends.llvm.tta.architecture.OpUnary;
 import net.sf.orcc.backends.llvm.tta.architecture.Operation;
@@ -84,12 +83,14 @@ import org.eclipse.emf.ecore.plugin.EcorePlugin;
 /**
  * <!-- begin-user-doc --> An implementation of the model <b>Factory</b>. <!--
  * end-user-doc -->
+ * 
  * @generated
  */
 public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		ArchitectureFactory {
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @deprecated
 	 * @generated
 	 */
@@ -99,9 +100,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * Creates the default factory implementation.
-	 * <!-- begin-user-doc --> <!--
+	 * Creates the default factory implementation. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public static ArchitectureFactory init() {
@@ -118,9 +119,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * Creates an instance of the factory.
-	 * <!-- begin-user-doc --> <!--
+	 * Creates an instance of the factory. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ArchitectureFactoryImpl() {
@@ -129,6 +130,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String convertDesignConfigurationToString(EDataType eDataType,
@@ -138,6 +140,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String convertExtensionToString(EDataType eDataType,
@@ -147,6 +150,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String convertOpBinaryToString(EDataType eDataType,
@@ -156,6 +160,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String convertOpUnaryToString(EDataType eDataType,
@@ -165,6 +170,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String convertProcessorConfigurationToString(EDataType eDataType,
@@ -174,6 +180,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String convertSocketTypeToString(EDataType eDataType,
@@ -183,6 +190,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -209,6 +217,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -220,10 +229,10 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 			return createSignal();
 		case ArchitecturePackage.COMPONENT:
 			return createComponent();
-		case ArchitecturePackage.BUFFER:
-			return createBuffer();
 		case ArchitecturePackage.PORT:
 			return createPort();
+		case ArchitecturePackage.MEMORY:
+			return createMemory();
 		case ArchitecturePackage.PROCESSOR:
 			return createProcessor();
 		case ArchitecturePackage.BUS:
@@ -244,8 +253,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 			return createSocket();
 		case ArchitecturePackage.OPERATION:
 			return createOperation();
-		case ArchitecturePackage.ADDRESS_SPACE:
-			return createAddressSpace();
 		case ArchitecturePackage.READS:
 			return createReads();
 		case ArchitecturePackage.WRITES:
@@ -276,35 +283,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 			throw new IllegalArgumentException("The class '" + eClass.getName()
 					+ "' is not a valid classifier");
 		}
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public AddressSpace createAddressSpace() {
-		AddressSpaceImpl addressSpace = new AddressSpaceImpl();
-		return addressSpace;
-	}
-
-	@Override
-	public AddressSpace createAddressSpace(String name, int width,
-			int minAddress, int maxAddress) {
-		AddressSpaceImpl addressSpace = new AddressSpaceImpl();
-		addressSpace.setName(name);
-		addressSpace.setWidth(width);
-		addressSpace.setMinAddress(minAddress);
-		addressSpace.setMaxAddress(maxAddress);
-		return addressSpace;
-	}
-
-	@Override
-	public AddressSpace createAddressSpace(String name, int id, int width,
-			int minAddress, int maxAddress) {
-		AddressSpace addressSpace = createAddressSpace(name, width, minAddress,
-				maxAddress);
-		addressSpace.setId(id);
-		return addressSpace;
 	}
 
 	public FunctionUnit createAlu2Unit(Processor tta, String name) {
@@ -399,6 +377,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Bridge createBridge() {
@@ -408,24 +387,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Buffer createBuffer() {
-		BufferImpl buffer = new BufferImpl();
-		return buffer;
-	}
-
-	@Override
-	public Buffer createBuffer(int id, Vertex source, Vertex target) {
-		BufferImpl buffer = new BufferImpl();
-		buffer.setLabel("" + id);
-		buffer.setSource(source);
-		buffer.setTarget(target);
-		return buffer;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Bus createBus() {
@@ -451,6 +413,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Component createComponent() {
@@ -481,6 +444,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public DesignConfiguration createDesignConfigurationFromString(
@@ -495,6 +459,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprBinary createExprBinary() {
@@ -513,6 +478,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprFalse createExprFalse() {
@@ -522,6 +488,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprTrue createExprTrue() {
@@ -531,6 +498,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprUnary createExprUnary() {
@@ -552,6 +520,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Extension createExtensionFromString(EDataType eDataType,
@@ -566,6 +535,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -592,6 +562,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public FunctionUnit createFunctionUnit() {
@@ -648,6 +619,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public FuPort createFuPort() {
@@ -674,6 +646,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public GlobalControlUnit createGlobalControlUnit() {
@@ -691,9 +664,10 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public GlobalControlUnit createGlobalControlUnitDefault(Processor tta) {
+	public GlobalControlUnit createGlobalControlUnitDefault(Processor tta,
+			Memory program) {
 		GlobalControlUnit gcu = createGlobalControlUnit(3, 1);
-		gcu.setAddressSpace(tta.getProgram());
+		gcu.setAddressSpace(program);
 
 		// Sockets
 		EList<Segment> segments = getAllSegments(tta.getBuses());
@@ -731,20 +705,12 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Implementation createImplementation() {
 		ImplementationImpl implementation = new ImplementationImpl();
 		return implementation;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Map.Entry<String, Implementation> createTypeToImplMapEntry() {
-		TypeToImplMapEntryImpl typeToImplMapEntry = new TypeToImplMapEntryImpl();
-		return typeToImplMapEntry;
 	}
 
 	@Override
@@ -763,9 +729,8 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public FunctionUnit createLSU(String name, Processor tta,
-			AddressSpace addressSpace) {
-		FunctionUnit LSU = createFunctionUnit(tta, name, "LSU");
+	public FunctionUnit createLSU(int id, Processor tta, Memory addressSpace) {
+		FunctionUnit LSU = createFunctionUnit(tta, "LSU_" + id, "LSU");
 		// Operations
 		EList<FuPort> ports = LSU.getPorts();
 		String[] loadOperations = { "ldw", "ldq", "ldh", "ldqu", "ldhu" };
@@ -781,7 +746,48 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 							ports.get(1)));
 		}
 		LSU.setAddressSpace(addressSpace);
+		LSU.setAttribute("id", id);
 		return LSU;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public Memory createMemory() {
+		MemoryImpl memory = new MemoryImpl();
+		return memory;
+	}
+
+	public Memory createMemory(String name, int width, int minAddress,
+			int maxAddress) {
+		Memory addressSpace = new MemoryImpl();
+		addressSpace.setName(name);
+		addressSpace.setWidth(width);
+		addressSpace.setMinAddress(minAddress);
+		addressSpace.setMaxAddress(maxAddress);
+		return addressSpace;
+	}
+
+	public Memory createMemory(String name, int id, int width, int minAddress,
+			int maxAddress) {
+		Memory addressSpace = createMemory(name, width, minAddress, maxAddress);
+		return addressSpace;
+	}
+
+	@Override
+	public Memory createMemory(int id, Processor source, Processor target) {
+		Memory sharedMemory = new MemoryImpl();
+		sharedMemory.setName("smem_" + id);
+		FunctionUnit sourceLSU = source.connect(sharedMemory);
+		FunctionUnit targetLSU = target.connect(sharedMemory);
+		sharedMemory.setSource(source);
+		sharedMemory.setTarget(target);
+		sharedMemory.setSourcePort(sourceLSU);
+		sharedMemory.setTargetPort(targetLSU);
+		sharedMemory.setAttribute("id", id);
+		return sharedMemory;
 	}
 
 	@Override
@@ -805,6 +811,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public OpBinary createOpBinaryFromString(EDataType eDataType,
@@ -819,6 +826,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Operation createOperation() {
@@ -914,6 +922,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public OpUnary createOpUnaryFromString(EDataType eDataType,
@@ -927,6 +936,27 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
+	public FunctionUnit createOutputSignalUnit(Processor tta, String signalName) {
+		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
+		String name = "SIG_OUT_" + signalName;
+		functionUnit.setName(name);
+		// Sockets
+		EList<Segment> segments = getAllSegments(tta.getBuses());
+		Socket i1 = createInputSocket(name + "_i1", segments);
+		// Port
+		FuPort in1t = createFuPort("in1t", 32, true, true);
+		in1t.connect(i1);
+		functionUnit.getPorts().add(in1t);
+		// Operation
+		Operation write = createOperation("LEDS");
+		write.setControl(false);
+		write.getPipeline().add(createReads(in1t, 0, 1));
+		functionUnit.getOperations().add(write);
+		functionUnit.setImplementation("SIG_OUT");
+		return functionUnit;
+	}
+
+	@Override
 	public Socket createOutputSocket(String name, EList<Segment> segments) {
 		Socket socket = createSocket(name, segments);
 		socket.setType(SocketType.OUTPUT);
@@ -935,18 +965,11 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Port createPort() {
 		PortImpl port = new PortImpl();
-		return port;
-	}
-
-	@Override
-	public Port createPort(String name) {
-		PortImpl port = new PortImpl();
-		port.setName(name);
-		port.setAttribute("native", null);
 		return port;
 	}
 
@@ -959,8 +982,17 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return port;
 	}
 
+	@Override
+	public Port createPort(String name) {
+		PortImpl port = new PortImpl();
+		port.setName(name);
+		port.setAttribute("native", null);
+		return port;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Map.Entry<FuPort, Integer> createPortToIndexMapEntry() {
@@ -970,6 +1002,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Processor createProcessor() {
@@ -984,17 +1017,18 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		processor.setName(name);
 
 		// Address spaces
-		AddressSpace data = createAddressSpace("data", 0, 8, 0,
+		Memory program = createMemory("instructions", 8, 0, 60000);
+		Memory data = createMemory("data", 0, 8, 0,
 				quantizeUp(ramSize / 8 + 512));
-		processor.setProgram(createAddressSpace("instructions", 8, 0, 60000));
-		processor.getData().add(data);
+		processor.setROM(program);
+		processor.getLocalRAMs().add(data);
 		// Buses
 		for (int i = 0; i < conf.getBusNb(); i++) {
 			Bus bus = createBusDefault(i, 32);
 			processor.getBuses().add(bus);
 		}
 		// Global Control Unit
-		processor.setGcu(createGlobalControlUnitDefault(processor));
+		processor.setGcu(createGlobalControlUnitDefault(processor, program));
 		// Register files
 		RegisterFile bool = createRegisterFileDefault(processor, "BOOL",
 				conf.getBoolRfSize(), 1);
@@ -1017,8 +1051,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		}
 		// * LSU
 		for (int i = 0; i < conf.getLsuNb(); i++) {
-			String lsuName = conf.getLsuNb() == 1 ? "LSU" : "LSU_" + i;
-			units.add(createLSU(lsuName, processor, data));
+			units.add(createLSU(i, processor, data));
 		}
 		// * Mul
 		for (int i = 0; i < conf.getMulNb(); i++) {
@@ -1034,6 +1067,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ProcessorConfiguration createProcessorConfigurationFromString(
@@ -1049,6 +1083,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Reads createReads() {
@@ -1067,6 +1102,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public RegisterFile createRegisterFile() {
@@ -1134,6 +1170,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Resource createResource() {
@@ -1152,6 +1189,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Segment createSegment() {
@@ -1168,6 +1206,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ShortImmediate createShortImmediate() {
@@ -1185,6 +1224,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Signal createSignal() {
@@ -1207,6 +1247,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Socket createSocket() {
@@ -1226,6 +1267,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public SocketType createSocketTypeFromString(EDataType eDataType,
@@ -1238,29 +1280,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return result;
 	}
 
-	@Override
-	public FunctionUnit createOutputSignalUnit(Processor tta, String signalName) {
-		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
-		String name = "SIG_OUT_" + signalName;
-		functionUnit.setName(name);
-		// Sockets
-		EList<Segment> segments = getAllSegments(tta.getBuses());
-		Socket i1 = createInputSocket(name + "_i1", segments);
-		// Port
-		FuPort in1t = createFuPort("in1t", 32, true, true);
-		in1t.connect(i1);
-		functionUnit.getPorts().add(in1t);
-		// Operation
-		Operation write = createOperation("LEDS");
-		write.setControl(false);
-		write.getPipeline().add(createReads(in1t, 0, 1));
-		functionUnit.getOperations().add(write);
-		functionUnit.setImplementation("SIG_OUT");
-		return functionUnit;
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public TermBool createTermBool() {
@@ -1278,6 +1300,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public TermUnit createTermUnit() {
@@ -1295,6 +1318,17 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public Map.Entry<String, Implementation> createTypeToImplMapEntry() {
+		TypeToImplMapEntryImpl typeToImplMapEntry = new TypeToImplMapEntryImpl();
+		return typeToImplMapEntry;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Writes createWrites() {
@@ -1321,6 +1355,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ArchitecturePackage getArchitecturePackage() {

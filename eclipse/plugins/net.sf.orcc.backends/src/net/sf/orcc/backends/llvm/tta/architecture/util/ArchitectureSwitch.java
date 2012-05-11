@@ -30,10 +30,8 @@ package net.sf.orcc.backends.llvm.tta.architecture.util;
 
 import java.util.Map;
 
-import net.sf.orcc.backends.llvm.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.llvm.tta.architecture.Bridge;
-import net.sf.orcc.backends.llvm.tta.architecture.Buffer;
 import net.sf.orcc.backends.llvm.tta.architecture.Bus;
 import net.sf.orcc.backends.llvm.tta.architecture.Component;
 import net.sf.orcc.backends.llvm.tta.architecture.Design;
@@ -48,6 +46,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.GlobalControlUnit;
 import net.sf.orcc.backends.llvm.tta.architecture.Guard;
 import net.sf.orcc.backends.llvm.tta.architecture.Implementation;
 import net.sf.orcc.backends.llvm.tta.architecture.Link;
+import net.sf.orcc.backends.llvm.tta.architecture.Memory;
 import net.sf.orcc.backends.llvm.tta.architecture.Operation;
 import net.sf.orcc.backends.llvm.tta.architecture.Port;
 import net.sf.orcc.backends.llvm.tta.architecture.Processor;
@@ -172,19 +171,6 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 				result = defaultCase(theEObject);
 			return result;
 		}
-		case ArchitecturePackage.BUFFER: {
-			Buffer buffer = (Buffer) theEObject;
-			T result = caseBuffer(buffer);
-			if (result == null)
-				result = caseLink(buffer);
-			if (result == null)
-				result = caseEdge(buffer);
-			if (result == null)
-				result = caseAttributable(buffer);
-			if (result == null)
-				result = defaultCase(theEObject);
-			return result;
-		}
 		case ArchitecturePackage.PORT: {
 			Port port = (Port) theEObject;
 			T result = casePort(port);
@@ -192,6 +178,19 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 				result = caseVertex(port);
 			if (result == null)
 				result = caseAttributable(port);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
+		case ArchitecturePackage.MEMORY: {
+			Memory memory = (Memory) theEObject;
+			T result = caseMemory(memory);
+			if (result == null)
+				result = caseLink(memory);
+			if (result == null)
+				result = caseEdge(memory);
+			if (result == null)
+				result = caseAttributable(memory);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -274,13 +273,6 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 		case ArchitecturePackage.OPERATION: {
 			Operation operation = (Operation) theEObject;
 			T result = caseOperation(operation);
-			if (result == null)
-				result = defaultCase(theEObject);
-			return result;
-		}
-		case ArchitecturePackage.ADDRESS_SPACE: {
-			AddressSpace addressSpace = (AddressSpace) theEObject;
-			T result = caseAddressSpace(addressSpace);
 			if (result == null)
 				result = defaultCase(theEObject);
 			return result;
@@ -482,20 +474,6 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Buffer</em>'.
-	 * <!-- begin-user-doc --> This implementation returns
-	 * null; returning a non-null result will terminate the switch. <!--
-	 * end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Buffer</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseBuffer(Buffer object) {
-		return null;
-	}
-
-	/**
 	 * Returns the result of interpreting the object as an instance of '<em>Processor</em>'.
 	 * <!-- begin-user-doc --> This implementation returns
 	 * null; returning a non-null result will terminate the switch. <!--
@@ -506,6 +484,20 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseProcessor(Processor object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Memory</em>'.
+	 * <!-- begin-user-doc --> This implementation returns
+	 * null; returning a non-null result will terminate the switch. <!--
+	 * end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Memory</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseMemory(Memory object) {
 		return null;
 	}
 
@@ -656,20 +648,6 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Address Space</em>'.
-	 * <!-- begin-user-doc --> This implementation
-	 * returns null; returning a non-null result will terminate the switch. <!--
-	 * end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Address Space</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseAddressSpace(AddressSpace object) {
-		return null;
-	}
-
-	/**
 	 * Returns the result of interpreting the object as an instance of '<em>Guard</em>'.
 	 * <!-- begin-user-doc --> This implementation returns
 	 * null; returning a non-null result will terminate the switch. <!--
@@ -800,10 +778,9 @@ public class ArchitectureSwitch<T> extends Switch<T> {
 
 	/**
 	 * Returns the result of interpreting the object as an instance of '<em>Type To Impl Map Entry</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> This
+	 * implementation returns null; returning a non-null result will terminate
+	 * the switch. <!-- end-user-doc -->
 	 * @param object the target of the switch.
 	 * @return the result of interpreting the object as an instance of '<em>Type To Impl Map Entry</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)

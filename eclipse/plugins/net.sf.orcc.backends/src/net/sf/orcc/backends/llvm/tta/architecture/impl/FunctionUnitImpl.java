@@ -30,7 +30,7 @@ package net.sf.orcc.backends.llvm.tta.architecture.impl;
 
 import java.util.Collection;
 
-import net.sf.orcc.backends.llvm.tta.architecture.AddressSpace;
+import net.sf.orcc.backends.llvm.tta.architecture.Memory;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.llvm.tta.architecture.FuPort;
 import net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit;
@@ -106,7 +106,7 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 	 * @generated
 	 * @ordered
 	 */
-	protected AddressSpace addressSpace;
+	protected Memory addressSpace;
 
 	/**
 	 * The default value of the '{@link #getImplementation() <em>Implementation</em>}' attribute.
@@ -194,10 +194,10 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public AddressSpace getAddressSpace() {
+	public Memory getAddressSpace() {
 		if (addressSpace != null && addressSpace.eIsProxy()) {
 			InternalEObject oldAddressSpace = (InternalEObject) addressSpace;
-			addressSpace = (AddressSpace) eResolveProxy(oldAddressSpace);
+			addressSpace = (Memory) eResolveProxy(oldAddressSpace);
 			if (addressSpace != oldAddressSpace) {
 				if (eNotificationRequired())
 					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
@@ -212,7 +212,7 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public AddressSpace basicGetAddressSpace() {
+	public Memory basicGetAddressSpace() {
 		return addressSpace;
 	}
 
@@ -220,8 +220,8 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setAddressSpace(AddressSpace newAddressSpace) {
-		AddressSpace oldAddressSpace = addressSpace;
+	public void setAddressSpace(Memory newAddressSpace) {
+		Memory oldAddressSpace = addressSpace;
 		addressSpace = newAddressSpace;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
@@ -311,7 +311,7 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 			getPorts().addAll((Collection<? extends FuPort>) newValue);
 			return;
 		case ArchitecturePackage.FUNCTION_UNIT__ADDRESS_SPACE:
-			setAddressSpace((AddressSpace) newValue);
+			setAddressSpace((Memory) newValue);
 			return;
 		case ArchitecturePackage.FUNCTION_UNIT__IMPLEMENTATION:
 			setImplementation((String) newValue);
@@ -337,7 +337,7 @@ public class FunctionUnitImpl extends PortImpl implements FunctionUnit {
 			getPorts().clear();
 			return;
 		case ArchitecturePackage.FUNCTION_UNIT__ADDRESS_SPACE:
-			setAddressSpace((AddressSpace) null);
+			setAddressSpace((Memory) null);
 			return;
 		case ArchitecturePackage.FUNCTION_UNIT__IMPLEMENTATION:
 			setImplementation(IMPLEMENTATION_EDEFAULT);

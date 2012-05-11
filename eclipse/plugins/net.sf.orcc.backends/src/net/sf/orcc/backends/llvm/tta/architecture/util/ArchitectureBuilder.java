@@ -34,13 +34,12 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.backends.llvm.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitectureFactory;
-import net.sf.orcc.backends.llvm.tta.architecture.Buffer;
 import net.sf.orcc.backends.llvm.tta.architecture.Component;
 import net.sf.orcc.backends.llvm.tta.architecture.Design;
 import net.sf.orcc.backends.llvm.tta.architecture.DesignConfiguration;
 import net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit;
+import net.sf.orcc.backends.llvm.tta.architecture.Memory;
 import net.sf.orcc.backends.llvm.tta.architecture.Port;
 import net.sf.orcc.backends.llvm.tta.architecture.Processor;
 import net.sf.orcc.backends.llvm.tta.architecture.ProcessorConfiguration;
@@ -81,17 +80,22 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	private class ProjectionFinalizer extends ArchitectureSwitch<Void> {
 
 		@Override
-		public Void caseBuffer(Buffer buffer) {
+		public Void caseMemory(Memory buffer) {
+			FunctionUnit srcLSU = (FunctionUnit) buffer.getSourcePort();
+			FunctionUnit tgtLSU = (FunctionUnit) buffer.getTargetPort();
+
 			int bits = 0;
 			for (Connection connection : buffer.getMappedConnections()) {
 				bits += connection.getSize()
 						* connection.getSourcePort().getType().getSizeInBits()
 						+ 2 * 32;
+				connection.getSourcePort().setAttribute("id",
+						srcLSU.getAttribute("id").getValue());
+				connection.getTargetPort().setAttribute("id",
+						tgtLSU.getAttribute("id").getValue());
 			}
 			buffer.setDepth(bits / 32);
 			int maxAdress = bits / 8;
-			FunctionUnit srcLSU = (FunctionUnit) buffer.getSourcePort();
-			FunctionUnit tgtLSU = (FunctionUnit) buffer.getTargetPort();
 			srcLSU.getAddressSpace().setMaxAddress(maxAdress);
 			tgtLSU.getAddressSpace().setMaxAddress(maxAdress);
 			return null;
@@ -99,7 +103,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 
 		@Override
 		public Void caseDesign(Design design) {
-			for (Buffer buffer : design.getBuffers()) {
+			for (Memory buffer : design.getSharedMemories()) {
 				doSwitch(buffer);
 			}
 			return null;
@@ -109,7 +113,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 
 	private int bufferId = 0;
 
-	private Map<Component, Map<Component, Buffer>> bufferMap;
+	private Map<Component, Map<Component, Memory>> bufferMap;
 
 	private Map<Vertex, Component> componentMap;
 	@SuppressWarnings("unused")
@@ -125,7 +129,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	public ArchitectureBuilder(DesignConfiguration conf) {
 		design = factory.createDesign();
 		componentMap = new HashMap<Vertex, Component>();
-		bufferMap = new HashMap<Component, Map<Component, Buffer>>();
+		bufferMap = new HashMap<Component, Map<Component, Memory>>();
 
 		optimizedActors = new ArrayList<String>();
 		optimizedActors.add("decoder_texture_IQ");
@@ -139,16 +143,6 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	public ArchitectureBuilder(DesignConfiguration conf, Mapping mapping) {
 		this.conf = conf;
 		this.mapping = mapping;
-	}
-
-	private FunctionUnit addBuffer(Processor processor, Buffer buffer) {
-		int i = processor.getData().size();
-		AddressSpace buf = factory.createAddressSpace("buf_" + i, i, 8, 0,
-				buffer.getDepth() * 4);
-		FunctionUnit lsu = factory.createLSU("LSU_buf_" + i, processor, buf);
-		processor.getData().add(buf);
-		processor.getFunctionUnits().add(lsu);
-		return lsu;
 	}
 
 	/**
@@ -341,16 +335,6 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		return neededMemorySize;
 	}
 
-	private Buffer createBuffer(Vertex source, Vertex target) {
-		Buffer buffer = factory.createBuffer(bufferId++, source, target);
-		Port sourcePort = addBuffer((Processor) source, buffer);
-		Port targetPort = addBuffer((Processor) target, buffer);
-		buffer.setSourcePort(sourcePort);
-		buffer.setTargetPort(targetPort);
-		design.add(buffer);
-		return buffer;
-	}
-
 	private int getSize(Type type) {
 		int size;
 		if (type.isList()) {
@@ -386,31 +370,25 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	 */
 	private void mapToBuffer(Connection connection) {
 		// TODO: when both actors are mapped to the same processor
-		Component source = componentMap.get(connection.getSource());
-		Component target = componentMap.get(connection.getTarget());
+		Processor source = (Processor) componentMap.get(connection.getSource());
+		Processor target = (Processor) componentMap.get(connection.getTarget());
 
-		Map<Component, Buffer> tgtToBufferMap;
+		Map<Component, Memory> tgtToBufferMap;
 		if (bufferMap.containsKey(source)) {
 			tgtToBufferMap = bufferMap.get(source);
 		} else {
-			tgtToBufferMap = new HashMap<Component, Buffer>();
+			tgtToBufferMap = new HashMap<Component, Memory>();
 			bufferMap.put(source, tgtToBufferMap);
 		}
 
-		Buffer buffer;
+		Memory buffer;
 		if (tgtToBufferMap.containsKey(target)) {
 			buffer = tgtToBufferMap.get(target);
 		} else {
-			buffer = createBuffer(source, target);
+			buffer = factory.createMemory(bufferId++, source, target);
+			design.add(buffer);
 			tgtToBufferMap.put(target, buffer);
 		}
 		buffer.getMappedConnections().add(connection);
-
-		FunctionUnit srcLSU = (FunctionUnit) buffer.getSourcePort();
-		connection.getSourcePort().setAttribute("id",
-				srcLSU.getAddressSpace().getId());
-		FunctionUnit tgtLSU = (FunctionUnit) buffer.getTargetPort();
-		connection.getTargetPort().setAttribute("id",
-				tgtLSU.getAddressSpace().getId());
 	}
 }

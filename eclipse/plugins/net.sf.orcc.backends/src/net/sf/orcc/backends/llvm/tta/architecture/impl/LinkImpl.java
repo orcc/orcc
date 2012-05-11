@@ -30,7 +30,6 @@
  */
 package net.sf.orcc.backends.llvm.tta.architecture.impl;
 
-
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.llvm.tta.architecture.Link;
 import net.sf.orcc.backends.llvm.tta.architecture.Port;

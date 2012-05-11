@@ -5,9 +5,9 @@ printProcessor(processor, options) ::= <<
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Declare and initialize FIFO variables 
 
-<processor.incoming: { buffer |<declareBuffer(buffer, buffer.targetPort.addressSpace.id)>}; separator="\n\n">
+<processor.incoming: { buffer |<declareBuffer(buffer, buffer.targetPort.id)>}; separator="\n\n">
 
-<processor.outgoing: { buffer |<declareBuffer(buffer, buffer.sourcePort.addressSpace.id)>}; separator="\n\n">
+<processor.outgoing: { buffer |<declareBuffer(buffer, buffer.sourcePort.id)>}; separator="\n\n">
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Declare the scheduling function of each actor

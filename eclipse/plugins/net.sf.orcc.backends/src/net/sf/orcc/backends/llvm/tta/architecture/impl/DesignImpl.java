@@ -34,7 +34,7 @@ import java.util.Collection;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
-import net.sf.orcc.backends.llvm.tta.architecture.Buffer;
+import net.sf.orcc.backends.llvm.tta.architecture.Memory;
 import net.sf.orcc.backends.llvm.tta.architecture.Component;
 import net.sf.orcc.backends.llvm.tta.architecture.Design;
 import net.sf.orcc.backends.llvm.tta.architecture.DesignConfiguration;
@@ -67,7 +67,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getComponents <em>Components</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getProcessors <em>Processors</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getBuffers <em>Buffers</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getSharedMemories <em>Shared Memories</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getSignals <em>Signals</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getInputs <em>Inputs</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getOutputs <em>Outputs</em>}</li>
@@ -112,13 +112,14 @@ public class DesignImpl extends GraphImpl implements Design {
 	 */
 	protected EList<Processor> processors;
 	/**
-	 * The cached value of the '{@link #getBuffers() <em>Buffers</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getBuffers()
+	 * The cached value of the '{@link #getSharedMemories() <em>Shared Memories</em>}' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getSharedMemories()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Buffer> buffers;
+	protected EList<Memory> sharedMemories;
 	/**
 	 * The cached value of the '{@link #getSignals() <em>Signals</em>}' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -183,8 +184,8 @@ public class DesignImpl extends GraphImpl implements Design {
 	public void add(Edge edge) {
 		if (edge instanceof Signal) {
 			getSignals().add((Signal) edge);
-		} else if (edge instanceof Buffer) {
-			getBuffers().add((Buffer) edge);
+		} else if (edge instanceof Memory) {
+			getSharedMemories().add((Memory) edge);
 		}
 		getEdges().add(edge);
 	}
@@ -219,8 +220,8 @@ public class DesignImpl extends GraphImpl implements Design {
 			return getComponents();
 		case ArchitecturePackage.DESIGN__PROCESSORS:
 			return getProcessors();
-		case ArchitecturePackage.DESIGN__BUFFERS:
-			return getBuffers();
+		case ArchitecturePackage.DESIGN__SHARED_MEMORIES:
+			return getSharedMemories();
 		case ArchitecturePackage.DESIGN__SIGNALS:
 			return getSignals();
 		case ArchitecturePackage.DESIGN__INPUTS:
@@ -264,8 +265,8 @@ public class DesignImpl extends GraphImpl implements Design {
 			return components != null && !components.isEmpty();
 		case ArchitecturePackage.DESIGN__PROCESSORS:
 			return processors != null && !processors.isEmpty();
-		case ArchitecturePackage.DESIGN__BUFFERS:
-			return buffers != null && !buffers.isEmpty();
+		case ArchitecturePackage.DESIGN__SHARED_MEMORIES:
+			return sharedMemories != null && !sharedMemories.isEmpty();
 		case ArchitecturePackage.DESIGN__SIGNALS:
 			return signals != null && !signals.isEmpty();
 		case ArchitecturePackage.DESIGN__INPUTS:
@@ -299,9 +300,9 @@ public class DesignImpl extends GraphImpl implements Design {
 			getProcessors().clear();
 			getProcessors().addAll((Collection<? extends Processor>) newValue);
 			return;
-		case ArchitecturePackage.DESIGN__BUFFERS:
-			getBuffers().clear();
-			getBuffers().addAll((Collection<? extends Buffer>) newValue);
+		case ArchitecturePackage.DESIGN__SHARED_MEMORIES:
+			getSharedMemories().clear();
+			getSharedMemories().addAll((Collection<? extends Memory>) newValue);
 			return;
 		case ArchitecturePackage.DESIGN__SIGNALS:
 			getSignals().clear();
@@ -370,8 +371,8 @@ public class DesignImpl extends GraphImpl implements Design {
 		case ArchitecturePackage.DESIGN__PROCESSORS:
 			getProcessors().clear();
 			return;
-		case ArchitecturePackage.DESIGN__BUFFERS:
-			getBuffers().clear();
+		case ArchitecturePackage.DESIGN__SHARED_MEMORIES:
+			getSharedMemories().clear();
 			return;
 		case ArchitecturePackage.DESIGN__SIGNALS:
 			getSignals().clear();
@@ -417,15 +418,16 @@ public class DesignImpl extends GraphImpl implements Design {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Buffer> getBuffers() {
-		if (buffers == null) {
-			buffers = new EObjectResolvingEList<Buffer>(Buffer.class, this,
-					ArchitecturePackage.DESIGN__BUFFERS);
+	public EList<Memory> getSharedMemories() {
+		if (sharedMemories == null) {
+			sharedMemories = new EObjectResolvingEList<Memory>(Memory.class,
+					this, ArchitecturePackage.DESIGN__SHARED_MEMORIES);
 		}
-		return buffers;
+		return sharedMemories;
 	}
 
 	/**

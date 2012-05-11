@@ -56,7 +56,7 @@ begin
   ---------------------------------------------------------------------------
   -- Buffers instantiation 
   --------------------------------------------------------------------------- 
-  <design.buffers: assignBuffer(); separator="\n\n">
+  <design.sharedMemories: assignBuffer(); separator="\n\n">
   ---------------------------------------------------------------------------
   -- Processors instantiation 
   ---------------------------------------------------------------------------
@@ -99,16 +99,16 @@ signal s_<signal.label> : std_logic_vector(<signal.size>-1 downto 0);
 >>
 
 declareBufferSignals(buffer) ::= <<
-signal buf_<buffer.label>_wren_p1    : std_logic;
-signal buf_<buffer.label>_address_p1 : std_logic_vector(<buffer.addrWidth>-1 downto 0);
-signal buf_<buffer.label>_byteen_p1  : std_logic_vector(3 downto 0);
-signal buf_<buffer.label>_data_p1    : std_logic_vector(31 downto 0);
-signal buf_<buffer.label>_queue_p1   : std_logic_vector(31 downto 0);
-signal buf_<buffer.label>_wren_p2    : std_logic;
-signal buf_<buffer.label>_address_p2 : std_logic_vector(<buffer.addrWidth>-1 downto 0);
-signal buf_<buffer.label>_byteen_p2  : std_logic_vector(3 downto 0);
-signal buf_<buffer.label>_data_p2    : std_logic_vector(31 downto 0);
-signal buf_<buffer.label>_queue_p2   : std_logic_vector(31 downto 0);
+signal <buffer.name>_wren_p1    : std_logic;
+signal <buffer.name>_address_p1 : std_logic_vector(<buffer.addrWidth>-1 downto 0);
+signal <buffer.name>_byteen_p1  : std_logic_vector(3 downto 0);
+signal <buffer.name>_data_p1    : std_logic_vector(31 downto 0);
+signal <buffer.name>_queue_p1   : std_logic_vector(31 downto 0);
+signal <buffer.name>_wren_p2    : std_logic;
+signal <buffer.name>_address_p2 : std_logic_vector(<buffer.addrWidth>-1 downto 0);
+signal <buffer.name>_byteen_p2  : std_logic_vector(3 downto 0);
+signal <buffer.name>_data_p2    : std_logic_vector(31 downto 0);
+signal <buffer.name>_queue_p2   : std_logic_vector(31 downto 0);
 >> 
 
 
@@ -117,30 +117,30 @@ signal buf_<buffer.label>_queue_p2   : std_logic_vector(31 downto 0);
 ///////////////////////////////////////////////////////////////////////////////
 
 assignNetworkPort(port, link) ::= <<
-<port.label> \<= s_<link.label>;
+<port.name> \<= s_<link.name>;
 >>
 
 assignInputPort(port, link) ::= <<
 <if(link.signal)
-><port.name> =\> s_<link.label>,<
+><port.name> =\> s_<link.name>,<
 else
->fu_LSU_buf_<port.addressSpace.id>_dmem_data_in    => buf_<link.label>_data_p2,
-fu_LSU_buf_<port.addressSpace.id>_dmem_data_out   => buf_<link.label>_queue_p2,
-fu_LSU_buf_<port.addressSpace.id>_dmem_addr       => buf_<link.label>_address_p2,
-fu_LSU_buf_<port.addressSpace.id>_dmem_wr_en_x(0) => buf_<link.label>_wren_p2,
-fu_LSU_buf_<port.addressSpace.id>_dmem_bytemask   => buf_<link.label>_byteen_p2,<
+>fu_<port.name>_dmem_data_in    => <link.name>_data_p2,
+fu_<port.name>_dmem_data_out   => <link.name>_queue_p2,
+fu_<port.name>_dmem_addr       => <link.name>_address_p2,
+fu_<port.name>_dmem_wr_en_x(0) => <link.name>_wren_p2,
+fu_<port.name>_dmem_bytemask   => <link.name>_byteen_p2,<
 endif>
 >>
 
 assignOutputPort(port, link) ::= <<
 <if(link.signal)
-><port.name> =\> s_<link.label>,<
+><port.name> =\> s_<link.name>,<
 else
->fu_LSU_buf_<port.addressSpace.id>_dmem_data_in    => buf_<link.label>_data_p1,
-fu_LSU_buf_<port.addressSpace.id>_dmem_data_out   => buf_<link.label>_queue_p1,
-fu_LSU_buf_<port.addressSpace.id>_dmem_addr       => buf_<link.label>_address_p1,
-fu_LSU_buf_<port.addressSpace.id>_dmem_wr_en_x(0) => buf_<link.label>_wren_p1,
-fu_LSU_buf_<port.addressSpace.id>_dmem_bytemask   => buf_<link.label>_byteen_p1,<
+>fu_<port.name>_dmem_data_in    => <link.name>_data_p1,
+fu_<port.name>_dmem_data_out   => <link.name>_queue_p1,
+fu_<port.name>_dmem_addr       => <link.name>_address_p1,
+fu_<port.name>_dmem_wr_en_x(0) => <link.name>_wren_p1,
+fu_<port.name>_dmem_bytemask   => <link.name>_byteen_p1,<
 endif>
 >>
 
@@ -158,30 +158,30 @@ assignComponent(component) ::= <<
 >>
 
 assignBuffer(buffer) ::= <<
-buffer_<buffer.label> : entity work.inferredRAM_2p
+<buffer.name> : entity work.inferredRAM_2p
   generic map(depth      =\> <buffer.depth>,
               byte_width =\> 8,
               addr_width =\> <buffer.addrWidth>,
               bytes      =\> 4)
   port map(clk        =\> clk,
-           wren_p1    =\> buf_<buffer.label>_wren_p1,
-           address_p1 =\> buf_<buffer.label>_address_p1,
-           byteen_p1  =\> buf_<buffer.label>_byteen_p1,
-           data_p1    =\> buf_<buffer.label>_data_p1,
-           q_p1       =\> buf_<buffer.label>_queue_p1,
-           wren_p2    =\> buf_<buffer.label>_wren_p2,
-           address_p2 =\> buf_<buffer.label>_address_p2,
-           byteen_p2  =\> buf_<buffer.label>_byteen_p2,
-           data_p2    =\> buf_<buffer.label>_data_p2,
-           q_p2       =\> buf_<buffer.label>_queue_p2,
+           wren_p1    =\> <buffer.name>_wren_p1,
+           address_p1 =\> <buffer.name>_address_p1,
+           byteen_p1  =\> <buffer.name>_byteen_p1,
+           data_p1    =\> <buffer.name>_data_p1,
+           q_p1       =\> <buffer.name>_queue_p1,
+           wren_p2    =\> <buffer.name>_wren_p2,
+           address_p2 =\> <buffer.name>_address_p2,
+           byteen_p2  =\> <buffer.name>_byteen_p2,
+           data_p2    =\> <buffer.name>_data_p2,
+           q_p2       =\> <buffer.name>_queue_p2,
            rst_n      =\> rst_n);
 >>
 
 assignProcessor(processor) ::= <<
 <processor.name>_inst : entity work.<processor.name>
   generic map(device_family =\> "<options.fpga.family>")
-  port map(clk                          =\> clk,
+  port map(clk =\> clk,
            <processor.incoming: { edge |<assignInputPort(edge.targetPort, edge)>}; separator="\n">
            <processor.outgoing: { edge |<assignOutputPort(edge.sourcePort, edge)>}; separator="\n">
-           rst_n                        =\> rst_n);
+           rst_n =\> rst_n);
 >>

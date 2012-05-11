@@ -33,20 +33,23 @@ package net.sf.orcc.backends.llvm.tta.architecture.impl;
 import java.util.Collection;
 
 import net.sf.orcc.backends.TemplateData;
-import net.sf.orcc.backends.llvm.tta.architecture.AddressSpace;
+import net.sf.orcc.backends.llvm.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.llvm.tta.architecture.Bridge;
 import net.sf.orcc.backends.llvm.tta.architecture.Bus;
 import net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.llvm.tta.architecture.GlobalControlUnit;
+import net.sf.orcc.backends.llvm.tta.architecture.Memory;
 import net.sf.orcc.backends.llvm.tta.architecture.Processor;
 import net.sf.orcc.backends.llvm.tta.architecture.ProcessorConfiguration;
 import net.sf.orcc.backends.llvm.tta.architecture.RegisterFile;
 import net.sf.orcc.backends.llvm.tta.architecture.Socket;
+import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Vertex;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
+import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
@@ -67,8 +70,9 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.ProcessorImpl#getSockets <em>Sockets</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.ProcessorImpl#getFunctionUnits <em>Function Units</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.ProcessorImpl#getRegisterFiles <em>Register Files</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.ProcessorImpl#getProgram <em>Program</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.ProcessorImpl#getData <em>Data</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.ProcessorImpl#getROM <em>ROM</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.ProcessorImpl#getLocalRAMs <em>Local RA Ms</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.ProcessorImpl#getSharedRAMs <em>Shared RA Ms</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.ProcessorImpl#getMappedActors <em>Mapped Actors</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.ProcessorImpl#getConfiguration <em>Configuration</em>}</li>
  * </ul>
@@ -134,22 +138,24 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	protected EList<RegisterFile> registerFiles;
 
 	/**
-	 * The cached value of the '{@link #getProgram() <em>Program</em>}' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getProgram()
+	 * The cached value of the '{@link #getROM() <em>ROM</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getROM()
 	 * @generated
 	 * @ordered
 	 */
-	protected AddressSpace program;
+	protected Memory rom;
 
 	/**
-	 * The cached value of the '{@link #getData() <em>Data</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getData()
+	 * The cached value of the '{@link #getLocalRAMs() <em>Local RA Ms</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getLocalRAMs()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<AddressSpace> data;
+	protected EList<Memory> localRAMs;
 
 	/**
 	 * The cached value of the '{@link #getMappedActors() <em>Mapped Actors</em>}' reference list.
@@ -215,26 +221,6 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetProgram(AddressSpace newProgram,
-			NotificationChain msgs) {
-		AddressSpace oldProgram = program;
-		program = newProgram;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, ArchitecturePackage.PROCESSOR__PROGRAM,
-					oldProgram, newProgram);
-			if (msgs == null)
-				msgs = notification;
-			else
-				msgs.add(notification);
-		}
-		return msgs;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
@@ -250,10 +236,12 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 			return getFunctionUnits();
 		case ArchitecturePackage.PROCESSOR__REGISTER_FILES:
 			return getRegisterFiles();
-		case ArchitecturePackage.PROCESSOR__PROGRAM:
-			return getProgram();
-		case ArchitecturePackage.PROCESSOR__DATA:
-			return getData();
+		case ArchitecturePackage.PROCESSOR__ROM:
+			return getROM();
+		case ArchitecturePackage.PROCESSOR__LOCAL_RA_MS:
+			return getLocalRAMs();
+		case ArchitecturePackage.PROCESSOR__SHARED_RA_MS:
+			return getSharedRAMs();
 		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
 			return getMappedActors();
 		case ArchitecturePackage.PROCESSOR__CONFIGURATION:
@@ -286,10 +274,11 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 		case ArchitecturePackage.PROCESSOR__REGISTER_FILES:
 			return ((InternalEList<?>) getRegisterFiles()).basicRemove(
 					otherEnd, msgs);
-		case ArchitecturePackage.PROCESSOR__PROGRAM:
-			return basicSetProgram(null, msgs);
-		case ArchitecturePackage.PROCESSOR__DATA:
-			return ((InternalEList<?>) getData()).basicRemove(otherEnd, msgs);
+		case ArchitecturePackage.PROCESSOR__ROM:
+			return basicSetROM(null, msgs);
+		case ArchitecturePackage.PROCESSOR__LOCAL_RA_MS:
+			return ((InternalEList<?>) getLocalRAMs()).basicRemove(otherEnd,
+					msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -313,10 +302,12 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 			return functionUnits != null && !functionUnits.isEmpty();
 		case ArchitecturePackage.PROCESSOR__REGISTER_FILES:
 			return registerFiles != null && !registerFiles.isEmpty();
-		case ArchitecturePackage.PROCESSOR__PROGRAM:
-			return program != null;
-		case ArchitecturePackage.PROCESSOR__DATA:
-			return data != null && !data.isEmpty();
+		case ArchitecturePackage.PROCESSOR__ROM:
+			return rom != null;
+		case ArchitecturePackage.PROCESSOR__LOCAL_RA_MS:
+			return localRAMs != null && !localRAMs.isEmpty();
+		case ArchitecturePackage.PROCESSOR__SHARED_RA_MS:
+			return !getSharedRAMs().isEmpty();
 		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
 			return mappedActors != null && !mappedActors.isEmpty();
 		case ArchitecturePackage.PROCESSOR__CONFIGURATION:
@@ -358,12 +349,12 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 			getRegisterFiles().addAll(
 					(Collection<? extends RegisterFile>) newValue);
 			return;
-		case ArchitecturePackage.PROCESSOR__PROGRAM:
-			setProgram((AddressSpace) newValue);
+		case ArchitecturePackage.PROCESSOR__ROM:
+			setROM((Memory) newValue);
 			return;
-		case ArchitecturePackage.PROCESSOR__DATA:
-			getData().clear();
-			getData().addAll((Collection<? extends AddressSpace>) newValue);
+		case ArchitecturePackage.PROCESSOR__LOCAL_RA_MS:
+			getLocalRAMs().clear();
+			getLocalRAMs().addAll((Collection<? extends Memory>) newValue);
 			return;
 		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
 			getMappedActors().clear();
@@ -410,11 +401,11 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 		case ArchitecturePackage.PROCESSOR__REGISTER_FILES:
 			getRegisterFiles().clear();
 			return;
-		case ArchitecturePackage.PROCESSOR__PROGRAM:
-			setProgram((AddressSpace) null);
+		case ArchitecturePackage.PROCESSOR__ROM:
+			setROM((Memory) null);
 			return;
-		case ArchitecturePackage.PROCESSOR__DATA:
-			getData().clear();
+		case ArchitecturePackage.PROCESSOR__LOCAL_RA_MS:
+			getLocalRAMs().clear();
 			return;
 		case ArchitecturePackage.PROCESSOR__MAPPED_ACTORS:
 			getMappedActors().clear();
@@ -462,19 +453,6 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<AddressSpace> getData() {
-		if (data == null) {
-			data = new EObjectContainmentEList<AddressSpace>(
-					AddressSpace.class, this,
-					ArchitecturePackage.PROCESSOR__DATA);
-		}
-		return data;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EList<FunctionUnit> getFunctionUnits() {
 		if (functionUnits == null) {
 			functionUnits = new EObjectContainmentEList<FunctionUnit>(
@@ -508,14 +486,6 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public AddressSpace getProgram() {
-		return program;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EList<RegisterFile> getRegisterFiles() {
 		if (registerFiles == null) {
 			registerFiles = new EObjectContainmentEList<RegisterFile>(
@@ -523,6 +493,93 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 					ArchitecturePackage.PROCESSOR__REGISTER_FILES);
 		}
 		return registerFiles;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Memory getROM() {
+		return rom;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetROM(Memory newROM, NotificationChain msgs) {
+		Memory oldROM = rom;
+		rom = newROM;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, ArchitecturePackage.PROCESSOR__ROM,
+					oldROM, newROM);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setROM(Memory newROM) {
+		if (newROM != rom) {
+			NotificationChain msgs = null;
+			if (rom != null)
+				msgs = ((InternalEObject) rom).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE
+								- ArchitecturePackage.PROCESSOR__ROM, null,
+						msgs);
+			if (newROM != null)
+				msgs = ((InternalEObject) newROM).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE
+								- ArchitecturePackage.PROCESSOR__ROM, null,
+						msgs);
+			msgs = basicSetROM(newROM, msgs);
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.PROCESSOR__ROM, newROM, newROM));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Memory> getLocalRAMs() {
+		if (localRAMs == null) {
+			localRAMs = new EObjectContainmentEList<Memory>(Memory.class, this,
+					ArchitecturePackage.PROCESSOR__LOCAL_RA_MS);
+		}
+		return localRAMs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 */
+	public EList<Memory> getSharedRAMs() {
+		EList<Memory> sharedRAMs = new BasicEList<Memory>();
+		for (Edge edge : getOutgoing()) {
+			if (edge instanceof Memory) {
+				sharedRAMs.add((Memory) edge);
+			}
+		}
+		for (Edge edge : getIncoming()) {
+			if (edge instanceof Memory) {
+				sharedRAMs.add((Memory) edge);
+			}
+		}
+		return sharedRAMs;
 	}
 
 	/**
@@ -558,6 +615,19 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 */
+	public FunctionUnit connect(Memory sharedMemory) {
+		// Id is the number of local and shared memories minus one for the ROM
+		int id = getLocalRAMs().size() + getSharedRAMs().size();
+		FunctionUnit lsu = ArchitectureFactory.eINSTANCE.createLSU(id, this,
+				sharedMemory);
+		getFunctionUnits().add(lsu);
+		return lsu;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setGcu(GlobalControlUnit newGcu) {
@@ -579,32 +649,6 @@ public class ProcessorImpl extends ComponentImpl implements Processor {
 		} else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
 					ArchitecturePackage.PROCESSOR__GCU, newGcu, newGcu));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setProgram(AddressSpace newProgram) {
-		if (newProgram != program) {
-			NotificationChain msgs = null;
-			if (program != null)
-				msgs = ((InternalEObject) program).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE
-								- ArchitecturePackage.PROCESSOR__PROGRAM, null,
-						msgs);
-			if (newProgram != null)
-				msgs = ((InternalEObject) newProgram).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE
-								- ArchitecturePackage.PROCESSOR__PROGRAM, null,
-						msgs);
-			msgs = basicSetProgram(newProgram, msgs);
-			if (msgs != null)
-				msgs.dispatch();
-		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					ArchitecturePackage.PROCESSOR__PROGRAM, newProgram,
-					newProgram));
 	}
 
 	/**

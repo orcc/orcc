@@ -56,49 +56,6 @@ public interface ArchitectureFactory extends EFactory {
 			.init();
 
 	/**
-	 * Returns a new object of class '<em>Address Space</em>'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return a new object of class '<em>Address Space</em>'.
-	 * @generated
-	 */
-	AddressSpace createAddressSpace();
-
-	/**
-	 * Returns a new address space with the given parameters
-	 * 
-	 * @param name
-	 *            the name of the AddressSpace
-	 * @param width
-	 *            the width of the AdressSpace
-	 * @param minAddress
-	 *            the minimum address
-	 * @param maxAddress
-	 *            the maximum address
-	 * @return an AddressSpace with the given parameters
-	 */
-	AddressSpace createAddressSpace(String name, int width, int minAddress,
-			int maxAddress);
-
-	/**
-	 * Returns a new address space with the given parameters
-	 * 
-	 * @param name
-	 *            the name of the AddressSpace
-	 * @param id
-	 *            the id of the AddressSpace
-	 * @param width
-	 *            the width of the AdressSpace
-	 * @param minAddress
-	 *            the minimum address
-	 * @param maxAddress
-	 *            the maximum address
-	 * @return an AddressSpace with the given parameters
-	 */
-	AddressSpace createAddressSpace(String name, int id, int width,
-			int minAddress, int maxAddress);
-
-	/**
 	 * Returns a new ALU unit
 	 * 
 	 * @param tta
@@ -117,26 +74,6 @@ public interface ArchitectureFactory extends EFactory {
 	 * @generated
 	 */
 	Bridge createBridge();
-
-	/**
-	 * Returns a new object of class '<em>Buffer</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Buffer</em>'.
-	 * @generated
-	 */
-	Buffer createBuffer();
-
-	/**
-	 * Returns a new object of class '<em>Buffer</em>'.
-	 * 
-	 * @param source
-	 *            the source vertex of this buffer
-	 * @param target
-	 *            the target vertex of this buffer
-	 * @return a new buffer
-	 */
-	Buffer createBuffer(int id, Vertex source, Vertex target);
 
 	/**
 	 * Returns a new object of class '<em>Bus</em>'.
@@ -358,7 +295,8 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the containing TTA processor
 	 * @return a simple GlobalControlUnit
 	 */
-	GlobalControlUnit createGlobalControlUnitDefault(Processor tta);
+	GlobalControlUnit createGlobalControlUnitDefault(Processor tta,
+			Memory program);
 
 	/**
 	 * Returns a new list of guards corresponding to default TTA processor
@@ -399,7 +337,18 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the containing TTA processor
 	 * @return an LSU with the given parameters
 	 */
-	FunctionUnit createLSU(String name, Processor tta, AddressSpace addressSpace);
+	FunctionUnit createLSU(int id, Processor tta, Memory addressSpace);
+
+	/**
+	 * Returns a new object of class '<em>Memory</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Memory</em>'.
+	 * @generated
+	 */
+	Memory createMemory();
+
+	Memory createMemory(int id, Processor source, Processor target);
 
 	/**
 	 * Return a new multiplier unit with the given parameters
@@ -440,6 +389,15 @@ public interface ArchitectureFactory extends EFactory {
 	Operation createOperationCtrl(String name, FuPort port);
 
 	/**
+	 * Return a new signal unit
+	 * 
+	 * @param tta
+	 *            the containing tta processor
+	 * @return a new input signal
+	 */
+	FunctionUnit createOutputSignalUnit(Processor tta, String signalName);
+
+	/**
 	 * Return a new output socket with the given parameters
 	 * 
 	 * @param name
@@ -459,9 +417,9 @@ public interface ArchitectureFactory extends EFactory {
 	 */
 	Port createPort();
 
-	Port createPort(String name);
-
 	Port createPort(net.sf.orcc.df.Port port);
+
+	Port createPort(String name);
 
 	/**
 	 * Returns a new object of class '<em>Processor</em>'.
@@ -664,15 +622,6 @@ public interface ArchitectureFactory extends EFactory {
 	 * @return a Socket initialized with the given parameters
 	 */
 	Socket createSocket(String name, EList<Segment> segments);
-
-	/**
-	 * Return a new signal unit
-	 * 
-	 * @param tta
-	 *            the containing tta processor
-	 * @return a new input signal
-	 */
-	FunctionUnit createOutputSignalUnit(Processor tta, String signalName);
 
 	/**
 	 * Returns a new object of class '<em>Term Bool</em>'.

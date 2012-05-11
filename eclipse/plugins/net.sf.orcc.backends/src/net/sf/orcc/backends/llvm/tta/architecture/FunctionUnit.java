@@ -118,12 +118,12 @@ public interface FunctionUnit extends Port {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Address Space</em>' reference.
-	 * @see #setAddressSpace(AddressSpace)
+	 * @see #setAddressSpace(Memory)
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getFunctionUnit_AddressSpace()
 	 * @model
 	 * @generated
 	 */
-	AddressSpace getAddressSpace();
+	Memory getAddressSpace();
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit#getAddressSpace <em>Address Space</em>}' reference.
@@ -133,7 +133,7 @@ public interface FunctionUnit extends Port {
 	 * @see #getAddressSpace()
 	 * @generated
 	 */
-	void setAddressSpace(AddressSpace value);
+	void setAddressSpace(Memory value);
 
 	/**
 	 * Returns the value of the '<em><b>Implementation</b></em>' attribute.

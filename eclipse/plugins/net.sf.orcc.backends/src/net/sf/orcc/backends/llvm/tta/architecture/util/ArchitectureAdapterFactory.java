@@ -30,10 +30,8 @@ package net.sf.orcc.backends.llvm.tta.architecture.util;
 
 import java.util.Map;
 
-import net.sf.orcc.backends.llvm.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.llvm.tta.architecture.Bridge;
-import net.sf.orcc.backends.llvm.tta.architecture.Buffer;
 import net.sf.orcc.backends.llvm.tta.architecture.Bus;
 import net.sf.orcc.backends.llvm.tta.architecture.Component;
 import net.sf.orcc.backends.llvm.tta.architecture.Design;
@@ -48,6 +46,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.GlobalControlUnit;
 import net.sf.orcc.backends.llvm.tta.architecture.Guard;
 import net.sf.orcc.backends.llvm.tta.architecture.Implementation;
 import net.sf.orcc.backends.llvm.tta.architecture.Link;
+import net.sf.orcc.backends.llvm.tta.architecture.Memory;
 import net.sf.orcc.backends.llvm.tta.architecture.Operation;
 import net.sf.orcc.backends.llvm.tta.architecture.Port;
 import net.sf.orcc.backends.llvm.tta.architecture.Processor;
@@ -146,13 +145,13 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 		}
 
 		@Override
-		public Adapter caseBuffer(Buffer object) {
-			return createBufferAdapter();
+		public Adapter casePort(Port object) {
+			return createPortAdapter();
 		}
 
 		@Override
-		public Adapter casePort(Port object) {
-			return createPortAdapter();
+		public Adapter caseMemory(Memory object) {
+			return createMemoryAdapter();
 		}
 
 		@Override
@@ -203,11 +202,6 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 		@Override
 		public Adapter caseOperation(Operation object) {
 			return createOperationAdapter();
-		}
-
-		@Override
-		public Adapter caseAddressSpace(AddressSpace object) {
-			return createAddressSpaceAdapter();
 		}
 
 		@Override
@@ -386,19 +380,6 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.llvm.tta.architecture.Buffer <em>Buffer</em>}'.
-	 * <!-- begin-user-doc --> This default implementation returns null so
-	 * that we can easily ignore cases; it's useful to ignore a case when
-	 * inheritance will catch all the cases anyway. <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.Buffer
-	 * @generated
-	 */
-	public Adapter createBufferAdapter() {
-		return null;
-	}
-
-	/**
 	 * Creates a new adapter for an object of class '
 	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Processor
 	 * <em>Processor</em>}'. <!-- begin-user-doc --> This default implementation
@@ -411,6 +392,19 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createProcessorAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.llvm.tta.architecture.Memory <em>Memory</em>}'.
+	 * <!-- begin-user-doc --> This default implementation returns null so
+	 * that we can easily ignore cases; it's useful to ignore a case when
+	 * inheritance will catch all the cases anyway. <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.Memory
+	 * @generated
+	 */
+	public Adapter createMemoryAdapter() {
 		return null;
 	}
 
@@ -557,20 +551,6 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.llvm.tta.architecture.AddressSpace <em>Address Space</em>}'.
-	 * <!-- begin-user-doc --> This default
-	 * implementation returns null so that we can easily ignore cases; it's
-	 * useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.AddressSpace
-	 * @generated
-	 */
-	public Adapter createAddressSpaceAdapter() {
-		return null;
-	}
-
-	/**
 	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.llvm.tta.architecture.Guard <em>Guard</em>}'.
 	 * <!-- begin-user-doc --> This default implementation returns null so that
 	 * we can easily ignore cases; it's useful to ignore a case when inheritance
@@ -702,9 +682,9 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 
 	/**
 	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Type To Impl Map Entry</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- begin-user-doc --> This default
+	 * implementation returns null so that we can easily ignore cases; it's
+	 * useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
 	 * @see java.util.Map.Entry

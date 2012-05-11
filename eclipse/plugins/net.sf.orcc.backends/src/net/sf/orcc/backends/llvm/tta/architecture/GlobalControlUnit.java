@@ -105,12 +105,12 @@ public interface GlobalControlUnit extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Address Space</em>' reference.
-	 * @see #setAddressSpace(AddressSpace)
+	 * @see #setAddressSpace(Memory)
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getGlobalControlUnit_AddressSpace()
 	 * @model
 	 * @generated
 	 */
-	AddressSpace getAddressSpace();
+	Memory getAddressSpace();
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.GlobalControlUnit#getAddressSpace <em>Address Space</em>}' reference.
@@ -120,7 +120,7 @@ public interface GlobalControlUnit extends EObject {
 	 * @see #getAddressSpace()
 	 * @generated
 	 */
-	void setAddressSpace(AddressSpace value);
+	void setAddressSpace(Memory value);
 
 	/**
 	 * Returns the value of the '<em><b>Operations</b></em>' containment reference list.

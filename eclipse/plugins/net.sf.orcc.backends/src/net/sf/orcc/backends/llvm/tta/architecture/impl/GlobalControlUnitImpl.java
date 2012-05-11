@@ -30,7 +30,7 @@ package net.sf.orcc.backends.llvm.tta.architecture.impl;
 
 import java.util.Collection;
 
-import net.sf.orcc.backends.llvm.tta.architecture.AddressSpace;
+import net.sf.orcc.backends.llvm.tta.architecture.Memory;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.llvm.tta.architecture.FuPort;
 import net.sf.orcc.backends.llvm.tta.architecture.GlobalControlUnit;
@@ -92,7 +92,7 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected AddressSpace addressSpace;
+	protected Memory addressSpace;
 
 	/**
 	 * The cached value of the '{@link #getOperations() <em>Operations</em>}' containment reference list.
@@ -235,10 +235,10 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public AddressSpace getAddressSpace() {
+	public Memory getAddressSpace() {
 		if (addressSpace != null && addressSpace.eIsProxy()) {
 			InternalEObject oldAddressSpace = (InternalEObject) addressSpace;
-			addressSpace = (AddressSpace) eResolveProxy(oldAddressSpace);
+			addressSpace = (Memory) eResolveProxy(oldAddressSpace);
 			if (addressSpace != oldAddressSpace) {
 				if (eNotificationRequired())
 					eNotify(new ENotificationImpl(
@@ -255,7 +255,7 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public AddressSpace basicGetAddressSpace() {
+	public Memory basicGetAddressSpace() {
 		return addressSpace;
 	}
 
@@ -263,8 +263,8 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setAddressSpace(AddressSpace newAddressSpace) {
-		AddressSpace oldAddressSpace = addressSpace;
+	public void setAddressSpace(Memory newAddressSpace) {
+		Memory oldAddressSpace = addressSpace;
 		addressSpace = newAddressSpace;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
@@ -387,7 +387,7 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 			setReturnAddress((FuPort) newValue);
 			return;
 		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__ADDRESS_SPACE:
-			setAddressSpace((AddressSpace) newValue);
+			setAddressSpace((Memory) newValue);
 			return;
 		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__OPERATIONS:
 			getOperations().clear();
@@ -417,7 +417,7 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 			setReturnAddress((FuPort) null);
 			return;
 		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__ADDRESS_SPACE:
-			setAddressSpace((AddressSpace) null);
+			setAddressSpace((Memory) null);
 			return;
 		case ArchitecturePackage.GLOBAL_CONTROL_UNIT__OPERATIONS:
 			getOperations().clear();

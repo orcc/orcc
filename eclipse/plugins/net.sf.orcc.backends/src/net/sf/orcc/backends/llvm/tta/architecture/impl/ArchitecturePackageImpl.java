@@ -30,11 +30,9 @@ package net.sf.orcc.backends.llvm.tta.architecture.impl;
 
 import java.util.Map;
 
-import net.sf.orcc.backends.llvm.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.llvm.tta.architecture.Bridge;
-import net.sf.orcc.backends.llvm.tta.architecture.Buffer;
 import net.sf.orcc.backends.llvm.tta.architecture.Bus;
 import net.sf.orcc.backends.llvm.tta.architecture.Component;
 import net.sf.orcc.backends.llvm.tta.architecture.Design;
@@ -51,6 +49,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.GlobalControlUnit;
 import net.sf.orcc.backends.llvm.tta.architecture.Guard;
 import net.sf.orcc.backends.llvm.tta.architecture.Implementation;
 import net.sf.orcc.backends.llvm.tta.architecture.Link;
+import net.sf.orcc.backends.llvm.tta.architecture.Memory;
 import net.sf.orcc.backends.llvm.tta.architecture.OpBinary;
 import net.sf.orcc.backends.llvm.tta.architecture.OpUnary;
 import net.sf.orcc.backends.llvm.tta.architecture.Operation;
@@ -97,8 +96,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	private EClass designEClass = null;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	private EClass linkEClass = null;
@@ -117,17 +115,16 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	private EClass componentEClass = null;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass bufferEClass = null;
+	private EClass processorEClass = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass processorEClass = null;
+	private EClass memoryEClass = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -193,12 +190,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass addressSpaceEClass = null;
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	private EClass guardEClass = null;
 
 	/**
@@ -250,8 +241,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	private EClass implementationEClass = null;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	private EClass typeToImplMapEntryEClass = null;
@@ -437,7 +427,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getDesign_Buffers() {
+	public EReference getDesign_SharedMemories() {
 		return (EReference) designEClass.getEStructuralFeatures().get(3);
 	}
 
@@ -466,8 +456,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getDesign_HardwareDatabase() {
@@ -483,8 +472,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EClass getLink() {
@@ -492,8 +480,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getLink_SourcePort() {
@@ -501,8 +488,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getLink_TargetPort() {
@@ -518,11 +504,20 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getSignal_Name() {
+		return (EAttribute) signalEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EAttribute getSignal_Size() {
-		return (EAttribute) signalEClass.getEStructuralFeatures().get(0);
+		return (EAttribute) signalEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -555,51 +550,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 */
 	public EReference getComponent_Outputs() {
 		return (EReference) componentEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getBuffer() {
-		return bufferEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getBuffer_Depth() {
-		return (EAttribute) bufferEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getBuffer_WordWidth() {
-		return (EAttribute) bufferEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getBuffer_AddrWidth() {
-		return (EAttribute) bufferEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getBuffer_MappedConnections() {
-		return (EReference) bufferEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -659,18 +609,20 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getProcessor_Program() {
+	public EReference getProcessor_ROM() {
 		return (EReference) processorEClass.getEStructuralFeatures().get(6);
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getProcessor_Data() {
+	public EReference getProcessor_LocalRAMs() {
 		return (EReference) processorEClass.getEStructuralFeatures().get(7);
 	}
 
@@ -679,7 +631,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getProcessor_MappedActors() {
+	public EReference getProcessor_SharedRAMs() {
 		return (EReference) processorEClass.getEStructuralFeatures().get(8);
 	}
 
@@ -687,8 +639,88 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getProcessor_MappedActors() {
+		return (EReference) processorEClass.getEStructuralFeatures().get(9);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EAttribute getProcessor_Configuration() {
-		return (EAttribute) processorEClass.getEStructuralFeatures().get(9);
+		return (EAttribute) processorEClass.getEStructuralFeatures().get(10);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getMemory() {
+		return memoryEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getMemory_Name() {
+		return (EAttribute) memoryEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getMemory_MinAddress() {
+		return (EAttribute) memoryEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getMemory_MaxAddress() {
+		return (EAttribute) memoryEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getMemory_Width() {
+		return (EAttribute) memoryEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getMemory_Depth() {
+		return (EAttribute) memoryEClass.getEStructuralFeatures().get(4);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getMemory_WordWidth() {
+		return (EAttribute) memoryEClass.getEStructuralFeatures().get(5);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getMemory_AddrWidth() {
+		return (EAttribute) memoryEClass.getEStructuralFeatures().get(6);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getMemory_MappedConnections() {
+		return (EReference) memoryEClass.getEStructuralFeatures().get(7);
 	}
 
 	/**
@@ -882,8 +914,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EAttribute getFunctionUnit_Implementation() {
@@ -947,8 +978,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EAttribute getRegisterFile_Implementation() {
@@ -1081,55 +1111,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 */
 	public EAttribute getOperation_Control() {
 		return (EAttribute) operationEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getAddressSpace() {
-		return addressSpaceEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getAddressSpace_Name() {
-		return (EAttribute) addressSpaceEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getAddressSpace_MinAddress() {
-		return (EAttribute) addressSpaceEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getAddressSpace_MaxAddress() {
-		return (EAttribute) addressSpaceEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getAddressSpace_Width() {
-		return (EAttribute) addressSpaceEClass.getEStructuralFeatures().get(3);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getAddressSpace_Id() {
-		return (EAttribute) addressSpaceEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -1295,8 +1276,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EClass getTypeToImplMapEntry() {
@@ -1304,8 +1284,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EAttribute getTypeToImplMapEntry_Key() {
@@ -1314,8 +1293,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getTypeToImplMapEntry_Value() {
@@ -1526,7 +1504,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEAttribute(designEClass, DESIGN__NAME);
 		createEReference(designEClass, DESIGN__COMPONENTS);
 		createEReference(designEClass, DESIGN__PROCESSORS);
-		createEReference(designEClass, DESIGN__BUFFERS);
+		createEReference(designEClass, DESIGN__SHARED_MEMORIES);
 		createEReference(designEClass, DESIGN__SIGNALS);
 		createEReference(designEClass, DESIGN__INPUTS);
 		createEReference(designEClass, DESIGN__OUTPUTS);
@@ -1538,6 +1516,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEReference(linkEClass, LINK__TARGET_PORT);
 
 		signalEClass = createEClass(SIGNAL);
+		createEAttribute(signalEClass, SIGNAL__NAME);
 		createEAttribute(signalEClass, SIGNAL__SIZE);
 
 		componentEClass = createEClass(COMPONENT);
@@ -1545,13 +1524,17 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEReference(componentEClass, COMPONENT__INPUTS);
 		createEReference(componentEClass, COMPONENT__OUTPUTS);
 
-		bufferEClass = createEClass(BUFFER);
-		createEAttribute(bufferEClass, BUFFER__DEPTH);
-		createEAttribute(bufferEClass, BUFFER__WORD_WIDTH);
-		createEAttribute(bufferEClass, BUFFER__ADDR_WIDTH);
-		createEReference(bufferEClass, BUFFER__MAPPED_CONNECTIONS);
-
 		portEClass = createEClass(PORT);
+
+		memoryEClass = createEClass(MEMORY);
+		createEAttribute(memoryEClass, MEMORY__NAME);
+		createEAttribute(memoryEClass, MEMORY__MIN_ADDRESS);
+		createEAttribute(memoryEClass, MEMORY__MAX_ADDRESS);
+		createEAttribute(memoryEClass, MEMORY__WIDTH);
+		createEAttribute(memoryEClass, MEMORY__DEPTH);
+		createEAttribute(memoryEClass, MEMORY__WORD_WIDTH);
+		createEAttribute(memoryEClass, MEMORY__ADDR_WIDTH);
+		createEReference(memoryEClass, MEMORY__MAPPED_CONNECTIONS);
 
 		processorEClass = createEClass(PROCESSOR);
 		createEReference(processorEClass, PROCESSOR__GCU);
@@ -1560,8 +1543,9 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEReference(processorEClass, PROCESSOR__SOCKETS);
 		createEReference(processorEClass, PROCESSOR__FUNCTION_UNITS);
 		createEReference(processorEClass, PROCESSOR__REGISTER_FILES);
-		createEReference(processorEClass, PROCESSOR__PROGRAM);
-		createEReference(processorEClass, PROCESSOR__DATA);
+		createEReference(processorEClass, PROCESSOR__ROM);
+		createEReference(processorEClass, PROCESSOR__LOCAL_RA_MS);
+		createEReference(processorEClass, PROCESSOR__SHARED_RA_MS);
 		createEReference(processorEClass, PROCESSOR__MAPPED_ACTORS);
 		createEAttribute(processorEClass, PROCESSOR__CONFIGURATION);
 
@@ -1625,13 +1609,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEAttribute(operationEClass, OPERATION__NAME);
 		createEReference(operationEClass, OPERATION__PIPELINE);
 		createEAttribute(operationEClass, OPERATION__CONTROL);
-
-		addressSpaceEClass = createEClass(ADDRESS_SPACE);
-		createEAttribute(addressSpaceEClass, ADDRESS_SPACE__NAME);
-		createEAttribute(addressSpaceEClass, ADDRESS_SPACE__MIN_ADDRESS);
-		createEAttribute(addressSpaceEClass, ADDRESS_SPACE__MAX_ADDRESS);
-		createEAttribute(addressSpaceEClass, ADDRESS_SPACE__WIDTH);
-		createEAttribute(addressSpaceEClass, ADDRESS_SPACE__ID);
 
 		elementEClass = createEClass(ELEMENT);
 		createEAttribute(elementEClass, ELEMENT__START_CYCLE);
@@ -1739,8 +1716,8 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		linkEClass.getESuperTypes().add(theGraphPackage.getEdge());
 		signalEClass.getESuperTypes().add(this.getLink());
 		componentEClass.getESuperTypes().add(theGraphPackage.getVertex());
-		bufferEClass.getESuperTypes().add(this.getLink());
 		portEClass.getESuperTypes().add(theGraphPackage.getVertex());
+		memoryEClass.getESuperTypes().add(this.getLink());
 		processorEClass.getESuperTypes().add(this.getComponent());
 		functionUnitEClass.getESuperTypes().add(this.getPort());
 		readsEClass.getESuperTypes().add(this.getElement());
@@ -1768,9 +1745,9 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				"processors", null, 0, -1, Design.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getDesign_Buffers(), this.getBuffer(), null, "buffers",
-				null, 0, -1, Design.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
+		initEReference(getDesign_SharedMemories(), this.getMemory(), null,
+				"sharedMemories", null, 0, -1, Design.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getDesign_Signals(), this.getSignal(), null, "signals",
 				null, 0, -1, Design.class, !IS_TRANSIENT, !IS_VOLATILE,
@@ -1807,6 +1784,10 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 		initEClass(signalEClass, Signal.class, "Signal", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getSignal_Name(), ecorePackage.getEString(), "name",
+				null, 0, 1, Signal.class, IS_TRANSIENT, IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED,
+				IS_ORDERED);
 		initEAttribute(getSignal_Size(), theEcorePackage.getEInt(), "size",
 				null, 0, 1, Signal.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
@@ -1827,28 +1808,44 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(bufferEClass, Buffer.class, "Buffer", !IS_ABSTRACT,
-				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getBuffer_Depth(), theEcorePackage.getEInt(), "depth",
-				null, 0, 1, Buffer.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
-		initEAttribute(getBuffer_WordWidth(), theEcorePackage.getEInt(),
-				"wordWidth", "32", 0, 1, Buffer.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
-		initEAttribute(getBuffer_AddrWidth(), theEcorePackage.getEInt(),
-				"addrWidth", null, 0, 1, Buffer.class, IS_TRANSIENT,
-				IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
-		initEReference(getBuffer_MappedConnections(),
-				theDfPackage.getConnection(), null, "mappedConnections", null,
-				0, -1, Buffer.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
 		initEClass(portEClass, Port.class, "Port", !IS_ABSTRACT, !IS_INTERFACE,
 				IS_GENERATED_INSTANCE_CLASS);
+
+		initEClass(memoryEClass, Memory.class, "Memory", !IS_ABSTRACT,
+				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getMemory_Name(), ecorePackage.getEString(), "name",
+				null, 0, 1, Memory.class, IS_TRANSIENT, IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED,
+				IS_ORDERED);
+		initEAttribute(getMemory_MinAddress(), ecorePackage.getEInt(),
+				"minAddress", null, 0, 1, Memory.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMemory_MaxAddress(), ecorePackage.getEInt(),
+				"maxAddress", null, 0, 1, Memory.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMemory_Width(), ecorePackage.getEInt(), "width",
+				null, 0, 1, Memory.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
+		initEAttribute(getMemory_Depth(), theEcorePackage.getEInt(), "depth",
+				null, 0, 1, Memory.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
+		initEAttribute(getMemory_WordWidth(), theEcorePackage.getEInt(),
+				"wordWidth", "32", 0, 1, Memory.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMemory_AddrWidth(), theEcorePackage.getEInt(),
+				"addrWidth", null, 0, 1, Memory.class, IS_TRANSIENT,
+				IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
+		initEReference(getMemory_MappedConnections(),
+				theDfPackage.getConnection(), null, "mappedConnections", null,
+				0, -1, Memory.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(processorEClass, Processor.class, "Processor", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -1878,14 +1875,18 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE,
 				!IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
-		initEReference(getProcessor_Program(), this.getAddressSpace(), null,
-				"program", null, 0, 1, Processor.class, !IS_TRANSIENT,
+		initEReference(getProcessor_ROM(), this.getMemory(), null, "ROM", null,
+				0, 1, Processor.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getProcessor_LocalRAMs(), this.getMemory(), null,
+				"localRAMs", null, 0, -1, Processor.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getProcessor_Data(), this.getAddressSpace(), null,
-				"data", null, 0, -1, Processor.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getProcessor_SharedRAMs(), this.getMemory(), null,
+				"sharedRAMs", null, 0, -1, Processor.class, IS_TRANSIENT,
+				IS_VOLATILE, !IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getProcessor_MappedActors(),
 				theGraphPackage.getVertex(), null, "mappedActors", null, 0, -1,
 				Processor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
@@ -1895,6 +1896,11 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				this.getProcessorConfiguration(), "configuration", null, 0, 1,
 				Processor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
 				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		EOperation op = addEOperation(processorEClass, this.getFunctionUnit(),
+				"connect", 0, 1, IS_UNIQUE, IS_ORDERED);
+		addEParameter(op, this.getMemory(), "sharedMemory", 0, 1, IS_UNIQUE,
+				IS_ORDERED);
 
 		initEClass(busEClass, Bus.class, "Bus", !IS_ABSTRACT, !IS_INTERFACE,
 				IS_GENERATED_INSTANCE_CLASS);
@@ -1950,11 +1956,11 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE,
 				!IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
-		initEReference(getGlobalControlUnit_AddressSpace(),
-				this.getAddressSpace(), null, "addressSpace", null, 0, 1,
-				GlobalControlUnit.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getGlobalControlUnit_AddressSpace(), this.getMemory(),
+				null, "addressSpace", null, 0, 1, GlobalControlUnit.class,
+				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE,
+				IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
 		initEReference(getGlobalControlUnit_Operations(), this.getOperation(),
 				null, "operations", null, 0, -1, GlobalControlUnit.class,
 				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE,
@@ -1985,11 +1991,10 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				"ports", null, 0, -1, FunctionUnit.class, IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getFunctionUnit_AddressSpace(), this.getAddressSpace(),
-				null, "addressSpace", null, 0, 1, FunctionUnit.class,
-				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE,
-				IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
+		initEReference(getFunctionUnit_AddressSpace(), this.getMemory(), null,
+				"addressSpace", null, 0, 1, FunctionUnit.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getFunctionUnit_Implementation(),
 				theEcorePackage.getEString(), "implementation", null, 0, 1,
 				FunctionUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
@@ -2053,8 +2058,8 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
 
-		EOperation op = addEOperation(fuPortEClass, null, "connect", 0, 1,
-				IS_UNIQUE, IS_ORDERED);
+		op = addEOperation(fuPortEClass, null, "connect", 0, 1, IS_UNIQUE,
+				IS_ORDERED);
 		addEParameter(op, this.getSocket(), "socket", 0, 1, IS_UNIQUE,
 				IS_ORDERED);
 
@@ -2098,29 +2103,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 		addEOperation(operationEClass, this.getPortToIndexMapEntry(),
 				"getPortToIndexMap", 0, -1, IS_UNIQUE, IS_ORDERED);
-
-		initEClass(addressSpaceEClass, AddressSpace.class, "AddressSpace",
-				!IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getAddressSpace_Name(), ecorePackage.getEString(),
-				"name", null, 0, 1, AddressSpace.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
-		initEAttribute(getAddressSpace_MinAddress(), ecorePackage.getEInt(),
-				"minAddress", null, 0, 1, AddressSpace.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
-		initEAttribute(getAddressSpace_MaxAddress(), ecorePackage.getEInt(),
-				"maxAddress", null, 0, 1, AddressSpace.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
-		initEAttribute(getAddressSpace_Width(), ecorePackage.getEInt(),
-				"width", null, 0, 1, AddressSpace.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
-		initEAttribute(getAddressSpace_Id(), theEcorePackage.getEInt(), "id",
-				null, 0, 1, AddressSpace.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
 
 		initEClass(elementEClass, Element.class, "Element", IS_ABSTRACT,
 				IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
