@@ -34,11 +34,10 @@ import java.util.Collection;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
-import net.sf.orcc.backends.llvm.tta.architecture.Memory;
 import net.sf.orcc.backends.llvm.tta.architecture.Component;
 import net.sf.orcc.backends.llvm.tta.architecture.Design;
-import net.sf.orcc.backends.llvm.tta.architecture.DesignConfiguration;
 import net.sf.orcc.backends.llvm.tta.architecture.Implementation;
+import net.sf.orcc.backends.llvm.tta.architecture.Memory;
 import net.sf.orcc.backends.llvm.tta.architecture.Port;
 import net.sf.orcc.backends.llvm.tta.architecture.Processor;
 import net.sf.orcc.backends.llvm.tta.architecture.Signal;
@@ -72,7 +71,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getInputs <em>Inputs</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getOutputs <em>Outputs</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getHardwareDatabase <em>Hardware Database</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.DesignImpl#getConfiguration <em>Configuration</em>}</li>
  * </ul>
  * </p>
  *
@@ -113,8 +111,8 @@ public class DesignImpl extends GraphImpl implements Design {
 	protected EList<Processor> processors;
 	/**
 	 * The cached value of the '{@link #getSharedMemories() <em>Shared Memories</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @see #getSharedMemories()
 	 * @generated
 	 * @ordered
@@ -153,24 +151,6 @@ public class DesignImpl extends GraphImpl implements Design {
 	 * @ordered
 	 */
 	protected EMap<String, Implementation> hardwareDatabase;
-	/**
-	 * The default value of the '{@link #getConfiguration() <em>Configuration</em>}' attribute.
-	 * <!-- begin-user-doc --> <!--
-	 * end-user-doc -->
-	 * @see #getConfiguration()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final DesignConfiguration CONFIGURATION_EDEFAULT = DesignConfiguration.DIRECT_MAPPING;
-	/**
-	 * The cached value of the '{@link #getConfiguration() <em>Configuration</em>}' attribute.
-	 * <!-- begin-user-doc --> <!--
-	 * end-user-doc -->
-	 * @see #getConfiguration()
-	 * @generated
-	 * @ordered
-	 */
-	protected DesignConfiguration configuration = CONFIGURATION_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -233,8 +213,6 @@ public class DesignImpl extends GraphImpl implements Design {
 				return getHardwareDatabase();
 			else
 				return getHardwareDatabase().map();
-		case ArchitecturePackage.DESIGN__CONFIGURATION:
-			return getConfiguration();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -275,8 +253,6 @@ public class DesignImpl extends GraphImpl implements Design {
 			return outputs != null && !outputs.isEmpty();
 		case ArchitecturePackage.DESIGN__HARDWARE_DATABASE:
 			return hardwareDatabase != null && !hardwareDatabase.isEmpty();
-		case ArchitecturePackage.DESIGN__CONFIGURATION:
-			return configuration != CONFIGURATION_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -318,9 +294,6 @@ public class DesignImpl extends GraphImpl implements Design {
 			return;
 		case ArchitecturePackage.DESIGN__HARDWARE_DATABASE:
 			((EStructuralFeature.Setting) getHardwareDatabase()).set(newValue);
-			return;
-		case ArchitecturePackage.DESIGN__CONFIGURATION:
-			setConfiguration((DesignConfiguration) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -386,9 +359,6 @@ public class DesignImpl extends GraphImpl implements Design {
 		case ArchitecturePackage.DESIGN__HARDWARE_DATABASE:
 			getHardwareDatabase().clear();
 			return;
-		case ArchitecturePackage.DESIGN__CONFIGURATION:
-			setConfiguration(CONFIGURATION_EDEFAULT);
-			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -418,8 +388,7 @@ public class DesignImpl extends GraphImpl implements Design {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EList<Memory> getSharedMemories() {
@@ -428,14 +397,6 @@ public class DesignImpl extends GraphImpl implements Design {
 					this, ArchitecturePackage.DESIGN__SHARED_MEMORIES);
 		}
 		return sharedMemories;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public DesignConfiguration getConfiguration() {
-		return configuration;
 	}
 
 	/**
@@ -492,20 +453,6 @@ public class DesignImpl extends GraphImpl implements Design {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setConfiguration(DesignConfiguration newConfiguration) {
-		DesignConfiguration oldConfiguration = configuration;
-		configuration = newConfiguration == null ? CONFIGURATION_EDEFAULT
-				: newConfiguration;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					ArchitecturePackage.DESIGN__CONFIGURATION,
-					oldConfiguration, configuration));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
@@ -529,8 +476,6 @@ public class DesignImpl extends GraphImpl implements Design {
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (name: ");
 		result.append(name);
-		result.append(", configuration: ");
-		result.append(configuration);
 		result.append(')');
 		return result.toString();
 	}

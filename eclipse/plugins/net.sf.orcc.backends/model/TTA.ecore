@@ -18,11 +18,6 @@
         eType="#//Port"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="hardwareDatabase" upperBound="-1"
         eType="#//TypeToImplMapEntry" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="configuration" eType="#//DesignConfiguration"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EEnum" name="DesignConfiguration">
-    <eLiterals name="DirectMapping"/>
-    <eLiterals name="Hade" value="1"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Link" abstract="true" eSuperTypes="../../net.sf.orcc.models/model/Graph.ecore#//Edge">
     <eStructuralFeatures xsi:type="ecore:EReference" name="sourcePort" eType="#//Port"/>

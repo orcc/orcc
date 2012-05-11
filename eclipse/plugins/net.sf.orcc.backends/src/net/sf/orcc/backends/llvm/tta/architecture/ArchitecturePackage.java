@@ -224,22 +224,13 @@ public interface ArchitecturePackage extends EPackage {
 	int DESIGN__HARDWARE_DATABASE = GraphPackage.GRAPH_FEATURE_COUNT + 7;
 
 	/**
-	 * The feature id for the '<em><b>Configuration</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int DESIGN__CONFIGURATION = GraphPackage.GRAPH_FEATURE_COUNT + 8;
-
-	/**
 	 * The number of structural features of the '<em>Design</em>' class. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int DESIGN_FEATURE_COUNT = GraphPackage.GRAPH_FEATURE_COUNT + 9;
+	int DESIGN_FEATURE_COUNT = GraphPackage.GRAPH_FEATURE_COUNT + 8;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.LinkImpl <em>Link</em>}' class.
@@ -1980,16 +1971,6 @@ public interface ArchitecturePackage extends EPackage {
 	int PORT_TO_INDEX_MAP_ENTRY_FEATURE_COUNT = 2;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.DesignConfiguration <em>Design Configuration</em>}' enum.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.DesignConfiguration
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getDesignConfiguration()
-	 * @generated
-	 */
-	int DESIGN_CONFIGURATION = 32;
-
-	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.ProcessorConfiguration <em>Processor Configuration</em>}' enum.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1997,7 +1978,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getProcessorConfiguration()
 	 * @generated
 	 */
-	int PROCESSOR_CONFIGURATION = 33;
+	int PROCESSOR_CONFIGURATION = 32;
 
 	/**
 	 * The meta object id for the '
@@ -2009,7 +1990,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getSocketType()
 	 * @generated
 	 */
-	int SOCKET_TYPE = 34;
+	int SOCKET_TYPE = 33;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.Extension <em>Extension</em>}' enum.
@@ -2018,7 +1999,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getExtension()
 	 * @generated
 	 */
-	int EXTENSION = 35;
+	int EXTENSION = 34;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.OpUnary <em>Op Unary</em>}' enum.
@@ -2027,7 +2008,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getOpUnary()
 	 * @generated
 	 */
-	int OP_UNARY = 36;
+	int OP_UNARY = 35;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.llvm.tta.architecture.OpBinary <em>Op Binary</em>}' enum.
@@ -2036,7 +2017,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getOpBinary()
 	 * @generated
 	 */
-	int OP_BINARY = 37;
+	int OP_BINARY = 36;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.llvm.tta.architecture.Design <em>Design</em>}'.
@@ -2134,17 +2115,6 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 */
 	EReference getDesign_HardwareDatabase();
-
-	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getConfiguration <em>Configuration</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Configuration</em>'.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.Design#getConfiguration()
-	 * @see #getDesign()
-	 * @generated
-	 */
-	EAttribute getDesign_Configuration();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.llvm.tta.architecture.Link <em>Link</em>}'.
@@ -3227,16 +3197,6 @@ public interface ArchitecturePackage extends EPackage {
 	EAttribute getPortToIndexMapEntry_Value();
 
 	/**
-	 * Returns the meta object for enum '{@link net.sf.orcc.backends.llvm.tta.architecture.DesignConfiguration <em>Design Configuration</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for enum '<em>Design Configuration</em>'.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.DesignConfiguration
-	 * @generated
-	 */
-	EEnum getDesignConfiguration();
-
-	/**
 	 * Returns the meta object for enum '{@link net.sf.orcc.backends.llvm.tta.architecture.ProcessorConfiguration <em>Processor Configuration</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3498,14 +3458,6 @@ public interface ArchitecturePackage extends EPackage {
 		 */
 		EReference DESIGN__HARDWARE_DATABASE = eINSTANCE
 				.getDesign_HardwareDatabase();
-
-		/**
-		 * The meta object literal for the '<em><b>Configuration</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute DESIGN__CONFIGURATION = eINSTANCE.getDesign_Configuration();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.llvm.tta.architecture.impl.LinkImpl <em>Link</em>}' class.
@@ -4474,16 +4426,6 @@ public interface ArchitecturePackage extends EPackage {
 		 */
 		EAttribute PORT_TO_INDEX_MAP_ENTRY__VALUE = eINSTANCE
 				.getPortToIndexMapEntry_Value();
-
-		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.llvm.tta.architecture.DesignConfiguration <em>Design Configuration</em>}' enum.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.backends.llvm.tta.architecture.DesignConfiguration
-		 * @see net.sf.orcc.backends.llvm.tta.architecture.impl.ArchitecturePackageImpl#getDesignConfiguration()
-		 * @generated
-		 */
-		EEnum DESIGN_CONFIGURATION = eINSTANCE.getDesignConfiguration();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.llvm.tta.architecture.ProcessorConfiguration <em>Processor Configuration</em>}' enum.

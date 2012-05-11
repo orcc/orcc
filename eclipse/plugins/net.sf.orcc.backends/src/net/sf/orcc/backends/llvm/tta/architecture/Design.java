@@ -50,7 +50,6 @@ import org.eclipse.emf.common.util.EMap;
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getInputs <em>Inputs</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getOutputs <em>Outputs</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getHardwareDatabase <em>Hardware Database</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getConfiguration <em>Configuration</em>}</li>
  * </ul>
  * </p>
  *
@@ -202,33 +201,4 @@ public interface Design extends Graph {
 	 * @generated
 	 */
 	EMap<String, Implementation> getHardwareDatabase();
-
-	/**
-	 * Returns the value of the '<em><b>Configuration</b></em>' attribute.
-	 * The literals are from the enumeration {@link net.sf.orcc.backends.llvm.tta.architecture.DesignConfiguration}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Configuration</em>' attribute isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Configuration</em>' attribute.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.DesignConfiguration
-	 * @see #setConfiguration(DesignConfiguration)
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getDesign_Configuration()
-	 * @model
-	 * @generated
-	 */
-	DesignConfiguration getConfiguration();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getConfiguration <em>Configuration</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Configuration</em>' attribute.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.DesignConfiguration
-	 * @see #getConfiguration()
-	 * @generated
-	 */
-	void setConfiguration(DesignConfiguration value);
 } // Design

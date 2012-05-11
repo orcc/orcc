@@ -37,14 +37,12 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.llvm.tta.architecture.Component;
 import net.sf.orcc.backends.llvm.tta.architecture.Design;
-import net.sf.orcc.backends.llvm.tta.architecture.DesignConfiguration;
 import net.sf.orcc.backends.llvm.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.llvm.tta.architecture.Memory;
 import net.sf.orcc.backends.llvm.tta.architecture.Port;
 import net.sf.orcc.backends.llvm.tta.architecture.Processor;
 import net.sf.orcc.backends.llvm.tta.architecture.ProcessorConfiguration;
 import net.sf.orcc.backends.llvm.tta.architecture.Signal;
-import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
@@ -116,17 +114,13 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	private Map<Component, Map<Component, Memory>> bufferMap;
 
 	private Map<Vertex, Component> componentMap;
-	@SuppressWarnings("unused")
-	private DesignConfiguration conf;
 
 	private Design design;
 	private ArchitectureFactory factory = ArchitectureFactory.eINSTANCE;
-	@SuppressWarnings("unused")
-	private Mapping mapping;
 
 	private List<String> optimizedActors;
 
-	public ArchitectureBuilder(DesignConfiguration conf) {
+	public ArchitectureBuilder() {
 		design = factory.createDesign();
 		componentMap = new HashMap<Vertex, Component>();
 		bufferMap = new HashMap<Component, Map<Component, Memory>>();
@@ -138,11 +132,6 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		optimizedActors.add("decoder_motion_add");
 		optimizedActors.add("decoder_texture_idct2d");
 		optimizedActors.add("decoder_motion_framebuf");
-	}
-
-	public ArchitectureBuilder(DesignConfiguration conf, Mapping mapping) {
-		this.conf = conf;
-		this.mapping = mapping;
 	}
 
 	/**

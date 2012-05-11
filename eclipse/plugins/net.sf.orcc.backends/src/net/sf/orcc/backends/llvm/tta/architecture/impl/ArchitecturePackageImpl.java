@@ -36,7 +36,6 @@ import net.sf.orcc.backends.llvm.tta.architecture.Bridge;
 import net.sf.orcc.backends.llvm.tta.architecture.Bus;
 import net.sf.orcc.backends.llvm.tta.architecture.Component;
 import net.sf.orcc.backends.llvm.tta.architecture.Design;
-import net.sf.orcc.backends.llvm.tta.architecture.DesignConfiguration;
 import net.sf.orcc.backends.llvm.tta.architecture.Element;
 import net.sf.orcc.backends.llvm.tta.architecture.ExprBinary;
 import net.sf.orcc.backends.llvm.tta.architecture.ExprFalse;
@@ -280,12 +279,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EEnum designConfigurationEEnum = null;
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	private EEnum processorConfigurationEEnum = null;
 
 	/**
@@ -423,8 +416,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getDesign_SharedMemories() {
@@ -467,14 +459,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getDesign_Configuration() {
-		return (EAttribute) designEClass.getEStructuralFeatures().get(8);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EClass getLink() {
 		return linkEClass;
 	}
@@ -504,8 +488,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EAttribute getSignal_Name() {
@@ -609,8 +592,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getProcessor_ROM() {
@@ -618,8 +600,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getProcessor_LocalRAMs() {
@@ -627,8 +608,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getProcessor_SharedRAMs() {
@@ -1331,14 +1311,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EEnum getDesignConfiguration() {
-		return designConfigurationEEnum;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EEnum getProcessorConfiguration() {
 		return processorConfigurationEEnum;
 	}
@@ -1509,7 +1481,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEReference(designEClass, DESIGN__INPUTS);
 		createEReference(designEClass, DESIGN__OUTPUTS);
 		createEReference(designEClass, DESIGN__HARDWARE_DATABASE);
-		createEAttribute(designEClass, DESIGN__CONFIGURATION);
 
 		linkEClass = createEClass(LINK);
 		createEReference(linkEClass, LINK__SOURCE_PORT);
@@ -1668,7 +1639,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				PORT_TO_INDEX_MAP_ENTRY__VALUE);
 
 		// Create enums
-		designConfigurationEEnum = createEEnum(DESIGN_CONFIGURATION);
 		processorConfigurationEEnum = createEEnum(PROCESSOR_CONFIGURATION);
 		socketTypeEEnum = createEEnum(SOCKET_TYPE);
 		extensionEEnum = createEEnum(EXTENSION);
@@ -1766,10 +1736,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				0, -1, Design.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getDesign_Configuration(),
-				this.getDesignConfiguration(), "configuration", null, 0, 1,
-				Design.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
-				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(linkEClass, Link.class, "Link", IS_ABSTRACT, !IS_INTERFACE,
 				IS_GENERATED_INSTANCE_CLASS);
@@ -2285,12 +2251,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Initialize enums and add enum literals
-		initEEnum(designConfigurationEEnum, DesignConfiguration.class,
-				"DesignConfiguration");
-		addEEnumLiteral(designConfigurationEEnum,
-				DesignConfiguration.DIRECT_MAPPING);
-		addEEnumLiteral(designConfigurationEEnum, DesignConfiguration.HADE);
-
 		initEEnum(processorConfigurationEEnum, ProcessorConfiguration.class,
 				"ProcessorConfiguration");
 		addEEnumLiteral(processorConfigurationEEnum,

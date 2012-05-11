@@ -45,7 +45,6 @@ import net.sf.orcc.backends.llvm.aot.LLVMTypePrinter;
 import net.sf.orcc.backends.llvm.transformations.StringTransformation;
 import net.sf.orcc.backends.llvm.transformations.TemplateInfoComputing;
 import net.sf.orcc.backends.llvm.tta.architecture.Design;
-import net.sf.orcc.backends.llvm.tta.architecture.DesignConfiguration;
 import net.sf.orcc.backends.llvm.tta.architecture.Processor;
 import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureBuilder;
 import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitecturePrinter;
@@ -87,7 +86,6 @@ public class TTABackendImpl extends LLVMBackendImpl {
 	private FPGA fpga;
 	private String libPath;
 
-	private DesignConfiguration conf;
 	private Design design;
 
 	String instancePath;
@@ -101,10 +99,6 @@ public class TTABackendImpl extends LLVMBackendImpl {
 				"Stratix III (EP3SL150F1152C2)"));
 		// Set default FIFO size to 256
 		fifoSize = getAttribute(FIFO_SIZE, 256);
-
-		conf = DesignConfiguration.getByName(getAttribute(
-				"net.sf.orcc.backends.tta.configuration", "Standard"));
-
 	}
 
 	/*
@@ -170,7 +164,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		network = doTransformNetwork(network);
 
 		// build the design
-		design = new ArchitectureBuilder(conf).caseNetwork(network);
+		design = new ArchitectureBuilder().caseNetwork(network);
 
 		// print instances and entities
 		String oldPath = path;
