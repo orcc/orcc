@@ -72,6 +72,9 @@ char *output_genetic;
 // deactivate display
 char display_flags = DISPLAY_ENABLE;
 
+// compute number of errors in the program
+int compareErrors = 0;
+
 // Pause function
 void wait_for_key() {
 #ifdef _WIN32

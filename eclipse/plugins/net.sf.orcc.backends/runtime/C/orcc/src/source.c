@@ -32,7 +32,6 @@
 #include <sys/stat.h>
 #include <time.h>
 
-
 #include "orcc_util.h"
 
 // from APR
@@ -106,7 +105,12 @@ unsigned int source_getNbLoop(void)
 
 void source_exit(int exitCode)
 {
-	exit(exitCode);
+	if(exitCode != 0){
+		exit(exitCode);
+	} else {
+		// compareErrors' default value is 0
+		exit(compareErrors);
+	}
 }
 
 int source_sizeOfFile() { 
