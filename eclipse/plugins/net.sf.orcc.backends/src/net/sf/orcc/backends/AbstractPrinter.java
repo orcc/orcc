@@ -34,12 +34,11 @@ import java.io.IOException;
 import java.util.Locale;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.graph.Edge;
-import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.util.ExpressionPrinter;
 import net.sf.orcc.ir.util.TypePrinter;
+import net.sf.orcc.util.Attributable;
 import net.sf.orcc.util.Attribute;
 
 import org.eclipse.emf.common.util.EMap;
@@ -64,23 +63,6 @@ import org.stringtemplate.v4.misc.STNoSuchPropertyException;
  * 
  */
 public abstract class AbstractPrinter {
-
-	protected static class EdgeModelAdaptor extends ObjectModelAdaptor {
-
-		@Override
-		public Object getProperty(Interpreter interp, ST st, Object o,
-				Object property, String propertyName)
-				throws STNoSuchPropertyException {
-			String name = String.valueOf(property);
-			Attribute attribute = ((Edge) o).getAttribute(name);
-			if (attribute == null) {
-				return super.getProperty(interp, st, o, property, propertyName);
-			} else {
-				return attribute.getValue();
-			}
-		}
-
-	}
 
 	protected static class EMapModelAdaptor extends MapModelAdaptor {
 
@@ -120,14 +102,14 @@ public abstract class AbstractPrinter {
 
 	}
 
-	protected static class VertexModelAdaptor extends ObjectModelAdaptor {
+	protected static class AttributableModelAdaptor extends ObjectModelAdaptor {
 
 		@Override
 		public Object getProperty(Interpreter interp, ST st, Object o,
 				Object property, String propertyName)
 				throws STNoSuchPropertyException {
 			String name = String.valueOf(property);
-			Attribute attribute = ((Vertex) o).getAttribute(name);
+			Attribute attribute = ((Attributable) o).getAttribute(name);
 			if (attribute == null) {
 				return super.getProperty(interp, st, o, property, propertyName);
 			} else {
@@ -200,8 +182,8 @@ public abstract class AbstractPrinter {
 		group.registerRenderer(Type.class, new TypeRenderer());
 
 		group.registerModelAdaptor(EMap.class, new EMapModelAdaptor());
-		group.registerModelAdaptor(Vertex.class, new VertexModelAdaptor());
-		group.registerModelAdaptor(Edge.class, new EdgeModelAdaptor());
+		group.registerModelAdaptor(Attributable.class,
+				new AttributableModelAdaptor());
 	}
 
 	protected void printTemplate(ST template, String fileName) {
