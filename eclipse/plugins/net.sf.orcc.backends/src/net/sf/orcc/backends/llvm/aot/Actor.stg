@@ -300,9 +300,11 @@ entry:
 ///////////////////////////////////////////////////////////////////////////////
 
 printExternalFifo(connection, port) ::= <<
-@fifo_<connection.id>_content = external global [<connection.size> x <port.type>]
+<if(!port.native)
+>@fifo_<connection.id>_content = external global [<connection.size> x <port.type>]
 @fifo_<connection.id>_rdIndex = external global i32
-@fifo_<connection.id>_wrIndex = external global i32
+@fifo_<connection.id>_wrIndex = external global i32<
+endif>
 >>
 
 printInput(port, connection) ::= <<

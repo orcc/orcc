@@ -1,9 +1,11 @@
 import "net/sf/orcc/backends/llvm/aot/Actor.stg"
 
 printExternalFifo(connection, port) ::= <<
-@fifo_<connection.id>_content = external addrspace(<port.id>) global [<connection.size> x <if(connection.sourcePort)><connection.sourcePort.type><else><connection.targetPort.type><endif>]
+<if(!port.native)
+>@fifo_<connection.id>_content = external addrspace(<port.id>) global [<connection.size> x <if(connection.sourcePort)><connection.sourcePort.type><else><connection.targetPort.type><endif>]
 @fifo_<connection.id>_rdIndex = external addrspace(<port.id>) global i32
-@fifo_<connection.id>_wrIndex = external addrspace(<port.id>) global i32
+@fifo_<connection.id>_wrIndex = external addrspace(<port.id>) global i32<
+endif>
 >>
 
 printReadTokensFunction(port, connection) ::= <<
