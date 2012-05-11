@@ -179,7 +179,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		printer = new StandardPrinter(
 				"net/sf/orcc/backends/llvm/tta/LLVM_Actor.stg");
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
-		printer.setTypePrinter(new TTATypePrinter());
+		printer.setTypePrinter(new LLVMTypePrinter());
 		printInstances(network);
 		printEntities(network);
 		path = oldPath;
