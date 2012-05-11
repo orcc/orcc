@@ -44,7 +44,6 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Memory#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Memory#getMinAddress <em>Min Address</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Memory#getMaxAddress <em>Max Address</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Memory#getWidth <em>Width</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Memory#getDepth <em>Depth</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Memory#getWordWidth <em>Word Width</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.Memory#getAddrWidth <em>Addr Width</em>}</li>
@@ -134,32 +133,6 @@ public interface Memory extends Link {
 	 * @generated
 	 */
 	void setMaxAddress(int value);
-
-	/**
-	 * Returns the value of the '<em><b>Width</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Width</em>' attribute isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Width</em>' attribute.
-	 * @see #setWidth(int)
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getMemory_Width()
-	 * @model
-	 * @generated
-	 */
-	int getWidth();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Memory#getWidth <em>Width</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Width</em>' attribute.
-	 * @see #getWidth()
-	 * @generated
-	 */
-	void setWidth(int value);
 
 	/**
 	 * Returns the value of the '<em><b>Depth</b></em>' attribute. <!--

@@ -52,7 +52,6 @@ import org.eclipse.emf.ecore.util.EObjectResolvingEList;
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.MemoryImpl#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.MemoryImpl#getMinAddress <em>Min Address</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.MemoryImpl#getMaxAddress <em>Max Address</em>}</li>
- *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.MemoryImpl#getWidth <em>Width</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.MemoryImpl#getDepth <em>Depth</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.MemoryImpl#getWordWidth <em>Word Width</em>}</li>
  *   <li>{@link net.sf.orcc.backends.llvm.tta.architecture.impl.MemoryImpl#getAddrWidth <em>Addr Width</em>}</li>
@@ -107,24 +106,6 @@ public class MemoryImpl extends LinkImpl implements Memory {
 	 * @ordered
 	 */
 	protected int maxAddress = MAX_ADDRESS_EDEFAULT;
-
-	/**
-	 * The default value of the '{@link #getWidth() <em>Width</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getWidth()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final int WIDTH_EDEFAULT = 0;
-
-	/**
-	 * The cached value of the '{@link #getWidth() <em>Width</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getWidth()
-	 * @generated
-	 * @ordered
-	 */
-	protected int width = WIDTH_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #getDepth() <em>Depth</em>}' attribute.
@@ -258,26 +239,6 @@ public class MemoryImpl extends LinkImpl implements Memory {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public int getWidth() {
-		return width;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setWidth(int newWidth) {
-		int oldWidth = width;
-		width = newWidth;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					ArchitecturePackage.MEMORY__WIDTH, oldWidth, width));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	public int getDepth() {
 		return depth;
 	}
@@ -348,8 +309,6 @@ public class MemoryImpl extends LinkImpl implements Memory {
 			return getMinAddress();
 		case ArchitecturePackage.MEMORY__MAX_ADDRESS:
 			return getMaxAddress();
-		case ArchitecturePackage.MEMORY__WIDTH:
-			return getWidth();
 		case ArchitecturePackage.MEMORY__DEPTH:
 			return getDepth();
 		case ArchitecturePackage.MEMORY__WORD_WIDTH:
@@ -378,9 +337,6 @@ public class MemoryImpl extends LinkImpl implements Memory {
 			return;
 		case ArchitecturePackage.MEMORY__MAX_ADDRESS:
 			setMaxAddress((Integer) newValue);
-			return;
-		case ArchitecturePackage.MEMORY__WIDTH:
-			setWidth((Integer) newValue);
 			return;
 		case ArchitecturePackage.MEMORY__DEPTH:
 			setDepth((Integer) newValue);
@@ -413,9 +369,6 @@ public class MemoryImpl extends LinkImpl implements Memory {
 		case ArchitecturePackage.MEMORY__MAX_ADDRESS:
 			setMaxAddress(MAX_ADDRESS_EDEFAULT);
 			return;
-		case ArchitecturePackage.MEMORY__WIDTH:
-			setWidth(WIDTH_EDEFAULT);
-			return;
 		case ArchitecturePackage.MEMORY__DEPTH:
 			setDepth(DEPTH_EDEFAULT);
 			return;
@@ -443,8 +396,6 @@ public class MemoryImpl extends LinkImpl implements Memory {
 			return minAddress != MIN_ADDRESS_EDEFAULT;
 		case ArchitecturePackage.MEMORY__MAX_ADDRESS:
 			return maxAddress != MAX_ADDRESS_EDEFAULT;
-		case ArchitecturePackage.MEMORY__WIDTH:
-			return width != WIDTH_EDEFAULT;
 		case ArchitecturePackage.MEMORY__DEPTH:
 			return depth != DEPTH_EDEFAULT;
 		case ArchitecturePackage.MEMORY__WORD_WIDTH:
@@ -471,8 +422,6 @@ public class MemoryImpl extends LinkImpl implements Memory {
 		result.append(minAddress);
 		result.append(", maxAddress: ");
 		result.append(maxAddress);
-		result.append(", width: ");
-		result.append(width);
 		result.append(", depth: ");
 		result.append(depth);
 		result.append(", wordWidth: ");

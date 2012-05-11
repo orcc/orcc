@@ -722,22 +722,13 @@ public interface ArchitecturePackage extends EPackage {
 	int MEMORY__MAX_ADDRESS = LINK_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>Width</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int MEMORY__WIDTH = LINK_FEATURE_COUNT + 3;
-
-	/**
 	 * The feature id for the '<em><b>Depth</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int MEMORY__DEPTH = LINK_FEATURE_COUNT + 4;
+	int MEMORY__DEPTH = LINK_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Word Width</b></em>' attribute.
@@ -746,7 +737,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int MEMORY__WORD_WIDTH = LINK_FEATURE_COUNT + 5;
+	int MEMORY__WORD_WIDTH = LINK_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>Addr Width</b></em>' attribute.
@@ -755,7 +746,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int MEMORY__ADDR_WIDTH = LINK_FEATURE_COUNT + 6;
+	int MEMORY__ADDR_WIDTH = LINK_FEATURE_COUNT + 5;
 
 	/**
 	 * The feature id for the '<em><b>Mapped Connections</b></em>' reference list.
@@ -764,7 +755,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int MEMORY__MAPPED_CONNECTIONS = LINK_FEATURE_COUNT + 7;
+	int MEMORY__MAPPED_CONNECTIONS = LINK_FEATURE_COUNT + 6;
 
 	/**
 	 * The number of structural features of the '<em>Memory</em>' class.
@@ -773,7 +764,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int MEMORY_FEATURE_COUNT = LINK_FEATURE_COUNT + 8;
+	int MEMORY_FEATURE_COUNT = LINK_FEATURE_COUNT + 7;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -2391,17 +2382,6 @@ public interface ArchitecturePackage extends EPackage {
 	EAttribute getMemory_MaxAddress();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.llvm.tta.architecture.Memory#getWidth <em>Width</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Width</em>'.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.Memory#getWidth()
-	 * @see #getMemory()
-	 * @generated
-	 */
-	EAttribute getMemory_Width();
-
-	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.llvm.tta.architecture.Memory#getDepth <em>Depth</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3679,14 +3659,6 @@ public interface ArchitecturePackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute MEMORY__MAX_ADDRESS = eINSTANCE.getMemory_MaxAddress();
-
-		/**
-		 * The meta object literal for the '<em><b>Width</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute MEMORY__WIDTH = eINSTANCE.getMemory_Width();
 
 		/**
 		 * The meta object literal for the '<em><b>Depth</b></em>' attribute feature.

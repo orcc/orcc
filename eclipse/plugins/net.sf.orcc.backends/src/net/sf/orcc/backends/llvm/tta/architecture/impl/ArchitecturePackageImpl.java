@@ -667,7 +667,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getMemory_Width() {
+	public EAttribute getMemory_Depth() {
 		return (EAttribute) memoryEClass.getEStructuralFeatures().get(3);
 	}
 
@@ -675,7 +675,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getMemory_Depth() {
+	public EAttribute getMemory_WordWidth() {
 		return (EAttribute) memoryEClass.getEStructuralFeatures().get(4);
 	}
 
@@ -683,7 +683,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getMemory_WordWidth() {
+	public EAttribute getMemory_AddrWidth() {
 		return (EAttribute) memoryEClass.getEStructuralFeatures().get(5);
 	}
 
@@ -691,16 +691,8 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getMemory_AddrWidth() {
-		return (EAttribute) memoryEClass.getEStructuralFeatures().get(6);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EReference getMemory_MappedConnections() {
-		return (EReference) memoryEClass.getEStructuralFeatures().get(7);
+		return (EReference) memoryEClass.getEStructuralFeatures().get(6);
 	}
 
 	/**
@@ -1501,7 +1493,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEAttribute(memoryEClass, MEMORY__NAME);
 		createEAttribute(memoryEClass, MEMORY__MIN_ADDRESS);
 		createEAttribute(memoryEClass, MEMORY__MAX_ADDRESS);
-		createEAttribute(memoryEClass, MEMORY__WIDTH);
 		createEAttribute(memoryEClass, MEMORY__DEPTH);
 		createEAttribute(memoryEClass, MEMORY__WORD_WIDTH);
 		createEAttribute(memoryEClass, MEMORY__ADDR_WIDTH);
@@ -1791,10 +1782,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				"maxAddress", null, 0, 1, Memory.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMemory_Width(), ecorePackage.getEInt(), "width",
-				null, 0, 1, Memory.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
 		initEAttribute(getMemory_Depth(), theEcorePackage.getEInt(), "depth",
 				null, 0, 1, Memory.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,

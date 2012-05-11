@@ -153,7 +153,7 @@ connectSocket(socket) ::= <<
 
 printAddressSpace(addressSpace, id) ::= <<
 \<address-space name="<addressSpace.name>"\>
-	\<width\><addressSpace.width>\</width\>
+	\<width\><addressSpace.wordWidth>\</width\>
 	\<min-address\><addressSpace.minAddress>\</min-address\>
 	\<max-address\><addressSpace.maxAddress>\</max-address\>
 	<if(id)>\<numerical-id\><id>\</numerical-id\><endif>
