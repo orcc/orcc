@@ -48,7 +48,6 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.llvm.aot.LLVMExpressionPrinter;
 import net.sf.orcc.backends.llvm.aot.LLVMTypePrinter;
-import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
 import net.sf.orcc.backends.llvm.transformations.ListInitializer;
 import net.sf.orcc.backends.llvm.transformations.StringTransformation;
 import net.sf.orcc.backends.llvm.transformations.TemplateInfoComputing;
@@ -166,7 +165,7 @@ public class JadeBackendImpl extends AbstractBackend {
 		DfSwitch<?>[] transformations = {
 				new DfVisitor<Void>(new DeadCodeElimination()),
 				new DfVisitor<Void>(new DeadVariableRemoval()),
-				new BoolToIntTransformation(), new StringTransformation(),
+				new StringTransformation(),
 				new RenameTransformation(this.transformations),
 				new DfVisitor<Expression>(new TacTransformation()),
 				new DfVisitor<Void>(new CopyPropagator()),

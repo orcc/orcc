@@ -42,7 +42,6 @@ import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.llvm.aot.LLVMBackendImpl;
 import net.sf.orcc.backends.llvm.aot.LLVMExpressionPrinter;
 import net.sf.orcc.backends.llvm.aot.LLVMTypePrinter;
-import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
 import net.sf.orcc.backends.llvm.transformations.StringTransformation;
 import net.sf.orcc.backends.llvm.transformations.TemplateInfoComputing;
 import net.sf.orcc.backends.llvm.tta.architecture.Design;
@@ -140,7 +139,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 				new NetworkFlattener(), new BroadcastAdder(),
 				new TypeResizer(true, true, false), new UnitImporter(),
 				new DfVisitor<Void>(new SSATransformation()),
-				new BoolToIntTransformation(), new StringTransformation(),
+				new StringTransformation(),
 				new RenameTransformation(this.transformations),
 				new DfVisitor<Expression>(new TacTransformation()),
 				new DfVisitor<Void>(new CopyPropagator()),
