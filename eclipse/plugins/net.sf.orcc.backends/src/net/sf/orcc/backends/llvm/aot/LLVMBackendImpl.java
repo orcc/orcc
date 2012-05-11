@@ -36,10 +36,9 @@ import java.util.Map;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
-import net.sf.orcc.backends.llvm.transformations.TemplateInfoComputing;
-import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
 import net.sf.orcc.backends.llvm.transformations.ListInitializer;
 import net.sf.orcc.backends.llvm.transformations.StringTransformation;
+import net.sf.orcc.backends.llvm.transformations.TemplateInfoComputing;
 import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.backends.transformations.EmptyBlockRemover;
 import net.sf.orcc.backends.transformations.InstPhiTransformation;
@@ -127,7 +126,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 				new DeadGlobalElimination(),
 				new DfVisitor<Void>(new DeadCodeElimination()),
 				new DfVisitor<Void>(new DeadVariableRemoval()),
-				new BoolToIntTransformation(), new StringTransformation(),
+				new StringTransformation(),
 				new RenameTransformation(this.transformations),
 				new DfVisitor<Expression>(new TacTransformation()),
 				new DfVisitor<Void>(new CopyPropagator()),
