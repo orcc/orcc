@@ -6,16 +6,15 @@
  */
 package net.sf.orcc.backends.ir.util;
 
+import net.sf.orcc.backends.ir.BlockFor;
 import net.sf.orcc.backends.ir.InstAssignIndex;
 import net.sf.orcc.backends.ir.InstCast;
-import net.sf.orcc.backends.ir.InstGetElementPtr;
 import net.sf.orcc.backends.ir.InstTernary;
 import net.sf.orcc.backends.ir.IrSpecificPackage;
-import net.sf.orcc.backends.ir.BlockFor;
-import net.sf.orcc.ir.InstSpecific;
-import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockSpecific;
+import net.sf.orcc.ir.InstSpecific;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.util.Attributable;
 
 import org.eclipse.emf.ecore.EObject;
@@ -101,19 +100,6 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 				result = defaultCase(theEObject);
 			return result;
 		}
-		case IrSpecificPackage.INST_GET_ELEMENT_PTR: {
-			InstGetElementPtr instGetElementPtr = (InstGetElementPtr) theEObject;
-			T result = caseInstGetElementPtr(instGetElementPtr);
-			if (result == null)
-				result = caseInstSpecific(instGetElementPtr);
-			if (result == null)
-				result = caseInstruction(instGetElementPtr);
-			if (result == null)
-				result = caseAttributable(instGetElementPtr);
-			if (result == null)
-				result = defaultCase(theEObject);
-			return result;
-		}
 		case IrSpecificPackage.INST_TERNARY: {
 			InstTernary instTernary = (InstTernary) theEObject;
 			T result = caseInstTernary(instTernary);
@@ -170,20 +156,6 @@ public class IrSpecificSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseInstCast(InstCast object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Inst Get Element Ptr</em>'.
-	 * <!-- begin-user-doc --> This
-	 * implementation returns null; returning a non-null result will terminate
-	 * the switch. <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Inst Get Element Ptr</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseInstGetElementPtr(InstGetElementPtr object) {
 		return null;
 	}
 

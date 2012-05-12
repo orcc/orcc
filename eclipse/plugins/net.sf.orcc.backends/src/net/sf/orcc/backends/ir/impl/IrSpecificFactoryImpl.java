@@ -8,13 +8,12 @@ package net.sf.orcc.backends.ir.impl;
 
 import java.util.List;
 
+import net.sf.orcc.backends.ir.BlockFor;
 import net.sf.orcc.backends.ir.InstAssignIndex;
 import net.sf.orcc.backends.ir.InstCast;
-import net.sf.orcc.backends.ir.InstGetElementPtr;
 import net.sf.orcc.backends.ir.InstTernary;
 import net.sf.orcc.backends.ir.IrSpecificFactory;
 import net.sf.orcc.backends.ir.IrSpecificPackage;
-import net.sf.orcc.backends.ir.BlockFor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
@@ -27,17 +26,16 @@ import org.eclipse.emf.ecore.impl.EFactoryImpl;
 import org.eclipse.emf.ecore.plugin.EcorePlugin;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model <b>Factory</b>.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model <b>Factory</b>. <!--
+ * end-user-doc -->
  * @generated
  */
 public class IrSpecificFactoryImpl extends EFactoryImpl implements
 		IrSpecificFactory {
 	/**
 	 * Creates the default factory implementation.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @generated
 	 */
 	public static IrSpecificFactory init() {
@@ -55,8 +53,8 @@ public class IrSpecificFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * Creates an instance of the factory.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @generated
 	 */
 	public IrSpecificFactoryImpl() {
@@ -64,8 +62,7 @@ public class IrSpecificFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -75,8 +72,6 @@ public class IrSpecificFactoryImpl extends EFactoryImpl implements
 			return createInstAssignIndex();
 		case IrSpecificPackage.INST_CAST:
 			return createInstCast();
-		case IrSpecificPackage.INST_GET_ELEMENT_PTR:
-			return createInstGetElementPtr();
 		case IrSpecificPackage.INST_TERNARY:
 			return createInstTernary();
 		case IrSpecificPackage.BLOCK_FOR:
@@ -88,8 +83,7 @@ public class IrSpecificFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public InstAssignIndex createInstAssignIndex() {
@@ -108,8 +102,7 @@ public class IrSpecificFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public InstCast createInstCast() {
@@ -126,28 +119,7 @@ public class IrSpecificFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public InstGetElementPtr createInstGetElementPtr() {
-		InstGetElementPtrImpl instGetElementPtr = new InstGetElementPtrImpl();
-		return instGetElementPtr;
-	}
-
-	@Override
-	public InstGetElementPtr createInstGetElementPtr(Var source, Var target,
-			List<Expression> indexes) {
-		InstGetElementPtrImpl instGetElementPtr = new InstGetElementPtrImpl();
-		instGetElementPtr.setSource(IrFactory.eINSTANCE.createUse(source));
-		instGetElementPtr.setTarget(IrFactory.eINSTANCE.createDef(target));
-		instGetElementPtr.getIndexes().addAll(indexes);
-		return instGetElementPtr;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public InstTernary createInstTernary() {
@@ -156,8 +128,7 @@ public class IrSpecificFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public BlockFor createBlockFor() {
@@ -177,8 +148,7 @@ public class IrSpecificFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public IrSpecificPackage getIrSpecificPackage() {
@@ -186,8 +156,7 @@ public class IrSpecificFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @deprecated
 	 * @generated
 	 */
@@ -196,4 +165,4 @@ public class IrSpecificFactoryImpl extends EFactoryImpl implements
 		return IrSpecificPackage.eINSTANCE;
 	}
 
-} //IrSpecificFactoryImpl
+} // IrSpecificFactoryImpl

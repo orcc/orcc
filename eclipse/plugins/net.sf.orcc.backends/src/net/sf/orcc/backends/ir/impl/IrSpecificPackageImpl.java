@@ -6,13 +6,12 @@
  */
 package net.sf.orcc.backends.ir.impl;
 
+import net.sf.orcc.backends.ir.BlockFor;
 import net.sf.orcc.backends.ir.InstAssignIndex;
 import net.sf.orcc.backends.ir.InstCast;
-import net.sf.orcc.backends.ir.InstGetElementPtr;
 import net.sf.orcc.backends.ir.InstTernary;
 import net.sf.orcc.backends.ir.IrSpecificFactory;
 import net.sf.orcc.backends.ir.IrSpecificPackage;
-import net.sf.orcc.backends.ir.BlockFor;
 import net.sf.orcc.ir.IrPackage;
 
 import org.eclipse.emf.ecore.EAttribute;
@@ -43,13 +42,6 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	private EClass instCastEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass instGetElementPtrEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -204,45 +196,6 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getInstGetElementPtr() {
-		return instGetElementPtrEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getInstGetElementPtr_Indexes() {
-		return (EReference) instGetElementPtrEClass.getEStructuralFeatures()
-				.get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getInstGetElementPtr_Target() {
-		return (EReference) instGetElementPtrEClass.getEStructuralFeatures()
-				.get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getInstGetElementPtr_Source() {
-		return (EReference) instGetElementPtrEClass.getEStructuralFeatures()
-				.get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EClass getInstTernary() {
 		return instTernaryEClass;
 	}
@@ -384,11 +337,6 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 		createEReference(instCastEClass, INST_CAST__TARGET);
 		createEReference(instCastEClass, INST_CAST__SOURCE);
 
-		instGetElementPtrEClass = createEClass(INST_GET_ELEMENT_PTR);
-		createEReference(instGetElementPtrEClass, INST_GET_ELEMENT_PTR__INDEXES);
-		createEReference(instGetElementPtrEClass, INST_GET_ELEMENT_PTR__TARGET);
-		createEReference(instGetElementPtrEClass, INST_GET_ELEMENT_PTR__SOURCE);
-
 		instTernaryEClass = createEClass(INST_TERNARY);
 		createEReference(instTernaryEClass, INST_TERNARY__CONDITION_VALUE);
 		createEReference(instTernaryEClass, INST_TERNARY__TRUE_VALUE);
@@ -442,8 +390,6 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 		instAssignIndexEClass.getESuperTypes().add(
 				theIrPackage.getInstSpecific());
 		instCastEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
-		instGetElementPtrEClass.getESuperTypes().add(
-				theIrPackage.getInstSpecific());
 		instTernaryEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
 		blockForEClass.getESuperTypes().add(theIrPackage.getBlockSpecific());
 
@@ -477,25 +423,6 @@ public class IrSpecificPackageImpl extends EPackageImpl implements
 				"source", null, 0, 1, InstCast.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-		initEClass(instGetElementPtrEClass, InstGetElementPtr.class,
-				"InstGetElementPtr", !IS_ABSTRACT, !IS_INTERFACE,
-				IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getInstGetElementPtr_Indexes(),
-				theIrPackage.getExpression(), null, "indexes", null, 0, -1,
-				InstGetElementPtr.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getInstGetElementPtr_Target(), theIrPackage.getDef(),
-				null, "target", null, 0, 1, InstGetElementPtr.class,
-				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE,
-				!IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
-		initEReference(getInstGetElementPtr_Source(), theIrPackage.getUse(),
-				null, "source", null, 0, 1, InstGetElementPtr.class,
-				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE,
-				!IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
 
 		initEClass(instTernaryEClass, InstTernary.class, "InstTernary",
 				!IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);

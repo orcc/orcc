@@ -200,79 +200,6 @@ public interface IrSpecificPackage extends EPackage {
 	int INST_CAST_FEATURE_COUNT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 2;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.ir.impl.InstGetElementPtrImpl <em>Inst Get Element Ptr</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.backends.ir.impl.InstGetElementPtrImpl
-	 * @see net.sf.orcc.backends.ir.impl.IrSpecificPackageImpl#getInstGetElementPtr()
-	 * @generated
-	 */
-	int INST_GET_ELEMENT_PTR = 2;
-
-	/**
-	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_GET_ELEMENT_PTR__ATTRIBUTES = IrPackage.INST_SPECIFIC__ATTRIBUTES;
-
-	/**
-	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_GET_ELEMENT_PTR__LINE_NUMBER = IrPackage.INST_SPECIFIC__LINE_NUMBER;
-
-	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_GET_ELEMENT_PTR__PREDICATE = IrPackage.INST_SPECIFIC__PREDICATE;
-
-	/**
-	 * The feature id for the '<em><b>Indexes</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_GET_ELEMENT_PTR__INDEXES = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 0;
-
-	/**
-	 * The feature id for the '<em><b>Target</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_GET_ELEMENT_PTR__TARGET = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 1;
-
-	/**
-	 * The feature id for the '<em><b>Source</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_GET_ELEMENT_PTR__SOURCE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 2;
-
-	/**
-	 * The number of structural features of the '<em>Inst Get Element Ptr</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_GET_ELEMENT_PTR_FEATURE_COUNT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 3;
-
-	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.ir.impl.InstTernaryImpl <em>Inst Ternary</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -280,7 +207,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @see net.sf.orcc.backends.ir.impl.IrSpecificPackageImpl#getInstTernary()
 	 * @generated
 	 */
-	int INST_TERNARY = 3;
+	int INST_TERNARY = 2;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -362,7 +289,7 @@ public interface IrSpecificPackage extends EPackage {
 	 * @see net.sf.orcc.backends.ir.impl.IrSpecificPackageImpl#getBlockFor()
 	 * @generated
 	 */
-	int BLOCK_FOR = 4;
+	int BLOCK_FOR = 3;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -519,49 +446,6 @@ public interface IrSpecificPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getInstCast_Source();
-
-	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.backends.ir.InstGetElementPtr <em>Inst Get Element Ptr</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Inst Get Element Ptr</em>'.
-	 * @see net.sf.orcc.backends.ir.InstGetElementPtr
-	 * @generated
-	 */
-	EClass getInstGetElementPtr();
-
-	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.ir.InstGetElementPtr#getIndexes <em>Indexes</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Indexes</em>'.
-	 * @see net.sf.orcc.backends.ir.InstGetElementPtr#getIndexes()
-	 * @see #getInstGetElementPtr()
-	 * @generated
-	 */
-	EReference getInstGetElementPtr_Indexes();
-
-	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.ir.InstGetElementPtr#getTarget <em>Target</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Target</em>'.
-	 * @see net.sf.orcc.backends.ir.InstGetElementPtr#getTarget()
-	 * @see #getInstGetElementPtr()
-	 * @generated
-	 */
-	EReference getInstGetElementPtr_Target();
-
-	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.ir.InstGetElementPtr#getSource <em>Source</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Source</em>'.
-	 * @see net.sf.orcc.backends.ir.InstGetElementPtr#getSource()
-	 * @see #getInstGetElementPtr()
-	 * @generated
-	 */
-	EReference getInstGetElementPtr_Source();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.ir.InstTernary <em>Inst Ternary</em>}'.
@@ -777,43 +661,6 @@ public interface IrSpecificPackage extends EPackage {
 		 * @generated
 		 */
 		EReference INST_CAST__SOURCE = eINSTANCE.getInstCast_Source();
-
-		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.ir.impl.InstGetElementPtrImpl <em>Inst Get Element Ptr</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.backends.ir.impl.InstGetElementPtrImpl
-		 * @see net.sf.orcc.backends.ir.impl.IrSpecificPackageImpl#getInstGetElementPtr()
-		 * @generated
-		 */
-		EClass INST_GET_ELEMENT_PTR = eINSTANCE.getInstGetElementPtr();
-
-		/**
-		 * The meta object literal for the '<em><b>Indexes</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference INST_GET_ELEMENT_PTR__INDEXES = eINSTANCE
-				.getInstGetElementPtr_Indexes();
-
-		/**
-		 * The meta object literal for the '<em><b>Target</b></em>' containment reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference INST_GET_ELEMENT_PTR__TARGET = eINSTANCE
-				.getInstGetElementPtr_Target();
-
-		/**
-		 * The meta object literal for the '<em><b>Source</b></em>' containment reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference INST_GET_ELEMENT_PTR__SOURCE = eINSTANCE
-				.getInstGetElementPtr_Source();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.ir.impl.InstTernaryImpl <em>Inst Ternary</em>}' class.
