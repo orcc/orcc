@@ -358,26 +358,35 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	 *            the connection to map on a buffer
 	 */
 	private void mapToBuffer(Connection connection) {
-		// TODO: when both actors are mapped to the same processor
 		Processor source = (Processor) componentMap.get(connection.getSource());
 		Processor target = (Processor) componentMap.get(connection.getTarget());
 
-		Map<Component, Memory> tgtToBufferMap;
-		if (bufferMap.containsKey(source)) {
-			tgtToBufferMap = bufferMap.get(source);
-		} else {
-			tgtToBufferMap = new HashMap<Component, Memory>();
-			bufferMap.put(source, tgtToBufferMap);
-		}
+		Memory ram;
 
-		Memory buffer;
-		if (tgtToBufferMap.containsKey(target)) {
-			buffer = tgtToBufferMap.get(target);
+		if (source == target) {
+			// Both actors are mapped to the same processor, then the FIFO is
+			// mapped to its local RAM.
+			ram = source.getLocalRAMs().get(0);
 		} else {
-			buffer = factory.createMemory(bufferId++, source, target);
-			design.add(buffer);
-			tgtToBufferMap.put(target, buffer);
+			// Both actors are mapped to different processors, then the FIFO is
+			// mapped in their shared memory (it is created if necessary).
+			Map<Component, Memory> tgtToBufferMap;
+			if (bufferMap.containsKey(source)) {
+				tgtToBufferMap = bufferMap.get(source);
+			} else {
+				tgtToBufferMap = new HashMap<Component, Memory>();
+				bufferMap.put(source, tgtToBufferMap);
+			}
+
+			if (tgtToBufferMap.containsKey(target)) {
+				ram = tgtToBufferMap.get(target);
+			} else {
+				ram = factory.createMemory(bufferId++, source, target);
+				design.add(ram);
+				tgtToBufferMap.put(target, ram);
+			}
+
 		}
-		buffer.getMappedConnections().add(connection);
+		ram.getMappedConnections().add(connection);
 	}
 }
