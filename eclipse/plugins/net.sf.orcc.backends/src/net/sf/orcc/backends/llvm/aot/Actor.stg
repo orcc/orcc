@@ -603,7 +603,7 @@ bb_finished:
 >>
 
 schedulerWithoutFSM(actions) ::= <<
-define void @<instance.name>_scheduler() noreturn nounwind {
+define void @<instance.name>_scheduler() nounwind {
 entry:
 	<printCallStartTokenFunctions()>
 	br label %bb_scheduler_start
@@ -781,7 +781,7 @@ printEntity(entity, options) ::= <<
 ; Output ports
 <entity.outputs: { port |<printOutput(port, first(entity.outgoingPortMap.(port)))>}; separator="\n\n">
 
-define void @<entity.name>_scheduler() noreturn nounwind {
+define void @<entity.name>_scheduler() alwaysinline nounwind {
 entry:
 	br label %bb_fifo_init
 	
