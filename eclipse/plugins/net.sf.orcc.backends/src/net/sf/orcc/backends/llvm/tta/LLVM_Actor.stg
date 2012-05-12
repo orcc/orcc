@@ -108,21 +108,24 @@ printNativeRead(port, var) ::= <<
 >>
 
 printNativeWrite(port, var) ::= <<
-%tmp_<var.name>_elt = getelementptr [1 x <port.type>]* %top_frame, i32 0, i1 0 
-%tmp_<var.name> = load <port.type>* %top_frame_elt
-tail call void asm sideeffect "SIG_OUT_<port.name>.LEDS", "ir,ir"(<port.type> %tmp_<var.name>) nounwind
+%tmp_<var.name>_elt = getelementptr <var.type>* <Var(var)>, i32 0, i1 0 
+%tmp_<var.name> = load <var.type.innermostType>* %tmp_<var.name>_elt
+tail call void asm sideeffect "SIG_OUT_<port.name>.LEDS", "ir"(<var.type.innermostType> %tmp_<var.name>) nounwind
 >>
 
 checkOutputPorts(action, port, restPorts, portToIndexMap, state, lastPort=false) ::= <<
-%size_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = load i32* @SIZE_<port.name>
+<if(!port.native)
+>%size_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = load i32* @SIZE_<port.name>
 %index_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = load i32* @index_<port.name>
 %rdIndex_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = load volatile i32 addrspace(<port.id>)* @fifo_<first(instance.outgoingPortMap.(port)).id>_rdIndex
 %tmp_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = sub i32 %size_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)>, %index_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)>
-%status_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = add i32 %tmp_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)>, %rdIndex_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)>
+%status_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = add i32 %tmp_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)>, %rdIndex_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)><
+endif>
+
 <if(!lastPort)>
-%has_valid_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = icmp uge i32 %status_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)>, <pattern.numTokensMap.(port)>
+%has_valid_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = icmp uge i32 <if(!port.native)>%status_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)><else><pattern.numTokensMap.(port)><endif>, <pattern.numTokensMap.(port)>
 <else>
-%available_output_<if(state)><state.name>_<endif><action.name>_<port.name> = icmp sge i32 %status_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)>, <pattern.numTokensMap.(port)>
+%available_output_<if(state)><state.name>_<endif><action.name>_<port.name> = icmp sge i32 <if(!port.native)>%status_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)><else><pattern.numTokensMap.(port)><endif>, <pattern.numTokensMap.(port)>
 %has_valid_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = and i1 %has_valid_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(lastPort)>, %available_output_<if(state)><state.name>_<endif><action.name>_<port.name><
 endif><
 if(restPorts)>
@@ -138,6 +141,7 @@ printActionBody(procedure) ::= <<
 define internal void @<procedure.name>() nounwind {
 entry:
 	<procedure.locals: variableDeclaration()>
+	<action.outputPattern.ports: { port | <if(port.native)><variableDeclaration(action.outputPattern.portToVarMap.(port))><endif>}; separator="\n">
 	<action.inputPattern.ports: { port | <if(!port.native)><fifoVar(port, action.inputPattern.portToVarMap.(port))><endif>}; separator="\n">
 	<action.outputPattern.ports: { port | <if(!port.native)><fifoVar(port, action.outputPattern.portToVarMap.(port))><endif>}; separator="\n">
 	<action.inputPattern.ports: { port | <if(port.native)><printNativeRead(port, action.inputPattern.portToVarMap.(port))><endif>}; separator="\n">
