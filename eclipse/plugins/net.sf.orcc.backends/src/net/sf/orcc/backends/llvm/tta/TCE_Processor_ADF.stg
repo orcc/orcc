@@ -14,9 +14,9 @@ printProcessor(processor, options) ::= <<
 	
 	<processor.localRAMs: { ram |<printAddressSpace(ram, i0)>}; separator="\n\n">
 	
-	<processor.incoming: { ram |<printAddressSpace(ram, ram.targetPort.id)>}; separator="\n\n">
+	<processor.incoming: { edge |<if(!edge.signal)><printAddressSpace(edge, edge.targetPort.id)><endif>}; separator="\n\n">
 	
-	<processor.outgoing: { ram |<printAddressSpace(ram, ram.sourcePort.id)>}; separator="\n\n">
+	<processor.outgoing: { edge |<if(!edge.signal)><printAddressSpace(edge, edge.sourcePort.id)><endif>}; separator="\n\n">
 	
 	<if(processor.gcu)><printGlobalControlUnit(processor.gcu)><endif>
 \</adf\>

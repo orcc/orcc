@@ -912,7 +912,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		in1t.connect(i1);
 		functionUnit.getPorts().add(in1t);
 		// Operation
-		Operation write = createOperation("LEDS");
+		Operation write = createOperation("leds");
 		write.setControl(false);
 		write.getPipeline().add(createReads(in1t, 0, 1));
 		functionUnit.getOperations().add(write);
