@@ -348,7 +348,7 @@ public interface ArchitectureFactory extends EFactory {
 	 */
 	Memory createMemory();
 
-	Memory createMemory(int id, Processor source, Processor target);
+	Memory createMemory(int id, int width, Processor source, Processor target);
 
 	/**
 	 * Return a new multiplier unit with the given parameters

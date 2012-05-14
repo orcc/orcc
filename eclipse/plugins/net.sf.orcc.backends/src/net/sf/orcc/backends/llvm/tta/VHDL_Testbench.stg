@@ -51,7 +51,7 @@ architecture arch_tb_<processor.name> of tb_<processor.name> is
 
 begin
 
-  <processor.name>_inst : entity work.processor_<processor.name>
+  <processor.name>_inst : entity work.<processor.name>
     generic map(device_family =\> "<options.fpga.family>")
     port map (
       clk =\> clk,

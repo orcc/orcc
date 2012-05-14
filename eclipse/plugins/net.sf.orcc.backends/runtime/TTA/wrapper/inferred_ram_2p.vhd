@@ -71,7 +71,9 @@ entity inferredRAM_2p is
     address_p2 : in  std_logic_vector(addr_width-1 downto 0);
     byteen_p2  : in  std_logic_vector(bytes-1 downto 0);
     data_p2    : in  std_logic_vector(bytes*byte_width-1 downto 0);
-    queue_p2   : out std_logic_vector(bytes*byte_width-1 downto 0));
+    queue_p2   : out std_logic_vector(bytes*byte_width-1 downto 0);
+    --
+    rst_n      : in  std_logic);
 end inferredRAM_2p;
 
 -------------------------------------------------------------------------------
@@ -84,14 +86,14 @@ architecture arch_inferredRAM_2p of inferredRAM_2p is
   -----------------------------------------------------------------------------
   
   type word_type is array (0 to bytes -1) of std_logic_vector(byte_width-1 downto 0);
-  type ram_type is array (0 to depth -1) of word_type;
+  type ram_type is array (0 to 2 ** addr_width -1) of word_type;
 
   -----------------------------------------------------------------------------
   -- Internal signal declarations
   -----------------------------------------------------------------------------
-  shared variable ram   : ram_type := (others => (others => std_logic_vector(to_signed(initVal, byte_width))));
-  signal iaddress_p1    : integer range depth - 1 downto 0;
-  signal iaddress_p2    : integer range depth - 1 downto 0;
+  signal ram            : ram_type := (others => (others => std_logic_vector(to_signed(initVal, byte_width))));
+  signal iaddress_p1    : integer range 0 to 2 ** addr_width -1;
+  signal iaddress_p2    : integer range 0 to 2 ** addr_width -1;
   signal queue_p1_local : word_type;
   signal queue_p2_local : word_type;
   -----------------------------------------------------------------------------
@@ -137,16 +139,16 @@ begin
       if (wren_p2 = '1') then
         -- edit this code if using other than four bytes per word
         if(byteen_p2(0) = '1') then
-          ram(iaddress_p2)(0) <= data_p2;
+          ram(iaddress_p2)(0) := data_p2;
         end if;
         if(byteen_p2(1) = '1') then
-          ram(iaddress_p2)(1) <= data_p2;
+          ram(iaddress_p2)(1) := data_p2;
         end if;
         if(byteen_p2(2) = '1') then
-          ram(iaddress_p2)(2) <= data_p2;
+          ram(iaddress_p2)(2) := data_p2;
         end if;
         if(byteen_p2(3) = '1') then
-          ram(iaddress_p2)(3) <= data_p2;
+          ram(iaddress_p2)(3) := data_p2;
         end if;
       end if;
       queue_p2_local <= ram(iaddress_p2);

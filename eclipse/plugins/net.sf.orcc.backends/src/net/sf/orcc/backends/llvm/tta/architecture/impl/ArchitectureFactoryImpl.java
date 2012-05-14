@@ -426,7 +426,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		hwDb.put("LSU", createImplementation("stratixII.hdb", 2));
 		hwDb.put("MUL", createImplementation("asic_130nm_1.5V.hdb", 88));
 		hwDb.put("LU", createImplementation("asic_130nm_1.5V.hdb", 22));
-		hwDb.put("SIG_OUT", createImplementation("stratixIII.hdb",2));
+		hwDb.put("SIG_OUT", createImplementation("stratixIII.hdb", 2));
 		return design;
 	}
 
@@ -742,7 +742,8 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public Memory createMemory(int id, Processor source, Processor target) {
+	public Memory createMemory(int id, int width, Processor source,
+			Processor target) {
 		Memory sharedMemory = new MemoryImpl();
 		sharedMemory.setName("smem_" + id);
 		FunctionUnit sourceLSU = source.connect(sharedMemory);

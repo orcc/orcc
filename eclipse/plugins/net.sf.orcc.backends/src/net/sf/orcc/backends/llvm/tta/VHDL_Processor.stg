@@ -72,30 +72,35 @@ architecture bdf_type of <processor.name> is
   -- Signals declaration
   ---------------------------------------------------------------------------
   signal dram_addr          : std_logic_vector(fu_LSU_0_addrw-2-1 downto 0);
-  signal imem_addr          : std_logic_vector(IMEMADDRWIDTH-1 downto 0);
   signal wren_wire          : std_logic;
-  signal bytemask_wire      : std_logic_vector(fu_LSU_0_dataw/8-1 downto 0);
+  signal wren_x_wire        : std_logic;
   signal dram_data_in_wire  : std_logic_vector(fu_LSU_0_dataw-1 downto 0);
   signal dram_data_out_wire : std_logic_vector(fu_LSU_0_dataw-1 downto 0);
-  signal wren_x_wire        : std_logic;
-  signal idata_wire         : std_logic_vector(INSTRUCTIONWIDTH-1 downto 0);
+  signal bytemask_wire      : std_logic_vector(fu_LSU_0_dataw/8-1 downto 0);
 <if(options.fpga.xilinx)>
   signal bytemask_i         : std_logic_vector(fu_LSU_0_dataw/8-1 downto 0);
   signal bytemask_i2        : std_logic_vector(fu_LSU_0_dataw/8-1 downto 0);
 <endif>
-
+  --
+  signal imem_addr          : std_logic_vector(IMEMADDRWIDTH-1 downto 0);
+  signal idata_wire         : std_logic_vector(INSTRUCTIONWIDTH-1 downto 0);
+  --
+  <processor.incoming: { edge |<declarePortSignal(edge, edge.targetPort)>}; separator="\n">
+  <processor.outgoing: { edge |<declarePortSignal(edge, edge.sourcePort)>}; separator="\n">
   ---------------------------------------------------------------------------
 
 begin
 
   wren_wire \<= not(wren_x_wire);
+  <processor.incoming: { edge |<mapPortSignal(edge, edge.targetPort)>}; separator="\n">
+  <processor.outgoing: { edge |<mapPortSignal(edge, edge.sourcePort)>}; separator="\n">
 
 <if(options.fpga.altera)>
 
   inst_dram_<processor.name> : entity work.dram
     generic map(size          =\> DATADEPTH,
                 width         =\> fu_LSU_0_dataw,
-                widthu		  =\> fu_LSU_0_addrw,
+                widthu		  =\> fu_LSU_0_addrw-2,
                 init_file     =\> "dram_<processor.name>.mif",
                 device_family =\> device_family)
     port map(clock   =\> clk,
@@ -112,7 +117,7 @@ begin
                 init_file     =\> "irom_<processor.name>.mif",
                 device_family =\> device_family)
     port map(clock   =\> clk,
-             address =\> imem_addr,
+             address =\> imem_addr(INSTRUCTIONADDRWIDTH-1 downto 0),
              q       =\> idata_wire);
 <else>
   bytemask_i2 \<= wren_wire & wren_wire & wren_wire & wren_wire;
@@ -155,7 +160,7 @@ end bdf_type;
 
 declarePort(edge, port) ::= <<
 <if(edge.signal)
->fu_<port.name> : out std_logic_vector(fu_<port.name>_led_count-1 downto 0);<
+>fu_<port.name> : out std_logic_vector(<edge.size>-1 downto 0);<
 else
 >fu_<port.name>_dmem_data_in  : in std_logic_vector(fu_<port.name>_dataw-1 downto 0);
 fu_<port.name>_dmem_data_out : out std_logic_vector(fu_<port.name>_dataw-1 downto 0);
@@ -165,14 +170,31 @@ fu_<port.name>_dmem_bytemask : out std_logic_vector(fu_<port.name>_dataw/8-1 dow
 endif>
 >>
 
+declarePortSignal(edge, port) ::= <<
+<if(edge.signal)
+>signal fu_<port.name>_i : std_logic_vector(7 downto 0);<
+else
+>signal fu_<port.name>_dmem_wr_en_x : std_logic;<
+endif>
+>>
+
 mapPort(edge, port) ::= <<
 <if(edge.signal)
->fu_<port.name>_STRATIXIII_LED =\> fu_<port.name>,<
+>fu_<port.name>_STRATIXIII_LED =\> fu_<port.name>_i,<
 else
 >fu_<port.name>_dmem_data_in    =\> fu_<port.name>_dmem_data_in,
 fu_<port.name>_dmem_data_out   =\> fu_<port.name>_dmem_data_out,
 fu_<port.name>_dmem_addr       =\> fu_<port.name>_dmem_addr,
-fu_<port.name>_dmem_wr_en_x(0) =\> not(fu_<port.name>_dmem_wr_en),
+fu_<port.name>_dmem_wr_en_x(0) =\> fu_<port.name>_dmem_wr_en_x,
 fu_<port.name>_dmem_bytemask   =\> fu_<port.name>_dmem_bytemask,<
 endif>
 >>
+
+mapPortSignal(edge, port) ::= <<
+<if(edge.signal)
+>fu_<port.name> \<= fu_<port.name>_i(<edge.size>-1 downto 0);<
+else
+>fu_<port.name>_dmem_wr_en \<= not(fu_<port.name>_dmem_wr_en_x);<
+endif>
+>>
+

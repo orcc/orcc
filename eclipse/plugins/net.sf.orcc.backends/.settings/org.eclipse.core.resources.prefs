@@ -4,5 +4,6 @@ encoding//model/TTA.ecorediag=UTF-8
 encoding//runtime/TTA/generate=utf-8
 encoding//runtime/TTA/orcc_/__init__.py=utf-8
 encoding//runtime/TTA/orcc_/design.py=utf-8
+encoding//runtime/TTA/orcc_/memory.py=utf-8
 encoding//runtime/TTA/orcc_/port.py=utf-8
 encoding//runtime/TTA/orcc_/processor.py=utf-8

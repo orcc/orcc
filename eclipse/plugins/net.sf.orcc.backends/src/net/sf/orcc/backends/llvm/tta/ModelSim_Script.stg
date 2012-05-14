@@ -59,8 +59,9 @@ exec compxlib -s mti_se -l vhdl -arch virtex6 -lib unisim -lib xilinxcorelib &
 compileProcessor(processor, callByNetwork=true) ::= <<
 # Compile processor <processor.name>
 vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/vhdl/imem_mau_pkg.vhdl
-vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/vhdl/globals_pkg.vhdl
+vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/vhdl/<processor.name>_tl_globals_pkg.vhdl
 vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/vhdl/<processor.name>_tl_params_pkg.vhdl
+vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/vhdl/<processor.name>_mem_constants_pkg.vhd
 vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/vhdl/<processor.name>_tl.vhdl
 vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/vhdl/<processor.name>.vhd
 vcom -93 -quiet -work work <if(callByNetwork)><processor.name>/<endif>tta/gcu_ic/gcu_opcodes_pkg.vhdl
@@ -87,18 +88,12 @@ exec cp -f <if(!callByNetwork)>../<endif>wrapper/irom_<processor.name>.mif . &
 compileOtherComponents(callByNetwork=true) ::= <<
 # Compile other components
 <if(options.fpga.altera)>
-vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/altera_fifo.vhd
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/altera_ram.vhd
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/altera_rom.vhd
-<else>
-vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/xilinx_fifo.vhd
-vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/fifo_br.vhd
 <endif>
 
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>simulation/sim_package.vhd
-vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/broadcast.vhd
-vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/broadcast_2.vhd
-vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/broadcast_6.vhd
+vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/inferredRAM_2p.vhd
 >>
 
 compileInterfaceComponents(callByNetwork=true) ::= <<
@@ -113,8 +108,6 @@ compileSharedComponent(callByNetwork=true) ::= <<
 # Compile Shared components
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>share/vhdl/util_pkg.vhdl
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>share/vhdl/tce_util_pkg.vhdl
-vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>share/vhdl/cal_stream_in_8fifos.vhdl
-vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>share/vhdl/cal_stream_out_8fifos.vhdl
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>share/vhdl/rf_1wr_1rd_always_1_guarded_0.vhd
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>share/vhdl/mul.vhdl
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>share/vhdl/ldh_ldhu_ldq_ldqu_ldw_sth_stq_stw.vhdl

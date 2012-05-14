@@ -381,7 +381,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 			if (tgtToBufferMap.containsKey(target)) {
 				ram = tgtToBufferMap.get(target);
 			} else {
-				ram = factory.createMemory(bufferId++, source, target);
+				ram = factory.createMemory(bufferId++, 8, source, target);
 				design.add(ram);
 				tgtToBufferMap.put(target, ram);
 			}

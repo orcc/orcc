@@ -246,7 +246,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 				"net/sf/orcc/backends/llvm/tta/VHDL_Processor.stg");
 		vhdlPrinter.getOptions().put("fpga", fpga);
 		
-		vhdlPrinter.print(tta.getName() + ".vhdl", processorPath, tta);
+		vhdlPrinter.print(tta.getName() + ".vhd", processorPath, tta);
 
 		// Print high-level description
 		ArchitecturePrinter adfPrinter = new ArchitecturePrinter(

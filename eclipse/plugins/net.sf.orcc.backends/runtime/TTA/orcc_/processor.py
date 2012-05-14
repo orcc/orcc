@@ -124,7 +124,7 @@ class Processor:
             print "RAM: " + str(self.dram.depth) + "x" + str(self.dram.width) + "bits"
             
         self.generateMemConstants(libPath, os.path.join(vhdlPath, self._memConstantsPkg))
-        shutil.copy(os.path.join(cgPath, self._processorFile), vhdlPath)
+        shutil.copy(self._processorFile, vhdlPath)
         
         if not targetAltera: 
             cgPath = os.path.join(instanceSrcPath, "ipcore_dir_gen")

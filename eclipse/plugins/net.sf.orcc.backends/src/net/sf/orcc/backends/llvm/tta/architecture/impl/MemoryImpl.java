@@ -34,7 +34,6 @@ import java.util.Collection;
 
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.llvm.tta.architecture.Memory;
-import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.df.Connection;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -280,7 +279,7 @@ public class MemoryImpl extends LinkImpl implements Memory {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 */
 	public int getAddrWidth() {
-		return BackendUtil.closestPow_2(Math.log(getDepth()) / Math.log(2));
+		return (int) Math.ceil((Math.log(getDepth()) / Math.log(2)));
 	}
 
 	/**

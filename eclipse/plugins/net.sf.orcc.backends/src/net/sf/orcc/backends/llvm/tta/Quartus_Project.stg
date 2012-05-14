@@ -18,8 +18,6 @@ set_global_assignment -name VHDL_FILE top.vhd
 # Shared components
 set_global_assignment -name VHDL_FILE share/vhdl/util_pkg.vhdl
 set_global_assignment -name VHDL_FILE share/vhdl/tce_util_pkg.vhdl
-set_global_assignment -name VHDL_FILE share/vhdl/cal_stream_in_8fifos.vhdl
-set_global_assignment -name VHDL_FILE share/vhdl/cal_stream_out_8fifos.vhdl
 set_global_assignment -name VHDL_FILE share/vhdl/rf_1wr_1rd_always_1_guarded_0.vhd
 set_global_assignment -name VHDL_FILE share/vhdl/mul.vhdl
 set_global_assignment -name VHDL_FILE share/vhdl/ldh_ldhu_ldq_ldqu_ldw_sth_stq_stw.vhdl
@@ -28,11 +26,9 @@ set_global_assignment -name VHDL_FILE share/vhdl/add_and_eq_gt_gtu_ior_shl_shr_s
 
 # Other components
 set_global_assignment -name VHDL_FILE wrapper/altera_fifo.vhd
-set_global_assignment -name VHDL_FILE wrapper/altera_ram.vhd
+set_global_assignment -name VHDL_FILE wrapper/altera_ram_1p.vhd
+set_global_assignment -name VHDL_FILE wrapper/altera_ram_2p.vhd
 set_global_assignment -name VHDL_FILE wrapper/altera_rom.vhd
-set_global_assignment -name VHDL_FILE wrapper/broadcast.vhd
-set_global_assignment -name VHDL_FILE wrapper/broadcast_2.vhd
-set_global_assignment -name VHDL_FILE wrapper/broadcast_6.vhd
 set_global_assignment -name VHDL_FILE interface/counter.vhd
 set_global_assignment -name VHDL_FILE interface/fps_eval.vhd
 set_global_assignment -name VHDL_FILE interface/segment_display_conv.vhd
