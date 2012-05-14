@@ -56,6 +56,7 @@ class Processor:
         self.actors = actors
         # Useful filenames
         self._processorFile = self.id + ".vhd"
+        self._memConstantsPkg = self.id + "_mem_constants_pkg.vhd"
         self._tbFile = self.id + "_tb.vhd"
         self._tclFile = self.id + ".tcl"
         self._adfFile = self.id + ".adf"
@@ -102,25 +103,18 @@ class Processor:
         sharePath = os.path.join(srcPath, "share")
         os.chdir(instanceSrcPath)
         
-        # Clean old generation
-        shutil.rmtree(ttaPath, ignore_errors=True)
-
-        # Copy libraries in working directory
-        shutil.copy(os.path.join(libPath, "stream", "stream_units.hdb"), instanceSrcPath)
-        shutil.rmtree("vhdl", ignore_errors=True)
-        shutil.copytree(os.path.join(libPath, "stream", "vhdl"), "vhdl")
-        shutil.copy(os.path.join(libPath, "stream", "opset", "stream_units.opb"), instanceSrcPath)
-        shutil.copy(os.path.join(libPath, "stream", "opset", "stream_units.opp"), instanceSrcPath)
         # Remove existing build directory
         shutil.rmtree(ttaPath, ignore_errors=True)
+        
         # Generate the TTA processor
         retcode = subprocess.call(["createbem", "-o", self._bemFile, self._adfFile])    
-        if retcode == 0: retcode = subprocess.call(["generateprocessor"] + args + ["-o", ttaPath, "-b", self._bemFile, "--shared-files-dir", sharePath,
+        if retcode == 0: 
+            retcode = subprocess.call(["generateprocessor"] + args + ["-o", ttaPath, "-b", self._bemFile, "--shared-files-dir", sharePath,
                                         "-l", "vhdl", "-e", self._entity, "-i", self._idfFile, self._adfFile])
         if retcode == 0: 
-            retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", vhdlPath, "-f", "mif", "-o", "mif", self._adfFile])
-            if not targetAltera:
-                retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", vhdlPath, "-f", "coe", "-o", "coe", self._adfFile])                
+            retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-f", "mif", "-o", "mif", self._adfFile])
+        if retcode == 0 and not targetAltera: 
+            retcode = subprocess.call(["generatebits", "-e", self._entity, "-b", self._bemFile, "-d", "-w", "4", "-p", self._tpefFile, "-x", vhdlPath, "-f", "coe", "-o", "coe", self._adfFile])                
 
         # Generate processor files
         self.irom = self._readMif(self.id + ".mif")
@@ -129,7 +123,9 @@ class Processor:
             print "ROM: " + str(self.irom.depth) + "x" + str(self.irom.width) + "bits"
             print "RAM: " + str(self.dram.depth) + "x" + str(self.dram.width) + "bits"
             
-        self.generateProcessor(libPath, os.path.join(vhdlPath, self._processorFile), targetAltera)
+        self.generateMemConstants(libPath, os.path.join(vhdlPath, self._memConstantsPkg))
+        shutil.copy(os.path.join(cgPath, self._processorFile), vhdlPath)
+        
         if not targetAltera: 
             cgPath = os.path.join(instanceSrcPath, "ipcore_dir_gen")
             shutil.rmtree(cgPath, ignore_errors=True)
@@ -160,11 +156,8 @@ class Processor:
         os.chmod(os.path.join(instanceSrcPath, self._tclFile), stat.S_IRWXU)        
 
         # Clean working directory
-        os.remove("stream_units.hdb")
         os.remove(self._bemFile)
         shutil.rmtree("vhdl", ignore_errors=True)
-        os.remove("stream_units.opp")
-        os.remove("stream_units.opb")
         
         return retcode
 
@@ -239,9 +232,9 @@ class Processor:
                 return True;
         return False        
 
-    def generateProcessor(self, libPath, targetFile, targetAltera):
-        template = tempita.Template.from_filename(os.path.join(libPath, "templates", "processor.template"), namespace={}, encoding=None)
-        result = template.substitute(id=self.id, targetAltera=targetAltera, inputs=self.inputs, outputs=self.outputs,
+    def generateMemConstants(self, libPath, targetFile):
+        template = tempita.Template.from_filename(os.path.join(libPath, "templates", "mem_constants.template"), namespace={}, encoding=None)
+        result = template.substitute(id=self.id,
             irom_width=self.irom.getWidth(), irom_addr=self.irom.getAddr(), irom_depth=self.irom.getDepth(),
             dram_width=self.dram.getWidth(), dram_addr=self.dram.getAddr(), dram_depth=self.dram.getDepth())
         open(targetFile, "w").write(result)

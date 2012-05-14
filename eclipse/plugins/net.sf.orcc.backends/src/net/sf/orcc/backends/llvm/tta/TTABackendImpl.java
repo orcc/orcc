@@ -192,7 +192,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 
 		// VHDL Network of TTA processors
 		ArchitecturePrinter vhdlPrinter = new ArchitecturePrinter(
-				"net/sf/orcc/backends/llvm/tta/VHDL_Network.stg");
+				"net/sf/orcc/backends/llvm/tta/VHDL_Design.stg");
 		vhdlPrinter.setExpressionPrinter(new LLVMExpressionPrinter());
 		vhdlPrinter.getOptions().put("fpga", fpga);
 		vhdlPrinter.print("top.vhd", path, design);
@@ -200,7 +200,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		// Python package
 		String pythonPath = OrccUtil.createFolder(path, "informations_");
 		ArchitecturePrinter pythonPrinter = new ArchitecturePrinter(
-				"net/sf/orcc/backends/llvm/tta/Python_Network.stg");
+				"net/sf/orcc/backends/llvm/tta/Python_Design.stg");
 		pythonPrinter.getOptions().put("fpga", fpga);
 		pythonPrinter.print("informations.py", pythonPath, design);
 		OrccUtil.createFile(pythonPath, "__init__.py");
@@ -240,6 +240,13 @@ public class TTABackendImpl extends LLVMBackendImpl {
 
 	private void printProcessor(Processor tta) {
 		String processorPath = OrccUtil.createFolder(path, tta.getName());
+
+		// Print VHDL description
+		ArchitecturePrinter vhdlPrinter = new ArchitecturePrinter(
+				"net/sf/orcc/backends/llvm/tta/VHDL_Processor.stg");
+		vhdlPrinter.getOptions().put("fpga", fpga);
+		
+		vhdlPrinter.print(tta.getName() + ".vhdl", processorPath, tta);
 
 		// Print high-level description
 		ArchitecturePrinter adfPrinter = new ArchitecturePrinter(

@@ -1,0 +1,27 @@
+-------------------------------------------------------------------------------
+-- Title      : {{id}}
+-- Project    : 
+-------------------------------------------------------------------------------
+-- File       : {{id}}_mem_constants.vhd
+-- Author     : Orcc - TTA
+-- Company    : 
+-- Created    : 
+-- Standard   : VHDL'93
+-------------------------------------------------------------------------------
+-- Copyright (c)  
+-------------------------------------------------------------------------------
+-- Revisions  :
+-- Date        Version  Author  Description
+-- 
+-------------------------------------------------------------------------------
+
+package {{id}}_mem_constants is
+  -- depth of the instruction memory 
+  constant INSTRUCTIONDEPTH : positive := {{irom_depth}};
+  -- address width of the instruction memory
+  constant INSTRUCTIONADDRWIDTH : positive := {{irom_addr}};
+  -- depth of the instruction memory 
+  constant DATADEPTH : positive := {{dram_depth}};
+end {{id}}_mem_constants;
+
+------------------------------------------------------------------------------

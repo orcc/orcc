@@ -122,25 +122,25 @@ assignNetworkPort(port, link) ::= <<
 
 assignInputPort(port, link) ::= <<
 <if(link.signal)
-><port.name> =\> s_<link.name>,<
+>fu_<port.name>_signal =\> s_<link.name>,<
 else
->fu_<port.name>_dmem_data_in    => <link.name>_data_p2,
-fu_<port.name>_dmem_data_out   => <link.name>_queue_p2,
-fu_<port.name>_dmem_addr       => <link.name>_address_p2,
-fu_<port.name>_dmem_wr_en_x(0) => <link.name>_wren_p2,
-fu_<port.name>_dmem_bytemask   => <link.name>_byteen_p2,<
+>fu_<port.name>_dmem_data_in    =\> <link.name>_data_p2,
+fu_<port.name>_dmem_data_out   =\> <link.name>_queue_p2,
+fu_<port.name>_dmem_addr       =\> <link.name>_address_p2,
+fu_<port.name>_dmem_wr_en      =\> <link.name>_wren_p2,
+fu_<port.name>_dmem_bytemask   =\> <link.name>_byteen_p2,<
 endif>
 >>
 
 assignOutputPort(port, link) ::= <<
 <if(link.signal)
-><port.name> =\> s_<link.name>,<
+>fu_<port.name>_signal =\> s_<link.name>,<
 else
->fu_<port.name>_dmem_data_in    => <link.name>_data_p1,
-fu_<port.name>_dmem_data_out   => <link.name>_queue_p1,
-fu_<port.name>_dmem_addr       => <link.name>_address_p1,
-fu_<port.name>_dmem_wr_en_x(0) => <link.name>_wren_p1,
-fu_<port.name>_dmem_bytemask   => <link.name>_byteen_p1,<
+>fu_<port.name>_dmem_data_in    =\> <link.name>_data_p1,
+fu_<port.name>_dmem_data_out   =\> <link.name>_queue_p1,
+fu_<port.name>_dmem_addr       =\> <link.name>_address_p1,
+fu_<port.name>_dmem_wr_en      =\> <link.name>_wren_p1,
+fu_<port.name>_dmem_bytemask   =\> <link.name>_byteen_p1,<
 endif>
 >>
 
@@ -152,8 +152,8 @@ assignComponent(component) ::= <<
 <component.name>_inst : entity work.<component.name>
   <if(component.attributes)>generic map(<component.attributes: assignGeneric(); separator=",\n">)<endif>
   port map(clk =\> clk,
-           <component.inputs: { input |<assignInputPort(input, component.incomingPortMap.(input))>}; separator="\n">
-           <component.outputs: { output |<assignOutputPort(output, component.outgoingPortMap.(output))>}; separator="\n">
+           <component.inputs: { input |<input.name> =\> s_<component.incomingPortMap.(input).name>,}; separator="\n">
+           <component.outputs: { output |<output.name> =\> s_<component.outgoingPortMap.(output).name>,}; separator="\n">
            rst_n =\> rst_n);
 >>
 
