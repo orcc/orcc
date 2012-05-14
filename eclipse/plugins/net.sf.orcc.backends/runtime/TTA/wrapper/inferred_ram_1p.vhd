@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@live.fr)
 -- Company    : INSA - Rennes
 -- Created    : 
--- Last update: 2011-09-13
+-- Last update: 2012-05-15
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -53,9 +53,9 @@ use work.synflow_package.all;
 
 entity inferredRAM_1p is
   generic (
-    depth : integer := 32;
-    width : integer := 16;
-    initVal: integer := 0);
+    depth   : integer := 32;
+    width   : integer := 16;
+    initVal : integer := 0);
   port (
     clk        : in  std_logic;
     --
@@ -82,7 +82,7 @@ architecture arch_inferredRAM_1p of inferredRAM_1p is
   -- Internal signal declarations
   -----------------------------------------------------------------------------
   shared variable ram : ram_type := (others => std_logic_vector(to_signed(initVal, width)));
-  signal iaddress_p1 : integer range DEPTH - 1 downto 0;
+  signal iaddress_p1  : integer range DEPTH - 1 downto 0;
   --
   -----------------------------------------------------------------------------
   

@@ -1,12 +1,12 @@
 -------------------------------------------------------------------------------
--- Title      : True Dual Port RAM
--- Project    : ORCC
+-- Title      : True Dual Port RAM (Inferred)
+-- Project    : Orcc - TTA
 -------------------------------------------------------------------------------
--- File       : inferredRAM_2p.vhd
+-- File       : inferred_ram_2p.vhd
 -- Author     : Nicolas Siret (nicolas.siret@live.fr)
 -- Company    : INSA - Rennes
 -- Created    : 
--- Last update: 2012-05-08
+-- Last update: 2012-05-15
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ library work;
 -------------------------------------------------------------------------------
 
 
-entity inferredRAM_2p is
+entity dram_2p is
   generic (
     depth      : integer;
     addr_width : integer;
@@ -74,12 +74,12 @@ entity inferredRAM_2p is
     queue_p2   : out std_logic_vector(bytes*byte_width-1 downto 0);
     --
     rst_n      : in  std_logic);
-end inferredRAM_2p;
+end dram_2p;
 
 -------------------------------------------------------------------------------
 
 
-architecture arch_inferredRAM_2p of inferredRAM_2p is
+architecture inferred_dram_2p of dram_2p is
 
   -----------------------------------------------------------------------------
   -- Internal type declarations
@@ -102,11 +102,11 @@ begin
 
   iaddress_p1 <= to_integer(unsigned(address_p1));
   iaddress_p2 <= to_integer(unsigned(address_p2));
-  
+
   -- Reorganize the read data from the RAM to match the output
-  unpack: for i in 0 to bytes - 1 generate
+  unpack : for i in 0 to bytes - 1 generate
     queue_p1(byte_width*(i+1) - 1 downto byte_width*i) <= queue_p1_local(i);
-    queue_p2(byte_width*(i+1) - 1 downto byte_width*i) <= queue_p2_local(i);    
+    queue_p2(byte_width*(i+1) - 1 downto byte_width*i) <= queue_p2_local(i);
   end generate unpack;
 
   -- Read and write data process for p1
@@ -135,7 +135,7 @@ begin
   -- Read and write data process for p2
   rdwrData_p2 : process (clk)
   begin
-   if rising_edge(clk) then
+    if rising_edge(clk) then
       if (wren_p2 = '1') then
         -- edit this code if using other than four bytes per word
         if(byteen_p2(0) = '1') then
@@ -156,4 +156,4 @@ begin
   end process rdwrData_p2;
 
 
-end arch_inferredRAM_2p;
+end inferred_dram_2p;

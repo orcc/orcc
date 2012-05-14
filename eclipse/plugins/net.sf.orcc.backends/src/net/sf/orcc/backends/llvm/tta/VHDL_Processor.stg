@@ -97,28 +97,32 @@ begin
 
 <if(options.fpga.altera)>
 
-  inst_dram_<processor.name> : entity work.dram
-    generic map(size          =\> DATADEPTH,
-                width         =\> fu_LSU_0_dataw,
-                widthu		  =\> fu_LSU_0_addrw-2,
+  inst_dram_<processor.name> : entity work.dram_1p
+    generic map(depth         =\> DATADEPTH,
+                byte_width    =\> fu_LSU_0_dataw/4,
+                addr_width	  =\> fu_LSU_0_addrw-2,
+                bytes         =\> 4,
                 init_file     =\> "dram_<processor.name>.mif",
                 device_family =\> device_family)
-    port map(clock   =\> clk,
+    port map(clk     =\> clk,
              wren    =\> wren_wire,
              address =\> dram_addr,
-             byteena =\> bytemask_wire,
+             byteen  =\> bytemask_wire,
              data    =\> dram_data_in_wire,
-             q       =\> dram_data_out_wire);
+             queue   =\> dram_data_out_wire,
+             rst_n   =\> rst_n);
 
   inst_irom_<processor.name> : entity work.irom
-    generic map(size          =\> INSTRUCTIONDEPTH,
-                width         =\> INSTRUCTIONWIDTH,
-                widthu		  =\> INSTRUCTIONADDRWIDTH,
+    generic map(depth         =\> INSTRUCTIONDEPTH,
+                byte_width    =\> IMEMMAUWIDTH,
+                addr_width	  =\> INSTRUCTIONADDRWIDTH,
+                bytes         =\> IMEMWIDTHINMAUS,
                 init_file     =\> "irom_<processor.name>.mif",
                 device_family =\> device_family)
-    port map(clock   =\> clk,
+    port map(clk     =\> clk,
              address =\> imem_addr(INSTRUCTIONADDRWIDTH-1 downto 0),
-             q       =\> idata_wire);
+             queue   =\> idata_wire,
+             rst_n   =\> rst_n);
 <else>
   bytemask_i2 \<= wren_wire & wren_wire & wren_wire & wren_wire;
   bytemask_i  \<= bytemask_i2 and bytemask_wire;

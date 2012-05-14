@@ -88,12 +88,12 @@ exec cp -f <if(!callByNetwork)>../<endif>wrapper/irom_<processor.name>.mif . &
 compileOtherComponents(callByNetwork=true) ::= <<
 # Compile other components
 <if(options.fpga.altera)>
-vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/altera_ram.vhd
+vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/altera_ram_1p.vhd
+vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/altera_ram_2p.vhd
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/altera_rom.vhd
 <endif>
 
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>simulation/sim_package.vhd
-vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>wrapper/inferredRAM_2p.vhd
 >>
 
 compileInterfaceComponents(callByNetwork=true) ::= <<
