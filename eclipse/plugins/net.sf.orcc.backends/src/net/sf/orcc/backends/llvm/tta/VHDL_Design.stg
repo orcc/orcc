@@ -99,12 +99,12 @@ signal s_<signal.label> : std_logic_vector(<signal.size>-1 downto 0);
 
 declareBufferSignals(buffer) ::= <<
 signal <buffer.name>_wren_p1    : std_logic;
-signal <buffer.name>_address_p1 : std_logic_vector(<buffer.addrWidth>-1 downto 0);
+signal <buffer.name>_address_p1 : std_logic_vector(<buffer.addrWidth>-2-1 downto 0);
 signal <buffer.name>_byteen_p1  : std_logic_vector(3 downto 0);
 signal <buffer.name>_data_p1    : std_logic_vector(31 downto 0);
 signal <buffer.name>_queue_p1   : std_logic_vector(31 downto 0);
 signal <buffer.name>_wren_p2    : std_logic;
-signal <buffer.name>_address_p2 : std_logic_vector(<buffer.addrWidth>-1 downto 0);
+signal <buffer.name>_address_p2 : std_logic_vector(<buffer.addrWidth>-2-1 downto 0);
 signal <buffer.name>_byteen_p2  : std_logic_vector(3 downto 0);
 signal <buffer.name>_data_p2    : std_logic_vector(31 downto 0);
 signal <buffer.name>_queue_p2   : std_logic_vector(31 downto 0);
@@ -159,9 +159,10 @@ assignComponent(component) ::= <<
 assignBuffer(buffer) ::= <<
 <buffer.name> : entity work.dram_2p
   generic map(depth      =\> <buffer.depth>,
-              byte_width =\> 8,
-              addr_width =\> <buffer.addrWidth>,
-              bytes      =\> 4)
+              byte_width =\> <buffer.wordWidth>,
+              addr_width =\> <buffer.addrWidth>-2,
+              bytes      =\> 4,
+              device_family =\> "<options.fpga.family>")
   port map(clk        =\> clk,
            wren_p1    =\> <buffer.name>_wren_p1,
            address_p1 =\> <buffer.name>_address_p1,

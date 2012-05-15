@@ -98,15 +98,6 @@ public class MemoryImpl extends LinkImpl implements Memory {
 	protected static final int MAX_ADDRESS_EDEFAULT = 0;
 
 	/**
-	 * The cached value of the '{@link #getMaxAddress() <em>Max Address</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getMaxAddress()
-	 * @generated
-	 * @ordered
-	 */
-	protected int maxAddress = MAX_ADDRESS_EDEFAULT;
-
-	/**
 	 * The default value of the '{@link #getDepth() <em>Depth</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getDepth()
@@ -215,23 +206,9 @@ public class MemoryImpl extends LinkImpl implements Memory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
 	 */
 	public int getMaxAddress() {
-		return maxAddress;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setMaxAddress(int newMaxAddress) {
-		int oldMaxAddress = maxAddress;
-		maxAddress = newMaxAddress;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					ArchitecturePackage.MEMORY__MAX_ADDRESS, oldMaxAddress,
-					maxAddress));
+		return getMinAddress() + getDepth() - 1;
 	}
 
 	/**
@@ -334,9 +311,6 @@ public class MemoryImpl extends LinkImpl implements Memory {
 		case ArchitecturePackage.MEMORY__MIN_ADDRESS:
 			setMinAddress((Integer) newValue);
 			return;
-		case ArchitecturePackage.MEMORY__MAX_ADDRESS:
-			setMaxAddress((Integer) newValue);
-			return;
 		case ArchitecturePackage.MEMORY__DEPTH:
 			setDepth((Integer) newValue);
 			return;
@@ -365,9 +339,6 @@ public class MemoryImpl extends LinkImpl implements Memory {
 		case ArchitecturePackage.MEMORY__MIN_ADDRESS:
 			setMinAddress(MIN_ADDRESS_EDEFAULT);
 			return;
-		case ArchitecturePackage.MEMORY__MAX_ADDRESS:
-			setMaxAddress(MAX_ADDRESS_EDEFAULT);
-			return;
 		case ArchitecturePackage.MEMORY__DEPTH:
 			setDepth(DEPTH_EDEFAULT);
 			return;
@@ -394,7 +365,7 @@ public class MemoryImpl extends LinkImpl implements Memory {
 		case ArchitecturePackage.MEMORY__MIN_ADDRESS:
 			return minAddress != MIN_ADDRESS_EDEFAULT;
 		case ArchitecturePackage.MEMORY__MAX_ADDRESS:
-			return maxAddress != MAX_ADDRESS_EDEFAULT;
+			return getMaxAddress() != MAX_ADDRESS_EDEFAULT;
 		case ArchitecturePackage.MEMORY__DEPTH:
 			return depth != DEPTH_EDEFAULT;
 		case ArchitecturePackage.MEMORY__WORD_WIDTH:
@@ -419,8 +390,6 @@ public class MemoryImpl extends LinkImpl implements Memory {
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (minAddress: ");
 		result.append(minAddress);
-		result.append(", maxAddress: ");
-		result.append(maxAddress);
 		result.append(", depth: ");
 		result.append(depth);
 		result.append(", wordWidth: ");

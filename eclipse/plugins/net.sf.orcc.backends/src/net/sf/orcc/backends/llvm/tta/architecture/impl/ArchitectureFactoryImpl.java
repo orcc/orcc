@@ -66,6 +66,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Term;
 import net.sf.orcc.backends.llvm.tta.architecture.TermBool;
 import net.sf.orcc.backends.llvm.tta.architecture.TermUnit;
 import net.sf.orcc.backends.llvm.tta.architecture.Writes;
+import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.util.EcoreHelper;
 
@@ -82,14 +83,12 @@ import org.eclipse.emf.ecore.plugin.EcorePlugin;
 /**
  * <!-- begin-user-doc --> An implementation of the model <b>Factory</b>. <!--
  * end-user-doc -->
- * 
  * @generated
  */
 public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		ArchitectureFactory {
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @deprecated
 	 * @generated
 	 */
@@ -99,9 +98,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * Creates the default factory implementation. <!-- begin-user-doc --> <!--
+	 * Creates the default factory implementation.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public static ArchitectureFactory init() {
@@ -118,9 +117,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * Creates an instance of the factory. <!-- begin-user-doc --> <!--
+	 * Creates an instance of the factory.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public ArchitectureFactoryImpl() {
@@ -129,7 +128,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public String convertExtensionToString(EDataType eDataType,
@@ -139,7 +137,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public String convertOpBinaryToString(EDataType eDataType,
@@ -149,7 +146,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public String convertOpUnaryToString(EDataType eDataType,
@@ -159,7 +155,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public String convertProcessorConfigurationToString(EDataType eDataType,
@@ -169,7 +164,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public String convertSocketTypeToString(EDataType eDataType,
@@ -179,7 +173,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -204,7 +197,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -364,7 +356,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Bridge createBridge() {
@@ -374,7 +365,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Bus createBus() {
@@ -400,7 +390,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Component createComponent() {
@@ -432,7 +421,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public ExprBinary createExprBinary() {
@@ -451,7 +439,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public ExprFalse createExprFalse() {
@@ -461,7 +448,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public ExprTrue createExprTrue() {
@@ -471,7 +457,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public ExprUnary createExprUnary() {
@@ -493,7 +478,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Extension createExtensionFromString(EDataType eDataType,
@@ -508,7 +492,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -533,7 +516,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public FunctionUnit createFunctionUnit() {
@@ -590,7 +572,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public FuPort createFuPort() {
@@ -617,7 +598,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public GlobalControlUnit createGlobalControlUnit() {
@@ -676,7 +656,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Implementation createImplementation() {
@@ -723,22 +702,11 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Memory createMemory() {
 		MemoryImpl memory = new MemoryImpl();
 		return memory;
-	}
-
-	public Memory createMemory(String name, int width, int minAddress,
-			int maxAddress) {
-		Memory addressSpace = new MemoryImpl();
-		addressSpace.setName(name);
-		addressSpace.setWordWidth(width);
-		addressSpace.setMinAddress(minAddress);
-		addressSpace.setMaxAddress(maxAddress);
-		return addressSpace;
 	}
 
 	@Override
@@ -754,6 +722,22 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		sharedMemory.setTargetPort(targetLSU);
 		sharedMemory.setAttribute("id", id);
 		return sharedMemory;
+	}
+
+	@Override
+	public Memory createMemory(String name, int wordWidth, int depth) {
+		return createMemory(name, wordWidth, depth, 0);
+	}
+
+	@Override
+	public Memory createMemory(String name, int wordWidth, int depth,
+			int minAdress) {
+		Memory addressSpace = new MemoryImpl();
+		addressSpace.setName(name);
+		addressSpace.setWordWidth(wordWidth);
+		addressSpace.setMinAddress(minAdress);
+		addressSpace.setDepth(BackendUtil.quantizeUp(depth));
+		return addressSpace;
 	}
 
 	@Override
@@ -777,7 +761,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public OpBinary createOpBinaryFromString(EDataType eDataType,
@@ -792,7 +775,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Operation createOperation() {
@@ -888,7 +870,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public OpUnary createOpUnaryFromString(EDataType eDataType,
@@ -931,7 +912,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Port createPort() {
@@ -958,7 +938,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Map.Entry<FuPort, Integer> createPortToIndexMapEntry() {
@@ -968,7 +947,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Processor createProcessor() {
@@ -983,8 +961,8 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		processor.setName(name);
 
 		// Address spaces
-		Memory program = createMemory("instructions", 8, 0, 60000);
-		Memory data = createMemory("data", 8, 0, quantizeUp(ramSize / 8 + 512));
+		Memory program = createMemory("instructions", 8, 60000, 0);
+		Memory data = createMemory("data", 8, ramSize / 8 + 512, 0);
 		processor.setROM(program);
 		processor.getLocalRAMs().add(data);
 		// Buses
@@ -1032,7 +1010,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public ProcessorConfiguration createProcessorConfigurationFromString(
@@ -1048,7 +1025,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Reads createReads() {
@@ -1067,7 +1043,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public RegisterFile createRegisterFile() {
@@ -1135,7 +1110,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Resource createResource() {
@@ -1154,7 +1128,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Segment createSegment() {
@@ -1171,7 +1144,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public ShortImmediate createShortImmediate() {
@@ -1189,7 +1161,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Signal createSignal() {
@@ -1212,7 +1183,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Socket createSocket() {
@@ -1232,7 +1202,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public SocketType createSocketTypeFromString(EDataType eDataType,
@@ -1247,7 +1216,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public TermBool createTermBool() {
@@ -1265,7 +1233,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public TermUnit createTermUnit() {
@@ -1283,7 +1250,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Map.Entry<String, Implementation> createTypeToImplMapEntry() {
@@ -1293,7 +1259,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Writes createWrites() {
@@ -1320,23 +1285,10 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public ArchitecturePackage getArchitecturePackage() {
 		return (ArchitecturePackage) getEPackage();
-	}
-
-	/**
-	 * Round up to next power of 2 for example 30000 -> 32768
-	 * 
-	 * @param value
-	 *            the value to round up
-	 * @return the next power of 2 after the value
-	 */
-	private int quantizeUp(int value) {
-		double tmp = Math.log(value) / Math.log(2.0);
-		return (int) (Math.pow(2, (Math.floor(tmp) + 1.0)) - 1.0);
 	}
 
 } // ArchitectureFactoryImpl

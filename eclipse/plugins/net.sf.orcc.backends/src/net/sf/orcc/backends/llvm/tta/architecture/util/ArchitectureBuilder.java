@@ -43,6 +43,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Port;
 import net.sf.orcc.backends.llvm.tta.architecture.Processor;
 import net.sf.orcc.backends.llvm.tta.architecture.ProcessorConfiguration;
 import net.sf.orcc.backends.llvm.tta.architecture.Signal;
+import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
@@ -79,23 +80,20 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 
 		@Override
 		public Void caseMemory(Memory buffer) {
-			FunctionUnit srcLSU = (FunctionUnit) buffer.getSourcePort();
-			FunctionUnit tgtLSU = (FunctionUnit) buffer.getTargetPort();
-
 			int bits = 0;
 			for (Connection connection : buffer.getMappedConnections()) {
 				bits += connection.getSize()
 						* connection.getSourcePort().getType().getSizeInBits()
 						+ 2 * 32;
 				connection.getSourcePort().setAttribute("id",
-						srcLSU.getAttribute("id").getValue());
+						buffer.getSourcePort().getAttribute("id").getValue());
 				connection.getTargetPort().setAttribute("id",
-						tgtLSU.getAttribute("id").getValue());
+						buffer.getTargetPort().getAttribute("id").getValue());
 			}
-			buffer.setDepth(bits / 32);
-			int maxAdress = bits / 8;
-			srcLSU.getAddressSpace().setMaxAddress(maxAdress);
-			tgtLSU.getAddressSpace().setMaxAddress(maxAdress);
+
+			buffer.setDepth(BackendUtil.quantizeUp(bits / 8));
+			buffer.setWordWidth(8);
+			buffer.setMinAddress(0);
 			return null;
 		}
 

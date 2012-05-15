@@ -348,7 +348,45 @@ public interface ArchitectureFactory extends EFactory {
 	 */
 	Memory createMemory();
 
-	Memory createMemory(int id, int width, Processor source, Processor target);
+	/**
+	 * @param id
+	 * @param wordWidth
+	 * @param source
+	 * @param target
+	 * @return
+	 */
+	Memory createMemory(int id, int wordWidth, Processor source,
+			Processor target);
+
+	/**
+	 * Returns a new memory object. The depth of the memory is rounding off to
+	 * the new power of two automatically.
+	 * 
+	 * @param name
+	 *            the name of the address space
+	 * @param wordWidth
+	 *            the size of a word
+	 * @param depth
+	 *            the depth of the memory
+	 * @return a new object of class '<em>Memory</em>'
+	 */
+	Memory createMemory(String name, int wordWidth, int depth);
+
+	/**
+	 * Returns a new memory object. The depth of the memory is rounding off to
+	 * the new power of two automatically.
+	 * 
+	 * @param name
+	 *            the name of the address space
+	 * @param wordWidth
+	 *            the size of a word
+	 * @param depth
+	 *            the depth of the memory
+	 * @param minAddress
+	 *            the address of the first block
+	 * @return a new object of class '<em>Memory</em>'
+	 */
+	Memory createMemory(String name, int wordWidth, int depth, int minAddress);
 
 	/**
 	 * Return a new multiplier unit with the given parameters

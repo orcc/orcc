@@ -94,4 +94,16 @@ public class BackendUtil {
 		return p;
 	}
 
+	/**
+	 * Round up to next power of 2 for example 30000 -> 32768
+	 * 
+	 * @param value
+	 *            the value to round up
+	 * @return the next power of 2 after the value
+	 */
+	public static int quantizeUp(int value) {
+		double tmp = Math.log(value) / Math.log(2.0);
+		return (int) (Math.pow(2, Math.ceil(tmp)));
+	}
+
 }

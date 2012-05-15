@@ -53,11 +53,13 @@ library work;
 
 entity dram_2p is
   generic (
-    depth      : integer;
-    addr_width : integer;
-    byte_width : integer;
-    bytes      : integer;
-    initVal    : integer := 0);
+    depth         : integer;
+    addr_width    : integer;
+    byte_width    : integer;
+    bytes         : integer;
+    init_file     : string := "NONE";
+    device_family : string;
+    initVal       : integer := 0);
   port (
     clk        : in  std_logic;
     --
@@ -81,17 +83,7 @@ end dram_2p;
 
 architecture altera_dram_2p of dram_2p is
 
-  -----------------------------------------------------------------------------
-  -- Internal signal declarations
-  -----------------------------------------------------------------------------
-  signal iqueue_p1 : std_logic_vector (bytes*byte_width-1 downto 0);
-  signal iqueue_p2 : std_logic_vector (bytes*byte_width-1 downto 0);
-  -----------------------------------------------------------------------------
-
 begin
-
-  queue_p1 <= iqueue_p1(bytes*byte_width-1 downto 0);
-  queue_p2 <= iqueue_p2(bytes*byte_width-1 downto 0);
 
   ram_component : altera_mf_components.altsyncram
     generic map (
@@ -102,8 +94,9 @@ begin
       clock_enable_input_b               => "BYPASS",
       clock_enable_output_a              => "BYPASS",
       clock_enable_output_b              => "BYPASS",
+      init_file                          => init_file,
       indata_reg_b                       => "CLOCK0",
-      intended_device_family             => "Cyclone IV GX",
+      intended_device_family             => device_family,
       lpm_type                           => "altsyncram",
       numwords_a                         => depth,
       numwords_b                         => depth,
@@ -130,12 +123,12 @@ begin
       address_a => address_p1,
       byteena_a => byteen_p1,
       data_a    => data_p1,
-      q_a       => iqueue_p1,
+      q_a       => queue_p1,
       wren_b    => wren_p2,
       address_b => address_p2,
       byteena_b => byteen_p2,
       data_b    => data_p2,
-      q_b       => iqueue_p2
+      q_b       => queue_p2
       );
 
 end altera_dram_2p;

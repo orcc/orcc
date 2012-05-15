@@ -1779,9 +1779,9 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
 				!IS_DERIVED, IS_ORDERED);
 		initEAttribute(getMemory_MaxAddress(), ecorePackage.getEInt(),
-				"maxAddress", null, 0, 1, Memory.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
+				"maxAddress", null, 0, 1, Memory.class, IS_TRANSIENT,
+				IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
+				IS_DERIVED, IS_ORDERED);
 		initEAttribute(getMemory_Depth(), theEcorePackage.getEInt(), "depth",
 				null, 0, 1, Memory.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
@@ -1793,7 +1793,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		initEAttribute(getMemory_AddrWidth(), theEcorePackage.getEInt(),
 				"addrWidth", null, 0, 1, Memory.class, IS_TRANSIENT,
 				IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
+				IS_DERIVED, IS_ORDERED);
 		initEReference(getMemory_MappedConnections(),
 				theDfPackage.getConnection(), null, "mappedConnections", null,
 				0, -1, Memory.class, !IS_TRANSIENT, !IS_VOLATILE,
