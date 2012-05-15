@@ -51,6 +51,7 @@ import net.sf.orcc.ir.util.ExpressionPrinter;
 public class LLVMExpressionPrinter extends ExpressionPrinter {
 
 	private boolean signed;
+	private boolean floating;
 
 	@Override
 	protected String toString(OpBinary op) {
@@ -62,30 +63,42 @@ public class LLVMExpressionPrinter extends ExpressionPrinter {
 		case BITXOR:
 			return "xor";
 		case DIV:
-			if (signed) {
+			if (floating) {
+				return "fdiv";
+			} else if (signed) {
 				return "sdiv";
 			} else {
 				return "udiv";
 			}
 		case DIV_INT:
-			if (signed) {
+			if (floating) {
+				return "fdiv";
+			} else if (signed) {
 				return "sdiv";
 			} else {
 				return "udiv";
 			}
 		case EQ:
-			return "icmp eq";
+			if (floating) {
+				return "fcmp oeq";
+			} else {
+				return "icmp eq";
+			}
 		case EXP:
 			return "pow";
 		case GE:
-			if (signed) {
+			if (floating) {
+				return "fcmp oge";
+			} else if (signed) {
 				return "icmp sge";
 			} else {
 				return "icmp uge";
 			}
 
 		case GT:
-			if (signed) {
+			if (floating) {
+				return "fcmp ogt";
+			} else if (signed) {
 				return "icmp sgt";
 			} else {
 				return "icmp ugt";
@@ -93,7 +106,9 @@ public class LLVMExpressionPrinter extends ExpressionPrinter {
 		case LOGIC_AND:
 			return "and";
 		case LE:
-			if (signed) {
+			if (floating) {
+				return "fcmp ole";
+			} else if (signed) {
 				return "icmp sle";
 			} else {
 				return "icmp ule";
@@ -101,23 +116,39 @@ public class LLVMExpressionPrinter extends ExpressionPrinter {
 		case LOGIC_OR:
 			return "or";
 		case LT:
-			if (signed) {
+			if (floating) {
+				return "fcmp olt";
+			} else if (signed) {
 				return "icmp slt";
 			} else {
 				return "icmp ult";
 			}
 		case MINUS:
-			return "sub";
+			if (floating) {
+				return "fsub";
+			} else {
+				return "sub";
+			}
 		case MOD:
-			if (signed) {
+			if (floating) {
+				return "frem";
+			} else if (signed) {
 				return "srem";
 			} else {
 				return "urem";
 			}
 		case NE:
-			return "icmp ne";
+			if (floating) {
+				return "fcmp one";
+			} else {
+				return "icmp ne";
+			}
 		case PLUS:
-			return "add";
+			if (floating) {
+				return "fadd";
+			} else {
+				return "add";
+			}
 		case SHIFT_LEFT:
 			return "shl";
 		case SHIFT_RIGHT:
@@ -127,7 +158,11 @@ public class LLVMExpressionPrinter extends ExpressionPrinter {
 				return "lshr";
 			}
 		case TIMES:
-			return "mul";
+			if (floating) {
+				return "fmul";
+			} else {
+				return "mul";
+			}
 		default:
 			throw new NullPointerException();
 		}
@@ -151,11 +186,8 @@ public class LLVMExpressionPrinter extends ExpressionPrinter {
 			type = expr.getType();
 		}
 
-		if (type.isUint()) {
-			signed = false;
-		} else {
-			signed = true;
-		}
+		signed = !type.isUint();
+		floating = type.isFloat();
 
 		builder.append(toString(op));
 		builder.append(" ");
