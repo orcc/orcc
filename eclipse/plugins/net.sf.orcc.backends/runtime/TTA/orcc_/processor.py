@@ -83,16 +83,23 @@ class Processor:
     def compile(self, srcPath, libPath, args, debug):
         processorPath = os.path.join(srcPath, self.id)
         actorsPath = os.path.join(srcPath, "actors")
+        tempPath = os.path.join(processorPath, "temp")
         os.chdir(processorPath)
+        
         
         sourceFiles = [self._llFile]
         for actor in self.actors:
             sourceFiles.append(os.path.join(actorsPath, actor + ".ll"))
         
-        retcode = subprocess.call(["tcecc"] + args + ["-o", self._tpefFile, "-a", self._adfFile] + sourceFiles)
-        if retcode == 0 and debug: retcode = subprocess.call(["tcecc", "-O3", "-o", self._bcFile, self._llFile, "--emit-llvm"])
-        if retcode == 0 and debug: retcode = subprocess.call(["llvm-dis", "-o", self._llOptFile, self._bcFile])
-        if retcode == 0 and debug: retcode = subprocess.call(["tcedisasm", "-n", "-o", self._asmFile, self._adfFile, self._tpefFile])
+        if debug:
+            retcode = subprocess.call(["tcecc"] + args + ["-O3", "--temp-dir", tempPath, "-o", self._tpefFile, "-a", self._adfFile] + sourceFiles)
+        else:
+            shutil.rmtree(tempPath, ignore_errors=True)
+            os.mkdir(tempPath)
+            retcode = subprocess.call(["tcecc"] + args + ["-O3", "-v", "-o", self._tpefFile, "-a", self._adfFile] + sourceFiles)
+            #if retcode == 0 and debug: retcode = subprocess.call(["llvm-dis", "-o", self._llOptFile, self._bcFile])
+            if retcode == 0: retcode = subprocess.call(["tcedisasm", "-n", "-o", self._asmFile, self._adfFile, self._tpefFile])
+        
         return retcode
 
     def generate(self, srcPath, libPath, args, debug, targetAltera):
