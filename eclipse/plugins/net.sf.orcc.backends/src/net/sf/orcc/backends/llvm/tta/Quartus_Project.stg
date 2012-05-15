@@ -25,7 +25,6 @@ set_global_assignment -name VHDL_FILE share/vhdl/and_ior_xor.vhdl
 set_global_assignment -name VHDL_FILE share/vhdl/add_and_eq_gt_gtu_ior_shl_shr_shru_sub_sxhw_sxqw_xor.vhdl
 
 # Other components
-set_global_assignment -name VHDL_FILE wrapper/altera_fifo.vhd
 set_global_assignment -name VHDL_FILE wrapper/altera_ram_1p.vhd
 set_global_assignment -name VHDL_FILE wrapper/altera_ram_2p.vhd
 set_global_assignment -name VHDL_FILE wrapper/altera_rom.vhd
@@ -64,7 +63,8 @@ printProcessor(processor) ::= <<
 # Processor <processor.name>
 set_global_assignment -name VHDL_FILE <processor.name>/tta/vhdl/<processor.name>_tl_params_pkg.vhdl
 set_global_assignment -name VHDL_FILE <processor.name>/tta/vhdl/<processor.name>_tl.vhdl
-set_global_assignment -name VHDL_FILE <processor.name>/tta/vhdl/globals_pkg.vhdl
+set_global_assignment -name VHDL_FILE <processor.name>/tta/vhdl/<processor.name>_tl_globals_pkg.vhdl
+set_global_assignment -name VHDL_FILE <processor.name>/tta/vhdl/<processor.name>_mem_constants_pkg.vhd
 set_global_assignment -name VHDL_FILE <processor.name>/tta/vhdl/<processor.name>.vhd
 set_global_assignment -name VHDL_FILE <processor.name>/tta/vhdl/imem_mau_pkg.vhdl
 set_global_assignment -name VHDL_FILE <processor.name>/tta/gcu_ic/output_socket_<length(processor.buses)>_1.vhdl
