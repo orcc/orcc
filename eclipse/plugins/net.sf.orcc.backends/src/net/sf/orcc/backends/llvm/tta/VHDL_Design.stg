@@ -123,8 +123,8 @@ assignInputPort(port, link) ::= <<
 <if(link.signal)
 >fu_<port.name> =\> s_<link.name>(<link.size>-1 downto 0),<
 else
->fu_<port.name>_dmem_data_in  =\> <link.name>_data_p2,
-fu_<port.name>_dmem_data_out =\> <link.name>_queue_p2,
+>fu_<port.name>_dmem_data_in  =\> <link.name>_queue_p2,
+fu_<port.name>_dmem_data_out =\> <link.name>_data_p2,
 fu_<port.name>_dmem_addr     =\> <link.name>_address_p2,
 fu_<port.name>_dmem_wr_en    =\> <link.name>_wren_p2,
 fu_<port.name>_dmem_bytemask =\> <link.name>_byteen_p2,<
@@ -135,8 +135,8 @@ assignOutputPort(port, link) ::= <<
 <if(link.signal)
 >fu_<port.name>(<link.size>-1 downto 0) =\> s_<link.name>,<
 else
->fu_<port.name>_dmem_data_in  =\> <link.name>_data_p1,
-fu_<port.name>_dmem_data_out =\> <link.name>_queue_p1,
+>fu_<port.name>_dmem_data_in  =\> <link.name>_queue_p1,
+fu_<port.name>_dmem_data_out =\> <link.name>_data_p1,
 fu_<port.name>_dmem_addr     =\> <link.name>_address_p1,
 fu_<port.name>_dmem_wr_en    =\> <link.name>_wren_p1,
 fu_<port.name>_dmem_bytemask =\> <link.name>_byteen_p1,<
