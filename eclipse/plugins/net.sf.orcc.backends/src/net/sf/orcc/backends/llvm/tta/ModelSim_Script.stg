@@ -113,4 +113,5 @@ vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>share/vhdl/mul.vhdl
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>share/vhdl/ldh_ldhu_ldq_ldqu_ldw_sth_stq_stw.vhdl
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>share/vhdl/and_ior_xor.vhdl
 vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>share/vhdl/add_and_eq_gt_gtu_ior_shl_shr_shru_sub_sxhw_sxqw_xor.vhdl
+vcom -93 -quiet -work work <if(!callByNetwork)>../<endif>share/vhdl/stratix3_led_io_always_1.vhd
 >>
