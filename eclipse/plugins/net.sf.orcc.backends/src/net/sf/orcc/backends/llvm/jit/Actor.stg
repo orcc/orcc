@@ -508,29 +508,49 @@ fifo(port) ::= <<
 <fifoVarName(port)> = global <port.type>* null
 >>
 
+printStore(store) ::= <<
+<if(store.target.variable.type.list)>
+<varName(store.target.variable, store)> = getelementptr <store.target.variable.type>* <Var(store.target.variable)>, i32 0, <indexes(store.indexes)>
+store <store.target.variable.type.innermostType> <Expr(store.value)>, <store.target.variable.type.innermostType>* <varName(store.target.variable, store)>
+<else>
+store <store.target.variable.type> <Expr(store.value)>, <store.target.variable.type>* <Var(store.target.variable)>
+<endif>
+>>
+
+printLoad(load) ::= <<
+<if(load.source.variable.type.list)>
+<varName(load.source.variable, load)> = getelementptr <load.source.variable.type>* <Var(load.source.variable)>, i32 0, <indexes(load.indexes)>
+<Var(load.target.variable)> = load <load.source.variable.type.innermostType>* <varName(load.source.variable, load)>
+<else>
+<Var(load.target.variable)> = load <load.source.variable.type>* <Var(load.source.variable)>
+<endif>
+>>
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Action
 ///////////////////////////////////////////////////////////////////////////////
 
-printAction(action) ::= <<
-define <action.scheduler.returnType> @<action.scheduler.name>(<action.scheduler.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
+printActionSchedulable(procedure) ::= <<
+define <action.scheduler.returnType> @<procedure.name>(<procedure.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
 entry:
-	<action.scheduler.locals: variableDeclaration()>
+	<procedure.locals: variableDeclaration()>
 	<action.peekPattern.ports: { port | <fifoVar(port, action.inputPattern.portToVarMap.(port))>}; separator="\n">
-	br label %b<label(first(action.scheduler.nodes))>
+	br label %b<label(first(procedure.nodes))>
 	
 <printNodes(action.scheduler.nodes)>
 }
+>>
 
-define void @<action.body.name>(<action.body.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
+printActionBody(procedure) ::= <<
+define void @<procedure.name>(<procedure.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
 entry:
-	<action.body.locals: variableDeclaration()>
+	<procedure.locals: variableDeclaration()>
 	<action.inputPattern.ports: { port | <fifoVar(port, action.inputPattern.portToVarMap.(port))>}; separator="\n">
 	<action.outputPattern.ports: { port | <fifoVar(port, action.outputPattern.portToVarMap.(port))>}; separator="\n">
-	br label %b<label(first(action.body.nodes))>
+	br label %b<label(first(procedure.nodes))>
 
-<printNodes(action.body.nodes)>
+<printNodes(procedure.nodes)>
 }
 >>
 
