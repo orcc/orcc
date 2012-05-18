@@ -151,6 +151,9 @@ entry:
 	<action.inputPattern.ports: { port | <if(!port.native)><printFifoEnd(port, action.inputPattern.numTokensMap.(port))><endif>}; separator="\n">
 	<action.outputPattern.ports: { port | <if(!port.native)><printFifoEnd(port, action.outputPattern.numTokensMap.(port))><endif>}; separator="\n"> 
 	<action.outputPattern.ports: { port | <if(port.native)><printNativeWrite(port, action.outputPattern.portToVarMap.(port))><endif>}; separator="\n">
+	;; TOFIX: only when the connected actors is mapped to another processor
+	<action.inputPattern.ports: {port|<if(!port.native)>call void @read_end_<port.name>()<endif>}; separator="\n">
+	<action.outputPattern.ports: {port|<if(!port.native)>call void @write_end_<port.name>()<endif>}; separator="\n">
 	ret void
 }
 >>
