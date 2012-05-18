@@ -98,7 +98,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		fpga = FPGA.builder(getAttribute("net.sf.orcc.backends.tta.fpga",
 				"Stratix III (EP3SL150F1152C2)"));
 		// Set default FIFO size to 256
-		fifoSize = getAttribute(FIFO_SIZE, 256);
+		fifoSize = getAttribute(FIFO_SIZE, 512);
 	}
 
 	/*
