@@ -917,7 +917,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		EList<Segment> segments = getAllSegments(tta.getBuses());
 		Socket i1 = createInputSocket(name + "_i1", segments);
 		// Port
-		FuPort in1t = createFuPort("in1t", 32, true, true);
+		FuPort in1t = createFuPort("in1t", 8, true, true);
 		in1t.connect(i1);
 		functionUnit.getPorts().add(in1t);
 		// Operation
