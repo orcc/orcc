@@ -33,6 +33,7 @@ package net.sf.orcc.backends.llvm.tta.architecture.impl;
 import java.util.Collection;
 
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
+import net.sf.orcc.backends.llvm.tta.architecture.Design;
 import net.sf.orcc.backends.llvm.tta.architecture.Memory;
 import net.sf.orcc.df.Connection;
 
@@ -270,6 +271,13 @@ public class MemoryImpl extends LinkImpl implements Memory {
 					ArchitecturePackage.MEMORY__MAPPED_CONNECTIONS);
 		}
 		return mappedConnections;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 */
+	public boolean isShared() {
+		return eContainer() instanceof Design;
 	}
 
 	/**

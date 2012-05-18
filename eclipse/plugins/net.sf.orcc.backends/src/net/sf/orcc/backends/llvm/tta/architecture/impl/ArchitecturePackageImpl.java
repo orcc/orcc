@@ -1800,6 +1800,9 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
+		addEOperation(memoryEClass, theEcorePackage.getEBoolean(), "isShared",
+				0, 1, IS_UNIQUE, IS_ORDERED);
+
 		initEClass(processorEClass, Processor.class, "Processor", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getProcessor_Gcu(), this.getGlobalControlUnit(), null,

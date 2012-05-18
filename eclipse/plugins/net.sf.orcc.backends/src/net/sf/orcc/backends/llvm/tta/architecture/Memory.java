@@ -207,4 +207,12 @@ public interface Memory extends Link {
 	 */
 	EList<Connection> getMappedConnections();
 
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @model kind="operation"
+	 * @generated
+	 */
+	boolean isShared();
+
 } // Buffer

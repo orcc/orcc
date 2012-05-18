@@ -38,6 +38,7 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Port" eSuperTypes="../../net.sf.orcc.models/model/Graph.ecore#//Vertex"/>
   <eClassifiers xsi:type="ecore:EClass" name="Memory" eSuperTypes="#//Link">
+    <eOperations name="isShared" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EBoolean"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
         volatile="true" transient="true" derived="true"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="minAddress" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
