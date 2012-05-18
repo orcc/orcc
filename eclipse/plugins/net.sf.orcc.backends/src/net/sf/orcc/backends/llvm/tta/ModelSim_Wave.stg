@@ -32,13 +32,10 @@ add wave -noupdate -format Literal /tb_top/top_orcc/<port.name>
 printProcessorWave(processor, choosePrefix) ::= <<
 add wave -noupdate -divider \<NULL\>
 add wave -noupdate -divider <processor.name>
-add wave -noupdate -divider \<NULL\>
-add wave -noupdate -format Logic /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<processor.name><endif>/<processor.name>_inst/clk
-add wave -noupdate -format Logic /<if(choosePrefix)>tb_top/top_orcc<else>/tb_<processor.name><endif>/<processor.name>_inst/rst_n
 add wave -noupdate -divider inputs
 <processor.incoming: { link | <printProcessorPortWave(link, link.targetPort, choosePrefix)> }; separator="\n">
 add wave -noupdate -divider outputs
-<processor.outgoing: { link | <printProcessorPortWave(link, link.sourcePort, choosePrefix)> }; separator="\n">
+<processor.outgoing: { link | <printProcessorPortWave(link, link.sourcePort, choosePrefix)> }; separator="\n"><processor.outgoing: { link | <printProcessorPortWave(link, link.sourcePort, choosePrefix)> }; separator="\n">
 >>
 
 printProcessorPortWave(link, port, choosePrefix) ::= <<
