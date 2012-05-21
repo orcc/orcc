@@ -156,7 +156,7 @@ printAddressSpace(addressSpace, id) ::= <<
 	\<width\><addressSpace.wordWidth>\</width\>
 	\<min-address\><addressSpace.minAddress>\</min-address\>
 	\<max-address\><addressSpace.maxAddress>\</max-address\>
-	<if(addressSpace.shared)>\<shared-memory/\><endif>
+	\<shared-memory\><if(addressSpace.shared)>true<else>false<endif>\</shared-memory\>
 	<if(id)>\<numerical-id\><id>\</numerical-id\><endif>
 \</address-space\>
 >>
