@@ -52,7 +52,6 @@ import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.moc.CSDFMoC;
 
@@ -263,7 +262,7 @@ public class StaticActorNormalizer {
 			List<Block> nodes = scheduler.getBlocks();
 			nodes.clear();
 
-			BlockBasic block = IrFactoryImpl.eINSTANCE.createBlockBasic();
+			BlockBasic block = IrFactory.eINSTANCE.createBlockBasic();
 			nodes.add(block);
 			block.add(IrFactory.eINSTANCE.createInstReturn(IrFactory.eINSTANCE
 					.createExprBool(true)));
@@ -378,7 +377,7 @@ public class StaticActorNormalizer {
 
 		variables = procedure.getLocals();
 
-		BlockBasic block = IrFactoryImpl.eINSTANCE.createBlockBasic();
+		BlockBasic block = IrFactory.eINSTANCE.createBlockBasic();
 		procedure.getBlocks().add(block);
 
 		createInputCondition(block);

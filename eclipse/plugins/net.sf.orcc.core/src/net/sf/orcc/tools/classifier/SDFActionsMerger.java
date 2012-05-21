@@ -50,7 +50,6 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.util.IrUtil;
 
@@ -99,15 +98,15 @@ public class SDFActionsMerger extends DfVisitor<Object> {
 
 	private BlockIf createActionCall(Expression expr, Procedure body,
 			Pattern inputPattern, Pattern outputPattern) {
-		BlockIf nodeIf = IrFactoryImpl.eINSTANCE.createBlockIf();
-		nodeIf.setJoinBlock(IrFactoryImpl.eINSTANCE.createBlockBasic());
+		BlockIf nodeIf = IrFactory.eINSTANCE.createBlockIf();
+		nodeIf.setJoinBlock(IrFactory.eINSTANCE.createBlockBasic());
 		nodeIf.setCondition(expr);
 
 		List<Expression> callExprs = setProcedureParameters(body, inputPattern,
 				outputPattern);
 		actor.getProcs().add(body);
 		List<Block> thenNodes = nodeIf.getThenBlocks();
-		BlockBasic node = IrFactoryImpl.eINSTANCE.createBlockBasic();
+		BlockBasic node = IrFactory.eINSTANCE.createBlockBasic();
 
 		node.add(IrFactory.eINSTANCE.createInstCall(0, null, body, callExprs));
 
@@ -148,7 +147,7 @@ public class SDFActionsMerger extends DfVisitor<Object> {
 		// create "then" nodes
 		InstAssign thenAssign = IrFactory.eINSTANCE.createInstAssign(result,
 				IrFactory.eINSTANCE.createExprBool(true));
-		BlockBasic nodeBlock = IrFactoryImpl.eINSTANCE.createBlockBasic();
+		BlockBasic nodeBlock = IrFactory.eINSTANCE.createBlockBasic();
 		nodeBlock.add(thenAssign);
 		procedure.getBlocks().add(nodeBlock);
 

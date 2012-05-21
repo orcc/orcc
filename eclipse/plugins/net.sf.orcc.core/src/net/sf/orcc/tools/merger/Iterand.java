@@ -44,7 +44,7 @@ public class Iterand {
 
 	private enum Type {
 		SCHEDULE, VERTEX
-	};
+	}
 
 	private Object contents;
 

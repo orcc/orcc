@@ -41,7 +41,6 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.impl.IrResourceFactoryImpl;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
@@ -247,14 +246,14 @@ public class IrUtil {
 	public static BlockBasic getFirst(List<Block> nodes) {
 		BlockBasic block;
 		if (nodes.isEmpty()) {
-			block = IrFactoryImpl.eINSTANCE.createBlockBasic();
+			block = IrFactory.eINSTANCE.createBlockBasic();
 			nodes.add(block);
 		} else {
 			Block node = nodes.get(0);
 			if (node.isBlockBasic()) {
 				block = (BlockBasic) node;
 			} else {
-				block = IrFactoryImpl.eINSTANCE.createBlockBasic();
+				block = IrFactory.eINSTANCE.createBlockBasic();
 				nodes.add(0, block);
 			}
 		}
@@ -273,14 +272,14 @@ public class IrUtil {
 	public static BlockBasic getLast(List<Block> nodes) {
 		BlockBasic block;
 		if (nodes.isEmpty()) {
-			block = IrFactoryImpl.eINSTANCE.createBlockBasic();
+			block = IrFactory.eINSTANCE.createBlockBasic();
 			nodes.add(block);
 		} else {
 			Block node = nodes.get(nodes.size() - 1);
 			if (node.isBlockBasic()) {
 				block = (BlockBasic) node;
 			} else {
-				block = IrFactoryImpl.eINSTANCE.createBlockBasic();
+				block = IrFactory.eINSTANCE.createBlockBasic();
 				nodes.add(block);
 			}
 		}
