@@ -51,6 +51,9 @@ extern char *output_genetic;
 // display flags
 extern char display_flags;
 
+// compute number of errors in the program
+extern int compareErrors;
+
 // initialize APR and parse command-line options
 void init_orcc(int argc, char *argv[]);
 

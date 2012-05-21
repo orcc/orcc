@@ -115,6 +115,8 @@ void compareYUV_init()
 
 	fstat(fileno(ptrFile), &st);
 	fileSize = st.st_size;
+
+	compareErrors = 0;
 }
 
 static void compareYUV_readComponent(unsigned char **Component, unsigned short width, unsigned short height, char sizeChanged) {
@@ -170,6 +172,8 @@ void compareYUV_comparePicture(unsigned char *pictureBufferY, unsigned char *pic
 		if(numErrors == 0)
 		{
 			printf("; no error detected !\n");
+		} else {
+			compareErrors += numErrors;
 		}
 
 		if(ftell(ptrFile) == fileSize) {

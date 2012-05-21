@@ -52,7 +52,7 @@ extern char	*optarg;
 extern int getopt(int nargc, char * const *nargv, const char *ostr);
 
 //Nb Loops
-unsigned int nbLoops = DEFAULT_INFINITE_LOOP; // -1: infinite loop.
+unsigned int nbLoops = 1; // -1: infinite loop.
 
 // input file
 char *input_file;
@@ -71,6 +71,9 @@ char *output_genetic;
 
 // deactivate display
 char display_flags = DISPLAY_ENABLE;
+
+// compute number of errors in the program
+int compareErrors = 0;
 
 // Pause function
 void wait_for_key() {
@@ -109,7 +112,7 @@ void print_and_exit(const char *msg) {
 	exit(1);
 }
 
-static const char *usage = "%s: -i <file> [-o <file>] [-w <file>] [-l <number of loop iterations>...\n";
+static const char *usage = "%s: -i <file> [-o <file>] [-w <file>] [-l <number of loop iterations>]\n";
 static char *program;
 
 void print_usage() {
@@ -119,7 +122,9 @@ void print_usage() {
 ///////////////////////////////////////////////////////////////////////////////
 // initializes APR and parses options
 void init_orcc(int argc, char *argv[]) {
-	const char *ostr = "g:i:l:m:n:o:w:";
+	// every command line option must be followed by ':' if it takes an
+	// argument, and '::' if this argument is optional
+	const char *ostr = "g:i:l:m:no:w:";
 	int c;
 
 	program = argv[0];
