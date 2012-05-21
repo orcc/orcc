@@ -581,7 +581,7 @@ bb_outside_finished:
 <endif>
 
 
-define void @<instance.name>_scheduler() noreturn nounwind {
+define void @<instance.name>_scheduler() nounwind {
 entry:
 	br label %bb_scheduler_start
 
@@ -668,7 +668,7 @@ call <initialize.body.returnType> @<initialize.body.name> ()
 >>
 
 initializeFunction() ::= <<
-define void @<instance.name>_initialize() noreturn nounwind {
+define void @<instance.name>_initialize() nounwind {
 entry:
 	<printCallStartTokenFunctions()>
 	<instance.actor.initializes: callInitialize(); separator="\n">
