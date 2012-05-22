@@ -1,0 +1,25 @@
+printDesign(design, options) ::= <<
+#include \<SimulatorMultiprocessor.hh\>
+
+#include \<stdio.h\>
+
+int main() {
+  SimulatorMultiprocessor* simulator = new SimulatorMultiprocessor();
+
+  fprintf(stdout, "Add processors\n");
+  <design.processors: printProcessor(); separator="\n">
+
+  fprintf(stdout, "Initialize the simulators\n");
+  simulator->initialize();
+	
+  fprintf(stdout, "Run\n");
+  simulator->run();
+
+  return 0;
+}
+
+>>
+
+printProcessor(processor) ::= <<
+simulator->addProcessor("<processor.name>", "<processor.name>/<processor.name>.adf", "<processor.name>/<processor.name>.tpef");
+>>

@@ -236,6 +236,11 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		tclPrinter.print("top.tcl", path, design);
 		tbPrinter.print("top_tb.vhd", path, design);
 		wavePrinter.print("wave.do", path, design);
+		
+		// TCE
+		ArchitecturePrinter simPrinter = new ArchitecturePrinter(
+				"net/sf/orcc/backends/llvm/tta/TCE_Simulation.stg");
+		simPrinter.print("top.cc", path, design);
 	}
 
 	private void printProcessor(Processor tta) {
