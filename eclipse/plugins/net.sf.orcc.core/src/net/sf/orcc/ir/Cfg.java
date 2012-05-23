@@ -91,8 +91,8 @@ public interface Cfg extends Graph {
 
 	/**
 	 * Returns <code>true</code> if the given <code>m</code> node
-	 * <i>immediately</i> dominates the given <code>n</code> node. If the
-	 * dominance information has not been computed yet, it is computed now.
+	 * <i>immediately</i> dominates the given <code>n</code> node. The dominance
+	 * information must have been computed first.
 	 * 
 	 * @param m
 	 *            a CFG node
@@ -100,13 +100,15 @@ public interface Cfg extends Graph {
 	 *            a CFG node
 	 * @return <code>true</code> if <code>m</code> immediately dominates
 	 *         <code>n</code>
+	 * @throws IllegalStateException
+	 *             if the dominance information is not available
 	 */
 	boolean immediatelyDominates(Vertex m, Vertex n);
 
 	/**
 	 * Returns <code>true</code> if the given <code>m</code> node
-	 * <i>immediately</i> post-dominates the given <code>n</code> node. If the
-	 * post-dominance information has not been computed yet, it is computed now.
+	 * <i>immediately</i> post-dominates the given <code>n</code> node. The
+	 * dominance information must have been computed first.
 	 * 
 	 * @param m
 	 *            a CFG node
@@ -114,6 +116,8 @@ public interface Cfg extends Graph {
 	 *            a CFG node
 	 * @return <code>true</code> if <code>m</code> immediately post-dominates
 	 *         <code>n</code>
+	 * @throws IllegalStateException
+	 *             if the dominance information is not available
 	 */
 	boolean immediatelyPostDominates(Vertex m, Vertex n);
 
