@@ -39,7 +39,9 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.graph.Edge;
+import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.ecore.EObject;
@@ -86,8 +88,18 @@ public class Instantiator extends DfSwitch<Void> {
 				network.getInstances());
 		for (Instance instance : instances) {
 			EObject entity = instance.getEntity();
+			
 			if (entity instanceof Actor) {
-
+				// assigns arguments' values to instance's variables
+				for (Argument argument : instance.getArguments()) {
+					Expression value = (Expression) new Copier().copy(argument.getValue());
+					if(argument.getVariable().getType().isList() && !argument.getValue().isExprList()){
+						ExprList exprList = IrFactory.eINSTANCE.createExprList();
+						exprList.getValue().add(value);
+						value = exprList;
+					}
+					argument.getVariable().setInitialValue(value);
+				}
 			} else if (entity instanceof Network) {
 				instantiate(network, instance, entity);
 			}
