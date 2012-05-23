@@ -8,6 +8,29 @@ printExternalFifo(connection, port) ::= <<
 endif>
 >>
 
+
+printInput(port, connection) ::= <<
+<if(!port.native)
+>@SIZE_<port.name> = internal constant i32 <connection.size>
+@index_<port.name> = internal global i32 0
+@wrIndex_<port.name> = internal global i32 0
+@numTokens_<port.name> = internal global i32 0
+
+<printReadTokensFunction(port, connection)><
+endif>
+>>
+
+printOutput(port, connection) ::= <<
+<if(!port.native)
+>@SIZE_<port.name> = internal constant i32 <connection.size>
+@index_<port.name> = internal global i32 0
+@rdIndex_<port.name> = internal global i32 0
+@numFree_<port.name> = internal global i32 0
+
+<printWriteTokensFunction(port, connection)><
+endif>
+>>
+
 printReadTokensFunction(port, connection) ::= <<
 define internal void @read_<port.name>() {
 entry:
@@ -17,6 +40,7 @@ read:
 	%rdIndex = load volatile i32 addrspace(<port.id>)* @fifo_<connection.id>_rdIndex
 	store i32 %rdIndex, i32* @index_<port.name>
 	%wrIndex = load volatile i32 addrspace(<port.id>)* @fifo_<connection.id>_wrIndex
+	store i32 %wrIndex, i32* @wrIndex_<port.name>
 	%getNumTokens = sub i32 %wrIndex, %rdIndex
 	%numTokens = add i32 %rdIndex, %getNumTokens
 	store i32 %numTokens, i32* @numTokens_<port.name>
@@ -43,6 +67,7 @@ write:
 	%wrIndex = load volatile i32 addrspace(<port.id>)* @fifo_<connection.id>_wrIndex
 	store i32 %wrIndex, i32* @index_<port.name>
 	%rdIndex = load volatile i32 addrspace(<port.id>)* @fifo_<connection.id>_rdIndex
+	store i32 %rdIndex, i32* @rdIndex_<port.name>
 	%size = load i32* @SIZE_<port.name>
 	%numTokens = sub i32 %wrIndex, %rdIndex
 	%getNumFree = sub i32 %size, %numTokens
@@ -120,7 +145,7 @@ checkOutputPorts(action, port, restPorts, portToIndexMap, state, lastPort=false)
 <if(!port.native)
 >%size_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = load i32* @SIZE_<port.name>
 %index_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = load i32* @index_<port.name>
-%rdIndex_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = load volatile i32 addrspace(<port.id>)* @fifo_<first(instance.outgoingPortMap.(port)).id>_rdIndex
+%rdIndex_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = load i32* @rdIndex_<port.name>
 %tmp_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = sub i32 %size_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)>, %index_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)>
 %status_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = add i32 %tmp_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)>, %rdIndex_<port.name>_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)><
 endif>
@@ -175,7 +200,7 @@ br label %bb_scheduler_start
 checkBcastOutputs(port, restPorts, lastPort) ::= <<
 %size_<port.name> = load i32* @SIZE_<port.name>
 %index_<port.name> = load i32* @index_<port.name>
-%rdIndex_<port.name> = load volatile i32 addrspace(<port.id>)* @fifo_<first(entity.outgoingPortMap.(port)).id>_rdIndex
+%rdIndex_<port.name> = load i32* @rdIndex_<port.name>
 %tmp_<port.name> = sub i32 %size_<port.name>, %index_<port.name>
 %status_<port.name> = add i32 %tmp_<port.name>, %rdIndex_<port.name>
 %ready_<port.name> = icmp sge i32 %status_<port.name>, 1
