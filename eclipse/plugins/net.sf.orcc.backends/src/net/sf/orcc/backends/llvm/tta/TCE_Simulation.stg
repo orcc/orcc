@@ -10,7 +10,7 @@ int main() {
   <design.processors: printProcessor(); separator="\n">
 
   fprintf(stdout, "Initialize the simulators\n");
-  simulator->initialize();
+  simulator->initialize(<if(options.profile)>true<else>false<endif>);
 	
   fprintf(stdout, "Run\n");
   simulator->run();

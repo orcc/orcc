@@ -243,6 +243,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		// TCE
 		ArchitecturePrinter simPrinter = new ArchitecturePrinter(
 				"net/sf/orcc/backends/llvm/tta/TCE_Simulation.stg");
+		simPrinter.getOptions().put("profile", profile);
 		simPrinter.print("top.cc", path, design);
 	}
 

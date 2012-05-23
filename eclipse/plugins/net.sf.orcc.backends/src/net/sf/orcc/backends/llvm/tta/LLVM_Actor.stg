@@ -166,7 +166,7 @@ addrspace(0) <if(variable.assignable)>global<else>constant<endif>
 >>
 
 printActionBody(procedure) ::= <<
-define internal void @<procedure.name>() nounwind <if(!options.profile)>noinline <endif>{
+define internal void @<procedure.name>() nounwind <if(options.profile)>noinline <endif>{
 entry:
 	<procedure.locals: variableDeclaration()>
 	<action.outputPattern.ports: { port | <if(port.native)><variableDeclaration(action.outputPattern.portToVarMap.(port))><endif>}; separator="\n">
