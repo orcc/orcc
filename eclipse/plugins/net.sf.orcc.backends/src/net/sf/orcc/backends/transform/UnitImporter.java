@@ -29,6 +29,7 @@
 package net.sf.orcc.backends.transform;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import net.sf.orcc.df.Action;
@@ -90,7 +91,6 @@ public class UnitImporter extends DfVisitor<Object> {
 
 				}
 				use.setVariable(varInActor);
-
 			}
 
 			return null;
@@ -102,7 +102,7 @@ public class UnitImporter extends DfVisitor<Object> {
 				Procedure procInActor = (Procedure) copier.get(proc);
 				if (procInActor == null) {
 					procInActor = (Procedure) copier.copy(proc);
-
+					proc.setAttribute("package", getPackage(proc.eContainer()));
 					TreeIterator<EObject> it = EcoreUtil.getAllContents(proc,
 							true);
 					while (it.hasNext()) {
@@ -134,12 +134,12 @@ public class UnitImporter extends DfVisitor<Object> {
 							copyCall.setProcedure(copyProc);
 						}
 					}
-
 					actor.getProcs().add(indexProc++, procInActor);
-					doSwitch(procInActor);
+					super.caseProcedure(procInActor);
 				}
 				return procInActor;
 			} else {
+				proc.setAttribute("package", getPackage(proc.eContainer()));
 				super.caseProcedure(proc);
 				return proc;
 			}
@@ -167,6 +167,16 @@ public class UnitImporter extends DfVisitor<Object> {
 		}
 
 		return null;
+	}
+
+	private List<String> getPackage(EObject eObject) {
+		String[] name = { "" };
+		if (eObject instanceof Actor) {
+			name = ((Actor) eObject).getName().split("\\.");
+		} else if (eObject instanceof Unit) {
+			name = ((Unit) eObject).getName().split("\\.");
+		}
+		return Arrays.asList(name);
 	}
 
 }
