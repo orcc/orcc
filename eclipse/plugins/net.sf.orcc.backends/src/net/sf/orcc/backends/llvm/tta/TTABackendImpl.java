@@ -83,6 +83,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 
 	private boolean debug;
 	private boolean finalize;
+	private boolean profile;
 	private FPGA fpga;
 	private String libPath;
 
@@ -99,6 +100,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 				"Stratix III (EP3SL150F1152C2)"));
 		// Set default FIFO size to 256
 		fifoSize = getAttribute(FIFO_SIZE, 512);
+		profile = getAttribute("net.sf.orcc.backends.profile", false);
 	}
 
 	/*
@@ -173,6 +175,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 				"net/sf/orcc/backends/llvm/tta/LLVM_Actor.stg");
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
+		printer.getOptions().put("profile", profile);
 		printInstances(network);
 		printEntities(network);
 		path = oldPath;
@@ -236,7 +239,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		tclPrinter.print("top.tcl", path, design);
 		tbPrinter.print("top_tb.vhd", path, design);
 		wavePrinter.print("wave.do", path, design);
-		
+
 		// TCE
 		ArchitecturePrinter simPrinter = new ArchitecturePrinter(
 				"net/sf/orcc/backends/llvm/tta/TCE_Simulation.stg");
@@ -250,7 +253,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		ArchitecturePrinter vhdlPrinter = new ArchitecturePrinter(
 				"net/sf/orcc/backends/llvm/tta/VHDL_Processor.stg");
 		vhdlPrinter.getOptions().put("fpga", fpga);
-		
+
 		vhdlPrinter.print(tta.getName() + ".vhd", processorPath, tta);
 
 		// Print high-level description

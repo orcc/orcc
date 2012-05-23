@@ -79,6 +79,9 @@
                id="net.sf.orcc.plugins.compileXDF">
          </option>
          <option
+               id="net.sf.orcc.backends.profile">
+         </option>
+         <option
                id="net.sf.orcc.backends.tta.finalizeGeneration">
          </option>
          <option
@@ -289,6 +292,13 @@
                   id="Others">
                </comboBoxItem>
             </comboBox>
+         </option>
+         <option
+               defaultValue="false"
+               description="Generate output files that can be used with profiling tools"
+               id="net.sf.orcc.backends.profile"
+               name="Enable profiling">
+            <checkBox></checkBox>
          </option>
    </extension>
    <extension
