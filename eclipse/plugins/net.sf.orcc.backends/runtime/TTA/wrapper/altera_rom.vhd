@@ -84,7 +84,7 @@ begin
       intended_device_family => device_family,
       lpm_hint               => "ENABLE_RUNTIME_MOD=NO",
       lpm_type               => "altsyncram",
-      numwords_a             => depth,
+      numwords_a             => 2 ** addr_width,
       operation_mode         => "ROM",
       outdata_aclr_a         => "NONE",
       outdata_reg_a          => "UNREGISTERED",

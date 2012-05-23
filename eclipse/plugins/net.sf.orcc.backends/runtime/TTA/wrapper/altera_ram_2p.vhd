@@ -83,39 +83,44 @@ end dram_2p;
 
 architecture altera_dram_2p of dram_2p is
 
+	SIGNAL iqueue_p1	: STD_LOGIC_VECTOR (bytes*byte_width-1 DOWNTO 0);
+	SIGNAL iqueue_p2	: STD_LOGIC_VECTOR (bytes*byte_width-1 DOWNTO 0);
+
 begin
+	queue_p1    <= iqueue_p1(bytes*byte_width-1 DOWNTO 0);
+	queue_p2    <= iqueue_p2(bytes*byte_width-1 DOWNTO 0);
 
   ram_component : altera_mf_components.altsyncram
     generic map (
-      address_reg_b                      => "CLOCK0",
-      byteena_reg_b                      => "CLOCK0",
-      byte_size                          => byte_width,
-      clock_enable_input_a               => "BYPASS",
-      clock_enable_input_b               => "BYPASS",
-      clock_enable_output_a              => "BYPASS",
-      clock_enable_output_b              => "BYPASS",
-      init_file                          => init_file,
-      indata_reg_b                       => "CLOCK0",
-      intended_device_family             => device_family,
-      lpm_type                           => "altsyncram",
-      numwords_a                         => depth,
-      numwords_b                         => depth,
-      operation_mode                     => "BIDIR_DUAL_PORT",
-      outdata_aclr_a                     => "NONE",
-      outdata_aclr_b                     => "NONE",
-      outdata_reg_a                      => "CLOCK0",
-      outdata_reg_b                      => "CLOCK0",
-      power_up_uninitialized             => "FALSE",
-      read_during_write_mode_mixed_ports => "DONT_CARE",
-      read_during_write_mode_port_a      => "DONT_CARE",
-      read_during_write_mode_port_b      => "DONT_CARE",
-      widthad_a                          => addr_width,
-      widthad_b                          => addr_width,
-      width_a                            => bytes*byte_width,
-      width_b                            => bytes*byte_width,
-      width_byteena_a                    => bytes,
-      width_byteena_b                    => bytes,
-      wrcontrol_wraddress_reg_b          => "CLOCK0"
+      	address_reg_b => "CLOCK0",
+		byteena_reg_b => "CLOCK0",
+		byte_size => byte_width,
+		clock_enable_input_a => "BYPASS",
+		clock_enable_input_b => "BYPASS",
+		clock_enable_output_a => "BYPASS",
+		clock_enable_output_b => "BYPASS",
+		init_file                          => init_file,
+		indata_reg_b => "CLOCK0",
+		intended_device_family => device_family,
+		lpm_type => "altsyncram",
+		numwords_a => 2 ** addr_width,
+		numwords_b => 2 ** addr_width,
+		operation_mode => "BIDIR_DUAL_PORT",
+		outdata_aclr_a => "NONE",
+		outdata_aclr_b => "NONE",
+		outdata_reg_a => "UNREGISTERED",
+		outdata_reg_b => "UNREGISTERED",
+		power_up_uninitialized => "FALSE",
+		read_during_write_mode_mixed_ports => "DONT_CARE",
+		read_during_write_mode_port_a => "NEW_DATA_NO_NBE_READ",
+		read_during_write_mode_port_b => "NEW_DATA_NO_NBE_READ",
+		widthad_a => addr_width,
+		widthad_b => addr_width,
+		width_a => bytes*byte_width,
+		width_b => bytes*byte_width,
+		width_byteena_a => bytes,
+		width_byteena_b => bytes,
+		wrcontrol_wraddress_reg_b => "CLOCK0"
       )
     port map (
       clock0    => clk,
@@ -123,12 +128,12 @@ begin
       address_a => address_p1,
       byteena_a => byteen_p1,
       data_a    => data_p1,
-      q_a       => queue_p1,
+      q_a       => iqueue_p1,
       wren_b    => wren_p2,
       address_b => address_p2,
       byteena_b => byteen_p2,
       data_b    => data_p2,
-      q_b       => queue_p2
+      q_b       => iqueue_p2
       );
 
 end altera_dram_2p;

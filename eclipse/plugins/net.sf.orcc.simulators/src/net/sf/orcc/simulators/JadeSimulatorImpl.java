@@ -48,8 +48,8 @@ import java.util.List;
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.transformations.Instantiator;
-import net.sf.orcc.df.transformations.NetworkFlattener;
+import net.sf.orcc.df.transform.Instantiator;
+import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.core.resources.IFile;

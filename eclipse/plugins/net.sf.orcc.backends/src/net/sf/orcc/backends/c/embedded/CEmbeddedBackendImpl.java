@@ -39,8 +39,8 @@ import net.sf.orcc.backends.c.CNetworkTemplateData;
 import net.sf.orcc.backends.c.CTypePrinter;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.transformations.Instantiator;
-import net.sf.orcc.df.transformations.NetworkFlattener;
+import net.sf.orcc.df.transform.Instantiator;
+import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.moc.SDFMoC;
 
 import org.eclipse.core.resources.IFile;

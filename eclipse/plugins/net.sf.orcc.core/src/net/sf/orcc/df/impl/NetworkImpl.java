@@ -45,7 +45,7 @@ import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.transformations.NetworkClassifier;
+import net.sf.orcc.df.transform.NetworkClassifier;
 import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Vertex;

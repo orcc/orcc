@@ -50,7 +50,7 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.transformations.SSATransformation;
+import net.sf.orcc.ir.transform.SSATransformation;
 import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
