@@ -61,6 +61,16 @@ class Design:
             if not processor.isBroadcast:
                 print ">> Simulate the execution of " + processor.id + "."
                 processor.simulate(srcPath, libPath, tracePath)
+                
+    def profile(self, srcPath):
+        f = open("profiling.txt", "w")
+        for processor in self.processors:
+            f.write("*********************************************************\n")
+            f.write("****** TTA: " + processor.id + "\n")
+            f.write("*********************************************************\n")
+            f.write(processor.profile(srcPath))
+            f.write("\n\n\n")
+        f.close()
 
 
     def generate(self, srcPath, libPath, args, debug):

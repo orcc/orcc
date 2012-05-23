@@ -46,7 +46,8 @@ def usage():
     print "-c, --compile=[options]  \t Compile the application from the generated LLVM assembly code into TTA binary"
     print "-d, --debug \t\t\t Debug mode, generate extra files and print additionnal information"
     print "-g, --generate=[options] \t Generate the VHDL files of the TTA processors"
-    print "-s, --simulate \t\t\t Simulate the generated code with the TCE simulator (FIFO traces have to be in 'trace' directory)"
+    print "-s, --simulate \t\t\t [Broken] Simulate the generated code with the TCE simulator (FIFO traces have to be in 'trace' directory)"
+    print "-p, --profile \t\t\t Generate a text file containing all the results of the profiling (Need to have already the traces of the simulator)"
     print "--clean \t\t\t Clean source directory ('generated') and build directory ('build-generated')"
     
 
@@ -86,9 +87,12 @@ def generate(arg, debug, target):
     print "* Generation of %d processors done in %f seconds." % (len(design.processors), time.time() - start)
 
 
+def profile(target):
+    design.profile(target)
+
 
 try:
-	opts, args = getopt.getopt(sys.argv[1:], "hcsgdx:v", ["help", "compile=", "simulate", "generate=", "debug"])
+	opts, args = getopt.getopt(sys.argv[1:], "hcsgdpx:v", ["help", "compile=", "simulate", "generate=", "profile", "debug"])
 except getopt.GetoptError, err:
 	print str(err)
 	usage()
@@ -129,5 +133,10 @@ for o, a in opts:
 for o, a in opts:
 	if o in ("-g", "--generate"):
 		generate(a, debug, srcPath)
+        
+for o, a in opts:
+    if o in ("-p", "--profile"):
+        print "test"
+        profile(srcPath)
 
 

@@ -203,7 +203,13 @@ class Processor:
             os.remove("stream_units.opp")
             os.remove("stream_units.opb")
             os.remove("stream_units.cc")
-
+            
+    def profile(self, srcPath):
+        instancePath = os.path.join(srcPath, self.id)
+        os.chdir(instancePath)
+        retcode = subprocess.call(["tcedisasm", "-F", self._adfFile, self._tpefFile])
+        retcode = subprocess.call(["generate_cachegrind", self._tpefFile + ".trace"])
+        return subprocess.check_output(["cgview", "-e", self._tpefFile + ".trace.cachegrind"])
 
     def _readMif(self, fileName):
         fh = open(fileName, "r")
