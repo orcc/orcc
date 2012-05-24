@@ -298,6 +298,7 @@ public enum ProcessorConfiguration implements Enumerator {
 	public int getLsuNb() {
 		switch (this) {
 		case HUGE:
+			return 2;
 		case STANDARD:
 		case CUSTOM:
 		default:
