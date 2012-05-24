@@ -115,20 +115,10 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	private Design design;
 	private ArchitectureFactory factory = ArchitectureFactory.eINSTANCE;
 
-	private List<String> optimizedActors;
-
 	public ArchitectureBuilder() {
 		design = factory.createDesign();
 		componentMap = new HashMap<Vertex, Component>();
 		bufferMap = new HashMap<Component, Map<Component, Memory>>();
-
-		optimizedActors = new ArrayList<String>();
-		optimizedActors.add("decoder_texture_IQ");
-		optimizedActors.add("Merger");
-		optimizedActors.add("decoder_motion_interpolation");
-		optimizedActors.add("decoder_motion_add");
-		optimizedActors.add("decoder_texture_idct2d");
-		optimizedActors.add("decoder_motion_framebuf");
 	}
 
 	/**
@@ -193,7 +183,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 
 	@Override
 	public Design caseBroadcast(Broadcast broadcast) {
-		ProcessorConfiguration conf = ProcessorConfiguration.STANDARD;
+		ProcessorConfiguration conf = ProcessorConfiguration.HUGE;
 		Processor processor = factory.createProcessor(
 				"processor_" + broadcast.getName(), conf, 512);
 		processor.getMappedActors().add(broadcast);
@@ -234,7 +224,7 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 			// FIXME: Compute the RAM size during the last compilation step
 			int memorySize = computeNeededMemorySize(instance);
 
-			ProcessorConfiguration conf = ProcessorConfiguration.STANDARD;
+			ProcessorConfiguration conf = ProcessorConfiguration.HUGE;
 			Processor processor = factory.createProcessor("processor_"
 					+ instance.getName(), conf, memorySize);
 			component = processor;
