@@ -82,6 +82,9 @@
                id="net.sf.orcc.backends.profile">
          </option>
          <option
+               id="net.sf.orcc.backends.llvm.tta.configuration">
+         </option>
+         <option
                id="net.sf.orcc.backends.tta.finalizeGeneration">
          </option>
          <option
@@ -299,6 +302,23 @@
                id="net.sf.orcc.backends.profile"
                name="Enable profiling">
             <checkBox></checkBox>
+         </option>
+         <option
+               defaultValue="Standard"
+               description="Predefined configurations for the processors"
+               id="net.sf.orcc.backends.llvm.tta.configuration"
+               name="Processor configuration">
+            <comboBox>
+               <comboBoxItem
+                  id="Standard">
+               </comboBoxItem>
+               <comboBoxItem
+                  id="Custom">
+               </comboBoxItem>
+               <comboBoxItem
+                  id="Huge">
+               </comboBoxItem>
+            </comboBox>
          </option>
    </extension>
    <extension

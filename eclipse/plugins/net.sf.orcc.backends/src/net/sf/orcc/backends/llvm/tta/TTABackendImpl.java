@@ -46,6 +46,7 @@ import net.sf.orcc.backends.llvm.transform.StringTransformation;
 import net.sf.orcc.backends.llvm.transform.TemplateInfoComputing;
 import net.sf.orcc.backends.llvm.tta.architecture.Design;
 import net.sf.orcc.backends.llvm.tta.architecture.Processor;
+import net.sf.orcc.backends.llvm.tta.architecture.ProcessorConfiguration;
 import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitectureBuilder;
 import net.sf.orcc.backends.llvm.tta.architecture.util.ArchitecturePrinter;
 import net.sf.orcc.backends.llvm.tta.transform.ComplexHwOpDetector;
@@ -88,6 +89,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 	private String libPath;
 
 	private Design design;
+	private ProcessorConfiguration configuration;
 
 	String instancePath;
 
@@ -101,6 +103,8 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		// Set default FIFO size to 256
 		fifoSize = getAttribute(FIFO_SIZE, 512);
 		profile = getAttribute("net.sf.orcc.backends.profile", false);
+		configuration = ProcessorConfiguration.getByName(getAttribute(
+				"net.sf.orcc.backends.llvm.tta.configuration", "Huge"));
 	}
 
 	/*
@@ -166,7 +170,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		network = doTransformNetwork(network);
 
 		// build the design
-		design = new ArchitectureBuilder().caseNetwork(network);
+		design = new ArchitectureBuilder(configuration).caseNetwork(network);
 
 		// print instances and entities
 		String oldPath = path;

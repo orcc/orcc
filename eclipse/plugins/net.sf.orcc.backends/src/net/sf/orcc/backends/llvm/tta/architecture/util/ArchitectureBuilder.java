@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.llvm.tta.architecture.util;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -113,12 +112,14 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	private Map<Vertex, Component> componentMap;
 
 	private Design design;
+	private ProcessorConfiguration configuration;
 	private ArchitectureFactory factory = ArchitectureFactory.eINSTANCE;
 
-	public ArchitectureBuilder() {
-		design = factory.createDesign();
-		componentMap = new HashMap<Vertex, Component>();
-		bufferMap = new HashMap<Component, Map<Component, Memory>>();
+	public ArchitectureBuilder(ProcessorConfiguration configuration) {
+		this.configuration = configuration;
+		this.design = factory.createDesign();
+		this.componentMap = new HashMap<Vertex, Component>();
+		this.bufferMap = new HashMap<Component, Map<Component, Memory>>();
 	}
 
 	/**
@@ -224,9 +225,8 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 			// FIXME: Compute the RAM size during the last compilation step
 			int memorySize = computeNeededMemorySize(instance);
 
-			ProcessorConfiguration conf = ProcessorConfiguration.HUGE;
 			Processor processor = factory.createProcessor("processor_"
-					+ instance.getName(), conf, memorySize);
+					+ instance.getName(), configuration, memorySize);
 			component = processor;
 			processor.getMappedActors().add(instance);
 		}
