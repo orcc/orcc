@@ -128,8 +128,8 @@ class Processor:
         self.irom = self._readMif(self.id + ".mif")
         self.dram = self._readAdf(self._adfFile)
         if debug: 
-            print "ROM: " + str(self.irom.depth) + "x" + str(self.irom.width) + "bits"
-            print "RAM: " + str(self.dram.depth) + "x" + str(self.dram.width) + "bits"
+            print "ROM: " + str(self.irom.depth) + "x" + str(self.irom.width) + "bits - " + str(self.irom.depth*self.irom.width/ 8) + " bytes"
+            print "RAM: " + str(self.dram.depth) + "x" + str(self.dram.width) + "bits - " + str(self.dram.depth*self.dram.width/ 8) + " bytes"
             
         self.generateMemConstants(libPath, os.path.join(vhdlPath, self._memConstantsPkg))
         shutil.copy(self._processorFile, vhdlPath)
