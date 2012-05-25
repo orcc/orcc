@@ -45,6 +45,26 @@ public interface DfFactory extends EFactory {
 	Action createAction();
 
 	/**
+	 * Creates a new action.
+	 * 
+	 * @param tag
+	 *            action tag name
+	 * @param inputPattern
+	 *            input pattern
+	 * @param outputPattern
+	 *            output pattern
+	 * @param peekedPattern
+	 *            peeked pattern
+	 * @param scheduler
+	 *            procedure that computes scheduling information
+	 * @param body
+	 *            procedure that holds the body of the action
+	 */
+	Action createAction(String tag, Pattern inputPattern,
+			Pattern outputPattern, Pattern peekedPattern, Procedure scheduler,
+			Procedure body);
+	
+	/**
 	 * Creates a new action with empty patterns, the given tag, scheduler and
 	 * body.
 	 * 
@@ -95,15 +115,6 @@ public interface DfFactory extends EFactory {
 	 */
 	Argument createArgument();
 
-	/**
-	 * Returns a new object of class '<em>Unit</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Unit</em>'.
-	 * @generated
-	 */
-	Unit createUnit();
-
 	Argument createArgument(Var variable, Expression value);
 
 	/**
@@ -153,23 +164,6 @@ public interface DfFactory extends EFactory {
 
 	/**
 	 * Creates a connection from source (and source port) to target (and target
-	 * port) with the given size. This will create a connection with the
-	 * {@link #BUFFER_SIZE} attribute set to size.
-	 * 
-	 * @param source
-	 *            source vertex
-	 * @param sourcePort
-	 *            source port
-	 * @param target
-	 *            target vertex
-	 * @param targetPort
-	 *            target port
-	 */
-	Connection createConnection(Vertex source, Port sourcePort, Vertex target,
-			Port targetPort, int size);
-
-	/**
-	 * Creates a connection from source (and source port) to target (and target
 	 * port)with the given attributes. Attributes are copied.
 	 * 
 	 * @param source
@@ -185,6 +179,23 @@ public interface DfFactory extends EFactory {
 	 */
 	Connection createConnection(Vertex source, Port sourcePort, Vertex target,
 			Port targetPort, Collection<Attribute> attributes);
+
+	/**
+	 * Creates a connection from source (and source port) to target (and target
+	 * port) with the given size. This will create a connection with the
+	 * {@link #BUFFER_SIZE} attribute set to size.
+	 * 
+	 * @param source
+	 *            source vertex
+	 * @param sourcePort
+	 *            source port
+	 * @param target
+	 *            target vertex
+	 * @param targetPort
+	 *            target port
+	 */
+	Connection createConnection(Vertex source, Port sourcePort, Vertex target,
+			Port targetPort, int size);
 
 	/**
 	 * Returns a new object of class '<em>FSM</em>'.
@@ -290,6 +301,15 @@ public interface DfFactory extends EFactory {
 	Transition createTransition();
 
 	Transition createTransition(State source, Action action, State target);
+
+	/**
+	 * Returns a new object of class '<em>Unit</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Unit</em>'.
+	 * @generated
+	 */
+	Unit createUnit();
 
 	/**
 	 * Returns the package supported by this factory.
