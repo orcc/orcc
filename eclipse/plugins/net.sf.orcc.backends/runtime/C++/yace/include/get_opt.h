@@ -93,7 +93,7 @@ public:
 
 	void parse(int argc, char* argv[]);
 
-	template<typename T> T getOptionAs(const std::string&);
+	template<typename T> bool getOptionAs(const std::string&, T&);
 
 	const Tokens& getTokens() const {return tokens;};	
 
@@ -103,11 +103,9 @@ private:
 };
 
 template<typename T>
-T GetOpt::getOptionAs(const std::string& s)
+bool GetOpt::getOptionAs(const std::string& s, T& res)
 {
-	T res;
-	Options<T>(this)(s, res);
-	return res;
+	return Options<T>(this)(s, res);
 }
 
 template<typename T>
@@ -116,16 +114,17 @@ class Options
 public:
 	Options<T>(const GetOpt* options) : options(options) {}
 	
-	void operator () (const std::string& s, T& res)
+	bool operator () (const std::string& s, T& res)
 	{
 		TokensIterator it = options->getTokens().find(s);
 		if(it != options->getTokens().end())
 		{
 			convert<T>((it->second)[0], res);
+			return true;
 		}
 		else
 		{
-			// option not found
+			return false;
 		}
 	}
 private:

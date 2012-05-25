@@ -40,7 +40,7 @@
 
 std::string input_file;
 std::string config_file;
-int nbLoops;
+int nbLoops = -1;
 
 GetOpt::GetOpt(int argc, char* argv[])
 {
@@ -70,7 +70,9 @@ void GetOpt::parse(int argc, char* argv[])
 
 void GetOpt::getOptions()
 {
-	input_file = this->getOptionAs<std::string>("i");
-	config_file = this->getOptionAs<std::string>("p");
-	nbLoops = this->getOptionAs<int>("l");
+	this->getOptionAs<std::string>("i", input_file);
+	this->getOptionAs<std::string>("p", config_file);
+	bool exists = this->getOptionAs<int>("l", nbLoops);
+	if(!exists)
+		nbLoops = -1;
 }

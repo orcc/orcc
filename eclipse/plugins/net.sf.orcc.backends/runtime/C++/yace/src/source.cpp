@@ -50,6 +50,10 @@ static FILE *file = NULL;
 static int nb;
 static int stop;
 
+static int loopsCount;
+
+static unsigned int nbByteRead = 0;
+
 void source_init() 
 {
 	stop = 0;
@@ -72,6 +76,8 @@ void source_init()
 //		wait_for_key();
 		exit(1);
 	}
+
+	loopsCount = nbLoops;
 }
 
 int source_sizeOfFile() { 
@@ -115,7 +121,7 @@ unsigned int source_readByte(){
 }
 
 
-void source_readNBytes(unsigned char outTable[], unsigned short nbTokenToRead){
+void source_readNBytes(unsigned char outTable[], unsigned int nbTokenToRead){
 	int n = fread(outTable, 1, nbTokenToRead, file);
 
 	if(n < nbTokenToRead) {
@@ -127,6 +133,14 @@ void source_readNBytes(unsigned char outTable[], unsigned short nbTokenToRead){
 unsigned int source_getNbLoop(void)
 {
 	return nbLoops;
+}
+
+void source_decrementNbLoops(){
+	--loopsCount;
+}
+
+bool source_isMaxLoopsReached(){
+	return nbLoops != -1 && loopsCount <= 0;
 }
 
 void source_exit(int exitCode)
