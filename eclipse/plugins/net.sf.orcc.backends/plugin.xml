@@ -108,6 +108,19 @@
                id="net.sf.orcc.backends.classify">
          </option>
       </backend>
+      <backend
+            class="net.sf.orcc.backends.cplusplus.YaceBackend"
+            name="C++">
+         <option
+               id="net.sf.orcc.plugins.compileXDF">
+         </option>
+         <option
+               id="net.sf.orcc.backends.classify">
+         </option>
+         <option
+               id="net.sf.orcc.backends.normalize">
+         </option>
+      </backend>
    </extension>
    <extension
          point="net.sf.orcc.core.options">

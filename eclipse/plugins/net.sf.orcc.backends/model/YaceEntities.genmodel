@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/net.sf.orcc.backends/src"
+    editDirectory="/net.sf.orcc.backends.edit/src" editorDirectory="/net.sf.orcc.backends.editor/src"
+    modelPluginID="net.sf.orcc.backends" templateDirectory="" modelName="YaceEntities"
+    editPluginClass="net.sf.orcc.backends.cplusplus.entities.provider.YaceEntitiesEditPlugin"
+    editorPluginClass="net.sf.orcc.backends.cplusplus.entities.presentation.YaceEntitiesEditorPlugin"
+    testSuiteClass="net.sf.orcc.backends.cplusplus.entities.tests.YaceEntitiesAllTests"
+    importerID="org.eclipse.emf.importer.ecore" complianceLevel="6.0" copyrightFields="false"
+    editPluginID="net.sf.orcc.backends.edit" editorPluginID="net.sf.orcc.backends.editor"
+    usedGenPackages="../../net.sf.orcc.core/model/Core.genmodel#//df ../../net.sf.orcc.core/model/Core.genmodel#//ir ../../net.sf.orcc.core/model/Core.genmodel#//moc platform:/plugin/org.eclipse.emf.ecore/model/Ecore.genmodel#//ecore ../../net.sf.orcc.models/model/Graph.genmodel#//util ../../net.sf.orcc.models/model/Graph.genmodel#//graph">
+  <foreignModel>YaceEntities.ecore</foreignModel>
+  <genPackages prefix="YaceEntities" basePackage="net.sf.orcc.backends.cplusplus"
+      disposableProviderFactory="true" ecorePackage="YaceEntities.ecore#/">
+    <genClasses ecoreClass="YaceEntities.ecore#//Sender">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference YaceEntities.ecore#//Sender/input"/>
+    </genClasses>
+    <genClasses ecoreClass="YaceEntities.ecore#//Receiver">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference YaceEntities.ecore#//Receiver/output"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="YaceEntities.ecore#//Interface">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YaceEntities.ecore#//Interface/id"/>
+    </genClasses>
+    <genClasses ecoreClass="YaceEntities.ecore#//InterfaceEthernet">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YaceEntities.ecore#//InterfaceEthernet/ip"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YaceEntities.ecore#//InterfaceEthernet/portNumber"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YaceEntities.ecore#//InterfaceEthernet/server"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="YaceEntities.ecore#//Communicator">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference YaceEntities.ecore#//Communicator/intf"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>
