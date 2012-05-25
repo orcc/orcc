@@ -142,6 +142,20 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	}
 
 	@Override
+	public Action createAction(String tagName, Pattern inputPattern,
+			Pattern outputPattern, Pattern peekedPattern, Procedure scheduler,
+			Procedure body) {
+		ActionImpl action = new ActionImpl();
+		action.setBody(body);
+		action.setInputPattern(inputPattern);
+		action.setOutputPattern(outputPattern);
+		action.setPeekPattern(peekedPattern);
+		action.setScheduler(scheduler);
+		action.setTag(createTag(tagName));
+		return action;
+	}
+
+	@Override
 	public Action createAction(String tagName, Procedure scheduler,
 			Procedure body) {
 		ActionImpl action = new ActionImpl();
@@ -153,7 +167,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 		action.setTag(createTag(tagName));
 		return action;
 	}
-
+	
 	@Override
 	public Action createAction(Tag tag, Pattern inputPattern,
 			Pattern outputPattern, Pattern peekedPattern, Procedure scheduler,
@@ -184,15 +198,6 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	public Argument createArgument() {
 		ArgumentImpl argument = new ArgumentImpl();
 		return argument;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Unit createUnit() {
-		UnitImpl unit = new UnitImpl();
-		return unit;
 	}
 
 	@Override
@@ -247,19 +252,19 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 
 	@Override
 	public Connection createConnection(Vertex source, Port sourcePort,
-			Vertex target, Port targetPort, int size) {
+			Vertex target, Port targetPort, Collection<Attribute> attributes) {
 		Connection connection = createConnection(source, sourcePort, target,
 				targetPort);
-		connection.setAttribute(Connection.BUFFER_SIZE, size);
+		connection.getAttributes().addAll(EcoreUtil.copyAll(attributes));
 		return connection;
 	}
 
 	@Override
 	public Connection createConnection(Vertex source, Port sourcePort,
-			Vertex target, Port targetPort, Collection<Attribute> attributes) {
+			Vertex target, Port targetPort, int size) {
 		Connection connection = createConnection(source, sourcePort, target,
 				targetPort);
-		connection.getAttributes().addAll(EcoreUtil.copyAll(attributes));
+		connection.setAttribute(Connection.BUFFER_SIZE, size);
 		return connection;
 	}
 
@@ -429,6 +434,15 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 		transition.setAction(action);
 		transition.setTarget(target);
 		return transition;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Unit createUnit() {
+		UnitImpl unit = new UnitImpl();
+		return unit;
 	}
 
 	/**
