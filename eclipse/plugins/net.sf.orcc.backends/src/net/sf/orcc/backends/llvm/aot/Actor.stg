@@ -566,7 +566,7 @@ schedulerWithFSM(actions, fsm) ::= <<
 @_FSM_state = internal global i32 <instance.actor.templateData.stateToLabelMap.(fsm.initialState)>
 
 <if(actions)>
-define void @<instance.name>_outside_FSM_scheduler() nounwind {
+define void @<instance.name>_outside_FSM_scheduler() <if(options.profile)>noinline <endif>nounwind {
 entry:
 	br label %bb_outside_scheduler_start
 	
@@ -603,7 +603,7 @@ bb_finished:
 >>
 
 schedulerWithoutFSM(actions) ::= <<
-define void @<instance.name>_scheduler() nounwind {
+define void @<instance.name>_scheduler() <if(options.profile)>noinline <endif>nounwind {
 entry:
 	<printCallStartTokenFunctions()>
 	br label %bb_scheduler_start
