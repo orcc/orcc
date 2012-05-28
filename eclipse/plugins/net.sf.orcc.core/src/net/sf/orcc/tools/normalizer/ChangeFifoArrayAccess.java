@@ -79,14 +79,14 @@ public class ChangeFifoArrayAccess extends DfVisitor<Void> {
 		}
 
 		private void updateIndex(Var var, List<Expression> indexes) {
-			if (indexes.size() < 2) {
+			if (indexes.size() == 1) {
 				Var varCount = actor.getStateVar(var.getName() + "_count");
 				ExprBinary expr = IrFactory.eINSTANCE.createExprBinary(
 						IrFactory.eINSTANCE.createExprVar(varCount),
 						OpBinary.PLUS, indexes.get(0),
 						IrFactory.eINSTANCE.createTypeInt(32));
 
-				indexes.set(0, expr);
+				indexes.add(expr);
 			} else {
 				System.err.println("TODO index");
 			}
