@@ -14,9 +14,6 @@
                id="net.sf.orcc.backends.classify">
          </option>
          <option
-               id="net.sf.orcc.backends.normalize">
-         </option>
-         <option
                id="net.sf.orcc.backends.newScheduler">
          </option>
          <option
@@ -117,9 +114,6 @@
          <option
                id="net.sf.orcc.backends.classify">
          </option>
-         <option
-               id="net.sf.orcc.backends.normalize">
-         </option>
       </backend>
    </extension>
    <extension
@@ -144,6 +138,13 @@
                      name="Merge static actors together">
                   <checkBox></checkBox>
                </option>
+		       <option
+		             defaultValue="false"
+		             description="Transform actors to higher-level"
+		             id="net.sf.orcc.backends.normalize"
+		             name="Transform actors to higher-level">
+		          <checkBox></checkBox>
+		       </option>
             </checkBox>
          </option>
          <option
@@ -263,13 +264,6 @@
                defaultValue="false"
                id="net.sf.orcc.backends.coDesign"
                name="Co-Design">
-            <checkBox></checkBox>
-         </option>
-         <option
-               defaultValue="false"
-               description="Transform actors to higher-level"
-               id="net.sf.orcc.backends.normalize"
-               name="Transform actors to higher-level">
             <checkBox></checkBox>
          </option>
          <option
