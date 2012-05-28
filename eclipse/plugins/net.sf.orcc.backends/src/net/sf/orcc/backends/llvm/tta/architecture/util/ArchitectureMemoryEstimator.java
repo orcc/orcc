@@ -135,7 +135,7 @@ public class ArchitectureMemoryEstimator extends ArchitectureVisitor<Void> {
 	@Override
 	public Void caseProcessor(Processor processor) {
 		Memory rom = processor.getROM();
-		rom.setDepth(60000);
+		rom.setDepth(480000);
 		rom.setWordWidth(8);
 		rom.setMinAddress(0);
 
@@ -148,7 +148,7 @@ public class ArchitectureMemoryEstimator extends ArchitectureVisitor<Void> {
 		// the stack and the state of the actors.
 		int bits = 0;
 		for (Vertex entity : processor.getMappedActors()) {
-			bits = dfVisitor.doSwitch(entity);
+			bits += dfVisitor.doSwitch(entity);
 		}
 		Memory ram = processor.getLocalRAMs().get(0);
 		ram.setDepth(ram.getDepth() + bits / 8);
