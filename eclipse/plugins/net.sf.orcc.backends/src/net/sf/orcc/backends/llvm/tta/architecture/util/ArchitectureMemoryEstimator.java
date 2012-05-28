@@ -43,8 +43,18 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 
+/**
+ * The class defines an estimator of the quantity of memory needed by an design
+ * after the projection of an application on this design.
+ * 
+ * @author Herve Yviquel
+ */
 public class ArchitectureMemoryEstimator extends ArchitectureVisitor<Void> {
 
+	/**
+	 * The class defines a Network visitor used to evaluate the memory needs of
+	 * the given dataflow entities.
+	 */
 	private class InnerDfVisitor extends DfVisitor<Integer> {
 		private class InnerIrVisitor extends AbstractIrVisitor<Integer> {
 
@@ -65,7 +75,6 @@ public class ArchitectureMemoryEstimator extends ArchitectureVisitor<Void> {
 		}
 
 		public InnerDfVisitor() {
-			super();
 			this.irVisitor = new InnerIrVisitor();
 		}
 
@@ -89,11 +98,6 @@ public class ArchitectureMemoryEstimator extends ArchitectureVisitor<Void> {
 		}
 
 		@Override
-		public Integer caseInstance(Instance instance) {
-			return doSwitch(instance.getActor());
-		}
-		
-		@Override
 		public Integer caseBroadcast(Broadcast broadcast) {
 			return 512;
 		}
@@ -102,6 +106,11 @@ public class ArchitectureMemoryEstimator extends ArchitectureVisitor<Void> {
 		public Integer caseConnection(Connection connection) {
 			return connection.getSize()
 					* getSize(connection.getSourcePort().getType()) + 2 * 32;
+		}
+
+		@Override
+		public Integer caseInstance(Instance instance) {
+			return doSwitch(instance.getActor());
 		}
 	}
 
@@ -125,17 +134,32 @@ public class ArchitectureMemoryEstimator extends ArchitectureVisitor<Void> {
 
 	@Override
 	public Void caseProcessor(Processor processor) {
+		// Compute size of the local circular buffer
+		for (Memory ram : processor.getLocalRAMs()) {
+			doSwitch(ram);
+		}
+
+		// Increase the first RAM to contains stack and state
 		int bits = 0;
 		for (Vertex entity : processor.getMappedActors()) {
 			bits = dfVisitor.doSwitch(entity);
 		}
 		Memory ram = processor.getLocalRAMs().get(0);
-		ram.setDepth(bits / 8);
+		ram.setDepth(ram.getDepth() + bits / 8);
 		ram.setWordWidth(8);
 		ram.setMinAddress(0);
 		return null;
 	}
 
+	/**
+	 * Compute the size in bits of the given type. The method getSizeInBits() of
+	 * the class Type is not relevant here because the TCE consider boolean as
+	 * an 8-bits type.
+	 * 
+	 * @param type
+	 *            the type to evaluate
+	 * @return the size of the type in bits.
+	 */
 	private int getSize(Type type) {
 		int size;
 		if (type.isList()) {
