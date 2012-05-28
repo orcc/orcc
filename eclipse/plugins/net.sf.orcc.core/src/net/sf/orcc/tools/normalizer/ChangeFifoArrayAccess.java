@@ -30,6 +30,7 @@ package net.sf.orcc.tools.normalizer;
 
 import java.util.List;
 
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.Def;
@@ -51,12 +52,12 @@ import net.sf.orcc.ir.util.AbstractIrVisitor;
  * @author Jerome Gorin
  * 
  */
-public class ChangeFifoArrayAccess extends DfVisitor<Object> {
+public class ChangeFifoArrayAccess extends DfVisitor<Void> {
 
-	private class IrVisitor extends AbstractIrVisitor<Object> {
+	private class IrVisitor extends AbstractIrVisitor<Void> {
 
 		@Override
-		public Object caseInstLoad(InstLoad load) {
+		public Void caseInstLoad(InstLoad load) {
 			Use use = load.getSource();
 			Var var = use.getVariable();
 			if (var.isLocal() && var.eContainer() instanceof Pattern) {
@@ -67,7 +68,7 @@ public class ChangeFifoArrayAccess extends DfVisitor<Object> {
 		}
 
 		@Override
-		public Object caseInstStore(InstStore store) {
+		public Void caseInstStore(InstStore store) {
 			Def def = store.getTarget();
 			Var var = def.getVariable();
 			if (var.isLocal() && var.eContainer() instanceof Pattern) {
@@ -95,6 +96,12 @@ public class ChangeFifoArrayAccess extends DfVisitor<Object> {
 
 	public ChangeFifoArrayAccess() {
 		irVisitor = new IrVisitor();
+	}
+
+	@Override
+	public Void caseActor(Actor actor) {
+		this.actor = actor;
+		return super.caseActor(actor);
 	}
 
 }
