@@ -96,7 +96,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
+	 * @generateds
 	 */
 	private EClass linkEClass = null;
 

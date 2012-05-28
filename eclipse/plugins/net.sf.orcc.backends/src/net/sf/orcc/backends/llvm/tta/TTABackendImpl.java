@@ -30,11 +30,14 @@ package net.sf.orcc.backends.llvm.tta;
 
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
+import static net.sf.orcc.OrccLaunchConstants.MAPPING;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.CustomPrinter;
@@ -58,13 +61,18 @@ import net.sf.orcc.backends.transform.UnitImporter;
 import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
 import net.sf.orcc.backends.util.FPGA;
+import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.df.transform.BroadcastAdder;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
+import net.sf.orcc.graph.Edge;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.transform.BlockCombine;
@@ -82,16 +90,44 @@ import net.sf.orcc.util.OrccUtil;
  */
 public class TTABackendImpl extends LLVMBackendImpl {
 
-	private boolean debug;
-	private boolean finalize;
-	private boolean profile;
-	private FPGA fpga;
-	private String libPath;
-
-	private Design design;
 	private ProcessorConfiguration configuration;
-
+	private boolean debug;
+	private Design design;
+	private boolean finalize;
+	private FPGA fpga;
 	String instancePath;
+
+	private String libPath;
+	private Mapping mapping;
+	private boolean profile;
+
+	private Map<String, String> userMapping;
+
+	private Map<Port, Integer> computePortToAddrSpaceIdMap(Network network) {
+		Map<Port, Integer> map = new HashMap<Port, Integer>();
+		Map<Vertex, Processor> actorsToProcessorMap = design
+				.getActorToProcessorMap();
+		for (Vertex vertex : network.getVertices()) {
+			if (!(vertex instanceof Port)) {
+				Processor processor = actorsToProcessorMap.get(vertex);
+				for (Edge edge : vertex.getOutgoing()) {
+					Connection connection = (Connection) edge;
+					Port port = connection.getSourcePort();
+					if (!port.isNative()) {
+						map.put(port, processor.getAddrSpaceId(connection));
+					}
+				}
+				for (Edge edge : vertex.getIncoming()) {
+					Connection connection = (Connection) edge;
+					Port port = connection.getTargetPort();
+					if (!port.isNative()) {
+						map.put(port, processor.getAddrSpaceId(connection));
+					}
+				}
+			}
+		}
+		return map;
+	}
 
 	@Override
 	public void doInitializeOptions() {
@@ -105,25 +141,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		profile = getAttribute("net.sf.orcc.backends.profile", false);
 		configuration = ProcessorConfiguration.getByName(getAttribute(
 				"net.sf.orcc.backends.llvm.tta.configuration", "Huge"));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.orcc.backends.AbstractBackend#exportRuntimeLibrary()
-	 */
-	@Override
-	public boolean exportRuntimeLibrary() throws OrccException {
-		libPath = path + File.separator + "libs";
-		write("Export library files into " + libPath + "... ");
-		if (copyFolderToFileSystem("/runtime/TTA", libPath)) {
-			write("OK" + "\n");
-			new File(libPath + File.separator + "generate").setExecutable(true);
-			return true;
-		} else {
-			write("Error" + "\n");
-			return false;
-		}
+		userMapping = getAttribute(MAPPING, new HashMap<String, String>());
 	}
 
 	@Override
@@ -170,7 +188,9 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		network = doTransformNetwork(network);
 
 		// build the design
-		design = new ArchitectureBuilder(configuration).caseNetwork(network);
+		mapping = new Mapping(network, userMapping, true, false);
+		design = new ArchitectureBuilder().build(network, configuration,
+				mapping);
 
 		// print instances and entities
 		String oldPath = path;
@@ -180,6 +200,8 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
 		printer.getOptions().put("profile", profile);
+		printer.getOptions().put("portToAddrSpaceIdMap",
+				computePortToAddrSpaceIdMap(network));
 		printInstances(network);
 		printEntities(network);
 		path = oldPath;
@@ -192,6 +214,25 @@ public class TTABackendImpl extends LLVMBackendImpl {
 
 		if (finalize) {
 			runPythonScript();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.orcc.backends.AbstractBackend#exportRuntimeLibrary()
+	 */
+	@Override
+	public boolean exportRuntimeLibrary() throws OrccException {
+		libPath = path + File.separator + "libs";
+		write("Export library files into " + libPath + "... ");
+		if (copyFolderToFileSystem("/runtime/TTA", libPath)) {
+			write("OK" + "\n");
+			new File(libPath + File.separator + "generate").setExecutable(true);
+			return true;
+		} else {
+			write("Error" + "\n");
+			return false;
 		}
 	}
 

@@ -30,7 +30,10 @@
  */
 package net.sf.orcc.backends.llvm.tta.architecture;
 
+import java.util.Map;
+
 import net.sf.orcc.graph.Graph;
+import net.sf.orcc.graph.Vertex;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.EMap;
@@ -59,45 +62,23 @@ import org.eclipse.emf.common.util.EMap;
  */
 public interface Design extends Graph {
 
-	/**
-	 * Returns the value of the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Name</em>' attribute isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Name</em>' attribute.
-	 * @see #setName(String)
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getDesign_Name()
-	 * @model
-	 * @generated
-	 */
-	String getName();
+	void addInput(Port port);
 
 	void addOutput(Port port);
 
-	void addInput(Port port);
+	Map<Vertex, Processor> getActorToProcessorMap();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getName <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Name</em>' attribute.
-	 * @see #getName()
-	 * @generated
-	 */
-	void setName(String value);
-
-	/**
-	 * Returns the value of the '<em><b>Components</b></em>' reference list.
-	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.Component}.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Components</b></em>' reference list. The
+	 * list contents are of type
+	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Component}. <!--
+	 * begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Components</em>' reference list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Components</em>' reference list.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getDesign_Components()
 	 * @model
@@ -106,62 +87,35 @@ public interface Design extends Graph {
 	EList<Component> getComponents();
 
 	/**
-	 * Returns the value of the '<em><b>Processors</b></em>' reference list.
-	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.Processor}.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Hardware Database</b></em>' map. The key
+	 * is of type {@link java.lang.String}, and the value is of type
+	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Implementation}, <!--
+	 * begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Processors</em>' reference list isn't clear,
-	 * there really should be more of a description here...
+	 * If the meaning of the '<em>Hardware Database</em>' map isn't clear, there
+	 * really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Processors</em>' reference list.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getDesign_Processors()
-	 * @model
+	 * 
+	 * @return the value of the '<em>Hardware Database</em>' map.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getDesign_HardwareDatabase()
+	 * @model mapType=
+	 *        "net.sf.orcc.backends.llvm.tta.architecture.TypeToImplMapEntry<org.eclipse.emf.ecore.EString, net.sf.orcc.backends.llvm.tta.architecture.Implementation>"
 	 * @generated
 	 */
-	EList<Processor> getProcessors();
+	EMap<String, Implementation> getHardwareDatabase();
 
 	/**
-	 * Returns the value of the '<em><b>Shared Memories</b></em>' reference list.
-	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.Memory}.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Inputs</b></em>' reference list. The
+	 * list contents are of type
+	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Port}. <!--
+	 * begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Shared Memories</em>' reference list isn't clear,
-	 * there really should be more of a description here...
+	 * If the meaning of the '<em>Inputs</em>' reference list isn't clear, there
+	 * really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Shared Memories</em>' reference list.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getDesign_SharedMemories()
-	 * @model
-	 * @generated
-	 */
-	EList<Memory> getSharedMemories();
-
-	/**
-	 * Returns the value of the '<em><b>Signals</b></em>' reference list.
-	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.Signal}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Signals</em>' reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Signals</em>' reference list.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getDesign_Signals()
-	 * @model
-	 * @generated
-	 */
-	EList<Signal> getSignals();
-
-	/**
-	 * Returns the value of the '<em><b>Inputs</b></em>' reference list.
-	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.Port}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Inputs</em>' reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Inputs</em>' reference list.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getDesign_Inputs()
 	 * @model
@@ -170,14 +124,33 @@ public interface Design extends Graph {
 	EList<Port> getInputs();
 
 	/**
-	 * Returns the value of the '<em><b>Outputs</b></em>' reference list.
-	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.Port}.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Name</em>' attribute isn't clear, there really
+	 * should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * 
+	 * @return the value of the '<em>Name</em>' attribute.
+	 * @see #setName(String)
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getDesign_Name()
+	 * @model
+	 * @generated
+	 */
+	String getName();
+
+	/**
+	 * Returns the value of the '<em><b>Outputs</b></em>' reference list. The
+	 * list contents are of type
+	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Port}. <!--
+	 * begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Outputs</em>' reference list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Outputs</em>' reference list.
 	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getDesign_Outputs()
 	 * @model
@@ -186,19 +159,74 @@ public interface Design extends Graph {
 	EList<Port> getOutputs();
 
 	/**
-	 * Returns the value of the '<em><b>Hardware Database</b></em>' map.
-	 * The key is of type {@link java.lang.String},
-	 * and the value is of type {@link net.sf.orcc.backends.llvm.tta.architecture.Implementation},
-	 * <!-- begin-user-doc -->
+	 * Returns the '<em><b>Processor</b></em>' reference with the given name.
+	 * 
+	 * @param name
+	 *            the name of the processor
+	 * @return the reference of the processor or null if it does not exist.
+	 */
+	Processor getProcessor(String name);
+
+	/**
+	 * Returns the value of the '<em><b>Processors</b></em>' reference list. The
+	 * list contents are of type
+	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Processor}. <!--
+	 * begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Hardware Database</em>' map isn't clear,
+	 * If the meaning of the '<em>Processors</em>' reference list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Hardware Database</em>' map.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getDesign_HardwareDatabase()
-	 * @model mapType="net.sf.orcc.backends.llvm.tta.architecture.TypeToImplMapEntry<org.eclipse.emf.ecore.EString, net.sf.orcc.backends.llvm.tta.architecture.Implementation>"
+	 * 
+	 * @return the value of the '<em>Processors</em>' reference list.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getDesign_Processors()
+	 * @model
 	 * @generated
 	 */
-	EMap<String, Implementation> getHardwareDatabase();
+	EList<Processor> getProcessors();
+
+	/**
+	 * Returns the value of the '<em><b>Shared Memories</b></em>' reference
+	 * list. The list contents are of type
+	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Memory}. <!--
+	 * begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Shared Memories</em>' reference list isn't
+	 * clear, there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * 
+	 * @return the value of the '<em>Shared Memories</em>' reference list.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getDesign_SharedMemories()
+	 * @model
+	 * @generated
+	 */
+	EList<Memory> getSharedMemories();
+
+	/**
+	 * Returns the value of the '<em><b>Signals</b></em>' reference list. The
+	 * list contents are of type
+	 * {@link net.sf.orcc.backends.llvm.tta.architecture.Signal}. <!--
+	 * begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Signals</em>' reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * 
+	 * @return the value of the '<em>Signals</em>' reference list.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getDesign_Signals()
+	 * @model
+	 * @generated
+	 */
+	EList<Signal> getSignals();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Design#getName <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Name</em>' attribute.
+	 * @see #getName()
+	 * @generated
+	 */
+	void setName(String value);
 } // Design

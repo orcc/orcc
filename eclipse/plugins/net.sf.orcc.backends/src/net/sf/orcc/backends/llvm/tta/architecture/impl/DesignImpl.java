@@ -31,6 +31,8 @@
 package net.sf.orcc.backends.llvm.tta.architecture.impl;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage;
@@ -187,6 +189,18 @@ public class DesignImpl extends GraphImpl implements Design {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
+	public void addInput(Port port) {
+		getVertices().add(port);
+		getInputs().add(port);
+	}
+
+	@Override
+	public void addOutput(Port port) {
+		getVertices().add(port);
+		getOutputs().add(port);
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -217,16 +231,19 @@ public class DesignImpl extends GraphImpl implements Design {
 		return super.eGet(featureID, resolve, coreType);
 	}
 
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
-	public void addInput(Port port) {
-		getVertices().add(port);
-		getInputs().add(port);
-	}
-
-	@Override
-	public void addOutput(Port port) {
-		getVertices().add(port);
-		getOutputs().add(port);
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
+		switch (featureID) {
+		case ArchitecturePackage.DESIGN__HARDWARE_DATABASE:
+			return ((InternalEList<?>) getHardwareDatabase()).basicRemove(
+					otherEnd, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**
@@ -312,26 +329,6 @@ public class DesignImpl extends GraphImpl implements Design {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setName(String newName) {
-		String oldName = name;
-		name = newName;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					ArchitecturePackage.DESIGN__NAME, oldName, name));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
@@ -363,6 +360,17 @@ public class DesignImpl extends GraphImpl implements Design {
 		super.eUnset(featureID);
 	}
 
+	@Override
+	public Map<Vertex, Processor> getActorToProcessorMap() {
+		Map<Vertex, Processor> map = new HashMap<Vertex, Processor>();
+		for (Processor processor : getProcessors()) {
+			for (Vertex actor : processor.getMappedActors()) {
+				map.put(actor, processor);
+			}
+		}
+		return map;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -373,6 +381,62 @@ public class DesignImpl extends GraphImpl implements Design {
 					this, ArchitecturePackage.DESIGN__COMPONENTS);
 		}
 		return components;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EMap<String, Implementation> getHardwareDatabase() {
+		if (hardwareDatabase == null) {
+			hardwareDatabase = new EcoreEMap<String, Implementation>(
+					ArchitecturePackage.Literals.TYPE_TO_IMPL_MAP_ENTRY,
+					TypeToImplMapEntryImpl.class, this,
+					ArchitecturePackage.DESIGN__HARDWARE_DATABASE);
+		}
+		return hardwareDatabase;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Port> getInputs() {
+		if (inputs == null) {
+			inputs = new EObjectResolvingEList<Port>(Port.class, this,
+					ArchitecturePackage.DESIGN__INPUTS);
+		}
+		return inputs;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Port> getOutputs() {
+		if (outputs == null) {
+			outputs = new EObjectResolvingEList<Port>(Port.class, this,
+					ArchitecturePackage.DESIGN__OUTPUTS);
+		}
+		return outputs;
+	}
+
+	@Override
+	public Processor getProcessor(String name) {
+		for (Processor processor : getProcessors()) {
+			if (processor.getName().equals(name)) {
+				return processor;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -415,53 +479,12 @@ public class DesignImpl extends GraphImpl implements Design {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Port> getInputs() {
-		if (inputs == null) {
-			inputs = new EObjectResolvingEList<Port>(Port.class, this,
-					ArchitecturePackage.DESIGN__INPUTS);
-		}
-		return inputs;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Port> getOutputs() {
-		if (outputs == null) {
-			outputs = new EObjectResolvingEList<Port>(Port.class, this,
-					ArchitecturePackage.DESIGN__OUTPUTS);
-		}
-		return outputs;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EMap<String, Implementation> getHardwareDatabase() {
-		if (hardwareDatabase == null) {
-			hardwareDatabase = new EcoreEMap<String, Implementation>(
-					ArchitecturePackage.Literals.TYPE_TO_IMPL_MAP_ENTRY,
-					TypeToImplMapEntryImpl.class, this,
-					ArchitecturePackage.DESIGN__HARDWARE_DATABASE);
-		}
-		return hardwareDatabase;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
-		switch (featureID) {
-		case ArchitecturePackage.DESIGN__HARDWARE_DATABASE:
-			return ((InternalEList<?>) getHardwareDatabase()).basicRemove(
-					otherEnd, msgs);
-		}
-		return super.eInverseRemove(otherEnd, featureID, msgs);
+	public void setName(String newName) {
+		String oldName = name;
+		name = newName;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					ArchitecturePackage.DESIGN__NAME, oldName, name));
 	}
 
 	/**

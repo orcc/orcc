@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.backends.llvm.tta.architecture.util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
@@ -42,7 +42,7 @@ import net.sf.orcc.backends.llvm.tta.architecture.Port;
 import net.sf.orcc.backends.llvm.tta.architecture.Processor;
 import net.sf.orcc.backends.llvm.tta.architecture.ProcessorConfiguration;
 import net.sf.orcc.backends.llvm.tta.architecture.Signal;
-import net.sf.orcc.df.Action;
+import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Broadcast;
@@ -50,10 +50,8 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.graph.Vertex;
-import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.TypeList;
-import net.sf.orcc.ir.Var;
 
 /**
  * This class define an architecture builder from the mapping of actors on a set
@@ -66,61 +64,65 @@ import net.sf.orcc.ir.Var;
 public class ArchitectureBuilder extends DfSwitch<Design> {
 
 	/**
-	 * This class define an architecture visitor used to update needed
-	 * information after the projection of a dataflow application onto a network
-	 * of processors. For example, it computes the size of each memory according
-	 * to the mapping.
-	 * 
-	 * @author Herve Yviquel
-	 * 
+	 * This class defines a network visitor used to create a design according to
+	 * the given network and the mapping.
 	 */
-	private class ProjectionFinalizer extends ArchitectureSwitch<Void> {
-
+	private class Mapper extends DfVisitor<Void> {
 		@Override
-		public Void caseMemory(Memory buffer) {
-			int bits = 0;
-			for (Connection connection : buffer.getMappedConnections()) {
-				bits += connection.getSize()
-						* getSize(connection.getSourcePort().getType()) + 2
-						* 32;
-				connection.getSourcePort().setAttribute("id",
-						buffer.getSourcePort().getAttribute("id").getValue());
-				connection.getTargetPort().setAttribute("id",
-						buffer.getTargetPort().getAttribute("id").getValue());
-			}
-
-			buffer.setDepth(bits / 8 + 64);
-			buffer.setWordWidth(8);
-			buffer.setMinAddress(0);
+		public Void caseBroadcast(Broadcast broadcast) {
+			Processor processor = design.getProcessor(mapping
+					.getMappedComponent(broadcast));
+			processor.getMappedActors().add(broadcast);
+			componentMap.put(broadcast, processor);
 			return null;
 		}
 
 		@Override
-		public Void caseDesign(Design design) {
-			for (Memory buffer : design.getSharedMemories()) {
-				doSwitch(buffer);
+		public Void caseConnection(Connection connection) {
+			if (isNative(connection)) {
+				// Native connection are hardware signals
+				addSignal(connection);
+			} else {
+				// FIFO connection are mapped to a memory
+				mapToBuffer(connection);
 			}
 			return null;
 		}
 
+		@Override
+		public Void caseInstance(Instance instance) {
+			Actor actor = instance.getActor();
+			if (actor.isNative()) {
+				Component component;
+				// A native actor describes a VHDL component from the library.
+				component = factory.createComponent(instance.getActor()
+						.getSimpleName());
+				// The parameter of this actor is used as generic.
+				for (Argument arg : instance.getArguments()) {
+					component.setAttribute(arg.getVariable().getName(),
+							arg.getValue());
+				}
+				design.add(component);
+				componentMap.put(instance, component);
+			} else {
+				Processor processor = design.getProcessor(mapping
+						.getMappedComponent(instance));
+				processor.getMappedActors().add(instance);
+				componentMap.put(instance, processor);
+			}
+
+			return null;
+		}
 	}
 
 	private int bufferId = 0;
 
 	private Map<Component, Map<Component, Memory>> bufferMap;
-
 	private Map<Vertex, Component> componentMap;
 
 	private Design design;
-	private ProcessorConfiguration configuration;
 	private ArchitectureFactory factory = ArchitectureFactory.eINSTANCE;
-
-	public ArchitectureBuilder(ProcessorConfiguration configuration) {
-		this.configuration = configuration;
-		this.design = factory.createDesign();
-		this.componentMap = new HashMap<Vertex, Component>();
-		this.bufferMap = new HashMap<Component, Map<Component, Memory>>();
-	}
+	private Mapping mapping;
 
 	/**
 	 * Add a simple signal to the design. The signal is the translation of
@@ -182,148 +184,34 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		design.add(signal);
 	}
 
-	@Override
-	public Design caseBroadcast(Broadcast broadcast) {
-		ProcessorConfiguration conf = ProcessorConfiguration.HUGE;
-		Processor processor = factory.createProcessor(
-				"processor_" + broadcast.getName(), conf, 512);
-		processor.getMappedActors().add(broadcast);
-		design.add(processor);
-		componentMap.put(broadcast, processor);
-		return null;
-	}
+	/**
+	 * @param network
+	 * @param configuration
+	 * @param mapping
+	 * @return
+	 */
+	public Design build(Network network, ProcessorConfiguration configuration,
+			Mapping mapping) {
+		this.mapping = mapping;
+		this.componentMap = new HashMap<Vertex, Component>();
+		this.bufferMap = new HashMap<Component, Map<Component, Memory>>();
+		this.design = factory.createDesign();
 
-	@Override
-	public Design caseConnection(Connection connection) {
-		if (isNative(connection)) {
-			// Native connection are hardware signals
-			addSignal(connection);
-		} else {
-			// FIFO connection are mapped to a memory
-			mapToBuffer(connection);
+		// Map all unmapped component to its own processor
+		for (Vertex unmapped : new ArrayList<Vertex>(
+				mapping.getUnmappedEntities())) {
+			mapping.map("processor_" + unmapped.getLabel(), unmapped);
 		}
-		return null;
-	}
 
-	@Override
-	public Design caseInstance(Instance instance) {
-		Actor actor = instance.getActor();
-		Component component;
-		if (actor.isNative()) {
-			// A native actor describes a VHDL component from the library.
-			component = factory.createComponent(instance.getActor()
-					.getSimpleName());
-			// The parameter of this actor is used as generics.
-			for (Argument arg : instance.getArguments()) {
-				component.setAttribute(arg.getVariable().getName(),
-						arg.getValue());
-			}
-		} else {
-			// FIXME: Map several actors on the same processor
-			// TODO: Let the user choosing the configuration of the processor
-
-			// FIXME: Compute the RAM size during the last compilation step
-			int memorySize = computeNeededMemorySize(instance);
-
-			Processor processor = factory.createProcessor("processor_"
-					+ instance.getName(), configuration, memorySize);
-			component = processor;
-			processor.getMappedActors().add(instance);
+		// Build processors
+		for (String name : mapping.getComponents()) {
+			design.add(factory.createProcessor(name, configuration, 0));
 		}
-		design.add(component);
-		componentMap.put(instance, component);
-		return null;
-	}
 
-	@Override
-	public Design caseNetwork(Network network) {
-		design = factory.createDesign();
-
-		for (Vertex entity : network.getEntities()) {
-			doSwitch(entity);
-		}
-		for (Instance instance : network.getInstances()) {
-			doSwitch(instance);
-		}
-		for (Connection connection : network.getConnections()) {
-			doSwitch(connection);
-		}
-		new ProjectionFinalizer().doSwitch(design);
+		new Mapper().doSwitch(network);
+		new ArchitectureMemoryEstimator().doSwitch(design);
 
 		return design;
-	}
-
-	private int computeNeededMemorySize(Action action) {
-		int neededMemorySize = 0;
-		neededMemorySize += computeNeededMemorySize(action.getBody()
-				.getLocals());
-		neededMemorySize += computeNeededMemorySize(action.getInputPattern()
-				.getVariables());
-		neededMemorySize += computeNeededMemorySize(action.getScheduler()
-				.getLocals());
-		neededMemorySize += computeNeededMemorySize(action.getPeekPattern()
-				.getVariables());
-		return neededMemorySize;
-	}
-
-	/**
-	 * Returns the memory size needed by the given actor in bits. This size
-	 * corresponds to the sum of state variable size (only assignable variables
-	 * or constant arrays) plus the maximum of the sum of local arrays per each
-	 * action.
-	 * 
-	 * @param instance
-	 *            the given instance
-	 * @return the memory size needed by the given actor
-	 */
-	private int computeNeededMemorySize(Instance instance) {
-		int neededMemorySize = 0;
-		// Compute memory size needed by state variable
-		for (Var var : instance.getActor().getStateVars()) {
-			if (var.isAssignable() || var.getType().isList()) {
-				neededMemorySize += getSize(var.getType());
-			}
-		}
-		// Compute memory size needed by the actions
-		for (Action action : instance.getActor().getActions()) {
-			neededMemorySize += computeNeededMemorySize(action) * 1.3;
-		}
-		return neededMemorySize;
-	}
-
-	/**
-	 * Return the memory size needed by the given variables. That corresponds to
-	 * the total size of the contained arrays.
-	 * 
-	 * @param vars
-	 *            the list procedure
-	 * @return the memory size needed by the given procedure
-	 */
-	private int computeNeededMemorySize(List<Var> localVars) {
-		int neededMemorySize = 0;
-		// Compute memory size needed by local arrays
-		for (Var var : localVars) {
-			if (var.getType().isList()) {
-				neededMemorySize += getSize(var.getType());
-			}
-		}
-
-		return neededMemorySize;
-	}
-
-	private int getSize(Type type) {
-		int size;
-		if (type.isList()) {
-			size = getSize(((TypeList) type).getInnermostType());
-			for (int dim : type.getDimensions()) {
-				size *= dim;
-			}
-		} else if (type.isBool()) {
-			size = 8;
-		} else {
-			size = type.getSizeInBits();
-		}
-		return size;
 	}
 
 	private boolean isNative(Connection connection) {
@@ -349,31 +237,35 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		Processor target = (Processor) componentMap.get(connection.getTarget());
 
 		Memory ram;
+		Map<Component, Memory> tgtToBufferMap;
 
-		if (source == target) {
-			// Both actors are mapped to the same processor, then the FIFO is
-			// mapped to its local RAM.
-			ram = source.getLocalRAMs().get(0);
+		if (bufferMap.containsKey(source)) {
+			tgtToBufferMap = bufferMap.get(source);
 		} else {
-			// Both actors are mapped to different processors, then the FIFO is
-			// mapped in their shared memory (it is created if necessary).
-			Map<Component, Memory> tgtToBufferMap;
-			if (bufferMap.containsKey(source)) {
-				tgtToBufferMap = bufferMap.get(source);
-			} else {
-				tgtToBufferMap = new HashMap<Component, Memory>();
-				bufferMap.put(source, tgtToBufferMap);
-			}
+			tgtToBufferMap = new HashMap<Component, Memory>();
+			bufferMap.put(source, tgtToBufferMap);
+		}
 
-			if (tgtToBufferMap.containsKey(target)) {
-				ram = tgtToBufferMap.get(target);
+		if (tgtToBufferMap.containsKey(target)) {
+			ram = tgtToBufferMap.get(target);
+		} else {
+			if (source == target) {
+				// Both actors are mapped to the same processor, then the
+				// FIFO is mapped to its local RAM.
+				ram = source.getLocalRAMs().get(0);
+				FunctionUnit lsu = source.getFunctionUnit("LSU_0");
+				ram.setAttribute("id", bufferId++);
+				ram.setSourcePort(lsu);
+				ram.setTargetPort(lsu);
 			} else {
+				// Both actors are mapped to different processors, then the
+				// FIFO is mapped in their shared memory.
 				ram = factory.createMemory(bufferId++, 8, source, target);
 				design.add(ram);
-				tgtToBufferMap.put(target, ram);
 			}
-
+			tgtToBufferMap.put(target, ram);
 		}
+
 		ram.getMappedConnections().add(connection);
 	}
 }

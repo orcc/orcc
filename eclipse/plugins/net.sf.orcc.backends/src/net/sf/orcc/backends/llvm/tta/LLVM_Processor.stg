@@ -5,9 +5,8 @@ printProcessor(processor, options) ::= <<
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Declare and initialize FIFO variables 
 
-<processor.incoming: { buffer |<declareBuffer(buffer, buffer.targetPort.id)>}; separator="\n\n">
-
-<processor.outgoing: { buffer |<declareBuffer(buffer, buffer.sourcePort.id)>}; separator="\n\n">
+<processor.localRAMs: declareBuffer(); separator="\n\n">
+<processor.sharedRAMs: declareBuffer(); separator="\n\n">
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Declare the scheduling function of each actor
@@ -27,8 +26,8 @@ loop:
 }
 >>
 
-declareBuffer(buffer, id) ::= <<
-<buffer.mappedConnections: declareFifo(id); separator="\n\n">
+declareBuffer(buffer) ::= <<
+<buffer.mappedConnections: declareFifo(processor.memToAddrSpaceIdMap.(buffer)); separator="\n\n">
 >>
 
 declareFifo(connection, id) ::= <<

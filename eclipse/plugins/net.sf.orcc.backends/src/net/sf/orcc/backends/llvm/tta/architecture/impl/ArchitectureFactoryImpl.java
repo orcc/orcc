@@ -696,7 +696,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 							ports.get(1)));
 		}
 		LSU.setAddressSpace(addressSpace);
-		LSU.setAttribute("id", id);
 		return LSU;
 	}
 

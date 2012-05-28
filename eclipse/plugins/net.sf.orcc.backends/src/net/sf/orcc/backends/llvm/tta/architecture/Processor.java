@@ -30,6 +30,9 @@
  */
 package net.sf.orcc.backends.llvm.tta.architecture;
 
+import java.util.Map;
+
+import net.sf.orcc.df.Connection;
 import net.sf.orcc.graph.Vertex;
 
 import org.eclipse.emf.common.util.EList;
@@ -60,6 +63,14 @@ import org.eclipse.emf.common.util.EList;
  * @generated
  */
 public interface Processor extends Component {
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @model
+	 * @generated
+	 */
+	FunctionUnit connect(Memory sharedMemory);
+
 	/**
 	 * Returns the value of the '<em><b>Bridges</b></em>' containment reference
 	 * list. The list contents are of type
@@ -114,6 +125,8 @@ public interface Processor extends Component {
 	 */
 	ProcessorConfiguration getConfiguration();
 
+	FunctionUnit getFunctionUnit(String name);
+
 	/**
 	 * Returns the value of the '<em><b>Function Units</b></em>' containment
 	 * reference list. The list contents are of type
@@ -150,6 +163,22 @@ public interface Processor extends Component {
 	GlobalControlUnit getGcu();
 
 	/**
+	 * Returns the value of the '<em><b>Local RA Ms</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.Memory}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Local RA Ms</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Local RA Ms</em>' containment reference list.
+	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_LocalRAMs()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Memory> getLocalRAMs();
+
+	/**
 	 * Returns the value of the '<em><b>Mapped Actors</b></em>' reference list.
 	 * The list contents are of type {@link net.sf.orcc.graph.Vertex}. <!--
 	 * begin-user-doc -->
@@ -165,6 +194,10 @@ public interface Processor extends Component {
 	 * @generated
 	 */
 	EList<Vertex> getMappedActors();
+
+	Map<Memory, Integer> getMemToAddrSpaceIdMap();
+
+	Integer getAddrSpaceId(Connection connection);
 
 	/**
 	 * Returns the value of the '<em><b>Register Files</b></em>' containment
@@ -200,32 +233,6 @@ public interface Processor extends Component {
 	 * @generated
 	 */
 	Memory getROM();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getROM <em>ROM</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>ROM</em>' containment reference.
-	 * @see #getROM()
-	 * @generated
-	 */
-	void setROM(Memory value);
-
-	/**
-	 * Returns the value of the '<em><b>Local RA Ms</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.backends.llvm.tta.architecture.Memory}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Local RA Ms</em>' containment reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Local RA Ms</em>' containment reference list.
-	 * @see net.sf.orcc.backends.llvm.tta.architecture.ArchitecturePackage#getProcessor_LocalRAMs()
-	 * @model containment="true"
-	 * @generated
-	 */
-	EList<Memory> getLocalRAMs();
 
 	/**
 	 * Returns the value of the '<em><b>Shared RA Ms</b></em>' reference list.
@@ -273,14 +280,6 @@ public interface Processor extends Component {
 	void setConfiguration(ProcessorConfiguration value);
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @model
-	 * @generated
-	 */
-	FunctionUnit connect(Memory sharedMemory);
-
-	/**
 	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getGcu <em>Gcu</em>}' containment reference.
 	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
@@ -289,5 +288,15 @@ public interface Processor extends Component {
 	 * @generated
 	 */
 	void setGcu(GlobalControlUnit value);
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.llvm.tta.architecture.Processor#getROM <em>ROM</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>ROM</em>' containment reference.
+	 * @see #getROM()
+	 * @generated
+	 */
+	void setROM(Memory value);
 
 } // Processor

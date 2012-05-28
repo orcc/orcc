@@ -32,10 +32,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.graph.Vertex;
 
 /**
@@ -46,55 +48,132 @@ import net.sf.orcc.graph.Vertex;
  */
 public class Mapping {
 
-	private Map<String, List<Vertex>> execMapping;
-	private Network network;
-	private List<Vertex> unmapped;
+	private class Visitor extends DfVisitor<Void> {
+		@Override
+		public Void caseBroadcast(Broadcast broadcast) {
+			if (mapBroadcasts) {
+				// Broadcasts are mapped with their source
+				Instance instance = (Instance) broadcast.getPredecessors().get(
+						0);
+				map(userMapping.get(instance.getHierarchicalName()), broadcast);
+			} else {
+				unmappedEntities.add(broadcast);
+			}
+			return null;
+		}
+
+		@Override
+		public Void caseInstance(Instance instance) {
+			if (mapNativeActors || !instance.getActor().isNative()) {
+				map(userMapping.get(instance.getHierarchicalName()), instance);
+			}
+			return null;
+		}
+	}
+
+	private Map<String, List<Vertex>> componentToEntitiesMap;
+
+	private Map<Vertex, String> entityToComponentMap;
+	private boolean mapBroadcasts;
+
+	private boolean mapNativeActors;
+	private List<Vertex> unmappedEntities;
 	private Map<String, String> userMapping;
 
+	public Mapping(Network network, Map<String, String> userMapping) {
+		this(network, userMapping, false, true);
+	}
+
 	public Mapping(Network network, Map<String, String> userMapping,
-			boolean mapBroadcast) {
-		this.network = network;
+			boolean mapBroadcasts, boolean mapNativeActors) {
 		this.userMapping = userMapping;
-		this.execMapping = new HashMap<String, List<Vertex>>();
-		this.unmapped = new ArrayList<Vertex>();
-		computeMapping(mapBroadcast);
+		this.mapBroadcasts = mapBroadcasts;
+		this.mapNativeActors = mapNativeActors;
+		this.componentToEntitiesMap = new HashMap<String, List<Vertex>>();
+		this.entityToComponentMap = new HashMap<Vertex, String>();
+		this.unmappedEntities = new ArrayList<Vertex>();
+		new Visitor().caseNetwork(network);
 	}
 
-	private void computeMapping(boolean mapBroadcast) {
-		for (Instance instance : network.getInstances()) {
-			map(instance.getHierarchicalName(), instance);
-		}
-		if (mapBroadcast) {
-			for (Vertex entity : network.getEntities()) {
-				if (entity instanceof Broadcast) {
-					// Broadcasts are mapped with their source
-					String srcName = ((Instance) entity.getPredecessors()
-							.get(0)).getHierarchicalName();
-					map(srcName, entity);
-				}
-			}
-		}
+	/**
+	 * @return
+	 */
+	public Map<String, List<Vertex>> getComponentToEntitiesMap() {
+		return componentToEntitiesMap;
 	}
 
-	public Map<String, List<Vertex>> getExecMapping() {
-		return execMapping;
+	/**
+	 * @return
+	 */
+	public Map<Vertex, String> getEntityToComponentMap() {
+		return entityToComponentMap;
 	}
 
-	public List<Vertex> getUnmapped() {
-		return unmapped;
+	/**
+	 * @param entity
+	 * @return
+	 */
+	public String getMappedComponent(Vertex entity) {
+		return entityToComponentMap.get(entity);
 	}
 
-	private void map(String name, Vertex vertex) {
-		String component = userMapping.get(name);
-		if (component != null) {
-			List<Vertex> list = execMapping.get(component);
+	/**
+	 * @param component
+	 * @return
+	 */
+	public List<Vertex> getMappedEntities(String component) {
+		return componentToEntitiesMap.get(component);
+	}
+
+	public List<Vertex> getUnmappedEntities() {
+		return unmappedEntities;
+	}
+
+	/**
+	 * @return
+	 */
+	public Set<String> getComponents() {
+		return componentToEntitiesMap.keySet();
+	}
+
+	/**
+	 * @param entity
+	 * @return
+	 */
+	public boolean isNotMapped(Vertex entity) {
+		return unmappedEntities.contains(entity);
+	}
+
+	/**
+	 * @param name
+	 * @param vertex
+	 */
+	public void map(String component, Vertex vertex) {
+		if (component != null && !component.isEmpty()) {
+			List<Vertex> list = componentToEntitiesMap.get(component);
 			if (list == null) {
 				list = new ArrayList<Vertex>();
-				execMapping.put(component, list);
+				componentToEntitiesMap.put(component, list);
 			}
 			list.add(vertex);
+			entityToComponentMap.put(vertex, component);
+			unmappedEntities.remove(vertex);
 		} else {
-			unmapped.add(vertex);
+			unmappedEntities.add(vertex);
 		}
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean mapBroadcasts() {
+		return mapBroadcasts;
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean mapNativeActors() {
+		return mapNativeActors;
 	}
 }

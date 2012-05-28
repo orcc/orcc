@@ -10,14 +10,12 @@ printProcessor(processor, options) ::= <<
 	
 	<processor.registerFiles: printRegisterFile(); separator="\n\n">
 	
-	<printAddressSpace(processor.ROM, false)>
+	<printAddressSpace(processor.ROM)>
 	
-	<processor.localRAMs: { ram |<printAddressSpace(ram, i0)>}; separator="\n\n">
+	<processor.localRAMs: printAddressSpace(); separator="\n\n">
 	
-	<processor.incoming: { edge |<if(!edge.signal)><printAddressSpace(edge, edge.targetPort.id)><endif>}; separator="\n\n">
-	
-	<processor.outgoing: { edge |<if(!edge.signal)><printAddressSpace(edge, edge.sourcePort.id)><endif>}; separator="\n\n">
-	
+	<processor.sharedRAMs: printAddressSpace(); separator="\n\n">
+
 	<if(processor.gcu)><printGlobalControlUnit(processor.gcu)><endif>
 \</adf\>
 >>
@@ -151,13 +149,13 @@ connectSocket(socket) ::= <<
 <if(socket)>\<connects-to\><socket.name>\</connects-to\><endif>
 >>
 
-printAddressSpace(addressSpace, id) ::= <<
+printAddressSpace(addressSpace) ::= <<
 \<address-space name="<addressSpace.name>"\>
 	\<width\><addressSpace.wordWidth>\</width\>
 	\<min-address\><addressSpace.minAddress>\</min-address\>
 	\<max-address\><addressSpace.maxAddress>\</max-address\>
 	\<shared-memory\><if(addressSpace.shared)>true<else>false<endif>\</shared-memory\>
-	<if(id)>\<numerical-id\><id>\</numerical-id\><endif>
+	<if(processor.memToAddrSpaceIdMap.(addressSpace))>\<numerical-id\><processor.memToAddrSpaceIdMap.(addressSpace)>\</numerical-id\><endif>
 \</address-space\>
 >>
 
