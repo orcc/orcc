@@ -12,6 +12,7 @@ backend).
 	* support simulation and profiling using ttasim (experimental branch of TCE).
 	* add option to choose the configuration of the processors between several 
 	predefined profiles. 
+	* support the mapping of several actors on the same processor.
 
 Misc
 ----
