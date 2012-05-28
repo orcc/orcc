@@ -66,7 +66,6 @@ import net.sf.orcc.backends.llvm.tta.architecture.Term;
 import net.sf.orcc.backends.llvm.tta.architecture.TermBool;
 import net.sf.orcc.backends.llvm.tta.architecture.TermUnit;
 import net.sf.orcc.backends.llvm.tta.architecture.Writes;
-import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.util.util.EcoreHelper;
 
@@ -709,33 +708,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public Memory createMemory(int id, int width, Processor source,
-			Processor target) {
-		Memory sharedMemory = new MemoryImpl();
-		sharedMemory.setName("smem_" + id);
-		FunctionUnit sourceLSU = source.connect(sharedMemory);
-		FunctionUnit targetLSU = target.connect(sharedMemory);
-		sharedMemory.setSource(source);
-		sharedMemory.setTarget(target);
-		sharedMemory.setSourcePort(sourceLSU);
-		sharedMemory.setTargetPort(targetLSU);
-		sharedMemory.setAttribute("id", id);
-		return sharedMemory;
-	}
-
-	@Override
-	public Memory createMemory(String name, int wordWidth, int depth) {
-		return createMemory(name, wordWidth, depth, 0);
-	}
-
-	@Override
-	public Memory createMemory(String name, int wordWidth, int depth,
-			int minAdress) {
+	public Memory createMemory(String name) {
 		Memory addressSpace = new MemoryImpl();
 		addressSpace.setName(name);
-		addressSpace.setWordWidth(wordWidth);
-		addressSpace.setMinAddress(minAdress);
-		addressSpace.setDepth(depth);
 		return addressSpace;
 	}
 
@@ -960,9 +935,8 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		processor.setName(name);
 
 		// Address spaces
-		Memory program = createMemory("instructions", 8, 60000, 0);
-		Memory data = createMemory("data", 8,
-				BackendUtil.quantizeUp(ramSize / 8 + 512), 0);
+		Memory program = createMemory("instructions");
+		Memory data = createMemory("data");
 		processor.setROM(program);
 		processor.getLocalRAMs().add(data);
 		// Buses

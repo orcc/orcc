@@ -251,18 +251,25 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		} else {
 			if (source == target) {
 				// Both actors are mapped to the same processor, then the
-				// FIFO is mapped to its local RAM.
-				ram = source.getLocalRAMs().get(0);
-				FunctionUnit lsu = source.getFunctionUnit("LSU_0");
-				ram.setAttribute("id", bufferId++);
+				// FIFO is mapped to a new local RAM.
+				ram = factory.createMemory("lmem_" + bufferId);
+				FunctionUnit lsu = source.connect(ram);
 				ram.setSourcePort(lsu);
 				ram.setTargetPort(lsu);
+				source.getLocalRAMs().add(ram);
 			} else {
 				// Both actors are mapped to different processors, then the
-				// FIFO is mapped in their shared memory.
-				ram = factory.createMemory(bufferId++, 8, source, target);
+				// FIFO is mapped in a new shared memory.
+				ram = factory.createMemory("smem_" + bufferId);
+				FunctionUnit sourceLSU = source.connect(ram);
+				FunctionUnit targetLSU = target.connect(ram);
+				ram.setSource(source);
+				ram.setTarget(target);
+				ram.setSourcePort(sourceLSU);
+				ram.setTargetPort(targetLSU);
 				design.add(ram);
 			}
+			ram.setAttribute("id", bufferId++);
 			tgtToBufferMap.put(target, ram);
 		}
 

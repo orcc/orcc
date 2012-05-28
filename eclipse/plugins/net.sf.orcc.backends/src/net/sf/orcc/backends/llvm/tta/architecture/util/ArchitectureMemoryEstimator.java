@@ -134,12 +134,18 @@ public class ArchitectureMemoryEstimator extends ArchitectureVisitor<Void> {
 
 	@Override
 	public Void caseProcessor(Processor processor) {
+		Memory rom = processor.getROM();
+		rom.setDepth(60000);
+		rom.setWordWidth(8);
+		rom.setMinAddress(0);
+
 		// Compute size of the local circular buffer
 		for (Memory ram : processor.getLocalRAMs()) {
 			doSwitch(ram);
 		}
 
-		// Increase the first RAM to contains stack and state
+		// Increase the size of the first RAM according to the memory needs for
+		// the stack and the state of the actors.
 		int bits = 0;
 		for (Vertex entity : processor.getMappedActors()) {
 			bits = dfVisitor.doSwitch(entity);
