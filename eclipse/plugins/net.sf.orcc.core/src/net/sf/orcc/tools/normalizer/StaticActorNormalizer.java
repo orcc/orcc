@@ -111,8 +111,8 @@ public class StaticActorNormalizer {
 
 			BlockWhile nodeWhile = irFactory.createBlockWhile();
 			nodeWhile.setJoinBlock(irFactory.createBlockBasic());
-			nodeWhile.getBlocks().addAll(nodes);
-
+			nodes = nodeWhile.getBlocks();
+			
 			oldNodes.add(nodeWhile);
 
 			// assign condition
