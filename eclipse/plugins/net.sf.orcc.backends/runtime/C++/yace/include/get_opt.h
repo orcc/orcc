@@ -143,7 +143,7 @@ public:
 		TokensIterator it = tokens.find(s);
 		if(it != tokens.end())
 		{
-			std::vector<std::string>::iterator vec_it;
+			std::vector<std::string>::const_iterator vec_it;
 			for(vec_it = it->second.begin(); vec_it != it->second.end(); vec_it++)
 			{
 				T item;

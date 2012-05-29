@@ -179,7 +179,7 @@ class NetworkPrinter extends AbstractPrinter {
 		if(NOT NO_DISPLAY)
 		set(libraries ${libraries} ${SDL_LIBRARY})
 		endif()
-		set(libraries ${libraries} ${CMAKE_THREAD_LIBS_INIT})	
+		set(libraries ${libraries} ${CMAKE_THREAD_LIBS_INIT} "stdc++")
 		target_link_libraries(«network.simpleName» ${libraries})
 	'''
 	
