@@ -196,8 +196,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 			if (element instanceof Vertex) {
 				Vertex vertex = (Vertex) element;
 				String component = (String) value;
-				if (component == null || component.contains(",")
-						|| component.isEmpty()) {
+				if (component == null || component.contains(",")) {
 					return;
 				}
 				setMapping(vertex, component);
