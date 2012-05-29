@@ -13,6 +13,11 @@ backend).
 	* add option to choose the configuration of the processors between several 
 	predefined profiles. 
 	* support the mapping of several actors on the same processor.
+	
+Bugfixes
+--------
+- UI: Removing an existing mapping was not possible without removing the runtime
+configuration.
 
 Misc
 ----
