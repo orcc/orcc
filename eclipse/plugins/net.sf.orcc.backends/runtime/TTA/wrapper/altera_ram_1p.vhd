@@ -6,7 +6,7 @@
 -- Author     : Herve Yviquel
 -- Company    : IRISA
 -- Created    : 
--- Last update: 2012-05-15
+-- Last update: 2012-05-29
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -54,12 +54,12 @@ library work;
 
 entity dram_1p is
   generic (
-      depth         : integer;
-      addr_width    : integer;
-      byte_width    : integer;
-      bytes         : integer;
-      init_file     : string;
-      device_family : string);
+    depth         : integer;
+    addr_width    : integer;
+    byte_width    : integer;
+    bytes         : integer;
+    init_file     : string;
+    device_family : string);
   port (
     clk     : in  std_logic;
     --

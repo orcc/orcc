@@ -6,7 +6,7 @@
 -- Author     : Herve Yviquel
 -- Company    : IRISA
 -- Created    : 
--- Last update: 2012-05-15
+-- Last update: 2012-05-29
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -84,7 +84,7 @@ begin
       intended_device_family => device_family,
       lpm_hint               => "ENABLE_RUNTIME_MOD=NO",
       lpm_type               => "altsyncram",
-      numwords_a             => 2 ** addr_width,
+      numwords_a             => depth,
       operation_mode         => "ROM",
       outdata_aclr_a         => "NONE",
       outdata_reg_a          => "UNREGISTERED",
