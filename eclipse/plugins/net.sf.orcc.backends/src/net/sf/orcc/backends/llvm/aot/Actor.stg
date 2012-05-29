@@ -482,7 +482,7 @@ bb_<action.name>_unschedulable:
 	<if(outsideFSM)>
 		br label %bb_outside_finished
 	<else>
-		br label %bb_finished
+		br label %bb_waiting
 	<endif>
 <endif>
 >>
@@ -535,7 +535,7 @@ else
 
 bb_<sourceState.name>_finished:
 	store i32 <instance.actor.templateData.stateToLabelMap.(sourceState)>, i32* @_FSM_state
-	br label %bb_finished
+	br label %bb_waiting
 <endif>
 >>
 
@@ -596,6 +596,10 @@ default:
 
 <fsm.states: printTransition(); separator="\n">
 
+bb_waiting:
+	<if(options.profile)>call void @<instance.name>_wait()<endif>
+	br label %bb_finished
+
 bb_finished:
 	<printCallEndTokenFunctions()>
 	ret void
@@ -610,6 +614,11 @@ entry:
 	
 bb_scheduler_start:
 <printActionLoop(actions=instance.actor.actionsOutsideFsm, outsideFSM=false)>
+
+bb_waiting:
+	<if(options.profile)>call void @<instance.name>_wait()<endif>
+	br label %bb_finished
+
 bb_finished:
 	<printCallEndTokenFunctions()>
 	ret void
@@ -746,6 +755,13 @@ declare i32 @printf(i8* noalias , ...) nounwind
 
 <if(instance.actor.initializes)>
 <initializeFunction()>
+<endif>
+
+<if(options.profile)>
+define void @<instance.name>_wait() nounwind noinline {
+entry:
+	ret void
+}
 <endif>
 
 <if(instance.actor.fsm)>
