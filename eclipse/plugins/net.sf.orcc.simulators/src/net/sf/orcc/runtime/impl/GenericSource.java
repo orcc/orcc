@@ -29,9 +29,12 @@
 
 package net.sf.orcc.runtime.impl;
 
+import net.sf.orcc.util.WriteListener;
+
 public class GenericSource {
 
 	protected static String inputStimulus = "";
+	protected static WriteListener listener = null;
 
 	/**
 	 * Sets the file name used by this Source class.
@@ -46,6 +49,10 @@ public class GenericSource {
 
 	public static void setInputStimulus(String fileName) {
 		GenericSource.inputStimulus = fileName;
+	}
+	
+	public static void setWriteListener(WriteListener listener){
+		GenericSource.listener = listener;
 	}
 	
 	public void close(){

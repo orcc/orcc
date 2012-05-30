@@ -32,6 +32,7 @@ package net.sf.orcc.runtime.impl;
 import java.io.File;
 
 import system.io.item.AccessFile;
+import system.io.item.Console;
 
 public class SystemIO extends GenericSource {
 
@@ -67,9 +68,17 @@ public class SystemIO extends GenericSource {
 	public boolean isAccessFile() {
 		return false;
 	}
+	
+	public boolean isConsole() {
+		return false;
+	}
 
 	public static AccessFile toAccessFile(SystemIO io) {
 		return (AccessFile) io;
+	}
+	
+	public static Console toConsole(SystemIO io) {
+		return (Console) io;
 	}
 
 }

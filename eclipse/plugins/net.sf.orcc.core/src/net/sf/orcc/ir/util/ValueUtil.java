@@ -69,6 +69,8 @@ public class ValueUtil {
 			return ((BigDecimal) val1).add((BigDecimal) val2);
 		} else if (isInt(val1) && isInt(val2)) {
 			return ((BigInteger) val1).add((BigInteger) val2);
+		} else if (isString(val1) || isString(val2)){
+			return val1.toString() + val2.toString();
 		}
 		throw new OrccRuntimeException("type mismatch in add");
 	}

@@ -7,6 +7,7 @@ import net.sf.orcc.runtime.impl.IntfChannel;
 import net.sf.orcc.runtime.impl.IntfNet;
 import net.sf.orcc.runtime.impl.SystemIO;
 import system.io.item.AccessFile;
+import system.io.item.Console;
 
 public class RuntimeFactory {
 
@@ -32,6 +33,10 @@ public class RuntimeFactory {
 		return new SystemIO();
 	}
 
+	public static SystemIO createConsole(String id){
+		return new Console(id);
+	}
+	
 	public static AccessFile createAccessFile(String path) {
 		return new AccessFile(path);
 	}

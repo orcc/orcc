@@ -160,6 +160,7 @@ public class SlowSimulator extends AbstractSimulator {
 
 	protected void initializeNetwork(Network network) {
 		GenericSource.setInputStimulus(stimulusFile);
+		GenericSource.setWriteListener(getWriteListener());
 
 		for (Instance instance : network.getInstances()) {
 			ActorInterpreter interpreter = interpreters.get(instance);
