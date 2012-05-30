@@ -43,7 +43,6 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.graph.Edge;
-import net.sf.orcc.graph.Graph;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.graph.visit.ReversePostOrder;
 import net.sf.orcc.graph.visit.SccFinder;
@@ -83,7 +82,7 @@ public class StaticRegionDetector {
 		network = EcoreUtil.copy(network);
 
 		// the clustered graph is just the network
-		Graph clusteredGraph = network;
+		Network clusteredGraph = network;
 
 		Actor actor = DfFactory.eINSTANCE.createActor();
 		actor.setName("cluster");
@@ -97,9 +96,9 @@ public class StaticRegionDetector {
 		List<Edge> edges = new ArrayList<Edge>();
 
 		for (Vertex vertex : vertices) {
-			for (Vertex other : clusteredGraph.getVertices()) {
+			for (Instance other : clusteredGraph.getInstances()) {
 				if (((Instance) vertex).getName().equals(
-						((Instance) other).getName())) {
+						other.getName())) {
 					verticesCopy.add(other);
 				}
 			}
