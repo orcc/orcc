@@ -76,7 +76,7 @@ import net.sf.orcc.ir.transform.DeadVariableRemoval;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.transform.SSATransformation;
 import net.sf.orcc.ir.transform.TacTransformation;
-import net.sf.orcc.tools.classifier.ActorClassifier;
+import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
 import net.sf.orcc.util.OrccUtil;
 
@@ -148,7 +148,7 @@ public class JadeBackendImpl extends AbstractBackend {
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		if (classify) {
-			new ActorClassifier().doSwitch(actor);
+			new Classifier().doSwitch(actor);
 			if (normalize) {
 				new ActorNormalizer().doSwitch(actor);
 			}

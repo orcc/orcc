@@ -47,7 +47,7 @@ import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.State;
 import net.sf.orcc.df.Transition;
-import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.graph.visit.BFS;
@@ -69,14 +69,14 @@ import org.eclipse.core.runtime.CoreException;
  * @author Matthieu Wipliez
  * 
  */
-public class ActorClassifier extends DfSwitch<Object> {
+public class Classifier extends DfVisitor<Void> {
 
 	private Actor actor;
 
 	/**
 	 * Creates a new classifier
 	 */
-	public ActorClassifier() {
+	public Classifier() {
 	}
 
 	/**
@@ -106,6 +106,28 @@ public class ActorClassifier extends DfSwitch<Object> {
 			e.printStackTrace();
 			return true;
 		}
+	}
+
+	@Override
+	public Void caseActor(Actor actor) {
+		try {
+			this.actor = actor;
+
+			actor.resetTokenConsumption();
+			actor.resetTokenProduction();
+
+			classify();
+		} catch (Exception e) {
+			System.out.println("An exception occurred when classifying actor "
+					+ actor.getName() + ": " + e);
+			System.out.println("MoC set to DPN");
+			System.out.println();
+			actor.setMoC(MocFactory.eINSTANCE.createDPNMoC());
+		} finally {
+			this.actor = null;
+		}
+
+		return null;
 	}
 
 	/**
@@ -344,28 +366,6 @@ public class ActorClassifier extends DfSwitch<Object> {
 		interpreter.setTokenRates(sdfMoc);
 
 		return sdfMoc;
-	}
-
-	@Override
-	public Object caseActor(Actor actor) {
-		try {
-			this.actor = actor;
-
-			actor.resetTokenConsumption();
-			actor.resetTokenProduction();
-
-			classify();
-		} catch (Exception e) {
-			System.out.println("An exception occurred when classifying actor "
-					+ actor.getName() + ": " + e);
-			System.out.println("MoC set to DPN");
-			System.out.println();
-			actor.setMoC(MocFactory.eINSTANCE.createDPNMoC());
-		} finally {
-			this.actor = null;
-		}
-
-		return null;
 	}
 
 	/**

@@ -40,9 +40,9 @@ import net.sf.orcc.backends.c.CTypePrinter;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transform.Instantiator;
-import net.sf.orcc.df.transform.NetworkClassifier;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.moc.SDFMoC;
+import net.sf.orcc.tools.classifier.Classifier;
 
 import org.eclipse.core.resources.IFile;
 
@@ -115,7 +115,7 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 		// The classification gives production and consumption information from
 		// the graph
 		write("Starting classification of actors... ");
-		new NetworkClassifier().doSwitch(network);
+		new Classifier().doSwitch(network);
 		write("done\n");
 
 		if (network.getMoC().isCSDF()) {
