@@ -38,22 +38,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.transform.NetworkClassifier;
 import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.graph.impl.GraphImpl;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
-import net.sf.orcc.tools.merger.ActorMerger;
-import net.sf.orcc.tools.normalizer.ActorNormalizer;
 import net.sf.orcc.util.util.EcoreHelper;
 
 import org.eclipse.core.resources.IFile;
@@ -163,8 +159,8 @@ public class NetworkImpl extends GraphImpl implements Network {
 
 	/**
 	 * The default value of the '{@link #getTemplateData() <em>Template Data</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @see #getTemplateData()
 	 * @generated
 	 * @ordered
@@ -173,8 +169,8 @@ public class NetworkImpl extends GraphImpl implements Network {
 
 	/**
 	 * The cached value of the '{@link #getTemplateData() <em>Template Data</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @see #getTemplateData()
 	 * @generated
 	 * @ordered
@@ -232,16 +228,6 @@ public class NetworkImpl extends GraphImpl implements Network {
 				msgs.add(notification);
 		}
 		return msgs;
-	}
-
-	/**
-	 * Classifies this network.
-	 * 
-	 * @throws OrccException
-	 *             if something goes wrong
-	 */
-	public void classify() throws OrccException {
-		new NetworkClassifier().doSwitch(this);
 	}
 
 	/**
@@ -727,8 +713,7 @@ public class NetworkImpl extends GraphImpl implements Network {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public Object getTemplateData() {
@@ -761,31 +746,6 @@ public class NetworkImpl extends GraphImpl implements Network {
 
 	public boolean isNetwork() {
 		return true;
-	}
-
-	/**
-	 * Merges actors of this network. Note that for this transformation to work
-	 * properly, actors must have been classified and normalized first.
-	 * 
-	 * @throws OrccException
-	 *             if something goes wrong
-	 */
-	public void mergeActors() throws OrccException {
-		new ActorMerger().doSwitch(this);
-	}
-
-	/**
-	 * Normalizes actors of this network so they can later be merged. Note that
-	 * for this transformation to work properly, actors must have been
-	 * classified first.
-	 * 
-	 * @throws OrccException
-	 *             if something goes wrong
-	 */
-	public void normalizeActors() throws OrccException {
-		for (Actor actor : getAllActors()) {
-			new ActorNormalizer().doSwitch(actor);
-		}
 	}
 
 	@Override
@@ -844,8 +804,7 @@ public class NetworkImpl extends GraphImpl implements Network {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setTemplateData(Object newTemplateData) {

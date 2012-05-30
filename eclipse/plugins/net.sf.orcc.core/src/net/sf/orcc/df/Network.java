@@ -85,14 +85,6 @@ public interface Network extends Graph {
 	void addOutput(Port port);
 
 	/**
-	 * Classifies this network.
-	 * 
-	 * @throws OrccException
-	 *             if something goes wrong
-	 */
-	void classify() throws OrccException;
-
-	/**
 	 * Computes the source map and target maps that associate each connection to
 	 * its source vertex (respectively target vertex).
 	 */
@@ -331,25 +323,6 @@ public interface Network extends Graph {
 	 * @generated
 	 */
 	EList<Var> getVariables();
-
-	/**
-	 * Merges actors of this network. Note that for this transformation to work
-	 * properly, actors must have been classified and normalized first.
-	 * 
-	 * @throws OrccException
-	 *             if something goes wrong
-	 */
-	void mergeActors() throws OrccException;
-
-	/**
-	 * Normalizes actors of this network so they can later be merged. Note that
-	 * for this transformation to work properly, actors must have been
-	 * classified first.
-	 * 
-	 * @throws OrccException
-	 *             if something goes wrong
-	 */
-	void normalizeActors() throws OrccException;
 
 	/**
 	 * Removes the given instance from the list of instances, and then removes

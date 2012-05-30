@@ -51,11 +51,13 @@ import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transform.Instantiator;
+import net.sf.orcc.df.transform.NetworkClassifier;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.tools.merger.ActorMerger;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
 
 import org.eclipse.core.resources.IFile;
@@ -219,10 +221,10 @@ public class CBackendImpl extends AbstractBackend {
 
 		if (classify) {
 			write("Classification of actors...\n");
-			network.classify();
+			new NetworkClassifier().doSwitch(network);
 			if (merge) {
 				write("Merging of actors...\n");
-				network.mergeActors();
+				new ActorMerger().doSwitch(network);
 			}
 		}
 
