@@ -80,6 +80,9 @@ import net.sf.orcc.ir.transform.CfgBuilder;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.transform.SSATransformation;
 import net.sf.orcc.ir.transform.TacTransformation;
+import net.sf.orcc.tools.classifier.Classifier;
+import net.sf.orcc.tools.merger.ActorMerger;
+import net.sf.orcc.tools.normalizer.ActorNormalizer;
 import net.sf.orcc.util.OrccUtil;
 
 /**
@@ -100,6 +103,9 @@ public class TTABackendImpl extends LLVMBackendImpl {
 	private String libPath;
 	private Mapping mapping;
 	private boolean profile;
+	private boolean classify;
+	private boolean normalize;
+	private boolean merge;
 
 	private Map<String, String> userMapping;
 
@@ -142,6 +148,10 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		configuration = ProcessorConfiguration.getByName(getAttribute(
 				"net.sf.orcc.backends.llvm.tta.configuration", "Huge"));
 		userMapping = getAttribute(MAPPING, new HashMap<String, String>());
+
+		classify = getAttribute("net.sf.orcc.backends.classify", false);
+		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
+		merge = getAttribute("net.sf.orcc.backends.merge", false);
 	}
 
 	@Override
@@ -149,13 +159,31 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		// do not transform actors
 	}
 
-	@Override
+	protected void doAnalyzeNetwork(Network network) throws OrccException {
+		write("Analyze the network...\n");
+
+		new ComplexHwOpDetector(getWriteListener()).doSwitch(network);
+		if (classify) {
+			new Classifier().doSwitch(network);
+		}
+	}
+
 	protected Network doTransformNetwork(Network network) throws OrccException {
 		write("Transform the network...\n");
 
-		DfSwitch<?>[] transformations = { new Instantiator(fifoSize),
-				new NetworkFlattener(), new BroadcastAdder(),
-				new TypeResizer(true, true, false), new UnitImporter(),
+		new Instantiator(fifoSize).doSwitch(network);
+		new NetworkFlattener().doSwitch(network);
+		new BroadcastAdder().doSwitch(network);
+
+		if (normalize) {
+			new ActorNormalizer().doSwitch(network);
+		}
+		if (merge) {
+			new ActorMerger().doSwitch(network);
+		}
+
+		DfSwitch<?>[] transformations = { new TypeResizer(true, true, false),
+				new UnitImporter(),
 				new DfVisitor<Void>(new SSATransformation()),
 				new StringTransformation(),
 				new RenameTransformation(this.transformations),
@@ -167,8 +195,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 				new DfVisitor<Void>(new EmptyBlockRemover()),
 				new DfVisitor<Void>(new BlockCombine()),
 				new DfVisitor<CfgNode>(new CfgBuilder()),
-				new DfVisitor<Void>(new TemplateInfoComputing()),
-				new ComplexHwOpDetector(getWriteListener()) };
+				new DfVisitor<Void>(new TemplateInfoComputing()), };
 
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(network);
@@ -185,7 +212,9 @@ public class TTABackendImpl extends LLVMBackendImpl {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
-		network = doTransformNetwork(network);
+
+		doAnalyzeNetwork(network);
+		doTransformNetwork(network);
 
 		// build the design
 		mapping = new Mapping(network, userMapping, true, false);
