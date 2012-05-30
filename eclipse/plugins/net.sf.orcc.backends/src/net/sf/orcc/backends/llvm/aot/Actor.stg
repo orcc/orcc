@@ -566,7 +566,7 @@ schedulerWithFSM(actions, fsm) ::= <<
 @_FSM_state = internal global i32 <instance.actor.templateData.stateToLabelMap.(fsm.initialState)>
 
 <if(actions)>
-define void @<instance.name>_outside_FSM_scheduler() <if(options.profile)>noinline <endif>nounwind {
+define void @<instance.name>_outside_FSM_scheduler() nounwind {
 entry:
 	br label %bb_outside_scheduler_start
 	
@@ -581,7 +581,7 @@ bb_outside_finished:
 <endif>
 
 
-define void @<instance.name>_scheduler() nounwind {
+define void @<instance.name>_scheduler() <if(options.profile)>noinline <endif>nounwind {
 entry:
 	br label %bb_scheduler_start
 
@@ -758,8 +758,13 @@ declare i32 @printf(i8* noalias , ...) nounwind
 <endif>
 
 <if(options.profile)>
+@_waiting_count = global i32 zeroinitializer, align 32
+
 define void @<instance.name>_wait() nounwind noinline {
 entry:
+	%tmp = load volatile i32* @_waiting_count
+	%tmp_2 = add i32 %tmp, 1
+	store volatile i32 %tmp_2, i32* @_waiting_count
 	ret void
 }
 <endif>
