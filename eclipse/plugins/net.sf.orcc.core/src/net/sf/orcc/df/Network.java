@@ -31,7 +31,6 @@ package net.sf.orcc.df;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.graph.Graph;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Var;
