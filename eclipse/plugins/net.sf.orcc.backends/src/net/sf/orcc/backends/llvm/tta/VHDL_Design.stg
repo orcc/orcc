@@ -158,7 +158,7 @@ assignComponent(component) ::= <<
 
 assignBuffer(buffer) ::= <<
 <buffer.name> : entity work.dram_2p
-  generic map(depth      =\> <buffer.depth>,
+  generic map(depth      =\> <buffer.depth>/4,
               byte_width =\> <buffer.wordWidth>,
               addr_width =\> <buffer.addrWidth>-2,
               bytes      =\> 4,
