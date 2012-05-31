@@ -12,13 +12,13 @@
 
    <extension point="org.eclipse.emf.ecore.generated_package">
       <package
-            uri="http://dftools.sf.net/model/2012/Graph"
+            uri="http://orcc.sf.net/model/2012/Graph"
             class="net.sf.orcc.graph.GraphPackage"
             genModel="model/Graph.genmodel"/>
       <package
             class="net.sf.orcc.util.UtilPackage"
             genModel="model/Graph.genmodel"
-            uri="http://dftools.sf.net/model/2012/Util">
+            uri="http://orcc.sf.net/model/2012/Util">
       </package>
    </extension>
 
