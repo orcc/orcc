@@ -57,7 +57,7 @@ public class ActorNormalizer extends DfSwitch<Void> {
 		}
 
 		MoC clasz = actor.getMoC();
-		if (clasz.isCSDF()) {
+		if (clasz.isCSDF() && actor.getActions().size() > 1) {
 			new StaticActorNormalizer(actor).normalize();
 		}
 

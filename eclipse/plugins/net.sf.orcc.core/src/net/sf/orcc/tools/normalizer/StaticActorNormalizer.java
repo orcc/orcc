@@ -44,6 +44,7 @@ import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
+import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
@@ -112,7 +113,7 @@ public class StaticActorNormalizer {
 			BlockWhile nodeWhile = irFactory.createBlockWhile();
 			nodeWhile.setJoinBlock(irFactory.createBlockBasic());
 			nodes = nodeWhile.getBlocks();
-			
+
 			oldNodes.add(nodeWhile);
 
 			// assign condition
@@ -255,16 +256,10 @@ public class StaticActorNormalizer {
 
 		// all action scheduler now just return true
 		for (Action action : actor.getActions()) {
-			Procedure scheduler = action.getScheduler();
-			scheduler.getLocals().clear();
-
-			List<Block> nodes = scheduler.getBlocks();
-			nodes.clear();
-
-			BlockBasic block = irFactory.createBlockBasic();
-			nodes.add(block);
-			block.add(irFactory.createInstReturn(irFactory.createExprBool(true)));
+			actor.getProcs().add(action.getBody());
 		}
+
+		actor.getActions().clear();
 	}
 
 	/**
@@ -357,8 +352,58 @@ public class StaticActorNormalizer {
 		for (Port port : inputPattern.getPorts()) {
 			int numTokens = inputPattern.getNumTokens(port);
 			Var var = actor.getStateVar(port.getName());
-			System.out.println("must read " + numTokens + " tokens from "
-					+ var.getName());
+
+			// Create the port variable
+			Type type = irFactory.createTypeList(numTokens, port.getType());
+			Var portVar = irFactory.createVar(type, "port_" + port.getName(),
+					true, 0);
+			inputPattern.setVariable(port, portVar);
+
+			BlockBasic blockInit = irFactory.createBlockBasic();
+			Var loopVar = procedure.newTempLocalVariable(
+					irFactory.createTypeInt(32), "num_repeats");
+			InstAssign assign = irFactory.createInstAssign(loopVar,
+					irFactory.createExprInt(0));
+			blockInit.add(assign);
+
+			BlockBasic blockLoop = irFactory.createBlockBasic();
+
+			List<Expression> indexes = new ArrayList<Expression>(1);
+			indexes.add(irFactory.createExprVar(loopVar));
+
+			Var tmpVar = procedure
+					.newTempLocalVariable(port.getType(), "token");
+			InstLoad load = irFactory.createInstLoad(tmpVar, portVar, indexes);
+			blockLoop.add(load);
+
+			indexes = new ArrayList<Expression>(1);
+			indexes.add(irFactory.createExprVar(loopVar));
+			InstStore store = irFactory.createInstStore(var, indexes,
+					irFactory.createExprVar(tmpVar));
+			blockLoop.add(store);
+
+			// add increment
+			assign = irFactory.createInstAssign(loopVar, irFactory
+					.createExprBinary(irFactory.createExprVar(loopVar),
+							OpBinary.PLUS, irFactory.createExprInt(1),
+							loopVar.getType()));
+			blockLoop.add(assign);
+
+			// create while node
+			Expression condition = irFactory.createExprBinary(
+					irFactory.createExprVar(loopVar), OpBinary.LT,
+					irFactory.createExprInt(numTokens),
+					irFactory.createTypeBool());
+			List<Block> nodes = new ArrayList<Block>(1);
+			nodes.add(blockLoop);
+
+			BlockWhile nodeWhile = irFactory.createBlockWhile();
+			nodeWhile.setJoinBlock(irFactory.createBlockBasic());
+			nodeWhile.setCondition(condition);
+			nodeWhile.getBlocks().addAll(nodes);
+
+			procedure.getBlocks().add(blockInit);
+			procedure.getBlocks().add(nodeWhile);
 		}
 	}
 
@@ -392,8 +437,59 @@ public class StaticActorNormalizer {
 		for (Port port : outputPattern.getPorts()) {
 			int numTokens = outputPattern.getNumTokens(port);
 			Var var = actor.getStateVar(port.getName());
-			System.out.println("must write " + numTokens + " tokens from "
-					+ var.getName());
+
+			// Create the port variable
+			Type type = irFactory.createTypeList(numTokens, port.getType());
+			Var portVar = irFactory.createVar(type, "port_" + port.getName(),
+					true, 0);
+			outputPattern.setVariable(port, portVar);
+
+			BlockBasic blockInit = irFactory.createBlockBasic();
+			Var loopVar = procedure.newTempLocalVariable(
+					irFactory.createTypeInt(32), "num_repeats");
+			InstAssign assign = irFactory.createInstAssign(loopVar,
+					irFactory.createExprInt(0));
+			blockInit.add(assign);
+
+			BlockBasic blockLoop = irFactory.createBlockBasic();
+
+			List<Expression> indexes = new ArrayList<Expression>(1);
+			indexes.add(irFactory.createExprVar(loopVar));
+
+			Var tmpVar = procedure
+					.newTempLocalVariable(port.getType(), "token");
+			InstLoad load = irFactory.createInstLoad(tmpVar, var, indexes);
+			blockLoop.add(load);
+
+			indexes = new ArrayList<Expression>(1);
+			indexes.add(irFactory.createExprVar(loopVar));
+			InstStore store = irFactory.createInstStore(portVar, indexes,
+					irFactory.createExprVar(tmpVar));
+			blockLoop.add(store);
+
+			// add increment
+			assign = irFactory.createInstAssign(loopVar, irFactory
+					.createExprBinary(irFactory.createExprVar(loopVar),
+							OpBinary.PLUS, irFactory.createExprInt(1),
+							loopVar.getType()));
+			blockLoop.add(assign);
+
+			// create while node
+			Expression condition = irFactory.createExprBinary(
+					irFactory.createExprVar(loopVar), OpBinary.LT,
+					irFactory.createExprInt(numTokens),
+					irFactory.createTypeBool());
+			List<Block> nodes = new ArrayList<Block>(1);
+			nodes.add(blockLoop);
+
+			BlockWhile nodeWhile = irFactory.createBlockWhile();
+			nodeWhile.setJoinBlock(irFactory.createBlockBasic());
+			nodeWhile.setCondition(condition);
+			nodeWhile.getBlocks().addAll(nodes);
+
+			procedure.getBlocks().add(blockInit);
+			procedure.getBlocks().add(nodeWhile);
+
 		}
 	}
 
