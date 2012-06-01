@@ -691,8 +691,8 @@ entry:
 // Instance
 ///////////////////////////////////////////////////////////////////////////////
 
-actorParameter(parameter) ::= <<
-@<parameter.name> = global <parameter.type> undef
+actorParameter(parameter, argument) ::= <<
+@<parameter.name> = global <parameter.type> <argument.value>
 >>
 
 printInstance(instance, options) ::= <<
@@ -725,7 +725,7 @@ declare i32 @printf(i8* noalias , ...) nounwind
 <if(instance.actor.parameters)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Parameter values of the instance
-<instance.actor.parameters: actorParameter(); separator="\n">
+<instance.actor.parameters, instance.arguments: { param, arg | <actorParameter(param, arg)>}; separator="\n">
 <endif>
 
 <if(instance.actor.stateVars)>
