@@ -31,7 +31,6 @@ package net.sf.orcc.tools.normalizer;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.moc.MoC;
-import net.sf.orcc.tools.classifier.Classifier;
 
 /**
  * This class defines an actor transformation that normalizes actors so they can
@@ -51,11 +50,6 @@ public class ActorNormalizer extends DfSwitch<Void> {
 
 	@Override
 	public Void caseActor(Actor actor) {
-		if (!actor.hasMoC()) {
-			// Actor has not been classified
-			new Classifier().doSwitch(actor);
-		}
-
 		MoC clasz = actor.getMoC();
 		if (clasz.isCSDF() && actor.getActions().size() > 1) {
 			new StaticActorNormalizer(actor).normalize();
