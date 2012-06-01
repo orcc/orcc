@@ -692,7 +692,7 @@ entry:
 ///////////////////////////////////////////////////////////////////////////////
 
 actorParameter(parameter, argument) ::= <<
-@<parameter.name> = global <parameter.type> <argument.value>
+@<parameter.name> = internal global <parameter.type> <argument.value>
 >>
 
 printInstance(instance, options) ::= <<
