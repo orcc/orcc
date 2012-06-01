@@ -18,6 +18,8 @@ Bugfixes
 --------
 - UI: Removing an existing mapping was not possible without removing the runtime
 configuration.
+- Tools: The normalizer is working back and it has been improved to avoid useless
+memory copies from the FIFOs.
 
 Misc
 ----
