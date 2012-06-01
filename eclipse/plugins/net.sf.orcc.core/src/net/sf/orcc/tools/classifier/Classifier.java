@@ -111,6 +111,10 @@ public class Classifier extends DfVisitor<Void> {
 
 	@Override
 	public Void caseActor(Actor actor) {
+		if (actor.isNative()) {
+			return null;
+		}
+
 		try {
 			this.actor = actor;
 
@@ -119,10 +123,12 @@ public class Classifier extends DfVisitor<Void> {
 
 			classify();
 		} catch (Exception e) {
+			MoC moc = MocFactory.eINSTANCE.createDPNMoC();
+			actor.setMoC(moc);
 			listener.writeText("An exception occurred when classifying actor "
-					+ actor.getName() + ": MoC set to DPN\n");
+					+ actor.getName() + "\n");
+			listener.writeText("MoC of " + actor.getName() + ": " + moc + "\n");
 			e.printStackTrace();
-			actor.setMoC(MocFactory.eINSTANCE.createDPNMoC());
 		} finally {
 			this.actor = null;
 		}
