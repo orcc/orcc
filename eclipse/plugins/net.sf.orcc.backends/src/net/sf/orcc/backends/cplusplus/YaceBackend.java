@@ -108,7 +108,7 @@ public class YaceBackend extends AbstractBackend {
 
 		if (classify) {
 			write("Starting classification of actors... ");
-			new Classifier().doSwitch(network);
+			new Classifier(getWriteListener()).doSwitch(network);
 			write("done\n");
 			if (merge) {
 				new ActorMerger().doSwitch(network);

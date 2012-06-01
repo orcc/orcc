@@ -164,7 +164,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 
 		new ComplexHwOpDetector(getWriteListener()).doSwitch(network);
 		if (classify) {
-			new Classifier().doSwitch(network);
+			new Classifier(getWriteListener()).doSwitch(network);
 		}
 	}
 

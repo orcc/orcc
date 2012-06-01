@@ -57,6 +57,7 @@ import net.sf.orcc.moc.MoC;
 import net.sf.orcc.moc.MocFactory;
 import net.sf.orcc.moc.QSDFMoC;
 import net.sf.orcc.moc.SDFMoC;
+import net.sf.orcc.util.WriteListener;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -73,10 +74,10 @@ public class Classifier extends DfVisitor<Void> {
 
 	private Actor actor;
 
-	/**
-	 * Creates a new classifier
-	 */
-	public Classifier() {
+	private WriteListener listener;
+
+	public Classifier(WriteListener listener) {
+		this.listener = listener;
 	}
 
 	/**
@@ -93,16 +94,16 @@ public class Classifier extends DfVisitor<Void> {
 		GuardSatChecker checker = new GuardSatChecker(actor);
 		try {
 			if (checker.checkSat(previous, action)) {
-				System.out.println(actor.getName() + ": guards of actions "
+				listener.writeText(actor.getName() + ": guards of actions "
 						+ previous.getName() + " and " + action.getName()
-						+ " are compatible");
+						+ " are compatible\n");
 				return true;
 			}
 
 			return false;
 		} catch (OrccRuntimeException e) {
-			System.err.println(actor.getName()
-					+ ": could not check time-dependency");
+			listener.writeText(actor.getName()
+					+ ": could not check time-dependency\n");
 			e.printStackTrace();
 			return true;
 		}
@@ -118,10 +119,9 @@ public class Classifier extends DfVisitor<Void> {
 
 			classify();
 		} catch (Exception e) {
-			System.out.println("An exception occurred when classifying actor "
-					+ actor.getName() + ": " + e);
-			System.out.println("MoC set to DPN");
-			System.out.println();
+			listener.writeText("An exception occurred when classifying actor "
+					+ actor.getName() + ": MoC set to DPN\n");
+			e.printStackTrace();
 			actor.setMoC(MocFactory.eINSTANCE.createDPNMoC());
 		} finally {
 			this.actor = null;
@@ -151,8 +151,8 @@ public class Classifier extends DfVisitor<Void> {
 		// checks for empty actors
 		List<Action> actions = actor.getActions();
 		if (actions.isEmpty()) {
-			System.out.println("actor " + actor.getName()
-					+ " does not contain any actions, defaults to dynamic");
+			listener.writeText("actor " + actor.getName()
+					+ " does not contain any actions, defaults to dynamic\n");
 			actor.setMoC(MocFactory.eINSTANCE.createKPNMoC());
 			return;
 		}
@@ -191,7 +191,7 @@ public class Classifier extends DfVisitor<Void> {
 
 		// set and print MoC
 		actor.setMoC(moc);
-		System.out.println("MoC of " + actor.getName() + ": " + moc);
+		listener.writeText("MoC of " + actor.getName() + ": " + moc + "\n");
 	}
 
 	/**
@@ -285,8 +285,8 @@ public class Classifier extends DfVisitor<Void> {
 		FSM fsm = actor.getFsm();
 		String name = actor.getName();
 		if (!isQuasiStaticFsm(fsm)) {
-			System.out.println(name
-					+ " has an FSM that is NOT compatible with quasi-static");
+			listener.writeText(name
+					+ " has an FSM that is NOT compatible with quasi-static\n");
 			return MocFactory.eINSTANCE.createKPNMoC();
 		}
 
@@ -295,14 +295,15 @@ public class Classifier extends DfVisitor<Void> {
 		// analyze the configuration of this actor
 		List<Port> ports = findConfigurationPorts(fsm);
 		if (ports.isEmpty()) {
-			System.out.println("no configuration ports found for " + name);
+			listener.writeText("no configuration ports found for " + name
+					+ "\n");
 			return MocFactory.eINSTANCE.createKPNMoC();
 		}
 
 		Map<Action, Map<String, Object>> configurations = findConfigurationValues(
 				fsm, ports);
 		if (configurations.isEmpty()) {
-			System.out.println("no configurations for " + name);
+			listener.writeText("no configurations for " + name + "\n");
 			return MocFactory.eINSTANCE.createKPNMoC();
 		}
 
@@ -312,7 +313,8 @@ public class Classifier extends DfVisitor<Void> {
 		for (Action action : fsm.getTargetActions(initialState)) {
 			Map<String, Object> configuration = configurations.get(action);
 			if (configuration == null) {
-				System.out.println("no configuration for " + action.getName());
+				listener.writeText("no configuration for " + action.getName()
+						+ "\n");
 				return MocFactory.eINSTANCE.createKPNMoC();
 			}
 			SDFMoC staticClass = classifyFsmConfiguration(configuration);
@@ -357,7 +359,7 @@ public class Classifier extends DfVisitor<Void> {
 			// Reset output production
 			interpreter.getActor().resetTokenProduction();
 		}
-				
+
 		interpreter.schedule();
 		Action action = interpreter.getExecutedAction();
 		Invocation invocation = eINSTANCE.createInvocation(action);

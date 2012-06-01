@@ -115,7 +115,7 @@ public class CEmbeddedBackendImpl extends AbstractBackend {
 		// The classification gives production and consumption information from
 		// the graph
 		write("Starting classification of actors... ");
-		new Classifier().doSwitch(network);
+		new Classifier(getWriteListener()).doSwitch(network);
 		write("done\n");
 
 		if (network.getMoC().isCSDF()) {

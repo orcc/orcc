@@ -221,7 +221,7 @@ public class CBackendImpl extends AbstractBackend {
 
 		if (classify) {
 			write("Classification of actors...\n");
-			new Classifier().doSwitch(network);
+			new Classifier(getWriteListener()).doSwitch(network);
 			if (merge) {
 				write("Merging of actors...\n");
 				new ActorMerger().doSwitch(network);
