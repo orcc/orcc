@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.df.transform;
 
+import static net.sf.orcc.df.Connection.BUFFER_SIZE;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,18 +60,50 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  */
 public class Instantiator extends DfSwitch<Void> {
 
-	static String BUFFER_SIZE = Connection.BUFFER_SIZE;
-
 	private int defaultFifoSize;
+
+	private boolean duplicateActors;
 
 	private List<Actor> listActors;
 
 	/**
 	 * Creates a default instantiator, equivalent to
-	 * <code>Instantiator(0)</code>.
+	 * <code>Instantiator(false, 0)</code>, that will replace instances of
+	 * networks by instantiated networks, and does not set default FIFO size.
 	 */
 	public Instantiator() {
-		this(0);
+	}
+
+	/**
+	 * Creates an instantiator that will replace instances of networks by
+	 * instantiated networks, and if duplicateActors is <code>true</code>, then
+	 * the instantiator also transforms instances of actors by duplicating
+	 * actors.
+	 * 
+	 * @param duplicateActors
+	 *            <code>true</code> if actors should be duplicated
+	 */
+	public Instantiator(boolean duplicateActors) {
+		this(duplicateActors, 0);
+	}
+
+	/**
+	 * Creates an instantiator that will replace instances of networks by
+	 * instantiated networks, and if duplicateActors is <code>true</code>, then
+	 * the instantiator also transforms instances of actors by duplicating
+	 * actors.
+	 * 
+	 * @param duplicateActors
+	 *            <code>true</code> if actors should be duplicated
+	 * @param defaultFifoSize
+	 *            default FIFO size
+	 */
+	public Instantiator(boolean duplicateActors, int defaultFifoSize) {
+		this.defaultFifoSize = defaultFifoSize;
+		if (duplicateActors) {
+			this.duplicateActors = true;
+			listActors = new ArrayList<Actor>();
+		}
 	}
 
 	/**
@@ -80,8 +114,7 @@ public class Instantiator extends DfSwitch<Void> {
 	 *            default FIFO size
 	 */
 	public Instantiator(int defaultFifoSize) {
-		this.defaultFifoSize = defaultFifoSize;
-		listActors = new ArrayList<Actor>();
+		this(false, defaultFifoSize);
 	}
 
 	@Override
@@ -93,17 +126,17 @@ public class Instantiator extends DfSwitch<Void> {
 			EObject entity = instance.getEntity();
 
 			if (entity instanceof Actor) {
-				Actor a = (Actor) entity;
-				if (listActors.contains(a)) {
-					Actor newActor = duplicateActor(instance, a);
-
-					listActors.add(newActor);
-				} else {
-					listActors.add(a);
+				Actor actor = (Actor) entity;
+				if (duplicateActors) {
+					if (listActors.contains(actor)) {
+						Actor newActor = duplicateActor(instance);
+						listActors.add(newActor);
+					} else {
+						listActors.add(actor);
+					}
 				}
-
 			} else if (entity instanceof Network) {
-				instantiateNetwork(network, instance, entity);
+				instantiateNetwork(network, instance);
 			}
 		}
 
@@ -117,6 +150,16 @@ public class Instantiator extends DfSwitch<Void> {
 		return null;
 	}
 
+	/**
+	 * Replaces connections to the instance by connections to the entity.
+	 * 
+	 * @param copier
+	 *            a copier object used to create the newEntity
+	 * @param instance
+	 *            an instance
+	 * @param newEntity
+	 *            the new entity
+	 */
 	private void connect(Copier copier, Instance instance, Vertex newEntity) {
 		List<Edge> incoming = new ArrayList<Edge>(instance.getIncoming());
 		for (Edge edge : incoming) {
@@ -135,22 +178,39 @@ public class Instantiator extends DfSwitch<Void> {
 		}
 	}
 
-	private Actor duplicateActor(Instance instance, Actor oldActor) {
-		Copier c = new Copier();
-		Actor newActor = IrUtil.copy(c, oldActor);
+	/**
+	 * Replaces the actor referenced by the instance by a fresh copy, and
+	 * updates the instance's connections.
+	 * 
+	 * @param instance
+	 *            an instance that references an actor
+	 * @return the duplicate actor
+	 */
+	private Actor duplicateActor(Instance instance) {
+		Copier copier = new Copier();
+		Actor newActor = IrUtil.copy(copier, (Actor) instance.getEntity());
 
 		// Update reference to instance's entity
 		instance.setEntity(newActor);
 		// Update connection to this new entity
-		connect(c, instance, instance);
+		connect(copier, instance, instance);
 
 		return newActor;
 	}
 
-	private void instantiateNetwork(Network network, Instance instance, EObject entity) {
+	/**
+	 * Instantiates the sub-network referenced by the instance in the given
+	 * network.
+	 * 
+	 * @param network
+	 *            network that contains instance
+	 * @param instance
+	 *            an instance that references a sub-network
+	 */
+	private void instantiateNetwork(Network network, Instance instance) {
 		// copy sub network
 		Copier copier = new Copier();
-		Network subNetwork = (Network) copier.copy(entity);
+		Network subNetwork = (Network) copier.copy(instance.getEntity());
 		copier.copyReferences();
 
 		// instantiate sub network
