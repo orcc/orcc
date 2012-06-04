@@ -206,10 +206,13 @@ public class CBackendImpl extends AbstractBackend {
 
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(actor);
-			ResourceSet set = new ResourceSetImpl();
-			if (debug && !IrUtil.serializeActor(set, path, actor)) {
-				System.err.println("oops " + transformation + " "
-						+ actor.getName());
+			if (debug) {
+				ResourceSet set = new ResourceSetImpl();
+				if (!IrUtil.serializeActor(set, path, actor)) {
+					System.err.println("Error with " + transformation
+							+ " on actor "
+							+ actor.getName());
+				}
 			}
 		}
 
