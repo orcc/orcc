@@ -162,8 +162,6 @@ public class LLVMBackendImpl extends AbstractBackend {
 								+ instance.getName());
 					}
 				}
-				// fake instruction
-				System.out.println("");
 			}
 		}
 
