@@ -129,8 +129,14 @@ public class LLVMBackendImpl extends AbstractBackend {
 	}
 
 	protected Network doTransformNetwork(Network network) throws OrccException {
-		DfSwitch<?>[] transformations = { new Instantiator(fifoSize),
-				new NetworkFlattener(), new BroadcastAdder(),
+
+		// instantiate and flattens network
+		write("Instantiating...\n");
+		new Instantiator(fifoSize).doSwitch(network);
+		write("Flattening...\n");
+		new NetworkFlattener().doSwitch(network);
+
+		DfSwitch<?>[] transformations = { new BroadcastAdder(),
 				new TypeResizer(true, true, false), new UnitImporter(),
 				new DfVisitor<Void>(new SSATransformation()),
 				new DeadGlobalElimination(),
