@@ -65,6 +65,13 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class SSATransformation extends AbstractIrVisitor<Void> {
 
+	/*
+	 * FIXME : if this transformation is applied more than one time on an actor,
+	 * it may causes a NullPointerException. Check commitPhi method, the
+	 * oldVar.getName() call and the value of oldVar, set to null by
+	 * phi.setOldVariable(null) call.
+	 */
+
 	/**
 	 * ith branch (or 0 if we are not in a branch)
 	 */
