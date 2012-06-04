@@ -39,8 +39,10 @@ import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.graph.Edge;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
@@ -60,6 +62,8 @@ public class Instantiator extends DfSwitch<Void> {
 
 	private int defaultFifoSize;
 
+	private List<Actor> listActors;
+
 	/**
 	 * Creates a default instantiator, equivalent to
 	 * <code>Instantiator(0)</code>.
@@ -77,6 +81,7 @@ public class Instantiator extends DfSwitch<Void> {
 	 */
 	public Instantiator(int defaultFifoSize) {
 		this.defaultFifoSize = defaultFifoSize;
+		listActors = new ArrayList<Actor>();
 	}
 
 	@Override
@@ -88,9 +93,17 @@ public class Instantiator extends DfSwitch<Void> {
 			EObject entity = instance.getEntity();
 
 			if (entity instanceof Actor) {
+				Actor a = (Actor) entity;
+				if (listActors.contains(a)) {
+					Actor newActor = duplicateActor(instance, a);
+
+					listActors.add(newActor);
+				} else {
+					listActors.add(a);
+				}
 
 			} else if (entity instanceof Network) {
-				instantiate(network, instance, entity);
+				instantiateNetwork(network, instance, entity);
 			}
 		}
 
@@ -104,11 +117,10 @@ public class Instantiator extends DfSwitch<Void> {
 		return null;
 	}
 
-	private void connect(Copier copier, Instance instance,
-			Network instantiatedNetwork) {
+	private void connect(Copier copier, Instance instance, Vertex newEntity) {
 		List<Edge> incoming = new ArrayList<Edge>(instance.getIncoming());
 		for (Edge edge : incoming) {
-			edge.setTarget(instantiatedNetwork);
+			edge.setTarget(newEntity);
 			Connection connection = (Connection) edge;
 			connection.setTargetPort((Port) copier.get(connection
 					.getTargetPort()));
@@ -116,14 +128,26 @@ public class Instantiator extends DfSwitch<Void> {
 
 		List<Edge> outgoing = new ArrayList<Edge>(instance.getOutgoing());
 		for (Edge edge : outgoing) {
-			edge.setSource(instantiatedNetwork);
+			edge.setSource(newEntity);
 			Connection connection = (Connection) edge;
 			connection.setSourcePort((Port) copier.get(connection
 					.getSourcePort()));
 		}
 	}
 
-	private void instantiate(Network network, Instance instance, EObject entity) {
+	private Actor duplicateActor(Instance instance, Actor oldActor) {
+		Copier c = new Copier();
+		Actor newActor = IrUtil.copy(c, oldActor);
+
+		// Update reference to instance's entity
+		instance.setEntity(newActor);
+		// Update connection to this new entity
+		connect(c, instance, instance);
+
+		return newActor;
+	}
+
+	private void instantiateNetwork(Network network, Instance instance, EObject entity) {
 		// copy sub network
 		Copier copier = new Copier();
 		Network subNetwork = (Network) copier.copy(entity);
