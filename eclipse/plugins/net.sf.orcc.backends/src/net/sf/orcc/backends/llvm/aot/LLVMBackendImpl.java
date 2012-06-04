@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.backends.llvm.aot;
 
+import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -65,8 +67,11 @@ import net.sf.orcc.ir.transform.DeadVariableRemoval;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.transform.SSATransformation;
 import net.sf.orcc.ir.transform.TacTransformation;
+import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 
 /**
  * LLVM back-end.
@@ -78,6 +83,8 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 	protected StandardPrinter printer;
 	protected final Map<String, String> transformations;
+
+	protected boolean debug;
 
 	/**
 	 * Creates a new instance of the LLVM back-end. Initializes the
@@ -111,6 +118,9 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 		// Set src directory as path
 		path = srcDir.getAbsolutePath();
+
+		// Initialize debug mode attribute
+		debug = getAttribute(DEBUG_MODE, false);
 	}
 
 	@Override
@@ -141,6 +151,20 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 		for (DfSwitch<?> transformation : transformations) {
 			transformation.doSwitch(network);
+			if (debug) {
+				ResourceSet set = new ResourceSetImpl();
+
+				List<Instance> instancess = network.getInstances();
+				for (Instance instance : instancess) {
+					if (!IrUtil.serializeActor(set, path, instance)) {
+						System.err.println("Error with "
+								+ transformation.toString() + " on instance "
+								+ instance.getName());
+					}
+				}
+				// fake instruction
+				System.out.println("");
+			}
 		}
 
 		network.computeTemplateMaps();
