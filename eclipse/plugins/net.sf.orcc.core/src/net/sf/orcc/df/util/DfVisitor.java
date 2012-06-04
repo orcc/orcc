@@ -57,7 +57,10 @@ public class DfVisitor<T> extends DfSwitch<T> {
 
 	protected AbstractIrVisitor<T> irVisitor;
 
+	boolean visitInstances;
+
 	public DfVisitor() {
+		visitInstances = true;
 	}
 
 	/**
@@ -66,7 +69,20 @@ public class DfVisitor<T> extends DfSwitch<T> {
 	 * actions).
 	 */
 	public DfVisitor(AbstractIrVisitor<T> irVisitor) {
+		this(irVisitor, true);
+	}
+
+	/**
+	 * Creates a new abstract actor visitor that visits all nodes and
+	 * instructions of all procedures (including the ones referenced by
+	 * actions). If visitInstances is true, visitor will look into Instances
+	 * instead of Actors of a network. When a network use the same actor for
+	 * more than one instance, or when a visitor must visit instances, this
+	 * option is important.
+	 */
+	public DfVisitor(AbstractIrVisitor<T> irVisitor, boolean visitInstances) {
 		this.irVisitor = irVisitor;
+		this.visitInstances = visitInstances;
 	}
 
 	@Override
@@ -145,8 +161,14 @@ public class DfVisitor<T> extends DfSwitch<T> {
 		for (Port port : network.getOutputs()) {
 			doSwitch(port);
 		}
-		for (Instance instance : network.getInstances()) {
-			doSwitch(instance);
+		if (visitInstances) {
+			for (Instance instance : network.getInstances()) {
+				doSwitch(instance);
+			}
+		} else {
+			for (Actor actor : network.getAllActors()) {
+				doSwitch(actor);
+			}
 		}
 		for (Vertex entity : network.getEntities()) {
 			doSwitch(entity);
