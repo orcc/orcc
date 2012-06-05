@@ -171,7 +171,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 	protected Network doTransformNetwork(Network network) throws OrccException {
 		write("Transform the network...\n");
 
-		new Instantiator(fifoSize).doSwitch(network);
+		new Instantiator(true, fifoSize).doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
 		new BroadcastAdder().doSwitch(network);
 
