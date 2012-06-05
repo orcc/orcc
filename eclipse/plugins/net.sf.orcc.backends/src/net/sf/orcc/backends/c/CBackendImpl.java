@@ -41,12 +41,20 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.StandardPrinter;
 import net.sf.orcc.backends.c.transform.CBroadcastAdder;
+import net.sf.orcc.backends.transform.CastAdder;
+import net.sf.orcc.backends.transform.DivisionSubstitution;
+import net.sf.orcc.backends.transform.EmptyBlockRemover;
 import net.sf.orcc.backends.transform.Inliner;
+import net.sf.orcc.backends.transform.InstPhiTransformation;
 import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.backends.transform.ParameterImporter;
+import net.sf.orcc.backends.transform.StoreOnceTransformation;
 import net.sf.orcc.backends.transform.TypeResizer;
 import net.sf.orcc.backends.transform.UnitImporter;
 import net.sf.orcc.backends.util.BackendUtil;
+import net.sf.orcc.backends.xlim.transform.InstTernaryAdder;
+import net.sf.orcc.backends.xlim.transform.ListFlattener;
+import net.sf.orcc.backends.xlim.transform.XlimDeadVariableRemoval;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
@@ -54,9 +62,17 @@ import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.df.util.DfVisitor;
+import net.sf.orcc.ir.CfgNode;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.transform.BlockCombine;
+import net.sf.orcc.ir.transform.CfgBuilder;
+import net.sf.orcc.ir.transform.DeadCodeElimination;
+import net.sf.orcc.ir.transform.DeadGlobalElimination;
+import net.sf.orcc.ir.transform.DeadVariableRemoval;
 import net.sf.orcc.ir.transform.PhiRemoval;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.transform.SSATransformation;
+import net.sf.orcc.ir.transform.TacTransformation;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.ActorMerger;
@@ -184,24 +200,47 @@ public class CBackendImpl extends AbstractBackend {
 
 		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();
 		transformations.add(new UnitImporter());
-
-		// If "-t" option is passed to command line, apply additional
-		// transformations
-		if (getAttribute("net.sf.orcc.backends.additionalTransfos", false)) {
-			transformations.add(new DfVisitor<Void>(new SSATransformation()));
-			transformations.add(new DfVisitor<Object>(new PhiRemoval()));
-		}
-
 		transformations.add(new TypeResizer(true, false, true));
 		transformations.add(new RenameTransformation(replacementMap));
 
 		// If "-t" option is passed to command line, apply additional
 		// transformations
 		if (getAttribute("net.sf.orcc.backends.additionalTransfos", false)) {
+			transformations.add(new StoreOnceTransformation());
+			transformations.add(new DfVisitor<Void>(new SSATransformation()));
+			transformations.add(new DfVisitor<Object>(new PhiRemoval()));
 			transformations.add(new Multi2MonoToken());
+			transformations.add(new DivisionSubstitution());
 			transformations.add(new ParameterImporter());
 			transformations.add(new DfVisitor<Void>(new Inliner(true, true)));
-			// transformations.add(new StoreOnceTransformation());
+
+			// transformations.add(new UnaryListRemoval());
+			// transformations.add(new GlobalArrayInitializer(true));
+
+			transformations.add(new DfVisitor<Void>(new InstTernaryAdder()));
+			// transformations.add(new CustomPeekAdder()); // Xlim only ?
+
+			transformations.add(new DeadGlobalElimination());
+
+			transformations.add(new DfVisitor<Void>(new DeadVariableRemoval()));
+			transformations.add(new DfVisitor<Void>(new DeadCodeElimination()));
+			transformations.add(new DfVisitor<Void>(
+					new XlimDeadVariableRemoval()));
+			transformations.add(new DfVisitor<Void>(new ListFlattener()));
+			transformations.add(new DfVisitor<Expression>(
+					new TacTransformation()));
+			transformations.add(new DfVisitor<CfgNode>(new CfgBuilder()));
+			transformations
+					.add(new DfVisitor<Void>(new InstPhiTransformation()));
+			transformations.add(new DfVisitor<Void>(new EmptyBlockRemover()));
+			transformations.add(new DfVisitor<Void>(new BlockCombine()));
+
+			// transformations.add(new DfVisitor<Expression>(new
+			// LiteralIntegersAdder())); // Xlim only ?
+			transformations.add(new DfVisitor<Expression>(new CastAdder(true)));
+
+			// NullPointerException when running backend with this transfo
+			// transformations.add(new XlimVariableRenamer());
 		}
 
 		for (DfSwitch<?> transformation : transformations) {
