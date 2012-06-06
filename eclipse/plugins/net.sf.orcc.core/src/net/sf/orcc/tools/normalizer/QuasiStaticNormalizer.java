@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2012, IRISA
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,41 +28,42 @@
  */
 package net.sf.orcc.tools.normalizer;
 
+import java.util.List;
+
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.util.DfSwitch;
-import net.sf.orcc.moc.CSDFMoC;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
+import net.sf.orcc.moc.QSDFMoC;
 
-/**
- * This class defines an actor transformation that normalizes actors so they can
- * later be merged together.
- * 
- * @author Matthieu Wipliez
- * @author Jerome Gorin
- * @author Herve Yviquel
- * 
- */
-public class ActorNormalizer extends DfSwitch<Void> {
+public class QuasiStaticNormalizer {
+	
+	private Actor actor;
 
-	@Override
-	public Void caseActor(Actor actor) {
-		MoC clasz = actor.getMoC();
-		if (clasz.isCSDF() && actor.getActions().size() > 1) {
-			Action action = new StaticNormalizer().normalize("xxx",
-					(CSDFMoC) clasz);
+	private QSDFMoC quasiStaticCls;
 
-			// Removes FSM
-			actor.setFsm(null);
-			// Removes all actions from action scheduler
-			actor.getActionsOutsideFsm().clear();
-			actor.getActions().clear();
-			// Add the static action
-			actor.getActions().add(action);
-			actor.getActionsOutsideFsm().add(action);
+	private List<Var> variables;
+
+	/**
+	 * Creates a new normalizer
+	 */
+	public QuasiStaticNormalizer(Actor actor) {
+		this.actor = actor;
+		quasiStaticCls = (QSDFMoC) actor.getMoC();
+	}
+	
+	/**
+	 * Normalizes this actor so it fits the given static class.
+	 * 
+	 * @param staticCls
+	 *            a static class
+	 */
+	public void normalize() {
+		for(Action action : quasiStaticCls.getActions()){
+			MoC moc = quasiStaticCls.getMoC(action);
+			
 		}
-
-		return null;
+		
 	}
 
 }

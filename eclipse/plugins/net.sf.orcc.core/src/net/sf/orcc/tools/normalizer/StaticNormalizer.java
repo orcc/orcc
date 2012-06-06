@@ -70,7 +70,7 @@ import org.eclipse.emf.common.util.EList;
  * @author Herve Yviquel
  * 
  */
-public class StaticActorNormalizer {
+public class StaticNormalizer {
 
 	/**
 	 * This class contains code to transform a pattern to IR code.
