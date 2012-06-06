@@ -94,12 +94,12 @@ public class SmtSolver {
 				}
 			} else if (exp.isList()) {
 				SExpList list = (SExpList) exp;
-				if (list.startsWith(new SExpSymbol("_"))) {
+				if (list.size() == 2) {
 					SExpSymbol bv = list.getSymbol(1);
 					// remove "bv" from the symbol
 					String contents = bv.getContents().substring(2);
-					BigInteger value = new BigInteger(contents);
-					return value.intValue();
+					BigInteger value = new BigInteger(contents, 16);
+					return value;
 				}
 			}
 
