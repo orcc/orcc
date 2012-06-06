@@ -20,7 +20,7 @@ Bugfixes
 configuration.
 - Tools: The normalizer is working back and it has been improved to avoid useless
 memory copies from the FIFOs.
-- Classifier: Fix the classification of QSDF actors
+- Classifier: Fix the classification of QSDF actors.
 
 Misc
 ----
