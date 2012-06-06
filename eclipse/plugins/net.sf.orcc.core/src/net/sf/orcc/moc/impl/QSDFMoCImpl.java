@@ -12,9 +12,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import net.sf.orcc.df.Action;
+import net.sf.orcc.moc.MoC;
 import net.sf.orcc.moc.MocPackage;
 import net.sf.orcc.moc.QSDFMoC;
-import net.sf.orcc.moc.SDFMoC;
 
 import org.eclipse.emf.ecore.EClass;
 
@@ -28,14 +28,14 @@ import org.eclipse.emf.ecore.EClass;
  */
 public class QSDFMoCImpl extends MoCImpl implements QSDFMoC {
 
-	private Map<Action, SDFMoC> configurations;
+	private Map<Action, MoC> configurations;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 */
 	protected QSDFMoCImpl() {
 		super();
-		configurations = new HashMap<Action, SDFMoC>();
+		configurations = new HashMap<Action, MoC>();
 	}
 
 	/**
@@ -53,12 +53,12 @@ public class QSDFMoCImpl extends MoCImpl implements QSDFMoC {
 	}
 
 	@Override
-	public Map<Action, SDFMoC> getConfigurations() {
+	public Map<Action, MoC> getConfigurations() {
 		return configurations;
 	}
 
 	@Override
-	public SDFMoC getSDFMoC(Action action) {
+	public MoC getMoC(Action action) {
 		return configurations.get(action);
 	}
 
@@ -68,7 +68,7 @@ public class QSDFMoCImpl extends MoCImpl implements QSDFMoC {
 	}
 
 	@Override
-	public void setSDFMoC(Action action, SDFMoC moc) {
+	public void setMoC(Action action, MoC moc) {
 		configurations.put(action, moc);
 	}
 
@@ -76,9 +76,9 @@ public class QSDFMoCImpl extends MoCImpl implements QSDFMoC {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("QSDF configurations: [");
-		for (Entry<Action, SDFMoC> entry : configurations.entrySet()) {
+		for (Entry<Action, MoC> entry : configurations.entrySet()) {
 			builder.append(entry.getKey().getName());
-			builder.append(":");
+			builder.append(": ");
 			builder.append(entry.getValue());
 			builder.append(" ");
 		}

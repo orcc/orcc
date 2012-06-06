@@ -254,8 +254,8 @@ public class Classifier extends DfVisitor<Void> {
 	 *            a configuration
 	 * @return a static class
 	 */
-	private SDFMoC classifyFsmConfiguration(Map<String, Object> configuration) {
-		SDFMoC sdfMoc = MocFactory.eINSTANCE.createSDFMoC();
+	private MoC classifyFsmConfiguration(Map<String, Object> configuration) {
+		CSDFMoC csdfMoc = MocFactory.eINSTANCE.createCSDFMoC();
 
 		AbstractInterpreter interpreter = new AbstractInterpreter(actor);
 		State initialState = interpreter.getFsmState();
@@ -268,18 +268,23 @@ public class Classifier extends DfVisitor<Void> {
 			interpreter.schedule();
 			Action latest = interpreter.getExecutedAction();
 			Invocation invocation = eINSTANCE.createInvocation(latest);
-			sdfMoc.getInvocations().add(invocation);
+			csdfMoc.getInvocations().add(invocation);
 			nbPhases++;
 		} while (!interpreter.getFsmState().equals(initialState)
 				&& nbPhases < MAX_PHASES);
 
-		if (nbPhases == MAX_PHASES) {
+		if (nbPhases == 1) {
+			SDFMoC sdfMoc = MocFactory.eINSTANCE.createSDFMoC();
+			interpreter.setTokenRates(sdfMoc);
+			return sdfMoc;
+		} else if (nbPhases == MAX_PHASES) {
 			throw new OrccRuntimeException("too many phases");
 		}
 
-		interpreter.setTokenRates(sdfMoc);
+		interpreter.setTokenRates(csdfMoc);
+		csdfMoc.setNumberOfPhases(nbPhases);
 
-		return sdfMoc;
+		return csdfMoc;
 	}
 
 	/**
@@ -323,9 +328,9 @@ public class Classifier extends DfVisitor<Void> {
 						+ "\n");
 				return MocFactory.eINSTANCE.createKPNMoC();
 			}
-			SDFMoC staticClass = classifyFsmConfiguration(configuration);
+			MoC staticClass = classifyFsmConfiguration(configuration);
 
-			quasiStatic.setSDFMoC(action, staticClass);
+			quasiStatic.setMoC(action, staticClass);
 		}
 
 		return quasiStatic;

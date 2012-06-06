@@ -60,7 +60,7 @@ public interface QSDFMoC extends MoC {
 	 * 
 	 * @return a map of Action and the associated SDF MoC
 	 */
-	Map<Action, SDFMoC> getConfigurations();
+	Map<Action, MoC> getConfigurations();
 
 	/**
 	 * Returns the SDF MoC that is associated with the configuration given by
@@ -70,7 +70,7 @@ public interface QSDFMoC extends MoC {
 	 *            a configuration action
 	 * @return a SDF MoC
 	 */
-	SDFMoC getSDFMoC(Action action);
+	MoC getMoC(Action action);
 
 	/**
 	 * Sets the SDF MoC that is associated with the configuration given by the
@@ -81,6 +81,6 @@ public interface QSDFMoC extends MoC {
 	 * @param moc
 	 *            a SDF MoC
 	 */
-	void setSDFMoC(Action action, SDFMoC moc);
+	void setMoC(Action action, MoC moc);
 
 }
