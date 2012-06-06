@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.transform;
+package net.sf.orcc.df.transform;
 
 import java.util.ArrayList;
 import java.util.Arrays;
