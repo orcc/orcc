@@ -29,16 +29,14 @@
 package net.sf.orcc.tools.normalizer;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.df.Action;
-import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.df.Tag;
-import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockWhile;
@@ -60,53 +58,50 @@ import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.moc.CSDFMoC;
 
+import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.EList;
+
 /**
- * This class defines a normalizer for static actors.
+ * This class defines a normalizer for static actors. In other words, a new
+ * action is created from the detected patter of a CSDF model of computation.
  * 
  * @author Matthieu Wipliez
  * @author Jerome Gorin
+ * @author Herve Yviquel
  * 
  */
 public class StaticActorNormalizer {
 
 	/**
-	 * This class contains code to transform a pattern to IR code (not entirely
-	 * valid because not in SSA form at this point).
-	 * 
-	 * @author Matthieu Wipliez
-	 * 
+	 * This class contains code to transform a pattern to IR code.
 	 */
-	private class MyPatternVisitor implements PatternVisitor {
-
-		private Procedure procedure;
+	private class BodyBuilder implements PatternVisitor {
 
 		private int depth;
-
 		private List<Var> indexes;
+		private List<Block> blocks;
+		private Procedure procedure;
 
-		private List<Block> nodes;
-
-		public MyPatternVisitor(Procedure procedure) {
+		public BodyBuilder(Procedure procedure) {
 			this.procedure = procedure;
-			this.nodes = procedure.getBlocks();
+			this.blocks = procedure.getBlocks();
 			this.indexes = new ArrayList<Var>();
 		}
 
-		private List<Instruction> updateIndex(Pattern pattern) {
-			List<Instruction> instrs = new ArrayList<Instruction>();
-
+		private EList<Instruction> updateCounter(Pattern pattern) {
+			EList<Instruction> instrs = new BasicEList<Instruction>();
 			for (Port port : pattern.getPorts()) {
 				int numTokens = pattern.getNumTokens(port);
-				Var varCount = actor.getStateVar(port.getName() + "_count");
+				Var varCount = portToVarCountMap.get(port);
 
-				InstStore store = irFactory.createInstStore(varCount, irFactory
-						.createExprBinary(irFactory.createExprVar(varCount),
+				InstAssign assign = irFactory.createInstAssign(varCount,
+						irFactory.createExprBinary(
+								irFactory.createExprVar(varCount),
 								OpBinary.PLUS,
 								irFactory.createExprInt(numTokens),
 								irFactory.createTypeInt(32)));
-				instrs.add(store);
+				instrs.add(assign);
 			}
-
 			return instrs;
 		}
 
@@ -116,48 +111,46 @@ public class StaticActorNormalizer {
 			if (indexes.size() < depth) {
 				Var varDef = irFactory.createVar(0, irFactory.createTypeBool(),
 						"loop", true, depth - 1);
-				variables.add(varDef);
+				procedure.getLocals().add(varDef);
 				indexes.add(varDef);
 			}
 
 			Var loopVar = indexes.get(depth - 1);
 
-			// init var
-			BlockBasic block = IrUtil.getLast(nodes);
+			// Initialize loop counter
+			BlockBasic block = IrUtil.getLast(blocks);
 			InstAssign assign = irFactory.createInstAssign(loopVar,
 					irFactory.createExprInt(0));
 			block.add(assign);
 
-			// create while
-			List<Block> oldNodes = nodes;
-			nodes = new ArrayList<Block>();
-
+			// Create while
+			List<Block> oldNodes = blocks;
 			BlockWhile nodeWhile = irFactory.createBlockWhile();
 			nodeWhile.setJoinBlock(irFactory.createBlockBasic());
-			nodes = nodeWhile.getBlocks();
 
+			blocks = nodeWhile.getBlocks();
 			oldNodes.add(nodeWhile);
 
-			// assign condition
+			// Create the loop condition
 			Expression condition = irFactory.createExprBinary(
 					irFactory.createExprVar(loopVar), OpBinary.LT,
 					irFactory.createExprInt(pattern.getNumIterations()),
 					irFactory.createTypeBool());
 			nodeWhile.setCondition(condition);
 
-			// accept sub pattern
+			// Accept sub pattern
 			pattern.getPattern().accept(this);
 
-			// add assign
-			block = IrUtil.getLast(nodes);
+			// Increment the loop counter
+			block = IrUtil.getLast(blocks);
 			assign = irFactory.createInstAssign(loopVar, irFactory
 					.createExprBinary(irFactory.createExprVar(loopVar),
 							OpBinary.PLUS, irFactory.createExprInt(1),
 							irFactory.createTypeInt(32)));
 			block.add(assign);
 
-			// restore stuff
-			this.nodes = oldNodes;
+			// Restore stuff
+			this.blocks = oldNodes;
 			depth--;
 		}
 
@@ -170,27 +163,35 @@ public class StaticActorNormalizer {
 
 		@Override
 		public void visit(SimplePattern pattern) {
+			// Copy the body of the action
 			Action action = pattern.getAction();
+			Procedure bodyCopy = IrUtil.copy(action.getBody());
 
-			for(Var var : new ArrayList<Var>(action.getBody().getLocals())){
-				var.setName(action.getName() + "_" + var.getName());
-				procedure.getLocals().add(var);
+			// Rename variables
+			for (Var var : bodyCopy.getLocals()) {
+				String varName = var.getName();
+				Var existingVar = procedure.getLocal(varName);
+				for (int i = 0; existingVar != null; i++) {
+					varName = var.getName() + i;
+					existingVar = procedure.getLocal(varName);
+				}
+				var.setName(varName);
 			}
-			nodes.addAll(action.getBody().getBlocks());
+
+			// Move variables and blocks in the body of the new action
+			procedure.getLocals().addAll(bodyCopy.getLocals());
+			blocks.addAll(bodyCopy.getBlocks());
 
 			// Update variable counter index
-			List<Instruction> indexIn = updateIndex(action.getInputPattern());
-			List<Instruction> indexOut = updateIndex(action.getOutputPattern());
-
-			// Add all instructions
-			BlockBasic block = IrUtil.getLast(nodes);
-			block.getInstructions().addAll(indexIn);
-			block.getInstructions().addAll(indexOut);
+			BlockBasic block = IrUtil.getLast(blocks);
+			block.getInstructions().addAll(
+					updateCounter(action.getInputPattern()));
+			block.getInstructions().addAll(
+					updateCounter(action.getOutputPattern()));
 		}
-
 	}
 
-	private class UpdateFifoAccess extends AbstractIrVisitor<Void> {
+	private class UpdatePortAccesses extends AbstractIrVisitor<Void> {
 
 		@Override
 		public Void caseInstLoad(InstLoad load) {
@@ -198,9 +199,10 @@ public class StaticActorNormalizer {
 			Var var = use.getVariable();
 			if (var.eContainer() instanceof Pattern) {
 				Pattern oldPattern = (Pattern) var.eContainer();
-				Pattern newPattern = staticCls.getInputPattern();
-				use.setVariable(newPattern.getVariable(oldPattern.getPort(var)));
-				updateIndex(var, load.getIndexes());
+				Pattern newPattern = clasz.getInputPattern();
+				Port port = oldPattern.getPort(var);
+				use.setVariable(newPattern.getVariable(port));
+				updateIndex(portToVarCountMap.get(port), load.getIndexes());
 			}
 			return null;
 		}
@@ -211,117 +213,28 @@ public class StaticActorNormalizer {
 			Var var = def.getVariable();
 			if (var.eContainer() instanceof Pattern) {
 				Pattern oldPattern = (Pattern) var.eContainer();
-				Pattern newPattern = staticCls.getOutputPattern();
-				def.setVariable(newPattern.getVariable(oldPattern.getPort(var)));
-				updateIndex(var, store.getIndexes());
+				Pattern newPattern = clasz.getOutputPattern();
+				Port port = oldPattern.getPort(var);
+				def.setVariable(newPattern.getVariable(port));
+				updateIndex(portToVarCountMap.get(port), store.getIndexes());
 			}
 			return null;
 		}
 
-		private void updateIndex(Var var, List<Expression> indexes) {
-			if (indexes.size() == 1) {
-				Var varCount = actor.getStateVar(var.getName() + "_count");
-				ExprBinary expr = IrFactory.eINSTANCE.createExprBinary(
-						IrFactory.eINSTANCE.createExprVar(varCount),
-						OpBinary.PLUS, indexes.get(0),
-						IrFactory.eINSTANCE.createTypeInt(32));
-
-				indexes.add(expr);
-			} else {
-				System.err.println("TODO index");
-			}
+		private void updateIndex(Var varCount, List<Expression> indexes) {
+			ExprBinary expr = IrFactory.eINSTANCE.createExprBinary(
+					IrFactory.eINSTANCE.createExprVar(varCount), OpBinary.PLUS,
+					indexes.get(0), IrFactory.eINSTANCE.createTypeInt(32));
+			indexes.add(expr);
 		}
-
 	}
 
 	private final DfFactory dfFactory = DfFactory.eINSTANCE;
 	private final IrFactory irFactory = IrFactory.eINSTANCE;
 
-	private static final String ACTION_NAME = "xxx";
-	private static final String SCHEDULER_NAME = "isSchedulable_" + ACTION_NAME;
-
-	private Actor actor;
-
-	private CSDFMoC staticCls;
-
-	private List<Var> variables;
-
-	/**
-	 * Creates a new normalizer
-	 */
-	public StaticActorNormalizer(Actor actor) {
-		this.actor = actor;
-		staticCls = (CSDFMoC) actor.getMoC();
-	}
-
-	/**
-	 * Adds state variables to hold the values of data read/stored in the given
-	 * pattern. Initializes count to 0.
-	 * 
-	 * @param procedure
-	 *            body of the target action
-	 * @param pattern
-	 *            input or output pattern
-	 */
-	private void addStateVariables(Procedure procedure, Pattern pattern) {
-		BlockBasic block = procedure.getLast();
-		for (Port port : pattern.getPorts()) {
-			Type type = irFactory.createTypeList(pattern.getNumTokens(port),
-					port.getType());
-			Var var = irFactory.createVar(type, port.getName(), true, 0);
-
-			pattern.setVariable(port, var);
-
-			Var varCount = irFactory
-					.createVar(0, irFactory.createTypeInt(32), port.getName()
-							+ "_count", true, irFactory.createExprInt(0));
-			actor.getStateVars().add(varCount);
-
-			InstStore store = irFactory.createInstStore(varCount,
-					irFactory.createExprInt(0));
-			block.add(store);
-		}
-	}
-
-	/**
-	 * Adds the given action to the actor and to its action scheduler.
-	 * 
-	 * @param action
-	 *            an action
-	 */
-	private void addStaticAction(Action action) {
-		actor.getActions().add(action);
-		actor.getActionsOutsideFsm().add(action);
-	}
-
-	/**
-	 * Cleans up the actor.
-	 */
-	private void cleanupActor() {
-		// removes FSM
-		actor.setFsm(null);
-
-		// removes all actions from action scheduler
-		actor.getActionsOutsideFsm().clear();
-		actor.getActions().clear();
-	}
-
-	/**
-	 * Creates the static action for this actor.
-	 * 
-	 * @return a static action
-	 */
-	private Action createAction() {
-		Procedure scheduler = createScheduler();
-		Procedure body = createBody();
-
-		Pattern input = staticCls.getInputPattern();
-		Pattern output = staticCls.getOutputPattern();
-		Tag tag = dfFactory.createTag(ACTION_NAME);
-
-		return dfFactory.createAction(tag, input, output,
-				dfFactory.createPattern(), scheduler, body);
-	}
+	private CSDFMoC clasz;
+	private String name;
+	private Map<Port, Var> portToVarCountMap;
 
 	/**
 	 * Creates the body of the static action.
@@ -329,85 +242,87 @@ public class StaticActorNormalizer {
 	 * @return the body of the static action
 	 */
 	private Procedure createBody() {
-		Procedure procedure = irFactory.createProcedure(ACTION_NAME, 0,
+		Procedure procedure = irFactory.createProcedure(name, 0,
 				irFactory.createTypeVoid());
 
-		variables = procedure.getLocals();
+		// Initialize input and output port variables and their counters
+		initializePorts(procedure, clasz.getInputPattern());
+		initializePorts(procedure, clasz.getOutputPattern());
 
-		// add state variables
-		addStateVariables(procedure, staticCls.getInputPattern());
-		addStateVariables(procedure, staticCls.getOutputPattern());
-
-		// change accesses to FIFO
-		new DfVisitor<Void>(new UpdateFifoAccess()).doSwitch(actor);
-
-		// finds a pattern in the actions and visit it
+		// Finds a pattern in the actions
 		LoopPatternRecognizer r = new LoopPatternRecognizer();
-		ExecutionPattern pattern = r.getPattern(staticCls.getInvocations());
+		ExecutionPattern pattern = r.getPattern(clasz.getInvocations());
 		System.out.println(pattern);
-		pattern.accept(new MyPatternVisitor(procedure));
+
+		// Build the new body
+		pattern.accept(new BodyBuilder(procedure));
+
+		// Update port accesses
+		new UpdatePortAccesses().doSwitch(procedure);
 
 		return procedure;
 	}
 
 	/**
-	 * Creates a return instruction that uses the results of the hasTokens tests
-	 * previously created.
+	 * Creates the scheduler of the static action.
 	 * 
-	 * @param block
-	 *            block to which return is to be added
-	 */
-	private void createInputCondition(BlockBasic block) {
-		Expression value;
-		Iterator<Var> it = variables.iterator();
-		if (it.hasNext()) {
-			Var previous = it.next();
-			value = irFactory.createExprVar(previous);
-
-			while (it.hasNext()) {
-				Var thisOne = it.next();
-				value = irFactory.createExprBinary(value, OpBinary.LOGIC_AND,
-						irFactory.createExprVar(thisOne),
-						irFactory.createTypeBool());
-				previous = thisOne;
-			}
-		} else {
-			value = irFactory.createExprBool(true);
-		}
-
-		InstReturn returnInstr = irFactory.createInstReturn(value);
-		block.add(returnInstr);
-	}
-
-	/**
-	 * Creates an "isSchedulable" procedure for the static action of this actor.
-	 * 
-	 * @return an "isSchedulable" procedure
+	 * @return a scheduling procedure
 	 */
 	private Procedure createScheduler() {
-		Procedure procedure = irFactory.createProcedure(SCHEDULER_NAME, 0,
-				irFactory.createTypeBool());
-
-		variables = procedure.getLocals();
+		Procedure procedure = irFactory.createProcedure(
+				"isSchedulable_" + name, 0, irFactory.createTypeBool());
 
 		BlockBasic block = irFactory.createBlockBasic();
-		procedure.getBlocks().add(block);
+		InstReturn returnInstr = irFactory.createInstReturn(irFactory
+				.createExprBool(true));
 
-		createInputCondition(block);
+		block.add(returnInstr);
+		procedure.getBlocks().add(block);
 
 		return procedure;
 	}
 
 	/**
-	 * Normalizes this actor so it fits the given static class.
+	 * Add port variables to the pattern. Create a counter for each port and
+	 * initialize it to 0.
 	 * 
-	 * @param staticCls
-	 *            a static class
+	 * @param procedure
+	 *            body of the target action
+	 * @param pattern
+	 *            input or output pattern
 	 */
-	public void normalize() {
-		Action staticAction = createAction();
-		cleanupActor();
-		addStaticAction(staticAction);
+	private void initializePorts(Procedure procedure, Pattern pattern) {
+		BlockBasic block = procedure.getLast();
+		for (Port port : pattern.getPorts()) {
+			// Port variable
+			Type type = irFactory.createTypeList(pattern.getNumTokens(port),
+					port.getType());
+			Var var = irFactory.createVar(type, port.getName(), true, 0);
+			pattern.setVariable(port, var);
+
+			// Counter variable
+			Var varCount = procedure.newTempLocalVariable(
+					irFactory.createTypeInt(32), port.getName() + "_count");
+			InstAssign assign = irFactory.createInstAssign(varCount,
+					irFactory.createExprInt(0));
+			block.add(assign);
+
+			portToVarCountMap.put(port, varCount);
+		}
 	}
 
+	public Action normalize(String name, CSDFMoC moc) {
+		this.clasz = moc;
+		this.name = name;
+		this.portToVarCountMap = new HashMap<Port, Var>();
+
+		Procedure scheduler = createScheduler();
+		Procedure body = createBody();
+		Pattern input = clasz.getInputPattern();
+		Pattern output = clasz.getOutputPattern();
+		Pattern peeked = dfFactory.createPattern();
+
+		return dfFactory.createAction(name, input, output, peeked, scheduler,
+				body);
+	}
 }

@@ -28,8 +28,10 @@
  */
 package net.sf.orcc.tools.normalizer;
 
+import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.MoC;
 
 /**
@@ -38,21 +40,26 @@ import net.sf.orcc.moc.MoC;
  * 
  * @author Matthieu Wipliez
  * @author Jerome Gorin
+ * @author Herve Yviquel
  * 
  */
 public class ActorNormalizer extends DfSwitch<Void> {
-
-	/**
-	 * Creates a new normalizer
-	 */
-	public ActorNormalizer() {
-	}
 
 	@Override
 	public Void caseActor(Actor actor) {
 		MoC clasz = actor.getMoC();
 		if (clasz.isCSDF() && actor.getActions().size() > 1) {
-			new StaticActorNormalizer(actor).normalize();
+			Action action = new StaticActorNormalizer().normalize("xxx",
+					(CSDFMoC) clasz);
+
+			// Removes FSM
+			actor.setFsm(null);
+			// Removes all actions from action scheduler
+			actor.getActionsOutsideFsm().clear();
+			actor.getActions().clear();
+			// Add the static action
+			actor.getActions().add(action);
+			actor.getActionsOutsideFsm().add(action);
 		}
 
 		return null;
