@@ -63,11 +63,6 @@ public class BlockBasicImpl extends BlockImpl implements BlockBasic {
 		getInstructions().add(index, instruction);
 	}
 
-	@Override
-	public void addAll(Collection<Instruction> instruction) {
-		getInstructions().addAll(instructions);
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated

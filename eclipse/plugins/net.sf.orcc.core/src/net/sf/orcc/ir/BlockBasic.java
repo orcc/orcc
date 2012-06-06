@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.ListIterator;
 
@@ -68,8 +67,6 @@ public interface BlockBasic extends Block {
 	 *            an instruction
 	 */
 	void add(int index, Instruction instruction);
-
-	void addAll(Collection<Instruction> instruction);
 
 	/**
 	 * Returns the value of the '<em><b>Instructions</b></em>' containment reference list.
