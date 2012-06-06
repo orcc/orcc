@@ -36,6 +36,7 @@ import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.ir.BlockIf;
 import net.sf.orcc.ir.BlockWhile;
 import net.sf.orcc.ir.InstLoad;
@@ -88,6 +89,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 		// create a copier, and copy the original actor
 		copier = new EcoreUtil.Copier();
 		Actor copyOfActor = IrUtil.copy(copier, actor);
+		new UnitImporter().doSwitch(copyOfActor);
 
 		// save actions of the original actor
 		originalActions = new HashMap<Action, Action>();
@@ -201,7 +203,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 	}
 
 	@Override
-	public void execute(Action action) {
+	protected void execute(Action action) {
 		executedAction = action;
 		Pattern inputPattern = action.getInputPattern();
 		for (Port port : inputPattern.getPorts()) {
