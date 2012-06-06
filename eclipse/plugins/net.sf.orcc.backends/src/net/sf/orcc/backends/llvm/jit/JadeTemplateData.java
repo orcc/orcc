@@ -46,7 +46,6 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.moc.QSDFMoC;
-import net.sf.orcc.moc.SDFMoC;
 
 import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EObject;
@@ -197,9 +196,9 @@ public class JadeTemplateData extends LLVMTemplateData {
 		}
 	}
 
-	private void computeConfiguration(Action action, SDFMoC sdfMoC) {
+	private void computeConfiguration(Action action, CSDFMoC csdfMoC) {
 		configurations.put(action, id++);
-		computeCSDFMoC(sdfMoC);
+		computeCSDFMoC(csdfMoC);
 	}
 
 	private void computeCSDFMoC(CSDFMoC sdfmoc) {
@@ -292,7 +291,7 @@ public class JadeTemplateData extends LLVMTemplateData {
 
 	private void computeQSDFMoC(QSDFMoC qsdfMoc) {
 		for (Action action : qsdfMoc.getActions()) {
-			computeConfiguration(action, qsdfMoc.getSDFMoC(action));
+			computeConfiguration(action, (CSDFMoC) qsdfMoc.getMoC(action));
 		}
 	}
 
