@@ -10,9 +10,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.ListIterator;
 
+import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.BlockBasic;
 
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
@@ -61,6 +61,11 @@ public class BlockBasicImpl extends BlockImpl implements BlockBasic {
 	@Override
 	public void add(int index, Instruction instruction) {
 		getInstructions().add(index, instruction);
+	}
+
+	@Override
+	public void addAll(Collection<Instruction> instruction) {
+		getInstructions().addAll(instructions);
 	}
 
 	/**
@@ -163,6 +168,21 @@ public class BlockBasicImpl extends BlockImpl implements BlockBasic {
 	}
 
 	@Override
+	public boolean isBlockBasic() {
+		return true;
+	}
+
+	@Override
+	public boolean isBlockIf() {
+		return false;
+	}
+
+	@Override
+	public boolean isBlockWhile() {
+		return false;
+	}
+
+	@Override
 	public boolean isNodeBlock() {
 		return true;
 	}
@@ -196,21 +216,6 @@ public class BlockBasicImpl extends BlockImpl implements BlockBasic {
 		}
 
 		return sb.toString();
-	}
-
-	@Override
-	public boolean isBlockBasic() {
-		return true;
-	}
-
-	@Override
-	public boolean isBlockIf() {
-		return false;
-	}
-
-	@Override
-	public boolean isBlockWhile() {
-		return false;
 	}
 
 } // NodeBlockImpl
