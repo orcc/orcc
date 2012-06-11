@@ -6,7 +6,7 @@
  */
 package net.sf.orcc.moc.impl;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -35,7 +35,7 @@ public class QSDFMoCImpl extends MoCImpl implements QSDFMoC {
 	 */
 	protected QSDFMoCImpl() {
 		super();
-		configurations = new HashMap<Action, MoC>();
+		configurations = new LinkedHashMap<Action, MoC>();
 	}
 
 	/**
