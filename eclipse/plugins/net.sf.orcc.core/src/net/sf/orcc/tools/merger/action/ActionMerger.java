@@ -29,7 +29,7 @@
 package net.sf.orcc.tools.merger.action;
 
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.moc.MoC;
 
 /**
@@ -41,7 +41,11 @@ import net.sf.orcc.moc.MoC;
  * @author Herve Yviquel
  * 
  */
-public class ActionMerger extends DfSwitch<Void> {
+public class ActionMerger extends DfVisitor<Void> {
+	
+	public ActionMerger(){
+		this.visitInstances = false;
+	}
 
 	@Override
 	public Void caseActor(Actor actor) {

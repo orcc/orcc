@@ -57,7 +57,7 @@ public class DfVisitor<T> extends DfSwitch<T> {
 
 	protected AbstractIrVisitor<T> irVisitor;
 
-	private boolean visitInstances;
+	protected boolean visitInstances;
 
 	public DfVisitor() {
 		visitInstances = true;

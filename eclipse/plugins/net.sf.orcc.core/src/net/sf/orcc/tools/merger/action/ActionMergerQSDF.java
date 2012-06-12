@@ -86,6 +86,7 @@ public class ActionMergerQSDF {
 					Pattern prevPattern = previous.getInputPattern();
 					Pattern currPattern = action.getInputPattern();
 
+					// FIXME: better implementation using isSuperSetOf()
 					for (Port port : qsdfmoc.getConfigurationPorts()) {
 						if (prevPattern.getNumTokens(port) == currPattern
 								.getNumTokens(port)) {
