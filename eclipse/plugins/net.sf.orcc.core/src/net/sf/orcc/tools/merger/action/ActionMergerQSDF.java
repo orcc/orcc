@@ -62,7 +62,10 @@ public class ActionMergerQSDF {
 
 	private static IrFactory factory = IrFactory.eINSTANCE;
 
+	private Actor actor;
+
 	public void merge(Actor actor) {
+		this.actor = actor;
 		MoC clasz = actor.getMoC();
 		if (clasz.isQuasiStatic()) {
 			QSDFMoC qsdfmoc = (QSDFMoC) clasz;
@@ -82,6 +85,7 @@ public class ActionMergerQSDF {
 				Action currCopy = IrUtil.copy(action);
 
 				for (Action previous : previousActions) {
+					@SuppressWarnings("unused")
 					boolean checkCompatibility = false;
 					Pattern prevPattern = previous.getInputPattern();
 					Pattern currPattern = action.getInputPattern();
@@ -93,8 +97,7 @@ public class ActionMergerQSDF {
 							checkCompatibility = true;
 						}
 					}
-					if (checkCompatibility
-							&& checker.checkSat(action, previous)) {
+					if (checker.checkSat(action, previous)) {
 						Action prevCopy = IrUtil.copy(previous);
 						removeCompatibility(currCopy, prevCopy);
 					}
@@ -107,7 +110,7 @@ public class ActionMergerQSDF {
 					CSDFMoC csdfMoc = (CSDFMoC) moc;
 
 					Action newAction = new ActionMergerCSDF().merge(
-							action.getName(), csdfMoc);
+							action.getName(), csdfMoc, actor);
 					newAction.setPeekPattern(currCopy.getPeekPattern());
 					newAction.setScheduler(currCopy.getScheduler());
 
@@ -142,10 +145,8 @@ public class ActionMergerQSDF {
 		// Rename variables
 		for (Var var : prevSched.getLocals()) {
 			String varName = var.getName();
-			Var existingVar = initSched.getLocal(varName);
-			for (int i = 0; existingVar != null; i++) {
+			for (int i = 0; isExistingVar(varName, initSched); i++) {
 				varName = var.getName() + i;
-				existingVar = initSched.getLocal(varName);
 			}
 			var.setName(varName);
 		}
@@ -171,6 +172,11 @@ public class ActionMergerQSDF {
 			}
 		}
 
+	}
+
+	private boolean isExistingVar(String varName, Procedure procedure) {
+		return procedure.getLocal(varName) != null
+				|| actor.getStateVar(varName) != null;
 	}
 
 }

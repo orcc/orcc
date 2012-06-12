@@ -90,6 +90,11 @@ public class ActionMergerCSDF {
 			this.indexes = new ArrayList<Var>();
 		}
 
+		private boolean isExistingVar(String varName) {
+			return procedure.getLocal(varName) != null
+					|| actor.getStateVar(varName) != null;
+		}
+
 		private EList<Instruction> updateCounter(Pattern pattern) {
 			EList<Instruction> instrs = new BasicEList<Instruction>();
 			for (Port port : pattern.getPorts()) {
@@ -172,10 +177,8 @@ public class ActionMergerCSDF {
 			// Rename variables
 			for (Var var : bodyCopy.getLocals()) {
 				String varName = var.getName();
-				Var existingVar = procedure.getLocal(varName);
-				for (int i = 0; existingVar != null; i++) {
+				for (int i = 0; isExistingVar(varName); i++) {
 					varName = var.getName() + i;
-					existingVar = procedure.getLocal(varName);
 				}
 				var.setName(varName);
 			}
@@ -233,6 +236,8 @@ public class ActionMergerCSDF {
 	private final IrFactory irFactory = IrFactory.eINSTANCE;
 
 	private CSDFMoC clasz;
+	private Actor actor;
+
 	private Pattern inputPattern;
 	private Pattern outputPattern;
 	private String name;
@@ -316,8 +321,8 @@ public class ActionMergerCSDF {
 	public void merge(Actor actor) {
 		MoC clasz = actor.getMoC();
 		if (clasz.isCSDF()) {
-			Action action = new ActionMergerCSDF()
-					.merge("xxx", (CSDFMoC) clasz);
+			Action action = new ActionMergerCSDF().merge("xxx",
+					(CSDFMoC) clasz, actor);
 
 			// Remove FSM
 			actor.setFsm(null);
@@ -331,12 +336,13 @@ public class ActionMergerCSDF {
 		}
 	}
 
-	public Action merge(String name, CSDFMoC moc) {
+	public Action merge(String name, CSDFMoC moc, Actor actor) {
 		this.clasz = moc;
 		this.name = name;
 		this.inputPattern = IrUtil.copy(clasz.getInputPattern());
 		this.outputPattern = IrUtil.copy(clasz.getOutputPattern());
 		this.portToVarCountMap = new HashMap<Port, Var>();
+		this.actor = actor;
 
 		Procedure scheduler = createScheduler();
 		Procedure body = createBody();
