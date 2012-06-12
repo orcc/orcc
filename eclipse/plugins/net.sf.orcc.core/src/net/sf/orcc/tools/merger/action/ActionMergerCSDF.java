@@ -108,7 +108,7 @@ public class ActionMergerCSDF {
 		}
 
 		@Override
-		public void visit(LoopPattern pattern) {
+		public void visit(PatternLoop pattern) {
 			depth++;
 			if (indexes.size() < depth) {
 				Var varDef = irFactory.createVar(0, irFactory.createTypeBool(),
@@ -252,7 +252,7 @@ public class ActionMergerCSDF {
 		initializePorts(procedure, outputPattern);
 
 		// Finds a pattern in the actions
-		LoopPatternRecognizer r = new LoopPatternRecognizer();
+		PatternLoopRecognizer r = new PatternLoopRecognizer();
 		PatternExecution pattern = r.getPattern(clasz.getInvocations());
 		System.out.println(pattern);
 

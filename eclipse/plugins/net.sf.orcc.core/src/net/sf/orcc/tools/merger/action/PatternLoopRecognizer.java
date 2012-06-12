@@ -42,9 +42,9 @@ import net.sf.orcc.moc.Invocation;
  * @author Matthieu Wipliez
  * 
  */
-public class LoopPatternRecognizer {
+public class PatternLoopRecognizer {
 
-	public LoopPatternRecognizer() {
+	public PatternLoopRecognizer() {
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class LoopPatternRecognizer {
 	private void addPattern(PatternSequential seq, int iterations,
 			PatternExecution pattern) {
 		if (iterations > 1) {
-			seq.add(new LoopPattern(iterations, pattern));
+			seq.add(new PatternLoop(iterations, pattern));
 		} else {
 			seq.add(pattern);
 		}

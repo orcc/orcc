@@ -42,7 +42,7 @@ public interface PatternVisitor {
 	 * @param pattern
 	 *            a loop pattern
 	 */
-	public void visit(LoopPattern pattern);
+	public void visit(PatternLoop pattern);
 
 	/**
 	 * Visits the given sequential pattern.

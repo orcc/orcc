@@ -39,13 +39,13 @@ package net.sf.orcc.tools.merger.action;
  * @author Matthieu Wipliez
  * 
  */
-public class LoopPattern extends PatternExecution {
+public class PatternLoop extends PatternExecution {
 
 	private int numIterations;
 
 	private PatternExecution pattern;
 
-	public LoopPattern(int iterations, PatternExecution pattern) {
+	public PatternLoop(int iterations, PatternExecution pattern) {
 		this.numIterations = iterations;
 		this.pattern = pattern;
 	}
@@ -62,8 +62,8 @@ public class LoopPattern extends PatternExecution {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof LoopPattern) {
-			LoopPattern other = (LoopPattern) obj;
+		if (obj instanceof PatternLoop) {
+			PatternLoop other = (PatternLoop) obj;
 			return numIterations == other.numIterations
 					&& pattern.equals(other.pattern);
 		}
