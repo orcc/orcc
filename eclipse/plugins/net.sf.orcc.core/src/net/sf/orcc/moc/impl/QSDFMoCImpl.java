@@ -6,12 +6,15 @@
  */
 package net.sf.orcc.moc.impl;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.moc.MocPackage;
 import net.sf.orcc.moc.QSDFMoC;
@@ -29,6 +32,7 @@ import org.eclipse.emf.ecore.EClass;
 public class QSDFMoCImpl extends MoCImpl implements QSDFMoC {
 
 	private Map<Action, MoC> configurations;
+	private List<Port> configurationPorts;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -36,6 +40,7 @@ public class QSDFMoCImpl extends MoCImpl implements QSDFMoC {
 	protected QSDFMoCImpl() {
 		super();
 		configurations = new LinkedHashMap<Action, MoC>();
+		configurationPorts = new ArrayList<Port>();
 	}
 
 	/**
@@ -52,6 +57,11 @@ public class QSDFMoCImpl extends MoCImpl implements QSDFMoC {
 		return configurations.keySet();
 	}
 
+	@Override
+	public List<Port> getConfigurationPorts() {
+		return configurationPorts;
+	}
+	
 	@Override
 	public Map<Action, MoC> getConfigurations() {
 		return configurations;

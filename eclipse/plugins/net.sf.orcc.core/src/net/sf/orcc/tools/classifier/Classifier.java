@@ -320,6 +320,7 @@ public class Classifier extends DfVisitor<Void> {
 
 		// will unroll for each branch departing from the initial state
 		QSDFMoC quasiStatic = MocFactory.eINSTANCE.createQSDFMoC();
+		quasiStatic.getConfigurationPorts().addAll(ports);
 
 		for (Action action : fsm.getTargetActions(initialState)) {
 			Map<String, Object> configuration = configurations.get(action);

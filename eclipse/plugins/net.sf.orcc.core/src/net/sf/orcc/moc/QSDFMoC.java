@@ -28,10 +28,12 @@
  */
 package net.sf.orcc.moc;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Port;
 
 /**
  * This class defines a quasi-static dataflow (QSDF) MoC. QSDF is a model that
@@ -55,6 +57,13 @@ public interface QSDFMoC extends MoC {
 	 */
 	Set<Action> getActions();
 
+	/**
+	 * Returns the configuration ports of the QSDF MoC.
+	 * 
+	 * @return a list of Port used by the configuration
+	 */
+	List<Port> getConfigurationPorts();
+	
 	/**
 	 * Returns the configurations of the QSDF MoC.
 	 * 
