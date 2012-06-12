@@ -124,6 +124,8 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 	private ArchitectureFactory factory = ArchitectureFactory.eINSTANCE;
 	private Mapping mapping;
 
+	private boolean limitConnection = false;
+
 	/**
 	 * Add a simple signal to the design. The signal is the translation of
 	 * native connection. External ports and functional units are automatically
@@ -237,16 +239,18 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 		Processor target = (Processor) componentMap.get(connection.getTarget());
 
 		Memory ram;
-		Map<Component, Memory> tgtToBufferMap;
+		Map<Component, Memory> tgtToBufferMap = null;
 
-		if (bufferMap.containsKey(source)) {
-			tgtToBufferMap = bufferMap.get(source);
-		} else {
-			tgtToBufferMap = new HashMap<Component, Memory>();
-			bufferMap.put(source, tgtToBufferMap);
+		if (limitConnection) {
+			if (bufferMap.containsKey(source)) {
+				tgtToBufferMap = bufferMap.get(source);
+			} else {
+				tgtToBufferMap = new HashMap<Component, Memory>();
+				bufferMap.put(source, tgtToBufferMap);
+			}
 		}
 
-		if (tgtToBufferMap.containsKey(target)) {
+		if (limitConnection && tgtToBufferMap.containsKey(target)) {
 			ram = tgtToBufferMap.get(target);
 		} else {
 			if (source == target) {
@@ -270,7 +274,10 @@ public class ArchitectureBuilder extends DfSwitch<Design> {
 				design.add(ram);
 			}
 			ram.setAttribute("id", bufferId++);
-			tgtToBufferMap.put(target, ram);
+
+			if (limitConnection) {
+				tgtToBufferMap.put(target, ram);
+			}
 		}
 
 		ram.getMappedConnections().add(connection);
