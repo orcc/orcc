@@ -30,6 +30,7 @@ package net.sf.orcc.backends.llvm.tta.architecture.util;
 
 import net.sf.orcc.backends.llvm.tta.architecture.Memory;
 import net.sf.orcc.backends.llvm.tta.architecture.Processor;
+import net.sf.orcc.backends.util.BackendUtil;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Broadcast;
@@ -50,6 +51,8 @@ import net.sf.orcc.ir.util.AbstractIrVisitor;
  * @author Herve Yviquel
  */
 public class ArchitectureMemoryEstimator extends ArchitectureVisitor<Void> {
+
+	final double ERROR_MARGIN = 0.3;
 
 	/**
 	 * The class defines a Network visitor used to evaluate the memory needs of
@@ -80,7 +83,9 @@ public class ArchitectureMemoryEstimator extends ArchitectureVisitor<Void> {
 
 		@Override
 		public Integer caseAction(Action action) {
-			return doSwitch(action.getBody()) + doSwitch(action.getBody());
+			int bits = doSwitch(action.getScheduler())
+					+ doSwitch(action.getBody());
+			return (int) Math.ceil(bits + bits * ERROR_MARGIN);
 		}
 
 		@Override
@@ -104,8 +109,9 @@ public class ArchitectureMemoryEstimator extends ArchitectureVisitor<Void> {
 
 		@Override
 		public Integer caseConnection(Connection connection) {
-			return connection.getSize()
+			int bits = connection.getSize()
 					* getSize(connection.getSourcePort().getType()) + 2 * 32;
+			return (int) Math.ceil(bits + bits * ERROR_MARGIN);
 		}
 
 		@Override
@@ -126,7 +132,7 @@ public class ArchitectureMemoryEstimator extends ArchitectureVisitor<Void> {
 		for (Connection connection : buffer.getMappedConnections()) {
 			bits += dfVisitor.doSwitch(connection);
 		}
-		buffer.setDepth(bits / 8 + 64);
+		buffer.setDepth(BackendUtil.quantizeUp(bits / 8 + 64));
 		buffer.setWordWidth(8);
 		buffer.setMinAddress(0);
 		return null;
@@ -151,7 +157,7 @@ public class ArchitectureMemoryEstimator extends ArchitectureVisitor<Void> {
 			bits += dfVisitor.doSwitch(entity);
 		}
 		Memory ram = processor.getLocalRAMs().get(0);
-		ram.setDepth(ram.getDepth() + bits / 8);
+		ram.setDepth(BackendUtil.quantizeUp(ram.getDepth() + bits / 8));
 		ram.setWordWidth(8);
 		ram.setMinAddress(0);
 		return null;
