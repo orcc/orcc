@@ -28,11 +28,29 @@
  */
 package net.sf.orcc.tools.normalizer;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Pattern;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.InstReturn;
+import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.OpBinary;
+import net.sf.orcc.ir.OpUnary;
+import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.MoC;
+import net.sf.orcc.moc.QSDFMoC;
+import net.sf.orcc.tools.classifier.GuardSatChecker;
 
 /**
  * This class defines an actor transformation that normalizes actors so they can
@@ -45,24 +63,135 @@ import net.sf.orcc.moc.MoC;
  */
 public class ActorNormalizer extends DfSwitch<Void> {
 
+	private static IrFactory factory = IrFactory.eINSTANCE;
+
 	@Override
 	public Void caseActor(Actor actor) {
 		MoC clasz = actor.getMoC();
-		if (clasz.isCSDF() && actor.getActions().size() > 1) {
+		if (clasz.isSDF()) {
+			// Do nothing
+			return null;
+		} else if (clasz.isCSDF()) {
 			Action action = new StaticNormalizer().normalize("xxx",
 					(CSDFMoC) clasz);
 
-			// Removes FSM
-			actor.setFsm(null);
-			// Removes all actions from action scheduler
-			actor.getActionsOutsideFsm().clear();
-			actor.getActions().clear();
+			clean(actor);
+
 			// Add the static action
 			actor.getActions().add(action);
 			actor.getActionsOutsideFsm().add(action);
+		} else if (clasz.isQuasiStatic()) {
+			QSDFMoC qsdfmoc = (QSDFMoC) clasz;
+
+			clean(actor);
+
+			GuardSatChecker checker = new GuardSatChecker(actor);
+			List<Action> previousActions = new ArrayList<Action>();
+
+			for (Action action : qsdfmoc.getActions()) {
+				MoC moc = qsdfmoc.getMoC(action);
+
+				Action currCopy = IrUtil.copy(action);
+
+				for (Action previous : previousActions) {
+					boolean checkCompatibility = false;
+					Pattern prevPattern = previous.getInputPattern();
+					Pattern currPattern = action.getInputPattern();
+
+					for (Port port : qsdfmoc.getConfigurationPorts()) {
+						if (prevPattern.getNumTokens(port) == currPattern
+								.getNumTokens(port)) {
+							checkCompatibility = true;
+						}
+					}
+					if (checkCompatibility
+							&& checker.checkSat(action, previous)) {
+						Action prevCopy = IrUtil.copy(previous);
+						removeCompatibility(currCopy, prevCopy);
+					}
+				}
+
+				if (moc.isSDF()) {
+					actor.getActions().add(currCopy);
+					actor.getActionsOutsideFsm().add(currCopy);
+				} else if (moc.isCSDF()) {
+					CSDFMoC csdfMoc = (CSDFMoC) moc;
+
+					Action newAction = new StaticNormalizer().normalize(
+							action.getName(), csdfMoc);
+					newAction.setPeekPattern(currCopy.getPeekPattern());
+					newAction.setScheduler(currCopy.getScheduler());
+
+					actor.getActions().add(newAction);
+					actor.getActionsOutsideFsm().add(newAction);
+				} else {
+					throw new OrccRuntimeException("Uncompatible MoC");
+				}
+				previousActions.add(action);
+			}
 		}
 
 		return null;
+	}
+
+	private void removeCompatibility(Action initial, Action previous) {
+		Procedure initSched = initial.getScheduler();
+		Procedure prevSched = previous.getScheduler();
+
+		// Update the guard to remove the compatibility between both actions
+		// New guard = guard(init) and not(guard(previous))
+		List<Instruction> initInstrs = IrUtil.getLast(initSched.getBlocks())
+				.getInstructions();
+		List<Instruction> prevInstrs = IrUtil.getLast(prevSched.getBlocks())
+				.getInstructions();
+		InstReturn initRet = (InstReturn) initInstrs.get(initInstrs.size() - 1);
+		InstReturn prevRet = (InstReturn) prevInstrs
+				.remove(prevInstrs.size() - 1);
+		Expression notPrev = factory.createExprUnary(OpUnary.LOGIC_NOT,
+				prevRet.getValue(), factory.createTypeBool());
+		initRet.setValue(factory.createExprBinary(initRet.getValue(),
+				OpBinary.LOGIC_AND, notPrev, factory.createTypeBool()));
+
+		// Rename variables
+		for (Var var : prevSched.getLocals()) {
+			String varName = var.getName();
+			Var existingVar = initSched.getLocal(varName);
+			for (int i = 0; existingVar != null; i++) {
+				varName = var.getName() + i;
+				existingVar = initSched.getLocal(varName);
+			}
+			var.setName(varName);
+		}
+
+		// Merge both schedulers
+		initSched.getLocals().addAll(prevSched.getLocals());
+		initInstrs.addAll(0, prevInstrs);
+
+		// Update pattern
+		Pattern initPeeked = initial.getPeekPattern();
+		Pattern prevPeeked = previous.getPeekPattern();
+		for (Port port : prevPeeked.getPorts()) {
+			if (initPeeked.contains(port)) {
+				// Update uses
+				for (Use prevUse : new ArrayList<Use>(prevPeeked.getVariable(
+						port).getUses())) {
+					prevUse.setVariable(initPeeked.getVariable(port));
+				}
+			} else {
+				// Add port and variable
+				initPeeked.setVariable(port, prevPeeked.getVariable(port));
+				initPeeked.setNumTokens(port, prevPeeked.getNumTokens(port));
+			}
+		}
+
+	}
+
+	private void clean(Actor actor) {
+		// Remove FSM
+		actor.setFsm(null);
+		// Remove all actions from action scheduler
+		actor.getActionsOutsideFsm().clear();
+		actor.getActions().clear();
 	}
 
 }
