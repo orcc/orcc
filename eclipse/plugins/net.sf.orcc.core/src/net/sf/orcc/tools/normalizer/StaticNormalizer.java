@@ -199,9 +199,8 @@ public class StaticNormalizer {
 			Var var = use.getVariable();
 			if (var.eContainer() instanceof Pattern) {
 				Pattern oldPattern = (Pattern) var.eContainer();
-				Pattern newPattern = clasz.getInputPattern();
 				Port port = oldPattern.getPort(var);
-				use.setVariable(newPattern.getVariable(port));
+				use.setVariable(inputPattern.getVariable(port));
 				updateIndex(portToVarCountMap.get(port), load.getIndexes());
 			}
 			return null;
@@ -213,9 +212,8 @@ public class StaticNormalizer {
 			Var var = def.getVariable();
 			if (var.eContainer() instanceof Pattern) {
 				Pattern oldPattern = (Pattern) var.eContainer();
-				Pattern newPattern = clasz.getOutputPattern();
 				Port port = oldPattern.getPort(var);
-				def.setVariable(newPattern.getVariable(port));
+				def.setVariable(outputPattern.getVariable(port));
 				updateIndex(portToVarCountMap.get(port), store.getIndexes());
 			}
 			return null;
@@ -233,6 +231,8 @@ public class StaticNormalizer {
 	private final IrFactory irFactory = IrFactory.eINSTANCE;
 
 	private CSDFMoC clasz;
+	private Pattern inputPattern;
+	private Pattern outputPattern;
 	private String name;
 	private Map<Port, Var> portToVarCountMap;
 
@@ -246,8 +246,8 @@ public class StaticNormalizer {
 				irFactory.createTypeVoid());
 
 		// Initialize input and output port variables and their counters
-		initializePorts(procedure, clasz.getInputPattern());
-		initializePorts(procedure, clasz.getOutputPattern());
+		initializePorts(procedure, inputPattern);
+		initializePorts(procedure, outputPattern);
 
 		// Finds a pattern in the actions
 		LoopPatternRecognizer r = new LoopPatternRecognizer();
@@ -314,15 +314,15 @@ public class StaticNormalizer {
 	public Action normalize(String name, CSDFMoC moc) {
 		this.clasz = moc;
 		this.name = name;
+		this.inputPattern = IrUtil.copy(clasz.getInputPattern());
+		this.outputPattern = IrUtil.copy(clasz.getOutputPattern());
 		this.portToVarCountMap = new HashMap<Port, Var>();
 
 		Procedure scheduler = createScheduler();
 		Procedure body = createBody();
-		Pattern input = clasz.getInputPattern();
-		Pattern output = clasz.getOutputPattern();
 		Pattern peeked = dfFactory.createPattern();
 
-		return dfFactory.createAction(name, input, output, peeked, scheduler,
-				body);
+		return dfFactory.createAction(name, inputPattern, outputPattern,
+				peeked, scheduler, body);
 	}
 }
