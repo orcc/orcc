@@ -72,7 +72,7 @@ import org.eclipse.emf.common.util.EList;
  * @author Herve Yviquel
  * 
  */
-public class CSDFActionMerger {
+public class ActionMergerCSDF {
 
 	/**
 	 * This class contains code to transform a pattern to IR code.
@@ -157,14 +157,14 @@ public class CSDFActionMerger {
 		}
 
 		@Override
-		public void visit(SequentialPattern pattern) {
-			for (ExecutionPattern subPattern : pattern) {
+		public void visit(PatternSequential pattern) {
+			for (PatternExecution subPattern : pattern) {
 				subPattern.accept(this);
 			}
 		}
 
 		@Override
-		public void visit(SimplePattern pattern) {
+		public void visit(PatternSimple pattern) {
 			// Copy the body of the action
 			Action action = pattern.getAction();
 			Procedure bodyCopy = IrUtil.copy(action.getBody());
@@ -253,7 +253,7 @@ public class CSDFActionMerger {
 
 		// Finds a pattern in the actions
 		LoopPatternRecognizer r = new LoopPatternRecognizer();
-		ExecutionPattern pattern = r.getPattern(clasz.getInvocations());
+		PatternExecution pattern = r.getPattern(clasz.getInvocations());
 		System.out.println(pattern);
 
 		// Build the new body
@@ -316,7 +316,7 @@ public class CSDFActionMerger {
 	public void merge(Actor actor) {
 		MoC clasz = actor.getMoC();
 		if (clasz.isCSDF()) {
-			Action action = new CSDFActionMerger()
+			Action action = new ActionMergerCSDF()
 					.merge("xxx", (CSDFMoC) clasz);
 
 			// Remove FSM

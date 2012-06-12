@@ -28,55 +28,63 @@
  */
 package net.sf.orcc.tools.merger.action;
 
+import net.sf.orcc.df.Action;
+
 /**
- * This class defines a pattern. A pattern is the invocation of one or more
- * patterns. A pattern can invoke one action (simple pattern), a series of other
- * patterns (sequential pattern), or a loop of one pattern (loop pattern).
+ * This class defines a simple pattern. A simple pattern is the invocation of
+ * one action.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public abstract class ExecutionPattern {
+public class PatternSimple extends PatternExecution {
 
-	public ExecutionPattern() {
+	private Action action;
+
+	public PatternSimple(Action action) {
+		this.action = action;
 	}
 
-	/**
-	 * Accepts a visitor.
-	 * 
-	 * @param visitor
-	 *            a visitor
-	 */
-	public abstract void accept(PatternVisitor visitor);
+	@Override
+	public void accept(PatternVisitor visitor) {
+		visitor.visit(this);
+	}
 
-	/**
-	 * Returns the cost of this pattern. The cost is determined from the number
-	 * of sequential patterns, for instance [a, b, a, b] is more expensive than
-	 * [2 x [a, b]].
-	 * 
-	 * @return the cost of this pattern
-	 */
-	public abstract int cost();
+	@Override
+	public int cost() {
+		return 1;
+	}
 
-	/**
-	 * Returns <code>true</code> if this pattern is a loop pattern.
-	 * 
-	 * @return <code>true</code> if this pattern is a loop pattern
-	 */
-	public abstract boolean isLoop();
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof PatternSimple) {
+			return action.equals(((PatternSimple) obj).action);
+		}
+		return false;
+	}
 
-	/**
-	 * Returns <code>true</code> if this pattern is a sequential pattern.
-	 * 
-	 * @return <code>true</code> if this pattern is a sequential pattern
-	 */
-	public abstract boolean isSequential();
+	public Action getAction() {
+		return action;
+	}
 
-	/**
-	 * Returns <code>true</code> if this pattern is a simple pattern.
-	 * 
-	 * @return <code>true</code> if this pattern is a simple pattern
-	 */
-	public abstract boolean isSimple();
+	@Override
+	public boolean isLoop() {
+		return false;
+	}
+
+	@Override
+	public boolean isSequential() {
+		return false;
+	}
+
+	@Override
+	public boolean isSimple() {
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return action.toString();
+	}
 
 }

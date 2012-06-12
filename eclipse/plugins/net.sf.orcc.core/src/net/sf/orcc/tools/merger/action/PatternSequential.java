@@ -43,13 +43,13 @@ import java.util.List;
  * @author Matthieu Wipliez
  * 
  */
-public class SequentialPattern extends ExecutionPattern implements
-		Iterable<ExecutionPattern> {
+public class PatternSequential extends PatternExecution implements
+		Iterable<PatternExecution> {
 
-	private List<ExecutionPattern> patterns;
+	private List<PatternExecution> patterns;
 
-	public SequentialPattern() {
-		patterns = new ArrayList<ExecutionPattern>();
+	public PatternSequential() {
+		patterns = new ArrayList<PatternExecution>();
 	}
 
 	@Override
@@ -57,14 +57,14 @@ public class SequentialPattern extends ExecutionPattern implements
 		visitor.visit(this);
 	}
 
-	public void add(ExecutionPattern pattern) {
+	public void add(PatternExecution pattern) {
 		patterns.add(pattern);
 	}
 
 	@Override
 	public int cost() {
 		int cost = 0;
-		for (ExecutionPattern pattern : patterns) {
+		for (PatternExecution pattern : patterns) {
 			cost += pattern.cost();
 		}
 		return cost;
@@ -72,19 +72,19 @@ public class SequentialPattern extends ExecutionPattern implements
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof SequentialPattern) {
-			SequentialPattern other = (SequentialPattern) obj;
+		if (obj instanceof PatternSequential) {
+			PatternSequential other = (PatternSequential) obj;
 			return patterns.equals(other.patterns);
 		}
 		return false;
 	}
 
-	public ExecutionPattern get(int index) {
+	public PatternExecution get(int index) {
 		return patterns.get(index);
 	}
 
-	public SequentialPattern getSubPattern(int beginIndex, int length) {
-		SequentialPattern pattern = new SequentialPattern();
+	public PatternSequential getSubPattern(int beginIndex, int length) {
+		PatternSequential pattern = new PatternSequential();
 		for (int i = beginIndex; i < beginIndex + length; i++) {
 			pattern.add(patterns.get(i));
 		}
@@ -108,7 +108,7 @@ public class SequentialPattern extends ExecutionPattern implements
 	}
 
 	@Override
-	public Iterator<ExecutionPattern> iterator() {
+	public Iterator<PatternExecution> iterator() {
 		return patterns.iterator();
 	}
 

@@ -58,7 +58,7 @@ import net.sf.orcc.tools.classifier.GuardSatChecker;
  * @author Herve Yviquel
  * 
  */
-public class QSDFActionMerger {
+public class ActionMergerQSDF {
 
 	private static IrFactory factory = IrFactory.eINSTANCE;
 
@@ -105,7 +105,7 @@ public class QSDFActionMerger {
 				} else if (moc.isCSDF()) {
 					CSDFMoC csdfMoc = (CSDFMoC) moc;
 
-					Action newAction = new CSDFActionMerger().merge(
+					Action newAction = new ActionMergerCSDF().merge(
 							action.getName(), csdfMoc);
 					newAction.setPeekPattern(currCopy.getPeekPattern());
 					newAction.setScheduler(currCopy.getScheduler());

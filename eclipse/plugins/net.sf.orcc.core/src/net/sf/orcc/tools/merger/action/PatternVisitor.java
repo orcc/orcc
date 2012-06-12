@@ -50,7 +50,7 @@ public interface PatternVisitor {
 	 * @param pattern
 	 *            a sequential pattern
 	 */
-	public void visit(SequentialPattern pattern);
+	public void visit(PatternSequential pattern);
 
 	/**
 	 * Visits the given simple pattern.
@@ -58,6 +58,6 @@ public interface PatternVisitor {
 	 * @param pattern
 	 *            a simple pattern
 	 */
-	public void visit(SimplePattern pattern);
+	public void visit(PatternSimple pattern);
 
 }

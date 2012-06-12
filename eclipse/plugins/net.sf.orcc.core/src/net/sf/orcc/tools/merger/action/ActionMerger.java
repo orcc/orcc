@@ -49,9 +49,9 @@ public class ActionMerger extends DfSwitch<Void> {
 		if (clasz.isSDF()) {
 			// Do nothing
 		} else if (clasz.isCSDF()) {
-			new CSDFActionMerger().merge(actor);
+			new ActionMergerCSDF().merge(actor);
 		} else if (clasz.isQuasiStatic()) {
-			new QSDFActionMerger().merge(actor);
+			new ActionMergerQSDF().merge(actor);
 		}
 
 		return null;

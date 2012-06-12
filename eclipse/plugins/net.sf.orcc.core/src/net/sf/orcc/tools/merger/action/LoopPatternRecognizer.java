@@ -59,8 +59,8 @@ public class LoopPatternRecognizer {
 	 * @param pattern
 	 *            a pattern
 	 */
-	private void addPattern(SequentialPattern seq, int iterations,
-			ExecutionPattern pattern) {
+	private void addPattern(PatternSequential seq, int iterations,
+			PatternExecution pattern) {
 		if (iterations > 1) {
 			seq.add(new LoopPattern(iterations, pattern));
 		} else {
@@ -68,11 +68,11 @@ public class LoopPatternRecognizer {
 		}
 	}
 
-	private SequentialPattern createSequential(List<Invocation> invocations) {
-		SequentialPattern pattern = new SequentialPattern();
+	private PatternSequential createSequential(List<Invocation> invocations) {
+		PatternSequential pattern = new PatternSequential();
 		for (Invocation invocation : invocations) {
 			Action action = invocation.getAction();
-			SimplePattern simple = new SimplePattern(action);
+			PatternSimple simple = new PatternSimple(action);
 			pattern.add(simple);
 		}
 
@@ -86,10 +86,10 @@ public class LoopPatternRecognizer {
 	 *            a sequential pattern
 	 * @return a sequential pattern (possibly the same)
 	 */
-	private SequentialPattern findHigherOrderLoopPattern(
-			SequentialPattern pattern, int length, SequentialPattern look) {
-		SequentialPattern newPattern = new SequentialPattern();
-		SequentialPattern sub = null;
+	private PatternSequential findHigherOrderLoopPattern(
+			PatternSequential pattern, int length, PatternSequential look) {
+		PatternSequential newPattern = new PatternSequential();
+		PatternSequential sub = null;
 
 		int iterations = 0;
 		int maxIndex = pattern.size() - length - 1;
@@ -133,11 +133,11 @@ public class LoopPatternRecognizer {
 	 *            a sequential pattern
 	 * @return a sequential pattern (possibly the same)
 	 */
-	private SequentialPattern findHigherOrderPattern(SequentialPattern pattern) {
-		SequentialPattern best = pattern;
+	private PatternSequential findHigherOrderPattern(PatternSequential pattern) {
+		PatternSequential best = pattern;
 		int maxPatternSize = pattern.size() / 2;
 		for (int i = 2; i < maxPatternSize; i++) {
-			SequentialPattern newPattern = findHigherOrderPattern(pattern, i);
+			PatternSequential newPattern = findHigherOrderPattern(pattern, i);
 			if (newPattern.cost() < best.cost()) {
 				best = newPattern;
 			}
@@ -154,13 +154,13 @@ public class LoopPatternRecognizer {
 	 *            a sequential pattern
 	 * @return a sequential pattern (possibly the same)
 	 */
-	private SequentialPattern findHigherOrderPattern(SequentialPattern pattern,
+	private PatternSequential findHigherOrderPattern(PatternSequential pattern,
 			int length) {
-		SequentialPattern best = pattern;
+		PatternSequential best = pattern;
 		int maxIndex = pattern.size() - length - 1;
 		for (int i = 0; i < maxIndex; i++) {
-			SequentialPattern look = pattern.getSubPattern(i, length);
-			SequentialPattern newPattern = findHigherOrderLoopPattern(pattern,
+			PatternSequential look = pattern.getSubPattern(i, length);
+			PatternSequential newPattern = findHigherOrderLoopPattern(pattern,
 					length, look);
 			if (newPattern.cost() < best.cost()) {
 				best = newPattern;
@@ -177,15 +177,15 @@ public class LoopPatternRecognizer {
 	 *            a sequential pattern
 	 * @return a sequential pattern (possibly the same)
 	 */
-	private SequentialPattern findLoopPattern(SequentialPattern oldPattern) {
-		Iterator<ExecutionPattern> it = oldPattern.iterator();
+	private PatternSequential findLoopPattern(PatternSequential oldPattern) {
+		Iterator<PatternExecution> it = oldPattern.iterator();
 		if (it.hasNext()) {
-			SequentialPattern newPattern = new SequentialPattern();
-			ExecutionPattern previous = it.next();
+			PatternSequential newPattern = new PatternSequential();
+			PatternExecution previous = it.next();
 			int iterations = 1;
 
 			while (it.hasNext()) {
-				ExecutionPattern next = it.next();
+				PatternExecution next = it.next();
 				if (previous.equals(next)) {
 					iterations++;
 				} else {
@@ -212,8 +212,8 @@ public class LoopPatternRecognizer {
 	 *            a sequential pattern
 	 * @return a sequential pattern (possibly the same)
 	 */
-	private SequentialPattern findPattern(SequentialPattern pattern) {
-		SequentialPattern oldPattern;
+	private PatternSequential findPattern(PatternSequential pattern) {
+		PatternSequential oldPattern;
 		do {
 			oldPattern = pattern;
 			pattern = findLoopPattern(oldPattern);
@@ -234,9 +234,9 @@ public class LoopPatternRecognizer {
 	 *            a list of actions
 	 * @return an execution pattern that matches the given list of actions
 	 */
-	public ExecutionPattern getPattern(List<Invocation> invocations) {
-		SequentialPattern oldPattern;
-		SequentialPattern newPattern = createSequential(invocations);
+	public PatternExecution getPattern(List<Invocation> invocations) {
+		PatternSequential oldPattern;
+		PatternSequential newPattern = createSequential(invocations);
 		do {
 			oldPattern = newPattern;
 			newPattern = findPattern(oldPattern);

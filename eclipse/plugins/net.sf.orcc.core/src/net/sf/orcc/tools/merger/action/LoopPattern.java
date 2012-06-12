@@ -39,13 +39,13 @@ package net.sf.orcc.tools.merger.action;
  * @author Matthieu Wipliez
  * 
  */
-public class LoopPattern extends ExecutionPattern {
+public class LoopPattern extends PatternExecution {
 
 	private int numIterations;
 
-	private ExecutionPattern pattern;
+	private PatternExecution pattern;
 
-	public LoopPattern(int iterations, ExecutionPattern pattern) {
+	public LoopPattern(int iterations, PatternExecution pattern) {
 		this.numIterations = iterations;
 		this.pattern = pattern;
 	}
@@ -74,7 +74,7 @@ public class LoopPattern extends ExecutionPattern {
 		return numIterations;
 	}
 
-	public ExecutionPattern getPattern() {
+	public PatternExecution getPattern() {
 		return pattern;
 	}
 

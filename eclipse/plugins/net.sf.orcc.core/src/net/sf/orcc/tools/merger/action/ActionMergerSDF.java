@@ -66,7 +66,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Matthieu Wipliez
  * 
  */
-public class SDFActionMerger extends DfVisitor<Object> {
+public class ActionMergerSDF extends DfVisitor<Object> {
 
 	private Actor actor;
 
@@ -75,7 +75,7 @@ public class SDFActionMerger extends DfVisitor<Object> {
 	/**
 	 * Creates a new classifier
 	 */
-	public SDFActionMerger() {
+	public ActionMergerSDF() {
 	}
 
 	@Override
