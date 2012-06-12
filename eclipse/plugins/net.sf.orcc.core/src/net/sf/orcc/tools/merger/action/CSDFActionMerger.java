@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.df.Action;
+import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.DfFactory;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
@@ -57,20 +58,21 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractIrVisitor;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.moc.CSDFMoC;
+import net.sf.orcc.moc.MoC;
 
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 
 /**
- * This class defines a normalizer for static actors. In other words, a new
- * action is created from the detected patter of a CSDF model of computation.
+ * This class defines a merger for CSDF actors. In other words, a new action is
+ * created from the detected pattern of a CSDF model of computation.
  * 
  * @author Matthieu Wipliez
  * @author Jerome Gorin
  * @author Herve Yviquel
  * 
  */
-public class StaticActionMerger {
+public class CSDFActionMerger {
 
 	/**
 	 * This class contains code to transform a pattern to IR code.
@@ -311,7 +313,25 @@ public class StaticActionMerger {
 		}
 	}
 
-	public Action normalize(String name, CSDFMoC moc) {
+	public void merge(Actor actor) {
+		MoC clasz = actor.getMoC();
+		if (clasz.isCSDF()) {
+			Action action = new CSDFActionMerger()
+					.merge("xxx", (CSDFMoC) clasz);
+
+			// Remove FSM
+			actor.setFsm(null);
+			// Remove all actions from action scheduler
+			actor.getActionsOutsideFsm().clear();
+			actor.getActions().clear();
+
+			// Add the static action
+			actor.getActions().add(action);
+			actor.getActionsOutsideFsm().add(action);
+		}
+	}
+
+	public Action merge(String name, CSDFMoC moc) {
 		this.clasz = moc;
 		this.name = name;
 		this.inputPattern = IrUtil.copy(clasz.getInputPattern());
