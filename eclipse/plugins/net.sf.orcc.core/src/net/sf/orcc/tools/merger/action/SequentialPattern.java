@@ -26,11 +26,15 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.tools.normalizer;
+package net.sf.orcc.tools.merger.action;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * This class defines a loop pattern. A loop pattern is the invocation of one or
- * more patterns within a loop. It has the form:
+ * more actions within a loop. It has the form:
  * 
  * <pre>
  * P = (n0 * p0, n1 * p1, ... nn * pn)
@@ -39,15 +43,13 @@ package net.sf.orcc.tools.normalizer;
  * @author Matthieu Wipliez
  * 
  */
-public class LoopPattern extends ExecutionPattern {
+public class SequentialPattern extends ExecutionPattern implements
+		Iterable<ExecutionPattern> {
 
-	private int numIterations;
+	private List<ExecutionPattern> patterns;
 
-	private ExecutionPattern pattern;
-
-	public LoopPattern(int iterations, ExecutionPattern pattern) {
-		this.numIterations = iterations;
-		this.pattern = pattern;
+	public SequentialPattern() {
+		patterns = new ArrayList<ExecutionPattern>();
 	}
 
 	@Override
@@ -55,37 +57,49 @@ public class LoopPattern extends ExecutionPattern {
 		visitor.visit(this);
 	}
 
+	public void add(ExecutionPattern pattern) {
+		patterns.add(pattern);
+	}
+
 	@Override
 	public int cost() {
-		return pattern.cost();
+		int cost = 0;
+		for (ExecutionPattern pattern : patterns) {
+			cost += pattern.cost();
+		}
+		return cost;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof LoopPattern) {
-			LoopPattern other = (LoopPattern) obj;
-			return numIterations == other.numIterations
-					&& pattern.equals(other.pattern);
+		if (obj instanceof SequentialPattern) {
+			SequentialPattern other = (SequentialPattern) obj;
+			return patterns.equals(other.patterns);
 		}
 		return false;
 	}
 
-	public int getNumIterations() {
-		return numIterations;
+	public ExecutionPattern get(int index) {
+		return patterns.get(index);
 	}
 
-	public ExecutionPattern getPattern() {
+	public SequentialPattern getSubPattern(int beginIndex, int length) {
+		SequentialPattern pattern = new SequentialPattern();
+		for (int i = beginIndex; i < beginIndex + length; i++) {
+			pattern.add(patterns.get(i));
+		}
+
 		return pattern;
 	}
 
 	@Override
 	public boolean isLoop() {
-		return true;
+		return false;
 	}
 
 	@Override
 	public boolean isSequential() {
-		return false;
+		return true;
 	}
 
 	@Override
@@ -94,8 +108,22 @@ public class LoopPattern extends ExecutionPattern {
 	}
 
 	@Override
+	public Iterator<ExecutionPattern> iterator() {
+		return patterns.iterator();
+	}
+
+	/**
+	 * Returns the size of this pattern.
+	 * 
+	 * @return the size of this pattern
+	 */
+	public int size() {
+		return patterns.size();
+	}
+
+	@Override
 	public String toString() {
-		return numIterations + " x " + pattern;
+		return patterns.toString();
 	}
 
 }

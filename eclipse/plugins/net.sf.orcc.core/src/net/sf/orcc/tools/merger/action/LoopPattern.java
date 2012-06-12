@@ -26,57 +26,76 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.tools.normalizer;
+package net.sf.orcc.tools.merger.action;
 
 /**
- * This class defines a pattern. A pattern is the invocation of one or more
- * patterns. A pattern can invoke one action (simple pattern), a series of other
- * patterns (sequential pattern), or a loop of one pattern (loop pattern).
+ * This class defines a loop pattern. A loop pattern is the invocation of one or
+ * more patterns within a loop. It has the form:
+ * 
+ * <pre>
+ * P = (n0 * p0, n1 * p1, ... nn * pn)
+ * </pre>
  * 
  * @author Matthieu Wipliez
  * 
  */
-public abstract class ExecutionPattern {
+public class LoopPattern extends ExecutionPattern {
 
-	public ExecutionPattern() {
+	private int numIterations;
+
+	private ExecutionPattern pattern;
+
+	public LoopPattern(int iterations, ExecutionPattern pattern) {
+		this.numIterations = iterations;
+		this.pattern = pattern;
 	}
 
-	/**
-	 * Accepts a visitor.
-	 * 
-	 * @param visitor
-	 *            a visitor
-	 */
-	public abstract void accept(PatternVisitor visitor);
+	@Override
+	public void accept(PatternVisitor visitor) {
+		visitor.visit(this);
+	}
 
-	/**
-	 * Returns the cost of this pattern. The cost is determined from the number
-	 * of sequential patterns, for instance [a, b, a, b] is more expensive than
-	 * [2 x [a, b]].
-	 * 
-	 * @return the cost of this pattern
-	 */
-	public abstract int cost();
+	@Override
+	public int cost() {
+		return pattern.cost();
+	}
 
-	/**
-	 * Returns <code>true</code> if this pattern is a loop pattern.
-	 * 
-	 * @return <code>true</code> if this pattern is a loop pattern
-	 */
-	public abstract boolean isLoop();
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof LoopPattern) {
+			LoopPattern other = (LoopPattern) obj;
+			return numIterations == other.numIterations
+					&& pattern.equals(other.pattern);
+		}
+		return false;
+	}
 
-	/**
-	 * Returns <code>true</code> if this pattern is a sequential pattern.
-	 * 
-	 * @return <code>true</code> if this pattern is a sequential pattern
-	 */
-	public abstract boolean isSequential();
+	public int getNumIterations() {
+		return numIterations;
+	}
 
-	/**
-	 * Returns <code>true</code> if this pattern is a simple pattern.
-	 * 
-	 * @return <code>true</code> if this pattern is a simple pattern
-	 */
-	public abstract boolean isSimple();
+	public ExecutionPattern getPattern() {
+		return pattern;
+	}
+
+	@Override
+	public boolean isLoop() {
+		return true;
+	}
+
+	@Override
+	public boolean isSequential() {
+		return false;
+	}
+
+	@Override
+	public boolean isSimple() {
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return numIterations + " x " + pattern;
+	}
 
 }

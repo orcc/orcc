@@ -29,7 +29,7 @@ Export-Package: net.sf.orcc,
  net.sf.orcc.plugins,
  net.sf.orcc.preferences,
  net.sf.orcc.tools.classifier,
+ net.sf.orcc.tools.merger.action,
  net.sf.orcc.tools.merger.actor,
- net.sf.orcc.tools.normalizer,
  net.sf.orcc.tools.statistics,
  net.sf.orcc.util

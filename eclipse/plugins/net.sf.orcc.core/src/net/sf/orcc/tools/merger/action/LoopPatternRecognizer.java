@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.tools.normalizer;
+package net.sf.orcc.tools.merger.action;
 
 import java.util.Iterator;
 import java.util.List;

@@ -26,38 +26,65 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.tools.normalizer;
+package net.sf.orcc.tools.merger.action;
+
+import net.sf.orcc.df.Action;
 
 /**
- * This class defines a pattern visitor.
+ * This class defines a simple pattern. A simple pattern is the invocation of
+ * one action.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public interface PatternVisitor {
+public class SimplePattern extends ExecutionPattern {
 
-	/**
-	 * Visits the given loop pattern.
-	 * 
-	 * @param pattern
-	 *            a loop pattern
-	 */
-	public void visit(LoopPattern pattern);
+	private Action action;
 
-	/**
-	 * Visits the given sequential pattern.
-	 * 
-	 * @param pattern
-	 *            a sequential pattern
-	 */
-	public void visit(SequentialPattern pattern);
+	public SimplePattern(Action action) {
+		this.action = action;
+	}
 
-	/**
-	 * Visits the given simple pattern.
-	 * 
-	 * @param pattern
-	 *            a simple pattern
-	 */
-	public void visit(SimplePattern pattern);
+	@Override
+	public void accept(PatternVisitor visitor) {
+		visitor.visit(this);
+	}
+
+	@Override
+	public int cost() {
+		return 1;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof SimplePattern) {
+			return action.equals(((SimplePattern) obj).action);
+		}
+		return false;
+	}
+
+	public Action getAction() {
+		return action;
+	}
+
+	@Override
+	public boolean isLoop() {
+		return false;
+	}
+
+	@Override
+	public boolean isSequential() {
+		return false;
+	}
+
+	@Override
+	public boolean isSimple() {
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return action.toString();
+	}
 
 }
