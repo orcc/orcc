@@ -26,51 +26,67 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.tools.normalizer.sequitur;
+package net.sf.orcc.tools.sequitur;
 
 /**
- * This class defines a digram.
+ * This class defines a non-terminal symbol.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class Digram {
+public class NonTerminalSymbol extends Symbol {
 
-	private Symbol s1;
+	private Rule rule;
 
-	private Symbol s2;
+	/**
+	 * Creates a new non-terminal symbol that references the given rule, and
+	 * increments the rule's reference count.
+	 * 
+	 * @param rule
+	 *            rule referenced
+	 */
+	public NonTerminalSymbol(Rule rule) {
+		this.rule = rule;
+		rule.incrementReferenceCount();
+	}
 
-	public Digram(Symbol s1, Symbol s2) {
-		this.s1 = s1;
-		this.s2 = s2;
+	@Override
+	public Symbol copy() {
+		return new NonTerminalSymbol(rule);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof Digram) {
-			Digram digram = (Digram) obj;
-			return s1.equals(digram.s1) && s2.equals(digram.s2);
+		if (obj instanceof NonTerminalSymbol) {
+			NonTerminalSymbol symbol = (NonTerminalSymbol) obj;
+			return rule.equals(symbol.rule);
 		}
 
 		return false;
 	}
 
-	public Symbol getS1() {
-		return s1;
-	}
-
-	public Symbol getS2() {
-		return s2;
+	/**
+	 * Returns the rule referenced by this non-terminal symbol.
+	 * 
+	 * @return the rule referenced by this non-terminal symbol
+	 */
+	public Rule getRule() {
+		return rule;
 	}
 
 	@Override
 	public int hashCode() {
-		return s1.hashCode() ^ s2.hashCode();
+		return rule.hashCode();
+	}
+
+	@Override
+	public boolean isNonTerminal() {
+		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "[" + s1 + ", " + s2 + "]";
+		return "{" + rule.getName() + "}";
 	}
 
 }

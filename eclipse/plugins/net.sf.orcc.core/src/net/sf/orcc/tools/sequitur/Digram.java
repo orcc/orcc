@@ -26,76 +26,51 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.tools.normalizer.sequitur;
+package net.sf.orcc.tools.sequitur;
 
 /**
- * This class defines a symbol.
+ * This class defines a digram.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public abstract class Symbol {
+public class Digram {
 
-	private Symbol next;
+	private Symbol s1;
 
-	private Symbol previous;
+	private Symbol s2;
 
-	/**
-	 * Appends the given symbol to this symbol.
-	 * 
-	 * @param symbol
-	 *            a symbol
-	 */
-	protected void append(Symbol symbol) {
-		next = symbol;
-		symbol.previous = this;
+	public Digram(Symbol s1, Symbol s2) {
+		this.s1 = s1;
+		this.s2 = s2;
 	}
 
-	/**
-	 * Returns a copy of this symbol without any links to other symbols.
-	 * 
-	 * @return a copy of this symbol without any links to other symbols
-	 */
-	public abstract Symbol copy();
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Digram) {
+			Digram digram = (Digram) obj;
+			return s1.equals(digram.s1) && s2.equals(digram.s2);
+		}
 
-	public Symbol getNext() {
-		return next;
-	}
-
-	public Symbol getPrevious() {
-		return previous;
-	}
-
-	/**
-	 * Inserts this symbol between <code>predecessor</code> and
-	 * <code>successor</code> symbols.
-	 * 
-	 * @param predecessor
-	 *            symbol that will be the predecessor of this symbol
-	 * @param successor
-	 *            symbol that will be the successor of this symbol
-	 */
-	public void insertBetween(Symbol predecessor, Symbol successor) {
-		predecessor.append(this);
-		append(successor);
-	}
-
-	/**
-	 * Returns <code>true</code> if this symbol is a guard.
-	 * 
-	 * @return <code>true</code> if this symbol is a guard
-	 */
-	public boolean isGuard() {
 		return false;
 	}
 
-	/**
-	 * Returns <code>true</code> if this symbol is non-terminal.
-	 * 
-	 * @return <code>true</code> if this symbol is non-terminal
-	 */
-	public boolean isNonTerminal() {
-		return false;
+	public Symbol getS1() {
+		return s1;
+	}
+
+	public Symbol getS2() {
+		return s2;
+	}
+
+	@Override
+	public int hashCode() {
+		return s1.hashCode() ^ s2.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return "[" + s1 + ", " + s2 + "]";
 	}
 
 }

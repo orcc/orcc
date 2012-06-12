@@ -26,49 +26,76 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.tools.normalizer.sequitur;
+package net.sf.orcc.tools.sequitur;
 
 /**
- * This class defines a terminal symbol.
+ * This class defines a symbol.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class TerminalSymbol extends Symbol {
+public abstract class Symbol {
 
-	private Object contents;
+	private Symbol next;
 
-	public TerminalSymbol(Object contents) {
-		this.contents = contents;
+	private Symbol previous;
+
+	/**
+	 * Appends the given symbol to this symbol.
+	 * 
+	 * @param symbol
+	 *            a symbol
+	 */
+	protected void append(Symbol symbol) {
+		next = symbol;
+		symbol.previous = this;
 	}
 
-	@Override
-	public Symbol copy() {
-		return new TerminalSymbol(contents);
+	/**
+	 * Returns a copy of this symbol without any links to other symbols.
+	 * 
+	 * @return a copy of this symbol without any links to other symbols
+	 */
+	public abstract Symbol copy();
+
+	public Symbol getNext() {
+		return next;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof TerminalSymbol) {
-			TerminalSymbol symbol = (TerminalSymbol) obj;
-			return contents.equals(symbol.contents);
-		}
+	public Symbol getPrevious() {
+		return previous;
+	}
 
+	/**
+	 * Inserts this symbol between <code>predecessor</code> and
+	 * <code>successor</code> symbols.
+	 * 
+	 * @param predecessor
+	 *            symbol that will be the predecessor of this symbol
+	 * @param successor
+	 *            symbol that will be the successor of this symbol
+	 */
+	public void insertBetween(Symbol predecessor, Symbol successor) {
+		predecessor.append(this);
+		append(successor);
+	}
+
+	/**
+	 * Returns <code>true</code> if this symbol is a guard.
+	 * 
+	 * @return <code>true</code> if this symbol is a guard
+	 */
+	public boolean isGuard() {
 		return false;
 	}
 
-	public Object getContents() {
-		return contents;
-	}
-
-	@Override
-	public int hashCode() {
-		return contents.hashCode();
-	}
-
-	@Override
-	public String toString() {
-		return contents.toString();
+	/**
+	 * Returns <code>true</code> if this symbol is non-terminal.
+	 * 
+	 * @return <code>true</code> if this symbol is non-terminal
+	 */
+	public boolean isNonTerminal() {
+		return false;
 	}
 
 }

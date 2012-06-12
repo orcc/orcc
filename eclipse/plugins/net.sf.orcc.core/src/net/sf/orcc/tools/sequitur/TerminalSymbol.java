@@ -26,67 +26,49 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.tools.normalizer.sequitur;
+package net.sf.orcc.tools.sequitur;
 
 /**
- * This class defines a non-terminal symbol.
+ * This class defines a terminal symbol.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class NonTerminalSymbol extends Symbol {
+public class TerminalSymbol extends Symbol {
 
-	private Rule rule;
+	private Object contents;
 
-	/**
-	 * Creates a new non-terminal symbol that references the given rule, and
-	 * increments the rule's reference count.
-	 * 
-	 * @param rule
-	 *            rule referenced
-	 */
-	public NonTerminalSymbol(Rule rule) {
-		this.rule = rule;
-		rule.incrementReferenceCount();
+	public TerminalSymbol(Object contents) {
+		this.contents = contents;
 	}
 
 	@Override
 	public Symbol copy() {
-		return new NonTerminalSymbol(rule);
+		return new TerminalSymbol(contents);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof NonTerminalSymbol) {
-			NonTerminalSymbol symbol = (NonTerminalSymbol) obj;
-			return rule.equals(symbol.rule);
+		if (obj instanceof TerminalSymbol) {
+			TerminalSymbol symbol = (TerminalSymbol) obj;
+			return contents.equals(symbol.contents);
 		}
 
 		return false;
 	}
 
-	/**
-	 * Returns the rule referenced by this non-terminal symbol.
-	 * 
-	 * @return the rule referenced by this non-terminal symbol
-	 */
-	public Rule getRule() {
-		return rule;
+	public Object getContents() {
+		return contents;
 	}
 
 	@Override
 	public int hashCode() {
-		return rule.hashCode();
-	}
-
-	@Override
-	public boolean isNonTerminal() {
-		return true;
+		return contents.hashCode();
 	}
 
 	@Override
 	public String toString() {
-		return "{" + rule.getName() + "}";
+		return contents.toString();
 	}
 
 }
