@@ -77,7 +77,6 @@ public class Classifier extends DfVisitor<Void> {
 	private WriteListener listener;
 
 	public Classifier(WriteListener listener) {
-		this.visitInstances = false;
 		this.listener = listener;
 	}
 

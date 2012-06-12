@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.df.util;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Broadcast;
@@ -57,32 +60,51 @@ public class DfVisitor<T> extends DfSwitch<T> {
 
 	protected AbstractIrVisitor<T> irVisitor;
 
-	protected boolean visitInstances;
+	protected boolean visitOnce;
 
+	private Set<Actor> visited;
+
+	/**
+	 * Creates a new visitor that visits objects from the Df model. Each actor
+	 * is visited exactly one time.
+	 */
 	public DfVisitor() {
-		visitInstances = true;
+		visitOnce = true;
 	}
 
 	/**
-	 * Creates a new abstract actor visitor that visits all nodes and
-	 * instructions of all procedures (including the ones referenced by
-	 * actions).
+	 * Creates a new visitor that visits objects from the Df model, and
+	 * delegates to the given irVisitor for objects of the Ir model. Each actor
+	 * is visited exactly one time.
+	 * 
+	 * @param irVisitor
+	 *            a concrete implementation of AbstractIrVisitor that is invoked
+	 *            when visiting the IR
 	 */
 	public DfVisitor(AbstractIrVisitor<T> irVisitor) {
 		this(irVisitor, true);
 	}
 
 	/**
-	 * Creates a new abstract actor visitor that visits all nodes and
-	 * instructions of all procedures (including the ones referenced by
-	 * actions). If visitInstances is true, visitor will look into Instances
-	 * instead of Actors of a network. When a network use the same actor for
-	 * more than one instance, or when a visitor must visit instances, this
-	 * option is important.
+	 * Creates a new visitor that visits an object from the Df model, and
+	 * delegates to the given irVisitor for objects of the Ir model. Unless
+	 * visitOnce is false, each actor is visited exactly one time. If visitOnce
+	 * is false, then this visitor visits actors each time they are referenced.
+	 * 
+	 * @param irVisitor
+	 *            a concrete implementation of AbstractIrVisitor that is invoked
+	 *            when visiting the IR
+	 * @param visitOnce
+	 *            <code>true</code> for the default behavior (visit each actor
+	 *            once), <code>false</code> for visiting actors when they are
+	 *            referenced (possibly multiple times)
 	 */
-	public DfVisitor(AbstractIrVisitor<T> irVisitor, boolean visitInstances) {
+	public DfVisitor(AbstractIrVisitor<T> irVisitor, boolean visitOnce) {
 		this.irVisitor = irVisitor;
-		this.visitInstances = visitInstances;
+		this.visitOnce = visitOnce;
+		if (visitOnce) {
+			visited = new HashSet<Actor>();
+		}
 	}
 
 	@Override
@@ -146,7 +168,20 @@ public class DfVisitor<T> extends DfSwitch<T> {
 	@Override
 	public T caseInstance(Instance instance) {
 		if (instance.isActor()) {
-			doSwitch(instance.getActor());
+			Actor actor = instance.getActor();
+			if (visitOnce) {
+				// if visitOnce is true, make sure we did not visit this actor
+				if (visited.contains(actor)) {
+					// actor already visited, return
+					return null;
+				}
+
+				// add actor to visited set
+				visited.add(actor);
+			}
+
+			// visit actor (note the fall-through if visitOnce is false)
+			doSwitch(actor);
 		} else {
 			doSwitch(instance.getEntity());
 		}
@@ -158,24 +193,23 @@ public class DfVisitor<T> extends DfSwitch<T> {
 		for (Port port : network.getInputs()) {
 			doSwitch(port);
 		}
+
 		for (Port port : network.getOutputs()) {
 			doSwitch(port);
 		}
-		if (visitInstances) {
-			for (Instance instance : network.getInstances()) {
-				doSwitch(instance);
-			}
-		} else {
-			for (Actor actor : network.getAllActors()) {
-				doSwitch(actor);
-			}
+
+		for (Instance instance : network.getInstances()) {
+			doSwitch(instance);
 		}
+
 		for (Vertex entity : network.getEntities()) {
 			doSwitch(entity);
 		}
+
 		for (Connection connection : network.getConnections()) {
 			doSwitch(connection);
 		}
+
 		return null;
 	}
 

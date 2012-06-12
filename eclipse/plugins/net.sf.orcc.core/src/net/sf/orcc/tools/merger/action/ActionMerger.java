@@ -42,10 +42,6 @@ import net.sf.orcc.moc.MoC;
  * 
  */
 public class ActionMerger extends DfVisitor<Void> {
-	
-	public ActionMerger(){
-		this.visitInstances = false;
-	}
 
 	@Override
 	public Void caseActor(Actor actor) {
