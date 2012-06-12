@@ -27,47 +27,21 @@
  * SUCH DAMAGE.
  */
 
-package net.sf.orcc.tools.merger;
-
-import net.sf.orcc.df.Instance;
-import net.sf.orcc.df.Network;
-import net.sf.orcc.graph.Vertex;
-import net.sf.orcc.graph.visit.ReversePostOrder;
+package net.sf.orcc.tools.merger.actor;
 
 /**
- * This class computes a single appearance schedule (SAS) with 1-level nested
- * loop from the given SDF graph.
+ * This interface defines a scheduler.
  * 
  * @author Ghislain Roquier
  * 
  */
-public class SASLoopScheduler extends AbstractScheduler {
+public interface IScheduler {
 
-	public SASLoopScheduler(Network network) {
-		super(network);
-	}
-
-	@Override
-	public void schedule() {
-		schedule = new Schedule();
-
-		schedule.setIterationCount(1);
-
-		for (Vertex vertex : new ReversePostOrder(network, network.getInputs())) {
-			if (vertex instanceof Instance) {
-				int rep = repetitions.get(vertex);
-				Iterand iterand = null;
-				if (rep > 1) {
-					Schedule subSched = new Schedule();
-					subSched.setIterationCount(repetitions.get(vertex));
-					subSched.add(new Iterand(vertex));
-					iterand = new Iterand(subSched);
-				} else {
-					iterand = new Iterand(vertex);
-				}
-				schedule.add(iterand);
-			}
-		}
-	}
-
+	/**
+	 * Schedules the given network in-place.
+	 * 
+	 * @param network
+	 *            a network
+	 */
+	public void schedule();
 }

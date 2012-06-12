@@ -27,64 +27,47 @@
  * SUCH DAMAGE.
  */
 
-package net.sf.orcc.tools.merger;
+package net.sf.orcc.tools.merger.actor;
 
 import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Network;
 import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.graph.visit.ReversePostOrder;
 
 /**
- * This class defines an element of the body of a schedule. An iterand can be
- * either a vertex or another schedule.
+ * This class computes a single appearance schedule (SAS) with 1-level nested
+ * loop from the given SDF graph.
  * 
  * @author Ghislain Roquier
  * 
  */
+public class SASLoopScheduler extends AbstractScheduler {
 
-public class Iterand {
-
-	private enum Type {
-		SCHEDULE, VERTEX
-	}
-
-	private Object contents;
-
-	private Type type;
-
-	public Iterand(Schedule schedule) {
-		contents = schedule;
-		type = Type.SCHEDULE;
-	}
-
-	public Iterand(Vertex vertex) {
-		contents = vertex;
-		type = Type.VERTEX;
-	}
-
-	public Schedule getSchedule() {
-		return (Schedule) contents;
-	}
-
-	public Vertex getVertex() {
-		return (Vertex) contents;
-	}
-
-	public boolean isSchedule() {
-		return (type == Type.SCHEDULE);
-	}
-
-	public boolean isVertex() {
-		return (type == Type.VERTEX);
+	public SASLoopScheduler(Network network) {
+		super(network);
 	}
 
 	@Override
-	public String toString() {
-		Object obj;
-		if (isVertex()) {
-			obj = ((Instance) contents).getName();
-		} else {
-			obj = contents;
+	public void schedule() {
+		schedule = new Schedule();
+
+		schedule.setIterationCount(1);
+
+		for (Vertex vertex : new ReversePostOrder(network, network.getInputs())) {
+			if (vertex instanceof Instance) {
+				int rep = repetitions.get(vertex);
+				Iterand iterand = null;
+				if (rep > 1) {
+					Schedule subSched = new Schedule();
+					subSched.setIterationCount(repetitions.get(vertex));
+					subSched.add(new Iterand(vertex));
+					iterand = new Iterand(subSched);
+				} else {
+					iterand = new Iterand(vertex);
+				}
+				schedule.add(iterand);
+			}
 		}
-		return "" + obj + "";
 	}
 
 }

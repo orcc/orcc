@@ -48,7 +48,7 @@ import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfSwitch;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
-import net.sf.orcc.tools.merger.ActorMerger;
+import net.sf.orcc.tools.merger.actor.ActorMerger;
 
 import org.eclipse.core.resources.IFile;
 

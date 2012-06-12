@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 
-package net.sf.orcc.tools.merger;
+package net.sf.orcc.tools.merger.actor;
 
 import java.util.HashMap;
 import java.util.Map;

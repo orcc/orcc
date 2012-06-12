@@ -27,21 +27,64 @@
  * SUCH DAMAGE.
  */
 
-package net.sf.orcc.tools.merger;
+package net.sf.orcc.tools.merger.actor;
+
+import net.sf.orcc.df.Instance;
+import net.sf.orcc.graph.Vertex;
 
 /**
- * This interface defines a scheduler.
+ * This class defines an element of the body of a schedule. An iterand can be
+ * either a vertex or another schedule.
  * 
  * @author Ghislain Roquier
  * 
  */
-public interface IScheduler {
 
-	/**
-	 * Schedules the given network in-place.
-	 * 
-	 * @param network
-	 *            a network
-	 */
-	public void schedule();
+public class Iterand {
+
+	private enum Type {
+		SCHEDULE, VERTEX
+	}
+
+	private Object contents;
+
+	private Type type;
+
+	public Iterand(Schedule schedule) {
+		contents = schedule;
+		type = Type.SCHEDULE;
+	}
+
+	public Iterand(Vertex vertex) {
+		contents = vertex;
+		type = Type.VERTEX;
+	}
+
+	public Schedule getSchedule() {
+		return (Schedule) contents;
+	}
+
+	public Vertex getVertex() {
+		return (Vertex) contents;
+	}
+
+	public boolean isSchedule() {
+		return (type == Type.SCHEDULE);
+	}
+
+	public boolean isVertex() {
+		return (type == Type.VERTEX);
+	}
+
+	@Override
+	public String toString() {
+		Object obj;
+		if (isVertex()) {
+			obj = ((Instance) contents).getName();
+		} else {
+			obj = contents;
+		}
+		return "" + obj + "";
+	}
+
 }

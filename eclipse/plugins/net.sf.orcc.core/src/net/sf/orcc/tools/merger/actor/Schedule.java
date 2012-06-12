@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 
-package net.sf.orcc.tools.merger;
+package net.sf.orcc.tools.merger.actor;
 
 import java.util.LinkedHashSet;
 import java.util.LinkedList;

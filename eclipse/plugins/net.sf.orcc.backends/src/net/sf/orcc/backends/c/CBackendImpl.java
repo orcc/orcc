@@ -75,7 +75,7 @@ import net.sf.orcc.ir.transform.SSATransformation;
 import net.sf.orcc.ir.transform.TacTransformation;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.tools.classifier.Classifier;
-import net.sf.orcc.tools.merger.ActorMerger;
+import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
 
 import org.eclipse.core.resources.IFile;
