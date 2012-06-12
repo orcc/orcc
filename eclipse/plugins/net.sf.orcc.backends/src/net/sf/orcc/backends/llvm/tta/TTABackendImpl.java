@@ -81,7 +81,7 @@ import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.ir.transform.SSATransformation;
 import net.sf.orcc.ir.transform.TacTransformation;
 import net.sf.orcc.tools.classifier.Classifier;
-import net.sf.orcc.tools.merger.action.ActorNormalizer;
+import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.util.OrccUtil;
 
@@ -176,7 +176,7 @@ public class TTABackendImpl extends LLVMBackendImpl {
 		new BroadcastAdder().doSwitch(network);
 
 		if (normalize) {
-			new ActorNormalizer().doSwitch(network);
+			new ActionMerger().doSwitch(network);
 		}
 		if (merge) {
 			new ActorMerger().doSwitch(network);

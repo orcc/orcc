@@ -75,7 +75,7 @@ import net.sf.orcc.ir.transform.SSATransformation;
 import net.sf.orcc.ir.transform.TacTransformation;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.tools.classifier.Classifier;
-import net.sf.orcc.tools.merger.action.ActorNormalizer;
+import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
 
 import org.eclipse.core.resources.IFile;
@@ -195,7 +195,7 @@ public class CBackendImpl extends AbstractBackend {
 		replacementMap.put("IN", "IN_my_precious");
 
 		if (normalize) {
-			new ActorNormalizer().doSwitch(actor);
+			new ActionMerger().doSwitch(actor);
 		}
 
 		List<DfSwitch<?>> transformations = new ArrayList<DfSwitch<?>>();

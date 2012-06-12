@@ -70,7 +70,7 @@ import org.eclipse.emf.common.util.EList;
  * @author Herve Yviquel
  * 
  */
-public class StaticNormalizer {
+public class StaticActionMerger {
 
 	/**
 	 * This class contains code to transform a pattern to IR code.

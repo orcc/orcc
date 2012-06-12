@@ -61,7 +61,7 @@ import net.sf.orcc.tools.classifier.GuardSatChecker;
  * @author Herve Yviquel
  * 
  */
-public class ActorNormalizer extends DfSwitch<Void> {
+public class ActionMerger extends DfSwitch<Void> {
 
 	private static IrFactory factory = IrFactory.eINSTANCE;
 
@@ -72,7 +72,7 @@ public class ActorNormalizer extends DfSwitch<Void> {
 			// Do nothing
 			return null;
 		} else if (clasz.isCSDF()) {
-			Action action = new StaticNormalizer().normalize("xxx",
+			Action action = new StaticActionMerger().normalize("xxx",
 					(CSDFMoC) clasz);
 
 			clean(actor);
@@ -117,7 +117,7 @@ public class ActorNormalizer extends DfSwitch<Void> {
 				} else if (moc.isCSDF()) {
 					CSDFMoC csdfMoc = (CSDFMoC) moc;
 
-					Action newAction = new StaticNormalizer().normalize(
+					Action newAction = new StaticActionMerger().normalize(
 							action.getName(), csdfMoc);
 					newAction.setPeekPattern(currCopy.getPeekPattern());
 					newAction.setScheduler(currCopy.getScheduler());
