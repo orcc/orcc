@@ -118,7 +118,7 @@ public class JadeSimulatorImpl extends AbstractSimulator {
 		ResourceSet set = new ResourceSetImpl();
 		Network network = EcoreHelper.getEObject(set, xdfFile);
 		// instantiate networks (but not actors) and flattens network
-		new Instantiator().doSwitch(network);
+		new Instantiator(false).doSwitch(network);
 		new NetworkFlattener().doSwitch(network);
 
 		xdfFlattenFile = new File(vtlFolder, network.getSimpleName() + ".xdf");

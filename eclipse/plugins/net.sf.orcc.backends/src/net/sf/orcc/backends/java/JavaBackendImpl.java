@@ -96,7 +96,7 @@ public class JavaBackendImpl extends AbstractBackend {
 	private Network doTransformNetwork(Network network) throws OrccException {
 		// instantiate and flattens network
 		write("Instantiating...\n");
-		new Instantiator(fifoSize).doSwitch(network);
+		new Instantiator(false, fifoSize).doSwitch(network);
 
 		write("Flattening...\n");
 		new NetworkFlattener().doSwitch(network);

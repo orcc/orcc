@@ -67,18 +67,12 @@ public class Instantiator extends DfSwitch<Void> {
 	private List<Actor> listActors;
 
 	/**
-	 * Creates a default instantiator, equivalent to
-	 * <code>Instantiator(false, 0)</code>, that will replace instances of
-	 * networks by instantiated networks, and does not set default FIFO size.
-	 */
-	public Instantiator() {
-	}
-
-	/**
-	 * Creates an instantiator that will replace instances of networks by
-	 * instantiated networks, and if duplicateActors is <code>true</code>, then
-	 * the instantiator also transforms instances of actors by duplicating
-	 * actors.
+	 * Creates an instantiator, equivalent to
+	 * <code>Instantiator(duplicateActors, 0)</code>, that will replace
+	 * instances of networks by instantiated networks, and if duplicateActors is
+	 * <code>true</code>, then the instantiator also transforms instances of
+	 * actors by duplicating actors. The instantiator does not set default FIFO
+	 * size.
 	 * 
 	 * @param duplicateActors
 	 *            <code>true</code> if actors should be duplicated
@@ -100,21 +94,10 @@ public class Instantiator extends DfSwitch<Void> {
 	 */
 	public Instantiator(boolean duplicateActors, int defaultFifoSize) {
 		this.defaultFifoSize = defaultFifoSize;
+		this.duplicateActors = duplicateActors;
 		if (duplicateActors) {
-			this.duplicateActors = true;
 			listActors = new ArrayList<Actor>();
 		}
-	}
-
-	/**
-	 * Creates an instantiator that will replace instances of networks by
-	 * instantiated networks.
-	 * 
-	 * @param defaultFifoSize
-	 *            default FIFO size
-	 */
-	public Instantiator(int defaultFifoSize) {
-		this(false, defaultFifoSize);
 	}
 
 	@Override

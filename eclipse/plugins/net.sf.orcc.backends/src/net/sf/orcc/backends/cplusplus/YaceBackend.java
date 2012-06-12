@@ -102,7 +102,7 @@ public class YaceBackend extends AbstractBackend {
 
 	private Network doTransformNetwork(Network network) throws OrccException {
 		write("Instantiating... ");
-		new Instantiator().doSwitch(network);
+		new Instantiator(false).doSwitch(network);
 		write("done\n");
 		new NetworkFlattener().doSwitch(network);
 
