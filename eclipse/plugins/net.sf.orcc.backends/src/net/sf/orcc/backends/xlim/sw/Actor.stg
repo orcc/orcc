@@ -50,7 +50,7 @@ endif>
 // For each input or output retrieve the list of the I/Os
 // and attribute to the variable "port" the name of the I/O 
 
-actorPorts() ::= <<
+actorPorts(instance) ::= <<
 \<!-- Ports --\>
 \<!-- Input Ports --\>
 <instance.actor.inputs: {port|<actorPort(port=port, dir="in")>}; separator="\n">
@@ -104,7 +104,7 @@ if(var.type.list)><var.name>_typedef<else><var.type><endif>"<
 if(!var.type.list)><if(!var.type.float)> size="<if (var.type.bool)>1<else><var.type.size><endif>"<endif><endif>/\><endif>
 >>
 
-stateVars() ::= <<
+stateVars(instance) ::= <<
 \<!-- State Variables --\>
 <instance.actor.stateVars: stateVar(); separator="\n">
 >>
@@ -822,9 +822,9 @@ printDesign(instance) ::= <<
 \<!-- /<printHierarchicalPath(instance.hierarchicalId)> --\>
 \<!-- Source file is "<instance.actor.file>" --\>
 \<design name="<instance.id>"\>
-	<actorPorts()>
+	<actorPorts(instance)>
 	<parameters(instance.arguments)>
-	<stateVars()>
+	<stateVars(instance)>
 	<instance.actor.actions: typeDef()>
 	<instance.actor.actions: action(); separator="\n\n">
 	\<!-- ACTION SCHEDULER --\>
