@@ -69,7 +69,7 @@ public class DfVisitor<T> extends DfSwitch<T> {
 	 * is visited exactly one time.
 	 */
 	public DfVisitor() {
-		visitOnce = true;
+		this(null, true);
 	}
 
 	/**
@@ -250,6 +250,21 @@ public class DfVisitor<T> extends DfSwitch<T> {
 	 */
 	final public Actor getActor() {
 		return actor;
+	}
+
+	@Override
+	public String toString() {
+		String retString = "Base : ";
+		retString += this.getClass().getName();
+
+		retString += " / irVisitor : ";
+		if (irVisitor == null) {
+			retString += "null";
+		} else {
+			retString += irVisitor.getClass().getName();
+		}
+
+		return retString;
 	}
 
 }
