@@ -34,6 +34,7 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.util.Attribute;
 
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.impl.EFactoryImpl;
@@ -98,6 +99,8 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 			return createPort();
 		case DfPackage.INSTANCE:
 			return createInstance();
+		case DfPackage.PROCESS:
+			return createProcess();
 		case DfPackage.ACTOR:
 			return createActor();
 		case DfPackage.NETWORK:
@@ -129,6 +132,42 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 		default:
 			throw new IllegalArgumentException("The class '" + eClass.getName()
 					+ "' is not a valid classifier");
+		}
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Object createFromString(EDataType eDataType, String initialValue) {
+		switch (eDataType.getClassifierID()) {
+		case DfPackage.MAP:
+			return createMapFromString(eDataType, initialValue);
+		case DfPackage.LIST:
+			return createListFromString(eDataType, initialValue);
+		default:
+			throw new IllegalArgumentException("The datatype '"
+					+ eDataType.getName() + "' is not a valid classifier");
+		}
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public String convertToString(EDataType eDataType, Object instanceValue) {
+		switch (eDataType.getClassifierID()) {
+		case DfPackage.MAP:
+			return convertMapToString(eDataType, instanceValue);
+		case DfPackage.LIST:
+			return convertListToString(eDataType, instanceValue);
+		default:
+			throw new IllegalArgumentException("The datatype '"
+					+ eDataType.getName() + "' is not a valid classifier");
 		}
 	}
 
@@ -167,7 +206,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 		action.setTag(createTag(tagName));
 		return action;
 	}
-	
+
 	@Override
 	public Action createAction(Tag tag, Pattern inputPattern,
 			Pattern outputPattern, Pattern peekedPattern, Procedure scheduler,
@@ -198,6 +237,43 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	public Argument createArgument() {
 		ArgumentImpl argument = new ArgumentImpl();
 		return argument;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Map<?, ?> createMapFromString(EDataType eDataType,
+			String initialValue) {
+		return (Map<?, ?>) super.createFromString(initialValue);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String convertMapToString(EDataType eDataType, Object instanceValue) {
+		return super.convertToString(instanceValue);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public List<?> createListFromString(EDataType eDataType, String initialValue) {
+		return (List<?>) super.createFromString(initialValue);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String convertListToString(EDataType eDataType, Object instanceValue) {
+		return super.convertToString(instanceValue);
 	}
 
 	@Override
@@ -284,6 +360,16 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	public Instance createInstance() {
 		InstanceImpl instance = new InstanceImpl();
 		return instance;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public net.sf.orcc.df.Process createProcess() {
+		ProcessImpl process = new ProcessImpl();
+		return process;
 	}
 
 	@Override

@@ -237,7 +237,8 @@ public class CfgImpl extends GraphImpl implements Cfg {
 	@Override
 	public boolean immediatelyDominates(Vertex m, Vertex n) {
 		if (doms == null) {
-			throw new IllegalStateException("computeDominance must be called first");
+			throw new IllegalStateException(
+					"computeDominance must be called first");
 		}
 
 		return m == doms.get(n);
@@ -246,7 +247,8 @@ public class CfgImpl extends GraphImpl implements Cfg {
 	@Override
 	public boolean immediatelyPostDominates(Vertex m, Vertex n) {
 		if (idoms == null) {
-			throw new IllegalStateException("computeDominance must be called first");
+			throw new IllegalStateException(
+					"computeDominance must be called first");
 		}
 
 		return m == idoms.get(n);

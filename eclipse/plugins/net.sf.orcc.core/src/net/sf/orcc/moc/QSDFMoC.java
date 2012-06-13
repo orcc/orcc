@@ -63,7 +63,7 @@ public interface QSDFMoC extends MoC {
 	 * @return a list of Port used by the configuration
 	 */
 	List<Port> getConfigurationPorts();
-	
+
 	/**
 	 * Returns the configurations of the QSDF MoC.
 	 * 

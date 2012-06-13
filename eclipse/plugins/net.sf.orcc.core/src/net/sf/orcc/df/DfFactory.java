@@ -63,7 +63,7 @@ public interface DfFactory extends EFactory {
 	Action createAction(String tag, Pattern inputPattern,
 			Pattern outputPattern, Pattern peekedPattern, Procedure scheduler,
 			Procedure body);
-	
+
 	/**
 	 * Creates a new action with empty patterns, the given tag, scheduler and
 	 * body.
@@ -214,6 +214,15 @@ public interface DfFactory extends EFactory {
 	 * @generated
 	 */
 	Instance createInstance();
+
+	/**
+	 * Returns a new object of class '<em>Process</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Process</em>'.
+	 * @generated
+	 */
+	Process createProcess();
 
 	Instance createInstance(String id, EObject entity);
 

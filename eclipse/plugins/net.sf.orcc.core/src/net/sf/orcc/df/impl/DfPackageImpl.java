@@ -6,6 +6,7 @@
  */
 package net.sf.orcc.df.impl;
 
+import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.df.Action;
@@ -32,6 +33,8 @@ import net.sf.orcc.util.UtilPackage;
 
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EDataType;
+import org.eclipse.emf.ecore.EGenericType;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EcorePackage;
@@ -59,6 +62,13 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	private EClass instanceEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass processEClass = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -137,6 +147,20 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	private EClass argumentEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EDataType mapEDataType = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EDataType listEDataType = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -374,6 +398,60 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 */
 	public EAttribute getInstance_Name() {
 		return (EAttribute) instanceEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getProcess() {
+		return processEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getProcess_Name() {
+		return (EAttribute) processEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getProcess_IncomingPortMap() {
+		return (EAttribute) processEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getProcess_Inputs() {
+		return (EReference) processEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getProcess_OutgoingPortMap() {
+		return (EAttribute) processEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getProcess_Outputs() {
+		return (EReference) processEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -848,6 +926,24 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EDataType getMap() {
+		return mapEDataType;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EDataType getList() {
+		return listEDataType;
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -941,6 +1037,13 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEReference(instanceEClass, INSTANCE__ENTITY);
 		createEAttribute(instanceEClass, INSTANCE__NAME);
 
+		processEClass = createEClass(PROCESS);
+		createEAttribute(processEClass, PROCESS__NAME);
+		createEAttribute(processEClass, PROCESS__INCOMING_PORT_MAP);
+		createEReference(processEClass, PROCESS__INPUTS);
+		createEAttribute(processEClass, PROCESS__OUTGOING_PORT_MAP);
+		createEReference(processEClass, PROCESS__OUTPUTS);
+
 		actorEClass = createEClass(ACTOR);
 		createEReference(actorEClass, ACTOR__ACTIONS);
 		createEReference(actorEClass, ACTOR__ACTIONS_OUTSIDE_FSM);
@@ -1022,6 +1125,10 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		argumentEClass = createEClass(ARGUMENT);
 		createEReference(argumentEClass, ARGUMENT__VALUE);
 		createEReference(argumentEClass, ARGUMENT__VARIABLE);
+
+		// Create data types
+		mapEDataType = createEDataType(MAP);
+		listEDataType = createEDataType(LIST);
 	}
 
 	/**
@@ -1060,6 +1167,9 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				.getEPackage(MocPackage.eNS_URI);
 
 		// Create type parameters
+		addETypeParameter(mapEDataType, "T");
+		addETypeParameter(mapEDataType, "T1");
+		addETypeParameter(listEDataType, "T");
 
 		// Set bounds for type parameters
 
@@ -1131,6 +1241,41 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				null, 0, 1, Instance.class, IS_TRANSIENT, IS_VOLATILE,
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED,
 				IS_ORDERED);
+
+		initEClass(processEClass, net.sf.orcc.df.Process.class, "Process",
+				!IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getProcess_Name(), ecorePackage.getEString(), "name",
+				null, 0, 1, net.sf.orcc.df.Process.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
+		EGenericType g1 = createEGenericType(this.getMap());
+		EGenericType g2 = createEGenericType(this.getPort());
+		g1.getETypeArguments().add(g2);
+		g2 = createEGenericType(this.getConnection());
+		g1.getETypeArguments().add(g2);
+		initEAttribute(getProcess_IncomingPortMap(), g1, "incomingPortMap",
+				null, 0, 1, net.sf.orcc.df.Process.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
+		initEReference(getProcess_Inputs(), this.getPort(), null, "inputs",
+				null, 0, -1, net.sf.orcc.df.Process.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		g1 = createEGenericType(this.getMap());
+		g2 = createEGenericType(this.getPort());
+		g1.getETypeArguments().add(g2);
+		g2 = createEGenericType(this.getList());
+		g1.getETypeArguments().add(g2);
+		EGenericType g3 = createEGenericType(this.getConnection());
+		g2.getETypeArguments().add(g3);
+		initEAttribute(getProcess_OutgoingPortMap(), g1, "outgoingPortMap",
+				null, 0, 1, net.sf.orcc.df.Process.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
+		initEReference(getProcess_Outputs(), this.getPort(), null, "outputs",
+				null, 0, -1, net.sf.orcc.df.Process.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(actorEClass, Actor.class, "Actor", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -1230,7 +1375,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getNetwork_TemplateData(),
-				theEcorePackage.getEJavaObject(), "templateData", null, 0, 1,
+				ecorePackage.getEJavaObject(), "templateData", null, 0, 1,
 				Network.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
 				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNetwork_Variables(), theIrPackage.getVar(), null,
@@ -1388,6 +1533,12 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				"variable", null, 0, 1, Argument.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		// Initialize data types
+		initEDataType(mapEDataType, Map.class, "Map", IS_SERIALIZABLE,
+				!IS_GENERATED_INSTANCE_CLASS);
+		initEDataType(listEDataType, List.class, "List", IS_SERIALIZABLE,
+				!IS_GENERATED_INSTANCE_CLASS);
 
 		// Create resource
 		createResource(eNS_URI);

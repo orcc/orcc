@@ -61,7 +61,7 @@ public class QSDFMoCImpl extends MoCImpl implements QSDFMoC {
 	public List<Port> getConfigurationPorts() {
 		return configurationPorts;
 	}
-	
+
 	@Override
 	public Map<Action, MoC> getConfigurations() {
 		return configurations;

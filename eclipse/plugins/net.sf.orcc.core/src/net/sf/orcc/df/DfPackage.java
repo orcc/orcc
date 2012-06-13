@@ -11,6 +11,7 @@ import net.sf.orcc.util.UtilPackage;
 
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 
@@ -65,7 +66,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getNetwork()
 	 * @generated
 	 */
-	int NETWORK = 4;
+	int NETWORK = 5;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.ConnectionImpl
@@ -76,7 +77,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getConnection()
 	 * @generated
 	 */
-	int CONNECTION = 6;
+	int CONNECTION = 7;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.InstanceImpl <em>Instance</em>}' class.
@@ -94,7 +95,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getBroadcast()
 	 * @generated
 	 */
-	int BROADCAST = 5;
+	int BROADCAST = 6;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.ActionImpl <em>Action</em>}' class.
@@ -103,7 +104,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getAction()
 	 * @generated
 	 */
-	int ACTION = 7;
+	int ACTION = 8;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.ActorImpl <em>Actor</em>}' class.
@@ -112,7 +113,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getActor()
 	 * @generated
 	 */
-	int ACTOR = 3;
+	int ACTOR = 4;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.FSMImpl <em>FSM</em>}' class.
@@ -121,7 +122,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getFSM()
 	 * @generated
 	 */
-	int FSM = 8;
+	int FSM = 9;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.PatternImpl <em>Pattern</em>}' class.
@@ -130,7 +131,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getPattern()
 	 * @generated
 	 */
-	int PATTERN = 9;
+	int PATTERN = 10;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.PortImpl <em>Port</em>}' class.
@@ -148,7 +149,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getState()
 	 * @generated
 	 */
-	int STATE = 10;
+	int STATE = 11;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.TagImpl <em>Tag</em>}' class.
@@ -157,7 +158,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getTag()
 	 * @generated
 	 */
-	int TAG = 11;
+	int TAG = 12;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.TransitionImpl
@@ -168,7 +169,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getTransition()
 	 * @generated
 	 */
-	int TRANSITION = 12;
+	int TRANSITION = 13;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.PortToEIntegerObjectMapEntryImpl <em>Port To EInteger Object Map Entry</em>}' class.
@@ -178,7 +179,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getPortToEIntegerObjectMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = 13;
+	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = 14;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.PortToVarMapEntryImpl <em>Port To Var Map Entry</em>}' class.
@@ -188,7 +189,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getPortToVarMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_VAR_MAP_ENTRY = 14;
+	int PORT_TO_VAR_MAP_ENTRY = 15;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.VarToPortMapEntryImpl <em>Var To Port Map Entry</em>}' class.
@@ -198,7 +199,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getVarToPortMapEntry()
 	 * @generated
 	 */
-	int VAR_TO_PORT_MAP_ENTRY = 15;
+	int VAR_TO_PORT_MAP_ENTRY = 16;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.ArgumentImpl <em>Argument</em>}' class.
@@ -207,7 +208,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getArgument()
 	 * @generated
 	 */
-	int ARGUMENT = 16;
+	int ARGUMENT = 17;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.df.impl.UnitImpl <em>Unit</em>}' class.
@@ -444,6 +445,70 @@ public interface DfPackage extends EPackage {
 	 * @ordered
 	 */
 	int INSTANCE_FEATURE_COUNT = GraphPackage.VERTEX_FEATURE_COUNT + 3;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.df.impl.ProcessImpl <em>Process</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.df.impl.ProcessImpl
+	 * @see net.sf.orcc.df.impl.DfPackageImpl#getProcess()
+	 * @generated
+	 */
+	int PROCESS = 3;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCESS__NAME = 0;
+
+	/**
+	 * The feature id for the '<em><b>Incoming Port Map</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCESS__INCOMING_PORT_MAP = 1;
+
+	/**
+	 * The feature id for the '<em><b>Inputs</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCESS__INPUTS = 2;
+
+	/**
+	 * The feature id for the '<em><b>Outgoing Port Map</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCESS__OUTGOING_PORT_MAP = 3;
+
+	/**
+	 * The feature id for the '<em><b>Outputs</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCESS__OUTPUTS = 4;
+
+	/**
+	 * The number of structural features of the '<em>Process</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCESS_FEATURE_COUNT = 5;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -1314,6 +1379,26 @@ public interface DfPackage extends EPackage {
 	int ARGUMENT_FEATURE_COUNT = 2;
 
 	/**
+	 * The meta object id for the '<em>Map</em>' data type.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see java.util.Map
+	 * @see net.sf.orcc.df.impl.DfPackageImpl#getMap()
+	 * @generated
+	 */
+	int MAP = 18;
+
+	/**
+	 * The meta object id for the '<em>List</em>' data type.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see java.util.List
+	 * @see net.sf.orcc.df.impl.DfPackageImpl#getList()
+	 * @generated
+	 */
+	int LIST = 19;
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Network <em>Network</em>}'.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Network</em>'.
@@ -1512,6 +1597,71 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getInstance_Name();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.df.Process <em>Process</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Process</em>'.
+	 * @see net.sf.orcc.df.Process
+	 * @generated
+	 */
+	EClass getProcess();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.Process#getName <em>Name</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Name</em>'.
+	 * @see net.sf.orcc.df.Process#getName()
+	 * @see #getProcess()
+	 * @generated
+	 */
+	EAttribute getProcess_Name();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.Process#getIncomingPortMap <em>Incoming Port Map</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Incoming Port Map</em>'.
+	 * @see net.sf.orcc.df.Process#getIncomingPortMap()
+	 * @see #getProcess()
+	 * @generated
+	 */
+	EAttribute getProcess_IncomingPortMap();
+
+	/**
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.df.Process#getInputs <em>Inputs</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Inputs</em>'.
+	 * @see net.sf.orcc.df.Process#getInputs()
+	 * @see #getProcess()
+	 * @generated
+	 */
+	EReference getProcess_Inputs();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.df.Process#getOutgoingPortMap <em>Outgoing Port Map</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Outgoing Port Map</em>'.
+	 * @see net.sf.orcc.df.Process#getOutgoingPortMap()
+	 * @see #getProcess()
+	 * @generated
+	 */
+	EAttribute getProcess_OutgoingPortMap();
+
+	/**
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.df.Process#getOutputs <em>Outputs</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Outputs</em>'.
+	 * @see net.sf.orcc.df.Process#getOutputs()
+	 * @see #getProcess()
+	 * @generated
+	 */
+	EReference getProcess_Outputs();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Broadcast <em>Broadcast</em>}'.
@@ -2143,6 +2293,28 @@ public interface DfPackage extends EPackage {
 	EReference getArgument_Variable();
 
 	/**
+	 * Returns the meta object for data type '{@link java.util.Map <em>Map</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for data type '<em>Map</em>'.
+	 * @see java.util.Map
+	 * @model instanceClass="java.util.Map" typeParameters="T T1"
+	 * @generated
+	 */
+	EDataType getMap();
+
+	/**
+	 * Returns the meta object for data type '{@link java.util.List <em>List</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for data type '<em>List</em>'.
+	 * @see java.util.List
+	 * @model instanceClass="java.util.List" typeParameters="T"
+	 * @generated
+	 */
+	EDataType getList();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Unit <em>Unit</em>}'.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Unit</em>'.
@@ -2379,6 +2551,58 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute INSTANCE__NAME = eINSTANCE.getInstance_Name();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.df.impl.ProcessImpl <em>Process</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.df.impl.ProcessImpl
+		 * @see net.sf.orcc.df.impl.DfPackageImpl#getProcess()
+		 * @generated
+		 */
+		EClass PROCESS = eINSTANCE.getProcess();
+
+		/**
+		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute PROCESS__NAME = eINSTANCE.getProcess_Name();
+
+		/**
+		 * The meta object literal for the '<em><b>Incoming Port Map</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute PROCESS__INCOMING_PORT_MAP = eINSTANCE
+				.getProcess_IncomingPortMap();
+
+		/**
+		 * The meta object literal for the '<em><b>Inputs</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference PROCESS__INPUTS = eINSTANCE.getProcess_Inputs();
+
+		/**
+		 * The meta object literal for the '<em><b>Outgoing Port Map</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute PROCESS__OUTGOING_PORT_MAP = eINSTANCE
+				.getProcess_OutgoingPortMap();
+
+		/**
+		 * The meta object literal for the '<em><b>Outputs</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference PROCESS__OUTPUTS = eINSTANCE.getProcess_Outputs();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.BroadcastImpl <em>Broadcast</em>}' class.
@@ -2846,6 +3070,26 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EReference ARGUMENT__VARIABLE = eINSTANCE.getArgument_Variable();
+
+		/**
+		 * The meta object literal for the '<em>Map</em>' data type.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see java.util.Map
+		 * @see net.sf.orcc.df.impl.DfPackageImpl#getMap()
+		 * @generated
+		 */
+		EDataType MAP = eINSTANCE.getMap();
+
+		/**
+		 * The meta object literal for the '<em>List</em>' data type.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see java.util.List
+		 * @see net.sf.orcc.df.impl.DfPackageImpl#getList()
+		 * @generated
+		 */
+		EDataType LIST = eINSTANCE.getList();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.UnitImpl <em>Unit</em>}' class.

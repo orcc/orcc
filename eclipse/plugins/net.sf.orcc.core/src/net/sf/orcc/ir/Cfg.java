@@ -36,15 +36,15 @@ import org.eclipse.emf.common.util.EList;
 /**
  * <!-- begin-user-doc -->This interface defines a Control-Flow Graph.<!--
  * end-user-doc -->
- * 
+ *
  * <p>
  * The following features are supported:
  * <ul>
- * <li>{@link net.sf.orcc.ir.Cfg#getEntry <em>Entry</em>}</li>
- * <li>{@link net.sf.orcc.ir.Cfg#getExit <em>Exit</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.Cfg#getEntry <em>Entry</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.Cfg#getExit <em>Exit</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @see net.sf.orcc.ir.IrPackage#getCfg()
  * @model
  * @generated
@@ -132,22 +132,18 @@ public interface Cfg extends Graph {
 	boolean isLoop(Vertex node);
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Cfg#getEntry <em>Entry</em>}
-	 * ' reference. <!-- begin-user-doc --><!-- end-user-doc -->
-	 * 
-	 * @param value
-	 *            the new value of the '<em>Entry</em>' reference.
+	 * Sets the value of the '{@link net.sf.orcc.ir.Cfg#getEntry <em>Entry</em>}' reference.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @param value the new value of the '<em>Entry</em>' reference.
 	 * @see #getEntry()
 	 * @generated
 	 */
 	void setEntry(CfgNode value);
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Cfg#getExit <em>Exit</em>}'
-	 * reference. <!-- begin-user-doc --><!-- end-user-doc -->
-	 * 
-	 * @param value
-	 *            the new value of the '<em>Exit</em>' reference.
+	 * Sets the value of the '{@link net.sf.orcc.ir.Cfg#getExit <em>Exit</em>}' reference.
+	 * <!-- begin-user-doc --><!-- end-user-doc -->
+	 * @param value the new value of the '<em>Exit</em>' reference.
 	 * @see #getExit()
 	 * @generated
 	 */
