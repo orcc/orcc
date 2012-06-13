@@ -154,6 +154,7 @@ public class XlimBackendImpl extends AbstractBackend {
 			new Multi2MonoToken().doSwitch(actor);
 			new LocalArrayRemoval().doSwitch(actor);
 			new DivisionSubstitution().doSwitch(actor);
+			new UnaryListRemoval().doSwitch(actor);
 		}
 
 		DfSwitch<?>[] transformations = { new UnitImporter(),
@@ -162,7 +163,7 @@ public class XlimBackendImpl extends AbstractBackend {
 				new DeadGlobalElimination(),
 				new DfVisitor<Void>(new DeadCodeElimination()),
 				new DfVisitor<Void>(new DeadVariableRemoval()),
-				new UnaryListRemoval(), new GlobalArrayInitializer(useHw),
+				new GlobalArrayInitializer(useHw),
 				new DfVisitor<Void>(new InstTernaryAdder()),
 				new CustomPeekAdder(),
 				new DfVisitor<Void>(new ListFlattener()),
