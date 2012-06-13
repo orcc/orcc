@@ -45,6 +45,7 @@ import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.Attribute;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
@@ -118,6 +119,16 @@ public class Instantiator extends DfSwitch<Void> {
 						listActors.add(actor);
 					}
 				}
+
+				// set attribute's value when passed as instance parameter
+				for (Argument argument : instance.getArguments()) {
+					Attribute attribute = actor.getAttribute(argument
+							.getVariable().getName());
+					if (attribute != null) {
+						attribute.setValue(argument.getValue());
+					}
+				}
+
 			} else if (entity instanceof Network) {
 				instantiateNetwork(network, instance);
 			}
