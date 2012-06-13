@@ -1,0 +1,80 @@
+1.2       unreleased
+====================
+
+Notable changes and features
+----------------------------
+- Front-end: experimental support of new floating point types (half and double).
+- New LLVM backend with static compilation (the old version is renamed as Jade 
+backend).
+- LLVM/Jade backends: experimental support of floating point type.
+- TTA backend: 
+	* new interconnection mechanism between the processors.
+	* support simulation and profiling using ttasim (experimental branch of TCE).
+	* add option to choose the configuration of the processors between several 
+	predefined profiles. 
+	* support the mapping of several actors on the same processor.
+	
+Bugfixes
+--------
+- UI: Removing an existing mapping was not possible without removing the runtime
+configuration.
+- Tools: The normalizer is working back and it has been improved to avoid useless
+memory copies from the FIFOs.
+
+Misc
+----
+- Move the 'models' plugin in Orcc repository and remove dependencies to dftools.
+
+
+1.1.1     April 2012
+====================
+
+Notable changes and features
+----------------------------
+- Interpreter: bit exact simulation and floating point simulation.
+
+Smaller features
+----------------
+- TTA backend: reduction of the logic utilization on the target platform.
+
+
+1.1       March 2012
+====================
+
+Notable changes and features
+----------------------------
+- Embedded runtime libraries (C, Java and TTA) automatically extracted during the
+code generation.
+
+Smaller features
+----------------
+- TTA back-end: support Xilinx device.
+- Code generator is now able to print For loops.
+
+Misc
+----
+- Addition of a New Control Flow Graph API.
+- Removed dependencies to JGraphT (FSM builder, Merger, etc) in favor of DFtools
+graph API.
+
+
+1.0     January 2012
+====================
+
+Notable changes and features
+----------------------------
+- First usable version of the TTA back-end (only for Altera device).
+
+Misc
+----
+- Deletion of the VHDL back-end (not maintained anymore).
+- Deletion of the C++ back-end (not used anymore).
+
+
+0.9.5       May 2012
+====================
+
+Notable changes and features
+----------------------------
+- Addition of an earlier version of the TTA back-end.
+
