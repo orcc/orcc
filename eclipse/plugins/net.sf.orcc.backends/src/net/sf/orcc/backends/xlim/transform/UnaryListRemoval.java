@@ -90,10 +90,7 @@ public class UnaryListRemoval extends DfVisitor<Void> {
 				for (Def def : new ArrayList<Def>(var.getDefs())) {
 					InstStore store = EcoreHelper.getContainerOfType(def,
 							InstStore.class);
-					InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
-							store.getTarget().getVariable(), store.getValue());
-					EcoreUtil.replace(store, assign);
-					IrUtil.delete(store);
+					store.getIndexes().clear();
 				}
 			}
 		}
