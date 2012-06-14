@@ -91,6 +91,8 @@ public interface Actor extends Attributable {
 	 * @generated
 	 */
 	EList<Action> getActionsOutsideFsm();
+	
+	<T> T getAdapter(Class<T> type);
 
 	/**
 	 * Returns the file this actor is defined in.

@@ -457,22 +457,13 @@ public interface DfPackage extends EPackage {
 	int PROCESS = 3;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PROCESS__NAME = 0;
-
-	/**
 	 * The feature id for the '<em><b>Incoming Port Map</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PROCESS__INCOMING_PORT_MAP = 1;
+	int PROCESS__INCOMING_PORT_MAP = 0;
 
 	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' reference list.
@@ -481,7 +472,16 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PROCESS__INPUTS = 2;
+	int PROCESS__INPUTS = 1;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCESS__NAME = 2;
 
 	/**
 	 * The feature id for the '<em><b>Outgoing Port Map</b></em>' attribute.

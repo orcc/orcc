@@ -415,7 +415,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EAttribute getProcess_Name() {
-		return (EAttribute) processEClass.getEStructuralFeatures().get(0);
+		return (EAttribute) processEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -424,7 +424,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EAttribute getProcess_IncomingPortMap() {
-		return (EAttribute) processEClass.getEStructuralFeatures().get(1);
+		return (EAttribute) processEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -433,7 +433,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getProcess_Inputs() {
-		return (EReference) processEClass.getEStructuralFeatures().get(2);
+		return (EReference) processEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -1038,9 +1038,9 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEAttribute(instanceEClass, INSTANCE__NAME);
 
 		processEClass = createEClass(PROCESS);
-		createEAttribute(processEClass, PROCESS__NAME);
 		createEAttribute(processEClass, PROCESS__INCOMING_PORT_MAP);
 		createEReference(processEClass, PROCESS__INPUTS);
+		createEAttribute(processEClass, PROCESS__NAME);
 		createEAttribute(processEClass, PROCESS__OUTGOING_PORT_MAP);
 		createEReference(processEClass, PROCESS__OUTPUTS);
 
@@ -1244,10 +1244,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 
 		initEClass(processEClass, net.sf.orcc.df.Process.class, "Process",
 				!IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getProcess_Name(), ecorePackage.getEString(), "name",
-				null, 0, 1, net.sf.orcc.df.Process.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
 		EGenericType g1 = createEGenericType(this.getMap());
 		EGenericType g2 = createEGenericType(this.getPort());
 		g1.getETypeArguments().add(g2);
@@ -1255,12 +1251,17 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		g1.getETypeArguments().add(g2);
 		initEAttribute(getProcess_IncomingPortMap(), g1, "incomingPortMap",
 				null, 0, 1, net.sf.orcc.df.Process.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
+				!IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID,
+				IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getProcess_Inputs(), this.getPort(), null, "inputs",
 				null, 0, -1, net.sf.orcc.df.Process.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+				!IS_VOLATILE, !IS_CHANGEABLE, !IS_COMPOSITE,
+				IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED,
+				IS_ORDERED);
+		initEAttribute(getProcess_Name(), ecorePackage.getEString(), "name",
+				null, 0, 1, net.sf.orcc.df.Process.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
+				!IS_DERIVED, IS_ORDERED);
 		g1 = createEGenericType(this.getMap());
 		g2 = createEGenericType(this.getPort());
 		g1.getETypeArguments().add(g2);
@@ -1270,12 +1271,13 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		g2.getETypeArguments().add(g3);
 		initEAttribute(getProcess_OutgoingPortMap(), g1, "outgoingPortMap",
 				null, 0, 1, net.sf.orcc.df.Process.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
+				!IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID,
+				IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getProcess_Outputs(), this.getPort(), null, "outputs",
 				null, 0, -1, net.sf.orcc.df.Process.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+				!IS_VOLATILE, !IS_CHANGEABLE, !IS_COMPOSITE,
+				IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED,
+				IS_ORDERED);
 
 		initEClass(actorEClass, Actor.class, "Actor", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);

@@ -579,6 +579,14 @@ public class ActorImpl extends AttributableImpl implements Actor {
 		}
 		return actionsOutsideFsm;
 	}
+	
+	@Override
+	public <T> T getAdapter(Class<T> type) {
+		if (type == ProcessImpl.class) {
+			// return new ProcessImpl(this, getInputs(), getOutputs());
+		}
+		return null;
+	}
 
 	@Override
 	public IFile getFile() {

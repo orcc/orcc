@@ -44,9 +44,9 @@ import org.eclipse.emf.ecore.EObject;
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link net.sf.orcc.df.Process#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.df.Process#getIncomingPortMap <em>Incoming Port Map</em>}</li>
  *   <li>{@link net.sf.orcc.df.Process#getInputs <em>Inputs</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Process#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.df.Process#getOutgoingPortMap <em>Outgoing Port Map</em>}</li>
  *   <li>{@link net.sf.orcc.df.Process#getOutputs <em>Outputs</em>}</li>
  * </ul>
@@ -69,9 +69,8 @@ public interface Process extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Incoming Port Map</em>' attribute.
-	 * @see #setIncomingPortMap(Map)
 	 * @see net.sf.orcc.df.DfPackage#getProcess_IncomingPortMap()
-	 * @model dataType="net.sf.orcc.df.Map<net.sf.orcc.df.Port, net.sf.orcc.df.Connection>"
+	 * @model dataType="net.sf.orcc.df.Map<net.sf.orcc.df.Port, net.sf.orcc.df.Connection>" changeable="false"
 	 * @generated
 	 */
 	Map<Port, Connection> getIncomingPortMap();
@@ -119,9 +118,8 @@ public interface Process extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Outgoing Port Map</em>' attribute.
-	 * @see #setOutgoingPortMap(Map)
 	 * @see net.sf.orcc.df.DfPackage#getProcess_OutgoingPortMap()
-	 * @model dataType="net.sf.orcc.df.Map<net.sf.orcc.df.Port, net.sf.orcc.df.List<net.sf.orcc.df.Connection>>"
+	 * @model dataType="net.sf.orcc.df.Map<net.sf.orcc.df.Port, net.sf.orcc.df.List<net.sf.orcc.df.Connection>>" changeable="false"
 	 * @generated
 	 */
 	Map<Port, List<Connection>> getOutgoingPortMap();
@@ -143,16 +141,6 @@ public interface Process extends EObject {
 	EList<Port> getOutputs();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.df.Process#getIncomingPortMap <em>Incoming Port Map</em>}' attribute.
-	 * <!-- begin-user-doc --> <!--
-	 * end-user-doc -->
-	 * @param value the new value of the '<em>Incoming Port Map</em>' attribute.
-	 * @see #getIncomingPortMap()
-	 * @generated
-	 */
-	void setIncomingPortMap(Map<Port, Connection> value);
-
-	/**
 	 * Sets the value of the '{@link net.sf.orcc.df.Process#getName <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Name</em>' attribute.
@@ -160,15 +148,5 @@ public interface Process extends EObject {
 	 * @generated
 	 */
 	void setName(String value);
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.df.Process#getOutgoingPortMap <em>Outgoing Port Map</em>}' attribute.
-	 * <!-- begin-user-doc --> <!--
-	 * end-user-doc -->
-	 * @param value the new value of the '<em>Outgoing Port Map</em>' attribute.
-	 * @see #getOutgoingPortMap()
-	 * @generated
-	 */
-	void setOutgoingPortMap(Map<Port, List<Connection>> value);
 
 } // Process

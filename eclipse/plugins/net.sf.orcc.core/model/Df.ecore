@@ -26,16 +26,16 @@
         volatile="true" transient="true" derived="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Process">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="incomingPortMap">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="incomingPortMap" changeable="false">
       <eGenericType eClassifier="#//Map">
         <eTypeArguments eClassifier="#//Port"/>
         <eTypeArguments eClassifier="#//Connection"/>
       </eGenericType>
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EReference" name="inputs" upperBound="-1"
-        eType="#//Port"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="outgoingPortMap">
+        eType="#//Port" changeable="false" derived="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="outgoingPortMap" changeable="false">
       <eGenericType eClassifier="#//Map">
         <eTypeArguments eClassifier="#//Port"/>
         <eTypeArguments eClassifier="#//List">
@@ -44,7 +44,7 @@
       </eGenericType>
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EReference" name="outputs" upperBound="-1"
-        eType="#//Port"/>
+        eType="#//Port" changeable="false" derived="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Actor" eSuperTypes="../../net.sf.orcc.models/model/Util.ecore#//Attributable">
     <eStructuralFeatures xsi:type="ecore:EReference" name="actions" upperBound="-1"
