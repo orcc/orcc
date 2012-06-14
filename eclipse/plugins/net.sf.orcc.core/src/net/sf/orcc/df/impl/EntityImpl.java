@@ -39,6 +39,7 @@ import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Vertex;
 
@@ -231,6 +232,11 @@ public class EntityImpl extends EObjectImpl implements Entity {
 	 */
 	public String getName() {
 		return name;
+	}
+
+	@Override
+	public String getSimpleName() {
+		return DfUtil.getSimpleName(getName());
 	}
 
 	/**

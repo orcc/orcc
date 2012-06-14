@@ -247,6 +247,14 @@ public class InstanceImpl extends VertexImpl implements Instance {
 				return null;
 			}
 			return (T) new EntityImpl(this, inputs, outputs);
+		} else if (type == Actor.class) {
+			if (entity instanceof Actor) {
+				return (T) entity;
+			}
+		} else if (type == Network.class) {
+			if (entity instanceof Network) {
+				return (T) entity;
+			}
 		} else if (type.isAssignableFrom(getClass())) {
 			return (T) this;
 		}

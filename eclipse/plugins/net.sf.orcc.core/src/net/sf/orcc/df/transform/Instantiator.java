@@ -47,7 +47,6 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.Attribute;
 
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 
 /**
@@ -104,13 +103,19 @@ public class Instantiator extends DfSwitch<Void> {
 	@Override
 	public Void caseNetwork(Network network) {
 		// copy instances to entities/instances
-		List<Instance> instances = new ArrayList<Instance>(
-				network.getInstances());
-		for (Instance instance : instances) {
-			EObject entity = instance.getEntity();
+		List<Vertex> entities = new ArrayList<Vertex>(network.getEntities());
+		for (Vertex vertex : entities) {
+			Instance instance = vertex.getAdapter(Instance.class);
+			if (instance == null) {
+				// cannot instantiate anything else than an instance
+				continue;
+			}
 
-			if (entity instanceof Actor) {
-				Actor actor = (Actor) entity;
+			Actor actor = instance.getAdapter(Actor.class);
+			if (actor == null) {
+				// instance of a network
+				instantiateNetwork(network, instance);
+			} else {
 				if (duplicateActors) {
 					if (listActors.contains(actor)) {
 						Actor newActor = duplicateActor(instance);
@@ -128,9 +133,6 @@ public class Instantiator extends DfSwitch<Void> {
 						attribute.setValue(argument.getValue());
 					}
 				}
-
-			} else if (entity instanceof Network) {
-				instantiateNetwork(network, instance);
 			}
 		}
 

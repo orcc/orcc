@@ -104,17 +104,7 @@ public interface Entity extends EObject {
 	 * @generated
 	 */
 	String getName();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.df.Entity#getName <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Name</em>' attribute.
-	 * @see #getName()
-	 * @generated
-	 */
-	void setName(String value);
-
+	
 	/**
 	 * Returns the value of the '<em><b>Outgoing Port Map</b></em>' attribute.
 	 * <!-- begin-user-doc -->
@@ -145,5 +135,23 @@ public interface Entity extends EObject {
 	 * @generated
 	 */
 	EList<Port> getOutputs();
+
+	/**
+	 * Returns the last component of the qualified name returned by
+	 * {@link #getName()}.
+	 * 
+	 * @return an unqualified name
+	 */
+	String getSimpleName();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.df.Entity#getName <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Name</em>' attribute.
+	 * @see #getName()
+	 * @generated
+	 */
+	void setName(String value);
 
 } // Entity

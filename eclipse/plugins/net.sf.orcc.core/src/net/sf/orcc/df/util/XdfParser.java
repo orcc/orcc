@@ -673,14 +673,14 @@ public class XdfParser {
 
 			return port;
 		} else {
-			Instance instance = network.getInstance(vertexName);
-			if (instance == null) {
+			Vertex vertex = network.getEntity(vertexName);
+			if (vertex == null) {
 				throw new OrccRuntimeException(
 						"An Connection element has an invalid"
 								+ " \"src-port\" " + "attribute");
 			}
 
-			return instance;
+			return vertex;
 		}
 	}
 

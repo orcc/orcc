@@ -33,7 +33,7 @@ import java.util.List;
 
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
-import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfSwitch;
@@ -65,25 +65,27 @@ public class NetworkFlattener extends DfSwitch<Void> {
 	public Void caseNetwork(Network network) {
 		List<Vertex> entities = new ArrayList<Vertex>(network.getEntities());
 		for (Vertex entity : entities) {
-			if (entity instanceof Network) {
-				Network subNetwork = (Network) entity;
-
-				// flatten this sub-network
-				new NetworkFlattener().doSwitch(subNetwork);
-
-				moveEntitiesAndConnections(network, subNetwork);
-				propagateVariables(subNetwork.getParameters());
-				propagateVariables(subNetwork.getVariables());
-
-				linkOutgoingConnections(network, subNetwork);
-				linkIncomingConnections(network, subNetwork);
-
-				// remove entity from network
-				network.removeEntity(entity);
-
-				// remove connections to clean up incoming/outgoing of instances
-				subNetwork.removeEdges(subNetwork.getConnections());
+			Network subNetwork = entity.getAdapter(Network.class);
+			if (subNetwork == null) {
+				// cannot flatten anything else than a network
+				continue;
 			}
+
+			// flatten this sub-network
+			new NetworkFlattener().doSwitch(subNetwork);
+
+			moveEntitiesAndConnections(network, subNetwork);
+			propagateVariables(subNetwork.getParameters());
+			propagateVariables(subNetwork.getVariables());
+
+			linkOutgoingConnections(network, subNetwork);
+			linkIncomingConnections(network, subNetwork);
+
+			// remove entity from network
+			network.removeEntity(entity);
+
+			// remove connections to clean up incoming/outgoing of instances
+			subNetwork.removeEdges(subNetwork.getConnections());
 		}
 
 		return null;
@@ -145,23 +147,17 @@ public class NetworkFlattener extends DfSwitch<Void> {
 
 	private void moveEntitiesAndConnections(Network network, Network subNetwork) {
 		// Rename subNetwork entities
-		for (Vertex entity : subNetwork.getEntities()) {
-			entity.setLabel(subNetwork.getSimpleName() + "_"
-					+ ((Network) entity).getSimpleName());
-		}
-		for (Instance instance : subNetwork.getInstances()) {
-			instance.setName(subNetwork.getSimpleName() + "_"
-					+ instance.getSimpleName());
+		for (Vertex vertex : subNetwork.getEntities()) {
+			Entity entity = vertex.getAdapter(Entity.class);
+			vertex.setLabel(subNetwork.getSimpleName() + "_"
+					+ entity.getSimpleName());
 		}
 
 		// move entities/instances and vertices in this network
 		network.getEntities().addAll(subNetwork.getEntities());
-		network.getInstances().addAll(subNetwork.getInstances());
-		List<Vertex> vertices = new ArrayList<Vertex>(subNetwork.getVertices());
+		List<Vertex> vertices = new ArrayList<Vertex>(subNetwork.getEntities());
 		for (Vertex vertex : vertices) {
-			if (!(vertex instanceof Port)) {
-				network.getVertices().add(vertex);
-			}
+			network.getVertices().add(vertex);
 		}
 
 		// move connections between entities in this network

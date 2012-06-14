@@ -198,10 +198,6 @@ public class DfVisitor<T> extends DfSwitch<T> {
 			doSwitch(port);
 		}
 
-		for (Instance instance : network.getInstances()) {
-			doSwitch(instance);
-		}
-
 		for (Vertex entity : network.getEntities()) {
 			doSwitch(entity);
 		}

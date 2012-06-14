@@ -32,6 +32,7 @@ import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.util.DfSwitch;
+import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
 import net.sf.orcc.ir.util.ValueUtil;
@@ -49,7 +50,8 @@ public class ArgumentEvaluator extends DfSwitch<Void> {
 	public Void caseInstance(Instance instance) {
 		for (Argument argument : instance.getArguments()) {
 			Var var = argument.getVariable();
-			Object value = new ExpressionEvaluator().doSwitch(argument.getValue());
+			Object value = new ExpressionEvaluator().doSwitch(argument
+					.getValue());
 			var.setValue(new ExpressionEvaluator().doSwitch(argument.getValue()));
 			argument.setValue(ValueUtil.getExpression(value));
 		}
@@ -65,8 +67,8 @@ public class ArgumentEvaluator extends DfSwitch<Void> {
 					.getInitialValue()));
 		}
 
-		for (Instance instance : network.getInstances()) {
-			doSwitch(instance);
+		for (Vertex vertex : network.getEntities()) {
+			doSwitch(vertex);
 		}
 		return null;
 	}
