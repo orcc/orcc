@@ -36,6 +36,7 @@ import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
 
+import net.sf.orcc.util.Adaptable;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.EList;
 
@@ -63,7 +64,7 @@ import org.eclipse.emf.common.util.EList;
  * @model
  * @generated
  */
-public interface Network extends Graph {
+public interface Network extends Graph, Adaptable {
 
 	/**
 	 * Adds the given port to this network. The port is added to the vertices

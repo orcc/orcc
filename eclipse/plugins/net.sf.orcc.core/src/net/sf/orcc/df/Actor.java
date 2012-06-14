@@ -33,6 +33,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
 
+import net.sf.orcc.util.Adaptable;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.EList;
 
@@ -66,7 +67,7 @@ import org.eclipse.emf.common.util.EList;
  * @model
  * @generated
  */
-public interface Actor extends Vertex {
+public interface Actor extends Vertex, Adaptable {
 
 	/**
 	 * Returns the value of the '<em><b>Actions</b></em>' containment reference list.
@@ -91,17 +92,6 @@ public interface Actor extends Vertex {
 	 * @generated
 	 */
 	EList<Action> getActionsOutsideFsm();
-
-	/**
-	 * If possible, adapts this object to the given type: creates a new instance
-	 * of the given class, and returns it. If it is not possible to adapt this
-	 * object to the requested type, this method returns <code>null</code>.
-	 * 
-	 * @param type
-	 *            type of the class to which this object should be adapted
-	 * @return an instance of the given type, or <code>null</code>
-	 */
-	<T> T getAdapter(Class<T> type);
 
 	/**
 	 * Returns the file this actor is defined in.

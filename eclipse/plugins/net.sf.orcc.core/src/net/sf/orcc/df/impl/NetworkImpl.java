@@ -41,6 +41,7 @@ import java.util.Set;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -443,6 +444,15 @@ public class NetworkImpl extends GraphImpl implements Network {
 			return;
 		}
 		super.eUnset(featureID);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T> T getAdapter(Class<T> type) {
+		if (type == Entity.class) {
+			return (T) new EntityImpl(this, getInputs(), getOutputs());
+		}
+		return null;
 	}
 
 	/**

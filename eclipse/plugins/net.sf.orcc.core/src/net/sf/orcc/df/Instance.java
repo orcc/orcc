@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.util.Adaptable;
 import net.sf.orcc.moc.MoC;
 
 import org.eclipse.emf.common.util.EList;
@@ -54,7 +55,7 @@ import org.eclipse.emf.ecore.EObject;
  * @model
  * @generated
  */
-public interface Instance extends Vertex {
+public interface Instance extends Vertex, Adaptable {
 
 	/**
 	 * Returns the actor referenced by this instance.

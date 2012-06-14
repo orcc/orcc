@@ -39,6 +39,7 @@ import net.sf.orcc.df.Argument;
 import net.sf.orcc.df.Broadcast;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfPackage;
+import net.sf.orcc.df.Entity;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
@@ -228,6 +229,26 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	@Override
 	public Actor getActor() {
 		return (Actor) getEntity();
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T> T getAdapter(Class<T> type) {
+		if (type == Entity.class) {
+			EList<Port> inputs, outputs;
+			if (entity instanceof Actor) {
+				inputs = ((Actor) entity).getInputs();
+				outputs = ((Actor) entity).getOutputs();
+			} else if (entity instanceof Network) {
+				inputs = ((Network) entity).getInputs();
+				outputs = ((Network) entity).getOutputs();
+			} else {
+				// cannot adapt instances of other objects to Entity
+				return null;
+			}
+			return (T) new EntityImpl(this, inputs, outputs);
+		}
+		return null;
 	}
 
 	/**
