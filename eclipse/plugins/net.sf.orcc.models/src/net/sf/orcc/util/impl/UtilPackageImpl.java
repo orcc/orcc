@@ -4,6 +4,7 @@ package net.sf.orcc.util.impl;
 
 import net.sf.orcc.graph.GraphPackage;
 import net.sf.orcc.graph.impl.GraphPackageImpl;
+import net.sf.orcc.util.Adaptable;
 import net.sf.orcc.util.Attributable;
 import net.sf.orcc.util.Attribute;
 import net.sf.orcc.util.UtilFactory;
@@ -11,8 +12,11 @@ import net.sf.orcc.util.UtilPackage;
 
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EGenericType;
+import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
+import org.eclipse.emf.ecore.ETypeParameter;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.impl.EPackageImpl;
 
@@ -36,6 +40,13 @@ public class UtilPackageImpl extends EPackageImpl implements UtilPackage {
 	 * @generated
 	 */
 	private EClass attributableEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass adaptableEClass = null;
 
 	/**
 	 * Creates an instance of the model <b>Package</b>, registered with
@@ -179,6 +190,15 @@ public class UtilPackageImpl extends EPackageImpl implements UtilPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EClass getAdaptable() {
+		return adaptableEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public UtilFactory getUtilFactory() {
 		return (UtilFactory) getEFactoryInstance();
 	}
@@ -211,6 +231,8 @@ public class UtilPackageImpl extends EPackageImpl implements UtilPackage {
 
 		attributableEClass = createEClass(ATTRIBUTABLE);
 		createEReference(attributableEClass, ATTRIBUTABLE__ATTRIBUTES);
+
+		adaptableEClass = createEClass(ADAPTABLE);
 	}
 
 	/**
@@ -275,6 +297,19 @@ public class UtilPackageImpl extends EPackageImpl implements UtilPackage {
 				"attributes", null, 0, -1, Attributable.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(adaptableEClass, Adaptable.class, "Adaptable", IS_ABSTRACT,
+				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+
+		EOperation op = addEOperation(adaptableEClass, null, "getAdapter", 0,
+				1, IS_UNIQUE, IS_ORDERED);
+		ETypeParameter t1 = addETypeParameter(op, "T");
+		EGenericType g1 = createEGenericType(ecorePackage.getEJavaClass());
+		EGenericType g2 = createEGenericType(t1);
+		g1.getETypeArguments().add(g2);
+		addEParameter(op, g1, "type", 0, 1, IS_UNIQUE, IS_ORDERED);
+		g1 = createEGenericType(t1);
+		initEOperation(op, g1);
 
 		// Create resource
 		createResource(eNS_URI);

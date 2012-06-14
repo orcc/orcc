@@ -2,6 +2,7 @@
  */
 package net.sf.orcc.util.util;
 
+import net.sf.orcc.util.Adaptable;
 import net.sf.orcc.util.Attributable;
 import net.sf.orcc.util.Attribute;
 import net.sf.orcc.util.UtilPackage;
@@ -81,6 +82,13 @@ public class UtilSwitch<T> extends Switch<T> {
 				result = defaultCase(theEObject);
 			return result;
 		}
+		case UtilPackage.ADAPTABLE: {
+			Adaptable adaptable = (Adaptable) theEObject;
+			T result = caseAdaptable(adaptable);
+			if (result == null)
+				result = defaultCase(theEObject);
+			return result;
+		}
 		default:
 			return defaultCase(theEObject);
 		}
@@ -113,6 +121,21 @@ public class UtilSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseAttributable(Attributable object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Adaptable</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Adaptable</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseAdaptable(Adaptable object) {
 		return null;
 	}
 

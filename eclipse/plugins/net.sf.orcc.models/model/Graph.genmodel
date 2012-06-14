@@ -34,5 +34,11 @@
     <genClasses ecoreClass="Util.ecore#//Attributable">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Util.ecore#//Attributable/attributes"/>
     </genClasses>
+    <genClasses ecoreClass="Util.ecore#//Adaptable">
+      <genOperations ecoreOperation="Util.ecore#//Adaptable/getAdapter">
+        <genParameters ecoreParameter="Util.ecore#//Adaptable/getAdapter/type"/>
+        <genTypeParameters ecoreTypeParameter="Util.ecore#//Adaptable/getAdapter/T"/>
+      </genOperations>
+    </genClasses>
   </genPackages>
 </genmodel:GenModel>

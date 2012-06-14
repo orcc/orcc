@@ -139,6 +139,25 @@ public interface UtilPackage extends EPackage {
 	int ATTRIBUTABLE_FEATURE_COUNT = 1;
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.util.impl.AdaptableImpl <em>Adaptable</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.util.impl.AdaptableImpl
+	 * @see net.sf.orcc.util.impl.UtilPackageImpl#getAdaptable()
+	 * @generated
+	 */
+	int ADAPTABLE = 2;
+
+	/**
+	 * The number of structural features of the '<em>Adaptable</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ADAPTABLE_FEATURE_COUNT = 0;
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.util.Attribute <em>Attribute</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -212,6 +231,16 @@ public interface UtilPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getAttributable_Attributes();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.util.Adaptable <em>Adaptable</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Adaptable</em>'.
+	 * @see net.sf.orcc.util.Adaptable
+	 * @generated
+	 */
+	EClass getAdaptable();
 
 	/**
 	 * Returns the factory that creates the instances of the model.
@@ -297,6 +326,16 @@ public interface UtilPackage extends EPackage {
 		 */
 		EReference ATTRIBUTABLE__ATTRIBUTES = eINSTANCE
 				.getAttributable_Attributes();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.util.impl.AdaptableImpl <em>Adaptable</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.util.impl.AdaptableImpl
+		 * @see net.sf.orcc.util.impl.UtilPackageImpl#getAdaptable()
+		 * @generated
+		 */
+		EClass ADAPTABLE = eINSTANCE.getAdaptable();
 
 	}
 
